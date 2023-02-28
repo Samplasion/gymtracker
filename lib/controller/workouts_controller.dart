@@ -6,6 +6,7 @@ import '../model/exercise.dart';
 import '../model/set.dart';
 import '../model/workout.dart';
 import '../utils/go.dart';
+import '../utils/utils.dart' as utils;
 import '../view/exercises.dart';
 import '../view/workout.dart';
 import 'countdown_controller.dart';
@@ -97,5 +98,11 @@ class WorkoutsController extends GetxController with ServiceableController {
 
   void removeCountdown() {
     Get.find<CountdownController>().removeCountdown();
+  }
+
+  void reorder(int oldIndex, int newIndex) {
+    final list = service.routines;
+    utils.reorder(list, oldIndex, newIndex);
+    service.routines = list;
   }
 }

@@ -1,5 +1,8 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:gymtracker/utils/utils.dart';
 
 import '../controller/workouts_controller.dart';
 import '../model/workout.dart';
@@ -34,33 +37,59 @@ class _RoutinesViewState extends State<RoutinesView> {
         title: Text("routines.title".tr),
       ),
       body: Obx(() {
-        return ListView(
-          children: [
-            ListTile(
-              title: Text("routines.quickWorkout.title".tr),
-              subtitle: Text("routines.quickWorkout.subtitle".tr),
-              leading: const CircleAvatar(child: Icon(Icons.timer_rounded)),
-              onTap: () {
-                controller.startRoutine(context, emptyWorkout);
-              },
-            ),
-            for (final workout in controller.workouts) ...[
-              ListTile(
-                leading: CircleAvatar(
-                  backgroundColor:
-                      Theme.of(context).colorScheme.secondaryContainer,
-                  foregroundColor:
-                      Theme.of(context).colorScheme.onSecondaryContainer,
-                  child: Text(workout.name.characters.first.toUpperCase()),
-                ),
-                title: Text(workout.name),
-                subtitle:
-                    Text("general.exercises".plural(workout.exercises.length)),
+        return CustomScrollView(
+          slivers: [
+            SliverToBoxAdapter(
+              child: ListTile(
+                title: Text("routines.quickWorkout.title".tr),
+                subtitle: Text("routines.quickWorkout.subtitle".tr),
+                leading: const CircleAvatar(child: Icon(Icons.timer_rounded)),
                 onTap: () {
-                  Go.to(() => ExercisesView(workout: workout));
+                  controller.startRoutine(context, emptyWorkout);
                 },
               ),
-            ],
+            ),
+            SliverReorderableList(
+              itemBuilder: (context, index) {
+                final workout = controller.workouts[index];
+                return Material(
+                  type: MaterialType.transparency,
+                  key: ValueKey(workout.id),
+                  child: ListTile(
+                    leading: CircleAvatar(
+                      backgroundColor:
+                          Theme.of(context).colorScheme.secondaryContainer,
+                      foregroundColor:
+                          Theme.of(context).colorScheme.onSecondaryContainer,
+                      child: Text(workout.name.characters.first.toUpperCase()),
+                    ),
+                    trailing: () {
+                      if (Platform.isAndroid || Platform.isIOS) {
+                        return ReorderableDelayedDragStartListener(
+                          index: index,
+                          child: const Icon(Icons.drag_handle),
+                        );
+                      } else {
+                        return ReorderableDragStartListener(
+                          index: index,
+                          child: const Icon(Icons.drag_handle),
+                        );
+                      }
+                    }(),
+                    title: Text(workout.name),
+                    subtitle: Text(
+                        "general.exercises".plural(workout.exercises.length)),
+                    onTap: () {
+                      Go.to(() => ExercisesView(workout: workout));
+                    },
+                  ),
+                );
+              },
+              itemCount: controller.workouts.length,
+              onReorder: (oldIndex, newIndex) {
+                controller.reorder(oldIndex, newIndex);
+              },
+            ),
           ],
         );
       }),

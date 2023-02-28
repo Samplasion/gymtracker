@@ -1,0 +1,207 @@
+appName: GymTracker
+
+set:
+  kind: Set kind
+  kindShort:
+    warmUp: W
+    drop: D
+  kindLong:
+    normal: Normal set
+    warmUp: Warm-up set
+    drop: Drop set
+
+exercise:
+  fields:
+    restTime: Rest time
+    weight: Weight
+    time: Time
+    reps: Reps
+    distance: Distance
+  actions:
+    addSet: + Add Set
+  editor:
+    create:
+      title: Create new exercise
+    edit:
+      title: Edit exercise
+    fields:
+      title:
+        label: Exercise name
+        errors:
+          empty: The name must not be empty.
+          invalid: An exercise with this name already exists.
+      parameters:
+        label: Parameters
+        values:
+          repsWeight: Weight & reps
+          timeWeight: Weight & time
+          time: Time
+          freeBodyReps: Reps
+          distance: Distance
+        errors:
+          empty: Select the parameters of this exercise
+      primaryMuscleGroup:
+        label: Primary muscle group
+        errors:
+          empty: You must select a muscle group.
+      secondaryMuscleGroups: 
+        label: Other muscle groups
+  picker:
+    title: Select exercises
+    errors:
+      empty: You must select an exercise.
+
+workouts:
+  untitled: Untitled workout
+  title: Workouts
+  actions:
+    delete: Delete workout
+    start: Redo this workout
+  
+routines:
+  title: Routines
+  quickWorkout:
+    title: Quick workout
+    subtitle: Quickly start an empty workout
+  actions:
+    delete: Delete routine
+    edit: Edit routine
+    start: Start routine
+    create: Create new routine
+  editor:
+    exercises:
+      title: Exercises
+      add: Add exercises
+    fields:
+      name:
+        label: Routine name
+        errors:
+          empty: The name must not be empty.
+
+history:
+  title: History
+  andMore:
+    one: "...and one more exercise"
+    two: "...and %s more exercises"
+    few: "...and %s more exercises"
+    many: "...and %s more exercises"
+    other: "...and %s more exercises"
+
+settings:
+  title: Settings
+  options:
+    useDynamicColor:
+      label: Use dynamic color
+    locale:
+      label: App language
+
+ongoingWorkout:
+  title: Ongoing workout
+  actions:
+    finish: Finish workout
+    cancel: Cancel workout
+  exercises:
+    add: + Add exercise
+    replace: Replace exercises
+    reorder: Reorder exercises
+    remove: Remove exercise
+  info:
+    time: Time
+    reps: Reps
+    volume: Lifted weight
+  finish:
+    title: Finish workout
+    fields:
+      name:
+        label: Workout name
+        errors:
+          empty: The name must not be empty.
+      startingTime:
+        label: Starting time
+      duration:
+        label: Duration
+        errors:
+          empty: The duration must not be zero.
+  cancel:
+    title: Cancel workout?
+    text: You won't be able to undo this later if you change your mind.
+    actions:
+      no: Don't cancel
+      yes: Cancel workout
+  overwrite:
+    title: Start workout?
+    text: Your current workout will be overwritten.
+    actions:
+      no: Cancel
+      yes: Start
+
+timer: 
+  add15s: "+15s"
+  subtract15s: "-15s"
+  skip: Skip
+
+exerciseList:
+  restTime: "Rest time: "
+  fields:
+    weight: "@weight @unit"
+    time: "@time"
+    reps:
+      zero: "0 reps"
+      one: "%s rep"
+      two: "%s reps"
+      few: "%s reps"
+      many: "%s reps"
+      other: "%s reps"
+    distance: "@distance @unit"
+
+general:
+  exercises:
+    zero: "No exercises"
+    one: "%s exercise"
+    two: "%s exercises"
+    few: "%s exercises"
+    many: "%s exercises"
+    other: "%s exercises"
+
+muscleGroups:
+  abductors: Abductors
+  abs: Abs
+  adductors: Adductors
+  biceps: Biceps
+  calves: Calves
+  chest: Chest
+  forearm: Forearm
+  glutes: Glutes
+  hamstrings: Hamstrings
+  lats: Lats
+  lowerBack: Lower back
+  none: None
+  other: Other
+  quadriceps: Quadriceps
+  shoulders: Shoulders
+  traps: Traps
+  triceps: Triceps
+  upperBack: Upper back
+
+actions:
+  create: Create
+  remove: Remove
+
+units:
+  kg: kg
+  lbs: lbs
+  km: km
+  mi: mi
+
+time:
+  hours:
+    zero: "@minutes:@seconds"
+    one: "@hours hour, @minutes:@seconds"
+    two: "@hours hours, @minutes:@seconds"
+    few: "@hours hours, @minutes:@seconds"
+    many: "@hours hours, @minutes:@seconds"
+    other: "@hours hours, @minutes:@seconds"
+
+locales:
+  en: English
+  it: Italian

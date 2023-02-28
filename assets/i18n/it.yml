@@ -1,0 +1,207 @@
+appName: GymTracker
+
+set:
+  kind: Tipo serie
+  kindShort:
+    warmUp: R
+    drop: D
+  kindLong:
+    normal: Serie normale
+    warmUp: Riscaldamento
+    drop: Drop set
+
+exercise:
+  fields:
+    restTime: Riposo
+    weight: Peso
+    time: Tempo
+    reps: Ripetizioni
+    distance: Distanza
+  actions:
+    addSet: + Aggiungi serie
+  editor:
+    create:
+      title: Crea esercizio
+    edit:
+      title: Modifica esercizio
+    fields:
+      title:
+        label: Nome esercizio
+        errors:
+          empty: Il nome non dev'essere vuoto.
+          invalid: Un esercizio con questo nome esiste già.
+      parameters:
+        label: Parametri
+        values:
+          repsWeight: Peso e ripetizioni
+          timeWeight: Peso e tempo
+          time: Tempo
+          freeBodyReps: Ripetizioni
+          distance: Distanza
+        errors:
+          empty: Seleziona i parametri di questo esercizio
+      primaryMuscleGroup:
+        label: Gruppo muscolare primario
+        errors:
+          empty: Devi selezionare un gruppo muscolare.
+      secondaryMuscleGroups: 
+        label: Gruppi muscolari secondari
+  picker:
+    title: Seleziona esercizi
+    errors:
+      empty: Devi selezionare un esercizio.
+
+workouts:
+  untitled: Allenamento senza nome
+  title: Allenamenti
+  actions:
+    delete: Elimina allenamento
+    start: Ripeti allenamento
+  
+routines:
+  title: Routine
+  quickWorkout:
+    title: Allenamento rapido
+    subtitle: Avvia rapidamente un allenamento vuoto
+  actions:
+    delete: Elimina routine
+    edit: Modifica routine
+    start: Avvia routine
+    create: Crea routine
+  editor:
+    exercises:
+      title: Esercizi
+      add: Aggiungi esercizi
+    fields:
+      name:
+        label: Nome della routine
+        errors:
+          empty: Il nome non dev'essere vuoto.
+
+history:
+  title: Cronologia
+  andMore:
+    one: "...e un altro"
+    two: "...e altri %s"
+    few: "...e altri %s"
+    many: "...e altri %s"
+    other: "...e altri %s"
+
+settings:
+  title: Impostazioni
+  options:
+    useDynamicColor:
+      label: Usa colore dinamico
+    locale:
+      label: Lingua dell'applicazione
+
+ongoingWorkout:
+  title: Allenamento in corso
+  actions:
+    finish: Termina allenamento
+    cancel: Scarta allenamento
+  exercises:
+    add: + Aggiungi esercizio
+    replace: Cambia esercizio
+    reorder: Riordina esercizi
+    remove: Rimuovi esercizio
+  info:
+    time: Tempo
+    reps: Ripetizioni
+    volume: Volume sollevato
+  finish:
+    title: Termina allenamento
+    fields:
+      name:
+        label: Nome allenamento
+        errors:
+          empty: Il nome non dev'essere vuoto.
+      startingTime:
+        label: Data di avvio
+      duration:
+        label: Durata
+        errors:
+          empty: La durata non dev'essere zero.
+  cancel:
+    title: Scartare l'allenamento?
+    text: Non potrai annullare quest'azione se cambi idea.
+    actions:
+      no: Annulla
+      yes: Scarta
+  overwrite:
+    title: Avviare l'allenamento?
+    text: L'allenamento in corso sarà sovrascritto.
+    actions:
+      no: Annulla
+      yes: Avvia
+
+timer: 
+  add15s: "+15s"
+  subtract15s: "-15s"
+  skip: Salta
+
+exerciseList:
+  restTime: "Riposo: "
+  fields:
+    weight: "@weight @unit"
+    time: "@time"
+    reps:
+      zero: "0 rip."
+      one: "%s rip."
+      two: "%s rip."
+      few: "%s rip."
+      many: "%s di rip."
+      other: "%s rip."
+    distance: "@distance @unit"
+
+general:
+  exercises:
+    zero: "Nessun esercizio"
+    one: "%s esercizio"
+    two: "%s esercizi"
+    few: "%s esercizi"
+    many: "%s di esercizi"
+    other: "%s esercizi"
+
+muscleGroups:
+  abductors: Abduttori
+  abs: Addominali
+  adductors: Adductori
+  biceps: Bicipiti
+  calves: Polpacci
+  chest: Petto
+  forearm: Avambraccio
+  glutes: Glutei
+  hamstrings: Tendini del ginocchio
+  lats: Lat
+  lowerBack: Schiena bassa
+  none: Nessuo
+  other: Altro
+  quadriceps: Quadricipiti
+  shoulders: Spalle
+  traps: Trapezoidi
+  triceps: Tricipidi
+  upperBack: Schiena alta
+
+actions:
+  create: Create
+  remove: Remove
+
+units:
+  kg: kg
+  lbs: lbs
+  km: km
+  mi: mi
+
+time:
+  hours:
+    zero: "@minutes:@seconds"
+    one: "@hours ora, @minutes:@seconds"
+    two: "@hours ore, @minutes:@seconds"
+    few: "@hours ore, @minutes:@seconds"
+    many: "@hours di ore, @minutes:@seconds"
+    other: "@hours ore, @minutes:@seconds"
+
+locales:
+  en: Inglese
+  it: Italiano

@@ -184,8 +184,8 @@ muscleGroups:
   upperBack: Schiena alta
 
 actions:
-  create: Create
-  remove: Remove
+  create: Crea
+  remove: Rimuovi
 
 units:
   kg: kg

@@ -81,6 +81,7 @@ class _TimeInputFieldState extends State<TimeInputField> {
     } else {
       _startTimer();
     }
+    FocusManager.instance.primaryFocus?.unfocus();
   }
 
   @override

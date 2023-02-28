@@ -391,6 +391,7 @@ class _WorkoutExerciseSetEditorState extends State<WorkoutExerciseSetEditor> {
                     ),
                     onUpdate: (isDone) {
                       widget.onSetSetDone(isDone ?? widget.set.done);
+                      FocusManager.instance.primaryFocus?.unfocus();
                     },
                   ),
                   const SizedBox(width: 8),

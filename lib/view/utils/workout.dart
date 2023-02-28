@@ -7,6 +7,7 @@ import 'package:get/get.dart';
 
 import '../../model/exercise.dart';
 import '../../model/set.dart';
+import '../../utils/extensions.dart';
 import '../../utils/sets.dart';
 import '../../utils/utils.dart';
 import 'exercise.dart';
@@ -208,7 +209,7 @@ class _WorkoutExerciseSetEditorState extends State<WorkoutExerciseSetEditor> {
           if (value.isEmpty) {
             widget.set.weight = null;
           } else {
-            widget.set.weight = double.tryParse(value);
+            widget.set.weight = value.tryParseDouble();
           }
         },
       );

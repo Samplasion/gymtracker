@@ -273,6 +273,9 @@ class WorkoutInfoBar extends StatelessWidget {
                       curve: Curves.decelerate,
                       duration: const Duration(milliseconds: 400),
                       builder: (context, value, _) {
+                        if (doubleIsActuallyInt(controller.liftedWeight)) {
+                          return Text("${value.round()}");
+                        }
                         return Text(stringifyDouble(value));
                       },
                     ),

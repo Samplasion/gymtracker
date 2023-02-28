@@ -8,6 +8,7 @@ import '../controller/workouts_controller.dart';
 import '../model/exercise.dart';
 import '../model/set.dart';
 import '../model/workout.dart';
+import '../service/localizations.dart';
 import '../utils/go.dart';
 import '../utils/sets.dart';
 import '../utils/utils.dart';
@@ -216,8 +217,7 @@ class ExerciseSetView extends StatelessWidget {
           })),
         if ([SetParameters.repsWeight, SetParameters.freeBodyReps]
             .contains(set.parameters))
-          Text("exerciseList.fields.reps_singular".trPlural(
-              "exerciseList.fields.reps_plural", set.reps, ["${set.reps}"])),
+          Text("exerciseList.fields.reps".plural(set.reps ?? 0)),
         if ([SetParameters.distance].contains(set.parameters))
           Text("exerciseList.fields.distance".trParams({
             "distance": stringifyDouble(set.distance!),

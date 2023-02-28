@@ -53,7 +53,8 @@ class _DateFieldState extends State<DateField> {
       // ignore: use_build_context_synchronously
       TimeOfDay? time = await showTimePicker(
         context: context,
-        initialTime: const TimeOfDay(hour: 0, minute: 0),
+        initialTime:
+            TimeOfDay(hour: widget.date.hour, minute: widget.date.minute),
       );
 
       if (time != null) {

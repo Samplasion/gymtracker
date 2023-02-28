@@ -17,16 +17,24 @@ class HistoryView extends StatelessWidget {
   Widget build(BuildContext context) {
     final controller = Get.put(HistoryController());
     return Scaffold(
-      appBar: AppBar(title: Text("history.title".tr)),
       body: Obx(
-        () => ListView(
-          children: ListTile.divideTiles(
-            tiles: [
-              for (final workout in controller.history.reversed)
-                HistoryWorkout(workout: workout),
-            ],
-            context: context,
-          ).toList(),
+        () => CustomScrollView(
+          slivers: [
+            SliverAppBar.large(
+              title: Text("history.title".tr),
+            ),
+            SliverList(
+              delegate: SliverChildListDelegate(
+                ListTile.divideTiles(
+                  tiles: [
+                    for (final workout in controller.history.reversed)
+                      HistoryWorkout(workout: workout),
+                  ],
+                  context: context,
+                ).toList(),
+              ),
+            ),
+          ],
         ),
       ),
     );

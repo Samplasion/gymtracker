@@ -33,12 +33,12 @@ class _RoutinesViewState extends State<RoutinesView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text("routines.title".tr),
-      ),
       body: Obx(() {
         return CustomScrollView(
           slivers: [
+            SliverAppBar.large(
+              title: Text("routines.title".tr),
+            ),
             SliverToBoxAdapter(
               child: ListTile(
                 title: Text("routines.quickWorkout.title".tr),

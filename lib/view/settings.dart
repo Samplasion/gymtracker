@@ -14,34 +14,38 @@ class SettingsView extends StatelessWidget {
     final currentLocale =
         (Get.locale ?? Get.deviceLocale ?? Get.fallbackLocale)!;
     return Scaffold(
-      appBar: AppBar(
-        title: Text("settings.title".tr),
-      ),
-      body: ListView(
-        children: [
-          ValueBuilder<bool?>(
-            initialValue: controller.usesDynamicColor.value,
-            builder: (value, onChanged) => SwitchListTile(
-              title: Text("settings.options.useDynamicColor.label".tr),
-              value: value ?? false,
-              onChanged: onChanged,
-            ),
-            onUpdate: (v) => controller.setUsesDynamicColor(v ?? false),
+      body: CustomScrollView(
+        slivers: [
+          SliverAppBar.large(
+            title: Text("settings.title".tr),
           ),
-          Obx(
-            () => ValueBuilder<Locale?>(
-              initialValue: controller.locale.value,
-              builder: (value, onChange) => RadioModalTile(
-                title: Text("settings.options.locale.label".tr),
-                onChange: onChange,
-                values: {
-                  for (final locale in GTLocalizations.supportedLocales)
-                    locale: "locales.${locale.languageCode}".tr,
-                },
-                selectedValue: value,
+          SliverList(
+            delegate: SliverChildListDelegate([
+              ValueBuilder<bool?>(
+                initialValue: controller.usesDynamicColor.value,
+                builder: (value, onChanged) => SwitchListTile(
+                  title: Text("settings.options.useDynamicColor.label".tr),
+                  value: value ?? false,
+                  onChanged: onChanged,
+                ),
+                onUpdate: (v) => controller.setUsesDynamicColor(v ?? false),
               ),
-              onUpdate: (v) => controller.setLocale(v ?? currentLocale),
-            ),
+              Obx(
+                () => ValueBuilder<Locale?>(
+                  initialValue: controller.locale.value,
+                  builder: (value, onChange) => RadioModalTile(
+                    title: Text("settings.options.locale.label".tr),
+                    onChange: onChange,
+                    values: {
+                      for (final locale in GTLocalizations.supportedLocales)
+                        locale: "locales.${locale.languageCode}".tr,
+                    },
+                    selectedValue: value,
+                  ),
+                  onUpdate: (v) => controller.setLocale(v ?? currentLocale),
+                ),
+              ),
+            ]),
           ),
         ],
       ),

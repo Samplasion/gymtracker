@@ -100,6 +100,9 @@ ongoingWorkout:
   actions:
     finish: Termina allenamento
     cancel: Scarta allenamento
+    short:
+      cancel: Annulla
+      resume: Riprendi
   exercises:
     add: + Aggiungi esercizio
     replace: Cambia esercizio

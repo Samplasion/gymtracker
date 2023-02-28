@@ -140,7 +140,7 @@ class OngoingWorkoutBar extends StatelessWidget {
                   icon: const Icon(Icons.play_arrow_rounded),
                   clipBehavior: Clip.hardEdge,
                   label: Text(
-                    "Resume".tr,
+                    "ongoingWorkout.actions.short.resume".tr,
                     overflow: TextOverflow.clip,
                     maxLines: 1,
                   ),
@@ -166,7 +166,7 @@ class OngoingWorkoutBar extends StatelessWidget {
                     ),
                     clipBehavior: Clip.hardEdge,
                     label: Text(
-                      "Cancel".tr,
+                      "ongoingWorkout.actions.short.cancel".tr,
                       style:
                           TextStyle(color: Theme.of(context).colorScheme.error),
                       overflow: TextOverflow.clip,

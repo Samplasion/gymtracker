@@ -44,6 +44,8 @@ class GTLocalizations extends Translations with ChangeNotifier {
   @override
   notifyListeners() {
     super.notifyListeners();
+    Get.delete<GTLocalizations>();
+    Get.put(this);
     printInfo(info: "notified listeners");
   }
 }

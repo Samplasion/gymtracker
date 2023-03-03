@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get/state_manager.dart';
+import 'package:uuid/uuid.dart';
 
+import '../controller/history_controller.dart';
 import '../model/exercise.dart';
 import '../model/set.dart';
 import '../model/workout.dart';
@@ -16,6 +18,12 @@ import 'workout_controller.dart';
 class WorkoutsController extends GetxController with ServiceableController {
   RxList<Workout> workouts = <Workout>[].obs;
   RxBool hasOngoingWorkout = false.obs;
+
+  @override
+  onInit() {
+    super.onInit();
+    Get.put(HistoryController());
+  }
 
   @override
   onServiceChange() {
@@ -35,7 +43,11 @@ class WorkoutsController extends GetxController with ServiceableController {
     Get.back();
   }
 
-  Future<void> startRoutine(BuildContext context, Workout workout) async {
+  Future<void> startRoutine(
+    BuildContext context,
+    Workout workout, {
+    bool isEmpty = false,
+  }) async {
     if (hasOngoingWorkout.isTrue) {
       final result = await showDialog<bool>(
         context: context,
@@ -46,7 +58,12 @@ class WorkoutsController extends GetxController with ServiceableController {
 
     removeCountdown();
 
-    Get.put(WorkoutController("workouts.untitled".tr));
+    String? workoutID = workout.isConcrete ? workout.parentID : workout.id;
+    if (isEmpty) {
+      workoutID = null;
+    }
+
+    Get.put(WorkoutController("workouts.untitled".tr, workoutID));
     // ignore: use_build_context_synchronously
     if (Navigator.of(context).canPop()) {
       Get.back();
@@ -58,11 +75,20 @@ class WorkoutsController extends GetxController with ServiceableController {
         ..name(clone.name)
         ..exercises([
           for (final ex in clone.exercises)
-            ex.copyWith.sets([
-              for (final set in ex.sets) set.copyWith.done(false),
-            ]),
+            ex.copyWith(
+              sets: ([
+                for (final set in ex.sets) set.copyWith.done(false),
+              ]),
+              // If we're redoing a previous workout,
+              // we want to inherit the previous parent ID,
+              // ie. the original routine's ID
+              parentID: workout.isConcrete ? ex.parentID : ex.id,
+              id: const Uuid().v4(),
+            ),
         ])
-        ..time(DateTime.now());
+        ..time(DateTime.now())
+        // Same goes for this
+        ..parentID(workoutID);
     });
   }
 
@@ -104,5 +130,13 @@ class WorkoutsController extends GetxController with ServiceableController {
     final list = service.routines;
     utils.reorder(list, oldIndex, newIndex);
     service.routines = list;
+  }
+
+  List<Workout> getChildren(Workout routine) {
+    final historyCont = Get.find<HistoryController>();
+    return [
+      for (final workout in historyCont.history)
+        if (workout.parentID == routine.id) workout
+    ];
   }
 }

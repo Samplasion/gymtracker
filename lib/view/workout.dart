@@ -19,7 +19,7 @@ import 'utils/time.dart';
 import 'utils/timer.dart';
 
 WorkoutController get controller =>
-    Get.put(WorkoutController("Untitled workout"));
+    Get.put(WorkoutController("Untitled workout", null));
 
 class WorkoutView extends StatefulWidget {
   const WorkoutView({super.key});
@@ -84,9 +84,9 @@ class _WorkoutViewState extends State<WorkoutView> {
       bottomNavigationBar: Obx(() {
         return Crossfade(
           firstChild: const SizedBox.shrink(),
-          secondChild: Column(
+          secondChild: const Column(
             mainAxisSize: MainAxisSize.min,
-            children: const [WorkoutTimerView()],
+            children: [WorkoutTimerView()],
           ),
           showSecond: countdownController.isActive,
         );
@@ -457,11 +457,8 @@ class _WorkoutFinishPageState extends State<WorkoutFinishPage> {
               const SizedBox(height: 8),
               TextFormField(
                 controller: titleController,
-                decoration: InputDecoration(
-                  isDense: true,
-                  border: const OutlineInputBorder(),
-                  labelText: "ongoingWorkout.finish.fields.name.label".tr,
-                ),
+                decoration:
+                    _decoration("ongoingWorkout.finish.fields.name.label".tr),
                 validator: (string) {
                   if (string == null || string.isEmpty) {
                     return "ongoingWorkout.finish.fields.name.errors.empty".tr;
@@ -470,24 +467,35 @@ class _WorkoutFinishPageState extends State<WorkoutFinishPage> {
                 },
               ),
               DateField(
-                decoration: InputDecoration(
-                  isDense: true,
-                  border: const OutlineInputBorder(),
-                  labelText:
-                      "ongoingWorkout.finish.fields.startingTime.label".tr,
-                ),
+                decoration: _decoration(
+                    "ongoingWorkout.finish.fields.startingTime.label".tr),
                 date: controller.time.value,
                 onSelect: (date) => setState(() => controller.time(date)),
                 firstDate: DateTime.fromMillisecondsSinceEpoch(0),
                 lastDate: DateTime.now().add(const Duration(days: 7)),
               ),
+              DropdownButtonFormField<String?>(
+                decoration:
+                    _decoration("ongoingWorkout.finish.fields.parent.label".tr),
+                items: [
+                  DropdownMenuItem(
+                    value: null,
+                    child: Text(
+                        "ongoingWorkout.finish.fields.parent.options.none".tr),
+                  ),
+                  for (final routine in Get.find<WorkoutsController>().workouts)
+                    DropdownMenuItem(
+                      value: routine.id,
+                      child: Text(routine.name),
+                    ),
+                ],
+                onChanged: (v) => setState(() => controller.parentID.value = v),
+                value: controller.parentID.value,
+              ),
               TimeInputField(
                 controller: timeController,
-                decoration: InputDecoration(
-                  isDense: true,
-                  border: const OutlineInputBorder(),
-                  labelText: "ongoingWorkout.finish.fields.duration.label".tr,
-                ),
+                decoration: _decoration(
+                    "ongoingWorkout.finish.fields.duration.label".tr),
                 validator: (duration) {
                   if (duration == null || duration.inSeconds == 0) {
                     return "ongoingWorkout.finish.fields.duration.errors.empty"
@@ -508,6 +516,14 @@ class _WorkoutFinishPageState extends State<WorkoutFinishPage> {
           ),
         ),
       ),
+    );
+  }
+
+  InputDecoration _decoration(String label) {
+    return InputDecoration(
+      isDense: true,
+      border: const OutlineInputBorder(),
+      labelText: label,
     );
   }
 

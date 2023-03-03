@@ -45,7 +45,7 @@ class _RoutinesViewState extends State<RoutinesView> {
                 subtitle: Text("routines.quickWorkout.subtitle".tr),
                 leading: const CircleAvatar(child: Icon(Icons.timer_rounded)),
                 onTap: () {
-                  controller.startRoutine(context, emptyWorkout);
+                  controller.startRoutine(context, emptyWorkout, isEmpty: true);
                 },
               ),
             ),

@@ -11,6 +11,11 @@ set:
     drop: Drop set
 
 exercise:
+  chart:
+    views:
+      volume: Volume
+      reps: Ripetizioni
+      duration: Durata allenamento
   fields:
     restTime: Riposo
     weight: Peso
@@ -121,6 +126,10 @@ ongoingWorkout:
           empty: Il nome non dev'essere vuoto.
       startingTime:
         label: Data di avvio
+      parent:
+        label: Salva come
+        options:
+          none: Nessuna routine
       duration:
         label: Durata
         errors:

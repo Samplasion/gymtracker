@@ -40,6 +40,10 @@ class Exercise {
   final Set<MuscleGroup> secondaryMuscleGroups;
   Duration restTime;
 
+  /// The ID of the non-concrete (ie. part of a routine) exercise
+  /// this concrete exercise should be categorized under.
+  String? parentID;
+
   Exercise({
     String? id,
     required this.name,
@@ -48,6 +52,7 @@ class Exercise {
     required this.primaryMuscleGroup,
     this.secondaryMuscleGroups = const <MuscleGroup>{},
     required this.restTime,
+    this.parentID,
   })  : id = id ?? const Uuid().v4(),
         assert(sets.isEmpty || parameters == sets[0].parameters,
             "The parameters must not change between the Exercise and its Sets"),

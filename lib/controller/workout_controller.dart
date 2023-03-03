@@ -13,14 +13,20 @@ import 'workouts_controller.dart';
 class WorkoutController extends GetxController {
   RxString name;
   Rx<DateTime> time;
+  Rx<String?> parentID;
 
-  WorkoutController(String name)
+  WorkoutController(String name, String? parentID)
       : name = name.obs,
-        time = DateTime.now().obs;
+        time = DateTime.now().obs,
+        parentID = Rx<String?>(parentID);
 
   RxList<Exercise> exercises = <Exercise>[].obs;
 
-  Workout generateWorkout() => Workout(name: name.value, exercises: exercises);
+  Workout generateWorkout(String parentID) => Workout(
+        name: name.value,
+        exercises: exercises,
+        parentID: parentID,
+      );
 
   List<ExSet> get allSets => [for (final ex in exercises) ...ex.sets];
   List<ExSet> get doneSets => [
@@ -103,6 +109,7 @@ class WorkoutController extends GetxController {
       exercises: exercises,
       duration: duration,
       startingDate: time.value,
+      parentID: parentID.value,
     );
     final service = Get.find<DatabaseService>();
     service.workoutHistory = [

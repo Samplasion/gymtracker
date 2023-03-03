@@ -45,7 +45,9 @@ class CountdownController extends GetxController {
 
     // Play sound
     if (Platform.isAndroid || Platform.isIOS) {
-      FlutterRingtonePlayer.playNotification();
+      FlutterRingtonePlayer.playNotification(
+        asAlarm: true,
+      );
     } else {
       SystemSound.play(SystemSoundType.alert);
     }

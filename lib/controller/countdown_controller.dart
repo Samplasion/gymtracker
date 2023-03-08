@@ -15,7 +15,7 @@ class CountdownController extends GetxController {
     super.onInit();
 
     final plugin = FlutterLocalNotificationsPlugin();
-    const androidInit = AndroidInitializationSettings('app_icon');
+    const androidInit = AndroidInitializationSettings('ic_launcher_foreground');
     const darwinInit = DarwinInitializationSettings(
       requestAlertPermission: true,
       requestBadgePermission: true,

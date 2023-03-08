@@ -62,6 +62,10 @@ workouts:
   actions:
     delete: Elimina allenamento
     start: Ripeti allenamento
+    changeParent:
+      label: Cambia routine di base
+      options:
+        none: Nessuna
   
 routines:
   title: Routine
@@ -167,6 +171,10 @@ exerciseList:
     distance: "@distance @unit"
 
 general:
+  dialogs:
+    actions:
+      ok: OK
+      cancel: Annulla
   exercises:
     zero: "Nessun esercizio"
     one: "%s esercizio"

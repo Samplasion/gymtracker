@@ -15,6 +15,7 @@ import '../utils/go.dart';
 import '../utils/sets.dart';
 import '../utils/utils.dart';
 import 'routine_creator.dart';
+import 'utils/dropdown_dialog.dart';
 import 'utils/exercise.dart';
 import 'utils/timer.dart';
 
@@ -46,7 +47,48 @@ class _ExercisesViewState extends State<ExercisesView> {
         actions: [
           PopupMenuButton(
             itemBuilder: (context) => [
-              if (workout.isConcrete)
+              if (workout.isConcrete) ...[
+                PopupMenuItem(
+                  textStyle: TextStyle(
+                    color: Theme.of(context).colorScheme.error,
+                  ),
+                  child: Text("workouts.actions.changeParent.label".tr),
+                  onTap: () {
+                    SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
+                      showDialog(
+                        context: context,
+                        builder: (_) {
+                          return DropdownDialog(
+                            title:
+                                Text("workouts.actions.changeParent.label".tr),
+                            items: [
+                              DropdownMenuItem(
+                                value: null,
+                                child: Text(
+                                  "workouts.actions.changeParent.options.none"
+                                      .tr,
+                                  style: const TextStyle(
+                                      fontStyle: FontStyle.italic),
+                                ),
+                              ),
+                              for (final workout in controller.workouts)
+                                DropdownMenuItem(
+                                  value: workout.id,
+                                  child: Text(workout.name),
+                                ),
+                            ],
+                            initialItem: workout.parentID,
+                            onSelect: (value) {
+                              setState(() => workout.parentID = value);
+                              Get.find<history.HistoryController>()
+                                  .setParentID(workout, newParentID: value);
+                            },
+                          );
+                        },
+                      );
+                    });
+                  },
+                ),
                 PopupMenuItem(
                   textStyle: TextStyle(
                     color: Theme.of(context).colorScheme.error,
@@ -60,8 +102,8 @@ class _ExercisesViewState extends State<ExercisesView> {
                       Get.back();
                     });
                   },
-                )
-              else ...[
+                ),
+              ] else ...[
                 PopupMenuItem(
                   child: Text("routines.actions.edit".tr),
                   onTap: () {

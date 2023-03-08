@@ -10,7 +10,6 @@ import '../model/workout.dart';
 class DatabaseService extends GetxService with ChangeNotifier {
   final GetStorage exerciseStorage = GetStorage("exercises");
   final GetStorage routinesStorage = GetStorage("routines");
-  // History
   final GetStorage workoutsStorage = GetStorage("workouts");
   final GetStorage settingsStorage = GetStorage("settings");
 
@@ -23,11 +22,11 @@ class DatabaseService extends GetxService with ChangeNotifier {
   onInit() {
     super.onInit();
 
-    onServiceChange();
-    exerciseStorage.listen(onServiceChange);
-    routinesStorage.listen(onServiceChange);
-    workoutsStorage.listen(onServiceChange);
-    settingsStorage.listen(onServiceChange);
+    onServiceChange("main")();
+    exerciseStorage.listen(onServiceChange("exercise"));
+    routinesStorage.listen(onServiceChange("routines"));
+    workoutsStorage.listen(onServiceChange("workouts"));
+    settingsStorage.listen(onServiceChange("settings"));
   }
 
   Future ensureInitialized() async {
@@ -39,9 +38,16 @@ class DatabaseService extends GetxService with ChangeNotifier {
     ]);
   }
 
-  void onServiceChange() {
+  void Function() onServiceChange(String service) {
+    return () {
+      printInfo(info: "$service service updated");
+    };
+  }
+
+  @override
+  notifyListeners() {
+    super.notifyListeners();
     printInfo(info: "Notified listeners");
-    notifyListeners();
   }
 
   List<Exercise> get exercises {
@@ -60,7 +66,9 @@ class DatabaseService extends GetxService with ChangeNotifier {
     return [for (final json in jsons) Workout.fromJson(json)];
   }
 
-  set routines(List<Workout> routines) {
+  set routines(List<Workout> routines) => writeRoutines(routines);
+
+  writeRoutines(List<Workout> routines) {
     List jsons = [for (final rt in routines) rt.toJson()];
     routinesStorage.write("data", json.encode(jsons));
     notifyListeners();
@@ -71,9 +79,12 @@ class DatabaseService extends GetxService with ChangeNotifier {
     return [for (final json in jsons) Workout.fromJson(json)];
   }
 
-  set workoutHistory(List<Workout> workoutHistory) {
-    List jsons = [for (final wo in workoutHistory) wo.toJson()];
-    workoutsStorage.write("data", json.encode(jsons));
-    notifyListeners();
+  set workoutHistory(List<Workout> history) => writeHistory(history);
+
+  writeHistory(List<Workout> history) {
+    List jsons = [for (final wo in history) wo.toJson()];
+    workoutsStorage
+        .write("data", json.encode(jsons))
+        .then((_) => notifyListeners());
   }
 }

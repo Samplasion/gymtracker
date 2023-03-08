@@ -89,14 +89,15 @@ class HistoryWorkout extends StatelessWidget {
                                 Flexible(
                                   child: TimerView.buildTimeString(
                                     context,
-                                    workout.duration!,
+                                    workout.duration ?? Duration.zero,
                                     builder: (time) => Text.rich(
                                       TextSpan(
                                         children: [
                                           TextSpan(
                                             text: DateFormat.yMd()
                                                 .add_Hm()
-                                                .format(workout.startingDate!),
+                                                .format(workout.startingDate ??
+                                                    DateTime.now()),
                                           ),
                                           const TextSpan(text: " - "),
                                           time

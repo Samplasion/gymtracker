@@ -150,6 +150,7 @@ ongoingWorkout:
     actions:
       no: Cancel
       yes: Start
+  restOver: Rest time is over!
 
 timer: 
   add15s: "+15s"
@@ -225,3 +226,7 @@ time:
 locales:
   en: English
   it: Italian
+
+androidNotificationChannel:
+  name: Rest timeout
+  description: Sends a notification whenever a running rest timer runs out of time.

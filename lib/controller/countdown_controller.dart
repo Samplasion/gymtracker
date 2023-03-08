@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/services.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_ringtone_player/flutter_ringtone_player.dart';
 import 'package:get/get.dart';
 
@@ -9,6 +10,23 @@ class CountdownController extends GetxController {
   Rx<DateTime?> targetTime = Rx(null);
   Rx<DateTime?> startingTime = Rx(null);
   Timer? timer;
+
+  @override
+  onInit() {
+    super.onInit();
+
+    final plugin = FlutterLocalNotificationsPlugin();
+    const androidInit = AndroidInitializationSettings('app_icon');
+    const macOSInit = MacOSInitializationSettings(
+      requestAlertPermission: true,
+      requestBadgePermission: true,
+      requestSoundPermission: true,
+    );
+    plugin.initialize(const InitializationSettings(
+      android: androidInit,
+      macOS: macOSInit,
+    ));
+  }
 
   bool get isActive => targetTime.value != null && timer != null;
   Duration get remaining =>
@@ -43,14 +61,33 @@ class CountdownController extends GetxController {
     targetTime.value = null;
     startingTime.value = null;
 
-    // Play sound
-    if (Platform.isAndroid || Platform.isIOS) {
-      FlutterRingtonePlayer.playNotification(
-        asAlarm: true,
+    // Show notification
+    final plugin = FlutterLocalNotificationsPlugin();
+    final androidDetails = AndroidNotificationDetails(
+      'org.js.samplasion.gymtracker.RestTimeoutChannel',
+      'androidNotificationChannel.name'.tr,
+      'androidNotificationChannel.description'.tr,
+      importance: Importance.max,
+      priority: Priority.high,
+      ticker: 'workout.restOver'.tr,
+    );
+    const macOSDetails = MacOSNotificationDetails(
+      presentSound: true,
+      presentAlert: true,
+      presentBadge: true,
+    );
+    final notificationDetails = NotificationDetails(
+      android: androidDetails,
+      macOS: macOSDetails,
+    );
+    plugin.cancel(0).then((_) {
+      plugin.show(
+        0,
+        'appName'.tr,
+        'ongoingWorkout.restOver'.tr,
+        notificationDetails,
       );
-    } else {
-      SystemSound.play(SystemSoundType.alert);
-    }
+    });
   }
 
   setCountdown(Duration delta) {

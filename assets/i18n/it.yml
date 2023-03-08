@@ -150,6 +150,7 @@ ongoingWorkout:
     actions:
       no: Annulla
       yes: Avvia
+  restOver: È scaduto il tempo di riposo!
 
 timer: 
   add15s: "+15s"
@@ -225,3 +226,7 @@ time:
 locales:
   en: Inglese
   it: Italiano
+
+androidNotificationChannel:
+  name: Timer tempo di riposo
+  description: Invia una notifica quando il timer del tempo di riposo finisce.

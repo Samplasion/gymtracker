@@ -54,7 +54,7 @@ class CountdownController extends GetxController {
     }
   }
 
-  _onRing() {
+  _onRing() async {
     // Clean up
     timer?.cancel();
     timer = null;
@@ -75,20 +75,20 @@ class CountdownController extends GetxController {
       presentSound: true,
       presentAlert: true,
       presentBadge: true,
+      interruptionLevel: InterruptionLevel.timeSensitive,
     );
     final notificationDetails = NotificationDetails(
       android: androidDetails,
       macOS: darwinDetails,
       iOS: darwinDetails,
     );
-    plugin.cancel(0).then((_) {
-      plugin.show(
-        0,
-        'appName'.tr,
-        'ongoingWorkout.restOver'.tr,
-        notificationDetails,
-      );
-    });
+    await plugin.cancel(0);
+    plugin.show(
+      0,
+      'appName'.tr,
+      'ongoingWorkout.restOver'.tr,
+      notificationDetails,
+    );
   }
 
   setCountdown(Duration delta) {

@@ -3,7 +3,6 @@ import 'dart:io';
 
 import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:flutter_ringtone_player/flutter_ringtone_player.dart';
 import 'package:get/get.dart';
 
 class CountdownController extends GetxController {
@@ -17,14 +16,15 @@ class CountdownController extends GetxController {
 
     final plugin = FlutterLocalNotificationsPlugin();
     const androidInit = AndroidInitializationSettings('app_icon');
-    const macOSInit = MacOSInitializationSettings(
+    const darwinInit = DarwinInitializationSettings(
       requestAlertPermission: true,
       requestBadgePermission: true,
       requestSoundPermission: true,
     );
     plugin.initialize(const InitializationSettings(
       android: androidInit,
-      macOS: macOSInit,
+      macOS: darwinInit,
+      iOS: darwinInit,
     ));
   }
 
@@ -66,19 +66,20 @@ class CountdownController extends GetxController {
     final androidDetails = AndroidNotificationDetails(
       'org.js.samplasion.gymtracker.RestTimeoutChannel',
       'androidNotificationChannel.name'.tr,
-      'androidNotificationChannel.description'.tr,
+      channelDescription: 'androidNotificationChannel.description'.tr,
       importance: Importance.max,
       priority: Priority.high,
       ticker: 'workout.restOver'.tr,
     );
-    const macOSDetails = MacOSNotificationDetails(
+    const darwinDetails = DarwinNotificationDetails(
       presentSound: true,
       presentAlert: true,
       presentBadge: true,
     );
     final notificationDetails = NotificationDetails(
       android: androidDetails,
-      macOS: macOSDetails,
+      macOS: darwinDetails,
+      iOS: darwinDetails,
     );
     plugin.cancel(0).then((_) {
       plugin.show(

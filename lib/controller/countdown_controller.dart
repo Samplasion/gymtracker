@@ -10,11 +10,12 @@ class CountdownController extends GetxController {
   Rx<DateTime?> startingTime = Rx(null);
   Timer? timer;
 
+  final plugin = FlutterLocalNotificationsPlugin();
+
   @override
   onInit() {
     super.onInit();
 
-    final plugin = FlutterLocalNotificationsPlugin();
     const androidInit = AndroidInitializationSettings('ic_launcher_foreground');
     const darwinInit = DarwinInitializationSettings(
       requestAlertPermission: true,
@@ -62,7 +63,6 @@ class CountdownController extends GetxController {
     startingTime.value = null;
 
     // Show notification
-    final plugin = FlutterLocalNotificationsPlugin();
     final androidDetails = AndroidNotificationDetails(
       'org.js.samplasion.gymtracker.RestTimeoutChannel',
       'androidNotificationChannel.name'.tr,
@@ -82,7 +82,6 @@ class CountdownController extends GetxController {
       macOS: darwinDetails,
       iOS: darwinDetails,
     );
-    await plugin.cancel(0);
     plugin.show(
       0,
       'appName'.tr,
@@ -92,6 +91,7 @@ class CountdownController extends GetxController {
   }
 
   setCountdown(Duration delta) {
+    plugin.cancel(0);
     final now = DateTime.now();
     startingTime(now);
     targetTime(now.add(delta));

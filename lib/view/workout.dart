@@ -84,9 +84,9 @@ class _WorkoutViewState extends State<WorkoutView> {
       bottomNavigationBar: Obx(() {
         return Crossfade(
           firstChild: const SizedBox.shrink(),
-          secondChild: const Column(
+          secondChild: Column(
             mainAxisSize: MainAxisSize.min,
-            children: [WorkoutTimerView()],
+            children: const [WorkoutTimerView()],
           ),
           showSecond: countdownController.isActive,
         );

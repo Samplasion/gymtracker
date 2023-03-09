@@ -4,3 +4,7 @@ class Breakpoints {
   static const m = 720;
   static const l = 1024;
 }
+
+class NotificationIDs {
+  static const restTimer = 0;
+}

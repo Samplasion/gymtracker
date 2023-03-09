@@ -7,7 +7,7 @@ import '../controller/workout_controller.dart';
 import '../controller/workouts_controller.dart';
 import '../model/exercise.dart';
 import '../model/set.dart';
-import '../utils/breakpoints.dart';
+import '../utils/constants.dart';
 import '../utils/go.dart';
 import '../utils/utils.dart';
 import '../view/exercise_picker.dart';

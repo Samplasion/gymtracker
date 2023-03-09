@@ -5,6 +5,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get/get.dart';
 
+import '../utils/constants.dart';
+
 class CountdownController extends GetxController {
   Rx<DateTime?> targetTime = Rx(null);
   Rx<DateTime?> startingTime = Rx(null);
@@ -83,7 +85,7 @@ class CountdownController extends GetxController {
       iOS: darwinDetails,
     );
     plugin.show(
-      0,
+      NotificationIDs.restTimer,
       'appName'.tr,
       'ongoingWorkout.restOver'.tr,
       notificationDetails,
@@ -91,7 +93,7 @@ class CountdownController extends GetxController {
   }
 
   setCountdown(Duration delta) {
-    plugin.cancel(0);
+    plugin.cancel(NotificationIDs.restTimer);
     final now = DateTime.now();
     startingTime(now);
     targetTime(now.add(delta));

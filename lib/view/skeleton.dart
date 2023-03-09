@@ -8,7 +8,7 @@ import 'package:iconify_flutter/icons/mdi.dart';
 
 import '../controller/workout_controller.dart';
 import '../service/localizations.dart';
-import '../utils/breakpoints.dart';
+import '../utils/constants.dart';
 import '../utils/go.dart';
 import 'history.dart';
 import 'routines.dart';

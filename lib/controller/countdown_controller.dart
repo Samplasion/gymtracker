@@ -1,10 +1,9 @@
 import 'dart:async';
-import 'dart:io';
 
-import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get/get.dart';
 
+import '../service/notifications.dart';
 import '../utils/constants.dart';
 
 class CountdownController extends GetxController {
@@ -12,24 +11,8 @@ class CountdownController extends GetxController {
   Rx<DateTime?> startingTime = Rx(null);
   Timer? timer;
 
-  final plugin = FlutterLocalNotificationsPlugin();
-
-  @override
-  onInit() {
-    super.onInit();
-
-    const androidInit = AndroidInitializationSettings('ic_launcher_foreground');
-    const darwinInit = DarwinInitializationSettings(
-      requestAlertPermission: true,
-      requestBadgePermission: true,
-      requestSoundPermission: true,
-    );
-    plugin.initialize(const InitializationSettings(
-      android: androidInit,
-      macOS: darwinInit,
-      iOS: darwinInit,
-    ));
-  }
+  FlutterLocalNotificationsPlugin get notificationsPlugin =>
+      Get.find<NotificationsService>().plugin;
 
   bool get isActive => targetTime.value != null && timer != null;
   Duration get remaining =>
@@ -84,7 +67,7 @@ class CountdownController extends GetxController {
       macOS: darwinDetails,
       iOS: darwinDetails,
     );
-    plugin.show(
+    notificationsPlugin.show(
       NotificationIDs.restTimer,
       'appName'.tr,
       'ongoingWorkout.restOver'.tr,
@@ -93,7 +76,7 @@ class CountdownController extends GetxController {
   }
 
   setCountdown(Duration delta) {
-    plugin.cancel(NotificationIDs.restTimer);
+    notificationsPlugin.cancel(NotificationIDs.restTimer);
     final now = DateTime.now();
     startingTime(now);
     targetTime(now.add(delta));

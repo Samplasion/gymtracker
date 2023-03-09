@@ -10,6 +10,7 @@ import 'package:gymtracker/view/skeleton.dart';
 import 'controller/settings_controller.dart';
 import 'service/database.dart';
 import 'service/localizations.dart';
+import 'service/notifications.dart';
 import 'utils/go.dart';
 import 'view/routines.dart';
 
@@ -34,6 +35,7 @@ class MainApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Get.put(_databaseService);
+    Get.put(NotificationsService());
     Get.put(CountdownController());
     final settings = Get.put(SettingsController());
     final localizations = Get.put(this.localizations);

@@ -55,6 +55,7 @@ exercise:
     title: Seleziona esercizi
     errors:
       empty: Devi selezionare un esercizio.
+  custom: Personalizzato
 
 workouts:
   untitled: Allenamento senza nome

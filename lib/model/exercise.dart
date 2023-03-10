@@ -44,6 +44,10 @@ class Exercise {
   /// this concrete exercise should be categorized under.
   String? parentID;
 
+  bool _standard = false;
+
+  bool get isCustom => !_standard;
+
   Exercise({
     String? id,
     required this.name,
@@ -59,6 +63,24 @@ class Exercise {
         assert(
             sets.isEmpty || sets.map((e) => e.parameters).toSet().length == 1,
             "The sets must have the same parameters.");
+
+  factory Exercise.standard({
+    required String id,
+    required String name,
+    required SetParameters parameters,
+    required MuscleGroup primaryMuscleGroup,
+    Set<MuscleGroup> secondaryMuscleGroups = const <MuscleGroup>{},
+  }) {
+    return Exercise(
+      id: id,
+      name: name,
+      parameters: parameters,
+      primaryMuscleGroup: primaryMuscleGroup,
+      secondaryMuscleGroups: secondaryMuscleGroups,
+      sets: [ExSet.empty(kind: SetKind.normal, parameters: parameters)],
+      restTime: Duration.zero,
+    ).._standard = true;
+  }
 
   factory Exercise.fromJson(Map<String, dynamic> json) =>
       _$ExerciseFromJson(json);

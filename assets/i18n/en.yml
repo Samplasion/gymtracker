@@ -55,6 +55,7 @@ exercise:
     title: Select exercises
     errors:
       empty: You must select an exercise.
+  custom: Custom
 
 workouts:
   untitled: Untitled workout

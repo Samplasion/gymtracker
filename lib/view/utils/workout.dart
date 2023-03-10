@@ -77,7 +77,17 @@ class _WorkoutExerciseEditorState extends State<WorkoutExerciseEditor> {
                   ExerciseIcon(exercise: widget.exercise),
                 const SizedBox(width: 16),
                 Expanded(
-                  child: Text(widget.exercise.name,
+                  child: Text.rich(
+                      TextSpan(children: [
+                        TextSpan(text: widget.exercise.name),
+                        if (widget.exercise.isCustom) ...[
+                          const WidgetSpan(
+                            baseline: TextBaseline.ideographic,
+                            alignment: PlaceholderAlignment.middle,
+                            child: CustomExerciseBadge(),
+                          ),
+                        ],
+                      ]),
                       style: Theme.of(context).textTheme.titleMedium),
                 ),
                 PopupMenuButton(

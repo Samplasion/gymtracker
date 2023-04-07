@@ -8,9 +8,10 @@ import '../model/workout.dart';
 import '../service/database.dart';
 import '../view/workout.dart';
 import 'countdown_controller.dart';
+import 'serviceable_controller.dart';
 import 'workouts_controller.dart';
 
-class WorkoutController extends GetxController {
+class WorkoutController extends GetxController with ServiceableController {
   RxString name;
   Rx<DateTime> time;
   Rx<String?> parentID;
@@ -19,6 +20,17 @@ class WorkoutController extends GetxController {
       : name = name.obs,
         time = DateTime.now().obs,
         parentID = Rx<String?>(parentID);
+
+  factory WorkoutController.fromSavedData(Map<String, dynamic> data) {
+    // final  data = service.getOngoingData()!;
+    final cont = WorkoutController(data['name'], data['parentID']);
+    cont.exercises((data['exercises'] as List)
+        .map((el) => Exercise.fromJson(el))
+        .toList());
+    cont.time(DateTime.fromMillisecondsSinceEpoch(
+        data['time'] ?? DateTime.now().millisecondsSinceEpoch));
+    return cont;
+  }
 
   RxList<Exercise> exercises = <Exercise>[].obs;
 
@@ -56,6 +68,19 @@ class WorkoutController extends GetxController {
     removeCountdown();
     SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
       Get.find<WorkoutsController>().hasOngoingWorkout(false);
+      service.deleteOngoing();
+    });
+  }
+
+  void save() {
+    if (!service.hasOngoing) return;
+
+    printInfo(info: "Saving ongoing data");
+    service.writeToOngoing({
+      "name": name.value,
+      "exercises": exercises.map((ex) => ex.toJson()).toList(),
+      "parentID": parentID.value,
+      "time": time.value.millisecondsSinceEpoch,
     });
   }
 
@@ -126,4 +151,7 @@ class WorkoutController extends GetxController {
   void removeCountdown() {
     Get.find<CountdownController>().removeCountdown();
   }
+
+  @override
+  void onServiceChange() {}
 }

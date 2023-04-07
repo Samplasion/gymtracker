@@ -35,6 +35,15 @@ class _WorkoutViewState extends State<WorkoutView> {
   }
 
   @override
+  void dispose() {
+    super.dispose();
+
+    try {
+      Get.find<WorkoutController>().save();
+    } catch (_) {}
+  }
+
+  @override
   Widget build(BuildContext context) {
     final countdownController = Get.find<CountdownController>();
 

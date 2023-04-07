@@ -23,11 +23,30 @@ class WorkoutsController extends GetxController with ServiceableController {
   onInit() {
     super.onInit();
     Get.put(HistoryController());
+
+    if (service.hasOngoing) {
+      Get.put(WorkoutController.fromSavedData(service.getOngoingData()!));
+    }
   }
 
   @override
   onServiceChange() {
     workouts(service.routines);
+  }
+
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    printInfo(info: "Change lifecycle state callback received (state: $state)");
+    if (hasOngoingWorkout()) {
+      switch (state) {
+        case AppLifecycleState.inactive:
+        case AppLifecycleState.paused:
+        case AppLifecycleState.resumed:
+          Get.find<WorkoutController>().save();
+          break;
+        default:
+          break;
+      }
+    }
   }
 
   void submitRoutine({

@@ -24,7 +24,20 @@ class SkeletonView extends StatefulWidget {
   State<SkeletonView> createState() => _SkeletonViewState();
 }
 
-class _SkeletonViewState extends State<SkeletonView> {
+class _SkeletonViewState extends State<SkeletonView>
+    with WidgetsBindingObserver {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
   int _selectedIndex = 0;
 
   List<Widget> get pages => [
@@ -39,6 +52,11 @@ class _SkeletonViewState extends State<SkeletonView> {
     super.reassemble();
     printInfo(info: "[#reassemble()] called");
     Get.find<GTLocalizations>().init();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    Get.find<WorkoutsController>().didChangeAppLifecycleState(state);
   }
 
   @override

@@ -12,6 +12,7 @@ class DatabaseService extends GetxService with ChangeNotifier {
   final GetStorage routinesStorage = GetStorage("routines");
   final GetStorage workoutsStorage = GetStorage("workouts");
   final GetStorage settingsStorage = GetStorage("settings");
+  final GetStorage ongoingStorage = GetStorage("ongoing");
 
   writeSetting<T>(String key, T value) {
     settingsStorage.write(key, value);
@@ -27,6 +28,7 @@ class DatabaseService extends GetxService with ChangeNotifier {
     routinesStorage.listen(onServiceChange("routines"));
     workoutsStorage.listen(onServiceChange("workouts"));
     settingsStorage.listen(onServiceChange("settings"));
+    ongoingStorage.listen(onServiceChange("ongoing"));
   }
 
   Future ensureInitialized() async {
@@ -127,4 +129,19 @@ class DatabaseService extends GetxService with ChangeNotifier {
       rethrow;
     }
   }
+
+  void writeToOngoing(Map<String, dynamic> data) {
+    ongoingStorage.write("data", jsonEncode(data));
+  }
+
+  Map<String, dynamic>? getOngoingData() {
+    if (!hasOngoing) return null;
+    return jsonDecode(ongoingStorage.read("data"));
+  }
+
+  void deleteOngoing() {
+    ongoingStorage.remove("data");
+  }
+
+  bool get hasOngoing => ongoingStorage.hasData("data");
 }

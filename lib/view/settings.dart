@@ -1,6 +1,10 @@
+import 'dart:convert';
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:gymtracker/service/localizations.dart';
+import 'package:share_plus/share_plus.dart';
 
 import '../controller/settings_controller.dart';
 import 'settings/radio.dart';
@@ -44,6 +48,25 @@ class SettingsView extends StatelessWidget {
                   ),
                   onUpdate: (v) => controller.setLocale(v ?? currentLocale),
                 ),
+              ),
+              ListTile(
+                title: Text("settings.options.export.label".tr),
+                onTap: () async {
+                  final box = context.findRenderObject() as RenderBox?;
+
+                  await Share.shareXFiles(
+                    [
+                      XFile.fromData(
+                        Uint8List.fromList(utf8
+                            .encode(json.encode(controller.service.toJson()))),
+                        mimeType: "application/json",
+                        name: "${"settings.options.export.filename".tr}.json",
+                      )
+                    ],
+                    sharePositionOrigin:
+                        box!.localToGlobal(Offset.zero) & box.size,
+                  );
+                },
               ),
             ]),
           ),

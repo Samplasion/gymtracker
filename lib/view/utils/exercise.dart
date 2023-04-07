@@ -44,6 +44,7 @@ class ExerciseListTile extends StatelessWidget {
         TextSpan(children: [
           TextSpan(text: exercise.name),
           if (exercise.isCustom) ...[
+            const TextSpan(text: " "),
             const WidgetSpan(
               baseline: TextBaseline.ideographic,
               alignment: PlaceholderAlignment.middle,
@@ -62,20 +63,17 @@ class CustomExerciseBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(left: 8),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 4),
-        decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.secondaryContainer,
-          borderRadius: BorderRadius.circular(4),
-        ),
-        child: Text(
-          "exercise.custom".tr.toUpperCase(),
-          style: TextStyle(
-            fontSize: 12,
-            color: Theme.of(context).colorScheme.onSecondaryContainer,
-          ),
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 4),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.secondaryContainer,
+        borderRadius: BorderRadius.circular(4),
+      ),
+      child: Text(
+        "exercise.custom".tr.toUpperCase(),
+        style: TextStyle(
+          fontSize: 12,
+          color: Theme.of(context).colorScheme.onSecondaryContainer,
         ),
       ),
     );

@@ -11,6 +11,7 @@ import '../service/localizations.dart';
 import '../utils/constants.dart';
 import '../utils/go.dart';
 import 'history.dart';
+import 'library.dart';
 import 'routines.dart';
 import 'settings.dart';
 import 'utils/crossfade.dart';
@@ -28,6 +29,7 @@ class _SkeletonViewState extends State<SkeletonView> {
 
   List<Widget> get pages => [
         const RoutinesView(),
+        const LibraryView(),
         const HistoryView(),
         const SettingsView(),
       ];
@@ -66,6 +68,8 @@ class _SkeletonViewState extends State<SkeletonView> {
             if (Get.find<WorkoutsController>().hasOngoingWorkout.isTrue)
               OngoingWorkoutBar(open: () => Go.to(() => const WorkoutView())),
             NavigationBar(
+              labelBehavior:
+                  NavigationDestinationLabelBehavior.onlyShowSelected,
               destinations: [
                 NavigationDestination(
                   icon: Iconify(
@@ -77,6 +81,10 @@ class _SkeletonViewState extends State<SkeletonView> {
                     color: Theme.of(context).colorScheme.onSecondaryContainer,
                   ),
                   label: "routines.title".tr,
+                ),
+                NavigationDestination(
+                  icon: const Icon(Icons.local_library_rounded),
+                  label: "library.title".tr,
                 ),
                 NavigationDestination(
                   icon: const Icon(Icons.history_rounded),

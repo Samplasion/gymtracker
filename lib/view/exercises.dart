@@ -203,6 +203,7 @@ class RoutineHistoryData extends StatefulWidget {
 
   final Workout routine;
 
+  @override
   State<RoutineHistoryData> createState() => _RoutineHistoryDataState();
 }
 

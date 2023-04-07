@@ -87,4 +87,44 @@ class DatabaseService extends GetxService with ChangeNotifier {
         .write("data", json.encode(jsons))
         .then((_) => notifyListeners());
   }
+
+  toJson() {
+    return {
+      "exercise": jsonDecode(exerciseStorage.read("data")),
+      "routines": jsonDecode(routinesStorage.read("data")),
+      "workouts": jsonDecode(workoutsStorage.read("data")),
+      "settings": {
+        for (final key in settingsStorage.getKeys<Iterable<String>>())
+          key: settingsStorage.read(key),
+      },
+    };
+  }
+
+  fromJson(Map<String, dynamic> json) {
+    final previousJson = toJson();
+
+    innerImportJson(Map<String, dynamic> json) {
+      if (json['exercise'] is List) {
+        exerciseStorage.write("data", jsonEncode(json['exercise']));
+      }
+      if (json['routines'] is List) {
+        routinesStorage.write("data", jsonEncode(json['routines']));
+      }
+      if (json['workouts'] is List) {
+        workoutsStorage.write("data", jsonEncode(json['workouts']));
+      }
+      if (json['settings'] is Map<String, dynamic>) {
+        for (final key in json['settings'].keys) {
+          writeSetting(key, json['settings']);
+        }
+      }
+    }
+
+    try {
+      innerImportJson(json);
+    } catch (_) {
+      innerImportJson(previousJson);
+      rethrow;
+    }
+  }
 }

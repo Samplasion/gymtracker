@@ -56,6 +56,8 @@ exercise:
     errors:
       empty: Devi selezionare un esercizio.
   custom: Personalizzato
+  info:
+    title: Info esercizio
 
 workouts:
   untitled: Allenamento senza nome
@@ -231,3 +233,54 @@ locales:
 androidNotificationChannel:
   name: Timer tempo di riposo
   description: Invia una notifica quando il timer del tempo di riposo finisce.
+
+library:
+  title: Libreria esercizi
+  custom: Esercizi personalizzati
+  cardio:
+    name: Cardio
+    exercises:
+      aerobics: Aerobica
+      biking: Bicicletta
+      ergometer: Ergometro
+      ergometerHorizontal: Ergometro (orizzontale)
+      pilates: Pilates
+      running: Corsa
+      treadmill: Tapis roulant
+      zumba: Zumba
+  chest:
+    name: Petto
+    exercises:
+      barbellBenchPressFlat: Panca piana (bilanciere)
+      barbellBenchPressIncline: Panca inclinata (bilanciere, in avanti)
+      barbellBenchPressDecline: Panca inclinata (bilanciere, all'indietro)
+      dumbbellBenchPressFlat: Panca piana (manubri)
+      dumbbellBenchPressIncline: Panca inclinata (manubri, in avanti)
+      dumbbellBenchPressDecline: Panca inclinata (manubri, all'indietro)
+  biceps:
+    name: Bicipiti
+    exercises:
+      barbellBicepsCurl: Bicep curl (bilanciere)
+  abs:
+    name: Addominali
+    exercises:
+      crunches: Crunch
+      kneeRaise: Sollevamento delle ginocchia
+      legRaise: Sollevamento delle gambe
+      crunchMachine: Crunch machine
+  calves:
+    name: Polpacci
+    exercises:
+      calfRaiseStanding: Calf raise (in piedi)
+      calfRaiseSeated: Calf raise (seduti)
+  quadriceps:
+    name: Quadricipiti
+    exercises:
+      squatsBarbell: Squat (bilanciere)
+      legPress: Leg press
+      legExtension: Leg extension
+  hamstrings:
+    name: Tendini del ginocchio
+    exercises:
+      legCurlProne: Leg curl (sdraiati)
+      legCurlSeated: Leg curl (seduti)

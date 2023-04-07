@@ -81,6 +81,7 @@ class _WorkoutExerciseEditorState extends State<WorkoutExerciseEditor> {
                       TextSpan(children: [
                         TextSpan(text: widget.exercise.name),
                         if (widget.exercise.isCustom) ...[
+                          const TextSpan(text: " "),
                           const WidgetSpan(
                             baseline: TextBaseline.ideographic,
                             alignment: PlaceholderAlignment.middle,

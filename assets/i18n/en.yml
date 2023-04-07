@@ -56,6 +56,8 @@ exercise:
     errors:
       empty: You must select an exercise.
   custom: Custom
+  info:
+    title: Exercise info
 
 workouts:
   untitled: Untitled workout
@@ -231,3 +233,54 @@ locales:
 androidNotificationChannel:
   name: Rest timeout
   description: Sends a notification whenever a running rest timer runs out of time.
+
+library:
+  title: Exercise library
+  custom: Custom exercises
+  cardio:
+    name: Cardio
+    exercises:
+      aerobics: Aerobics
+      biking: Biking
+      ergometer: Ergometer
+      ergometerHorizontal: Ergometer (horizontal)
+      pilates: Pilates
+      running: Running
+      treadmill: Treadmill
+      zumba: Zumba
+  chest:
+    name: Chest
+    exercises:
+      barbellBenchPressFlat: Bench press (barbell)
+      barbellBenchPressIncline: Bench press (barbell, incline)
+      barbellBenchPressDecline: Bench press (barbell, decline)
+      dumbbellBenchPressFlat: Bench press (dumbbell)
+      dumbbellBenchPressIncline: Bench press (dumbbell, incline)
+      dumbbellBenchPressDecline: Bench press (dumbbell, decline)
+  biceps:
+    name: Biceps
+    exercises:
+      barbellBicepsCurl: Bicep curl (barbell)
+  abs:
+    name: Abs
+    exercises:
+      crunches: Crunches
+      kneeRaise: Knee raise
+      legRaise: Leg raise
+      crunchMachine: Crunch (machine)
+  calves:
+    name: Calves
+    exercises:
+      calfRaiseStanding: Calf raise (standing)
+      calfRaiseSeated: Calf raise (seated)
+  quadriceps:
+    name: Quadriceps
+    exercises:
+      squatsBarbell: Squats (barbell)
+      legPress: Leg press
+      legExtension: Leg extension
+  hamstrings:
+    name: Hamstrings
+    exercises:
+      legCurlProne: Leg curl (prone)
+      legCurlSeated: Leg curl (seated)

@@ -93,4 +93,8 @@ class Exercise {
   Exercise clone() => Exercise.fromJson(toJson());
 
   void regenerateID() => id = const Uuid().v4();
+
+  /// Returns true if [other] is [this] or an instance of [this]
+  /// (ie. [other.parentID] == [id].)
+  bool isTheSameAs(Exercise other) => other.id == id || other.parentID == id;
 }

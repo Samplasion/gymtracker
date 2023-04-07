@@ -103,8 +103,11 @@ class _ExercisePickerState extends State<ExercisePicker> {
       return;
     }
     ScaffoldMessenger.of(context).clearSnackBars();
-    final List<Exercise> exercises =
-        selectedExercises.map((e) => e.clone()..regenerateID()).toList();
+    final List<Exercise> exercises = selectedExercises
+        .map((e) => e.clone()
+          ..parentID = e.parentID ?? e.id
+          ..regenerateID())
+        .toList();
     Get.back(result: exercises);
   }
 }

@@ -50,22 +50,15 @@ class SettingsView extends StatelessWidget {
                 ),
               ),
               ListTile(
+                title: Text("settings.options.import.label".tr),
+                onTap: () async {
+                  await controller.importSettings();
+                },
+              ),
+              ListTile(
                 title: Text("settings.options.export.label".tr),
                 onTap: () async {
-                  final box = context.findRenderObject() as RenderBox?;
-
-                  await Share.shareXFiles(
-                    [
-                      XFile.fromData(
-                        Uint8List.fromList(utf8
-                            .encode(json.encode(controller.service.toJson()))),
-                        mimeType: "application/json",
-                        name: "${"settings.options.export.filename".tr}.json",
-                      )
-                    ],
-                    sharePositionOrigin:
-                        box!.localToGlobal(Offset.zero) & box.size,
-                  );
+                  await controller.exportSettings(context);
                 },
               ),
             ]),

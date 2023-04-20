@@ -117,7 +117,7 @@ class DatabaseService extends GetxService with ChangeNotifier {
       }
       if (json['settings'] is Map<String, dynamic>) {
         for (final key in json['settings'].keys) {
-          writeSetting(key, json['settings']);
+          writeSetting(key, json['settings'][key]);
         }
       }
     }

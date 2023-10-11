@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 extension StringUtils on String {
   double parseDouble() {
     return double.parse(replaceAll(",", "."));
@@ -5,5 +7,12 @@ extension StringUtils on String {
 
   double? tryParseDouble() {
     return double.tryParse(replaceAll(",", "."));
+  }
+}
+
+extension ColorUtils on Color {
+  Brightness estimateForegroundBrightness() {
+    final luminance = computeLuminance();
+    return luminance > 0.5 ? Brightness.dark : Brightness.light;
   }
 }

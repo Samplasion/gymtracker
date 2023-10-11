@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:gymtracker/controller/countdown_controller.dart';
+import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/view/skeleton.dart';
 
 import 'controller/exercises_controller.dart';
@@ -85,6 +86,10 @@ class MainApp extends StatelessWidget {
                   value: SystemUiOverlayStyle(
                     systemNavigationBarColor:
                         Theme.of(context).colorScheme.background,
+                    systemNavigationBarIconBrightness: Theme.of(context)
+                        .colorScheme
+                        .background
+                        .estimateForegroundBrightness(),
                   ),
                   child: child ?? Container(),
                 ),

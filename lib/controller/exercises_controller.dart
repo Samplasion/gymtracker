@@ -38,6 +38,7 @@ class ExercisesController extends GetxController with ServiceableController {
       primaryMuscleGroup: primaryMuscleGroup,
       secondaryMuscleGroups: secondaryMuscleGroups,
       restTime: restTime,
+      notes: '',
     );
   }
 

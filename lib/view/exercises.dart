@@ -29,13 +29,7 @@ class ExercisesView extends StatefulWidget {
 }
 
 class _ExercisesViewState extends State<ExercisesView> {
-  late Workout workout;
-
-  @override
-  void initState() {
-    super.initState();
-    workout = widget.workout;
-  }
+  late Workout workout = widget.workout;
 
   WorkoutsController get controller => Get.find<WorkoutsController>();
 
@@ -534,6 +528,11 @@ class ExerciseDataView extends StatelessWidget {
             ],
           ),
         ),
+        if (exercise.notes.isNotEmpty)
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: Text(exercise.notes),
+          ),
         for (int i = 0; i < exercise.sets.length; i++)
           ExerciseSetView(
             set: exercise.sets[i],

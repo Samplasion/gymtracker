@@ -191,6 +191,11 @@ class _WorkoutViewState extends State<WorkoutView> {
                     controller.exercises.refresh();
                     controller.save();
                   },
+                  onNotesChange: (exercise, notes) {
+                    exercise.notes = notes;
+                    controller.exercises.refresh();
+                    controller.save();
+                  },
                 ),
             Padding(
               padding: const EdgeInsets.all(16),

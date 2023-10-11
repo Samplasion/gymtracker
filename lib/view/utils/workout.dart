@@ -26,6 +26,7 @@ class WorkoutExerciseEditor extends StatefulWidget {
   final void Function(ExSet set, SetKind kind) onSetSelectKind;
   final void Function(Exercise exercise, ExSet set, bool isDone) onSetSetDone;
   final VoidCallback onSetValueChange;
+  final void Function(Exercise exercise, String notes) onNotesChange;
 
   const WorkoutExerciseEditor({
     required this.exercise,
@@ -40,6 +41,7 @@ class WorkoutExerciseEditor extends StatefulWidget {
     required this.onSetSelectKind,
     required this.onSetSetDone,
     required this.onSetValueChange,
+    required this.onNotesChange,
     super.key,
   });
 
@@ -51,6 +53,8 @@ class _WorkoutExerciseEditorState extends State<WorkoutExerciseEditor> {
   late final timeController = TextEditingController(
     text: TimeInputField.encodeDuration(widget.exercise.restTime),
   );
+  late final notesController =
+      TextEditingController(text: widget.exercise.notes);
 
   @override
   Widget build(BuildContext context) {
@@ -123,6 +127,62 @@ class _WorkoutExerciseEditorState extends State<WorkoutExerciseEditor> {
                 ),
               ],
             ),
+          ),
+          const SizedBox(height: 8),
+          ListTile(
+            leading: const Icon(Icons.notes),
+            title: Text(
+              widget.exercise.notes.isEmpty
+                  ? "exercise.editor.fields.notes.label".tr
+                  : widget.exercise.notes,
+              style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                    fontStyle: widget.exercise.notes.isEmpty
+                        ? FontStyle.italic
+                        : FontStyle.normal,
+                    fontWeight: widget.exercise.notes.isEmpty
+                        ? FontWeight.w600
+                        : FontWeight.normal,
+                    fontSize: widget.exercise.notes.isEmpty ? 15 : null,
+                  ),
+            ),
+            trailing: const Icon(Icons.edit),
+            onTap: () {
+              showDialog(
+                context: context,
+                builder: (context) {
+                  return AlertDialog(
+                    contentPadding: const EdgeInsets.all(24),
+                    title: Text('exercise.editor.fields.notes.label'.tr),
+                    content: TextField(
+                      controller: notesController,
+                      autofocus: true,
+                      minLines: 4,
+                      maxLines: null,
+                      decoration: InputDecoration(
+                        border: const OutlineInputBorder(),
+                        labelText: "exercise.editor.fields.notes.label".tr,
+                      ),
+                    ),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.pop(context),
+                        child: Text(MaterialLocalizations.of(context)
+                            .cancelButtonLabel),
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          widget.onNotesChange(
+                              widget.exercise, notesController.text.trim());
+                          Navigator.pop(context);
+                        },
+                        child: Text(
+                            MaterialLocalizations.of(context).okButtonLabel),
+                      ),
+                    ],
+                  );
+                },
+              );
+            },
           ),
           Padding(
             padding: const EdgeInsets.all(16),

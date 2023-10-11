@@ -44,6 +44,9 @@ class Exercise {
   /// this concrete exercise should be categorized under.
   String? parentID;
 
+  @JsonKey(defaultValue: "")
+  String notes;
+
   bool _standard = false;
 
   bool get isCustom => !_standard;
@@ -57,6 +60,7 @@ class Exercise {
     this.secondaryMuscleGroups = const <MuscleGroup>{},
     required this.restTime,
     this.parentID,
+    required this.notes,
   })  : id = id ?? const Uuid().v4(),
         assert(sets.isEmpty || parameters == sets[0].parameters,
             "The parameters must not change between the Exercise and its Sets"),
@@ -79,6 +83,7 @@ class Exercise {
       secondaryMuscleGroups: secondaryMuscleGroups,
       sets: [ExSet.empty(kind: SetKind.normal, parameters: parameters)],
       restTime: Duration.zero,
+      notes: "",
     ).._standard = true;
   }
 

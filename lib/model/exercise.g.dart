@@ -23,6 +23,8 @@ abstract class _$ExerciseCWProxy {
 
   Exercise parentID(String? parentID);
 
+  Exercise notes(String notes);
+
   /// This function **does support** nullification of nullable fields. All `null` values passed to `non-nullable` fields will be ignored. You can also use `Exercise(...).copyWith.fieldName(...)` to override fields one at a time with nullification support.
   ///
   /// Usage
@@ -38,6 +40,7 @@ abstract class _$ExerciseCWProxy {
     Set<MuscleGroup>? secondaryMuscleGroups,
     Duration? restTime,
     String? parentID,
+    String? notes,
   });
 }
 
@@ -74,6 +77,9 @@ class _$ExerciseCWProxyImpl implements _$ExerciseCWProxy {
   Exercise parentID(String? parentID) => this(parentID: parentID);
 
   @override
+  Exercise notes(String notes) => this(notes: notes);
+
+  @override
 
   /// This function **does support** nullification of nullable fields. All `null` values passed to `non-nullable` fields will be ignored. You can also use `Exercise(...).copyWith.fieldName(...)` to override fields one at a time with nullification support.
   ///
@@ -90,6 +96,7 @@ class _$ExerciseCWProxyImpl implements _$ExerciseCWProxy {
     Object? secondaryMuscleGroups = const $CopyWithPlaceholder(),
     Object? restTime = const $CopyWithPlaceholder(),
     Object? parentID = const $CopyWithPlaceholder(),
+    Object? notes = const $CopyWithPlaceholder(),
   }) {
     return Exercise(
       id: id == const $CopyWithPlaceholder()
@@ -134,6 +141,11 @@ class _$ExerciseCWProxyImpl implements _$ExerciseCWProxy {
           ? _value.parentID
           // ignore: cast_nullable_to_non_nullable
           : parentID as String?,
+      notes: notes == const $CopyWithPlaceholder() || notes == null
+          // ignore: unnecessary_non_null_assertion
+          ? _value.notes!
+          // ignore: cast_nullable_to_non_nullable
+          : notes as String,
     );
   }
 }
@@ -163,6 +175,7 @@ Exercise _$ExerciseFromJson(Map<String, dynamic> json) => Exercise(
           const <MuscleGroup>{},
       restTime: Duration(microseconds: json['restTime'] as int),
       parentID: json['parentID'] as String?,
+      notes: json['notes'] as String? ?? '',
     );
 
 Map<String, dynamic> _$ExerciseToJson(Exercise instance) => <String, dynamic>{
@@ -176,6 +189,7 @@ Map<String, dynamic> _$ExerciseToJson(Exercise instance) => <String, dynamic>{
           .toList(),
       'restTime': instance.restTime.inMicroseconds,
       'parentID': instance.parentID,
+      'notes': instance.notes,
     };
 
 const _$SetParametersEnumMap = {

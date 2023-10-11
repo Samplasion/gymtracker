@@ -169,6 +169,10 @@ class _RoutineCreatorState extends State<RoutineCreator> {
                       },
                       onSetSetDone: (ex, set, done) {},
                       onSetValueChange: () {},
+                      onNotesChange: (ex, notes) {
+                        ex.notes = notes;
+                        controller.exercises.refresh();
+                      },
                     ),
                   ],
                 ],

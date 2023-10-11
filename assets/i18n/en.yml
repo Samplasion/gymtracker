@@ -51,6 +51,8 @@ exercise:
           empty: You must select a muscle group.
       secondaryMuscleGroups: 
         label: Other muscle groups
+      notes:
+        label: Notes
   picker:
     title: Select exercises
     errors:

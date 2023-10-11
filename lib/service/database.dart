@@ -99,8 +99,6 @@ class DatabaseService extends GetxService with ChangeNotifier {
         for (final key in settingsStorage.getKeys<Iterable<String>>())
           key: settingsStorage.read(key),
       },
-      if (ongoingStorage.hasData("data"))
-        "ongoing": jsonDecode(ongoingStorage.read("data")),
     };
   }
 
@@ -121,9 +119,6 @@ class DatabaseService extends GetxService with ChangeNotifier {
         for (final key in json['settings'].keys) {
           writeSetting(key, json['settings'][key]);
         }
-      }
-      if (json['ongoing'] is String) {
-        ongoingStorage.write("data", jsonEncode(json['ongoing']));
       }
     }
 

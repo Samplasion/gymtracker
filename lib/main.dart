@@ -65,7 +65,7 @@ class MainApp extends StatelessWidget {
               return GetMaterialApp(
                 translations: localizations,
                 locale: () {
-                  print(settings.locale.value);
+                  printInfo(info: "${settings.locale.value}");
                   return settings.locale.value;
                 }(),
                 fallbackLocale: const Locale('en'),

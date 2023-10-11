@@ -1,0 +1,93 @@
+name: CI Builds
+
+on:
+  release:
+    types:
+      - created
+  workflow_dispatch: {}
+  push: {}
+
+jobs:
+  # build_ios:
+  #   name: Build iOS app
+  #   continue-on-error: true
+  #   runs-on: macos-11
+  #   steps:
+  #     - name: Checkout
+  #       uses: actions/checkout@v2
+  #     - name: Setup Flutter
+  #       uses: subosito/flutter-action@v2
+  #       with:
+  #         flutter-version: "3.13.6"
+  #         channel: "stable"
+  #     - name: Install dependencies
+  #       run: flutter pub get
+  #     - name: Install Homebrew
+  #       run: /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
+  #     - name: Install bash 5
+  #       run: brew install bash
+  #     - name: Export brew path
+  #       run: echo "/usr/local/bin" >> $GITHUB_PATH
+  #     - name: Build
+  #       run: |
+  #         tools/build_ios.sh
+  #     - name: Release
+  #       if: github.event_name == 'release'
+  #       uses: softprops/action-gh-release@v1
+  #       with:
+  #         files: out/ios/GymTracker-*
+  #         generate_release_notes: true
+  #     - name: Upload artifacts
+  #       if: github.event_name != 'release'
+  #       uses: actions/upload-artifact@v2
+  #       with:
+  #         name: GymTracker iOS app
+  #         path: out/ios/GymTracker-*
+  build_android:
+    name: Build Android app [${{ matrix.flag }}]
+    continue-on-error: true
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        # a = apk, b = bundle
+        flag: [a, b]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "3.13.6"
+          channel: "stable"
+      - name: Clean project
+        run: flutter clean
+      - name: Install dependencies
+        run: flutter pub get
+      - name: Decode Keystore
+        env:
+          ENCODED_STRING: ${{ secrets.KEYSTORE }}
+        run: |
+          TMP_KEYSTORE_FILE_PATH="${RUNNER_TEMP}"/keystore.jks
+          echo $ENCODED_STRING | base64 -di > "${TMP_KEYSTORE_FILE_PATH}"
+          echo "TMP_KEYSTORE_FILE_PATH=${TMP_KEYSTORE_FILE_PATH}" >> $GITHUB_ENV
+      - name: Generate key.properties
+        run: |
+          echo 'storePassword=${{ secrets.SECRET_STORE_PASSWORD }}' >> key.properties
+          echo 'keyPassword=${{ secrets.SECRET_KEY_PASSWORD }}' >> key.properties
+          echo 'keyAlias=${{ secrets.SECRET_KEY_ALIAS }}' >> key.properties
+          echo 'storeFile=${{ env.TMP_KEYSTORE_FILE_PATH }}' >> key.properties
+          mv key.properties android/
+      - name: Build
+        run: tools/build_android.sh -${{ matrix.flag }}
+      - name: Release
+        if: github.event_name == 'release'
+        uses: softprops/action-gh-release@v1
+        with:
+          files: out/android/GymTracker-*
+          generate_release_notes: true
+      - name: Upload artifacts
+        if: github.event_name != 'release'
+        uses: actions/upload-artifact@v2
+        with:
+          name: GymTracker Android app [${{ matrix.flag }}]
+          path: out/android/GymTracker-*

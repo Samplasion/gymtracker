@@ -374,7 +374,10 @@ class WorkoutTimerView extends StatelessWidget {
                         builder: (_, time) => TimerView.buildTimeString(
                           context,
                           countdownController.remaining,
-                          style: const TextStyle(fontWeight: FontWeight.bold),
+                          style: Theme.of(context)
+                              .textTheme
+                              .bodyMedium!
+                              .copyWith(fontWeight: FontWeight.bold),
                         ),
                       ),
                     ),

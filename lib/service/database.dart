@@ -99,7 +99,8 @@ class DatabaseService extends GetxService with ChangeNotifier {
         for (final key in settingsStorage.getKeys<Iterable<String>>())
           key: settingsStorage.read(key),
       },
-      "ongoing": jsonDecode(ongoingStorage.read("data")),
+      if (ongoingStorage.hasData("data"))
+        "ongoing": jsonDecode(ongoingStorage.read("data")),
     };
   }
 

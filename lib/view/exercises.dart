@@ -446,31 +446,35 @@ class _RoutineHistoryDataState extends State<RoutineHistoryData> {
 
   String _getDayMonth(DateTime? dateTime) {
     if (dateTime == null) return "";
-    return "${dateTime.day}/${dateTime.month}";
+    return "${dateTime.day}/${dateTime.month}/${dateTime.year}";
+  }
+
+  String _getMonth(DateTime? dateTime) {
+    if (dateTime == null) return "";
+    return "${dateTime.month}/${dateTime.year}";
   }
 
   Widget Function(double, TitleMeta) bottomTitleWidgets(BuildContext context) {
     return (double value, TitleMeta meta) {
-      if (value == 0 ||
-          _getDayMonth(children[value.toInt() - 1].startingDate) !=
-              _getDayMonth(children[value.toInt()].startingDate)) {
-        return SideTitleWidget(
-          axisSide: meta.axisSide,
-          child: Text(
-            DateFormat.yMd()
-                .format(children[value.toInt()].startingDate ?? DateTime.now()),
-            style: Theme.of(context).textTheme.labelSmall,
-          ),
-        );
-      } else {
-        return SideTitleWidget(
-          axisSide: meta.axisSide,
-          child: Text(
-            "",
-            style: Theme.of(context).textTheme.labelSmall,
-          ),
-        );
+      DateTime? cur = children[value.toInt()].startingDate;
+      String text = DateFormat.Md().format(cur ?? DateTime.now());
+
+      if (value > 0) {
+        DateTime? prev = children[value.toInt() - 1].startingDate;
+        if (_getDayMonth(prev) == _getDayMonth(cur)) {
+          text = "";
+        } else if (_getMonth(prev) == _getMonth(cur)) {
+          text = DateFormat.d().format(cur ?? DateTime.now());
+        }
       }
+
+      return SideTitleWidget(
+        axisSide: meta.axisSide,
+        child: Text(
+          text,
+          style: Theme.of(context).textTheme.labelSmall,
+        ),
+      );
     };
   }
 

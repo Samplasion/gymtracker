@@ -99,6 +99,7 @@ class DatabaseService extends GetxService with ChangeNotifier {
         for (final key in settingsStorage.getKeys<Iterable<String>>())
           key: settingsStorage.read(key),
       },
+      "ongoing": jsonDecode(ongoingStorage.read("data")),
     };
   }
 
@@ -120,6 +121,9 @@ class DatabaseService extends GetxService with ChangeNotifier {
           writeSetting(key, json['settings'][key]);
         }
       }
+      if (json['ongoing'] is String) {
+        ongoingStorage.write("data", jsonEncode(json['ongoing']));
+      }
     }
 
     try {
@@ -131,6 +135,7 @@ class DatabaseService extends GetxService with ChangeNotifier {
   }
 
   void writeToOngoing(Map<String, dynamic> data) {
+    printInfo(info: "Requested write of ongoing workout data: $data");
     ongoingStorage.write("data", jsonEncode(data));
   }
 
@@ -140,6 +145,7 @@ class DatabaseService extends GetxService with ChangeNotifier {
   }
 
   void deleteOngoing() {
+    printInfo(info: "Requested deletion of ongoing workout data");
     ongoingStorage.remove("data");
   }
 

@@ -104,7 +104,7 @@ class _WorkoutViewState extends State<WorkoutView> {
         () => ListView(
           children: [
             // Avoid calling [get controller] in order to avoid
-            // recreating it.
+            // recreating it, thus starting a new workout.
             if (Get.find<WorkoutsController>().hasOngoingWorkout())
               for (int i = 0; i < controller.exercises.length; i++)
                 WorkoutExerciseEditor(
@@ -129,6 +129,7 @@ class _WorkoutViewState extends State<WorkoutView> {
                           controller.exercises[newIndices[i]]
                       ]);
                     });
+                    controller.save();
                   },
                   onReplace: () {
                     SchedulerBinding.instance
@@ -143,15 +144,18 @@ class _WorkoutViewState extends State<WorkoutView> {
                         ),
                       ]);
                       controller.exercises.refresh();
+                      controller.save();
                     });
                   },
                   onRemove: () {
                     controller.exercises.removeAt(i);
                     controller.exercises.refresh();
+                    controller.save();
                   },
                   onChangeRestTime: (value) {
                     controller.exercises[i].restTime = value;
                     controller.exercises.refresh();
+                    controller.save();
                   },
                   onSetCreate: () {
                     controller.exercises[i].sets.add(ExSet.empty(
@@ -159,16 +163,19 @@ class _WorkoutViewState extends State<WorkoutView> {
                       parameters: controller.exercises[i].parameters,
                     ));
                     controller.exercises.refresh();
+                    controller.save();
                   },
                   onSetRemove: (index) {
                     setState(() {
                       controller.exercises[i].sets.removeAt(index);
                       controller.exercises.refresh();
+                      controller.save();
                     });
                   },
                   onSetSelectKind: (set, kind) {
                     set.kind = kind;
                     controller.exercises.refresh();
+                    controller.save();
                   },
                   onSetSetDone: (exercise, set, done) {
                     set.done = done;
@@ -177,10 +184,12 @@ class _WorkoutViewState extends State<WorkoutView> {
                         countdownController.setCountdown(exercise.restTime);
                       }
                     }
+                    controller.save();
                     controller.exercises.refresh();
                   },
                   onSetValueChange: () {
                     controller.exercises.refresh();
+                    controller.save();
                   },
                 ),
             Padding(

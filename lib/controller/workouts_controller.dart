@@ -107,7 +107,8 @@ class WorkoutsController extends GetxController with ServiceableController {
         ])
         ..time(DateTime.now())
         // Same goes for this
-        ..parentID(workoutID);
+        ..parentID(workoutID)
+        ..save();
     });
   }
 

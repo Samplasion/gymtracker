@@ -59,6 +59,7 @@ class WorkoutController extends GetxController with ServiceableController {
     super.onInit();
     SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
       Get.find<WorkoutsController>().hasOngoingWorkout(true);
+      save();
     });
   }
 
@@ -73,7 +74,7 @@ class WorkoutController extends GetxController with ServiceableController {
   }
 
   void save() {
-    if (!service.hasOngoing) return;
+    if (Get.find<WorkoutsController>().hasOngoingWorkout.isFalse) return;
 
     printInfo(info: "Saving ongoing data");
     service.writeToOngoing({

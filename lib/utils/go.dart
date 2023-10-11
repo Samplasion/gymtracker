@@ -32,4 +32,29 @@ class Go {
     );
     ScaffoldMessenger.of(Get.context!).showSnackBar(snackBar);
   }
+
+  static void dialog(
+    String title,
+    String body, {
+    Widget? icon,
+  }) {
+    showDialog(
+      context: Get.context!,
+      builder: (context) {
+        return AlertDialog(
+          icon: icon ?? const Icon(Icons.info),
+          title: Text(title.tr),
+          content: Text(body.tr),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Get.back();
+              },
+              child: Text(MaterialLocalizations.of(context).okButtonLabel),
+            ),
+          ],
+        );
+      },
+    );
+  }
 }

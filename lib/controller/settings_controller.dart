@@ -57,7 +57,7 @@ class SettingsController extends GetxController with ServiceableController {
         Go.snack("settings.options.import.success".tr);
       } catch (e) {
         e.printError();
-        Go.snack("settings.options.import.failed".tr);
+        Go.dialog("settings.options.import.failed".tr, e.toString());
       }
     } else {
       // User canceled the picker

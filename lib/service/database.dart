@@ -92,9 +92,9 @@ class DatabaseService extends GetxService with ChangeNotifier {
 
   toJson() {
     return {
-      "exercise": jsonDecode(exerciseStorage.read("data")),
-      "routines": jsonDecode(routinesStorage.read("data")),
-      "workouts": jsonDecode(workoutsStorage.read("data")),
+      "exercise": jsonDecode(exerciseStorage.read("data") ?? "[]"),
+      "routines": jsonDecode(routinesStorage.read("data") ?? "[]"),
+      "workouts": jsonDecode(workoutsStorage.read("data") ?? "[]"),
       "settings": {
         for (final key in settingsStorage.getKeys<Iterable<String>>())
           key: settingsStorage.read(key),

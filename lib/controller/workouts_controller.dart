@@ -159,4 +159,8 @@ class WorkoutsController extends GetxController with ServiceableController {
         if (workout.parentID == routine.id) workout
     ];
   }
+
+  void importWorkout(Workout workout) {
+    service.routines = [...service.routines, workout.toRoutine()];
+  }
 }

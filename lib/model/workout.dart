@@ -66,4 +66,6 @@ class Workout {
       };
 
   Workout clone() => Workout.fromJson(toJson());
+
+  Workout toRoutine() => copyWith(duration: null, startingDate: null);
 }

@@ -71,6 +71,9 @@ workouts:
       label: Cambia routine di base
       options:
         none: Nessuna
+    saveAsRoutine:
+      button: Salva come routine
+      done: Allenamento salvato come routine
   
 routines:
   title: Routine

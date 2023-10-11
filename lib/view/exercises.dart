@@ -159,6 +159,19 @@ class _ExercisesViewState extends State<ExercisesView> {
               ),
             ),
           ),
+          if (workout.isConcrete)
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.all(16).copyWith(top: 0),
+                child: FilledButton.tonal(
+                  onPressed: () {
+                    Get.find<WorkoutsController>().importWorkout(workout);
+                    Go.snack("workouts.actions.saveAsRoutine.done".tr);
+                  },
+                  child: Text("workouts.actions.saveAsRoutine.button".tr),
+                ),
+              ),
+            ),
           SliverList(
             delegate: SliverChildBuilderDelegate(
               (context, index) {

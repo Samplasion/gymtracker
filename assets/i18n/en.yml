@@ -118,8 +118,8 @@ ongoingWorkout:
     finish: Finish workout
     cancel: Cancel workout
     short:
-      cancel: Annulla
-      resume: Riprendi
+      cancel: Cancel
+      resume: Resume
   exercises:
     add: + Add exercise
     replace: Replace exercises

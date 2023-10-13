@@ -113,6 +113,12 @@ settings:
       label: App language
     weightUnit:
       label: Weight unit
+    import:
+      label: Import data
+      success: Successfully imported data
+      failed: Failed to import data
+    export:
+      label: Export data (JSON)
 
 ongoingWorkout:
   title: Ongoing workout

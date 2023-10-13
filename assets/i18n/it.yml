@@ -113,6 +113,12 @@ settings:
       label: Lingua dell'applicazione
     weightUnit:
       label: Unità di peso
+    import:
+      label: Importa dati
+      success: Dati importati con successo
+      failed: Impossibile importare i dati
+    export:
+      label: Esporta dati (JSON)
 
 ongoingWorkout:
   title: Allenamento in corso

@@ -111,6 +111,8 @@ settings:
       label: Usa colore dinamico
     locale:
       label: Lingua dell'applicazione
+    weightUnit:
+      label: Unità di peso
 
 ongoingWorkout:
   title: Allenamento in corso
@@ -159,6 +161,7 @@ ongoingWorkout:
       no: Annulla
       yes: Avvia
   restOver: È scaduto il tempo di riposo!
+  weightCalculator: Calcolatrice pesi
 
 timer: 
   add15s: "+15s"
@@ -234,6 +237,24 @@ time:
 locales:
   en: Inglese
   it: Italiano
+
+weightUnits:
+  kg: Chili
+  lb: Libbre
+
+barbells:
+  normal: Normale
+  short: Corto
+  ezBar: EZ bar
+  none: Nessuno
+
+weightCalculator:
+  weight:
+    label: Peso totale
+  weights:
+    label: Pesi disponibili
+  barbells:
+    label: Bilanciere
 
 androidNotificationChannel:
   name: Timer tempo di riposo

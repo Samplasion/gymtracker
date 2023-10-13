@@ -34,3 +34,13 @@ Color getOnContainerColor(BuildContext context, Color color) {
 double oneRepMax({required double weight, required int reps}) {
   return weight / (1.0278 - (0.0278 * reps));
 }
+
+double mapRange(
+  double value,
+  double min,
+  double max,
+  double newMin,
+  double newMax,
+) {
+  return (((value - min) * (newMax - newMin)) / (max - min)) + newMin;
+}

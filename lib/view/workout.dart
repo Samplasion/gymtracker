@@ -17,6 +17,7 @@ import 'utils/date_field.dart';
 import 'utils/exercise.dart';
 import 'utils/time.dart';
 import 'utils/timer.dart';
+import 'utils/weight_calculator.dart';
 
 WorkoutController get controller =>
     Get.put(WorkoutController("Untitled workout", null));
@@ -51,6 +52,16 @@ class _WorkoutViewState extends State<WorkoutView> {
       appBar: AppBar(
         title: Text("ongoingWorkout.title".tr),
         actions: [
+          IconButton(
+            tooltip: "ongoingWorkout.weightCalculator".tr,
+            icon: const Icon(Icons.calculate),
+            onPressed: () {
+              showModalBottomSheet(
+                context: context,
+                builder: (context) => const WeightCalculator(),
+              );
+            },
+          ),
           PopupMenuButton(
             itemBuilder: (context) => [
               PopupMenuItem(

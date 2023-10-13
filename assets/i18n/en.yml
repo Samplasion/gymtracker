@@ -111,6 +111,8 @@ settings:
       label: Use dynamic color
     locale:
       label: App language
+    weightUnit:
+      label: Weight unit
 
 ongoingWorkout:
   title: Ongoing workout
@@ -159,6 +161,7 @@ ongoingWorkout:
       no: Cancel
       yes: Start
   restOver: Rest time is over!
+  weightCalculator: Weight calculator
 
 timer: 
   add15s: "+15s"
@@ -234,6 +237,24 @@ time:
 locales:
   en: English
   it: Italian
+
+weightUnits:
+  kg: Kilograms
+  lb: Pounds
+
+barbells:
+  normal: Normal
+  short: Short
+  ezBar: EZ bar
+  none: No bar
+
+weightCalculator:
+  weight:
+    label: Total weight
+  weights:
+    label: Available weight plates
+  barbells:
+    label: Barbell
 
 androidNotificationChannel:
   name: Rest timeout

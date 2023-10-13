@@ -7,12 +7,14 @@ import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:share_plus/share_plus.dart';
 
+import '../data/weights.dart';
 import '../utils/go.dart';
 import 'serviceable_controller.dart';
 
 class SettingsController extends GetxController with ServiceableController {
   RxBool usesDynamicColor = false.obs;
   Rx<Locale?> locale = Get.locale.obs;
+  Rx<Weights?> weightUnit = Weights.kg.obs;
 
   void setUsesDynamicColor(bool usesDC) =>
       service.writeSetting("usesDynamicColor", usesDC);
@@ -21,11 +23,18 @@ class SettingsController extends GetxController with ServiceableController {
     service.writeSetting("locale", locale.languageCode);
   }
 
+  void setWeightUnit(Weights weightUnit) =>
+      service.writeSetting("weightUnit", weightUnit.name);
+
   @override
   void onServiceChange() {
     final storage = service.settingsStorage;
     usesDynamicColor(storage.read<bool>("usesDynamicColor") ?? false);
     locale(Locale(storage.read<String>("locale") ?? "en"));
+    weightUnit(Weights.values.firstWhere(
+      (element) => element.name == storage.read<String>("weightUnit"),
+      orElse: () => Weights.kg,
+    ));
   }
 
   Future exportSettings(BuildContext context) async {

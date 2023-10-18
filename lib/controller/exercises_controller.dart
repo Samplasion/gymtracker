@@ -31,7 +31,7 @@ class ExercisesController extends GetxController with ServiceableController {
     List<ExSet> sets = const [],
     required Duration restTime,
   }) {
-    return Exercise(
+    return Exercise.custom(
       name: name,
       parameters: parameters,
       sets: sets,

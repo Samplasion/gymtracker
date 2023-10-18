@@ -29,8 +29,8 @@ enum MuscleGroup {
   upperBack,
 }
 
-@JsonSerializable()
-@CopyWith()
+@JsonSerializable(constructor: "_")
+@CopyWith(constructor: "_")
 class Exercise {
   String id;
   final String name;
@@ -47,11 +47,12 @@ class Exercise {
   @JsonKey(defaultValue: "")
   String notes;
 
-  bool _standard = false;
+  @JsonKey(defaultValue: false)
+  final bool standard;
 
-  bool get isCustom => !_standard;
+  bool get isCustom => !standard;
 
-  Exercise({
+  Exercise._({
     String? id,
     required this.name,
     required this.parameters,
@@ -61,12 +62,36 @@ class Exercise {
     required this.restTime,
     this.parentID,
     required this.notes,
+    required this.standard,
   })  : id = id ?? const Uuid().v4(),
         assert(sets.isEmpty || parameters == sets[0].parameters,
             "The parameters must not change between the Exercise and its Sets"),
         assert(
             sets.isEmpty || sets.map((e) => e.parameters).toSet().length == 1,
             "The sets must have the same parameters.");
+
+  factory Exercise.custom({
+    String? id,
+    required String name,
+    required SetParameters parameters,
+    required List<ExSet> sets,
+    required MuscleGroup primaryMuscleGroup,
+    Set<MuscleGroup> secondaryMuscleGroups = const <MuscleGroup>{},
+    required Duration restTime,
+    String? parentID,
+    required String notes,
+  }) =>
+      Exercise._(
+        name: name,
+        parameters: parameters,
+        sets: sets,
+        primaryMuscleGroup: primaryMuscleGroup,
+        secondaryMuscleGroups: secondaryMuscleGroups,
+        restTime: restTime,
+        parentID: parentID,
+        notes: notes,
+        standard: false,
+      );
 
   factory Exercise.standard({
     required String id,
@@ -75,7 +100,7 @@ class Exercise {
     required MuscleGroup primaryMuscleGroup,
     Set<MuscleGroup> secondaryMuscleGroups = const <MuscleGroup>{},
   }) {
-    return Exercise(
+    return Exercise._(
       id: id,
       name: name,
       parameters: parameters,
@@ -84,7 +109,8 @@ class Exercise {
       sets: [ExSet.empty(kind: SetKind.normal, parameters: parameters)],
       restTime: Duration.zero,
       notes: "",
-    ).._standard = true;
+      standard: true,
+    );
   }
 
   factory Exercise.fromJson(Map<String, dynamic> json) =>

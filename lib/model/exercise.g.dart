@@ -25,6 +25,8 @@ abstract class _$ExerciseCWProxy {
 
   Exercise notes(String notes);
 
+  Exercise standard(bool standard);
+
   /// This function **does support** nullification of nullable fields. All `null` values passed to `non-nullable` fields will be ignored. You can also use `Exercise(...).copyWith.fieldName(...)` to override fields one at a time with nullification support.
   ///
   /// Usage
@@ -41,6 +43,7 @@ abstract class _$ExerciseCWProxy {
     Duration? restTime,
     String? parentID,
     String? notes,
+    bool? standard,
   });
 }
 
@@ -80,6 +83,9 @@ class _$ExerciseCWProxyImpl implements _$ExerciseCWProxy {
   Exercise notes(String notes) => this(notes: notes);
 
   @override
+  Exercise standard(bool standard) => this(standard: standard);
+
+  @override
 
   /// This function **does support** nullification of nullable fields. All `null` values passed to `non-nullable` fields will be ignored. You can also use `Exercise(...).copyWith.fieldName(...)` to override fields one at a time with nullification support.
   ///
@@ -97,44 +103,39 @@ class _$ExerciseCWProxyImpl implements _$ExerciseCWProxy {
     Object? restTime = const $CopyWithPlaceholder(),
     Object? parentID = const $CopyWithPlaceholder(),
     Object? notes = const $CopyWithPlaceholder(),
+    Object? standard = const $CopyWithPlaceholder(),
   }) {
-    return Exercise(
+    return Exercise._(
       id: id == const $CopyWithPlaceholder()
           ? _value.id
           // ignore: cast_nullable_to_non_nullable
           : id as String?,
       name: name == const $CopyWithPlaceholder() || name == null
-          // ignore: unnecessary_non_null_assertion
-          ? _value.name!
+          ? _value.name
           // ignore: cast_nullable_to_non_nullable
           : name as String,
       parameters:
           parameters == const $CopyWithPlaceholder() || parameters == null
-              // ignore: unnecessary_non_null_assertion
-              ? _value.parameters!
+              ? _value.parameters
               // ignore: cast_nullable_to_non_nullable
               : parameters as SetParameters,
       sets: sets == const $CopyWithPlaceholder() || sets == null
-          // ignore: unnecessary_non_null_assertion
-          ? _value.sets!
+          ? _value.sets
           // ignore: cast_nullable_to_non_nullable
           : sets as List<ExSet>,
       primaryMuscleGroup: primaryMuscleGroup == const $CopyWithPlaceholder() ||
               primaryMuscleGroup == null
-          // ignore: unnecessary_non_null_assertion
-          ? _value.primaryMuscleGroup!
+          ? _value.primaryMuscleGroup
           // ignore: cast_nullable_to_non_nullable
           : primaryMuscleGroup as MuscleGroup,
       secondaryMuscleGroups:
           secondaryMuscleGroups == const $CopyWithPlaceholder() ||
                   secondaryMuscleGroups == null
-              // ignore: unnecessary_non_null_assertion
-              ? _value.secondaryMuscleGroups!
+              ? _value.secondaryMuscleGroups
               // ignore: cast_nullable_to_non_nullable
               : secondaryMuscleGroups as Set<MuscleGroup>,
       restTime: restTime == const $CopyWithPlaceholder() || restTime == null
-          // ignore: unnecessary_non_null_assertion
-          ? _value.restTime!
+          ? _value.restTime
           // ignore: cast_nullable_to_non_nullable
           : restTime as Duration,
       parentID: parentID == const $CopyWithPlaceholder()
@@ -142,10 +143,13 @@ class _$ExerciseCWProxyImpl implements _$ExerciseCWProxy {
           // ignore: cast_nullable_to_non_nullable
           : parentID as String?,
       notes: notes == const $CopyWithPlaceholder() || notes == null
-          // ignore: unnecessary_non_null_assertion
-          ? _value.notes!
+          ? _value.notes
           // ignore: cast_nullable_to_non_nullable
           : notes as String,
+      standard: standard == const $CopyWithPlaceholder() || standard == null
+          ? _value.standard
+          // ignore: cast_nullable_to_non_nullable
+          : standard as bool,
     );
   }
 }
@@ -160,7 +164,7 @@ extension $ExerciseCopyWith on Exercise {
 // JsonSerializableGenerator
 // **************************************************************************
 
-Exercise _$ExerciseFromJson(Map<String, dynamic> json) => Exercise(
+Exercise _$ExerciseFromJson(Map<String, dynamic> json) => Exercise._(
       id: json['id'] as String?,
       name: json['name'] as String,
       parameters: $enumDecode(_$SetParametersEnumMap, json['parameters']),
@@ -176,6 +180,7 @@ Exercise _$ExerciseFromJson(Map<String, dynamic> json) => Exercise(
       restTime: Duration(microseconds: json['restTime'] as int),
       parentID: json['parentID'] as String?,
       notes: json['notes'] as String? ?? '',
+      standard: json['standard'] as bool? ?? false,
     );
 
 Map<String, dynamic> _$ExerciseToJson(Exercise instance) => <String, dynamic>{
@@ -190,6 +195,7 @@ Map<String, dynamic> _$ExerciseToJson(Exercise instance) => <String, dynamic>{
       'restTime': instance.restTime.inMicroseconds,
       'parentID': instance.parentID,
       'notes': instance.notes,
+      'standard': instance.standard,
     };
 
 const _$SetParametersEnumMap = {

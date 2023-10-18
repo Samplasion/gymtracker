@@ -95,14 +95,12 @@ class _$ExSetCWProxyImpl implements _$ExSetCWProxy {
           // ignore: cast_nullable_to_non_nullable
           : id as String?,
       kind: kind == const $CopyWithPlaceholder() || kind == null
-          // ignore: unnecessary_non_null_assertion
-          ? _value.kind!
+          ? _value.kind
           // ignore: cast_nullable_to_non_nullable
           : kind as SetKind,
       parameters:
           parameters == const $CopyWithPlaceholder() || parameters == null
-              // ignore: unnecessary_non_null_assertion
-              ? _value.parameters!
+              ? _value.parameters
               // ignore: cast_nullable_to_non_nullable
               : parameters as SetParameters,
       reps: reps == const $CopyWithPlaceholder()
@@ -122,8 +120,7 @@ class _$ExSetCWProxyImpl implements _$ExSetCWProxy {
           // ignore: cast_nullable_to_non_nullable
           : distance as double?,
       done: done == const $CopyWithPlaceholder() || done == null
-          // ignore: unnecessary_non_null_assertion
-          ? _value.done!
+          ? _value.done
           // ignore: cast_nullable_to_non_nullable
           : done as bool,
     );

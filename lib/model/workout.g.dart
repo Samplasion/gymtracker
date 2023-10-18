@@ -82,13 +82,11 @@ class _$WorkoutCWProxyImpl implements _$WorkoutCWProxy {
           // ignore: cast_nullable_to_non_nullable
           : id as String?,
       name: name == const $CopyWithPlaceholder() || name == null
-          // ignore: unnecessary_non_null_assertion
-          ? _value.name!
+          ? _value.name
           // ignore: cast_nullable_to_non_nullable
           : name as String,
       exercises: exercises == const $CopyWithPlaceholder() || exercises == null
-          // ignore: unnecessary_non_null_assertion
-          ? _value.exercises!
+          ? _value.exercises
           // ignore: cast_nullable_to_non_nullable
           : exercises as List<Exercise>,
       duration: duration == const $CopyWithPlaceholder()

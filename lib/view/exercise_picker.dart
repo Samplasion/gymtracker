@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:gymtracker/service/localizations.dart';
 
 import '../controller/exercises_controller.dart';
+import '../data/exercises.dart';
 import '../model/exercise.dart';
+import '../utils/go.dart';
+import '../utils/utils.dart';
 import 'utils/exercise.dart';
 import 'exercise_creator.dart';
 
@@ -20,63 +24,89 @@ class _ExercisePickerState extends State<ExercisePicker> {
 
   Set<Exercise> selectedExercises = {};
 
+  Map<String, ExerciseCategory> get exercises {
+    final sortedKeys = [...exerciseStandardLibrary.keys]
+      ..sort((a, b) => a.toLowerCase().compareTo(b.toLowerCase()));
+    return {
+      "library.custom".tr: ExerciseCategory(
+        exercises: controller.exercises,
+        icon: const Icon(Icons.star_rounded),
+        color: Colors.yellow,
+      ),
+      for (final key in sortedKeys) key: exerciseStandardLibrary[key]!,
+    };
+  }
+
   @override
   Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
     return Scaffold(
       appBar: AppBar(
         title: Text("exercise.picker.title".tr),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.check),
-            onPressed: _submit,
-          )
+          if (!widget.singlePick)
+            IconButton(
+              icon: const Icon(Icons.check),
+              onPressed: _submit,
+            )
         ],
       ),
       body: Obx(
-        () => ListView.builder(
-          itemCount: controller.exercises.length,
-          itemBuilder: (BuildContext context, int index) {
-            final exercise = controller.exercises[index];
-            final isSelected = selectedExercises.contains(exercise);
-            return Dismissible(
-              key: ValueKey(exercise.id),
-              onDismissed: (_) {
-                selectedExercises.remove(exercise);
-                controller.deleteExercise(exercise);
-                controller.exercises.refresh();
-              },
-              direction: DismissDirection.endToStart,
-              background: Container(
-                color: scheme.error,
-                alignment: Alignment.centerRight,
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Text(
-                    "actions.remove".tr,
-                    style: TextStyle(color: scheme.onError),
-                  ),
-                ),
+        () => CustomScrollView(
+          slivers: [
+            SliverList(
+              delegate: SliverChildListDelegate(
+                [
+                  for (final category in exercises.entries)
+                    ListTile(
+                      leading: CircleAvatar(
+                        backgroundColor:
+                            getContainerColor(context, category.value.color),
+                        foregroundColor:
+                            getOnContainerColor(context, category.value.color),
+                        child: category.value.icon,
+                      ),
+                      title: Text(category.key),
+                      subtitle: Text(
+                        "general.exercises"
+                            .plural(category.value.exercises.length),
+                      ),
+                      onTap: () {
+                        Go.to(
+                          () => StatefulBuilder(builder: (context, setState) {
+                            return LibraryPickerExercisesView(
+                              name: category.key,
+                              category: category.value,
+                              singleSelection: widget.singlePick,
+                              onSelected: (exercise) {
+                                final isSelected =
+                                    selectedExercises.contains(exercise);
+                                isSelected.printInfo(info: "outer picker");
+                                setState(() {
+                                  if (isSelected) {
+                                    selectedExercises.remove(exercise);
+                                  } else {
+                                    if (widget.singlePick) {
+                                      selectedExercises = {exercise};
+                                    } else {
+                                      selectedExercises.add(exercise);
+                                    }
+                                  }
+                                });
+                              },
+                              onSubmit: () {
+                                Get.back();
+                                _submit();
+                              },
+                              selectedExercises: selectedExercises,
+                            );
+                          }),
+                        );
+                      },
+                    ),
+                ],
               ),
-              child: ExerciseListTile(
-                exercise: exercise,
-                selected: isSelected,
-                onTap: () {
-                  setState(() {
-                    if (isSelected) {
-                      selectedExercises.remove(exercise);
-                    } else {
-                      if (widget.singlePick) {
-                        selectedExercises = {exercise};
-                      } else {
-                        selectedExercises.add(exercise);
-                      }
-                    }
-                  });
-                },
-              ),
-            );
-          },
+            ),
+          ],
         ),
       ),
       floatingActionButton: FloatingActionButton.extended(
@@ -94,12 +124,7 @@ class _ExercisePickerState extends State<ExercisePicker> {
 
   void _submit() {
     if (widget.singlePick && selectedExercises.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text("exercise.picker.errors.empty".tr),
-          behavior: SnackBarBehavior.floating,
-        ),
-      );
+      Go.snack("exercise.picker.errors.empty".tr);
       return;
     }
     ScaffoldMessenger.of(context).clearSnackBars();
@@ -108,6 +133,64 @@ class _ExercisePickerState extends State<ExercisePicker> {
           ..parentID = e.parentID ?? e.id
           ..regenerateID())
         .toList();
-    Get.back(result: exercises);
+    Get.back(result: exercises, closeOverlays: true);
+  }
+}
+
+class LibraryPickerExercisesView extends StatefulWidget {
+  const LibraryPickerExercisesView({
+    required this.name,
+    required this.category,
+    required this.onSelected,
+    required this.singleSelection,
+    required this.onSubmit,
+    required this.selectedExercises,
+    super.key,
+  });
+
+  final String name;
+  final ExerciseCategory category;
+  final ValueChanged<Exercise> onSelected;
+  final bool singleSelection;
+  final VoidCallback onSubmit;
+  final Set<Exercise> selectedExercises;
+
+  @override
+  State<LibraryPickerExercisesView> createState() =>
+      _LibraryPickerExercisesViewState();
+}
+
+class _LibraryPickerExercisesViewState
+    extends State<LibraryPickerExercisesView> {
+  @override
+  Widget build(BuildContext context) {
+    final sorted = [...widget.category.exercises]
+      ..sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(widget.name),
+        actions: [
+          if (widget.singleSelection)
+            IconButton(
+              icon: const Icon(Icons.check),
+              onPressed: widget.onSubmit,
+            )
+        ],
+      ),
+      body: ListView.builder(
+        itemCount: widget.category.exercises.length,
+        itemBuilder: (context, index) {
+          return ExerciseListTile(
+            exercise: sorted[index],
+            selected: widget.selectedExercises.contains(sorted[index]),
+            onTap: () {
+              setState(() {
+                widget.onSelected(sorted[index]);
+              });
+            },
+          );
+        },
+      ),
+    );
   }
 }

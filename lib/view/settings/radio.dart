@@ -70,59 +70,77 @@ class _RadioModalTileState<T> extends State<RadioModalTile<T>>
                   outerSetState(func);
                 }
 
-                final ad = AlertDialog(
-                  scrollable: true,
-                  title: widget.title,
-                  content: Column(
-                    children: [
-                      for (final entry in widget.values.entries)
-                        RadioListTile<T>(
-                          title: Text(entry.value),
-                          value: entry.key,
-                          groupValue: _value,
-                          activeColor: Theme.of(context).colorScheme.secondary,
-                          onChanged: (value) {
-                            _setState(() {
-                              if (value != null) {
-                                _value = value;
-                                widget.onChange?.call(value);
-                              }
-                            });
-                            SchedulerBinding.instance
-                                .addPostFrameCallback((timeStamp) {
-                              _setState(() {});
-                            });
-                          },
-                        ),
-                    ],
-                  ),
-                  actions: [
-                    TextButton(
-                      child: Text(
-                          MaterialLocalizations.of(context).cancelButtonLabel),
-                      onPressed: () {
-                        widget.onChange?.call(oldValue);
-                        Navigator.of(context).pop(false);
-                      },
+                return Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: DefaultTextStyle(
+                        style: Theme.of(context).textTheme.titleLarge!,
+                        child: widget.title,
+                      ),
                     ),
-                    TextButton(
-                      child:
-                          Text(MaterialLocalizations.of(context).okButtonLabel),
-                      onPressed: () {
-                        if (widget.onChange != null) {
-                          widget.onChange!(widget.selectedValue);
-                        }
-                        Navigator.of(context).pop(true);
-                      },
+                    Flexible(
+                      child: SingleChildScrollView(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            for (final entry in widget.values.entries)
+                              RadioListTile<T>(
+                                title: Text(entry.value),
+                                value: entry.key,
+                                groupValue: _value,
+                                activeColor:
+                                    Theme.of(context).colorScheme.secondary,
+                                onChanged: (value) {
+                                  _setState(() {
+                                    if (value != null) {
+                                      _value = value;
+                                      widget.onChange?.call(value);
+                                    }
+                                  });
+                                  SchedulerBinding.instance
+                                      .addPostFrameCallback((timeStamp) {
+                                    _setState(() {});
+                                  });
+                                },
+                              ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    Flexible(
+                      child: Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: Wrap(
+                          alignment: WrapAlignment.end,
+                          children: [
+                            TextButton(
+                              child: Text(MaterialLocalizations.of(context)
+                                  .cancelButtonLabel),
+                              onPressed: () {
+                                widget.onChange?.call(oldValue);
+                                Navigator.of(context).pop(false);
+                              },
+                            ),
+                            TextButton(
+                              child: Text(MaterialLocalizations.of(context)
+                                  .okButtonLabel),
+                              onPressed: () {
+                                if (widget.onChange != null) {
+                                  widget.onChange!(widget.selectedValue);
+                                }
+                                Navigator.of(context).pop(true);
+                              },
+                            ),
+                          ],
+                        ),
+                      ),
                     ),
                   ],
                 );
-                final dialog = ad.build(context) as Dialog;
-                return ((((dialog.build(context) as AnimatedPadding).child!
-                                as MediaQuery)
-                            .child as Align)
-                        .child as ConstrainedBox)
-                    .child!;
               },
             );
           },

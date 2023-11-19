@@ -1,9 +1,8 @@
 import 'package:copy_with_extension/copy_with_extension.dart';
-import 'package:gymtracker/model/exercise.dart';
+import 'package:gymtracker/model/exercisable.dart';
+import 'package:gymtracker/model/set.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:uuid/uuid.dart';
-
-import 'set.dart';
 
 part 'workout.g.dart';
 
@@ -19,7 +18,7 @@ part 'workout.g.dart';
 class Workout {
   String id;
   final String name;
-  final List<Exercise> exercises;
+  final List<WorkoutExercisable> exercises;
   final Duration? duration;
   final DateTime? startingDate;
 

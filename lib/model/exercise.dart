@@ -1,4 +1,5 @@
 import 'package:copy_with_extension/copy_with_extension.dart';
+import 'package:gymtracker/model/exercisable.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:uuid/uuid.dart';
 
@@ -31,13 +32,15 @@ enum MuscleGroup {
 
 @JsonSerializable(constructor: "_")
 @CopyWith(constructor: "_")
-class Exercise {
+class Exercise extends WorkoutExercisable {
   String id;
   final String name;
   final SetParameters parameters;
+  @override
   final List<ExSet> sets;
   final MuscleGroup primaryMuscleGroup;
   final Set<MuscleGroup> secondaryMuscleGroups;
+  @override
   Duration restTime;
 
   /// The ID of the non-concrete (ie. part of a routine) exercise
@@ -116,9 +119,11 @@ class Exercise {
   factory Exercise.fromJson(Map<String, dynamic> json) =>
       _$ExerciseFromJson(json);
 
+  @override
   Map<String, dynamic> toJson() => <String, dynamic>{
         ..._$ExerciseToJson(this),
         'sets': [for (final set in sets) set.toJson()],
+        'type': 'exercise',
       };
 
   Exercise clone() => Exercise.fromJson(toJson());

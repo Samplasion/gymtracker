@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get/state_manager.dart';
+import 'package:gymtracker/model/superset.dart';
 import 'package:uuid/uuid.dart';
 
 import '../controller/history_controller.dart';
@@ -94,16 +95,32 @@ class WorkoutsController extends GetxController with ServiceableController {
         ..name(clone.name)
         ..exercises([
           for (final ex in clone.exercises)
-            ex.copyWith(
-              sets: ([
-                for (final set in ex.sets) set.copyWith.done(false),
-              ]),
-              // If we're redoing a previous workout,
-              // we want to inherit the previous parent ID,
-              // ie. the original routine's ID
-              parentID: workout.isConcrete ? ex.parentID : ex.id,
-              id: const Uuid().v4(),
-            ),
+            if (ex is Exercise)
+              ex.copyWith(
+                sets: ([
+                  for (final set in ex.sets) set.copyWith.done(false),
+                ]),
+                // If we're redoing a previous workout,
+                // we want to inherit the previous parent ID,
+                // ie. the original routine's ID
+                parentID: workout.isConcrete ? ex.parentID : ex.id,
+                id: const Uuid().v4(),
+              )
+            else if (ex is Superset)
+              ex.copyWith(
+                exercises: ex.exercises
+                    .map((ex) => ex.copyWith(
+                          sets: ([
+                            for (final set in ex.sets) set.copyWith.done(false),
+                          ]),
+                          // If we're redoing a previous workout,
+                          // we want to inherit the previous parent ID,
+                          // ie. the original routine's ID
+                          parentID: workout.isConcrete ? ex.parentID : ex.id,
+                          id: const Uuid().v4(),
+                        ))
+                    .toList(),
+              ),
         ])
         ..time(DateTime.now())
         // Same goes for this

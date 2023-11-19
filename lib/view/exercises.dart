@@ -3,6 +3,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:get/get.dart';
+import 'package:gymtracker/model/exercisable.dart';
+import 'package:gymtracker/model/superset.dart';
 import 'package:intl/intl.dart';
 
 import '../controller/history_controller.dart' as history;
@@ -499,12 +501,16 @@ class ExerciseDataView extends StatelessWidget {
     required this.index,
   });
 
-  final Exercise exercise;
+  final WorkoutExercisable exercise;
   final Workout workout;
   final int index;
 
   @override
   Widget build(BuildContext context) {
+    // if (this.exercise is Superset) return Container();
+    assert(this.exercise is! Superset);
+
+    final exercise = this.exercise as Exercise;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [

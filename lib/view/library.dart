@@ -115,9 +115,10 @@ class ExerciseInfoView extends StatelessWidget {
     final history = <Exercise>[];
     for (final workout in controller.history) {
       history.addAll(
-        workout.exercises.where(
-          (element) => exercise.isTheSameAs(element),
-        ),
+        // TODO(Supersets): Fix this
+        workout.exercises.whereType<Exercise>().where(
+              (element) => exercise.isTheSameAs(element),
+            ),
       );
     }
     return history;

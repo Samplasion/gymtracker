@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:get/get.dart';
+import 'package:gymtracker/model/exercisable.dart';
 
 import '../model/exercise.dart';
 import '../model/set.dart';
@@ -32,7 +33,7 @@ class WorkoutController extends GetxController with ServiceableController {
     return cont;
   }
 
-  RxList<Exercise> exercises = <Exercise>[].obs;
+  RxList<WorkoutExercisable> exercises = <WorkoutExercisable>[].obs;
 
   Workout generateWorkout(String parentID) => Workout(
         name: name.value,

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:gymtracker/model/exercise.dart';
 import 'package:intl/intl.dart';
 
 import '../controller/history_controller.dart';
@@ -117,7 +118,9 @@ class HistoryWorkout extends StatelessWidget {
                 ],
               ),
             ),
-            for (final exercise in workout.exercises.take(3))
+            // TODO(Supersets): Fix this
+            for (final exercise
+                in workout.exercises.whereType<Exercise>().take(3))
               ExerciseListTile(exercise: exercise, selected: false),
             if (workout.exercises.length > 3) ...[
               ListTile(

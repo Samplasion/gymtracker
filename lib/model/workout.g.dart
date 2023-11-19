@@ -11,7 +11,7 @@ abstract class _$WorkoutCWProxy {
 
   Workout name(String name);
 
-  Workout exercises(List<Exercise> exercises);
+  Workout exercises(List<WorkoutExercisable> exercises);
 
   Workout duration(Duration? duration);
 
@@ -28,7 +28,7 @@ abstract class _$WorkoutCWProxy {
   Workout call({
     String? id,
     String? name,
-    List<Exercise>? exercises,
+    List<WorkoutExercisable>? exercises,
     Duration? duration,
     DateTime? startingDate,
     String? parentID,
@@ -48,7 +48,8 @@ class _$WorkoutCWProxyImpl implements _$WorkoutCWProxy {
   Workout name(String name) => this(name: name);
 
   @override
-  Workout exercises(List<Exercise> exercises) => this(exercises: exercises);
+  Workout exercises(List<WorkoutExercisable> exercises) =>
+      this(exercises: exercises);
 
   @override
   Workout duration(Duration? duration) => this(duration: duration);
@@ -88,7 +89,7 @@ class _$WorkoutCWProxyImpl implements _$WorkoutCWProxy {
       exercises: exercises == const $CopyWithPlaceholder() || exercises == null
           ? _value.exercises
           // ignore: cast_nullable_to_non_nullable
-          : exercises as List<Exercise>,
+          : exercises as List<WorkoutExercisable>,
       duration: duration == const $CopyWithPlaceholder()
           ? _value.duration
           // ignore: cast_nullable_to_non_nullable
@@ -119,7 +120,7 @@ Workout _$WorkoutFromJson(Map<String, dynamic> json) => Workout(
       id: json['id'] as String?,
       name: json['name'] as String,
       exercises: (json['exercises'] as List<dynamic>)
-          .map((e) => Exercise.fromJson(e as Map<String, dynamic>))
+          .map((e) => WorkoutExercisable.fromJson(e as Map<String, dynamic>))
           .toList(),
       duration: json['duration'] == null
           ? null

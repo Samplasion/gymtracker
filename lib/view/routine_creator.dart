@@ -51,7 +51,9 @@ class _RoutineCreatorState extends State<RoutineCreator> {
   void initState() {
     super.initState();
     if (widget.base != null) {
-      controller.exercises(widget.base!.exercises.wrap());
+      // TODO(Supersets): Fix this
+      controller.exercises(
+          widget.base!.exercises.whereType<Exercise>().toList().wrap());
     }
   }
 

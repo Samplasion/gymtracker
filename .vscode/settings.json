@@ -2,5 +2,5 @@
   "conventionalCommits.scopes": [
     "i18n"
   ],
-  "dart.flutterSdkPath": "~/fvm/versions/3.13.3"
+  "dart.flutterSdkPath": "~/fvm/default"
 }

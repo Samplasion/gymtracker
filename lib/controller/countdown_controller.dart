@@ -59,8 +59,6 @@ class CountdownController extends GetxController {
     const darwinDetails = DarwinNotificationDetails(
       presentSound: true,
       presentAlert: true,
-      presentBadge: true,
-      interruptionLevel: InterruptionLevel.timeSensitive,
     );
     final notificationDetails = NotificationDetails(
       android: androidDetails,

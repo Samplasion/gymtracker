@@ -135,11 +135,12 @@ class OngoingWorkoutBar extends StatelessWidget {
     final isPhone = context.width < Breakpoints.xs;
     return Card(
       elevation: 1,
-      margin: EdgeInsets.zero,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(
-          top: Radius.circular(13),
-        ),
+      margin: const EdgeInsets.fromLTRB(8, 0, 8, 8),
+      shape: RoundedRectangleBorder(
+        // borderRadius: BorderRadius.vertical(
+        //   top: Radius.circular(13),
+        // ),
+        borderRadius: BorderRadius.circular(13),
       ),
       child: Container(
         constraints: const BoxConstraints(minHeight: 64),
@@ -152,10 +153,7 @@ class OngoingWorkoutBar extends StatelessWidget {
                 child: Obx(
                   () => TimerView(
                     startingTime: Get.find<WorkoutController>().time.value,
-                    builder: (_, time) => Hero(
-                      tag: "Ongoing",
-                      child: time,
-                    ),
+                    builder: (_, time) => time,
                   ),
                 ),
               ),

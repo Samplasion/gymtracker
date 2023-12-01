@@ -45,8 +45,8 @@ class MainApp extends StatelessWidget {
 
     const seedColor = Colors.blue;
     return DynamicColorBuilder(builder: (light, dark) {
-      return Obx(
-        () {
+      return Container(
+        child: () {
           final lightScheme = (light != null && settings.usesDynamicColor())
               ? light.harmonized()
               : ColorScheme.fromSeed(
@@ -96,7 +96,7 @@ class MainApp extends StatelessWidget {
               );
             },
           );
-        },
+        }(),
       );
     });
   }

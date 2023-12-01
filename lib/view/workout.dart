@@ -102,13 +102,15 @@ class _WorkoutViewState extends State<WorkoutView> {
       ),
       resizeToAvoidBottomInset: true,
       bottomNavigationBar: Obx(() {
-        return Crossfade(
-          firstChild: const SizedBox.shrink(),
-          secondChild: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: const [WorkoutTimerView()],
+        return SafeArea(
+          child: Crossfade(
+            firstChild: const SizedBox.shrink(),
+            secondChild: const Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [WorkoutTimerView()],
+            ),
+            showSecond: countdownController.isActive,
           ),
-          showSecond: countdownController.isActive,
         );
       }),
       body: Obx(

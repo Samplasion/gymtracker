@@ -19,6 +19,8 @@ import 'view/routines.dart';
 final _databaseService = DatabaseService();
 
 void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
   await GetStorage.init();
 
   final l = GTLocalizations();

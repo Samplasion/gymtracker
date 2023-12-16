@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:gymtracker/controller/settings_controller.dart';
 import 'package:gymtracker/data/weights.dart';
@@ -44,12 +45,10 @@ class _WeightCalculatorState extends State<WeightCalculator>
                 break;
             }
             final weights = calculateBarbellWeights(
-              double.tryParse(_weightController.text) ?? 0,
+              double.tryParse(_weightController.text.replaceAll(",", ".")) ?? 0,
               weights: selectedWeights.toList(),
               barbellWeight: barbellWeight,
             );
-
-            print(weights);
 
             return SizedBox(
               height: 420,
@@ -72,7 +71,17 @@ class _WeightCalculatorState extends State<WeightCalculator>
                           padding: const EdgeInsets.all(16),
                           child: TextField(
                             controller: _weightController,
-                            keyboardType: TextInputType.number,
+                            keyboardType: const TextInputType.numberWithOptions(
+                              decimal: true,
+                              signed: true,
+                            ),
+                            inputFormatters: [
+                              FilteringTextInputFormatter.allow(
+                                RegExp(
+                                  r'^\d+[\.,]?\d*',
+                                ),
+                              )
+                            ],
                             decoration: InputDecoration(
                               labelText: 'weightCalculator.weight.label'.tr,
                               border: const OutlineInputBorder(),

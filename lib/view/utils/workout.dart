@@ -303,7 +303,10 @@ class _WorkoutExerciseSetEditorState extends State<WorkoutExerciseSetEditor> {
       );
   TextField get repsField => TextField(
         controller: repsController,
-        keyboardType: TextInputType.number,
+        keyboardType: const TextInputType.numberWithOptions(
+          decimal: true,
+          signed: true,
+        ),
         inputFormatters: [
           FilteringTextInputFormatter.digitsOnly,
         ],
@@ -323,7 +326,10 @@ class _WorkoutExerciseSetEditorState extends State<WorkoutExerciseSetEditor> {
       );
   TextField get distanceField => TextField(
         controller: weightController,
-        keyboardType: const TextInputType.numberWithOptions(decimal: true),
+        keyboardType: const TextInputType.numberWithOptions(
+          decimal: true,
+          signed: true,
+        ),
         inputFormatters: [
           FilteringTextInputFormatter.allow(RegExp("[0123456789.,]")),
         ],

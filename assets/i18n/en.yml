@@ -109,6 +109,8 @@ settings:
   options:
     useDynamicColor:
       label: Use dynamic color
+    color:
+      label: App color
     locale:
       label: App language
     weightUnit:
@@ -119,6 +121,10 @@ settings:
       failed: Failed to import data
     export:
       label: Export data (JSON)
+  
+  colorPicker:
+    heading:
+      label: Select a color [@color]
 
 ongoingWorkout:
   title: Ongoing workout

@@ -3,7 +3,9 @@ import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:gymtracker/service/color.dart';
 import 'package:gymtracker/service/localizations.dart';
+import 'package:gymtracker/view/settings/color.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../controller/settings_controller.dart';
@@ -26,14 +28,40 @@ class SettingsView extends StatelessWidget {
           ),
           SliverList(
             delegate: SliverChildListDelegate([
-              ValueBuilder<bool?>(
-                initialValue: controller.usesDynamicColor.value,
-                builder: (value, onChanged) => SwitchListTile(
-                  title: Text("settings.options.useDynamicColor.label".tr),
-                  value: value ?? false,
-                  onChanged: onChanged,
+              if (ColorService().supportsDynamicColor)
+                ValueBuilder<bool?>(
+                  initialValue: controller.usesDynamicColor.value,
+                  builder: (value, onChanged) => SwitchListTile(
+                    title: Text("settings.options.useDynamicColor.label".tr),
+                    value: value ?? false,
+                    onChanged: onChanged,
+                  ),
+                  onUpdate: (v) => controller.setUsesDynamicColor(v ?? false),
                 ),
-                onUpdate: (v) => controller.setUsesDynamicColor(v ?? false),
+              AnimatedBuilder(
+                animation: controller.service,
+                builder: (context, _) {
+                  final state = (!ColorService().supportsDynamicColor ||
+                          !controller.usesDynamicColor.value)
+                      ? CrossFadeState.showFirst
+                      : CrossFadeState.showSecond;
+                  return AnimatedCrossFade(
+                    firstChild: Obx(
+                      () => ValueBuilder<Color?>(
+                        initialValue: controller.color.value,
+                        builder: (value, onChange) => ColorModalTile(
+                          title: Text("settings.options.color.label".tr),
+                          onChange: onChange,
+                          selectedValue: value ?? Colors.blue,
+                        ),
+                        onUpdate: (v) => controller.setColor(v ?? Colors.blue),
+                      ),
+                    ),
+                    secondChild: const SizedBox.shrink(),
+                    crossFadeState: state,
+                    duration: const Duration(milliseconds: 300),
+                  );
+                },
               ),
               Obx(
                 () => ValueBuilder<Locale?>(

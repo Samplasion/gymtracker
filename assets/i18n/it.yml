@@ -109,6 +109,8 @@ settings:
   options:
     useDynamicColor:
       label: Usa colore dinamico
+    color:
+      label: Colore dell'applicazione
     locale:
       label: Lingua dell'applicazione
     weightUnit:
@@ -119,6 +121,10 @@ settings:
       failed: Impossibile importare i dati
     export:
       label: Esporta dati (JSON)
+  
+  colorPicker:
+    heading:
+      label: Seleziona un colore [@color]
 
 ongoingWorkout:
   title: Allenamento in corso

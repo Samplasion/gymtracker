@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:gymtracker/controller/countdown_controller.dart';
+import 'package:gymtracker/service/color.dart';
 import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/view/skeleton.dart';
 
@@ -28,6 +29,8 @@ void main() async {
 
   await _databaseService.ensureInitialized();
 
+  await ColorService().init();
+
   runApp(MainApp(localizations: l));
 }
 
@@ -45,61 +48,67 @@ class MainApp extends StatelessWidget {
     final settings = Get.put(SettingsController());
     final localizations = Get.put(this.localizations);
 
-    const seedColor = Colors.blue;
     return DynamicColorBuilder(builder: (light, dark) {
-      return Container(
-        child: () {
-          final lightScheme = (light != null && settings.usesDynamicColor())
-              ? light.harmonized()
-              : ColorScheme.fromSeed(
-                  seedColor: seedColor,
-                  brightness: Brightness.light,
+      return AnimatedBuilder(
+          animation: settings.service,
+          builder: (context, _) {
+            return Container(
+              child: () {
+                final seedColor = settings.color();
+                (seedColor, settings.usesDynamicColor()).printInfo();
+                final lightScheme =
+                    (light != null && settings.usesDynamicColor())
+                        ? light.harmonized()
+                        : ColorScheme.fromSeed(
+                            seedColor: seedColor,
+                            brightness: Brightness.light,
+                          );
+                final darkScheme = (dark != null && settings.usesDynamicColor())
+                    ? dark.harmonized()
+                    : ColorScheme.fromSeed(
+                        seedColor: seedColor,
+                        brightness: Brightness.dark,
+                      ).harmonized();
+                return AnimatedBuilder(
+                  animation: localizations,
+                  builder: (context, _) {
+                    return GetMaterialApp(
+                      translations: localizations,
+                      locale: () {
+                        printInfo(info: "${settings.locale.value}");
+                        return settings.locale.value;
+                      }(),
+                      fallbackLocale: const Locale('en'),
+                      theme: ThemeData(
+                        useMaterial3: true,
+                        brightness: Brightness.light,
+                        colorScheme: lightScheme,
+                      ),
+                      darkTheme: ThemeData(
+                        useMaterial3: true,
+                        brightness: Brightness.dark,
+                        colorScheme: darkScheme,
+                      ),
+                      home: const _Loader(),
+                      debugShowCheckedModeBanner: false,
+                      builder: (context, child) =>
+                          AnnotatedRegion<SystemUiOverlayStyle>(
+                        value: SystemUiOverlayStyle(
+                          systemNavigationBarColor:
+                              Theme.of(context).colorScheme.background,
+                          systemNavigationBarIconBrightness: Theme.of(context)
+                              .colorScheme
+                              .background
+                              .estimateForegroundBrightness(),
+                        ),
+                        child: child ?? Container(),
+                      ),
+                    );
+                  },
                 );
-          final darkScheme = (dark != null && settings.usesDynamicColor())
-              ? dark.harmonized()
-              : ColorScheme.fromSeed(
-                  seedColor: seedColor,
-                  brightness: Brightness.dark,
-                ).harmonized();
-          return AnimatedBuilder(
-            animation: localizations,
-            builder: (context, _) {
-              return GetMaterialApp(
-                translations: localizations,
-                locale: () {
-                  printInfo(info: "${settings.locale.value}");
-                  return settings.locale.value;
-                }(),
-                fallbackLocale: const Locale('en'),
-                theme: ThemeData(
-                  useMaterial3: true,
-                  brightness: Brightness.light,
-                  colorScheme: lightScheme,
-                ),
-                darkTheme: ThemeData(
-                  useMaterial3: true,
-                  brightness: Brightness.dark,
-                  colorScheme: darkScheme,
-                ),
-                home: const _Loader(),
-                debugShowCheckedModeBanner: false,
-                builder: (context, child) =>
-                    AnnotatedRegion<SystemUiOverlayStyle>(
-                  value: SystemUiOverlayStyle(
-                    systemNavigationBarColor:
-                        Theme.of(context).colorScheme.background,
-                    systemNavigationBarIconBrightness: Theme.of(context)
-                        .colorScheme
-                        .background
-                        .estimateForegroundBrightness(),
-                  ),
-                  child: child ?? Container(),
-                ),
-              );
-            },
-          );
-        }(),
-      );
+              }(),
+            );
+          });
     });
   }
 }

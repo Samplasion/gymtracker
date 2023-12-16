@@ -3,6 +3,7 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:file_picker/file_picker.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:share_plus/share_plus.dart';
@@ -11,13 +12,19 @@ import '../data/weights.dart';
 import '../utils/go.dart';
 import 'serviceable_controller.dart';
 
+Color defaultColor = Color(Colors.blue.value);
+
 class SettingsController extends GetxController with ServiceableController {
   RxBool usesDynamicColor = false.obs;
+  Rx<Color> color = defaultColor.obs;
   Rx<Locale?> locale = Get.locale.obs;
   Rx<Weights?> weightUnit = Weights.kg.obs;
 
   void setUsesDynamicColor(bool usesDC) =>
       service.writeSetting("usesDynamicColor", usesDC);
+
+  void setColor(Color color) => service.writeSetting("color", color.value);
+
   void setLocale(Locale locale) {
     Get.updateLocale(locale);
     service.writeSetting("locale", locale.languageCode);
@@ -30,6 +37,7 @@ class SettingsController extends GetxController with ServiceableController {
   void onServiceChange() {
     final storage = service.settingsStorage;
     usesDynamicColor(storage.read<bool>("usesDynamicColor") ?? false);
+    color(Color(storage.read<int>("color") ?? defaultColor.value));
     locale(Locale(storage.read<String>("locale") ?? "en"));
     weightUnit(Weights.values.firstWhere(
       (element) => element.name == storage.read<String>("weightUnit"),

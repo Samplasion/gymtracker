@@ -96,7 +96,11 @@ class WorkoutsController extends GetxController with ServiceableController {
           for (final ex in clone.exercises)
             ex.copyWith(
               sets: ([
-                for (final set in ex.sets) set.copyWith.done(false),
+                for (final set in ex.sets)
+                  set.copyWith(
+                    done: false,
+                    reps: [SetKind.failure, SetKind.failureStripping].contains(set.kind) ? 0 : set.reps,
+                  ),
               ]),
               // If we're redoing a previous workout,
               // we want to inherit the previous parent ID,

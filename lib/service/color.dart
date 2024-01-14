@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:gymtracker/utils/version_resolver.dart';
 
 class ColorService {

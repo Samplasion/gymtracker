@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:device_info_plus/device_info_plus.dart';
+import 'package:flutter/foundation.dart';
 
 Future<bool> versionMatches({
   VersionRequirement? android,
@@ -12,6 +13,7 @@ Future<bool> versionMatches({
   // VersionRequirement? linux,
   // VersionRequirement? fuchsia,
 }) async {
+  if (kIsWeb) return false;
   final resolver = VersionResolver(DeviceInfoPlugin());
   if (Platform.isAndroid && android != null) {
     final sdkInt = await resolver.getAndroidVersion();

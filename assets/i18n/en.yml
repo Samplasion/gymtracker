@@ -5,10 +5,14 @@ set:
   kindShort:
     warmUp: W
     drop: D
+    failure: F
+    failureStripping: S
   kindLong:
     normal: Normal set
     warmUp: Warm-up set
     drop: Drop set
+    failure: To failure
+    failureStripping: To failure, with stripping
 
 exercise:
   chart:

@@ -165,6 +165,8 @@ const _$SetKindEnumMap = {
   SetKind.warmUp: 'warmUp',
   SetKind.normal: 'normal',
   SetKind.drop: 'drop',
+  SetKind.failure: 'failure',
+  SetKind.failureStripping: 'failureStripping',
 };
 
 const _$SetParametersEnumMap = {

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:get/get.dart';
+import 'package:gymtracker/utils/extensions.dart';
 
 import '../controller/countdown_controller.dart';
 import '../controller/workout_controller.dart';
@@ -192,8 +193,16 @@ class _WorkoutViewState extends State<WorkoutView> {
                   },
                   onSetSetDone: (exercise, set, done) {
                     set.done = done;
+
                     if (done) {
-                      if (exercise.restTime.inSeconds > 0) {
+                      bool shouldAdd = exercise.restTime.inSeconds > 0;
+                      final nextSet = exercise.sets.getAt(exercise.sets.indexWhere((element) => element.id == set.id) + 1);
+                      // Yes, I know I could've done something without control flow
+                      // but this is much more readable and maintainable I think
+                      if (nextSet != null && nextSet.kind == SetKind.failureStripping) {
+                        shouldAdd = false;
+                      }
+                      if (shouldAdd) {
                         countdownController.setCountdown(exercise.restTime);
                       }
                     }

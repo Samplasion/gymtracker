@@ -1,8 +1,8 @@
-import 'dart:io';
+
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:gymtracker/utils/utils.dart';
+import 'package:universal_platform/universal_platform.dart';
 
 import '../controller/workouts_controller.dart';
 import '../model/workout.dart';
@@ -64,7 +64,7 @@ class _RoutinesViewState extends State<RoutinesView> {
                       child: Text(workout.name.characters.first.toUpperCase()),
                     ),
                     trailing: () {
-                      if (Platform.isAndroid || Platform.isIOS) {
+                      if (UniversalPlatform.isAndroid || UniversalPlatform.isIOS) {
                         return ReorderableDelayedDragStartListener(
                           index: index,
                           child: const Icon(Icons.drag_handle),

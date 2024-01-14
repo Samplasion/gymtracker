@@ -1,4 +1,4 @@
-import 'dart:io';
+import 'package:universal_platform/universal_platform.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -67,7 +67,7 @@ class _WorkoutExerciseEditorState extends State<WorkoutExerciseEditor> {
             child: Row(
               children: [
                 if (widget.isCreating) ...[
-                  if (Platform.isAndroid || Platform.isIOS)
+                  if (UniversalPlatform.isAndroid || UniversalPlatform.isIOS)
                     ReorderableDelayedDragStartListener(
                       index: widget.index,
                       child: const Icon(Icons.drag_handle),
@@ -414,6 +414,22 @@ class _WorkoutExerciseSetEditorState extends State<WorkoutExerciseSetEditor> {
                   ),
                   tooltip: "set.kind".tr,
                   itemBuilder: (context) => <PopupMenuEntry<SetKind>>[
+                    for (final kind in SetKind.values)
+                      PopupMenuItem(
+                        value: kind,
+                        child: ListTile(
+                          leading: buildSetType(
+                            context,
+                            kind,
+                            set: widget.set,
+                            allSets: widget.exercise.sets,
+                          ),
+                          title: Text('set.kindLong.${kind.name}'.tr),
+                        ),
+                      ),
+                    // TODO: (?) button with explanations for each kind
+                  ],
+                  /* itemBuilder: (context) => <PopupMenuEntry<SetKind>>[
                     PopupMenuItem(
                       value: SetKind.normal,
                       child: ListTile(
@@ -450,7 +466,7 @@ class _WorkoutExerciseSetEditorState extends State<WorkoutExerciseSetEditor> {
                         title: Text('set.kindLong.drop'.tr),
                       ),
                     ),
-                  ],
+                  ], */
                   onSelected: widget.onSetSelectKind,
                 ),
                 const SizedBox(width: 8),

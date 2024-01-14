@@ -3,6 +3,7 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:file_picker/file_picker.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
@@ -63,7 +64,13 @@ class SettingsController extends GetxController with ServiceableController {
   Future importSettings() async {
     FilePickerResult? result = await FilePicker.platform.pickFiles();
 
-    if (result?.files.single.path != null) {
+    if (kIsWeb && result?.files.single.bytes != null) {
+      String content = String.fromCharCodes(result!.files.single.bytes!.toList());
+      Map<String, dynamic> map = json.decode(content);
+
+      service.fromJson(map);
+      Go.snack("settings.options.import.success".tr);
+    } else if (!kIsWeb && result?.files.single.path != null) {
       try {
         File file = File(result!.files.single.path!);
         String content = await file.readAsString();

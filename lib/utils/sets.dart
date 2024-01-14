@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:gymtracker/utils/extensions.dart';
 
 import '../model/set.dart';
 
@@ -41,6 +42,22 @@ Widget buildSetType(
         "set.kindShort.drop".tr,
         style: TextStyle(
           color: scheme.error,
+          fontWeight: FontWeight.bold,
+        ),
+      );
+    case SetKind.failure:
+      return Text(
+        "set.kindShort.failure".tr,
+        style: TextStyle(
+          color: context.harmonizeColor(Colors.blue),
+          fontWeight: FontWeight.bold,
+        ),
+      );
+    case SetKind.failureStripping:
+      return Text(
+        "set.kindShort.failureStripping".tr,
+        style: TextStyle(
+          color: context.harmonizeColor(Colors.blueGrey),
           fontWeight: FontWeight.bold,
         ),
       );

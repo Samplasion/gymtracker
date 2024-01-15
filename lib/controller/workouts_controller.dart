@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get/state_manager.dart';
+import 'package:gymtracker/service/localizations.dart';
 import 'package:uuid/uuid.dart';
 
 import '../controller/history_controller.dart';
@@ -84,7 +85,7 @@ class WorkoutsController extends GetxController with ServiceableController {
       workoutID = null;
     }
 
-    Get.put(WorkoutController("workouts.untitled".tr, workoutID, null));
+    Get.put(WorkoutController("workouts.untitled".t, workoutID, null));
     // ignore: use_build_context_synchronously
     if (Navigator.of(context).canPop()) {
       Get.back();

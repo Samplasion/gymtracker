@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:gymtracker/service/localizations.dart';
 
 import '../controller/workouts_controller.dart';
 import '../model/exercise.dart';
@@ -68,9 +69,9 @@ class _RoutineCreatorState extends State<RoutineCreator> {
       appBar: AppBar(
         title: Text(() {
           if (widget.base == null) {
-            return "routines.actions.create".tr;
+            return "routines.actions.create".t;
           } else {
-            return "routines.actions.edit".tr;
+            return "routines.actions.edit".t;
           }
         }()),
         actions: [
@@ -91,11 +92,11 @@ class _RoutineCreatorState extends State<RoutineCreator> {
                 decoration: InputDecoration(
                   isDense: true,
                   border: const OutlineInputBorder(),
-                  labelText: "routines.editor.fields.name.label".tr,
+                  labelText: "routines.editor.fields.name.label".t,
                 ),
                 validator: (string) {
                   if (string == null || string.isEmpty) {
-                    return "routines.editor.fields.name.errors.empty".tr;
+                    return "routines.editor.fields.name.errors.empty".t;
                   }
                   return null;
                 },
@@ -107,11 +108,11 @@ class _RoutineCreatorState extends State<RoutineCreator> {
                 decoration: InputDecoration(
                   isDense: true,
                   border: const OutlineInputBorder(),
-                  labelText: "routines.editor.fields.infobox.label".tr,
+                  labelText: "routines.editor.fields.infobox.label".t,
                   alignLabelWithHint: true,
                 ),
               ),
-              Text("routines.editor.exercises.title".tr,
+              Text("routines.editor.exercises.title".t,
                   style: Theme.of(context).textTheme.titleMedium),
             ]
                 .map((c) => Padding(
@@ -123,7 +124,7 @@ class _RoutineCreatorState extends State<RoutineCreator> {
                     ))
                 .toList(),
             ListTile(
-              title: Text("routines.editor.exercises.add".tr),
+              title: Text("routines.editor.exercises.add".t),
               leading: const CircleAvatar(child: Icon(Icons.add_rounded)),
               onTap: () {
                 Go.to<List<Exercise>>(() => const ExercisePicker(

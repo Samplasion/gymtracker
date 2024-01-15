@@ -21,7 +21,7 @@ class HistoryView extends StatelessWidget {
         () => CustomScrollView(
           slivers: [
             SliverAppBar.large(
-              title: Text("history.title".tr),
+              title: Text("history.title".t),
             ),
             SliverList(
               delegate: SliverChildListDelegate(

@@ -1,12 +1,11 @@
 import 'dart:convert';
 import 'dart:io';
-import 'dart:typed_data';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
+import 'package:gymtracker/service/localizations.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../data/weights.dart';
@@ -54,7 +53,7 @@ class SettingsController extends GetxController with ServiceableController {
         XFile.fromData(
           Uint8List.fromList(utf8.encode(json.encode(service.toJson()))),
           mimeType: "application/json",
-          name: "${"settings.options.export.filename".tr}.json",
+          name: "${"settings.options.export.filename".t}.json",
         )
       ],
       sharePositionOrigin: box!.localToGlobal(Offset.zero) & box.size,
@@ -69,7 +68,7 @@ class SettingsController extends GetxController with ServiceableController {
       Map<String, dynamic> map = json.decode(content);
 
       service.fromJson(map);
-      Go.snack("settings.options.import.success".tr);
+      Go.snack("settings.options.import.success".t);
     } else if (!kIsWeb && result?.files.single.path != null) {
       try {
         File file = File(result!.files.single.path!);
@@ -77,7 +76,7 @@ class SettingsController extends GetxController with ServiceableController {
         Map<String, dynamic> map = json.decode(content);
 
         service.fromJson(map);
-        Go.snack("settings.options.import.success".tr);
+        Go.snack("settings.options.import.success".t);
       } catch (e) {
         e.printError();
 
@@ -86,7 +85,7 @@ class SettingsController extends GetxController with ServiceableController {
           errorString = e.stackTrace.toString();
         }
 
-        Go.dialog("settings.options.import.failed".tr, errorString);
+        Go.dialog("settings.options.import.failed".t, errorString);
       }
     } else {
       // User canceled the picker

@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:gymtracker/controller/settings_controller.dart';
 import 'package:gymtracker/data/weights.dart';
+import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/utils/utils.dart';
 
@@ -59,7 +60,7 @@ class _WeightCalculatorState extends State<WeightCalculator>
                     height: kToolbarHeight,
                     padding: const EdgeInsets.only(left: 16),
                     child: Text(
-                      "ongoingWorkout.weightCalculator".tr,
+                      "ongoingWorkout.weightCalculator".t,
                       style: context.textTheme.titleLarge,
                     ),
                   ),
@@ -83,7 +84,7 @@ class _WeightCalculatorState extends State<WeightCalculator>
                               )
                             ],
                             decoration: InputDecoration(
-                              labelText: 'weightCalculator.weight.label'.tr,
+                              labelText: 'weightCalculator.weight.label'.t,
                               border: const OutlineInputBorder(),
                             ),
                             onChanged: (value) {
@@ -94,7 +95,7 @@ class _WeightCalculatorState extends State<WeightCalculator>
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 16),
                           child: Text(
-                            "weightCalculator.weights.label".tr,
+                            "weightCalculator.weights.label".t,
                             style: context.textTheme.bodyMedium,
                           ),
                         ),
@@ -127,7 +128,7 @@ class _WeightCalculatorState extends State<WeightCalculator>
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 16),
                           child: Text(
-                            "weightCalculator.barbells.label".tr,
+                            "weightCalculator.barbells.label".t,
                             style: context.textTheme.bodyMedium,
                           ),
                         ),
@@ -142,7 +143,7 @@ class _WeightCalculatorState extends State<WeightCalculator>
                                   child: ChoiceChip(
                                     label: Text.rich(TextSpan(children: [
                                       TextSpan(
-                                          text: "barbells.${barbell.name}".tr),
+                                          text: "barbells.${barbell.name}".t),
                                       TextSpan(
                                         text: () {
                                           switch (format) {
@@ -285,7 +286,7 @@ class _WeightCalculatorState extends State<WeightCalculator>
                                 onPressed: () {
                                   Navigator.pop(context);
                                 },
-                                label: Text("general.dialogs.actions.ok".tr),
+                                label: Text("general.dialogs.actions.ok".t),
                                 icon: const Icon(Icons.done),
                               ),
                             ],

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:get/get.dart';
+import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/view/components/infobox.dart';
 
@@ -52,10 +53,10 @@ class _WorkoutViewState extends State<WorkoutView> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text("ongoingWorkout.title".tr),
+        title: Text("ongoingWorkout.title".t),
         actions: [
           IconButton(
-            tooltip: "ongoingWorkout.weightCalculator".tr,
+            tooltip: "ongoingWorkout.weightCalculator".t,
             icon: const Icon(Icons.calculate),
             onPressed: () {
               showModalBottomSheet(
@@ -68,7 +69,7 @@ class _WorkoutViewState extends State<WorkoutView> {
             itemBuilder: (context) => [
               PopupMenuItem(
                 child: Text(
-                  "ongoingWorkout.actions.finish".tr,
+                  "ongoingWorkout.actions.finish".t,
                 ),
                 onTap: () {
                   SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
@@ -78,7 +79,7 @@ class _WorkoutViewState extends State<WorkoutView> {
               ),
               PopupMenuItem(
                 child: Text(
-                  "ongoingWorkout.actions.cancel".tr,
+                  "ongoingWorkout.actions.cancel".t,
                   style: TextStyle(color: Theme.of(context).colorScheme.error),
                 ),
                 onTap: () {
@@ -240,7 +241,7 @@ class _WorkoutViewState extends State<WorkoutView> {
                   );
                   controller.exercises.refresh();
                 },
-                child: Text('ongoingWorkout.exercises.add'.tr),
+                child: Text('ongoingWorkout.exercises.add'.t),
               ),
             ),
           ],
@@ -272,7 +273,7 @@ class WorkoutInfoBar extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          "ongoingWorkout.info.time".tr,
+                          "ongoingWorkout.info.time".t,
                           style: Theme.of(context).textTheme.labelMedium,
                         ),
                         Hero(
@@ -288,7 +289,7 @@ class WorkoutInfoBar extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    "ongoingWorkout.info.reps".tr,
+                    "ongoingWorkout.info.reps".t,
                     style: Theme.of(context).textTheme.labelMedium,
                   ),
                   Obx(
@@ -310,7 +311,7 @@ class WorkoutInfoBar extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    "ongoingWorkout.info.volume".tr,
+                    "ongoingWorkout.info.volume".t,
                     style: Theme.of(context).textTheme.labelMedium,
                   ),
                   Obx(
@@ -411,7 +412,7 @@ class WorkoutTimerView extends StatelessWidget {
                   const SizedBox(width: 8),
                   IconButton(
                     icon: Text(
-                      "timer.subtract15s".tr,
+                      "timer.subtract15s".t,
                       style: TextStyle(
                         color: Theme.of(context).colorScheme.error,
                       ),
@@ -420,7 +421,7 @@ class WorkoutTimerView extends StatelessWidget {
                   ),
                   IconButton(
                     icon: Text(
-                      "timer.add15s".tr,
+                      "timer.add15s".t,
                       style: TextStyle(
                         color: Theme.of(context).colorScheme.tertiary,
                       ),
@@ -433,7 +434,7 @@ class WorkoutTimerView extends StatelessWidget {
                       icon: const Icon(Icons.skip_next_rounded),
                       clipBehavior: Clip.hardEdge,
                       label: Text(
-                        "timer.skip".tr,
+                        "timer.skip".t,
                         overflow: TextOverflow.clip,
                         maxLines: 1,
                       ),
@@ -489,7 +490,7 @@ class _WorkoutFinishPageState extends State<WorkoutFinishPage> {
         appBar: PreferredSize(
           preferredSize: const Size(0, kToolbarHeight + 1),
           child: AppBar(
-            title: Text("ongoingWorkout.finish.title".tr),
+            title: Text("ongoingWorkout.finish.title".t),
             leading: const CloseButton(),
             bottom: const PreferredSize(
               preferredSize: Size(0, 1),
@@ -511,17 +512,17 @@ class _WorkoutFinishPageState extends State<WorkoutFinishPage> {
               TextFormField(
                 controller: titleController,
                 decoration:
-                    _decoration("ongoingWorkout.finish.fields.name.label".tr),
+                    _decoration("ongoingWorkout.finish.fields.name.label".t),
                 validator: (string) {
                   if (string == null || string.isEmpty) {
-                    return "ongoingWorkout.finish.fields.name.errors.empty".tr;
+                    return "ongoingWorkout.finish.fields.name.errors.empty".t;
                   }
                   return null;
                 },
               ),
               DateField(
                 decoration: _decoration(
-                    "ongoingWorkout.finish.fields.startingTime.label".tr),
+                    "ongoingWorkout.finish.fields.startingTime.label".t),
                 date: controller.time.value,
                 onSelect: (date) => setState(() => controller.time(date)),
                 firstDate: DateTime.fromMillisecondsSinceEpoch(0),
@@ -529,12 +530,12 @@ class _WorkoutFinishPageState extends State<WorkoutFinishPage> {
               ),
               DropdownButtonFormField<String?>(
                 decoration:
-                    _decoration("ongoingWorkout.finish.fields.parent.label".tr),
+                    _decoration("ongoingWorkout.finish.fields.parent.label".t),
                 items: [
                   DropdownMenuItem(
                     value: null,
                     child: Text(
-                        "ongoingWorkout.finish.fields.parent.options.none".tr),
+                        "ongoingWorkout.finish.fields.parent.options.none".t),
                   ),
                   for (final routine in Get.find<WorkoutsController>().workouts)
                     DropdownMenuItem(
@@ -548,11 +549,11 @@ class _WorkoutFinishPageState extends State<WorkoutFinishPage> {
               TimeInputField(
                 controller: timeController,
                 decoration: _decoration(
-                    "ongoingWorkout.finish.fields.duration.label".tr),
+                    "ongoingWorkout.finish.fields.duration.label".t),
                 validator: (duration) {
                   if (duration == null || duration.inSeconds == 0) {
                     return "ongoingWorkout.finish.fields.duration.errors.empty"
-                        .tr;
+                        .t;
                   }
                   return null;
                 },
@@ -564,7 +565,7 @@ class _WorkoutFinishPageState extends State<WorkoutFinishPage> {
                 decoration: InputDecoration(
                   isDense: true,
                   border: const OutlineInputBorder(),
-                  labelText: "ongoingWorkout.finish.fields.infobox.label".tr,
+                  labelText: "ongoingWorkout.finish.fields.infobox.label".t,
                   alignLabelWithHint: true,
                 ),
               ),
@@ -624,7 +625,7 @@ class _WorkoutExerciseReorderDialogState
         appBar: PreferredSize(
           preferredSize: const Size(0, kToolbarHeight + 1),
           child: AppBar(
-            title: Text("ongoingWorkout.exercises.reorder".tr),
+            title: Text("ongoingWorkout.exercises.reorder".t),
             leading: const CloseButton(),
             bottom: const PreferredSize(
               preferredSize: Size(0, 1),

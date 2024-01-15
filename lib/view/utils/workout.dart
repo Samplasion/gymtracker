@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:get/get.dart';
+import 'package:gymtracker/service/localizations.dart';
 
 import '../../model/exercise.dart';
 import '../../model/set.dart';
@@ -102,14 +103,14 @@ class _WorkoutExerciseEditorState extends State<WorkoutExerciseEditor> {
                         onTap: widget.onReorder,
                         child: ListTile(
                           leading: const Icon(Icons.compare_arrows),
-                          title: Text('ongoingWorkout.exercises.reorder'.tr),
+                          title: Text('ongoingWorkout.exercises.reorder'.t),
                         ),
                       ),
                       PopupMenuItem(
                         onTap: widget.onReplace,
                         child: ListTile(
                           leading: const Icon(Icons.refresh),
-                          title: Text('ongoingWorkout.exercises.replace'.tr),
+                          title: Text('ongoingWorkout.exercises.replace'.t),
                         ),
                       ),
                       const PopupMenuDivider(),
@@ -120,7 +121,7 @@ class _WorkoutExerciseEditorState extends State<WorkoutExerciseEditor> {
                         textColor: Theme.of(context).colorScheme.error,
                         iconColor: Theme.of(context).colorScheme.error,
                         leading: const Icon(Icons.delete),
-                        title: Text('ongoingWorkout.exercises.remove'.tr),
+                        title: Text('ongoingWorkout.exercises.remove'.t),
                       ),
                     ),
                   ],
@@ -133,7 +134,7 @@ class _WorkoutExerciseEditorState extends State<WorkoutExerciseEditor> {
             leading: const Icon(Icons.notes),
             title: Text(
               widget.exercise.notes.isEmpty
-                  ? "exercise.editor.fields.notes.label".tr
+                  ? "exercise.editor.fields.notes.label".t
                   : widget.exercise.notes,
               style: Theme.of(context).textTheme.bodyMedium!.copyWith(
                     fontStyle: widget.exercise.notes.isEmpty
@@ -152,7 +153,7 @@ class _WorkoutExerciseEditorState extends State<WorkoutExerciseEditor> {
                 builder: (context) {
                   return AlertDialog(
                     contentPadding: const EdgeInsets.all(24),
-                    title: Text('exercise.editor.fields.notes.label'.tr),
+                    title: Text('exercise.editor.fields.notes.label'.t),
                     content: TextField(
                       controller: notesController,
                       autofocus: true,
@@ -160,7 +161,7 @@ class _WorkoutExerciseEditorState extends State<WorkoutExerciseEditor> {
                       maxLines: null,
                       decoration: InputDecoration(
                         border: const OutlineInputBorder(),
-                        labelText: "exercise.editor.fields.notes.label".tr,
+                        labelText: "exercise.editor.fields.notes.label".t,
                       ),
                     ),
                     actions: [
@@ -191,7 +192,7 @@ class _WorkoutExerciseEditorState extends State<WorkoutExerciseEditor> {
               decoration: InputDecoration(
                 isDense: true,
                 border: const OutlineInputBorder(),
-                labelText: "exercise.fields.restTime".tr,
+                labelText: "exercise.fields.restTime".t,
               ),
               onChangedTime: (value) =>
                   widget.onChangeRestTime(value ?? Duration.zero),
@@ -217,7 +218,7 @@ class _WorkoutExerciseEditorState extends State<WorkoutExerciseEditor> {
           const SizedBox(height: 8),
           FilledButton.tonal(
             onPressed: widget.onSetCreate,
-            child: Text('exercise.actions.addSet'.tr),
+            child: Text('exercise.actions.addSet'.t),
           ),
         ],
       ),
@@ -273,7 +274,7 @@ class _WorkoutExerciseSetEditorState extends State<WorkoutExerciseSetEditor> {
         decoration: InputDecoration(
           isDense: true,
           border: const OutlineInputBorder(),
-          labelText: "exercise.fields.weight".tr,
+          labelText: "exercise.fields.weight".t,
         ),
         onChanged: (value) {
           widget.onSetValueChange();
@@ -290,7 +291,7 @@ class _WorkoutExerciseSetEditorState extends State<WorkoutExerciseSetEditor> {
         decoration: InputDecoration(
           isDense: true,
           border: const OutlineInputBorder(),
-          labelText: "exercise.fields.time".tr,
+          labelText: "exercise.fields.time".t,
         ),
         onChanged: (value) {
           widget.onSetValueChange();
@@ -313,7 +314,7 @@ class _WorkoutExerciseSetEditorState extends State<WorkoutExerciseSetEditor> {
         decoration: InputDecoration(
           isDense: true,
           border: const OutlineInputBorder(),
-          labelText: "exercise.fields.reps".tr,
+          labelText: "exercise.fields.reps".t,
         ),
         onChanged: (value) {
           widget.onSetValueChange();
@@ -336,7 +337,7 @@ class _WorkoutExerciseSetEditorState extends State<WorkoutExerciseSetEditor> {
         decoration: InputDecoration(
           isDense: true,
           border: const OutlineInputBorder(),
-          labelText: "exercise.fields.distance".tr,
+          labelText: "exercise.fields.distance".t,
         ),
         onChanged: (value) {
           widget.onSetValueChange();
@@ -386,7 +387,7 @@ class _WorkoutExerciseSetEditorState extends State<WorkoutExerciseSetEditor> {
             backgroundColor: scheme.error,
             foregroundColor: scheme.onError,
             icon: Icons.delete_forever_rounded,
-            label: 'actions.remove'.tr,
+            label: 'actions.remove'.t,
           ),
         ],
       ),
@@ -412,7 +413,7 @@ class _WorkoutExerciseSetEditorState extends State<WorkoutExerciseSetEditor> {
                     set: widget.set,
                     allSets: widget.exercise.sets,
                   ),
-                  tooltip: "set.kind".tr,
+                  tooltip: "set.kind".t,
                   itemBuilder: (context) => <PopupMenuEntry<SetKind>>[
                     for (final kind in SetKind.values)
                       PopupMenuItem(
@@ -424,7 +425,7 @@ class _WorkoutExerciseSetEditorState extends State<WorkoutExerciseSetEditor> {
                             set: widget.set,
                             allSets: widget.exercise.sets,
                           ),
-                          title: Text('set.kindLong.${kind.name}'.tr),
+                          title: Text('set.kindLong.${kind.name}'.t),
                         ),
                       ),
                     // TODO: (?) button with explanations for each kind
@@ -439,7 +440,7 @@ class _WorkoutExerciseSetEditorState extends State<WorkoutExerciseSetEditor> {
                           set: widget.set,
                           allSets: widget.exercise.sets,
                         ),
-                        title: Text('set.kindLong.normal'.tr),
+                        title: Text('set.kindLong.normal'.t),
                       ),
                     ),
                     PopupMenuItem(
@@ -451,7 +452,7 @@ class _WorkoutExerciseSetEditorState extends State<WorkoutExerciseSetEditor> {
                           set: widget.set,
                           allSets: widget.exercise.sets,
                         ),
-                        title: Text('set.kindLong.warmUp'.tr),
+                        title: Text('set.kindLong.warmUp'.t),
                       ),
                     ),
                     PopupMenuItem(
@@ -463,7 +464,7 @@ class _WorkoutExerciseSetEditorState extends State<WorkoutExerciseSetEditor> {
                           set: widget.set,
                           allSets: widget.exercise.sets,
                         ),
-                        title: Text('set.kindLong.drop'.tr),
+                        title: Text('set.kindLong.drop'.t),
                       ),
                     ),
                   ], */

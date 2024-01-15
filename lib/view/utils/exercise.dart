@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+import 'package:gymtracker/service/localizations.dart';
 
 import '../../model/exercise.dart';
 
@@ -70,7 +70,7 @@ class CustomExerciseBadge extends StatelessWidget {
         borderRadius: BorderRadius.circular(4),
       ),
       child: Text(
-        "exercise.custom".tr.toUpperCase(),
+        "exercise.custom".t.toUpperCase(),
         style: TextStyle(
           fontSize: 12,
           color: Theme.of(context).colorScheme.onSecondaryContainer,

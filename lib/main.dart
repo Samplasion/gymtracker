@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:gymtracker/controller/countdown_controller.dart';
+import 'package:gymtracker/controller/debug_controller.dart';
 import 'package:gymtracker/service/color.dart';
 import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/view/skeleton.dart';
@@ -15,7 +16,6 @@ import 'service/database.dart';
 import 'service/localizations.dart';
 import 'service/notifications.dart';
 import 'utils/go.dart';
-import 'view/routines.dart';
 
 final _databaseService = DatabaseService();
 
@@ -43,6 +43,7 @@ class MainApp extends StatelessWidget {
     Get.put(NotificationsService());
     Get.put(CountdownController());
     Get.put(ExercisesController());
+    Get.put(DebugController());
     final settings = Get.put(SettingsController());
     final localizations = Get.put(this.localizations);
 
@@ -116,7 +117,7 @@ class MainApp extends StatelessWidget {
 /// Used to force the root widget to be an
 /// animated route, so that exit animations work.
 class _Loader extends StatefulWidget {
-  const _Loader({super.key});
+  const _Loader();
 
   @override
   State<_Loader> createState() => __LoaderState();

@@ -1,7 +1,7 @@
 import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
+import 'package:gymtracker/service/localizations.dart';
 
 class Go {
   static Future<T?> to<T>(Widget Function() page) async {
@@ -47,8 +47,8 @@ class Go {
       builder: (context) {
         return AlertDialog(
           icon: icon ?? const Icon(Icons.info),
-          title: Text(title.tr),
-          content: Text(body.tr),
+          title: Text(title.t),
+          content: Text(body.t),
           actions: [
             TextButton(
               onPressed: () {

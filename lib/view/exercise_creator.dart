@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:gymtracker/model/exercise.dart';
 import 'package:gymtracker/model/set.dart';
+import 'package:gymtracker/service/localizations.dart';
 
 import '../controller/exercises_controller.dart';
 
@@ -32,9 +33,9 @@ class _ExerciseCreatorState extends State<ExerciseCreator> {
         appBar: AppBar(
           title: Text(() {
             if (widget.base == null) {
-              return "exercise.editor.create.title".tr;
+              return "exercise.editor.create.title".t;
             } else {
-              return "exercise.editor.edit.title".tr;
+              return "exercise.editor.edit.title".t;
             }
           }()),
           leading: const CloseButton(),
@@ -58,34 +59,34 @@ class _ExerciseCreatorState extends State<ExerciseCreator> {
                 TextFormField(
                   controller: titleController,
                   decoration:
-                      _decoration("exercise.editor.fields.title.label".tr),
+                      _decoration("exercise.editor.fields.title.label".t),
                   validator: (string) {
                     if (string == null || string.isEmpty) {
-                      return "exercise.editor.fields.title.errors.empty".tr;
+                      return "exercise.editor.fields.title.errors.empty".t;
                     }
                     if (!controller.isNameValid(string)) {
-                      return "exercise.editor.fields.title.errors.invalid".tr;
+                      return "exercise.editor.fields.title.errors.invalid".t;
                     }
                     return null;
                   },
                 ),
                 DropdownButtonFormField(
                   decoration:
-                      _decoration("exercise.editor.fields.parameters.label".tr),
+                      _decoration("exercise.editor.fields.parameters.label".t),
                   items: [
                     for (final param in SetParameters.values)
                       DropdownMenuItem(
                         value: param,
                         child: Text(
                             "exercise.editor.fields.parameters.values.${param.name}"
-                                .tr),
+                                .t),
                       ),
                   ],
                   onChanged: (v) => setState(() => params = v!),
                   validator: (value) {
                     if (value == null) {
                       return "exercise.editor.fields.parameters.errors.empty"
-                          .tr;
+                          .t;
                     }
                     return null;
                   },
@@ -93,12 +94,12 @@ class _ExerciseCreatorState extends State<ExerciseCreator> {
                 ),
                 DropdownButtonFormField<MuscleGroup>(
                   decoration: _decoration(
-                      "exercise.editor.fields.primaryMuscleGroup.label".tr),
+                      "exercise.editor.fields.primaryMuscleGroup.label".t),
                   items: [
                     for (final muscle in MuscleGroup.values)
                       DropdownMenuItem(
                         value: muscle,
-                        child: Text("muscleGroups.${muscle.name}".tr),
+                        child: Text("muscleGroups.${muscle.name}".t),
                       ),
                   ],
                   onChanged: (value) {
@@ -111,13 +112,13 @@ class _ExerciseCreatorState extends State<ExerciseCreator> {
                   validator: (value) {
                     if (value == null) {
                       return "exercise.editor.fields.primaryMuscleGroup.errors.empty"
-                          .tr;
+                          .t;
                     }
                     return null;
                   },
                 ),
                 Text(
-                  "exercise.editor.fields.secondaryMuscleGroups.label".tr,
+                  "exercise.editor.fields.secondaryMuscleGroups.label".t,
                   style: Theme.of(context).textTheme.titleMedium,
                 ),
                 Wrap(
@@ -126,13 +127,13 @@ class _ExerciseCreatorState extends State<ExerciseCreator> {
                   children: [
                     for (final muscle in MuscleGroup.values)
                       ChoiceChip(
-                        label: Text("muscleGroups.${muscle.name}".tr),
+                        label: Text("muscleGroups.${muscle.name}".t),
                         avatar: CircleAvatar(
                           child: Text(
                             otherGroups.contains(muscle)
                                 ? ""
                                 : "muscleGroups.${muscle.name}"
-                                    .tr
+                                    .t
                                     .characters
                                     .first
                                     .toUpperCase(),

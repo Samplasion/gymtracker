@@ -37,12 +37,12 @@ class _RoutinesViewState extends State<RoutinesView> {
         return CustomScrollView(
           slivers: [
             SliverAppBar.large(
-              title: Text("routines.title".tr),
+              title: Text("routines.title".t),
             ),
             SliverToBoxAdapter(
               child: ListTile(
-                title: Text("routines.quickWorkout.title".tr),
-                subtitle: Text("routines.quickWorkout.subtitle".tr),
+                title: Text("routines.quickWorkout.title".t),
+                subtitle: Text("routines.quickWorkout.subtitle".t),
                 leading: const CircleAvatar(child: Icon(Icons.timer_rounded)),
                 onTap: () {
                   controller.startRoutine(context, emptyWorkout, isEmpty: true);

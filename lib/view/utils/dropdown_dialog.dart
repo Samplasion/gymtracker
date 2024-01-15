@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:gymtracker/service/localizations.dart';
 
 class DropdownDialog<T> extends StatefulWidget {
   final Widget? title;
@@ -42,14 +43,14 @@ class _DropdownDialogState<T> extends State<DropdownDialog<T>> {
           onPressed: () {
             Get.back();
           },
-          child: Text("general.dialogs.actions.cancel".tr),
+          child: Text("general.dialogs.actions.cancel".t),
         ),
         FilledButton.tonal(
           onPressed: () {
             Get.back();
             widget.onSelect?.call(item);
           },
-          child: Text("general.dialogs.actions.ok".tr),
+          child: Text("general.dialogs.actions.ok".t),
         ),
       ],
     );

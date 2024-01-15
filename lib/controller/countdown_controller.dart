@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get/get.dart';
+import 'package:gymtracker/service/localizations.dart';
 
 import '../service/notifications.dart';
 import '../utils/constants.dart';
@@ -50,11 +51,11 @@ class CountdownController extends GetxController {
     // Show notification
     final androidDetails = AndroidNotificationDetails(
       'org.js.samplasion.gymtracker.RestTimeoutChannel',
-      'androidNotificationChannel.name'.tr,
-      channelDescription: 'androidNotificationChannel.description'.tr,
+      'androidNotificationChannel.name'.t,
+      channelDescription: 'androidNotificationChannel.description'.t,
       importance: Importance.max,
       priority: Priority.high,
-      ticker: 'workout.restOver'.tr,
+      ticker: 'workout.restOver'.t,
     );
     const darwinDetails = DarwinNotificationDetails(
       presentSound: true,
@@ -67,8 +68,8 @@ class CountdownController extends GetxController {
     );
     notificationsPlugin.show(
       NotificationIDs.restTimer,
-      'appName'.tr,
-      'ongoingWorkout.restOver'.tr,
+      'appName'.t,
+      'ongoingWorkout.restOver'.t,
       notificationDetails,
     );
   }

@@ -313,6 +313,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.61.0"
+  flat:
+    dependency: "direct main"
+    description:
+      name: flat
+      sha256: c12a224ac14666985222e9b1ffc4e72c3cfee980004b99b8de101be3099b003a
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.5.0"
   flex_color_picker:
     dependency: "direct main"
     description:

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:get/get.dart';
+import 'package:gymtracker/service/localizations.dart';
 
 import '../model/exercise.dart';
 import '../model/set.dart';
@@ -98,16 +99,16 @@ class WorkoutController extends GetxController with ServiceableController {
       builder: (context) {
         return AlertDialog(
           icon: const Icon(Icons.info),
-          title: Text("ongoingWorkout.cancel.title".tr),
+          title: Text("ongoingWorkout.cancel.title".t),
           content: Text(
-            "ongoingWorkout.cancel.text".tr,
+            "ongoingWorkout.cancel.text".t,
           ),
           actions: [
             TextButton(
               onPressed: () {
                 Get.back();
               },
-              child: Text("ongoingWorkout.cancel.actions.no".tr),
+              child: Text("ongoingWorkout.cancel.actions.no".t),
             ),
             FilledButton.tonal(
               onPressed: () {
@@ -116,7 +117,7 @@ class WorkoutController extends GetxController with ServiceableController {
 
                 onCanceled();
               },
-              child: Text("ongoingWorkout.cancel.actions.yes".tr),
+              child: Text("ongoingWorkout.cancel.actions.yes".t),
             ),
           ],
         );

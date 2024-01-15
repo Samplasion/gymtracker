@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+import 'package:gymtracker/service/localizations.dart';
 
 class Infobox extends StatelessWidget {
   final String text;
@@ -26,7 +26,7 @@ class Infobox extends StatelessWidget {
                     alignment: PlaceholderAlignment.middle,
                   ),
                   const TextSpan(text: "  "),
-                  TextSpan(text: "infobox.label".tr),
+                  TextSpan(text: "infobox.label".t),
                 ]),
                 style: const TextStyle(
                   fontSize: 16,

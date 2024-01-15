@@ -395,7 +395,7 @@ class _WorkoutExerciseSetEditorState extends State<WorkoutExerciseSetEditor> {
         curve: Curves.linearToEaseOut,
         tween: ColorTween(
           begin: defaultColor,
-          end: widget.set.done
+          end: widget.set.done && !widget.isCreating
               ? scheme.tertiaryContainer.withOpacity(0.5)
               : defaultColor,
         ),

@@ -1,4 +1,5 @@
 import 'package:copy_with_extension/copy_with_extension.dart';
+import 'package:gymtracker/service/localizations.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:uuid/uuid.dart';
 
@@ -128,4 +129,8 @@ class Exercise {
   /// Returns true if [other] is [this] or an instance of [this]
   /// (ie. [other.parentID] == [id].)
   bool isTheSameAs(Exercise other) => other.id == id || other.parentID == id;
+}
+
+extension Display on Exercise {
+  String get displayName => isCustom ? name : (parentID ?? id).t;
 }

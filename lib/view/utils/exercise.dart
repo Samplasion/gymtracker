@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:gymtracker/data/exercises.dart';
 import 'package:gymtracker/service/localizations.dart';
+import 'package:gymtracker/utils/extensions.dart';
+import 'package:gymtracker/utils/utils.dart';
 
 import '../../model/exercise.dart';
 
@@ -10,9 +13,20 @@ class ExerciseIcon extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    Color backgroundColor = Theme.of(context).colorScheme.secondaryContainer;
+    Color foregroundColor = Theme.of(context).colorScheme.onSecondaryContainer;
+
+    if (exercise.standard) {
+      final color = exerciseStandardLibrary.entries.firstWhereOrNull((element) => element.value.exercises.any((e) => e.id == (exercise.parentID ?? exercise.id)))?.value.color;
+      if (color != null) {
+        backgroundColor = getContainerColor(context, color);
+        foregroundColor = getOnContainerColor(context, color);
+      }
+    }
+    
     return CircleAvatar(
-      backgroundColor: Theme.of(context).colorScheme.secondaryContainer,
-      foregroundColor: Theme.of(context).colorScheme.onSecondaryContainer,
+      backgroundColor: backgroundColor,
+      foregroundColor: foregroundColor,
       child: Text(exercise.name.characters.first.toUpperCase()),
     );
   }
@@ -33,9 +47,20 @@ class ExerciseListTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final unselectedIcon = ExerciseIcon(exercise: exercise);
+    Color backgroundColor = Theme.of(context).colorScheme.secondary;
+    Color foregroundColor = Theme.of(context).colorScheme.onSecondary;
+
+    if (exercise.standard) {
+      final color = exerciseStandardLibrary.entries.firstWhereOrNull((element) => element.value.exercises.any((e) => e.id == (exercise.parentID ?? exercise.id)))?.value.color;
+      if (color != null) {
+        backgroundColor = getContainerColor(context, color);
+        foregroundColor = getOnContainerColor(context, color);
+      }
+    }
+
     final selectedIcon = CircleAvatar(
-      backgroundColor: Theme.of(context).colorScheme.secondary,
-      foregroundColor: Theme.of(context).colorScheme.onSecondary,
+      backgroundColor: backgroundColor,
+      foregroundColor: foregroundColor,
       child: const Icon(Icons.check),
     );
     return ListTile(

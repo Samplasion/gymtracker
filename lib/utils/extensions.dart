@@ -28,6 +28,15 @@ extension ListUtils<T> on List<T> {
   }
 }
 
+extension IterableUtils<T> on Iterable<T> {
+  T? firstWhereOrNull(bool Function(T) predicate) {
+    for (final element in this) {
+      if (predicate(element)) return element;
+    }
+    return null;
+  }
+}
+
 extension ListDoubleUtils on List<double> {
   double get min {
     double min = first;

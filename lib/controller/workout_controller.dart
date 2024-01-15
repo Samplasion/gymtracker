@@ -141,6 +141,7 @@ class WorkoutController extends GetxController with ServiceableController {
       duration: duration,
       startingDate: time.value,
       parentID: parentID.value,
+      infobox: infobox.value,
     );
     final service = Get.find<DatabaseService>();
     service.workoutHistory = [

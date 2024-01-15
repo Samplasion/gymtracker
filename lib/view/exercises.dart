@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:get/get.dart';
+import 'package:gymtracker/view/components/infobox.dart';
 import 'package:intl/intl.dart';
 
 import '../controller/history_controller.dart' as history;
@@ -170,6 +171,12 @@ class _ExercisesViewState extends State<ExercisesView> {
                   },
                   child: Text("workouts.actions.saveAsRoutine.button".tr),
                 ),
+              ),
+            ),
+          if (workout.infobox != null)
+            SliverToBoxAdapter(
+              child: Infobox(
+                text: workout.infobox!,
               ),
             ),
           SliverList(

@@ -15,15 +15,17 @@ class WorkoutController extends GetxController with ServiceableController {
   RxString name;
   Rx<DateTime> time;
   Rx<String?> parentID;
+  Rx<String?> infobox;
 
-  WorkoutController(String name, String? parentID)
+  WorkoutController(String name, String? parentID, String? infobox)
       : name = name.obs,
         time = DateTime.now().obs,
-        parentID = Rx<String?>(parentID);
+        parentID = Rx<String?>(parentID),
+        infobox = Rx<String?>(infobox);
 
   factory WorkoutController.fromSavedData(Map<String, dynamic> data) {
     // final  data = service.getOngoingData()!;
-    final cont = WorkoutController(data['name'], data['parentID']);
+    final cont = WorkoutController(data['name'], data['parentID'], data['infobox']);
     cont.exercises((data['exercises'] as List)
         .map((el) => Exercise.fromJson(el))
         .toList());
@@ -38,6 +40,7 @@ class WorkoutController extends GetxController with ServiceableController {
         name: name.value,
         exercises: exercises,
         parentID: parentID,
+        infobox: infobox(),
       );
 
   List<ExSet> get allSets => [for (final ex in exercises) ...ex.sets];
@@ -82,6 +85,7 @@ class WorkoutController extends GetxController with ServiceableController {
       "exercises": exercises.map((ex) => ex.toJson()).toList(),
       "parentID": parentID.value,
       "time": time.value.millisecondsSinceEpoch,
+      "infobox": infobox.value,
     });
   }
 

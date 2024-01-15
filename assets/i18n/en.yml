@@ -98,6 +98,8 @@ routines:
         label: Routine name
         errors:
           empty: The name must not be empty.
+      infobox:
+        label: Notes
 
 history:
   title: History
@@ -164,6 +166,8 @@ ongoingWorkout:
         label: Duration
         errors:
           empty: The duration must not be zero.
+      infobox:
+        label: Notes
   cancel:
     title: Cancel workout?
     text: You won't be able to undo this later if you change your mind.
@@ -326,3 +330,6 @@ library:
     exercises:
       legCurlProne: Leg curl (prone)
       legCurlSeated: Leg curl (seated)
+
+infobox:
+  label: Notes

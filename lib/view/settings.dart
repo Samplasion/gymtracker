@@ -1,12 +1,8 @@
-import 'dart:convert';
-import 'dart:typed_data';
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:gymtracker/service/color.dart';
 import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/view/settings/color.dart';
-import 'package:share_plus/share_plus.dart';
 
 import '../controller/settings_controller.dart';
 import '../data/weights.dart';

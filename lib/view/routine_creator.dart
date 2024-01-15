@@ -44,6 +44,7 @@ class RoutineCreator extends StatefulWidget {
 class _RoutineCreatorState extends State<RoutineCreator> {
   final formKey = GlobalKey<FormState>();
   late final titleController = TextEditingController(text: widget.base?.name);
+  late final infoboxController = TextEditingController(text: widget.base?.infobox);
 
   WorkoutsController get workoutsController => Get.find<WorkoutsController>();
 
@@ -98,6 +99,17 @@ class _RoutineCreatorState extends State<RoutineCreator> {
                   }
                   return null;
                 },
+              ),
+              TextFormField(
+                controller: infoboxController,
+                minLines: 3,
+                maxLines: null,
+                decoration: InputDecoration(
+                  isDense: true,
+                  border: const OutlineInputBorder(),
+                  labelText: "routines.editor.fields.infobox.label".tr,
+                  alignLabelWithHint: true,
+                ),
               ),
               Text("routines.editor.exercises.title".tr,
                   style: Theme.of(context).textTheme.titleMedium),
@@ -205,6 +217,7 @@ class _RoutineCreatorState extends State<RoutineCreator> {
         workoutsController.submitRoutine(
           name: titleController.text,
           exercises: controller.exercises.unwrap(),
+          infobox: infoboxController.text.trim().isEmpty ? null : infoboxController.text,
         );
       } else {
         Get.back(
@@ -212,6 +225,7 @@ class _RoutineCreatorState extends State<RoutineCreator> {
             name: titleController.text,
             exercises: controller.exercises.unwrap(),
             id: widget.base!.id,
+            infobox: infoboxController.text.trim().isEmpty ? null : infoboxController.text,
           ),
         );
       }

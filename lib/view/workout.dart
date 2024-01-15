@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:get/get.dart';
 import 'package:gymtracker/utils/extensions.dart';
+import 'package:gymtracker/view/components/infobox.dart';
 
 import '../controller/countdown_controller.dart';
 import '../controller/workout_controller.dart';
@@ -21,7 +22,7 @@ import 'utils/timer.dart';
 import 'utils/weight_calculator.dart';
 
 WorkoutController get controller =>
-    Get.put(WorkoutController("Untitled workout", null));
+    Get.put(WorkoutController("Untitled workout", null, null));
 
 class WorkoutView extends StatefulWidget {
   const WorkoutView({super.key});
@@ -117,6 +118,9 @@ class _WorkoutViewState extends State<WorkoutView> {
       body: Obx(
         () => ListView(
           children: [
+            if (Get.isRegistered<WorkoutController>() && Get.find<WorkoutController>().infobox() != null)
+              Infobox(text: controller.infobox()!),
+
             // Avoid calling [get controller] in order to avoid
             // recreating it, thus starting a new workout.
             if (Get.find<WorkoutsController>().hasOngoingWorkout())
@@ -476,6 +480,7 @@ class _WorkoutFinishPageState extends State<WorkoutFinishPage> {
         DateTime.now().difference(controller.time.value)),
   );
   final dateController = TextEditingController();
+  final infoboxController = TextEditingController(text: controller.infobox.value);
 
   @override
   Widget build(BuildContext context) {
@@ -551,6 +556,17 @@ class _WorkoutFinishPageState extends State<WorkoutFinishPage> {
                   }
                   return null;
                 },
+              ),
+              TextFormField(
+                controller: infoboxController,
+                minLines: 3,
+                maxLines: null,
+                decoration: InputDecoration(
+                  isDense: true,
+                  border: const OutlineInputBorder(),
+                  labelText: "ongoingWorkout.finish.fields.infobox.label".tr,
+                  alignLabelWithHint: true,
+                ),
               ),
             ]
                 .map((c) => Padding(

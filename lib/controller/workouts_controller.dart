@@ -52,10 +52,12 @@ class WorkoutsController extends GetxController with ServiceableController {
   void submitRoutine({
     required String name,
     required List<Exercise> exercises,
+    required String? infobox,
   }) {
     final routine = Workout(
       name: name,
       exercises: exercises,
+      infobox: infobox,
     );
     service.routines = [...service.routines, routine];
 
@@ -82,7 +84,7 @@ class WorkoutsController extends GetxController with ServiceableController {
       workoutID = null;
     }
 
-    Get.put(WorkoutController("workouts.untitled".tr, workoutID));
+    Get.put(WorkoutController("workouts.untitled".tr, workoutID, null));
     // ignore: use_build_context_synchronously
     if (Navigator.of(context).canPop()) {
       Get.back();
@@ -112,6 +114,7 @@ class WorkoutsController extends GetxController with ServiceableController {
         ..time(DateTime.now())
         // Same goes for this
         ..parentID(workoutID)
+        ..infobox(workout.infobox)
         ..save();
     });
   }
@@ -126,11 +129,13 @@ class WorkoutsController extends GetxController with ServiceableController {
     required String name,
     required List<Exercise> exercises,
     required String id,
+    required String? infobox,
   }) {
     return Workout(
       name: name,
       exercises: exercises,
       id: id,
+      infobox: infobox,
     );
   }
 

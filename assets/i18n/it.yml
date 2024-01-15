@@ -98,6 +98,8 @@ routines:
         label: Nome della routine
         errors:
           empty: Il nome non dev'essere vuoto.
+      infobox:
+        label: Note
 
 history:
   title: Cronologia
@@ -164,6 +166,8 @@ ongoingWorkout:
         label: Durata
         errors:
           empty: La durata non dev'essere zero.
+      infobox:
+        label: Note
   cancel:
     title: Scartare l'allenamento?
     text: Non potrai annullare quest'azione se cambi idea.
@@ -176,7 +180,7 @@ ongoingWorkout:
     actions:
       no: Annulla
       yes: Avvia
-  restOver: È scaduto il tempo di riposo!
+  restOver: È scaduto il tempo di recupero!
   weightCalculator: Calcolatrice pesi
 
 timer: 
@@ -326,3 +330,6 @@ library:
     exercises:
       legCurlProne: Leg curl (sdraiati)
       legCurlSeated: Leg curl (seduti)
+
+infobox:
+  label: Note

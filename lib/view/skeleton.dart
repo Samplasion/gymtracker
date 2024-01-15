@@ -112,10 +112,11 @@ class _SkeletonViewState extends State<SkeletonView>
                   icon: const Icon(Icons.history_rounded),
                   label: "history.title".t,
                 ),
-                NavigationDestination(
-                  icon: const Icon(Icons.settings_rounded),
-                  label: "settings.title".t,
-                ),
+                if (kDebugMode)
+                  NavigationDestination(
+                    icon: const Icon(Icons.settings_rounded),
+                    label: "settings.title".t,
+                  ),
                 const NavigationDestination(
                   icon: Icon(Icons.bug_report),
                   label: "Debug",

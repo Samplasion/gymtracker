@@ -60,6 +60,12 @@ extension Fallback on String {
     }
     return tr;
   }
+
+  bool get existsAsTranslationKey {
+    return Get.find<GTLocalizations>()
+        .keys[Get.locale!.languageCode]!
+        .containsKey(this);
+  }
 }
 
 extension Plural on String {

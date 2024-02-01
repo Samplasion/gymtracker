@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:gymtracker/controller/debug_controller.dart';
+import 'package:gymtracker/controller/history_controller.dart';
+import 'package:gymtracker/service/database.dart';
 import 'package:gymtracker/utils/go.dart';
 
 class DebugView extends StatelessWidget {
@@ -39,6 +41,19 @@ class DebugView extends StatelessWidget {
                   },
                 );
               }),
+              ListTile(
+                title: const Text("Fix history std. exercise labels"),
+                subtitle: const Text(
+                    "Fixes the labels of the standard exercises in the history"),
+                onTap: () {
+                  final hc = Get.find<HistoryController>();
+                  final db = Get.find<DatabaseService>();
+                  db.workoutHistory =
+                      db.workoutHistory.map(hc.fixWorkout).toList();
+
+                  Go.snack("Fixed ${db.workoutHistory.length} workouts");
+                },
+              )
             ]),
           ),
         ],

@@ -102,13 +102,18 @@ class WorkoutsController extends GetxController with ServiceableController {
                 for (final set in ex.sets)
                   set.copyWith(
                     done: false,
-                    reps: [SetKind.failure, SetKind.failureStripping].contains(set.kind) ? 0 : set.reps,
+                    reps: [SetKind.failure, SetKind.failureStripping]
+                            .contains(set.kind)
+                        ? 0
+                        : set.reps,
                   ),
               ]),
               // If we're redoing a previous workout,
               // we want to inherit the previous parent ID,
               // ie. the original routine's ID
-              parentID: workout.isConcrete ? ex.parentID : ex.id,
+              // But we also want to keep it if we're cloning
+              // a built-in exercise, so that the translated name is kept.
+              parentID: workout.isConcrete || ex.standard ? ex.parentID : ex.id,
               id: const Uuid().v4(),
             ),
         ])

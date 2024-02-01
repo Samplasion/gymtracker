@@ -17,17 +17,21 @@ class ExerciseIcon extends StatelessWidget {
     Color foregroundColor = Theme.of(context).colorScheme.onSecondaryContainer;
 
     if (exercise.standard) {
-      final color = exerciseStandardLibrary.entries.firstWhereOrNull((element) => element.value.exercises.any((e) => e.id == (exercise.parentID ?? exercise.id)))?.value.color;
+      final color = exerciseStandardLibrary.entries
+          .firstWhereOrNull((element) => element.value.exercises
+              .any((e) => e.id == (exercise.parentID ?? exercise.id)))
+          ?.value
+          .color;
       if (color != null) {
         backgroundColor = getContainerColor(context, color);
         foregroundColor = getOnContainerColor(context, color);
       }
     }
-    
+
     return CircleAvatar(
       backgroundColor: backgroundColor,
       foregroundColor: foregroundColor,
-      child: Text(exercise.name.characters.first.toUpperCase()),
+      child: Text(exercise.displayName.characters.first.toUpperCase()),
     );
   }
 }
@@ -51,7 +55,11 @@ class ExerciseListTile extends StatelessWidget {
     Color foregroundColor = Theme.of(context).colorScheme.onSecondary;
 
     if (exercise.standard) {
-      final color = exerciseStandardLibrary.entries.firstWhereOrNull((element) => element.value.exercises.any((e) => e.id == (exercise.parentID ?? exercise.id)))?.value.color;
+      final color = exerciseStandardLibrary.entries
+          .firstWhereOrNull((element) => element.value.exercises
+              .any((e) => e.id == (exercise.parentID ?? exercise.id)))
+          ?.value
+          .color;
       if (color != null) {
         backgroundColor = getContainerColor(context, color);
         foregroundColor = getOnContainerColor(context, color);
@@ -67,7 +75,7 @@ class ExerciseListTile extends StatelessWidget {
       leading: selected ? selectedIcon : unselectedIcon,
       title: Text.rich(
         TextSpan(children: [
-          TextSpan(text: exercise.name),
+          TextSpan(text: exercise.displayName),
           if (exercise.isCustom) ...[
             const TextSpan(text: " "),
             const WidgetSpan(

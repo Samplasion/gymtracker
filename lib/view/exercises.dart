@@ -524,8 +524,24 @@ class ExerciseDataView extends StatelessWidget {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    exercise.displayName,
+                  // Text(
+                  //   exercise.displayName,
+
+                  // ),
+                  Text.rich(
+                    TextSpan(
+                      children: [
+                        TextSpan(text: exercise.displayName),
+                        if (exercise.isCustom) ...[
+                          const TextSpan(text: " "),
+                          const WidgetSpan(
+                            baseline: TextBaseline.ideographic,
+                            alignment: PlaceholderAlignment.middle,
+                            child: CustomExerciseBadge(),
+                          ),
+                        ],
+                      ],
+                    ),
                     style: Theme.of(context).textTheme.titleMedium,
                   ),
                   TimerView.buildTimeString(

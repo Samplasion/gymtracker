@@ -19,7 +19,7 @@ class LibraryView extends GetView<ExercisesController> {
     final sortedKeys = [...exerciseStandardLibrary.keys]
       ..sort((a, b) => a.toLowerCase().compareTo(b.toLowerCase()));
     return {
-      "library.custom".tr: ExerciseCategory(
+      "library.custom".t: ExerciseCategory(
         exercises: controller.exercises,
         icon: const Icon(Icons.star_rounded),
         color: Colors.yellow,
@@ -35,7 +35,7 @@ class LibraryView extends GetView<ExercisesController> {
         () => CustomScrollView(
           slivers: [
             SliverAppBar.large(
-              title: Text("library.title".tr),
+              title: Text("library.title".t),
             ),
             SliverList(
               delegate: SliverChildListDelegate(
@@ -127,7 +127,7 @@ class ExerciseInfoView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("exercise.info.title".tr)),
+      appBar: AppBar(title: Text("exercise.info.title".t)),
       body: ListTileTheme(
         contentPadding: EdgeInsets.zero,
         child: ListView(

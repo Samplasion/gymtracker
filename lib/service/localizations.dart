@@ -1,9 +1,12 @@
+import 'dart:collection';
 import 'dart:convert';
 import 'dart:ui';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
+import 'package:gymtracker/controller/debug_controller.dart';
 import 'package:intl/intl.dart';
 import 'package:yaml/yaml.dart';
 
@@ -37,7 +40,6 @@ class GTLocalizations extends Translations with ChangeNotifier {
       keys[locale.languageCode] =
           flattenTranslations(jsonDecode(jsonEncode(loadYaml(bundle))));
     }
-    // print(keys);
     notifyListeners();
   }
 
@@ -47,6 +49,22 @@ class GTLocalizations extends Translations with ChangeNotifier {
     Get.delete<GTLocalizations>();
     Get.put(this);
     printInfo(info: "notified listeners");
+  }
+}
+
+extension Fallback on String {
+  String get t {
+    if (tr == this) {
+      Get.find<DebugController>().missingKeys.add(this);
+      return this;
+    }
+    return tr;
+  }
+
+  bool get existsAsTranslationKey {
+    return Get.find<GTLocalizations>()
+        .keys[Get.locale!.languageCode]!
+        .containsKey(this);
   }
 }
 

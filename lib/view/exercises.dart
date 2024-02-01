@@ -5,6 +5,7 @@ import 'package:flutter/scheduler.dart';
 import 'package:get/get.dart';
 import 'package:gymtracker/model/exercisable.dart';
 import 'package:gymtracker/model/superset.dart';
+import 'package:gymtracker/view/components/infobox.dart';
 import 'package:intl/intl.dart';
 
 import '../controller/history_controller.dart' as history;
@@ -48,7 +49,7 @@ class _ExercisesViewState extends State<ExercisesView> {
                   textStyle: TextStyle(
                     color: Theme.of(context).colorScheme.error,
                   ),
-                  child: Text("workouts.actions.changeParent.label".tr),
+                  child: Text("workouts.actions.changeParent.label".t),
                   onTap: () {
                     SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
                       showDialog(
@@ -56,13 +57,13 @@ class _ExercisesViewState extends State<ExercisesView> {
                         builder: (_) {
                           return DropdownDialog(
                             title:
-                                Text("workouts.actions.changeParent.label".tr),
+                                Text("workouts.actions.changeParent.label".t),
                             items: [
                               DropdownMenuItem(
                                 value: null,
                                 child: Text(
                                   "workouts.actions.changeParent.options.none"
-                                      .tr,
+                                      .t,
                                   style: const TextStyle(
                                       fontStyle: FontStyle.italic),
                                 ),
@@ -89,7 +90,7 @@ class _ExercisesViewState extends State<ExercisesView> {
                   textStyle: TextStyle(
                     color: Theme.of(context).colorScheme.error,
                   ),
-                  child: Text("workouts.actions.delete".tr),
+                  child: Text("workouts.actions.delete".t),
                   onTap: () {
                     Get.find<history.HistoryController>()
                         .deleteWorkout(workout);
@@ -101,7 +102,7 @@ class _ExercisesViewState extends State<ExercisesView> {
                 ),
               ] else ...[
                 PopupMenuItem(
-                  child: Text("routines.actions.edit".tr),
+                  child: Text("routines.actions.edit".t),
                   onTap: () {
                     SchedulerBinding.instance
                         .addPostFrameCallback((timeStamp) async {
@@ -121,7 +122,7 @@ class _ExercisesViewState extends State<ExercisesView> {
                   textStyle: TextStyle(
                     color: Theme.of(context).colorScheme.error,
                   ),
-                  child: Text("routines.actions.delete".tr),
+                  child: Text("routines.actions.delete".t),
                   onTap: () {
                     Get.find<WorkoutsController>().deleteWorkout(workout);
                     SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
@@ -153,9 +154,9 @@ class _ExercisesViewState extends State<ExercisesView> {
                 },
                 child: Text(() {
                   if (workout.isConcrete) {
-                    return "workouts.actions.start".tr;
+                    return "workouts.actions.start".t;
                   } else {
-                    return "routines.actions.start".tr;
+                    return "routines.actions.start".t;
                   }
                 }()),
               ),
@@ -168,10 +169,16 @@ class _ExercisesViewState extends State<ExercisesView> {
                 child: FilledButton.tonal(
                   onPressed: () {
                     Get.find<WorkoutsController>().importWorkout(workout);
-                    Go.snack("workouts.actions.saveAsRoutine.done".tr);
+                    Go.snack("workouts.actions.saveAsRoutine.done".t);
                   },
-                  child: Text("workouts.actions.saveAsRoutine.button".tr),
+                  child: Text("workouts.actions.saveAsRoutine.button".t),
                 ),
+              ),
+            ),
+          if (workout.infobox != null)
+            SliverToBoxAdapter(
+              child: Infobox(
+                text: workout.infobox!,
               ),
             ),
           SliverList(
@@ -268,7 +275,7 @@ class _RoutineHistoryDataState extends State<RoutineHistoryData> {
               return TextSpan(
                   text: "exerciseList.fields.weight".trParams({
                 "weight": stringifyDouble(value),
-                "unit": "units.kg".tr,
+                "unit": "units.kg".t,
               }));
             case _RoutineHistoryDataType.reps:
               return TextSpan(
@@ -425,7 +432,7 @@ class _RoutineHistoryDataState extends State<RoutineHistoryData> {
               children: [
                 for (final type in _RoutineHistoryDataType.values)
                   ChoiceChip(
-                    label: Text("exercise.chart.views.${type.name}".tr),
+                    label: Text("exercise.chart.views.${type.name}".t),
                     avatar: CircleAvatar(
                       child: this.type == type
                           ? const SizedBox.shrink()
@@ -523,15 +530,33 @@ class ExerciseDataView extends StatelessWidget {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(exercise.name,
-                      style: Theme.of(context).textTheme.titleMedium),
+                  // Text(
+                  //   exercise.displayName,
+
+                  // ),
+                  Text.rich(
+                    TextSpan(
+                      children: [
+                        TextSpan(text: exercise.displayName),
+                        if (exercise.isCustom) ...[
+                          const TextSpan(text: " "),
+                          const WidgetSpan(
+                            baseline: TextBaseline.ideographic,
+                            alignment: PlaceholderAlignment.middle,
+                            child: CustomExerciseBadge(),
+                          ),
+                        ],
+                      ],
+                    ),
+                    style: Theme.of(context).textTheme.titleMedium,
+                  ),
                   TimerView.buildTimeString(
                     context,
                     workout.exercises[index].restTime,
                     builder: (time) => Text.rich(
                       TextSpan(
                         children: [
-                          TextSpan(text: "exerciseList.restTime".tr),
+                          TextSpan(text: "exerciseList.restTime".t),
                           time
                         ],
                         style:
@@ -587,7 +612,7 @@ class ExerciseSetView extends StatelessWidget {
             .contains(set.parameters))
           Text("exerciseList.fields.weight".trParams({
             "weight": stringifyDouble(set.weight!),
-            "unit": "units.kg".tr,
+            "unit": "units.kg".t,
           })),
         if ([
           SetParameters.timeWeight,
@@ -603,7 +628,7 @@ class ExerciseSetView extends StatelessWidget {
         if ([SetParameters.distance].contains(set.parameters))
           Text("exerciseList.fields.distance".trParams({
             "distance": stringifyDouble(set.distance!),
-            "unit": "units.km".tr,
+            "unit": "units.km".t,
           })),
       ];
 
@@ -659,22 +684,22 @@ class OverwriteDialog extends StatelessWidget {
   Widget build(BuildContext context) {
     return AlertDialog(
       icon: const Icon(Icons.info),
-      title: Text("ongoingWorkout.overwrite.title".tr),
+      title: Text("ongoingWorkout.overwrite.title".t),
       content: Text(
-        "ongoingWorkout.overwrite.text".tr,
+        "ongoingWorkout.overwrite.text".t,
       ),
       actions: [
         TextButton(
           onPressed: () {
             Get.back(result: false);
           },
-          child: Text("ongoingWorkout.overwrite.actions.no".tr),
+          child: Text("ongoingWorkout.overwrite.actions.no".t),
         ),
         FilledButton.tonal(
           onPressed: () {
             Get.back(result: true);
           },
-          child: Text("ongoingWorkout.overwrite.actions.yes".tr),
+          child: Text("ongoingWorkout.overwrite.actions.yes".t),
         ),
       ],
     );

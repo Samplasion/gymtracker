@@ -28,7 +28,7 @@ class _ExercisePickerState extends State<ExercisePicker> {
     final sortedKeys = [...exerciseStandardLibrary.keys]
       ..sort((a, b) => a.toLowerCase().compareTo(b.toLowerCase()));
     return {
-      "library.custom".tr: ExerciseCategory(
+      "library.custom".t: ExerciseCategory(
         exercises: controller.exercises,
         icon: const Icon(Icons.star_rounded),
         color: Colors.yellow,
@@ -41,7 +41,7 @@ class _ExercisePickerState extends State<ExercisePicker> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("exercise.picker.title".tr),
+        title: Text("exercise.picker.title".t),
         actions: [
           if (!widget.singlePick)
             IconButton(
@@ -116,7 +116,7 @@ class _ExercisePickerState extends State<ExercisePicker> {
             builder: (context) => const ExerciseCreator(base: null),
           );
         },
-        label: Text("actions.create".tr),
+        label: Text("actions.create".t),
         icon: const Icon(Icons.add),
       ),
     );
@@ -124,7 +124,7 @@ class _ExercisePickerState extends State<ExercisePicker> {
 
   void _submit() {
     if (widget.singlePick && selectedExercises.isEmpty) {
-      Go.snack("exercise.picker.errors.empty".tr);
+      Go.snack("exercise.picker.errors.empty".t);
       return;
     }
     ScaffoldMessenger.of(context).clearSnackBars();

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:gymtracker/service/localizations.dart';
 
 import '../controller/workouts_controller.dart';
 import '../model/exercise.dart';
@@ -44,6 +45,7 @@ class RoutineCreator extends StatefulWidget {
 class _RoutineCreatorState extends State<RoutineCreator> {
   final formKey = GlobalKey<FormState>();
   late final titleController = TextEditingController(text: widget.base?.name);
+  late final infoboxController = TextEditingController(text: widget.base?.infobox);
 
   WorkoutsController get workoutsController => Get.find<WorkoutsController>();
 
@@ -69,9 +71,9 @@ class _RoutineCreatorState extends State<RoutineCreator> {
       appBar: AppBar(
         title: Text(() {
           if (widget.base == null) {
-            return "routines.actions.create".tr;
+            return "routines.actions.create".t;
           } else {
-            return "routines.actions.edit".tr;
+            return "routines.actions.edit".t;
           }
         }()),
         actions: [
@@ -92,16 +94,27 @@ class _RoutineCreatorState extends State<RoutineCreator> {
                 decoration: InputDecoration(
                   isDense: true,
                   border: const OutlineInputBorder(),
-                  labelText: "routines.editor.fields.name.label".tr,
+                  labelText: "routines.editor.fields.name.label".t,
                 ),
                 validator: (string) {
                   if (string == null || string.isEmpty) {
-                    return "routines.editor.fields.name.errors.empty".tr;
+                    return "routines.editor.fields.name.errors.empty".t;
                   }
                   return null;
                 },
               ),
-              Text("routines.editor.exercises.title".tr,
+              TextFormField(
+                controller: infoboxController,
+                minLines: 3,
+                maxLines: null,
+                decoration: InputDecoration(
+                  isDense: true,
+                  border: const OutlineInputBorder(),
+                  labelText: "routines.editor.fields.infobox.label".t,
+                  alignLabelWithHint: true,
+                ),
+              ),
+              Text("routines.editor.exercises.title".t,
                   style: Theme.of(context).textTheme.titleMedium),
             ]
                 .map((c) => Padding(
@@ -113,7 +126,7 @@ class _RoutineCreatorState extends State<RoutineCreator> {
                     ))
                 .toList(),
             ListTile(
-              title: Text("routines.editor.exercises.add".tr),
+              title: Text("routines.editor.exercises.add".t),
               leading: const CircleAvatar(child: Icon(Icons.add_rounded)),
               onTap: () {
                 Go.to<List<Exercise>>(() => const ExercisePicker(
@@ -207,6 +220,7 @@ class _RoutineCreatorState extends State<RoutineCreator> {
         workoutsController.submitRoutine(
           name: titleController.text,
           exercises: controller.exercises.unwrap(),
+          infobox: infoboxController.text.trim().isEmpty ? null : infoboxController.text,
         );
       } else {
         Get.back(
@@ -214,6 +228,7 @@ class _RoutineCreatorState extends State<RoutineCreator> {
             name: titleController.text,
             exercises: controller.exercises.unwrap(),
             id: widget.base!.id,
+            infobox: infoboxController.text.trim().isEmpty ? null : infoboxController.text,
           ),
         );
       }

@@ -90,6 +90,8 @@ class _TimeInputFieldState extends State<TimeInputField> {
     super.dispose();
   }
 
+  TextSelection? _oldSelection;
+
   @override
   Widget build(BuildContext context) {
     return TextFormField(
@@ -119,11 +121,19 @@ class _TimeInputFieldState extends State<TimeInputField> {
       ),
       inputFormatters: <TextInputFormatter>[TimeTextInputFormatter()],
       onChanged: (value) {
+        if (_oldSelection != null) {
+          if (_oldSelection?.baseOffset == value.length) {
+            widget.controller.selection = _oldSelection!;
+          }
+        }
         value = value.replaceAll(":", "");
         setState(() => numericalValue = int.parse(value).toString());
         widget.onChanged?.call(value);
         widget.onChangedTime
             ?.call(TimeInputField.parseDuration(widget.controller.text));
+        setState(() {
+          _oldSelection = widget.controller.selection;
+        });
       },
       onEditingComplete: () => normalizeField(),
       onTapOutside: (_) {

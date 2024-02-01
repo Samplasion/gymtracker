@@ -9,6 +9,8 @@ enum SetKind {
   warmUp,
   normal,
   drop,
+  failure,
+  failureStripping,
 }
 
 @JsonEnum()

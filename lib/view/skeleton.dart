@@ -1,7 +1,9 @@
 import 'package:animations/animations.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart' hide Localizations;
 import 'package:get/get.dart';
 import 'package:gymtracker/controller/workouts_controller.dart';
+import 'package:gymtracker/view/debug.dart';
 import 'package:gymtracker/view/workout.dart';
 import 'package:iconify_flutter/iconify_flutter.dart';
 import 'package:iconify_flutter/icons/mdi.dart';
@@ -45,6 +47,8 @@ class _SkeletonViewState extends State<SkeletonView>
         const LibraryView(),
         const HistoryView(),
         const SettingsView(),
+        if (kDebugMode)
+          const DebugView(),
       ];
 
   @override
@@ -98,20 +102,25 @@ class _SkeletonViewState extends State<SkeletonView>
                     Mdi.dumbbell,
                     color: Theme.of(context).colorScheme.onSecondaryContainer,
                   ),
-                  label: "routines.title".tr,
+                  label: "routines.title".t,
                 ),
                 NavigationDestination(
                   icon: const Icon(Icons.local_library_rounded),
-                  label: "library.title".tr,
+                  label: "library.title".t,
                 ),
                 NavigationDestination(
                   icon: const Icon(Icons.history_rounded),
-                  label: "history.title".tr,
+                  label: "history.title".t,
                 ),
                 NavigationDestination(
                   icon: const Icon(Icons.settings_rounded),
-                  label: "settings.title".tr,
+                  label: "settings.title".t,
                 ),
+                if (kDebugMode)
+                  const NavigationDestination(
+                    icon: Icon(Icons.bug_report),
+                    label: "Debug",
+                  ),
               ],
               selectedIndex: _selectedIndex,
               onDestinationSelected: (i) => setState(() => _selectedIndex = i),
@@ -135,11 +144,12 @@ class OngoingWorkoutBar extends StatelessWidget {
     final isPhone = context.width < Breakpoints.xs;
     return Card(
       elevation: 1,
-      margin: EdgeInsets.zero,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(
-          top: Radius.circular(13),
-        ),
+      margin: const EdgeInsets.fromLTRB(8, 0, 8, 8),
+      shape: RoundedRectangleBorder(
+        // borderRadius: BorderRadius.vertical(
+        //   top: Radius.circular(13),
+        // ),
+        borderRadius: BorderRadius.circular(13),
       ),
       child: Container(
         constraints: const BoxConstraints(minHeight: 64),
@@ -152,10 +162,7 @@ class OngoingWorkoutBar extends StatelessWidget {
                 child: Obx(
                   () => TimerView(
                     startingTime: Get.find<WorkoutController>().time.value,
-                    builder: (_, time) => Hero(
-                      tag: "Ongoing",
-                      child: time,
-                    ),
+                    builder: (_, time) => time,
                   ),
                 ),
               ),
@@ -166,7 +173,7 @@ class OngoingWorkoutBar extends StatelessWidget {
                   icon: const Icon(Icons.play_arrow_rounded),
                   clipBehavior: Clip.hardEdge,
                   label: Text(
-                    "ongoingWorkout.actions.short.resume".tr,
+                    "ongoingWorkout.actions.short.resume".t,
                     overflow: TextOverflow.clip,
                     maxLines: 1,
                   ),
@@ -192,7 +199,7 @@ class OngoingWorkoutBar extends StatelessWidget {
                     ),
                     clipBehavior: Clip.hardEdge,
                     label: Text(
-                      "ongoingWorkout.actions.short.cancel".tr,
+                      "ongoingWorkout.actions.short.cancel".t,
                       style:
                           TextStyle(color: Theme.of(context).colorScheme.error),
                       overflow: TextOverflow.clip,

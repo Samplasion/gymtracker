@@ -22,6 +22,8 @@ class Workout {
   final Duration? duration;
   final DateTime? startingDate;
 
+  final String? infobox;
+
   /// The ID of the non-concrete (ie. part of a routine) exercise
   /// this concrete exercise should be categorized under.
   String? parentID;
@@ -54,6 +56,7 @@ class Workout {
     this.duration,
     this.startingDate,
     this.parentID,
+    this.infobox,
   }) : id = id ?? const Uuid().v4();
 
   factory Workout.fromJson(Map<String, dynamic> json) =>

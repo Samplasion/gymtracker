@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get/state_manager.dart';
 import 'package:gymtracker/model/superset.dart';
+import 'package:gymtracker/service/localizations.dart';
 import 'package:uuid/uuid.dart';
 
 import '../controller/history_controller.dart';
@@ -53,10 +54,12 @@ class WorkoutsController extends GetxController with ServiceableController {
   void submitRoutine({
     required String name,
     required List<Exercise> exercises,
+    required String? infobox,
   }) {
     final routine = Workout(
       name: name,
       exercises: exercises,
+      infobox: infobox,
     );
     service.routines = [...service.routines, routine];
 
@@ -83,12 +86,31 @@ class WorkoutsController extends GetxController with ServiceableController {
       workoutID = null;
     }
 
-    Get.put(WorkoutController("workouts.untitled".tr, workoutID));
+    Get.put(WorkoutController("workouts.untitled".t, workoutID, null));
     // ignore: use_build_context_synchronously
     if (Navigator.of(context).canPop()) {
       Get.back();
     }
     Go.to(() => const WorkoutView());
+    Exercise cloneExercise(Exercise ex) => ex.copyWith(
+          sets: ([
+            for (final set in ex.sets)
+              set.copyWith(
+                done: false,
+                reps: [SetKind.failure, SetKind.failureStripping]
+                        .contains(set.kind)
+                    ? 0
+                    : set.reps,
+              ),
+          ]),
+          // If we're redoing a previous workout,
+          // we want to inherit the previous parent ID,
+          // ie. the original routine's ID
+          // But we also want to keep it if we're cloning
+          // a built-in exercise, so that the translated name is kept.
+          parentID: workout.isConcrete || ex.standard ? ex.parentID : ex.id,
+          id: const Uuid().v4(),
+        );
     Future.delayed(const Duration(milliseconds: 100)).then((_) {
       final clone = workout.clone();
       Get.find<WorkoutController>()
@@ -96,35 +118,16 @@ class WorkoutsController extends GetxController with ServiceableController {
         ..exercises([
           for (final ex in clone.exercises)
             if (ex is Exercise)
-              ex.copyWith(
-                sets: ([
-                  for (final set in ex.sets) set.copyWith.done(false),
-                ]),
-                // If we're redoing a previous workout,
-                // we want to inherit the previous parent ID,
-                // ie. the original routine's ID
-                parentID: workout.isConcrete ? ex.parentID : ex.id,
-                id: const Uuid().v4(),
-              )
+              cloneExercise(ex)
             else if (ex is Superset)
               ex.copyWith(
-                exercises: ex.exercises
-                    .map((ex) => ex.copyWith(
-                          sets: ([
-                            for (final set in ex.sets) set.copyWith.done(false),
-                          ]),
-                          // If we're redoing a previous workout,
-                          // we want to inherit the previous parent ID,
-                          // ie. the original routine's ID
-                          parentID: workout.isConcrete ? ex.parentID : ex.id,
-                          id: const Uuid().v4(),
-                        ))
-                    .toList(),
+                exercises: ex.exercises.map(cloneExercise).toList(),
               ),
         ])
         ..time(DateTime.now())
         // Same goes for this
         ..parentID(workoutID)
+        ..infobox(workout.infobox)
         ..save();
     });
   }
@@ -139,11 +142,13 @@ class WorkoutsController extends GetxController with ServiceableController {
     required String name,
     required List<Exercise> exercises,
     required String id,
+    required String? infobox,
   }) {
     return Workout(
       name: name,
       exercises: exercises,
       id: id,
+      infobox: infobox,
     );
   }
 

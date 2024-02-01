@@ -19,6 +19,8 @@ abstract class _$WorkoutCWProxy {
 
   Workout parentID(String? parentID);
 
+  Workout infobox(String? infobox);
+
   /// This function **does support** nullification of nullable fields. All `null` values passed to `non-nullable` fields will be ignored. You can also use `Workout(...).copyWith.fieldName(...)` to override fields one at a time with nullification support.
   ///
   /// Usage
@@ -32,6 +34,7 @@ abstract class _$WorkoutCWProxy {
     Duration? duration,
     DateTime? startingDate,
     String? parentID,
+    String? infobox,
   });
 }
 
@@ -62,6 +65,9 @@ class _$WorkoutCWProxyImpl implements _$WorkoutCWProxy {
   Workout parentID(String? parentID) => this(parentID: parentID);
 
   @override
+  Workout infobox(String? infobox) => this(infobox: infobox);
+
+  @override
 
   /// This function **does support** nullification of nullable fields. All `null` values passed to `non-nullable` fields will be ignored. You can also use `Workout(...).copyWith.fieldName(...)` to override fields one at a time with nullification support.
   ///
@@ -76,6 +82,7 @@ class _$WorkoutCWProxyImpl implements _$WorkoutCWProxy {
     Object? duration = const $CopyWithPlaceholder(),
     Object? startingDate = const $CopyWithPlaceholder(),
     Object? parentID = const $CopyWithPlaceholder(),
+    Object? infobox = const $CopyWithPlaceholder(),
   }) {
     return Workout(
       id: id == const $CopyWithPlaceholder()
@@ -102,6 +109,10 @@ class _$WorkoutCWProxyImpl implements _$WorkoutCWProxy {
           ? _value.parentID
           // ignore: cast_nullable_to_non_nullable
           : parentID as String?,
+      infobox: infobox == const $CopyWithPlaceholder()
+          ? _value.infobox
+          // ignore: cast_nullable_to_non_nullable
+          : infobox as String?,
     );
   }
 }
@@ -129,6 +140,7 @@ Workout _$WorkoutFromJson(Map<String, dynamic> json) => Workout(
           ? null
           : DateTime.parse(json['startingDate'] as String),
       parentID: json['parentID'] as String?,
+      infobox: json['infobox'] as String?,
     );
 
 Map<String, dynamic> _$WorkoutToJson(Workout instance) => <String, dynamic>{
@@ -137,5 +149,6 @@ Map<String, dynamic> _$WorkoutToJson(Workout instance) => <String, dynamic>{
       'exercises': instance.exercises,
       'duration': instance.duration?.inMicroseconds,
       'startingDate': instance.startingDate?.toIso8601String(),
+      'infobox': instance.infobox,
       'parentID': instance.parentID,
     };

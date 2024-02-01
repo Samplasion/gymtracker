@@ -5,10 +5,14 @@ set:
   kindShort:
     warmUp: R
     drop: D
+    failure: M
+    failureStripping: S
   kindLong:
     normal: Serie normale
     warmUp: Riscaldamento
     drop: Drop set
+    failure: A morire
+    failureStripping: A morire, con stripping
 
 exercise:
   chart:
@@ -94,6 +98,8 @@ routines:
         label: Nome della routine
         errors:
           empty: Il nome non dev'essere vuoto.
+      infobox:
+        label: Note
 
 history:
   title: Cronologia
@@ -109,6 +115,8 @@ settings:
   options:
     useDynamicColor:
       label: Usa colore dinamico
+    color:
+      label: Colore dell'applicazione
     locale:
       label: Lingua dell'applicazione
     weightUnit:
@@ -119,6 +127,10 @@ settings:
       failed: Impossibile importare i dati
     export:
       label: Esporta dati (JSON)
+  
+  colorPicker:
+    heading:
+      label: Seleziona un colore [@color]
 
 ongoingWorkout:
   title: Allenamento in corso
@@ -154,6 +166,8 @@ ongoingWorkout:
         label: Durata
         errors:
           empty: La durata non dev'essere zero.
+      infobox:
+        label: Note
   cancel:
     title: Scartare l'allenamento?
     text: Non potrai annullare quest'azione se cambi idea.
@@ -166,7 +180,7 @@ ongoingWorkout:
     actions:
       no: Annulla
       yes: Avvia
-  restOver: È scaduto il tempo di riposo!
+  restOver: È scaduto il tempo di recupero!
   weightCalculator: Calcolatrice pesi
 
 timer: 
@@ -289,10 +303,19 @@ library:
       dumbbellBenchPressFlat: Panca piana (manubri)
       dumbbellBenchPressIncline: Panca inclinata (manubri, in avanti)
       dumbbellBenchPressDecline: Panca inclinata (manubri, all'indietro)
+      smithMachineBenchPressFlat: Panca piana (Multipower)
+      smithMachineBenchPressIncline: Panca inclinata (Multipower, in avanti)
+      smithMachineBenchPressDecline: Panca inclinata (Multipower, all'indietro)
+      butterflyMachine: Butterfly machine
+      dumbbellHexPress: Hex Press (manubri)
+      smithMachineHexPress: Hex Press al Multipower
+      seatedCableChestFlys: Croci ai cavi da seduto
   biceps:
     name: Bicipiti
     exercises:
       barbellBicepsCurl: Bicep curl (bilanciere)
+      spiderCurls: Spider curls
+      singleArmCableHammerCurls: Hammer curls ai cavi (braccio singolo)
   abs:
     name: Addominali
     exercises:
@@ -311,8 +334,39 @@ library:
       squatsBarbell: Squat (bilanciere)
       legPress: Leg press
       legExtension: Leg extension
+      smithMachineLunges: Affondi al Multipower
+      lunges: Affondi
+      legPress45deg: Leg press (45°)
   hamstrings:
     name: Tendini del ginocchio
     exercises:
       legCurlProne: Leg curl (sdraiati)
       legCurlSeated: Leg curl (seduti)
+  shoulders:
+    name: Spalle
+    exercises:
+      shoulderPressMachine: Shoulder press (macchina)
+      latRaisesInclinedBench: Alzate laterali (panca inclinata)
+      latRaisesCable: Alzate laterali ai cavi
+      latRaisesDualCable: Alzate laterali ai cavi (entrambe le braccia)
+      reverseFlysInclinedBench: Croci inverse (panca inclinata)
+  back:
+    name: Schiena
+    exercises:
+      hyperExtensions: Iperestensioni
+      weightedHyperExtensions: Iperestensioni con peso
+      barbellRow: Rematore col bilanciere
+      triangleBarLatPulldowns: Trazioni laterali (con triangolo)
+      underhandGripLatPulldowns: Trazioni laterali (presa supina)
+      latPulldowns: Trazioni laterali
+      cableSeatedRowTriangleBar: Rematore al cavo (con triangolo)
+      straightArmCablePushdown: Pulldown a braccia dritte
+  triceps:
+    name: Tricipiti
+    exercises:
+      dips: Dip
+      overheadRopeTricepExtension: Estensione dei tricipiti sopra la testa
+      tricepsRopePushdown: Pushdown dei tricipiti con corda
+
+infobox:
+  label: Note

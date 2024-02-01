@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:get/get.dart';
 import 'package:gymtracker/model/exercisable.dart';
+import 'package:gymtracker/service/localizations.dart';
 
 import '../model/exercise.dart';
 import '../model/set.dart';
@@ -16,15 +17,18 @@ class WorkoutController extends GetxController with ServiceableController {
   RxString name;
   Rx<DateTime> time;
   Rx<String?> parentID;
+  Rx<String?> infobox;
 
-  WorkoutController(String name, String? parentID)
+  WorkoutController(String name, String? parentID, String? infobox)
       : name = name.obs,
         time = DateTime.now().obs,
-        parentID = Rx<String?>(parentID);
+        parentID = Rx<String?>(parentID),
+        infobox = Rx<String?>(infobox);
 
   factory WorkoutController.fromSavedData(Map<String, dynamic> data) {
     // final  data = service.getOngoingData()!;
-    final cont = WorkoutController(data['name'], data['parentID']);
+    final cont =
+        WorkoutController(data['name'], data['parentID'], data['infobox']);
     cont.exercises((data['exercises'] as List)
         .map((el) => Exercise.fromJson(el))
         .toList());
@@ -39,6 +43,7 @@ class WorkoutController extends GetxController with ServiceableController {
         name: name.value,
         exercises: exercises,
         parentID: parentID,
+        infobox: infobox(),
       );
 
   List<ExSet> get allSets => [for (final ex in exercises) ...ex.sets];
@@ -83,6 +88,7 @@ class WorkoutController extends GetxController with ServiceableController {
       "exercises": exercises.map((ex) => ex.toJson()).toList(),
       "parentID": parentID.value,
       "time": time.value.millisecondsSinceEpoch,
+      "infobox": infobox.value,
     });
   }
 
@@ -95,16 +101,16 @@ class WorkoutController extends GetxController with ServiceableController {
       builder: (context) {
         return AlertDialog(
           icon: const Icon(Icons.info),
-          title: Text("ongoingWorkout.cancel.title".tr),
+          title: Text("ongoingWorkout.cancel.title".t),
           content: Text(
-            "ongoingWorkout.cancel.text".tr,
+            "ongoingWorkout.cancel.text".t,
           ),
           actions: [
             TextButton(
               onPressed: () {
                 Get.back();
               },
-              child: Text("ongoingWorkout.cancel.actions.no".tr),
+              child: Text("ongoingWorkout.cancel.actions.no".t),
             ),
             FilledButton.tonal(
               onPressed: () {
@@ -113,7 +119,7 @@ class WorkoutController extends GetxController with ServiceableController {
 
                 onCanceled();
               },
-              child: Text("ongoingWorkout.cancel.actions.yes".tr),
+              child: Text("ongoingWorkout.cancel.actions.yes".t),
             ),
           ],
         );
@@ -137,6 +143,7 @@ class WorkoutController extends GetxController with ServiceableController {
       duration: duration,
       startingDate: time.value,
       parentID: parentID.value,
+      infobox: infobox.value,
     );
     final service = Get.find<DatabaseService>();
     service.workoutHistory = [

@@ -5,10 +5,14 @@ set:
   kindShort:
     warmUp: W
     drop: D
+    failure: F
+    failureStripping: S
   kindLong:
     normal: Normal set
     warmUp: Warm-up set
     drop: Drop set
+    failure: To failure
+    failureStripping: To failure, with stripping
 
 exercise:
   chart:
@@ -94,6 +98,8 @@ routines:
         label: Routine name
         errors:
           empty: The name must not be empty.
+      infobox:
+        label: Notes
 
 history:
   title: History
@@ -109,6 +115,8 @@ settings:
   options:
     useDynamicColor:
       label: Use dynamic color
+    color:
+      label: App color
     locale:
       label: App language
     weightUnit:
@@ -119,6 +127,10 @@ settings:
       failed: Failed to import data
     export:
       label: Export data (JSON)
+  
+  colorPicker:
+    heading:
+      label: Select a color [@color]
 
 ongoingWorkout:
   title: Ongoing workout
@@ -154,6 +166,8 @@ ongoingWorkout:
         label: Duration
         errors:
           empty: The duration must not be zero.
+      infobox:
+        label: Notes
   cancel:
     title: Cancel workout?
     text: You won't be able to undo this later if you change your mind.
@@ -289,10 +303,19 @@ library:
       dumbbellBenchPressFlat: Bench press (dumbbell)
       dumbbellBenchPressIncline: Bench press (dumbbell, incline)
       dumbbellBenchPressDecline: Bench press (dumbbell, decline)
+      smithMachineBenchPressFlat: Bench press (Smith machine)
+      smithMachineBenchPressIncline: Bench press (Smith machine, incline)
+      smithMachineBenchPressDecline: Bench press (Smith machine, decline)
+      butterflyMachine: Butterfly Machine
+      dumbbellHexPress: Dumbbell Hex Press
+      smithMachineHexPress: Smith Machine Hex Press
+      seatedCableChestFlys: Seated cable chest flys
   biceps:
     name: Biceps
     exercises:
       barbellBicepsCurl: Bicep curl (barbell)
+      spiderCurls: Spider curls
+      singleArmCableHammerCurls: Hammer curls (cable, single arm)
   abs:
     name: Abs
     exercises:
@@ -311,8 +334,39 @@ library:
       squatsBarbell: Squats (barbell)
       legPress: Leg press
       legExtension: Leg extension
+      smithMachineLunges: Smith machine lunges
+      lunges: Lunges
+      legPress45deg: Leg press (45°)
   hamstrings:
     name: Hamstrings
     exercises:
       legCurlProne: Leg curl (prone)
       legCurlSeated: Leg curl (seated)
+  shoulders:
+    name: Shoulders
+    exercises:
+      shoulderPressMachine: Shoulder press (machine)
+      latRaisesInclinedBench: Lat raises (inclined bench)
+      latRaisesCable: Lat raises (cable)
+      latRaisesDualCable: Lat raises (cable, both arms)
+      reverseFlysInclinedBench: Reverse flys (inclined bench)
+  back:
+    name: Back
+    exercises:
+      hyperExtensions: Hyperextensions
+      weightedHyperExtensions: Hyperextensions (weighted)
+      barbellRow: Barbell row
+      triangleBarLatPulldowns: Lat pulldowns (triangle bar)
+      underhandGripLatPulldowns: Lat pulldowns (underhand grip)
+      latPulldowns: Lat pulldowns
+      cableSeatedRowTriangleBar: Cable seated row (triangle bar)
+      straightArmCablePushdown: Straight-arm Cable Pushdowns
+  triceps:
+    name: Triceps
+    exercises:
+      dips: Dips
+      overheadRopeTricepExtension: Overhead rope tricep extension
+      tricepsRopePushdown: Triceps rope pushdown
+
+infobox:
+  label: Notes

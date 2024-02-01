@@ -1,23 +1,30 @@
 import 'dart:convert';
 import 'dart:io';
-import 'dart:typed_data';
 
 import 'package:file_picker/file_picker.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:gymtracker/service/localizations.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../data/weights.dart';
 import '../utils/go.dart';
 import 'serviceable_controller.dart';
 
+Color defaultColor = Color(Colors.blue.value);
+
 class SettingsController extends GetxController with ServiceableController {
   RxBool usesDynamicColor = false.obs;
+  Rx<Color> color = defaultColor.obs;
   Rx<Locale?> locale = Get.locale.obs;
   Rx<Weights?> weightUnit = Weights.kg.obs;
 
   void setUsesDynamicColor(bool usesDC) =>
       service.writeSetting("usesDynamicColor", usesDC);
+
+  void setColor(Color color) => service.writeSetting("color", color.value);
+
   void setLocale(Locale locale) {
     Get.updateLocale(locale);
     service.writeSetting("locale", locale.languageCode);
@@ -30,6 +37,7 @@ class SettingsController extends GetxController with ServiceableController {
   void onServiceChange() {
     final storage = service.settingsStorage;
     usesDynamicColor(storage.read<bool>("usesDynamicColor") ?? false);
+    color(Color(storage.read<int>("color") ?? defaultColor.value));
     locale(Locale(storage.read<String>("locale") ?? "en"));
     weightUnit(Weights.values.firstWhere(
       (element) => element.name == storage.read<String>("weightUnit"),
@@ -45,7 +53,7 @@ class SettingsController extends GetxController with ServiceableController {
         XFile.fromData(
           Uint8List.fromList(utf8.encode(json.encode(service.toJson()))),
           mimeType: "application/json",
-          name: "${"settings.options.export.filename".tr}.json",
+          name: "${"settings.options.export.filename".t}.json",
         )
       ],
       sharePositionOrigin: box!.localToGlobal(Offset.zero) & box.size,
@@ -55,14 +63,20 @@ class SettingsController extends GetxController with ServiceableController {
   Future importSettings() async {
     FilePickerResult? result = await FilePicker.platform.pickFiles();
 
-    if (result?.files.single.path != null) {
+    if (kIsWeb && result?.files.single.bytes != null) {
+      String content = String.fromCharCodes(result!.files.single.bytes!.toList());
+      Map<String, dynamic> map = json.decode(content);
+
+      service.fromJson(map);
+      Go.snack("settings.options.import.success".t);
+    } else if (!kIsWeb && result?.files.single.path != null) {
       try {
         File file = File(result!.files.single.path!);
         String content = await file.readAsString();
         Map<String, dynamic> map = json.decode(content);
 
         service.fromJson(map);
-        Go.snack("settings.options.import.success".tr);
+        Go.snack("settings.options.import.success".t);
       } catch (e) {
         e.printError();
 
@@ -71,7 +85,7 @@ class SettingsController extends GetxController with ServiceableController {
           errorString = e.stackTrace.toString();
         }
 
-        Go.dialog("settings.options.import.failed".tr, errorString);
+        Go.dialog("settings.options.import.failed".t, errorString);
       }
     } else {
       // User canceled the picker

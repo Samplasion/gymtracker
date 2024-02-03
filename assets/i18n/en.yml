@@ -81,6 +81,7 @@ workouts:
   
 routines:
   title: Routines
+  newRoutine: New routine
   quickWorkout:
     title: Quick workout
     subtitle: Quickly start an empty workout

@@ -81,6 +81,7 @@ workouts:
   
 routines:
   title: Routine
+  newRoutine: Nuova routine
   quickWorkout:
     title: Allenamento rapido
     subtitle: Avvia rapidamente un allenamento vuoto

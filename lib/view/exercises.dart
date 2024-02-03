@@ -604,7 +604,8 @@ class ExerciseDataView extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8)
+                .copyWith(top: 16),
             child: Row(
               children: [
                 ExerciseIcon(exercise: superset),

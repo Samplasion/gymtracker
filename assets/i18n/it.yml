@@ -102,6 +102,7 @@ routines:
         label: Note
     superset:
       title: Superserie
+      add: Aggiungi superserie
       subtitle:
         one: "Superserie con un esercizio"
         two: "Superserie con %s esercizi"

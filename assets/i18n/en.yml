@@ -102,6 +102,7 @@ routines:
         label: Notes
     superset:
       title: Superset
+      add: Add superset
       subtitle:
         one: "Superset with %s exercise"
         two: "Superset with %s exercises"

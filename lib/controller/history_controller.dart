@@ -14,6 +14,9 @@ class HistoryController extends GetxController with ServiceableController {
   @override
   void onServiceChange() {
     history(service.workoutHistory);
+    history.sort((a, b) => (a.startingDate ??
+            DateTime.fromMillisecondsSinceEpoch(0))
+        .compareTo(b.startingDate ?? DateTime.fromMillisecondsSinceEpoch(0)));
   }
 
   void deleteWorkout(Workout workout) {

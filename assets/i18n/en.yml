@@ -111,6 +111,10 @@ routines:
         many: "Superset with %s exercises"
         other: "Superset with %s exercises"
       addExercise: Add exercises
+      remove:
+        title: Remove superset
+        body: Are you sure you want to remove this superset? This action cannot be undone.
+
 
 history:
   title: History

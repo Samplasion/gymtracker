@@ -111,6 +111,9 @@ routines:
         many: "Superserie con %s esercizi"
         other: "Superserie con %s esercizi"
       addExercise: Aggiungi esercizi
+      remove:
+        title: Rimuovi superserie
+        body: Vuoi davvero rimuovere questa superserie? Quest'azione non può essere annullata.
 
 history:
   title: Cronologia

@@ -87,7 +87,7 @@ class HistoryWorkout extends StatelessWidget {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text("general.exercises".plural(
-                                    workout.exercises.length,
+                                    workout.displayExerciseCount,
                                   )),
                                   Flexible(
                                     child: TimerView.buildTimeString(
@@ -126,7 +126,7 @@ class HistoryWorkout extends StatelessWidget {
               if (workout.exercises.length > 3) ...[
                 ListTile(
                   title: Text(
-                    "history.andMore".plural(workout.exercises.length - 3),
+                    "history.andMore".plural(workout.displayExerciseCount - 3),
                   ),
                 ),
               ] else ...[

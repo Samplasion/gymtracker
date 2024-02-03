@@ -76,8 +76,8 @@ class _RoutinesViewState extends State<RoutinesView> {
                       }
                     }(),
                     title: Text(workout.name),
-                    subtitle: Text(
-                        "general.exercises".plural(workout.exercises.length)),
+                    subtitle: Text("general.exercises"
+                        .plural(workout.displayExerciseCount)),
                     onTap: () {
                       Go.to(() => ExercisesView(workout: workout));
                     },

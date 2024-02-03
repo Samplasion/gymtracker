@@ -1,6 +1,7 @@
 import 'package:copy_with_extension/copy_with_extension.dart';
 import 'package:gymtracker/model/exercisable.dart';
 import 'package:gymtracker/model/set.dart';
+import 'package:gymtracker/model/superset.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:uuid/uuid.dart';
 
@@ -48,6 +49,10 @@ class Workout {
       doneSets.fold(0, (value, element) => value + (element.reps ?? 0));
   double get liftedWeight => doneSets.fold(0.0,
       (value, element) => value + (element.weight ?? 0) * (element.reps ?? 1));
+
+  int get displayExerciseCount => exercises
+      .map((e) => e is Superset ? e.exercises.length : 1)
+      .fold(0, (a, b) => a + b);
 
   Workout({
     String? id,

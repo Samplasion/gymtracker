@@ -76,9 +76,7 @@ class _ExercisesViewState extends State<ExercisesView> {
                             ],
                             initialItem: workout.parentID,
                             onSelect: (value) {
-                              setState(() => workout.parentID = value);
-                              Get.find<history.HistoryController>()
-                                  .setParentID(workout, newParentID: value);
+                              changeParent(value);
                             },
                           );
                         },
@@ -169,7 +167,11 @@ class _ExercisesViewState extends State<ExercisesView> {
                 padding: const EdgeInsets.all(16).copyWith(top: 0),
                 child: FilledButton.tonal(
                   onPressed: () {
-                    Get.find<WorkoutsController>().importWorkout(workout);
+                    final newID =
+                        Get.find<WorkoutsController>().importWorkout(workout);
+                    if (workout.parentID == null) {
+                      changeParent(newID);
+                    }
                     Go.snack("workouts.actions.saveAsRoutine.done".t);
                   },
                   child: Text("workouts.actions.saveAsRoutine.button".t),
@@ -210,6 +212,12 @@ class _ExercisesViewState extends State<ExercisesView> {
         ],
       ),
     );
+  }
+
+  void changeParent(String? value) {
+    setState(() => workout.parentID = value);
+    Get.find<history.HistoryController>()
+        .setParentID(workout, newParentID: value);
   }
 }
 

@@ -183,7 +183,12 @@ class WorkoutsController extends GetxController with ServiceableController {
     ];
   }
 
-  void importWorkout(Workout workout) {
-    service.routines = [...service.routines, workout.toRoutine()];
+  String importWorkout(Workout workout) {
+    final routine = workout.toRoutine();
+    service.routines = [
+      ...service.routines,
+      routine,
+    ];
+    return routine.id;
   }
 }

@@ -3,7 +3,6 @@ import 'package:gymtracker/model/set.dart';
 import 'package:gymtracker/model/superset.dart';
 import 'package:json_annotation/json_annotation.dart';
 
-@JsonSerializable()
 abstract class WorkoutExercisable {
   static WorkoutExercisable fromJson(Map<String, dynamic> json) {
     switch (json['type']) {
@@ -19,6 +18,8 @@ abstract class WorkoutExercisable {
 
   Map<String, dynamic> toJson();
 
+  String get id;
   List<ExSet> get sets;
   Duration get restTime;
+  String get notes;
 }

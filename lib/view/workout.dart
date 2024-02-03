@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:get/get.dart';
+import 'package:gymtracker/model/exercisable.dart';
+import 'package:gymtracker/model/superset.dart';
 import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/view/components/infobox.dart';
+import 'package:gymtracker/view/utils/superset.dart';
 
 import '../controller/countdown_controller.dart';
 import '../controller/workout_controller.dart';
@@ -134,23 +137,23 @@ class _WorkoutViewState extends State<WorkoutView> {
                     onReorder: () async {
                       SchedulerBinding.instance
                           .addPostFrameCallback((timeStamp) async {
-                        // TODO(Supersets): Fix this
                         // TODO: While we're at it, fix the timers messing up when reordering exercises.
-                        // final newIndices = await showDialog<List<int>>(
-                        //   builder: (context) => WorkoutExerciseReorderDialog(
-                        //     exercises: controller.exercises,
-                        //   ),
-                        //   context: context,
-                        // );
-                        // if (newIndices == null ||
-                        //     newIndices.length != controller.exercises.length) {
-                        //   return;
-                        // }
-                        // controller.exercises([
-                        //   for (int i = 0; i < newIndices.length; i++)
-                        //     controller.exercises[newIndices[i]]
-                        // ]);
+                        final newIndices = await showDialog<List<int>>(
+                          builder: (context) => WorkoutExerciseReorderDialog(
+                            exercises: controller.exercises,
+                          ),
+                          context: context,
+                        );
+                        if (newIndices == null ||
+                            newIndices.length != controller.exercises.length) {
+                          return;
+                        }
+                        controller.exercises([
+                          for (int i = 0; i < newIndices.length; i++)
+                            controller.exercises[newIndices[i]]
+                        ]);
                       });
+                      controller.exercises.refresh();
                       controller.save();
                     },
                     onReplace: () {
@@ -219,21 +222,205 @@ class _WorkoutViewState extends State<WorkoutView> {
                       controller.exercises.refresh();
                       controller.save();
                     },
+                  )
+                else
+                  SupersetEditor(
+                    superset: controller.exercises[i] as Superset,
+                    index: i,
+                    isCreating: false,
+                    key: ValueKey((controller.exercises[i] as Superset).id),
+                    onSupersetRemove: () {
+                      controller.exercises.removeAt(i);
+                      controller.exercises.refresh();
+                      controller.save();
+                    },
+                    onSupersetReorder: () {
+                      SchedulerBinding.instance
+                          .addPostFrameCallback((timeStamp) async {
+                        final newIndices = await showDialog<List<int>>(
+                          builder: (context) => WorkoutExerciseReorderDialog(
+                            exercises: controller.exercises,
+                          ),
+                          context: context,
+                        );
+                        if (newIndices == null ||
+                            newIndices.length != controller.exercises.length) {
+                          return;
+                        }
+                        controller.exercises([
+                          for (int i = 0; i < newIndices.length; i++)
+                            controller.exercises[newIndices[i]]
+                        ]);
+                      });
+                    },
+                    onSupersetReplace: () {
+                      SchedulerBinding.instance
+                          .addPostFrameCallback((timeStamp) async {
+                        final ex = await Go.to<List<Exercise>>(
+                            () => const ExercisePicker(singlePick: true));
+                        if (ex == null || ex.isEmpty) return;
+                        controller.exercises[i] = ex.first.copyWith.sets([
+                          ExSet.empty(
+                            kind: SetKind.normal,
+                            parameters: ex.first.parameters,
+                          ),
+                        ]);
+                        controller.exercises.refresh();
+                        controller.save();
+                      });
+                    },
+                    onSupersetChangeRestTime: (time) {
+                      (controller.exercises[i] as Superset).restTime = time;
+                      controller.exercises.refresh();
+                      controller.save();
+                    },
+                    onNotesChange: (_, notes) {
+                      (controller.exercises[i] as Superset).notes = notes;
+                      controller.exercises.refresh();
+                      controller.save();
+                    },
+                    onExerciseAdd: () {
+                      SchedulerBinding.instance
+                          .addPostFrameCallback((timeStamp) async {
+                        final exs = await Go.to<List<Exercise>>(
+                            () => const ExercisePicker(singlePick: false));
+                        if (exs == null || exs.isEmpty) return;
+                        (controller.exercises[i] as Superset).exercises.addAll(
+                              exs.map((ex) => ex.copyWith.sets([
+                                    ExSet.empty(
+                                      kind: SetKind.normal,
+                                      parameters: ex.parameters,
+                                    ),
+                                  ])),
+                            );
+                        controller.exercises.refresh();
+                        controller.save();
+                      });
+                    },
+                    onExerciseRemove: (index) {
+                      setState(() {
+                        (controller.exercises[i] as Superset)
+                            .exercises
+                            .removeAt(index);
+                        controller.exercises.refresh();
+                        controller.save();
+                      });
+                    },
+                    onExerciseReorder: (_) {
+                      SchedulerBinding.instance
+                          .addPostFrameCallback((timeStamp) async {
+                        final exercises = (controller.exercises[i] as Superset)
+                            .exercises
+                            .cast<Exercise>();
+                        final newIndices = await showDialog<List<int>>(
+                          builder: (context) => WorkoutExerciseReorderDialog(
+                            exercises: exercises,
+                          ),
+                          context: context,
+                        );
+                        if (newIndices == null ||
+                            newIndices.length != exercises.length) {
+                          return;
+                        }
+                        controller.exercises[i] =
+                            (controller.exercises[i] as Superset)
+                                .copyWith
+                                .exercises([
+                          for (int j = 0; j < newIndices.length; j++)
+                            (controller.exercises[i] as Superset)
+                                .exercises[newIndices[j]]
+                        ]);
+                      });
+                      controller.save();
+                      controller.exercises.refresh();
+                    },
+                    onExerciseReorderIndexed: (_, __) {},
+                    onExerciseReplace: (index) {
+                      SchedulerBinding.instance
+                          .addPostFrameCallback((timeStamp) async {
+                        final ex = await Go.to<List<Exercise>>(
+                            () => const ExercisePicker(singlePick: true));
+                        if (ex == null || ex.isEmpty) return;
+                        (controller.exercises[i] as Superset).exercises[index] =
+                            ex.first.copyWith.sets([
+                          ExSet.empty(
+                            kind: SetKind.normal,
+                            parameters: ex.first.parameters,
+                          ),
+                        ]);
+                        controller.exercises.refresh();
+                        controller.save();
+                      });
+                    },
+                    onExerciseSetCreate: (index) {
+                      (controller.exercises[i] as Superset)
+                          .exercises[index]
+                          .sets
+                          .add(ExSet.empty(
+                            kind: SetKind.normal,
+                            parameters: (controller.exercises[i] as Superset)
+                                .exercises[index]
+                                .parameters,
+                          ));
+                      controller.exercises.refresh();
+                      controller.save();
+                    },
+                    onExerciseSetRemove: (index, setIndex) {
+                      setState(() {
+                        (controller.exercises[i] as Superset)
+                            .exercises[index]
+                            .sets
+                            .removeAt(setIndex);
+                        controller.exercises.refresh();
+                        controller.save();
+                      });
+                    },
+                    onExerciseSetSelectKind: (index, set, kind) {
+                      set.kind = kind;
+                      controller.exercises.refresh();
+                      controller.save();
+                    },
+                    onExerciseSetSetDone: (exercise, set, done) {
+                      final superset = controller.exercises[i] as Superset;
+                      set.done = done;
+                      if (done) {
+                        final index =
+                            superset.exercises.findExerciseIndex(exercise);
+                        if (index == superset.exercises.length - 1 &&
+                            superset.restTime.inSeconds > 0) {
+                          countdownController.setCountdown(superset.restTime);
+                        }
+                      }
+                      controller.save();
+                      controller.exercises.refresh();
+                    },
+                    onExerciseSetValueChange: () {
+                      controller.exercises.refresh();
+                      controller.save();
+                    },
+                    onExerciseChangeRestTime: (index, time) {
+                      // Currently unsupported
+                    },
+                    onExerciseNotesChange: (exercise, notes) {
+                      exercise.notes = notes;
+                      controller.exercises.refresh();
+                      controller.save();
+                    },
                   ),
             Padding(
               padding: const EdgeInsets.all(16),
               child: FilledButton(
                 onPressed: () async {
-                  final ex = await Go.to<List<Exercise>>(
-                      () => const ExercisePicker(singlePick: true));
-                  if (ex == null || ex.isEmpty) return;
-                  controller.exercises.add(
-                    ex.first.copyWith.sets([
-                      ExSet.empty(
-                        kind: SetKind.normal,
-                        parameters: ex.first.parameters,
-                      ),
-                    ]),
+                  final exs = await Go.to<List<Exercise>>(
+                      () => const ExercisePicker(singlePick: false));
+                  if (exs == null || exs.isEmpty) return;
+                  controller.exercises.addAll(
+                    exs.map((ex) => ex.copyWith.sets([
+                          ExSet.empty(
+                            kind: SetKind.normal,
+                            parameters: ex.parameters,
+                          ),
+                        ])),
                   );
                   controller.exercises.refresh();
                 },
@@ -602,7 +789,7 @@ class _WorkoutFinishPageState extends State<WorkoutFinishPage> {
 }
 
 class WorkoutExerciseReorderDialog extends StatefulWidget {
-  final List<Exercise> exercises;
+  final List<WorkoutExercisable> exercises;
 
   const WorkoutExerciseReorderDialog({required this.exercises, super.key});
 

@@ -138,7 +138,8 @@ class _ExercisesViewState extends State<ExercisesView> {
       ),
       body: CustomScrollView(
         slivers: [
-          if (!workout.isConcrete && controller.getChildren(workout).isNotEmpty)
+          if (!workout.isConcrete &&
+              controller.getChildren(workout).length >= 2)
             SliverToBoxAdapter(
               child: Padding(
                 padding: const EdgeInsets.all(16),
@@ -191,6 +192,7 @@ class _ExercisesViewState extends State<ExercisesView> {
                     exercise: exercise,
                     workout: workout,
                     index: index,
+                    isInSuperset: false,
                   ),
                 );
               },
@@ -506,15 +508,18 @@ class ExerciseDataView extends StatelessWidget {
     required this.exercise,
     required this.workout,
     required this.index,
+    required this.isInSuperset,
   });
 
   final WorkoutExercisable exercise;
   final Workout workout;
   final int index;
+  final bool isInSuperset;
 
   @override
   Widget build(BuildContext context) {
-    // if (this.exercise is Superset) return Container();
+    if (this.exercise is Superset) return _buildSuperset(context);
+
     assert(this.exercise is! Superset);
 
     final exercise = this.exercise as Exercise;
@@ -530,10 +535,6 @@ class ExerciseDataView extends StatelessWidget {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Text(
-                  //   exercise.displayName,
-
-                  // ),
                   Text.rich(
                     TextSpan(
                       children: [
@@ -550,23 +551,26 @@ class ExerciseDataView extends StatelessWidget {
                     ),
                     style: Theme.of(context).textTheme.titleMedium,
                   ),
-                  TimerView.buildTimeString(
-                    context,
-                    workout.exercises[index].restTime,
-                    builder: (time) => Text.rich(
-                      TextSpan(
-                        children: [
-                          TextSpan(text: "exerciseList.restTime".t),
-                          time
-                        ],
-                        style:
-                            Theme.of(context).textTheme.labelMedium!.copyWith(
-                                  color: Theme.of(context).colorScheme.primary,
-                                ),
+                  if (!isInSuperset)
+                    TimerView.buildTimeString(
+                      context,
+                      workout.exercises[index].restTime,
+                      builder: (time) => Text.rich(
+                        TextSpan(
+                          children: [
+                            TextSpan(text: "exerciseList.restTime".t),
+                            time
+                          ],
+                          style: Theme.of(context)
+                              .textTheme
+                              .labelMedium!
+                              .copyWith(
+                                color: Theme.of(context).colorScheme.primary,
+                              ),
+                        ),
                       ),
+                      style: const TextStyle(),
                     ),
-                    style: const TextStyle(),
-                  ),
                   if (kDebugMode) ...[
                     Text(exercise.id),
                     Text("parent: ${exercise.parentID}"),
@@ -589,6 +593,84 @@ class ExerciseDataView extends StatelessWidget {
             alt: i % 2 == 0,
           ),
       ],
+    );
+  }
+
+  Widget _buildSuperset(BuildContext context) {
+    final superset = exercise as Superset;
+    return Card(
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: Row(
+              children: [
+                ExerciseIcon(exercise: superset),
+                const SizedBox(width: 16),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Text(
+                    //   exercise.displayName,
+
+                    // ),
+                    Text.rich(
+                      TextSpan(
+                        children: [
+                          TextSpan(
+                              text:
+                                  "superset".plural(superset.exercises.length)),
+                        ],
+                      ),
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                    TimerView.buildTimeString(
+                      context,
+                      workout.exercises[index].restTime,
+                      builder: (time) => Text.rich(
+                        TextSpan(
+                          children: [
+                            TextSpan(text: "exerciseList.restTime".t),
+                            time
+                          ],
+                          style: Theme.of(context)
+                              .textTheme
+                              .labelMedium!
+                              .copyWith(
+                                color: Theme.of(context).colorScheme.primary,
+                              ),
+                        ),
+                      ),
+                      style: const TextStyle(),
+                    ),
+                    if (kDebugMode) ...[
+                      Text(superset.id),
+                    ],
+                  ],
+                ),
+              ],
+            ),
+          ),
+          if (exercise.notes.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              child: Text(exercise.notes),
+            ),
+          const Divider(),
+          for (final exercise in (this.exercise as Superset).exercises)
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8),
+              child: ExerciseDataView(
+                exercise: exercise,
+                workout: workout,
+                index: index,
+                isInSuperset: true,
+              ),
+            ),
+        ],
+      ),
     );
   }
 }
@@ -638,7 +720,7 @@ class ExerciseSetView extends StatelessWidget {
     var colorScheme = Theme.of(context).colorScheme;
     return Container(
       color: alt
-          ? scheme.background
+          ? scheme.background.withOpacity(0)
           : ElevationOverlay.applySurfaceTint(
               scheme.surface,
               scheme.surfaceTint,

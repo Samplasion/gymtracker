@@ -10,15 +10,21 @@ part 'superset.g.dart';
 @JsonSerializable()
 @CopyWith()
 class Superset extends WorkoutExercisable {
+  @override
   String id;
   final List<Exercise> exercises;
   @override
   Duration restTime;
 
+  @JsonKey(defaultValue: "")
+  @override
+  String notes;
+
   Superset({
     String? id,
     required this.exercises,
     required this.restTime,
+    this.notes = "",
   }) : id = id ?? const Uuid().v4();
 
   factory Superset.empty() {
@@ -39,6 +45,7 @@ class Superset extends WorkoutExercisable {
   @override
   Map<String, dynamic> toJson() => {
         ..._$SupersetToJson(this),
+        'exercises': [for (final exercise in exercises) exercise.toJson()],
         'type': 'superset',
       };
 

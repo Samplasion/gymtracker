@@ -100,6 +100,15 @@ routines:
           empty: Il nome non dev'essere vuoto.
       infobox:
         label: Note
+    superset:
+      title: Superserie
+      subtitle:
+        one: "Superserie con un esercizio"
+        two: "Superserie con %s esercizi"
+        few: "Superserie con %s esercizi"
+        many: "Superserie con %s esercizi"
+        other: "Superserie con %s esercizi"
+      addExercise: Aggiungi esercizi
 
 history:
   title: Cronologia
@@ -182,6 +191,9 @@ ongoingWorkout:
       yes: Avvia
   restOver: È scaduto il tempo di recupero!
   weightCalculator: Calcolatrice pesi
+  superset:
+    replaceWithExercise: Cambia con esercizio
+    remove: Rimuovi superserie
 
 timer: 
   add15s: "+15s"
@@ -370,3 +382,10 @@ library:
 
 infobox:
   label: Note
+
+superset:
+  one: "Superserie con un esercizio"
+  two: "Superserie con %s esercizi"
+  few: "Superserie con %s esercizi"
+  many: "Superserie con %s esercizi"
+  other: "Superserie con %s esercizi"

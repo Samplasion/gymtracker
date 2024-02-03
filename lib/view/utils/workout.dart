@@ -1,3 +1,4 @@
+import 'package:gymtracker/view/utils/drag_handle.dart';
 import 'package:universal_platform/universal_platform.dart';
 
 import 'package:flutter/material.dart';
@@ -28,6 +29,8 @@ class WorkoutExerciseEditor extends StatefulWidget {
   final void Function(Exercise exercise, ExSet set, bool isDone) onSetSetDone;
   final VoidCallback onSetValueChange;
   final void Function(Exercise exercise, String notes) onNotesChange;
+  final bool isInSuperset;
+  final bool createDivider;
 
   const WorkoutExerciseEditor({
     required this.exercise,
@@ -43,6 +46,8 @@ class WorkoutExerciseEditor extends StatefulWidget {
     required this.onSetSetDone,
     required this.onSetValueChange,
     required this.onNotesChange,
+    this.isInSuperset = false,
+    this.createDivider = false,
     super.key,
   });
 
@@ -70,16 +75,7 @@ class _WorkoutExerciseEditorState extends State<WorkoutExerciseEditor> {
               child: Row(
                 children: [
                   if (widget.isCreating) ...[
-                    if (UniversalPlatform.isAndroid || UniversalPlatform.isIOS)
-                      ReorderableDelayedDragStartListener(
-                        index: widget.index,
-                        child: const Icon(Icons.drag_handle),
-                      )
-                    else
-                      ReorderableDragStartListener(
-                        index: widget.index,
-                        child: const Icon(Icons.drag_handle),
-                      ),
+                    DragHandle(index: widget.index),
                   ] else
                     ExerciseIcon(exercise: widget.exercise),
                   const SizedBox(width: 16),
@@ -187,19 +183,20 @@ class _WorkoutExerciseEditorState extends State<WorkoutExerciseEditor> {
                 );
               },
             ),
-            Padding(
-              padding: const EdgeInsets.all(16),
-              child: TimeInputField(
-                controller: timeController,
-                decoration: InputDecoration(
-                  isDense: true,
-                  border: const OutlineInputBorder(),
-                  labelText: "exercise.fields.restTime".t,
+            if (!widget.isInSuperset)
+              Padding(
+                padding: const EdgeInsets.all(16),
+                child: TimeInputField(
+                  controller: timeController,
+                  decoration: InputDecoration(
+                    isDense: true,
+                    border: const OutlineInputBorder(),
+                    labelText: "exercise.fields.restTime".t,
+                  ),
+                  onChangedTime: (value) =>
+                      widget.onChangeRestTime(value ?? Duration.zero),
                 ),
-                onChangedTime: (value) =>
-                    widget.onChangeRestTime(value ?? Duration.zero),
               ),
-            ),
             for (int i = 0; i < widget.exercise.sets.length; i++)
               WorkoutExerciseSetEditor(
                 key: ValueKey(widget.exercise.sets[i].id),
@@ -222,6 +219,10 @@ class _WorkoutExerciseEditorState extends State<WorkoutExerciseEditor> {
               onPressed: widget.onSetCreate,
               child: Text('exercise.actions.addSet'.t),
             ),
+            if (widget.createDivider) ...[
+              const SizedBox(height: 8),
+              const Divider(),
+            ],
           ],
         ),
       ),
@@ -372,7 +373,7 @@ class _WorkoutExerciseSetEditorState extends State<WorkoutExerciseSetEditor> {
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     final defaultColor = widget.alt
-        ? scheme.background
+        ? scheme.background.withOpacity(0)
         : ElevationOverlay.applySurfaceTint(
             scheme.surface,
             scheme.surfaceTint,

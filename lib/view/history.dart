@@ -121,9 +121,7 @@ class HistoryWorkout extends StatelessWidget {
                   ],
                 ),
               ),
-              // TODO(Supersets): Fix this
-              for (final exercise
-                  in workout.exercises.whereType<Exercise>().take(3))
+              for (final exercise in workout.exercises.take(3))
                 ExerciseListTile(exercise: exercise, selected: false),
               if (workout.exercises.length > 3) ...[
                 ListTile(

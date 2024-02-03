@@ -30,7 +30,7 @@ class WorkoutController extends GetxController with ServiceableController {
     final cont =
         WorkoutController(data['name'], data['parentID'], data['infobox']);
     cont.exercises((data['exercises'] as List)
-        .map((el) => Exercise.fromJson(el))
+        .map((el) => WorkoutExercisable.fromJson(el))
         .toList());
     cont.time(DateTime.fromMillisecondsSinceEpoch(
         data['time'] ?? DateTime.now().millisecondsSinceEpoch));

@@ -35,6 +35,7 @@ enum MuscleGroup {
 @JsonSerializable(constructor: "_")
 @CopyWith(constructor: "_")
 class Exercise extends WorkoutExercisable {
+  @override
   String id;
   final String name;
   final SetParameters parameters;
@@ -50,6 +51,7 @@ class Exercise extends WorkoutExercisable {
   String? parentID;
 
   @JsonKey(defaultValue: "")
+  @override
   String notes;
 
   @JsonKey(defaultValue: false)
@@ -144,5 +146,14 @@ extension Display on Exercise {
     if (candidate.existsAsTranslationKey) return candidate.t;
     name.printError(info: "No translation found");
     return name;
+  }
+}
+
+extension Utils on List<Exercise> {
+  int? findExerciseIndex(Exercise ex) {
+    for (var i = 0; i < length; i++) {
+      if (this[i].id == ex.id) return i;
+    }
+    return null;
   }
 }

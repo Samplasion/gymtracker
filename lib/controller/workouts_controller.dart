@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get/state_manager.dart';
+import 'package:gymtracker/model/exercisable.dart';
 import 'package:gymtracker/model/superset.dart';
 import 'package:gymtracker/service/localizations.dart';
 import 'package:uuid/uuid.dart';
@@ -53,7 +54,7 @@ class WorkoutsController extends GetxController with ServiceableController {
 
   void submitRoutine({
     required String name,
-    required List<Exercise> exercises,
+    required List<WorkoutExercisable> exercises,
     required String? infobox,
   }) {
     final routine = Workout(
@@ -140,7 +141,7 @@ class WorkoutsController extends GetxController with ServiceableController {
 
   generate({
     required String name,
-    required List<Exercise> exercises,
+    required List<WorkoutExercisable> exercises,
     required String id,
     required String? infobox,
   }) {

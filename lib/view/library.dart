@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:gymtracker/data/exercises.dart';
+import 'package:gymtracker/model/superset.dart';
 import 'package:gymtracker/service/localizations.dart';
 
 import '../controller/exercises_controller.dart';
@@ -115,10 +116,16 @@ class ExerciseInfoView extends StatelessWidget {
     final history = <Exercise>[];
     for (final workout in controller.history) {
       history.addAll(
-        // TODO(Supersets): Fix this
-        workout.exercises.whereType<Exercise>().where(
-              (element) => exercise.isTheSameAs(element),
-            ),
+        [
+          for (final exercise in workout.exercises)
+            if (exercise is Exercise) ...[
+              exercise,
+            ] else if (exercise is Superset) ...[
+              for (final e in exercise.exercises) e,
+            ],
+        ].where(
+          (element) => exercise.isTheSameAs(element),
+        ),
       );
     }
     return history;

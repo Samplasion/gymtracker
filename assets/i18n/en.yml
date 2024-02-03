@@ -100,6 +100,15 @@ routines:
           empty: The name must not be empty.
       infobox:
         label: Notes
+    superset:
+      title: Superset
+      subtitle:
+        one: "Superset with %s exercise"
+        two: "Superset with %s exercises"
+        few: "Superset with %s exercises"
+        many: "Superset with %s exercises"
+        other: "Superset with %s exercises"
+      addExercise: Add exercises
 
 history:
   title: History
@@ -182,6 +191,9 @@ ongoingWorkout:
       yes: Start
   restOver: Rest time is over!
   weightCalculator: Weight calculator
+  superset:
+    replaceWithExercise: Replace with exercise
+    remove: Remove superset
 
 timer: 
   add15s: "+15s"
@@ -370,3 +382,10 @@ library:
 
 infobox:
   label: Notes
+
+superset:
+  one: "Superset with %s exercise"
+  two: "Superset with %s exercises"
+  few: "Superset with %s exercises"
+  many: "Superset with %s exercises"
+  other: "Superset with %s exercises"

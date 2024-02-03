@@ -134,9 +134,12 @@ settings:
     import:
       label: Importa dati
       success: Dati importati con successo
-      failed: Impossibile importare i dati
+      failed:
+        title: Impossibile importare i dati
+        copy: Il messaggio di errore è stato copiato negli appunti.
     export:
       label: Esporta dati (JSON)
+      filename: Dati_GymTracker
   
   colorPicker:
     heading:

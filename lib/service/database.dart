@@ -7,6 +7,8 @@ import 'package:get/get.dart';
 import '../model/exercise.dart';
 import '../model/workout.dart';
 
+const DATABASE_VERSION = 1;
+
 class DatabaseService extends GetxService with ChangeNotifier {
   final GetStorage exerciseStorage = GetStorage("exercises");
   final GetStorage routinesStorage = GetStorage("routines");
@@ -92,6 +94,7 @@ class DatabaseService extends GetxService with ChangeNotifier {
 
   toJson() {
     return {
+      "version": DATABASE_VERSION,
       "exercise": jsonDecode(exerciseStorage.read("data") ?? "[]"),
       "routines": jsonDecode(routinesStorage.read("data") ?? "[]"),
       "workouts": jsonDecode(workoutsStorage.read("data") ?? "[]"),
@@ -104,6 +107,10 @@ class DatabaseService extends GetxService with ChangeNotifier {
 
   fromJson(Map<String, dynamic> json) {
     final previousJson = toJson();
+
+    if (json['version'] is int && (json['version'] as int) > DATABASE_VERSION) {
+      throw DatabaseImportVersionMismatch((json['version'] as int? ?? -1));
+    }
 
     innerImportJson(Map<String, dynamic> json) {
       if (json['exercise'] is List) {
@@ -146,4 +153,15 @@ class DatabaseService extends GetxService with ChangeNotifier {
   }
 
   bool get hasOngoing => ongoingStorage.hasData("data");
+}
+
+class DatabaseImportVersionMismatch implements Exception {
+  final int version;
+
+  DatabaseImportVersionMismatch(this.version);
+
+  @override
+  String toString() {
+    return "Trying to import a newer version of the database: $version (current version: $DATABASE_VERSION)";
+  }
 }

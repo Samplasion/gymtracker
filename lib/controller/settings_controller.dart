@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:gymtracker/service/localizations.dart';
 import 'package:share_plus/share_plus.dart';
@@ -53,18 +54,20 @@ class SettingsController extends GetxController with ServiceableController {
         XFile.fromData(
           Uint8List.fromList(utf8.encode(json.encode(service.toJson()))),
           mimeType: "application/json",
-          name: "${"settings.options.export.filename".t}.json",
+          name:
+              "${"settings.options.export.filename".t}_${DateTime.now().toIso8601String()}.json",
         )
       ],
       sharePositionOrigin: box!.localToGlobal(Offset.zero) & box.size,
     );
   }
 
-  Future importSettings() async {
+  Future importSettings(BuildContext context) async {
     FilePickerResult? result = await FilePicker.platform.pickFiles();
 
     if (kIsWeb && result?.files.single.bytes != null) {
-      String content = String.fromCharCodes(result!.files.single.bytes!.toList());
+      String content =
+          String.fromCharCodes(result!.files.single.bytes!.toList());
       Map<String, dynamic> map = json.decode(content);
 
       service.fromJson(map);
@@ -82,10 +85,21 @@ class SettingsController extends GetxController with ServiceableController {
 
         String errorString = e.toString();
         if (e is Error) {
-          errorString = e.stackTrace.toString();
+          errorString = "$errorString\n${e.stackTrace}";
         }
 
-        Go.dialog("settings.options.import.failed".t, errorString);
+        Go.dialog("settings.options.import.failed.title".t, errorString,
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Clipboard.setData(ClipboardData(text: errorString));
+                  Go.snack("settings.options.import.failed.copy".t);
+                },
+                child: Text(
+                    // ignore: use_build_context_synchronously
+                    MaterialLocalizations.of(context).copyButtonLabel),
+              )
+            ]);
       }
     } else {
       // User canceled the picker

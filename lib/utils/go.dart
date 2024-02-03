@@ -41,6 +41,7 @@ class Go {
     String title,
     String body, {
     Widget? icon,
+    List<Widget> actions = const <Widget>[],
   }) {
     showDialog(
       context: Get.context!,
@@ -50,6 +51,7 @@ class Go {
           title: Text(title.t),
           content: Text(body.t),
           actions: [
+            ...actions,
             TextButton(
               onPressed: () {
                 Get.back();

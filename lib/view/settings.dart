@@ -92,7 +92,7 @@ class SettingsView extends StatelessWidget {
               ListTile(
                 title: Text("settings.options.import.label".t),
                 onTap: () async {
-                  await controller.importSettings();
+                  await controller.importSettings(context);
                 },
               ),
               ListTile(

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:get/get.dart';
 import 'package:gymtracker/model/exercisable.dart';
 import 'package:gymtracker/model/superset.dart';
@@ -194,7 +195,20 @@ class _RoutineCreatorState extends State<RoutineCreator> {
         index: i,
         isCreating: true,
         onReorder: () {},
-        onReplace: () {},
+        onReplace: () {
+          SchedulerBinding.instance.addPostFrameCallback((timeStamp) async {
+            final ex = await Go.to<List<Exercise>>(
+                () => const ExercisePicker(singlePick: true));
+            if (ex == null || ex.isEmpty) return;
+            controller.exercises[i].data = ex.first.copyWith.sets([
+              ExSet.empty(
+                kind: SetKind.normal,
+                parameters: ex.first.parameters,
+              ),
+            ]);
+            controller.exercises.refresh();
+          });
+        },
         onRemove: () {
           controller.exercises.removeAt(i);
           controller.exercises.refresh();
@@ -238,7 +252,20 @@ class _RoutineCreatorState extends State<RoutineCreator> {
         index: i,
         isCreating: true,
         onSupersetReorder: () {},
-        onSupersetReplace: () {},
+        onSupersetReplace: () {
+          SchedulerBinding.instance.addPostFrameCallback((timeStamp) async {
+            final ex = await Go.to<List<Exercise>>(
+                () => const ExercisePicker(singlePick: true));
+            if (ex == null || ex.isEmpty) return;
+            controller.exercises[i].data = ex.first.copyWith.sets([
+              ExSet.empty(
+                kind: SetKind.normal,
+                parameters: ex.first.parameters,
+              ),
+            ]);
+            controller.exercises.refresh();
+          });
+        },
         onSupersetRemove: () {
           controller.exercises.removeAt(i);
           controller.exercises.refresh();
@@ -284,7 +311,21 @@ class _RoutineCreatorState extends State<RoutineCreator> {
           );
           controller.exercises.refresh();
         },
-        onExerciseReplace: (_) {},
+        onExerciseReplace: (j) {
+          SchedulerBinding.instance.addPostFrameCallback((timeStamp) async {
+            final ex = await Go.to<List<Exercise>>(
+                () => const ExercisePicker(singlePick: true));
+            if (ex == null || ex.isEmpty) return;
+            (controller.exercises[i].data as Superset).exercises[j] =
+                ex.first.copyWith.sets([
+              ExSet.empty(
+                kind: SetKind.normal,
+                parameters: ex.first.parameters,
+              ),
+            ]);
+            controller.exercises.refresh();
+          });
+        },
         onExerciseChangeRestTime: (int index, Duration value) {
           (controller.exercises[i].data as Superset).exercises[index].restTime =
               value;

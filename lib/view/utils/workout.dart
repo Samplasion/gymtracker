@@ -104,15 +104,15 @@ class _WorkoutExerciseEditorState extends State<WorkoutExerciseEditor> {
                             title: Text('ongoingWorkout.exercises.reorder'.t),
                           ),
                         ),
-                        PopupMenuItem(
-                          onTap: widget.onReplace,
-                          child: ListTile(
-                            leading: const Icon(Icons.refresh),
-                            title: Text('ongoingWorkout.exercises.replace'.t),
-                          ),
-                        ),
-                        const PopupMenuDivider(),
                       ],
+                      PopupMenuItem(
+                        onTap: widget.onReplace,
+                        child: ListTile(
+                          leading: const Icon(Icons.refresh),
+                          title: Text('ongoingWorkout.exercises.replace'.t),
+                        ),
+                      ),
+                      const PopupMenuDivider(),
                       PopupMenuItem(
                         onTap: widget.onRemove,
                         child: ListTile(

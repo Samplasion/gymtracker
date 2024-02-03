@@ -93,16 +93,16 @@ class _SupersetEditorState extends State<SupersetEditor> {
                       title: Text('ongoingWorkout.exercises.reorder'.t),
                     ),
                   ),
-                  PopupMenuItem(
-                    onTap: widget.onSupersetReplace,
-                    child: ListTile(
-                      leading: const Icon(Icons.refresh),
-                      title:
-                          Text('ongoingWorkout.superset.replaceWithExercise'.t),
-                    ),
-                  ),
-                  const PopupMenuDivider(),
                 ],
+                PopupMenuItem(
+                  onTap: widget.onSupersetReplace,
+                  child: ListTile(
+                    leading: const Icon(Icons.refresh),
+                    title:
+                        Text('ongoingWorkout.superset.replaceWithExercise'.t),
+                  ),
+                ),
+                const PopupMenuDivider(),
                 PopupMenuItem(
                   onTap: () async {
                     final delete = await Go.confirm(

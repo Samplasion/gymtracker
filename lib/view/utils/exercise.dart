@@ -190,18 +190,21 @@ class ExerciseListTile extends StatelessWidget {
                 ..update(element, (value) => value + 1, ifAbsent: () => 1));
       }
 
-      return Text(
-        times.entries.map((e) {
-          if (e.value == 1 &&
-              ![SetParameters.time, SetParameters.distance]
-                  .contains(exercise.parameters)) {
-            return e.key;
-          }
-          return "${e.value} × ${e.key}";
-        }).join(", "),
-        maxLines: 2,
-        overflow: TextOverflow.ellipsis,
-      );
+      final text = times.entries.map((e) {
+        if (e.value == 1 &&
+            ![SetParameters.time, SetParameters.distance]
+                .contains(exercise.parameters)) {
+          return e.key;
+        }
+        return "${e.value} × ${e.key}";
+      }).join(", ");
+      if (text.isNotEmpty) {
+        return Text(
+          text,
+          maxLines: 2,
+          overflow: TextOverflow.ellipsis,
+        );
+      }
     }
   }
 }

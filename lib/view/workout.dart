@@ -139,7 +139,6 @@ class _WorkoutViewState extends State<WorkoutView> {
                     onReorder: () async {
                       SchedulerBinding.instance
                           .addPostFrameCallback((timeStamp) async {
-                        // TODO: While we're at it, fix the timers messing up when reordering exercises.
                         final newIndices = await showDialog<List<int>>(
                           builder: (context) => WorkoutExerciseReorderDialog(
                             exercises: controller.exercises,

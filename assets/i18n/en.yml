@@ -72,6 +72,7 @@ exercise:
   custom: Custom
   info:
     title: Exercise info
+    viewWorkout: View workout
 
 workouts:
   untitled: Untitled workout

@@ -271,7 +271,7 @@ class _SupersetEditorState extends State<SupersetEditor> {
               widget.onExerciseAdd();
             },
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: widget.superset.exercises.isEmpty ? 8 : 16),
         ],
       ),
     );

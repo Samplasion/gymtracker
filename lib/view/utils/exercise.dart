@@ -197,7 +197,7 @@ class ExerciseListTile extends StatelessWidget {
                   .contains(exercise.parameters)) {
             return e.key;
           }
-          return "${e.value} x ${e.key}";
+          return "${e.value} × ${e.key}";
         }).join(", "),
         maxLines: 2,
         overflow: TextOverflow.ellipsis,

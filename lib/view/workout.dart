@@ -132,6 +132,7 @@ class _WorkoutViewState extends State<WorkoutView> {
               for (int i = 0; i < controller.exercises.length; i++)
                 if (controller.exercises[i] is Exercise)
                   WorkoutExerciseEditor(
+                    key: ValueKey((controller.exercises[i] as Exercise).id),
                     exercise: controller.exercises[i] as Exercise,
                     index: i,
                     isCreating: false,
@@ -160,15 +161,20 @@ class _WorkoutViewState extends State<WorkoutView> {
                     onReplace: () {
                       SchedulerBinding.instance
                           .addPostFrameCallback((timeStamp) async {
+                        final old = controller.exercises[i] as Exercise;
                         final ex = await Go.to<List<Exercise>>(
                             () => const ExercisePicker(singlePick: true));
                         if (ex == null || ex.isEmpty) return;
-                        controller.exercises[i] = ex.first.copyWith.sets([
-                          ExSet.empty(
-                            kind: SetKind.normal,
-                            parameters: ex.first.parameters,
-                          ),
-                        ]);
+                        controller.exercises[i] = ex.first.copyWith(
+                          sets: ([
+                            for (final set in old.sets)
+                              ExSet.empty(
+                                kind: set.kind,
+                                parameters: ex.first.parameters,
+                              ),
+                          ]),
+                          restTime: old.restTime,
+                        );
                         controller.exercises.refresh();
                         controller.save();
                       });
@@ -339,16 +345,22 @@ class _WorkoutViewState extends State<WorkoutView> {
                     onExerciseReplace: (index) {
                       SchedulerBinding.instance
                           .addPostFrameCallback((timeStamp) async {
+                        final old = (controller.exercises[i] as Superset)
+                            .exercises[index];
                         final ex = await Go.to<List<Exercise>>(
                             () => const ExercisePicker(singlePick: true));
                         if (ex == null || ex.isEmpty) return;
                         (controller.exercises[i] as Superset).exercises[index] =
-                            ex.first.copyWith.sets([
-                          ExSet.empty(
-                            kind: SetKind.normal,
-                            parameters: ex.first.parameters,
-                          ),
-                        ]);
+                            ex.first.copyWith(
+                          sets: ([
+                            for (final set in old.sets)
+                              ExSet.empty(
+                                kind: set.kind,
+                                parameters: ex.first.parameters,
+                              ),
+                          ]),
+                          restTime: old.restTime,
+                        );
                         controller.exercises.refresh();
                         controller.save();
                       });

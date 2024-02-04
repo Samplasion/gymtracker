@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:ui';
 
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:gymtracker/controller/debug_controller.dart';
@@ -92,4 +93,8 @@ extension Plural on String {
       ...?args,
     }).replaceAll("%s", howMany.toString());
   }
+}
+
+extension ContextLocale on BuildContext {
+  Locale get locale => Localizations.localeOf(this);
 }

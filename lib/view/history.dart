@@ -98,7 +98,8 @@ class HistoryWorkout extends StatelessWidget {
                                         TextSpan(
                                           children: [
                                             TextSpan(
-                                              text: DateFormat.yMd()
+                                              text: DateFormat.yMd(context
+                                                      .locale.languageCode)
                                                   .add_Hm()
                                                   .format(
                                                       workout.startingDate ??

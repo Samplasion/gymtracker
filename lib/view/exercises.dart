@@ -304,7 +304,7 @@ class _RoutineHistoryDataState extends State<RoutineHistoryData> {
             if (showDate) ...[
               const TextSpan(text: " "),
               TextSpan(
-                text: DateFormat.yMd()
+                text: DateFormat.yMd(context.locale.languageCode)
                     .format(children[selectedIndex].startingDate!),
                 style: TextStyle(
                   color: Theme.of(context).colorScheme.onSurfaceVariant,
@@ -476,14 +476,16 @@ class _RoutineHistoryDataState extends State<RoutineHistoryData> {
   Widget Function(double, TitleMeta) bottomTitleWidgets(BuildContext context) {
     return (double value, TitleMeta meta) {
       DateTime? cur = children[value.toInt()].startingDate;
-      String text = DateFormat.Md().format(cur ?? DateTime.now());
+      String text = DateFormat.Md(context.locale.languageCode)
+          .format(cur ?? DateTime.now());
 
       if (value > 0) {
         DateTime? prev = children[value.toInt() - 1].startingDate;
         if (_getDayMonth(prev) == _getDayMonth(cur)) {
           text = "";
         } else if (_getMonth(prev) == _getMonth(cur)) {
-          text = DateFormat.d().format(cur ?? DateTime.now());
+          text = DateFormat.d(context.locale.languageCode)
+              .format(cur ?? DateTime.now());
         }
       }
 

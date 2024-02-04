@@ -213,9 +213,12 @@ class _ExerciseInfoViewState extends State<ExerciseInfoView> {
                                       .toUpperCase()),
                                 ),
                                 title: Text(history[index].$3.name),
-                                subtitle: Text(DateFormat.yMd().add_Hm().format(
-                                    history[index].$3.startingDate ??
-                                        DateTime.now())),
+                                subtitle: Text(
+                                    DateFormat.yMd(context.locale.languageCode)
+                                        .add_Hm()
+                                        .format(
+                                            history[index].$3.startingDate ??
+                                                DateTime.now())),
                               ),
                             ],
                           ),

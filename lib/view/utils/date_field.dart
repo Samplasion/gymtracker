@@ -1,6 +1,7 @@
 // ignore_for_file: must_be_immutable
 
 import 'package:flutter/material.dart';
+import 'package:gymtracker/service/localizations.dart';
 import 'package:intl/intl.dart';
 
 class DateField extends StatefulWidget {
@@ -35,7 +36,7 @@ class _DateFieldState extends State<DateField> {
         border: const OutlineInputBorder(),
       ),
       controller: TextEditingController(
-        text: DateFormat.yMEd(/* context.currentLocale.languageCode */)
+        text: DateFormat.yMEd(context.locale.languageCode)
             .add_jm()
             .format(widget.date),
       ),

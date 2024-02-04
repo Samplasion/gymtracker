@@ -62,7 +62,7 @@ class _WorkoutViewState extends State<WorkoutView> {
             tooltip: "ongoingWorkout.weightCalculator".t,
             icon: const Icon(Icons.calculate),
             onPressed: () {
-              showModalBottomSheet(
+              showDialog(
                 context: context,
                 builder: (context) => const WeightCalculator(),
               );

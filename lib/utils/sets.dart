@@ -12,6 +12,7 @@ Widget buildSetType(
   SetKind kind, {
   required ExSet set,
   required List<ExSet> allSets,
+  double fontSize = 14,
 }) {
   final scheme = Theme.of(context).colorScheme;
   switch (kind) {
@@ -21,6 +22,7 @@ Widget buildSetType(
         style: TextStyle(
           color: scheme.tertiary,
           fontWeight: FontWeight.bold,
+          fontSize: fontSize,
         ),
       );
     case SetKind.normal:
@@ -36,6 +38,7 @@ Widget buildSetType(
         style: TextStyle(
           color: scheme.primary,
           fontWeight: FontWeight.bold,
+          fontSize: fontSize,
         ),
       );
     case SetKind.drop:
@@ -44,6 +47,7 @@ Widget buildSetType(
         style: TextStyle(
           color: scheme.error,
           fontWeight: FontWeight.bold,
+          fontSize: fontSize,
         ),
       );
     case SetKind.failure:
@@ -52,6 +56,7 @@ Widget buildSetType(
         style: TextStyle(
           color: context.harmonizeColor(Colors.blue),
           fontWeight: FontWeight.bold,
+          fontSize: fontSize,
         ),
       );
     case SetKind.failureStripping:
@@ -60,6 +65,7 @@ Widget buildSetType(
         style: TextStyle(
           color: context.harmonizeColor(Colors.blueGrey),
           fontWeight: FontWeight.bold,
+          fontSize: fontSize,
         ),
       );
   }

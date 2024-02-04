@@ -422,6 +422,7 @@ class _WorkoutExerciseSetEditorState extends State<WorkoutExerciseSetEditor> {
                     for (final kind in SetKind.values)
                       PopupMenuItem(
                         value: kind,
+                        onTap: () => widget.onSetSelectKind(kind),
                         child: ListTile(
                           leading: buildSetType(
                             context,
@@ -432,47 +433,58 @@ class _WorkoutExerciseSetEditorState extends State<WorkoutExerciseSetEditor> {
                           title: Text('set.kindLong.${kind.name}'.t),
                         ),
                       ),
-                    // TODO: (?) button with explanations for each kind
+                    const PopupMenuDivider(),
+                    PopupMenuItem(
+                      onTap: () {
+                        showDialog(
+                          context: context,
+                          builder: (context) {
+                            return AlertDialog(
+                              title: Text('set.kinds.help.title'.t),
+                              scrollable: true,
+                              content: Column(
+                                children: [
+                                  for (final kind in SetKind.values)
+                                    ListTile(
+                                      leading: buildSetType(
+                                        context,
+                                        kind,
+                                        set: widget.set,
+                                        allSets: widget.exercise.sets,
+                                        fontSize: 16,
+                                      ),
+                                      title:
+                                          Text('set.kindLong.${kind.name}'.t),
+                                      subtitle:
+                                          Text('set.kinds.help.${kind.name}'.t),
+                                    ),
+                                ],
+                              ),
+                              actions: [
+                                TextButton(
+                                  onPressed: () {
+                                    Navigator.pop(context);
+                                  },
+                                  child: Text(MaterialLocalizations.of(context)
+                                      .okButtonLabel),
+                                ),
+                              ],
+                            );
+                          },
+                        );
+                      },
+                      child: ListTile(
+                        leading: Text(
+                          "?",
+                          style: TextStyle(
+                            color: scheme.primary,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        title: Text('set.kinds.help.title'.t),
+                      ),
+                    ),
                   ],
-                  /* itemBuilder: (context) => <PopupMenuEntry<SetKind>>[
-                    PopupMenuItem(
-                      value: SetKind.normal,
-                      child: ListTile(
-                        leading: buildSetType(
-                          context,
-                          SetKind.normal,
-                          set: widget.set,
-                          allSets: widget.exercise.sets,
-                        ),
-                        title: Text('set.kindLong.normal'.t),
-                      ),
-                    ),
-                    PopupMenuItem(
-                      value: SetKind.warmUp,
-                      child: ListTile(
-                        leading: buildSetType(
-                          context,
-                          SetKind.warmUp,
-                          set: widget.set,
-                          allSets: widget.exercise.sets,
-                        ),
-                        title: Text('set.kindLong.warmUp'.t),
-                      ),
-                    ),
-                    PopupMenuItem(
-                      value: SetKind.drop,
-                      child: ListTile(
-                        leading: buildSetType(
-                          context,
-                          SetKind.drop,
-                          set: widget.set,
-                          allSets: widget.exercise.sets,
-                        ),
-                        title: Text('set.kindLong.drop'.t),
-                      ),
-                    ),
-                  ], */
-                  onSelected: widget.onSetSelectKind,
                 ),
                 const SizedBox(width: 8),
                 for (int i = 0; i < fields.length; i++) ...[

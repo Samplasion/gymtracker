@@ -73,6 +73,7 @@ exercise:
   info:
     title: Info esercizio
     viewWorkout: Vedi allenamento
+    noHistory: Non ci sono allenamenti per questo esercizio.
 
 workouts:
   untitled: Allenamento senza nome

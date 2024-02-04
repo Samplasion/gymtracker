@@ -73,6 +73,7 @@ exercise:
   info:
     title: Exercise info
     viewWorkout: View workout
+    noHistory: You haven't performed this exercise yet.
 
 workouts:
   untitled: Untitled workout

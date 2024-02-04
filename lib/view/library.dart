@@ -234,6 +234,14 @@ class _ExerciseInfoViewState extends State<ExerciseInfoView> {
                 );
               },
             ),
+            if (history.isEmpty) ...[
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Text("exercise.info.noHistory".t),
+                ),
+              ),
+            ],
             const SliverToBoxAdapter(
               child: SizedBox(height: 8),
             ),

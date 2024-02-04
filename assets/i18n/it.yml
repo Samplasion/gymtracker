@@ -105,6 +105,7 @@ routines:
       title: Superserie
       add: Aggiungi superserie
       subtitle:
+        zero: "Superserie senza esercizi"
         one: "Superserie con un esercizio"
         two: "Superserie con %s esercizi"
         few: "Superserie con %s esercizi"
@@ -159,6 +160,7 @@ ongoingWorkout:
       resume: Riprendi
   exercises:
     add: + Aggiungi esercizio
+    addSuperset: + Aggiungi superserie
     replace: Cambia esercizio
     reorder: Riordina esercizi
     remove: Rimuovi esercizio
@@ -392,6 +394,7 @@ infobox:
   label: Note
 
 superset:
+  zero: "Superserie senza esercizi"
   one: "Superserie con un esercizio"
   two: "Superserie con %s esercizi"
   few: "Superserie con %s esercizi"

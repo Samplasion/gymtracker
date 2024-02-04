@@ -5,6 +5,7 @@ import 'package:gymtracker/model/exercisable.dart';
 import 'package:gymtracker/model/superset.dart';
 import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/view/components/infobox.dart';
+import 'package:gymtracker/view/components/split_button.dart';
 import 'package:gymtracker/view/utils/superset.dart';
 
 import '../controller/countdown_controller.dart';
@@ -409,23 +410,33 @@ class _WorkoutViewState extends State<WorkoutView> {
                   ),
             Padding(
               padding: const EdgeInsets.all(16),
-              child: FilledButton(
-                onPressed: () async {
-                  final exs = await Go.to<List<Exercise>>(
-                      () => const ExercisePicker(singlePick: false));
-                  if (exs == null || exs.isEmpty) return;
-                  controller.exercises.addAll(
-                    exs.map((ex) => ex.copyWith.sets([
-                          ExSet.empty(
-                            kind: SetKind.normal,
-                            parameters: ex.parameters,
-                          ),
-                        ])),
-                  );
-                  controller.exercises.refresh();
-                },
-                child: Text('ongoingWorkout.exercises.add'.t),
-              ),
+              child: SplitButton(segments: [
+                SplitButtonSegment(
+                  title: 'ongoingWorkout.exercises.add'.t,
+                  type: SplitButtonSegmentType.filled,
+                  onTap: () async {
+                    final exs = await Go.to<List<Exercise>>(
+                        () => const ExercisePicker(singlePick: false));
+                    if (exs == null || exs.isEmpty) return;
+                    controller.exercises.addAll(
+                      exs.map((ex) => ex.copyWith.sets([
+                            ExSet.empty(
+                              kind: SetKind.normal,
+                              parameters: ex.parameters,
+                            ),
+                          ])),
+                    );
+                    controller.exercises.refresh();
+                  },
+                ),
+                SplitButtonSegment(
+                  title: "ongoingWorkout.exercise.addSuperset".t,
+                  onTap: () {
+                    controller.exercises.add(Superset.empty());
+                    controller.exercises.refresh();
+                  },
+                ),
+              ]),
             ),
           ],
         ),

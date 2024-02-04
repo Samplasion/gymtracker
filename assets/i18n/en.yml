@@ -105,6 +105,7 @@ routines:
       title: Superset
       add: Add superset
       subtitle:
+        zero: "Superset without exercises"
         one: "Superset with %s exercise"
         two: "Superset with %s exercises"
         few: "Superset with %s exercises"
@@ -160,6 +161,7 @@ ongoingWorkout:
       resume: Resume
   exercises:
     add: + Add exercise
+    addSuperset: + Add superset
     replace: Replace exercises
     reorder: Reorder exercises
     remove: Remove exercise
@@ -393,6 +395,7 @@ infobox:
   label: Notes
 
 superset:
+  zero: "Superset without exercises"
   one: "Superset with %s exercise"
   two: "Superset with %s exercises"
   few: "Superset with %s exercises"

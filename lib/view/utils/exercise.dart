@@ -140,6 +140,7 @@ class ExerciseListTile extends StatelessWidget {
   Text? _buildSubtitle(BuildContext context) {
     final exercise = this.exercise;
     if (exercise is Superset) {
+      if (exercise.exercises.isEmpty) return null;
       return Text(
         exercise.exercises.map((e) => e.displayName).join(", "),
         maxLines: 2,

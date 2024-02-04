@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:gymtracker/data/exercises.dart';
 import 'package:gymtracker/model/exercisable.dart';
+import 'package:gymtracker/model/set.dart';
 import 'package:gymtracker/model/superset.dart';
+import 'package:gymtracker/model/workout.dart';
 import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/utils/utils.dart';
+import 'package:gymtracker/view/utils/timer.dart';
 
 import '../../model/exercise.dart';
 
@@ -54,11 +57,13 @@ class ExerciseIcon extends StatelessWidget {
 class ExerciseListTile extends StatelessWidget {
   final WorkoutExercisable exercise;
   final bool selected;
+  final bool isConcrete;
   final VoidCallback? onTap;
 
   const ExerciseListTile({
     required this.exercise,
     required this.selected,
+    required this.isConcrete,
     this.onTap,
     super.key,
   });
@@ -113,8 +118,91 @@ class ExerciseListTile extends StatelessWidget {
           ],
         ]),
       ),
+      subtitle: _buildSubtitle(
+        context,
+      ),
       onTap: onTap,
     );
+  }
+
+  String _buildWeight(double weight) => "exerciseList.fields.weight".tParams({
+        "weight": stringifyDouble(weight),
+        "unit": "units.kg".t,
+      });
+  String _buildReps(int? reps) => "exerciseList.fields.reps".plural(reps ?? 0);
+  String _buildTime(BuildContext context, Duration time) =>
+      TimerView.buildTimeString(context, time, builder: (time) => time.text!);
+  String _buildDistance(double? distance) =>
+      "exerciseList.fields.distance".tParams({
+        "distance": stringifyDouble(distance ?? 0),
+        "unit": "units.km".t,
+      });
+
+  Text? _buildSubtitle(BuildContext context) {
+    final exercise = this.exercise;
+    if (exercise is Superset) {
+      return Text(
+        exercise.exercises.map((e) => e.displayName).join(", "),
+        maxLines: 2,
+        overflow: TextOverflow.ellipsis,
+      );
+    } else if (exercise is Exercise) {
+      if (!isConcrete) return null;
+
+      Map<String, int> times;
+      switch (exercise.parameters) {
+        case SetParameters.repsWeight:
+          times = exercise.sets
+              .map((set) =>
+                  "${_buildReps(set.reps)} ${_buildWeight(set.weight ?? 0)}")
+              .fold(
+                  <String, int>{},
+                  (previousValue, element) => previousValue
+                    ..update(element, (value) => value + 1, ifAbsent: () => 1));
+
+        case SetParameters.freeBodyReps:
+          times = exercise.sets.map((set) => _buildReps(set.reps)).fold(
+              <String, int>{},
+              (previousValue, element) => previousValue
+                ..update(element, (value) => value + 1, ifAbsent: () => 1));
+
+        case SetParameters.timeWeight:
+          times = exercise.sets
+              .map((set) =>
+                  "${_buildReps(set.reps)} ${_buildTime(context, set.time ?? Duration.zero)}")
+              .fold(
+                  <String, int>{},
+                  (previousValue, element) => previousValue
+                    ..update(element, (value) => value + 1, ifAbsent: () => 1));
+
+        case SetParameters.time:
+          times = exercise.sets
+              .map((set) => _buildTime(context, set.time ?? Duration.zero))
+              .fold(
+                  <String, int>{},
+                  (previousValue, element) => previousValue
+                    ..update(element, (value) => value + 1, ifAbsent: () => 1));
+
+        case SetParameters.distance:
+          times = exercise.sets.map((set) => _buildDistance(set.distance)).fold(
+              <String, int>{},
+              (previousValue, element) => previousValue
+                ..update(element, (value) => value + 1, ifAbsent: () => 1));
+      }
+
+      return Text(
+        times.entries.map((e) {
+          if (e.value == 1 &&
+              ![SetParameters.time, SetParameters.distance]
+                  .contains(exercise.parameters)) {
+            return e.key;
+          }
+          return "${e.value} x ${e.key}";
+        }).join(", "),
+        maxLines: 2,
+        overflow: TextOverflow.ellipsis,
+      );
+    }
   }
 }
 

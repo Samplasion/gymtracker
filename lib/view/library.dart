@@ -96,6 +96,7 @@ class LibraryExercisesView extends StatelessWidget {
           return ExerciseListTile(
             exercise: sorted[index],
             selected: false,
+            isConcrete: false,
             onTap: () {
               Go.to(() => ExerciseInfoView(exercise: sorted[index]));
             },

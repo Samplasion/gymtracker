@@ -831,6 +831,7 @@ class _WorkoutExerciseReorderDialogState
             return ExerciseListTile(
               key: ValueKey(exercise.id),
               exercise: exercise,
+              isConcrete: false,
               selected: false,
             );
           },

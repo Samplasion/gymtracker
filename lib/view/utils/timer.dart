@@ -5,7 +5,7 @@ import 'package:get/get.dart';
 
 import '../../service/localizations.dart';
 
-typedef TimerStringBuilder = Widget Function(TextSpan time);
+typedef TimerStringBuilder<T> = T Function(TextSpan time);
 
 class TimerView extends StatefulWidget {
   final DateTime startingTime;
@@ -20,12 +20,13 @@ class TimerView extends StatefulWidget {
   @override
   State<TimerView> createState() => _TimerViewState();
 
-  static Widget buildTimeString(
+  static T buildTimeString<T>(
     BuildContext context,
     Duration time, {
-    TimerStringBuilder builder = TimerView._defaultTimerStringBuilder,
+    TimerStringBuilder<T>? builder,
     TextStyle? style,
   }) {
+    builder ??= _defaultTimerStringBuilder as TimerStringBuilder<T>;
     final hours = time.inHours;
     final minutes = (time.inMinutes % 60).toString().padLeft(2, '0');
     final seconds = (time.inSeconds % 60).toString().padLeft(2, '0');

@@ -183,6 +183,7 @@ class _LibraryPickerExercisesViewState
           return ExerciseListTile(
             exercise: sorted[index],
             selected: widget.selectedExercises.contains(sorted[index]),
+            isConcrete: false,
             onTap: () {
               setState(() {
                 widget.onSelected(sorted[index]);

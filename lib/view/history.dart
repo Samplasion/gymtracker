@@ -124,7 +124,11 @@ class HistoryWorkout extends StatelessWidget {
                 ),
               ),
               for (final exercise in workout.exercises.take(showExercises))
-                ExerciseListTile(exercise: exercise, selected: false),
+                ExerciseListTile(
+                  exercise: exercise,
+                  selected: false,
+                  isConcrete: true,
+                ),
               if (workout.exercises.length > showExercises) ...[
                 ListTile(
                   title: Text(

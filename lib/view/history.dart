@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:gymtracker/model/exercise.dart';
 import 'package:intl/intl.dart';
 
 import '../controller/history_controller.dart';

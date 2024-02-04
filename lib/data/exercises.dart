@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:gymtracker/model/set.dart';
 import 'package:gymtracker/service/localizations.dart';
 
@@ -317,12 +316,11 @@ Map<String, ExerciseCategory> get exerciseStandardLibrary => {
             primaryMuscleGroup: MuscleGroup.shoulders,
           ),
           Exercise.standard(
-            id: "library.shoulders.exercises.reverseFlysInclinedBench",
-            name: "library.shoulders.exercises.reverseFlysInclinedBench".t,
-            parameters: SetParameters.repsWeight,
-            primaryMuscleGroup: MuscleGroup.shoulders,
-            secondaryMuscleGroups: {MuscleGroup.upperBack}
-          ),
+              id: "library.shoulders.exercises.reverseFlysInclinedBench",
+              name: "library.shoulders.exercises.reverseFlysInclinedBench".t,
+              parameters: SetParameters.repsWeight,
+              primaryMuscleGroup: MuscleGroup.shoulders,
+              secondaryMuscleGroups: {MuscleGroup.upperBack}),
         ],
         icon: Text("library.shoulders.name".t.characters.first.toUpperCase()),
         color: Colors.cyan,

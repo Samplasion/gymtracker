@@ -4,9 +4,7 @@ import 'package:get/get.dart';
 import 'package:gymtracker/model/exercisable.dart';
 import 'package:gymtracker/model/superset.dart';
 import 'package:gymtracker/service/localizations.dart';
-import 'package:gymtracker/view/utils/drag_handle.dart';
 import 'package:gymtracker/view/utils/superset.dart';
-import 'package:gymtracker/view/utils/time.dart';
 
 import '../controller/workouts_controller.dart';
 import '../model/exercise.dart';

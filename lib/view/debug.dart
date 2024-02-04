@@ -67,20 +67,18 @@ String generateYamlForMissingKeys(List<String> missingKeys) {
     for (final key in missingKeys) key: key.split(".").last,
   });
 
-  var yamlString = "";
-
   String processMap(currentLevel, Map map) {
     var current = "";
     for (final entry in map.entries) {
-      if (entry.value is Map)
+      if (entry.value is Map) {
         current +=
             "$currentLevel${entry.key}:\n${processMap(currentLevel + "  ", entry.value)}";
-      else
+      } else {
         current += "$currentLevel${entry.key}: ${entry.value}\n";
+      }
     }
     return current;
   }
 
-  // return keys.toString();
   return processMap("", keys);
 }

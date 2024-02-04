@@ -35,6 +35,7 @@ class SelectableAnimatedBuilder extends StatefulWidget {
     required this.isSelected,
     this.duration = const Duration(milliseconds: 200),
     required this.builder,
+    super.key,
   });
 
   /// When true, the widget will animate an animation controller from 0 to 1.
@@ -104,11 +105,4 @@ class _SelectableAnimatedBuilderState extends State<SelectableAnimatedBuilder>
       _controller,
     );
   }
-}
-
-/// Returns `true` if this animation is ticking forward, or has completed,
-/// based on [status].
-bool _isForwardOrCompleted(Animation<double> animation) {
-  return animation.status == AnimationStatus.forward ||
-      animation.status == AnimationStatus.completed;
 }

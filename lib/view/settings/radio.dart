@@ -31,8 +31,6 @@ class _RadioModalTileState<T> extends State<RadioModalTile<T>>
     with SingleTickerProviderStateMixin {
   late T _value = widget.selectedValue;
   final ScrollController _scrollController = ScrollController();
-  late final AnimationController _animationController =
-      BottomSheet.createAnimationController(this);
 
   @override
   void dispose() {

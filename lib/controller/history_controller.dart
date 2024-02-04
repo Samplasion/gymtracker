@@ -1,8 +1,6 @@
-import 'package:flutter/rendering.dart';
 import 'package:get/get.dart';
 import 'package:gymtracker/model/exercisable.dart';
 import 'package:gymtracker/model/superset.dart';
-import 'package:gymtracker/service/database.dart';
 
 import '../model/exercise.dart';
 import '../model/workout.dart';

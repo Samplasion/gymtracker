@@ -4,7 +4,6 @@ import 'package:get/get.dart';
 import 'package:gymtracker/model/exercisable.dart';
 import 'package:gymtracker/service/localizations.dart';
 
-import '../model/exercise.dart';
 import '../model/set.dart';
 import '../model/workout.dart';
 import '../service/database.dart';

@@ -1,6 +1,5 @@
 import 'package:flex_color_picker/flex_color_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
 import 'package:get/get.dart';
 
 typedef OnChange<T> = void Function(T value);
@@ -31,8 +30,6 @@ class _ColorModalTileState extends State<ColorModalTile>
     with SingleTickerProviderStateMixin {
   late Color _value = widget.selectedValue;
   final ScrollController _scrollController = ScrollController();
-  late final AnimationController _animationController =
-      BottomSheet.createAnimationController(this);
 
   @override
   void dispose() {

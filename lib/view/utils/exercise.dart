@@ -149,54 +149,46 @@ class ExerciseListTile extends StatelessWidget {
     } else if (exercise is Exercise) {
       if (!isConcrete) return null;
 
-      Map<String, int> times;
+      Iterable<String> formattedSets;
+
       switch (exercise.parameters) {
         case SetParameters.repsWeight:
-          times = exercise.sets
-              .map((set) =>
-                  "${_buildReps(set.reps)} ${_buildWeight(set.weight ?? 0)}")
-              .fold(
-                  <String, int>{},
-                  (previousValue, element) => previousValue
-                    ..update(element, (value) => value + 1, ifAbsent: () => 1));
+          formattedSets = exercise.sets.map((set) =>
+              "${_buildReps(set.reps)} ${_buildWeight(set.weight ?? 0)}");
 
         case SetParameters.freeBodyReps:
-          times = exercise.sets.map((set) => _buildReps(set.reps)).fold(
-              <String, int>{},
-              (previousValue, element) => previousValue
-                ..update(element, (value) => value + 1, ifAbsent: () => 1));
+          formattedSets = exercise.sets.map((set) => _buildReps(set.reps));
 
         case SetParameters.timeWeight:
-          times = exercise.sets
-              .map((set) =>
-                  "${_buildReps(set.reps)} ${_buildTime(context, set.time ?? Duration.zero)}")
-              .fold(
-                  <String, int>{},
-                  (previousValue, element) => previousValue
-                    ..update(element, (value) => value + 1, ifAbsent: () => 1));
+          formattedSets = exercise.sets.map((set) =>
+              "${_buildReps(set.reps)} ${_buildTime(context, set.time ?? Duration.zero)}");
 
         case SetParameters.time:
-          times = exercise.sets
-              .map((set) => _buildTime(context, set.time ?? Duration.zero))
-              .fold(
-                  <String, int>{},
-                  (previousValue, element) => previousValue
-                    ..update(element, (value) => value + 1, ifAbsent: () => 1));
+          formattedSets = exercise.sets
+              .map((set) => _buildTime(context, set.time ?? Duration.zero));
 
         case SetParameters.distance:
-          times = exercise.sets.map((set) => _buildDistance(set.distance)).fold(
-              <String, int>{},
-              (previousValue, element) => previousValue
-                ..update(element, (value) => value + 1, ifAbsent: () => 1));
+          formattedSets =
+              exercise.sets.map((set) => _buildDistance(set.distance));
       }
 
-      final text = times.entries.map((e) {
-        if (e.value == 1 &&
+      final text =
+          formattedSets.fold(<(String, int)>[], (previousValue, element) {
+        if (previousValue.isEmpty || previousValue.last.$1 != element) {
+          return [...previousValue, (element, 1)];
+        }
+        return [
+          ...previousValue
+            ..removeLast()
+            ..add((element, previousValue.last.$2 + 1))
+        ];
+      }).map((e) {
+        if (e.$2 == 1 &&
             ![SetParameters.time, SetParameters.distance]
                 .contains(exercise.parameters)) {
-          return e.key;
+          return e.$1;
         }
-        return "${e.value} × ${e.key}";
+        return "${e.$2} × ${e.$1}";
       }).join(", ");
       if (text.isNotEmpty) {
         return Text(

@@ -41,6 +41,7 @@ class Go {
     String title,
     String body, {
     Widget? icon,
+    List<Widget> actions = const <Widget>[],
   }) {
     showDialog(
       context: Get.context!,
@@ -50,6 +51,7 @@ class Go {
           title: Text(title.t),
           content: Text(body.t),
           actions: [
+            ...actions,
             TextButton(
               onPressed: () {
                 Get.back();
@@ -60,5 +62,36 @@ class Go {
         );
       },
     );
+  }
+
+  static Future<bool> confirm(
+    String title,
+    String body, {
+    Widget? icon,
+  }) {
+    return showDialog<bool>(
+      context: Get.context!,
+      builder: (context) {
+        return AlertDialog(
+          icon: icon ?? const Icon(Icons.info),
+          title: Text(title.t),
+          content: Text(body.t),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Get.back(result: false);
+              },
+              child: Text(MaterialLocalizations.of(context).cancelButtonLabel),
+            ),
+            TextButton(
+              onPressed: () {
+                Get.back(result: true);
+              },
+              child: Text(MaterialLocalizations.of(context).okButtonLabel),
+            ),
+          ],
+        );
+      },
+    ).then((value) => value ?? false);
   }
 }

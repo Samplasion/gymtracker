@@ -2,6 +2,7 @@ import 'package:dynamic_color/dynamic_color.dart';
 import 'package:flutter/material.dart' hide Localizations;
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:gymtracker/controller/countdown_controller.dart';
@@ -77,7 +78,13 @@ class MainApp extends StatelessWidget {
                         printInfo(info: "${settings.locale.value}");
                         return settings.locale.value;
                       }(),
+                      supportedLocales: GTLocalizations.supportedLocales,
                       fallbackLocale: const Locale('en'),
+                      localizationsDelegates: const [
+                        GlobalMaterialLocalizations.delegate,
+                        GlobalWidgetsLocalizations.delegate,
+                        GlobalCupertinoLocalizations.delegate,
+                      ],
                       theme: ThemeData(
                         useMaterial3: true,
                         brightness: Brightness.light,

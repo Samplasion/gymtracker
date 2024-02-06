@@ -13,6 +13,14 @@ set:
     drop: Drop set
     failure: A morire
     failureStripping: A morire, con stripping
+  kinds:
+    help:
+      title: Cosa significa?
+      warmUp: Una serie di riscaldamento è una serie leggera di un esercizio che esegui prima delle serie di lavoro effettive. Il suo scopo è preparare i muscoli per il lavoro pesante imminente.
+      normal: Una serie normale è una serie regolare di un esercizio, in cui esegui un certo numero di ripetizioni con un certo peso.
+      drop: Una serie di drop ("Drop set") è una serie in cui abbassi il peso dopo aver raggiunto il fallimento muscolare e continui a eseguire ripetizioni con il peso inferiore.
+      failure: Una serie "a morire" è una serie in cui esegui ripetizioni fino a raggiungere il fallimento muscolare.
+      failureStripping: Una serie "a morire" con stripping è una sorta di serie "a morire" in cui esegui ripetizioni fino a raggiungere il fallimento muscolare, quindi abbassi il peso e continui a eseguire ripetizioni con il peso inferiore, senza recuperare.
 
 exercise:
   chart:
@@ -21,7 +29,7 @@ exercise:
       reps: Ripetizioni
       duration: Durata allenamento
   fields:
-    restTime: Riposo
+    restTime: Recupero
     weight: Peso
     time: Tempo
     reps: Ripetizioni
@@ -64,6 +72,8 @@ exercise:
   custom: Personalizzato
   info:
     title: Info esercizio
+    viewWorkout: Vedi allenamento
+    noHistory: Non ci sono allenamenti per questo esercizio.
 
 workouts:
   untitled: Allenamento senza nome
@@ -81,6 +91,7 @@ workouts:
   
 routines:
   title: Routine
+  newRoutine: Nuova routine
   quickWorkout:
     title: Allenamento rapido
     subtitle: Avvia rapidamente un allenamento vuoto
@@ -100,6 +111,20 @@ routines:
           empty: Il nome non dev'essere vuoto.
       infobox:
         label: Note
+    superset:
+      title: Superserie
+      add: Aggiungi superserie
+      subtitle:
+        zero: "Superserie senza esercizi"
+        one: "Superserie con un esercizio"
+        two: "Superserie con %s esercizi"
+        few: "Superserie con %s esercizi"
+        many: "Superserie con %s esercizi"
+        other: "Superserie con %s esercizi"
+      addExercise: Aggiungi esercizi
+      remove:
+        title: Rimuovi superserie
+        body: Vuoi davvero rimuovere questa superserie? Quest'azione non può essere annullata.
 
 history:
   title: Cronologia
@@ -124,9 +149,12 @@ settings:
     import:
       label: Importa dati
       success: Dati importati con successo
-      failed: Impossibile importare i dati
+      failed:
+        title: Impossibile importare i dati
+        copy: Il messaggio di errore è stato copiato negli appunti.
     export:
       label: Esporta dati (JSON)
+      filename: Dati_GymTracker
   
   colorPicker:
     heading:
@@ -142,6 +170,7 @@ ongoingWorkout:
       resume: Riprendi
   exercises:
     add: + Aggiungi esercizio
+    addSuperset: + Aggiungi superserie
     replace: Cambia esercizio
     reorder: Riordina esercizi
     remove: Rimuovi esercizio
@@ -182,6 +211,9 @@ ongoingWorkout:
       yes: Avvia
   restOver: È scaduto il tempo di recupero!
   weightCalculator: Calcolatrice pesi
+  superset:
+    replaceWithExercise: Cambia con esercizio
+    remove: Rimuovi superserie
 
 timer: 
   add15s: "+15s"
@@ -189,7 +221,7 @@ timer:
   skip: Salta
 
 exerciseList:
-  restTime: "Riposo: "
+  restTime: "Recupero: "
   fields:
     weight: "@weight @unit"
     time: "@time"
@@ -277,8 +309,8 @@ weightCalculator:
     label: Bilanciere
 
 androidNotificationChannel:
-  name: Timer tempo di riposo
-  description: Invia una notifica quando il timer del tempo di riposo finisce.
+  name: Timer tempo di recupero
+  description: Invia una notifica quando il timer del tempo di recupero finisce.
 
 library:
   title: Libreria esercizi
@@ -370,3 +402,11 @@ library:
 
 infobox:
   label: Note
+
+superset:
+  zero: "Superserie senza esercizi"
+  one: "Superserie con un esercizio"
+  two: "Superserie con %s esercizi"
+  few: "Superserie con %s esercizi"
+  many: "Superserie con %s esercizi"
+  other: "Superserie con %s esercizi"

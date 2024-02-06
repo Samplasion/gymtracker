@@ -1,5 +1,3 @@
-
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:universal_platform/universal_platform.dart';
@@ -64,7 +62,8 @@ class _RoutinesViewState extends State<RoutinesView> {
                       child: Text(workout.name.characters.first.toUpperCase()),
                     ),
                     trailing: () {
-                      if (UniversalPlatform.isAndroid || UniversalPlatform.isIOS) {
+                      if (UniversalPlatform.isAndroid ||
+                          UniversalPlatform.isIOS) {
                         return ReorderableDelayedDragStartListener(
                           index: index,
                           child: const Icon(Icons.drag_handle),
@@ -77,8 +76,8 @@ class _RoutinesViewState extends State<RoutinesView> {
                       }
                     }(),
                     title: Text(workout.name),
-                    subtitle: Text(
-                        "general.exercises".plural(workout.exercises.length)),
+                    subtitle: Text("general.exercises"
+                        .plural(workout.displayExerciseCount)),
                     onTap: () {
                       Go.to(() => ExercisesView(workout: workout));
                     },
@@ -90,15 +89,20 @@ class _RoutinesViewState extends State<RoutinesView> {
                 controller.reorder(oldIndex, newIndex);
               },
             ),
+            const SliverToBoxAdapter(child: Divider()),
+            SliverToBoxAdapter(
+              child: ListTile(
+                title: Text("routines.newRoutine".t),
+                leading: const CircleAvatar(child: Icon(Icons.add_rounded)),
+                onTap: () {
+                  Go.to(() => const RoutineCreator());
+                },
+              ),
+            ),
+            const SliverToBoxAdapter(child: SizedBox(height: 8)),
           ],
         );
       }),
-      floatingActionButton: FloatingActionButton(
-        child: const Icon(Icons.add_rounded),
-        onPressed: () {
-          Go.to(() => const RoutineCreator());
-        },
-      ),
     );
   }
 }

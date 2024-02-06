@@ -23,13 +23,13 @@ class HistoryView extends StatelessWidget {
             SliverAppBar.large(
               title: Text("history.title".t),
             ),
-            SliverList(
-              delegate: SliverChildListDelegate(
-                [
-                  for (final workout in controller.history.reversed)
-                    HistoryWorkout(workout: workout),
-                ],
-              ),
+            SliverList.builder(
+              itemCount: controller.history.length,
+              itemBuilder: (context, index) {
+                final workout =
+                    controller.history[controller.history.length - index - 1];
+                return HistoryWorkout(workout: workout);
+              },
             ),
           ],
         ),
@@ -40,8 +40,10 @@ class HistoryView extends StatelessWidget {
 
 class HistoryWorkout extends StatelessWidget {
   final Workout workout;
+  final int showExercises;
 
-  const HistoryWorkout({required this.workout, super.key});
+  const HistoryWorkout(
+      {required this.workout, this.showExercises = 5, super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -86,7 +88,7 @@ class HistoryWorkout extends StatelessWidget {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text("general.exercises".plural(
-                                    workout.exercises.length,
+                                    workout.displayExerciseCount,
                                   )),
                                   Flexible(
                                     child: TimerView.buildTimeString(
@@ -96,7 +98,8 @@ class HistoryWorkout extends StatelessWidget {
                                         TextSpan(
                                           children: [
                                             TextSpan(
-                                              text: DateFormat.yMd()
+                                              text: DateFormat.yMd(context
+                                                      .locale.languageCode)
                                                   .add_Hm()
                                                   .format(
                                                       workout.startingDate ??
@@ -120,12 +123,17 @@ class HistoryWorkout extends StatelessWidget {
                   ],
                 ),
               ),
-              for (final exercise in workout.exercises.take(3))
-                ExerciseListTile(exercise: exercise, selected: false),
-              if (workout.exercises.length > 3) ...[
+              for (final exercise in workout.exercises.take(showExercises))
+                ExerciseListTile(
+                  exercise: exercise,
+                  selected: false,
+                  isConcrete: true,
+                ),
+              if (workout.exercises.length > showExercises) ...[
                 ListTile(
                   title: Text(
-                    "history.andMore".plural(workout.exercises.length - 3),
+                    "history.andMore"
+                        .plural(workout.displayExerciseCount - showExercises),
                   ),
                 ),
               ] else ...[

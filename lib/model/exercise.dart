@@ -1,5 +1,6 @@
 import 'package:copy_with_extension/copy_with_extension.dart';
 import 'package:get/get.dart';
+import 'package:gymtracker/model/exercisable.dart';
 import 'package:gymtracker/service/localizations.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:uuid/uuid.dart';
@@ -33,13 +34,16 @@ enum MuscleGroup {
 
 @JsonSerializable(constructor: "_")
 @CopyWith(constructor: "_")
-class Exercise {
+class Exercise extends WorkoutExercisable {
+  @override
   String id;
   final String name;
   final SetParameters parameters;
+  @override
   final List<ExSet> sets;
   final MuscleGroup primaryMuscleGroup;
   final Set<MuscleGroup> secondaryMuscleGroups;
+  @override
   Duration restTime;
 
   /// The ID of the non-concrete (ie. part of a routine) exercise
@@ -47,6 +51,7 @@ class Exercise {
   String? parentID;
 
   @JsonKey(defaultValue: "")
+  @override
   String notes;
 
   @JsonKey(defaultValue: false)
@@ -118,9 +123,11 @@ class Exercise {
   factory Exercise.fromJson(Map<String, dynamic> json) =>
       _$ExerciseFromJson(json);
 
+  @override
   Map<String, dynamic> toJson() => <String, dynamic>{
         ..._$ExerciseToJson(this),
         'sets': [for (final set in sets) set.toJson()],
+        'type': 'exercise',
       };
 
   Exercise clone() => Exercise.fromJson(toJson());
@@ -139,5 +146,14 @@ extension Display on Exercise {
     if (candidate.existsAsTranslationKey) return candidate.t;
     name.printError(info: "No translation found");
     return name;
+  }
+}
+
+extension Utils on List<Exercise> {
+  int? findExerciseIndex(Exercise ex) {
+    for (var i = 0; i < length; i++) {
+      if (this[i].id == ex.id) return i;
+    }
+    return null;
   }
 }

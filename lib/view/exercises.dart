@@ -3,6 +3,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:get/get.dart';
+import 'package:gymtracker/model/exercisable.dart';
+import 'package:gymtracker/model/superset.dart';
 import 'package:gymtracker/view/components/infobox.dart';
 import 'package:intl/intl.dart';
 
@@ -74,9 +76,7 @@ class _ExercisesViewState extends State<ExercisesView> {
                             ],
                             initialItem: workout.parentID,
                             onSelect: (value) {
-                              setState(() => workout.parentID = value);
-                              Get.find<history.HistoryController>()
-                                  .setParentID(workout, newParentID: value);
+                              changeParent(value);
                             },
                           );
                         },
@@ -136,7 +136,8 @@ class _ExercisesViewState extends State<ExercisesView> {
       ),
       body: CustomScrollView(
         slivers: [
-          if (!workout.isConcrete && controller.getChildren(workout).isNotEmpty)
+          if (!workout.isConcrete &&
+              controller.getChildren(workout).length >= 2)
             SliverToBoxAdapter(
               child: Padding(
                 padding: const EdgeInsets.all(16),
@@ -166,7 +167,11 @@ class _ExercisesViewState extends State<ExercisesView> {
                 padding: const EdgeInsets.all(16).copyWith(top: 0),
                 child: FilledButton.tonal(
                   onPressed: () {
-                    Get.find<WorkoutsController>().importWorkout(workout);
+                    final newID =
+                        Get.find<WorkoutsController>().importWorkout(workout);
+                    if (workout.parentID == null) {
+                      changeParent(newID);
+                    }
                     Go.snack("workouts.actions.saveAsRoutine.done".t);
                   },
                   child: Text("workouts.actions.saveAsRoutine.button".t),
@@ -189,6 +194,7 @@ class _ExercisesViewState extends State<ExercisesView> {
                     exercise: exercise,
                     workout: workout,
                     index: index,
+                    isInSuperset: false,
                   ),
                 );
               },
@@ -206,6 +212,12 @@ class _ExercisesViewState extends State<ExercisesView> {
         ],
       ),
     );
+  }
+
+  void changeParent(String? value) {
+    setState(() => workout.parentID = value);
+    Get.find<history.HistoryController>()
+        .setParentID(workout, newParentID: value);
   }
 }
 
@@ -292,7 +304,7 @@ class _RoutineHistoryDataState extends State<RoutineHistoryData> {
             if (showDate) ...[
               const TextSpan(text: " "),
               TextSpan(
-                text: DateFormat.yMd()
+                text: DateFormat.yMd(context.locale.languageCode)
                     .format(children[selectedIndex].startingDate!),
                 style: TextStyle(
                   color: Theme.of(context).colorScheme.onSurfaceVariant,
@@ -464,14 +476,16 @@ class _RoutineHistoryDataState extends State<RoutineHistoryData> {
   Widget Function(double, TitleMeta) bottomTitleWidgets(BuildContext context) {
     return (double value, TitleMeta meta) {
       DateTime? cur = children[value.toInt()].startingDate;
-      String text = DateFormat.Md().format(cur ?? DateTime.now());
+      String text = DateFormat.Md(context.locale.languageCode)
+          .format(cur ?? DateTime.now());
 
       if (value > 0) {
         DateTime? prev = children[value.toInt() - 1].startingDate;
         if (_getDayMonth(prev) == _getDayMonth(cur)) {
           text = "";
         } else if (_getMonth(prev) == _getMonth(cur)) {
-          text = DateFormat.d().format(cur ?? DateTime.now());
+          text = DateFormat.d(context.locale.languageCode)
+              .format(cur ?? DateTime.now());
         }
       }
 
@@ -504,14 +518,21 @@ class ExerciseDataView extends StatelessWidget {
     required this.exercise,
     required this.workout,
     required this.index,
+    required this.isInSuperset,
   });
 
-  final Exercise exercise;
+  final WorkoutExercisable exercise;
   final Workout workout;
   final int index;
+  final bool isInSuperset;
 
   @override
   Widget build(BuildContext context) {
+    if (this.exercise is Superset) return _buildSuperset(context);
+
+    assert(this.exercise is! Superset);
+
+    final exercise = this.exercise as Exercise;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -524,10 +545,6 @@ class ExerciseDataView extends StatelessWidget {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Text(
-                  //   exercise.displayName,
-
-                  // ),
                   Text.rich(
                     TextSpan(
                       children: [
@@ -544,23 +561,26 @@ class ExerciseDataView extends StatelessWidget {
                     ),
                     style: Theme.of(context).textTheme.titleMedium,
                   ),
-                  TimerView.buildTimeString(
-                    context,
-                    workout.exercises[index].restTime,
-                    builder: (time) => Text.rich(
-                      TextSpan(
-                        children: [
-                          TextSpan(text: "exerciseList.restTime".t),
-                          time
-                        ],
-                        style:
-                            Theme.of(context).textTheme.labelMedium!.copyWith(
-                                  color: Theme.of(context).colorScheme.primary,
-                                ),
+                  if (!isInSuperset)
+                    TimerView.buildTimeString(
+                      context,
+                      workout.exercises[index].restTime,
+                      builder: (time) => Text.rich(
+                        TextSpan(
+                          children: [
+                            TextSpan(text: "exerciseList.restTime".t),
+                            time
+                          ],
+                          style: Theme.of(context)
+                              .textTheme
+                              .labelMedium!
+                              .copyWith(
+                                color: Theme.of(context).colorScheme.primary,
+                              ),
+                        ),
                       ),
+                      style: const TextStyle(),
                     ),
-                    style: const TextStyle(),
-                  ),
                   if (kDebugMode) ...[
                     Text(exercise.id),
                     Text("parent: ${exercise.parentID}"),
@@ -583,6 +603,85 @@ class ExerciseDataView extends StatelessWidget {
             alt: i % 2 == 0,
           ),
       ],
+    );
+  }
+
+  Widget _buildSuperset(BuildContext context) {
+    final superset = exercise as Superset;
+    return Card(
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8)
+                .copyWith(top: 16),
+            child: Row(
+              children: [
+                ExerciseIcon(exercise: superset),
+                const SizedBox(width: 16),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Text(
+                    //   exercise.displayName,
+
+                    // ),
+                    Text.rich(
+                      TextSpan(
+                        children: [
+                          TextSpan(
+                              text:
+                                  "superset".plural(superset.exercises.length)),
+                        ],
+                      ),
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                    TimerView.buildTimeString(
+                      context,
+                      workout.exercises[index].restTime,
+                      builder: (time) => Text.rich(
+                        TextSpan(
+                          children: [
+                            TextSpan(text: "exerciseList.restTime".t),
+                            time
+                          ],
+                          style: Theme.of(context)
+                              .textTheme
+                              .labelMedium!
+                              .copyWith(
+                                color: Theme.of(context).colorScheme.primary,
+                              ),
+                        ),
+                      ),
+                      style: const TextStyle(),
+                    ),
+                    if (kDebugMode) ...[
+                      Text(superset.id),
+                    ],
+                  ],
+                ),
+              ],
+            ),
+          ),
+          if (exercise.notes.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              child: Text(exercise.notes),
+            ),
+          const Divider(),
+          for (final exercise in (this.exercise as Superset).exercises)
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8),
+              child: ExerciseDataView(
+                exercise: exercise,
+                workout: workout,
+                index: index,
+                isInSuperset: true,
+              ),
+            ),
+        ],
+      ),
     );
   }
 }
@@ -632,7 +731,7 @@ class ExerciseSetView extends StatelessWidget {
     var colorScheme = Theme.of(context).colorScheme;
     return Container(
       color: alt
-          ? scheme.background
+          ? scheme.background.withOpacity(0)
           : ElevationOverlay.applySurfaceTint(
               scheme.surface,
               scheme.surfaceTint,

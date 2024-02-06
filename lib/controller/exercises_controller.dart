@@ -1,9 +1,7 @@
-import 'package:flutter/rendering.dart';
 import 'package:get/get.dart';
 import 'package:gymtracker/model/set.dart';
 
 import '../model/exercise.dart';
-import '../service/database.dart';
 import 'serviceable_controller.dart';
 
 class ExercisesController extends GetxController with ServiceableController {

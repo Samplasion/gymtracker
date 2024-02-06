@@ -1,11 +1,10 @@
-import 'dart:collection';
 import 'dart:convert';
 import 'dart:ui';
 
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-import 'package:get_storage/get_storage.dart';
 import 'package:gymtracker/controller/debug_controller.dart';
 import 'package:intl/intl.dart';
 import 'package:yaml/yaml.dart';
@@ -61,6 +60,16 @@ extension Fallback on String {
     return tr;
   }
 
+  String tParams([Map<String, String> params = const {}]) {
+    var trans = t;
+    if (params.isNotEmpty) {
+      params.forEach((key, value) {
+        trans = trans.replaceAll('@$key', value);
+      });
+    }
+    return trans;
+  }
+
   bool get existsAsTranslationKey {
     return Get.find<GTLocalizations>()
         .keys[Get.locale!.languageCode]!
@@ -79,9 +88,13 @@ extension Plural on String {
       many: "$this.many",
       other: "$this.other",
       locale: Get.locale!.languageCode,
-    ).trParams({
+    ).tParams({
       "howMany": howMany.toString(),
       ...?args,
     }).replaceAll("%s", howMany.toString());
   }
+}
+
+extension ContextLocale on BuildContext {
+  Locale get locale => Localizations.localeOf(this);
 }

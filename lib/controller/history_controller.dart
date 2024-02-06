@@ -1,6 +1,6 @@
-import 'package:flutter/rendering.dart';
 import 'package:get/get.dart';
-import 'package:gymtracker/service/database.dart';
+import 'package:gymtracker/model/exercisable.dart';
+import 'package:gymtracker/model/superset.dart';
 
 import '../model/exercise.dart';
 import '../model/workout.dart';
@@ -12,6 +12,9 @@ class HistoryController extends GetxController with ServiceableController {
   @override
   void onServiceChange() {
     history(service.workoutHistory);
+    history.sort((a, b) => (a.startingDate ??
+            DateTime.fromMillisecondsSinceEpoch(0))
+        .compareTo(b.startingDate ?? DateTime.fromMillisecondsSinceEpoch(0)));
   }
 
   void deleteWorkout(Workout workout) {
@@ -46,28 +49,38 @@ class HistoryController extends GetxController with ServiceableController {
       return workout;
     }
 
-    final exercises = <Exercise>[];
+    final exercises = <WorkoutExercisable>[];
     for (final exercise in workout.exercises) {
-      if (exercise.isCustom) {
-        workout.id.printInfo(info: "Custom exercise found");
-        exercises.add(exercise);
-        continue;
+      Exercise getFixedExercise(Exercise exercise) {
+        if (exercise.isCustom) {
+          workout.id.printInfo(info: "Custom exercise found");
+          return exercise;
+        }
+
+        // Returns the standard exercise, which is not an instance
+        // of an exercise in the Standard Library but a child of it.
+        final standard = parent.exercises.firstWhereOrNull(
+          (element) => element is Exercise && element.id == exercise.parentID,
+        );
+        if (standard == null) {
+          workout.id.printInfo(info: "Standard exercise not found");
+          return exercise;
+        }
+
+        return exercise.copyWith(
+          parentID: (standard as Exercise).parentID ?? standard.id,
+        );
       }
 
-      // Returns the standard exercise, which is not an instance
-      // of an exercise in the Standard Library but a child of it.
-      final standard = parent.exercises.firstWhereOrNull(
-        (element) => element.id == exercise.parentID,
-      );
-      if (standard == null) {
-        workout.id.printInfo(info: "Standard exercise not found");
-        exercises.add(exercise);
-        continue;
+      if (exercise is Exercise) {
+        exercises.add(getFixedExercise(exercise));
+      } else if (exercise is Superset) {
+        exercises.add(
+          exercise.copyWith(
+            exercises: exercise.exercises.map(getFixedExercise).toList(),
+          ),
+        );
       }
-
-      exercises.add(exercise.copyWith(
-        parentID: standard.parentID ?? standard.id,
-      ));
     }
 
     return workout.copyWith(

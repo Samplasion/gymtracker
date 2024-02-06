@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:get/get.dart';
+import 'package:gymtracker/model/exercisable.dart';
 import 'package:gymtracker/service/localizations.dart';
 
-import '../model/exercise.dart';
 import '../model/set.dart';
 import '../model/workout.dart';
 import '../service/database.dart';
@@ -26,16 +26,17 @@ class WorkoutController extends GetxController with ServiceableController {
 
   factory WorkoutController.fromSavedData(Map<String, dynamic> data) {
     // final  data = service.getOngoingData()!;
-    final cont = WorkoutController(data['name'], data['parentID'], data['infobox']);
+    final cont =
+        WorkoutController(data['name'], data['parentID'], data['infobox']);
     cont.exercises((data['exercises'] as List)
-        .map((el) => Exercise.fromJson(el))
+        .map((el) => WorkoutExercisable.fromJson(el))
         .toList());
     cont.time(DateTime.fromMillisecondsSinceEpoch(
         data['time'] ?? DateTime.now().millisecondsSinceEpoch));
     return cont;
   }
 
-  RxList<Exercise> exercises = <Exercise>[].obs;
+  RxList<WorkoutExercisable> exercises = <WorkoutExercisable>[].obs;
 
   Workout generateWorkout(String parentID) => Workout(
         name: name.value,

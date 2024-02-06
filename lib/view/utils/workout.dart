@@ -1,4 +1,4 @@
-import 'package:universal_platform/universal_platform.dart';
+import 'package:gymtracker/view/utils/drag_handle.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -28,6 +28,8 @@ class WorkoutExerciseEditor extends StatefulWidget {
   final void Function(Exercise exercise, ExSet set, bool isDone) onSetSetDone;
   final VoidCallback onSetValueChange;
   final void Function(Exercise exercise, String notes) onNotesChange;
+  final bool isInSuperset;
+  final bool createDivider;
 
   const WorkoutExerciseEditor({
     required this.exercise,
@@ -43,6 +45,8 @@ class WorkoutExerciseEditor extends StatefulWidget {
     required this.onSetSetDone,
     required this.onSetValueChange,
     required this.onNotesChange,
+    this.isInSuperset = false,
+    this.createDivider = false,
     super.key,
   });
 
@@ -59,53 +63,47 @@ class _WorkoutExerciseEditorState extends State<WorkoutExerciseEditor> {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8),
-      child: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Row(
-              children: [
-                if (widget.isCreating) ...[
-                  if (UniversalPlatform.isAndroid || UniversalPlatform.isIOS)
-                    ReorderableDelayedDragStartListener(
-                      index: widget.index,
-                      child: const Icon(Icons.drag_handle),
-                    )
-                  else
-                    ReorderableDragStartListener(
-                      index: widget.index,
-                      child: const Icon(Icons.drag_handle),
-                    ),
-                ] else
-                  ExerciseIcon(exercise: widget.exercise),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Text.rich(
-                      TextSpan(children: [
-                        TextSpan(text: widget.exercise.name),
-                        if (widget.exercise.isCustom) ...[
-                          const TextSpan(text: " "),
-                          const WidgetSpan(
-                            baseline: TextBaseline.ideographic,
-                            alignment: PlaceholderAlignment.middle,
-                            child: CustomExerciseBadge(),
+    return Scrollable(
+      viewportBuilder: (BuildContext context, _) => Padding(
+        padding: const EdgeInsets.symmetric(vertical: 8),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Row(
+                children: [
+                  if (widget.isCreating) ...[
+                    DragHandle(index: widget.index),
+                  ] else
+                    ExerciseIcon(exercise: widget.exercise),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Text.rich(
+                        TextSpan(children: [
+                          TextSpan(text: widget.exercise.name),
+                          if (widget.exercise.isCustom) ...[
+                            const TextSpan(text: " "),
+                            const WidgetSpan(
+                              baseline: TextBaseline.ideographic,
+                              alignment: PlaceholderAlignment.middle,
+                              child: CustomExerciseBadge(),
+                            ),
+                          ],
+                        ]),
+                        style: Theme.of(context).textTheme.titleMedium),
+                  ),
+                  PopupMenuButton(
+                    itemBuilder: (context) => <PopupMenuEntry<dynamic>>[
+                      if (!widget.isCreating) ...[
+                        PopupMenuItem(
+                          onTap: widget.onReorder,
+                          child: ListTile(
+                            leading: const Icon(Icons.compare_arrows),
+                            title: Text('ongoingWorkout.exercises.reorder'.t),
                           ),
-                        ],
-                      ]),
-                      style: Theme.of(context).textTheme.titleMedium),
-                ),
-                PopupMenuButton(
-                  itemBuilder: (context) => <PopupMenuEntry<dynamic>>[
-                    if (!widget.isCreating) ...[
-                      PopupMenuItem(
-                        onTap: widget.onReorder,
-                        child: ListTile(
-                          leading: const Icon(Icons.compare_arrows),
-                          title: Text('ongoingWorkout.exercises.reorder'.t),
                         ),
-                      ),
+                      ],
                       PopupMenuItem(
                         onTap: widget.onReplace,
                         child: ListTile(
@@ -114,113 +112,118 @@ class _WorkoutExerciseEditorState extends State<WorkoutExerciseEditor> {
                         ),
                       ),
                       const PopupMenuDivider(),
-                    ],
-                    PopupMenuItem(
-                      onTap: widget.onRemove,
-                      child: ListTile(
-                        textColor: Theme.of(context).colorScheme.error,
-                        iconColor: Theme.of(context).colorScheme.error,
-                        leading: const Icon(Icons.delete),
-                        title: Text('ongoingWorkout.exercises.remove'.t),
+                      PopupMenuItem(
+                        onTap: widget.onRemove,
+                        child: ListTile(
+                          textColor: Theme.of(context).colorScheme.error,
+                          iconColor: Theme.of(context).colorScheme.error,
+                          leading: const Icon(Icons.delete),
+                          title: Text('ongoingWorkout.exercises.remove'.t),
+                        ),
                       ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 8),
-          ListTile(
-            leading: const Icon(Icons.notes),
-            title: Text(
-              widget.exercise.notes.isEmpty
-                  ? "exercise.editor.fields.notes.label".t
-                  : widget.exercise.notes,
-              style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                    fontStyle: widget.exercise.notes.isEmpty
-                        ? FontStyle.italic
-                        : FontStyle.normal,
-                    fontWeight: widget.exercise.notes.isEmpty
-                        ? FontWeight.w600
-                        : FontWeight.normal,
-                    fontSize: widget.exercise.notes.isEmpty ? 15 : null,
+                    ],
                   ),
+                ],
+              ),
             ),
-            trailing: const Icon(Icons.edit),
-            onTap: () {
-              showDialog(
-                context: context,
-                builder: (context) {
-                  return AlertDialog(
-                    contentPadding: const EdgeInsets.all(24),
-                    title: Text('exercise.editor.fields.notes.label'.t),
-                    content: TextField(
-                      controller: notesController,
-                      autofocus: true,
-                      minLines: 4,
-                      maxLines: null,
-                      decoration: InputDecoration(
-                        border: const OutlineInputBorder(),
-                        labelText: "exercise.editor.fields.notes.label".t,
-                      ),
+            const SizedBox(height: 8),
+            ListTile(
+              leading: const Icon(Icons.notes),
+              title: Text(
+                widget.exercise.notes.isEmpty
+                    ? "exercise.editor.fields.notes.label".t
+                    : widget.exercise.notes,
+                style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                      fontStyle: widget.exercise.notes.isEmpty
+                          ? FontStyle.italic
+                          : FontStyle.normal,
+                      fontWeight: widget.exercise.notes.isEmpty
+                          ? FontWeight.w600
+                          : FontWeight.normal,
+                      fontSize: widget.exercise.notes.isEmpty ? 15 : null,
                     ),
-                    actions: [
-                      TextButton(
-                        onPressed: () => Navigator.pop(context),
-                        child: Text(MaterialLocalizations.of(context)
-                            .cancelButtonLabel),
-                      ),
-                      TextButton(
-                        onPressed: () {
-                          widget.onNotesChange(
-                              widget.exercise, notesController.text.trim());
-                          Navigator.pop(context);
-                        },
-                        child: Text(
-                            MaterialLocalizations.of(context).okButtonLabel),
-                      ),
-                    ],
-                  );
-                },
-              );
-            },
-          ),
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: TimeInputField(
-              controller: timeController,
-              decoration: InputDecoration(
-                isDense: true,
-                border: const OutlineInputBorder(),
-                labelText: "exercise.fields.restTime".t,
               ),
-              onChangedTime: (value) =>
-                  widget.onChangeRestTime(value ?? Duration.zero),
+              trailing: const Icon(Icons.edit),
+              onTap: () {
+                showDialog(
+                  context: context,
+                  builder: (context) {
+                    return AlertDialog(
+                      contentPadding: const EdgeInsets.all(24),
+                      title: Text('exercise.editor.fields.notes.label'.t),
+                      content: TextField(
+                        controller: notesController,
+                        autofocus: true,
+                        minLines: 4,
+                        maxLines: null,
+                        decoration: InputDecoration(
+                          border: const OutlineInputBorder(),
+                          labelText: "exercise.editor.fields.notes.label".t,
+                        ),
+                      ),
+                      actions: [
+                        TextButton(
+                          onPressed: () => Navigator.pop(context),
+                          child: Text(MaterialLocalizations.of(context)
+                              .cancelButtonLabel),
+                        ),
+                        TextButton(
+                          onPressed: () {
+                            widget.onNotesChange(
+                                widget.exercise, notesController.text.trim());
+                            Navigator.pop(context);
+                          },
+                          child: Text(
+                              MaterialLocalizations.of(context).okButtonLabel),
+                        ),
+                      ],
+                    );
+                  },
+                );
+              },
             ),
-          ),
-          for (int i = 0; i < widget.exercise.sets.length; i++)
-            WorkoutExerciseSetEditor(
-              key: ValueKey(widget.exercise.sets[i].id),
-              set: widget.exercise.sets[i],
-              exercise: widget.exercise,
-              onDelete: () => widget.onSetRemove(i),
-              alt: i % 2 == 0,
-              isCreating: widget.isCreating,
-              onSetSelectKind: (val) =>
-                  widget.onSetSelectKind(widget.exercise.sets[i], val),
-              onSetSetDone: (val) => widget.onSetSetDone(
-                widget.exercise,
-                widget.exercise.sets[i],
-                val,
+            if (!widget.isInSuperset)
+              Padding(
+                padding: const EdgeInsets.all(16),
+                child: TimeInputField(
+                  controller: timeController,
+                  decoration: InputDecoration(
+                    isDense: true,
+                    border: const OutlineInputBorder(),
+                    labelText: "exercise.fields.restTime".t,
+                  ),
+                  onChangedTime: (value) =>
+                      widget.onChangeRestTime(value ?? Duration.zero),
+                ),
               ),
-              onSetValueChange: widget.onSetValueChange,
+            for (int i = 0; i < widget.exercise.sets.length; i++)
+              WorkoutExerciseSetEditor(
+                key: ValueKey(widget.exercise.sets[i].id),
+                set: widget.exercise.sets[i],
+                exercise: widget.exercise,
+                onDelete: () => widget.onSetRemove(i),
+                alt: i % 2 == 0,
+                isCreating: widget.isCreating,
+                onSetSelectKind: (val) =>
+                    widget.onSetSelectKind(widget.exercise.sets[i], val),
+                onSetSetDone: (val) => widget.onSetSetDone(
+                  widget.exercise,
+                  widget.exercise.sets[i],
+                  val,
+                ),
+                onSetValueChange: widget.onSetValueChange,
+              ),
+            const SizedBox(height: 8),
+            FilledButton.tonal(
+              onPressed: widget.onSetCreate,
+              child: Text('exercise.actions.addSet'.t),
             ),
-          const SizedBox(height: 8),
-          FilledButton.tonal(
-            onPressed: widget.onSetCreate,
-            child: Text('exercise.actions.addSet'.t),
-          ),
-        ],
+            if (widget.createDivider) ...[
+              const SizedBox(height: 8),
+              const Divider(),
+            ],
+          ],
+        ),
       ),
     );
   }
@@ -369,14 +372,14 @@ class _WorkoutExerciseSetEditorState extends State<WorkoutExerciseSetEditor> {
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     final defaultColor = widget.alt
-        ? scheme.background
+        ? scheme.background.withOpacity(0)
         : ElevationOverlay.applySurfaceTint(
             scheme.surface,
             scheme.surfaceTint,
             0.7,
           );
     return Slidable(
-      key: ValueKey(widget.set.id),
+      key: ValueKey("${widget.exercise.id}${widget.set.id}"),
       endActionPane: ActionPane(
         extentRatio: 1 / 3,
         dragDismissible: false,
@@ -418,6 +421,7 @@ class _WorkoutExerciseSetEditorState extends State<WorkoutExerciseSetEditor> {
                     for (final kind in SetKind.values)
                       PopupMenuItem(
                         value: kind,
+                        onTap: () => widget.onSetSelectKind(kind),
                         child: ListTile(
                           leading: buildSetType(
                             context,
@@ -428,47 +432,58 @@ class _WorkoutExerciseSetEditorState extends State<WorkoutExerciseSetEditor> {
                           title: Text('set.kindLong.${kind.name}'.t),
                         ),
                       ),
-                    // TODO: (?) button with explanations for each kind
+                    const PopupMenuDivider(),
+                    PopupMenuItem(
+                      onTap: () {
+                        showDialog(
+                          context: context,
+                          builder: (context) {
+                            return AlertDialog(
+                              title: Text('set.kinds.help.title'.t),
+                              scrollable: true,
+                              content: Column(
+                                children: [
+                                  for (final kind in SetKind.values)
+                                    ListTile(
+                                      leading: buildSetType(
+                                        context,
+                                        kind,
+                                        set: widget.set,
+                                        allSets: widget.exercise.sets,
+                                        fontSize: 16,
+                                      ),
+                                      title:
+                                          Text('set.kindLong.${kind.name}'.t),
+                                      subtitle:
+                                          Text('set.kinds.help.${kind.name}'.t),
+                                    ),
+                                ],
+                              ),
+                              actions: [
+                                TextButton(
+                                  onPressed: () {
+                                    Navigator.pop(context);
+                                  },
+                                  child: Text(MaterialLocalizations.of(context)
+                                      .okButtonLabel),
+                                ),
+                              ],
+                            );
+                          },
+                        );
+                      },
+                      child: ListTile(
+                        leading: Text(
+                          "?",
+                          style: TextStyle(
+                            color: scheme.primary,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        title: Text('set.kinds.help.title'.t),
+                      ),
+                    ),
                   ],
-                  /* itemBuilder: (context) => <PopupMenuEntry<SetKind>>[
-                    PopupMenuItem(
-                      value: SetKind.normal,
-                      child: ListTile(
-                        leading: buildSetType(
-                          context,
-                          SetKind.normal,
-                          set: widget.set,
-                          allSets: widget.exercise.sets,
-                        ),
-                        title: Text('set.kindLong.normal'.t),
-                      ),
-                    ),
-                    PopupMenuItem(
-                      value: SetKind.warmUp,
-                      child: ListTile(
-                        leading: buildSetType(
-                          context,
-                          SetKind.warmUp,
-                          set: widget.set,
-                          allSets: widget.exercise.sets,
-                        ),
-                        title: Text('set.kindLong.warmUp'.t),
-                      ),
-                    ),
-                    PopupMenuItem(
-                      value: SetKind.drop,
-                      child: ListTile(
-                        leading: buildSetType(
-                          context,
-                          SetKind.drop,
-                          set: widget.set,
-                          allSets: widget.exercise.sets,
-                        ),
-                        title: Text('set.kindLong.drop'.t),
-                      ),
-                    ),
-                  ], */
-                  onSelected: widget.onSetSelectKind,
                 ),
                 const SizedBox(width: 8),
                 for (int i = 0; i < fields.length; i++) ...[

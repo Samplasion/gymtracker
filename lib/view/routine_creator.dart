@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:get/get.dart';
+import 'package:gymtracker/model/exercisable.dart';
+import 'package:gymtracker/model/superset.dart';
 import 'package:gymtracker/service/localizations.dart';
+import 'package:gymtracker/view/utils/superset.dart';
 
 import '../controller/workouts_controller.dart';
 import '../model/exercise.dart';
@@ -26,7 +30,7 @@ extension _Unwrap<T> on RxList<_DateWrapped<T>> {
 }
 
 class _RoutineCreatorController extends GetxController {
-  final exercises = <_DateWrapped<Exercise>>[].obs;
+  final exercises = <_DateWrapped<WorkoutExercisable>>[].obs;
 }
 
 // ignore: library_private_types_in_public_api
@@ -45,7 +49,8 @@ class RoutineCreator extends StatefulWidget {
 class _RoutineCreatorState extends State<RoutineCreator> {
   final formKey = GlobalKey<FormState>();
   late final titleController = TextEditingController(text: widget.base?.name);
-  late final infoboxController = TextEditingController(text: widget.base?.infobox);
+  late final infoboxController =
+      TextEditingController(text: widget.base?.infobox);
 
   WorkoutsController get workoutsController => Get.find<WorkoutsController>();
 
@@ -137,6 +142,26 @@ class _RoutineCreatorState extends State<RoutineCreator> {
                 });
               },
             ),
+            ListTile(
+              title: Text("routines.editor.superset.add".t),
+              leading: const CircleAvatar(child: Icon(Icons.add_rounded)),
+              onTap: () {
+                Go.to<List<Exercise>>(() => const ExercisePicker(
+                      singlePick: false,
+                    )).then((result) {
+                  result ??= [];
+                  setState(() {
+                    // controller.exercises.addAll(result!.wrap());
+                    controller.exercises.add(_DateWrapped(
+                      Superset(
+                        restTime: Duration.zero,
+                        exercises: result!,
+                      ),
+                    ));
+                  });
+                });
+              },
+            ),
             Obx(
               () => ReorderableListView(
                 buildDefaultDragHandles: false,
@@ -144,49 +169,7 @@ class _RoutineCreatorState extends State<RoutineCreator> {
                 physics: const NeverScrollableScrollPhysics(),
                 children: [
                   for (int i = 0; i < controller.exercises.length; i++) ...[
-                    WorkoutExerciseEditor(
-                      key: ValueKey(
-                          "${controller.exercises[i].data.name}${controller.exercises[i].date}"),
-                      exercise: controller.exercises[i].data,
-                      index: i,
-                      isCreating: true,
-                      onReorder: () {},
-                      onReplace: () {},
-                      onRemove: () {
-                        controller.exercises.removeAt(i);
-                        controller.exercises.refresh();
-                      },
-                      onChangeRestTime: (value) {
-                        controller.exercises[i].data.restTime = value;
-                        controller.exercises.refresh();
-                      },
-                      onSetCreate: () {
-                        final ex = controller.exercises[i];
-                        controller.exercises[i].data.sets.add(
-                          ExSet.empty(
-                            kind: SetKind.normal,
-                            parameters: ex.data.parameters,
-                          ),
-                        );
-                        controller.exercises.refresh();
-                      },
-                      onSetRemove: (int index) {
-                        setState(() {
-                          controller.exercises[i].data.sets.removeAt(index);
-                          controller.exercises.refresh();
-                        });
-                      },
-                      onSetSelectKind: (set, kind) {
-                        set.kind = kind;
-                        controller.exercises.refresh();
-                      },
-                      onSetSetDone: (ex, set, done) {},
-                      onSetValueChange: () {},
-                      onNotesChange: (ex, notes) {
-                        ex.notes = notes;
-                        controller.exercises.refresh();
-                      },
-                    ),
+                    exerciseEntry(i),
                   ],
                 ],
                 onReorder: (oldIndex, newIndex) {
@@ -199,6 +182,185 @@ class _RoutineCreatorState extends State<RoutineCreator> {
         ),
       ),
     );
+  }
+
+  Widget exerciseEntry(int i) {
+    if (controller.exercises[i].data is Exercise) {
+      return WorkoutExerciseEditor(
+        key: ValueKey(
+            "${(controller.exercises[i].data as Exercise).name}${controller.exercises[i].date}"),
+        exercise: (controller.exercises[i].data as Exercise),
+        index: i,
+        isCreating: true,
+        onReorder: () {},
+        onReplace: () {
+          SchedulerBinding.instance.addPostFrameCallback((timeStamp) async {
+            final ex = await Go.to<List<Exercise>>(
+                () => const ExercisePicker(singlePick: true));
+            if (ex == null || ex.isEmpty) return;
+            controller.exercises[i].data = ex.first.copyWith.sets([
+              ExSet.empty(
+                kind: SetKind.normal,
+                parameters: ex.first.parameters,
+              ),
+            ]);
+            controller.exercises.refresh();
+          });
+        },
+        onRemove: () {
+          controller.exercises.removeAt(i);
+          controller.exercises.refresh();
+        },
+        onChangeRestTime: (value) {
+          (controller.exercises[i].data as Exercise).restTime = value;
+          controller.exercises.refresh();
+        },
+        onSetCreate: () {
+          final ex = controller.exercises[i];
+          controller.exercises[i].data.sets.add(
+            ExSet.empty(
+              kind: SetKind.normal,
+              parameters: (ex.data as Exercise).parameters,
+            ),
+          );
+          controller.exercises.refresh();
+        },
+        onSetRemove: (int index) {
+          setState(() {
+            controller.exercises[i].data.sets.removeAt(index);
+            controller.exercises.refresh();
+          });
+        },
+        onSetSelectKind: (set, kind) {
+          set.kind = kind;
+          controller.exercises.refresh();
+        },
+        onSetSetDone: (ex, set, done) {},
+        onSetValueChange: () {},
+        onNotesChange: (ex, notes) {
+          ex.notes = notes;
+          controller.exercises.refresh();
+        },
+      );
+    } else {
+      return SupersetEditor(
+        key: ValueKey(
+            "superset-${(controller.exercises[i].data as Superset).id}${controller.exercises[i].date}"),
+        superset: controller.exercises[i].data as Superset,
+        index: i,
+        isCreating: true,
+        onSupersetReorder: () {},
+        onSupersetReplace: () {
+          SchedulerBinding.instance.addPostFrameCallback((timeStamp) async {
+            final ex = await Go.to<List<Exercise>>(
+                () => const ExercisePicker(singlePick: true));
+            if (ex == null || ex.isEmpty) return;
+            controller.exercises[i].data = ex.first.copyWith.sets([
+              ExSet.empty(
+                kind: SetKind.normal,
+                parameters: ex.first.parameters,
+              ),
+            ]);
+            controller.exercises.refresh();
+          });
+        },
+        onSupersetRemove: () {
+          controller.exercises.removeAt(i);
+          controller.exercises.refresh();
+        },
+        onSupersetChangeRestTime: (value) {
+          (controller.exercises[i].data as Superset).restTime = value;
+          controller.exercises.refresh();
+        },
+        onNotesChange: (superset, notes) {
+          superset.notes = notes;
+          controller.exercises.refresh();
+        },
+        onExerciseRemove: (int index) {
+          setState(() {
+            (controller.exercises[i].data as Superset)
+                .exercises
+                .removeAt(index);
+            controller.exercises.refresh();
+          });
+        },
+        onExerciseAdd: () async {
+          final exercises = await Go.to<List<Exercise>>(
+              () => const ExercisePicker(singlePick: false));
+          if (exercises == null) return;
+          (controller.exercises[i].data as Superset).exercises.addAll(
+                exercises.map(
+                  (ex) => ex.copyWith.sets([
+                    ExSet.empty(
+                      kind: SetKind.normal,
+                      parameters: ex.parameters,
+                    ),
+                  ]),
+                ),
+              );
+          controller.exercises.refresh();
+        },
+        onExerciseReorder: (_) {},
+        onExerciseReorderIndexed: (a, b) {
+          _reorder(
+            (controller.exercises[i].data as Superset).exercises,
+            a,
+            b,
+          );
+          controller.exercises.refresh();
+        },
+        onExerciseReplace: (j) {
+          SchedulerBinding.instance.addPostFrameCallback((timeStamp) async {
+            final ex = await Go.to<List<Exercise>>(
+                () => const ExercisePicker(singlePick: true));
+            if (ex == null || ex.isEmpty) return;
+            (controller.exercises[i].data as Superset).exercises[j] =
+                ex.first.copyWith.sets([
+              ExSet.empty(
+                kind: SetKind.normal,
+                parameters: ex.first.parameters,
+              ),
+            ]);
+            controller.exercises.refresh();
+          });
+        },
+        onExerciseChangeRestTime: (int index, Duration value) {
+          (controller.exercises[i].data as Superset).exercises[index].restTime =
+              value;
+          controller.exercises.refresh();
+        },
+        onExerciseSetCreate: (int index) {
+          final ex =
+              (controller.exercises[i].data as Superset).exercises[index];
+          (controller.exercises[i].data as Superset).exercises[index].sets.add(
+                ExSet.empty(
+                  kind: SetKind.normal,
+                  parameters: ex.parameters,
+                ),
+              );
+          controller.exercises.refresh();
+        },
+        onExerciseSetRemove: (int index, int setIndex) {
+          setState(() {
+            (controller.exercises[i].data as Superset)
+                .exercises[index]
+                .sets
+                .removeAt(setIndex);
+            controller.exercises.refresh();
+          });
+        },
+        onExerciseSetSelectKind: (int index, set, kind) {
+          set.kind = kind;
+          controller.exercises.refresh();
+        },
+        onExerciseSetSetDone: (ex, set, done) {},
+        onExerciseSetValueChange: () {},
+        onExerciseNotesChange: (ex, notes) {
+          ex.notes = notes;
+          controller.exercises.refresh();
+        },
+      );
+    }
   }
 
   void _reorder<T>(List<T> list, int oldIndex, int newIndex) {
@@ -218,7 +380,9 @@ class _RoutineCreatorState extends State<RoutineCreator> {
         workoutsController.submitRoutine(
           name: titleController.text,
           exercises: controller.exercises.unwrap(),
-          infobox: infoboxController.text.trim().isEmpty ? null : infoboxController.text,
+          infobox: infoboxController.text.trim().isEmpty
+              ? null
+              : infoboxController.text,
         );
       } else {
         Get.back(
@@ -226,7 +390,9 @@ class _RoutineCreatorState extends State<RoutineCreator> {
             name: titleController.text,
             exercises: controller.exercises.unwrap(),
             id: widget.base!.id,
-            infobox: infoboxController.text.trim().isEmpty ? null : infoboxController.text,
+            infobox: infoboxController.text.trim().isEmpty
+                ? null
+                : infoboxController.text,
           ),
         );
       }

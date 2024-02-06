@@ -542,50 +542,52 @@ class ExerciseDataView extends StatelessWidget {
             children: [
               ExerciseIcon(exercise: exercise),
               const SizedBox(width: 16),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text.rich(
-                    TextSpan(
-                      children: [
-                        TextSpan(text: exercise.displayName),
-                        if (exercise.isCustom) ...[
-                          const TextSpan(text: " "),
-                          const WidgetSpan(
-                            baseline: TextBaseline.ideographic,
-                            alignment: PlaceholderAlignment.middle,
-                            child: CustomExerciseBadge(),
-                          ),
-                        ],
-                      ],
-                    ),
-                    style: Theme.of(context).textTheme.titleMedium,
-                  ),
-                  if (!isInSuperset)
-                    TimerView.buildTimeString(
-                      context,
-                      workout.exercises[index].restTime,
-                      builder: (time) => Text.rich(
-                        TextSpan(
-                          children: [
-                            TextSpan(text: "exerciseList.restTime".t),
-                            time
+              Flexible(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text.rich(
+                      TextSpan(
+                        children: [
+                          TextSpan(text: exercise.displayName),
+                          if (exercise.isCustom) ...[
+                            const TextSpan(text: " "),
+                            const WidgetSpan(
+                              baseline: TextBaseline.ideographic,
+                              alignment: PlaceholderAlignment.middle,
+                              child: CustomExerciseBadge(),
+                            ),
                           ],
-                          style: Theme.of(context)
-                              .textTheme
-                              .labelMedium!
-                              .copyWith(
-                                color: Theme.of(context).colorScheme.primary,
-                              ),
-                        ),
+                        ],
                       ),
-                      style: const TextStyle(),
+                      style: Theme.of(context).textTheme.titleMedium,
                     ),
-                  if (kDebugMode) ...[
-                    Text(exercise.id),
-                    Text("parent: ${exercise.parentID}"),
+                    if (!isInSuperset)
+                      TimerView.buildTimeString(
+                        context,
+                        workout.exercises[index].restTime,
+                        builder: (time) => Text.rich(
+                          TextSpan(
+                            children: [
+                              TextSpan(text: "exerciseList.restTime".t),
+                              time
+                            ],
+                            style: Theme.of(context)
+                                .textTheme
+                                .labelMedium!
+                                .copyWith(
+                                  color: Theme.of(context).colorScheme.primary,
+                                ),
+                          ),
+                        ),
+                        style: const TextStyle(),
+                      ),
+                    if (kDebugMode) ...[
+                      Text(exercise.id),
+                      Text("parent: ${exercise.parentID}"),
+                    ],
                   ],
-                ],
+                ),
               ),
             ],
           ),

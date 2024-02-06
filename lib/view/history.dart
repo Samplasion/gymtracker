@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_sticky_header/flutter_sticky_header.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 
@@ -10,29 +11,83 @@ import 'exercises.dart';
 import 'utils/exercise.dart';
 import 'utils/timer.dart';
 
+typedef MonthYear = (int month, int year);
+
 class HistoryView extends StatelessWidget {
   const HistoryView({super.key});
 
+  Map<MonthYear, List<Workout>> get historyByMonth {
+    final controller = Get.find<HistoryController>();
+    final history = controller.history.reversed;
+    final map = <MonthYear, List<Workout>>{};
+    for (final workout in history) {
+      final key = (
+        workout.startingDate!.month,
+        workout.startingDate!.year,
+      );
+      if (!map.containsKey(key)) {
+        map[key] = [];
+      }
+      map[key]!.add(workout);
+    }
+    return map;
+  }
+
   @override
   Widget build(BuildContext context) {
-    final controller = Get.find<HistoryController>();
     return Scaffold(
       body: Obx(
-        () => CustomScrollView(
-          slivers: [
-            SliverAppBar.large(
-              title: Text("history.title".t),
-            ),
-            SliverList.builder(
-              itemCount: controller.history.length,
-              itemBuilder: (context, index) {
-                final workout =
-                    controller.history[controller.history.length - index - 1];
-                return HistoryWorkout(workout: workout);
-              },
-            ),
-          ],
+        () {
+          final history = historyByMonth;
+          return CustomScrollView(
+            slivers: [
+              SliverAppBar.large(
+                title: Text("history.title".t),
+              ),
+              for (final date in history.keys) ...[
+                SliverStickyHeader.builder(
+                  builder: (context, state) =>
+                      _buildHeader(context, state, date),
+                  sliver: SliverList(
+                    delegate: SliverChildBuilderDelegate(
+                      childCount: (history[date] ?? []).length,
+                      (context, index) {
+                        return HistoryWorkout(
+                            workout: (history[date] ?? [])[index]);
+                      },
+                    ),
+                  ),
+                ),
+              ],
+            ],
+          );
+        },
+      ),
+    );
+  }
+
+  _buildHeader(
+    BuildContext context,
+    SliverStickyHeaderState state,
+    MonthYear date,
+  ) {
+    final elevatedAppBarColor = ElevationOverlay.applySurfaceTint(
+      Theme.of(context).colorScheme.surface,
+      Theme.of(context).colorScheme.surfaceTint,
+      3,
+    );
+    return Container(
+      height: 60,
+      color: state.isPinned
+          ? elevatedAppBarColor
+          : Theme.of(context).colorScheme.background,
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      alignment: Alignment.centerLeft,
+      child: Text(
+        DateFormat.yMMMM(context.locale.languageCode).format(
+          DateTime(date.$2, date.$1),
         ),
+        style: Theme.of(context).textTheme.titleMedium,
       ),
     );
   }

@@ -178,9 +178,8 @@ class ExerciseListTile extends StatelessWidget {
           return [...previousValue, (element, 1)];
         }
         return [
-          ...previousValue
-            ..removeLast()
-            ..add((element, previousValue.last.$2 + 1))
+          ...previousValue.sublist(0, previousValue.length - 1),
+          (element, previousValue.last.$2 + 1)
         ];
       }).map((e) {
         if (e.$2 == 1 &&

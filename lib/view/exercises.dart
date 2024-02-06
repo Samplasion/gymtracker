@@ -622,46 +622,44 @@ class ExerciseDataView extends StatelessWidget {
               children: [
                 ExerciseIcon(exercise: superset),
                 const SizedBox(width: 16),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Text(
-                    //   exercise.displayName,
-
-                    // ),
-                    Text.rich(
-                      TextSpan(
-                        children: [
-                          TextSpan(
-                              text:
-                                  "superset".plural(superset.exercises.length)),
-                        ],
-                      ),
-                      style: Theme.of(context).textTheme.titleMedium,
-                    ),
-                    TimerView.buildTimeString(
-                      context,
-                      workout.exercises[index].restTime,
-                      builder: (time) => Text.rich(
+                Flexible(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text.rich(
                         TextSpan(
                           children: [
-                            TextSpan(text: "exerciseList.restTime".t),
-                            time
+                            TextSpan(
+                                text: "superset"
+                                    .plural(superset.exercises.length)),
                           ],
-                          style: Theme.of(context)
-                              .textTheme
-                              .labelMedium!
-                              .copyWith(
-                                color: Theme.of(context).colorScheme.primary,
-                              ),
                         ),
+                        style: Theme.of(context).textTheme.titleMedium,
                       ),
-                      style: const TextStyle(),
-                    ),
-                    if (kDebugMode) ...[
-                      Text(superset.id),
+                      TimerView.buildTimeString(
+                        context,
+                        workout.exercises[index].restTime,
+                        builder: (time) => Text.rich(
+                          TextSpan(
+                            children: [
+                              TextSpan(text: "exerciseList.restTime".t),
+                              time
+                            ],
+                            style: Theme.of(context)
+                                .textTheme
+                                .labelMedium!
+                                .copyWith(
+                                  color: Theme.of(context).colorScheme.primary,
+                                ),
+                          ),
+                        ),
+                        style: const TextStyle(),
+                      ),
+                      if (kDebugMode) ...[
+                        Text(superset.id),
+                      ],
                     ],
-                  ],
+                  ),
                 ),
               ],
             ),

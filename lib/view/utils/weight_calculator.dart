@@ -50,250 +50,245 @@ class _WeightCalculatorState extends State<WeightCalculator>
             barbellWeight: barbellWeight,
           );
 
-          return SizedBox(
-            height: 420,
-            child: Column(
-              children: [
-                Container(
-                  alignment: Alignment.centerLeft,
-                  height: kToolbarHeight,
-                  padding: const EdgeInsets.only(left: 16),
-                  child: Text(
-                    "ongoingWorkout.weightCalculator".t,
-                    style: context.textTheme.titleLarge,
-                  ),
+          return Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                alignment: Alignment.centerLeft,
+                height: kToolbarHeight,
+                padding: const EdgeInsets.only(left: 16),
+                child: Text(
+                  "ongoingWorkout.weightCalculator".t,
+                  style: context.textTheme.titleLarge,
                 ),
-                const Divider(height: 1),
-                Expanded(
-                  child: ListView(
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.all(16),
-                        child: TextField(
-                          controller: _weightController,
-                          keyboardType: const TextInputType.numberWithOptions(
-                            decimal: true,
-                            signed: true,
-                          ),
-                          inputFormatters: [
-                            FilteringTextInputFormatter.allow(
-                              RegExp(
-                                r'^\d+[\.,]?\d*',
+              ),
+              const Divider(height: 1),
+              Flexible(
+                fit: FlexFit.loose,
+                child: ListView(
+                  shrinkWrap: true,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: TextField(
+                        controller: _weightController,
+                        keyboardType: const TextInputType.numberWithOptions(
+                          decimal: true,
+                          signed: true,
+                        ),
+                        inputFormatters: [
+                          FilteringTextInputFormatter.allow(
+                            RegExp(
+                              r'^\d+[\.,]?\d*',
+                            ),
+                          )
+                        ],
+                        decoration: InputDecoration(
+                          labelText: 'weightCalculator.weight.label'.t,
+                          border: const OutlineInputBorder(),
+                        ),
+                        onChanged: (value) {
+                          setState(() {});
+                        },
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: Text(
+                        "weightCalculator.weights.label".t,
+                        style: context.textTheme.bodyMedium,
+                      ),
+                    ),
+                    SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: Row(
+                        children: [
+                          const SizedBox(width: 8),
+                          for (final weight in format.weights.reversed)
+                            Padding(
+                              padding: const EdgeInsets.all(8),
+                              child: FilterChip(
+                                label: Text(stringifyDouble(weight)),
+                                selected: selectedWeights.contains(weight),
+                                onSelected: (selected) {
+                                  setState(() {
+                                    if (selected) {
+                                      selectedWeights.add(weight);
+                                    } else {
+                                      selectedWeights.remove(weight);
+                                    }
+                                  });
+                                },
                               ),
-                            )
-                          ],
-                          decoration: InputDecoration(
-                            labelText: 'weightCalculator.weight.label'.t,
-                            border: const OutlineInputBorder(),
-                          ),
-                          onChanged: (value) {
-                            setState(() {});
-                          },
-                        ),
+                            ),
+                          const SizedBox(width: 8),
+                        ],
                       ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
-                        child: Text(
-                          "weightCalculator.weights.label".t,
-                          style: context.textTheme.bodyMedium,
-                        ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: Text(
+                        "weightCalculator.barbells.label".t,
+                        style: context.textTheme.bodyMedium,
                       ),
-                      SingleChildScrollView(
-                        scrollDirection: Axis.horizontal,
-                        child: Row(
-                          children: [
-                            const SizedBox(width: 8),
-                            for (final weight in format.weights.reversed)
-                              Padding(
-                                padding: const EdgeInsets.all(8),
-                                child: FilterChip(
-                                  label: Text(stringifyDouble(weight)),
-                                  selected: selectedWeights.contains(weight),
-                                  onSelected: (selected) {
-                                    setState(() {
-                                      if (selected) {
-                                        selectedWeights.add(weight);
-                                      } else {
-                                        selectedWeights.remove(weight);
+                    ),
+                    SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: Row(
+                        children: [
+                          const SizedBox(width: 8),
+                          for (final barbell in Bars.values)
+                            Padding(
+                              padding: const EdgeInsets.all(8),
+                              child: ChoiceChip(
+                                label: Text.rich(TextSpan(children: [
+                                  TextSpan(text: "barbells.${barbell.name}".t),
+                                  TextSpan(
+                                    text: () {
+                                      switch (format) {
+                                        case Weights.kg:
+                                          return " (${stringifyDouble(barbell.weightKg)} kg)";
+                                        case Weights.lb:
+                                          return " (${stringifyDouble(barbell.weightLb)} lb)";
                                       }
-                                    });
-                                  },
-                                ),
+                                    }(),
+                                    style:
+                                        Theme.of(context).textTheme.bodySmall,
+                                  ),
+                                ])),
+                                selected: selectedBarbell == barbell,
+                                onSelected: (selected) {
+                                  setState(() {
+                                    selectedBarbell = barbell;
+                                  });
+                                },
                               ),
-                            const SizedBox(width: 8),
-                          ],
-                        ),
+                            ),
+                          const SizedBox(width: 8),
+                        ],
                       ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
-                        child: Text(
-                          "weightCalculator.barbells.label".t,
-                          style: context.textTheme.bodyMedium,
-                        ),
-                      ),
-                      SingleChildScrollView(
+                    ),
+                    const SizedBox(height: 24),
+                    Center(
+                      child: SingleChildScrollView(
                         scrollDirection: Axis.horizontal,
                         child: Row(
                           children: [
                             const SizedBox(width: 8),
-                            for (final barbell in Bars.values)
-                              Padding(
-                                padding: const EdgeInsets.all(8),
-                                child: ChoiceChip(
-                                  label: Text.rich(TextSpan(children: [
-                                    TextSpan(
-                                        text: "barbells.${barbell.name}".t),
-                                    TextSpan(
-                                      text: () {
-                                        switch (format) {
-                                          case Weights.kg:
-                                            return " (${stringifyDouble(barbell.weightKg)} kg)";
-                                          case Weights.lb:
-                                            return " (${stringifyDouble(barbell.weightLb)} lb)";
-                                        }
-                                      }(),
-                                      style:
-                                          Theme.of(context).textTheme.bodySmall,
-                                    ),
-                                  ])),
-                                  selected: selectedBarbell == barbell,
-                                  onSelected: (selected) {
-                                    setState(() {
-                                      selectedBarbell = barbell;
-                                    });
-                                  },
+                            Container(
+                              height: 20,
+                              padding:
+                                  const EdgeInsets.only(left: 16, right: 12),
+                              alignment: Alignment.center,
+                              decoration: BoxDecoration(
+                                color: Theme.of(context).colorScheme.secondary,
+                                borderRadius: const BorderRadius.horizontal(
+                                  left: Radius.circular(8),
+                                  // right: Radius.circular(3),
                                 ),
                               ),
-                            const SizedBox(width: 8),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 24),
-                      Center(
-                        child: SingleChildScrollView(
-                          scrollDirection: Axis.horizontal,
-                          child: Row(
-                            children: [
-                              const SizedBox(width: 8),
+                              child: Center(
+                                child: Text(
+                                  stringifyDouble(barbellWeight),
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .bodySmall!
+                                      .copyWith(
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .onSecondary,
+                                      ),
+                                ),
+                              ),
+                            ),
+                            Container(
+                              height: 28,
+                              width: 12,
+                              decoration: BoxDecoration(
+                                color: Theme.of(context).colorScheme.secondary,
+                                borderRadius: const BorderRadius.horizontal(
+                                  left: Radius.circular(5),
+                                  right: Radius.circular(3),
+                                ),
+                              ),
+                            ),
+                            for (final weight in weights) ...[
+                              const SizedBox(width: 2),
                               Container(
-                                height: 20,
-                                padding:
-                                    const EdgeInsets.only(left: 16, right: 12),
-                                alignment: Alignment.center,
+                                height: mapRange(weight, format.weights.min,
+                                    format.weights.max, 32, 64),
+                                constraints: const BoxConstraints(
+                                  maxWidth: 40,
+                                ),
+                                padding: const EdgeInsets.all(4),
                                 decoration: BoxDecoration(
-                                  color:
-                                      Theme.of(context).colorScheme.secondary,
-                                  borderRadius: const BorderRadius.horizontal(
-                                    left: Radius.circular(8),
-                                    // right: Radius.circular(3),
-                                  ),
+                                  color: Theme.of(context).colorScheme.tertiary,
+                                  borderRadius: BorderRadius.circular(8),
                                 ),
                                 child: Center(
                                   child: Text(
-                                    stringifyDouble(barbellWeight),
+                                    stringifyDouble(weight),
                                     style: Theme.of(context)
                                         .textTheme
                                         .bodySmall!
                                         .copyWith(
                                           color: Theme.of(context)
                                               .colorScheme
-                                              .onSecondary,
+                                              .onTertiary,
                                         ),
                                   ),
                                 ),
                               ),
-                              Container(
-                                height: 28,
-                                width: 12,
-                                decoration: BoxDecoration(
-                                  color:
-                                      Theme.of(context).colorScheme.secondary,
-                                  borderRadius: const BorderRadius.horizontal(
-                                    left: Radius.circular(5),
-                                    right: Radius.circular(3),
-                                  ),
-                                ),
-                              ),
-                              for (final weight in weights) ...[
-                                const SizedBox(width: 2),
-                                Container(
-                                  height: mapRange(weight, format.weights.min,
-                                      format.weights.max, 32, 64),
-                                  constraints: const BoxConstraints(
-                                    maxWidth: 40,
-                                  ),
-                                  padding: const EdgeInsets.all(4),
-                                  decoration: BoxDecoration(
-                                    color:
-                                        Theme.of(context).colorScheme.tertiary,
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                  child: Center(
-                                    child: Text(
-                                      stringifyDouble(weight),
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .bodySmall!
-                                          .copyWith(
-                                            color: Theme.of(context)
-                                                .colorScheme
-                                                .onTertiary,
-                                          ),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                              const SizedBox(width: 2),
-                              Container(
-                                height: 20,
-                                width: 12,
-                                decoration: BoxDecoration(
-                                  color:
-                                      Theme.of(context).colorScheme.secondary,
-                                  borderRadius: const BorderRadius.horizontal(
-                                    left: Radius.circular(3),
-                                    right: Radius.circular(8),
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(width: 8),
                             ],
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 24),
-                    ],
-                  ),
-                ),
-                const Divider(height: 1),
-                Row(
-                  children: [
-                    Expanded(
-                      child: Padding(
-                        padding: const EdgeInsets.only(
-                          top: 8,
-                          bottom: 8,
-                          left: 16,
-                          right: 16,
-                        ),
-                        child: Wrap(
-                          alignment: WrapAlignment.end,
-                          children: [
-                            TextButton.icon(
-                              onPressed: () {
-                                Navigator.pop(context);
-                              },
-                              label: Text("general.dialogs.actions.ok".t),
-                              icon: const Icon(Icons.done),
+                            const SizedBox(width: 2),
+                            Container(
+                              height: 20,
+                              width: 12,
+                              decoration: BoxDecoration(
+                                color: Theme.of(context).colorScheme.secondary,
+                                borderRadius: const BorderRadius.horizontal(
+                                  left: Radius.circular(3),
+                                  right: Radius.circular(8),
+                                ),
+                              ),
                             ),
+                            const SizedBox(width: 8),
                           ],
                         ),
                       ),
                     ),
+                    const SizedBox(height: 24),
                   ],
-                )
-              ],
-            ),
+                ),
+              ),
+              const Divider(height: 1),
+              Row(
+                children: [
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.only(
+                        top: 8,
+                        bottom: 8,
+                        left: 16,
+                        right: 16,
+                      ),
+                      child: Wrap(
+                        alignment: WrapAlignment.end,
+                        children: [
+                          TextButton.icon(
+                            onPressed: () {
+                              Navigator.pop(context);
+                            },
+                            label: Text("general.dialogs.actions.ok".t),
+                            icon: const Icon(Icons.done),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              )
+            ],
           );
         },
       ),

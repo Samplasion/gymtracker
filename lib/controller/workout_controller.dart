@@ -164,9 +164,18 @@ class WorkoutController extends GetxController with ServiceableController {
   }
 
   void removeRelevantStopwatches() {
-    final controller = Get.find<StopwatchController>();
     final ids = allSets.map((e) => e.id);
-    controller.removeStopwatches(ids);
+    final controller = Get.find<StopwatchController>();
+
+    for (final id in ids) {
+      controller.updateBinding(id, (timer, duration, encoded) {
+        // no-op
+      });
+    }
+
+    SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
+      controller.removeStopwatches(ids);
+    });
   }
 
   @override

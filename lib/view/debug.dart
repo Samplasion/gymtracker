@@ -4,8 +4,10 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:gymtracker/controller/debug_controller.dart';
 import 'package:gymtracker/controller/history_controller.dart';
+import 'package:gymtracker/controller/stopwatch_controller.dart';
 import 'package:gymtracker/service/database.dart';
 import 'package:gymtracker/utils/go.dart';
+import 'package:gymtracker/view/utils/timer.dart';
 
 class DebugView extends StatelessWidget {
   const DebugView({super.key});
@@ -53,7 +55,31 @@ class DebugView extends StatelessWidget {
 
                   Go.snack("Fixed ${db.workoutHistory.length} workouts");
                 },
-              )
+              ),
+              ListTile(
+                title: Text(
+                  "Running stopwatches",
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.secondary,
+                  ),
+                ),
+              ),
+              Obx(() {
+                return Column(
+                  children: [
+                    for (final entry
+                        in Get.find<StopwatchController>().stopwatches.entries)
+                      TimerView(
+                        builder: (ctx, _) => ListTile(
+                          title: Text(entry.key),
+                          subtitle: Text(
+                              "Running: ${entry.value.timer.isActive}, Current time: ${entry.value.currentTime}"),
+                        ),
+                        startingTime: DateTime.now(),
+                      ),
+                  ],
+                );
+              }),
             ]),
           ),
         ],

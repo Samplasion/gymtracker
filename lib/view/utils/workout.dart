@@ -290,6 +290,7 @@ class _WorkoutExerciseSetEditorState extends State<WorkoutExerciseSetEditor> {
       );
   Widget get timeField => TimeInputField(
         timerInteractive: !widget.isCreating,
+        setID: widget.set.id,
         controller: timeController,
         decoration: InputDecoration(
           isDense: true,

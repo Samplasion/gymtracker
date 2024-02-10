@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:get/get.dart';
+import 'package:gymtracker/controller/stopwatch_controller.dart';
 import 'package:gymtracker/model/exercisable.dart';
 import 'package:gymtracker/service/localizations.dart';
 
@@ -72,6 +73,7 @@ class WorkoutController extends GetxController with ServiceableController {
   void onClose() {
     super.onClose();
     removeCountdown();
+    removeRelevantStopwatches();
     SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
       Get.find<WorkoutsController>().hasOngoingWorkout(false);
       service.deleteOngoing();
@@ -135,6 +137,7 @@ class WorkoutController extends GetxController with ServiceableController {
 
   void sumbit(String name, Duration duration) {
     removeCountdown();
+    removeRelevantStopwatches();
 
     final workout = Workout(
       name: name,
@@ -158,6 +161,12 @@ class WorkoutController extends GetxController with ServiceableController {
 
   void removeCountdown() {
     Get.find<CountdownController>().removeCountdown();
+  }
+
+  void removeRelevantStopwatches() {
+    final controller = Get.find<StopwatchController>();
+    final ids = allSets.map((e) => e.id);
+    controller.removeStopwatches(ids);
   }
 
   @override

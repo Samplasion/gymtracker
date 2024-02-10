@@ -3,6 +3,8 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:get/get.dart';
+import 'package:gymtracker/controller/stopwatch_controller.dart';
 
 import 'animated_selectable.dart';
 
@@ -13,6 +15,7 @@ class TimeInputField extends StatefulWidget {
   final String? Function(Duration?)? validator;
   final void Function(Duration?)? onChangedTime;
   final bool timerInteractive;
+  final String? setID;
 
   const TimeInputField({
     required this.controller,
@@ -21,8 +24,10 @@ class TimeInputField extends StatefulWidget {
     this.onChangedTime,
     this.validator,
     this.timerInteractive = false,
+    this.setID,
     super.key,
-  });
+  }) : assert((timerInteractive == false) == (setID == null),
+            "If timerInteractive is true, setID must be provided");
 
   @override
   State<TimeInputField> createState() => _TimeInputFieldState();
@@ -42,38 +47,43 @@ class TimeInputField extends StatefulWidget {
 }
 
 class _TimeInputFieldState extends State<TimeInputField> {
+  final controller = Get.find<StopwatchController>();
+
   late String numericalValue = _toTimeString(widget.controller.text);
   final node = FocusNode();
-
-  Timer? timer;
-
-  void _onTimerTick(Timer timer) {
-    final parsed = TimeInputField.parseDuration(widget.controller.text);
-    final encoded = TimeInputField.encodeDuration(Duration(
-      seconds: 1,
-      microseconds: parsed.inMicroseconds,
-    ));
-    widget.onChanged?.call(encoded);
-    setState(() => widget.controller.text = encoded);
-  }
 
   @override
   void initState() {
     super.initState();
     widget.controller.text =
         _normalize(widget.controller.text.replaceAll(":", ""));
+    if (widget.timerInteractive && controller.isRunning(widget.setID!)) {
+      controller.updateBinding(widget.setID!, _onTick);
+    }
   }
 
   _startTimer() {
-    timer = Timer.periodic(const Duration(seconds: 1), _onTimerTick);
+    controller.addStopwatch(TimeFieldStopwatch(
+      onTick: _onTick,
+      getCurrentTime: () => widget.controller.text,
+      setID: widget.setID!,
+    ));
+  }
+
+  void _onTick(timer, duration, encoded) {
+    widget.onChanged?.call(encoded);
+    if (mounted) setState(() => widget.controller.text = encoded);
   }
 
   _endTimer() {
-    timer?.cancel();
+    controller.removeStopwatch(widget.setID!);
   }
 
+  bool get _isActive =>
+      widget.timerInteractive && controller.isRunning(widget.setID!);
+
   _toggleTimer() {
-    if (timer?.isActive ?? false) {
+    if (_isActive) {
       _endTimer();
     } else {
       _startTimer();
@@ -83,7 +93,6 @@ class _TimeInputFieldState extends State<TimeInputField> {
 
   @override
   void dispose() {
-    _endTimer();
     super.dispose();
   }
 
@@ -98,7 +107,7 @@ class _TimeInputFieldState extends State<TimeInputField> {
       decoration: (widget.decoration ?? const InputDecoration()).copyWith(
         suffixIcon: () {
           if (widget.timerInteractive) {
-            var isActive = timer?.isActive ?? false;
+            var isActive = _isActive;
             return SelectableAnimatedBuilder(
               isSelected: isActive,
               builder: (context, animation) => IconButton(
@@ -139,12 +148,12 @@ class _TimeInputFieldState extends State<TimeInputField> {
       },
       style: TextStyle(
         color: () {
-          if (timer?.isActive ?? false) {
+          if (_isActive) {
             return Theme.of(context).colorScheme.primary;
           }
         }(),
       ),
-      readOnly: timer?.isActive ?? false,
+      readOnly: _isActive,
       validator: widget.validator == null
           ? null
           : (string) {

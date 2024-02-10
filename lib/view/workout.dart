@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:get/get.dart';
+import 'package:gymtracker/controller/stopwatch_controller.dart';
 import 'package:gymtracker/model/exercisable.dart';
 import 'package:gymtracker/model/superset.dart';
 import 'package:gymtracker/service/localizations.dart';
@@ -86,6 +87,7 @@ class _WorkoutViewState extends State<WorkoutView> {
                   style: TextStyle(color: Theme.of(context).colorScheme.error),
                 ),
                 onTap: () {
+                  final allSets = controller.allSets.map((e) => e.id);
                   SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
                     controller.cancelWorkoutWithDialog(context, onCanceled: () {
                       SchedulerBinding.instance

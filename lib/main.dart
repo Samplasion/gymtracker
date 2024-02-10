@@ -7,6 +7,7 @@ import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:gymtracker/controller/countdown_controller.dart';
 import 'package:gymtracker/controller/debug_controller.dart';
+import 'package:gymtracker/controller/stopwatch_controller.dart';
 import 'package:gymtracker/service/color.dart';
 import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/view/skeleton.dart';
@@ -45,6 +46,7 @@ class MainApp extends StatelessWidget {
     Get.put(CountdownController());
     Get.put(ExercisesController());
     Get.put(DebugController());
+    Get.put(StopwatchController());
     final settings = Get.put(SettingsController());
     final localizations = Get.put(this.localizations);
 

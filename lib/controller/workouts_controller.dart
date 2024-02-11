@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:get/get.dart';
 import 'package:gymtracker/model/exercisable.dart';
 import 'package:gymtracker/model/superset.dart';
@@ -133,6 +134,7 @@ class WorkoutsController extends GetxController with ServiceableController {
   }
 
   void deleteWorkout(Workout workout) {
+    // TODO: Remove "parentID" binding from history entries
     service.routines = service.routines.where((w) {
       return w.id != workout.id;
     }).toList();
@@ -189,5 +191,43 @@ class WorkoutsController extends GetxController with ServiceableController {
       routine,
     ];
     return routine.id;
+  }
+
+  void deleteRoutineWithDialog(
+    BuildContext context, {
+    required Workout workout,
+    required void Function() onCanceled,
+  }) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          icon: const Icon(Icons.info),
+          title: Text("routines.actions.delete.title".t),
+          content: Text(
+            "routines.actions.delete.text".t,
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Get.back(closeOverlays: true);
+              },
+              child: Text("routines.actions.delete.actions.no".t),
+            ),
+            FilledButton.tonal(
+              onPressed: () {
+                deleteWorkout(workout);
+                SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
+                  Get.back(closeOverlays: true);
+                });
+
+                onCanceled();
+              },
+              child: Text("routines.actions.delete.actions.yes".t),
+            ),
+          ],
+        );
+      },
+    );
   }
 }

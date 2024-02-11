@@ -136,12 +136,21 @@ class _ExercisesViewState extends State<ExercisesView> {
                   textStyle: TextStyle(
                     color: Theme.of(context).colorScheme.error,
                   ),
-                  child: Text("routines.actions.delete".t),
+                  child: Text(
+                    "routines.actions.delete.title".t,
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.error,
+                    ),
+                  ),
                   onTap: () {
-                    Get.find<WorkoutsController>().deleteWorkout(workout);
-                    SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
-                      Get.back();
-                      Get.back();
+                    Get.find<WorkoutsController>()
+                        .deleteRoutineWithDialog(context, workout: workout,
+                            onCanceled: () {
+                      SchedulerBinding.instance
+                          .addPostFrameCallback((timeStamp) {
+                        Get.back();
+                        Go.snack("routines.actions.delete.done".t);
+                      });
                     });
                   },
                 ),

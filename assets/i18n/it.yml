@@ -79,7 +79,7 @@ workouts:
   untitled: Allenamento senza nome
   title: Allenamenti
   actions:
-    delete: 
+    delete:
       title: Elimina allenamento
       text: Vuoi davvero eliminare questo allenamento? Quest'azione non può essere annullata.
       actions:
@@ -102,7 +102,13 @@ routines:
     title: Allenamento rapido
     subtitle: Avvia rapidamente un allenamento vuoto
   actions:
-    delete: Elimina routine
+    delete:
+      title: Elimina routine
+      text: Vuoi davvero eliminare questa routine? Quest'azione non può essere annullata.
+      actions:
+        no: Annulla
+        yes: Elimina
+      done: La routine è stata eliminata.
     edit: Modifica routine
     start: Avvia routine
     create: Crea routine

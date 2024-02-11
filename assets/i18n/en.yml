@@ -102,7 +102,13 @@ routines:
     title: Quick workout
     subtitle: Quickly start an empty workout
   actions:
-    delete: Delete routine
+    delete:
+      title: Delete routine
+      text: Are you sure you want to delete this routine? This action cannot be undone.
+      actions:
+        no: Cancel
+        yes: Delete
+      done: The routine has been deleted.
     edit: Edit routine
     start: Start routine
     create: Create new routine

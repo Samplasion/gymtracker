@@ -79,7 +79,13 @@ workouts:
   untitled: Untitled workout
   title: Workouts
   actions:
-    delete: Delete workout
+    delete:
+      title: Delete workout
+      text: Are you sure you want to delete this workout? This action cannot be undone.
+      actions:
+        no: Cancel
+        yes: Delete
+      done: The workout has been deleted.
     start: Redo this workout
     changeParent:
       label: Change base routine

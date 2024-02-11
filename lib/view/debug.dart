@@ -37,6 +37,7 @@ class DebugView extends StatelessWidget {
                     ),
                   ),
                   onTap: () {
+                    printInfo(info: "\n$missingKeys\n");
                     Clipboard.setData(ClipboardData(text: missingKeys));
                     Go.snack(
                         "The missing keys have been copied to the clipboard");

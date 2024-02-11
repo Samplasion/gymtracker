@@ -1,6 +1,9 @@
+import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:get/get.dart';
 import 'package:gymtracker/model/exercisable.dart';
 import 'package:gymtracker/model/superset.dart';
+import 'package:gymtracker/service/localizations.dart';
 
 import '../model/exercise.dart';
 import '../model/workout.dart';
@@ -85,6 +88,44 @@ class HistoryController extends GetxController with ServiceableController {
 
     return workout.copyWith(
       exercises: exercises,
+    );
+  }
+
+  void deleteWorkoutWithDialog(
+    BuildContext context, {
+    required Workout workout,
+    required void Function() onCanceled,
+  }) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          icon: const Icon(Icons.info),
+          title: Text("workouts.actions.delete.title".t),
+          content: Text(
+            "workouts.actions.delete.text".t,
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Get.back(closeOverlays: true);
+              },
+              child: Text("workouts.actions.delete.actions.no".t),
+            ),
+            FilledButton.tonal(
+              onPressed: () {
+                deleteWorkout(workout);
+                SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
+                  Get.back(closeOverlays: true);
+                });
+
+                onCanceled();
+              },
+              child: Text("workouts.actions.delete.actions.yes".t),
+            ),
+          ],
+        );
+      },
     );
   }
 }

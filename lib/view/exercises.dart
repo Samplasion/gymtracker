@@ -46,9 +46,17 @@ class _ExercisesViewState extends State<ExercisesView> {
             itemBuilder: (context) => [
               if (workout.isConcrete) ...[
                 PopupMenuItem(
-                  textStyle: TextStyle(
-                    color: Theme.of(context).colorScheme.error,
-                  ),
+                  child: Text("workouts.actions.saveAsRoutine.button".t),
+                  onTap: () {
+                    final newID =
+                        Get.find<WorkoutsController>().importWorkout(workout);
+                    if (workout.parentID == null) {
+                      changeParent(newID);
+                    }
+                    Go.snack("workouts.actions.saveAsRoutine.done".t);
+                  },
+                ),
+                PopupMenuItem(
                   child: Text("workouts.actions.changeParent.label".t),
                   onTap: () {
                     SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
@@ -88,13 +96,21 @@ class _ExercisesViewState extends State<ExercisesView> {
                   textStyle: TextStyle(
                     color: Theme.of(context).colorScheme.error,
                   ),
-                  child: Text("workouts.actions.delete".t),
+                  child: Text(
+                    "workouts.actions.delete.title".t,
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.error,
+                    ),
+                  ),
                   onTap: () {
                     Get.find<history.HistoryController>()
-                        .deleteWorkout(workout);
-                    SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
-                      Get.back();
-                      Get.back();
+                        .deleteWorkoutWithDialog(context, workout: workout,
+                            onCanceled: () {
+                      SchedulerBinding.instance
+                          .addPostFrameCallback((timeStamp) {
+                        Get.back();
+                        Go.snack("workouts.actions.delete.done".t);
+                      });
                     });
                   },
                 ),
@@ -161,23 +177,6 @@ class _ExercisesViewState extends State<ExercisesView> {
               ),
             ),
           ),
-          if (workout.isConcrete)
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.all(16).copyWith(top: 0),
-                child: FilledButton.tonal(
-                  onPressed: () {
-                    final newID =
-                        Get.find<WorkoutsController>().importWorkout(workout);
-                    if (workout.parentID == null) {
-                      changeParent(newID);
-                    }
-                    Go.snack("workouts.actions.saveAsRoutine.done".t);
-                  },
-                  child: Text("workouts.actions.saveAsRoutine.button".t),
-                ),
-              ),
-            ),
           if (workout.infobox != null)
             SliverToBoxAdapter(
               child: Infobox(

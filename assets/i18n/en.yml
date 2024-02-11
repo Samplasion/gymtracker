@@ -142,7 +142,6 @@ routines:
         title: Remove superset
         body: Are you sure you want to remove this superset? This action cannot be undone.
 
-
 history:
   title: History
   andMore:
@@ -231,6 +230,13 @@ ongoingWorkout:
   superset:
     replaceWithExercise: Replace with exercise
     remove: Remove superset
+  ongoingWorkout:
+    stopwatch:
+      label: Stopwatch
+      start: Start
+      pause: Pause
+      reset: Reset
+
 
 timer: 
   add15s: "+15s"

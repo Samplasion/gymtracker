@@ -54,11 +54,128 @@ class _WorkoutViewState extends State<WorkoutView> {
   @override
   Widget build(BuildContext context) {
     final countdownController = Get.find<CountdownController>();
+    final stopwatchController = Get.find<StopwatchController>();
 
     return Scaffold(
       appBar: AppBar(
-        title: Text("ongoingWorkout.title".t),
+        title: Obx(() {
+          print((
+            stopwatchController.globalStopwatch.isStopped.isFalse,
+            stopwatchController.globalStopwatch.currentDuration.inSeconds > 0
+          ));
+          if (stopwatchController.globalStopwatch.isStopped.isFalse ||
+              stopwatchController.globalStopwatch.currentDuration.inSeconds >
+                  0) {
+            return TimerView(
+              builder: (ctx, _) {
+                return Text.rich(
+                  TimerView.buildTimeString(
+                    context,
+                    stopwatchController.globalStopwatch.currentDuration,
+                    style: TextStyle(
+                        color: Theme.of(context).colorScheme.secondary),
+                    builder: (time) => TextSpan(
+                      children: [
+                        TextSpan(
+                          children: [
+                            WidgetSpan(
+                              child: Icon(
+                                Icons.timer,
+                                size: 14,
+                                color: Theme.of(context).colorScheme.secondary,
+                              ),
+                              alignment: PlaceholderAlignment.middle,
+                            ),
+                            const TextSpan(text: " ("),
+                            time,
+                            const TextSpan(text: ")   "),
+                          ],
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.secondary,
+                            fontSize: 14,
+                          ),
+                        ),
+                        TextSpan(
+                          text: "ongoingWorkout.title".t,
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              },
+              startingTime: DateTime.now(),
+            );
+          }
+          return Text("ongoingWorkout.title".t);
+        }),
         actions: [
+          IconButton(
+            tooltip: "ongoingWorkout.stopwatch.label".t,
+            icon: const Icon(Icons.timer),
+            onPressed: () {
+              GlobalStopwatch getStopwatch() =>
+                  stopwatchController.globalStopwatch;
+              showDialog(
+                context: context,
+                builder: (context) => AlertDialog(
+                  title: Text("ongoingWorkout.stopwatch.label".t),
+                  content: TimerView(
+                    startingTime: DateTime.now(),
+                    builder: (context, _) {
+                      return Obx(
+                        () => Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            TimerView.buildTimeString(
+                              context,
+                              getStopwatch().currentDuration,
+                              style: Theme.of(context).textTheme.displaySmall,
+                            ),
+                            const SizedBox(height: 16),
+                            OverflowBar(
+                              alignment: MainAxisAlignment.end,
+                              overflowAlignment: OverflowBarAlignment.end,
+                              children: [
+                                if (getStopwatch().isStopped())
+                                  TextButton.icon(
+                                    icon: const Icon(Icons.play_arrow_rounded),
+                                    label: Text(
+                                        "ongoingWorkout.stopwatch.start".t),
+                                    onPressed: () {
+                                      getStopwatch().start();
+                                    },
+                                  )
+                                else
+                                  TextButton.icon(
+                                    icon: const Icon(Icons.pause_rounded),
+                                    label: Text(
+                                        "ongoingWorkout.stopwatch.pause".t),
+                                    onPressed: () {
+                                      getStopwatch().pause();
+                                    },
+                                  ),
+                                if (getStopwatch().isStopped() &&
+                                    getStopwatch().currentDuration.inSeconds >
+                                        0)
+                                  TextButton.icon(
+                                    icon: const Icon(Icons.replay_rounded),
+                                    label: Text(
+                                        "ongoingWorkout.stopwatch.reset".t),
+                                    onPressed: () {
+                                      getStopwatch().reset();
+                                    },
+                                  ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              );
+            },
+          ),
           IconButton(
             tooltip: "ongoingWorkout.weightCalculator".t,
             icon: const Icon(Icons.calculate),
@@ -87,7 +204,6 @@ class _WorkoutViewState extends State<WorkoutView> {
                   style: TextStyle(color: Theme.of(context).colorScheme.error),
                 ),
                 onTap: () {
-                  final allSets = controller.allSets.map((e) => e.id);
                   SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
                     controller.cancelWorkoutWithDialog(context, onCanceled: () {
                       SchedulerBinding.instance
@@ -482,6 +598,8 @@ class WorkoutInfoBar extends StatelessWidget {
                         Text(
                           "ongoingWorkout.info.time".t,
                           style: Theme.of(context).textTheme.labelMedium,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
                         Hero(
                           tag: "Ongoing",
@@ -498,6 +616,8 @@ class WorkoutInfoBar extends StatelessWidget {
                   Text(
                     "ongoingWorkout.info.reps".t,
                     style: Theme.of(context).textTheme.labelMedium,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
                   Obx(
                     () => TweenAnimationBuilder(
@@ -520,6 +640,8 @@ class WorkoutInfoBar extends StatelessWidget {
                   Text(
                     "ongoingWorkout.info.volume".t,
                     style: Theme.of(context).textTheme.labelMedium,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
                   Obx(
                     () => TweenAnimationBuilder(

@@ -1,6 +1,7 @@
 import 'package:animations/animations.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart' hide Localizations;
+import 'package:flutter/scheduler.dart';
 import 'package:get/get.dart';
 import 'package:gymtracker/controller/workouts_controller.dart';
 import 'package:gymtracker/view/debug.dart';
@@ -47,8 +48,7 @@ class _SkeletonViewState extends State<SkeletonView>
         const LibraryView(),
         const HistoryView(),
         const SettingsView(),
-        if (kDebugMode)
-          const DebugView(),
+        if (kDebugMode) const DebugView(),
       ];
 
   @override
@@ -88,7 +88,12 @@ class _SkeletonViewState extends State<SkeletonView>
           mainAxisSize: MainAxisSize.min,
           children: [
             if (Get.find<WorkoutsController>().hasOngoingWorkout.isTrue)
-              OngoingWorkoutBar(open: () => Go.to(() => const WorkoutView())),
+              OngoingWorkoutBar(
+                open: () =>
+                    SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
+                  Go.to(() => const WorkoutView());
+                }),
+              ),
             NavigationBar(
               labelBehavior:
                   NavigationDestinationLabelBehavior.onlyShowSelected,

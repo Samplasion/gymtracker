@@ -230,6 +230,11 @@ ongoingWorkout:
   superset:
     replaceWithExercise: Cambia con esercizio
     remove: Rimuovi superserie
+  stopwatch:
+    label: Cronometro
+    start: Avvia
+    pause: Pausa
+    reset: Resetta
 
 timer: 
   add15s: "+15s"

@@ -176,6 +176,9 @@ class WorkoutController extends GetxController with ServiceableController {
     SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
       controller.removeStopwatches(ids);
     });
+
+    // Stop the global stopwatch
+    controller.globalStopwatch.reset();
   }
 
   @override

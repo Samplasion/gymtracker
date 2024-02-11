@@ -28,11 +28,12 @@ class _ExercisePickerState extends State<ExercisePicker> {
     final sortedKeys = [...exerciseStandardLibrary.keys]
       ..sort((a, b) => a.toLowerCase().compareTo(b.toLowerCase()));
     return {
-      "library.custom".t: ExerciseCategory(
-        exercises: controller.exercises,
-        icon: const Icon(Icons.star_rounded),
-        color: Colors.yellow,
-      ),
+      if (controller.exercises.isNotEmpty)
+        "library.custom".t: ExerciseCategory(
+          exercises: controller.exercises,
+          icon: const Icon(Icons.star_rounded),
+          color: Colors.yellow,
+        ),
       for (final key in sortedKeys) key: exerciseStandardLibrary[key]!,
     };
   }

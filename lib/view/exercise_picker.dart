@@ -170,11 +170,10 @@ class _LibraryPickerExercisesViewState
       appBar: AppBar(
         title: Text(widget.name),
         actions: [
-          if (widget.singleSelection)
-            IconButton(
-              icon: const Icon(Icons.check),
-              onPressed: widget.onSubmit,
-            )
+          IconButton(
+            icon: const Icon(Icons.check),
+            onPressed: widget.onSubmit,
+          )
         ],
       ),
       body: ListView.builder(

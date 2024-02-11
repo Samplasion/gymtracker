@@ -580,7 +580,14 @@ class WorkoutTimerView extends StatelessWidget {
       child: Column(
         children: [
           TimerView(
-            startingTime: Get.find<WorkoutController>().time.value,
+            startingTime: () {
+              try {
+                return Get.find<WorkoutController>().time.value;
+              } catch (e) {
+                e.printError();
+                return DateTime.now();
+              }
+            }(),
             builder: (_, time) {
               return TweenAnimationBuilder(
                 tween: Tween<double>(
@@ -604,7 +611,14 @@ class WorkoutTimerView extends StatelessWidget {
                   Expanded(
                     child: Obx(
                       () => TimerView(
-                        startingTime: Get.find<WorkoutController>().time.value,
+                        startingTime: () {
+                          try {
+                            return Get.find<WorkoutController>().time.value;
+                          } catch (e) {
+                            e.printError();
+                            return DateTime.now();
+                          }
+                        }(),
                         builder: (_, time) => TimerView.buildTimeString(
                           context,
                           countdownController.remaining,

@@ -237,11 +237,12 @@ class _ExercisesViewState extends State<ExercisesView> {
           ),
           if (kDebugMode)
             SliverToBoxAdapter(
-              child: Text(workout.id, textAlign: TextAlign.center),
+              child: Text("own id: ${workout.id}", textAlign: TextAlign.center),
             ),
           if (kDebugMode)
             SliverToBoxAdapter(
-              child: Text("${workout.parentID}", textAlign: TextAlign.center),
+              child: Text("parent: ${workout.parentID}",
+                  textAlign: TextAlign.center),
             ),
         ],
       ),

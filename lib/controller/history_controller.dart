@@ -142,4 +142,13 @@ class HistoryController extends GetxController with ServiceableController {
       },
     );
   }
+
+  void unbindAllFromParent(String id) {
+    service.workoutHistory = service.workoutHistory.map((workout) {
+      if (workout.parentID == id) {
+        return workout.copyWith(parentID: null);
+      }
+      return workout;
+    }).toList();
+  }
 }

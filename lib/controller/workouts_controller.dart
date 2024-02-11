@@ -134,10 +134,10 @@ class WorkoutsController extends GetxController with ServiceableController {
   }
 
   void deleteWorkout(Workout workout) {
-    // TODO: Remove "parentID" binding from history entries
     service.routines = service.routines.where((w) {
       return w.id != workout.id;
     }).toList();
+    Get.find<HistoryController>().unbindAllFromParent(workout.id);
   }
 
   generate({

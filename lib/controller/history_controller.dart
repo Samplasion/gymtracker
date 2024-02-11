@@ -38,6 +38,20 @@ class HistoryController extends GetxController with ServiceableController {
     }
   }
 
+  Workout rename(Workout workout, {String? newName}) {
+    final index = service.workoutHistory
+        .indexWhere((element) => element.id == workout.id);
+    final newWorkout = workout.copyWith(name: newName);
+    if (index >= 0) {
+      service.workoutHistory = [
+        ...service.workoutHistory.sublist(0, index),
+        newWorkout,
+        ...service.workoutHistory.sublist(index + 1),
+      ];
+    }
+    return newWorkout;
+  }
+
   Workout fixWorkout(Workout workout) {
     workout.id.printInfo(info: "Fixing workout");
     if (workout.parentID == null) {

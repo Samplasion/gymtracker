@@ -6,6 +6,7 @@ import 'package:get/get.dart';
 import 'package:gymtracker/model/exercisable.dart';
 import 'package:gymtracker/model/superset.dart';
 import 'package:gymtracker/view/components/infobox.dart';
+import 'package:gymtracker/view/utils/textfield_dialog.dart';
 import 'package:intl/intl.dart';
 
 import '../controller/history_controller.dart' as history;
@@ -54,6 +55,31 @@ class _ExercisesViewState extends State<ExercisesView> {
                       changeParent(newID);
                     }
                     Go.snack("workouts.actions.saveAsRoutine.done".t);
+                  },
+                ),
+                PopupMenuItem(
+                  child: Text("workouts.actions.rename.label".t),
+                  onTap: () {
+                    SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
+                      showDialog(
+                        context: context,
+                        builder: (_) {
+                          return TextFieldDialog(
+                            title: Text("workouts.actions.rename.label".t),
+                            initialValue: workout.name,
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return "workouts.actions.rename.errors.empty".t;
+                              }
+                              return null;
+                            },
+                            onDone: (value) {
+                              rename(value);
+                            },
+                          );
+                        },
+                      );
+                    });
                   },
                 ),
                 PopupMenuItem(
@@ -226,6 +252,14 @@ class _ExercisesViewState extends State<ExercisesView> {
     setState(() => workout.parentID = value);
     Get.find<history.HistoryController>()
         .setParentID(workout, newParentID: value);
+  }
+
+  void rename(String? value) {
+    final newWorkout =
+        Get.find<history.HistoryController>().rename(workout, newName: value);
+    SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
+      setState(() => workout = newWorkout);
+    });
   }
 }
 

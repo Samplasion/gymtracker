@@ -87,6 +87,10 @@ workouts:
         yes: Delete
       done: The workout has been deleted.
     start: Redo this workout
+    rename:
+      label: Rename workout
+      errors:
+        empty: The name must not be empty.
     changeParent:
       label: Change base routine
       options:

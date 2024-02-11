@@ -87,6 +87,10 @@ workouts:
         yes: Elimina
       done: L'allenamento è stato eliminato.
     start: Ripeti allenamento
+    rename:
+      label: Rinomina allenamento
+      errors:
+        empty: Il nome non dev'essere vuoto.
     changeParent:
       label: Cambia routine di base
       options:

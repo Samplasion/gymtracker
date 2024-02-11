@@ -1,4 +1,5 @@
 import 'package:dynamic_color/dynamic_color.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart' hide Localizations;
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
@@ -75,6 +76,13 @@ class MainApp extends StatelessWidget {
                   animation: localizations,
                   builder: (context, _) {
                     return GetMaterialApp(
+                      title: () {
+                        if (kDebugMode) {
+                          return "${"appName".t} (Debug)";
+                        } else {
+                          return "appName".t;
+                        }
+                      }(),
                       translations: localizations,
                       locale: () {
                         printInfo(info: "${settings.locale.value}");

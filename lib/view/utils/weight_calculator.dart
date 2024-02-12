@@ -88,7 +88,13 @@ class _WeightCalculatorState extends State<WeightCalculator>
                           border: const OutlineInputBorder(),
                         ),
                         onChanged: (value) {
-                          setState(() {});
+                          setState(() {
+                            _weightController.text = stringifyDouble(
+                                double.parse(value).clamp(0, 10000));
+                            if (value.endsWith(".")) {
+                              _weightController.text += ".";
+                            }
+                          });
                         },
                       ),
                     ),

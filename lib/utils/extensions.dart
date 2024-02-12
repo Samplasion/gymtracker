@@ -62,3 +62,11 @@ extension BuildContextUtils on BuildContext {
     return color.harmonizeWith(Theme.of(this).colorScheme.primary);
   }
 }
+
+extension NumUtils on num {
+  num clamp(num min, num max) {
+    if (this < min) return min;
+    if (this > max) return max;
+    return this;
+  }
+}

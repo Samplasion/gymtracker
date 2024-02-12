@@ -6,64 +6,66 @@ import 'serviceable_controller.dart';
 
 const _globalStopwatchID = "global";
 
-abstract class Stopwatch {
+abstract class GTStopwatch {
   DateTime get startingTime;
-  Timer get timer;
   String get currentTime;
   Function get onTick;
+  RxBool get isStopped;
 
   dispose();
 }
 
-class GlobalStopwatch extends Stopwatch {
-  Duration currentDuration = Duration.zero;
+class GlobalStopwatch extends GTStopwatch {
+  late Stopwatch stopwatch;
+
+  Duration get currentDuration => stopwatch.elapsed;
+  late Timer timer;
+  @override
+  String get currentTime => TimeInputField.encodeDuration(stopwatch.elapsed);
   @override
   DateTime get startingTime => DateTime.now().subtract(currentDuration);
   @override
-  late Timer timer;
-  @override
-  String get currentTime => TimeInputField.encodeDuration(currentDuration);
-
-  @override
   final void Function(Duration duration) onTick;
 
-  RxBool isStopped = false.obs;
+  @override
+  RxBool isStopped = true.obs;
 
   GlobalStopwatch({
     required this.onTick,
   }) {
-    timer = Timer.periodic(const Duration(seconds: 1), _onTickInternal);
+    stopwatch = Stopwatch();
+    stopwatch.stop();
+    stopwatch.reset();
   }
 
   @override
   void dispose() {
     onTick(DateTime.now().difference(startingTime));
     timer.cancel();
+    stopwatch.stop();
+    stopwatch.reset();
   }
 
   void pause() {
     isStopped.value = true;
-    timer.cancel();
+    stopwatch.stop();
   }
 
   void start() {
     isStopped.value = false;
-    if (!timer.isActive) {
-      timer = Timer.periodic(const Duration(seconds: 1), _onTickInternal);
-    }
+    stopwatch.start();
   }
 
-  void _onTickInternal(_) {
-    currentDuration = currentDuration + const Duration(seconds: 1);
-    onTick(currentDuration);
+  void _onTickInternal() {
+    onTick(stopwatch.elapsed);
   }
 
   void reset() {
     // Intentionally trigger a rebuild by setting isStopped to false and then true
     isStopped.value = false;
     isStopped.value = true;
-    timer.cancel();
-    currentDuration = Duration.zero;
+    stopwatch.stop();
+    stopwatch.reset();
     onTick(Duration.zero);
   }
 }
@@ -71,7 +73,7 @@ class GlobalStopwatch extends Stopwatch {
 typedef TickBinding = void Function(
     Timer timer, Duration duration, String encoded);
 
-class TimeFieldStopwatch extends Stopwatch {
+class TimeFieldStopwatch extends GTStopwatch {
   @override
   TickBinding onTick;
   final String Function() getCurrentTime;
@@ -79,10 +81,11 @@ class TimeFieldStopwatch extends Stopwatch {
 
   @override
   final DateTime startingTime = DateTime.now();
-  @override
   late Timer timer;
   @override
   late String currentTime;
+  @override
+  RxBool get isStopped => RxBool(timer.isActive);
 
   TimeFieldStopwatch({
     required this.onTick,
@@ -108,7 +111,7 @@ class TimeFieldStopwatch extends Stopwatch {
 }
 
 class StopwatchController extends GetxController with ServiceableController {
-  final RxMap<String, Stopwatch> stopwatches = <String, Stopwatch>{
+  final RxMap<String, GTStopwatch> stopwatches = <String, GTStopwatch>{
     _globalStopwatchID: GlobalStopwatch(onTick: (duration) {})..reset(),
   }.obs;
 
@@ -135,7 +138,16 @@ class StopwatchController extends GetxController with ServiceableController {
     }
   }
 
-  bool isRunning(String setID) => stopwatches[setID]?.timer.isActive ?? false;
+  bool isRunning(String setID) {
+    final stopwatch = stopwatches[setID];
+    if (stopwatch == null) return false;
+    if (stopwatch is GlobalStopwatch) {
+      return !stopwatch.isStopped.value;
+    } else if (stopwatch is TimeFieldStopwatch) {
+      return stopwatch.timer.isActive;
+    }
+    return false;
+  }
 
   void updateBinding(String setID, TickBinding binding) {
     final stopwatch = stopwatches[setID];

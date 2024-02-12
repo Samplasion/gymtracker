@@ -77,22 +77,16 @@ class _WorkoutViewState extends State<WorkoutView> {
                             WidgetSpan(
                               child: Icon(
                                 Icons.timer,
-                                size: 14,
                                 color: Theme.of(context).colorScheme.secondary,
                               ),
                               alignment: PlaceholderAlignment.middle,
                             ),
-                            const TextSpan(text: " ("),
+                            const TextSpan(text: " "),
                             time,
-                            const TextSpan(text: ")   "),
                           ],
                           style: TextStyle(
                             color: Theme.of(context).colorScheme.secondary,
-                            fontSize: 14,
                           ),
-                        ),
-                        TextSpan(
-                          text: "ongoingWorkout.title".t,
                         ),
                       ],
                     ),

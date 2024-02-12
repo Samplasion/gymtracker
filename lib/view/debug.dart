@@ -75,7 +75,7 @@ class DebugView extends StatelessWidget {
                         builder: (ctx, _) => ListTile(
                           title: Text(entry.key),
                           subtitle: Text(
-                              "Running: ${entry.value.timer.isActive}, Current time: ${entry.value.currentTime}"),
+                              "Running: ${!entry.value.isStopped()}, Current time: ${entry.value.currentTime}"),
                         ),
                         startingTime: DateTime.now(),
                       ),

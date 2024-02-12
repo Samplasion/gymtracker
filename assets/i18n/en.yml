@@ -233,12 +233,11 @@ ongoingWorkout:
   superset:
     replaceWithExercise: Replace with exercise
     remove: Remove superset
-  ongoingWorkout:
-    stopwatch:
-      label: Stopwatch
-      start: Start
-      pause: Pause
-      reset: Reset
+  stopwatch:
+    label: Stopwatch
+    start: Start
+    pause: Pause
+    reset: Reset
 
 
 timer: 

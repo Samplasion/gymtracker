@@ -180,7 +180,7 @@ settings:
       label: Seleziona un colore [@color]
 
 ongoingWorkout:
-  title: Allenamento in corso
+  title: Allenamento
   actions:
     finish: Termina allenamento
     cancel: Scarta allenamento

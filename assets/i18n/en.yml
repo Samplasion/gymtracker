@@ -180,7 +180,7 @@ settings:
       label: Select a color [@color]
 
 ongoingWorkout:
-  title: Ongoing workout
+  title: Workout
   actions:
     finish: Finish workout
     cancel: Cancel workout

@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_sticky_header/flutter_sticky_header.dart';
 import 'package:get/get.dart';
@@ -18,7 +19,7 @@ class HistoryView extends StatelessWidget {
 
   Map<MonthYear, List<Workout>> get historyByMonth {
     final controller = Get.find<HistoryController>();
-    final history = controller.history.reversed;
+    final history = controller.userVisibleWorkouts.reversed;
     final map = <MonthYear, List<Workout>>{};
     for (final workout in history) {
       final key = (
@@ -97,8 +98,16 @@ class HistoryWorkout extends StatelessWidget {
   final Workout workout;
   final int showExercises;
 
-  const HistoryWorkout(
-      {required this.workout, this.showExercises = 5, super.key});
+  HistoryController get controller => Get.find<HistoryController>();
+
+  late final Workout? continuation =
+      controller.getContinuation(incompleteWorkout: workout);
+
+  HistoryWorkout({
+    required this.workout,
+    this.showExercises = 5,
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -134,9 +143,23 @@ class HistoryWorkout extends StatelessWidget {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(workout.name,
-                                  style:
-                                      Theme.of(context).textTheme.titleMedium),
+                              Text.rich(
+                                TextSpan(
+                                  children: [
+                                    TextSpan(text: workout.name),
+                                    if (workout.isContinuation && kDebugMode)
+                                      TextSpan(
+                                        text: " [CONTINUATION]",
+                                        style: TextStyle(
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .error,
+                                        ),
+                                      ),
+                                  ],
+                                ),
+                                style: Theme.of(context).textTheme.titleMedium,
+                              ),
                               Row(
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
@@ -161,7 +184,39 @@ class HistoryWorkout extends StatelessWidget {
                                                           DateTime.now()),
                                             ),
                                             const TextSpan(text: " - "),
-                                            time
+                                            time,
+                                            if (continuation != null) ...[
+                                              const TextSpan(text: "\n+ "),
+                                              TextSpan(
+                                                text: DateFormat.yMd(context
+                                                        .locale.languageCode)
+                                                    .add_Hm()
+                                                    .format(continuation!
+                                                            .startingDate ??
+                                                        DateTime.now()),
+                                              ),
+                                              const TextSpan(text: " - "),
+                                              TimerView.buildTimeString(
+                                                context,
+                                                continuation!.duration ??
+                                                    Duration.zero,
+                                                builder: (time) => time,
+                                              ),
+                                              const TextSpan(text: "\n"),
+                                              TimerView.buildTimeString(
+                                                context,
+                                                (continuation!.duration ??
+                                                        Duration.zero) +
+                                                    (workout.duration ??
+                                                        Duration.zero),
+                                                builder: (time) => TextSpan(
+                                                  text: "general.totalTime"
+                                                      .tParams({
+                                                    "time": time.text!,
+                                                  }),
+                                                ),
+                                              )
+                                            ]
                                           ],
                                         ),
                                         textAlign: TextAlign.end,

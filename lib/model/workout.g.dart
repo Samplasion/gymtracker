@@ -21,6 +21,10 @@ abstract class _$WorkoutCWProxy {
 
   Workout infobox(String? infobox);
 
+  Workout completedBy(String? completedBy);
+
+  Workout completes(String? completes);
+
   /// This function **does support** nullification of nullable fields. All `null` values passed to `non-nullable` fields will be ignored. You can also use `Workout(...).copyWith.fieldName(...)` to override fields one at a time with nullification support.
   ///
   /// Usage
@@ -35,6 +39,8 @@ abstract class _$WorkoutCWProxy {
     DateTime? startingDate,
     String? parentID,
     String? infobox,
+    String? completedBy,
+    String? completes,
   });
 }
 
@@ -68,6 +74,12 @@ class _$WorkoutCWProxyImpl implements _$WorkoutCWProxy {
   Workout infobox(String? infobox) => this(infobox: infobox);
 
   @override
+  Workout completedBy(String? completedBy) => this(completedBy: completedBy);
+
+  @override
+  Workout completes(String? completes) => this(completes: completes);
+
+  @override
 
   /// This function **does support** nullification of nullable fields. All `null` values passed to `non-nullable` fields will be ignored. You can also use `Workout(...).copyWith.fieldName(...)` to override fields one at a time with nullification support.
   ///
@@ -83,6 +95,8 @@ class _$WorkoutCWProxyImpl implements _$WorkoutCWProxy {
     Object? startingDate = const $CopyWithPlaceholder(),
     Object? parentID = const $CopyWithPlaceholder(),
     Object? infobox = const $CopyWithPlaceholder(),
+    Object? completedBy = const $CopyWithPlaceholder(),
+    Object? completes = const $CopyWithPlaceholder(),
   }) {
     return Workout(
       id: id == const $CopyWithPlaceholder()
@@ -113,6 +127,14 @@ class _$WorkoutCWProxyImpl implements _$WorkoutCWProxy {
           ? _value.infobox
           // ignore: cast_nullable_to_non_nullable
           : infobox as String?,
+      completedBy: completedBy == const $CopyWithPlaceholder()
+          ? _value.completedBy
+          // ignore: cast_nullable_to_non_nullable
+          : completedBy as String?,
+      completes: completes == const $CopyWithPlaceholder()
+          ? _value.completes
+          // ignore: cast_nullable_to_non_nullable
+          : completes as String?,
     );
   }
 }
@@ -141,6 +163,8 @@ Workout _$WorkoutFromJson(Map<String, dynamic> json) => Workout(
           : DateTime.parse(json['startingDate'] as String),
       parentID: json['parentID'] as String?,
       infobox: json['infobox'] as String?,
+      completedBy: json['completedBy'] as String?,
+      completes: json['completes'] as String?,
     );
 
 Map<String, dynamic> _$WorkoutToJson(Workout instance) => <String, dynamic>{
@@ -151,4 +175,6 @@ Map<String, dynamic> _$WorkoutToJson(Workout instance) => <String, dynamic>{
       'startingDate': instance.startingDate?.toIso8601String(),
       'infobox': instance.infobox,
       'parentID': instance.parentID,
+      'completedBy': instance.completedBy,
+      'completes': instance.completes,
     };

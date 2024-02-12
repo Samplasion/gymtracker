@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:get/get.dart';
+import 'package:gymtracker/controller/history_controller.dart';
 import 'package:gymtracker/controller/stopwatch_controller.dart';
 import 'package:gymtracker/model/exercisable.dart';
 import 'package:gymtracker/service/localizations.dart';
@@ -18,6 +19,8 @@ class WorkoutController extends GetxController with ServiceableController {
   Rx<DateTime> time;
   Rx<String?> parentID;
   Rx<String?> infobox;
+  RxBool isContinuation = false.obs;
+  Rx<String?> continuesID = Rx(null);
 
   WorkoutController(String name, String? parentID, String? infobox)
       : name = name.obs,
@@ -34,6 +37,8 @@ class WorkoutController extends GetxController with ServiceableController {
         .toList());
     cont.time(DateTime.fromMillisecondsSinceEpoch(
         data['time'] ?? DateTime.now().millisecondsSinceEpoch));
+    cont.continuesID(data['continuesID']);
+    cont.isContinuation(data['isContinuation'] ?? false);
     return cont;
   }
 
@@ -90,6 +95,8 @@ class WorkoutController extends GetxController with ServiceableController {
       "parentID": parentID.value,
       "time": time.value.millisecondsSinceEpoch,
       "infobox": infobox.value,
+      "isContinuation": isContinuation.value,
+      "continuesID": continuesID.value,
     });
   }
 
@@ -146,7 +153,14 @@ class WorkoutController extends GetxController with ServiceableController {
       startingDate: time.value,
       parentID: parentID.value,
       infobox: infobox.value,
+      completes: continuesID.value,
     );
+
+    if (isContinuation.isTrue) {
+      final historyController = Get.find<HistoryController>();
+      historyController.bindContinuation(continuation: workout);
+    }
+
     final service = Get.find<DatabaseService>();
     service.workoutHistory = [
       ...service.workoutHistory,

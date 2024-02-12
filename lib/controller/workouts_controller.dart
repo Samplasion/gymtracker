@@ -93,44 +93,86 @@ class WorkoutsController extends GetxController with ServiceableController {
       Get.back();
     }
     Go.to(() => const WorkoutView());
-    Exercise cloneExercise(Exercise ex) => ex.copyWith(
-          sets: ([
-            for (final set in ex.sets)
-              set.copyWith(
-                done: false,
-                reps: [SetKind.failure, SetKind.failureStripping]
-                        .contains(set.kind)
-                    ? 0
-                    : set.reps,
-              ),
-          ]),
-          // If we're redoing a previous workout,
-          // we want to inherit the previous parent ID,
-          // ie. the original routine's ID
-          // But we also want to keep it if we're cloning
-          // a built-in exercise, so that the translated name is kept.
-          parentID: workout.isConcrete || ex.standard ? ex.parentID : ex.id,
-          id: const Uuid().v4(),
-        );
     Future.delayed(const Duration(milliseconds: 100)).then((_) {
-      final clone = workout.clone();
-      Get.find<WorkoutController>()
-        ..name(clone.name)
-        ..exercises([
-          for (final ex in clone.exercises)
+      _clone(
+        workout,
+        parentID: workoutID,
+        exerciseFilter: (ex) => true,
+      );
+    });
+  }
+
+  bool isWorkoutContinuable(Workout workout) {
+    return workout.isContinuable;
+  }
+
+  Future<void> continueWorkout(
+    BuildContext context,
+    Workout workout,
+  ) async {
+    if (hasOngoingWorkout.isTrue) {
+      final result = await showDialog<bool>(
+        context: context,
+        builder: (context) => const OverwriteDialog(),
+      );
+      if (!(result ?? false)) return;
+    }
+
+    removeCountdown();
+
+    String? parentID = workout.parentID;
+
+    Get.put(WorkoutController(workout.name, parentID, workout.infobox));
+    // ignore: use_build_context_synchronously
+    if (Navigator.of(context).canPop()) {
+      Get.back();
+    }
+    Go.to(() => const WorkoutView());
+    Future.delayed(const Duration(milliseconds: 100)).then((_) {
+      _clone(
+        workout,
+        parentID: parentID,
+        exerciseFilter: (ex) => ex.sets.any((set) => !set.done),
+        setFilter: (set) => !set.done,
+        continuation: true,
+      );
+    });
+  }
+
+  _clone(
+    Workout workout, {
+    String? parentID,
+    required bool Function(WorkoutExercisable exercise) exerciseFilter,
+    bool Function(ExSet set)? setFilter,
+    bool continuation = false,
+  }) {
+    final clone = workout.clone();
+    Get.find<WorkoutController>()
+      ..name(clone.name)
+      ..exercises([
+        for (final ex in clone.exercises)
+          if (exerciseFilter(ex))
             if (ex is Exercise)
-              cloneExercise(ex)
+              ex.instantiate(
+                workout: workout,
+                setFilter: setFilter,
+              )
             else if (ex is Superset)
               ex.copyWith(
-                exercises: ex.exercises.map(cloneExercise).toList(),
+                exercises: ex.exercises
+                    .map((e) => e.instantiate(
+                          workout: workout,
+                          setFilter: setFilter,
+                        ))
+                    .toList(),
               ),
-        ])
-        ..time(DateTime.now())
-        // Same goes for this
-        ..parentID(workoutID)
-        ..infobox(workout.infobox)
-        ..save();
-    });
+      ])
+      ..time(DateTime.now())
+      ..parentID(parentID)
+      ..infobox(workout.infobox)
+      ..isContinuation(continuation)
+      ..continuesID(continuation ? workout.id : null)
+      ..save();
   }
 
   void deleteWorkout(Workout workout) {

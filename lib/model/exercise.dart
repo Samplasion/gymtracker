@@ -1,6 +1,7 @@
 import 'package:copy_with_extension/copy_with_extension.dart';
 import 'package:get/get.dart';
 import 'package:gymtracker/model/exercisable.dart';
+import 'package:gymtracker/model/workout.dart';
 import 'package:gymtracker/service/localizations.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:uuid/uuid.dart';
@@ -8,6 +9,8 @@ import 'package:uuid/uuid.dart';
 import 'set.dart';
 
 part 'exercise.g.dart';
+
+bool _defaultSetFilter(set) => true;
 
 enum MuscleGroup {
   abductors,
@@ -137,6 +140,30 @@ class Exercise extends WorkoutExercisable {
   /// Returns true if [other] is [this] or an instance of [this]
   /// (ie. [other.parentID] == [id].)
   bool isTheSameAs(Exercise other) => other.id == id || other.parentID == id;
+
+  Exercise instantiate({
+    required Workout workout,
+    bool Function(ExSet set)? setFilter = _defaultSetFilter,
+  }) =>
+      copyWith(
+        sets: ([
+          for (final set in sets)
+            set.copyWith(
+              done: false,
+              reps:
+                  [SetKind.failure, SetKind.failureStripping].contains(set.kind)
+                      ? 0
+                      : set.reps,
+            ),
+        ]),
+        // If we're redoing a previous workout,
+        // we want to inherit the previous parent ID,
+        // ie. the original routine's ID
+        // But we also want to keep it if we're cloning
+        // a built-in exercise, so that the translated name is kept.
+        parentID: workout.isConcrete || standard ? parentID : id,
+        id: const Uuid().v4(),
+      );
 }
 
 extension Display on Exercise {

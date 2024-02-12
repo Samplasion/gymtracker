@@ -59,10 +59,6 @@ class _WorkoutViewState extends State<WorkoutView> {
     return Scaffold(
       appBar: AppBar(
         title: Obx(() {
-          print((
-            stopwatchController.globalStopwatch.isStopped.isFalse,
-            stopwatchController.globalStopwatch.currentDuration.inSeconds > 0
-          ));
           if (stopwatchController.globalStopwatch.isStopped.isFalse ||
               stopwatchController.globalStopwatch.currentDuration.inSeconds >
                   0) {

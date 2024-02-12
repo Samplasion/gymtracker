@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart' hide Localizations;
 import 'package:flutter/scheduler.dart';
 import 'package:get/get.dart';
+import 'package:gymtracker/controller/history_controller.dart';
 import 'package:gymtracker/controller/workouts_controller.dart';
 import 'package:gymtracker/view/debug.dart';
 import 'package:gymtracker/view/workout.dart';
@@ -114,7 +115,12 @@ class _SkeletonViewState extends State<SkeletonView>
                   label: "library.title".t,
                 ),
                 NavigationDestination(
-                  icon: const Icon(Icons.history_rounded),
+                  icon: Badge(
+                    label: Text(
+                        "${Get.find<HistoryController>().userVisibleLength}"),
+                    isLabelVisible: _selectedIndex == 2,
+                    child: const Icon(Icons.history_rounded),
+                  ),
                   label: "history.title".t,
                 ),
                 NavigationDestination(

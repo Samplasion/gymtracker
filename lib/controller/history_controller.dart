@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:get/get.dart';
@@ -12,6 +13,12 @@ import 'serviceable_controller.dart';
 class HistoryController extends GetxController with ServiceableController {
   RxList<Workout> history = <Workout>[].obs;
 
+  int get userVisibleLength => userVisibleWorkouts.length;
+
+  List<Workout> get userVisibleWorkouts => history
+      .where((workout) => !workout.isContinuation || !kDebugMode)
+      .toList();
+
   @override
   void onServiceChange() {
     history(service.workoutHistory);
@@ -22,7 +29,8 @@ class HistoryController extends GetxController with ServiceableController {
 
   void deleteWorkout(Workout workout) {
     service.workoutHistory = service.workoutHistory.where((w) {
-      return w.id != workout.id;
+      // Remove the workout and its continuation, if any
+      return w.id != workout.id && w.id != workout.completedBy;
     }).toList();
   }
 
@@ -151,4 +159,38 @@ class HistoryController extends GetxController with ServiceableController {
       return workout;
     }).toList();
   }
+
+  void bindContinuation({required Workout continuation}) {
+    service.workoutHistory = service.workoutHistory.map((workout) {
+      if (workout.id == continuation.completes) {
+        return workout.copyWith(completedBy: continuation.id);
+      }
+      return workout;
+    }).toList();
+  }
+
+  bool hasContinuation({required Workout incompleteWorkout}) =>
+      getContinuation(incompleteWorkout: incompleteWorkout) != null;
+
+  Workout? getContinuation({required Workout incompleteWorkout}) {
+    if (incompleteWorkout.isComplete) return null;
+    return service.workoutHistory.firstWhereOrNull(
+      (element) => element.completes == incompleteWorkout.id,
+    );
+  }
+
+  Workout? getOriginalForContinuation({required Workout continuationWorkout}) {
+    return service.workoutHistory.firstWhereOrNull(
+      (element) => element.completedBy == continuationWorkout.id,
+    );
+  }
+}
+
+extension WorkoutHistory on Workout {
+  bool get hasContinuation =>
+      Get.find<HistoryController>().hasContinuation(incompleteWorkout: this);
+  Workout? get continuation =>
+      Get.find<HistoryController>().getContinuation(incompleteWorkout: this);
+  Workout? get originalWorkoutForContinuation => Get.find<HistoryController>()
+      .getOriginalForContinuation(continuationWorkout: this);
 }

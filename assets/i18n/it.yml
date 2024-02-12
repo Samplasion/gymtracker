@@ -74,6 +74,8 @@ exercise:
     title: Info esercizio
     viewWorkout: Vedi allenamento
     noHistory: Non ci sono allenamenti per questo esercizio.
+  continuation:
+    label: "Continuazione"
 
 workouts:
   untitled: Allenamento senza nome
@@ -98,6 +100,7 @@ workouts:
     saveAsRoutine:
       button: Salva come routine
       done: Allenamento salvato come routine
+    continue: Continua quest'allenamento
   
 routines:
   title: Routine
@@ -267,6 +270,7 @@ general:
     few: "%s esercizi"
     many: "%s di esercizi"
     other: "%s esercizi"
+  totalTime: "Tempo totale: @time"
 
 muscleGroups:
   abductors: Abduttori

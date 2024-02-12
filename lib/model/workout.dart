@@ -22,7 +22,6 @@ class Workout {
   final List<WorkoutExercisable> exercises;
   final Duration? duration;
   final DateTime? startingDate;
-
   final String? infobox;
 
   /// The ID of the non-concrete (ie. part of a routine) exercise
@@ -31,6 +30,34 @@ class Workout {
 
   /// Whether this is a concrete workout.
   bool get isConcrete => duration != null;
+
+  /// Whether this workout is complete (or a routine)
+  bool get isComplete => !isConcrete || allSets.every((set) => set.done);
+
+  /// Whether this workout can be continued by another
+  bool get isContinuable =>
+      !isComplete && completedBy == null && completes == null;
+
+  /// Whether this workout completes another
+  bool get isContinuation => completes != null;
+
+  /// If this workout is not complete, and a workout completing this exists,
+  /// the ID referencing the [Workout] that completes [this].
+  ///
+  /// {@template gymtracker_workout_completion}
+  /// A workout can be complete, that is, every set in the workout has been done.
+  /// If that's not the case, [isComplete] is false, and the user has the option
+  /// to continue it with another concrete workout, with only the sets that they
+  /// haven't done. When that happens, the new workout gets a field [completes]
+  /// that is bound to this workout's [id], and this workout gets a field
+  /// [completedBy] that is bound to the new workout's [id].
+  ///
+  /// It is an error to define both [completedBy] and [completes].
+  /// {@endtemplate}
+  String? completedBy;
+
+  /// {@macro gymtracker_workout_completion}
+  String? completes;
 
   DateTime? get endingDate => (duration != null && startingDate != null)
       ? startingDate!.add(duration!)
@@ -62,7 +89,14 @@ class Workout {
     this.startingDate,
     this.parentID,
     this.infobox,
-  }) : id = id ?? const Uuid().v4();
+    this.completedBy,
+    this.completes,
+  })  : id = id ?? const Uuid().v4(),
+        assert(() {
+          if (completedBy == null && completes == null) return true;
+          return (completedBy == null) != (completes == null);
+        }(),
+            "Both completedBy and completes cannot be defined at the same time.");
 
   factory Workout.fromJson(Map<String, dynamic> json) =>
       _$WorkoutFromJson(json);

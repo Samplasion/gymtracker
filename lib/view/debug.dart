@@ -1,5 +1,6 @@
 import 'package:flat/flat.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:gymtracker/controller/debug_controller.dart';
@@ -79,6 +80,18 @@ class DebugView extends StatelessWidget {
                         startingTime: DateTime.now(),
                       ),
                   ],
+                );
+              }),
+              StatefulBuilder(builder: (context, setState) {
+                return Slider(
+                  value: timeDilation,
+                  onChanged: ((value) {
+                    setState(() {
+                      timeDilation = value;
+                    });
+                  }),
+                  min: 1,
+                  max: 15,
                 );
               }),
             ]),

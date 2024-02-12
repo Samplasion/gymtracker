@@ -14,37 +14,52 @@ import 'utils/timer.dart';
 
 typedef MonthYear = (int month, int year);
 
-class HistoryView extends StatelessWidget {
+Map<MonthYear, List<Workout>> _getHistoryByMonthThread(List<Workout> raw) {
+  final map = <MonthYear, List<Workout>>{};
+  for (final workout in raw.reversed) {
+    final key = (
+      workout.startingDate!.month,
+      workout.startingDate!.year,
+    );
+    if (!map.containsKey(key)) {
+      map[key] = [];
+    }
+    map[key]!.add(workout);
+  }
+  return map;
+}
+
+class HistoryView extends StatefulWidget {
   const HistoryView({super.key});
 
-  Map<MonthYear, List<Workout>> get historyByMonth {
+  @override
+  State<HistoryView> createState() => _HistoryViewState();
+}
+
+class _HistoryViewState extends State<HistoryView> {
+  late Future<Map<MonthYear, List<Workout>>> historyByMonth =
+      compute(_getHistoryByMonthThread, () {
     final controller = Get.find<HistoryController>();
-    final history = controller.userVisibleWorkouts.reversed;
-    final map = <MonthYear, List<Workout>>{};
-    for (final workout in history) {
-      final key = (
-        workout.startingDate!.month,
-        workout.startingDate!.year,
-      );
-      if (!map.containsKey(key)) {
-        map[key] = [];
-      }
-      map[key]!.add(workout);
-    }
-    return map;
-  }
+    return controller.userVisibleWorkouts;
+  }());
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Obx(
-        () {
-          final history = historyByMonth;
+      body: FutureBuilder(
+        future: historyByMonth,
+        builder: (context, snapshot) {
+          final history = snapshot.data ?? {};
+
           return CustomScrollView(
             slivers: [
               SliverAppBar.large(
                 title: Text("history.title".t),
               ),
+              if (!snapshot.hasData)
+                const SliverFillRemaining(
+                  child: Center(child: CircularProgressIndicator()),
+                ),
               for (final date in history.keys) ...[
                 SliverStickyHeader.builder(
                   builder: (context, state) =>

@@ -36,11 +36,40 @@ class HistoryView extends StatefulWidget {
 }
 
 class _HistoryViewState extends State<HistoryView> {
-  late Future<Map<MonthYear, List<Workout>>> historyByMonth =
-      compute(_getHistoryByMonthThread, () {
+  late Future<Map<MonthYear, List<Workout>>> historyByMonth = Future.value({});
+  late Worker worker;
+
+  @override
+  void initState() {
+    super.initState();
+    printInfo(info: "Init state");
+    _recompute();
     final controller = Get.find<HistoryController>();
-    return controller.userVisibleWorkouts;
-  }());
+    worker = ever(
+      controller.history,
+      (callback) {
+        printInfo(info: "History updated");
+        _recompute();
+      },
+    );
+  }
+
+  _recompute() {
+    final controller = Get.find<HistoryController>();
+    historyByMonth = compute(_getHistoryByMonthThread, () {
+      return controller.userVisibleWorkouts;
+    }());
+    if (mounted) {
+      setState(() {});
+    }
+  }
+
+  @override
+  void dispose() {
+    printInfo(info: "Dispose state");
+    worker.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -58,6 +87,21 @@ class _HistoryViewState extends State<HistoryView> {
               if (!snapshot.hasData)
                 const SliverFillRemaining(
                   child: Center(child: CircularProgressIndicator()),
+                )
+              else
+                SliverToBoxAdapter(
+                  child: AnimatedCrossFade(
+                    firstChild: const SizedBox(
+                      height: 100,
+                      child: Center(child: CircularProgressIndicator()),
+                    ),
+                    secondChild: const SizedBox.shrink(),
+                    crossFadeState:
+                        snapshot.connectionState != ConnectionState.done
+                            ? CrossFadeState.showFirst
+                            : CrossFadeState.showSecond,
+                    duration: const Duration(milliseconds: 300),
+                  ),
                 ),
               for (final date in history.keys) ...[
                 SliverStickyHeader.builder(

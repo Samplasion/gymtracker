@@ -56,10 +56,6 @@ class GlobalStopwatch extends GTStopwatch {
     stopwatch.start();
   }
 
-  void _onTickInternal() {
-    onTick(stopwatch.elapsed);
-  }
-
   void reset() {
     // Intentionally trigger a rebuild by setting isStopped to false and then true
     isStopped.value = false;

@@ -4,7 +4,6 @@ import 'package:get/get.dart';
 import 'package:gymtracker/model/exercisable.dart';
 import 'package:gymtracker/model/superset.dart';
 import 'package:gymtracker/service/localizations.dart';
-import 'package:uuid/uuid.dart';
 
 import '../controller/history_controller.dart';
 import '../model/exercise.dart';

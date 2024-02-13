@@ -39,6 +39,8 @@ class _HistoryViewState extends State<HistoryView> {
   late Future<Map<MonthYear, List<Workout>>> historyByMonth = Future.value({});
   late Worker worker;
 
+  Set<String> selectedEntries = {};
+
   @override
   void initState() {
     super.initState();
@@ -81,9 +83,7 @@ class _HistoryViewState extends State<HistoryView> {
 
           return CustomScrollView(
             slivers: [
-              SliverAppBar.large(
-                title: Text("history.title".t),
-              ),
+              _buildAppBar(),
               if (!snapshot.hasData)
                 const SliverFillRemaining(
                   child: Center(child: CircularProgressIndicator()),
@@ -105,14 +105,43 @@ class _HistoryViewState extends State<HistoryView> {
                 ),
               for (final date in history.keys) ...[
                 SliverStickyHeader.builder(
-                  builder: (context, state) =>
-                      _buildHeader(context, state, date),
+                  builder: (context, state) => _buildHeader(state, date),
                   sliver: SliverList(
                     delegate: SliverChildBuilderDelegate(
                       childCount: (history[date] ?? []).length,
                       (context, index) {
+                        final thatDate = (history[date] ?? []);
+
+                        _toggle() {
+                          if (snapshot.connectionState !=
+                              ConnectionState.done) {
+                            return;
+                          }
+                          setState(() {
+                            if (selectedEntries.contains(thatDate[index].id)) {
+                              selectedEntries.remove(thatDate[index].id);
+                            } else {
+                              selectedEntries.add(thatDate[index].id);
+                            }
+                          });
+                        }
+
                         return HistoryWorkout(
-                            workout: (history[date] ?? [])[index]);
+                          workout: thatDate[index],
+                          isSelected:
+                              selectedEntries.contains(thatDate[index].id),
+                          onTap: () {
+                            if (selectedEntries.isEmpty) {
+                              Go.to(() =>
+                                  ExercisesView(workout: thatDate[index]));
+                            } else {
+                              _toggle();
+                            }
+                          },
+                          onLongPress: () {
+                            _toggle();
+                          },
+                        );
                       },
                     ),
                   ),
@@ -125,8 +154,51 @@ class _HistoryViewState extends State<HistoryView> {
     );
   }
 
-  _buildHeader(
-    BuildContext context,
+  Widget _buildAppBar() {
+    if (selectedEntries.isEmpty) {
+      return SliverAppBar.large(
+        title: Text("history.title".t),
+      );
+    }
+
+    return SliverAppBar.large(
+      backgroundColor: Theme.of(context).colorScheme.inverseSurface,
+      foregroundColor: Theme.of(context).colorScheme.onInverseSurface,
+      surfaceTintColor: Colors.transparent,
+      title: Text(
+        "general.selected".plural(selectedEntries.length),
+      ),
+      leading: IconButton(
+        icon: const Icon(Icons.close),
+        onPressed: () {
+          setState(() {
+            selectedEntries.clear();
+          });
+        },
+      ),
+      actions: [
+        IconButton(
+          tooltip: "history.actions.deleteMultiple.title"
+              .plural(selectedEntries.length),
+          icon: const Icon(Icons.delete),
+          onPressed: () {
+            final controller = Get.find<HistoryController>();
+            controller.deleteWorkoutsWithDialog(
+              context,
+              workoutIDs: selectedEntries,
+              onDeleted: () {
+                Go.snack("history.actions.deleteMultiple.done"
+                    .plural(selectedEntries.length));
+                selectedEntries.clear();
+              },
+            );
+          },
+        ),
+      ],
+    );
+  }
+
+  Widget _buildHeader(
     SliverStickyHeaderState state,
     MonthYear date,
   ) {
@@ -155,6 +227,9 @@ class _HistoryViewState extends State<HistoryView> {
 class HistoryWorkout extends StatelessWidget {
   final Workout workout;
   final int showExercises;
+  final bool isSelected;
+  final VoidCallback? onTap;
+  final VoidCallback? onLongPress;
 
   HistoryController get controller => Get.find<HistoryController>();
 
@@ -164,20 +239,27 @@ class HistoryWorkout extends StatelessWidget {
   HistoryWorkout({
     required this.workout,
     this.showExercises = 5,
+    this.isSelected = false,
+    this.onTap,
+    this.onLongPress,
     super.key,
   });
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final fg =
+        isSelected ? colorScheme.onSurface : colorScheme.onPrimaryContainer;
+    final bg = isSelected ? colorScheme.surface : colorScheme.primaryContainer;
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      elevation: isSelected ? 16 : Theme.of(context).cardTheme.elevation,
       child: Material(
         type: MaterialType.transparency,
         child: InkWell(
           borderRadius: BorderRadius.circular(12),
-          onTap: () {
-            Go.to(() => ExercisesView(workout: workout));
-          },
+          onTap: onTap,
+          onLongPress: onLongPress,
           child: Column(
             children: [
               Padding(
@@ -189,12 +271,12 @@ class HistoryWorkout extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         CircleAvatar(
-                          backgroundColor:
-                              Theme.of(context).colorScheme.primaryContainer,
-                          foregroundColor:
-                              Theme.of(context).colorScheme.onPrimaryContainer,
-                          child:
-                              Text(workout.name.characters.first.toUpperCase()),
+                          backgroundColor: bg,
+                          foregroundColor: fg,
+                          child: isSelected
+                              ? const Icon(Icons.check)
+                              : Text(
+                                  workout.name.characters.first.toUpperCase()),
                         ),
                         const SizedBox(width: 16),
                         Expanded(

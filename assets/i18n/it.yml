@@ -153,6 +153,29 @@ history:
     few: "...e altri %s"
     many: "...e altri %s"
     other: "...e altri %s"
+  actions:
+    deleteMultiple:
+      title:
+        one: Rimuovi esercizio
+        two: Rimuovi %s esercizi
+        few: Rimuovi %s esercizi
+        many: Rimuovi %s esercizi
+        other: Rimuovi %s esercizi
+      text:
+        one: Sei sicuro di voler eliminare questo esercizio dalla tua cronologia? Quest'azione non può essere annullata.
+        two: Sei sicuro di voler eliminare questi esercizi dalla tua cronologia? Quest'azione non può essere annullata.
+        few: Sei sicuro di voler eliminare questi esercizi dalla tua cronologia? Quest'azione non può essere annullata.
+        many: Sei sicuro di voler eliminare questi esercizi dalla tua cronologia? Quest'azione non può essere annullata.
+        other: Sei sicuro di voler eliminare questi esercizi dalla tua cronologia? Quest'azione non può essere annullata.
+      actions:
+        no: Annulla
+        yes: Elimina
+      done:
+        one: L'esercizio è stato eliminato dalla tua cronologia.
+        two: Gli esercizi sono stati eliminati dalla tua cronologia.
+        few: Gli esercizi sono stati eliminati dalla tua cronologia.
+        many: Gli esercizi sono stati eliminati dalla tua cronologia.
+        other: Gli esercizi sono stati eliminati dalla tua cronologia.
 
 settings:
   title: Impostazioni
@@ -271,6 +294,13 @@ general:
     many: "%s di esercizi"
     other: "%s esercizi"
   totalTime: "Tempo totale: @time"
+  selected:
+    zero: "Nessuna selezione"
+    one: "1 elemento selezionato"
+    two: "%s elementi selezionati"
+    few: "%s elementi selezionati"
+    many: "%s elementi selezionati"
+    other: "%s elementi selezionati"
 
 muscleGroups:
   abductors: Abduttori

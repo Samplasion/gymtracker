@@ -15,7 +15,7 @@ class HistoryController extends GetxController with ServiceableController {
   int get userVisibleLength => userVisibleWorkouts.length;
 
   List<Workout> get userVisibleWorkouts => history
-      .where((workout) => !workout.isContinuation || !kDebugMode)
+      .where((workout) => !workout.isContinuation || kDebugMode)
       .toList();
 
   @override
@@ -143,6 +143,51 @@ class HistoryController extends GetxController with ServiceableController {
                 onCanceled();
               },
               child: Text("workouts.actions.delete.actions.yes".t),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void deleteWorkoutsWithDialog(
+    BuildContext context, {
+    required Set<String> workoutIDs,
+    required void Function() onDeleted,
+  }) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          icon: const Icon(Icons.info),
+          title: Text(
+              "history.actions.deleteMultiple.title".plural(workoutIDs.length)),
+          content: Text(
+            "history.actions.deleteMultiple.text".plural(workoutIDs.length),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Get.back(closeOverlays: true);
+              },
+              child: Text("history.actions.deleteMultiple.actions.no".t),
+            ),
+            FilledButton.tonal(
+              onPressed: () {
+                final deletedWorkouts = service.workoutHistory
+                    .where((element) => workoutIDs.contains(element.id))
+                    .toList();
+                for (final workout in deletedWorkouts) {
+                  deleteWorkout(workout);
+                }
+
+                SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
+                  Get.back(closeOverlays: true);
+                });
+
+                onDeleted();
+              },
+              child: Text("history.actions.deleteMultiple.actions.yes".t),
             ),
           ],
         );

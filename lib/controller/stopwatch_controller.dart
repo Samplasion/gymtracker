@@ -1,8 +1,8 @@
 import 'dart:async';
 
 import 'package:get/get.dart';
+import 'package:gymtracker/controller/serviceable_controller.dart';
 import 'package:gymtracker/view/utils/time.dart';
-import 'serviceable_controller.dart';
 
 const _globalStopwatchID = "global";
 

@@ -1,18 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:get/get.dart';
+import 'package:gymtracker/controller/countdown_controller.dart';
 import 'package:gymtracker/controller/history_controller.dart';
+import 'package:gymtracker/controller/serviceable_controller.dart';
 import 'package:gymtracker/controller/stopwatch_controller.dart';
+import 'package:gymtracker/controller/workouts_controller.dart';
 import 'package:gymtracker/model/exercisable.dart';
+import 'package:gymtracker/model/set.dart';
+import 'package:gymtracker/model/workout.dart';
+import 'package:gymtracker/service/database.dart';
 import 'package:gymtracker/service/localizations.dart';
-
-import '../model/set.dart';
-import '../model/workout.dart';
-import '../service/database.dart';
-import '../view/workout.dart';
-import 'countdown_controller.dart';
-import 'serviceable_controller.dart';
-import 'workouts_controller.dart';
+import 'package:gymtracker/view/workout.dart';
 
 class WorkoutController extends GetxController with ServiceableController {
   RxString name;

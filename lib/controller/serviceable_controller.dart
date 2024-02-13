@@ -1,6 +1,6 @@
 import 'package:get/get.dart';
 
-import '../service/database.dart';
+import 'package:gymtracker/service/database.dart';
 
 mixin ServiceableController on GetxController {
   DatabaseService get service => Get.find<DatabaseService>();

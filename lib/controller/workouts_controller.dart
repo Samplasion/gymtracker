@@ -1,21 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:get/get.dart';
+import 'package:gymtracker/controller/countdown_controller.dart';
+import 'package:gymtracker/controller/history_controller.dart';
+import 'package:gymtracker/controller/serviceable_controller.dart';
+import 'package:gymtracker/controller/workout_controller.dart';
 import 'package:gymtracker/model/exercisable.dart';
+import 'package:gymtracker/model/exercise.dart';
+import 'package:gymtracker/model/set.dart';
 import 'package:gymtracker/model/superset.dart';
+import 'package:gymtracker/model/workout.dart';
 import 'package:gymtracker/service/localizations.dart';
-
-import '../controller/history_controller.dart';
-import '../model/exercise.dart';
-import '../model/set.dart';
-import '../model/workout.dart';
-import '../utils/go.dart';
-import '../utils/utils.dart' as utils;
-import '../view/exercises.dart';
-import '../view/workout.dart';
-import 'countdown_controller.dart';
-import 'serviceable_controller.dart';
-import 'workout_controller.dart';
+import 'package:gymtracker/utils/go.dart';
+import 'package:gymtracker/utils/utils.dart' as utils;
+import 'package:gymtracker/view/exercises.dart';
+import 'package:gymtracker/view/workout.dart';
 
 class WorkoutsController extends GetxController with ServiceableController {
   RxList<Workout> workouts = <Workout>[].obs;

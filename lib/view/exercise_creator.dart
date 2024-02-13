@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:gymtracker/controller/exercises_controller.dart';
 import 'package:gymtracker/model/exercise.dart';
 import 'package:gymtracker/model/set.dart';
 import 'package:gymtracker/service/localizations.dart';
-
-import '../controller/exercises_controller.dart';
 
 class ExerciseCreator extends StatefulWidget {
   final Exercise? base;
@@ -85,8 +84,7 @@ class _ExerciseCreatorState extends State<ExerciseCreator> {
                   onChanged: (v) => setState(() => params = v!),
                   validator: (value) {
                     if (value == null) {
-                      return "exercise.editor.fields.parameters.errors.empty"
-                          .t;
+                      return "exercise.editor.fields.parameters.errors.empty".t;
                     }
                     return null;
                   },

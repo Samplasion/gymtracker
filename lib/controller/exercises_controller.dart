@@ -1,8 +1,7 @@
 import 'package:get/get.dart';
+import 'package:gymtracker/controller/serviceable_controller.dart';
+import 'package:gymtracker/model/exercise.dart';
 import 'package:gymtracker/model/set.dart';
-
-import '../model/exercise.dart';
-import 'serviceable_controller.dart';
 
 class ExercisesController extends GetxController with ServiceableController {
   RxList<Exercise> exercises = <Exercise>[].obs;

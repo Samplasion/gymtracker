@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:gymtracker/controller/workouts_controller.dart';
+import 'package:gymtracker/model/workout.dart';
+import 'package:gymtracker/service/localizations.dart';
+import 'package:gymtracker/utils/go.dart';
+import 'package:gymtracker/view/exercises.dart';
+import 'package:gymtracker/view/routine_creator.dart';
 import 'package:universal_platform/universal_platform.dart';
-
-import '../controller/workouts_controller.dart';
-import '../model/workout.dart';
-import '../service/localizations.dart';
-import '../utils/go.dart';
-import '../view/exercises.dart';
-import 'routine_creator.dart';
 
 Workout get emptyWorkout => Workout(name: "", exercises: []);
 

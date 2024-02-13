@@ -1,4 +1,4 @@
-import '../utils/utils.dart';
+import 'package:gymtracker/utils/utils.dart';
 
 enum Weights {
   kg([1.25, 2.5, 5, 10, 15, 20]),

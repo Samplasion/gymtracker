@@ -4,25 +4,24 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:get/get.dart';
 import 'package:gymtracker/controller/history_controller.dart';
+import 'package:gymtracker/controller/history_controller.dart' as history;
+import 'package:gymtracker/controller/workouts_controller.dart';
 import 'package:gymtracker/model/exercisable.dart';
+import 'package:gymtracker/model/exercise.dart';
+import 'package:gymtracker/model/set.dart';
 import 'package:gymtracker/model/superset.dart';
+import 'package:gymtracker/model/workout.dart';
+import 'package:gymtracker/service/localizations.dart';
+import 'package:gymtracker/utils/go.dart';
+import 'package:gymtracker/utils/sets.dart';
+import 'package:gymtracker/utils/utils.dart';
 import 'package:gymtracker/view/components/infobox.dart';
+import 'package:gymtracker/view/routine_creator.dart';
+import 'package:gymtracker/view/utils/dropdown_dialog.dart';
+import 'package:gymtracker/view/utils/exercise.dart';
 import 'package:gymtracker/view/utils/textfield_dialog.dart';
+import 'package:gymtracker/view/utils/timer.dart';
 import 'package:intl/intl.dart';
-
-import '../controller/history_controller.dart' as history;
-import '../controller/workouts_controller.dart';
-import '../model/exercise.dart';
-import '../model/set.dart';
-import '../model/workout.dart';
-import '../service/localizations.dart';
-import '../utils/go.dart';
-import '../utils/sets.dart';
-import '../utils/utils.dart';
-import 'routine_creator.dart';
-import 'utils/dropdown_dialog.dart';
-import 'utils/exercise.dart';
-import 'utils/timer.dart';
 
 class ExercisesView extends StatefulWidget {
   const ExercisesView({required this.workout, super.key});

@@ -1,12 +1,11 @@
 import 'package:copy_with_extension/copy_with_extension.dart';
 import 'package:get/get.dart';
 import 'package:gymtracker/model/exercisable.dart';
+import 'package:gymtracker/model/set.dart';
 import 'package:gymtracker/model/workout.dart';
 import 'package:gymtracker/service/localizations.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:uuid/uuid.dart';
-
-import 'set.dart';
 
 part 'exercise.g.dart';
 

@@ -2,13 +2,12 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:get/get.dart';
+import 'package:gymtracker/controller/serviceable_controller.dart';
 import 'package:gymtracker/model/exercisable.dart';
+import 'package:gymtracker/model/exercise.dart';
 import 'package:gymtracker/model/superset.dart';
+import 'package:gymtracker/model/workout.dart';
 import 'package:gymtracker/service/localizations.dart';
-
-import '../model/exercise.dart';
-import '../model/workout.dart';
-import 'serviceable_controller.dart';
 
 class HistoryController extends GetxController with ServiceableController {
   RxList<Workout> history = <Workout>[].obs;

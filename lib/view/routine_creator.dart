@@ -1,18 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:get/get.dart';
+import 'package:gymtracker/controller/workouts_controller.dart';
 import 'package:gymtracker/model/exercisable.dart';
+import 'package:gymtracker/model/exercise.dart';
+import 'package:gymtracker/model/set.dart';
 import 'package:gymtracker/model/superset.dart';
+import 'package:gymtracker/model/workout.dart';
 import 'package:gymtracker/service/localizations.dart';
+import 'package:gymtracker/utils/go.dart';
+import 'package:gymtracker/view/exercise_picker.dart';
 import 'package:gymtracker/view/utils/superset.dart';
-
-import '../controller/workouts_controller.dart';
-import '../model/exercise.dart';
-import '../model/set.dart';
-import '../model/workout.dart';
-import '../utils/go.dart';
-import 'exercise_picker.dart';
-import 'utils/workout.dart';
+import 'package:gymtracker/view/utils/workout.dart';
 
 class _DateWrapped<T> {
   T data;

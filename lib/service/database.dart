@@ -1,11 +1,10 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:get_storage/get_storage.dart';
 import 'package:get/get.dart';
-
-import '../model/exercise.dart';
-import '../model/workout.dart';
+import 'package:get_storage/get_storage.dart';
+import 'package:gymtracker/model/exercise.dart';
+import 'package:gymtracker/model/workout.dart';
 
 const DATABASE_VERSION = 1;
 

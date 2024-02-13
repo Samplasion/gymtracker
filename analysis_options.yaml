@@ -5,3 +5,8 @@ analyzer:
     body_might_complete_normally_nullable: false
     no_leading_underscores_for_local_identifiers: false
     constant_identifier_names: false
+
+linter:
+  rules:
+    - always_use_package_imports
+    - directives_ordering

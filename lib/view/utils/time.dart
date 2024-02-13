@@ -5,7 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:gymtracker/controller/stopwatch_controller.dart';
 
-import 'animated_selectable.dart';
+import 'package:gymtracker/view/utils/animated_selectable.dart';
 
 class TimeInputField extends StatefulWidget {
   final TextEditingController controller;

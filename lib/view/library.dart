@@ -1,18 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:gymtracker/controller/exercises_controller.dart';
+import 'package:gymtracker/controller/history_controller.dart';
 import 'package:gymtracker/data/exercises.dart';
+import 'package:gymtracker/model/exercise.dart';
 import 'package:gymtracker/model/superset.dart';
 import 'package:gymtracker/model/workout.dart';
 import 'package:gymtracker/service/localizations.dart';
+import 'package:gymtracker/utils/go.dart';
+import 'package:gymtracker/utils/utils.dart';
 import 'package:gymtracker/view/exercises.dart';
+import 'package:gymtracker/view/utils/exercise.dart';
 import 'package:intl/intl.dart';
-
-import '../controller/exercises_controller.dart';
-import '../controller/history_controller.dart';
-import '../model/exercise.dart';
-import '../utils/go.dart';
-import '../utils/utils.dart';
-import 'utils/exercise.dart';
 
 class LibraryView extends GetView<ExercisesController> {
   const LibraryView({super.key});

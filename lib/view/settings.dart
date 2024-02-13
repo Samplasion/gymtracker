@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:gymtracker/controller/settings_controller.dart';
+import 'package:gymtracker/data/weights.dart';
 import 'package:gymtracker/service/color.dart';
 import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/view/settings/color.dart';
-
-import '../controller/settings_controller.dart';
-import '../data/weights.dart';
-import 'settings/radio.dart';
+import 'package:gymtracker/view/settings/radio.dart';
 
 class SettingsView extends StatelessWidget {
   const SettingsView({super.key});

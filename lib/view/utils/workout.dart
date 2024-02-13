@@ -1,18 +1,16 @@
-import 'package:gymtracker/view/utils/drag_handle.dart';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:get/get.dart';
+import 'package:gymtracker/model/exercise.dart';
+import 'package:gymtracker/model/set.dart';
 import 'package:gymtracker/service/localizations.dart';
-
-import '../../model/exercise.dart';
-import '../../model/set.dart';
-import '../../utils/extensions.dart';
-import '../../utils/sets.dart';
-import '../../utils/utils.dart';
-import 'exercise.dart';
-import 'time.dart';
+import 'package:gymtracker/utils/extensions.dart';
+import 'package:gymtracker/utils/sets.dart';
+import 'package:gymtracker/utils/utils.dart';
+import 'package:gymtracker/view/utils/drag_handle.dart';
+import 'package:gymtracker/view/utils/exercise.dart';
+import 'package:gymtracker/view/utils/time.dart';
 
 class WorkoutExerciseEditor extends StatefulWidget {
   final Exercise exercise;

@@ -1,30 +1,29 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:get/get.dart';
+import 'package:gymtracker/controller/countdown_controller.dart';
 import 'package:gymtracker/controller/stopwatch_controller.dart';
+import 'package:gymtracker/controller/workout_controller.dart';
+import 'package:gymtracker/controller/workouts_controller.dart';
 import 'package:gymtracker/model/exercisable.dart';
+import 'package:gymtracker/model/exercise.dart';
+import 'package:gymtracker/model/set.dart';
 import 'package:gymtracker/model/superset.dart';
 import 'package:gymtracker/service/localizations.dart';
+import 'package:gymtracker/utils/constants.dart';
+import 'package:gymtracker/utils/go.dart';
+import 'package:gymtracker/utils/utils.dart';
 import 'package:gymtracker/view/components/infobox.dart';
 import 'package:gymtracker/view/components/split_button.dart';
+import 'package:gymtracker/view/exercise_picker.dart';
+import 'package:gymtracker/view/utils/crossfade.dart';
+import 'package:gymtracker/view/utils/date_field.dart';
+import 'package:gymtracker/view/utils/exercise.dart';
 import 'package:gymtracker/view/utils/superset.dart';
-
-import '../controller/countdown_controller.dart';
-import '../controller/workout_controller.dart';
-import '../controller/workouts_controller.dart';
-import '../model/exercise.dart';
-import '../model/set.dart';
-import '../utils/constants.dart';
-import '../utils/go.dart';
-import '../utils/utils.dart';
-import '../view/exercise_picker.dart';
-import '../view/utils/workout.dart';
-import 'utils/crossfade.dart';
-import 'utils/date_field.dart';
-import 'utils/exercise.dart';
-import 'utils/time.dart';
-import 'utils/timer.dart';
-import 'utils/weight_calculator.dart';
+import 'package:gymtracker/view/utils/time.dart';
+import 'package:gymtracker/view/utils/timer.dart';
+import 'package:gymtracker/view/utils/weight_calculator.dart';
+import 'package:gymtracker/view/utils/workout.dart';
 
 WorkoutController get controller =>
     Get.put(WorkoutController("Untitled workout", null, null));

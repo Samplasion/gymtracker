@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:gymtracker/controller/exercises_controller.dart';
+import 'package:gymtracker/data/exercises.dart';
+import 'package:gymtracker/model/exercise.dart';
 import 'package:gymtracker/service/localizations.dart';
-
-import '../controller/exercises_controller.dart';
-import '../data/exercises.dart';
-import '../model/exercise.dart';
-import '../utils/go.dart';
-import '../utils/utils.dart';
-import 'utils/exercise.dart';
-import 'exercise_creator.dart';
+import 'package:gymtracker/utils/go.dart';
+import 'package:gymtracker/utils/utils.dart';
+import 'package:gymtracker/view/exercise_creator.dart';
+import 'package:gymtracker/view/utils/exercise.dart';
 
 class ExercisePicker extends StatefulWidget {
   final bool singlePick;

@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
-import '../../service/localizations.dart';
+import 'package:gymtracker/service/localizations.dart';
 
 typedef TimerStringBuilder<T> = T Function(TextSpan time);
 

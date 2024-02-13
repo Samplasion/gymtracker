@@ -8,17 +8,16 @@ import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:gymtracker/controller/countdown_controller.dart';
 import 'package:gymtracker/controller/debug_controller.dart';
+import 'package:gymtracker/controller/exercises_controller.dart';
+import 'package:gymtracker/controller/settings_controller.dart';
 import 'package:gymtracker/controller/stopwatch_controller.dart';
 import 'package:gymtracker/service/color.dart';
+import 'package:gymtracker/service/database.dart';
+import 'package:gymtracker/service/localizations.dart';
+import 'package:gymtracker/service/notifications.dart';
 import 'package:gymtracker/utils/extensions.dart';
+import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/view/skeleton.dart';
-
-import 'controller/exercises_controller.dart';
-import 'controller/settings_controller.dart';
-import 'service/database.dart';
-import 'service/localizations.dart';
-import 'service/notifications.dart';
-import 'utils/go.dart';
 
 final _databaseService = DatabaseService();
 

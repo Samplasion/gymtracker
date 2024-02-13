@@ -4,22 +4,21 @@ import 'package:flutter/material.dart' hide Localizations;
 import 'package:flutter/scheduler.dart';
 import 'package:get/get.dart';
 import 'package:gymtracker/controller/history_controller.dart';
+import 'package:gymtracker/controller/workout_controller.dart';
 import 'package:gymtracker/controller/workouts_controller.dart';
+import 'package:gymtracker/service/localizations.dart';
+import 'package:gymtracker/utils/constants.dart';
+import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/view/debug.dart';
+import 'package:gymtracker/view/history.dart';
+import 'package:gymtracker/view/library.dart';
+import 'package:gymtracker/view/routines.dart';
+import 'package:gymtracker/view/settings.dart';
+import 'package:gymtracker/view/utils/crossfade.dart';
+import 'package:gymtracker/view/utils/timer.dart';
 import 'package:gymtracker/view/workout.dart';
 import 'package:iconify_flutter/iconify_flutter.dart';
 import 'package:iconify_flutter/icons/mdi.dart';
-
-import '../controller/workout_controller.dart';
-import '../service/localizations.dart';
-import '../utils/constants.dart';
-import '../utils/go.dart';
-import 'history.dart';
-import 'library.dart';
-import 'routines.dart';
-import 'settings.dart';
-import 'utils/crossfade.dart';
-import 'utils/timer.dart';
 
 class SkeletonView extends StatefulWidget {
   const SkeletonView({super.key});

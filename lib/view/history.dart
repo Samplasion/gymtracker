@@ -2,15 +2,14 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_sticky_header/flutter_sticky_header.dart';
 import 'package:get/get.dart';
+import 'package:gymtracker/controller/history_controller.dart';
+import 'package:gymtracker/model/workout.dart';
+import 'package:gymtracker/service/localizations.dart';
+import 'package:gymtracker/utils/go.dart';
+import 'package:gymtracker/view/exercises.dart';
+import 'package:gymtracker/view/utils/exercise.dart';
+import 'package:gymtracker/view/utils/timer.dart';
 import 'package:intl/intl.dart';
-
-import '../controller/history_controller.dart';
-import '../model/workout.dart';
-import '../service/localizations.dart';
-import '../utils/go.dart';
-import 'exercises.dart';
-import 'utils/exercise.dart';
-import 'utils/timer.dart';
 
 typedef MonthYear = (int month, int year);
 

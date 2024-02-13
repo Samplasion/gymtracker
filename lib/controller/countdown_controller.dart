@@ -3,9 +3,8 @@ import 'dart:async';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get/get.dart';
 import 'package:gymtracker/service/localizations.dart';
-
-import '../service/notifications.dart';
-import '../utils/constants.dart';
+import 'package:gymtracker/service/notifications.dart';
+import 'package:gymtracker/utils/constants.dart';
 
 class CountdownController extends GetxController {
   Rx<DateTime?> targetTime = Rx(null);

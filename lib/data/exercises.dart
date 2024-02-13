@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:gymtracker/model/exercise.dart';
 import 'package:gymtracker/model/set.dart';
 import 'package:gymtracker/service/localizations.dart';
-
-import '../model/exercise.dart';
 
 class ExerciseCategory {
   final List<Exercise> exercises;

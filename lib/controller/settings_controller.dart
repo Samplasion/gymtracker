@@ -6,12 +6,11 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:gymtracker/controller/serviceable_controller.dart';
+import 'package:gymtracker/data/weights.dart';
 import 'package:gymtracker/service/localizations.dart';
+import 'package:gymtracker/utils/go.dart';
 import 'package:share_plus/share_plus.dart';
-
-import '../data/weights.dart';
-import '../utils/go.dart';
-import 'serviceable_controller.dart';
 
 Color defaultColor = Color(Colors.blue.value);
 

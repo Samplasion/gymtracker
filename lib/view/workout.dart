@@ -816,6 +816,18 @@ class _WorkoutFinishPageState extends State<WorkoutFinishPage> {
   final infoboxController =
       TextEditingController(text: controller.infobox.value);
 
+  late String? pwInitialItem = () {
+    // Parent workout data
+    String? pwInitialItem = controller.parentID.value;
+    if (Get.find<WorkoutsController>()
+        .workouts
+        .every((element) => element.id != pwInitialItem)) {
+      pwInitialItem = null;
+    }
+
+    return pwInitialItem;
+  }();
+
   @override
   Widget build(BuildContext context) {
     return Dialog.fullscreen(
@@ -877,7 +889,7 @@ class _WorkoutFinishPageState extends State<WorkoutFinishPage> {
                     ),
                 ],
                 onChanged: (v) => setState(() => controller.parentID.value = v),
-                value: controller.parentID.value,
+                value: pwInitialItem,
               ),
               TimeInputField(
                 controller: timeController,

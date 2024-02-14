@@ -86,6 +86,11 @@ class _ExercisesViewState extends State<ExercisesView> {
                   child: Text("workouts.actions.changeParent.label".t),
                   onTap: () {
                     SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
+                      String? initialItem = workout.parentID;
+                      if (controller.workouts
+                          .every((element) => element.id != initialItem)) {
+                        initialItem = null;
+                      }
                       showDialog(
                         context: context,
                         builder: (_) {
@@ -108,7 +113,7 @@ class _ExercisesViewState extends State<ExercisesView> {
                                   child: Text(workout.name),
                                 ),
                             ],
-                            initialItem: workout.parentID,
+                            initialItem: initialItem,
                             onSelect: (value) {
                               changeParent(value);
                             },

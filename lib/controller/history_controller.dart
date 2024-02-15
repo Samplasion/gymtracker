@@ -8,6 +8,7 @@ import 'package:gymtracker/model/exercise.dart';
 import 'package:gymtracker/model/superset.dart';
 import 'package:gymtracker/model/workout.dart';
 import 'package:gymtracker/service/localizations.dart';
+import 'package:gymtracker/view/workout_editor.dart';
 
 class HistoryController extends GetxController with ServiceableController {
   RxList<Workout> history = <Workout>[].obs;
@@ -227,6 +228,32 @@ class HistoryController extends GetxController with ServiceableController {
     return service.workoutHistory.firstWhereOrNull(
       (element) => element.completedBy == continuationWorkout.id,
     );
+  }
+
+  void finishEditingWorkoutWithDialog(BuildContext context, Workout workout) {
+    showDialog(
+      context: context,
+      builder: (context) => WorkoutFinishEditingPage(
+        workout: workout,
+      ),
+    );
+  }
+
+  void submitEditedWorkout(Workout workout) {
+    final index = service.workoutHistory
+        .indexWhere((element) => element.id == workout.id);
+    if (index >= 0) {
+      service.workoutHistory = [
+        ...service.workoutHistory.sublist(0, index),
+        workout,
+        ...service.workoutHistory.sublist(index + 1),
+      ];
+    }
+    Get.back();
+    SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
+      Get.back();
+      Get.back();
+    });
   }
 }
 

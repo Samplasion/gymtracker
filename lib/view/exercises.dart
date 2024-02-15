@@ -15,12 +15,14 @@ import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/utils/sets.dart';
 import 'package:gymtracker/utils/utils.dart';
+import 'package:gymtracker/view/components/badges.dart';
 import 'package:gymtracker/view/components/infobox.dart';
 import 'package:gymtracker/view/routine_creator.dart';
 import 'package:gymtracker/view/utils/dropdown_dialog.dart';
 import 'package:gymtracker/view/utils/exercise.dart';
 import 'package:gymtracker/view/utils/textfield_dialog.dart';
 import 'package:gymtracker/view/utils/timer.dart';
+import 'package:gymtracker/view/workout_editor.dart';
 import 'package:intl/intl.dart';
 
 class ExercisesView extends StatefulWidget {
@@ -55,6 +57,28 @@ class _ExercisesViewState extends State<ExercisesView> {
                       changeParent(newID);
                     }
                     Go.snack("workouts.actions.saveAsRoutine.done".t);
+                  },
+                ),
+                PopupMenuItem(
+                  // TODO: Remove beta status
+                  child: Text.rich(
+                    TextSpan(
+                      children: [
+                        TextSpan(
+                          text: "workouts.actions.edit.label".t,
+                        ),
+                        const TextSpan(text: " "),
+                        const WidgetSpan(
+                          child: BetaBadge(),
+                          alignment: PlaceholderAlignment.middle,
+                        ),
+                      ],
+                    ),
+                  ),
+                  onTap: () {
+                    SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
+                      Go.to(() => WorkoutEditor(baseWorkout: workout));
+                    });
                   },
                 ),
                 PopupMenuItem(
@@ -230,7 +254,7 @@ class _ExercisesViewState extends State<ExercisesView> {
               ),
             ),
           ],
-          if (workout.infobox != null)
+          if (workout.shouldShowInfobox)
             SliverToBoxAdapter(
               child: Infobox(
                 text: workout.infobox!,

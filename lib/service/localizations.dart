@@ -49,10 +49,12 @@ class GTLocalizations extends Translations with ChangeNotifier {
   }
 }
 
+late final _debugController = Get.find<DebugController>();
+
 extension Fallback on String {
   String get t {
     if (tr == this) {
-      Get.find<DebugController>().missingKeys.add(this);
+      _debugController.addMissingKey(this);
       return this;
     }
     return tr;

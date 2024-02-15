@@ -24,6 +24,11 @@ class Workout {
   final DateTime? startingDate;
   final String? infobox;
 
+  bool get shouldShowInfobox => shouldShowAsInfobox(infobox);
+
+  static bool shouldShowAsInfobox(String? candidate) =>
+      candidate != null && candidate.trim().isNotEmpty;
+
   /// The ID of the non-concrete (ie. part of a routine) exercise
   /// this concrete exercise should be categorized under.
   String? parentID;

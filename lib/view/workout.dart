@@ -9,6 +9,7 @@ import 'package:gymtracker/model/exercisable.dart';
 import 'package:gymtracker/model/exercise.dart';
 import 'package:gymtracker/model/set.dart';
 import 'package:gymtracker/model/superset.dart';
+import 'package:gymtracker/model/workout.dart';
 import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/utils/constants.dart';
 import 'package:gymtracker/utils/go.dart';
@@ -230,7 +231,8 @@ class _WorkoutViewState extends State<WorkoutView> {
         () => ListView(
           children: [
             if (Get.isRegistered<WorkoutController>() &&
-                Get.find<WorkoutController>().infobox() != null)
+                Workout.shouldShowAsInfobox(
+                    Get.find<WorkoutController>().infobox()))
               Infobox(text: controller.infobox()!),
 
             // Avoid calling [get controller] in order to avoid

@@ -89,6 +89,8 @@ workouts:
         yes: Delete
       done: The workout has been deleted.
     start: Redo this workout
+    edit:
+      label: Edit workout
     rename:
       label: Rename workout
       errors:
@@ -465,3 +467,33 @@ superset:
   few: "Superset with %s exercises"
   many: "Superset with %s exercises"
   other: "Superset with %s exercises"
+
+historyEditor:
+  title: "Edit: @name"
+  exercises:
+    addSuperset: + Add superset
+    add: + Add exercise
+  info:
+    reps: Reps
+    volume: Lifted weight
+  actions:
+    finish: Finish editing
+  finish:
+    title: Finish editing
+    fields:
+      name:
+        label: Name
+        errors:
+          empty: The name must not be empty.
+      startingTime:
+        label: Starting time
+      parent:
+        label: Categorize under
+        options:
+          none: No routine
+      duration:
+        label: Duration
+        errors:
+          empty: The duration must not be zero.
+      infobox:
+        label: Notes

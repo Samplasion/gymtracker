@@ -7,6 +7,7 @@ import 'package:gymtracker/model/superset.dart';
 import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/utils/utils.dart';
+import 'package:gymtracker/view/components/badges.dart';
 import 'package:gymtracker/view/utils/timer.dart';
 
 class ExerciseIcon extends StatelessWidget {
@@ -196,27 +197,5 @@ class ExerciseListTile extends StatelessWidget {
         );
       }
     }
-  }
-}
-
-class CustomExerciseBadge extends StatelessWidget {
-  const CustomExerciseBadge({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 4),
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.secondaryContainer,
-        borderRadius: BorderRadius.circular(4),
-      ),
-      child: Text(
-        "exercise.custom".t.toUpperCase(),
-        style: TextStyle(
-          fontSize: 12,
-          color: Theme.of(context).colorScheme.onSecondaryContainer,
-        ),
-      ),
-    );
   }
 }

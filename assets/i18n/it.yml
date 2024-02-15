@@ -89,6 +89,8 @@ workouts:
         yes: Elimina
       done: L'allenamento è stato eliminato.
     start: Ripeti allenamento
+    edit:
+      label: Modifica allenamento
     rename:
       label: Rinomina allenamento
       errors:
@@ -465,3 +467,33 @@ superset:
   few: "Superserie con %s esercizi"
   many: "Superserie con %s esercizi"
   other: "Superserie con %s esercizi"
+
+historyEditor:
+  title: "Modifica: @name"
+  exercises:
+    addSuperset: + Aggiungi superserie
+    add: + Aggiungi esercizio
+  info:
+    reps: Ripetizioni
+    volume: Volume
+  actions:
+    finish: Termina modifica
+  finish:
+    title: Termina modifica
+    fields:
+      name:
+        label: Nome
+        errors:
+          empty: Il nome non dev'essere vuoto.
+      startingTime:
+        label: Data di inizio
+      parent:
+        label: Salva come
+        options:
+          none: Nessuna routine
+      duration:
+        label: Durata
+        errors:
+          empty: La durata non dev'essere zero.
+      infobox:
+        label: Note

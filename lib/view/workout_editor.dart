@@ -378,7 +378,9 @@ class _WorkoutEditorState extends State<WorkoutEditor> {
               SplitButtonSegment(
                 title: "historyEditor.exercises.addSuperset".t,
                 onTap: () {
-                  setState(() {});
+                  setState(() {
+                    workout.exercises.add(Superset.empty());
+                  });
                 },
               ),
             ]),

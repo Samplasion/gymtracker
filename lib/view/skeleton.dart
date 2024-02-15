@@ -4,8 +4,8 @@ import 'package:flutter/material.dart' hide Localizations;
 import 'package:flutter/scheduler.dart';
 import 'package:get/get.dart';
 import 'package:gymtracker/controller/history_controller.dart';
+import 'package:gymtracker/controller/routines_controller.dart';
 import 'package:gymtracker/controller/workout_controller.dart';
-import 'package:gymtracker/controller/workouts_controller.dart';
 import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/utils/constants.dart';
 import 'package:gymtracker/utils/go.dart';
@@ -60,7 +60,7 @@ class _SkeletonViewState extends State<SkeletonView>
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    Get.find<WorkoutsController>().didChangeAppLifecycleState(state);
+    Get.find<RoutinesController>().didChangeAppLifecycleState(state);
   }
 
   @override
@@ -87,7 +87,7 @@ class _SkeletonViewState extends State<SkeletonView>
         () => Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            if (Get.find<WorkoutsController>().hasOngoingWorkout.isTrue)
+            if (Get.find<RoutinesController>().hasOngoingWorkout.isTrue)
               OngoingWorkoutBar(
                 open: () =>
                     SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
@@ -147,7 +147,7 @@ class OngoingWorkoutBar extends StatelessWidget {
 
   const OngoingWorkoutBar({required this.open, super.key});
 
-  WorkoutsController get controller => Get.put(WorkoutsController());
+  RoutinesController get controller => Get.put(RoutinesController());
 
   @override
   Widget build(BuildContext context) {

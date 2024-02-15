@@ -5,7 +5,7 @@ import 'package:flutter/scheduler.dart';
 import 'package:get/get.dart';
 import 'package:gymtracker/controller/history_controller.dart';
 import 'package:gymtracker/controller/history_controller.dart' as history;
-import 'package:gymtracker/controller/workouts_controller.dart';
+import 'package:gymtracker/controller/routines_controller.dart';
 import 'package:gymtracker/model/exercisable.dart';
 import 'package:gymtracker/model/exercise.dart';
 import 'package:gymtracker/model/set.dart';
@@ -37,7 +37,7 @@ class ExercisesView extends StatefulWidget {
 class _ExercisesViewState extends State<ExercisesView> {
   late Workout workout = widget.workout;
 
-  WorkoutsController get controller => Get.find<WorkoutsController>();
+  RoutinesController get controller => Get.find<RoutinesController>();
 
   @override
   Widget build(BuildContext context) {
@@ -52,7 +52,7 @@ class _ExercisesViewState extends State<ExercisesView> {
                   child: Text("workouts.actions.saveAsRoutine.button".t),
                   onTap: () {
                     final newID =
-                        Get.find<WorkoutsController>().importWorkout(workout);
+                        Get.find<RoutinesController>().importWorkout(workout);
                     if (workout.parentID == null) {
                       changeParent(newID);
                     }
@@ -179,7 +179,7 @@ class _ExercisesViewState extends State<ExercisesView> {
                           () => RoutineCreator(base: workout));
 
                       if (newRoutine != null) {
-                        Get.find<WorkoutsController>().editRoutine(newRoutine);
+                        Get.find<RoutinesController>().editRoutine(newRoutine);
                         setState(() {
                           workout = newRoutine;
                         });
@@ -198,7 +198,7 @@ class _ExercisesViewState extends State<ExercisesView> {
                     ),
                   ),
                   onTap: () {
-                    Get.find<WorkoutsController>()
+                    Get.find<RoutinesController>()
                         .deleteRoutineWithDialog(context, workout: workout,
                             onCanceled: () {
                       SchedulerBinding.instance
@@ -388,7 +388,7 @@ enum _RoutineHistoryDataType {
 }
 
 class _RoutineHistoryDataState extends State<RoutineHistoryData> {
-  WorkoutsController get controller => Get.find<WorkoutsController>();
+  RoutinesController get controller => Get.find<RoutinesController>();
   List<Workout> get children => controller.getChildren(widget.routine);
 
   _RoutineHistoryDataType type = _RoutineHistoryDataType.volume;

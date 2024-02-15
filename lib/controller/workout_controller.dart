@@ -3,9 +3,9 @@ import 'package:flutter/scheduler.dart';
 import 'package:get/get.dart';
 import 'package:gymtracker/controller/countdown_controller.dart';
 import 'package:gymtracker/controller/history_controller.dart';
+import 'package:gymtracker/controller/routines_controller.dart';
 import 'package:gymtracker/controller/serviceable_controller.dart';
 import 'package:gymtracker/controller/stopwatch_controller.dart';
-import 'package:gymtracker/controller/workouts_controller.dart';
 import 'package:gymtracker/model/exercisable.dart';
 import 'package:gymtracker/model/set.dart';
 import 'package:gymtracker/model/workout.dart';
@@ -68,7 +68,7 @@ class WorkoutController extends GetxController with ServiceableController {
   void onInit() {
     super.onInit();
     SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
-      Get.find<WorkoutsController>().hasOngoingWorkout(true);
+      Get.find<RoutinesController>().hasOngoingWorkout(true);
       save();
     });
   }
@@ -79,13 +79,13 @@ class WorkoutController extends GetxController with ServiceableController {
     removeCountdown();
     removeRelevantStopwatches();
     SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
-      Get.find<WorkoutsController>().hasOngoingWorkout(false);
+      Get.find<RoutinesController>().hasOngoingWorkout(false);
       service.deleteOngoing();
     });
   }
 
   void save() {
-    if (Get.find<WorkoutsController>().hasOngoingWorkout.isFalse) return;
+    if (Get.find<RoutinesController>().hasOngoingWorkout.isFalse) return;
 
     printInfo(info: "Saving ongoing data");
     service.writeToOngoing({

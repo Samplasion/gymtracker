@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:get/get.dart';
 import 'package:gymtracker/controller/countdown_controller.dart';
+import 'package:gymtracker/controller/routines_controller.dart';
 import 'package:gymtracker/controller/stopwatch_controller.dart';
 import 'package:gymtracker/controller/workout_controller.dart';
-import 'package:gymtracker/controller/workouts_controller.dart';
 import 'package:gymtracker/model/exercisable.dart';
 import 'package:gymtracker/model/exercise.dart';
 import 'package:gymtracker/model/set.dart';
@@ -237,7 +237,7 @@ class _WorkoutViewState extends State<WorkoutView> {
 
             // Avoid calling [get controller] in order to avoid
             // recreating it, thus starting a new workout.
-            if (Get.find<WorkoutsController>().hasOngoingWorkout())
+            if (Get.find<RoutinesController>().hasOngoingWorkout())
               for (int i = 0; i < controller.exercises.length; i++)
                 if (controller.exercises[i] is Exercise)
                   WorkoutExerciseEditor(
@@ -821,7 +821,7 @@ class _WorkoutFinishPageState extends State<WorkoutFinishPage> {
   late String? pwInitialItem = () {
     // Parent workout data
     String? pwInitialItem = controller.parentID.value;
-    if (Get.find<WorkoutsController>()
+    if (Get.find<RoutinesController>()
         .workouts
         .every((element) => element.id != pwInitialItem)) {
       pwInitialItem = null;
@@ -884,7 +884,7 @@ class _WorkoutFinishPageState extends State<WorkoutFinishPage> {
                     child: Text(
                         "ongoingWorkout.finish.fields.parent.options.none".t),
                   ),
-                  for (final routine in Get.find<WorkoutsController>().workouts)
+                  for (final routine in Get.find<RoutinesController>().workouts)
                     DropdownMenuItem(
                       value: routine.id,
                       child: Text(routine.name),

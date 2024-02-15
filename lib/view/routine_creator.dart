@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:get/get.dart';
-import 'package:gymtracker/controller/workouts_controller.dart';
+import 'package:gymtracker/controller/routines_controller.dart';
 import 'package:gymtracker/model/exercisable.dart';
 import 'package:gymtracker/model/exercise.dart';
 import 'package:gymtracker/model/set.dart';
@@ -51,7 +51,7 @@ class _RoutineCreatorState extends State<RoutineCreator> {
   late final infoboxController =
       TextEditingController(text: widget.base?.infobox);
 
-  WorkoutsController get workoutsController => Get.find<WorkoutsController>();
+  RoutinesController get workoutsController => Get.find<RoutinesController>();
 
   @override
   void initState() {

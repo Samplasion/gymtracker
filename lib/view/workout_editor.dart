@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:get/get.dart';
 import 'package:gymtracker/controller/history_controller.dart';
+import 'package:gymtracker/controller/routines_controller.dart';
 import 'package:gymtracker/controller/workout_controller.dart';
-import 'package:gymtracker/controller/workouts_controller.dart';
 import 'package:gymtracker/model/exercisable.dart';
 import 'package:gymtracker/model/exercise.dart';
 import 'package:gymtracker/model/set.dart';
@@ -508,7 +508,7 @@ class _WorkoutFinishEditingPageState extends State<WorkoutFinishEditingPage> {
   late String? pwInitialItem = () {
     // Parent workout data
     String? pwInitialItem = widget.workout.parentID;
-    if (Get.find<WorkoutsController>()
+    if (Get.find<RoutinesController>()
         .workouts
         .every((element) => element.id != pwInitialItem)) {
       pwInitialItem = null;
@@ -571,7 +571,7 @@ class _WorkoutFinishEditingPageState extends State<WorkoutFinishEditingPage> {
                     child: Text(
                         "historyEditor.finish.fields.parent.options.none".t),
                   ),
-                  for (final routine in Get.find<WorkoutsController>().workouts)
+                  for (final routine in Get.find<RoutinesController>().workouts)
                     DropdownMenuItem(
                       value: routine.id,
                       child: Text(routine.name),

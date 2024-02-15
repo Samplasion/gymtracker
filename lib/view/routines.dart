@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:gymtracker/controller/workouts_controller.dart';
+import 'package:gymtracker/controller/routines_controller.dart';
 import 'package:gymtracker/model/workout.dart';
 import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/utils/go.dart';
@@ -18,7 +18,7 @@ class RoutinesView extends StatefulWidget {
 }
 
 class _RoutinesViewState extends State<RoutinesView> {
-  WorkoutsController get controller => Get.put(WorkoutsController());
+  RoutinesController get controller => Get.put(RoutinesController());
   int selectedIndex = 0;
 
   @override

@@ -16,7 +16,7 @@ import 'package:gymtracker/utils/utils.dart' as utils;
 import 'package:gymtracker/view/exercises.dart';
 import 'package:gymtracker/view/workout.dart';
 
-class WorkoutsController extends GetxController with ServiceableController {
+class RoutinesController extends GetxController with ServiceableController {
   RxList<Workout> workouts = <Workout>[].obs;
   RxBool hasOngoingWorkout = false.obs;
 

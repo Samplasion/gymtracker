@@ -1,4 +1,5 @@
 import 'package:fl_chart/fl_chart.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
@@ -17,6 +18,9 @@ import 'package:gymtracker/utils/sets.dart';
 import 'package:gymtracker/utils/utils.dart';
 import 'package:gymtracker/view/components/badges.dart';
 import 'package:gymtracker/view/components/infobox.dart';
+import 'package:gymtracker/view/platform/platform_widget.dart';
+import 'package:gymtracker/view/platform/popup_menu_button.dart';
+import 'package:gymtracker/view/platform/scaffold.dart';
 import 'package:gymtracker/view/routine_creator.dart';
 import 'package:gymtracker/view/utils/dropdown_dialog.dart';
 import 'package:gymtracker/view/utils/exercise.dart';
@@ -41,178 +45,17 @@ class _ExercisesViewState extends State<ExercisesView> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
+    return PlatformScaffold(
+      materialAppBar: AppBar(
         title: Text(workout.name),
         actions: [
-          PopupMenuButton(
-            itemBuilder: (context) => [
-              if (workout.isConcrete) ...[
-                PopupMenuItem(
-                  child: Text("workouts.actions.saveAsRoutine.button".t),
-                  onTap: () {
-                    final newID =
-                        Get.find<RoutinesController>().importWorkout(workout);
-                    if (workout.parentID == null) {
-                      changeParent(newID);
-                    }
-                    Go.snack("workouts.actions.saveAsRoutine.done".t);
-                  },
-                ),
-                PopupMenuItem(
-                  // TODO: Remove beta status
-                  child: Text.rich(
-                    TextSpan(
-                      children: [
-                        TextSpan(
-                          text: "workouts.actions.edit.label".t,
-                        ),
-                        const TextSpan(text: " "),
-                        const WidgetSpan(
-                          child: BetaBadge(),
-                          alignment: PlaceholderAlignment.middle,
-                        ),
-                      ],
-                    ),
-                  ),
-                  onTap: () {
-                    SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
-                      Go.to(() => WorkoutEditor(baseWorkout: workout));
-                    });
-                  },
-                ),
-                PopupMenuItem(
-                  child: Text("workouts.actions.rename.label".t),
-                  onTap: () {
-                    SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
-                      showDialog(
-                        context: context,
-                        builder: (_) {
-                          return TextFieldDialog(
-                            title: Text("workouts.actions.rename.label".t),
-                            initialValue: workout.name,
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return "workouts.actions.rename.errors.empty".t;
-                              }
-                              return null;
-                            },
-                            onDone: (value) {
-                              rename(value);
-                            },
-                          );
-                        },
-                      );
-                    });
-                  },
-                ),
-                PopupMenuItem(
-                  child: Text("workouts.actions.changeParent.label".t),
-                  onTap: () {
-                    SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
-                      String? initialItem = workout.parentID;
-                      if (controller.workouts
-                          .every((element) => element.id != initialItem)) {
-                        initialItem = null;
-                      }
-                      showDialog(
-                        context: context,
-                        builder: (_) {
-                          return DropdownDialog(
-                            title:
-                                Text("workouts.actions.changeParent.label".t),
-                            items: [
-                              DropdownMenuItem(
-                                value: null,
-                                child: Text(
-                                  "workouts.actions.changeParent.options.none"
-                                      .t,
-                                  style: const TextStyle(
-                                      fontStyle: FontStyle.italic),
-                                ),
-                              ),
-                              for (final workout in controller.workouts)
-                                DropdownMenuItem(
-                                  value: workout.id,
-                                  child: Text(workout.name),
-                                ),
-                            ],
-                            initialItem: initialItem,
-                            onSelect: (value) {
-                              changeParent(value);
-                            },
-                          );
-                        },
-                      );
-                    });
-                  },
-                ),
-                PopupMenuItem(
-                  textStyle: TextStyle(
-                    color: Theme.of(context).colorScheme.error,
-                  ),
-                  child: Text(
-                    "workouts.actions.delete.title".t,
-                    style: TextStyle(
-                      color: Theme.of(context).colorScheme.error,
-                    ),
-                  ),
-                  onTap: () {
-                    Get.find<history.HistoryController>()
-                        .deleteWorkoutWithDialog(context, workout: workout,
-                            onCanceled: () {
-                      SchedulerBinding.instance
-                          .addPostFrameCallback((timeStamp) {
-                        Get.back();
-                        Go.snack("workouts.actions.delete.done".t);
-                      });
-                    });
-                  },
-                ),
-              ] else ...[
-                PopupMenuItem(
-                  child: Text("routines.actions.edit".t),
-                  onTap: () {
-                    SchedulerBinding.instance
-                        .addPostFrameCallback((timeStamp) async {
-                      final newRoutine = await Go.to<Workout>(
-                          () => RoutineCreator(base: workout));
-
-                      if (newRoutine != null) {
-                        Get.find<RoutinesController>().editRoutine(newRoutine);
-                        setState(() {
-                          workout = newRoutine;
-                        });
-                      }
-                    });
-                  },
-                ),
-                PopupMenuItem(
-                  textStyle: TextStyle(
-                    color: Theme.of(context).colorScheme.error,
-                  ),
-                  child: Text(
-                    "routines.actions.delete.title".t,
-                    style: TextStyle(
-                      color: Theme.of(context).colorScheme.error,
-                    ),
-                  ),
-                  onTap: () {
-                    Get.find<RoutinesController>()
-                        .deleteRoutineWithDialog(context, workout: workout,
-                            onCanceled: () {
-                      SchedulerBinding.instance
-                          .addPostFrameCallback((timeStamp) {
-                        Get.back();
-                        Go.snack("routines.actions.delete.done".t);
-                      });
-                    });
-                  },
-                ),
-              ],
-            ],
-          ),
+          _buildPopupButton(),
         ],
+      ),
+      cupertinoNavigationBar: CupertinoNavigationBar(
+        middle: Text(workout.name),
+        trailing: _buildPopupButton(),
+        automaticallyImplyLeading: true,
       ),
       body: CustomScrollView(
         slivers: [
@@ -351,6 +194,143 @@ class _ExercisesViewState extends State<ExercisesView> {
           ],
         ],
       ),
+    );
+  }
+
+  Widget _buildPopupButton() {
+    return PlatformPopupMenuButton(
+      itemBuilder: (context) => [
+        if (workout.isConcrete) ...[
+          PullDownMenuItem(
+            title: "workouts.actions.saveAsRoutine.button".t,
+            onTap: () {
+              final newID =
+                  Get.find<RoutinesController>().importWorkout(workout);
+              if (workout.parentID == null) {
+                changeParent(newID);
+              }
+              Go.snack("workouts.actions.saveAsRoutine.done".t);
+            },
+          ),
+          PullDownMenuItem(
+            // TODO: Remove beta status
+            title: "workouts.actions.edit.label".t,
+            iconWidget: BetaBadge(),
+            onTap: () {
+              SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
+                Go.to(() => WorkoutEditor(baseWorkout: workout));
+              });
+            },
+          ),
+          PullDownMenuItem(
+            title: "workouts.actions.rename.label".t,
+            onTap: () {
+              SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
+                showDialog(
+                  context: context,
+                  builder: (_) {
+                    return TextFieldDialog(
+                      title: Text("workouts.actions.rename.label".t),
+                      initialValue: workout.name,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return "workouts.actions.rename.errors.empty".t;
+                        }
+                        return null;
+                      },
+                      onDone: (value) {
+                        rename(value);
+                      },
+                    );
+                  },
+                );
+              });
+            },
+          ),
+          PullDownMenuItem(
+            title: "workouts.actions.changeParent.label".t,
+            onTap: () {
+              SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
+                String? initialItem = workout.parentID;
+                if (controller.workouts
+                    .every((element) => element.id != initialItem)) {
+                  initialItem = null;
+                }
+                showDialog(
+                  context: context,
+                  builder: (_) {
+                    return DropdownDialog(
+                      title: Text("workouts.actions.changeParent.label".t),
+                      items: [
+                        DropdownMenuItem(
+                          value: null,
+                          child: Text(
+                            "workouts.actions.changeParent.options.none".t,
+                            style: const TextStyle(fontStyle: FontStyle.italic),
+                          ),
+                        ),
+                        for (final workout in controller.workouts)
+                          DropdownMenuItem(
+                            value: workout.id,
+                            child: Text(workout.name),
+                          ),
+                      ],
+                      initialItem: initialItem,
+                      onSelect: (value) {
+                        changeParent(value);
+                      },
+                    );
+                  },
+                );
+              });
+            },
+          ),
+          PullDownMenuItem(
+            title: "workouts.actions.delete.title".t,
+            isDestructive: true,
+            onTap: () {
+              Get.find<history.HistoryController>()
+                  .deleteWorkoutWithDialog(context, workout: workout,
+                      onCanceled: () {
+                SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
+                  Get.back();
+                  Go.snack("workouts.actions.delete.done".t);
+                });
+              });
+            },
+          ),
+        ] else ...[
+          PullDownMenuItem(
+            title: "routines.actions.edit".t,
+            onTap: () {
+              SchedulerBinding.instance.addPostFrameCallback((timeStamp) async {
+                final newRoutine =
+                    await Go.to<Workout>(() => RoutineCreator(base: workout));
+
+                if (newRoutine != null) {
+                  Get.find<RoutinesController>().editRoutine(newRoutine);
+                  setState(() {
+                    workout = newRoutine;
+                  });
+                }
+              });
+            },
+          ),
+          PullDownMenuItem(
+            title: "routines.actions.delete.title".t,
+            isDestructive: true,
+            onTap: () {
+              Get.find<RoutinesController>().deleteRoutineWithDialog(context,
+                  workout: workout, onCanceled: () {
+                SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
+                  Get.back();
+                  Go.snack("routines.actions.delete.done".t);
+                });
+              });
+            },
+          ),
+        ],
+      ],
     );
   }
 
@@ -584,26 +564,49 @@ class _RoutineHistoryDataState extends State<RoutineHistoryData> {
         Flexible(
           child: Padding(
             padding: const EdgeInsets.only(top: 16),
-            child: Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children: [
-                for (final type in _RoutineHistoryDataType.values)
-                  ChoiceChip(
-                    label: Text("exercise.chart.views.${type.name}".t),
-                    avatar: CircleAvatar(
-                      child: this.type == type
-                          ? const SizedBox.shrink()
-                          : Icon(buildType(type), size: 16),
-                    ),
-                    selected: this.type == type,
-                    onSelected: (sel) {
-                      if (sel) {
-                        setState(() => this.type = type);
-                      }
+            child: PlatformBuilder(
+              buildMaterial: (context) {
+                return Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: [
+                    for (final type in _RoutineHistoryDataType.values)
+                      ChoiceChip(
+                        label: Text("exercise.chart.views.${type.name}".t),
+                        avatar: CircleAvatar(
+                          child: this.type == type
+                              ? const SizedBox.shrink()
+                              : Icon(buildType(type), size: 16),
+                        ),
+                        selected: this.type == type,
+                        onSelected: (sel) {
+                          if (sel) {
+                            setState(() => this.type = type);
+                          }
+                        },
+                      ),
+                  ],
+                );
+              },
+              buildCupertino: (context) {
+                return Center(
+                  child: CupertinoSlidingSegmentedControl(
+                    groupValue: type,
+                    children: {
+                      for (final type in _RoutineHistoryDataType.values)
+                        type: Text(
+                          "exercise.chart.views.${type.name}".t,
+                          style: Theme.of(context).textTheme.labelSmall,
+                          textAlign: TextAlign.center,
+                          maxLines: 2,
+                        ),
+                    },
+                    onValueChanged: (value) {
+                      setState(() => type = value as _RoutineHistoryDataType);
                     },
                   ),
-              ],
+                );
+              },
             ),
           ),
         ),

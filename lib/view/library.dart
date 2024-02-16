@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:gymtracker/controller/exercises_controller.dart';
@@ -11,6 +12,9 @@ import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/utils/utils.dart';
 import 'package:gymtracker/view/components/badges.dart';
 import 'package:gymtracker/view/exercises.dart';
+import 'package:gymtracker/view/platform/app_bar.dart';
+import 'package:gymtracker/view/platform/list_tile.dart';
+import 'package:gymtracker/view/platform/scaffold.dart';
 import 'package:gymtracker/view/utils/exercise.dart';
 import 'package:intl/intl.dart';
 
@@ -33,20 +37,20 @@ class LibraryView extends GetView<ExercisesController> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return PlatformScaffold(
       body: Obx(
         () => CustomScrollView(
           slivers: [
-            SliverAppBar.large(
+            PlatformSliverAppBar(
               title: Text("library.title".t),
             ),
             SliverList(
               delegate: SliverChildListDelegate(
                 [
                   for (final category in exercises.entries)
-                    ListTile(
-                      leading: CircleAvatar(
-                        backgroundColor:
+                    PlatformListTile(
+                      leading: PlatformLeadingIcon(
+                        materialBackgroundColor:
                             getContainerColor(context, category.value.color),
                         foregroundColor:
                             getOnContainerColor(context, category.value.color),
@@ -88,9 +92,12 @@ class LibraryExercisesView extends StatelessWidget {
   Widget build(BuildContext context) {
     final sorted = [...category.exercises]
       ..sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
-    return Scaffold(
-      appBar: AppBar(
+    return PlatformScaffold(
+      materialAppBar: AppBar(
         title: Text(name),
+      ),
+      cupertinoNavigationBar: CupertinoNavigationBar(
+        middle: Text(name),
       ),
       body: ListView.builder(
         itemCount: category.exercises.length,

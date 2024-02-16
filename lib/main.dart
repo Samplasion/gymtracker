@@ -1,4 +1,5 @@
 import 'package:dynamic_color/dynamic_color.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart' hide Localizations;
 import 'package:flutter/scheduler.dart';
@@ -9,6 +10,7 @@ import 'package:get_storage/get_storage.dart';
 import 'package:gymtracker/controller/countdown_controller.dart';
 import 'package:gymtracker/controller/debug_controller.dart';
 import 'package:gymtracker/controller/exercises_controller.dart';
+import 'package:gymtracker/controller/platform_controller.dart';
 import 'package:gymtracker/controller/settings_controller.dart';
 import 'package:gymtracker/controller/stopwatch_controller.dart';
 import 'package:gymtracker/service/color.dart';
@@ -17,6 +19,8 @@ import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/service/notifications.dart';
 import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/utils/go.dart';
+import 'package:gymtracker/view/platform/app.dart';
+import 'package:gymtracker/view/platform/scaffold.dart';
 import 'package:gymtracker/view/skeleton.dart';
 
 final _databaseService = DatabaseService();
@@ -47,6 +51,7 @@ class MainApp extends StatelessWidget {
     Get.put(ExercisesController());
     Get.put(DebugController());
     Get.put(StopwatchController());
+    Get.put(PlatformController());
     final settings = Get.put(SettingsController());
     final localizations = Get.put(this.localizations);
 
@@ -74,7 +79,7 @@ class MainApp extends StatelessWidget {
                 return AnimatedBuilder(
                   animation: localizations,
                   builder: (context, _) {
-                    return GetMaterialApp(
+                    return PlatformApp(
                       title: () {
                         if (kDebugMode) {
                           return "${"appName".t} (Debug)";
@@ -150,10 +155,13 @@ class __LoaderState extends State<_Loader> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text("Loading...")),
+    return PlatformScaffold(
+      materialAppBar: AppBar(title: const Text("Loading...")),
+      cupertinoNavigationBar: const CupertinoNavigationBar(
+        middle: Text("Loading..."),
+      ),
       body: const Center(
-        child: CircularProgressIndicator(),
+        child: CircularProgressIndicator.adaptive(),
       ),
     );
   }

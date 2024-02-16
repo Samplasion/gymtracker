@@ -12,6 +12,9 @@ import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/view/debug.dart';
 import 'package:gymtracker/view/history.dart';
 import 'package:gymtracker/view/library.dart';
+import 'package:gymtracker/view/platform/navigation_bar.dart';
+import 'package:gymtracker/view/platform/platform_widget.dart';
+import 'package:gymtracker/view/platform/scaffold.dart';
 import 'package:gymtracker/view/routines.dart';
 import 'package:gymtracker/view/settings.dart';
 import 'package:gymtracker/view/utils/crossfade.dart';
@@ -65,17 +68,24 @@ class _SkeletonViewState extends State<SkeletonView>
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return PlatformScaffold(
       body: PageTransitionSwitcher(
         transitionBuilder: (
           Widget child,
           Animation<double> primaryAnimation,
           Animation<double> secondaryAnimation,
         ) {
-          return FadeThroughTransition(
-            animation: primaryAnimation,
-            secondaryAnimation: secondaryAnimation,
-            child: child,
+          return PlatformBuilder(
+            buildMaterial: (context) {
+              return FadeThroughTransition(
+                animation: primaryAnimation,
+                secondaryAnimation: secondaryAnimation,
+                child: child,
+              );
+            },
+            buildCupertino: (context) {
+              return child;
+            },
           );
         },
         child: KeyedSubtree(
@@ -94,7 +104,7 @@ class _SkeletonViewState extends State<SkeletonView>
                   Go.to(() => const WorkoutView());
                 }),
               ),
-            NavigationBar(
+            PlatformNavigationBar(
               labelBehavior:
                   NavigationDestinationLabelBehavior.onlyShowSelected,
               destinations: [

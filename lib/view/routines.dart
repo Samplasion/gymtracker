@@ -5,6 +5,9 @@ import 'package:gymtracker/model/workout.dart';
 import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/view/exercises.dart';
+import 'package:gymtracker/view/platform/app_bar.dart';
+import 'package:gymtracker/view/platform/list_tile.dart';
+import 'package:gymtracker/view/platform/scaffold.dart';
 import 'package:gymtracker/view/routine_creator.dart';
 import 'package:universal_platform/universal_platform.dart';
 
@@ -29,18 +32,19 @@ class _RoutinesViewState extends State<RoutinesView> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return PlatformScaffold(
       body: Obx(() {
         return CustomScrollView(
           slivers: [
-            SliverAppBar.large(
+            PlatformSliverAppBar(
               title: Text("routines.title".t),
             ),
             SliverToBoxAdapter(
-              child: ListTile(
+              child: PlatformListTile(
                 title: Text("routines.quickWorkout.title".t),
                 subtitle: Text("routines.quickWorkout.subtitle".t),
-                leading: const CircleAvatar(child: Icon(Icons.timer_rounded)),
+                leading:
+                    const PlatformLeadingIcon(child: Icon(Icons.timer_rounded)),
                 onTap: () {
                   controller.startRoutine(context, emptyWorkout, isEmpty: true);
                 },
@@ -52,9 +56,9 @@ class _RoutinesViewState extends State<RoutinesView> {
                 return Material(
                   type: MaterialType.transparency,
                   key: ValueKey(workout.id),
-                  child: ListTile(
-                    leading: CircleAvatar(
-                      backgroundColor:
+                  child: PlatformListTile(
+                    leading: PlatformLeadingIcon(
+                      materialBackgroundColor:
                           Theme.of(context).colorScheme.secondaryContainer,
                       foregroundColor:
                           Theme.of(context).colorScheme.onSecondaryContainer,
@@ -90,9 +94,10 @@ class _RoutinesViewState extends State<RoutinesView> {
             ),
             const SliverToBoxAdapter(child: Divider()),
             SliverToBoxAdapter(
-              child: ListTile(
+              child: PlatformListTile(
                 title: Text("routines.newRoutine".t),
-                leading: const CircleAvatar(child: Icon(Icons.add_rounded)),
+                leading:
+                    const PlatformLeadingIcon(child: Icon(Icons.add_rounded)),
                 onTap: () {
                   Go.to(() => const RoutineCreator());
                 },

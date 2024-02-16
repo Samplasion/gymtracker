@@ -1,5 +1,9 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:gymtracker/view/platform/dialogs_modals.dart';
+import 'package:gymtracker/view/platform/list_tile.dart';
+import 'package:gymtracker/view/platform/platform_widget.dart';
 
 typedef OnChange<T> = void Function(T value);
 
@@ -51,13 +55,20 @@ class _RadioModalTileState<T> extends State<RadioModalTile<T>>
 
   @override
   Widget build(BuildContext context) {
-    return ListTile(
+    return PlatformListTile(
       title: widget.title,
       subtitle: widget.subtitle ?? Text(subtitle),
-      trailing: const Icon(Icons.arrow_right_rounded),
+      trailing: PlatformBuilder(
+        buildMaterial: (context) {
+          return const Icon(Icons.arrow_right_rounded);
+        },
+        buildCupertino: (context) {
+          return const Icon(CupertinoIcons.forward);
+        },
+      ),
       onTap: () {
         T oldValue = widget.selectedValue;
-        showModalBottomSheet<bool>(
+        showPlatformModalBottomSheet<bool>(
           context: context,
           builder: (context) {
             return StatefulBuilder(

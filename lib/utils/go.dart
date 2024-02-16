@@ -1,16 +1,27 @@
 import 'package:animations/animations.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:gymtracker/controller/platform_controller.dart';
 import 'package:gymtracker/service/localizations.dart';
+import 'package:gymtracker/view/platform/transition.dart';
 
 class Go {
   static Future<T?> to<T>(Widget Function() page) async {
+    final platformController = Get.find<PlatformController>();
+    if (platformController.platform.value == UIPlatform.cupertino) {
+      return Navigator.of(Get.context!).push<T>(
+        CupertinoPageRoute(
+          builder: (context) => page(),
+        ),
+      );
+    }
     return Navigator.of(Get.context!).push<T>(
       PageRouteBuilder(
         pageBuilder: (context, _, __) => page(),
         transitionsBuilder: (context, animation, secondaryAnimation, child) {
-          return SharedAxisTransition(
-            transitionType: SharedAxisTransitionType.horizontal,
+          return PlatformTransition(
+            materialTransitionType: SharedAxisTransitionType.horizontal,
             animation: animation,
             secondaryAnimation: secondaryAnimation,
             child: child,

@@ -1,13 +1,19 @@
 import 'package:flat/flat.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:gymtracker/controller/debug_controller.dart';
 import 'package:gymtracker/controller/history_controller.dart';
+import 'package:gymtracker/controller/platform_controller.dart';
 import 'package:gymtracker/controller/stopwatch_controller.dart';
 import 'package:gymtracker/service/database.dart';
 import 'package:gymtracker/utils/go.dart';
+import 'package:gymtracker/view/platform/app_bar.dart';
+import 'package:gymtracker/view/platform/list_tile.dart';
+import 'package:gymtracker/view/platform/platform_widget.dart';
+import 'package:gymtracker/view/platform/scaffold.dart';
 import 'package:gymtracker/view/utils/timer.dart';
 
 class DebugView extends StatelessWidget {
@@ -16,11 +22,12 @@ class DebugView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = Get.find<DebugController>();
+    final platformController = Get.find<PlatformController>();
 
-    return Scaffold(
+    return PlatformScaffold(
       body: CustomScrollView(
         slivers: [
-          const SliverAppBar.large(
+          const PlatformSliverAppBar(
             title: Text("Debug"),
           ),
           SliverList(
@@ -28,7 +35,7 @@ class DebugView extends StatelessWidget {
               Obx(() {
                 final missingKeys =
                     generateYamlForMissingKeys([...controller.missingKeys]);
-                return ListTile(
+                return PlatformListTile(
                   title: const Text("Missing translations"),
                   subtitle: Text(
                     missingKeys,
@@ -45,7 +52,7 @@ class DebugView extends StatelessWidget {
                   },
                 );
               }),
-              ListTile(
+              PlatformListTile(
                 title: const Text("Fix history std. exercise labels"),
                 subtitle: const Text(
                     "Fixes the labels of the standard exercises in the history"),
@@ -58,7 +65,7 @@ class DebugView extends StatelessWidget {
                   Go.snack("Fixed ${db.workoutHistory.length} workouts");
                 },
               ),
-              ListTile(
+              PlatformListTile(
                 title: Text(
                   "Running stopwatches",
                   style: TextStyle(
@@ -72,7 +79,7 @@ class DebugView extends StatelessWidget {
                     for (final entry
                         in Get.find<StopwatchController>().stopwatches.entries)
                       TimerView(
-                        builder: (ctx, _) => ListTile(
+                        builder: (ctx, _) => PlatformListTile(
                           title: Text(entry.key),
                           subtitle: Text(
                               "Running: ${!entry.value.isStopped()}, Current time: ${entry.value.currentTime}"),
@@ -83,17 +90,69 @@ class DebugView extends StatelessWidget {
                 );
               }),
               StatefulBuilder(builder: (context, setState) {
-                return Slider(
-                  value: timeDilation,
-                  onChanged: ((value) {
-                    setState(() {
-                      timeDilation = value;
-                    });
-                  }),
-                  min: 1,
-                  max: 15,
+                return PlatformBuilder(
+                  buildCupertino: (context) {
+                    return PlatformListTile(
+                      title: const Text("Time dilation"),
+                      subtitle: Text("Current time dilation: $timeDilation"),
+                      onTap: () {
+                        showCupertinoDialog(
+                          context: context,
+                          builder: (context) {
+                            return StatefulBuilder(
+                              builder: (context, setState) {
+                                return CupertinoAlertDialog(
+                                  title: const Text("Time dilation"),
+                                  content: CupertinoSlider(
+                                    value: timeDilation,
+                                    onChanged: ((value) {
+                                      setState(() {
+                                        timeDilation = value;
+                                      });
+                                    }),
+                                    min: 1,
+                                    max: 15,
+                                  ),
+                                  actions: [
+                                    CupertinoDialogAction(
+                                      child: const Text("Close"),
+                                      onPressed: () {
+                                        Navigator.of(context).pop();
+                                      },
+                                    ),
+                                  ],
+                                );
+                              },
+                            );
+                          },
+                        );
+                      },
+                    );
+                  },
+                  buildMaterial: (context) {
+                    return Slider(
+                      value: timeDilation,
+                      onChanged: ((value) {
+                        setState(() {
+                          timeDilation = value;
+                        });
+                      }),
+                      min: 1,
+                      max: 15,
+                    );
+                  },
                 );
               }),
+              Obx(
+                () => PlatformListTile(
+                  title: const Text("Toggle platform design"),
+                  subtitle: Text(
+                      "Current design: ${platformController.platform.value.name}"),
+                  onTap: () {
+                    platformController.toggle();
+                  },
+                ),
+              ),
             ]),
           ),
         ],

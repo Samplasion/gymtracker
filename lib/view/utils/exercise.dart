@@ -8,6 +8,7 @@ import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/utils/utils.dart';
 import 'package:gymtracker/view/components/badges.dart';
+import 'package:gymtracker/view/platform/list_tile.dart';
 import 'package:gymtracker/view/utils/timer.dart';
 
 class ExerciseIcon extends StatelessWidget {
@@ -87,12 +88,12 @@ class ExerciseListTile extends StatelessWidget {
       }
     }
 
-    final selectedIcon = CircleAvatar(
-      backgroundColor: backgroundColor,
+    final selectedIcon = PlatformLeadingIcon(
+      materialBackgroundColor: backgroundColor,
       foregroundColor: foregroundColor,
       child: const Icon(Icons.check),
     );
-    return ListTile(
+    return PlatformListTile(
       leading: selected ? selectedIcon : unselectedIcon,
       title: Text.rich(
         TextSpan(children: [

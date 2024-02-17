@@ -8,7 +8,12 @@ import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/utils/utils.dart';
 
 class WeightCalculator extends StatefulWidget {
-  const WeightCalculator({super.key});
+  final double? startingWeight;
+
+  const WeightCalculator({
+    super.key,
+    this.startingWeight,
+  });
 
   @override
   State<WeightCalculator> createState() => _WeightCalculatorState();
@@ -16,7 +21,10 @@ class WeightCalculator extends StatefulWidget {
 
 class _WeightCalculatorState extends State<WeightCalculator>
     with SingleTickerProviderStateMixin {
-  final _weightController = TextEditingController();
+  late final _weightController = TextEditingController(
+      text: widget.startingWeight != null
+          ? stringifyDouble(widget.startingWeight!)
+          : null);
   Bars selectedBarbell = Bars.normal;
   late final animationController = AnimationController(
     vsync: this,
@@ -30,8 +38,6 @@ class _WeightCalculatorState extends State<WeightCalculator>
   Widget build(BuildContext context) {
     final controller = Get.find<SettingsController>();
     return Dialog(
-      // animationController: animationController,
-      // onClosing: () {},
       child: Obx(
         () {
           final format = controller.weightUnit()!;

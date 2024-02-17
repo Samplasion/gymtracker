@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:get/get.dart';
@@ -6,12 +7,14 @@ import 'package:gymtracker/model/exercise.dart';
 import 'package:gymtracker/model/set.dart';
 import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/utils/extensions.dart';
+import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/utils/sets.dart';
 import 'package:gymtracker/utils/utils.dart';
 import 'package:gymtracker/view/components/badges.dart';
 import 'package:gymtracker/view/utils/drag_handle.dart';
 import 'package:gymtracker/view/utils/exercise.dart';
 import 'package:gymtracker/view/utils/time.dart';
+import 'package:gymtracker/view/utils/weight_calculator.dart';
 
 class WorkoutExerciseEditor extends StatefulWidget {
   final Exercise exercise;
@@ -267,7 +270,24 @@ class _WorkoutExerciseSetEditorState extends State<WorkoutExerciseSetEditor> {
   late var distanceController =
       TextEditingController(text: stringifyDouble(widget.set.distance ?? 0));
 
+  final _weightFocusNode = FocusNode();
+
+  @override
+  void initState() {
+    super.initState();
+    _weightFocusNode.addListener(() {
+      setState(() {});
+    });
+  }
+
+  @override
+  void dispose() {
+    _weightFocusNode.dispose();
+    super.dispose();
+  }
+
   TextField get weightField => TextField(
+        focusNode: _weightFocusNode,
         controller: weightController,
         keyboardType: const TextInputType.numberWithOptions(decimal: true),
         inputFormatters: [
@@ -277,6 +297,19 @@ class _WorkoutExerciseSetEditorState extends State<WorkoutExerciseSetEditor> {
           isDense: true,
           border: const OutlineInputBorder(),
           labelText: "exercise.fields.weight".t,
+          // suffix: Text("kg"),
+          suffixIcon: _weightFocusNode.hasFocus
+              ? IconButton(
+                  icon: const Icon(Icons.calculate_rounded),
+                  onPressed: () {
+                    Go.toDialog(
+                      () => WeightCalculator(
+                        startingWeight: weightController.text.tryParseDouble(),
+                      ),
+                    );
+                  },
+                )
+              : null,
         ),
         onChanged: (value) {
           widget.onSetValueChange();

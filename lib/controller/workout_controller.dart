@@ -11,6 +11,7 @@ import 'package:gymtracker/model/set.dart';
 import 'package:gymtracker/model/workout.dart';
 import 'package:gymtracker/service/database.dart';
 import 'package:gymtracker/service/localizations.dart';
+import 'package:gymtracker/struct/stopwatch_extended.dart';
 import 'package:gymtracker/view/workout.dart';
 
 class WorkoutController extends GetxController with ServiceableController {
@@ -28,9 +29,9 @@ class WorkoutController extends GetxController with ServiceableController {
         infobox = Rx<String?>(infobox);
 
   factory WorkoutController.fromSavedData(Map<String, dynamic> data) {
-    // final  data = service.getOngoingData()!;
     final cont =
         WorkoutController(data['name'], data['parentID'], data['infobox']);
+
     cont.exercises((data['exercises'] as List)
         .map((el) => WorkoutExercisable.fromJson(el))
         .toList());
@@ -38,6 +39,30 @@ class WorkoutController extends GetxController with ServiceableController {
         data['time'] ?? DateTime.now().millisecondsSinceEpoch));
     cont.continuesID(data['continuesID']);
     cont.isContinuation(data['isContinuation'] ?? false);
+
+    if (data.containsKey("globalStopwatch")) {
+      final controller = Get.find<StopwatchController>();
+
+      // Separating the two cases this way avoids a couple of nasty bugs:
+      //
+      // * If the stopwatch is paused, saving the duration allows us to recover
+      //   the stopwatch value without it ticking while the app is closed.
+      // * If the stopwatch is running, we actually want to tick while the
+      //   app is closed, so we save the starting time and the fact that it's
+      //   running.
+      if (data['globalStopwatchPaused'] == false) {
+        controller.globalStopwatch.stopwatch = StopwatchEx.fromMilliseconds(
+          DateTime.now().millisecondsSinceEpoch -
+              (data['globalStopwatch'] as int),
+        );
+        controller.globalStopwatch.start();
+      } else {
+        controller.globalStopwatch.stopwatch = StopwatchEx.fromMilliseconds(
+          data['globalStopwatchNominalDuration'] as int,
+        );
+      }
+    }
+
     return cont;
   }
 
@@ -86,6 +111,7 @@ class WorkoutController extends GetxController with ServiceableController {
 
   void save() {
     if (Get.find<RoutinesController>().hasOngoingWorkout.isFalse) return;
+    final stopwatchController = Get.find<StopwatchController>();
 
     printInfo(info: "Saving ongoing data");
     service.writeToOngoing({
@@ -96,6 +122,15 @@ class WorkoutController extends GetxController with ServiceableController {
       "infobox": infobox.value,
       "isContinuation": isContinuation.value,
       "continuesID": continuesID.value,
+      if (stopwatchController.globalStopwatch.currentDuration.inSeconds >
+          0) ...{
+        "globalStopwatch": stopwatchController
+            .globalStopwatch.startingTime.millisecondsSinceEpoch,
+        "globalStopwatchPaused":
+            stopwatchController.globalStopwatch.isStopped(),
+        "globalStopwatchNominalDuration":
+            stopwatchController.globalStopwatch.currentDuration.inMilliseconds,
+      }
     });
   }
 

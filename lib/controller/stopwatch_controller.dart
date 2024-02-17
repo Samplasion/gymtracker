@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:get/get.dart';
 import 'package:gymtracker/controller/serviceable_controller.dart';
+import 'package:gymtracker/struct/stopwatch_extended.dart';
 import 'package:gymtracker/view/utils/time.dart';
 
 const _globalStopwatchID = "global";
@@ -16,7 +17,7 @@ abstract class GTStopwatch {
 }
 
 class GlobalStopwatch extends GTStopwatch {
-  late Stopwatch stopwatch;
+  late StopwatchEx stopwatch;
 
   Duration get currentDuration => stopwatch.elapsed;
   late Timer timer;
@@ -33,7 +34,7 @@ class GlobalStopwatch extends GTStopwatch {
   GlobalStopwatch({
     required this.onTick,
   }) {
-    stopwatch = Stopwatch();
+    stopwatch = StopwatchEx();
     stopwatch.stop();
     stopwatch.reset();
   }

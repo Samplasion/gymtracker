@@ -565,7 +565,7 @@ class _RoutineHistoryDataState extends State<RoutineHistoryData> {
           child: Padding(
             padding: const EdgeInsets.only(top: 16),
             child: PlatformBuilder(
-              buildMaterial: (context) {
+              buildMaterial: (context, _) {
                 return Wrap(
                   spacing: 8,
                   runSpacing: 8,
@@ -588,7 +588,7 @@ class _RoutineHistoryDataState extends State<RoutineHistoryData> {
                   ],
                 );
               },
-              buildCupertino: (context) {
+              buildCupertino: (context, _) {
                 return Center(
                   child: CupertinoSlidingSegmentedControl(
                     groupValue: type,

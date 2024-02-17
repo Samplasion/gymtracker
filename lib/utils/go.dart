@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:gymtracker/controller/platform_controller.dart';
 import 'package:gymtracker/service/localizations.dart';
+import 'package:gymtracker/view/platform/dialogs_modals.dart';
 import 'package:gymtracker/view/platform/transition.dart';
 
 class Go {
@@ -54,10 +55,10 @@ class Go {
     Widget? icon,
     List<Widget> actions = const <Widget>[],
   }) {
-    showDialog(
+    showPlatformDialog(
       context: Get.context!,
       builder: (context) {
-        return AlertDialog(
+        return PlatformAlertDialog(
           icon: icon ?? const Icon(Icons.info),
           title: Text(title.t),
           content: Text(body.t),
@@ -80,10 +81,10 @@ class Go {
     String body, {
     Widget? icon,
   }) {
-    return showDialog<bool>(
+    return showPlatformDialog<bool>(
       context: Get.context!,
       builder: (context) {
-        return AlertDialog(
+        return PlatformAlertDialog(
           icon: icon ?? const Icon(Icons.info),
           title: Text(title.t),
           content: Text(body.t),

@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
@@ -9,9 +10,16 @@ import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/utils/sets.dart';
 import 'package:gymtracker/utils/utils.dart';
 import 'package:gymtracker/view/components/badges.dart';
+import 'package:gymtracker/view/platform/dialogs_modals.dart';
+import 'package:gymtracker/view/platform/icons.dart';
+import 'package:gymtracker/view/platform/list_tile.dart';
+import 'package:gymtracker/view/platform/platform_widget.dart';
+import 'package:gymtracker/view/platform/popup_menu_button.dart';
+import 'package:gymtracker/view/platform/text_form_field.dart';
 import 'package:gymtracker/view/utils/drag_handle.dart';
 import 'package:gymtracker/view/utils/exercise.dart';
 import 'package:gymtracker/view/utils/time.dart';
+import 'package:pull_down_button/pull_down_button.dart';
 
 class WorkoutExerciseEditor extends StatefulWidget {
   final Exercise exercise;
@@ -126,7 +134,7 @@ class _WorkoutExerciseEditorState extends State<WorkoutExerciseEditor> {
               ),
             ),
             const SizedBox(height: 8),
-            ListTile(
+            PlatformListTile(
               leading: const Icon(Icons.notes),
               title: Text(
                 widget.exercise.notes.isEmpty
@@ -267,13 +275,13 @@ class _WorkoutExerciseSetEditorState extends State<WorkoutExerciseSetEditor> {
   late var distanceController =
       TextEditingController(text: stringifyDouble(widget.set.distance ?? 0));
 
-  TextField get weightField => TextField(
+  Widget get weightField => PlatformTextFormField(
         controller: weightController,
         keyboardType: const TextInputType.numberWithOptions(decimal: true),
         inputFormatters: [
           FilteringTextInputFormatter.allow(RegExp("[0123456789.,]")),
         ],
-        decoration: InputDecoration(
+        materialDecoration: InputDecoration(
           isDense: true,
           border: const OutlineInputBorder(),
           labelText: "exercise.fields.weight".t,
@@ -305,7 +313,7 @@ class _WorkoutExerciseSetEditorState extends State<WorkoutExerciseSetEditor> {
           }
         },
       );
-  TextField get repsField => TextField(
+  Widget get repsField => PlatformTextFormField(
         controller: repsController,
         keyboardType: const TextInputType.numberWithOptions(
           decimal: true,
@@ -314,7 +322,7 @@ class _WorkoutExerciseSetEditorState extends State<WorkoutExerciseSetEditor> {
         inputFormatters: [
           FilteringTextInputFormatter.digitsOnly,
         ],
-        decoration: InputDecoration(
+        materialDecoration: InputDecoration(
           isDense: true,
           border: const OutlineInputBorder(),
           labelText: "exercise.fields.reps".t,
@@ -328,7 +336,7 @@ class _WorkoutExerciseSetEditorState extends State<WorkoutExerciseSetEditor> {
           }
         },
       );
-  TextField get distanceField => TextField(
+  Widget get distanceField => PlatformTextFormField(
         controller: weightController,
         keyboardType: const TextInputType.numberWithOptions(
           decimal: true,
@@ -337,7 +345,7 @@ class _WorkoutExerciseSetEditorState extends State<WorkoutExerciseSetEditor> {
         inputFormatters: [
           FilteringTextInputFormatter.allow(RegExp("[0123456789.,]")),
         ],
-        decoration: InputDecoration(
+        materialDecoration: InputDecoration(
           isDense: true,
           border: const OutlineInputBorder(),
           labelText: "exercise.fields.distance".t,
@@ -389,7 +397,7 @@ class _WorkoutExerciseSetEditorState extends State<WorkoutExerciseSetEditor> {
             onPressed: (_) => widget.onDelete(),
             backgroundColor: scheme.error,
             foregroundColor: scheme.onError,
-            icon: Icons.delete_forever_rounded,
+            icon: PlatformIcons.delete_forever,
             label: 'actions.remove'.t,
           ),
         ],
@@ -409,53 +417,119 @@ class _WorkoutExerciseSetEditorState extends State<WorkoutExerciseSetEditor> {
             padding: const EdgeInsets.all(8),
             child: Row(
               children: [
-                PopupMenuButton(
-                  icon: buildSetType(
-                    context,
-                    widget.set.kind,
-                    set: widget.set,
-                    allSets: widget.exercise.sets,
-                  ),
+                PlatformPopupMenuButton(
                   tooltip: "set.kind".t,
-                  itemBuilder: (context) => <PopupMenuEntry<SetKind>>[
+                  child: PlatformBuilder(
+                    buildMaterial: (context, child) {
+                      return buildSetType(
+                        context,
+                        widget.set.kind,
+                        set: widget.set,
+                        allSets: widget.exercise.sets,
+                      );
+                    },
+                    buildCupertino: (context, child) => child!,
+                    child: buildSetType(
+                      context,
+                      widget.set.kind,
+                      set: widget.set,
+                      allSets: widget.exercise.sets,
+                    ),
+                  ),
+                  itemBuilder: (context) => [
                     for (final kind in SetKind.values)
-                      PopupMenuItem(
-                        value: kind,
+                      PullDownMenuItem(
                         onTap: () => widget.onSetSelectKind(kind),
-                        child: ListTile(
-                          leading: buildSetType(
-                            context,
-                            kind,
-                            set: widget.set,
-                            allSets: widget.exercise.sets,
-                          ),
-                          title: Text('set.kindLong.${kind.name}'.t),
+                        iconWidget: buildSetType(
+                          context,
+                          kind,
+                          set: widget.set,
+                          allSets: widget.exercise.sets,
                         ),
+                        title: 'set.kindLong.${kind.name}'.t,
                       ),
-                    const PopupMenuDivider(),
-                    PopupMenuItem(
+                    const PullDownMenuDivider.large(),
+                    PullDownMenuItem(
                       onTap: () {
-                        showDialog(
+                        showPlatformDialog(
                           context: context,
                           builder: (context) {
-                            return AlertDialog(
+                            return PlatformAlertDialog(
                               title: Text('set.kinds.help.title'.t),
                               scrollable: true,
                               content: Column(
                                 children: [
                                   for (final kind in SetKind.values)
-                                    ListTile(
-                                      leading: buildSetType(
-                                        context,
-                                        kind,
-                                        set: widget.set,
-                                        allSets: widget.exercise.sets,
-                                        fontSize: 16,
-                                      ),
-                                      title:
-                                          Text('set.kindLong.${kind.name}'.t),
-                                      subtitle:
-                                          Text('set.kinds.help.${kind.name}'.t),
+                                    PlatformBuilder(
+                                      buildMaterial: (context, _) {
+                                        return PlatformListTile(
+                                          leading: buildSetType(
+                                            context,
+                                            kind,
+                                            set: widget.set,
+                                            allSets: widget.exercise.sets,
+                                            fontSize: 16,
+                                          ),
+                                          title: Text(
+                                              'set.kindLong.${kind.name}'.t),
+                                          subtitle: Text(
+                                              'set.kinds.help.${kind.name}'.t),
+                                        );
+                                      },
+                                      buildCupertino: (context, child) {
+                                        return Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                              vertical: 4),
+                                          child: Row(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              SizedBox(
+                                                width: 32,
+                                                height: 32,
+                                                child: buildSetType(
+                                                  context,
+                                                  kind,
+                                                  set: widget.set,
+                                                  allSets: widget.exercise.sets,
+                                                  fontSize: 16,
+                                                ),
+                                              ),
+                                              const SizedBox(width: 8),
+                                              Expanded(
+                                                child: Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    Text(
+                                                      'set.kindLong.${kind.name}'
+                                                          .t,
+                                                      style: Theme.of(context)
+                                                          .textTheme
+                                                          .bodyLarge
+                                                          ?.copyWith(
+                                                            fontWeight:
+                                                                FontWeight.bold,
+                                                          ),
+                                                      textAlign:
+                                                          TextAlign.start,
+                                                    ),
+                                                    Text(
+                                                      'set.kinds.help.${kind.name}'
+                                                          .t,
+                                                      style: Theme.of(context)
+                                                          .textTheme
+                                                          .bodySmall,
+                                                      textAlign:
+                                                          TextAlign.start,
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        );
+                                      },
                                     ),
                                 ],
                               ),
@@ -472,16 +546,17 @@ class _WorkoutExerciseSetEditorState extends State<WorkoutExerciseSetEditor> {
                           },
                         );
                       },
-                      child: ListTile(
-                        leading: Text(
+                      iconWidget: PlatformBuilder(
+                        buildCupertino: (context, _) => const Icon(Icons.help),
+                        buildMaterial: (context, _) => Text(
                           "?",
                           style: TextStyle(
                             color: scheme.primary,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                        title: Text('set.kinds.help.title'.t),
                       ),
+                      title: 'set.kinds.help.title'.t,
                     ),
                   ],
                 ),
@@ -493,10 +568,21 @@ class _WorkoutExerciseSetEditorState extends State<WorkoutExerciseSetEditor> {
                 const SizedBox(width: 8),
                 if (!widget.isCreating) ...[
                   ValueBuilder<bool?>(
-                    builder: (_, update) => Checkbox(
-                      value: widget.set.done,
-                      onChanged: update,
-                      activeColor: Theme.of(context).colorScheme.tertiary,
+                    builder: (_, update) => PlatformBuilder(
+                      buildMaterial: (context, _) {
+                        return Checkbox(
+                          value: widget.set.done,
+                          onChanged: update,
+                          activeColor: Theme.of(context).colorScheme.tertiary,
+                        );
+                      },
+                      buildCupertino: (context, _) {
+                        return CupertinoCheckbox(
+                          value: widget.set.done,
+                          onChanged: update,
+                          activeColor: Theme.of(context).colorScheme.tertiary,
+                        );
+                      },
                     ),
                     onUpdate: (isDone) {
                       widget.onSetSetDone(isDone ?? widget.set.done);

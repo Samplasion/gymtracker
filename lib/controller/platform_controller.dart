@@ -7,8 +7,9 @@ enum UIPlatform {
 }
 
 class PlatformController extends GetxController with ServiceableController {
-  final Rx<UIPlatform> platform = () {
-    if (GetPlatform.isIOS || GetPlatform.isMacOS) {
+  bool get supportsCupertino => GetPlatform.isIOS || GetPlatform.isMacOS;
+  late final Rx<UIPlatform> platform = () {
+    if (supportsCupertino) {
       return UIPlatform.cupertino;
     }
 

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:gymtracker/controller/stopwatch_controller.dart';
+import 'package:gymtracker/view/platform/text_form_field.dart';
 
 import 'package:gymtracker/view/utils/animated_selectable.dart';
 
@@ -99,11 +100,12 @@ class _TimeInputFieldState extends State<TimeInputField> {
 
   @override
   Widget build(BuildContext context) {
-    return TextFormField(
+    return PlatformTextFormField(
       controller: widget.controller,
       focusNode: node,
       keyboardType: const TextInputType.numberWithOptions(decimal: false),
-      decoration: (widget.decoration ?? const InputDecoration()).copyWith(
+      materialDecoration:
+          (widget.decoration ?? const InputDecoration()).copyWith(
         suffixIcon: () {
           if (widget.timerInteractive) {
             var isActive = _isActive;
@@ -141,7 +143,7 @@ class _TimeInputFieldState extends State<TimeInputField> {
         });
       },
       onEditingComplete: () => normalizeField(),
-      onTapOutside: (_) {
+      onTapOutside: () {
         normalizeField();
         node.unfocus();
       },

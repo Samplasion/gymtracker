@@ -6,40 +6,28 @@ import 'package:pull_down_button/pull_down_button.dart';
 export 'package:pull_down_button/pull_down_button.dart' show PullDownMenuItem;
 
 class PlatformPopupMenuButton extends PlatformStatelessWidget {
-  final List<PullDownMenuItem> Function(BuildContext) itemBuilder;
+  final List<PullDownMenuEntry> Function(BuildContext) itemBuilder;
+  final Widget? child;
+  final String? tooltip;
 
   const PlatformPopupMenuButton({
     super.key,
     required this.itemBuilder,
+    this.child,
+    this.tooltip,
   });
 
   @override
   Widget buildMaterial(BuildContext context) {
     return PopupMenuButton(
-      itemBuilder: (context) => itemBuilder(context).map((item) {
-        return PopupMenuItem(
-          value: item,
-          child: Text.rich(
-            TextSpan(
-              text: item.title,
-              children: [
-                if (item.iconWidget != null) ...[
-                  const TextSpan(text: ' '),
-                  WidgetSpan(
-                    child: item.iconWidget!,
-                    alignment: PlaceholderAlignment.middle,
-                  ),
-                ]
-              ],
-            ),
-            style: TextStyle(
-              color: item.isDestructive
-                  ? Theme.of(context).colorScheme.error
-                  : null,
-            ),
-          ),
-        );
-      }).toList(),
+      icon: child,
+      tooltip: tooltip,
+      itemBuilder: (context) => itemBuilder(context)
+          .map((item) {
+            return _cupertinoToMaterial(context, item);
+          })
+          .whereType<PopupMenuEntry>()
+          .toList(),
     );
   }
 
@@ -50,8 +38,31 @@ class PlatformPopupMenuButton extends PlatformStatelessWidget {
       buttonBuilder: (context, showMenu) => CupertinoButton(
         onPressed: showMenu,
         padding: EdgeInsets.zero,
-        child: const Icon(CupertinoIcons.ellipsis_circle),
+        child: child ?? const Icon(CupertinoIcons.ellipsis_circle),
       ),
     );
+  }
+
+  PopupMenuEntry? _cupertinoToMaterial(
+      BuildContext context, PullDownMenuEntry item) {
+    if (item is PullDownMenuItem) {
+      return PopupMenuItem(
+        value: item,
+        onTap: item.onTap,
+        child: ListTile(
+          leading: item.iconWidget,
+          title: Text(
+            item.title,
+            style: TextStyle(
+              color: item.isDestructive
+                  ? Theme.of(context).colorScheme.error
+                  : null,
+            ),
+          ),
+        ),
+      );
+    } else if (item is PullDownMenuDivider) {
+      return PopupMenuDivider();
+    }
   }
 }

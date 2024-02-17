@@ -1,6 +1,8 @@
 import 'package:flex_color_picker/flex_color_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:gymtracker/view/platform/list_tile.dart';
+import 'package:gymtracker/view/platform/platform_widget.dart';
 
 typedef OnChange<T> = void Function(T value);
 
@@ -13,6 +15,7 @@ class ColorModalTile extends StatefulWidget {
   final Widget? subtitle;
   final Color selectedValue;
   final OnChange<Color>? onChange;
+  final bool cupertinoIsNotched;
 
   const ColorModalTile({
     super.key,
@@ -20,6 +23,7 @@ class ColorModalTile extends StatefulWidget {
     this.subtitle,
     required this.title,
     required this.selectedValue,
+    this.cupertinoIsNotched = false,
   });
 
   @override
@@ -43,14 +47,27 @@ class _ColorModalTileState extends State<ColorModalTile>
 
   @override
   Widget build(BuildContext context) {
-    return ListTile(
+    return PlatformListTile(
+      cupertinoIsNotched: widget.cupertinoIsNotched,
       title: widget.title,
       subtitle: widget.subtitle ?? Text(subtitle),
-      trailing: ColorIndicator(
-        width: 40,
-        height: 40,
-        borderRadius: 4,
-        color: widget.selectedValue,
+      trailing: PlatformBuilder(
+        buildMaterial: (context, _) {
+          return ColorIndicator(
+            width: 40,
+            height: 40,
+            borderRadius: 4,
+            color: widget.selectedValue,
+          );
+        },
+        buildCupertino: (context, _) {
+          return ColorIndicator(
+            width: 24,
+            height: 24,
+            borderRadius: 1000,
+            color: widget.selectedValue,
+          );
+        },
       ),
       onTap: () {
         Color oldValue = widget.selectedValue;

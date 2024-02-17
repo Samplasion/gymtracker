@@ -17,6 +17,7 @@ class RadioModalTile<T> extends StatefulWidget {
   final Map<T, String> values;
   final T selectedValue;
   final OnChange<T>? onChange;
+  final bool cupertinoIsNotched;
 
   const RadioModalTile({
     super.key,
@@ -25,6 +26,7 @@ class RadioModalTile<T> extends StatefulWidget {
     required this.title,
     required this.values,
     required this.selectedValue,
+    this.cupertinoIsNotched = false,
   });
 
   @override
@@ -56,14 +58,18 @@ class _RadioModalTileState<T> extends State<RadioModalTile<T>>
   @override
   Widget build(BuildContext context) {
     return PlatformListTile(
+      cupertinoIsNotched: widget.cupertinoIsNotched,
       title: widget.title,
       subtitle: widget.subtitle ?? Text(subtitle),
       trailing: PlatformBuilder(
-        buildMaterial: (context) {
+        buildMaterial: (context, _) {
           return const Icon(Icons.arrow_right_rounded);
         },
-        buildCupertino: (context) {
-          return const Icon(CupertinoIcons.forward);
+        buildCupertino: (context, _) {
+          return const Icon(
+            CupertinoIcons.forward,
+            color: CupertinoColors.systemGrey,
+          );
         },
       ),
       onTap: () {

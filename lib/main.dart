@@ -22,6 +22,7 @@ import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/view/platform/app.dart';
 import 'package:gymtracker/view/platform/scaffold.dart';
 import 'package:gymtracker/view/skeleton.dart';
+import 'package:gymtracker/view/utils/restartable.dart';
 
 final _databaseService = DatabaseService();
 
@@ -55,81 +56,84 @@ class MainApp extends StatelessWidget {
     final settings = Get.put(SettingsController());
     final localizations = Get.put(this.localizations);
 
-    return DynamicColorBuilder(builder: (light, dark) {
-      return AnimatedBuilder(
-          animation: settings.service,
-          builder: (context, _) {
-            return Container(
-              child: () {
-                final seedColor = settings.color();
-                (seedColor, settings.usesDynamicColor()).printInfo();
-                final lightScheme =
-                    (light != null && settings.usesDynamicColor())
-                        ? light.harmonized()
-                        : ColorScheme.fromSeed(
-                            seedColor: seedColor,
-                            brightness: Brightness.light,
-                          );
-                final darkScheme = (dark != null && settings.usesDynamicColor())
-                    ? dark.harmonized()
-                    : ColorScheme.fromSeed(
-                        seedColor: seedColor,
-                        brightness: Brightness.dark,
-                      ).harmonized();
-                return AnimatedBuilder(
-                  animation: localizations,
-                  builder: (context, _) {
-                    return PlatformApp(
-                      title: () {
-                        if (kDebugMode) {
-                          return "${"appName".t} (Debug)";
-                        } else {
-                          return "appName".t;
-                        }
-                      }(),
-                      translations: localizations,
-                      locale: () {
-                        printInfo(info: "${settings.locale.value}");
-                        return settings.locale.value;
-                      }(),
-                      supportedLocales: GTLocalizations.supportedLocales,
-                      fallbackLocale: const Locale('en'),
-                      localizationsDelegates: const [
-                        GlobalMaterialLocalizations.delegate,
-                        GlobalWidgetsLocalizations.delegate,
-                        GlobalCupertinoLocalizations.delegate,
-                      ],
-                      theme: ThemeData(
-                        useMaterial3: true,
-                        brightness: Brightness.light,
-                        colorScheme: lightScheme,
-                      ),
-                      darkTheme: ThemeData(
-                        useMaterial3: true,
-                        brightness: Brightness.dark,
-                        colorScheme: darkScheme,
-                      ),
-                      home: const _Loader(),
-                      debugShowCheckedModeBanner: false,
-                      builder: (context, child) =>
-                          AnnotatedRegion<SystemUiOverlayStyle>(
-                        value: SystemUiOverlayStyle(
-                          systemNavigationBarColor:
-                              Theme.of(context).colorScheme.background,
-                          systemNavigationBarIconBrightness: Theme.of(context)
-                              .colorScheme
-                              .background
-                              .estimateForegroundBrightness(),
+    return Restartable(
+      child: DynamicColorBuilder(builder: (light, dark) {
+        return AnimatedBuilder(
+            animation: settings.service,
+            builder: (context, _) {
+              return Container(
+                child: () {
+                  final seedColor = settings.color();
+                  (seedColor, settings.usesDynamicColor()).printInfo();
+                  final lightScheme =
+                      (light != null && settings.usesDynamicColor())
+                          ? light.harmonized()
+                          : ColorScheme.fromSeed(
+                              seedColor: seedColor,
+                              brightness: Brightness.light,
+                            );
+                  final darkScheme =
+                      (dark != null && settings.usesDynamicColor())
+                          ? dark.harmonized()
+                          : ColorScheme.fromSeed(
+                              seedColor: seedColor,
+                              brightness: Brightness.dark,
+                            ).harmonized();
+                  return AnimatedBuilder(
+                    animation: localizations,
+                    builder: (context, _) {
+                      return PlatformApp(
+                        title: () {
+                          if (kDebugMode) {
+                            return "${"appName".t} (Debug)";
+                          } else {
+                            return "appName".t;
+                          }
+                        }(),
+                        translations: localizations,
+                        locale: () {
+                          printInfo(info: "${settings.locale.value}");
+                          return settings.locale.value;
+                        }(),
+                        supportedLocales: GTLocalizations.supportedLocales,
+                        fallbackLocale: const Locale('en'),
+                        localizationsDelegates: const [
+                          GlobalMaterialLocalizations.delegate,
+                          GlobalWidgetsLocalizations.delegate,
+                          GlobalCupertinoLocalizations.delegate,
+                        ],
+                        theme: ThemeData(
+                          useMaterial3: true,
+                          brightness: Brightness.light,
+                          colorScheme: lightScheme,
                         ),
-                        child: child ?? Container(),
-                      ),
-                    );
-                  },
-                );
-              }(),
-            );
-          });
-    });
+                        darkTheme: ThemeData(
+                          useMaterial3: true,
+                          brightness: Brightness.dark,
+                          colorScheme: darkScheme,
+                        ),
+                        home: const _Loader(),
+                        debugShowCheckedModeBanner: false,
+                        builder: (context, child) =>
+                            AnnotatedRegion<SystemUiOverlayStyle>(
+                          value: SystemUiOverlayStyle(
+                            systemNavigationBarColor:
+                                Theme.of(context).colorScheme.background,
+                            systemNavigationBarIconBrightness: Theme.of(context)
+                                .colorScheme
+                                .background
+                                .estimateForegroundBrightness(),
+                          ),
+                          child: child ?? Container(),
+                        ),
+                      );
+                    },
+                  );
+                }(),
+              );
+            });
+      }),
+    );
   }
 }
 

@@ -39,6 +39,7 @@ class PlatformNavigationBar extends PlatformStatelessWidget {
           .toList(),
       currentIndex: selectedIndex,
       onTap: onDestinationSelected,
+      iconSize: 24,
     );
   }
 }

@@ -109,21 +109,23 @@ abstract class PlatformState<T extends StatefulWidget> extends State<T> {
   Widget buildCupertino(BuildContext context);
 }
 
-class PlatformBuilder extends StatelessWidget {
-  final Widget Function(BuildContext context) buildMaterial;
-  final Widget Function(BuildContext context) buildCupertino;
+class PlatformBuilder<T> extends StatelessWidget {
+  final Widget Function(BuildContext context, T? child) buildMaterial;
+  final Widget Function(BuildContext context, T? child) buildCupertino;
+  final T? child;
 
   const PlatformBuilder({
     super.key,
     required this.buildMaterial,
     required this.buildCupertino,
+    this.child,
   });
 
   @override
   Widget build(BuildContext context) {
     final controller = Get.find<PlatformController>();
     return controller.platform.value == UIPlatform.material
-        ? buildMaterial(context)
-        : buildCupertino(context);
+        ? buildMaterial(context, child)
+        : buildCupertino(context, child);
   }
 }

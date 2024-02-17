@@ -91,7 +91,7 @@ class DebugView extends StatelessWidget {
               }),
               StatefulBuilder(builder: (context, setState) {
                 return PlatformBuilder(
-                  buildCupertino: (context) {
+                  buildCupertino: (context, _) {
                     return PlatformListTile(
                       title: const Text("Time dilation"),
                       subtitle: Text("Current time dilation: $timeDilation"),
@@ -129,7 +129,7 @@ class DebugView extends StatelessWidget {
                       },
                     );
                   },
-                  buildMaterial: (context) {
+                  buildMaterial: (context, _) {
                     return Slider(
                       value: timeDilation,
                       onChanged: ((value) {

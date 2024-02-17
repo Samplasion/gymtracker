@@ -127,7 +127,7 @@ class _ExercisePickerState extends State<ExercisePicker> {
       Go.snack("exercise.picker.errors.empty".t);
       return;
     }
-    ScaffoldMessenger.of(context).clearSnackBars();
+    ScaffoldMessenger.maybeOf(context)?.clearSnackBars();
     final List<Exercise> exercises = selectedExercises
         .map((e) => e.clone()
           ..parentID = e.parentID ?? e.id

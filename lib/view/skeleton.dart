@@ -1,4 +1,7 @@
+import 'dart:ui';
+
 import 'package:animations/animations.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart' hide Localizations;
 import 'package:flutter/scheduler.dart';
@@ -9,9 +12,11 @@ import 'package:gymtracker/controller/workout_controller.dart';
 import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/utils/constants.dart';
 import 'package:gymtracker/utils/go.dart';
+import 'package:gymtracker/view/cupertino/translucent_card.dart';
 import 'package:gymtracker/view/debug.dart';
 import 'package:gymtracker/view/history.dart';
 import 'package:gymtracker/view/library.dart';
+import 'package:gymtracker/view/platform/icons.dart';
 import 'package:gymtracker/view/platform/navigation_bar.dart';
 import 'package:gymtracker/view/platform/platform_widget.dart';
 import 'package:gymtracker/view/platform/scaffold.dart';
@@ -76,14 +81,14 @@ class _SkeletonViewState extends State<SkeletonView>
           Animation<double> secondaryAnimation,
         ) {
           return PlatformBuilder(
-            buildMaterial: (context) {
+            buildMaterial: (context, _) {
               return FadeThroughTransition(
                 animation: primaryAnimation,
                 secondaryAnimation: secondaryAnimation,
                 child: child,
               );
             },
-            buildCupertino: (context) {
+            buildCupertino: (context, _) {
               return child;
             },
           );
@@ -120,7 +125,7 @@ class _SkeletonViewState extends State<SkeletonView>
                   label: "routines.title".t,
                 ),
                 NavigationDestination(
-                  icon: const Icon(Icons.local_library_rounded),
+                  icon: Icon(PlatformIcons.library),
                   label: "library.title".t,
                 ),
                 NavigationDestination(
@@ -128,17 +133,17 @@ class _SkeletonViewState extends State<SkeletonView>
                     label: Text(
                         "${Get.find<HistoryController>().userVisibleLength}"),
                     isLabelVisible: _selectedIndex == 2,
-                    child: const Icon(Icons.history_rounded),
+                    child: Icon(PlatformIcons.history),
                   ),
                   label: "history.title".t,
                 ),
                 NavigationDestination(
-                  icon: const Icon(Icons.settings_rounded),
+                  icon: Icon(PlatformIcons.settings),
                   label: "settings.title".t,
                 ),
                 if (kDebugMode)
-                  const NavigationDestination(
-                    icon: Icon(Icons.bug_report),
+                  NavigationDestination(
+                    icon: Icon(PlatformIcons.debug),
                     label: "Debug",
                   ),
               ],
@@ -152,92 +157,104 @@ class _SkeletonViewState extends State<SkeletonView>
   }
 }
 
-class OngoingWorkoutBar extends StatelessWidget {
+class OngoingWorkoutBar extends PlatformStatelessWidget {
   final VoidCallback open;
 
   const OngoingWorkoutBar({required this.open, super.key});
 
-  RoutinesController get controller => Get.put(RoutinesController());
+  RoutinesController get routinesController => Get.put(RoutinesController());
 
   @override
-  Widget build(BuildContext context) {
+  Widget buildMaterial(BuildContext context) {
     final isPhone = context.width < Breakpoints.xs;
     return Card(
       elevation: 1,
       margin: const EdgeInsets.fromLTRB(8, 0, 8, 8),
       shape: RoundedRectangleBorder(
-        // borderRadius: BorderRadius.vertical(
-        //   top: Radius.circular(13),
-        // ),
         borderRadius: BorderRadius.circular(13),
       ),
-      child: Container(
-        constraints: const BoxConstraints(minHeight: 64),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        child: Center(
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Expanded(
-                child: Obx(
-                  () => TimerView(
-                    startingTime: Get.find<WorkoutController>().time.value,
-                    builder: (_, time) => time,
-                  ),
+      child: _buildCardBody(context, isPhone),
+    );
+  }
+
+  @override
+  Widget buildCupertino(BuildContext context) {
+    final isPhone = context.width < Breakpoints.xs;
+    return TranslucentCard(
+      child: Padding(
+        padding: const EdgeInsets.only(left: 8),
+        child: _buildCardBody(context, isPhone),
+      ),
+    );
+  }
+
+  Container _buildCardBody(BuildContext context, bool isPhone) {
+    return Container(
+      constraints: const BoxConstraints(minHeight: 64),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      child: Center(
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Expanded(
+              child: Obx(
+                () => TimerView(
+                  startingTime: Get.find<WorkoutController>().time.value,
+                  builder: (_, time) => time,
                 ),
               ),
-              const SizedBox(width: 8),
-              Crossfade(
+            ),
+            const SizedBox(width: 8),
+            Crossfade(
+              firstChild: TextButton.icon(
+                onPressed: resumeWorkout,
+                icon: const Icon(Icons.play_arrow_rounded),
+                clipBehavior: Clip.hardEdge,
+                label: Text(
+                  "ongoingWorkout.actions.short.resume".t,
+                  overflow: TextOverflow.clip,
+                  maxLines: 1,
+                ),
+              ),
+              secondChild: IconButton(
+                onPressed: resumeWorkout,
+                icon: Icon(
+                  Icons.play_arrow_rounded,
+                  color: Theme.of(context).colorScheme.primary,
+                ),
+              ),
+              showSecond: isPhone,
+            ),
+            const SizedBox(width: 8),
+            ClipRect(
+              clipBehavior: Clip.hardEdge,
+              child: Crossfade(
                 firstChild: TextButton.icon(
-                  onPressed: resumeWorkout,
-                  icon: const Icon(Icons.play_arrow_rounded),
+                  onPressed: () => cancelWorkout(context),
+                  icon: Icon(
+                    Icons.close_rounded,
+                    color: Theme.of(context).colorScheme.error,
+                  ),
                   clipBehavior: Clip.hardEdge,
                   label: Text(
-                    "ongoingWorkout.actions.short.resume".t,
+                    "ongoingWorkout.actions.short.cancel".t,
+                    style:
+                        TextStyle(color: Theme.of(context).colorScheme.error),
                     overflow: TextOverflow.clip,
                     maxLines: 1,
                   ),
                 ),
                 secondChild: IconButton(
-                  onPressed: resumeWorkout,
+                  onPressed: () => cancelWorkout(context),
                   icon: Icon(
-                    Icons.play_arrow_rounded,
-                    color: Theme.of(context).colorScheme.primary,
+                    Icons.close_rounded,
+                    color: Theme.of(context).colorScheme.error,
                   ),
                 ),
                 showSecond: isPhone,
               ),
-              const SizedBox(width: 8),
-              ClipRect(
-                clipBehavior: Clip.hardEdge,
-                child: Crossfade(
-                  firstChild: TextButton.icon(
-                    onPressed: () => cancelWorkout(context),
-                    icon: Icon(
-                      Icons.close_rounded,
-                      color: Theme.of(context).colorScheme.error,
-                    ),
-                    clipBehavior: Clip.hardEdge,
-                    label: Text(
-                      "ongoingWorkout.actions.short.cancel".t,
-                      style:
-                          TextStyle(color: Theme.of(context).colorScheme.error),
-                      overflow: TextOverflow.clip,
-                      maxLines: 1,
-                    ),
-                  ),
-                  secondChild: IconButton(
-                    onPressed: () => cancelWorkout(context),
-                    icon: Icon(
-                      Icons.close_rounded,
-                      color: Theme.of(context).colorScheme.error,
-                    ),
-                  ),
-                  showSecond: isPhone,
-                ),
-              ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

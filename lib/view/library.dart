@@ -14,8 +14,10 @@ import 'package:gymtracker/view/components/badges.dart';
 import 'package:gymtracker/view/exercises.dart';
 import 'package:gymtracker/view/platform/app_bar.dart';
 import 'package:gymtracker/view/platform/list_tile.dart';
+import 'package:gymtracker/view/platform/platform_widget.dart';
 import 'package:gymtracker/view/platform/scaffold.dart';
 import 'package:gymtracker/view/utils/exercise.dart';
+import 'package:gymtracker/view/utils/platform_padded.dart';
 import 'package:intl/intl.dart';
 
 class LibraryView extends GetView<ExercisesController> {
@@ -44,32 +46,45 @@ class LibraryView extends GetView<ExercisesController> {
             PlatformSliverAppBar(
               title: Text("library.title".t),
             ),
-            SliverList(
-              delegate: SliverChildListDelegate(
-                [
-                  for (final category in exercises.entries)
-                    PlatformListTile(
-                      leading: PlatformLeadingIcon(
-                        materialBackgroundColor:
-                            getContainerColor(context, category.value.color),
-                        foregroundColor:
-                            getOnContainerColor(context, category.value.color),
-                        child: category.value.icon,
-                      ),
-                      title: Text(category.key),
-                      subtitle: Text(
-                        "general.exercises"
-                            .plural(category.value.exercises.length),
-                      ),
-                      onTap: () {
-                        Go.to(() => LibraryExercisesView(
-                              name: category.key,
-                              category: category.value,
-                            ));
-                      },
+            PlatformBuilder(
+              buildMaterial: (context, children) {
+                return SliverList(
+                  delegate: SliverChildListDelegate(children!),
+                );
+              },
+              buildCupertino: (context, children) {
+                return PlatformPadded(
+                  sliver: SliverToBoxAdapter(
+                    child: CupertinoListSection.insetGrouped(
+                      children: children!,
                     ),
-                ],
-              ),
+                  ),
+                );
+              },
+              child: [
+                for (final category in exercises.entries)
+                  PlatformListTile(
+                    cupertinoIsNotched: true,
+                    leading: PlatformLeadingIcon(
+                      materialBackgroundColor:
+                          getContainerColor(context, category.value.color),
+                      foregroundColor:
+                          getOnContainerColor(context, category.value.color),
+                      child: category.value.icon,
+                    ),
+                    title: Text(category.key),
+                    subtitle: Text(
+                      "general.exercises"
+                          .plural(category.value.exercises.length),
+                    ),
+                    onTap: () {
+                      Go.to(() => LibraryExercisesView(
+                            name: category.key,
+                            category: category.value,
+                          ));
+                    },
+                  ),
+              ],
             ),
           ],
         ),

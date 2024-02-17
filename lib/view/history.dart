@@ -1,3 +1,6 @@
+import 'dart:ui';
+
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_sticky_header/flutter_sticky_header.dart';
@@ -7,6 +10,9 @@ import 'package:gymtracker/model/workout.dart';
 import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/view/exercises.dart';
+import 'package:gymtracker/view/platform/app_bar.dart';
+import 'package:gymtracker/view/platform/platform_widget.dart';
+import 'package:gymtracker/view/platform/scaffold.dart';
 import 'package:gymtracker/view/utils/exercise.dart';
 import 'package:gymtracker/view/utils/timer.dart';
 import 'package:intl/intl.dart';
@@ -75,7 +81,7 @@ class _HistoryViewState extends State<HistoryView> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return PlatformScaffold(
       body: FutureBuilder(
         future: historyByMonth,
         builder: (context, snapshot) {
@@ -86,14 +92,15 @@ class _HistoryViewState extends State<HistoryView> {
               _buildAppBar(),
               if (!snapshot.hasData)
                 const SliverFillRemaining(
-                  child: Center(child: CircularProgressIndicator()),
+                  child: Center(child: CircularProgressIndicator.adaptive()),
                 )
               else
                 SliverToBoxAdapter(
                   child: AnimatedCrossFade(
                     firstChild: const SizedBox(
                       height: 100,
-                      child: Center(child: CircularProgressIndicator()),
+                      child:
+                          Center(child: CircularProgressIndicator.adaptive()),
                     ),
                     secondChild: const SizedBox.shrink(),
                     crossFadeState:
@@ -154,17 +161,18 @@ class _HistoryViewState extends State<HistoryView> {
     );
   }
 
+  // TODO: Implement "Edit" button pattern on iOS
   Widget _buildAppBar() {
     if (selectedEntries.isEmpty) {
-      return SliverAppBar.large(
+      return PlatformSliverAppBar(
         title: Text("history.title".t),
       );
     }
 
-    return SliverAppBar.large(
-      backgroundColor: Theme.of(context).colorScheme.inverseSurface,
-      foregroundColor: Theme.of(context).colorScheme.onInverseSurface,
-      surfaceTintColor: Colors.transparent,
+    return PlatformSliverAppBar(
+      materialBackgroundColor: Theme.of(context).colorScheme.inverseSurface,
+      materialForegroundColor: Theme.of(context).colorScheme.onInverseSurface,
+      materialSurfaceTintColor: Colors.transparent,
       title: Text(
         "general.selected".plural(selectedEntries.length),
       ),
@@ -207,19 +215,56 @@ class _HistoryViewState extends State<HistoryView> {
       Theme.of(context).colorScheme.surfaceTint,
       3,
     );
-    return Container(
-      height: 60,
-      color: state.isPinned
-          ? elevatedAppBarColor
-          : Theme.of(context).colorScheme.background,
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      alignment: Alignment.centerLeft,
-      child: Text(
-        DateFormat.yMMMM(context.locale.languageCode).format(
-          DateTime(date.$2, date.$1),
-        ),
-        style: Theme.of(context).textTheme.titleMedium,
-      ),
+    return PlatformBuilder(
+      buildMaterial: (context, _) {
+        return Container(
+          height: 60,
+          color: state.isPinned
+              ? elevatedAppBarColor
+              : Theme.of(context).colorScheme.background,
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          alignment: Alignment.centerLeft,
+          child: Text(
+            DateFormat.yMMMM(context.locale.languageCode).format(
+              DateTime(date.$2, date.$1),
+            ),
+            style: Theme.of(context).textTheme.titleMedium,
+          ),
+        );
+      },
+      buildCupertino: (context, _) {
+        return ClipRect(
+          child: BackdropFilter(
+            filter: ImageFilter.blur(
+              sigmaX: 16,
+              sigmaY: 16,
+            ),
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                color: CupertinoTheme.of(context)
+                    .barBackgroundColor
+                    .withOpacity(0.8),
+                border: Border(
+                  bottom: BorderSide(
+                    color: CupertinoTheme.of(context).barBackgroundColor,
+                  ),
+                ),
+              ),
+              child: Container(
+                height: 36,
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  DateFormat.yMMMM(context.locale.languageCode).format(
+                    DateTime(date.$2, date.$1),
+                  ),
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 }

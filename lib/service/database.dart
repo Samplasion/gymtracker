@@ -75,34 +75,87 @@ class DatabaseService extends GetxService with ChangeNotifier {
     return exerciseBox.values.toList();
   }
 
-  set exercises(List<Exercise> exercises) {
+  _writeExercises(List<Exercise> exercises) {
     exerciseBox.clear().then((_) {
-      exerciseBox.addAll(exercises).then((value) => notifyListeners());
+      exerciseBox.putAll({
+        for (final exercise in exercises) exercise.id: exercise,
+      }).then((value) => notifyListeners());
     });
+  }
+
+  setExercise(Exercise exercise) {
+    exerciseBox.put(exercise.id, exercise).then((value) => notifyListeners());
+  }
+
+  removeExercise(Exercise exercise) {
+    exerciseBox.delete(exercise.id).then((value) => notifyListeners());
   }
 
   List<Workout> get routines {
     return routinesBox.values.toList();
   }
 
-  set routines(List<Workout> routines) => writeRoutines(routines);
-
-  writeRoutines(List<Workout> routines) {
+  _writeRoutines(List<Workout> routines) {
     routinesBox.clear().then((_) {
       routinesBox.addAll(routines).then((value) => notifyListeners());
     });
+  }
+
+  setAllRoutines(List<Workout> routines) {
+    _writeRoutines(routines);
+    notifyListeners();
+  }
+
+  setRoutine(Workout routine) {
+    final idx = [...routinesBox.values].indexWhere((r) => r.id == routine.id);
+    if (idx >= 0) {
+      routinesBox.putAt(idx, routine).then((value) => notifyListeners());
+    } else {
+      routinesBox.add(routine).then((value) => notifyListeners());
+    }
+  }
+
+  removeRoutine(Workout routine) {
+    final idx = [...routinesBox.values].indexWhere((r) => r.id == routine.id);
+    if (idx >= 0) {
+      routinesBox.deleteAt(idx).then((value) => notifyListeners());
+    }
+  }
+
+  bool hasRoutine(String id) {
+    return [...routinesBox.values].indexWhere((r) => r.id == id) >= 0;
   }
 
   List<Workout> get workoutHistory {
     return historyBox.values.toList();
   }
 
-  set workoutHistory(List<Workout> history) => writeHistory(history);
-
-  writeHistory(List<Workout> history) {
+  _writeHistory(List<Workout> history) {
     historyBox.clear().then((_) {
-      historyBox.addAll(history).then((value) => notifyListeners());
+      historyBox.putAll({
+        for (final workout in history) workout.id: workout,
+      }).then((value) => notifyListeners());
     });
+  }
+
+  setHistoryWorkout(Workout workout) {
+    historyBox.put(workout.id, workout).then((value) => notifyListeners());
+  }
+
+  removeHistoryWorkout(Workout workout) {
+    removeHistoryWorkoutById(workout.id);
+  }
+
+  removeHistoryWorkoutById(String id) {
+    historyBox.delete(id).then((value) => notifyListeners());
+  }
+
+  Workout? getHistoryWorkout(String id) {
+    return historyBox.get(id);
+  }
+
+  bool hasHistoryWorkout(String id) {
+    return historyBox.containsKey(id);
   }
 
   toJson() {
@@ -127,17 +180,17 @@ class DatabaseService extends GetxService with ChangeNotifier {
 
     innerImportJson(Map<String, dynamic> json) {
       if (json['exercise'] is List) {
-        exercises = ([
+        _writeExercises([
           for (final json in json['exercise']) Exercise.fromJson(json),
         ]);
       }
       if (json['routines'] is List) {
-        writeRoutines([
+        _writeRoutines([
           for (final json in json['routines']) Workout.fromJson(json),
         ]);
       }
       if (json['workouts'] is List) {
-        writeHistory([
+        _writeHistory([
           for (final json in json['workouts']) Workout.fromJson(json),
         ]);
       }

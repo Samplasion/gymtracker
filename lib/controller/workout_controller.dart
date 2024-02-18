@@ -196,10 +196,7 @@ class WorkoutController extends GetxController with ServiceableController {
     }
 
     final service = Get.find<DatabaseService>();
-    service.workoutHistory = [
-      ...service.workoutHistory,
-      workout,
-    ];
+    service.setHistoryWorkout(workout);
     Get.back();
     SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
       Get.back();

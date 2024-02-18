@@ -14,12 +14,6 @@ class ExercisesController extends GetxController with ServiceableController {
   bool isNameValid(String name) =>
       !exercises.any((element) => element.name == name);
 
-  void deleteWorkout(Exercise exercise) {
-    service.exercises = service.exercises.where((e) {
-      return e.name != exercise.name;
-    }).toList();
-  }
-
   Exercise generateEmpty({
     required String name,
     required SetParameters parameters,
@@ -55,16 +49,12 @@ class ExercisesController extends GetxController with ServiceableController {
       restTime: restTime,
     );
 
-    service.exercises = [
-      ...service.exercises,
-      exercise,
-    ];
+    service.setExercise(exercise);
 
     Get.back();
   }
 
   void deleteExercise(Exercise exercise) {
-    service.exercises =
-        service.exercises.where((e) => e.id != exercise.id).toList();
+    service.removeExercise(exercise);
   }
 }

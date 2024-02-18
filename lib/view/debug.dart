@@ -56,8 +56,9 @@ class DebugView extends StatelessWidget {
                 onTap: () {
                   final hc = Get.find<HistoryController>();
                   final db = Get.find<DatabaseService>();
-                  db.workoutHistory =
-                      db.workoutHistory.map(hc.fixWorkout).toList();
+                  for (final workout in db.workoutHistory) {
+                    db.setHistoryWorkout(hc.fixWorkout(workout));
+                  }
 
                   Go.snack("Fixed ${db.workoutHistory.length} workouts");
                 },

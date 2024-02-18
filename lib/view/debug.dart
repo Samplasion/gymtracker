@@ -6,9 +6,13 @@ import 'package:get/get.dart';
 import 'package:gymtracker/controller/debug_controller.dart';
 import 'package:gymtracker/controller/history_controller.dart';
 import 'package:gymtracker/controller/stopwatch_controller.dart';
+import 'package:gymtracker/model/exercise.dart';
+import 'package:gymtracker/model/workout.dart';
 import 'package:gymtracker/service/database.dart';
 import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/view/utils/timer.dart';
+import 'package:hive/hive.dart';
+import 'package:hive_ui/hive_ui.dart';
 
 class DebugView extends StatelessWidget {
   const DebugView({super.key});
@@ -58,6 +62,24 @@ class DebugView extends StatelessWidget {
                   Go.snack("Fixed ${db.workoutHistory.length} workouts");
                 },
               ),
+              ListTile(
+                  title: const Text("Database inspector"),
+                  onTap: () {
+                    Go.to(
+                      () => HiveBoxesView(
+                        hiveBoxes: {
+                          Hive.box<Exercise>("exercises"): (json) =>
+                              Exercise.fromJson(json),
+                          Hive.box<Workout>("routines"): (json) =>
+                              Workout.fromJson(json),
+                          Hive.box<Workout>("history"): (json) =>
+                              Workout.fromJson(json),
+                        },
+                        onError: (String errorMessage) =>
+                            Go.snack(errorMessage),
+                      ),
+                    );
+                  }),
               ListTile(
                 title: Text(
                   "Running stopwatches",

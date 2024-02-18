@@ -3,15 +3,21 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:gymtracker/adapters/builtin.dart' as builtin_adapters;
+import 'package:gymtracker/adapters/exercise.dart';
+import 'package:gymtracker/adapters/set.dart';
+import 'package:gymtracker/adapters/superset.dart';
+import 'package:gymtracker/adapters/workout.dart';
 import 'package:gymtracker/model/exercise.dart';
 import 'package:gymtracker/model/workout.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 
 const DATABASE_VERSION = 1;
 
 class DatabaseService extends GetxService with ChangeNotifier {
-  final GetStorage exerciseStorage = GetStorage("exercises");
-  final GetStorage routinesStorage = GetStorage("routines");
-  final GetStorage workoutsStorage = GetStorage("workouts");
+  late final Box<Exercise> exerciseBox;
+  late final Box<Workout> routinesBox;
+  late final Box<Workout> historyBox;
   final GetStorage settingsStorage = GetStorage("settings");
   final GetStorage ongoingStorage = GetStorage("ongoing");
 
@@ -25,18 +31,30 @@ class DatabaseService extends GetxService with ChangeNotifier {
     super.onInit();
 
     onServiceChange("main")();
-    exerciseStorage.listen(onServiceChange("exercise"));
-    routinesStorage.listen(onServiceChange("routines"));
-    workoutsStorage.listen(onServiceChange("workouts"));
+    exerciseBox.listenable().addListener(onServiceChange("exercises"));
+    routinesBox.listenable().addListener(onServiceChange("routines"));
+    historyBox.listenable().addListener(onServiceChange("history"));
     settingsStorage.listen(onServiceChange("settings"));
     ongoingStorage.listen(onServiceChange("ongoing"));
   }
 
   Future ensureInitialized() async {
+    await Hive.initFlutter();
+
+    builtin_adapters.registerAll();
+    Hive.registerAdapter(WorkoutAdapter());
+    Hive.registerAdapter(MuscleGroupAdapter());
+    Hive.registerAdapter(ExerciseAdapter());
+    Hive.registerAdapter(SupersetAdapter());
+    Hive.registerAdapter(SetKindAdapter());
+    Hive.registerAdapter(SetParametersAdapter());
+    Hive.registerAdapter(ExSetAdapter());
+
+    exerciseBox = await Hive.openBox<Exercise>("exercises");
+    routinesBox = await Hive.openBox<Workout>("routines");
+    historyBox = await Hive.openBox<Workout>("history");
+
     return Future.wait([
-      exerciseStorage.initStorage,
-      routinesStorage.initStorage,
-      workoutsStorage.initStorage,
       settingsStorage.initStorage,
     ]);
   }
@@ -54,49 +72,45 @@ class DatabaseService extends GetxService with ChangeNotifier {
   }
 
   List<Exercise> get exercises {
-    List jsons = json.decode(exerciseStorage.read<String>("data") ?? "[]");
-    return [for (final json in jsons) Exercise.fromJson(json)];
+    return exerciseBox.values.toList();
   }
 
   set exercises(List<Exercise> exercises) {
-    List jsons = [for (final ex in exercises) ex.toJson()];
-    exerciseStorage.write("data", json.encode(jsons));
-    notifyListeners();
+    exerciseBox.clear().then((_) {
+      exerciseBox.addAll(exercises).then((value) => notifyListeners());
+    });
   }
 
   List<Workout> get routines {
-    List jsons = json.decode(routinesStorage.read<String>("data") ?? "[]");
-    return [for (final json in jsons) Workout.fromJson(json)];
+    return routinesBox.values.toList();
   }
 
   set routines(List<Workout> routines) => writeRoutines(routines);
 
   writeRoutines(List<Workout> routines) {
-    List jsons = [for (final rt in routines) rt.toJson()];
-    routinesStorage.write("data", json.encode(jsons));
-    notifyListeners();
+    routinesBox.clear().then((_) {
+      routinesBox.addAll(routines).then((value) => notifyListeners());
+    });
   }
 
   List<Workout> get workoutHistory {
-    List jsons = json.decode(workoutsStorage.read<String>("data") ?? "[]");
-    return [for (final json in jsons) Workout.fromJson(json)];
+    return historyBox.values.toList();
   }
 
   set workoutHistory(List<Workout> history) => writeHistory(history);
 
   writeHistory(List<Workout> history) {
-    List jsons = [for (final wo in history) wo.toJson()];
-    workoutsStorage
-        .write("data", json.encode(jsons))
-        .then((_) => notifyListeners());
+    historyBox.clear().then((_) {
+      historyBox.addAll(history).then((value) => notifyListeners());
+    });
   }
 
   toJson() {
     return {
       "version": DATABASE_VERSION,
-      "exercise": jsonDecode(exerciseStorage.read("data") ?? "[]"),
-      "routines": jsonDecode(routinesStorage.read("data") ?? "[]"),
-      "workouts": jsonDecode(workoutsStorage.read("data") ?? "[]"),
+      "exercise": exerciseBox.values.map((e) => e.toJson()).toList(),
+      "routines": routinesBox.values.map((e) => e.toJson()).toList(),
+      "workouts": historyBox.values.map((e) => e.toJson()).toList(),
       "settings": {
         for (final key in settingsStorage.getKeys<Iterable<String>>())
           key: settingsStorage.read(key),
@@ -113,13 +127,19 @@ class DatabaseService extends GetxService with ChangeNotifier {
 
     innerImportJson(Map<String, dynamic> json) {
       if (json['exercise'] is List) {
-        exerciseStorage.write("data", jsonEncode(json['exercise']));
+        exercises = ([
+          for (final json in json['exercise']) Exercise.fromJson(json),
+        ]);
       }
       if (json['routines'] is List) {
-        routinesStorage.write("data", jsonEncode(json['routines']));
+        writeRoutines([
+          for (final json in json['routines']) Workout.fromJson(json),
+        ]);
       }
       if (json['workouts'] is List) {
-        workoutsStorage.write("data", jsonEncode(json['workouts']));
+        writeHistory([
+          for (final json in json['workouts']) Workout.fromJson(json),
+        ]);
       }
       if (json['settings'] is Map<String, dynamic>) {
         for (final key in json['settings'].keys) {

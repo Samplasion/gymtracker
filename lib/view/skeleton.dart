@@ -17,8 +17,6 @@ import 'package:gymtracker/view/settings.dart';
 import 'package:gymtracker/view/utils/crossfade.dart';
 import 'package:gymtracker/view/utils/timer.dart';
 import 'package:gymtracker/view/workout.dart';
-import 'package:iconify_flutter/iconify_flutter.dart';
-import 'package:iconify_flutter/icons/mdi.dart';
 
 class SkeletonView extends StatefulWidget {
   const SkeletonView({super.key});
@@ -99,14 +97,7 @@ class _SkeletonViewState extends State<SkeletonView>
                   NavigationDestinationLabelBehavior.onlyShowSelected,
               destinations: [
                 NavigationDestination(
-                  icon: Iconify(
-                    Mdi.dumbbell,
-                    color: Theme.of(context).colorScheme.onSurfaceVariant,
-                  ),
-                  selectedIcon: Iconify(
-                    Mdi.dumbbell,
-                    color: Theme.of(context).colorScheme.onSecondaryContainer,
-                  ),
+                  icon: const Icon(Icons.fitness_center_rounded),
                   label: "routines.title".t,
                 ),
                 NavigationDestination(

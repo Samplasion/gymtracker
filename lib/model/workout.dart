@@ -115,4 +115,6 @@ class Workout {
 
   Workout toRoutine() =>
       copyWith(duration: null, startingDate: null, id: const Uuid().v4());
+
+  Workout regenerateID() => copyWith(id: const Uuid().v4());
 }

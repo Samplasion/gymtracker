@@ -240,6 +240,25 @@ class HistoryController extends GetxController with ServiceableController {
       Get.back();
     });
   }
+
+  /// Adds a new workout to the history, avoiding collisions
+  void addNewWorkout(Workout workout) {
+    final collides = service.hasHistoryWorkout(workout.id);
+    if (collides) {
+      workout = workout.regenerateID();
+      if (workout.completes != null) {
+        final completed = service.getHistoryWorkout(workout.completes!);
+        if (completed != null) {
+          service.setHistoryWorkout(completed.copyWith(
+            completedBy: workout.id,
+          ));
+        } else {
+          workout = workout.copyWith(completes: null);
+        }
+      }
+    }
+    service.setHistoryWorkout(workout);
+  }
 }
 
 extension WorkoutHistory on Workout {

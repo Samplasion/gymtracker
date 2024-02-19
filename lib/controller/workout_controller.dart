@@ -9,7 +9,6 @@ import 'package:gymtracker/controller/stopwatch_controller.dart';
 import 'package:gymtracker/model/exercisable.dart';
 import 'package:gymtracker/model/set.dart';
 import 'package:gymtracker/model/workout.dart';
-import 'package:gymtracker/service/database.dart';
 import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/struct/stopwatch_extended.dart';
 import 'package:gymtracker/view/workout.dart';
@@ -195,8 +194,8 @@ class WorkoutController extends GetxController with ServiceableController {
       historyController.bindContinuation(continuation: workout);
     }
 
-    final service = Get.find<DatabaseService>();
-    service.setHistoryWorkout(workout);
+    final historyController = Get.find<HistoryController>();
+    historyController.addNewWorkout(workout);
     Get.back();
     SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
       Get.back();

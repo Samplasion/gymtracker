@@ -16,6 +16,7 @@ import 'package:gymtracker/service/color.dart';
 import 'package:gymtracker/service/database.dart';
 import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/service/notifications.dart';
+import 'package:gymtracker/service/version.dart';
 import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/view/skeleton.dart';
@@ -33,6 +34,7 @@ void main() async {
   await _databaseService.ensureInitialized();
 
   await ColorService().init();
+  await VersionService().init();
 
   final String currentTimeZone = await FlutterTimezone.getLocalTimezone();
   tz.initializeTimeZones();

@@ -1,9 +1,12 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:gymtracker/controller/settings_controller.dart';
 import 'package:gymtracker/data/weights.dart';
 import 'package:gymtracker/service/color.dart';
 import 'package:gymtracker/service/localizations.dart';
+import 'package:gymtracker/service/version.dart';
 import 'package:gymtracker/view/settings/color.dart';
 import 'package:gymtracker/view/settings/radio.dart';
 
@@ -100,10 +103,117 @@ class SettingsView extends StatelessWidget {
                   await controller.exportSettings(context);
                 },
               ),
+              const Divider(),
+              AboutListTileEx(
+                applicationName: "appName".t,
+                applicationVersion: "appInfo.version".tParams({
+                  "version": VersionService().packageInfo.version,
+                  "build": VersionService().packageInfo.buildNumber,
+                }),
+                aboutBoxChildren: [
+                  Text("appInfo.shortDescription".t),
+                ],
+                applicationIcon: const InAppIcon(),
+                icon: const Icon(Icons.info),
+                subtitle: Text("appInfo.version".tParams({
+                  "version": VersionService().packageInfo.version,
+                  "build": VersionService().packageInfo.buildNumber,
+                })),
+              ),
             ]),
           ),
         ],
       ),
     );
+  }
+}
+
+class InAppIcon extends StatelessWidget {
+  final double size;
+  final double iconSize;
+
+  const InAppIcon({
+    this.size = 48,
+    this.iconSize = 24,
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      alignment: Alignment.center,
+      children: [
+        Container(
+          width: size,
+          height: size,
+          decoration: BoxDecoration(
+            shape: BoxShape.rectangle,
+            borderRadius: BorderRadius.circular(13),
+            color: Theme.of(context).colorScheme.primary,
+          ),
+        ),
+        Icon(
+          Icons.fitness_center,
+          color: Theme.of(context).colorScheme.onPrimary,
+          size: iconSize,
+        ),
+      ],
+    );
+  }
+}
+
+class AboutListTileEx extends StatelessWidget {
+  const AboutListTileEx({
+    super.key,
+    this.icon,
+    this.child,
+    this.subtitle,
+    this.applicationName,
+    this.applicationVersion,
+    this.applicationIcon,
+    this.applicationLegalese,
+    this.aboutBoxChildren,
+    this.dense,
+  });
+
+  final Widget? icon;
+  final Widget? child;
+  final Widget? subtitle;
+  final String? applicationName;
+  final String? applicationVersion;
+  final Widget? applicationIcon;
+  final String? applicationLegalese;
+  final List<Widget>? aboutBoxChildren;
+  final bool? dense;
+
+  @override
+  Widget build(BuildContext context) {
+    assert(debugCheckHasMaterial(context));
+    assert(debugCheckHasMaterialLocalizations(context));
+    return ListTile(
+      leading: icon,
+      title: child ??
+          Text(MaterialLocalizations.of(context).aboutListTileTitle(
+            applicationName ?? _defaultApplicationName(context),
+          )),
+      subtitle: subtitle,
+      dense: dense,
+      onTap: () {
+        showAboutDialog(
+          context: context,
+          applicationName: applicationName,
+          applicationVersion: applicationVersion,
+          applicationIcon: applicationIcon,
+          applicationLegalese: applicationLegalese,
+          children: aboutBoxChildren,
+        );
+      },
+    );
+  }
+
+  String _defaultApplicationName(BuildContext context) {
+    final Title? ancestorTitle = context.findAncestorWidgetOfExactType<Title>();
+    return ancestorTitle?.title ??
+        Platform.resolvedExecutable.split(Platform.pathSeparator).last;
   }
 }

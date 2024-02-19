@@ -1,5 +1,9 @@
 appName: GymTracker
 
+appInfo:
+  version: "Versione @version (build @build)"
+  shortDescription: "Il miglior tracker per i tuoi allenamenti."
+
 set:
   kind: Tipo serie
   kindShort:

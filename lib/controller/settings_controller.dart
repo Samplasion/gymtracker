@@ -35,12 +35,11 @@ class SettingsController extends GetxController with ServiceableController {
 
   @override
   void onServiceChange() {
-    final storage = service.settingsStorage;
-    usesDynamicColor(storage.read<bool>("usesDynamicColor") ?? false);
-    color(Color(storage.read<int>("color") ?? defaultColor.value));
-    locale(Locale(storage.read<String>("locale") ?? "en"));
+    usesDynamicColor(service.readSetting<bool>("usesDynamicColor") ?? false);
+    color(Color(service.readSetting<int>("color") ?? defaultColor.value));
+    locale(Locale(service.readSetting<String>("locale") ?? "en"));
     weightUnit(Weights.values.firstWhere(
-      (element) => element.name == storage.read<String>("weightUnit"),
+      (element) => element.name == service.readSetting<String>("weightUnit"),
       orElse: () => Weights.kg,
     ));
   }

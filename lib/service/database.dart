@@ -2,7 +2,6 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get_storage/get_storage.dart';
 import 'package:gymtracker/adapters/builtin.dart' as builtin_adapters;
 import 'package:gymtracker/adapters/exercise.dart';
 import 'package:gymtracker/adapters/set.dart';
@@ -18,12 +17,16 @@ class DatabaseService extends GetxService with ChangeNotifier {
   late final Box<Exercise> exerciseBox;
   late final Box<Workout> routinesBox;
   late final Box<Workout> historyBox;
-  final GetStorage settingsStorage = GetStorage("settings");
-  final GetStorage ongoingStorage = GetStorage("ongoing");
+  late final Box<dynamic> settingsBox;
+  late final Box<String> ongoingBox;
 
   writeSetting<T>(String key, T value) {
-    settingsStorage.write(key, value);
+    settingsBox.put(key, value);
     notifyListeners();
+  }
+
+  readSetting<T>(String key) {
+    return settingsBox.get(key) as T?;
   }
 
   @override
@@ -34,8 +37,8 @@ class DatabaseService extends GetxService with ChangeNotifier {
     exerciseBox.listenable().addListener(onServiceChange("exercises"));
     routinesBox.listenable().addListener(onServiceChange("routines"));
     historyBox.listenable().addListener(onServiceChange("history"));
-    settingsStorage.listen(onServiceChange("settings"));
-    ongoingStorage.listen(onServiceChange("ongoing"));
+    settingsBox.listenable().addListener(onServiceChange("settings"));
+    ongoingBox.listenable().addListener(onServiceChange("ongoing"));
   }
 
   Future ensureInitialized() async {
@@ -53,10 +56,8 @@ class DatabaseService extends GetxService with ChangeNotifier {
     exerciseBox = await Hive.openBox<Exercise>("exercises");
     routinesBox = await Hive.openBox<Workout>("routines");
     historyBox = await Hive.openBox<Workout>("history");
-
-    return Future.wait([
-      settingsStorage.initStorage,
-    ]);
+    settingsBox = await Hive.openBox("settings");
+    ongoingBox = await Hive.openBox<String>("ongoing");
   }
 
   void Function() onServiceChange(String service) {
@@ -165,8 +166,7 @@ class DatabaseService extends GetxService with ChangeNotifier {
       "routines": routinesBox.values.map((e) => e.toJson()).toList(),
       "workouts": historyBox.values.map((e) => e.toJson()).toList(),
       "settings": {
-        for (final key in settingsStorage.getKeys<Iterable<String>>())
-          key: settingsStorage.read(key),
+        for (final key in settingsBox.keys) key: settingsBox.get(key),
       },
     };
   }
@@ -211,20 +211,20 @@ class DatabaseService extends GetxService with ChangeNotifier {
 
   void writeToOngoing(Map<String, dynamic> data) {
     printInfo(info: "Requested write of ongoing workout data: $data");
-    ongoingStorage.write("data", jsonEncode(data));
+    ongoingBox.put("data", jsonEncode(data));
   }
 
   Map<String, dynamic>? getOngoingData() {
     if (!hasOngoing) return null;
-    return jsonDecode(ongoingStorage.read("data"));
+    return jsonDecode(ongoingBox.get("data") ?? "null");
   }
 
   void deleteOngoing() {
     printInfo(info: "Requested deletion of ongoing workout data");
-    ongoingStorage.remove("data");
+    ongoingBox.delete("data");
   }
 
-  bool get hasOngoing => ongoingStorage.hasData("data");
+  bool get hasOngoing => ongoingBox.containsKey("data");
 }
 
 class DatabaseImportVersionMismatch implements Exception {

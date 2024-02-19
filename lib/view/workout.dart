@@ -943,7 +943,7 @@ class _WorkoutFinishPageState extends State<WorkoutFinishPage> {
     final isValid = formKey.currentState!.validate();
 
     if (isValid) {
-      controller.sumbit(
+      controller.submit(
         titleController.text,
         TimeInputField.parseDuration(timeController.text),
       );

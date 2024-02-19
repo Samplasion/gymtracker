@@ -1,4 +1,7 @@
+import 'dart:math';
+
 import 'package:copy_with_extension/copy_with_extension.dart';
+import 'package:flutter/foundation.dart';
 import 'package:gymtracker/model/exercisable.dart';
 import 'package:gymtracker/model/set.dart';
 import 'package:gymtracker/model/superset.dart';
@@ -117,4 +120,87 @@ class Workout {
       copyWith(duration: null, startingDate: null, id: const Uuid().v4());
 
   Workout regenerateID() => copyWith(id: const Uuid().v4());
+}
+
+class WorkoutDifference {
+  final int addedExercises, removedExercises, changedExercises;
+
+  bool get isEmpty =>
+      addedExercises == 0 && removedExercises == 0 && changedExercises == 0;
+
+  @visibleForTesting
+  const WorkoutDifference.raw({
+    required this.addedExercises,
+    required this.removedExercises,
+    required this.changedExercises,
+  });
+
+  factory WorkoutDifference.fromWorkouts({
+    required Workout oldWorkout,
+    required Workout newWorkout,
+  }) {
+    final oldExercises = oldWorkout.exercises;
+    final newExercises = newWorkout.exercises;
+
+    int changedExercises = 0;
+
+    for (int i = 0; i < min(oldExercises.length, newExercises.length); i++) {
+      final oldCandidate = oldExercises[i];
+      final newCandidate = newExercises[i];
+
+      bool isDifferent = false;
+      isDifferent |= oldCandidate.sets.length != newCandidate.sets.length;
+      // If either is a superset and the other is not
+      isDifferent |= (oldCandidate is Superset) != (newCandidate is Superset);
+      if (oldCandidate is Superset && newCandidate is Superset) {
+        isDifferent |=
+            oldCandidate.exercises.length != newCandidate.exercises.length;
+      }
+
+      for (int j = 0;
+          j < min(oldCandidate.sets.length, newCandidate.sets.length);
+          j++) {
+        final oldSet = oldCandidate.sets[j];
+        final newSet = newCandidate.sets[j];
+
+        isDifferent |= oldSet.distance != newSet.distance;
+        isDifferent |= oldSet.reps != newSet.reps;
+        isDifferent |= oldSet.weight != newSet.weight;
+        isDifferent |= oldSet.time != newSet.time;
+        isDifferent |= oldSet.kind != newSet.kind;
+      }
+
+      if (isDifferent) changedExercises++;
+    }
+
+    final addedExercises = max(0, newExercises.length - oldExercises.length);
+    final removedExercises = max(0, oldExercises.length - newExercises.length);
+
+    return WorkoutDifference.raw(
+      addedExercises: addedExercises,
+      removedExercises: removedExercises,
+      changedExercises: changedExercises,
+    );
+  }
+
+  @override
+  String toString() {
+    return 'WorkoutDifference{addedExercises: $addedExercises, removedExercises: $removedExercises, changedExercises: $changedExercises}';
+  }
+
+  @override
+  operator ==(Object other) {
+    if (identical(this, other)) return true;
+
+    return other is WorkoutDifference &&
+        other.addedExercises == addedExercises &&
+        other.removedExercises == removedExercises &&
+        other.changedExercises == changedExercises;
+  }
+
+  @override
+  int get hashCode =>
+      addedExercises.hashCode ^
+      removedExercises.hashCode ^
+      changedExercises.hashCode;
 }

@@ -263,6 +263,31 @@ ongoingWorkout:
     start: Avvia
     pause: Pausa
     reset: Resetta
+  updateRoutine:
+    differenceTitle: Aggiorna routine
+    differenceText: Hai modificato l'allenamento. Vuoi aggiornare la routine di base?
+    differences:
+      added:
+        zero: "Nessun esercizio aggiunto"
+        one: "1 esercizio aggiunto"
+        two: "%s esercizi aggiunti"
+        few: "%s esercizi aggiunti"
+        many: "%s esercizi aggiunti"
+        other: "%s esercizi aggiunti"
+      removed:
+        zero: "Nessun esercizio rimosso"
+        one: "1 esercizio rimosso"
+        two: "%s esercizi rimossi"
+        few: "%s esercizi rimossi"
+        many: "%s esercizi rimossi"
+        other: "%s esercizi rimossi"
+      changed:
+        zero: "Nessun esercizio modificato"
+        one: "1 esercizio modificato"
+        two: "%s esercizi modificati"
+        few: "%s esercizi modificati"
+        many: "%s esercizi modificati"
+        other: "%s esercizi modificati"
 
 timer: 
   add15s: "+15s"

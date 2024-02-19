@@ -263,6 +263,31 @@ ongoingWorkout:
     start: Start
     pause: Pause
     reset: Reset
+  updateRoutine:
+    differenceTitle: "Change routine?"
+    differenceText: You've made changes to the workout. Do you want to save them to the routine?
+    differences:
+      added:
+        zero: "No exercises added"
+        one: "1 exercise added"
+        two: "%s exercises added"
+        few: "%s exercises added"
+        many: "%s exercises added"
+        other: "%s exercises added"
+      removed:
+        zero: "No exercises removed"
+        one: "1 exercise removed"
+        two: "%s exercises removed"
+        few: "%s exercises removed"
+        many: "%s exercises removed"
+        other: "%s exercises removed"
+      changed:
+        zero: "No exercises changed"
+        one: "1 exercise changed"
+        two: "%s exercises changed"
+        few: "%s exercises changed"
+        many: "%s exercises changed"
+        other: "%s exercises changed"
 
 timer: 
   add15s: "+15s"

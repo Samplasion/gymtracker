@@ -11,6 +11,7 @@ import 'package:gymtracker/model/set.dart';
 import 'package:gymtracker/model/workout.dart';
 import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/struct/stopwatch_extended.dart';
+import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/view/workout.dart';
 
 class WorkoutController extends GetxController with ServiceableController {
@@ -175,7 +176,7 @@ class WorkoutController extends GetxController with ServiceableController {
     );
   }
 
-  void sumbit(String name, Duration duration) {
+  Future<void> submit(String name, Duration duration) async {
     final historyController = Get.find<HistoryController>();
 
     removeCountdown();
@@ -200,7 +201,49 @@ class WorkoutController extends GetxController with ServiceableController {
     SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
       Get.back();
       Get.delete<WorkoutController>();
+      askToUpdateRoutine(workout);
     });
+  }
+
+  void askToUpdateRoutine(Workout workout) async {
+    final routinesController = Get.find<RoutinesController>();
+
+    if (workout.parentID != null &&
+        routinesController.hasRoutine(workout.parentID!)) {
+      final routine = routinesController.getRoutine(workout.parentID!);
+      final difference = WorkoutDifference.fromWorkouts(
+        oldWorkout: routine!,
+        newWorkout: workout,
+      );
+      if (!difference.isEmpty) {
+        final confirm = await Go.confirm(
+          "ongoingWorkout.updateRoutine.differenceTitle".t,
+          () {
+            String text =
+                "${"ongoingWorkout.updateRoutine.differenceText".t}\n\n";
+            if (difference.addedExercises > 0) {
+              text +=
+                  "- ${"ongoingWorkout.updateRoutine.differences.added".plural(difference.addedExercises)}\n";
+            }
+            if (difference.removedExercises > 0) {
+              text +=
+                  "- ${"ongoingWorkout.updateRoutine.differences.removed".plural(difference.removedExercises)}\n";
+            }
+            if (difference.changedExercises > 0) {
+              text +=
+                  "- ${"ongoingWorkout.updateRoutine.differences.changed".plural(difference.changedExercises)}\n";
+            }
+
+            return text.trim();
+          }(),
+          transformText: (s) => s,
+        );
+        if (confirm) {
+          routinesController.updateRoutineFromWorkout(
+              workout.parentID!, workout);
+        }
+      }
+    }
   }
 
   void removeCountdown() {

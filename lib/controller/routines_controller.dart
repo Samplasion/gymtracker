@@ -259,4 +259,25 @@ class RoutinesController extends GetxController with ServiceableController {
       },
     );
   }
+
+  bool hasRoutine(String s) {
+    return service.hasRoutine(s);
+  }
+
+  Workout? getRoutine(String s) {
+    return service.routines.firstWhereOrNull((r) => r.id == s);
+  }
+
+  void updateRoutineFromWorkout(String s, Workout workout) {
+    final oldRoutine = getRoutine(s);
+    if (oldRoutine == null) return;
+    final newRoutine = workout.toRoutine().copyWith(
+          name: oldRoutine.name,
+          id: oldRoutine.id,
+          parentID: null,
+          completedBy: null,
+          completes: null,
+        );
+    service.setRoutine(newRoutine);
+  }
 }

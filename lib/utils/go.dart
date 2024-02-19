@@ -68,6 +68,7 @@ class Go {
     String title,
     String body, {
     Widget? icon,
+    String Function(String) transformText = _defaultT,
   }) {
     return showDialog<bool>(
       context: Get.context!,
@@ -95,3 +96,5 @@ class Go {
     ).then((value) => value ?? false);
   }
 }
+
+String _defaultT(String s) => s.t;

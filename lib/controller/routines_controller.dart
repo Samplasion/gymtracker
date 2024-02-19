@@ -60,7 +60,7 @@ class RoutinesController extends GetxController with ServiceableController {
       exercises: exercises,
       infobox: infobox,
     );
-    service.routines = [...service.routines, routine];
+    service.setRoutine(routine);
 
     Get.back();
   }
@@ -174,9 +174,7 @@ class RoutinesController extends GetxController with ServiceableController {
   }
 
   void deleteWorkout(Workout workout) {
-    service.routines = service.routines.where((w) {
-      return w.id != workout.id;
-    }).toList();
+    service.removeRoutine(workout);
     Get.find<HistoryController>().unbindAllFromParent(workout.id);
   }
 
@@ -195,14 +193,8 @@ class RoutinesController extends GetxController with ServiceableController {
   }
 
   void editRoutine(Workout newRoutine) {
-    final index =
-        service.routines.indexWhere((element) => element.id == newRoutine.id);
-    if (index >= 0) {
-      service.routines = [
-        ...service.routines.sublist(0, index),
-        newRoutine,
-        ...service.routines.sublist(index + 1),
-      ];
+    if (service.hasRoutine(newRoutine.id)) {
+      service.setRoutine(newRoutine);
     }
   }
 
@@ -213,7 +205,7 @@ class RoutinesController extends GetxController with ServiceableController {
   void reorder(int oldIndex, int newIndex) {
     final list = service.routines;
     utils.reorder(list, oldIndex, newIndex);
-    service.routines = list;
+    service.setAllRoutines(list);
   }
 
   List<Workout> getChildren(Workout routine) {
@@ -226,10 +218,7 @@ class RoutinesController extends GetxController with ServiceableController {
 
   String importWorkout(Workout workout) {
     final routine = workout.toRoutine();
-    service.routines = [
-      ...service.routines,
-      routine,
-    ];
+    service.setRoutine(routine);
     return routine.id;
   }
 

@@ -34,8 +34,8 @@ enum MuscleGroup {
   upperBack,
 }
 
-@JsonSerializable(constructor: "_")
-@CopyWith(constructor: "_")
+@JsonSerializable(constructor: "raw")
+@CopyWith(constructor: "raw")
 class Exercise extends WorkoutExercisable {
   @override
   String id;
@@ -61,7 +61,7 @@ class Exercise extends WorkoutExercisable {
 
   bool get isCustom => !standard;
 
-  Exercise._({
+  Exercise.raw({
     String? id,
     required this.name,
     required this.parameters,
@@ -90,7 +90,7 @@ class Exercise extends WorkoutExercisable {
     String? parentID,
     required String notes,
   }) =>
-      Exercise._(
+      Exercise.raw(
         name: name,
         parameters: parameters,
         sets: sets,
@@ -109,7 +109,7 @@ class Exercise extends WorkoutExercisable {
     required MuscleGroup primaryMuscleGroup,
     Set<MuscleGroup> secondaryMuscleGroups = const <MuscleGroup>{},
   }) {
-    return Exercise._(
+    return Exercise.raw(
       id: id,
       name: name,
       parameters: parameters,

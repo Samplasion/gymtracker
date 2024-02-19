@@ -28,34 +28,25 @@ class HistoryController extends GetxController with ServiceableController {
   }
 
   void deleteWorkout(Workout workout) {
-    service.workoutHistory = service.workoutHistory.where((w) {
-      // Remove the workout and its continuation, if any
-      return w.id != workout.id && w.id != workout.completedBy;
-    }).toList();
+    service.removeHistoryWorkoutById(workout.id);
+    if (workout.completedBy != null) {
+      service.removeHistoryWorkoutById(workout.completedBy!);
+    }
   }
 
   void setParentID(Workout workout, {String? newParentID}) {
-    final index = service.workoutHistory
-        .indexWhere((element) => element.id == workout.id);
-    if (index >= 0) {
-      service.workoutHistory = [
-        ...service.workoutHistory.sublist(0, index),
-        workout.copyWith.parentID(newParentID),
-        ...service.workoutHistory.sublist(index + 1),
-      ];
+    if (service.hasHistoryWorkout(workout.id)) {
+      service.setHistoryWorkout(
+        workout.copyWith(parentID: newParentID),
+      );
     }
   }
 
   Workout rename(Workout workout, {String? newName}) {
-    final index = service.workoutHistory
-        .indexWhere((element) => element.id == workout.id);
+    if (newName == null) return workout;
     final newWorkout = workout.copyWith(name: newName);
-    if (index >= 0) {
-      service.workoutHistory = [
-        ...service.workoutHistory.sublist(0, index),
-        newWorkout,
-        ...service.workoutHistory.sublist(index + 1),
-      ];
+    if (service.hasHistoryWorkout(workout.id)) {
+      service.setHistoryWorkout(newWorkout);
     }
     return newWorkout;
   }
@@ -197,21 +188,23 @@ class HistoryController extends GetxController with ServiceableController {
   }
 
   void unbindAllFromParent(String id) {
-    service.workoutHistory = service.workoutHistory.map((workout) {
+    for (final workout in service.workoutHistory) {
       if (workout.parentID == id) {
-        return workout.copyWith(parentID: null);
+        service.setHistoryWorkout(
+          workout.copyWith(parentID: null),
+        );
       }
-      return workout;
-    }).toList();
+    }
   }
 
   void bindContinuation({required Workout continuation}) {
-    service.workoutHistory = service.workoutHistory.map((workout) {
+    for (final workout in service.workoutHistory) {
       if (workout.id == continuation.completes) {
-        return workout.copyWith(completedBy: continuation.id);
+        service.setHistoryWorkout(
+          workout.copyWith(completedBy: continuation.id),
+        );
       }
-      return workout;
-    }).toList();
+    }
   }
 
   bool hasContinuation({required Workout incompleteWorkout}) =>
@@ -240,20 +233,31 @@ class HistoryController extends GetxController with ServiceableController {
   }
 
   void submitEditedWorkout(Workout workout) {
-    final index = service.workoutHistory
-        .indexWhere((element) => element.id == workout.id);
-    if (index >= 0) {
-      service.workoutHistory = [
-        ...service.workoutHistory.sublist(0, index),
-        workout,
-        ...service.workoutHistory.sublist(index + 1),
-      ];
-    }
+    service.setHistoryWorkout(workout);
     Get.back();
     SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
       Get.back();
       Get.back();
     });
+  }
+
+  /// Adds a new workout to the history, avoiding collisions
+  void addNewWorkout(Workout workout) {
+    final collides = service.hasHistoryWorkout(workout.id);
+    if (collides) {
+      workout = workout.regenerateID();
+      if (workout.completes != null) {
+        final completed = service.getHistoryWorkout(workout.completes!);
+        if (completed != null) {
+          service.setHistoryWorkout(completed.copyWith(
+            completedBy: workout.id,
+          ));
+        } else {
+          workout = workout.copyWith(completes: null);
+        }
+      }
+    }
+    service.setHistoryWorkout(workout);
   }
 }
 

@@ -9,7 +9,6 @@ import 'package:gymtracker/controller/stopwatch_controller.dart';
 import 'package:gymtracker/model/exercisable.dart';
 import 'package:gymtracker/model/set.dart';
 import 'package:gymtracker/model/workout.dart';
-import 'package:gymtracker/service/database.dart';
 import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/struct/stopwatch_extended.dart';
 import 'package:gymtracker/view/workout.dart';
@@ -177,6 +176,8 @@ class WorkoutController extends GetxController with ServiceableController {
   }
 
   void sumbit(String name, Duration duration) {
+    final historyController = Get.find<HistoryController>();
+
     removeCountdown();
     removeRelevantStopwatches();
 
@@ -191,15 +192,10 @@ class WorkoutController extends GetxController with ServiceableController {
     );
 
     if (isContinuation.isTrue) {
-      final historyController = Get.find<HistoryController>();
       historyController.bindContinuation(continuation: workout);
     }
 
-    final service = Get.find<DatabaseService>();
-    service.workoutHistory = [
-      ...service.workoutHistory,
-      workout,
-    ];
+    historyController.addNewWorkout(workout);
     Get.back();
     SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
       Get.back();

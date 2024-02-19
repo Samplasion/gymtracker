@@ -2,22 +2,31 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get_storage/get_storage.dart';
+import 'package:gymtracker/adapters/builtin.dart' as builtin_adapters;
+import 'package:gymtracker/adapters/exercise.dart';
+import 'package:gymtracker/adapters/set.dart';
+import 'package:gymtracker/adapters/superset.dart';
+import 'package:gymtracker/adapters/workout.dart';
 import 'package:gymtracker/model/exercise.dart';
 import 'package:gymtracker/model/workout.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 
 const DATABASE_VERSION = 1;
 
 class DatabaseService extends GetxService with ChangeNotifier {
-  final GetStorage exerciseStorage = GetStorage("exercises");
-  final GetStorage routinesStorage = GetStorage("routines");
-  final GetStorage workoutsStorage = GetStorage("workouts");
-  final GetStorage settingsStorage = GetStorage("settings");
-  final GetStorage ongoingStorage = GetStorage("ongoing");
+  late final Box<Exercise> exerciseBox;
+  late final Box<Workout> routinesBox;
+  late final Box<Workout> historyBox;
+  late final Box<dynamic> settingsBox;
+  late final Box<String> ongoingBox;
 
   writeSetting<T>(String key, T value) {
-    settingsStorage.write(key, value);
+    settingsBox.put(key, value);
     notifyListeners();
+  }
+
+  readSetting<T>(String key) {
+    return settingsBox.get(key) as T?;
   }
 
   @override
@@ -25,20 +34,30 @@ class DatabaseService extends GetxService with ChangeNotifier {
     super.onInit();
 
     onServiceChange("main")();
-    exerciseStorage.listen(onServiceChange("exercise"));
-    routinesStorage.listen(onServiceChange("routines"));
-    workoutsStorage.listen(onServiceChange("workouts"));
-    settingsStorage.listen(onServiceChange("settings"));
-    ongoingStorage.listen(onServiceChange("ongoing"));
+    exerciseBox.listenable().addListener(onServiceChange("exercises"));
+    routinesBox.listenable().addListener(onServiceChange("routines"));
+    historyBox.listenable().addListener(onServiceChange("history"));
+    settingsBox.listenable().addListener(onServiceChange("settings"));
+    ongoingBox.listenable().addListener(onServiceChange("ongoing"));
   }
 
   Future ensureInitialized() async {
-    return Future.wait([
-      exerciseStorage.initStorage,
-      routinesStorage.initStorage,
-      workoutsStorage.initStorage,
-      settingsStorage.initStorage,
-    ]);
+    await Hive.initFlutter();
+
+    builtin_adapters.registerAll();
+    Hive.registerAdapter(WorkoutAdapter());
+    Hive.registerAdapter(MuscleGroupAdapter());
+    Hive.registerAdapter(ExerciseAdapter());
+    Hive.registerAdapter(SupersetAdapter());
+    Hive.registerAdapter(SetKindAdapter());
+    Hive.registerAdapter(SetParametersAdapter());
+    Hive.registerAdapter(ExSetAdapter());
+
+    exerciseBox = await Hive.openBox<Exercise>("exercises");
+    routinesBox = await Hive.openBox<Workout>("routines");
+    historyBox = await Hive.openBox<Workout>("history");
+    settingsBox = await Hive.openBox("settings");
+    ongoingBox = await Hive.openBox<String>("ongoing");
   }
 
   void Function() onServiceChange(String service) {
@@ -54,52 +73,100 @@ class DatabaseService extends GetxService with ChangeNotifier {
   }
 
   List<Exercise> get exercises {
-    List jsons = json.decode(exerciseStorage.read<String>("data") ?? "[]");
-    return [for (final json in jsons) Exercise.fromJson(json)];
+    return exerciseBox.values.toList();
   }
 
-  set exercises(List<Exercise> exercises) {
-    List jsons = [for (final ex in exercises) ex.toJson()];
-    exerciseStorage.write("data", json.encode(jsons));
-    notifyListeners();
+  _writeExercises(List<Exercise> exercises) {
+    exerciseBox.clear().then((_) {
+      exerciseBox.putAll({
+        for (final exercise in exercises) exercise.id: exercise,
+      }).then((value) => notifyListeners());
+    });
+  }
+
+  setExercise(Exercise exercise) {
+    exerciseBox.put(exercise.id, exercise).then((value) => notifyListeners());
+  }
+
+  removeExercise(Exercise exercise) {
+    exerciseBox.delete(exercise.id).then((value) => notifyListeners());
   }
 
   List<Workout> get routines {
-    List jsons = json.decode(routinesStorage.read<String>("data") ?? "[]");
-    return [for (final json in jsons) Workout.fromJson(json)];
+    return routinesBox.values.toList();
   }
 
-  set routines(List<Workout> routines) => writeRoutines(routines);
+  _writeRoutines(List<Workout> routines) {
+    routinesBox.clear().then((_) {
+      routinesBox.addAll(routines).then((value) => notifyListeners());
+    });
+  }
 
-  writeRoutines(List<Workout> routines) {
-    List jsons = [for (final rt in routines) rt.toJson()];
-    routinesStorage.write("data", json.encode(jsons));
+  setAllRoutines(List<Workout> routines) {
+    _writeRoutines(routines);
     notifyListeners();
   }
 
-  List<Workout> get workoutHistory {
-    List jsons = json.decode(workoutsStorage.read<String>("data") ?? "[]");
-    return [for (final json in jsons) Workout.fromJson(json)];
+  setRoutine(Workout routine) {
+    final idx = [...routinesBox.values].indexWhere((r) => r.id == routine.id);
+    if (idx >= 0) {
+      routinesBox.putAt(idx, routine).then((value) => notifyListeners());
+    } else {
+      routinesBox.add(routine).then((value) => notifyListeners());
+    }
   }
 
-  set workoutHistory(List<Workout> history) => writeHistory(history);
+  removeRoutine(Workout routine) {
+    final idx = [...routinesBox.values].indexWhere((r) => r.id == routine.id);
+    if (idx >= 0) {
+      routinesBox.deleteAt(idx).then((value) => notifyListeners());
+    }
+  }
 
-  writeHistory(List<Workout> history) {
-    List jsons = [for (final wo in history) wo.toJson()];
-    workoutsStorage
-        .write("data", json.encode(jsons))
-        .then((_) => notifyListeners());
+  bool hasRoutine(String id) {
+    return [...routinesBox.values].indexWhere((r) => r.id == id) >= 0;
+  }
+
+  List<Workout> get workoutHistory {
+    return historyBox.values.toList();
+  }
+
+  _writeHistory(List<Workout> history) {
+    historyBox.clear().then((_) {
+      historyBox.putAll({
+        for (final workout in history) workout.id: workout,
+      }).then((value) => notifyListeners());
+    });
+  }
+
+  setHistoryWorkout(Workout workout) {
+    historyBox.put(workout.id, workout).then((value) => notifyListeners());
+  }
+
+  removeHistoryWorkout(Workout workout) {
+    removeHistoryWorkoutById(workout.id);
+  }
+
+  removeHistoryWorkoutById(String id) {
+    historyBox.delete(id).then((value) => notifyListeners());
+  }
+
+  Workout? getHistoryWorkout(String id) {
+    return historyBox.get(id);
+  }
+
+  bool hasHistoryWorkout(String id) {
+    return historyBox.containsKey(id);
   }
 
   toJson() {
     return {
       "version": DATABASE_VERSION,
-      "exercise": jsonDecode(exerciseStorage.read("data") ?? "[]"),
-      "routines": jsonDecode(routinesStorage.read("data") ?? "[]"),
-      "workouts": jsonDecode(workoutsStorage.read("data") ?? "[]"),
+      "exercise": exerciseBox.values.map((e) => e.toJson()).toList(),
+      "routines": routinesBox.values.map((e) => e.toJson()).toList(),
+      "workouts": historyBox.values.map((e) => e.toJson()).toList(),
       "settings": {
-        for (final key in settingsStorage.getKeys<Iterable<String>>())
-          key: settingsStorage.read(key),
+        for (final key in settingsBox.keys) key: settingsBox.get(key),
       },
     };
   }
@@ -113,13 +180,19 @@ class DatabaseService extends GetxService with ChangeNotifier {
 
     innerImportJson(Map<String, dynamic> json) {
       if (json['exercise'] is List) {
-        exerciseStorage.write("data", jsonEncode(json['exercise']));
+        _writeExercises([
+          for (final json in json['exercise']) Exercise.fromJson(json),
+        ]);
       }
       if (json['routines'] is List) {
-        routinesStorage.write("data", jsonEncode(json['routines']));
+        _writeRoutines([
+          for (final json in json['routines']) Workout.fromJson(json),
+        ]);
       }
       if (json['workouts'] is List) {
-        workoutsStorage.write("data", jsonEncode(json['workouts']));
+        _writeHistory([
+          for (final json in json['workouts']) Workout.fromJson(json),
+        ]);
       }
       if (json['settings'] is Map<String, dynamic>) {
         for (final key in json['settings'].keys) {
@@ -138,20 +211,20 @@ class DatabaseService extends GetxService with ChangeNotifier {
 
   void writeToOngoing(Map<String, dynamic> data) {
     printInfo(info: "Requested write of ongoing workout data: $data");
-    ongoingStorage.write("data", jsonEncode(data));
+    ongoingBox.put("data", jsonEncode(data));
   }
 
   Map<String, dynamic>? getOngoingData() {
     if (!hasOngoing) return null;
-    return jsonDecode(ongoingStorage.read("data"));
+    return jsonDecode(ongoingBox.get("data") ?? "null");
   }
 
   void deleteOngoing() {
     printInfo(info: "Requested deletion of ongoing workout data");
-    ongoingStorage.remove("data");
+    ongoingBox.delete("data");
   }
 
-  bool get hasOngoing => ongoingStorage.hasData("data");
+  bool get hasOngoing => ongoingBox.containsKey("data");
 }
 
 class DatabaseImportVersionMismatch implements Exception {

@@ -105,7 +105,7 @@ class _$ExerciseCWProxyImpl implements _$ExerciseCWProxy {
     Object? notes = const $CopyWithPlaceholder(),
     Object? standard = const $CopyWithPlaceholder(),
   }) {
-    return Exercise._(
+    return Exercise.raw(
       id: id == const $CopyWithPlaceholder()
           ? _value.id
           // ignore: cast_nullable_to_non_nullable
@@ -164,7 +164,7 @@ extension $ExerciseCopyWith on Exercise {
 // JsonSerializableGenerator
 // **************************************************************************
 
-Exercise _$ExerciseFromJson(Map<String, dynamic> json) => Exercise._(
+Exercise _$ExerciseFromJson(Map<String, dynamic> json) => Exercise.raw(
       id: json['id'] as String?,
       name: json['name'] as String,
       parameters: $enumDecode(_$SetParametersEnumMap, json['parameters']),

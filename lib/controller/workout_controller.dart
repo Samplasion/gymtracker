@@ -176,6 +176,8 @@ class WorkoutController extends GetxController with ServiceableController {
   }
 
   void sumbit(String name, Duration duration) {
+    final historyController = Get.find<HistoryController>();
+
     removeCountdown();
     removeRelevantStopwatches();
 
@@ -190,11 +192,9 @@ class WorkoutController extends GetxController with ServiceableController {
     );
 
     if (isContinuation.isTrue) {
-      final historyController = Get.find<HistoryController>();
       historyController.bindContinuation(continuation: workout);
     }
 
-    final historyController = Get.find<HistoryController>();
     historyController.addNewWorkout(workout);
     Get.back();
     SchedulerBinding.instance.addPostFrameCallback((timeStamp) {

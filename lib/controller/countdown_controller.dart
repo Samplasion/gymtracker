@@ -1,10 +1,12 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get/get.dart';
 import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/service/notifications.dart';
 import 'package:gymtracker/utils/constants.dart';
+import 'package:timezone/timezone.dart';
 
 class CountdownController extends GetxController {
   Rx<DateTime?> targetTime = Rx(null);
@@ -35,8 +37,31 @@ class CountdownController extends GetxController {
 
   _onUpdate() {
     timer?.cancel();
+    if (Platform.isIOS) {
+      notificationsPlugin.cancel(NotificationIDs.restTimer);
+    }
+
     if (targetTime.value != null) {
       timer = Timer(targetTime.value!.difference(DateTime.now()), _onRing);
+      if (Platform.isIOS) {
+        const darwinDetails = DarwinNotificationDetails(
+          presentSound: true,
+          presentAlert: true,
+        );
+        const notificationDetails = NotificationDetails(
+          iOS: darwinDetails,
+        );
+        notificationsPlugin.zonedSchedule(
+          NotificationIDs.restTimer,
+          'appName'.t,
+          'ongoingWorkout.restOver'.t,
+          TZDateTime.from(targetTime.value!, local),
+          notificationDetails,
+          uiLocalNotificationDateInterpretation:
+              UILocalNotificationDateInterpretation.wallClockTime,
+          androidAllowWhileIdle: true,
+        );
+      }
     }
   }
 
@@ -48,29 +73,31 @@ class CountdownController extends GetxController {
     startingTime.value = null;
 
     // Show notification
-    final androidDetails = AndroidNotificationDetails(
-      'org.js.samplasion.gymtracker.RestTimeoutChannel',
-      'androidNotificationChannel.name'.t,
-      channelDescription: 'androidNotificationChannel.description'.t,
-      importance: Importance.max,
-      priority: Priority.high,
-      ticker: 'workout.restOver'.t,
-    );
-    const darwinDetails = DarwinNotificationDetails(
-      presentSound: true,
-      presentAlert: true,
-    );
-    final notificationDetails = NotificationDetails(
-      android: androidDetails,
-      macOS: darwinDetails,
-      iOS: darwinDetails,
-    );
-    notificationsPlugin.show(
-      NotificationIDs.restTimer,
-      'appName'.t,
-      'ongoingWorkout.restOver'.t,
-      notificationDetails,
-    );
+    if (!Platform.isIOS) {
+      final androidDetails = AndroidNotificationDetails(
+        'org.js.samplasion.gymtracker.RestTimeoutChannel',
+        'androidNotificationChannel.name'.t,
+        channelDescription: 'androidNotificationChannel.description'.t,
+        importance: Importance.max,
+        priority: Priority.high,
+        ticker: 'workout.restOver'.t,
+      );
+      const darwinDetails = DarwinNotificationDetails(
+        presentSound: true,
+        presentAlert: true,
+      );
+      final notificationDetails = NotificationDetails(
+        android: androidDetails,
+        macOS: darwinDetails,
+        iOS: darwinDetails,
+      );
+      notificationsPlugin.show(
+        NotificationIDs.restTimer,
+        'appName'.t,
+        'ongoingWorkout.restOver'.t,
+        notificationDetails,
+      );
+    }
   }
 
   setCountdown(Duration delta) {

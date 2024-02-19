@@ -4,6 +4,7 @@ import 'package:flutter/material.dart' hide Localizations;
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:gymtracker/controller/countdown_controller.dart';
@@ -18,6 +19,8 @@ import 'package:gymtracker/service/notifications.dart';
 import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/view/skeleton.dart';
+import 'package:timezone/data/latest_all.dart' as tz;
+import 'package:timezone/timezone.dart' as tz;
 
 final _databaseService = DatabaseService();
 
@@ -30,6 +33,10 @@ void main() async {
   await _databaseService.ensureInitialized();
 
   await ColorService().init();
+
+  final String currentTimeZone = await FlutterTimezone.getLocalTimezone();
+  tz.initializeTimeZones();
+  tz.setLocalLocation(tz.getLocation(currentTimeZone));
 
   runApp(MainApp(localizations: l));
 }

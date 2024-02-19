@@ -24,6 +24,7 @@ dependencies:
   flutter_multi_formatter: ^2.10.2
   flutter_slidable: ^2.0.0
   flutter_sticky_header: ^0.6.5
+  flutter_timezone: ^1.0.8
   get: ^4.6.5
   get_storage: ^2.0.3
   hive: ^2.2.3
@@ -33,6 +34,7 @@ dependencies:
   intl: ^0.18.0
   json_annotation: ^4.8.0
   share_plus: ^6.3.1
+  timezone: ^0.9.2
   universal_platform: ^1.0.0+1
   uuid: ^3.0.7
   yaml: ^3.1.1

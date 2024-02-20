@@ -40,17 +40,22 @@ void main() async {
   tz.initializeTimeZones();
   tz.setLocalLocation(tz.getLocation(currentTimeZone));
 
-  runApp(MainApp(localizations: l));
+  runApp(MainApp(localizations: l, databaseService: _databaseService));
 }
 
 class MainApp extends StatelessWidget {
   final GTLocalizations localizations;
+  final DatabaseService databaseService;
 
-  const MainApp({required this.localizations, super.key});
+  const MainApp({
+    required this.localizations,
+    required this.databaseService,
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) {
-    Get.put(_databaseService);
+    Get.put(databaseService);
     Get.put(NotificationsService());
     Get.put(CountdownController());
     Get.put(ExercisesController());

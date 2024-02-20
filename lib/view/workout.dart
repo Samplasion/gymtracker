@@ -180,6 +180,7 @@ class _WorkoutViewState extends State<WorkoutView> {
             },
           ),
           PopupMenuButton(
+            key: const Key("main-menu"),
             itemBuilder: (context) => <PopupMenuEntry<dynamic>>[
               PopupMenuItem(
                 child: Text(

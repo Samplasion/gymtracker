@@ -44,6 +44,10 @@ class DatabaseService extends GetxService with ChangeNotifier {
   Future ensureInitialized() async {
     await Hive.initFlutter();
 
+    return _ensureInitialized();
+  }
+
+  Future<void> _ensureInitialized() async {
     builtin_adapters.registerAll();
     Hive.registerAdapter(WorkoutAdapter());
     Hive.registerAdapter(MuscleGroupAdapter());
@@ -58,6 +62,23 @@ class DatabaseService extends GetxService with ChangeNotifier {
     historyBox = await Hive.openBox<Workout>("history");
     settingsBox = await Hive.openBox("settings");
     ongoingBox = await Hive.openBox<String>("ongoing");
+  }
+
+  @visibleForTesting
+  Future ensureInitializedForTests() async {
+    await Hive.initFlutter("test");
+    return _ensureInitialized();
+  }
+
+  @visibleForTesting
+  Future teardown() async {
+    // ignore: invalid_use_of_visible_for_testing_member
+    Hive.resetAdapters();
+    await exerciseBox.clear();
+    await routinesBox.clear();
+    await historyBox.clear();
+    await settingsBox.clear();
+    await ongoingBox.clear();
   }
 
   void Function() onServiceChange(String service) {

@@ -53,7 +53,9 @@ jobs:
     strategy:
       matrix:
         # a = apk, b = bundle
-        flag: [a, b]
+        # flag: [a, b]
+        # Temporarily disable bundle build
+        flag: [a]
     steps:
       - name: Checkout
         uses: actions/checkout@v2

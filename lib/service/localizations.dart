@@ -40,6 +40,17 @@ class GTLocalizations extends Translations with ChangeNotifier {
     notifyListeners();
   }
 
+  @visibleForTesting
+  initTests(List<Locale> locales) async {
+    for (final locale in locales) {
+      final bundle =
+          await rootBundle.loadString('assets/i18n/${locale.languageCode}.yml');
+      keys[locale.languageCode] =
+          flattenTranslations(jsonDecode(jsonEncode(loadYaml(bundle))));
+    }
+    notifyListeners();
+  }
+
   @override
   notifyListeners() {
     super.notifyListeners();

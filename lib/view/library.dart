@@ -192,6 +192,7 @@ class _ExerciseInfoViewState extends State<ExerciseInfoView> {
                           index: history[index].$2,
                           workout: history[index].$3,
                           isInSuperset: false,
+                          weightUnit: history[index].$3.weightUnit,
                         ),
                         const Divider(),
                         Padding(

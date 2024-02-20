@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:get/get.dart';
+import 'package:gymtracker/data/weights.dart';
 import 'package:gymtracker/model/exercise.dart';
 import 'package:gymtracker/model/set.dart';
 import 'package:gymtracker/service/localizations.dart';
@@ -29,6 +30,7 @@ class WorkoutExerciseEditor extends StatefulWidget {
   final void Function(Exercise exercise, ExSet set, bool isDone) onSetSetDone;
   final VoidCallback onSetValueChange;
   final void Function(Exercise exercise, String notes) onNotesChange;
+  final Weights weightUnit;
   final bool isInSuperset;
   final bool createDivider;
 
@@ -46,6 +48,7 @@ class WorkoutExerciseEditor extends StatefulWidget {
     required this.onSetSetDone,
     required this.onSetValueChange,
     required this.onNotesChange,
+    required this.weightUnit,
     this.isInSuperset = false,
     this.createDivider = false,
     super.key,
@@ -213,6 +216,7 @@ class _WorkoutExerciseEditorState extends State<WorkoutExerciseEditor> {
                   val,
                 ),
                 onSetValueChange: widget.onSetValueChange,
+                weightUnit: widget.weightUnit,
               ),
             const SizedBox(height: 8),
             FilledButton.tonal(
@@ -239,6 +243,7 @@ class WorkoutExerciseSetEditor extends StatefulWidget {
   final void Function(SetKind) onSetSelectKind;
   final void Function(bool) onSetSetDone;
   final VoidCallback onSetValueChange;
+  final Weights weightUnit;
 
   const WorkoutExerciseSetEditor({
     required this.exercise,
@@ -249,6 +254,7 @@ class WorkoutExerciseSetEditor extends StatefulWidget {
     required this.onSetSetDone,
     required this.onDelete,
     required this.onSetValueChange,
+    required this.weightUnit,
     super.key,
   });
 
@@ -296,7 +302,7 @@ class _WorkoutExerciseSetEditorState extends State<WorkoutExerciseSetEditor> {
           isDense: true,
           border: const OutlineInputBorder(),
           labelText: "exercise.fields.weight".t,
-          // suffix: Text("kg"),
+          suffix: Text("units.${widget.weightUnit.name}".t),
           suffixIcon: _weightFocusNode.hasFocus
               ? IconButton(
                   icon: const Icon(Icons.calculate_rounded),
@@ -304,6 +310,7 @@ class _WorkoutExerciseSetEditorState extends State<WorkoutExerciseSetEditor> {
                     Go.toDialog(
                       () => WeightCalculator(
                         startingWeight: weightController.text.tryParseDouble(),
+                        weightUnit: widget.weightUnit,
                       ),
                     );
                   },

@@ -25,6 +25,8 @@ abstract class _$WorkoutCWProxy {
 
   Workout completes(String? completes);
 
+  Workout weightUnit(Weights weightUnit);
+
   /// This function **does support** nullification of nullable fields. All `null` values passed to `non-nullable` fields will be ignored. You can also use `Workout(...).copyWith.fieldName(...)` to override fields one at a time with nullification support.
   ///
   /// Usage
@@ -41,6 +43,7 @@ abstract class _$WorkoutCWProxy {
     String? infobox,
     String? completedBy,
     String? completes,
+    Weights? weightUnit,
   });
 }
 
@@ -80,6 +83,9 @@ class _$WorkoutCWProxyImpl implements _$WorkoutCWProxy {
   Workout completes(String? completes) => this(completes: completes);
 
   @override
+  Workout weightUnit(Weights weightUnit) => this(weightUnit: weightUnit);
+
+  @override
 
   /// This function **does support** nullification of nullable fields. All `null` values passed to `non-nullable` fields will be ignored. You can also use `Workout(...).copyWith.fieldName(...)` to override fields one at a time with nullification support.
   ///
@@ -97,6 +103,7 @@ class _$WorkoutCWProxyImpl implements _$WorkoutCWProxy {
     Object? infobox = const $CopyWithPlaceholder(),
     Object? completedBy = const $CopyWithPlaceholder(),
     Object? completes = const $CopyWithPlaceholder(),
+    Object? weightUnit = const $CopyWithPlaceholder(),
   }) {
     return Workout(
       id: id == const $CopyWithPlaceholder()
@@ -135,6 +142,11 @@ class _$WorkoutCWProxyImpl implements _$WorkoutCWProxy {
           ? _value.completes
           // ignore: cast_nullable_to_non_nullable
           : completes as String?,
+      weightUnit:
+          weightUnit == const $CopyWithPlaceholder() || weightUnit == null
+              ? _value.weightUnit
+              // ignore: cast_nullable_to_non_nullable
+              : weightUnit as Weights,
     );
   }
 }
@@ -165,6 +177,8 @@ Workout _$WorkoutFromJson(Map<String, dynamic> json) => Workout(
       infobox: json['infobox'] as String?,
       completedBy: json['completedBy'] as String?,
       completes: json['completes'] as String?,
+      weightUnit: $enumDecodeNullable(_$WeightsEnumMap, json['weightUnit']) ??
+          Weights.kg,
     );
 
 Map<String, dynamic> _$WorkoutToJson(Workout instance) => <String, dynamic>{
@@ -175,6 +189,12 @@ Map<String, dynamic> _$WorkoutToJson(Workout instance) => <String, dynamic>{
       'startingDate': instance.startingDate?.toIso8601String(),
       'infobox': instance.infobox,
       'parentID': instance.parentID,
+      'weightUnit': _$WeightsEnumMap[instance.weightUnit]!,
       'completedBy': instance.completedBy,
       'completes': instance.completes,
     };
+
+const _$WeightsEnumMap = {
+  Weights.kg: 'kg',
+  Weights.lb: 'lb',
+};

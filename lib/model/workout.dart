@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:copy_with_extension/copy_with_extension.dart';
 import 'package:flutter/foundation.dart';
+import 'package:gymtracker/data/weights.dart';
 import 'package:gymtracker/model/exercisable.dart';
 import 'package:gymtracker/model/set.dart';
 import 'package:gymtracker/model/superset.dart';
@@ -35,6 +36,9 @@ class Workout {
   /// The ID of the non-concrete (ie. part of a routine) exercise
   /// this concrete exercise should be categorized under.
   String? parentID;
+
+  /// The unit of weight used in this workout.
+  Weights weightUnit;
 
   /// Whether this is a concrete workout.
   bool get isConcrete => duration != null;
@@ -99,6 +103,7 @@ class Workout {
     this.infobox,
     this.completedBy,
     this.completes,
+    this.weightUnit = Weights.kg,
   })  : id = id ?? const Uuid().v4(),
         assert(() {
           if (completedBy == null && completes == null) return true;

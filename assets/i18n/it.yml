@@ -193,7 +193,7 @@ settings:
     locale:
       label: Lingua dell'applicazione
     weightUnit:
-      label: Unità di peso
+      label: Unità di peso predefinita
     import:
       label: Importa dati
       success: Dati importati con successo
@@ -216,6 +216,7 @@ ongoingWorkout:
     short:
       cancel: Annulla
       resume: Riprendi
+    changeWeightUnit: Cambia unità di peso
   exercises:
     add: + Aggiungi esercizio
     addSuperset: + Aggiungi superserie
@@ -359,7 +360,7 @@ actions:
 
 units:
   kg: kg
-  lbs: lbs
+  lb: lbs
   km: km
   mi: mi
 
@@ -507,6 +508,7 @@ historyEditor:
     volume: Volume
   actions:
     finish: Termina modifica
+    changeWeightUnit: Cambia unità di peso
   finish:
     title: Termina modifica
     fields:

@@ -5,7 +5,9 @@ import 'package:gymtracker/controller/countdown_controller.dart';
 import 'package:gymtracker/controller/history_controller.dart';
 import 'package:gymtracker/controller/routines_controller.dart';
 import 'package:gymtracker/controller/serviceable_controller.dart';
+import 'package:gymtracker/controller/settings_controller.dart';
 import 'package:gymtracker/controller/stopwatch_controller.dart';
+import 'package:gymtracker/data/weights.dart';
 import 'package:gymtracker/model/exercisable.dart';
 import 'package:gymtracker/model/set.dart';
 import 'package:gymtracker/model/workout.dart';
@@ -21,12 +23,15 @@ class WorkoutController extends GetxController with ServiceableController {
   Rx<String?> infobox;
   RxBool isContinuation = false.obs;
   Rx<String?> continuesID = Rx(null);
+  late Rx<Weights> weightUnit;
 
   WorkoutController(String name, String? parentID, String? infobox)
       : name = name.obs,
         time = DateTime.now().obs,
         parentID = Rx<String?>(parentID),
-        infobox = Rx<String?>(infobox);
+        infobox = Rx<String?>(infobox),
+        weightUnit =
+            (Get.find<SettingsController>().weightUnit() ?? Weights.kg).obs;
 
   factory WorkoutController.fromSavedData(Map<String, dynamic> data) {
     final cont =
@@ -39,6 +44,10 @@ class WorkoutController extends GetxController with ServiceableController {
         data['time'] ?? DateTime.now().millisecondsSinceEpoch));
     cont.continuesID(data['continuesID']);
     cont.isContinuation(data['isContinuation'] ?? false);
+    cont.weightUnit(Weights.values.firstWhere(
+      (element) => element.name == data['weightUnit'],
+      orElse: () => Weights.kg,
+    ));
 
     if (data.containsKey("globalStopwatch")) {
       final controller = Get.find<StopwatchController>();
@@ -122,6 +131,7 @@ class WorkoutController extends GetxController with ServiceableController {
       "infobox": infobox.value,
       "isContinuation": isContinuation.value,
       "continuesID": continuesID.value,
+      "weightUnit": weightUnit.value.name,
       if (stopwatchController.globalStopwatch.currentDuration.inSeconds >
           0) ...{
         "globalStopwatch": stopwatchController
@@ -190,6 +200,7 @@ class WorkoutController extends GetxController with ServiceableController {
       parentID: parentID.value,
       infobox: infobox.value,
       completes: continuesID.value,
+      weightUnit: weightUnit.value,
     );
 
     if (isContinuation.isTrue) {

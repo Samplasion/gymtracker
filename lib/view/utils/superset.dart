@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gymtracker/data/weights.dart';
 import 'package:gymtracker/model/exercise.dart';
 import 'package:gymtracker/model/set.dart';
 import 'package:gymtracker/model/superset.dart';
@@ -32,6 +33,7 @@ class SupersetEditor extends StatefulWidget {
   final VoidCallback onExerciseSetValueChange;
   final void Function(Superset superset, String notes) onNotesChange;
   final void Function(Exercise exercise, String notes) onExerciseNotesChange;
+  final Weights weightUnit;
 
   const SupersetEditor({
     required super.key,
@@ -55,6 +57,7 @@ class SupersetEditor extends StatefulWidget {
     required this.onExerciseSetValueChange,
     required this.onNotesChange,
     required this.onExerciseNotesChange,
+    required this.weightUnit,
   });
 
   @override
@@ -212,6 +215,7 @@ class _SupersetEditorState extends State<SupersetEditor> {
                   createDivider: true,
                   isCreating: widget.isCreating,
                   isInSuperset: true,
+                  weightUnit: widget.weightUnit,
                   onReorder: () {
                     widget.onExerciseReorder(j);
                   },

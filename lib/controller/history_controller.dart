@@ -235,6 +235,7 @@ class HistoryController extends GetxController with ServiceableController {
 
   void submitEditedWorkout(Workout workout) {
     service.setHistoryWorkout(workout);
+    print((workout.name, workout.weightUnit));
     Get.back();
     SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
       Get.back();

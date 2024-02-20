@@ -6,6 +6,7 @@ import 'package:get/get.dart';
 import 'package:gymtracker/controller/history_controller.dart';
 import 'package:gymtracker/controller/history_controller.dart' as history;
 import 'package:gymtracker/controller/routines_controller.dart';
+import 'package:gymtracker/data/weights.dart';
 import 'package:gymtracker/model/exercisable.dart';
 import 'package:gymtracker/model/exercise.dart';
 import 'package:gymtracker/model/set.dart';
@@ -271,6 +272,7 @@ class _ExercisesViewState extends State<ExercisesView> {
                     workout: workout,
                     index: index,
                     isInSuperset: false,
+                    weightUnit: workout.weightUnit,
                   ),
                 );
               },
@@ -328,6 +330,7 @@ class _ExercisesViewState extends State<ExercisesView> {
                       workout: workout.continuation!,
                       index: index,
                       isInSuperset: false,
+                      weightUnit: workout.weightUnit,
                     ),
                   );
                 },
@@ -422,6 +425,7 @@ class _RoutineHistoryDataState extends State<RoutineHistoryData> {
     TextStyle style, {
     bool showDate = true,
     TextAlign? textAlign,
+    required Weights weightUnit,
   }) {
     return TimerView.buildTimeString(
       context,
@@ -430,10 +434,11 @@ class _RoutineHistoryDataState extends State<RoutineHistoryData> {
         TextSpan buildType() {
           switch (type) {
             case _RoutineHistoryDataType.volume:
+              // TODO: Convert lbs to kg and then everything to the user-set unit to display in the chart
               return TextSpan(
                   text: "exerciseList.fields.weight".trParams({
                 "weight": stringifyDouble(value),
-                "unit": "units.kg".t,
+                "unit": "units.${weightUnit.name}".t,
               }));
             case _RoutineHistoryDataType.reps:
               return TextSpan(
@@ -475,11 +480,13 @@ class _RoutineHistoryDataState extends State<RoutineHistoryData> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         buildSpan(
-            _getY(children[selectedIndex]),
-            Theme.of(context)
-                .textTheme
-                .bodyLarge!
-                .copyWith(fontWeight: FontWeight.bold)),
+          _getY(children[selectedIndex]),
+          Theme.of(context)
+              .textTheme
+              .bodyLarge!
+              .copyWith(fontWeight: FontWeight.bold),
+          weightUnit: widget.routine.weightUnit,
+        ),
         AspectRatio(
           aspectRatio: 1.7,
           child: Padding(
@@ -655,6 +662,7 @@ class _RoutineHistoryDataState extends State<RoutineHistoryData> {
             Theme.of(context).textTheme.labelSmall!,
             showDate: false,
             textAlign: TextAlign.end,
+            weightUnit: widget.routine.weightUnit,
           ),
         );
   }
@@ -667,12 +675,14 @@ class ExerciseDataView extends StatelessWidget {
     required this.workout,
     required this.index,
     required this.isInSuperset,
+    required this.weightUnit,
   });
 
   final WorkoutExercisable exercise;
   final Workout workout;
   final int index;
   final bool isInSuperset;
+  final Weights weightUnit;
 
   @override
   Widget build(BuildContext context) {
@@ -751,6 +761,7 @@ class ExerciseDataView extends StatelessWidget {
             exercise: exercise,
             isConcrete: workout.isConcrete,
             alt: i % 2 == 0,
+            weightUnit: weightUnit,
           ),
       ],
     );
@@ -826,6 +837,7 @@ class ExerciseDataView extends StatelessWidget {
                 workout: workout,
                 index: index,
                 isInSuperset: true,
+                weightUnit: weightUnit,
               ),
             ),
         ],
@@ -839,12 +851,14 @@ class ExerciseSetView extends StatelessWidget {
   final Exercise exercise;
   final bool isConcrete;
   final bool alt;
+  final Weights weightUnit;
 
   const ExerciseSetView({
     required this.set,
     required this.exercise,
     required this.isConcrete,
     required this.alt,
+    required this.weightUnit,
     super.key,
   });
 
@@ -853,7 +867,7 @@ class ExerciseSetView extends StatelessWidget {
             .contains(set.parameters))
           Text("exerciseList.fields.weight".trParams({
             "weight": stringifyDouble(set.weight!),
-            "unit": "units.kg".t,
+            "unit": "units.${weightUnit.name}".t,
           })),
         if ([
           SetParameters.timeWeight,

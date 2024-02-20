@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:get/get.dart';
 import 'package:gymtracker/controller/routines_controller.dart';
+import 'package:gymtracker/controller/settings_controller.dart';
+import 'package:gymtracker/data/weights.dart';
 import 'package:gymtracker/model/exercisable.dart';
 import 'package:gymtracker/model/exercise.dart';
 import 'package:gymtracker/model/set.dart';
@@ -191,6 +193,8 @@ class _RoutineCreatorState extends State<RoutineCreator> {
         exercise: (controller.exercises[i].data as Exercise),
         index: i,
         isCreating: true,
+        weightUnit:
+            Get.find<SettingsController>().weightUnit.value ?? Weights.kg,
         onReorder: () {},
         onReplace: () {
           SchedulerBinding.instance.addPostFrameCallback((timeStamp) async {
@@ -248,6 +252,8 @@ class _RoutineCreatorState extends State<RoutineCreator> {
         superset: controller.exercises[i].data as Superset,
         index: i,
         isCreating: true,
+        weightUnit:
+            Get.find<SettingsController>().weightUnit.value ?? Weights.kg,
         onSupersetReorder: () {},
         onSupersetReplace: () {
           SchedulerBinding.instance.addPostFrameCallback((timeStamp) async {

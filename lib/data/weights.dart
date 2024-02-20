@@ -1,5 +1,7 @@
 import 'package:gymtracker/utils/utils.dart';
+import 'package:json_annotation/json_annotation.dart';
 
+@JsonEnum()
 enum Weights {
   kg([1.25, 2.5, 5, 10, 15, 20]),
   lb([2.5, 5, 10, 25, 35, 50]);

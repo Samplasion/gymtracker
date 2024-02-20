@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:gymtracker/controller/history_controller.dart';
 import 'package:gymtracker/controller/routines_controller.dart';
 import 'package:gymtracker/controller/workout_controller.dart';
+import 'package:gymtracker/data/weights.dart';
 import 'package:gymtracker/model/exercisable.dart';
 import 'package:gymtracker/model/exercise.dart';
 import 'package:gymtracker/model/set.dart';
@@ -62,12 +63,26 @@ class _WorkoutEditorState extends State<WorkoutEditor> {
             onPressed: () {
               showDialog(
                 context: context,
-                builder: (context) => const WeightCalculator(),
+                builder: (context) => WeightCalculator(
+                  weightUnit: workout.weightUnit,
+                ),
               );
             },
           ),
           PopupMenuButton(
-            itemBuilder: (context) => [
+            itemBuilder: (context) => <PopupMenuEntry<dynamic>>[
+              PopupMenuItem(
+                child: Text(
+                  "historyEditor.actions.changeWeightUnit".t,
+                ),
+                onTap: () {
+                  setState(() {
+                    workout.weightUnit = Weights.values[
+                        (workout.weightUnit.index + 1) % Weights.values.length];
+                  });
+                },
+              ),
+              const PopupMenuDivider(),
               PopupMenuItem(
                 child: Text(
                   "historyEditor.actions.finish".t,
@@ -108,6 +123,7 @@ class _WorkoutEditorState extends State<WorkoutEditor> {
                 exercise: workout.exercises[i] as Exercise,
                 index: i,
                 isCreating: false,
+                weightUnit: workout.weightUnit,
                 onReorder: () async {
                   SchedulerBinding.instance
                       .addPostFrameCallback((timeStamp) async {
@@ -194,6 +210,7 @@ class _WorkoutEditorState extends State<WorkoutEditor> {
                 index: i,
                 isCreating: false,
                 key: ValueKey((workout.exercises[i] as Superset).id),
+                weightUnit: workout.weightUnit,
                 onSupersetRemove: () {
                   workout.exercises.removeAt(i);
                   setState(() {});

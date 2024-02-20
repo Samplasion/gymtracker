@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gymtracker/data/exercises.dart';
+import 'package:gymtracker/data/weights.dart';
 import 'package:gymtracker/model/exercisable.dart';
 import 'package:gymtracker/model/exercise.dart';
 import 'package:gymtracker/model/set.dart';
@@ -57,15 +58,18 @@ class ExerciseListTile extends StatelessWidget {
   final WorkoutExercisable exercise;
   final bool selected;
   final bool isConcrete;
+  final Weights? weightUnit;
   final VoidCallback? onTap;
 
   const ExerciseListTile({
     required this.exercise,
     required this.selected,
     required this.isConcrete,
+    this.weightUnit,
     this.onTap,
     super.key,
-  });
+  }) : assert((weightUnit == null) == !isConcrete,
+            "Weight unit must be set if the exercise is concrete");
 
   @override
   Widget build(BuildContext context) {
@@ -126,7 +130,7 @@ class ExerciseListTile extends StatelessWidget {
 
   String _buildWeight(double weight) => "exerciseList.fields.weight".tParams({
         "weight": stringifyDouble(weight),
-        "unit": "units.kg".t,
+        "unit": "units.${weightUnit!.name}".t,
       });
   String _buildReps(int? reps) => "exerciseList.fields.reps".plural(reps ?? 0);
   String _buildTime(BuildContext context, Duration time) =>

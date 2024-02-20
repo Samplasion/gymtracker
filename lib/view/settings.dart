@@ -108,7 +108,13 @@ class SettingsView extends StatelessWidget {
                 applicationName: "appName".t,
                 applicationVersion: "appInfo.version".tParams({
                   "version": VersionService().packageInfo.version,
-                  "build": VersionService().packageInfo.buildNumber,
+                  "build": const String.fromEnvironment(
+                    "BUILD",
+                    defaultValue: "[NO_VALUE]",
+                  ).replaceAll(
+                    "[NO_VALUE]",
+                    VersionService().packageInfo.buildNumber,
+                  ),
                 }),
                 aboutBoxChildren: [
                   Text("appInfo.shortDescription".t),
@@ -117,7 +123,13 @@ class SettingsView extends StatelessWidget {
                 icon: const Icon(Icons.info),
                 subtitle: Text("appInfo.version".tParams({
                   "version": VersionService().packageInfo.version,
-                  "build": VersionService().packageInfo.buildNumber,
+                  "build": const String.fromEnvironment(
+                    "BUILD",
+                    defaultValue: "[NO_VALUE]",
+                  ).replaceAll(
+                    "[NO_VALUE]",
+                    VersionService().packageInfo.buildNumber,
+                  ),
                 })),
               ),
             ]),

@@ -55,13 +55,13 @@ echo "##                                                         ##"
 echo "#############################################################"
 echo 
 echo App version: $VER
-echo Build number: $BUILD
+echo Build number: $NOW
 echo Flavor: $flavor
 echo 
 
 _build_appbundle() {
     echo "📦 Building the bundle..."
-    flutter build appbundle --$flavor --build-number $BUILD 1> /dev/null
+    flutter build appbundle --$flavor --build-number $NOW --dart-define=BUILD=$BUILD 1> /dev/null
 }
 
 _build_apk() {

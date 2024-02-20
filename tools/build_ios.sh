@@ -41,13 +41,13 @@ echo "##                                                         ##"
 echo "#############################################################"
 echo 
 echo App version: $VER
-echo Build number: $BUILD
+echo Build number: $NOW
 echo Flavor: $flavor
 echo 
 
 build() {
     echo "📦 Building the iOS app..."
-    flutter build ipa --$flavor --build-number=$BUILD --no-codesign 1> /dev/null
+    flutter build ipa --$flavor --build-number=$NOW --dart-define=BUILD=$BUILD --no-codesign 1> /dev/null
 }
 
 cleanup() {

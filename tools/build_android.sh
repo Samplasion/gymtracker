@@ -66,7 +66,7 @@ _build_appbundle() {
 
 _build_apk() {
     echo "📦 Building the APK..."
-    flutter build apk --$flavor --build-number $BUILD 1> /dev/null
+    flutter build apk --$flavor --build-number $NOW --dart-define=BUILD=$BUILD 1> /dev/null
 }
 
 build() {

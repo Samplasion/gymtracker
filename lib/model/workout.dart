@@ -154,6 +154,7 @@ class WorkoutDifference {
       final newCandidate = newExercises[i];
 
       bool isDifferent = false;
+      isDifferent |= oldCandidate.notes != newCandidate.notes;
       isDifferent |= oldCandidate.sets.length != newCandidate.sets.length;
       // If either is a superset and the other is not
       isDifferent |= (oldCandidate is Superset) != (newCandidate is Superset);

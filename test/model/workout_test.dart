@@ -215,6 +215,22 @@ void main() {
           ),
         );
       });
+      test('with changed notes', () {
+        final workout2 = workout.clone();
+        workout2.exercises[0] = (workout2.exercises[0] as Exercise)
+            .copyWith(notes: "These notes have been changed");
+        expect(
+          WorkoutDifference.fromWorkouts(
+            oldWorkout: workout,
+            newWorkout: workout2,
+          ),
+          const WorkoutDifference.raw(
+            addedExercises: 0,
+            removedExercises: 0,
+            changedExercises: 1,
+          ),
+        );
+      });
     });
   });
 }

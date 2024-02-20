@@ -6,6 +6,7 @@ set -e
 name="GymTracker"
 flavor="release"
 NOW=$(date +"%s")
+BUILD=$(git rev-parse HEAD | cut -c1-7)
 CUR=$(pwd)
 VER=$(grep "version: " $CUR/pubspec.yaml | sed 's/version: //')
 
@@ -40,12 +41,13 @@ echo "##                                                         ##"
 echo "#############################################################"
 echo 
 echo App version: $VER
-echo Build number: $NOW
+echo Build number: $BUILD
+echo Flavor: $flavor
 echo 
 
 build() {
     echo "📦 Building the iOS app..."
-    flutter build ipa --$flavor --no-codesign 1> /dev/null
+    flutter build ipa --$flavor --build-number=$BUILD --no-codesign 1> /dev/null
 }
 
 cleanup() {

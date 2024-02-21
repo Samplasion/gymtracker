@@ -70,6 +70,7 @@ class _WorkoutEditorState extends State<WorkoutEditor> {
             },
           ),
           PopupMenuButton(
+            key: const Key("main-menu"),
             itemBuilder: (context) => <PopupMenuEntry<dynamic>>[
               PopupMenuItem(
                 child: Text(

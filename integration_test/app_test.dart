@@ -10,6 +10,7 @@ import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 
 import 'flows/create_routine.dart';
+import 'flows/edit_workout.dart';
 import 'flows/workout_from_routine.dart';
 
 void main() async {
@@ -33,6 +34,7 @@ void main() async {
 
   tearDown(() => databaseService.teardown());
 
+  // TODO: Use localized strings ("".t) in the tests
   group('end-to-end test', () {
     testWidgets(
       'create routine',
@@ -41,6 +43,10 @@ void main() async {
     testWidgets(
       'create workout from routine and save it back',
       (tester) => testWorkoutFromRoutineFlow(tester, l, databaseService),
+    );
+    testWidgets(
+      'edit workout',
+      (tester) => testEditWorkoutFlow(tester, l, databaseService),
     );
   });
 }

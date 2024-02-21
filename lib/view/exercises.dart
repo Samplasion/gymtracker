@@ -61,6 +61,7 @@ class _ExercisesViewState extends State<ExercisesView> {
                   },
                 ),
                 PopupMenuItem(
+                  key: const Key("edit-workout"),
                   // TODO: Remove beta status
                   child: Text.rich(
                     TextSpan(

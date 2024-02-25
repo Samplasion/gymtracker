@@ -155,6 +155,7 @@ class WorkoutDifference {
 
       bool isDifferent = false;
       isDifferent |= oldCandidate.notes != newCandidate.notes;
+      isDifferent |= oldCandidate.restTime != newCandidate.restTime;
       isDifferent |= oldCandidate.sets.length != newCandidate.sets.length;
       // If either is a superset and the other is not
       isDifferent |= (oldCandidate is Superset) != (newCandidate is Superset);
@@ -191,7 +192,7 @@ class WorkoutDifference {
 
   @override
   String toString() {
-    return 'WorkoutDifference{addedExercises: $addedExercises, removedExercises: $removedExercises, changedExercises: $changedExercises}';
+    return 'WorkoutDifference[+$addedExercises, -$removedExercises, ~$changedExercises]';
   }
 
   @override

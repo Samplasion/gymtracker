@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:gymtracker/model/exercise.dart';
 import 'package:gymtracker/model/set.dart';
+import 'package:gymtracker/model/superset.dart';
 import 'package:gymtracker/model/workout.dart';
 import 'package:test/test.dart';
 
@@ -72,10 +73,9 @@ void main() {
       completes: null,
     );
     Exercise newExercise() {
-      final id = Random().nextInt(100).toString();
+      final number = Random().nextInt(100).toString();
       return Exercise.custom(
-        id: id,
-        name: 'Test Exercise $id',
+        name: 'Test Exercise $number',
         parameters: SetParameters.repsWeight,
         sets: [
           ExSet(
@@ -97,52 +97,175 @@ void main() {
         secondaryMuscleGroups: {MuscleGroup.lowerBack},
         restTime: const Duration(seconds: 60),
         parentID: null,
-        notes: 'Test Notes',
+        notes: 'Test Notes $number',
       );
     }
 
-    test('difference should be correctly calculated (added exercise)', () {
-      final workout2 = workout.clone();
-      workout2.exercises.add(newExercise());
-      expect(
-        WorkoutDifference.fromWorkouts(
-          oldWorkout: workout,
-          newWorkout: workout2,
-        ),
-        const WorkoutDifference.raw(
-          addedExercises: 1,
-          removedExercises: 0,
-          changedExercises: 0,
-        ),
-      );
-    });
+    group("WorkoutDifference class", () {
+      test('difference should be correctly calculated (added exercise)', () {
+        final workout2 = workout.clone();
+        workout2.exercises.add(newExercise());
+        expect(
+          WorkoutDifference.fromWorkouts(
+            oldWorkout: workout,
+            newWorkout: workout2,
+          ),
+          const WorkoutDifference.raw(
+            addedExercises: 1,
+            removedExercises: 0,
+            changedExercises: 0,
+          ),
+        );
+      });
 
-    test('difference should be correctly calculated (removed exercise)', () {
-      final workout2 = workout.clone();
-      workout2.exercises.clear();
-      expect(
-        WorkoutDifference.fromWorkouts(
-          oldWorkout: workout,
-          newWorkout: workout2,
-        ),
-        const WorkoutDifference.raw(
-          addedExercises: 0,
-          removedExercises: 2,
-          changedExercises: 0,
-        ),
-      );
-    });
+      test('difference should be correctly calculated (removed exercise)', () {
+        final workout2 = workout.clone();
+        workout2.exercises.clear();
+        expect(
+          WorkoutDifference.fromWorkouts(
+            oldWorkout: workout,
+            newWorkout: workout2,
+          ),
+          const WorkoutDifference.raw(
+            addedExercises: 0,
+            removedExercises: 2,
+            changedExercises: 0,
+          ),
+        );
+      });
 
-    group("difference should be correctly calculated (changed exercises)", () {
-      test('with an added set', () {
+      group("difference should be correctly calculated (changed exercises)",
+          () {
+        test('with an added set', () {
+          final workout2 = workout.clone();
+          workout2.exercises[0].sets.add(ExSet(
+            reps: 10,
+            weight: 100,
+            time: const Duration(seconds: 60),
+            parameters: SetParameters.repsWeight,
+            kind: SetKind.normal,
+          ));
+          expect(
+            WorkoutDifference.fromWorkouts(
+              oldWorkout: workout,
+              newWorkout: workout2,
+            ),
+            const WorkoutDifference.raw(
+              addedExercises: 0,
+              removedExercises: 0,
+              changedExercises: 1,
+            ),
+          );
+        });
+        test('with a removed set', () {
+          final workout2 = workout.clone();
+          workout2.exercises[0].sets.removeLast();
+          expect(
+            WorkoutDifference.fromWorkouts(
+              oldWorkout: workout,
+              newWorkout: workout2,
+            ),
+            const WorkoutDifference.raw(
+              addedExercises: 0,
+              removedExercises: 0,
+              changedExercises: 1,
+            ),
+          );
+        });
+        test('with a changed set kind', () {
+          final workout2 = workout.clone();
+          workout2.exercises[0].sets[0].kind = SetKind.failureStripping;
+          expect(
+            WorkoutDifference.fromWorkouts(
+              oldWorkout: workout,
+              newWorkout: workout2,
+            ),
+            const WorkoutDifference.raw(
+              addedExercises: 0,
+              removedExercises: 0,
+              changedExercises: 1,
+            ),
+          );
+        });
+        test('with a different set weight', () {
+          final workout2 = workout.clone();
+          workout2.exercises[0].sets[0].weight = 200;
+          expect(
+            WorkoutDifference.fromWorkouts(
+              oldWorkout: workout,
+              newWorkout: workout2,
+            ),
+            const WorkoutDifference.raw(
+              addedExercises: 0,
+              removedExercises: 0,
+              changedExercises: 1,
+            ),
+          );
+        });
+        test('with different reps weight', () {
+          final workout2 = workout.clone();
+          workout2.exercises[0].sets[0].weight = 200;
+          expect(
+            WorkoutDifference.fromWorkouts(
+              oldWorkout: workout,
+              newWorkout: workout2,
+            ),
+            const WorkoutDifference.raw(
+              addedExercises: 0,
+              removedExercises: 0,
+              changedExercises: 1,
+            ),
+          );
+        });
+        test('with changed notes', () {
+          final workout2 = workout.clone();
+          workout2.exercises[0] = (workout2.exercises[0] as Exercise)
+              .copyWith(notes: "These notes have been changed");
+          expect(
+            WorkoutDifference.fromWorkouts(
+              oldWorkout: workout,
+              newWorkout: workout2,
+            ),
+            const WorkoutDifference.raw(
+              addedExercises: 0,
+              removedExercises: 0,
+              changedExercises: 1,
+            ),
+          );
+        });
+
+        test("with reordered exercises", () {
+          final workout1 = workout.clone();
+          workout1.exercises.add(newExercise());
+          final workout2 = workout1.clone();
+          final exs = workout2.exercises.reversed.toList();
+          workout2.exercises
+            ..clear()
+            ..addAll(exs);
+          expect(
+            WorkoutDifference.fromWorkouts(
+              oldWorkout: workout1,
+              newWorkout: workout2,
+            ),
+            const WorkoutDifference.raw(
+              addedExercises: 0,
+              removedExercises: 0,
+              changedExercises: 2,
+            ),
+          );
+        });
+      });
+
+      test('difference should be correctly calculated (with supersets)', () {
         final workout2 = workout.clone();
-        workout2.exercises[0].sets.add(ExSet(
-          reps: 10,
-          weight: 100,
-          time: const Duration(seconds: 60),
-          parameters: SetParameters.repsWeight,
-          kind: SetKind.normal,
-        ));
+        workout2.exercises[0] = Superset(
+          restTime: const Duration(seconds: 60),
+          exercises: [
+            workout2.exercises[0] as Exercise,
+            newExercise(),
+          ],
+          notes: "Superset notes",
+        );
         expect(
           WorkoutDifference.fromWorkouts(
             oldWorkout: workout,
@@ -154,14 +277,17 @@ void main() {
             changedExercises: 1,
           ),
         );
-      });
-      test('with a removed set', () {
-        final workout2 = workout.clone();
-        workout2.exercises[0].sets.removeLast();
+
+        final workout3 = workout2.clone();
+        (workout3.exercises[0] as Superset).exercises
+          ..add(newExercise())
+          ..add(
+            newExercise(),
+          );
         expect(
           WorkoutDifference.fromWorkouts(
-            oldWorkout: workout,
-            newWorkout: workout2,
+            oldWorkout: workout2,
+            newWorkout: workout3,
           ),
           const WorkoutDifference.raw(
             addedExercises: 0,
@@ -169,14 +295,13 @@ void main() {
             changedExercises: 1,
           ),
         );
-      });
-      test('with a changed set kind', () {
-        final workout2 = workout.clone();
-        workout2.exercises[0].sets[0].kind = SetKind.failureStripping;
+
+        final workout4 = workout3.clone();
+        (workout4.exercises[0] as Superset).notes = "Changed notes";
         expect(
           WorkoutDifference.fromWorkouts(
-            oldWorkout: workout,
-            newWorkout: workout2,
+            oldWorkout: workout3,
+            newWorkout: workout4,
           ),
           const WorkoutDifference.raw(
             addedExercises: 0,
@@ -184,14 +309,14 @@ void main() {
             changedExercises: 1,
           ),
         );
-      });
-      test('with a different set weight', () {
-        final workout2 = workout.clone();
-        workout2.exercises[0].sets[0].weight = 200;
+
+        final workout5 = workout4.clone();
+        (workout5.exercises[0] as Superset).restTime =
+            const Duration(seconds: 120);
         expect(
           WorkoutDifference.fromWorkouts(
-            oldWorkout: workout,
-            newWorkout: workout2,
+            oldWorkout: workout4,
+            newWorkout: workout5,
           ),
           const WorkoutDifference.raw(
             addedExercises: 0,
@@ -199,14 +324,15 @@ void main() {
             changedExercises: 1,
           ),
         );
-      });
-      test('with different reps weight', () {
-        final workout2 = workout.clone();
-        workout2.exercises[0].sets[0].weight = 200;
+
+        final workout6 = workout5.clone();
+        (workout6.exercises[0] as Superset).exercises
+          ..clear()
+          ..addAll(workout5.exercises.reversed.whereType<Exercise>().toList());
         expect(
           WorkoutDifference.fromWorkouts(
-            oldWorkout: workout,
-            newWorkout: workout2,
+            oldWorkout: workout5,
+            newWorkout: workout6,
           ),
           const WorkoutDifference.raw(
             addedExercises: 0,
@@ -214,20 +340,24 @@ void main() {
             changedExercises: 1,
           ),
         );
-      });
-      test('with changed notes', () {
-        final workout2 = workout.clone();
-        workout2.exercises[0] = (workout2.exercises[0] as Exercise)
-            .copyWith(notes: "These notes have been changed");
+
+        final workout7 = workout6.clone();
+        workout7.exercises.insert(0, newExercise());
+        (workout7.exercises[1] as Superset).exercises
+          ..clear()
+          ..addAll(
+              (workout6.exercises[0] as Superset).exercises.reversed.toList());
         expect(
           WorkoutDifference.fromWorkouts(
-            oldWorkout: workout,
-            newWorkout: workout2,
+            // S, E
+            oldWorkout: workout6,
+            // E, S, E
+            newWorkout: workout7,
           ),
           const WorkoutDifference.raw(
-            addedExercises: 0,
+            addedExercises: 1,
             removedExercises: 0,
-            changedExercises: 1,
+            changedExercises: 2,
           ),
         );
       });

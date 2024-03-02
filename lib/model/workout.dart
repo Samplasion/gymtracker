@@ -171,7 +171,13 @@ class WorkoutDifference {
         final newSet = newCandidate.sets[j];
 
         isDifferent |= oldSet.distance != newSet.distance;
-        isDifferent |= oldSet.reps != newSet.reps;
+        // Don't cound failure and stripping sets as changed since we're erasing
+        // them anyway when instantiating the routine.
+        // It doesn't really matter whether we use oldSet or newSet here;
+        // If they aren't equal, the set is considered changed anyway.
+        if (newSet.kind.shouldKeepInRoutine) {
+          isDifferent |= oldSet.reps != newSet.reps;
+        }
         isDifferent |= oldSet.weight != newSet.weight;
         isDifferent |= oldSet.time != newSet.time;
         isDifferent |= oldSet.kind != newSet.kind;

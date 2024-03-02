@@ -256,6 +256,57 @@ void main() {
         });
       });
 
+      test("with failure and stripping sets", () {
+        final workout1 = workout.copyWith(exercises: [
+          for (final kind
+              in SetKind.values.where((kind) => !kind.shouldKeepInRoutine)) ...[
+            Exercise.custom(
+              name: "Test Exercise $kind",
+              parameters: SetParameters.repsWeight,
+              sets: [
+                ExSet(
+                  reps: 10,
+                  weight: 100,
+                  time: const Duration(seconds: 60),
+                  parameters: SetParameters.repsWeight,
+                  kind: kind,
+                ),
+              ],
+              primaryMuscleGroup: MuscleGroup.abs,
+              secondaryMuscleGroups: {MuscleGroup.lowerBack},
+              restTime: const Duration(seconds: 60),
+              parentID: null,
+              notes: 'Test Notes',
+            ),
+          ]
+        ]);
+        final workout2 = workout1.copyWith(exercises: [
+          for (final ex in workout1.exercises.whereType<Exercise>()) ...[
+            ex.copyWith(
+              sets: [
+                for (final set in ex.sets) ...[
+                  set.copyWith(
+                    reps: 20,
+                  ),
+                ],
+              ],
+            ),
+          ],
+        ]);
+
+        expect(
+          WorkoutDifference.fromWorkouts(
+            oldWorkout: workout1,
+            newWorkout: workout2,
+          ),
+          const WorkoutDifference.raw(
+            addedExercises: 0,
+            removedExercises: 0,
+            changedExercises: 0,
+          ),
+        );
+      });
+
       test('difference should be correctly calculated (with supersets)', () {
         final workout2 = workout.clone();
         workout2.exercises[0] = Superset(

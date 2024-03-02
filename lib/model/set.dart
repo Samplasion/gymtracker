@@ -9,8 +9,12 @@ enum SetKind {
   warmUp,
   normal,
   drop,
-  failure,
-  failureStripping,
+  failure(shouldKeepInRoutine: false),
+  failureStripping(shouldKeepInRoutine: false);
+
+  const SetKind({this.shouldKeepInRoutine = true});
+
+  final bool shouldKeepInRoutine;
 }
 
 @JsonEnum()

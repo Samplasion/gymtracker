@@ -149,10 +149,7 @@ class Exercise extends WorkoutExercisable {
           for (final set in sets)
             set.copyWith(
               done: false,
-              reps:
-                  [SetKind.failure, SetKind.failureStripping].contains(set.kind)
-                      ? 0
-                      : set.reps,
+              reps: set.kind.shouldKeepInRoutine ? set.reps : 0,
             ),
         ]),
         // If we're redoing a previous workout,

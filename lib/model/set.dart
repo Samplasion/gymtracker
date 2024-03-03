@@ -121,4 +121,37 @@ class ExSet {
   factory ExSet.fromJson(Map<String, dynamic> json) => _$ExSetFromJson(json);
 
   Map<String, dynamic> toJson() => _$ExSetToJson(this);
+
+  /// Calculates the one-rep max for this set
+  ///
+  /// The one-rep max is calculated using the Brzycki formula:
+  /// `1rm = w / (1.0278 - (0.0278 * r))`.
+  double? get oneRepMax {
+    if (parameters != SetParameters.repsWeight) {
+      throw SetParametersError(
+        parameters,
+        expectedParameters: SetParameters.repsWeight,
+      );
+    }
+    if (reps == null || weight == null) {
+      throw Exception("Reps and weight must be defined to calculate 1RM");
+    }
+    if (reps == 0) return null;
+    return weight! / (1.0278 - (0.0278 * reps!));
+  }
+}
+
+class SetParametersError extends Error {
+  final SetParameters parameters;
+  final SetParameters expectedParameters;
+
+  SetParametersError(
+    this.parameters, {
+    required this.expectedParameters,
+  });
+
+  @override
+  String toString() {
+    return "Invalid parameters for set: $parameters instead of $expectedParameters";
+  }
 }

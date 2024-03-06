@@ -129,6 +129,7 @@ class _WorkoutViewState extends State<WorkoutView> {
                               children: [
                                 if (getStopwatch().isStopped())
                                   TextButton.icon(
+                                    key: const Key("start"),
                                     icon: const Icon(Icons.play_arrow_rounded),
                                     label: Text(
                                         "ongoingWorkout.stopwatch.start".t),
@@ -138,6 +139,7 @@ class _WorkoutViewState extends State<WorkoutView> {
                                   )
                                 else
                                   TextButton.icon(
+                                    key: const Key("pause"),
                                     icon: const Icon(Icons.pause_rounded),
                                     label: Text(
                                         "ongoingWorkout.stopwatch.pause".t),
@@ -149,6 +151,7 @@ class _WorkoutViewState extends State<WorkoutView> {
                                     getStopwatch().currentDuration.inSeconds >
                                         0)
                                   TextButton.icon(
+                                    key: const Key("reset"),
                                     icon: const Icon(Icons.replay_rounded),
                                     label: Text(
                                         "ongoingWorkout.stopwatch.reset".t),
@@ -184,17 +187,6 @@ class _WorkoutViewState extends State<WorkoutView> {
             itemBuilder: (context) => <PopupMenuEntry<dynamic>>[
               PopupMenuItem(
                 child: Text(
-                  "ongoingWorkout.actions.changeWeightUnit".t,
-                ),
-                onTap: () {
-                  controller.weightUnit(Weights.values[
-                      (controller.weightUnit().index + 1) %
-                          Weights.values.length]);
-                },
-              ),
-              const PopupMenuDivider(),
-              PopupMenuItem(
-                child: Text(
                   "ongoingWorkout.actions.finish".t,
                 ),
                 onTap: () {
@@ -218,6 +210,17 @@ class _WorkoutViewState extends State<WorkoutView> {
                       });
                     });
                   });
+                },
+              ),
+              const PopupMenuDivider(),
+              PopupMenuItem(
+                child: Text(
+                  "ongoingWorkout.actions.changeWeightUnit".t,
+                ),
+                onTap: () {
+                  controller.weightUnit(Weights.values[
+                      (controller.weightUnit().index + 1) %
+                          Weights.values.length]);
                 },
               ),
             ],

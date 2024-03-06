@@ -74,18 +74,6 @@ class _WorkoutEditorState extends State<WorkoutEditor> {
             itemBuilder: (context) => <PopupMenuEntry<dynamic>>[
               PopupMenuItem(
                 child: Text(
-                  "historyEditor.actions.changeWeightUnit".t,
-                ),
-                onTap: () {
-                  setState(() {
-                    workout.weightUnit = Weights.values[
-                        (workout.weightUnit.index + 1) % Weights.values.length];
-                  });
-                },
-              ),
-              const PopupMenuDivider(),
-              PopupMenuItem(
-                child: Text(
                   "historyEditor.actions.finish".t,
                 ),
                 onTap: () {
@@ -94,6 +82,18 @@ class _WorkoutEditorState extends State<WorkoutEditor> {
                       context,
                       workout,
                     );
+                  });
+                },
+              ),
+              const PopupMenuDivider(),
+              PopupMenuItem(
+                child: Text(
+                  "historyEditor.actions.changeWeightUnit".t,
+                ),
+                onTap: () {
+                  setState(() {
+                    workout.weightUnit = Weights.values[
+                        (workout.weightUnit.index + 1) % Weights.values.length];
                   });
                 },
               ),

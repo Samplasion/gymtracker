@@ -137,6 +137,8 @@ class _HistoryViewState extends State<HistoryView> {
                         }
 
                         return SafeArea(
+                          top: false,
+                          bottom: false,
                           child: HistoryWorkout(
                             workout: thatDate[index],
                             isSelected:

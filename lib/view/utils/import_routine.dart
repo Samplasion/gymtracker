@@ -30,6 +30,7 @@ class _ImportRoutineModalState extends State<ImportRoutineModal>
       colorScheme.surfaceTint,
       4,
     );
+    final safeArea = MediaQuery.paddingOf(context);
     return BottomSheet(
       animationController: controller,
       onClosing: () {},
@@ -51,8 +52,8 @@ class _ImportRoutineModalState extends State<ImportRoutineModal>
                   ),
                 ),
               SliverPadding(
-                padding: const EdgeInsets.all(16)
-                    .copyWith(bottom: kBottomNavigationBarHeight + 20),
+                padding: const EdgeInsets.all(16).copyWith(
+                    bottom: kBottomNavigationBarHeight + safeArea.bottom + 20),
                 sliver: DecoratedSliver(
                   decoration: BoxDecoration(
                     border: Border.all(
@@ -89,7 +90,7 @@ class _ImportRoutineModalState extends State<ImportRoutineModal>
           extendBody: true,
           bottomNavigationBar: Container(
             alignment: Alignment.center,
-            height: kBottomNavigationBarHeight + 16,
+            height: kBottomNavigationBarHeight + safeArea.bottom + 16,
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: [
@@ -98,9 +99,9 @@ class _ImportRoutineModalState extends State<ImportRoutineModal>
                 ],
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
-                stops: const [
+                stops: [
                   0,
-                  16 / (16 + kBottomNavigationBarHeight),
+                  16 / (16 + kBottomNavigationBarHeight + safeArea.bottom),
                 ],
               ),
             ),

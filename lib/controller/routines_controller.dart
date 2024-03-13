@@ -7,6 +7,7 @@ import 'package:get/get.dart';
 import 'package:gymtracker/controller/countdown_controller.dart';
 import 'package:gymtracker/controller/history_controller.dart';
 import 'package:gymtracker/controller/serviceable_controller.dart';
+import 'package:gymtracker/controller/settings_controller.dart';
 import 'package:gymtracker/controller/workout_controller.dart';
 import 'package:gymtracker/model/exercisable.dart';
 import 'package:gymtracker/model/exercise.dart';
@@ -74,6 +75,7 @@ class RoutinesController extends GetxController
       name: name,
       exercises: exercises,
       infobox: infobox,
+      weightUnit: settingsController.weightUnit.value!,
     );
     service.setRoutine(routine);
 
@@ -185,6 +187,7 @@ class RoutinesController extends GetxController
       ..infobox(workout.infobox)
       ..isContinuation(continuation)
       ..continuesID(continuation ? workout.id : null)
+      ..weightUnit(clone.weightUnit)
       ..save();
   }
 
@@ -200,11 +203,11 @@ class RoutinesController extends GetxController
     required String? infobox,
   }) {
     return Workout(
-      name: name,
-      exercises: exercises,
-      id: id,
-      infobox: infobox,
-    );
+        name: name,
+        exercises: exercises,
+        id: id,
+        infobox: infobox,
+        weightUnit: settingsController.weightUnit.value!);
   }
 
   void editRoutine(Workout newRoutine) {

@@ -6,6 +6,7 @@ import 'package:gymtracker/data/weights.dart';
 import 'package:gymtracker/model/exercisable.dart';
 import 'package:gymtracker/model/set.dart';
 import 'package:gymtracker/model/superset.dart';
+import 'package:gymtracker/utils/utils.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:uuid/uuid.dart';
 
@@ -178,7 +179,15 @@ class WorkoutDifference {
         if (newSet.kind.shouldKeepInRoutine) {
           isDifferent |= oldSet.reps != newSet.reps;
         }
-        isDifferent |= oldSet.weight != newSet.weight;
+        isDifferent |= !doubleEquality(
+          Weights.convert(
+            value: oldSet.weight ?? 0,
+            from: oldWorkout.weightUnit,
+            to: newWorkout.weightUnit,
+          ),
+          newSet.weight ?? 0,
+          epsilon: 0.001,
+        );
         isDifferent |= oldSet.time != newSet.time;
         isDifferent |= oldSet.kind != newSet.kind;
       }

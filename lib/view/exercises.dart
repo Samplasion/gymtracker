@@ -8,6 +8,7 @@ import 'package:get/get.dart';
 import 'package:gymtracker/controller/history_controller.dart';
 import 'package:gymtracker/controller/history_controller.dart' as history;
 import 'package:gymtracker/controller/routines_controller.dart';
+import 'package:gymtracker/controller/settings_controller.dart';
 import 'package:gymtracker/data/weights.dart';
 import 'package:gymtracker/model/exercisable.dart';
 import 'package:gymtracker/model/exercise.dart';
@@ -430,9 +431,19 @@ class _RoutineHistoryDataState extends State<RoutineHistoryData> {
   }
 
   double _getY(Workout wo) {
+    print((
+      "_getY",
+      wo.liftedWeight,
+      wo.weightUnit,
+      settingsController.weightUnit.value!
+    ));
     switch (type) {
       case _RoutineHistoryDataType.volume:
-        return wo.liftedWeight;
+        return Weights.convert(
+          value: wo.liftedWeight,
+          from: wo.weightUnit,
+          to: settingsController.weightUnit.value!,
+        );
       case _RoutineHistoryDataType.reps:
         return wo.reps.toDouble();
       case _RoutineHistoryDataType.duration:
@@ -447,6 +458,8 @@ class _RoutineHistoryDataState extends State<RoutineHistoryData> {
     TextAlign? textAlign,
     required Weights weightUnit,
   }) {
+    print(
+        ("buildSpan", value, weightUnit, settingsController.weightUnit.value!));
     return TimerView.buildTimeString(
       context,
       Duration(seconds: value.toInt()),
@@ -454,11 +467,13 @@ class _RoutineHistoryDataState extends State<RoutineHistoryData> {
         TextSpan buildType() {
           switch (type) {
             case _RoutineHistoryDataType.volume:
-              // TODO: Convert lbs to kg and then everything to the user-set unit to display in the chart
               return TextSpan(
                   text: "exerciseList.fields.weight".trParams({
-                "weight": stringifyDouble(value),
-                "unit": "units.${weightUnit.name}".t,
+                "weight": stringifyDouble(Weights.convert(
+                    value: value,
+                    from: weightUnit,
+                    to: settingsController.weightUnit.value!)),
+                "unit": "units.${settingsController.weightUnit.value!.name}".t,
               }));
             case _RoutineHistoryDataType.reps:
               return TextSpan(
@@ -505,7 +520,8 @@ class _RoutineHistoryDataState extends State<RoutineHistoryData> {
               .textTheme
               .bodyLarge!
               .copyWith(fontWeight: FontWeight.bold),
-          weightUnit: widget.routine.weightUnit,
+          // The value was converted by _getY already
+          weightUnit: settingsController.weightUnit.value!,
         ),
         AspectRatio(
           aspectRatio: 1.7,
@@ -682,7 +698,8 @@ class _RoutineHistoryDataState extends State<RoutineHistoryData> {
             Theme.of(context).textTheme.labelSmall!,
             showDate: false,
             textAlign: TextAlign.end,
-            weightUnit: widget.routine.weightUnit,
+            // The value was already converted by the _getY call
+            weightUnit: settingsController.weightUnit.value!,
           ),
         );
   }
@@ -886,8 +903,11 @@ class ExerciseSetView extends StatelessWidget {
         if ([SetParameters.repsWeight, SetParameters.timeWeight]
             .contains(set.parameters))
           Text("exerciseList.fields.weight".trParams({
-            "weight": stringifyDouble(set.weight!),
-            "unit": "units.${weightUnit.name}".t,
+            "weight": stringifyDouble(Weights.convert(
+                value: set.weight!,
+                from: weightUnit,
+                to: settingsController.weightUnit.value!)),
+            "unit": "units.${settingsController.weightUnit.value!.name}".t,
           })),
         if ([
           SetParameters.timeWeight,

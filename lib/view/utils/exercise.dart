@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gymtracker/controller/settings_controller.dart';
 import 'package:gymtracker/data/exercises.dart';
 import 'package:gymtracker/data/weights.dart';
 import 'package:gymtracker/model/exercisable.dart';
@@ -129,8 +130,11 @@ class ExerciseListTile extends StatelessWidget {
   }
 
   String _buildWeight(double weight) => "exerciseList.fields.weight".tParams({
-        "weight": stringifyDouble(weight),
-        "unit": "units.${weightUnit!.name}".t,
+        "weight": stringifyDouble(Weights.convert(
+            value: weight,
+            from: weightUnit!,
+            to: settingsController.weightUnit.value!)),
+        "unit": "units.${settingsController.weightUnit.value!.name}".t,
       });
   String _buildReps(int? reps) => "exerciseList.fields.reps".plural(reps ?? 0);
   String _buildTime(BuildContext context, Duration time) =>

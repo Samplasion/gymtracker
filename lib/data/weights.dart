@@ -18,6 +18,22 @@ enum Weights {
         return "${stringifyDouble(weight)} lb";
     }
   }
+
+  static double convert({
+    required double value,
+    required Weights from,
+    required Weights to,
+  }) {
+    if (from == to) return value;
+    if (from == kg && to == lb) {
+      return value * 2.20462262185;
+    }
+    if (from == lb && to == kg) {
+      return value / 2.20462262185;
+    }
+    // Unreachable
+    return -1;
+  }
 }
 
 enum Bars {

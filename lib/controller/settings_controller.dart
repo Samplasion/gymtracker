@@ -14,6 +14,8 @@ import 'package:share_plus/share_plus.dart';
 
 Color defaultColor = Color(Colors.blue.value);
 
+SettingsController get settingsController => Get.find<SettingsController>();
+
 class SettingsController extends GetxController with ServiceableController {
   RxBool usesDynamicColor = false.obs;
   Rx<Color> color = defaultColor.obs;

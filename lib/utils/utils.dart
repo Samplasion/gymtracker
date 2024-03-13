@@ -2,7 +2,11 @@ import 'package:dynamic_color/dynamic_color.dart';
 import 'package:flutter/material.dart';
 
 bool doubleIsActuallyInt(double double, [double epsilon = 0.001]) {
-  return (double - double.floor()).abs() < epsilon;
+  return doubleEquality(double, double.floorToDouble(), epsilon: epsilon);
+}
+
+bool doubleEquality(double a, double b, {required double epsilon}) {
+  return (b - a).abs() < epsilon;
 }
 
 String stringifyDouble(double double, [double epsilon = 0.001]) {

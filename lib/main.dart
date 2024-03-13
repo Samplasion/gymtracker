@@ -1,3 +1,4 @@
+import 'package:device_sim/device_sim.dart';
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart' hide Localizations;
@@ -67,81 +68,85 @@ class MainApp extends StatelessWidget {
     final settings = Get.put(SettingsController());
     final localizations = Get.put(this.localizations);
 
-    return DynamicColorBuilder(builder: (light, dark) {
-      return AnimatedBuilder(
-          animation: settings.service,
-          builder: (context, _) {
-            return Container(
-              child: () {
-                final seedColor = settings.color();
-                (seedColor, settings.usesDynamicColor()).printInfo();
-                final lightScheme =
-                    (light != null && settings.usesDynamicColor())
-                        ? light.harmonized()
-                        : ColorScheme.fromSeed(
-                            seedColor: seedColor,
-                            brightness: Brightness.light,
-                          );
-                final darkScheme = (dark != null && settings.usesDynamicColor())
-                    ? dark.harmonized()
-                    : ColorScheme.fromSeed(
-                        seedColor: seedColor,
-                        brightness: Brightness.dark,
-                      ).harmonized();
-                return AnimatedBuilder(
-                  animation: localizations,
-                  builder: (context, _) {
-                    return GetMaterialApp(
-                      title: () {
-                        if (kDebugMode) {
-                          return "${"appName".t} (Debug)";
-                        } else {
-                          return "appName".t;
-                        }
-                      }(),
-                      translations: localizations,
-                      locale: () {
-                        printInfo(info: "${settings.locale.value}");
-                        return settings.locale.value;
-                      }(),
-                      supportedLocales: GTLocalizations.supportedLocales,
-                      fallbackLocale: const Locale('en'),
-                      localizationsDelegates: const [
-                        GlobalMaterialLocalizations.delegate,
-                        GlobalWidgetsLocalizations.delegate,
-                        GlobalCupertinoLocalizations.delegate,
-                      ],
-                      theme: ThemeData(
-                        useMaterial3: true,
-                        brightness: Brightness.light,
-                        colorScheme: lightScheme,
-                      ),
-                      darkTheme: ThemeData(
-                        useMaterial3: true,
-                        brightness: Brightness.dark,
-                        colorScheme: darkScheme,
-                      ),
-                      home: const _Loader(),
-                      debugShowCheckedModeBanner: false,
-                      builder: (context, child) =>
-                          AnnotatedRegion<SystemUiOverlayStyle>(
-                        value: SystemUiOverlayStyle(
-                          systemNavigationBarColor:
-                              Theme.of(context).colorScheme.background,
-                          systemNavigationBarIconBrightness: Theme.of(context)
-                              .colorScheme
-                              .background
-                              .estimateForegroundBrightness(),
+    return DeviceSim(
+      builder: (context) => DynamicColorBuilder(builder: (light, dark) {
+        return AnimatedBuilder(
+            animation: settings.service,
+            builder: (context, _) {
+              return Container(
+                child: () {
+                  final seedColor = settings.color();
+                  (seedColor, settings.usesDynamicColor()).printInfo();
+                  final lightScheme =
+                      (light != null && settings.usesDynamicColor())
+                          ? light.harmonized()
+                          : ColorScheme.fromSeed(
+                              seedColor: seedColor,
+                              brightness: Brightness.light,
+                            );
+                  final darkScheme =
+                      (dark != null && settings.usesDynamicColor())
+                          ? dark.harmonized()
+                          : ColorScheme.fromSeed(
+                              seedColor: seedColor,
+                              brightness: Brightness.dark,
+                            ).harmonized();
+                  return AnimatedBuilder(
+                    animation: localizations,
+                    builder: (context, _) {
+                      return GetMaterialApp(
+                        useInheritedMediaQuery: true,
+                        title: () {
+                          if (kDebugMode) {
+                            return "${"appName".t} (Debug)";
+                          } else {
+                            return "appName".t;
+                          }
+                        }(),
+                        translations: localizations,
+                        locale: () {
+                          printInfo(info: "${settings.locale.value}");
+                          return settings.locale.value;
+                        }(),
+                        supportedLocales: GTLocalizations.supportedLocales,
+                        fallbackLocale: const Locale('en'),
+                        localizationsDelegates: const [
+                          GlobalMaterialLocalizations.delegate,
+                          GlobalWidgetsLocalizations.delegate,
+                          GlobalCupertinoLocalizations.delegate,
+                        ],
+                        theme: ThemeData(
+                          useMaterial3: true,
+                          brightness: Brightness.light,
+                          colorScheme: lightScheme,
                         ),
-                        child: child ?? Container(),
-                      ),
-                    );
-                  },
-                );
-              }(),
-            );
-          });
-    });
+                        darkTheme: ThemeData(
+                          useMaterial3: true,
+                          brightness: Brightness.dark,
+                          colorScheme: darkScheme,
+                        ),
+                        home: const _Loader(),
+                        debugShowCheckedModeBanner: false,
+                        builder: (context, child) =>
+                            AnnotatedRegion<SystemUiOverlayStyle>(
+                          value: SystemUiOverlayStyle(
+                            systemNavigationBarColor:
+                                Theme.of(context).colorScheme.background,
+                            systemNavigationBarIconBrightness: Theme.of(context)
+                                .colorScheme
+                                .background
+                                .estimateForegroundBrightness(),
+                          ),
+                          child: child ?? Container(),
+                        ),
+                      );
+                    },
+                  );
+                }(),
+              );
+            });
+      }),
+    );
   }
 }
 

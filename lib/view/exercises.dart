@@ -232,144 +232,147 @@ class _ExercisesViewState extends State<ExercisesView> {
           ),
         ],
       ),
-      body: CustomScrollView(
-        slivers: [
-          if (!workout.isConcrete &&
-              controller.getChildren(workout).length >= 2)
+      body: SafeArea(
+        child: CustomScrollView(
+          slivers: [
+            if (!workout.isConcrete &&
+                controller.getChildren(workout).length >= 2)
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: RoutineHistoryData(routine: workout),
+                ),
+              ),
             SliverToBoxAdapter(
               child: Padding(
                 padding: const EdgeInsets.all(16),
-                child: RoutineHistoryData(routine: workout),
-              ),
-            ),
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: FilledButton(
-                onPressed: () {
-                  controller.startRoutine(context, workout);
-                },
-                child: Text(() {
-                  if (workout.isConcrete) {
-                    return "workouts.actions.start".t;
-                  } else {
-                    return "routines.actions.start".t;
-                  }
-                }()),
-              ),
-            ),
-          ),
-          if (controller.isWorkoutContinuable(workout)) ...[
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.all(16).copyWith(top: 0),
-                child: FilledButton.tonal(
+                child: FilledButton(
                   onPressed: () {
-                    controller.continueWorkout(context, workout);
+                    controller.startRoutine(context, workout);
                   },
-                  child: Text("workouts.actions.continue".t),
+                  child: Text(() {
+                    if (workout.isConcrete) {
+                      return "workouts.actions.start".t;
+                    } else {
+                      return "routines.actions.start".t;
+                    }
+                  }()),
                 ),
               ),
             ),
-          ],
-          if (workout.shouldShowInfobox)
-            SliverToBoxAdapter(
-              child: Infobox(
-                text: workout.infobox!,
-              ),
-            ),
-          SliverList(
-            delegate: SliverChildBuilderDelegate(
-              (context, index) {
-                final exercise = workout.exercises[index];
-                return Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 8),
-                  child: ExerciseDataView(
-                    exercise: exercise,
-                    workout: workout,
-                    index: index,
-                    isInSuperset: false,
-                    weightUnit: workout.weightUnit,
+            if (controller.isWorkoutContinuable(workout)) ...[
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.all(16).copyWith(top: 0),
+                  child: FilledButton.tonal(
+                    onPressed: () {
+                      controller.continueWorkout(context, workout);
+                    },
+                    child: Text("workouts.actions.continue".t),
                   ),
-                );
-              },
-              childCount: workout.exercises.length,
-            ),
-          ),
-          if (kDebugMode) ...[
-            SliverToBoxAdapter(
-              child: Text("own id: ${workout.id}", textAlign: TextAlign.center),
-            ),
-            SliverToBoxAdapter(
-              child: Text("parent: ${workout.parentID}",
-                  textAlign: TextAlign.center),
-            ),
-            SliverToBoxAdapter(
-              child: Text(
-                workout.toJson().toString(),
-                style: const TextStyle(
-                  fontFamily: "monospace",
-                  fontFamilyFallback: <String>["Menlo", "Courier"],
                 ),
               ),
-            ),
-          ],
-          if (workout.isContinuation && kDebugMode) ...[
-            SliverToBoxAdapter(
-              child: ListTile(
-                title: const Text("See original workout"),
-                onTap: () {
-                  Go.to(
-                    () => ExercisesView(
-                      workout: workout.originalWorkoutForContinuation!,
-                    ),
-                  );
-                },
+            ],
+            if (workout.shouldShowInfobox)
+              SliverToBoxAdapter(
+                child: Infobox(
+                  text: workout.infobox!,
+                ),
               ),
-            ),
-          ],
-          if (workout.isConcrete && workout.hasContinuation) ...[
-            const SliverToBoxAdapter(child: Divider()),
-            SliverToBoxAdapter(
-              child: ListTile(
-                leading: const CircleAvatar(child: Icon(Icons.add)),
-                title: Text("exercise.continuation.label".t),
-              ),
-            ),
             SliverList(
               delegate: SliverChildBuilderDelegate(
                 (context, index) {
-                  final exercise = workout.continuation!.exercises[index];
+                  final exercise = workout.exercises[index];
                   return Padding(
                     padding: const EdgeInsets.symmetric(vertical: 8),
                     child: ExerciseDataView(
                       exercise: exercise,
-                      workout: workout.continuation!,
+                      workout: workout,
                       index: index,
                       isInSuperset: false,
                       weightUnit: workout.weightUnit,
                     ),
                   );
                 },
-                childCount: workout.continuation!.exercises.length,
+                childCount: workout.exercises.length,
               ),
             ),
-            if (kDebugMode)
+            if (kDebugMode) ...[
+              SliverToBoxAdapter(
+                child:
+                    Text("own id: ${workout.id}", textAlign: TextAlign.center),
+              ),
+              SliverToBoxAdapter(
+                child: Text("parent: ${workout.parentID}",
+                    textAlign: TextAlign.center),
+              ),
               SliverToBoxAdapter(
                 child: Text(
-                  "cont id: ${workout.continuation!.id}",
-                  textAlign: TextAlign.center,
+                  workout.toJson().toString(),
+                  style: const TextStyle(
+                    fontFamily: "monospace",
+                    fontFamilyFallback: <String>["Menlo", "Courier"],
+                  ),
                 ),
               ),
-            if (kDebugMode)
+            ],
+            if (workout.isContinuation && kDebugMode) ...[
               SliverToBoxAdapter(
-                child: Text(
-                  "cont parent: ${workout.continuation!.parentID}",
-                  textAlign: TextAlign.center,
+                child: ListTile(
+                  title: const Text("See original workout"),
+                  onTap: () {
+                    Go.to(
+                      () => ExercisesView(
+                        workout: workout.originalWorkoutForContinuation!,
+                      ),
+                    );
+                  },
                 ),
               ),
+            ],
+            if (workout.isConcrete && workout.hasContinuation) ...[
+              const SliverToBoxAdapter(child: Divider()),
+              SliverToBoxAdapter(
+                child: ListTile(
+                  leading: const CircleAvatar(child: Icon(Icons.add)),
+                  title: Text("exercise.continuation.label".t),
+                ),
+              ),
+              SliverList(
+                delegate: SliverChildBuilderDelegate(
+                  (context, index) {
+                    final exercise = workout.continuation!.exercises[index];
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 8),
+                      child: ExerciseDataView(
+                        exercise: exercise,
+                        workout: workout.continuation!,
+                        index: index,
+                        isInSuperset: false,
+                        weightUnit: workout.weightUnit,
+                      ),
+                    );
+                  },
+                  childCount: workout.continuation!.exercises.length,
+                ),
+              ),
+              if (kDebugMode)
+                SliverToBoxAdapter(
+                  child: Text(
+                    "cont id: ${workout.continuation!.id}",
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              if (kDebugMode)
+                SliverToBoxAdapter(
+                  child: Text(
+                    "cont parent: ${workout.continuation!.parentID}",
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+            ],
           ],
-        ],
+        ),
       ),
     );
   }

@@ -136,21 +136,23 @@ class _HistoryViewState extends State<HistoryView> {
                           });
                         }
 
-                        return HistoryWorkout(
-                          workout: thatDate[index],
-                          isSelected:
-                              selectedEntries.contains(thatDate[index].id),
-                          onTap: () {
-                            if (selectedEntries.isEmpty) {
-                              Go.to(() =>
-                                  ExercisesView(workout: thatDate[index]));
-                            } else {
+                        return SafeArea(
+                          child: HistoryWorkout(
+                            workout: thatDate[index],
+                            isSelected:
+                                selectedEntries.contains(thatDate[index].id),
+                            onTap: () {
+                              if (selectedEntries.isEmpty) {
+                                Go.to(() =>
+                                    ExercisesView(workout: thatDate[index]));
+                              } else {
+                                _toggle();
+                              }
+                            },
+                            onLongPress: () {
                               _toggle();
-                            }
-                          },
-                          onLongPress: () {
-                            _toggle();
-                          },
+                            },
+                          ),
                         );
                       },
                     ),

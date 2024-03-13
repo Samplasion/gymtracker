@@ -143,81 +143,84 @@ class OngoingWorkoutBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isPhone = context.width < Breakpoints.xs;
-    return Card(
-      elevation: 1,
-      margin: const EdgeInsets.fromLTRB(8, 0, 8, 8),
-      shape: RoundedRectangleBorder(
-        // borderRadius: BorderRadius.vertical(
-        //   top: Radius.circular(13),
-        // ),
-        borderRadius: BorderRadius.circular(13),
-      ),
-      child: Container(
-        constraints: const BoxConstraints(minHeight: 64),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        child: Center(
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Expanded(
-                child: Obx(
-                  () => TimerView(
-                    startingTime: Get.find<WorkoutController>().time.value,
-                    builder: (_, time) => time,
-                  ),
-                ),
-              ),
-              const SizedBox(width: 8),
-              Crossfade(
-                firstChild: TextButton.icon(
-                  onPressed: resumeWorkout,
-                  icon: const Icon(Icons.play_arrow_rounded),
-                  clipBehavior: Clip.hardEdge,
-                  label: Text(
-                    "ongoingWorkout.actions.short.resume".t,
-                    overflow: TextOverflow.clip,
-                    maxLines: 1,
-                  ),
-                ),
-                secondChild: IconButton(
-                  onPressed: resumeWorkout,
-                  icon: Icon(
-                    Icons.play_arrow_rounded,
-                    color: Theme.of(context).colorScheme.primary,
-                  ),
-                ),
-                showSecond: isPhone,
-              ),
-              const SizedBox(width: 8),
-              ClipRect(
-                clipBehavior: Clip.hardEdge,
-                child: Crossfade(
-                  firstChild: TextButton.icon(
-                    onPressed: () => cancelWorkout(context),
-                    icon: Icon(
-                      Icons.close_rounded,
-                      color: Theme.of(context).colorScheme.error,
+    return SafeArea(
+      bottom: false,
+      child: Card(
+        elevation: 1,
+        margin: const EdgeInsets.fromLTRB(8, 0, 8, 8),
+        shape: RoundedRectangleBorder(
+          // borderRadius: BorderRadius.vertical(
+          //   top: Radius.circular(13),
+          // ),
+          borderRadius: BorderRadius.circular(13),
+        ),
+        child: Container(
+          constraints: const BoxConstraints(minHeight: 64),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          child: Center(
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Expanded(
+                  child: Obx(
+                    () => TimerView(
+                      startingTime: Get.find<WorkoutController>().time.value,
+                      builder: (_, time) => time,
                     ),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Crossfade(
+                  firstChild: TextButton.icon(
+                    onPressed: resumeWorkout,
+                    icon: const Icon(Icons.play_arrow_rounded),
                     clipBehavior: Clip.hardEdge,
                     label: Text(
-                      "ongoingWorkout.actions.short.cancel".t,
-                      style:
-                          TextStyle(color: Theme.of(context).colorScheme.error),
+                      "ongoingWorkout.actions.short.resume".t,
                       overflow: TextOverflow.clip,
                       maxLines: 1,
                     ),
                   ),
                   secondChild: IconButton(
-                    onPressed: () => cancelWorkout(context),
+                    onPressed: resumeWorkout,
                     icon: Icon(
-                      Icons.close_rounded,
-                      color: Theme.of(context).colorScheme.error,
+                      Icons.play_arrow_rounded,
+                      color: Theme.of(context).colorScheme.primary,
                     ),
                   ),
                   showSecond: isPhone,
                 ),
-              ),
-            ],
+                const SizedBox(width: 8),
+                ClipRect(
+                  clipBehavior: Clip.hardEdge,
+                  child: Crossfade(
+                    firstChild: TextButton.icon(
+                      onPressed: () => cancelWorkout(context),
+                      icon: Icon(
+                        Icons.close_rounded,
+                        color: Theme.of(context).colorScheme.error,
+                      ),
+                      clipBehavior: Clip.hardEdge,
+                      label: Text(
+                        "ongoingWorkout.actions.short.cancel".t,
+                        style: TextStyle(
+                            color: Theme.of(context).colorScheme.error),
+                        overflow: TextOverflow.clip,
+                        maxLines: 1,
+                      ),
+                    ),
+                    secondChild: IconButton(
+                      onPressed: () => cancelWorkout(context),
+                      icon: Icon(
+                        Icons.close_rounded,
+                        color: Theme.of(context).colorScheme.error,
+                      ),
+                    ),
+                    showSecond: isPhone,
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),

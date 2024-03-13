@@ -154,103 +154,104 @@ class _ExerciseInfoViewState extends State<ExerciseInfoView> {
       appBar: AppBar(title: Text("exercise.info.title".t)),
       body: ListTileTheme(
         contentPadding: EdgeInsets.zero,
-        child: CustomScrollView(
-          slivers: [
-            if (exercise.isCustom)
-              SliverPadding(
-                padding: const EdgeInsets.all(16).copyWith(bottom: 8),
-                sliver: const SliverToBoxAdapter(
-                  child: Row(
-                    children: [CustomExerciseBadge()],
-                  ),
-                ),
-              ),
-            SliverPadding(
-              padding: const EdgeInsets.all(16)
-                  .copyWith(top: exercise.isCustom ? 0 : 16),
-              sliver: SliverToBoxAdapter(
-                child: Text(
-                  exercise.name,
-                  style: Theme.of(context).textTheme.displayMedium,
-                ),
-              ),
-            ),
-            SliverList.builder(
-              itemCount: history.length,
-              itemBuilder: (context, index) {
-                return Card(
-                  margin:
-                      const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-                  clipBehavior: Clip.antiAlias,
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 8)
-                        .copyWith(bottom: 16),
-                    child: Column(
-                      children: [
-                        ExerciseDataView(
-                          exercise: history[index].$1,
-                          index: history[index].$2,
-                          workout: history[index].$3,
-                          isInSuperset: false,
-                          weightUnit: history[index].$3.weightUnit,
-                        ),
-                        const Divider(),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 16),
-                          child: Column(
-                            children: [
-                              ListTile(
-                                leading: CircleAvatar(
-                                  backgroundColor: Theme.of(context)
-                                      .colorScheme
-                                      .primaryContainer,
-                                  foregroundColor: Theme.of(context)
-                                      .colorScheme
-                                      .onPrimaryContainer,
-                                  child: Text(history[index]
-                                      .$3
-                                      .name
-                                      .characters
-                                      .first
-                                      .toUpperCase()),
-                                ),
-                                title: Text(history[index].$3.name),
-                                subtitle: Text(
-                                    DateFormat.yMd(context.locale.languageCode)
-                                        .add_Hm()
-                                        .format(
-                                            history[index].$3.startingDate ??
-                                                DateTime.now())),
-                              ),
-                            ],
-                          ),
-                        ),
-                        OutlinedButton(
-                          onPressed: () {
-                            Go.to(
-                              () => ExercisesView(workout: history[index].$3),
-                            );
-                          },
-                          child: Text("exercise.info.viewWorkout".t),
-                        )
-                      ],
+        child: SafeArea(
+          child: CustomScrollView(
+            slivers: [
+              if (exercise.isCustom)
+                SliverPadding(
+                  padding: const EdgeInsets.all(16).copyWith(bottom: 8),
+                  sliver: const SliverToBoxAdapter(
+                    child: Row(
+                      children: [CustomExerciseBadge()],
                     ),
                   ),
-                );
-              },
-            ),
-            if (history.isEmpty) ...[
-              SliverToBoxAdapter(
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Text("exercise.info.noHistory".t),
+                ),
+              SliverPadding(
+                padding: const EdgeInsets.all(16)
+                    .copyWith(top: exercise.isCustom ? 0 : 16),
+                sliver: SliverToBoxAdapter(
+                  child: Text(
+                    exercise.name,
+                    style: Theme.of(context).textTheme.displayMedium,
+                  ),
                 ),
               ),
+              SliverList.builder(
+                itemCount: history.length,
+                itemBuilder: (context, index) {
+                  return Card(
+                    margin:
+                        const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                    clipBehavior: Clip.antiAlias,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 8)
+                          .copyWith(bottom: 16),
+                      child: Column(
+                        children: [
+                          ExerciseDataView(
+                            exercise: history[index].$1,
+                            index: history[index].$2,
+                            workout: history[index].$3,
+                            isInSuperset: false,
+                            weightUnit: history[index].$3.weightUnit,
+                          ),
+                          const Divider(),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 16),
+                            child: Column(
+                              children: [
+                                ListTile(
+                                  leading: CircleAvatar(
+                                    backgroundColor: Theme.of(context)
+                                        .colorScheme
+                                        .primaryContainer,
+                                    foregroundColor: Theme.of(context)
+                                        .colorScheme
+                                        .onPrimaryContainer,
+                                    child: Text(history[index]
+                                        .$3
+                                        .name
+                                        .characters
+                                        .first
+                                        .toUpperCase()),
+                                  ),
+                                  title: Text(history[index].$3.name),
+                                  subtitle: Text(DateFormat.yMd(
+                                          context.locale.languageCode)
+                                      .add_Hm()
+                                      .format(history[index].$3.startingDate ??
+                                          DateTime.now())),
+                                ),
+                              ],
+                            ),
+                          ),
+                          OutlinedButton(
+                            onPressed: () {
+                              Go.to(
+                                () => ExercisesView(workout: history[index].$3),
+                              );
+                            },
+                            child: Text("exercise.info.viewWorkout".t),
+                          )
+                        ],
+                      ),
+                    ),
+                  );
+                },
+              ),
+              if (history.isEmpty) ...[
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Text("exercise.info.noHistory".t),
+                  ),
+                ),
+              ],
+              const SliverToBoxAdapter(
+                child: SizedBox(height: 8),
+              ),
             ],
-            const SliverToBoxAdapter(
-              child: SizedBox(height: 8),
-            ),
-          ],
+          ),
         ),
       ),
     );

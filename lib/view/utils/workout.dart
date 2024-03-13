@@ -368,7 +368,7 @@ class _WorkoutExerciseSetEditorState extends State<WorkoutExerciseSetEditor> {
         },
       );
   TextField get distanceField => TextField(
-        controller: weightController,
+        controller: distanceController,
         keyboardType: const TextInputType.numberWithOptions(
           decimal: true,
           signed: true,

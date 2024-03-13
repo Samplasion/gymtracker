@@ -155,15 +155,9 @@ class _WorkoutEditorState extends State<WorkoutEditor> {
                     final ex = await Go.to<List<Exercise>>(
                         () => const ExercisePicker(singlePick: true));
                     if (ex == null || ex.isEmpty) return;
-                    workout.exercises[i] = ex.first.copyWith(
-                      sets: ([
-                        for (final set in old.sets)
-                          ExSet.empty(
-                            kind: set.kind,
-                            parameters: ex.first.parameters,
-                          ),
-                      ]),
-                      restTime: old.restTime,
+                    workout.exercises[i] = Exercise.replaced(
+                      from: old,
+                      to: ex.first,
                     );
                     setState(() {});
                   });
@@ -320,15 +314,9 @@ class _WorkoutEditorState extends State<WorkoutEditor> {
                         () => const ExercisePicker(singlePick: true));
                     if (ex == null || ex.isEmpty) return;
                     (workout.exercises[i] as Superset).exercises[index] =
-                        ex.first.copyWith(
-                      sets: ([
-                        for (final set in old.sets)
-                          ExSet.empty(
-                            kind: set.kind,
-                            parameters: ex.first.parameters,
-                          ),
-                      ]),
-                      restTime: old.restTime,
+                        Exercise.replaced(
+                      from: old,
+                      to: ex.first,
                     );
                     setState(() {});
                   });

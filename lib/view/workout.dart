@@ -292,15 +292,9 @@ class _WorkoutViewState extends State<WorkoutView> {
                         final ex = await Go.to<List<Exercise>>(
                             () => const ExercisePicker(singlePick: true));
                         if (ex == null || ex.isEmpty) return;
-                        controller.exercises[i] = ex.first.copyWith(
-                          sets: ([
-                            for (final set in old.sets)
-                              ExSet.empty(
-                                kind: set.kind,
-                                parameters: ex.first.parameters,
-                              ),
-                          ]),
-                          restTime: old.restTime,
+                        controller.exercises[i] = Exercise.replaced(
+                          from: old,
+                          to: ex.first,
                         );
                         controller.exercises.refresh();
                         controller.save();
@@ -479,15 +473,9 @@ class _WorkoutViewState extends State<WorkoutView> {
                             () => const ExercisePicker(singlePick: true));
                         if (ex == null || ex.isEmpty) return;
                         (controller.exercises[i] as Superset).exercises[index] =
-                            ex.first.copyWith(
-                          sets: ([
-                            for (final set in old.sets)
-                              ExSet.empty(
-                                kind: set.kind,
-                                parameters: ex.first.parameters,
-                              ),
-                          ]),
-                          restTime: old.restTime,
+                            Exercise.replaced(
+                          from: old,
+                          to: ex.first,
                         );
                         controller.exercises.refresh();
                         controller.save();

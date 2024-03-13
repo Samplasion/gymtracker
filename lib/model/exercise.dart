@@ -160,6 +160,26 @@ class Exercise extends WorkoutExercisable {
         parentID: workout.isConcrete || standard ? parentID : id,
         id: const Uuid().v4(),
       );
+
+  static Exercise replaced({required Exercise from, required Exercise to}) {
+    return to.copyWith(
+      notes: from.notes,
+      restTime: from.restTime,
+      sets: to.parameters == from.parameters
+          ? [for (final set in from.sets) set.copyWith()]
+          : [
+              for (final set in from.sets)
+                ExSet(
+                  parameters: to.parameters,
+                  kind: set.kind,
+                  reps: 0,
+                  weight: 0,
+                  time: Duration.zero,
+                  distance: 0,
+                ),
+            ],
+    );
+  }
 }
 
 extension Display on Exercise {

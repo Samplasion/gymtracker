@@ -33,10 +33,12 @@ dependencies:
   intl: ^0.18.0
   json_annotation: ^4.8.0
   package_info_plus: ^3.1.2
+  protocol_handler: ^0.1.5
   share_plus: ^6.3.1
   timezone: ^0.9.2
   universal_platform: ^1.0.0+1
   uuid: ^3.0.7
+  wolt_modal_sheet: ^0.4.1
   yaml: ^3.1.1
 
 dev_dependencies:

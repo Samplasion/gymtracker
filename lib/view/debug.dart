@@ -5,11 +5,13 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:gymtracker/controller/debug_controller.dart';
 import 'package:gymtracker/controller/history_controller.dart';
+import 'package:gymtracker/controller/routines_controller.dart';
 import 'package:gymtracker/controller/stopwatch_controller.dart';
 import 'package:gymtracker/model/exercise.dart';
 import 'package:gymtracker/model/workout.dart';
 import 'package:gymtracker/service/database.dart';
 import 'package:gymtracker/utils/go.dart';
+import 'package:gymtracker/view/utils/import_routine.dart';
 import 'package:gymtracker/view/utils/timer.dart';
 import 'package:hive/hive.dart';
 import 'package:hive_ui/hive_ui.dart';
@@ -61,6 +63,23 @@ class DebugView extends StatelessWidget {
                   }
 
                   Go.snack("Fixed ${db.workoutHistory.length} workouts");
+                },
+              ),
+              ListTile(
+                title: const Text("Push workout import modal"),
+                onTap: () {
+                  showModalBottomSheet(
+                    context: context,
+                    isScrollControlled: true,
+                    backgroundColor: Colors.transparent,
+                    elevation: 0,
+                    constraints: BoxConstraints.loose(Size(
+                      MediaQuery.of(context).size.width,
+                      MediaQuery.of(context).size.height - kToolbarHeight,
+                    )),
+                    builder: (context) => ImportRoutineModal(
+                        workout: Get.find<RoutinesController>().workouts.first),
+                  );
                 },
               ),
               ListTile(

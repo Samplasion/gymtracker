@@ -107,6 +107,14 @@ workouts:
       button: Save as routine
       done: Successfully saved as routine
     continue: Continue this workout
+    share:
+      button: Share this routine
+      alert:
+        title: Link generated
+        body: A unique link has been generated. Click the button below to copy it, and send it to share the routine.
+        actions:
+          share: Copy
+          shared: The link has been copied.
   
 routines:
   title: Routines
@@ -528,3 +536,20 @@ historyEditor:
           empty: The duration must not be zero.
       infobox:
         label: Notes
+
+importRoutine:
+  title: Import routine
+  errors:
+    badJson:
+      title: Bad data
+      body: The link you followed is malformed and cannot be opened.
+    noJson:
+      title: No data
+      body: The link you followed is malformed and cannot be opened.
+  import:
+    label: Import
+    done: The routine has been imported.
+
+unknownUrl:
+  title: Unknown URL
+  text: You followed a URL that doesn't lead anywhere.

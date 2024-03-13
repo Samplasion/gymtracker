@@ -1,3 +1,6 @@
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:flutter/material.dart';
 
@@ -69,4 +72,11 @@ extension NumUtils on num {
     if (this > max) return max;
     return this;
   }
+}
+
+final Compressor = utf8.fuse(gzip.fuse(base64));
+
+extension StringCompression on String {
+  String get compressed => Compressor.encode(this);
+  String get uncompressed => Compressor.decode(this);
 }

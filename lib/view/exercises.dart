@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -13,6 +15,7 @@ import 'package:gymtracker/model/set.dart';
 import 'package:gymtracker/model/superset.dart';
 import 'package:gymtracker/model/workout.dart';
 import 'package:gymtracker/service/localizations.dart';
+import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/utils/sets.dart';
 import 'package:gymtracker/utils/utils.dart';
@@ -172,6 +175,19 @@ class _ExercisesViewState extends State<ExercisesView> {
                   },
                 ),
               ] else ...[
+                PopupMenuItem(
+                  child: Text("workouts.actions.share.button".t),
+                  onTap: () {
+                    final uri = Uri(
+                      scheme: "gymtracker",
+                      host: "routine",
+                      queryParameters: {
+                        "json": jsonEncode(workout.toJson()).compressed,
+                      },
+                    );
+                    controller.shareRoutine(uri);
+                  },
+                ),
                 PopupMenuItem(
                   child: Text("routines.actions.edit".t),
                   onTap: () {

@@ -4,6 +4,7 @@
 
 list(APPEND FLUTTER_PLUGIN_LIST
   dynamic_color
+  protocol_handler
   share_plus
   url_launcher_windows
 )

@@ -107,6 +107,14 @@ workouts:
       button: Salva come routine
       done: Allenamento salvato come routine
     continue: Continua quest'allenamento
+    share:
+      button: Condividi questa routine
+      alert:
+        title: Link generato
+        body: Un link univoco è stato generato. Tocca il pulsante per copiarlo, poi invia il link per condividere questa routine.
+        actions:
+          share: Copia
+          shared: Il link è stato copiato.
   
 routines:
   title: Routine
@@ -528,3 +536,20 @@ historyEditor:
           empty: La durata non dev'essere zero.
       infobox:
         label: Note
+
+importRoutine:
+  title: Importa routine
+  errors:
+    badJson:
+      title: Dati danneggiati
+      body: Il link che hai seguito è danneggiato e non può essere aperto.
+    noJson:
+      title: Dati mancanti
+      body: Il link che hai seguito è danneggiato e non può essere aperto.
+  import:
+    label: Importa
+    done: The routine has been imported.
+
+unknownUrl:
+  title: URL sconosciuto
+  text: Hai seguito un URL che non porta da nessuna parte.

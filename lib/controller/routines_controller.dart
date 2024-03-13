@@ -1,5 +1,8 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:gymtracker/controller/countdown_controller.dart';
 import 'package:gymtracker/controller/history_controller.dart';
@@ -11,23 +14,36 @@ import 'package:gymtracker/model/set.dart';
 import 'package:gymtracker/model/superset.dart';
 import 'package:gymtracker/model/workout.dart';
 import 'package:gymtracker/service/localizations.dart';
+import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/utils/utils.dart' as utils;
 import 'package:gymtracker/view/exercises.dart';
+import 'package:gymtracker/view/utils/import_routine.dart';
 import 'package:gymtracker/view/workout.dart';
+import 'package:protocol_handler/protocol_handler.dart';
+import 'package:wolt_modal_sheet/wolt_modal_sheet.dart';
 
-class RoutinesController extends GetxController with ServiceableController {
+class RoutinesController extends GetxController
+    with ServiceableController, ProtocolListener {
   RxList<Workout> workouts = <Workout>[].obs;
   RxBool hasOngoingWorkout = false.obs;
 
   @override
   onInit() {
     super.onInit();
+    protocolHandler.addListener(this);
+
     Get.put(HistoryController());
 
     if (service.hasOngoing) {
       Get.put(WorkoutController.fromSavedData(service.getOngoingData()!));
     }
+  }
+
+  @override
+  onClose() {
+    protocolHandler.removeListener(this);
+    super.onClose();
   }
 
   @override
@@ -279,5 +295,138 @@ class RoutinesController extends GetxController with ServiceableController {
           completes: null,
         );
     service.setRoutine(newRoutine);
+  }
+
+  @override
+  onProtocolUrlReceived(String url) {
+    final Uri parsed = Uri.parse(url);
+    print('Url received: $parsed');
+
+    switch (parsed.host) {
+      case "routine":
+        return onRoutineUrlReceived(parsed);
+      default:
+        return onUnknownUrlReceived(parsed);
+    }
+  }
+
+  void onRoutineUrlReceived(Uri parsed) {
+    if (!parsed.queryParameters.containsKey("json")) {
+      Go.dialog(
+        "importRoutine.errors.noJson.title".t,
+        "importRoutine.errors.noJson.body".t,
+      );
+      return;
+    }
+
+    late dynamic json;
+    try {
+      json = jsonDecode("${parsed.queryParameters['json']}".uncompressed);
+    } catch (e) {
+      printError(info: "$e");
+      Go.dialog(
+        "importRoutine.errors.badJson.title".t,
+        "importRoutine.errors.badJson.body".t,
+      );
+      return;
+    }
+
+    late Workout workout;
+    try {
+      workout = Workout.fromJson(json);
+    } catch (e) {
+      printError(info: "$e");
+      Go.dialog(
+        "importRoutine.errors.badWorkout.title".t,
+        "importRoutine.errors.badWorkout.body".t,
+      );
+      return;
+    }
+
+    showModalBottomSheet(
+      context: Get.context!,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      enableDrag: true,
+      showDragHandle: true,
+      elevation: 0,
+      constraints: BoxConstraints.loose(Size(
+        MediaQuery.of(Get.context!).size.width,
+        MediaQuery.of(Get.context!).size.height - kToolbarHeight / 3,
+      )),
+      builder: (context) => ImportRoutineModal(workout: workout),
+    );
+  }
+
+  void onUnknownUrlReceived(Uri parsed) {
+    showDialog(
+      context: Get.context!,
+      builder: (context) => AlertDialog(
+        title: Text("unknownUrl.title".t),
+        content: RichText(
+          text: TextSpan(
+            children: [
+              TextSpan(text: "unknownUrl.text".t),
+              const TextSpan(text: "\n\n"),
+              TextSpan(
+                text: parsed.toString(),
+                style: const TextStyle(
+                  fontFamily: "monospace",
+                  fontFamilyFallback: <String>["Menlo", "Courier"],
+                ),
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Get.back(),
+            child: Text(MaterialLocalizations.of(context).okButtonLabel),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void shareRoutine(Uri uri) {
+    showDialog(
+      context: Get.context!,
+      builder: (context) => AlertDialog(
+        title: Text("workouts.actions.share.alert.title".t),
+        scrollable: true,
+        content: RichText(
+          text: TextSpan(
+            children: [
+              // TODO: QR code.
+              TextSpan(text: "workouts.actions.share.alert.body".t),
+              const TextSpan(text: "\n\n"),
+              TextSpan(
+                text: uri.toString(),
+                style: const TextStyle(
+                  fontFamily: "monospace",
+                  fontFamilyFallback: <String>["Menlo", "Courier"],
+                ),
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Get.back();
+            },
+            child: Text(MaterialLocalizations.of(context).okButtonLabel),
+          ),
+          TextButton(
+            onPressed: () {
+              Get.back();
+              Clipboard.setData(ClipboardData(text: uri.toString()));
+              Go.snack("workouts.actions.share.alert.actions.shared".t);
+            },
+            child: Text("workouts.actions.share.alert.actions.share".t),
+          ),
+        ],
+      ),
+    );
   }
 }

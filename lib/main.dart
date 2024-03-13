@@ -20,6 +20,7 @@ import 'package:gymtracker/service/version.dart';
 import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/view/skeleton.dart';
+import 'package:protocol_handler/protocol_handler.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 
@@ -39,6 +40,8 @@ void main() async {
   final String currentTimeZone = await FlutterTimezone.getLocalTimezone();
   tz.initializeTimeZones();
   tz.setLocalLocation(tz.getLocation(currentTimeZone));
+
+  await protocolHandler.register('gymtracker');
 
   runApp(MainApp(localizations: l, databaseService: _databaseService));
 }

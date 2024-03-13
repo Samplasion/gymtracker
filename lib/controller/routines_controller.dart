@@ -21,7 +21,6 @@ import 'package:gymtracker/view/exercises.dart';
 import 'package:gymtracker/view/utils/import_routine.dart';
 import 'package:gymtracker/view/workout.dart';
 import 'package:protocol_handler/protocol_handler.dart';
-import 'package:wolt_modal_sheet/wolt_modal_sheet.dart';
 
 class RoutinesController extends GetxController
     with ServiceableController, ProtocolListener {

@@ -91,6 +91,16 @@ class SettingsView extends StatelessWidget {
                   onUpdate: (v) => controller.setWeightUnit(v ?? Weights.kg),
                 ),
               ),
+              ValueBuilder<bool?>(
+                initialValue: controller.showSuggestedRoutines.value,
+                builder: (value, onChanged) => SwitchListTile(
+                  title: Text("settings.options.showSuggestedRoutines.label".t),
+                  value: value ?? false,
+                  onChanged: onChanged,
+                ),
+                onUpdate: (v) =>
+                    controller.setShowSuggestedRoutines(v ?? false),
+              ),
               ListTile(
                 title: Text("settings.options.import.label".t),
                 onTap: () async {

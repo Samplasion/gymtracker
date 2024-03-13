@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:gymtracker/controller/history_controller.dart';
 import 'package:gymtracker/controller/routines_controller.dart';
+import 'package:gymtracker/controller/settings_controller.dart';
 import 'package:gymtracker/model/workout.dart';
 import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/utils/go.dart';
@@ -48,7 +49,10 @@ class _RoutinesViewState extends State<RoutinesView> {
 
   @override
   Widget build(BuildContext context) {
-    final suggested = _suggestedRoutines;
+    final showSuggestedRoutines =
+        Get.find<SettingsController>().showSuggestedRoutines.value;
+    final suggested =
+        showSuggestedRoutines ? _suggestedRoutines : <(Workout, int)>[];
     return Scaffold(
       body: Obx(() {
         return CustomScrollView(
@@ -66,7 +70,7 @@ class _RoutinesViewState extends State<RoutinesView> {
                 },
               ),
             ),
-            if (suggested.isNotEmpty) ...[
+            if (showSuggestedRoutines && suggested.isNotEmpty) ...[
               const SliverToBoxAdapter(child: Divider()),
               SliverList(
                 delegate: SliverChildBuilderDelegate(

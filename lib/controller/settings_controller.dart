@@ -19,6 +19,7 @@ class SettingsController extends GetxController with ServiceableController {
   Rx<Color> color = defaultColor.obs;
   Rx<Locale?> locale = Get.locale.obs;
   Rx<Weights?> weightUnit = Weights.kg.obs;
+  RxBool showSuggestedRoutines = true.obs;
 
   void setUsesDynamicColor(bool usesDC) =>
       service.writeSetting("usesDynamicColor", usesDC);
@@ -33,6 +34,9 @@ class SettingsController extends GetxController with ServiceableController {
   void setWeightUnit(Weights weightUnit) =>
       service.writeSetting("weightUnit", weightUnit.name);
 
+  void setShowSuggestedRoutines(bool show) =>
+      service.writeSetting("showSuggestedRoutines", show);
+
   @override
   void onServiceChange() {
     usesDynamicColor(service.readSetting<bool>("usesDynamicColor") ?? false);
@@ -42,6 +46,8 @@ class SettingsController extends GetxController with ServiceableController {
       (element) => element.name == service.readSetting<String>("weightUnit"),
       orElse: () => Weights.kg,
     ));
+    showSuggestedRoutines(
+        service.readSetting<bool>("showSuggestedRoutines") ?? true);
   }
 
   Future exportSettings(BuildContext context) async {

@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
@@ -102,7 +103,12 @@ class _TimeInputFieldState extends State<TimeInputField> {
     return TextFormField(
       controller: widget.controller,
       focusNode: node,
-      keyboardType: const TextInputType.numberWithOptions(decimal: false),
+      keyboardType: Platform.isIOS
+          ? const TextInputType.numberWithOptions(
+              decimal: true,
+              signed: true,
+            )
+          : const TextInputType.numberWithOptions(decimal: false),
       decoration: (widget.decoration ?? const InputDecoration()).copyWith(
         suffixIcon: () {
           if (widget.timerInteractive) {

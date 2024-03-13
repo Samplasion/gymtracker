@@ -294,7 +294,10 @@ class _WorkoutExerciseSetEditorState extends State<WorkoutExerciseSetEditor> {
   TextField get weightField => TextField(
         focusNode: _weightFocusNode,
         controller: weightController,
-        keyboardType: const TextInputType.numberWithOptions(decimal: true),
+        keyboardType: const TextInputType.numberWithOptions(
+          decimal: true,
+          signed: true,
+        ),
         inputFormatters: [
           FilteringTextInputFormatter.allow(RegExp("[0123456789.,]")),
         ],

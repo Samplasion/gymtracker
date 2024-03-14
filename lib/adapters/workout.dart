@@ -1,3 +1,4 @@
+import 'package:gymtracker/controller/settings_controller.dart';
 import 'package:gymtracker/model/exercisable.dart';
 import 'package:gymtracker/model/workout.dart';
 import 'package:hive/hive.dart';
@@ -18,7 +19,9 @@ class WorkoutAdapter extends TypeAdapter<Workout> {
       infobox: reader.read(),
       completedBy: reader.read(),
       completes: reader.read(),
-      weightUnit: reader.read(),
+      weightUnit: reader.availableBytes > 0
+          ? reader.read()
+          : settingsController.weightUnit.value!,
     );
   }
 

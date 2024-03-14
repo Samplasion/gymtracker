@@ -18,6 +18,7 @@ class WorkoutAdapter extends TypeAdapter<Workout> {
       infobox: reader.read(),
       completedBy: reader.read(),
       completes: reader.read(),
+      weightUnit: reader.read(),
     );
   }
 
@@ -32,5 +33,6 @@ class WorkoutAdapter extends TypeAdapter<Workout> {
     writer.write(obj.infobox);
     writer.write(obj.completedBy);
     writer.write(obj.completes);
+    writer.write(obj.weightUnit);
   }
 }

@@ -6,6 +6,7 @@ import 'package:gymtracker/adapters/builtin.dart' as builtin_adapters;
 import 'package:gymtracker/adapters/exercise.dart';
 import 'package:gymtracker/adapters/set.dart';
 import 'package:gymtracker/adapters/superset.dart';
+import 'package:gymtracker/adapters/weights.dart';
 import 'package:gymtracker/adapters/workout.dart';
 import 'package:gymtracker/model/exercise.dart';
 import 'package:gymtracker/model/workout.dart';
@@ -56,6 +57,7 @@ class DatabaseService extends GetxService with ChangeNotifier {
     Hive.registerAdapter(SetKindAdapter());
     Hive.registerAdapter(SetParametersAdapter());
     Hive.registerAdapter(ExSetAdapter());
+    Hive.registerAdapter(WeightsAdapter());
 
     exerciseBox = await Hive.openBox<Exercise>("exercises");
     routinesBox = await Hive.openBox<Workout>("routines");

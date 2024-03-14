@@ -68,16 +68,8 @@ class DebugView extends StatelessWidget {
               ListTile(
                 title: const Text("Push workout import modal"),
                 onTap: () {
-                  showModalBottomSheet(
-                    context: context,
-                    isScrollControlled: true,
-                    backgroundColor: Colors.transparent,
-                    elevation: 0,
-                    constraints: BoxConstraints.loose(Size(
-                      MediaQuery.of(context).size.width,
-                      MediaQuery.of(context).size.height - kToolbarHeight,
-                    )),
-                    builder: (context) => ImportRoutineModal(
+                  Go.showBottomModalScreen(
+                    (context) => ImportRoutineModal(
                         workout: Get.find<RoutinesController>().workouts.first),
                   );
                 },

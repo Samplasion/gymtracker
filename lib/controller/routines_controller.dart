@@ -345,18 +345,8 @@ class RoutinesController extends GetxController
       return;
     }
 
-    showModalBottomSheet(
-      context: Get.context!,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      enableDrag: true,
-      showDragHandle: true,
-      elevation: 0,
-      constraints: BoxConstraints.loose(Size(
-        MediaQuery.of(Get.context!).size.width,
-        MediaQuery.of(Get.context!).size.height - kToolbarHeight / 3,
-      )),
-      builder: (context) => ImportRoutineModal(workout: workout),
+    Go.showBottomModalScreen(
+      (context) => ImportRoutineModal(workout: workout),
     );
   }
 

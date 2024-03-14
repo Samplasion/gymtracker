@@ -6,6 +6,7 @@ import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/view/components/infobox.dart';
 import 'package:gymtracker/view/exercises.dart';
+import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 
 class ImportRoutineModal extends StatefulWidget {
   final Workout workout;
@@ -31,106 +32,99 @@ class _ImportRoutineModalState extends State<ImportRoutineModal>
       4,
     );
     final safeArea = MediaQuery.paddingOf(context);
-    return BottomSheet(
-      animationController: controller,
-      onClosing: () {},
-      clipBehavior: Clip.hardEdge,
-      backgroundColor: Colors.transparent,
-      builder: (context) {
-        return Scaffold(
-          body: CustomScrollView(
-            slivers: [
-              SliverAppBar.medium(
-                title: Text(workout.name),
-                automaticallyImplyLeading: false,
-                shadowColor: Colors.transparent,
+    return Scaffold(
+      body: CustomScrollView(
+        controller: ModalScrollController.of(context),
+        slivers: [
+          SliverAppBar.medium(
+            title: Text(workout.name),
+            automaticallyImplyLeading: false,
+            shadowColor: Colors.transparent,
+          ),
+          if (workout.shouldShowInfobox)
+            SliverToBoxAdapter(
+              child: Infobox(
+                text: workout.infobox!,
               ),
-              if (workout.shouldShowInfobox)
-                SliverToBoxAdapter(
-                  child: Infobox(
-                    text: workout.infobox!,
+            ),
+          SliverPadding(
+            padding: const EdgeInsets.all(16).copyWith(
+                bottom: kBottomNavigationBarHeight + safeArea.bottom + 20),
+            sliver: DecoratedSliver(
+              decoration: BoxDecoration(
+                border: Border.all(
+                  color: Theme.of(context).colorScheme.outline,
+                  width: 1,
+                ),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              sliver: SliverPadding(
+                padding: const EdgeInsets.all(1),
+                sliver: SliverList(
+                  delegate: SliverChildBuilderDelegate(
+                    (context, index) {
+                      final exercise = workout.exercises[index];
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 8),
+                        child: ExerciseDataView(
+                          exercise: exercise,
+                          workout: workout,
+                          index: index,
+                          isInSuperset: false,
+                          weightUnit: workout.weightUnit,
+                        ),
+                      );
+                    },
+                    childCount: workout.exercises.length,
                   ),
                 ),
-              SliverPadding(
-                padding: const EdgeInsets.all(16).copyWith(
-                    bottom: kBottomNavigationBarHeight + safeArea.bottom + 20),
-                sliver: DecoratedSliver(
-                  decoration: BoxDecoration(
-                    border: Border.all(
-                      color: Theme.of(context).colorScheme.outline,
-                      width: 1,
-                    ),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  sliver: SliverPadding(
-                    padding: const EdgeInsets.all(1),
-                    sliver: SliverList(
-                      delegate: SliverChildBuilderDelegate(
-                        (context, index) {
-                          final exercise = workout.exercises[index];
-                          return Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 8),
-                            child: ExerciseDataView(
-                              exercise: exercise,
-                              workout: workout,
-                              index: index,
-                              isInSuperset: false,
-                              weightUnit: workout.weightUnit,
-                            ),
-                          );
-                        },
-                        childCount: workout.exercises.length,
-                      ),
-                    ),
-                  ),
-                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+      extendBody: true,
+      bottomNavigationBar: Container(
+        alignment: Alignment.center,
+        height: kBottomNavigationBarHeight + safeArea.bottom + 16,
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [
+              gradientColor.withAlpha(0),
+              gradientColor,
+            ],
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            stops: [
+              0,
+              16 / (16 + kBottomNavigationBarHeight + safeArea.bottom),
+            ],
+          ),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: OverflowBar(
+            alignment: MainAxisAlignment.end,
+            spacing: 8,
+            overflowSpacing: 16,
+            children: [
+              FilledButton.tonal(
+                onPressed: () => Get.back(),
+                child:
+                    Text(MaterialLocalizations.of(context).cancelButtonLabel),
+              ),
+              FilledButton(
+                onPressed: () {
+                  Get.back();
+                  Get.find<RoutinesController>().importWorkout(workout);
+                  Go.snack("importRoutine.import.done".t);
+                },
+                child: Text('importRoutine.import.label'.t),
               ),
             ],
           ),
-          extendBody: true,
-          bottomNavigationBar: Container(
-            alignment: Alignment.center,
-            height: kBottomNavigationBarHeight + safeArea.bottom + 16,
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  gradientColor.withAlpha(0),
-                  gradientColor,
-                ],
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                stops: [
-                  0,
-                  16 / (16 + kBottomNavigationBarHeight + safeArea.bottom),
-                ],
-              ),
-            ),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: OverflowBar(
-                alignment: MainAxisAlignment.end,
-                spacing: 8,
-                overflowSpacing: 16,
-                children: [
-                  FilledButton.tonal(
-                    onPressed: () => Get.back(),
-                    child: Text(
-                        MaterialLocalizations.of(context).cancelButtonLabel),
-                  ),
-                  FilledButton(
-                    onPressed: () {
-                      Get.back();
-                      Get.find<RoutinesController>().importWorkout(workout);
-                      Go.snack("importRoutine.import.done".t);
-                    },
-                    child: Text('importRoutine.import.label'.t),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        );
-      },
+        ),
+      ),
     );
   }
 }

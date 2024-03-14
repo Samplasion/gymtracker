@@ -1,22 +1,13 @@
-import 'package:animations/animations.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide Material;
 import 'package:get/get.dart';
 import 'package:gymtracker/service/localizations.dart';
-import 'package:wolt_modal_sheet/wolt_modal_sheet.dart';
+import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 
 class Go {
   static Future<T?> to<T>(Widget Function() page) async {
     return Navigator.of(Get.context!).push<T>(
-      PageRouteBuilder(
-        pageBuilder: (context, _, __) => page(),
-        transitionsBuilder: (context, animation, secondaryAnimation, child) {
-          return SharedAxisTransition(
-            transitionType: SharedAxisTransitionType.horizontal,
-            animation: animation,
-            secondaryAnimation: secondaryAnimation,
-            child: child,
-          );
-        },
+      MaterialWithModalsPageRoute(
+        builder: (context) => page(),
       ),
     );
   }
@@ -97,55 +88,11 @@ class Go {
     ).then((value) => value ?? false);
   }
 
-  static Future<T?> showWoltSheet<T>({
-    required BuildContext context,
-    required WoltModalSheetPageListBuilder pageListBuilder,
-    WoltModalTypeBuilder? modalTypeBuilder,
-    ValueNotifier<int>? pageIndexNotifier,
-    Widget Function(Widget)? decorator,
-    bool useRootNavigator = false,
-    bool? useSafeArea,
-    bool? barrierDismissible,
-    bool? enableDrag,
-    bool? showDragHandle,
-    RouteSettings? routeSettings,
-    Duration? transitionDuration,
-    VoidCallback? onModalDismissedWithBarrierTap,
-    VoidCallback? onModalDismissedWithDrag,
-    AnimationController? transitionAnimationController,
-    AnimatedWidget? bottomSheetTransitionAnimation,
-    AnimatedWidget? dialogTransitionAnimation,
-    double? minDialogWidth,
-    double? maxDialogWidth,
-    double? minPageHeight,
-    double? maxPageHeight,
-    Color? modalBarrierColor,
-  }) {
-    final NavigatorState navigator = Navigator.of(context);
-    final themeData = Theme.of(context).extension<WoltModalSheetThemeData>();
-    return navigator.push<T>(
-      WoltModalSheetRoute<T>(
-        decorator: decorator,
-        pageIndexNotifier: pageIndexNotifier ?? ValueNotifier(0),
-        pageListBuilderNotifier: ValueNotifier(pageListBuilder),
-        modalTypeBuilder: modalTypeBuilder,
-        routeSettings: routeSettings,
-        transitionDuration: transitionDuration,
-        barrierDismissible: barrierDismissible,
-        enableDrag: enableDrag,
-        showDragHandle: showDragHandle,
-        onModalDismissedWithBarrierTap: onModalDismissedWithBarrierTap,
-        onModalDismissedWithDrag: onModalDismissedWithDrag,
-        transitionAnimationController: transitionAnimationController,
-        useSafeArea: useSafeArea,
-        bottomSheetTransitionAnimation: bottomSheetTransitionAnimation,
-        dialogTransitionAnimation: dialogTransitionAnimation,
-        maxDialogWidth: maxDialogWidth,
-        minDialogWidth: minDialogWidth,
-        maxPageHeight: maxPageHeight,
-        minPageHeight: minPageHeight,
-        modalBarrierColor: modalBarrierColor ?? themeData?.modalBarrierColor,
-      ),
+  static Future<T?> showBottomModalScreen<T>(WidgetBuilder page) async {
+    final context = Get.context!;
+    showCupertinoModalBottomSheet(
+      context: context,
+      builder: (context) => page(context),
     );
   }
 }

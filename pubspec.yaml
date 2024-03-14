@@ -33,6 +33,7 @@ dependencies:
   hive_ui: ^1.0.14
   intl: ^0.18.0
   json_annotation: ^4.8.0
+  modal_bottom_sheet: ^3.0.0-pre
   package_info_plus: ^3.1.2
   protocol_handler: ^0.1.5
   share_plus: ^6.3.1

@@ -1,3 +1,4 @@
+import 'package:animations/animations.dart';
 import 'package:device_sim/device_sim.dart';
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:flutter/foundation.dart';
@@ -94,6 +95,12 @@ class MainApp extends StatelessWidget {
                   return AnimatedBuilder(
                     animation: localizations,
                     builder: (context, _) {
+                      var pageTransitionsTheme =
+                          PageTransitionsTheme(builders: {
+                        TargetPlatform.android: _SharedAxisTransitionBuilder(),
+                        TargetPlatform.iOS: _SharedAxisTransitionBuilder(),
+                        TargetPlatform.macOS: _SharedAxisTransitionBuilder(),
+                      });
                       return GetMaterialApp(
                         useInheritedMediaQuery: true,
                         title: () {
@@ -119,11 +126,13 @@ class MainApp extends StatelessWidget {
                           useMaterial3: true,
                           brightness: Brightness.light,
                           colorScheme: lightScheme,
+                          pageTransitionsTheme: pageTransitionsTheme,
                         ),
                         darkTheme: ThemeData(
                           useMaterial3: true,
                           brightness: Brightness.dark,
                           colorScheme: darkScheme,
+                          pageTransitionsTheme: pageTransitionsTheme,
                         ),
                         home: const _Loader(),
                         debugShowCheckedModeBanner: false,
@@ -177,6 +186,23 @@ class __LoaderState extends State<_Loader> {
       body: const Center(
         child: CircularProgressIndicator(),
       ),
+    );
+  }
+}
+
+class _SharedAxisTransitionBuilder extends PageTransitionsBuilder {
+  @override
+  Widget buildTransitions<T>(
+      PageRoute<T> route,
+      BuildContext context,
+      Animation<double> animation,
+      Animation<double> secondaryAnimation,
+      Widget child) {
+    return SharedAxisTransition(
+      transitionType: SharedAxisTransitionType.horizontal,
+      animation: animation,
+      secondaryAnimation: secondaryAnimation,
+      child: child,
     );
   }
 }

@@ -1,16 +1,19 @@
 import 'dart:convert';
 
-import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 import 'package:gymtracker/adapters/builtin.dart' as builtin_adapters;
 import 'package:gymtracker/adapters/exercise.dart';
+import 'package:gymtracker/adapters/measurements.dart';
 import 'package:gymtracker/adapters/set.dart';
 import 'package:gymtracker/adapters/superset.dart';
 import 'package:gymtracker/adapters/weights.dart';
 import 'package:gymtracker/adapters/workout.dart';
 import 'package:gymtracker/model/exercise.dart';
+import 'package:gymtracker/model/measurements.dart';
 import 'package:gymtracker/model/workout.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:path_provider/path_provider.dart';
 
 const DATABASE_VERSION = 1;
 
@@ -20,6 +23,7 @@ class DatabaseService extends GetxService with ChangeNotifier {
   late final Box<Workout> historyBox;
   late final Box<dynamic> settingsBox;
   late final Box<String> ongoingBox;
+  late final Box<WeightMeasurement> weightMeasurementsBox;
 
   writeSetting<T>(String key, T value) {
     settingsBox.put(key, value);
@@ -40,10 +44,17 @@ class DatabaseService extends GetxService with ChangeNotifier {
     historyBox.listenable().addListener(onServiceChange("history"));
     settingsBox.listenable().addListener(onServiceChange("settings"));
     ongoingBox.listenable().addListener(onServiceChange("ongoing"));
+    weightMeasurementsBox
+        .listenable()
+        .addListener(onServiceChange("weightMeasurements"));
   }
 
   Future ensureInitialized() async {
     await Hive.initFlutter();
+    if (kDebugMode) {
+      final appDir = await getApplicationDocumentsDirectory();
+      print("Loaded Hive in $appDir");
+    }
 
     return _ensureInitialized();
   }
@@ -58,12 +69,15 @@ class DatabaseService extends GetxService with ChangeNotifier {
     Hive.registerAdapter(SetParametersAdapter());
     Hive.registerAdapter(ExSetAdapter());
     Hive.registerAdapter(WeightsAdapter());
+    Hive.registerAdapter(WeightMeasurementAdapter());
 
     exerciseBox = await Hive.openBox<Exercise>("exercises");
     routinesBox = await Hive.openBox<Workout>("routines");
     historyBox = await Hive.openBox<Workout>("history");
     settingsBox = await Hive.openBox("settings");
     ongoingBox = await Hive.openBox<String>("ongoing");
+    weightMeasurementsBox =
+        await Hive.openBox<WeightMeasurement>("weightMeasurements");
   }
 
   @visibleForTesting
@@ -180,6 +194,22 @@ class DatabaseService extends GetxService with ChangeNotifier {
 
   bool hasHistoryWorkout(String id) {
     return historyBox.containsKey(id);
+  }
+
+  getWeightMeasurement(String measurementID) {
+    return weightMeasurementsBox.get(measurementID);
+  }
+
+  setWeightMeasurement(WeightMeasurement measurement) {
+    weightMeasurementsBox
+        .put(measurement.id, measurement)
+        .then((value) => notifyListeners());
+  }
+
+  removeWeightMeasurement(WeightMeasurement measurement) {
+    weightMeasurementsBox
+        .delete(measurement.id)
+        .then((value) => notifyListeners());
   }
 
   toJson() {

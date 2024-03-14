@@ -69,8 +69,9 @@ class DebugView extends StatelessWidget {
                 title: const Text("Push workout import modal"),
                 onTap: () {
                   Go.showBottomModalScreen(
-                    (context) => ImportRoutineModal(
-                        workout: Get.find<RoutinesController>().workouts.first),
+                    (context, _) => ImportRoutineModal(
+                      workout: Get.find<RoutinesController>().workouts.first,
+                    ),
                   );
                 },
               ),
@@ -137,6 +138,12 @@ class DebugView extends StatelessWidget {
 }
 
 String generateYamlForMissingKeys(List<String> missingKeys) {
+  print((
+    missingKeys,
+    {
+      for (final key in missingKeys) key: key.split(".").last,
+    }
+  ));
   Map<String, dynamic> keys = unflatten({
     for (final key in missingKeys) key: key.split(".").last,
   });

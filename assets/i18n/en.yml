@@ -367,6 +367,8 @@ muscleGroups:
 actions:
   create: Create
   remove: Remove
+  edit: Edit
+  undo: Undo
 
 units:
   kg: kg
@@ -555,3 +557,26 @@ importRoutine:
 unknownUrl:
   title: Unknown URL
   text: You followed a URL that doesn't lead anywhere.
+
+me:
+  title: Vitals
+  weight:
+    label: Weight
+    none: "N/A"
+    allData:
+      label: Show all data
+    measured:
+      never: "Last measured: never"
+      date: "Last measured: @date"
+    addMeasurement: Add measurement
+  addWeight:
+    time:
+      label: Date and time
+    weight:
+      label: Weight
+    weightUnit:
+      label: Unit
+  allData:
+    label: All recorded data
+    removed:
+      text: The data has been removed

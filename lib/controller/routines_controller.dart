@@ -346,7 +346,7 @@ class RoutinesController extends GetxController
     }
 
     Go.showBottomModalScreen(
-      (context) => ImportRoutineModal(workout: workout),
+      (context, _) => ImportRoutineModal(workout: workout),
     );
   }
 

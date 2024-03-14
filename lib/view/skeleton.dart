@@ -12,6 +12,7 @@ import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/view/debug.dart';
 import 'package:gymtracker/view/history.dart';
 import 'package:gymtracker/view/library.dart';
+import 'package:gymtracker/view/me.dart';
 import 'package:gymtracker/view/routines.dart';
 import 'package:gymtracker/view/settings.dart';
 import 'package:gymtracker/view/utils/crossfade.dart';
@@ -45,6 +46,7 @@ class _SkeletonViewState extends State<SkeletonView>
         const RoutinesView(),
         const LibraryView(),
         const HistoryView(),
+        const MeView(),
         const SettingsView(),
         if (kDebugMode) const DebugView(),
       ];
@@ -112,6 +114,10 @@ class _SkeletonViewState extends State<SkeletonView>
                     child: const Icon(Icons.history_rounded),
                   ),
                   label: "history.title".t,
+                ),
+                NavigationDestination(
+                  icon: const Icon(Icons.person_rounded),
+                  label: "me.title".t,
                 ),
                 NavigationDestination(
                   icon: const Icon(Icons.settings_rounded),

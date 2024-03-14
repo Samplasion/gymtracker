@@ -21,10 +21,11 @@ class Go {
     return to<T>(page);
   }
 
-  static Future snack(String text) async {
+  static Future snack(String text, {SnackBarAction? action}) async {
     final snackBar = SnackBar(
       content: Text(text),
       behavior: SnackBarBehavior.floating,
+      action: action,
     );
     ScaffoldMessenger.of(Get.context!).showSnackBar(snackBar);
   }
@@ -88,11 +89,12 @@ class Go {
     ).then((value) => value ?? false);
   }
 
-  static Future<T?> showBottomModalScreen<T>(WidgetBuilder page) async {
+  static Future<T?> showBottomModalScreen<T>(
+      Widget Function(BuildContext, ScrollController?) page) async {
     final context = Get.context!;
-    showCupertinoModalBottomSheet(
+    return showCupertinoModalBottomSheet(
       context: context,
-      builder: (context) => page(context),
+      builder: (context) => page(context, ModalScrollController.of(context)),
     );
   }
 }

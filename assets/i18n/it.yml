@@ -367,6 +367,8 @@ muscleGroups:
 actions:
   create: Crea
   remove: Rimuovi
+  edit: Modifica
+  undo: Annulla
 
 units:
   kg: kg
@@ -555,3 +557,26 @@ importRoutine:
 unknownUrl:
   title: URL sconosciuto
   text: Hai seguito un URL che non porta da nessuna parte.
+
+me:
+  title: Parametri vitali
+  weight:
+    label: Peso
+    none: "N/D"
+    allData:
+      label: Mostra tutti i dati
+    measured:
+      never: "Ultima misurazione: mai"
+      date: "Ultima misurazione: @date"
+    addMeasurement: Aggiungi misurazione
+  addWeight:
+    time:
+      label: Data e ora
+    weight:
+      label: Peso
+    weightUnit:
+      label: Unità
+  allData:
+    label: Tutti i dati registrati
+    removed:
+      text: Il dato è stato rimosso

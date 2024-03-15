@@ -27,8 +27,19 @@ import 'package:gymtracker/view/utils/timer.dart';
 import 'package:gymtracker/view/utils/weight_calculator.dart';
 import 'package:gymtracker/view/utils/workout.dart';
 
-WorkoutController get controller =>
-    Get.put(WorkoutController("Untitled workout", null, null));
+WorkoutController get controller {
+  if (Get.isRegistered<WorkoutController>()) {
+    return Get.find<WorkoutController>();
+  }
+
+  return Get.put(WorkoutController("Untitled workout", null, null));
+}
+
+WorkoutController? get safeController {
+  if (Get.isRegistered<WorkoutController>()) {
+    return Get.find<WorkoutController>();
+  }
+}
 
 class WorkoutView extends StatefulWidget {
   const WorkoutView({super.key});
@@ -257,7 +268,9 @@ class _WorkoutViewState extends State<WorkoutView> {
               // Avoid calling [get controller] in order to avoid
               // recreating it, thus starting a new workout.
               if (Get.find<RoutinesController>().hasOngoingWorkout())
-                for (int i = 0; i < controller.exercises.length; i++)
+                for (int i = 0;
+                    i < (safeController?.exercises.length ?? 0);
+                    i++)
                   if (controller.exercises[i] is Exercise)
                     WorkoutExerciseEditor(
                       key: ValueKey((controller.exercises[i] as Exercise).id),
@@ -595,26 +608,29 @@ class WorkoutInfoBar extends StatelessWidget {
           child: Row(
             children: [
               Obx(
-                () => TimerView(
-                  startingTime: controller.time.value,
-                  builder: (context, text) {
-                    return Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          "ongoingWorkout.info.time".t,
-                          style: Theme.of(context).textTheme.labelMedium,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        Hero(
-                          tag: "Ongoing",
-                          child: text,
-                        ),
-                      ],
-                    );
-                  },
-                ),
+                () {
+                  if (safeController == null) return const SizedBox.shrink();
+                  return TimerView(
+                    startingTime: safeController!.time.value,
+                    builder: (context, text) {
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            "ongoingWorkout.info.time".t,
+                            style: Theme.of(context).textTheme.labelMedium,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          Hero(
+                            tag: "Ongoing",
+                            child: text,
+                          ),
+                        ],
+                      );
+                    },
+                  );
+                },
               ),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -629,7 +645,7 @@ class WorkoutInfoBar extends StatelessWidget {
                     () => TweenAnimationBuilder(
                       tween: Tween<double>(
                         begin: 0,
-                        end: controller.reps.toDouble(),
+                        end: safeController?.reps.toDouble() ?? 0,
                       ),
                       curve: Curves.decelerate,
                       duration: const Duration(milliseconds: 400),
@@ -653,12 +669,13 @@ class WorkoutInfoBar extends StatelessWidget {
                     () => TweenAnimationBuilder(
                       tween: Tween<double>(
                         begin: 0,
-                        end: controller.liftedWeight,
+                        end: safeController?.liftedWeight ?? 0,
                       ),
                       curve: Curves.decelerate,
                       duration: const Duration(milliseconds: 400),
                       builder: (context, value, _) {
-                        if (doubleIsActuallyInt(controller.liftedWeight)) {
+                        if (doubleIsActuallyInt(
+                            safeController?.liftedWeight ?? 0)) {
                           return Text("${value.round()}");
                         }
                         return Text(stringifyDouble(value));
@@ -676,7 +693,7 @@ class WorkoutInfoBar extends StatelessWidget {
             curve: Curves.linearToEaseOut,
             tween: Tween<double>(
               begin: 0,
-              end: controller.progress,
+              end: safeController?.progress ?? 0,
             ),
             builder: (context, value, _) => LinearProgressIndicator(
               value: value,

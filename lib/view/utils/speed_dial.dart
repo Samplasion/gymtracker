@@ -8,29 +8,32 @@ const kSpeedDialButtonSpacing = 16.0;
 class SpeedDial extends StatelessWidget {
   final int Function(Breakpoints) crossAxisCountBuilder;
   final List<Widget> buttons;
-  final double buttonHeight;
+  final double Function(Breakpoints) buttonHeight;
   final double spacing;
 
   const SpeedDial({
     required this.crossAxisCountBuilder,
     required this.buttons,
-    this.buttonHeight = kSpeedDialButtonHeight,
+    this.buttonHeight = _defaultButtonHeight,
     this.spacing = kSpeedDialButtonSpacing,
     super.key,
   });
+
+  static double _defaultButtonHeight(Breakpoints _) => kSpeedDialButtonHeight;
 
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, size) {
-        final crossAxis =
-            crossAxisCountBuilder(Breakpoints.computeBreakpoint(size.maxWidth));
+        final breakpoint = Breakpoints.computeBreakpoint(size.maxWidth);
+        final crossAxis = crossAxisCountBuilder(breakpoint);
         return GridView.count(
           padding: EdgeInsets.zero,
           physics: const NeverScrollableScrollPhysics(),
           shrinkWrap: true,
           crossAxisCount: crossAxis,
-          childAspectRatio: (size.maxWidth / crossAxis) / buttonHeight,
+          childAspectRatio:
+              (size.maxWidth / crossAxis) / buttonHeight(breakpoint),
           mainAxisSpacing: spacing,
           crossAxisSpacing: spacing,
           children: buttons,
@@ -43,16 +46,20 @@ class SpeedDial extends StatelessWidget {
 class SpeedDialButton extends StatelessWidget {
   final Widget icon;
   final Widget text;
-  final VoidCallback onTap;
+  final Widget? subtitle;
+  final VoidCallback? onTap;
   final bool enabled;
   final bool showTrailing;
+  final bool dense;
 
   const SpeedDialButton({
     required this.icon,
     required this.text,
-    required this.onTap,
+    this.subtitle,
+    this.onTap,
     this.enabled = true,
     this.showTrailing = false,
+    this.dense = false,
     super.key,
   });
 
@@ -63,14 +70,19 @@ class SpeedDialButton extends StatelessWidget {
       margin: EdgeInsets.zero,
       child: InkWell(
         onTap: enabled ? onTap : null,
-        child: Center(
-          child: ListTile(
-            leading: icon,
-            title: text,
-            enabled: enabled,
-            mouseCursor: MouseCursor.defer,
-            trailing: showTrailing ? const ListTileActionIcon() : null,
-          ),
+        child: Stack(
+          alignment: Alignment.center,
+          children: [
+            ListTile(
+              leading: icon,
+              title: text,
+              subtitle: subtitle,
+              enabled: enabled,
+              mouseCursor: MouseCursor.defer,
+              trailing: showTrailing ? const ListTileActionIcon() : null,
+              dense: dense,
+            ),
+          ],
         ),
       ),
     );

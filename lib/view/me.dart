@@ -44,7 +44,7 @@ class MeView extends GetView<MeController> {
                         Breakpoints.xxs => 1,
                         _ => 2,
                       },
-                      buttonHeight: kSpeedDialButtonHeight / 1.3,
+                      buttonHeight: (_) => kSpeedDialButtonHeight / 1.3,
                       buttons: [
                         SpeedDialButton(
                           icon: const Icon(Icons.calendar_month_rounded),

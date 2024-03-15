@@ -37,10 +37,8 @@ class GTLocalizations extends Translations with ChangeNotifier {
       keys[locale.languageCode] =
           flattenTranslations(jsonDecode(jsonEncode(loadYaml(bundle))));
     }
-    if (!cache) {
-      Get.translations.clear();
-      Get.addTranslations(keys);
-    }
+    Get.translations.clear();
+    Get.addTranslations(keys);
     notifyListeners();
   }
 

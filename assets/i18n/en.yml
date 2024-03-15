@@ -583,5 +583,14 @@ me:
   calendar:
     label: Calendar
     empty: You haven't worked out on this date
+    streak: Streak
+    rest: Rest
+    streakDays:
+      zero: 0 days
+      one: 1 day
+      two: 2 days
+      few: "%s days"
+      many: "%s days"
+      other: "%s days"
   stats:
     label: Statistics

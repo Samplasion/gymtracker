@@ -583,5 +583,14 @@ me:
   calendar:
     label: Calendario
     empty: Non ti sei allenato questo giorno
+    streak: Serie
+    rest: Riposo
+    streakDays:
+      zero: 0 giorni
+      one: 1 giorno
+      two: 2 giorni
+      few: "%s giorni"
+      many: "%s giorni"
+      other: "%s giorni"
   stats:
     label: Statistiche

@@ -412,7 +412,7 @@ androidNotificationChannel:
   description: Sends a notification whenever a running rest timer runs out of time.
 
 library:
-  title: Exercise library
+  title: Library
   custom: Custom exercises
   cardio:
     name: Cardio
@@ -559,7 +559,7 @@ unknownUrl:
   text: You followed a URL that doesn't lead anywhere.
 
 me:
-  title: Vitals
+  title: Profile
   weight:
     label: Weight
     none: "N/A"

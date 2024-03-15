@@ -412,7 +412,7 @@ androidNotificationChannel:
   description: Invia una notifica quando il timer del tempo di recupero finisce.
 
 library:
-  title: Libreria esercizi
+  title: Libreria
   custom: Esercizi personalizzati
   cardio:
     name: Cardio
@@ -559,7 +559,7 @@ unknownUrl:
   text: Hai seguito un URL che non porta da nessuna parte.
 
 me:
-  title: Parametri vitali
+  title: Profilo
   weight:
     label: Peso
     none: "N/D"

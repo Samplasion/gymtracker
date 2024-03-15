@@ -7,6 +7,7 @@ import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/view/components/controlled.dart';
+import 'package:gymtracker/view/exercises.dart';
 import 'package:gymtracker/view/utils/history_workout.dart';
 import 'package:intl/intl.dart';
 import 'package:scrollable_clean_calendar/controllers/clean_calendar_controller.dart';
@@ -68,28 +69,8 @@ class _MeCalendarPageState
       color: Theme.of(context).colorScheme.onSurface,
     );
 
-    if (values.isSelected) {
-      if ((values.selectedMinDate != null &&
-              values.day.isSameDay(values.selectedMinDate!)) ||
-          (values.selectedMaxDate != null &&
-              values.day.isSameDay(values.selectedMaxDate!))) {
-        bgColor = Theme.of(context).colorScheme.primary;
-        txtStyle = (Theme.of(context).textTheme.bodyLarge)!.copyWith(
-          color: Theme.of(context).colorScheme.onPrimary,
-        );
-      } else {
-        bgColor = Theme.of(context).colorScheme.primary.withOpacity(.3);
-        txtStyle = (Theme.of(context).textTheme.bodyLarge)!.copyWith(
-          color: Theme.of(context).colorScheme.primary,
-        );
-      }
-    } else if (values.day.isSameDay(values.minDate)) {
-      bgColor = Colors.transparent;
-      txtStyle = (Theme.of(context).textTheme.bodyLarge)!.copyWith(
-        color: Theme.of(context).colorScheme.primary,
-      );
-    } else if (values.day.isBefore(values.minDate) ||
-        values.day.isAfter(values.maxDate)) {
+    if (values.day.startOfDay.isBefore(values.minDate.startOfDay) ||
+        values.day.startOfDay.isAfter(values.maxDate.startOfDay)) {
       bgColor = Theme.of(context).colorScheme.surface.withOpacity(.4);
       txtStyle = (Theme.of(context).textTheme.bodyLarge)!.copyWith(
         color: Theme.of(context).colorScheme.onSurface.withOpacity(.5),
@@ -152,6 +133,9 @@ class MeCalendarDayPage extends StatelessWidget {
         return HistoryWorkout(
           workout: workout,
           showExercises: workout.exercises.length,
+          onTap: () {
+            Go.to(() => ExercisesView(workout: workout));
+          },
         );
       },
     );

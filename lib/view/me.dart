@@ -40,12 +40,15 @@ class MeView extends GetView<MeController> {
                 padding: EdgeInsets.symmetric(horizontal: 16),
                 child: WeightCard(),
               ),
-              ListTile(
-                title: Text("me.weight.allData.label".t),
-                trailing: const Icon(Icons.chevron_right_rounded),
-                onTap: () {
-                  Go.to(() => const WeightMeasurementDataPage());
-                },
+              Obx(
+                () => ListTile(
+                  title: Text("me.weight.allData.label".t),
+                  trailing: const Icon(Icons.chevron_right_rounded),
+                  enabled: controller.weightMeasurements.isNotEmpty,
+                  onTap: () {
+                    Go.to(() => const WeightMeasurementDataPage());
+                  },
+                ),
               ),
             ]),
           ),

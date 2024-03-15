@@ -580,3 +580,8 @@ me:
     label: All recorded data
     removed:
       text: The data has been removed
+  calendar:
+    label: Calendar
+    empty: You haven't worked out on this date
+  stats:
+    label: Statistics

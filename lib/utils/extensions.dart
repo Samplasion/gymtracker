@@ -14,6 +14,12 @@ extension StringUtils on String {
   }
 }
 
+extension DateUtils on DateTime {
+  DateTime get startOfDay {
+    return DateTime(year, month, day, 0, 0, 0, 0, 0);
+  }
+}
+
 extension ColorUtils on Color {
   Brightness estimateForegroundBrightness() {
     final luminance = computeLuminance();

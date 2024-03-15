@@ -148,7 +148,7 @@ class OngoingWorkoutBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isPhone = context.width < Breakpoints.xs;
+    final isPhone = context.width < Breakpoints.xs.screenWidth;
     return SafeArea(
       bottom: false,
       child: Card(

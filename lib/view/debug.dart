@@ -108,6 +108,7 @@ class _DebugViewState extends State<DebugView> {
                     enabled: snapshot.connectionState == ConnectionState.done,
                     title: const Text("Reload translation keys"),
                     onTap: () async {
+                      controller.missingKeys.clear();
                       _loadTranslationsFuture =
                           Get.find<GTLocalizations>().init(false);
                       _loadTranslationsFuture.then((_) {

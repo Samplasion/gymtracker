@@ -580,3 +580,8 @@ me:
     label: Tutti i dati registrati
     removed:
       text: Il dato è stato rimosso
+  calendar:
+    label: Calendario
+    empty: Non ti sei allenato questo giorno
+  stats:
+    label: Statistiche

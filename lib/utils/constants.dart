@@ -1,8 +1,29 @@
-class Breakpoints {
-  static const xs = 480;
-  static const s = 600;
-  static const m = 720;
-  static const l = 1024;
+import 'package:get/get.dart';
+
+enum Breakpoints {
+  xxs._(320),
+  xs._(480),
+  s._(600),
+  m._(720),
+  l._(1024),
+  xl._(999999);
+
+  const Breakpoints._(this.screenWidth);
+
+  final int screenWidth;
+
+  static Breakpoints get currentBreakpoint =>
+      computeBreakpoint(Get.context!.width);
+
+  static Breakpoints computeBreakpoint(double width) {
+    final w = width;
+    if (w < xxs.screenWidth) return xxs;
+    if (w < xs.screenWidth) return xs;
+    if (w < s.screenWidth) return s;
+    if (w < m.screenWidth) return m;
+    if (w < l.screenWidth) return l;
+    return xl;
+  }
 }
 
 class NotificationIDs {

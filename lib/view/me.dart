@@ -8,11 +8,14 @@ import 'package:gymtracker/controller/settings_controller.dart';
 import 'package:gymtracker/data/weights.dart';
 import 'package:gymtracker/model/measurements.dart';
 import 'package:gymtracker/service/localizations.dart';
+import 'package:gymtracker/utils/constants.dart';
 import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/utils/utils.dart';
+import 'package:gymtracker/view/me/calendar.dart';
 import 'package:gymtracker/view/utils/date_field.dart';
 import 'package:gymtracker/view/utils/section_title.dart';
+import 'package:gymtracker/view/utils/speed_dial.dart';
 import 'package:intl/intl.dart';
 
 class MeView extends GetView<MeController> {
@@ -26,31 +29,63 @@ class MeView extends GetView<MeController> {
           SliverAppBar.large(
             title: Text("me.title".t),
           ),
-          SliverList(
-            delegate: SliverChildListDelegate([
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: SafeArea(
-                  top: false,
-                  bottom: false,
-                  child: SectionTitle("me.weight.label".t),
+          SliverPadding(
+            padding: const EdgeInsets.symmetric(vertical: 16),
+            sliver: SliverList(
+              delegate: SliverChildListDelegate([
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: SafeArea(
+                    top: false,
+                    bottom: false,
+                    child: SpeedDial(
+                      crossAxisCountBuilder: (breakpoint) =>
+                          switch (breakpoint) {
+                        Breakpoints.xxs => 1,
+                        _ => 2,
+                      },
+                      buttons: [
+                        SpeedDialButton(
+                          icon: const Icon(Icons.calendar_month_rounded),
+                          text: Text("me.calendar.label".t),
+                          onTap: () {
+                            Go.to(() => const MeCalendarPage());
+                          },
+                        ),
+                        SpeedDialButton(
+                          icon: const Icon(Icons.query_stats_rounded),
+                          text: Text("me.stats.label".t),
+                          onTap: () {},
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
-              ),
-              const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 16),
-                child: WeightCard(),
-              ),
-              Obx(
-                () => ListTile(
-                  title: Text("me.weight.allData.label".t),
-                  trailing: const Icon(Icons.chevron_right_rounded),
-                  enabled: controller.weightMeasurements.isNotEmpty,
-                  onTap: () {
-                    Go.to(() => const WeightMeasurementDataPage());
-                  },
+                const SizedBox(height: 24),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: SafeArea(
+                    top: false,
+                    bottom: false,
+                    child: SectionTitle("me.weight.label".t),
+                  ),
                 ),
-              ),
-            ]),
+                const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 16),
+                  child: WeightCard(),
+                ),
+                Obx(
+                  () => ListTile(
+                    title: Text("me.weight.allData.label".t),
+                    trailing: const Icon(Icons.chevron_right_rounded),
+                    enabled: controller.weightMeasurements.isNotEmpty,
+                    onTap: () {
+                      Go.to(() => const WeightMeasurementDataPage());
+                    },
+                  ),
+                ),
+              ]),
+            ),
           ),
         ],
       ),

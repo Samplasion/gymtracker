@@ -694,7 +694,7 @@ class WorkoutTimerView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final countdownController = Get.find<CountdownController>();
-    final isPhone = context.width < Breakpoints.xs;
+    final isPhone = context.width < Breakpoints.xs.screenWidth;
 
     return Card(
       elevation: 8,

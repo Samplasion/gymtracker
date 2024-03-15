@@ -8,6 +8,7 @@ import 'package:gymtracker/model/exercise.dart';
 import 'package:gymtracker/model/superset.dart';
 import 'package:gymtracker/model/workout.dart';
 import 'package:gymtracker/service/localizations.dart';
+import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/view/workout_editor.dart';
 
 class HistoryController extends GetxController with ServiceableController {
@@ -18,6 +19,7 @@ class HistoryController extends GetxController with ServiceableController {
   List<Workout> get userVisibleWorkouts => history
       .where((workout) => !workout.isContinuation || kDebugMode)
       .toList();
+  Map<DateTime, List<Workout>> workoutsByDay = {};
 
   @override
   void onServiceChange() {
@@ -26,6 +28,17 @@ class HistoryController extends GetxController with ServiceableController {
             DateTime.fromMillisecondsSinceEpoch(0))
         .compareTo(b.startingDate ?? DateTime.fromMillisecondsSinceEpoch(0)));
     history(hist);
+    _computeWorkoutsByDay();
+  }
+
+  void _computeWorkoutsByDay() {
+    final _counts = <DateTime, List<Workout>>{};
+    for (final workout in userVisibleWorkouts) {
+      final date = workout.startingDate!.startOfDay;
+      _counts.putIfAbsent(date, () => []);
+      _counts[date]!.add(workout);
+    }
+    workoutsByDay = _counts;
   }
 
   void deleteWorkout(Workout workout) {

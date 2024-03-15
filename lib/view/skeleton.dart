@@ -94,43 +94,53 @@ class _SkeletonViewState extends State<SkeletonView>
                   Go.to(() => const WorkoutView());
                 }),
               ),
-            NavigationBar(
-              labelBehavior:
-                  NavigationDestinationLabelBehavior.onlyShowSelected,
-              destinations: [
-                NavigationDestination(
-                  icon: const Icon(Icons.fitness_center_rounded),
-                  label: "routines.title".t,
+            NavigationBarTheme(
+              data: NavigationBarThemeData(
+                labelTextStyle: MaterialStatePropertyAll(
+                  Theme.of(context).textTheme.labelMedium!.copyWith(
+                        overflow: TextOverflow.ellipsis,
+                      ),
                 ),
-                NavigationDestination(
-                  icon: const Icon(Icons.local_library_rounded),
-                  label: "library.title".t,
-                ),
-                NavigationDestination(
-                  icon: Badge(
-                    label: Text(
-                        "${Get.find<HistoryController>().userVisibleLength}"),
-                    isLabelVisible: _selectedIndex == 2,
-                    child: const Icon(Icons.history_rounded),
+              ),
+              child: NavigationBar(
+                labelBehavior:
+                    NavigationDestinationLabelBehavior.onlyShowSelected,
+                destinations: [
+                  NavigationDestination(
+                    icon: const Icon(Icons.fitness_center_rounded),
+                    label: "routines.title".t,
                   ),
-                  label: "history.title".t,
-                ),
-                NavigationDestination(
-                  icon: const Icon(Icons.person_rounded),
-                  label: "me.title".t,
-                ),
-                NavigationDestination(
-                  icon: const Icon(Icons.settings_rounded),
-                  label: "settings.title".t,
-                ),
-                if (kDebugMode)
-                  const NavigationDestination(
-                    icon: Icon(Icons.bug_report),
-                    label: "Debug",
+                  NavigationDestination(
+                    icon: const Icon(Icons.local_library_rounded),
+                    label: "library.title".t,
                   ),
-              ],
-              selectedIndex: _selectedIndex,
-              onDestinationSelected: (i) => setState(() => _selectedIndex = i),
+                  NavigationDestination(
+                    icon: Badge(
+                      label: Text(
+                          "${Get.find<HistoryController>().userVisibleLength}"),
+                      isLabelVisible: _selectedIndex == 2,
+                      child: const Icon(Icons.history_rounded),
+                    ),
+                    label: "history.title".t,
+                  ),
+                  NavigationDestination(
+                    icon: const Icon(Icons.person_rounded),
+                    label: "me.title".t,
+                  ),
+                  NavigationDestination(
+                    icon: const Icon(Icons.settings_rounded),
+                    label: "settings.title".t,
+                  ),
+                  if (kDebugMode)
+                    const NavigationDestination(
+                      icon: Icon(Icons.bug_report),
+                      label: "Debug",
+                    ),
+                ],
+                selectedIndex: _selectedIndex,
+                onDestinationSelected: (i) =>
+                    setState(() => _selectedIndex = i),
+              ),
             ),
           ],
         ),

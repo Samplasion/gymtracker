@@ -95,6 +95,7 @@ class Go {
     return showCupertinoModalBottomSheet(
       context: context,
       builder: (context) => page(context, ModalScrollController.of(context)),
+      duration: const Duration(milliseconds: 250),
     );
   }
 }

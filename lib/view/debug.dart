@@ -10,14 +10,22 @@ import 'package:gymtracker/controller/stopwatch_controller.dart';
 import 'package:gymtracker/model/exercise.dart';
 import 'package:gymtracker/model/workout.dart';
 import 'package:gymtracker/service/database.dart';
+import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/view/utils/import_routine.dart';
 import 'package:gymtracker/view/utils/timer.dart';
 import 'package:hive/hive.dart';
 import 'package:hive_ui/hive_ui.dart';
 
-class DebugView extends StatelessWidget {
+class DebugView extends StatefulWidget {
   const DebugView({super.key});
+
+  @override
+  State<DebugView> createState() => _DebugViewState();
+}
+
+class _DebugViewState extends State<DebugView> {
+  Future<void> _loadTranslationsFuture = Future.value();
 
   @override
   Widget build(BuildContext context) {
@@ -93,6 +101,27 @@ class DebugView extends StatelessWidget {
                       ),
                     );
                   }),
+              FutureBuilder(
+                future: _loadTranslationsFuture,
+                builder: (context, snapshot) {
+                  return ListTile(
+                    enabled: snapshot.connectionState == ConnectionState.done,
+                    title: const Text("Reload translation keys"),
+                    onTap: () async {
+                      _loadTranslationsFuture =
+                          Get.find<GTLocalizations>().init(false);
+                      _loadTranslationsFuture.then((_) {
+                        print((
+                          Get.find<GTLocalizations>().keys,
+                          Get.find<GTLocalizations>().keys['en']?['me.title'],
+                          "me.title".t,
+                        ));
+                        Go.snack("Reloaded");
+                      });
+                    },
+                  );
+                },
+              ),
               ListTile(
                 title: Text(
                   "Running stopwatches",

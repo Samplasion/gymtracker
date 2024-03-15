@@ -30,12 +30,16 @@ class GTLocalizations extends Translations with ChangeNotifier {
     return translations;
   }
 
-  init() async {
+  Future init([bool cache = true]) async {
     for (final locale in supportedLocales) {
-      final bundle =
-          await rootBundle.loadString('assets/i18n/${locale.languageCode}.yml');
+      final bundle = await rootBundle
+          .loadString('assets/i18n/${locale.languageCode}.yml', cache: cache);
       keys[locale.languageCode] =
           flattenTranslations(jsonDecode(jsonEncode(loadYaml(bundle))));
+    }
+    if (!cache) {
+      Get.translations.clear();
+      Get.addTranslations(keys);
     }
     notifyListeners();
   }

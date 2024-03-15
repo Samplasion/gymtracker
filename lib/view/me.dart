@@ -44,17 +44,24 @@ class MeView extends GetView<MeController> {
                         Breakpoints.xxs => 1,
                         _ => 2,
                       },
+                      buttonHeight: kSpeedDialButtonHeight / 1.3,
                       buttons: [
                         SpeedDialButton(
                           icon: const Icon(Icons.calendar_month_rounded),
-                          text: Text("me.calendar.label".t),
+                          text: Text(
+                            "me.calendar.label".t,
+                            style: Theme.of(context).textTheme.bodySmall,
+                          ),
                           onTap: () {
                             Go.to(() => const MeCalendarPage());
                           },
                         ),
                         SpeedDialButton(
                           icon: const Icon(Icons.query_stats_rounded),
-                          text: Text("me.stats.label".t),
+                          text: Text(
+                            "me.stats.label".t,
+                            style: Theme.of(context).textTheme.bodySmall,
+                          ),
                           onTap: () {},
                         ),
                       ],

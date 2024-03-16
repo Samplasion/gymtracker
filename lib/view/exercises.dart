@@ -29,6 +29,7 @@ import 'package:gymtracker/view/utils/exercise.dart';
 import 'package:gymtracker/view/utils/history_workout.dart';
 import 'package:gymtracker/view/utils/textfield_dialog.dart';
 import 'package:gymtracker/view/utils/timer.dart';
+import 'package:gymtracker/view/utils/workout_utils.dart';
 import 'package:gymtracker/view/workout_editor.dart';
 import 'package:intl/intl.dart';
 
@@ -238,50 +239,49 @@ class _ExercisesViewState extends State<ExercisesView> {
       body: SafeArea(
         child: CustomScrollView(
           slivers: [
+            SliverToBoxAdapter(
+              child: Card(
+                margin: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      WorkoutHeader(
+                        workout: workout,
+                        continuation: workout.continuation,
+                      ),
+                      const Divider(height: 32),
+                      FilledButton(
+                        onPressed: () {
+                          controller.startRoutine(context, workout);
+                        },
+                        child: Text(() {
+                          if (workout.isConcrete) {
+                            return "workouts.actions.start".t;
+                          } else {
+                            return "routines.actions.start".t;
+                          }
+                        }()),
+                      ),
+                      if (controller.isWorkoutContinuable(workout))
+                        FilledButton.tonal(
+                          onPressed: () {
+                            controller.continueWorkout(context, workout);
+                          },
+                          child: Text("workouts.actions.continue".t),
+                        ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
             if (!workout.isConcrete &&
                 controller.getChildren(workout).length >= 2)
               SliverToBoxAdapter(
                 child: Padding(
                   padding: const EdgeInsets.all(16),
                   child: RoutineHistoryData(routine: workout),
-                ),
-              ),
-            if (workout.isConcrete)
-              SliverToBoxAdapter(
-                child: Card(
-                  margin: const EdgeInsets.fromLTRB(16, 16, 16, 8),
-                  child: Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        HistoryWorkoutHeader(
-                          workout: workout,
-                          continuation: workout.continuation,
-                        ),
-                        const Divider(height: 32),
-                        FilledButton(
-                          onPressed: () {
-                            controller.startRoutine(context, workout);
-                          },
-                          child: Text(() {
-                            if (workout.isConcrete) {
-                              return "workouts.actions.start".t;
-                            } else {
-                              return "routines.actions.start".t;
-                            }
-                          }()),
-                        ),
-                        if (controller.isWorkoutContinuable(workout))
-                          FilledButton.tonal(
-                            onPressed: () {
-                              controller.continueWorkout(context, workout);
-                            },
-                            child: Text("workouts.actions.continue".t),
-                          ),
-                      ],
-                    ),
-                  ),
                 ),
               ),
             if (workout.shouldShowInfobox)

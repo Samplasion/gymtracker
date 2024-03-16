@@ -3,6 +3,7 @@ import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:get/get.dart';
+import 'package:gymtracker/controller/history_controller.dart';
 import 'package:gymtracker/controller/me_controller.dart';
 import 'package:gymtracker/controller/settings_controller.dart';
 import 'package:gymtracker/data/weights.dart';
@@ -47,16 +48,21 @@ class MeView extends GetView<MeController> {
                       },
                       buttonHeight: (_) => kSpeedDialButtonHeight / 1.3,
                       buttons: [
-                        SpeedDialButton(
-                          icon: const Icon(Icons.calendar_month_rounded),
-                          text: Text(
-                            "me.calendar.label".t,
-                            style: Theme.of(context).textTheme.bodySmall,
-                          ),
-                          onTap: () {
-                            Go.to(() => const MeCalendarPage());
-                          },
-                        ),
+                        Obx(() {
+                          return SpeedDialButton(
+                            icon: const Icon(Icons.calendar_month_rounded),
+                            text: Text(
+                              "me.calendar.label".t,
+                              style: Theme.of(context).textTheme.bodySmall,
+                            ),
+                            onTap: () {
+                              Go.to(() => const MeCalendarPage());
+                            },
+                            enabled: Get.find<HistoryController>()
+                                .history
+                                .isNotEmpty,
+                          );
+                        }),
                         SpeedDialButton(
                           icon: const Icon(Icons.query_stats_rounded),
                           text: Text(

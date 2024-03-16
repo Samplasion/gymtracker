@@ -22,6 +22,7 @@ import 'package:gymtracker/utils/sets.dart';
 import 'package:gymtracker/utils/utils.dart';
 import 'package:gymtracker/view/components/badges.dart';
 import 'package:gymtracker/view/components/infobox.dart';
+import 'package:gymtracker/view/library.dart';
 import 'package:gymtracker/view/routine_creator.dart';
 import 'package:gymtracker/view/utils/dropdown_dialog.dart';
 import 'package:gymtracker/view/utils/exercise.dart';
@@ -735,7 +736,12 @@ class ExerciseDataView extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 16),
           child: Row(
             children: [
-              ExerciseIcon(exercise: exercise),
+              GestureDetector(
+                child: ExerciseIcon(exercise: exercise),
+                onTap: () {
+                  Go.to(() => ExerciseInfoView(exercise: exercise));
+                },
+              ),
               const SizedBox(width: 16),
               Flexible(
                 child: Column(

@@ -2,11 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:gymtracker/controller/exercises_controller.dart';
 import 'package:gymtracker/controller/history_controller.dart';
+import 'package:gymtracker/controller/settings_controller.dart';
 import 'package:gymtracker/data/exercises.dart';
+import 'package:gymtracker/data/weights.dart';
 import 'package:gymtracker/model/exercise.dart';
+import 'package:gymtracker/model/set.dart';
 import 'package:gymtracker/model/superset.dart';
 import 'package:gymtracker/model/workout.dart';
 import 'package:gymtracker/service/localizations.dart';
+import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/utils/utils.dart';
 import 'package:gymtracker/view/components/badges.dart';
@@ -176,6 +180,11 @@ class _ExerciseInfoViewState extends State<ExerciseInfoView> {
                   ),
                 ),
               ),
+              if (history.isNotEmpty)
+                SliverList(
+                  delegate:
+                      SliverChildListDelegate(_getInfoTiles(exercise, context)),
+                ),
               SliverList.builder(
                 itemCount: history.length,
                 itemBuilder: (context, index) {
@@ -255,5 +264,166 @@ class _ExerciseInfoViewState extends State<ExerciseInfoView> {
         ),
       ),
     );
+  }
+
+  List<ListTileTheme> _getInfoTiles(Exercise exercise, BuildContext context) {
+    return [
+      Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        child: Text("exercise.info.usefulData".t,
+            style: Theme.of(context).textTheme.labelLarge!.copyWith(
+                  color: Theme.of(context).colorScheme.primary,
+                )),
+      ),
+      if ([SetParameters.repsWeight, SetParameters.timeWeight]
+          .contains(exercise.parameters))
+        Builder(builder: (context) {
+          var best = history.first;
+          var bestScore = -1.0;
+
+          for (final hist in history) {
+            final (Exercise exercise, int _, Workout workout) = hist;
+            if (exercise.sets.where((set) => set.done).isEmpty) continue;
+            final value = Weights.convert(
+                value: exercise.sets
+                    .where((set) => set.done)
+                    .map((set) => set.weight)
+                    .whereType<num>()
+                    .max
+                    .toDouble(),
+                from: workout.weightUnit,
+                to: settingsController.weightUnit.value!);
+            if (value >= bestScore) {
+              best = hist;
+              bestScore = value;
+            }
+          }
+
+          return ExerciseInfoTile(
+            "exercise.info.heaviestWeight.label".t,
+            bestScore.userFacingWeight,
+            onTap: () {
+              Go.to(() => ExercisesView(workout: best.$3));
+            },
+          );
+        }),
+      if ([SetParameters.repsWeight].contains(exercise.parameters))
+        Builder(builder: (context) {
+          var best = history.first;
+          var bestScore = -1.0;
+
+          for (final hist in history) {
+            final (Exercise exercise, int _, Workout workout) = hist;
+            if (exercise.sets.where((set) => set.done).isEmpty) continue;
+            final value = Weights.convert(
+                value: exercise.sets
+                    .where((set) => set.done)
+                    .map((set) => set.oneRepMax)
+                    .whereType<num>()
+                    .max
+                    .toDouble(),
+                from: workout.weightUnit,
+                to: settingsController.weightUnit.value!);
+            if (value >= bestScore) {
+              best = hist;
+              bestScore = value;
+            }
+          }
+
+          return ExerciseInfoTile(
+            "exercise.info.best1rm.label".t,
+            bestScore.userFacingWeight,
+            onTap: () {
+              Go.to(() => ExercisesView(workout: best.$3));
+            },
+          );
+        }),
+      if ([SetParameters.repsWeight].contains(exercise.parameters))
+        Builder(builder: (context) {
+          var best = history.first;
+          var bestWeight = 0.0;
+          var bestReps = 0;
+          var bestScore = -1.0;
+
+          for (final hist in history) {
+            final (Exercise exercise, int _, Workout workout) = hist;
+            for (final set in exercise.sets.where((set) => set.done)) {
+              final value = Weights.convert(
+                  value: set.weight!,
+                  from: workout.weightUnit,
+                  to: settingsController.weightUnit.value!);
+              if ((value * set.reps!) >= bestScore) {
+                best = hist;
+                bestScore = (value * set.reps!);
+                bestWeight = value;
+                bestReps = set.reps!;
+              }
+            }
+          }
+
+          return ExerciseInfoTile(
+            "exercise.info.bestSetVolume.label".t,
+            "${bestWeight.userFacingWeight} × $bestReps",
+            onTap: () {
+              Go.to(() => ExercisesView(workout: best.$3));
+            },
+          );
+        }),
+      if ([SetParameters.repsWeight, SetParameters.timeWeight]
+          .contains(exercise.parameters))
+        Builder(builder: (context) {
+          var best = history.first;
+          var bestScore = -1.0;
+
+          for (final hist in history) {
+            final (Exercise exercise, int _, Workout workout) = hist;
+            if (exercise.sets.where((set) => set.done).isEmpty) continue;
+            final value = Weights.convert(
+                value: exercise.sets
+                    .where((set) => set.done)
+                    .map((set) => set.weight! * (set.reps ?? 1))
+                    .whereType<num>()
+                    .sum
+                    .toDouble(),
+                from: workout.weightUnit,
+                to: settingsController.weightUnit.value!);
+            if (value >= bestScore) {
+              best = hist;
+              bestScore = value;
+            }
+          }
+
+          return ExerciseInfoTile(
+            "exercise.info.bestSessionVolume.label".t,
+            bestScore.userFacingWeight,
+            onTap: () {
+              Go.to(() => ExercisesView(workout: best.$3));
+            },
+          );
+        }),
+    ].map((w) {
+      // Restore default theme for this section only
+      return ListTileTheme(
+        data: Theme.of(context).listTileTheme,
+        child: w,
+      );
+    }).toList();
+  }
+}
+
+class ExerciseInfoTile extends StatelessWidget {
+  final String title, subtitle;
+  final VoidCallback? onTap;
+
+  const ExerciseInfoTile(
+    this.title,
+    this.subtitle, {
+    this.onTap,
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return ListTile(title: Text(title), subtitle: Text(subtitle), onTap: onTap);
   }
 }

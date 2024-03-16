@@ -78,6 +78,15 @@ exercise:
     title: Exercise info
     viewWorkout: View workout
     noHistory: You haven't performed this exercise yet.
+    heaviestWeight:
+      label: Heaviest weight
+    best1rm:
+      label: Best 1 Rep Max
+    bestSetVolume:
+      label: Best set volume
+    bestSessionVolume:
+      label: Best session volume
+    usefulData: Useful data
   continuation:
     label: "Continuation"
 

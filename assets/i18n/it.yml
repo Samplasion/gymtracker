@@ -78,6 +78,15 @@ exercise:
     title: Info esercizio
     viewWorkout: Vedi allenamento
     noHistory: Non ci sono allenamenti per questo esercizio.
+    heaviestWeight:
+      label: Peso massimo
+    best1rm:
+      label: Miglior 1 Rep Max
+    bestSetVolume:
+      label: Miglior volume di una serie
+    bestSessionVolume:
+      label: Miglior volume totale di una sessione
+    usefulData: Dati utili
   continuation:
     label: "Continuazione"
 

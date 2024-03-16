@@ -3,7 +3,10 @@ import 'dart:io';
 
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:flutter/material.dart';
+import 'package:gymtracker/controller/settings_controller.dart';
 import 'package:gymtracker/model/workout.dart';
+import 'package:gymtracker/service/localizations.dart';
+import 'package:gymtracker/utils/utils.dart';
 
 extension StringUtils on String {
   double parseDouble() {
@@ -65,6 +68,14 @@ extension NumIterableUtils<T extends num> on Iterable<T> {
     }
     return max;
   }
+
+  T get sum {
+    T sum = 0 as T;
+    for (final element in this) {
+      sum = (sum + element as T);
+    }
+    return sum;
+  }
 }
 
 extension BuildContextUtils on BuildContext {
@@ -123,5 +134,14 @@ extension WorkoutIterableUtils on Iterable<Workout> {
       }
     }
     return result;
+  }
+}
+
+extension WeightUtils on double {
+  String get userFacingWeight {
+    return "exerciseList.fields.weight".tParams({
+      "weight": stringifyDouble(this),
+      "unit": "units.${settingsController.weightUnit.value!.name}".t,
+    });
   }
 }

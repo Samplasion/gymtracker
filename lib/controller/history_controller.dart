@@ -21,6 +21,8 @@ class HistoryController extends GetxController with ServiceableController {
       .toList();
   Map<DateTime, List<Workout>> workoutsByDay = {};
 
+  Rx<(int, int)> streaks = (0, 0).obs;
+
   @override
   void onServiceChange() {
     final hist = service.workoutHistory;
@@ -29,6 +31,7 @@ class HistoryController extends GetxController with ServiceableController {
         .compareTo(b.startingDate ?? DateTime.fromMillisecondsSinceEpoch(0)));
     history(hist);
     _computeWorkoutsByDay();
+    _computeStreaks();
   }
 
   void _computeWorkoutsByDay() {
@@ -39,6 +42,41 @@ class HistoryController extends GetxController with ServiceableController {
       _counts[date]!.add(workout);
     }
     workoutsByDay = _counts;
+  }
+
+  // TODO: Localize the first day-of-week for streak weeks computation
+  void _computeStreaks() {
+    printInfo(info: "Recomputed streaks");
+
+    var (streak, rest) = (0, 0);
+
+    final keys = workoutsByDay.keys.toList();
+    keys.sort();
+
+    var today = DateTime.now().startOfDay;
+    var lastMonday = today.weekday == DateTime.monday
+        ? today
+        : today.subtract(Duration(days: today.weekday - 1));
+
+    while (true) {
+      if (keys.any((element) =>
+          element.isAfter(lastMonday) &&
+          element.isBefore(lastMonday.add(const Duration(days: 7))))) {
+        streak++;
+        lastMonday = lastMonday.subtract(const Duration(days: 7));
+      } else {
+        break;
+      }
+    }
+
+    if (!workoutsByDay.containsKey(today)) {
+      final keys = workoutsByDay.keys.toList()..sort();
+      if (keys.isNotEmpty) {
+        rest = today.difference(keys.last).inDays;
+      }
+    }
+
+    streaks((streak, rest));
   }
 
   void deleteWorkout(Workout workout) {

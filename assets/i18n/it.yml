@@ -601,6 +601,13 @@ me:
       few: "%s giorni"
       many: "%s giorni"
       other: "%s giorni"
+    streakWeeks:
+      zero: 0 settimane
+      one: 1 settimana
+      two: 2 settimane
+      few: "%s settimane"
+      many: "%s settimane"
+      other: "%s settimane"
   stats:
     label: Statistiche
     timeFrame:

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:gymtracker/controller/history_controller.dart';
 import 'package:gymtracker/controller/me_controller.dart';
+import 'package:gymtracker/icons/gymtracker_icons.dart';
 import 'package:gymtracker/model/workout.dart';
 import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/utils/constants.dart';
@@ -40,28 +41,6 @@ class _MeCalendarPageState
     },
   );
 
-  (int, int) computeStreaks(Map<DateTime, List<Workout>> workoutsByDay) {
-    var (streak, rest) = (0, 0);
-
-    var today = DateTime.now().startOfDay;
-
-    if (workoutsByDay.containsKey(today)) {
-      int past = 0;
-      do {
-        past += 1;
-        streak++;
-      } while (workoutsByDay
-          .containsKey(today.subtract(Duration(days: past)).startOfDay));
-    } else {
-      final keys = workoutsByDay.keys.toList()..sort();
-      if (keys.isNotEmpty) {
-        rest = today.difference(keys.last).inDays;
-      }
-    }
-
-    return (streak, rest);
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -72,11 +51,9 @@ class _MeCalendarPageState
         children: [
           Padding(
             padding: const EdgeInsets.all(16),
-            child: ListenableBuilder(
-              listenable: historyController,
-              builder: (context, _) {
-                final (streakDays, restDays) =
-                    computeStreaks(historyController.workoutsByDay);
+            child: Obx(
+              () {
+                final (streakWeeks, restDays) = historyController.streaks();
                 return SpeedDial(
                   crossAxisCountBuilder: (breakpoint) => switch (breakpoint) {
                     Breakpoints.xxs => 1,
@@ -90,16 +67,18 @@ class _MeCalendarPageState
                       kSpeedDialButtonHeight,
                   buttons: [
                     SpeedDialButton(
-                      icon: const Icon(Icons.fireplace_rounded),
-                      text: Text("me.calendar.streak".t),
-                      subtitle:
-                          Text("me.calendar.streakDays".plural(streakDays)),
+                      icon: Icon(GymTrackerIcons.fire,
+                          color: context.harmonizeColor(Colors.orange)),
+                      text: Text("me.calendar.streakWeeks".plural(streakWeeks)),
+                      subtitle: Text("me.calendar.streak".t),
                       dense: true,
                     ),
                     SpeedDialButton(
-                      icon: const Icon(Icons.nightlight_round),
-                      text: Text("me.calendar.rest".t),
-                      subtitle: Text("me.calendar.streakDays".plural(restDays)),
+                      icon: Icon(Icons.nightlight_round,
+                          color: context
+                              .harmonizeColor(Colors.deepPurple.shade300)),
+                      text: Text("me.calendar.streakDays".plural(restDays)),
+                      subtitle: Text("me.calendar.rest".t),
                       dense: true,
                     ),
                   ],

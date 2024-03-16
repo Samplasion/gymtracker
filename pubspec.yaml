@@ -59,6 +59,11 @@ dev_dependencies:
   test: ^1.24.3
 
 flutter:
+  fonts:
+   - family:  GymTracker
+     fonts:
+      - asset: fonts/GymTracker.ttf
+
   uses-material-design: true
   assets:
     - assets/i18n/en.yml

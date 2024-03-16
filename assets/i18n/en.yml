@@ -601,6 +601,13 @@ me:
       few: "%s days"
       many: "%s days"
       other: "%s days"
+    streakWeeks:
+      zero: 0 weeks
+      one: 1 week
+      two: 2 weeks
+      few: "%s weeks"
+      many: "%s weeks"
+      other: "%s weeks"
   stats:
     label: Statistics
     timeFrame:

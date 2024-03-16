@@ -49,6 +49,8 @@ void main() async {
   runApp(MainApp(localizations: l, databaseService: _databaseService));
 }
 
+const applicationKey = Key("GymTracker");
+
 class MainApp extends StatelessWidget {
   final GTLocalizations localizations;
   final DatabaseService databaseService;
@@ -65,14 +67,15 @@ class MainApp extends StatelessWidget {
     Get.put(NotificationsService());
     Get.put(CountdownController());
     Get.put(ExercisesController());
-    Get.put(DebugController());
+    final debugController = Get.put(DebugController());
     Get.put(StopwatchController());
     Get.put(MeController());
     final settings = Get.put(SettingsController());
     final localizations = Get.put(this.localizations);
 
-    return DeviceSim(
-      builder: (context) => DynamicColorBuilder(builder: (light, dark) {
+    final application = DynamicColorBuilder(
+      key: applicationKey,
+      builder: (light, dark) {
         return AnimatedBuilder(
             animation: settings.service,
             builder: (context, _) {
@@ -156,8 +159,16 @@ class MainApp extends StatelessWidget {
                 }(),
               );
             });
-      }),
+      },
     );
+
+    return Obx(() {
+      if (debugController.showSimulator.isTrue) {
+        return DeviceSim(builder: (context) => application);
+      }
+
+      return application;
+    });
   }
 }
 

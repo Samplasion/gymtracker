@@ -118,6 +118,17 @@ class _DebugViewState extends State<DebugView> {
                   );
                 },
               ),
+              ValueBuilder<bool?>(
+                initialValue: controller.showSimulator.value,
+                builder: (value, onChanged) => SwitchListTile(
+                  title: const Text("Show device simulator"),
+                  value: value ?? false,
+                  onChanged: onChanged,
+                ),
+                onUpdate: (v) => controller.setShowSimulator(v ?? false),
+              ),
+
+              // ------------
               ListTile(
                 title: Text(
                   "Running stopwatches",

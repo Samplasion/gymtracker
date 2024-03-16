@@ -66,17 +66,9 @@ class SpeedDialButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    final cardTheme = CardTheme.of(context);
     return Card(
       clipBehavior: Clip.hardEdge,
-      elevation: enabled ? null : 0,
-      surfaceTintColor: Colors.transparent,
-      color: ElevationOverlay.applySurfaceTint(
-        cardTheme.color ?? colorScheme.background,
-        cardTheme.surfaceTintColor ?? colorScheme.surfaceTint,
-        1,
-      ),
+      elevation: enabled ? null : 0.5,
       margin: EdgeInsets.zero,
       child: InkWell(
         onTap: enabled ? onTap : null,

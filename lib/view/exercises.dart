@@ -26,6 +26,7 @@ import 'package:gymtracker/view/library.dart';
 import 'package:gymtracker/view/routine_creator.dart';
 import 'package:gymtracker/view/utils/dropdown_dialog.dart';
 import 'package:gymtracker/view/utils/exercise.dart';
+import 'package:gymtracker/view/utils/history_workout.dart';
 import 'package:gymtracker/view/utils/textfield_dialog.dart';
 import 'package:gymtracker/view/utils/timer.dart';
 import 'package:gymtracker/view/workout_editor.dart';
@@ -245,36 +246,44 @@ class _ExercisesViewState extends State<ExercisesView> {
                   child: RoutineHistoryData(routine: workout),
                 ),
               ),
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: FilledButton(
-                  onPressed: () {
-                    controller.startRoutine(context, workout);
-                  },
-                  child: Text(() {
-                    if (workout.isConcrete) {
-                      return "workouts.actions.start".t;
-                    } else {
-                      return "routines.actions.start".t;
-                    }
-                  }()),
-                ),
-              ),
-            ),
-            if (controller.isWorkoutContinuable(workout)) ...[
+            if (workout.isConcrete)
               SliverToBoxAdapter(
-                child: Padding(
-                  padding: const EdgeInsets.all(16).copyWith(top: 0),
-                  child: FilledButton.tonal(
-                    onPressed: () {
-                      controller.continueWorkout(context, workout);
-                    },
-                    child: Text("workouts.actions.continue".t),
+                child: Card(
+                  margin: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        HistoryWorkoutHeader(
+                          workout: workout,
+                          continuation: workout.continuation,
+                        ),
+                        const Divider(height: 32),
+                        FilledButton(
+                          onPressed: () {
+                            controller.startRoutine(context, workout);
+                          },
+                          child: Text(() {
+                            if (workout.isConcrete) {
+                              return "workouts.actions.start".t;
+                            } else {
+                              return "routines.actions.start".t;
+                            }
+                          }()),
+                        ),
+                        if (controller.isWorkoutContinuable(workout))
+                          FilledButton.tonal(
+                            onPressed: () {
+                              controller.continueWorkout(context, workout);
+                            },
+                            child: Text("workouts.actions.continue".t),
+                          ),
+                      ],
+                    ),
                   ),
                 ),
               ),
-            ],
             if (workout.shouldShowInfobox)
               SliverToBoxAdapter(
                 child: Infobox(

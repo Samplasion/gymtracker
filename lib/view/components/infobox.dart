@@ -11,6 +11,7 @@ class Infobox extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: Card(
+        margin: EdgeInsets.zero,
         child: Padding(
           padding: const EdgeInsets.all(16),
           child: Column(

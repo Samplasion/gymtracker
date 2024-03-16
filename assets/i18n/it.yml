@@ -190,6 +190,7 @@ history:
         few: Gli esercizi sono stati eliminati dalla tua cronologia.
         many: Gli esercizi sono stati eliminati dalla tua cronologia.
         other: Gli esercizi sono stati eliminati dalla tua cronologia.
+  showAll: Mostra tutto
 
 settings:
   title: Impostazioni

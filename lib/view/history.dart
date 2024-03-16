@@ -6,14 +6,18 @@ import 'package:gymtracker/model/workout.dart';
 import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/view/exercises.dart';
+import 'package:gymtracker/view/me/calendar.dart';
+import 'package:gymtracker/view/utils/action_icon.dart';
 import 'package:gymtracker/view/utils/history_workout.dart';
 import 'package:intl/intl.dart';
+
+const kHistoryWorkoutsAbridgedCount = 20;
 
 typedef MonthYear = (int month, int year);
 
 Map<MonthYear, List<Workout>> _getHistoryByMonthThread(List<Workout> raw) {
   final map = <MonthYear, List<Workout>>{};
-  for (final workout in raw.reversed) {
+  for (final workout in raw.reversed.take(kHistoryWorkoutsAbridgedCount)) {
     final key = (
       workout.startingDate!.month,
       workout.startingDate!.year,
@@ -159,6 +163,22 @@ class _HistoryViewState extends State<HistoryView> {
                   ),
                 ),
               ],
+              if (Get.find<HistoryController>().userVisibleWorkouts.length >
+                  kHistoryWorkoutsAbridgedCount)
+                SliverPadding(
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  sliver: SliverToBoxAdapter(
+                    child: ListTile(
+                      title: Text("history.showAll".t),
+                      trailing: const ListTileActionIcon(),
+                      onTap: () {
+                        Go.to(
+                          () => const MeCalendarPage(),
+                        );
+                      },
+                    ),
+                  ),
+                ),
             ],
           );
         },

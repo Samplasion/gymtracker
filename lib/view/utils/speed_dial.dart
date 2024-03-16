@@ -30,6 +30,7 @@ class SpeedDial extends StatelessWidget {
         return GridView.count(
           padding: EdgeInsets.zero,
           physics: const NeverScrollableScrollPhysics(),
+          controller: ScrollController(),
           shrinkWrap: true,
           crossAxisCount: crossAxis,
           childAspectRatio:

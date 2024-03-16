@@ -432,12 +432,6 @@ class _RoutineHistoryDataState extends State<RoutineHistoryData> {
   }
 
   double _getY(Workout wo) {
-    print((
-      "_getY",
-      wo.liftedWeight,
-      wo.weightUnit,
-      settingsController.weightUnit.value!
-    ));
     switch (type) {
       case _RoutineHistoryDataType.volume:
         return Weights.convert(
@@ -459,8 +453,6 @@ class _RoutineHistoryDataState extends State<RoutineHistoryData> {
     TextAlign? textAlign,
     required Weights weightUnit,
   }) {
-    print(
-        ("buildSpan", value, weightUnit, settingsController.weightUnit.value!));
     return TimerView.buildTimeString(
       context,
       Duration(seconds: value.toInt()),

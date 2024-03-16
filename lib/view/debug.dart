@@ -112,11 +112,6 @@ class _DebugViewState extends State<DebugView> {
                       _loadTranslationsFuture =
                           Get.find<GTLocalizations>().init(false);
                       _loadTranslationsFuture.then((_) {
-                        print((
-                          Get.find<GTLocalizations>().keys,
-                          Get.find<GTLocalizations>().keys['en']?['me.title'],
-                          "me.title".t,
-                        ));
                         Go.snack("Reloaded");
                       });
                     },
@@ -168,12 +163,6 @@ class _DebugViewState extends State<DebugView> {
 }
 
 String generateYamlForMissingKeys(List<String> missingKeys) {
-  print((
-    missingKeys,
-    {
-      for (final key in missingKeys) key: key.split(".").last,
-    }
-  ));
   Map<String, dynamic> keys = unflatten({
     for (final key in missingKeys) key: key.split(".").last,
   });

@@ -302,7 +302,7 @@ class RoutinesController extends GetxController
   @override
   onProtocolUrlReceived(String url) {
     final Uri parsed = Uri.parse(url);
-    print('Url received: $parsed');
+    debugPrint('Url received: $parsed');
 
     switch (parsed.host) {
       case "routine":

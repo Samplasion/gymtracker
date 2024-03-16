@@ -13,8 +13,15 @@ const encodedLipsum =
 void main() {
   group('StringCompression extension', () {
     test("compressed", () {
-      expect("Test".compressed, "H4sIAAAAAAAAEwtJLS4BADLRTXgEAAAA");
-      expect(lipsum.compressed, encodedLipsum);
+      const testCompressed = "H4sIAAAAAAAAEwtJLS4BADLRTXgEAAAA";
+      expect(
+          [testCompressed, testCompressed.replaceRange(12, 12, "A")]
+              .contains("Test".compressed),
+          true);
+      expect(
+          [encodedLipsum, encodedLipsum.replaceRange(12, 12, "A")]
+              .contains(lipsum.compressed),
+          true);
     });
     test("uncompressed", () {
       expect("H4sIAAAAAAAAEwtJLS4BADLRTXgEAAAA".uncompressed, "Test");

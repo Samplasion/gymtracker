@@ -53,12 +53,10 @@ class _MeCalendarPageState
       } while (workoutsByDay
           .containsKey(today.subtract(Duration(days: past)).startOfDay));
     } else {
-      int past = 0;
-      do {
-        past += 1;
-        rest++;
-      } while (!workoutsByDay
-          .containsKey(today.subtract(Duration(days: past)).startOfDay));
+      final keys = workoutsByDay.keys.toList()..sort();
+      if (keys.isNotEmpty) {
+        rest = today.difference(keys.last).inDays;
+      }
     }
 
     return (streak, rest);

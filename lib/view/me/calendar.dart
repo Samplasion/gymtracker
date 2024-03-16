@@ -32,7 +32,9 @@ class _MeCalendarPageState
     extends ControlledState<MeCalendarPage, MeController> {
   HistoryController get historyController => Get.find<HistoryController>();
   late final calendarController = CleanCalendarController(
-    minDate: historyController.userVisibleWorkouts.first.startingDate!,
+    minDate: historyController.userVisibleWorkouts.isEmpty
+        ? DateTime.now()
+        : historyController.userVisibleWorkouts.first.startingDate!,
     maxDate: DateTime.now(),
     rangeMode: false,
     initialFocusDate: DateTime.now(),
@@ -130,12 +132,6 @@ class _MeCalendarPageState
       decoration: BoxDecoration(
         color: bgColor,
         borderRadius: BorderRadius.circular(kDayBorderRadius),
-        border: values.day.isSameDay(values.minDate)
-            ? Border.all(
-                color: Theme.of(context).colorScheme.primary,
-                width: 2,
-              )
-            : null,
       ),
       child: Text(
         values.text,

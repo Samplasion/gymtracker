@@ -48,21 +48,16 @@ class MeView extends GetView<MeController> {
                       },
                       buttonHeight: (_) => kSpeedDialButtonHeight / 1.3,
                       buttons: [
-                        Obx(() {
-                          return SpeedDialButton(
-                            icon: const Icon(Icons.calendar_month_rounded),
-                            text: Text(
-                              "me.calendar.label".t,
-                              style: Theme.of(context).textTheme.bodySmall,
-                            ),
-                            onTap: () {
-                              Go.to(() => const MeCalendarPage());
-                            },
-                            enabled: Get.find<HistoryController>()
-                                .history
-                                .isNotEmpty,
-                          );
-                        }),
+                        SpeedDialButton(
+                          icon: const Icon(Icons.calendar_month_rounded),
+                          text: Text(
+                            "me.calendar.label".t,
+                            style: Theme.of(context).textTheme.bodySmall,
+                          ),
+                          onTap: () {
+                            Go.to(() => const MeCalendarPage());
+                          },
+                        ),
                         SpeedDialButton(
                           icon: const Icon(Icons.query_stats_rounded),
                           text: Text(

@@ -3,6 +3,7 @@ import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:get/get.dart';
+import 'package:gymtracker/controller/history_controller.dart';
 import 'package:gymtracker/controller/me_controller.dart';
 import 'package:gymtracker/controller/settings_controller.dart';
 import 'package:gymtracker/data/weights.dart';
@@ -12,7 +13,9 @@ import 'package:gymtracker/utils/constants.dart';
 import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/utils/utils.dart';
+import 'package:gymtracker/view/charts/muscle_category.dart';
 import 'package:gymtracker/view/me/calendar.dart';
+import 'package:gymtracker/view/me/statistics.dart';
 import 'package:gymtracker/view/utils/date_field.dart';
 import 'package:gymtracker/view/utils/section_title.dart';
 import 'package:gymtracker/view/utils/speed_dial.dart';
@@ -62,7 +65,9 @@ class MeView extends GetView<MeController> {
                             "me.stats.label".t,
                             style: Theme.of(context).textTheme.bodySmall,
                           ),
-                          onTap: () {},
+                          onTap: () {
+                            Go.to(() => const MeStatisticsPage());
+                          },
                         ),
                       ],
                     ),

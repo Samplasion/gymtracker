@@ -11,27 +11,40 @@ part 'exercise.g.dart';
 
 bool _defaultSetFilter(set) => true;
 
-enum MuscleGroup {
-  abductors,
-  abs,
-  adductors,
-  biceps,
-  calves,
+enum MuscleCategory {
+  arms,
+  back,
   chest,
-  forearm,
-  glutes,
-  hamstrings,
-  lats,
-  lowerBack,
+  core,
+  legs,
+  shoulders,
+}
+
+enum MuscleGroup {
+  abductors(MuscleCategory.legs),
+  abs(MuscleCategory.core),
+  adductors(MuscleCategory.legs),
+  biceps(MuscleCategory.arms),
+  calves(MuscleCategory.legs),
+  chest(MuscleCategory.chest),
+  forearm(MuscleCategory.arms),
+  glutes(MuscleCategory.legs),
+  hamstrings(MuscleCategory.legs),
+  lats(MuscleCategory.legs),
+  lowerBack(MuscleCategory.back),
 
   /// Or cardio
   none,
   other,
-  quadriceps,
-  shoulders,
-  traps,
-  triceps,
-  upperBack,
+  quadriceps(MuscleCategory.legs),
+  shoulders(MuscleCategory.shoulders),
+  traps(MuscleCategory.back),
+  triceps(MuscleCategory.arms),
+  upperBack(MuscleCategory.back);
+
+  const MuscleGroup([this.category]);
+
+  final MuscleCategory? category;
 }
 
 @JsonSerializable(constructor: "raw")

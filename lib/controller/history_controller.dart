@@ -274,6 +274,40 @@ class HistoryController extends GetxController with ServiceableController {
     }
     service.setHistoryWorkout(workout);
   }
+
+  Map<MuscleCategory, double> calculateMuscleCategoryDistributionFor({
+    required List<Workout> workouts,
+  }) {
+    Map<MuscleCategory, double> map = {
+      for (final category in MuscleCategory.values) category: 0,
+    };
+
+    void handleExercise(Exercise exercise) {
+      for (final group in [
+        exercise.primaryMuscleGroup,
+        ...exercise.secondaryMuscleGroups
+      ]) {
+        if (group.category == null) continue;
+        map[group.category!] = map[group.category!]! +
+            exercise.sets.where((element) => element.done).length;
+      }
+    }
+
+    for (final workout in workouts) {
+      for (final exercise in workout.exercises) {
+        exercise.when(
+          exercise: handleExercise,
+          superset: (superset) {
+            for (final exercise in superset.exercises) {
+              handleExercise(exercise);
+            }
+          },
+        );
+      }
+    }
+
+    return map;
+  }
 }
 
 extension WorkoutHistory on Workout {

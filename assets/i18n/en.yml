@@ -365,6 +365,14 @@ muscleGroups:
   triceps: Triceps
   upperBack: Upper back
 
+muscleCategories:
+  arms: Arms
+  back: Back
+  chest: Chest
+  core: Core
+  legs: Legs
+  shoulders: Shoulders
+
 actions:
   create: Create
   remove: Remove
@@ -595,3 +603,16 @@ me:
       other: "%s days"
   stats:
     label: Statistics
+    timeFrame:
+      thirtyDays: Last 30 days
+      threeMonths: Last 3 months
+      year: Last year
+      allTime: All time
+    workouts:
+      label: Workouts
+    duration:
+      label: Duration
+    volume:
+      label: Volume
+    sets:
+      label: Sets

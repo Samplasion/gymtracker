@@ -26,4 +26,21 @@ abstract class WorkoutExercisable {
   List<ExSet> get sets;
   Duration get restTime;
   String get notes;
+
+  when({
+    void Function(Exercise)? exercise,
+    void Function(Superset)? superset,
+    void Function()? other,
+  }) {
+    assert([exercise, superset, other].any((el) => el != null),
+        "At least one callback must be provided.");
+    if (this is Exercise && exercise != null) {
+      exercise(this as Exercise);
+      return;
+    } else if (this is Superset && superset != null) {
+      superset(this as Superset);
+      return;
+    }
+    other?.call();
+  }
 }

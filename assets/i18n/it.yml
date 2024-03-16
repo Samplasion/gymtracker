@@ -365,6 +365,14 @@ muscleGroups:
   triceps: Tricipidi
   upperBack: Schiena alta
 
+muscleCategories:
+  arms: Braccia
+  back: Schiena
+  chest: Petto
+  core: Core
+  legs: Gambe
+  shoulders: Spalle
+
 actions:
   create: Crea
   remove: Rimuovi
@@ -595,3 +603,16 @@ me:
       other: "%s giorni"
   stats:
     label: Statistiche
+    timeFrame:
+      thirtyDays: Ultimi 30 giorni
+      threeMonths: Ultimi 3 mesi
+      year: Ultimo anno
+      allTime: Tutto
+    workouts:
+      label: Allenamenti
+    duration:
+      label: Durata
+    volume:
+      label: Volume
+    sets:
+      label: Serie

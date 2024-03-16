@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:flutter/material.dart';
+import 'package:gymtracker/model/workout.dart';
 
 extension StringUtils on String {
   double parseDouble() {
@@ -44,9 +45,9 @@ extension IterableUtils<T> on Iterable<T> {
   }
 }
 
-extension ListDoubleUtils on List<double> {
-  double get min {
-    double min = first;
+extension NumIterableUtils<T extends num> on Iterable<T> {
+  T get min {
+    T min = first;
     for (final element in this) {
       if (element < min) {
         min = element;
@@ -55,8 +56,8 @@ extension ListDoubleUtils on List<double> {
     return min;
   }
 
-  double get max {
-    double max = first;
+  T get max {
+    T max = first;
     for (final element in this) {
       if (element > max) {
         max = element;
@@ -85,4 +86,42 @@ final Compressor = utf8.fuse(gzip.fuse(base64));
 extension StringCompression on String {
   String get compressed => Compressor.encode(this);
   String get uncompressed => Compressor.decode(this);
+}
+
+extension WorkoutIterableUtils on Iterable<Workout> {
+  /// Returns all the workouts performed in the given time [period].
+  ///
+  /// Assumes [this] is sorted such that the most recent workout is last.
+  List<Workout> inTimePeriod(Duration period) {
+    List<Workout> result = [];
+    List<Workout> self = toList();
+    final today = DateTime.now().startOfDay;
+    final timeStart = today.subtract(period);
+    for (final workout in self.reversed) {
+      if (workout.startingDate != null &&
+          workout.startingDate!.isAfter(timeStart)) {
+        result.add(workout);
+      }
+    }
+    return result;
+  }
+
+  /// Returns all the workouts performed in the time [period] immediately
+  /// preceding the current period.
+  ///
+  /// Assumes [this] is sorted such that the most recent workout is last.
+  List<Workout> inPrecedingTimePeriod(Duration period) {
+    List<Workout> result = [];
+    List<Workout> self = toList();
+    final today = DateTime.now().startOfDay.subtract(period);
+    final timeStart = today;
+    for (final workout in self.reversed) {
+      if (workout.startingDate != null &&
+          workout.startingDate!.isAfter(timeStart) &&
+          workout.startingDate!.isBefore(today)) {
+        result.add(workout);
+      }
+    }
+    return result;
+  }
 }

@@ -80,7 +80,6 @@ class _MeCalendarPageState
                 return SpeedDial(
                   crossAxisCountBuilder: (breakpoint) => switch (breakpoint) {
                     Breakpoints.xxs => 1,
-                    Breakpoints.xs => 1,
                     _ => 2,
                   },
                   buttonHeight: (breakpoint) =>

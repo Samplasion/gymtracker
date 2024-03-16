@@ -11,6 +11,7 @@ import 'package:gymtracker/utils/constants.dart';
 import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/view/charts/muscle_category.dart';
 import 'package:gymtracker/view/components/controlled.dart';
+import 'package:gymtracker/view/components/tweened_builder.dart';
 import 'package:gymtracker/view/utils/speed_dial.dart';
 import 'package:gymtracker/view/utils/timer.dart';
 import 'package:intl/intl.dart';
@@ -117,37 +118,58 @@ class _MeStatisticsPageState
                 } *
                 kSpeedDialButtonHeight,
             buttons: [
-              SpeedDialButton(
-                icon: const Icon(Icons.fitness_center_rounded),
-                text: Text("${speedDialData.$1}"),
-                subtitle: Text("me.stats.workouts.label".t),
+              TweenedIntBuilder(
+                value: speedDialData.$1,
+                builder: (context, value) {
+                  return SpeedDialButton(
+                    icon: const Icon(Icons.fitness_center_rounded),
+                    text: Text("${value.toInt()}"),
+                    subtitle: Text("me.stats.workouts.label".t),
+                  );
+                },
               ),
-              SpeedDialButton(
-                icon: const Icon(Icons.access_time_rounded),
-                text: TimerView.buildTimeString(
-                  context,
-                  speedDialData.$2,
-                  builder: (time) => Text("${time.text}"),
-                ),
-                subtitle: Text("me.stats.duration.label".t),
+              TweenedIntBuilder(
+                value: speedDialData.$2.inMilliseconds,
+                builder: (context, value) {
+                  return SpeedDialButton(
+                    icon: const Icon(Icons.access_time_rounded),
+                    text: TimerView.buildTimeString(
+                      context,
+                      Duration(milliseconds: value),
+                      builder: (time) => Text("${time.text}"),
+                    ),
+                    subtitle: Text("me.stats.duration.label".t),
+                  );
+                },
               ),
-              SpeedDialButton(
-                icon: const Icon(Icons.line_weight_rounded),
-                text: Text(
-                  "exerciseList.fields.weight".trParams({
-                    "weight":
-                        NumberFormat.compact(locale: Get.locale!.languageCode)
-                            .format(speedDialData.$3),
-                    "unit":
-                        "units.${settingsController.weightUnit.value!.name}".t,
-                  }),
-                ),
-                subtitle: Text("me.stats.volume.label".t),
+              TweenedDoubleBuilder(
+                value: speedDialData.$3,
+                builder: (context, value) {
+                  return SpeedDialButton(
+                    icon: const Icon(Icons.line_weight_rounded),
+                    text: Text(
+                      "exerciseList.fields.weight".trParams({
+                        "weight": NumberFormat.compact(
+                                locale: Get.locale!.languageCode)
+                            .format(value),
+                        "unit":
+                            "units.${settingsController.weightUnit.value!.name}"
+                                .t,
+                      }),
+                    ),
+                    subtitle: Text("me.stats.volume.label".t),
+                  );
+                },
               ),
-              SpeedDialButton(
-                icon: const Icon(Icons.numbers_rounded),
-                text: Text("${speedDialData.$4}"),
-                subtitle: Text("me.stats.sets.label".t),
+              TweenedIntBuilder(
+                value: speedDialData.$4,
+                builder: (context, value) {
+                  return SpeedDialButton(
+                    icon: const Icon(Icons.numbers_rounded),
+                    text: Text("$value"),
+                    subtitle: Text("me.stats.sets.label".t),
+                  );
+                },
               ),
             ],
           )

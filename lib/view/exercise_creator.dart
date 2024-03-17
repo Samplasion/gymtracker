@@ -98,7 +98,7 @@ class _ExerciseCreatorState extends State<ExerciseCreator> {
                   decoration: _decoration(
                       "exercise.editor.fields.primaryMuscleGroup.label".t),
                   items: [
-                    for (final muscle in MuscleGroup.values)
+                    for (final muscle in muscleGroups)
                       DropdownMenuItem(
                         value: muscle,
                         child: Text("muscleGroups.${muscle.name}".t),

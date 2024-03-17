@@ -1,5 +1,7 @@
 # GymTracker
 
+[![Integration tests](https://github.com/Samplasion/gymtracker/actions/workflows/integration_test.yml/badge.svg)](https://github.com/Samplasion/gymtracker/actions/workflows/integration_test.yml) [![Unit tests](https://github.com/Samplasion/gymtracker/actions/workflows/test.yml/badge.svg)](https://github.com/Samplasion/gymtracker/actions/workflows/test.yml) [![CI Builds](https://github.com/Samplasion/gymtracker/actions/workflows/build.yml/badge.svg)](https://github.com/Samplasion/gymtracker/actions/workflows/build.yml)
+
 A simple gym progress tracker app built with Flutter.
 
 ## Getting Started

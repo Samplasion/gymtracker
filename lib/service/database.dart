@@ -196,6 +196,15 @@ class DatabaseService extends GetxService with ChangeNotifier {
     return historyBox.containsKey(id);
   }
 
+  _writeWeightMeasurements(List<WeightMeasurement> weightMeasurements) {
+    weightMeasurementsBox.clear().then((_) {
+      weightMeasurementsBox.putAll({
+        for (final measurement in weightMeasurements)
+          measurement.id: measurement,
+      }).then((value) => notifyListeners());
+    });
+  }
+
   getWeightMeasurement(String measurementID) {
     return weightMeasurementsBox.get(measurementID);
   }
@@ -221,6 +230,8 @@ class DatabaseService extends GetxService with ChangeNotifier {
       "settings": {
         for (final key in settingsBox.keys) key: settingsBox.get(key),
       },
+      "weightMeasurements":
+          weightMeasurementsBox.values.map((e) => e.toJson()).toList(),
     };
   }
 
@@ -251,6 +262,12 @@ class DatabaseService extends GetxService with ChangeNotifier {
         for (final key in json['settings'].keys) {
           writeSetting(key, json['settings'][key]);
         }
+      }
+      if (json['weightMeasurements'] is List) {
+        _writeWeightMeasurements([
+          for (final json in json['weightMeasurements'])
+            WeightMeasurement.fromJson(json),
+        ]);
       }
     }
 

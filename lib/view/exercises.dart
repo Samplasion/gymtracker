@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:get/get.dart';
+import 'package:gymtracker/controller/exercises_controller.dart';
 import 'package:gymtracker/controller/history_controller.dart';
 import 'package:gymtracker/controller/history_controller.dart' as history;
 import 'package:gymtracker/controller/routines_controller.dart';
@@ -740,7 +741,10 @@ class ExerciseDataView extends StatelessWidget {
               GestureDetector(
                 child: ExerciseIcon(exercise: exercise),
                 onTap: () {
-                  Go.to(() => ExerciseInfoView(exercise: exercise));
+                  Go.to(() => ExerciseInfoView(
+                      exercise: workout.isConcrete
+                          ? exercise.parent ?? exercise
+                          : exercise));
                 },
               ),
               const SizedBox(width: 16),

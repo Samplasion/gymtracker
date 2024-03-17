@@ -199,7 +199,7 @@ class _ExerciseInfoViewState extends State<ExerciseInfoView> {
                     .copyWith(top: exercise.isCustom ? 0 : 16),
                 sliver: SliverToBoxAdapter(
                   child: Text(
-                    exercise.name,
+                    exercise.displayName,
                     style: Theme.of(context).textTheme.displayMedium,
                   ),
                 ),

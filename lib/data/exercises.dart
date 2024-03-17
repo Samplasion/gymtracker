@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:gymtracker/model/exercise.dart';
 import 'package:gymtracker/model/set.dart';
 import 'package:gymtracker/service/localizations.dart';
@@ -406,3 +407,11 @@ Map<String, ExerciseCategory> get exerciseStandardLibrary => {
         color: Colors.yellow,
       ),
     };
+
+Exercise? getStandardExerciseByID(String id) =>
+    exerciseStandardLibrary.values.fold(
+        <Exercise>[],
+        (previousValue, element) => [
+              ...previousValue,
+              ...element.exercises,
+            ]).firstWhereOrNull((element) => element.id == id);

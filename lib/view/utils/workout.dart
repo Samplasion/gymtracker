@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:get/get.dart';
+import 'package:gymtracker/controller/exercises_controller.dart';
 import 'package:gymtracker/data/weights.dart';
 import 'package:gymtracker/model/exercise.dart';
 import 'package:gymtracker/model/set.dart';
@@ -11,6 +12,7 @@ import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/utils/sets.dart';
 import 'package:gymtracker/utils/utils.dart';
 import 'package:gymtracker/view/components/badges.dart';
+import 'package:gymtracker/view/library.dart';
 import 'package:gymtracker/view/utils/drag_handle.dart';
 import 'package:gymtracker/view/utils/exercise.dart';
 import 'package:gymtracker/view/utils/time.dart';
@@ -80,7 +82,14 @@ class _WorkoutExerciseEditorState extends State<WorkoutExerciseEditor> {
                   if (widget.isCreating) ...[
                     DragHandle(index: widget.index),
                   ] else
-                    ExerciseIcon(exercise: widget.exercise),
+                    GestureDetector(
+                      child: ExerciseIcon(exercise: widget.exercise),
+                      onTap: () {
+                        Go.to(() => ExerciseInfoView(
+                            exercise:
+                                widget.exercise.parent ?? widget.exercise));
+                      },
+                    ),
                   const SizedBox(width: 16),
                   Expanded(
                     child: Text.rich(

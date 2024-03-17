@@ -516,6 +516,7 @@ library:
       dips: Dips
       overheadRopeTricepExtension: Overhead rope tricep extension
       tricepsRopePushdown: Triceps rope pushdown
+  newCustomExercise: New exercise
 
 infobox:
   label: Notes

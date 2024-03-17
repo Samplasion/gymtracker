@@ -516,6 +516,7 @@ library:
       dips: Dip
       overheadRopeTricepExtension: Estensione dei tricipiti sopra la testa
       tricepsRopePushdown: Pushdown dei tricipiti con corda
+  newCustomExercise: Nuovo esercizio
 
 infobox:
   label: Note

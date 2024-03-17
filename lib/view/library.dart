@@ -14,6 +14,7 @@ import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/utils/utils.dart';
 import 'package:gymtracker/view/components/badges.dart';
+import 'package:gymtracker/view/exercise_creator.dart';
 import 'package:gymtracker/view/exercises.dart';
 import 'package:gymtracker/view/utils/exercise.dart';
 import 'package:intl/intl.dart';
@@ -65,6 +66,7 @@ class LibraryView extends GetView<ExercisesController> {
                         Go.to(() => LibraryExercisesView(
                               name: category.key,
                               category: category.value,
+                              isCustom: category.key == "library.custom".t,
                             ));
                       },
                     ),
@@ -82,11 +84,13 @@ class LibraryExercisesView extends StatelessWidget {
   const LibraryExercisesView({
     required this.name,
     required this.category,
+    required this.isCustom,
     super.key,
   });
 
   final String name;
   final ExerciseCategory category;
+  final bool isCustom;
 
   @override
   Widget build(BuildContext context) {
@@ -96,18 +100,38 @@ class LibraryExercisesView extends StatelessWidget {
       appBar: AppBar(
         title: Text(name),
       ),
-      body: ListView.builder(
-        itemCount: category.exercises.length,
-        itemBuilder: (context, index) {
-          return ExerciseListTile(
-            exercise: sorted[index],
-            selected: false,
-            isConcrete: false,
-            onTap: () {
-              Go.to(() => ExerciseInfoView(exercise: sorted[index]));
+      body: CustomScrollView(
+        slivers: [
+          if (isCustom) ...[
+            SliverToBoxAdapter(
+              child: ListTile(
+                title: Text("library.newCustomExercise".t),
+                leading: const CircleAvatar(child: Icon(Icons.add_rounded)),
+                onTap: () {
+                  Go.showBottomModalScreen(
+                      (context, controller) => ExerciseCreator(
+                            base: null,
+                            scrollController: controller,
+                          ));
+                },
+              ),
+            ),
+            const SliverToBoxAdapter(child: Divider()),
+          ],
+          SliverList.builder(
+            itemCount: category.exercises.length,
+            itemBuilder: (context, index) {
+              return ExerciseListTile(
+                exercise: sorted[index],
+                selected: false,
+                isConcrete: false,
+                onTap: () {
+                  Go.to(() => ExerciseInfoView(exercise: sorted[index]));
+                },
+              );
             },
-          );
-        },
+          ),
+        ],
       ),
     );
   }

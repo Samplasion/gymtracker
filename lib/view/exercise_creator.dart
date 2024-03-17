@@ -7,8 +7,9 @@ import 'package:gymtracker/service/localizations.dart';
 
 class ExerciseCreator extends StatefulWidget {
   final Exercise? base;
+  final ScrollController? scrollController;
 
-  const ExerciseCreator({required this.base, super.key});
+  const ExerciseCreator({required this.base, this.scrollController, super.key});
 
   @override
   State<ExerciseCreator> createState() => _ExerciseCreatorState();
@@ -56,6 +57,7 @@ class _ExerciseCreatorState extends State<ExerciseCreator> {
         body: Form(
           key: formKey,
           child: ListView(
+            controller: widget.scrollController,
             children: [
               ...[
                 const SizedBox(height: 8),

@@ -180,7 +180,9 @@ class OngoingWorkoutBar extends StatelessWidget {
                 Expanded(
                   child: Obx(
                     () => TimerView(
-                      startingTime: Get.find<WorkoutController>().time.value,
+                      startingTime: Get.isRegistered<WorkoutController>()
+                          ? Get.find<WorkoutController>().time.value
+                          : DateTime.now(),
                       builder: (_, time) => time,
                     ),
                   ),

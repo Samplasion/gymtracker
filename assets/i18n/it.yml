@@ -69,6 +69,9 @@ exercise:
         label: Gruppi muscolari secondari
       notes:
         label: Note
+    cannotChangeParameters:
+      title: Non puoi cambiare i parametri di questo esercizio
+      text: Puoi cambiare i parametri solo degli esercizi che non hai ancora eseguito.
   picker:
     title: Seleziona esercizi
     errors:
@@ -89,6 +92,9 @@ exercise:
     usefulData: Dati utili
   continuation:
     label: "Continuazione"
+  delete:
+    title: Elimina esercizio
+    body: Vuoi davvero eliminare questo esercizio? Quest'azione non può essere annullata.
 
 workouts:
   untitled: Allenamento senza nome

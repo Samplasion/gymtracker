@@ -4,12 +4,19 @@ import 'package:gymtracker/controller/exercises_controller.dart';
 import 'package:gymtracker/model/exercise.dart';
 import 'package:gymtracker/model/set.dart';
 import 'package:gymtracker/service/localizations.dart';
+import 'package:gymtracker/utils/go.dart';
 
 class ExerciseCreator extends StatefulWidget {
   final Exercise? base;
   final ScrollController? scrollController;
+  final bool shouldChangeParameters;
 
-  const ExerciseCreator({required this.base, this.scrollController, super.key});
+  const ExerciseCreator({
+    required this.base,
+    this.scrollController,
+    this.shouldChangeParameters = true,
+    super.key,
+  });
 
   @override
   State<ExerciseCreator> createState() => _ExerciseCreatorState();
@@ -75,26 +82,39 @@ class _ExerciseCreatorState extends State<ExerciseCreator> {
                     return null;
                   },
                 ),
-                DropdownButtonFormField(
-                  decoration:
-                      _decoration("exercise.editor.fields.parameters.label".t),
-                  items: [
-                    for (final param in SetParameters.values)
-                      DropdownMenuItem(
-                        value: param,
-                        child: Text(
-                            "exercise.editor.fields.parameters.values.${param.name}"
-                                .t),
-                      ),
-                  ],
-                  onChanged: (v) => setState(() => params = v!),
-                  validator: (value) {
-                    if (value == null) {
-                      return "exercise.editor.fields.parameters.errors.empty".t;
-                    }
-                    return null;
-                  },
-                  value: params,
+                GestureDetector(
+                  onTap: widget.shouldChangeParameters
+                      ? null
+                      : () {
+                          Go.dialog(
+                            "exercise.editor.cannotChangeParameters.title",
+                            "exercise.editor.cannotChangeParameters.text",
+                          );
+                        },
+                  child: DropdownButtonFormField(
+                    decoration: _decoration(
+                        "exercise.editor.fields.parameters.label".t),
+                    items: [
+                      for (final param in SetParameters.values)
+                        DropdownMenuItem(
+                          value: param,
+                          child: Text(
+                              "exercise.editor.fields.parameters.values.${param.name}"
+                                  .t),
+                        ),
+                    ],
+                    onChanged: widget.shouldChangeParameters
+                        ? (SetParameters? v) => setState(() => params = v!)
+                        : null,
+                    validator: (value) {
+                      if (value == null) {
+                        return "exercise.editor.fields.parameters.errors.empty"
+                            .t;
+                      }
+                      return null;
+                    },
+                    value: params,
+                  ),
                 ),
                 DropdownButtonFormField<MuscleGroup>(
                   decoration: _decoration(
@@ -120,6 +140,7 @@ class _ExerciseCreatorState extends State<ExerciseCreator> {
                     }
                     return null;
                   },
+                  value: primaryGroup,
                 ),
                 Text(
                   "exercise.editor.fields.secondaryMuscleGroups.label".t,
@@ -197,7 +218,7 @@ class _ExerciseCreatorState extends State<ExerciseCreator> {
         );
       } else {
         Get.back(
-          result: controller.generateEmpty(
+          result: widget.base!.copyWith(
             name: titleController.text,
             parameters: params,
             primaryMuscleGroup: primaryGroup!,

@@ -57,4 +57,8 @@ class ExercisesController extends GetxController with ServiceableController {
   void deleteExercise(Exercise exercise) {
     service.removeExercise(exercise);
   }
+
+  void saveEdit(Exercise exercise) {
+    service.setExercise(exercise);
+  }
 }

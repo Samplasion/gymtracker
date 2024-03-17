@@ -179,7 +179,49 @@ class _ExerciseInfoViewState extends State<ExerciseInfoView> {
   Widget build(BuildContext context) {
     final exercise = widget.exercise;
     return Scaffold(
-      appBar: AppBar(title: Text("exercise.info.title".t)),
+      appBar: AppBar(
+        title: Text("exercise.info.title".t),
+        actions: [
+          if (exercise.isCustom)
+            PopupMenuButton(
+              itemBuilder: (_) => [
+                PopupMenuItem(
+                  child: Text("actions.edit".t),
+                  onTap: () async {
+                    final ex = await Go.showBottomModalScreen<Exercise>(
+                        (context, controller) => ExerciseCreator(
+                              base: exercise,
+                              scrollController: controller,
+                              shouldChangeParameters: history.isEmpty,
+                            ));
+                    if (ex != null) {
+                      Get.find<ExercisesController>().saveEdit(ex);
+                      Go.off(() => ExerciseInfoView(exercise: ex));
+                    }
+                  },
+                ),
+                if (history.isEmpty)
+                  PopupMenuItem(
+                    child: Text(
+                      "actions.remove".t,
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.error,
+                      ),
+                    ),
+                    onTap: () async {
+                      final delete = await Go.confirm(
+                          "exercise.delete.title", "exercise.delete.body");
+                      if (delete) {
+                        Get.find<ExercisesController>()
+                            .deleteExercise(exercise);
+                        Get.back();
+                      }
+                    },
+                  ),
+              ],
+            ),
+        ],
+      ),
       body: ListTileTheme(
         contentPadding: EdgeInsets.zero,
         child: SafeArea(

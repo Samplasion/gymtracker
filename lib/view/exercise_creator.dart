@@ -27,6 +27,10 @@ class _ExerciseCreatorState extends State<ExerciseCreator> {
 
   @override
   Widget build(BuildContext context) {
+    final muscleGroups = MuscleGroup.values.toList();
+    muscleGroups.sort((a, b) =>
+        "muscleGroups.${a.name}".t.compareTo("muscleGroups.${b.name}".t));
+
     return Dialog.fullscreen(
       child: Scaffold(
         appBar: AppBar(
@@ -123,7 +127,7 @@ class _ExerciseCreatorState extends State<ExerciseCreator> {
                   runSpacing: 8,
                   spacing: 8,
                   children: [
-                    for (final muscle in MuscleGroup.values)
+                    for (final muscle in muscleGroups)
                       ChoiceChip(
                         label: Text("muscleGroups.${muscle.name}".t),
                         avatar: CircleAvatar(

@@ -206,6 +206,7 @@ history:
         many: The exercises have been deleted from your history.
         other: The exercises have been deleted from your history.
   showAll: Show all data
+  search: Search workouts
 
 settings:
   title: Settings

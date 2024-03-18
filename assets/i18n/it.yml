@@ -206,6 +206,7 @@ history:
         many: Gli esercizi sono stati eliminati dalla tua cronologia.
         other: Gli esercizi sono stati eliminati dalla tua cronologia.
   showAll: Mostra tutto
+  search: Cerca allenamenti
 
 settings:
   title: Impostazioni

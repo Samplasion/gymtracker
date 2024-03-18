@@ -41,7 +41,23 @@ class _HistoryViewState extends State<HistoryView> {
   late Future<Map<MonthYear, List<Workout>>> historyByMonth = Future.value({});
   late Worker worker;
 
+  final searchTextController = TextEditingController();
+  final searchFocusNode = FocusNode();
+
+  bool isSearching = false;
+
   Set<String> selectedEntries = {};
+
+  Map<MonthYear, List<Workout>> get searchResults {
+    if (!isSearching) return {};
+    final controller = Get.find<HistoryController>();
+    final matching = controller.userVisibleWorkouts.where((workout) {
+      return workout.name
+          .toLowerCase()
+          .contains(searchTextController.text.toLowerCase());
+    }).toList();
+    return _getHistoryByMonthThread(matching);
+  }
 
   @override
   void initState() {
@@ -91,7 +107,7 @@ class _HistoryViewState extends State<HistoryView> {
       body: FutureBuilder(
         future: historyByMonth,
         builder: (context, snapshot) {
-          final history = snapshot.data ?? {};
+          final history = isSearching ? searchResults : snapshot.data ?? {};
 
           return CustomScrollView(
             slivers: [
@@ -163,8 +179,9 @@ class _HistoryViewState extends State<HistoryView> {
                   ),
                 ),
               ],
-              if (Get.find<HistoryController>().userVisibleWorkouts.length >
-                  kHistoryWorkoutsAbridgedCount)
+              if (!isSearching &&
+                  Get.find<HistoryController>().userVisibleWorkouts.length >
+                      kHistoryWorkoutsAbridgedCount)
                 SliverPadding(
                   padding: const EdgeInsets.symmetric(vertical: 16),
                   sliver: SliverToBoxAdapter(
@@ -190,6 +207,39 @@ class _HistoryViewState extends State<HistoryView> {
     if (selectedEntries.isEmpty) {
       return SliverAppBar.large(
         title: Text("history.title".t),
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(kToolbarHeight / 1.25 + 32),
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: SearchBar(
+              hintText: "history.search".t,
+              controller: searchTextController,
+              focusNode: searchFocusNode,
+              constraints: const BoxConstraints.tightFor(
+                height: kToolbarHeight / 1.25,
+              ),
+              onChanged: (q) {
+                setState(() {
+                  isSearching = q.isNotEmpty;
+                });
+              },
+              trailing: [
+                if (isSearching) ...[
+                  IconButton(
+                    icon: const Icon(Icons.clear_rounded),
+                    onPressed: () {
+                      setState(() {
+                        searchTextController.clear();
+                        searchFocusNode.unfocus();
+                        isSearching = false;
+                      });
+                    },
+                  ),
+                ]
+              ],
+            ),
+          ),
+        ),
       );
     }
 
@@ -240,17 +290,21 @@ class _HistoryViewState extends State<HistoryView> {
       3,
     );
     return Container(
-      height: 60,
+      height: 32,
       color: state.isPinned
           ? elevatedAppBarColor
           : Theme.of(context).colorScheme.background,
       padding: const EdgeInsets.symmetric(horizontal: 16),
       alignment: Alignment.centerLeft,
-      child: Text(
-        DateFormat.yMMMM(context.locale.languageCode).format(
-          DateTime(date.$2, date.$1),
+      child: SafeArea(
+        top: false,
+        bottom: false,
+        child: Text(
+          DateFormat.yMMMM(context.locale.languageCode).format(
+            DateTime(date.$2, date.$1),
+          ),
+          style: Theme.of(context).textTheme.titleMedium,
         ),
-        style: Theme.of(context).textTheme.titleMedium,
       ),
     );
   }

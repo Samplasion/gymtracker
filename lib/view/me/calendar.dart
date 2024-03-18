@@ -17,7 +17,6 @@ import 'package:scrollable_clean_calendar/controllers/clean_calendar_controller.
 import 'package:scrollable_clean_calendar/models/day_values_model.dart';
 import 'package:scrollable_clean_calendar/scrollable_clean_calendar.dart';
 import 'package:scrollable_clean_calendar/utils/enums.dart';
-import 'package:scrollable_clean_calendar/utils/extensions.dart';
 
 const double kDayBorderRadius = 6;
 

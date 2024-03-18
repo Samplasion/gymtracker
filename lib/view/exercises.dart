@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
@@ -21,18 +20,17 @@ import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/utils/sets.dart';
 import 'package:gymtracker/utils/utils.dart';
+import 'package:gymtracker/view/charts/routine_history.dart';
 import 'package:gymtracker/view/components/badges.dart';
 import 'package:gymtracker/view/components/infobox.dart';
 import 'package:gymtracker/view/library.dart';
 import 'package:gymtracker/view/routine_creator.dart';
 import 'package:gymtracker/view/utils/dropdown_dialog.dart';
 import 'package:gymtracker/view/utils/exercise.dart';
-import 'package:gymtracker/view/utils/history_workout.dart';
 import 'package:gymtracker/view/utils/textfield_dialog.dart';
 import 'package:gymtracker/view/utils/timer.dart';
 import 'package:gymtracker/view/utils/workout_utils.dart';
 import 'package:gymtracker/view/workout_editor.dart';
-import 'package:intl/intl.dart';
 
 class ExercisesView extends StatefulWidget {
   const ExercisesView({required this.workout, super.key});
@@ -282,7 +280,7 @@ class _ExercisesViewState extends State<ExercisesView> {
               SliverToBoxAdapter(
                 child: Padding(
                   padding: const EdgeInsets.all(16),
-                  child: RoutineHistoryData(routine: workout),
+                  child: RoutineHistoryChart(routine: workout),
                 ),
               ),
             if (workout.shouldShowInfobox)
@@ -401,310 +399,6 @@ class _ExercisesViewState extends State<ExercisesView> {
     SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
       setState(() => workout = newWorkout);
     });
-  }
-}
-
-class RoutineHistoryData extends StatefulWidget {
-  const RoutineHistoryData({
-    required this.routine,
-    super.key,
-  });
-
-  final Workout routine;
-
-  @override
-  State<RoutineHistoryData> createState() => _RoutineHistoryDataState();
-}
-
-enum _RoutineHistoryDataType {
-  volume,
-  reps,
-  duration,
-}
-
-class _RoutineHistoryDataState extends State<RoutineHistoryData> {
-  RoutinesController get controller => Get.find<RoutinesController>();
-  List<Workout> get children => controller.getChildren(widget.routine);
-
-  _RoutineHistoryDataType type = _RoutineHistoryDataType.volume;
-
-  late int selectedIndex = children.length - 1;
-
-  IconData buildType(_RoutineHistoryDataType type) {
-    switch (type) {
-      case _RoutineHistoryDataType.volume:
-        return Icons.line_weight_rounded;
-      case _RoutineHistoryDataType.reps:
-        return Icons.numbers_rounded;
-      case _RoutineHistoryDataType.duration:
-        return Icons.timer_rounded;
-    }
-  }
-
-  double _getY(Workout wo) {
-    switch (type) {
-      case _RoutineHistoryDataType.volume:
-        return Weights.convert(
-          value: wo.liftedWeight,
-          from: wo.weightUnit,
-          to: settingsController.weightUnit.value!,
-        );
-      case _RoutineHistoryDataType.reps:
-        return wo.reps.toDouble();
-      case _RoutineHistoryDataType.duration:
-        return wo.duration!.inSeconds.toDouble();
-    }
-  }
-
-  Widget buildSpan(
-    double value,
-    TextStyle style, {
-    bool showDate = true,
-    TextAlign? textAlign,
-    required Weights weightUnit,
-  }) {
-    return TimerView.buildTimeString(
-      context,
-      Duration(seconds: value.toInt()),
-      builder: (time) {
-        TextSpan buildType() {
-          switch (type) {
-            case _RoutineHistoryDataType.volume:
-              return TextSpan(
-                  text: "exerciseList.fields.weight".trParams({
-                "weight": stringifyDouble(Weights.convert(
-                    value: value,
-                    from: weightUnit,
-                    to: settingsController.weightUnit.value!)),
-                "unit": "units.${settingsController.weightUnit.value!.name}".t,
-              }));
-            case _RoutineHistoryDataType.reps:
-              return TextSpan(
-                  text: "exerciseList.fields.reps".plural(value.toInt()));
-            case _RoutineHistoryDataType.duration:
-              return time;
-          }
-        }
-
-        return Text.rich(
-          TextSpan(children: [
-            TextSpan(
-              children: [buildType()],
-              style: style,
-            ),
-            if (showDate) ...[
-              const TextSpan(text: " "),
-              TextSpan(
-                text: DateFormat.yMd(context.locale.languageCode)
-                    .format(children[selectedIndex].startingDate!),
-                style: TextStyle(
-                  color: Theme.of(context).colorScheme.onSurfaceVariant,
-                ),
-              ),
-            ],
-          ]),
-          textAlign: textAlign,
-        );
-      },
-      style: style,
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        buildSpan(
-          _getY(children[selectedIndex]),
-          Theme.of(context)
-              .textTheme
-              .bodyLarge!
-              .copyWith(fontWeight: FontWeight.bold),
-          // The value was converted by _getY already
-          weightUnit: settingsController.weightUnit.value!,
-        ),
-        AspectRatio(
-          aspectRatio: 1.7,
-          child: Padding(
-            padding: const EdgeInsets.only(
-              top: 16,
-              right: 16,
-            ),
-            child: LineChart(
-              LineChartData(
-                gridData: FlGridData(
-                  show: true,
-                  drawVerticalLine: false,
-                  getDrawingHorizontalLine: (value) {
-                    return FlLine(
-                      color: colorScheme.outlineVariant,
-                      strokeWidth: 1,
-                    );
-                  },
-                  getDrawingVerticalLine: (value) {
-                    return FlLine(
-                      color: colorScheme.outlineVariant,
-                      strokeWidth: 1,
-                    );
-                  },
-                ),
-                titlesData: FlTitlesData(
-                  show: true,
-                  rightTitles: AxisTitles(
-                    sideTitles: SideTitles(showTitles: false),
-                  ),
-                  topTitles: AxisTitles(
-                    sideTitles: SideTitles(showTitles: false),
-                  ),
-                  leftTitles: AxisTitles(
-                    sideTitles: SideTitles(
-                      showTitles: true,
-                      reservedSize: 70,
-                      // interval: 1,
-                      getTitlesWidget: leftTitleWidgets(context),
-                    ),
-                  ),
-                  bottomTitles: AxisTitles(
-                    sideTitles: SideTitles(
-                      showTitles: true,
-                      reservedSize: 30,
-                      interval: 1,
-                      getTitlesWidget: bottomTitleWidgets(context),
-                    ),
-                  ),
-                ),
-                borderData: FlBorderData(
-                  border: Border.all(color: colorScheme.outline),
-                ),
-                showingTooltipIndicators: [],
-                lineTouchData: LineTouchData(
-                  touchTooltipData: LineTouchTooltipData(
-                    tooltipBgColor: Colors.transparent,
-                    getTooltipItems: (items) => <LineTooltipItem?>[
-                      ...items.map((_) => LineTooltipItem(
-                            "hhh",
-                            const TextStyle(color: Colors.transparent),
-                          ))
-                    ],
-                  ),
-                  touchSpotThreshold: 10000,
-                  enabled: true,
-                  touchCallback: (event, response) {
-                    final touchLineBarSpot = response?.lineBarSpots?.first;
-                    final index = touchLineBarSpot?.x.toInt();
-                    if (index != selectedIndex && index != null) {
-                      setState(() => selectedIndex = index);
-                    }
-                  },
-                ),
-                lineBarsData: [
-                  LineChartBarData(
-                    dotData: FlDotData(show: false),
-                    spots: [
-                      for (int i = 0; i < children.length; i++)
-                        FlSpot(
-                          i.toDouble(),
-                          _getY(children[i]),
-                        ),
-                    ],
-                    isCurved: true,
-                    preventCurveOverShooting: true,
-                    color: colorScheme.primary,
-                    barWidth: 3,
-                    isStrokeCapRound: true,
-                    belowBarData: BarAreaData(
-                      show: true,
-                      color: colorScheme.primary.withOpacity(0.3),
-                    ),
-                  ),
-                ],
-              ),
-              swapAnimationDuration: const Duration(milliseconds: 350),
-              swapAnimationCurve: Curves.linearToEaseOut,
-            ),
-          ),
-        ),
-        Flexible(
-          child: Padding(
-            padding: const EdgeInsets.only(top: 16),
-            child: Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children: [
-                for (final type in _RoutineHistoryDataType.values)
-                  ChoiceChip(
-                    label: Text("exercise.chart.views.${type.name}".t),
-                    avatar: CircleAvatar(
-                      child: this.type == type
-                          ? const SizedBox.shrink()
-                          : Icon(buildType(type), size: 16),
-                    ),
-                    selected: this.type == type,
-                    onSelected: (sel) {
-                      if (sel) {
-                        setState(() => this.type = type);
-                      }
-                    },
-                  ),
-              ],
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  String _getDayMonth(DateTime? dateTime) {
-    if (dateTime == null) return "";
-    return "${dateTime.day}/${dateTime.month}/${dateTime.year}";
-  }
-
-  String _getMonth(DateTime? dateTime) {
-    if (dateTime == null) return "";
-    return "${dateTime.month}/${dateTime.year}";
-  }
-
-  Widget Function(double, TitleMeta) bottomTitleWidgets(BuildContext context) {
-    return (double value, TitleMeta meta) {
-      DateTime? cur = children[value.toInt()].startingDate;
-      String text = DateFormat.Md(context.locale.languageCode)
-          .format(cur ?? DateTime.now());
-
-      if (value > 0) {
-        DateTime? prev = children[value.toInt() - 1].startingDate;
-        if (_getDayMonth(prev) == _getDayMonth(cur)) {
-          text = "";
-        } else if (_getMonth(prev) == _getMonth(cur)) {
-          text = DateFormat.d(context.locale.languageCode)
-              .format(cur ?? DateTime.now());
-        }
-      }
-
-      return SideTitleWidget(
-        axisSide: meta.axisSide,
-        child: Text(
-          text,
-          style: Theme.of(context).textTheme.labelSmall,
-        ),
-      );
-    };
-  }
-
-  Widget Function(double, TitleMeta) leftTitleWidgets(BuildContext context) {
-    return (double value, TitleMeta meta) => SideTitleWidget(
-          axisSide: meta.axisSide,
-          child: buildSpan(
-            value,
-            Theme.of(context).textTheme.labelSmall!,
-            showDate: false,
-            textAlign: TextAlign.end,
-            // The value was already converted by the _getY call
-            weightUnit: settingsController.weightUnit.value!,
-          ),
-        );
   }
 }
 

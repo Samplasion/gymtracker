@@ -13,6 +13,7 @@ import 'package:gymtracker/utils/constants.dart';
 import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/utils/utils.dart';
+import 'package:gymtracker/view/charts/weight_chart.dart';
 import 'package:gymtracker/view/me/calendar.dart';
 import 'package:gymtracker/view/me/statistics.dart';
 import 'package:gymtracker/view/utils/date_field.dart';
@@ -117,60 +118,94 @@ class WeightCard extends StatelessWidget {
         top: false,
         bottom: false,
         child: Card(
+          clipBehavior: Clip.hardEdge,
           margin: EdgeInsets.zero,
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Obx(
-              () {
-                final latestMeasurement = controller.latestWeightMeasurement;
-
-                return Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Text(
-                      latestMeasurement == null
-                          ? "me.weight.none".t
-                          : "exerciseList.fields.weight".trParams({
-                              "weight": stringifyDouble(
-                                  latestMeasurement.convertedWeight),
-                              "unit":
-                                  "units.${settingsController.weightUnit.value!.name}"
-                                      .t,
-                            }),
-                      textAlign: TextAlign.center,
-                      style: Theme.of(context).textTheme.displaySmall,
-                    ),
-                    Text(
-                      latestMeasurement == null
-                          ? "me.weight.measured.never".t
-                          : "me.weight.measured.date".tParams({
-                              "date":
-                                  DateFormat.yMMMMd(context.locale.languageCode)
-                                      .format(latestMeasurement.time),
-                            }),
-                      textAlign: TextAlign.center,
-                      style: Theme.of(context).textTheme.bodySmall,
-                    ),
-                    const SizedBox(height: 16),
-                    TextButton(
-                      onPressed: () async {
-                        var measurement =
-                            await Go.showBottomModalScreen<WeightMeasurement>(
-                                (context, controller) {
-                          return WeightMeasurementAddSheet(
-                              controller: controller);
-                        });
-
-                        if (measurement != null) {
-                          controller.addWeightMeasurement(measurement);
-                        }
-                      },
-                      child: Text("me.weight.addMeasurement".t),
-                    ),
-                  ],
+          child: Stack(
+            alignment: Alignment.center,
+            children: [
+              Obx(() {
+                if (controller.weightMeasurements.length < 2) {
+                  return const SizedBox.shrink();
+                }
+                return Positioned.fill(
+                  child: WeightChart(
+                    weights: controller.weightMeasurements
+                        .map((element) => Weights.convert(
+                            value: element.weight,
+                            from: element.weightUnit,
+                            to: settingsController.weightUnit.value!))
+                        .toList(),
+                  ),
                 );
-              },
-            ),
+              }),
+              Positioned.fill(
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [
+                        context.cardColor().withOpacity(0.99),
+                        context.cardColor().withOpacity(0.8),
+                        context.cardColor().withOpacity(0.5),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(16),
+                child: Obx(
+                  () {
+                    final latestMeasurement =
+                        controller.latestWeightMeasurement;
+
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Text(
+                          latestMeasurement == null
+                              ? "me.weight.none".t
+                              : "exerciseList.fields.weight".trParams({
+                                  "weight": stringifyDouble(
+                                      latestMeasurement.convertedWeight),
+                                  "unit":
+                                      "units.${settingsController.weightUnit.value!.name}"
+                                          .t,
+                                }),
+                          textAlign: TextAlign.center,
+                          style: Theme.of(context).textTheme.displaySmall,
+                        ),
+                        Text(
+                          latestMeasurement == null
+                              ? "me.weight.measured.never".t
+                              : "me.weight.measured.date".tParams({
+                                  "date": DateFormat.yMMMMd(
+                                          context.locale.languageCode)
+                                      .format(latestMeasurement.time),
+                                }),
+                          textAlign: TextAlign.center,
+                          style: Theme.of(context).textTheme.bodySmall,
+                        ),
+                        const SizedBox(height: 16),
+                        TextButton(
+                          onPressed: () async {
+                            var measurement = await Go.showBottomModalScreen<
+                                WeightMeasurement>((context, controller) {
+                              return WeightMeasurementAddSheet(
+                                  controller: controller);
+                            });
+
+                            if (measurement != null) {
+                              controller.addWeightMeasurement(measurement);
+                            }
+                          },
+                          child: Text("me.weight.addMeasurement".t),
+                        ),
+                      ],
+                    );
+                  },
+                ),
+              ),
+            ],
           ),
         ),
       ),
@@ -262,12 +297,8 @@ class WeightMeasurementDataDetailsPage extends StatelessWidget {
         title: Text("me.weight.label".t),
       ),
       body: Obx(() {
-        debugPrint((
-          measurementID,
-          [...controller.service.weightMeasurementsBox.keys]
-        ).toString());
-        final measurement = controller.getWeightMeasurementByID(measurementID)!;
-        debugPrint("$measurement");
+        final measurement = controller.getWeightMeasurementByID(measurementID);
+        if (measurement == null) return const SizedBox.shrink();
         return ListView(
           children: [
             ListTile(

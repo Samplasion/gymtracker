@@ -15,6 +15,8 @@ class ResponsiveBuilder extends StatefulWidget {
 class _ResponsiveBuilderState extends State<ResponsiveBuilder> {
   @override
   Widget build(BuildContext context) {
-    return widget.builder(context, Breakpoints.currentBreakpoint);
+    return LayoutBuilder(builder: (context, constraints) {
+      return widget.builder(context, Breakpoints.currentBreakpoint);
+    });
   }
 }

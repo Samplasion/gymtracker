@@ -145,3 +145,16 @@ extension WeightUtils on double {
     });
   }
 }
+
+extension ContextThemingUtils on BuildContext {
+  ThemeData get theme => Theme.of(this);
+  ColorScheme get colorScheme => theme.colorScheme;
+
+  Color cardColor({double elevation = 1}) {
+    return ElevationOverlay.applySurfaceTint(
+      theme.cardTheme.color ?? colorScheme.background,
+      theme.cardTheme.surfaceTintColor ?? colorScheme.surfaceTint,
+      elevation,
+    );
+  }
+}

@@ -319,24 +319,26 @@ class HistoryController extends GetxController with ServiceableController {
       for (final category in MuscleCategory.values) category: 0,
     };
 
-    void handleExercise(Exercise exercise) {
+    void handleExercise(Workout workout, Exercise exercise) {
       for (final group in [
         exercise.primaryMuscleGroup,
         ...exercise.secondaryMuscleGroups
       ]) {
         if (group.category == null) continue;
         map[group.category!] = map[group.category!]! +
-            exercise.sets.where((element) => element.done).length;
+            exercise.sets
+                .where((element) => !workout.isConcrete || element.done)
+                .length;
       }
     }
 
     for (final workout in workouts) {
       for (final exercise in workout.exercises) {
         exercise.when(
-          exercise: handleExercise,
+          exercise: (ex) => handleExercise(workout, ex),
           superset: (superset) {
             for (final exercise in superset.exercises) {
-              handleExercise(exercise);
+              handleExercise(workout, exercise);
             }
           },
         );

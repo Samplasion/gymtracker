@@ -2,9 +2,11 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:gymtracker/controller/history_controller.dart';
+import 'package:gymtracker/model/exercise.dart';
 import 'package:gymtracker/model/workout.dart';
 import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/utils/extensions.dart';
+import 'package:gymtracker/utils/utils.dart';
 
 const kBarHeight = 24.0;
 const kBarPadding = 24.0;
@@ -14,6 +16,12 @@ class WorkoutMuscleCategoriesBarChart extends GetWidget<HistoryController> {
 
   const WorkoutMuscleCategoriesBarChart({required this.workout, super.key});
 
+  static bool shouldShow(Workout workout) => Get.find<HistoryController>()
+      .calculateMuscleCategoryDistributionFor(workouts: [workout])
+      .entries
+      .where((e) => e.value > 0)
+      .isNotEmpty;
+
   @override
   Widget build(BuildContext context) {
     final data =
@@ -21,9 +29,11 @@ class WorkoutMuscleCategoriesBarChart extends GetWidget<HistoryController> {
     final nonEmptyData = data.entries.where((e) => e.value > 0).toList();
     final max = data.values.sum;
 
-    final textReservedSize = nonEmptyData
-        .map((e) => "muscleCategories.${e.key.name}".t.computeSize().width + 16)
-        .max;
+    String getLabel(MuscleCategory cat) =>
+        "${"muscleCategories.${cat.name}".t} (${((data[cat] ?? 0) * 100 / max).round()}%)";
+
+    final textReservedSize =
+        nonEmptyData.map((e) => getLabel(e.key).computeSize().width + 16).max;
 
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -40,7 +50,6 @@ class WorkoutMuscleCategoriesBarChart extends GetWidget<HistoryController> {
           child: Padding(
             padding: const EdgeInsets.only(
               top: 16,
-              right: 16,
             ),
             child: RotatedBox(
               quarterTurns: 1,
@@ -85,9 +94,7 @@ class WorkoutMuscleCategoriesBarChart extends GetWidget<HistoryController> {
                         getTitlesWidget: (x, meta) {
                           return RotatedBox(
                             quarterTurns: -1,
-                            child: Text(
-                                "muscleCategories.${nonEmptyData[x.toInt()].key.name}"
-                                    .t),
+                            child: Text(getLabel(nonEmptyData[x.toInt()].key)),
                           );
                         },
                       ),

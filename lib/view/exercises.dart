@@ -21,6 +21,7 @@ import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/utils/sets.dart';
 import 'package:gymtracker/utils/utils.dart';
 import 'package:gymtracker/view/charts/routine_history.dart';
+import 'package:gymtracker/view/charts/workout_muscle_categories.dart';
 import 'package:gymtracker/view/components/badges.dart';
 import 'package:gymtracker/view/components/infobox.dart';
 import 'package:gymtracker/view/library.dart';
@@ -281,6 +282,13 @@ class _ExercisesViewState extends State<ExercisesView> {
                 child: Padding(
                   padding: const EdgeInsets.all(16),
                   child: RoutineHistoryChart(routine: workout),
+                ),
+              ),
+            if (workout.isConcrete)
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: WorkoutMuscleCategoriesBarChart(workout: workout),
                 ),
               ),
             if (workout.shouldShowInfobox)

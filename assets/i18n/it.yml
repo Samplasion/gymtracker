@@ -339,6 +339,8 @@ exerciseList:
       many: "%s di rip."
       other: "%s rip."
     distance: "@distance @unit"
+  workoutMuscleCategoriesBarChart:
+    label: Distribuzione muscolare
 
 general:
   dialogs:

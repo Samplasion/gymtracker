@@ -3,11 +3,11 @@ import 'dart:io';
 
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+import 'package:get/get.dart' hide ContextExtensionss;
 import 'package:gymtracker/controller/settings_controller.dart';
 import 'package:gymtracker/model/workout.dart';
 import 'package:gymtracker/service/localizations.dart';
-import 'package:intl/intl.dart';
+import 'package:intl/intl.dart' hide TextDirection;
 
 extension StringUtils on String {
   double parseDouble() {
@@ -16,6 +16,19 @@ extension StringUtils on String {
 
   double? tryParseDouble() {
     return double.tryParse(replaceAll(",", "."));
+  }
+
+  Size computeSize() {
+    final TextPainter textPainter = TextPainter(
+      text:
+          TextSpan(text: this, style: Get.context!.theme.textTheme.bodyMedium),
+      maxLines: 1,
+      textDirection: TextDirection.ltr,
+    )..layout(
+        minWidth: 0,
+        maxWidth: double.infinity,
+      );
+    return textPainter.size;
   }
 }
 
@@ -70,8 +83,15 @@ extension NumIterableUtils<T extends num> on Iterable<T> {
     return max;
   }
 
+  T get _zero => switch (T) {
+        double => 0.0,
+        num => 0,
+        int => 0,
+        _ => 0 as dynamic,
+      };
+
   T get sum {
-    T sum = 0 as T;
+    T sum = _zero;
     for (final element in this) {
       sum = (sum + element as T);
     }

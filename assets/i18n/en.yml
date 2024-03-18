@@ -339,6 +339,8 @@ exerciseList:
       many: "%s reps"
       other: "%s reps"
     distance: "@distance @unit"
+  workoutMuscleCategoriesBarChart:
+    label: Muscle distribution
 
 general:
   dialogs:

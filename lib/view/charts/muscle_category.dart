@@ -1,5 +1,4 @@
 import 'package:fl_chart/fl_chart.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:gymtracker/controller/history_controller.dart';
 import 'package:gymtracker/model/exercise.dart';
@@ -7,7 +6,6 @@ import 'package:gymtracker/model/workout.dart';
 import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/view/components/controlled.dart';
-import 'package:simple_animations/simple_animations.dart';
 
 class MuscleCategoryGraph extends StatefulWidget {
   final List<Workout> workouts;

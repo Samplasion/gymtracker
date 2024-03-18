@@ -207,7 +207,6 @@ class _ExerciseInfoViewState extends State<ExerciseInfoView> {
                               shouldChangeParameters: history.isEmpty,
                             ));
                     if (ex != null) {
-                      print((exercise, ex));
                       assert(ex.id == exercise.id);
                       Get.find<ExercisesController>().saveEdit(ex);
                       if (isInUse) {

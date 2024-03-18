@@ -6,7 +6,6 @@ import 'package:gymtracker/model/exercise.dart';
 import 'package:gymtracker/model/workout.dart';
 import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/utils/extensions.dart';
-import 'package:gymtracker/utils/utils.dart';
 
 const kBarHeight = 24.0;
 const kBarPadding = 24.0;

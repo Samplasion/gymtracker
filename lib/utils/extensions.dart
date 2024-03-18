@@ -120,11 +120,11 @@ extension NumUtils on num {
   }
 }
 
-final Compressor = utf8.fuse(gzip.fuse(base64));
+final stringCompressor = utf8.fuse(gzip.fuse(base64));
 
 extension StringCompression on String {
-  String get compressed => Compressor.encode(this);
-  String get uncompressed => Compressor.decode(this);
+  String get compressed => stringCompressor.encode(this);
+  String get uncompressed => stringCompressor.decode(this);
 }
 
 extension WorkoutIterableUtils on Iterable<Workout> {

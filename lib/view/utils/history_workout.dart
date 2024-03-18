@@ -1,13 +1,10 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:gymtracker/controller/history_controller.dart';
 import 'package:gymtracker/model/workout.dart';
 import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/view/utils/exercise.dart';
-import 'package:gymtracker/view/utils/timer.dart';
 import 'package:gymtracker/view/utils/workout_utils.dart';
-import 'package:intl/intl.dart';
 
 class HistoryWorkout extends StatelessWidget {
   final Workout workout;

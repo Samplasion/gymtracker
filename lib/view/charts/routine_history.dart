@@ -130,8 +130,8 @@ class _RoutineHistoryChartState
           // The value was converted by _getY already
           weightUnit: settingsController.weightUnit.value!,
         ),
-        AspectRatio(
-          aspectRatio: 1.7,
+        ConstrainedBox(
+          constraints: BoxConstraints.loose(const Size.fromHeight(300)),
           child: Padding(
             padding: const EdgeInsets.only(
               top: 16,

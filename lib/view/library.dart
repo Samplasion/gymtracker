@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:gymtracker/controller/exercises_controller.dart';
 import 'package:gymtracker/controller/history_controller.dart';
 import 'package:gymtracker/controller/settings_controller.dart';
+import 'package:gymtracker/controller/workout_controller.dart';
 import 'package:gymtracker/data/exercises.dart';
 import 'package:gymtracker/data/weights.dart';
 import 'package:gymtracker/model/exercise.dart';
@@ -188,6 +189,17 @@ class _ExerciseInfoViewState extends State<ExerciseInfoView> {
                 PopupMenuItem(
                   child: Text("actions.edit".t),
                   onTap: () async {
+                    final isInUse = Get.isRegistered<WorkoutController>() &&
+                        Get.find<WorkoutController>().hasExercise(exercise);
+                    if (isInUse) {
+                      final shouldOverwrite = await Go.confirm(
+                        "exercise.editor.overwriteInWorkout.title",
+                        "exercise.editor.overwriteInWorkout.body",
+                      );
+                      if (!shouldOverwrite) {
+                        return;
+                      }
+                    }
                     final ex = await Go.showBottomModalScreen<Exercise>(
                         (context, controller) => ExerciseCreator(
                               base: exercise,
@@ -195,7 +207,13 @@ class _ExerciseInfoViewState extends State<ExerciseInfoView> {
                               shouldChangeParameters: history.isEmpty,
                             ));
                     if (ex != null) {
+                      print((exercise, ex));
+                      assert(ex.id == exercise.id);
                       Get.find<ExercisesController>().saveEdit(ex);
+                      if (isInUse) {
+                        Get.find<WorkoutController>()
+                            .applyExerciseModification(ex);
+                      }
                       Go.off(() => ExerciseInfoView(exercise: ex));
                     }
                   },

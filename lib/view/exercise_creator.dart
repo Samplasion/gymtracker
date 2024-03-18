@@ -205,7 +205,7 @@ class _ExerciseCreatorState extends State<ExerciseCreator> {
     );
   }
 
-  void _submit() {
+  void _submit() async {
     final isValid = formKey.currentState!.validate();
 
     if (isValid) {
@@ -219,13 +219,19 @@ class _ExerciseCreatorState extends State<ExerciseCreator> {
         );
       } else {
         Get.back(
-          result: widget.base!.copyWith(
-            name: titleController.text,
-            parameters: params,
-            primaryMuscleGroup: primaryGroup!,
-            secondaryMuscleGroups: otherGroups,
-            sets: widget.base!.sets,
-            restTime: Duration.zero,
+          result: Exercise.replaced(
+            from: widget.base!,
+            to: Exercise.custom(
+              id: widget.base!.id,
+              parentID: widget.base!.parentID,
+              name: titleController.text,
+              parameters: params,
+              primaryMuscleGroup: primaryGroup!,
+              secondaryMuscleGroups: otherGroups,
+              restTime: Duration.zero,
+              notes: widget.base!.notes,
+              sets: [],
+            ),
           ),
         );
       }

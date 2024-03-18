@@ -83,12 +83,14 @@ class _WorkoutExerciseEditorState extends State<WorkoutExerciseEditor> {
                     DragHandle(index: widget.index),
                   ] else
                     GestureDetector(
+                      onTap: widget.exercise.parent == null
+                          ? null
+                          : () {
+                              debugPrint("${widget.exercise.parent}");
+                              Go.to(() => ExerciseInfoView(
+                                  exercise: widget.exercise.parent!));
+                            },
                       child: ExerciseIcon(exercise: widget.exercise),
-                      onTap: () {
-                        Go.to(() => ExerciseInfoView(
-                            exercise:
-                                widget.exercise.parent ?? widget.exercise));
-                      },
                     ),
                   const SizedBox(width: 16),
                   Expanded(

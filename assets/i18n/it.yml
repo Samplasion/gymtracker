@@ -72,6 +72,9 @@ exercise:
     cannotChangeParameters:
       title: Non puoi cambiare i parametri di questo esercizio
       text: Puoi cambiare i parametri solo degli esercizi che non hai ancora eseguito.
+    overwriteInWorkout:
+      title: Questo esercizio fa parte del tuo allenamento in corso
+      body: Puoi modificarlo, ma se cambi i parametri dovrai riempire nuovamente i valori. Vuoi continuare?
   picker:
     title: Seleziona esercizi
     errors:

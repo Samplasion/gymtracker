@@ -104,6 +104,7 @@ class Exercise extends WorkoutExercisable {
     required String notes,
   }) =>
       Exercise.raw(
+        id: id,
         name: name,
         parameters: parameters,
         sets: sets,
@@ -153,6 +154,12 @@ class Exercise extends WorkoutExercisable {
   /// (ie. [other.parentID] == [id].)
   bool isTheSameAs(Exercise other) => other.id == id || other.parentID == id;
 
+  /// Returns true if [other] is a sibling of [this]
+  bool isSiblingOf(Exercise other) => other.parentID == parentID;
+
+  /// Returns true if [other] is a child of [this]
+  bool isParentOf(Exercise other) => other.parentID == id;
+
   Exercise instantiate({
     required Workout workout,
     bool Function(ExSet set)? setFilter = _defaultSetFilter,
@@ -192,6 +199,11 @@ class Exercise extends WorkoutExercisable {
                 ),
             ],
     );
+  }
+
+  @override
+  String toString() {
+    return "Exercise${toJson()}";
   }
 }
 

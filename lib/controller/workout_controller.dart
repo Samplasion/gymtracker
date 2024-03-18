@@ -9,7 +9,9 @@ import 'package:gymtracker/controller/settings_controller.dart';
 import 'package:gymtracker/controller/stopwatch_controller.dart';
 import 'package:gymtracker/data/weights.dart';
 import 'package:gymtracker/model/exercisable.dart';
+import 'package:gymtracker/model/exercise.dart';
 import 'package:gymtracker/model/set.dart';
+import 'package:gymtracker/model/superset.dart';
 import 'package:gymtracker/model/workout.dart';
 import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/struct/stopwatch_extended.dart';
@@ -277,6 +279,48 @@ class WorkoutController extends GetxController with ServiceableController {
 
     // Stop the global stopwatch
     controller.globalStopwatch.reset();
+  }
+
+  bool hasExercise(Exercise exercise) {
+    return exercises.any((element) {
+      return element.map(
+          exercise: (ex) => exercise.isParentOf(ex),
+          superset: (ss) =>
+              ss.exercises.any((element) => exercise.isParentOf(element)));
+    });
+  }
+
+  void applyExerciseModification(Exercise exercise) {
+    assert(exercise.isCustom);
+    assert(hasExercise(exercise));
+
+    final res = exercises.toList();
+    for (int i = 0; i < exercises.length; i++) {
+      exercises[i].when(
+        exercise: (e) {
+          if (exercise.isParentOf(e)) {
+            res[i] = Exercise.replaced(from: e, to: exercise).copyWith(
+              id: e.id,
+              parentID: e.parentID,
+            );
+          }
+        },
+        superset: (superset) {
+          for (int j = 0; j < superset.exercises.length; j++) {
+            if (exercise.isParentOf(superset.exercises[j])) {
+              (res[i] as Superset).exercises[j] =
+                  Exercise.replaced(from: superset.exercises[j], to: exercise)
+                      .copyWith(
+                id: superset.exercises[j].id,
+                parentID: superset.exercises[j].parentID,
+              );
+            }
+          }
+        },
+      );
+    }
+
+    exercises(res);
   }
 
   @override

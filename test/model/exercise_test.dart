@@ -2,6 +2,22 @@ import 'package:gymtracker/model/exercise.dart';
 import 'package:gymtracker/model/set.dart';
 import 'package:test/test.dart';
 
+void expectExercise(Exercise result, Exercise expected) {
+  expect(result.name, expected.name);
+  expect(result.parameters, expected.parameters);
+  expect(result.primaryMuscleGroup, expected.primaryMuscleGroup);
+  expect(result.secondaryMuscleGroups, expected.secondaryMuscleGroups);
+  expect(result.restTime, expected.restTime);
+  expect(result.notes, expected.notes);
+  expect(result.sets.length, expected.sets.length);
+  for (int i = 0; i < result.sets.length; i++) {
+    expect(result.sets[i].kind, expected.sets[i].kind);
+    expect(result.sets[i].parameters, expected.sets[i].parameters);
+    expect(result.sets[i].reps, expected.sets[i].reps);
+    expect(result.sets[i].weight, expected.sets[i].weight);
+  }
+}
+
 void main() {
   group('Exercise model', () {
     group("replaced(from:to:) static method", () {
@@ -50,19 +66,7 @@ void main() {
           notes: "From notes",
           sets: sets,
         );
-        expect(result.name, expected.name);
-        expect(result.parameters, expected.parameters);
-        expect(result.primaryMuscleGroup, expected.primaryMuscleGroup);
-        expect(result.secondaryMuscleGroups, expected.secondaryMuscleGroups);
-        expect(result.restTime, expected.restTime);
-        expect(result.notes, expected.notes);
-        expect(result.sets.length, expected.sets.length);
-        for (int i = 0; i < result.sets.length; i++) {
-          expect(result.sets[i].kind, expected.sets[i].kind);
-          expect(result.sets[i].parameters, expected.sets[i].parameters);
-          expect(result.sets[i].reps, expected.sets[i].reps);
-          expect(result.sets[i].weight, expected.sets[i].weight);
-        }
+        expectExercise(result, expected);
       });
 
       test("computes with different parameters", () {
@@ -125,20 +129,62 @@ void main() {
                 ),
             ],
           );
-          expect(result.name, expected.name);
-          expect(result.parameters, expected.parameters);
-          expect(result.primaryMuscleGroup, expected.primaryMuscleGroup);
-          expect(result.secondaryMuscleGroups, expected.secondaryMuscleGroups);
-          expect(result.restTime, expected.restTime);
-          expect(result.notes, expected.notes);
-          expect(result.sets.length, expected.sets.length);
-          for (int i = 0; i < result.sets.length; i++) {
-            expect(result.sets[i].kind, expected.sets[i].kind);
-            expect(result.sets[i].parameters, expected.sets[i].parameters);
-            expect(result.sets[i].reps, expected.sets[i].reps);
-            expect(result.sets[i].weight, expected.sets[i].weight);
-          }
+
+          expectExercise(result, expected);
         }
+      });
+
+      test("guarantees copyWith compatibility", () {
+        const params = SetParameters.repsWeight;
+        final base = Exercise.custom(
+          id: "",
+          parentID: "",
+          name: "To",
+          parameters: params,
+          primaryMuscleGroup: MuscleGroup.shoulders,
+          secondaryMuscleGroups: {MuscleGroup.traps, MuscleGroup.triceps},
+          restTime: const Duration(minutes: 2),
+          notes: "To notes",
+          sets: [],
+        );
+
+        final result = base.copyWith(
+          name: "Copied",
+          parameters: params,
+          primaryMuscleGroup: MuscleGroup.abductors,
+          secondaryMuscleGroups: {},
+          sets: base.sets,
+        );
+        final expected = Exercise.replaced(
+          from: base,
+          to: base.copyWith(
+            name: "Copied",
+            parameters: params,
+            primaryMuscleGroup: MuscleGroup.abductors,
+            secondaryMuscleGroups: {},
+            sets: base.sets,
+          ),
+        );
+
+        expectExercise(result, expected);
+      });
+
+      test("is idempotent", () {
+        final base = Exercise.custom(
+          id: "",
+          parentID: "",
+          name: "To",
+          parameters: SetParameters.repsWeight,
+          primaryMuscleGroup: MuscleGroup.shoulders,
+          secondaryMuscleGroups: {MuscleGroup.traps, MuscleGroup.triceps},
+          restTime: const Duration(minutes: 2),
+          notes: "To notes",
+          sets: [],
+        );
+        final result = Exercise.replaced(from: base, to: base);
+
+        expect(result.id, base.id);
+        expectExercise(result, base);
       });
     });
   });

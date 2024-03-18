@@ -43,4 +43,16 @@ abstract class WorkoutExercisable {
     }
     other?.call();
   }
+
+  T map<T>({
+    required T Function(Exercise) exercise,
+    required T Function(Superset) superset,
+  }) {
+    if (this is Exercise) {
+      return exercise(this as Exercise);
+    } else if (this is Superset) {
+      return superset(this as Superset);
+    }
+    throw TypeError();
+  }
 }

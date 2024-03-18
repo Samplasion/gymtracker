@@ -323,6 +323,9 @@ ongoingWorkout:
         few: "%s esercizi modificati"
         many: "%s esercizi modificati"
         other: "%s esercizi modificati"
+  goodJob:
+    title: Ottimo lavoro!
+    body: Ecco delle statistiche sull'allenamento appena terminato.
 
 timer: 
   add15s: "+15s"
@@ -643,5 +646,7 @@ me:
       label: Durata
     volume:
       label: Volume
+    distance:
+      label: Distanza percorsa
     sets:
       label: Serie

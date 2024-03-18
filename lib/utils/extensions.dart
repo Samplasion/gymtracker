@@ -172,6 +172,14 @@ extension WeightUtils on double {
       "unit": "units.${settingsController.weightUnit.value!.name}".t,
     });
   }
+
+  String get userFacingDistance {
+    return "exerciseList.fields.distance".tParams({
+      "distance": localized,
+      // "unit": "units.${settingsController.distanceUnit.value!.name}".t,
+      "unit": "km",
+    });
+  }
 }
 
 extension ContextThemingUtils on BuildContext {

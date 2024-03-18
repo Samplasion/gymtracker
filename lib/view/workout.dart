@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:get/get.dart';
@@ -26,6 +27,7 @@ import 'package:gymtracker/view/utils/time.dart';
 import 'package:gymtracker/view/utils/timer.dart';
 import 'package:gymtracker/view/utils/weight_calculator.dart';
 import 'package:gymtracker/view/utils/workout.dart';
+import 'package:gymtracker/view/utils/workout_done.dart';
 
 WorkoutController get controller {
   if (Get.isRegistered<WorkoutController>()) {
@@ -234,6 +236,20 @@ class _WorkoutViewState extends State<WorkoutView> {
                           Weights.values.length]);
                 },
               ),
+              if (kDebugMode)
+                PopupMenuItem(
+                  child: const Text("Show Good Job dialog"),
+                  onTap: () {
+                    Go.showBottomModalScreen(
+                      (_, controller) => WorkoutDoneSheet(
+                        workout: safeController!.generateWorkout("").copyWith(
+                              duration: const Duration(minutes: 1),
+                            ),
+                        controller: controller,
+                      ),
+                    );
+                  },
+                ),
             ],
           ),
         ],

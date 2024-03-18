@@ -89,6 +89,8 @@ class Workout {
       doneSets.fold(0, (value, element) => value + (element.reps ?? 0));
   double get liftedWeight => doneSets.fold(0.0,
       (value, element) => value + (element.weight ?? 0) * (element.reps ?? 1));
+  double get distanceRan =>
+      doneSets.fold(0.0, (value, element) => value + (element.distance ?? 0));
 
   int get displayExerciseCount => exercises
       .map((e) => e is Superset ? e.exercises.length : 1)

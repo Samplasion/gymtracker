@@ -1,0 +1,100 @@
+import 'package:flutter/material.dart';
+import 'package:get/get.dart' hide ContextExtensionss;
+import 'package:gymtracker/model/workout.dart';
+import 'package:gymtracker/service/localizations.dart';
+import 'package:gymtracker/utils/constants.dart';
+import 'package:gymtracker/utils/extensions.dart';
+import 'package:gymtracker/view/charts/workout_muscle_categories.dart';
+import 'package:gymtracker/view/utils/speed_dial.dart';
+import 'package:gymtracker/view/utils/timer.dart';
+
+class WorkoutDoneSheet extends StatelessWidget {
+  final Workout workout;
+  final ScrollController? controller;
+
+  const WorkoutDoneSheet({required this.workout, this.controller, super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: CustomScrollView(
+        controller: controller,
+        slivers: [
+          SliverAppBar.large(
+            automaticallyImplyLeading: false,
+            actions: [
+              IconButton(
+                icon: const Icon(Icons.done_rounded),
+                onPressed: () {
+                  Get.back();
+                },
+              ),
+            ],
+            flexibleSpace: FlexibleSpaceBar(
+              title: Text('ongoingWorkout.goodJob.title'.t),
+              expandedTitleScale:
+                  context.theme.textTheme.displaySmall!.fontSize! /
+                      context.theme.textTheme.titleLarge!.fontSize!,
+            ),
+          ),
+          SliverPadding(
+            padding: const EdgeInsets.all(16),
+            sliver: SliverList.list(
+              children: [
+                Text(
+                  'ongoingWorkout.goodJob.body'.t,
+                  style: context.theme.textTheme.bodyLarge,
+                ),
+                if (WorkoutMuscleCategoriesBarChart.shouldShow(workout)) ...[
+                  const SizedBox(height: 16),
+                  WorkoutMuscleCategoriesBarChart(workout: workout),
+                ],
+                const SizedBox(height: 16),
+                SpeedDial(
+                  crossAxisCountBuilder: (bp) => switch (bp) {
+                    Breakpoints.xxs || Breakpoints.xs || Breakpoints.s => 1,
+                    _ => 3,
+                  },
+                  buttonHeight: (bp) =>
+                      switch (bp) {
+                        Breakpoints.xxs || Breakpoints.xs => 1.1,
+                        _ => 1.3,
+                      } *
+                      kSpeedDialButtonHeight,
+                  buttons: [
+                    SpeedDialButton(
+                      icon: const Icon(Icons.access_time_rounded),
+                      text: TimerView.buildTimeString(
+                        context,
+                        workout.duration!,
+                        builder: (time) => Text("${time.text}"),
+                      ),
+                      subtitle: Text("me.stats.duration.label".t),
+                    ),
+                    if (workout.liftedWeight > 0)
+                      SpeedDialButton(
+                        icon: const Icon(Icons.line_weight_rounded),
+                        text: Text(workout.liftedWeight.userFacingWeight),
+                        subtitle: Text("me.stats.volume.label".t),
+                      ),
+                    if (workout.distanceRan > 0)
+                      SpeedDialButton(
+                        icon: const Icon(Icons.run_circle_rounded),
+                        text: Text(workout.distanceRan.userFacingDistance),
+                        subtitle: Text("me.stats.distance.label".t),
+                      ),
+                    SpeedDialButton(
+                      icon: const Icon(Icons.numbers_rounded),
+                      text: Text(workout.doneSets.length.toString()),
+                      subtitle: Text("me.stats.sets.label".t),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}

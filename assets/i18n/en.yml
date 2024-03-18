@@ -323,6 +323,9 @@ ongoingWorkout:
         few: "%s exercises changed"
         many: "%s exercises changed"
         other: "%s exercises changed"
+  goodJob:
+    title: Good job!
+    body: Here's some statistics about the workout you've just finished.
 
 timer: 
   add15s: "+15s"
@@ -643,5 +646,7 @@ me:
       label: Duration
     volume:
       label: Volume
+    distance:
+      label: Distance ran
     sets:
       label: Sets

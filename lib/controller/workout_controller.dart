@@ -16,6 +16,7 @@ import 'package:gymtracker/model/workout.dart';
 import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/struct/stopwatch_extended.dart';
 import 'package:gymtracker/utils/go.dart';
+import 'package:gymtracker/view/utils/workout_done.dart';
 import 'package:gymtracker/view/workout.dart';
 
 class WorkoutController extends GetxController with ServiceableController {
@@ -214,11 +215,20 @@ class WorkoutController extends GetxController with ServiceableController {
     SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
       Get.back();
       Get.delete<WorkoutController>();
-      askToUpdateRoutine(workout);
+      askToUpdateRoutine(workout).then((_) {
+        if (workout.doneSets.isNotEmpty) {
+          Go.showBottomModalScreen(
+            (context, controller) => WorkoutDoneSheet(
+              workout: workout,
+              controller: controller,
+            ),
+          );
+        }
+      });
     });
   }
 
-  void askToUpdateRoutine(Workout workout) async {
+  Future<void> askToUpdateRoutine(Workout workout) async {
     final routinesController = Get.find<RoutinesController>();
 
     if (workout.parentID != null &&

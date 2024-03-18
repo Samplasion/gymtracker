@@ -7,7 +7,6 @@ import 'package:gymtracker/model/workout.dart';
 import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/view/components/controlled.dart';
-import 'package:gymtracker/view/components/spider_chart_plus.dart';
 import 'package:simple_animations/simple_animations.dart';
 
 class MuscleCategoryGraph extends StatefulWidget {

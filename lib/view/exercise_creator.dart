@@ -76,7 +76,8 @@ class _ExerciseCreatorState extends State<ExerciseCreator> {
                     if (string == null || string.isEmpty) {
                       return "exercise.editor.fields.title.errors.empty".t;
                     }
-                    if (!controller.isNameValid(string)) {
+                    if (widget.base == null &&
+                        !controller.isNameValid(string)) {
                       return "exercise.editor.fields.title.errors.invalid".t;
                     }
                     return null;

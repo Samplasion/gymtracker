@@ -1,3 +1,6 @@
+import 'dart:ui';
+
+import 'package:get/get.dart';
 import 'package:gymtracker/utils/extensions.dart';
 import 'package:test/test.dart';
 
@@ -26,6 +29,32 @@ void main() {
     test("uncompressed", () {
       expect("H4sIAAAAAAAAEwtJLS4BADLRTXgEAAAA".uncompressed, "Test");
       expect(encodedLipsum.uncompressed, lipsum);
+    });
+  });
+
+  group('NumGenericUtils extension', () {
+    group("localized", () {
+      test("en-US", () {
+        Get.updateLocale(const Locale("en", "US"));
+        expect(1.234.localized, "1.23");
+        expect(1.239.localized, "1.24");
+        expect(12.localized, "12");
+        expect(1234.localized, "1,234");
+        expect(1234.567.localized, "1,234.57");
+        expect(123456789.012.localized, "123,456,789.01");
+      });
+
+      test("it-IT", () {
+        Get.updateLocale(const Locale("it", "IT"));
+        expect(1.234.localized, "1,23");
+        expect(1.239.localized, "1,24");
+        expect(12.localized, "12");
+        expect(1234.localized, "1.234");
+        expect(1234.567.localized, "1.234,57");
+        expect(123456789.012.localized, "123.456.789,01");
+      });
+
+      // To update if we support new languages
     });
   });
 }

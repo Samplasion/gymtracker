@@ -164,13 +164,8 @@ class WeightCard extends StatelessWidget {
                         Text(
                           latestMeasurement == null
                               ? "me.weight.none".t
-                              : "exerciseList.fields.weight".trParams({
-                                  "weight": stringifyDouble(
-                                      latestMeasurement.convertedWeight),
-                                  "unit":
-                                      "units.${settingsController.weightUnit.value!.name}"
-                                          .t,
-                                }),
+                              : latestMeasurement
+                                  .convertedWeight.userFacingWeight,
                           textAlign: TextAlign.center,
                           style: Theme.of(context).textTheme.displaySmall,
                         ),
@@ -257,10 +252,7 @@ class WeightMeasurementDataPage extends StatelessWidget {
               ],
             ),
             child: ListTile(
-              title: Text("exerciseList.fields.weight".trParams({
-                "weight": stringifyDouble(measurement.convertedWeight),
-                "unit": "units.${settingsController.weightUnit.value!.name}".t,
-              })),
+              title: Text(measurement.convertedWeight.userFacingWeight),
               subtitle: Text(DateFormat.MMMd(context.locale.languageCode)
                   .add_Hm()
                   .format(measurement.time)),
@@ -303,13 +295,7 @@ class WeightMeasurementDataDetailsPage extends StatelessWidget {
           children: [
             ListTile(
               title: Text("me.addWeight.weight.label".t),
-              subtitle: Text(
-                "exerciseList.fields.weight".trParams({
-                  "weight": stringifyDouble(measurement.convertedWeight),
-                  "unit":
-                      "units.${settingsController.weightUnit.value!.name}".t,
-                }),
-              ),
+              subtitle: Text(measurement.convertedWeight.userFacingWeight),
             ),
             ListTile(
               title: Text("me.addWeight.time.label".t),

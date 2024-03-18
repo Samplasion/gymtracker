@@ -607,13 +607,11 @@ class ExerciseSetView extends StatelessWidget {
   List<Widget> get fields => [
         if ([SetParameters.repsWeight, SetParameters.timeWeight]
             .contains(set.parameters))
-          Text("exerciseList.fields.weight".trParams({
-            "weight": stringifyDouble(Weights.convert(
-                value: set.weight!,
-                from: weightUnit,
-                to: settingsController.weightUnit.value!)),
-            "unit": "units.${settingsController.weightUnit.value!.name}".t,
-          })),
+          Text(Weights.convert(
+            value: set.weight!,
+            from: weightUnit,
+            to: settingsController.weightUnit.value!,
+          ).userFacingWeight),
         if ([
           SetParameters.timeWeight,
           SetParameters.time,

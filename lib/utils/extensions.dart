@@ -3,10 +3,12 @@ import 'dart:io';
 
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:gymtracker/controller/settings_controller.dart';
 import 'package:gymtracker/model/workout.dart';
 import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/utils/utils.dart';
+import 'package:intl/intl.dart';
 
 extension StringUtils on String {
   double parseDouble() {
@@ -84,6 +86,13 @@ extension BuildContextUtils on BuildContext {
   }
 }
 
+extension NumGenericUtils<T extends num> on T {
+  String get localized => NumberFormat(
+        "###,###.##",
+        Get.locale!.languageCode,
+      ).format(this);
+}
+
 extension NumUtils on num {
   num clamp(num min, num max) {
     if (this < min) return min;
@@ -140,7 +149,7 @@ extension WorkoutIterableUtils on Iterable<Workout> {
 extension WeightUtils on double {
   String get userFacingWeight {
     return "exerciseList.fields.weight".tParams({
-      "weight": stringifyDouble(this),
+      "weight": localized,
       "unit": "units.${settingsController.weightUnit.value!.name}".t,
     });
   }

@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:gymtracker/controller/history_controller.dart';
@@ -93,6 +95,11 @@ class _MeCalendarPageState
               locale: Get.locale!.languageCode,
               calendarController: calendarController,
               layout: Layout.DEFAULT,
+              padding: EdgeInsets.symmetric(
+                  horizontal: max(
+                      0,
+                      (context.width - Breakpoints.xs.screenWidth.toDouble()) /
+                          2)),
               dayBuilder: (context, values) {
                 final date = values.day.startOfDay;
                 final count =

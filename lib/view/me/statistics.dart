@@ -100,7 +100,6 @@ class _MeStatisticsPageState
             width: max(200, min(context.width, context.height / 3)),
             height: max(200, min(context.width, context.height / 3)),
             child: MuscleCategoryGraph(
-              key: ValueKey(timeFrame),
               workouts: periodWorkouts,
             ),
           ),

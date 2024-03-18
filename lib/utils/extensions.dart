@@ -7,7 +7,6 @@ import 'package:get/get.dart';
 import 'package:gymtracker/controller/settings_controller.dart';
 import 'package:gymtracker/model/workout.dart';
 import 'package:gymtracker/service/localizations.dart';
-import 'package:gymtracker/utils/utils.dart';
 import 'package:intl/intl.dart';
 
 extension StringUtils on String {

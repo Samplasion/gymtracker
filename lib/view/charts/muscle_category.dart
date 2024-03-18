@@ -1,6 +1,8 @@
+import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:gymtracker/controller/history_controller.dart';
+import 'package:gymtracker/model/exercise.dart';
 import 'package:gymtracker/model/workout.dart';
 import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/utils/extensions.dart';
@@ -19,52 +21,46 @@ class MuscleCategoryGraph extends StatefulWidget {
 
 class _MuscleCategoryGraphState
     extends ControlledState<MuscleCategoryGraph, HistoryController> {
-  late final data = controller.calculateMuscleCategoryDistributionFor(
-      workouts: widget.workouts);
+  Map<MuscleCategory, double> get data => controller
+      .calculateMuscleCategoryDistributionFor(workouts: widget.workouts);
   double get maxValue => data.values.max;
 
   @override
   Widget build(BuildContext context) {
-    final tween = MovieTween(curve: Curves.easeOut);
-
     final entries = data.entries.toList();
-    for (int i = 0; i < entries.length; i++) {
-      tween.tween(
-        "$i",
-        Tween(begin: 0.0, end: entries[i].value),
-        duration: const Duration(milliseconds: 400),
-        begin: Duration(milliseconds: 50 * i),
-      );
-    }
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 32),
-      child: PlayAnimationBuilder<Movie>(
-          tween: tween,
-          duration: tween.duration,
-          builder: (context, value, _) {
-            return SpiderChartPlus(
-              data: [
-                for (int i = 0; i < entries.length; i++) value.get("$i"),
-              ],
-              maxValue: maxValue,
-              colors: <Color>[
-                for (final _ in data.entries)
-                  Theme.of(context).colorScheme.primary,
-              ],
-              labels: [
-                for (int i = 0; i < entries.length; i++)
-                  "muscleCategories.${entries[i].key.name}".t,
-              ],
-              interPointStrokeColor: Theme.of(context).colorScheme.primary,
-              interLineStrokeColor:
-                  Theme.of(context).colorScheme.outlineVariant,
-              areaFillColor:
-                  Theme.of(context).colorScheme.primary.withOpacity(0.35),
-              labelColor: Theme.of(context).colorScheme.outline,
-              paintDataValues: kDebugMode,
-            );
-          }),
+    return RadarChart(
+      RadarChartData(
+        dataSets: [
+          RadarDataSet(
+            dataEntries: [
+              for (int i = 0; i < entries.length; i++)
+                RadarEntry(value: entries[i].value),
+            ],
+            borderColor: context.colorScheme.primary,
+            fillColor: context.colorScheme.primary.withOpacity(0.3),
+            entryRadius: 0,
+          ),
+        ],
+        radarShape: RadarShape.polygon,
+        radarBorderData:
+            BorderSide(color: context.colorScheme.outlineVariant, width: 1.5),
+        tickBorderData: BorderSide(color: context.colorScheme.outlineVariant),
+        gridBorderData: BorderSide(color: context.colorScheme.outlineVariant),
+        radarTouchData: RadarTouchData(enabled: false),
+        borderData: FlBorderData(show: false),
+        ticksTextStyle: const TextStyle(color: Colors.transparent),
+        getTitle: (i, angle) {
+          if (angle > 90 && angle < 270) angle -= 180;
+          return RadarChartTitle(
+            text: "muscleCategories.${entries[i].key.name}".t,
+            angle: angle,
+            positionPercentageOffset: 0.1,
+          );
+        },
+      ),
+      swapAnimationDuration: const Duration(seconds: 1),
+      swapAnimationCurve: Curves.easeInOut,
     );
   }
 }

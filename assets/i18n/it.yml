@@ -347,6 +347,10 @@ exerciseList:
     distance: "@distance @unit"
   workoutMuscleCategoriesBarChart:
     label: Distribuzione muscolare
+  stats:
+    time: Durata
+    volume: Volume
+    sets: Serie
 
 general:
   dialogs:

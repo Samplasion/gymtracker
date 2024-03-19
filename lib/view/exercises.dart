@@ -24,6 +24,7 @@ import 'package:gymtracker/view/charts/routine_history.dart';
 import 'package:gymtracker/view/charts/workout_muscle_categories.dart';
 import 'package:gymtracker/view/components/badges.dart';
 import 'package:gymtracker/view/components/infobox.dart';
+import 'package:gymtracker/view/components/stats.dart';
 import 'package:gymtracker/view/library.dart';
 import 'package:gymtracker/view/routine_creator.dart';
 import 'package:gymtracker/view/utils/dropdown_dialog.dart';
@@ -251,6 +252,29 @@ class _ExercisesViewState extends State<ExercisesView> {
                         workout: workout,
                         continuation: workout.continuation,
                       ),
+                      if (workout.isConcrete) ...[
+                        const Divider(height: 32),
+                        StatsRow(
+                          stats: [
+                            Stats(
+                              value: TimerView.buildTimeString(
+                                context,
+                                workout.duration!,
+                                builder: (time) => time.text!,
+                              ),
+                              label: "exerciseList.stats.time".t,
+                            ),
+                            Stats(
+                              value: workout.liftedWeight.userFacingWeight,
+                              label: "exerciseList.stats.volume".t,
+                            ),
+                            Stats(
+                              value: workout.doneSets.length.toString(),
+                              label: "exerciseList.stats.sets".t,
+                            ),
+                          ],
+                        ),
+                      ],
                       const Divider(height: 32),
                       FilledButton(
                         onPressed: () {
@@ -264,13 +288,15 @@ class _ExercisesViewState extends State<ExercisesView> {
                           }
                         }()),
                       ),
-                      if (controller.isWorkoutContinuable(workout))
+                      if (controller.isWorkoutContinuable(workout)) ...[
+                        const SizedBox(height: 8),
                         FilledButton.tonal(
                           onPressed: () {
                             controller.continueWorkout(context, workout);
                           },
                           child: Text("workouts.actions.continue".t),
                         ),
+                      ],
                     ],
                   ),
                 ),

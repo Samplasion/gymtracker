@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:math';
 
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:flutter/material.dart';
@@ -192,5 +193,27 @@ extension ContextThemingUtils on BuildContext {
       theme.cardTheme.surfaceTintColor ?? colorScheme.surfaceTint,
       elevation,
     );
+  }
+}
+
+Widget separatorBuilder(int index) => const Divider();
+
+extension SeparatedWidgetList on Iterable<Widget> {
+  List<Widget> separated({
+    separatorBuilder = separatorBuilder,
+  }) {
+    final self = toList();
+    final List<Widget> widgets = [];
+
+    for (int i = 0; i < max(0, self.length * 2 - 1); i++) {
+      final int itemIndex = i ~/ 2;
+      if (i.isEven) {
+        widgets.add(self[itemIndex]);
+      } else {
+        widgets.add(separatorBuilder(itemIndex));
+      }
+    }
+
+    return widgets;
   }
 }

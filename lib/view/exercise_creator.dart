@@ -56,7 +56,8 @@ class _ExerciseCreatorState extends State<ExerciseCreator> {
           ),
           actions: [
             IconButton(
-              icon: const Icon(Icons.check),
+              key: const Key("done"),
+              icon: const Icon(Icons.done_rounded),
               onPressed: _submit,
             )
           ],

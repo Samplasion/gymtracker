@@ -27,12 +27,11 @@ class LibraryView extends GetView<ExercisesController> {
     final sortedKeys = [...exerciseStandardLibrary.keys]
       ..sort((a, b) => a.toLowerCase().compareTo(b.toLowerCase()));
     return {
-      if (controller.exercises.isNotEmpty)
-        "library.custom".t: ExerciseCategory(
-          exercises: controller.exercises,
-          icon: const Icon(Icons.star_rounded),
-          color: Colors.yellow,
-        ),
+      "library.custom".t: ExerciseCategory(
+        exercises: controller.exercises,
+        icon: const Icon(Icons.star_rounded),
+        color: Colors.yellow,
+      ),
       for (final key in sortedKeys) key: exerciseStandardLibrary[key]!,
     };
   }
@@ -185,6 +184,7 @@ class _ExerciseInfoViewState extends State<ExerciseInfoView> {
         actions: [
           if (exercise.isCustom)
             PopupMenuButton(
+              key: const Key("menu"),
               itemBuilder: (_) => [
                 PopupMenuItem(
                   child: Text("actions.edit".t),

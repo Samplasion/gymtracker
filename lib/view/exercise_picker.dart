@@ -45,7 +45,8 @@ class _ExercisePickerState extends State<ExercisePicker> {
         actions: [
           if (!widget.singlePick)
             IconButton(
-              icon: const Icon(Icons.check),
+              key: const Key('pick'),
+              icon: const Icon(Icons.check_rounded),
               onPressed: _submit,
             )
         ],
@@ -171,7 +172,8 @@ class _LibraryPickerExercisesViewState
         title: Text(widget.name),
         actions: [
           IconButton(
-            icon: const Icon(Icons.check),
+            key: const Key('pick'),
+            icon: const Icon(Icons.check_rounded),
             onPressed: widget.onSubmit,
           )
         ],

@@ -9,7 +9,9 @@ import 'package:integration_test/integration_test.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 
+import 'flows/create_exercise.dart';
 import 'flows/create_routine.dart';
+import 'flows/edit_exercise_while_ongoing.dart';
 import 'flows/edit_workout.dart';
 import 'flows/workout_from_routine.dart';
 
@@ -47,6 +49,15 @@ void main() async {
     testWidgets(
       'edit workout',
       (tester) => testEditWorkoutFlow(tester, l, databaseService),
+    );
+    testWidgets(
+      'create exercise',
+      (tester) => testCreateExerciseFlow(tester, l, databaseService),
+    );
+    testWidgets(
+      'edit exercise while workout is ongoing',
+      (tester) =>
+          testEditExerciseWhileWorkoutIsOngoingFlow(tester, l, databaseService),
     );
   });
 }

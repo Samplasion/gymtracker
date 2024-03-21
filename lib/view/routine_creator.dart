@@ -166,7 +166,7 @@ class _RoutineCreatorState extends State<RoutineCreator> {
                     controller.exercises.add(_DateWrapped(
                       Superset(
                         restTime: Duration.zero,
-                        exercises: result!,
+                        exercises: [for (final ex in result!) ex.makeChild()],
                       ),
                     ));
                   });
@@ -270,7 +270,7 @@ class _RoutineCreatorState extends State<RoutineCreator> {
             final ex = await Go.to<List<Exercise>>(
                 () => const ExercisePicker(singlePick: true));
             if (ex == null || ex.isEmpty) return;
-            controller.exercises[i].data = ex.first.copyWith.sets([
+            controller.exercises[i].data = ex.first.makeChild().copyWith.sets([
               ExSet.empty(
                 kind: SetKind.normal,
                 parameters: ex.first.parameters,
@@ -305,7 +305,7 @@ class _RoutineCreatorState extends State<RoutineCreator> {
           if (exercises == null) return;
           (controller.exercises[i].data as Superset).exercises.addAll(
                 exercises.map(
-                  (ex) => ex.copyWith.sets([
+                  (ex) => ex.makeChild().copyWith.sets([
                     ExSet.empty(
                       kind: SetKind.normal,
                       parameters: ex.parameters,

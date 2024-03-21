@@ -14,6 +14,7 @@ import 'flows/create_routine.dart';
 import 'flows/edit_exercise_in_routines_and_history.dart';
 import 'flows/edit_exercise_while_ongoing.dart';
 import 'flows/edit_workout.dart';
+import 'flows/routine_from_workout.dart';
 import 'flows/workout_from_routine.dart';
 
 void main() async {
@@ -69,6 +70,10 @@ void main() async {
     testWidgets(
       'create exercise',
       (tester) => testCreateExerciseFlow(tester, l, databaseService),
+    );
+    testWidgets(
+      'create routine from history workout',
+      (tester) => testRoutineFromWorkout(tester, l, databaseService),
     );
   });
 }

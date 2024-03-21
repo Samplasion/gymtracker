@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:get/get.dart';
+import 'package:gymtracker/controller/coordinator.dart';
 import 'package:gymtracker/controller/exercises_controller.dart';
 import 'package:gymtracker/controller/history_controller.dart';
 import 'package:gymtracker/controller/history_controller.dart' as history;
@@ -27,9 +28,7 @@ import 'package:gymtracker/view/components/infobox.dart';
 import 'package:gymtracker/view/components/stats.dart';
 import 'package:gymtracker/view/library.dart';
 import 'package:gymtracker/view/routine_creator.dart';
-import 'package:gymtracker/view/utils/dropdown_dialog.dart';
 import 'package:gymtracker/view/utils/exercise.dart';
-import 'package:gymtracker/view/utils/textfield_dialog.dart';
 import 'package:gymtracker/view/utils/timer.dart';
 import 'package:gymtracker/view/utils/workout_utils.dart';
 import 'package:gymtracker/view/workout_editor.dart';
@@ -55,17 +54,14 @@ class _ExercisesViewState extends State<ExercisesView> {
         title: Text(workout.name),
         actions: [
           PopupMenuButton(
+            key: const Key('menu'),
             itemBuilder: (context) => [
               if (workout.isConcrete) ...[
                 PopupMenuItem(
+                  key: const Key("save-as-routine"),
                   child: Text("workouts.actions.saveAsRoutine.button".t),
                   onTap: () {
-                    final newID =
-                        Get.find<RoutinesController>().importWorkout(workout);
-                    if (workout.parentID == null) {
-                      changeParent(newID);
-                    }
-                    Go.snack("workouts.actions.saveAsRoutine.done".t);
+                    Get.find<Coordinator>().saveWorkoutAsRoutine(workout);
                   },
                 ),
                 PopupMenuItem(
@@ -345,8 +341,6 @@ class _ExercisesViewState extends State<ExercisesView> {
 
   void changeParent(String? value) {
     setState(() => workout.parentID = value);
-    Get.find<history.HistoryController>()
-        .setParentID(workout, newParentID: value);
   }
 
   void rename(String? value) {

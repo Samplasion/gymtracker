@@ -165,6 +165,9 @@ Future<void> testEditExerciseWhileWorkoutIsOngoingFlow(
   // await tester.tap(find.widgetWithIcon(IconButton, Icons.done_rounded));
   // await tester.pumpAndSettle();
 
+  // Wait for the database changes to flush
+  await tester.pumpAndSettle(const Duration(seconds: 5));
+
   // Check that our changes have been saved
   var ex = databaseService.exerciseBox.values.first;
   expectExercise(

@@ -10,7 +10,10 @@ import 'package:gymtracker/controller/settings_controller.dart';
 import 'package:gymtracker/controller/stopwatch_controller.dart';
 import 'package:gymtracker/controller/workout_controller.dart';
 import 'package:gymtracker/model/exercise.dart';
+import 'package:gymtracker/model/workout.dart';
+import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/service/notifications.dart';
+import 'package:gymtracker/utils/go.dart';
 
 class Coordinator extends GetxController with ServiceableController {
   @override
@@ -45,5 +48,13 @@ class Coordinator extends GetxController with ServiceableController {
         Get.find<WorkoutController>().hasExercise(ex)) {
       Get.find<WorkoutController>().applyExerciseModification(ex);
     }
+  }
+
+  void saveWorkoutAsRoutine(Workout workout) {
+    final newID = Get.find<RoutinesController>().importWorkout(workout);
+    if (workout.parentID == null) {
+      Get.find<HistoryController>().setParentID(workout, newParentID: newID);
+    }
+    Go.snack("workouts.actions.saveAsRoutine.done".t);
   }
 }

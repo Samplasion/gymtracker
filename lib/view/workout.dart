@@ -443,21 +443,7 @@ class _WorkoutViewState extends State<WorkoutView> {
                       onExerciseAdd: () {
                         SchedulerBinding.instance
                             .addPostFrameCallback((timeStamp) async {
-                          final exs = await Go.to<List<Exercise>>(
-                              () => const ExercisePicker(singlePick: false));
-                          if (exs == null || exs.isEmpty) return;
-                          (controller.exercises[i] as Superset)
-                              .exercises
-                              .addAll(
-                                exs.map((ex) => ex.copyWith.sets([
-                                      ExSet.empty(
-                                        kind: SetKind.normal,
-                                        parameters: ex.parameters,
-                                      ),
-                                    ])),
-                              );
-                          controller.exercises.refresh();
-                          controller.save();
+                          controller.pickExercisesForSuperset(i);
                         });
                       },
                       onExerciseRemove: (index) {
@@ -578,18 +564,7 @@ class _WorkoutViewState extends State<WorkoutView> {
                     title: 'ongoingWorkout.exercises.add'.t,
                     type: SplitButtonSegmentType.filled,
                     onTap: () async {
-                      final exs = await Go.to<List<Exercise>>(
-                          () => const ExercisePicker(singlePick: false));
-                      if (exs == null || exs.isEmpty) return;
-                      controller.exercises.addAll(
-                        exs.map((ex) => ex.copyWith.sets([
-                              ExSet.empty(
-                                kind: SetKind.normal,
-                                parameters: ex.parameters,
-                              ),
-                            ])),
-                      );
-                      controller.exercises.refresh();
+                      controller.pickExercises();
                     },
                   ),
                   SplitButtonSegment(

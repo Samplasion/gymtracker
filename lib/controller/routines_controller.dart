@@ -58,7 +58,9 @@ class RoutinesController extends GetxController
         case AppLifecycleState.inactive:
         case AppLifecycleState.paused:
         case AppLifecycleState.resumed:
-          Get.find<WorkoutController>().save();
+          if (Get.isRegistered<WorkoutController>()) {
+            Get.find<WorkoutController>().save();
+          }
           break;
         default:
           break;
@@ -420,5 +422,53 @@ class RoutinesController extends GetxController
         ],
       ),
     );
+  }
+
+  bool hasExercise(Exercise exercise) {
+    return workouts.any(
+      (routine) => routine.exercises.any((element) {
+        return element.map(
+            exercise: (ex) => exercise.isParentOf(ex),
+            superset: (ss) =>
+                ss.exercises.any((element) => exercise.isParentOf(element)));
+      }),
+    );
+  }
+
+  void applyExerciseModification(Exercise exercise) {
+    assert(exercise.isCustom);
+
+    final newHistory = service.routinesBox.values.toList();
+    for (int i = 0; i < newHistory.length; i++) {
+      final workout = newHistory[i];
+
+      final res = workout.exercises.toList();
+      for (int i = 0; i < res.length; i++) {
+        res[i].when(
+          exercise: (e) {
+            if (exercise.isParentOf(e)) {
+              res[i] = Exercise.replaced(from: e, to: exercise).copyWith(
+                id: e.id,
+                parentID: e.parentID,
+              );
+            }
+          },
+          superset: (superset) {
+            for (int j = 0; j < superset.exercises.length; j++) {
+              if (exercise.isParentOf(superset.exercises[j])) {
+                (res[i] as Superset).exercises[j] =
+                    Exercise.replaced(from: superset.exercises[j], to: exercise)
+                        .copyWith(
+                  id: superset.exercises[j].id,
+                  parentID: superset.exercises[j].parentID,
+                );
+              }
+            }
+          },
+        );
+      }
+      newHistory[i] = workout.copyWith.exercises(res);
+    }
+    service.setAllRoutines(newHistory);
   }
 }

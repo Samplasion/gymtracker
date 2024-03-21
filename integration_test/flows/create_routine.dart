@@ -63,7 +63,7 @@ Future<void> testCreateRoutineFlow(
   // Trigger a frame.
   await tester.pumpAndSettle();
 
-  final addExercise = find.widgetWithIcon(IconButton, Icons.check);
+  final addExercise = find.byKey(const Key("pick"));
   await tester.tap(addExercise);
 
   // Trigger a frame.
@@ -140,6 +140,7 @@ Future<void> testCreateRoutineFlow(
   expect(newRoutine.exercises.length, 1);
   final exerciseObj = newRoutine.exercises.first as Exercise;
   expect(exerciseObj.name, "Crunches");
+  expect(exerciseObj.parentID, "library.abs.exercises.crunches");
   expect(exerciseObj.restTime, const Duration(minutes: 1));
   expect(exerciseObj.sets.length, 3);
   expect(exerciseObj.sets.map((e) => e.reps).toList(), [5, 10, 15]);

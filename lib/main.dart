@@ -9,16 +9,12 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
-import 'package:gymtracker/controller/countdown_controller.dart';
+import 'package:gymtracker/controller/coordinator.dart';
 import 'package:gymtracker/controller/debug_controller.dart';
-import 'package:gymtracker/controller/exercises_controller.dart';
-import 'package:gymtracker/controller/me_controller.dart';
 import 'package:gymtracker/controller/settings_controller.dart';
-import 'package:gymtracker/controller/stopwatch_controller.dart';
 import 'package:gymtracker/service/color.dart';
 import 'package:gymtracker/service/database.dart';
 import 'package:gymtracker/service/localizations.dart';
-import 'package:gymtracker/service/notifications.dart';
 import 'package:gymtracker/service/version.dart';
 import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/utils/go.dart';
@@ -64,13 +60,9 @@ class MainApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Get.put(databaseService);
-    Get.put(NotificationsService());
-    Get.put(CountdownController());
-    Get.put(ExercisesController());
-    final debugController = Get.put(DebugController());
-    Get.put(StopwatchController());
-    Get.put(MeController());
-    final settings = Get.put(SettingsController());
+    Get.put(Coordinator()..init());
+    final debugController = Get.find<DebugController>();
+    final settings = Get.find<SettingsController>();
     final localizations = Get.put(this.localizations);
 
     final application = DynamicColorBuilder(

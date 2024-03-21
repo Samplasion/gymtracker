@@ -160,26 +160,40 @@ class Exercise extends WorkoutExercisable {
   /// Returns true if [other] is a child of [this]
   bool isParentOf(Exercise other) => other.parentID == id;
 
+  /// This function already calls [makeSibling] or [makeChild] internally.
   Exercise instantiate({
     required Workout workout,
     bool Function(ExSet set)? setFilter = _defaultSetFilter,
-  }) =>
-      copyWith(
-        sets: ([
-          for (final set in sets)
-            set.copyWith(
-              done: false,
-              reps: set.kind.shouldKeepInRoutine ? set.reps : 0,
-            ),
-        ]),
-        // If we're redoing a previous workout,
-        // we want to inherit the previous parent ID,
-        // ie. the original routine's ID
-        // But we also want to keep it if we're cloning
-        // a built-in exercise, so that the translated name is kept.
-        parentID: workout.isConcrete || standard ? parentID : id,
-        id: const Uuid().v4(),
-      );
+  }) {
+    // If we're redoing a previous workout,
+    // we want to inherit the previous parent ID,
+    // ie. the original routine's ID
+    // But we also want to keep it if we're cloning
+    // a built-in exercise, so that the translated name is kept.
+    final base = workout.isConcrete || standard ? makeSibling() : makeChild();
+    return base.copyWith(
+      sets: ([
+        for (final set in sets)
+          set.copyWith(
+            done: false,
+            reps: set.kind.shouldKeepInRoutine ? set.reps : 0,
+          ),
+      ]),
+    );
+  }
+
+  Exercise makeSibling() {
+    return clone()..regenerateID();
+  }
+
+  Exercise makeChild() {
+    final child = clone()
+      ..parentID = id
+      ..regenerateID();
+    print(
+        "Making child of [id: $id, pid: $parentID] with ID [id: ${child.id}, pid: ${child.parentID}]");
+    return child;
+  }
 
   static Exercise replaced({required Exercise from, required Exercise to}) {
     return to.copyWith(

@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:get/get.dart';
+import 'package:gymtracker/controller/exercises_controller.dart';
+import 'package:gymtracker/controller/workout_controller.dart';
 import 'package:gymtracker/main.dart';
 import 'package:gymtracker/model/exercise.dart';
 import 'package:gymtracker/model/set.dart';
@@ -24,8 +27,10 @@ void expectExercise(Exercise result, Exercise expected) {
   }
 }
 
+const wait = Duration(milliseconds: 500);
+
 final Exercise baseExercise = Exercise.custom(
-  id: "",
+  id: "ourID",
   name: "CustomExercise",
   parameters: SetParameters.distance,
   sets: [],
@@ -49,36 +54,52 @@ Future<void> testEditExerciseWhileWorkoutIsOngoingFlow(
   // Wait for the app to finish loading
   await tester.pumpAndSettle(const Duration(seconds: 5));
 
+  print("Starting database state: ${databaseService.toJson()}");
+
   // Manually add the exercise
   // We can do it this way since we verified the "Create exercise" flow
   // is working in another test
-  databaseService.setExercise(baseExercise);
+  await databaseService.exerciseBox.clear();
+  Get.find<ExercisesController>().addExercise(baseExercise);
+
+  await tester.pumpAndSettle();
+
+  print("Edited database state: ${databaseService.toJson()}");
+  expect(Get.find<ExercisesController>().exercises.isNotEmpty, true);
+  expectExercise(
+      Get.find<ExercisesController>().exercises.single, baseExercise);
 
   await tester
       .tap(find.widgetWithText(ListTile, 'routines.quickWorkout.title'.t));
-  await tester.pumpAndSettle(const Duration(seconds: 5));
+  await tester.pumpAndSettle();
 
   expect(find.byType(WorkoutView), findsOneWidget);
 
   await tester
       .tap(find.widgetWithText(FilledButton, 'ongoingWorkout.exercises.add'.t));
-  await tester.pumpAndSettle();
+  await tester.pumpAndSettle(wait);
   await tester.tap(find.widgetWithText(ListTile, 'library.custom'.t));
-  await tester.pumpAndSettle();
+  await tester.pumpAndSettle(wait);
   // TODO: Pick more precisely
   await tester.tap(find.byType(ExerciseListTile));
-  await tester.pumpAndSettle();
+  await tester.pumpAndSettle(wait);
   await tester.tap(find.byKey(const Key('pick')));
-  await tester.pumpAndSettle();
+  await tester.pumpAndSettle(wait);
+
+  final ongoingWorkout = Get.find<WorkoutController>();
+  print(ongoingWorkout.exercises.single.toJson());
+  expect(
+      (ongoingWorkout.exercises.single as Exercise).parentID, baseExercise.id);
+
   await tester.tap(find.widgetWithText(
       CircleAvatar, baseExercise.displayName.characters.first));
-  await tester.pumpAndSettle();
+  await tester.pumpAndSettle(wait);
   await tester.tap(find.byKey(const Key('menu')));
-  await tester.pumpAndSettle();
+  await tester.pumpAndSettle(wait);
   await tester.tap(find.widgetWithText(PopupMenuItem, "actions.edit".t));
-  await tester.pumpAndSettle();
+  await tester.pumpAndSettle(wait);
   await tester.tap(find.widgetWithText(TextButton, "OK"));
-  await tester.pumpAndSettle();
+  await tester.pumpAndSettle(wait);
 
   final titleBtn =
       find.widgetWithText(TextField, "exercise.editor.fields.title.label".t);
@@ -97,21 +118,27 @@ Future<void> testEditExerciseWhileWorkoutIsOngoingFlow(
   for (final finder in setFields) {
     expect(finder, findsOneWidget);
   }
-  await tester.enterText(setFields[0], "EditedExercise");
+  await tester.enterText(setFields[0], "SecondEditedExercise");
   await tester.tap(setFields[1]);
-  await tester.pumpAndSettle();
-  await tester.tap(find.widgetWithText(DropdownMenuItem<SetParameters>,
-      "exercise.editor.fields.parameters.values.time".t));
-  await tester.pumpAndSettle();
+  await tester.pumpAndSettle(wait);
+  await tester.tap(
+    find.widgetWithText(DropdownMenuItem<SetParameters>,
+        "exercise.editor.fields.parameters.values.time".t),
+    warnIfMissed: false,
+  );
+  await tester.pumpAndSettle(wait);
   await tester.tap(setFields[2]);
-  await tester.pumpAndSettle();
-  await tester.tap(find.widgetWithText(
-      DropdownMenuItem<MuscleGroup>, "muscleGroups.chest".t));
+  await tester.pumpAndSettle(wait);
+  await tester.tap(
+    find.widgetWithText(DropdownMenuItem<MuscleGroup>, "muscleGroups.chest".t),
+    warnIfMissed: false,
+  );
   await tester.pumpAndSettle();
   await tester.tap(find.widgetWithText(ChoiceChip, "muscleGroups.glutes".t));
   await tester.tap(find.widgetWithText(ChoiceChip, "muscleGroups.triceps".t));
   await tester.pumpAndSettle();
 
+  // Save changes (pushes to DB)
   await tester.tap(find.byKey(const Key('done')));
   await tester.pumpAndSettle();
 
@@ -139,12 +166,12 @@ Future<void> testEditExerciseWhileWorkoutIsOngoingFlow(
   // await tester.pumpAndSettle();
 
   // Check that our changes have been saved
-  final ex = databaseService.exerciseBox.values.first;
+  var ex = databaseService.exerciseBox.values.first;
   expectExercise(
     ex,
     Exercise.custom(
-      id: "",
-      name: "EditedExercise",
+      id: baseExercise.id,
+      name: "SecondEditedExercise",
       parameters: SetParameters.time,
       sets: [],
       primaryMuscleGroup: MuscleGroup.chest,

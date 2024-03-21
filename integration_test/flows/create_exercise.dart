@@ -40,7 +40,6 @@ Future<void> testCreateExerciseFlow(
   // Verify that the app has started.
   expect(find.text('library.title'.t), findsOneWidget);
 
-  // Verify that the app has started.
   await tester
       .tap(find.widgetWithText(NavigationDestination, 'library.title'.t));
   await tester.pumpAndSettle();

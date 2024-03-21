@@ -469,10 +469,11 @@ class ExerciseDataView extends StatelessWidget {
               GestureDetector(
                 child: ExerciseIcon(exercise: exercise),
                 onTap: () {
-                  Go.to(() => ExerciseInfoView(
-                      exercise: workout.isConcrete
-                          ? exercise.parent ?? exercise
-                          : exercise));
+                  final target =
+                      workout.isConcrete ? exercise.parent : exercise;
+                  if (target != null) {
+                    Go.to(() => ExerciseInfoView(exercise: target));
+                  }
                 },
               ),
               const SizedBox(width: 16),

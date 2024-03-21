@@ -138,7 +138,17 @@ class _RoutineCreatorState extends State<RoutineCreator> {
                     )).then((result) {
                   result ??= [];
                   setState(() {
-                    controller.exercises.addAll(result!.wrap());
+                    controller.exercises.addAll(result!
+                        .map((ex) {
+                          return ex.makeChild().copyWith.sets([
+                            ExSet.empty(
+                              kind: SetKind.normal,
+                              parameters: ex.parameters,
+                            ),
+                          ]);
+                        })
+                        .toList()
+                        .wrap());
                   });
                 });
               },
@@ -201,7 +211,7 @@ class _RoutineCreatorState extends State<RoutineCreator> {
             final ex = await Go.to<List<Exercise>>(
                 () => const ExercisePicker(singlePick: true));
             if (ex == null || ex.isEmpty) return;
-            controller.exercises[i].data = ex.first.copyWith.sets([
+            controller.exercises[i].data = ex.first.makeChild().copyWith.sets([
               ExSet.empty(
                 kind: SetKind.normal,
                 parameters: ex.first.parameters,

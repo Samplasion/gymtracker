@@ -16,6 +16,7 @@ import 'package:gymtracker/model/workout.dart';
 import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/struct/stopwatch_extended.dart';
 import 'package:gymtracker/utils/go.dart';
+import 'package:gymtracker/view/exercise_picker.dart';
 import 'package:gymtracker/view/utils/workout_done.dart';
 import 'package:gymtracker/view/workout.dart';
 
@@ -85,6 +86,7 @@ class WorkoutController extends GetxController with ServiceableController {
         exercises: exercises,
         parentID: parentID,
         infobox: infobox(),
+        duration: DateTime.now().difference(time.value),
       );
 
   List<ExSet> get allSets => [for (final ex in exercises) ...ex.sets];
@@ -331,6 +333,44 @@ class WorkoutController extends GetxController with ServiceableController {
     }
 
     exercises(res);
+  }
+
+  Future<void> pickExercises() async {
+    final exs = await Go.to<List<Exercise>>(
+        () => const ExercisePicker(singlePick: false));
+    if (exs == null || exs.isEmpty) return;
+    print(exs.map((e) => e.toJson()));
+    exercises.addAll(
+      exs.map(
+        (ex) => ex.makeChild().copyWith.sets(
+          [
+            ExSet.empty(
+              kind: SetKind.normal,
+              parameters: ex.parameters,
+            ),
+          ],
+        ),
+      ),
+    );
+    exercises.refresh();
+  }
+
+  Future<void> pickExercisesForSuperset(int i) async {
+    final exs = await Go.to<List<Exercise>>(
+        () => const ExercisePicker(singlePick: false));
+    if (exs == null || exs.isEmpty) return;
+    (exercises[i] as Superset).exercises.addAll(
+          exs.map(
+            (ex) => ex.makeChild().copyWith.sets([
+              ExSet.empty(
+                kind: SetKind.normal,
+                parameters: ex.parameters,
+              ),
+            ]),
+          ),
+        );
+    exercises.refresh();
+    save();
   }
 
   @override

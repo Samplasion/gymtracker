@@ -26,7 +26,7 @@ class TimeInputField extends StatefulWidget {
     this.timerInteractive = false,
     this.setID,
     super.key,
-  }) : assert((timerInteractive == false) == (setID == null),
+  }) : assert(timerInteractive ? (setID != null) : true,
             "If timerInteractive is true, setID must be provided");
 
   @override

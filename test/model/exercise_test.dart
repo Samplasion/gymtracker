@@ -1,5 +1,6 @@
 import 'package:gymtracker/model/exercise.dart';
 import 'package:gymtracker/model/set.dart';
+import 'package:gymtracker/model/workout.dart';
 import 'package:test/test.dart';
 
 void expectExercise(Exercise result, Exercise expected) {
@@ -20,6 +21,56 @@ void expectExercise(Exercise result, Exercise expected) {
 
 void main() {
   group('Exercise model', () {
+    group("instantiate(workout:)", () {
+      final base = Exercise.custom(
+        name: "Exercise",
+        parameters: SetParameters.distance,
+        sets: [],
+        primaryMuscleGroup: MuscleGroup.abductors,
+        restTime: Duration.zero,
+        notes: "Notes",
+      );
+      test("instantiates a child of the exercise in a routine", () {
+        final workout = Workout(
+          name: "Workout",
+          exercises: [],
+        );
+
+        expectExercise(
+          base.instantiate(workout: workout),
+          Exercise.custom(
+            name: "Exercise",
+            parameters: SetParameters.distance,
+            sets: [],
+            primaryMuscleGroup: MuscleGroup.abductors,
+            restTime: Duration.zero,
+            notes: "Notes",
+          ),
+        );
+      });
+      test("instantiates a child of the exercise in a concrete workout", () {
+        final workout = Workout(
+          name: "Workout",
+          exercises: [],
+          duration: const Duration(minutes: 1),
+          startingDate: DateTime.now(),
+        );
+
+        expectExercise(
+          base.instantiate(workout: workout),
+          Exercise.custom(
+            name: "Exercise",
+            parentID: base.id,
+            parameters: SetParameters.distance,
+            sets: [],
+            primaryMuscleGroup: MuscleGroup.abductors,
+            restTime: Duration.zero,
+            notes: "Notes",
+          ),
+        );
+      });
+    });
+
     group("replaced(from:to:) static method", () {
       test("computes with the same parameters", () {
         final sets = [

@@ -1,5 +1,7 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:gymtracker/controller/coordinator.dart';
 import 'package:gymtracker/controller/exercises_controller.dart';
 import 'package:gymtracker/controller/history_controller.dart';
 import 'package:gymtracker/controller/settings_controller.dart';
@@ -189,32 +191,8 @@ class _ExerciseInfoViewState extends State<ExerciseInfoView> {
                 PopupMenuItem(
                   child: Text("actions.edit".t),
                   onTap: () async {
-                    final isInUse = Get.isRegistered<WorkoutController>() &&
-                        Get.find<WorkoutController>().hasExercise(exercise);
-                    if (isInUse) {
-                      final shouldOverwrite = await Go.confirm(
-                        "exercise.editor.overwriteInWorkout.title",
-                        "exercise.editor.overwriteInWorkout.body",
-                      );
-                      if (!shouldOverwrite) {
-                        return;
-                      }
-                    }
-                    final ex = await Go.showBottomModalScreen<Exercise>(
-                        (context, controller) => ExerciseCreator(
-                              base: exercise,
-                              scrollController: controller,
-                              shouldChangeParameters: history.isEmpty,
-                            ));
-                    if (ex != null) {
-                      assert(ex.id == exercise.id);
-                      Get.find<ExercisesController>().saveEdit(ex);
-                      if (isInUse) {
-                        Get.find<WorkoutController>()
-                            .applyExerciseModification(ex);
-                      }
-                      Go.off(() => ExerciseInfoView(exercise: ex));
-                    }
+                    Get.find<ExercisesController>()
+                        .editExercise(exercise, history);
                   },
                 ),
                 if (history.isEmpty)
@@ -342,6 +320,13 @@ class _ExerciseInfoViewState extends State<ExerciseInfoView> {
               const SliverToBoxAdapter(
                 child: SizedBox(height: 8),
               ),
+              if (kDebugMode)
+                SliverToBoxAdapter(
+                  child: Text(
+                    "id: ${widget.exercise.id}",
+                    textAlign: TextAlign.center,
+                  ),
+                ),
             ],
           ),
         ),

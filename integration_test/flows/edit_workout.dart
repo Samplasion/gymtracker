@@ -9,6 +9,7 @@ import 'package:gymtracker/service/database.dart';
 import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/view/exercises.dart';
 import 'package:gymtracker/view/utils/history_workout.dart';
+import 'package:gymtracker/view/utils/workout_done.dart';
 import 'package:gymtracker/view/workout.dart';
 import 'package:gymtracker/view/workout_editor.dart';
 
@@ -115,6 +116,11 @@ Future<void> testEditWorkoutFlow(
 
   final originalWorkout = databaseService.historyBox.values.single.clone();
 
+  // Close the Good Job sheet
+  expect(find.byType(WorkoutDoneSheet), findsOneWidget);
+  await tester.tap(find.byIcon(Icons.done_rounded));
+  await tester.pumpAndSettle();
+
   await tester.tap(find.byIcon(Icons.history_rounded));
   await tester.pumpAndSettle();
 
@@ -171,7 +177,7 @@ Future<void> testEditWorkoutFlow(
   await tester.tap(find.text("Zumba"));
   await tester.pumpAndSettle();
 
-  await tester.tap(find.widgetWithIcon(IconButton, Icons.check));
+  await tester.tap(find.byKey(const Key("pick")));
   await tester.pumpAndSettle();
 
   await tester.drag(find.byType(ListView), const Offset(0.0, -300.0));
@@ -189,8 +195,8 @@ Future<void> testEditWorkoutFlow(
   await tester.enterText(
       find.widgetWithText(TextFormField, "Notes"), "Edited notes");
   await tester.pumpAndSettle();
-  await tester.tap(find.widgetWithIcon(IconButton, Icons.check));
-  await tester.pumpAndSettle();
+  await tester.tap(find.byKey(const Key("submit")));
+  await tester.pumpAndSettle(const Duration(seconds: 1));
 
   expect(find.byType(WorkoutFinishEditingPage), findsNothing);
   expect(find.byType(WorkoutEditor), findsNothing);

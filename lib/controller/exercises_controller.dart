@@ -1,8 +1,14 @@
 import 'package:get/get.dart';
+import 'package:gymtracker/controller/coordinator.dart';
 import 'package:gymtracker/controller/serviceable_controller.dart';
+import 'package:gymtracker/controller/workout_controller.dart';
 import 'package:gymtracker/data/exercises.dart';
 import 'package:gymtracker/model/exercise.dart';
 import 'package:gymtracker/model/set.dart';
+import 'package:gymtracker/model/workout.dart';
+import 'package:gymtracker/utils/go.dart';
+import 'package:gymtracker/view/exercise_creator.dart';
+import 'package:gymtracker/view/library.dart';
 
 class ExercisesController extends GetxController with ServiceableController {
   RxList<Exercise> exercises = <Exercise>[].obs;
@@ -50,9 +56,13 @@ class ExercisesController extends GetxController with ServiceableController {
       restTime: restTime,
     );
 
-    service.setExercise(exercise);
+    addExercise(exercise);
 
     Get.back();
+  }
+
+  void addExercise(Exercise exercise) {
+    service.setExercise(exercise);
   }
 
   void deleteExercise(Exercise exercise) {
@@ -61,6 +71,36 @@ class ExercisesController extends GetxController with ServiceableController {
 
   void saveEdit(Exercise exercise) {
     service.setExercise(exercise);
+  }
+
+  void editExercise(
+      Exercise exercise, List<(Exercise, int, Workout)> history) async {
+    if (Get.isRegistered<WorkoutController>() &&
+        Get.find<WorkoutController>().hasExercise(exercise)) {
+      final shouldOverwrite = await Go.confirm(
+        "exercise.editor.overwriteInWorkout.title",
+        "exercise.editor.overwriteInWorkout.body",
+      );
+      if (!shouldOverwrite) {
+        return;
+      }
+    }
+    final ex = await Go.showBottomModalScreen<Exercise>(
+        (context, controller) => ExerciseCreator(
+              base: exercise,
+              scrollController: controller,
+              shouldChangeParameters: history.isEmpty,
+            ));
+    final isInUse = Get.find<Coordinator>().hasExercise(exercise);
+    print(("IS IN USE", isInUse));
+    if (ex != null) {
+      assert(ex.id == exercise.id);
+      Get.find<ExercisesController>().saveEdit(ex);
+      if (isInUse) {
+        Get.find<Coordinator>().applyExerciseModification(ex);
+      }
+      Go.off(() => ExerciseInfoView(exercise: ex));
+    }
   }
 }
 

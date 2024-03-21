@@ -538,6 +538,7 @@ class _WorkoutFinishEditingPageState extends State<WorkoutFinishEditingPage> {
             ),
             actions: [
               IconButton(
+                key: const Key("submit"),
                 icon: const Icon(Icons.check),
                 onPressed: _submit,
               )

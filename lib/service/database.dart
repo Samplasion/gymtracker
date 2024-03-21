@@ -83,18 +83,19 @@ class DatabaseService extends GetxService with ChangeNotifier {
   @visibleForTesting
   Future ensureInitializedForTests() async {
     await Hive.initFlutter("test");
-    return _ensureInitialized();
+    await _ensureInitialized();
   }
 
   @visibleForTesting
   Future teardown() async {
-    // ignore: invalid_use_of_visible_for_testing_member
-    Hive.resetAdapters();
+    debugPrint("!!! Tearing down");
     await exerciseBox.clear();
     await routinesBox.clear();
     await historyBox.clear();
     await settingsBox.clear();
     await ongoingBox.clear();
+    // ignore: invalid_use_of_visible_for_testing_member
+    Hive.resetAdapters();
   }
 
   void Function() onServiceChange(String service) {
@@ -168,7 +169,7 @@ class DatabaseService extends GetxService with ChangeNotifier {
     return historyBox.values.toList();
   }
 
-  _writeHistory(List<Workout> history) {
+  writeAllHistory(List<Workout> history) {
     historyBox.clear().then((_) {
       historyBox.putAll({
         for (final workout in history) workout.id: workout,
@@ -254,7 +255,7 @@ class DatabaseService extends GetxService with ChangeNotifier {
         ]);
       }
       if (json['workouts'] is List) {
-        _writeHistory([
+        writeAllHistory([
           for (final json in json['workouts']) Workout.fromJson(json),
         ]);
       }

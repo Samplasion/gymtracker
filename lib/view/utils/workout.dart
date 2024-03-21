@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
@@ -234,6 +235,16 @@ class _WorkoutExerciseEditorState extends State<WorkoutExerciseEditor> {
               onPressed: widget.onSetCreate,
               child: Text('exercise.actions.addSet'.t),
             ),
+            if (kDebugMode) ...[
+              Text(
+                "id: ${widget.exercise.id}",
+                textAlign: TextAlign.center,
+              ),
+              Text(
+                "parent: ${widget.exercise.parentID}",
+                textAlign: TextAlign.center,
+              ),
+            ],
             if (widget.createDivider) ...[
               const SizedBox(height: 8),
               const Divider(),
@@ -423,6 +434,13 @@ class _WorkoutExerciseSetEditorState extends State<WorkoutExerciseSetEditor> {
 
   @override
   Widget build(BuildContext context) {
+    if ([
+          SetParameters.timeWeight,
+          SetParameters.time,
+        ].contains(widget.set.parameters) &&
+        kDebugMode) {
+      print(widget.set.toJson());
+    }
     final scheme = Theme.of(context).colorScheme;
     final defaultColor = widget.alt
         ? scheme.background.withOpacity(0)

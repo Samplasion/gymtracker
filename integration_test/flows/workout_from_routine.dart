@@ -4,6 +4,7 @@ import 'package:gymtracker/service/database.dart';
 import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/view/exercises.dart';
 import 'package:gymtracker/view/utils/history_workout.dart';
+import 'package:gymtracker/view/utils/workout_done.dart';
 import 'package:gymtracker/view/workout.dart';
 
 import 'create_routine.dart';
@@ -79,9 +80,14 @@ Future<void> testWorkoutFromRoutineFlow(
     expect(set.reps, 10);
   }
 
+  // Close the Good Job sheet
+  expect(find.byType(WorkoutDoneSheet), findsOneWidget);
+  await tester.tap(find.byIcon(Icons.done_rounded));
+  await tester.pumpAndSettle();
+
   // Check the history view
   await tester.tap(find.byIcon(Icons.history_rounded));
-  await tester.pumpAndSettle();
+  await tester.pumpAndSettle(const Duration(seconds: 2));
 
   expect(find.byType(HistoryWorkout), findsOneWidget);
   expect(find.text("Test Routine"), findsOneWidget);

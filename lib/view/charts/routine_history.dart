@@ -1,4 +1,5 @@
 import 'package:fl_chart/fl_chart.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:gymtracker/controller/routines_controller.dart';
 import 'package:gymtracker/controller/settings_controller.dart';
@@ -6,7 +7,9 @@ import 'package:gymtracker/data/weights.dart';
 import 'package:gymtracker/model/workout.dart';
 import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/utils/extensions.dart';
+import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/view/components/controlled.dart';
+import 'package:gymtracker/view/exercises.dart';
 import 'package:gymtracker/view/utils/timer.dart';
 import 'package:intl/intl.dart';
 
@@ -35,6 +38,17 @@ class _RoutineHistoryChartState
   _RoutineHistoryChartType type = _RoutineHistoryChartType.volume;
 
   late int selectedIndex = children.length - 1;
+
+  late final dateRecognizer = TapGestureRecognizer()
+    ..onTap = () {
+      Go.to(() => ExercisesView(workout: children[selectedIndex]));
+    };
+
+  @override
+  void dispose() {
+    dateRecognizer.dispose();
+    super.dispose();
+  }
 
   IconData buildType(_RoutineHistoryChartType type) {
     switch (type) {
@@ -102,8 +116,10 @@ class _RoutineHistoryChartState
                 text: DateFormat.yMd(context.locale.languageCode)
                     .format(children[selectedIndex].startingDate!),
                 style: TextStyle(
-                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  color: Theme.of(context).colorScheme.primary,
+                  decoration: TextDecoration.underline,
                 ),
+                recognizer: dateRecognizer,
               ),
             ],
           ]),

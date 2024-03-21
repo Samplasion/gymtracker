@@ -70,20 +70,8 @@ class _ExercisesViewState extends State<ExercisesView> {
                 ),
                 PopupMenuItem(
                   key: const Key("edit-workout"),
-                  // TODO: Remove beta status
-                  child: Text.rich(
-                    TextSpan(
-                      children: [
-                        TextSpan(
-                          text: "workouts.actions.edit.label".t,
-                        ),
-                        const TextSpan(text: " "),
-                        const WidgetSpan(
-                          child: BetaBadge(),
-                          alignment: PlaceholderAlignment.middle,
-                        ),
-                      ],
-                    ),
+                  child: Text(
+                    "workouts.actions.edit.label".t,
                   ),
                   onTap: () {
                     SchedulerBinding.instance.addPostFrameCallback((timeStamp) {

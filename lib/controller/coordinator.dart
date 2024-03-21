@@ -31,7 +31,6 @@ class Coordinator extends GetxController with ServiceableController {
         Get.find<WorkoutController>().hasExercise(exercise);
     final isInHistory = Get.find<HistoryController>().hasExercise(exercise);
     final isInRoutines = Get.find<RoutinesController>().hasExercise(exercise);
-    print((isInWorkout, isInHistory, isInRoutines));
     return isInWorkout || isInHistory || isInRoutines;
   }
 

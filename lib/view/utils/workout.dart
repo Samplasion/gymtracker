@@ -434,13 +434,6 @@ class _WorkoutExerciseSetEditorState extends State<WorkoutExerciseSetEditor> {
 
   @override
   Widget build(BuildContext context) {
-    if ([
-          SetParameters.timeWeight,
-          SetParameters.time,
-        ].contains(widget.set.parameters) &&
-        kDebugMode) {
-      print(widget.set.toJson());
-    }
     final scheme = Theme.of(context).colorScheme;
     final defaultColor = widget.alt
         ? scheme.background.withOpacity(0)

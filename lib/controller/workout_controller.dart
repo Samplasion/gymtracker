@@ -339,7 +339,6 @@ class WorkoutController extends GetxController with ServiceableController {
     final exs = await Go.to<List<Exercise>>(
         () => const ExercisePicker(singlePick: false));
     if (exs == null || exs.isEmpty) return;
-    print(exs.map((e) => e.toJson()));
     exercises.addAll(
       exs.map(
         (ex) => ex.makeChild().copyWith.sets(

@@ -382,7 +382,6 @@ class HistoryController extends GetxController with ServiceableController {
       }
       newHistory[i] = workout.copyWith.exercises(res);
     }
-    print(("HistoryController.applyExMod", newHistory.map((h) => h.toJson())));
     service.writeAllHistory(newHistory);
   }
 

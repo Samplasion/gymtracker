@@ -87,7 +87,7 @@ exercise:
     heaviestWeight:
       label: Peso massimo
     best1rm:
-      label: Miglior 1 Rep Max
+      label: Miglior massimale
     bestSetVolume:
       label: Miglior volume di una serie
     bestSessionVolume:

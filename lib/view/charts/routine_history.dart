@@ -173,10 +173,10 @@ class _RoutineHistoryChartState
                 ),
                 titlesData: FlTitlesData(
                   show: true,
-                  rightTitles: AxisTitles(
+                  rightTitles: const AxisTitles(
                     sideTitles: SideTitles(showTitles: false),
                   ),
-                  topTitles: AxisTitles(
+                  topTitles: const AxisTitles(
                     sideTitles: SideTitles(showTitles: false),
                   ),
                   leftTitles: AxisTitles(
@@ -204,9 +204,9 @@ class _RoutineHistoryChartState
                   touchTooltipData: LineTouchTooltipData(
                     tooltipBgColor: Colors.transparent,
                     getTooltipItems: (items) => <LineTooltipItem?>[
-                      ...items.map((_) => LineTooltipItem(
+                      ...items.map((_) => const LineTooltipItem(
                             "hhh",
-                            const TextStyle(color: Colors.transparent),
+                            TextStyle(color: Colors.transparent),
                           ))
                     ],
                   ),
@@ -222,7 +222,7 @@ class _RoutineHistoryChartState
                 ),
                 lineBarsData: [
                   LineChartBarData(
-                    dotData: FlDotData(show: false),
+                    dotData: const FlDotData(show: false),
                     spots: [
                       for (int i = 0; i < children.length; i++)
                         FlSpot(
@@ -242,8 +242,8 @@ class _RoutineHistoryChartState
                   ),
                 ],
               ),
-              swapAnimationDuration: const Duration(milliseconds: 350),
-              swapAnimationCurve: Curves.linearToEaseOut,
+              // swapAnimationDuration: const Duration(milliseconds: 350),
+              // swapAnimationCurve: Curves.linearToEaseOut,
             ),
           ),
         ),

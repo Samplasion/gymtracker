@@ -1,5 +1,7 @@
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_quill/flutter_quill.dart';
+import 'package:gymtracker/utils/extensions.dart';
 
 bool doubleIsActuallyInt(double double, [double epsilon = 0.001]) {
   return doubleEquality(double, double.floorToDouble(), epsilon: epsilon);
@@ -47,4 +49,11 @@ double mapRange(
   double newMax,
 ) {
   return (((value - min) * (newMax - newMin)) / (max - min)) + newMin;
+}
+
+QuillController quillControllerFromText(String? text) {
+  return QuillController(
+    document: (text ?? "").asQuillDocument(),
+    selection: const TextSelection.collapsed(offset: 0),
+  );
 }

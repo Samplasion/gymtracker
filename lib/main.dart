@@ -32,7 +32,6 @@ void main() async {
   await l.init();
 
   await _databaseService.ensureInitialized();
-  Get.put(_databaseService);
 
   await ColorService().init();
   await VersionService().init();
@@ -60,6 +59,7 @@ class MainApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    Get.put(databaseService);
     Get.put(Coordinator()..init());
     final debugController = Get.find<DebugController>();
     final settings = Get.find<SettingsController>();

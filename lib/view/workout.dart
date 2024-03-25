@@ -6,6 +6,7 @@ import 'package:gymtracker/controller/countdown_controller.dart';
 import 'package:gymtracker/controller/routines_controller.dart';
 import 'package:gymtracker/controller/stopwatch_controller.dart';
 import 'package:gymtracker/controller/workout_controller.dart';
+import 'package:gymtracker/data/distance.dart';
 import 'package:gymtracker/data/weights.dart';
 import 'package:gymtracker/model/exercisable.dart';
 import 'package:gymtracker/model/exercise.dart';
@@ -236,6 +237,16 @@ class _WorkoutViewState extends State<WorkoutView> {
                           Weights.values.length]);
                 },
               ),
+              PopupMenuItem(
+                child: Text(
+                  "ongoingWorkout.actions.changeDistanceUnit".t,
+                ),
+                onTap: () {
+                  controller.distanceUnit(Distance.values[
+                      (controller.distanceUnit().index + 1) %
+                          Distance.values.length]);
+                },
+              ),
               if (kDebugMode)
                 PopupMenuItem(
                   child: const Text("Show Good Job dialog"),
@@ -294,6 +305,7 @@ class _WorkoutViewState extends State<WorkoutView> {
                       index: i,
                       isCreating: false,
                       weightUnit: controller.weightUnit.value,
+                      distanceUnit: controller.distanceUnit.value,
                       onReorder: () async {
                         SchedulerBinding.instance
                             .addPostFrameCallback((timeStamp) async {
@@ -389,6 +401,7 @@ class _WorkoutViewState extends State<WorkoutView> {
                       isCreating: false,
                       key: ValueKey((controller.exercises[i] as Superset).id),
                       weightUnit: controller.weightUnit.value,
+                      distanceUnit: controller.distanceUnit.value,
                       onSupersetRemove: () {
                         controller.exercises.removeAt(i);
                         controller.exercises.refresh();

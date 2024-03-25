@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:copy_with_extension/copy_with_extension.dart';
 import 'package:flutter/foundation.dart';
+import 'package:gymtracker/data/distance.dart';
 import 'package:gymtracker/data/weights.dart';
 import 'package:gymtracker/model/exercisable.dart';
 import 'package:gymtracker/model/set.dart';
@@ -40,6 +41,9 @@ class Workout {
 
   /// The unit of weight used in this workout.
   Weights weightUnit;
+
+  /// The unit of distance used in this workout.
+  Distance distanceUnit;
 
   /// Whether this is a concrete workout.
   bool get isConcrete => duration != null;
@@ -89,7 +93,7 @@ class Workout {
       doneSets.fold(0, (value, element) => value + (element.reps ?? 0));
   double get liftedWeight => doneSets.fold(0.0,
       (value, element) => value + (element.weight ?? 0) * (element.reps ?? 1));
-  double get distanceRan =>
+  double get distanceRun =>
       doneSets.fold(0.0, (value, element) => value + (element.distance ?? 0));
 
   int get displayExerciseCount => exercises
@@ -107,6 +111,7 @@ class Workout {
     this.completedBy,
     this.completes,
     this.weightUnit = Weights.kg,
+    this.distanceUnit = Distance.km,
   })  : id = id ?? const Uuid().v4(),
         assert(() {
           if (completedBy == null && completes == null) return true;

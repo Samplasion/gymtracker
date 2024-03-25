@@ -19,7 +19,7 @@ class TweenedBuilder<T> extends StatelessWidget {
     return TweenAnimationBuilder(
       tween: tweenBuilder(value),
       builder: (context, value, _) => builder(context, value),
-      duration: const Duration(milliseconds: 400),
+      duration: const Duration(milliseconds: 500),
     );
   }
 }

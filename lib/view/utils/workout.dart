@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:get/get.dart';
 import 'package:gymtracker/controller/exercises_controller.dart';
+import 'package:gymtracker/data/distance.dart';
 import 'package:gymtracker/data/weights.dart';
 import 'package:gymtracker/model/exercise.dart';
 import 'package:gymtracker/model/set.dart';
@@ -34,6 +35,7 @@ class WorkoutExerciseEditor extends StatefulWidget {
   final VoidCallback onSetValueChange;
   final void Function(Exercise exercise, String notes) onNotesChange;
   final Weights weightUnit;
+  final Distance distanceUnit;
   final bool isInSuperset;
   final bool createDivider;
 
@@ -52,6 +54,7 @@ class WorkoutExerciseEditor extends StatefulWidget {
     required this.onSetValueChange,
     required this.onNotesChange,
     required this.weightUnit,
+    required this.distanceUnit,
     this.isInSuperset = false,
     this.createDivider = false,
     super.key,
@@ -229,6 +232,7 @@ class _WorkoutExerciseEditorState extends State<WorkoutExerciseEditor> {
                 ),
                 onSetValueChange: widget.onSetValueChange,
                 weightUnit: widget.weightUnit,
+                distanceUnit: widget.distanceUnit,
               ),
             const SizedBox(height: 8),
             FilledButton.tonal(
@@ -266,6 +270,7 @@ class WorkoutExerciseSetEditor extends StatefulWidget {
   final void Function(bool) onSetSetDone;
   final VoidCallback onSetValueChange;
   final Weights weightUnit;
+  final Distance distanceUnit;
 
   const WorkoutExerciseSetEditor({
     required this.exercise,
@@ -277,6 +282,7 @@ class WorkoutExerciseSetEditor extends StatefulWidget {
     required this.onDelete,
     required this.onSetValueChange,
     required this.weightUnit,
+    required this.distanceUnit,
     super.key,
   });
 
@@ -405,6 +411,7 @@ class _WorkoutExerciseSetEditorState extends State<WorkoutExerciseSetEditor> {
           isDense: true,
           border: const OutlineInputBorder(),
           labelText: "exercise.fields.distance".t,
+          suffix: Text("units.${widget.distanceUnit.name}".t),
         ),
         onChanged: (value) {
           widget.onSetValueChange();

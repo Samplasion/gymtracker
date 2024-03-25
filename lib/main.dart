@@ -23,15 +23,16 @@ import 'package:protocol_handler/protocol_handler.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 
-final _databaseService = DatabaseService();
-
 void main() async {
+  final _databaseService = DatabaseService();
+
   await GetStorage.init();
 
   final l = GTLocalizations();
   await l.init();
 
   await _databaseService.ensureInitialized();
+  Get.put(_databaseService);
 
   await ColorService().init();
   await VersionService().init();
@@ -59,7 +60,6 @@ class MainApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Get.put(databaseService);
     Get.put(Coordinator()..init());
     final debugController = Get.find<DebugController>();
     final settings = Get.find<SettingsController>();

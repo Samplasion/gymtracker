@@ -205,6 +205,7 @@ class _RoutineCreatorState extends State<RoutineCreator> {
         isCreating: true,
         weightUnit:
             Get.find<SettingsController>().weightUnit.value ?? Weights.kg,
+        distanceUnit: Get.find<SettingsController>().distanceUnit.value,
         onReorder: () {},
         onReplace: () {
           SchedulerBinding.instance.addPostFrameCallback((timeStamp) async {
@@ -264,6 +265,7 @@ class _RoutineCreatorState extends State<RoutineCreator> {
         isCreating: true,
         weightUnit:
             Get.find<SettingsController>().weightUnit.value ?? Weights.kg,
+        distanceUnit: Get.find<SettingsController>().distanceUnit.value,
         onSupersetReorder: () {},
         onSupersetReplace: () {
           SchedulerBinding.instance.addPostFrameCallback((timeStamp) async {

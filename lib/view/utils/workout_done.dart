@@ -77,10 +77,10 @@ class WorkoutDoneSheet extends StatelessWidget {
                         text: Text(workout.liftedWeight.userFacingWeight),
                         subtitle: Text("me.stats.volume.label".t),
                       ),
-                    if (workout.distanceRan > 0)
+                    if (workout.distanceRun > 0)
                       SpeedDialButton(
                         icon: const Icon(Icons.run_circle_rounded),
-                        text: Text(workout.distanceRan.userFacingDistance),
+                        text: Text(workout.distanceRun.userFacingDistance),
                         subtitle: Text("me.stats.distance.label".t),
                       ),
                     SpeedDialButton(

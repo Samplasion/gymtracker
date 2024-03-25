@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:gymtracker/controller/settings_controller.dart';
+import 'package:gymtracker/data/distance.dart';
 import 'package:gymtracker/data/weights.dart';
 import 'package:gymtracker/service/color.dart';
 import 'package:gymtracker/service/localizations.dart';
@@ -89,6 +90,21 @@ class SettingsView extends StatelessWidget {
                     selectedValue: value,
                   ),
                   onUpdate: (v) => controller.setWeightUnit(v ?? Weights.kg),
+                ),
+              ),
+              Obx(
+                () => ValueBuilder<Distance?>(
+                  initialValue: controller.distanceUnit.value,
+                  builder: (value, onChange) => RadioModalTile<Distance?>(
+                    title: Text("settings.options.distanceUnit.label".t),
+                    onChange: onChange,
+                    values: {
+                      for (final distance in Distance.values)
+                        distance: "distanceUnits.${distance.name}".t,
+                    },
+                    selectedValue: value,
+                  ),
+                  onUpdate: (v) => controller.setDistanceUnit(v ?? Distance.km),
                 ),
               ),
               ValueBuilder<bool?>(

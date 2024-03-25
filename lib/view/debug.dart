@@ -174,6 +174,7 @@ class _DebugViewState extends State<DebugView> {
 }
 
 String generateYamlForMissingKeys(List<String> missingKeys) {
+  missingKeys = missingKeys.where((key) => key != "appName").toList();
   Map<String, dynamic> keys = unflatten({
     for (final key in missingKeys) key: key.split(".").last,
   });
@@ -191,5 +192,5 @@ String generateYamlForMissingKeys(List<String> missingKeys) {
     return current;
   }
 
-  return processMap("", keys);
+  return processMap("", keys).trim();
 }

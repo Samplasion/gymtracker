@@ -7,6 +7,7 @@ import 'package:gymtracker/controller/routines_controller.dart';
 import 'package:gymtracker/controller/serviceable_controller.dart';
 import 'package:gymtracker/controller/settings_controller.dart';
 import 'package:gymtracker/controller/stopwatch_controller.dart';
+import 'package:gymtracker/data/distance.dart';
 import 'package:gymtracker/data/weights.dart';
 import 'package:gymtracker/model/exercisable.dart';
 import 'package:gymtracker/model/exercise.dart';
@@ -28,6 +29,7 @@ class WorkoutController extends GetxController with ServiceableController {
   RxBool isContinuation = false.obs;
   Rx<String?> continuesID = Rx(null);
   late Rx<Weights> weightUnit;
+  late Rx<Distance> distanceUnit;
 
   WorkoutController(String name, String? parentID, String? infobox)
       : name = name.obs,
@@ -35,7 +37,8 @@ class WorkoutController extends GetxController with ServiceableController {
         parentID = Rx<String?>(parentID),
         infobox = Rx<String?>(infobox),
         weightUnit =
-            (Get.find<SettingsController>().weightUnit() ?? Weights.kg).obs;
+            (Get.find<SettingsController>().weightUnit() ?? Weights.kg).obs,
+        distanceUnit = (Get.find<SettingsController>().distanceUnit()).obs;
 
   factory WorkoutController.fromSavedData(Map<String, dynamic> data) {
     final cont =
@@ -206,6 +209,7 @@ class WorkoutController extends GetxController with ServiceableController {
       infobox: infobox.value,
       completes: continuesID.value,
       weightUnit: weightUnit.value,
+      distanceUnit: distanceUnit.value,
     );
 
     if (isContinuation.isTrue) {

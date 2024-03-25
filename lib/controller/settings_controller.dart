@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:gymtracker/controller/serviceable_controller.dart';
+import 'package:gymtracker/data/distance.dart';
 import 'package:gymtracker/data/weights.dart';
 import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/utils/go.dart';
@@ -21,6 +22,7 @@ class SettingsController extends GetxController with ServiceableController {
   Rx<Color> color = defaultColor.obs;
   Rx<Locale?> locale = Get.locale.obs;
   Rx<Weights?> weightUnit = Weights.kg.obs;
+  Rx<Distance> distanceUnit = Distance.km.obs;
   RxBool showSuggestedRoutines = true.obs;
 
   void setUsesDynamicColor(bool usesDC) =>
@@ -36,6 +38,9 @@ class SettingsController extends GetxController with ServiceableController {
   void setWeightUnit(Weights weightUnit) =>
       service.writeSetting("weightUnit", weightUnit.name);
 
+  void setDistanceUnit(Distance distanceUnit) =>
+      service.writeSetting("distanceUnit", distanceUnit.name);
+
   void setShowSuggestedRoutines(bool show) =>
       service.writeSetting("showSuggestedRoutines", show);
 
@@ -47,6 +52,10 @@ class SettingsController extends GetxController with ServiceableController {
     weightUnit(Weights.values.firstWhere(
       (element) => element.name == service.readSetting<String>("weightUnit"),
       orElse: () => Weights.kg,
+    ));
+    distanceUnit(Distance.values.firstWhere(
+      (element) => element.name == service.readSetting<String>("distanceUnit"),
+      orElse: () => Distance.km,
     ));
     showSuggestedRoutines(
         service.readSetting<bool>("showSuggestedRoutines") ?? true);

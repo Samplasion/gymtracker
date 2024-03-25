@@ -166,7 +166,7 @@ extension WorkoutIterableUtils on Iterable<Workout> {
   }
 }
 
-extension WeightUtils on double {
+extension ValueUtils on double {
   String get userFacingWeight {
     return "exerciseList.fields.weight".tParams({
       "weight": localized,
@@ -177,8 +177,7 @@ extension WeightUtils on double {
   String get userFacingDistance {
     return "exerciseList.fields.distance".tParams({
       "distance": localized,
-      // "unit": "units.${settingsController.distanceUnit.value!.name}".t,
-      "unit": "km",
+      "unit": "units.${settingsController.distanceUnit.value.name}".t,
     });
   }
 }

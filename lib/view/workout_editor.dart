@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:gymtracker/controller/history_controller.dart';
 import 'package:gymtracker/controller/routines_controller.dart';
 import 'package:gymtracker/controller/workout_controller.dart';
+import 'package:gymtracker/data/distance.dart';
 import 'package:gymtracker/data/weights.dart';
 import 'package:gymtracker/model/exercisable.dart';
 import 'package:gymtracker/model/exercise.dart';
@@ -97,6 +98,18 @@ class _WorkoutEditorState extends State<WorkoutEditor> {
                   });
                 },
               ),
+              PopupMenuItem(
+                child: Text(
+                  "ongoingWorkout.actions.changeDistanceUnit".t,
+                ),
+                onTap: () {
+                  setState(() {
+                    workout.distanceUnit = Distance.values[
+                        (workout.distanceUnit.index + 1) %
+                            Distance.values.length];
+                  });
+                },
+              ),
             ],
           ),
         ],
@@ -125,6 +138,7 @@ class _WorkoutEditorState extends State<WorkoutEditor> {
                 index: i,
                 isCreating: false,
                 weightUnit: workout.weightUnit,
+                distanceUnit: workout.distanceUnit,
                 onReorder: () async {
                   SchedulerBinding.instance
                       .addPostFrameCallback((timeStamp) async {
@@ -206,6 +220,7 @@ class _WorkoutEditorState extends State<WorkoutEditor> {
                 isCreating: false,
                 key: ValueKey((workout.exercises[i] as Superset).id),
                 weightUnit: workout.weightUnit,
+                distanceUnit: workout.distanceUnit,
                 onSupersetRemove: () {
                   workout.exercises.removeAt(i);
                   setState(() {});

@@ -178,6 +178,8 @@ class _ExerciseInfoViewState extends State<ExerciseInfoView> {
   @override
   Widget build(BuildContext context) {
     final exercise = widget.exercise;
+    final infoTiles = _getInfoTiles(exercise, context);
+
     return Scaffold(
       appBar: AppBar(
         title: Text("exercise.info.title".t),
@@ -239,10 +241,9 @@ class _ExerciseInfoViewState extends State<ExerciseInfoView> {
                   ),
                 ),
               ),
-              if (history.isNotEmpty)
+              if (history.isNotEmpty && infoTiles.length > 1)
                 SliverList(
-                  delegate:
-                      SliverChildListDelegate(_getInfoTiles(exercise, context)),
+                  delegate: SliverChildListDelegate(infoTiles),
                 ),
               SliverList.builder(
                 itemCount: history.length,
@@ -262,6 +263,7 @@ class _ExerciseInfoViewState extends State<ExerciseInfoView> {
                             workout: history[index].$3,
                             isInSuperset: false,
                             weightUnit: history[index].$3.weightUnit,
+                            distanceUnit: history[index].$3.distanceUnit,
                           ),
                           const Divider(),
                           Padding(

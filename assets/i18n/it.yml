@@ -221,7 +221,9 @@ settings:
     locale:
       label: Lingua dell'applicazione
     weightUnit:
-      label: Unità di peso predefinita
+      label: Unità di peso
+    distanceUnit:
+      label: Unità di distanza
     showSuggestedRoutines:
       label: Mostra routine suggerite
     import:
@@ -247,6 +249,7 @@ ongoingWorkout:
       cancel: Annulla
       resume: Riprendi
     changeWeightUnit: Cambia unità di peso
+    changeDistanceUnit: Cambia unità di distanza
   exercises:
     add: + Aggiungi esercizio
     addSuperset: + Aggiungi superserie
@@ -350,6 +353,7 @@ exerciseList:
   stats:
     time: Durata
     volume: Volume
+    distance: Distanza
     sets: Serie
 
 general:
@@ -429,6 +433,10 @@ locales:
 weightUnits:
   kg: Chili
   lb: Libbre
+
+distanceUnits:
+  km: Chilometri
+  mi: Miglia
 
 barbells:
   normal: Normale

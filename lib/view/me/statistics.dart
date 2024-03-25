@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:gymtracker/controller/history_controller.dart';
 import 'package:gymtracker/controller/settings_controller.dart';
+import 'package:gymtracker/data/distance.dart';
 import 'package:gymtracker/data/weights.dart';
 import 'package:gymtracker/model/workout.dart';
 import 'package:gymtracker/service/localizations.dart';
@@ -15,6 +16,8 @@ import 'package:gymtracker/view/components/tweened_builder.dart';
 import 'package:gymtracker/view/utils/speed_dial.dart';
 import 'package:gymtracker/view/utils/timer.dart';
 import 'package:intl/intl.dart';
+
+typedef _SpeedDialData = (int, Duration, double, int, double);
 
 enum TimeFrame {
   thirtyDays(Duration(days: 30)),
@@ -45,13 +48,14 @@ class _MeStatisticsPageState
     return controller.history;
   }
 
-  (int, Duration, double, int) get speedDialData {
+  _SpeedDialData get speedDialData {
     final pw = periodWorkouts;
 
     int workouts = pw.length;
     Duration duration = Duration.zero;
     double volume = 0;
     int sets = 0;
+    double distance = 0;
 
     for (final workout in pw) {
       duration += workout.duration ?? Duration.zero;
@@ -61,9 +65,14 @@ class _MeStatisticsPageState
         to: settingsController.weightUnit.value!,
       );
       sets += workout.doneSets.length;
+      distance += Distance.convert(
+        value: workout.distanceRun,
+        from: workout.distanceUnit,
+        to: settingsController.distanceUnit.value,
+      );
     }
 
-    return (workouts, duration, volume, sets);
+    return (workouts, duration, volume, sets, distance);
   }
 
   @override
@@ -167,6 +176,25 @@ class _MeStatisticsPageState
                     icon: const Icon(Icons.numbers_rounded),
                     text: Text("$value"),
                     subtitle: Text("me.stats.sets.label".t),
+                  );
+                },
+              ),
+              TweenedDoubleBuilder(
+                value: speedDialData.$5,
+                builder: (context, value) {
+                  return SpeedDialButton(
+                    icon: const Icon(Icons.directions_run_rounded),
+                    text: Text(
+                      "exerciseList.fields.distance".trParams({
+                        "distance": NumberFormat.compact(
+                                locale: Get.locale!.languageCode)
+                            .format(value),
+                        "unit":
+                            "units.${settingsController.distanceUnit.value.name}"
+                                .t,
+                      }),
+                    ),
+                    subtitle: Text("me.stats.distance.label".t),
                   );
                 },
               ),

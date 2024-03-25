@@ -54,6 +54,7 @@ class HistoryWorkout extends StatelessWidget {
                   selected: false,
                   isConcrete: true,
                   weightUnit: workout.weightUnit,
+                  distanceUnit: workout.distanceUnit,
                 ),
               if (workout.exercises.length > showExercises) ...[
                 ListTile(

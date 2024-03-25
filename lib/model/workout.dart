@@ -6,6 +6,7 @@ import 'package:gymtracker/data/weights.dart';
 import 'package:gymtracker/model/exercisable.dart';
 import 'package:gymtracker/model/set.dart';
 import 'package:gymtracker/model/superset.dart';
+import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/utils/utils.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:uuid/uuid.dart';
@@ -32,7 +33,7 @@ class Workout {
   bool get shouldShowInfobox => shouldShowAsInfobox(infobox);
 
   static bool shouldShowAsInfobox(String? candidate) =>
-      candidate != null && candidate.trim().isNotEmpty;
+      candidate != null && !candidate.asQuillDocument().isEmpty();
 
   /// The ID of the non-concrete (ie. part of a routine) exercise
   /// this concrete exercise should be categorized under.

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:flutter_quill/flutter_quill.dart';
 import 'package:get/get.dart';
 import 'package:gymtracker/controller/routines_controller.dart';
 import 'package:gymtracker/controller/settings_controller.dart';
@@ -10,7 +11,9 @@ import 'package:gymtracker/model/set.dart';
 import 'package:gymtracker/model/superset.dart';
 import 'package:gymtracker/model/workout.dart';
 import 'package:gymtracker/service/localizations.dart';
+import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/utils/go.dart';
+import 'package:gymtracker/view/components/rich_text_editor.dart';
 import 'package:gymtracker/view/exercise_picker.dart';
 import 'package:gymtracker/view/utils/superset.dart';
 import 'package:gymtracker/view/utils/workout.dart';
@@ -50,8 +53,10 @@ class RoutineCreator extends StatefulWidget {
 class _RoutineCreatorState extends State<RoutineCreator> {
   final formKey = GlobalKey<FormState>();
   late final titleController = TextEditingController(text: widget.base?.name);
-  late final infoboxController =
-      TextEditingController(text: widget.base?.infobox);
+  late final infoboxController = QuillController(
+    document: (widget.base?.infobox ?? "").asQuillDocument(),
+    selection: const TextSelection.collapsed(offset: 0),
+  );
 
   RoutinesController get workoutsController => Get.find<RoutinesController>();
 
@@ -107,16 +112,15 @@ class _RoutineCreatorState extends State<RoutineCreator> {
                   return null;
                 },
               ),
-              TextFormField(
-                controller: infoboxController,
-                minLines: 3,
-                maxLines: null,
+              GTRichTextEditor(
+                infoboxController: infoboxController,
                 decoration: InputDecoration(
                   isDense: true,
                   border: const OutlineInputBorder(),
                   labelText: "routines.editor.fields.infobox.label".t,
                   alignLabelWithHint: true,
                 ),
+                onTapOutside: () {},
               ),
               Text("routines.editor.exercises.title".t,
                   style: Theme.of(context).textTheme.titleMedium),
@@ -395,9 +399,9 @@ class _RoutineCreatorState extends State<RoutineCreator> {
         workoutsController.submitRoutine(
           name: titleController.text,
           exercises: controller.exercises.unwrap(),
-          infobox: infoboxController.text.trim().isEmpty
+          infobox: infoboxController.document.toPlainText().trim().isEmpty
               ? null
-              : infoboxController.text,
+              : infoboxController.toEncoded(),
         );
       } else {
         Get.back(
@@ -405,9 +409,9 @@ class _RoutineCreatorState extends State<RoutineCreator> {
             name: titleController.text,
             exercises: controller.exercises.unwrap(),
             id: widget.base!.id,
-            infobox: infoboxController.text.trim().isEmpty
+            infobox: infoboxController.document.toPlainText().trim().isEmpty
                 ? null
-                : infoboxController.text,
+                : infoboxController.toEncoded(),
           ),
         );
       }

@@ -413,5 +413,23 @@ void main() {
         );
       });
     });
+
+    group("shouldShowAsInfobox(text)", () {
+      test("returns false for empty strings",
+          () => expect(Workout.shouldShowAsInfobox(""), false));
+      test("returns false for newline strings",
+          () => expect(Workout.shouldShowAsInfobox("\n"), false));
+      test(
+          "returns false for empty rich texts",
+          () => expect(
+              Workout.shouldShowAsInfobox('[{"insert": "\\n"}]'), false));
+      test("returns true for everything else", () {
+        expect(Workout.shouldShowAsInfobox('hello'), true);
+        expect(
+            Workout.shouldShowAsInfobox(
+                '[{"insert":"Mitochondria is the "},{"insert":"powerhouse","attributes":{"bold":true}},{"insert":" of the "},{"insert":"cell","attributes":{"italic":true}},{"insert":".\\n"}]'),
+            true);
+      });
+    });
   });
 }

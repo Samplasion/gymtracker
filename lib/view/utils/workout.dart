@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_quill/flutter_quill.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:get/get.dart';
 import 'package:gymtracker/controller/exercises_controller.dart';
@@ -13,6 +14,8 @@ import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/utils/sets.dart';
 import 'package:gymtracker/utils/utils.dart';
 import 'package:gymtracker/view/components/badges.dart';
+import 'package:gymtracker/view/components/maybe_rich_text.dart';
+import 'package:gymtracker/view/components/rich_text_editor.dart';
 import 'package:gymtracker/view/library.dart';
 import 'package:gymtracker/view/utils/drag_handle.dart';
 import 'package:gymtracker/view/utils/exercise.dart';
@@ -65,193 +68,215 @@ class _WorkoutExerciseEditorState extends State<WorkoutExerciseEditor> {
   late final timeController = TextEditingController(
     text: TimeInputField.encodeDuration(widget.exercise.restTime),
   );
-  late final notesController =
-      TextEditingController(text: widget.exercise.notes);
+  late final notesController = quillControllerFromText(widget.exercise.notes);
 
   @override
   Widget build(BuildContext context) {
     return Scrollable(
-      viewportBuilder: (BuildContext context, _) => Padding(
-        padding: const EdgeInsets.symmetric(vertical: 8),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Row(
-                children: [
-                  if (widget.isCreating) ...[
-                    DragHandle(index: widget.index),
-                  ] else
-                    GestureDetector(
-                      onTap: widget.exercise.parent == null
-                          ? null
-                          : () {
-                              debugPrint("${widget.exercise.parent}");
-                              Go.to(() => ExerciseInfoView(
-                                  exercise: widget.exercise.parent!));
-                            },
-                      child: ExerciseIcon(exercise: widget.exercise),
+      viewportBuilder: (BuildContext context, _) {
+        var notesTextStyle = Theme.of(context).textTheme.bodyMedium!.copyWith(
+              fontStyle: widget.exercise.notes.isEmpty
+                  ? FontStyle.italic
+                  : FontStyle.normal,
+              fontWeight: widget.exercise.notes.isEmpty
+                  ? FontWeight.w600
+                  : FontWeight.normal,
+              fontSize: widget.exercise.notes.isEmpty ? 15 : null,
+            );
+        return Padding(
+          padding: const EdgeInsets.symmetric(vertical: 8),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Row(
+                  children: [
+                    if (widget.isCreating) ...[
+                      DragHandle(index: widget.index),
+                    ] else
+                      GestureDetector(
+                        onTap: widget.exercise.parent == null
+                            ? null
+                            : () {
+                                debugPrint("${widget.exercise.parent}");
+                                Go.to(() => ExerciseInfoView(
+                                    exercise: widget.exercise.parent!));
+                              },
+                        child: ExerciseIcon(exercise: widget.exercise),
+                      ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Text.rich(
+                          TextSpan(children: [
+                            TextSpan(text: widget.exercise.displayName),
+                            if (widget.exercise.isCustom) ...[
+                              const TextSpan(text: " "),
+                              const WidgetSpan(
+                                baseline: TextBaseline.ideographic,
+                                alignment: PlaceholderAlignment.middle,
+                                child: CustomExerciseBadge(),
+                              ),
+                            ],
+                          ]),
+                          style: Theme.of(context).textTheme.titleMedium),
                     ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: Text.rich(
-                        TextSpan(children: [
-                          TextSpan(text: widget.exercise.displayName),
-                          if (widget.exercise.isCustom) ...[
-                            const TextSpan(text: " "),
-                            const WidgetSpan(
-                              baseline: TextBaseline.ideographic,
-                              alignment: PlaceholderAlignment.middle,
-                              child: CustomExerciseBadge(),
+                    PopupMenuButton(
+                      itemBuilder: (context) => <PopupMenuEntry<dynamic>>[
+                        if (!widget.isCreating) ...[
+                          PopupMenuItem(
+                            onTap: widget.onReorder,
+                            child: ListTile(
+                              leading: const Icon(Icons.compare_arrows),
+                              title: Text('ongoingWorkout.exercises.reorder'.t),
                             ),
-                          ],
-                        ]),
-                        style: Theme.of(context).textTheme.titleMedium),
-                  ),
-                  PopupMenuButton(
-                    itemBuilder: (context) => <PopupMenuEntry<dynamic>>[
-                      if (!widget.isCreating) ...[
+                          ),
+                        ],
                         PopupMenuItem(
-                          onTap: widget.onReorder,
+                          onTap: widget.onReplace,
                           child: ListTile(
-                            leading: const Icon(Icons.compare_arrows),
-                            title: Text('ongoingWorkout.exercises.reorder'.t),
+                            leading: const Icon(Icons.refresh),
+                            title: Text('ongoingWorkout.exercises.replace'.t),
+                          ),
+                        ),
+                        const PopupMenuDivider(),
+                        PopupMenuItem(
+                          onTap: widget.onRemove,
+                          child: ListTile(
+                            textColor: Theme.of(context).colorScheme.error,
+                            iconColor: Theme.of(context).colorScheme.error,
+                            leading: const Icon(Icons.delete),
+                            title: Text('ongoingWorkout.exercises.remove'.t),
                           ),
                         ),
                       ],
-                      PopupMenuItem(
-                        onTap: widget.onReplace,
-                        child: ListTile(
-                          leading: const Icon(Icons.refresh),
-                          title: Text('ongoingWorkout.exercises.replace'.t),
-                        ),
-                      ),
-                      const PopupMenuDivider(),
-                      PopupMenuItem(
-                        onTap: widget.onRemove,
-                        child: ListTile(
-                          textColor: Theme.of(context).colorScheme.error,
-                          iconColor: Theme.of(context).colorScheme.error,
-                          leading: const Icon(Icons.delete),
-                          title: Text('ongoingWorkout.exercises.remove'.t),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 8),
-            ListTile(
-              leading: const Icon(Icons.notes),
-              title: Text(
-                widget.exercise.notes.isEmpty
-                    ? "exercise.editor.fields.notes.label".t
-                    : widget.exercise.notes,
-                style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                      fontStyle: widget.exercise.notes.isEmpty
-                          ? FontStyle.italic
-                          : FontStyle.normal,
-                      fontWeight: widget.exercise.notes.isEmpty
-                          ? FontWeight.w600
-                          : FontWeight.normal,
-                      fontSize: widget.exercise.notes.isEmpty ? 15 : null,
                     ),
-              ),
-              trailing: const Icon(Icons.edit),
-              onTap: () {
-                showDialog(
-                  context: context,
-                  builder: (context) {
-                    return AlertDialog(
-                      contentPadding: const EdgeInsets.all(24),
-                      title: Text('exercise.editor.fields.notes.label'.t),
-                      content: TextField(
-                        controller: notesController,
-                        autofocus: true,
-                        minLines: 4,
-                        maxLines: null,
-                        decoration: InputDecoration(
-                          border: const OutlineInputBorder(),
-                          labelText: "exercise.editor.fields.notes.label".t,
-                        ),
-                      ),
-                      actions: [
-                        TextButton(
-                          onPressed: () => Navigator.pop(context),
-                          child: Text(MaterialLocalizations.of(context)
-                              .cancelButtonLabel),
-                        ),
-                        TextButton(
-                          onPressed: () {
-                            widget.onNotesChange(
-                                widget.exercise, notesController.text.trim());
-                            Navigator.pop(context);
-                          },
-                          child: Text(
-                              MaterialLocalizations.of(context).okButtonLabel),
-                        ),
-                      ],
-                    );
-                  },
-                );
-              },
-            ),
-            if (!widget.isInSuperset)
-              Padding(
-                padding: const EdgeInsets.all(16),
-                child: TimeInputField(
-                  controller: timeController,
-                  decoration: InputDecoration(
-                    isDense: true,
-                    border: const OutlineInputBorder(),
-                    labelText: "exercise.fields.restTime".t,
-                  ),
-                  onChangedTime: (value) =>
-                      widget.onChangeRestTime(value ?? Duration.zero),
+                  ],
                 ),
               ),
-            for (int i = 0; i < widget.exercise.sets.length; i++)
-              WorkoutExerciseSetEditor(
-                key: ValueKey(widget.exercise.sets[i].id),
-                set: widget.exercise.sets[i],
-                exercise: widget.exercise,
-                onDelete: () => widget.onSetRemove(i),
-                alt: i % 2 == 0,
-                isCreating: widget.isCreating,
-                onSetSelectKind: (val) =>
-                    widget.onSetSelectKind(widget.exercise.sets[i], val),
-                onSetSetDone: (val) => widget.onSetSetDone(
-                  widget.exercise,
-                  widget.exercise.sets[i],
-                  val,
-                ),
-                onSetValueChange: widget.onSetValueChange,
-                weightUnit: widget.weightUnit,
-              ),
-            const SizedBox(height: 8),
-            FilledButton.tonal(
-              onPressed: widget.onSetCreate,
-              child: Text('exercise.actions.addSet'.t),
-            ),
-            if (kDebugMode) ...[
-              Text(
-                "id: ${widget.exercise.id}",
-                textAlign: TextAlign.center,
-              ),
-              Text(
-                "parent: ${widget.exercise.parentID}",
-                textAlign: TextAlign.center,
-              ),
-            ],
-            if (widget.createDivider) ...[
               const SizedBox(height: 8),
-              const Divider(),
+              ListTile(
+                leading: const Icon(Icons.notes),
+                title: widget.exercise.notes.asQuillDocument().isEmpty()
+                    ? Text(
+                        "exercise.editor.fields.notes.label".t,
+                        style: notesTextStyle,
+                      )
+                    : MaybeRichText(
+                        text: widget.exercise.notes,
+                        style: notesTextStyle,
+                      ),
+                trailing: const Icon(Icons.edit),
+                onTap: () {
+                  showDialog(
+                    context: context,
+                    builder: (context) {
+                      return GTRichTextEditDialog(
+                        controller: notesController,
+                        onNotesChange: (text) {
+                          widget.onNotesChange(widget.exercise, text);
+                          Navigator.pop(context);
+                        },
+                      );
+                    },
+                  );
+                },
+              ),
+              if (!widget.isInSuperset)
+                Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: TimeInputField(
+                    controller: timeController,
+                    decoration: InputDecoration(
+                      isDense: true,
+                      border: const OutlineInputBorder(),
+                      labelText: "exercise.fields.restTime".t,
+                    ),
+                    onChangedTime: (value) =>
+                        widget.onChangeRestTime(value ?? Duration.zero),
+                  ),
+                ),
+              for (int i = 0; i < widget.exercise.sets.length; i++)
+                WorkoutExerciseSetEditor(
+                  key: ValueKey(widget.exercise.sets[i].id),
+                  set: widget.exercise.sets[i],
+                  exercise: widget.exercise,
+                  onDelete: () => widget.onSetRemove(i),
+                  alt: i % 2 == 0,
+                  isCreating: widget.isCreating,
+                  onSetSelectKind: (val) =>
+                      widget.onSetSelectKind(widget.exercise.sets[i], val),
+                  onSetSetDone: (val) => widget.onSetSetDone(
+                    widget.exercise,
+                    widget.exercise.sets[i],
+                    val,
+                  ),
+                  onSetValueChange: widget.onSetValueChange,
+                  weightUnit: widget.weightUnit,
+                ),
+              const SizedBox(height: 8),
+              FilledButton.tonal(
+                onPressed: widget.onSetCreate,
+                child: Text('exercise.actions.addSet'.t),
+              ),
+              if (kDebugMode) ...[
+                Text(
+                  "id: ${widget.exercise.id}",
+                  textAlign: TextAlign.center,
+                ),
+                Text(
+                  "parent: ${widget.exercise.parentID}",
+                  textAlign: TextAlign.center,
+                ),
+              ],
+              if (widget.createDivider) ...[
+                const SizedBox(height: 8),
+                const Divider(),
+              ],
             ],
-          ],
+          ),
+        );
+      },
+    );
+  }
+}
+
+class GTRichTextEditDialog extends StatelessWidget {
+  const GTRichTextEditDialog({
+    super.key,
+    required this.controller,
+    required this.onNotesChange,
+  });
+
+  final QuillController controller;
+  final ValueChanged<String> onNotesChange;
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      contentPadding: const EdgeInsets.all(24),
+      title: Text('exercise.editor.fields.notes.label'.t),
+      content: GTRichTextEditor(
+        infoboxController: controller,
+        autofocus: true,
+        decoration: InputDecoration(
+          border: const OutlineInputBorder(),
+          labelText: "exercise.editor.fields.notes.label".t,
         ),
       ),
+      scrollable: true,
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: Text(MaterialLocalizations.of(context).cancelButtonLabel),
+        ),
+        TextButton(
+          onPressed: () {
+            onNotesChange(controller.toEncoded());
+          },
+          child: Text(MaterialLocalizations.of(context).okButtonLabel),
+        ),
+      ],
     );
   }
 }

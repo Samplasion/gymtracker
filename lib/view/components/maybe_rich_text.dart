@@ -12,9 +12,9 @@ class MaybeRichText extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final parsed = text.tryParseJson();
-    if (parsed == null) return Text(text);
-
     final textStyle = style ?? context.textTheme.bodyMedium!;
+    if (parsed == null) return Text(text, style: textStyle);
+
     return DefaultTextStyle(
       style: textStyle,
       child: QuillEditor.basic(

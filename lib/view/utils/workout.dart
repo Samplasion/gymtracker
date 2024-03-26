@@ -157,6 +157,48 @@ class _WorkoutExerciseEditorState extends State<WorkoutExerciseEditor> {
                   ],
                 ),
               ),
+              const SizedBox(height: 8),
+              ListTile(
+                leading: const Icon(Icons.notes),
+                title: widget.exercise.notes.asQuillDocument().isEmpty()
+                    ? Text(
+                        "exercise.editor.fields.notes.label".t,
+                        style: notesTextStyle,
+                      )
+                    : MaybeRichText(
+                        text: widget.exercise.notes,
+                        style: notesTextStyle,
+                      ),
+                trailing: const Icon(Icons.edit),
+                onTap: () {
+                  showDialog(
+                    context: context,
+                    builder: (context) {
+                      return GTRichTextEditDialog(
+                        controller: notesController,
+                        onNotesChange: (text) {
+                          widget.onNotesChange(widget.exercise, text);
+                          Navigator.pop(context);
+                        },
+                      );
+                    },
+                  );
+                },
+              ),
+              if (!widget.isInSuperset)
+                Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: TimeInputField(
+                    controller: timeController,
+                    decoration: InputDecoration(
+                      isDense: true,
+                      border: const OutlineInputBorder(),
+                      labelText: "exercise.fields.restTime".t,
+                    ),
+                    onChangedTime: (value) =>
+                        widget.onChangeRestTime(value ?? Duration.zero),
+                  ),
+                ),
               for (int i = 0; i < widget.exercise.sets.length; i++)
                 WorkoutExerciseSetEditor(
                   key: ValueKey(widget.exercise.sets[i].id),
@@ -193,85 +235,7 @@ class _WorkoutExerciseEditorState extends State<WorkoutExerciseEditor> {
               ],
               if (widget.createDivider) ...[
                 const SizedBox(height: 8),
-                ListTile(
-                  leading: const Icon(Icons.notes),
-                  title: widget.exercise.notes.asQuillDocument().isEmpty()
-                      ? Text(
-                          "exercise.editor.fields.notes.label".t,
-                          style: notesTextStyle,
-                        )
-                      : MaybeRichText(
-                          text: widget.exercise.notes,
-                          style: notesTextStyle,
-                        ),
-                  trailing: const Icon(Icons.edit),
-                  onTap: () {
-                    showDialog(
-                      context: context,
-                      builder: (context) {
-                        return GTRichTextEditDialog(
-                          controller: notesController,
-                          onNotesChange: (text) {
-                            widget.onNotesChange(widget.exercise, text);
-                            Navigator.pop(context);
-                          },
-                        );
-                      },
-                    );
-                  },
-                ),
-                if (!widget.isInSuperset)
-                  Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: TimeInputField(
-                      controller: timeController,
-                      decoration: InputDecoration(
-                        isDense: true,
-                        border: const OutlineInputBorder(),
-                        labelText: "exercise.fields.restTime".t,
-                      ),
-                      onChangedTime: (value) =>
-                          widget.onChangeRestTime(value ?? Duration.zero),
-                    ),
-                  ),
-                for (int i = 0; i < widget.exercise.sets.length; i++)
-                  WorkoutExerciseSetEditor(
-                    key: ValueKey(widget.exercise.sets[i].id),
-                    set: widget.exercise.sets[i],
-                    exercise: widget.exercise,
-                    onDelete: () => widget.onSetRemove(i),
-                    alt: i % 2 == 0,
-                    isCreating: widget.isCreating,
-                    onSetSelectKind: (val) =>
-                        widget.onSetSelectKind(widget.exercise.sets[i], val),
-                    onSetSetDone: (val) => widget.onSetSetDone(
-                      widget.exercise,
-                      widget.exercise.sets[i],
-                      val,
-                    ),
-                    onSetValueChange: widget.onSetValueChange,
-                    weightUnit: widget.weightUnit,
-                    distanceUnit: widget.distanceUnit,
-                  ),
-                const SizedBox(height: 8),
-                FilledButton.tonal(
-                  onPressed: widget.onSetCreate,
-                  child: Text('exercise.actions.addSet'.t),
-                ),
-                if (kDebugMode) ...[
-                  Text(
-                    "id: ${widget.exercise.id}",
-                    textAlign: TextAlign.center,
-                  ),
-                  Text(
-                    "parent: ${widget.exercise.parentID}",
-                    textAlign: TextAlign.center,
-                  ),
-                ],
-                if (widget.createDivider) ...[
-                  const SizedBox(height: 8),
-                  const Divider(),
-                ],
+                const Divider(),
               ],
             ],
           ),

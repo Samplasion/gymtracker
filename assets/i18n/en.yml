@@ -221,7 +221,9 @@ settings:
     locale:
       label: App language
     weightUnit:
-      label: Default weight unit
+      label: Weight unit
+    distanceUnit:
+      label: Distance unit
     showSuggestedRoutines:
       label: Show suggested routines
     import:
@@ -247,6 +249,7 @@ ongoingWorkout:
       cancel: Cancel
       resume: Resume
     changeWeightUnit: Change weight unit
+    changeDistanceUnit: Change distance unit
   exercises:
     add: + Add exercise
     addSuperset: + Add superset
@@ -350,6 +353,7 @@ exerciseList:
   stats:
     time: Duration
     volume: Volume
+    distance: Distance
     sets: Sets
 
 general:
@@ -429,6 +433,10 @@ locales:
 weightUnits:
   kg: Kilograms
   lb: Pounds
+
+distanceUnits:
+  km: Kilometers
+  mi: Miles
 
 barbells:
   normal: Normal

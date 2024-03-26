@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gymtracker/controller/settings_controller.dart';
+import 'package:gymtracker/data/distance.dart';
 import 'package:gymtracker/data/exercises.dart';
 import 'package:gymtracker/data/weights.dart';
 import 'package:gymtracker/model/exercisable.dart';
@@ -60,6 +61,7 @@ class ExerciseListTile extends StatelessWidget {
   final bool selected;
   final bool isConcrete;
   final Weights? weightUnit;
+  final Distance? distanceUnit;
   final VoidCallback? onTap;
 
   const ExerciseListTile({
@@ -67,10 +69,13 @@ class ExerciseListTile extends StatelessWidget {
     required this.selected,
     required this.isConcrete,
     this.weightUnit,
+    this.distanceUnit,
     this.onTap,
     super.key,
-  }) : assert((weightUnit == null) == !isConcrete,
-            "Weight unit must be set if the exercise is concrete");
+  })  : assert((weightUnit == null) == !isConcrete,
+            "Weight unit must be set if the exercise is concrete"),
+        assert((distanceUnit == null) == !isConcrete,
+            "Distance unit must be set if the exercise is concrete");
 
   @override
   Widget build(BuildContext context) {
@@ -137,11 +142,11 @@ class ExerciseListTile extends StatelessWidget {
   String _buildReps(int? reps) => "exerciseList.fields.reps".plural(reps ?? 0);
   String _buildTime(BuildContext context, Duration time) =>
       TimerView.buildTimeString(context, time, builder: (time) => time.text!);
-  String _buildDistance(double? distance) =>
-      "exerciseList.fields.distance".tParams({
-        "distance": stringifyDouble(distance ?? 0),
-        "unit": "units.km".t,
-      });
+  String _buildDistance(double? distance) => Distance.convert(
+          value: distance ?? 0,
+          from: distanceUnit!,
+          to: settingsController.distanceUnit.value)
+      .userFacingDistance;
 
   Text? _buildSubtitle(BuildContext context) {
     final exercise = this.exercise;

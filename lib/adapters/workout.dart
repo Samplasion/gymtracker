@@ -1,4 +1,5 @@
-import 'package:gymtracker/controller/settings_controller.dart';
+import 'package:gymtracker/data/distance.dart';
+import 'package:gymtracker/data/weights.dart';
 import 'package:gymtracker/model/exercisable.dart';
 import 'package:gymtracker/model/workout.dart';
 import 'package:hive/hive.dart';
@@ -19,9 +20,8 @@ class WorkoutAdapter extends TypeAdapter<Workout> {
       infobox: reader.read(),
       completedBy: reader.read(),
       completes: reader.read(),
-      weightUnit: reader.availableBytes > 0
-          ? reader.read()
-          : settingsController.weightUnit.value!,
+      weightUnit: reader.availableBytes > 0 ? reader.read() : Weights.kg,
+      distanceUnit: reader.availableBytes > 0 ? reader.read() : Distance.km,
     );
   }
 
@@ -37,5 +37,6 @@ class WorkoutAdapter extends TypeAdapter<Workout> {
     writer.write(obj.completedBy);
     writer.write(obj.completes);
     writer.write(obj.weightUnit);
+    writer.write(obj.distanceUnit);
   }
 }

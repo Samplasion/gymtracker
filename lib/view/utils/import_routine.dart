@@ -72,6 +72,7 @@ class _ImportRoutineModalState extends State<ImportRoutineModal>
                           index: index,
                           isInSuperset: false,
                           weightUnit: workout.weightUnit,
+                          distanceUnit: workout.distanceUnit,
                         ),
                       );
                     },

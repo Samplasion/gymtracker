@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 import 'package:gymtracker/adapters/builtin.dart' as builtin_adapters;
+import 'package:gymtracker/adapters/distance.dart';
 import 'package:gymtracker/adapters/exercise.dart';
 import 'package:gymtracker/adapters/measurements.dart';
 import 'package:gymtracker/adapters/set.dart';
@@ -70,6 +71,7 @@ class DatabaseService extends GetxService with ChangeNotifier {
     Hive.registerAdapter(ExSetAdapter());
     Hive.registerAdapter(WeightsAdapter());
     Hive.registerAdapter(WeightMeasurementAdapter());
+    Hive.registerAdapter(DistanceAdapter());
 
     exerciseBox = await Hive.openBox<Exercise>("exercises");
     routinesBox = await Hive.openBox<Workout>("routines");

@@ -23,9 +23,9 @@ import 'package:protocol_handler/protocol_handler.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 
-final _databaseService = DatabaseService();
-
 void main() async {
+  final _databaseService = DatabaseService();
+
   await GetStorage.init();
 
   final l = GTLocalizations();

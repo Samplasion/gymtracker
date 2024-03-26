@@ -10,6 +10,7 @@ import 'package:gymtracker/controller/history_controller.dart';
 import 'package:gymtracker/controller/history_controller.dart' as history;
 import 'package:gymtracker/controller/routines_controller.dart';
 import 'package:gymtracker/controller/settings_controller.dart';
+import 'package:gymtracker/data/distance.dart';
 import 'package:gymtracker/data/weights.dart';
 import 'package:gymtracker/model/exercisable.dart';
 import 'package:gymtracker/model/exercise.dart';
@@ -20,7 +21,6 @@ import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/utils/sets.dart';
-import 'package:gymtracker/utils/utils.dart';
 import 'package:gymtracker/view/charts/routine_history.dart';
 import 'package:gymtracker/view/charts/workout_muscle_categories.dart';
 import 'package:gymtracker/view/components/badges.dart';
@@ -182,10 +182,24 @@ class _ExercisesViewState extends State<ExercisesView> {
                               ),
                               label: "exerciseList.stats.time".t,
                             ),
-                            Stats(
-                              value: workout.liftedWeight.userFacingWeight,
-                              label: "exerciseList.stats.volume".t,
-                            ),
+                            if (workout.liftedWeight > 0)
+                              Stats(
+                                value: Weights.convert(
+                                  value: workout.liftedWeight,
+                                  from: workout.weightUnit,
+                                  to: settingsController.weightUnit.value!,
+                                ).userFacingWeight,
+                                label: "exerciseList.stats.volume".t,
+                              ),
+                            if (workout.distanceRun > 0)
+                              Stats(
+                                value: Distance.convert(
+                                  value: workout.distanceRun,
+                                  from: workout.distanceUnit,
+                                  to: settingsController.distanceUnit.value,
+                                ).userFacingDistance,
+                                label: "exerciseList.stats.distance".t,
+                              ),
                             Stats(
                               value: workout.doneSets.length.toString(),
                               label: "exerciseList.stats.sets".t,
@@ -253,6 +267,7 @@ class _ExercisesViewState extends State<ExercisesView> {
                       index: index,
                       isInSuperset: false,
                       weightUnit: workout.weightUnit,
+                      distanceUnit: workout.distanceUnit,
                     ),
                   );
                 },
@@ -312,6 +327,7 @@ class _ExercisesViewState extends State<ExercisesView> {
                         index: index,
                         isInSuperset: false,
                         weightUnit: workout.weightUnit,
+                        distanceUnit: workout.distanceUnit,
                       ),
                     );
                   },
@@ -360,6 +376,7 @@ class ExerciseDataView extends StatelessWidget {
     required this.index,
     required this.isInSuperset,
     required this.weightUnit,
+    required this.distanceUnit,
   });
 
   final WorkoutExercisable exercise;
@@ -367,6 +384,7 @@ class ExerciseDataView extends StatelessWidget {
   final int index;
   final bool isInSuperset;
   final Weights weightUnit;
+  final Distance distanceUnit;
 
   @override
   Widget build(BuildContext context) {
@@ -455,6 +473,7 @@ class ExerciseDataView extends StatelessWidget {
             isConcrete: workout.isConcrete,
             alt: i % 2 == 0,
             weightUnit: weightUnit,
+            distanceUnit: distanceUnit,
           ),
       ],
     );
@@ -531,6 +550,7 @@ class ExerciseDataView extends StatelessWidget {
                 index: index,
                 isInSuperset: true,
                 weightUnit: weightUnit,
+                distanceUnit: distanceUnit,
               ),
             ),
         ],
@@ -545,6 +565,7 @@ class ExerciseSetView extends StatelessWidget {
   final bool isConcrete;
   final bool alt;
   final Weights weightUnit;
+  final Distance distanceUnit;
 
   const ExerciseSetView({
     required this.set,
@@ -552,6 +573,7 @@ class ExerciseSetView extends StatelessWidget {
     required this.isConcrete,
     required this.alt,
     required this.weightUnit,
+    required this.distanceUnit,
     super.key,
   });
 
@@ -575,10 +597,11 @@ class ExerciseSetView extends StatelessWidget {
             .contains(set.parameters))
           Text("exerciseList.fields.reps".plural(set.reps ?? 0)),
         if ([SetParameters.distance].contains(set.parameters))
-          Text("exerciseList.fields.distance".trParams({
-            "distance": stringifyDouble(set.distance!),
-            "unit": "units.km".t,
-          })),
+          Text(Distance.convert(
+            value: set.distance!,
+            from: distanceUnit,
+            to: settingsController.distanceUnit.value,
+          ).userFacingDistance),
       ];
 
   @override

@@ -92,8 +92,8 @@ class WeightChart extends StatelessWidget {
             ),
           ],
         ),
-        duration: const Duration(milliseconds: 350),
-        curve: Curves.linearToEaseOut,
+        swapAnimationDuration: const Duration(milliseconds: 350),
+        swapAnimationCurve: Curves.linearToEaseOut,
       );
     });
   }

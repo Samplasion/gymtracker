@@ -49,6 +49,7 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  flutter_quill_test: ^9.3.3
   flutter_lints: ^3.0.1
   build_runner: ^2.3.3
   json_serializable: ^6.6.1

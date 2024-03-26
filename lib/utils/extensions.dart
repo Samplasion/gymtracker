@@ -246,9 +246,15 @@ extension SeparatedWidgetList on Iterable<Widget> {
   }
 }
 
-extension StringifyQuill on QuillController {
+extension StringifyQuill on Document {
   String toEncoded() {
-    return jsonEncode(document.toDelta().toJson());
+    return jsonEncode(toDelta().toJson());
+  }
+}
+
+extension StringifyQuillController on QuillController {
+  String toEncoded() {
+    return document.toEncoded();
   }
 }
 

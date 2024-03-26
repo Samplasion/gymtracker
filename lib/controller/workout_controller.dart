@@ -55,6 +55,10 @@ class WorkoutController extends GetxController with ServiceableController {
       (element) => element.name == data['weightUnit'],
       orElse: () => Weights.kg,
     ));
+    cont.distanceUnit(Distance.values.firstWhere(
+      (element) => element.name == data['distanceUnit'],
+      orElse: () => Distance.km,
+    ));
 
     if (data.containsKey("globalStopwatch")) {
       final controller = Get.find<StopwatchController>();
@@ -140,6 +144,7 @@ class WorkoutController extends GetxController with ServiceableController {
       "isContinuation": isContinuation.value,
       "continuesID": continuesID.value,
       "weightUnit": weightUnit.value.name,
+      "distanceUnit": distanceUnit.value.name,
       if (stopwatchController.globalStopwatch.currentDuration.inSeconds >
           0) ...{
         "globalStopwatch": stopwatchController

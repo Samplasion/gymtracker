@@ -139,16 +139,16 @@ Future<void> testEditWorkoutFlow(
   await tester.pumpAndSettle();
 
   final addSetButton = find.widgetWithText(FilledButton, "+ Add Set");
-  await tester.drag(find.byType(ListView), const Offset(0.0, -300.0));
+  await tester.drag(find.byType(ListView), const Offset(0.0, -600.0));
   await tester.pumpAndSettle();
   await tester.tap(addSetButton);
   await tester.pumpAndSettle();
-  await tester.drag(find.byType(ListView), const Offset(0.0, -300.0));
+  await tester.drag(find.byType(ListView), const Offset(0.0, -600.0));
   await tester.pumpAndSettle();
   await tester.tap(addSetButton);
   await tester.pumpAndSettle();
 
-  await tester.drag(find.byType(ListView), const Offset(0.0, -300.0));
+  await tester.drag(find.byType(ListView), const Offset(0.0, -600.0));
   final fourthSetTypeButton = find.descendant(
     of: find.byType(IconButton),
     matching: find.text('4'),
@@ -160,7 +160,7 @@ Future<void> testEditWorkoutFlow(
   await tester.pumpAndSettle();
 
   // Now it finds the fifth set
-  await tester.drag(find.byType(ListView), const Offset(0.0, -300.0));
+  await tester.drag(find.byType(ListView), const Offset(0.0, -600.0));
   await tester.pumpAndSettle();
   await tester.tap(fourthSetTypeButton);
   await tester.pumpAndSettle();
@@ -184,7 +184,7 @@ Future<void> testEditWorkoutFlow(
   await tester.tap(find.byKey(const Key("pick")));
   await tester.pumpAndSettle();
 
-  await tester.drag(find.byType(ListView), const Offset(0.0, -300.0));
+  await tester.drag(find.byType(ListView), const Offset(0.0, -600.0));
   await tester.pumpAndSettle();
   await tester.enterText(find.widgetWithText(TextField, "Time"), "100");
   await tester.pumpAndSettle();

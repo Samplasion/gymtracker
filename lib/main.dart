@@ -18,6 +18,7 @@ import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/service/version.dart';
 import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/utils/go.dart';
+import 'package:gymtracker/utils/theme.dart';
 import 'package:gymtracker/view/skeleton.dart';
 import 'package:protocol_handler/protocol_handler.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
@@ -122,13 +123,13 @@ class MainApp extends StatelessWidget {
                         theme: ThemeData(
                           useMaterial3: true,
                           brightness: Brightness.light,
-                          colorScheme: lightScheme,
+                          colorScheme: lightScheme.neutralBackground(),
                           pageTransitionsTheme: pageTransitionsTheme,
                         ),
                         darkTheme: ThemeData(
                           useMaterial3: true,
                           brightness: Brightness.dark,
-                          colorScheme: darkScheme,
+                          colorScheme: darkScheme.neutralBackground(),
                           pageTransitionsTheme: pageTransitionsTheme,
                         ),
                         home: const _Loader(),

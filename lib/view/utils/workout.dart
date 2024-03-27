@@ -16,6 +16,7 @@ import 'package:gymtracker/utils/sets.dart';
 import 'package:gymtracker/utils/utils.dart';
 import 'package:gymtracker/view/components/badges.dart';
 import 'package:gymtracker/view/components/maybe_rich_text.dart';
+import 'package:gymtracker/view/components/parent_viewer.dart';
 import 'package:gymtracker/view/components/rich_text_editor.dart';
 import 'package:gymtracker/view/library.dart';
 import 'package:gymtracker/view/utils/drag_handle.dart';
@@ -98,14 +99,8 @@ class _WorkoutExerciseEditorState extends State<WorkoutExerciseEditor> {
                     if (widget.isCreating) ...[
                       DragHandle(index: widget.index),
                     ] else
-                      GestureDetector(
-                        onTap: widget.exercise.parent == null
-                            ? null
-                            : () {
-                                debugPrint("${widget.exercise.parent}");
-                                Go.to(() => ExerciseInfoView(
-                                    exercise: widget.exercise.parent!));
-                              },
+                      ExerciseParentViewGesture(
+                        exercise: widget.exercise,
                         child: ExerciseIcon(exercise: widget.exercise),
                       ),
                     const SizedBox(width: 16),

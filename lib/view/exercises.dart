@@ -26,6 +26,7 @@ import 'package:gymtracker/view/charts/workout_muscle_categories.dart';
 import 'package:gymtracker/view/components/badges.dart';
 import 'package:gymtracker/view/components/infobox.dart';
 import 'package:gymtracker/view/components/maybe_rich_text.dart';
+import 'package:gymtracker/view/components/parent_viewer.dart';
 import 'package:gymtracker/view/components/stats.dart';
 import 'package:gymtracker/view/library.dart';
 import 'package:gymtracker/view/routine_creator.dart';
@@ -401,15 +402,9 @@ class ExerciseDataView extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 16),
           child: Row(
             children: [
-              GestureDetector(
+              ExerciseParentViewGesture(
+                exercise: exercise,
                 child: ExerciseIcon(exercise: exercise),
-                onTap: () {
-                  final target =
-                      workout.isConcrete ? exercise.parent : exercise;
-                  if (target != null) {
-                    Go.to(() => ExerciseInfoView(exercise: target));
-                  }
-                },
               ),
               const SizedBox(width: 16),
               Flexible(

@@ -102,19 +102,22 @@ class ExercisesController extends GetxController with ServiceableController {
       Go.off(() => ExerciseInfoView(exercise: ex));
     }
   }
+
+  getExerciseByID(String id) {
+    return exercises.firstWhereOrNull((element) => element.id == id);
+  }
 }
 
 extension ExerciseParent on Exercise {
   ExercisesController get _controller => Get.find<ExercisesController>();
 
-  Exercise? get parent {
+  Exercise? getParent() {
     if (parentID == null) return null;
 
     if (standard) {
       return getStandardExerciseByID(parentID!);
     }
 
-    return _controller.exercises
-        .firstWhereOrNull((element) => element.id == parentID);
+    return _controller.getExerciseByID(parentID!);
   }
 }

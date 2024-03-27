@@ -114,6 +114,15 @@ class _ExercisesViewState extends State<ExercisesView> {
                   },
                 ),
                 PopupMenuItem(
+                  child: Text(
+                    "routines.actions.viewHistory".t,
+                  ),
+                  onTap: () {
+                    Get.find<RoutinesController>()
+                        .viewHistory(routine: workout);
+                  },
+                ),
+                PopupMenuItem(
                   child: Text("routines.actions.edit".t),
                   onTap: () {
                     SchedulerBinding.instance

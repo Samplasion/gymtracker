@@ -19,6 +19,7 @@ import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/utils/utils.dart' as utils;
 import 'package:gymtracker/view/exercises.dart';
+import 'package:gymtracker/view/utils/history_workout.dart';
 import 'package:gymtracker/view/utils/import_routine.dart';
 import 'package:gymtracker/view/workout.dart';
 import 'package:protocol_handler/protocol_handler.dart';
@@ -470,5 +471,28 @@ class RoutinesController extends GetxController
       newHistory[i] = workout.copyWith.exercises(res);
     }
     service.setAllRoutines(newHistory);
+  }
+
+  void viewHistory({required Workout routine}) {
+    final history = coordinator.getRoutineHistory(routine: routine);
+    Go.to(
+      () => Scaffold(
+        appBar: AppBar(title: Text("routines.actions.viewHistory".t)),
+        body: ListView.builder(
+          padding: const EdgeInsets.symmetric(vertical: 8),
+          itemCount: history.length,
+          itemBuilder: (context, index) {
+            final workout = history[index];
+            return HistoryWorkout(
+              workout: workout,
+              showExercises: workout.exercises.length,
+              onTap: () {
+                Go.to(() => ExercisesView(workout: workout));
+              },
+            );
+          },
+        ),
+      ),
+    );
   }
 }

@@ -151,6 +151,7 @@ routines:
     edit: Edit routine
     start: Start routine
     create: Create new routine
+    viewHistory: View history
   editor:
     exercises:
       title: Exercises

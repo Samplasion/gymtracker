@@ -151,6 +151,7 @@ routines:
     edit: Modifica routine
     start: Avvia routine
     create: Crea routine
+    viewHistory: Cronologia
   editor:
     exercises:
       title: Esercizi

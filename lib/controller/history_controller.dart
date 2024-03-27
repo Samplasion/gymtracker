@@ -395,6 +395,17 @@ class HistoryController extends GetxController with ServiceableController {
       }),
     );
   }
+
+  List<Workout> getRoutineHistory(Workout routine) {
+    final history = this
+        .history
+        .where((element) => element.parentID == routine.id)
+        .toList();
+    history.sort((a, b) => (b.startingDate ??
+            DateTime.fromMillisecondsSinceEpoch(0))
+        .compareTo(a.startingDate ?? DateTime.fromMillisecondsSinceEpoch(0)));
+    return history;
+  }
 }
 
 extension WorkoutHistory on Workout {

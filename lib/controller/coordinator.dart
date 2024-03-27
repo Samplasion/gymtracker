@@ -57,4 +57,8 @@ class Coordinator extends GetxController with ServiceableController {
     }
     Go.snack("workouts.actions.saveAsRoutine.done".t);
   }
+
+  List<Workout> getRoutineHistory({required Workout routine}) {
+    return Get.find<HistoryController>().getRoutineHistory(routine);
+  }
 }

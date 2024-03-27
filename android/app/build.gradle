@@ -30,6 +30,7 @@ if (keystorePropertiesFile.exists()) {
 }
 
 android {
+    namespace "org.js.samplasion.gymtracker"
     compileSdkVersion flutter.compileSdkVersion
     ndkVersion flutter.ndkVersion
 

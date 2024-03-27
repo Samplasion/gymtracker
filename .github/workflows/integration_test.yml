@@ -21,6 +21,7 @@ jobs:
         with:
           flutter-version: "3.19.4"
           channel: 'stable'
+          cache: true
 
       - run: flutter pub get
       - run: flutter test integration_test

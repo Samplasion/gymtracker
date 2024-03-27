@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_quill/flutter_quill.dart';
 import 'package:get/get.dart';
+import 'package:gymtracker/data/rich_text.dart';
 import 'package:gymtracker/utils/extensions.dart';
 
 class MaybeRichText extends StatelessWidget {
@@ -38,6 +39,12 @@ class MaybeRichText extends StatelessWidget {
           showCursor: false,
           enableInteractiveSelection: false,
           enableSelectionToolbar: false,
+          customStyleBuilder: (attr) {
+            if (attr.key == highlightAttribute.key) {
+              return getHighlightTextStyle(context);
+            }
+            return const TextStyle();
+          },
         ),
       ),
     );

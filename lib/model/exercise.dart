@@ -165,12 +165,9 @@ class Exercise extends WorkoutExercisable {
     required Workout workout,
     bool Function(ExSet set)? setFilter = _defaultSetFilter,
   }) {
-    // If we're redoing a previous workout,
-    // we want to inherit the previous parent ID,
-    // ie. the original routine's ID
-    // But we also want to keep it if we're cloning
-    // a built-in exercise, so that the translated name is kept.
-    final base = workout.isConcrete || standard ? makeSibling() : makeChild();
+    // We want to keep the parent ID of the exercise in the library (custom
+    // or not) as to avoid a "linked list" type situation
+    final base = makeSibling();
     return base.copyWith(
       sets: ([
         for (final set in sets)
@@ -190,8 +187,8 @@ class Exercise extends WorkoutExercisable {
     final child = clone()
       ..parentID = id
       ..regenerateID();
-    print(
-        "Making child of [id: $id, pid: $parentID] with ID [id: ${child.id}, pid: ${child.parentID}]");
+    // debugPrint(
+    //     "Making child of [id: $id, pid: $parentID] with ID [id: ${child.id}, pid: ${child.parentID}]");
     return child;
   }
 

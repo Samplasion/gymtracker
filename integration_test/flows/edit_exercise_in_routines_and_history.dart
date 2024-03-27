@@ -103,6 +103,9 @@ Future<void> testEditExerciseInRoutineAndHistoryFlow(
   // Scroll down
   await tester.drag(find.byType(ListView), const Offset(0.0, -600.0));
 
+  // Trigger a frame.
+  await tester.pumpAndSettle();
+
   // Add an exercise
   final addExerciseButton = find.widgetWithText(ListTile, "Add exercises");
   await tester.tap(addExerciseButton);

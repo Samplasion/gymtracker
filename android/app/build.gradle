@@ -32,9 +32,10 @@ if (keystorePropertiesFile.exists()) {
 android {
     namespace "org.js.samplasion.gymtracker"
     compileSdkVersion flutter.compileSdkVersion
-    ndkVersion flutter.ndkVersion
+    ndkVersion "25.1.8937393"
 
     compileOptions {
+        coreLibraryDesugaringEnabled true
         sourceCompatibility JavaVersion.VERSION_17
         targetCompatibility JavaVersion.VERSION_17
     }
@@ -100,5 +101,6 @@ flutter {
 }
 
 dependencies {
+    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.0.3'
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.7.10"
 }

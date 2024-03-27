@@ -8,14 +8,20 @@ PODS:
   - flutter_timezone (0.1.0):
     - FlutterMacOS
   - FlutterMacOS (1.0.0)
+  - irondash_engine_context (0.0.1):
+    - FlutterMacOS
   - package_info_plus (0.0.1):
     - FlutterMacOS
   - path_provider_foundation (0.0.1):
     - Flutter
     - FlutterMacOS
-  - protocol_handler (0.0.1):
+  - protocol_handler_macos (0.0.1):
     - FlutterMacOS
   - share_plus (0.0.1):
+    - FlutterMacOS
+  - super_native_extensions (0.0.1):
+    - FlutterMacOS
+  - url_launcher_macos (0.0.1):
     - FlutterMacOS
 
 DEPENDENCIES:
@@ -24,10 +30,13 @@ DEPENDENCIES:
   - flutter_local_notifications (from `Flutter/ephemeral/.symlinks/plugins/flutter_local_notifications/macos`)
   - flutter_timezone (from `Flutter/ephemeral/.symlinks/plugins/flutter_timezone/macos`)
   - FlutterMacOS (from `Flutter/ephemeral`)
+  - irondash_engine_context (from `Flutter/ephemeral/.symlinks/plugins/irondash_engine_context/macos`)
   - package_info_plus (from `Flutter/ephemeral/.symlinks/plugins/package_info_plus/macos`)
   - path_provider_foundation (from `Flutter/ephemeral/.symlinks/plugins/path_provider_foundation/darwin`)
-  - protocol_handler (from `Flutter/ephemeral/.symlinks/plugins/protocol_handler/macos`)
+  - protocol_handler_macos (from `Flutter/ephemeral/.symlinks/plugins/protocol_handler_macos/macos`)
   - share_plus (from `Flutter/ephemeral/.symlinks/plugins/share_plus/macos`)
+  - super_native_extensions (from `Flutter/ephemeral/.symlinks/plugins/super_native_extensions/macos`)
+  - url_launcher_macos (from `Flutter/ephemeral/.symlinks/plugins/url_launcher_macos/macos`)
 
 EXTERNAL SOURCES:
   device_info_plus:
@@ -40,14 +49,20 @@ EXTERNAL SOURCES:
     :path: Flutter/ephemeral/.symlinks/plugins/flutter_timezone/macos
   FlutterMacOS:
     :path: Flutter/ephemeral
+  irondash_engine_context:
+    :path: Flutter/ephemeral/.symlinks/plugins/irondash_engine_context/macos
   package_info_plus:
     :path: Flutter/ephemeral/.symlinks/plugins/package_info_plus/macos
   path_provider_foundation:
     :path: Flutter/ephemeral/.symlinks/plugins/path_provider_foundation/darwin
-  protocol_handler:
-    :path: Flutter/ephemeral/.symlinks/plugins/protocol_handler/macos
+  protocol_handler_macos:
+    :path: Flutter/ephemeral/.symlinks/plugins/protocol_handler_macos/macos
   share_plus:
     :path: Flutter/ephemeral/.symlinks/plugins/share_plus/macos
+  super_native_extensions:
+    :path: Flutter/ephemeral/.symlinks/plugins/super_native_extensions/macos
+  url_launcher_macos:
+    :path: Flutter/ephemeral/.symlinks/plugins/url_launcher_macos/macos
 
 SPEC CHECKSUMS:
   device_info_plus: 5401765fde0b8d062a2f8eb65510fb17e77cf07f
@@ -55,10 +70,13 @@ SPEC CHECKSUMS:
   flutter_local_notifications: 3805ca215b2fb7f397d78b66db91f6a747af52e4
   flutter_timezone: 6b906d1740654acb16e50b639835628fea851037
   FlutterMacOS: 8f6f14fa908a6fb3fba0cd85dbd81ec4b251fb24
-  package_info_plus: 02d7a575e80f194102bef286361c6c326e4c29ce
-  path_provider_foundation: 29f094ae23ebbca9d3d0cec13889cd9060c0e943
-  protocol_handler: 587e1caf6c0b92ce351ab14081968dae49cb8cc6
-  share_plus: 76dd39142738f7a68dd57b05093b5e8193f220f7
+  irondash_engine_context: da62996ee25616d2f01bbeb85dc115d813359478
+  package_info_plus: fa739dd842b393193c5ca93c26798dff6e3d0e0c
+  path_provider_foundation: 3784922295ac71e43754bd15e0653ccfd36a147c
+  protocol_handler_macos: d10a6c01d6373389ffd2278013ab4c47ed6d6daa
+  share_plus: 36537c04ce0c3e3f5bd297ce4318b6d5ee5fd6cf
+  super_native_extensions: 85efee3a7495b46b04befcfc86ed12069264ebf3
+  url_launcher_macos: d2691c7dd33ed713bf3544850a623080ec693d95
 
 PODFILE CHECKSUM: 353c8bcc5d5b0994e508d035b5431cfe18c1dea7
 

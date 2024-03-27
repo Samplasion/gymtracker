@@ -31,11 +31,11 @@ class WeightChart extends StatelessWidget {
           minY: minY - padding,
           maxY: maxY + padding,
           maxX: relevantWeights.length - 0.5,
-          gridData: FlGridData(
+          gridData: const FlGridData(
             show: false,
             drawVerticalLine: false,
           ),
-          titlesData: FlTitlesData(
+          titlesData: const FlTitlesData(
             show: false,
           ),
           borderData: FlBorderData(
@@ -45,9 +45,9 @@ class WeightChart extends StatelessWidget {
             touchTooltipData: LineTouchTooltipData(
               tooltipBgColor: Colors.transparent,
               getTooltipItems: (items) => <LineTooltipItem?>[
-                ...items.map((_) => LineTooltipItem(
+                ...items.map((_) => const LineTooltipItem(
                       "hhh",
-                      const TextStyle(color: Colors.transparent),
+                      TextStyle(color: Colors.transparent),
                     ))
               ],
             ),
@@ -92,8 +92,8 @@ class WeightChart extends StatelessWidget {
             ),
           ],
         ),
-        swapAnimationDuration: const Duration(milliseconds: 350),
-        swapAnimationCurve: Curves.linearToEaseOut,
+        duration: const Duration(milliseconds: 350),
+        curve: Curves.linearToEaseOut,
       );
     });
   }

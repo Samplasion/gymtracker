@@ -13,14 +13,15 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: futureware-tech/simulator-action@v3
-        with:
-          model: 'iPhone 14'
+      # - uses: futureware-tech/simulator-action@v3
+      #   with:
+      #     model: 'iPhone 14'
 
       - uses: subosito/flutter-action@v2
         with:
-          flutter-version: "3.13.6"
+          flutter-version: "3.19.4"
           channel: 'stable'
+          cache: true
 
       - run: flutter pub get
-      - run: flutter test integration_test
+      - run: flutter test integration_test -d macos

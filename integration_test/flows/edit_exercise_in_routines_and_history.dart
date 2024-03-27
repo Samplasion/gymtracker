@@ -100,6 +100,12 @@ Future<void> testEditExerciseInRoutineAndHistoryFlow(
   final nameField = find.widgetWithText(TextFormField, "Routine name");
   await tester.enterText(nameField, "Test Routine");
 
+  // Scroll down
+  await tester.drag(find.byType(ListView), const Offset(0.0, -600.0));
+
+  // Trigger a frame.
+  await tester.pumpAndSettle();
+
   // Add an exercise
   final addExerciseButton = find.widgetWithText(ListTile, "Add exercises");
   await tester.tap(addExerciseButton);

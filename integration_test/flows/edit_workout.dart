@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_quill/flutter_quill.dart';
+import 'package:flutter_quill_test/flutter_quill_test.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:gymtracker/data/exercises.dart';
 import 'package:gymtracker/main.dart';
@@ -7,6 +9,8 @@ import 'package:gymtracker/model/set.dart';
 import 'package:gymtracker/model/workout.dart';
 import 'package:gymtracker/service/database.dart';
 import 'package:gymtracker/service/localizations.dart';
+import 'package:gymtracker/utils/extensions.dart';
+import 'package:gymtracker/view/components/rich_text_editor.dart';
 import 'package:gymtracker/view/exercises.dart';
 import 'package:gymtracker/view/utils/history_workout.dart';
 import 'package:gymtracker/view/utils/workout_done.dart';
@@ -135,16 +139,16 @@ Future<void> testEditWorkoutFlow(
   await tester.pumpAndSettle();
 
   final addSetButton = find.widgetWithText(FilledButton, "+ Add Set");
-  await tester.drag(find.byType(ListView), const Offset(0.0, -300.0));
+  await tester.drag(find.byType(ListView), const Offset(0.0, -600.0));
   await tester.pumpAndSettle();
   await tester.tap(addSetButton);
   await tester.pumpAndSettle();
-  await tester.drag(find.byType(ListView), const Offset(0.0, -300.0));
+  await tester.drag(find.byType(ListView), const Offset(0.0, -600.0));
   await tester.pumpAndSettle();
   await tester.tap(addSetButton);
   await tester.pumpAndSettle();
 
-  await tester.drag(find.byType(ListView), const Offset(0.0, -300.0));
+  await tester.drag(find.byType(ListView), const Offset(0.0, -600.0));
   final fourthSetTypeButton = find.descendant(
     of: find.byType(IconButton),
     matching: find.text('4'),
@@ -156,7 +160,7 @@ Future<void> testEditWorkoutFlow(
   await tester.pumpAndSettle();
 
   // Now it finds the fifth set
-  await tester.drag(find.byType(ListView), const Offset(0.0, -300.0));
+  await tester.drag(find.byType(ListView), const Offset(0.0, -600.0));
   await tester.pumpAndSettle();
   await tester.tap(fourthSetTypeButton);
   await tester.pumpAndSettle();
@@ -180,7 +184,7 @@ Future<void> testEditWorkoutFlow(
   await tester.tap(find.byKey(const Key("pick")));
   await tester.pumpAndSettle();
 
-  await tester.drag(find.byType(ListView), const Offset(0.0, -300.0));
+  await tester.drag(find.byType(ListView), const Offset(0.0, -600.0));
   await tester.pumpAndSettle();
   await tester.enterText(find.widgetWithText(TextField, "Time"), "100");
   await tester.pumpAndSettle();
@@ -192,8 +196,10 @@ Future<void> testEditWorkoutFlow(
 
   expect(find.byType(WorkoutFinishEditingPage), findsOneWidget);
 
-  await tester.enterText(
-      find.widgetWithText(TextFormField, "Notes"), "Edited notes");
+  await tester.quillEnterText(
+    find.byType(QuillEditor),
+    "Edited notes\n",
+  );
   await tester.pumpAndSettle();
   await tester.tap(find.byKey(const Key("submit")));
   await tester.pumpAndSettle(const Duration(seconds: 1));
@@ -221,5 +227,5 @@ Future<void> testEditWorkoutFlow(
   expect(editedWorkout.exercises[1].sets.single.parameters, SetParameters.time);
   expect(
       editedWorkout.exercises[1].sets.single.time, const Duration(minutes: 1));
-  expect(editedWorkout.infobox, "Edited notes");
+  expect(editedWorkout.infobox, "Edited notes\n".asQuillDocument().toEncoded());
 }

@@ -25,6 +25,7 @@ import 'package:gymtracker/view/charts/routine_history.dart';
 import 'package:gymtracker/view/charts/workout_muscle_categories.dart';
 import 'package:gymtracker/view/components/badges.dart';
 import 'package:gymtracker/view/components/infobox.dart';
+import 'package:gymtracker/view/components/maybe_rich_text.dart';
 import 'package:gymtracker/view/components/stats.dart';
 import 'package:gymtracker/view/library.dart';
 import 'package:gymtracker/view/routine_creator.dart';
@@ -464,7 +465,7 @@ class ExerciseDataView extends StatelessWidget {
         if (exercise.notes.isNotEmpty)
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            child: Text(exercise.notes),
+            child: MaybeRichText(text: exercise.notes),
           ),
         for (int i = 0; i < exercise.sets.length; i++)
           ExerciseSetView(

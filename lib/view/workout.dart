@@ -1,6 +1,9 @@
+import 'dart:convert';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:flutter_quill/flutter_quill.dart';
 import 'package:get/get.dart';
 import 'package:gymtracker/controller/countdown_controller.dart';
 import 'package:gymtracker/controller/routines_controller.dart';
@@ -15,9 +18,11 @@ import 'package:gymtracker/model/superset.dart';
 import 'package:gymtracker/model/workout.dart';
 import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/utils/constants.dart';
+import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/utils/utils.dart';
 import 'package:gymtracker/view/components/infobox.dart';
+import 'package:gymtracker/view/components/rich_text_editor.dart';
 import 'package:gymtracker/view/components/split_button.dart';
 import 'package:gymtracker/view/exercise_picker.dart';
 import 'package:gymtracker/view/utils/crossfade.dart';
@@ -852,8 +857,10 @@ class _WorkoutFinishPageState extends State<WorkoutFinishPage> {
         DateTime.now().difference(controller.time.value)),
   );
   final dateController = TextEditingController();
-  final infoboxController =
-      TextEditingController(text: controller.infobox.value);
+  final infoboxController = QuillController(
+    document: (controller.infobox.value ?? "").asQuillDocument(),
+    selection: const TextSelection.collapsed(offset: 0),
+  );
 
   late String? pwInitialItem = () {
     // Parent workout data
@@ -942,16 +949,19 @@ class _WorkoutFinishPageState extends State<WorkoutFinishPage> {
                   return null;
                 },
               ),
-              TextFormField(
-                controller: infoboxController,
-                minLines: 3,
-                maxLines: null,
+              GTRichTextEditor(
+                infoboxController: infoboxController,
                 decoration: InputDecoration(
                   isDense: true,
                   border: const OutlineInputBorder(),
                   labelText: "ongoingWorkout.finish.fields.infobox.label".t,
                   alignLabelWithHint: true,
                 ),
+                onTapOutside: () {
+                  printInfo(info: "Quill Editor onTapOutside");
+                  controller.infobox(jsonEncode(
+                      infoboxController.document.toDelta().toJson()));
+                },
               ),
             ]
                 .map((c) => Padding(

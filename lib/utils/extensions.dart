@@ -4,6 +4,8 @@ import 'dart:math';
 
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_quill/flutter_quill.dart';
+import 'package:flutter_quill/quill_delta.dart';
 import 'package:get/get.dart' hide ContextExtensionss;
 import 'package:gymtracker/controller/settings_controller.dart';
 import 'package:gymtracker/model/workout.dart';
@@ -30,6 +32,32 @@ extension StringUtils on String {
         maxWidth: double.infinity,
       );
     return textPainter.size;
+  }
+
+  dynamic tryParseJson() {
+    try {
+      return jsonDecode(this);
+    } catch (e) {
+      return null;
+    }
+  }
+
+  Document asQuillDocument() {
+    final json = tryParseJson();
+    if (json != null) {
+      debugPrint(
+          "[String#asQuillDocument] $json is not a null json; interpreting it as a delta");
+      try {
+        return Document.fromJson(json);
+      } catch (_) {
+        debugPrint(
+            "[String#asQuillDocument] '$this' is not a valid delta; falling back to plaintext string");
+      }
+    } else {
+      debugPrint(
+          "[String#asQuillDocument] '$this' is not a json; creating delta");
+    }
+    return Document.fromDelta(Delta()..insert("${trim()}\n"));
   }
 }
 
@@ -214,5 +242,23 @@ extension SeparatedWidgetList on Iterable<Widget> {
     }
 
     return widgets;
+  }
+}
+
+extension StringifyQuill on Document {
+  String toEncoded() {
+    return jsonEncode(toDelta().toJson());
+  }
+}
+
+extension StringifyQuillController on QuillController {
+  String toEncoded() {
+    return document.toEncoded();
+  }
+}
+
+extension EmptyDocument on Document {
+  bool get isEmpty {
+    return toPlainText().trim().isEmpty;
   }
 }

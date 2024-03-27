@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:flutter_quill/flutter_quill.dart';
 import 'package:get/get.dart';
 import 'package:gymtracker/controller/history_controller.dart';
 import 'package:gymtracker/controller/routines_controller.dart';
@@ -12,9 +13,11 @@ import 'package:gymtracker/model/set.dart';
 import 'package:gymtracker/model/superset.dart';
 import 'package:gymtracker/model/workout.dart';
 import 'package:gymtracker/service/localizations.dart';
+import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/utils/utils.dart';
 import 'package:gymtracker/view/components/infobox.dart';
+import 'package:gymtracker/view/components/rich_text_editor.dart';
 import 'package:gymtracker/view/components/split_button.dart';
 import 'package:gymtracker/view/exercise_picker.dart';
 import 'package:gymtracker/view/utils/date_field.dart';
@@ -523,8 +526,10 @@ class _WorkoutFinishEditingPageState extends State<WorkoutFinishEditingPage> {
   );
   late final dateController = TextEditingController();
   late DateTime startingDate = widget.workout.startingDate ?? DateTime.now();
-  late final infoboxController =
-      TextEditingController(text: widget.workout.infobox);
+  late final infoboxController = QuillController(
+    document: (widget.workout.infobox ?? "").asQuillDocument(),
+    selection: const TextSelection.collapsed(offset: 0),
+  );
 
   late String? pwInitialItem = () {
     // Parent workout data
@@ -614,16 +619,15 @@ class _WorkoutFinishEditingPageState extends State<WorkoutFinishEditingPage> {
                   return null;
                 },
               ),
-              TextFormField(
-                controller: infoboxController,
-                minLines: 3,
-                maxLines: null,
+              GTRichTextEditor(
+                infoboxController: infoboxController,
                 decoration: InputDecoration(
                   isDense: true,
                   border: const OutlineInputBorder(),
                   labelText: "historyEditor.finish.fields.infobox.label".t,
                   alignLabelWithHint: true,
                 ),
+                onTapOutside: () {},
               ),
             ]
                 .map((c) => Padding(
@@ -658,7 +662,7 @@ class _WorkoutFinishEditingPageState extends State<WorkoutFinishEditingPage> {
           name: titleController.text,
           startingDate: startingDate,
           duration: TimeInputField.parseDuration(timeController.text),
-          infobox: infoboxController.text,
+          infobox: infoboxController.toEncoded(),
         ),
       );
     }

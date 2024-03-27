@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gymtracker/service/localizations.dart';
+import 'package:gymtracker/view/components/maybe_rich_text.dart';
 
 class Infobox extends StatelessWidget {
   final String text;
@@ -35,7 +36,7 @@ class Infobox extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 4),
-              Text(text),
+              MaybeRichText(text: text),
             ],
           ),
         ),

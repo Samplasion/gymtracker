@@ -17,6 +17,7 @@ import 'package:gymtracker/utils/utils.dart';
 import 'package:gymtracker/view/components/badges.dart';
 import 'package:gymtracker/view/components/maybe_rich_text.dart';
 import 'package:gymtracker/view/components/parent_viewer.dart';
+import 'package:gymtracker/view/components/rich_text_dialog.dart';
 import 'package:gymtracker/view/components/rich_text_editor.dart';
 import 'package:gymtracker/view/library.dart';
 import 'package:gymtracker/view/utils/drag_handle.dart';
@@ -173,7 +174,7 @@ class _WorkoutExerciseEditorState extends State<WorkoutExerciseEditor> {
                         controller: notesController,
                         onNotesChange: (text) {
                           widget.onNotesChange(widget.exercise, text);
-                          Navigator.pop(context);
+                          Get.back();
                         },
                       );
                     },
@@ -236,47 +237,6 @@ class _WorkoutExerciseEditorState extends State<WorkoutExerciseEditor> {
           ),
         );
       },
-    );
-  }
-}
-
-class GTRichTextEditDialog extends StatelessWidget {
-  const GTRichTextEditDialog({
-    super.key,
-    required this.controller,
-    required this.onNotesChange,
-  });
-
-  final QuillController controller;
-  final ValueChanged<String> onNotesChange;
-
-  @override
-  Widget build(BuildContext context) {
-    return Dialog.fullscreen(
-      child: Scaffold(
-        appBar: AppBar(
-          title: Text('exercise.editor.fields.notes.label'.t),
-          actions: [
-            IconButton(
-              onPressed: () {
-                onNotesChange(controller.document.toEncoded());
-              },
-              icon: const Icon(Icons.done_rounded),
-            ),
-          ],
-        ),
-        body: Padding(
-          padding: const EdgeInsets.all(24),
-          child: GTRichTextEditor(
-            infoboxController: controller,
-            autofocus: true,
-            decoration: InputDecoration(
-              border: const OutlineInputBorder(),
-              labelText: "exercise.editor.fields.notes.label".t,
-            ),
-          ),
-        ),
-      ),
     );
   }
 }

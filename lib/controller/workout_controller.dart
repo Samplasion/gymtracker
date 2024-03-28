@@ -18,6 +18,7 @@ import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/struct/stopwatch_extended.dart';
 import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/utils/utils.dart';
+import 'package:gymtracker/view/components/rich_text_dialog.dart';
 import 'package:gymtracker/view/exercise_picker.dart';
 import 'package:gymtracker/view/utils/workout.dart';
 import 'package:gymtracker/view/utils/workout_done.dart';
@@ -392,6 +393,7 @@ class WorkoutController extends GetxController with ServiceableController {
         onNotesChange: (text) {
           infobox(text);
           save();
+          Get.back();
         },
       ),
     );

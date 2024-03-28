@@ -3,8 +3,6 @@ import 'package:flutter_quill/flutter_quill.dart';
 import 'package:get/get.dart';
 import 'package:gymtracker/data/rich_text.dart';
 import 'package:gymtracker/service/localizations.dart';
-import 'package:gymtracker/utils/constants.dart';
-import 'package:gymtracker/utils/extensions.dart';
 
 class GTRichTextEditor extends StatelessWidget {
   const GTRichTextEditor({
@@ -22,8 +20,6 @@ class GTRichTextEditor extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isLarge =
-        Breakpoints.currentBreakpoint.screenWidth > Breakpoints.m.screenWidth;
     return InputDecorator(
       decoration: InputDecoration(
         isDense: true,
@@ -36,8 +32,6 @@ class GTRichTextEditor extends StatelessWidget {
         children: [
           QuillToolbar.simple(
             configurations: QuillSimpleToolbarConfigurations(
-              multiRowsDisplay: isLarge,
-              toolbarSize: kToolbarHeight,
               showDividers: false,
               showFontFamily: false,
               showSearchButton: false,

@@ -1,5 +1,7 @@
 import 'package:copy_with_extension/copy_with_extension.dart';
 import 'package:get/get.dart';
+import 'package:gymtracker/data/distance.dart';
+import 'package:gymtracker/data/weights.dart';
 import 'package:gymtracker/model/exercisable.dart';
 import 'package:gymtracker/model/set.dart';
 import 'package:gymtracker/model/workout.dart';
@@ -215,6 +217,36 @@ class Exercise extends WorkoutExercisable {
   @override
   String toString() {
     return "Exercise${toJson()}";
+  }
+
+  @override
+  Exercise changeUnits({
+    required Weights fromWeightUnit,
+    required Weights toWeightUnit,
+    required Distance fromDistanceUnit,
+    required Distance toDistanceUnit,
+  }) {
+    return copyWith(
+      sets: [
+        for (final set in sets)
+          set.copyWith(
+            weight: set.weight == null
+                ? null
+                : Weights.convert(
+                    value: set.weight!,
+                    from: fromWeightUnit,
+                    to: toWeightUnit,
+                  ),
+            distance: set.distance == null
+                ? null
+                : Distance.convert(
+                    value: set.distance!,
+                    from: fromDistanceUnit,
+                    to: toDistanceUnit,
+                  ),
+          ),
+      ],
+    );
   }
 }
 

@@ -120,6 +120,36 @@ class Workout {
         }(),
             "Both completedBy and completes cannot be defined at the same time.");
 
+  static Workout combine(Workout workout1, Workout workout2) {
+    assert(workout1.isConcrete == workout2.isConcrete,
+        "Both workouts must be concrete or not concrete.");
+    assert(!workout1.isContinuation);
+    assert(!workout2.isContinuation);
+
+    return Workout(
+      name: workout1.name,
+      exercises: [
+        ...workout1.exercises,
+        for (final exercise in workout2.exercises)
+          exercise.changeUnits(
+            fromWeightUnit: workout2.weightUnit,
+            toWeightUnit: workout1.weightUnit,
+            fromDistanceUnit: workout2.distanceUnit,
+            toDistanceUnit: workout1.distanceUnit,
+          ),
+      ],
+      duration: (workout1.duration ?? Duration.zero) +
+          (workout2.duration ?? Duration.zero),
+      startingDate: workout1.startingDate,
+      weightUnit: workout1.weightUnit,
+      distanceUnit: workout1.distanceUnit,
+      parentID:
+          workout1.parentID == workout2.parentID ? workout1.parentID : null,
+      infobox: workout1.infobox?.richCombine(workout2.infobox ?? "") ??
+          workout2.infobox,
+    );
+  }
+
   factory Workout.fromJson(Map<String, dynamic> json) =>
       _$WorkoutFromJson(json);
 

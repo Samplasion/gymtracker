@@ -1,10 +1,15 @@
 import 'dart:math';
 
+import 'package:gymtracker/data/distance.dart';
+import 'package:gymtracker/data/weights.dart';
 import 'package:gymtracker/model/exercise.dart';
 import 'package:gymtracker/model/set.dart';
 import 'package:gymtracker/model/superset.dart';
 import 'package:gymtracker/model/workout.dart';
+import 'package:gymtracker/utils/extensions.dart';
 import 'package:test/test.dart';
+
+import '../expectations.dart';
 
 void main() {
   group('Workout model', () {
@@ -430,6 +435,158 @@ void main() {
                 '[{"insert":"Mitochondria is the "},{"insert":"powerhouse","attributes":{"bold":true}},{"insert":" of the "},{"insert":"cell","attributes":{"italic":true}},{"insert":".\\n"}]'),
             true);
       });
+    });
+
+    group("combine(workout1, workout2)", () {
+      test("should combine two workouts", () {
+        final workout2 = Workout(
+          id: "2",
+          name: 'Test Workout 2',
+          exercises: [
+            Exercise.custom(
+              id: "1",
+              name: 'Test Exercise',
+              parameters: SetParameters.repsWeight,
+              sets: [
+                ExSet(
+                  reps: 10,
+                  weight: 100,
+                  time: const Duration(seconds: 60),
+                  parameters: SetParameters.repsWeight,
+                  kind: SetKind.normal,
+                ),
+                ExSet(
+                  reps: 10,
+                  weight: 100,
+                  time: const Duration(seconds: 60),
+                  parameters: SetParameters.repsWeight,
+                  kind: SetKind.normal,
+                ),
+              ],
+              primaryMuscleGroup: MuscleGroup.abs,
+              secondaryMuscleGroups: {MuscleGroup.lowerBack},
+              restTime: const Duration(seconds: 60),
+              parentID: null,
+              notes: 'Test Notes',
+            ),
+            Exercise.custom(
+              id: "2",
+              name: 'Test Exercise 2',
+              parameters: SetParameters.repsWeight,
+              sets: [
+                ExSet(
+                  reps: 10,
+                  weight: 100,
+                  time: const Duration(seconds: 60),
+                  parameters: SetParameters.repsWeight,
+                  kind: SetKind.normal,
+                ),
+                ExSet(
+                  reps: 10,
+                  weight: 100,
+                  time: const Duration(seconds: 60),
+                  parameters: SetParameters.repsWeight,
+                  kind: SetKind.normal,
+                ),
+              ],
+              primaryMuscleGroup: MuscleGroup.abs,
+              secondaryMuscleGroups: {MuscleGroup.lowerBack},
+              restTime: const Duration(seconds: 60),
+              parentID: null,
+              notes: 'Test Notes',
+            ),
+          ],
+          duration: const Duration(seconds: 60),
+          startingDate: DateTime.now(),
+          parentID: null,
+          infobox: 'Test Infobox',
+          completedBy: null,
+          completes: null,
+        );
+
+        final combined = Workout.combine(workout, workout2);
+
+        expect(combined.exercises.length, 4);
+        expect(combined.exercises[0].id, "1");
+        expect(combined.exercises[1].id, "2");
+        expect(combined.exercises[2].id, "1");
+        expect(combined.exercises[3].id, "2");
+        expect(combined.startingDate, workout.startingDate);
+        expect(combined.duration, const Duration(minutes: 2));
+        expect(
+          combined.infobox!.asQuillDocument().toPlainText(),
+          "Test Infobox\nTest Infobox\n",
+        );
+        expect(combined.weightUnit, Weights.kg);
+        expect(combined.distanceUnit, Distance.km);
+      });
+
+      test(
+        "should convert weights and distances to the unit defined by the first workout",
+        () {
+          final workout2 = Workout(
+            id: "2",
+            name: 'Test Workout 2',
+            exercises: [
+              Exercise.custom(
+                id: "1",
+                name: 'Test Exercise',
+                parameters: SetParameters.repsWeight,
+                sets: [
+                  ExSet(
+                    reps: 10,
+                    weight: 100,
+                    time: const Duration(seconds: 60),
+                    parameters: SetParameters.repsWeight,
+                    kind: SetKind.normal,
+                  ),
+                ],
+                primaryMuscleGroup: MuscleGroup.abs,
+                secondaryMuscleGroups: {MuscleGroup.lowerBack},
+                restTime: const Duration(seconds: 60),
+                parentID: null,
+                notes: 'Test Notes',
+              ),
+              Exercise.custom(
+                id: "2",
+                name: 'Test Exercise 2',
+                parameters: SetParameters.distance,
+                sets: [
+                  ExSet(
+                    distance: 10,
+                    time: const Duration(seconds: 60),
+                    parameters: SetParameters.distance,
+                    kind: SetKind.normal,
+                  ),
+                ],
+                primaryMuscleGroup: MuscleGroup.abs,
+                secondaryMuscleGroups: {MuscleGroup.lowerBack},
+                restTime: const Duration(seconds: 60),
+                parentID: null,
+                notes: 'Test Notes',
+              ),
+            ],
+            duration: const Duration(seconds: 60),
+            startingDate: DateTime.now(),
+            parentID: null,
+            infobox: 'Test Infobox',
+            completedBy: null,
+            completes: null,
+            weightUnit: Weights.lb,
+            distanceUnit: Distance.mi,
+          );
+
+          final combined = Workout.combine(
+            workout.copyWith(exercises: []),
+            workout2,
+          );
+
+          expect(combined.weightUnit, Weights.kg);
+          expect(combined.distanceUnit, Distance.km);
+          expectDouble(combined.exercises[0].sets[0].weight!, 45.359237);
+          expectDouble(combined.exercises[1].sets[0].distance!, 16.09344);
+        },
+      );
     });
   });
 }

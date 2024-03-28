@@ -59,6 +59,12 @@ extension StringUtils on String {
     }
     return Document.fromDelta(Delta()..insert("${trim()}\n"));
   }
+
+  String richCombine(String other) {
+    final Delta self = asQuillDocument().toDelta();
+    final Delta otherDelta = other.trim().asQuillDocument().toDelta();
+    return Document.fromDelta(self.compose(otherDelta)).toEncoded();
+  }
 }
 
 extension DateUtils on DateTime {

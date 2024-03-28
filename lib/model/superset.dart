@@ -1,4 +1,6 @@
 import 'package:copy_with_extension/copy_with_extension.dart';
+import 'package:gymtracker/data/distance.dart';
+import 'package:gymtracker/data/weights.dart';
 import 'package:gymtracker/model/exercisable.dart';
 import 'package:gymtracker/model/exercise.dart';
 import 'package:gymtracker/model/set.dart';
@@ -52,4 +54,23 @@ class Superset extends WorkoutExercisable {
   Superset clone() => Superset.fromJson(toJson());
 
   void regenerateID() => id = const Uuid().v4();
+
+  @override
+  Superset changeUnits(
+      {required Weights fromWeightUnit,
+      required Weights toWeightUnit,
+      required Distance fromDistanceUnit,
+      required Distance toDistanceUnit}) {
+    return copyWith(
+      exercises: [
+        for (final exercise in exercises)
+          exercise.changeUnits(
+            fromWeightUnit: fromWeightUnit,
+            toWeightUnit: toWeightUnit,
+            fromDistanceUnit: fromDistanceUnit,
+            toDistanceUnit: toDistanceUnit,
+          ),
+      ],
+    );
+  }
 }

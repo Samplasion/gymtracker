@@ -1,3 +1,5 @@
+import 'package:gymtracker/data/distance.dart';
+import 'package:gymtracker/data/weights.dart';
 import 'package:gymtracker/model/exercise.dart';
 import 'package:gymtracker/model/set.dart';
 import 'package:gymtracker/model/superset.dart';
@@ -58,4 +60,11 @@ abstract class WorkoutExercisable {
 
   Exercise get asExercise => this as Exercise;
   Superset get asSuperset => this as Superset;
+
+  WorkoutExercisable changeUnits({
+    required Weights fromWeightUnit,
+    required Weights toWeightUnit,
+    required Distance fromDistanceUnit,
+    required Distance toDistanceUnit,
+  });
 }

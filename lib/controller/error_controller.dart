@@ -8,15 +8,16 @@ class ErrorController extends GetxController {
   void onInit() {
     super.onInit();
 
-    FlutterError.onError = (details) {
-      FlutterError.presentError(details);
-      sendDetails(details);
-      // if (kReleaseMode) exit(1);
-    };
-    PlatformDispatcher.instance.onError = (error, stack) {
-      sendError(error, stack);
-      return true;
-    };
+    // FIXME: This is not working
+    // FlutterError.onError = (details) {
+    //   FlutterError.presentError(details);
+    //   sendDetails(details);
+    //   // if (kReleaseMode) exit(1);
+    // };
+    // PlatformDispatcher.instance.onError = (error, stack) {
+    //   sendError(error, stack);
+    //   return true;
+    // };
   }
 
   void sendDetails(FlutterErrorDetails details) {
@@ -25,6 +26,7 @@ class ErrorController extends GetxController {
         !details.stack!.toString().contains('package:gymtracker')) {
       return;
     }
+
     Go.to(() => ErrorView(details: details));
   }
 

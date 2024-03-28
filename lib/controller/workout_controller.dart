@@ -17,7 +17,9 @@ import 'package:gymtracker/model/workout.dart';
 import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/struct/stopwatch_extended.dart';
 import 'package:gymtracker/utils/go.dart';
+import 'package:gymtracker/utils/utils.dart';
 import 'package:gymtracker/view/exercise_picker.dart';
+import 'package:gymtracker/view/utils/workout.dart';
 import 'package:gymtracker/view/utils/workout_done.dart';
 import 'package:gymtracker/view/workout.dart';
 
@@ -130,6 +132,7 @@ class WorkoutController extends GetxController with ServiceableController {
     });
   }
 
+  /// Writes the ongoing workout to the database so that we can restore it on app restart.
   void save() {
     if (Get.find<RoutinesController>().hasOngoingWorkout.isFalse) return;
     final stopwatchController = Get.find<StopwatchController>();
@@ -379,6 +382,19 @@ class WorkoutController extends GetxController with ServiceableController {
         );
     exercises.refresh();
     save();
+  }
+
+  void showEditNotesDialog() {
+    final controller = quillControllerFromText(infobox.value);
+    Go.toDialog(
+      () => GTRichTextEditDialog(
+        controller: controller,
+        onNotesChange: (text) {
+          infobox(text);
+          save();
+        },
+      ),
+    );
   }
 
   @override

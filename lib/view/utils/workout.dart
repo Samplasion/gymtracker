@@ -272,6 +272,7 @@ class GTRichTextEditDialog extends StatelessWidget {
         TextButton(
           onPressed: () {
             onNotesChange(controller.toEncoded());
+            Navigator.pop(context);
           },
           child: Text(MaterialLocalizations.of(context).okButtonLabel),
         ),

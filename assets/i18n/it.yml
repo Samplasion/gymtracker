@@ -664,6 +664,9 @@ me:
     sets:
       label: Serie
 
+richText:
+  highlight: Evidenzia
+
 errorView:
   shortTitle: Errore
   title: Oh cavolo!

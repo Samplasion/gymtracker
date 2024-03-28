@@ -664,6 +664,9 @@ me:
     sets:
       label: Sets
 
+richText:
+  highlight: Highlight
+
 errorView:
   shortTitle: Error
   title: Oh snap!

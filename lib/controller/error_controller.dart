@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 import 'package:gymtracker/utils/go.dart';
@@ -22,6 +20,11 @@ class ErrorController extends GetxController {
   }
 
   void sendDetails(FlutterErrorDetails details) {
+    // Ignore errors that are not from the app
+    if (details.stack != null &&
+        !details.stack!.toString().contains('package:gymtracker')) {
+      return;
+    }
     Go.to(() => ErrorView(details: details));
   }
 

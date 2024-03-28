@@ -4,7 +4,7 @@ import 'package:get/get.dart';
 import 'package:gymtracker/data/rich_text.dart';
 import 'package:gymtracker/service/localizations.dart';
 
-class GTRichTextEditor extends StatelessWidget {
+class GTRichTextEditor extends StatefulWidget {
   const GTRichTextEditor({
     super.key,
     required this.infoboxController,
@@ -19,7 +19,32 @@ class GTRichTextEditor extends StatelessWidget {
   final bool autofocus;
 
   @override
+  State<GTRichTextEditor> createState() => _GTRichTextEditorState();
+}
+
+class _GTRichTextEditorState extends State<GTRichTextEditor> {
+  final FocusNode _focusNode = FocusNode();
+
+  @override
+  void initState() {
+    super.initState();
+    _focusNode.addListener(_onFocusChange);
+  }
+
+  @override
+  void dispose() {
+    _focusNode.removeListener(_onFocusChange);
+    _focusNode.dispose();
+    super.dispose();
+  }
+
+  _onFocusChange() {
+    setState(() {});
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final shouldShowToolbar = _focusNode.hasPrimaryFocus;
     return InputDecorator(
       decoration: InputDecoration(
         isDense: true,
@@ -30,60 +55,10 @@ class GTRichTextEditor extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          QuillToolbar.simple(
-            configurations: QuillSimpleToolbarConfigurations(
-              showDividers: false,
-              showFontFamily: false,
-              showSearchButton: false,
-              showCodeBlock: false,
-              showIndent: false,
-              showInlineCode: false,
-              showHeaderStyle: false,
-              showBackgroundColorButton: false,
-              showColorButton: false,
-              showFontSize: false,
-              toolbarIconAlignment: WrapAlignment.start,
-              showSuperscript: false,
-              showSubscript: false,
-              toolbarSectionSpacing: 0,
-              controller: infoboxController,
-              sharedConfigurations: QuillSharedConfigurations(
-                locale: Get.locale!,
-              ),
-              customButtons: [
-                QuillToolbarCustomButtonOptions(
-                  // TODO: Figure out how to make this appear on when the text is highlighted
-                  icon: const Icon(Icons.highlight_rounded),
-                  tooltip: "richText.highlight".t,
-                  onPressed: () {
-                    // If the selection is already highlighted, remove the highlight
-                    final attr = infoboxController.getSelectionStyle();
-                    final isHighlighted =
-                        attr.containsKey(highlightAttribute.key);
-                    if (isHighlighted) {
-                      infoboxController.selectStyle(
-                        highlightAttribute,
-                        false,
-                      );
-                      infoboxController.formatSelection(
-                        Attribute.clone(highlightAttribute, null),
-                      );
-                    } else {
-                      infoboxController.selectStyle(
-                        highlightAttribute,
-                        true,
-                      );
-                      infoboxController.formatSelection(highlightAttribute);
-                    }
-                  },
-                )
-              ],
-            ),
-          ),
-          const Divider(),
           QuillEditor.basic(
+            focusNode: _focusNode,
             configurations: QuillEditorConfigurations(
-              controller: infoboxController,
+              controller: widget.infoboxController,
               readOnly: false,
               sharedConfigurations: QuillSharedConfigurations(
                 locale: Get.locale!,
@@ -94,9 +69,9 @@ class GTRichTextEditor extends StatelessWidget {
               scrollable: true,
               expands: false,
               isOnTapOutsideEnabled: true,
-              autoFocus: autofocus,
+              autoFocus: widget.autofocus,
               onTapOutside: (_, __) {
-                onTapOutside?.call();
+                widget.onTapOutside?.call();
               },
               customStyleBuilder: (attr) {
                 if (attr.key == highlightAttribute.key) {
@@ -106,6 +81,60 @@ class GTRichTextEditor extends StatelessWidget {
               },
             ),
           ),
+          if (shouldShowToolbar) ...[
+            const Divider(),
+            QuillToolbar.simple(
+              configurations: QuillSimpleToolbarConfigurations(
+                showDividers: false,
+                showFontFamily: false,
+                showSearchButton: false,
+                showCodeBlock: false,
+                showIndent: false,
+                showInlineCode: false,
+                showHeaderStyle: false,
+                showBackgroundColorButton: false,
+                showColorButton: false,
+                showFontSize: false,
+                toolbarIconAlignment: WrapAlignment.start,
+                showSuperscript: false,
+                showSubscript: false,
+                toolbarSectionSpacing: 0,
+                controller: widget.infoboxController,
+                sharedConfigurations: QuillSharedConfigurations(
+                  locale: Get.locale!,
+                ),
+                customButtons: [
+                  QuillToolbarCustomButtonOptions(
+                    // TODO: Figure out how to make this appear on when the text is highlighted
+                    icon: const Icon(Icons.highlight_rounded),
+                    tooltip: "richText.highlight".t,
+                    onPressed: () {
+                      // If the selection is already highlighted, remove the highlight
+                      final attr = widget.infoboxController.getSelectionStyle();
+                      final isHighlighted =
+                          attr.containsKey(highlightAttribute.key);
+                      if (isHighlighted) {
+                        widget.infoboxController.selectStyle(
+                          highlightAttribute,
+                          false,
+                        );
+                        widget.infoboxController.formatSelection(
+                          Attribute.clone(highlightAttribute, null),
+                        );
+                      } else {
+                        widget.infoboxController.selectStyle(
+                          highlightAttribute,
+                          true,
+                        );
+                        widget.infoboxController
+                            .formatSelection(highlightAttribute);
+                      }
+                    },
+                  )
+                ],
+              ),
+            ),
+          ],
         ],
       ),
     );

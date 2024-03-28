@@ -252,31 +252,31 @@ class GTRichTextEditDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return AlertDialog(
-      contentPadding: const EdgeInsets.all(24),
-      title: Text('exercise.editor.fields.notes.label'.t),
-      content: GTRichTextEditor(
-        infoboxController: controller,
-        autofocus: true,
-        decoration: InputDecoration(
-          border: const OutlineInputBorder(),
-          labelText: "exercise.editor.fields.notes.label".t,
+    return Dialog.fullscreen(
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text('exercise.editor.fields.notes.label'.t),
+          actions: [
+            IconButton(
+              onPressed: () {
+                onNotesChange(controller.document.toEncoded());
+              },
+              icon: const Icon(Icons.done_rounded),
+            ),
+          ],
+        ),
+        body: Padding(
+          padding: const EdgeInsets.all(24),
+          child: GTRichTextEditor(
+            infoboxController: controller,
+            autofocus: true,
+            decoration: InputDecoration(
+              border: const OutlineInputBorder(),
+              labelText: "exercise.editor.fields.notes.label".t,
+            ),
+          ),
         ),
       ),
-      scrollable: true,
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(context),
-          child: Text(MaterialLocalizations.of(context).cancelButtonLabel),
-        ),
-        TextButton(
-          onPressed: () {
-            onNotesChange(controller.toEncoded());
-            Navigator.pop(context);
-          },
-          child: Text(MaterialLocalizations.of(context).okButtonLabel),
-        ),
-      ],
     );
   }
 }

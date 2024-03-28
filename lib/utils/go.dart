@@ -21,6 +21,11 @@ class Go {
     return to<T>(page);
   }
 
+  static Future<T?> replace<T>(Widget Function() page) async {
+    Navigator.of(Get.context!).popUntil((route) => route.isFirst);
+    return off<T>(page);
+  }
+
   static Future snack(String text, {SnackBarAction? action}) async {
     final snackBar = SnackBar(
       content: Text(text),

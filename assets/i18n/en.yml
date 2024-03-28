@@ -663,3 +663,15 @@ me:
       label: Distance ran
     sets:
       label: Sets
+
+errorView:
+  shortTitle: Error
+  title: Oh snap!
+  subtitle: An unexpected error occurred.
+  body: |
+    You can try the following:
+
+     • Restart the app
+     • Check if you are using the latest version
+     • Contact support
+  stack: "If the error persists, please provide the following information to the support team:"

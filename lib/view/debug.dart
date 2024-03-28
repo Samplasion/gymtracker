@@ -127,6 +127,19 @@ class _DebugViewState extends State<DebugView> {
                 ),
                 onUpdate: (v) => controller.setShowSimulator(v ?? false),
               ),
+              ListTile(
+                title: const Text("CRASH!"),
+                onTap: () {
+                  throw Exception("Crash!");
+                },
+              ),
+              ListTile(
+                title: const Text("CRASH (MethodChannel)!"),
+                onTap: () async {
+                  const channel = MethodChannel('crashy-custom-channel');
+                  await channel.invokeMethod('blah');
+                },
+              ),
 
               // ------------
               ListTile(

@@ -1,6 +1,7 @@
 import 'package:get/get.dart';
 import 'package:gymtracker/controller/countdown_controller.dart';
 import 'package:gymtracker/controller/debug_controller.dart';
+import 'package:gymtracker/controller/error_controller.dart';
 import 'package:gymtracker/controller/exercises_controller.dart';
 import 'package:gymtracker/controller/history_controller.dart';
 import 'package:gymtracker/controller/me_controller.dart';
@@ -27,6 +28,7 @@ class Coordinator extends GetxController with ServiceableController {
     Get.put(StopwatchController());
     Get.put(MeController());
     Get.put(SettingsController());
+    Get.put(ErrorController(), permanent: true);
   }
 
   bool hasExercise(Exercise exercise) {

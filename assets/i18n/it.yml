@@ -663,3 +663,15 @@ me:
       label: Distanza percorsa
     sets:
       label: Serie
+
+errorView:
+  shortTitle: Errore
+  title: Oh cavolo!
+  subtitle: Qualcosa è andato storto.
+  body: |
+    Se il problema persiste, prova a:
+
+     • Riavviare l'app
+     • Assicurarti di avere l'ultima versione dell'app
+     • Contattare il supporto
+  stack: "Se il problema persiste, per favore fornisci le seguenti informazioni al supporto:"

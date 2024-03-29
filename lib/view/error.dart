@@ -6,20 +6,14 @@ import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/utils/extensions.dart';
 
 class ErrorView extends GetWidget<ErrorController> {
-  final FlutterErrorDetails? details;
-  final Object? error;
-  final StackTrace? stack;
+  static const routeName = "/error";
 
-  ErrorView({this.details, this.error, this.stack, super.key})
-      : assert(() {
-          if (details == null && error == null) {
-            throw ArgumentError("Either details or error must be provided");
-          }
-          return true;
-        }());
+  const ErrorView({super.key});
 
   @override
   Widget build(BuildContext context) {
+    ErrorViewArguments args =
+        ModalRoute.of(context)!.settings.arguments as ErrorViewArguments;
     return Scaffold(
       appBar: AppBar(
         title: Text("errorView.shortTitle".t),
@@ -49,6 +43,13 @@ class ErrorView extends GetWidget<ErrorController> {
                 },
                 child: const Text("Back"),
               ),
+              const SizedBox(height: 16),
+              FilledButton(
+                onPressed: () {
+                  [][0];
+                },
+                child: const Text("Crash again!"),
+              ),
             ],
             const SizedBox(height: 16),
             Text(
@@ -56,9 +57,9 @@ class ErrorView extends GetWidget<ErrorController> {
               style: Get.textTheme.bodyMedium,
             ),
             const SizedBox(height: 16),
-            if (details != null) ...[
+            if (args.details != null) ...[
               Text(
-                details!.exceptionAsString(),
+                args.details!.exceptionAsString(),
                 style: TextStyle(
                   color: context.colorScheme.onSurfaceVariant,
                   fontFamily: "monospace",
@@ -67,7 +68,7 @@ class ErrorView extends GetWidget<ErrorController> {
               ),
               const SizedBox(height: 16),
               Text(
-                details!.stack.toString(),
+                args.details!.stack.toString(),
                 style: TextStyle(
                   color: context.colorScheme.onSurfaceVariant,
                   fontFamily: "monospace",
@@ -76,7 +77,7 @@ class ErrorView extends GetWidget<ErrorController> {
               ),
             ] else
               Text(
-                error.toString(),
+                args.error.toString(),
                 style: TextStyle(
                   color: context.colorScheme.onSurfaceVariant,
                   fontFamily: "monospace",
@@ -88,4 +89,18 @@ class ErrorView extends GetWidget<ErrorController> {
       ),
     );
   }
+}
+
+class ErrorViewArguments {
+  final FlutterErrorDetails? details;
+  final Object? error;
+  final StackTrace? stack;
+
+  ErrorViewArguments({this.details, this.error, this.stack})
+      : assert(() {
+          if (details == null && error == null) {
+            throw ArgumentError("Either details or error must be provided");
+          }
+          return true;
+        }());
 }

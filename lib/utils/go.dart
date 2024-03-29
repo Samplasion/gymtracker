@@ -6,12 +6,29 @@ import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 class Go {
   static Navigator get navigator => Get.find<Navigator>();
 
+  /// Returns the name of the topmost route in the navigator stack.
+  ///
+  /// This is a workaround for the fact that [Navigator] does not have a method
+  /// to get the topmost route name. Please use this method with caution.
+  static String? getTopmostRouteName() {
+    String? top;
+    Navigator.popUntil(Get.context!, (route) {
+      top = route.settings.name;
+      return true;
+    });
+    return top;
+  }
+
   static Future<T?> to<T>(Widget Function() page) async {
     return Navigator.of(Get.context!).push<T>(
       MaterialWithModalsPageRoute(
         builder: (context) => page(),
       ),
     );
+  }
+
+  static Future<T?> toNamed<T>(String route, {Object? arguments}) async {
+    return Navigator.of(Get.context!).pushNamed<T>(route, arguments: arguments);
   }
 
   static Future<T?> toDialog<T>(Widget Function() page) async {
@@ -23,7 +40,7 @@ class Go {
     return to<T>(page);
   }
 
-  static Future<T?> replace<T>(Widget Function() page) async {
+  static Future<T?> replaceStack<T>(Widget Function() page) async {
     Navigator.of(Get.context!).popUntil((route) => route.isFirst);
     return off<T>(page);
   }

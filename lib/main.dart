@@ -20,6 +20,7 @@ import 'package:gymtracker/service/version.dart';
 import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/utils/theme.dart';
+import 'package:gymtracker/view/error.dart';
 import 'package:gymtracker/view/skeleton.dart';
 import 'package:protocol_handler/protocol_handler.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
@@ -133,6 +134,9 @@ class MainApp extends StatelessWidget {
                           pageTransitionsTheme: pageTransitionsTheme,
                         ),
                         home: const _Loader(),
+                        routes: {
+                          ErrorView.routeName: (context) => const ErrorView(),
+                        },
                         debugShowCheckedModeBanner: false,
                         builder: (context, child) =>
                             AnnotatedRegion<SystemUiOverlayStyle>(

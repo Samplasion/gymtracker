@@ -13,12 +13,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # Build the app before running the integration tests
-      # This is apparently necessary for the integration tests to work
-      # without timing out
-      - name: Build
-        run: flutter build macos
-
       - uses: subosito/flutter-action@v2
         with:
           flutter-version: "3.19.4"
@@ -26,4 +20,11 @@ jobs:
           cache: true
 
       - run: flutter pub get
+
+      # Build the app before running the integration tests
+      # This is apparently necessary for the integration tests to work
+      # without timing out
+      - name: Build
+        run: flutter build macos
+
       - run: flutter test integration_test -d macos

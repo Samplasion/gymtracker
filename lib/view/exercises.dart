@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:get/get.dart';
 import 'package:gymtracker/controller/coordinator.dart';
-import 'package:gymtracker/controller/exercises_controller.dart';
 import 'package:gymtracker/controller/history_controller.dart';
 import 'package:gymtracker/controller/history_controller.dart' as history;
 import 'package:gymtracker/controller/routines_controller.dart';
@@ -28,7 +27,6 @@ import 'package:gymtracker/view/components/infobox.dart';
 import 'package:gymtracker/view/components/maybe_rich_text.dart';
 import 'package:gymtracker/view/components/parent_viewer.dart';
 import 'package:gymtracker/view/components/stats.dart';
-import 'package:gymtracker/view/library.dart';
 import 'package:gymtracker/view/routine_creator.dart';
 import 'package:gymtracker/view/utils/exercise.dart';
 import 'package:gymtracker/view/utils/timer.dart';
@@ -624,15 +622,14 @@ class ExerciseSetView extends StatelessWidget {
       padding: const EdgeInsets.all(8),
       child: Row(
         children: [
-          PopupMenuButton(
+          IconButton(
             icon: buildSetType(
               context,
               set.kind,
               set: set,
               allSets: exercise.sets,
             ),
-            itemBuilder: (context) => <PopupMenuEntry<SetKind>>[],
-            enabled: false,
+            onPressed: null,
           ),
           const SizedBox(width: 8),
           for (int i = 0; i < fields.length; i++) ...[

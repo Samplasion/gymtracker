@@ -479,19 +479,22 @@ class RoutinesController extends GetxController
     Go.to(
       () => Scaffold(
         appBar: AppBar(title: Text("routines.actions.viewHistory".t)),
-        body: ListView.builder(
-          padding: const EdgeInsets.symmetric(vertical: 8),
-          itemCount: history.length,
-          itemBuilder: (context, index) {
-            final workout = history[index];
-            return HistoryWorkout(
-              workout: workout,
-              showExercises: workout.exercises.length,
-              onTap: () {
-                Go.to(() => ExercisesView(workout: workout));
-              },
-            );
-          },
+        body: Scrollbar(
+          child: ListView.builder(
+            padding: const EdgeInsets.symmetric(vertical: 8) +
+                MediaQuery.of(Get.context!).padding.copyWith(top: 0),
+            itemCount: history.length,
+            itemBuilder: (context, index) {
+              final workout = history[index];
+              return HistoryWorkout(
+                workout: workout,
+                showExercises: workout.exercises.length,
+                onTap: () {
+                  Go.to(() => ExercisesView(workout: workout));
+                },
+              );
+            },
+          ),
         ),
       ),
     );

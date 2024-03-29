@@ -243,8 +243,7 @@ class _ExercisesViewState extends State<ExercisesView> {
                 ),
               ),
             ),
-            if (!workout.isConcrete &&
-                controller.getChildren(workout).length >= 2)
+            if (RoutineHistoryChart.shouldShow(workout))
               SliverToBoxAdapter(
                 child: Padding(
                   padding: const EdgeInsets.all(16),

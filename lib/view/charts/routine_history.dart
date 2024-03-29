@@ -1,6 +1,7 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:gymtracker/controller/routines_controller.dart';
 import 'package:gymtracker/controller/settings_controller.dart';
 import 'package:gymtracker/data/weights.dart';
@@ -23,6 +24,11 @@ class RoutineHistoryChart extends StatefulWidget {
 
   @override
   State<RoutineHistoryChart> createState() => _RoutineHistoryChartState();
+
+  static shouldShow(Workout workout) {
+    final controller = Get.find<RoutinesController>();
+    return !workout.isConcrete && controller.getChildren(workout).length >= 2;
+  }
 }
 
 enum _RoutineHistoryChartType {
@@ -35,14 +41,44 @@ class _RoutineHistoryChartState
     extends ControlledState<RoutineHistoryChart, RoutinesController> {
   List<Workout> get children => controller.getChildren(widget.routine);
 
-  _RoutineHistoryChartType type = _RoutineHistoryChartType.volume;
-
   late int selectedIndex = children.length - 1;
 
   late final dateRecognizer = TapGestureRecognizer()
     ..onTap = () {
       Go.to(() => ExercisesView(workout: children[selectedIndex]));
     };
+
+  late _RoutineHistoryChartType type = availableTypes.first;
+  late final Set<_RoutineHistoryChartType> availableTypes = () {
+    final types = <_RoutineHistoryChartType>{};
+    final values = <_RoutineHistoryChartType, List<double>>{
+      _RoutineHistoryChartType.volume: [],
+      _RoutineHistoryChartType.reps: [],
+      _RoutineHistoryChartType.duration: [],
+    };
+
+    for (final wo in children) {
+      values[_RoutineHistoryChartType.volume]!.add(Weights.convert(
+        value: wo.liftedWeight,
+        from: wo.weightUnit,
+        to: settingsController.weightUnit.value!,
+      ));
+      values[_RoutineHistoryChartType.reps]!.add(wo.reps.toDouble());
+      values[_RoutineHistoryChartType.duration]!
+          .add(wo.duration!.inSeconds.toDouble());
+    }
+
+    if (values[_RoutineHistoryChartType.volume]!.any((v) => v != 0)) {
+      types.add(_RoutineHistoryChartType.volume);
+    }
+    if (values[_RoutineHistoryChartType.reps]!.any((v) => v != 0)) {
+      types.add(_RoutineHistoryChartType.reps);
+    }
+
+    types.add(_RoutineHistoryChartType.duration);
+
+    return types;
+  }();
 
   @override
   void dispose() {
@@ -254,7 +290,7 @@ class _RoutineHistoryChartState
               spacing: 8,
               runSpacing: 8,
               children: [
-                for (final type in _RoutineHistoryChartType.values)
+                for (final type in availableTypes)
                   ChoiceChip(
                     label: Text("exercise.chart.views.${type.name}".t),
                     avatar: CircleAvatar(

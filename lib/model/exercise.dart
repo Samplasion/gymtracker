@@ -162,7 +162,7 @@ class Exercise extends WorkoutExercisable {
   /// Returns true if [other] is a child of [this]
   bool isParentOf(Exercise other) => other.parentID == id;
 
-  /// This function already calls [makeSibling] or [makeChild] internally.
+  /// This function already calls [makeSibling] internally.
   Exercise instantiate({
     required Workout workout,
     bool Function(ExSet set)? setFilter = _defaultSetFilter,

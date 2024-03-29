@@ -8,6 +8,7 @@ import 'package:gymtracker/model/set.dart';
 import 'package:gymtracker/model/workout.dart';
 import 'package:gymtracker/service/database.dart';
 import 'package:gymtracker/service/localizations.dart';
+import 'package:gymtracker/service/logger.dart';
 import 'package:gymtracker/view/utils/exercise.dart';
 
 void expectExercise(Exercise result, Exercise expected) {
@@ -77,8 +78,11 @@ Future<void> testEditExerciseInRoutineAndHistoryFlow(
     startingDate: DateTime.now(),
   );
   expect(workout.isConcrete, true);
-  workout.exercises.add(baseExercise.instantiate(workout: workout.toRoutine()));
-  print(workout.exercises.single);
+  // Simulate picking the exercise
+  workout.exercises.add(
+    baseExercise.makeChild().instantiate(workout: workout.toRoutine()),
+  );
+  globalLogger.d(workout.exercises.single);
   expect(workout.exercises.single.id != baseExercise.id, true);
   expect((workout.exercises.single as Exercise).parentID, baseExercise.id);
   databaseService.setHistoryWorkout(workout);

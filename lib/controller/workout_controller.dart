@@ -41,7 +41,13 @@ class WorkoutController extends GetxController with ServiceableController {
         infobox = Rx<String?>(infobox),
         weightUnit =
             (Get.find<SettingsController>().weightUnit() ?? Weights.kg).obs,
-        distanceUnit = (Get.find<SettingsController>().distanceUnit()).obs;
+        distanceUnit = (Get.find<SettingsController>().distanceUnit()).obs {
+    logger.w(
+      "Created with name $name, parentID $parentID, and infobox $infobox",
+      error: Error(),
+      stackTrace: StackTrace.current,
+    );
+  }
 
   factory WorkoutController.fromSavedData(Map<String, dynamic> data) {
     final cont =

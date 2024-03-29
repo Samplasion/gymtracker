@@ -293,7 +293,8 @@ class _WorkoutViewState extends State<WorkoutView> {
       body: SafeArea(
         child: Obx(
           () {
-            if (Workout.shouldShowAsInfobox(controller.infobox())) {
+            if (safeController != null &&
+                Workout.shouldShowAsInfobox(safeController!.infobox())) {
               return _buildListView();
             }
             return CustomMaterialIndicator(

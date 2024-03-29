@@ -6,6 +6,7 @@ import 'package:gymtracker/data/exercises.dart';
 import 'package:gymtracker/model/exercise.dart';
 import 'package:gymtracker/model/set.dart';
 import 'package:gymtracker/model/workout.dart';
+import 'package:gymtracker/service/logger.dart';
 import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/view/exercise_creator.dart';
 import 'package:gymtracker/view/library.dart';
@@ -92,7 +93,7 @@ class ExercisesController extends GetxController with ServiceableController {
               shouldChangeParameters: history.isEmpty,
             ));
     final isInUse = Get.find<Coordinator>().hasExercise(exercise);
-    print(("IS IN USE", isInUse));
+    logger.d(("IS IN USE", isInUse));
     if (ex != null) {
       assert(ex.id == exercise.id);
       Get.find<ExercisesController>().saveEdit(ex);

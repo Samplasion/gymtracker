@@ -8,6 +8,7 @@ import 'package:gymtracker/model/exercise.dart';
 import 'package:gymtracker/model/superset.dart';
 import 'package:gymtracker/model/workout.dart';
 import 'package:gymtracker/service/localizations.dart';
+import 'package:gymtracker/service/logger.dart';
 import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/view/workout_editor.dart';
 
@@ -46,7 +47,7 @@ class HistoryController extends GetxController with ServiceableController {
 
   // TODO: Localize the first day-of-week for streak weeks computation
   void _computeStreaks() {
-    printInfo(info: "Recomputed streaks");
+    logger.t("Recomputed streaks");
 
     var (streak, rest) = (0, 0);
 
@@ -104,16 +105,16 @@ class HistoryController extends GetxController with ServiceableController {
   }
 
   Workout fixWorkout(Workout workout) {
-    workout.id.printInfo(info: "Fixing workout");
+    workout.id.logger.i("Fixing workout");
     if (workout.parentID == null) {
-      workout.id.printInfo(info: "No parent ID");
+      workout.id.logger.w("No parent ID");
       return workout;
     }
     final parent = service.routines.firstWhereOrNull(
       (element) => element.id == workout.parentID,
     );
     if (parent == null) {
-      workout.id.printInfo(info: "Parent not found");
+      workout.id.logger.w("Parent not found");
       return workout;
     }
 
@@ -121,7 +122,7 @@ class HistoryController extends GetxController with ServiceableController {
     for (final exercise in workout.exercises) {
       Exercise getFixedExercise(Exercise exercise) {
         if (exercise.isCustom) {
-          workout.id.printInfo(info: "Custom exercise found");
+          workout.id.logger.i("Custom exercise found");
           return exercise;
         }
 
@@ -131,7 +132,7 @@ class HistoryController extends GetxController with ServiceableController {
           (element) => element is Exercise && element.id == exercise.parentID,
         );
         if (standard == null) {
-          workout.id.printInfo(info: "Standard exercise not found");
+          workout.id.logger.i("Standard exercise not found");
           return exercise;
         }
 

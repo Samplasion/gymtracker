@@ -13,6 +13,7 @@ import 'package:gymtracker/adapters/workout.dart';
 import 'package:gymtracker/model/exercise.dart';
 import 'package:gymtracker/model/measurements.dart';
 import 'package:gymtracker/model/workout.dart';
+import 'package:gymtracker/service/logger.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:path_provider/path_provider.dart';
 
@@ -54,7 +55,7 @@ class DatabaseService extends GetxService with ChangeNotifier {
     await Hive.initFlutter();
     if (kDebugMode) {
       final appDir = await getApplicationDocumentsDirectory();
-      print("Loaded Hive in $appDir");
+      logger.i("Loaded Hive in $appDir");
     }
 
     return _ensureInitialized();
@@ -90,7 +91,7 @@ class DatabaseService extends GetxService with ChangeNotifier {
 
   @visibleForTesting
   Future teardown() async {
-    debugPrint("!!! Tearing down");
+    logger.t("!!! Tearing down");
     await exerciseBox.clear();
     await routinesBox.clear();
     await historyBox.clear();
@@ -102,14 +103,14 @@ class DatabaseService extends GetxService with ChangeNotifier {
 
   void Function() onServiceChange(String service) {
     return () {
-      printInfo(info: "$service service updated");
+      logger.d("$service service updated");
     };
   }
 
   @override
   notifyListeners() {
     super.notifyListeners();
-    printInfo(info: "Notified listeners");
+    logger.d("Notified listeners");
   }
 
   List<Exercise> get exercises {
@@ -283,7 +284,8 @@ class DatabaseService extends GetxService with ChangeNotifier {
   }
 
   void writeToOngoing(Map<String, dynamic> data) {
-    printInfo(info: "Requested write of ongoing workout data: $data");
+    logger.i("Requested write of ongoing workout data");
+    logger.d("Ongoing data: ${jsonEncode(data)}");
     ongoingBox.put("data", jsonEncode(data));
   }
 
@@ -293,7 +295,7 @@ class DatabaseService extends GetxService with ChangeNotifier {
   }
 
   void deleteOngoing() {
-    printInfo(info: "Requested deletion of ongoing workout data");
+    logger.i("Requested deletion of ongoing workout data");
     ongoingBox.delete("data");
   }
 

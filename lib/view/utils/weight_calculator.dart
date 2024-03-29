@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:gymtracker/data/weights.dart';
 import 'package:gymtracker/service/localizations.dart';
+import 'package:gymtracker/service/logger.dart';
 import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/utils/utils.dart';
 
@@ -311,7 +312,7 @@ List<double> calculateBarbellWeights(double weight,
   final sortedWeights = [...weights]..sort((a, b) => b.compareTo(a));
 
   for (final weight in sortedWeights) {
-    // print("$perSide >= $weight");
+    globalLogger.d("[calculateBarbellWeights] $perSide >= $weight");
     if (perSide >= weight) {
       final count = perSide ~/ weight;
       for (var i = 0; i < count; i++) {

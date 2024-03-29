@@ -15,6 +15,7 @@ import 'package:gymtracker/model/set.dart';
 import 'package:gymtracker/model/superset.dart';
 import 'package:gymtracker/model/workout.dart';
 import 'package:gymtracker/service/localizations.dart';
+import 'package:gymtracker/service/logger.dart';
 import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/utils/utils.dart' as utils;
@@ -53,7 +54,7 @@ class RoutinesController extends GetxController
   }
 
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    printInfo(info: "Change lifecycle state callback received (state: $state)");
+    logger.t("Change lifecycle state callback received (state: ${state.name})");
     if (hasOngoingWorkout()) {
       switch (state) {
         case AppLifecycleState.inactive:
@@ -305,7 +306,7 @@ class RoutinesController extends GetxController
   @override
   onProtocolUrlReceived(String url) {
     final Uri parsed = Uri.parse(url);
-    debugPrint('Url received: $parsed');
+    logger.d('Url received: $parsed');
 
     switch (parsed.host) {
       case "routine":
@@ -327,8 +328,8 @@ class RoutinesController extends GetxController
     late dynamic json;
     try {
       json = jsonDecode("${parsed.queryParameters['json']}".uncompressed);
-    } catch (e) {
-      printError(info: "$e");
+    } catch (e, s) {
+      logger.e("$e", error: e, stackTrace: s);
       Go.dialog(
         "importRoutine.errors.badJson.title".t,
         "importRoutine.errors.badJson.body".t,
@@ -339,8 +340,8 @@ class RoutinesController extends GetxController
     late Workout workout;
     try {
       workout = Workout.fromJson(json);
-    } catch (e) {
-      printError(info: "$e");
+    } catch (e, s) {
+      logger.e("$e", error: e, stackTrace: s);
       Go.dialog(
         "importRoutine.errors.badWorkout.title".t,
         "importRoutine.errors.badWorkout.body".t,

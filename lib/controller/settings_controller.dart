@@ -10,6 +10,7 @@ import 'package:gymtracker/controller/serviceable_controller.dart';
 import 'package:gymtracker/data/distance.dart';
 import 'package:gymtracker/data/weights.dart';
 import 'package:gymtracker/service/localizations.dart';
+import 'package:gymtracker/service/logger.dart';
 import 'package:gymtracker/utils/go.dart';
 import 'package:share_plus/share_plus.dart';
 
@@ -63,7 +64,6 @@ class SettingsController extends GetxController with ServiceableController {
 
   Future exportSettings(BuildContext context) async {
     final box = context.findRenderObject() as RenderBox?;
-    // printInfo(info: service.toJson());
     await Share.shareXFiles(
       [
         XFile.fromData(
@@ -95,8 +95,8 @@ class SettingsController extends GetxController with ServiceableController {
 
         service.fromJson(map);
         Go.snack("settings.options.import.success".t);
-      } catch (e) {
-        e.printError();
+      } catch (e, s) {
+        logger.e("", error: e, stackTrace: s);
 
         String errorString = e.toString();
         if (e is Error) {
@@ -118,7 +118,7 @@ class SettingsController extends GetxController with ServiceableController {
       }
     } else {
       // User canceled the picker
-      printInfo(info: "Picker canceled");
+      logger.i("Picker canceled");
     }
   }
 }

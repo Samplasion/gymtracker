@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:gymtracker/controller/debug_controller.dart';
+import 'package:gymtracker/service/logger.dart';
 import 'package:intl/intl.dart';
 import 'package:yaml/yaml.dart';
 
@@ -58,7 +59,7 @@ class GTLocalizations extends Translations with ChangeNotifier {
     super.notifyListeners();
     Get.delete<GTLocalizations>();
     Get.put(this);
-    printInfo(info: "notified listeners");
+    logger.i("notified listeners");
   }
 }
 

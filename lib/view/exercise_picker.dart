@@ -4,6 +4,7 @@ import 'package:gymtracker/controller/exercises_controller.dart';
 import 'package:gymtracker/data/exercises.dart';
 import 'package:gymtracker/model/exercise.dart';
 import 'package:gymtracker/service/localizations.dart';
+import 'package:gymtracker/service/logger.dart';
 import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/utils/utils.dart';
 import 'package:gymtracker/view/exercise_creator.dart';
@@ -80,7 +81,7 @@ class _ExercisePickerState extends State<ExercisePicker> {
                               onSelected: (exercise) {
                                 final isSelected =
                                     selectedExercises.contains(exercise);
-                                isSelected.printInfo(info: "outer picker");
+                                isSelected.logger.d("outer picker");
                                 setState(() {
                                   if (isSelected) {
                                     selectedExercises.remove(exercise);

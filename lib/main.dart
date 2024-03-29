@@ -15,6 +15,7 @@ import 'package:gymtracker/controller/settings_controller.dart';
 import 'package:gymtracker/service/color.dart';
 import 'package:gymtracker/service/database.dart';
 import 'package:gymtracker/service/localizations.dart';
+import 'package:gymtracker/service/logger.dart';
 import 'package:gymtracker/service/version.dart';
 import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/utils/go.dart';
@@ -75,7 +76,6 @@ class MainApp extends StatelessWidget {
               return Container(
                 child: () {
                   final seedColor = settings.color();
-                  (seedColor, settings.usesDynamicColor()).printInfo();
                   final lightScheme =
                       (light != null && settings.usesDynamicColor())
                           ? light.harmonized()
@@ -110,7 +110,7 @@ class MainApp extends StatelessWidget {
                         }(),
                         translations: localizations,
                         locale: () {
-                          printInfo(info: "${settings.locale.value}");
+                          logger.d("Locale: ${settings.locale.value}");
                           return settings.locale.value;
                         }(),
                         supportedLocales: GTLocalizations.supportedLocales,

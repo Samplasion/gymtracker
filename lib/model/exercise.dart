@@ -6,6 +6,7 @@ import 'package:gymtracker/model/exercisable.dart';
 import 'package:gymtracker/model/set.dart';
 import 'package:gymtracker/model/workout.dart';
 import 'package:gymtracker/service/localizations.dart';
+import 'package:gymtracker/service/logger.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:uuid/uuid.dart';
 
@@ -189,8 +190,8 @@ class Exercise extends WorkoutExercisable {
     final child = clone()
       ..parentID = id
       ..regenerateID();
-    // debugPrint(
-    //     "Making child of [id: $id, pid: $parentID] with ID [id: ${child.id}, pid: ${child.parentID}]");
+    logger.t(
+        "Making child of [id: $id, pid: $parentID] with ID [id: ${child.id}, pid: ${child.parentID}]");
     return child;
   }
 
@@ -255,7 +256,7 @@ extension Display on Exercise {
     if (isCustom) return name;
     final candidate = parentID ?? id;
     if (candidate.existsAsTranslationKey) return candidate.t;
-    name.printError(info: "No translation found");
+    name.logger.e("No translation found");
     return name;
   }
 }

@@ -11,11 +11,14 @@ import 'package:gymtracker/model/exercise.dart';
 import 'package:gymtracker/model/workout.dart';
 import 'package:gymtracker/service/database.dart';
 import 'package:gymtracker/service/localizations.dart';
+import 'package:gymtracker/service/logger.dart';
 import 'package:gymtracker/utils/go.dart';
+import 'package:gymtracker/view/settings/radio.dart';
 import 'package:gymtracker/view/utils/import_routine.dart';
 import 'package:gymtracker/view/utils/timer.dart';
 import 'package:hive/hive.dart';
 import 'package:hive_ui/hive_ui.dart';
+import 'package:logger/logger.dart' as logger_lib;
 
 class DebugView extends StatefulWidget {
   const DebugView({super.key});
@@ -52,7 +55,7 @@ class _DebugViewState extends State<DebugView> {
                     ),
                   ),
                   onTap: () {
-                    printInfo(info: "\n$missingKeys\n");
+                    logger.d("\n$missingKeys\n");
                     Clipboard.setData(ClipboardData(text: missingKeys));
                     Go.snack(
                         "The missing keys have been copied to the clipboard");
@@ -139,6 +142,18 @@ class _DebugViewState extends State<DebugView> {
                   const channel = MethodChannel('crashy-custom-channel');
                   await channel.invokeMethod('blah');
                 },
+              ),
+              ValueBuilder<logger_lib.Level?>(
+                initialValue: logger_lib.Logger.level,
+                builder: (val, onChange) => RadioModalTile<logger_lib.Level?>(
+                  title: const Text("Logger level"),
+                  onChange: onChange,
+                  values: {
+                    for (final lvl in logger_lib.Level.values) lvl: lvl.name,
+                  },
+                  selectedValue: val,
+                ),
+                onUpdate: (v) => logger_lib.Logger.level = v!,
               ),
 
               // ------------

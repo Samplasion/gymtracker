@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:gymtracker/controller/history_controller.dart';
 import 'package:gymtracker/model/workout.dart';
 import 'package:gymtracker/service/localizations.dart';
+import 'package:gymtracker/service/logger.dart';
 import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/view/exercises.dart';
 import 'package:gymtracker/view/me/calendar.dart';
@@ -62,13 +63,13 @@ class _HistoryViewState extends State<HistoryView> {
   @override
   void initState() {
     super.initState();
-    printInfo(info: "Init state");
+    logger.d("Init state");
     _recompute();
     final controller = Get.find<HistoryController>();
     worker = ever(
       controller.history,
       (callback) {
-        printInfo(info: "History updated");
+        logger.i("History updated");
         _recompute();
       },
     );
@@ -89,14 +90,14 @@ class _HistoryViewState extends State<HistoryView> {
       if (mounted) {
         setState(() {});
       }
-    } catch (e) {
-      printError(info: e.toString());
+    } catch (e, s) {
+      logger.e("Error computing history", error: e, stackTrace: s);
     }
   }
 
   @override
   void dispose() {
-    printInfo(info: "Dispose state");
+    logger.d("Dispose state");
     worker.dispose();
     super.dispose();
   }

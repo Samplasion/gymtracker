@@ -7,6 +7,7 @@ import 'package:gymtracker/controller/history_controller.dart';
 import 'package:gymtracker/controller/routines_controller.dart';
 import 'package:gymtracker/controller/workout_controller.dart';
 import 'package:gymtracker/service/localizations.dart';
+import 'package:gymtracker/service/logger.dart';
 import 'package:gymtracker/utils/constants.dart';
 import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/view/debug.dart';
@@ -54,7 +55,7 @@ class _SkeletonViewState extends State<SkeletonView>
   @override
   void reassemble() {
     super.reassemble();
-    printInfo(info: "[#reassemble()] called");
+    logger.i("[#reassemble()] called");
     Get.find<GTLocalizations>().init();
   }
 

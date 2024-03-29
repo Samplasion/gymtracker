@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gymtracker/controller/exercises_controller.dart';
 import 'package:gymtracker/model/exercise.dart';
+import 'package:gymtracker/service/logger.dart';
 import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/view/library.dart';
 
@@ -27,7 +28,7 @@ class ExerciseParentViewGesture extends StatelessWidget {
   void _onTap() {
     final parent = exercise.getParent();
     final enabled = this.enabled && parent != null;
-    debugPrint(
+    logger.t(
         "onTap: ${exercise.id}'s parent is ${exercise.parentID} ($parent) enabled: $enabled");
     if (enabled) {
       Go.to(() => ExerciseInfoView(exercise: parent));

@@ -10,6 +10,7 @@ import 'package:get/get.dart' hide ContextExtensionss;
 import 'package:gymtracker/controller/settings_controller.dart';
 import 'package:gymtracker/model/workout.dart';
 import 'package:gymtracker/service/localizations.dart';
+import 'package:gymtracker/service/logger.dart';
 import 'package:intl/intl.dart' hide TextDirection;
 
 extension StringUtils on String {
@@ -45,17 +46,16 @@ extension StringUtils on String {
   Document asQuillDocument() {
     final json = tryParseJson();
     if (json != null) {
-      debugPrint(
-          "[String#asQuillDocument] $json is not a null json; interpreting it as a delta");
+      logger.d(
+          "[String#asQuillDocument] not a null json; interpreting it as a delta");
       try {
         return Document.fromJson(json);
       } catch (_) {
-        debugPrint(
-            "[String#asQuillDocument] '$this' is not a valid delta; falling back to plaintext string");
+        logger.d(
+            "[String#asQuillDocument] not a valid delta; falling back to plaintext string");
       }
     } else {
-      debugPrint(
-          "[String#asQuillDocument] '$this' is not a json; creating delta");
+      logger.d("[String#asQuillDocument] not a json; creating delta");
     }
     return Document.fromDelta(Delta()..insert("${trim()}\n"));
   }

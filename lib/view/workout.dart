@@ -18,6 +18,7 @@ import 'package:gymtracker/model/set.dart';
 import 'package:gymtracker/model/superset.dart';
 import 'package:gymtracker/model/workout.dart';
 import 'package:gymtracker/service/localizations.dart';
+import 'package:gymtracker/service/logger.dart';
 import 'package:gymtracker/utils/constants.dart';
 import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/utils/go.dart';
@@ -774,8 +775,8 @@ class WorkoutTimerView extends StatelessWidget {
             startingTime: () {
               try {
                 return Get.find<WorkoutController>().time.value;
-              } catch (e) {
-                e.printError();
+              } catch (e, s) {
+                logger.e("Error getting workout time", error: e, stackTrace: s);
                 return DateTime.now();
               }
             }(),
@@ -805,8 +806,12 @@ class WorkoutTimerView extends StatelessWidget {
                         startingTime: () {
                           try {
                             return Get.find<WorkoutController>().time.value;
-                          } catch (e) {
-                            e.printError();
+                          } catch (e, s) {
+                            logger.e(
+                              "Error getting workout time",
+                              error: e,
+                              stackTrace: s,
+                            );
                             return DateTime.now();
                           }
                         }(),
@@ -994,7 +999,7 @@ class _WorkoutFinishPageState extends State<WorkoutFinishPage> {
                   alignLabelWithHint: true,
                 ),
                 onTapOutside: () {
-                  printInfo(info: "Quill Editor onTapOutside");
+                  logger.d("Quill Editor onTapOutside");
                   controller.infobox(jsonEncode(
                       infoboxController.document.toDelta().toJson()));
                 },

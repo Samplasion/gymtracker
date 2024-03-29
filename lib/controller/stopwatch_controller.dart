@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:get/get.dart';
 import 'package:gymtracker/controller/serviceable_controller.dart';
+import 'package:gymtracker/service/logger.dart';
 import 'package:gymtracker/struct/stopwatch_extended.dart';
 import 'package:gymtracker/view/utils/time.dart';
 
@@ -114,7 +115,7 @@ class StopwatchController extends GetxController with ServiceableController {
 
   @override
   void onServiceChange() {
-    printInfo(info: "Service changed");
+    logger.i("Service changed");
   }
 
   void addStopwatch(TimeFieldStopwatch stopwatch) {

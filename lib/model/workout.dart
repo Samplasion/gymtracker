@@ -125,6 +125,8 @@ class Workout {
         "Both workouts must be concrete or not concrete.");
     assert(!workout1.isContinuation);
     assert(!workout2.isContinuation);
+    assert(workout1.startingDate!.isBefore(workout2.startingDate!),
+        "Workout 1 must start before workout 2.");
 
     return Workout(
       name: workout1.name,

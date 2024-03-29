@@ -71,7 +71,7 @@ void main() {
         ),
       ],
       duration: const Duration(seconds: 60),
-      startingDate: DateTime.now(),
+      startingDate: DateTime.now().subtract(const Duration(minutes: 1)),
       parentID: null,
       infobox: 'Test Infobox',
       completedBy: null,
@@ -587,6 +587,76 @@ void main() {
           expectDouble(combined.exercises[1].sets[0].distance!, 16.09344);
         },
       );
+
+      test("asserts if the second workout comes before the first", () {
+        final workout2 = Workout(
+          id: "2",
+          name: 'Test Workout 2',
+          exercises: [],
+          duration: const Duration(seconds: 60),
+          startingDate: DateTime.now().subtract(const Duration(minutes: 10)),
+          parentID: null,
+          infobox: 'Test Infobox',
+          completedBy: null,
+          completes: null,
+        );
+
+        expect(() => Workout.combine(workout, workout2),
+            throwsA(isA<AssertionError>()));
+      });
+
+      test("asserts if any of the workouts is not concrete", () {
+        final workout2 = Workout(
+          id: "2",
+          name: 'Test Workout 2',
+          exercises: [],
+          startingDate: DateTime.now(),
+        );
+
+        expect(() => Workout.combine(workout, workout2),
+            throwsA(isA<AssertionError>()));
+        expect(
+            () => Workout.combine(
+                  workout2.copyWith(
+                    // Avoid previously tested assertion
+                    startingDate:
+                        DateTime.now().subtract(const Duration(minutes: 10)),
+                    duration: const Duration(seconds: 60),
+                  ),
+                  workout.copyWith.duration(null),
+                ),
+            throwsA(isA<AssertionError>()));
+      });
+
+      test("asserts if any of the workouts is a continuation", () {
+        final workout2 = Workout(
+          id: "2",
+          name: 'Test Workout 2',
+          exercises: [],
+          startingDate: DateTime.now(),
+          duration: const Duration(minutes: 1),
+        );
+
+        expect(
+            () => Workout.combine(
+                  workout,
+                  workout2.copyWith(
+                    completes: "fake id",
+                  ),
+                ),
+            throwsA(isA<AssertionError>()));
+        expect(
+            () => Workout.combine(
+                  workout2.copyWith(
+                    // Avoid previously tested assertion
+                    startingDate:
+                        DateTime.now().subtract(const Duration(minutes: 10)),
+                    completes: "fake id",
+                  ),
+                  workout.copyWith.completes("fake id"),
+                ),
+            throwsA(isA<AssertionError>()));
+      });
     });
   });
 }

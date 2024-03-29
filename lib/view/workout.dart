@@ -330,6 +330,7 @@ class _WorkoutViewState extends State<WorkoutView> {
   ListView _buildListView() {
     final countdownController = Get.find<CountdownController>();
     return ListView(
+      padding: const EdgeInsets.symmetric(vertical: 8),
       children: [
         if (Get.isRegistered<WorkoutController>() &&
             Workout.shouldShowAsInfobox(

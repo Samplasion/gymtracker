@@ -29,14 +29,16 @@ class GTRichTextEditDialog extends StatelessWidget {
             ),
           ],
         ),
-        body: Padding(
-          padding: const EdgeInsets.all(24),
-          child: GTRichTextEditor(
-            infoboxController: controller,
-            autofocus: true,
-            decoration: InputDecoration(
-              border: const OutlineInputBorder(),
-              labelText: "exercise.editor.fields.notes.label".t,
+        body: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(24),
+            child: GTRichTextEditor(
+              infoboxController: controller,
+              autofocus: true,
+              decoration: InputDecoration(
+                border: const OutlineInputBorder(),
+                labelText: "exercise.editor.fields.notes.label".t,
+              ),
             ),
           ),
         ),

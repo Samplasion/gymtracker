@@ -101,14 +101,7 @@ class _ExercisesViewState extends State<ExercisesView> {
                 PopupMenuItem(
                   child: Text("workouts.actions.share.button".t),
                   onTap: () {
-                    final uri = Uri(
-                      scheme: "gymtracker",
-                      host: "routine",
-                      queryParameters: {
-                        "json": jsonEncode(workout.toJson()).compressed,
-                      },
-                    );
-                    controller.shareRoutine(uri);
+                    controller.shareRoutine(workout);
                   },
                 ),
                 PopupMenuItem(

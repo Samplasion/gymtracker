@@ -384,7 +384,14 @@ class RoutinesController extends GetxController
     );
   }
 
-  void shareRoutine(Uri uri) {
+  void shareRoutine(Workout routine) {
+    final uri = Uri(
+      scheme: "gymtracker",
+      host: "routine",
+      queryParameters: {
+        "json": jsonEncode(routine.toJson()).compressed,
+      },
+    );
     showDialog(
       context: Get.context!,
       builder: (context) => AlertDialog(

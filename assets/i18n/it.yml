@@ -65,7 +65,7 @@ exercise:
         label: Gruppo muscolare primario
         errors:
           empty: Devi selezionare un gruppo muscolare.
-      secondaryMuscleGroups: 
+      secondaryMuscleGroups:
         label: Gruppi muscolari secondari
       notes:
         label: Note
@@ -133,7 +133,7 @@ workouts:
         actions:
           share: Copia
           shared: Il link è stato copiato.
-  
+
 routines:
   title: Routine
   newRoutine: Nuova routine
@@ -236,7 +236,7 @@ settings:
     export:
       label: Esporta dati (JSON)
       filename: Dati_GymTracker
-  
+
   colorPicker:
     heading:
       label: Seleziona un colore [@color]
@@ -331,7 +331,7 @@ ongoingWorkout:
     title: Ottimo lavoro!
     body: Ecco delle statistiche sull'allenamento appena terminato.
 
-timer: 
+timer:
   add15s: "+15s"
   subtract15s: "-15s"
   skip: Salta
@@ -678,3 +678,4 @@ errorView:
      • Assicurarti di avere l'ultima versione dell'app
      • Contattare il supporto
   stack: "Se il problema persiste, per favore fornisci le seguenti informazioni al supporto:"
+  noStack: Nessuna informazione disponibile sullo stack.

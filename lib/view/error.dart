@@ -84,6 +84,20 @@ class ErrorView extends GetWidget<ErrorController> {
                   fontFamilyFallback: const ["Menlo", "Courier"],
                 ),
               ),
+            if (args.stack != null)
+              Text(
+                "\n${args.stack!.toString()}",
+                style: TextStyle(
+                  color: context.colorScheme.onSurfaceVariant,
+                  fontFamily: "monospace",
+                  fontFamilyFallback: const ["Menlo", "Courier"],
+                ),
+              )
+            else
+              Text(
+                "errorView.noStack".t,
+                style: Get.textTheme.bodyMedium,
+              ),
           ],
         ),
       ),

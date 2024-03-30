@@ -411,6 +411,18 @@ muscleCategories:
   legs: Legs
   shoulders: Shoulders
 
+titleGenerator:
+  template: "@muscles Workout"
+  title:
+    # Keep in sync with the number of `muscleCategories` above
+    - ""
+    - "@0"
+    - "@0 and @1"
+    - "@0, @1, and @2"
+    - "@0, @1, @2, and @3"
+    - "@0, @1, @2, @3, and @4"
+    - "@0, @1, @2, @3, @4, and @5"
+
 actions:
   create: Create
   remove: Remove

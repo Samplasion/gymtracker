@@ -95,6 +95,19 @@ class WorkoutController extends GetxController with ServiceableController {
     return cont;
   }
 
+  static String generateWorkoutTitle(Set<MuscleCategory> selectedGroups) {
+    globalLogger.d("[WorkoutController#generateWorkoutTitle]\n$selectedGroups");
+    globalLogger.d(
+        "[WorkoutController#generateWorkoutTitle]\n${"titleGenerator.title".tByIndex(selectedGroups.length)}");
+    return "titleGenerator.template".tParams({
+      "muscles":
+          "titleGenerator.title".tByIndexWithParams(selectedGroups.length, {
+        for (int i = 0; i < selectedGroups.length; i++)
+          "$i": "muscleCategories.${selectedGroups.elementAt(i).name}".t,
+      }),
+    }).trim();
+  }
+
   RxList<WorkoutExercisable> exercises = <WorkoutExercisable>[].obs;
 
   Workout generateWorkout(String parentID) => Workout(
@@ -203,10 +216,34 @@ class WorkoutController extends GetxController with ServiceableController {
   }
 
   void finishWorkoutWithDialog(BuildContext context) {
+    generateNameIfEmpty();
+
     showDialog(
       context: context,
       builder: (context) => const WorkoutFinishPage(),
     );
+  }
+
+  void generateNameIfEmpty() {
+    if (name.value.trim().isEmpty) {
+      final groups = <MuscleCategory>{};
+
+      for (final ex in exercises) {
+        ex.when(
+          exercise: (e) {
+            final cat = e.primaryMuscleGroup.category;
+            if (cat != null) groups.add(cat);
+          },
+          superset: (s) => groups.addAll(
+            s.exercises
+                .map((e) => e.primaryMuscleGroup.category)
+                .whereType<MuscleCategory>(),
+          ),
+        );
+      }
+
+      name(WorkoutController.generateWorkoutTitle(groups));
+    }
   }
 
   Future<void> submit(String name, Duration duration) async {

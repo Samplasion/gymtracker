@@ -7,6 +7,7 @@ import 'package:gymtracker/controller/debug_controller.dart';
 import 'package:gymtracker/controller/history_controller.dart';
 import 'package:gymtracker/controller/routines_controller.dart';
 import 'package:gymtracker/controller/stopwatch_controller.dart';
+import 'package:gymtracker/controller/workout_controller.dart';
 import 'package:gymtracker/model/exercise.dart';
 import 'package:gymtracker/model/workout.dart';
 import 'package:gymtracker/service/database.dart';
@@ -143,6 +144,12 @@ class _DebugViewState extends State<DebugView> {
                   await channel.invokeMethod('blah');
                 },
               ),
+              ListTile(
+                title: const Text("Generated title alert"),
+                onTap: () async {
+                  Go.to(() => const WorkoutTitleGeneratorAlert());
+                },
+              ),
               ValueBuilder<logger_lib.Level?>(
                 initialValue: logger_lib.Logger.level,
                 builder: (val, onChange) => RadioModalTile<logger_lib.Level?>(
@@ -221,4 +228,50 @@ String generateYamlForMissingKeys(List<String> missingKeys) {
   }
 
   return processMap("", keys).trim();
+}
+
+class WorkoutTitleGeneratorAlert extends StatefulWidget {
+  const WorkoutTitleGeneratorAlert({super.key});
+
+  @override
+  State<WorkoutTitleGeneratorAlert> createState() =>
+      _WorkoutTitleGeneratorAlertState();
+}
+
+class _WorkoutTitleGeneratorAlertState
+    extends State<WorkoutTitleGeneratorAlert> {
+  final Set<MuscleCategory> _selectedCategories = {};
+
+  String _generate() =>
+      WorkoutController.generateWorkoutTitle(_selectedCategories);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text("Generate workout title"),
+      ),
+      body: ListView(
+        padding: const EdgeInsets.all(16.0),
+        children: [
+          Text(_generate()),
+          ...MuscleCategory.values.map((category) {
+            return CheckboxListTile(
+              title: Text(category.name),
+              value: _selectedCategories.contains(category),
+              onChanged: (value) {
+                setState(() {
+                  if (value!) {
+                    _selectedCategories.add(category);
+                  } else {
+                    _selectedCategories.remove(category);
+                  }
+                });
+              },
+            );
+          }),
+        ],
+      ),
+    );
+  }
 }

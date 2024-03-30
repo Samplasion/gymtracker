@@ -24,6 +24,11 @@ class GTLocalizations extends Translations with ChangeNotifier {
       if (value is Map) {
         translations.addAll(
             flattenTranslations(value as Map<String, dynamic>, '$prefix$key.'));
+      } else if (value is List) {
+        for (var i = 0; i < value.length; i++) {
+          translations.addAll(
+              flattenTranslations({i.toString(): value[i]}, '$prefix$key.'));
+        }
       } else {
         translations['$prefix$key'] = value.toString();
       }
@@ -63,7 +68,7 @@ class GTLocalizations extends Translations with ChangeNotifier {
   }
 }
 
-late final _debugController = Get.find<DebugController>();
+DebugController get _debugController => Get.find<DebugController>();
 
 extension Fallback on String {
   String get t {
@@ -72,6 +77,14 @@ extension Fallback on String {
       return this;
     }
     return tr;
+  }
+
+  String tByIndex(int index) {
+    return "$this.$index".t;
+  }
+
+  String tByIndexWithParams(int index, Map<String, String> params) {
+    return "$this.$index".tParams(params);
   }
 
   String tParams([Map<String, String> params = const {}]) {

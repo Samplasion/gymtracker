@@ -270,19 +270,19 @@ class WorkoutController extends GetxController with ServiceableController {
 
     historyController.addNewWorkout(workout);
     Get.back();
-    SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
+    SchedulerBinding.instance.addPostFrameCallback((timeStamp) async {
       Get.back();
       Get.delete<WorkoutController>();
-      askToUpdateRoutine(workout).then((_) {
-        if (workout.doneSets.isNotEmpty) {
-          Go.showBottomModalScreen(
-            (context, controller) => WorkoutDoneSheet(
-              workout: workout,
-              controller: controller,
-            ),
-          );
-        }
-      });
+      await askToUpdateRoutine(workout);
+
+      if (workout.doneSets.isNotEmpty) {
+        Go.showBottomModalScreen(
+          (context, controller) => WorkoutDoneSheet(
+            workout: workout,
+            controller: controller,
+          ),
+        );
+      }
     });
   }
 

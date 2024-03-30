@@ -9,6 +9,7 @@ import 'package:integration_test/integration_test.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 
+import 'flows/combine_workouts.dart';
 import 'flows/create_exercise.dart';
 import 'flows/create_routine.dart';
 import 'flows/edit_exercise_in_routines_and_history.dart';
@@ -74,6 +75,10 @@ void main() async {
     testWidgets(
       'create routine from history workout',
       (tester) => testRoutineFromWorkout(tester, l, databaseService),
+    );
+    testWidgets(
+      'combine workouts',
+      (tester) => testCombineWorkoutsFlow(tester, l, databaseService),
     );
   });
 }

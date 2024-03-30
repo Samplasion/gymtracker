@@ -314,6 +314,10 @@ class _ExercisesViewState extends State<ExercisesView> {
                 child: ListTile(
                   leading: const CircleAvatar(child: Icon(Icons.add)),
                   title: Text("exercise.continuation.label".t),
+                  subtitle: Text("exercise.continuation.description".t),
+                  onTap: () {
+                    Get.find<HistoryController>().combineWorkoutsFlow(workout);
+                  },
                 ),
               ),
               SliverList(
@@ -327,8 +331,8 @@ class _ExercisesViewState extends State<ExercisesView> {
                         workout: workout.continuation!,
                         index: index,
                         isInSuperset: false,
-                        weightUnit: workout.weightUnit,
-                        distanceUnit: workout.distanceUnit,
+                        weightUnit: workout.continuation!.weightUnit,
+                        distanceUnit: workout.continuation!.distanceUnit,
                       ),
                     );
                   },

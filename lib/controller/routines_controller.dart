@@ -192,6 +192,7 @@ class RoutinesController extends GetxController
       ..isContinuation(continuation)
       ..continuesID(continuation ? workout.id : null)
       ..weightUnit(clone.weightUnit)
+      ..distanceUnit(clone.distanceUnit)
       ..save();
   }
 

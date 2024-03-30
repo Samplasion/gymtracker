@@ -173,10 +173,11 @@ class Exercise extends WorkoutExercisable {
     return base.copyWith(
       sets: ([
         for (final set in sets)
-          set.copyWith(
-            done: false,
-            reps: set.kind.shouldKeepInRoutine ? set.reps : 0,
-          ),
+          if (setFilter?.call(set) ?? true)
+            set.copyWith(
+              done: false,
+              reps: set.kind.shouldKeepInRoutine ? set.reps : 0,
+            ),
       ]),
     );
   }

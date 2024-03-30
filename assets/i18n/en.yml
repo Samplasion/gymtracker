@@ -95,6 +95,11 @@ exercise:
     usefulData: Useful data
   continuation:
     label: "Continuation"
+    description: Tap to combine the two workouts into a single entry.
+    combine:
+      confirm:
+        title: Combine workouts
+        body: Are you sure you want to combine these workouts? This action cannot be undone, and the old workouts will be deleted.
   delete:
     title: Delete exercise
     body: Are you sure you want to delete this exercise? This action cannot be undone.

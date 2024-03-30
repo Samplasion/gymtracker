@@ -10,6 +10,8 @@ import 'package:gymtracker/model/workout.dart';
 import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/service/logger.dart';
 import 'package:gymtracker/utils/extensions.dart';
+import 'package:gymtracker/utils/go.dart';
+import 'package:gymtracker/view/exercises.dart';
 import 'package:gymtracker/view/workout_editor.dart';
 
 class HistoryController extends GetxController with ServiceableController {
@@ -406,6 +408,40 @@ class HistoryController extends GetxController with ServiceableController {
             DateTime.fromMillisecondsSinceEpoch(0))
         .compareTo(a.startingDate ?? DateTime.fromMillisecondsSinceEpoch(0)));
     return history;
+  }
+
+  Future<void> combineWorkoutsFlow(Workout workout) async {
+    if (!workout.hasContinuation) {
+      throw ArgumentError("Workout must have a continuation.");
+    }
+
+    final w1 = workout.withFilters(
+      exerciseFilter: (e) => e.sets.any((element) => element.done),
+      setFilter: (e, s) => s.done,
+    );
+    final w2 = workout.continuation!;
+
+    final shouldCombine = await Go.confirm(
+      "exercise.continuation.combine.confirm.title",
+      "exercise.continuation.combine.confirm.body",
+      icon: const Icon(Icons.compare_arrows_rounded),
+    );
+
+    logger.t("Should combine: $shouldCombine");
+
+    if (!shouldCombine) {
+      return;
+    }
+
+    final combined = Workout.combine(w1, w2);
+
+    logger.d(combined.toJson());
+
+    addNewWorkout(combined);
+    deleteWorkout(w1);
+    deleteWorkout(w2);
+
+    Go.off(() => ExercisesView(workout: combined));
   }
 }
 

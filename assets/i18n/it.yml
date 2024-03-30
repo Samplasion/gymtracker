@@ -95,6 +95,11 @@ exercise:
     usefulData: Dati utili
   continuation:
     label: "Continuazione"
+    description: Tocca per unire i due allenamenti in un'unica voce.
+    combine:
+      confirm:
+        title: Unisci allenamenti
+        body: Vuoi davvero unire questi due allenamenti? Quest'azione non può essere annullata. Inoltre, i vecchi allenamenti non saranno più disponibili.
   delete:
     title: Elimina esercizio
     body: Vuoi davvero eliminare questo esercizio? Quest'azione non può essere annullata.

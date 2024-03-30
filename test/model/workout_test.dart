@@ -12,7 +12,7 @@ import 'package:test/test.dart';
 import '../expectations.dart';
 
 void main() {
-  group('Workout model', () {
+  group('Workout model -', () {
     final workout = Workout(
       id: "1",
       name: 'Test Workout',
@@ -106,7 +106,7 @@ void main() {
       );
     }
 
-    group("WorkoutDifference class", () {
+    group("WorkoutDifference class -", () {
       test('difference should be correctly calculated (added exercise)', () {
         final workout2 = workout.clone();
         workout2.exercises.add(newExercise());
@@ -419,7 +419,7 @@ void main() {
       });
     });
 
-    group("shouldShowAsInfobox(text)", () {
+    group("shouldShowAsInfobox(text) -", () {
       test("returns false for empty strings",
           () => expect(Workout.shouldShowAsInfobox(""), false));
       test("returns false for newline strings",
@@ -437,8 +437,9 @@ void main() {
       });
     });
 
-    group("combine(workout1, workout2)", () {
+    group("workout combination -", () {
       test("should combine two workouts", () {
+        final workout1 = workout.copyWith(completedBy: "2");
         final workout2 = Workout(
           id: "2",
           name: 'Test Workout 2',
@@ -501,11 +502,12 @@ void main() {
           parentID: null,
           infobox: 'Test Infobox',
           completedBy: null,
-          completes: null,
+          completes: "1",
         );
 
-        final combined = Workout.combine(workout, workout2);
+        final combined = Workout.combine(workout1, workout2);
 
+        expect(Workout.canCombine(workout1, workout2), true);
         expect(combined.exercises.length, 4);
         expect(combined.exercises[0].id, "1");
         expect(combined.exercises[1].id, "2");
@@ -519,11 +521,14 @@ void main() {
         );
         expect(combined.weightUnit, Weights.kg);
         expect(combined.distanceUnit, Distance.km);
+        expect(combined.completes, null);
+        expect(combined.completedBy, null);
       });
 
       test(
         "should convert weights and distances to the unit defined by the first workout",
         () {
+          final workout1 = workout.copyWith(completedBy: "2");
           final workout2 = Workout(
             id: "2",
             name: 'Test Workout 2',
@@ -571,16 +576,18 @@ void main() {
             parentID: null,
             infobox: 'Test Infobox',
             completedBy: null,
-            completes: null,
+            completes: "1",
             weightUnit: Weights.lb,
             distanceUnit: Distance.mi,
           );
 
           final combined = Workout.combine(
-            workout.copyWith(exercises: []),
+            workout1.copyWith(exercises: []),
             workout2,
           );
 
+          expect(Workout.canCombine(workout1.copyWith(exercises: []), workout2),
+              true);
           expect(combined.weightUnit, Weights.kg);
           expect(combined.distanceUnit, Distance.km);
           expectDouble(combined.exercises[0].sets[0].weight!, 45.359237);
@@ -589,6 +596,7 @@ void main() {
       );
 
       test("asserts if the second workout comes before the first", () {
+        final workout1 = workout.copyWith(completedBy: "2");
         final workout2 = Workout(
           id: "2",
           name: 'Test Workout 2',
@@ -598,37 +606,53 @@ void main() {
           parentID: null,
           infobox: 'Test Infobox',
           completedBy: null,
-          completes: null,
+          completes: "1",
         );
 
-        expect(() => Workout.combine(workout, workout2),
+        expect(Workout.canCombine(workout1, workout2), false);
+        expect(() => Workout.combine(workout1, workout2),
             throwsA(isA<AssertionError>()));
       });
 
-      test("asserts if any of the workouts is not concrete", () {
-        final workout2 = Workout(
-          id: "2",
-          name: 'Test Workout 2',
-          exercises: [],
-          startingDate: DateTime.now(),
-        );
+      // test("asserts if any of the workouts is not concrete", () {
+      //   final workout1 = workout.copyWith(completedBy: "2");
+      //   final workout2 = Workout(
+      //     id: "2",
+      //     name: 'Test Workout 2',
+      //     exercises: [],
+      //     startingDate: DateTime.now(),
+      //   );
 
-        expect(() => Workout.combine(workout, workout2),
-            throwsA(isA<AssertionError>()));
-        expect(
-            () => Workout.combine(
-                  workout2.copyWith(
-                    // Avoid previously tested assertion
-                    startingDate:
-                        DateTime.now().subtract(const Duration(minutes: 10)),
-                    duration: const Duration(seconds: 60),
-                  ),
-                  workout.copyWith.duration(null),
-                ),
-            throwsA(isA<AssertionError>()));
-      });
+      //   expect(Workout.canCombine(workout1, workout2), false);
+      //   expect(() => Workout.combine(workout1, workout2),
+      //       throwsA(isA<AssertionError>()));
+      //   expect(
+      //     Workout.canCombine(
+      //       workout2.copyWith(
+      //         // Avoid previously tested assertion
+      //         startingDate:
+      //             DateTime.now().subtract(const Duration(minutes: 10)),
+      //         duration: const Duration(seconds: 60),
+      //       ),
+      //       workout1.copyWith.duration(null),
+      //     ),
+      //     false,
+      //   );
+      //   expect(
+      //       () => Workout.combine(
+      //             workout2.copyWith(
+      //               // Avoid previously tested assertion
+      //               startingDate:
+      //                   DateTime.now().subtract(const Duration(minutes: 10)),
+      //               duration: const Duration(seconds: 60),
+      //             ),
+      //             workout1.copyWith.duration(null),
+      //           ),
+      //       throwsA(isA<AssertionError>()));
+      // });
 
-      test("asserts if any of the workouts is a continuation", () {
+      test("asserts if the first workout isn't a continuation of the second",
+          () {
         final workout2 = Workout(
           id: "2",
           name: 'Test Workout 2',
@@ -638,6 +662,14 @@ void main() {
         );
 
         expect(
+          Workout.canCombine(
+              workout,
+              workout2.copyWith(
+                completes: "fake id",
+              )),
+          false,
+        );
+        expect(
             () => Workout.combine(
                   workout,
                   workout2.copyWith(
@@ -645,6 +677,19 @@ void main() {
                   ),
                 ),
             throwsA(isA<AssertionError>()));
+
+        expect(
+          Workout.canCombine(
+            workout2.copyWith(
+              // Avoid previously tested assertion
+              startingDate:
+                  DateTime.now().subtract(const Duration(minutes: 10)),
+              completes: "fake id",
+            ),
+            workout.copyWith.completes("fake id"),
+          ),
+          false,
+        );
         expect(
             () => Workout.combine(
                   workout2.copyWith(

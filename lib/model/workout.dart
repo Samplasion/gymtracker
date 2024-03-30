@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:gymtracker/data/distance.dart';
 import 'package:gymtracker/data/weights.dart';
 import 'package:gymtracker/model/exercisable.dart';
+import 'package:gymtracker/model/exercise.dart';
 import 'package:gymtracker/model/set.dart';
 import 'package:gymtracker/model/superset.dart';
 import 'package:gymtracker/utils/extensions.dart';
@@ -120,15 +121,28 @@ class Workout {
         }(),
             "Both completedBy and completes cannot be defined at the same time.");
 
+  static bool canCombine(Workout workout1, Workout workout2) {
+    return workout1.isConcrete == workout2.isConcrete && !workout1.isConcrete ||
+        (workout1.completedBy == workout2.id &&
+            workout2.completes == workout1.id &&
+            workout1.startingDate!.isBefore(workout2.startingDate!));
+  }
+
   static Workout combine(Workout workout1, Workout workout2) {
     assert(workout1.isConcrete == workout2.isConcrete,
         "Both workouts must be concrete or not concrete.");
-    assert(!workout1.isContinuation);
-    assert(!workout2.isContinuation);
-    assert(workout1.startingDate!.isBefore(workout2.startingDate!),
-        "Workout 1 must start before workout 2.");
+    if (workout1.isConcrete) {
+      assert(
+          workout1.completedBy == workout2.id &&
+              workout2.completes == workout1.id &&
+              workout1.completedBy != null &&
+              workout2.completes != null,
+          "Workout 1 must be completed by workout 2.");
+      assert(workout1.startingDate!.isBefore(workout2.startingDate!),
+          "Workout 1 must start before workout 2.");
+    }
 
-    return Workout(
+    final result = Workout(
       name: workout1.name,
       exercises: [
         ...workout1.exercises,
@@ -150,6 +164,10 @@ class Workout {
       infobox: workout1.infobox?.richCombine(workout2.infobox ?? "") ??
           workout2.infobox,
     );
+
+    assert(result.id != workout1.id && result.id != workout2.id);
+
+    return result;
   }
 
   factory Workout.fromJson(Map<String, dynamic> json) =>
@@ -166,6 +184,38 @@ class Workout {
       copyWith(duration: null, startingDate: null, id: const Uuid().v4());
 
   Workout regenerateID() => copyWith(id: const Uuid().v4());
+
+  Workout withFilters({
+    bool Function(WorkoutExercisable)? exerciseFilter,
+    bool Function(WorkoutExercisable, ExSet)? setFilter,
+  }) {
+    return copyWith(
+      exercises: [
+        for (final exercise in exercises)
+          if (exerciseFilter?.call(exercise) ?? true)
+            exercise.map(
+              superset: (superset) => superset.copyWith(
+                exercises: [
+                  for (final exercise in superset.exercises)
+                    if (exerciseFilter?.call(exercise) ?? true)
+                      exercise.copyWith(
+                        sets: [
+                          for (final set in exercise.sets)
+                            if (setFilter?.call(exercise, set) ?? true) set,
+                        ],
+                      ),
+                ],
+              ),
+              exercise: (single) => single.copyWith(
+                sets: [
+                  for (final set in single.sets)
+                    if (setFilter?.call(single, set) ?? true) set,
+                ],
+              ),
+            ),
+      ],
+    );
+  }
 }
 
 class WorkoutDifference {

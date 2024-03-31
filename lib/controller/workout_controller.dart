@@ -34,6 +34,8 @@ class WorkoutController extends GetxController with ServiceableController {
   late Rx<Weights> weightUnit;
   late Rx<Distance> distanceUnit;
 
+  RxList<WorkoutExercisable> exercises = <WorkoutExercisable>[].obs;
+
   WorkoutController(String name, String? parentID, String? infobox)
       : name = name.obs,
         time = DateTime.now().obs,
@@ -114,8 +116,6 @@ class WorkoutController extends GetxController with ServiceableController {
       }),
     }).trim();
   }
-
-  RxList<WorkoutExercisable> exercises = <WorkoutExercisable>[].obs;
 
   Workout generateWorkout(String parentID) => Workout(
         name: name.value,

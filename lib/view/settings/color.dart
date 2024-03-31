@@ -80,6 +80,26 @@ class _ColorModalTileState extends State<ColorModalTile>
                       child: SingleChildScrollView(
                         child: ColorPicker(
                           color: _value,
+                          // Whatever, we don't need to know the color name
+                          // because we calculate it later
+                          customColorSwatchesAndNames: {
+                            Colors.red: "",
+                            Colors.pink: "",
+                            Colors.purple: "",
+                            Colors.deepPurple: "",
+                            Colors.indigo: "",
+                            Colors.blue: "",
+                            Colors.lightBlue: "",
+                            Colors.cyan: "",
+                            Colors.teal: "",
+                            Colors.green: "",
+                            Colors.lightGreen: "",
+                            Colors.lime: "",
+                            Colors.yellow: "",
+                            Colors.amber: "",
+                            Colors.orange: "",
+                            Colors.deepOrange: "",
+                          },
                           onColorChanged: (Color value) {
                             _setState(() {
                               _value = value;
@@ -99,7 +119,9 @@ class _ColorModalTileState extends State<ColorModalTile>
                             style: Theme.of(context).textTheme.titleSmall,
                           ),
                           copyPasteBehavior: const ColorPickerCopyPasteBehavior(
-                            longPressMenu: true,
+                            longPressMenu: false,
+                            ctrlC: false,
+                            ctrlV: false,
                           ),
                           materialNameTextStyle:
                               Theme.of(context).textTheme.bodySmall,
@@ -110,10 +132,10 @@ class _ColorModalTileState extends State<ColorModalTile>
                           enableShadesSelection: false,
                           pickersEnabled: const <ColorPickerType, bool>{
                             ColorPickerType.both: false,
-                            ColorPickerType.primary: true,
+                            ColorPickerType.primary: false,
                             ColorPickerType.accent: false,
                             ColorPickerType.bw: false,
-                            ColorPickerType.custom: false,
+                            ColorPickerType.custom: true,
                             ColorPickerType.wheel: false,
                           },
                         ),

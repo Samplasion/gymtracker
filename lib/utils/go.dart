@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart' hide Material;
+import 'package:flutter/scheduler.dart';
 import 'package:get/get.dart';
 import 'package:gymtracker/service/localizations.dart';
+import 'package:gymtracker/service/logger.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 
 class Go {
@@ -121,6 +123,101 @@ class Go {
       builder: (context) => page(context, ModalScrollController.of(context)),
       duration: const Duration(milliseconds: 250),
     );
+  }
+
+  static Future<void> showRadioModal<T>({
+    required T? selectedValue,
+    required Map<T, String> values,
+    required Widget title,
+    required void Function(T?)? onChange,
+  }) async {
+    T? oldValue = selectedValue;
+    T? _value = selectedValue;
+    final revert = await showModalBottomSheet<bool>(
+      context: Get.context!,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: DefaultTextStyle(
+                    style: Theme.of(context).textTheme.titleLarge!,
+                    child: title,
+                  ),
+                ),
+                Flexible(
+                  child: SingleChildScrollView(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        for (final entry in values.entries)
+                          RadioListTile<T>(
+                            title: Text(entry.value),
+                            value: entry.key,
+                            groupValue: _value,
+                            activeColor:
+                                Theme.of(context).colorScheme.secondary,
+                            onChanged: (value) {
+                              setState(() {
+                                if (value != null) {
+                                  _value = value;
+                                  onChange?.call(value);
+                                }
+                              });
+                              SchedulerBinding.instance
+                                  .addPostFrameCallback((timeStamp) {
+                                setState(() {});
+                              });
+                            },
+                          ),
+                      ],
+                    ),
+                  ),
+                ),
+                Flexible(
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Wrap(
+                      alignment: WrapAlignment.end,
+                      children: [
+                        TextButton(
+                          child: Text(MaterialLocalizations.of(context)
+                              .cancelButtonLabel),
+                          onPressed: () {
+                            onChange?.call(oldValue);
+                            Navigator.of(context).pop(false);
+                          },
+                        ),
+                        TextButton(
+                          child: Text(
+                              MaterialLocalizations.of(context).okButtonLabel),
+                          onPressed: () {
+                            if (onChange != null) {
+                              onChange(_value);
+                            }
+                            Navigator.of(context).pop(true);
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+
+    if (revert == false) {
+      globalLogger.d("[Go.showRadioModal]\nReverting");
+      onChange?.call(oldValue);
+    }
   }
 }
 

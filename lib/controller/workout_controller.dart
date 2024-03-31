@@ -442,6 +442,37 @@ class WorkoutController extends GetxController with ServiceableController {
     );
   }
 
+  void changeWeightUnitDialog() {
+    Go.showRadioModal(
+      selectedValue: weightUnit.value,
+      title: Text("ongoingWorkout.actions.changeWeightUnit".t),
+      values: {
+        for (final val in Weights.values) val: "weightUnits.${val.name}".t,
+      },
+      onChange: (value) {
+        logger.w("Changing weight unit to $value");
+        if (value != null) weightUnit(value);
+        save();
+      },
+    );
+  }
+
+  void changeDistanceUnitDialog() {
+    Go.showRadioModal(
+      selectedValue: distanceUnit.value,
+      title: Text("ongoingWorkout.actions.changeDistanceUnit".t),
+      values: {
+        for (final distance in Distance.values)
+          distance: "distanceUnits.${distance.name}".t,
+      },
+      onChange: (value) {
+        logger.d("Changing distance unit to $value");
+        if (value != null) distanceUnit(value);
+        save();
+      },
+    );
+  }
+
   @override
   void onServiceChange() {}
 }

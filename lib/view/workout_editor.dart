@@ -13,6 +13,7 @@ import 'package:gymtracker/model/set.dart';
 import 'package:gymtracker/model/superset.dart';
 import 'package:gymtracker/model/workout.dart';
 import 'package:gymtracker/service/localizations.dart';
+import 'package:gymtracker/service/logger.dart';
 import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/utils/utils.dart';
@@ -96,8 +97,7 @@ class _WorkoutEditorState extends State<WorkoutEditor> {
                 ),
                 onTap: () {
                   setState(() {
-                    workout.weightUnit = Weights.values[
-                        (workout.weightUnit.index + 1) % Weights.values.length];
+                    changeWeightUnitDialog();
                   });
                 },
               ),
@@ -107,9 +107,7 @@ class _WorkoutEditorState extends State<WorkoutEditor> {
                 ),
                 onTap: () {
                   setState(() {
-                    workout.distanceUnit = Distance.values[
-                        (workout.distanceUnit.index + 1) %
-                            Distance.values.length];
+                    changeDistanceUnitDialog();
                   });
                 },
               ),
@@ -411,6 +409,37 @@ class _WorkoutEditorState extends State<WorkoutEditor> {
           ),
         ],
       ),
+    );
+  }
+
+  void changeWeightUnitDialog() {
+    Go.showRadioModal(
+      selectedValue: workout.weightUnit,
+      title: Text("ongoingWorkout.actions.changeWeightUnit".t),
+      values: {
+        for (final val in Weights.values) val: "weightUnits.${val.name}".t,
+      },
+      onChange: (value) {
+        logger.w("Changing weight unit to $value");
+        if (value != null) workout.weightUnit = value;
+        setState(() {});
+      },
+    );
+  }
+
+  void changeDistanceUnitDialog() {
+    Go.showRadioModal(
+      selectedValue: workout.distanceUnit,
+      title: Text("ongoingWorkout.actions.changeDistanceUnit".t),
+      values: {
+        for (final distance in Distance.values)
+          distance: "distanceUnits.${distance.name}".t,
+      },
+      onChange: (value) {
+        logger.d("Changing distance unit to $value");
+        if (value != null) workout.distanceUnit = value;
+        setState(() {});
+      },
     );
   }
 }

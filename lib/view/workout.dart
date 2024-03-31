@@ -10,8 +10,6 @@ import 'package:gymtracker/controller/countdown_controller.dart';
 import 'package:gymtracker/controller/routines_controller.dart';
 import 'package:gymtracker/controller/stopwatch_controller.dart';
 import 'package:gymtracker/controller/workout_controller.dart';
-import 'package:gymtracker/data/distance.dart';
-import 'package:gymtracker/data/weights.dart';
 import 'package:gymtracker/model/exercisable.dart';
 import 'package:gymtracker/model/exercise.dart';
 import 'package:gymtracker/model/set.dart';
@@ -239,9 +237,7 @@ class _WorkoutViewState extends State<WorkoutView> {
                   "ongoingWorkout.actions.changeWeightUnit".t,
                 ),
                 onTap: () {
-                  controller.weightUnit(Weights.values[
-                      (controller.weightUnit().index + 1) %
-                          Weights.values.length]);
+                  controller.changeWeightUnitDialog();
                 },
               ),
               PopupMenuItem(
@@ -249,9 +245,7 @@ class _WorkoutViewState extends State<WorkoutView> {
                   "ongoingWorkout.actions.changeDistanceUnit".t,
                 ),
                 onTap: () {
-                  controller.distanceUnit(Distance.values[
-                      (controller.distanceUnit().index + 1) %
-                          Distance.values.length]);
+                  controller.changeDistanceUnitDialog();
                 },
               ),
               if (kDebugMode)

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:gymtracker/utils/go.dart';
 
 typedef OnChange<T> = void Function(T value);
 
@@ -56,100 +57,19 @@ class _RadioModalTileState<T> extends State<RadioModalTile<T>>
       subtitle: widget.subtitle ?? Text(subtitle),
       trailing: const Icon(Icons.arrow_right_rounded),
       onTap: () {
-        T oldValue = widget.selectedValue;
-        showModalBottomSheet<bool>(
-          context: context,
-          builder: (context) {
-            return StatefulBuilder(
-              builder: (context, innerSetState) {
-                final outerSetState = setState;
-                void _setState(void Function() func) {
-                  innerSetState(func);
-                  outerSetState(func);
-                }
-
-                return Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.all(16),
-                      child: DefaultTextStyle(
-                        style: Theme.of(context).textTheme.titleLarge!,
-                        child: widget.title,
-                      ),
-                    ),
-                    Flexible(
-                      child: SingleChildScrollView(
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: [
-                            for (final entry in widget.values.entries)
-                              RadioListTile<T>(
-                                title: Text(entry.value),
-                                value: entry.key,
-                                groupValue: _value,
-                                activeColor:
-                                    Theme.of(context).colorScheme.secondary,
-                                onChanged: (value) {
-                                  _setState(() {
-                                    if (value != null) {
-                                      _value = value;
-                                      widget.onChange?.call(value);
-                                    }
-                                  });
-                                  SchedulerBinding.instance
-                                      .addPostFrameCallback((timeStamp) {
-                                    _setState(() {});
-                                  });
-                                },
-                              ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    Flexible(
-                      child: Padding(
-                        padding: const EdgeInsets.all(16),
-                        child: Wrap(
-                          alignment: WrapAlignment.end,
-                          children: [
-                            TextButton(
-                              child: Text(MaterialLocalizations.of(context)
-                                  .cancelButtonLabel),
-                              onPressed: () {
-                                widget.onChange?.call(oldValue);
-                                Navigator.of(context).pop(false);
-                              },
-                            ),
-                            TextButton(
-                              child: Text(MaterialLocalizations.of(context)
-                                  .okButtonLabel),
-                              onPressed: () {
-                                if (widget.onChange != null) {
-                                  widget.onChange!(widget.selectedValue);
-                                }
-                                Navigator.of(context).pop(true);
-                              },
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
-                );
-              },
-            );
+        Go.showRadioModal(
+          selectedValue: widget.selectedValue,
+          values: widget.values,
+          title: widget.title,
+          onChange: (value) {
+            if (value != null && mounted) {
+              setState(() {
+                _value = value;
+                widget.onChange?.call(value);
+              });
+            }
           },
-        ).then((result) {
-          if (result == null || !result) {
-            widget.onChange?.call(oldValue);
-            setState(() {
-              _value = oldValue;
-            });
-          }
-        });
+        );
       },
     );
   }

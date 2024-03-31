@@ -131,7 +131,7 @@ class Go {
     required Widget title,
     required void Function(T?)? onChange,
   }) async {
-    T? oldValue = selectedValue;
+    final T? oldValue = selectedValue;
     T? _value = selectedValue;
     final revert = await showModalBottomSheet<bool>(
       context: Get.context!,
@@ -180,30 +180,32 @@ class Go {
                   ),
                 ),
                 Flexible(
-                  child: Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Wrap(
-                      alignment: WrapAlignment.end,
-                      children: [
-                        TextButton(
-                          child: Text(MaterialLocalizations.of(context)
-                              .cancelButtonLabel),
-                          onPressed: () {
-                            onChange?.call(oldValue);
-                            Navigator.of(context).pop(false);
-                          },
-                        ),
-                        TextButton(
-                          child: Text(
-                              MaterialLocalizations.of(context).okButtonLabel),
-                          onPressed: () {
-                            if (onChange != null) {
-                              onChange(_value);
-                            }
-                            Navigator.of(context).pop(true);
-                          },
-                        ),
-                      ],
+                  child: SafeArea(
+                    child: Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Wrap(
+                        alignment: WrapAlignment.end,
+                        children: [
+                          TextButton(
+                            child: Text(MaterialLocalizations.of(context)
+                                .cancelButtonLabel),
+                            onPressed: () {
+                              onChange?.call(oldValue);
+                              Navigator.of(context).pop(false);
+                            },
+                          ),
+                          TextButton(
+                            child: Text(MaterialLocalizations.of(context)
+                                .okButtonLabel),
+                            onPressed: () {
+                              if (onChange != null) {
+                                onChange(_value);
+                              }
+                              Navigator.of(context).pop(true);
+                            },
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
@@ -214,7 +216,7 @@ class Go {
       },
     );
 
-    if (revert == false) {
+    if (revert != true) {
       globalLogger.d("[Go.showRadioModal]\nReverting");
       onChange?.call(oldValue);
     }

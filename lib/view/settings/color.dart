@@ -120,30 +120,32 @@ class _ColorModalTileState extends State<ColorModalTile>
                       ),
                     ),
                     Flexible(
-                      child: Padding(
-                        padding: const EdgeInsets.all(16),
-                        child: Wrap(
-                          alignment: WrapAlignment.end,
-                          children: [
-                            TextButton(
-                              child: Text(MaterialLocalizations.of(context)
-                                  .cancelButtonLabel),
-                              onPressed: () {
-                                widget.onChange?.call(oldValue);
-                                Navigator.of(context).pop(false);
-                              },
-                            ),
-                            TextButton(
-                              child: Text(MaterialLocalizations.of(context)
-                                  .okButtonLabel),
-                              onPressed: () {
-                                if (widget.onChange != null) {
-                                  widget.onChange!(widget.selectedValue);
-                                }
-                                Navigator.of(context).pop(true);
-                              },
-                            ),
-                          ],
+                      child: SafeArea(
+                        child: Padding(
+                          padding: const EdgeInsets.all(16),
+                          child: Wrap(
+                            alignment: WrapAlignment.end,
+                            children: [
+                              TextButton(
+                                child: Text(MaterialLocalizations.of(context)
+                                    .cancelButtonLabel),
+                                onPressed: () {
+                                  widget.onChange?.call(oldValue);
+                                  Navigator.of(context).pop(false);
+                                },
+                              ),
+                              TextButton(
+                                child: Text(MaterialLocalizations.of(context)
+                                    .okButtonLabel),
+                                onPressed: () {
+                                  if (widget.onChange != null) {
+                                    widget.onChange!(widget.selectedValue);
+                                  }
+                                  Navigator.of(context).pop(true);
+                                },
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     ),

@@ -118,18 +118,25 @@ class LibraryExercisesView extends StatelessWidget {
             ),
             const SliverToBoxAdapter(child: Divider()),
           ],
-          SliverList.builder(
-            itemCount: category.exercises.length,
-            itemBuilder: (context, index) {
-              return ExerciseListTile(
-                exercise: sorted[index],
-                selected: false,
-                isConcrete: false,
-                onTap: () {
-                  Go.to(() => ExerciseInfoView(exercise: sorted[index]));
-                },
-              );
-            },
+          SliverPadding(
+            padding: MediaQuery.of(context).padding.copyWith(
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                ),
+            sliver: SliverList.builder(
+              itemCount: category.exercises.length,
+              itemBuilder: (context, index) {
+                return ExerciseListTile(
+                  exercise: sorted[index],
+                  selected: false,
+                  isConcrete: false,
+                  onTap: () {
+                    Go.to(() => ExerciseInfoView(exercise: sorted[index]));
+                  },
+                );
+              },
+            ),
           ),
         ],
       ),

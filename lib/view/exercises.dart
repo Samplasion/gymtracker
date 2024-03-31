@@ -158,6 +158,7 @@ class _ExercisesViewState extends State<ExercisesView> {
         ],
       ),
       body: SafeArea(
+        bottom: false,
         child: CustomScrollView(
           slivers: [
             SliverToBoxAdapter(
@@ -354,6 +355,16 @@ class _ExercisesViewState extends State<ExercisesView> {
                   ),
                 ),
             ],
+            SliverPadding(
+              padding: MediaQuery.of(context).padding.copyWith(
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                  ),
+              sliver: const SliverToBoxAdapter(
+                child: SizedBox.shrink(),
+              ),
+            ),
           ],
         ),
       ),

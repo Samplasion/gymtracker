@@ -277,20 +277,19 @@ class _WorkoutViewState extends State<WorkoutView> {
           child: const WorkoutInfoBar(),
         ),
       ),
-      resizeToAvoidBottomInset: true,
+      resizeToAvoidBottomInset: false,
       bottomNavigationBar: Obx(() {
-        return SafeArea(
-          child: Crossfade(
-            firstChild: const SizedBox.shrink(),
-            secondChild: const Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [WorkoutTimerView()],
-            ),
-            showSecond: countdownController.isActive,
+        return Crossfade(
+          firstChild: const SizedBox.shrink(),
+          secondChild: const Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [WorkoutTimerView()],
           ),
+          showSecond: countdownController.isActive,
         );
       }),
       body: SafeArea(
+        bottom: false,
         child: Obx(
           () {
             if (safeController != null &&
@@ -331,7 +330,11 @@ class _WorkoutViewState extends State<WorkoutView> {
   ListView _buildListView() {
     final countdownController = Get.find<CountdownController>();
     return ListView(
-      padding: const EdgeInsets.symmetric(vertical: 8),
+      padding: const EdgeInsets.symmetric(vertical: 8) +
+          EdgeInsets.only(
+            bottom: MediaQuery.of(context).viewInsets.bottom +
+                MediaQuery.of(context).padding.bottom,
+          ),
       children: [
         if (Get.isRegistered<WorkoutController>() &&
             Workout.shouldShowAsInfobox(
@@ -771,108 +774,119 @@ class WorkoutTimerView extends StatelessWidget {
         ),
       ),
       clipBehavior: Clip.antiAlias,
-      child: Column(
-        children: [
-          TimerView(
-            startingTime: () {
-              try {
-                return Get.find<WorkoutController>().time.value;
-              } catch (e, s) {
-                logger.e("Error getting workout time", error: e, stackTrace: s);
-                return DateTime.now();
-              }
-            }(),
-            builder: (_, time) {
-              return TweenAnimationBuilder(
-                tween: Tween<double>(
-                  begin: 1,
-                  end: countdownController.progress,
-                ),
-                duration: const Duration(milliseconds: 220),
-                builder: (context, value, child) {
-                  return LinearProgressIndicator(value: value);
-                },
-              );
-            },
-          ),
-          Container(
-            constraints: const BoxConstraints(minHeight: 64),
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            child: Center(
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Expanded(
-                    child: Obx(
-                      () => TimerView(
-                        startingTime: () {
-                          try {
-                            return Get.find<WorkoutController>().time.value;
-                          } catch (e, s) {
-                            logger.e(
-                              "Error getting workout time",
-                              error: e,
-                              stackTrace: s,
-                            );
-                            return DateTime.now();
-                          }
-                        }(),
-                        builder: (_, time) => TimerView.buildTimeString(
-                          context,
-                          countdownController.remaining,
-                          style: Theme.of(context)
-                              .textTheme
-                              .bodyMedium!
-                              .copyWith(fontWeight: FontWeight.bold),
+      child: SafeArea(
+        left: false,
+        right: false,
+        child: Column(
+          children: [
+            TimerView(
+              startingTime: () {
+                try {
+                  return Get.find<WorkoutController>().time.value;
+                } catch (e, s) {
+                  logger.e("Error getting workout time",
+                      error: e, stackTrace: s);
+                  return DateTime.now();
+                }
+              }(),
+              builder: (_, time) {
+                return TweenAnimationBuilder(
+                  tween: Tween<double>(
+                    begin: 1,
+                    end: countdownController.progress,
+                  ),
+                  duration: const Duration(milliseconds: 220),
+                  builder: (context, value, child) {
+                    return LinearProgressIndicator(value: value);
+                  },
+                );
+              },
+            ),
+            SafeArea(
+              top: false,
+              bottom: false,
+              child: Container(
+                constraints: const BoxConstraints(minHeight: 64),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                child: Center(
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Expanded(
+                        child: Obx(
+                          () => TimerView(
+                            startingTime: () {
+                              try {
+                                return Get.find<WorkoutController>().time.value;
+                              } catch (e, s) {
+                                logger.e(
+                                  "Error getting workout time",
+                                  error: e,
+                                  stackTrace: s,
+                                );
+                                return DateTime.now();
+                              }
+                            }(),
+                            builder: (_, time) => TimerView.buildTimeString(
+                              context,
+                              countdownController.remaining,
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodyMedium!
+                                  .copyWith(fontWeight: FontWeight.bold),
+                            ),
+                          ),
                         ),
                       ),
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  IconButton(
-                    icon: Text(
-                      "timer.subtract15s".t,
-                      style: TextStyle(
-                        color: Theme.of(context).colorScheme.error,
+                      const SizedBox(width: 8),
+                      IconButton(
+                        icon: Text(
+                          "timer.subtract15s".t,
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.error,
+                          ),
+                        ),
+                        onPressed: () =>
+                            countdownController.subtract15Seconds(),
                       ),
-                    ),
-                    onPressed: () => countdownController.subtract15Seconds(),
-                  ),
-                  IconButton(
-                    icon: Text(
-                      "timer.add15s".t,
-                      style: TextStyle(
-                        color: Theme.of(context).colorScheme.tertiary,
+                      IconButton(
+                        icon: Text(
+                          "timer.add15s".t,
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.tertiary,
+                          ),
+                        ),
+                        onPressed: () => countdownController.add15Seconds(),
                       ),
-                    ),
-                    onPressed: () => countdownController.add15Seconds(),
-                  ),
-                  Crossfade(
-                    firstChild: TextButton.icon(
-                      onPressed: skipCountdown,
-                      icon: const Icon(Icons.skip_next_rounded),
-                      clipBehavior: Clip.hardEdge,
-                      label: Text(
-                        "timer.skip".t,
-                        overflow: TextOverflow.clip,
-                        maxLines: 1,
+                      Crossfade(
+                        firstChild: TextButton.icon(
+                          onPressed: skipCountdown,
+                          icon: const Icon(Icons.skip_next_rounded),
+                          clipBehavior: Clip.hardEdge,
+                          label: Text(
+                            "timer.skip".t,
+                            overflow: TextOverflow.clip,
+                            maxLines: 1,
+                          ),
+                        ),
+                        secondChild: IconButton(
+                          onPressed: skipCountdown,
+                          icon: Icon(
+                            Icons.skip_next_rounded,
+                            color: Theme.of(context).colorScheme.primary,
+                          ),
+                        ),
+                        showSecond: isPhone,
                       ),
-                    ),
-                    secondChild: IconButton(
-                      onPressed: skipCountdown,
-                      icon: Icon(
-                        Icons.skip_next_rounded,
-                        color: Theme.of(context).colorScheme.primary,
-                      ),
-                    ),
-                    showSecond: isPhone,
+                      const SizedBox(width: 8),
+                    ],
                   ),
-                  const SizedBox(width: 8),
-                ],
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

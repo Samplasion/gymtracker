@@ -96,10 +96,14 @@ class _MeCalendarPageState
               calendarController: calendarController,
               layout: Layout.DEFAULT,
               padding: EdgeInsets.symmetric(
-                  horizontal: max(
-                      0,
-                      (context.width - Breakpoints.xs.screenWidth.toDouble()) /
-                          2)),
+                    horizontal: max(
+                        0,
+                        (context.width -
+                                Breakpoints.xs.screenWidth.toDouble()) /
+                            2),
+                  ) +
+                  const EdgeInsets.all(16) +
+                  MediaQuery.of(context).padding.copyWith(top: 0),
               dayBuilder: (context, values) {
                 final date = values.day.startOfDay;
                 final count =

@@ -42,6 +42,12 @@ class WorkoutController extends GetxController with ServiceableController {
         weightUnit =
             (Get.find<SettingsController>().weightUnit() ?? Weights.kg).obs,
         distanceUnit = (Get.find<SettingsController>().distanceUnit()).obs {
+    final sc = Get.find<SettingsController>();
+    logger.d("""
+      Currently defined units:
+        - Weight: ${sc.weightUnit()!.name} \t(cfr. ${weightUnit.value.name})
+        - Distance: ${sc.distanceUnit().name} \t(cfr. ${distanceUnit.value.name})
+    """);
     logger.w(
       "Created with name $name, parentID $parentID, and infobox $infobox",
       error: Error(),
@@ -79,6 +85,7 @@ class WorkoutController extends GetxController with ServiceableController {
       // * If the stopwatch is running, we actually want to tick while the
       //   app is closed, so we save the starting time and the fact that it's
       //   running.
+      // TODO: Test these cases.
       if (data['globalStopwatchPaused'] == false) {
         controller.globalStopwatch.stopwatch = StopwatchEx.fromMilliseconds(
           DateTime.now().millisecondsSinceEpoch -
@@ -116,6 +123,8 @@ class WorkoutController extends GetxController with ServiceableController {
         parentID: parentID,
         infobox: infobox(),
         duration: DateTime.now().difference(time.value),
+        weightUnit: weightUnit.value,
+        distanceUnit: distanceUnit.value,
       );
 
   List<ExSet> get allSets => [for (final ex in exercises) ...ex.sets];
@@ -157,7 +166,11 @@ class WorkoutController extends GetxController with ServiceableController {
     if (Get.find<RoutinesController>().hasOngoingWorkout.isFalse) return;
     final stopwatchController = Get.find<StopwatchController>();
 
-    logger.i("Saving ongoing data");
+    logger.i(
+      "Saving ongoing data",
+      error: Error(),
+      stackTrace: StackTrace.current,
+    );
     service.writeToOngoing({
       "name": name.value,
       "exercises": exercises.map((ex) => ex.toJson()).toList(),
@@ -471,6 +484,43 @@ class WorkoutController extends GetxController with ServiceableController {
         save();
       },
     );
+  }
+
+  void applyExistingWorkout(
+    Workout workout, {
+    String? parentID,
+    required bool Function(WorkoutExercisable exercise) exerciseFilter,
+    bool Function(ExSet set)? setFilter,
+    bool continuation = false,
+  }) {
+    this
+      ..name(workout.name)
+      ..exercises([
+        for (final ex in workout.exercises)
+          if (exerciseFilter(ex))
+            if (ex is Exercise)
+              ex.instantiate(
+                workout: workout,
+                setFilter: setFilter,
+              )
+            else if (ex is Superset)
+              ex.copyWith(
+                exercises: ex.exercises
+                    .map((e) => e.instantiate(
+                          workout: workout,
+                          setFilter: setFilter,
+                        ))
+                    .toList(),
+              ),
+      ])
+      ..time(DateTime.now())
+      ..parentID(parentID)
+      ..infobox(workout.infobox)
+      ..isContinuation(continuation)
+      ..continuesID(continuation ? workout.id : null)
+      ..weightUnit(workout.weightUnit)
+      ..distanceUnit(workout.distanceUnit)
+      ..save();
   }
 
   @override

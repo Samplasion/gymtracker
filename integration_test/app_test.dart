@@ -12,6 +12,7 @@ import 'package:timezone/timezone.dart' as tz;
 import 'flows/combine_workouts.dart';
 import 'flows/create_exercise.dart';
 import 'flows/create_routine.dart';
+import 'flows/default_units.dart';
 import 'flows/edit_exercise_in_routines_and_history.dart';
 import 'flows/edit_exercise_while_ongoing.dart';
 import 'flows/edit_workout.dart';
@@ -79,6 +80,10 @@ void main() async {
     testWidgets(
       'combine workouts',
       (tester) => testCombineWorkoutsFlow(tester, l, databaseService),
+    );
+    testWidgets(
+      'test default units',
+      (tester) => testDefaultUnitsFlow(tester, l, databaseService),
     );
   });
 }

@@ -11,8 +11,6 @@ import 'package:gymtracker/view/exercises.dart';
 import 'package:gymtracker/view/routine_creator.dart';
 import 'package:universal_platform/universal_platform.dart';
 
-Workout get emptyWorkout => Workout(name: "", exercises: []);
-
 class RoutinesView extends StatefulWidget {
   const RoutinesView({super.key});
 
@@ -66,7 +64,7 @@ class _RoutinesViewState extends State<RoutinesView> {
                 subtitle: Text("routines.quickWorkout.subtitle".t),
                 leading: const CircleAvatar(child: Icon(Icons.timer_rounded)),
                 onTap: () {
-                  controller.startRoutine(context, emptyWorkout, isEmpty: true);
+                  controller.startRoutine(context);
                 },
               ),
             ),

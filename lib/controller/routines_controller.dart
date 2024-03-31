@@ -86,11 +86,9 @@ class RoutinesController extends GetxController
     Get.back();
   }
 
-  Future<void> startRoutine(
-    BuildContext context,
-    Workout workout, {
-    bool isEmpty = false,
-  }) async {
+  Future<void> startRoutine(BuildContext context, [Workout? workout]) async {
+    final isEmpty = workout == null;
+
     if (hasOngoingWorkout.isTrue) {
       final result = await showDialog<bool>(
         context: context,
@@ -101,9 +99,9 @@ class RoutinesController extends GetxController
 
     removeCountdown();
 
-    String? workoutID = workout.isConcrete ? workout.parentID : workout.id;
-    if (isEmpty) {
-      workoutID = null;
+    String? workoutID;
+    if (!isEmpty) {
+      workoutID = workout.isConcrete ? workout.parentID : workout.id;
     }
 
     Get.put(WorkoutController("workouts.untitled".t, workoutID, null));
@@ -159,41 +157,22 @@ class RoutinesController extends GetxController
   }
 
   _clone(
-    Workout workout, {
+    Workout? workout, {
     String? parentID,
     required bool Function(WorkoutExercisable exercise) exerciseFilter,
     bool Function(ExSet set)? setFilter,
     bool continuation = false,
   }) {
-    final clone = workout.clone();
-    Get.find<WorkoutController>()
-      ..name(clone.name)
-      ..exercises([
-        for (final ex in clone.exercises)
-          if (exerciseFilter(ex))
-            if (ex is Exercise)
-              ex.instantiate(
-                workout: workout,
-                setFilter: setFilter,
-              )
-            else if (ex is Superset)
-              ex.copyWith(
-                exercises: ex.exercises
-                    .map((e) => e.instantiate(
-                          workout: workout,
-                          setFilter: setFilter,
-                        ))
-                    .toList(),
-              ),
-      ])
-      ..time(DateTime.now())
-      ..parentID(parentID)
-      ..infobox(workout.infobox)
-      ..isContinuation(continuation)
-      ..continuesID(continuation ? workout.id : null)
-      ..weightUnit(clone.weightUnit)
-      ..distanceUnit(clone.distanceUnit)
-      ..save();
+    if (workout != null) {
+      final clone = workout.clone();
+      Get.find<WorkoutController>().applyExistingWorkout(
+        clone,
+        parentID: parentID,
+        exerciseFilter: exerciseFilter,
+        setFilter: setFilter,
+        continuation: continuation,
+      );
+    }
   }
 
   void deleteWorkout(Workout workout) {

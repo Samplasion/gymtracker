@@ -395,51 +395,53 @@ class _WeightMeasurementAddSheet extends State<WeightMeasurementAddSheet> {
           IconButton(onPressed: submit, icon: const Icon(Icons.done)),
         ],
       ),
-      body: ListView(
-        controller: widget.controller,
-        padding: const EdgeInsets.all(16),
-        children: [
-          DateField(
-            decoration: _decoration("me.addWeight.time.label".t),
-            date: time,
-            onSelect: (date) => setState(() => time = date),
-            firstDate: DateTime.fromMillisecondsSinceEpoch(0),
-            lastDate: DateTime.now()
-                .add(const Duration(days: 1))
-                .copyWith(hour: 0, minute: 0, second: 0),
-          ),
-          const SizedBox(height: 16),
-          TextField(
-            focusNode: _weightFocusNode,
-            controller: weightController,
-            keyboardType: const TextInputType.numberWithOptions(
-              decimal: true,
-              signed: true,
+      body: SafeArea(
+        child: ListView(
+          controller: widget.controller,
+          padding: const EdgeInsets.all(16),
+          children: [
+            DateField(
+              decoration: _decoration("me.addWeight.time.label".t),
+              date: time,
+              onSelect: (date) => setState(() => time = date),
+              firstDate: DateTime.fromMillisecondsSinceEpoch(0),
+              lastDate: DateTime.now()
+                  .add(const Duration(days: 1))
+                  .copyWith(hour: 0, minute: 0, second: 0),
             ),
-            inputFormatters: [
-              FilteringTextInputFormatter.allow(RegExp("[0123456789.,]")),
-            ],
-            decoration: InputDecoration(
-              isDense: true,
-              border: const OutlineInputBorder(),
-              labelText: "me.addWeight.weight.label".t,
-              suffix: Text("units.${weightUnit.name}".t),
+            const SizedBox(height: 16),
+            TextField(
+              focusNode: _weightFocusNode,
+              controller: weightController,
+              keyboardType: const TextInputType.numberWithOptions(
+                decimal: true,
+                signed: true,
+              ),
+              inputFormatters: [
+                FilteringTextInputFormatter.allow(RegExp("[0123456789.,]")),
+              ],
+              decoration: InputDecoration(
+                isDense: true,
+                border: const OutlineInputBorder(),
+                labelText: "me.addWeight.weight.label".t,
+                suffix: Text("units.${weightUnit.name}".t),
+              ),
             ),
-          ),
-          const SizedBox(height: 16),
-          DropdownButtonFormField<Weights>(
-            decoration: _decoration("me.addWeight.weightUnit.label".t),
-            items: [
-              for (final weightUnit in Weights.values)
-                DropdownMenuItem(
-                  value: weightUnit,
-                  child: Text("weightUnits.${weightUnit.name}".t),
-                ),
-            ],
-            onChanged: (v) => setState(() => weightUnit = v!),
-            value: weightUnit,
-          ),
-        ],
+            const SizedBox(height: 16),
+            DropdownButtonFormField<Weights>(
+              decoration: _decoration("me.addWeight.weightUnit.label".t),
+              items: [
+                for (final weightUnit in Weights.values)
+                  DropdownMenuItem(
+                    value: weightUnit,
+                    child: Text("weightUnits.${weightUnit.name}".t),
+                  ),
+              ],
+              onChanged: (v) => setState(() => weightUnit = v!),
+              value: weightUnit,
+            ),
+          ],
+        ),
       ),
     );
   }

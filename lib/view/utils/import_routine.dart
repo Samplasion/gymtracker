@@ -49,7 +49,12 @@ class _ImportRoutineModalState extends State<ImportRoutineModal>
             ),
           SliverPadding(
             padding: const EdgeInsets.all(16).copyWith(
-                bottom: kBottomNavigationBarHeight + safeArea.bottom + 20),
+                  bottom: kBottomNavigationBarHeight + safeArea.bottom + 20,
+                ) +
+                EdgeInsets.only(
+                  left: safeArea.left,
+                  right: safeArea.right,
+                ),
             sliver: DecoratedSliver(
               decoration: BoxDecoration(
                 border: Border.all(
@@ -102,27 +107,30 @@ class _ImportRoutineModalState extends State<ImportRoutineModal>
             ],
           ),
         ),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          child: OverflowBar(
-            alignment: MainAxisAlignment.end,
-            spacing: 8,
-            overflowSpacing: 16,
-            children: [
-              FilledButton.tonal(
-                onPressed: () => Get.back(),
-                child:
-                    Text(MaterialLocalizations.of(context).cancelButtonLabel),
-              ),
-              FilledButton(
-                onPressed: () {
-                  Get.back();
-                  Get.find<RoutinesController>().importWorkout(workout);
-                  Go.snack("importRoutine.import.done".t);
-                },
-                child: Text('importRoutine.import.label'.t),
-              ),
-            ],
+        child: SafeArea(
+          bottom: false,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: OverflowBar(
+              alignment: MainAxisAlignment.end,
+              spacing: 8,
+              overflowSpacing: 16,
+              children: [
+                FilledButton.tonal(
+                  onPressed: () => Get.back(),
+                  child:
+                      Text(MaterialLocalizations.of(context).cancelButtonLabel),
+                ),
+                FilledButton(
+                  onPressed: () {
+                    Get.back();
+                    Get.find<RoutinesController>().importWorkout(workout);
+                    Go.snack("importRoutine.import.done".t);
+                  },
+                  child: Text('importRoutine.import.label'.t),
+                ),
+              ],
+            ),
           ),
         ),
       ),

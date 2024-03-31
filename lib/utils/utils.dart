@@ -57,3 +57,16 @@ QuillController quillControllerFromText(String? text) {
     selection: const TextSelection.collapsed(offset: 0),
   );
 }
+
+// Returns a date such that, if today's day of week is [firstDayOfWeek], then
+// the returned date is today. Otherwise, it is the most recent day of the week
+// in the past that has [firstDayOfWeek] as its day of week.
+DateTime getLastDayOfWeek(DateTime date, int firstDayOfWeek) {
+  final today = date.startOfDay;
+  var offset = today.weekday - firstDayOfWeek;
+  if (offset <= 0) offset += 7;
+  final lastMonday = today.weekday == firstDayOfWeek
+      ? today
+      : today.subtract(Duration(days: offset));
+  return lastMonday;
+}

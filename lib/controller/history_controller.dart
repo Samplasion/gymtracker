@@ -9,6 +9,7 @@ import 'package:gymtracker/model/superset.dart';
 import 'package:gymtracker/model/workout.dart';
 import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/service/logger.dart';
+import 'package:gymtracker/struct/streaks.dart';
 import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/view/exercises.dart';
@@ -24,7 +25,7 @@ class HistoryController extends GetxController with ServiceableController {
       .toList();
   Map<DateTime, List<Workout>> workoutsByDay = {};
 
-  Rx<(int, int)> streaks = (0, 0).obs;
+  Rx<Streaks> streaks = Streaks.zero.obs;
 
   @override
   void onServiceChange() {
@@ -34,7 +35,7 @@ class HistoryController extends GetxController with ServiceableController {
         .compareTo(b.startingDate ?? DateTime.fromMillisecondsSinceEpoch(0)));
     history(hist);
     _computeWorkoutsByDay();
-    _computeStreaks();
+    computeStreaks();
   }
 
   void _computeWorkoutsByDay() {
@@ -47,39 +48,14 @@ class HistoryController extends GetxController with ServiceableController {
     workoutsByDay = _counts;
   }
 
-  // TODO: Localize the first day-of-week for streak weeks computation
-  void _computeStreaks() {
-    logger.t("Recomputed streaks");
+  void computeStreaks() {
+    streaks(Streaks.fromMappedDays(
+      workoutsByDay,
+      firstDayOfWeek: GTLocalizations.firstDayOfWeekFor(Get.context!),
+      today: DateTime.now(),
+    ));
 
-    var (streak, rest) = (0, 0);
-
-    final keys = workoutsByDay.keys.toList();
-    keys.sort();
-
-    var today = DateTime.now().startOfDay;
-    var lastMonday = today.weekday == DateTime.monday
-        ? today
-        : today.subtract(Duration(days: today.weekday - 1));
-
-    while (true) {
-      if (keys.any((element) =>
-          element.isAfter(lastMonday) &&
-          element.isBefore(lastMonday.add(const Duration(days: 7))))) {
-        streak++;
-        lastMonday = lastMonday.subtract(const Duration(days: 7));
-      } else {
-        break;
-      }
-    }
-
-    if (!workoutsByDay.containsKey(today)) {
-      final keys = workoutsByDay.keys.toList()..sort();
-      if (keys.isNotEmpty) {
-        rest = today.difference(keys.last).inDays;
-      }
-    }
-
-    streaks((streak, rest));
+    logger.d("Recomputed streaks: $streaks");
   }
 
   void deleteWorkout(Workout workout) {

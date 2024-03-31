@@ -162,6 +162,14 @@ class _DebugViewState extends State<DebugView> {
                 ),
                 onUpdate: (v) => logger_lib.Logger.level = v!,
               ),
+              ListTile(
+                title: const Text("Recompute streaks"),
+                subtitle: Text(
+                    "Current value: ${Get.find<HistoryController>().streaks.value}"),
+                onTap: () {
+                  Get.find<HistoryController>().computeStreaks();
+                },
+              ),
 
               // ------------
               ListTile(

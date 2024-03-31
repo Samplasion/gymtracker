@@ -42,6 +42,7 @@ class _MeCalendarPageState
     onDayTapped: (day) {
       Go.to(() => MeCalendarDayPage(day: day.startOfDay));
     },
+    weekdayStart: GTLocalizations.firstDayOfWeekFor(context),
   );
 
   @override
@@ -56,7 +57,7 @@ class _MeCalendarPageState
             padding: const EdgeInsets.all(16),
             child: Obx(
               () {
-                final (streakWeeks, restDays) = historyController.streaks();
+                final streaks = historyController.streaks();
                 return SpeedDial(
                   crossAxisCountBuilder: (breakpoint) => switch (breakpoint) {
                     Breakpoints.xxs => 1,
@@ -72,7 +73,8 @@ class _MeCalendarPageState
                     SpeedDialButton(
                       icon: Icon(GymTrackerIcons.fire,
                           color: context.harmonizeColor(Colors.orange)),
-                      text: Text("me.calendar.streakWeeks".plural(streakWeeks)),
+                      text: Text(
+                          "me.calendar.streakWeeks".plural(streaks.weekStreak)),
                       subtitle: Text("me.calendar.streak".t),
                       dense: true,
                     ),
@@ -80,7 +82,8 @@ class _MeCalendarPageState
                       icon: Icon(Icons.nightlight_round,
                           color: context
                               .harmonizeColor(Colors.deepPurple.shade300)),
-                      text: Text("me.calendar.streakDays".plural(restDays)),
+                      text: Text(
+                          "me.calendar.streakDays".plural(streaks.restDays)),
                       subtitle: Text("me.calendar.rest".t),
                       dense: true,
                     ),

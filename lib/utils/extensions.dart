@@ -71,6 +71,10 @@ extension DateUtils on DateTime {
   DateTime get startOfDay {
     return DateTime(year, month, day, 0, 0, 0, 0, 0);
   }
+
+  bool isAfterOrAtSameMomentAs(DateTime other) {
+    return isAfter(other) || isAtSameMomentAs(other);
+  }
 }
 
 extension ColorUtils on Color {

@@ -26,6 +26,8 @@ import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 
 void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
   final _databaseService = DatabaseService();
 
   final l = GTLocalizations();

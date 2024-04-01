@@ -78,12 +78,6 @@ class _HistoryViewState extends State<HistoryView> {
   _recompute() {
     final controller = Get.find<HistoryController>();
     try {
-      // TODO: Figure out why this freaks out
-      // historyByMonth = compute(_getHistoryByMonthThread, () {
-      //   print(
-      //       controller.userVisibleWorkouts.map((e) => e.runtimeType).toList());
-      //   return controller.userVisibleWorkouts;
-      // }());
       historyByMonth = Future.value(_getHistoryByMonthThread(
         controller.userVisibleWorkouts,
       ));

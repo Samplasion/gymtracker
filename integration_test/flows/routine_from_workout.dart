@@ -6,7 +6,6 @@ import 'package:gymtracker/main.dart';
 import 'package:gymtracker/service/database.dart';
 import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/view/utils/history_workout.dart';
-import 'package:gymtracker/view/utils/workout_done.dart';
 import 'package:gymtracker/view/workout.dart';
 
 const workoutName = "Workout";

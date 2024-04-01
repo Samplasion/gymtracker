@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
 import 'package:gymtracker/utils/go.dart';
 
 typedef OnChange<T> = void Function(T value);
@@ -30,7 +29,6 @@ class RadioModalTile<T> extends StatefulWidget {
 
 class _RadioModalTileState<T> extends State<RadioModalTile<T>>
     with SingleTickerProviderStateMixin {
-  late T _value = widget.selectedValue;
   final ScrollController _scrollController = ScrollController();
 
   @override
@@ -64,7 +62,6 @@ class _RadioModalTileState<T> extends State<RadioModalTile<T>>
           onChange: (value) {
             if (value != null && mounted) {
               setState(() {
-                _value = value;
                 widget.onChange?.call(value);
               });
             }

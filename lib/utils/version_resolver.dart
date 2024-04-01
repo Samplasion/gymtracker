@@ -52,7 +52,7 @@ class VersionResolver {
 
   Future<double> getiOSVersion() async {
     final iosInfo = await _plugin.iosInfo;
-    return double.parse(iosInfo.systemVersion!.split(".").first);
+    return double.parse(iosInfo.systemVersion.split(".").first);
   }
 
   Future<double> getMacOSVersion() async {

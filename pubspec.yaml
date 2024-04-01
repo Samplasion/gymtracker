@@ -1,10 +1,10 @@
 name: gymtracker
 description: A new Flutter project.
-publish_to: 'none'
+publish_to: "none"
 version: 0.4.0
 
 environment:
-  sdk: '>=3.1.4 <4.0.0'
+  sdk: ">=3.1.4 <4.0.0"
 
 dependencies:
   animations: ^2.0.7
@@ -19,17 +19,14 @@ dependencies:
   flex_color_picker: ^3.3.0
   flutter:
     sdk: flutter
-  flutter_expandable_fab: ^2.0.0
   flutter_local_notifications: ^17.0.0
   flutter_localizations:
     sdk: flutter
-  flutter_multi_formatter: ^2.10.2
   flutter_quill: ^9.3.3
   flutter_slidable: ^3.1.0
   flutter_sticky_header: ^0.6.5
   flutter_timezone: ^1.0.8
   get: ^4.6.5
-  get_storage: ^2.0.3
   hive: ^2.2.3
   hive_flutter: ^1.1.0
   hive_ui: ^1.0.14
@@ -66,9 +63,9 @@ dev_dependencies:
 
 flutter:
   fonts:
-   - family:  GymTracker
-     fonts:
-      - asset: fonts/GymTracker.ttf
+    - family: GymTracker
+      fonts:
+        - asset: fonts/GymTracker.ttf
 
   uses-material-design: true
   assets:

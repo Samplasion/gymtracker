@@ -8,7 +8,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:get/get.dart';
-import 'package:get_storage/get_storage.dart';
 import 'package:gymtracker/controller/coordinator.dart';
 import 'package:gymtracker/controller/debug_controller.dart';
 import 'package:gymtracker/controller/settings_controller.dart';
@@ -28,8 +27,6 @@ import 'package:timezone/timezone.dart' as tz;
 
 void main() async {
   final _databaseService = DatabaseService();
-
-  await GetStorage.init();
 
   final l = GTLocalizations();
   await l.init();

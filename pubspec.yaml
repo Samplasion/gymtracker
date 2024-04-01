@@ -39,7 +39,9 @@ dependencies:
   modal_bottom_sheet: ^3.0.0-pre
   package_info_plus: ^6.0.0
   protocol_handler: ^0.2.0
+  qr_flutter: ^4.1.0
   quill_delta: ^3.0.0-nullsafety.2
+  screenshot: ^2.3.0
   scrollable_clean_calendar: ^1.5.0
   share_plus: ^8.0.2
   simple_animations: ^5.0.2

@@ -136,7 +136,9 @@ workouts:
         title: Link generato
         body: Un link univoco è stato generato. Tocca il pulsante per copiarlo, poi invia il link per condividere questa routine.
         actions:
+          close: Chiudi
           share: Copia
+          shareQR: Condividi QR
           shared: Il link è stato copiato.
 
 routines:

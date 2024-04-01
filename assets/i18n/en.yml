@@ -136,7 +136,9 @@ workouts:
         title: Link generated
         body: A unique link has been generated. Click the button below to copy it, and send it to share the routine.
         actions:
+          close: Close
           share: Copy
+          shareQR: Share QR code
           shared: The link has been copied.
 
 routines:

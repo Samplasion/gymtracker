@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
-import 'package:get/get.dart';
+import 'package:get/get.dart' hide ContextExtensionss;
 import 'package:gymtracker/controller/countdown_controller.dart';
 import 'package:gymtracker/controller/history_controller.dart';
 import 'package:gymtracker/controller/serviceable_controller.dart';
@@ -16,6 +16,7 @@ import 'package:gymtracker/model/superset.dart';
 import 'package:gymtracker/model/workout.dart';
 import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/service/logger.dart';
+import 'package:gymtracker/service/share.dart';
 import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/utils/utils.dart' as utils;
@@ -24,6 +25,8 @@ import 'package:gymtracker/view/utils/history_workout.dart';
 import 'package:gymtracker/view/utils/import_routine.dart';
 import 'package:gymtracker/view/workout.dart';
 import 'package:protocol_handler/protocol_handler.dart';
+import 'package:qr_flutter/qr_flutter.dart';
+import 'package:screenshot/screenshot.dart';
 
 class RoutinesController extends GetxController
     with ServiceableController, ProtocolListener {
@@ -374,42 +377,7 @@ class RoutinesController extends GetxController
     );
     showDialog(
       context: Get.context!,
-      builder: (context) => AlertDialog(
-        title: Text("workouts.actions.share.alert.title".t),
-        scrollable: true,
-        content: RichText(
-          text: TextSpan(
-            children: [
-              // TODO: QR code.
-              TextSpan(text: "workouts.actions.share.alert.body".t),
-              const TextSpan(text: "\n\n"),
-              TextSpan(
-                text: uri.toString(),
-                style: const TextStyle(
-                  fontFamily: "monospace",
-                  fontFamilyFallback: <String>["Menlo", "Courier"],
-                ),
-              ),
-            ],
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Get.back();
-            },
-            child: Text(MaterialLocalizations.of(context).okButtonLabel),
-          ),
-          TextButton(
-            onPressed: () {
-              Get.back();
-              Clipboard.setData(ClipboardData(text: uri.toString()));
-              Go.snack("workouts.actions.share.alert.actions.shared".t);
-            },
-            child: Text("workouts.actions.share.alert.actions.share".t),
-          ),
-        ],
-      ),
+      builder: (context) => ShareRoutineAlertDialog(uri: uri),
     );
   }
 
@@ -485,5 +453,109 @@ class RoutinesController extends GetxController
         ),
       ),
     );
+  }
+}
+
+class ShareRoutineAlertDialog extends StatefulWidget {
+  final Uri uri;
+
+  const ShareRoutineAlertDialog({required this.uri, super.key});
+
+  @override
+  State<ShareRoutineAlertDialog> createState() =>
+      _ShareRoutineAlertDialogState();
+}
+
+class _ShareRoutineAlertDialogState extends State<ShareRoutineAlertDialog> {
+  ScreenshotController screenshotController = ScreenshotController();
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: Text("workouts.actions.share.alert.title".t),
+      scrollable: true,
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text("workouts.actions.share.alert.body".t),
+          const SizedBox(height: 16),
+          SizedBox(
+            width: 480.0,
+            height: 480.0,
+            child: QrImageView(
+              data: widget.uri.toString(),
+              version: QrVersions.auto,
+              eyeStyle: QrEyeStyle(
+                eyeShape: QrEyeShape.square,
+                color: context.theme.colorScheme.onSurface,
+              ),
+              dataModuleStyle: QrDataModuleStyle(
+                dataModuleShape: QrDataModuleShape.square,
+                color: context.theme.colorScheme.onSurface,
+              ),
+              padding: const EdgeInsets.all(16),
+            ),
+          ),
+          const SizedBox(height: 16),
+          Text(
+            widget.uri.toString(),
+            style: TextStyle(
+              fontFamily: "monospace",
+              fontFamilyFallback: const <String>["Menlo", "Courier"],
+              color: context.theme.colorScheme.onSurfaceVariant,
+            ),
+          ),
+        ],
+      ),
+      actions: [
+        TextButton(
+          onPressed: () {
+            Get.back();
+          },
+          child: Text("workouts.actions.share.alert.actions.close".t),
+        ),
+        TextButton(
+          onPressed: () {
+            Get.back();
+            Clipboard.setData(ClipboardData(text: widget.uri.toString()));
+            Go.snack("workouts.actions.share.alert.actions.shared".t);
+          },
+          child: Text("workouts.actions.share.alert.actions.share".t),
+        ),
+        FilledButton.tonal(
+          onPressed: () {
+            shareImage();
+          },
+          child: Text("workouts.actions.share.alert.actions.shareQR".t),
+        ),
+      ],
+    );
+  }
+
+  Future<void> shareImage() async {
+    const imageSize = 512.0;
+    final capturedImage = await screenshotController.captureFromWidget(
+      SizedBox(
+        width: imageSize,
+        height: imageSize,
+        child: QrImageView(
+          data: widget.uri.toString(),
+          version: QrVersions.auto,
+          backgroundColor: Colors.white,
+          eyeStyle: const QrEyeStyle(
+            eyeShape: QrEyeShape.square,
+            color: Colors.black,
+          ),
+          dataModuleStyle: const QrDataModuleStyle(
+            dataModuleShape: QrDataModuleShape.square,
+            color: Colors.black,
+          ),
+          padding: const EdgeInsets.all(4),
+        ),
+      ),
+      targetSize: const Size(imageSize, imageSize),
+    );
+
+    ShareService().shareImage(capturedImage);
   }
 }

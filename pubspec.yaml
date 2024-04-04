@@ -12,6 +12,7 @@ dependencies:
   custom_refresh_indicator: ^3.1.0
   device_info_plus: ^9.1.2
   device_sim: ^0.1.2
+  drift: ^2.16.0
   dynamic_color: ^1.6.2
   file_picker: ^8.0.0+1
   fl_chart: ^0.66.2
@@ -35,6 +36,8 @@ dependencies:
   logger: ^2.2.0
   modal_bottom_sheet: ^3.0.0-pre
   package_info_plus: ^6.0.0
+  path: ^1.9.0
+  path_provider: ^2.1.2
   protocol_handler: ^0.2.0
   qr_flutter: ^4.1.0
   quill_delta: ^3.0.0-nullsafety.2
@@ -42,6 +45,8 @@ dependencies:
   scrollable_clean_calendar: ^1.5.0
   share_plus: ^8.0.2
   simple_animations: ^5.0.2
+  sqlite3: ^2.4.2
+  sqlite3_flutter_libs: ^0.5.20
   timezone: ^0.9.2
   universal_platform: ^1.0.0+1
   uuid: ^4.0.0
@@ -52,7 +57,7 @@ dev_dependencies:
     sdk: flutter
   flutter_quill_test: ^9.3.3
   flutter_lints: ^3.0.1
-  build_runner: ^2.3.3
+  build_runner: ^2.4.9
   json_serializable: ^6.6.1
   copy_with_extension_gen: ^5.0.0
   integration_test:
@@ -60,6 +65,7 @@ dev_dependencies:
   flutter_driver:
     sdk: flutter
   test: ^1.24.3
+  drift_dev: ^2.16.0
 
 flutter:
   fonts:

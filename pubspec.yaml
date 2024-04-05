@@ -13,6 +13,7 @@ dependencies:
   device_info_plus: ^9.1.2
   device_sim: ^0.1.2
   drift: ^2.16.0
+  drift_db_viewer: ^2.0.0
   dynamic_color: ^1.6.2
   file_picker: ^8.0.0+1
   fl_chart: ^0.66.2
@@ -41,6 +42,7 @@ dependencies:
   protocol_handler: ^0.2.0
   qr_flutter: ^4.1.0
   quill_delta: ^3.0.0-nullsafety.2
+  rxdart: ^0.27.7
   screenshot: ^2.3.0
   scrollable_clean_calendar: ^1.5.0
   share_plus: ^8.0.2

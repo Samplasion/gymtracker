@@ -144,7 +144,7 @@ abstract class _$GTHistoryWorkoutCWProxy {
 
   GTHistoryWorkout duration(Duration duration);
 
-  GTHistoryWorkout parentID(int parentID);
+  GTHistoryWorkout parentID(int? parentID);
 
   GTHistoryWorkout completedByID(int? completedByID);
 
@@ -210,7 +210,7 @@ class _$GTHistoryWorkoutCWProxyImpl implements _$GTHistoryWorkoutCWProxy {
   GTHistoryWorkout duration(Duration duration) => this(duration: duration);
 
   @override
-  GTHistoryWorkout parentID(int parentID) => this(parentID: parentID);
+  GTHistoryWorkout parentID(int? parentID) => this(parentID: parentID);
 
   @override
   GTHistoryWorkout completedByID(int? completedByID) =>
@@ -282,10 +282,10 @@ class _$GTHistoryWorkoutCWProxyImpl implements _$GTHistoryWorkoutCWProxy {
           ? _value.duration
           // ignore: cast_nullable_to_non_nullable
           : duration as Duration,
-      parentID: parentID == const $CopyWithPlaceholder() || parentID == null
+      parentID: parentID == const $CopyWithPlaceholder()
           ? _value.parentID
           // ignore: cast_nullable_to_non_nullable
-          : parentID as int,
+          : parentID as int?,
       completedByID: completedByID == const $CopyWithPlaceholder()
           ? _value.completedByID
           // ignore: cast_nullable_to_non_nullable
@@ -353,7 +353,7 @@ GTHistoryWorkout _$GTHistoryWorkoutFromJson(Map<String, dynamic> json) =>
       sortOrder: json['sortOrder'] as int,
       startingDate: DateTime.parse(json['startingDate'] as String),
       duration: Duration(microseconds: json['duration'] as int),
-      parentID: json['parentID'] as int,
+      parentID: json['parentID'] as int?,
       completedByID: json['completedByID'] as int?,
       completesID: json['completesID'] as int?,
     );

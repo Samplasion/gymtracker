@@ -9,6 +9,8 @@ part of 'exercise.dart';
 abstract class _$GTLibraryExerciseCWProxy {
   GTLibraryExercise id(int id);
 
+  GTLibraryExercise libraryID(String? libraryID);
+
   GTLibraryExercise name(String name);
 
   GTLibraryExercise parameters(GTSetParameters parameters);
@@ -18,6 +20,8 @@ abstract class _$GTLibraryExerciseCWProxy {
   GTLibraryExercise secondaryMuscleGroups(
       Set<GTMuscleGroup> secondaryMuscleGroups);
 
+  GTLibraryExercise isCustom(bool isCustom);
+
   /// This function **does support** nullification of nullable fields. All `null` values passed to `non-nullable` fields will be ignored. You can also use `GTLibraryExercise(...).copyWith.fieldName(...)` to override fields one at a time with nullification support.
   ///
   /// Usage
@@ -26,10 +30,12 @@ abstract class _$GTLibraryExerciseCWProxy {
   /// ````
   GTLibraryExercise call({
     int? id,
+    String? libraryID,
     String? name,
     GTSetParameters? parameters,
     GTMuscleGroup? primaryMuscleGroup,
     Set<GTMuscleGroup>? secondaryMuscleGroups,
+    bool? isCustom,
   });
 }
 
@@ -41,6 +47,9 @@ class _$GTLibraryExerciseCWProxyImpl implements _$GTLibraryExerciseCWProxy {
 
   @override
   GTLibraryExercise id(int id) => this(id: id);
+
+  @override
+  GTLibraryExercise libraryID(String? libraryID) => this(libraryID: libraryID);
 
   @override
   GTLibraryExercise name(String name) => this(name: name);
@@ -59,6 +68,9 @@ class _$GTLibraryExerciseCWProxyImpl implements _$GTLibraryExerciseCWProxy {
       this(secondaryMuscleGroups: secondaryMuscleGroups);
 
   @override
+  GTLibraryExercise isCustom(bool isCustom) => this(isCustom: isCustom);
+
+  @override
 
   /// This function **does support** nullification of nullable fields. All `null` values passed to `non-nullable` fields will be ignored. You can also use `GTLibraryExercise(...).copyWith.fieldName(...)` to override fields one at a time with nullification support.
   ///
@@ -68,16 +80,22 @@ class _$GTLibraryExerciseCWProxyImpl implements _$GTLibraryExerciseCWProxy {
   /// ````
   GTLibraryExercise call({
     Object? id = const $CopyWithPlaceholder(),
+    Object? libraryID = const $CopyWithPlaceholder(),
     Object? name = const $CopyWithPlaceholder(),
     Object? parameters = const $CopyWithPlaceholder(),
     Object? primaryMuscleGroup = const $CopyWithPlaceholder(),
     Object? secondaryMuscleGroups = const $CopyWithPlaceholder(),
+    Object? isCustom = const $CopyWithPlaceholder(),
   }) {
     return GTLibraryExercise(
       id: id == const $CopyWithPlaceholder() || id == null
           ? _value.id
           // ignore: cast_nullable_to_non_nullable
           : id as int,
+      libraryID: libraryID == const $CopyWithPlaceholder()
+          ? _value.libraryID
+          // ignore: cast_nullable_to_non_nullable
+          : libraryID as String?,
       name: name == const $CopyWithPlaceholder() || name == null
           ? _value.name
           // ignore: cast_nullable_to_non_nullable
@@ -98,6 +116,10 @@ class _$GTLibraryExerciseCWProxyImpl implements _$GTLibraryExerciseCWProxy {
               ? _value.secondaryMuscleGroups
               // ignore: cast_nullable_to_non_nullable
               : secondaryMuscleGroups as Set<GTMuscleGroup>,
+      isCustom: isCustom == const $CopyWithPlaceholder() || isCustom == null
+          ? _value.isCustom
+          // ignore: cast_nullable_to_non_nullable
+          : isCustom as bool,
     );
   }
 }
@@ -122,6 +144,8 @@ abstract class _$GTSupersetCWProxy {
 
   GTSuperset sortOrder(int sortOrder);
 
+  GTSuperset exercises(List<GTExercise> exercises);
+
   /// This function **does support** nullification of nullable fields. All `null` values passed to `non-nullable` fields will be ignored. You can also use `GTSuperset(...).copyWith.fieldName(...)` to override fields one at a time with nullification support.
   ///
   /// Usage
@@ -135,6 +159,7 @@ abstract class _$GTSupersetCWProxy {
     Duration? restTime,
     String? notes,
     int? sortOrder,
+    List<GTExercise>? exercises,
   });
 }
 
@@ -163,6 +188,10 @@ class _$GTSupersetCWProxyImpl implements _$GTSupersetCWProxy {
   GTSuperset sortOrder(int sortOrder) => this(sortOrder: sortOrder);
 
   @override
+  GTSuperset exercises(List<GTExercise> exercises) =>
+      this(exercises: exercises);
+
+  @override
 
   /// This function **does support** nullification of nullable fields. All `null` values passed to `non-nullable` fields will be ignored. You can also use `GTSuperset(...).copyWith.fieldName(...)` to override fields one at a time with nullification support.
   ///
@@ -177,6 +206,7 @@ class _$GTSupersetCWProxyImpl implements _$GTSupersetCWProxy {
     Object? restTime = const $CopyWithPlaceholder(),
     Object? notes = const $CopyWithPlaceholder(),
     Object? sortOrder = const $CopyWithPlaceholder(),
+    Object? exercises = const $CopyWithPlaceholder(),
   }) {
     return GTSuperset(
       id: id == const $CopyWithPlaceholder() || id == null
@@ -203,6 +233,10 @@ class _$GTSupersetCWProxyImpl implements _$GTSupersetCWProxy {
           ? _value.sortOrder
           // ignore: cast_nullable_to_non_nullable
           : sortOrder as int,
+      exercises: exercises == const $CopyWithPlaceholder() || exercises == null
+          ? _value.exercises
+          // ignore: cast_nullable_to_non_nullable
+          : exercises as List<GTExercise>,
     );
   }
 }
@@ -433,6 +467,7 @@ extension $GTExerciseCopyWith on GTExercise {
 GTLibraryExercise _$GTLibraryExerciseFromJson(Map<String, dynamic> json) =>
     GTLibraryExercise(
       id: json['id'] as int,
+      libraryID: json['libraryID'] as String?,
       name: json['name'] as String,
       parameters: $enumDecode(_$GTSetParametersEnumMap, json['parameters']),
       primaryMuscleGroup:
@@ -440,11 +475,13 @@ GTLibraryExercise _$GTLibraryExerciseFromJson(Map<String, dynamic> json) =>
       secondaryMuscleGroups: (json['secondaryMuscleGroups'] as List<dynamic>)
           .map((e) => $enumDecode(_$GTMuscleGroupEnumMap, e))
           .toSet(),
+      isCustom: json['isCustom'] as bool? ?? true,
     );
 
 Map<String, dynamic> _$GTLibraryExerciseToJson(GTLibraryExercise instance) =>
     <String, dynamic>{
       'id': instance.id,
+      'libraryID': instance.libraryID,
       'name': instance.name,
       'parameters': _$GTSetParametersEnumMap[instance.parameters]!,
       'primaryMuscleGroup':
@@ -452,6 +489,7 @@ Map<String, dynamic> _$GTLibraryExerciseToJson(GTLibraryExercise instance) =>
       'secondaryMuscleGroups': instance.secondaryMuscleGroups
           .map((e) => _$GTMuscleGroupEnumMap[e]!)
           .toList(),
+      'isCustom': instance.isCustom,
     };
 
 const _$GTSetParametersEnumMap = {
@@ -490,6 +528,9 @@ GTSuperset _$GTSupersetFromJson(Map<String, dynamic> json) => GTSuperset(
       restTime: Duration(microseconds: json['restTime'] as int),
       notes: json['notes'] as String,
       sortOrder: json['sortOrder'] as int,
+      exercises: (json['exercises'] as List<dynamic>)
+          .map((e) => GTExercise.fromJson(e as Map<String, dynamic>))
+          .toList(),
     );
 
 Map<String, dynamic> _$GTSupersetToJson(GTSuperset instance) =>
@@ -500,6 +541,7 @@ Map<String, dynamic> _$GTSupersetToJson(GTSuperset instance) =>
       'notes': instance.notes,
       'sortOrder': instance.sortOrder,
       'restTime': instance.restTime.inMicroseconds,
+      'exercises': instance.exercises,
     };
 
 GTExercise _$GTExerciseFromJson(Map<String, dynamic> json) => GTExercise(

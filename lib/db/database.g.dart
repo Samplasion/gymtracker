@@ -22,10 +22,7 @@ class $CustomExercisesTable extends CustomExercises
   @override
   late final GeneratedColumn<String> name = GeneratedColumn<String>(
       'name', aliasedName, false,
-      additionalChecks:
-          GeneratedColumn.checkTextLength(minTextLength: 1, maxTextLength: 64),
-      type: DriftSqlType.string,
-      requiredDuringInsert: true);
+      type: DriftSqlType.string, requiredDuringInsert: true);
   static const VerificationMeta _parametersMeta =
       const VerificationMeta('parameters');
   @override
@@ -347,16 +344,13 @@ class $RoutinesTable extends Routines with TableInfo<$RoutinesTable, Routine> {
   @override
   late final GeneratedColumn<String> name = GeneratedColumn<String>(
       'name', aliasedName, false,
-      additionalChecks:
-          GeneratedColumn.checkTextLength(minTextLength: 1, maxTextLength: 64),
-      type: DriftSqlType.string,
-      requiredDuringInsert: true);
+      type: DriftSqlType.string, requiredDuringInsert: true);
   static const VerificationMeta _infoboxMeta =
       const VerificationMeta('infobox');
   @override
   late final GeneratedColumn<String> infobox = GeneratedColumn<String>(
-      'infobox', aliasedName, true,
-      type: DriftSqlType.string, requiredDuringInsert: false);
+      'infobox', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
   static const VerificationMeta _weightUnitMeta =
       const VerificationMeta('weightUnit');
   @override
@@ -402,6 +396,8 @@ class $RoutinesTable extends Routines with TableInfo<$RoutinesTable, Routine> {
     if (data.containsKey('infobox')) {
       context.handle(_infoboxMeta,
           infobox.isAcceptableOrUnknown(data['infobox']!, _infoboxMeta));
+    } else if (isInserting) {
+      context.missing(_infoboxMeta);
     }
     context.handle(_weightUnitMeta, const VerificationResult.success());
     context.handle(_distanceUnitMeta, const VerificationResult.success());
@@ -425,7 +421,7 @@ class $RoutinesTable extends Routines with TableInfo<$RoutinesTable, Routine> {
       name: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}name'])!,
       infobox: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}infobox']),
+          .read(DriftSqlType.string, data['${effectivePrefix}infobox'])!,
       weightUnit: $RoutinesTable.$converterweightUnit.fromSql(attachedDatabase
           .typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}weight_unit'])!),
@@ -451,14 +447,14 @@ class $RoutinesTable extends Routines with TableInfo<$RoutinesTable, Routine> {
 class Routine extends DataClass implements Insertable<Routine> {
   final int id;
   final String name;
-  final String? infobox;
+  final String infobox;
   final Weights weightUnit;
   final Distance distanceUnit;
   final int sortOrder;
   const Routine(
       {required this.id,
       required this.name,
-      this.infobox,
+      required this.infobox,
       required this.weightUnit,
       required this.distanceUnit,
       required this.sortOrder});
@@ -467,9 +463,7 @@ class Routine extends DataClass implements Insertable<Routine> {
     final map = <String, Expression>{};
     map['id'] = Variable<int>(id);
     map['name'] = Variable<String>(name);
-    if (!nullToAbsent || infobox != null) {
-      map['infobox'] = Variable<String>(infobox);
-    }
+    map['infobox'] = Variable<String>(infobox);
     {
       map['weight_unit'] = Variable<String>(
           $RoutinesTable.$converterweightUnit.toSql(weightUnit));
@@ -486,9 +480,7 @@ class Routine extends DataClass implements Insertable<Routine> {
     return RoutinesCompanion(
       id: Value(id),
       name: Value(name),
-      infobox: infobox == null && nullToAbsent
-          ? const Value.absent()
-          : Value(infobox),
+      infobox: Value(infobox),
       weightUnit: Value(weightUnit),
       distanceUnit: Value(distanceUnit),
       sortOrder: Value(sortOrder),
@@ -501,7 +493,7 @@ class Routine extends DataClass implements Insertable<Routine> {
     return Routine(
       id: serializer.fromJson<int>(json['id']),
       name: serializer.fromJson<String>(json['name']),
-      infobox: serializer.fromJson<String?>(json['infobox']),
+      infobox: serializer.fromJson<String>(json['infobox']),
       weightUnit: $RoutinesTable.$converterweightUnit
           .fromJson(serializer.fromJson<String>(json['weightUnit'])),
       distanceUnit: $RoutinesTable.$converterdistanceUnit
@@ -515,7 +507,7 @@ class Routine extends DataClass implements Insertable<Routine> {
     return <String, dynamic>{
       'id': serializer.toJson<int>(id),
       'name': serializer.toJson<String>(name),
-      'infobox': serializer.toJson<String?>(infobox),
+      'infobox': serializer.toJson<String>(infobox),
       'weightUnit': serializer.toJson<String>(
           $RoutinesTable.$converterweightUnit.toJson(weightUnit)),
       'distanceUnit': serializer.toJson<String>(
@@ -527,14 +519,14 @@ class Routine extends DataClass implements Insertable<Routine> {
   Routine copyWith(
           {int? id,
           String? name,
-          Value<String?> infobox = const Value.absent(),
+          String? infobox,
           Weights? weightUnit,
           Distance? distanceUnit,
           int? sortOrder}) =>
       Routine(
         id: id ?? this.id,
         name: name ?? this.name,
-        infobox: infobox.present ? infobox.value : this.infobox,
+        infobox: infobox ?? this.infobox,
         weightUnit: weightUnit ?? this.weightUnit,
         distanceUnit: distanceUnit ?? this.distanceUnit,
         sortOrder: sortOrder ?? this.sortOrder,
@@ -570,7 +562,7 @@ class Routine extends DataClass implements Insertable<Routine> {
 class RoutinesCompanion extends UpdateCompanion<Routine> {
   final Value<int> id;
   final Value<String> name;
-  final Value<String?> infobox;
+  final Value<String> infobox;
   final Value<Weights> weightUnit;
   final Value<Distance> distanceUnit;
   final Value<int> sortOrder;
@@ -585,11 +577,12 @@ class RoutinesCompanion extends UpdateCompanion<Routine> {
   RoutinesCompanion.insert({
     this.id = const Value.absent(),
     required String name,
-    this.infobox = const Value.absent(),
+    required String infobox,
     required Weights weightUnit,
     required Distance distanceUnit,
     required int sortOrder,
   })  : name = Value(name),
+        infobox = Value(infobox),
         weightUnit = Value(weightUnit),
         distanceUnit = Value(distanceUnit),
         sortOrder = Value(sortOrder);
@@ -614,7 +607,7 @@ class RoutinesCompanion extends UpdateCompanion<Routine> {
   RoutinesCompanion copyWith(
       {Value<int>? id,
       Value<String>? name,
-      Value<String?>? infobox,
+      Value<String>? infobox,
       Value<Weights>? weightUnit,
       Value<Distance>? distanceUnit,
       Value<int>? sortOrder}) {
@@ -687,10 +680,7 @@ class $HistoryWorkoutsTable extends HistoryWorkouts
   @override
   late final GeneratedColumn<String> name = GeneratedColumn<String>(
       'name', aliasedName, false,
-      additionalChecks:
-          GeneratedColumn.checkTextLength(minTextLength: 1, maxTextLength: 64),
-      type: DriftSqlType.string,
-      requiredDuringInsert: true);
+      type: DriftSqlType.string, requiredDuringInsert: true);
   static const VerificationMeta _infoboxMeta =
       const VerificationMeta('infobox');
   @override
@@ -713,27 +703,27 @@ class $HistoryWorkoutsTable extends HistoryWorkouts
       const VerificationMeta('parentId');
   @override
   late final GeneratedColumn<int> parentId = GeneratedColumn<int>(
-      'parent_id', aliasedName, false,
+      'parent_id', aliasedName, true,
       type: DriftSqlType.int,
-      requiredDuringInsert: true,
+      requiredDuringInsert: false,
       defaultConstraints:
           GeneratedColumn.constraintIsAlways('REFERENCES routines (id)'));
   static const VerificationMeta _completedByMeta =
       const VerificationMeta('completedBy');
   @override
   late final GeneratedColumn<int> completedBy = GeneratedColumn<int>(
-      'completed_by', aliasedName, false,
+      'completed_by', aliasedName, true,
       type: DriftSqlType.int,
-      requiredDuringInsert: true,
+      requiredDuringInsert: false,
       defaultConstraints: GeneratedColumn.constraintIsAlways(
           'REFERENCES history_workouts (id)'));
   static const VerificationMeta _completesMeta =
       const VerificationMeta('completes');
   @override
   late final GeneratedColumn<int> completes = GeneratedColumn<int>(
-      'completes', aliasedName, false,
+      'completes', aliasedName, true,
       type: DriftSqlType.int,
-      requiredDuringInsert: true,
+      requiredDuringInsert: false,
       defaultConstraints: GeneratedColumn.constraintIsAlways(
           'REFERENCES history_workouts (id)'));
   static const VerificationMeta _weightUnitMeta =
@@ -811,22 +801,16 @@ class $HistoryWorkoutsTable extends HistoryWorkouts
     if (data.containsKey('parent_id')) {
       context.handle(_parentIdMeta,
           parentId.isAcceptableOrUnknown(data['parent_id']!, _parentIdMeta));
-    } else if (isInserting) {
-      context.missing(_parentIdMeta);
     }
     if (data.containsKey('completed_by')) {
       context.handle(
           _completedByMeta,
           completedBy.isAcceptableOrUnknown(
               data['completed_by']!, _completedByMeta));
-    } else if (isInserting) {
-      context.missing(_completedByMeta);
     }
     if (data.containsKey('completes')) {
       context.handle(_completesMeta,
           completes.isAcceptableOrUnknown(data['completes']!, _completesMeta));
-    } else if (isInserting) {
-      context.missing(_completesMeta);
     }
     context.handle(_weightUnitMeta, const VerificationResult.success());
     context.handle(_distanceUnitMeta, const VerificationResult.success());
@@ -860,11 +844,11 @@ class $HistoryWorkoutsTable extends HistoryWorkouts
       startingDate: attachedDatabase.typeMapping.read(
           DriftSqlType.dateTime, data['${effectivePrefix}starting_date'])!,
       parentId: attachedDatabase.typeMapping
-          .read(DriftSqlType.int, data['${effectivePrefix}parent_id'])!,
+          .read(DriftSqlType.int, data['${effectivePrefix}parent_id']),
       completedBy: attachedDatabase.typeMapping
-          .read(DriftSqlType.int, data['${effectivePrefix}completed_by'])!,
+          .read(DriftSqlType.int, data['${effectivePrefix}completed_by']),
       completes: attachedDatabase.typeMapping
-          .read(DriftSqlType.int, data['${effectivePrefix}completes'])!,
+          .read(DriftSqlType.int, data['${effectivePrefix}completes']),
       weightUnit: $HistoryWorkoutsTable.$converterweightUnit.fromSql(
           attachedDatabase.typeMapping.read(
               DriftSqlType.string, data['${effectivePrefix}weight_unit'])!),
@@ -893,9 +877,9 @@ class HistoryWorkout extends DataClass implements Insertable<HistoryWorkout> {
   final String? infobox;
   final int duration;
   final DateTime startingDate;
-  final int parentId;
-  final int completedBy;
-  final int completes;
+  final int? parentId;
+  final int? completedBy;
+  final int? completes;
   final Weights weightUnit;
   final Distance distanceUnit;
   final int sortOrder;
@@ -905,9 +889,9 @@ class HistoryWorkout extends DataClass implements Insertable<HistoryWorkout> {
       this.infobox,
       required this.duration,
       required this.startingDate,
-      required this.parentId,
-      required this.completedBy,
-      required this.completes,
+      this.parentId,
+      this.completedBy,
+      this.completes,
       required this.weightUnit,
       required this.distanceUnit,
       required this.sortOrder});
@@ -921,9 +905,15 @@ class HistoryWorkout extends DataClass implements Insertable<HistoryWorkout> {
     }
     map['duration'] = Variable<int>(duration);
     map['starting_date'] = Variable<DateTime>(startingDate);
-    map['parent_id'] = Variable<int>(parentId);
-    map['completed_by'] = Variable<int>(completedBy);
-    map['completes'] = Variable<int>(completes);
+    if (!nullToAbsent || parentId != null) {
+      map['parent_id'] = Variable<int>(parentId);
+    }
+    if (!nullToAbsent || completedBy != null) {
+      map['completed_by'] = Variable<int>(completedBy);
+    }
+    if (!nullToAbsent || completes != null) {
+      map['completes'] = Variable<int>(completes);
+    }
     {
       map['weight_unit'] = Variable<String>(
           $HistoryWorkoutsTable.$converterweightUnit.toSql(weightUnit));
@@ -945,9 +935,15 @@ class HistoryWorkout extends DataClass implements Insertable<HistoryWorkout> {
           : Value(infobox),
       duration: Value(duration),
       startingDate: Value(startingDate),
-      parentId: Value(parentId),
-      completedBy: Value(completedBy),
-      completes: Value(completes),
+      parentId: parentId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(parentId),
+      completedBy: completedBy == null && nullToAbsent
+          ? const Value.absent()
+          : Value(completedBy),
+      completes: completes == null && nullToAbsent
+          ? const Value.absent()
+          : Value(completes),
       weightUnit: Value(weightUnit),
       distanceUnit: Value(distanceUnit),
       sortOrder: Value(sortOrder),
@@ -963,9 +959,9 @@ class HistoryWorkout extends DataClass implements Insertable<HistoryWorkout> {
       infobox: serializer.fromJson<String?>(json['infobox']),
       duration: serializer.fromJson<int>(json['duration']),
       startingDate: serializer.fromJson<DateTime>(json['startingDate']),
-      parentId: serializer.fromJson<int>(json['parentId']),
-      completedBy: serializer.fromJson<int>(json['completedBy']),
-      completes: serializer.fromJson<int>(json['completes']),
+      parentId: serializer.fromJson<int?>(json['parentId']),
+      completedBy: serializer.fromJson<int?>(json['completedBy']),
+      completes: serializer.fromJson<int?>(json['completes']),
       weightUnit: $HistoryWorkoutsTable.$converterweightUnit
           .fromJson(serializer.fromJson<String>(json['weightUnit'])),
       distanceUnit: $HistoryWorkoutsTable.$converterdistanceUnit
@@ -982,9 +978,9 @@ class HistoryWorkout extends DataClass implements Insertable<HistoryWorkout> {
       'infobox': serializer.toJson<String?>(infobox),
       'duration': serializer.toJson<int>(duration),
       'startingDate': serializer.toJson<DateTime>(startingDate),
-      'parentId': serializer.toJson<int>(parentId),
-      'completedBy': serializer.toJson<int>(completedBy),
-      'completes': serializer.toJson<int>(completes),
+      'parentId': serializer.toJson<int?>(parentId),
+      'completedBy': serializer.toJson<int?>(completedBy),
+      'completes': serializer.toJson<int?>(completes),
       'weightUnit': serializer.toJson<String>(
           $HistoryWorkoutsTable.$converterweightUnit.toJson(weightUnit)),
       'distanceUnit': serializer.toJson<String>(
@@ -999,9 +995,9 @@ class HistoryWorkout extends DataClass implements Insertable<HistoryWorkout> {
           Value<String?> infobox = const Value.absent(),
           int? duration,
           DateTime? startingDate,
-          int? parentId,
-          int? completedBy,
-          int? completes,
+          Value<int?> parentId = const Value.absent(),
+          Value<int?> completedBy = const Value.absent(),
+          Value<int?> completes = const Value.absent(),
           Weights? weightUnit,
           Distance? distanceUnit,
           int? sortOrder}) =>
@@ -1011,9 +1007,9 @@ class HistoryWorkout extends DataClass implements Insertable<HistoryWorkout> {
         infobox: infobox.present ? infobox.value : this.infobox,
         duration: duration ?? this.duration,
         startingDate: startingDate ?? this.startingDate,
-        parentId: parentId ?? this.parentId,
-        completedBy: completedBy ?? this.completedBy,
-        completes: completes ?? this.completes,
+        parentId: parentId.present ? parentId.value : this.parentId,
+        completedBy: completedBy.present ? completedBy.value : this.completedBy,
+        completes: completes.present ? completes.value : this.completes,
         weightUnit: weightUnit ?? this.weightUnit,
         distanceUnit: distanceUnit ?? this.distanceUnit,
         sortOrder: sortOrder ?? this.sortOrder,
@@ -1062,9 +1058,9 @@ class HistoryWorkoutsCompanion extends UpdateCompanion<HistoryWorkout> {
   final Value<String?> infobox;
   final Value<int> duration;
   final Value<DateTime> startingDate;
-  final Value<int> parentId;
-  final Value<int> completedBy;
-  final Value<int> completes;
+  final Value<int?> parentId;
+  final Value<int?> completedBy;
+  final Value<int?> completes;
   final Value<Weights> weightUnit;
   final Value<Distance> distanceUnit;
   final Value<int> sortOrder;
@@ -1087,18 +1083,15 @@ class HistoryWorkoutsCompanion extends UpdateCompanion<HistoryWorkout> {
     this.infobox = const Value.absent(),
     required int duration,
     required DateTime startingDate,
-    required int parentId,
-    required int completedBy,
-    required int completes,
+    this.parentId = const Value.absent(),
+    this.completedBy = const Value.absent(),
+    this.completes = const Value.absent(),
     required Weights weightUnit,
     required Distance distanceUnit,
     required int sortOrder,
   })  : name = Value(name),
         duration = Value(duration),
         startingDate = Value(startingDate),
-        parentId = Value(parentId),
-        completedBy = Value(completedBy),
-        completes = Value(completes),
         weightUnit = Value(weightUnit),
         distanceUnit = Value(distanceUnit),
         sortOrder = Value(sortOrder);
@@ -1136,9 +1129,9 @@ class HistoryWorkoutsCompanion extends UpdateCompanion<HistoryWorkout> {
       Value<String?>? infobox,
       Value<int>? duration,
       Value<DateTime>? startingDate,
-      Value<int>? parentId,
-      Value<int>? completedBy,
-      Value<int>? completes,
+      Value<int?>? parentId,
+      Value<int?>? completedBy,
+      Value<int?>? completes,
       Value<Weights>? weightUnit,
       Value<Distance>? distanceUnit,
       Value<int>? sortOrder}) {
@@ -1246,10 +1239,7 @@ class $HistoryWorkoutExercisesTable extends HistoryWorkoutExercises
   @override
   late final GeneratedColumn<String> name = GeneratedColumn<String>(
       'name', aliasedName, false,
-      additionalChecks:
-          GeneratedColumn.checkTextLength(minTextLength: 1, maxTextLength: 64),
-      type: DriftSqlType.string,
-      requiredDuringInsert: true);
+      type: DriftSqlType.string, requiredDuringInsert: true);
   static const VerificationMeta _parametersMeta =
       const VerificationMeta('parameters');
   @override
@@ -1318,15 +1308,24 @@ class $HistoryWorkoutExercisesTable extends HistoryWorkoutExercises
   late final GeneratedColumn<String> notes = GeneratedColumn<String>(
       'notes', aliasedName, true,
       type: DriftSqlType.string, requiredDuringInsert: false);
-  static const VerificationMeta _inSupersetMeta =
-      const VerificationMeta('inSuperset');
+  static const VerificationMeta _isSupersetMeta =
+      const VerificationMeta('isSuperset');
   @override
-  late final GeneratedColumn<bool> inSuperset = GeneratedColumn<bool>(
-      'in_superset', aliasedName, false,
+  late final GeneratedColumn<bool> isSuperset = GeneratedColumn<bool>(
+      'is_superset', aliasedName, false,
       type: DriftSqlType.bool,
       requiredDuringInsert: true,
       defaultConstraints: GeneratedColumn.constraintIsAlways(
-          'CHECK ("in_superset" IN (0, 1))'));
+          'CHECK ("is_superset" IN (0, 1))'));
+  static const VerificationMeta _isInSupersetMeta =
+      const VerificationMeta('isInSuperset');
+  @override
+  late final GeneratedColumn<bool> isInSuperset = GeneratedColumn<bool>(
+      'is_in_superset', aliasedName, false,
+      type: DriftSqlType.bool,
+      requiredDuringInsert: true,
+      defaultConstraints: GeneratedColumn.constraintIsAlways(
+          'CHECK ("is_in_superset" IN (0, 1))'));
   static const VerificationMeta _supersetIdMeta =
       const VerificationMeta('supersetId');
   @override
@@ -1356,7 +1355,8 @@ class $HistoryWorkoutExercisesTable extends HistoryWorkoutExercises
         libraryExerciseId,
         customExerciseId,
         notes,
-        inSuperset,
+        isSuperset,
+        isInSuperset,
         supersetId,
         sortOrder
       ];
@@ -1417,13 +1417,21 @@ class $HistoryWorkoutExercisesTable extends HistoryWorkoutExercises
       context.handle(
           _notesMeta, notes.isAcceptableOrUnknown(data['notes']!, _notesMeta));
     }
-    if (data.containsKey('in_superset')) {
+    if (data.containsKey('is_superset')) {
       context.handle(
-          _inSupersetMeta,
-          inSuperset.isAcceptableOrUnknown(
-              data['in_superset']!, _inSupersetMeta));
+          _isSupersetMeta,
+          isSuperset.isAcceptableOrUnknown(
+              data['is_superset']!, _isSupersetMeta));
     } else if (isInserting) {
-      context.missing(_inSupersetMeta);
+      context.missing(_isSupersetMeta);
+    }
+    if (data.containsKey('is_in_superset')) {
+      context.handle(
+          _isInSupersetMeta,
+          isInSuperset.isAcceptableOrUnknown(
+              data['is_in_superset']!, _isInSupersetMeta));
+    } else if (isInserting) {
+      context.missing(_isInSupersetMeta);
     }
     if (data.containsKey('superset_id')) {
       context.handle(
@@ -1476,8 +1484,10 @@ class $HistoryWorkoutExercisesTable extends HistoryWorkoutExercises
           .read(DriftSqlType.int, data['${effectivePrefix}custom_exercise_id']),
       notes: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}notes']),
-      inSuperset: attachedDatabase.typeMapping
-          .read(DriftSqlType.bool, data['${effectivePrefix}in_superset'])!,
+      isSuperset: attachedDatabase.typeMapping
+          .read(DriftSqlType.bool, data['${effectivePrefix}is_superset'])!,
+      isInSuperset: attachedDatabase.typeMapping
+          .read(DriftSqlType.bool, data['${effectivePrefix}is_in_superset'])!,
       supersetId: attachedDatabase.typeMapping
           .read(DriftSqlType.int, data['${effectivePrefix}superset_id']),
       sortOrder: attachedDatabase.typeMapping
@@ -1527,7 +1537,8 @@ class HistoryWorkoutExercise extends DataClass
   final String? libraryExerciseId;
   final int? customExerciseId;
   final String? notes;
-  final bool inSuperset;
+  final bool isSuperset;
+  final bool isInSuperset;
   final int? supersetId;
   final int sortOrder;
   const HistoryWorkoutExercise(
@@ -1543,7 +1554,8 @@ class HistoryWorkoutExercise extends DataClass
       this.libraryExerciseId,
       this.customExerciseId,
       this.notes,
-      required this.inSuperset,
+      required this.isSuperset,
+      required this.isInSuperset,
       this.supersetId,
       required this.sortOrder});
   @override
@@ -1584,7 +1596,8 @@ class HistoryWorkoutExercise extends DataClass
     if (!nullToAbsent || notes != null) {
       map['notes'] = Variable<String>(notes);
     }
-    map['in_superset'] = Variable<bool>(inSuperset);
+    map['is_superset'] = Variable<bool>(isSuperset);
+    map['is_in_superset'] = Variable<bool>(isInSuperset);
     if (!nullToAbsent || supersetId != null) {
       map['superset_id'] = Variable<int>(supersetId);
     }
@@ -1619,7 +1632,8 @@ class HistoryWorkoutExercise extends DataClass
           : Value(customExerciseId),
       notes:
           notes == null && nullToAbsent ? const Value.absent() : Value(notes),
-      inSuperset: Value(inSuperset),
+      isSuperset: Value(isSuperset),
+      isInSuperset: Value(isInSuperset),
       supersetId: supersetId == null && nullToAbsent
           ? const Value.absent()
           : Value(supersetId),
@@ -1648,7 +1662,8 @@ class HistoryWorkoutExercise extends DataClass
           serializer.fromJson<String?>(json['libraryExerciseId']),
       customExerciseId: serializer.fromJson<int?>(json['customExerciseId']),
       notes: serializer.fromJson<String?>(json['notes']),
-      inSuperset: serializer.fromJson<bool>(json['inSuperset']),
+      isSuperset: serializer.fromJson<bool>(json['isSuperset']),
+      isInSuperset: serializer.fromJson<bool>(json['isInSuperset']),
       supersetId: serializer.fromJson<int?>(json['supersetId']),
       sortOrder: serializer.fromJson<int>(json['sortOrder']),
     );
@@ -1674,7 +1689,8 @@ class HistoryWorkoutExercise extends DataClass
       'libraryExerciseId': serializer.toJson<String?>(libraryExerciseId),
       'customExerciseId': serializer.toJson<int?>(customExerciseId),
       'notes': serializer.toJson<String?>(notes),
-      'inSuperset': serializer.toJson<bool>(inSuperset),
+      'isSuperset': serializer.toJson<bool>(isSuperset),
+      'isInSuperset': serializer.toJson<bool>(isInSuperset),
       'supersetId': serializer.toJson<int?>(supersetId),
       'sortOrder': serializer.toJson<int>(sortOrder),
     };
@@ -1694,7 +1710,8 @@ class HistoryWorkoutExercise extends DataClass
           Value<String?> libraryExerciseId = const Value.absent(),
           Value<int?> customExerciseId = const Value.absent(),
           Value<String?> notes = const Value.absent(),
-          bool? inSuperset,
+          bool? isSuperset,
+          bool? isInSuperset,
           Value<int?> supersetId = const Value.absent(),
           int? sortOrder}) =>
       HistoryWorkoutExercise(
@@ -1718,7 +1735,8 @@ class HistoryWorkoutExercise extends DataClass
             ? customExerciseId.value
             : this.customExerciseId,
         notes: notes.present ? notes.value : this.notes,
-        inSuperset: inSuperset ?? this.inSuperset,
+        isSuperset: isSuperset ?? this.isSuperset,
+        isInSuperset: isInSuperset ?? this.isInSuperset,
         supersetId: supersetId.present ? supersetId.value : this.supersetId,
         sortOrder: sortOrder ?? this.sortOrder,
       );
@@ -1737,7 +1755,8 @@ class HistoryWorkoutExercise extends DataClass
           ..write('libraryExerciseId: $libraryExerciseId, ')
           ..write('customExerciseId: $customExerciseId, ')
           ..write('notes: $notes, ')
-          ..write('inSuperset: $inSuperset, ')
+          ..write('isSuperset: $isSuperset, ')
+          ..write('isInSuperset: $isInSuperset, ')
           ..write('supersetId: $supersetId, ')
           ..write('sortOrder: $sortOrder')
           ..write(')'))
@@ -1758,7 +1777,8 @@ class HistoryWorkoutExercise extends DataClass
       libraryExerciseId,
       customExerciseId,
       notes,
-      inSuperset,
+      isSuperset,
+      isInSuperset,
       supersetId,
       sortOrder);
   @override
@@ -1777,7 +1797,8 @@ class HistoryWorkoutExercise extends DataClass
           other.libraryExerciseId == this.libraryExerciseId &&
           other.customExerciseId == this.customExerciseId &&
           other.notes == this.notes &&
-          other.inSuperset == this.inSuperset &&
+          other.isSuperset == this.isSuperset &&
+          other.isInSuperset == this.isInSuperset &&
           other.supersetId == this.supersetId &&
           other.sortOrder == this.sortOrder);
 }
@@ -1796,7 +1817,8 @@ class HistoryWorkoutExercisesCompanion
   final Value<String?> libraryExerciseId;
   final Value<int?> customExerciseId;
   final Value<String?> notes;
-  final Value<bool> inSuperset;
+  final Value<bool> isSuperset;
+  final Value<bool> isInSuperset;
   final Value<int?> supersetId;
   final Value<int> sortOrder;
   const HistoryWorkoutExercisesCompanion({
@@ -1812,7 +1834,8 @@ class HistoryWorkoutExercisesCompanion
     this.libraryExerciseId = const Value.absent(),
     this.customExerciseId = const Value.absent(),
     this.notes = const Value.absent(),
-    this.inSuperset = const Value.absent(),
+    this.isSuperset = const Value.absent(),
+    this.isInSuperset = const Value.absent(),
     this.supersetId = const Value.absent(),
     this.sortOrder = const Value.absent(),
   });
@@ -1829,13 +1852,15 @@ class HistoryWorkoutExercisesCompanion
     this.libraryExerciseId = const Value.absent(),
     this.customExerciseId = const Value.absent(),
     this.notes = const Value.absent(),
-    required bool inSuperset,
+    required bool isSuperset,
+    required bool isInSuperset,
     this.supersetId = const Value.absent(),
     required int sortOrder,
   })  : routineId = Value(routineId),
         name = Value(name),
         isCustom = Value(isCustom),
-        inSuperset = Value(inSuperset),
+        isSuperset = Value(isSuperset),
+        isInSuperset = Value(isInSuperset),
         sortOrder = Value(sortOrder);
   static Insertable<HistoryWorkoutExercise> custom({
     Expression<int>? id,
@@ -1850,7 +1875,8 @@ class HistoryWorkoutExercisesCompanion
     Expression<String>? libraryExerciseId,
     Expression<int>? customExerciseId,
     Expression<String>? notes,
-    Expression<bool>? inSuperset,
+    Expression<bool>? isSuperset,
+    Expression<bool>? isInSuperset,
     Expression<int>? supersetId,
     Expression<int>? sortOrder,
   }) {
@@ -1869,7 +1895,8 @@ class HistoryWorkoutExercisesCompanion
       if (libraryExerciseId != null) 'library_exercise_id': libraryExerciseId,
       if (customExerciseId != null) 'custom_exercise_id': customExerciseId,
       if (notes != null) 'notes': notes,
-      if (inSuperset != null) 'in_superset': inSuperset,
+      if (isSuperset != null) 'is_superset': isSuperset,
+      if (isInSuperset != null) 'is_in_superset': isInSuperset,
       if (supersetId != null) 'superset_id': supersetId,
       if (sortOrder != null) 'sort_order': sortOrder,
     });
@@ -1888,7 +1915,8 @@ class HistoryWorkoutExercisesCompanion
       Value<String?>? libraryExerciseId,
       Value<int?>? customExerciseId,
       Value<String?>? notes,
-      Value<bool>? inSuperset,
+      Value<bool>? isSuperset,
+      Value<bool>? isInSuperset,
       Value<int?>? supersetId,
       Value<int>? sortOrder}) {
     return HistoryWorkoutExercisesCompanion(
@@ -1905,7 +1933,8 @@ class HistoryWorkoutExercisesCompanion
       libraryExerciseId: libraryExerciseId ?? this.libraryExerciseId,
       customExerciseId: customExerciseId ?? this.customExerciseId,
       notes: notes ?? this.notes,
-      inSuperset: inSuperset ?? this.inSuperset,
+      isSuperset: isSuperset ?? this.isSuperset,
+      isInSuperset: isInSuperset ?? this.isInSuperset,
       supersetId: supersetId ?? this.supersetId,
       sortOrder: sortOrder ?? this.sortOrder,
     );
@@ -1957,8 +1986,11 @@ class HistoryWorkoutExercisesCompanion
     if (notes.present) {
       map['notes'] = Variable<String>(notes.value);
     }
-    if (inSuperset.present) {
-      map['in_superset'] = Variable<bool>(inSuperset.value);
+    if (isSuperset.present) {
+      map['is_superset'] = Variable<bool>(isSuperset.value);
+    }
+    if (isInSuperset.present) {
+      map['is_in_superset'] = Variable<bool>(isInSuperset.value);
     }
     if (supersetId.present) {
       map['superset_id'] = Variable<int>(supersetId.value);
@@ -1984,7 +2016,8 @@ class HistoryWorkoutExercisesCompanion
           ..write('libraryExerciseId: $libraryExerciseId, ')
           ..write('customExerciseId: $customExerciseId, ')
           ..write('notes: $notes, ')
-          ..write('inSuperset: $inSuperset, ')
+          ..write('isSuperset: $isSuperset, ')
+          ..write('isInSuperset: $isInSuperset, ')
           ..write('supersetId: $supersetId, ')
           ..write('sortOrder: $sortOrder')
           ..write(')'))
@@ -2020,10 +2053,7 @@ class $RoutineExercisesTable extends RoutineExercises
   @override
   late final GeneratedColumn<String> name = GeneratedColumn<String>(
       'name', aliasedName, false,
-      additionalChecks:
-          GeneratedColumn.checkTextLength(minTextLength: 1, maxTextLength: 64),
-      type: DriftSqlType.string,
-      requiredDuringInsert: true);
+      type: DriftSqlType.string, requiredDuringInsert: true);
   static const VerificationMeta _parametersMeta =
       const VerificationMeta('parameters');
   @override
@@ -2091,15 +2121,24 @@ class $RoutineExercisesTable extends RoutineExercises
   late final GeneratedColumn<String> notes = GeneratedColumn<String>(
       'notes', aliasedName, true,
       type: DriftSqlType.string, requiredDuringInsert: false);
-  static const VerificationMeta _inSupersetMeta =
-      const VerificationMeta('inSuperset');
+  static const VerificationMeta _isSupersetMeta =
+      const VerificationMeta('isSuperset');
   @override
-  late final GeneratedColumn<bool> inSuperset = GeneratedColumn<bool>(
-      'in_superset', aliasedName, false,
+  late final GeneratedColumn<bool> isSuperset = GeneratedColumn<bool>(
+      'is_superset', aliasedName, false,
       type: DriftSqlType.bool,
       requiredDuringInsert: true,
       defaultConstraints: GeneratedColumn.constraintIsAlways(
-          'CHECK ("in_superset" IN (0, 1))'));
+          'CHECK ("is_superset" IN (0, 1))'));
+  static const VerificationMeta _isInSupersetMeta =
+      const VerificationMeta('isInSuperset');
+  @override
+  late final GeneratedColumn<bool> isInSuperset = GeneratedColumn<bool>(
+      'is_in_superset', aliasedName, false,
+      type: DriftSqlType.bool,
+      requiredDuringInsert: true,
+      defaultConstraints: GeneratedColumn.constraintIsAlways(
+          'CHECK ("is_in_superset" IN (0, 1))'));
   static const VerificationMeta _supersetIdMeta =
       const VerificationMeta('supersetId');
   @override
@@ -2129,7 +2168,8 @@ class $RoutineExercisesTable extends RoutineExercises
         libraryExerciseId,
         customExerciseId,
         notes,
-        inSuperset,
+        isSuperset,
+        isInSuperset,
         supersetId,
         sortOrder
       ];
@@ -2189,13 +2229,21 @@ class $RoutineExercisesTable extends RoutineExercises
       context.handle(
           _notesMeta, notes.isAcceptableOrUnknown(data['notes']!, _notesMeta));
     }
-    if (data.containsKey('in_superset')) {
+    if (data.containsKey('is_superset')) {
       context.handle(
-          _inSupersetMeta,
-          inSuperset.isAcceptableOrUnknown(
-              data['in_superset']!, _inSupersetMeta));
+          _isSupersetMeta,
+          isSuperset.isAcceptableOrUnknown(
+              data['is_superset']!, _isSupersetMeta));
     } else if (isInserting) {
-      context.missing(_inSupersetMeta);
+      context.missing(_isSupersetMeta);
+    }
+    if (data.containsKey('is_in_superset')) {
+      context.handle(
+          _isInSupersetMeta,
+          isInSuperset.isAcceptableOrUnknown(
+              data['is_in_superset']!, _isInSupersetMeta));
+    } else if (isInserting) {
+      context.missing(_isInSupersetMeta);
     }
     if (data.containsKey('superset_id')) {
       context.handle(
@@ -2247,8 +2295,10 @@ class $RoutineExercisesTable extends RoutineExercises
           .read(DriftSqlType.int, data['${effectivePrefix}custom_exercise_id']),
       notes: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}notes']),
-      inSuperset: attachedDatabase.typeMapping
-          .read(DriftSqlType.bool, data['${effectivePrefix}in_superset'])!,
+      isSuperset: attachedDatabase.typeMapping
+          .read(DriftSqlType.bool, data['${effectivePrefix}is_superset'])!,
+      isInSuperset: attachedDatabase.typeMapping
+          .read(DriftSqlType.bool, data['${effectivePrefix}is_in_superset'])!,
       supersetId: attachedDatabase.typeMapping
           .read(DriftSqlType.int, data['${effectivePrefix}superset_id']),
       sortOrder: attachedDatabase.typeMapping
@@ -2297,7 +2347,8 @@ class RoutineExercise extends DataClass implements Insertable<RoutineExercise> {
   final String? libraryExerciseId;
   final int? customExerciseId;
   final String? notes;
-  final bool inSuperset;
+  final bool isSuperset;
+  final bool isInSuperset;
   final int? supersetId;
   final int sortOrder;
   const RoutineExercise(
@@ -2313,7 +2364,8 @@ class RoutineExercise extends DataClass implements Insertable<RoutineExercise> {
       this.libraryExerciseId,
       this.customExerciseId,
       this.notes,
-      required this.inSuperset,
+      required this.isSuperset,
+      required this.isInSuperset,
       this.supersetId,
       required this.sortOrder});
   @override
@@ -2353,7 +2405,8 @@ class RoutineExercise extends DataClass implements Insertable<RoutineExercise> {
     if (!nullToAbsent || notes != null) {
       map['notes'] = Variable<String>(notes);
     }
-    map['in_superset'] = Variable<bool>(inSuperset);
+    map['is_superset'] = Variable<bool>(isSuperset);
+    map['is_in_superset'] = Variable<bool>(isInSuperset);
     if (!nullToAbsent || supersetId != null) {
       map['superset_id'] = Variable<int>(supersetId);
     }
@@ -2388,7 +2441,8 @@ class RoutineExercise extends DataClass implements Insertable<RoutineExercise> {
           : Value(customExerciseId),
       notes:
           notes == null && nullToAbsent ? const Value.absent() : Value(notes),
-      inSuperset: Value(inSuperset),
+      isSuperset: Value(isSuperset),
+      isInSuperset: Value(isInSuperset),
       supersetId: supersetId == null && nullToAbsent
           ? const Value.absent()
           : Value(supersetId),
@@ -2416,7 +2470,8 @@ class RoutineExercise extends DataClass implements Insertable<RoutineExercise> {
           serializer.fromJson<String?>(json['libraryExerciseId']),
       customExerciseId: serializer.fromJson<int?>(json['customExerciseId']),
       notes: serializer.fromJson<String?>(json['notes']),
-      inSuperset: serializer.fromJson<bool>(json['inSuperset']),
+      isSuperset: serializer.fromJson<bool>(json['isSuperset']),
+      isInSuperset: serializer.fromJson<bool>(json['isInSuperset']),
       supersetId: serializer.fromJson<int?>(json['supersetId']),
       sortOrder: serializer.fromJson<int>(json['sortOrder']),
     );
@@ -2441,7 +2496,8 @@ class RoutineExercise extends DataClass implements Insertable<RoutineExercise> {
       'libraryExerciseId': serializer.toJson<String?>(libraryExerciseId),
       'customExerciseId': serializer.toJson<int?>(customExerciseId),
       'notes': serializer.toJson<String?>(notes),
-      'inSuperset': serializer.toJson<bool>(inSuperset),
+      'isSuperset': serializer.toJson<bool>(isSuperset),
+      'isInSuperset': serializer.toJson<bool>(isInSuperset),
       'supersetId': serializer.toJson<int?>(supersetId),
       'sortOrder': serializer.toJson<int>(sortOrder),
     };
@@ -2461,7 +2517,8 @@ class RoutineExercise extends DataClass implements Insertable<RoutineExercise> {
           Value<String?> libraryExerciseId = const Value.absent(),
           Value<int?> customExerciseId = const Value.absent(),
           Value<String?> notes = const Value.absent(),
-          bool? inSuperset,
+          bool? isSuperset,
+          bool? isInSuperset,
           Value<int?> supersetId = const Value.absent(),
           int? sortOrder}) =>
       RoutineExercise(
@@ -2485,7 +2542,8 @@ class RoutineExercise extends DataClass implements Insertable<RoutineExercise> {
             ? customExerciseId.value
             : this.customExerciseId,
         notes: notes.present ? notes.value : this.notes,
-        inSuperset: inSuperset ?? this.inSuperset,
+        isSuperset: isSuperset ?? this.isSuperset,
+        isInSuperset: isInSuperset ?? this.isInSuperset,
         supersetId: supersetId.present ? supersetId.value : this.supersetId,
         sortOrder: sortOrder ?? this.sortOrder,
       );
@@ -2504,7 +2562,8 @@ class RoutineExercise extends DataClass implements Insertable<RoutineExercise> {
           ..write('libraryExerciseId: $libraryExerciseId, ')
           ..write('customExerciseId: $customExerciseId, ')
           ..write('notes: $notes, ')
-          ..write('inSuperset: $inSuperset, ')
+          ..write('isSuperset: $isSuperset, ')
+          ..write('isInSuperset: $isInSuperset, ')
           ..write('supersetId: $supersetId, ')
           ..write('sortOrder: $sortOrder')
           ..write(')'))
@@ -2525,7 +2584,8 @@ class RoutineExercise extends DataClass implements Insertable<RoutineExercise> {
       libraryExerciseId,
       customExerciseId,
       notes,
-      inSuperset,
+      isSuperset,
+      isInSuperset,
       supersetId,
       sortOrder);
   @override
@@ -2544,7 +2604,8 @@ class RoutineExercise extends DataClass implements Insertable<RoutineExercise> {
           other.libraryExerciseId == this.libraryExerciseId &&
           other.customExerciseId == this.customExerciseId &&
           other.notes == this.notes &&
-          other.inSuperset == this.inSuperset &&
+          other.isSuperset == this.isSuperset &&
+          other.isInSuperset == this.isInSuperset &&
           other.supersetId == this.supersetId &&
           other.sortOrder == this.sortOrder);
 }
@@ -2562,7 +2623,8 @@ class RoutineExercisesCompanion extends UpdateCompanion<RoutineExercise> {
   final Value<String?> libraryExerciseId;
   final Value<int?> customExerciseId;
   final Value<String?> notes;
-  final Value<bool> inSuperset;
+  final Value<bool> isSuperset;
+  final Value<bool> isInSuperset;
   final Value<int?> supersetId;
   final Value<int> sortOrder;
   const RoutineExercisesCompanion({
@@ -2578,7 +2640,8 @@ class RoutineExercisesCompanion extends UpdateCompanion<RoutineExercise> {
     this.libraryExerciseId = const Value.absent(),
     this.customExerciseId = const Value.absent(),
     this.notes = const Value.absent(),
-    this.inSuperset = const Value.absent(),
+    this.isSuperset = const Value.absent(),
+    this.isInSuperset = const Value.absent(),
     this.supersetId = const Value.absent(),
     this.sortOrder = const Value.absent(),
   });
@@ -2595,13 +2658,15 @@ class RoutineExercisesCompanion extends UpdateCompanion<RoutineExercise> {
     this.libraryExerciseId = const Value.absent(),
     this.customExerciseId = const Value.absent(),
     this.notes = const Value.absent(),
-    required bool inSuperset,
+    required bool isSuperset,
+    required bool isInSuperset,
     this.supersetId = const Value.absent(),
     required int sortOrder,
   })  : routineId = Value(routineId),
         name = Value(name),
         isCustom = Value(isCustom),
-        inSuperset = Value(inSuperset),
+        isSuperset = Value(isSuperset),
+        isInSuperset = Value(isInSuperset),
         sortOrder = Value(sortOrder);
   static Insertable<RoutineExercise> custom({
     Expression<int>? id,
@@ -2616,7 +2681,8 @@ class RoutineExercisesCompanion extends UpdateCompanion<RoutineExercise> {
     Expression<String>? libraryExerciseId,
     Expression<int>? customExerciseId,
     Expression<String>? notes,
-    Expression<bool>? inSuperset,
+    Expression<bool>? isSuperset,
+    Expression<bool>? isInSuperset,
     Expression<int>? supersetId,
     Expression<int>? sortOrder,
   }) {
@@ -2635,7 +2701,8 @@ class RoutineExercisesCompanion extends UpdateCompanion<RoutineExercise> {
       if (libraryExerciseId != null) 'library_exercise_id': libraryExerciseId,
       if (customExerciseId != null) 'custom_exercise_id': customExerciseId,
       if (notes != null) 'notes': notes,
-      if (inSuperset != null) 'in_superset': inSuperset,
+      if (isSuperset != null) 'is_superset': isSuperset,
+      if (isInSuperset != null) 'is_in_superset': isInSuperset,
       if (supersetId != null) 'superset_id': supersetId,
       if (sortOrder != null) 'sort_order': sortOrder,
     });
@@ -2654,7 +2721,8 @@ class RoutineExercisesCompanion extends UpdateCompanion<RoutineExercise> {
       Value<String?>? libraryExerciseId,
       Value<int?>? customExerciseId,
       Value<String?>? notes,
-      Value<bool>? inSuperset,
+      Value<bool>? isSuperset,
+      Value<bool>? isInSuperset,
       Value<int?>? supersetId,
       Value<int>? sortOrder}) {
     return RoutineExercisesCompanion(
@@ -2671,7 +2739,8 @@ class RoutineExercisesCompanion extends UpdateCompanion<RoutineExercise> {
       libraryExerciseId: libraryExerciseId ?? this.libraryExerciseId,
       customExerciseId: customExerciseId ?? this.customExerciseId,
       notes: notes ?? this.notes,
-      inSuperset: inSuperset ?? this.inSuperset,
+      isSuperset: isSuperset ?? this.isSuperset,
+      isInSuperset: isInSuperset ?? this.isInSuperset,
       supersetId: supersetId ?? this.supersetId,
       sortOrder: sortOrder ?? this.sortOrder,
     );
@@ -2722,8 +2791,11 @@ class RoutineExercisesCompanion extends UpdateCompanion<RoutineExercise> {
     if (notes.present) {
       map['notes'] = Variable<String>(notes.value);
     }
-    if (inSuperset.present) {
-      map['in_superset'] = Variable<bool>(inSuperset.value);
+    if (isSuperset.present) {
+      map['is_superset'] = Variable<bool>(isSuperset.value);
+    }
+    if (isInSuperset.present) {
+      map['is_in_superset'] = Variable<bool>(isInSuperset.value);
     }
     if (supersetId.present) {
       map['superset_id'] = Variable<int>(supersetId.value);
@@ -2749,7 +2821,8 @@ class RoutineExercisesCompanion extends UpdateCompanion<RoutineExercise> {
           ..write('libraryExerciseId: $libraryExerciseId, ')
           ..write('customExerciseId: $customExerciseId, ')
           ..write('notes: $notes, ')
-          ..write('inSuperset: $inSuperset, ')
+          ..write('isSuperset: $isSuperset, ')
+          ..write('isInSuperset: $isInSuperset, ')
           ..write('supersetId: $supersetId, ')
           ..write('sortOrder: $sortOrder')
           ..write(')'))

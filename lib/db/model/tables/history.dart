@@ -6,13 +6,15 @@ import 'package:gymtracker/db/model/tables/routines.dart';
 
 class HistoryWorkouts extends Table {
   IntColumn get id => integer().autoIncrement()();
-  TextColumn get name => text().withLength(min: 1, max: 64)();
+  TextColumn get name => text()();
   TextColumn get infobox => text().nullable()();
   IntColumn get duration => integer()();
   Column<DateTime> get startingDate => dateTime()();
-  IntColumn get parentId => integer().references(Routines, #id)();
-  IntColumn get completedBy => integer().references(HistoryWorkouts, #id)();
-  IntColumn get completes => integer().references(HistoryWorkouts, #id)();
+  IntColumn get parentId => integer().nullable().references(Routines, #id)();
+  IntColumn get completedBy =>
+      integer().nullable().references(HistoryWorkouts, #id)();
+  IntColumn get completes =>
+      integer().nullable().references(HistoryWorkouts, #id)();
   TextColumn get weightUnit => textEnum<Weights>()();
   TextColumn get distanceUnit => textEnum<Distance>()();
   IntColumn get sortOrder => integer()();

@@ -10,6 +10,8 @@ import 'package:gymtracker/adapters/set.dart';
 import 'package:gymtracker/adapters/superset.dart';
 import 'package:gymtracker/adapters/weights.dart';
 import 'package:gymtracker/adapters/workout.dart';
+import 'package:gymtracker/db/database.dart';
+import 'package:gymtracker/db/imports/types.dart';
 import 'package:gymtracker/model/exercise.dart';
 import 'package:gymtracker/model/measurements.dart';
 import 'package:gymtracker/model/workout.dart';
@@ -17,9 +19,9 @@ import 'package:gymtracker/service/logger.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:path_provider/path_provider.dart';
 
-const DATABASE_VERSION = 1;
-
 class DatabaseService extends GetxService with ChangeNotifier {
+  late final GTDatabase db;
+
   late final Box<Exercise> exerciseBox;
   late final Box<Workout> routinesBox;
   late final Box<Workout> historyBox;
@@ -39,6 +41,12 @@ class DatabaseService extends GetxService with ChangeNotifier {
   @override
   onInit() {
     super.onInit();
+
+    db = GTDatabase();
+
+    db.getAllRoutines().listen((routines) {
+      logger.e(routines);
+    });
 
     onServiceChange("main")();
     exerciseBox.listenable().addListener(onServiceChange("exercises"));
@@ -226,59 +234,81 @@ class DatabaseService extends GetxService with ChangeNotifier {
   }
 
   toJson() {
-    return {
-      "version": DATABASE_VERSION,
-      "exercise": exerciseBox.values.map((e) => e.toJson()).toList(),
-      "routines": routinesBox.values.map((e) => e.toJson()).toList(),
-      "workouts": historyBox.values.map((e) => e.toJson()).toList(),
-      "settings": {
-        for (final key in settingsBox.keys) key: settingsBox.get(key),
-      },
-      "weightMeasurements":
-          weightMeasurementsBox.values.map((e) => e.toJson()).toList(),
-    };
+    final converter = getConverter(DATABASE_VERSION);
+
+    return converter.export(DatabaseSnapshot(
+      customExercises: [],
+      routines: [],
+      routineExercises: [],
+      historyWorkouts: [],
+      historyWorkoutExercises: [],
+    ));
   }
 
-  fromJson(Map<String, dynamic> json) {
+  Future fromJson(Map<String, dynamic> json) async {
     final previousJson = toJson();
 
     if (json['version'] is int && (json['version'] as int) > DATABASE_VERSION) {
       throw DatabaseImportVersionMismatch((json['version'] as int? ?? -1));
     }
 
-    innerImportJson(Map<String, dynamic> json) {
-      if (json['exercise'] is List) {
-        _writeExercises([
-          for (final json in json['exercise']) Exercise.fromJson(json),
-        ]);
-      }
-      if (json['routines'] is List) {
-        _writeRoutines([
-          for (final json in json['routines']) Workout.fromJson(json),
-        ]);
-      }
-      if (json['workouts'] is List) {
-        writeAllHistory([
-          for (final json in json['workouts']) Workout.fromJson(json),
-        ]);
-      }
-      if (json['settings'] is Map<String, dynamic>) {
-        for (final key in json['settings'].keys) {
-          writeSetting(key, json['settings'][key]);
-        }
-      }
-      if (json['weightMeasurements'] is List) {
-        _writeWeightMeasurements([
-          for (final json in json['weightMeasurements'])
-            WeightMeasurement.fromJson(json),
-        ]);
-      }
+    Future innerImportJson(Map<String, dynamic> json) async {
+      final converter =
+          getConverter(json['version'] as int? ?? DATABASE_VERSION);
+      final snapshot = converter.process(json);
+
+      await db.transaction(() async {
+        await db.clearTheWholeThingIAmAbsolutelySureISwear();
+
+        logger.i("Created import transaction");
+        await db.batch(
+          (batch) {
+            batch.logger.i("Importing exercises");
+            batch.insertAll(
+              db.customExercises,
+              [for (final ex in snapshot.customExercises) ex.toInsertable()],
+            );
+          },
+        );
+
+        await db.batch((batch) {
+          batch.logger.i("Importing routines");
+          batch.insertAll(
+            db.routines,
+            [for (final rt in snapshot.routines) rt.toInsertable()],
+          );
+
+          batch.insertAll(
+            db.routineExercises,
+            [
+              for (final ex in snapshot.routineExercises) ex.toRoutineExercise()
+            ],
+          );
+        });
+
+        await db.batch((batch) {
+          batch.logger.i("Importing history");
+
+          batch.insertAll(
+            db.historyWorkouts,
+            [for (final rt in snapshot.historyWorkouts) rt.toInsertable()],
+          );
+
+          batch.insertAll(
+            db.historyWorkoutExercises,
+            [
+              for (final ex in snapshot.historyWorkoutExercises)
+                ex.toHistoryWorkoutExercise()
+            ],
+          );
+        });
+      });
     }
 
     try {
-      innerImportJson(json);
+      await innerImportJson(json);
     } catch (_) {
-      innerImportJson(previousJson);
+      await innerImportJson(previousJson);
       rethrow;
     }
   }

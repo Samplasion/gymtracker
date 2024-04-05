@@ -39,7 +39,7 @@ enum GTMuscleGroup {
 
 class CustomExercises extends Table {
   IntColumn get id => integer().autoIncrement()();
-  TextColumn get name => text().withLength(min: 1, max: 64)();
+  TextColumn get name => text()();
   TextColumn get parameters => textEnum<GTSetParameters>()();
   TextColumn get primaryMuscleGroup => textEnum<GTMuscleGroup>()();
   TextColumn get secondaryMuscleGroups => text().map(
@@ -53,23 +53,24 @@ class MuscleGroupSetConverter
 
   @override
   Set<GTMuscleGroup> fromSql(String fromDb) {
+    if (fromDb.trim().isEmpty) return {};
     return fromDb
         .split(',')
-        .map((e) => GTMuscleGroup.values
-            .firstWhere((element) => element.toString() == e))
+        .map((e) =>
+            GTMuscleGroup.values.firstWhere((element) => element.name == e))
         .toSet();
   }
 
   @override
   String toSql(Set<GTMuscleGroup> value) {
-    return value.map((e) => e.toString()).join(',');
+    return value.map((e) => e.name).join(',');
   }
 }
 
 abstract class LinkedExerciseBase extends Table {
   IntColumn get id => integer().autoIncrement()();
   IntColumn get routineId;
-  TextColumn get name => text().withLength(min: 1, max: 64)();
+  TextColumn get name => text()();
   TextColumn get parameters => textEnum<GTSetParameters>().nullable()();
   TextColumn get sets => text().nullable().map(const GTSetListConverter())();
   TextColumn get primaryMuscleGroup => textEnum<GTMuscleGroup>().nullable()();
@@ -82,7 +83,8 @@ abstract class LinkedExerciseBase extends Table {
   IntColumn get customExerciseId =>
       integer().nullable().references(CustomExercises, #id)();
   TextColumn get notes => text().nullable()();
-  BoolColumn get inSuperset => boolean()();
+  BoolColumn get isSuperset => boolean()();
+  BoolColumn get isInSuperset => boolean()();
   IntColumn get supersetId;
   IntColumn get sortOrder => integer()();
 }

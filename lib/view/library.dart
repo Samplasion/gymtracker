@@ -350,7 +350,7 @@ class _ExerciseInfoViewState extends State<ExerciseInfoView> {
                   color: Theme.of(context).colorScheme.primary,
                 )),
       ),
-      if ([SetParameters.repsWeight, SetParameters.timeWeight]
+      if ([GTSetParameters.repsWeight, GTSetParameters.timeWeight]
           .contains(exercise.parameters))
         Builder(builder: (context) {
           var best = history.first;
@@ -382,7 +382,7 @@ class _ExerciseInfoViewState extends State<ExerciseInfoView> {
             },
           );
         }),
-      if ([SetParameters.repsWeight].contains(exercise.parameters))
+      if ([GTSetParameters.repsWeight].contains(exercise.parameters))
         Builder(builder: (context) {
           var best = history.first;
           var bestScore = -1.0;
@@ -413,7 +413,7 @@ class _ExerciseInfoViewState extends State<ExerciseInfoView> {
             },
           );
         }),
-      if ([SetParameters.repsWeight].contains(exercise.parameters))
+      if ([GTSetParameters.repsWeight].contains(exercise.parameters))
         Builder(builder: (context) {
           var best = history.first;
           var bestWeight = 0.0;
@@ -444,7 +444,7 @@ class _ExerciseInfoViewState extends State<ExerciseInfoView> {
             },
           );
         }),
-      if ([SetParameters.repsWeight, SetParameters.timeWeight]
+      if ([GTSetParameters.repsWeight, GTSetParameters.timeWeight]
           .contains(exercise.parameters))
         Builder(builder: (context) {
           var best = history.first;

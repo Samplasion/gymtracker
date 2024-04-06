@@ -6,33 +6,33 @@ part of 'set.dart';
 // CopyWithGenerator
 // **************************************************************************
 
-abstract class _$ExSetCWProxy {
-  ExSet id(String? id);
+abstract class _$GTSetCWProxy {
+  GTSet id(String? id);
 
-  ExSet kind(SetKind kind);
+  GTSet kind(GTSetKind kind);
 
-  ExSet parameters(SetParameters parameters);
+  GTSet parameters(GTSetParameters parameters);
 
-  ExSet reps(int? reps);
+  GTSet reps(int? reps);
 
-  ExSet weight(double? weight);
+  GTSet weight(double? weight);
 
-  ExSet time(Duration? time);
+  GTSet time(Duration? time);
 
-  ExSet distance(double? distance);
+  GTSet distance(double? distance);
 
-  ExSet done(bool done);
+  GTSet done(bool done);
 
-  /// This function **does support** nullification of nullable fields. All `null` values passed to `non-nullable` fields will be ignored. You can also use `ExSet(...).copyWith.fieldName(...)` to override fields one at a time with nullification support.
+  /// This function **does support** nullification of nullable fields. All `null` values passed to `non-nullable` fields will be ignored. You can also use `GTSet(...).copyWith.fieldName(...)` to override fields one at a time with nullification support.
   ///
   /// Usage
   /// ```dart
-  /// ExSet(...).copyWith(id: 12, name: "My name")
+  /// GTSet(...).copyWith(id: 12, name: "My name")
   /// ````
-  ExSet call({
+  GTSet call({
     String? id,
-    SetKind? kind,
-    SetParameters? parameters,
+    GTSetKind? kind,
+    GTSetParameters? parameters,
     int? reps,
     double? weight,
     Duration? time,
@@ -41,45 +41,45 @@ abstract class _$ExSetCWProxy {
   });
 }
 
-/// Proxy class for `copyWith` functionality. This is a callable class and can be used as follows: `instanceOfExSet.copyWith(...)`. Additionally contains functions for specific fields e.g. `instanceOfExSet.copyWith.fieldName(...)`
-class _$ExSetCWProxyImpl implements _$ExSetCWProxy {
-  const _$ExSetCWProxyImpl(this._value);
+/// Proxy class for `copyWith` functionality. This is a callable class and can be used as follows: `instanceOfGTSet.copyWith(...)`. Additionally contains functions for specific fields e.g. `instanceOfGTSet.copyWith.fieldName(...)`
+class _$GTSetCWProxyImpl implements _$GTSetCWProxy {
+  const _$GTSetCWProxyImpl(this._value);
 
-  final ExSet _value;
-
-  @override
-  ExSet id(String? id) => this(id: id);
+  final GTSet _value;
 
   @override
-  ExSet kind(SetKind kind) => this(kind: kind);
+  GTSet id(String? id) => this(id: id);
 
   @override
-  ExSet parameters(SetParameters parameters) => this(parameters: parameters);
+  GTSet kind(GTSetKind kind) => this(kind: kind);
 
   @override
-  ExSet reps(int? reps) => this(reps: reps);
+  GTSet parameters(GTSetParameters parameters) => this(parameters: parameters);
 
   @override
-  ExSet weight(double? weight) => this(weight: weight);
+  GTSet reps(int? reps) => this(reps: reps);
 
   @override
-  ExSet time(Duration? time) => this(time: time);
+  GTSet weight(double? weight) => this(weight: weight);
 
   @override
-  ExSet distance(double? distance) => this(distance: distance);
+  GTSet time(Duration? time) => this(time: time);
 
   @override
-  ExSet done(bool done) => this(done: done);
+  GTSet distance(double? distance) => this(distance: distance);
+
+  @override
+  GTSet done(bool done) => this(done: done);
 
   @override
 
-  /// This function **does support** nullification of nullable fields. All `null` values passed to `non-nullable` fields will be ignored. You can also use `ExSet(...).copyWith.fieldName(...)` to override fields one at a time with nullification support.
+  /// This function **does support** nullification of nullable fields. All `null` values passed to `non-nullable` fields will be ignored. You can also use `GTSet(...).copyWith.fieldName(...)` to override fields one at a time with nullification support.
   ///
   /// Usage
   /// ```dart
-  /// ExSet(...).copyWith(id: 12, name: "My name")
+  /// GTSet(...).copyWith(id: 12, name: "My name")
   /// ````
-  ExSet call({
+  GTSet call({
     Object? id = const $CopyWithPlaceholder(),
     Object? kind = const $CopyWithPlaceholder(),
     Object? parameters = const $CopyWithPlaceholder(),
@@ -89,7 +89,7 @@ class _$ExSetCWProxyImpl implements _$ExSetCWProxy {
     Object? distance = const $CopyWithPlaceholder(),
     Object? done = const $CopyWithPlaceholder(),
   }) {
-    return ExSet(
+    return GTSet(
       id: id == const $CopyWithPlaceholder()
           ? _value.id
           // ignore: cast_nullable_to_non_nullable
@@ -97,12 +97,12 @@ class _$ExSetCWProxyImpl implements _$ExSetCWProxy {
       kind: kind == const $CopyWithPlaceholder() || kind == null
           ? _value.kind
           // ignore: cast_nullable_to_non_nullable
-          : kind as SetKind,
+          : kind as GTSetKind,
       parameters:
           parameters == const $CopyWithPlaceholder() || parameters == null
               ? _value.parameters
               // ignore: cast_nullable_to_non_nullable
-              : parameters as SetParameters,
+              : parameters as GTSetParameters,
       reps: reps == const $CopyWithPlaceholder()
           ? _value.reps
           // ignore: cast_nullable_to_non_nullable
@@ -127,20 +127,20 @@ class _$ExSetCWProxyImpl implements _$ExSetCWProxy {
   }
 }
 
-extension $ExSetCopyWith on ExSet {
-  /// Returns a callable class that can be used as follows: `instanceOfExSet.copyWith(...)` or like so:`instanceOfExSet.copyWith.fieldName(...)`.
+extension $GTSetCopyWith on GTSet {
+  /// Returns a callable class that can be used as follows: `instanceOfGTSet.copyWith(...)` or like so:`instanceOfGTSet.copyWith.fieldName(...)`.
   // ignore: library_private_types_in_public_api
-  _$ExSetCWProxy get copyWith => _$ExSetCWProxyImpl(this);
+  _$GTSetCWProxy get copyWith => _$GTSetCWProxyImpl(this);
 }
 
 // **************************************************************************
 // JsonSerializableGenerator
 // **************************************************************************
 
-ExSet _$ExSetFromJson(Map<String, dynamic> json) => ExSet(
+GTSet _$GTSetFromJson(Map<String, dynamic> json) => GTSet(
       id: json['id'] as String?,
-      kind: $enumDecode(_$SetKindEnumMap, json['kind']),
-      parameters: $enumDecode(_$SetParametersEnumMap, json['parameters']),
+      kind: $enumDecode(_$GTSetKindEnumMap, json['kind']),
+      parameters: $enumDecode(_$GTSetParametersEnumMap, json['parameters']),
       reps: json['reps'] as int?,
       weight: (json['weight'] as num?)?.toDouble(),
       time: json['time'] == null
@@ -150,10 +150,10 @@ ExSet _$ExSetFromJson(Map<String, dynamic> json) => ExSet(
       done: json['done'] as bool? ?? false,
     );
 
-Map<String, dynamic> _$ExSetToJson(ExSet instance) => <String, dynamic>{
+Map<String, dynamic> _$GTSetToJson(GTSet instance) => <String, dynamic>{
       'id': instance.id,
-      'kind': _$SetKindEnumMap[instance.kind]!,
-      'parameters': _$SetParametersEnumMap[instance.parameters]!,
+      'kind': _$GTSetKindEnumMap[instance.kind]!,
+      'parameters': _$GTSetParametersEnumMap[instance.parameters]!,
       'reps': instance.reps,
       'weight': instance.weight,
       'time': instance.time?.inMicroseconds,
@@ -161,18 +161,18 @@ Map<String, dynamic> _$ExSetToJson(ExSet instance) => <String, dynamic>{
       'done': instance.done,
     };
 
-const _$SetKindEnumMap = {
-  SetKind.warmUp: 'warmUp',
-  SetKind.normal: 'normal',
-  SetKind.drop: 'drop',
-  SetKind.failure: 'failure',
-  SetKind.failureStripping: 'failureStripping',
+const _$GTSetKindEnumMap = {
+  GTSetKind.warmUp: 'warmUp',
+  GTSetKind.normal: 'normal',
+  GTSetKind.drop: 'drop',
+  GTSetKind.failure: 'failure',
+  GTSetKind.failureStripping: 'failureStripping',
 };
 
-const _$SetParametersEnumMap = {
-  SetParameters.repsWeight: 'repsWeight',
-  SetParameters.timeWeight: 'timeWeight',
-  SetParameters.freeBodyReps: 'freeBodyReps',
-  SetParameters.time: 'time',
-  SetParameters.distance: 'distance',
+const _$GTSetParametersEnumMap = {
+  GTSetParameters.repsWeight: 'repsWeight',
+  GTSetParameters.timeWeight: 'timeWeight',
+  GTSetParameters.freeBodyReps: 'freeBodyReps',
+  GTSetParameters.time: 'time',
+  GTSetParameters.distance: 'distance',
 };

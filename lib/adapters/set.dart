@@ -1,45 +1,45 @@
 import 'package:gymtracker/model/set.dart';
 import 'package:hive/hive.dart';
 
-class SetKindAdapter extends TypeAdapter<SetKind> {
+class SetKindAdapter extends TypeAdapter<GTSetKind> {
   @override
   final int typeId = 3;
 
   @override
-  SetKind read(BinaryReader reader) {
+  GTSetKind read(BinaryReader reader) {
     final index = reader.readByte();
-    return SetKind.values[index];
+    return GTSetKind.values[index];
   }
 
   @override
-  void write(BinaryWriter writer, SetKind obj) {
+  void write(BinaryWriter writer, GTSetKind obj) {
     writer.writeByte(obj.index);
   }
 }
 
-class SetParametersAdapter extends TypeAdapter<SetParameters> {
+class SetParametersAdapter extends TypeAdapter<GTSetParameters> {
   @override
   final int typeId = 4;
 
   @override
-  SetParameters read(BinaryReader reader) {
+  GTSetParameters read(BinaryReader reader) {
     final index = reader.readByte();
-    return SetParameters.values[index];
+    return GTSetParameters.values[index];
   }
 
   @override
-  void write(BinaryWriter writer, SetParameters obj) {
+  void write(BinaryWriter writer, GTSetParameters obj) {
     writer.writeByte(obj.index);
   }
 }
 
-class ExSetAdapter extends TypeAdapter<ExSet> {
+class ExSetAdapter extends TypeAdapter<GTSet> {
   @override
   final int typeId = 5;
 
   @override
-  ExSet read(BinaryReader reader) {
-    return ExSet(
+  GTSet read(BinaryReader reader) {
+    return GTSet(
       id: reader.read(),
       kind: reader.read(),
       parameters: reader.read(),
@@ -52,7 +52,7 @@ class ExSetAdapter extends TypeAdapter<ExSet> {
   }
 
   @override
-  void write(BinaryWriter writer, ExSet obj) {
+  void write(BinaryWriter writer, GTSet obj) {
     writer.write(obj.id);
     writer.write(obj.kind);
     writer.write(obj.parameters);

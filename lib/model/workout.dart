@@ -82,8 +82,8 @@ class Workout {
       ? startingDate!.add(duration!)
       : null;
 
-  List<ExSet> get allSets => [for (final ex in exercises) ...ex.sets];
-  List<ExSet> get doneSets => [
+  List<GTSet> get allSets => [for (final ex in exercises) ...ex.sets];
+  List<GTSet> get doneSets => [
         for (final set in allSets)
           if (set.done) set
       ];
@@ -187,7 +187,7 @@ class Workout {
 
   Workout withFilters({
     bool Function(WorkoutExercisable)? exerciseFilter,
-    bool Function(WorkoutExercisable, ExSet)? setFilter,
+    bool Function(WorkoutExercisable, GTSet)? setFilter,
   }) {
     return copyWith(
       exercises: [

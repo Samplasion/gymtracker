@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
@@ -16,15 +17,18 @@ import 'package:gymtracker/model/exercise.dart';
 import 'package:gymtracker/model/measurements.dart';
 import 'package:gymtracker/model/workout.dart';
 import 'package:gymtracker/service/logger.dart';
+import 'package:gymtracker/utils/extensions.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:rxdart/rxdart.dart';
 
 class DatabaseService extends GetxService with ChangeNotifier {
   late final GTDatabase db;
 
-  late final Box<Exercise> exerciseBox;
-  late final Box<Workout> routinesBox;
-  late final Box<Workout> historyBox;
+  final exercises$ = BehaviorSubject<List<Exercise>>.seeded([]);
+  final routines$ = BehaviorSubject<List<Workout>>.seeded([]);
+  final history$ = BehaviorSubject<List<Workout>>.seeded([]);
+
   late final Box<dynamic> settingsBox;
   late final Box<String> ongoingBox;
   late final Box<WeightMeasurement> weightMeasurementsBox;
@@ -44,14 +48,17 @@ class DatabaseService extends GetxService with ChangeNotifier {
 
     db = GTDatabase();
 
-    db.getAllRoutines().listen((routines) {
-      logger.e(routines);
-    });
+    db.getAllRoutines()
+      ..pipe(routines$)
+      ..listen((_) => onServiceChange("routines")());
+    db.getAllCustomExercises()
+      ..pipe(exercises$)
+      ..listen((_) => onServiceChange("exercises")());
+    db.getAllHistoryWorkouts()
+      ..pipe(history$)
+      ..listen((_) => onServiceChange("history")());
 
     onServiceChange("main")();
-    exerciseBox.listenable().addListener(onServiceChange("exercises"));
-    routinesBox.listenable().addListener(onServiceChange("routines"));
-    historyBox.listenable().addListener(onServiceChange("history"));
     settingsBox.listenable().addListener(onServiceChange("settings"));
     ongoingBox.listenable().addListener(onServiceChange("ongoing"));
     weightMeasurementsBox
@@ -82,9 +89,6 @@ class DatabaseService extends GetxService with ChangeNotifier {
     Hive.registerAdapter(WeightMeasurementAdapter());
     Hive.registerAdapter(DistanceAdapter());
 
-    exerciseBox = await Hive.openBox<Exercise>("exercises");
-    routinesBox = await Hive.openBox<Workout>("routines");
-    historyBox = await Hive.openBox<Workout>("history");
     settingsBox = await Hive.openBox("settings");
     ongoingBox = await Hive.openBox<String>("ongoing");
     weightMeasurementsBox =
@@ -100,9 +104,6 @@ class DatabaseService extends GetxService with ChangeNotifier {
   @visibleForTesting
   Future teardown() async {
     logger.t("!!! Tearing down");
-    await exerciseBox.clear();
-    await routinesBox.clear();
-    await historyBox.clear();
     await settingsBox.clear();
     await ongoingBox.clear();
     // ignore: invalid_use_of_visible_for_testing_member
@@ -122,32 +123,60 @@ class DatabaseService extends GetxService with ChangeNotifier {
   }
 
   List<Exercise> get exercises {
-    return exerciseBox.values.toList();
+    return exercises$.value;
   }
 
-  _writeExercises(List<Exercise> exercises) {
-    exerciseBox.clear().then((_) {
-      exerciseBox.putAll({
-        for (final exercise in exercises) exercise.id: exercise,
-      }).then((value) => notifyListeners());
+  @visibleForTesting
+  writeExercises(List<Exercise> exercises) {
+    db.batch((batch) {
+      batch.logger.i("Importing exercises");
+      batch.deleteAll(db.customExercises);
+      batch.insertAll(
+        db.customExercises,
+        [for (final ex in exercises) ex.toInsertable()],
+      );
     });
   }
 
   setExercise(Exercise exercise) {
-    exerciseBox.put(exercise.id, exercise).then((value) => notifyListeners());
+    if (exercises.any((element) => element.id == exercise.id)) {
+      db.updateCustomExercise(exercise);
+    } else {
+      db.insertCustomExercise(exercise);
+    }
   }
 
   removeExercise(Exercise exercise) {
-    exerciseBox.delete(exercise.id).then((value) => notifyListeners());
+    db.deleteCustomExercise(exercise.id);
   }
 
   List<Workout> get routines {
-    return routinesBox.values.toList();
+    return routines$.value;
   }
 
   _writeRoutines(List<Workout> routines) {
-    routinesBox.clear().then((_) {
-      routinesBox.addAll(routines).then((value) => notifyListeners());
+    db.batch((batch) {
+      batch.logger.i("Importing routines");
+      batch.deleteAll(db.routines);
+      batch.insertAll(
+        db.routines,
+        routines.toSortedRoutineInsertables(),
+      );
+
+      final allExercises = routines
+          .expand((r) => r.exercises)
+          .map((e) => e.map(
+                exercise: (ex) => [ex],
+                superset: (ss) => [ss, ...ss.exercises],
+              ))
+          .expand((e) => e)
+          .toList();
+
+      batch.deleteAll(db.routineExercises);
+      batch.insertAll(
+        db.routineExercises,
+        allExercises.toSortedRoutineExerciseInsertables(),
+      );
     });
   }
 
@@ -157,55 +186,77 @@ class DatabaseService extends GetxService with ChangeNotifier {
   }
 
   setRoutine(Workout routine) {
-    final idx = [...routinesBox.values].indexWhere((r) => r.id == routine.id);
-    if (idx >= 0) {
-      routinesBox.putAt(idx, routine).then((value) => notifyListeners());
+    if (routines.any((element) => element.id == routine.id)) {
+      fixWorkout(routine);
+      db.updateRoutine(routine);
     } else {
-      routinesBox.add(routine).then((value) => notifyListeners());
+      fixWorkout(routine);
+      db.insertRoutine(routine);
     }
   }
 
   removeRoutine(Workout routine) {
-    final idx = [...routinesBox.values].indexWhere((r) => r.id == routine.id);
-    if (idx >= 0) {
-      routinesBox.deleteAt(idx).then((value) => notifyListeners());
-    }
+    db.deleteRoutine(routine.id);
   }
 
   bool hasRoutine(String id) {
-    return [...routinesBox.values].indexWhere((r) => r.id == id) >= 0;
+    return routines.any((element) => element.id == id);
   }
 
   List<Workout> get workoutHistory {
-    return historyBox.values.toList();
+    return history$.value;
   }
 
   writeAllHistory(List<Workout> history) {
-    historyBox.clear().then((_) {
-      historyBox.putAll({
-        for (final workout in history) workout.id: workout,
-      }).then((value) => notifyListeners());
+    db.batch((batch) {
+      batch.logger.i("Importing routines");
+      batch.deleteAll(db.historyWorkouts);
+      batch.insertAll(
+        db.historyWorkouts,
+        routines.toSortedHistoryWorkoutInsertables(),
+      );
+
+      final allExercises = routines
+          .expand((r) => r.exercises)
+          .map((e) => e.map(
+                exercise: (ex) => [ex],
+                superset: (ss) => [ss, ...ss.exercises],
+              ))
+          .expand((e) => e)
+          .toList();
+
+      batch.deleteAll(db.historyWorkoutExercises);
+      batch.insertAll(
+        db.historyWorkoutExercises,
+        allExercises.toSortedHistoryWorkoutInsertables(),
+      );
     });
   }
 
-  setHistoryWorkout(Workout workout) {
-    historyBox.put(workout.id, workout).then((value) => notifyListeners());
+  Future setHistoryWorkout(Workout workout) async {
+    if (workoutHistory.any((element) => element.id == workout.id)) {
+      fixWorkout(workout);
+      await db.updateHistoryWorkout(workout);
+    } else {
+      fixWorkout(workout);
+      await db.insertHistoryWorkout(workout);
+    }
   }
 
   removeHistoryWorkout(Workout workout) {
     removeHistoryWorkoutById(workout.id);
   }
 
-  removeHistoryWorkoutById(String id) {
-    historyBox.delete(id).then((value) => notifyListeners());
+  Future removeHistoryWorkoutById(String id) async {
+    await db.deleteHistoryWorkout(id);
   }
 
   Workout? getHistoryWorkout(String id) {
-    return historyBox.get(id);
+    return workoutHistory.firstWhereOrNull((element) => element.id == id);
   }
 
   bool hasHistoryWorkout(String id) {
-    return historyBox.containsKey(id);
+    return workoutHistory.any((element) => element.id == id);
   }
 
   _writeWeightMeasurements(List<WeightMeasurement> weightMeasurements) {
@@ -237,11 +288,11 @@ class DatabaseService extends GetxService with ChangeNotifier {
     final converter = getConverter(DATABASE_VERSION);
 
     return converter.export(DatabaseSnapshot(
-      customExercises: [],
-      routines: [],
-      routineExercises: [],
-      historyWorkouts: [],
-      historyWorkoutExercises: [],
+      customExercises: exercises,
+      routines: routines,
+      routineExercises: routines.flattenedExercises,
+      historyWorkouts: workoutHistory,
+      historyWorkoutExercises: workoutHistory.flattenedExercises,
     ));
   }
 
@@ -275,14 +326,12 @@ class DatabaseService extends GetxService with ChangeNotifier {
           batch.logger.i("Importing routines");
           batch.insertAll(
             db.routines,
-            [for (final rt in snapshot.routines) rt.toInsertable()],
+            snapshot.routines.toSortedRoutineInsertables(),
           );
 
           batch.insertAll(
             db.routineExercises,
-            [
-              for (final ex in snapshot.routineExercises) ex.toRoutineExercise()
-            ],
+            snapshot.routineExercises.toSortedRoutineExerciseInsertables(),
           );
         });
 
@@ -291,15 +340,13 @@ class DatabaseService extends GetxService with ChangeNotifier {
 
           batch.insertAll(
             db.historyWorkouts,
-            [for (final rt in snapshot.historyWorkouts) rt.toInsertable()],
+            snapshot.historyWorkouts.toSortedHistoryWorkoutInsertables(),
           );
 
           batch.insertAll(
             db.historyWorkoutExercises,
-            [
-              for (final ex in snapshot.historyWorkoutExercises)
-                ex.toHistoryWorkoutExercise()
-            ],
+            snapshot.historyWorkoutExercises
+                .toSortedHistoryWorkoutInsertables(),
           );
         });
       });
@@ -330,6 +377,10 @@ class DatabaseService extends GetxService with ChangeNotifier {
   }
 
   bool get hasOngoing => ongoingBox.containsKey("data");
+
+  void transaction<T>(Future<T> Function() action) async {
+    await db.transaction(action);
+  }
 }
 
 class DatabaseImportVersionMismatch implements Exception {
@@ -340,5 +391,20 @@ class DatabaseImportVersionMismatch implements Exception {
   @override
   String toString() {
     return "Trying to import a newer version of the database: $version (current version: $DATABASE_VERSION)";
+  }
+}
+
+void fixWorkout(Workout workout) {
+  for (final exercise in workout.exercises) {
+    exercise.when(exercise: (ex) {
+      ex.workoutID = workout.id;
+      ex.supersetID = null;
+    }, superset: (ss) {
+      ss.workoutID = workout.id;
+      for (final ex in ss.exercises) {
+        ex.workoutID = workout.id;
+        ex.supersetID = ss.id;
+      }
+    });
   }
 }

@@ -1,44 +1,19 @@
 import 'package:drift/drift.dart';
-import 'package:gymtracker/db/model/tables/set.dart';
+import 'package:gymtracker/db/model/tables/set.dart' show GTSetListConverter;
+import 'package:gymtracker/model/exercise.dart' show GTMuscleGroup;
+import 'package:gymtracker/model/set.dart';
+import 'package:uuid/uuid.dart';
 
-enum GTMuscleCategory {
-  arms,
-  back,
-  chest,
-  core,
-  legs,
-  shoulders,
-}
+export 'package:gymtracker/model/exercise.dart'
+    show GTMuscleGroup, GTMuscleCategory;
 
-enum GTMuscleGroup {
-  abductors(GTMuscleCategory.legs),
-  abs(GTMuscleCategory.core),
-  adductors(GTMuscleCategory.legs),
-  biceps(GTMuscleCategory.arms),
-  calves(GTMuscleCategory.legs),
-  chest(GTMuscleCategory.chest),
-  forearm(GTMuscleCategory.arms),
-  glutes(GTMuscleCategory.legs),
-  hamstrings(GTMuscleCategory.legs),
-  lats(GTMuscleCategory.legs),
-  lowerBack(GTMuscleCategory.back),
-
-  /// Or cardio
-  none,
-  other,
-  quadriceps(GTMuscleCategory.legs),
-  shoulders(GTMuscleCategory.shoulders),
-  traps(GTMuscleCategory.back),
-  triceps(GTMuscleCategory.arms),
-  upperBack(GTMuscleCategory.back);
-
-  const GTMuscleGroup([this.category]);
-
-  final GTMuscleCategory? category;
-}
+const _uuid = Uuid();
 
 class CustomExercises extends Table {
-  IntColumn get id => integer().autoIncrement()();
+  @override
+  Set<Column<Object>> get primaryKey => {id};
+
+  TextColumn get id => text().clientDefault(() => _uuid.v4())();
   TextColumn get name => text()();
   TextColumn get parameters => textEnum<GTSetParameters>()();
   TextColumn get primaryMuscleGroup => textEnum<GTMuscleGroup>()();
@@ -68,8 +43,11 @@ class MuscleGroupSetConverter
 }
 
 abstract class LinkedExerciseBase extends Table {
-  IntColumn get id => integer().autoIncrement()();
-  IntColumn get routineId;
+  @override
+  Set<Column<Object>> get primaryKey => {id};
+
+  TextColumn get id => text().clientDefault(() => _uuid.v4())();
+  TextColumn get routineId;
   TextColumn get name => text()();
   TextColumn get parameters => textEnum<GTSetParameters>().nullable()();
   TextColumn get sets => text().nullable().map(const GTSetListConverter())();
@@ -80,11 +58,11 @@ abstract class LinkedExerciseBase extends Table {
   IntColumn get restTime => integer().nullable()();
   BoolColumn get isCustom => boolean()();
   TextColumn get libraryExerciseId => text().nullable()();
-  IntColumn get customExerciseId =>
-      integer().nullable().references(CustomExercises, #id)();
+  TextColumn get customExerciseId =>
+      text().nullable().references(CustomExercises, #id)();
   TextColumn get notes => text().nullable()();
   BoolColumn get isSuperset => boolean()();
   BoolColumn get isInSuperset => boolean()();
-  IntColumn get supersetId;
+  TextColumn get supersetId;
   IntColumn get sortOrder => integer()();
 }

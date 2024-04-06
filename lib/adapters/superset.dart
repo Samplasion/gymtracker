@@ -13,6 +13,7 @@ class SupersetAdapter extends TypeAdapter<Superset> {
       exercises: (reader.read() as List).cast<Exercise>(),
       restTime: reader.read(),
       notes: reader.read(),
+      workoutID: reader.availableBytes > 0 ? reader.read() : null,
     );
   }
 
@@ -22,5 +23,6 @@ class SupersetAdapter extends TypeAdapter<Superset> {
     writer.write(obj.exercises);
     writer.write(obj.restTime);
     writer.write(obj.notes);
+    writer.write(obj.workoutID);
   }
 }

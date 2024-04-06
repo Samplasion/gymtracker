@@ -1,11 +1,5 @@
-import 'dart:convert';
-import 'dart:io';
-
-import 'package:drift/drift.dart' show TableStatements;
 import 'package:drift_db_viewer/drift_db_viewer.dart';
-import 'package:file_picker/file_picker.dart';
 import 'package:flat/flat.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
@@ -15,13 +9,7 @@ import 'package:gymtracker/controller/history_controller.dart';
 import 'package:gymtracker/controller/routines_controller.dart';
 import 'package:gymtracker/controller/stopwatch_controller.dart';
 import 'package:gymtracker/controller/workout_controller.dart';
-import 'package:gymtracker/db/database.dart';
-import 'package:gymtracker/db/model/api/exercise.dart';
-import 'package:gymtracker/db/model/api/routine.dart';
-import 'package:gymtracker/db/model/api/set.dart';
-import 'package:gymtracker/db/model/tables/exercise.dart';
 import 'package:gymtracker/model/exercise.dart';
-import 'package:gymtracker/model/workout.dart';
 import 'package:gymtracker/service/database.dart';
 import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/service/logger.dart';
@@ -246,7 +234,7 @@ class WorkoutTitleGeneratorAlert extends StatefulWidget {
 
 class _WorkoutTitleGeneratorAlertState
     extends State<WorkoutTitleGeneratorAlert> {
-  final Set<MuscleCategory> _selectedCategories = {};
+  final Set<GTMuscleCategory> _selectedCategories = {};
 
   String _generate() =>
       WorkoutController.generateWorkoutTitle(_selectedCategories);
@@ -261,7 +249,7 @@ class _WorkoutTitleGeneratorAlertState
         padding: const EdgeInsets.all(16.0),
         children: [
           Text(_generate()),
-          ...MuscleCategory.values.map((category) {
+          ...GTMuscleCategory.values.map((category) {
             return CheckboxListTile(
               title: Text(category.name),
               value: _selectedCategories.contains(category),

@@ -18,7 +18,7 @@ class MuscleCategoryGraph extends StatefulWidget {
 
 class _MuscleCategoryGraphState
     extends ControlledState<MuscleCategoryGraph, HistoryController> {
-  Map<MuscleCategory, double> get data => controller
+  Map<GTMuscleCategory, double> get data => controller
       .calculateMuscleCategoryDistributionFor(workouts: widget.workouts);
   double get maxValue => data.values.max;
 

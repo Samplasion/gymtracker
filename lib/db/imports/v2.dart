@@ -1,5 +1,7 @@
-import 'package:gymtracker/db/database.dart';
 import 'package:gymtracker/db/imports/types.dart';
+import 'package:gymtracker/model/exercisable.dart';
+import 'package:gymtracker/model/exercise.dart';
+import 'package:gymtracker/model/workout.dart';
 
 class VersionedJsonImportV2 extends VersionedJsonImportBase {
   @override
@@ -12,22 +14,21 @@ class VersionedJsonImportV2 extends VersionedJsonImportBase {
     return DatabaseSnapshot(
       customExercises: [
         for (final exercise in json['customExercises'])
-          GTLibraryExercise.fromJson(exercise)
+          Exercise.fromJson(exercise)
       ],
       routines: [
-        for (final routine in json['routines']) GTRoutine.fromJson(routine)
+        for (final routine in json['routines']) Workout.fromJson(routine)
       ],
       routineExercises: [
         for (final exercise in json['routineExercises'])
-          GTExerciseOrSuperset.fromJson(exercise)
+          WorkoutExercisable.fromJson(exercise)
       ],
       historyWorkouts: [
-        for (final workout in json['workouts'])
-          GTHistoryWorkout.fromJson(workout)
+        for (final workout in json['workouts']) Workout.fromJson(workout)
       ],
       historyWorkoutExercises: [
         for (final exercise in json['workoutExercises'])
-          GTExerciseOrSuperset.fromJson(exercise)
+          WorkoutExercisable.fromJson(exercise)
       ],
     );
   }

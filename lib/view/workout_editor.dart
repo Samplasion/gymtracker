@@ -186,8 +186,8 @@ class _WorkoutEditorState extends State<WorkoutEditor> {
                   setState(() {});
                 },
                 onSetCreate: () {
-                  workout.exercises[i].sets.add(ExSet.empty(
-                    kind: SetKind.normal,
+                  workout.exercises[i].sets.add(GTSet.empty(
+                    kind: GTSetKind.normal,
                     parameters: (workout.exercises[i] as Exercise).parameters,
                   ));
                   setState(() {});
@@ -255,8 +255,8 @@ class _WorkoutEditorState extends State<WorkoutEditor> {
                         () => const ExercisePicker(singlePick: true));
                     if (ex == null || ex.isEmpty) return;
                     workout.exercises[i] = ex.first.copyWith.sets([
-                      ExSet.empty(
-                        kind: SetKind.normal,
+                      GTSet.empty(
+                        kind: GTSetKind.normal,
                         parameters: ex.first.parameters,
                       ),
                     ]);
@@ -279,8 +279,8 @@ class _WorkoutEditorState extends State<WorkoutEditor> {
                     if (exs == null || exs.isEmpty) return;
                     (workout.exercises[i] as Superset).exercises.addAll(
                           exs.map((ex) => ex.copyWith.sets([
-                                ExSet.empty(
-                                  kind: SetKind.normal,
+                                GTSet.empty(
+                                  kind: GTSetKind.normal,
                                   parameters: ex.parameters,
                                 ),
                               ])),
@@ -341,8 +341,8 @@ class _WorkoutEditorState extends State<WorkoutEditor> {
                   (workout.exercises[i] as Superset)
                       .exercises[index]
                       .sets
-                      .add(ExSet.empty(
-                        kind: SetKind.normal,
+                      .add(GTSet.empty(
+                        kind: GTSetKind.normal,
                         parameters: (workout.exercises[i] as Superset)
                             .exercises[index]
                             .parameters,
@@ -388,8 +388,8 @@ class _WorkoutEditorState extends State<WorkoutEditor> {
                   if (exs == null || exs.isEmpty) return;
                   workout.exercises.addAll(
                     exs.map((ex) => ex.copyWith.sets([
-                          ExSet.empty(
-                            kind: SetKind.normal,
+                          GTSet.empty(
+                            kind: GTSetKind.normal,
                             parameters: ex.parameters,
                           ),
                         ])),

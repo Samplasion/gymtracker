@@ -11,13 +11,11 @@ class $CustomExercisesTable extends CustomExercises
   $CustomExercisesTable(this.attachedDatabase, [this._alias]);
   static const VerificationMeta _idMeta = const VerificationMeta('id');
   @override
-  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
       'id', aliasedName, false,
-      hasAutoIncrement: true,
-      type: DriftSqlType.int,
+      type: DriftSqlType.string,
       requiredDuringInsert: false,
-      defaultConstraints:
-          GeneratedColumn.constraintIsAlways('PRIMARY KEY AUTOINCREMENT'));
+      clientDefault: () => _uuid.v4());
   static const VerificationMeta _nameMeta = const VerificationMeta('name');
   @override
   late final GeneratedColumn<String> name = GeneratedColumn<String>(
@@ -85,7 +83,7 @@ class $CustomExercisesTable extends CustomExercises
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return CustomExercise(
       id: attachedDatabase.typeMapping
-          .read(DriftSqlType.int, data['${effectivePrefix}id'])!,
+          .read(DriftSqlType.string, data['${effectivePrefix}id'])!,
       name: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}name'])!,
       parameters: $CustomExercisesTable.$converterparameters.fromSql(
@@ -117,7 +115,7 @@ class $CustomExercisesTable extends CustomExercises
 }
 
 class CustomExercise extends DataClass implements Insertable<CustomExercise> {
-  final int id;
+  final String id;
   final String name;
   final GTSetParameters parameters;
   final GTMuscleGroup primaryMuscleGroup;
@@ -131,7 +129,7 @@ class CustomExercise extends DataClass implements Insertable<CustomExercise> {
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
-    map['id'] = Variable<int>(id);
+    map['id'] = Variable<String>(id);
     map['name'] = Variable<String>(name);
     {
       map['parameters'] = Variable<String>(
@@ -164,7 +162,7 @@ class CustomExercise extends DataClass implements Insertable<CustomExercise> {
       {ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return CustomExercise(
-      id: serializer.fromJson<int>(json['id']),
+      id: serializer.fromJson<String>(json['id']),
       name: serializer.fromJson<String>(json['name']),
       parameters: $CustomExercisesTable.$converterparameters
           .fromJson(serializer.fromJson<String>(json['parameters'])),
@@ -178,7 +176,7 @@ class CustomExercise extends DataClass implements Insertable<CustomExercise> {
   Map<String, dynamic> toJson({ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
-      'id': serializer.toJson<int>(id),
+      'id': serializer.toJson<String>(id),
       'name': serializer.toJson<String>(name),
       'parameters': serializer.toJson<String>(
           $CustomExercisesTable.$converterparameters.toJson(parameters)),
@@ -191,7 +189,7 @@ class CustomExercise extends DataClass implements Insertable<CustomExercise> {
   }
 
   CustomExercise copyWith(
-          {int? id,
+          {String? id,
           String? name,
           GTSetParameters? parameters,
           GTMuscleGroup? primaryMuscleGroup,
@@ -231,17 +229,19 @@ class CustomExercise extends DataClass implements Insertable<CustomExercise> {
 }
 
 class CustomExercisesCompanion extends UpdateCompanion<CustomExercise> {
-  final Value<int> id;
+  final Value<String> id;
   final Value<String> name;
   final Value<GTSetParameters> parameters;
   final Value<GTMuscleGroup> primaryMuscleGroup;
   final Value<Set<GTMuscleGroup>> secondaryMuscleGroups;
+  final Value<int> rowid;
   const CustomExercisesCompanion({
     this.id = const Value.absent(),
     this.name = const Value.absent(),
     this.parameters = const Value.absent(),
     this.primaryMuscleGroup = const Value.absent(),
     this.secondaryMuscleGroups = const Value.absent(),
+    this.rowid = const Value.absent(),
   });
   CustomExercisesCompanion.insert({
     this.id = const Value.absent(),
@@ -249,16 +249,18 @@ class CustomExercisesCompanion extends UpdateCompanion<CustomExercise> {
     required GTSetParameters parameters,
     required GTMuscleGroup primaryMuscleGroup,
     required Set<GTMuscleGroup> secondaryMuscleGroups,
+    this.rowid = const Value.absent(),
   })  : name = Value(name),
         parameters = Value(parameters),
         primaryMuscleGroup = Value(primaryMuscleGroup),
         secondaryMuscleGroups = Value(secondaryMuscleGroups);
   static Insertable<CustomExercise> custom({
-    Expression<int>? id,
+    Expression<String>? id,
     Expression<String>? name,
     Expression<String>? parameters,
     Expression<String>? primaryMuscleGroup,
     Expression<String>? secondaryMuscleGroups,
+    Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -268,15 +270,17 @@ class CustomExercisesCompanion extends UpdateCompanion<CustomExercise> {
         'primary_muscle_group': primaryMuscleGroup,
       if (secondaryMuscleGroups != null)
         'secondary_muscle_groups': secondaryMuscleGroups,
+      if (rowid != null) 'rowid': rowid,
     });
   }
 
   CustomExercisesCompanion copyWith(
-      {Value<int>? id,
+      {Value<String>? id,
       Value<String>? name,
       Value<GTSetParameters>? parameters,
       Value<GTMuscleGroup>? primaryMuscleGroup,
-      Value<Set<GTMuscleGroup>>? secondaryMuscleGroups}) {
+      Value<Set<GTMuscleGroup>>? secondaryMuscleGroups,
+      Value<int>? rowid}) {
     return CustomExercisesCompanion(
       id: id ?? this.id,
       name: name ?? this.name,
@@ -284,6 +288,7 @@ class CustomExercisesCompanion extends UpdateCompanion<CustomExercise> {
       primaryMuscleGroup: primaryMuscleGroup ?? this.primaryMuscleGroup,
       secondaryMuscleGroups:
           secondaryMuscleGroups ?? this.secondaryMuscleGroups,
+      rowid: rowid ?? this.rowid,
     );
   }
 
@@ -291,7 +296,7 @@ class CustomExercisesCompanion extends UpdateCompanion<CustomExercise> {
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
     if (id.present) {
-      map['id'] = Variable<int>(id.value);
+      map['id'] = Variable<String>(id.value);
     }
     if (name.present) {
       map['name'] = Variable<String>(name.value);
@@ -310,6 +315,9 @@ class CustomExercisesCompanion extends UpdateCompanion<CustomExercise> {
           .$convertersecondaryMuscleGroups
           .toSql(secondaryMuscleGroups.value));
     }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
     return map;
   }
 
@@ -320,7 +328,8 @@ class CustomExercisesCompanion extends UpdateCompanion<CustomExercise> {
           ..write('name: $name, ')
           ..write('parameters: $parameters, ')
           ..write('primaryMuscleGroup: $primaryMuscleGroup, ')
-          ..write('secondaryMuscleGroups: $secondaryMuscleGroups')
+          ..write('secondaryMuscleGroups: $secondaryMuscleGroups, ')
+          ..write('rowid: $rowid')
           ..write(')'))
         .toString();
   }
@@ -333,13 +342,11 @@ class $RoutinesTable extends Routines with TableInfo<$RoutinesTable, Routine> {
   $RoutinesTable(this.attachedDatabase, [this._alias]);
   static const VerificationMeta _idMeta = const VerificationMeta('id');
   @override
-  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
       'id', aliasedName, false,
-      hasAutoIncrement: true,
-      type: DriftSqlType.int,
+      type: DriftSqlType.string,
       requiredDuringInsert: false,
-      defaultConstraints:
-          GeneratedColumn.constraintIsAlways('PRIMARY KEY AUTOINCREMENT'));
+      clientDefault: () => _uuid.v4());
   static const VerificationMeta _nameMeta = const VerificationMeta('name');
   @override
   late final GeneratedColumn<String> name = GeneratedColumn<String>(
@@ -417,7 +424,7 @@ class $RoutinesTable extends Routines with TableInfo<$RoutinesTable, Routine> {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return Routine(
       id: attachedDatabase.typeMapping
-          .read(DriftSqlType.int, data['${effectivePrefix}id'])!,
+          .read(DriftSqlType.string, data['${effectivePrefix}id'])!,
       name: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}name'])!,
       infobox: attachedDatabase.typeMapping
@@ -445,7 +452,7 @@ class $RoutinesTable extends Routines with TableInfo<$RoutinesTable, Routine> {
 }
 
 class Routine extends DataClass implements Insertable<Routine> {
-  final int id;
+  final String id;
   final String name;
   final String infobox;
   final Weights weightUnit;
@@ -461,7 +468,7 @@ class Routine extends DataClass implements Insertable<Routine> {
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
-    map['id'] = Variable<int>(id);
+    map['id'] = Variable<String>(id);
     map['name'] = Variable<String>(name);
     map['infobox'] = Variable<String>(infobox);
     {
@@ -491,7 +498,7 @@ class Routine extends DataClass implements Insertable<Routine> {
       {ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return Routine(
-      id: serializer.fromJson<int>(json['id']),
+      id: serializer.fromJson<String>(json['id']),
       name: serializer.fromJson<String>(json['name']),
       infobox: serializer.fromJson<String>(json['infobox']),
       weightUnit: $RoutinesTable.$converterweightUnit
@@ -505,7 +512,7 @@ class Routine extends DataClass implements Insertable<Routine> {
   Map<String, dynamic> toJson({ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
-      'id': serializer.toJson<int>(id),
+      'id': serializer.toJson<String>(id),
       'name': serializer.toJson<String>(name),
       'infobox': serializer.toJson<String>(infobox),
       'weightUnit': serializer.toJson<String>(
@@ -517,7 +524,7 @@ class Routine extends DataClass implements Insertable<Routine> {
   }
 
   Routine copyWith(
-          {int? id,
+          {String? id,
           String? name,
           String? infobox,
           Weights? weightUnit,
@@ -560,12 +567,13 @@ class Routine extends DataClass implements Insertable<Routine> {
 }
 
 class RoutinesCompanion extends UpdateCompanion<Routine> {
-  final Value<int> id;
+  final Value<String> id;
   final Value<String> name;
   final Value<String> infobox;
   final Value<Weights> weightUnit;
   final Value<Distance> distanceUnit;
   final Value<int> sortOrder;
+  final Value<int> rowid;
   const RoutinesCompanion({
     this.id = const Value.absent(),
     this.name = const Value.absent(),
@@ -573,6 +581,7 @@ class RoutinesCompanion extends UpdateCompanion<Routine> {
     this.weightUnit = const Value.absent(),
     this.distanceUnit = const Value.absent(),
     this.sortOrder = const Value.absent(),
+    this.rowid = const Value.absent(),
   });
   RoutinesCompanion.insert({
     this.id = const Value.absent(),
@@ -581,18 +590,20 @@ class RoutinesCompanion extends UpdateCompanion<Routine> {
     required Weights weightUnit,
     required Distance distanceUnit,
     required int sortOrder,
+    this.rowid = const Value.absent(),
   })  : name = Value(name),
         infobox = Value(infobox),
         weightUnit = Value(weightUnit),
         distanceUnit = Value(distanceUnit),
         sortOrder = Value(sortOrder);
   static Insertable<Routine> custom({
-    Expression<int>? id,
+    Expression<String>? id,
     Expression<String>? name,
     Expression<String>? infobox,
     Expression<String>? weightUnit,
     Expression<String>? distanceUnit,
     Expression<int>? sortOrder,
+    Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -601,16 +612,18 @@ class RoutinesCompanion extends UpdateCompanion<Routine> {
       if (weightUnit != null) 'weight_unit': weightUnit,
       if (distanceUnit != null) 'distance_unit': distanceUnit,
       if (sortOrder != null) 'sort_order': sortOrder,
+      if (rowid != null) 'rowid': rowid,
     });
   }
 
   RoutinesCompanion copyWith(
-      {Value<int>? id,
+      {Value<String>? id,
       Value<String>? name,
       Value<String>? infobox,
       Value<Weights>? weightUnit,
       Value<Distance>? distanceUnit,
-      Value<int>? sortOrder}) {
+      Value<int>? sortOrder,
+      Value<int>? rowid}) {
     return RoutinesCompanion(
       id: id ?? this.id,
       name: name ?? this.name,
@@ -618,6 +631,7 @@ class RoutinesCompanion extends UpdateCompanion<Routine> {
       weightUnit: weightUnit ?? this.weightUnit,
       distanceUnit: distanceUnit ?? this.distanceUnit,
       sortOrder: sortOrder ?? this.sortOrder,
+      rowid: rowid ?? this.rowid,
     );
   }
 
@@ -625,7 +639,7 @@ class RoutinesCompanion extends UpdateCompanion<Routine> {
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
     if (id.present) {
-      map['id'] = Variable<int>(id.value);
+      map['id'] = Variable<String>(id.value);
     }
     if (name.present) {
       map['name'] = Variable<String>(name.value);
@@ -644,6 +658,9 @@ class RoutinesCompanion extends UpdateCompanion<Routine> {
     if (sortOrder.present) {
       map['sort_order'] = Variable<int>(sortOrder.value);
     }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
     return map;
   }
 
@@ -655,7 +672,8 @@ class RoutinesCompanion extends UpdateCompanion<Routine> {
           ..write('infobox: $infobox, ')
           ..write('weightUnit: $weightUnit, ')
           ..write('distanceUnit: $distanceUnit, ')
-          ..write('sortOrder: $sortOrder')
+          ..write('sortOrder: $sortOrder, ')
+          ..write('rowid: $rowid')
           ..write(')'))
         .toString();
   }
@@ -669,13 +687,11 @@ class $HistoryWorkoutsTable extends HistoryWorkouts
   $HistoryWorkoutsTable(this.attachedDatabase, [this._alias]);
   static const VerificationMeta _idMeta = const VerificationMeta('id');
   @override
-  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
       'id', aliasedName, false,
-      hasAutoIncrement: true,
-      type: DriftSqlType.int,
+      type: DriftSqlType.string,
       requiredDuringInsert: false,
-      defaultConstraints:
-          GeneratedColumn.constraintIsAlways('PRIMARY KEY AUTOINCREMENT'));
+      clientDefault: () => _uuid.v4());
   static const VerificationMeta _nameMeta = const VerificationMeta('name');
   @override
   late final GeneratedColumn<String> name = GeneratedColumn<String>(
@@ -702,27 +718,27 @@ class $HistoryWorkoutsTable extends HistoryWorkouts
   static const VerificationMeta _parentIdMeta =
       const VerificationMeta('parentId');
   @override
-  late final GeneratedColumn<int> parentId = GeneratedColumn<int>(
+  late final GeneratedColumn<String> parentId = GeneratedColumn<String>(
       'parent_id', aliasedName, true,
-      type: DriftSqlType.int,
+      type: DriftSqlType.string,
       requiredDuringInsert: false,
       defaultConstraints:
           GeneratedColumn.constraintIsAlways('REFERENCES routines (id)'));
   static const VerificationMeta _completedByMeta =
       const VerificationMeta('completedBy');
   @override
-  late final GeneratedColumn<int> completedBy = GeneratedColumn<int>(
+  late final GeneratedColumn<String> completedBy = GeneratedColumn<String>(
       'completed_by', aliasedName, true,
-      type: DriftSqlType.int,
+      type: DriftSqlType.string,
       requiredDuringInsert: false,
       defaultConstraints: GeneratedColumn.constraintIsAlways(
           'REFERENCES history_workouts (id)'));
   static const VerificationMeta _completesMeta =
       const VerificationMeta('completes');
   @override
-  late final GeneratedColumn<int> completes = GeneratedColumn<int>(
+  late final GeneratedColumn<String> completes = GeneratedColumn<String>(
       'completes', aliasedName, true,
-      type: DriftSqlType.int,
+      type: DriftSqlType.string,
       requiredDuringInsert: false,
       defaultConstraints: GeneratedColumn.constraintIsAlways(
           'REFERENCES history_workouts (id)'));
@@ -741,12 +757,6 @@ class $HistoryWorkoutsTable extends HistoryWorkouts
               type: DriftSqlType.string, requiredDuringInsert: true)
           .withConverter<Distance>(
               $HistoryWorkoutsTable.$converterdistanceUnit);
-  static const VerificationMeta _sortOrderMeta =
-      const VerificationMeta('sortOrder');
-  @override
-  late final GeneratedColumn<int> sortOrder = GeneratedColumn<int>(
-      'sort_order', aliasedName, false,
-      type: DriftSqlType.int, requiredDuringInsert: true);
   @override
   List<GeneratedColumn> get $columns => [
         id,
@@ -758,8 +768,7 @@ class $HistoryWorkoutsTable extends HistoryWorkouts
         completedBy,
         completes,
         weightUnit,
-        distanceUnit,
-        sortOrder
+        distanceUnit
       ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -814,12 +823,6 @@ class $HistoryWorkoutsTable extends HistoryWorkouts
     }
     context.handle(_weightUnitMeta, const VerificationResult.success());
     context.handle(_distanceUnitMeta, const VerificationResult.success());
-    if (data.containsKey('sort_order')) {
-      context.handle(_sortOrderMeta,
-          sortOrder.isAcceptableOrUnknown(data['sort_order']!, _sortOrderMeta));
-    } else if (isInserting) {
-      context.missing(_sortOrderMeta);
-    }
     return context;
   }
 
@@ -834,7 +837,7 @@ class $HistoryWorkoutsTable extends HistoryWorkouts
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return HistoryWorkout(
       id: attachedDatabase.typeMapping
-          .read(DriftSqlType.int, data['${effectivePrefix}id'])!,
+          .read(DriftSqlType.string, data['${effectivePrefix}id'])!,
       name: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}name'])!,
       infobox: attachedDatabase.typeMapping
@@ -844,19 +847,17 @@ class $HistoryWorkoutsTable extends HistoryWorkouts
       startingDate: attachedDatabase.typeMapping.read(
           DriftSqlType.dateTime, data['${effectivePrefix}starting_date'])!,
       parentId: attachedDatabase.typeMapping
-          .read(DriftSqlType.int, data['${effectivePrefix}parent_id']),
+          .read(DriftSqlType.string, data['${effectivePrefix}parent_id']),
       completedBy: attachedDatabase.typeMapping
-          .read(DriftSqlType.int, data['${effectivePrefix}completed_by']),
+          .read(DriftSqlType.string, data['${effectivePrefix}completed_by']),
       completes: attachedDatabase.typeMapping
-          .read(DriftSqlType.int, data['${effectivePrefix}completes']),
+          .read(DriftSqlType.string, data['${effectivePrefix}completes']),
       weightUnit: $HistoryWorkoutsTable.$converterweightUnit.fromSql(
           attachedDatabase.typeMapping.read(
               DriftSqlType.string, data['${effectivePrefix}weight_unit'])!),
       distanceUnit: $HistoryWorkoutsTable.$converterdistanceUnit.fromSql(
           attachedDatabase.typeMapping.read(
               DriftSqlType.string, data['${effectivePrefix}distance_unit'])!),
-      sortOrder: attachedDatabase.typeMapping
-          .read(DriftSqlType.int, data['${effectivePrefix}sort_order'])!,
     );
   }
 
@@ -872,17 +873,16 @@ class $HistoryWorkoutsTable extends HistoryWorkouts
 }
 
 class HistoryWorkout extends DataClass implements Insertable<HistoryWorkout> {
-  final int id;
+  final String id;
   final String name;
   final String? infobox;
   final int duration;
   final DateTime startingDate;
-  final int? parentId;
-  final int? completedBy;
-  final int? completes;
+  final String? parentId;
+  final String? completedBy;
+  final String? completes;
   final Weights weightUnit;
   final Distance distanceUnit;
-  final int sortOrder;
   const HistoryWorkout(
       {required this.id,
       required this.name,
@@ -893,12 +893,11 @@ class HistoryWorkout extends DataClass implements Insertable<HistoryWorkout> {
       this.completedBy,
       this.completes,
       required this.weightUnit,
-      required this.distanceUnit,
-      required this.sortOrder});
+      required this.distanceUnit});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
-    map['id'] = Variable<int>(id);
+    map['id'] = Variable<String>(id);
     map['name'] = Variable<String>(name);
     if (!nullToAbsent || infobox != null) {
       map['infobox'] = Variable<String>(infobox);
@@ -906,13 +905,13 @@ class HistoryWorkout extends DataClass implements Insertable<HistoryWorkout> {
     map['duration'] = Variable<int>(duration);
     map['starting_date'] = Variable<DateTime>(startingDate);
     if (!nullToAbsent || parentId != null) {
-      map['parent_id'] = Variable<int>(parentId);
+      map['parent_id'] = Variable<String>(parentId);
     }
     if (!nullToAbsent || completedBy != null) {
-      map['completed_by'] = Variable<int>(completedBy);
+      map['completed_by'] = Variable<String>(completedBy);
     }
     if (!nullToAbsent || completes != null) {
-      map['completes'] = Variable<int>(completes);
+      map['completes'] = Variable<String>(completes);
     }
     {
       map['weight_unit'] = Variable<String>(
@@ -922,7 +921,6 @@ class HistoryWorkout extends DataClass implements Insertable<HistoryWorkout> {
       map['distance_unit'] = Variable<String>(
           $HistoryWorkoutsTable.$converterdistanceUnit.toSql(distanceUnit));
     }
-    map['sort_order'] = Variable<int>(sortOrder);
     return map;
   }
 
@@ -946,7 +944,6 @@ class HistoryWorkout extends DataClass implements Insertable<HistoryWorkout> {
           : Value(completes),
       weightUnit: Value(weightUnit),
       distanceUnit: Value(distanceUnit),
-      sortOrder: Value(sortOrder),
     );
   }
 
@@ -954,53 +951,50 @@ class HistoryWorkout extends DataClass implements Insertable<HistoryWorkout> {
       {ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return HistoryWorkout(
-      id: serializer.fromJson<int>(json['id']),
+      id: serializer.fromJson<String>(json['id']),
       name: serializer.fromJson<String>(json['name']),
       infobox: serializer.fromJson<String?>(json['infobox']),
       duration: serializer.fromJson<int>(json['duration']),
       startingDate: serializer.fromJson<DateTime>(json['startingDate']),
-      parentId: serializer.fromJson<int?>(json['parentId']),
-      completedBy: serializer.fromJson<int?>(json['completedBy']),
-      completes: serializer.fromJson<int?>(json['completes']),
+      parentId: serializer.fromJson<String?>(json['parentId']),
+      completedBy: serializer.fromJson<String?>(json['completedBy']),
+      completes: serializer.fromJson<String?>(json['completes']),
       weightUnit: $HistoryWorkoutsTable.$converterweightUnit
           .fromJson(serializer.fromJson<String>(json['weightUnit'])),
       distanceUnit: $HistoryWorkoutsTable.$converterdistanceUnit
           .fromJson(serializer.fromJson<String>(json['distanceUnit'])),
-      sortOrder: serializer.fromJson<int>(json['sortOrder']),
     );
   }
   @override
   Map<String, dynamic> toJson({ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
-      'id': serializer.toJson<int>(id),
+      'id': serializer.toJson<String>(id),
       'name': serializer.toJson<String>(name),
       'infobox': serializer.toJson<String?>(infobox),
       'duration': serializer.toJson<int>(duration),
       'startingDate': serializer.toJson<DateTime>(startingDate),
-      'parentId': serializer.toJson<int?>(parentId),
-      'completedBy': serializer.toJson<int?>(completedBy),
-      'completes': serializer.toJson<int?>(completes),
+      'parentId': serializer.toJson<String?>(parentId),
+      'completedBy': serializer.toJson<String?>(completedBy),
+      'completes': serializer.toJson<String?>(completes),
       'weightUnit': serializer.toJson<String>(
           $HistoryWorkoutsTable.$converterweightUnit.toJson(weightUnit)),
       'distanceUnit': serializer.toJson<String>(
           $HistoryWorkoutsTable.$converterdistanceUnit.toJson(distanceUnit)),
-      'sortOrder': serializer.toJson<int>(sortOrder),
     };
   }
 
   HistoryWorkout copyWith(
-          {int? id,
+          {String? id,
           String? name,
           Value<String?> infobox = const Value.absent(),
           int? duration,
           DateTime? startingDate,
-          Value<int?> parentId = const Value.absent(),
-          Value<int?> completedBy = const Value.absent(),
-          Value<int?> completes = const Value.absent(),
+          Value<String?> parentId = const Value.absent(),
+          Value<String?> completedBy = const Value.absent(),
+          Value<String?> completes = const Value.absent(),
           Weights? weightUnit,
-          Distance? distanceUnit,
-          int? sortOrder}) =>
+          Distance? distanceUnit}) =>
       HistoryWorkout(
         id: id ?? this.id,
         name: name ?? this.name,
@@ -1012,7 +1006,6 @@ class HistoryWorkout extends DataClass implements Insertable<HistoryWorkout> {
         completes: completes.present ? completes.value : this.completes,
         weightUnit: weightUnit ?? this.weightUnit,
         distanceUnit: distanceUnit ?? this.distanceUnit,
-        sortOrder: sortOrder ?? this.sortOrder,
       );
   @override
   String toString() {
@@ -1026,15 +1019,14 @@ class HistoryWorkout extends DataClass implements Insertable<HistoryWorkout> {
           ..write('completedBy: $completedBy, ')
           ..write('completes: $completes, ')
           ..write('weightUnit: $weightUnit, ')
-          ..write('distanceUnit: $distanceUnit, ')
-          ..write('sortOrder: $sortOrder')
+          ..write('distanceUnit: $distanceUnit')
           ..write(')'))
         .toString();
   }
 
   @override
   int get hashCode => Object.hash(id, name, infobox, duration, startingDate,
-      parentId, completedBy, completes, weightUnit, distanceUnit, sortOrder);
+      parentId, completedBy, completes, weightUnit, distanceUnit);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -1048,22 +1040,21 @@ class HistoryWorkout extends DataClass implements Insertable<HistoryWorkout> {
           other.completedBy == this.completedBy &&
           other.completes == this.completes &&
           other.weightUnit == this.weightUnit &&
-          other.distanceUnit == this.distanceUnit &&
-          other.sortOrder == this.sortOrder);
+          other.distanceUnit == this.distanceUnit);
 }
 
 class HistoryWorkoutsCompanion extends UpdateCompanion<HistoryWorkout> {
-  final Value<int> id;
+  final Value<String> id;
   final Value<String> name;
   final Value<String?> infobox;
   final Value<int> duration;
   final Value<DateTime> startingDate;
-  final Value<int?> parentId;
-  final Value<int?> completedBy;
-  final Value<int?> completes;
+  final Value<String?> parentId;
+  final Value<String?> completedBy;
+  final Value<String?> completes;
   final Value<Weights> weightUnit;
   final Value<Distance> distanceUnit;
-  final Value<int> sortOrder;
+  final Value<int> rowid;
   const HistoryWorkoutsCompanion({
     this.id = const Value.absent(),
     this.name = const Value.absent(),
@@ -1075,7 +1066,7 @@ class HistoryWorkoutsCompanion extends UpdateCompanion<HistoryWorkout> {
     this.completes = const Value.absent(),
     this.weightUnit = const Value.absent(),
     this.distanceUnit = const Value.absent(),
-    this.sortOrder = const Value.absent(),
+    this.rowid = const Value.absent(),
   });
   HistoryWorkoutsCompanion.insert({
     this.id = const Value.absent(),
@@ -1088,25 +1079,24 @@ class HistoryWorkoutsCompanion extends UpdateCompanion<HistoryWorkout> {
     this.completes = const Value.absent(),
     required Weights weightUnit,
     required Distance distanceUnit,
-    required int sortOrder,
+    this.rowid = const Value.absent(),
   })  : name = Value(name),
         duration = Value(duration),
         startingDate = Value(startingDate),
         weightUnit = Value(weightUnit),
-        distanceUnit = Value(distanceUnit),
-        sortOrder = Value(sortOrder);
+        distanceUnit = Value(distanceUnit);
   static Insertable<HistoryWorkout> custom({
-    Expression<int>? id,
+    Expression<String>? id,
     Expression<String>? name,
     Expression<String>? infobox,
     Expression<int>? duration,
     Expression<DateTime>? startingDate,
-    Expression<int>? parentId,
-    Expression<int>? completedBy,
-    Expression<int>? completes,
+    Expression<String>? parentId,
+    Expression<String>? completedBy,
+    Expression<String>? completes,
     Expression<String>? weightUnit,
     Expression<String>? distanceUnit,
-    Expression<int>? sortOrder,
+    Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -1119,22 +1109,22 @@ class HistoryWorkoutsCompanion extends UpdateCompanion<HistoryWorkout> {
       if (completes != null) 'completes': completes,
       if (weightUnit != null) 'weight_unit': weightUnit,
       if (distanceUnit != null) 'distance_unit': distanceUnit,
-      if (sortOrder != null) 'sort_order': sortOrder,
+      if (rowid != null) 'rowid': rowid,
     });
   }
 
   HistoryWorkoutsCompanion copyWith(
-      {Value<int>? id,
+      {Value<String>? id,
       Value<String>? name,
       Value<String?>? infobox,
       Value<int>? duration,
       Value<DateTime>? startingDate,
-      Value<int?>? parentId,
-      Value<int?>? completedBy,
-      Value<int?>? completes,
+      Value<String?>? parentId,
+      Value<String?>? completedBy,
+      Value<String?>? completes,
       Value<Weights>? weightUnit,
       Value<Distance>? distanceUnit,
-      Value<int>? sortOrder}) {
+      Value<int>? rowid}) {
     return HistoryWorkoutsCompanion(
       id: id ?? this.id,
       name: name ?? this.name,
@@ -1146,7 +1136,7 @@ class HistoryWorkoutsCompanion extends UpdateCompanion<HistoryWorkout> {
       completes: completes ?? this.completes,
       weightUnit: weightUnit ?? this.weightUnit,
       distanceUnit: distanceUnit ?? this.distanceUnit,
-      sortOrder: sortOrder ?? this.sortOrder,
+      rowid: rowid ?? this.rowid,
     );
   }
 
@@ -1154,7 +1144,7 @@ class HistoryWorkoutsCompanion extends UpdateCompanion<HistoryWorkout> {
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
     if (id.present) {
-      map['id'] = Variable<int>(id.value);
+      map['id'] = Variable<String>(id.value);
     }
     if (name.present) {
       map['name'] = Variable<String>(name.value);
@@ -1169,13 +1159,13 @@ class HistoryWorkoutsCompanion extends UpdateCompanion<HistoryWorkout> {
       map['starting_date'] = Variable<DateTime>(startingDate.value);
     }
     if (parentId.present) {
-      map['parent_id'] = Variable<int>(parentId.value);
+      map['parent_id'] = Variable<String>(parentId.value);
     }
     if (completedBy.present) {
-      map['completed_by'] = Variable<int>(completedBy.value);
+      map['completed_by'] = Variable<String>(completedBy.value);
     }
     if (completes.present) {
-      map['completes'] = Variable<int>(completes.value);
+      map['completes'] = Variable<String>(completes.value);
     }
     if (weightUnit.present) {
       map['weight_unit'] = Variable<String>(
@@ -1186,8 +1176,8 @@ class HistoryWorkoutsCompanion extends UpdateCompanion<HistoryWorkout> {
           .$converterdistanceUnit
           .toSql(distanceUnit.value));
     }
-    if (sortOrder.present) {
-      map['sort_order'] = Variable<int>(sortOrder.value);
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
     }
     return map;
   }
@@ -1205,7 +1195,7 @@ class HistoryWorkoutsCompanion extends UpdateCompanion<HistoryWorkout> {
           ..write('completes: $completes, ')
           ..write('weightUnit: $weightUnit, ')
           ..write('distanceUnit: $distanceUnit, ')
-          ..write('sortOrder: $sortOrder')
+          ..write('rowid: $rowid')
           ..write(')'))
         .toString();
   }
@@ -1219,19 +1209,17 @@ class $HistoryWorkoutExercisesTable extends HistoryWorkoutExercises
   $HistoryWorkoutExercisesTable(this.attachedDatabase, [this._alias]);
   static const VerificationMeta _idMeta = const VerificationMeta('id');
   @override
-  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
       'id', aliasedName, false,
-      hasAutoIncrement: true,
-      type: DriftSqlType.int,
+      type: DriftSqlType.string,
       requiredDuringInsert: false,
-      defaultConstraints:
-          GeneratedColumn.constraintIsAlways('PRIMARY KEY AUTOINCREMENT'));
+      clientDefault: () => _uuid.v4());
   static const VerificationMeta _routineIdMeta =
       const VerificationMeta('routineId');
   @override
-  late final GeneratedColumn<int> routineId = GeneratedColumn<int>(
+  late final GeneratedColumn<String> routineId = GeneratedColumn<String>(
       'routine_id', aliasedName, false,
-      type: DriftSqlType.int,
+      type: DriftSqlType.string,
       requiredDuringInsert: true,
       defaultConstraints: GeneratedColumn.constraintIsAlways(
           'REFERENCES history_workouts (id)'));
@@ -1297,9 +1285,9 @@ class $HistoryWorkoutExercisesTable extends HistoryWorkoutExercises
   static const VerificationMeta _customExerciseIdMeta =
       const VerificationMeta('customExerciseId');
   @override
-  late final GeneratedColumn<int> customExerciseId = GeneratedColumn<int>(
+  late final GeneratedColumn<String> customExerciseId = GeneratedColumn<String>(
       'custom_exercise_id', aliasedName, true,
-      type: DriftSqlType.int,
+      type: DriftSqlType.string,
       requiredDuringInsert: false,
       defaultConstraints: GeneratedColumn.constraintIsAlways(
           'REFERENCES custom_exercises (id)'));
@@ -1329,9 +1317,9 @@ class $HistoryWorkoutExercisesTable extends HistoryWorkoutExercises
   static const VerificationMeta _supersetIdMeta =
       const VerificationMeta('supersetId');
   @override
-  late final GeneratedColumn<int> supersetId = GeneratedColumn<int>(
+  late final GeneratedColumn<String> supersetId = GeneratedColumn<String>(
       'superset_id', aliasedName, true,
-      type: DriftSqlType.int,
+      type: DriftSqlType.string,
       requiredDuringInsert: false,
       defaultConstraints: GeneratedColumn.constraintIsAlways(
           'REFERENCES history_workout_exercises (id)'));
@@ -1455,9 +1443,9 @@ class $HistoryWorkoutExercisesTable extends HistoryWorkoutExercises
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return HistoryWorkoutExercise(
       id: attachedDatabase.typeMapping
-          .read(DriftSqlType.int, data['${effectivePrefix}id'])!,
+          .read(DriftSqlType.string, data['${effectivePrefix}id'])!,
       routineId: attachedDatabase.typeMapping
-          .read(DriftSqlType.int, data['${effectivePrefix}routine_id'])!,
+          .read(DriftSqlType.string, data['${effectivePrefix}routine_id'])!,
       name: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}name'])!,
       parameters: $HistoryWorkoutExercisesTable.$converterparametersn.fromSql(
@@ -1480,8 +1468,8 @@ class $HistoryWorkoutExercisesTable extends HistoryWorkoutExercises
           .read(DriftSqlType.bool, data['${effectivePrefix}is_custom'])!,
       libraryExerciseId: attachedDatabase.typeMapping.read(
           DriftSqlType.string, data['${effectivePrefix}library_exercise_id']),
-      customExerciseId: attachedDatabase.typeMapping
-          .read(DriftSqlType.int, data['${effectivePrefix}custom_exercise_id']),
+      customExerciseId: attachedDatabase.typeMapping.read(
+          DriftSqlType.string, data['${effectivePrefix}custom_exercise_id']),
       notes: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}notes']),
       isSuperset: attachedDatabase.typeMapping
@@ -1489,7 +1477,7 @@ class $HistoryWorkoutExercisesTable extends HistoryWorkoutExercises
       isInSuperset: attachedDatabase.typeMapping
           .read(DriftSqlType.bool, data['${effectivePrefix}is_in_superset'])!,
       supersetId: attachedDatabase.typeMapping
-          .read(DriftSqlType.int, data['${effectivePrefix}superset_id']),
+          .read(DriftSqlType.string, data['${effectivePrefix}superset_id']),
       sortOrder: attachedDatabase.typeMapping
           .read(DriftSqlType.int, data['${effectivePrefix}sort_order'])!,
     );
@@ -1525,8 +1513,8 @@ class $HistoryWorkoutExercisesTable extends HistoryWorkoutExercises
 
 class HistoryWorkoutExercise extends DataClass
     implements Insertable<HistoryWorkoutExercise> {
-  final int id;
-  final int routineId;
+  final String id;
+  final String routineId;
   final String name;
   final GTSetParameters? parameters;
   final List<GTSet>? sets;
@@ -1535,11 +1523,11 @@ class HistoryWorkoutExercise extends DataClass
   final int? restTime;
   final bool isCustom;
   final String? libraryExerciseId;
-  final int? customExerciseId;
+  final String? customExerciseId;
   final String? notes;
   final bool isSuperset;
   final bool isInSuperset;
-  final int? supersetId;
+  final String? supersetId;
   final int sortOrder;
   const HistoryWorkoutExercise(
       {required this.id,
@@ -1561,8 +1549,8 @@ class HistoryWorkoutExercise extends DataClass
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
-    map['id'] = Variable<int>(id);
-    map['routine_id'] = Variable<int>(routineId);
+    map['id'] = Variable<String>(id);
+    map['routine_id'] = Variable<String>(routineId);
     map['name'] = Variable<String>(name);
     if (!nullToAbsent || parameters != null) {
       map['parameters'] = Variable<String>($HistoryWorkoutExercisesTable
@@ -1591,7 +1579,7 @@ class HistoryWorkoutExercise extends DataClass
       map['library_exercise_id'] = Variable<String>(libraryExerciseId);
     }
     if (!nullToAbsent || customExerciseId != null) {
-      map['custom_exercise_id'] = Variable<int>(customExerciseId);
+      map['custom_exercise_id'] = Variable<String>(customExerciseId);
     }
     if (!nullToAbsent || notes != null) {
       map['notes'] = Variable<String>(notes);
@@ -1599,7 +1587,7 @@ class HistoryWorkoutExercise extends DataClass
     map['is_superset'] = Variable<bool>(isSuperset);
     map['is_in_superset'] = Variable<bool>(isInSuperset);
     if (!nullToAbsent || supersetId != null) {
-      map['superset_id'] = Variable<int>(supersetId);
+      map['superset_id'] = Variable<String>(supersetId);
     }
     map['sort_order'] = Variable<int>(sortOrder);
     return map;
@@ -1645,8 +1633,8 @@ class HistoryWorkoutExercise extends DataClass
       {ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return HistoryWorkoutExercise(
-      id: serializer.fromJson<int>(json['id']),
-      routineId: serializer.fromJson<int>(json['routineId']),
+      id: serializer.fromJson<String>(json['id']),
+      routineId: serializer.fromJson<String>(json['routineId']),
       name: serializer.fromJson<String>(json['name']),
       parameters: $HistoryWorkoutExercisesTable.$converterparametersn
           .fromJson(serializer.fromJson<String?>(json['parameters'])),
@@ -1660,11 +1648,11 @@ class HistoryWorkoutExercise extends DataClass
       isCustom: serializer.fromJson<bool>(json['isCustom']),
       libraryExerciseId:
           serializer.fromJson<String?>(json['libraryExerciseId']),
-      customExerciseId: serializer.fromJson<int?>(json['customExerciseId']),
+      customExerciseId: serializer.fromJson<String?>(json['customExerciseId']),
       notes: serializer.fromJson<String?>(json['notes']),
       isSuperset: serializer.fromJson<bool>(json['isSuperset']),
       isInSuperset: serializer.fromJson<bool>(json['isInSuperset']),
-      supersetId: serializer.fromJson<int?>(json['supersetId']),
+      supersetId: serializer.fromJson<String?>(json['supersetId']),
       sortOrder: serializer.fromJson<int>(json['sortOrder']),
     );
   }
@@ -1672,8 +1660,8 @@ class HistoryWorkoutExercise extends DataClass
   Map<String, dynamic> toJson({ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
-      'id': serializer.toJson<int>(id),
-      'routineId': serializer.toJson<int>(routineId),
+      'id': serializer.toJson<String>(id),
+      'routineId': serializer.toJson<String>(routineId),
       'name': serializer.toJson<String>(name),
       'parameters': serializer.toJson<String?>($HistoryWorkoutExercisesTable
           .$converterparametersn
@@ -1687,18 +1675,18 @@ class HistoryWorkoutExercise extends DataClass
       'restTime': serializer.toJson<int?>(restTime),
       'isCustom': serializer.toJson<bool>(isCustom),
       'libraryExerciseId': serializer.toJson<String?>(libraryExerciseId),
-      'customExerciseId': serializer.toJson<int?>(customExerciseId),
+      'customExerciseId': serializer.toJson<String?>(customExerciseId),
       'notes': serializer.toJson<String?>(notes),
       'isSuperset': serializer.toJson<bool>(isSuperset),
       'isInSuperset': serializer.toJson<bool>(isInSuperset),
-      'supersetId': serializer.toJson<int?>(supersetId),
+      'supersetId': serializer.toJson<String?>(supersetId),
       'sortOrder': serializer.toJson<int>(sortOrder),
     };
   }
 
   HistoryWorkoutExercise copyWith(
-          {int? id,
-          int? routineId,
+          {String? id,
+          String? routineId,
           String? name,
           Value<GTSetParameters?> parameters = const Value.absent(),
           Value<List<GTSet>?> sets = const Value.absent(),
@@ -1708,11 +1696,11 @@ class HistoryWorkoutExercise extends DataClass
           Value<int?> restTime = const Value.absent(),
           bool? isCustom,
           Value<String?> libraryExerciseId = const Value.absent(),
-          Value<int?> customExerciseId = const Value.absent(),
+          Value<String?> customExerciseId = const Value.absent(),
           Value<String?> notes = const Value.absent(),
           bool? isSuperset,
           bool? isInSuperset,
-          Value<int?> supersetId = const Value.absent(),
+          Value<String?> supersetId = const Value.absent(),
           int? sortOrder}) =>
       HistoryWorkoutExercise(
         id: id ?? this.id,
@@ -1805,8 +1793,8 @@ class HistoryWorkoutExercise extends DataClass
 
 class HistoryWorkoutExercisesCompanion
     extends UpdateCompanion<HistoryWorkoutExercise> {
-  final Value<int> id;
-  final Value<int> routineId;
+  final Value<String> id;
+  final Value<String> routineId;
   final Value<String> name;
   final Value<GTSetParameters?> parameters;
   final Value<List<GTSet>?> sets;
@@ -1815,12 +1803,13 @@ class HistoryWorkoutExercisesCompanion
   final Value<int?> restTime;
   final Value<bool> isCustom;
   final Value<String?> libraryExerciseId;
-  final Value<int?> customExerciseId;
+  final Value<String?> customExerciseId;
   final Value<String?> notes;
   final Value<bool> isSuperset;
   final Value<bool> isInSuperset;
-  final Value<int?> supersetId;
+  final Value<String?> supersetId;
   final Value<int> sortOrder;
+  final Value<int> rowid;
   const HistoryWorkoutExercisesCompanion({
     this.id = const Value.absent(),
     this.routineId = const Value.absent(),
@@ -1838,10 +1827,11 @@ class HistoryWorkoutExercisesCompanion
     this.isInSuperset = const Value.absent(),
     this.supersetId = const Value.absent(),
     this.sortOrder = const Value.absent(),
+    this.rowid = const Value.absent(),
   });
   HistoryWorkoutExercisesCompanion.insert({
     this.id = const Value.absent(),
-    required int routineId,
+    required String routineId,
     required String name,
     this.parameters = const Value.absent(),
     this.sets = const Value.absent(),
@@ -1856,6 +1846,7 @@ class HistoryWorkoutExercisesCompanion
     required bool isInSuperset,
     this.supersetId = const Value.absent(),
     required int sortOrder,
+    this.rowid = const Value.absent(),
   })  : routineId = Value(routineId),
         name = Value(name),
         isCustom = Value(isCustom),
@@ -1863,8 +1854,8 @@ class HistoryWorkoutExercisesCompanion
         isInSuperset = Value(isInSuperset),
         sortOrder = Value(sortOrder);
   static Insertable<HistoryWorkoutExercise> custom({
-    Expression<int>? id,
-    Expression<int>? routineId,
+    Expression<String>? id,
+    Expression<String>? routineId,
     Expression<String>? name,
     Expression<String>? parameters,
     Expression<String>? sets,
@@ -1873,12 +1864,13 @@ class HistoryWorkoutExercisesCompanion
     Expression<int>? restTime,
     Expression<bool>? isCustom,
     Expression<String>? libraryExerciseId,
-    Expression<int>? customExerciseId,
+    Expression<String>? customExerciseId,
     Expression<String>? notes,
     Expression<bool>? isSuperset,
     Expression<bool>? isInSuperset,
-    Expression<int>? supersetId,
+    Expression<String>? supersetId,
     Expression<int>? sortOrder,
+    Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -1899,12 +1891,13 @@ class HistoryWorkoutExercisesCompanion
       if (isInSuperset != null) 'is_in_superset': isInSuperset,
       if (supersetId != null) 'superset_id': supersetId,
       if (sortOrder != null) 'sort_order': sortOrder,
+      if (rowid != null) 'rowid': rowid,
     });
   }
 
   HistoryWorkoutExercisesCompanion copyWith(
-      {Value<int>? id,
-      Value<int>? routineId,
+      {Value<String>? id,
+      Value<String>? routineId,
       Value<String>? name,
       Value<GTSetParameters?>? parameters,
       Value<List<GTSet>?>? sets,
@@ -1913,12 +1906,13 @@ class HistoryWorkoutExercisesCompanion
       Value<int?>? restTime,
       Value<bool>? isCustom,
       Value<String?>? libraryExerciseId,
-      Value<int?>? customExerciseId,
+      Value<String?>? customExerciseId,
       Value<String?>? notes,
       Value<bool>? isSuperset,
       Value<bool>? isInSuperset,
-      Value<int?>? supersetId,
-      Value<int>? sortOrder}) {
+      Value<String?>? supersetId,
+      Value<int>? sortOrder,
+      Value<int>? rowid}) {
     return HistoryWorkoutExercisesCompanion(
       id: id ?? this.id,
       routineId: routineId ?? this.routineId,
@@ -1937,6 +1931,7 @@ class HistoryWorkoutExercisesCompanion
       isInSuperset: isInSuperset ?? this.isInSuperset,
       supersetId: supersetId ?? this.supersetId,
       sortOrder: sortOrder ?? this.sortOrder,
+      rowid: rowid ?? this.rowid,
     );
   }
 
@@ -1944,10 +1939,10 @@ class HistoryWorkoutExercisesCompanion
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
     if (id.present) {
-      map['id'] = Variable<int>(id.value);
+      map['id'] = Variable<String>(id.value);
     }
     if (routineId.present) {
-      map['routine_id'] = Variable<int>(routineId.value);
+      map['routine_id'] = Variable<String>(routineId.value);
     }
     if (name.present) {
       map['name'] = Variable<String>(name.value);
@@ -1981,7 +1976,7 @@ class HistoryWorkoutExercisesCompanion
       map['library_exercise_id'] = Variable<String>(libraryExerciseId.value);
     }
     if (customExerciseId.present) {
-      map['custom_exercise_id'] = Variable<int>(customExerciseId.value);
+      map['custom_exercise_id'] = Variable<String>(customExerciseId.value);
     }
     if (notes.present) {
       map['notes'] = Variable<String>(notes.value);
@@ -1993,10 +1988,13 @@ class HistoryWorkoutExercisesCompanion
       map['is_in_superset'] = Variable<bool>(isInSuperset.value);
     }
     if (supersetId.present) {
-      map['superset_id'] = Variable<int>(supersetId.value);
+      map['superset_id'] = Variable<String>(supersetId.value);
     }
     if (sortOrder.present) {
       map['sort_order'] = Variable<int>(sortOrder.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
     }
     return map;
   }
@@ -2019,7 +2017,8 @@ class HistoryWorkoutExercisesCompanion
           ..write('isSuperset: $isSuperset, ')
           ..write('isInSuperset: $isInSuperset, ')
           ..write('supersetId: $supersetId, ')
-          ..write('sortOrder: $sortOrder')
+          ..write('sortOrder: $sortOrder, ')
+          ..write('rowid: $rowid')
           ..write(')'))
         .toString();
   }
@@ -2033,19 +2032,17 @@ class $RoutineExercisesTable extends RoutineExercises
   $RoutineExercisesTable(this.attachedDatabase, [this._alias]);
   static const VerificationMeta _idMeta = const VerificationMeta('id');
   @override
-  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
       'id', aliasedName, false,
-      hasAutoIncrement: true,
-      type: DriftSqlType.int,
+      type: DriftSqlType.string,
       requiredDuringInsert: false,
-      defaultConstraints:
-          GeneratedColumn.constraintIsAlways('PRIMARY KEY AUTOINCREMENT'));
+      clientDefault: () => _uuid.v4());
   static const VerificationMeta _routineIdMeta =
       const VerificationMeta('routineId');
   @override
-  late final GeneratedColumn<int> routineId = GeneratedColumn<int>(
+  late final GeneratedColumn<String> routineId = GeneratedColumn<String>(
       'routine_id', aliasedName, false,
-      type: DriftSqlType.int,
+      type: DriftSqlType.string,
       requiredDuringInsert: true,
       defaultConstraints:
           GeneratedColumn.constraintIsAlways('REFERENCES routines (id)'));
@@ -2110,9 +2107,9 @@ class $RoutineExercisesTable extends RoutineExercises
   static const VerificationMeta _customExerciseIdMeta =
       const VerificationMeta('customExerciseId');
   @override
-  late final GeneratedColumn<int> customExerciseId = GeneratedColumn<int>(
+  late final GeneratedColumn<String> customExerciseId = GeneratedColumn<String>(
       'custom_exercise_id', aliasedName, true,
-      type: DriftSqlType.int,
+      type: DriftSqlType.string,
       requiredDuringInsert: false,
       defaultConstraints: GeneratedColumn.constraintIsAlways(
           'REFERENCES custom_exercises (id)'));
@@ -2142,9 +2139,9 @@ class $RoutineExercisesTable extends RoutineExercises
   static const VerificationMeta _supersetIdMeta =
       const VerificationMeta('supersetId');
   @override
-  late final GeneratedColumn<int> supersetId = GeneratedColumn<int>(
+  late final GeneratedColumn<String> supersetId = GeneratedColumn<String>(
       'superset_id', aliasedName, true,
-      type: DriftSqlType.int,
+      type: DriftSqlType.string,
       requiredDuringInsert: false,
       defaultConstraints: GeneratedColumn.constraintIsAlways(
           'REFERENCES routine_exercises (id)'));
@@ -2267,9 +2264,9 @@ class $RoutineExercisesTable extends RoutineExercises
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return RoutineExercise(
       id: attachedDatabase.typeMapping
-          .read(DriftSqlType.int, data['${effectivePrefix}id'])!,
+          .read(DriftSqlType.string, data['${effectivePrefix}id'])!,
       routineId: attachedDatabase.typeMapping
-          .read(DriftSqlType.int, data['${effectivePrefix}routine_id'])!,
+          .read(DriftSqlType.string, data['${effectivePrefix}routine_id'])!,
       name: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}name'])!,
       parameters: $RoutineExercisesTable.$converterparametersn.fromSql(
@@ -2291,8 +2288,8 @@ class $RoutineExercisesTable extends RoutineExercises
           .read(DriftSqlType.bool, data['${effectivePrefix}is_custom'])!,
       libraryExerciseId: attachedDatabase.typeMapping.read(
           DriftSqlType.string, data['${effectivePrefix}library_exercise_id']),
-      customExerciseId: attachedDatabase.typeMapping
-          .read(DriftSqlType.int, data['${effectivePrefix}custom_exercise_id']),
+      customExerciseId: attachedDatabase.typeMapping.read(
+          DriftSqlType.string, data['${effectivePrefix}custom_exercise_id']),
       notes: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}notes']),
       isSuperset: attachedDatabase.typeMapping
@@ -2300,7 +2297,7 @@ class $RoutineExercisesTable extends RoutineExercises
       isInSuperset: attachedDatabase.typeMapping
           .read(DriftSqlType.bool, data['${effectivePrefix}is_in_superset'])!,
       supersetId: attachedDatabase.typeMapping
-          .read(DriftSqlType.int, data['${effectivePrefix}superset_id']),
+          .read(DriftSqlType.string, data['${effectivePrefix}superset_id']),
       sortOrder: attachedDatabase.typeMapping
           .read(DriftSqlType.int, data['${effectivePrefix}sort_order'])!,
     );
@@ -2335,8 +2332,8 @@ class $RoutineExercisesTable extends RoutineExercises
 }
 
 class RoutineExercise extends DataClass implements Insertable<RoutineExercise> {
-  final int id;
-  final int routineId;
+  final String id;
+  final String routineId;
   final String name;
   final GTSetParameters? parameters;
   final List<GTSet>? sets;
@@ -2345,11 +2342,11 @@ class RoutineExercise extends DataClass implements Insertable<RoutineExercise> {
   final int? restTime;
   final bool isCustom;
   final String? libraryExerciseId;
-  final int? customExerciseId;
+  final String? customExerciseId;
   final String? notes;
   final bool isSuperset;
   final bool isInSuperset;
-  final int? supersetId;
+  final String? supersetId;
   final int sortOrder;
   const RoutineExercise(
       {required this.id,
@@ -2371,8 +2368,8 @@ class RoutineExercise extends DataClass implements Insertable<RoutineExercise> {
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
-    map['id'] = Variable<int>(id);
-    map['routine_id'] = Variable<int>(routineId);
+    map['id'] = Variable<String>(id);
+    map['routine_id'] = Variable<String>(routineId);
     map['name'] = Variable<String>(name);
     if (!nullToAbsent || parameters != null) {
       map['parameters'] = Variable<String>(
@@ -2400,7 +2397,7 @@ class RoutineExercise extends DataClass implements Insertable<RoutineExercise> {
       map['library_exercise_id'] = Variable<String>(libraryExerciseId);
     }
     if (!nullToAbsent || customExerciseId != null) {
-      map['custom_exercise_id'] = Variable<int>(customExerciseId);
+      map['custom_exercise_id'] = Variable<String>(customExerciseId);
     }
     if (!nullToAbsent || notes != null) {
       map['notes'] = Variable<String>(notes);
@@ -2408,7 +2405,7 @@ class RoutineExercise extends DataClass implements Insertable<RoutineExercise> {
     map['is_superset'] = Variable<bool>(isSuperset);
     map['is_in_superset'] = Variable<bool>(isInSuperset);
     if (!nullToAbsent || supersetId != null) {
-      map['superset_id'] = Variable<int>(supersetId);
+      map['superset_id'] = Variable<String>(supersetId);
     }
     map['sort_order'] = Variable<int>(sortOrder);
     return map;
@@ -2454,8 +2451,8 @@ class RoutineExercise extends DataClass implements Insertable<RoutineExercise> {
       {ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return RoutineExercise(
-      id: serializer.fromJson<int>(json['id']),
-      routineId: serializer.fromJson<int>(json['routineId']),
+      id: serializer.fromJson<String>(json['id']),
+      routineId: serializer.fromJson<String>(json['routineId']),
       name: serializer.fromJson<String>(json['name']),
       parameters: $RoutineExercisesTable.$converterparametersn
           .fromJson(serializer.fromJson<String?>(json['parameters'])),
@@ -2468,11 +2465,11 @@ class RoutineExercise extends DataClass implements Insertable<RoutineExercise> {
       isCustom: serializer.fromJson<bool>(json['isCustom']),
       libraryExerciseId:
           serializer.fromJson<String?>(json['libraryExerciseId']),
-      customExerciseId: serializer.fromJson<int?>(json['customExerciseId']),
+      customExerciseId: serializer.fromJson<String?>(json['customExerciseId']),
       notes: serializer.fromJson<String?>(json['notes']),
       isSuperset: serializer.fromJson<bool>(json['isSuperset']),
       isInSuperset: serializer.fromJson<bool>(json['isInSuperset']),
-      supersetId: serializer.fromJson<int?>(json['supersetId']),
+      supersetId: serializer.fromJson<String?>(json['supersetId']),
       sortOrder: serializer.fromJson<int>(json['sortOrder']),
     );
   }
@@ -2480,8 +2477,8 @@ class RoutineExercise extends DataClass implements Insertable<RoutineExercise> {
   Map<String, dynamic> toJson({ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
-      'id': serializer.toJson<int>(id),
-      'routineId': serializer.toJson<int>(routineId),
+      'id': serializer.toJson<String>(id),
+      'routineId': serializer.toJson<String>(routineId),
       'name': serializer.toJson<String>(name),
       'parameters': serializer.toJson<String?>(
           $RoutineExercisesTable.$converterparametersn.toJson(parameters)),
@@ -2494,18 +2491,18 @@ class RoutineExercise extends DataClass implements Insertable<RoutineExercise> {
       'restTime': serializer.toJson<int?>(restTime),
       'isCustom': serializer.toJson<bool>(isCustom),
       'libraryExerciseId': serializer.toJson<String?>(libraryExerciseId),
-      'customExerciseId': serializer.toJson<int?>(customExerciseId),
+      'customExerciseId': serializer.toJson<String?>(customExerciseId),
       'notes': serializer.toJson<String?>(notes),
       'isSuperset': serializer.toJson<bool>(isSuperset),
       'isInSuperset': serializer.toJson<bool>(isInSuperset),
-      'supersetId': serializer.toJson<int?>(supersetId),
+      'supersetId': serializer.toJson<String?>(supersetId),
       'sortOrder': serializer.toJson<int>(sortOrder),
     };
   }
 
   RoutineExercise copyWith(
-          {int? id,
-          int? routineId,
+          {String? id,
+          String? routineId,
           String? name,
           Value<GTSetParameters?> parameters = const Value.absent(),
           Value<List<GTSet>?> sets = const Value.absent(),
@@ -2515,11 +2512,11 @@ class RoutineExercise extends DataClass implements Insertable<RoutineExercise> {
           Value<int?> restTime = const Value.absent(),
           bool? isCustom,
           Value<String?> libraryExerciseId = const Value.absent(),
-          Value<int?> customExerciseId = const Value.absent(),
+          Value<String?> customExerciseId = const Value.absent(),
           Value<String?> notes = const Value.absent(),
           bool? isSuperset,
           bool? isInSuperset,
-          Value<int?> supersetId = const Value.absent(),
+          Value<String?> supersetId = const Value.absent(),
           int? sortOrder}) =>
       RoutineExercise(
         id: id ?? this.id,
@@ -2611,8 +2608,8 @@ class RoutineExercise extends DataClass implements Insertable<RoutineExercise> {
 }
 
 class RoutineExercisesCompanion extends UpdateCompanion<RoutineExercise> {
-  final Value<int> id;
-  final Value<int> routineId;
+  final Value<String> id;
+  final Value<String> routineId;
   final Value<String> name;
   final Value<GTSetParameters?> parameters;
   final Value<List<GTSet>?> sets;
@@ -2621,12 +2618,13 @@ class RoutineExercisesCompanion extends UpdateCompanion<RoutineExercise> {
   final Value<int?> restTime;
   final Value<bool> isCustom;
   final Value<String?> libraryExerciseId;
-  final Value<int?> customExerciseId;
+  final Value<String?> customExerciseId;
   final Value<String?> notes;
   final Value<bool> isSuperset;
   final Value<bool> isInSuperset;
-  final Value<int?> supersetId;
+  final Value<String?> supersetId;
   final Value<int> sortOrder;
+  final Value<int> rowid;
   const RoutineExercisesCompanion({
     this.id = const Value.absent(),
     this.routineId = const Value.absent(),
@@ -2644,10 +2642,11 @@ class RoutineExercisesCompanion extends UpdateCompanion<RoutineExercise> {
     this.isInSuperset = const Value.absent(),
     this.supersetId = const Value.absent(),
     this.sortOrder = const Value.absent(),
+    this.rowid = const Value.absent(),
   });
   RoutineExercisesCompanion.insert({
     this.id = const Value.absent(),
-    required int routineId,
+    required String routineId,
     required String name,
     this.parameters = const Value.absent(),
     this.sets = const Value.absent(),
@@ -2662,6 +2661,7 @@ class RoutineExercisesCompanion extends UpdateCompanion<RoutineExercise> {
     required bool isInSuperset,
     this.supersetId = const Value.absent(),
     required int sortOrder,
+    this.rowid = const Value.absent(),
   })  : routineId = Value(routineId),
         name = Value(name),
         isCustom = Value(isCustom),
@@ -2669,8 +2669,8 @@ class RoutineExercisesCompanion extends UpdateCompanion<RoutineExercise> {
         isInSuperset = Value(isInSuperset),
         sortOrder = Value(sortOrder);
   static Insertable<RoutineExercise> custom({
-    Expression<int>? id,
-    Expression<int>? routineId,
+    Expression<String>? id,
+    Expression<String>? routineId,
     Expression<String>? name,
     Expression<String>? parameters,
     Expression<String>? sets,
@@ -2679,12 +2679,13 @@ class RoutineExercisesCompanion extends UpdateCompanion<RoutineExercise> {
     Expression<int>? restTime,
     Expression<bool>? isCustom,
     Expression<String>? libraryExerciseId,
-    Expression<int>? customExerciseId,
+    Expression<String>? customExerciseId,
     Expression<String>? notes,
     Expression<bool>? isSuperset,
     Expression<bool>? isInSuperset,
-    Expression<int>? supersetId,
+    Expression<String>? supersetId,
     Expression<int>? sortOrder,
+    Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -2705,12 +2706,13 @@ class RoutineExercisesCompanion extends UpdateCompanion<RoutineExercise> {
       if (isInSuperset != null) 'is_in_superset': isInSuperset,
       if (supersetId != null) 'superset_id': supersetId,
       if (sortOrder != null) 'sort_order': sortOrder,
+      if (rowid != null) 'rowid': rowid,
     });
   }
 
   RoutineExercisesCompanion copyWith(
-      {Value<int>? id,
-      Value<int>? routineId,
+      {Value<String>? id,
+      Value<String>? routineId,
       Value<String>? name,
       Value<GTSetParameters?>? parameters,
       Value<List<GTSet>?>? sets,
@@ -2719,12 +2721,13 @@ class RoutineExercisesCompanion extends UpdateCompanion<RoutineExercise> {
       Value<int?>? restTime,
       Value<bool>? isCustom,
       Value<String?>? libraryExerciseId,
-      Value<int?>? customExerciseId,
+      Value<String?>? customExerciseId,
       Value<String?>? notes,
       Value<bool>? isSuperset,
       Value<bool>? isInSuperset,
-      Value<int?>? supersetId,
-      Value<int>? sortOrder}) {
+      Value<String?>? supersetId,
+      Value<int>? sortOrder,
+      Value<int>? rowid}) {
     return RoutineExercisesCompanion(
       id: id ?? this.id,
       routineId: routineId ?? this.routineId,
@@ -2743,6 +2746,7 @@ class RoutineExercisesCompanion extends UpdateCompanion<RoutineExercise> {
       isInSuperset: isInSuperset ?? this.isInSuperset,
       supersetId: supersetId ?? this.supersetId,
       sortOrder: sortOrder ?? this.sortOrder,
+      rowid: rowid ?? this.rowid,
     );
   }
 
@@ -2750,10 +2754,10 @@ class RoutineExercisesCompanion extends UpdateCompanion<RoutineExercise> {
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
     if (id.present) {
-      map['id'] = Variable<int>(id.value);
+      map['id'] = Variable<String>(id.value);
     }
     if (routineId.present) {
-      map['routine_id'] = Variable<int>(routineId.value);
+      map['routine_id'] = Variable<String>(routineId.value);
     }
     if (name.present) {
       map['name'] = Variable<String>(name.value);
@@ -2786,7 +2790,7 @@ class RoutineExercisesCompanion extends UpdateCompanion<RoutineExercise> {
       map['library_exercise_id'] = Variable<String>(libraryExerciseId.value);
     }
     if (customExerciseId.present) {
-      map['custom_exercise_id'] = Variable<int>(customExerciseId.value);
+      map['custom_exercise_id'] = Variable<String>(customExerciseId.value);
     }
     if (notes.present) {
       map['notes'] = Variable<String>(notes.value);
@@ -2798,10 +2802,13 @@ class RoutineExercisesCompanion extends UpdateCompanion<RoutineExercise> {
       map['is_in_superset'] = Variable<bool>(isInSuperset.value);
     }
     if (supersetId.present) {
-      map['superset_id'] = Variable<int>(supersetId.value);
+      map['superset_id'] = Variable<String>(supersetId.value);
     }
     if (sortOrder.present) {
       map['sort_order'] = Variable<int>(sortOrder.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
     }
     return map;
   }
@@ -2824,7 +2831,8 @@ class RoutineExercisesCompanion extends UpdateCompanion<RoutineExercise> {
           ..write('isSuperset: $isSuperset, ')
           ..write('isInSuperset: $isInSuperset, ')
           ..write('supersetId: $supersetId, ')
-          ..write('sortOrder: $sortOrder')
+          ..write('sortOrder: $sortOrder, ')
+          ..write('rowid: $rowid')
           ..write(')'))
         .toString();
   }

@@ -2,9 +2,15 @@ import 'package:drift/drift.dart';
 import 'package:gymtracker/data/distance.dart';
 import 'package:gymtracker/data/weights.dart';
 import 'package:gymtracker/db/model/tables/exercise.dart';
+import 'package:uuid/uuid.dart';
+
+const _uuid = Uuid();
 
 class Routines extends Table {
-  IntColumn get id => integer().autoIncrement()();
+  @override
+  Set<Column<Object>> get primaryKey => {id};
+
+  TextColumn get id => text().clientDefault(() => _uuid.v4())();
   TextColumn get name => text()();
   TextColumn get infobox => text()();
   TextColumn get weightUnit => textEnum<Weights>()();
@@ -14,9 +20,9 @@ class Routines extends Table {
 
 class RoutineExercises extends LinkedExerciseBase {
   @override
-  IntColumn get routineId => integer().references(Routines, #id)();
+  TextColumn get routineId => text().references(Routines, #id)();
 
   @override
-  IntColumn get supersetId =>
-      integer().nullable().references(RoutineExercises, #id)();
+  TextColumn get supersetId =>
+      text().nullable().references(RoutineExercises, #id)();
 }

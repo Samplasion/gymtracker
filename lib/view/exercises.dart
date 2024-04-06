@@ -568,7 +568,7 @@ class ExerciseDataView extends StatelessWidget {
 }
 
 class ExerciseSetView extends StatelessWidget {
-  final ExSet set;
+  final GTSet set;
   final Exercise exercise;
   final bool isConcrete;
   final bool alt;
@@ -586,7 +586,7 @@ class ExerciseSetView extends StatelessWidget {
   });
 
   List<Widget> get fields => [
-        if ([SetParameters.repsWeight, SetParameters.timeWeight]
+        if ([GTSetParameters.repsWeight, GTSetParameters.timeWeight]
             .contains(set.parameters))
           Text(Weights.convert(
             value: set.weight!,
@@ -594,17 +594,17 @@ class ExerciseSetView extends StatelessWidget {
             to: settingsController.weightUnit.value!,
           ).userFacingWeight),
         if ([
-          SetParameters.timeWeight,
-          SetParameters.time,
+          GTSetParameters.timeWeight,
+          GTSetParameters.time,
         ].contains(set.parameters))
           Text("exerciseList.fields.time".trParams({
             "time":
                 "${(set.time!.inSeconds ~/ 60).toString().padLeft(2, "0")}:${(set.time!.inSeconds % 60).toString().padLeft(2, "0")}",
           })),
-        if ([SetParameters.repsWeight, SetParameters.freeBodyReps]
+        if ([GTSetParameters.repsWeight, GTSetParameters.freeBodyReps]
             .contains(set.parameters))
           Text("exerciseList.fields.reps".plural(set.reps ?? 0)),
-        if ([SetParameters.distance].contains(set.parameters))
+        if ([GTSetParameters.distance].contains(set.parameters))
           Text(Distance.convert(
             value: set.distance!,
             from: distanceUnit,

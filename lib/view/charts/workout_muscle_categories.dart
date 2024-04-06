@@ -28,7 +28,7 @@ class WorkoutMuscleCategoriesBarChart extends GetWidget<HistoryController> {
     final nonEmptyData = data.entries.where((e) => e.value > 0).toList();
     final max = data.values.sum;
 
-    String getLabel(MuscleCategory cat) =>
+    String getLabel(GTMuscleCategory cat) =>
         "${"muscleCategories.${cat.name}".t} (${((data[cat] ?? 0) * 100 / max).round()}%)";
 
     final textReservedSize =

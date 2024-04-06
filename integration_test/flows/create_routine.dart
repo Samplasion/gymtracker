@@ -133,9 +133,9 @@ Future<void> testCreateRoutineFlow(
   // Verify that we're at the routine page
   expect(find.text('New routine'), findsOneWidget);
   expect(find.text('Test Routine'), findsOneWidget);
-  expect(databaseService.routinesBox.values.length, 1);
+  expect(databaseService.routines.length, 1);
 
-  final newRoutine = databaseService.routinesBox.values.first;
+  final newRoutine = databaseService.routines.first;
   expect(newRoutine.name, "Test Routine");
   expect(newRoutine.exercises.length, 1);
   final exerciseObj = newRoutine.exercises.first as Exercise;

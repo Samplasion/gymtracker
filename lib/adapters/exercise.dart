@@ -2,18 +2,18 @@ import 'package:gymtracker/model/exercise.dart';
 import 'package:gymtracker/model/set.dart';
 import 'package:hive/hive.dart';
 
-class MuscleGroupAdapter extends TypeAdapter<MuscleGroup> {
+class MuscleGroupAdapter extends TypeAdapter<GTMuscleGroup> {
   @override
   final int typeId = 6;
 
   @override
-  MuscleGroup read(BinaryReader reader) {
+  GTMuscleGroup read(BinaryReader reader) {
     final index = reader.readByte();
-    return MuscleGroup.values[index];
+    return GTMuscleGroup.values[index];
   }
 
   @override
-  void write(BinaryWriter writer, MuscleGroup obj) {
+  void write(BinaryWriter writer, GTMuscleGroup obj) {
     writer.writeByte(obj.index);
   }
 }
@@ -28,13 +28,15 @@ class ExerciseAdapter extends TypeAdapter<Exercise> {
       id: reader.read(),
       name: reader.read(),
       parameters: reader.read(),
-      sets: (reader.read() as List).cast<ExSet>(),
-      primaryMuscleGroup: reader.read() as MuscleGroup,
-      secondaryMuscleGroups: (reader.read() as Set).cast<MuscleGroup>(),
+      sets: (reader.read() as List).cast<GTSet>(),
+      primaryMuscleGroup: reader.read() as GTMuscleGroup,
+      secondaryMuscleGroups: (reader.read() as Set).cast<GTMuscleGroup>(),
       restTime: reader.read(),
       parentID: reader.read(),
       notes: reader.read(),
       standard: reader.read(),
+      supersetID: reader.availableBytes > 0 ? reader.read() : null,
+      workoutID: reader.availableBytes > 0 ? reader.read() : null,
     );
   }
 
@@ -50,5 +52,7 @@ class ExerciseAdapter extends TypeAdapter<Exercise> {
     writer.write(obj.parentID);
     writer.write(obj.notes);
     writer.write(obj.standard);
+    writer.write(obj.supersetID);
+    writer.write(obj.workoutID);
   }
 }

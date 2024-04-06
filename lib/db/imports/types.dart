@@ -1,6 +1,8 @@
-import 'package:gymtracker/db/database.dart';
 import 'package:gymtracker/db/imports/v1.dart';
 import 'package:gymtracker/db/imports/v2.dart';
+import 'package:gymtracker/model/exercisable.dart';
+import 'package:gymtracker/model/exercise.dart';
+import 'package:gymtracker/model/workout.dart';
 
 const converters = {
   1: VersionedJsonImportV1(),
@@ -27,11 +29,11 @@ abstract class VersionedJsonImportBase {
 }
 
 class DatabaseSnapshot {
-  final List<GTLibraryExercise> customExercises;
-  final List<GTRoutine> routines;
-  final List<GTExerciseOrSuperset> routineExercises;
-  final List<GTHistoryWorkout> historyWorkouts;
-  final List<GTExerciseOrSuperset> historyWorkoutExercises;
+  final List<Exercise> customExercises;
+  final List<Workout> routines;
+  final List<WorkoutExercisable> routineExercises;
+  final List<Workout> historyWorkouts;
+  final List<WorkoutExercisable> historyWorkoutExercises;
 
   const DatabaseSnapshot({
     required this.customExercises,

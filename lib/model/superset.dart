@@ -22,17 +22,22 @@ class Superset extends WorkoutExercisable {
   @override
   String notes;
 
+  @override
+  String? workoutID;
+
   Superset({
     String? id,
     required this.exercises,
     required this.restTime,
     this.notes = "",
+    required this.workoutID,
   }) : id = id ?? const Uuid().v4();
 
   factory Superset.empty() {
     return Superset(
       exercises: [],
       restTime: const Duration(seconds: 0),
+      workoutID: null,
     );
   }
 
@@ -40,7 +45,7 @@ class Superset extends WorkoutExercisable {
       _$SupersetFromJson(json);
 
   @override
-  List<ExSet> get sets => [
+  List<GTSet> get sets => [
         for (final ex in exercises) ...ex.sets,
       ];
 

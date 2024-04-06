@@ -15,19 +15,26 @@ class ExercisesController extends GetxController with ServiceableController {
   RxList<Exercise> exercises = <Exercise>[].obs;
 
   @override
-  void onServiceChange() {
-    exercises(service.exercises);
+  onInit() {
+    super.onInit();
+    service.exercises$.listen((event) {
+      logger.d("Updated with ${event.length} exercises");
+      exercises(event);
+    });
   }
+
+  @override
+  void onServiceChange() {}
 
   bool isNameValid(String name) =>
       !exercises.any((element) => element.name == name);
 
   Exercise generateEmpty({
     required String name,
-    required SetParameters parameters,
-    required MuscleGroup primaryMuscleGroup,
-    required Set<MuscleGroup> secondaryMuscleGroups,
-    List<ExSet> sets = const [],
+    required GTSetParameters parameters,
+    required GTMuscleGroup primaryMuscleGroup,
+    required Set<GTMuscleGroup> secondaryMuscleGroups,
+    List<GTSet> sets = const [],
     required Duration restTime,
   }) {
     return Exercise.custom(
@@ -38,14 +45,16 @@ class ExercisesController extends GetxController with ServiceableController {
       secondaryMuscleGroups: secondaryMuscleGroups,
       restTime: restTime,
       notes: '',
+      supersetID: null,
+      workoutID: null,
     );
   }
 
   void submit({
     required String name,
-    required SetParameters parameters,
-    required MuscleGroup primaryMuscleGroup,
-    required Set<MuscleGroup> otherMuscleGroups,
+    required GTSetParameters parameters,
+    required GTMuscleGroup primaryMuscleGroup,
+    required Set<GTMuscleGroup> otherMuscleGroups,
     required Duration restTime,
   }) {
     final exercise = generateEmpty(

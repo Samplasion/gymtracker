@@ -5,20 +5,20 @@ import 'package:uuid/uuid.dart';
 part 'set.g.dart';
 
 @JsonEnum()
-enum SetKind {
+enum GTSetKind {
   warmUp,
   normal,
   drop,
   failure(shouldKeepInRoutine: false),
   failureStripping(shouldKeepInRoutine: false);
 
-  const SetKind({this.shouldKeepInRoutine = true});
+  const GTSetKind({this.shouldKeepInRoutine = true});
 
   final bool shouldKeepInRoutine;
 }
 
 @JsonEnum()
-enum SetParameters {
+enum GTSetParameters {
   repsWeight,
   timeWeight,
   freeBodyReps,
@@ -28,10 +28,10 @@ enum SetParameters {
 
 @JsonSerializable()
 @CopyWith()
-class ExSet {
+class GTSet {
   String id;
-  SetKind kind;
-  final SetParameters parameters;
+  GTSetKind kind;
+  final GTSetParameters parameters;
 
   int? reps;
   double? weight;
@@ -39,7 +39,7 @@ class ExSet {
   double? distance;
   bool done;
 
-  ExSet({
+  GTSet({
     String? id,
     required this.kind,
     required this.parameters,
@@ -58,59 +58,59 @@ class ExSet {
         ));
 
   static bool _validateParameters({
-    required SetParameters parameters,
+    required GTSetParameters parameters,
     required int? reps,
     required double? weight,
     required Duration? time,
     required double? distance,
   }) {
     switch (parameters) {
-      case SetParameters.repsWeight:
+      case GTSetParameters.repsWeight:
         return reps != null && weight != null;
-      case SetParameters.timeWeight:
+      case GTSetParameters.timeWeight:
         return time != null && weight != null;
-      case SetParameters.freeBodyReps:
+      case GTSetParameters.freeBodyReps:
         return reps != null;
-      case SetParameters.time:
+      case GTSetParameters.time:
         return time != null;
-      case SetParameters.distance:
+      case GTSetParameters.distance:
         return distance != null;
     }
   }
 
-  factory ExSet.empty({
-    required SetKind kind,
-    required SetParameters parameters,
+  factory GTSet.empty({
+    required GTSetKind kind,
+    required GTSetParameters parameters,
   }) {
     switch (parameters) {
-      case SetParameters.repsWeight:
-        return ExSet(
+      case GTSetParameters.repsWeight:
+        return GTSet(
           kind: kind,
           parameters: parameters,
           reps: 0,
           weight: 0,
         );
-      case SetParameters.timeWeight:
-        return ExSet(
+      case GTSetParameters.timeWeight:
+        return GTSet(
           kind: kind,
           parameters: parameters,
           time: Duration.zero,
           weight: 0,
         );
-      case SetParameters.freeBodyReps:
-        return ExSet(
+      case GTSetParameters.freeBodyReps:
+        return GTSet(
           kind: kind,
           parameters: parameters,
           reps: 0,
         );
-      case SetParameters.time:
-        return ExSet(
+      case GTSetParameters.time:
+        return GTSet(
           kind: kind,
           parameters: parameters,
           time: Duration.zero,
         );
-      case SetParameters.distance:
-        return ExSet(
+      case GTSetParameters.distance:
+        return GTSet(
           kind: kind,
           parameters: parameters,
           distance: 0,
@@ -118,19 +118,19 @@ class ExSet {
     }
   }
 
-  factory ExSet.fromJson(Map<String, dynamic> json) => _$ExSetFromJson(json);
+  factory GTSet.fromJson(Map<String, dynamic> json) => _$GTSetFromJson(json);
 
-  Map<String, dynamic> toJson() => _$ExSetToJson(this);
+  Map<String, dynamic> toJson() => _$GTSetToJson(this);
 
   /// Calculates the one-rep max for this set
   ///
   /// The one-rep max is calculated using the Brzycki formula:
   /// `1rm = w / (1.0278 - (0.0278 * r))`.
   double? get oneRepMax {
-    if (parameters != SetParameters.repsWeight) {
+    if (parameters != GTSetParameters.repsWeight) {
       throw SetParametersError(
         parameters,
-        expectedParameters: SetParameters.repsWeight,
+        expectedParameters: GTSetParameters.repsWeight,
       );
     }
     if (reps == null || weight == null) {
@@ -142,8 +142,8 @@ class ExSet {
 }
 
 class SetParametersError extends Error {
-  final SetParameters parameters;
-  final SetParameters expectedParameters;
+  final GTSetParameters parameters;
+  final GTSetParameters expectedParameters;
 
   SetParametersError(
     this.parameters, {

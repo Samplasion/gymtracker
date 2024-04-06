@@ -28,15 +28,21 @@ class HistoryController extends GetxController with ServiceableController {
   Rx<Streaks> streaks = Streaks.zero.obs;
 
   @override
-  void onServiceChange() {
-    final hist = service.workoutHistory;
-    hist.sort((a, b) => (a.startingDate ??
-            DateTime.fromMillisecondsSinceEpoch(0))
-        .compareTo(b.startingDate ?? DateTime.fromMillisecondsSinceEpoch(0)));
-    history(hist);
-    _computeWorkoutsByDay();
-    computeStreaks();
+  onInit() {
+    super.onInit();
+    service.history$.listen((event) {
+      logger.d("Updated with ${event.length} exercises");
+      event.sort((a, b) => (a.startingDate ??
+              DateTime.fromMillisecondsSinceEpoch(0))
+          .compareTo(b.startingDate ?? DateTime.fromMillisecondsSinceEpoch(0)));
+      history(event);
+      _computeWorkoutsByDay();
+      computeStreaks();
+    });
   }
+
+  @override
+  void onServiceChange() {}
 
   void _computeWorkoutsByDay() {
     final _counts = <DateTime, List<Workout>>{};
@@ -58,10 +64,10 @@ class HistoryController extends GetxController with ServiceableController {
     logger.d("Recomputed streaks: $streaks");
   }
 
-  void deleteWorkout(Workout workout) {
-    service.removeHistoryWorkoutById(workout.id);
+  Future<void> deleteWorkout(Workout workout) async {
+    await service.removeHistoryWorkoutById(workout.id);
     if (workout.completedBy != null) {
-      service.removeHistoryWorkoutById(workout.completedBy!);
+      await service.removeHistoryWorkoutById(workout.completedBy!);
     }
   }
 
@@ -249,8 +255,10 @@ class HistoryController extends GetxController with ServiceableController {
   }
 
   Workout? getOriginalForContinuation({required Workout continuationWorkout}) {
+    assert(continuationWorkout.completes != null,
+        "Workout must be a continuation");
     return service.workoutHistory.firstWhereOrNull(
-      (element) => element.completedBy == continuationWorkout.id,
+      (element) => element.id == continuationWorkout.completes,
     );
   }
 
@@ -273,14 +281,14 @@ class HistoryController extends GetxController with ServiceableController {
   }
 
   /// Adds a new workout to the history, avoiding collisions
-  void addNewWorkout(Workout workout) {
+  Future<void> addNewWorkout(Workout workout) async {
     final collides = service.hasHistoryWorkout(workout.id);
     if (collides) {
       workout = workout.regenerateID();
       if (workout.completes != null) {
         final completed = service.getHistoryWorkout(workout.completes!);
         if (completed != null) {
-          service.setHistoryWorkout(completed.copyWith(
+          await service.setHistoryWorkout(completed.copyWith(
             completedBy: workout.id,
           ));
         } else {
@@ -288,14 +296,14 @@ class HistoryController extends GetxController with ServiceableController {
         }
       }
     }
-    service.setHistoryWorkout(workout);
+    await service.setHistoryWorkout(workout);
   }
 
-  Map<MuscleCategory, double> calculateMuscleCategoryDistributionFor({
+  Map<GTMuscleCategory, double> calculateMuscleCategoryDistributionFor({
     required List<Workout> workouts,
   }) {
-    Map<MuscleCategory, double> map = {
-      for (final category in MuscleCategory.values) category: 0,
+    Map<GTMuscleCategory, double> map = {
+      for (final category in GTMuscleCategory.values) category: 0,
     };
 
     void handleExercise(Workout workout, Exercise exercise) {
@@ -330,7 +338,7 @@ class HistoryController extends GetxController with ServiceableController {
   void applyExerciseModification(Exercise exercise) {
     assert(exercise.isCustom);
 
-    final newHistory = service.historyBox.values.toList();
+    final newHistory = service.history$.value.toList();
     for (int i = 0; i < newHistory.length; i++) {
       final workout = newHistory[i];
 
@@ -413,11 +421,24 @@ class HistoryController extends GetxController with ServiceableController {
 
     logger.d(combined.toJson());
 
-    addNewWorkout(combined);
-    deleteWorkout(w1);
-    deleteWorkout(w2);
+    replaceWorkoutsWithCombined(
+      workouts: [w1, w2],
+      combined: combined,
+    );
 
     Go.off(() => ExercisesView(workout: combined));
+  }
+
+  void replaceWorkoutsWithCombined({
+    required List<Workout> workouts,
+    required Workout combined,
+  }) {
+    service.transaction(() async {
+      for (final workout in workouts) {
+        await deleteWorkout(workout);
+      }
+      await addNewWorkout(combined);
+    });
   }
 }
 

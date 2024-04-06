@@ -20,54 +20,58 @@ void main() {
         Exercise.custom(
           id: "1",
           name: 'Test Exercise',
-          parameters: SetParameters.repsWeight,
+          parameters: GTSetParameters.repsWeight,
           sets: [
-            ExSet(
+            GTSet(
               reps: 10,
               weight: 100,
               time: const Duration(seconds: 60),
-              parameters: SetParameters.repsWeight,
-              kind: SetKind.normal,
+              parameters: GTSetParameters.repsWeight,
+              kind: GTSetKind.normal,
             ),
-            ExSet(
+            GTSet(
               reps: 10,
               weight: 100,
               time: const Duration(seconds: 60),
-              parameters: SetParameters.repsWeight,
-              kind: SetKind.normal,
+              parameters: GTSetParameters.repsWeight,
+              kind: GTSetKind.normal,
             ),
           ],
-          primaryMuscleGroup: MuscleGroup.abs,
-          secondaryMuscleGroups: {MuscleGroup.lowerBack},
+          primaryMuscleGroup: GTMuscleGroup.abs,
+          secondaryMuscleGroups: {GTMuscleGroup.lowerBack},
           restTime: const Duration(seconds: 60),
           parentID: null,
           notes: 'Test Notes',
+          workoutID: null,
+          supersetID: null,
         ),
         Exercise.custom(
           id: "2",
           name: 'Test Exercise 2',
-          parameters: SetParameters.repsWeight,
+          parameters: GTSetParameters.repsWeight,
           sets: [
-            ExSet(
+            GTSet(
               reps: 10,
               weight: 100,
               time: const Duration(seconds: 60),
-              parameters: SetParameters.repsWeight,
-              kind: SetKind.normal,
+              parameters: GTSetParameters.repsWeight,
+              kind: GTSetKind.normal,
             ),
-            ExSet(
+            GTSet(
               reps: 10,
               weight: 100,
               time: const Duration(seconds: 60),
-              parameters: SetParameters.repsWeight,
-              kind: SetKind.normal,
+              parameters: GTSetParameters.repsWeight,
+              kind: GTSetKind.normal,
             ),
           ],
-          primaryMuscleGroup: MuscleGroup.abs,
-          secondaryMuscleGroups: {MuscleGroup.lowerBack},
+          primaryMuscleGroup: GTMuscleGroup.abs,
+          secondaryMuscleGroups: {GTMuscleGroup.lowerBack},
           restTime: const Duration(seconds: 60),
           parentID: null,
           notes: 'Test Notes',
+          workoutID: null,
+          supersetID: null,
         ),
       ],
       duration: const Duration(seconds: 60),
@@ -81,28 +85,30 @@ void main() {
       final number = Random().nextInt(100).toString();
       return Exercise.custom(
         name: 'Test Exercise $number',
-        parameters: SetParameters.repsWeight,
+        parameters: GTSetParameters.repsWeight,
         sets: [
-          ExSet(
+          GTSet(
             reps: 10,
             weight: 100,
             time: const Duration(seconds: 60),
-            parameters: SetParameters.repsWeight,
-            kind: SetKind.normal,
+            parameters: GTSetParameters.repsWeight,
+            kind: GTSetKind.normal,
           ),
-          ExSet(
+          GTSet(
             reps: 10,
             weight: 100,
             time: const Duration(seconds: 60),
-            parameters: SetParameters.repsWeight,
-            kind: SetKind.normal,
+            parameters: GTSetParameters.repsWeight,
+            kind: GTSetKind.normal,
           ),
         ],
-        primaryMuscleGroup: MuscleGroup.abs,
-        secondaryMuscleGroups: {MuscleGroup.lowerBack},
+        primaryMuscleGroup: GTMuscleGroup.abs,
+        secondaryMuscleGroups: {GTMuscleGroup.lowerBack},
         restTime: const Duration(seconds: 60),
         parentID: null,
         notes: 'Test Notes $number',
+        workoutID: null,
+        supersetID: null,
       );
     }
 
@@ -143,12 +149,12 @@ void main() {
           () {
         test('with an added set', () {
           final workout2 = workout.clone();
-          workout2.exercises[0].sets.add(ExSet(
+          workout2.exercises[0].sets.add(GTSet(
             reps: 10,
             weight: 100,
             time: const Duration(seconds: 60),
-            parameters: SetParameters.repsWeight,
-            kind: SetKind.normal,
+            parameters: GTSetParameters.repsWeight,
+            kind: GTSetKind.normal,
           ));
           expect(
             WorkoutDifference.fromWorkouts(
@@ -179,7 +185,7 @@ void main() {
         });
         test('with a changed set kind', () {
           final workout2 = workout.clone();
-          workout2.exercises[0].sets[0].kind = SetKind.failureStripping;
+          workout2.exercises[0].sets[0].kind = GTSetKind.failureStripping;
           expect(
             WorkoutDifference.fromWorkouts(
               oldWorkout: workout,
@@ -263,25 +269,27 @@ void main() {
 
       test("with failure and stripping sets", () {
         final workout1 = workout.copyWith(exercises: [
-          for (final kind
-              in SetKind.values.where((kind) => !kind.shouldKeepInRoutine)) ...[
+          for (final kind in GTSetKind.values
+              .where((kind) => !kind.shouldKeepInRoutine)) ...[
             Exercise.custom(
               name: "Test Exercise $kind",
-              parameters: SetParameters.repsWeight,
+              parameters: GTSetParameters.repsWeight,
               sets: [
-                ExSet(
+                GTSet(
                   reps: 10,
                   weight: 100,
                   time: const Duration(seconds: 60),
-                  parameters: SetParameters.repsWeight,
+                  parameters: GTSetParameters.repsWeight,
                   kind: kind,
                 ),
               ],
-              primaryMuscleGroup: MuscleGroup.abs,
-              secondaryMuscleGroups: {MuscleGroup.lowerBack},
+              primaryMuscleGroup: GTMuscleGroup.abs,
+              secondaryMuscleGroups: {GTMuscleGroup.lowerBack},
               restTime: const Duration(seconds: 60),
               parentID: null,
               notes: 'Test Notes',
+              workoutID: null,
+              supersetID: null,
             ),
           ]
         ]);
@@ -321,6 +329,7 @@ void main() {
             newExercise(),
           ],
           notes: "Superset notes",
+          workoutID: null,
         );
         expect(
           WorkoutDifference.fromWorkouts(
@@ -447,54 +456,58 @@ void main() {
             Exercise.custom(
               id: "1",
               name: 'Test Exercise',
-              parameters: SetParameters.repsWeight,
+              parameters: GTSetParameters.repsWeight,
               sets: [
-                ExSet(
+                GTSet(
                   reps: 10,
                   weight: 100,
                   time: const Duration(seconds: 60),
-                  parameters: SetParameters.repsWeight,
-                  kind: SetKind.normal,
+                  parameters: GTSetParameters.repsWeight,
+                  kind: GTSetKind.normal,
                 ),
-                ExSet(
+                GTSet(
                   reps: 10,
                   weight: 100,
                   time: const Duration(seconds: 60),
-                  parameters: SetParameters.repsWeight,
-                  kind: SetKind.normal,
+                  parameters: GTSetParameters.repsWeight,
+                  kind: GTSetKind.normal,
                 ),
               ],
-              primaryMuscleGroup: MuscleGroup.abs,
-              secondaryMuscleGroups: {MuscleGroup.lowerBack},
+              primaryMuscleGroup: GTMuscleGroup.abs,
+              secondaryMuscleGroups: {GTMuscleGroup.lowerBack},
               restTime: const Duration(seconds: 60),
               parentID: null,
               notes: 'Test Notes',
+              workoutID: null,
+              supersetID: null,
             ),
             Exercise.custom(
               id: "2",
               name: 'Test Exercise 2',
-              parameters: SetParameters.repsWeight,
+              parameters: GTSetParameters.repsWeight,
               sets: [
-                ExSet(
+                GTSet(
                   reps: 10,
                   weight: 100,
                   time: const Duration(seconds: 60),
-                  parameters: SetParameters.repsWeight,
-                  kind: SetKind.normal,
+                  parameters: GTSetParameters.repsWeight,
+                  kind: GTSetKind.normal,
                 ),
-                ExSet(
+                GTSet(
                   reps: 10,
                   weight: 100,
                   time: const Duration(seconds: 60),
-                  parameters: SetParameters.repsWeight,
-                  kind: SetKind.normal,
+                  parameters: GTSetParameters.repsWeight,
+                  kind: GTSetKind.normal,
                 ),
               ],
-              primaryMuscleGroup: MuscleGroup.abs,
-              secondaryMuscleGroups: {MuscleGroup.lowerBack},
+              primaryMuscleGroup: GTMuscleGroup.abs,
+              secondaryMuscleGroups: {GTMuscleGroup.lowerBack},
               restTime: const Duration(seconds: 60),
               parentID: null,
               notes: 'Test Notes',
+              workoutID: null,
+              supersetID: null,
             ),
           ],
           duration: const Duration(seconds: 60),
@@ -536,39 +549,43 @@ void main() {
               Exercise.custom(
                 id: "1",
                 name: 'Test Exercise',
-                parameters: SetParameters.repsWeight,
+                parameters: GTSetParameters.repsWeight,
                 sets: [
-                  ExSet(
+                  GTSet(
                     reps: 10,
                     weight: 100,
                     time: const Duration(seconds: 60),
-                    parameters: SetParameters.repsWeight,
-                    kind: SetKind.normal,
+                    parameters: GTSetParameters.repsWeight,
+                    kind: GTSetKind.normal,
                   ),
                 ],
-                primaryMuscleGroup: MuscleGroup.abs,
-                secondaryMuscleGroups: {MuscleGroup.lowerBack},
+                primaryMuscleGroup: GTMuscleGroup.abs,
+                secondaryMuscleGroups: {GTMuscleGroup.lowerBack},
                 restTime: const Duration(seconds: 60),
                 parentID: null,
                 notes: 'Test Notes',
+                workoutID: null,
+                supersetID: null,
               ),
               Exercise.custom(
                 id: "2",
                 name: 'Test Exercise 2',
-                parameters: SetParameters.distance,
+                parameters: GTSetParameters.distance,
                 sets: [
-                  ExSet(
+                  GTSet(
                     distance: 10,
                     time: const Duration(seconds: 60),
-                    parameters: SetParameters.distance,
-                    kind: SetKind.normal,
+                    parameters: GTSetParameters.distance,
+                    kind: GTSetKind.normal,
                   ),
                 ],
-                primaryMuscleGroup: MuscleGroup.abs,
-                secondaryMuscleGroups: {MuscleGroup.lowerBack},
+                primaryMuscleGroup: GTMuscleGroup.abs,
+                secondaryMuscleGroups: {GTMuscleGroup.lowerBack},
                 restTime: const Duration(seconds: 60),
                 parentID: null,
                 notes: 'Test Notes',
+                workoutID: null,
+                supersetID: null,
               ),
             ],
             duration: const Duration(seconds: 60),
@@ -613,43 +630,6 @@ void main() {
         expect(() => Workout.combine(workout1, workout2),
             throwsA(isA<AssertionError>()));
       });
-
-      // test("asserts if any of the workouts is not concrete", () {
-      //   final workout1 = workout.copyWith(completedBy: "2");
-      //   final workout2 = Workout(
-      //     id: "2",
-      //     name: 'Test Workout 2',
-      //     exercises: [],
-      //     startingDate: DateTime.now(),
-      //   );
-
-      //   expect(Workout.canCombine(workout1, workout2), false);
-      //   expect(() => Workout.combine(workout1, workout2),
-      //       throwsA(isA<AssertionError>()));
-      //   expect(
-      //     Workout.canCombine(
-      //       workout2.copyWith(
-      //         // Avoid previously tested assertion
-      //         startingDate:
-      //             DateTime.now().subtract(const Duration(minutes: 10)),
-      //         duration: const Duration(seconds: 60),
-      //       ),
-      //       workout1.copyWith.duration(null),
-      //     ),
-      //     false,
-      //   );
-      //   expect(
-      //       () => Workout.combine(
-      //             workout2.copyWith(
-      //               // Avoid previously tested assertion
-      //               startingDate:
-      //                   DateTime.now().subtract(const Duration(minutes: 10)),
-      //               duration: const Duration(seconds: 60),
-      //             ),
-      //             workout1.copyWith.duration(null),
-      //           ),
-      //       throwsA(isA<AssertionError>()));
-      // });
 
       test("asserts if the first workout isn't a continuation of the second",
           () {

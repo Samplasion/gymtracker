@@ -43,6 +43,11 @@ class RoutinesController extends GetxController
     if (service.hasOngoing) {
       Get.put(WorkoutController.fromSavedData(service.getOngoingData()!));
     }
+
+    service.routines$.listen((event) {
+      logger.d("Updated with ${event.length} exercises");
+      workouts(event);
+    });
   }
 
   @override
@@ -52,9 +57,7 @@ class RoutinesController extends GetxController
   }
 
   @override
-  onServiceChange() {
-    workouts(service.routines);
-  }
+  onServiceChange() {}
 
   void didChangeAppLifecycleState(AppLifecycleState state) {
     logger.t("Change lifecycle state callback received (state: ${state.name})");
@@ -163,7 +166,7 @@ class RoutinesController extends GetxController
     Workout? workout, {
     String? parentID,
     required bool Function(WorkoutExercisable exercise) exerciseFilter,
-    bool Function(ExSet set)? setFilter,
+    bool Function(GTSet set)? setFilter,
     bool continuation = false,
   }) {
     if (workout != null) {
@@ -395,7 +398,7 @@ class RoutinesController extends GetxController
   void applyExerciseModification(Exercise exercise) {
     assert(exercise.isCustom);
 
-    final newHistory = service.routinesBox.values.toList();
+    final newHistory = service.routines$.value.toList();
     for (int i = 0; i < newHistory.length; i++) {
       final workout = newHistory[i];
 

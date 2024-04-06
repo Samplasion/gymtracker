@@ -46,9 +46,9 @@ class ErrorView extends GetWidget<ErrorController> {
               const SizedBox(height: 16),
               FilledButton(
                 onPressed: () {
-                  [][0];
+                  controller.dumpError(args);
                 },
-                child: const Text("Crash again!"),
+                child: const Text("Dump error to console"),
               ),
             ],
             const SizedBox(height: 16),

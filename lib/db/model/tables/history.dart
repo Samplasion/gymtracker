@@ -3,21 +3,26 @@ import 'package:gymtracker/data/distance.dart';
 import 'package:gymtracker/data/weights.dart';
 import 'package:gymtracker/db/model/tables/exercise.dart';
 import 'package:gymtracker/db/model/tables/routines.dart';
+import 'package:uuid/uuid.dart';
+
+const _uuid = Uuid();
 
 class HistoryWorkouts extends Table {
-  IntColumn get id => integer().autoIncrement()();
+  @override
+  Set<Column<Object>> get primaryKey => {id};
+
+  TextColumn get id => text().clientDefault(() => _uuid.v4())();
   TextColumn get name => text()();
   TextColumn get infobox => text().nullable()();
   IntColumn get duration => integer()();
   Column<DateTime> get startingDate => dateTime()();
-  IntColumn get parentId => integer().nullable().references(Routines, #id)();
-  IntColumn get completedBy =>
-      integer().nullable().references(HistoryWorkouts, #id)();
-  IntColumn get completes =>
-      integer().nullable().references(HistoryWorkouts, #id)();
+  TextColumn get parentId => text().nullable().references(Routines, #id)();
+  TextColumn get completedBy =>
+      text().nullable().references(HistoryWorkouts, #id)();
+  TextColumn get completes =>
+      text().nullable().references(HistoryWorkouts, #id)();
   TextColumn get weightUnit => textEnum<Weights>()();
   TextColumn get distanceUnit => textEnum<Distance>()();
-  IntColumn get sortOrder => integer()();
 
   @override
   List<Set<Column>> get uniqueKeys => [
@@ -27,9 +32,9 @@ class HistoryWorkouts extends Table {
 
 class HistoryWorkoutExercises extends LinkedExerciseBase {
   @override
-  IntColumn get routineId => integer().references(HistoryWorkouts, #id)();
+  TextColumn get routineId => text().references(HistoryWorkouts, #id)();
 
   @override
-  IntColumn get supersetId =>
-      integer().nullable().references(HistoryWorkoutExercises, #id)();
+  TextColumn get supersetId =>
+      text().nullable().references(HistoryWorkoutExercises, #id)();
 }

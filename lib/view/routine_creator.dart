@@ -145,8 +145,8 @@ class _RoutineCreatorState extends State<RoutineCreator> {
                     controller.exercises.addAll(result!
                         .map((ex) {
                           return ex.makeChild().copyWith.sets([
-                            ExSet.empty(
-                              kind: SetKind.normal,
+                            GTSet.empty(
+                              kind: GTSetKind.normal,
                               parameters: ex.parameters,
                             ),
                           ]);
@@ -171,6 +171,7 @@ class _RoutineCreatorState extends State<RoutineCreator> {
                       Superset(
                         restTime: Duration.zero,
                         exercises: [for (final ex in result!) ex.makeChild()],
+                        workoutID: widget.base?.id,
                       ),
                     ));
                   });
@@ -217,8 +218,8 @@ class _RoutineCreatorState extends State<RoutineCreator> {
                 () => const ExercisePicker(singlePick: true));
             if (ex == null || ex.isEmpty) return;
             controller.exercises[i].data = ex.first.makeChild().copyWith.sets([
-              ExSet.empty(
-                kind: SetKind.normal,
+              GTSet.empty(
+                kind: GTSetKind.normal,
                 parameters: ex.first.parameters,
               ),
             ]);
@@ -236,8 +237,8 @@ class _RoutineCreatorState extends State<RoutineCreator> {
         onSetCreate: () {
           final ex = controller.exercises[i];
           controller.exercises[i].data.sets.add(
-            ExSet.empty(
-              kind: SetKind.normal,
+            GTSet.empty(
+              kind: GTSetKind.normal,
               parameters: (ex.data as Exercise).parameters,
             ),
           );
@@ -277,8 +278,8 @@ class _RoutineCreatorState extends State<RoutineCreator> {
                 () => const ExercisePicker(singlePick: true));
             if (ex == null || ex.isEmpty) return;
             controller.exercises[i].data = ex.first.makeChild().copyWith.sets([
-              ExSet.empty(
-                kind: SetKind.normal,
+              GTSet.empty(
+                kind: GTSetKind.normal,
                 parameters: ex.first.parameters,
               ),
             ]);
@@ -312,8 +313,8 @@ class _RoutineCreatorState extends State<RoutineCreator> {
           (controller.exercises[i].data as Superset).exercises.addAll(
                 exercises.map(
                   (ex) => ex.makeChild().copyWith.sets([
-                    ExSet.empty(
-                      kind: SetKind.normal,
+                    GTSet.empty(
+                      kind: GTSetKind.normal,
                       parameters: ex.parameters,
                     ),
                   ]),
@@ -337,8 +338,8 @@ class _RoutineCreatorState extends State<RoutineCreator> {
             if (ex == null || ex.isEmpty) return;
             (controller.exercises[i].data as Superset).exercises[j] =
                 ex.first.copyWith.sets([
-              ExSet.empty(
-                kind: SetKind.normal,
+              GTSet.empty(
+                kind: GTSetKind.normal,
                 parameters: ex.first.parameters,
               ),
             ]);
@@ -354,8 +355,8 @@ class _RoutineCreatorState extends State<RoutineCreator> {
           final ex =
               (controller.exercises[i].data as Superset).exercises[index];
           (controller.exercises[i].data as Superset).exercises[index].sets.add(
-                ExSet.empty(
-                  kind: SetKind.normal,
+                GTSet.empty(
+                  kind: GTSetKind.normal,
                   parameters: ex.parameters,
                 ),
               );

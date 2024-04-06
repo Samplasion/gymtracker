@@ -8,6 +8,7 @@ import 'package:flutter_quill/flutter_quill.dart';
 import 'package:flutter_quill/quill_delta.dart';
 import 'package:get/get.dart' hide ContextExtensionss;
 import 'package:gymtracker/controller/settings_controller.dart';
+import 'package:gymtracker/model/exercisable.dart';
 import 'package:gymtracker/model/workout.dart';
 import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/service/logger.dart';
@@ -199,6 +200,59 @@ extension WorkoutIterableUtils on Iterable<Workout> {
           workout.startingDate!.isBefore(today)) {
         result.add(workout);
       }
+    }
+    return result;
+  }
+
+  /// Returns a flattened view of the exercises in this list of workouts.
+  ///
+  /// For example, if you have this list of workouts:
+  ///
+  /// ```dart
+  /// final workouts = [
+  ///   Workout(
+  ///     exercises: [
+  ///       Exercise(name: "A"),
+  ///       Exercise(name: "B"),
+  ///       Superset(
+  ///         exercises: [
+  ///           Exercise(name: "C"),
+  ///           Exercise(name: "D"),
+  ///         ],
+  ///       ),
+  ///     ],
+  ///   ),
+  ///   Workout(
+  ///     exercises: [
+  ///       Exercise(name: "E"),
+  ///     ],
+  ///   ),
+  /// ];
+  /// ```
+  ///
+  /// Then this getter will return:
+  ///
+  /// ```dart
+  /// [
+  ///    Exercise(name: "A"),
+  ///    Exercise(name: "B"),
+  ///    Superset(),
+  ///    Exercise(name: "C"),
+  ///    Exercise(name: "D"),
+  ///    Exercise(name: "E"),
+  /// ]
+  /// ```
+  ///
+  /// (This is a simplified example; the actual output will be more complex.)
+  ///
+  /// The order of the exercises is preserved.
+  List<WorkoutExercisable> get flattenedExercises {
+    List<WorkoutExercisable> result = [];
+    for (final workout in this) {
+      result.addAll(workout.exercises.expand((element) => element.map(
+            exercise: (ex) => [ex],
+            superset: (ss) => [ss, ...ss.exercises],
+          )));
     }
     return result;
   }

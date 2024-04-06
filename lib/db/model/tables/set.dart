@@ -1,30 +1,9 @@
 import 'dart:convert';
 
 import 'package:drift/drift.dart';
-import 'package:gymtracker/db/model/api/set.dart';
-import 'package:json_annotation/json_annotation.dart';
+import 'package:gymtracker/model/set.dart';
 
-@JsonEnum()
-enum GTSetKind {
-  warmUp,
-  normal,
-  drop,
-  failure(shouldKeepInRoutine: false),
-  failureStripping(shouldKeepInRoutine: false);
-
-  const GTSetKind({this.shouldKeepInRoutine = true});
-
-  final bool shouldKeepInRoutine;
-}
-
-@JsonEnum()
-enum GTSetParameters {
-  repsWeight,
-  timeWeight,
-  freeBodyReps,
-  time,
-  distance,
-}
+export 'package:gymtracker/model/set.dart' show GTSetKind, GTSetParameters;
 
 class GTSetListConverter extends TypeConverter<List<GTSet>, String> {
   const GTSetListConverter();

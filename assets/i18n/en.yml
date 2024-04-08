@@ -118,6 +118,8 @@ workouts:
     start: Redo this workout
     edit:
       label: Edit workout
+    editContinuation:
+      label: Edit workout continuation
     rename:
       label: Rename workout
       errors:

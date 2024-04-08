@@ -118,6 +118,8 @@ workouts:
     start: Ripeti allenamento
     edit:
       label: Modifica allenamento
+    editContinuation:
+      label: Modifica continuazione
     rename:
       label: Rinomina allenamento
       errors:

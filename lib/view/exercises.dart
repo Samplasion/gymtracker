@@ -73,6 +73,20 @@ class _ExercisesViewState extends State<ExercisesView> {
                     });
                   },
                 ),
+                if (workout.hasContinuation)
+                  PopupMenuItem(
+                    key: const Key("edit-workout-cont"),
+                    child: Text(
+                      "workouts.actions.editContinuation.label".t,
+                    ),
+                    onTap: () {
+                      SchedulerBinding.instance
+                          .addPostFrameCallback((timeStamp) {
+                        Go.to(() =>
+                            WorkoutEditor(baseWorkout: workout.continuation!));
+                      });
+                    },
+                  ),
                 PopupMenuItem(
                   textStyle: TextStyle(
                     color: Theme.of(context).colorScheme.error,

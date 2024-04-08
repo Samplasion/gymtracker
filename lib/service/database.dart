@@ -1,25 +1,19 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:drift/drift.dart';
 import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
-import 'package:gymtracker/adapters/builtin.dart' as builtin_adapters;
-import 'package:gymtracker/adapters/distance.dart';
-import 'package:gymtracker/adapters/exercise.dart';
-import 'package:gymtracker/adapters/measurements.dart';
-import 'package:gymtracker/adapters/set.dart';
-import 'package:gymtracker/adapters/superset.dart';
-import 'package:gymtracker/adapters/weights.dart';
-import 'package:gymtracker/adapters/workout.dart';
 import 'package:gymtracker/db/database.dart';
 import 'package:gymtracker/db/imports/types.dart';
+import 'package:gymtracker/model/exercisable.dart';
 import 'package:gymtracker/model/exercise.dart';
 import 'package:gymtracker/model/measurements.dart';
+import 'package:gymtracker/model/preferences.dart';
+import 'package:gymtracker/model/superset.dart';
 import 'package:gymtracker/model/workout.dart';
 import 'package:gymtracker/service/logger.dart';
 import 'package:gymtracker/utils/extensions.dart';
-import 'package:hive_flutter/hive_flutter.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:rxdart/rxdart.dart';
 
 class DatabaseService extends GetxService with ChangeNotifier {
@@ -28,26 +22,30 @@ class DatabaseService extends GetxService with ChangeNotifier {
   final exercises$ = BehaviorSubject<List<Exercise>>.seeded([]);
   final routines$ = BehaviorSubject<List<Workout>>.seeded([]);
   final history$ = BehaviorSubject<List<Workout>>.seeded([]);
+  final prefs$ = BehaviorSubject<Prefs>.seeded(Prefs.defaultValue);
+  final ongoing$ = BehaviorSubject<Map<String, dynamic>?>.seeded(null);
+  final weightMeasurements$ =
+      BehaviorSubject<List<WeightMeasurement>>.seeded([]);
 
-  late final Box<dynamic> settingsBox;
-  late final Box<String> ongoingBox;
-  late final Box<WeightMeasurement> weightMeasurementsBox;
-
-  writeSetting<T>(String key, T value) {
-    settingsBox.put(key, value);
+  writeSettings(Prefs prefs) {
+    db.setPreferences(prefs);
     notifyListeners();
-  }
-
-  readSetting<T>(String key) {
-    return settingsBox.get(key) as T?;
   }
 
   @override
   onInit() {
     super.onInit();
 
-    db = GTDatabase();
+    onServiceChange("main")();
+  }
 
+  Future ensureInitialized() async {
+    db = GTDatabase.prod();
+
+    return _ensureInitialized();
+  }
+
+  Future<void> _ensureInitialized() async {
     db.getAllRoutines()
       ..pipe(routines$)
       ..listen((_) => onServiceChange("routines")());
@@ -57,57 +55,36 @@ class DatabaseService extends GetxService with ChangeNotifier {
     db.getAllHistoryWorkouts()
       ..pipe(history$)
       ..listen((_) => onServiceChange("history")());
-
-    onServiceChange("main")();
-    settingsBox.listenable().addListener(onServiceChange("settings"));
-    ongoingBox.listenable().addListener(onServiceChange("ongoing"));
-    weightMeasurementsBox
-        .listenable()
-        .addListener(onServiceChange("weightMeasurements"));
-  }
-
-  Future ensureInitialized() async {
-    await Hive.initFlutter();
-    if (kDebugMode) {
-      final appDir = await getApplicationDocumentsDirectory();
-      logger.i("Loaded Hive in $appDir");
-    }
-
-    return _ensureInitialized();
-  }
-
-  Future<void> _ensureInitialized() async {
-    builtin_adapters.registerAll();
-    Hive.registerAdapter(WorkoutAdapter());
-    Hive.registerAdapter(MuscleGroupAdapter());
-    Hive.registerAdapter(ExerciseAdapter());
-    Hive.registerAdapter(SupersetAdapter());
-    Hive.registerAdapter(SetKindAdapter());
-    Hive.registerAdapter(SetParametersAdapter());
-    Hive.registerAdapter(ExSetAdapter());
-    Hive.registerAdapter(WeightsAdapter());
-    Hive.registerAdapter(WeightMeasurementAdapter());
-    Hive.registerAdapter(DistanceAdapter());
-
-    settingsBox = await Hive.openBox("settings");
-    ongoingBox = await Hive.openBox<String>("ongoing");
-    weightMeasurementsBox =
-        await Hive.openBox<WeightMeasurement>("weightMeasurements");
+    db.watchPreferences()
+      ..pipe(prefs$)
+      ..listen((prefs) {
+        notifyListeners();
+        onServiceChange("preferences")();
+        prefs.logger.d("Changed.");
+      });
+    db.watchOngoing()
+      ..pipe(ongoing$)
+      ..listen((event) {
+        onServiceChange("ongoing")();
+      });
+    db.watchWeightMeasurements()
+      ..pipe(weightMeasurements$)
+      ..listen((_) => onServiceChange("weight measurements")());
   }
 
   @visibleForTesting
-  Future ensureInitializedForTests() async {
-    await Hive.initFlutter("test");
+  Future ensureInitializedForTests(QueryExecutor e) async {
+    // We're inside a @visibleForTesting method, so it's fine
+    // ignore: invalid_use_of_visible_for_testing_member
+    db = GTDatabase.withQueryExecutor(e);
+
     await _ensureInitialized();
   }
 
   @visibleForTesting
   Future teardown() async {
     logger.t("!!! Tearing down");
-    await settingsBox.clear();
-    await ongoingBox.clear();
-    // ignore: invalid_use_of_visible_for_testing_member
-    Hive.resetAdapters();
+    await db.clearTheWholeThingIAmAbsolutelySureISwear();
   }
 
   void Function() onServiceChange(String service) {
@@ -126,9 +103,10 @@ class DatabaseService extends GetxService with ChangeNotifier {
     return exercises$.value;
   }
 
+  /// This method is only public for testing purposes.
   @visibleForTesting
   writeExercises(List<Exercise> exercises) {
-    db.batch((batch) {
+    return db.batch((batch) {
       batch.logger.i("Importing exercises");
       batch.deleteAll(db.customExercises);
       batch.insertAll(
@@ -154,38 +132,42 @@ class DatabaseService extends GetxService with ChangeNotifier {
     return routines$.value;
   }
 
-  _writeRoutines(List<Workout> routines) {
-    db.batch((batch) {
-      batch.logger.i("Importing routines");
-      batch.deleteAll(db.routines);
-      batch.insertAll(
-        db.routines,
-        routines.toSortedRoutineInsertables(),
-      );
-
-      final allExercises = routines
-          .expand((r) => r.exercises)
-          .map((e) => e.map(
-                exercise: (ex) => [ex],
-                superset: (ss) => [ss, ...ss.exercises],
-              ))
-          .expand((e) => e)
-          .toList();
-
-      batch.deleteAll(db.routineExercises);
-      batch.insertAll(
-        db.routineExercises,
-        allExercises.toSortedRoutineExerciseInsertables(),
-      );
+  Future _writeRoutines(List<Workout> routines) {
+    return db.transaction(() async {
+      await db.batch((batch) {
+        batch.logger.i("Importing routines");
+        batch.deleteAll(db.routines);
+        batch.insertAll(
+          db.routines,
+          routines.toSortedRoutineInsertables(),
+        );
+      });
+      await _writeRoutineExercises(routines.flattenedExercises);
     });
   }
 
+  Future _writeRoutineExercises(
+      List<WorkoutExercisable> routineExercises) async {
+    final routineExerciseInsertables = routineExercises
+        .fold(
+          <String, List<WorkoutExercisable>>{},
+          (m, r) {
+            return m..putIfAbsent(r.workoutID!, () => []).add(r);
+          },
+        )
+        .values
+        .expand((list) => list.toSortedInsertables());
+    await db.delete(db.routineExercises).go();
+    await db.batch(
+        (b) => b.insertAll(db.routineExercises, routineExerciseInsertables));
+  }
+
   setAllRoutines(List<Workout> routines) {
-    _writeRoutines(routines);
-    notifyListeners();
+    return _writeRoutines(routines).then((_) => notifyListeners());
   }
 
   setRoutine(Workout routine) {
+    logger.i("Setting routine");
     if (routines.any((element) => element.id == routine.id)) {
       fixWorkout(routine);
       db.updateRoutine(routine);
@@ -207,33 +189,38 @@ class DatabaseService extends GetxService with ChangeNotifier {
     return history$.value;
   }
 
-  writeAllHistory(List<Workout> history) {
-    db.batch((batch) {
-      batch.logger.i("Importing routines");
-      batch.deleteAll(db.historyWorkouts);
-      batch.insertAll(
-        db.historyWorkouts,
-        routines.toSortedHistoryWorkoutInsertables(),
-      );
-
-      final allExercises = routines
-          .expand((r) => r.exercises)
-          .map((e) => e.map(
-                exercise: (ex) => [ex],
-                superset: (ss) => [ss, ...ss.exercises],
-              ))
-          .expand((e) => e)
-          .toList();
-
-      batch.deleteAll(db.historyWorkoutExercises);
-      batch.insertAll(
-        db.historyWorkoutExercises,
-        allExercises.toSortedHistoryWorkoutInsertables(),
-      );
+  Future writeAllHistory(List<Workout> history) {
+    return db.transaction(() async {
+      await db.batch((batch) {
+        batch.logger.i("Importing routines");
+        batch.deleteAll(db.historyWorkouts);
+        batch.insertAll(
+          db.historyWorkouts,
+          history.toSortedHistoryWorkoutInsertables(),
+        );
+      });
+      await _writeHistoryExercises(history.flattenedExercises);
     });
   }
 
+  Future _writeHistoryExercises(
+      List<WorkoutExercisable> historyWorkoutExercises) async {
+    final historyExerciseInsertables = historyWorkoutExercises
+        .fold(
+          <String, List<WorkoutExercisable>>{},
+          (m, r) {
+            return m..putIfAbsent(r.workoutID!, () => []).add(r);
+          },
+        )
+        .values
+        .expand((list) => list.toSortedInsertables());
+    await db.delete(db.historyWorkoutExercises).go();
+    await db.batch((b) =>
+        b.insertAll(db.historyWorkoutExercises, historyExerciseInsertables));
+  }
+
   Future setHistoryWorkout(Workout workout) async {
+    logger.i("Setting history workout");
     if (workoutHistory.any((element) => element.id == workout.id)) {
       fixWorkout(workout);
       await db.updateHistoryWorkout(workout);
@@ -259,29 +246,25 @@ class DatabaseService extends GetxService with ChangeNotifier {
     return workoutHistory.any((element) => element.id == id);
   }
 
-  _writeWeightMeasurements(List<WeightMeasurement> weightMeasurements) {
-    weightMeasurementsBox.clear().then((_) {
-      weightMeasurementsBox.putAll({
-        for (final measurement in weightMeasurements)
-          measurement.id: measurement,
-      }).then((value) => notifyListeners());
-    });
+  Future _writeWeightMeasurements(List<WeightMeasurement> weightMeasurements) {
+    return db.setWeightMeasurements(weightMeasurements);
   }
 
   getWeightMeasurement(String measurementID) {
-    return weightMeasurementsBox.get(measurementID);
+    return weightMeasurements$.value
+        .firstWhereOrNull((element) => element.id == measurementID);
   }
 
   setWeightMeasurement(WeightMeasurement measurement) {
-    weightMeasurementsBox
-        .put(measurement.id, measurement)
-        .then((value) => notifyListeners());
+    if (getWeightMeasurement(measurement.id) == null) {
+      db.insertWeightMeasurement(measurement);
+    } else {
+      db.updateWeightMeasurement(measurement);
+    }
   }
 
   removeWeightMeasurement(WeightMeasurement measurement) {
-    weightMeasurementsBox
-        .delete(measurement.id)
-        .then((value) => notifyListeners());
+    db.deleteWeightMeasurement(measurement.id);
   }
 
   toJson() {
@@ -293,6 +276,8 @@ class DatabaseService extends GetxService with ChangeNotifier {
       routineExercises: routines.flattenedExercises,
       historyWorkouts: workoutHistory,
       historyWorkoutExercises: workoutHistory.flattenedExercises,
+      preferences: prefs$.value,
+      weightMeasurements: weightMeasurements$.value,
     ));
   }
 
@@ -312,43 +297,13 @@ class DatabaseService extends GetxService with ChangeNotifier {
         await db.clearTheWholeThingIAmAbsolutelySureISwear();
 
         logger.i("Created import transaction");
-        await db.batch(
-          (batch) {
-            batch.logger.i("Importing exercises");
-            batch.insertAll(
-              db.customExercises,
-              [for (final ex in snapshot.customExercises) ex.toInsertable()],
-            );
-          },
-        );
-
-        await db.batch((batch) {
-          batch.logger.i("Importing routines");
-          batch.insertAll(
-            db.routines,
-            snapshot.routines.toSortedRoutineInsertables(),
-          );
-
-          batch.insertAll(
-            db.routineExercises,
-            snapshot.routineExercises.toSortedRoutineExerciseInsertables(),
-          );
-        });
-
-        await db.batch((batch) {
-          batch.logger.i("Importing history");
-
-          batch.insertAll(
-            db.historyWorkouts,
-            snapshot.historyWorkouts.toSortedHistoryWorkoutInsertables(),
-          );
-
-          batch.insertAll(
-            db.historyWorkoutExercises,
-            snapshot.historyWorkoutExercises
-                .toSortedHistoryWorkoutInsertables(),
-          );
-        });
+        await writeExercises(snapshot.customExercises);
+        await _writeRoutines(snapshot.routines);
+        await _writeRoutineExercises(snapshot.routineExercises);
+        await writeAllHistory(snapshot.historyWorkouts);
+        await _writeHistoryExercises(snapshot.historyWorkoutExercises);
+        await db.setPreferences(snapshot.preferences);
+        await _writeWeightMeasurements(snapshot.weightMeasurements);
       });
     }
 
@@ -363,23 +318,95 @@ class DatabaseService extends GetxService with ChangeNotifier {
   void writeToOngoing(Map<String, dynamic> data) {
     logger.i("Requested write of ongoing workout data");
     logger.d("Ongoing data: ${jsonEncode(data)}");
-    ongoingBox.put("data", jsonEncode(data));
+    db.setOngoing(data);
   }
 
   Map<String, dynamic>? getOngoingData() {
     if (!hasOngoing) return null;
-    return jsonDecode(ongoingBox.get("data") ?? "null");
+    return ongoing$.valueOrNull;
   }
 
   void deleteOngoing() {
     logger.i("Requested deletion of ongoing workout data");
-    ongoingBox.delete("data");
+    db.deleteOngoing();
   }
 
-  bool get hasOngoing => ongoingBox.containsKey("data");
+  bool get hasOngoing => ongoing$.valueOrNull != null;
 
   void transaction<T>(Future<T> Function() action) async {
     await db.transaction(action);
+  }
+
+  Future<void> applyExerciseModificationToHistory(Exercise exercise) {
+    final newHistory = history$.value.toList();
+    for (int i = 0; i < newHistory.length; i++) {
+      final workout = newHistory[i];
+
+      final res = workout.exercises.toList();
+      for (int i = 0; i < res.length; i++) {
+        res[i].when(
+          exercise: (e) {
+            if (exercise.isParentOf(e)) {
+              res[i] = Exercise.replaced(from: e, to: exercise).copyWith(
+                id: e.id,
+                parentID: e.parentID,
+              );
+            }
+          },
+          superset: (superset) {
+            for (int j = 0; j < superset.exercises.length; j++) {
+              if (exercise.isParentOf(superset.exercises[j])) {
+                (res[i] as Superset).exercises[j] =
+                    Exercise.replaced(from: superset.exercises[j], to: exercise)
+                        .copyWith(
+                  id: superset.exercises[j].id,
+                  parentID: superset.exercises[j].parentID,
+                );
+              }
+            }
+          },
+        );
+      }
+      newHistory[i] = workout.copyWith.exercises(res);
+    }
+
+    return writeAllHistory(newHistory);
+  }
+
+  Future<void> applyExerciseModificationToRoutines(Exercise exercise) {
+    final newRoutines = routines$.value.toList();
+    for (int i = 0; i < newRoutines.length; i++) {
+      final workout = newRoutines[i];
+
+      final res = workout.exercises.toList();
+      for (int i = 0; i < res.length; i++) {
+        res[i].when(
+          exercise: (e) {
+            if (exercise.isParentOf(e)) {
+              res[i] = Exercise.replaced(from: e, to: exercise).copyWith(
+                id: e.id,
+                parentID: e.parentID,
+              );
+            }
+          },
+          superset: (superset) {
+            for (int j = 0; j < superset.exercises.length; j++) {
+              if (exercise.isParentOf(superset.exercises[j])) {
+                (res[i] as Superset).exercises[j] =
+                    Exercise.replaced(from: superset.exercises[j], to: exercise)
+                        .copyWith(
+                  id: superset.exercises[j].id,
+                  parentID: superset.exercises[j].parentID,
+                );
+              }
+            }
+          },
+        );
+      }
+      newRoutines[i] = workout.copyWith.exercises(res);
+    }
+
+    return setAllRoutines(newRoutines);
   }
 }
 

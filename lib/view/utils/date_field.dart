@@ -6,7 +6,7 @@ import 'package:intl/intl.dart';
 
 class DateField extends StatefulWidget {
   DateField({
-    Key? key,
+    super.key,
     this.decoration,
     required this.date,
     required this.onSelect,
@@ -14,7 +14,7 @@ class DateField extends StatefulWidget {
     this.firstDate,
     this.lastDate,
     this.selectableDayPredicate,
-  }) : super(key: key);
+  });
 
   final InputDecoration? decoration;
   final DateTime date;

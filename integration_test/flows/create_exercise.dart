@@ -80,7 +80,8 @@ Future<void> testCreateExerciseFlow(
   expectExercise(
     ex,
     Exercise.custom(
-      id: "",
+      // We don't care about the ID, just that the data is correct
+      id: ex.id,
       name: "EditedExercise",
       parameters: GTSetParameters.time,
       sets: [],

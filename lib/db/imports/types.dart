@@ -1,7 +1,11 @@
+import 'dart:convert';
+
 import 'package:gymtracker/db/imports/v1.dart';
 import 'package:gymtracker/db/imports/v2.dart';
 import 'package:gymtracker/model/exercisable.dart';
 import 'package:gymtracker/model/exercise.dart';
+import 'package:gymtracker/model/measurements.dart';
+import 'package:gymtracker/model/preferences.dart';
 import 'package:gymtracker/model/workout.dart';
 
 const converters = {
@@ -34,6 +38,8 @@ class DatabaseSnapshot {
   final List<WorkoutExercisable> routineExercises;
   final List<Workout> historyWorkouts;
   final List<WorkoutExercisable> historyWorkoutExercises;
+  final Prefs preferences;
+  final List<WeightMeasurement> weightMeasurements;
 
   const DatabaseSnapshot({
     required this.customExercises,
@@ -41,5 +47,20 @@ class DatabaseSnapshot {
     required this.routineExercises,
     required this.historyWorkouts,
     required this.historyWorkoutExercises,
+    required this.preferences,
+    required this.weightMeasurements,
   });
+
+  @override
+  String toString() {
+    return """DatabaseSnapshot(
+  customExercises: ${jsonEncode(customExercises)},
+  routines: ${jsonEncode(routines)},
+  routineExercises: ${jsonEncode(routineExercises)},
+  historyWorkouts: ${jsonEncode(historyWorkouts)},
+  historyWorkoutExercises: ${jsonEncode(historyWorkoutExercises)},
+  preferences: ${jsonEncode(preferences.toJson())},
+  weightMeasurements: ${jsonEncode(weightMeasurements)},
+)""";
+  }
 }

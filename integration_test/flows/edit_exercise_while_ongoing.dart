@@ -54,7 +54,7 @@ Future<void> testEditExerciseWhileWorkoutIsOngoingFlow(
 
   print("Edited database state: ${databaseService.toJson()}");
   expect(Get.find<ExercisesController>().exercises.isNotEmpty, true);
-  expectExercise(
+  expectAbstractExercise(
       Get.find<ExercisesController>().exercises.single, baseExercise);
 
   await tester
@@ -159,7 +159,7 @@ Future<void> testEditExerciseWhileWorkoutIsOngoingFlow(
 
   // Check that our changes have been saved
   var ex = databaseService.exercises.first;
-  expectExercise(
+  expectAbstractExercise(
     ex,
     Exercise.custom(
       id: baseExercise.id,
@@ -169,7 +169,7 @@ Future<void> testEditExerciseWhileWorkoutIsOngoingFlow(
       primaryMuscleGroup: GTMuscleGroup.chest,
       secondaryMuscleGroups: {GTMuscleGroup.triceps},
       restTime: Duration.zero,
-      notes: "Base Notes",
+      notes: "",
       workoutID: null,
       supersetID: null,
     ),

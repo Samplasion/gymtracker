@@ -56,6 +56,11 @@ class Superset extends WorkoutExercisable {
         'type': 'superset',
       };
 
+  @override
+  String toString() {
+    return 'Superset${toJson()}';
+  }
+
   Superset clone() => Superset.fromJson(toJson());
 
   void regenerateID() => id = const Uuid().v4();

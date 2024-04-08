@@ -16,32 +16,41 @@ import 'package:gymtracker/view/utils/workout_done.dart';
 import 'package:gymtracker/view/workout.dart';
 import 'package:gymtracker/view/workout_editor.dart';
 
-Workout get baseRoutine => Workout(
-      name: "Test Routine",
-      exercises: [
-        exerciseStandardLibrary["library.abs.name".t]!.exercises.first.copyWith(
-          restTime: const Duration(minutes: 1),
-          sets: [
-            GTSet(
-              reps: 10,
-              kind: GTSetKind.normal,
-              parameters: GTSetParameters.freeBodyReps,
-            ),
-            GTSet(
-              reps: 10,
-              kind: GTSetKind.normal,
-              parameters: GTSetParameters.freeBodyReps,
-            ),
-            GTSet(
-              reps: 10,
-              kind: GTSetKind.normal,
-              parameters: GTSetParameters.freeBodyReps,
-            ),
-          ],
-        ),
-      ],
-      infobox: "Inject",
-    );
+Workout get baseRoutine {
+  final libEx = exerciseStandardLibrary["library.abs.name".t]!.exercises.first;
+  final baseRoutine = Workout(
+    name: "Test Routine",
+    id: "test-routine",
+    exercises: [
+      libEx.copyWith(
+        parentID: libEx.id,
+        workoutID: "test-routine",
+        restTime: const Duration(minutes: 1),
+        sets: [
+          GTSet(
+            reps: 10,
+            kind: GTSetKind.normal,
+            parameters: GTSetParameters.freeBodyReps,
+          ),
+          GTSet(
+            reps: 10,
+            kind: GTSetKind.normal,
+            parameters: GTSetParameters.freeBodyReps,
+          ),
+          GTSet(
+            reps: 10,
+            kind: GTSetKind.normal,
+            parameters: GTSetParameters.freeBodyReps,
+          ),
+        ],
+      ),
+    ],
+    infobox: "Inject",
+  );
+  baseRoutine.exercises.first = (baseRoutine.exercises.first as Exercise)
+      .instantiate(workout: baseRoutine);
+  return baseRoutine;
+}
 
 Future<void> testEditWorkoutFlow(
   WidgetTester tester,

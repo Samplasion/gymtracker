@@ -66,3 +66,49 @@ abstract class LinkedExerciseBase extends Table {
   TextColumn get supersetId;
   IntColumn get sortOrder => integer()();
 }
+
+class ConcreteExercise {
+  final String id;
+  final String routineId;
+  final String name;
+  final GTSetParameters? parameters;
+  final List<GTSet>? sets;
+  final GTMuscleGroup? primaryMuscleGroup;
+  final Set<GTMuscleGroup>? secondaryMuscleGroups;
+  final int? restTime;
+  final bool isCustom;
+  final String? libraryExerciseId;
+  final String? customExerciseId;
+  final String? notes;
+  final bool isSuperset;
+  final bool isInSuperset;
+  final String? supersetId;
+  final int sortOrder;
+
+  const ConcreteExercise({
+    required this.id,
+    required this.routineId,
+    required this.name,
+    required this.parameters,
+    required this.sets,
+    required this.primaryMuscleGroup,
+    required this.secondaryMuscleGroups,
+    required this.restTime,
+    required this.isCustom,
+    required this.libraryExerciseId,
+    required this.customExerciseId,
+    required this.notes,
+    required this.isSuperset,
+    required this.isInSuperset,
+    required this.supersetId,
+    required this.sortOrder,
+  })  : assert(
+            isSuperset
+                ? true
+                : isCustom
+                    ? customExerciseId != null
+                    : libraryExerciseId != null,
+            "Concrete exercises must have a parent ID (ID: $id)"),
+        assert(isInSuperset ? supersetId != null : true,
+            "If isInSuperset is true, supersetId must be set (ID: $id)");
+}

@@ -31,12 +31,10 @@ class Streaks {
     final keys = mappedDays.keys.toList();
     keys.sort();
 
-    keys.logger.t("");
-
     today = today.startOfDay;
     var lastMonday = getLastDayOfWeek(today, firstDayOfWeek);
 
-    lastMonday.logger.t("");
+    globalLogger.t("Last first-DOW: $lastMonday");
 
     while (true) {
       if (keys.any((element) =>

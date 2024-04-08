@@ -1,7 +1,10 @@
 import 'package:gymtracker/db/imports/types.dart';
 import 'package:gymtracker/model/exercisable.dart';
 import 'package:gymtracker/model/exercise.dart';
+import 'package:gymtracker/model/measurements.dart';
+import 'package:gymtracker/model/preferences.dart';
 import 'package:gymtracker/model/workout.dart';
+import 'package:gymtracker/service/logger.dart';
 
 class VersionedJsonImportV2 extends VersionedJsonImportBase {
   @override
@@ -30,7 +33,12 @@ class VersionedJsonImportV2 extends VersionedJsonImportBase {
         for (final exercise in json['workoutExercises'])
           WorkoutExercisable.fromJson(exercise)
       ],
-    );
+      preferences: Prefs.fromJson(json['preferences']),
+      weightMeasurements: [
+        for (final weight in json['weightMeasurements'])
+          WeightMeasurement.fromJson(weight)
+      ],
+    )..logger.d("Importing");
   }
 
   @override
@@ -38,14 +46,22 @@ class VersionedJsonImportV2 extends VersionedJsonImportBase {
     return {
       'version': version,
       'customExercises': [for (final ex in data.customExercises) ex.toJson()],
-      'routines': [for (final routine in data.routines) routine.toJson()],
+      'routines': [
+        for (final routine in data.routines)
+          routine.copyWith.exercises([]).toJson()
+      ],
       'routineExercises': [for (final ex in data.routineExercises) ex.toJson()],
       'workouts': [
-        for (final workout in data.historyWorkouts) workout.toJson()
+        for (final workout in data.historyWorkouts)
+          workout.copyWith.exercises([]).toJson()
       ],
       'workoutExercises': [
         for (final ex in data.historyWorkoutExercises) ex.toJson()
       ],
+      'preferences': data.preferences.toJson(),
+      'weightMeasurements': [
+        for (final weight in data.weightMeasurements) weight.toJson()
+      ]
     };
   }
 }

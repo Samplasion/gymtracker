@@ -11,6 +11,7 @@ import 'package:get/get.dart';
 import 'package:gymtracker/controller/coordinator.dart';
 import 'package:gymtracker/controller/debug_controller.dart';
 import 'package:gymtracker/controller/settings_controller.dart';
+import 'package:gymtracker/model/preferences.dart';
 import 'package:gymtracker/service/color.dart';
 import 'package:gymtracker/service/database.dart';
 import 'package:gymtracker/service/localizations.dart';
@@ -111,7 +112,8 @@ class MainApp extends StatelessWidget {
                         translations: localizations,
                         locale: () {
                           logger.d("Locale: ${settings.locale.value}");
-                          return settings.locale.value;
+                          return settings.locale.value ??
+                              Prefs.defaultValue.locale;
                         }(),
                         supportedLocales: GTLocalizations.supportedLocales,
                         fallbackLocale: const Locale('en'),
@@ -183,8 +185,10 @@ class __LoaderState extends State<_Loader> {
   @override
   void initState() {
     super.initState();
-    SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
-      Go.off(() => const SkeletonView());
+    Get.find<SettingsController>().awaitInitialized().then((_) {
+      SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
+        Go.off(() => const SkeletonView());
+      });
     });
   }
 

@@ -191,7 +191,7 @@ class _ExerciseCreatorState extends State<ExerciseCreator> {
                         ).copyWith(top: 0),
                         child: c,
                       ))
-                  .toList(),
+                  ,
             ],
           ),
         ),

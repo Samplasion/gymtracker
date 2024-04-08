@@ -62,7 +62,7 @@ class _MeStatisticsPageState
       volume += Weights.convert(
         value: workout.liftedWeight,
         from: workout.weightUnit,
-        to: settingsController.weightUnit.value!,
+        to: settingsController.weightUnit.value,
       );
       sets += workout.doneSets.length;
       distance += Distance.convert(
@@ -161,7 +161,7 @@ class _MeStatisticsPageState
                                 locale: Get.locale!.languageCode)
                             .format(value),
                         "unit":
-                            "units.${settingsController.weightUnit.value!.name}"
+                            "units.${settingsController.weightUnit.value.name}"
                                 .t,
                       }),
                     ),

@@ -30,6 +30,7 @@ class HistoryWorkouts extends Table {
       ];
 }
 
+@UseRowClass(ConcreteExercise)
 class HistoryWorkoutExercises extends LinkedExerciseBase {
   @override
   TextColumn get routineId => text().references(HistoryWorkouts, #id)();

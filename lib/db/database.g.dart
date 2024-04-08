@@ -1202,7 +1202,7 @@ class HistoryWorkoutsCompanion extends UpdateCompanion<HistoryWorkout> {
 }
 
 class $HistoryWorkoutExercisesTable extends HistoryWorkoutExercises
-    with TableInfo<$HistoryWorkoutExercisesTable, HistoryWorkoutExercise> {
+    with TableInfo<$HistoryWorkoutExercisesTable, ConcreteExercise> {
   @override
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
@@ -1354,8 +1354,7 @@ class $HistoryWorkoutExercisesTable extends HistoryWorkoutExercises
   String get actualTableName => $name;
   static const String $name = 'history_workout_exercises';
   @override
-  VerificationContext validateIntegrity(
-      Insertable<HistoryWorkoutExercise> instance,
+  VerificationContext validateIntegrity(Insertable<ConcreteExercise> instance,
       {bool isInserting = false}) {
     final context = VerificationContext();
     final data = instance.toColumns(true);
@@ -1439,9 +1438,9 @@ class $HistoryWorkoutExercisesTable extends HistoryWorkoutExercises
   @override
   Set<GeneratedColumn> get $primaryKey => {id};
   @override
-  HistoryWorkoutExercise map(Map<String, dynamic> data, {String? tablePrefix}) {
+  ConcreteExercise map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
-    return HistoryWorkoutExercise(
+    return ConcreteExercise(
       id: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}id'])!,
       routineId: attachedDatabase.typeMapping
@@ -1511,288 +1510,8 @@ class $HistoryWorkoutExercisesTable extends HistoryWorkoutExercises
       NullAwareTypeConverter.wrap($convertersecondaryMuscleGroups);
 }
 
-class HistoryWorkoutExercise extends DataClass
-    implements Insertable<HistoryWorkoutExercise> {
-  final String id;
-  final String routineId;
-  final String name;
-  final GTSetParameters? parameters;
-  final List<GTSet>? sets;
-  final GTMuscleGroup? primaryMuscleGroup;
-  final Set<GTMuscleGroup>? secondaryMuscleGroups;
-  final int? restTime;
-  final bool isCustom;
-  final String? libraryExerciseId;
-  final String? customExerciseId;
-  final String? notes;
-  final bool isSuperset;
-  final bool isInSuperset;
-  final String? supersetId;
-  final int sortOrder;
-  const HistoryWorkoutExercise(
-      {required this.id,
-      required this.routineId,
-      required this.name,
-      this.parameters,
-      this.sets,
-      this.primaryMuscleGroup,
-      this.secondaryMuscleGroups,
-      this.restTime,
-      required this.isCustom,
-      this.libraryExerciseId,
-      this.customExerciseId,
-      this.notes,
-      required this.isSuperset,
-      required this.isInSuperset,
-      this.supersetId,
-      required this.sortOrder});
-  @override
-  Map<String, Expression> toColumns(bool nullToAbsent) {
-    final map = <String, Expression>{};
-    map['id'] = Variable<String>(id);
-    map['routine_id'] = Variable<String>(routineId);
-    map['name'] = Variable<String>(name);
-    if (!nullToAbsent || parameters != null) {
-      map['parameters'] = Variable<String>($HistoryWorkoutExercisesTable
-          .$converterparametersn
-          .toSql(parameters));
-    }
-    if (!nullToAbsent || sets != null) {
-      map['sets'] = Variable<String>(
-          $HistoryWorkoutExercisesTable.$convertersetsn.toSql(sets));
-    }
-    if (!nullToAbsent || primaryMuscleGroup != null) {
-      map['primary_muscle_group'] = Variable<String>(
-          $HistoryWorkoutExercisesTable.$converterprimaryMuscleGroupn
-              .toSql(primaryMuscleGroup));
-    }
-    if (!nullToAbsent || secondaryMuscleGroups != null) {
-      map['secondary_muscle_groups'] = Variable<String>(
-          $HistoryWorkoutExercisesTable.$convertersecondaryMuscleGroupsn
-              .toSql(secondaryMuscleGroups));
-    }
-    if (!nullToAbsent || restTime != null) {
-      map['rest_time'] = Variable<int>(restTime);
-    }
-    map['is_custom'] = Variable<bool>(isCustom);
-    if (!nullToAbsent || libraryExerciseId != null) {
-      map['library_exercise_id'] = Variable<String>(libraryExerciseId);
-    }
-    if (!nullToAbsent || customExerciseId != null) {
-      map['custom_exercise_id'] = Variable<String>(customExerciseId);
-    }
-    if (!nullToAbsent || notes != null) {
-      map['notes'] = Variable<String>(notes);
-    }
-    map['is_superset'] = Variable<bool>(isSuperset);
-    map['is_in_superset'] = Variable<bool>(isInSuperset);
-    if (!nullToAbsent || supersetId != null) {
-      map['superset_id'] = Variable<String>(supersetId);
-    }
-    map['sort_order'] = Variable<int>(sortOrder);
-    return map;
-  }
-
-  HistoryWorkoutExercisesCompanion toCompanion(bool nullToAbsent) {
-    return HistoryWorkoutExercisesCompanion(
-      id: Value(id),
-      routineId: Value(routineId),
-      name: Value(name),
-      parameters: parameters == null && nullToAbsent
-          ? const Value.absent()
-          : Value(parameters),
-      sets: sets == null && nullToAbsent ? const Value.absent() : Value(sets),
-      primaryMuscleGroup: primaryMuscleGroup == null && nullToAbsent
-          ? const Value.absent()
-          : Value(primaryMuscleGroup),
-      secondaryMuscleGroups: secondaryMuscleGroups == null && nullToAbsent
-          ? const Value.absent()
-          : Value(secondaryMuscleGroups),
-      restTime: restTime == null && nullToAbsent
-          ? const Value.absent()
-          : Value(restTime),
-      isCustom: Value(isCustom),
-      libraryExerciseId: libraryExerciseId == null && nullToAbsent
-          ? const Value.absent()
-          : Value(libraryExerciseId),
-      customExerciseId: customExerciseId == null && nullToAbsent
-          ? const Value.absent()
-          : Value(customExerciseId),
-      notes:
-          notes == null && nullToAbsent ? const Value.absent() : Value(notes),
-      isSuperset: Value(isSuperset),
-      isInSuperset: Value(isInSuperset),
-      supersetId: supersetId == null && nullToAbsent
-          ? const Value.absent()
-          : Value(supersetId),
-      sortOrder: Value(sortOrder),
-    );
-  }
-
-  factory HistoryWorkoutExercise.fromJson(Map<String, dynamic> json,
-      {ValueSerializer? serializer}) {
-    serializer ??= driftRuntimeOptions.defaultSerializer;
-    return HistoryWorkoutExercise(
-      id: serializer.fromJson<String>(json['id']),
-      routineId: serializer.fromJson<String>(json['routineId']),
-      name: serializer.fromJson<String>(json['name']),
-      parameters: $HistoryWorkoutExercisesTable.$converterparametersn
-          .fromJson(serializer.fromJson<String?>(json['parameters'])),
-      sets: serializer.fromJson<List<GTSet>?>(json['sets']),
-      primaryMuscleGroup: $HistoryWorkoutExercisesTable
-          .$converterprimaryMuscleGroupn
-          .fromJson(serializer.fromJson<String?>(json['primaryMuscleGroup'])),
-      secondaryMuscleGroups: serializer
-          .fromJson<Set<GTMuscleGroup>?>(json['secondaryMuscleGroups']),
-      restTime: serializer.fromJson<int?>(json['restTime']),
-      isCustom: serializer.fromJson<bool>(json['isCustom']),
-      libraryExerciseId:
-          serializer.fromJson<String?>(json['libraryExerciseId']),
-      customExerciseId: serializer.fromJson<String?>(json['customExerciseId']),
-      notes: serializer.fromJson<String?>(json['notes']),
-      isSuperset: serializer.fromJson<bool>(json['isSuperset']),
-      isInSuperset: serializer.fromJson<bool>(json['isInSuperset']),
-      supersetId: serializer.fromJson<String?>(json['supersetId']),
-      sortOrder: serializer.fromJson<int>(json['sortOrder']),
-    );
-  }
-  @override
-  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
-    serializer ??= driftRuntimeOptions.defaultSerializer;
-    return <String, dynamic>{
-      'id': serializer.toJson<String>(id),
-      'routineId': serializer.toJson<String>(routineId),
-      'name': serializer.toJson<String>(name),
-      'parameters': serializer.toJson<String?>($HistoryWorkoutExercisesTable
-          .$converterparametersn
-          .toJson(parameters)),
-      'sets': serializer.toJson<List<GTSet>?>(sets),
-      'primaryMuscleGroup': serializer.toJson<String?>(
-          $HistoryWorkoutExercisesTable.$converterprimaryMuscleGroupn
-              .toJson(primaryMuscleGroup)),
-      'secondaryMuscleGroups':
-          serializer.toJson<Set<GTMuscleGroup>?>(secondaryMuscleGroups),
-      'restTime': serializer.toJson<int?>(restTime),
-      'isCustom': serializer.toJson<bool>(isCustom),
-      'libraryExerciseId': serializer.toJson<String?>(libraryExerciseId),
-      'customExerciseId': serializer.toJson<String?>(customExerciseId),
-      'notes': serializer.toJson<String?>(notes),
-      'isSuperset': serializer.toJson<bool>(isSuperset),
-      'isInSuperset': serializer.toJson<bool>(isInSuperset),
-      'supersetId': serializer.toJson<String?>(supersetId),
-      'sortOrder': serializer.toJson<int>(sortOrder),
-    };
-  }
-
-  HistoryWorkoutExercise copyWith(
-          {String? id,
-          String? routineId,
-          String? name,
-          Value<GTSetParameters?> parameters = const Value.absent(),
-          Value<List<GTSet>?> sets = const Value.absent(),
-          Value<GTMuscleGroup?> primaryMuscleGroup = const Value.absent(),
-          Value<Set<GTMuscleGroup>?> secondaryMuscleGroups =
-              const Value.absent(),
-          Value<int?> restTime = const Value.absent(),
-          bool? isCustom,
-          Value<String?> libraryExerciseId = const Value.absent(),
-          Value<String?> customExerciseId = const Value.absent(),
-          Value<String?> notes = const Value.absent(),
-          bool? isSuperset,
-          bool? isInSuperset,
-          Value<String?> supersetId = const Value.absent(),
-          int? sortOrder}) =>
-      HistoryWorkoutExercise(
-        id: id ?? this.id,
-        routineId: routineId ?? this.routineId,
-        name: name ?? this.name,
-        parameters: parameters.present ? parameters.value : this.parameters,
-        sets: sets.present ? sets.value : this.sets,
-        primaryMuscleGroup: primaryMuscleGroup.present
-            ? primaryMuscleGroup.value
-            : this.primaryMuscleGroup,
-        secondaryMuscleGroups: secondaryMuscleGroups.present
-            ? secondaryMuscleGroups.value
-            : this.secondaryMuscleGroups,
-        restTime: restTime.present ? restTime.value : this.restTime,
-        isCustom: isCustom ?? this.isCustom,
-        libraryExerciseId: libraryExerciseId.present
-            ? libraryExerciseId.value
-            : this.libraryExerciseId,
-        customExerciseId: customExerciseId.present
-            ? customExerciseId.value
-            : this.customExerciseId,
-        notes: notes.present ? notes.value : this.notes,
-        isSuperset: isSuperset ?? this.isSuperset,
-        isInSuperset: isInSuperset ?? this.isInSuperset,
-        supersetId: supersetId.present ? supersetId.value : this.supersetId,
-        sortOrder: sortOrder ?? this.sortOrder,
-      );
-  @override
-  String toString() {
-    return (StringBuffer('HistoryWorkoutExercise(')
-          ..write('id: $id, ')
-          ..write('routineId: $routineId, ')
-          ..write('name: $name, ')
-          ..write('parameters: $parameters, ')
-          ..write('sets: $sets, ')
-          ..write('primaryMuscleGroup: $primaryMuscleGroup, ')
-          ..write('secondaryMuscleGroups: $secondaryMuscleGroups, ')
-          ..write('restTime: $restTime, ')
-          ..write('isCustom: $isCustom, ')
-          ..write('libraryExerciseId: $libraryExerciseId, ')
-          ..write('customExerciseId: $customExerciseId, ')
-          ..write('notes: $notes, ')
-          ..write('isSuperset: $isSuperset, ')
-          ..write('isInSuperset: $isInSuperset, ')
-          ..write('supersetId: $supersetId, ')
-          ..write('sortOrder: $sortOrder')
-          ..write(')'))
-        .toString();
-  }
-
-  @override
-  int get hashCode => Object.hash(
-      id,
-      routineId,
-      name,
-      parameters,
-      sets,
-      primaryMuscleGroup,
-      secondaryMuscleGroups,
-      restTime,
-      isCustom,
-      libraryExerciseId,
-      customExerciseId,
-      notes,
-      isSuperset,
-      isInSuperset,
-      supersetId,
-      sortOrder);
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      (other is HistoryWorkoutExercise &&
-          other.id == this.id &&
-          other.routineId == this.routineId &&
-          other.name == this.name &&
-          other.parameters == this.parameters &&
-          other.sets == this.sets &&
-          other.primaryMuscleGroup == this.primaryMuscleGroup &&
-          other.secondaryMuscleGroups == this.secondaryMuscleGroups &&
-          other.restTime == this.restTime &&
-          other.isCustom == this.isCustom &&
-          other.libraryExerciseId == this.libraryExerciseId &&
-          other.customExerciseId == this.customExerciseId &&
-          other.notes == this.notes &&
-          other.isSuperset == this.isSuperset &&
-          other.isInSuperset == this.isInSuperset &&
-          other.supersetId == this.supersetId &&
-          other.sortOrder == this.sortOrder);
-}
-
 class HistoryWorkoutExercisesCompanion
-    extends UpdateCompanion<HistoryWorkoutExercise> {
+    extends UpdateCompanion<ConcreteExercise> {
   final Value<String> id;
   final Value<String> routineId;
   final Value<String> name;
@@ -1853,7 +1572,7 @@ class HistoryWorkoutExercisesCompanion
         isSuperset = Value(isSuperset),
         isInSuperset = Value(isInSuperset),
         sortOrder = Value(sortOrder);
-  static Insertable<HistoryWorkoutExercise> custom({
+  static Insertable<ConcreteExercise> custom({
     Expression<String>? id,
     Expression<String>? routineId,
     Expression<String>? name,
@@ -2025,7 +1744,7 @@ class HistoryWorkoutExercisesCompanion
 }
 
 class $RoutineExercisesTable extends RoutineExercises
-    with TableInfo<$RoutineExercisesTable, RoutineExercise> {
+    with TableInfo<$RoutineExercisesTable, ConcreteExercise> {
   @override
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
@@ -2176,7 +1895,7 @@ class $RoutineExercisesTable extends RoutineExercises
   String get actualTableName => $name;
   static const String $name = 'routine_exercises';
   @override
-  VerificationContext validateIntegrity(Insertable<RoutineExercise> instance,
+  VerificationContext validateIntegrity(Insertable<ConcreteExercise> instance,
       {bool isInserting = false}) {
     final context = VerificationContext();
     final data = instance.toColumns(true);
@@ -2260,9 +1979,9 @@ class $RoutineExercisesTable extends RoutineExercises
   @override
   Set<GeneratedColumn> get $primaryKey => {id};
   @override
-  RoutineExercise map(Map<String, dynamic> data, {String? tablePrefix}) {
+  ConcreteExercise map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
-    return RoutineExercise(
+    return ConcreteExercise(
       id: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}id'])!,
       routineId: attachedDatabase.typeMapping
@@ -2331,283 +2050,7 @@ class $RoutineExercisesTable extends RoutineExercises
       NullAwareTypeConverter.wrap($convertersecondaryMuscleGroups);
 }
 
-class RoutineExercise extends DataClass implements Insertable<RoutineExercise> {
-  final String id;
-  final String routineId;
-  final String name;
-  final GTSetParameters? parameters;
-  final List<GTSet>? sets;
-  final GTMuscleGroup? primaryMuscleGroup;
-  final Set<GTMuscleGroup>? secondaryMuscleGroups;
-  final int? restTime;
-  final bool isCustom;
-  final String? libraryExerciseId;
-  final String? customExerciseId;
-  final String? notes;
-  final bool isSuperset;
-  final bool isInSuperset;
-  final String? supersetId;
-  final int sortOrder;
-  const RoutineExercise(
-      {required this.id,
-      required this.routineId,
-      required this.name,
-      this.parameters,
-      this.sets,
-      this.primaryMuscleGroup,
-      this.secondaryMuscleGroups,
-      this.restTime,
-      required this.isCustom,
-      this.libraryExerciseId,
-      this.customExerciseId,
-      this.notes,
-      required this.isSuperset,
-      required this.isInSuperset,
-      this.supersetId,
-      required this.sortOrder});
-  @override
-  Map<String, Expression> toColumns(bool nullToAbsent) {
-    final map = <String, Expression>{};
-    map['id'] = Variable<String>(id);
-    map['routine_id'] = Variable<String>(routineId);
-    map['name'] = Variable<String>(name);
-    if (!nullToAbsent || parameters != null) {
-      map['parameters'] = Variable<String>(
-          $RoutineExercisesTable.$converterparametersn.toSql(parameters));
-    }
-    if (!nullToAbsent || sets != null) {
-      map['sets'] =
-          Variable<String>($RoutineExercisesTable.$convertersetsn.toSql(sets));
-    }
-    if (!nullToAbsent || primaryMuscleGroup != null) {
-      map['primary_muscle_group'] = Variable<String>($RoutineExercisesTable
-          .$converterprimaryMuscleGroupn
-          .toSql(primaryMuscleGroup));
-    }
-    if (!nullToAbsent || secondaryMuscleGroups != null) {
-      map['secondary_muscle_groups'] = Variable<String>($RoutineExercisesTable
-          .$convertersecondaryMuscleGroupsn
-          .toSql(secondaryMuscleGroups));
-    }
-    if (!nullToAbsent || restTime != null) {
-      map['rest_time'] = Variable<int>(restTime);
-    }
-    map['is_custom'] = Variable<bool>(isCustom);
-    if (!nullToAbsent || libraryExerciseId != null) {
-      map['library_exercise_id'] = Variable<String>(libraryExerciseId);
-    }
-    if (!nullToAbsent || customExerciseId != null) {
-      map['custom_exercise_id'] = Variable<String>(customExerciseId);
-    }
-    if (!nullToAbsent || notes != null) {
-      map['notes'] = Variable<String>(notes);
-    }
-    map['is_superset'] = Variable<bool>(isSuperset);
-    map['is_in_superset'] = Variable<bool>(isInSuperset);
-    if (!nullToAbsent || supersetId != null) {
-      map['superset_id'] = Variable<String>(supersetId);
-    }
-    map['sort_order'] = Variable<int>(sortOrder);
-    return map;
-  }
-
-  RoutineExercisesCompanion toCompanion(bool nullToAbsent) {
-    return RoutineExercisesCompanion(
-      id: Value(id),
-      routineId: Value(routineId),
-      name: Value(name),
-      parameters: parameters == null && nullToAbsent
-          ? const Value.absent()
-          : Value(parameters),
-      sets: sets == null && nullToAbsent ? const Value.absent() : Value(sets),
-      primaryMuscleGroup: primaryMuscleGroup == null && nullToAbsent
-          ? const Value.absent()
-          : Value(primaryMuscleGroup),
-      secondaryMuscleGroups: secondaryMuscleGroups == null && nullToAbsent
-          ? const Value.absent()
-          : Value(secondaryMuscleGroups),
-      restTime: restTime == null && nullToAbsent
-          ? const Value.absent()
-          : Value(restTime),
-      isCustom: Value(isCustom),
-      libraryExerciseId: libraryExerciseId == null && nullToAbsent
-          ? const Value.absent()
-          : Value(libraryExerciseId),
-      customExerciseId: customExerciseId == null && nullToAbsent
-          ? const Value.absent()
-          : Value(customExerciseId),
-      notes:
-          notes == null && nullToAbsent ? const Value.absent() : Value(notes),
-      isSuperset: Value(isSuperset),
-      isInSuperset: Value(isInSuperset),
-      supersetId: supersetId == null && nullToAbsent
-          ? const Value.absent()
-          : Value(supersetId),
-      sortOrder: Value(sortOrder),
-    );
-  }
-
-  factory RoutineExercise.fromJson(Map<String, dynamic> json,
-      {ValueSerializer? serializer}) {
-    serializer ??= driftRuntimeOptions.defaultSerializer;
-    return RoutineExercise(
-      id: serializer.fromJson<String>(json['id']),
-      routineId: serializer.fromJson<String>(json['routineId']),
-      name: serializer.fromJson<String>(json['name']),
-      parameters: $RoutineExercisesTable.$converterparametersn
-          .fromJson(serializer.fromJson<String?>(json['parameters'])),
-      sets: serializer.fromJson<List<GTSet>?>(json['sets']),
-      primaryMuscleGroup: $RoutineExercisesTable.$converterprimaryMuscleGroupn
-          .fromJson(serializer.fromJson<String?>(json['primaryMuscleGroup'])),
-      secondaryMuscleGroups: serializer
-          .fromJson<Set<GTMuscleGroup>?>(json['secondaryMuscleGroups']),
-      restTime: serializer.fromJson<int?>(json['restTime']),
-      isCustom: serializer.fromJson<bool>(json['isCustom']),
-      libraryExerciseId:
-          serializer.fromJson<String?>(json['libraryExerciseId']),
-      customExerciseId: serializer.fromJson<String?>(json['customExerciseId']),
-      notes: serializer.fromJson<String?>(json['notes']),
-      isSuperset: serializer.fromJson<bool>(json['isSuperset']),
-      isInSuperset: serializer.fromJson<bool>(json['isInSuperset']),
-      supersetId: serializer.fromJson<String?>(json['supersetId']),
-      sortOrder: serializer.fromJson<int>(json['sortOrder']),
-    );
-  }
-  @override
-  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
-    serializer ??= driftRuntimeOptions.defaultSerializer;
-    return <String, dynamic>{
-      'id': serializer.toJson<String>(id),
-      'routineId': serializer.toJson<String>(routineId),
-      'name': serializer.toJson<String>(name),
-      'parameters': serializer.toJson<String?>(
-          $RoutineExercisesTable.$converterparametersn.toJson(parameters)),
-      'sets': serializer.toJson<List<GTSet>?>(sets),
-      'primaryMuscleGroup': serializer.toJson<String?>($RoutineExercisesTable
-          .$converterprimaryMuscleGroupn
-          .toJson(primaryMuscleGroup)),
-      'secondaryMuscleGroups':
-          serializer.toJson<Set<GTMuscleGroup>?>(secondaryMuscleGroups),
-      'restTime': serializer.toJson<int?>(restTime),
-      'isCustom': serializer.toJson<bool>(isCustom),
-      'libraryExerciseId': serializer.toJson<String?>(libraryExerciseId),
-      'customExerciseId': serializer.toJson<String?>(customExerciseId),
-      'notes': serializer.toJson<String?>(notes),
-      'isSuperset': serializer.toJson<bool>(isSuperset),
-      'isInSuperset': serializer.toJson<bool>(isInSuperset),
-      'supersetId': serializer.toJson<String?>(supersetId),
-      'sortOrder': serializer.toJson<int>(sortOrder),
-    };
-  }
-
-  RoutineExercise copyWith(
-          {String? id,
-          String? routineId,
-          String? name,
-          Value<GTSetParameters?> parameters = const Value.absent(),
-          Value<List<GTSet>?> sets = const Value.absent(),
-          Value<GTMuscleGroup?> primaryMuscleGroup = const Value.absent(),
-          Value<Set<GTMuscleGroup>?> secondaryMuscleGroups =
-              const Value.absent(),
-          Value<int?> restTime = const Value.absent(),
-          bool? isCustom,
-          Value<String?> libraryExerciseId = const Value.absent(),
-          Value<String?> customExerciseId = const Value.absent(),
-          Value<String?> notes = const Value.absent(),
-          bool? isSuperset,
-          bool? isInSuperset,
-          Value<String?> supersetId = const Value.absent(),
-          int? sortOrder}) =>
-      RoutineExercise(
-        id: id ?? this.id,
-        routineId: routineId ?? this.routineId,
-        name: name ?? this.name,
-        parameters: parameters.present ? parameters.value : this.parameters,
-        sets: sets.present ? sets.value : this.sets,
-        primaryMuscleGroup: primaryMuscleGroup.present
-            ? primaryMuscleGroup.value
-            : this.primaryMuscleGroup,
-        secondaryMuscleGroups: secondaryMuscleGroups.present
-            ? secondaryMuscleGroups.value
-            : this.secondaryMuscleGroups,
-        restTime: restTime.present ? restTime.value : this.restTime,
-        isCustom: isCustom ?? this.isCustom,
-        libraryExerciseId: libraryExerciseId.present
-            ? libraryExerciseId.value
-            : this.libraryExerciseId,
-        customExerciseId: customExerciseId.present
-            ? customExerciseId.value
-            : this.customExerciseId,
-        notes: notes.present ? notes.value : this.notes,
-        isSuperset: isSuperset ?? this.isSuperset,
-        isInSuperset: isInSuperset ?? this.isInSuperset,
-        supersetId: supersetId.present ? supersetId.value : this.supersetId,
-        sortOrder: sortOrder ?? this.sortOrder,
-      );
-  @override
-  String toString() {
-    return (StringBuffer('RoutineExercise(')
-          ..write('id: $id, ')
-          ..write('routineId: $routineId, ')
-          ..write('name: $name, ')
-          ..write('parameters: $parameters, ')
-          ..write('sets: $sets, ')
-          ..write('primaryMuscleGroup: $primaryMuscleGroup, ')
-          ..write('secondaryMuscleGroups: $secondaryMuscleGroups, ')
-          ..write('restTime: $restTime, ')
-          ..write('isCustom: $isCustom, ')
-          ..write('libraryExerciseId: $libraryExerciseId, ')
-          ..write('customExerciseId: $customExerciseId, ')
-          ..write('notes: $notes, ')
-          ..write('isSuperset: $isSuperset, ')
-          ..write('isInSuperset: $isInSuperset, ')
-          ..write('supersetId: $supersetId, ')
-          ..write('sortOrder: $sortOrder')
-          ..write(')'))
-        .toString();
-  }
-
-  @override
-  int get hashCode => Object.hash(
-      id,
-      routineId,
-      name,
-      parameters,
-      sets,
-      primaryMuscleGroup,
-      secondaryMuscleGroups,
-      restTime,
-      isCustom,
-      libraryExerciseId,
-      customExerciseId,
-      notes,
-      isSuperset,
-      isInSuperset,
-      supersetId,
-      sortOrder);
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      (other is RoutineExercise &&
-          other.id == this.id &&
-          other.routineId == this.routineId &&
-          other.name == this.name &&
-          other.parameters == this.parameters &&
-          other.sets == this.sets &&
-          other.primaryMuscleGroup == this.primaryMuscleGroup &&
-          other.secondaryMuscleGroups == this.secondaryMuscleGroups &&
-          other.restTime == this.restTime &&
-          other.isCustom == this.isCustom &&
-          other.libraryExerciseId == this.libraryExerciseId &&
-          other.customExerciseId == this.customExerciseId &&
-          other.notes == this.notes &&
-          other.isSuperset == this.isSuperset &&
-          other.isInSuperset == this.isInSuperset &&
-          other.supersetId == this.supersetId &&
-          other.sortOrder == this.sortOrder);
-}
-
-class RoutineExercisesCompanion extends UpdateCompanion<RoutineExercise> {
+class RoutineExercisesCompanion extends UpdateCompanion<ConcreteExercise> {
   final Value<String> id;
   final Value<String> routineId;
   final Value<String> name;
@@ -2668,7 +2111,7 @@ class RoutineExercisesCompanion extends UpdateCompanion<RoutineExercise> {
         isSuperset = Value(isSuperset),
         isInSuperset = Value(isInSuperset),
         sortOrder = Value(sortOrder);
-  static Insertable<RoutineExercise> custom({
+  static Insertable<ConcreteExercise> custom({
     Expression<String>? id,
     Expression<String>? routineId,
     Expression<String>? name,
@@ -2838,6 +2281,482 @@ class RoutineExercisesCompanion extends UpdateCompanion<RoutineExercise> {
   }
 }
 
+class $PreferencesTable extends Preferences
+    with TableInfo<$PreferencesTable, Preference> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $PreferencesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _dataMeta = const VerificationMeta('data');
+  @override
+  late final GeneratedColumn<String> data = GeneratedColumn<String>(
+      'data', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  @override
+  List<GeneratedColumn> get $columns => [data];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'preferences';
+  @override
+  VerificationContext validateIntegrity(Insertable<Preference> instance,
+      {bool isInserting = false}) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('data')) {
+      context.handle(
+          _dataMeta, this.data.isAcceptableOrUnknown(data['data']!, _dataMeta));
+    } else if (isInserting) {
+      context.missing(_dataMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => const {};
+  @override
+  Preference map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return Preference(
+      data: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}data'])!,
+    );
+  }
+
+  @override
+  $PreferencesTable createAlias(String alias) {
+    return $PreferencesTable(attachedDatabase, alias);
+  }
+}
+
+class Preference extends DataClass implements Insertable<Preference> {
+  final String data;
+  const Preference({required this.data});
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['data'] = Variable<String>(data);
+    return map;
+  }
+
+  PreferencesCompanion toCompanion(bool nullToAbsent) {
+    return PreferencesCompanion(
+      data: Value(data),
+    );
+  }
+
+  factory Preference.fromJson(Map<String, dynamic> json,
+      {ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return Preference(
+      data: serializer.fromJson<String>(json['data']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'data': serializer.toJson<String>(data),
+    };
+  }
+
+  Preference copyWith({String? data}) => Preference(
+        data: data ?? this.data,
+      );
+  @override
+  String toString() {
+    return (StringBuffer('Preference(')
+          ..write('data: $data')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => data.hashCode;
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is Preference && other.data == this.data);
+}
+
+class PreferencesCompanion extends UpdateCompanion<Preference> {
+  final Value<String> data;
+  final Value<int> rowid;
+  const PreferencesCompanion({
+    this.data = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  PreferencesCompanion.insert({
+    required String data,
+    this.rowid = const Value.absent(),
+  }) : data = Value(data);
+  static Insertable<Preference> custom({
+    Expression<String>? data,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (data != null) 'data': data,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  PreferencesCompanion copyWith({Value<String>? data, Value<int>? rowid}) {
+    return PreferencesCompanion(
+      data: data ?? this.data,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (data.present) {
+      map['data'] = Variable<String>(data.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('PreferencesCompanion(')
+          ..write('data: $data, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $OngoingDataTable extends OngoingData
+    with TableInfo<$OngoingDataTable, OngoingDatum> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $OngoingDataTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _dataMeta = const VerificationMeta('data');
+  @override
+  late final GeneratedColumn<String> data = GeneratedColumn<String>(
+      'data', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  @override
+  List<GeneratedColumn> get $columns => [data];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'ongoing_data';
+  @override
+  VerificationContext validateIntegrity(Insertable<OngoingDatum> instance,
+      {bool isInserting = false}) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('data')) {
+      context.handle(
+          _dataMeta, this.data.isAcceptableOrUnknown(data['data']!, _dataMeta));
+    } else if (isInserting) {
+      context.missing(_dataMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => const {};
+  @override
+  OngoingDatum map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return OngoingDatum(
+      data: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}data'])!,
+    );
+  }
+
+  @override
+  $OngoingDataTable createAlias(String alias) {
+    return $OngoingDataTable(attachedDatabase, alias);
+  }
+}
+
+class OngoingDatum extends DataClass implements Insertable<OngoingDatum> {
+  final String data;
+  const OngoingDatum({required this.data});
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['data'] = Variable<String>(data);
+    return map;
+  }
+
+  OngoingDataCompanion toCompanion(bool nullToAbsent) {
+    return OngoingDataCompanion(
+      data: Value(data),
+    );
+  }
+
+  factory OngoingDatum.fromJson(Map<String, dynamic> json,
+      {ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return OngoingDatum(
+      data: serializer.fromJson<String>(json['data']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'data': serializer.toJson<String>(data),
+    };
+  }
+
+  OngoingDatum copyWith({String? data}) => OngoingDatum(
+        data: data ?? this.data,
+      );
+  @override
+  String toString() {
+    return (StringBuffer('OngoingDatum(')
+          ..write('data: $data')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => data.hashCode;
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is OngoingDatum && other.data == this.data);
+}
+
+class OngoingDataCompanion extends UpdateCompanion<OngoingDatum> {
+  final Value<String> data;
+  final Value<int> rowid;
+  const OngoingDataCompanion({
+    this.data = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  OngoingDataCompanion.insert({
+    required String data,
+    this.rowid = const Value.absent(),
+  }) : data = Value(data);
+  static Insertable<OngoingDatum> custom({
+    Expression<String>? data,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (data != null) 'data': data,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  OngoingDataCompanion copyWith({Value<String>? data, Value<int>? rowid}) {
+    return OngoingDataCompanion(
+      data: data ?? this.data,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (data.present) {
+      map['data'] = Variable<String>(data.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('OngoingDataCompanion(')
+          ..write('data: $data, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $WeightMeasurementsTable extends WeightMeasurements
+    with TableInfo<$WeightMeasurementsTable, WeightMeasurement> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $WeightMeasurementsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+      'id', aliasedName, false,
+      type: DriftSqlType.string,
+      requiredDuringInsert: false,
+      clientDefault: () => _uuid.v4());
+  static const VerificationMeta _weightMeta = const VerificationMeta('weight');
+  @override
+  late final GeneratedColumn<double> weight = GeneratedColumn<double>(
+      'weight', aliasedName, false,
+      type: DriftSqlType.double, requiredDuringInsert: true);
+  static const VerificationMeta _timeMeta = const VerificationMeta('time');
+  @override
+  late final GeneratedColumn<DateTime> time = GeneratedColumn<DateTime>(
+      'time', aliasedName, false,
+      type: DriftSqlType.dateTime, requiredDuringInsert: true);
+  static const VerificationMeta _weightUnitMeta =
+      const VerificationMeta('weightUnit');
+  @override
+  late final GeneratedColumnWithTypeConverter<Weights, String> weightUnit =
+      GeneratedColumn<String>('weight_unit', aliasedName, false,
+              type: DriftSqlType.string, requiredDuringInsert: true)
+          .withConverter<Weights>(
+              $WeightMeasurementsTable.$converterweightUnit);
+  @override
+  List<GeneratedColumn> get $columns => [id, weight, time, weightUnit];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'weight_measurements';
+  @override
+  VerificationContext validateIntegrity(Insertable<WeightMeasurement> instance,
+      {bool isInserting = false}) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('weight')) {
+      context.handle(_weightMeta,
+          weight.isAcceptableOrUnknown(data['weight']!, _weightMeta));
+    } else if (isInserting) {
+      context.missing(_weightMeta);
+    }
+    if (data.containsKey('time')) {
+      context.handle(
+          _timeMeta, time.isAcceptableOrUnknown(data['time']!, _timeMeta));
+    } else if (isInserting) {
+      context.missing(_timeMeta);
+    }
+    context.handle(_weightUnitMeta, const VerificationResult.success());
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  WeightMeasurement map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return WeightMeasurement(
+      id: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}id'])!,
+      weight: attachedDatabase.typeMapping
+          .read(DriftSqlType.double, data['${effectivePrefix}weight'])!,
+      time: attachedDatabase.typeMapping
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}time'])!,
+      weightUnit: $WeightMeasurementsTable.$converterweightUnit.fromSql(
+          attachedDatabase.typeMapping.read(
+              DriftSqlType.string, data['${effectivePrefix}weight_unit'])!),
+    );
+  }
+
+  @override
+  $WeightMeasurementsTable createAlias(String alias) {
+    return $WeightMeasurementsTable(attachedDatabase, alias);
+  }
+
+  static JsonTypeConverter2<Weights, String, String> $converterweightUnit =
+      const EnumNameConverter<Weights>(Weights.values);
+}
+
+class WeightMeasurementsCompanion extends UpdateCompanion<WeightMeasurement> {
+  final Value<String> id;
+  final Value<double> weight;
+  final Value<DateTime> time;
+  final Value<Weights> weightUnit;
+  final Value<int> rowid;
+  const WeightMeasurementsCompanion({
+    this.id = const Value.absent(),
+    this.weight = const Value.absent(),
+    this.time = const Value.absent(),
+    this.weightUnit = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  WeightMeasurementsCompanion.insert({
+    this.id = const Value.absent(),
+    required double weight,
+    required DateTime time,
+    required Weights weightUnit,
+    this.rowid = const Value.absent(),
+  })  : weight = Value(weight),
+        time = Value(time),
+        weightUnit = Value(weightUnit);
+  static Insertable<WeightMeasurement> custom({
+    Expression<String>? id,
+    Expression<double>? weight,
+    Expression<DateTime>? time,
+    Expression<String>? weightUnit,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (weight != null) 'weight': weight,
+      if (time != null) 'time': time,
+      if (weightUnit != null) 'weight_unit': weightUnit,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  WeightMeasurementsCompanion copyWith(
+      {Value<String>? id,
+      Value<double>? weight,
+      Value<DateTime>? time,
+      Value<Weights>? weightUnit,
+      Value<int>? rowid}) {
+    return WeightMeasurementsCompanion(
+      id: id ?? this.id,
+      weight: weight ?? this.weight,
+      time: time ?? this.time,
+      weightUnit: weightUnit ?? this.weightUnit,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (weight.present) {
+      map['weight'] = Variable<double>(weight.value);
+    }
+    if (time.present) {
+      map['time'] = Variable<DateTime>(time.value);
+    }
+    if (weightUnit.present) {
+      map['weight_unit'] = Variable<String>($WeightMeasurementsTable
+          .$converterweightUnit
+          .toSql(weightUnit.value));
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('WeightMeasurementsCompanion(')
+          ..write('id: $id, ')
+          ..write('weight: $weight, ')
+          ..write('time: $time, ')
+          ..write('weightUnit: $weightUnit, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$GTDatabase extends GeneratedDatabase {
   _$GTDatabase(QueryExecutor e) : super(e);
   late final $CustomExercisesTable customExercises =
@@ -2849,6 +2768,10 @@ abstract class _$GTDatabase extends GeneratedDatabase {
       $HistoryWorkoutExercisesTable(this);
   late final $RoutineExercisesTable routineExercises =
       $RoutineExercisesTable(this);
+  late final $PreferencesTable preferences = $PreferencesTable(this);
+  late final $OngoingDataTable ongoingData = $OngoingDataTable(this);
+  late final $WeightMeasurementsTable weightMeasurements =
+      $WeightMeasurementsTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -2858,6 +2781,9 @@ abstract class _$GTDatabase extends GeneratedDatabase {
         routines,
         historyWorkouts,
         historyWorkoutExercises,
-        routineExercises
+        routineExercises,
+        preferences,
+        ongoingData,
+        weightMeasurements
       ];
 }

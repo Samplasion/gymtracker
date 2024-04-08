@@ -38,6 +38,7 @@ class HistoryController extends GetxController with ServiceableController {
       history(event);
       _computeWorkoutsByDay();
       computeStreaks();
+      coordinator.computeSuggestions();
     });
   }
 
@@ -55,6 +56,10 @@ class HistoryController extends GetxController with ServiceableController {
   }
 
   void computeStreaks() {
+    if (Get.context == null) {
+      logger.w("[computeStreaks] Context is null, ignoring.");
+    }
+
     streaks(Streaks.fromMappedDays(
       workoutsByDay,
       firstDayOfWeek: GTLocalizations.firstDayOfWeekFor(Get.context!),
@@ -282,6 +287,8 @@ class HistoryController extends GetxController with ServiceableController {
 
   /// Adds a new workout to the history, avoiding collisions
   Future<void> addNewWorkout(Workout workout) async {
+    logger.d(workout);
+    logger.d("Adding new workout to history");
     final collides = service.hasHistoryWorkout(workout.id);
     if (collides) {
       workout = workout.regenerateID();
@@ -338,38 +345,7 @@ class HistoryController extends GetxController with ServiceableController {
   void applyExerciseModification(Exercise exercise) {
     assert(exercise.isCustom);
 
-    final newHistory = service.history$.value.toList();
-    for (int i = 0; i < newHistory.length; i++) {
-      final workout = newHistory[i];
-
-      final res = workout.exercises.toList();
-      for (int i = 0; i < res.length; i++) {
-        res[i].when(
-          exercise: (e) {
-            if (exercise.isParentOf(e)) {
-              res[i] = Exercise.replaced(from: e, to: exercise).copyWith(
-                id: e.id,
-                parentID: e.parentID,
-              );
-            }
-          },
-          superset: (superset) {
-            for (int j = 0; j < superset.exercises.length; j++) {
-              if (exercise.isParentOf(superset.exercises[j])) {
-                (res[i] as Superset).exercises[j] =
-                    Exercise.replaced(from: superset.exercises[j], to: exercise)
-                        .copyWith(
-                  id: superset.exercises[j].id,
-                  parentID: superset.exercises[j].parentID,
-                );
-              }
-            }
-          },
-        );
-      }
-      newHistory[i] = workout.copyWith.exercises(res);
-    }
-    service.writeAllHistory(newHistory);
+    service.applyExerciseModificationToHistory(exercise);
   }
 
   bool hasExercise(Exercise exercise) {

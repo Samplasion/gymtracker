@@ -18,6 +18,7 @@ class Routines extends Table {
   IntColumn get sortOrder => integer()();
 }
 
+@UseRowClass(ConcreteExercise)
 class RoutineExercises extends LinkedExerciseBase {
   @override
   TextColumn get routineId => text().references(Routines, #id)();

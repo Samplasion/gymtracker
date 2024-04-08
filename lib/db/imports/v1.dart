@@ -1,5 +1,7 @@
 import 'package:gymtracker/db/imports/types.dart';
 import 'package:gymtracker/model/exercise.dart';
+import 'package:gymtracker/model/measurements.dart';
+import 'package:gymtracker/model/preferences.dart';
 import 'package:gymtracker/model/workout.dart';
 import 'package:gymtracker/service/logger.dart';
 import 'package:gymtracker/utils/extensions.dart';
@@ -65,6 +67,14 @@ class VersionedJsonImportV1 extends VersionedJsonImportBase {
           'expected $expectedHistoryLength, got ${actualHistory.length}');
     }
 
+    final prefs = json['settings'];
+    if (prefs['locale'] != null) prefs['locale'] = [prefs['locale']];
+
+    final weightMeasurements = [
+      for (final measurement in json['weightMeasurements'])
+        WeightMeasurement.fromJson(measurement),
+    ];
+
     return DatabaseSnapshot(
       customExercises: exercises,
       routines: routines,
@@ -78,6 +88,8 @@ class VersionedJsonImportV1 extends VersionedJsonImportBase {
       ]),
       historyWorkouts: history,
       historyWorkoutExercises: actualHistory,
+      preferences: Prefs.fromJson(prefs),
+      weightMeasurements: weightMeasurements,
     );
   }
 

@@ -206,6 +206,7 @@ extension WorkoutIterableUtils on Iterable<Workout> {
 
   /// Returns a flattened view of the exercises in this list of workouts.
   ///
+  /// {@template flattenedExercises}
   /// For example, if you have this list of workouts:
   ///
   /// ```dart
@@ -246,6 +247,7 @@ extension WorkoutIterableUtils on Iterable<Workout> {
   /// (This is a simplified example; the actual output will be more complex.)
   ///
   /// The order of the exercises is preserved.
+  /// {@endtemplate}
   List<WorkoutExercisable> get flattenedExercises {
     List<WorkoutExercisable> result = [];
     for (final workout in this) {
@@ -258,11 +260,25 @@ extension WorkoutIterableUtils on Iterable<Workout> {
   }
 }
 
+extension WorkoutUtils on Workout {
+  /// Returns a flattened view of the exercises in this workout.
+  ///
+  /// {@macro flattenedExercises}
+  List<WorkoutExercisable> get flattenedExercises {
+    return exercises
+        .expand((element) => element.map(
+              exercise: (ex) => [ex],
+              superset: (ss) => [ss, ...ss.exercises],
+            ))
+        .toList();
+  }
+}
+
 extension ValueUtils on double {
   String get userFacingWeight {
     return "exerciseList.fields.weight".tParams({
       "weight": localized,
-      "unit": "units.${settingsController.weightUnit.value!.name}".t,
+      "unit": "units.${settingsController.weightUnit.value.name}".t,
     });
   }
 

@@ -193,6 +193,7 @@ class Exercise extends WorkoutExercisable {
     // or not) as to avoid a "linked list" type situation
     final base = makeSibling();
     return base.copyWith(
+      workoutID: workout.id,
       sets: ([
         for (final set in sets)
           if (setFilter?.call(set) ?? true)
@@ -220,6 +221,7 @@ class Exercise extends WorkoutExercisable {
   static Exercise replaced({required Exercise from, required Exercise to}) {
     return to.copyWith(
       workoutID: from.workoutID,
+      supersetID: from.supersetID,
       notes: from.notes,
       restTime: from.restTime,
       sets: to.parameters == from.parameters

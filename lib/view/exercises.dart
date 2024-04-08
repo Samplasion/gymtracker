@@ -188,7 +188,7 @@ class _ExercisesViewState extends State<ExercisesView> {
                                 value: Weights.convert(
                                   value: workout.liftedWeight,
                                   from: workout.weightUnit,
-                                  to: settingsController.weightUnit.value!,
+                                  to: settingsController.weightUnit.value,
                                 ).userFacingWeight,
                                 label: "exerciseList.stats.volume".t,
                               ),
@@ -591,7 +591,7 @@ class ExerciseSetView extends StatelessWidget {
           Text(Weights.convert(
             value: set.weight!,
             from: weightUnit,
-            to: settingsController.weightUnit.value!,
+            to: settingsController.weightUnit.value,
           ).userFacingWeight),
         if ([
           GTSetParameters.timeWeight,

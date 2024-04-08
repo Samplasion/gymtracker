@@ -178,10 +178,57 @@ class Workout {
         'exercises': [for (final exercise in exercises) exercise.toJson()],
       };
 
+  @override
+  String toString() {
+    return 'Workout[$name] ${toJson()}';
+  }
+
   Workout clone() => Workout.fromJson(toJson());
 
-  Workout toRoutine() =>
-      copyWith(duration: null, startingDate: null, id: const Uuid().v4());
+  Workout toRoutine({
+    String? routineID,
+  }) {
+    final newRoutineID = routineID ?? const Uuid().v4();
+    return copyWith(
+      duration: null,
+      startingDate: null,
+      id: newRoutineID,
+      exercises: [
+        for (final exercise in exercises)
+          exercise.map(
+            superset: (superset) {
+              final newSupersetID = const Uuid().v4();
+              return superset.copyWith(
+                id: newSupersetID,
+                workoutID: newRoutineID,
+                exercises: [
+                  for (final exercise in superset.exercises)
+                    exercise.copyWith(
+                      id: const Uuid().v4(),
+                      workoutID: newRoutineID,
+                      supersetID: newSupersetID,
+                      sets: [
+                        for (final set in exercise.sets)
+                          set.copyWith(done: false),
+                      ],
+                    ),
+                ],
+              );
+            },
+            exercise: (single) => single.copyWith(
+              id: const Uuid().v4(),
+              sets: [
+                for (final set in single.sets)
+                  set.copyWith(
+                    id: const Uuid().v4(),
+                    done: false,
+                  ),
+              ],
+            ),
+          ),
+      ],
+    );
+  }
 
   Workout regenerateID() => copyWith(id: const Uuid().v4());
 

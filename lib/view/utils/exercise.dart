@@ -137,7 +137,7 @@ class ExerciseListTile extends StatelessWidget {
   String _buildWeight(double weight) => Weights.convert(
           value: weight,
           from: weightUnit!,
-          to: settingsController.weightUnit.value!)
+          to: settingsController.weightUnit.value)
       .userFacingWeight;
   String _buildReps(int? reps) => "exerciseList.fields.reps".plural(reps ?? 0);
   String _buildTime(BuildContext context, Duration time) =>

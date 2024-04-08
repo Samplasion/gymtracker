@@ -646,6 +646,7 @@ me:
     label: Tutti i dati registrati
     removed:
       text: Il dato è stato rimosso
+    none: Nessun dato
   calendar:
     label: Calendario
     empty: Non ti sei allenato questo giorno

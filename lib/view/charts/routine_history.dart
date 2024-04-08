@@ -61,7 +61,7 @@ class _RoutineHistoryChartState
       values[_RoutineHistoryChartType.volume]!.add(Weights.convert(
         value: wo.liftedWeight,
         from: wo.weightUnit,
-        to: settingsController.weightUnit.value!,
+        to: settingsController.weightUnit.value,
       ));
       values[_RoutineHistoryChartType.reps]!.add(wo.reps.toDouble());
       values[_RoutineHistoryChartType.duration]!
@@ -103,7 +103,7 @@ class _RoutineHistoryChartState
         return Weights.convert(
           value: wo.liftedWeight,
           from: wo.weightUnit,
-          to: settingsController.weightUnit.value!,
+          to: settingsController.weightUnit.value,
         );
       case _RoutineHistoryChartType.reps:
         return wo.reps.toDouble();
@@ -130,7 +130,7 @@ class _RoutineHistoryChartState
                   text: Weights.convert(
                           value: value,
                           from: weightUnit,
-                          to: settingsController.weightUnit.value!)
+                          to: settingsController.weightUnit.value)
                       .userFacingWeight);
             case _RoutineHistoryChartType.reps:
               return TextSpan(
@@ -180,7 +180,7 @@ class _RoutineHistoryChartState
               .bodyLarge!
               .copyWith(fontWeight: FontWeight.bold),
           // The value was converted by _getY already
-          weightUnit: settingsController.weightUnit.value!,
+          weightUnit: settingsController.weightUnit.value,
         ),
         ConstrainedBox(
           constraints: BoxConstraints.loose(const Size.fromHeight(300)),
@@ -358,7 +358,7 @@ class _RoutineHistoryChartState
             showDate: false,
             textAlign: TextAlign.end,
             // The value was already converted by the _getY call
-            weightUnit: settingsController.weightUnit.value!,
+            weightUnit: settingsController.weightUnit.value,
           ),
         );
   }

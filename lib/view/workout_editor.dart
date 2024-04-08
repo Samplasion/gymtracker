@@ -254,7 +254,7 @@ class _WorkoutEditorState extends State<WorkoutEditor> {
                     final ex = await Go.to<List<Exercise>>(
                         () => const ExercisePicker(singlePick: true));
                     if (ex == null || ex.isEmpty) return;
-                    workout.exercises[i] = ex.first.copyWith.sets([
+                    workout.exercises[i] = ex.first.makeChild().copyWith.sets([
                       GTSet.empty(
                         kind: GTSetKind.normal,
                         parameters: ex.first.parameters,
@@ -278,7 +278,7 @@ class _WorkoutEditorState extends State<WorkoutEditor> {
                         () => const ExercisePicker(singlePick: false));
                     if (exs == null || exs.isEmpty) return;
                     (workout.exercises[i] as Superset).exercises.addAll(
-                          exs.map((ex) => ex.copyWith.sets([
+                          exs.map((ex) => ex.makeChild().copyWith.sets([
                                 GTSet.empty(
                                   kind: GTSetKind.normal,
                                   parameters: ex.parameters,
@@ -387,7 +387,7 @@ class _WorkoutEditorState extends State<WorkoutEditor> {
                       () => const ExercisePicker(singlePick: false));
                   if (exs == null || exs.isEmpty) return;
                   workout.exercises.addAll(
-                    exs.map((ex) => ex.copyWith.sets([
+                    exs.map((ex) => ex.makeChild().copyWith.sets([
                           GTSet.empty(
                             kind: GTSetKind.normal,
                             parameters: ex.parameters,

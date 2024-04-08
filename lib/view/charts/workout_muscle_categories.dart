@@ -68,7 +68,7 @@ class WorkoutMuscleCategoriesBarChart extends GetWidget<HistoryController> {
                         ],
                       ),
                   ],
-                  gridData: FlGridData(
+                  gridData: const FlGridData(
                     show: true,
                     drawVerticalLine: false,
                     drawHorizontalLine: false,
@@ -77,15 +77,15 @@ class WorkoutMuscleCategoriesBarChart extends GetWidget<HistoryController> {
                   barTouchData: BarTouchData(enabled: false),
                   titlesData: FlTitlesData(
                     show: true,
-                    topTitles: AxisTitles(
+                    topTitles: const AxisTitles(
                         sideTitles: SideTitles(
                       showTitles: false,
                       reservedSize: 16,
                     )),
                     leftTitles:
-                        AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                        const AxisTitles(sideTitles: SideTitles(showTitles: false)),
                     rightTitles:
-                        AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                        const AxisTitles(sideTitles: SideTitles(showTitles: false)),
                     bottomTitles: AxisTitles(
                       sideTitles: SideTitles(
                         showTitles: true,

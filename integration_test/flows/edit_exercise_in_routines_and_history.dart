@@ -52,7 +52,7 @@ Future<void> testEditExerciseInRoutineAndHistoryFlow(
 
   print("Edited database state: ${databaseService.toJson()}");
   expect(Get.find<ExercisesController>().exercises.isNotEmpty, true);
-  expectExercise(
+  expectAbstractExercise(
       Get.find<ExercisesController>().exercises.single, baseExercise);
 
   // Add a fake workout
@@ -71,6 +71,8 @@ Future<void> testEditExerciseInRoutineAndHistoryFlow(
     baseExercise.makeChild().instantiate(workout: workout.toRoutine()),
   );
   globalLogger.d(workout.exercises.single);
+  expect(baseExercise.isAbstract, true);
+  expect(workout.exercises.single.asExercise.isAbstract, false);
   expect(workout.exercises.single.id != baseExercise.id, true);
   expect((workout.exercises.single as Exercise).parentID, baseExercise.id);
   databaseService.setHistoryWorkout(workout);
@@ -185,7 +187,7 @@ Future<void> testEditExerciseInRoutineAndHistoryFlow(
 
   // Check that our changes have been saved
   var ex = databaseService.exercises.first;
-  expectExercise(
+  expectAbstractExercise(
     ex,
     Exercise.custom(
       id: baseExercise.id,
@@ -210,7 +212,8 @@ Future<void> testEditExerciseInRoutineAndHistoryFlow(
   expectExercise(
     ex,
     Exercise.custom(
-      id: "(something else)",
+      // We don't care about the ID, we want to check the rest of the data
+      id: ex.id,
       parentID: baseExercise.id,
       name: "EditedExercise",
       parameters: GTSetParameters.freeBodyReps,
@@ -230,7 +233,8 @@ Future<void> testEditExerciseInRoutineAndHistoryFlow(
     // We don't care about the sets in this test.
     ex.copyWith.sets([]),
     Exercise.custom(
-      id: "(something else)",
+      // We don't care about the ID, we want to check the rest of the data
+      id: ex.id,
       parentID: baseExercise.id,
       name: "EditedExercise",
       parameters: GTSetParameters.freeBodyReps,
@@ -238,7 +242,10 @@ Future<void> testEditExerciseInRoutineAndHistoryFlow(
       primaryMuscleGroup: GTMuscleGroup.chest,
       secondaryMuscleGroups: {GTMuscleGroup.triceps},
       restTime: Duration.zero,
-      notes: "Base Notes",
+      // Note to self: We don't set the notes in the test. So we don't have
+      // notes to expect here in the routine. The previous behavior in which
+      // we had notes in the exercise was wrong.
+      notes: "",
       workoutID: databaseService.routines.single.id,
       supersetID: null,
     ),

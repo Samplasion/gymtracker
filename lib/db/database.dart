@@ -1,20 +1,28 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
+import 'package:flutter/foundation.dart';
 import 'package:gymtracker/data/distance.dart';
 import 'package:gymtracker/data/weights.dart';
 import 'package:gymtracker/db/model/tables/exercise.dart';
 import 'package:gymtracker/db/model/tables/history.dart';
+import 'package:gymtracker/db/model/tables/measurements.dart';
+import 'package:gymtracker/db/model/tables/ongoing.dart';
+import 'package:gymtracker/db/model/tables/preferences.dart';
 import 'package:gymtracker/db/model/tables/routines.dart';
 import 'package:gymtracker/db/model/tables/set.dart';
 import 'package:gymtracker/db/utils.dart';
 import 'package:gymtracker/model/exercisable.dart' as model;
 import 'package:gymtracker/model/exercise.dart' as model;
+import 'package:gymtracker/model/measurements.dart';
+import 'package:gymtracker/model/preferences.dart';
 import 'package:gymtracker/model/set.dart';
 import 'package:gymtracker/model/superset.dart' as model;
 import 'package:gymtracker/model/workout.dart' as model;
 import 'package:gymtracker/service/logger.dart';
+import 'package:gymtracker/utils/extensions.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import 'package:rxdart/rxdart.dart';
@@ -35,9 +43,23 @@ const DATABASE_VERSION = 2;
   HistoryWorkoutExercises,
   Routines,
   RoutineExercises,
+  Preferences,
+  OngoingData,
+  WeightMeasurements,
 ])
 class GTDatabase extends _$GTDatabase {
-  GTDatabase() : super(_openConnection());
+  GTDatabase.prod() : super(_openConnection());
+
+  @visibleForTesting
+  GTDatabase.withQueryExecutor(super.e);
+
+  @override
+  MigrationStrategy get migration => MigrationStrategy(
+        onCreate: (m) async {
+          await m.createAll();
+          await into(preferences).insert(Prefs.defaultValue);
+        },
+      );
 
   @override
   int get schemaVersion => DATABASE_VERSION;
@@ -57,7 +79,7 @@ class GTDatabase extends _$GTDatabase {
         ..where((routineExercises) => routineExercises.routineId.isIn(ids));
 
       return entryQuery.watch().map((rows) {
-        final idToItems = <String, List<RoutineExercise>>{};
+        final idToItems = <String, List<ConcreteExercise>>{};
 
         for (final row in rows) {
           idToItems.putIfAbsent(row.routineId, () => []).add(row);
@@ -65,11 +87,13 @@ class GTDatabase extends _$GTDatabase {
 
         return [
           for (var id in ids)
-            _workoutFromRoutineData(idToRoutine[id]!, idToItems[id] ?? []),
+            _workoutFromDatabase(idToRoutine[id]!, idToItems[id] ?? []),
         ];
       });
     });
   }
+
+  Future<List<model.Workout>> getAllRoutinesFuture() => getAllRoutines().first;
 
   Future<model.Workout> getRoutine(String id) async {
     final routine =
@@ -79,39 +103,60 @@ class GTDatabase extends _$GTDatabase {
           ..where((tbl) => tbl.routineId.equals(id)))
         .get();
 
-    return _workoutFromRoutineData(routine, rawExercises);
+    return _workoutFromDatabase(routine, rawExercises);
   }
 
   Future<void> insertRoutine(model.Workout routine) async {
+    final newSortOrder = await routines.count().getSingle();
     return batch((batch) {
       batch.insert(
         routines,
-        routine.toRoutineInsertable(),
+        routine.toRoutineInsertable().copyWith(sortOrder: Value(newSortOrder)),
       );
       batch.insertAll(
         routineExercises,
-        routine.exercises.toSortedRoutineExerciseInsertables(),
+        routine.flattenedExercises.toSortedInsertables(),
       );
     });
   }
 
   Future<void> deleteRoutine(String id) async {
-    await (delete(routines)..where((tbl) => tbl.id.equals(id))).go();
-    await (delete(routineExercises)..where((tbl) => tbl.routineId.equals(id)))
-        .go();
+    final remainingIDs = (await (select(routines)
+          ..where((tbl) => tbl.id.isNotValue(id))
+          ..orderBy([(r) => OrderingTerm(expression: r.sortOrder)]))
+        .get());
+    final idToSortOrder = {
+      for (int i = 0; i < remainingIDs.length; i++) remainingIDs[i].id: i
+    };
+    return batch((batch) {
+      batch.deleteWhere(routines, (tbl) => tbl.id.equals(id));
+      batch.deleteWhere(routineExercises, (tbl) => tbl.routineId.equals(id));
+      for (final entry in idToSortOrder.entries) {
+        batch.update(
+          routines,
+          RoutinesCompanion(sortOrder: Value(entry.value)),
+          where: (tbl) => tbl.id.equals(entry.key),
+        );
+      }
+    });
   }
 
   Future<void> updateRoutine(model.Workout routine) async {
+    final sortOrder = (await (select(routines)
+              ..where((tbl) => tbl.id.equals(routine.id)))
+            .getSingle())
+        .sortOrder;
     return batch((batch) {
+      // batch.deleteWhere(routines, (tbl) => tbl.id.equals(routine.id));
       batch.replace(
         routines,
-        routine.toRoutineInsertable(),
+        routine.toRoutineInsertable().copyWith(sortOrder: Value(sortOrder)),
       );
       batch.deleteWhere(
           routineExercises, (tbl) => tbl.routineId.equals(routine.id));
       batch.insertAll(
         routineExercises,
-        routine.exercises.toSortedRoutineExerciseInsertables(),
+        routine.flattenedExercises.toSortedInsertables(),
       );
     });
   }
@@ -133,14 +178,14 @@ class GTDatabase extends _$GTDatabase {
         ..where((tbl) => tbl.routineId.isIn(ids));
 
       return entryQuery.watch().map((rows) {
-        final idToItems = <String, List<HistoryWorkoutExercise>>{};
+        final idToItems = <String, List<ConcreteExercise>>{};
 
         for (final row in rows) {
           idToItems.putIfAbsent(row.routineId, () => []).add(row);
         }
         return [
           for (var id in ids)
-            _historyWorkoutFromData(idToWorkout[id]!, idToItems[id] ?? []),
+            _historyWorkoutFromDatabase(idToWorkout[id]!, idToItems[id] ?? []),
         ];
       });
     });
@@ -158,10 +203,13 @@ class GTDatabase extends _$GTDatabase {
           ..where((tbl) => tbl.routineId.equals(id)))
         .get();
 
-    return _historyWorkoutFromData(workout, rawExercises);
+    return _historyWorkoutFromDatabase(workout, rawExercises);
   }
 
   Future<void> insertHistoryWorkout(model.Workout workout) async {
+    logger.e(workout);
+    logger.e(workout.toHistoryWorkoutInsertable());
+    logger.e(workout.flattenedExercises.toSortedInsertables());
     return batch((batch) {
       batch.insert(
         historyWorkouts,
@@ -169,7 +217,7 @@ class GTDatabase extends _$GTDatabase {
       );
       batch.insertAll(
         historyWorkoutExercises,
-        workout.exercises.toSortedHistoryWorkoutInsertables(),
+        workout.flattenedExercises.toSortedInsertables(),
       );
     });
   }
@@ -191,7 +239,7 @@ class GTDatabase extends _$GTDatabase {
           historyWorkoutExercises, (tbl) => tbl.routineId.equals(workout.id));
       batch.insertAll(
         historyWorkoutExercises,
-        workout.exercises.toSortedHistoryWorkoutInsertables(),
+        workout.flattenedExercises.toSortedInsertables(),
       );
     });
   }
@@ -215,9 +263,9 @@ class GTDatabase extends _$GTDatabase {
     await (update(customExercises).replace(exercise.toInsertable()));
   }
 
-  model.Workout _workoutFromRoutineData(
-      Routine routine, List<RoutineExercise> rawExercises) {
-    final entries = databaseRoutineExercisesToExercises(rawExercises);
+  model.Workout _workoutFromDatabase(
+      Routine routine, List<ConcreteExercise> rawExercises) {
+    final entries = databaseExercisesToExercises(rawExercises);
 
     return model.Workout(
       id: routine.id,
@@ -234,9 +282,9 @@ class GTDatabase extends _$GTDatabase {
     );
   }
 
-  model.Workout _historyWorkoutFromData(
-      HistoryWorkout routine, List<HistoryWorkoutExercise> rawExercises) {
-    final entries = databaseHistoryWorkoutExercisesToExercises(rawExercises);
+  model.Workout _historyWorkoutFromDatabase(
+      HistoryWorkout routine, List<ConcreteExercise> rawExercises) {
+    final entries = databaseExercisesToExercises(rawExercises);
 
     return model.Workout(
       id: routine.id,
@@ -253,12 +301,71 @@ class GTDatabase extends _$GTDatabase {
     );
   }
 
+  Stream<Prefs> watchPreferences() {
+    return select(preferences)
+        .watch()
+        .map((l) => l.isEmpty ? Prefs.defaultValue : Prefs.fromDatabase(l[0]));
+  }
+
+  Future<void> setPreferences(Prefs prefs) {
+    return transaction(() async {
+      await delete(preferences).go();
+      await into(preferences).insert(prefs);
+    });
+  }
+
+  Stream<Map<String, dynamic>?> watchOngoing() {
+    return select(ongoingData).watch().map((l) {
+      if (l.isEmpty) return null;
+      return jsonDecode(l[0].data);
+    });
+  }
+
+  Future<void> setOngoing(Map<String, dynamic> ongoing) {
+    return transaction(() async {
+      await deleteOngoing();
+      await into(ongoingData)
+          .insert(OngoingDataCompanion(data: Value(jsonEncode(ongoing))));
+    });
+  }
+
+  Future deleteOngoing() {
+    return delete(ongoingData).go();
+  }
+
+  Stream<List<WeightMeasurement>> watchWeightMeasurements() {
+    final query = select(weightMeasurements)
+      ..orderBy([(tbl) => OrderingTerm.asc(tbl.time)]);
+    return query.watch();
+  }
+
+  Future<void> insertWeightMeasurement(WeightMeasurement measurement) {
+    return into(weightMeasurements).insert(measurement);
+  }
+
+  Future<void> deleteWeightMeasurement(String id) {
+    return (delete(weightMeasurements)..where((tbl) => tbl.id.equals(id))).go();
+  }
+
+  Future<void> updateWeightMeasurement(WeightMeasurement measurement) {
+    return (update(weightMeasurements).replace(measurement));
+  }
+
+  Future<void> setWeightMeasurements(List<WeightMeasurement> measurements) {
+    return transaction(() async {
+      await delete(weightMeasurements).go();
+      await batch((batch) {
+        for (final measurement in measurements) {
+          batch.insert(weightMeasurements, measurement);
+        }
+      });
+    });
+  }
+
   Future clearTheWholeThingIAmAbsolutelySureISwear() async {
-    await customExercises.deleteAll();
-    await routines.deleteAll();
-    await routineExercises.deleteAll();
-    await historyWorkouts.deleteAll();
-    await historyWorkoutExercises.deleteAll();
+    for (var table in allTables) {
+      await table.deleteAll();
+    }
   }
 }
 
@@ -351,59 +458,16 @@ extension WorkoutDatabaseUtils on model.Workout {
 
 extension WorkoutExercisableListDatabaseUtils
     on List<model.WorkoutExercisable> {
-  List<RoutineExercisesCompanion> toSortedRoutineExerciseInsertables() {
+  List<UpdateCompanion<ConcreteExercise>> toSortedInsertables() {
     return [
       for (int i = 0; i < length; i++)
-        this[i].toRoutineExercise().copyWith(sortOrder: Value(i)),
-    ];
-  }
-
-  List<HistoryWorkoutExercisesCompanion> toSortedHistoryWorkoutInsertables() {
-    return [
-      for (int i = 0; i < length; i++)
-        this[i].toHistoryWorkoutExercise().copyWith(sortOrder: Value(i)),
+        this[i].toInsertable().copyWith(sortOrder: Value(i)),
     ];
   }
 }
 
 extension WorkoutExercisableDatabaseUtils on model.WorkoutExercisable {
-  RoutineExercisesCompanion toRoutineExercise() {
-    return RoutineExercisesCompanion(
-      id: Value(id),
-      routineId: Value(workoutID!),
-      name: this is model.Exercise ? Value(asExercise.name) : const Value(""),
-      parameters: this is model.Exercise
-          ? Value(asExercise.parameters)
-          : const Value.absent(),
-      sets: Value(sets),
-      primaryMuscleGroup: this is model.Exercise
-          ? Value(asExercise.primaryMuscleGroup)
-          : const Value.absent(),
-      secondaryMuscleGroups: this is model.Exercise
-          ? Value(asExercise.secondaryMuscleGroups)
-          : const Value.absent(),
-      restTime: Value(restTime.inSeconds),
-      isCustom: this is model.Exercise
-          ? Value(asExercise.isCustom)
-          : const Value(false),
-      libraryExerciseId: this is model.Exercise && asExercise.standard
-          ? Value(asExercise.parentID)
-          : const Value.absent(),
-      customExerciseId: this is model.Exercise && !asExercise.standard
-          ? Value(asExercise.id)
-          : const Value.absent(),
-      notes: Value(notes),
-      isSuperset: Value(this is model.Superset),
-      isInSuperset: this is model.Exercise
-          ? Value(asExercise.isInSuperset)
-          : const Value(false),
-      supersetId: this is model.Exercise
-          ? Value(asExercise.supersetID)
-          : const Value.absent(),
-    );
-  }
-
-  HistoryWorkoutExercisesCompanion toHistoryWorkoutExercise() {
+  HistoryWorkoutExercisesCompanion toInsertable() {
     return HistoryWorkoutExercisesCompanion(
       id: Value(id),
       routineId: Value(workoutID!),
@@ -426,7 +490,7 @@ extension WorkoutExercisableDatabaseUtils on model.WorkoutExercisable {
           ? Value(asExercise.parentID)
           : const Value.absent(),
       customExerciseId: this is model.Exercise && !asExercise.standard
-          ? Value(asExercise.id)
+          ? Value(asExercise.parentID)
           : const Value.absent(),
       notes: Value(notes),
       isSuperset: Value(this is model.Superset),

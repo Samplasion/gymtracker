@@ -41,13 +41,12 @@ class WorkoutController extends GetxController with ServiceableController {
         time = DateTime.now().obs,
         parentID = Rx<String?>(parentID),
         infobox = Rx<String?>(infobox),
-        weightUnit =
-            (Get.find<SettingsController>().weightUnit() ?? Weights.kg).obs,
+        weightUnit = (Get.find<SettingsController>().weightUnit()).obs,
         distanceUnit = (Get.find<SettingsController>().distanceUnit()).obs {
     final sc = Get.find<SettingsController>();
     logger.d("""
       Currently defined units:
-        - Weight: ${sc.weightUnit()!.name} \t(cfr. ${weightUnit.value.name})
+        - Weight: ${sc.weightUnit().name} \t(cfr. ${weightUnit.value.name})
         - Distance: ${sc.distanceUnit().name} \t(cfr. ${distanceUnit.value.name})
     """);
     logger.w(
@@ -281,6 +280,7 @@ class WorkoutController extends GetxController with ServiceableController {
       historyController.bindContinuation(continuation: workout);
     }
 
+    workout.logger.d("Submitting workout");
     historyController.addNewWorkout(workout);
     Get.back();
     SchedulerBinding.instance.addPostFrameCallback((timeStamp) async {
@@ -421,6 +421,7 @@ class WorkoutController extends GetxController with ServiceableController {
       ),
     );
     exercises.refresh();
+    save();
   }
 
   Future<void> pickExercisesForSuperset(int i) async {

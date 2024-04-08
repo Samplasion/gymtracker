@@ -1,11 +1,16 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:gymtracker/model/exercise.dart';
 
-void expectExercise(Exercise result, Exercise expected) {
+void expectAbstractExercise(Exercise result, Exercise expected) {
+  expect(result.id, expected.id);
   expect(result.name, expected.name);
   expect(result.parameters, expected.parameters);
   expect(result.primaryMuscleGroup, expected.primaryMuscleGroup);
   expect(result.secondaryMuscleGroups, expected.secondaryMuscleGroups);
+}
+
+void expectExercise(Exercise result, Exercise expected) {
+  expectAbstractExercise(result, expected);
   expect(result.restTime, expected.restTime);
   expect(result.notes, expected.notes);
   expect(result.sets.length, expected.sets.length);

@@ -11,7 +11,7 @@ import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/view/utils/exercise.dart';
 import 'package:gymtracker/view/workout.dart';
 
-import '../utils/expectations.dart';
+import '../../test/expectations.dart';
 
 const wait = Duration(milliseconds: 500);
 

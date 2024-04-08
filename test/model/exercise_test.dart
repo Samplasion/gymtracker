@@ -3,32 +3,7 @@ import 'package:gymtracker/model/set.dart';
 import 'package:gymtracker/model/workout.dart';
 import 'package:test/test.dart';
 
-void expectExercise(
-  Exercise result,
-  Exercise expected, {
-  bool checkWorkoutID = true,
-  bool checkSupersetID = true,
-}) {
-  expect(result.name, expected.name);
-  expect(result.parameters, expected.parameters);
-  expect(result.primaryMuscleGroup, expected.primaryMuscleGroup);
-  expect(result.secondaryMuscleGroups, expected.secondaryMuscleGroups);
-  expect(result.restTime, expected.restTime);
-  expect(result.notes, expected.notes);
-  if (checkWorkoutID) {
-    expect(result.workoutID, expected.workoutID);
-  }
-  if (checkSupersetID) {
-    expect(result.supersetID, expected.supersetID);
-  }
-  expect(result.sets.length, expected.sets.length);
-  for (int i = 0; i < result.sets.length; i++) {
-    expect(result.sets[i].kind, expected.sets[i].kind);
-    expect(result.sets[i].parameters, expected.sets[i].parameters);
-    expect(result.sets[i].reps, expected.sets[i].reps);
-    expect(result.sets[i].weight, expected.sets[i].weight);
-  }
-}
+import '../expectations.dart';
 
 void main() {
   group('Exercise model', () {
@@ -49,16 +24,19 @@ void main() {
           exercises: [],
         );
 
+        final instantiated = base.instantiate(workout: workout);
         expectExercise(
-          base.instantiate(workout: workout),
+          instantiated,
           Exercise.custom(
+            // We don't care about the ID
+            id: instantiated.id,
             name: "Exercise",
             parameters: GTSetParameters.distance,
             sets: [],
             primaryMuscleGroup: GTMuscleGroup.abductors,
             restTime: Duration.zero,
             notes: "Notes",
-            workoutID: null,
+            workoutID: workout.id,
             supersetID: null,
           ),
         );
@@ -71,9 +49,12 @@ void main() {
           startingDate: DateTime.now(),
         );
 
+        final instantiated = base.instantiate(workout: workout);
         expectExercise(
-          base.instantiate(workout: workout),
+          instantiated,
           Exercise.custom(
+            // We don't care about the ID
+            id: instantiated.id,
             name: "Exercise",
             parentID: base.id,
             parameters: GTSetParameters.distance,
@@ -81,7 +62,7 @@ void main() {
             primaryMuscleGroup: GTMuscleGroup.abductors,
             restTime: Duration.zero,
             notes: "Notes",
-            workoutID: null,
+            workoutID: workout.id,
             supersetID: null,
           ),
         );

@@ -7,7 +7,7 @@ import 'package:gymtracker/service/database.dart';
 import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/view/components/badges.dart';
 
-import '../utils/expectations.dart';
+import '../../test/expectations.dart';
 
 Future<void> testCreateExerciseFlow(
   WidgetTester tester,

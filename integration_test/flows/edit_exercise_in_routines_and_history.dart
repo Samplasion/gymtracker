@@ -11,7 +11,7 @@ import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/service/logger.dart';
 import 'package:gymtracker/view/utils/exercise.dart';
 
-import '../utils/expectations.dart';
+import '../../test/expectations.dart';
 
 final Exercise baseExercise = Exercise.custom(
   id: "ourNewID",

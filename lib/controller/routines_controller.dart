@@ -223,11 +223,21 @@ class RoutinesController extends GetxController
     service.setAllRoutines(list);
   }
 
-  List<Workout> getChildren(Workout routine) {
+  List<Workout> getChildren(
+    Workout routine, {
+    bool allowSynthesized = false,
+  }) {
     final historyCont = Get.find<HistoryController>();
     return [
       for (final workout in historyCont.history)
-        if (workout.parentID == routine.id) workout
+        if (workout.parentID == routine.id && !workout.isContinuation)
+          if (allowSynthesized)
+            workout.synthesizeContinuations(
+              previous: false,
+              next: true,
+            )
+          else
+            workout,
     ];
   }
 

@@ -276,8 +276,13 @@ class HistoryController extends GetxController with ServiceableController {
     );
   }
 
-  void submitEditedWorkout(Workout workout) {
-    service.setHistoryWorkout(workout);
+  Future<void> submitEditedWorkout(Workout workout) async {
+    await service.setHistoryWorkout(workout);
+    if (workout.hasContinuation) {
+      service.setHistoryWorkout(workout.continuation!.copyWith(
+        parentID: workout.parentID,
+      ));
+    }
     Get.back();
     SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
       Get.back();
@@ -321,7 +326,7 @@ class HistoryController extends GetxController with ServiceableController {
         if (group.category == null) continue;
         map[group.category!] = map[group.category!]! +
             exercise.sets
-                .where((element) => !workout.isConcrete || element.done)
+                .where((element) => element.done || !workout.isConcrete)
                 .length;
       }
     }
@@ -416,6 +421,10 @@ class HistoryController extends GetxController with ServiceableController {
       await addNewWorkout(combined);
     });
   }
+
+  Workout? getByID(String id) {
+    return history.firstWhereOrNull((element) => element.id == id);
+  }
 }
 
 extension WorkoutHistory on Workout {
@@ -425,4 +434,19 @@ extension WorkoutHistory on Workout {
       Get.find<HistoryController>().getContinuation(incompleteWorkout: this);
   Workout? get originalWorkoutForContinuation => Get.find<HistoryController>()
       .getOriginalForContinuation(continuationWorkout: this);
+
+  SynthesizedWorkout synthesizeContinuations({
+    bool previous = true,
+    bool next = true,
+  }) {
+    final self = this is SynthesizedWorkout
+        ? (this as SynthesizedWorkout).components.first
+        : this;
+    return SynthesizedWorkout([
+      self,
+      if (previous && self.isContinuation) self.originalWorkoutForContinuation!,
+      if (next && self.completedBy != null && self.continuation != null)
+        self.continuation!,
+    ]);
+  }
 }

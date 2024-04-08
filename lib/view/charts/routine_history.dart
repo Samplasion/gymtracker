@@ -2,6 +2,7 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:gymtracker/controller/history_controller.dart';
 import 'package:gymtracker/controller/routines_controller.dart';
 import 'package:gymtracker/controller/settings_controller.dart';
 import 'package:gymtracker/data/weights.dart';
@@ -27,7 +28,14 @@ class RoutineHistoryChart extends StatefulWidget {
 
   static shouldShow(Workout workout) {
     final controller = Get.find<RoutinesController>();
-    return !workout.isConcrete && controller.getChildren(workout).length >= 2;
+    return !workout.isConcrete &&
+        controller
+                .getChildren(
+                  workout,
+                  allowSynthesized: true,
+                )
+                .length >=
+            2;
   }
 }
 
@@ -39,13 +47,20 @@ enum _RoutineHistoryChartType {
 
 class _RoutineHistoryChartState
     extends ControlledState<RoutineHistoryChart, RoutinesController> {
-  List<Workout> get children => controller.getChildren(widget.routine);
+  List<Workout> get children => controller.getChildren(
+        widget.routine,
+        allowSynthesized: true,
+      );
 
   late int selectedIndex = children.length - 1;
 
   late final dateRecognizer = TapGestureRecognizer()
     ..onTap = () {
-      Go.to(() => ExercisesView(workout: children[selectedIndex]));
+      Go.to(
+        () => ExercisesView(
+            workout: Get.find<HistoryController>()
+                .getByID(children[selectedIndex].id)!),
+      );
     };
 
   late _RoutineHistoryChartType type = availableTypes.first;

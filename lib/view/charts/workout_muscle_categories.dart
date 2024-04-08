@@ -31,8 +31,9 @@ class WorkoutMuscleCategoriesBarChart extends GetWidget<HistoryController> {
     String getLabel(GTMuscleCategory cat) =>
         "${"muscleCategories.${cat.name}".t} (${((data[cat] ?? 0) * 100 / max).round()}%)";
 
-    final textReservedSize =
-        nonEmptyData.map((e) => getLabel(e.key).computeSize().width + 16).max;
+    final textReservedSize = nonEmptyData.isEmpty
+        ? 0.0
+        : nonEmptyData.map((e) => getLabel(e.key).computeSize().width + 16).max;
 
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -82,10 +83,10 @@ class WorkoutMuscleCategoriesBarChart extends GetWidget<HistoryController> {
                       showTitles: false,
                       reservedSize: 16,
                     )),
-                    leftTitles:
-                        const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                    rightTitles:
-                        const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                    leftTitles: const AxisTitles(
+                        sideTitles: SideTitles(showTitles: false)),
+                    rightTitles: const AxisTitles(
+                        sideTitles: SideTitles(showTitles: false)),
                     bottomTitles: AxisTitles(
                       sideTitles: SideTitles(
                         showTitles: true,

@@ -174,10 +174,7 @@ class _ExercisesViewState extends State<ExercisesView> {
                       if (workout.isConcrete) ...[
                         const Divider(height: 32),
                         WorkoutStatsRow(
-                          workout: SynthesizedWorkout([
-                            workout,
-                            if (workout.hasContinuation) workout.continuation!,
-                          ]),
+                          workout: _getSynthesizedWorkout(),
                         ),
                       ],
                       const Divider(height: 32),
@@ -214,16 +211,13 @@ class _ExercisesViewState extends State<ExercisesView> {
                   child: RoutineHistoryChart(routine: workout),
                 ),
               ),
-            if (WorkoutMuscleCategoriesBarChart.shouldShow(workout))
+            if (WorkoutMuscleCategoriesBarChart.shouldShow(
+                _getSynthesizedWorkout()))
               SliverToBoxAdapter(
                 child: Padding(
                   padding: const EdgeInsets.all(16),
                   child: WorkoutMuscleCategoriesBarChart(
-                    workout: SynthesizedWorkout([
-                      workout,
-                      if (workout.isConcrete && workout.hasContinuation)
-                        workout.continuation!,
-                    ]),
+                    workout: _getSynthesizedWorkout(),
                   ),
                 ),
               ),
@@ -345,6 +339,13 @@ class _ExercisesViewState extends State<ExercisesView> {
         ),
       ),
     );
+  }
+
+  SynthesizedWorkout _getSynthesizedWorkout() {
+    return SynthesizedWorkout([
+      workout,
+      if (workout.isConcrete && workout.hasContinuation) workout.continuation!,
+    ]);
   }
 
   void changeParent(String? value) {

@@ -292,6 +292,8 @@ class SynthesizedWorkout implements Workout {
 
   SynthesizedWorkout(this.components)
       : assert(components.isNotEmpty),
+        assert(components.every((wo) => wo is! SynthesizedWorkout),
+            "Cannot nest synthesized workouts"),
         assert(
             components.every((e) => e.isConcrete) ||
                 components.every((e) => !e.isConcrete),
@@ -316,7 +318,7 @@ class SynthesizedWorkout implements Workout {
       throw SynthesizedWorkoutSetterException("distanceUnit");
 
   @override
-  String get id => "";
+  String get id => components.first.id;
   @override
   set id(String v) => throw SynthesizedWorkoutSetterException("id");
 
@@ -377,7 +379,7 @@ class SynthesizedWorkout implements Workout {
   bool get isComplete => components.every((e) => e.isComplete);
 
   @override
-  bool get isConcrete => true;
+  bool get isConcrete => components.first.isConcrete;
 
   @override
   bool get isContinuable => false;

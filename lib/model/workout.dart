@@ -265,6 +265,179 @@ class Workout {
   }
 }
 
+class SynthesizedWorkoutSetterException implements Exception {
+  final String field;
+
+  SynthesizedWorkoutSetterException(this.field);
+
+  @override
+  String toString() {
+    return "Cannot set field `$field` on a synthesized workout.";
+  }
+}
+
+class SynthesizedWorkoutMethodException implements Exception {
+  final String method;
+
+  SynthesizedWorkoutMethodException(this.method);
+
+  @override
+  String toString() {
+    return "Cannot call method `$method` on a synthesized workout.";
+  }
+}
+
+class SynthesizedWorkout implements Workout {
+  final List<Workout> components;
+
+  SynthesizedWorkout(this.components)
+      : assert(components.isNotEmpty),
+        assert(
+            components.every((e) => e.isConcrete) ||
+                components.every((e) => !e.isConcrete),
+            "All components must be either routines or concrete");
+
+  @override
+  String? get completedBy => null;
+  @override
+  set completedBy(String? v) =>
+      throw SynthesizedWorkoutSetterException("completedBy");
+
+  @override
+  String? get completes => null;
+  @override
+  set completes(String? v) =>
+      throw SynthesizedWorkoutSetterException("completes");
+
+  @override
+  Distance get distanceUnit => components.first.distanceUnit;
+  @override
+  set distanceUnit(Distance v) =>
+      throw SynthesizedWorkoutSetterException("distanceUnit");
+
+  @override
+  String get id => "";
+  @override
+  set id(String v) => throw SynthesizedWorkoutSetterException("id");
+
+  @override
+  String? get parentID => null;
+  @override
+  set parentID(String? v) =>
+      throw SynthesizedWorkoutSetterException("parentID");
+
+  @override
+  Weights get weightUnit => components.first.weightUnit;
+  @override
+  set weightUnit(Weights v) =>
+      throw SynthesizedWorkoutSetterException("weightUnit");
+
+  @override
+  List<GTSet> get allSets => components.expand((e) => e.allSets).toList();
+
+  @override
+  Workout clone() {
+    throw SynthesizedWorkoutMethodException("clone");
+  }
+
+  @override
+  int get displayExerciseCount =>
+      components.fold(0, (a, b) => a + b.displayExerciseCount);
+
+  @override
+  double get distanceRun => components.fold(0.0, (a, b) => a + b.distanceRun);
+
+  @override
+  List<GTSet> get doneSets => components.expand((e) => e.doneSets).toList();
+
+  @override
+  Duration get duration => components.fold(
+      Duration.zero, (a, b) => a + (b.duration ?? Duration.zero));
+
+  @override
+  DateTime get endingDate => startingDate!.add(duration);
+
+  @override
+  List<WorkoutExercisable> get exercises => components
+      .expand((w) => [
+            for (final e in w.exercises)
+              e.changeUnits(
+                fromWeightUnit: w.weightUnit,
+                toWeightUnit: weightUnit,
+                fromDistanceUnit: w.distanceUnit,
+                toDistanceUnit: distanceUnit,
+              )
+          ])
+      .toList();
+
+  @override
+  String? get infobox => components.first.infobox;
+
+  @override
+  bool get isComplete => components.every((e) => e.isComplete);
+
+  @override
+  bool get isConcrete => true;
+
+  @override
+  bool get isContinuable => false;
+
+  @override
+  bool get isContinuation => false;
+
+  @override
+  double get liftedWeight => components.fold(
+      0.0,
+      (a, b) =>
+          a +
+          Weights.convert(
+            value: b.liftedWeight,
+            from: b.weightUnit,
+            to: weightUnit,
+          ));
+
+  @override
+  String get name => components.first.name;
+
+  @override
+  double get progress =>
+      // Average progress
+      components.fold(0.0, (a, b) => a + b.progress) / components.length;
+
+  @override
+  Workout regenerateID() {
+    throw SynthesizedWorkoutMethodException("regenerateID");
+  }
+
+  @override
+  int get reps => components.fold(0, (a, b) => a + b.reps);
+
+  @override
+  bool get shouldShowInfobox => components.first.shouldShowInfobox;
+
+  @override
+  DateTime? get startingDate => components.first.startingDate;
+
+  @override
+  Map<String, dynamic> toJson() {
+    return {
+      "components": components.map((e) => e.toJson()).toList(),
+    };
+  }
+
+  @override
+  Workout toRoutine({String? routineID}) {
+    throw SynthesizedWorkoutMethodException("toRoutine");
+  }
+
+  @override
+  Workout withFilters(
+      {bool Function(WorkoutExercisable p1)? exerciseFilter,
+      bool Function(WorkoutExercisable p1, GTSet p2)? setFilter}) {
+    throw SynthesizedWorkoutMethodException("withFilters");
+  }
+}
+
 class WorkoutDifference {
   final int addedExercises, removedExercises, changedExercises;
 

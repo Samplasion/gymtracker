@@ -173,39 +173,11 @@ class _ExercisesViewState extends State<ExercisesView> {
                       ),
                       if (workout.isConcrete) ...[
                         const Divider(height: 32),
-                        StatsRow(
-                          stats: [
-                            Stats(
-                              value: TimerView.buildTimeString(
-                                context,
-                                workout.duration!,
-                                builder: (time) => time.text!,
-                              ),
-                              label: "exerciseList.stats.time".t,
-                            ),
-                            if (workout.liftedWeight > 0)
-                              Stats(
-                                value: Weights.convert(
-                                  value: workout.liftedWeight,
-                                  from: workout.weightUnit,
-                                  to: settingsController.weightUnit.value,
-                                ).userFacingWeight,
-                                label: "exerciseList.stats.volume".t,
-                              ),
-                            if (workout.distanceRun > 0)
-                              Stats(
-                                value: Distance.convert(
-                                  value: workout.distanceRun,
-                                  from: workout.distanceUnit,
-                                  to: settingsController.distanceUnit.value,
-                                ).userFacingDistance,
-                                label: "exerciseList.stats.distance".t,
-                              ),
-                            Stats(
-                              value: workout.doneSets.length.toString(),
-                              label: "exerciseList.stats.sets".t,
-                            ),
-                          ],
+                        WorkoutStatsRow(
+                          workout: SynthesizedWorkout([
+                            workout,
+                            if (workout.hasContinuation) workout.continuation!,
+                          ]),
                         ),
                       ],
                       const Divider(height: 32),
@@ -246,7 +218,13 @@ class _ExercisesViewState extends State<ExercisesView> {
               SliverToBoxAdapter(
                 child: Padding(
                   padding: const EdgeInsets.all(16),
-                  child: WorkoutMuscleCategoriesBarChart(workout: workout),
+                  child: WorkoutMuscleCategoriesBarChart(
+                    workout: SynthesizedWorkout([
+                      workout,
+                      if (workout.isConcrete && workout.hasContinuation)
+                        workout.continuation!,
+                    ]),
+                  ),
                 ),
               ),
             if (workout.shouldShowInfobox)
@@ -379,6 +357,53 @@ class _ExercisesViewState extends State<ExercisesView> {
     SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
       setState(() => workout = newWorkout);
     });
+  }
+}
+
+class WorkoutStatsRow extends StatelessWidget {
+  const WorkoutStatsRow({
+    super.key,
+    required this.workout,
+  });
+
+  final Workout workout;
+
+  @override
+  Widget build(BuildContext context) {
+    return StatsRow(
+      stats: [
+        Stats(
+          value: TimerView.buildTimeString(
+            context,
+            workout.duration!,
+            builder: (time) => time.text!,
+          ),
+          label: "exerciseList.stats.time".t,
+        ),
+        if (workout.liftedWeight > 0)
+          Stats(
+            value: Weights.convert(
+              value: workout.liftedWeight,
+              from: workout.weightUnit,
+              to: settingsController.weightUnit.value,
+            ).userFacingWeight,
+            label: "exerciseList.stats.volume".t,
+          ),
+        if (workout.distanceRun > 0)
+          Stats(
+            value: Distance.convert(
+              value: workout.distanceRun,
+              from: workout.distanceUnit,
+              to: settingsController.distanceUnit.value,
+            ).userFacingDistance,
+            label: "exerciseList.stats.distance".t,
+          ),
+        Stats(
+          value: workout.doneSets.length.toString(),
+          label: "exerciseList.stats.sets".t,
+        ),
+      ],
+    );
   }
 }
 

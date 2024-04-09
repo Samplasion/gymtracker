@@ -12,79 +12,13 @@ import 'package:test/test.dart';
 import '../expectations.dart';
 
 void main() {
-  group('Workout model -', () {
-    final workout = Workout(
-      id: "1",
-      name: 'Test Workout',
-      exercises: [
-        Exercise.custom(
-          id: "1",
-          name: 'Test Exercise',
-          parameters: GTSetParameters.repsWeight,
-          sets: [
-            GTSet(
-              reps: 10,
-              weight: 100,
-              time: const Duration(seconds: 60),
-              parameters: GTSetParameters.repsWeight,
-              kind: GTSetKind.normal,
-            ),
-            GTSet(
-              reps: 10,
-              weight: 100,
-              time: const Duration(seconds: 60),
-              parameters: GTSetParameters.repsWeight,
-              kind: GTSetKind.normal,
-            ),
-          ],
-          primaryMuscleGroup: GTMuscleGroup.abs,
-          secondaryMuscleGroups: {GTMuscleGroup.lowerBack},
-          restTime: const Duration(seconds: 60),
-          parentID: null,
-          notes: 'Test Notes',
-          workoutID: null,
-          supersetID: null,
-        ),
-        Exercise.custom(
-          id: "2",
-          name: 'Test Exercise 2',
-          parameters: GTSetParameters.repsWeight,
-          sets: [
-            GTSet(
-              reps: 10,
-              weight: 100,
-              time: const Duration(seconds: 60),
-              parameters: GTSetParameters.repsWeight,
-              kind: GTSetKind.normal,
-            ),
-            GTSet(
-              reps: 10,
-              weight: 100,
-              time: const Duration(seconds: 60),
-              parameters: GTSetParameters.repsWeight,
-              kind: GTSetKind.normal,
-            ),
-          ],
-          primaryMuscleGroup: GTMuscleGroup.abs,
-          secondaryMuscleGroups: {GTMuscleGroup.lowerBack},
-          restTime: const Duration(seconds: 60),
-          parentID: null,
-          notes: 'Test Notes',
-          workoutID: null,
-          supersetID: null,
-        ),
-      ],
-      duration: const Duration(seconds: 60),
-      startingDate: DateTime.now().subtract(const Duration(minutes: 1)),
-      parentID: null,
-      infobox: 'Test Infobox',
-      completedBy: null,
-      completes: null,
-    );
-    Exercise newExercise() {
-      final number = Random().nextInt(100).toString();
-      return Exercise.custom(
-        name: 'Test Exercise $number',
+  final workout = Workout(
+    id: "1",
+    name: 'Test Workout',
+    exercises: [
+      Exercise.custom(
+        id: "1",
+        name: 'Test Exercise',
         parameters: GTSetParameters.repsWeight,
         sets: [
           GTSet(
@@ -106,12 +40,78 @@ void main() {
         secondaryMuscleGroups: {GTMuscleGroup.lowerBack},
         restTime: const Duration(seconds: 60),
         parentID: null,
-        notes: 'Test Notes $number',
+        notes: 'Test Notes',
         workoutID: null,
         supersetID: null,
-      );
-    }
+      ),
+      Exercise.custom(
+        id: "2",
+        name: 'Test Exercise 2',
+        parameters: GTSetParameters.repsWeight,
+        sets: [
+          GTSet(
+            reps: 10,
+            weight: 100,
+            time: const Duration(seconds: 60),
+            parameters: GTSetParameters.repsWeight,
+            kind: GTSetKind.normal,
+          ),
+          GTSet(
+            reps: 10,
+            weight: 100,
+            time: const Duration(seconds: 60),
+            parameters: GTSetParameters.repsWeight,
+            kind: GTSetKind.normal,
+          ),
+        ],
+        primaryMuscleGroup: GTMuscleGroup.abs,
+        secondaryMuscleGroups: {GTMuscleGroup.lowerBack},
+        restTime: const Duration(seconds: 60),
+        parentID: null,
+        notes: 'Test Notes',
+        workoutID: null,
+        supersetID: null,
+      ),
+    ],
+    duration: const Duration(seconds: 60),
+    startingDate: DateTime.now().subtract(const Duration(minutes: 1)),
+    parentID: null,
+    infobox: 'Test Infobox',
+    completedBy: null,
+    completes: null,
+  );
+  Exercise newExercise() {
+    final number = Random().nextInt(100).toString();
+    return Exercise.custom(
+      name: 'Test Exercise $number',
+      parameters: GTSetParameters.repsWeight,
+      sets: [
+        GTSet(
+          reps: 10,
+          weight: 100,
+          time: const Duration(seconds: 60),
+          parameters: GTSetParameters.repsWeight,
+          kind: GTSetKind.normal,
+        ),
+        GTSet(
+          reps: 10,
+          weight: 100,
+          time: const Duration(seconds: 60),
+          parameters: GTSetParameters.repsWeight,
+          kind: GTSetKind.normal,
+        ),
+      ],
+      primaryMuscleGroup: GTMuscleGroup.abs,
+      secondaryMuscleGroups: {GTMuscleGroup.lowerBack},
+      restTime: const Duration(seconds: 60),
+      parentID: null,
+      notes: 'Test Notes $number',
+      workoutID: null,
+      supersetID: null,
+    );
+  }
 
+  group('Workout model -', () {
     group("WorkoutDifference class -", () {
       test('difference should be correctly calculated (added exercise)', () {
         final workout2 = workout.clone();
@@ -681,6 +681,163 @@ void main() {
                   workout.copyWith.completes("fake id"),
                 ),
             throwsA(isA<AssertionError>()));
+      });
+    });
+  });
+  group('SynthesizedWorkout class -', () {
+    final routine1 = Workout(
+      id: "r1",
+      name: "R1",
+      exercises: [
+        newExercise().copyWith.workoutID("r2"),
+      ],
+    );
+    final routine2 = Workout(
+      id: "r2",
+      name: "R2",
+      exercises: [
+        Superset(
+          id: "s1",
+          exercises: [newExercise().copyWith.workoutID("r2")],
+          restTime: Duration.zero,
+          workoutID: "r2",
+        ),
+      ],
+    );
+
+    final workout1 = routine1.copyWith(
+      startingDate: DateTime.now(),
+      duration: Duration.zero,
+    );
+    final workout2 = routine2.copyWith(
+      startingDate: DateTime.now(),
+      duration: Duration.zero,
+    );
+
+    group("constructor should assert", () {
+      test("if the component list is empty", () {
+        expect(() => SynthesizedWorkout([]), throwsA(isA<AssertionError>()));
+      });
+      test("if we're nesting synthesized workouts", () {
+        expect(
+            () => SynthesizedWorkout([
+                  routine1,
+                  SynthesizedWorkout([routine2])
+                ]),
+            throwsA(isA<AssertionError>()));
+      });
+      test("if the workouts aren't all concrete or not concrete", () {
+        expect(() => SynthesizedWorkout([routine1, workout2]),
+            throwsA(isA<AssertionError>()));
+      });
+    });
+
+    final synthesizedRoutine = SynthesizedWorkout([routine1, routine2]);
+    final synthesizedWorkout = SynthesizedWorkout([workout1, workout2]);
+
+    group("synthesized routine -", () {
+      test("values are relayed correctly", () {
+        expect(synthesizedRoutine.isConcrete, false);
+        expect(synthesizedRoutine.id, routine1.id);
+        expect(synthesizedRoutine.name, routine1.name);
+        expect(synthesizedRoutine.allSets, routine1.allSets + routine2.allSets);
+        expect(synthesizedRoutine.exercises.length,
+            (routine1.exercises + routine2.exercises).length);
+        for (int i = 0; i < synthesizedWorkout.exercises.length; i++) {
+          if (synthesizedWorkout.exercises[i] is Superset) continue;
+          expectExercise(synthesizedWorkout.exercises[i] as Exercise,
+              (routine1.exercises + routine2.exercises)[i] as Exercise);
+        }
+        expect(synthesizedRoutine.displayExerciseCount,
+            routine1.displayExerciseCount + routine2.displayExerciseCount);
+        expect(synthesizedRoutine.progress,
+            (routine1.progress + routine2.progress) / 2);
+        expect(synthesizedRoutine.liftedWeight,
+            routine1.liftedWeight + routine2.liftedWeight);
+        expect(synthesizedRoutine.distanceRun,
+            routine1.distanceRun + routine2.distanceRun);
+      });
+
+      test("setters should throw", () {
+        expect(() => synthesizedRoutine.id = "",
+            throwsA(isA<SynthesizedWorkoutSetterException>()));
+        expect(() => synthesizedRoutine.parentID = "",
+            throwsA(isA<SynthesizedWorkoutSetterException>()));
+        expect(() => synthesizedRoutine.completedBy = "",
+            throwsA(isA<SynthesizedWorkoutSetterException>()));
+        expect(() => synthesizedRoutine.completes = "",
+            throwsA(isA<SynthesizedWorkoutSetterException>()));
+        expect(() => synthesizedRoutine.distanceUnit = Distance.mi,
+            throwsA(isA<SynthesizedWorkoutSetterException>()));
+        expect(() => synthesizedRoutine.weightUnit = Weights.kg,
+            throwsA(isA<SynthesizedWorkoutSetterException>()));
+      });
+
+      test("methods should throw", () {
+        expect(() => synthesizedRoutine.clone(),
+            throwsA(isA<SynthesizedWorkoutMethodException>()));
+        expect(() => synthesizedRoutine.regenerateID(),
+            throwsA(isA<SynthesizedWorkoutMethodException>()));
+        expect(() => synthesizedRoutine.toRoutine(),
+            throwsA(isA<SynthesizedWorkoutMethodException>()));
+        expect(() => synthesizedRoutine.withFilters(),
+            throwsA(isA<SynthesizedWorkoutMethodException>()));
+        expect(() => synthesizedRoutine.regenerateExerciseIDs(),
+            throwsA(isA<SynthesizedWorkoutMethodException>()));
+      });
+    });
+    group("synthesized workout -", () {
+      test("values are relayed correctly", () {
+        expect(synthesizedWorkout.isConcrete, true);
+        expect(synthesizedWorkout.id, workout1.id);
+        expect(synthesizedWorkout.name, workout1.name);
+        expect(synthesizedWorkout.allSets, workout1.allSets + workout2.allSets);
+        expect(synthesizedWorkout.exercises.length,
+            (workout1.exercises + workout2.exercises).length);
+        for (int i = 0; i < synthesizedWorkout.exercises.length; i++) {
+          if (synthesizedWorkout.exercises[i] is Superset) continue;
+          expectExercise(synthesizedWorkout.exercises[i] as Exercise,
+              (workout1.exercises + workout2.exercises)[i] as Exercise);
+        }
+        expect(synthesizedWorkout.displayExerciseCount,
+            workout1.displayExerciseCount + workout2.displayExerciseCount);
+        expect(synthesizedWorkout.progress,
+            (workout1.progress + workout2.progress) / 2);
+        expect(synthesizedWorkout.liftedWeight,
+            workout1.liftedWeight + workout2.liftedWeight);
+        expect(synthesizedWorkout.distanceRun,
+            workout1.distanceRun + workout2.distanceRun);
+        expect(synthesizedWorkout.startingDate, workout1.startingDate);
+        expect(synthesizedWorkout.duration,
+            workout1.duration! + workout2.duration!);
+      });
+
+      test("setters should throw", () {
+        expect(() => synthesizedWorkout.id = "",
+            throwsA(isA<SynthesizedWorkoutSetterException>()));
+        expect(() => synthesizedWorkout.parentID = "",
+            throwsA(isA<SynthesizedWorkoutSetterException>()));
+        expect(() => synthesizedWorkout.completedBy = "",
+            throwsA(isA<SynthesizedWorkoutSetterException>()));
+        expect(() => synthesizedWorkout.completes = "",
+            throwsA(isA<SynthesizedWorkoutSetterException>()));
+        expect(() => synthesizedWorkout.distanceUnit = Distance.mi,
+            throwsA(isA<SynthesizedWorkoutSetterException>()));
+        expect(() => synthesizedWorkout.weightUnit = Weights.kg,
+            throwsA(isA<SynthesizedWorkoutSetterException>()));
+      });
+
+      test("methods should throw", () {
+        expect(() => synthesizedWorkout.clone(),
+            throwsA(isA<SynthesizedWorkoutMethodException>()));
+        expect(() => synthesizedWorkout.regenerateID(),
+            throwsA(isA<SynthesizedWorkoutMethodException>()));
+        expect(() => synthesizedWorkout.toRoutine(),
+            throwsA(isA<SynthesizedWorkoutMethodException>()));
+        expect(() => synthesizedWorkout.withFilters(),
+            throwsA(isA<SynthesizedWorkoutMethodException>()));
+        expect(() => synthesizedWorkout.regenerateExerciseIDs(),
+            throwsA(isA<SynthesizedWorkoutMethodException>()));
       });
     });
   });

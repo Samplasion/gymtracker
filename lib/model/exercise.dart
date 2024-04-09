@@ -242,11 +242,7 @@ class Exercise extends WorkoutExercisable {
 
   @override
   String toString() {
-    return "Exercise${{
-      ...toJson(),
-      'isStandardLibraryExercise': isStandardLibraryExercise,
-      'isAbstract': isAbstract
-    }}";
+    return "Exercise${{...toJson(), 'isAbstract': isAbstract}}";
   }
 
   @override

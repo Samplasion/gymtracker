@@ -263,6 +263,22 @@ class Workout {
       ],
     );
   }
+
+  void regenerateExerciseIDs() {
+    for (final exercise in exercises) {
+      exercise.map(
+        superset: (superset) {
+          final newSupersetID = const Uuid().v4();
+          superset.id = newSupersetID;
+          for (final exercise in superset.exercises) {
+            exercise.id = const Uuid().v4();
+            exercise.supersetID = newSupersetID;
+          }
+        },
+        exercise: (single) => single.id = const Uuid().v4(),
+      );
+    }
+  }
 }
 
 class SynthesizedWorkoutSetterException implements Exception {
@@ -437,6 +453,11 @@ class SynthesizedWorkout implements Workout {
       {bool Function(WorkoutExercisable p1)? exerciseFilter,
       bool Function(WorkoutExercisable p1, GTSet p2)? setFilter}) {
     throw SynthesizedWorkoutMethodException("withFilters");
+  }
+
+  @override
+  void regenerateExerciseIDs() {
+    throw SynthesizedWorkoutMethodException("regenerateExerciseIDs");
   }
 }
 

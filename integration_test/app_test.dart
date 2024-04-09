@@ -15,6 +15,7 @@ import 'flows/combine_workouts.dart';
 import 'flows/create_exercise.dart';
 import 'flows/create_routine.dart';
 import 'flows/default_units.dart';
+import 'flows/edit_combination.dart';
 import 'flows/edit_exercise_in_routines_and_history.dart';
 import 'flows/edit_exercise_while_ongoing.dart';
 import 'flows/edit_workout.dart';
@@ -24,9 +25,8 @@ import 'flows/workout_from_routine.dart';
 void main() async {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
   TestService().isTest = true;
-  late DatabaseService databaseService;
+  late DatabaseService databaseService = DatabaseService();
   final l = GTLocalizations();
-  databaseService = DatabaseService();
   await databaseService.ensureInitializedForTests(NativeDatabase.memory());
 
   setUp(() async {
@@ -82,6 +82,10 @@ void main() async {
     testWidgets(
       'combine workouts',
       (tester) => testCombineWorkoutsFlow(tester, l, databaseService),
+    );
+    testWidgets(
+      'edit workout combination',
+      (tester) => testEditWorkoutCombinationFlow(tester, l, databaseService),
     );
     testWidgets(
       'test default units',

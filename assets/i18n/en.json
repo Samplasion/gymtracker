@@ -883,7 +883,7 @@
     "shortTitle": "Error",
     "title": "Oh snap!",
     "subtitle": "An unexpected error occurred.",
-    "body": "You can try the following:\n\n • Restart the app\n • Check if you are using the latest version\n • Contact support\n",
+    "body": "You can try the following:\n\n • Restart the app\n • Check if you are using the latest version\n • Contact support",
     "stack": "If the error persists, please provide the following information to the support team:",
     "noStack": "No stack trace available."
   }

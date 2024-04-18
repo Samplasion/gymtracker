@@ -639,7 +639,7 @@
         "cableBicepsCurl": "Bicep curl (cavi)",
         "dumbbellBicepsCurl": "Bicep curl (manubri)",
         "bicepsCurlMachine": "Bicep curl (macchina)",
-        "chinUps": "Chin ups"
+        "chinUps": "Chin up"
       }
     },
     "abs": {
@@ -883,7 +883,7 @@
     "shortTitle": "Errore",
     "title": "Oh cavolo!",
     "subtitle": "Qualcosa è andato storto.",
-    "body": "Se il problema persiste, prova a:\n\n • Riavviare l'app\n • Assicurarti di avere l'ultima versione dell'app\n • Contattare il supporto\n",
+    "body": "Se il problema persiste, prova a:\n\n • Riavviare l'app\n • Assicurarti di avere l'ultima versione dell'app\n • Contattare il supporto",
     "stack": "Se il problema persiste, per favore fornisci le seguenti informazioni al supporto:",
     "noStack": "Nessuna informazione disponibile sullo stack."
   }

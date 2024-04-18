@@ -625,7 +625,9 @@
         "butterflyMachine": "Butterfly Machine",
         "dumbbellHexPress": "Dumbbell Hex Press",
         "smithMachineHexPress": "Smith Machine Hex Press",
-        "seatedCableChestFlys": "Seated cable chest flys"
+        "seatedCableChestFlys": "Seated cable chest flys",
+        "verticalChestPress": "Vertical chest press",
+        "cableFlyCrossovers": "Cable fly cross-overs"
       }
     },
     "biceps": {
@@ -633,7 +635,11 @@
       "exercises": {
         "barbellBicepsCurl": "Bicep curl (barbell)",
         "spiderCurls": "Spider curls",
-        "singleArmCableHammerCurls": "Hammer curls (cable, single arm)"
+        "singleArmCableHammerCurls": "Hammer curls (cable, single arm)",
+        "cableBicepsCurl": "Bicep curl (cable)",
+        "dumbbellBicepsCurl": "Bicep curl (dumbbell)",
+        "bicepsCurlMachine": "Bicep curl (machine)",
+        "chinUps": "Chin Ups"
       }
     },
     "abs": {
@@ -642,7 +648,9 @@
         "crunches": "Crunches",
         "kneeRaise": "Knee raise",
         "legRaise": "Leg raise",
-        "crunchMachine": "Crunch (machine)"
+        "crunchMachine": "Crunch (machine)",
+        "heelsUpCrunch": "Heels-up crunches",
+        "fullBodyCrunch": "Full-body crunches"
       }
     },
     "calves": {
@@ -677,7 +685,8 @@
         "latRaisesInclinedBench": "Lat raises (inclined bench)",
         "latRaisesCable": "Lat raises (cable)",
         "latRaisesDualCable": "Lat raises (cable, both arms)",
-        "reverseFlysInclinedBench": "Reverse flys (inclined bench)"
+        "reverseFlysInclinedBench": "Reverse flys (inclined bench)",
+        "arnoldPress": "Arnold press"
       }
     },
     "back": {
@@ -690,7 +699,7 @@
         "underhandGripLatPulldowns": "Lat pulldowns (underhand grip)",
         "latPulldowns": "Lat pulldowns",
         "cableSeatedRowTriangleBar": "Cable seated row (triangle bar)",
-        "straightArmCablePushdown": "Straight-arm Cable Pushdowns"
+        "straightArmCablePushdown": "Straight-arm cable pushdowns"
       }
     },
     "triceps": {
@@ -701,7 +710,16 @@
         "tricepsRopePushdown": "Triceps rope pushdown"
       }
     },
-    "newCustomExercise": "New exercise"
+    "newCustomExercise": "New exercise",
+    "hips": {
+      "exercises": {
+        "gluteBridge": "Glute bridge",
+        "hipThrust": "Hip thrust",
+        "hipAdduction": "Hip adduction",
+        "hipAbduction": "Hip abduction"
+      },
+      "name": "Hips"
+    }
   },
   "infobox": {
     "label": "Notes"

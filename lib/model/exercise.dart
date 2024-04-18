@@ -43,7 +43,10 @@ enum GTMuscleGroup {
   shoulders(GTMuscleCategory.shoulders),
   traps(GTMuscleCategory.back),
   triceps(GTMuscleCategory.arms),
-  upperBack(GTMuscleCategory.back);
+  upperBack(GTMuscleCategory.back),
+
+  // Added later: keep sorted by added date and don't rename
+  thighs(GTMuscleCategory.legs);
 
   const GTMuscleGroup([this.category]);
 

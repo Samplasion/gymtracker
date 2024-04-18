@@ -625,7 +625,9 @@
         "butterflyMachine": "Butterfly machine",
         "dumbbellHexPress": "Hex Press (manubri)",
         "smithMachineHexPress": "Hex Press al Multipower",
-        "seatedCableChestFlys": "Croci ai cavi da seduto"
+        "seatedCableChestFlys": "Croci ai cavi da seduto",
+        "verticalChestPress": "Chest press (verticale)",
+        "cableFlyCrossovers": "Croci ai cavi alti"
       }
     },
     "biceps": {
@@ -633,7 +635,11 @@
       "exercises": {
         "barbellBicepsCurl": "Bicep curl (bilanciere)",
         "spiderCurls": "Spider curls",
-        "singleArmCableHammerCurls": "Hammer curls ai cavi (braccio singolo)"
+        "singleArmCableHammerCurls": "Hammer curls ai cavi (braccio singolo)",
+        "cableBicepsCurl": "Bicep curl (cavi)",
+        "dumbbellBicepsCurl": "Bicep curl (manubri)",
+        "bicepsCurlMachine": "Bicep curl (macchina)",
+        "chinUps": "Chin ups"
       }
     },
     "abs": {
@@ -642,7 +648,9 @@
         "crunches": "Crunch",
         "kneeRaise": "Sollevamento delle ginocchia",
         "legRaise": "Sollevamento delle gambe",
-        "crunchMachine": "Crunch machine"
+        "crunchMachine": "Crunch machine",
+        "heelsUpCrunch": "Crunch (caviglie alzate)",
+        "fullBodyCrunch": "Full-body crunch"
       }
     },
     "calves": {
@@ -677,7 +685,8 @@
         "latRaisesInclinedBench": "Alzate laterali (panca inclinata)",
         "latRaisesCable": "Alzate laterali ai cavi",
         "latRaisesDualCable": "Alzate laterali ai cavi (entrambe le braccia)",
-        "reverseFlysInclinedBench": "Croci inverse (panca inclinata)"
+        "reverseFlysInclinedBench": "Croci inverse (panca inclinata)",
+        "arnoldPress": "Arnold press"
       }
     },
     "back": {
@@ -701,7 +710,16 @@
         "tricepsRopePushdown": "Pushdown dei tricipiti con corda"
       }
     },
-    "newCustomExercise": "Nuovo esercizio"
+    "newCustomExercise": "Nuovo esercizio",
+    "hips": {
+      "name": "Fianchi e anche",
+      "exercises": {
+        "gluteBridge": "Ponte per i glutei",
+        "hipThrust": "Hip thrust",
+        "hipAdduction": "Hip adduction",
+        "hipAbduction": "Hip abduction"
+      }
+    }
   },
   "infobox": {
     "label": "Note"

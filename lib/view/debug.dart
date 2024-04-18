@@ -212,6 +212,7 @@ String generateJsonForMissingKeys(List<String> missingKeys) {
 
   const encoder = JsonEncoder.withIndent("  ");
   final lines = encoder.convert(keys).split('\n');
+  if (lines.length == 1) return lines.join('\n');
   return lines.skip(1).take(lines.length - 2).join('\n');
 }
 

@@ -49,7 +49,6 @@ dependencies:
   timezone: ^0.9.2
   universal_platform: ^1.0.0+1
   uuid: ^4.0.0
-  yaml: ^3.1.1
 
 dev_dependencies:
   flutter_test:
@@ -74,5 +73,5 @@ flutter:
 
   uses-material-design: true
   assets:
-    - assets/i18n/en.yml
-    - assets/i18n/it.yml
+    - assets/i18n/en.json
+    - assets/i18n/it.json

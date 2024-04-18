@@ -45,3 +45,6 @@ app.*.map.json
 
 # Output directory
 out/
+
+# Internationalization
+accent.json

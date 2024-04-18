@@ -6,7 +6,6 @@ import 'package:get/get.dart';
 import 'package:gymtracker/controller/debug_controller.dart';
 import 'package:gymtracker/service/logger.dart';
 import 'package:intl/intl.dart';
-import 'package:yaml/yaml.dart';
 
 class GTLocalizations extends Translations with ChangeNotifier {
   @override
@@ -39,9 +38,8 @@ class GTLocalizations extends Translations with ChangeNotifier {
   Future init([bool cache = true]) async {
     for (final locale in supportedLocales) {
       final bundle = await rootBundle
-          .loadString('assets/i18n/${locale.languageCode}.yml', cache: cache);
-      keys[locale.languageCode] =
-          flattenTranslations(jsonDecode(jsonEncode(loadYaml(bundle))));
+          .loadString('assets/i18n/${locale.languageCode}.json', cache: cache);
+      keys[locale.languageCode] = flattenTranslations(jsonDecode(bundle));
     }
     Get.translations.clear();
     Get.addTranslations(keys);
@@ -51,10 +49,9 @@ class GTLocalizations extends Translations with ChangeNotifier {
   @visibleForTesting
   initTests(List<Locale> locales) async {
     for (final locale in locales) {
-      final bundle =
-          await rootBundle.loadString('assets/i18n/${locale.languageCode}.yml');
-      keys[locale.languageCode] =
-          flattenTranslations(jsonDecode(jsonEncode(loadYaml(bundle))));
+      final bundle = await rootBundle
+          .loadString('assets/i18n/${locale.languageCode}.json');
+      keys[locale.languageCode] = flattenTranslations(jsonDecode(bundle));
     }
     notifyListeners();
   }

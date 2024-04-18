@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:drift_db_viewer/drift_db_viewer.dart';
 import 'package:flat/flat.dart';
 import 'package:flutter/material.dart';
@@ -43,7 +45,7 @@ class _DebugViewState extends State<DebugView> {
             delegate: SliverChildListDelegate([
               Obx(() {
                 final missingKeys =
-                    generateYamlForMissingKeys([...controller.missingKeys]);
+                    generateJsonForMissingKeys([...controller.missingKeys]);
                 return ListTile(
                   title: const Text("Missing translations"),
                   subtitle: Text(
@@ -202,26 +204,15 @@ class _DebugViewState extends State<DebugView> {
   }
 }
 
-String generateYamlForMissingKeys(List<String> missingKeys) {
+String generateJsonForMissingKeys(List<String> missingKeys) {
   missingKeys = missingKeys.where((key) => key != "appName").toList();
   Map<String, dynamic> keys = unflatten({
     for (final key in missingKeys) key: key.split(".").last,
   });
 
-  String processMap(currentLevel, Map map) {
-    var current = "";
-    for (final entry in map.entries) {
-      if (entry.value is Map) {
-        current +=
-            "$currentLevel${entry.key}:\n${processMap(currentLevel + "  ", entry.value)}";
-      } else {
-        current += "$currentLevel${entry.key}: ${entry.value}\n";
-      }
-    }
-    return current;
-  }
-
-  return processMap("", keys).trim();
+  const encoder = JsonEncoder.withIndent("  ");
+  final lines = encoder.convert(keys).split('\n');
+  return lines.skip(1).take(lines.length - 2).join('\n');
 }
 
 class WorkoutTitleGeneratorAlert extends StatefulWidget {

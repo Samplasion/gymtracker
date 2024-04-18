@@ -70,6 +70,7 @@ class _GTRichTextEditorState extends State<GTRichTextEditor> {
               expands: false,
               isOnTapOutsideEnabled: true,
               autoFocus: widget.autofocus,
+              keyboardAppearance: context.theme.brightness,
               onTapOutside: (_, __) {
                 widget.onTapOutside?.call();
               },

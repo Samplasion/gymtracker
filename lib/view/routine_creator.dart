@@ -4,7 +4,6 @@ import 'package:flutter_quill/flutter_quill.dart';
 import 'package:get/get.dart';
 import 'package:gymtracker/controller/routines_controller.dart';
 import 'package:gymtracker/controller/settings_controller.dart';
-import 'package:gymtracker/data/weights.dart';
 import 'package:gymtracker/model/exercisable.dart';
 import 'package:gymtracker/model/exercise.dart';
 import 'package:gymtracker/model/set.dart';
@@ -105,6 +104,7 @@ class _RoutineCreatorState extends State<RoutineCreator> {
                   border: const OutlineInputBorder(),
                   labelText: "routines.editor.fields.name.label".t,
                 ),
+                autovalidateMode: AutovalidateMode.onUserInteraction,
                 validator: (string) {
                   if (string == null || string.isEmpty) {
                     return "routines.editor.fields.name.errors.empty".t;
@@ -124,15 +124,13 @@ class _RoutineCreatorState extends State<RoutineCreator> {
               ),
               Text("routines.editor.exercises.title".t,
                   style: Theme.of(context).textTheme.titleMedium),
-            ]
-                .map((c) => Padding(
-                      padding: const EdgeInsets.symmetric(
-                        vertical: 16,
-                        horizontal: 16,
-                      ).copyWith(top: 0),
-                      child: c,
-                    ))
-                .toList(),
+            ].map((c) => Padding(
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 16,
+                    horizontal: 16,
+                  ).copyWith(top: 0),
+                  child: c,
+                )),
             ListTile(
               title: Text("routines.editor.exercises.add".t),
               leading: const CircleAvatar(child: Icon(Icons.add_rounded)),
@@ -145,8 +143,8 @@ class _RoutineCreatorState extends State<RoutineCreator> {
                     controller.exercises.addAll(result!
                         .map((ex) {
                           return ex.makeChild().copyWith.sets([
-                            ExSet.empty(
-                              kind: SetKind.normal,
+                            GTSet.empty(
+                              kind: GTSetKind.normal,
                               parameters: ex.parameters,
                             ),
                           ]);
@@ -171,6 +169,7 @@ class _RoutineCreatorState extends State<RoutineCreator> {
                       Superset(
                         restTime: Duration.zero,
                         exercises: [for (final ex in result!) ex.makeChild()],
+                        workoutID: widget.base?.id,
                       ),
                     ));
                   });
@@ -207,8 +206,7 @@ class _RoutineCreatorState extends State<RoutineCreator> {
         exercise: (controller.exercises[i].data as Exercise),
         index: i,
         isCreating: true,
-        weightUnit:
-            Get.find<SettingsController>().weightUnit.value ?? Weights.kg,
+        weightUnit: Get.find<SettingsController>().weightUnit.value,
         distanceUnit: Get.find<SettingsController>().distanceUnit.value,
         onReorder: () {},
         onReplace: () {
@@ -217,8 +215,8 @@ class _RoutineCreatorState extends State<RoutineCreator> {
                 () => const ExercisePicker(singlePick: true));
             if (ex == null || ex.isEmpty) return;
             controller.exercises[i].data = ex.first.makeChild().copyWith.sets([
-              ExSet.empty(
-                kind: SetKind.normal,
+              GTSet.empty(
+                kind: GTSetKind.normal,
                 parameters: ex.first.parameters,
               ),
             ]);
@@ -236,8 +234,8 @@ class _RoutineCreatorState extends State<RoutineCreator> {
         onSetCreate: () {
           final ex = controller.exercises[i];
           controller.exercises[i].data.sets.add(
-            ExSet.empty(
-              kind: SetKind.normal,
+            GTSet.empty(
+              kind: GTSetKind.normal,
               parameters: (ex.data as Exercise).parameters,
             ),
           );
@@ -267,8 +265,7 @@ class _RoutineCreatorState extends State<RoutineCreator> {
         superset: controller.exercises[i].data as Superset,
         index: i,
         isCreating: true,
-        weightUnit:
-            Get.find<SettingsController>().weightUnit.value ?? Weights.kg,
+        weightUnit: Get.find<SettingsController>().weightUnit.value,
         distanceUnit: Get.find<SettingsController>().distanceUnit.value,
         onSupersetReorder: () {},
         onSupersetReplace: () {
@@ -277,8 +274,8 @@ class _RoutineCreatorState extends State<RoutineCreator> {
                 () => const ExercisePicker(singlePick: true));
             if (ex == null || ex.isEmpty) return;
             controller.exercises[i].data = ex.first.makeChild().copyWith.sets([
-              ExSet.empty(
-                kind: SetKind.normal,
+              GTSet.empty(
+                kind: GTSetKind.normal,
                 parameters: ex.first.parameters,
               ),
             ]);
@@ -312,8 +309,8 @@ class _RoutineCreatorState extends State<RoutineCreator> {
           (controller.exercises[i].data as Superset).exercises.addAll(
                 exercises.map(
                   (ex) => ex.makeChild().copyWith.sets([
-                    ExSet.empty(
-                      kind: SetKind.normal,
+                    GTSet.empty(
+                      kind: GTSetKind.normal,
                       parameters: ex.parameters,
                     ),
                   ]),
@@ -337,8 +334,8 @@ class _RoutineCreatorState extends State<RoutineCreator> {
             if (ex == null || ex.isEmpty) return;
             (controller.exercises[i].data as Superset).exercises[j] =
                 ex.first.copyWith.sets([
-              ExSet.empty(
-                kind: SetKind.normal,
+              GTSet.empty(
+                kind: GTSetKind.normal,
                 parameters: ex.first.parameters,
               ),
             ]);
@@ -354,8 +351,8 @@ class _RoutineCreatorState extends State<RoutineCreator> {
           final ex =
               (controller.exercises[i].data as Superset).exercises[index];
           (controller.exercises[i].data as Superset).exercises[index].sets.add(
-                ExSet.empty(
-                  kind: SetKind.normal,
+                GTSet.empty(
+                  kind: GTSetKind.normal,
                   parameters: ex.parameters,
                 ),
               );

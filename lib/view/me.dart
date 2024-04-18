@@ -132,7 +132,7 @@ class WeightCard extends StatelessWidget {
                         .map((element) => Weights.convert(
                             value: element.weight,
                             from: element.weightUnit,
-                            to: settingsController.weightUnit.value!))
+                            to: settingsController.weightUnit.value))
                         .toList(),
                   ),
                 );
@@ -214,57 +214,73 @@ class WeightMeasurementDataPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final measurements = [...controller.weightMeasurements.reversed];
     final scheme = Theme.of(context).colorScheme;
     return Scaffold(
       appBar: AppBar(
         title: Text("me.allData.label".t),
       ),
-      body: ListView.builder(
-        itemBuilder: (context, index) {
-          final measurement = measurements[index];
-          return Slidable(
-            key: ValueKey(measurement.id),
-            endActionPane: ActionPane(
-              extentRatio: 1 / 3,
-              dragDismissible: false,
-              motion: const BehindMotion(),
-              children: [
-                SlidableAction(
-                  onPressed: (_) {
-                    controller.removeWeightMeasurement(measurement);
-                    Go.snack(
-                      "me.allData.removed.text".t,
-                      action: SnackBarAction(
-                        label: "actions.undo".t,
-                        onPressed: () {
-                          controller.addWeightMeasurement(measurement);
-                        },
-                      ),
-                    );
-                  },
-                  backgroundColor: scheme.error,
-                  foregroundColor: scheme.onError,
-                  icon: Icons.delete_forever_rounded,
-                  label: 'actions.remove'.t,
+      body: StreamBuilder(
+        stream: controller.weightMeasurements.stream,
+        initialData: controller.weightMeasurements,
+        builder: (context, snapshot) {
+          final measurements = [...snapshot.data!.reversed];
+
+          if (measurements.isEmpty) {
+            return Center(
+              child: Text(
+                "me.allData.none".t,
+                style: Theme.of(context).textTheme.titleLarge,
+              ),
+            );
+          }
+
+          return ListView.builder(
+            itemBuilder: (context, index) {
+              final measurement = measurements[index];
+              return Slidable(
+                key: ValueKey(measurement.id),
+                endActionPane: ActionPane(
+                  extentRatio: 1 / 3,
+                  dragDismissible: false,
+                  motion: const BehindMotion(),
+                  children: [
+                    SlidableAction(
+                      onPressed: (_) {
+                        controller.removeWeightMeasurement(measurement);
+                        Go.snack(
+                          "me.allData.removed.text".t,
+                          action: SnackBarAction(
+                            label: "actions.undo".t,
+                            onPressed: () {
+                              controller.addWeightMeasurement(measurement);
+                            },
+                          ),
+                        );
+                      },
+                      backgroundColor: scheme.error,
+                      foregroundColor: scheme.onError,
+                      icon: Icons.delete_forever_rounded,
+                      label: 'actions.remove'.t,
+                    ),
+                  ],
                 ),
-              ],
-            ),
-            child: ListTile(
-              title: Text(measurement.convertedWeight.userFacingWeight),
-              subtitle: Text(DateFormat.MMMd(context.locale.languageCode)
-                  .add_Hm()
-                  .format(measurement.time)),
-              trailing: const Icon(Icons.chevron_right_rounded),
-              onTap: () {
-                Go.to(() => WeightMeasurementDataDetailsPage(
-                      measurementID: measurement.id,
-                    ));
-              },
-            ),
+                child: ListTile(
+                  title: Text(measurement.convertedWeight.userFacingWeight),
+                  subtitle: Text(DateFormat.MMMd(context.locale.languageCode)
+                      .add_Hm()
+                      .format(measurement.time)),
+                  trailing: const Icon(Icons.chevron_right_rounded),
+                  onTap: () {
+                    Go.to(() => WeightMeasurementDataDetailsPage(
+                          measurementID: measurement.id,
+                        ));
+                  },
+                ),
+              );
+            },
+            itemCount: controller.weightMeasurements.length,
           );
         },
-        itemCount: controller.weightMeasurements.length,
       ),
     );
   }
@@ -373,7 +389,7 @@ class WeightMeasurementAddSheet extends StatefulWidget {
 class _WeightMeasurementAddSheet extends State<WeightMeasurementAddSheet> {
   DateTime time = DateTime.now();
   late var weightController = TextEditingController(text: "0");
-  Weights weightUnit = settingsController.weightUnit()!;
+  Weights weightUnit = settingsController.weightUnit();
   final FocusNode _weightFocusNode = FocusNode();
 
   @override
@@ -461,12 +477,18 @@ class _WeightMeasurementAddSheet extends State<WeightMeasurementAddSheet> {
       return;
     }
     Navigator.of(context).pop(
-      WeightMeasurement(
-        weight: weight,
-        time: time,
-        weightUnit: weightUnit,
-        id: widget.base?.id,
-      ),
+      widget.base?.id == null
+          ? WeightMeasurement.generateID(
+              weight: weight,
+              time: time,
+              weightUnit: weightUnit,
+            )
+          : WeightMeasurement(
+              weight: weight,
+              time: time,
+              weightUnit: weightUnit,
+              id: widget.base!.id,
+            ),
     );
   }
 }

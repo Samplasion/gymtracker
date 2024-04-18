@@ -1,5 +1,6 @@
 import 'package:copy_with_extension/copy_with_extension.dart';
 import 'package:gymtracker/data/distance.dart';
+import 'package:gymtracker/data/exercises.dart';
 import 'package:gymtracker/data/weights.dart';
 import 'package:gymtracker/model/exercisable.dart';
 import 'package:gymtracker/model/set.dart';
@@ -13,7 +14,7 @@ part 'exercise.g.dart';
 
 bool _defaultSetFilter(set) => true;
 
-enum MuscleCategory {
+enum GTMuscleCategory {
   arms,
   back,
   chest,
@@ -22,31 +23,34 @@ enum MuscleCategory {
   shoulders,
 }
 
-enum MuscleGroup {
-  abductors(MuscleCategory.legs),
-  abs(MuscleCategory.core),
-  adductors(MuscleCategory.legs),
-  biceps(MuscleCategory.arms),
-  calves(MuscleCategory.legs),
-  chest(MuscleCategory.chest),
-  forearm(MuscleCategory.arms),
-  glutes(MuscleCategory.legs),
-  hamstrings(MuscleCategory.legs),
-  lats(MuscleCategory.legs),
-  lowerBack(MuscleCategory.back),
+enum GTMuscleGroup {
+  abductors(GTMuscleCategory.legs),
+  abs(GTMuscleCategory.core),
+  adductors(GTMuscleCategory.legs),
+  biceps(GTMuscleCategory.arms),
+  calves(GTMuscleCategory.legs),
+  chest(GTMuscleCategory.chest),
+  forearm(GTMuscleCategory.arms),
+  glutes(GTMuscleCategory.legs),
+  hamstrings(GTMuscleCategory.legs),
+  lats(GTMuscleCategory.legs),
+  lowerBack(GTMuscleCategory.back),
 
   /// Or cardio
   none,
   other,
-  quadriceps(MuscleCategory.legs),
-  shoulders(MuscleCategory.shoulders),
-  traps(MuscleCategory.back),
-  triceps(MuscleCategory.arms),
-  upperBack(MuscleCategory.back);
+  quadriceps(GTMuscleCategory.legs),
+  shoulders(GTMuscleCategory.shoulders),
+  traps(GTMuscleCategory.back),
+  triceps(GTMuscleCategory.arms),
+  upperBack(GTMuscleCategory.back),
 
-  const MuscleGroup([this.category]);
+  // Added later: keep sorted by added date and don't rename
+  thighs(GTMuscleCategory.legs);
 
-  final MuscleCategory? category;
+  const GTMuscleGroup([this.category]);
+
+  final GTMuscleCategory? category;
 }
 
 @JsonSerializable(constructor: "raw")
@@ -55,13 +59,19 @@ class Exercise extends WorkoutExercisable {
   @override
   String id;
   final String name;
-  final SetParameters parameters;
+  final GTSetParameters parameters;
   @override
-  final List<ExSet> sets;
-  final MuscleGroup primaryMuscleGroup;
-  final Set<MuscleGroup> secondaryMuscleGroups;
+  final List<GTSet> sets;
+  final GTMuscleGroup primaryMuscleGroup;
+  final Set<GTMuscleGroup> secondaryMuscleGroups;
   @override
   Duration restTime;
+
+  bool get isAbstract => workoutID == null;
+  bool get isStandardLibraryExercise {
+    final query = isAbstract ? id : parentID;
+    return getStandardExerciseByID(query!) != null;
+  }
 
   /// The ID of the non-concrete (ie. part of a routine) exercise
   /// this concrete exercise should be categorized under.
@@ -71,10 +81,17 @@ class Exercise extends WorkoutExercisable {
   @override
   String notes;
 
+  String? supersetID;
+
+  @override
+  String? workoutID;
+
   @JsonKey(defaultValue: false)
   final bool standard;
 
   bool get isCustom => !standard;
+
+  bool get isInSuperset => supersetID != null;
 
   Exercise.raw({
     String? id,
@@ -82,11 +99,13 @@ class Exercise extends WorkoutExercisable {
     required this.parameters,
     required this.sets,
     required this.primaryMuscleGroup,
-    this.secondaryMuscleGroups = const <MuscleGroup>{},
+    this.secondaryMuscleGroups = const <GTMuscleGroup>{},
     required this.restTime,
     this.parentID,
     required this.notes,
     required this.standard,
+    required this.supersetID,
+    required this.workoutID,
   })  : id = id ?? const Uuid().v4(),
         assert(sets.isEmpty || parameters == sets[0].parameters,
             "The parameters must not change between the Exercise and its Sets"),
@@ -97,13 +116,15 @@ class Exercise extends WorkoutExercisable {
   factory Exercise.custom({
     String? id,
     required String name,
-    required SetParameters parameters,
-    required List<ExSet> sets,
-    required MuscleGroup primaryMuscleGroup,
-    Set<MuscleGroup> secondaryMuscleGroups = const <MuscleGroup>{},
+    required GTSetParameters parameters,
+    required List<GTSet> sets,
+    required GTMuscleGroup primaryMuscleGroup,
+    Set<GTMuscleGroup> secondaryMuscleGroups = const <GTMuscleGroup>{},
     required Duration restTime,
     String? parentID,
     required String notes,
+    required String? supersetID,
+    required String? workoutID,
   }) =>
       Exercise.raw(
         id: id,
@@ -116,14 +137,16 @@ class Exercise extends WorkoutExercisable {
         parentID: parentID,
         notes: notes,
         standard: false,
+        supersetID: supersetID,
+        workoutID: workoutID,
       );
 
   factory Exercise.standard({
     required String id,
     required String name,
-    required SetParameters parameters,
-    required MuscleGroup primaryMuscleGroup,
-    Set<MuscleGroup> secondaryMuscleGroups = const <MuscleGroup>{},
+    required GTSetParameters parameters,
+    required GTMuscleGroup primaryMuscleGroup,
+    Set<GTMuscleGroup> secondaryMuscleGroups = const <GTMuscleGroup>{},
   }) {
     return Exercise.raw(
       id: id,
@@ -131,10 +154,12 @@ class Exercise extends WorkoutExercisable {
       parameters: parameters,
       primaryMuscleGroup: primaryMuscleGroup,
       secondaryMuscleGroups: secondaryMuscleGroups,
-      sets: [ExSet.empty(kind: SetKind.normal, parameters: parameters)],
+      sets: [GTSet.empty(kind: GTSetKind.normal, parameters: parameters)],
       restTime: Duration.zero,
       notes: "",
       standard: true,
+      supersetID: null,
+      workoutID: null,
     );
   }
 
@@ -165,12 +190,13 @@ class Exercise extends WorkoutExercisable {
   /// This function already calls [makeSibling] internally.
   Exercise instantiate({
     required Workout workout,
-    bool Function(ExSet set)? setFilter = _defaultSetFilter,
+    bool Function(GTSet set)? setFilter = _defaultSetFilter,
   }) {
     // We want to keep the parent ID of the exercise in the library (custom
     // or not) as to avoid a "linked list" type situation
     final base = makeSibling();
     return base.copyWith(
+      workoutID: workout.id,
       sets: ([
         for (final set in sets)
           if (setFilter?.call(set) ?? true)
@@ -197,13 +223,15 @@ class Exercise extends WorkoutExercisable {
 
   static Exercise replaced({required Exercise from, required Exercise to}) {
     return to.copyWith(
+      workoutID: from.workoutID,
+      supersetID: from.supersetID,
       notes: from.notes,
       restTime: from.restTime,
       sets: to.parameters == from.parameters
           ? [for (final set in from.sets) set.copyWith()]
           : [
               for (final set in from.sets)
-                ExSet(
+                GTSet(
                   parameters: to.parameters,
                   kind: set.kind,
                   reps: 0,
@@ -217,7 +245,7 @@ class Exercise extends WorkoutExercisable {
 
   @override
   String toString() {
-    return "Exercise${toJson()}";
+    return "Exercise${{...toJson(), 'isAbstract': isAbstract}}";
   }
 
   @override
@@ -254,7 +282,9 @@ class Exercise extends WorkoutExercisable {
 extension Display on Exercise {
   String get displayName {
     if (isCustom) return name;
-    final candidate = parentID ?? id;
+
+    final candidate = isAbstract ? id : parentID!;
+
     if (candidate.existsAsTranslationKey) return candidate.t;
     name.logger.e("No translation found");
     return name;

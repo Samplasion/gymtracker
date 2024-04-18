@@ -1,3 +1,6 @@
+import 'dart:convert';
+
+import 'package:drift_db_viewer/drift_db_viewer.dart';
 import 'package:flat/flat.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
@@ -9,7 +12,6 @@ import 'package:gymtracker/controller/routines_controller.dart';
 import 'package:gymtracker/controller/stopwatch_controller.dart';
 import 'package:gymtracker/controller/workout_controller.dart';
 import 'package:gymtracker/model/exercise.dart';
-import 'package:gymtracker/model/workout.dart';
 import 'package:gymtracker/service/database.dart';
 import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/service/logger.dart';
@@ -17,8 +19,6 @@ import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/view/settings/radio.dart';
 import 'package:gymtracker/view/utils/import_routine.dart';
 import 'package:gymtracker/view/utils/timer.dart';
-import 'package:hive/hive.dart';
-import 'package:hive_ui/hive_ui.dart';
 import 'package:logger/logger.dart' as logger_lib;
 
 class DebugView extends StatefulWidget {
@@ -45,7 +45,7 @@ class _DebugViewState extends State<DebugView> {
             delegate: SliverChildListDelegate([
               Obx(() {
                 final missingKeys =
-                    generateYamlForMissingKeys([...controller.missingKeys]);
+                    generateJsonForMissingKeys([...controller.missingKeys]);
                 return ListTile(
                   title: const Text("Missing translations"),
                   subtitle: Text(
@@ -88,23 +88,11 @@ class _DebugViewState extends State<DebugView> {
                 },
               ),
               ListTile(
-                  title: const Text("Database inspector"),
-                  onTap: () {
-                    Go.to(
-                      () => HiveBoxesView(
-                        hiveBoxes: {
-                          Hive.box<Exercise>("exercises"): (json) =>
-                              Exercise.fromJson(json),
-                          Hive.box<Workout>("routines"): (json) =>
-                              Workout.fromJson(json),
-                          Hive.box<Workout>("history"): (json) =>
-                              Workout.fromJson(json),
-                        },
-                        onError: (String errorMessage) =>
-                            Go.snack(errorMessage),
-                      ),
-                    );
-                  }),
+                title: const Text("Database inspector"),
+                onTap: () {
+                  Go.to(() => DriftDbViewer(Get.find<DatabaseService>().db));
+                },
+              ),
               FutureBuilder(
                 future: _loadTranslationsFuture,
                 builder: (context, snapshot) {
@@ -216,26 +204,16 @@ class _DebugViewState extends State<DebugView> {
   }
 }
 
-String generateYamlForMissingKeys(List<String> missingKeys) {
+String generateJsonForMissingKeys(List<String> missingKeys) {
   missingKeys = missingKeys.where((key) => key != "appName").toList();
   Map<String, dynamic> keys = unflatten({
     for (final key in missingKeys) key: key.split(".").last,
   });
 
-  String processMap(currentLevel, Map map) {
-    var current = "";
-    for (final entry in map.entries) {
-      if (entry.value is Map) {
-        current +=
-            "$currentLevel${entry.key}:\n${processMap(currentLevel + "  ", entry.value)}";
-      } else {
-        current += "$currentLevel${entry.key}: ${entry.value}\n";
-      }
-    }
-    return current;
-  }
-
-  return processMap("", keys).trim();
+  const encoder = JsonEncoder.withIndent("  ");
+  final lines = encoder.convert(keys).split('\n');
+  if (lines.length == 1) return lines.join('\n');
+  return lines.skip(1).take(lines.length - 2).join('\n');
 }
 
 class WorkoutTitleGeneratorAlert extends StatefulWidget {
@@ -248,7 +226,7 @@ class WorkoutTitleGeneratorAlert extends StatefulWidget {
 
 class _WorkoutTitleGeneratorAlertState
     extends State<WorkoutTitleGeneratorAlert> {
-  final Set<MuscleCategory> _selectedCategories = {};
+  final Set<GTMuscleCategory> _selectedCategories = {};
 
   String _generate() =>
       WorkoutController.generateWorkoutTitle(_selectedCategories);
@@ -263,7 +241,7 @@ class _WorkoutTitleGeneratorAlertState
         padding: const EdgeInsets.all(16.0),
         children: [
           Text(_generate()),
-          ...MuscleCategory.values.map((category) {
+          ...GTMuscleCategory.values.map((category) {
             return CheckboxListTile(
               title: Text(category.name),
               value: _selectedCategories.contains(category),

@@ -9,11 +9,13 @@ class MeController extends GetxController with ServiceableController {
       weightMeasurements.isEmpty ? null : weightMeasurements.last;
 
   @override
-  void onServiceChange() {
-    final list = service.weightMeasurementsBox.values.toList();
-    list.sort((a, b) => a.time.compareTo(b.time));
-    weightMeasurements(list);
+  void onInit() {
+    super.onInit();
+    weightMeasurements.bindStream(service.weightMeasurements$);
   }
+
+  @override
+  void onServiceChange() {}
 
   void addWeightMeasurement(WeightMeasurement measurement) {
     service.setWeightMeasurement(measurement);

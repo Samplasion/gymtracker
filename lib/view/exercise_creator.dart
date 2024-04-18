@@ -26,16 +26,17 @@ class _ExerciseCreatorState extends State<ExerciseCreator> {
   final formKey = GlobalKey<FormState>();
   late final titleController = TextEditingController(text: widget.base?.name);
 
-  late SetParameters params =
-      widget.base?.parameters ?? SetParameters.repsWeight;
-  late MuscleGroup? primaryGroup = widget.base?.primaryMuscleGroup;
-  late Set<MuscleGroup> otherGroups = widget.base?.secondaryMuscleGroups ?? {};
+  late GTSetParameters params =
+      widget.base?.parameters ?? GTSetParameters.repsWeight;
+  late GTMuscleGroup? primaryGroup = widget.base?.primaryMuscleGroup;
+  late Set<GTMuscleGroup> otherGroups =
+      widget.base?.secondaryMuscleGroups ?? {};
 
   ExercisesController get controller => Get.put(ExercisesController());
 
   @override
   Widget build(BuildContext context) {
-    final muscleGroups = MuscleGroup.values.toList();
+    final muscleGroups = GTMuscleGroup.values.toList();
     muscleGroups.sort((a, b) =>
         "muscleGroups.${a.name}".t.compareTo("muscleGroups.${b.name}".t));
 
@@ -97,7 +98,7 @@ class _ExerciseCreatorState extends State<ExerciseCreator> {
                     decoration: _decoration(
                         "exercise.editor.fields.parameters.label".t),
                     items: [
-                      for (final param in SetParameters.values)
+                      for (final param in GTSetParameters.values)
                         DropdownMenuItem(
                           value: param,
                           child: Text(
@@ -106,7 +107,7 @@ class _ExerciseCreatorState extends State<ExerciseCreator> {
                         ),
                     ],
                     onChanged: widget.shouldChangeParameters
-                        ? (SetParameters? v) => setState(() => params = v!)
+                        ? (GTSetParameters? v) => setState(() => params = v!)
                         : null,
                     validator: (value) {
                       if (value == null) {
@@ -118,7 +119,7 @@ class _ExerciseCreatorState extends State<ExerciseCreator> {
                     value: params,
                   ),
                 ),
-                DropdownButtonFormField<MuscleGroup>(
+                DropdownButtonFormField<GTMuscleGroup>(
                   decoration: _decoration(
                       "exercise.editor.fields.primaryMuscleGroup.label".t),
                   items: [
@@ -190,7 +191,7 @@ class _ExerciseCreatorState extends State<ExerciseCreator> {
                         ).copyWith(top: 0),
                         child: c,
                       ))
-                  .toList(),
+                  ,
             ],
           ),
         ),
@@ -232,6 +233,8 @@ class _ExerciseCreatorState extends State<ExerciseCreator> {
               restTime: Duration.zero,
               notes: widget.base!.notes,
               sets: [],
+              workoutID: widget.base!.workoutID,
+              supersetID: null,
             ),
           ),
         );

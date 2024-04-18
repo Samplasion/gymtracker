@@ -11,33 +11,21 @@ import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/view/utils/exercise.dart';
 import 'package:gymtracker/view/workout.dart';
 
-void expectExercise(Exercise result, Exercise expected) {
-  expect(result.name, expected.name);
-  expect(result.parameters, expected.parameters);
-  expect(result.primaryMuscleGroup, expected.primaryMuscleGroup);
-  expect(result.secondaryMuscleGroups, expected.secondaryMuscleGroups);
-  expect(result.restTime, expected.restTime);
-  expect(result.notes, expected.notes);
-  expect(result.sets.length, expected.sets.length);
-  for (int i = 0; i < result.sets.length; i++) {
-    expect(result.sets[i].kind, expected.sets[i].kind);
-    expect(result.sets[i].parameters, expected.sets[i].parameters);
-    expect(result.sets[i].reps, expected.sets[i].reps);
-    expect(result.sets[i].weight, expected.sets[i].weight);
-  }
-}
+import '../../test/expectations.dart';
 
 const wait = Duration(milliseconds: 500);
 
 final Exercise baseExercise = Exercise.custom(
   id: "ourID",
   name: "CustomExercise",
-  parameters: SetParameters.distance,
+  parameters: GTSetParameters.distance,
   sets: [],
-  primaryMuscleGroup: MuscleGroup.abductors,
-  secondaryMuscleGroups: {MuscleGroup.glutes},
+  primaryMuscleGroup: GTMuscleGroup.abductors,
+  secondaryMuscleGroups: {GTMuscleGroup.glutes},
   restTime: Duration.zero,
   notes: "Base Notes",
+  workoutID: "routineID",
+  supersetID: "supersetID",
 );
 
 Future<void> testEditExerciseWhileWorkoutIsOngoingFlow(
@@ -59,14 +47,14 @@ Future<void> testEditExerciseWhileWorkoutIsOngoingFlow(
   // Manually add the exercise
   // We can do it this way since we verified the "Create exercise" flow
   // is working in another test
-  await databaseService.exerciseBox.clear();
+  await databaseService.writeExercises([]);
   Get.find<ExercisesController>().addExercise(baseExercise);
 
   await tester.pumpAndSettle();
 
   print("Edited database state: ${databaseService.toJson()}");
   expect(Get.find<ExercisesController>().exercises.isNotEmpty, true);
-  expectExercise(
+  expectAbstractExercise(
       Get.find<ExercisesController>().exercises.single, baseExercise);
 
   await tester
@@ -104,10 +92,10 @@ Future<void> testEditExerciseWhileWorkoutIsOngoingFlow(
   final titleBtn =
       find.widgetWithText(TextField, "exercise.editor.fields.title.label".t);
   final parametersBtn = find.widgetWithText(
-      DropdownButtonFormField<SetParameters>,
+      DropdownButtonFormField<GTSetParameters>,
       "exercise.editor.fields.parameters.label".t);
   final primaryMuscleGroupBtn = find.widgetWithText(
-      DropdownButtonFormField<MuscleGroup>,
+      DropdownButtonFormField<GTMuscleGroup>,
       "exercise.editor.fields.primaryMuscleGroup.label".t);
   final setFields = [
     titleBtn,
@@ -122,7 +110,7 @@ Future<void> testEditExerciseWhileWorkoutIsOngoingFlow(
   await tester.tap(setFields[1]);
   await tester.pumpAndSettle(wait);
   await tester.tap(
-    find.widgetWithText(DropdownMenuItem<SetParameters>,
+    find.widgetWithText(DropdownMenuItem<GTSetParameters>,
         "exercise.editor.fields.parameters.values.time".t),
     warnIfMissed: false,
   );
@@ -130,7 +118,8 @@ Future<void> testEditExerciseWhileWorkoutIsOngoingFlow(
   await tester.tap(setFields[2]);
   await tester.pumpAndSettle(wait);
   await tester.tap(
-    find.widgetWithText(DropdownMenuItem<MuscleGroup>, "muscleGroups.chest".t),
+    find.widgetWithText(
+        DropdownMenuItem<GTMuscleGroup>, "muscleGroups.chest".t),
     warnIfMissed: false,
   );
   await tester.pumpAndSettle();
@@ -169,18 +158,20 @@ Future<void> testEditExerciseWhileWorkoutIsOngoingFlow(
   await tester.pumpAndSettle(const Duration(seconds: 5));
 
   // Check that our changes have been saved
-  var ex = databaseService.exerciseBox.values.first;
-  expectExercise(
+  var ex = databaseService.exercises.first;
+  expectAbstractExercise(
     ex,
     Exercise.custom(
       id: baseExercise.id,
       name: "SecondEditedExercise",
-      parameters: SetParameters.time,
+      parameters: GTSetParameters.time,
       sets: [],
-      primaryMuscleGroup: MuscleGroup.chest,
-      secondaryMuscleGroups: {MuscleGroup.triceps},
+      primaryMuscleGroup: GTMuscleGroup.chest,
+      secondaryMuscleGroups: {GTMuscleGroup.triceps},
       restTime: Duration.zero,
-      notes: "Base Notes",
+      notes: "",
+      workoutID: null,
+      supersetID: null,
     ),
   );
 }

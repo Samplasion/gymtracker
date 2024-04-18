@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:gymtracker/controller/history_controller.dart';
 import 'package:gymtracker/controller/routines_controller.dart';
 import 'package:gymtracker/controller/settings_controller.dart';
-import 'package:gymtracker/model/workout.dart';
 import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/view/components/badges.dart';
@@ -28,31 +26,15 @@ class _RoutinesViewState extends State<RoutinesView> {
     controller.onServiceChange();
   }
 
-  List<(Workout, int)> get _suggestedRoutines {
-    final today = DateTime.now().weekday;
-    final candidates = <Workout, int>{};
-    final controller = Get.find<HistoryController>();
-    final history = controller.history;
-    for (final routine in this.controller.workouts) {
-      final occurrences = history.where((wo) => wo.parentID == routine.id);
-      candidates[routine] =
-          occurrences.where((wo) => wo.startingDate?.weekday == today).length;
-    }
-    candidates.removeWhere((k, v) => v == 0);
-
-    final listCandidates = [...candidates.entries];
-    listCandidates.sort((a, b) => b.value - a.value);
-    return [...listCandidates.map((a) => (a.key, a.value)).take(5)];
-  }
-
   @override
   Widget build(BuildContext context) {
     final showSuggestedRoutines =
         Get.find<SettingsController>().showSuggestedRoutines.value;
-    final suggested =
-        showSuggestedRoutines ? _suggestedRoutines : <(Workout, int)>[];
     return Scaffold(
       body: Obx(() {
+        final suggested = showSuggestedRoutines
+            ? controller.suggestions
+            : <RoutineSuggestion>[];
         return CustomScrollView(
           slivers: [
             SliverAppBar.large(
@@ -73,7 +55,8 @@ class _RoutinesViewState extends State<RoutinesView> {
               SliverList(
                 delegate: SliverChildBuilderDelegate(
                   (context, index) {
-                    final (workout, frequency) = suggested[index];
+                    final (routine: workout, occurrences: frequency) =
+                        suggested[index];
                     return Material(
                       type: MaterialType.transparency,
                       key: ValueKey(workout.id),

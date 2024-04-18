@@ -16,32 +16,41 @@ import 'package:gymtracker/view/utils/workout_done.dart';
 import 'package:gymtracker/view/workout.dart';
 import 'package:gymtracker/view/workout_editor.dart';
 
-Workout get baseRoutine => Workout(
-      name: "Test Routine",
-      exercises: [
-        exerciseStandardLibrary["library.abs.name".t]!.exercises.first.copyWith(
-          restTime: const Duration(minutes: 1),
-          sets: [
-            ExSet(
-              reps: 10,
-              kind: SetKind.normal,
-              parameters: SetParameters.freeBodyReps,
-            ),
-            ExSet(
-              reps: 10,
-              kind: SetKind.normal,
-              parameters: SetParameters.freeBodyReps,
-            ),
-            ExSet(
-              reps: 10,
-              kind: SetKind.normal,
-              parameters: SetParameters.freeBodyReps,
-            ),
-          ],
-        ),
-      ],
-      infobox: "Inject",
-    );
+Workout get baseRoutine {
+  final libEx = exerciseStandardLibrary["library.abs.name".t]!.exercises.first;
+  final baseRoutine = Workout(
+    name: "Test Routine",
+    id: "test-routine",
+    exercises: [
+      libEx.copyWith(
+        parentID: libEx.id,
+        workoutID: "test-routine",
+        restTime: const Duration(minutes: 1),
+        sets: [
+          GTSet(
+            reps: 10,
+            kind: GTSetKind.normal,
+            parameters: GTSetParameters.freeBodyReps,
+          ),
+          GTSet(
+            reps: 10,
+            kind: GTSetKind.normal,
+            parameters: GTSetParameters.freeBodyReps,
+          ),
+          GTSet(
+            reps: 10,
+            kind: GTSetKind.normal,
+            parameters: GTSetParameters.freeBodyReps,
+          ),
+        ],
+      ),
+    ],
+    infobox: "Inject",
+  );
+  baseRoutine.exercises.first = (baseRoutine.exercises.first as Exercise)
+      .instantiate(workout: baseRoutine);
+  return baseRoutine;
+}
 
 Future<void> testEditWorkoutFlow(
   WidgetTester tester,
@@ -57,7 +66,7 @@ Future<void> testEditWorkoutFlow(
   // Manually add the routine
   // We can do it this way since we verified the "Create routine" flow
   // is working in another test
-  databaseService.routinesBox.add(baseRoutine);
+  databaseService.setRoutine(baseRoutine);
 
   // Wait for the app to finish loading
   await tester.pumpAndSettle(const Duration(seconds: 5));
@@ -117,7 +126,7 @@ Future<void> testEditWorkoutFlow(
   expect(find.byType(WorkoutView), findsNothing);
   expect(find.byType(AlertDialog), findsNothing);
 
-  final originalWorkout = databaseService.historyBox.values.single.clone();
+  final originalWorkout = databaseService.workoutHistory.single.clone();
 
   // Close the Good Job sheet
   expect(find.byType(WorkoutDoneSheet), findsOneWidget);
@@ -207,7 +216,7 @@ Future<void> testEditWorkoutFlow(
   expect(find.byType(WorkoutEditor), findsNothing);
 
   // Check the edited workout
-  final editedWorkout = databaseService.historyBox.values.single;
+  final editedWorkout = databaseService.workoutHistory.single;
   expect(editedWorkout.id, originalWorkout.id);
   expect(editedWorkout.exercises.length, 2);
   expect(editedWorkout.exercises[0].id, originalWorkout.exercises[0].id);
@@ -218,12 +227,13 @@ Future<void> testEditWorkoutFlow(
       originalWorkout.exercises[0].sets[1].id);
   expect(editedWorkout.exercises[0].sets[2].id,
       originalWorkout.exercises[0].sets[2].id);
-  expect(editedWorkout.exercises[0].sets[3].kind, SetKind.failureStripping);
-  expect(editedWorkout.exercises[0].sets[4].kind, SetKind.drop);
+  expect(editedWorkout.exercises[0].sets[3].kind, GTSetKind.failureStripping);
+  expect(editedWorkout.exercises[0].sets[4].kind, GTSetKind.drop);
   expect((editedWorkout.exercises[1] as Exercise).name, "Zumba");
   expect((editedWorkout.exercises[1] as Exercise).standard, true);
   expect(editedWorkout.exercises[1].sets.length, 1);
-  expect(editedWorkout.exercises[1].sets.single.parameters, SetParameters.time);
+  expect(
+      editedWorkout.exercises[1].sets.single.parameters, GTSetParameters.time);
   expect(
       editedWorkout.exercises[1].sets.single.time, const Duration(minutes: 1));
   expect(editedWorkout.infobox, "Edited notes\n".asQuillDocument().toEncoded());

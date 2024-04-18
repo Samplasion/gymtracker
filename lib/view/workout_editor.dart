@@ -186,8 +186,8 @@ class _WorkoutEditorState extends State<WorkoutEditor> {
                   setState(() {});
                 },
                 onSetCreate: () {
-                  workout.exercises[i].sets.add(ExSet.empty(
-                    kind: SetKind.normal,
+                  workout.exercises[i].sets.add(GTSet.empty(
+                    kind: GTSetKind.normal,
                     parameters: (workout.exercises[i] as Exercise).parameters,
                   ));
                   setState(() {});
@@ -254,9 +254,9 @@ class _WorkoutEditorState extends State<WorkoutEditor> {
                     final ex = await Go.to<List<Exercise>>(
                         () => const ExercisePicker(singlePick: true));
                     if (ex == null || ex.isEmpty) return;
-                    workout.exercises[i] = ex.first.copyWith.sets([
-                      ExSet.empty(
-                        kind: SetKind.normal,
+                    workout.exercises[i] = ex.first.makeChild().copyWith.sets([
+                      GTSet.empty(
+                        kind: GTSetKind.normal,
                         parameters: ex.first.parameters,
                       ),
                     ]);
@@ -278,9 +278,9 @@ class _WorkoutEditorState extends State<WorkoutEditor> {
                         () => const ExercisePicker(singlePick: false));
                     if (exs == null || exs.isEmpty) return;
                     (workout.exercises[i] as Superset).exercises.addAll(
-                          exs.map((ex) => ex.copyWith.sets([
-                                ExSet.empty(
-                                  kind: SetKind.normal,
+                          exs.map((ex) => ex.makeChild().copyWith.sets([
+                                GTSet.empty(
+                                  kind: GTSetKind.normal,
                                   parameters: ex.parameters,
                                 ),
                               ])),
@@ -341,8 +341,8 @@ class _WorkoutEditorState extends State<WorkoutEditor> {
                   (workout.exercises[i] as Superset)
                       .exercises[index]
                       .sets
-                      .add(ExSet.empty(
-                        kind: SetKind.normal,
+                      .add(GTSet.empty(
+                        kind: GTSetKind.normal,
                         parameters: (workout.exercises[i] as Superset)
                             .exercises[index]
                             .parameters,
@@ -387,9 +387,9 @@ class _WorkoutEditorState extends State<WorkoutEditor> {
                       () => const ExercisePicker(singlePick: false));
                   if (exs == null || exs.isEmpty) return;
                   workout.exercises.addAll(
-                    exs.map((ex) => ex.copyWith.sets([
-                          ExSet.empty(
-                            kind: SetKind.normal,
+                    exs.map((ex) => ex.makeChild().copyWith.sets([
+                          GTSet.empty(
+                            kind: GTSetKind.normal,
                             parameters: ex.parameters,
                           ),
                         ])),
@@ -599,17 +599,18 @@ class _WorkoutFinishEditingPageState extends State<WorkoutFinishEditingPage> {
           child: ListView(
             children: [
               const SizedBox(height: 8),
-              TextFormField(
-                controller: titleController,
-                decoration:
-                    _decoration("historyEditor.finish.fields.name.label".t),
-                validator: (string) {
-                  if (string == null || string.isEmpty) {
-                    return "historyEditor.finish.fields.name.errors.empty".t;
-                  }
-                  return null;
-                },
-              ),
+              if (!widget.workout.isContinuation)
+                TextFormField(
+                  controller: titleController,
+                  decoration:
+                      _decoration("historyEditor.finish.fields.name.label".t),
+                  validator: (string) {
+                    if (string == null || string.isEmpty) {
+                      return "historyEditor.finish.fields.name.errors.empty".t;
+                    }
+                    return null;
+                  },
+                ),
               DateField(
                 decoration: _decoration(
                     "historyEditor.finish.fields.startingTime.label".t),
@@ -618,24 +619,26 @@ class _WorkoutFinishEditingPageState extends State<WorkoutFinishEditingPage> {
                 firstDate: DateTime.fromMillisecondsSinceEpoch(0),
                 lastDate: DateTime.now().add(const Duration(days: 7)),
               ),
-              DropdownButtonFormField<String?>(
-                decoration:
-                    _decoration("historyEditor.finish.fields.parent.label".t),
-                items: [
-                  DropdownMenuItem(
-                    value: null,
-                    child: Text(
-                        "historyEditor.finish.fields.parent.options.none".t),
-                  ),
-                  for (final routine in Get.find<RoutinesController>().workouts)
+              if (!widget.workout.isContinuation)
+                DropdownButtonFormField<String?>(
+                  decoration:
+                      _decoration("historyEditor.finish.fields.parent.label".t),
+                  items: [
                     DropdownMenuItem(
-                      value: routine.id,
-                      child: Text(routine.name),
+                      value: null,
+                      child: Text(
+                          "historyEditor.finish.fields.parent.options.none".t),
                     ),
-                ],
-                onChanged: (v) => setState(() => widget.workout.parentID = v),
-                value: pwInitialItem,
-              ),
+                    for (final routine
+                        in Get.find<RoutinesController>().workouts)
+                      DropdownMenuItem(
+                        value: routine.id,
+                        child: Text(routine.name),
+                      ),
+                  ],
+                  onChanged: (v) => setState(() => widget.workout.parentID = v),
+                  value: pwInitialItem,
+                ),
               TimeInputField(
                 controller: timeController,
                 decoration:
@@ -648,16 +651,17 @@ class _WorkoutFinishEditingPageState extends State<WorkoutFinishEditingPage> {
                   return null;
                 },
               ),
-              GTRichTextEditor(
-                infoboxController: infoboxController,
-                decoration: InputDecoration(
-                  isDense: true,
-                  border: const OutlineInputBorder(),
-                  labelText: "historyEditor.finish.fields.infobox.label".t,
-                  alignLabelWithHint: true,
+              if (!widget.workout.isContinuation)
+                GTRichTextEditor(
+                  infoboxController: infoboxController,
+                  decoration: InputDecoration(
+                    isDense: true,
+                    border: const OutlineInputBorder(),
+                    labelText: "historyEditor.finish.fields.infobox.label".t,
+                    alignLabelWithHint: true,
+                  ),
+                  onTapOutside: () {},
                 ),
-                onTapOutside: () {},
-              ),
             ]
                 .map((c) => Padding(
                       padding: const EdgeInsets.symmetric(

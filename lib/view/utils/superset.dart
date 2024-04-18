@@ -27,9 +27,9 @@ class SupersetEditor extends StatefulWidget {
   final void Function(int index, Duration time) onExerciseChangeRestTime;
   final void Function(int index) onExerciseSetCreate;
   final void Function(int exIndex, int setIndex) onExerciseSetRemove;
-  final void Function(int exIndex, ExSet set, SetKind kind)
+  final void Function(int exIndex, GTSet set, GTSetKind kind)
       onExerciseSetSelectKind;
-  final void Function(Exercise exercise, ExSet set, bool isDone)
+  final void Function(Exercise exercise, GTSet set, bool isDone)
       onExerciseSetSetDone;
   final VoidCallback onExerciseSetValueChange;
   final void Function(Superset superset, String notes) onNotesChange;

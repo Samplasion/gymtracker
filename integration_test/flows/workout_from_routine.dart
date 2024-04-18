@@ -74,7 +74,7 @@ Future<void> testWorkoutFromRoutineFlow(
   await tester.pumpAndSettle();
 
   // Check that our changes have been saved
-  final routine = databaseService.routinesBox.values.first;
+  final routine = databaseService.routines.first;
   final firstExercise = routine.exercises.first;
   for (final set in firstExercise.sets) {
     expect(set.reps, 10);
@@ -94,10 +94,11 @@ Future<void> testWorkoutFromRoutineFlow(
   expect(find.text("3 × 10 reps"), findsOneWidget);
 
   // Check the history entry in the db
-  final history = databaseService.historyBox.values.first;
+  final history = databaseService.workoutHistory.single;
   expect(history.id == routine.id, false);
   expect(history.parentID, routine.id);
-  final historyFirstExercise = routine.exercises.first;
+  final historyFirstExercise = history.exercises.single;
+  // debugPrint("$historyFirstExercise");
   for (final set in historyFirstExercise.sets) {
     expect(set.done, true);
   }

@@ -12,7 +12,6 @@ import 'package:gymtracker/controller/workout_controller.dart';
 import 'package:gymtracker/model/exercisable.dart';
 import 'package:gymtracker/model/exercise.dart';
 import 'package:gymtracker/model/set.dart';
-import 'package:gymtracker/model/superset.dart';
 import 'package:gymtracker/model/workout.dart';
 import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/service/logger.dart';
@@ -28,10 +27,17 @@ import 'package:protocol_handler/protocol_handler.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:screenshot/screenshot.dart';
 
+typedef RoutineSuggestion = ({
+  Workout routine,
+  int occurrences,
+});
+
 class RoutinesController extends GetxController
     with ServiceableController, ProtocolListener {
   RxList<Workout> workouts = <Workout>[].obs;
   RxBool hasOngoingWorkout = false.obs;
+
+  RxList<RoutineSuggestion> get suggestions => coordinator.suggestions;
 
   @override
   onInit() {
@@ -43,6 +49,12 @@ class RoutinesController extends GetxController
     if (service.hasOngoing) {
       Get.put(WorkoutController.fromSavedData(service.getOngoingData()!));
     }
+
+    service.routines$.listen((event) {
+      logger.d("Updated with ${event.length} exercises");
+      workouts(event);
+      coordinator.computeSuggestions();
+    });
   }
 
   @override
@@ -52,9 +64,7 @@ class RoutinesController extends GetxController
   }
 
   @override
-  onServiceChange() {
-    workouts(service.routines);
-  }
+  onServiceChange() {}
 
   void didChangeAppLifecycleState(AppLifecycleState state) {
     logger.t("Change lifecycle state callback received (state: ${state.name})");
@@ -82,7 +92,7 @@ class RoutinesController extends GetxController
       name: name,
       exercises: exercises,
       infobox: infobox,
-      weightUnit: settingsController.weightUnit.value!,
+      weightUnit: settingsController.weightUnit.value,
     );
     service.setRoutine(routine);
 
@@ -163,11 +173,11 @@ class RoutinesController extends GetxController
     Workout? workout, {
     String? parentID,
     required bool Function(WorkoutExercisable exercise) exerciseFilter,
-    bool Function(ExSet set)? setFilter,
+    bool Function(GTSet set)? setFilter,
     bool continuation = false,
   }) {
     if (workout != null) {
-      final clone = workout.clone();
+      final clone = workout.clone()..regenerateExerciseIDs();
       Get.find<WorkoutController>().applyExistingWorkout(
         clone,
         parentID: parentID,
@@ -194,7 +204,7 @@ class RoutinesController extends GetxController
         exercises: exercises,
         id: id,
         infobox: infobox,
-        weightUnit: settingsController.weightUnit.value!);
+        weightUnit: settingsController.weightUnit.value);
   }
 
   void editRoutine(Workout newRoutine) {
@@ -213,16 +223,27 @@ class RoutinesController extends GetxController
     service.setAllRoutines(list);
   }
 
-  List<Workout> getChildren(Workout routine) {
+  List<Workout> getChildren(
+    Workout routine, {
+    bool allowSynthesized = false,
+  }) {
     final historyCont = Get.find<HistoryController>();
     return [
       for (final workout in historyCont.history)
-        if (workout.parentID == routine.id) workout
+        if (workout.parentID == routine.id && !workout.isContinuation)
+          if (allowSynthesized)
+            workout.synthesizeContinuations(
+              previous: false,
+              next: true,
+            )
+          else
+            workout,
     ];
   }
 
   String importWorkout(Workout workout) {
     final routine = workout.toRoutine();
+    logger.d((routine, routine.exercises));
     service.setRoutine(routine);
     return routine.id;
   }
@@ -276,13 +297,14 @@ class RoutinesController extends GetxController
   void updateRoutineFromWorkout(String s, Workout workout) {
     final oldRoutine = getRoutine(s);
     if (oldRoutine == null) return;
-    final newRoutine = workout.toRoutine().copyWith(
+    final newRoutine = workout
+        .copyWith(
           name: oldRoutine.name,
-          id: oldRoutine.id,
           parentID: null,
           completedBy: null,
           completes: null,
-        );
+        )
+        .toRoutine(routineID: oldRoutine.id);
     service.setRoutine(newRoutine);
   }
 
@@ -395,38 +417,7 @@ class RoutinesController extends GetxController
   void applyExerciseModification(Exercise exercise) {
     assert(exercise.isCustom);
 
-    final newHistory = service.routinesBox.values.toList();
-    for (int i = 0; i < newHistory.length; i++) {
-      final workout = newHistory[i];
-
-      final res = workout.exercises.toList();
-      for (int i = 0; i < res.length; i++) {
-        res[i].when(
-          exercise: (e) {
-            if (exercise.isParentOf(e)) {
-              res[i] = Exercise.replaced(from: e, to: exercise).copyWith(
-                id: e.id,
-                parentID: e.parentID,
-              );
-            }
-          },
-          superset: (superset) {
-            for (int j = 0; j < superset.exercises.length; j++) {
-              if (exercise.isParentOf(superset.exercises[j])) {
-                (res[i] as Superset).exercises[j] =
-                    Exercise.replaced(from: superset.exercises[j], to: exercise)
-                        .copyWith(
-                  id: superset.exercises[j].id,
-                  parentID: superset.exercises[j].parentID,
-                );
-              }
-            }
-          },
-        );
-      }
-      newHistory[i] = workout.copyWith.exercises(res);
-    }
-    service.setAllRoutines(newHistory);
+    service.applyExerciseModificationToRoutines(exercise);
   }
 
   void viewHistory({required Workout routine}) {

@@ -11,31 +11,19 @@ import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/service/logger.dart';
 import 'package:gymtracker/view/utils/exercise.dart';
 
-void expectExercise(Exercise result, Exercise expected) {
-  expect(result.name, expected.name);
-  expect(result.parameters, expected.parameters);
-  expect(result.primaryMuscleGroup, expected.primaryMuscleGroup);
-  expect(result.secondaryMuscleGroups, expected.secondaryMuscleGroups);
-  expect(result.restTime, expected.restTime);
-  expect(result.notes, expected.notes);
-  expect(result.sets.length, expected.sets.length);
-  for (int i = 0; i < result.sets.length; i++) {
-    expect(result.sets[i].kind, expected.sets[i].kind);
-    expect(result.sets[i].parameters, expected.sets[i].parameters);
-    expect(result.sets[i].reps, expected.sets[i].reps);
-    expect(result.sets[i].weight, expected.sets[i].weight);
-  }
-}
+import '../../test/expectations.dart';
 
 final Exercise baseExercise = Exercise.custom(
   id: "ourNewID",
   name: "CustomExercise",
-  parameters: SetParameters.freeBodyReps,
+  parameters: GTSetParameters.freeBodyReps,
   sets: [],
-  primaryMuscleGroup: MuscleGroup.abductors,
-  secondaryMuscleGroups: {MuscleGroup.glutes},
+  primaryMuscleGroup: GTMuscleGroup.abductors,
+  secondaryMuscleGroups: {GTMuscleGroup.glutes},
   restTime: Duration.zero,
   notes: "Base Notes",
+  workoutID: null,
+  supersetID: null,
 );
 
 Future<void> testEditExerciseInRoutineAndHistoryFlow(
@@ -57,14 +45,14 @@ Future<void> testEditExerciseInRoutineAndHistoryFlow(
   // Manually add the exercise
   // We can do it this way since we verified the "Create exercise" flow
   // is working in another test
-  await databaseService.exerciseBox.clear();
+  await databaseService.writeExercises([]);
   Get.find<ExercisesController>().addExercise(baseExercise);
 
   await tester.pumpAndSettle();
 
   print("Edited database state: ${databaseService.toJson()}");
   expect(Get.find<ExercisesController>().exercises.isNotEmpty, true);
-  expectExercise(
+  expectAbstractExercise(
       Get.find<ExercisesController>().exercises.single, baseExercise);
 
   // Add a fake workout
@@ -83,6 +71,8 @@ Future<void> testEditExerciseInRoutineAndHistoryFlow(
     baseExercise.makeChild().instantiate(workout: workout.toRoutine()),
   );
   globalLogger.d(workout.exercises.single);
+  expect(baseExercise.isAbstract, true);
+  expect(workout.exercises.single.asExercise.isAbstract, false);
   expect(workout.exercises.single.id != baseExercise.id, true);
   expect((workout.exercises.single as Exercise).parentID, baseExercise.id);
   databaseService.setHistoryWorkout(workout);
@@ -164,7 +154,7 @@ Future<void> testEditExerciseInRoutineAndHistoryFlow(
   final titleBtn =
       find.widgetWithText(TextField, "exercise.editor.fields.title.label".t);
   final primaryMuscleGroupBtn = find.widgetWithText(
-      DropdownButtonFormField<MuscleGroup>,
+      DropdownButtonFormField<GTMuscleGroup>,
       "exercise.editor.fields.primaryMuscleGroup.label".t);
   final setFields = [
     titleBtn,
@@ -179,7 +169,8 @@ Future<void> testEditExerciseInRoutineAndHistoryFlow(
   await tester.tap(setFields[1]);
   await tester.pumpAndSettle();
   await tester.tap(
-    find.widgetWithText(DropdownMenuItem<MuscleGroup>, "muscleGroups.chest".t),
+    find.widgetWithText(
+        DropdownMenuItem<GTMuscleGroup>, "muscleGroups.chest".t),
     warnIfMissed: false,
   );
   await tester.pumpAndSettle();
@@ -195,58 +186,68 @@ Future<void> testEditExerciseInRoutineAndHistoryFlow(
   await tester.pumpAndSettle();
 
   // Check that our changes have been saved
-  var ex = databaseService.exerciseBox.values.first;
-  expectExercise(
+  var ex = databaseService.exercises.first;
+  expectAbstractExercise(
     ex,
     Exercise.custom(
       id: baseExercise.id,
       name: "EditedExercise",
-      parameters: SetParameters.freeBodyReps,
+      parameters: GTSetParameters.freeBodyReps,
       sets: [],
-      primaryMuscleGroup: MuscleGroup.chest,
-      secondaryMuscleGroups: {MuscleGroup.triceps},
+      primaryMuscleGroup: GTMuscleGroup.chest,
+      secondaryMuscleGroups: {GTMuscleGroup.triceps},
       restTime: Duration.zero,
       notes: "Base Notes",
+      workoutID: null,
+      supersetID: null,
     ),
   );
 
   print(databaseService.toJson());
 
   // Check the history data as well
-  ex = databaseService.historyBox.values
-      .firstWhere((workout) => workout.id == "ourFakeWorkout")
-      .exercises
-      .single as Exercise;
+  final historyWorkout = databaseService.workoutHistory
+      .firstWhere((workout) => workout.id == "ourFakeWorkout");
+  ex = historyWorkout.exercises.single as Exercise;
   expectExercise(
     ex,
     Exercise.custom(
-      id: "(something else)",
+      // We don't care about the ID, we want to check the rest of the data
+      id: ex.id,
       parentID: baseExercise.id,
       name: "EditedExercise",
-      parameters: SetParameters.freeBodyReps,
+      parameters: GTSetParameters.freeBodyReps,
       sets: [],
-      primaryMuscleGroup: MuscleGroup.chest,
-      secondaryMuscleGroups: {MuscleGroup.triceps},
+      primaryMuscleGroup: GTMuscleGroup.chest,
+      secondaryMuscleGroups: {GTMuscleGroup.triceps},
       restTime: Duration.zero,
       notes: "Base Notes",
+      workoutID: historyWorkout.id,
+      supersetID: null,
     ),
   );
 
   // And the routine data
-  ex = databaseService.routinesBox.values.single.exercises.single as Exercise;
+  ex = databaseService.routines.single.exercises.single as Exercise;
   expectExercise(
     // We don't care about the sets in this test.
     ex.copyWith.sets([]),
     Exercise.custom(
-      id: "(something else)",
+      // We don't care about the ID, we want to check the rest of the data
+      id: ex.id,
       parentID: baseExercise.id,
       name: "EditedExercise",
-      parameters: SetParameters.freeBodyReps,
+      parameters: GTSetParameters.freeBodyReps,
       sets: [],
-      primaryMuscleGroup: MuscleGroup.chest,
-      secondaryMuscleGroups: {MuscleGroup.triceps},
+      primaryMuscleGroup: GTMuscleGroup.chest,
+      secondaryMuscleGroups: {GTMuscleGroup.triceps},
       restTime: Duration.zero,
-      notes: "Base Notes",
+      // Note to self: We don't set the notes in the test. So we don't have
+      // notes to expect here in the routine. The previous behavior in which
+      // we had notes in the exercise was wrong.
+      notes: "",
+      workoutID: databaseService.routines.single.id,
+      supersetID: null,
     ),
   );
 }

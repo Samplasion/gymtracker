@@ -28,11 +28,12 @@ class WorkoutMuscleCategoriesBarChart extends GetWidget<HistoryController> {
     final nonEmptyData = data.entries.where((e) => e.value > 0).toList();
     final max = data.values.sum;
 
-    String getLabel(MuscleCategory cat) =>
+    String getLabel(GTMuscleCategory cat) =>
         "${"muscleCategories.${cat.name}".t} (${((data[cat] ?? 0) * 100 / max).round()}%)";
 
-    final textReservedSize =
-        nonEmptyData.map((e) => getLabel(e.key).computeSize().width + 16).max;
+    final textReservedSize = nonEmptyData.isEmpty
+        ? 0.0
+        : nonEmptyData.map((e) => getLabel(e.key).computeSize().width + 16).max;
 
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -68,7 +69,7 @@ class WorkoutMuscleCategoriesBarChart extends GetWidget<HistoryController> {
                         ],
                       ),
                   ],
-                  gridData: FlGridData(
+                  gridData: const FlGridData(
                     show: true,
                     drawVerticalLine: false,
                     drawHorizontalLine: false,
@@ -77,15 +78,15 @@ class WorkoutMuscleCategoriesBarChart extends GetWidget<HistoryController> {
                   barTouchData: BarTouchData(enabled: false),
                   titlesData: FlTitlesData(
                     show: true,
-                    topTitles: AxisTitles(
+                    topTitles: const AxisTitles(
                         sideTitles: SideTitles(
                       showTitles: false,
                       reservedSize: 16,
                     )),
-                    leftTitles:
-                        AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                    rightTitles:
-                        AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                    leftTitles: const AxisTitles(
+                        sideTitles: SideTitles(showTitles: false)),
+                    rightTitles: const AxisTitles(
+                        sideTitles: SideTitles(showTitles: false)),
                     bottomTitles: AxisTitles(
                       sideTitles: SideTitles(
                         showTitles: true,

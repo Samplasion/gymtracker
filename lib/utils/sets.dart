@@ -7,14 +7,14 @@ import 'package:gymtracker/utils/extensions.dart';
 
 Widget buildSetType(
   BuildContext context,
-  SetKind kind, {
-  required ExSet set,
-  required List<ExSet> allSets,
+  GTSetKind kind, {
+  required GTSet set,
+  required List<GTSet> allSets,
   double fontSize = 14,
 }) {
   final scheme = Theme.of(context).colorScheme;
   switch (kind) {
-    case SetKind.warmUp:
+    case GTSetKind.warmUp:
       return Text(
         "set.kindShort.warmUp".t,
         style: TextStyle(
@@ -23,11 +23,11 @@ Widget buildSetType(
           fontSize: fontSize,
         ),
       );
-    case SetKind.normal:
+    case GTSetKind.normal:
       return Text(
         max(
                 allSets
-                        .where((element) => element.kind == SetKind.normal)
+                        .where((element) => element.kind == GTSetKind.normal)
                         .toList()
                         .indexOf(set) +
                     1,
@@ -39,7 +39,7 @@ Widget buildSetType(
           fontSize: fontSize,
         ),
       );
-    case SetKind.drop:
+    case GTSetKind.drop:
       return Text(
         "set.kindShort.drop".t,
         style: TextStyle(
@@ -48,7 +48,7 @@ Widget buildSetType(
           fontSize: fontSize,
         ),
       );
-    case SetKind.failure:
+    case GTSetKind.failure:
       return Text(
         "set.kindShort.failure".t,
         style: TextStyle(
@@ -57,7 +57,7 @@ Widget buildSetType(
           fontSize: fontSize,
         ),
       );
-    case SetKind.failureStripping:
+    case GTSetKind.failureStripping:
       return Text(
         "set.kindShort.failureStripping".t,
         style: TextStyle(

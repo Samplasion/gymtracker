@@ -7,21 +7,7 @@ import 'package:gymtracker/service/database.dart';
 import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/view/components/badges.dart';
 
-void expectExercise(Exercise result, Exercise expected) {
-  expect(result.name, expected.name);
-  expect(result.parameters, expected.parameters);
-  expect(result.primaryMuscleGroup, expected.primaryMuscleGroup);
-  expect(result.secondaryMuscleGroups, expected.secondaryMuscleGroups);
-  expect(result.restTime, expected.restTime);
-  expect(result.notes, expected.notes);
-  expect(result.sets.length, expected.sets.length);
-  for (int i = 0; i < result.sets.length; i++) {
-    expect(result.sets[i].kind, expected.sets[i].kind);
-    expect(result.sets[i].parameters, expected.sets[i].parameters);
-    expect(result.sets[i].reps, expected.sets[i].reps);
-    expect(result.sets[i].weight, expected.sets[i].weight);
-  }
-}
+import '../../test/expectations.dart';
 
 Future<void> testCreateExerciseFlow(
   WidgetTester tester,
@@ -52,10 +38,10 @@ Future<void> testCreateExerciseFlow(
   final titleBtn =
       find.widgetWithText(TextField, "exercise.editor.fields.title.label".t);
   final parametersBtn = find.widgetWithText(
-      DropdownButtonFormField<SetParameters>,
+      DropdownButtonFormField<GTSetParameters>,
       "exercise.editor.fields.parameters.label".t);
   final primaryMuscleGroupBtn = find.widgetWithText(
-      DropdownButtonFormField<MuscleGroup>,
+      DropdownButtonFormField<GTMuscleGroup>,
       "exercise.editor.fields.primaryMuscleGroup.label".t);
   final setFields = [
     titleBtn,
@@ -69,13 +55,13 @@ Future<void> testCreateExerciseFlow(
   await tester.enterText(setFields[0], "EditedExercise");
   await tester.tap(setFields[1]);
   await tester.pumpAndSettle();
-  await tester.tap(find.widgetWithText(DropdownMenuItem<SetParameters>,
+  await tester.tap(find.widgetWithText(DropdownMenuItem<GTSetParameters>,
       "exercise.editor.fields.parameters.values.time".t));
   await tester.pumpAndSettle();
   await tester.tap(setFields[2]);
   await tester.pumpAndSettle();
   await tester.tap(find.widgetWithText(
-      DropdownMenuItem<MuscleGroup>, "muscleGroups.chest".t));
+      DropdownMenuItem<GTMuscleGroup>, "muscleGroups.chest".t));
   await tester.pumpAndSettle();
   await tester.tap(find.widgetWithText(ChoiceChip, "muscleGroups.triceps".t));
   await tester.pumpAndSettle();
@@ -90,18 +76,21 @@ Future<void> testCreateExerciseFlow(
   await tester.pumpAndSettle();
 
   // Check that our changes have been saved
-  final ex = databaseService.exerciseBox.values.first;
+  final ex = databaseService.exercises.first;
   expectExercise(
     ex,
     Exercise.custom(
-      id: "",
+      // We don't care about the ID, just that the data is correct
+      id: ex.id,
       name: "EditedExercise",
-      parameters: SetParameters.time,
+      parameters: GTSetParameters.time,
       sets: [],
-      primaryMuscleGroup: MuscleGroup.chest,
-      secondaryMuscleGroups: {MuscleGroup.triceps},
+      primaryMuscleGroup: GTMuscleGroup.chest,
+      secondaryMuscleGroups: {GTMuscleGroup.triceps},
       restTime: Duration.zero,
       notes: "",
+      supersetID: null,
+      workoutID: null,
     ),
   );
 }

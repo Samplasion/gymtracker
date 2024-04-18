@@ -19,47 +19,74 @@ Color defaultColor = Color(Colors.blue.value);
 SettingsController get settingsController => Get.find<SettingsController>();
 
 class SettingsController extends GetxController with ServiceableController {
+  RxBool hasInitialized = false.obs;
   RxBool usesDynamicColor = false.obs;
   Rx<Color> color = defaultColor.obs;
   Rx<Locale?> locale = Get.locale.obs;
-  Rx<Weights?> weightUnit = Weights.kg.obs;
+  Rx<Weights> weightUnit = Weights.kg.obs;
   Rx<Distance> distanceUnit = Distance.km.obs;
   RxBool showSuggestedRoutines = true.obs;
 
   void setUsesDynamicColor(bool usesDC) =>
-      service.writeSetting("usesDynamicColor", usesDC);
+      service.writeSettings(service.prefs$.value.copyWith(
+        usesDynamicColor: usesDC,
+      ));
 
-  void setColor(Color color) => service.writeSetting("color", color.value);
+  void setColor(Color color) =>
+      service.writeSettings(service.prefs$.value.copyWith(color: color));
 
   void setLocale(Locale locale) {
     Get.updateLocale(locale);
-    service.writeSetting("locale", locale.languageCode);
+    service.writeSettings(service.prefs$.value.copyWith(locale: locale));
   }
 
   void setWeightUnit(Weights weightUnit) =>
-      service.writeSetting("weightUnit", weightUnit.name);
+      service.writeSettings(service.prefs$.value.copyWith(
+        weightUnit: weightUnit,
+      ));
 
   void setDistanceUnit(Distance distanceUnit) =>
-      service.writeSetting("distanceUnit", distanceUnit.name);
+      service.writeSettings(service.prefs$.value.copyWith(
+        distanceUnit: distanceUnit,
+      ));
 
   void setShowSuggestedRoutines(bool show) =>
-      service.writeSetting("showSuggestedRoutines", show);
+      service.writeSettings(service.prefs$.value.copyWith(
+        showSuggestedRoutines: show,
+      ));
+
+  @override
+  void onInit() {
+    super.onInit();
+
+    service.prefs$.listen((prefs) {
+      hasInitialized(true);
+
+      Get.updateLocale(prefs.locale);
+
+      usesDynamicColor(prefs.usesDynamicColor);
+      color(prefs.color);
+      locale(prefs.locale);
+      weightUnit(prefs.weightUnit);
+      distanceUnit(prefs.distanceUnit);
+      showSuggestedRoutines(prefs.showSuggestedRoutines);
+
+      notifyChildrens();
+    });
+  }
 
   @override
   void onServiceChange() {
-    usesDynamicColor(service.readSetting<bool>("usesDynamicColor") ?? false);
-    color(Color(service.readSetting<int>("color") ?? defaultColor.value));
-    locale(Locale(service.readSetting<String>("locale") ?? "en"));
-    weightUnit(Weights.values.firstWhere(
-      (element) => element.name == service.readSetting<String>("weightUnit"),
-      orElse: () => Weights.kg,
-    ));
-    distanceUnit(Distance.values.firstWhere(
-      (element) => element.name == service.readSetting<String>("distanceUnit"),
-      orElse: () => Distance.km,
-    ));
-    showSuggestedRoutines(
-        service.readSetting<bool>("showSuggestedRoutines") ?? true);
+    final prefs = service.prefs$.value;
+
+    usesDynamicColor(prefs.usesDynamicColor);
+    color(prefs.color);
+    locale(prefs.locale);
+    weightUnit(prefs.weightUnit);
+    distanceUnit(prefs.distanceUnit);
+    showSuggestedRoutines(prefs.showSuggestedRoutines);
+
+    notifyChildrens();
   }
 
   Future exportSettings(BuildContext context) async {
@@ -80,45 +107,58 @@ class SettingsController extends GetxController with ServiceableController {
   Future importSettings(BuildContext context) async {
     FilePickerResult? result = await FilePicker.platform.pickFiles();
 
-    if (kIsWeb && result?.files.single.bytes != null) {
-      String content =
-          String.fromCharCodes(result!.files.single.bytes!.toList());
-      Map<String, dynamic> map = json.decode(content);
+    try {
+      if (kIsWeb && result?.files.single.bytes != null) {
+        String content =
+            String.fromCharCodes(result!.files.single.bytes!.toList());
+        Map<String, dynamic> map = json.decode(content);
 
-      service.fromJson(map);
-      Go.snack("settings.options.import.success".t);
-    } else if (!kIsWeb && result?.files.single.path != null) {
-      try {
+        await service.fromJson(map);
+        Go.snack("settings.options.import.success".t);
+      } else if (!kIsWeb && result?.files.single.path != null) {
         File file = File(result!.files.single.path!);
         String content = await file.readAsString();
         Map<String, dynamic> map = json.decode(content);
 
-        service.fromJson(map);
+        await service.fromJson(map);
         Go.snack("settings.options.import.success".t);
-      } catch (e, s) {
-        logger.e("", error: e, stackTrace: s);
-
-        String errorString = e.toString();
-        if (e is Error) {
-          errorString = "$errorString\n${e.stackTrace}";
-        }
-
-        Go.dialog("settings.options.import.failed.title".t, errorString,
-            actions: [
-              TextButton(
-                onPressed: () {
-                  Clipboard.setData(ClipboardData(text: errorString));
-                  Go.snack("settings.options.import.failed.copy".t);
-                },
-                child: Text(
-                    // ignore: use_build_context_synchronously
-                    MaterialLocalizations.of(context).copyButtonLabel),
-              )
-            ]);
+      } else {
+        // User canceled the picker
+        logger.i("Picker canceled");
       }
-    } else {
-      // User canceled the picker
-      logger.i("Picker canceled");
+    } catch (e, s) {
+      logger.e("", error: e, stackTrace: s);
+
+      String errorString = e.toString();
+      if (e is Error) {
+        errorString = "$errorString\n${e.stackTrace}";
+      }
+
+      Go.dialog("settings.options.import.failed.title".t, errorString,
+          actions: [
+            TextButton(
+              onPressed: () {
+                Clipboard.setData(ClipboardData(text: errorString));
+                Go.snack("settings.options.import.failed.copy".t);
+              },
+              child: Text(
+                  // ignore: use_build_context_synchronously
+                  MaterialLocalizations.of(context).copyButtonLabel),
+            )
+          ]);
     }
+  }
+
+  /// Waits for the database to fire the first "Preferences loaded" event.
+  ///
+  /// Guaranteed to always return if the first event has already been fired.
+  /// Otherwise, it is guaranteed to return in 5 seconds if the database
+  /// doesn't fire the event for some reason.
+  Future<void> awaitInitialized() async {
+    if (hasInitialized()) return;
+    await Future.any([
+      service.db.watchPreferences().first,
+      Future.delayed(const Duration(seconds: 5)),
+    ]);
   }
 }

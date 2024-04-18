@@ -41,13 +41,12 @@ class WorkoutController extends GetxController with ServiceableController {
         time = DateTime.now().obs,
         parentID = Rx<String?>(parentID),
         infobox = Rx<String?>(infobox),
-        weightUnit =
-            (Get.find<SettingsController>().weightUnit() ?? Weights.kg).obs,
+        weightUnit = (Get.find<SettingsController>().weightUnit()).obs,
         distanceUnit = (Get.find<SettingsController>().distanceUnit()).obs {
     final sc = Get.find<SettingsController>();
     logger.d("""
       Currently defined units:
-        - Weight: ${sc.weightUnit()!.name} \t(cfr. ${weightUnit.value.name})
+        - Weight: ${sc.weightUnit().name} \t(cfr. ${weightUnit.value.name})
         - Distance: ${sc.distanceUnit().name} \t(cfr. ${distanceUnit.value.name})
     """);
     logger.w(
@@ -104,7 +103,7 @@ class WorkoutController extends GetxController with ServiceableController {
     return cont;
   }
 
-  static String generateWorkoutTitle(Set<MuscleCategory> selectedGroups) {
+  static String generateWorkoutTitle(Set<GTMuscleCategory> selectedGroups) {
     globalLogger.d("[WorkoutController#generateWorkoutTitle]\n$selectedGroups");
     globalLogger.d(
         "[WorkoutController#generateWorkoutTitle]\n${"titleGenerator.title".tByIndex(selectedGroups.length)}");
@@ -127,8 +126,8 @@ class WorkoutController extends GetxController with ServiceableController {
         distanceUnit: distanceUnit.value,
       );
 
-  List<ExSet> get allSets => [for (final ex in exercises) ...ex.sets];
-  List<ExSet> get doneSets => [
+  List<GTSet> get allSets => [for (final ex in exercises) ...ex.sets];
+  List<GTSet> get doneSets => [
         for (final set in allSets)
           if (set.done) set
       ];
@@ -239,7 +238,7 @@ class WorkoutController extends GetxController with ServiceableController {
 
   void generateNameIfEmpty() {
     if (name.value.trim().isEmpty) {
-      final groups = <MuscleCategory>{};
+      final groups = <GTMuscleCategory>{};
 
       for (final ex in exercises) {
         ex.when(
@@ -250,7 +249,7 @@ class WorkoutController extends GetxController with ServiceableController {
           superset: (s) => groups.addAll(
             s.exercises
                 .map((e) => e.primaryMuscleGroup.category)
-                .whereType<MuscleCategory>(),
+                .whereType<GTMuscleCategory>(),
           ),
         );
       }
@@ -281,6 +280,7 @@ class WorkoutController extends GetxController with ServiceableController {
       historyController.bindContinuation(continuation: workout);
     }
 
+    workout.logger.d("Submitting workout");
     historyController.addNewWorkout(workout);
     Get.back();
     SchedulerBinding.instance.addPostFrameCallback((timeStamp) async {
@@ -412,8 +412,8 @@ class WorkoutController extends GetxController with ServiceableController {
       exs.map(
         (ex) => ex.makeChild().copyWith.sets(
           [
-            ExSet.empty(
-              kind: SetKind.normal,
+            GTSet.empty(
+              kind: GTSetKind.normal,
               parameters: ex.parameters,
             ),
           ],
@@ -421,6 +421,7 @@ class WorkoutController extends GetxController with ServiceableController {
       ),
     );
     exercises.refresh();
+    save();
   }
 
   Future<void> pickExercisesForSuperset(int i) async {
@@ -430,8 +431,8 @@ class WorkoutController extends GetxController with ServiceableController {
     (exercises[i] as Superset).exercises.addAll(
           exs.map(
             (ex) => ex.makeChild().copyWith.sets([
-              ExSet.empty(
-                kind: SetKind.normal,
+              GTSet.empty(
+                kind: GTSetKind.normal,
                 parameters: ex.parameters,
               ),
             ]),
@@ -490,7 +491,7 @@ class WorkoutController extends GetxController with ServiceableController {
     Workout workout, {
     String? parentID,
     required bool Function(WorkoutExercisable exercise) exerciseFilter,
-    bool Function(ExSet set)? setFilter,
+    bool Function(GTSet set)? setFilter,
     bool continuation = false,
   }) {
     this

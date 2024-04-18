@@ -31,8 +31,8 @@ class WorkoutExerciseEditor extends StatefulWidget {
   final void Function(Duration time) onChangeRestTime;
   final VoidCallback onSetCreate;
   final void Function(int index) onSetRemove;
-  final void Function(ExSet set, SetKind kind) onSetSelectKind;
-  final void Function(Exercise exercise, ExSet set, bool isDone) onSetSetDone;
+  final void Function(GTSet set, GTSetKind kind) onSetSelectKind;
+  final void Function(Exercise exercise, GTSet set, bool isDone) onSetSetDone;
   final VoidCallback onSetValueChange;
   final void Function(Exercise exercise, String notes) onNotesChange;
   final Weights weightUnit;
@@ -239,11 +239,11 @@ class _WorkoutExerciseEditorState extends State<WorkoutExerciseEditor> {
 
 class WorkoutExerciseSetEditor extends StatefulWidget {
   final Exercise exercise;
-  final ExSet set;
+  final GTSet set;
   final bool alt;
   final bool isCreating;
   final VoidCallback onDelete;
-  final void Function(SetKind) onSetSelectKind;
+  final void Function(GTSetKind) onSetSelectKind;
   final void Function(bool) onSetSetDone;
   final VoidCallback onSetValueChange;
   final Weights weightUnit;
@@ -401,18 +401,18 @@ class _WorkoutExerciseSetEditorState extends State<WorkoutExerciseSetEditor> {
       );
 
   List<Widget> get fields => [
-        if ([SetParameters.repsWeight, SetParameters.timeWeight]
+        if ([GTSetParameters.repsWeight, GTSetParameters.timeWeight]
             .contains(widget.set.parameters))
           weightField,
         if ([
-          SetParameters.timeWeight,
-          SetParameters.time,
+          GTSetParameters.timeWeight,
+          GTSetParameters.time,
         ].contains(widget.set.parameters))
           timeField,
-        if ([SetParameters.repsWeight, SetParameters.freeBodyReps]
+        if ([GTSetParameters.repsWeight, GTSetParameters.freeBodyReps]
             .contains(widget.set.parameters))
           repsField,
-        if ([SetParameters.distance].contains(widget.set.parameters))
+        if ([GTSetParameters.distance].contains(widget.set.parameters))
           distanceField,
       ];
 
@@ -465,8 +465,8 @@ class _WorkoutExerciseSetEditorState extends State<WorkoutExerciseSetEditor> {
                     allSets: widget.exercise.sets,
                   ),
                   tooltip: "set.kind".t,
-                  itemBuilder: (context) => <PopupMenuEntry<SetKind>>[
-                    for (final kind in SetKind.values)
+                  itemBuilder: (context) => <PopupMenuEntry<GTSetKind>>[
+                    for (final kind in GTSetKind.values)
                       PopupMenuItem(
                         value: kind,
                         onTap: () => widget.onSetSelectKind(kind),
@@ -491,7 +491,7 @@ class _WorkoutExerciseSetEditorState extends State<WorkoutExerciseSetEditor> {
                               scrollable: true,
                               content: Column(
                                 children: [
-                                  for (final kind in SetKind.values)
+                                  for (final kind in GTSetKind.values)
                                     ListTile(
                                       leading: buildSetType(
                                         context,

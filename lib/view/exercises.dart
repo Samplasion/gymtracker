@@ -73,6 +73,20 @@ class _ExercisesViewState extends State<ExercisesView> {
                     });
                   },
                 ),
+                if (workout.hasContinuation)
+                  PopupMenuItem(
+                    key: const Key("edit-workout-cont"),
+                    child: Text(
+                      "workouts.actions.editContinuation.label".t,
+                    ),
+                    onTap: () {
+                      SchedulerBinding.instance
+                          .addPostFrameCallback((timeStamp) {
+                        Go.to(() =>
+                            WorkoutEditor(baseWorkout: workout.continuation!));
+                      });
+                    },
+                  ),
                 PopupMenuItem(
                   textStyle: TextStyle(
                     color: Theme.of(context).colorScheme.error,
@@ -173,39 +187,8 @@ class _ExercisesViewState extends State<ExercisesView> {
                       ),
                       if (workout.isConcrete) ...[
                         const Divider(height: 32),
-                        StatsRow(
-                          stats: [
-                            Stats(
-                              value: TimerView.buildTimeString(
-                                context,
-                                workout.duration!,
-                                builder: (time) => time.text!,
-                              ),
-                              label: "exerciseList.stats.time".t,
-                            ),
-                            if (workout.liftedWeight > 0)
-                              Stats(
-                                value: Weights.convert(
-                                  value: workout.liftedWeight,
-                                  from: workout.weightUnit,
-                                  to: settingsController.weightUnit.value!,
-                                ).userFacingWeight,
-                                label: "exerciseList.stats.volume".t,
-                              ),
-                            if (workout.distanceRun > 0)
-                              Stats(
-                                value: Distance.convert(
-                                  value: workout.distanceRun,
-                                  from: workout.distanceUnit,
-                                  to: settingsController.distanceUnit.value,
-                                ).userFacingDistance,
-                                label: "exerciseList.stats.distance".t,
-                              ),
-                            Stats(
-                              value: workout.doneSets.length.toString(),
-                              label: "exerciseList.stats.sets".t,
-                            ),
-                          ],
+                        WorkoutStatsRow(
+                          workout: _getSynthesizedWorkout(),
                         ),
                       ],
                       const Divider(height: 32),
@@ -242,11 +225,14 @@ class _ExercisesViewState extends State<ExercisesView> {
                   child: RoutineHistoryChart(routine: workout),
                 ),
               ),
-            if (WorkoutMuscleCategoriesBarChart.shouldShow(workout))
+            if (WorkoutMuscleCategoriesBarChart.shouldShow(
+                _getSynthesizedWorkout()))
               SliverToBoxAdapter(
                 child: Padding(
                   padding: const EdgeInsets.all(16),
-                  child: WorkoutMuscleCategoriesBarChart(workout: workout),
+                  child: WorkoutMuscleCategoriesBarChart(
+                    workout: _getSynthesizedWorkout(),
+                  ),
                 ),
               ),
             if (workout.shouldShowInfobox)
@@ -369,6 +355,13 @@ class _ExercisesViewState extends State<ExercisesView> {
     );
   }
 
+  SynthesizedWorkout _getSynthesizedWorkout() {
+    return SynthesizedWorkout([
+      workout,
+      if (workout.isConcrete && workout.hasContinuation) workout.continuation!,
+    ]);
+  }
+
   void changeParent(String? value) {
     setState(() => workout.parentID = value);
   }
@@ -379,6 +372,53 @@ class _ExercisesViewState extends State<ExercisesView> {
     SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
       setState(() => workout = newWorkout);
     });
+  }
+}
+
+class WorkoutStatsRow extends StatelessWidget {
+  const WorkoutStatsRow({
+    super.key,
+    required this.workout,
+  });
+
+  final Workout workout;
+
+  @override
+  Widget build(BuildContext context) {
+    return StatsRow(
+      stats: [
+        Stats(
+          value: TimerView.buildTimeString(
+            context,
+            workout.duration!,
+            builder: (time) => time.text!,
+          ),
+          label: "exerciseList.stats.time".t,
+        ),
+        if (workout.liftedWeight > 0)
+          Stats(
+            value: Weights.convert(
+              value: workout.liftedWeight,
+              from: workout.weightUnit,
+              to: settingsController.weightUnit.value,
+            ).userFacingWeight,
+            label: "exerciseList.stats.volume".t,
+          ),
+        if (workout.distanceRun > 0)
+          Stats(
+            value: Distance.convert(
+              value: workout.distanceRun,
+              from: workout.distanceUnit,
+              to: settingsController.distanceUnit.value,
+            ).userFacingDistance,
+            label: "exerciseList.stats.distance".t,
+          ),
+        Stats(
+          value: workout.doneSets.length.toString(),
+          label: "exerciseList.stats.sets".t,
+        ),
+      ],
+    );
   }
 }
 
@@ -568,7 +608,7 @@ class ExerciseDataView extends StatelessWidget {
 }
 
 class ExerciseSetView extends StatelessWidget {
-  final ExSet set;
+  final GTSet set;
   final Exercise exercise;
   final bool isConcrete;
   final bool alt;
@@ -586,25 +626,25 @@ class ExerciseSetView extends StatelessWidget {
   });
 
   List<Widget> get fields => [
-        if ([SetParameters.repsWeight, SetParameters.timeWeight]
+        if ([GTSetParameters.repsWeight, GTSetParameters.timeWeight]
             .contains(set.parameters))
           Text(Weights.convert(
             value: set.weight!,
             from: weightUnit,
-            to: settingsController.weightUnit.value!,
+            to: settingsController.weightUnit.value,
           ).userFacingWeight),
         if ([
-          SetParameters.timeWeight,
-          SetParameters.time,
+          GTSetParameters.timeWeight,
+          GTSetParameters.time,
         ].contains(set.parameters))
           Text("exerciseList.fields.time".trParams({
             "time":
                 "${(set.time!.inSeconds ~/ 60).toString().padLeft(2, "0")}:${(set.time!.inSeconds % 60).toString().padLeft(2, "0")}",
           })),
-        if ([SetParameters.repsWeight, SetParameters.freeBodyReps]
+        if ([GTSetParameters.repsWeight, GTSetParameters.freeBodyReps]
             .contains(set.parameters))
           Text("exerciseList.fields.reps".plural(set.reps ?? 0)),
-        if ([SetParameters.distance].contains(set.parameters))
+        if ([GTSetParameters.distance].contains(set.parameters))
           Text(Distance.convert(
             value: set.distance!,
             from: distanceUnit,

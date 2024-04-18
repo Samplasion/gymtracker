@@ -5,9 +5,9 @@ void main() {
   group('ExSet model', () {
     group("one rep max", () {
       test("is calculated correctly", () {
-        final set = ExSet(
-          kind: SetKind.normal,
-          parameters: SetParameters.repsWeight,
+        final set = GTSet(
+          kind: GTSetKind.normal,
+          parameters: GTSetParameters.repsWeight,
           reps: 10,
           weight: 100,
         );
@@ -17,9 +17,9 @@ void main() {
       });
 
       test("is null if reps is 0", () {
-        final set = ExSet(
-          kind: SetKind.normal,
-          parameters: SetParameters.repsWeight,
+        final set = GTSet(
+          kind: GTSetKind.normal,
+          parameters: GTSetParameters.repsWeight,
           reps: 0,
           weight: 100,
         );
@@ -27,9 +27,9 @@ void main() {
       });
 
       test("is 0 if weight is 0", () {
-        final set = ExSet(
-          kind: SetKind.normal,
-          parameters: SetParameters.repsWeight,
+        final set = GTSet(
+          kind: GTSetKind.normal,
+          parameters: GTSetParameters.repsWeight,
           reps: 10,
           weight: 0,
         );
@@ -37,13 +37,13 @@ void main() {
       });
 
       test("throws if parameters are not repsWeight", () {
-        for (final parameters in SetParameters.values) {
-          if (parameters == SetParameters.repsWeight) {
+        for (final parameters in GTSetParameters.values) {
+          if (parameters == GTSetParameters.repsWeight) {
             continue;
           }
           expect(
-            () => ExSet(
-              kind: SetKind.normal,
+            () => GTSet(
+              kind: GTSetKind.normal,
               parameters: parameters,
               // Specify all parameters to avoid assertion error
               reps: 10,
@@ -58,9 +58,9 @@ void main() {
 
       test("throws if the set is malformed", () {
         expect(
-          () => ExSet(
-            kind: SetKind.normal,
-            parameters: SetParameters.repsWeight,
+          () => GTSet(
+            kind: GTSetKind.normal,
+            parameters: GTSetParameters.repsWeight,
           ).oneRepMax,
           throwsA(anything),
         );

@@ -401,8 +401,8 @@ class _WorkoutViewState extends State<WorkoutView> {
                   _controller.save();
                 },
                 onSetCreate: () {
-                  _controller.exercises[i].sets.add(ExSet.empty(
-                    kind: SetKind.normal,
+                  _controller.exercises[i].sets.add(GTSet.empty(
+                    kind: GTSetKind.normal,
                     parameters:
                         (_controller.exercises[i] as Exercise).parameters,
                   ));
@@ -481,8 +481,8 @@ class _WorkoutViewState extends State<WorkoutView> {
                     if (ex == null || ex.isEmpty) return;
                     _controller.exercises[i] =
                         ex.first.makeChild().copyWith.sets([
-                      ExSet.empty(
-                        kind: SetKind.normal,
+                      GTSet.empty(
+                        kind: GTSetKind.normal,
                         parameters: ex.first.parameters,
                       ),
                     ]);
@@ -565,8 +565,8 @@ class _WorkoutViewState extends State<WorkoutView> {
                   (_controller.exercises[i] as Superset)
                       .exercises[index]
                       .sets
-                      .add(ExSet.empty(
-                        kind: SetKind.normal,
+                      .add(GTSet.empty(
+                        kind: GTSetKind.normal,
                         parameters: (_controller.exercises[i] as Superset)
                             .exercises[index]
                             .parameters,

@@ -199,42 +199,43 @@ class _HistoryViewState extends State<HistoryView> {
   }
 
   Widget _buildAppBar() {
+    final searchBar = PreferredSize(
+      preferredSize: const Size.fromHeight(kToolbarHeight / 1.25 + 32),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: SearchBar(
+          hintText: "history.search".t,
+          controller: searchTextController,
+          focusNode: searchFocusNode,
+          constraints: const BoxConstraints.tightFor(
+            height: kToolbarHeight / 1.25,
+          ),
+          onChanged: (q) {
+            setState(() {
+              isSearching = q.isNotEmpty;
+            });
+          },
+          trailing: [
+            if (isSearching) ...[
+              IconButton(
+                icon: const Icon(Icons.clear_rounded),
+                onPressed: () {
+                  setState(() {
+                    searchTextController.clear();
+                    searchFocusNode.unfocus();
+                    isSearching = false;
+                  });
+                },
+              ),
+            ]
+          ],
+        ),
+      ),
+    );
     if (selectedEntries.isEmpty) {
       return SliverAppBar.large(
         title: Text("history.title".t),
-        bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(kToolbarHeight / 1.25 + 32),
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: SearchBar(
-              hintText: "history.search".t,
-              controller: searchTextController,
-              focusNode: searchFocusNode,
-              constraints: const BoxConstraints.tightFor(
-                height: kToolbarHeight / 1.25,
-              ),
-              onChanged: (q) {
-                setState(() {
-                  isSearching = q.isNotEmpty;
-                });
-              },
-              trailing: [
-                if (isSearching) ...[
-                  IconButton(
-                    icon: const Icon(Icons.clear_rounded),
-                    onPressed: () {
-                      setState(() {
-                        searchTextController.clear();
-                        searchFocusNode.unfocus();
-                        isSearching = false;
-                      });
-                    },
-                  ),
-                ]
-              ],
-            ),
-          ),
-        ),
+        bottom: searchBar,
       );
     }
 
@@ -245,6 +246,7 @@ class _HistoryViewState extends State<HistoryView> {
       title: Text(
         "general.selected".plural(selectedEntries.length),
       ),
+      bottom: searchBar,
       leading: IconButton(
         icon: const Icon(Icons.close),
         onPressed: () {

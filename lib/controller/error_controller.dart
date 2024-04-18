@@ -1,15 +1,19 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/scheduler.dart';
-import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:gymtracker/service/logger.dart';
+import 'package:gymtracker/service/test.dart';
 import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/view/error.dart';
 
 class ErrorController extends GetxController {
+  int get loggerErrorMethodCount => 24;
+
   @override
   void onInit() {
     super.onInit();
+
+    if (TestService().isTest) return;
 
     FlutterError.onError = (details) {
       FlutterError.presentError(details);
@@ -70,5 +74,14 @@ class ErrorController extends GetxController {
       error: error,
       stack: stack,
     );
+  }
+
+  void dumpError(ErrorViewArguments args) {
+    if (args.details != null) {
+      logger.e("",
+          error: args.details!.exception, stackTrace: args.details!.stack);
+    } else {
+      logger.e("", error: args.error, stackTrace: args.stack);
+    }
   }
 }

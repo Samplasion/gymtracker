@@ -1,9 +1,11 @@
+import 'package:drift/native.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:gymtracker/service/color.dart';
 import 'package:gymtracker/service/database.dart';
 import 'package:gymtracker/service/localizations.dart';
+import 'package:gymtracker/service/test.dart';
 import 'package:gymtracker/service/version.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
@@ -13,6 +15,7 @@ import 'flows/combine_workouts.dart';
 import 'flows/create_exercise.dart';
 import 'flows/create_routine.dart';
 import 'flows/default_units.dart';
+import 'flows/edit_combination.dart';
 import 'flows/edit_exercise_in_routines_and_history.dart';
 import 'flows/edit_exercise_while_ongoing.dart';
 import 'flows/edit_workout.dart';
@@ -21,13 +24,12 @@ import 'flows/workout_from_routine.dart';
 
 void main() async {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
-  late DatabaseService databaseService;
+  TestService().isTest = true;
+  late DatabaseService databaseService = DatabaseService();
   final l = GTLocalizations();
+  await databaseService.ensureInitializedForTests(NativeDatabase.memory());
 
   setUp(() async {
-    databaseService = DatabaseService();
-    await databaseService.ensureInitializedForTests();
-
     await ColorService().init();
     await VersionService().init();
 
@@ -80,6 +82,10 @@ void main() async {
     testWidgets(
       'combine workouts',
       (tester) => testCombineWorkoutsFlow(tester, l, databaseService),
+    );
+    testWidgets(
+      'edit workout combination',
+      (tester) => testEditWorkoutCombinationFlow(tester, l, databaseService),
     );
     testWidgets(
       'test default units',

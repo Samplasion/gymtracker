@@ -7,7 +7,7 @@ part of 'measurements.dart';
 // **************************************************************************
 
 abstract class _$WeightMeasurementCWProxy {
-  WeightMeasurement id(String? id);
+  WeightMeasurement id(String id);
 
   WeightMeasurement weight(double weight);
 
@@ -36,7 +36,7 @@ class _$WeightMeasurementCWProxyImpl implements _$WeightMeasurementCWProxy {
   final WeightMeasurement _value;
 
   @override
-  WeightMeasurement id(String? id) => this(id: id);
+  WeightMeasurement id(String id) => this(id: id);
 
   @override
   WeightMeasurement weight(double weight) => this(weight: weight);
@@ -63,10 +63,10 @@ class _$WeightMeasurementCWProxyImpl implements _$WeightMeasurementCWProxy {
     Object? weightUnit = const $CopyWithPlaceholder(),
   }) {
     return WeightMeasurement(
-      id: id == const $CopyWithPlaceholder()
+      id: id == const $CopyWithPlaceholder() || id == null
           ? _value.id
           // ignore: cast_nullable_to_non_nullable
-          : id as String?,
+          : id as String,
       weight: weight == const $CopyWithPlaceholder() || weight == null
           ? _value.weight
           // ignore: cast_nullable_to_non_nullable
@@ -97,7 +97,7 @@ extension $WeightMeasurementCopyWith on WeightMeasurement {
 
 WeightMeasurement _$WeightMeasurementFromJson(Map<String, dynamic> json) =>
     WeightMeasurement(
-      id: json['id'] as String?,
+      id: json['id'] as String,
       weight: (json['weight'] as num).toDouble(),
       time: DateTime.parse(json['time'] as String),
       weightUnit: $enumDecode(_$WeightsEnumMap, json['weightUnit']),

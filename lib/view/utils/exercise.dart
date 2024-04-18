@@ -137,7 +137,7 @@ class ExerciseListTile extends StatelessWidget {
   String _buildWeight(double weight) => Weights.convert(
           value: weight,
           from: weightUnit!,
-          to: settingsController.weightUnit.value!)
+          to: settingsController.weightUnit.value)
       .userFacingWeight;
   String _buildReps(int? reps) => "exerciseList.fields.reps".plural(reps ?? 0);
   String _buildTime(BuildContext context, Duration time) =>
@@ -163,22 +163,22 @@ class ExerciseListTile extends StatelessWidget {
       Iterable<String> formattedSets;
 
       switch (exercise.parameters) {
-        case SetParameters.repsWeight:
+        case GTSetParameters.repsWeight:
           formattedSets = exercise.sets.map((set) =>
               "${_buildReps(set.reps)} ${_buildWeight(set.weight ?? 0)}");
 
-        case SetParameters.freeBodyReps:
+        case GTSetParameters.freeBodyReps:
           formattedSets = exercise.sets.map((set) => _buildReps(set.reps));
 
-        case SetParameters.timeWeight:
+        case GTSetParameters.timeWeight:
           formattedSets = exercise.sets.map((set) =>
               "${_buildReps(set.reps)} ${_buildTime(context, set.time ?? Duration.zero)}");
 
-        case SetParameters.time:
+        case GTSetParameters.time:
           formattedSets = exercise.sets
               .map((set) => _buildTime(context, set.time ?? Duration.zero));
 
-        case SetParameters.distance:
+        case GTSetParameters.distance:
           formattedSets =
               exercise.sets.map((set) => _buildDistance(set.distance));
       }
@@ -194,7 +194,7 @@ class ExerciseListTile extends StatelessWidget {
         ];
       }).map((e) {
         if (e.$2 == 1 &&
-            ![SetParameters.time, SetParameters.distance]
+            ![GTSetParameters.time, GTSetParameters.distance]
                 .contains(exercise.parameters)) {
           return e.$1;
         }

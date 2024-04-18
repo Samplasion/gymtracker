@@ -350,7 +350,7 @@ class _ExerciseInfoViewState extends State<ExerciseInfoView> {
                   color: Theme.of(context).colorScheme.primary,
                 )),
       ),
-      if ([SetParameters.repsWeight, SetParameters.timeWeight]
+      if ([GTSetParameters.repsWeight, GTSetParameters.timeWeight]
           .contains(exercise.parameters))
         Builder(builder: (context) {
           var best = history.first;
@@ -367,7 +367,7 @@ class _ExerciseInfoViewState extends State<ExerciseInfoView> {
                     .max
                     .toDouble(),
                 from: workout.weightUnit,
-                to: settingsController.weightUnit.value!);
+                to: settingsController.weightUnit.value);
             if (value >= bestScore) {
               best = hist;
               bestScore = value;
@@ -382,7 +382,7 @@ class _ExerciseInfoViewState extends State<ExerciseInfoView> {
             },
           );
         }),
-      if ([SetParameters.repsWeight].contains(exercise.parameters))
+      if ([GTSetParameters.repsWeight].contains(exercise.parameters))
         Builder(builder: (context) {
           var best = history.first;
           var bestScore = -1.0;
@@ -398,7 +398,7 @@ class _ExerciseInfoViewState extends State<ExerciseInfoView> {
                     .max
                     .toDouble(),
                 from: workout.weightUnit,
-                to: settingsController.weightUnit.value!);
+                to: settingsController.weightUnit.value);
             if (value >= bestScore) {
               best = hist;
               bestScore = value;
@@ -413,7 +413,7 @@ class _ExerciseInfoViewState extends State<ExerciseInfoView> {
             },
           );
         }),
-      if ([SetParameters.repsWeight].contains(exercise.parameters))
+      if ([GTSetParameters.repsWeight].contains(exercise.parameters))
         Builder(builder: (context) {
           var best = history.first;
           var bestWeight = 0.0;
@@ -426,7 +426,7 @@ class _ExerciseInfoViewState extends State<ExerciseInfoView> {
               final value = Weights.convert(
                   value: set.weight!,
                   from: workout.weightUnit,
-                  to: settingsController.weightUnit.value!);
+                  to: settingsController.weightUnit.value);
               if ((value * set.reps!) >= bestScore) {
                 best = hist;
                 bestScore = (value * set.reps!);
@@ -444,7 +444,7 @@ class _ExerciseInfoViewState extends State<ExerciseInfoView> {
             },
           );
         }),
-      if ([SetParameters.repsWeight, SetParameters.timeWeight]
+      if ([GTSetParameters.repsWeight, GTSetParameters.timeWeight]
           .contains(exercise.parameters))
         Builder(builder: (context) {
           var best = history.first;
@@ -461,7 +461,7 @@ class _ExerciseInfoViewState extends State<ExerciseInfoView> {
                     .sum
                     .toDouble(),
                 from: workout.weightUnit,
-                to: settingsController.weightUnit.value!);
+                to: settingsController.weightUnit.value);
             if (value >= bestScore) {
               best = hist;
               bestScore = value;

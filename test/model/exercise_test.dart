@@ -3,32 +3,20 @@ import 'package:gymtracker/model/set.dart';
 import 'package:gymtracker/model/workout.dart';
 import 'package:test/test.dart';
 
-void expectExercise(Exercise result, Exercise expected) {
-  expect(result.name, expected.name);
-  expect(result.parameters, expected.parameters);
-  expect(result.primaryMuscleGroup, expected.primaryMuscleGroup);
-  expect(result.secondaryMuscleGroups, expected.secondaryMuscleGroups);
-  expect(result.restTime, expected.restTime);
-  expect(result.notes, expected.notes);
-  expect(result.sets.length, expected.sets.length);
-  for (int i = 0; i < result.sets.length; i++) {
-    expect(result.sets[i].kind, expected.sets[i].kind);
-    expect(result.sets[i].parameters, expected.sets[i].parameters);
-    expect(result.sets[i].reps, expected.sets[i].reps);
-    expect(result.sets[i].weight, expected.sets[i].weight);
-  }
-}
+import '../expectations.dart';
 
 void main() {
   group('Exercise model', () {
     group("instantiate(workout:)", () {
       final base = Exercise.custom(
         name: "Exercise",
-        parameters: SetParameters.distance,
+        parameters: GTSetParameters.distance,
         sets: [],
-        primaryMuscleGroup: MuscleGroup.abductors,
+        primaryMuscleGroup: GTMuscleGroup.abductors,
         restTime: Duration.zero,
         notes: "Notes",
+        workoutID: null,
+        supersetID: null,
       );
       test("instantiates a child of the exercise in a routine", () {
         final workout = Workout(
@@ -36,15 +24,20 @@ void main() {
           exercises: [],
         );
 
+        final instantiated = base.instantiate(workout: workout);
         expectExercise(
-          base.instantiate(workout: workout),
+          instantiated,
           Exercise.custom(
+            // We don't care about the ID
+            id: instantiated.id,
             name: "Exercise",
-            parameters: SetParameters.distance,
+            parameters: GTSetParameters.distance,
             sets: [],
-            primaryMuscleGroup: MuscleGroup.abductors,
+            primaryMuscleGroup: GTMuscleGroup.abductors,
             restTime: Duration.zero,
             notes: "Notes",
+            workoutID: workout.id,
+            supersetID: null,
           ),
         );
       });
@@ -56,16 +49,21 @@ void main() {
           startingDate: DateTime.now(),
         );
 
+        final instantiated = base.instantiate(workout: workout);
         expectExercise(
-          base.instantiate(workout: workout),
+          instantiated,
           Exercise.custom(
+            // We don't care about the ID
+            id: instantiated.id,
             name: "Exercise",
             parentID: base.id,
-            parameters: SetParameters.distance,
+            parameters: GTSetParameters.distance,
             sets: [],
-            primaryMuscleGroup: MuscleGroup.abductors,
+            primaryMuscleGroup: GTMuscleGroup.abductors,
             restTime: Duration.zero,
             notes: "Notes",
+            workoutID: workout.id,
+            supersetID: null,
           ),
         );
       });
@@ -74,10 +72,10 @@ void main() {
     group("replaced(from:to:) static method", () {
       test("computes with the same parameters", () {
         final sets = [
-          for (int i = 0; i < SetKind.values.length; i++)
-            ExSet(
-              kind: SetKind.values[i],
-              parameters: SetParameters.repsWeight,
+          for (int i = 0; i < GTSetKind.values.length; i++)
+            GTSet(
+              kind: GTSetKind.values[i],
+              parameters: GTSetParameters.repsWeight,
               reps: 10,
               weight: i * 10,
             ),
@@ -86,23 +84,27 @@ void main() {
           id: "",
           parentID: "",
           name: "From",
-          parameters: SetParameters.repsWeight,
-          primaryMuscleGroup: MuscleGroup.abductors,
-          secondaryMuscleGroups: {MuscleGroup.abs, MuscleGroup.adductors},
+          parameters: GTSetParameters.repsWeight,
+          primaryMuscleGroup: GTMuscleGroup.abductors,
+          secondaryMuscleGroups: {GTMuscleGroup.abs, GTMuscleGroup.adductors},
           restTime: const Duration(minutes: 1),
           notes: "From notes",
           sets: sets,
+          workoutID: null,
+          supersetID: null,
         );
         final to = Exercise.custom(
           id: "",
           parentID: "",
           name: "To",
-          parameters: SetParameters.repsWeight,
-          primaryMuscleGroup: MuscleGroup.shoulders,
-          secondaryMuscleGroups: {MuscleGroup.traps, MuscleGroup.triceps},
+          parameters: GTSetParameters.repsWeight,
+          primaryMuscleGroup: GTMuscleGroup.shoulders,
+          secondaryMuscleGroups: {GTMuscleGroup.traps, GTMuscleGroup.triceps},
           restTime: const Duration(minutes: 2),
           notes: "To notes",
           sets: [],
+          workoutID: null,
+          supersetID: null,
         );
 
         final result = Exercise.replaced(from: from, to: to);
@@ -110,40 +112,44 @@ void main() {
           id: "",
           parentID: "",
           name: "To",
-          parameters: SetParameters.repsWeight,
-          primaryMuscleGroup: MuscleGroup.shoulders,
-          secondaryMuscleGroups: {MuscleGroup.traps, MuscleGroup.triceps},
+          parameters: GTSetParameters.repsWeight,
+          primaryMuscleGroup: GTMuscleGroup.shoulders,
+          secondaryMuscleGroups: {GTMuscleGroup.traps, GTMuscleGroup.triceps},
           restTime: const Duration(minutes: 1),
           notes: "From notes",
           sets: sets,
+          workoutID: null,
+          supersetID: null,
         );
         expectExercise(result, expected);
       });
 
       test("computes with different parameters", () {
-        const params = SetParameters.repsWeight;
+        const params = GTSetParameters.repsWeight;
         final from = Exercise.custom(
           id: "",
           parentID: "",
           name: "From",
           parameters: params,
-          primaryMuscleGroup: MuscleGroup.abductors,
-          secondaryMuscleGroups: {MuscleGroup.abs, MuscleGroup.adductors},
+          primaryMuscleGroup: GTMuscleGroup.abductors,
+          secondaryMuscleGroups: {GTMuscleGroup.abs, GTMuscleGroup.adductors},
           restTime: const Duration(minutes: 1),
           notes: "From notes",
           sets: [
-            for (int i = 0; i < SetKind.values.length; i++)
-              ExSet(
-                kind: SetKind.values[i],
+            for (int i = 0; i < GTSetKind.values.length; i++)
+              GTSet(
+                kind: GTSetKind.values[i],
                 parameters: params,
                 reps: 10,
                 weight: i * 10,
               ),
           ],
+          workoutID: null,
+          supersetID: null,
         );
 
         final otherParameters =
-            SetParameters.values.where((element) => element != params);
+            GTSetParameters.values.where((element) => element != params);
 
         for (final params in otherParameters) {
           final to = Exercise.custom(
@@ -151,11 +157,13 @@ void main() {
             parentID: "",
             name: "To",
             parameters: params,
-            primaryMuscleGroup: MuscleGroup.shoulders,
-            secondaryMuscleGroups: {MuscleGroup.traps, MuscleGroup.triceps},
+            primaryMuscleGroup: GTMuscleGroup.shoulders,
+            secondaryMuscleGroups: {GTMuscleGroup.traps, GTMuscleGroup.triceps},
             restTime: const Duration(minutes: 2),
             notes: "To notes",
             sets: [],
+            workoutID: null,
+            supersetID: null,
           );
 
           final result = Exercise.replaced(from: from, to: to);
@@ -164,13 +172,13 @@ void main() {
             parentID: "",
             name: "To",
             parameters: params,
-            primaryMuscleGroup: MuscleGroup.shoulders,
-            secondaryMuscleGroups: {MuscleGroup.traps, MuscleGroup.triceps},
+            primaryMuscleGroup: GTMuscleGroup.shoulders,
+            secondaryMuscleGroups: {GTMuscleGroup.traps, GTMuscleGroup.triceps},
             restTime: const Duration(minutes: 1),
             notes: "From notes",
             sets: [
               for (final set in from.sets)
-                ExSet(
+                GTSet(
                   kind: set.kind,
                   parameters: params,
                   reps: 0,
@@ -179,6 +187,8 @@ void main() {
                   distance: 0,
                 ),
             ],
+            workoutID: null,
+            supersetID: null,
           );
 
           expectExercise(result, expected);
@@ -186,23 +196,25 @@ void main() {
       });
 
       test("guarantees copyWith compatibility", () {
-        const params = SetParameters.repsWeight;
+        const params = GTSetParameters.repsWeight;
         final base = Exercise.custom(
           id: "",
           parentID: "",
           name: "To",
           parameters: params,
-          primaryMuscleGroup: MuscleGroup.shoulders,
-          secondaryMuscleGroups: {MuscleGroup.traps, MuscleGroup.triceps},
+          primaryMuscleGroup: GTMuscleGroup.shoulders,
+          secondaryMuscleGroups: {GTMuscleGroup.traps, GTMuscleGroup.triceps},
           restTime: const Duration(minutes: 2),
           notes: "To notes",
           sets: [],
+          workoutID: null,
+          supersetID: null,
         );
 
         final result = base.copyWith(
           name: "Copied",
           parameters: params,
-          primaryMuscleGroup: MuscleGroup.abductors,
+          primaryMuscleGroup: GTMuscleGroup.abductors,
           secondaryMuscleGroups: {},
           sets: base.sets,
         );
@@ -211,7 +223,7 @@ void main() {
           to: base.copyWith(
             name: "Copied",
             parameters: params,
-            primaryMuscleGroup: MuscleGroup.abductors,
+            primaryMuscleGroup: GTMuscleGroup.abductors,
             secondaryMuscleGroups: {},
             sets: base.sets,
           ),
@@ -225,12 +237,14 @@ void main() {
           id: "",
           parentID: "",
           name: "To",
-          parameters: SetParameters.repsWeight,
-          primaryMuscleGroup: MuscleGroup.shoulders,
-          secondaryMuscleGroups: {MuscleGroup.traps, MuscleGroup.triceps},
+          parameters: GTSetParameters.repsWeight,
+          primaryMuscleGroup: GTMuscleGroup.shoulders,
+          secondaryMuscleGroups: {GTMuscleGroup.traps, GTMuscleGroup.triceps},
           restTime: const Duration(minutes: 2),
           notes: "To notes",
           sets: [],
+          workoutID: null,
+          supersetID: null,
         );
         final result = Exercise.replaced(from: base, to: base);
 

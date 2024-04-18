@@ -28,15 +28,22 @@ class HistoryController extends GetxController with ServiceableController {
   Rx<Streaks> streaks = Streaks.zero.obs;
 
   @override
-  void onServiceChange() {
-    final hist = service.workoutHistory;
-    hist.sort((a, b) => (a.startingDate ??
-            DateTime.fromMillisecondsSinceEpoch(0))
-        .compareTo(b.startingDate ?? DateTime.fromMillisecondsSinceEpoch(0)));
-    history(hist);
-    _computeWorkoutsByDay();
-    computeStreaks();
+  onInit() {
+    super.onInit();
+    service.history$.listen((event) {
+      logger.d("Updated with ${event.length} exercises");
+      event.sort((a, b) => (a.startingDate ??
+              DateTime.fromMillisecondsSinceEpoch(0))
+          .compareTo(b.startingDate ?? DateTime.fromMillisecondsSinceEpoch(0)));
+      history(event);
+      _computeWorkoutsByDay();
+      computeStreaks();
+      coordinator.computeSuggestions();
+    });
   }
+
+  @override
+  void onServiceChange() {}
 
   void _computeWorkoutsByDay() {
     final _counts = <DateTime, List<Workout>>{};
@@ -49,6 +56,10 @@ class HistoryController extends GetxController with ServiceableController {
   }
 
   void computeStreaks() {
+    if (Get.context == null) {
+      logger.w("[computeStreaks] Context is null, ignoring.");
+    }
+
     streaks(Streaks.fromMappedDays(
       workoutsByDay,
       firstDayOfWeek: GTLocalizations.firstDayOfWeekFor(Get.context!),
@@ -58,10 +69,10 @@ class HistoryController extends GetxController with ServiceableController {
     logger.d("Recomputed streaks: $streaks");
   }
 
-  void deleteWorkout(Workout workout) {
-    service.removeHistoryWorkoutById(workout.id);
+  Future<void> deleteWorkout(Workout workout) async {
+    await service.removeHistoryWorkoutById(workout.id);
     if (workout.completedBy != null) {
-      service.removeHistoryWorkoutById(workout.completedBy!);
+      await service.removeHistoryWorkoutById(workout.completedBy!);
     }
   }
 
@@ -249,8 +260,10 @@ class HistoryController extends GetxController with ServiceableController {
   }
 
   Workout? getOriginalForContinuation({required Workout continuationWorkout}) {
+    assert(continuationWorkout.completes != null,
+        "Workout must be a continuation");
     return service.workoutHistory.firstWhereOrNull(
-      (element) => element.completedBy == continuationWorkout.id,
+      (element) => element.id == continuationWorkout.completes,
     );
   }
 
@@ -263,8 +276,13 @@ class HistoryController extends GetxController with ServiceableController {
     );
   }
 
-  void submitEditedWorkout(Workout workout) {
-    service.setHistoryWorkout(workout);
+  Future<void> submitEditedWorkout(Workout workout) async {
+    await service.setHistoryWorkout(workout);
+    if (workout.hasContinuation) {
+      service.setHistoryWorkout(workout.continuation!.copyWith(
+        parentID: workout.parentID,
+      ));
+    }
     Get.back();
     SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
       Get.back();
@@ -273,14 +291,16 @@ class HistoryController extends GetxController with ServiceableController {
   }
 
   /// Adds a new workout to the history, avoiding collisions
-  void addNewWorkout(Workout workout) {
+  Future<void> addNewWorkout(Workout workout) async {
+    logger.d(workout);
+    logger.d("Adding new workout to history");
     final collides = service.hasHistoryWorkout(workout.id);
     if (collides) {
       workout = workout.regenerateID();
       if (workout.completes != null) {
         final completed = service.getHistoryWorkout(workout.completes!);
         if (completed != null) {
-          service.setHistoryWorkout(completed.copyWith(
+          await service.setHistoryWorkout(completed.copyWith(
             completedBy: workout.id,
           ));
         } else {
@@ -288,14 +308,14 @@ class HistoryController extends GetxController with ServiceableController {
         }
       }
     }
-    service.setHistoryWorkout(workout);
+    await service.setHistoryWorkout(workout);
   }
 
-  Map<MuscleCategory, double> calculateMuscleCategoryDistributionFor({
+  Map<GTMuscleCategory, double> calculateMuscleCategoryDistributionFor({
     required List<Workout> workouts,
   }) {
-    Map<MuscleCategory, double> map = {
-      for (final category in MuscleCategory.values) category: 0,
+    Map<GTMuscleCategory, double> map = {
+      for (final category in GTMuscleCategory.values) category: 0,
     };
 
     void handleExercise(Workout workout, Exercise exercise) {
@@ -306,7 +326,7 @@ class HistoryController extends GetxController with ServiceableController {
         if (group.category == null) continue;
         map[group.category!] = map[group.category!]! +
             exercise.sets
-                .where((element) => !workout.isConcrete || element.done)
+                .where((element) => element.done || !workout.isConcrete)
                 .length;
       }
     }
@@ -330,38 +350,7 @@ class HistoryController extends GetxController with ServiceableController {
   void applyExerciseModification(Exercise exercise) {
     assert(exercise.isCustom);
 
-    final newHistory = service.historyBox.values.toList();
-    for (int i = 0; i < newHistory.length; i++) {
-      final workout = newHistory[i];
-
-      final res = workout.exercises.toList();
-      for (int i = 0; i < res.length; i++) {
-        res[i].when(
-          exercise: (e) {
-            if (exercise.isParentOf(e)) {
-              res[i] = Exercise.replaced(from: e, to: exercise).copyWith(
-                id: e.id,
-                parentID: e.parentID,
-              );
-            }
-          },
-          superset: (superset) {
-            for (int j = 0; j < superset.exercises.length; j++) {
-              if (exercise.isParentOf(superset.exercises[j])) {
-                (res[i] as Superset).exercises[j] =
-                    Exercise.replaced(from: superset.exercises[j], to: exercise)
-                        .copyWith(
-                  id: superset.exercises[j].id,
-                  parentID: superset.exercises[j].parentID,
-                );
-              }
-            }
-          },
-        );
-      }
-      newHistory[i] = workout.copyWith.exercises(res);
-    }
-    service.writeAllHistory(newHistory);
+    service.applyExerciseModificationToHistory(exercise);
   }
 
   bool hasExercise(Exercise exercise) {
@@ -413,11 +402,28 @@ class HistoryController extends GetxController with ServiceableController {
 
     logger.d(combined.toJson());
 
-    addNewWorkout(combined);
-    deleteWorkout(w1);
-    deleteWorkout(w2);
+    replaceWorkoutsWithCombined(
+      workouts: [w1, w2],
+      combined: combined,
+    );
 
     Go.off(() => ExercisesView(workout: combined));
+  }
+
+  void replaceWorkoutsWithCombined({
+    required List<Workout> workouts,
+    required Workout combined,
+  }) {
+    service.transaction(() async {
+      for (final workout in workouts) {
+        await deleteWorkout(workout);
+      }
+      await addNewWorkout(combined);
+    });
+  }
+
+  Workout? getByID(String id) {
+    return history.firstWhereOrNull((element) => element.id == id);
   }
 }
 
@@ -428,4 +434,19 @@ extension WorkoutHistory on Workout {
       Get.find<HistoryController>().getContinuation(incompleteWorkout: this);
   Workout? get originalWorkoutForContinuation => Get.find<HistoryController>()
       .getOriginalForContinuation(continuationWorkout: this);
+
+  SynthesizedWorkout synthesizeContinuations({
+    bool previous = true,
+    bool next = true,
+  }) {
+    final self = this is SynthesizedWorkout
+        ? (this as SynthesizedWorkout).components.first
+        : this;
+    return SynthesizedWorkout([
+      self,
+      if (previous && self.isContinuation) self.originalWorkoutForContinuation!,
+      if (next && self.completedBy != null && self.continuation != null)
+        self.continuation!,
+    ]);
+  }
 }

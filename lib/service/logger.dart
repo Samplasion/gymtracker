@@ -32,7 +32,7 @@ final _oneLinePrefixPrinter = OneLinePrefixPrinter(
 final globalLogger = Logger(printer: _oneLinePrefixPrinter);
 
 class OneLinePrefixPrinter extends LogPrinter {
-  final LogPrinter printer;
+  final PrettyPrinter printer;
   final Map<Level, String> levels;
   final Map<Level, AnsiColor> levelColors;
 
@@ -55,6 +55,18 @@ class OneLinePrefixPrinter extends LogPrinter {
       lines[i] = "${" " * (maxPrefixLength)} ${lines[i]}";
     }
     return lines;
+  }
+
+  copyWith({
+    PrettyPrinter? printer,
+    Map<Level, String>? levels,
+    Map<Level, AnsiColor>? levelColors,
+  }) {
+    return OneLinePrefixPrinter(
+      printer: printer ?? this.printer,
+      levels: levels ?? this.levels,
+      levelColors: levelColors ?? this.levelColors,
+    );
   }
 }
 
@@ -83,5 +95,29 @@ class ObjectLogger<T> extends Logger {
 }
 
 extension ObjectLoggerExt on Object {
-  Logger get logger => ObjectLogger(this, printer: _oneLinePrefixPrinter);
+  Logger get logger => ObjectLogger(
+        this,
+        printer: _oneLinePrefixPrinter.copyWith(
+          printer: _oneLinePrefixPrinter.printer
+              .copyWith(errorMethodCount: loggerErrorMethodCount),
+        ),
+      );
+
+  int get loggerErrorMethodCount => 8;
+}
+
+extension on PrettyPrinter {
+  PrettyPrinter copyWith({
+    int? errorMethodCount,
+  }) {
+    return PrettyPrinter(
+      errorMethodCount: errorMethodCount ?? this.errorMethodCount,
+      printEmojis: printEmojis,
+      colors: colors,
+      lineLength: lineLength,
+      noBoxingByDefault: noBoxingByDefault,
+      methodCount: methodCount,
+      levelColors: levelColors,
+    );
+  }
 }

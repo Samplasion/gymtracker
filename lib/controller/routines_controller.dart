@@ -117,7 +117,12 @@ class RoutinesController extends GetxController
       workoutID = workout.isConcrete ? workout.parentID : workout.id;
     }
 
-    Get.put(WorkoutController("workouts.untitled".t, workoutID, null));
+    // We aren't naming the workout here because the _clone()
+    // method will take care of that.
+    // Specifically, if [workout] is null, it will autogenerate a title
+    // once the user goes to finish the workout.
+    Get.put(WorkoutController("", workoutID, null));
+
     // ignore: use_build_context_synchronously
     if (Navigator.of(context).canPop()) {
       Get.back();

@@ -1,0 +1,7 @@
+languageIds:
+  - dart
+usageMatchRegex:
+  - "['\"]([\\w\\d+\\.]+)['\"]\\.t"
+refactorTemplates:
+  - '"$1".t'
+monopoly: true

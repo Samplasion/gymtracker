@@ -555,7 +555,7 @@ class _WorkoutViewState extends State<WorkoutView> {
                     (_controller.exercises[i] as Superset).exercises[index] =
                         Exercise.replaced(
                       from: old,
-                      to: ex.first,
+                      to: ex.first.makeChild(),
                     );
                     _controller.exercises.refresh();
                     _controller.save();

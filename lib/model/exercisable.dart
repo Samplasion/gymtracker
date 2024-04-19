@@ -69,4 +69,6 @@ abstract class WorkoutExercisable {
     required Distance fromDistanceUnit,
     required Distance toDistanceUnit,
   });
+
+  WorkoutExercisable clone() => WorkoutExercisable.fromJson(toJson());
 }

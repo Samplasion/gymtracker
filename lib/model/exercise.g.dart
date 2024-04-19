@@ -253,4 +253,5 @@ const _$GTMuscleGroupEnumMap = {
   GTMuscleGroup.traps: 'traps',
   GTMuscleGroup.triceps: 'triceps',
   GTMuscleGroup.upperBack: 'upperBack',
+  GTMuscleGroup.thighs: 'thighs',
 };

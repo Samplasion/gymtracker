@@ -15,6 +15,7 @@ import 'package:gymtracker/model/set.dart';
 import 'package:gymtracker/model/superset.dart';
 import 'package:gymtracker/model/workout.dart';
 import 'package:gymtracker/service/localizations.dart';
+import 'package:gymtracker/service/logger.dart';
 import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/utils/sets.dart';
@@ -132,6 +133,8 @@ class _ExercisesViewState extends State<ExercisesView> {
                         .addPostFrameCallback((timeStamp) async {
                       final newRoutine = await Go.to<Workout>(
                           () => RoutineCreator(base: workout));
+
+                      logger.d("newRoutine: $newRoutine");
 
                       if (newRoutine != null) {
                         Get.find<RoutinesController>().editRoutine(newRoutine);

@@ -63,7 +63,8 @@ class _RoutineCreatorState extends State<RoutineCreator> {
   void initState() {
     super.initState();
     if (widget.base != null) {
-      controller.exercises(widget.base!.exercises.wrap());
+      controller.exercises(
+          widget.base!.exercises.map((e) => e.clone()).toList().wrap());
     }
   }
 
@@ -332,13 +333,16 @@ class _RoutineCreatorState extends State<RoutineCreator> {
             final ex = await Go.to<List<Exercise>>(
                 () => const ExercisePicker(singlePick: true));
             if (ex == null || ex.isEmpty) return;
-            (controller.exercises[i].data as Superset).exercises[j] =
-                ex.first.copyWith.sets([
+            final exs =
+                (controller.exercises[i].data as Superset).exercises.toList();
+            exs[j] = ex.first.makeChild().copyWith.sets([
               GTSet.empty(
                 kind: GTSetKind.normal,
                 parameters: ex.first.parameters,
               ),
             ]);
+            controller.exercises[i].data =
+                controller.exercises[i].data.asSuperset.copyWith.exercises(exs);
             controller.exercises.refresh();
           });
         },

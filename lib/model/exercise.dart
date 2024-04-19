@@ -67,6 +67,7 @@ class Exercise extends WorkoutExercisable {
   @override
   Duration restTime;
 
+  bool get isOrphan => parentID == null;
   bool get isAbstract => workoutID == null;
   bool get isStandardLibraryExercise {
     final query = isAbstract ? id : parentID;
@@ -286,7 +287,9 @@ extension Display on Exercise {
     final candidate = isAbstract ? id : parentID!;
 
     if (candidate.existsAsTranslationKey) return candidate.t;
-    name.logger.e("No translation found");
+    if (!isOrphan && parentID!.existsAsTranslationKey) return parentID!.t;
+    name.logger.e(
+        "No translation found for exercise $candidate which ${isAbstract ? "is" : "is not"} abstract");
     return name;
   }
 }

@@ -108,7 +108,7 @@ class ConcreteExercise {
                 : isCustom
                     ? customExerciseId != null
                     : libraryExerciseId != null,
-            "Concrete exercises must have a parent ID (ID: $id)"),
+            "Concrete exercises must have a parent ID (ID: $id, customExerciseId: $customExerciseId, libraryExerciseId: $libraryExerciseId)"),
         assert(isInSuperset ? supersetId != null : true,
             "If isInSuperset is true, supersetId must be set (ID: $id)");
 }

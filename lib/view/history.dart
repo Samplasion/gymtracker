@@ -233,13 +233,13 @@ class _HistoryViewState extends State<HistoryView> {
       ),
     );
     if (selectedEntries.isEmpty) {
-      return SliverAppBar.large(
+      return SliverAppBar.medium(
         title: Text("history.title".t),
         bottom: searchBar,
       );
     }
 
-    return SliverAppBar.large(
+    return SliverAppBar.medium(
       backgroundColor: Theme.of(context).colorScheme.inverseSurface,
       foregroundColor: Theme.of(context).colorScheme.onInverseSurface,
       surfaceTintColor: Colors.transparent,

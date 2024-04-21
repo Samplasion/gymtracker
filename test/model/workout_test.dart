@@ -185,7 +185,8 @@ void main() {
         });
         test('with a changed set kind', () {
           final workout2 = workout.clone();
-          workout2.exercises[0].sets[0].kind = GTSetKind.failureStripping;
+          workout2.exercises[0].sets[0] = workout2.exercises[0].sets[0].copyWith
+              .kind(GTSetKind.failureStripping);
           expect(
             WorkoutDifference.fromWorkouts(
               oldWorkout: workout,
@@ -200,7 +201,8 @@ void main() {
         });
         test('with a different set weight', () {
           final workout2 = workout.clone();
-          workout2.exercises[0].sets[0].weight = 200;
+          workout2.exercises[0].sets[0] =
+              workout2.exercises[0].sets[0].copyWith.weight(200);
           expect(
             WorkoutDifference.fromWorkouts(
               oldWorkout: workout,
@@ -215,7 +217,8 @@ void main() {
         });
         test('with different reps weight', () {
           final workout2 = workout.clone();
-          workout2.exercises[0].sets[0].weight = 200;
+          workout2.exercises[0].sets[0] =
+              workout2.exercises[0].sets[0].copyWith.weight(200);
           expect(
             WorkoutDifference.fromWorkouts(
               oldWorkout: workout,
@@ -362,7 +365,8 @@ void main() {
         );
 
         final workout4 = workout3.clone();
-        (workout4.exercises[0] as Superset).notes = "Changed notes";
+        workout4.exercises[0] =
+            (workout4.exercises[0] as Superset).copyWith.notes("Changed notes");
         expect(
           WorkoutDifference.fromWorkouts(
             oldWorkout: workout3,
@@ -376,8 +380,9 @@ void main() {
         );
 
         final workout5 = workout4.clone();
-        (workout5.exercises[0] as Superset).restTime =
-            const Duration(seconds: 120);
+        workout5.exercises[0] = (workout5.exercises[0] as Superset)
+            .copyWith
+            .restTime(const Duration(seconds: 120));
         expect(
           WorkoutDifference.fromWorkouts(
             oldWorkout: workout4,
@@ -758,21 +763,6 @@ void main() {
             routine1.distanceRun + routine2.distanceRun);
       });
 
-      test("setters should throw", () {
-        expect(() => synthesizedRoutine.id = "",
-            throwsA(isA<SynthesizedWorkoutSetterException>()));
-        expect(() => synthesizedRoutine.parentID = "",
-            throwsA(isA<SynthesizedWorkoutSetterException>()));
-        expect(() => synthesizedRoutine.completedBy = "",
-            throwsA(isA<SynthesizedWorkoutSetterException>()));
-        expect(() => synthesizedRoutine.completes = "",
-            throwsA(isA<SynthesizedWorkoutSetterException>()));
-        expect(() => synthesizedRoutine.distanceUnit = Distance.mi,
-            throwsA(isA<SynthesizedWorkoutSetterException>()));
-        expect(() => synthesizedRoutine.weightUnit = Weights.kg,
-            throwsA(isA<SynthesizedWorkoutSetterException>()));
-      });
-
       test("methods should throw", () {
         expect(() => synthesizedRoutine.clone(),
             throwsA(isA<SynthesizedWorkoutMethodException>()));
@@ -782,7 +772,7 @@ void main() {
             throwsA(isA<SynthesizedWorkoutMethodException>()));
         expect(() => synthesizedRoutine.withFilters(),
             throwsA(isA<SynthesizedWorkoutMethodException>()));
-        expect(() => synthesizedRoutine.regenerateExerciseIDs(),
+        expect(() => synthesizedRoutine.withRegeneratedExerciseIDs(),
             throwsA(isA<SynthesizedWorkoutMethodException>()));
       });
     });
@@ -812,21 +802,6 @@ void main() {
             workout1.duration! + workout2.duration!);
       });
 
-      test("setters should throw", () {
-        expect(() => synthesizedWorkout.id = "",
-            throwsA(isA<SynthesizedWorkoutSetterException>()));
-        expect(() => synthesizedWorkout.parentID = "",
-            throwsA(isA<SynthesizedWorkoutSetterException>()));
-        expect(() => synthesizedWorkout.completedBy = "",
-            throwsA(isA<SynthesizedWorkoutSetterException>()));
-        expect(() => synthesizedWorkout.completes = "",
-            throwsA(isA<SynthesizedWorkoutSetterException>()));
-        expect(() => synthesizedWorkout.distanceUnit = Distance.mi,
-            throwsA(isA<SynthesizedWorkoutSetterException>()));
-        expect(() => synthesizedWorkout.weightUnit = Weights.kg,
-            throwsA(isA<SynthesizedWorkoutSetterException>()));
-      });
-
       test("methods should throw", () {
         expect(() => synthesizedWorkout.clone(),
             throwsA(isA<SynthesizedWorkoutMethodException>()));
@@ -836,7 +811,7 @@ void main() {
             throwsA(isA<SynthesizedWorkoutMethodException>()));
         expect(() => synthesizedWorkout.withFilters(),
             throwsA(isA<SynthesizedWorkoutMethodException>()));
-        expect(() => synthesizedWorkout.regenerateExerciseIDs(),
+        expect(() => synthesizedWorkout.withRegeneratedExerciseIDs(),
             throwsA(isA<SynthesizedWorkoutMethodException>()));
       });
     });

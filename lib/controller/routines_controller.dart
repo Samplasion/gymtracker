@@ -182,7 +182,7 @@ class RoutinesController extends GetxController
     bool continuation = false,
   }) {
     if (workout != null) {
-      final clone = workout.clone()..regenerateExerciseIDs();
+      final clone = workout.clone().withRegeneratedExerciseIDs();
       Get.find<WorkoutController>().applyExistingWorkout(
         clone,
         parentID: parentID,

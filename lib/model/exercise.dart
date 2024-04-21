@@ -57,7 +57,7 @@ enum GTMuscleGroup {
 @CopyWith(constructor: "raw")
 class Exercise extends WorkoutExercisable {
   @override
-  String id;
+  final String id;
   final String name;
   final GTSetParameters parameters;
   @override
@@ -65,7 +65,7 @@ class Exercise extends WorkoutExercisable {
   final GTMuscleGroup primaryMuscleGroup;
   final Set<GTMuscleGroup> secondaryMuscleGroups;
   @override
-  Duration restTime;
+  final Duration restTime;
 
   bool get isOrphan => parentID == null;
   bool get isAbstract => workoutID == null;
@@ -76,16 +76,16 @@ class Exercise extends WorkoutExercisable {
 
   /// The ID of the non-concrete (ie. part of a routine) exercise
   /// this concrete exercise should be categorized under.
-  String? parentID;
+  final String? parentID;
 
   @JsonKey(defaultValue: "")
   @override
-  String notes;
+  final String notes;
 
-  String? supersetID;
+  final String? supersetID;
 
   @override
-  String? workoutID;
+  final String? workoutID;
 
   @JsonKey(defaultValue: false)
   final bool standard;
@@ -174,9 +174,10 @@ class Exercise extends WorkoutExercisable {
         'type': 'exercise',
       };
 
+  @override
   Exercise clone() => Exercise.fromJson(toJson());
 
-  void regenerateID() => id = const Uuid().v4();
+  Exercise _withRegeneratedID() => copyWith.id(const Uuid().v4());
 
   /// Returns true if [other] is [this] or an instance of [this]
   /// (ie. [other.parentID] == [id].)
@@ -210,13 +211,11 @@ class Exercise extends WorkoutExercisable {
   }
 
   Exercise makeSibling() {
-    return clone()..regenerateID();
+    return _withRegeneratedID();
   }
 
   Exercise makeChild() {
-    final child = clone()
-      ..parentID = id
-      ..regenerateID();
+    final child = _withRegeneratedID().copyWith(parentID: id);
     logger.t(
         "Making child of [id: $id, pid: $parentID] with ID [id: ${child.id}, pid: ${child.parentID}]");
     return child;

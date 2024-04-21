@@ -25,7 +25,7 @@ part 'workout.g.dart';
 /// [duration]. If the [duration] is null, then the workout is
 /// not concrete and represents a routine.
 class Workout {
-  String id;
+  final String id;
   final String name;
   final List<WorkoutExercisable> exercises;
   final Duration? duration;
@@ -39,13 +39,13 @@ class Workout {
 
   /// The ID of the non-concrete (ie. part of a routine) exercise
   /// this concrete exercise should be categorized under.
-  String? parentID;
+  final String? parentID;
 
   /// The unit of weight used in this workout.
-  Weights weightUnit;
+  final Weights weightUnit;
 
   /// The unit of distance used in this workout.
-  Distance distanceUnit;
+  final Distance distanceUnit;
 
   /// Whether this is a concrete workout.
   bool get isConcrete => duration != null;
@@ -73,10 +73,10 @@ class Workout {
   ///
   /// It is an error to define both [completedBy] and [completes].
   /// {@endtemplate}
-  String? completedBy;
+  final String? completedBy;
 
   /// {@macro gymtracker_workout_completion}
-  String? completes;
+  final String? completes;
 
   DateTime? get endingDate => (duration != null && startingDate != null)
       ? startingDate!.add(duration!)
@@ -264,31 +264,27 @@ class Workout {
     );
   }
 
-  void regenerateExerciseIDs() {
+  Workout withRegeneratedExerciseIDs() {
+    final newExercises = <WorkoutExercisable>[];
     for (final exercise in exercises) {
-      exercise.map(
+      newExercises.add(exercise.map(
         superset: (superset) {
           final newSupersetID = const Uuid().v4();
-          superset.id = newSupersetID;
-          for (final exercise in superset.exercises) {
-            exercise.id = const Uuid().v4();
-            exercise.supersetID = newSupersetID;
-          }
+          return superset.copyWith(
+            exercises: [
+              for (final exercise in superset.exercises)
+                exercise.copyWith(
+                  id: const Uuid().v4(),
+                  supersetID: newSupersetID,
+                ),
+            ],
+            id: newSupersetID,
+          );
         },
-        exercise: (single) => single.id = const Uuid().v4(),
-      );
+        exercise: (single) => single.copyWith(id: const Uuid().v4()),
+      ));
     }
-  }
-}
-
-class SynthesizedWorkoutSetterException implements Exception {
-  final String field;
-
-  SynthesizedWorkoutSetterException(this.field);
-
-  @override
-  String toString() {
-    return "Cannot set field `$field` on a synthesized workout.";
+    return copyWith(exercises: newExercises);
   }
 }
 
@@ -317,38 +313,21 @@ class SynthesizedWorkout implements Workout {
 
   @override
   String? get completedBy => null;
-  @override
-  set completedBy(String? v) =>
-      throw SynthesizedWorkoutSetterException("completedBy");
 
   @override
   String? get completes => null;
-  @override
-  set completes(String? v) =>
-      throw SynthesizedWorkoutSetterException("completes");
 
   @override
   Distance get distanceUnit => components.first.distanceUnit;
-  @override
-  set distanceUnit(Distance v) =>
-      throw SynthesizedWorkoutSetterException("distanceUnit");
 
   @override
   String get id => components.first.id;
-  @override
-  set id(String v) => throw SynthesizedWorkoutSetterException("id");
 
   @override
   String? get parentID => null;
-  @override
-  set parentID(String? v) =>
-      throw SynthesizedWorkoutSetterException("parentID");
 
   @override
   Weights get weightUnit => components.first.weightUnit;
-  @override
-  set weightUnit(Weights v) =>
-      throw SynthesizedWorkoutSetterException("weightUnit");
 
   @override
   List<GTSet> get allSets => components.expand((e) => e.allSets).toList();
@@ -456,8 +435,8 @@ class SynthesizedWorkout implements Workout {
   }
 
   @override
-  void regenerateExerciseIDs() {
-    throw SynthesizedWorkoutMethodException("regenerateExerciseIDs");
+  Workout withRegeneratedExerciseIDs() {
+    throw SynthesizedWorkoutMethodException("withRegeneratedExerciseIDs");
   }
 }
 

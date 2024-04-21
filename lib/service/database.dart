@@ -169,11 +169,9 @@ class DatabaseService extends GetxService with ChangeNotifier {
   setRoutine(Workout routine) {
     logger.i("Setting routine");
     if (routines.any((element) => element.id == routine.id)) {
-      fixWorkout(routine);
-      db.updateRoutine(routine);
+      db.updateRoutine(fixWorkout(routine));
     } else {
-      fixWorkout(routine);
-      db.insertRoutine(routine);
+      db.insertRoutine(fixWorkout(routine));
     }
   }
 
@@ -222,11 +220,9 @@ class DatabaseService extends GetxService with ChangeNotifier {
   Future setHistoryWorkout(Workout workout) async {
     logger.i("Setting history workout");
     if (workoutHistory.any((element) => element.id == workout.id)) {
-      fixWorkout(workout);
-      await db.updateHistoryWorkout(workout);
+      await db.updateHistoryWorkout(fixWorkout(workout));
     } else {
-      fixWorkout(workout);
-      await db.insertHistoryWorkout(workout);
+      await db.insertHistoryWorkout(fixWorkout(workout));
     }
   }
 
@@ -421,17 +417,23 @@ class DatabaseImportVersionMismatch implements Exception {
   }
 }
 
-void fixWorkout(Workout workout) {
+Workout fixWorkout(Workout workout) {
+  final newExercises = <WorkoutExercisable>[];
   for (final exercise in workout.exercises) {
-    exercise.when(exercise: (ex) {
-      ex.workoutID = workout.id;
-      ex.supersetID = null;
+    newExercises.add(exercise.map(exercise: (ex) {
+      return ex.copyWith(
+        workoutID: workout.id,
+        supersetID: null,
+      );
     }, superset: (ss) {
-      ss.workoutID = workout.id;
-      for (final ex in ss.exercises) {
-        ex.workoutID = workout.id;
-        ex.supersetID = ss.id;
-      }
-    });
+      return ss.copyWith(
+        workoutID: workout.id,
+        exercises: ss.exercises
+            .map((e) => e.copyWith(workoutID: workout.id, supersetID: ss.id))
+            .toList(),
+      );
+    }));
   }
+
+  return workout.copyWith(exercises: newExercises);
 }

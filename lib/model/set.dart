@@ -29,15 +29,15 @@ enum GTSetParameters {
 @JsonSerializable()
 @CopyWith()
 class GTSet {
-  String id;
-  GTSetKind kind;
+  final String id;
+  final GTSetKind kind;
   final GTSetParameters parameters;
 
-  int? reps;
-  double? weight;
-  Duration? time;
-  double? distance;
-  bool done;
+  final int? reps;
+  final double? weight;
+  final Duration? time;
+  final double? distance;
+  final bool done;
 
   GTSet({
     String? id,

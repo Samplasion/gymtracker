@@ -365,10 +365,6 @@ class _ExercisesViewState extends State<ExercisesView> {
     ]);
   }
 
-  void changeParent(String? value) {
-    setState(() => workout.parentID = value);
-  }
-
   void rename(String? value) {
     final newWorkout =
         Get.find<history.HistoryController>().rename(workout, newName: value);

@@ -13,5 +13,4 @@ if git diff-index --quiet HEAD --; then
   echo "No changes to commit"
 else
   git commit -m "chore: update translations"
-  git push
 fi

@@ -69,5 +69,4 @@ if git diff-index --quiet HEAD --; then
   echo "No changes to commit"
 else
   git commit -m "chore: increase version number to $NEW_VER"
-  git push
 fi

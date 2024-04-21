@@ -13,17 +13,17 @@ part 'superset.g.dart';
 @CopyWith()
 class Superset extends WorkoutExercisable {
   @override
-  String id;
+  final String id;
   final List<Exercise> exercises;
   @override
-  Duration restTime;
+  final Duration restTime;
 
   @JsonKey(defaultValue: "")
   @override
-  String notes;
+  final String notes;
 
   @override
-  String? workoutID;
+  final String? workoutID;
 
   Superset({
     String? id,
@@ -61,9 +61,10 @@ class Superset extends WorkoutExercisable {
     return 'Superset${toJson()}';
   }
 
+  @override
   Superset clone() => Superset.fromJson(toJson());
 
-  void regenerateID() => id = const Uuid().v4();
+  void withRegenerateID() => copyWith.id(const Uuid().v4());
 
   @override
   Superset changeUnits(

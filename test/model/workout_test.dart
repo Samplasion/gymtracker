@@ -365,7 +365,8 @@ void main() {
         );
 
         final workout4 = workout3.clone();
-        (workout4.exercises[0] as Superset).notes = "Changed notes";
+        workout4.exercises[0] =
+            (workout4.exercises[0] as Superset).copyWith.notes("Changed notes");
         expect(
           WorkoutDifference.fromWorkouts(
             oldWorkout: workout3,
@@ -379,8 +380,9 @@ void main() {
         );
 
         final workout5 = workout4.clone();
-        (workout5.exercises[0] as Superset).restTime =
-            const Duration(seconds: 120);
+        workout5.exercises[0] = (workout5.exercises[0] as Superset)
+            .copyWith
+            .restTime(const Duration(seconds: 120));
         expect(
           WorkoutDifference.fromWorkouts(
             oldWorkout: workout4,

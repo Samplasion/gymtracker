@@ -1,7 +1,9 @@
 import 'package:gymtracker/db/imports/types.dart';
+import 'package:gymtracker/model/exercisable.dart';
 import 'package:gymtracker/model/exercise.dart';
 import 'package:gymtracker/model/measurements.dart';
 import 'package:gymtracker/model/preferences.dart';
+import 'package:gymtracker/model/superset.dart';
 import 'package:gymtracker/model/workout.dart';
 import 'package:gymtracker/service/logger.dart';
 import 'package:gymtracker/utils/extensions.dart';
@@ -109,52 +111,65 @@ class VersionedJsonImportV1 extends VersionedJsonImportBase {
     final allRoutineExercises = routines.flattenedExercises;
     final allHistoryExercises = history.flattenedExercises;
 
-    _processExercise(Workout workout, Exercise ex, String? supersetID) {
-      ex.workoutID ??= workout.id;
-      ex.supersetID ??= supersetID;
+    Exercise _processExercise(
+        Workout workout, Exercise ex, String? supersetID) {
+      ex = ex.copyWith(
+        workoutID: ex.workoutID ?? workout.id,
+        supersetID: ex.parentID ?? supersetID,
+      );
 
       if (ex.standard) {
         // TODO: check that the exercise is still in the library
-        return;
       } else if (!exerciseIDs.contains(ex.parentID)) {
-        ex.parentID = exerciseNamesToIDs[ex.name];
+        ex = ex.copyWith.parentID(exerciseNamesToIDs[ex.name]);
 
         if (ex.parentID == null) {
           throw Exception('Exercise not found: ${ex.name}');
         }
       }
+
+      return ex;
     }
 
     final validRoutineIDs = {null, for (final routine in routines) routine.id};
 
     final processedRoutineIDs = <String>{};
 
-    for (final routine in routines) {
+    for (int i = 0; i < routines.length; i++) {
+      final routine = routines[i];
+      final newExercises = <WorkoutExercisable>[];
       for (final ex in routine.exercises) {
         ex.when(
           exercise: (ex) {
             if (processedRoutineIDs.contains(ex.id)) {
-              ex.id = const Uuid().v4();
+              ex = ex.copyWith.id(const Uuid().v4());
             }
             processedRoutineIDs.add(ex.id);
-            _processExercise(routine, ex, null);
+            newExercises.add(_processExercise(routine, ex, null));
           },
           superset: (ss) {
+            final newSupersetExercises = <Exercise>[];
+
             if (processedRoutineIDs.contains(ss.id)) {
-              ss.id = const Uuid().v4();
+              ss = ss.copyWith.id(const Uuid().v4());
             }
             processedRoutineIDs.add(ss.id);
-            ss.workoutID ??= routine.id;
-            for (final ex in ss.exercises) {
+            ss = ss.copyWith.workoutID(ss.workoutID ?? routine.id);
+
+            for (var ex in ss.exercises) {
               if (processedRoutineIDs.contains(ex.id)) {
-                ex.id = const Uuid().v4();
+                ex = ex.copyWith.id(const Uuid().v4());
               }
               processedRoutineIDs.add(ex.id);
-              _processExercise(routine, ex, ss.id);
+              newSupersetExercises.add(_processExercise(routine, ex, ss.id));
             }
+
+            newExercises.add(ss.copyWith(exercises: newSupersetExercises));
           },
         );
       }
+
+      routines[i] = routine.copyWith(exercises: newExercises);
     }
 
     logger.t('Processed routine IDs: ${processedRoutineIDs.length}\n'
@@ -163,7 +178,9 @@ class VersionedJsonImportV1 extends VersionedJsonImportBase {
 
     final processedHistoryIDs = <String>{};
 
-    for (final workout in history) {
+    for (int i = 0; i < history.length; i++) {
+      final workout = history[i];
+      final newExercises = <WorkoutExercisable>[];
       if (!validRoutineIDs.contains(workout.parentID)) {
         throw Exception(
             'Routine not found: ${workout.parentID} (in workout ${workout.id})');
@@ -172,26 +189,33 @@ class VersionedJsonImportV1 extends VersionedJsonImportBase {
         ex.when(
           exercise: (ex) {
             if (processedHistoryIDs.contains(ex.id)) {
-              ex.id = const Uuid().v4();
+              ex = ex.copyWith.id(const Uuid().v4());
             }
             processedHistoryIDs.add(ex.id);
-            _processExercise(workout, ex, null);
+            newExercises.add(_processExercise(workout, ex, null));
           },
           superset: (ss) {
+            final newSupersetExercises = <Exercise>[];
+
             if (processedHistoryIDs.contains(ss.id)) {
-              ss.id = const Uuid().v4();
+              ss = ss.copyWith.id(const Uuid().v4());
             }
             processedHistoryIDs.add(ss.id);
-            ss.workoutID ??= workout.id;
-            for (final ex in ss.exercises) {
+            ss = ss.copyWith.workoutID(ss.workoutID ?? workout.id);
+
+            for (var ex in ss.exercises) {
               if (processedHistoryIDs.contains(ex.id)) {
-                ex.id = const Uuid().v4();
+                ex = ex.copyWith.id(const Uuid().v4());
               }
               processedHistoryIDs.add(ex.id);
-              _processExercise(workout, ex, ss.id);
+              newSupersetExercises.add(_processExercise(workout, ex, ss.id));
             }
+
+            newExercises.add(ss.copyWith(exercises: newSupersetExercises));
           },
         );
+
+        history[i] = workout.copyWith(exercises: newExercises);
       }
     }
 

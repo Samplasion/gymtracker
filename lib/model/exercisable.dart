@@ -25,7 +25,6 @@ abstract class WorkoutExercisable {
   Map<String, dynamic> toJson();
 
   String get id;
-  set id(String value);
   String? get workoutID;
   List<GTSet> get sets;
   Duration get restTime;

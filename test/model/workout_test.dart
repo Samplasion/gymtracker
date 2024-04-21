@@ -785,7 +785,7 @@ void main() {
             throwsA(isA<SynthesizedWorkoutMethodException>()));
         expect(() => synthesizedRoutine.withFilters(),
             throwsA(isA<SynthesizedWorkoutMethodException>()));
-        expect(() => synthesizedRoutine.regenerateExerciseIDs(),
+        expect(() => synthesizedRoutine.withRegeneratedExerciseIDs(),
             throwsA(isA<SynthesizedWorkoutMethodException>()));
       });
     });
@@ -839,7 +839,7 @@ void main() {
             throwsA(isA<SynthesizedWorkoutMethodException>()));
         expect(() => synthesizedWorkout.withFilters(),
             throwsA(isA<SynthesizedWorkoutMethodException>()));
-        expect(() => synthesizedWorkout.regenerateExerciseIDs(),
+        expect(() => synthesizedWorkout.withRegeneratedExerciseIDs(),
             throwsA(isA<SynthesizedWorkoutMethodException>()));
       });
     });

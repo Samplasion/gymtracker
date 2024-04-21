@@ -264,20 +264,27 @@ class Workout {
     );
   }
 
-  void regenerateExerciseIDs() {
+  Workout withRegeneratedExerciseIDs() {
+    final newExercises = <WorkoutExercisable>[];
     for (final exercise in exercises) {
-      exercise.map(
+      newExercises.add(exercise.map(
         superset: (superset) {
           final newSupersetID = const Uuid().v4();
-          superset.id = newSupersetID;
-          for (final exercise in superset.exercises) {
-            exercise.id = const Uuid().v4();
-            exercise.supersetID = newSupersetID;
-          }
+          return superset.copyWith(
+            exercises: [
+              for (final exercise in superset.exercises)
+                exercise.copyWith(
+                  id: const Uuid().v4(),
+                  supersetID: newSupersetID,
+                ),
+            ],
+            id: newSupersetID,
+          );
         },
-        exercise: (single) => single.id = const Uuid().v4(),
-      );
+        exercise: (single) => single.copyWith(id: const Uuid().v4()),
+      ));
     }
+    return copyWith(exercises: newExercises);
   }
 }
 
@@ -456,8 +463,8 @@ class SynthesizedWorkout implements Workout {
   }
 
   @override
-  void regenerateExerciseIDs() {
-    throw SynthesizedWorkoutMethodException("regenerateExerciseIDs");
+  Workout withRegeneratedExerciseIDs() {
+    throw SynthesizedWorkoutMethodException("withRegeneratedExerciseIDs");
   }
 }
 

@@ -9,7 +9,7 @@ import 'package:uuid/uuid.dart';
 part 'measurements.g.dart';
 
 abstract class GTMeasurement {
-  GTMeasurement();
+  const GTMeasurement();
 
   factory GTMeasurement.fromJson(Map<String, dynamic> json) =>
       _internalFromJson(json);
@@ -35,10 +35,10 @@ class WeightMeasurement extends GTMeasurement
   @override
   final String type = "weight";
 
-  String id;
-  double weight;
-  DateTime time;
-  Weights weightUnit;
+  final String id;
+  final double weight;
+  final DateTime time;
+  final Weights weightUnit;
 
   double get convertedWeight => Weights.convert(
         value: weight,
@@ -46,7 +46,7 @@ class WeightMeasurement extends GTMeasurement
         to: settingsController.weightUnit.value,
       );
 
-  WeightMeasurement({
+  const WeightMeasurement({
     required this.id,
     required this.weight,
     required this.time,

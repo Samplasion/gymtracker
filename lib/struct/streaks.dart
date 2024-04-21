@@ -7,13 +7,12 @@ import 'package:gymtracker/utils/utils.dart';
 /// The [weekStreak] is the number of weeks the user has completed without
 /// missing a day.
 ///
-/// The [restDays] is the number of days the user has missed in the current
-/// week.
+/// The [restDays] are the number of days since the last workout.
 class Streaks {
   /// The number of weeks the user has completed without missing a day.
   final int weekStreak;
 
-  /// The number of days the user has missed in the current week.
+  /// The number of days since the last workout.
   final int restDays;
 
   const Streaks({required this.weekStreak, required this.restDays});

@@ -3,7 +3,6 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:gymtracker/model/set.dart';
 import 'package:gymtracker/service/localizations.dart';
-import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/utils/theme.dart';
 
 Widget buildSetType(

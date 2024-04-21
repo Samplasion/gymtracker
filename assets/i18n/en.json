@@ -712,13 +712,13 @@
     },
     "newCustomExercise": "New exercise",
     "hips": {
+      "name": "Hips",
       "exercises": {
         "gluteBridge": "Glute bridge",
         "hipThrust": "Hip thrust",
         "hipAdduction": "Hip adduction",
         "hipAbduction": "Hip abduction"
-      },
-      "name": "Hips"
+      }
     }
   },
   "infobox": {
@@ -786,6 +786,10 @@
       "noJson": {
         "title": "No data",
         "body": "The link you followed is malformed and cannot be opened."
+      },
+      "badWorkout": {
+        "title": "Bad workout",
+        "body": "The link you followed leads to a malformed workout. Maybe it was created by an older version of the app."
       }
     },
     "import": {

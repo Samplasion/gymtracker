@@ -786,6 +786,10 @@
       "noJson": {
         "title": "Dati mancanti",
         "body": "Il link che hai seguito è danneggiato e non può essere aperto."
+      },
+      "badWorkout": {
+        "title": "Allenamento non valido",
+        "body": "Hai seguito un link che porta ad un allenamento non valido. Forse è stato creato da una vecchia versione dell'app."
       }
     },
     "import": {

@@ -26,7 +26,7 @@
         "normal": "A normal set is a regular set of an exercise, where you perform a certain amount of reps with a certain weight.",
         "drop": "A drop set is a set where you drop the weight after reaching failure and continue to perform reps with the lower weight.",
         "failure": "A failure set is a set where you perform reps until you reach technical failure.",
-        "failureStripping": "A failure set with stripping is a kind of failure set where you perform reps until you reach technical failure, then you strip some weight and continue to perform reps with the lower weight, without resting."
+        "failureStripping": "A failure set with stripping is a kind of failure set that starts immediately after the previous set (without resting), in which you perform reps until you reach technical failure."
       }
     }
   },

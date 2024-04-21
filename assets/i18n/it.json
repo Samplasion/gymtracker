@@ -26,7 +26,7 @@
         "normal": "Una serie normale è una serie regolare di un esercizio, in cui esegui un certo numero di ripetizioni con un certo peso.",
         "drop": "Una serie di drop (\"Drop set\") è una serie in cui abbassi il peso dopo aver raggiunto il fallimento muscolare e continui a eseguire ripetizioni con il peso inferiore.",
         "failure": "Una serie \"a morire\" è una serie in cui esegui ripetizioni fino a raggiungere il fallimento muscolare.",
-        "failureStripping": "Una serie \"a morire\" con stripping è una sorta di serie \"a morire\" in cui esegui ripetizioni fino a raggiungere il fallimento muscolare, quindi abbassi il peso e continui a eseguire ripetizioni con il peso inferiore, senza recuperare."
+        "failureStripping": "Una serie \"a morire\" con stripping è una serie \"a morire\" che parte immediatamente dalla serie precedente (quindi senza recupero), in cui esegui ripetizioni fino a raggiungere il fallimento muscolare."
       }
     }
   },

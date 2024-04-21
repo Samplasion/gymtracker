@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:gymtracker/model/set.dart';
 import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/utils/extensions.dart';
+import 'package:gymtracker/utils/theme.dart';
 
 Widget buildSetType(
   BuildContext context,
@@ -52,7 +53,7 @@ Widget buildSetType(
       return Text(
         "set.kindShort.failure".t,
         style: TextStyle(
-          color: context.harmonizeColor(Colors.blue),
+          color: scheme.quinary,
           fontWeight: FontWeight.bold,
           fontSize: fontSize,
         ),
@@ -61,7 +62,7 @@ Widget buildSetType(
       return Text(
         "set.kindShort.failureStripping".t,
         style: TextStyle(
-          color: context.harmonizeColor(Colors.blueGrey),
+          color: scheme.quaternary,
           fontWeight: FontWeight.bold,
           fontSize: fontSize,
         ),

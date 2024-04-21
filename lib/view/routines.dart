@@ -3,7 +3,9 @@ import 'package:get/get.dart';
 import 'package:gymtracker/controller/routines_controller.dart';
 import 'package:gymtracker/controller/settings_controller.dart';
 import 'package:gymtracker/service/localizations.dart';
+import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/utils/go.dart';
+import 'package:gymtracker/utils/theme.dart';
 import 'package:gymtracker/view/components/badges.dart';
 import 'package:gymtracker/view/exercises.dart';
 import 'package:gymtracker/view/routine_creator.dart';
@@ -44,7 +46,11 @@ class _RoutinesViewState extends State<RoutinesView> {
               child: ListTile(
                 title: Text("routines.quickWorkout.title".t),
                 subtitle: Text("routines.quickWorkout.subtitle".t),
-                leading: const CircleAvatar(child: Icon(Icons.timer_rounded)),
+                leading: CircleAvatar(
+                  foregroundColor: context.colorScheme.onQuaternaryContainer,
+                  backgroundColor: context.colorScheme.quaternaryContainer,
+                  child: const Icon(Icons.timer_rounded),
+                ),
                 onTap: () {
                   controller.startRoutine(context);
                 },

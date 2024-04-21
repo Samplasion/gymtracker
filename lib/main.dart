@@ -127,12 +127,20 @@ class MainApp extends StatelessWidget {
                           brightness: Brightness.light,
                           colorScheme: lightScheme.neutralBackground(),
                           pageTransitionsTheme: pageTransitionsTheme,
+                          extensions: [
+                            MoreColors.fromColorScheme(
+                                lightScheme.neutralBackground()),
+                          ],
                         ),
                         darkTheme: ThemeData(
                           useMaterial3: true,
                           brightness: Brightness.dark,
                           colorScheme: darkScheme.neutralBackground(),
                           pageTransitionsTheme: pageTransitionsTheme,
+                          extensions: [
+                            MoreColors.fromColorScheme(
+                                darkScheme.neutralBackground()),
+                          ],
                         ),
                         home: const _Loader(),
                         routes: {

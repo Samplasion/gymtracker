@@ -83,6 +83,56 @@ extension ColorUtils on Color {
     final luminance = computeLuminance();
     return luminance > 0.5 ? Brightness.dark : Brightness.light;
   }
+
+  List<Color> get triadicColors {
+    final List<Color> result = [this];
+    final HSLColor hsl = HSLColor.fromColor(this);
+    for (int i = 1; i <= 2; i++) {
+      result.add(hsl.withHue((hsl.hue + 120 * i) % 360).toColor());
+    }
+
+    return result;
+  }
+
+  List<Color> get tetradicColors {
+    final List<Color> result = [this];
+    final HSLColor hsl = HSLColor.fromColor(this);
+    for (int i = 1; i <= 3; i++) {
+      result.add(hsl.withHue((hsl.hue + 90 * i) % 360).toColor());
+    }
+
+    return result;
+  }
+
+  List<Color> get pentadicColors {
+    final List<Color> result = [this];
+    final HSLColor hsl = HSLColor.fromColor(this);
+    for (int i = 1; i <= 4; i++) {
+      result.add(hsl.withHue((hsl.hue + 72 * i) % 360).toColor());
+    }
+
+    return result;
+  }
+
+  List<Color> get splitComplementaryColors {
+    final List<Color> result = [this];
+    final HSLColor hsl = HSLColor.fromColor(this);
+
+    result.add(hsl.withHue((hsl.hue + 150) % 360).toColor());
+    result.add(hsl.withHue((hsl.hue + 210) % 360).toColor());
+
+    return result;
+  }
+
+  List<Color> get analogousColors {
+    final List<Color> result = [this];
+    final HSLColor hsl = HSLColor.fromColor(this);
+
+    result.add(hsl.withHue((hsl.hue - 30) % 360).toColor());
+    result.add(hsl.withHue((hsl.hue + 30) % 360).toColor());
+
+    return result;
+  }
 }
 
 extension ListUtils<T> on List<T> {

@@ -8,6 +8,7 @@ import 'package:gymtracker/data/weights.dart';
 import 'package:gymtracker/model/exercise.dart';
 import 'package:gymtracker/model/set.dart';
 import 'package:gymtracker/service/localizations.dart';
+import 'package:gymtracker/struct/editor_callback.dart';
 import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/utils/sets.dart';
@@ -23,18 +24,9 @@ import 'package:gymtracker/view/utils/weight_calculator.dart';
 
 class WorkoutExerciseEditor extends StatefulWidget {
   final Exercise exercise;
-  final int index;
+  final ExerciseIndex index;
   final bool isCreating;
-  final VoidCallback onReorder;
-  final VoidCallback onReplace;
-  final VoidCallback onRemove;
-  final void Function(Duration time) onChangeRestTime;
-  final VoidCallback onSetCreate;
-  final void Function(int index) onSetRemove;
-  final void Function(GTSet set, GTSetKind kind) onSetSelectKind;
-  final void Function(Exercise exercise, GTSet set, bool isDone) onSetSetDone;
-  final VoidCallback onSetValueChange;
-  final void Function(Exercise exercise, String notes) onNotesChange;
+  final EditorCallbacks callbacks;
   final Weights weightUnit;
   final Distance distanceUnit;
   final bool isInSuperset;
@@ -44,16 +36,7 @@ class WorkoutExerciseEditor extends StatefulWidget {
     required this.exercise,
     required this.index,
     required this.isCreating,
-    required this.onReorder,
-    required this.onReplace,
-    required this.onRemove,
-    required this.onChangeRestTime,
-    required this.onSetCreate,
-    required this.onSetRemove,
-    required this.onSetSelectKind,
-    required this.onSetSetDone,
-    required this.onSetValueChange,
-    required this.onNotesChange,
+    required this.callbacks,
     required this.weightUnit,
     required this.distanceUnit,
     this.isInSuperset = false,
@@ -94,7 +77,7 @@ class _WorkoutExerciseEditorState extends State<WorkoutExerciseEditor> {
                 child: Row(
                   children: [
                     if (widget.isCreating) ...[
-                      DragHandle(index: widget.index),
+                      DragHandle(index: widget.index.exerciseIndex),
                     ] else
                       ExerciseParentViewGesture(
                         exercise: widget.exercise,
@@ -120,7 +103,11 @@ class _WorkoutExerciseEditorState extends State<WorkoutExerciseEditor> {
                       itemBuilder: (context) => <PopupMenuEntry<dynamic>>[
                         if (!widget.isCreating) ...[
                           PopupMenuItem(
-                            onTap: widget.onReorder,
+                            onTap: () {
+                              widget.callbacks.onExerciseReorder(
+                                widget.index.supersetIndex,
+                              );
+                            },
                             child: ListTile(
                               leading: const Icon(Icons.compare_arrows),
                               title: Text('ongoingWorkout.exercises.reorder'.t),
@@ -128,7 +115,9 @@ class _WorkoutExerciseEditorState extends State<WorkoutExerciseEditor> {
                           ),
                         ],
                         PopupMenuItem(
-                          onTap: widget.onReplace,
+                          onTap: () {
+                            widget.callbacks.onExerciseReplace(widget.index);
+                          },
                           child: ListTile(
                             leading: const Icon(Icons.refresh),
                             title: Text('ongoingWorkout.exercises.replace'.t),
@@ -136,7 +125,9 @@ class _WorkoutExerciseEditorState extends State<WorkoutExerciseEditor> {
                         ),
                         const PopupMenuDivider(),
                         PopupMenuItem(
-                          onTap: widget.onRemove,
+                          onTap: () {
+                            widget.callbacks.onExerciseRemove(widget.index);
+                          },
                           child: ListTile(
                             textColor: Theme.of(context).colorScheme.error,
                             iconColor: Theme.of(context).colorScheme.error,
@@ -169,7 +160,8 @@ class _WorkoutExerciseEditorState extends State<WorkoutExerciseEditor> {
                       return GTRichTextEditDialog(
                         controller: notesController,
                         onNotesChange: (text) {
-                          widget.onNotesChange(widget.exercise, text);
+                          widget.callbacks
+                              .onExerciseNotesChange(widget.index, text);
                           Get.back();
                         },
                       );
@@ -187,8 +179,9 @@ class _WorkoutExerciseEditorState extends State<WorkoutExerciseEditor> {
                       border: const OutlineInputBorder(),
                       labelText: "exercise.fields.restTime".t,
                     ),
-                    onChangedTime: (value) =>
-                        widget.onChangeRestTime(value ?? Duration.zero),
+                    onChangedTime: (value) => widget.callbacks
+                        .onExerciseChangeRestTime(
+                            widget.index, value ?? Duration.zero),
                   ),
                 ),
               for (int i = 0; i < widget.exercise.sets.length; i++)
@@ -196,23 +189,27 @@ class _WorkoutExerciseEditorState extends State<WorkoutExerciseEditor> {
                   key: ValueKey(widget.exercise.sets[i].id),
                   set: widget.exercise.sets[i],
                   exercise: widget.exercise,
-                  onDelete: () => widget.onSetRemove(i),
+                  onDelete: () => widget.callbacks.onSetRemove(widget.index, i),
                   alt: i % 2 == 0,
                   isCreating: widget.isCreating,
                   onSetSelectKind: (val) =>
-                      widget.onSetSelectKind(widget.exercise.sets[i], val),
-                  onSetSetDone: (val) => widget.onSetSetDone(
-                    widget.exercise,
-                    widget.exercise.sets[i],
+                      widget.callbacks.onSetSelectKind(widget.index, i, val),
+                  onSetSetDone: (val) => widget.callbacks.onSetSetDone(
+                    widget.index,
+                    i,
                     val,
                   ),
-                  onSetValueChange: widget.onSetValueChange,
+                  onSetValueChange: (set) => widget.callbacks.onSetValueChange(
+                    widget.index,
+                    i,
+                    set,
+                  ),
                   weightUnit: widget.weightUnit,
                   distanceUnit: widget.distanceUnit,
                 ),
               const SizedBox(height: 8),
               FilledButton.tonal(
-                onPressed: widget.onSetCreate,
+                onPressed: () => widget.callbacks.onSetCreate(widget.index),
                 child: Text('exercise.actions.addSet'.t),
               ),
               if (kDebugMode) ...[
@@ -245,7 +242,7 @@ class WorkoutExerciseSetEditor extends StatefulWidget {
   final VoidCallback onDelete;
   final void Function(GTSetKind) onSetSelectKind;
   final void Function(bool) onSetSetDone;
-  final VoidCallback onSetValueChange;
+  final void Function(GTSet) onSetValueChange;
   final Weights weightUnit;
   final Distance distanceUnit;
 
@@ -276,7 +273,7 @@ class _WorkoutExerciseSetEditorState extends State<WorkoutExerciseSetEditor> {
           ? "0"
           : TimeInputField.encodeDuration(widget.set.time!));
   late var repsController =
-      TextEditingController(text: widget.set.reps.toString());
+      TextEditingController(text: (widget.set.reps ?? 0).toString());
   late var distanceController =
       TextEditingController(text: stringifyDouble(widget.set.distance ?? 0));
 
@@ -326,12 +323,10 @@ class _WorkoutExerciseSetEditorState extends State<WorkoutExerciseSetEditor> {
               : null,
         ),
         onChanged: (value) {
-          widget.onSetValueChange();
-          if (value.isEmpty) {
-            widget.set.weight = null;
-          } else {
-            widget.set.weight = value.tryParseDouble();
-          }
+          final newSet = widget.set.copyWith(
+            weight: value.isEmpty ? null : value.tryParseDouble(),
+          );
+          widget.onSetValueChange(newSet);
         },
       );
   Widget get timeField => TimeInputField(
@@ -344,12 +339,10 @@ class _WorkoutExerciseSetEditorState extends State<WorkoutExerciseSetEditor> {
           labelText: "exercise.fields.time".t,
         ),
         onChanged: (value) {
-          widget.onSetValueChange();
-          if (value.isEmpty) {
-            widget.set.time = null;
-          } else {
-            widget.set.time = TimeInputField.parseDuration(value);
-          }
+          final newSet = widget.set.copyWith(
+            time: value.isEmpty ? null : TimeInputField.parseDuration(value),
+          );
+          widget.onSetValueChange(newSet);
         },
       );
   TextField get repsField => TextField(
@@ -367,12 +360,10 @@ class _WorkoutExerciseSetEditorState extends State<WorkoutExerciseSetEditor> {
           labelText: "exercise.fields.reps".t,
         ),
         onChanged: (value) {
-          widget.onSetValueChange();
-          if (value.isEmpty) {
-            widget.set.reps = null;
-          } else {
-            widget.set.reps = int.tryParse(value);
-          }
+          final newSet = widget.set.copyWith(
+            reps: value.isEmpty ? null : int.tryParse(value),
+          );
+          widget.onSetValueChange(newSet);
         },
       );
   TextField get distanceField => TextField(
@@ -391,12 +382,10 @@ class _WorkoutExerciseSetEditorState extends State<WorkoutExerciseSetEditor> {
           suffix: Text("units.${widget.distanceUnit.name}".t),
         ),
         onChanged: (value) {
-          widget.onSetValueChange();
-          if (value.isEmpty) {
-            widget.set.distance = null;
-          } else {
-            widget.set.distance = double.tryParse(value);
-          }
+          final newSet = widget.set.copyWith(
+            distance: value.isEmpty ? null : value.tryParseDouble(),
+          );
+          widget.onSetValueChange(newSet);
         },
       );
 

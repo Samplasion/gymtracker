@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:gymtracker/data/distance.dart';
 import 'package:gymtracker/data/weights.dart';
-import 'package:gymtracker/model/exercise.dart';
-import 'package:gymtracker/model/set.dart';
 import 'package:gymtracker/model/superset.dart';
 import 'package:gymtracker/service/localizations.dart';
+import 'package:gymtracker/struct/editor_callback.dart';
 import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/view/utils/drag_handle.dart';
 import 'package:gymtracker/view/utils/exercise.dart';
@@ -15,25 +14,7 @@ class SupersetEditor extends StatefulWidget {
   final Superset superset;
   final int index;
   final bool isCreating;
-  final VoidCallback onSupersetRemove;
-  final VoidCallback onSupersetReorder;
-  final VoidCallback onSupersetReplace;
-  final ValueChanged<Duration> onSupersetChangeRestTime;
-  final VoidCallback onExerciseAdd;
-  final void Function(int index) onExerciseRemove;
-  final void Function(int index) onExerciseReorder;
-  final void Function(int oldIndex, int newIndex) onExerciseReorderIndexed;
-  final void Function(int index) onExerciseReplace;
-  final void Function(int index, Duration time) onExerciseChangeRestTime;
-  final void Function(int index) onExerciseSetCreate;
-  final void Function(int exIndex, int setIndex) onExerciseSetRemove;
-  final void Function(int exIndex, GTSet set, GTSetKind kind)
-      onExerciseSetSelectKind;
-  final void Function(Exercise exercise, GTSet set, bool isDone)
-      onExerciseSetSetDone;
-  final VoidCallback onExerciseSetValueChange;
-  final void Function(Superset superset, String notes) onNotesChange;
-  final void Function(Exercise exercise, String notes) onExerciseNotesChange;
+  final EditorCallbacks callbacks;
   final Weights weightUnit;
   final Distance distanceUnit;
 
@@ -42,23 +23,7 @@ class SupersetEditor extends StatefulWidget {
     required this.superset,
     required this.index,
     required this.isCreating,
-    required this.onSupersetRemove,
-    required this.onSupersetReorder,
-    required this.onSupersetReplace,
-    required this.onSupersetChangeRestTime,
-    required this.onExerciseAdd,
-    required this.onExerciseRemove,
-    required this.onExerciseReorder,
-    required this.onExerciseReorderIndexed,
-    required this.onExerciseReplace,
-    required this.onExerciseChangeRestTime,
-    required this.onExerciseSetCreate,
-    required this.onExerciseSetRemove,
-    required this.onExerciseSetSelectKind,
-    required this.onExerciseSetSetDone,
-    required this.onExerciseSetValueChange,
-    required this.onNotesChange,
-    required this.onExerciseNotesChange,
+    required this.callbacks,
     required this.weightUnit,
     required this.distanceUnit,
   });
@@ -76,6 +41,8 @@ class _SupersetEditorState extends State<SupersetEditor> {
 
   @override
   Widget build(BuildContext context) {
+    final topLevelEntryIndex =
+        (exerciseIndex: widget.index, supersetIndex: null);
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: Column(
@@ -93,7 +60,8 @@ class _SupersetEditorState extends State<SupersetEditor> {
               itemBuilder: (context) => <PopupMenuEntry<dynamic>>[
                 if (!widget.isCreating) ...[
                   PopupMenuItem(
-                    onTap: widget.onSupersetReorder,
+                    onTap: () =>
+                        widget.callbacks.onExerciseReorder(widget.index),
                     child: ListTile(
                       leading: const Icon(Icons.compare_arrows),
                       title: Text('ongoingWorkout.exercises.reorder'.t),
@@ -101,7 +69,9 @@ class _SupersetEditorState extends State<SupersetEditor> {
                   ),
                 ],
                 PopupMenuItem(
-                  onTap: widget.onSupersetReplace,
+                  // We're considering this superset as a top-level exercise entry
+                  onTap: () =>
+                      widget.callbacks.onExerciseReplace(topLevelEntryIndex),
                   child: ListTile(
                     leading: const Icon(Icons.refresh),
                     title:
@@ -115,7 +85,10 @@ class _SupersetEditorState extends State<SupersetEditor> {
                       "routines.editor.superset.remove.title",
                       "routines.editor.superset.remove.body",
                     );
-                    if (delete) widget.onSupersetRemove();
+                    if (delete) {
+                      // We're considering this superset as a top-level exercise entry
+                      widget.callbacks.onExerciseRemove(topLevelEntryIndex);
+                    }
                   },
                   child: ListTile(
                     textColor: Theme.of(context).colorScheme.error,
@@ -169,8 +142,8 @@ class _SupersetEditorState extends State<SupersetEditor> {
                       ),
                       TextButton(
                         onPressed: () {
-                          widget.onNotesChange(
-                              widget.superset, notesController.text.trim());
+                          widget.callbacks.onExerciseNotesChange(
+                              topLevelEntryIndex, notesController.text.trim());
                           Navigator.pop(context);
                         },
                         child: Text(
@@ -191,10 +164,9 @@ class _SupersetEditorState extends State<SupersetEditor> {
                 border: const OutlineInputBorder(),
                 labelText: "exercise.fields.restTime".t,
               ),
-              // onChangedTime: (value) =>
-              //     widget.onChangeRestTime(value ?? Duration.zero),
               onChangedTime: (value) {
-                widget.onSupersetChangeRestTime(value ?? Duration.zero);
+                widget.callbacks.onExerciseChangeRestTime(
+                    topLevelEntryIndex, value ?? Duration.zero);
               },
             ),
           ),
@@ -204,9 +176,8 @@ class _SupersetEditorState extends State<SupersetEditor> {
             buildDefaultDragHandles: false,
             physics: const NeverScrollableScrollPhysics(),
             onReorder: (oldIndex, newIndex) {
-              // _reorder(widget.superset.exercises, oldIndex, newIndex);
-              // controller.exercises.refresh();
-              widget.onExerciseReorderIndexed(oldIndex, newIndex);
+              widget.callbacks.onSupersetExercisesReorderPair(
+                  widget.index, oldIndex, newIndex);
             },
             children: [
               for (int j = 0; j < widget.superset.exercises.length; j++) ...[
@@ -214,60 +185,16 @@ class _SupersetEditorState extends State<SupersetEditor> {
                   key: ValueKey(
                       "superset-${widget.superset.exercises[j].name}${widget.superset.id}"),
                   exercise: widget.superset.exercises[j],
-                  index: j,
+                  index: (
+                    exerciseIndex: j,
+                    supersetIndex: widget.index,
+                  ),
                   createDivider: true,
                   isCreating: widget.isCreating,
                   isInSuperset: true,
                   weightUnit: widget.weightUnit,
                   distanceUnit: widget.distanceUnit,
-                  onReorder: () {
-                    widget.onExerciseReorder(j);
-                  },
-                  onReplace: () {
-                    widget.onExerciseReplace(j);
-                  },
-                  onRemove: () {
-                    widget.onExerciseRemove(j);
-                  },
-                  onChangeRestTime: (value) {
-                    // widget.superset.restTime = value;
-                    // controller.exercises.refresh();
-                    widget.onExerciseChangeRestTime(j, value);
-                  },
-                  onSetCreate: () {
-                    // final ex = widget.superset.exercises[j];
-                    // widget.superset.exercises[j].sets.add(
-                    //   ExSet.empty(
-                    //     kind: SetKind.normal,
-                    //     parameters: ex.parameters,
-                    //   ),
-                    // );
-                    // controller.exercises.refresh();
-                    widget.onExerciseSetCreate(j);
-                  },
-                  onSetRemove: (int index) {
-                    // setState(() {
-                    //   // widget.superset.exercises[j].sets.removeAt(index);
-                    //   // controller.exercises.refresh();
-                    // });
-                    widget.onExerciseSetRemove(j, index);
-                  },
-                  onSetSelectKind: (set, kind) {
-                    // set.kind = kind;
-                    // controller.exercises.refresh();
-                    widget.onExerciseSetSelectKind(j, set, kind);
-                  },
-                  onSetSetDone: (ex, set, done) {
-                    widget.onExerciseSetSetDone(ex, set, done);
-                  },
-                  onSetValueChange: () {
-                    widget.onExerciseSetValueChange();
-                  },
-                  onNotesChange: (ex, notes) {
-                    // ex.notes = notes;
-                    // controller.exercises.refresh();
-                    widget.onExerciseNotesChange(ex, notes);
-                  },
+                  callbacks: widget.callbacks,
                 ),
               ],
             ],
@@ -276,7 +203,7 @@ class _SupersetEditorState extends State<SupersetEditor> {
             title: Text("routines.editor.superset.addExercise".t),
             leading: const Icon(Icons.add),
             onTap: () {
-              widget.onExerciseAdd();
+              widget.callbacks.onSupersetAddExercise(widget.index);
             },
           ),
           SizedBox(height: widget.superset.exercises.isEmpty ? 8 : 16),

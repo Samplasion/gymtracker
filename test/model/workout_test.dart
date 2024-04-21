@@ -185,7 +185,8 @@ void main() {
         });
         test('with a changed set kind', () {
           final workout2 = workout.clone();
-          workout2.exercises[0].sets[0].kind = GTSetKind.failureStripping;
+          workout2.exercises[0].sets[0] = workout2.exercises[0].sets[0].copyWith
+              .kind(GTSetKind.failureStripping);
           expect(
             WorkoutDifference.fromWorkouts(
               oldWorkout: workout,
@@ -200,7 +201,8 @@ void main() {
         });
         test('with a different set weight', () {
           final workout2 = workout.clone();
-          workout2.exercises[0].sets[0].weight = 200;
+          workout2.exercises[0].sets[0] =
+              workout2.exercises[0].sets[0].copyWith.weight(200);
           expect(
             WorkoutDifference.fromWorkouts(
               oldWorkout: workout,
@@ -215,7 +217,8 @@ void main() {
         });
         test('with different reps weight', () {
           final workout2 = workout.clone();
-          workout2.exercises[0].sets[0].weight = 200;
+          workout2.exercises[0].sets[0] =
+              workout2.exercises[0].sets[0].copyWith.weight(200);
           expect(
             WorkoutDifference.fromWorkouts(
               oldWorkout: workout,

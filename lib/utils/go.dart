@@ -47,13 +47,19 @@ class Go {
     return off<T>(page);
   }
 
-  static Future snack(String text, {SnackBarAction? action}) async {
+  static Future snack(
+    String text, {
+    SnackBarAction? action,
+    bool assertive = false,
+  }) async {
     final snackBar = SnackBar(
       content: Text(text),
       behavior: SnackBarBehavior.floating,
       action: action,
     );
-    ScaffoldMessenger.of(Get.context!).showSnackBar(snackBar);
+    var messenger = ScaffoldMessenger.of(Get.context!);
+    if (assertive) messenger.clearSnackBars();
+    messenger.showSnackBar(snackBar);
   }
 
   static void dialog(

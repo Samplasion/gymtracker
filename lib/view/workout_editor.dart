@@ -195,7 +195,7 @@ class _WorkoutEditorState extends State<WorkoutEditor> {
       },
       onChange: (value) {
         logger.w("Changing weight unit to $value");
-        if (value != null) workout.weightUnit = value;
+        if (value != null) workout = workout.copyWith.weightUnit(value);
         setState(() {});
       },
     );
@@ -211,7 +211,7 @@ class _WorkoutEditorState extends State<WorkoutEditor> {
       },
       onChange: (value) {
         logger.d("Changing distance unit to $value");
-        if (value != null) workout.distanceUnit = value;
+        if (value != null) workout = workout.copyWith.distanceUnit(value);
         setState(() {});
       },
     );
@@ -726,12 +726,11 @@ class _WorkoutFinishEditingPageState extends State<WorkoutFinishEditingPage> {
     selection: const TextSelection.collapsed(offset: 0),
   );
 
-  late String? pwInitialItem = () {
+  late String? parentWorkoutID = () {
     // Parent workout data
     String? pwInitialItem = widget.workout.parentID;
-    if (Get.find<RoutinesController>()
-        .workouts
-        .every((element) => element.id != pwInitialItem)) {
+    if (pwInitialItem == null ||
+        !Get.find<RoutinesController>().hasRoutine(pwInitialItem)) {
       pwInitialItem = null;
     }
 
@@ -802,8 +801,8 @@ class _WorkoutFinishEditingPageState extends State<WorkoutFinishEditingPage> {
                         child: Text(routine.name),
                       ),
                   ],
-                  onChanged: (v) => setState(() => widget.workout.parentID = v),
-                  value: pwInitialItem,
+                  onChanged: (v) => setState(() => parentWorkoutID = v),
+                  value: parentWorkoutID,
                 ),
               TimeInputField(
                 controller: timeController,
@@ -859,6 +858,7 @@ class _WorkoutFinishEditingPageState extends State<WorkoutFinishEditingPage> {
       controller.submitEditedWorkout(
         widget.workout.copyWith(
           name: titleController.text,
+          parentID: parentWorkoutID,
           startingDate: startingDate,
           duration: TimeInputField.parseDuration(timeController.text),
           infobox: infoboxController.toEncoded(),

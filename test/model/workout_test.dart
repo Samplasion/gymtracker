@@ -763,21 +763,6 @@ void main() {
             routine1.distanceRun + routine2.distanceRun);
       });
 
-      test("setters should throw", () {
-        expect(() => synthesizedRoutine.id = "",
-            throwsA(isA<SynthesizedWorkoutSetterException>()));
-        expect(() => synthesizedRoutine.parentID = "",
-            throwsA(isA<SynthesizedWorkoutSetterException>()));
-        expect(() => synthesizedRoutine.completedBy = "",
-            throwsA(isA<SynthesizedWorkoutSetterException>()));
-        expect(() => synthesizedRoutine.completes = "",
-            throwsA(isA<SynthesizedWorkoutSetterException>()));
-        expect(() => synthesizedRoutine.distanceUnit = Distance.mi,
-            throwsA(isA<SynthesizedWorkoutSetterException>()));
-        expect(() => synthesizedRoutine.weightUnit = Weights.kg,
-            throwsA(isA<SynthesizedWorkoutSetterException>()));
-      });
-
       test("methods should throw", () {
         expect(() => synthesizedRoutine.clone(),
             throwsA(isA<SynthesizedWorkoutMethodException>()));
@@ -815,21 +800,6 @@ void main() {
         expect(synthesizedWorkout.startingDate, workout1.startingDate);
         expect(synthesizedWorkout.duration,
             workout1.duration! + workout2.duration!);
-      });
-
-      test("setters should throw", () {
-        expect(() => synthesizedWorkout.id = "",
-            throwsA(isA<SynthesizedWorkoutSetterException>()));
-        expect(() => synthesizedWorkout.parentID = "",
-            throwsA(isA<SynthesizedWorkoutSetterException>()));
-        expect(() => synthesizedWorkout.completedBy = "",
-            throwsA(isA<SynthesizedWorkoutSetterException>()));
-        expect(() => synthesizedWorkout.completes = "",
-            throwsA(isA<SynthesizedWorkoutSetterException>()));
-        expect(() => synthesizedWorkout.distanceUnit = Distance.mi,
-            throwsA(isA<SynthesizedWorkoutSetterException>()));
-        expect(() => synthesizedWorkout.weightUnit = Weights.kg,
-            throwsA(isA<SynthesizedWorkoutSetterException>()));
       });
 
       test("methods should throw", () {

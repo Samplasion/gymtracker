@@ -736,7 +736,8 @@
     "title": "Modifica: @name",
     "exercises": {
       "addSuperset": "+ Aggiungi superserie",
-      "add": "+ Aggiungi esercizio"
+      "add": "+ Aggiungi esercizio",
+      "reorder": "Riordina esercizi"
     },
     "info": {
       "reps": "Ripetizioni",

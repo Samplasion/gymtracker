@@ -736,7 +736,8 @@
     "title": "Edit: @name",
     "exercises": {
       "addSuperset": "+ Add superset",
-      "add": "+ Add exercise"
+      "add": "+ Add exercise",
+      "reorder": "Reorder exercises"
     },
     "info": {
       "reps": "Reps",

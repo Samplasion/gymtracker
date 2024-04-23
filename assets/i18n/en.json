@@ -343,9 +343,10 @@
     "exercises": {
       "add": "+ Add exercise",
       "addSuperset": "+ Add superset",
-      "replace": "Replace exercises",
-      "reorder": "Reorder exercises",
-      "remove": "Remove exercise"
+      "replace": "Replace exercise…",
+      "reorder": "Reorder exercises...",
+      "remove": "Remove exercise",
+      "addToSuperset": "Add to superset…"
     },
     "info": {
       "time": "Time",
@@ -442,6 +443,17 @@
     "goodJob": {
       "title": "Good job!",
       "body": "Here's some statistics about the workout you've just finished."
+    },
+    "exercisesToSuperset": {
+      "title": "Create new superset",
+      "errorBannerTitle": "Can't create superset",
+      "errors": {
+        "addingNonContiguous": "You can only add exercises that are next to each other.",
+        "removingMiddle": "You can only unselect the first or last exercise.",
+        "notExercise": "You must select an exercise.",
+        "tooFew": "You must select at least two exercises.",
+        "differingSets": "The selected exercises must have the same number of sets."
+      }
     }
   },
   "timer": {
@@ -712,13 +724,13 @@
     },
     "newCustomExercise": "New exercise",
     "hips": {
-      "name": "Hips",
       "exercises": {
         "gluteBridge": "Glute bridge",
         "hipThrust": "Hip thrust",
         "hipAdduction": "Hip adduction",
         "hipAbduction": "Hip abduction"
-      }
+      },
+      "name": "Hips"
     }
   },
   "infobox": {

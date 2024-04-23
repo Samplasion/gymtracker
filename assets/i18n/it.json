@@ -343,9 +343,10 @@
     "exercises": {
       "add": "+ Aggiungi esercizio",
       "addSuperset": "+ Aggiungi superserie",
-      "replace": "Cambia esercizio",
-      "reorder": "Riordina esercizi",
-      "remove": "Rimuovi esercizio"
+      "replace": "Cambia esercizio…",
+      "reorder": "Riordina esercizi…",
+      "remove": "Rimuovi esercizio",
+      "addToSuperset": "Aggiungi a superserie…"
     },
     "info": {
       "time": "Tempo",
@@ -442,6 +443,17 @@
     "goodJob": {
       "title": "Ottimo lavoro!",
       "body": "Ecco delle statistiche sull'allenamento appena terminato."
+    },
+    "exercisesToSuperset": {
+      "title": "Crea nuova superserie",
+      "errorBannerTitle": "Impossibile creare superserie",
+      "errors": {
+        "addingNonContiguous": "Puoi aggiungere solo esercizi vicini l'un l'altro",
+        "removingMiddle": "Puoi deselezionare solo il primo o l'ultimo esercizio.",
+        "notExercise": "Devi selezionare un esercizio.",
+        "tooFew": "Seleziona almeno due esercizi.",
+        "differingSets": "Gli esercizi selezionati devono avere lo stesso numero di serie."
+      }
     }
   },
   "timer": {

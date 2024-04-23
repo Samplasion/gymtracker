@@ -250,11 +250,11 @@
   "history": {
     "title": "History",
     "andMore": {
-      "one": "...and one more exercise",
-      "two": "...and %s more exercises",
-      "few": "...and %s more exercises",
-      "many": "...and %s more exercises",
-      "other": "...and %s more exercises"
+      "one": "…and one more exercise",
+      "two": "…and %s more exercises",
+      "few": "…and %s more exercises",
+      "many": "…and %s more exercises",
+      "other": "…and %s more exercises"
     },
     "actions": {
       "deleteMultiple": {
@@ -344,7 +344,7 @@
       "add": "+ Add exercise",
       "addSuperset": "+ Add superset",
       "replace": "Replace exercise…",
-      "reorder": "Reorder exercises...",
+      "reorder": "Reorder exercises…",
       "remove": "Remove exercise",
       "addToSuperset": "Add to superset…"
     },

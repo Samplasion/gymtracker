@@ -250,11 +250,11 @@
   "history": {
     "title": "Cronologia",
     "andMore": {
-      "one": "...e un altro",
-      "two": "...e altri %s",
-      "few": "...e altri %s",
-      "many": "...e altri %s",
-      "other": "...e altri %s"
+      "one": "…e un altro",
+      "two": "…e altri %s",
+      "few": "…e altri %s",
+      "many": "…e altri %s",
+      "other": "…e altri %s"
     },
     "actions": {
       "deleteMultiple": {

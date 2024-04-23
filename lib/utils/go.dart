@@ -34,7 +34,7 @@ class Go {
   }
 
   static Future<T?> toDialog<T>(Widget Function() page) async {
-    showDialog(context: Get.context!, builder: (_) => page());
+    return showDialog(context: Get.context!, builder: (_) => page());
   }
 
   static Future<T?> off<T>(Widget Function() page) async {

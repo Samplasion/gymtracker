@@ -123,6 +123,18 @@ class _WorkoutExerciseEditorState extends State<WorkoutExerciseEditor> {
                             title: Text('ongoingWorkout.exercises.replace'.t),
                           ),
                         ),
+                        if (widget.index.supersetIndex == null)
+                          PopupMenuItem(
+                            onTap: () {
+                              widget.callbacks.onGroupExercisesIntoSuperset(
+                                  widget.index.exerciseIndex);
+                            },
+                            child: ListTile(
+                              leading: const Icon(Icons.group_work_rounded),
+                              title: Text(
+                                  'ongoingWorkout.exercises.addToSuperset'.t),
+                            ),
+                          ),
                         const PopupMenuDivider(),
                         PopupMenuItem(
                           onTap: () {

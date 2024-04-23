@@ -5,7 +5,13 @@ typedef ExerciseIndex = ({
   int? supersetIndex,
 });
 
+enum EditorMode {
+  creation,
+  editingOrWorkout,
+}
+
 class EditorCallbacks {
+  final EditorMode mode;
   final void Function(int? supersetIndex) onExerciseReorder;
   final void Function(ExerciseIndex exerciseIndex) onExerciseReplace;
   final void Function(ExerciseIndex exerciseIndex) onExerciseRemove;
@@ -24,8 +30,33 @@ class EditorCallbacks {
   final void Function(int supersetIndex) onSupersetAddExercise;
   final void Function(int index, int oldExerciseIndex, int newExerciseIndex)
       onSupersetExercisesReorderPair;
+  final void Function(int startingIndex) onGroupExercisesIntoSuperset;
 
-  const EditorCallbacks({
+  EditorCallbacks.creation({
+    required this.onExerciseReplace,
+    required this.onExerciseRemove,
+    required this.onExerciseChangeRestTime,
+    required this.onExerciseNotesChange,
+    required this.onSetCreate,
+    required this.onSetRemove,
+    required this.onSetSelectKind,
+    required this.onSetValueChange,
+    required this.onSupersetAddExercise,
+    required this.onSupersetExercisesReorderPair,
+  })  : mode = EditorMode.creation,
+        onExerciseReorder = ((index) {
+          throw Exception(
+              "onExerciseReorder is not available in creation mode.");
+        }),
+        onSetSetDone = ((ex, set, done) {
+          throw Exception("onSetSetDone is not available in creation mode.");
+        }),
+        onGroupExercisesIntoSuperset = ((index) {
+          throw Exception(
+              "onGroupExercisesIntoSuperset is not available in creation mode.");
+        });
+
+  EditorCallbacks.editor({
     required this.onExerciseReorder,
     required this.onExerciseReplace,
     required this.onExerciseRemove,
@@ -37,6 +68,10 @@ class EditorCallbacks {
     required this.onSetSetDone,
     required this.onSetValueChange,
     required this.onSupersetAddExercise,
-    required this.onSupersetExercisesReorderPair,
-  });
+    required this.onGroupExercisesIntoSuperset,
+  })  : mode = EditorMode.editingOrWorkout,
+        onSupersetExercisesReorderPair = ((index, oldIndex, newIndex) {
+          throw Exception(
+              "onSupersetExercisesReorderPair is not available in editing mode.");
+        });
 }

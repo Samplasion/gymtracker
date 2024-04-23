@@ -165,6 +165,12 @@ class _DebugViewState extends State<DebugView> {
                   Go.to(() => const ColorsPane());
                 },
               ),
+              ListTile(
+                title: const Text("MaterialBanner test"),
+                onTap: () async {
+                  Go.to(() => const _DebugMaterialBannerTest());
+                },
+              ),
 
               // ------------
               ListTile(
@@ -541,6 +547,61 @@ class ColorChip extends StatelessWidget {
             Expanded(child: Text(label, style: TextStyle(color: labelColor))),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class _DebugMaterialBannerTest extends StatefulWidget {
+  const _DebugMaterialBannerTest();
+
+  @override
+  State<_DebugMaterialBannerTest> createState() =>
+      _DebugMaterialBannerTestState();
+}
+
+class _DebugMaterialBannerTestState extends State<_DebugMaterialBannerTest> {
+  final Set<int> selected = {};
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text("MaterialBanner test"),
+      ),
+      body: Column(
+        children: [
+          if (selected.length >= 5)
+            MaterialBanner(
+              content: const Text("You have selected 5 items"),
+              backgroundColor: Theme.of(context).colorScheme.errorContainer,
+              contentTextStyle: TextStyle(
+                color: Theme.of(context).colorScheme.onErrorContainer,
+              ),
+              actions: const [SizedBox()],
+              dividerColor: Colors.transparent,
+            ),
+          Expanded(
+            child: ListView.builder(
+              itemCount: 20,
+              itemBuilder: (context, index) {
+                return CheckboxListTile(
+                  title: Text("Item $index"),
+                  value: selected.contains(index),
+                  onChanged: (_) {
+                    setState(() {
+                      if (selected.contains(index)) {
+                        selected.remove(index);
+                      } else {
+                        selected.add(index);
+                      }
+                    });
+                  },
+                );
+              },
+            ),
+          ),
+        ],
       ),
     );
   }

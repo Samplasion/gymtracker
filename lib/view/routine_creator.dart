@@ -251,9 +251,8 @@ class _RoutineCreatorState extends State<RoutineCreator> {
 class _RoutineCreatorController extends GetxController {
   final exercises = <_DateWrapped<WorkoutExercisable>>[].obs;
 
-  EditorCallbacks get callbacks => EditorCallbacks(
-      onExerciseReorder: (_) {},
-      onExerciseReplace: (index) {
+  EditorCallbacks get callbacks =>
+      EditorCallbacks.creation(onExerciseReplace: (index) {
         final (exerciseIndex: i, supersetIndex: supersetIndex) = index;
         SchedulerBinding.instance.addPostFrameCallback((timeStamp) async {
           final ex = await Go.to<List<Exercise>>(
@@ -282,8 +281,7 @@ class _RoutineCreatorController extends GetxController {
           }
           controller.exercises.refresh();
         });
-      },
-      onExerciseRemove: (index) {
+      }, onExerciseRemove: (index) {
         final (exerciseIndex: i, supersetIndex: supersetIndex) = index;
         if (supersetIndex == null) {
           exercises.removeAt(i);
@@ -297,8 +295,7 @@ class _RoutineCreatorController extends GetxController {
           ]);
         }
         controller.exercises.refresh();
-      },
-      onExerciseChangeRestTime: (index, value) {
+      }, onExerciseChangeRestTime: (index, value) {
         final (exerciseIndex: i, supersetIndex: supersetIndex) = index;
         if (supersetIndex == null) {
           final ex = exercises[i].data;
@@ -317,8 +314,7 @@ class _RoutineCreatorController extends GetxController {
           throw UnimplementedError();
         }
         controller.exercises.refresh();
-      },
-      onSetCreate: (index) {
+      }, onSetCreate: (index) {
         final (exerciseIndex: i, supersetIndex: supersetIndex) = index;
         if (supersetIndex == null) {
           final ex = exercises[i].data as Exercise;
@@ -338,8 +334,7 @@ class _RoutineCreatorController extends GetxController {
           );
         }
         controller.exercises.refresh();
-      },
-      onSetRemove: (exerciseIndex, index) {
+      }, onSetRemove: (exerciseIndex, index) {
         final (exerciseIndex: i, supersetIndex: supersetIndex) = exerciseIndex;
         if (supersetIndex == null) {
           final ex = exercises[i].data as Exercise;
@@ -361,8 +356,7 @@ class _RoutineCreatorController extends GetxController {
         }
 
         controller.exercises.refresh();
-      },
-      onSetSelectKind: (index, setIndex, kind) {
+      }, onSetSelectKind: (index, setIndex, kind) {
         final (exerciseIndex: i, supersetIndex: supersetIndex) = index;
         if (supersetIndex == null) {
           final ex = exercises[i].data as Exercise;
@@ -389,9 +383,7 @@ class _RoutineCreatorController extends GetxController {
           );
         }
         controller.exercises.refresh();
-      },
-      onSetSetDone: (ex, set, done) {},
-      onSetValueChange: (index, setIndex, newSet) {
+      }, onSetValueChange: (index, setIndex, newSet) {
         final (exerciseIndex: i, supersetIndex: supersetIndex) = index;
         if (supersetIndex == null) {
           final ex = exercises[i].data as Exercise;
@@ -412,8 +404,7 @@ class _RoutineCreatorController extends GetxController {
           );
         }
         controller.exercises.refresh();
-      },
-      onExerciseNotesChange: (index, notes) {
+      }, onExerciseNotesChange: (index, notes) {
         final (
           exerciseIndex: exerciseIndex,
           supersetIndex: supersetIndex,
@@ -445,8 +436,7 @@ class _RoutineCreatorController extends GetxController {
         }
 
         exercises.refresh();
-      },
-      onSupersetAddExercise: (supersetIndex) {
+      }, onSupersetAddExercise: (supersetIndex) {
         SchedulerBinding.instance.addPostFrameCallback((timeStamp) async {
           final ex = await Go.to<List<Exercise>>(
               () => const ExercisePicker(singlePick: true));
@@ -464,8 +454,8 @@ class _RoutineCreatorController extends GetxController {
           ]);
           controller.exercises.refresh();
         });
-      },
-      onSupersetExercisesReorderPair: (supersetIndex, oldExIndex, newExIndex) {
+      }, onSupersetExercisesReorderPair:
+          (supersetIndex, oldExIndex, newExIndex) {
         final superset = exercises[supersetIndex].data as Superset;
         final supersetExercises = superset.exercises.toList();
         reorder(supersetExercises, oldExIndex, newExIndex);

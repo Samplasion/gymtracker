@@ -392,3 +392,23 @@ extension EmptyDocument on Document {
     return toPlainText().trim().isEmpty;
   }
 }
+
+extension HarmonizedMaterialColor on MaterialColor {
+  MaterialColor harmonizeWith(Color color) {
+    return MaterialColor(
+      color.harmonizeWith(this).value,
+      {
+        50: this[50]!.harmonizeWith(color),
+        100: this[100]!.harmonizeWith(color),
+        200: this[200]!.harmonizeWith(color),
+        300: this[300]!.harmonizeWith(color),
+        400: this[400]!.harmonizeWith(color),
+        500: this[500]!.harmonizeWith(color),
+        600: this[600]!.harmonizeWith(color),
+        700: this[700]!.harmonizeWith(color),
+        800: this[800]!.harmonizeWith(color),
+        900: this[900]!.harmonizeWith(color),
+      },
+    );
+  }
+}

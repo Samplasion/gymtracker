@@ -24,6 +24,7 @@ import 'package:gymtracker/view/components/split_button.dart';
 import 'package:gymtracker/view/exercise_picker.dart';
 import 'package:gymtracker/view/utils/date_field.dart';
 import 'package:gymtracker/view/utils/exercise.dart';
+import 'package:gymtracker/view/utils/exercises_to_superset.dart';
 import 'package:gymtracker/view/utils/superset.dart';
 import 'package:gymtracker/view/utils/time.dart';
 import 'package:gymtracker/view/utils/weight_calculator.dart';
@@ -221,7 +222,7 @@ class _WorkoutEditorState extends State<WorkoutEditor> {
         workout = workout.copyWith.exercises(exercises);
       });
 
-  EditorCallbacks get callbacks => EditorCallbacks(
+  EditorCallbacks get callbacks => EditorCallbacks.editor(
         onExerciseReorder: (supersetIndex) async {
           final target = supersetIndex == null
               ? workout.exercises
@@ -604,8 +605,30 @@ class _WorkoutEditorState extends State<WorkoutEditor> {
             _setExercises(exercises);
           });
         },
-        onSupersetExercisesReorderPair: (a1, a2, a3) {
-          // We dont use a reorderable list view in workout view
+        onGroupExercisesIntoSuperset: (startingIndex) async {
+          final exercises = workout.exercises.toList();
+
+          final indices = await Go.toDialog(() => ExercisesToSupersetDialog(
+              exercises: exercises, startingIndex: startingIndex));
+
+          if (indices == null || indices.length < 2) return;
+
+          final newSuperset = Superset(
+            restTime: Duration.zero,
+            workoutID: null,
+            exercises: [
+              for (final index in indices) exercises[index] as Exercise,
+            ],
+          );
+
+          final newExercises = [
+            for (int i = 0; i < indices.first; i++) exercises[i],
+            newSuperset,
+            for (int i = indices.last + 1; i < exercises.length; i++)
+              exercises[i],
+          ];
+
+          _setExercises(newExercises);
         },
       );
 }

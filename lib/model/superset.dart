@@ -27,11 +27,15 @@ class Superset extends WorkoutExercisable {
 
   Superset({
     String? id,
-    required this.exercises,
+    required List<Exercise> exercises,
     required this.restTime,
     this.notes = "",
     required this.workoutID,
-  }) : id = id ?? const Uuid().v4();
+  })  : id = id ?? const Uuid().v4(),
+        exercises = [
+          for (final exercise in exercises)
+            exercise.copyWith(workoutID: workoutID, supersetID: id),
+        ];
 
   factory Superset.empty() {
     return Superset(

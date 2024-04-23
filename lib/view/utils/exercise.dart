@@ -98,8 +98,8 @@ class ExerciseListTile extends StatelessWidget {
     }
 
     final selectedIcon = CircleAvatar(
-      backgroundColor: backgroundColor,
-      foregroundColor: foregroundColor,
+      backgroundColor: foregroundColor,
+      foregroundColor: backgroundColor,
       child: const Icon(Icons.check),
     );
     return ListTile(

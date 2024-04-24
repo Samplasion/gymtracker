@@ -50,6 +50,8 @@ WorkoutController? get safeController {
 class WorkoutView extends StatefulWidget {
   const WorkoutView({super.key});
 
+  static const routeName = "/workout";
+
   @override
   State<WorkoutView> createState() => _WorkoutViewState();
 }

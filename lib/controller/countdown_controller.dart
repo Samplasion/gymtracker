@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get/get.dart';
 import 'package:gymtracker/service/localizations.dart';
+import 'package:gymtracker/service/logger.dart';
 import 'package:gymtracker/service/notifications.dart';
 import 'package:gymtracker/utils/constants.dart';
 import 'package:timezone/timezone.dart';
@@ -72,6 +73,8 @@ class CountdownController extends GetxController {
     targetTime.value = null;
     startingTime.value = null;
 
+    logger.i('Rest timer finished');
+
     // Show notification
     if (!Platform.isIOS) {
       final androidDetails = AndroidNotificationDetails(
@@ -80,7 +83,7 @@ class CountdownController extends GetxController {
         channelDescription: 'androidNotificationChannel.description'.t,
         importance: Importance.max,
         priority: Priority.high,
-        ticker: 'workout.restOver'.t,
+        ticker: 'ongoingWorkout.restOver'.t,
       );
       const darwinDetails = DarwinNotificationDetails(
         presentSound: true,

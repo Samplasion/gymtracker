@@ -92,7 +92,7 @@ class _SkeletonViewState extends State<SkeletonView>
               OngoingWorkoutBar(
                 open: () =>
                     SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
-                  Go.to(() => const WorkoutView());
+                  Go.toNamed(WorkoutView.routeName);
                 }),
               ),
             NavigationBarTheme(

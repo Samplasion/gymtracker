@@ -22,6 +22,7 @@ import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/utils/theme.dart';
 import 'package:gymtracker/view/error.dart';
 import 'package:gymtracker/view/skeleton.dart';
+import 'package:gymtracker/view/workout.dart';
 import 'package:protocol_handler/protocol_handler.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
@@ -144,6 +145,8 @@ class MainApp extends StatelessWidget {
                         ),
                         home: const _Loader(),
                         routes: {
+                          WorkoutView.routeName: (context) =>
+                              const WorkoutView(),
                           ErrorView.routeName: (context) => const ErrorView(),
                         },
                         debugShowCheckedModeBanner: false,

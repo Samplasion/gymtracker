@@ -1,5 +1,8 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get/get.dart';
 import 'package:gymtracker/controller/countdown_controller.dart';
 import 'package:gymtracker/controller/history_controller.dart';
@@ -18,6 +21,7 @@ import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/service/logger.dart';
 import 'package:gymtracker/struct/editor_callback.dart';
 import 'package:gymtracker/struct/stopwatch_extended.dart';
+import 'package:gymtracker/utils/constants.dart';
 import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/utils/utils.dart';
@@ -36,7 +40,6 @@ class WorkoutController extends GetxController with ServiceableController {
   Rx<String?> continuesID = Rx(null);
   late Rx<Weights> weightUnit;
   late Rx<Distance> distanceUnit;
-
   RxList<WorkoutExercisable> exercises = <WorkoutExercisable>[].obs;
 
   WorkoutController(String name, String? parentID, String? infobox)
@@ -49,8 +52,8 @@ class WorkoutController extends GetxController with ServiceableController {
     final sc = Get.find<SettingsController>();
     logger.d("""
       Currently defined units:
-        - Weight: ${sc.weightUnit().name} \t(cfr. ${weightUnit.value.name})
-        - Distance: ${sc.distanceUnit().name} \t(cfr. ${distanceUnit.value.name})
+        - Weight: \t${sc.weightUnit().name} \t(cfr. ${weightUnit.value.name})
+        - Distance: \t${sc.distanceUnit().name} \t(cfr. ${distanceUnit.value.name})
     """);
     logger.w(
       "Created with name $name, parentID $parentID, and infobox $infobox",
@@ -947,4 +950,14 @@ class WorkoutController extends GetxController with ServiceableController {
 
   @override
   void onServiceChange() {}
+
+  void onNotificationTapped(NotificationResponse value) {
+    logger.t((value.id, NotificationIDs.restTimer));
+    if (value.id == NotificationIDs.restTimer) {
+      logger.t((Go.getTopmostRouteName(), WorkoutView.routeName));
+      if (Go.getTopmostRouteName() != WorkoutView.routeName) {
+        Go.toNamed(WorkoutView.routeName);
+      }
+    }
+  }
 }

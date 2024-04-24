@@ -126,7 +126,7 @@ class RoutinesController extends GetxController
     if (Navigator.of(context).canPop()) {
       Get.back();
     }
-    Go.to(() => const WorkoutView());
+    Go.toNamed(WorkoutView.routeName);
     Future.delayed(const Duration(milliseconds: 100)).then((_) {
       _clone(
         workout,
@@ -161,7 +161,7 @@ class RoutinesController extends GetxController
     if (Navigator.of(context).canPop()) {
       Get.back();
     }
-    Go.to(() => const WorkoutView());
+    Go.toNamed(WorkoutView.routeName);
     Future.delayed(const Duration(milliseconds: 100)).then((_) {
       _clone(
         workout,

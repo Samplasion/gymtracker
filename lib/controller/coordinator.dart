@@ -1,3 +1,4 @@
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get/get.dart';
 import 'package:gymtracker/controller/countdown_controller.dart';
 import 'package:gymtracker/controller/debug_controller.dart';
@@ -88,5 +89,11 @@ class Coordinator extends GetxController with ServiceableController {
     ]);
     logger
         .d("Recomputed suggested routines with ${suggestions().length} values");
+  }
+
+  void onNotificationTapped(NotificationResponse value) {
+    if (Get.isRegistered<WorkoutController>()) {
+      Get.find<WorkoutController>().onNotificationTapped(value);
+    }
   }
 }

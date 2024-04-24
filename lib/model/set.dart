@@ -139,6 +139,33 @@ class GTSet {
     if (reps == 0) return null;
     return weight! / (1.0278 - (0.0278 * reps!));
   }
+
+  @override
+  int get hashCode =>
+      id.hashCode ^
+      kind.hashCode ^
+      parameters.hashCode ^
+      reps.hashCode ^
+      weight.hashCode ^
+      time.hashCode ^
+      distance.hashCode ^
+      done.hashCode;
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other is GTSet) {
+      return id == other.id &&
+          kind == other.kind &&
+          parameters == other.parameters &&
+          reps == other.reps &&
+          weight == other.weight &&
+          time == other.time &&
+          distance == other.distance &&
+          done == other.done;
+    }
+    return false;
+  }
 }
 
 class SetParametersError extends Error {

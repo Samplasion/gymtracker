@@ -9,8 +9,7 @@ List<WorkoutExercisable> databaseExercisesToExercises(
     for (final e in data) e.id: e.sortOrder,
   };
   final exercises = data
-      .map((e) =>
-          (e, exerciseFromDatabaseExercise(e), e.isInSuperset))
+      .map((e) => (e, exerciseFromDatabaseExercise(e), e.isInSuperset))
       .toList();
   final mapped = {
     for (var (_, exercise, isInSuperset) in exercises)
@@ -42,6 +41,7 @@ WorkoutExercisable exerciseFromDatabaseExercise(ConcreteExercise data) {
       notes: data.notes ?? "",
       exercises: [],
       workoutID: data.routineId,
+      supersedesID: data.supersedesId,
     );
   } else {
     return Exercise.raw(
@@ -60,6 +60,7 @@ WorkoutExercisable exerciseFromDatabaseExercise(ConcreteExercise data) {
       standard: !data.isCustom,
       workoutID: data.routineId,
       supersetID: data.supersetId,
+      supersedesID: data.supersedesId,
     );
   }
 }

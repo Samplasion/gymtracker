@@ -17,13 +17,13 @@ class Superset extends WorkoutExercisable {
   final List<Exercise> exercises;
   @override
   final Duration restTime;
-
   @JsonKey(defaultValue: "")
   @override
   final String notes;
-
   @override
   final String? workoutID;
+  @override
+  final String? supersedesID;
 
   Superset({
     String? id,
@@ -31,6 +31,7 @@ class Superset extends WorkoutExercisable {
     required this.restTime,
     this.notes = "",
     required this.workoutID,
+    this.supersedesID,
   })  : id = id ?? const Uuid().v4(),
         exercises = [
           for (final exercise in exercises)
@@ -42,6 +43,7 @@ class Superset extends WorkoutExercisable {
       exercises: [],
       restTime: const Duration(seconds: 0),
       workoutID: null,
+      supersedesID: null,
     );
   }
 

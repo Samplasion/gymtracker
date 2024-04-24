@@ -3,6 +3,8 @@ import 'dart:io';
 
 import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
+// ignore: depend_on_referenced_packages
+import 'package:drift_dev/api/migrations.dart';
 import 'package:flutter/foundation.dart';
 import 'package:gymtracker/data/distance.dart';
 import 'package:gymtracker/data/weights.dart';
@@ -13,6 +15,7 @@ import 'package:gymtracker/db/model/tables/ongoing.dart';
 import 'package:gymtracker/db/model/tables/preferences.dart';
 import 'package:gymtracker/db/model/tables/routines.dart';
 import 'package:gymtracker/db/model/tables/set.dart';
+import 'package:gymtracker/db/schema_versions.dart';
 import 'package:gymtracker/db/utils.dart';
 import 'package:gymtracker/model/exercisable.dart' as model;
 import 'package:gymtracker/model/exercise.dart' as model;
@@ -35,7 +38,7 @@ part 'database.g.dart';
 // Used in the generated code
 const _uuid = Uuid();
 
-const DATABASE_VERSION = 2;
+const DATABASE_VERSION = 3;
 
 @DriftDatabase(tables: [
   CustomExercises,
@@ -58,6 +61,45 @@ class GTDatabase extends _$GTDatabase {
         onCreate: (m) async {
           await m.createAll();
           await into(preferences).insert(Prefs.defaultValue);
+        },
+        onUpgrade: (m, from, to) async {
+          // Run migration steps without foreign keys and re-enable them later
+          // (https://drift.simonbinder.eu/docs/advanced-features/migrations/#tips)
+          await customStatement('PRAGMA foreign_keys = OFF');
+
+          globalLogger.w("[GTDatabase] Running migration");
+
+          await m.runMigrationSteps(
+            from: from,
+            to: to,
+            steps: migrationSteps(
+              from2To3: (m, schema) async {
+                await m.addColumn(
+                  schema.routineExercises,
+                  schema.routineExercises.supersedesId,
+                );
+                await m.addColumn(
+                  schema.historyWorkoutExercises,
+                  schema.historyWorkoutExercises.supersedesId,
+                );
+              },
+            ),
+          );
+
+          if (kDebugMode) {
+            // Fail if the migration broke foreign keys
+            final wrongForeignKeys =
+                await customSelect('PRAGMA foreign_key_check').get();
+            assert(wrongForeignKeys.isEmpty,
+                '${wrongForeignKeys.map((e) => e.data)}');
+          }
+
+          await customStatement('PRAGMA foreign_keys = ON;');
+        },
+        beforeOpen: (details) async {
+          if (kDebugMode) {
+            await validateDatabaseSchema();
+          }
         },
       );
 
@@ -411,6 +453,7 @@ model.Exercise exerciseFromData(CustomExercise row) {
     notes: "",
     sets: [],
     workoutID: null,
+    supersedesID: null,
   );
 }
 
@@ -500,6 +543,7 @@ extension WorkoutExercisableDatabaseUtils on model.WorkoutExercisable {
       supersetId: this is model.Exercise
           ? Value(asExercise.supersetID)
           : const Value.absent(),
+      supersedesId: Value.absentIfNull(supersedesID),
     );
   }
 }

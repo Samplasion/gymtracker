@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:gymtracker/db/imports/v1.dart';
 import 'package:gymtracker/db/imports/v2.dart';
+import 'package:gymtracker/db/imports/v3.dart';
 import 'package:gymtracker/model/exercisable.dart';
 import 'package:gymtracker/model/exercise.dart';
 import 'package:gymtracker/model/measurements.dart';
@@ -11,6 +12,7 @@ import 'package:gymtracker/model/workout.dart';
 const converters = {
   1: VersionedJsonImportV1(),
   2: VersionedJsonImportV2(),
+  3: VersionedJsonImportV3(),
 };
 
 VersionedJsonImportBase getConverter(int version) {

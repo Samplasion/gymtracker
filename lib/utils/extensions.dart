@@ -412,3 +412,9 @@ extension HarmonizedMaterialColor on MaterialColor {
     );
   }
 }
+
+extension PrettyJsonExtension on Map<String, dynamic> {
+  String toPrettyString([String indent = '  ']) {
+    return JsonEncoder.withIndent(indent).convert(this);
+  }
+}

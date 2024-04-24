@@ -1,6 +1,11 @@
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_quill/flutter_quill.dart';
+import 'package:gymtracker/model/exercisable.dart';
+import 'package:gymtracker/model/exercise.dart';
+import 'package:gymtracker/model/superset.dart';
+import 'package:gymtracker/model/workout.dart';
+import 'package:gymtracker/service/logger.dart';
 import 'package:gymtracker/utils/extensions.dart';
 
 bool doubleIsActuallyInt(double double, [double epsilon = 0.001]) {

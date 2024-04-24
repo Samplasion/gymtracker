@@ -292,7 +292,7 @@ class HistoryController extends GetxController with ServiceableController {
 
   /// Adds a new workout to the history, avoiding collisions
   Future<void> addNewWorkout(Workout workout) async {
-    logger.d(workout);
+    logger.d(workout.toJson().toPrettyString());
     logger.d("Adding new workout to history");
     final collides = service.hasHistoryWorkout(workout.id);
     if (collides) {
@@ -377,7 +377,11 @@ class HistoryController extends GetxController with ServiceableController {
 
   Future<void> combineWorkoutsFlow(Workout workout) async {
     if (!workout.hasContinuation) {
-      throw ArgumentError("Workout must have a continuation.");
+      throw ArgumentError.value(
+        workout,
+        'workout',
+        "Workout must have a continuation.",
+      );
     }
 
     final w1 = workout.withFilters(
@@ -400,7 +404,7 @@ class HistoryController extends GetxController with ServiceableController {
 
     final combined = Workout.combine(w1, w2);
 
-    logger.d(combined.toJson());
+    logger.d(combined.toJson().toPrettyString());
 
     replaceWorkoutsWithCombined(
       workouts: [w1, w2],
@@ -443,8 +447,8 @@ extension WorkoutHistory on Workout {
         ? (this as SynthesizedWorkout).components.first
         : this;
     return SynthesizedWorkout([
-      self,
       if (previous && self.isContinuation) self.originalWorkoutForContinuation!,
+      self,
       if (next && self.completedBy != null && self.continuation != null)
         self.continuation!,
     ]);

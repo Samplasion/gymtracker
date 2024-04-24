@@ -8,6 +8,7 @@ import 'package:gymtracker/model/exercisable.dart';
 import 'package:gymtracker/model/exercise.dart';
 import 'package:gymtracker/model/set.dart';
 import 'package:gymtracker/model/superset.dart';
+import 'package:gymtracker/service/logger.dart';
 import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/utils/utils.dart';
 import 'package:json_annotation/json_annotation.dart';
@@ -102,6 +103,9 @@ class Workout {
       .map((e) => e is Superset ? e.exercises.length : 1)
       .fold(0, (a, b) => a + b);
 
+  bool get isSupersedence =>
+      completes != null && exercises.any((element) => element.isSupersedence);
+
   Workout({
     String? id,
     required this.name,
@@ -142,18 +146,14 @@ class Workout {
           "Workout 1 must start before workout 2.");
     }
 
+    // NOTE: We don't care about IDs in this method since they get fixed
+    // just before the data is saved to the database.
+
+    var exercises = getExercisesLinearly(workout1, workout2);
+
     final result = Workout(
       name: workout1.name,
-      exercises: [
-        ...workout1.exercises,
-        for (final exercise in workout2.exercises)
-          exercise.changeUnits(
-            fromWeightUnit: workout2.weightUnit,
-            toWeightUnit: workout1.weightUnit,
-            fromDistanceUnit: workout2.distanceUnit,
-            toDistanceUnit: workout1.distanceUnit,
-          ),
-      ],
+      exercises: exercises,
       duration: (workout1.duration ?? Duration.zero) +
           (workout2.duration ?? Duration.zero),
       startingDate: workout1.startingDate,
@@ -264,7 +264,7 @@ class Workout {
     );
   }
 
-  Workout withRegeneratedExerciseIDs() {
+  Workout withRegeneratedExerciseIDs({required bool superseding}) {
     final newExercises = <WorkoutExercisable>[];
     for (final exercise in exercises) {
       newExercises.add(exercise.map(
@@ -276,15 +276,27 @@ class Workout {
                 exercise.copyWith(
                   id: const Uuid().v4(),
                   supersetID: newSupersetID,
+                  supersedesID: superseding ? exercise.id : null,
                 ),
             ],
             id: newSupersetID,
+            supersedesID: superseding ? superset.id : null,
           );
         },
-        exercise: (single) => single.copyWith(id: const Uuid().v4()),
+        exercise: (single) => single.copyWith(
+          id: const Uuid().v4(),
+          supersedesID: superseding ? single.id : null,
+        ),
       ));
     }
     return copyWith(exercises: newExercises);
+  }
+
+  bool isCompletionOf(Workout base) {
+    return base.completedBy != null &&
+        completes != null &&
+        base.completedBy == id &&
+        completes == base.id;
   }
 }
 
@@ -330,7 +342,7 @@ class SynthesizedWorkout implements Workout {
   Weights get weightUnit => components.first.weightUnit;
 
   @override
-  List<GTSet> get allSets => components.expand((e) => e.allSets).toList();
+  List<GTSet> get allSets => exercises.expand((e) => e.sets).toList();
 
   @override
   Workout clone() {
@@ -345,7 +357,7 @@ class SynthesizedWorkout implements Workout {
   double get distanceRun => components.fold(0.0, (a, b) => a + b.distanceRun);
 
   @override
-  List<GTSet> get doneSets => components.expand((e) => e.doneSets).toList();
+  List<GTSet> get doneSets => allSets.where((s) => s.done).toList();
 
   @override
   Duration get duration => components.fold(
@@ -355,23 +367,36 @@ class SynthesizedWorkout implements Workout {
   DateTime get endingDate => startingDate!.add(duration);
 
   @override
-  List<WorkoutExercisable> get exercises => components
-      .expand((w) => [
-            for (final e in w.exercises)
-              e.changeUnits(
-                fromWeightUnit: w.weightUnit,
-                toWeightUnit: weightUnit,
-                fromDistanceUnit: w.distanceUnit,
-                toDistanceUnit: distanceUnit,
-              )
-          ])
-      .toList();
+  List<WorkoutExercisable> get exercises {
+    // If we have two components, account for the possibility that the second
+    // workout completes the first.
+    if (components.length == 2) {
+      return getExercisesLinearly(
+        components.first,
+        components.last,
+      );
+    }
+    return components
+        .expand((w) => [
+              for (final e in w.exercises)
+                e.changeUnits(
+                  fromWeightUnit: w.weightUnit,
+                  toWeightUnit: weightUnit,
+                  fromDistanceUnit: w.distanceUnit,
+                  toDistanceUnit: distanceUnit,
+                )
+            ])
+        .toList();
+  }
 
   @override
   String? get infobox => components.first.infobox;
 
   @override
   bool get isComplete => components.every((e) => e.isComplete);
+
+  @override
+  bool isCompletionOf(Workout base) => false;
 
   @override
   bool get isConcrete => components.first.isConcrete;
@@ -381,6 +406,9 @@ class SynthesizedWorkout implements Workout {
 
   @override
   bool get isContinuation => false;
+
+  @override
+  bool get isSupersedence => false;
 
   @override
   double get liftedWeight => components.fold(
@@ -419,6 +447,7 @@ class SynthesizedWorkout implements Workout {
   Map<String, dynamic> toJson() {
     return {
       "components": components.map((e) => e.toJson()).toList(),
+      'exercises': exercises.map((e) => e.toJson()).toList(),
     };
   }
 
@@ -435,7 +464,7 @@ class SynthesizedWorkout implements Workout {
   }
 
   @override
-  Workout withRegeneratedExerciseIDs() {
+  Workout withRegeneratedExerciseIDs({required bool superseding}) {
     throw SynthesizedWorkoutMethodException("withRegeneratedExerciseIDs");
   }
 }
@@ -537,4 +566,85 @@ class WorkoutDifference {
       addedExercises.hashCode ^
       removedExercises.hashCode ^
       changedExercises.hashCode;
+}
+
+/// Weird name for a function that returns exercises, overriding superseded exercises.
+List<WorkoutExercisable> getExercisesLinearly(Workout base, Workout cont) {
+  globalLogger.w('[getExercisesLinearly] usesNewAlgorithm: ${(
+    cont.isSupersedence,
+    cont.isCompletionOf(base)
+  )}');
+  if (cont.isSupersedence && cont.isCompletionOf(base)) {
+    final exercises = <WorkoutExercisable>[];
+    final ids = [
+      ...base.exercises.map((e) => e.id),
+      ...cont.exercises.where((e) => !e.isSupersedence).map((e) => e.id),
+    ];
+    globalLogger.d('[getExercisesLinearly] ids: $ids');
+    final exerciseMap = <String, WorkoutExercisable>{
+      for (final id in base.exercises.map((e) => e.id))
+        id: base.exercises.firstWhere((e) => e.id == id),
+      for (final id
+          in cont.exercises.where((e) => !e.isSupersedence).map((e) => e.id))
+        id: cont.exercises.firstWhere((e) => e.id == id).changeUnits(
+              fromWeightUnit: cont.weightUnit,
+              toWeightUnit: base.weightUnit,
+              fromDistanceUnit: cont.distanceUnit,
+              toDistanceUnit: base.distanceUnit,
+            ),
+    };
+
+    for (final exercise in cont.exercises) {
+      if (exercise.isSupersedence) {
+        final newExercise = exercise
+            .changeUnits(
+              fromWeightUnit: cont.weightUnit,
+              toWeightUnit: base.weightUnit,
+              fromDistanceUnit: cont.distanceUnit,
+              toDistanceUnit: base.distanceUnit,
+            )
+            .map(
+              exercise: (ex) => ex.copyWith(
+                id: ex.supersedesID,
+                supersedesID: null,
+              ),
+              superset: (superset) {
+                final exercises = [
+                  for (final exercise in superset.exercises)
+                    exercise.copyWith(
+                      id: exercise.supersedesID,
+                      supersetID: superset.id,
+                      supersedesID: null,
+                    ),
+                ];
+                final result = superset.copyWith(
+                  id: superset.supersedesID,
+                  supersedesID: null,
+                  exercises: exercises,
+                );
+                return result;
+              },
+            );
+        exerciseMap[newExercise.id] = newExercise;
+      }
+    }
+
+    for (final id in ids) {
+      final exercise = exerciseMap[id]!;
+      exercises.add(exercise);
+    }
+
+    return exercises;
+  } else {
+    return [
+      ...base.exercises,
+      for (final exercise in cont.exercises)
+        exercise.changeUnits(
+          fromWeightUnit: cont.weightUnit,
+          toWeightUnit: base.weightUnit,
+          fromDistanceUnit: cont.distanceUnit,
+          toDistanceUnit: base.distanceUnit,
+        ),
+    ];
+  }
 }

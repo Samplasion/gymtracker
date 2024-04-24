@@ -30,6 +30,13 @@ abstract class WorkoutExercisable {
   Duration get restTime;
   String get notes;
 
+  /// If this exercise supersedes a previous version of itself (for example, in
+  /// a continuation), this field should be set to the ID of the previous
+  /// exercise.
+  String? get supersedesID;
+
+  bool get isSupersedence => supersedesID != null;
+
   when({
     void Function(Exercise)? exercise,
     void Function(Superset)? superset,

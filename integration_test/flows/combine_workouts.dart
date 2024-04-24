@@ -106,12 +106,31 @@ Future<void> testCombineWorkoutsFlow(
   // Verify that we're now at the workout page
   expect(find.byType(WorkoutView), findsOneWidget);
 
-  // Verify that there's only one exercise with one set
-  // (the second set was marked as done)
-  expect(find.byType(WorkoutExerciseSetEditor), findsOneWidget);
+  // Verify that there's only one exercise with one done set and one undone set
+  expect(find.byType(WorkoutExerciseSetEditor), findsNWidgets(2));
+  expect(
+    find.descendant(
+      of: find.byType(WorkoutExerciseSetEditor),
+      matching: find.byWidgetPredicate(
+          (widget) => widget is Checkbox && widget.value == true),
+    ),
+    findsOneWidget,
+  );
+  expect(
+    find.descendant(
+      of: find.byType(WorkoutExerciseSetEditor),
+      matching: find.byWidgetPredicate(
+          (widget) => widget is Checkbox && widget.value == false),
+    ),
+    findsOneWidget,
+  );
 
   // Mark the first set as done
-  await tester.tap(find.byType(Checkbox).first);
+  await tester.tap(find.descendant(
+    of: find.byType(WorkoutExerciseSetEditor),
+    matching: find.byWidgetPredicate(
+        (widget) => widget is Checkbox && widget.value == false),
+  ));
   await tester.pumpAndSettle();
 
   // Finish the workout

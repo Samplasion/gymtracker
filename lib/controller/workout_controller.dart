@@ -927,6 +927,7 @@ class WorkoutController extends GetxController with ServiceableController {
               ex.instantiate(
                 workout: workout,
                 setFilter: setFilter,
+                isSupersedence: continuation && ex.isSupersedence,
               )
             else if (ex is Superset)
               ex.copyWith(
@@ -934,6 +935,7 @@ class WorkoutController extends GetxController with ServiceableController {
                     .map((e) => e.instantiate(
                           workout: workout,
                           setFilter: setFilter,
+                          isSupersedence: continuation && e.isSupersedence,
                         ))
                     .toList(),
               ),

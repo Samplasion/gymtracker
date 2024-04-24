@@ -31,6 +31,8 @@ abstract class _$ExerciseCWProxy {
 
   Exercise workoutID(String? workoutID);
 
+  Exercise supersedesID(String? supersedesID);
+
   /// This function **does support** nullification of nullable fields. All `null` values passed to `non-nullable` fields will be ignored. You can also use `Exercise(...).copyWith.fieldName(...)` to override fields one at a time with nullification support.
   ///
   /// Usage
@@ -50,6 +52,7 @@ abstract class _$ExerciseCWProxy {
     bool? standard,
     String? supersetID,
     String? workoutID,
+    String? supersedesID,
   });
 }
 
@@ -99,6 +102,10 @@ class _$ExerciseCWProxyImpl implements _$ExerciseCWProxy {
   Exercise workoutID(String? workoutID) => this(workoutID: workoutID);
 
   @override
+  Exercise supersedesID(String? supersedesID) =>
+      this(supersedesID: supersedesID);
+
+  @override
 
   /// This function **does support** nullification of nullable fields. All `null` values passed to `non-nullable` fields will be ignored. You can also use `Exercise(...).copyWith.fieldName(...)` to override fields one at a time with nullification support.
   ///
@@ -119,6 +126,7 @@ class _$ExerciseCWProxyImpl implements _$ExerciseCWProxy {
     Object? standard = const $CopyWithPlaceholder(),
     Object? supersetID = const $CopyWithPlaceholder(),
     Object? workoutID = const $CopyWithPlaceholder(),
+    Object? supersedesID = const $CopyWithPlaceholder(),
   }) {
     return Exercise.raw(
       id: id == const $CopyWithPlaceholder()
@@ -173,6 +181,10 @@ class _$ExerciseCWProxyImpl implements _$ExerciseCWProxy {
           ? _value.workoutID
           // ignore: cast_nullable_to_non_nullable
           : workoutID as String?,
+      supersedesID: supersedesID == const $CopyWithPlaceholder()
+          ? _value.supersedesID
+          // ignore: cast_nullable_to_non_nullable
+          : supersedesID as String?,
     );
   }
 }
@@ -206,6 +218,7 @@ Exercise _$ExerciseFromJson(Map<String, dynamic> json) => Exercise.raw(
       standard: json['standard'] as bool? ?? false,
       supersetID: json['supersetID'] as String?,
       workoutID: json['workoutID'] as String?,
+      supersedesID: json['supersedesID'] as String?,
     );
 
 Map<String, dynamic> _$ExerciseToJson(Exercise instance) => <String, dynamic>{
@@ -224,6 +237,7 @@ Map<String, dynamic> _$ExerciseToJson(Exercise instance) => <String, dynamic>{
       'supersetID': instance.supersetID,
       'workoutID': instance.workoutID,
       'standard': instance.standard,
+      'supersedesID': instance.supersedesID,
     };
 
 const _$GTSetParametersEnumMap = {

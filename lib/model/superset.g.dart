@@ -17,6 +17,8 @@ abstract class _$SupersetCWProxy {
 
   Superset workoutID(String? workoutID);
 
+  Superset supersedesID(String? supersedesID);
+
   /// This function **does support** nullification of nullable fields. All `null` values passed to `non-nullable` fields will be ignored. You can also use `Superset(...).copyWith.fieldName(...)` to override fields one at a time with nullification support.
   ///
   /// Usage
@@ -29,6 +31,7 @@ abstract class _$SupersetCWProxy {
     Duration? restTime,
     String? notes,
     String? workoutID,
+    String? supersedesID,
   });
 }
 
@@ -54,6 +57,10 @@ class _$SupersetCWProxyImpl implements _$SupersetCWProxy {
   Superset workoutID(String? workoutID) => this(workoutID: workoutID);
 
   @override
+  Superset supersedesID(String? supersedesID) =>
+      this(supersedesID: supersedesID);
+
+  @override
 
   /// This function **does support** nullification of nullable fields. All `null` values passed to `non-nullable` fields will be ignored. You can also use `Superset(...).copyWith.fieldName(...)` to override fields one at a time with nullification support.
   ///
@@ -67,6 +74,7 @@ class _$SupersetCWProxyImpl implements _$SupersetCWProxy {
     Object? restTime = const $CopyWithPlaceholder(),
     Object? notes = const $CopyWithPlaceholder(),
     Object? workoutID = const $CopyWithPlaceholder(),
+    Object? supersedesID = const $CopyWithPlaceholder(),
   }) {
     return Superset(
       id: id == const $CopyWithPlaceholder()
@@ -89,6 +97,10 @@ class _$SupersetCWProxyImpl implements _$SupersetCWProxy {
           ? _value.workoutID
           // ignore: cast_nullable_to_non_nullable
           : workoutID as String?,
+      supersedesID: supersedesID == const $CopyWithPlaceholder()
+          ? _value.supersedesID
+          // ignore: cast_nullable_to_non_nullable
+          : supersedesID as String?,
     );
   }
 }
@@ -111,6 +123,7 @@ Superset _$SupersetFromJson(Map<String, dynamic> json) => Superset(
       restTime: Duration(microseconds: json['restTime'] as int),
       notes: json['notes'] as String? ?? '',
       workoutID: json['workoutID'] as String?,
+      supersedesID: json['supersedesID'] as String?,
     );
 
 Map<String, dynamic> _$SupersetToJson(Superset instance) => <String, dynamic>{
@@ -119,4 +132,5 @@ Map<String, dynamic> _$SupersetToJson(Superset instance) => <String, dynamic>{
       'restTime': instance.restTime.inMicroseconds,
       'notes': instance.notes,
       'workoutID': instance.workoutID,
+      'supersedesID': instance.supersedesID,
     };

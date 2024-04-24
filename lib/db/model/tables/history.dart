@@ -38,4 +38,8 @@ class HistoryWorkoutExercises extends LinkedExerciseBase {
   @override
   TextColumn get supersetId =>
       text().nullable().references(HistoryWorkoutExercises, #id)();
+
+  @override
+  TextColumn get supersedesId =>
+      text().nullable().references(HistoryWorkoutExercises, #id)();
 }

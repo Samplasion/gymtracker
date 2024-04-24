@@ -327,20 +327,29 @@ class _ExercisesViewState extends State<ExercisesView> {
                   childCount: workout.continuation!.exercises.length,
                 ),
               ),
-              if (kDebugMode)
+              if (kDebugMode) ...[
                 SliverToBoxAdapter(
                   child: Text(
                     "cont id: ${workout.continuation!.id}",
                     textAlign: TextAlign.center,
                   ),
                 ),
-              if (kDebugMode)
                 SliverToBoxAdapter(
                   child: Text(
                     "cont parent: ${workout.continuation!.parentID}",
                     textAlign: TextAlign.center,
                   ),
                 ),
+                SliverToBoxAdapter(
+                  child: Text(
+                    workout.continuation!.toJson().toPrettyString(),
+                    style: const TextStyle(
+                      fontFamily: "monospace",
+                      fontFamilyFallback: <String>["Menlo", "Courier"],
+                    ),
+                  ),
+                ),
+              ],
             ],
             SliverPadding(
               padding: MediaQuery.of(context).padding.copyWith(
@@ -501,6 +510,7 @@ class ExerciseDataView extends StatelessWidget {
                     if (kDebugMode) ...[
                       Text(exercise.id),
                       Text("parent: ${exercise.parentID}"),
+                      Text("supersede: ${exercise.supersedesID}"),
                     ],
                   ],
                 ),

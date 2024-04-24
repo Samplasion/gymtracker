@@ -1329,6 +1329,15 @@ class $HistoryWorkoutExercisesTable extends HistoryWorkoutExercises
   late final GeneratedColumn<int> sortOrder = GeneratedColumn<int>(
       'sort_order', aliasedName, false,
       type: DriftSqlType.int, requiredDuringInsert: true);
+  static const VerificationMeta _supersedesIdMeta =
+      const VerificationMeta('supersedesId');
+  @override
+  late final GeneratedColumn<String> supersedesId = GeneratedColumn<String>(
+      'supersedes_id', aliasedName, true,
+      type: DriftSqlType.string,
+      requiredDuringInsert: false,
+      defaultConstraints: GeneratedColumn.constraintIsAlways(
+          'REFERENCES history_workout_exercises (id)'));
   @override
   List<GeneratedColumn> get $columns => [
         id,
@@ -1346,7 +1355,8 @@ class $HistoryWorkoutExercisesTable extends HistoryWorkoutExercises
         isSuperset,
         isInSuperset,
         supersetId,
-        sortOrder
+        sortOrder,
+        supersedesId
       ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -1432,6 +1442,12 @@ class $HistoryWorkoutExercisesTable extends HistoryWorkoutExercises
     } else if (isInserting) {
       context.missing(_sortOrderMeta);
     }
+    if (data.containsKey('supersedes_id')) {
+      context.handle(
+          _supersedesIdMeta,
+          supersedesId.isAcceptableOrUnknown(
+              data['supersedes_id']!, _supersedesIdMeta));
+    }
     return context;
   }
 
@@ -1479,6 +1495,8 @@ class $HistoryWorkoutExercisesTable extends HistoryWorkoutExercises
           .read(DriftSqlType.string, data['${effectivePrefix}superset_id']),
       sortOrder: attachedDatabase.typeMapping
           .read(DriftSqlType.int, data['${effectivePrefix}sort_order'])!,
+      supersedesId: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}supersedes_id']),
     );
   }
 
@@ -1528,6 +1546,7 @@ class HistoryWorkoutExercisesCompanion
   final Value<bool> isInSuperset;
   final Value<String?> supersetId;
   final Value<int> sortOrder;
+  final Value<String?> supersedesId;
   final Value<int> rowid;
   const HistoryWorkoutExercisesCompanion({
     this.id = const Value.absent(),
@@ -1546,6 +1565,7 @@ class HistoryWorkoutExercisesCompanion
     this.isInSuperset = const Value.absent(),
     this.supersetId = const Value.absent(),
     this.sortOrder = const Value.absent(),
+    this.supersedesId = const Value.absent(),
     this.rowid = const Value.absent(),
   });
   HistoryWorkoutExercisesCompanion.insert({
@@ -1565,6 +1585,7 @@ class HistoryWorkoutExercisesCompanion
     required bool isInSuperset,
     this.supersetId = const Value.absent(),
     required int sortOrder,
+    this.supersedesId = const Value.absent(),
     this.rowid = const Value.absent(),
   })  : routineId = Value(routineId),
         name = Value(name),
@@ -1589,6 +1610,7 @@ class HistoryWorkoutExercisesCompanion
     Expression<bool>? isInSuperset,
     Expression<String>? supersetId,
     Expression<int>? sortOrder,
+    Expression<String>? supersedesId,
     Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
@@ -1610,6 +1632,7 @@ class HistoryWorkoutExercisesCompanion
       if (isInSuperset != null) 'is_in_superset': isInSuperset,
       if (supersetId != null) 'superset_id': supersetId,
       if (sortOrder != null) 'sort_order': sortOrder,
+      if (supersedesId != null) 'supersedes_id': supersedesId,
       if (rowid != null) 'rowid': rowid,
     });
   }
@@ -1631,6 +1654,7 @@ class HistoryWorkoutExercisesCompanion
       Value<bool>? isInSuperset,
       Value<String?>? supersetId,
       Value<int>? sortOrder,
+      Value<String?>? supersedesId,
       Value<int>? rowid}) {
     return HistoryWorkoutExercisesCompanion(
       id: id ?? this.id,
@@ -1650,6 +1674,7 @@ class HistoryWorkoutExercisesCompanion
       isInSuperset: isInSuperset ?? this.isInSuperset,
       supersetId: supersetId ?? this.supersetId,
       sortOrder: sortOrder ?? this.sortOrder,
+      supersedesId: supersedesId ?? this.supersedesId,
       rowid: rowid ?? this.rowid,
     );
   }
@@ -1712,6 +1737,9 @@ class HistoryWorkoutExercisesCompanion
     if (sortOrder.present) {
       map['sort_order'] = Variable<int>(sortOrder.value);
     }
+    if (supersedesId.present) {
+      map['supersedes_id'] = Variable<String>(supersedesId.value);
+    }
     if (rowid.present) {
       map['rowid'] = Variable<int>(rowid.value);
     }
@@ -1737,6 +1765,7 @@ class HistoryWorkoutExercisesCompanion
           ..write('isInSuperset: $isInSuperset, ')
           ..write('supersetId: $supersetId, ')
           ..write('sortOrder: $sortOrder, ')
+          ..write('supersedesId: $supersedesId, ')
           ..write('rowid: $rowid')
           ..write(')'))
         .toString();
@@ -1870,6 +1899,15 @@ class $RoutineExercisesTable extends RoutineExercises
   late final GeneratedColumn<int> sortOrder = GeneratedColumn<int>(
       'sort_order', aliasedName, false,
       type: DriftSqlType.int, requiredDuringInsert: true);
+  static const VerificationMeta _supersedesIdMeta =
+      const VerificationMeta('supersedesId');
+  @override
+  late final GeneratedColumn<String> supersedesId = GeneratedColumn<String>(
+      'supersedes_id', aliasedName, true,
+      type: DriftSqlType.string,
+      requiredDuringInsert: false,
+      defaultConstraints: GeneratedColumn.constraintIsAlways(
+          'REFERENCES routine_exercises (id)'));
   @override
   List<GeneratedColumn> get $columns => [
         id,
@@ -1887,7 +1925,8 @@ class $RoutineExercisesTable extends RoutineExercises
         isSuperset,
         isInSuperset,
         supersetId,
-        sortOrder
+        sortOrder,
+        supersedesId
       ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -1973,6 +2012,12 @@ class $RoutineExercisesTable extends RoutineExercises
     } else if (isInserting) {
       context.missing(_sortOrderMeta);
     }
+    if (data.containsKey('supersedes_id')) {
+      context.handle(
+          _supersedesIdMeta,
+          supersedesId.isAcceptableOrUnknown(
+              data['supersedes_id']!, _supersedesIdMeta));
+    }
     return context;
   }
 
@@ -2019,6 +2064,8 @@ class $RoutineExercisesTable extends RoutineExercises
           .read(DriftSqlType.string, data['${effectivePrefix}superset_id']),
       sortOrder: attachedDatabase.typeMapping
           .read(DriftSqlType.int, data['${effectivePrefix}sort_order'])!,
+      supersedesId: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}supersedes_id']),
     );
   }
 
@@ -2067,6 +2114,7 @@ class RoutineExercisesCompanion extends UpdateCompanion<ConcreteExercise> {
   final Value<bool> isInSuperset;
   final Value<String?> supersetId;
   final Value<int> sortOrder;
+  final Value<String?> supersedesId;
   final Value<int> rowid;
   const RoutineExercisesCompanion({
     this.id = const Value.absent(),
@@ -2085,6 +2133,7 @@ class RoutineExercisesCompanion extends UpdateCompanion<ConcreteExercise> {
     this.isInSuperset = const Value.absent(),
     this.supersetId = const Value.absent(),
     this.sortOrder = const Value.absent(),
+    this.supersedesId = const Value.absent(),
     this.rowid = const Value.absent(),
   });
   RoutineExercisesCompanion.insert({
@@ -2104,6 +2153,7 @@ class RoutineExercisesCompanion extends UpdateCompanion<ConcreteExercise> {
     required bool isInSuperset,
     this.supersetId = const Value.absent(),
     required int sortOrder,
+    this.supersedesId = const Value.absent(),
     this.rowid = const Value.absent(),
   })  : routineId = Value(routineId),
         name = Value(name),
@@ -2128,6 +2178,7 @@ class RoutineExercisesCompanion extends UpdateCompanion<ConcreteExercise> {
     Expression<bool>? isInSuperset,
     Expression<String>? supersetId,
     Expression<int>? sortOrder,
+    Expression<String>? supersedesId,
     Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
@@ -2149,6 +2200,7 @@ class RoutineExercisesCompanion extends UpdateCompanion<ConcreteExercise> {
       if (isInSuperset != null) 'is_in_superset': isInSuperset,
       if (supersetId != null) 'superset_id': supersetId,
       if (sortOrder != null) 'sort_order': sortOrder,
+      if (supersedesId != null) 'supersedes_id': supersedesId,
       if (rowid != null) 'rowid': rowid,
     });
   }
@@ -2170,6 +2222,7 @@ class RoutineExercisesCompanion extends UpdateCompanion<ConcreteExercise> {
       Value<bool>? isInSuperset,
       Value<String?>? supersetId,
       Value<int>? sortOrder,
+      Value<String?>? supersedesId,
       Value<int>? rowid}) {
     return RoutineExercisesCompanion(
       id: id ?? this.id,
@@ -2189,6 +2242,7 @@ class RoutineExercisesCompanion extends UpdateCompanion<ConcreteExercise> {
       isInSuperset: isInSuperset ?? this.isInSuperset,
       supersetId: supersetId ?? this.supersetId,
       sortOrder: sortOrder ?? this.sortOrder,
+      supersedesId: supersedesId ?? this.supersedesId,
       rowid: rowid ?? this.rowid,
     );
   }
@@ -2250,6 +2304,9 @@ class RoutineExercisesCompanion extends UpdateCompanion<ConcreteExercise> {
     if (sortOrder.present) {
       map['sort_order'] = Variable<int>(sortOrder.value);
     }
+    if (supersedesId.present) {
+      map['supersedes_id'] = Variable<String>(supersedesId.value);
+    }
     if (rowid.present) {
       map['rowid'] = Variable<int>(rowid.value);
     }
@@ -2275,6 +2332,7 @@ class RoutineExercisesCompanion extends UpdateCompanion<ConcreteExercise> {
           ..write('isInSuperset: $isInSuperset, ')
           ..write('supersetId: $supersetId, ')
           ..write('sortOrder: $sortOrder, ')
+          ..write('supersedesId: $supersedesId, ')
           ..write('rowid: $rowid')
           ..write(')'))
         .toString();

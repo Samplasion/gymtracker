@@ -67,32 +67,29 @@ class Exercise extends WorkoutExercisable {
   @override
   final Duration restTime;
 
+  /// The ID of the non-concrete (ie. part of a routine) exercise
+  /// this concrete exercise should be categorized under.
+  final String? parentID;
+  @JsonKey(defaultValue: "")
+  @override
+  final String notes;
+  final String? supersetID;
+  @override
+  final String? workoutID;
+  @JsonKey(defaultValue: false)
+  final bool standard;
+
+  @override
+  final String? supersedesID;
+
+  bool get isCustom => !standard;
+  bool get isInSuperset => supersetID != null;
   bool get isOrphan => parentID == null;
   bool get isAbstract => workoutID == null;
   bool get isStandardLibraryExercise {
     final query = isAbstract ? id : parentID;
     return getStandardExerciseByID(query!) != null;
   }
-
-  /// The ID of the non-concrete (ie. part of a routine) exercise
-  /// this concrete exercise should be categorized under.
-  final String? parentID;
-
-  @JsonKey(defaultValue: "")
-  @override
-  final String notes;
-
-  final String? supersetID;
-
-  @override
-  final String? workoutID;
-
-  @JsonKey(defaultValue: false)
-  final bool standard;
-
-  bool get isCustom => !standard;
-
-  bool get isInSuperset => supersetID != null;
 
   Exercise.raw({
     String? id,
@@ -107,6 +104,7 @@ class Exercise extends WorkoutExercisable {
     required this.standard,
     required this.supersetID,
     required this.workoutID,
+    required this.supersedesID,
   })  : id = id ?? const Uuid().v4(),
         assert(sets.isEmpty || parameters == sets[0].parameters,
             "The parameters must not change between the Exercise and its Sets"),
@@ -140,6 +138,7 @@ class Exercise extends WorkoutExercisable {
         standard: false,
         supersetID: supersetID,
         workoutID: workoutID,
+        supersedesID: null,
       );
 
   factory Exercise.standard({
@@ -161,6 +160,7 @@ class Exercise extends WorkoutExercisable {
       standard: true,
       supersetID: null,
       workoutID: null,
+      supersedesID: null,
     );
   }
 
@@ -193,6 +193,7 @@ class Exercise extends WorkoutExercisable {
   Exercise instantiate({
     required Workout workout,
     bool Function(GTSet set)? setFilter = _defaultSetFilter,
+    bool isSupersedence = false,
   }) {
     // We want to keep the parent ID of the exercise in the library (custom
     // or not) as to avoid a "linked list" type situation
@@ -202,10 +203,13 @@ class Exercise extends WorkoutExercisable {
       sets: ([
         for (final set in sets)
           if (setFilter?.call(set) ?? true)
-            set.copyWith(
-              done: false,
-              reps: set.kind.shouldKeepInRoutine ? set.reps : 0,
-            ),
+            if (isSupersedence)
+              set.copyWith()
+            else
+              set.copyWith(
+                done: false,
+                reps: set.kind.shouldKeepInRoutine ? set.reps : 0,
+              ),
       ]),
     );
   }

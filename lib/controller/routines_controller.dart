@@ -11,7 +11,6 @@ import 'package:gymtracker/controller/settings_controller.dart';
 import 'package:gymtracker/controller/workout_controller.dart';
 import 'package:gymtracker/model/exercisable.dart';
 import 'package:gymtracker/model/exercise.dart';
-import 'package:gymtracker/model/set.dart';
 import 'package:gymtracker/model/workout.dart';
 import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/service/logger.dart';
@@ -168,7 +167,7 @@ class RoutinesController extends GetxController
         workout,
         parentID: parentID,
         exerciseFilter: (ex) => ex.sets.any((set) => !set.done),
-        setFilter: (set) => !set.done,
+        // setFilter: (set) => !set.done,
         continuation: true,
       );
     });
@@ -178,16 +177,14 @@ class RoutinesController extends GetxController
     Workout? workout, {
     String? parentID,
     required bool Function(WorkoutExercisable exercise) exerciseFilter,
-    bool Function(GTSet set)? setFilter,
     bool continuation = false,
   }) {
     if (workout != null) {
-      final clone = workout.clone().withRegeneratedExerciseIDs();
+      final clone = workout.withRegeneratedExerciseIDs(superseding: true);
       Get.find<WorkoutController>().applyExistingWorkout(
         clone,
         parentID: parentID,
         exerciseFilter: exerciseFilter,
-        setFilter: setFilter,
         continuation: continuation,
       );
     }

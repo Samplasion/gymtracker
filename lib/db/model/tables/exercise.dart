@@ -42,6 +42,7 @@ class MuscleGroupSetConverter
   }
 }
 
+// @UseRowClass(ConcreteExercise)
 abstract class LinkedExerciseBase extends Table {
   @override
   Set<Column<Object>> get primaryKey => {id};
@@ -65,6 +66,7 @@ abstract class LinkedExerciseBase extends Table {
   BoolColumn get isInSuperset => boolean()();
   TextColumn get supersetId;
   IntColumn get sortOrder => integer()();
+  TextColumn get supersedesId;
 }
 
 class ConcreteExercise {
@@ -84,6 +86,7 @@ class ConcreteExercise {
   final bool isInSuperset;
   final String? supersetId;
   final int sortOrder;
+  final String? supersedesId;
 
   const ConcreteExercise({
     required this.id,
@@ -102,6 +105,7 @@ class ConcreteExercise {
     required this.isInSuperset,
     required this.supersetId,
     required this.sortOrder,
+    required this.supersedesId,
   })  : assert(
             isSuperset
                 ? true

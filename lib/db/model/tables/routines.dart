@@ -26,4 +26,8 @@ class RoutineExercises extends LinkedExerciseBase {
   @override
   TextColumn get supersetId =>
       text().nullable().references(RoutineExercises, #id)();
+
+  @override
+  TextColumn get supersedesId =>
+      text().nullable().references(RoutineExercises, #id)();
 }

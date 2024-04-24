@@ -233,6 +233,10 @@ class _WorkoutExerciseEditorState extends State<WorkoutExerciseEditor> {
                   "parent: ${widget.exercise.parentID}",
                   textAlign: TextAlign.center,
                 ),
+                Text(
+                  "supersede: ${widget.exercise.supersedesID}",
+                  textAlign: TextAlign.center,
+                ),
               ],
               if (widget.createDivider) ...[
                 const SizedBox(height: 8),

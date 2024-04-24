@@ -24,6 +24,7 @@ void expectExercise(
   if (checkSupersetID) {
     expect(result.supersetID, expected.supersetID);
   }
+  expect(result.supersedesID, expected.supersedesID);
   expect(result.sets.length, expected.sets.length);
   for (int i = 0; i < result.sets.length; i++) {
     expect(result.sets[i].kind, expected.sets[i].kind);

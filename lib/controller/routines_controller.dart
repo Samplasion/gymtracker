@@ -66,7 +66,7 @@ class RoutinesController extends GetxController
   onServiceChange() {}
 
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    logger.t("Change lifecycle state callback received (state: ${state.name})");
+    // logger.t("Change lifecycle state callback received (state: ${state.name})");
     if (hasOngoingWorkout()) {
       switch (state) {
         case AppLifecycleState.inactive:

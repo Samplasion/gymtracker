@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:convert';
 
 import 'package:drift/drift.dart';
 import 'package:flutter/foundation.dart';
@@ -312,8 +311,6 @@ class DatabaseService extends GetxService with ChangeNotifier {
   }
 
   void writeToOngoing(Map<String, dynamic> data) {
-    logger.i("Requested write of ongoing workout data");
-    logger.d("Ongoing data: ${jsonEncode(data)}");
     db.setOngoing(data);
   }
 

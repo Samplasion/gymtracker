@@ -159,7 +159,6 @@ class OngoingWorkoutBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    logger.t(Navigator.of(context).widget.pages);
     final isPhone = context.width < Breakpoints.xs.screenWidth;
     return SafeArea(
       bottom: false,

@@ -581,11 +581,6 @@ class WorkoutController extends GetxController with ServiceableController {
     if (Get.find<RoutinesController>().hasOngoingWorkout.isFalse) return;
     final stopwatchController = Get.find<StopwatchController>();
 
-    logger.i(
-      "Saving ongoing data",
-      error: Error(),
-      stackTrace: StackTrace.current,
-    );
     service.writeToOngoing({
       "name": name.value,
       "exercises": exercises.map((ex) => ex.toJson()).toList(),

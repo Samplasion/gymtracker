@@ -35,7 +35,9 @@
       "views": {
         "volume": "Volume",
         "reps": "Reps",
-        "duration": "Workout Duration"
+        "duration": "Workout Duration",
+        "time": "Time",
+        "distance": "Distance"
       }
     },
     "fields": {
@@ -724,13 +726,13 @@
     },
     "newCustomExercise": "New exercise",
     "hips": {
-      "name": "Hips",
       "exercises": {
         "gluteBridge": "Glute bridge",
         "hipThrust": "Hip thrust",
         "hipAdduction": "Hip adduction",
         "hipAbduction": "Hip abduction"
-      }
+      },
+      "name": "Hips"
     }
   },
   "infobox": {

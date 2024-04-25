@@ -35,7 +35,9 @@
       "views": {
         "volume": "Volume",
         "reps": "Ripetizioni",
-        "duration": "Durata allenamento"
+        "duration": "Durata allenamento",
+        "time": "Time",
+        "distance": "Distanza"
       }
     },
     "fields": {

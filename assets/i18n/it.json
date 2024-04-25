@@ -846,10 +846,10 @@
       },
       "none": "Nessun dato",
       "predictedWeight": {
-        "label": "Peso predetto.",
+        "label": "Peso predetto",
         "dialog": {
           "title": "Peso predetto",
-          "text": "La predizione del peso è fornita a scopo esclusivamente informativo e non va preso seriamente."
+          "text": "La predizione del peso è fornita a scopo esclusivamente informativo e non va presa seriamente."
         }
       }
     },

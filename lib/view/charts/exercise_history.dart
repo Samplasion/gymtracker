@@ -17,6 +17,48 @@ import 'package:gymtracker/view/exercises.dart';
 import 'package:gymtracker/view/utils/timer.dart';
 import 'package:intl/intl.dart';
 
+Set<_ExerciseHistoryChartType> _calculateTypes(
+    List<_ExerciseHistoryChartChild> children) {
+  final types = <_ExerciseHistoryChartType>{};
+  final values = <_ExerciseHistoryChartType, List<double>>{
+    _ExerciseHistoryChartType.volume: [],
+    _ExerciseHistoryChartType.reps: [],
+    _ExerciseHistoryChartType.time: [],
+    _ExerciseHistoryChartType.distance: [],
+  };
+
+  for (final (wo, ex) in children) {
+    if (ex.liftedWeight != null) {
+      values[_ExerciseHistoryChartType.volume]!.add(Weights.convert(
+        value: ex.liftedWeight!,
+        from: wo.weightUnit,
+        to: settingsController.weightUnit.value,
+      ));
+    }
+    if (ex.reps != null) {
+      values[_ExerciseHistoryChartType.reps]!.add(ex.reps!.toDouble());
+    }
+    if (ex.time != null) {
+      values[_ExerciseHistoryChartType.time]!
+          .add(ex.time!.inSeconds.toDouble());
+    }
+    if (ex.distanceRun != null) {
+      values[_ExerciseHistoryChartType.distance]!.add(Distance.convert(
+        value: ex.distanceRun!,
+        from: wo.distanceUnit,
+        to: settingsController.distanceUnit.value,
+      ));
+    }
+  }
+
+  for (final type in _ExerciseHistoryChartType.values) {
+    if (values[type]!.isEmpty) continue;
+    types.add(type);
+  }
+
+  return types;
+}
+
 typedef _ExerciseHistoryChartChild = (Workout, Exercise);
 
 class ExerciseHistoryChart extends StatefulWidget {
@@ -31,7 +73,10 @@ class ExerciseHistoryChart extends StatefulWidget {
   @override
   State<ExerciseHistoryChart> createState() => _ExerciseHistoryChartState();
 
-  static shouldShow(List exercises) => exercises.length >= 2;
+  // ignore: library_private_types_in_public_api
+  static shouldShow(List<_ExerciseHistoryChartChild> exercises) {
+    return exercises.length >= 2 && _calculateTypes(exercises).isNotEmpty;
+  }
 }
 
 enum _ExerciseHistoryChartType {
@@ -57,46 +102,8 @@ class _ExerciseHistoryChartState
     };
 
   late _ExerciseHistoryChartType type = availableTypes.first;
-  late final Set<_ExerciseHistoryChartType> availableTypes = () {
-    final types = <_ExerciseHistoryChartType>{};
-    final values = <_ExerciseHistoryChartType, List<double>>{
-      _ExerciseHistoryChartType.volume: [],
-      _ExerciseHistoryChartType.reps: [],
-      _ExerciseHistoryChartType.time: [],
-      _ExerciseHistoryChartType.distance: [],
-    };
-
-    for (final (wo, ex) in children) {
-      if (ex.liftedWeight != null) {
-        values[_ExerciseHistoryChartType.volume]!.add(Weights.convert(
-          value: ex.liftedWeight!,
-          from: wo.weightUnit,
-          to: settingsController.weightUnit.value,
-        ));
-      }
-      if (ex.reps != null) {
-        values[_ExerciseHistoryChartType.reps]!.add(ex.reps!.toDouble());
-      }
-      if (ex.time != null) {
-        values[_ExerciseHistoryChartType.time]!
-            .add(ex.time!.inSeconds.toDouble());
-      }
-      if (ex.distanceRun != null) {
-        values[_ExerciseHistoryChartType.distance]!.add(Distance.convert(
-          value: ex.distanceRun!,
-          from: wo.distanceUnit,
-          to: settingsController.distanceUnit.value,
-        ));
-      }
-    }
-
-    for (final type in _ExerciseHistoryChartType.values) {
-      if (values[type]!.isEmpty) continue;
-      types.add(type);
-    }
-
-    return types;
-  }();
+  late final Set<_ExerciseHistoryChartType> availableTypes =
+      _calculateTypes(children);
 
   @override
   void dispose() {

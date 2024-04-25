@@ -724,13 +724,13 @@
     },
     "newCustomExercise": "New exercise",
     "hips": {
+      "name": "Hips",
       "exercises": {
         "gluteBridge": "Glute bridge",
         "hipThrust": "Hip thrust",
         "hipAdduction": "Hip adduction",
         "hipAbduction": "Hip abduction"
-      },
-      "name": "Hips"
+      }
     }
   },
   "infobox": {
@@ -844,7 +844,14 @@
       "removed": {
         "text": "The data has been removed"
       },
-      "none": "No data"
+      "none": "No data",
+      "predictedWeight": {
+        "label": "Predicted weight",
+        "dialog": {
+          "title": "Predicted weight",
+          "text": "The predicted weight is provided for informative purposes only and should not be taken seriously."
+        }
+      }
     },
     "calendar": {
       "label": "Calendar",

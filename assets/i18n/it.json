@@ -844,7 +844,14 @@
       "removed": {
         "text": "Il dato è stato rimosso"
       },
-      "none": "Nessun dato"
+      "none": "Nessun dato",
+      "predictedWeight": {
+        "label": "Peso predetto.",
+        "dialog": {
+          "title": "Peso predetto",
+          "text": "La predizione del peso è fornita a scopo esclusivamente informativo e non va preso seriamente."
+        }
+      }
     },
     "calendar": {
       "label": "Calendario",

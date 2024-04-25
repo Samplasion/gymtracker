@@ -27,8 +27,7 @@ class ExercisesToSupersetDialog extends StatefulWidget {
 
 enum _ETSStatus {
   valid,
-  tooFewExercises,
-  differingNumberOfSets;
+  tooFewExercises;
 
   bool get isValid => this == _ETSStatus.valid;
 }
@@ -43,10 +42,6 @@ class _ExercisesToSupersetDialogState extends State<ExercisesToSupersetDialog> {
       return _ETSStatus.tooFewExercises;
     }
 
-    if (!exercises.every((e) => e.sets.length == exercises.first.sets.length)) {
-      return _ETSStatus.differingNumberOfSets;
-    }
-
     return _ETSStatus.valid;
   }
 
@@ -58,15 +53,6 @@ class _ExercisesToSupersetDialogState extends State<ExercisesToSupersetDialog> {
           text: RichText(
             text: TextSpan(
               text: "ongoingWorkout.exercisesToSuperset.errors.tooFew".t,
-            ),
-          ),
-        ),
-      _ETSStatus.differingNumberOfSets => AlertBanner(
-          color: AlertColor.error(context),
-          title: "ongoingWorkout.exercisesToSuperset.errorBannerTitle".t,
-          text: RichText(
-            text: TextSpan(
-              text: "ongoingWorkout.exercisesToSuperset.errors.differingSets".t,
             ),
           ),
         ),

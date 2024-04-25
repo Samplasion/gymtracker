@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -14,11 +16,13 @@ import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/utils/utils.dart';
+import 'package:gymtracker/view/charts/exercise_history.dart';
 import 'package:gymtracker/view/components/badges.dart';
 import 'package:gymtracker/view/exercise_creator.dart';
 import 'package:gymtracker/view/exercises.dart';
 import 'package:gymtracker/view/utils/exercise.dart';
 import 'package:intl/intl.dart';
+import 'package:rxdart/rxdart.dart';
 
 class LibraryView extends GetView<ExercisesController> {
   const LibraryView({super.key});
@@ -154,7 +158,26 @@ class ExerciseInfoView extends StatefulWidget {
 }
 
 class _ExerciseInfoViewState extends State<ExerciseInfoView> {
-  late final List<(Exercise, int, Workout)> history = getHistory();
+  final historyStream =
+      BehaviorSubject<List<(Exercise, int, Workout)>>.seeded([]);
+  late final StreamSubscription historySub;
+
+  @override
+  void initState() {
+    super.initState();
+    final HistoryController controller = Get.find();
+    historyStream.add(getHistory());
+    historySub = controller.history.listen((_) {
+      historyStream.add(getHistory());
+    });
+  }
+
+  @override
+  void dispose() {
+    historyStream.close();
+    historySub.cancel();
+    super.dispose();
+  }
 
   List<(Exercise, int, Workout)> getHistory() {
     final controller = Get.find<HistoryController>();
@@ -185,163 +208,191 @@ class _ExerciseInfoViewState extends State<ExerciseInfoView> {
   @override
   Widget build(BuildContext context) {
     final exercise = widget.exercise;
-    final infoTiles = _getInfoTiles(exercise, context);
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("exercise.info.title".t),
-        actions: [
-          if (exercise.isCustom)
-            PopupMenuButton(
-              key: const Key("menu"),
-              itemBuilder: (_) => [
-                PopupMenuItem(
-                  child: Text("actions.edit".t),
-                  onTap: () async {
-                    Get.find<ExercisesController>()
-                        .editExercise(exercise, history);
-                  },
-                ),
-                if (history.isEmpty)
-                  PopupMenuItem(
-                    child: Text(
-                      "actions.remove".t,
-                      style: TextStyle(
-                        color: Theme.of(context).colorScheme.error,
-                      ),
-                    ),
-                    onTap: () async {
-                      final delete = await Go.confirm(
-                          "exercise.delete.title", "exercise.delete.body");
-                      if (delete) {
-                        Get.find<ExercisesController>()
-                            .deleteExercise(exercise);
-                        Get.back();
-                      }
-                    },
-                  ),
-              ],
-            ),
-        ],
-      ),
-      body: ListTileTheme(
-        contentPadding: EdgeInsets.zero,
-        child: SafeArea(
-          child: CustomScrollView(
-            slivers: [
+    return StreamBuilder<List<(Exercise, int, Workout)>>(
+      stream: historyStream,
+      initialData: const <(Exercise, int, Workout)>[],
+      builder: (context, historySnapshot) {
+        final history = historySnapshot.data ?? [];
+
+        final infoTiles = _getInfoTiles(exercise, context);
+        final chartHistory = history.map((e) => (e.$3, e.$1)).toList();
+        chartHistory
+            .sort((a, b) => a.$1.startingDate!.compareTo(b.$1.startingDate!));
+
+        return Scaffold(
+          appBar: AppBar(
+            title: Text("exercise.info.title".t),
+            actions: [
               if (exercise.isCustom)
-                SliverPadding(
-                  padding: const EdgeInsets.all(16).copyWith(bottom: 8),
-                  sliver: const SliverToBoxAdapter(
-                    child: Row(
-                      children: [CustomExerciseBadge()],
+                PopupMenuButton(
+                  key: const Key("menu"),
+                  itemBuilder: (_) => [
+                    PopupMenuItem(
+                      child: Text("actions.edit".t),
+                      onTap: () async {
+                        Get.find<ExercisesController>()
+                            .editExercise(exercise, history);
+                      },
                     ),
-                  ),
-                ),
-              SliverPadding(
-                padding: const EdgeInsets.all(16)
-                    .copyWith(top: exercise.isCustom ? 0 : 16),
-                sliver: SliverToBoxAdapter(
-                  child: Text(
-                    exercise.displayName,
-                    style: Theme.of(context).textTheme.displayMedium,
-                  ),
-                ),
-              ),
-              if (history.isNotEmpty && infoTiles.length > 1)
-                SliverList(
-                  delegate: SliverChildListDelegate(infoTiles),
-                ),
-              SliverList.builder(
-                itemCount: history.length,
-                itemBuilder: (context, index) {
-                  return Card(
-                    margin:
-                        const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-                    clipBehavior: Clip.antiAlias,
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 8)
-                          .copyWith(bottom: 16),
-                      child: Column(
-                        children: [
-                          ExerciseDataView(
-                            exercise: history[index].$1,
-                            index: history[index].$2,
-                            workout: history[index].$3,
-                            isInSuperset: false,
-                            weightUnit: history[index].$3.weightUnit,
-                            distanceUnit: history[index].$3.distanceUnit,
+                    if (history.isEmpty)
+                      PopupMenuItem(
+                        child: Text(
+                          "actions.remove".t,
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.error,
                           ),
-                          const Divider(),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 16),
-                            child: Column(
-                              children: [
-                                ListTile(
-                                  leading: CircleAvatar(
-                                    backgroundColor: Theme.of(context)
-                                        .colorScheme
-                                        .primaryContainer,
-                                    foregroundColor: Theme.of(context)
-                                        .colorScheme
-                                        .onPrimaryContainer,
-                                    child: Text(history[index]
-                                        .$3
-                                        .name
-                                        .characters
-                                        .first
-                                        .toUpperCase()),
-                                  ),
-                                  title: Text(history[index].$3.name),
-                                  subtitle: Text(DateFormat.yMd(
-                                          context.locale.languageCode)
-                                      .add_Hm()
-                                      .format(history[index].$3.startingDate ??
-                                          DateTime.now())),
-                                ),
-                              ],
-                            ),
-                          ),
-                          OutlinedButton(
-                            onPressed: () {
-                              Go.to(
-                                () => ExercisesView(workout: history[index].$3),
-                              );
-                            },
-                            child: Text("exercise.info.viewWorkout".t),
-                          )
-                        ],
+                        ),
+                        onTap: () async {
+                          final delete = await Go.confirm(
+                              "exercise.delete.title", "exercise.delete.body");
+                          if (delete) {
+                            Get.find<ExercisesController>()
+                                .deleteExercise(exercise);
+                            Get.back();
+                          }
+                        },
                       ),
-                    ),
-                  );
-                },
-              ),
-              if (history.isEmpty) ...[
-                SliverToBoxAdapter(
-                  child: Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Text("exercise.info.noHistory".t),
-                  ),
-                ),
-              ],
-              const SliverToBoxAdapter(
-                child: SizedBox(height: 8),
-              ),
-              if (kDebugMode)
-                SliverToBoxAdapter(
-                  child: Text(
-                    "id: ${widget.exercise.id}",
-                    textAlign: TextAlign.center,
-                  ),
+                  ],
                 ),
             ],
           ),
-        ),
-      ),
+          body: ListTileTheme(
+            contentPadding: EdgeInsets.zero,
+            child: SafeArea(
+              child: CustomScrollView(
+                slivers: [
+                  if (exercise.isCustom)
+                    SliverPadding(
+                      padding: const EdgeInsets.all(16).copyWith(bottom: 8),
+                      sliver: const SliverToBoxAdapter(
+                        child: Row(
+                          children: [CustomExerciseBadge()],
+                        ),
+                      ),
+                    ),
+                  SliverPadding(
+                    padding: const EdgeInsets.all(16)
+                        .copyWith(top: exercise.isCustom ? 0 : 16),
+                    sliver: SliverToBoxAdapter(
+                      child: Text(
+                        exercise.displayName,
+                        style: Theme.of(context).textTheme.displayMedium,
+                      ),
+                    ),
+                  ),
+                  if (chartHistory.isNotEmpty &&
+                      ExerciseHistoryChart.shouldShow(chartHistory))
+                    SliverPadding(
+                      padding: const EdgeInsets.all(16),
+                      sliver: SliverToBoxAdapter(
+                        child: ExerciseHistoryChart(
+                          key: ValueKey(chartHistory.length),
+                          children: chartHistory,
+                        ),
+                      ),
+                    ),
+                  if (history.isNotEmpty && infoTiles.length > 1)
+                    SliverList(
+                      delegate: SliverChildListDelegate(infoTiles),
+                    ),
+                  SliverList.builder(
+                    itemCount: history.length,
+                    itemBuilder: (context, index) {
+                      return Card(
+                        margin: const EdgeInsets.symmetric(
+                            vertical: 8, horizontal: 16),
+                        clipBehavior: Clip.antiAlias,
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 8)
+                              .copyWith(bottom: 16),
+                          child: Column(
+                            children: [
+                              ExerciseDataView(
+                                exercise: history[index].$1,
+                                index: history[index].$2,
+                                workout: history[index].$3,
+                                isInSuperset: false,
+                                weightUnit: history[index].$3.weightUnit,
+                                distanceUnit: history[index].$3.distanceUnit,
+                              ),
+                              const Divider(),
+                              Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 16),
+                                child: Column(
+                                  children: [
+                                    ListTile(
+                                      leading: CircleAvatar(
+                                        backgroundColor: Theme.of(context)
+                                            .colorScheme
+                                            .primaryContainer,
+                                        foregroundColor: Theme.of(context)
+                                            .colorScheme
+                                            .onPrimaryContainer,
+                                        child: Text(history[index]
+                                            .$3
+                                            .name
+                                            .characters
+                                            .first
+                                            .toUpperCase()),
+                                      ),
+                                      title: Text(history[index].$3.name),
+                                      subtitle: Text(DateFormat.yMd(
+                                              context.locale.languageCode)
+                                          .add_Hm()
+                                          .format(
+                                              history[index].$3.startingDate ??
+                                                  DateTime.now())),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              OutlinedButton(
+                                onPressed: () {
+                                  Go.to(
+                                    () => ExercisesView(
+                                        workout: history[index].$3),
+                                  );
+                                },
+                                child: Text("exercise.info.viewWorkout".t),
+                              )
+                            ],
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                  if (history.isEmpty) ...[
+                    SliverToBoxAdapter(
+                      child: Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: Text("exercise.info.noHistory".t),
+                      ),
+                    ),
+                  ],
+                  const SliverToBoxAdapter(
+                    child: SizedBox(height: 8),
+                  ),
+                  if (kDebugMode)
+                    SliverToBoxAdapter(
+                      child: Text(
+                        "id: ${widget.exercise.id}",
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 
   List<ListTileTheme> _getInfoTiles(Exercise exercise, BuildContext context) {
+    final history = historyStream.value;
+    if (history.isEmpty) return [];
     return [
       Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -390,13 +441,15 @@ class _ExerciseInfoViewState extends State<ExerciseInfoView> {
           for (final hist in history) {
             final (Exercise exercise, int _, Workout workout) = hist;
             if (exercise.sets.where((set) => set.done).isEmpty) continue;
+            var val = exercise.sets
+                .where((set) => set.done)
+                .map((set) => set.oneRepMax)
+                .whereType<num>()
+                .safeMax
+                ?.toDouble();
+            if (val == null) continue;
             final value = Weights.convert(
-                value: exercise.sets
-                    .where((set) => set.done)
-                    .map((set) => set.oneRepMax)
-                    .whereType<num>()
-                    .max
-                    .toDouble(),
+                value: val,
                 from: workout.weightUnit,
                 to: settingsController.weightUnit.value);
             if (value > bestScore) {

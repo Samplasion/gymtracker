@@ -173,6 +173,17 @@ extension NumIterableUtils<T extends num> on Iterable<T> {
     return max;
   }
 
+  T? get safeMax {
+    if (isEmpty) return null;
+    T max = first;
+    for (final element in this) {
+      if (element > max) {
+        max = element;
+      }
+    }
+    return max;
+  }
+
   T get _zero => switch (T) {
         double => 0.0,
         num => 0,

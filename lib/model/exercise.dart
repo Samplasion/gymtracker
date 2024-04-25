@@ -91,6 +91,36 @@ class Exercise extends WorkoutExercisable {
     return getStandardExerciseByID(query!) != null;
   }
 
+  List<GTSet> get doneSets => [
+        for (final set in sets)
+          if (set.done) set
+      ];
+  double? get liftedWeight {
+    if (parameters != GTSetParameters.repsWeight &&
+        parameters != GTSetParameters.timeWeight) return null;
+
+    return doneSets.fold(0.0,
+        (value, element) => value! + (element.weight ?? 0) * (element.reps!));
+  }
+
+  double? get distanceRun {
+    if (parameters != GTSetParameters.distance) return null;
+    return doneSets.fold(0.0, (value, element) => value! + (element.distance!));
+  }
+
+  Duration? get time {
+    if (parameters != GTSetParameters.time &&
+        parameters != GTSetParameters.timeWeight) return null;
+    return doneSets.fold(
+        Duration.zero, (value, element) => value! + (element.time!));
+  }
+
+  int? get reps {
+    if (parameters != GTSetParameters.repsWeight &&
+        parameters != GTSetParameters.freeBodyReps) return null;
+    return doneSets.fold(0, (value, element) => value! + (element.reps ?? 0));
+  }
+
   Exercise.raw({
     String? id,
     required this.name,

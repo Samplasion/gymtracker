@@ -8,14 +8,18 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:gymtracker/controller/debug_controller.dart';
 import 'package:gymtracker/controller/history_controller.dart';
+import 'package:gymtracker/controller/me_controller.dart';
 import 'package:gymtracker/controller/routines_controller.dart';
 import 'package:gymtracker/controller/stopwatch_controller.dart';
 import 'package:gymtracker/controller/workout_controller.dart';
+import 'package:gymtracker/data/weights.dart';
 import 'package:gymtracker/model/exercise.dart';
+import 'package:gymtracker/model/measurements.dart';
 import 'package:gymtracker/service/database.dart';
 import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/service/logger.dart';
 import 'package:gymtracker/utils/go.dart';
+import 'package:gymtracker/utils/noise.dart';
 import 'package:gymtracker/utils/theme.dart';
 import 'package:gymtracker/view/settings/radio.dart';
 import 'package:gymtracker/view/utils/import_routine.dart';
@@ -169,6 +173,12 @@ class _DebugViewState extends State<DebugView> {
                 title: const Text("MaterialBanner test"),
                 onTap: () async {
                   Go.to(() => const _DebugMaterialBannerTest());
+                },
+              ),
+              ListTile(
+                title: const Text("Add random weights..."),
+                onTap: () async {
+                  Go.toDialog(() => const _DebugAddRandomWeightAlert());
                 },
               ),
 
@@ -603,6 +613,88 @@ class _DebugMaterialBannerTestState extends State<_DebugMaterialBannerTest> {
           ),
         ],
       ),
+    );
+  }
+}
+
+class _DebugAddRandomWeightAlert extends StatefulWidget {
+  const _DebugAddRandomWeightAlert();
+
+  @override
+  State<_DebugAddRandomWeightAlert> createState() =>
+      __DebugAddRandomWeightAlertState();
+}
+
+class __DebugAddRandomWeightAlertState
+    extends State<_DebugAddRandomWeightAlert> {
+  double startingWeight = 80;
+  int numberOfWeights = 5;
+  int displacement = 0;
+
+  @override
+  Widget build(BuildContext context) {
+    final meController = Get.find<MeController>();
+
+    return AlertDialog(
+      title: const Text("Add random weight"),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text("Starting weight: $startingWeight"),
+          Slider(
+            value: startingWeight,
+            onChanged: (value) => setState(() => startingWeight = value),
+            min: 10.0,
+            max: 500.0,
+          ),
+          Text("Number of weights: $numberOfWeights"),
+          Slider(
+            value: numberOfWeights.toDouble(),
+            onChanged: (value) =>
+                setState(() => numberOfWeights = value.toInt()),
+            min: 1.0,
+            max: 50.0,
+            divisions: 49,
+          ),
+          Text("Displacement: $displacement day(s)"),
+          Slider(
+            value: displacement.toDouble(),
+            onChanged: (value) => setState(() => displacement = value.toInt()),
+            min: 0.0,
+            max: 14.0,
+            divisions: 14,
+          ),
+        ],
+      ),
+      actions: [
+        TextButton(
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+          child: const Text("Cancel"),
+        ),
+        TextButton(
+          onPressed: () {
+            final now = DateTime.now();
+            final noise = noiseSeries(numberOfWeights);
+            final weights = [
+              for (var i = 0; i < numberOfWeights; i++)
+                WeightMeasurement.generateID(
+                  weight: startingWeight + noise[i] * 20,
+                  time: now.subtract(Duration(
+                    days: i * displacement,
+                  )),
+                  weightUnit: Weights.kg,
+                ),
+            ];
+            for (final weight in weights) {
+              meController.addWeightMeasurement(weight);
+            }
+            Navigator.of(context).pop();
+          },
+          child: const Text("Add"),
+        ),
+      ],
     );
   }
 }

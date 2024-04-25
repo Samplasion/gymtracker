@@ -28,17 +28,33 @@ abstract class GTMeasurement {
   String get type;
 }
 
-@CopyWith()
-@JsonSerializable()
-class WeightMeasurement extends GTMeasurement
-    implements Insertable<WeightMeasurement> {
+class PredictedWeightMeasurement extends GTMeasurement {
   @override
   final String type = "weight";
 
-  final String id;
   final double weight;
   final DateTime time;
   final Weights weightUnit;
+
+  const PredictedWeightMeasurement({
+    required this.weight,
+    required this.time,
+    required this.weightUnit,
+  });
+
+  @override
+  Map<String, dynamic> toJson() => throw UnimplementedError();
+
+  @override
+  String toString() =>
+      """PredictedWeightMeasurement($weight ${weightUnit.name}, predicted at $time)""";
+}
+
+@CopyWith()
+@JsonSerializable()
+class WeightMeasurement extends PredictedWeightMeasurement
+    implements Insertable<WeightMeasurement> {
+  final String id;
 
   double get convertedWeight => Weights.convert(
         value: weight,
@@ -48,15 +64,15 @@ class WeightMeasurement extends GTMeasurement
 
   const WeightMeasurement({
     required this.id,
-    required this.weight,
-    required this.time,
-    required this.weightUnit,
+    required super.weight,
+    required super.time,
+    required super.weightUnit,
   });
 
   WeightMeasurement.generateID({
-    required this.weight,
-    required this.time,
-    required this.weightUnit,
+    required super.weight,
+    required super.time,
+    required super.weightUnit,
   }) : id = const Uuid().v4();
 
   factory WeightMeasurement.fromJson(Map<String, dynamic> json) =>

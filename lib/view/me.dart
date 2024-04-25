@@ -11,10 +11,12 @@ import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/utils/constants.dart';
 import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/utils/go.dart';
+import 'package:gymtracker/utils/theme.dart';
 import 'package:gymtracker/utils/utils.dart';
 import 'package:gymtracker/view/charts/weight_chart.dart';
 import 'package:gymtracker/view/me/calendar.dart';
 import 'package:gymtracker/view/me/statistics.dart';
+import 'package:gymtracker/view/utils/crossfade.dart';
 import 'package:gymtracker/view/utils/date_field.dart';
 import 'package:gymtracker/view/utils/section_title.dart';
 import 'package:gymtracker/view/utils/speed_dial.dart';
@@ -207,10 +209,83 @@ class WeightCard extends StatelessWidget {
   }
 }
 
-class WeightMeasurementDataPage extends StatelessWidget {
+class WeightMeasurementDataPage extends StatefulWidget {
   const WeightMeasurementDataPage({super.key});
 
+  @override
+  State<WeightMeasurementDataPage> createState() =>
+      _WeightMeasurementDataPageState();
+}
+
+class _WeightMeasurementDataPageState extends State<WeightMeasurementDataPage> {
   MeController get controller => Get.find<MeController>();
+
+  Widget get chart {
+    final predictedWeight = controller.predictedWeight.valueOrNull;
+    return Crossfade(
+      firstChild: const SizedBox.shrink(),
+      secondChild: Padding(
+        padding: const EdgeInsets.all(16),
+        child: SafeArea(
+          top: false,
+          bottom: false,
+          child: Card(
+            clipBehavior: Clip.hardEdge,
+            margin: EdgeInsets.zero,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if (predictedWeight != null) ...[
+                  ListTile(
+                    leading: CircleAvatar(
+                      backgroundColor: context.colorScheme.quaternaryContainer,
+                      foregroundColor:
+                          context.colorScheme.onQuaternaryContainer,
+                      child: Icon(() {
+                        final diff = predictedWeight.weight -
+                            controller.latestWeightMeasurement!.weight;
+                        final normalized = (diff * 100).truncate();
+                        if (normalized > 10) {
+                          return Icons.trending_up_rounded;
+                        } else if (normalized < -10) {
+                          return Icons.trending_down_rounded;
+                        } else {
+                          return Icons.trending_flat_rounded;
+                        }
+                      }()),
+                    ),
+                    title: Text("me.allData.predictedWeight.label".t),
+                    subtitle: Text(
+                      "${predictedWeight.weight.userFacingWeight} (${DateFormat.yMd(context.locale.languageCode).format(predictedWeight.time)})",
+                    ),
+                    onTap: () {
+                      Go.dialog("me.allData.predictedWeight.dialog.title".t,
+                          "me.allData.predictedWeight.dialog.text".t);
+                    },
+                    trailing: const Icon(Icons.info_rounded),
+                  ),
+                  const Divider(),
+                ],
+                ConstrainedBox(
+                  constraints: const BoxConstraints(maxHeight: 200),
+                  child: WeightChart(
+                    weights: controller.weightMeasurements
+                        .map((element) => Weights.convert(
+                            value: element.weight,
+                            from: element.weightUnit,
+                            to: settingsController.weightUnit.value))
+                        .toList(),
+                    predictedWeight: predictedWeight?.weight,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+      showSecond: controller.weightMeasurements.length > 1,
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -234,51 +309,58 @@ class WeightMeasurementDataPage extends StatelessWidget {
             );
           }
 
-          return ListView.builder(
-            itemBuilder: (context, index) {
-              final measurement = measurements[index];
-              return Slidable(
-                key: ValueKey(measurement.id),
-                endActionPane: ActionPane(
-                  extentRatio: 1 / 3,
-                  dragDismissible: false,
-                  motion: const BehindMotion(),
-                  children: [
-                    SlidableAction(
-                      onPressed: (_) {
-                        controller.removeWeightMeasurement(measurement);
-                        Go.snack(
-                          "me.allData.removed.text".t,
-                          action: SnackBarAction(
-                            label: "actions.undo".t,
-                            onPressed: () {
-                              controller.addWeightMeasurement(measurement);
-                            },
-                          ),
-                        );
-                      },
-                      backgroundColor: scheme.error,
-                      foregroundColor: scheme.onError,
-                      icon: Icons.delete_forever_rounded,
-                      label: 'actions.remove'.t,
+          return CustomScrollView(
+            slivers: [
+              SliverToBoxAdapter(child: chart),
+              SliverList.builder(
+                itemBuilder: (context, index) {
+                  final measurement = measurements[index];
+                  return Slidable(
+                    key: ValueKey(measurement.id),
+                    endActionPane: ActionPane(
+                      extentRatio: 1 / 3,
+                      dragDismissible: false,
+                      motion: const BehindMotion(),
+                      children: [
+                        SlidableAction(
+                          onPressed: (_) {
+                            controller.removeWeightMeasurement(measurement);
+                            Go.snack(
+                              "me.allData.removed.text".t,
+                              action: SnackBarAction(
+                                label: "actions.undo".t,
+                                onPressed: () {
+                                  controller.addWeightMeasurement(measurement);
+                                },
+                              ),
+                              assertive: true,
+                            );
+                          },
+                          backgroundColor: scheme.error,
+                          foregroundColor: scheme.onError,
+                          icon: Icons.delete_forever_rounded,
+                          label: 'actions.remove'.t,
+                        ),
+                      ],
                     ),
-                  ],
-                ),
-                child: ListTile(
-                  title: Text(measurement.convertedWeight.userFacingWeight),
-                  subtitle: Text(DateFormat.MMMd(context.locale.languageCode)
-                      .add_Hm()
-                      .format(measurement.time)),
-                  trailing: const Icon(Icons.chevron_right_rounded),
-                  onTap: () {
-                    Go.to(() => WeightMeasurementDataDetailsPage(
-                          measurementID: measurement.id,
-                        ));
-                  },
-                ),
-              );
-            },
-            itemCount: controller.weightMeasurements.length,
+                    child: ListTile(
+                      title: Text(measurement.convertedWeight.userFacingWeight),
+                      subtitle: Text(
+                          DateFormat.MMMd(context.locale.languageCode)
+                              .add_Hm()
+                              .format(measurement.time)),
+                      trailing: const Icon(Icons.chevron_right_rounded),
+                      onTap: () {
+                        Go.to(() => WeightMeasurementDataDetailsPage(
+                              measurementID: measurement.id,
+                            ));
+                      },
+                    ),
+                  );
+                },
+                itemCount: controller.weightMeasurements.length,
+              ),
+            ],
           );
         },
       ),

@@ -368,7 +368,7 @@ class _ExerciseInfoViewState extends State<ExerciseInfoView> {
                     .toDouble(),
                 from: workout.weightUnit,
                 to: settingsController.weightUnit.value);
-            if (value >= bestScore) {
+            if (value > bestScore) {
               best = hist;
               bestScore = value;
             }
@@ -399,7 +399,7 @@ class _ExerciseInfoViewState extends State<ExerciseInfoView> {
                     .toDouble(),
                 from: workout.weightUnit,
                 to: settingsController.weightUnit.value);
-            if (value >= bestScore) {
+            if (value > bestScore) {
               best = hist;
               bestScore = value;
             }
@@ -427,7 +427,7 @@ class _ExerciseInfoViewState extends State<ExerciseInfoView> {
                   value: set.weight!,
                   from: workout.weightUnit,
                   to: settingsController.weightUnit.value);
-              if ((value * set.reps!) >= bestScore) {
+              if ((value * set.reps!) > bestScore) {
                 best = hist;
                 bestScore = (value * set.reps!);
                 bestWeight = value;
@@ -462,7 +462,7 @@ class _ExerciseInfoViewState extends State<ExerciseInfoView> {
                     .toDouble(),
                 from: workout.weightUnit,
                 to: settingsController.weightUnit.value);
-            if (value >= bestScore) {
+            if (value > bestScore) {
               best = hist;
               bestScore = value;
             }

@@ -19,9 +19,8 @@ import 'package:gymtracker/service/logger.dart';
 import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/utils/sets.dart';
-import 'package:gymtracker/utils/theme.dart';
+import 'package:gymtracker/view/charts/bar_charts.dart';
 import 'package:gymtracker/view/charts/routine_history.dart';
-import 'package:gymtracker/view/charts/workout_muscle_categories.dart';
 import 'package:gymtracker/view/components/badges.dart';
 import 'package:gymtracker/view/components/infobox.dart';
 import 'package:gymtracker/view/components/maybe_rich_text.dart';
@@ -55,7 +54,7 @@ class _ExercisesViewState extends State<ExercisesView> {
           padding: const EdgeInsets.all(16),
           child: RoutineHistoryChart(routine: workout),
         ),
-      if (workout.isConcrete && _getSynthesizedWorkout().liftedWeight > 0)
+      if (WeightDistributionBarChart.shouldShow(_getSynthesizedWorkout()))
         Padding(
           padding: const EdgeInsets.all(16),
           child: WeightDistributionBarChart(
@@ -746,50 +745,6 @@ class OverwriteDialog extends StatelessWidget {
           child: Text("ongoingWorkout.overwrite.actions.yes".t),
         ),
       ],
-    );
-  }
-}
-
-class WeightDistributionBarChart extends StatelessWidget {
-  final Workout workout;
-
-  const WeightDistributionBarChart({required this.workout, super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    final mappedWeights = <GTMuscleCategory, double>{};
-
-    void processExercise(Exercise ex) {
-      for (final group in [
-        ex.primaryMuscleGroup,
-        ...ex.secondaryMuscleGroups
-      ]) {
-        if (group.category == null) continue;
-        mappedWeights[group.category!] =
-            (mappedWeights[group.category!] ?? 0) + ex.liftedWeight!;
-      }
-    }
-
-    for (final ex in workout.exercises) {
-      ex.when(
-        exercise: processExercise,
-        superset: (s) => s.exercises.forEach(processExercise),
-      );
-    }
-    final max = mappedWeights.values
-        .reduce((value, element) => value > element ? value : element);
-
-    final percentages = {
-      for (final entry in mappedWeights.entries) entry.key: entry.value / max,
-    };
-
-    return RawMuscleCategoriesBarChart(
-      title: "exerciseList.workoutWeightDistributionBarChart.label".t,
-      data: percentages,
-      color: context.colorScheme.quinary,
-      rightSideLabelBuilder: (category) {
-        return mappedWeights[category]!.userFacingWeight;
-      },
     );
   }
 }

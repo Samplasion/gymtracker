@@ -4,7 +4,7 @@ import 'package:gymtracker/model/workout.dart';
 import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/utils/constants.dart';
 import 'package:gymtracker/utils/extensions.dart';
-import 'package:gymtracker/view/charts/workout_muscle_categories.dart';
+import 'package:gymtracker/view/charts/bar_charts.dart';
 import 'package:gymtracker/view/utils/speed_dial.dart';
 import 'package:gymtracker/view/utils/timer.dart';
 
@@ -45,6 +45,10 @@ class WorkoutDoneSheet extends StatelessWidget {
                   'ongoingWorkout.goodJob.body'.t,
                   style: context.theme.textTheme.bodyLarge,
                 ),
+                if (WeightDistributionBarChart.shouldShow(workout)) ...[
+                  const SizedBox(height: 16),
+                  WeightDistributionBarChart(workout: workout),
+                ],
                 if (WorkoutMuscleCategoriesBarChart.shouldShow(workout)) ...[
                   const SizedBox(height: 16),
                   WorkoutMuscleCategoriesBarChart(workout: workout),

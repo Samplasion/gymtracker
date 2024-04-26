@@ -11,30 +11,6 @@ import 'package:gymtracker/utils/theme.dart';
 const kBarHeight = 24.0;
 const kBarPadding = 24.0;
 
-class WorkoutMuscleCategoriesBarChart extends GetWidget<HistoryController> {
-  final Workout workout;
-
-  const WorkoutMuscleCategoriesBarChart({required this.workout, super.key});
-
-  static bool shouldShow(Workout workout) => Get.find<HistoryController>()
-      .calculateMuscleCategoryDistributionFor(workouts: [workout])
-      .entries
-      .where((e) => e.value > 0)
-      .isNotEmpty;
-
-  @override
-  Widget build(BuildContext context) {
-    final data =
-        controller.calculateMuscleCategoryDistributionFor(workouts: [workout]);
-
-    return RawMuscleCategoriesBarChart(
-      title: "exerciseList.workoutMuscleCategoriesBarChart.label".t,
-      data: data,
-      color: context.colorScheme.quaternary,
-    );
-  }
-}
-
 class RawMuscleCategoriesBarChart extends StatelessWidget {
   final String title;
   final Map<GTMuscleCategory, double> data;
@@ -166,6 +142,78 @@ class RawMuscleCategoriesBarChart extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+}
+
+class WorkoutMuscleCategoriesBarChart extends GetWidget<HistoryController> {
+  final Workout workout;
+
+  const WorkoutMuscleCategoriesBarChart({required this.workout, super.key});
+
+  static bool shouldShow(Workout workout) => Get.find<HistoryController>()
+      .calculateMuscleCategoryDistributionFor(workouts: [workout])
+      .entries
+      .where((e) => e.value > 0)
+      .isNotEmpty;
+
+  @override
+  Widget build(BuildContext context) {
+    final data =
+        controller.calculateMuscleCategoryDistributionFor(workouts: [workout]);
+
+    return RawMuscleCategoriesBarChart(
+      title: "exerciseList.workoutMuscleCategoriesBarChart.label".t,
+      data: data,
+      color: context.colorScheme.quaternary,
+    );
+  }
+}
+
+class WeightDistributionBarChart extends StatelessWidget {
+  final Workout workout;
+
+  const WeightDistributionBarChart({required this.workout, super.key});
+
+  static bool shouldShow(Workout workout) =>
+      workout.isConcrete && workout.liftedWeight > 0;
+
+  @override
+  Widget build(BuildContext context) {
+    final mappedWeights = <GTMuscleCategory, double>{};
+
+    void processExercise(Exercise ex) {
+      if (ex.liftedWeight == null) return;
+      for (final group in [
+        ex.primaryMuscleGroup,
+        ...ex.secondaryMuscleGroups
+      ]) {
+        if (group.category == null) continue;
+        mappedWeights[group.category!] =
+            (mappedWeights[group.category!] ?? 0) + ex.liftedWeight!;
+      }
+    }
+
+    for (final ex in workout.exercises) {
+      ex.when(
+        exercise: processExercise,
+        superset: (s) => s.exercises.forEach(processExercise),
+      );
+    }
+    final max = mappedWeights.values
+        .reduce((value, element) => value > element ? value : element);
+
+    final percentages = {
+      for (final entry in mappedWeights.entries) entry.key: entry.value / max,
+    };
+
+    return RawMuscleCategoriesBarChart(
+      title: "exerciseList.workoutWeightDistributionBarChart.label".t,
+      data: percentages,
+      color: context.colorScheme.quinary,
+      rightSideLabelBuilder: (category) {
+        return mappedWeights[category]!.userFacingWeight;
+      },
     );
   }
 }

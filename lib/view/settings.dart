@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:gymtracker/controller/settings_controller.dart';
 import 'package:gymtracker/data/distance.dart';
 import 'package:gymtracker/data/weights.dart';
+import 'package:gymtracker/model/preferences.dart';
 import 'package:gymtracker/service/color.dart';
 import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/service/version.dart';
@@ -51,9 +52,10 @@ class SettingsView extends StatelessWidget {
                         builder: (value, onChange) => ColorModalTile(
                           title: Text("settings.options.color.label".t),
                           onChange: onChange,
-                          selectedValue: value ?? Colors.blue,
+                          selectedValue: value ?? Prefs.defaultValue.color,
                         ),
-                        onUpdate: (v) => controller.setColor(v ?? Colors.blue),
+                        onUpdate: (v) =>
+                            controller.setColor(v ?? Prefs.defaultValue.color),
                       ),
                     ),
                     secondChild: const SizedBox.shrink(),
@@ -61,6 +63,35 @@ class SettingsView extends StatelessWidget {
                     duration: const Duration(milliseconds: 300),
                   );
                 },
+              ),
+              ValueBuilder<bool?>(
+                initialValue: controller.amoledMode.value,
+                builder: (value, onChanged) => SwitchListTile(
+                  title: Text(
+                      "settings.options.amoledMode.label.${context.theme.brightness.name}"
+                          .t),
+                  value: value ?? Prefs.defaultValue.amoledMode,
+                  onChanged: onChanged,
+                ),
+                onUpdate: (v) => controller
+                    .setAmoledMode(v ?? Prefs.defaultValue.amoledMode),
+              ),
+              Obx(
+                () => ValueBuilder<ThemeMode?>(
+                  initialValue: controller.themeMode.value,
+                  builder: (value, onChange) => RadioModalTile(
+                    title: Text("settings.options.themeMode.label".t),
+                    onChange: onChange,
+                    values: {
+                      for (final mode in ThemeMode.values)
+                        mode:
+                            "settings.options.themeMode.values.${mode.name}".t,
+                    },
+                    selectedValue: value ?? ThemeMode.system,
+                  ),
+                  onUpdate: (v) =>
+                      controller.setThemeMode(v ?? ThemeMode.system),
+                ),
               ),
               Obx(
                 () => ValueBuilder<Locale?>(

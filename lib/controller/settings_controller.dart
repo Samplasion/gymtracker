@@ -9,6 +9,7 @@ import 'package:get/get.dart';
 import 'package:gymtracker/controller/serviceable_controller.dart';
 import 'package:gymtracker/data/distance.dart';
 import 'package:gymtracker/data/weights.dart';
+import 'package:gymtracker/model/preferences.dart';
 import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/service/logger.dart';
 import 'package:gymtracker/utils/go.dart';
@@ -20,12 +21,14 @@ SettingsController get settingsController => Get.find<SettingsController>();
 
 class SettingsController extends GetxController with ServiceableController {
   RxBool hasInitialized = false.obs;
-  RxBool usesDynamicColor = false.obs;
-  Rx<Color> color = defaultColor.obs;
-  Rx<Locale?> locale = Get.locale.obs;
-  Rx<Weights> weightUnit = Weights.kg.obs;
-  Rx<Distance> distanceUnit = Distance.km.obs;
-  RxBool showSuggestedRoutines = true.obs;
+  RxBool usesDynamicColor = Prefs.defaultValue.usesDynamicColor.obs;
+  Rx<Color> color = Prefs.defaultValue.color.obs;
+  Rx<Locale?> locale = Prefs.defaultValue.locale.obs;
+  Rx<Weights> weightUnit = Prefs.defaultValue.weightUnit.obs;
+  Rx<Distance> distanceUnit = Prefs.defaultValue.distanceUnit.obs;
+  RxBool showSuggestedRoutines = Prefs.defaultValue.showSuggestedRoutines.obs;
+  RxBool amoledMode = Prefs.defaultValue.amoledMode.obs;
+  Rx<ThemeMode> themeMode = Prefs.defaultValue.themeMode.obs;
 
   void setUsesDynamicColor(bool usesDC) =>
       service.writeSettings(service.prefs$.value.copyWith(
@@ -55,6 +58,16 @@ class SettingsController extends GetxController with ServiceableController {
         showSuggestedRoutines: show,
       ));
 
+  void setAmoledMode(bool amoledMode) =>
+      service.writeSettings(service.prefs$.value.copyWith(
+        amoledMode: amoledMode,
+      ));
+
+  void setThemeMode(ThemeMode themeMode) =>
+      service.writeSettings(service.prefs$.value.copyWith(
+        themeMode: themeMode,
+      ));
+
   @override
   void onInit() {
     super.onInit();
@@ -70,6 +83,8 @@ class SettingsController extends GetxController with ServiceableController {
       weightUnit(prefs.weightUnit);
       distanceUnit(prefs.distanceUnit);
       showSuggestedRoutines(prefs.showSuggestedRoutines);
+      amoledMode(prefs.amoledMode);
+      themeMode(prefs.themeMode);
 
       notifyChildrens();
     });
@@ -85,6 +100,8 @@ class SettingsController extends GetxController with ServiceableController {
     weightUnit(prefs.weightUnit);
     distanceUnit(prefs.distanceUnit);
     showSuggestedRoutines(prefs.showSuggestedRoutines);
+    amoledMode(prefs.amoledMode);
+    themeMode(prefs.themeMode);
 
     notifyChildrens();
   }

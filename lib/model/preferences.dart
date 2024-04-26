@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:ui';
 
 import 'package:drift/drift.dart';
+import 'package:flutter/material.dart';
 import 'package:gymtracker/data/distance.dart';
 import 'package:gymtracker/data/weights.dart';
 import 'package:gymtracker/db/database.dart';
@@ -14,6 +15,8 @@ class Prefs implements Insertable<Preference> {
   final Weights weightUnit;
   final Distance distanceUnit;
   final bool showSuggestedRoutines;
+  final bool amoledMode;
+  final ThemeMode themeMode;
 
   const Prefs({
     required this.usesDynamicColor,
@@ -22,6 +25,8 @@ class Prefs implements Insertable<Preference> {
     required this.weightUnit,
     required this.distanceUnit,
     required this.showSuggestedRoutines,
+    required this.amoledMode,
+    required this.themeMode,
   });
 
   factory Prefs.fromDatabase(Preference row) =>
@@ -34,6 +39,8 @@ class Prefs implements Insertable<Preference> {
     weightUnit: Weights.kg,
     distanceUnit: Distance.km,
     showSuggestedRoutines: true,
+    amoledMode: true,
+    themeMode: ThemeMode.system,
   );
 
   Map<String, dynamic> toJson() => {
@@ -46,6 +53,8 @@ class Prefs implements Insertable<Preference> {
         "weightUnit": weightUnit.name,
         "distanceUnit": distanceUnit.name,
         "showSuggestedRoutines": showSuggestedRoutines,
+        "amoledMode": amoledMode,
+        "themeMode": themeMode.name,
       };
 
   factory Prefs.fromJson(Map<String, dynamic> json) {
@@ -63,6 +72,11 @@ class Prefs implements Insertable<Preference> {
           : Distance.values.firstWhere((d) => d.name == json['distanceUnit']),
       showSuggestedRoutines:
           json['showSuggestedRoutines'] ?? defaults.showSuggestedRoutines,
+      amoledMode: json['amoledMode'] ?? defaults.amoledMode,
+      themeMode: ThemeMode.values.firstWhere(
+        (t) => t.name == json['themeMode'],
+        orElse: () => defaults.themeMode,
+      ),
     );
   }
 
@@ -75,6 +89,8 @@ class Prefs implements Insertable<Preference> {
   weightUnit: $weightUnit,
   distanceUnit: $distanceUnit,
   showSuggestedRoutines: $showSuggestedRoutines,
+  amoledMode: $amoledMode,
+  themeMode: $themeMode,
 )""";
   }
 
@@ -92,6 +108,8 @@ class Prefs implements Insertable<Preference> {
     Weights? weightUnit,
     Distance? distanceUnit,
     bool? showSuggestedRoutines,
+    bool? amoledMode,
+    ThemeMode? themeMode,
   }) {
     return Prefs(
       usesDynamicColor: usesDynamicColor ?? this.usesDynamicColor,
@@ -101,6 +119,8 @@ class Prefs implements Insertable<Preference> {
       distanceUnit: distanceUnit ?? this.distanceUnit,
       showSuggestedRoutines:
           showSuggestedRoutines ?? this.showSuggestedRoutines,
+      amoledMode: amoledMode ?? this.amoledMode,
+      themeMode: themeMode ?? this.themeMode,
     );
   }
 }

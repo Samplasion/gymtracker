@@ -78,20 +78,25 @@ class MainApp extends StatelessWidget {
               return Container(
                 child: () {
                   final seedColor = settings.color();
-                  final lightScheme =
+                  var lightScheme =
                       (light != null && settings.usesDynamicColor())
                           ? light.harmonized()
                           : ColorScheme.fromSeed(
                               seedColor: seedColor,
                               brightness: Brightness.light,
-                            );
-                  final darkScheme =
-                      (dark != null && settings.usesDynamicColor())
-                          ? dark.harmonized()
-                          : ColorScheme.fromSeed(
-                              seedColor: seedColor,
-                              brightness: Brightness.dark,
                             ).harmonized();
+                  if (settings.amoledMode.isTrue) {
+                    lightScheme = lightScheme.neutralBackground();
+                  }
+                  var darkScheme = (dark != null && settings.usesDynamicColor())
+                      ? dark.harmonized()
+                      : ColorScheme.fromSeed(
+                          seedColor: seedColor,
+                          brightness: Brightness.dark,
+                        ).harmonized();
+                  if (settings.amoledMode.isTrue) {
+                    darkScheme = darkScheme.neutralBackground();
+                  }
                   return AnimatedBuilder(
                     animation: localizations,
                     builder: (context, _) {
@@ -123,24 +128,23 @@ class MainApp extends StatelessWidget {
                           GlobalWidgetsLocalizations.delegate,
                           GlobalCupertinoLocalizations.delegate,
                         ],
+                        themeMode: settings.themeMode(),
                         theme: ThemeData(
                           useMaterial3: true,
                           brightness: Brightness.light,
-                          colorScheme: lightScheme.neutralBackground(),
+                          colorScheme: lightScheme,
                           pageTransitionsTheme: pageTransitionsTheme,
                           extensions: [
-                            MoreColors.fromColorScheme(
-                                lightScheme.neutralBackground()),
+                            MoreColors.fromColorScheme(lightScheme),
                           ],
                         ),
                         darkTheme: ThemeData(
                           useMaterial3: true,
                           brightness: Brightness.dark,
-                          colorScheme: darkScheme.neutralBackground(),
+                          colorScheme: darkScheme,
                           pageTransitionsTheme: pageTransitionsTheme,
                           extensions: [
-                            MoreColors.fromColorScheme(
-                                darkScheme.neutralBackground()),
+                            MoreColors.fromColorScheme(darkScheme),
                           ],
                         ),
                         home: const _Loader(),

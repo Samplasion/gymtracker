@@ -479,7 +479,7 @@
       "distance": "@distance @unit"
     },
     "workoutMuscleCategoriesBarChart": {
-      "label": "Distribuzione muscolare"
+      "label": "Distribuzione muscolare (per serie effettuate)"
     },
     "stats": {
       "time": "Durata",
@@ -488,7 +488,7 @@
       "sets": "Serie"
     },
     "workoutWeightDistributionBarChart": {
-      "label": "Muscle distribution (by lifted weight)"
+      "label": "Distribuzione muscolare (per peso sollevato)"
     }
   },
   "general": {

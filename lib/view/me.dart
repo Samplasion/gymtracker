@@ -259,8 +259,8 @@ class _WeightMeasurementDataPageState extends State<WeightMeasurementDataPage> {
                       "${predictedWeight.weight.userFacingWeight} (${DateFormat.yMd(context.locale.languageCode).format(predictedWeight.time)})",
                     ),
                     onTap: () {
-                      Go.dialog("me.allData.predictedWeight.dialog.title".t,
-                          "me.allData.predictedWeight.dialog.text".t);
+                      Go.dialog("me.allData.predictedWeight.dialog.title",
+                          "me.allData.predictedWeight.dialog.text");
                     },
                     trailing: const Icon(Icons.info_rounded),
                   ),

@@ -19,6 +19,7 @@ import 'package:gymtracker/service/logger.dart';
 import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/utils/sets.dart';
+import 'package:gymtracker/utils/theme.dart';
 import 'package:gymtracker/view/charts/routine_history.dart';
 import 'package:gymtracker/view/charts/workout_muscle_categories.dart';
 import 'package:gymtracker/view/components/badges.dart';
@@ -48,6 +49,28 @@ class _ExercisesViewState extends State<ExercisesView> {
 
   @override
   Widget build(BuildContext context) {
+    final charts = [
+      if (RoutineHistoryChart.shouldShow(workout))
+        Padding(
+          padding: const EdgeInsets.all(16),
+          child: RoutineHistoryChart(routine: workout),
+        ),
+      if (workout.isConcrete && _getSynthesizedWorkout().liftedWeight > 0)
+        Padding(
+          padding: const EdgeInsets.all(16),
+          child: WeightDistributionBarChart(
+            workout: _getSynthesizedWorkout(),
+          ),
+        ),
+      if (WorkoutMuscleCategoriesBarChart.shouldShow(_getSynthesizedWorkout()))
+        Padding(
+          padding: const EdgeInsets.all(16),
+          child: WorkoutMuscleCategoriesBarChart(
+            workout: _getSynthesizedWorkout(),
+          ),
+        ),
+    ].separated();
+
     return Scaffold(
       appBar: AppBar(
         title: Text(workout.name),
@@ -221,20 +244,13 @@ class _ExercisesViewState extends State<ExercisesView> {
                 ),
               ),
             ),
-            if (RoutineHistoryChart.shouldShow(workout))
+            if (charts.isNotEmpty)
               SliverToBoxAdapter(
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: RoutineHistoryChart(routine: workout),
-                ),
-              ),
-            if (WorkoutMuscleCategoriesBarChart.shouldShow(
-                _getSynthesizedWorkout()))
-              SliverToBoxAdapter(
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: WorkoutMuscleCategoriesBarChart(
-                    workout: _getSynthesizedWorkout(),
+                child: Card(
+                  margin: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: charts,
                   ),
                 ),
               ),
@@ -730,6 +746,50 @@ class OverwriteDialog extends StatelessWidget {
           child: Text("ongoingWorkout.overwrite.actions.yes".t),
         ),
       ],
+    );
+  }
+}
+
+class WeightDistributionBarChart extends StatelessWidget {
+  final Workout workout;
+
+  const WeightDistributionBarChart({required this.workout, super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final mappedWeights = <GTMuscleCategory, double>{};
+
+    void processExercise(Exercise ex) {
+      for (final group in [
+        ex.primaryMuscleGroup,
+        ...ex.secondaryMuscleGroups
+      ]) {
+        if (group.category == null) continue;
+        mappedWeights[group.category!] =
+            (mappedWeights[group.category!] ?? 0) + ex.liftedWeight!;
+      }
+    }
+
+    for (final ex in workout.exercises) {
+      ex.when(
+        exercise: processExercise,
+        superset: (s) => s.exercises.forEach(processExercise),
+      );
+    }
+    final max = mappedWeights.values
+        .reduce((value, element) => value > element ? value : element);
+
+    final percentages = {
+      for (final entry in mappedWeights.entries) entry.key: entry.value / max,
+    };
+
+    return RawMuscleCategoriesBarChart(
+      title: "exerciseList.workoutWeightDistributionBarChart.label".t,
+      data: percentages,
+      color: context.colorScheme.quinary,
+      rightSideLabelBuilder: (category) {
+        return mappedWeights[category]!.userFacingWeight;
+      },
     );
   }
 }

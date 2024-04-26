@@ -4,7 +4,6 @@ import 'package:gymtracker/data/weights.dart';
 import 'package:gymtracker/model/measurements.dart';
 import 'package:gymtracker/model/preferences.dart';
 import 'package:gymtracker/service/logger.dart';
-import 'package:gymtracker/utils/extensions.dart';
 import 'package:rxdart/rxdart.dart';
 
 class MeController extends GetxController with ServiceableController {

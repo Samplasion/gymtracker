@@ -486,6 +486,9 @@
       "volume": "Volume",
       "distance": "Distanza",
       "sets": "Serie"
+    },
+    "workoutWeightDistributionBarChart": {
+      "label": "Muscle distribution (by lifted weight)"
     }
   },
   "general": {

@@ -51,6 +51,7 @@ dependencies:
   universal_platform: ^1.0.0+1
   uuid: ^4.0.0
 
+  drift_dev: any
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -64,7 +65,6 @@ dev_dependencies:
   flutter_driver:
     sdk: flutter
   test: ^1.24.3
-  drift_dev: ^2.16.0
 
 flutter:
   fonts:

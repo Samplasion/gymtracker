@@ -6,6 +6,7 @@ import 'package:gymtracker/model/exercise.dart';
 import 'package:gymtracker/model/workout.dart';
 import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/utils/extensions.dart';
+import 'package:gymtracker/utils/theme.dart';
 
 const kBarHeight = 24.0;
 const kBarPadding = 24.0;
@@ -25,22 +26,70 @@ class WorkoutMuscleCategoriesBarChart extends GetWidget<HistoryController> {
   Widget build(BuildContext context) {
     final data =
         controller.calculateMuscleCategoryDistributionFor(workouts: [workout]);
-    final nonEmptyData = data.entries.where((e) => e.value > 0).toList();
+
+    return RawMuscleCategoriesBarChart(
+      title: "exerciseList.workoutMuscleCategoriesBarChart.label".t,
+      data: data,
+      color: context.colorScheme.quaternary,
+    );
+  }
+}
+
+class RawMuscleCategoriesBarChart extends StatelessWidget {
+  final String title;
+  final Map<GTMuscleCategory, double> data;
+  final String Function(GTMuscleCategory, double) labelBuilder;
+  final Color? color;
+  final String Function(GTMuscleCategory)? rightSideLabelBuilder;
+  final EdgeInsetsGeometry padding;
+
+  RawMuscleCategoriesBarChart({
+    super.key,
+    required this.title,
+    required this.data,
+    this.labelBuilder = defaultLabelBuilder,
+    this.color,
+    this.rightSideLabelBuilder,
+    this.padding = const EdgeInsets.all(16),
+  });
+
+  static String defaultLabelBuilder(GTMuscleCategory cat, double percentage) =>
+      "${"muscleCategories.${cat.name}".t} (${percentage.round()}%)";
+
+  late final nonEmptyData = () {
+    final ned = data.entries.where((e) => e.value > 0).toList();
+    ned.sort((a, b) => a.value.compareTo(b.value));
+    return ned;
+  }();
+
+  @override
+  Widget build(BuildContext context) {
     final max = data.values.sum;
 
-    String getLabel(GTMuscleCategory cat) =>
-        "${"muscleCategories.${cat.name}".t} (${((data[cat] ?? 0) * 100 / max).round()}%)";
+    String _getLabel(GTMuscleCategory cat) {
+      final percentage = ((data[cat] ?? 0) * 100 / max);
+      return labelBuilder(cat, percentage);
+    }
 
     final textReservedSize = nonEmptyData.isEmpty
         ? 0.0
-        : nonEmptyData.map((e) => getLabel(e.key).computeSize().width + 16).max;
+        : nonEmptyData
+            .map((e) => _getLabel(e.key).computeSize().width + 16)
+            .max;
+
+    double rightSideReservedSize = 16;
+    if (rightSideLabelBuilder != null) {
+      rightSideReservedSize = nonEmptyData
+          .map((e) => rightSideLabelBuilder!(e.key).computeSize().width + 16)
+          .max;
+    }
 
     return Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          "exerciseList.workoutMuscleCategoriesBarChart.label".t,
+          title,
           style: context.textTheme.bodyLarge!
               .copyWith(fontWeight: FontWeight.bold),
         ),
@@ -62,7 +111,7 @@ class WorkoutMuscleCategoriesBarChart extends GetWidget<HistoryController> {
                         barRods: [
                           BarChartRodData(
                             toY: nonEmptyData[i].value / max,
-                            color: context.colorScheme.secondary,
+                            color: color ?? context.colorScheme.secondary,
                             width: 24,
                             borderRadius: BorderRadius.circular(4),
                           ),
@@ -78,11 +127,22 @@ class WorkoutMuscleCategoriesBarChart extends GetWidget<HistoryController> {
                   barTouchData: BarTouchData(enabled: false),
                   titlesData: FlTitlesData(
                     show: true,
-                    topTitles: const AxisTitles(
-                        sideTitles: SideTitles(
-                      showTitles: false,
-                      reservedSize: 16,
-                    )),
+                    topTitles: AxisTitles(
+                      sideTitles: SideTitles(
+                        showTitles: rightSideLabelBuilder != null,
+                        reservedSize: rightSideReservedSize,
+                        getTitlesWidget: (value, meta) {
+                          return RotatedBox(
+                            quarterTurns: -1,
+                            child: Text(
+                              textAlign: TextAlign.right,
+                              rightSideLabelBuilder!(
+                                  nonEmptyData[value.toInt()].key),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
                     leftTitles: const AxisTitles(
                         sideTitles: SideTitles(showTitles: false)),
                     rightTitles: const AxisTitles(
@@ -94,7 +154,7 @@ class WorkoutMuscleCategoriesBarChart extends GetWidget<HistoryController> {
                         getTitlesWidget: (x, meta) {
                           return RotatedBox(
                             quarterTurns: -1,
-                            child: Text(getLabel(nonEmptyData[x.toInt()].key)),
+                            child: Text(_getLabel(nonEmptyData[x.toInt()].key)),
                           );
                         },
                       ),

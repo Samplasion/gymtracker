@@ -478,14 +478,17 @@
       },
       "distance": "@distance @unit"
     },
-    "workoutMuscleCategoriesBarChart": {
-      "label": "Muscle distribution"
-    },
     "stats": {
       "time": "Duration",
       "volume": "Volume",
       "distance": "Distance",
       "sets": "Sets"
+    },
+    "workoutMuscleCategoriesBarChart": {
+      "label": "Muscle distribution (by number of sets)"
+    },
+    "workoutWeightDistributionBarChart": {
+      "label": "Muscle distribution (by lifted weight)"
     }
   },
   "general": {

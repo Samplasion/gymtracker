@@ -319,9 +319,23 @@
           "copy": "Il messaggio di errore è stato copiato negli appunti."
         }
       },
+      "amoledMode": {
+        "label": {
+          "dark": "Modalità AMOLED",
+          "light": "Modalità bianco puro"
+        }
+      },
       "export": {
         "label": "Esporta dati (JSON)",
         "filename": "Dati_GymTracker"
+      },
+      "themeMode": {
+        "label": "Tema",
+        "values": {
+          "system": "Sistema",
+          "light": "Chiaro",
+          "dark": "Scuro"
+        }
       }
     },
     "colorPicker": {

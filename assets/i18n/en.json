@@ -319,6 +319,20 @@
           "copy": "The error message has been copied to the clipboard."
         }
       },
+      "amoledMode": {
+        "label": {
+          "dark": "AMOLED mode",
+          "light": "Pure White mode"
+        }
+      },
+      "themeMode": {
+        "label": "Theme",
+        "values": {
+          "system": "System",
+          "light": "Light",
+          "dark": "Dark"
+        }
+      },
       "export": {
         "label": "Export data (JSON)",
         "filename": "GymTracker_Data"

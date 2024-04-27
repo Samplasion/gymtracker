@@ -99,8 +99,10 @@ class Exercise extends WorkoutExercisable {
     if (parameters != GTSetParameters.repsWeight &&
         parameters != GTSetParameters.timeWeight) return null;
 
-    return doneSets.fold(0.0,
-        (value, element) => value! + (element.weight ?? 0) * (element.reps!));
+    return doneSets.fold(
+        0.0,
+        (value, element) =>
+            value! + (element.weight ?? 0) * (element.reps ?? 1));
   }
 
   double? get distanceRun {

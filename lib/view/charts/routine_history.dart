@@ -208,7 +208,16 @@ class _RoutineHistoryChartState
               LineChartData(
                 gridData: FlGridData(
                   show: true,
-                  drawVerticalLine: false,
+                  drawVerticalLine: true,
+                  verticalInterval: 1,
+                  checkToShowVerticalLine: (value) {
+                    if (value % 1 != 0) return false;
+                    DateTime? prev =
+                        children.getAt(value.toInt() - 1)?.startingDate;
+                    if (prev == null) return true;
+                    DateTime? cur = children[value.toInt()].startingDate;
+                    return _getMonth(prev) != _getMonth(cur);
+                  },
                   getDrawingHorizontalLine: (value) {
                     return FlLine(
                       color: colorScheme.outlineVariant,
@@ -234,7 +243,6 @@ class _RoutineHistoryChartState
                     sideTitles: SideTitles(
                       showTitles: true,
                       reservedSize: 70,
-                      // interval: 1,
                       getTitlesWidget: leftTitleWidgets(context),
                     ),
                   ),
@@ -242,7 +250,6 @@ class _RoutineHistoryChartState
                     sideTitles: SideTitles(
                       showTitles: true,
                       reservedSize: 30,
-                      interval: 1,
                       getTitlesWidget: bottomTitleWidgets(context),
                     ),
                   ),
@@ -340,17 +347,16 @@ class _RoutineHistoryChartState
 
   Widget Function(double, TitleMeta) bottomTitleWidgets(BuildContext context) {
     return (double value, TitleMeta meta) {
+      if (value % 1 != 0) return const SizedBox.shrink();
+
       DateTime? cur = children[value.toInt()].startingDate;
       String text = DateFormat.Md(context.locale.languageCode)
           .format(cur ?? DateTime.now());
 
       if (value > 0) {
-        DateTime? prev = children[value.toInt() - 1].startingDate;
+        DateTime? prev = children.getAt(value.truncate() - 1)?.startingDate;
         if (_getDayMonth(prev) == _getDayMonth(cur)) {
           text = "";
-        } else if (_getMonth(prev) == _getMonth(cur)) {
-          text = DateFormat.d(context.locale.languageCode)
-              .format(cur ?? DateTime.now());
         }
       }
 

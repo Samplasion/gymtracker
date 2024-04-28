@@ -325,6 +325,10 @@
           "light": "Pure White mode"
         }
       },
+      "export": {
+        "label": "Export data (JSON)",
+        "filename": "GymTracker_Data"
+      },
       "themeMode": {
         "label": "Theme",
         "values": {
@@ -332,10 +336,6 @@
           "light": "Light",
           "dark": "Dark"
         }
-      },
-      "export": {
-        "label": "Export data (JSON)",
-        "filename": "GymTracker_Data"
       }
     },
     "colorPicker": {
@@ -930,5 +930,13 @@
     "body": "You can try the following:\n\n • Restart the app\n • Check if you are using the latest version\n • Contact support",
     "stack": "If the error persists, please provide the following information to the support team:",
     "noStack": "No stack trace available."
+  },
+  "timeSeriesChart": {
+    "selectInterval": "Select interval",
+    "interval": {
+      "threeMonths": "3 months",
+      "sixMonths": "6 months",
+      "oneYear": "1 year"
+    }
   }
 }

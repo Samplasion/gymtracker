@@ -325,10 +325,6 @@
           "light": "Modalità bianco puro"
         }
       },
-      "export": {
-        "label": "Esporta dati (JSON)",
-        "filename": "Dati_GymTracker"
-      },
       "themeMode": {
         "label": "Tema",
         "values": {
@@ -336,6 +332,10 @@
           "light": "Chiaro",
           "dark": "Scuro"
         }
+      },
+      "export": {
+        "label": "Esporta dati (JSON)",
+        "filename": "Dati_GymTracker"
       }
     },
     "colorPicker": {
@@ -930,5 +930,13 @@
     "body": "Se il problema persiste, prova a:\n\n • Riavviare l'app\n • Assicurarti di avere l'ultima versione dell'app\n • Contattare il supporto",
     "stack": "Se il problema persiste, per favore fornisci le seguenti informazioni al supporto:",
     "noStack": "Nessuna informazione disponibile sullo stack."
+  },
+  "timeSeriesChart": {
+    "selectInterval": "Seleziona intervallo",
+    "interval": {
+      "threeMonths": "3 mesi",
+      "sixMonths": "6 mesi",
+      "oneYear": "1 anno"
+    }
   }
 }

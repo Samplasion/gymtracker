@@ -23,10 +23,12 @@ extension StringUtils on String {
     return double.tryParse(replaceAll(",", "."));
   }
 
-  Size computeSize() {
+  Size computeSize({
+    TextStyle? style,
+  }) {
     final TextPainter textPainter = TextPainter(
-      text:
-          TextSpan(text: this, style: Get.context!.theme.textTheme.bodyMedium),
+      text: TextSpan(
+          text: this, style: style ?? Get.context!.theme.textTheme.bodyMedium),
       maxLines: 1,
       textDirection: TextDirection.ltr,
     )..layout(
@@ -436,5 +438,11 @@ extension PrettyJsonExtensionMap on Map<String, dynamic> {
 extension PrettyJsonExtensionList on List<Map<String, dynamic>> {
   String toPrettyString([String indent = '  ']) {
     return _toPrettyString(this, indent);
+  }
+}
+
+extension ToMap<K, V> on Iterable<MapEntry<K, V>> {
+  Map<K, V> toMap() {
+    return Map.fromEntries(this);
   }
 }

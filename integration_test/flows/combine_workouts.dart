@@ -154,7 +154,7 @@ Future<void> testCombineWorkoutsFlow(
   expect(find.byType(HistoryView), findsOneWidget);
 
   // Scroll to the bottom
-  await tester.fling(find.byType(HistoryView), const Offset(0, -200), 1000);
+  await tester.fling(find.byType(HistoryView), const Offset(0, -400), 1000);
   await tester.pumpAndSettle();
 
   // Verify that the workout has been continued

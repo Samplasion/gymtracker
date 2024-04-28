@@ -448,3 +448,13 @@ extension ToMap<K, V> on Iterable<MapEntry<K, V>> {
     return Map.fromEntries(this);
   }
 }
+
+extension MapOfListUtils<K, V> on Map<K, List<V>> {
+  Map<K, List<V>> combinedWith(Map<K, List<V>> other) {
+    final res = Map<K, List<V>>.from(this);
+    for (final entry in other.entries) {
+      res[entry.key] = [...(res[entry.key] ?? []), ...entry.value];
+    }
+    return res;
+  }
+}

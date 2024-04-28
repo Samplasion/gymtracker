@@ -267,16 +267,11 @@ class _WeightMeasurementDataPageState extends State<WeightMeasurementDataPage> {
                   ),
                   const Divider(),
                 ],
-                ConstrainedBox(
-                  constraints: const BoxConstraints(maxHeight: 200),
-                  child: WeightChart(
-                    weights: controller.weightMeasurements
-                        .map((element) => Weights.convert(
-                            value: element.weight,
-                            from: element.weightUnit,
-                            to: settingsController.weightUnit.value))
-                        .toList(),
-                    predictedWeight: predictedWeight?.weight,
+                Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: WeightChartTimeSeries(
+                    weights: controller.weightMeasurements,
+                    predictedWeight: predictedWeight,
                   ),
                 ),
               ],

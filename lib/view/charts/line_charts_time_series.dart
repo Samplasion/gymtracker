@@ -6,6 +6,7 @@ import 'package:get/get.dart';
 import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/utils/go.dart';
+import 'package:gymtracker/utils/theme.dart';
 import 'package:gymtracker/view/charts/base_types.dart';
 import 'package:intl/intl.dart';
 
@@ -14,8 +15,11 @@ export 'package:gymtracker/view/charts/base_types.dart';
 class LineChartTimeSeries<T> extends StatefulWidget {
   final Map<T, LineChartCategory> categories;
   final Map<T, List<LineChartPoint>> data;
-  final Widget Function(T, int, LineChartPoint) currentValueBuilder;
+  final Map<T, List<LineChartPoint>>? predictions;
+  final Widget Function(T, int, LineChartPoint, bool) currentValueBuilder;
   final String Function(T, double) leftTitleBuilder;
+  final double? minY;
+  final double? maxY;
 
   LineChartTimeSeries({
     super.key,
@@ -23,6 +27,9 @@ class LineChartTimeSeries<T> extends StatefulWidget {
     required this.data,
     required this.currentValueBuilder,
     required this.leftTitleBuilder,
+    this.predictions,
+    this.minY,
+    this.maxY,
   })  : assert(categories.isNotEmpty),
         assert(data.isNotEmpty),
         assert(categories.length == data.length),
@@ -65,13 +72,17 @@ class _LineChartTimeSeriesState<T> extends State<LineChartTimeSeries<T>> {
     return sizes.max;
   }();
 
-  late final Map<T, Map<int, LineChartPoint>> dataIndices = widget.data.map(
-    (key, value) => MapEntry(
-      key,
-      Map.fromEntries(
-          value.map((point) => MapEntry(point.date.minutesSinceEpoch, point))),
-    ),
-  );
+  late final Map<T, Map<int, LineChartPoint>> dataIndices = widget.data
+      .combinedWith(
+        widget.predictions ?? {},
+      )
+      .map(
+        (key, value) => MapEntry(
+          key,
+          Map.fromEntries(value
+              .map((point) => MapEntry(point.date.minutesSinceEpoch, point))),
+        ),
+      );
 
   @override
   Widget build(BuildContext context) {
@@ -80,16 +91,38 @@ class _LineChartTimeSeriesState<T> extends State<LineChartTimeSeries<T>> {
     final filteredChildren = children.where((point) {
       return point.date.isAfter(startingDate);
     }).toList();
+    final predictionColor = colorScheme.quaternary;
+
+    var minDate = startingDate;
+    var maxDate = (filteredChildren.isEmpty
+        ? DateTime.now()
+        : filteredChildren.last.date);
+
+    if (widget.predictions?[selectedCategory] != null) {
+      final predictionDates = widget.predictions![selectedCategory]!
+          .map((point) => point.date)
+          .toList();
+      if (predictionDates.length > 1 && predictionDates.last.isAfter(maxDate)) {
+        maxDate = predictionDates.last;
+      }
+    }
 
     return Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Expanded(
-              child: widget.currentValueBuilder(selectedCategory, hoveredIndex,
-                  dataIndices[selectedCategory]![hoveredIndex]!),
+              child: widget.currentValueBuilder(
+                selectedCategory,
+                hoveredIndex,
+                dataIndices[selectedCategory]![hoveredIndex]!,
+                // Whether this point is predicted
+                !children.any((element) =>
+                    element.date.minutesSinceEpoch == hoveredIndex),
+              ),
             ),
             TextButton(
               onPressed: () {
@@ -118,6 +151,7 @@ class _LineChartTimeSeriesState<T> extends State<LineChartTimeSeries<T>> {
             ),
             child: LineChart(
               LineChartData(
+                clipData: const FlClipData.all(),
                 gridData: FlGridData(
                   show: true,
                   drawVerticalLine: true,
@@ -183,32 +217,74 @@ class _LineChartTimeSeriesState<T> extends State<LineChartTimeSeries<T>> {
                   touchSpotThreshold: 10000,
                   enabled: true,
                   touchCallback: (event, response) {
-                    final touchLineBarSpot = response?.lineBarSpots?.first;
-                    final index = touchLineBarSpot?.x.toInt();
+                    final allLines = response?.lineBarSpots ?? [];
+                    if (allLines.isEmpty) {
+                      return;
+                    }
+                    allLines.sort((a, b) => a.distance.compareTo(b.distance));
+
+                    final touchLineBarSpot = allLines.first;
+
+                    final index = touchLineBarSpot.x.toInt();
                     final availableIndices = {
                       ...dataIndices[selectedCategory]!.keys
                     };
+
                     if (index != hoveredIndex &&
-                        index != null &&
                         availableIndices.contains(index)) {
                       setState(() => hoveredIndex = index);
                     }
                   },
                 ),
-                minX: startingDate.minutesSinceEpoch.toDouble(),
-                maxX: (filteredChildren.isEmpty
-                        ? DateTime.now()
-                        : filteredChildren.last.date)
-                    .minutesSinceEpoch
-                    .toDouble(),
+                minX: minDate.minutesSinceEpoch.toDouble(),
+                maxX: maxDate.minutesSinceEpoch.toDouble(),
+                minY: widget.minY,
+                maxY: widget.maxY,
                 lineBarsData: [
+                  if (widget.predictions?[selectedCategory] != null)
+                    LineChartBarData(
+                      dotData: FlDotData(
+                        show: true,
+                        checkToShowDot: (spot, barData) {
+                          return !filteredChildren.any((element) =>
+                              element.date.minutesSinceEpoch == spot.x.toInt());
+                        },
+                      ),
+                      spots: [
+                        for (final point
+                            in widget.predictions![selectedCategory]!)
+                          FlSpot(
+                            point.date.minutesSinceEpoch.toDouble(),
+                            point.value,
+                          ),
+                      ],
+                      isCurved: true,
+                      preventCurveOverShooting: true,
+                      color: predictionColor,
+                      barWidth: 3,
+                      isStrokeCapRound: true,
+                      dashArray: [5, 10],
+                      belowBarData: BarAreaData(
+                        show: true,
+                        spotsLine: BarAreaSpotsLine(
+                          show: true,
+                          checkToShowSpotLine: (spot) =>
+                              spot.x ==
+                              widget.predictions![selectedCategory]?.last.date
+                                  .minutesSinceEpoch,
+                          flLineStyle:
+                              FlLine(color: predictionColor, dashArray: [5]),
+                        ),
+                        color: predictionColor.withOpacity(0.3),
+                      ),
+                    ),
                   LineChartBarData(
                     dotData: const FlDotData(),
                     spots: [
-                      for (int i = 0; i < filteredChildren.length; i++)
+                      for (int i = 0; i < children.length; i++)
                         FlSpot(
-                          filteredChildren[i].date.minutesSinceEpoch.toDouble(),
-                          filteredChildren[i].value,
+                          children[i].date.minutesSinceEpoch.toDouble(),
+                          children[i].value,
                         ),
                     ],
                     isCurved: type == _LineChartTimeSeriesType.threeMonths,
@@ -218,6 +294,13 @@ class _LineChartTimeSeriesState<T> extends State<LineChartTimeSeries<T>> {
                     isStrokeCapRound: true,
                     belowBarData: BarAreaData(
                       show: true,
+                      spotsLine: BarAreaSpotsLine(
+                        show: true,
+                        checkToShowSpotLine: (spot) =>
+                            spot.x ==
+                            filteredChildren.last.date.minutesSinceEpoch,
+                        flLineStyle: FlLine(color: colorScheme.primary),
+                      ),
                       color: colorScheme.primary.withOpacity(0.3),
                     ),
                   ),
@@ -228,32 +311,33 @@ class _LineChartTimeSeriesState<T> extends State<LineChartTimeSeries<T>> {
             ),
           ),
         ),
-        Flexible(
-          child: Padding(
-            padding: const EdgeInsets.only(top: 16),
-            child: Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children: [
-                for (final entry in widget.categories.entries)
-                  ChoiceChip(
-                    label: Text(entry.value.title),
-                    avatar: CircleAvatar(
-                      child: this.selectedCategory == entry.key
-                          ? const SizedBox.shrink()
-                          : entry.value.icon,
+        if (widget.categories.length > 1)
+          Flexible(
+            child: Padding(
+              padding: const EdgeInsets.only(top: 16),
+              child: Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: [
+                  for (final entry in widget.categories.entries)
+                    ChoiceChip(
+                      label: Text(entry.value.title),
+                      avatar: CircleAvatar(
+                        child: this.selectedCategory == entry.key
+                            ? const SizedBox.shrink()
+                            : entry.value.icon,
+                      ),
+                      selected: this.selectedCategory == entry.key,
+                      onSelected: (sel) {
+                        if (sel) {
+                          setState(() => this.selectedCategory = entry.key);
+                        }
+                      },
                     ),
-                    selected: this.selectedCategory == entry.key,
-                    onSelected: (sel) {
-                      if (sel) {
-                        setState(() => this.selectedCategory = entry.key);
-                      }
-                    },
-                  ),
-              ],
+                ],
+              ),
             ),
           ),
-        ),
       ],
     );
   }

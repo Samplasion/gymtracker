@@ -1,9 +1,14 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:gymtracker/icons/gymtracker_icons.dart';
+import 'package:gymtracker/model/measurements.dart';
+import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/utils/constants.dart';
 import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/utils/theme.dart';
+import 'package:gymtracker/view/charts/line_charts_time_series.dart';
 import 'package:gymtracker/view/components/responsive_builder.dart';
+import 'package:intl/intl.dart';
 
 class WeightChart extends StatelessWidget {
   final List<double> weights;
@@ -148,6 +153,89 @@ class WeightChart extends StatelessWidget {
         ),
         duration: const Duration(milliseconds: 350),
         curve: Curves.linearToEaseOut,
+      );
+    });
+  }
+}
+
+class WeightChartTimeSeries extends StatelessWidget {
+  final List<WeightMeasurement> weights;
+  final PredictedWeightMeasurement? predictedWeight;
+
+  const WeightChartTimeSeries(
+      {required this.weights, this.predictedWeight, super.key});
+
+  static const _chartCategory = "weight";
+
+  @override
+  Widget build(BuildContext context) {
+    return ResponsiveBuilder(builder: (context, breakpoint) {
+      final relevantWeights = weights.toList();
+      final minY = [
+        ...relevantWeights.map((m) => m.convertedWeight),
+        if (predictedWeight != null) predictedWeight!.weight
+      ].min;
+      final maxY = [
+        ...relevantWeights.map((m) => m.convertedWeight),
+        if (predictedWeight != null) predictedWeight!.weight
+      ].max;
+      final padding = [(maxY - minY) / 5, 2.5].min;
+
+      return LineChartTimeSeries(
+        data: {
+          _chartCategory: [
+            for (int i = 0; i < relevantWeights.length; i++)
+              LineChartPoint(
+                value: relevantWeights[i].convertedWeight,
+                date: relevantWeights[i].time,
+              ),
+          ]
+        },
+        predictions: {
+          if (predictedWeight != null)
+            _chartCategory: [
+              LineChartPoint(
+                value: relevantWeights.last.convertedWeight,
+                date: relevantWeights.last.time,
+              ),
+              LineChartPoint(
+                value: predictedWeight!.weight,
+                date: predictedWeight!.time,
+              ),
+            ]
+        },
+        categories: {
+          _chartCategory: LineChartCategory(
+              title: "Weight", icon: const Icon(GymTrackerIcons.info))
+        },
+        minY: minY - padding,
+        maxY: maxY + padding,
+        currentValueBuilder: (_, __, point, isPredicted) => Text.rich(
+          TextSpan(children: [
+            TextSpan(
+              children: [
+                TextSpan(
+                  text: point.value.userFacingWeight,
+                )
+              ],
+              style: Theme.of(context).textTheme.bodyLarge!.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: isPredicted
+                        ? Theme.of(context).colorScheme.quaternary
+                        : null,
+                  ),
+            ),
+            const TextSpan(text: " "),
+            TextSpan(
+              text: DateFormat.yMd(context.locale.languageCode)
+                  .format(point.date),
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
+            ),
+          ]),
+        ),
+        leftTitleBuilder: (_, value) => value.userFacingWeight,
       );
     });
   }

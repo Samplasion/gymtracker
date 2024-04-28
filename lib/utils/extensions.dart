@@ -71,6 +71,8 @@ extension StringUtils on String {
 }
 
 extension DateUtils on DateTime {
+  int get minutesSinceEpoch => millisecondsSinceEpoch ~/ 60000;
+
   DateTime get startOfDay {
     return DateTime(year, month, day, 0, 0, 0, 0, 0);
   }

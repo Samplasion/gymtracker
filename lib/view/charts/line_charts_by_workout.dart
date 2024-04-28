@@ -12,30 +12,13 @@ import 'package:gymtracker/model/workout.dart';
 import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/utils/go.dart';
+import 'package:gymtracker/view/charts/base_types.dart';
 import 'package:gymtracker/view/components/controlled.dart';
 import 'package:gymtracker/view/exercises.dart';
 import 'package:gymtracker/view/utils/timer.dart';
 import 'package:intl/intl.dart';
 
-class LineChartCategory {
-  final String title;
-  final Widget icon;
-
-  LineChartCategory({
-    required this.title,
-    required this.icon,
-  });
-}
-
-class LineChartPoint {
-  final DateTime date;
-  final double value;
-
-  LineChartPoint({
-    required this.date,
-    required this.value,
-  });
-}
+export 'package:gymtracker/view/charts/base_types.dart';
 
 class LineChartWithCategories<T> extends StatefulWidget {
   final Map<T, LineChartCategory> categories;
@@ -399,7 +382,10 @@ class _RoutineHistoryChartState
           .entries
           .where((element) => availableTypes.contains(element.key))
           .toMap(),
-      data: values,
+      data: {
+        for (final entry in values.entries)
+          if (availableTypes.contains(entry.key)) entry.key: entry.value
+      },
       currentValueBuilder: (type, index, point) {
         final style = Theme.of(context)
             .textTheme

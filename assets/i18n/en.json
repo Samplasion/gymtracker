@@ -857,6 +857,9 @@
       },
       "weightUnit": {
         "label": "Unit"
+      },
+      "errors": {
+        "invalidWeight": "Enter a valid weight"
       }
     },
     "allData": {

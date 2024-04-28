@@ -325,6 +325,10 @@
           "light": "Modalità bianco puro"
         }
       },
+      "export": {
+        "label": "Esporta dati (JSON)",
+        "filename": "Dati_GymTracker"
+      },
       "themeMode": {
         "label": "Tema",
         "values": {
@@ -332,10 +336,6 @@
           "light": "Chiaro",
           "dark": "Scuro"
         }
-      },
-      "export": {
-        "label": "Esporta dati (JSON)",
-        "filename": "Dati_GymTracker"
       }
     },
     "colorPicker": {
@@ -857,6 +857,9 @@
       },
       "weightUnit": {
         "label": "Unità"
+      },
+      "errors": {
+        "invalidWeight": "Inserisci un peso valido"
       }
     },
     "allData": {

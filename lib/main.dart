@@ -1,6 +1,7 @@
 import 'package:animations/animations.dart';
 import 'package:device_sim/device_sim.dart';
 import 'package:dynamic_color/dynamic_color.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart' hide Localizations;
 import 'package:flutter/scheduler.dart';
@@ -103,7 +104,8 @@ class MainApp extends StatelessWidget {
                       var pageTransitionsTheme =
                           PageTransitionsTheme(builders: {
                         TargetPlatform.android: _SharedAxisTransitionBuilder(),
-                        TargetPlatform.iOS: _SharedAxisTransitionBuilder(),
+                        TargetPlatform.iOS:
+                            const CupertinoPageTransitionsBuilder(),
                         TargetPlatform.macOS: _SharedAxisTransitionBuilder(),
                       });
                       return GetMaterialApp(

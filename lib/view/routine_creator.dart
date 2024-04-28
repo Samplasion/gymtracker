@@ -4,6 +4,7 @@ import 'package:flutter_quill/flutter_quill.dart';
 import 'package:get/get.dart';
 import 'package:gymtracker/controller/routines_controller.dart';
 import 'package:gymtracker/controller/settings_controller.dart';
+import 'package:gymtracker/icons/gymtracker_icons.dart';
 import 'package:gymtracker/model/exercisable.dart';
 import 'package:gymtracker/model/exercise.dart';
 import 'package:gymtracker/model/set.dart';
@@ -85,7 +86,7 @@ class _RoutineCreatorState extends State<RoutineCreator> {
         }()),
         actions: [
           IconButton(
-            icon: const Icon(Icons.check),
+            icon: const Icon(GymTrackerIcons.done),
             onPressed: _submit,
           )
         ],
@@ -132,7 +133,8 @@ class _RoutineCreatorState extends State<RoutineCreator> {
                 )),
             ListTile(
               title: Text("routines.editor.exercises.add".t),
-              leading: const CircleAvatar(child: Icon(Icons.add_rounded)),
+              leading:
+                  const CircleAvatar(child: Icon(GymTrackerIcons.add_exercise)),
               onTap: () {
                 Go.to<List<Exercise>>(() => const ExercisePicker(
                       singlePick: false,
@@ -156,7 +158,8 @@ class _RoutineCreatorState extends State<RoutineCreator> {
             ),
             ListTile(
               title: Text("routines.editor.superset.add".t),
-              leading: const CircleAvatar(child: Icon(Icons.add_rounded)),
+              leading:
+                  const CircleAvatar(child: Icon(GymTrackerIcons.add_superset)),
               onTap: () {
                 Go.to<List<Exercise>>(() => const ExercisePicker(
                       singlePick: false,

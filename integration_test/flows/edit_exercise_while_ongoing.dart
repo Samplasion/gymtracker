@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:get/get.dart';
 import 'package:gymtracker/controller/exercises_controller.dart';
 import 'package:gymtracker/controller/workout_controller.dart';
+import 'package:gymtracker/icons/gymtracker_icons.dart';
 import 'package:gymtracker/main.dart';
 import 'package:gymtracker/model/exercise.dart';
 import 'package:gymtracker/model/set.dart';
@@ -147,11 +148,11 @@ Future<void> testEditExerciseWhileWorkoutIsOngoingFlow(
     "Workout",
   );
 
-  await tester.tap(find.widgetWithIcon(IconButton, Icons.check));
+  await tester.tap(find.widgetWithIcon(IconButton, GymTrackerIcons.done));
   await tester.pumpAndSettle();
 
   // expect(find.byType(WorkoutDoneSheet), findsOneWidget);
-  // await tester.tap(find.widgetWithIcon(IconButton, Icons.done_rounded));
+  // await tester.tap(find.widgetWithIcon(IconButton, GymTrackerIcons.done));
   // await tester.pumpAndSettle();
 
   // Wait for the database changes to flush

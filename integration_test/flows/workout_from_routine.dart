@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:gymtracker/icons/gymtracker_icons.dart';
 import 'package:gymtracker/service/database.dart';
 import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/view/exercises.dart';
@@ -53,7 +54,7 @@ Future<void> testWorkoutFromRoutineFlow(
   expect(find.byType(WorkoutTimerView), findsOneWidget);
 
   // Avoid the above issue for the next pumpAndSettle calls
-  await tester.tap(find.widgetWithIcon(IconButton, Icons.skip_next_rounded));
+  await tester.tap(find.widgetWithIcon(IconButton, GymTrackerIcons.skip));
   await tester.pumpAndSettle();
 
   await tester.tap(find.byKey(const Key('main-menu')));
@@ -63,7 +64,7 @@ Future<void> testWorkoutFromRoutineFlow(
 
   expect(find.byType(WorkoutFinishPage), findsOneWidget);
 
-  await tester.tap(find.widgetWithIcon(IconButton, Icons.check));
+  await tester.tap(find.widgetWithIcon(IconButton, GymTrackerIcons.done));
   await tester.pumpAndSettle();
 
   expect(find.byType(WorkoutFinishPage), findsNothing);
@@ -82,11 +83,11 @@ Future<void> testWorkoutFromRoutineFlow(
 
   // Close the Good Job sheet
   expect(find.byType(WorkoutDoneSheet), findsOneWidget);
-  await tester.tap(find.byIcon(Icons.done_rounded));
+  await tester.tap(find.byIcon(GymTrackerIcons.done));
   await tester.pumpAndSettle();
 
   // Check the history view
-  await tester.tap(find.byIcon(Icons.history_rounded));
+  await tester.tap(find.byIcon(GymTrackerIcons.history));
   await tester.pumpAndSettle(const Duration(seconds: 2));
 
   expect(find.byType(HistoryWorkout), findsOneWidget);

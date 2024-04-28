@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gymtracker/icons/gymtracker_icons.dart';
 import 'package:gymtracker/utils/go.dart';
 
 typedef OnChange<T> = void Function(T value);
@@ -53,7 +54,7 @@ class _RadioModalTileState<T> extends State<RadioModalTile<T>>
     return ListTile(
       title: widget.title,
       subtitle: widget.subtitle ?? Text(subtitle),
-      trailing: const Icon(Icons.arrow_right_rounded),
+      trailing: const Icon(GymTrackerIcons.lt_chevron),
       onTap: () {
         Go.showRadioModal(
           selectedValue: widget.selectedValue,

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:gymtracker/icons/gymtracker_icons.dart';
 import 'package:gymtracker/main.dart';
 import 'package:gymtracker/service/database.dart';
 import 'package:gymtracker/service/localizations.dart';
@@ -77,16 +78,16 @@ Future<void> testCombineWorkoutsFlow(
 
   expect(find.byType(WorkoutFinishPage), findsOneWidget);
 
-  await tester.tap(find.widgetWithIcon(IconButton, Icons.check));
+  await tester.tap(find.widgetWithIcon(IconButton, GymTrackerIcons.done));
   await tester.pumpAndSettle();
 
   expect(find.byType(WorkoutDoneSheet), findsOneWidget);
 
-  await tester.tap(find.byIcon(Icons.done_rounded));
+  await tester.tap(find.byIcon(GymTrackerIcons.done));
   await tester.pumpAndSettle();
 
   // Go to the history page
-  await tester.tap(find.byIcon(Icons.history_rounded));
+  await tester.tap(find.byIcon(GymTrackerIcons.history));
   await tester.pumpAndSettle();
 
   // Verify that the workout is in the history
@@ -141,12 +142,12 @@ Future<void> testCombineWorkoutsFlow(
 
   expect(find.byType(WorkoutFinishPage), findsOneWidget);
 
-  await tester.tap(find.widgetWithIcon(IconButton, Icons.check));
+  await tester.tap(find.widgetWithIcon(IconButton, GymTrackerIcons.done));
   await tester.pumpAndSettle();
 
   expect(find.byType(WorkoutDoneSheet), findsOneWidget);
 
-  await tester.tap(find.byIcon(Icons.done_rounded));
+  await tester.tap(find.byIcon(GymTrackerIcons.done));
   await tester.pumpAndSettle();
 
   // Verify that we're now at the history page

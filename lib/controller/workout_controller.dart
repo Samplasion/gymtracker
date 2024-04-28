@@ -12,6 +12,7 @@ import 'package:gymtracker/controller/settings_controller.dart';
 import 'package:gymtracker/controller/stopwatch_controller.dart';
 import 'package:gymtracker/data/distance.dart';
 import 'package:gymtracker/data/weights.dart';
+import 'package:gymtracker/icons/gymtracker_icons.dart';
 import 'package:gymtracker/model/exercisable.dart';
 import 'package:gymtracker/model/exercise.dart';
 import 'package:gymtracker/model/set.dart';
@@ -614,7 +615,7 @@ class WorkoutController extends GetxController with ServiceableController {
       context: context,
       builder: (context) {
         return AlertDialog(
-          icon: const Icon(Icons.info),
+          icon: const Icon(GymTrackerIcons.info),
           title: Text("ongoingWorkout.cancel.title".t),
           content: Text(
             "ongoingWorkout.cancel.text".t,

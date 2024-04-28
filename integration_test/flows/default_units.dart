@@ -5,6 +5,7 @@ import 'package:gymtracker/controller/settings_controller.dart';
 import 'package:gymtracker/controller/workout_controller.dart';
 import 'package:gymtracker/data/distance.dart';
 import 'package:gymtracker/data/weights.dart';
+import 'package:gymtracker/icons/gymtracker_icons.dart';
 import 'package:gymtracker/main.dart';
 import 'package:gymtracker/service/database.dart';
 import 'package:gymtracker/service/localizations.dart';
@@ -51,7 +52,7 @@ Future<void> testDefaultUnitsFlow(
   await tester.pumpAndSettle();
 
   // Go to the settings and change the units
-  await tester.tap(find.byIcon(Icons.settings_rounded));
+  await tester.tap(find.byIcon(GymTrackerIcons.settings));
   await tester.pumpAndSettle();
 
   await tester.tap(find.text("settings.options.weightUnit.label".t));
@@ -75,7 +76,7 @@ Future<void> testDefaultUnitsFlow(
   expect(settingsController.distanceUnit.value, Distance.mi);
 
   // Go back
-  await tester.tap(find.byIcon(Icons.fitness_center_rounded));
+  await tester.tap(find.byIcon(GymTrackerIcons.library));
   await tester.pumpAndSettle();
 
   // Start another workout and check that the units have changed

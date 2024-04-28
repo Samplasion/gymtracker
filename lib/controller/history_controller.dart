@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:get/get.dart';
 import 'package:gymtracker/controller/serviceable_controller.dart';
+import 'package:gymtracker/icons/gymtracker_icons.dart';
 import 'package:gymtracker/model/exercisable.dart';
 import 'package:gymtracker/model/exercise.dart';
 import 'package:gymtracker/model/superset.dart';
@@ -155,7 +156,7 @@ class HistoryController extends GetxController with ServiceableController {
       context: context,
       builder: (context) {
         return AlertDialog(
-          icon: const Icon(Icons.info),
+          icon: const Icon(GymTrackerIcons.info),
           title: Text("workouts.actions.delete.title".t),
           content: Text(
             "workouts.actions.delete.text".t,
@@ -193,7 +194,7 @@ class HistoryController extends GetxController with ServiceableController {
       context: context,
       builder: (context) {
         return AlertDialog(
-          icon: const Icon(Icons.info),
+          icon: const Icon(GymTrackerIcons.info),
           title: Text(
               "history.actions.deleteMultiple.title".plural(workoutIDs.length)),
           content: Text(
@@ -393,7 +394,7 @@ class HistoryController extends GetxController with ServiceableController {
     final shouldCombine = await Go.confirm(
       "exercise.continuation.combine.confirm.title",
       "exercise.continuation.combine.confirm.body",
-      icon: const Icon(Icons.compare_arrows_rounded),
+      icon: const Icon(GymTrackerIcons.combine),
     );
 
     logger.t("Should combine: $shouldCombine");

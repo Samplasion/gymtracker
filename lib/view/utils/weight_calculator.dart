@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:gymtracker/data/weights.dart';
+import 'package:gymtracker/icons/gymtracker_icons.dart';
 import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/service/logger.dart';
 import 'package:gymtracker/utils/extensions.dart';
@@ -289,7 +290,7 @@ class _WeightCalculatorState extends State<WeightCalculator>
                             Navigator.pop(context);
                           },
                           label: Text("general.dialogs.actions.ok".t),
-                          icon: const Icon(Icons.done),
+                          icon: const Icon(GymTrackerIcons.done),
                         ),
                       ],
                     ),

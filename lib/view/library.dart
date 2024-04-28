@@ -8,6 +8,7 @@ import 'package:gymtracker/controller/history_controller.dart';
 import 'package:gymtracker/controller/settings_controller.dart';
 import 'package:gymtracker/data/exercises.dart';
 import 'package:gymtracker/data/weights.dart';
+import 'package:gymtracker/icons/gymtracker_icons.dart';
 import 'package:gymtracker/model/exercise.dart';
 import 'package:gymtracker/model/set.dart';
 import 'package:gymtracker/model/superset.dart';
@@ -33,7 +34,7 @@ class LibraryView extends GetView<ExercisesController> {
     return {
       "library.custom".t: ExerciseCategory(
         exercises: controller.exercises,
-        icon: const Icon(Icons.star_rounded),
+        icon: const Icon(GymTrackerIcons.custom_exercises),
         color: Colors.yellow,
       ),
       for (final key in sortedKeys) key: exerciseStandardLibrary[key]!,
@@ -110,7 +111,8 @@ class LibraryExercisesView extends StatelessWidget {
             SliverToBoxAdapter(
               child: ListTile(
                 title: Text("library.newCustomExercise".t),
-                leading: const CircleAvatar(child: Icon(Icons.add_rounded)),
+                leading: const CircleAvatar(
+                    child: Icon(GymTrackerIcons.create_exercise)),
                 onTap: () {
                   Go.showBottomModalScreen(
                       (context, controller) => ExerciseCreator(

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get/get.dart';
 import 'package:gymtracker/controller/exercises_controller.dart';
+import 'package:gymtracker/icons/gymtracker_icons.dart';
 import 'package:gymtracker/main.dart';
 import 'package:gymtracker/model/exercise.dart';
 import 'package:gymtracker/model/set.dart';
@@ -128,7 +129,7 @@ Future<void> testEditExerciseInRoutineAndHistoryFlow(
   await tester.pumpAndSettle();
 
   // Save the routine
-  final saveButton = find.widgetWithIcon(IconButton, Icons.check);
+  final saveButton = find.widgetWithIcon(IconButton, GymTrackerIcons.done);
   await tester.tap(saveButton);
 
   // Trigger a frame.

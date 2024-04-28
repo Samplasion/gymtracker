@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_sticky_header/flutter_sticky_header.dart';
 import 'package:get/get.dart';
 import 'package:gymtracker/controller/history_controller.dart';
+import 'package:gymtracker/icons/gymtracker_icons.dart';
 import 'package:gymtracker/model/workout.dart';
 import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/service/logger.dart';
@@ -218,7 +219,7 @@ class _HistoryViewState extends State<HistoryView> {
           trailing: [
             if (isSearching) ...[
               IconButton(
-                icon: const Icon(Icons.clear_rounded),
+                icon: const Icon(GymTrackerIcons.clear),
                 onPressed: () {
                   setState(() {
                     searchTextController.clear();
@@ -248,7 +249,7 @@ class _HistoryViewState extends State<HistoryView> {
       ),
       bottom: searchBar,
       leading: IconButton(
-        icon: const Icon(Icons.close),
+        icon: const Icon(GymTrackerIcons.close),
         onPressed: () {
           setState(() {
             selectedEntries.clear();
@@ -259,7 +260,7 @@ class _HistoryViewState extends State<HistoryView> {
         IconButton(
           tooltip: "history.actions.deleteMultiple.title"
               .plural(selectedEntries.length),
-          icon: const Icon(Icons.delete),
+          icon: const Icon(GymTrackerIcons.delete),
           onPressed: () {
             final controller = Get.find<HistoryController>();
             controller.deleteWorkoutsWithDialog(

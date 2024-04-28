@@ -7,6 +7,7 @@ import 'package:gymtracker/controller/routines_controller.dart';
 import 'package:gymtracker/controller/settings_controller.dart';
 import 'package:gymtracker/data/distance.dart';
 import 'package:gymtracker/data/weights.dart';
+import 'package:gymtracker/icons/gymtracker_icons.dart';
 import 'package:gymtracker/model/exercise.dart';
 import 'package:gymtracker/model/workout.dart';
 import 'package:gymtracker/service/localizations.dart';
@@ -368,15 +369,15 @@ class _RoutineHistoryChartState
       categories: {
         _RoutineHistoryChartType.volume: LineChartCategory(
           title: "exercise.chart.views.volume".t,
-          icon: const Icon(Icons.line_weight_rounded, size: 16),
+          icon: const Icon(GymTrackerIcons.volume, size: 16),
         ),
         _RoutineHistoryChartType.reps: LineChartCategory(
           title: "exercise.chart.views.reps".t,
-          icon: const Icon(Icons.numbers_rounded, size: 16),
+          icon: const Icon(GymTrackerIcons.reps, size: 16),
         ),
         _RoutineHistoryChartType.duration: LineChartCategory(
           title: "exercise.chart.views.duration".t,
-          icon: const Icon(Icons.timer_rounded, size: 16),
+          icon: const Icon(GymTrackerIcons.duration, size: 16),
         ),
       }
           .entries
@@ -565,19 +566,19 @@ class _ExerciseHistoryChartState
       categories: {
         _ExerciseHistoryChartType.volume: LineChartCategory(
           title: "exercise.chart.views.volume".t,
-          icon: const Icon(Icons.line_weight_rounded, size: 16),
+          icon: const Icon(GymTrackerIcons.volume, size: 16),
         ),
         _ExerciseHistoryChartType.reps: LineChartCategory(
           title: "exercise.chart.views.reps".t,
-          icon: const Icon(Icons.numbers_rounded, size: 16),
+          icon: const Icon(GymTrackerIcons.reps, size: 16),
         ),
         _ExerciseHistoryChartType.time: LineChartCategory(
           title: "exercise.chart.views.time".t,
-          icon: const Icon(Icons.timer_rounded, size: 16),
+          icon: const Icon(GymTrackerIcons.time, size: 16),
         ),
         _ExerciseHistoryChartType.distance: LineChartCategory(
           title: "exercise.chart.views.distance".t,
-          icon: const Icon(Icons.run_circle_outlined, size: 16),
+          icon: const Icon(GymTrackerIcons.distance, size: 16),
         ),
       }
           .entries

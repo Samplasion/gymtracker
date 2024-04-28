@@ -10,6 +10,7 @@ import 'package:gymtracker/controller/countdown_controller.dart';
 import 'package:gymtracker/controller/routines_controller.dart';
 import 'package:gymtracker/controller/stopwatch_controller.dart';
 import 'package:gymtracker/controller/workout_controller.dart';
+import 'package:gymtracker/icons/gymtracker_icons.dart';
 import 'package:gymtracker/model/exercisable.dart';
 import 'package:gymtracker/model/exercise.dart';
 import 'package:gymtracker/model/superset.dart';
@@ -96,7 +97,7 @@ class _WorkoutViewState extends State<WorkoutView> {
                           children: [
                             WidgetSpan(
                               child: Icon(
-                                Icons.timer,
+                                GymTrackerIcons.stopwatch,
                                 color: Theme.of(context).colorScheme.secondary,
                               ),
                               alignment: PlaceholderAlignment.middle,
@@ -121,7 +122,7 @@ class _WorkoutViewState extends State<WorkoutView> {
         actions: [
           IconButton(
             tooltip: "ongoingWorkout.stopwatch.label".t,
-            icon: const Icon(Icons.timer),
+            icon: const Icon(GymTrackerIcons.stopwatch),
             onPressed: () {
               GlobalStopwatch getStopwatch() =>
                   stopwatchController.globalStopwatch;
@@ -149,7 +150,7 @@ class _WorkoutViewState extends State<WorkoutView> {
                                 if (getStopwatch().isStopped())
                                   TextButton.icon(
                                     key: const Key("start"),
-                                    icon: const Icon(Icons.play_arrow_rounded),
+                                    icon: const Icon(GymTrackerIcons.resume),
                                     label: Text(
                                         "ongoingWorkout.stopwatch.start".t),
                                     onPressed: () {
@@ -159,7 +160,7 @@ class _WorkoutViewState extends State<WorkoutView> {
                                 else
                                   TextButton.icon(
                                     key: const Key("pause"),
-                                    icon: const Icon(Icons.pause_rounded),
+                                    icon: const Icon(GymTrackerIcons.pause),
                                     label: Text(
                                         "ongoingWorkout.stopwatch.pause".t),
                                     onPressed: () {
@@ -171,7 +172,7 @@ class _WorkoutViewState extends State<WorkoutView> {
                                         0)
                                   TextButton.icon(
                                     key: const Key("reset"),
-                                    icon: const Icon(Icons.replay_rounded),
+                                    icon: const Icon(GymTrackerIcons.reset),
                                     label: Text(
                                         "ongoingWorkout.stopwatch.reset".t),
                                     onPressed: () {
@@ -191,7 +192,7 @@ class _WorkoutViewState extends State<WorkoutView> {
           ),
           IconButton(
             tooltip: "ongoingWorkout.weightCalculator".t,
-            icon: const Icon(Icons.calculate),
+            icon: const Icon(GymTrackerIcons.weight_calculator),
             onPressed: () {
               showDialog(
                 context: context,
@@ -309,7 +310,7 @@ class _WorkoutViewState extends State<WorkoutView> {
                   ),
                   alignment: Alignment.center,
                   child: Icon(
-                    Icons.note_add_rounded,
+                    GymTrackerIcons.notes_add,
                     color: context.colorScheme.primary,
                   ),
                 );
@@ -606,7 +607,7 @@ class WorkoutTimerView extends StatelessWidget {
                       Crossfade(
                         firstChild: TextButton.icon(
                           onPressed: skipCountdown,
-                          icon: const Icon(Icons.skip_next_rounded),
+                          icon: const Icon(GymTrackerIcons.skip),
                           clipBehavior: Clip.hardEdge,
                           label: Text(
                             "timer.skip".t,
@@ -617,7 +618,7 @@ class WorkoutTimerView extends StatelessWidget {
                         secondChild: IconButton(
                           onPressed: skipCountdown,
                           icon: Icon(
-                            Icons.skip_next_rounded,
+                            GymTrackerIcons.skip,
                             color: Theme.of(context).colorScheme.primary,
                           ),
                         ),
@@ -690,7 +691,7 @@ class _WorkoutFinishPageState extends State<WorkoutFinishPage> {
             ),
             actions: [
               IconButton(
-                icon: const Icon(Icons.check),
+                icon: const Icon(GymTrackerIcons.done),
                 onPressed: _submit,
               )
             ],
@@ -829,7 +830,7 @@ class _WorkoutExerciseReorderDialogState
             ),
             actions: [
               IconButton(
-                icon: const Icon(Icons.check),
+                icon: const Icon(GymTrackerIcons.done),
                 onPressed: _submit,
               )
             ],

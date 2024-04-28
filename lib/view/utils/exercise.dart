@@ -3,6 +3,7 @@ import 'package:gymtracker/controller/settings_controller.dart';
 import 'package:gymtracker/data/distance.dart';
 import 'package:gymtracker/data/exercises.dart';
 import 'package:gymtracker/data/weights.dart';
+import 'package:gymtracker/icons/gymtracker_icons.dart';
 import 'package:gymtracker/model/exercisable.dart';
 import 'package:gymtracker/model/exercise.dart';
 import 'package:gymtracker/model/set.dart';
@@ -100,7 +101,7 @@ class ExerciseListTile extends StatelessWidget {
     final selectedIcon = CircleAvatar(
       backgroundColor: foregroundColor,
       foregroundColor: backgroundColor,
-      child: const Icon(Icons.check),
+      child: const Icon(GymTrackerIcons.done),
     );
     return ListTile(
       leading: selected ? selectedIcon : unselectedIcon,
@@ -110,7 +111,7 @@ class ExerciseListTile extends StatelessWidget {
             const WidgetSpan(
               baseline: TextBaseline.ideographic,
               alignment: PlaceholderAlignment.middle,
-              child: Icon(Icons.layers),
+              child: Icon(GymTrackerIcons.superset),
             ),
             const TextSpan(text: " "),
             TextSpan(text: "superset".plural(exercise.exercises.length)),

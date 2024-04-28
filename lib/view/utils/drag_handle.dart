@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gymtracker/icons/gymtracker_icons.dart';
 import 'package:universal_platform/universal_platform.dart';
 
 class DragHandle extends StatelessWidget {
@@ -11,12 +12,12 @@ class DragHandle extends StatelessWidget {
     if (UniversalPlatform.isAndroid || UniversalPlatform.isIOS) {
       return ReorderableDelayedDragStartListener(
         index: index,
-        child: const Icon(Icons.drag_handle),
+        child: const Icon(GymTrackerIcons.drag_handle),
       );
     } else {
       return ReorderableDragStartListener(
         index: index,
-        child: const Icon(Icons.drag_handle),
+        child: const Icon(GymTrackerIcons.drag_handle),
       );
     }
   }

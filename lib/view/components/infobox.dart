@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gymtracker/icons/gymtracker_icons.dart';
 import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/view/components/maybe_rich_text.dart';
 
@@ -26,7 +27,7 @@ class Infobox extends StatelessWidget {
                   TextSpan(children: [
                     WidgetSpan(
                       child: Icon(
-                        Icons.note_alt_outlined,
+                        GymTrackerIcons.notes,
                         color: Theme.of(context).colorScheme.onSurfaceVariant,
                       ),
                       alignment: PlaceholderAlignment.middle,

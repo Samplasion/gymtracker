@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gymtracker/icons/gymtracker_icons.dart';
 import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/utils/theme.dart';
 
@@ -102,7 +103,7 @@ class AlertBanner extends StatelessWidget {
                     padding: const EdgeInsets.only(
                         right: 16, left: 8, top: 8, bottom: 8),
                     child: Icon(
-                      Icons.info_outline,
+                      GymTrackerIcons.info_outline,
                       color: color.foreground,
                     ),
                   ),

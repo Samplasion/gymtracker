@@ -1,6 +1,7 @@
 import 'dart:collection';
 
 import 'package:flutter/material.dart';
+import 'package:gymtracker/icons/gymtracker_icons.dart';
 import 'package:gymtracker/model/exercisable.dart';
 import 'package:gymtracker/model/exercise.dart';
 import 'package:gymtracker/service/localizations.dart';
@@ -68,7 +69,7 @@ class _ExercisesToSupersetDialogState extends State<ExercisesToSupersetDialog> {
           title: Text("ongoingWorkout.exercisesToSuperset.title".t),
           actions: [
             IconButton(
-              icon: const Icon(Icons.check),
+              icon: const Icon(GymTrackerIcons.done),
               onPressed: status.isValid
                   ? () => Navigator.of(context).pop(selected.toList())
                   : null,

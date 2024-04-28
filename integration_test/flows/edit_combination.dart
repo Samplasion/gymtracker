@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:get/get.dart';
 import 'package:gymtracker/controller/history_controller.dart';
 import 'package:gymtracker/controller/workout_controller.dart';
+import 'package:gymtracker/icons/gymtracker_icons.dart';
 import 'package:gymtracker/model/exercise.dart';
 import 'package:gymtracker/model/set.dart';
 import 'package:gymtracker/model/superset.dart';
@@ -80,7 +81,7 @@ Future<void> testEditWorkoutCombinationFlow(
   await databaseService.setHistoryWorkout(historyWorkoutBase);
   expect(historyWorkoutBase.isContinuable, true);
 
-  await tester.tap(find.byIcon(Icons.history_rounded));
+  await tester.tap(find.byIcon(GymTrackerIcons.history));
   await tester.pumpAndSettle();
 
   expect(find.byType(HistoryWorkout), findsOneWidget);
@@ -104,7 +105,7 @@ Future<void> testEditWorkoutCombinationFlow(
 
   expect(find.byType(WorkoutFinishPage), findsOneWidget);
 
-  await tester.tap(find.widgetWithIcon(IconButton, Icons.check));
+  await tester.tap(find.widgetWithIcon(IconButton, GymTrackerIcons.done));
   await tester.pumpAndSettle();
 
   expect(find.byType(WorkoutFinishPage), findsNothing);
@@ -122,7 +123,7 @@ Future<void> testEditWorkoutCombinationFlow(
 
   // Close the Good Job sheet
   expect(find.byType(WorkoutDoneSheet), findsOneWidget);
-  await tester.tap(find.byIcon(Icons.done_rounded));
+  await tester.tap(find.byIcon(GymTrackerIcons.done));
   await tester.pumpAndSettle();
 
   await tester.fling(

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_quill/flutter_quill.dart';
+import 'package:gymtracker/icons/gymtracker_icons.dart';
 import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/view/components/rich_text_editor.dart';
@@ -25,7 +26,7 @@ class GTRichTextEditDialog extends StatelessWidget {
               onPressed: () {
                 onNotesChange(controller.document.toEncoded());
               },
-              icon: const Icon(Icons.done_rounded),
+              icon: const Icon(GymTrackerIcons.done),
             ),
           ],
         ),

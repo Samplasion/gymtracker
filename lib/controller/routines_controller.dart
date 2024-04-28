@@ -9,6 +9,7 @@ import 'package:gymtracker/controller/history_controller.dart';
 import 'package:gymtracker/controller/serviceable_controller.dart';
 import 'package:gymtracker/controller/settings_controller.dart';
 import 'package:gymtracker/controller/workout_controller.dart';
+import 'package:gymtracker/icons/gymtracker_icons.dart';
 import 'package:gymtracker/model/exercisable.dart';
 import 'package:gymtracker/model/exercise.dart';
 import 'package:gymtracker/model/workout.dart';
@@ -259,7 +260,7 @@ class RoutinesController extends GetxController
       context: context,
       builder: (context) {
         return AlertDialog(
-          icon: const Icon(Icons.info),
+          icon: const Icon(GymTrackerIcons.info),
           title: Text("routines.actions.delete.title".t),
           content: Text(
             "routines.actions.delete.text".t,

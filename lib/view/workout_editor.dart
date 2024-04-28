@@ -7,6 +7,7 @@ import 'package:gymtracker/controller/routines_controller.dart';
 import 'package:gymtracker/controller/workout_controller.dart';
 import 'package:gymtracker/data/distance.dart';
 import 'package:gymtracker/data/weights.dart';
+import 'package:gymtracker/icons/gymtracker_icons.dart';
 import 'package:gymtracker/model/exercisable.dart';
 import 'package:gymtracker/model/exercise.dart';
 import 'package:gymtracker/model/set.dart';
@@ -66,7 +67,7 @@ class _WorkoutEditorState extends State<WorkoutEditor> {
         actions: [
           IconButton(
             tooltip: "ongoingWorkout.weightCalculator".t,
-            icon: const Icon(Icons.calculate),
+            icon: const Icon(GymTrackerIcons.weight_calculator),
             onPressed: () {
               showDialog(
                 context: context,
@@ -776,7 +777,7 @@ class _WorkoutFinishEditingPageState extends State<WorkoutFinishEditingPage> {
             actions: [
               IconButton(
                 key: const Key("submit"),
-                icon: const Icon(Icons.check),
+                icon: const Icon(GymTrackerIcons.done),
                 onPressed: _submit,
               )
             ],
@@ -920,7 +921,7 @@ class _WorkoutExerciseReorderDialogState
             ),
             actions: [
               IconButton(
-                icon: const Icon(Icons.check),
+                icon: const Icon(GymTrackerIcons.done),
                 onPressed: _submit,
               )
             ],

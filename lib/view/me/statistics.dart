@@ -6,6 +6,7 @@ import 'package:gymtracker/controller/history_controller.dart';
 import 'package:gymtracker/controller/settings_controller.dart';
 import 'package:gymtracker/data/distance.dart';
 import 'package:gymtracker/data/weights.dart';
+import 'package:gymtracker/icons/gymtracker_icons.dart';
 import 'package:gymtracker/model/workout.dart';
 import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/utils/constants.dart';
@@ -130,7 +131,7 @@ class _MeStatisticsPageState
                 value: speedDialData.$1,
                 builder: (context, value) {
                   return SpeedDialButton(
-                    icon: const Icon(Icons.fitness_center_rounded),
+                    icon: const Icon(GymTrackerIcons.workout),
                     text: Text("${value.toInt()}"),
                     subtitle: Text("me.stats.workouts.label".t),
                   );
@@ -140,7 +141,7 @@ class _MeStatisticsPageState
                 value: speedDialData.$2.inMilliseconds,
                 builder: (context, value) {
                   return SpeedDialButton(
-                    icon: const Icon(Icons.access_time_rounded),
+                    icon: const Icon(GymTrackerIcons.duration),
                     text: TimerView.buildTimeString(
                       context,
                       Duration(milliseconds: value),
@@ -154,7 +155,7 @@ class _MeStatisticsPageState
                 value: speedDialData.$3,
                 builder: (context, value) {
                   return SpeedDialButton(
-                    icon: const Icon(Icons.line_weight_rounded),
+                    icon: const Icon(GymTrackerIcons.volume),
                     text: Text(
                       "exerciseList.fields.weight".trParams({
                         "weight": NumberFormat.compact(
@@ -173,7 +174,7 @@ class _MeStatisticsPageState
                 value: speedDialData.$4,
                 builder: (context, value) {
                   return SpeedDialButton(
-                    icon: const Icon(Icons.numbers_rounded),
+                    icon: const Icon(GymTrackerIcons.sets),
                     text: Text("$value"),
                     subtitle: Text("me.stats.sets.label".t),
                   );
@@ -183,7 +184,7 @@ class _MeStatisticsPageState
                 value: speedDialData.$5,
                 builder: (context, value) {
                   return SpeedDialButton(
-                    icon: const Icon(Icons.directions_run_rounded),
+                    icon: const Icon(GymTrackerIcons.distance),
                     text: Text(
                       "exerciseList.fields.distance".trParams({
                         "distance": NumberFormat.compact(

@@ -9,6 +9,7 @@ import 'package:gymtracker/controller/routines_controller.dart';
 import 'package:gymtracker/controller/settings_controller.dart';
 import 'package:gymtracker/data/distance.dart';
 import 'package:gymtracker/data/weights.dart';
+import 'package:gymtracker/icons/gymtracker_icons.dart';
 import 'package:gymtracker/model/exercisable.dart';
 import 'package:gymtracker/model/exercise.dart';
 import 'package:gymtracker/model/set.dart';
@@ -315,7 +316,8 @@ class _ExercisesViewState extends State<ExercisesView> {
               const SliverToBoxAdapter(child: Divider()),
               SliverToBoxAdapter(
                 child: ListTile(
-                  leading: const CircleAvatar(child: Icon(Icons.add)),
+                  leading: const CircleAvatar(
+                      child: Icon(GymTrackerIcons.continuation)),
                   title: Text("exercise.continuation.label".t),
                   subtitle: Text("exercise.continuation.description".t),
                   onTap: () {
@@ -708,9 +710,9 @@ class ExerciseSetView extends StatelessWidget {
           const SizedBox(width: 8),
           if (isConcrete) ...[
             if (set.done)
-              Icon(Icons.check_box, color: colorScheme.tertiary)
+              Icon(GymTrackerIcons.checkbox_on, color: colorScheme.tertiary)
             else
-              Icon(Icons.check_box_outline_blank,
+              Icon(GymTrackerIcons.checkbox_off,
                   color: colorScheme.onSurfaceVariant),
             const SizedBox(width: 8),
           ],
@@ -726,7 +728,7 @@ class OverwriteDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      icon: const Icon(Icons.info),
+      icon: const Icon(GymTrackerIcons.info),
       title: Text("ongoingWorkout.overwrite.title".t),
       content: Text(
         "ongoingWorkout.overwrite.text".t,

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_quill/flutter_quill.dart';
 import 'package:get/get.dart';
 import 'package:gymtracker/data/rich_text.dart';
+import 'package:gymtracker/icons/gymtracker_icons.dart';
 import 'package:gymtracker/service/localizations.dart';
 
 class GTRichTextEditor extends StatefulWidget {
@@ -107,7 +108,7 @@ class _GTRichTextEditorState extends State<GTRichTextEditor> {
                 customButtons: [
                   QuillToolbarCustomButtonOptions(
                     // TODO: Figure out how to make this appear on when the text is highlighted
-                    icon: const Icon(Icons.highlight_rounded),
+                    icon: const Icon(GymTrackerIcons.highlight),
                     tooltip: "richText.highlight".t,
                     onPressed: () {
                       // If the selection is already highlighted, remove the highlight

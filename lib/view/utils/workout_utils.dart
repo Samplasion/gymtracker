@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:gymtracker/icons/gymtracker_icons.dart';
 import 'package:gymtracker/model/workout.dart';
 import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/view/utils/timer.dart';
@@ -33,7 +34,7 @@ class WorkoutHeader extends StatelessWidget {
               backgroundColor: bg,
               foregroundColor: fg,
               child: isSelected
-                  ? const Icon(Icons.check)
+                  ? const Icon(GymTrackerIcons.done)
                   : Text(workout.name.characters.first.toUpperCase()),
             ),
             const SizedBox(width: 16),

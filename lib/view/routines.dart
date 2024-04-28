@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:gymtracker/controller/routines_controller.dart';
 import 'package:gymtracker/controller/settings_controller.dart';
+import 'package:gymtracker/icons/gymtracker_icons.dart';
 import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/utils/go.dart';
@@ -49,7 +50,7 @@ class _RoutinesViewState extends State<RoutinesView> {
                 leading: CircleAvatar(
                   foregroundColor: context.colorScheme.onQuaternaryContainer,
                   backgroundColor: context.colorScheme.quaternaryContainer,
-                  child: const Icon(Icons.timer_rounded),
+                  child: const Icon(GymTrackerIcons.empty_workout),
                 ),
                 onTap: () {
                   controller.startRoutine(context);
@@ -120,12 +121,12 @@ class _RoutinesViewState extends State<RoutinesView> {
                           UniversalPlatform.isIOS) {
                         return ReorderableDelayedDragStartListener(
                           index: index,
-                          child: const Icon(Icons.drag_handle),
+                          child: const Icon(GymTrackerIcons.drag_handle),
                         );
                       } else {
                         return ReorderableDragStartListener(
                           index: index,
-                          child: const Icon(Icons.drag_handle),
+                          child: const Icon(GymTrackerIcons.drag_handle),
                         );
                       }
                     }(),
@@ -147,7 +148,8 @@ class _RoutinesViewState extends State<RoutinesView> {
             SliverToBoxAdapter(
               child: ListTile(
                 title: Text("routines.newRoutine".t),
-                leading: const CircleAvatar(child: Icon(Icons.add_rounded)),
+                leading: const CircleAvatar(
+                    child: Icon(GymTrackerIcons.create_routine)),
                 onTap: () {
                   Go.to(() => const RoutineCreator());
                 },

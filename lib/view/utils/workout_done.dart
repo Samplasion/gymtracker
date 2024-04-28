@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart' hide ContextExtensionss;
+import 'package:gymtracker/icons/gymtracker_icons.dart';
 import 'package:gymtracker/model/workout.dart';
 import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/utils/constants.dart';
@@ -24,7 +25,7 @@ class WorkoutDoneSheet extends StatelessWidget {
             automaticallyImplyLeading: false,
             actions: [
               IconButton(
-                icon: const Icon(Icons.done_rounded),
+                icon: const Icon(GymTrackerIcons.done),
                 onPressed: () {
                   Get.back();
                 },
@@ -67,7 +68,7 @@ class WorkoutDoneSheet extends StatelessWidget {
                       kSpeedDialButtonHeight,
                   buttons: [
                     SpeedDialButton(
-                      icon: const Icon(Icons.access_time_rounded),
+                      icon: const Icon(GymTrackerIcons.duration),
                       text: TimerView.buildTimeString(
                         context,
                         workout.duration!,
@@ -77,18 +78,18 @@ class WorkoutDoneSheet extends StatelessWidget {
                     ),
                     if (workout.liftedWeight > 0)
                       SpeedDialButton(
-                        icon: const Icon(Icons.line_weight_rounded),
+                        icon: const Icon(GymTrackerIcons.volume),
                         text: Text(workout.liftedWeight.userFacingWeight),
                         subtitle: Text("me.stats.volume.label".t),
                       ),
                     if (workout.distanceRun > 0)
                       SpeedDialButton(
-                        icon: const Icon(Icons.run_circle_rounded),
+                        icon: const Icon(GymTrackerIcons.distance),
                         text: Text(workout.distanceRun.userFacingDistance),
                         subtitle: Text("me.stats.distance.label".t),
                       ),
                     SpeedDialButton(
-                      icon: const Icon(Icons.numbers_rounded),
+                      icon: const Icon(GymTrackerIcons.sets),
                       text: Text(workout.doneSets.length.toString()),
                       subtitle: Text("me.stats.sets.label".t),
                     ),

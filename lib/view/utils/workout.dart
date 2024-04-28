@@ -5,6 +5,7 @@ import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:get/get.dart';
 import 'package:gymtracker/data/distance.dart';
 import 'package:gymtracker/data/weights.dart';
+import 'package:gymtracker/icons/gymtracker_icons.dart';
 import 'package:gymtracker/model/exercise.dart';
 import 'package:gymtracker/model/set.dart';
 import 'package:gymtracker/service/localizations.dart';
@@ -109,7 +110,7 @@ class _WorkoutExerciseEditorState extends State<WorkoutExerciseEditor> {
                               );
                             },
                             child: ListTile(
-                              leading: const Icon(Icons.compare_arrows),
+                              leading: const Icon(GymTrackerIcons.reorder),
                               title: Text('ongoingWorkout.exercises.reorder'.t),
                             ),
                           ),
@@ -119,7 +120,7 @@ class _WorkoutExerciseEditorState extends State<WorkoutExerciseEditor> {
                             widget.callbacks.onExerciseReplace(widget.index);
                           },
                           child: ListTile(
-                            leading: const Icon(Icons.refresh),
+                            leading: const Icon(GymTrackerIcons.replace),
                             title: Text('ongoingWorkout.exercises.replace'.t),
                           ),
                         ),
@@ -130,7 +131,8 @@ class _WorkoutExerciseEditorState extends State<WorkoutExerciseEditor> {
                                   widget.index.exerciseIndex);
                             },
                             child: ListTile(
-                              leading: const Icon(Icons.group_work_rounded),
+                              leading:
+                                  const Icon(GymTrackerIcons.add_to_superset),
                               title: Text(
                                   'ongoingWorkout.exercises.addToSuperset'.t),
                             ),
@@ -143,7 +145,7 @@ class _WorkoutExerciseEditorState extends State<WorkoutExerciseEditor> {
                           child: ListTile(
                             textColor: Theme.of(context).colorScheme.error,
                             iconColor: Theme.of(context).colorScheme.error,
-                            leading: const Icon(Icons.delete),
+                            leading: const Icon(GymTrackerIcons.delete),
                             title: Text('ongoingWorkout.exercises.remove'.t),
                           ),
                         ),
@@ -154,7 +156,7 @@ class _WorkoutExerciseEditorState extends State<WorkoutExerciseEditor> {
               ),
               const SizedBox(height: 8),
               ListTile(
-                leading: const Icon(Icons.notes),
+                leading: const Icon(GymTrackerIcons.notes),
                 title: widget.exercise.notes.asQuillDocument().isEmpty()
                     ? Text(
                         "exercise.editor.fields.notes.label".t,
@@ -164,7 +166,7 @@ class _WorkoutExerciseEditorState extends State<WorkoutExerciseEditor> {
                         text: widget.exercise.notes,
                         style: notesTextStyle,
                       ),
-                trailing: const Icon(Icons.edit),
+                trailing: const Icon(GymTrackerIcons.edit),
                 onTap: () {
                   showDialog(
                     context: context,
@@ -326,7 +328,7 @@ class _WorkoutExerciseSetEditorState extends State<WorkoutExerciseSetEditor> {
           suffix: Text("units.${widget.weightUnit.name}".t),
           suffixIcon: _weightFocusNode.hasFocus
               ? IconButton(
-                  icon: const Icon(Icons.calculate_rounded),
+                  icon: const Icon(GymTrackerIcons.weight_calculator),
                   onPressed: () {
                     Go.toDialog(
                       () => WeightCalculator(
@@ -442,7 +444,7 @@ class _WorkoutExerciseSetEditorState extends State<WorkoutExerciseSetEditor> {
             onPressed: (_) => widget.onDelete(),
             backgroundColor: scheme.error,
             foregroundColor: scheme.onError,
-            icon: Icons.delete_forever_rounded,
+            icon: GymTrackerIcons.delete_forever,
             label: 'actions.remove'.t,
           ),
         ],

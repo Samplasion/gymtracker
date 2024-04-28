@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:gymtracker/controller/exercises_controller.dart';
+import 'package:gymtracker/icons/gymtracker_icons.dart';
 import 'package:gymtracker/model/exercise.dart';
 import 'package:gymtracker/model/set.dart';
 import 'package:gymtracker/service/localizations.dart';
@@ -58,7 +59,7 @@ class _ExerciseCreatorState extends State<ExerciseCreator> {
           actions: [
             IconButton(
               key: const Key("done"),
-              icon: const Icon(Icons.done_rounded),
+              icon: const Icon(GymTrackerIcons.done),
               onPressed: _submit,
             )
           ],
@@ -183,15 +184,13 @@ class _ExerciseCreatorState extends State<ExerciseCreator> {
                       ),
                   ],
                 ),
-              ]
-                  .map((c) => Padding(
-                        padding: const EdgeInsets.symmetric(
-                          vertical: 16,
-                          horizontal: 16,
-                        ).copyWith(top: 0),
-                        child: c,
-                      ))
-                  ,
+              ].map((c) => Padding(
+                    padding: const EdgeInsets.symmetric(
+                      vertical: 16,
+                      horizontal: 16,
+                    ).copyWith(top: 0),
+                    child: c,
+                  )),
             ],
           ),
         ),

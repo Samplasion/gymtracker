@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gymtracker/data/distance.dart';
 import 'package:gymtracker/data/weights.dart';
+import 'package:gymtracker/icons/gymtracker_icons.dart';
 import 'package:gymtracker/model/superset.dart';
 import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/struct/editor_callback.dart';
@@ -63,7 +64,7 @@ class _SupersetEditorState extends State<SupersetEditor> {
                     onTap: () =>
                         widget.callbacks.onExerciseReorder(widget.index),
                     child: ListTile(
-                      leading: const Icon(Icons.compare_arrows),
+                      leading: const Icon(GymTrackerIcons.reorder),
                       title: Text('ongoingWorkout.exercises.reorder'.t),
                     ),
                   ),
@@ -73,7 +74,7 @@ class _SupersetEditorState extends State<SupersetEditor> {
                   onTap: () =>
                       widget.callbacks.onExerciseReplace(topLevelEntryIndex),
                   child: ListTile(
-                    leading: const Icon(Icons.refresh),
+                    leading: const Icon(GymTrackerIcons.replace),
                     title:
                         Text('ongoingWorkout.superset.replaceWithExercise'.t),
                   ),
@@ -93,7 +94,7 @@ class _SupersetEditorState extends State<SupersetEditor> {
                   child: ListTile(
                     textColor: Theme.of(context).colorScheme.error,
                     iconColor: Theme.of(context).colorScheme.error,
-                    leading: const Icon(Icons.delete),
+                    leading: const Icon(GymTrackerIcons.delete),
                     title: Text('ongoingWorkout.superset.remove'.t),
                   ),
                 ),
@@ -101,7 +102,7 @@ class _SupersetEditorState extends State<SupersetEditor> {
             ),
           ),
           ListTile(
-            leading: const Icon(Icons.notes),
+            leading: const Icon(GymTrackerIcons.notes),
             title: Text(
               widget.superset.notes.isEmpty
                   ? "exercise.editor.fields.notes.label".t
@@ -116,7 +117,7 @@ class _SupersetEditorState extends State<SupersetEditor> {
                     fontSize: widget.superset.notes.isEmpty ? 15 : null,
                   ),
             ),
-            trailing: const Icon(Icons.edit),
+            trailing: const Icon(GymTrackerIcons.edit),
             onTap: () {
               showDialog(
                 context: context,
@@ -201,7 +202,7 @@ class _SupersetEditorState extends State<SupersetEditor> {
           ),
           ListTile(
             title: Text("routines.editor.superset.addExercise".t),
-            leading: const Icon(Icons.add),
+            leading: const Icon(GymTrackerIcons.add_exercise),
             onTap: () {
               widget.callbacks.onSupersetAddExercise(widget.index);
             },

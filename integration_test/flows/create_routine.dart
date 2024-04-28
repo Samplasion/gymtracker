@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:gymtracker/icons/gymtracker_icons.dart';
 import 'package:gymtracker/main.dart';
 import 'package:gymtracker/model/exercise.dart';
 import 'package:gymtracker/service/database.dart';
@@ -124,7 +125,7 @@ Future<void> testCreateRoutineFlow(
   await tester.pumpAndSettle();
 
   // Save the routine
-  final saveButton = find.widgetWithIcon(IconButton, Icons.check);
+  final saveButton = find.widgetWithIcon(IconButton, GymTrackerIcons.done);
   await tester.tap(saveButton);
 
   // Trigger a frame.

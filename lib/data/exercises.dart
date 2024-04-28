@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:gymtracker/icons/gymtracker_icons.dart';
 import 'package:gymtracker/model/exercise.dart';
 import 'package:gymtracker/model/set.dart';
 import 'package:gymtracker/service/localizations.dart';
@@ -69,7 +70,7 @@ Map<String, ExerciseCategory> get exerciseStandardLibrary => {
             primaryMuscleGroup: GTMuscleGroup.none,
           ),
         ],
-        icon: const Icon(Icons.directions_bike_rounded),
+        icon: const Icon(GymTrackerIcons.cardio),
         color: Colors.orange,
       ),
       "library.chest.name".t: ExerciseCategory(

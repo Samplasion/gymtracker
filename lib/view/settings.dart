@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:gymtracker/controller/settings_controller.dart';
 import 'package:gymtracker/data/distance.dart';
 import 'package:gymtracker/data/weights.dart';
+import 'package:gymtracker/icons/gymtracker_icons.dart';
 import 'package:gymtracker/model/preferences.dart';
 import 'package:gymtracker/service/color.dart';
 import 'package:gymtracker/service/localizations.dart';
@@ -177,7 +178,7 @@ class SettingsView extends StatelessWidget {
                   Text("appInfo.shortDescription".t),
                 ],
                 applicationIcon: const InAppIcon(),
-                icon: const Icon(Icons.info),
+                icon: const Icon(GymTrackerIcons.info),
                 subtitle: Text("appInfo.version".tParams({
                   "version": VersionService().packageInfo.version,
                   "build": const String.fromEnvironment(
@@ -222,7 +223,7 @@ class InAppIcon extends StatelessWidget {
           ),
         ),
         Icon(
-          Icons.fitness_center,
+          GymTrackerIcons.app_icon,
           color: Theme.of(context).colorScheme.onPrimary,
           size: iconSize,
         ),

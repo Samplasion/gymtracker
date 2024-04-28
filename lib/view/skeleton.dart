@@ -6,6 +6,7 @@ import 'package:get/get.dart';
 import 'package:gymtracker/controller/history_controller.dart';
 import 'package:gymtracker/controller/routines_controller.dart';
 import 'package:gymtracker/controller/workout_controller.dart';
+import 'package:gymtracker/icons/gymtracker_icons.dart';
 import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/service/logger.dart';
 import 'package:gymtracker/utils/constants.dart';
@@ -108,11 +109,11 @@ class _SkeletonViewState extends State<SkeletonView>
                     NavigationDestinationLabelBehavior.onlyShowSelected,
                 destinations: [
                   NavigationDestination(
-                    icon: const Icon(Icons.fitness_center_rounded),
+                    icon: const Icon(GymTrackerIcons.routines),
                     label: "routines.title".t,
                   ),
                   NavigationDestination(
-                    icon: const Icon(Icons.local_library_rounded),
+                    icon: const Icon(GymTrackerIcons.library),
                     label: "library.title".t,
                   ),
                   NavigationDestination(
@@ -120,21 +121,21 @@ class _SkeletonViewState extends State<SkeletonView>
                       label: Text(
                           "${Get.find<HistoryController>().userVisibleLength}"),
                       isLabelVisible: _selectedIndex == 2,
-                      child: const Icon(Icons.history_rounded),
+                      child: const Icon(GymTrackerIcons.history),
                     ),
                     label: "history.title".t,
                   ),
                   NavigationDestination(
-                    icon: const Icon(Icons.person_rounded),
+                    icon: const Icon(GymTrackerIcons.profile),
                     label: "me.title".t,
                   ),
                   NavigationDestination(
-                    icon: const Icon(Icons.settings_rounded),
+                    icon: const Icon(GymTrackerIcons.settings),
                     label: "settings.title".t,
                   ),
                   if (kDebugMode)
                     const NavigationDestination(
-                      icon: Icon(Icons.bug_report),
+                      icon: Icon(GymTrackerIcons.debug),
                       label: "Debug",
                     ),
                 ],
@@ -192,7 +193,7 @@ class OngoingWorkoutBar extends StatelessWidget {
                 Crossfade(
                   firstChild: TextButton.icon(
                     onPressed: resumeWorkout,
-                    icon: const Icon(Icons.play_arrow_rounded),
+                    icon: const Icon(GymTrackerIcons.resume),
                     clipBehavior: Clip.hardEdge,
                     label: Text(
                       "ongoingWorkout.actions.short.resume".t,
@@ -203,7 +204,7 @@ class OngoingWorkoutBar extends StatelessWidget {
                   secondChild: IconButton(
                     onPressed: resumeWorkout,
                     icon: Icon(
-                      Icons.play_arrow_rounded,
+                      GymTrackerIcons.resume,
                       color: Theme.of(context).colorScheme.primary,
                     ),
                   ),
@@ -216,7 +217,7 @@ class OngoingWorkoutBar extends StatelessWidget {
                     firstChild: TextButton.icon(
                       onPressed: () => cancelWorkout(context),
                       icon: Icon(
-                        Icons.close_rounded,
+                        GymTrackerIcons.close,
                         color: Theme.of(context).colorScheme.error,
                       ),
                       clipBehavior: Clip.hardEdge,
@@ -231,7 +232,7 @@ class OngoingWorkoutBar extends StatelessWidget {
                     secondChild: IconButton(
                       onPressed: () => cancelWorkout(context),
                       icon: Icon(
-                        Icons.close_rounded,
+                        GymTrackerIcons.close,
                         color: Theme.of(context).colorScheme.error,
                       ),
                     ),

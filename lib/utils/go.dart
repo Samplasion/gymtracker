@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart' hide Material;
 import 'package:flutter/scheduler.dart';
 import 'package:get/get.dart';
+import 'package:gymtracker/icons/gymtracker_icons.dart';
 import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/service/logger.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
@@ -72,7 +73,7 @@ class Go {
       context: Get.context!,
       builder: (context) {
         return AlertDialog(
-          icon: icon ?? const Icon(Icons.info),
+          icon: icon ?? const Icon(GymTrackerIcons.info),
           title: Text(title.t),
           content: Text(body.t),
           actions: [
@@ -99,7 +100,7 @@ class Go {
       context: Get.context!,
       builder: (context) {
         return AlertDialog(
-          icon: icon ?? const Icon(Icons.info),
+          icon: icon ?? const Icon(GymTrackerIcons.info),
           title: Text(title.t),
           content: Text(body.t),
           actions: [

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get/get.dart';
 import 'package:gymtracker/controller/routines_controller.dart';
+import 'package:gymtracker/icons/gymtracker_icons.dart';
 import 'package:gymtracker/main.dart';
 import 'package:gymtracker/service/database.dart';
 import 'package:gymtracker/service/localizations.dart';
@@ -88,7 +89,7 @@ Future<void> createWorkout(
     workoutName,
   );
 
-  await tester.tap(find.widgetWithIcon(IconButton, Icons.check));
+  await tester.tap(find.widgetWithIcon(IconButton, GymTrackerIcons.done));
   await tester.pumpAndSettle();
 
   expect(find.byType(WorkoutFinishPage), findsNothing);
@@ -96,7 +97,7 @@ Future<void> createWorkout(
 
   // No Workout done sheet because we haven't marked any of the sets as done
   // expect(find.byType(WorkoutDoneSheet), findsOneWidget);
-  // await tester.tap(find.widgetWithIcon(IconButton, Icons.done_rounded));
+  // await tester.tap(find.widgetWithIcon(IconButton, GymTrackerIcons.done));
   // await tester.pumpAndSettle();
 }
 

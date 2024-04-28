@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:gymtracker/controller/exercises_controller.dart';
 import 'package:gymtracker/data/exercises.dart';
+import 'package:gymtracker/icons/gymtracker_icons.dart';
 import 'package:gymtracker/model/exercise.dart';
 import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/service/logger.dart';
@@ -30,7 +31,7 @@ class _ExercisePickerState extends State<ExercisePicker> {
     return {
       "library.custom".t: ExerciseCategory(
         exercises: controller.exercises,
-        icon: const Icon(Icons.star_rounded),
+        icon: const Icon(GymTrackerIcons.custom_exercises),
         color: Colors.yellow,
       ),
       for (final key in sortedKeys) key: exerciseStandardLibrary[key]!,
@@ -46,7 +47,7 @@ class _ExercisePickerState extends State<ExercisePicker> {
           if (!widget.singlePick)
             IconButton(
               key: const Key('pick'),
-              icon: const Icon(Icons.check_rounded),
+              icon: const Icon(GymTrackerIcons.done),
               onPressed: _submit,
             )
         ],
@@ -118,7 +119,7 @@ class _ExercisePickerState extends State<ExercisePicker> {
           );
         },
         label: Text("actions.create".t),
-        icon: const Icon(Icons.add),
+        icon: const Icon(GymTrackerIcons.create_exercise),
       ),
     );
   }
@@ -169,7 +170,7 @@ class _LibraryPickerExercisesViewState
         actions: [
           IconButton(
             key: const Key('pick'),
-            icon: const Icon(Icons.check_rounded),
+            icon: const Icon(GymTrackerIcons.done),
             onPressed: widget.onSubmit,
           )
         ],

@@ -38,45 +38,11 @@ class CountdownController extends GetxController {
 
   _onUpdate() {
     timer?.cancel();
-    if (Platform.isIOS) {
-      notificationsPlugin.cancel(NotificationIDs.restTimer);
-    }
+    notificationsPlugin.cancel(NotificationIDs.restTimer);
 
     if (targetTime.value != null) {
       timer = Timer(targetTime.value!.difference(DateTime.now()), _onRing);
-      if (Platform.isIOS) {
-        const darwinDetails = DarwinNotificationDetails(
-          presentSound: true,
-          presentAlert: true,
-        );
-        const notificationDetails = NotificationDetails(
-          iOS: darwinDetails,
-        );
-        notificationsPlugin.zonedSchedule(
-          NotificationIDs.restTimer,
-          'appName'.t,
-          'ongoingWorkout.restOver'.t,
-          TZDateTime.from(targetTime.value!, local),
-          notificationDetails,
-          uiLocalNotificationDateInterpretation:
-              UILocalNotificationDateInterpretation.wallClockTime,
-          androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
-        );
-      }
-    }
-  }
 
-  _onRing() async {
-    // Clean up
-    timer?.cancel();
-    timer = null;
-    targetTime.value = null;
-    startingTime.value = null;
-
-    logger.i('Rest timer finished');
-
-    // Show notification
-    if (!Platform.isIOS) {
       final androidDetails = AndroidNotificationDetails(
         'org.js.samplasion.gymtracker.RestTimeoutChannel',
         'androidNotificationChannel.name'.t,
@@ -94,13 +60,27 @@ class CountdownController extends GetxController {
         macOS: darwinDetails,
         iOS: darwinDetails,
       );
-      notificationsPlugin.show(
+      notificationsPlugin.zonedSchedule(
         NotificationIDs.restTimer,
         'appName'.t,
         'ongoingWorkout.restOver'.t,
+        TZDateTime.from(targetTime.value!, local),
         notificationDetails,
+        uiLocalNotificationDateInterpretation:
+            UILocalNotificationDateInterpretation.wallClockTime,
+        androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
       );
     }
+  }
+
+  _onRing() async {
+    // Clean up
+    timer?.cancel();
+    timer = null;
+    targetTime.value = null;
+    startingTime.value = null;
+
+    logger.i('Rest timer finished');
   }
 
   setCountdown(Duration delta) {

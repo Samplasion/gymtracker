@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:gymtracker/icons/gymtracker_icons.dart';
 import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/utils/go.dart';
@@ -183,7 +184,14 @@ class _LineChartTimeSeriesState<T> extends State<LineChartTimeSeries<T>> {
                   },
                 );
               },
-              child: Text("timeSeriesChart.interval.${type.name}".t),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text("timeSeriesChart.interval.${type.name}".t),
+                  const SizedBox(width: 4),
+                  const Icon(GymTrackerIcons.dropdown),
+                ],
+              ),
             ),
           ],
         ),

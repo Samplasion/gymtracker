@@ -50,6 +50,7 @@ class GymTrackerIcons {
   static const IconData distance = Icons.directions_run_rounded;
   static const IconData done = Icons.done_rounded;
   static const IconData drag_handle = Icons.drag_handle;
+  static const IconData dropdown = Icons.arrow_drop_down_rounded;
   static const IconData duration = Icons.access_time_rounded;
   static const IconData edit = Icons.edit_rounded;
   static const IconData empty_workout = Icons.timer_rounded;

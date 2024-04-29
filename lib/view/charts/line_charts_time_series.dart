@@ -107,6 +107,9 @@ class _LineChartTimeSeriesState<T> extends State<LineChartTimeSeries<T>> {
       }
     }
 
+    // Pad the max date by 2 days to make the last day visible
+    maxDate = maxDate.add(const Duration(days: 2));
+
     return Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -155,7 +158,6 @@ class _LineChartTimeSeriesState<T> extends State<LineChartTimeSeries<T>> {
                 gridData: FlGridData(
                   show: true,
                   drawVerticalLine: true,
-                  // verticalInterval: 1,
                   verticalInterval:
                       const Duration(days: 1).inMinutes.toDouble(),
                   checkToShowVerticalLine: (value) {

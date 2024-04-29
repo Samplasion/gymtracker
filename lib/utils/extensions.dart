@@ -80,6 +80,10 @@ extension DateUtils on DateTime {
   bool isAfterOrAtSameMomentAs(DateTime other) {
     return isAfter(other) || isAtSameMomentAs(other);
   }
+
+  bool isBeforeOrAtSameMomentAs(DateTime other) {
+    return isBefore(other) || isAtSameMomentAs(other);
+  }
 }
 
 extension ColorUtils on Color {

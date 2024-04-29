@@ -55,6 +55,17 @@ class _LineChartTimeSeriesState<T> extends State<LineChartTimeSeries<T>> {
       widget.data[selectedCategory]!.last.date.minutesSinceEpoch;
   var type = _LineChartTimeSeriesType.threeMonths;
 
+  var _offset = Duration.zero;
+  Duration get offset => _offset;
+  set offset(Duration value) {
+    if (value.inHours >= 0) {
+      _offset = Duration.zero;
+      return;
+    }
+
+    _offset = value;
+  }
+
   List<LineChartPoint> get children => widget.data[selectedCategory]!;
 
   late final double leftReservedSize = () {
@@ -84,16 +95,14 @@ class _LineChartTimeSeriesState<T> extends State<LineChartTimeSeries<T>> {
         ),
       );
 
-  @override
-  Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    final startingDate = DateTime.now().startOfDay.subtract(type.duration);
-    final filteredChildren = children.where((point) {
-      return point.date.isAfter(startingDate);
-    }).toList();
-    final predictionColor = colorScheme.quaternary;
+  DateTime get startingDate =>
+      DateTime.now().startOfDay.subtract(type.duration);
+  List<LineChartPoint> get filteredChildren => children.where((point) {
+        return point.date.isAfter(startingDate);
+      }).toList();
 
-    var minDate = startingDate;
+  DateTime get absoluteMinimum => children.first.date.startOfDay;
+  DateTime get absoluteMaximum {
     var maxDate = (filteredChildren.isEmpty
         ? DateTime.now()
         : filteredChildren.last.date);
@@ -109,6 +118,39 @@ class _LineChartTimeSeriesState<T> extends State<LineChartTimeSeries<T>> {
 
     // Pad the max date by 2 days to make the last day visible
     maxDate = maxDate.add(const Duration(days: 2));
+
+    return maxDate;
+  }
+
+  _onDrag(DragUpdateDetails details) {
+    final days = -details.delta.dx / 2;
+    var newOffset = Duration(hours: (days * 24).toInt());
+
+    if (newOffset.isNegative &&
+        currentMinDate.add(newOffset).isBefore(absoluteMinimum)) {
+      newOffset = absoluteMinimum.difference(currentMinDate);
+    }
+
+    if (!newOffset.isNegative &&
+        currentMaxDate.add(newOffset).isAfter(absoluteMaximum)) {
+      newOffset = absoluteMaximum.difference(currentMaxDate);
+    }
+
+    setState(() => offset = offset + newOffset);
+  }
+
+  DateTime get currentMinDate {
+    return startingDate.add(offset);
+  }
+
+  DateTime get currentMaxDate {
+    return absoluteMaximum.add(offset);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final predictionColor = colorScheme.quaternary;
 
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -145,171 +187,176 @@ class _LineChartTimeSeriesState<T> extends State<LineChartTimeSeries<T>> {
             ),
           ],
         ),
-        ConstrainedBox(
-          constraints: BoxConstraints.loose(const Size.fromHeight(300)),
-          child: Padding(
-            padding: const EdgeInsets.only(
-              top: 16,
-              right: 16,
-            ),
-            child: LineChart(
-              LineChartData(
-                clipData: const FlClipData.all(),
-                gridData: FlGridData(
-                  show: true,
-                  drawVerticalLine: true,
-                  verticalInterval:
-                      const Duration(days: 1).inMinutes.toDouble(),
-                  checkToShowVerticalLine: (value) {
-                    final date = DateTime.fromMillisecondsSinceEpoch(
-                        value.toInt() * 60000);
-                    return date.day == 1;
-                  },
-                  getDrawingHorizontalLine: (value) {
-                    return FlLine(
-                      color: colorScheme.outlineVariant,
-                      strokeWidth: 1,
-                    );
-                  },
-                  getDrawingVerticalLine: (value) {
-                    return FlLine(
-                      color: colorScheme.outlineVariant,
-                      strokeWidth: 1,
-                    );
-                  },
-                ),
-                titlesData: FlTitlesData(
-                  show: true,
-                  rightTitles: const AxisTitles(
-                    sideTitles: SideTitles(showTitles: false),
+        GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onHorizontalDragUpdate: _onDrag,
+          child: ConstrainedBox(
+            constraints: BoxConstraints.loose(const Size.fromHeight(300)),
+            child: Padding(
+              padding: const EdgeInsets.only(
+                top: 16,
+                right: 16,
+              ),
+              child: LineChart(
+                LineChartData(
+                  clipData: const FlClipData.all(),
+                  gridData: FlGridData(
+                    show: true,
+                    drawVerticalLine: true,
+                    verticalInterval:
+                        const Duration(days: 1).inMinutes.toDouble(),
+                    checkToShowVerticalLine: (value) {
+                      final date = DateTime.fromMillisecondsSinceEpoch(
+                          value.toInt() * 60000);
+                      return date.day == 1;
+                    },
+                    getDrawingHorizontalLine: (value) {
+                      return FlLine(
+                        color: colorScheme.outlineVariant,
+                        strokeWidth: 1,
+                      );
+                    },
+                    getDrawingVerticalLine: (value) {
+                      return FlLine(
+                        color: colorScheme.outlineVariant,
+                        strokeWidth: 1,
+                      );
+                    },
                   ),
-                  topTitles: const AxisTitles(
-                    sideTitles: SideTitles(showTitles: false),
-                  ),
-                  leftTitles: AxisTitles(
-                    sideTitles: SideTitles(
-                      showTitles: true,
-                      reservedSize:
-                          [context.width / 5, leftReservedSize].min + 8,
-                      getTitlesWidget: leftTitleWidgets(context),
+                  titlesData: FlTitlesData(
+                    show: true,
+                    rightTitles: const AxisTitles(
+                      sideTitles: SideTitles(showTitles: false),
                     ),
-                  ),
-                  bottomTitles: AxisTitles(
-                    sideTitles: SideTitles(
-                      showTitles: true,
-                      reservedSize: 30,
-                      getTitlesWidget: bottomTitleWidgets(context),
+                    topTitles: const AxisTitles(
+                      sideTitles: SideTitles(showTitles: false),
                     ),
-                  ),
-                ),
-                borderData: FlBorderData(
-                  border: Border.all(color: colorScheme.outline),
-                ),
-                showingTooltipIndicators: [],
-                lineTouchData: LineTouchData(
-                  touchTooltipData: LineTouchTooltipData(
-                    tooltipBgColor: Colors.transparent,
-                    getTooltipItems: (items) => <LineTooltipItem?>[
-                      ...items.map((_) => const LineTooltipItem(
-                            "hhh",
-                            TextStyle(color: Colors.transparent),
-                          ))
-                    ],
-                  ),
-                  touchSpotThreshold: 10000,
-                  enabled: true,
-                  touchCallback: (event, response) {
-                    final allLines = response?.lineBarSpots ?? [];
-                    if (allLines.isEmpty) {
-                      return;
-                    }
-                    allLines.sort((a, b) => a.distance.compareTo(b.distance));
-
-                    final touchLineBarSpot = allLines.first;
-
-                    final index = touchLineBarSpot.x.toInt();
-                    final availableIndices = {
-                      ...dataIndices[selectedCategory]!.keys
-                    };
-
-                    if (index != hoveredIndex &&
-                        availableIndices.contains(index)) {
-                      setState(() => hoveredIndex = index);
-                    }
-                  },
-                ),
-                minX: minDate.minutesSinceEpoch.toDouble(),
-                maxX: maxDate.minutesSinceEpoch.toDouble(),
-                minY: widget.minY,
-                maxY: widget.maxY,
-                lineBarsData: [
-                  if (widget.predictions?[selectedCategory] != null)
-                    LineChartBarData(
-                      dotData: FlDotData(
-                        show: true,
-                        checkToShowDot: (spot, barData) {
-                          return !filteredChildren.any((element) =>
-                              element.date.minutesSinceEpoch == spot.x.toInt());
-                        },
+                    leftTitles: AxisTitles(
+                      sideTitles: SideTitles(
+                        showTitles: true,
+                        reservedSize:
+                            [context.width / 5, leftReservedSize].min + 8,
+                        getTitlesWidget: leftTitleWidgets(context),
                       ),
+                    ),
+                    bottomTitles: AxisTitles(
+                      sideTitles: SideTitles(
+                        showTitles: true,
+                        reservedSize: 30,
+                        getTitlesWidget: bottomTitleWidgets(context),
+                      ),
+                    ),
+                  ),
+                  borderData: FlBorderData(
+                    border: Border.all(color: colorScheme.outline),
+                  ),
+                  showingTooltipIndicators: [],
+                  lineTouchData: LineTouchData(
+                    touchTooltipData: LineTouchTooltipData(
+                      tooltipBgColor: Colors.transparent,
+                      getTooltipItems: (items) => <LineTooltipItem?>[
+                        ...items.map((_) => const LineTooltipItem(
+                              "hhh",
+                              TextStyle(color: Colors.transparent),
+                            ))
+                      ],
+                    ),
+                    touchSpotThreshold: 10000,
+                    enabled: true,
+                    touchCallback: (event, response) {
+                      final allLines = response?.lineBarSpots ?? [];
+                      if (allLines.isEmpty) {
+                        return;
+                      }
+                      allLines.sort((a, b) => a.distance.compareTo(b.distance));
+
+                      final touchLineBarSpot = allLines.first;
+
+                      final index = touchLineBarSpot.x.toInt();
+                      final availableIndices = {
+                        ...dataIndices[selectedCategory]!.keys
+                      };
+
+                      if (index != hoveredIndex &&
+                          availableIndices.contains(index)) {
+                        setState(() => hoveredIndex = index);
+                      }
+                    },
+                  ),
+                  minX: currentMinDate.minutesSinceEpoch.toDouble(),
+                  maxX: currentMaxDate.minutesSinceEpoch.toDouble(),
+                  minY: widget.minY,
+                  maxY: widget.maxY,
+                  lineBarsData: [
+                    if (widget.predictions?[selectedCategory] != null)
+                      LineChartBarData(
+                        dotData: FlDotData(
+                          show: true,
+                          checkToShowDot: (spot, barData) {
+                            return !filteredChildren.any((element) =>
+                                element.date.minutesSinceEpoch ==
+                                spot.x.toInt());
+                          },
+                        ),
+                        spots: [
+                          for (final point
+                              in widget.predictions![selectedCategory]!)
+                            FlSpot(
+                              point.date.minutesSinceEpoch.toDouble(),
+                              point.value,
+                            ),
+                        ],
+                        isCurved: true,
+                        preventCurveOverShooting: true,
+                        color: predictionColor,
+                        barWidth: 3,
+                        isStrokeCapRound: true,
+                        dashArray: [5, 10],
+                        belowBarData: BarAreaData(
+                          show: true,
+                          spotsLine: BarAreaSpotsLine(
+                            show: true,
+                            checkToShowSpotLine: (spot) =>
+                                spot.x ==
+                                widget.predictions![selectedCategory]?.last.date
+                                    .minutesSinceEpoch,
+                            flLineStyle:
+                                FlLine(color: predictionColor, dashArray: [5]),
+                          ),
+                          color: predictionColor.withOpacity(0.3),
+                        ),
+                      ),
+                    LineChartBarData(
+                      dotData: const FlDotData(),
                       spots: [
-                        for (final point
-                            in widget.predictions![selectedCategory]!)
+                        for (int i = 0; i < children.length; i++)
                           FlSpot(
-                            point.date.minutesSinceEpoch.toDouble(),
-                            point.value,
+                            children[i].date.minutesSinceEpoch.toDouble(),
+                            children[i].value,
                           ),
                       ],
-                      isCurved: true,
+                      isCurved: type == _LineChartTimeSeriesType.threeMonths,
                       preventCurveOverShooting: true,
-                      color: predictionColor,
+                      color: colorScheme.primary,
                       barWidth: 3,
                       isStrokeCapRound: true,
-                      dashArray: [5, 10],
                       belowBarData: BarAreaData(
                         show: true,
                         spotsLine: BarAreaSpotsLine(
                           show: true,
                           checkToShowSpotLine: (spot) =>
                               spot.x ==
-                              widget.predictions![selectedCategory]?.last.date
-                                  .minutesSinceEpoch,
-                          flLineStyle:
-                              FlLine(color: predictionColor, dashArray: [5]),
+                              filteredChildren.last.date.minutesSinceEpoch,
+                          flLineStyle: FlLine(color: colorScheme.primary),
                         ),
-                        color: predictionColor.withOpacity(0.3),
+                        color: colorScheme.primary.withOpacity(0.3),
                       ),
                     ),
-                  LineChartBarData(
-                    dotData: const FlDotData(),
-                    spots: [
-                      for (int i = 0; i < children.length; i++)
-                        FlSpot(
-                          children[i].date.minutesSinceEpoch.toDouble(),
-                          children[i].value,
-                        ),
-                    ],
-                    isCurved: type == _LineChartTimeSeriesType.threeMonths,
-                    preventCurveOverShooting: true,
-                    color: colorScheme.primary,
-                    barWidth: 3,
-                    isStrokeCapRound: true,
-                    belowBarData: BarAreaData(
-                      show: true,
-                      spotsLine: BarAreaSpotsLine(
-                        show: true,
-                        checkToShowSpotLine: (spot) =>
-                            spot.x ==
-                            filteredChildren.last.date.minutesSinceEpoch,
-                        flLineStyle: FlLine(color: colorScheme.primary),
-                      ),
-                      color: colorScheme.primary.withOpacity(0.3),
-                    ),
-                  ),
-                ],
+                  ],
+                ),
+                duration: const Duration(milliseconds: 350),
+                curve: Curves.linearToEaseOut,
               ),
-              duration: const Duration(milliseconds: 350),
-              curve: Curves.linearToEaseOut,
             ),
           ),
         ),

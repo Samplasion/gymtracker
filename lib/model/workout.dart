@@ -10,7 +10,7 @@ import 'package:gymtracker/model/set.dart';
 import 'package:gymtracker/model/superset.dart';
 import 'package:gymtracker/service/logger.dart';
 import 'package:gymtracker/utils/extensions.dart';
-import 'package:gymtracker/utils/utils.dart';
+import 'package:gymtracker/utils/utils.dart' hide min, max;
 import 'package:json_annotation/json_annotation.dart';
 import 'package:uuid/uuid.dart';
 

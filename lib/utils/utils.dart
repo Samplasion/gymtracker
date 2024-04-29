@@ -70,3 +70,11 @@ DateTime getLastDayOfWeek(DateTime date, int firstDayOfWeek) {
       : today.subtract(Duration(days: offset));
   return lastMonday;
 }
+
+DateTime min(DateTime a, DateTime b) {
+  return a.isBefore(b) ? a : b;
+}
+
+DateTime max(DateTime a, DateTime b) {
+  return a.isAfter(b) ? a : b;
+}

@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get/get.dart';
@@ -74,11 +76,24 @@ class NotificationController extends GetxController implements Listenable {
         true;
     hasAndroidScheduleExactAlarmPermission = result;
 
-    hasPermission = await Permission.notification.isGranted;
+    hasPermission = await _getHasPermission();
 
     logger.i("Has permission: $hasPermission\n"
         "(Android) Uses \"Schedule exact alarms\" permission: $usesAndroidExactAlarmPermission\n"
         "(Android 14+) Has \"Schedule exact alarms\" permission: $hasAndroidScheduleExactAlarmPermission\n");
+  }
+
+  Future<bool> _getHasPermission() async {
+    // The permission_handler plugin doesn't support macOS
+    if (Platform.isMacOS) {
+      final perms = await service.plugin
+          .resolvePlatformSpecificImplementation<
+              MacOSFlutterLocalNotificationsPlugin>()!
+          .checkPermissions();
+      return perms!.isEnabled;
+    } else {
+      return await Permission.notification.isGranted;
+    }
   }
 
   requestPermission() async {

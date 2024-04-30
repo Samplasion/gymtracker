@@ -11,6 +11,7 @@ import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:get/get.dart';
 import 'package:gymtracker/controller/coordinator.dart';
 import 'package:gymtracker/controller/debug_controller.dart';
+import 'package:gymtracker/controller/logger_controller.dart';
 import 'package:gymtracker/controller/settings_controller.dart';
 import 'package:gymtracker/model/preferences.dart';
 import 'package:gymtracker/service/color.dart';
@@ -30,6 +31,8 @@ import 'package:timezone/timezone.dart' as tz;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  Get.put(LoggerController());
 
   final _databaseService = DatabaseService();
 

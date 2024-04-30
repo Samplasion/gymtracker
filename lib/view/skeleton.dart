@@ -4,6 +4,7 @@ import 'package:flutter/material.dart' hide Localizations;
 import 'package:flutter/scheduler.dart';
 import 'package:get/get.dart';
 import 'package:gymtracker/controller/history_controller.dart';
+import 'package:gymtracker/controller/logger_controller.dart';
 import 'package:gymtracker/controller/notifications_controller.dart';
 import 'package:gymtracker/controller/routines_controller.dart';
 import 'package:gymtracker/controller/workout_controller.dart';
@@ -15,6 +16,7 @@ import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/view/debug.dart';
 import 'package:gymtracker/view/history.dart';
 import 'package:gymtracker/view/library.dart';
+import 'package:gymtracker/view/logs.dart';
 import 'package:gymtracker/view/me.dart';
 import 'package:gymtracker/view/routines.dart';
 import 'package:gymtracker/view/settings.dart';
@@ -57,6 +59,7 @@ class _SkeletonViewState extends State<SkeletonView>
         const MeView(),
         const SettingsView(),
         if (kDebugMode) const DebugView(),
+        if (LoggerController.shouldShowPane) const LogView(),
       ];
 
   @override
@@ -143,6 +146,11 @@ class _SkeletonViewState extends State<SkeletonView>
                     const NavigationDestination(
                       icon: Icon(GymTrackerIcons.debug),
                       label: "Debug",
+                    ),
+                  if (LoggerController.shouldShowPane)
+                    const NavigationDestination(
+                      icon: Icon(GymTrackerIcons.logs),
+                      label: "Logs",
                     ),
                 ],
                 selectedIndex: _selectedIndex,

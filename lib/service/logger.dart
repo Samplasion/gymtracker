@@ -1,6 +1,12 @@
+import 'dart:io';
+
+import 'package:get/get.dart';
+import 'package:gymtracker/controller/logger_controller.dart';
 import 'package:logger/logger.dart';
 
-Map<Level, AnsiColor> get _levelColors => {
+LoggerController get loggerController => Get.find<LoggerController>();
+
+Map<Level, AnsiColor> get levelColors => {
       Level.trace: AnsiColor.fg(AnsiColor.grey(0.5)),
       Level.debug: const AnsiColor.fg(73),
       Level.info: const AnsiColor.fg(12),
@@ -12,11 +18,11 @@ Map<Level, AnsiColor> get _levelColors => {
 final _oneLinePrefixPrinter = OneLinePrefixPrinter(
   printer: PrettyPrinter(
     printEmojis: false,
-    colors: true,
+    colors: !Platform.isIOS,
     lineLength: 80,
     noBoxingByDefault: true,
     methodCount: 0,
-    levelColors: _levelColors,
+    levelColors: levelColors,
   ),
   levels: {
     Level.trace: '[TRACE]',
@@ -26,10 +32,32 @@ final _oneLinePrefixPrinter = OneLinePrefixPrinter(
     Level.error: '[ERROR]',
     Level.fatal: '[FATAL]',
   },
-  levelColors: _levelColors,
+  levelColors: levelColors,
 );
 
-final globalLogger = Logger(printer: _oneLinePrefixPrinter);
+class GlobalControllerOutput extends LogOutput {
+  final parent = ConsoleOutput();
+
+  LoggerController? get loggerController => Get.isRegistered<LoggerController>()
+      ? Get.find<LoggerController>()
+      : null;
+
+  @override
+  void output(OutputEvent event) {
+    loggerController?.addLog(Log(
+      message: event.origin.message,
+      timestamp: event.origin.time,
+      level: event.origin.level,
+      object: null,
+      error: event.origin.error,
+      stackTrace: event.origin.stackTrace,
+    ));
+    parent.output(event);
+  }
+}
+
+final globalLogger =
+    Logger(printer: _oneLinePrefixPrinter, output: GlobalControllerOutput());
 
 class OneLinePrefixPrinter extends LogPrinter {
   final PrettyPrinter printer;
@@ -45,7 +73,11 @@ class OneLinePrefixPrinter extends LogPrinter {
   @override
   List<String> log(LogEvent event) {
     final lines = printer.log(event);
-    final color = levelColors[event.level] ?? const AnsiColor.none();
+    var color = levelColors[event.level] ?? const AnsiColor.none();
+
+    if (!printer.colors) {
+      color = const AnsiColor.none();
+    }
 
     final maxPrefixLength =
         levels.values.map((e) => e.length).reduce((a, b) => a > b ? a : b);
@@ -91,6 +123,15 @@ class ObjectLogger<T> extends Logger {
       error: error,
       stackTrace: stackTrace,
     );
+
+    loggerController.addLog(Log(
+      message: message.toString(),
+      timestamp: time ?? DateTime.now(),
+      object: _obj,
+      level: level,
+      error: error,
+      stackTrace: stackTrace,
+    ));
   }
 }
 

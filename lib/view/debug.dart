@@ -18,6 +18,7 @@ import 'package:gymtracker/model/measurements.dart';
 import 'package:gymtracker/service/database.dart';
 import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/service/logger.dart';
+import 'package:gymtracker/utils/constants.dart';
 import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/utils/noise.dart';
 import 'package:gymtracker/utils/theme.dart';
@@ -55,10 +56,7 @@ class _DebugViewState extends State<DebugView> {
                   title: const Text("Missing translations"),
                   subtitle: Text(
                     missingKeys,
-                    style: const TextStyle(
-                      fontFamily: "monospace",
-                      fontFamilyFallback: <String>["Menlo", "Courier"],
-                    ),
+                    style: monospace,
                   ),
                   onTap: () {
                     logger.d("\n$missingKeys\n");

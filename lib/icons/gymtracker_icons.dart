@@ -59,6 +59,7 @@ class GymTrackerIcons {
   static const IconData info = Icons.info_rounded;
   static const IconData info_outline = Icons.info_outline;
   static const IconData library = Icons.local_library_rounded;
+  static const IconData logs = Icons.assignment_rounded;
   static const IconData lt_chevron = Icons.chevron_right_rounded;
   static const IconData notes = Icons.note_alt_outlined;
   static const IconData notes_add = Icons.note_add_rounded;

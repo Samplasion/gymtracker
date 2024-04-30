@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 enum Breakpoints {
@@ -29,3 +30,8 @@ enum Breakpoints {
 class NotificationIDs {
   static const restTimer = 0;
 }
+
+const monospace = TextStyle(
+  fontFamily: "monospace",
+  fontFamilyFallback: <String>["Menlo", "Courier"],
+);

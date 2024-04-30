@@ -6,6 +6,7 @@ import 'package:gymtracker/controller/error_controller.dart';
 import 'package:gymtracker/controller/exercises_controller.dart';
 import 'package:gymtracker/controller/history_controller.dart';
 import 'package:gymtracker/controller/me_controller.dart';
+import 'package:gymtracker/controller/notifications_controller.dart';
 import 'package:gymtracker/controller/routines_controller.dart';
 import 'package:gymtracker/controller/serviceable_controller.dart';
 import 'package:gymtracker/controller/settings_controller.dart';
@@ -24,8 +25,16 @@ class Coordinator extends GetxController with ServiceableController {
   @override
   void onServiceChange() {}
 
+  Future awaitInitialized() {
+    return Future.wait([
+      Get.find<SettingsController>().awaitInitialized(),
+      Get.find<NotificationController>().initialize(),
+    ]);
+  }
+
   init() {
     Get.put(NotificationsService());
+    Get.put(NotificationController());
     Get.put(CountdownController());
     Get.put(ExercisesController());
     Get.put(DebugController());

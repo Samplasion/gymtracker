@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:gymtracker/controller/notifications_controller.dart';
 import 'package:gymtracker/controller/settings_controller.dart';
 import 'package:gymtracker/data/distance.dart';
 import 'package:gymtracker/data/weights.dart';
@@ -19,6 +20,7 @@ class SettingsView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = Get.find<SettingsController>();
+    final notificationController = Get.find<NotificationController>();
     final currentLocale =
         (Get.locale ?? Get.deviceLocale ?? Get.fallbackLocale)!;
     return Scaffold(
@@ -161,6 +163,7 @@ class SettingsView extends StatelessWidget {
                   await controller.exportSettings(context);
                 },
               ),
+              notificationController.settingsTile,
               const Divider(),
               AboutListTileEx(
                 applicationName: "appName".t,

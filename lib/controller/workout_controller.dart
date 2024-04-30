@@ -56,7 +56,7 @@ class WorkoutController extends GetxController with ServiceableController {
         - Weight: \t${sc.weightUnit().name} \t(cfr. ${weightUnit.value.name})
         - Distance: \t${sc.distanceUnit().name} \t(cfr. ${distanceUnit.value.name})
     """);
-    logger.w(
+    logger.d(
       "Created with name $name, parentID $parentID, and infobox $infobox",
       error: Error(),
       stackTrace: StackTrace.current,

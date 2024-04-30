@@ -4,6 +4,7 @@ import 'package:flutter/material.dart' hide Localizations;
 import 'package:flutter/scheduler.dart';
 import 'package:get/get.dart';
 import 'package:gymtracker/controller/history_controller.dart';
+import 'package:gymtracker/controller/notifications_controller.dart';
 import 'package:gymtracker/controller/routines_controller.dart';
 import 'package:gymtracker/controller/workout_controller.dart';
 import 'package:gymtracker/icons/gymtracker_icons.dart';
@@ -33,6 +34,11 @@ class _SkeletonViewState extends State<SkeletonView>
   @override
   void initState() {
     super.initState();
+
+    SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
+      Get.find<NotificationController>().androidRequestExactAlarmsPermission();
+    });
+
     WidgetsBinding.instance.addObserver(this);
   }
 

@@ -1,21 +1,15 @@
 import 'dart:async';
-import 'dart:io';
 
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get/get.dart';
-import 'package:gymtracker/service/localizations.dart';
+import 'package:gymtracker/controller/notifications_controller.dart';
 import 'package:gymtracker/service/logger.dart';
-import 'package:gymtracker/service/notifications.dart';
-import 'package:gymtracker/utils/constants.dart';
-import 'package:timezone/timezone.dart';
 
 class CountdownController extends GetxController {
   Rx<DateTime?> targetTime = Rx(null);
   Rx<DateTime?> startingTime = Rx(null);
   Timer? timer;
 
-  FlutterLocalNotificationsPlugin get notificationsPlugin =>
-      Get.find<NotificationsService>().plugin;
+  final NotificationController notificationController = Get.find();
 
   bool get isActive => targetTime.value != null && timer != null;
   Duration get remaining =>
@@ -38,38 +32,12 @@ class CountdownController extends GetxController {
 
   _onUpdate() {
     timer?.cancel();
-    notificationsPlugin.cancel(NotificationIDs.restTimer);
+    notificationController.cancelRestOverNotification();
 
     if (targetTime.value != null) {
       timer = Timer(targetTime.value!.difference(DateTime.now()), _onRing);
 
-      final androidDetails = AndroidNotificationDetails(
-        'org.js.samplasion.gymtracker.RestTimeoutChannel',
-        'androidNotificationChannel.name'.t,
-        channelDescription: 'androidNotificationChannel.description'.t,
-        importance: Importance.max,
-        priority: Priority.high,
-        ticker: 'ongoingWorkout.restOver'.t,
-      );
-      const darwinDetails = DarwinNotificationDetails(
-        presentSound: true,
-        presentAlert: true,
-      );
-      final notificationDetails = NotificationDetails(
-        android: androidDetails,
-        macOS: darwinDetails,
-        iOS: darwinDetails,
-      );
-      notificationsPlugin.zonedSchedule(
-        NotificationIDs.restTimer,
-        'appName'.t,
-        'ongoingWorkout.restOver'.t,
-        TZDateTime.from(targetTime.value!, local),
-        notificationDetails,
-        uiLocalNotificationDateInterpretation:
-            UILocalNotificationDateInterpretation.wallClockTime,
-        androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
-      );
+      notificationController.scheduleRestOverNotification(targetTime.value!);
     }
   }
 
@@ -84,7 +52,7 @@ class CountdownController extends GetxController {
   }
 
   setCountdown(Duration delta) {
-    notificationsPlugin.cancel(NotificationIDs.restTimer);
+    notificationController.cancelRestOverNotification();
     final now = DateTime.now();
     startingTime(now);
     targetTime(now.add(delta));

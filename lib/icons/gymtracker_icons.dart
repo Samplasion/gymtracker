@@ -62,6 +62,8 @@ class GymTrackerIcons {
   static const IconData lt_chevron = Icons.chevron_right_rounded;
   static const IconData notes = Icons.note_alt_outlined;
   static const IconData notes_add = Icons.note_add_rounded;
+  static const IconData notification_dialog =
+      Icons.notification_important_rounded;
   static const IconData pause = Icons.pause_rounded;
   static const IconData profile = Icons.person_rounded;
   static const IconData reorder = Icons.compare_arrows_rounded;

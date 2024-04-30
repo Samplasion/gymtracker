@@ -202,7 +202,7 @@ class __LoaderState extends State<_Loader> {
   @override
   void initState() {
     super.initState();
-    Get.find<SettingsController>().awaitInitialized().then((_) {
+    Get.find<Coordinator>().awaitInitialized().then((_) {
       SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
         Go.off(() => const SkeletonView());
       });

@@ -325,16 +325,23 @@
           "light": "Modalità bianco puro"
         }
       },
-      "export": {
-        "label": "Esporta dati (JSON)",
-        "filename": "Dati_GymTracker"
-      },
       "themeMode": {
         "label": "Tema",
         "values": {
           "system": "Sistema",
           "light": "Chiaro",
           "dark": "Scuro"
+        }
+      },
+      "export": {
+        "label": "Esporta dati (JSON)",
+        "filename": "Dati_GymTracker"
+      },
+      "notifications": {
+        "label": "Stato notifiche",
+        "subtitle": {
+          "noPermission": "Tocca per richiedere il permesso",
+          "noExactAlarmPermission": "Tocca per richiedere il permesso \"Promemoria e avvisi\" (Android 14+)"
         }
       }
     },
@@ -941,5 +948,9 @@
       "sixMonths": "6 mesi",
       "oneYear": "1 anno"
     }
+  },
+  "androidRequestExactAlarmsPermission": {
+    "title": "Permesso di invio notifiche",
+    "message": "Questa applicazione richiede un permesso speciale, \"Promemoria e avvisi\", sulle versioni di Android a partire da Android 14. Puoi scegliere di rifiutarlo, ma funzionalità come le notifiche di fine recupero non funzioneranno. Vuoi dare il permesso?"
   }
 }

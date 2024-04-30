@@ -336,6 +336,13 @@
           "light": "Light",
           "dark": "Dark"
         }
+      },
+      "notifications": {
+        "label": "Notification status",
+        "subtitle": {
+          "noPermission": "Tap to request permission",
+          "noExactAlarmPermission": "Tap to request \"Exact alarms\" permission (Android 14+)"
+        }
       }
     },
     "colorPicker": {
@@ -744,13 +751,13 @@
     },
     "newCustomExercise": "New exercise",
     "hips": {
+      "name": "Hips",
       "exercises": {
         "gluteBridge": "Glute bridge",
         "hipThrust": "Hip thrust",
         "hipAdduction": "Hip adduction",
         "hipAbduction": "Hip abduction"
-      },
-      "name": "Hips"
+      }
     }
   },
   "infobox": {
@@ -941,5 +948,9 @@
       "sixMonths": "6 months",
       "oneYear": "1 year"
     }
+  },
+  "androidRequestExactAlarmsPermission": {
+    "title": "Notification permission",
+    "message": "This app requires a special \"Exact alarms\" permission on versions of Android greater than or equal to 14. You can deny it, but features such as rest timer notifications won't work. Would you like to grant this permission?"
   }
 }

@@ -91,17 +91,29 @@ class NotificationController extends GetxController implements Listenable {
               MacOSFlutterLocalNotificationsPlugin>()!
           .checkPermissions();
       return perms!.isEnabled;
+    } else if (Platform.isIOS) {
+      final perms = await service.plugin
+          .resolvePlatformSpecificImplementation<
+              IOSFlutterLocalNotificationsPlugin>()!
+          .checkPermissions();
+      return perms!.isEnabled;
+    } else if (Platform.isAndroid) {
+      final perms = await service.plugin
+          .resolvePlatformSpecificImplementation<
+              AndroidFlutterLocalNotificationsPlugin>()!
+          .areNotificationsEnabled();
+      return perms ?? true;
     } else {
-      return await Permission.notification.isGranted;
+      throw UnsupportedError("Unsupported platform");
     }
   }
 
   requestPermission() async {
     if (hasPermission) return;
 
-    hasPermission = await Permission.notification
-        .request()
-        .then((status) => status.isGranted);
+    await Permission.notification.request().then((status) => status.isGranted);
+
+    hasPermission = await _getHasPermission();
 
     notifyListeners();
   }

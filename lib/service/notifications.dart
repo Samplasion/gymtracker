@@ -2,7 +2,6 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get/get.dart';
 import 'package:gymtracker/controller/coordinator.dart';
 import 'package:gymtracker/service/logger.dart';
-import 'package:permission_handler/permission_handler.dart';
 
 class NotificationsService extends GetxService {
   final plugin = FlutterLocalNotificationsPlugin();
@@ -25,17 +24,6 @@ class NotificationsService extends GetxService {
       ),
       onDidReceiveNotificationResponse: _onTapNotification,
     );
-  }
-
-  Future<bool> hasPermission() async {
-    final hasPermission = await Permission.notification.status;
-    final hasExactPermission = (await plugin
-            .resolvePlatformSpecificImplementation<
-                AndroidFlutterLocalNotificationsPlugin>()
-            ?.canScheduleExactNotifications()) ??
-        true;
-
-    return hasPermission.isGranted && hasExactPermission;
   }
 
   _onTapNotification(NotificationResponse response) {

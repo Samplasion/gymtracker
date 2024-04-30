@@ -75,6 +75,10 @@ class NotificationController extends GetxController implements Listenable {
     hasAndroidScheduleExactAlarmPermission = result;
 
     hasPermission = await Permission.notification.isGranted;
+
+    logger.i("Has permission: $hasPermission\n"
+        "(Android) Uses \"Schedule exact alarms\" permission: $usesAndroidExactAlarmPermission\n"
+        "(Android 14+) Has \"Schedule exact alarms\" permission: $hasAndroidScheduleExactAlarmPermission\n");
   }
 
   requestPermission() async {
@@ -92,6 +96,10 @@ class NotificationController extends GetxController implements Listenable {
     if (!hasPermission) {
       logger.i("We don't have notifications permission. "
           "Don't bother asking for exact alarms.");
+      return;
+    }
+    if (hasAndroidScheduleExactAlarmPermission) {
+      logger.i("We already have the exact alarms permission.");
       return;
     }
 

@@ -4,7 +4,8 @@ import 'package:get/get.dart';
 import 'package:gymtracker/controller/logger_controller.dart';
 import 'package:logger/logger.dart';
 
-LoggerController get loggerController => Get.find<LoggerController>();
+LoggerController? get loggerController =>
+    Get.isRegistered<LoggerController>() ? Get.find<LoggerController>() : null;
 
 Map<Level, AnsiColor> get levelColors => {
       Level.trace: AnsiColor.fg(AnsiColor.grey(0.5)),
@@ -124,7 +125,7 @@ class ObjectLogger<T> extends Logger {
       stackTrace: stackTrace,
     );
 
-    loggerController.addLog(Log(
+    loggerController?.addLog(Log(
       message: message.toString(),
       timestamp: time ?? DateTime.now(),
       object: _obj,

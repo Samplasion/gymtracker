@@ -108,6 +108,8 @@ class RoutinesController extends GetxController
         builder: (context) => const OverwriteDialog(),
       );
       if (!(result ?? false)) return;
+
+      Get.delete<WorkoutController>();
     }
 
     removeCountdown();

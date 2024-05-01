@@ -2,11 +2,14 @@ import 'dart:io';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:gymtracker/controller/stopwatch_controller.dart';
+import 'package:gymtracker/view/components/controlled.dart';
 
 import 'package:gymtracker/view/utils/animated_selectable.dart';
+import 'package:gymtracker/view/utils/crossfade.dart';
 
 class TimeInputField extends StatefulWidget {
   final TextEditingController controller;
@@ -46,9 +49,8 @@ class TimeInputField extends StatefulWidget {
   }
 }
 
-class _TimeInputFieldState extends State<TimeInputField> {
-  final controller = Get.find<StopwatchController>();
-
+class _TimeInputFieldState
+    extends ControlledState<TimeInputField, StopwatchController> {
   late String numericalValue = _toTimeString(widget.controller.text);
   final node = FocusNode();
 
@@ -92,6 +94,19 @@ class _TimeInputFieldState extends State<TimeInputField> {
   }
 
   @override
+  void didUpdateWidget(TimeInputField oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    if (oldWidget.timerInteractive && !widget.timerInteractive) {
+      if (controller.isRunning(widget.setID!)) {
+        SchedulerBinding.instance.addPostFrameCallback((_) {
+          _endTimer();
+        });
+      }
+    }
+  }
+
+  @override
   void dispose() {
     super.dispose();
   }
@@ -110,8 +125,9 @@ class _TimeInputFieldState extends State<TimeInputField> {
             )
           : const TextInputType.numberWithOptions(decimal: false),
       decoration: (widget.decoration ?? const InputDecoration()).copyWith(
-        suffixIcon: () {
-          if (widget.timerInteractive) {
+        suffixIcon: Crossfade(
+          firstChild: const SizedBox.shrink(),
+          secondChild: () {
             var isActive = _isActive;
             return SelectableAnimatedBuilder(
               isSelected: isActive,
@@ -127,8 +143,9 @@ class _TimeInputFieldState extends State<TimeInputField> {
                 },
               ),
             );
-          }
-        }(),
+          }(),
+          showSecond: widget.timerInteractive,
+        ),
       ),
       inputFormatters: <TextInputFormatter>[TimeTextInputFormatter()],
       onChanged: (value) {

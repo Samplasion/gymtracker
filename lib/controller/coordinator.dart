@@ -105,4 +105,9 @@ class Coordinator extends GetxController with ServiceableController {
       Get.find<WorkoutController>().onNotificationTapped(value);
     }
   }
+
+  void onHotReload() {
+    logger.i("[#reassemble()] called");
+    Get.find<GTLocalizations>().init(false);
+  }
 }

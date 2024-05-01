@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart' hide Localizations;
 import 'package:flutter/scheduler.dart';
 import 'package:get/get.dart';
+import 'package:gymtracker/controller/coordinator.dart';
 import 'package:gymtracker/controller/history_controller.dart';
 import 'package:gymtracker/controller/logger_controller.dart';
 import 'package:gymtracker/controller/notifications_controller.dart';
@@ -10,7 +11,6 @@ import 'package:gymtracker/controller/routines_controller.dart';
 import 'package:gymtracker/controller/workout_controller.dart';
 import 'package:gymtracker/icons/gymtracker_icons.dart';
 import 'package:gymtracker/service/localizations.dart';
-import 'package:gymtracker/service/logger.dart';
 import 'package:gymtracker/utils/constants.dart';
 import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/view/debug.dart';
@@ -65,8 +65,7 @@ class _SkeletonViewState extends State<SkeletonView>
   @override
   void reassemble() {
     super.reassemble();
-    logger.i("[#reassemble()] called");
-    Get.find<GTLocalizations>().init();
+    Get.find<Coordinator>().onHotReload();
   }
 
   @override

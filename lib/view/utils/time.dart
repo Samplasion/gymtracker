@@ -162,7 +162,10 @@ class _TimeInputFieldState
           _oldSelection = widget.controller.selection;
         });
       },
-      onEditingComplete: () => normalizeField(),
+      onEditingComplete: () {
+        normalizeField();
+        node.unfocus();
+      },
       onTapOutside: (_) {
         normalizeField();
         node.unfocus();

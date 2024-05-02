@@ -335,7 +335,11 @@
       },
       "export": {
         "label": "Esporta dati (JSON)",
-        "filename": "Dati_GymTracker"
+        "filename": "Dati_GymTracker",
+        "failed": {
+          "title": "Impossibile esportare i dati",
+          "copy": "Il messaggio di errore è stato copiato negli appunti."
+        }
       },
       "notifications": {
         "label": "Stato notifiche",

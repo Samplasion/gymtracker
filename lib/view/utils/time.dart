@@ -6,9 +6,7 @@ import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:gymtracker/controller/stopwatch_controller.dart';
 import 'package:gymtracker/view/components/controlled.dart';
-
 import 'package:gymtracker/view/utils/animated_selectable.dart';
-import 'package:gymtracker/view/utils/crossfade.dart';
 
 class TimeInputField extends StatefulWidget {
   final TextEditingController controller;
@@ -124,27 +122,24 @@ class _TimeInputFieldState
             )
           : const TextInputType.numberWithOptions(decimal: false),
       decoration: (widget.decoration ?? const InputDecoration()).copyWith(
-        suffixIcon: Crossfade(
-          firstChild: const SizedBox.shrink(),
-          secondChild: () {
-            var isActive = _isActive;
-            return SelectableAnimatedBuilder(
-              isSelected: isActive,
-              builder: (context, animation) => IconButton(
-                icon: AnimatedIcon(
-                  progress: animation,
-                  icon: AnimatedIcons.play_pause,
-                ),
-                onPressed: () {
-                  setState(() {
-                    _toggleTimer();
-                  });
-                },
+        suffixIcon: () {
+          if (!widget.timerInteractive) return null;
+          var isActive = _isActive;
+          return SelectableAnimatedBuilder(
+            isSelected: isActive,
+            builder: (context, animation) => IconButton(
+              icon: AnimatedIcon(
+                progress: animation,
+                icon: AnimatedIcons.play_pause,
               ),
-            );
-          }(),
-          showSecond: widget.timerInteractive,
-        ),
+              onPressed: () {
+                setState(() {
+                  _toggleTimer();
+                });
+              },
+            ),
+          );
+        }(),
       ),
       inputFormatters: <TextInputFormatter>[TimeTextInputFormatter()],
       onChanged: (value) {

@@ -12,6 +12,7 @@ import 'package:gymtracker/data/weights.dart';
 import 'package:gymtracker/model/preferences.dart';
 import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/service/logger.dart';
+import 'package:gymtracker/utils/constants.dart';
 import 'package:gymtracker/utils/go.dart';
 import 'package:share_plus/share_plus.dart';
 
@@ -107,18 +108,40 @@ class SettingsController extends GetxController with ServiceableController {
   }
 
   Future exportSettings(BuildContext context) async {
-    final box = context.findRenderObject() as RenderBox?;
-    await Share.shareXFiles(
-      [
-        XFile.fromData(
-          Uint8List.fromList(utf8.encode(json.encode(service.toJson()))),
-          mimeType: "application/json",
-          name:
-              "${"settings.options.export.filename".t}_${DateTime.now().toIso8601String()}.json",
-        )
-      ],
-      sharePositionOrigin: box!.localToGlobal(Offset.zero) & box.size,
-    );
+    try {
+      final box = context.findRenderObject() as RenderBox?;
+      await Share.shareXFiles(
+        [
+          XFile.fromData(
+            Uint8List.fromList(utf8.encode(json.encode(service.toJson()))),
+            mimeType: "application/json",
+            name:
+                "${"settings.options.export.filename".t}_${DateTime.now().toIso8601String()}.json",
+          )
+        ],
+        sharePositionOrigin: box!.localToGlobal(Offset.zero) & box.size,
+      );
+    } catch (e, s) {
+      logger.e(null, error: e, stackTrace: s);
+
+      Go.dialog(
+        "settings.options.export.failed.title".t,
+        "$e\n$s".trim(),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Clipboard.setData(ClipboardData(text: "$e\n$s".trim()));
+              Go.snack("settings.options.export.failed.copy".t);
+            },
+            child: Text(
+              // ignore: use_build_context_synchronously
+              MaterialLocalizations.of(context).copyButtonLabel,
+            ),
+          )
+        ],
+        bodyStyle: monospace,
+      );
+    }
   }
 
   Future importSettings(BuildContext context) async {

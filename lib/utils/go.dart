@@ -68,6 +68,8 @@ class Go {
     String body, {
     Widget? icon,
     List<Widget> actions = const <Widget>[],
+    bool scrollable = true,
+    TextStyle? bodyStyle,
   }) {
     showDialog(
       context: Get.context!,
@@ -75,7 +77,9 @@ class Go {
         return AlertDialog(
           icon: icon ?? const Icon(GymTrackerIcons.info),
           title: Text(title.t),
-          content: Text(body.t),
+          content: Text(body.t, style: bodyStyle),
+          scrollable: scrollable,
+          clipBehavior: Clip.hardEdge,
           actions: [
             ...actions,
             TextButton(

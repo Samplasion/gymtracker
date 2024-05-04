@@ -53,8 +53,8 @@ class _DateFieldState extends State<DateField> {
       lastDate: widget.lastDate ?? DateTime(DateTime.now().year + 1),
     );
     if (date != null) {
-      // ignore: use_build_context_synchronously
       TimeOfDay? time = await showTimePicker(
+        // ignore: use_build_context_synchronously
         context: context,
         initialTime:
             TimeOfDay(hour: widget.date.hour, minute: widget.date.minute),

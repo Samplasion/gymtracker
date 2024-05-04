@@ -16,25 +16,25 @@ Map<Level, AnsiColor> get levelColors => {
       Level.fatal: const AnsiColor.fg(199),
     };
 
-final _oneLinePrefixPrinter = OneLinePrefixPrinter(
-  printer: PrettyPrinter(
-    printEmojis: false,
-    colors: !Platform.isIOS,
-    lineLength: 80,
-    noBoxingByDefault: true,
-    methodCount: 0,
-    levelColors: levelColors,
-  ),
-  levels: {
-    Level.trace: '[TRACE]',
-    Level.debug: '[DEBUG]',
-    Level.info: '[INFO]',
-    Level.warning: '[WARN]',
-    Level.error: '[ERROR]',
-    Level.fatal: '[FATAL]',
-  },
-  levelColors: levelColors,
-);
+OneLinePrefixPrinter get _oneLinePrefixPrinter => OneLinePrefixPrinter(
+      printer: PrettyPrinter(
+        printEmojis: false,
+        colors: !Platform.isIOS,
+        lineLength: 80,
+        noBoxingByDefault: true,
+        methodCount: 0,
+        levelColors: levelColors,
+      ),
+      levels: {
+        Level.trace: '[TRACE]',
+        Level.debug: '[DEBUG]',
+        Level.info: '[INFO]',
+        Level.warning: '[WARN]',
+        Level.error: '[ERROR]',
+        Level.fatal: '[FATAL]',
+      },
+      levelColors: levelColors,
+    );
 
 class GlobalControllerOutput extends LogOutput {
   final parent = ConsoleOutput();
@@ -71,10 +71,8 @@ class OneLinePrefixPrinter extends LogPrinter {
     required this.levelColors,
   });
 
-  @override
-  List<String> log(LogEvent event) {
-    final lines = printer.log(event);
-    var color = levelColors[event.level] ?? const AnsiColor.none();
+  List<String> _prefix(List<String> lines, Level level) {
+    var color = levelColors[level] ?? const AnsiColor.none();
 
     if (!printer.colors) {
       color = const AnsiColor.none();
@@ -82,12 +80,49 @@ class OneLinePrefixPrinter extends LogPrinter {
 
     final maxPrefixLength =
         levels.values.map((e) => e.length).reduce((a, b) => a > b ? a : b);
-    final prefix = (levels[event.level] ?? "[UNK]").padLeft(maxPrefixLength);
+    final prefix = (levels[level] ?? "[UNK]").padLeft(maxPrefixLength);
     lines[0] = "${color(prefix)} ${lines[0]}";
     for (int i = 1; i < lines.length; i++) {
-      lines[i] = "${" " * (maxPrefixLength)} ${lines[i]}";
+      lines[i] = "${" " * (maxPrefixLength)} ${color(lines[i])}";
     }
+
     return lines;
+  }
+
+  List<String>? _formatStackTrace(List<String>? currentString) {
+    if (currentString == null) return null;
+
+    currentString = currentString
+        .where((line) => !line.contains("/service/logger.dart"))
+        .toList();
+
+    final result = <String>[];
+
+    final parseRegex = RegExp(r'^#\d+   (.+)$', multiLine: true);
+    int count = 0;
+    for (final match in parseRegex.allMatches(currentString.join("\n"))) {
+      result.add("#${count++}   ${match[1]}");
+    }
+
+    return result;
+  }
+
+  @override
+  List<String> log(LogEvent event) {
+    final lines = printer.log(event);
+
+    final stack = _formatStackTrace(printer
+        .formatStackTrace(event.stackTrace ?? StackTrace.current, 4)
+        ?.trim()
+        .split("\n"));
+    if (stack != null && stack.isNotEmpty) {
+      lines.addAll([
+        "",
+        ...stack,
+      ]);
+    }
+
+    return _prefix(lines, event.level);
   }
 
   copyWith({

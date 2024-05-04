@@ -149,7 +149,11 @@ class Workout {
     // NOTE: We don't care about IDs in this method since they get fixed
     // just before the data is saved to the database.
 
-    var exercises = getExercisesLinearly(workout1, workout2);
+    var exercises = getExercisesLinearly(
+      workout1,
+      workout2,
+      overrideSupersedencesWithNull: true,
+    );
 
     final result = Workout(
       name: workout1.name,
@@ -568,13 +572,22 @@ class WorkoutDifference {
       changedExercises.hashCode;
 }
 
-/// Weird name for a function that returns exercises, overriding superseded exercises.
-List<WorkoutExercisable> getExercisesLinearly(Workout base, Workout cont) {
-  globalLogger.w('[getExercisesLinearly] usesNewAlgorithm: ${(
+bool linearExercisesUseNewAlgorithm(Workout base, Workout cont) {
+  globalLogger.w('[linearExercisesUseNewAlgorithm] usesNewAlgorithm: ${(
     cont.isSupersedence,
     cont.isCompletionOf(base)
   )}');
-  if (cont.isSupersedence && cont.isCompletionOf(base)) {
+  return cont.isSupersedence && cont.isCompletionOf(base);
+}
+
+/// Weird name for a function that returns exercises, overriding superseded exercises.
+List<WorkoutExercisable> getExercisesLinearly(
+  Workout base,
+  Workout cont, {
+  bool overrideSupersedencesWithNull = false,
+}) {
+  if (linearExercisesUseNewAlgorithm(base, cont)) {
+    globalLogger.d("[getExercisesLinearly] ${("base", base.exercises.length)}");
     final exercises = <WorkoutExercisable>[];
     final ids = [
       ...base.exercises.map((e) => e.id),
@@ -631,7 +644,20 @@ List<WorkoutExercisable> getExercisesLinearly(Workout base, Workout cont) {
 
     for (final id in ids) {
       final exercise = exerciseMap[id]!;
-      exercises.add(exercise);
+
+      if (overrideSupersedencesWithNull) {
+        exercises.add(exercise.map(exercise: (ex) {
+          return ex.copyWith.supersedesID(null);
+        }, superset: (s) {
+          return s.copyWith(
+            supersedesID: null,
+            exercises:
+                s.exercises.map((e) => e.copyWith.supersedesID(null)).toList(),
+          );
+        }));
+      } else {
+        exercises.add(exercise);
+      }
     }
 
     return exercises;

@@ -385,11 +385,27 @@ class HistoryController extends GetxController with ServiceableController {
       );
     }
 
-    final w1 = workout.withFilters(
-      exerciseFilter: (e) => e.sets.any((element) => element.done),
-      setFilter: (e, s) => s.done,
-    );
-    final w2 = workout.continuation!;
+    // Rationale: The old algorithm used a filter on the base workout to filter
+    // done exercises so that they don't show up twice. To the new algorithm
+    // that's counter-productive so we don't do that.
+    // That is counter-productive because the new algorithm uses the
+    // [supersedesID] field on exercises to know what exercise goes where,
+    // so filtering exercises means that the combined workout has some
+    // exercises missing.
+    final w1 = linearExercisesUseNewAlgorithm(workout, workout.continuation!)
+        ? workout
+        : workout.withFilters(
+            exerciseFilter: (e) => e.sets.any((element) => element.done),
+            setFilter: (e, s) => s.done,
+          );
+    // Rationale: the continuation's infobox is pre-populated with the base
+    // workout's notes. Since the continuation algorithm appends the second
+    // workout's notes to the first, we want to avoid showing them twice
+    // if the user hasn't touched them.
+    final w2 = workout.continuation!.copyWith.infobox(
+        workout.continuation!.infobox == w1.infobox
+            ? null
+            : workout.continuation!.infobox);
 
     final shouldCombine = await Go.confirm(
       "exercise.continuation.combine.confirm.title",

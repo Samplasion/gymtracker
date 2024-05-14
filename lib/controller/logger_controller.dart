@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:gymtracker/service/logger.dart';
 import 'package:gymtracker/utils/go.dart';
 import 'package:logger/logger.dart';
 import 'package:rxdart/rxdart.dart';
@@ -37,6 +38,18 @@ extension LevelExt on Level {
       Level.fatal => 'Fatal',
       Level.off => 'Off',
       _ => "DON'T USE THIS LEVEL",
+    };
+  }
+
+  String get shortName {
+    return switch (this) {
+      Level.trace => 'TRC',
+      Level.debug => 'DBG',
+      Level.info => 'NFO',
+      Level.warning => 'WRN',
+      Level.error => 'ERR',
+      Level.fatal => 'FTL',
+      _ => "XXX",
     };
   }
 
@@ -101,5 +114,19 @@ class LoggerController extends GetxController {
     logs.clear();
     _onLogsUpdatedSubject.add(null);
     update();
+  }
+
+  void dumpAllLevels() {
+    for (final lvl in [
+      Level.trace,
+      Level.debug,
+      Level.info,
+      Level.warning,
+      Level.error,
+      Level.fatal,
+    ]) {
+      logger.log(
+          lvl, "This is an example ${lvl.displayName.toLowerCase()} message");
+    }
   }
 }

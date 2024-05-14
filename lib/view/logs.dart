@@ -2,9 +2,10 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
-import 'package:get/get.dart';
+import 'package:get/get.dart' hide ContextExtensionss;
 import 'package:gymtracker/controller/logger_controller.dart';
 import 'package:gymtracker/utils/constants.dart';
+import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/utils/utils.dart';
 import 'package:gymtracker/view/components/controlled.dart';
 import 'package:intl/intl.dart';
@@ -68,7 +69,7 @@ class _LogViewState extends ControlledState<LogView, LoggerController> {
     );
   }
 
-  static const _fontSize = 14.0;
+  static const _fontSize = 13.0;
 
   @override
   Widget build(BuildContext context) {
@@ -76,57 +77,66 @@ class _LogViewState extends ControlledState<LogView, LoggerController> {
       child: GetBuilder(
         init: controller,
         builder: (_) {
+          final levelColors = _getLevelColors(
+            context,
+            controller.level,
+            useM3: true,
+          );
           return Scaffold(
-            body: CustomScrollView(
-              controller: _scrollController,
-              slivers: [
-                SliverAppBar.large(
-                  title: const Text("Logs"),
-                  actions: [
-                    IconButton(
-                      icon: const Icon(Icons.clear),
-                      onPressed: controller.clearLogs,
-                    ),
-                    Stack(
-                      children: [
-                        IconButton(
-                          icon: const Icon(Icons.filter_list),
-                          onPressed: controller.showLevelRadioModal,
-                        ),
-                        Positioned(
-                          right: 0,
-                          top: 0,
-                          child: CircleAvatar(
-                            backgroundColor: _getLevelColors(
-                              context,
-                              controller.level,
-                            ).$1,
-                            radius: 8,
-                            child: Text(
-                              controller.filteredLogs.length.toString(),
-                              style: TextStyle(
-                                fontSize: 10,
-                                color: _getLevelColors(
-                                  context,
-                                  controller.level,
-                                ).$2,
+            body: Container(
+              color: Colors.black,
+              child: CustomScrollView(
+                controller: _scrollController,
+                slivers: [
+                  SliverAppBar.large(
+                    title: const Text("Logs"),
+                    actions: [
+                      IconButton(
+                        icon: const Icon(Icons.clear),
+                        onPressed: controller.clearLogs,
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.all_inclusive),
+                        onPressed: controller.dumpAllLevels,
+                      ),
+                      Stack(
+                        children: [
+                          IconButton(
+                            icon: const Icon(Icons.filter_list),
+                            onPressed: controller.showLevelRadioModal,
+                          ),
+                          Positioned(
+                            right: 0,
+                            top: 0,
+                            child: CircleAvatar(
+                              backgroundColor: levelColors.$1,
+                              radius: 8,
+                              child: Text(
+                                controller.filteredLogs.length.toString(),
+                                style: TextStyle(
+                                  fontSize: 10,
+                                  color: levelColors.$2,
+                                ),
                               ),
                             ),
                           ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-                SliverList(
-                  delegate: SliverChildListDelegate.fixed(
-                    List.generate(
-                      controller.filteredLogs.length,
-                      (index) => _buildLogTile(context, index),
+                        ],
+                      ),
+                    ],
+                  ),
+                  SliverList(
+                    delegate: SliverChildListDelegate.fixed(
+                      List.generate(
+                        controller.filteredLogs.length,
+                        (index) => _buildLogTile(context, index),
+                      ).separated(
+                        separatorBuilder: (_) => const Divider(height: 1),
+                      ),
                     ),
                   ),
-                ),
-              ],
+                  const SliverToBoxAdapter(child: SizedBox(height: 4)),
+                ],
+              ),
             ),
           );
         },
@@ -134,66 +144,70 @@ class _LogViewState extends ControlledState<LogView, LoggerController> {
     );
   }
 
+  String _indentedLines(String text, int indent) {
+    return text.split("\n").map((line) => " " * indent + line).join("\n");
+  }
+
   Widget _buildLogTile(BuildContext context, int index) {
     final log = controller.filteredLogs[index];
 
+    final prefix =
+        "${DateFormat.Md(Get.locale!.languageCode).format(log.timestamp)} "
+        "${DateFormat.Hms().format(log.timestamp)} ";
+    final indent = prefix.length;
+
     var spans = [
-      if (log.message.trim().isNotEmpty) TextSpan(text: log.message),
+      if (log.message.trim().isNotEmpty)
+        TextSpan(text: _indentedLines(log.message, indent)),
     ];
 
     if (log.error != null) {
       if (spans.isNotEmpty) {
         spans.add(const TextSpan(text: '\n\n'));
       }
-      spans.add(TextSpan(text: log.error.toString()));
+      spans.add(TextSpan(text: _indentedLines(log.error.toString(), indent)));
     }
 
     if (log.stackTrace != null) {
       if (spans.isNotEmpty) {
         spans.add(const TextSpan(text: '\n\n'));
       }
-      spans.add(TextSpan(text: log.stackTrace.toString()));
+      spans.add(
+          TextSpan(text: _indentedLines(log.stackTrace.toString(), indent)));
     }
 
     var (back, fore) = _getLevelColors(context, log.level);
 
-    return ListTile(
-      dense: true,
-      leading: CircleAvatar(
-        backgroundColor: back,
-        foregroundColor: fore,
-        child: Text(
-          log.level.name.characters.first.toUpperCase(),
+    var obj = log.object.toString();
+    if (obj.split("\n").length > 1) {
+      obj = _indentedLines(obj, indent).trimLeft();
+    }
+
+    return Container(
+      color: back,
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+      child: Text.rich(
+        TextSpan(children: [
+          TextSpan(text: prefix),
+          TextSpan(text: "[${log.level.shortName}] "),
+          TextSpan(text: '[${log.object.runtimeType}] $obj\n'),
+          ...spans,
+        ]),
+        style: monospace.copyWith(
+          color: fore,
+          fontSize: _fontSize,
         ),
       ),
-      title: Text(
-        '[${log.object.runtimeType}] ${log.object}',
-        style: monospace.copyWith(fontSize: _fontSize),
-      ),
-      subtitle: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Expanded(
-            child: Text.rich(
-              TextSpan(children: spans),
-              style: monospace.copyWith(fontSize: _fontSize),
-            ),
-          ),
-          Text(
-            '${DateFormat.yMd(Get.locale!.languageCode).format(log.timestamp)}\n${DateFormat.Hms().format(log.timestamp)}',
-            style: context.theme.textTheme.labelSmall,
-            textAlign: TextAlign.right,
-          ),
-        ],
-      ),
-      // trailing: ,
-      isThreeLine: true,
     );
   }
 
-  (Color, Color) _getLevelColors(BuildContext context, Level level) {
-    var back = getContainerColor(context, level.color);
-    var fore = getOnContainerColor(context, level.color);
+  (Color, Color) _getLevelColors(
+    BuildContext context,
+    Level level, {
+    bool useM3 = false,
+  }) {
+    var back = useM3 ? getContainerColor(context, level.color) : Colors.black;
+    var fore = useM3 ? getOnContainerColor(context, level.color) : level.color;
 
     if (level == Level.fatal) {
       back = Colors.red;

@@ -376,7 +376,7 @@ Widget separatorBuilder(int index) => const Divider();
 
 extension SeparatedWidgetList on Iterable<Widget> {
   List<Widget> separated({
-    separatorBuilder = separatorBuilder,
+    Widget Function(int index) separatorBuilder = separatorBuilder,
   }) {
     final self = toList();
     final List<Widget> widgets = [];

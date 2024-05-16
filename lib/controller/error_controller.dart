@@ -28,8 +28,8 @@ class ErrorController extends GetxController {
 
   void sendDetails(FlutterErrorDetails details) {
     if (Go.getTopmostRouteName() == ErrorView.routeName) {
-      logger.d("We are already in ErrorView. Here's the error:");
-      logger.i("", error: details.exception, stackTrace: details.stack);
+      logger.i("We are already in ErrorView. Here's the error:");
+      logger.w("", error: details.exception, stackTrace: details.stack);
       return;
     }
 
@@ -51,8 +51,8 @@ class ErrorController extends GetxController {
 
   void sendError(Object error, StackTrace stack) {
     if (Go.getTopmostRouteName() == ErrorView.routeName) {
-      logger.d("We are already in ErrorView. Here's the error:");
-      logger.e("", error: error, stackTrace: stack);
+      logger.i("We are already in ErrorView. Here's the error:");
+      logger.w("", error: error, stackTrace: stack);
       return;
     }
 

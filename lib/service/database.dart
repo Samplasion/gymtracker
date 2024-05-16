@@ -59,7 +59,7 @@ class DatabaseService extends GetxService with ChangeNotifier {
       ..listen((prefs) {
         notifyListeners();
         onServiceChange("preferences")();
-        prefs.logger.d("Changed.");
+        prefs.logger.i("Changed.");
       });
     db.watchOngoing()
       ..pipe(ongoing$)
@@ -88,14 +88,14 @@ class DatabaseService extends GetxService with ChangeNotifier {
 
   void Function() onServiceChange(String service) {
     return () {
-      logger.d("$service service updated");
+      logger.i("$service service updated");
     };
   }
 
   @override
   notifyListeners() {
     super.notifyListeners();
-    logger.d("Notified listeners");
+    logger.i("Notified listeners");
   }
 
   List<Exercise> get exercises {

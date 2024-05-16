@@ -107,7 +107,7 @@ class GTDatabase extends _$GTDatabase {
   int get schemaVersion => DATABASE_VERSION;
 
   Stream<List<model.Workout>> getAllRoutines() {
-    logger.d("Getting all routines");
+    logger.i("Getting all routines");
 
     final query = select(routines)
       ..orderBy([(r) => OrderingTerm(expression: r.sortOrder)]);
@@ -204,7 +204,7 @@ class GTDatabase extends _$GTDatabase {
   }
 
   Stream<List<model.Workout>> getAllHistoryWorkouts() {
-    logger.d("Getting all history workouts");
+    logger.i("Getting all history workouts");
 
     final query = select(historyWorkouts)
       ..orderBy([
@@ -287,7 +287,7 @@ class GTDatabase extends _$GTDatabase {
   }
 
   Stream<List<model.Exercise>> getAllCustomExercises() {
-    logger.d("Getting all custom exercises");
+    logger.i("Getting all custom exercises");
     return select(customExercises).watch().map((rows) {
       return [for (final row in rows) exerciseFromData(row)];
     });

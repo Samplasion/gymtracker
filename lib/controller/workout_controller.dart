@@ -51,12 +51,12 @@ class WorkoutController extends GetxController with ServiceableController {
         weightUnit = (Get.find<SettingsController>().weightUnit()).obs,
         distanceUnit = (Get.find<SettingsController>().distanceUnit()).obs {
     final sc = Get.find<SettingsController>();
-    logger.d("""
+    logger.i("""
       Currently defined units:
         - Weight: \t${sc.weightUnit().name} \t(cfr. ${weightUnit.value.name})
         - Distance: \t${sc.distanceUnit().name} \t(cfr. ${distanceUnit.value.name})
     """);
-    logger.d(
+    logger.i(
       "Created with name $name, parentID $parentID, and infobox $infobox",
       error: Error(),
       stackTrace: StackTrace.current,
@@ -695,7 +695,7 @@ class WorkoutController extends GetxController with ServiceableController {
       historyController.bindContinuation(continuation: workout);
     }
 
-    workout.logger.d("Submitting workout");
+    workout.logger.i("Submitting workout");
     historyController.addNewWorkout(workout);
     Get.back();
     SchedulerBinding.instance.addPostFrameCallback((timeStamp) async {
@@ -903,7 +903,7 @@ class WorkoutController extends GetxController with ServiceableController {
           distance: "distanceUnits.${distance.name}".t,
       },
       onChange: (value) {
-        logger.d("Changing distance unit to $value");
+        logger.i("Changing distance unit to $value");
         if (value != null) distanceUnit(value);
         save();
       },

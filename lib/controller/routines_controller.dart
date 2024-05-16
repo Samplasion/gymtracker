@@ -51,7 +51,7 @@ class RoutinesController extends GetxController
     }
 
     service.routines$.listen((event) {
-      logger.d("Updated with ${event.length} exercises");
+      logger.i("Updated with ${event.length} exercises");
       workouts(event);
       coordinator.computeSuggestions();
     });
@@ -316,7 +316,7 @@ class RoutinesController extends GetxController
   @override
   onProtocolUrlReceived(String url) {
     final Uri parsed = Uri.parse(url);
-    logger.d('Url received: $parsed');
+    logger.i('Url received: $parsed');
 
     switch (parsed.host) {
       case "routine":

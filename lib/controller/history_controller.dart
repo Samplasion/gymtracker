@@ -32,7 +32,7 @@ class HistoryController extends GetxController with ServiceableController {
   onInit() {
     super.onInit();
     service.history$.listen((event) {
-      logger.d("Updated with ${event.length} exercises");
+      logger.i("Updated with ${event.length} exercises");
       event.sort((a, b) => (a.startingDate ??
               DateTime.fromMillisecondsSinceEpoch(0))
           .compareTo(b.startingDate ?? DateTime.fromMillisecondsSinceEpoch(0)));
@@ -67,7 +67,7 @@ class HistoryController extends GetxController with ServiceableController {
       today: DateTime.now(),
     ));
 
-    logger.d("Recomputed streaks: $streaks");
+    logger.i("Recomputed streaks: $streaks");
   }
 
   Future<void> deleteWorkout(Workout workout) async {
@@ -294,7 +294,7 @@ class HistoryController extends GetxController with ServiceableController {
   /// Adds a new workout to the history, avoiding collisions
   Future<void> addNewWorkout(Workout workout) async {
     logger.d(workout.toJson().toPrettyString());
-    logger.d("Adding new workout to history");
+    logger.i("Adding new workout to history");
     final collides = service.hasHistoryWorkout(workout.id);
     if (collides) {
       workout = workout.regenerateID();

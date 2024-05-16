@@ -38,7 +38,7 @@ class VersionedJsonImportV2 extends VersionedJsonImportBase {
         for (final weight in json['weightMeasurements'])
           WeightMeasurement.fromJson(weight)
       ],
-    )..logger.d("Importing");
+    )..logger.i("Importing");
   }
 
   @override

@@ -49,16 +49,16 @@ extension StringUtils on String {
   Document asQuillDocument() {
     final json = tryParseJson();
     if (json != null) {
-      logger.d(
+      logger.i(
           "[String#asQuillDocument] not a null json; interpreting it as a delta");
       try {
         return Document.fromJson(json);
       } catch (_) {
-        logger.d(
+        logger.i(
             "[String#asQuillDocument] not a valid delta; falling back to plaintext string");
       }
     } else {
-      logger.d("[String#asQuillDocument] not a json; creating delta");
+      logger.i("[String#asQuillDocument] not a json; creating delta");
     }
     return Document.fromDelta(Delta()..insert("${trim()}\n"));
   }

@@ -97,7 +97,7 @@ class Coordinator extends GetxController with ServiceableController {
           .take(5)
     ]);
     logger
-        .d("Recomputed suggested routines with ${suggestions().length} values");
+        .i("Recomputed suggested routines with ${suggestions().length} values");
   }
 
   void onNotificationTapped(NotificationResponse value) {

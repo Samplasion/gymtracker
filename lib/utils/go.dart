@@ -228,7 +228,7 @@ class Go {
     );
 
     if (revert != true) {
-      globalLogger.d("[Go.showRadioModal]\nReverting");
+      globalLogger.i("[Go.showRadioModal]\nReverting");
       onChange?.call(oldValue);
     }
   }

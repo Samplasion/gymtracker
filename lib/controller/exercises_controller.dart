@@ -18,7 +18,7 @@ class ExercisesController extends GetxController with ServiceableController {
   onInit() {
     super.onInit();
     service.exercises$.listen((event) {
-      logger.d("Updated with ${event.length} exercises");
+      logger.i("Updated with ${event.length} exercises");
       exercises(event);
     });
   }

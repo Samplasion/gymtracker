@@ -212,7 +212,7 @@ class _WorkoutEditorState extends State<WorkoutEditor> {
           distance: "distanceUnits.${distance.name}".t,
       },
       onChange: (value) {
-        logger.d("Changing distance unit to $value");
+        logger.i("Changing distance unit to $value");
         if (value != null) workout = workout.copyWith.distanceUnit(value);
         setState(() {});
       },

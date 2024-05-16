@@ -123,7 +123,7 @@ class MainApp extends StatelessWidget {
                         }(),
                         translations: localizations,
                         locale: () {
-                          logger.d("Locale: ${settings.locale.value}");
+                          logger.i("Locale: ${settings.locale.value}");
                           return settings.locale.value ??
                               Prefs.defaultValue.locale;
                         }(),

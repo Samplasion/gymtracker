@@ -356,7 +356,12 @@
     },
     "advanced": {
       "title": "Impostazioni avanzate",
-      "subtitle": "Lasciate ogni speranza, o voi ch'entrate"
+      "subtitle": "Lasciate ogni speranza, o voi ch'entrate",
+      "options": {
+        "logs": {
+          "title": "Log"
+        }
+      }
     }
   },
   "ongoingWorkout": {

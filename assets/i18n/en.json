@@ -359,17 +359,17 @@
       "subtitle": "Here be dragons",
       "options": {
         "logs": {
-          "title": "Logs"
-        },
-        "levels": {
-          "trace": "Trace",
-          "debug": "Debug",
-          "info": "Info",
-          "warning": "Warning",
-          "error": "Error",
-          "fatal": "Fatal"
-        },
-        "level": "Level"
+          "title": "Logs",
+          "levels": {
+            "trace": "Trace",
+            "debug": "Debug",
+            "info": "Info",
+            "warning": "Warning",
+            "error": "Error",
+            "fatal": "Fatal"
+          },
+          "level": "Level"
+        }
       }
     }
   },

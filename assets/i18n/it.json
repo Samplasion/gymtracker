@@ -359,17 +359,17 @@
       "subtitle": "Lasciate ogni speranza, o voi ch'entrate",
       "options": {
         "logs": {
-          "title": "Log"
-        },
-        "levels": {
-          "trace": "Tutti i log",
-          "debug": "Debug",
-          "info": "Info",
-          "warning": "Avvisi",
-          "error": "Errore",
-          "fatal": "Errore fatale"
-        },
-        "level": "Livello"
+          "title": "Log",
+          "levels": {
+            "trace": "Tutti i log",
+            "debug": "Debug",
+            "info": "Info",
+            "warning": "Avviso",
+            "error": "Errore",
+            "fatal": "Errore fatale"
+          },
+          "level": "Livello"
+        }
       }
     }
   },

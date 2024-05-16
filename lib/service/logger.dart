@@ -1,8 +1,13 @@
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 import 'package:gymtracker/controller/logger_controller.dart';
 import 'package:logger/logger.dart';
+
+void initLogger() {
+  Logger.level = kDebugMode ? Level.debug : Level.warning;
+}
 
 LoggerController? get loggerController =>
     Get.isRegistered<LoggerController>() ? Get.find<LoggerController>() : null;

@@ -43,6 +43,8 @@ void main() async {
   await ColorService().init();
   await VersionService().init();
 
+  initLogger();
+
   final String currentTimeZone = await FlutterTimezone.getLocalTimezone();
   tz.initializeTimeZones();
   tz.setLocalLocation(tz.getLocation(currentTimeZone));

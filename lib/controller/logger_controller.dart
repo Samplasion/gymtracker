@@ -66,6 +66,17 @@ extension LevelExt on Level {
   }
 }
 
+const availableLevels = [
+  if (kDebugMode) ...[
+    Level.trace,
+    Level.debug,
+    Level.info,
+  ],
+  Level.warning,
+  Level.error,
+  Level.fatal,
+];
+
 class LoggerController extends GetxController {
   static const shouldShowPane =
       kDebugMode || bool.hasEnvironment('SHOW_LOGGER_PANE');
@@ -75,7 +86,7 @@ class LoggerController extends GetxController {
 
   final List<Log> logs = [];
 
-  Level level = Level.debug;
+  Level level = kDebugMode ? Level.debug : Level.warning;
 
   List<Log> get filteredLogs {
     return logs.where((log) => log.level.value >= level.value).toList();
@@ -95,10 +106,7 @@ class LoggerController extends GetxController {
     Go.showRadioModal(
       selectedValue: level,
       values: {
-        for (final lvl in Level.values)
-          // ignore: deprecated_member_use
-          if (lvl != Level.nothing && lvl != Level.verbose && lvl != Level.wtf)
-            lvl: lvl.displayName,
+        for (final lvl in availableLevels) lvl: lvl.displayName,
       },
       title: const Text("Level"),
       onChange: (newLevel) {
@@ -118,14 +126,7 @@ class LoggerController extends GetxController {
 
   void dumpAllLevels() {
     if (!kDebugMode) return;
-    for (final lvl in [
-      Level.trace,
-      Level.debug,
-      Level.info,
-      Level.warning,
-      Level.error,
-      Level.fatal,
-    ]) {
+    for (final lvl in availableLevels) {
       logger.log(
           lvl, "This is an example ${lvl.displayName.toLowerCase()} message");
     }

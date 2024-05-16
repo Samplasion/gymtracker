@@ -180,7 +180,7 @@ class SettingsView extends StatelessWidget {
                 aboutBoxChildren: [
                   Text("appInfo.shortDescription".t),
                 ],
-                applicationIcon: const InAppIcon(),
+                applicationIcon: const InAppIcon.proportional(),
                 icon: const Icon(GymTrackerIcons.info),
                 subtitle: Text("appInfo.version".tParams({
                   "version": VersionService().packageInfo.version,
@@ -207,9 +207,16 @@ class InAppIcon extends StatelessWidget {
 
   const InAppIcon({
     this.size = 48,
-    this.iconSize = 24,
+    this.iconSize = 34,
     super.key,
   });
+
+  const InAppIcon.proportional({
+    this.size = 48,
+    super.key,
+  }) :
+        // Looks about right
+        iconSize = 0.70 * size;
 
   @override
   Widget build(BuildContext context) {

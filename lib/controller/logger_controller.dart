@@ -117,6 +117,7 @@ class LoggerController extends GetxController {
   }
 
   void dumpAllLevels() {
+    if (!kDebugMode) return;
     for (final lvl in [
       Level.trace,
       Level.debug,

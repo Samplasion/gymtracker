@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:get/get.dart' hide ContextExtensionss;
@@ -91,37 +92,24 @@ class _LogViewState extends ControlledState<LogView, LoggerController> {
                   SliverAppBar.large(
                     title: const Text("Logs"),
                     actions: [
+                      Badge(
+                        label: Text("${controller.filteredLogs.length}"),
+                        backgroundColor: levelColors.$1,
+                        textColor: levelColors.$2,
+                        child: IconButton(
+                          icon: const Icon(Icons.filter_list),
+                          onPressed: controller.showLevelRadioModal,
+                        ),
+                      ),
                       IconButton(
-                        icon: const Icon(Icons.clear),
+                        icon: const Icon(Icons.delete_forever),
                         onPressed: controller.clearLogs,
                       ),
-                      IconButton(
-                        icon: const Icon(Icons.all_inclusive),
-                        onPressed: controller.dumpAllLevels,
-                      ),
-                      Stack(
-                        children: [
-                          IconButton(
-                            icon: const Icon(Icons.filter_list),
-                            onPressed: controller.showLevelRadioModal,
-                          ),
-                          Positioned(
-                            right: 0,
-                            top: 0,
-                            child: CircleAvatar(
-                              backgroundColor: levelColors.$1,
-                              radius: 8,
-                              child: Text(
-                                controller.filteredLogs.length.toString(),
-                                style: TextStyle(
-                                  fontSize: 10,
-                                  color: levelColors.$2,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
+                      if (kDebugMode)
+                        IconButton(
+                          icon: const Icon(Icons.all_inclusive),
+                          onPressed: controller.dumpAllLevels,
+                        ),
                     ],
                   ),
                   SliverList(
@@ -151,9 +139,7 @@ class _LogViewState extends ControlledState<LogView, LoggerController> {
   Widget _buildLogTile(BuildContext context, int index) {
     final log = controller.filteredLogs[index];
 
-    final prefix =
-        "${DateFormat.Md(Get.locale!.languageCode).format(log.timestamp)} "
-        "${DateFormat.Hms().format(log.timestamp)} ";
+    const prefix = "";
     final indent = prefix.length;
 
     var spans = [
@@ -183,20 +169,41 @@ class _LogViewState extends ControlledState<LogView, LoggerController> {
       obj = _indentedLines(obj, indent).trimLeft();
     }
 
+    final firstLine =
+        '$prefix[${log.level.shortName}] [${log.object.runtimeType}] $obj';
+    final textStyle = monospace.copyWith(
+      color: fore,
+      fontSize: _fontSize,
+    );
+
     return Container(
       color: back,
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-      child: Text.rich(
-        TextSpan(children: [
-          TextSpan(text: prefix),
-          TextSpan(text: "[${log.level.shortName}] "),
-          TextSpan(text: '[${log.object.runtimeType}] $obj\n'),
-          ...spans,
-        ]),
-        style: monospace.copyWith(
-          color: fore,
-          fontSize: _fontSize,
-        ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Flexible(
+                child: Text(
+                  firstLine,
+                  style: textStyle,
+                ),
+              ),
+              Text(
+                " ${DateFormat.Md(Get.locale!.languageCode).format(log.timestamp)} "
+                "${DateFormat.Hms().format(log.timestamp)} ",
+                style: textStyle.copyWith(color: fore.withOpacity(0.7)),
+              ),
+            ],
+          ),
+          Text.rich(
+            TextSpan(children: spans),
+            style: textStyle,
+          ),
+        ],
       ),
     );
   }

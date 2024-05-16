@@ -14,6 +14,8 @@ import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/service/logger.dart';
 import 'package:gymtracker/utils/constants.dart';
 import 'package:gymtracker/utils/go.dart';
+import 'package:gymtracker/view/logs.dart';
+import 'package:gymtracker/view/settings.dart';
 import 'package:share_plus/share_plus.dart';
 
 Color defaultColor = Color(Colors.blue.value);
@@ -200,5 +202,13 @@ class SettingsController extends GetxController with ServiceableController {
       service.db.watchPreferences().first,
       Future.delayed(const Duration(seconds: 5)),
     ]);
+  }
+
+  advancedSettings() {
+    Go.to(() => const AdvancedSettingsView());
+  }
+
+  showLogs() {
+    Go.to(() => const LogView());
   }
 }

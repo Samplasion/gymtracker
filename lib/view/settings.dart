@@ -11,6 +11,7 @@ import 'package:gymtracker/model/preferences.dart';
 import 'package:gymtracker/service/color.dart';
 import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/service/version.dart';
+import 'package:gymtracker/view/components/controlled.dart';
 import 'package:gymtracker/view/settings/color.dart';
 import 'package:gymtracker/view/settings/radio.dart';
 
@@ -165,6 +166,15 @@ class SettingsView extends StatelessWidget {
               ),
               notificationController.settingsTile,
               const Divider(),
+              ListTile(
+                title: Text("settings.advanced.title".t),
+                subtitle: Text("settings.advanced.subtitle".t),
+                leading: const Icon(GymTrackerIcons.advanced),
+                trailing: const Icon(GymTrackerIcons.lt_chevron),
+                onTap: () async {
+                  await controller.advancedSettings();
+                },
+              ),
               AboutListTileEx(
                 applicationName: "appName".t,
                 applicationVersion: "appInfo.version".tParams({
@@ -192,6 +202,35 @@ class SettingsView extends StatelessWidget {
                     VersionService().packageInfo.buildNumber,
                   ),
                 })),
+              ),
+            ]),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class AdvancedSettingsView extends ControlledWidget<SettingsController> {
+  const AdvancedSettingsView({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: CustomScrollView(
+        slivers: [
+          SliverAppBar.large(
+            title: Text("settings.advanced.title".t),
+          ),
+          SliverList(
+            delegate: SliverChildListDelegate([
+              ListTile(
+                title: Text("settings.advanced.options.logs.title".t),
+                leading: const Icon(GymTrackerIcons.logs),
+                trailing: const Icon(GymTrackerIcons.lt_chevron),
+                onTap: () async {
+                  await controller.showLogs();
+                },
               ),
             ]),
           ),

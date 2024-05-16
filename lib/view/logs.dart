@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:get/get.dart' hide ContextExtensionss;
 import 'package:gymtracker/controller/logger_controller.dart';
+import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/utils/constants.dart';
 import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/utils/utils.dart';
@@ -90,7 +91,7 @@ class _LogViewState extends ControlledState<LogView, LoggerController> {
                 controller: _scrollController,
                 slivers: [
                   SliverAppBar.large(
-                    title: const Text("Logs"),
+                    title: Text("settings.advanced.options.logs.title".t),
                     actions: [
                       Badge(
                         label: Text("${controller.filteredLogs.length}"),

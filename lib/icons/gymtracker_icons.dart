@@ -32,6 +32,7 @@ class GymTrackerIcons {
   static const IconData add_exercise = Icons.add_rounded;
   static const IconData add_superset = Icons.add_circle_rounded;
   static const IconData add_to_superset = Icons.group_work_rounded;
+  static const IconData advanced = Icons.settings_rounded;
   static const IconData app_icon = Icons.fitness_center_rounded;
   static const IconData calendar = Icons.calendar_month_rounded;
   static const IconData cardio = Icons.directions_bike_rounded;

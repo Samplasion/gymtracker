@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/service/logger.dart';
 import 'package:gymtracker/utils/go.dart';
 import 'package:logger/logger.dart';
@@ -78,8 +79,10 @@ const availableLevels = [
 ];
 
 class LoggerController extends GetxController {
+  // Whether to show the logger pane in the bottom nav bar
   static const shouldShowPane =
       kDebugMode || bool.hasEnvironment('SHOW_LOGGER_PANE');
+  static const keptLogs = shouldShowPane ? 500 : 50;
 
   Stream get onLogsUpdated => _onLogsUpdatedSubject.stream;
   final _onLogsUpdatedSubject = BehaviorSubject();
@@ -93,12 +96,11 @@ class LoggerController extends GetxController {
   }
 
   addLog(Log log) {
-    // This has the potential to be a huge memory burden
-    // So don't keep logs around if we're not showing the pane
-    if (!shouldShowPane) return;
-
     logs.add(log);
-    _onLogsUpdatedSubject.add(log);
+    if (logs.length > keptLogs) {
+      logs.removeRange(0, logs.length - keptLogs);
+    }
+    _onLogsUpdatedSubject.add(null);
     update();
   }
 
@@ -106,9 +108,10 @@ class LoggerController extends GetxController {
     Go.showRadioModal(
       selectedValue: level,
       values: {
-        for (final lvl in availableLevels) lvl: lvl.displayName,
+        for (final lvl in availableLevels)
+          lvl: "settings.advanced.options.logs.levels.${lvl.name}".t,
       },
-      title: const Text("Level"),
+      title: Text("settings.advanced.options.logs.level".t),
       onChange: (newLevel) {
         if (newLevel == null) return;
         level = newLevel;

@@ -325,20 +325,20 @@
           "light": "Modalità bianco puro"
         }
       },
-      "themeMode": {
-        "label": "Tema",
-        "values": {
-          "system": "Sistema",
-          "light": "Chiaro",
-          "dark": "Scuro"
-        }
-      },
       "export": {
         "label": "Esporta dati (JSON)",
         "filename": "Dati_GymTracker",
         "failed": {
           "title": "Impossibile esportare i dati",
           "copy": "Il messaggio di errore è stato copiato negli appunti."
+        }
+      },
+      "themeMode": {
+        "label": "Tema",
+        "values": {
+          "system": "Sistema",
+          "light": "Chiaro",
+          "dark": "Scuro"
         }
       },
       "notifications": {
@@ -353,6 +353,10 @@
       "heading": {
         "label": "Seleziona un colore [@color]"
       }
+    },
+    "advanced": {
+      "title": "Impostazioni avanzate",
+      "subtitle": "Lasciate ogni speranza, o voi ch'entrate"
     }
   },
   "ongoingWorkout": {

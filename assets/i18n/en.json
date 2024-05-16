@@ -353,6 +353,10 @@
       "heading": {
         "label": "Select a color [@color]"
       }
+    },
+    "advanced": {
+      "title": "Danger zone",
+      "subtitle": "Here be dragons"
     }
   },
   "ongoingWorkout": {

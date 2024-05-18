@@ -212,7 +212,11 @@
       "edit": "Edit routine",
       "start": "Start routine",
       "create": "Create new routine",
-      "viewHistory": "View history"
+      "viewHistory": "View history",
+      "deleteFolder": {
+        "title": "Delete folder",
+        "text": "Are you sure you wish to delete this folder? This action cannot be undone. The routines in this folder will be moved to the home screen."
+      }
     },
     "editor": {
       "exercises": {
@@ -247,7 +251,13 @@
           "body": "Are you sure you want to remove this superset? This action cannot be undone."
         }
       }
-    }
+    },
+    "newFolder": "New folder",
+    "folderNameEmpty": "The name must not be empty.",
+    "folderName": "Name",
+    "editFolder": "Edit folder",
+    "dropHere": "Drop here",
+    "moveToRoot": "Drop the routine here to move it to the home screen"
   },
   "history": {
     "title": "History",
@@ -557,6 +567,22 @@
       "few": "%s selected",
       "many": "%s selected",
       "other": "%s selected"
+    },
+    "workouts": {
+      "zero": "No workouts",
+      "one": "%s workout",
+      "two": "%s workouts",
+      "few": "%s workouts",
+      "many": "%s workouts",
+      "other": "%s workouts"
+    },
+    "routines": {
+      "zero": "No routines",
+      "one": "%s routine",
+      "two": "%s routines",
+      "few": "%s routines",
+      "many": "%s routines",
+      "other": "%s routines"
     }
   },
   "muscleGroups": {
@@ -604,7 +630,8 @@
     "create": "Create",
     "remove": "Remove",
     "edit": "Edit",
-    "undo": "Undo"
+    "undo": "Undo",
+    "save": "Save"
   },
   "units": {
     "kg": "kg",
@@ -773,13 +800,13 @@
     },
     "newCustomExercise": "New exercise",
     "hips": {
-      "name": "Hips",
       "exercises": {
         "gluteBridge": "Glute bridge",
         "hipThrust": "Hip thrust",
         "hipAdduction": "Hip adduction",
         "hipAbduction": "Hip abduction"
-      }
+      },
+      "name": "Hips"
     }
   },
   "infobox": {

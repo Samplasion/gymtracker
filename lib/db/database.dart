@@ -38,12 +38,13 @@ part 'database.g.dart';
 // Used in the generated code
 const _uuid = Uuid();
 
-const DATABASE_VERSION = 3;
+const DATABASE_VERSION = 4;
 
 @DriftDatabase(tables: [
   CustomExercises,
   HistoryWorkouts,
   HistoryWorkoutExercises,
+  RoutineFolders,
   Routines,
   RoutineExercises,
   Preferences,
@@ -72,18 +73,19 @@ class GTDatabase extends _$GTDatabase {
           await m.runMigrationSteps(
             from: from,
             to: to,
-            steps: migrationSteps(
-              from2To3: (m, schema) async {
-                await m.addColumn(
-                  schema.routineExercises,
-                  schema.routineExercises.supersedesId,
-                );
-                await m.addColumn(
-                  schema.historyWorkoutExercises,
-                  schema.historyWorkoutExercises.supersedesId,
-                );
-              },
-            ),
+            steps: migrationSteps(from2To3: (m, schema) async {
+              await m.addColumn(
+                schema.routineExercises,
+                schema.routineExercises.supersedesId,
+              );
+              await m.addColumn(
+                schema.historyWorkoutExercises,
+                schema.historyWorkoutExercises.supersedesId,
+              );
+            }, from3To4: (m, schema) async {
+              await m.createTable(schema.routineFolders);
+              await m.addColumn(schema.routines, schema.routines.folderId);
+            }),
           );
 
           if (kDebugMode) {
@@ -111,26 +113,36 @@ class GTDatabase extends _$GTDatabase {
 
     final query = select(routines)
       ..orderBy([(r) => OrderingTerm(expression: r.sortOrder)]);
-    final cartStream = query.watch();
+    final routineStream = query.watch();
 
-    return cartStream.switchMap((routines) {
+    return routineStream.switchMap((routines) {
       final idToRoutine = {for (var routine in routines) routine.id: routine};
       final ids = idToRoutine.keys;
 
-      final entryQuery = select(routineExercises)
-        ..where((routineExercises) => routineExercises.routineId.isIn(ids));
+      final folderQuery = select(routineFolders);
+      final folderStream = folderQuery.watch();
 
-      return entryQuery.watch().map((rows) {
-        final idToItems = <String, List<ConcreteExercise>>{};
+      return folderStream.switchMap((dbFolders) {
+        final idToFolder = {
+          for (var folder in dbFolders) folder.id: folder,
+        };
 
-        for (final row in rows) {
-          idToItems.putIfAbsent(row.routineId, () => []).add(row);
-        }
+        final exQuery = select(routineExercises)
+          ..where((routineExercises) => routineExercises.routineId.isIn(ids));
 
-        return [
-          for (var id in ids)
-            _workoutFromDatabase(idToRoutine[id]!, idToItems[id] ?? []),
-        ];
+        return exQuery.watch().map((rows) {
+          final idToExs = <String, List<ConcreteExercise>>{};
+
+          for (final row in rows) {
+            idToExs.putIfAbsent(row.routineId, () => []).add(row);
+          }
+
+          return [
+            for (var id in ids)
+              workoutFromDatabase(idToRoutine[id]!, idToExs[id] ?? [],
+                  dbFolder: idToFolder[idToRoutine[id]!.folderId]),
+          ];
+        });
       });
     });
   }
@@ -145,7 +157,13 @@ class GTDatabase extends _$GTDatabase {
           ..where((tbl) => tbl.routineId.equals(id)))
         .get();
 
-    return _workoutFromDatabase(routine, rawExercises);
+    final folder = routine.folderId != null
+        ? await (select(routineFolders)
+              ..where((tbl) => tbl.id.equals(routine.folderId!)))
+            .getSingle()
+        : null;
+
+    return workoutFromDatabase(routine, rawExercises, dbFolder: folder);
   }
 
   Future<void> insertRoutine(model.Workout routine) async {
@@ -203,6 +221,73 @@ class GTDatabase extends _$GTDatabase {
     });
   }
 
+  Stream<List<model.GTRoutineFolder>> watchRoutineFolders() {
+    return select(routineFolders)
+        .watch()
+        .map((l) => [for (final row in l) folderFromDatabase(row)]);
+  }
+
+  Future<void> insertRoutineFolder(model.GTRoutineFolder folder) async {
+    await into(routineFolders).insert(folder.toInsertable());
+    await _recomputeFolderSortOrders();
+  }
+
+  Future<void> deleteRoutineFolder(String id) async {
+    final allRoutines = await (select(routines)
+          ..orderBy([(r) => OrderingTerm(expression: r.sortOrder)]))
+        .get();
+    final routinesValues = allRoutines
+        .where((element) => element.folderId == id)
+        .toList(growable: false);
+
+    await batch((batch) {
+      batch.deleteWhere(routineFolders, (tbl) => tbl.id.equals(id));
+      int counter = allRoutines.length;
+      for (final routine in routinesValues) {
+        batch.update(
+          routines,
+          RoutinesCompanion(
+            folderId: const Value(null),
+            sortOrder: Value(counter++),
+          ),
+          where: (tbl) => tbl.id.equals(routine.id),
+        );
+      }
+    });
+
+    await _recomputeFolderSortOrders();
+  }
+
+  Future<void> updateRoutineFolder(model.GTRoutineFolder folder) async {
+    await (update(routineFolders).replace(folder.toInsertable()));
+  }
+
+  Future writeAllRoutineFolders(List<model.GTRoutineFolder> folders) {
+    return batch((batch) {
+      batch.deleteWhere(routineFolders, (_) => const Constant(true));
+      batch.insertAll(routineFolders, folders.map((f) => f.toInsertable()));
+    });
+  }
+
+  Future<void> _recomputeFolderSortOrders() async {
+    // Recompute sort orders
+    final query = select(routineFolders)
+      ..orderBy([(r) => OrderingTerm.asc(r.sortOrder)]);
+    final folders = await query.get();
+    final idToSortOrder = {
+      for (int i = 0; i < folders.length; i++) folders[i].id: i
+    };
+    return batch((batch) {
+      for (final entry in idToSortOrder.entries) {
+        batch.update(
+          routineFolders,
+          RoutineFoldersCompanion(sortOrder: Value(entry.value)),
+          where: (tbl) => tbl.id.equals(entry.key),
+        );
+      }
+    });
+  }
+
   Stream<List<model.Workout>> getAllHistoryWorkouts() {
     logger.i("Getting all history workouts");
 
@@ -227,7 +312,7 @@ class GTDatabase extends _$GTDatabase {
         }
         return [
           for (var id in ids)
-            _historyWorkoutFromDatabase(idToWorkout[id]!, idToItems[id] ?? []),
+            historyWorkoutFromDatabase(idToWorkout[id]!, idToItems[id] ?? []),
         ];
       });
     });
@@ -245,7 +330,7 @@ class GTDatabase extends _$GTDatabase {
           ..where((tbl) => tbl.routineId.equals(id)))
         .get();
 
-    return _historyWorkoutFromDatabase(workout, rawExercises);
+    return historyWorkoutFromDatabase(workout, rawExercises);
   }
 
   Future<void> insertHistoryWorkout(model.Workout workout) async {
@@ -303,44 +388,6 @@ class GTDatabase extends _$GTDatabase {
 
   Future<void> updateCustomExercise(model.Exercise exercise) async {
     await (update(customExercises).replace(exercise.toInsertable()));
-  }
-
-  model.Workout _workoutFromDatabase(
-      Routine routine, List<ConcreteExercise> rawExercises) {
-    final entries = databaseExercisesToExercises(rawExercises);
-
-    return model.Workout(
-      id: routine.id,
-      name: routine.name,
-      exercises: entries,
-      duration: null,
-      startingDate: null,
-      parentID: null,
-      infobox: routine.infobox,
-      completedBy: null,
-      completes: null,
-      weightUnit: routine.weightUnit,
-      distanceUnit: routine.distanceUnit,
-    );
-  }
-
-  model.Workout _historyWorkoutFromDatabase(
-      HistoryWorkout routine, List<ConcreteExercise> rawExercises) {
-    final entries = databaseExercisesToExercises(rawExercises);
-
-    return model.Workout(
-      id: routine.id,
-      name: routine.name,
-      exercises: entries,
-      duration: Duration(seconds: routine.duration),
-      startingDate: routine.startingDate,
-      parentID: routine.parentId,
-      infobox: routine.infobox,
-      completedBy: routine.completedBy,
-      completes: routine.completes,
-      weightUnit: routine.weightUnit,
-      distanceUnit: routine.distanceUnit,
-    );
   }
 
   Stream<Prefs> watchPreferences() {
@@ -459,10 +506,16 @@ model.Exercise exerciseFromData(CustomExercise row) {
 
 extension WorkoutListDatabaseUtils on List<model.Workout> {
   List<RoutinesCompanion> toSortedRoutineInsertables() {
-    return [
-      for (int i = 0; i < length; i++)
-        this[i].toRoutineInsertable().copyWith(sortOrder: Value(i)),
-    ];
+    final Map<String?, int> counts = {};
+    final List<RoutinesCompanion> insertables = [];
+    for (int i = 0; i < length; i++) {
+      counts.putIfAbsent(this[i].folder?.id, () => 0);
+      insertables.add(this[i]
+          .toRoutineInsertable()
+          .copyWith(sortOrder: Value(counts[this[i].folder?.id]!)));
+      counts[this[i].folder?.id] = counts[this[i].folder?.id]! + 1;
+    }
+    return insertables;
   }
 
   List<HistoryWorkoutsCompanion> toSortedHistoryWorkoutInsertables() {
@@ -480,6 +533,7 @@ extension WorkoutDatabaseUtils on model.Workout {
       infobox: Value(infobox ?? ""),
       weightUnit: Value(weightUnit),
       distanceUnit: Value(distanceUnit),
+      folderId: Value(folder?.id),
     );
   }
 
@@ -556,6 +610,16 @@ extension ExerciseDatabaseUtils on model.Exercise {
       parameters: Value(parameters),
       primaryMuscleGroup: Value(primaryMuscleGroup),
       secondaryMuscleGroups: Value(secondaryMuscleGroups),
+    );
+  }
+}
+
+extension FolderDatabaseUtils on model.GTRoutineFolder {
+  RoutineFoldersCompanion toInsertable() {
+    return RoutineFoldersCompanion(
+      id: Value(id),
+      name: Value(name),
+      sortOrder: Value(sortOrder),
     );
   }
 }

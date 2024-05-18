@@ -1,7 +1,56 @@
+import 'package:gymtracker/db/database.dart';
 import 'package:gymtracker/db/model/tables/exercise.dart';
 import 'package:gymtracker/model/exercisable.dart';
 import 'package:gymtracker/model/exercise.dart';
 import 'package:gymtracker/model/superset.dart';
+import 'package:gymtracker/model/workout.dart' as model;
+
+model.Workout workoutFromDatabase(
+  Routine routine,
+  List<ConcreteExercise> rawExercises, {
+  RoutineFolder? dbFolder,
+}) {
+  final entries = databaseExercisesToExercises(rawExercises);
+
+  model.GTRoutineFolder? modelFolder;
+  if (dbFolder != null) {
+    modelFolder = folderFromDatabase(dbFolder);
+  }
+
+  return model.Workout(
+    id: routine.id,
+    name: routine.name,
+    exercises: entries,
+    duration: null,
+    startingDate: null,
+    parentID: null,
+    infobox: routine.infobox,
+    completedBy: null,
+    completes: null,
+    weightUnit: routine.weightUnit,
+    distanceUnit: routine.distanceUnit,
+    folder: modelFolder,
+  );
+}
+
+model.Workout historyWorkoutFromDatabase(
+    HistoryWorkout routine, List<ConcreteExercise> rawExercises) {
+  final entries = databaseExercisesToExercises(rawExercises);
+
+  return model.Workout(
+    id: routine.id,
+    name: routine.name,
+    exercises: entries,
+    duration: Duration(seconds: routine.duration),
+    startingDate: routine.startingDate,
+    parentID: routine.parentId,
+    infobox: routine.infobox,
+    completedBy: routine.completedBy,
+    completes: routine.completes,
+    weightUnit: routine.weightUnit,
+    distanceUnit: routine.distanceUnit,
+  );
+}
 
 List<WorkoutExercisable> databaseExercisesToExercises(
     List<ConcreteExercise> data) {
@@ -63,4 +112,12 @@ WorkoutExercisable exerciseFromDatabaseExercise(ConcreteExercise data) {
       supersedesID: data.supersedesId,
     );
   }
+}
+
+model.GTRoutineFolder folderFromDatabase(RoutineFolder folder) {
+  return model.GTRoutineFolder(
+    id: folder.id,
+    name: folder.name,
+    sortOrder: folder.sortOrder,
+  );
 }

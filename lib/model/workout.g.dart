@@ -29,6 +29,8 @@ abstract class _$WorkoutCWProxy {
 
   Workout distanceUnit(Distance distanceUnit);
 
+  Workout folder(GTRoutineFolder? folder);
+
   /// This function **does support** nullification of nullable fields. All `null` values passed to `non-nullable` fields will be ignored. You can also use `Workout(...).copyWith.fieldName(...)` to override fields one at a time with nullification support.
   ///
   /// Usage
@@ -47,6 +49,7 @@ abstract class _$WorkoutCWProxy {
     String? completes,
     Weights? weightUnit,
     Distance? distanceUnit,
+    GTRoutineFolder? folder,
   });
 }
 
@@ -93,6 +96,9 @@ class _$WorkoutCWProxyImpl implements _$WorkoutCWProxy {
       this(distanceUnit: distanceUnit);
 
   @override
+  Workout folder(GTRoutineFolder? folder) => this(folder: folder);
+
+  @override
 
   /// This function **does support** nullification of nullable fields. All `null` values passed to `non-nullable` fields will be ignored. You can also use `Workout(...).copyWith.fieldName(...)` to override fields one at a time with nullification support.
   ///
@@ -112,6 +118,7 @@ class _$WorkoutCWProxyImpl implements _$WorkoutCWProxy {
     Object? completes = const $CopyWithPlaceholder(),
     Object? weightUnit = const $CopyWithPlaceholder(),
     Object? distanceUnit = const $CopyWithPlaceholder(),
+    Object? folder = const $CopyWithPlaceholder(),
   }) {
     return Workout(
       id: id == const $CopyWithPlaceholder()
@@ -160,6 +167,10 @@ class _$WorkoutCWProxyImpl implements _$WorkoutCWProxy {
               ? _value.distanceUnit
               // ignore: cast_nullable_to_non_nullable
               : distanceUnit as Distance,
+      folder: folder == const $CopyWithPlaceholder()
+          ? _value.folder
+          // ignore: cast_nullable_to_non_nullable
+          : folder as GTRoutineFolder?,
     );
   }
 }
@@ -195,6 +206,9 @@ Workout _$WorkoutFromJson(Map<String, dynamic> json) => Workout(
       distanceUnit:
           $enumDecodeNullable(_$DistanceEnumMap, json['distanceUnit']) ??
               Distance.km,
+      folder: json['folder'] == null
+          ? null
+          : GTRoutineFolder.fromJson(json['folder'] as Map<String, dynamic>),
     );
 
 Map<String, dynamic> _$WorkoutToJson(Workout instance) => <String, dynamic>{
@@ -209,6 +223,7 @@ Map<String, dynamic> _$WorkoutToJson(Workout instance) => <String, dynamic>{
       'distanceUnit': _$DistanceEnumMap[instance.distanceUnit]!,
       'completedBy': instance.completedBy,
       'completes': instance.completes,
+      'folder': instance.folder,
     };
 
 const _$WeightsEnumMap = {

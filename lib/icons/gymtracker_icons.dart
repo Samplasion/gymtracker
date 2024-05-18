@@ -43,6 +43,7 @@ class GymTrackerIcons {
   static const IconData combine = Icons.compare_arrows_rounded;
   static const IconData continuation = Icons.add_rounded;
   static const IconData create_exercise = Icons.add_rounded;
+  static const IconData create_folder = Icons.create_new_folder_rounded;
   static const IconData create_routine = Icons.add_rounded;
   static const IconData custom_exercises = Icons.star_rounded;
   static const IconData debug = Icons.bug_report_rounded;
@@ -55,6 +56,8 @@ class GymTrackerIcons {
   static const IconData duration = Icons.access_time_rounded;
   static const IconData edit = Icons.edit_rounded;
   static const IconData empty_workout = Icons.timer_rounded;
+  static const IconData folder_closed = Icons.folder_rounded;
+  static const IconData folder_open = Icons.folder_open_rounded;
   static const IconData highlight = Icons.highlight_rounded;
   static const IconData history = Icons.history_rounded;
   static const IconData info = Icons.info_rounded;

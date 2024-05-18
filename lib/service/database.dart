@@ -25,6 +25,7 @@ class DatabaseService extends GetxService with ChangeNotifier {
   final ongoing$ = BehaviorSubject<Map<String, dynamic>?>.seeded(null);
   final weightMeasurements$ =
       BehaviorSubject<List<WeightMeasurement>>.seeded([]);
+  final folders$ = BehaviorSubject<List<GTRoutineFolder>>.seeded([]);
 
   writeSettings(Prefs prefs) {
     db.setPreferences(prefs);
@@ -69,6 +70,9 @@ class DatabaseService extends GetxService with ChangeNotifier {
     db.watchWeightMeasurements()
       ..pipe(weightMeasurements$)
       ..listen((_) => onServiceChange("weight measurements")());
+    db.watchRoutineFolders()
+      ..pipe(folders$)
+      ..listen((_) => onServiceChange("folders")());
   }
 
   @visibleForTesting
@@ -165,12 +169,25 @@ class DatabaseService extends GetxService with ChangeNotifier {
     return _writeRoutines(routines).then((_) => notifyListeners());
   }
 
-  setRoutine(Workout routine) {
+  setRoutine(Workout routine) async {
     logger.i("Setting routine");
+    logger.d(
+        "Do we have it already? ${routines.any((element) => element.id == routine.id)}");
     if (routines.any((element) => element.id == routine.id)) {
-      db.updateRoutine(fixWorkout(routine));
+      await db.updateRoutine(fixWorkout(routine));
     } else {
-      db.insertRoutine(fixWorkout(routine));
+      await db.insertRoutine(fixWorkout(routine));
+    }
+    if (routine.folder != null) {
+      logger.i("Routine has a folder: ${routine.folder}");
+      final oldFolder = folders$.value
+          .firstWhereOrNull((element) => element.id == routine.folder!.id);
+      logger.d("Do we have it already? ${oldFolder != null} ($oldFolder)");
+      if (oldFolder == null) {
+        addFolder(routine.folder!);
+      } else {
+        updateFolder(routine.folder!);
+      }
     }
   }
 
@@ -262,6 +279,18 @@ class DatabaseService extends GetxService with ChangeNotifier {
     db.deleteWeightMeasurement(measurement.id);
   }
 
+  addFolder(GTRoutineFolder folder) {
+    db.insertRoutineFolder(folder);
+  }
+
+  removeFolder(GTRoutineFolder folder) {
+    db.deleteRoutineFolder(folder.id);
+  }
+
+  updateFolder(GTRoutineFolder folder) {
+    db.updateRoutineFolder(folder);
+  }
+
   toJson() {
     final converter = getConverter(DATABASE_VERSION);
 
@@ -273,6 +302,7 @@ class DatabaseService extends GetxService with ChangeNotifier {
       historyWorkoutExercises: workoutHistory.flattenedExercises,
       preferences: prefs$.value,
       weightMeasurements: weightMeasurements$.value,
+      folders: folders$.value,
     ));
   }
 
@@ -288,6 +318,13 @@ class DatabaseService extends GetxService with ChangeNotifier {
           getConverter(json['version'] as int? ?? DATABASE_VERSION);
       final snapshot = converter.process(json);
 
+      try {
+        converter.validate(snapshot);
+      } catch (e, stackTrace) {
+        logger.w("Validation failed", error: e, stackTrace: stackTrace);
+        rethrow;
+      }
+
       await db.transaction(() async {
         await db.clearTheWholeThingIAmAbsolutelySureISwear();
 
@@ -299,6 +336,7 @@ class DatabaseService extends GetxService with ChangeNotifier {
         await _writeHistoryExercises(snapshot.historyWorkoutExercises);
         await db.setPreferences(snapshot.preferences);
         await _writeWeightMeasurements(snapshot.weightMeasurements);
+        await db.writeAllRoutineFolders(snapshot.folders);
       });
     }
 

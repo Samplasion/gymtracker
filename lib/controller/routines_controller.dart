@@ -20,6 +20,7 @@ import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/utils/utils.dart' as utils;
 import 'package:gymtracker/view/exercises.dart';
+import 'package:gymtracker/view/routines.dart';
 import 'package:gymtracker/view/utils/history_workout.dart';
 import 'package:gymtracker/view/utils/import_routine.dart';
 import 'package:gymtracker/view/workout.dart';
@@ -36,8 +37,13 @@ class RoutinesController extends GetxController
     with ServiceableController, ProtocolListener {
   RxList<Workout> workouts = <Workout>[].obs;
   RxBool hasOngoingWorkout = false.obs;
+  RxMap<GTRoutineFolder, List<Workout>> folders =
+      <GTRoutineFolder, List<Workout>>{}.obs;
 
   RxList<RoutineSuggestion> get suggestions => coordinator.suggestions;
+
+  List<Workout> get rootRoutines =>
+      workouts.where((r) => r.folder == null).toList();
 
   @override
   onInit() {
@@ -54,6 +60,10 @@ class RoutinesController extends GetxController
       logger.i("Updated with ${event.length} exercises");
       workouts(event);
       coordinator.computeSuggestions();
+      _recomputeFolders(service.folders$.valueOrNull ?? []);
+    });
+    service.folders$.listen((fld) {
+      _recomputeFolders(fld);
     });
   }
 
@@ -222,10 +232,28 @@ class RoutinesController extends GetxController
     Get.find<CountdownController>().removeCountdown();
   }
 
-  void reorder(int oldIndex, int newIndex) {
-    final list = service.routines;
+  void reorderRoot(int oldIndex, int newIndex) {
+    final list = rootRoutines;
     utils.reorder(list, oldIndex, newIndex);
-    service.setAllRoutines(list);
+
+    final old = service.routines.toList();
+    old.removeWhere((r) => r.folder == null);
+    service.setAllRoutines([...list, ...old]);
+
+    // Optimistically reorder the list
+    workouts([...list, ...old]);
+  }
+
+  void reorderFolder(GTRoutineFolder folder, int oldIndex, int newIndex) {
+    final list = folders[folder]!;
+    utils.reorder(list, oldIndex, newIndex);
+
+    final old = service.routines.toList();
+    old.removeWhere((r) => r.folder?.id == folder.id);
+    service.setAllRoutines([...list, ...old]);
+
+    // Optimistically reorder the list
+    workouts([...list, ...old]);
   }
 
   List<Workout> getChildren(
@@ -449,6 +477,55 @@ class RoutinesController extends GetxController
         ),
       ),
     );
+  }
+
+  void createFolder() {
+    final folder = GTRoutineFolder.generate(
+      name: "routines.newFolder".t,
+    );
+    service.addFolder(folder);
+  }
+
+  void moveToFolder(Workout data, GTRoutineFolder folder) {
+    final routine = data.copyWith(folder: folder);
+    service.setRoutine(routine);
+  }
+
+  void moveToRoot(Workout data) {
+    if (data.folder == null) return;
+
+    final routine = data.copyWith(folder: null);
+    service.setRoutine(routine);
+  }
+
+  void _recomputeFolders(List<GTRoutineFolder> fld) {
+    final res = <String, List<Workout>>{};
+    for (final folder in fld) {
+      res[folder.id] =
+          service.routines.where((r) => r.folder?.id == folder.id).toList();
+    }
+    folders({
+      for (final folder in fld) folder: res[folder.id] ?? [],
+    });
+  }
+
+  Future<void> editFolderScreen(GTRoutineFolder folder) async {
+    final newFolder = await Go.showBottomModalScreen(
+      (context, _) => EditFolderModal(folder: folder),
+    );
+    if (newFolder != null) {
+      service.updateFolder(newFolder);
+    }
+  }
+
+  Future<void> deleteFolder(GTRoutineFolder folder) async {
+    final shouldDelete = await Go.confirm(
+      "routines.actions.deleteFolder.title".t,
+      "routines.actions.deleteFolder.text".t,
+    );
+    if (!shouldDelete) return;
+    Get.back();
+    service.removeFolder(folder);
   }
 }
 

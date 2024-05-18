@@ -212,7 +212,11 @@
       "edit": "Modifica routine",
       "start": "Avvia routine",
       "create": "Crea routine",
-      "viewHistory": "Cronologia"
+      "viewHistory": "Cronologia",
+      "deleteFolder": {
+        "title": "Elimina cartella",
+        "text": "Vuoi davvero eliminare questa cartella? Quest'azione non potrà essere annullata. Le routine in questa cartella verranno spostate nella schermata principale."
+      }
     },
     "editor": {
       "exercises": {
@@ -247,7 +251,13 @@
           "body": "Vuoi davvero rimuovere questa superserie? Quest'azione non può essere annullata."
         }
       }
-    }
+    },
+    "newFolder": "Nuova cartella",
+    "folderNameEmpty": "Il nome non dev'essere vuoto.",
+    "folderName": "Nome",
+    "editFolder": "Modifica cartella",
+    "dropHere": "Rilascia qui",
+    "moveToRoot": "Rilascia la routine quì per muoverla nella schermata principale."
   },
   "history": {
     "title": "Cronologia",
@@ -325,20 +335,20 @@
           "light": "Modalità bianco puro"
         }
       },
-      "export": {
-        "label": "Esporta dati (JSON)",
-        "filename": "Dati_GymTracker",
-        "failed": {
-          "title": "Impossibile esportare i dati",
-          "copy": "Il messaggio di errore è stato copiato negli appunti."
-        }
-      },
       "themeMode": {
         "label": "Tema",
         "values": {
           "system": "Sistema",
           "light": "Chiaro",
           "dark": "Scuro"
+        }
+      },
+      "export": {
+        "label": "Esporta dati (JSON)",
+        "filename": "Dati_GymTracker",
+        "failed": {
+          "title": "Impossibile esportare i dati",
+          "copy": "Il messaggio di errore è stato copiato negli appunti."
         }
       },
       "notifications": {
@@ -557,6 +567,22 @@
       "few": "%s elementi selezionati",
       "many": "%s elementi selezionati",
       "other": "%s elementi selezionati"
+    },
+    "workouts": {
+      "zero": "Nessun allenamento",
+      "one": "%s allenamento",
+      "two": "%s allenamenti",
+      "few": "%s allenamenti",
+      "many": "%s allenamenti",
+      "other": "%s allenamenti"
+    },
+    "routines": {
+      "zero": "Nessuna routine",
+      "one": "%s routine",
+      "two": "%s routine",
+      "few": "%s routine",
+      "many": "%s routine",
+      "other": "%s routine"
     }
   },
   "muscleGroups": {
@@ -604,7 +630,8 @@
     "create": "Crea",
     "remove": "Rimuovi",
     "edit": "Modifica",
-    "undo": "Annulla"
+    "undo": "Annulla",
+    "save": "Salva"
   },
   "units": {
     "kg": "kg",

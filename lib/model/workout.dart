@@ -16,6 +16,68 @@ import 'package:uuid/uuid.dart';
 
 part 'workout.g.dart';
 
+class GTRoutineFolder {
+  final String id;
+  final String name;
+  final int sortOrder;
+
+  const GTRoutineFolder({
+    required this.id,
+    required this.name,
+    required this.sortOrder,
+  });
+
+  GTRoutineFolder.generate({
+    required this.name,
+  })  : id = const Uuid().v4(), // Is overridden by the database
+        sortOrder = 9999999;
+
+  factory GTRoutineFolder.fromJson(Map<String, dynamic> json) {
+    return GTRoutineFolder(
+      id: json['id'] as String,
+      name: json['name'] as String,
+      sortOrder: json['sortOrder'] as int,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'name': name,
+      'sortOrder': sortOrder,
+    };
+  }
+
+  @override
+  String toString() {
+    return 'GTRoutineFolder[$name] ${toJson()}';
+  }
+
+  GTRoutineFolder copyWith({
+    String? id,
+    String? name,
+    int? sortOrder,
+  }) {
+    return GTRoutineFolder(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      sortOrder: sortOrder ?? this.sortOrder,
+    );
+  }
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is GTRoutineFolder &&
+          runtimeType == other.runtimeType &&
+          id == other.id &&
+          name == other.name &&
+          sortOrder == other.sortOrder;
+
+  @override
+  int get hashCode => id.hashCode ^ name.hashCode ^ sortOrder.hashCode;
+}
+
 @CopyWith()
 @JsonSerializable()
 
@@ -79,6 +141,12 @@ class Workout {
   /// {@macro gymtracker_workout_completion}
   final String? completes;
 
+  /// The folder this workout is in.
+  /// If null, the workout is not in a folder.
+  ///
+  /// It is an error to define [folder] if [isConcrete] is true (ie. [duration] is not null).
+  final GTRoutineFolder? folder;
+
   DateTime? get endingDate => (duration != null && startingDate != null)
       ? startingDate!.add(duration!)
       : null;
@@ -118,12 +186,17 @@ class Workout {
     this.completes,
     this.weightUnit = Weights.kg,
     this.distanceUnit = Distance.km,
+    this.folder,
   })  : id = id ?? const Uuid().v4(),
         assert(() {
           if (completedBy == null && completes == null) return true;
           return (completedBy == null) != (completes == null);
         }(),
-            "Both completedBy and completes cannot be defined at the same time.");
+            "Both completedBy and completes cannot be defined at the same time."),
+        assert(() {
+          if (folder != null) return duration == null;
+          return true;
+        }(), "A concrete workout cannot be in a folder.");
 
   static bool canCombine(Workout workout1, Workout workout2) {
     return workout1.isConcrete == workout2.isConcrete && !workout1.isConcrete ||
@@ -392,6 +465,9 @@ class SynthesizedWorkout implements Workout {
             ])
         .toList();
   }
+
+  @override
+  GTRoutineFolder? get folder => null;
 
   @override
   String? get infobox => components.first.infobox;

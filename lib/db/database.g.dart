@@ -335,6 +335,225 @@ class CustomExercisesCompanion extends UpdateCompanion<CustomExercise> {
   }
 }
 
+class $RoutineFoldersTable extends RoutineFolders
+    with TableInfo<$RoutineFoldersTable, RoutineFolder> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $RoutineFoldersTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+      'id', aliasedName, false,
+      type: DriftSqlType.string,
+      requiredDuringInsert: false,
+      clientDefault: () => _uuid.v4());
+  static const VerificationMeta _nameMeta = const VerificationMeta('name');
+  @override
+  late final GeneratedColumn<String> name = GeneratedColumn<String>(
+      'name', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _sortOrderMeta =
+      const VerificationMeta('sortOrder');
+  @override
+  late final GeneratedColumn<int> sortOrder = GeneratedColumn<int>(
+      'sort_order', aliasedName, false,
+      type: DriftSqlType.int, requiredDuringInsert: true);
+  @override
+  List<GeneratedColumn> get $columns => [id, name, sortOrder];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'routine_folders';
+  @override
+  VerificationContext validateIntegrity(Insertable<RoutineFolder> instance,
+      {bool isInserting = false}) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('name')) {
+      context.handle(
+          _nameMeta, name.isAcceptableOrUnknown(data['name']!, _nameMeta));
+    } else if (isInserting) {
+      context.missing(_nameMeta);
+    }
+    if (data.containsKey('sort_order')) {
+      context.handle(_sortOrderMeta,
+          sortOrder.isAcceptableOrUnknown(data['sort_order']!, _sortOrderMeta));
+    } else if (isInserting) {
+      context.missing(_sortOrderMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  RoutineFolder map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return RoutineFolder(
+      id: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}id'])!,
+      name: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}name'])!,
+      sortOrder: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}sort_order'])!,
+    );
+  }
+
+  @override
+  $RoutineFoldersTable createAlias(String alias) {
+    return $RoutineFoldersTable(attachedDatabase, alias);
+  }
+}
+
+class RoutineFolder extends DataClass implements Insertable<RoutineFolder> {
+  final String id;
+  final String name;
+  final int sortOrder;
+  const RoutineFolder(
+      {required this.id, required this.name, required this.sortOrder});
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['name'] = Variable<String>(name);
+    map['sort_order'] = Variable<int>(sortOrder);
+    return map;
+  }
+
+  RoutineFoldersCompanion toCompanion(bool nullToAbsent) {
+    return RoutineFoldersCompanion(
+      id: Value(id),
+      name: Value(name),
+      sortOrder: Value(sortOrder),
+    );
+  }
+
+  factory RoutineFolder.fromJson(Map<String, dynamic> json,
+      {ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return RoutineFolder(
+      id: serializer.fromJson<String>(json['id']),
+      name: serializer.fromJson<String>(json['name']),
+      sortOrder: serializer.fromJson<int>(json['sortOrder']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'name': serializer.toJson<String>(name),
+      'sortOrder': serializer.toJson<int>(sortOrder),
+    };
+  }
+
+  RoutineFolder copyWith({String? id, String? name, int? sortOrder}) =>
+      RoutineFolder(
+        id: id ?? this.id,
+        name: name ?? this.name,
+        sortOrder: sortOrder ?? this.sortOrder,
+      );
+  @override
+  String toString() {
+    return (StringBuffer('RoutineFolder(')
+          ..write('id: $id, ')
+          ..write('name: $name, ')
+          ..write('sortOrder: $sortOrder')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(id, name, sortOrder);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is RoutineFolder &&
+          other.id == this.id &&
+          other.name == this.name &&
+          other.sortOrder == this.sortOrder);
+}
+
+class RoutineFoldersCompanion extends UpdateCompanion<RoutineFolder> {
+  final Value<String> id;
+  final Value<String> name;
+  final Value<int> sortOrder;
+  final Value<int> rowid;
+  const RoutineFoldersCompanion({
+    this.id = const Value.absent(),
+    this.name = const Value.absent(),
+    this.sortOrder = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  RoutineFoldersCompanion.insert({
+    this.id = const Value.absent(),
+    required String name,
+    required int sortOrder,
+    this.rowid = const Value.absent(),
+  })  : name = Value(name),
+        sortOrder = Value(sortOrder);
+  static Insertable<RoutineFolder> custom({
+    Expression<String>? id,
+    Expression<String>? name,
+    Expression<int>? sortOrder,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (name != null) 'name': name,
+      if (sortOrder != null) 'sort_order': sortOrder,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  RoutineFoldersCompanion copyWith(
+      {Value<String>? id,
+      Value<String>? name,
+      Value<int>? sortOrder,
+      Value<int>? rowid}) {
+    return RoutineFoldersCompanion(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      sortOrder: sortOrder ?? this.sortOrder,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (name.present) {
+      map['name'] = Variable<String>(name.value);
+    }
+    if (sortOrder.present) {
+      map['sort_order'] = Variable<int>(sortOrder.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('RoutineFoldersCompanion(')
+          ..write('id: $id, ')
+          ..write('name: $name, ')
+          ..write('sortOrder: $sortOrder, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 class $RoutinesTable extends Routines with TableInfo<$RoutinesTable, Routine> {
   @override
   final GeneratedDatabase attachedDatabase;
@@ -378,9 +597,18 @@ class $RoutinesTable extends Routines with TableInfo<$RoutinesTable, Routine> {
   late final GeneratedColumn<int> sortOrder = GeneratedColumn<int>(
       'sort_order', aliasedName, false,
       type: DriftSqlType.int, requiredDuringInsert: true);
+  static const VerificationMeta _folderIdMeta =
+      const VerificationMeta('folderId');
+  @override
+  late final GeneratedColumn<String> folderId = GeneratedColumn<String>(
+      'folder_id', aliasedName, true,
+      type: DriftSqlType.string,
+      requiredDuringInsert: false,
+      defaultConstraints: GeneratedColumn.constraintIsAlways(
+          'REFERENCES routine_folders (id)'));
   @override
   List<GeneratedColumn> get $columns =>
-      [id, name, infobox, weightUnit, distanceUnit, sortOrder];
+      [id, name, infobox, weightUnit, distanceUnit, sortOrder, folderId];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -414,6 +642,10 @@ class $RoutinesTable extends Routines with TableInfo<$RoutinesTable, Routine> {
     } else if (isInserting) {
       context.missing(_sortOrderMeta);
     }
+    if (data.containsKey('folder_id')) {
+      context.handle(_folderIdMeta,
+          folderId.isAcceptableOrUnknown(data['folder_id']!, _folderIdMeta));
+    }
     return context;
   }
 
@@ -437,6 +669,8 @@ class $RoutinesTable extends Routines with TableInfo<$RoutinesTable, Routine> {
               DriftSqlType.string, data['${effectivePrefix}distance_unit'])!),
       sortOrder: attachedDatabase.typeMapping
           .read(DriftSqlType.int, data['${effectivePrefix}sort_order'])!,
+      folderId: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}folder_id']),
     );
   }
 
@@ -458,13 +692,15 @@ class Routine extends DataClass implements Insertable<Routine> {
   final Weights weightUnit;
   final Distance distanceUnit;
   final int sortOrder;
+  final String? folderId;
   const Routine(
       {required this.id,
       required this.name,
       required this.infobox,
       required this.weightUnit,
       required this.distanceUnit,
-      required this.sortOrder});
+      required this.sortOrder,
+      this.folderId});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
@@ -480,6 +716,9 @@ class Routine extends DataClass implements Insertable<Routine> {
           $RoutinesTable.$converterdistanceUnit.toSql(distanceUnit));
     }
     map['sort_order'] = Variable<int>(sortOrder);
+    if (!nullToAbsent || folderId != null) {
+      map['folder_id'] = Variable<String>(folderId);
+    }
     return map;
   }
 
@@ -491,6 +730,9 @@ class Routine extends DataClass implements Insertable<Routine> {
       weightUnit: Value(weightUnit),
       distanceUnit: Value(distanceUnit),
       sortOrder: Value(sortOrder),
+      folderId: folderId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(folderId),
     );
   }
 
@@ -506,6 +748,7 @@ class Routine extends DataClass implements Insertable<Routine> {
       distanceUnit: $RoutinesTable.$converterdistanceUnit
           .fromJson(serializer.fromJson<String>(json['distanceUnit'])),
       sortOrder: serializer.fromJson<int>(json['sortOrder']),
+      folderId: serializer.fromJson<String?>(json['folderId']),
     );
   }
   @override
@@ -520,6 +763,7 @@ class Routine extends DataClass implements Insertable<Routine> {
       'distanceUnit': serializer.toJson<String>(
           $RoutinesTable.$converterdistanceUnit.toJson(distanceUnit)),
       'sortOrder': serializer.toJson<int>(sortOrder),
+      'folderId': serializer.toJson<String?>(folderId),
     };
   }
 
@@ -529,7 +773,8 @@ class Routine extends DataClass implements Insertable<Routine> {
           String? infobox,
           Weights? weightUnit,
           Distance? distanceUnit,
-          int? sortOrder}) =>
+          int? sortOrder,
+          Value<String?> folderId = const Value.absent()}) =>
       Routine(
         id: id ?? this.id,
         name: name ?? this.name,
@@ -537,6 +782,7 @@ class Routine extends DataClass implements Insertable<Routine> {
         weightUnit: weightUnit ?? this.weightUnit,
         distanceUnit: distanceUnit ?? this.distanceUnit,
         sortOrder: sortOrder ?? this.sortOrder,
+        folderId: folderId.present ? folderId.value : this.folderId,
       );
   @override
   String toString() {
@@ -546,14 +792,15 @@ class Routine extends DataClass implements Insertable<Routine> {
           ..write('infobox: $infobox, ')
           ..write('weightUnit: $weightUnit, ')
           ..write('distanceUnit: $distanceUnit, ')
-          ..write('sortOrder: $sortOrder')
+          ..write('sortOrder: $sortOrder, ')
+          ..write('folderId: $folderId')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode =>
-      Object.hash(id, name, infobox, weightUnit, distanceUnit, sortOrder);
+  int get hashCode => Object.hash(
+      id, name, infobox, weightUnit, distanceUnit, sortOrder, folderId);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -563,7 +810,8 @@ class Routine extends DataClass implements Insertable<Routine> {
           other.infobox == this.infobox &&
           other.weightUnit == this.weightUnit &&
           other.distanceUnit == this.distanceUnit &&
-          other.sortOrder == this.sortOrder);
+          other.sortOrder == this.sortOrder &&
+          other.folderId == this.folderId);
 }
 
 class RoutinesCompanion extends UpdateCompanion<Routine> {
@@ -573,6 +821,7 @@ class RoutinesCompanion extends UpdateCompanion<Routine> {
   final Value<Weights> weightUnit;
   final Value<Distance> distanceUnit;
   final Value<int> sortOrder;
+  final Value<String?> folderId;
   final Value<int> rowid;
   const RoutinesCompanion({
     this.id = const Value.absent(),
@@ -581,6 +830,7 @@ class RoutinesCompanion extends UpdateCompanion<Routine> {
     this.weightUnit = const Value.absent(),
     this.distanceUnit = const Value.absent(),
     this.sortOrder = const Value.absent(),
+    this.folderId = const Value.absent(),
     this.rowid = const Value.absent(),
   });
   RoutinesCompanion.insert({
@@ -590,6 +840,7 @@ class RoutinesCompanion extends UpdateCompanion<Routine> {
     required Weights weightUnit,
     required Distance distanceUnit,
     required int sortOrder,
+    this.folderId = const Value.absent(),
     this.rowid = const Value.absent(),
   })  : name = Value(name),
         infobox = Value(infobox),
@@ -603,6 +854,7 @@ class RoutinesCompanion extends UpdateCompanion<Routine> {
     Expression<String>? weightUnit,
     Expression<String>? distanceUnit,
     Expression<int>? sortOrder,
+    Expression<String>? folderId,
     Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
@@ -612,6 +864,7 @@ class RoutinesCompanion extends UpdateCompanion<Routine> {
       if (weightUnit != null) 'weight_unit': weightUnit,
       if (distanceUnit != null) 'distance_unit': distanceUnit,
       if (sortOrder != null) 'sort_order': sortOrder,
+      if (folderId != null) 'folder_id': folderId,
       if (rowid != null) 'rowid': rowid,
     });
   }
@@ -623,6 +876,7 @@ class RoutinesCompanion extends UpdateCompanion<Routine> {
       Value<Weights>? weightUnit,
       Value<Distance>? distanceUnit,
       Value<int>? sortOrder,
+      Value<String?>? folderId,
       Value<int>? rowid}) {
     return RoutinesCompanion(
       id: id ?? this.id,
@@ -631,6 +885,7 @@ class RoutinesCompanion extends UpdateCompanion<Routine> {
       weightUnit: weightUnit ?? this.weightUnit,
       distanceUnit: distanceUnit ?? this.distanceUnit,
       sortOrder: sortOrder ?? this.sortOrder,
+      folderId: folderId ?? this.folderId,
       rowid: rowid ?? this.rowid,
     );
   }
@@ -658,6 +913,9 @@ class RoutinesCompanion extends UpdateCompanion<Routine> {
     if (sortOrder.present) {
       map['sort_order'] = Variable<int>(sortOrder.value);
     }
+    if (folderId.present) {
+      map['folder_id'] = Variable<String>(folderId.value);
+    }
     if (rowid.present) {
       map['rowid'] = Variable<int>(rowid.value);
     }
@@ -673,6 +931,7 @@ class RoutinesCompanion extends UpdateCompanion<Routine> {
           ..write('weightUnit: $weightUnit, ')
           ..write('distanceUnit: $distanceUnit, ')
           ..write('sortOrder: $sortOrder, ')
+          ..write('folderId: $folderId, ')
           ..write('rowid: $rowid')
           ..write(')'))
         .toString();
@@ -2819,6 +3078,7 @@ abstract class _$GTDatabase extends GeneratedDatabase {
   _$GTDatabase(QueryExecutor e) : super(e);
   late final $CustomExercisesTable customExercises =
       $CustomExercisesTable(this);
+  late final $RoutineFoldersTable routineFolders = $RoutineFoldersTable(this);
   late final $RoutinesTable routines = $RoutinesTable(this);
   late final $HistoryWorkoutsTable historyWorkouts =
       $HistoryWorkoutsTable(this);
@@ -2836,6 +3096,7 @@ abstract class _$GTDatabase extends GeneratedDatabase {
   @override
   List<DatabaseSchemaEntity> get allSchemaEntities => [
         customExercises,
+        routineFolders,
         routines,
         historyWorkouts,
         historyWorkoutExercises,

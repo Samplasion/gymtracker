@@ -6,11 +6,11 @@ import 'package:gymtracker/model/preferences.dart';
 import 'package:gymtracker/model/workout.dart';
 import 'package:gymtracker/service/logger.dart';
 
-class VersionedJsonImportV2 extends VersionedJsonImportBase {
+class VersionedJsonImportV4 extends VersionedJsonImportBase {
   @override
-  int get version => 2;
+  int get version => 4;
 
-  const VersionedJsonImportV2();
+  const VersionedJsonImportV4();
 
   @override
   DatabaseSnapshot process(Map<String, dynamic> json) {
@@ -38,8 +38,24 @@ class VersionedJsonImportV2 extends VersionedJsonImportBase {
         for (final weight in json['weightMeasurements'])
           WeightMeasurement.fromJson(weight)
       ],
-      folders: [],
+      folders: [
+        for (final folder in json['folders']) GTRoutineFolder.fromJson(folder)
+      ],
     )..logger.t("Importing");
+  }
+
+  @override
+  void validate(DatabaseSnapshot data) {
+    final folders = data.folders.map((f) => f.id).toSet();
+    if (data.routines
+        .any((ex) => ex.folder != null && !folders.contains(ex.folder!.id))) {
+      final invalidFolders = data.routines
+          .where((ex) => ex.folder != null && !folders.contains(ex.folder!.id))
+          .map((ex) => ex.folder!.id)
+          .toSet();
+      throw Exception(
+          "Invalid folder reference(s) in routines: $invalidFolders.");
+    }
   }
 
   @override
@@ -62,7 +78,8 @@ class VersionedJsonImportV2 extends VersionedJsonImportBase {
       'preferences': data.preferences.toJson(),
       'weightMeasurements': [
         for (final weight in data.weightMeasurements) weight.toJson()
-      ]
+      ],
+      'folders': [for (final folder in data.folders) folder.toJson()],
     };
   }
 }

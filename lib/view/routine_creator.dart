@@ -36,7 +36,7 @@ extension _Unwrap<T> on RxList<_DateWrapped<T>> {
 }
 
 // ignore: library_private_types_in_public_api
-_RoutineCreatorController get controller =>
+_RoutineCreatorController get _controller =>
     Get.put(_RoutineCreatorController());
 
 class RoutineCreator extends StatefulWidget {
@@ -62,7 +62,7 @@ class _RoutineCreatorState extends State<RoutineCreator> {
   void initState() {
     super.initState();
     if (widget.base != null) {
-      controller.exercises(
+      _controller.exercises(
           widget.base!.exercises.map((e) => e.clone()).toList().wrap());
     }
   }
@@ -141,7 +141,7 @@ class _RoutineCreatorState extends State<RoutineCreator> {
                     )).then((result) {
                   result ??= [];
                   setState(() {
-                    controller.exercises.addAll(result!
+                    _controller.exercises.addAll(result!
                         .map((ex) {
                           return ex.makeChild().copyWith.sets([
                             GTSet.empty(
@@ -167,7 +167,7 @@ class _RoutineCreatorState extends State<RoutineCreator> {
                   result ??= [];
                   setState(() {
                     // controller.exercises.addAll(result!.wrap());
-                    controller.exercises.add(_DateWrapped(
+                    _controller.exercises.add(_DateWrapped(
                       Superset(
                         restTime: Duration.zero,
                         exercises: [for (final ex in result!) ex.makeChild()],
@@ -184,13 +184,13 @@ class _RoutineCreatorState extends State<RoutineCreator> {
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
                 children: [
-                  for (int i = 0; i < controller.exercises.length; i++) ...[
+                  for (int i = 0; i < _controller.exercises.length; i++) ...[
                     exerciseEntry(i),
                   ],
                 ],
                 onReorder: (oldIndex, newIndex) {
-                  reorder(controller.exercises, oldIndex, newIndex);
-                  controller.exercises.refresh();
+                  reorder(_controller.exercises, oldIndex, newIndex);
+                  _controller.exercises.refresh();
                 },
               ),
             ),
@@ -201,25 +201,25 @@ class _RoutineCreatorState extends State<RoutineCreator> {
   }
 
   Widget exerciseEntry(int i) =>
-      controller.exercises[i].data.map(exercise: (ex) {
+      _controller.exercises[i].data.map(exercise: (ex) {
         return WorkoutExerciseEditor(
-          key: ValueKey("${ex.name}${controller.exercises[i].date}"),
+          key: ValueKey("${ex.name}${_controller.exercises[i].date}"),
           exercise: ex,
           index: (exerciseIndex: i, supersetIndex: null),
           isCreating: true,
           weightUnit: Get.find<SettingsController>().weightUnit.value,
           distanceUnit: Get.find<SettingsController>().distanceUnit.value,
-          callbacks: controller.callbacks,
+          callbacks: _controller.callbacks,
         );
       }, superset: (ss) {
         return SupersetEditor(
-          key: ValueKey("superset-${ss.id}${controller.exercises[i].date}"),
+          key: ValueKey("superset-${ss.id}${_controller.exercises[i].date}"),
           superset: ss,
           index: i,
           isCreating: true,
           weightUnit: Get.find<SettingsController>().weightUnit.value,
           distanceUnit: Get.find<SettingsController>().distanceUnit.value,
-          callbacks: controller.callbacks,
+          callbacks: _controller.callbacks,
         );
       });
 
@@ -230,7 +230,7 @@ class _RoutineCreatorState extends State<RoutineCreator> {
       if (widget.base == null) {
         workoutsController.submitRoutine(
           name: titleController.text,
-          exercises: controller.exercises.unwrap(),
+          exercises: _controller.exercises.unwrap(),
           infobox: infoboxController.document.toPlainText().trim().isEmpty
               ? null
               : infoboxController.toEncoded(),
@@ -239,7 +239,7 @@ class _RoutineCreatorState extends State<RoutineCreator> {
         Get.back(
           result: workoutsController.generate(
             name: titleController.text,
-            exercises: controller.exercises.unwrap(),
+            exercises: _controller.exercises.unwrap(),
             id: widget.base!.id,
             infobox: infoboxController.document.toPlainText().trim().isEmpty
                 ? null
@@ -282,7 +282,7 @@ class _RoutineCreatorController extends GetxController {
                   (exercises[supersetIndex] as Superset).exercises[j]
             ]);
           }
-          controller.exercises.refresh();
+          _controller.exercises.refresh();
         });
       }, onExerciseRemove: (index) {
         final (exerciseIndex: i, supersetIndex: supersetIndex) = index;
@@ -297,7 +297,7 @@ class _RoutineCreatorController extends GetxController {
               if (j != i) (exercises[supersetIndex] as Superset).exercises[j]
           ]);
         }
-        controller.exercises.refresh();
+        _controller.exercises.refresh();
       }, onExerciseChangeRestTime: (index, value) {
         final (exerciseIndex: i, supersetIndex: supersetIndex) = index;
         if (supersetIndex == null) {
@@ -316,7 +316,7 @@ class _RoutineCreatorController extends GetxController {
           // We don't support rest time for individual exercises in a superset
           throw UnimplementedError();
         }
-        controller.exercises.refresh();
+        _controller.exercises.refresh();
       }, onSetCreate: (index) {
         final (exerciseIndex: i, supersetIndex: supersetIndex) = index;
         if (supersetIndex == null) {
@@ -336,7 +336,7 @@ class _RoutineCreatorController extends GetxController {
             ),
           );
         }
-        controller.exercises.refresh();
+        _controller.exercises.refresh();
       }, onSetRemove: (exerciseIndex, index) {
         final (exerciseIndex: i, supersetIndex: supersetIndex) = exerciseIndex;
         if (supersetIndex == null) {
@@ -358,7 +358,7 @@ class _RoutineCreatorController extends GetxController {
           );
         }
 
-        controller.exercises.refresh();
+        _controller.exercises.refresh();
       }, onSetSelectKind: (index, setIndex, kind) {
         final (exerciseIndex: i, supersetIndex: supersetIndex) = index;
         if (supersetIndex == null) {
@@ -385,7 +385,7 @@ class _RoutineCreatorController extends GetxController {
             ],
           );
         }
-        controller.exercises.refresh();
+        _controller.exercises.refresh();
       }, onSetValueChange: (index, setIndex, newSet) {
         final (exerciseIndex: i, supersetIndex: supersetIndex) = index;
         if (supersetIndex == null) {
@@ -406,7 +406,7 @@ class _RoutineCreatorController extends GetxController {
             ],
           );
         }
-        controller.exercises.refresh();
+        _controller.exercises.refresh();
       }, onExerciseNotesChange: (index, notes) {
         final (
           exerciseIndex: exerciseIndex,
@@ -455,16 +455,16 @@ class _RoutineCreatorController extends GetxController {
             ...((exercises[supersetIndex].data as Superset).exercises),
             newExercise,
           ]);
-          controller.exercises.refresh();
+          _controller.exercises.refresh();
         });
       }, onSupersetExercisesReorderPair:
           (supersetIndex, oldExIndex, newExIndex) {
         final superset = exercises[supersetIndex].data as Superset;
         final supersetExercises = superset.exercises.toList();
         reorder(supersetExercises, oldExIndex, newExIndex);
-        controller.exercises[supersetIndex].data = superset.copyWith(
+        _controller.exercises[supersetIndex].data = superset.copyWith(
           exercises: supersetExercises,
         );
-        controller.exercises.refresh();
+        _controller.exercises.refresh();
       });
 }

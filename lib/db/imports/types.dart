@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:gymtracker/db/imports/v1.dart';
 import 'package:gymtracker/db/imports/v2.dart';
 import 'package:gymtracker/db/imports/v3.dart';
+import 'package:gymtracker/db/imports/v4.dart';
 import 'package:gymtracker/model/exercisable.dart';
 import 'package:gymtracker/model/exercise.dart';
 import 'package:gymtracker/model/measurements.dart';
@@ -13,6 +14,7 @@ const converters = {
   1: VersionedJsonImportV1(),
   2: VersionedJsonImportV2(),
   3: VersionedJsonImportV3(),
+  4: VersionedJsonImportV4(),
 };
 
 VersionedJsonImportBase getConverter(int version) {
@@ -29,6 +31,7 @@ abstract class VersionedJsonImportBase {
   int get version;
 
   DatabaseSnapshot process(Map<String, dynamic> json);
+  void validate(DatabaseSnapshot data) => true;
   Map<String, dynamic> export(DatabaseSnapshot data) {
     throw Exception("Unable to export data in database version $version");
   }
@@ -42,6 +45,7 @@ class DatabaseSnapshot {
   final List<WorkoutExercisable> historyWorkoutExercises;
   final Prefs preferences;
   final List<WeightMeasurement> weightMeasurements;
+  final List<GTRoutineFolder> folders;
 
   const DatabaseSnapshot({
     required this.customExercises,
@@ -51,6 +55,7 @@ class DatabaseSnapshot {
     required this.historyWorkoutExercises,
     required this.preferences,
     required this.weightMeasurements,
+    required this.folders,
   });
 
   @override
@@ -63,6 +68,7 @@ class DatabaseSnapshot {
   historyWorkoutExercises: ${jsonEncode(historyWorkoutExercises)},
   preferences: ${jsonEncode(preferences.toJson())},
   weightMeasurements: ${jsonEncode(weightMeasurements)},
+  folders: ${jsonEncode(folders)},
 )""";
   }
 }

@@ -6,6 +6,15 @@ import 'package:uuid/uuid.dart';
 
 const _uuid = Uuid();
 
+class RoutineFolders extends Table {
+  @override
+  Set<Column<Object>> get primaryKey => {id};
+
+  TextColumn get id => text().clientDefault(() => _uuid.v4())();
+  TextColumn get name => text()();
+  IntColumn get sortOrder => integer()();
+}
+
 class Routines extends Table {
   @override
   Set<Column<Object>> get primaryKey => {id};
@@ -16,6 +25,8 @@ class Routines extends Table {
   TextColumn get weightUnit => textEnum<Weights>()();
   TextColumn get distanceUnit => textEnum<Distance>()();
   IntColumn get sortOrder => integer()();
+  TextColumn get folderId =>
+      text().nullable().references(RoutineFolders, #id)();
 }
 
 @UseRowClass(ConcreteExercise)

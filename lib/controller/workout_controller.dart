@@ -536,16 +536,6 @@ class WorkoutController extends GetxController with ServiceableController {
     }).trim();
   }
 
-  Workout generateWorkout(String parentID) => Workout(
-        name: name.value,
-        exercises: exercises,
-        parentID: parentID,
-        infobox: infobox(),
-        duration: DateTime.now().difference(time.value),
-        weightUnit: weightUnit.value,
-        distanceUnit: distanceUnit.value,
-      );
-
   List<GTSet> get allSets => [for (final ex in exercises) ...ex.sets];
   List<GTSet> get doneSets => [
         for (final set in allSets)

@@ -251,20 +251,6 @@ class _WorkoutViewState extends State<WorkoutView> {
                   _controller.changeDistanceUnitDialog();
                 },
               ),
-              if (kDebugMode)
-                PopupMenuItem(
-                  child: const Text("Show Good Job dialog"),
-                  onTap: () {
-                    Go.showBottomModalScreen(
-                      (_, controller) => WorkoutDoneSheet(
-                        workout: safeController!.generateWorkout("").copyWith(
-                              duration: const Duration(minutes: 1),
-                            ),
-                        controller: controller,
-                      ),
-                    );
-                  },
-                ),
             ],
           ),
         ],

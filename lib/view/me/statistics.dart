@@ -14,6 +14,7 @@ import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/view/charts/muscle_category.dart';
 import 'package:gymtracker/view/components/controlled.dart';
 import 'package:gymtracker/view/components/tweened_builder.dart';
+import 'package:gymtracker/view/utils/input_decoration.dart';
 import 'package:gymtracker/view/utils/speed_dial.dart';
 import 'package:gymtracker/view/utils/timer.dart';
 import 'package:intl/intl.dart';
@@ -89,10 +90,7 @@ class _MeStatisticsPageState
             MediaQuery.of(context).viewPadding.copyWith(top: 0),
         children: [
           DropdownButtonFormField(
-            decoration: const InputDecoration(
-              isDense: true,
-              border: OutlineInputBorder(),
-            ),
+            decoration: const GymTrackerInputDecoration(),
             items: [
               for (final timeFrame in TimeFrame.values)
                 DropdownMenuItem(

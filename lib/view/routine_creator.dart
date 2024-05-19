@@ -17,6 +17,7 @@ import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/utils/utils.dart';
 import 'package:gymtracker/view/components/rich_text_editor.dart';
 import 'package:gymtracker/view/exercise_picker.dart';
+import 'package:gymtracker/view/utils/input_decoration.dart';
 import 'package:gymtracker/view/utils/superset.dart';
 import 'package:gymtracker/view/utils/workout.dart';
 
@@ -99,9 +100,7 @@ class _RoutineCreatorState extends State<RoutineCreator> {
               const SizedBox(height: 8),
               TextFormField(
                 controller: titleController,
-                decoration: InputDecoration(
-                  isDense: true,
-                  border: const OutlineInputBorder(),
+                decoration: GymTrackerInputDecoration(
                   labelText: "routines.editor.fields.name.label".t,
                 ),
                 autovalidateMode: AutovalidateMode.onUserInteraction,
@@ -114,9 +113,7 @@ class _RoutineCreatorState extends State<RoutineCreator> {
               ),
               GTRichTextEditor(
                 infoboxController: infoboxController,
-                decoration: InputDecoration(
-                  isDense: true,
-                  border: const OutlineInputBorder(),
+                decoration: GymTrackerInputDecoration(
                   labelText: "routines.editor.fields.infobox.label".t,
                   alignLabelWithHint: true,
                 ),

@@ -26,6 +26,7 @@ import 'package:gymtracker/view/components/split_button.dart';
 import 'package:gymtracker/view/utils/crossfade.dart';
 import 'package:gymtracker/view/utils/date_field.dart';
 import 'package:gymtracker/view/utils/exercise.dart';
+import 'package:gymtracker/view/utils/input_decoration.dart';
 import 'package:gymtracker/view/utils/routine_form_picker.dart';
 import 'package:gymtracker/view/utils/superset.dart';
 import 'package:gymtracker/view/utils/time.dart';
@@ -738,9 +739,7 @@ class _WorkoutFinishPageState extends State<WorkoutFinishPage> {
                 ),
                 GTRichTextEditor(
                   infoboxController: infoboxController,
-                  decoration: InputDecoration(
-                    isDense: true,
-                    border: const OutlineInputBorder(),
+                  decoration: GymTrackerInputDecoration(
                     labelText: "ongoingWorkout.finish.fields.infobox.label".t,
                     alignLabelWithHint: true,
                   ),
@@ -767,9 +766,7 @@ class _WorkoutFinishPageState extends State<WorkoutFinishPage> {
   }
 
   InputDecoration _decoration(String label) {
-    return InputDecoration(
-      isDense: true,
-      border: const OutlineInputBorder(),
+    return GymTrackerInputDecoration(
       labelText: label,
     );
   }

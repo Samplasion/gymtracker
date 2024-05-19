@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:gymtracker/service/localizations.dart';
+import 'package:gymtracker/view/utils/input_decoration.dart';
 
 class DropdownDialog<T> extends StatefulWidget {
   final Widget? title;
@@ -33,10 +34,7 @@ class _DropdownDialogState<T> extends State<DropdownDialog<T>> {
           setState(() => item = v);
         },
         value: item,
-        decoration: const InputDecoration(
-          isDense: true,
-          border: OutlineInputBorder(),
-        ),
+        decoration: const GymTrackerInputDecoration(),
       ),
       actions: [
         TextButton(

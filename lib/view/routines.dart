@@ -17,6 +17,7 @@ import 'package:gymtracker/view/routine_creator.dart';
 import 'package:gymtracker/view/utils/animated_selectable.dart';
 import 'package:gymtracker/view/utils/crossfade.dart';
 import 'package:gymtracker/view/utils/drag_handle.dart';
+import 'package:gymtracker/view/utils/input_decoration.dart';
 
 class RoutinesView extends StatefulWidget {
   const RoutinesView({super.key});
@@ -254,8 +255,7 @@ class _EditFolderModalState
             mainAxisSize: MainAxisSize.min,
             children: [
               TextFormField(
-                decoration: InputDecoration(
-                  border: const OutlineInputBorder(),
+                decoration: GymTrackerInputDecoration(
                   labelText: "routines.folderName".t,
                 ),
                 controller: _controller,

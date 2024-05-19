@@ -20,6 +20,7 @@ import 'package:gymtracker/view/components/parent_viewer.dart';
 import 'package:gymtracker/view/components/rich_text_dialog.dart';
 import 'package:gymtracker/view/utils/drag_handle.dart';
 import 'package:gymtracker/view/utils/exercise.dart';
+import 'package:gymtracker/view/utils/input_decoration.dart';
 import 'package:gymtracker/view/utils/time.dart';
 import 'package:gymtracker/view/utils/weight_calculator.dart';
 
@@ -188,9 +189,7 @@ class _WorkoutExerciseEditorState extends State<WorkoutExerciseEditor> {
                   padding: const EdgeInsets.all(16),
                   child: TimeInputField(
                     controller: timeController,
-                    decoration: InputDecoration(
-                      isDense: true,
-                      border: const OutlineInputBorder(),
+                    decoration: GymTrackerInputDecoration(
                       labelText: "exercise.fields.restTime".t,
                     ),
                     onChangedTime: (value) => widget.callbacks
@@ -321,9 +320,7 @@ class _WorkoutExerciseSetEditorState extends State<WorkoutExerciseSetEditor> {
         inputFormatters: [
           FilteringTextInputFormatter.allow(RegExp("[0123456789.,]")),
         ],
-        decoration: InputDecoration(
-          isDense: true,
-          border: const OutlineInputBorder(),
+        decoration: GymTrackerInputDecoration(
           labelText: "exercise.fields.weight".t,
           suffix: Text("units.${widget.weightUnit.name}".t),
           suffixIcon: _weightFocusNode.hasFocus
@@ -354,9 +351,7 @@ class _WorkoutExerciseSetEditorState extends State<WorkoutExerciseSetEditor> {
         }(),
         setID: widget.set.id,
         controller: timeController,
-        decoration: InputDecoration(
-          isDense: true,
-          border: const OutlineInputBorder(),
+        decoration: GymTrackerInputDecoration(
           labelText: "exercise.fields.time".t,
         ),
         onChanged: (value) {
@@ -375,9 +370,7 @@ class _WorkoutExerciseSetEditorState extends State<WorkoutExerciseSetEditor> {
         inputFormatters: [
           FilteringTextInputFormatter.digitsOnly,
         ],
-        decoration: InputDecoration(
-          isDense: true,
-          border: const OutlineInputBorder(),
+        decoration: GymTrackerInputDecoration(
           labelText: "exercise.fields.reps".t,
         ),
         onChanged: (value) {
@@ -396,9 +389,7 @@ class _WorkoutExerciseSetEditorState extends State<WorkoutExerciseSetEditor> {
         inputFormatters: [
           FilteringTextInputFormatter.allow(RegExp("[0123456789.,]")),
         ],
-        decoration: InputDecoration(
-          isDense: true,
-          border: const OutlineInputBorder(),
+        decoration: GymTrackerInputDecoration(
           labelText: "exercise.fields.distance".t,
           suffix: Text("units.${widget.distanceUnit.name}".t),
         ),

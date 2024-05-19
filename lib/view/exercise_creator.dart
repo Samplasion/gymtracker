@@ -6,6 +6,7 @@ import 'package:gymtracker/model/exercise.dart';
 import 'package:gymtracker/model/set.dart';
 import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/utils/go.dart';
+import 'package:gymtracker/view/utils/input_decoration.dart';
 
 class ExerciseCreator extends StatefulWidget {
   final Exercise? base;
@@ -199,11 +200,7 @@ class _ExerciseCreatorState extends State<ExerciseCreator> {
   }
 
   InputDecoration _decoration(String label) {
-    return InputDecoration(
-      isDense: true,
-      border: const OutlineInputBorder(),
-      labelText: label,
-    );
+    return GymTrackerInputDecoration(labelText: label);
   }
 
   void _submit() async {

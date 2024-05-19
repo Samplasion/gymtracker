@@ -8,6 +8,7 @@ import 'package:gymtracker/service/logger.dart';
 import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/utils/theme.dart';
 import 'package:gymtracker/utils/utils.dart';
+import 'package:gymtracker/view/utils/input_decoration.dart';
 
 class WeightCalculator extends StatefulWidget {
   final double? startingWeight;
@@ -90,9 +91,8 @@ class _WeightCalculatorState extends State<WeightCalculator>
                           ),
                         )
                       ],
-                      decoration: InputDecoration(
+                      decoration: GymTrackerInputDecoration(
                         labelText: 'weightCalculator.weight.label'.t,
-                        border: const OutlineInputBorder(),
                       ),
                       onChanged: (value) {
                         setState(() {

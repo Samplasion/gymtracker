@@ -4,6 +4,7 @@ import 'package:gymtracker/icons/gymtracker_icons.dart';
 import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/view/components/rich_text_editor.dart';
+import 'package:gymtracker/view/utils/input_decoration.dart';
 
 class GTRichTextEditDialog extends StatelessWidget {
   const GTRichTextEditDialog({
@@ -36,8 +37,7 @@ class GTRichTextEditDialog extends StatelessWidget {
             child: GTRichTextEditor(
               infoboxController: controller,
               autofocus: true,
-              decoration: InputDecoration(
-                border: const OutlineInputBorder(),
+              decoration: GymTrackerInputDecoration(
                 labelText: "exercise.editor.fields.notes.label".t,
               ),
             ),

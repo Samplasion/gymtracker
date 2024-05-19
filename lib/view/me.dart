@@ -19,6 +19,7 @@ import 'package:gymtracker/view/me/calendar.dart';
 import 'package:gymtracker/view/me/statistics.dart';
 import 'package:gymtracker/view/utils/crossfade.dart';
 import 'package:gymtracker/view/utils/date_field.dart';
+import 'package:gymtracker/view/utils/input_decoration.dart';
 import 'package:gymtracker/view/utils/section_title.dart';
 import 'package:gymtracker/view/utils/speed_dial.dart';
 import 'package:intl/intl.dart';
@@ -514,9 +515,7 @@ class _WeightMeasurementAddSheet extends State<WeightMeasurementAddSheet> {
               inputFormatters: [
                 FilteringTextInputFormatter.allow(RegExp("[0123456789.,]")),
               ],
-              decoration: InputDecoration(
-                isDense: true,
-                border: const OutlineInputBorder(),
+              decoration: GymTrackerInputDecoration(
                 labelText: "me.addWeight.weight.label".t,
                 suffix: Text("units.${weightUnit.name}".t),
               ),
@@ -541,11 +540,7 @@ class _WeightMeasurementAddSheet extends State<WeightMeasurementAddSheet> {
   }
 
   InputDecoration _decoration(String label) {
-    return InputDecoration(
-      isDense: true,
-      border: const OutlineInputBorder(),
-      labelText: label,
-    );
+    return GymTrackerInputDecoration(labelText: label);
   }
 
   void submit() {

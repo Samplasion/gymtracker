@@ -8,6 +8,7 @@ import 'package:gymtracker/struct/editor_callback.dart';
 import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/view/utils/drag_handle.dart';
 import 'package:gymtracker/view/utils/exercise.dart';
+import 'package:gymtracker/view/utils/input_decoration.dart';
 import 'package:gymtracker/view/utils/time.dart';
 import 'package:gymtracker/view/utils/workout.dart';
 
@@ -130,8 +131,7 @@ class _SupersetEditorState extends State<SupersetEditor> {
                       autofocus: true,
                       minLines: 4,
                       maxLines: null,
-                      decoration: InputDecoration(
-                        border: const OutlineInputBorder(),
+                      decoration: GymTrackerInputDecoration(
                         labelText: "exercise.editor.fields.notes.label".t,
                       ),
                     ),
@@ -160,9 +160,7 @@ class _SupersetEditorState extends State<SupersetEditor> {
             padding: const EdgeInsets.all(16),
             child: TimeInputField(
               controller: timeController,
-              decoration: InputDecoration(
-                isDense: true,
-                border: const OutlineInputBorder(),
+              decoration: GymTrackerInputDecoration(
                 labelText: "exercise.fields.restTime".t,
               ),
               onChangedTime: (value) {

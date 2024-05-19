@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:gymtracker/service/localizations.dart';
+import 'package:gymtracker/view/utils/input_decoration.dart';
 import 'package:intl/intl.dart';
 
 class DateField extends StatefulWidget {
@@ -32,9 +33,7 @@ class _DateFieldState extends State<DateField> {
   @override
   Widget build(BuildContext context) {
     return TextFormField(
-      decoration: (widget.decoration ?? const InputDecoration()).copyWith(
-        border: const OutlineInputBorder(),
-      ),
+      decoration: (widget.decoration ?? const GymTrackerInputDecoration()),
       controller: TextEditingController(
         text: DateFormat.yMEd(context.locale.languageCode)
             .add_jm()

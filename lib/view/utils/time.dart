@@ -7,6 +7,7 @@ import 'package:flutter/services.dart';
 import 'package:gymtracker/controller/stopwatch_controller.dart';
 import 'package:gymtracker/view/components/controlled.dart';
 import 'package:gymtracker/view/utils/animated_selectable.dart';
+import 'package:gymtracker/view/utils/input_decoration.dart';
 
 class TimeInputField extends StatefulWidget {
   final TextEditingController controller;
@@ -121,7 +122,8 @@ class _TimeInputFieldState
               signed: true,
             )
           : const TextInputType.numberWithOptions(decimal: false),
-      decoration: (widget.decoration ?? const InputDecoration()).copyWith(
+      decoration:
+          (widget.decoration ?? const GymTrackerInputDecoration()).copyWith(
         suffixIcon: () {
           if (!widget.timerInteractive) return null;
           var isActive = _isActive;

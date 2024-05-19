@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:gymtracker/service/localizations.dart';
+import 'package:gymtracker/view/utils/input_decoration.dart';
 
 class TextFieldDialog extends StatefulWidget {
   final Widget? title;
@@ -33,10 +34,7 @@ class _TextFieldDialogState extends State<TextFieldDialog> {
         title: widget.title,
         content: TextFormField(
           controller: controller,
-          decoration: const InputDecoration(
-            isDense: true,
-            border: OutlineInputBorder(),
-          ),
+          decoration: const GymTrackerInputDecoration(),
           validator: widget.validator,
         ),
         actions: [

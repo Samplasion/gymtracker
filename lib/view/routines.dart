@@ -5,6 +5,7 @@ import 'package:gymtracker/controller/settings_controller.dart';
 import 'package:gymtracker/icons/gymtracker_icons.dart';
 import 'package:gymtracker/model/workout.dart';
 import 'package:gymtracker/service/localizations.dart';
+import 'package:gymtracker/service/logger.dart';
 import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/utils/theme.dart';
@@ -24,20 +25,19 @@ class RoutinesView extends StatefulWidget {
   State<RoutinesView> createState() => _RoutinesViewState();
 }
 
-class _RoutinesViewState extends State<RoutinesView> {
+class _RoutinesViewState extends State<RoutinesView> with _RoutineList {
   RoutinesController get controller => Get.put(RoutinesController());
   int selectedIndex = 0;
-  final GlobalKey _draggableKey = GlobalKey();
-
-  final Map<String, bool> _folderExpansion = {};
-
-  bool isDraggingOverRoot = false;
-  bool isDraggingRootMovingCandidate = false;
 
   @override
   void initState() {
     super.initState();
     controller.onServiceChange();
+  }
+
+  @override
+  void onTapWorkout(Workout workout) {
+    Go.to(() => ExercisesView(workout: workout));
   }
 
   @override
@@ -49,10 +49,6 @@ class _RoutinesViewState extends State<RoutinesView> {
         final suggested = showSuggestedRoutines
             ? controller.suggestions
             : <RoutineSuggestion>[];
-        final folderList = controller.folders.keys.toList()
-          ..sort((a, b) {
-            return a.name.compareTo(b.name);
-          });
         return CustomScrollView(
           slivers: [
             SliverAppBar.large(
@@ -99,7 +95,7 @@ class _RoutinesViewState extends State<RoutinesView> {
                         subtitle: Text("general.exercises"
                             .plural(workout.displayExerciseCount)),
                         onTap: () {
-                          Go.to(() => ExercisesView(workout: workout));
+                          onTapWorkout(workout);
                         },
                       ),
                     );
@@ -109,194 +105,7 @@ class _RoutinesViewState extends State<RoutinesView> {
               ),
               const SliverToBoxAdapter(child: Divider()),
             ],
-            SliverList.builder(
-              itemBuilder: (context, index) {
-                final folder = folderList[index];
-                final workouts = controller.folders[folder]!;
-                return DragTarget<Workout>(
-                  builder: (context, candidateItems, rejectedItems) {
-                    final isExpanded = _folderExpansion[folder.id] ?? false;
-
-                    final shouldHighlight = candidateItems.isNotEmpty;
-                    var backgroundColor =
-                        Theme.of(context).colorScheme.secondary;
-                    var foregroundColor =
-                        Theme.of(context).colorScheme.onSecondary;
-                    var icon = GymTrackerIcons.folder_closed;
-
-                    if (shouldHighlight || isExpanded) {
-                      icon = GymTrackerIcons.folder_open;
-                    }
-
-                    final elevation = shouldHighlight || isExpanded ? 4.0 : 0.0;
-
-                    return AnimatedPadding(
-                      duration: const Duration(milliseconds: 200),
-                      padding: EdgeInsets.symmetric(
-                        vertical: isExpanded ? 8 : 0,
-                      ),
-                      child: Material(
-                        elevation: elevation,
-                        color: ElevationOverlay.applySurfaceTint(
-                          Theme.of(context).colorScheme.surface,
-                          Theme.of(context).colorScheme.surfaceTint,
-                          elevation,
-                        ),
-                        child: GestureDetector(
-                          onLongPress: () {
-                            controller.editFolderScreen(folder);
-                          },
-                          child: ExpansionTile(
-                            initiallyExpanded: isExpanded,
-                            shape: const RoundedRectangleBorder(),
-                            collapsedShape: const RoundedRectangleBorder(),
-                            onExpansionChanged: (expanded) {
-                              setState(() {
-                                _folderExpansion[folder.id] = expanded;
-                              });
-                            },
-                            leading: CircleAvatar(
-                              backgroundColor: backgroundColor,
-                              foregroundColor: foregroundColor,
-                              child: Icon(icon),
-                            ),
-                            title: Text(folder.name),
-                            subtitle: Text(
-                                "general.routines".plural(workouts.length)),
-                            trailing: SelectableAnimatedBuilder(
-                              isSelected: isExpanded,
-                              builder: (context, anim) {
-                                return RotationTransition(
-                                  turns: anim.drive(
-                                    Animatable.fromCallback((value) =>
-                                        mapRange(value, 0.0, 1.0, 0.25, 0.75)),
-                                  ),
-                                  child: const Icon(GymTrackerIcons.lt_chevron),
-                                );
-                              },
-                            ),
-                            children: [
-                              ReorderableList(
-                                physics: const NeverScrollableScrollPhysics(),
-                                shrinkWrap: true,
-                                itemCount: workouts.length,
-                                itemBuilder: (context, index) => _buildWorkout(
-                                  context,
-                                  index,
-                                  workouts[index],
-                                ),
-                                onReorder: (oldIndex, newIndex) {
-                                  controller.reorderFolder(
-                                      folder, oldIndex, newIndex);
-                                },
-                              )
-                            ],
-                          ),
-                        ),
-                      ),
-                    );
-                  },
-                  onAcceptWithDetails: (details) {
-                    controller.moveToFolder(details.data, folder);
-                  },
-                );
-              },
-              itemCount: controller.folders.length,
-            ),
-            SliverReorderableList(
-              itemBuilder: (context, index) => DragTarget<Workout>(
-                key: ValueKey(controller.rootRoutines[index].id),
-                onWillAcceptWithDetails: (data) {
-                  if (data.data.folder == null) {
-                    return false;
-                  }
-                  setState(() {
-                    isDraggingOverRoot = true;
-                  });
-                  return true;
-                },
-                onLeave: (data) {
-                  setState(() {
-                    isDraggingOverRoot = false;
-                  });
-                },
-                onAcceptWithDetails: (details) {
-                  controller.moveToRoot(details.data);
-                  setState(() {
-                    isDraggingOverRoot = false;
-                  });
-                },
-                builder: (context, candidateItems, rejectedItems) {
-                  final shouldHighlight =
-                      candidateItems.isNotEmpty || isDraggingOverRoot;
-                  final elevation = shouldHighlight ? 4.0 : 0.0;
-
-                  return Material(
-                    elevation: elevation,
-                    color: ElevationOverlay.applySurfaceTint(
-                      Theme.of(context).colorScheme.surface,
-                      Theme.of(context).colorScheme.surfaceTint,
-                      elevation,
-                    ),
-                    child: _buildWorkout(
-                      context,
-                      index,
-                      controller.rootRoutines[index],
-                    ),
-                  );
-                },
-              ),
-              itemCount: controller.rootRoutines.length,
-              onReorder: (oldIndex, newIndex) {
-                controller.reorderRoot(oldIndex, newIndex);
-              },
-            ),
-            SliverToBoxAdapter(
-              child: DragTarget<Workout>(
-                onWillAcceptWithDetails: (data) {
-                  if (data.data.folder == null) {
-                    return false;
-                  }
-                  return true;
-                },
-                onAcceptWithDetails: (details) {
-                  controller.moveToRoot(details.data);
-                },
-                builder: (context, candidateItems, rejectedItems) {
-                  final shouldHighlight = candidateItems.isNotEmpty;
-                  return Crossfade(
-                    showSecond:
-                        shouldHighlight || isDraggingRootMovingCandidate,
-                    firstChild: const Divider(),
-                    secondChild: Padding(
-                      padding: const EdgeInsets.only(bottom: 16),
-                      child: Material(
-                        elevation: shouldHighlight ? 4.0 : 0.0,
-                        color: ElevationOverlay.applySurfaceTint(
-                          Theme.of(context).colorScheme.surface,
-                          Theme.of(context).colorScheme.surfaceTint,
-                          shouldHighlight ? 4.0 : 0.0,
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 16),
-                          child: ListTile(
-                            title: Text("routines.dropHere".t),
-                            subtitle: Text("routines.moveToRoot".t),
-                            leading: CircleAvatar(
-                              backgroundColor:
-                                  Theme.of(context).colorScheme.secondary,
-                              foregroundColor:
-                                  Theme.of(context).colorScheme.onSecondary,
-                              child: const Icon(GymTrackerIcons.folder_open),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  );
-                },
-              ),
-            ),
+            ...routineList(),
             SliverToBoxAdapter(
               child: ListTile(
                 title: Text("routines.newRoutine".t),
@@ -322,41 +131,6 @@ class _RoutinesViewState extends State<RoutinesView> {
           ],
         );
       }),
-    );
-  }
-
-  Widget _buildWorkout(BuildContext context, int index, Workout workout) {
-    return LongPressDraggable<Workout>(
-      data: workout,
-      key: ValueKey(workout.id),
-      dragAnchorStrategy: pointerDragAnchorStrategy,
-      feedback: _DraggingListItem(
-        dragKey: _draggableKey,
-        workout: workout,
-      ),
-      onDragStarted: () {
-        setState(() {
-          if (workout.folder != null) isDraggingRootMovingCandidate = true;
-        });
-      },
-      onDragEnd: (details) {
-        setState(() {
-          if (workout.folder != null) isDraggingRootMovingCandidate = false;
-        });
-      },
-      child: Material(
-        type: MaterialType.transparency,
-        child: ListTile(
-          leading: _WorkoutIcon(workout: workout),
-          trailing: DragHandle(index: index),
-          title: Text(workout.name),
-          subtitle:
-              Text("general.exercises".plural(workout.displayExerciseCount)),
-          onTap: () {
-            Go.to(() => ExercisesView(workout: workout));
-          },
-        ),
-      ),
     );
   }
 }
@@ -495,6 +269,301 @@ class _EditFolderModalState
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+mixin _RoutineList<T extends StatefulWidget> on State<T> {
+  final GlobalKey _draggableKey = GlobalKey();
+
+  final Map<String, bool> _folderExpansion = {};
+
+  bool isDraggingOverRoot = false;
+  bool isDraggingRootMovingCandidate = false;
+
+  List<Widget> routineList() {
+    final controller = Get.find<RoutinesController>();
+    final folderList = controller.folders.keys.toList()
+      ..sort((a, b) {
+        return a.name.compareTo(b.name);
+      });
+    return [
+      SliverList.builder(
+        itemBuilder: (context, index) {
+          final folder = folderList[index];
+          final workouts = controller.folders[folder]!;
+          return DragTarget<Workout>(
+            builder: (context, candidateItems, rejectedItems) {
+              final isExpanded = _folderExpansion[folder.id] ?? false;
+
+              final shouldHighlight = candidateItems.isNotEmpty;
+              var backgroundColor = Theme.of(context).colorScheme.secondary;
+              var foregroundColor = Theme.of(context).colorScheme.onSecondary;
+              var icon = GymTrackerIcons.folder_closed;
+
+              if (shouldHighlight || isExpanded) {
+                icon = GymTrackerIcons.folder_open;
+              }
+
+              final elevation = shouldHighlight || isExpanded ? 4.0 : 0.0;
+
+              return AnimatedPadding(
+                duration: const Duration(milliseconds: 200),
+                padding: EdgeInsets.symmetric(
+                  vertical: isExpanded ? 8 : 0,
+                ),
+                child: Material(
+                  elevation: elevation,
+                  color: ElevationOverlay.applySurfaceTint(
+                    Theme.of(context).colorScheme.surface,
+                    Theme.of(context).colorScheme.surfaceTint,
+                    elevation,
+                  ),
+                  child: GestureDetector(
+                    onLongPress: () {
+                      controller.editFolderScreen(folder);
+                    },
+                    child: ExpansionTile(
+                      initiallyExpanded: isExpanded,
+                      shape: const RoundedRectangleBorder(),
+                      collapsedShape: const RoundedRectangleBorder(),
+                      onExpansionChanged: (expanded) {
+                        setState(() {
+                          _folderExpansion[folder.id] = expanded;
+                        });
+                      },
+                      leading: CircleAvatar(
+                        backgroundColor: backgroundColor,
+                        foregroundColor: foregroundColor,
+                        child: Icon(icon),
+                      ),
+                      title: Text(folder.name),
+                      subtitle:
+                          Text("general.routines".plural(workouts.length)),
+                      trailing: SelectableAnimatedBuilder(
+                        isSelected: isExpanded,
+                        builder: (context, anim) {
+                          return RotationTransition(
+                            turns: anim.drive(
+                              Animatable.fromCallback((value) =>
+                                  mapRange(value, 0.0, 1.0, 0.25, 0.75)),
+                            ),
+                            child: const Icon(GymTrackerIcons.lt_chevron),
+                          );
+                        },
+                      ),
+                      children: [
+                        ReorderableList(
+                          physics: const NeverScrollableScrollPhysics(),
+                          shrinkWrap: true,
+                          itemCount: workouts.length,
+                          itemBuilder: (context, index) => _buildWorkout(
+                            context,
+                            index,
+                            workouts[index],
+                          ),
+                          onReorder: (oldIndex, newIndex) {
+                            controller.reorderFolder(
+                                folder, oldIndex, newIndex);
+                          },
+                        )
+                      ],
+                    ),
+                  ),
+                ),
+              );
+            },
+            onAcceptWithDetails: (details) {
+              controller.moveToFolder(details.data, folder);
+            },
+          );
+        },
+        itemCount: controller.folders.length,
+      ),
+      SliverReorderableList(
+        itemBuilder: (context, index) => DragTarget<Workout>(
+          key: ValueKey(controller.rootRoutines[index].id),
+          onWillAcceptWithDetails: (data) {
+            if (data.data.folder == null) {
+              return false;
+            }
+            setState(() {
+              isDraggingOverRoot = true;
+            });
+            return true;
+          },
+          onLeave: (data) {
+            setState(() {
+              isDraggingOverRoot = false;
+            });
+          },
+          onAcceptWithDetails: (details) {
+            controller.moveToRoot(details.data);
+            setState(() {
+              isDraggingOverRoot = false;
+            });
+          },
+          builder: (context, candidateItems, rejectedItems) {
+            final shouldHighlight =
+                candidateItems.isNotEmpty || isDraggingOverRoot;
+            final elevation = shouldHighlight ? 4.0 : 0.0;
+
+            return Material(
+              elevation: elevation,
+              color: ElevationOverlay.applySurfaceTint(
+                Theme.of(context).colorScheme.surface,
+                Theme.of(context).colorScheme.surfaceTint,
+                elevation,
+              ),
+              child: _buildWorkout(
+                context,
+                index,
+                controller.rootRoutines[index],
+              ),
+            );
+          },
+        ),
+        itemCount: controller.rootRoutines.length,
+        onReorder: (oldIndex, newIndex) {
+          controller.reorderRoot(oldIndex, newIndex);
+        },
+      ),
+      SliverToBoxAdapter(
+        child: DragTarget<Workout>(
+          onWillAcceptWithDetails: (data) {
+            if (data.data.folder == null) {
+              return false;
+            }
+            return true;
+          },
+          onAcceptWithDetails: (details) {
+            controller.moveToRoot(details.data);
+          },
+          builder: (context, candidateItems, rejectedItems) {
+            final shouldHighlight = candidateItems.isNotEmpty;
+            return Crossfade(
+              showSecond: shouldHighlight || isDraggingRootMovingCandidate,
+              firstChild: const Divider(),
+              secondChild: Padding(
+                padding: const EdgeInsets.only(bottom: 16),
+                child: Material(
+                  elevation: shouldHighlight ? 4.0 : 0.0,
+                  color: ElevationOverlay.applySurfaceTint(
+                    Theme.of(context).colorScheme.surface,
+                    Theme.of(context).colorScheme.surfaceTint,
+                    shouldHighlight ? 4.0 : 0.0,
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    child: ListTile(
+                      title: Text("routines.dropHere".t),
+                      subtitle: Text("routines.moveToRoot".t),
+                      leading: CircleAvatar(
+                        backgroundColor:
+                            Theme.of(context).colorScheme.secondary,
+                        foregroundColor:
+                            Theme.of(context).colorScheme.onSecondary,
+                        child: const Icon(GymTrackerIcons.folder_open),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            );
+          },
+        ),
+      ),
+    ];
+  }
+
+  Widget _buildWorkout(BuildContext context, int index, Workout workout) {
+    return LongPressDraggable<Workout>(
+      data: workout,
+      key: ValueKey(workout.id),
+      dragAnchorStrategy: pointerDragAnchorStrategy,
+      feedback: _DraggingListItem(
+        dragKey: _draggableKey,
+        workout: workout,
+      ),
+      onDragStarted: () {
+        setState(() {
+          if (workout.folder != null) isDraggingRootMovingCandidate = true;
+        });
+      },
+      onDragEnd: (details) {
+        setState(() {
+          if (workout.folder != null) isDraggingRootMovingCandidate = false;
+        });
+      },
+      child: Material(
+        type: MaterialType.transparency,
+        child: ListTile(
+          leading: _WorkoutIcon(workout: workout),
+          trailing: DragHandle(index: index),
+          title: Text(workout.name),
+          subtitle:
+              Text("general.exercises".plural(workout.displayExerciseCount)),
+          onTap: () {
+            onTapWorkout(workout);
+          },
+        ),
+      ),
+    );
+  }
+
+  void onTapWorkout(Workout workout);
+}
+
+class RoutinePicker extends StatefulWidget {
+  final ValueChanged<Workout?> onPick;
+  final bool allowNone;
+
+  const RoutinePicker({
+    super.key,
+    required this.onPick,
+    required this.allowNone,
+  });
+
+  @override
+  State<RoutinePicker> createState() => _RoutinePickerState();
+}
+
+class _RoutinePickerState extends State<RoutinePicker> with _RoutineList {
+  @override
+  void onTapWorkout(Workout workout) {
+    logger.i("Picked workout: ${workout.name}");
+    widget.onPick(workout);
+    Get.back();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: CustomScrollView(
+        slivers: [
+          SliverAppBar.large(
+            title: Text("routines.pick".t),
+          ),
+          if (widget.allowNone) ...[
+            SliverToBoxAdapter(
+              child: ListTile(
+                leading: CircleAvatar(
+                  backgroundColor: context.colorScheme.tertiaryContainer,
+                  foregroundColor: context.colorScheme.onTertiaryContainer,
+                  child: const Icon(GymTrackerIcons.no_routine),
+                ),
+                title: Text("routines.none".t),
+                onTap: () {
+                  widget.onPick(null);
+                  Get.back();
+                },
+              ),
+            ),
+            const SliverToBoxAdapter(child: Divider()),
+          ],
+          ...routineList(),
+        ],
       ),
     );
   }

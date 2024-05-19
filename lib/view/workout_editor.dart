@@ -26,6 +26,7 @@ import 'package:gymtracker/view/exercise_picker.dart';
 import 'package:gymtracker/view/utils/date_field.dart';
 import 'package:gymtracker/view/utils/exercise.dart';
 import 'package:gymtracker/view/utils/exercises_to_superset.dart';
+import 'package:gymtracker/view/utils/routine_form_picker.dart';
 import 'package:gymtracker/view/utils/superset.dart';
 import 'package:gymtracker/view/utils/time.dart';
 import 'package:gymtracker/view/utils/weight_calculator.dart';
@@ -809,24 +810,19 @@ class _WorkoutFinishEditingPageState extends State<WorkoutFinishEditingPage> {
                 lastDate: DateTime.now().add(const Duration(days: 7)),
               ),
               if (!widget.workout.isContinuation)
-                DropdownButtonFormField<String?>(
+                RoutineFormPicker(
+                  key: ValueKey(parentWorkoutID),
                   decoration:
                       _decoration("historyEditor.finish.fields.parent.label".t),
-                  items: [
-                    DropdownMenuItem(
-                      value: null,
-                      child: Text(
-                          "historyEditor.finish.fields.parent.options.none".t),
-                    ),
-                    for (final routine
-                        in Get.find<RoutinesController>().workouts)
-                      DropdownMenuItem(
-                        value: routine.id,
-                        child: Text(routine.name),
-                      ),
-                  ],
-                  onChanged: (v) => setState(() => parentWorkoutID = v),
-                  value: parentWorkoutID,
+                  onChanged: (routine) {
+                    setState(() {
+                      parentWorkoutID = routine?.id;
+                    });
+                  },
+                  routine: Get.find<RoutinesController>()
+                      .workouts
+                      .firstWhereOrNull(
+                          (element) => element.id == parentWorkoutID),
                 ),
               TimeInputField(
                 controller: timeController,

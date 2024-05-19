@@ -257,7 +257,9 @@
     "folderName": "Name",
     "editFolder": "Edit folder",
     "dropHere": "Drop here",
-    "moveToRoot": "Drop the routine here to move it to the home screen"
+    "moveToRoot": "Drop the routine here to move it to the home screen",
+    "none": "No routine",
+    "pick": "Select a routine"
   },
   "history": {
     "title": "History",
@@ -1001,5 +1003,14 @@
   "androidRequestExactAlarmsPermission": {
     "title": "Notification permission",
     "message": "This app requires a special \"Exact alarms\" permission on versions of Android greater than or equal to 14. You can deny it, but features such as rest timer notifications won't work. Would you like to grant this permission?"
+  },
+  "routineFormPicker": {
+    "fields": {
+      "routine": {
+        "options": {
+          "none": "No routine selected"
+        }
+      }
+    }
   }
 }

@@ -27,6 +27,7 @@ import 'package:gymtracker/view/components/split_button.dart';
 import 'package:gymtracker/view/utils/crossfade.dart';
 import 'package:gymtracker/view/utils/date_field.dart';
 import 'package:gymtracker/view/utils/exercise.dart';
+import 'package:gymtracker/view/utils/routine_form_picker.dart';
 import 'package:gymtracker/view/utils/superset.dart';
 import 'package:gymtracker/view/utils/time.dart';
 import 'package:gymtracker/view/utils/timer.dart';
@@ -699,82 +700,82 @@ class _WorkoutFinishPageState extends State<WorkoutFinishPage> {
         ),
         body: Form(
           key: formKey,
-          child: ListView(
-            children: [
-              const SizedBox(height: 8),
-              TextFormField(
-                controller: titleController,
-                decoration:
-                    _decoration("ongoingWorkout.finish.fields.name.label".t),
-                validator: (string) {
-                  if (string == null || string.isEmpty) {
-                    return "ongoingWorkout.finish.fields.name.errors.empty".t;
-                  }
-                  return null;
-                },
-              ),
-              DateField(
-                decoration: _decoration(
-                    "ongoingWorkout.finish.fields.startingTime.label".t),
-                date: _controller.time.value,
-                onSelect: (date) => setState(() => _controller.time(date)),
-                firstDate: DateTime.fromMillisecondsSinceEpoch(0),
-                lastDate: DateTime.now().add(const Duration(days: 7)),
-              ),
-              DropdownButtonFormField<String?>(
-                decoration:
-                    _decoration("ongoingWorkout.finish.fields.parent.label".t),
-                items: [
-                  DropdownMenuItem(
-                    value: null,
-                    child: Text(
-                        "ongoingWorkout.finish.fields.parent.options.none".t),
+          child: Obx(
+            () => ListView(
+              children: [
+                const SizedBox(height: 8),
+                if (!_controller.isContinuation.value)
+                  TextFormField(
+                    controller: titleController,
+                    decoration: _decoration(
+                        "ongoingWorkout.finish.fields.name.label".t),
+                    validator: (string) {
+                      if (string == null || string.isEmpty) {
+                        return "ongoingWorkout.finish.fields.name.errors.empty"
+                            .t;
+                      }
+                      return null;
+                    },
                   ),
-                  for (final routine in Get.find<RoutinesController>().workouts)
-                    DropdownMenuItem(
-                      value: routine.id,
-                      child: Text(routine.name),
-                    ),
-                ],
-                onChanged: (v) =>
-                    setState(() => _controller.parentID.value = v),
-                value: pwInitialItem,
-              ),
-              TimeInputField(
-                controller: timeController,
-                decoration: _decoration(
-                    "ongoingWorkout.finish.fields.duration.label".t),
-                validator: (duration) {
-                  if (duration == null || duration.inSeconds == 0) {
-                    return "ongoingWorkout.finish.fields.duration.errors.empty"
-                        .t;
-                  }
-                  return null;
-                },
-              ),
-              GTRichTextEditor(
-                infoboxController: infoboxController,
-                decoration: InputDecoration(
-                  isDense: true,
-                  border: const OutlineInputBorder(),
-                  labelText: "ongoingWorkout.finish.fields.infobox.label".t,
-                  alignLabelWithHint: true,
+                DateField(
+                  decoration: _decoration(
+                      "ongoingWorkout.finish.fields.startingTime.label".t),
+                  date: _controller.time.value,
+                  onSelect: (date) => setState(() => _controller.time(date)),
+                  firstDate: DateTime.fromMillisecondsSinceEpoch(0),
+                  lastDate: DateTime.now().add(const Duration(days: 7)),
                 ),
-                onTapOutside: () {
-                  logger.d("Quill Editor onTapOutside");
-                  _controller.infobox(jsonEncode(
-                      infoboxController.document.toDelta().toJson()));
-                },
-              ),
-            ]
-                .map((c) => Padding(
-                      padding: const EdgeInsets.symmetric(
-                        vertical: 16,
-                        horizontal: 16,
-                      ).copyWith(top: 0),
-                      child: c,
-                    ))
-                .toList(),
+                if (!_controller.isContinuation.value)
+                  RoutineFormPicker(
+                    key: ValueKey(_controller.parentID.value),
+                    decoration: _decoration(
+                        "ongoingWorkout.finish.fields.parent.label".t),
+                    onChanged: (routine) {
+                      setState(() {
+                        _controller.parentID.value = routine?.id;
+                      });
+                    },
+                    routine: Get.find<RoutinesController>()
+                        .workouts
+                        .firstWhereOrNull((element) =>
+                            element.id == _controller.parentID.value),
+                  ),
+                TimeInputField(
+                  controller: timeController,
+                  decoration: _decoration(
+                      "ongoingWorkout.finish.fields.duration.label".t),
+                  validator: (duration) {
+                    if (duration == null || duration.inSeconds == 0) {
+                      return "ongoingWorkout.finish.fields.duration.errors.empty"
+                          .t;
+                    }
+                    return null;
+                  },
+                ),
+                GTRichTextEditor(
+                  infoboxController: infoboxController,
+                  decoration: InputDecoration(
+                    isDense: true,
+                    border: const OutlineInputBorder(),
+                    labelText: "ongoingWorkout.finish.fields.infobox.label".t,
+                    alignLabelWithHint: true,
+                  ),
+                  onTapOutside: () {
+                    logger.d("Quill Editor onTapOutside");
+                    _controller.infobox(jsonEncode(
+                        infoboxController.document.toDelta().toJson()));
+                  },
+                ),
+              ]
+                  .map((c) => Padding(
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 16,
+                          horizontal: 16,
+                        ).copyWith(top: 0),
+                        child: c,
+                      ))
+                  .toList(),
+            ),
           ),
         ),
       ),

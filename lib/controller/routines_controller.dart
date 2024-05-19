@@ -527,6 +527,15 @@ class RoutinesController extends GetxController
     Get.back();
     service.removeFolder(folder);
   }
+
+  Future<Workout?> pickRoutine({
+    required ValueChanged<Workout?> onPick,
+    required bool allowNone,
+  }) async {
+    await Go.showBottomModalScreen(
+      (context, _) => RoutinePicker(onPick: onPick, allowNone: allowNone),
+    );
+  }
 }
 
 class ShareRoutineAlertDialog extends StatefulWidget {

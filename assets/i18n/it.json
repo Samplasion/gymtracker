@@ -257,7 +257,9 @@
     "folderName": "Nome",
     "editFolder": "Modifica cartella",
     "dropHere": "Rilascia qui",
-    "moveToRoot": "Rilascia la routine quì per muoverla nella schermata principale."
+    "moveToRoot": "Rilascia la routine quì per muoverla nella schermata principale.",
+    "none": "Nessuna routine",
+    "pick": "Seleziona routine"
   },
   "history": {
     "title": "Cronologia",
@@ -335,20 +337,20 @@
           "light": "Modalità bianco puro"
         }
       },
-      "themeMode": {
-        "label": "Tema",
-        "values": {
-          "system": "Sistema",
-          "light": "Chiaro",
-          "dark": "Scuro"
-        }
-      },
       "export": {
         "label": "Esporta dati (JSON)",
         "filename": "Dati_GymTracker",
         "failed": {
           "title": "Impossibile esportare i dati",
           "copy": "Il messaggio di errore è stato copiato negli appunti."
+        }
+      },
+      "themeMode": {
+        "label": "Tema",
+        "values": {
+          "system": "Sistema",
+          "light": "Chiaro",
+          "dark": "Scuro"
         }
       },
       "notifications": {
@@ -1001,5 +1003,14 @@
   "androidRequestExactAlarmsPermission": {
     "title": "Permesso di invio notifiche",
     "message": "Questa applicazione richiede un permesso speciale, \"Promemoria e avvisi\", sulle versioni di Android a partire da Android 14. Puoi scegliere di rifiutarlo, ma funzionalità come le notifiche di fine recupero non funzioneranno. Vuoi dare il permesso?"
+  },
+  "routineFormPicker": {
+    "fields": {
+      "routine": {
+        "options": {
+          "none": "Nessuna routine selezionata"
+        }
+      }
+    }
   }
 }

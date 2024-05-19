@@ -257,7 +257,7 @@
     "folderName": "Nome",
     "editFolder": "Modifica cartella",
     "dropHere": "Rilascia qui",
-    "moveToRoot": "Rilascia la routine quì per muoverla nella schermata principale.",
+    "moveToRoot": "Rilascia la routine qui per muoverla nella schermata principale.",
     "none": "Nessuna routine",
     "pick": "Seleziona routine"
   },
@@ -337,20 +337,20 @@
           "light": "Modalità bianco puro"
         }
       },
-      "export": {
-        "label": "Esporta dati (JSON)",
-        "filename": "Dati_GymTracker",
-        "failed": {
-          "title": "Impossibile esportare i dati",
-          "copy": "Il messaggio di errore è stato copiato negli appunti."
-        }
-      },
       "themeMode": {
         "label": "Tema",
         "values": {
           "system": "Sistema",
           "light": "Chiaro",
           "dark": "Scuro"
+        }
+      },
+      "export": {
+        "label": "Esporta dati (JSON)",
+        "filename": "Dati_GymTracker",
+        "failed": {
+          "title": "Impossibile esportare i dati",
+          "copy": "Il messaggio di errore è stato copiato negli appunti."
         }
       },
       "notifications": {

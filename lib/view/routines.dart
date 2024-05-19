@@ -540,30 +540,34 @@ class _RoutinePickerState extends State<RoutinePicker> with _RoutineList {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: CustomScrollView(
-        slivers: [
-          SliverAppBar.large(
-            title: Text("routines.pick".t),
-          ),
-          if (widget.allowNone) ...[
-            SliverToBoxAdapter(
-              child: ListTile(
-                leading: CircleAvatar(
-                  backgroundColor: context.colorScheme.tertiaryContainer,
-                  foregroundColor: context.colorScheme.onTertiaryContainer,
-                  child: const Icon(GymTrackerIcons.no_routine),
-                ),
-                title: Text("routines.none".t),
-                onTap: () {
-                  widget.onPick(null);
-                  Get.back();
-                },
-              ),
+      body: Obx(
+        () => CustomScrollView(
+          slivers: [
+            SliverAppBar.large(
+              title: Text("routines.pick".t),
             ),
-            const SliverToBoxAdapter(child: Divider()),
+            if (widget.allowNone) ...[
+              SliverToBoxAdapter(
+                child: ListTile(
+                  leading: CircleAvatar(
+                    backgroundColor: context.colorScheme.tertiaryContainer,
+                    foregroundColor: context.colorScheme.onTertiaryContainer,
+                    child: const Icon(GymTrackerIcons.no_routine),
+                  ),
+                  title: Text("routines.none".t),
+                  onTap: () {
+                    widget.onPick(null);
+                    Get.back();
+                  },
+                ),
+              ),
+              const SliverToBoxAdapter(child: Divider()),
+            ],
+            ...routineList(),
+            // Make space for the expandable divider when dragging
+            const SliverToBoxAdapter(child: SizedBox(height: 128)),
           ],
-          ...routineList(),
-        ],
+        ),
       ),
     );
   }

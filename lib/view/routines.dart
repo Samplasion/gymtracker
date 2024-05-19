@@ -32,6 +32,7 @@ class _RoutinesViewState extends State<RoutinesView> {
   final Map<String, bool> _folderExpansion = {};
 
   bool isDraggingOverRoot = false;
+  bool isDraggingRootMovingCandidate = false;
 
   @override
   void initState() {
@@ -264,7 +265,8 @@ class _RoutinesViewState extends State<RoutinesView> {
                 builder: (context, candidateItems, rejectedItems) {
                   final shouldHighlight = candidateItems.isNotEmpty;
                   return Crossfade(
-                    showSecond: shouldHighlight,
+                    showSecond:
+                        shouldHighlight || isDraggingRootMovingCandidate,
                     firstChild: const Divider(),
                     secondChild: Padding(
                       padding: const EdgeInsets.only(bottom: 16),
@@ -332,16 +334,16 @@ class _RoutinesViewState extends State<RoutinesView> {
         dragKey: _draggableKey,
         workout: workout,
       ),
-      // onDragStarted: () {
-      //   setState(() {
-      //     if (workout.folder == null) isDraggingOverRoot = true;
-      //   });
-      // },
-      // onDragEnd: (details) {
-      //   setState(() {
-      //     if (workout.folder == null) isDraggingOverRoot = false;
-      //   });
-      // },
+      onDragStarted: () {
+        setState(() {
+          if (workout.folder != null) isDraggingRootMovingCandidate = true;
+        });
+      },
+      onDragEnd: (details) {
+        setState(() {
+          if (workout.folder != null) isDraggingRootMovingCandidate = false;
+        });
+      },
       child: Material(
         type: MaterialType.transparency,
         child: ListTile(

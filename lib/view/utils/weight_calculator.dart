@@ -6,6 +6,7 @@ import 'package:gymtracker/icons/gymtracker_icons.dart';
 import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/service/logger.dart';
 import 'package:gymtracker/utils/extensions.dart';
+import 'package:gymtracker/utils/theme.dart';
 import 'package:gymtracker/utils/utils.dart';
 
 class WeightCalculator extends StatefulWidget {
@@ -111,11 +112,10 @@ class _WeightCalculatorState extends State<WeightCalculator>
                       style: context.textTheme.bodyMedium,
                     ),
                   ),
-                  SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: Row(
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8),
+                    child: Wrap(
                       children: [
-                        const SizedBox(width: 8),
                         for (final weight in format.weights.reversed)
                           Padding(
                             padding: const EdgeInsets.all(8),
@@ -133,7 +133,6 @@ class _WeightCalculatorState extends State<WeightCalculator>
                               },
                             ),
                           ),
-                        const SizedBox(width: 8),
                       ],
                     ),
                   ),
@@ -144,11 +143,10 @@ class _WeightCalculatorState extends State<WeightCalculator>
                       style: context.textTheme.bodyMedium,
                     ),
                   ),
-                  SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: Row(
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8),
+                    child: Wrap(
                       children: [
-                        const SizedBox(width: 8),
                         for (final barbell in Bars.values)
                           Padding(
                             padding: const EdgeInsets.all(8),
@@ -175,7 +173,6 @@ class _WeightCalculatorState extends State<WeightCalculator>
                               },
                             ),
                           ),
-                        const SizedBox(width: 8),
                       ],
                     ),
                   ),
@@ -183,87 +180,11 @@ class _WeightCalculatorState extends State<WeightCalculator>
                   Center(
                     child: SingleChildScrollView(
                       scrollDirection: Axis.horizontal,
-                      child: Row(
-                        children: [
-                          const SizedBox(width: 8),
-                          Container(
-                            height: 20,
-                            padding: const EdgeInsets.only(left: 16, right: 12),
-                            alignment: Alignment.center,
-                            decoration: BoxDecoration(
-                              color: Theme.of(context).colorScheme.secondary,
-                              borderRadius: const BorderRadius.horizontal(
-                                left: Radius.circular(8),
-                                // right: Radius.circular(3),
-                              ),
-                            ),
-                            child: Center(
-                              child: Text(
-                                stringifyDouble(barbellWeight),
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .bodySmall!
-                                    .copyWith(
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .onSecondary,
-                                    ),
-                              ),
-                            ),
-                          ),
-                          Container(
-                            height: 28,
-                            width: 12,
-                            decoration: BoxDecoration(
-                              color: Theme.of(context).colorScheme.secondary,
-                              borderRadius: const BorderRadius.horizontal(
-                                left: Radius.circular(5),
-                                right: Radius.circular(3),
-                              ),
-                            ),
-                          ),
-                          for (final weight in weights) ...[
-                            const SizedBox(width: 2),
-                            Container(
-                              height: mapRange(weight, format.weights.min,
-                                  format.weights.max, 32, 64),
-                              constraints: const BoxConstraints(
-                                maxWidth: 40,
-                              ),
-                              padding: const EdgeInsets.all(4),
-                              decoration: BoxDecoration(
-                                color: Theme.of(context).colorScheme.tertiary,
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: Center(
-                                child: Text(
-                                  stringifyDouble(weight),
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .bodySmall!
-                                      .copyWith(
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .onTertiary,
-                                      ),
-                                ),
-                              ),
-                            ),
-                          ],
-                          const SizedBox(width: 2),
-                          Container(
-                            height: 20,
-                            width: 12,
-                            decoration: BoxDecoration(
-                              color: Theme.of(context).colorScheme.secondary,
-                              borderRadius: const BorderRadius.horizontal(
-                                left: Radius.circular(3),
-                                right: Radius.circular(8),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                        ],
+                      child: Barbell(
+                        barbellWeight: barbellWeight,
+                        weights: weights,
+                        format: format,
+                        dense: weights.length >= 4,
                       ),
                     ),
                   ),
@@ -301,6 +222,167 @@ class _WeightCalculatorState extends State<WeightCalculator>
           ],
         );
       }(),
+    );
+  }
+}
+
+class Barbell extends StatelessWidget {
+  const Barbell({
+    super.key,
+    required this.barbellWeight,
+    required this.weights,
+    required this.format,
+    required this.dense,
+  });
+
+  final double barbellWeight;
+  final List<double> weights;
+  final Weights format;
+  final bool dense;
+
+  List<(double, int)> get weightCounts {
+    if (!dense) {
+      return weights.map((e) => (e, 1)).toList();
+    }
+
+    final result = <(double, int)>[];
+    for (final weight in weights) {
+      if (result.isNotEmpty && result.last.$1 == weight) {
+        result[result.length - 1] = (weight, result.last.$2 + 1);
+      } else {
+        result.add((weight, 1));
+      }
+    }
+    return result;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final weightCounts = this.weightCounts;
+    return Row(
+      children: [
+        const SizedBox(width: 8),
+        Container(
+          height: 20,
+          width: 12,
+          decoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.secondary,
+            borderRadius: const BorderRadius.horizontal(
+              left: Radius.circular(8),
+              right: Radius.circular(3),
+            ),
+          ),
+        ),
+        const SizedBox(width: 4),
+        for (final (weight, count) in weightCounts.reversed) ...[
+          BarbellWeightPlate(weight: weight, count: count, format: format),
+          const SizedBox(width: 4),
+        ],
+        const SizedBox(width: 2),
+        Container(
+          height: 28,
+          width: 12,
+          decoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.secondary,
+            borderRadius: const BorderRadius.horizontal(
+              left: Radius.circular(3),
+              right: Radius.circular(5),
+            ),
+          ),
+        ),
+        Container(
+          height: 20,
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.secondary,
+          ),
+          child: Center(
+            child: Text(
+              stringifyDouble(barbellWeight),
+              style: Theme.of(context).textTheme.bodySmall!.copyWith(
+                    color: Theme.of(context).colorScheme.onSecondary,
+                  ),
+            ),
+          ),
+        ),
+        Container(
+          height: 28,
+          width: 12,
+          decoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.secondary,
+            borderRadius: const BorderRadius.horizontal(
+              left: Radius.circular(5),
+              right: Radius.circular(3),
+            ),
+          ),
+        ),
+        const SizedBox(width: 2),
+        for (final (weight, count) in weightCounts) ...[
+          const SizedBox(width: 4),
+          BarbellWeightPlate(weight: weight, count: count, format: format),
+        ],
+        const SizedBox(width: 4),
+        Container(
+          height: 20,
+          width: 12,
+          decoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.secondary,
+            borderRadius: const BorderRadius.horizontal(
+              left: Radius.circular(3),
+              right: Radius.circular(8),
+            ),
+          ),
+        ),
+        const SizedBox(width: 8),
+      ],
+    );
+  }
+}
+
+class BarbellWeightPlate extends StatelessWidget {
+  const BarbellWeightPlate({
+    super.key,
+    required this.weight,
+    required this.count,
+    required this.format,
+  });
+
+  final double weight;
+  final int count;
+  final Weights format;
+
+  @override
+  Widget build(BuildContext context) {
+    return Badge(
+      label: Text("x$count"),
+      backgroundColor: context.colorScheme.quinary,
+      textColor: context.colorScheme.onQuinary,
+      isLabelVisible: count > 1,
+      child: Container(
+        height:
+            mapRange(weight, format.weights.min, format.weights.max, 32, 64),
+        constraints: const BoxConstraints(
+          maxWidth: 40,
+        ),
+        padding: const EdgeInsets.all(4),
+        decoration: BoxDecoration(
+          color: Theme.of(context).colorScheme.tertiaryContainer,
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(
+            color: Theme.of(context).colorScheme.onTertiaryContainer,
+            width: 0.5,
+          ),
+        ),
+        child: Center(
+          child: Text(
+            stringifyDouble(weight),
+            style: Theme.of(context).textTheme.bodySmall!.copyWith(
+                  color: Theme.of(context).colorScheme.onTertiaryContainer,
+                ),
+          ),
+        ),
+      ),
     );
   }
 }

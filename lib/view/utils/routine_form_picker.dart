@@ -19,16 +19,11 @@ class RoutineFormPicker extends ControlledWidget<RoutinesController> {
 
   @override
   Widget build(BuildContext context) {
-    // (decorationIsDense
-    //     ? const EdgeInsets.fromLTRB(12.0, 20.0, 12.0, 12.0)
-    //     : const EdgeInsets.fromLTRB(12.0, 24.0, 12.0, 16.0));
     return InkWell(
+      mouseCursor: MaterialStateMouseCursor.clickable,
       onTap: _callback,
       child: InputDecorator(
         decoration: decoration.copyWith(
-          // contentPadding: (decoration.contentPadding ?? EdgeInsets.zero)
-          //     .resolve(Directionality.of(context))
-          //     .copyWith(top: 8, bottom: 0),
           contentPadding: const EdgeInsets.fromLTRB(12.0, 0, 12.0, 0),
         ),
         child: _buildBody(),
@@ -54,6 +49,7 @@ class RoutineFormPicker extends ControlledWidget<RoutinesController> {
         trailing: const Icon(GymTrackerIcons.lt_chevron),
         contentPadding: EdgeInsets.zero,
         visualDensity: VisualDensity.standard,
+        mouseCursor: MouseCursor.defer,
       );
     }
 
@@ -70,6 +66,7 @@ class RoutineFormPicker extends ControlledWidget<RoutinesController> {
       trailing: const Icon(GymTrackerIcons.lt_chevron),
       contentPadding: EdgeInsets.zero,
       visualDensity: VisualDensity.standard,
+      mouseCursor: MouseCursor.defer,
     );
   }
 }

@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -35,3 +36,10 @@ const monospace = TextStyle(
   fontFamily: "monospace",
   fontFamilyFallback: <String>["Menlo", "Courier"],
 );
+
+InteractiveInkFeatureFactory get platformDependentSplashFactory =>
+    switch (defaultTargetPlatform) {
+      TargetPlatform.android => InkSparkle.splashFactory,
+      TargetPlatform.iOS || TargetPlatform.macOS => NoSplash.splashFactory,
+      _ => InkRipple.splashFactory,
+    };

@@ -18,6 +18,7 @@ import 'package:gymtracker/service/database.dart';
 import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/service/logger.dart';
 import 'package:gymtracker/service/version.dart';
+import 'package:gymtracker/utils/constants.dart';
 import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/utils/theme.dart';
@@ -143,6 +144,7 @@ class MainApp extends StatelessWidget {
                           extensions: [
                             MoreColors.fromColorScheme(lightScheme),
                           ],
+                          splashFactory: platformDependentSplashFactory,
                         ),
                         darkTheme: ThemeData(
                           useMaterial3: true,
@@ -152,6 +154,7 @@ class MainApp extends StatelessWidget {
                           extensions: [
                             MoreColors.fromColorScheme(darkScheme),
                           ],
+                          splashFactory: platformDependentSplashFactory,
                         ),
                         home: const _Loader(),
                         routes: {

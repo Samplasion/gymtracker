@@ -53,23 +53,15 @@ class RoutineFormPicker extends ControlledWidget<RoutinesController> {
       );
     }
 
-    Text? subtitle;
+    Icon icon;
+    String text;
+
     if (routine!.folder != null) {
-      subtitle = Text.rich(
-        TextSpan(children: [
-          const WidgetSpan(
-            child: Icon(
-              GymTrackerIcons.folder_closed,
-              size: 20,
-            ),
-            alignment: PlaceholderAlignment.middle,
-          ),
-          const TextSpan(text: " "),
-          TextSpan(text: routine!.folder!.name),
-        ]),
-        maxLines: 1,
-        overflow: TextOverflow.ellipsis,
-      );
+      icon = const Icon(GymTrackerIcons.folder_closed, size: 20);
+      text = routine!.folder!.name;
+    } else {
+      icon = const Icon(GymTrackerIcons.folder_root, size: 20);
+      text = "routineFormPicker.fields.routine.options.root".t;
     }
 
     return ListTile(
@@ -78,7 +70,15 @@ class RoutineFormPicker extends ControlledWidget<RoutinesController> {
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
       ),
-      subtitle: subtitle,
+      subtitle: Text.rich(
+        TextSpan(children: [
+          WidgetSpan(child: icon, alignment: PlaceholderAlignment.middle),
+          const TextSpan(text: " "),
+          TextSpan(text: text),
+        ]),
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+      ),
       trailing: const Icon(GymTrackerIcons.lt_chevron),
       contentPadding: EdgeInsets.zero,
       visualDensity: VisualDensity.standard,

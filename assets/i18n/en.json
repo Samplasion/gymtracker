@@ -1008,7 +1008,8 @@
     "fields": {
       "routine": {
         "options": {
-          "none": "No routine selected"
+          "none": "No routine selected",
+          "root": "Home"
         }
       }
     }

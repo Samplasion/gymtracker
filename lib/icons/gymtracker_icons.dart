@@ -34,6 +34,7 @@ class GymTrackerIcons {
   static const IconData add_to_superset = Icons.group_work_rounded;
   static const IconData advanced = Icons.settings_rounded;
   static const IconData app_icon = Icons.fitness_center_rounded;
+  static const IconData breadcrumb_chevron = Icons.chevron_right_rounded;
   static const IconData calendar = Icons.calendar_month_rounded;
   static const IconData cardio = Icons.directions_bike_rounded;
   static const IconData checkbox_off = Icons.check_box_outline_blank_rounded;
@@ -58,6 +59,7 @@ class GymTrackerIcons {
   static const IconData empty_workout = Icons.timer_rounded;
   static const IconData folder_closed = Icons.folder_rounded;
   static const IconData folder_open = Icons.folder_open_rounded;
+  static const IconData folder_root = Icons.home_rounded;
   static const IconData highlight = Icons.highlight_rounded;
   static const IconData history = Icons.history_rounded;
   static const IconData info = Icons.info_rounded;

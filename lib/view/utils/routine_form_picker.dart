@@ -55,12 +55,28 @@ class RoutineFormPicker extends ControlledWidget<RoutinesController> {
 
     Text? subtitle;
     if (routine!.folder != null) {
-      subtitle = Text(routine!.folder!.name);
+      subtitle = Text.rich(
+        TextSpan(children: [
+          const WidgetSpan(
+            child: Icon(
+              GymTrackerIcons.folder_closed,
+              size: 20,
+            ),
+            alignment: PlaceholderAlignment.middle,
+          ),
+          const TextSpan(text: " "),
+          TextSpan(text: routine!.folder!.name),
+        ]),
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+      );
     }
 
     return ListTile(
       title: Text(
         routine!.name,
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
       ),
       subtitle: subtitle,
       trailing: const Icon(GymTrackerIcons.lt_chevron),

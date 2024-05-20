@@ -325,6 +325,10 @@ mixin _RoutineList<T extends StatefulWidget> on State<T> {
                       controller.editFolderScreen(folder);
                     },
                     child: ExpansionTile(
+                      expansionAnimationStyle: AnimationStyle(
+                        curve: Curves.easeInOutCubic,
+                        duration: const Duration(milliseconds: 350),
+                      ),
                       initiallyExpanded: isExpanded,
                       shape: const RoundedRectangleBorder(),
                       collapsedShape: const RoundedRectangleBorder(),

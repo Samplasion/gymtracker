@@ -635,10 +635,9 @@ class WorkoutController extends GetxController with ServiceableController {
   void finishWorkoutWithDialog(BuildContext context) {
     generateNameIfEmpty();
 
-    showDialog(
-      context: context,
-      builder: (context) => const WorkoutFinishPage(),
-    );
+    SchedulerBinding.instance.addPostFrameCallback((_) {
+      Go.showBottomModalScreen((context, _) => const WorkoutFinishPage());
+    });
   }
 
   void generateNameIfEmpty() {

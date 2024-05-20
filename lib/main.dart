@@ -123,11 +123,8 @@ class MainApp extends StatelessWidget {
                           }
                         }(),
                         translations: localizations,
-                        locale: () {
-                          logger.i("Locale: ${settings.locale.value}");
-                          return settings.locale.value ??
-                              Prefs.defaultValue.locale;
-                        }(),
+                        locale:
+                            settings.locale.value ?? Prefs.defaultValue.locale,
                         supportedLocales: GTLocalizations.supportedLocales,
                         fallbackLocale: const Locale('en'),
                         localizationsDelegates: const [
@@ -157,10 +154,15 @@ class MainApp extends StatelessWidget {
                           splashFactory: platformDependentSplashFactory,
                         ),
                         home: const _Loader(),
-                        routes: {
-                          WorkoutView.routeName: (context) =>
-                              const WorkoutView(),
-                          ErrorView.routeName: (context) => const ErrorView(),
+                        onGenerateRoute: (settings) {
+                          return switch (settings.name) {
+                            WorkoutView.routeName =>
+                              Go.materialRoute(() => const WorkoutView()),
+                            ErrorView.routeName =>
+                              Go.materialRoute(() => const ErrorView()),
+                            null || String() => throw Exception(
+                                "Invalid route: ${settings.name}"),
+                          };
                         },
                         debugShowCheckedModeBanner: false,
                         builder: (context, child) =>

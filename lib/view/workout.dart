@@ -207,6 +207,23 @@ class _WorkoutViewState extends State<WorkoutView> {
             itemBuilder: (context) => <PopupMenuEntry<dynamic>>[
               PopupMenuItem(
                 child: Text(
+                  "ongoingWorkout.actions.changeWeightUnit".t,
+                ),
+                onTap: () {
+                  _controller.changeWeightUnitDialog();
+                },
+              ),
+              PopupMenuItem(
+                child: Text(
+                  "ongoingWorkout.actions.changeDistanceUnit".t,
+                ),
+                onTap: () {
+                  _controller.changeDistanceUnitDialog();
+                },
+              ),
+              const PopupMenuDivider(),
+              PopupMenuItem(
+                child: Text(
                   "ongoingWorkout.actions.finish".t,
                 ),
                 onTap: () {
@@ -231,23 +248,6 @@ class _WorkoutViewState extends State<WorkoutView> {
                       });
                     });
                   });
-                },
-              ),
-              const PopupMenuDivider(),
-              PopupMenuItem(
-                child: Text(
-                  "ongoingWorkout.actions.changeWeightUnit".t,
-                ),
-                onTap: () {
-                  _controller.changeWeightUnitDialog();
-                },
-              ),
-              PopupMenuItem(
-                child: Text(
-                  "ongoingWorkout.actions.changeDistanceUnit".t,
-                ),
-                onTap: () {
-                  _controller.changeDistanceUnitDialog();
                 },
               ),
             ],
@@ -664,6 +664,7 @@ class _WorkoutFinishPageState extends State<WorkoutFinishPage> {
 
   @override
   Widget build(BuildContext context) {
+    final padding = MediaQuery.of(context).viewPadding;
     return Dialog.fullscreen(
       child: Scaffold(
         appBar: PreferredSize(
@@ -686,78 +687,82 @@ class _WorkoutFinishPageState extends State<WorkoutFinishPage> {
         body: Form(
           key: formKey,
           child: Obx(
-            () => ListView(
-              children: [
-                const SizedBox(height: 8),
-                if (!_controller.isContinuation.value)
-                  TextFormField(
-                    controller: titleController,
+            () => MediaQuery(
+              data: MediaQuery.of(context).copyWith(padding: EdgeInsets.zero),
+              child: ListView(
+                padding: padding,
+                children: [
+                  const SizedBox(height: 8),
+                  if (!_controller.isContinuation.value)
+                    TextFormField(
+                      controller: titleController,
+                      decoration: _decoration(
+                          "ongoingWorkout.finish.fields.name.label".t),
+                      validator: (string) {
+                        if (string == null || string.isEmpty) {
+                          return "ongoingWorkout.finish.fields.name.errors.empty"
+                              .t;
+                        }
+                        return null;
+                      },
+                    ),
+                  DateField(
                     decoration: _decoration(
-                        "ongoingWorkout.finish.fields.name.label".t),
-                    validator: (string) {
-                      if (string == null || string.isEmpty) {
-                        return "ongoingWorkout.finish.fields.name.errors.empty"
+                        "ongoingWorkout.finish.fields.startingTime.label".t),
+                    date: _controller.time.value,
+                    onSelect: (date) => setState(() => _controller.time(date)),
+                    firstDate: DateTime.fromMillisecondsSinceEpoch(0),
+                    lastDate: DateTime.now().add(const Duration(days: 7)),
+                  ),
+                  if (!_controller.isContinuation.value)
+                    RoutineFormPicker(
+                      key: ValueKey(_controller.parentID.value),
+                      decoration: _decoration(
+                          "ongoingWorkout.finish.fields.parent.label".t),
+                      onChanged: (routine) {
+                        setState(() {
+                          _controller.parentID.value = routine?.id;
+                        });
+                      },
+                      routine: Get.find<RoutinesController>()
+                          .workouts
+                          .firstWhereOrNull((element) =>
+                              element.id == _controller.parentID.value),
+                    ),
+                  TimeInputField(
+                    controller: timeController,
+                    decoration: _decoration(
+                        "ongoingWorkout.finish.fields.duration.label".t),
+                    validator: (duration) {
+                      if (duration == null || duration.inSeconds == 0) {
+                        return "ongoingWorkout.finish.fields.duration.errors.empty"
                             .t;
                       }
                       return null;
                     },
                   ),
-                DateField(
-                  decoration: _decoration(
-                      "ongoingWorkout.finish.fields.startingTime.label".t),
-                  date: _controller.time.value,
-                  onSelect: (date) => setState(() => _controller.time(date)),
-                  firstDate: DateTime.fromMillisecondsSinceEpoch(0),
-                  lastDate: DateTime.now().add(const Duration(days: 7)),
-                ),
-                if (!_controller.isContinuation.value)
-                  RoutineFormPicker(
-                    key: ValueKey(_controller.parentID.value),
-                    decoration: _decoration(
-                        "ongoingWorkout.finish.fields.parent.label".t),
-                    onChanged: (routine) {
-                      setState(() {
-                        _controller.parentID.value = routine?.id;
-                      });
+                  GTRichTextEditor(
+                    infoboxController: infoboxController,
+                    decoration: GymTrackerInputDecoration(
+                      labelText: "ongoingWorkout.finish.fields.infobox.label".t,
+                      alignLabelWithHint: true,
+                    ),
+                    onTapOutside: () {
+                      logger.d("Quill Editor onTapOutside");
+                      _controller.infobox(jsonEncode(
+                          infoboxController.document.toDelta().toJson()));
                     },
-                    routine: Get.find<RoutinesController>()
-                        .workouts
-                        .firstWhereOrNull((element) =>
-                            element.id == _controller.parentID.value),
                   ),
-                TimeInputField(
-                  controller: timeController,
-                  decoration: _decoration(
-                      "ongoingWorkout.finish.fields.duration.label".t),
-                  validator: (duration) {
-                    if (duration == null || duration.inSeconds == 0) {
-                      return "ongoingWorkout.finish.fields.duration.errors.empty"
-                          .t;
-                    }
-                    return null;
-                  },
-                ),
-                GTRichTextEditor(
-                  infoboxController: infoboxController,
-                  decoration: GymTrackerInputDecoration(
-                    labelText: "ongoingWorkout.finish.fields.infobox.label".t,
-                    alignLabelWithHint: true,
-                  ),
-                  onTapOutside: () {
-                    logger.d("Quill Editor onTapOutside");
-                    _controller.infobox(jsonEncode(
-                        infoboxController.document.toDelta().toJson()));
-                  },
-                ),
-              ]
-                  .map((c) => Padding(
-                        padding: const EdgeInsets.symmetric(
-                          vertical: 16,
-                          horizontal: 16,
-                        ).copyWith(top: 0),
-                        child: c,
-                      ))
-                  .toList(),
+                ]
+                    .map((c) => Padding(
+                          padding: const EdgeInsets.symmetric(
+                            vertical: 16,
+                            horizontal: 16,
+                          ).copyWith(top: 0),
+                          child: c,
+                        ))
+                    .toList(),
+              ),
             ),
           ),
         ),

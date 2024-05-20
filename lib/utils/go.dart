@@ -22,12 +22,14 @@ class Go {
     return top;
   }
 
-  static Future<T?> to<T>(Widget Function() page) async {
-    return Navigator.of(Get.context!).push<T>(
-      MaterialWithModalsPageRoute(
-        builder: (context) => page(),
-      ),
+  static Route<T> materialRoute<T>(Widget Function() page) {
+    return MaterialWithModalsPageRoute(
+      builder: (context) => page(),
     );
+  }
+
+  static Future<T?> to<T>(Widget Function() page) async {
+    return Navigator.of(Get.context!).push<T>(materialRoute(page));
   }
 
   static Future<T?> toNamed<T>(String route, {Object? arguments}) async {

@@ -84,20 +84,6 @@ class _WorkoutEditorState extends State<WorkoutEditor> {
             itemBuilder: (context) => <PopupMenuEntry<dynamic>>[
               PopupMenuItem(
                 child: Text(
-                  "historyEditor.actions.finish".t,
-                ),
-                onTap: () {
-                  SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
-                    historyController.finishEditingWorkoutWithDialog(
-                      context,
-                      workout,
-                    );
-                  });
-                },
-              ),
-              const PopupMenuDivider(),
-              PopupMenuItem(
-                child: Text(
                   "historyEditor.actions.changeWeightUnit".t,
                 ),
                 onTap: () {
@@ -113,6 +99,20 @@ class _WorkoutEditorState extends State<WorkoutEditor> {
                 onTap: () {
                   setState(() {
                     changeDistanceUnitDialog();
+                  });
+                },
+              ),
+              const PopupMenuDivider(),
+              PopupMenuItem(
+                child: Text(
+                  "historyEditor.actions.finish".t,
+                ),
+                onTap: () {
+                  SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
+                    historyController.finishEditingWorkoutWithDialog(
+                      context,
+                      workout,
+                    );
                   });
                 },
               ),
@@ -765,6 +765,7 @@ class _WorkoutFinishEditingPageState extends State<WorkoutFinishEditingPage> {
 
   @override
   Widget build(BuildContext context) {
+    final padding = MediaQuery.of(context).viewPadding;
     return Dialog.fullscreen(
       child: Scaffold(
         appBar: PreferredSize(
@@ -787,74 +788,79 @@ class _WorkoutFinishEditingPageState extends State<WorkoutFinishEditingPage> {
         ),
         body: Form(
           key: formKey,
-          child: ListView(
-            children: [
-              const SizedBox(height: 8),
-              if (!widget.workout.isContinuation)
-                TextFormField(
-                  controller: titleController,
-                  decoration:
-                      _decoration("historyEditor.finish.fields.name.label".t),
-                  validator: (string) {
-                    if (string == null || string.isEmpty) {
-                      return "historyEditor.finish.fields.name.errors.empty".t;
+          child: MediaQuery(
+            data: MediaQuery.of(context).copyWith(padding: EdgeInsets.zero),
+            child: ListView(
+              padding: padding,
+              children: [
+                const SizedBox(height: 8),
+                if (!widget.workout.isContinuation)
+                  TextFormField(
+                    controller: titleController,
+                    decoration:
+                        _decoration("historyEditor.finish.fields.name.label".t),
+                    validator: (string) {
+                      if (string == null || string.isEmpty) {
+                        return "historyEditor.finish.fields.name.errors.empty"
+                            .t;
+                      }
+                      return null;
+                    },
+                  ),
+                DateField(
+                  decoration: _decoration(
+                      "historyEditor.finish.fields.startingTime.label".t),
+                  date: startingDate,
+                  onSelect: (date) => setState(() => startingDate = date),
+                  firstDate: DateTime.fromMillisecondsSinceEpoch(0),
+                  lastDate: DateTime.now().add(const Duration(days: 7)),
+                ),
+                if (!widget.workout.isContinuation)
+                  RoutineFormPicker(
+                    key: ValueKey(parentWorkoutID),
+                    decoration: _decoration(
+                        "historyEditor.finish.fields.parent.label".t),
+                    onChanged: (routine) {
+                      setState(() {
+                        parentWorkoutID = routine?.id;
+                      });
+                    },
+                    routine: Get.find<RoutinesController>()
+                        .workouts
+                        .firstWhereOrNull(
+                            (element) => element.id == parentWorkoutID),
+                  ),
+                TimeInputField(
+                  controller: timeController,
+                  decoration: _decoration(
+                      "historyEditor.finish.fields.duration.label".t),
+                  validator: (duration) {
+                    if (duration == null || duration.inSeconds == 0) {
+                      return "historyEditor.finish.fields.duration.errors.empty"
+                          .t;
                     }
                     return null;
                   },
                 ),
-              DateField(
-                decoration: _decoration(
-                    "historyEditor.finish.fields.startingTime.label".t),
-                date: startingDate,
-                onSelect: (date) => setState(() => startingDate = date),
-                firstDate: DateTime.fromMillisecondsSinceEpoch(0),
-                lastDate: DateTime.now().add(const Duration(days: 7)),
-              ),
-              if (!widget.workout.isContinuation)
-                RoutineFormPicker(
-                  key: ValueKey(parentWorkoutID),
-                  decoration:
-                      _decoration("historyEditor.finish.fields.parent.label".t),
-                  onChanged: (routine) {
-                    setState(() {
-                      parentWorkoutID = routine?.id;
-                    });
-                  },
-                  routine: Get.find<RoutinesController>()
-                      .workouts
-                      .firstWhereOrNull(
-                          (element) => element.id == parentWorkoutID),
-                ),
-              TimeInputField(
-                controller: timeController,
-                decoration:
-                    _decoration("historyEditor.finish.fields.duration.label".t),
-                validator: (duration) {
-                  if (duration == null || duration.inSeconds == 0) {
-                    return "historyEditor.finish.fields.duration.errors.empty"
-                        .t;
-                  }
-                  return null;
-                },
-              ),
-              if (!widget.workout.isContinuation)
-                GTRichTextEditor(
-                  infoboxController: infoboxController,
-                  decoration: GymTrackerInputDecoration(
-                    labelText: "historyEditor.finish.fields.infobox.label".t,
-                    alignLabelWithHint: true,
+                if (!widget.workout.isContinuation)
+                  GTRichTextEditor(
+                    infoboxController: infoboxController,
+                    decoration: GymTrackerInputDecoration(
+                      labelText: "historyEditor.finish.fields.infobox.label".t,
+                      alignLabelWithHint: true,
+                    ),
+                    onTapOutside: () {},
                   ),
-                  onTapOutside: () {},
-                ),
-            ]
-                .map((c) => Padding(
-                      padding: const EdgeInsets.symmetric(
-                        vertical: 16,
-                        horizontal: 16,
-                      ).copyWith(top: 0),
-                      child: c,
-                    ))
-                .toList(),
+              ]
+                  .map((c) => Padding(
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 16,
+                          horizontal: 16,
+                        ).copyWith(top: 0),
+                        child: c,
+                      ))
+                  .toList(),
+            ),
           ),
         ),
       ),

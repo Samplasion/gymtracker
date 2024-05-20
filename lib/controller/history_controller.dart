@@ -269,12 +269,11 @@ class HistoryController extends GetxController with ServiceableController {
   }
 
   void finishEditingWorkoutWithDialog(BuildContext context, Workout workout) {
-    showDialog(
-      context: context,
-      builder: (context) => WorkoutFinishEditingPage(
-        workout: workout,
-      ),
-    );
+    SchedulerBinding.instance.addPostFrameCallback((_) {
+      Go.showBottomModalScreen(
+        (context, _) => WorkoutFinishEditingPage(workout: workout),
+      );
+    });
   }
 
   Future<void> submitEditedWorkout(Workout workout) async {

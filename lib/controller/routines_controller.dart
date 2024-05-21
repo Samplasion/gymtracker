@@ -337,7 +337,13 @@ class RoutinesController extends GetxController
           completedBy: null,
           completes: null,
         )
-        .toRoutine(routineID: oldRoutine.id);
+        .toRoutine(routineID: oldRoutine.id)
+        // Why the second copyWith call?
+        // That's because a concrete workout can't be in a folder,
+        // and at the time of the first copyWith call, this object
+        // is still a concrete workout.
+        .copyWith
+        .folder(oldRoutine.folder);
     service.setRoutine(newRoutine);
   }
 

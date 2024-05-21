@@ -262,6 +262,10 @@ class Workout {
 
   Workout clone() => Workout.fromJson(toJson());
 
+  /// Returns a version of this workout that is a routine.
+  ///
+  /// If [routineID] is not provided, a new ID is generated. Otherwise, the
+  /// provided ID is used.
   Workout toRoutine({
     String? routineID,
   }) {

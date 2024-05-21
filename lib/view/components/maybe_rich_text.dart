@@ -23,6 +23,7 @@ class MaybeRichText extends StatelessWidget {
           controller: QuillController(
             document: text.asQuillDocument(),
             selection: const TextSelection.collapsed(offset: 0),
+            readOnly: true,
           ),
           customStyles: DefaultStyles(
             paragraph: DefaultTextBlockStyle(
@@ -32,7 +33,6 @@ class MaybeRichText extends StatelessWidget {
               null,
             ),
           ),
-          readOnly: true,
           sharedConfigurations: QuillSharedConfigurations(
             locale: Get.locale!,
           ),

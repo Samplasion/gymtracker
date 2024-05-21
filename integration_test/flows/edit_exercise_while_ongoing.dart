@@ -37,7 +37,7 @@ Future<void> testEditExerciseWhileWorkoutIsOngoingFlow(
   // Load app widget.
   await tester.pumpWidget(
     MainApp(localizations: l, databaseService: databaseService),
-    const Duration(seconds: 5),
+    duration: const Duration(seconds: 5),
   );
 
   // Wait for the app to finish loading

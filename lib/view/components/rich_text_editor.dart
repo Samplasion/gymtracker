@@ -59,7 +59,6 @@ class _GTRichTextEditorState extends State<GTRichTextEditor> {
             focusNode: _focusNode,
             configurations: QuillEditorConfigurations(
               controller: widget.infoboxController,
-              readOnly: false,
               sharedConfigurations: QuillSharedConfigurations(
                 locale: Get.locale!,
               ),
@@ -115,21 +114,24 @@ class _GTRichTextEditorState extends State<GTRichTextEditor> {
                       final isHighlighted =
                           attr.containsKey(highlightAttribute.key);
                       if (isHighlighted) {
-                        widget.infoboxController.selectStyle(
-                          highlightAttribute,
-                          false,
-                        );
                         widget.infoboxController.formatSelection(
                           Attribute.clone(highlightAttribute, null),
                         );
                       } else {
-                        widget.infoboxController.selectStyle(
-                          highlightAttribute,
-                          true,
-                        );
                         widget.infoboxController
                             .formatSelection(highlightAttribute);
                       }
+                    },
+                    childBuilder: (opts, extraOptions) {
+                      final attr = widget.infoboxController.getSelectionStyle();
+                      final isHighlighted =
+                          attr.containsKey(highlightAttribute.key);
+                      return Icon(
+                        GymTrackerIcons.highlight,
+                        color: isHighlighted
+                            ? context.theme.colorScheme.secondary
+                            : context.theme.colorScheme.onSurface,
+                      );
                     },
                   )
                 ],

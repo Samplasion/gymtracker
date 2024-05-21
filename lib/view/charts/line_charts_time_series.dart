@@ -261,7 +261,7 @@ class _LineChartTimeSeriesState<T> extends State<LineChartTimeSeries<T>> {
                   showingTooltipIndicators: [],
                   lineTouchData: LineTouchData(
                     touchTooltipData: LineTouchTooltipData(
-                      tooltipBgColor: Colors.transparent,
+                      getTooltipColor: (_) => Colors.transparent,
                       getTooltipItems: (items) => <LineTooltipItem?>[
                         ...items.map((_) => const LineTooltipItem(
                               "hhh",

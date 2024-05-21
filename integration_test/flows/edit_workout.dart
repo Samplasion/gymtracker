@@ -61,7 +61,7 @@ Future<void> testEditWorkoutFlow(
   // Load app widget.
   await tester.pumpWidget(
     MainApp(localizations: l, databaseService: databaseService),
-    const Duration(seconds: 5),
+    duration: const Duration(seconds: 5),
   );
 
   // Manually add the routine

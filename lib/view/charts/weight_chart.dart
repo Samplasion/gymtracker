@@ -58,7 +58,7 @@ class WeightChart extends StatelessWidget {
           ),
           lineTouchData: LineTouchData(
             touchTooltipData: LineTouchTooltipData(
-              tooltipBgColor: Colors.transparent,
+              getTooltipColor: (_) => Colors.transparent,
               getTooltipItems: (items) => <LineTooltipItem?>[
                 ...items.map((_) => const LineTooltipItem(
                       "hhh",

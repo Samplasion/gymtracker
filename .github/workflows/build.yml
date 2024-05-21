@@ -32,6 +32,8 @@ jobs:
         run: brew install bash
       - name: Export brew path
         run: echo "/usr/local/bin" >> $GITHUB_PATH
+      - name: Install Rust
+        uses: actions-rust-lang/setup-rust-toolchain@v1
       - name: Build
         run: |
           tools/build_ios.sh
@@ -100,6 +102,8 @@ jobs:
           echo 'keyAlias=${{ secrets.SECRET_KEY_ALIAS }}' >> key.properties
           echo 'storeFile=${{ env.TMP_KEYSTORE_FILE_PATH }}' >> key.properties
           mv key.properties android/
+      - name: Install Rust
+        uses: actions-rust-lang/setup-rust-toolchain@v1
       - name: Build
         run: tools/build_android.sh -${{ matrix.flag }}
       - name: Release

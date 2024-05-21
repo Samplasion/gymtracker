@@ -10,14 +10,14 @@ dependencies:
   animations: ^2.0.7
   copy_with_extension: ^5.0.0
   custom_refresh_indicator: ^3.1.0
-  device_info_plus: ^9.1.2
+  device_info_plus: ^10.1.0
   device_sim: ^0.1.2
   drift: ^2.16.0
   drift_db_viewer: ^2.0.0
   dynamic_color: ^1.6.2
   fast_noise: ^2.0.0
   file_picker: ^8.0.0+1
-  fl_chart: ^0.66.2
+  fl_chart: ^0.68.0
   flat: ^0.5.0
   flex_color_picker: ^3.3.0
   flutter:
@@ -30,20 +30,20 @@ dependencies:
   flutter_sticky_header: ^0.6.5
   flutter_timezone: ^1.0.8
   get: ^4.6.5
-  intl: ^0.18.0
+  intl: ^0.19.0
   json_annotation: ^4.8.0
   logger: ^2.2.0
   modal_bottom_sheet: ^3.0.0-pre
-  package_info_plus: ^6.0.0
+  package_info_plus: ^8.0.0
   path: ^1.9.0
   path_provider: ^2.1.2
   protocol_handler: ^0.2.0
   qr_flutter: ^4.1.0
   quill_delta: ^3.0.0-nullsafety.2
   rxdart: ^0.27.7
-  screenshot: ^2.3.0
+  screenshot: ^3.0.0
   scrollable_clean_calendar: ^1.5.0
-  share_plus: ^8.0.2
+  share_plus: ^9.0.0
   simple_animations: ^5.0.2
   sqlite3: ^2.4.2
   sqlite3_flutter_libs: ^0.5.20
@@ -57,7 +57,7 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_quill_test: ^9.3.3
-  flutter_lints: ^3.0.1
+  flutter_lints: ^4.0.0
   build_runner: ^2.4.9
   json_serializable: ^6.6.1
   copy_with_extension_gen: ^5.0.0

@@ -22,9 +22,13 @@ class Go {
     return top;
   }
 
-  static Route<T> materialRoute<T>(Widget Function() page) {
+  static Route<T> materialRoute<T>(
+    Widget Function() page, {
+    RouteSettings? settings,
+  }) {
     return MaterialWithModalsPageRoute(
       builder: (context) => page(),
+      settings: settings,
     );
   }
 

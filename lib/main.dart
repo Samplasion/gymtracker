@@ -156,10 +156,14 @@ class MainApp extends StatelessWidget {
                         home: const _Loader(),
                         onGenerateRoute: (settings) {
                           return switch (settings.name) {
-                            WorkoutView.routeName =>
-                              Go.materialRoute(() => const WorkoutView()),
-                            ErrorView.routeName =>
-                              Go.materialRoute(() => const ErrorView()),
+                            WorkoutView.routeName => Go.materialRoute(
+                                () => const WorkoutView(),
+                                settings: settings,
+                              ),
+                            ErrorView.routeName => Go.materialRoute(
+                                () => const ErrorView(),
+                                settings: settings,
+                              ),
                             null || String() => throw Exception(
                                 "Invalid route: ${settings.name}"),
                           };

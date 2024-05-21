@@ -122,17 +122,6 @@ class _GTRichTextEditorState extends State<GTRichTextEditor> {
                             .formatSelection(highlightAttribute);
                       }
                     },
-                    childBuilder: (opts, extraOptions) {
-                      final attr = widget.infoboxController.getSelectionStyle();
-                      final isHighlighted =
-                          attr.containsKey(highlightAttribute.key);
-                      return Icon(
-                        GymTrackerIcons.highlight,
-                        color: isHighlighted
-                            ? context.theme.colorScheme.secondary
-                            : context.theme.colorScheme.onSurface,
-                      );
-                    },
                   )
                 ],
               ),

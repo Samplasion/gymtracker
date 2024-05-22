@@ -75,61 +75,52 @@ class _LogViewState extends ControlledState<LogView, LoggerController> {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: GetBuilder(
-        init: controller,
-        builder: (_) {
-          final levelColors = _getLevelColors(
-            context,
-            controller.level,
-            useM3: true,
-          );
-          return Scaffold(
-            body: Container(
-              color: Colors.black,
-              child: CustomScrollView(
+    return GetBuilder(
+      init: controller,
+      builder: (_) {
+        final levelColors = _getLevelColors(
+          context,
+          controller.level,
+          useM3: true,
+        );
+        return Scaffold(
+          appBar: AppBar(
+            title: Text("settings.advanced.options.logs.title".t),
+            actions: [
+              Badge(
+                label: Text("${controller.filteredLogs.length}"),
+                backgroundColor: levelColors.$1,
+                textColor: levelColors.$2,
+                child: IconButton(
+                  icon: const Icon(Icons.filter_list),
+                  onPressed: controller.showLevelRadioModal,
+                ),
+              ),
+              IconButton(
+                icon: const Icon(Icons.delete_forever),
+                onPressed: controller.clearLogs,
+              ),
+              if (kDebugMode)
+                IconButton(
+                  icon: const Icon(Icons.all_inclusive),
+                  onPressed: controller.dumpAllLevels,
+                ),
+            ],
+          ),
+          body: ColoredBox(
+            color: Colors.black,
+            child: SafeArea(
+              child: ListView.separated(
                 controller: _scrollController,
-                slivers: [
-                  SliverAppBar.large(
-                    title: Text("settings.advanced.options.logs.title".t),
-                    actions: [
-                      Badge(
-                        label: Text("${controller.filteredLogs.length}"),
-                        backgroundColor: levelColors.$1,
-                        textColor: levelColors.$2,
-                        child: IconButton(
-                          icon: const Icon(Icons.filter_list),
-                          onPressed: controller.showLevelRadioModal,
-                        ),
-                      ),
-                      IconButton(
-                        icon: const Icon(Icons.delete_forever),
-                        onPressed: controller.clearLogs,
-                      ),
-                      if (kDebugMode)
-                        IconButton(
-                          icon: const Icon(Icons.all_inclusive),
-                          onPressed: controller.dumpAllLevels,
-                        ),
-                    ],
-                  ),
-                  SliverList(
-                    delegate: SliverChildListDelegate.fixed(
-                      List.generate(
-                        controller.filteredLogs.length,
-                        (index) => _buildLogTile(context, index),
-                      ).separated(
-                        separatorBuilder: (_) => const Divider(height: 1),
-                      ),
-                    ),
-                  ),
-                  const SliverToBoxAdapter(child: SizedBox(height: 4)),
-                ],
+                itemCount: controller.filteredLogs.length,
+                itemBuilder: (context, index) => _buildLogTile(context, index),
+                separatorBuilder: (context, index) => const Divider(height: 1),
+                padding: const EdgeInsets.only(bottom: 8),
               ),
             ),
-          );
-        },
-      ),
+          ),
+        );
+      },
     );
   }
 

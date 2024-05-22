@@ -142,6 +142,9 @@ class MainApp extends StatelessWidget {
                             MoreColors.fromColorScheme(lightScheme),
                           ],
                           splashFactory: platformDependentSplashFactory,
+                          dialogTheme: DialogTheme(
+                            backgroundColor: lightScheme.surfaceContainer,
+                          ),
                         ),
                         darkTheme: ThemeData(
                           useMaterial3: true,
@@ -152,6 +155,9 @@ class MainApp extends StatelessWidget {
                             MoreColors.fromColorScheme(darkScheme),
                           ],
                           splashFactory: platformDependentSplashFactory,
+                          dialogTheme: DialogTheme(
+                            backgroundColor: darkScheme.surfaceContainer,
+                          ),
                         ),
                         home: const _Loader(),
                         onGenerateRoute: (settings) {

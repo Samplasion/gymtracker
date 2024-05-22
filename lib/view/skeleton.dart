@@ -227,26 +227,24 @@ class OngoingWorkoutBar extends StatelessWidget {
                   clipBehavior: Clip.hardEdge,
                   child: Crossfade(
                     firstChild: TextButton.icon(
-                      onPressed: () => cancelWorkout(context),
-                      icon: Icon(
-                        GymTrackerIcons.close,
-                        color: Theme.of(context).colorScheme.error,
+                      style: TextButton.styleFrom(
+                        foregroundColor: Theme.of(context).colorScheme.error,
                       ),
+                      onPressed: () => cancelWorkout(context),
+                      icon: const Icon(GymTrackerIcons.close),
                       clipBehavior: Clip.hardEdge,
                       label: Text(
                         "ongoingWorkout.actions.short.cancel".t,
-                        style: TextStyle(
-                            color: Theme.of(context).colorScheme.error),
                         overflow: TextOverflow.clip,
                         maxLines: 1,
                       ),
                     ),
                     secondChild: IconButton(
-                      onPressed: () => cancelWorkout(context),
-                      icon: Icon(
-                        GymTrackerIcons.close,
-                        color: Theme.of(context).colorScheme.error,
+                      style: IconButton.styleFrom(
+                        foregroundColor: Theme.of(context).colorScheme.error,
                       ),
+                      onPressed: () => cancelWorkout(context),
+                      icon: const Icon(GymTrackerIcons.close),
                     ),
                     showSecond: isPhone,
                   ),

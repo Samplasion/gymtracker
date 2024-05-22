@@ -106,6 +106,7 @@ class _HistoryViewState extends State<HistoryView> {
           final history = isSearching ? searchResults : snapshot.data ?? {};
 
           return CustomScrollView(
+            keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
             slivers: [
               _buildAppBar(),
               if (!snapshot.hasData)

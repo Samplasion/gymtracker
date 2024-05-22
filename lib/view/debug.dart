@@ -445,17 +445,29 @@ class ColorSchemeView extends StatelessWidget {
           children: [
             ColorChip(
                 label: 'background',
-                color: colorScheme.background,
-                onColor: colorScheme.onBackground),
+                color: colorScheme.surface,
+                onColor: colorScheme.onSurface),
             ColorChip(
                 label: 'onBackground',
-                color: colorScheme.onBackground,
-                onColor: colorScheme.background),
+                color: colorScheme.onSurface,
+                onColor: colorScheme.surface),
           ],
         ),
         _divider,
         ColorGroup(
           children: [
+            ColorChip(
+                label: 'surfaceContainer',
+                color: colorScheme.surfaceContainer,
+                onColor: colorScheme.onSurface),
+            ColorChip(
+                label: 'surfaceBright',
+                color: colorScheme.surfaceBright,
+                onColor: colorScheme.onSurface),
+            ColorChip(
+                label: 'surfaceDim',
+                color: colorScheme.surfaceDim,
+                onColor: colorScheme.onSurface),
             ColorChip(
                 label: 'surface',
                 color: colorScheme.surface,
@@ -464,14 +476,27 @@ class ColorSchemeView extends StatelessWidget {
                 label: 'onSurface',
                 color: colorScheme.onSurface,
                 onColor: colorScheme.surface),
+          ],
+        ),
+        _divider,
+        ColorGroup(
+          children: [
             ColorChip(
-                label: 'surfaceVariant',
-                color: colorScheme.surfaceVariant,
-                onColor: colorScheme.onSurfaceVariant),
+                label: 'surfaceContainerHighest',
+                color: colorScheme.surfaceContainerHighest,
+                onColor: colorScheme.onSurface),
             ColorChip(
-                label: 'onSurfaceVariant',
-                color: colorScheme.onSurfaceVariant,
-                onColor: colorScheme.surfaceVariant),
+                label: 'surfaceContainerHigh',
+                color: colorScheme.surfaceContainerHigh,
+                onColor: colorScheme.onSurface),
+            ColorChip(
+                label: 'surfaceContainerLow',
+                color: colorScheme.surfaceContainerLow,
+                onColor: colorScheme.onSurface),
+            ColorChip(
+                label: 'surfaceContainerLowest',
+                color: colorScheme.surfaceContainerLowest,
+                onColor: colorScheme.onSurface),
           ],
         ),
         _divider,

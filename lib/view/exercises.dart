@@ -684,7 +684,7 @@ class ExerciseSetView extends StatelessWidget {
     var colorScheme = Theme.of(context).colorScheme;
     return Container(
       color: alt
-          ? scheme.background.withOpacity(0)
+          ? scheme.surface.withOpacity(0)
           : ElevationOverlay.applySurfaceTint(
               scheme.surface,
               scheme.surfaceTint,

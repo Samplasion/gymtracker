@@ -421,7 +421,7 @@ class _WorkoutExerciseSetEditorState extends State<WorkoutExerciseSetEditor> {
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     final defaultColor = widget.alt
-        ? scheme.background.withOpacity(0)
+        ? scheme.surface.withOpacity(0)
         : ElevationOverlay.applySurfaceTint(
             scheme.surface,
             scheme.surfaceTint,

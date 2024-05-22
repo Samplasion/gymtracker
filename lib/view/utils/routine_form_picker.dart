@@ -20,7 +20,7 @@ class RoutineFormPicker extends ControlledWidget<RoutinesController> {
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      mouseCursor: MaterialStateMouseCursor.clickable,
+      mouseCursor: WidgetStateMouseCursor.clickable,
       onTap: _callback,
       child: InputDecorator(
         decoration: decoration.copyWith(

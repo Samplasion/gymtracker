@@ -291,7 +291,7 @@ class _HistoryViewState extends State<HistoryView> {
       height: 32,
       color: state.isPinned
           ? elevatedAppBarColor
-          : Theme.of(context).colorScheme.background,
+          : Theme.of(context).colorScheme.surface,
       padding: const EdgeInsets.symmetric(horizontal: 16),
       alignment: Alignment.centerLeft,
       child: SafeArea(

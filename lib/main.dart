@@ -179,10 +179,10 @@ class MainApp extends StatelessWidget {
                             AnnotatedRegion<SystemUiOverlayStyle>(
                           value: SystemUiOverlayStyle(
                             systemNavigationBarColor:
-                                Theme.of(context).colorScheme.background,
+                                Theme.of(context).colorScheme.surface,
                             systemNavigationBarIconBrightness: Theme.of(context)
                                 .colorScheme
-                                .background
+                                .surface
                                 .estimateForegroundBrightness(),
                           ),
                           child: child ?? Container(),

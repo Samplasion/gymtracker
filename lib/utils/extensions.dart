@@ -365,7 +365,7 @@ extension ContextThemingUtils on BuildContext {
 
   Color cardColor({double elevation = 1}) {
     return ElevationOverlay.applySurfaceTint(
-      theme.cardTheme.color ?? colorScheme.background,
+      theme.cardTheme.color ?? colorScheme.surface,
       theme.cardTheme.surfaceTintColor ?? colorScheme.surfaceTint,
       elevation,
     );

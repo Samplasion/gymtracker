@@ -12,6 +12,7 @@ import 'package:gymtracker/controller/workout_controller.dart';
 import 'package:gymtracker/icons/gymtracker_icons.dart';
 import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/utils/constants.dart';
+import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/view/debug.dart';
 import 'package:gymtracker/view/history.dart';
@@ -106,7 +107,7 @@ class _SkeletonViewState extends State<SkeletonView>
               ),
             NavigationBarTheme(
               data: NavigationBarThemeData(
-                labelTextStyle: MaterialStatePropertyAll(
+                labelTextStyle: WidgetStatePropertyAll(
                   Theme.of(context).textTheme.labelMedium!.copyWith(
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -178,11 +179,9 @@ class OngoingWorkoutBar extends StatelessWidget {
       bottom: false,
       child: Card(
         elevation: 1,
+        color: context.colorScheme.surfaceContainerHighest,
         margin: const EdgeInsets.fromLTRB(8, 0, 8, 8),
         shape: RoundedRectangleBorder(
-          // borderRadius: BorderRadius.vertical(
-          //   top: Radius.circular(13),
-          // ),
           borderRadius: BorderRadius.circular(13),
         ),
         child: Container(

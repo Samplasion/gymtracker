@@ -124,11 +124,17 @@ extension NeutralBackgroundColorScheme on ColorScheme {
     final fg = isDark ? kDarkForeground : kLightForeground;
     final surface = isDark ? kDarkBackgroundLight1 : kLightBackgroundBase;
     final surfaceTint = isDark ? Colors.white : Colors.grey[800];
+    final surfaceContainerHighest = Colors.grey[isDark ? 800 : 200];
     return copyWith(
       background: bg,
       onBackground: fg,
-      surface: surface,
+      surface: bg,
+      onSurface: fg,
+      surfaceDim: surface,
       surfaceTint: surfaceTint,
+      surfaceContainer: Colors.grey[isDark ? 900 : 100],
+      surfaceContainerHighest: surfaceContainerHighest,
+      surfaceBright: surfaceContainerHighest,
     );
   }
 }

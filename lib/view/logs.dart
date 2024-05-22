@@ -7,7 +7,6 @@ import 'package:get/get.dart' hide ContextExtensionss;
 import 'package:gymtracker/controller/logger_controller.dart';
 import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/utils/constants.dart';
-import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/utils/utils.dart';
 import 'package:gymtracker/view/components/controlled.dart';
 import 'package:intl/intl.dart';
@@ -132,7 +131,7 @@ class _LogViewState extends ControlledState<LogView, LoggerController> {
     final log = controller.filteredLogs[index];
 
     const prefix = "";
-    final indent = prefix.length;
+    const indent = prefix.length;
 
     var spans = [
       if (log.message.trim().isNotEmpty)

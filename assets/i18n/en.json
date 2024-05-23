@@ -1013,5 +1013,25 @@
         }
       }
     }
+  },
+  "cardioTimer": {
+    "name": "Interval timer",
+    "setUp": {
+      "title": "Set up interval timer",
+      "active": "Active time",
+      "rest": "Rest time",
+      "section": "Section #@section",
+      "start": "Start interval timer",
+      "addSection": "+ New section",
+      "errors": {
+        "duration": "The duration must not be null.",
+        "bothZeros": "Both times can't be zero.",
+        "generic": "There are errors in the settings. Fix them and try again."
+      }
+    },
+    "confirmExit": {
+      "title": "Exit interval timer",
+      "message": "Are you sure you want to leave? The current progress will be reset."
+    }
   }
 }

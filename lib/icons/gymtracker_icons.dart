@@ -37,6 +37,7 @@ class GymTrackerIcons {
   static const IconData breadcrumb_chevron = Icons.chevron_right_rounded;
   static const IconData calendar = Icons.calendar_month_rounded;
   static const IconData cardio = Icons.directions_bike_rounded;
+  static const IconData cardio_timer = Icons.alarm_rounded;
   static const IconData checkbox_off = Icons.check_box_outline_blank_rounded;
   static const IconData checkbox_on = Icons.check_box_rounded;
   static const IconData clear = Icons.clear_rounded;

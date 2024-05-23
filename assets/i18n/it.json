@@ -1013,5 +1013,25 @@
         }
       }
     }
+  },
+  "cardioTimer": {
+    "name": "Timer a intervalli",
+    "setUp": {
+      "title": "Impostazioni timer a intervalli",
+      "active": "Tempo di attività",
+      "rest": "Tempo di recupero",
+      "section": "Sezione @section",
+      "start": "Avvia timer a intervalli",
+      "addSection": "+ Nuova sezione",
+      "errors": {
+        "duration": "La durata non deve essere vuota.",
+        "bothZeros": "Almeno uno dei tempi deve essere maggiore di zero.",
+        "generic": "Ci sono errori nelle impostazioni. Risolvili e prova di nuovo."
+      }
+    },
+    "confirmExit": {
+      "title": "Esci",
+      "message": "Vuoi davvero uscire? Il progresso attuale sarà cancellato."
+    }
   }
 }

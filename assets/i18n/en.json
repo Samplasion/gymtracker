@@ -403,7 +403,8 @@
       "replace": "Replace exercise…",
       "reorder": "Reorder exercises…",
       "remove": "Remove exercise",
-      "addToSuperset": "Add to superset…"
+      "addToSuperset": "Add to superset…",
+      "startCardioTimer": "Start interval timer"
     },
     "info": {
       "time": "Time",

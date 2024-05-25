@@ -403,7 +403,8 @@
       "replace": "Cambia esercizio…",
       "reorder": "Riordina esercizi…",
       "remove": "Rimuovi esercizio",
-      "addToSuperset": "Aggiungi a superserie…"
+      "addToSuperset": "Aggiungi a superserie…",
+      "startCardioTimer": "Avvia timer a intervalli"
     },
     "info": {
       "time": "Tempo",

@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:get/get.dart';
 import 'package:gymtracker/icons/gymtracker_icons.dart';
+import 'package:gymtracker/model/exercise.dart';
+import 'package:gymtracker/model/set.dart';
 import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/utils/go.dart';
@@ -91,7 +93,7 @@ class _CardioTimerSetupScreenState extends State<CardioTimerSetupScreen> {
       return Go.snack("cardioTimer.setUp.errors.generic".t, assertive: true);
     }
     final cardioSections = sections.map((section) => section.section).toList();
-    Go.off(() => _CardioTimerScreen(sections: cardioSections));
+    Go.off(() => CardioTimerScreen(sections: cardioSections));
   }
 
   bool _isValid(CardioSection section) {
@@ -223,18 +225,43 @@ class _CardioTimerSetupScreenState extends State<CardioTimerSetupScreen> {
   }
 }
 
-class _CardioTimerScreen extends StatefulWidget {
+class CardioTimerScreen extends StatefulWidget {
   final List<CardioSection> sections;
 
-  const _CardioTimerScreen({
+  const CardioTimerScreen({
     required this.sections,
+    super.key,
   });
 
+  factory CardioTimerScreen.fromExercise(Exercise exercise) {
+    assert(exercise.sets.isNotEmpty, "Exercise has no sets");
+    assert(supportsTimer(exercise), "Exercise does not support timer");
+
+    final sections = [
+      for (var set in exercise.sets) ...[
+        CardioSection(
+          active: set.time ?? Duration.zero,
+          rest: exercise.restTime,
+        ),
+      ],
+    ];
+    return CardioTimerScreen(sections: sections);
+  }
+
   @override
-  State<_CardioTimerScreen> createState() => _CardioTimerScreenState();
+  State<CardioTimerScreen> createState() => _CardioTimerScreenState();
+
+  static bool supportsTimer(Exercise exercise) {
+    return [
+          GTSetParameters.time,
+          GTSetParameters.timeWeight,
+        ].contains(exercise.parameters) &&
+        exercise.sets.isNotEmpty &&
+        exercise.sets.any((set) => set.time!.inSeconds > 0);
+  }
 }
 
-class _CardioTimerScreenState extends State<_CardioTimerScreen> {
+class _CardioTimerScreenState extends State<CardioTimerScreen> {
   late final List<(Duration, bool)> _times = [
     for (var section in widget.sections) ...[
       if (section.active != Duration.zero) (section.active, true),

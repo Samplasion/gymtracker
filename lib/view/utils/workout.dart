@@ -18,6 +18,7 @@ import 'package:gymtracker/view/components/badges.dart';
 import 'package:gymtracker/view/components/maybe_rich_text.dart';
 import 'package:gymtracker/view/components/parent_viewer.dart';
 import 'package:gymtracker/view/components/rich_text_dialog.dart';
+import 'package:gymtracker/view/utils/cardio_timer.dart';
 import 'package:gymtracker/view/utils/drag_handle.dart';
 import 'package:gymtracker/view/utils/exercise.dart';
 import 'package:gymtracker/view/utils/input_decoration.dart';
@@ -138,6 +139,23 @@ class _WorkoutExerciseEditorState extends State<WorkoutExerciseEditor> {
                                   'ongoingWorkout.exercises.addToSuperset'.t),
                             ),
                           ),
+                        if (!widget.isCreating &&
+                            CardioTimerScreen.supportsTimer(
+                                widget.exercise)) ...[
+                          const PopupMenuDivider(),
+                          PopupMenuItem(
+                            onTap: () {
+                              Go.toDialog(() => CardioTimerScreen.fromExercise(
+                                  widget.exercise));
+                            },
+                            child: ListTile(
+                              leading: const Icon(GymTrackerIcons.cardio_timer),
+                              title: Text(
+                                  'ongoingWorkout.exercises.startCardioTimer'
+                                      .t),
+                            ),
+                          ),
+                        ],
                         const PopupMenuDivider(),
                         PopupMenuItem(
                           onTap: () {

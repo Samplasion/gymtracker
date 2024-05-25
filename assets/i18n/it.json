@@ -717,7 +717,9 @@
         "smithMachineHexPress": "Hex Press al Multipower",
         "seatedCableChestFlys": "Croci ai cavi da seduto",
         "verticalChestPress": "Chest press (verticale)",
-        "cableFlyCrossovers": "Croci ai cavi alti"
+        "cableFlyCrossovers": "Croci ai cavi alti",
+        "pushUps": "Push-up",
+        "pushUpsWeighted": "Push-up (zavorrati)"
       }
     },
     "biceps": {
@@ -729,7 +731,8 @@
         "cableBicepsCurl": "Bicep curl (cavi)",
         "dumbbellBicepsCurl": "Bicep curl (manubri)",
         "bicepsCurlMachine": "Bicep curl (macchina)",
-        "chinUps": "Chin up"
+        "chinUps": "Chin up",
+        "hammerCurlDumbbell": "Hammer curl (manubri)"
       }
     },
     "abs": {
@@ -740,7 +743,9 @@
         "legRaise": "Sollevamento delle gambe",
         "crunchMachine": "Crunch machine",
         "heelsUpCrunch": "Crunch (caviglie alzate)",
-        "fullBodyCrunch": "Full-body crunch"
+        "fullBodyCrunch": "Full-body crunch",
+        "plank": "Plank",
+        "hollowBodyHold": "Hollow body hold"
       }
     },
     "calves": {

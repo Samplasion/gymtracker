@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:gymtracker/controller/exercises_controller.dart';
 import 'package:gymtracker/controller/history_controller.dart';
@@ -19,6 +20,7 @@ import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/utils/utils.dart';
 import 'package:gymtracker/view/charts/line_charts_by_workout.dart';
 import 'package:gymtracker/view/components/badges.dart';
+import 'package:gymtracker/view/components/context_menu.dart';
 import 'package:gymtracker/view/exercise_creator.dart';
 import 'package:gymtracker/view/exercises.dart';
 import 'package:gymtracker/view/utils/exercise.dart';
@@ -133,7 +135,7 @@ class LibraryExercisesView extends StatelessWidget {
             sliver: SliverList.builder(
               itemCount: category.exercises.length,
               itemBuilder: (context, index) {
-                return ExerciseListTile(
+                var exerciseListTile = ExerciseListTile(
                   exercise: sorted[index],
                   selected: false,
                   isConcrete: false,
@@ -141,6 +143,55 @@ class LibraryExercisesView extends StatelessWidget {
                     Go.to(() => ExerciseInfoView(exercise: sorted[index]));
                   },
                 );
+                if (isCustom && kDebugMode) {
+                  return ContextMenuRegion(
+                    child: exerciseListTile,
+                    contextMenuBuilder: (context, offset) {
+                      return AdaptiveTextSelectionToolbar.buttonItems(
+                        anchors: TextSelectionToolbarAnchors(
+                          primaryAnchor: offset,
+                        ),
+                        buttonItems: <ContextMenuButtonItem>[
+                          ContextMenuButtonItem(
+                            onPressed: () {
+                              ContextMenuController.removeAny();
+                              final category =
+                                  sorted[index].primaryMuscleGroup.name;
+                              var name = sorted[index]
+                                  .name
+                                  .toLowerCase()
+                                  .replaceAllMapped(
+                                      RegExp(r"(\b[a-z](?=[a-z]{1}))"),
+                                      (match) => match.group(0)!.toUpperCase())
+                                  .replaceAllMapped(
+                                      RegExp(r'[^a-zA-Z0-9]'), (match) => '');
+                              name = name[0].toLowerCase() + name.substring(1);
+
+                              final dart = """
+Exercise.standard(
+  id: "library.$category.exercises.$name",
+  name: "library.$category.exercises.$name".t,
+  parameters: GTSetParameters.${sorted[index].parameters.name},
+  primaryMuscleGroup: GTMuscleGroup.${sorted[index].primaryMuscleGroup.name},
+  secondaryMuscleGroups: {${sorted[index].secondaryMuscleGroups.map((e) => "GTMuscleGroup.${e.name}").join(", ")}},
+),
+""";
+                              Clipboard.setData(ClipboardData(text: dart));
+                            },
+                            label: 'Copy as standard exercise',
+                          ),
+                          ContextMenuButtonItem(
+                            onPressed: () {
+                              ContextMenuController.removeAny();
+                            },
+                            label: 'Close',
+                          ),
+                        ],
+                      );
+                    },
+                  );
+                }
+                return exerciseListTile;
               },
             ),
           ),

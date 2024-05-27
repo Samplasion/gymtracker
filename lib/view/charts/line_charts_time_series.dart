@@ -153,6 +153,37 @@ class _LineChartTimeSeriesState<T> extends State<LineChartTimeSeries<T>> {
     final colorScheme = Theme.of(context).colorScheme;
     final predictionColor = colorScheme.quaternary;
 
+    final shownValues = children
+        .where((element) =>
+            element.date.isAfterOrAtSameMomentAs(currentMinDate) &&
+            element.date.isBeforeOrAtSameMomentAs(currentMaxDate))
+        .toList();
+
+    double? minY = max(
+            widget.minY ?? double.negativeInfinity,
+            [
+              double.infinity,
+              ...shownValues.map((e) => e.value),
+              ...?widget.predictions?[selectedCategory]?.map((e) => e.value)
+            ].min) -
+        2;
+    double? maxY = min(
+            widget.maxY ?? double.infinity,
+            [
+              double.negativeInfinity,
+              ...shownValues.map((e) => e.value),
+              ...?widget.predictions?[selectedCategory]?.map((e) => e.value)
+            ].max) +
+        2;
+
+    if (maxY.isFinite && minY.isFinite && maxY - minY < 5) {
+      minY = minY - 2;
+      maxY = maxY + 2;
+    }
+
+    if (minY.isInfinite) minY = widget.minY;
+    if (maxY.isInfinite) maxY = widget.maxY;
+
     return Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -293,8 +324,8 @@ class _LineChartTimeSeriesState<T> extends State<LineChartTimeSeries<T>> {
                   ),
                   minX: currentMinDate.minutesSinceEpoch.toDouble(),
                   maxX: currentMaxDate.minutesSinceEpoch.toDouble(),
-                  minY: widget.minY,
-                  maxY: widget.maxY,
+                  minY: minY,
+                  maxY: maxY,
                   lineBarsData: [
                     if (widget.predictions?[selectedCategory] != null)
                       LineChartBarData(

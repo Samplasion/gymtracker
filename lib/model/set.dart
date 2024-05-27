@@ -23,7 +23,16 @@ enum GTSetParameters {
   timeWeight,
   freeBodyReps,
   time,
-  distance,
+  distance;
+
+  bool get hasReps =>
+      this == GTSetParameters.repsWeight ||
+      this == GTSetParameters.freeBodyReps;
+  bool get hasWeight =>
+      this == GTSetParameters.repsWeight || this == GTSetParameters.timeWeight;
+  bool get hasTime =>
+      this == GTSetParameters.timeWeight || this == GTSetParameters.time;
+  bool get hasDistance => this == GTSetParameters.distance;
 }
 
 @JsonSerializable()

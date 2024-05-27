@@ -6,7 +6,6 @@ import 'package:flutter/scheduler.dart';
 import 'package:get/get.dart';
 import 'package:gymtracker/icons/gymtracker_icons.dart';
 import 'package:gymtracker/model/exercise.dart';
-import 'package:gymtracker/model/set.dart';
 import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/utils/go.dart';
@@ -252,10 +251,7 @@ class CardioTimerScreen extends StatefulWidget {
   State<CardioTimerScreen> createState() => _CardioTimerScreenState();
 
   static bool supportsTimer(Exercise exercise) {
-    return [
-          GTSetParameters.time,
-          GTSetParameters.timeWeight,
-        ].contains(exercise.parameters) &&
+    return exercise.parameters.hasTime &&
         exercise.sets.isNotEmpty &&
         exercise.sets.any((set) => set.time!.inSeconds > 0);
   }

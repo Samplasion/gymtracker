@@ -145,7 +145,7 @@ class _WorkoutExerciseEditorState extends State<WorkoutExerciseEditor> {
                           const PopupMenuDivider(),
                           PopupMenuItem(
                             onTap: () {
-                              Go.toDialog(() => CardioTimerScreen.fromExercise(
+                              Go.to(() => CardioTimerScreen.fromExercise(
                                   widget.exercise));
                             },
                             child: ListTile(

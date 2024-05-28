@@ -15,6 +15,12 @@ class ExerciseCategory {
     required this.icon,
     required this.color,
   });
+
+  ExerciseCategory filtered(bool Function(Exercise) filter) => ExerciseCategory(
+        exercises: exercises.where(filter).toList(),
+        icon: icon,
+        color: color,
+      );
 }
 
 Map<String, ExerciseCategory> get exerciseStandardLibrary => {

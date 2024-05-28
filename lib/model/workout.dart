@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:copy_with_extension/copy_with_extension.dart';
 import 'package:flutter/foundation.dart';
+import 'package:gymtracker/controller/exercises_controller.dart';
 import 'package:gymtracker/data/distance.dart';
 import 'package:gymtracker/data/weights.dart';
 import 'package:gymtracker/model/exercisable.dart';
@@ -379,6 +380,20 @@ class Workout {
         base.completedBy == id &&
         completes == base.id;
   }
+
+  bool hasExercise(Exercise exercise) {
+    if (exercise.parentID == null) {
+      return exercises.where((e) => e.isExercise).any((e) {
+        return e.asExercise.parentID == exercise.id;
+      });
+    } else {
+      final parent = exercise.getParent();
+      if (parent == null) {
+        return false;
+      }
+      return hasExercise(parent);
+    }
+  }
 }
 
 class SynthesizedWorkoutMethodException implements Exception {
@@ -550,6 +565,11 @@ class SynthesizedWorkout implements Workout {
   @override
   Workout withRegeneratedExerciseIDs({required bool superseding}) {
     throw SynthesizedWorkoutMethodException("withRegeneratedExerciseIDs");
+  }
+
+  @override
+  bool hasExercise(Exercise exercise) {
+    throw SynthesizedWorkoutMethodException("hasExercise");
   }
 }
 

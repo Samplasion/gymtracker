@@ -576,3 +576,62 @@ class _RoutinePickerState extends State<RoutinePicker> with _RoutineList {
     );
   }
 }
+
+class TerseRoutineListTile extends StatelessWidget {
+  final Workout? routine;
+  final VoidCallback? onTap;
+  final EdgeInsetsGeometry? contentPadding;
+  final bool showIcon;
+
+  const TerseRoutineListTile({
+    super.key,
+    required this.routine,
+    this.onTap,
+    this.contentPadding = EdgeInsets.zero,
+    this.showIcon = false,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    Icon icon;
+    String text;
+
+    if (routine!.folder != null) {
+      icon = const Icon(GymTrackerIcons.folder_closed, size: 20);
+      text = routine!.folder!.name;
+    } else {
+      icon = const Icon(GymTrackerIcons.folder_root, size: 20);
+      text = "routineFormPicker.fields.routine.options.root".t;
+    }
+
+    return ListTile(
+      leading: showIcon
+          ? CircleAvatar(
+              backgroundColor: Theme.of(context).colorScheme.secondaryContainer,
+              foregroundColor:
+                  Theme.of(context).colorScheme.onSecondaryContainer,
+              child: Text(routine!.name.characters.first.toUpperCase()),
+            )
+          : null,
+      title: Text(
+        routine!.name,
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+      ),
+      subtitle: Text.rich(
+        TextSpan(children: [
+          WidgetSpan(child: icon, alignment: PlaceholderAlignment.middle),
+          const TextSpan(text: " "),
+          TextSpan(text: text),
+        ]),
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+      ),
+      trailing: const Icon(GymTrackerIcons.lt_chevron),
+      onTap: onTap,
+      contentPadding: contentPadding,
+      visualDensity: VisualDensity.standard,
+      mouseCursor: MouseCursor.defer,
+    );
+  }
+}

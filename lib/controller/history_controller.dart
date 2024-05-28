@@ -445,6 +445,41 @@ class HistoryController extends GetxController with ServiceableController {
   Workout? getByID(String id) {
     return history.firstWhereOrNull((element) => element.id == id);
   }
+
+  void replaceExercise(Exercise from, Exercise to) {
+    service.writeAllHistory([
+      for (final workout in service.workoutHistory)
+        workout.copyWith(
+          exercises: [
+            for (final ex in workout.exercises)
+              ex.map(
+                exercise: (ex) {
+                  if (from.isTheSameAs(ex)) {
+                    return Exercise.replaced(
+                      from: ex,
+                      to: to.makeChild(),
+                    );
+                  } else {
+                    return ex;
+                  }
+                },
+                superset: (ss) => ss.copyWith(
+                  exercises: [
+                    for (final ex in ss.exercises)
+                      if (from.isTheSameAs(ex))
+                        Exercise.replaced(
+                          from: ex,
+                          to: to.makeChild(),
+                        )
+                      else
+                        ex,
+                  ],
+                ),
+              ),
+          ],
+        ),
+    ]);
+  }
 }
 
 extension WorkoutHistory on Workout {

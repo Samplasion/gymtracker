@@ -64,6 +64,10 @@ class ExerciseListTile extends StatelessWidget {
   final Weights? weightUnit;
   final Distance? distanceUnit;
   final VoidCallback? onTap;
+  final Widget? trailing;
+  final VisualDensity? visualDensity;
+  final MouseCursor? mouseCursor;
+  final EdgeInsetsGeometry? contentPadding;
 
   const ExerciseListTile({
     required this.exercise,
@@ -72,6 +76,10 @@ class ExerciseListTile extends StatelessWidget {
     this.weightUnit,
     this.distanceUnit,
     this.onTap,
+    this.trailing,
+    this.visualDensity,
+    this.mouseCursor,
+    this.contentPadding,
     super.key,
   })  : assert((weightUnit == null) == !isConcrete,
             "Weight unit must be set if the exercise is concrete"),
@@ -132,6 +140,10 @@ class ExerciseListTile extends StatelessWidget {
         context,
       ),
       onTap: onTap,
+      trailing: trailing,
+      visualDensity: visualDensity,
+      mouseCursor: mouseCursor,
+      contentPadding: contentPadding,
     );
   }
 

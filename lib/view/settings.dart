@@ -232,6 +232,14 @@ class AdvancedSettingsView extends ControlledWidget<SettingsController> {
                   await controller.showLogs();
                 },
               ),
+              ListTile(
+                title: Text("settings.advanced.options.migrations.title".t),
+                leading: const Icon(GymTrackerIcons.migration),
+                trailing: const Icon(GymTrackerIcons.lt_chevron),
+                onTap: () async {
+                  await controller.showMigrations();
+                },
+              ),
             ]),
           ),
         ],

@@ -66,6 +66,9 @@ abstract class WorkoutExercisable {
     throw TypeError();
   }
 
+  bool get isExercise => this is Exercise;
+  bool get isSuperset => this is Superset;
+
   Exercise get asExercise => this as Exercise;
   Superset get asSuperset => this as Superset;
 

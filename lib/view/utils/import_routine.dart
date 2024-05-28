@@ -76,6 +76,7 @@ class _ImportRoutineModalState extends State<ImportRoutineModal>
                           workout: workout,
                           index: index,
                           isInSuperset: false,
+                          highlight: false,
                           weightUnit: workout.weightUnit,
                           distanceUnit: workout.distanceUnit,
                         ),

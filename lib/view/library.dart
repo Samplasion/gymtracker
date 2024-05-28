@@ -24,7 +24,7 @@ import 'package:gymtracker/view/components/context_menu.dart';
 import 'package:gymtracker/view/exercise_creator.dart';
 import 'package:gymtracker/view/exercises.dart';
 import 'package:gymtracker/view/utils/exercise.dart';
-import 'package:intl/intl.dart';
+import 'package:gymtracker/view/utils/history_workout.dart';
 import 'package:rxdart/rxdart.dart';
 
 class LibraryView extends GetView<ExercisesController> {
@@ -366,6 +366,7 @@ class _ExerciseInfoViewState extends State<ExerciseInfoView> {
                                 index: history[index].$2,
                                 workout: history[index].$3,
                                 isInSuperset: false,
+                                highlight: false,
                                 weightUnit: history[index].$3.weightUnit,
                                 distanceUnit: history[index].$3.distanceUnit,
                               ),
@@ -375,28 +376,8 @@ class _ExerciseInfoViewState extends State<ExerciseInfoView> {
                                     const EdgeInsets.symmetric(horizontal: 16),
                                 child: Column(
                                   children: [
-                                    ListTile(
-                                      leading: CircleAvatar(
-                                        backgroundColor: Theme.of(context)
-                                            .colorScheme
-                                            .primaryContainer,
-                                        foregroundColor: Theme.of(context)
-                                            .colorScheme
-                                            .onPrimaryContainer,
-                                        child: Text(history[index]
-                                            .$3
-                                            .name
-                                            .characters
-                                            .first
-                                            .toUpperCase()),
-                                      ),
-                                      title: Text(history[index].$3.name),
-                                      subtitle: Text(DateFormat.yMd(
-                                              context.locale.languageCode)
-                                          .add_Hm()
-                                          .format(
-                                              history[index].$3.startingDate ??
-                                                  DateTime.now())),
+                                    TerseWorkoutListTile(
+                                      workout: history[index].$3,
                                     ),
                                   ],
                                 ),

@@ -187,6 +187,13 @@ class MainApp extends StatelessWidget {
                           ),
                           child: child ?? Container(),
                         ),
+                        logWriterCallback: (text, {bool? isError}) {
+                          if (isError == true) {
+                            logger.e(text);
+                          } else {
+                            logger.d(text);
+                          }
+                        },
                       );
                     },
                   );

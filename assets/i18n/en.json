@@ -337,20 +337,20 @@
           "light": "Pure White mode"
         }
       },
-      "export": {
-        "label": "Export data (JSON)",
-        "filename": "GymTracker_Data",
-        "failed": {
-          "title": "Failed to export data",
-          "copy": "The error message has been copied to the clipboard."
-        }
-      },
       "themeMode": {
         "label": "Theme",
         "values": {
           "system": "System",
           "light": "Light",
           "dark": "Dark"
+        }
+      },
+      "export": {
+        "label": "Export data (JSON)",
+        "filename": "GymTracker_Data",
+        "failed": {
+          "title": "Failed to export data",
+          "copy": "The error message has been copied to the clipboard."
         }
       },
       "notifications": {
@@ -381,6 +381,9 @@
             "fatal": "Fatal"
           },
           "level": "Level"
+        },
+        "migrations": {
+          "title": "Migrations"
         }
       }
     }
@@ -1038,6 +1041,60 @@
     "confirmExit": {
       "title": "Exit interval timer",
       "message": "Are you sure you want to leave? The current progress will be reset."
+    }
+  },
+  "migrations": {
+    "customToLibraryExercise": {
+      "fields": {
+        "from": {
+          "title": "Replace all occurrences of this custom exercise…",
+          "label": "Custom exercise"
+        },
+        "to": {
+          "title": "…with this library exercise…",
+          "label": "Library exercise"
+        }
+      },
+      "title": "Custom exercise to library exercise",
+      "description": "Replace all occurrences of a custom exercise with a compatible library exercise",
+      "preview": {
+        "from": "Replace…",
+        "to": "With…",
+        "affectedRoutines": "Affected routines",
+        "affectedWorkouts": "Affected workouts in history"
+      }
+    },
+    "common": {
+      "actions": {
+        "next": "Next step: preview",
+        "apply": "Apply migration"
+      },
+      "preview": "Migration preview",
+      "migrated": "Migration done!"
+    },
+    "title": "Migrations",
+    "removeUnusedExercises": {
+      "preview": {
+        "noAffected": "No data affected.",
+        "affectedExercises": "Affected exercises"
+      },
+      "title": "Remove unused exercises",
+      "description": "Clean up your library by removing all custom exercises you haven't used"
+    }
+  },
+  "exerciseFormPicker": {
+    "fields": {
+      "exercise": {
+        "options": {
+          "none": "No exercise selected"
+        }
+      }
+    }
+  },
+  "exercises": {
+    "none": {
+      "title": "No exercise",
+      "subtitle": "Tap here to deselect everything and go back"
     }
   }
 }

@@ -12,6 +12,7 @@ import 'package:gymtracker/controller/workout_controller.dart';
 import 'package:gymtracker/icons/gymtracker_icons.dart';
 import 'package:gymtracker/model/exercisable.dart';
 import 'package:gymtracker/model/exercise.dart';
+import 'package:gymtracker/model/superset.dart';
 import 'package:gymtracker/model/workout.dart';
 import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/service/logger.dart';
@@ -541,6 +542,41 @@ class RoutinesController extends GetxController
     await Go.showBottomModalScreen(
       (context, _) => RoutinePicker(onPick: onPick, allowNone: allowNone),
     );
+  }
+
+  void replaceExercise(Exercise from, Exercise to) {
+    service.setAllRoutines([
+      for (final routine in service.routines)
+        routine.copyWith(
+          exercises: [
+            for (final ex in routine.exercises)
+              ex.map(
+                exercise: (ex) {
+                  if (from.isTheSameAs(ex)) {
+                    return Exercise.replaced(
+                      from: ex,
+                      to: to.makeChild(),
+                    );
+                  } else {
+                    return ex;
+                  }
+                },
+                superset: (ss) => ss.copyWith(
+                  exercises: [
+                    for (final ex in ss.exercises)
+                      if (from.isTheSameAs(ex))
+                        Exercise.replaced(
+                          from: ex,
+                          to: to.makeChild(),
+                        )
+                      else
+                        ex,
+                  ],
+                ),
+              ),
+          ],
+        ),
+    ]);
   }
 }
 

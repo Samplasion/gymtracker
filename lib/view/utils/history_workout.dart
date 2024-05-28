@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:gymtracker/controller/history_controller.dart';
+import 'package:gymtracker/icons/gymtracker_icons.dart';
 import 'package:gymtracker/model/workout.dart';
 import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/view/utils/exercise.dart';
 import 'package:gymtracker/view/utils/workout_utils.dart';
+import 'package:intl/intl.dart';
 
 class HistoryWorkout extends StatelessWidget {
   final Workout workout;
@@ -70,6 +72,37 @@ class HistoryWorkout extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+class TerseWorkoutListTile extends StatelessWidget {
+  final Workout workout;
+  final VoidCallback? onTap;
+  final EdgeInsetsGeometry? contentPadding;
+
+  const TerseWorkoutListTile({
+    super.key,
+    required this.workout,
+    this.onTap,
+    this.contentPadding,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return ListTile(
+      leading: CircleAvatar(
+        backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+        foregroundColor: Theme.of(context).colorScheme.onPrimaryContainer,
+        child: Text(workout.name.characters.first.toUpperCase()),
+      ),
+      title: Text(workout.name),
+      subtitle: Text(DateFormat.yMd(context.locale.languageCode)
+          .add_Hm()
+          .format(workout.startingDate ?? DateTime.now())),
+      trailing: onTap == null ? null : const Icon(GymTrackerIcons.lt_chevron),
+      onTap: onTap,
+      contentPadding: contentPadding,
     );
   }
 }

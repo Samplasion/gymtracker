@@ -337,20 +337,20 @@
           "light": "Modalità bianco puro"
         }
       },
-      "themeMode": {
-        "label": "Tema",
-        "values": {
-          "system": "Sistema",
-          "light": "Chiaro",
-          "dark": "Scuro"
-        }
-      },
       "export": {
         "label": "Esporta dati (JSON)",
         "filename": "Dati_GymTracker",
         "failed": {
           "title": "Impossibile esportare i dati",
           "copy": "Il messaggio di errore è stato copiato negli appunti."
+        }
+      },
+      "themeMode": {
+        "label": "Tema",
+        "values": {
+          "system": "Sistema",
+          "light": "Chiaro",
+          "dark": "Scuro"
         }
       },
       "notifications": {
@@ -381,6 +381,9 @@
             "fatal": "Errore fatale"
           },
           "level": "Livello"
+        },
+        "migrations": {
+          "title": "Migrazioni"
         }
       }
     }
@@ -1038,6 +1041,60 @@
     "confirmExit": {
       "title": "Esci",
       "message": "Vuoi davvero uscire? Il progresso attuale sarà cancellato."
+    }
+  },
+  "migrations": {
+    "customToLibraryExercise": {
+      "fields": {
+        "from": {
+          "title": "Sostituisci tutte le occorrenze di questo esercizio personalizzato…",
+          "label": "Esercizio personalizzato"
+        },
+        "to": {
+          "title": "…con questo esercizio standard…",
+          "label": "Esercizio standard"
+        }
+      },
+      "title": "Esercizio personalizzato a esercizio standard",
+      "description": "Sostituisci tutte le occorrenze di un esercizio personalizzato con un esercizio standard compatibile",
+      "preview": {
+        "from": "Sostituisci…",
+        "to": "Con…",
+        "affectedRoutines": "Routine influenzate",
+        "affectedWorkouts": "Allenamenti cronologici influenzati"
+      }
+    },
+    "common": {
+      "actions": {
+        "next": "Prossimo step: anteprima",
+        "apply": "Applica migrazione"
+      },
+      "preview": "Anteprima migrazione",
+      "migrated": "Migrazione completata!"
+    },
+    "title": "Migrazioni",
+    "removeUnusedExercises": {
+      "preview": {
+        "noAffected": "Nessun dato verrebbe modificato.",
+        "affectedExercises": "Esercizi influenzati"
+      },
+      "title": "Rimuovi esercizi inutilizzati",
+      "description": "Pulisci la tua libreria rimuovendo tutti gli esercizi personalizzati che non hai usato"
+    }
+  },
+  "exerciseFormPicker": {
+    "fields": {
+      "exercise": {
+        "options": {
+          "none": "Nessun esercizio selezionato"
+        }
+      }
+    }
+  },
+  "exercises": {
+    "none": {
+      "title": "Nessun esercizio",
+      "subtitle": "Tocca per deselezionare tutto e tornare indietro"
     }
   }
 }

@@ -238,6 +238,10 @@ class Go {
       onChange?.call(oldValue);
     }
   }
+
+  static void popUntil(bool Function(Route route) predicate) {
+    Navigator.of(Get.context!).popUntil(predicate);
+  }
 }
 
 String _defaultT(String s) => s.t;

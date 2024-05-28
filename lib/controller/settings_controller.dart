@@ -15,6 +15,7 @@ import 'package:gymtracker/service/logger.dart';
 import 'package:gymtracker/utils/constants.dart';
 import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/view/logs.dart';
+import 'package:gymtracker/view/migrations.dart';
 import 'package:gymtracker/view/settings.dart';
 import 'package:share_plus/share_plus.dart';
 
@@ -210,5 +211,9 @@ class SettingsController extends GetxController with ServiceableController {
 
   showLogs() {
     Go.to(() => const LogView());
+  }
+
+  showMigrations() {
+    Go.to(() => const AllMigrationsView());
   }
 }

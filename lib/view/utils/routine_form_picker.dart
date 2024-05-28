@@ -4,6 +4,7 @@ import 'package:gymtracker/icons/gymtracker_icons.dart';
 import 'package:gymtracker/model/workout.dart';
 import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/view/components/controlled.dart';
+import 'package:gymtracker/view/routines.dart';
 
 class RoutineFormPicker extends ControlledWidget<RoutinesController> {
   final Workout? routine;
@@ -40,7 +41,7 @@ class RoutineFormPicker extends ControlledWidget<RoutinesController> {
     );
   }
 
-  ListTile _buildBody() {
+  Widget _buildBody() {
     if (routine == null) {
       return ListTile(
         title: Text(
@@ -53,36 +54,6 @@ class RoutineFormPicker extends ControlledWidget<RoutinesController> {
       );
     }
 
-    Icon icon;
-    String text;
-
-    if (routine!.folder != null) {
-      icon = const Icon(GymTrackerIcons.folder_closed, size: 20);
-      text = routine!.folder!.name;
-    } else {
-      icon = const Icon(GymTrackerIcons.folder_root, size: 20);
-      text = "routineFormPicker.fields.routine.options.root".t;
-    }
-
-    return ListTile(
-      title: Text(
-        routine!.name,
-        maxLines: 1,
-        overflow: TextOverflow.ellipsis,
-      ),
-      subtitle: Text.rich(
-        TextSpan(children: [
-          WidgetSpan(child: icon, alignment: PlaceholderAlignment.middle),
-          const TextSpan(text: " "),
-          TextSpan(text: text),
-        ]),
-        maxLines: 1,
-        overflow: TextOverflow.ellipsis,
-      ),
-      trailing: const Icon(GymTrackerIcons.lt_chevron),
-      contentPadding: EdgeInsets.zero,
-      visualDensity: VisualDensity.standard,
-      mouseCursor: MouseCursor.defer,
-    );
+    return TerseRoutineListTile(routine: routine);
   }
 }

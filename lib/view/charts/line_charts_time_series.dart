@@ -148,18 +148,22 @@ class _LineChartTimeSeriesState<T> extends State<LineChartTimeSeries<T>> {
     return absoluteMaximum.add(offset);
   }
 
-  @override
-  Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    final predictionColor = colorScheme.quaternary;
+  double? minY, maxY;
 
+  @override
+  void initState() {
+    super.initState();
+    _recalculateMinMax();
+  }
+
+  _recalculateMinMax() {
     final shownValues = children
         .where((element) =>
             element.date.isAfterOrAtSameMomentAs(currentMinDate) &&
             element.date.isBeforeOrAtSameMomentAs(currentMaxDate))
         .toList();
 
-    double? minY = max(
+    minY = max(
             widget.minY ?? double.negativeInfinity,
             [
               double.infinity,
@@ -167,7 +171,7 @@ class _LineChartTimeSeriesState<T> extends State<LineChartTimeSeries<T>> {
               ...?widget.predictions?[selectedCategory]?.map((e) => e.value)
             ].min) -
         2;
-    double? maxY = min(
+    maxY = min(
             widget.maxY ?? double.infinity,
             [
               double.negativeInfinity,
@@ -176,13 +180,19 @@ class _LineChartTimeSeriesState<T> extends State<LineChartTimeSeries<T>> {
             ].max) +
         2;
 
-    if (maxY.isFinite && minY.isFinite && maxY - minY < 5) {
-      minY = minY - 2;
-      maxY = maxY + 2;
+    if (maxY!.isFinite && minY!.isFinite && maxY! - minY! < 5) {
+      minY = minY! - 2;
+      maxY = maxY! + 2;
     }
 
-    if (minY.isInfinite) minY = widget.minY;
-    if (maxY.isInfinite) maxY = widget.maxY;
+    if (minY!.isInfinite) minY = widget.minY;
+    if (maxY!.isInfinite) maxY = widget.maxY;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final predictionColor = colorScheme.quaternary;
 
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -229,6 +239,12 @@ class _LineChartTimeSeriesState<T> extends State<LineChartTimeSeries<T>> {
         GestureDetector(
           behavior: HitTestBehavior.opaque,
           onHorizontalDragUpdate: _onDrag,
+          onHorizontalDragEnd: (details) {
+            _recalculateMinMax();
+          },
+          onHorizontalDragCancel: () {
+            _recalculateMinMax();
+          },
           child: ConstrainedBox(
             constraints: BoxConstraints.loose(const Size.fromHeight(300)),
             child: Padding(

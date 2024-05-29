@@ -165,23 +165,22 @@ class _LineChartTimeSeriesState<T> extends State<LineChartTimeSeries<T>> {
         .where((element) =>
             element.date.isAfterOrAtSameMomentAs(currentMinDate) &&
             element.date.isBeforeOrAtSameMomentAs(currentMaxDate))
+        .map((e) => e.value)
         .toList();
+    final shownPredictions = widget.predictions?[selectedCategory]
+            ?.where((element) =>
+                element.date.isAfterOrAtSameMomentAs(currentMinDate) &&
+                element.date.isBeforeOrAtSameMomentAs(currentMaxDate))
+            .map((e) => e.value)
+            .toList() ??
+        [];
+    final shownPoints = [...shownValues, ...shownPredictions];
 
-    minY = max(
-            widget.minY ?? double.negativeInfinity,
-            [
-              double.infinity,
-              ...shownValues.map((e) => e.value),
-              ...?widget.predictions?[selectedCategory]?.map((e) => e.value)
-            ].min) -
+    minY = max(widget.minY ?? double.negativeInfinity,
+            [double.infinity, ...shownPoints].min) -
         2;
-    maxY = min(
-            widget.maxY ?? double.infinity,
-            [
-              double.negativeInfinity,
-              ...shownValues.map((e) => e.value),
-              ...?widget.predictions?[selectedCategory]?.map((e) => e.value)
-            ].max) +
+    maxY = min(widget.maxY ?? double.infinity,
+            [double.negativeInfinity, ...shownPoints].max) +
         2;
 
     if (maxY!.isFinite && minY!.isFinite && maxY! - minY! < 5) {

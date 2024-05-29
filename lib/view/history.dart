@@ -11,6 +11,7 @@ import 'package:gymtracker/view/exercises.dart';
 import 'package:gymtracker/view/me/calendar.dart';
 import 'package:gymtracker/view/utils/action_icon.dart';
 import 'package:gymtracker/view/utils/history_workout.dart';
+import 'package:gymtracker/view/utils/input_decoration.dart';
 import 'package:intl/intl.dart';
 
 const kHistoryWorkoutsAbridgedCount = 20;
@@ -205,32 +206,32 @@ class _HistoryViewState extends State<HistoryView> {
       preferredSize: const Size.fromHeight(kToolbarHeight / 1.25 + 32),
       child: Padding(
         padding: const EdgeInsets.all(16),
-        child: SearchBar(
-          hintText: "history.search".t,
+        child: TextField(
+          decoration: GymTrackerInputDecoration(
+            labelText: "history.search".t,
+            suffixIcon: isSearching
+                ? IconButton(
+                    icon: const Icon(GymTrackerIcons.clear),
+                    onPressed: () {
+                      setState(() {
+                        searchTextController.clear();
+                        searchFocusNode.unfocus();
+                        isSearching = false;
+                      });
+                    },
+                  )
+                : null,
+          ),
           controller: searchTextController,
           focusNode: searchFocusNode,
-          constraints: const BoxConstraints.tightFor(
-            height: kToolbarHeight / 1.25,
-          ),
+          // constraints: const BoxConstraints.tightFor(
+          //   height: kToolbarHeight / 1.25,
+          // ),
           onChanged: (q) {
             setState(() {
               isSearching = q.isNotEmpty;
             });
           },
-          trailing: [
-            if (isSearching) ...[
-              IconButton(
-                icon: const Icon(GymTrackerIcons.clear),
-                onPressed: () {
-                  setState(() {
-                    searchTextController.clear();
-                    searchFocusNode.unfocus();
-                    isSearching = false;
-                  });
-                },
-              ),
-            ]
-          ],
         ),
       ),
     );

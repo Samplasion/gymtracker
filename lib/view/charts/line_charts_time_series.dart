@@ -42,12 +42,16 @@ class LineChartTimeSeries<T> extends StatefulWidget {
 
 enum _LineChartTimeSeriesType {
   threeMonths(Duration(days: 90)),
-  sixMonths(Duration(days: 180)),
-  oneYear(Duration(days: 365));
+  sixMonths(Duration(days: 180), dragOffset: 2),
+  oneYear(Duration(days: 365), dragOffset: 4);
 
-  const _LineChartTimeSeriesType(this.duration);
+  const _LineChartTimeSeriesType(
+    this.duration, {
+    this.dragOffset = 1,
+  });
 
   final Duration duration;
+  final double dragOffset;
 }
 
 class _LineChartTimeSeriesState<T> extends State<LineChartTimeSeries<T>> {
@@ -124,7 +128,7 @@ class _LineChartTimeSeriesState<T> extends State<LineChartTimeSeries<T>> {
   }
 
   _onDrag(DragUpdateDetails details) {
-    final days = -details.delta.dx / 2;
+    final days = -details.delta.dx / 2 * type.dragOffset;
     var newOffset = Duration(hours: (days * 24).toInt());
 
     if (newOffset.isNegative &&

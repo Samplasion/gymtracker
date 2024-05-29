@@ -187,6 +187,8 @@ class _LineChartTimeSeriesState<T> extends State<LineChartTimeSeries<T>> {
 
     if (minY!.isInfinite) minY = widget.minY;
     if (maxY!.isInfinite) maxY = widget.maxY;
+
+    setState(() {});
   }
 
   @override

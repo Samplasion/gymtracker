@@ -123,7 +123,11 @@
       "bestSessionVolume": {
         "label": "Best session volume"
       },
-      "usefulData": "Useful data"
+      "usefulData": "Useful data",
+      "home": "Home",
+      "history": "History",
+      "explanation": "Explanation",
+      "explanationDisclaimer": "Note: this explanation is provided for reference only. Always consult a fitness professional."
     },
     "continuation": {
       "label": "Continuation",

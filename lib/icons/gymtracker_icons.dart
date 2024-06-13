@@ -58,11 +58,13 @@ class GymTrackerIcons {
   static const IconData duration = Icons.access_time_rounded;
   static const IconData edit = Icons.edit_rounded;
   static const IconData empty_workout = Icons.timer_rounded;
+  static const IconData explanation = Icons.note_alt_outlined;
   static const IconData folder_closed = Icons.folder_rounded;
   static const IconData folder_open = Icons.folder_open_rounded;
   static const IconData folder_root = Icons.home_rounded;
   static const IconData highlight = Icons.highlight_rounded;
   static const IconData history = Icons.history_rounded;
+  static const IconData home = Icons.home_rounded;
   static const IconData info = Icons.info_rounded;
   static const IconData info_outline = Icons.info_outline;
   static const IconData library = Icons.local_library_rounded;

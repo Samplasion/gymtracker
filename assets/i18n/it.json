@@ -123,7 +123,11 @@
       "bestSessionVolume": {
         "label": "Miglior volume totale di una sessione"
       },
-      "usefulData": "Dati utili"
+      "usefulData": "Dati utili",
+      "home": "Home",
+      "history": "Cronologia",
+      "explanation": "Spiegazione",
+      "explanationDisclaimer": "Nota che questa spiegazione è fornita a puro scopo informativo, e non sostituisce il parere di un trainer qualificato."
     },
     "continuation": {
       "label": "Continuazione",
@@ -337,20 +341,20 @@
           "light": "Modalità bianco puro"
         }
       },
-      "themeMode": {
-        "label": "Tema",
-        "values": {
-          "system": "Sistema",
-          "light": "Chiaro",
-          "dark": "Scuro"
-        }
-      },
       "export": {
         "label": "Esporta dati (JSON)",
         "filename": "Dati_GymTracker",
         "failed": {
           "title": "Impossibile esportare i dati",
           "copy": "Il messaggio di errore è stato copiato negli appunti."
+        }
+      },
+      "themeMode": {
+        "label": "Tema",
+        "values": {
+          "system": "Sistema",
+          "light": "Chiaro",
+          "dark": "Scuro"
         }
       },
       "notifications": {

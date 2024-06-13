@@ -3,7 +3,8 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:get/get.dart';
+import 'package:flutter_markdown/flutter_markdown.dart';
+import 'package:get/get.dart' hide ContextExtensionss;
 import 'package:gymtracker/controller/exercises_controller.dart';
 import 'package:gymtracker/controller/history_controller.dart';
 import 'package:gymtracker/controller/settings_controller.dart';
@@ -210,10 +211,15 @@ class ExerciseInfoView extends StatefulWidget {
   State<ExerciseInfoView> createState() => _ExerciseInfoViewState();
 }
 
-class _ExerciseInfoViewState extends State<ExerciseInfoView> {
+class _ExerciseInfoViewState extends State<ExerciseInfoView>
+    with SingleTickerProviderStateMixin {
   final historyStream =
       BehaviorSubject<List<(Exercise, int, Workout)>>.seeded([]);
   late final StreamSubscription historySub;
+  late final tabController = TabController(
+    length: getTabs(widget.exercise, [], [], []).length,
+    vsync: this,
+  );
 
   @override
   void initState() {
@@ -258,6 +264,27 @@ class _ExerciseInfoViewState extends State<ExerciseInfoView> {
     return history;
   }
 
+  List<Widget> getTabs(
+          Exercise exercise,
+          List<(Workout, Exercise)> chartHistory,
+          List<(Exercise, int, Workout)> history,
+          List<ListTileTheme> infoTiles) =>
+      [
+        SafeArea(
+          bottom: false,
+          child: _homeBody(exercise, chartHistory, history, infoTiles),
+        ),
+        SafeArea(
+          bottom: false,
+          child: _historyBody(exercise, chartHistory, history),
+        ),
+        if (exercise.standard && exercise.exerciseExplanation != null)
+          SafeArea(
+            bottom: false,
+            child: _explanationBody(exercise),
+          ),
+      ];
+
   @override
   Widget build(BuildContext context) {
     final exercise = widget.exercise;
@@ -272,6 +299,8 @@ class _ExerciseInfoViewState extends State<ExerciseInfoView> {
         final chartHistory = history.map((e) => (e.$3, e.$1)).toList();
         chartHistory
             .sort((a, b) => a.$1.startingDate!.compareTo(b.$1.startingDate!));
+
+        final tabs = getTabs(exercise, chartHistory, history, infoTiles);
 
         return Scaffold(
           appBar: AppBar(
@@ -309,118 +338,214 @@ class _ExerciseInfoViewState extends State<ExerciseInfoView> {
                   ],
                 ),
             ],
+            bottom: TabBar(
+              controller: tabController,
+              tabs: [
+                Tab(
+                  icon: const Icon(GymTrackerIcons.home),
+                  text: "exercise.info.home".t,
+                ),
+                Tab(
+                  icon: const Icon(GymTrackerIcons.history),
+                  text: "exercise.info.history".t,
+                ),
+                Tab(
+                  icon: const Icon(GymTrackerIcons.explanation),
+                  text: "exercise.info.explanation".t,
+                ),
+              ].take(tabs.length).toList(),
+              isScrollable: true,
+            ),
           ),
           body: ListTileTheme(
             contentPadding: EdgeInsets.zero,
-            child: SafeArea(
-              child: CustomScrollView(
-                slivers: [
-                  if (exercise.isCustom)
-                    SliverPadding(
-                      padding: const EdgeInsets.all(16).copyWith(bottom: 8),
-                      sliver: const SliverToBoxAdapter(
-                        child: Row(
-                          children: [CustomExerciseBadge()],
-                        ),
-                      ),
-                    ),
-                  SliverPadding(
-                    padding: const EdgeInsets.all(16)
-                        .copyWith(top: exercise.isCustom ? 0 : 16),
-                    sliver: SliverToBoxAdapter(
-                      child: Text(
-                        exercise.displayName,
-                        style: Theme.of(context).textTheme.displayMedium,
-                      ),
-                    ),
-                  ),
-                  if (chartHistory.isNotEmpty &&
-                      ExerciseHistoryChart.shouldShow(chartHistory))
-                    SliverPadding(
-                      padding: const EdgeInsets.all(16),
-                      sliver: SliverToBoxAdapter(
-                        child: ExerciseHistoryChart(
-                          key: ValueKey(chartHistory.length),
-                          children: chartHistory,
-                        ),
-                      ),
-                    ),
-                  if (history.isNotEmpty && infoTiles.length > 1)
-                    SliverList(
-                      delegate: SliverChildListDelegate(infoTiles),
-                    ),
-                  SliverList.builder(
-                    itemCount: history.length,
-                    itemBuilder: (context, index) {
-                      return Card(
-                        margin: const EdgeInsets.symmetric(
-                            vertical: 8, horizontal: 16),
-                        clipBehavior: Clip.antiAlias,
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 8)
-                              .copyWith(bottom: 16),
-                          child: Column(
-                            children: [
-                              ExerciseDataView(
-                                exercise: history[index].$1,
-                                index: history[index].$2,
-                                workout: history[index].$3,
-                                isInSuperset: false,
-                                highlight: false,
-                                weightUnit: history[index].$3.weightUnit,
-                                distanceUnit: history[index].$3.distanceUnit,
-                              ),
-                              const Divider(),
-                              Padding(
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 16),
-                                child: Column(
-                                  children: [
-                                    TerseWorkoutListTile(
-                                      workout: history[index].$3,
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              OutlinedButton(
-                                onPressed: () {
-                                  Go.to(
-                                    () => ExercisesView(
-                                        workout: history[index].$3),
-                                  );
-                                },
-                                child: Text("exercise.info.viewWorkout".t),
-                              )
-                            ],
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-                  if (history.isEmpty) ...[
-                    SliverToBoxAdapter(
-                      child: Padding(
-                        padding: const EdgeInsets.all(16),
-                        child: Text("exercise.info.noHistory".t),
-                      ),
-                    ),
-                  ],
-                  const SliverToBoxAdapter(
-                    child: SizedBox(height: 8),
-                  ),
-                  if (kDebugMode)
-                    SliverToBoxAdapter(
-                      child: Text(
-                        "id: ${widget.exercise.id}",
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
-                ],
-              ),
+            child: TabBarView(
+              controller: tabController,
+              children: tabs,
             ),
           ),
         );
       },
+    );
+  }
+
+  Widget _homeBody(Exercise exercise, List<(Workout, Exercise)> chartHistory,
+      List<(Exercise, int, Workout)> history, List<ListTileTheme> infoTiles) {
+    return CustomScrollView(
+      slivers: [
+        if (exercise.isCustom)
+          SliverPadding(
+            padding: const EdgeInsets.all(16).copyWith(bottom: 8),
+            sliver: const SliverToBoxAdapter(
+              child: Row(
+                children: [CustomExerciseBadge()],
+              ),
+            ),
+          ),
+        SliverPadding(
+          padding: const EdgeInsets.all(16)
+              .copyWith(top: exercise.isCustom ? 0 : 16),
+          sliver: SliverToBoxAdapter(
+            child: Text(
+              exercise.displayName,
+              style: Theme.of(context).textTheme.displayMedium,
+            ),
+          ),
+        ),
+        if (history.isEmpty) ...[
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Text("exercise.info.noHistory".t),
+            ),
+          ),
+        ],
+        if (chartHistory.isNotEmpty &&
+            ExerciseHistoryChart.shouldShow(chartHistory))
+          SliverPadding(
+            padding: const EdgeInsets.all(16),
+            sliver: SliverToBoxAdapter(
+              child: ExerciseHistoryChart(
+                key: ValueKey(chartHistory.length),
+                children: chartHistory,
+              ),
+            ),
+          ),
+        if (history.isNotEmpty && infoTiles.length > 1)
+          SliverList(
+            delegate: SliverChildListDelegate(infoTiles),
+          ),
+        if (kDebugMode) ...[
+          const SliverToBoxAdapter(
+            child: SizedBox(height: 8),
+          ),
+          SliverToBoxAdapter(
+            child: Text(
+              "id: ${widget.exercise.id}",
+              textAlign: TextAlign.center,
+            ),
+          ),
+        ],
+        const SliverToBoxAdapter(
+          child: SizedBox(height: 8),
+        ),
+        SliverPadding(
+          padding: MediaQuery.of(context).padding.copyWith(
+                top: 0,
+                left: 0,
+                right: 0,
+              ),
+          sliver: const SliverToBoxAdapter(
+            child: SizedBox.shrink(),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _historyBody(Exercise exercise, List<(Workout, Exercise)> chartHistory,
+      List<(Exercise, int, Workout)> history) {
+    return CustomScrollView(
+      slivers: [
+        SliverList.builder(
+          itemCount: history.length,
+          itemBuilder: (context, index) {
+            return Card(
+              margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+              clipBehavior: Clip.antiAlias,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8)
+                    .copyWith(bottom: 16),
+                child: Column(
+                  children: [
+                    ExerciseDataView(
+                      exercise: history[index].$1,
+                      index: history[index].$2,
+                      workout: history[index].$3,
+                      isInSuperset: false,
+                      highlight: false,
+                      weightUnit: history[index].$3.weightUnit,
+                      distanceUnit: history[index].$3.distanceUnit,
+                    ),
+                    const Divider(),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: Column(
+                        children: [
+                          TerseWorkoutListTile(
+                            workout: history[index].$3,
+                          ),
+                        ],
+                      ),
+                    ),
+                    OutlinedButton(
+                      onPressed: () {
+                        Go.to(
+                          () => ExercisesView(workout: history[index].$3),
+                        );
+                      },
+                      child: Text("exercise.info.viewWorkout".t),
+                    )
+                  ],
+                ),
+              ),
+            );
+          },
+        ),
+        if (history.isEmpty) ...[
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Text("exercise.info.noHistory".t),
+            ),
+          ),
+        ],
+        const SliverToBoxAdapter(
+          child: SizedBox(height: 8),
+        ),
+        SliverPadding(
+          padding: MediaQuery.of(context).padding.copyWith(
+                top: 0,
+                left: 0,
+                right: 0,
+              ),
+          sliver: const SliverToBoxAdapter(
+            child: SizedBox.shrink(),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _explanationBody(Exercise exercise) {
+    return CustomScrollView(
+      slivers: [
+        SliverPadding(
+          padding: const EdgeInsets.all(16),
+          sliver: SliverToBoxAdapter(
+            child: MarkdownBody(data: exercise.exerciseExplanation!),
+          ),
+        ),
+        SliverPadding(
+          padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+          sliver: SliverToBoxAdapter(
+            child: Text(
+              "exercise.info.explanationDisclaimer".t,
+              style: context.theme.textTheme.labelSmall,
+            ),
+          ),
+        ),
+        SliverPadding(
+          padding: MediaQuery.of(context).padding.copyWith(
+                top: 0,
+                left: 0,
+                right: 0,
+              ),
+          sliver: const SliverToBoxAdapter(
+            child: SizedBox.shrink(),
+          ),
+        ),
+      ],
     );
   }
 

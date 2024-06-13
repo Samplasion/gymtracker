@@ -4,17 +4,24 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:gymtracker/controller/debug_controller.dart';
+import 'package:gymtracker/data/exercises.dart';
+import 'package:gymtracker/model/exercise.dart';
 import 'package:gymtracker/service/logger.dart';
 import 'package:intl/intl.dart';
 
 class GTLocalizations extends Translations with ChangeNotifier {
   @override
   final Map<String, Map<String, String>> keys = {};
+  final Map<String, Map<String, String>> exerciseExplanations = {};
 
   static final List<Locale> supportedLocales = [
     const Locale("en"),
     const Locale("it"),
   ];
+
+  static GTLocalizations of(BuildContext context) {
+    return Localizations.of<GTLocalizations>(context, GTLocalizations)!;
+  }
 
   Map<String, String> flattenTranslations(Map<String, dynamic> json,
       [String prefix = '']) {
@@ -44,6 +51,37 @@ class GTLocalizations extends Translations with ChangeNotifier {
     Get.translations.clear();
     Get.addTranslations(keys);
     notifyListeners();
+
+    for (final locale in supportedLocales) {
+      await loadExercises(locale);
+    }
+  }
+
+  loadExercises(Locale locale) async {
+    exerciseExplanations.putIfAbsent(locale.languageCode, () => {});
+
+    final exercises = exerciseStandardLibrary.values
+        .map((category) {
+          return category.exercises.map((exercise) {
+            final [_, category, _, id] = exercise.id.split(".");
+            return (exercise.id, category, id);
+          }).toList();
+        })
+        .expand((element) => element)
+        .toList();
+
+    for (final (fullID, category, id) in exercises) {
+      try {
+        final bundle = await rootBundle.loadString(
+            'assets/exercises/${locale.languageCode}/$category/$id.md',
+            cache: false);
+        exerciseExplanations[locale.languageCode]![fullID] = bundle;
+      } catch (e) {
+        logger.w(
+            "[${locale.languageCode}] Failed to load explanation for $fullID");
+        continue;
+      }
+    }
   }
 
   @visibleForTesting
@@ -72,14 +110,19 @@ class GTLocalizations extends Translations with ChangeNotifier {
     final loc = MaterialLocalizations.of(context).firstDayOfWeekIndex;
     return loc == 0 ? 7 : loc;
   }
+
+  Map<String, String> _getAllExerciseExplanationsForLocale(String locale) {
+    return exerciseExplanations[locale] ?? {};
+  }
 }
 
-DebugController get _debugController => Get.find<DebugController>();
+DebugController? get _debugController =>
+    Get.isRegistered<DebugController>() ? Get.find<DebugController>() : null;
 
 extension Fallback on String {
   String get t {
     if (tr == this) {
-      _debugController.addMissingKey(this);
+      _debugController?.addMissingKey(this);
       return this;
     }
     return tr;
@@ -130,4 +173,27 @@ extension Plural on String {
 
 extension ContextLocale on BuildContext {
   Locale get locale => Localizations.localeOf(this);
+}
+
+extension ExerciseExplanation on Exercise {
+  String? get exerciseExplanation {
+    assert(standard);
+
+    final locale = Get.locale!.languageCode;
+    final loc = Get.find<GTLocalizations>();
+    final explanation = loc._getAllExerciseExplanationsForLocale(locale)[id];
+    if (explanation == null) {
+      loc.logger
+          .w("No explanation found for $id in $locale. Falling back to en");
+
+      final fallback = loc._getAllExerciseExplanationsForLocale("en")[id];
+      if (fallback == null) {
+        loc.logger.e("No explanation found for $id in en either");
+        return null;
+      }
+
+      return fallback;
+    }
+    return explanation;
+  }
 }

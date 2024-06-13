@@ -53,6 +53,7 @@ dependencies:
 
   drift_dev: any
   permission_handler: ^11.3.1
+  flutter_markdown: ^0.7.2
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -77,3 +78,29 @@ flutter:
   assets:
     - assets/i18n/en.json
     - assets/i18n/it.json
+    #tool begin exercise-explainations
+    - assets/exercises/en/triceps/
+    - assets/exercises/en/forearms/
+    - assets/exercises/en/chest/
+    - assets/exercises/en/hamstrings/
+    - assets/exercises/en/back/
+    - assets/exercises/en/shoulders/
+    - assets/exercises/en/hips/
+    - assets/exercises/en/cardio/
+    - assets/exercises/en/abs/
+    - assets/exercises/en/quadriceps/
+    - assets/exercises/en/calves/
+    - assets/exercises/en/biceps/
+    - assets/exercises/it/triceps/
+    - assets/exercises/it/forearms/
+    - assets/exercises/it/chest/
+    - assets/exercises/it/hamstrings/
+    - assets/exercises/it/back/
+    - assets/exercises/it/shoulders/
+    - assets/exercises/it/hips/
+    - assets/exercises/it/cardio/
+    - assets/exercises/it/abs/
+    - assets/exercises/it/quadriceps/
+    - assets/exercises/it/calves/
+    - assets/exercises/it/biceps/
+    #tool end exercise-explainations

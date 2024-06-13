@@ -141,11 +141,11 @@ GTSet _$GTSetFromJson(Map<String, dynamic> json) => GTSet(
       id: json['id'] as String?,
       kind: $enumDecode(_$GTSetKindEnumMap, json['kind']),
       parameters: $enumDecode(_$GTSetParametersEnumMap, json['parameters']),
-      reps: json['reps'] as int?,
+      reps: (json['reps'] as num?)?.toInt(),
       weight: (json['weight'] as num?)?.toDouble(),
       time: json['time'] == null
           ? null
-          : Duration(microseconds: json['time'] as int),
+          : Duration(microseconds: (json['time'] as num).toInt()),
       distance: (json['distance'] as num?)?.toDouble(),
       done: json['done'] as bool? ?? false,
     );

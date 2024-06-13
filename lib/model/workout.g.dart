@@ -193,7 +193,7 @@ Workout _$WorkoutFromJson(Map<String, dynamic> json) => Workout(
           .toList(),
       duration: json['duration'] == null
           ? null
-          : Duration(microseconds: json['duration'] as int),
+          : Duration(microseconds: (json['duration'] as num).toInt()),
       startingDate: json['startingDate'] == null
           ? null
           : DateTime.parse(json['startingDate'] as String),

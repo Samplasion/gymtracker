@@ -3076,6 +3076,7 @@ class WeightMeasurementsCompanion extends UpdateCompanion<WeightMeasurement> {
 
 abstract class _$GTDatabase extends GeneratedDatabase {
   _$GTDatabase(QueryExecutor e) : super(e);
+  _$GTDatabaseManager get managers => _$GTDatabaseManager(this);
   late final $CustomExercisesTable customExercises =
       $CustomExercisesTable(this);
   late final $RoutineFoldersTable routineFolders = $RoutineFoldersTable(this);
@@ -3105,4 +3106,934 @@ abstract class _$GTDatabase extends GeneratedDatabase {
         ongoingData,
         weightMeasurements
       ];
+}
+
+typedef $$CustomExercisesTableInsertCompanionBuilder = CustomExercisesCompanion
+    Function({
+  Value<String> id,
+  required String name,
+  required GTSetParameters parameters,
+  required GTMuscleGroup primaryMuscleGroup,
+  required Set<GTMuscleGroup> secondaryMuscleGroups,
+  Value<int> rowid,
+});
+typedef $$CustomExercisesTableUpdateCompanionBuilder = CustomExercisesCompanion
+    Function({
+  Value<String> id,
+  Value<String> name,
+  Value<GTSetParameters> parameters,
+  Value<GTMuscleGroup> primaryMuscleGroup,
+  Value<Set<GTMuscleGroup>> secondaryMuscleGroups,
+  Value<int> rowid,
+});
+
+class $$CustomExercisesTableTableManager extends RootTableManager<
+    _$GTDatabase,
+    $CustomExercisesTable,
+    CustomExercise,
+    $$CustomExercisesTableFilterComposer,
+    $$CustomExercisesTableOrderingComposer,
+    $$CustomExercisesTableProcessedTableManager,
+    $$CustomExercisesTableInsertCompanionBuilder,
+    $$CustomExercisesTableUpdateCompanionBuilder> {
+  $$CustomExercisesTableTableManager(
+      _$GTDatabase db, $CustomExercisesTable table)
+      : super(TableManagerState(
+          db: db,
+          table: table,
+          filteringComposer:
+              $$CustomExercisesTableFilterComposer(ComposerState(db, table)),
+          orderingComposer:
+              $$CustomExercisesTableOrderingComposer(ComposerState(db, table)),
+          getChildManagerBuilder: (p) =>
+              $$CustomExercisesTableProcessedTableManager(p),
+          getUpdateCompanionBuilder: ({
+            Value<String> id = const Value.absent(),
+            Value<String> name = const Value.absent(),
+            Value<GTSetParameters> parameters = const Value.absent(),
+            Value<GTMuscleGroup> primaryMuscleGroup = const Value.absent(),
+            Value<Set<GTMuscleGroup>> secondaryMuscleGroups =
+                const Value.absent(),
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              CustomExercisesCompanion(
+            id: id,
+            name: name,
+            parameters: parameters,
+            primaryMuscleGroup: primaryMuscleGroup,
+            secondaryMuscleGroups: secondaryMuscleGroups,
+            rowid: rowid,
+          ),
+          getInsertCompanionBuilder: ({
+            Value<String> id = const Value.absent(),
+            required String name,
+            required GTSetParameters parameters,
+            required GTMuscleGroup primaryMuscleGroup,
+            required Set<GTMuscleGroup> secondaryMuscleGroups,
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              CustomExercisesCompanion.insert(
+            id: id,
+            name: name,
+            parameters: parameters,
+            primaryMuscleGroup: primaryMuscleGroup,
+            secondaryMuscleGroups: secondaryMuscleGroups,
+            rowid: rowid,
+          ),
+        ));
+}
+
+class $$CustomExercisesTableProcessedTableManager extends ProcessedTableManager<
+    _$GTDatabase,
+    $CustomExercisesTable,
+    CustomExercise,
+    $$CustomExercisesTableFilterComposer,
+    $$CustomExercisesTableOrderingComposer,
+    $$CustomExercisesTableProcessedTableManager,
+    $$CustomExercisesTableInsertCompanionBuilder,
+    $$CustomExercisesTableUpdateCompanionBuilder> {
+  $$CustomExercisesTableProcessedTableManager(super.$state);
+}
+
+class $$CustomExercisesTableFilterComposer
+    extends FilterComposer<_$GTDatabase, $CustomExercisesTable> {
+  $$CustomExercisesTableFilterComposer(super.$state);
+  ColumnFilters<String> get id => $state.composableBuilder(
+      column: $state.table.id,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+
+  ColumnFilters<String> get name => $state.composableBuilder(
+      column: $state.table.name,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+
+  ColumnWithTypeConverterFilters<GTSetParameters, GTSetParameters, String>
+      get parameters => $state.composableBuilder(
+          column: $state.table.parameters,
+          builder: (column, joinBuilders) => ColumnWithTypeConverterFilters(
+              column,
+              joinBuilders: joinBuilders));
+
+  ColumnWithTypeConverterFilters<GTMuscleGroup, GTMuscleGroup, String>
+      get primaryMuscleGroup => $state.composableBuilder(
+          column: $state.table.primaryMuscleGroup,
+          builder: (column, joinBuilders) => ColumnWithTypeConverterFilters(
+              column,
+              joinBuilders: joinBuilders));
+
+  ColumnWithTypeConverterFilters<Set<GTMuscleGroup>, Set<GTMuscleGroup>, String>
+      get secondaryMuscleGroups => $state.composableBuilder(
+          column: $state.table.secondaryMuscleGroups,
+          builder: (column, joinBuilders) => ColumnWithTypeConverterFilters(
+              column,
+              joinBuilders: joinBuilders));
+}
+
+class $$CustomExercisesTableOrderingComposer
+    extends OrderingComposer<_$GTDatabase, $CustomExercisesTable> {
+  $$CustomExercisesTableOrderingComposer(super.$state);
+  ColumnOrderings<String> get id => $state.composableBuilder(
+      column: $state.table.id,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  ColumnOrderings<String> get name => $state.composableBuilder(
+      column: $state.table.name,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  ColumnOrderings<String> get parameters => $state.composableBuilder(
+      column: $state.table.parameters,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  ColumnOrderings<String> get primaryMuscleGroup => $state.composableBuilder(
+      column: $state.table.primaryMuscleGroup,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  ColumnOrderings<String> get secondaryMuscleGroups => $state.composableBuilder(
+      column: $state.table.secondaryMuscleGroups,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+}
+
+typedef $$RoutineFoldersTableInsertCompanionBuilder = RoutineFoldersCompanion
+    Function({
+  Value<String> id,
+  required String name,
+  required int sortOrder,
+  Value<int> rowid,
+});
+typedef $$RoutineFoldersTableUpdateCompanionBuilder = RoutineFoldersCompanion
+    Function({
+  Value<String> id,
+  Value<String> name,
+  Value<int> sortOrder,
+  Value<int> rowid,
+});
+
+class $$RoutineFoldersTableTableManager extends RootTableManager<
+    _$GTDatabase,
+    $RoutineFoldersTable,
+    RoutineFolder,
+    $$RoutineFoldersTableFilterComposer,
+    $$RoutineFoldersTableOrderingComposer,
+    $$RoutineFoldersTableProcessedTableManager,
+    $$RoutineFoldersTableInsertCompanionBuilder,
+    $$RoutineFoldersTableUpdateCompanionBuilder> {
+  $$RoutineFoldersTableTableManager(_$GTDatabase db, $RoutineFoldersTable table)
+      : super(TableManagerState(
+          db: db,
+          table: table,
+          filteringComposer:
+              $$RoutineFoldersTableFilterComposer(ComposerState(db, table)),
+          orderingComposer:
+              $$RoutineFoldersTableOrderingComposer(ComposerState(db, table)),
+          getChildManagerBuilder: (p) =>
+              $$RoutineFoldersTableProcessedTableManager(p),
+          getUpdateCompanionBuilder: ({
+            Value<String> id = const Value.absent(),
+            Value<String> name = const Value.absent(),
+            Value<int> sortOrder = const Value.absent(),
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              RoutineFoldersCompanion(
+            id: id,
+            name: name,
+            sortOrder: sortOrder,
+            rowid: rowid,
+          ),
+          getInsertCompanionBuilder: ({
+            Value<String> id = const Value.absent(),
+            required String name,
+            required int sortOrder,
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              RoutineFoldersCompanion.insert(
+            id: id,
+            name: name,
+            sortOrder: sortOrder,
+            rowid: rowid,
+          ),
+        ));
+}
+
+class $$RoutineFoldersTableProcessedTableManager extends ProcessedTableManager<
+    _$GTDatabase,
+    $RoutineFoldersTable,
+    RoutineFolder,
+    $$RoutineFoldersTableFilterComposer,
+    $$RoutineFoldersTableOrderingComposer,
+    $$RoutineFoldersTableProcessedTableManager,
+    $$RoutineFoldersTableInsertCompanionBuilder,
+    $$RoutineFoldersTableUpdateCompanionBuilder> {
+  $$RoutineFoldersTableProcessedTableManager(super.$state);
+}
+
+class $$RoutineFoldersTableFilterComposer
+    extends FilterComposer<_$GTDatabase, $RoutineFoldersTable> {
+  $$RoutineFoldersTableFilterComposer(super.$state);
+  ColumnFilters<String> get id => $state.composableBuilder(
+      column: $state.table.id,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+
+  ColumnFilters<String> get name => $state.composableBuilder(
+      column: $state.table.name,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+
+  ColumnFilters<int> get sortOrder => $state.composableBuilder(
+      column: $state.table.sortOrder,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+
+  ComposableFilter routinesRefs(
+      ComposableFilter Function($$RoutinesTableFilterComposer f) f) {
+    final $$RoutinesTableFilterComposer composer = $state.composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.id,
+        referencedTable: $state.db.routines,
+        getReferencedColumn: (t) => t.folderId,
+        builder: (joinBuilder, parentComposers) =>
+            $$RoutinesTableFilterComposer(ComposerState(
+                $state.db, $state.db.routines, joinBuilder, parentComposers)));
+    return f(composer);
+  }
+}
+
+class $$RoutineFoldersTableOrderingComposer
+    extends OrderingComposer<_$GTDatabase, $RoutineFoldersTable> {
+  $$RoutineFoldersTableOrderingComposer(super.$state);
+  ColumnOrderings<String> get id => $state.composableBuilder(
+      column: $state.table.id,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  ColumnOrderings<String> get name => $state.composableBuilder(
+      column: $state.table.name,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  ColumnOrderings<int> get sortOrder => $state.composableBuilder(
+      column: $state.table.sortOrder,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+}
+
+typedef $$RoutinesTableInsertCompanionBuilder = RoutinesCompanion Function({
+  Value<String> id,
+  required String name,
+  required String infobox,
+  required Weights weightUnit,
+  required Distance distanceUnit,
+  required int sortOrder,
+  Value<String?> folderId,
+  Value<int> rowid,
+});
+typedef $$RoutinesTableUpdateCompanionBuilder = RoutinesCompanion Function({
+  Value<String> id,
+  Value<String> name,
+  Value<String> infobox,
+  Value<Weights> weightUnit,
+  Value<Distance> distanceUnit,
+  Value<int> sortOrder,
+  Value<String?> folderId,
+  Value<int> rowid,
+});
+
+class $$RoutinesTableTableManager extends RootTableManager<
+    _$GTDatabase,
+    $RoutinesTable,
+    Routine,
+    $$RoutinesTableFilterComposer,
+    $$RoutinesTableOrderingComposer,
+    $$RoutinesTableProcessedTableManager,
+    $$RoutinesTableInsertCompanionBuilder,
+    $$RoutinesTableUpdateCompanionBuilder> {
+  $$RoutinesTableTableManager(_$GTDatabase db, $RoutinesTable table)
+      : super(TableManagerState(
+          db: db,
+          table: table,
+          filteringComposer:
+              $$RoutinesTableFilterComposer(ComposerState(db, table)),
+          orderingComposer:
+              $$RoutinesTableOrderingComposer(ComposerState(db, table)),
+          getChildManagerBuilder: (p) =>
+              $$RoutinesTableProcessedTableManager(p),
+          getUpdateCompanionBuilder: ({
+            Value<String> id = const Value.absent(),
+            Value<String> name = const Value.absent(),
+            Value<String> infobox = const Value.absent(),
+            Value<Weights> weightUnit = const Value.absent(),
+            Value<Distance> distanceUnit = const Value.absent(),
+            Value<int> sortOrder = const Value.absent(),
+            Value<String?> folderId = const Value.absent(),
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              RoutinesCompanion(
+            id: id,
+            name: name,
+            infobox: infobox,
+            weightUnit: weightUnit,
+            distanceUnit: distanceUnit,
+            sortOrder: sortOrder,
+            folderId: folderId,
+            rowid: rowid,
+          ),
+          getInsertCompanionBuilder: ({
+            Value<String> id = const Value.absent(),
+            required String name,
+            required String infobox,
+            required Weights weightUnit,
+            required Distance distanceUnit,
+            required int sortOrder,
+            Value<String?> folderId = const Value.absent(),
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              RoutinesCompanion.insert(
+            id: id,
+            name: name,
+            infobox: infobox,
+            weightUnit: weightUnit,
+            distanceUnit: distanceUnit,
+            sortOrder: sortOrder,
+            folderId: folderId,
+            rowid: rowid,
+          ),
+        ));
+}
+
+class $$RoutinesTableProcessedTableManager extends ProcessedTableManager<
+    _$GTDatabase,
+    $RoutinesTable,
+    Routine,
+    $$RoutinesTableFilterComposer,
+    $$RoutinesTableOrderingComposer,
+    $$RoutinesTableProcessedTableManager,
+    $$RoutinesTableInsertCompanionBuilder,
+    $$RoutinesTableUpdateCompanionBuilder> {
+  $$RoutinesTableProcessedTableManager(super.$state);
+}
+
+class $$RoutinesTableFilterComposer
+    extends FilterComposer<_$GTDatabase, $RoutinesTable> {
+  $$RoutinesTableFilterComposer(super.$state);
+  ColumnFilters<String> get id => $state.composableBuilder(
+      column: $state.table.id,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+
+  ColumnFilters<String> get name => $state.composableBuilder(
+      column: $state.table.name,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+
+  ColumnFilters<String> get infobox => $state.composableBuilder(
+      column: $state.table.infobox,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+
+  ColumnWithTypeConverterFilters<Weights, Weights, String> get weightUnit =>
+      $state.composableBuilder(
+          column: $state.table.weightUnit,
+          builder: (column, joinBuilders) => ColumnWithTypeConverterFilters(
+              column,
+              joinBuilders: joinBuilders));
+
+  ColumnWithTypeConverterFilters<Distance, Distance, String> get distanceUnit =>
+      $state.composableBuilder(
+          column: $state.table.distanceUnit,
+          builder: (column, joinBuilders) => ColumnWithTypeConverterFilters(
+              column,
+              joinBuilders: joinBuilders));
+
+  ColumnFilters<int> get sortOrder => $state.composableBuilder(
+      column: $state.table.sortOrder,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+
+  $$RoutineFoldersTableFilterComposer get folderId {
+    final $$RoutineFoldersTableFilterComposer composer = $state.composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.folderId,
+        referencedTable: $state.db.routineFolders,
+        getReferencedColumn: (t) => t.id,
+        builder: (joinBuilder, parentComposers) =>
+            $$RoutineFoldersTableFilterComposer(ComposerState($state.db,
+                $state.db.routineFolders, joinBuilder, parentComposers)));
+    return composer;
+  }
+
+  ComposableFilter historyWorkoutsRefs(
+      ComposableFilter Function($$HistoryWorkoutsTableFilterComposer f) f) {
+    final $$HistoryWorkoutsTableFilterComposer composer =
+        $state.composerBuilder(
+            composer: this,
+            getCurrentColumn: (t) => t.id,
+            referencedTable: $state.db.historyWorkouts,
+            getReferencedColumn: (t) => t.parentId,
+            builder: (joinBuilder, parentComposers) =>
+                $$HistoryWorkoutsTableFilterComposer(ComposerState($state.db,
+                    $state.db.historyWorkouts, joinBuilder, parentComposers)));
+    return f(composer);
+  }
+}
+
+class $$RoutinesTableOrderingComposer
+    extends OrderingComposer<_$GTDatabase, $RoutinesTable> {
+  $$RoutinesTableOrderingComposer(super.$state);
+  ColumnOrderings<String> get id => $state.composableBuilder(
+      column: $state.table.id,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  ColumnOrderings<String> get name => $state.composableBuilder(
+      column: $state.table.name,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  ColumnOrderings<String> get infobox => $state.composableBuilder(
+      column: $state.table.infobox,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  ColumnOrderings<String> get weightUnit => $state.composableBuilder(
+      column: $state.table.weightUnit,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  ColumnOrderings<String> get distanceUnit => $state.composableBuilder(
+      column: $state.table.distanceUnit,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  ColumnOrderings<int> get sortOrder => $state.composableBuilder(
+      column: $state.table.sortOrder,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  $$RoutineFoldersTableOrderingComposer get folderId {
+    final $$RoutineFoldersTableOrderingComposer composer =
+        $state.composerBuilder(
+            composer: this,
+            getCurrentColumn: (t) => t.folderId,
+            referencedTable: $state.db.routineFolders,
+            getReferencedColumn: (t) => t.id,
+            builder: (joinBuilder, parentComposers) =>
+                $$RoutineFoldersTableOrderingComposer(ComposerState($state.db,
+                    $state.db.routineFolders, joinBuilder, parentComposers)));
+    return composer;
+  }
+}
+
+typedef $$HistoryWorkoutsTableInsertCompanionBuilder = HistoryWorkoutsCompanion
+    Function({
+  Value<String> id,
+  required String name,
+  Value<String?> infobox,
+  required int duration,
+  required DateTime startingDate,
+  Value<String?> parentId,
+  Value<String?> completedBy,
+  Value<String?> completes,
+  required Weights weightUnit,
+  required Distance distanceUnit,
+  Value<int> rowid,
+});
+typedef $$HistoryWorkoutsTableUpdateCompanionBuilder = HistoryWorkoutsCompanion
+    Function({
+  Value<String> id,
+  Value<String> name,
+  Value<String?> infobox,
+  Value<int> duration,
+  Value<DateTime> startingDate,
+  Value<String?> parentId,
+  Value<String?> completedBy,
+  Value<String?> completes,
+  Value<Weights> weightUnit,
+  Value<Distance> distanceUnit,
+  Value<int> rowid,
+});
+
+class $$HistoryWorkoutsTableTableManager extends RootTableManager<
+    _$GTDatabase,
+    $HistoryWorkoutsTable,
+    HistoryWorkout,
+    $$HistoryWorkoutsTableFilterComposer,
+    $$HistoryWorkoutsTableOrderingComposer,
+    $$HistoryWorkoutsTableProcessedTableManager,
+    $$HistoryWorkoutsTableInsertCompanionBuilder,
+    $$HistoryWorkoutsTableUpdateCompanionBuilder> {
+  $$HistoryWorkoutsTableTableManager(
+      _$GTDatabase db, $HistoryWorkoutsTable table)
+      : super(TableManagerState(
+          db: db,
+          table: table,
+          filteringComposer:
+              $$HistoryWorkoutsTableFilterComposer(ComposerState(db, table)),
+          orderingComposer:
+              $$HistoryWorkoutsTableOrderingComposer(ComposerState(db, table)),
+          getChildManagerBuilder: (p) =>
+              $$HistoryWorkoutsTableProcessedTableManager(p),
+          getUpdateCompanionBuilder: ({
+            Value<String> id = const Value.absent(),
+            Value<String> name = const Value.absent(),
+            Value<String?> infobox = const Value.absent(),
+            Value<int> duration = const Value.absent(),
+            Value<DateTime> startingDate = const Value.absent(),
+            Value<String?> parentId = const Value.absent(),
+            Value<String?> completedBy = const Value.absent(),
+            Value<String?> completes = const Value.absent(),
+            Value<Weights> weightUnit = const Value.absent(),
+            Value<Distance> distanceUnit = const Value.absent(),
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              HistoryWorkoutsCompanion(
+            id: id,
+            name: name,
+            infobox: infobox,
+            duration: duration,
+            startingDate: startingDate,
+            parentId: parentId,
+            completedBy: completedBy,
+            completes: completes,
+            weightUnit: weightUnit,
+            distanceUnit: distanceUnit,
+            rowid: rowid,
+          ),
+          getInsertCompanionBuilder: ({
+            Value<String> id = const Value.absent(),
+            required String name,
+            Value<String?> infobox = const Value.absent(),
+            required int duration,
+            required DateTime startingDate,
+            Value<String?> parentId = const Value.absent(),
+            Value<String?> completedBy = const Value.absent(),
+            Value<String?> completes = const Value.absent(),
+            required Weights weightUnit,
+            required Distance distanceUnit,
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              HistoryWorkoutsCompanion.insert(
+            id: id,
+            name: name,
+            infobox: infobox,
+            duration: duration,
+            startingDate: startingDate,
+            parentId: parentId,
+            completedBy: completedBy,
+            completes: completes,
+            weightUnit: weightUnit,
+            distanceUnit: distanceUnit,
+            rowid: rowid,
+          ),
+        ));
+}
+
+class $$HistoryWorkoutsTableProcessedTableManager extends ProcessedTableManager<
+    _$GTDatabase,
+    $HistoryWorkoutsTable,
+    HistoryWorkout,
+    $$HistoryWorkoutsTableFilterComposer,
+    $$HistoryWorkoutsTableOrderingComposer,
+    $$HistoryWorkoutsTableProcessedTableManager,
+    $$HistoryWorkoutsTableInsertCompanionBuilder,
+    $$HistoryWorkoutsTableUpdateCompanionBuilder> {
+  $$HistoryWorkoutsTableProcessedTableManager(super.$state);
+}
+
+class $$HistoryWorkoutsTableFilterComposer
+    extends FilterComposer<_$GTDatabase, $HistoryWorkoutsTable> {
+  $$HistoryWorkoutsTableFilterComposer(super.$state);
+  ColumnFilters<String> get id => $state.composableBuilder(
+      column: $state.table.id,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+
+  ColumnFilters<String> get name => $state.composableBuilder(
+      column: $state.table.name,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+
+  ColumnFilters<String> get infobox => $state.composableBuilder(
+      column: $state.table.infobox,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+
+  ColumnFilters<int> get duration => $state.composableBuilder(
+      column: $state.table.duration,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+
+  ColumnFilters<DateTime> get startingDate => $state.composableBuilder(
+      column: $state.table.startingDate,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+
+  ColumnWithTypeConverterFilters<Weights, Weights, String> get weightUnit =>
+      $state.composableBuilder(
+          column: $state.table.weightUnit,
+          builder: (column, joinBuilders) => ColumnWithTypeConverterFilters(
+              column,
+              joinBuilders: joinBuilders));
+
+  ColumnWithTypeConverterFilters<Distance, Distance, String> get distanceUnit =>
+      $state.composableBuilder(
+          column: $state.table.distanceUnit,
+          builder: (column, joinBuilders) => ColumnWithTypeConverterFilters(
+              column,
+              joinBuilders: joinBuilders));
+
+  $$RoutinesTableFilterComposer get parentId {
+    final $$RoutinesTableFilterComposer composer = $state.composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.parentId,
+        referencedTable: $state.db.routines,
+        getReferencedColumn: (t) => t.id,
+        builder: (joinBuilder, parentComposers) =>
+            $$RoutinesTableFilterComposer(ComposerState(
+                $state.db, $state.db.routines, joinBuilder, parentComposers)));
+    return composer;
+  }
+
+  $$HistoryWorkoutsTableFilterComposer get completedBy {
+    final $$HistoryWorkoutsTableFilterComposer composer =
+        $state.composerBuilder(
+            composer: this,
+            getCurrentColumn: (t) => t.completedBy,
+            referencedTable: $state.db.historyWorkouts,
+            getReferencedColumn: (t) => t.id,
+            builder: (joinBuilder, parentComposers) =>
+                $$HistoryWorkoutsTableFilterComposer(ComposerState($state.db,
+                    $state.db.historyWorkouts, joinBuilder, parentComposers)));
+    return composer;
+  }
+
+  $$HistoryWorkoutsTableFilterComposer get completes {
+    final $$HistoryWorkoutsTableFilterComposer composer =
+        $state.composerBuilder(
+            composer: this,
+            getCurrentColumn: (t) => t.completes,
+            referencedTable: $state.db.historyWorkouts,
+            getReferencedColumn: (t) => t.id,
+            builder: (joinBuilder, parentComposers) =>
+                $$HistoryWorkoutsTableFilterComposer(ComposerState($state.db,
+                    $state.db.historyWorkouts, joinBuilder, parentComposers)));
+    return composer;
+  }
+}
+
+class $$HistoryWorkoutsTableOrderingComposer
+    extends OrderingComposer<_$GTDatabase, $HistoryWorkoutsTable> {
+  $$HistoryWorkoutsTableOrderingComposer(super.$state);
+  ColumnOrderings<String> get id => $state.composableBuilder(
+      column: $state.table.id,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  ColumnOrderings<String> get name => $state.composableBuilder(
+      column: $state.table.name,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  ColumnOrderings<String> get infobox => $state.composableBuilder(
+      column: $state.table.infobox,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  ColumnOrderings<int> get duration => $state.composableBuilder(
+      column: $state.table.duration,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  ColumnOrderings<DateTime> get startingDate => $state.composableBuilder(
+      column: $state.table.startingDate,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  ColumnOrderings<String> get weightUnit => $state.composableBuilder(
+      column: $state.table.weightUnit,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  ColumnOrderings<String> get distanceUnit => $state.composableBuilder(
+      column: $state.table.distanceUnit,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  $$RoutinesTableOrderingComposer get parentId {
+    final $$RoutinesTableOrderingComposer composer = $state.composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.parentId,
+        referencedTable: $state.db.routines,
+        getReferencedColumn: (t) => t.id,
+        builder: (joinBuilder, parentComposers) =>
+            $$RoutinesTableOrderingComposer(ComposerState(
+                $state.db, $state.db.routines, joinBuilder, parentComposers)));
+    return composer;
+  }
+
+  $$HistoryWorkoutsTableOrderingComposer get completedBy {
+    final $$HistoryWorkoutsTableOrderingComposer composer =
+        $state.composerBuilder(
+            composer: this,
+            getCurrentColumn: (t) => t.completedBy,
+            referencedTable: $state.db.historyWorkouts,
+            getReferencedColumn: (t) => t.id,
+            builder: (joinBuilder, parentComposers) =>
+                $$HistoryWorkoutsTableOrderingComposer(ComposerState($state.db,
+                    $state.db.historyWorkouts, joinBuilder, parentComposers)));
+    return composer;
+  }
+
+  $$HistoryWorkoutsTableOrderingComposer get completes {
+    final $$HistoryWorkoutsTableOrderingComposer composer =
+        $state.composerBuilder(
+            composer: this,
+            getCurrentColumn: (t) => t.completes,
+            referencedTable: $state.db.historyWorkouts,
+            getReferencedColumn: (t) => t.id,
+            builder: (joinBuilder, parentComposers) =>
+                $$HistoryWorkoutsTableOrderingComposer(ComposerState($state.db,
+                    $state.db.historyWorkouts, joinBuilder, parentComposers)));
+    return composer;
+  }
+}
+
+typedef $$PreferencesTableInsertCompanionBuilder = PreferencesCompanion
+    Function({
+  required String data,
+  Value<int> rowid,
+});
+typedef $$PreferencesTableUpdateCompanionBuilder = PreferencesCompanion
+    Function({
+  Value<String> data,
+  Value<int> rowid,
+});
+
+class $$PreferencesTableTableManager extends RootTableManager<
+    _$GTDatabase,
+    $PreferencesTable,
+    Preference,
+    $$PreferencesTableFilterComposer,
+    $$PreferencesTableOrderingComposer,
+    $$PreferencesTableProcessedTableManager,
+    $$PreferencesTableInsertCompanionBuilder,
+    $$PreferencesTableUpdateCompanionBuilder> {
+  $$PreferencesTableTableManager(_$GTDatabase db, $PreferencesTable table)
+      : super(TableManagerState(
+          db: db,
+          table: table,
+          filteringComposer:
+              $$PreferencesTableFilterComposer(ComposerState(db, table)),
+          orderingComposer:
+              $$PreferencesTableOrderingComposer(ComposerState(db, table)),
+          getChildManagerBuilder: (p) =>
+              $$PreferencesTableProcessedTableManager(p),
+          getUpdateCompanionBuilder: ({
+            Value<String> data = const Value.absent(),
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              PreferencesCompanion(
+            data: data,
+            rowid: rowid,
+          ),
+          getInsertCompanionBuilder: ({
+            required String data,
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              PreferencesCompanion.insert(
+            data: data,
+            rowid: rowid,
+          ),
+        ));
+}
+
+class $$PreferencesTableProcessedTableManager extends ProcessedTableManager<
+    _$GTDatabase,
+    $PreferencesTable,
+    Preference,
+    $$PreferencesTableFilterComposer,
+    $$PreferencesTableOrderingComposer,
+    $$PreferencesTableProcessedTableManager,
+    $$PreferencesTableInsertCompanionBuilder,
+    $$PreferencesTableUpdateCompanionBuilder> {
+  $$PreferencesTableProcessedTableManager(super.$state);
+}
+
+class $$PreferencesTableFilterComposer
+    extends FilterComposer<_$GTDatabase, $PreferencesTable> {
+  $$PreferencesTableFilterComposer(super.$state);
+  ColumnFilters<String> get data => $state.composableBuilder(
+      column: $state.table.data,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+}
+
+class $$PreferencesTableOrderingComposer
+    extends OrderingComposer<_$GTDatabase, $PreferencesTable> {
+  $$PreferencesTableOrderingComposer(super.$state);
+  ColumnOrderings<String> get data => $state.composableBuilder(
+      column: $state.table.data,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+}
+
+typedef $$OngoingDataTableInsertCompanionBuilder = OngoingDataCompanion
+    Function({
+  required String data,
+  Value<int> rowid,
+});
+typedef $$OngoingDataTableUpdateCompanionBuilder = OngoingDataCompanion
+    Function({
+  Value<String> data,
+  Value<int> rowid,
+});
+
+class $$OngoingDataTableTableManager extends RootTableManager<
+    _$GTDatabase,
+    $OngoingDataTable,
+    OngoingDatum,
+    $$OngoingDataTableFilterComposer,
+    $$OngoingDataTableOrderingComposer,
+    $$OngoingDataTableProcessedTableManager,
+    $$OngoingDataTableInsertCompanionBuilder,
+    $$OngoingDataTableUpdateCompanionBuilder> {
+  $$OngoingDataTableTableManager(_$GTDatabase db, $OngoingDataTable table)
+      : super(TableManagerState(
+          db: db,
+          table: table,
+          filteringComposer:
+              $$OngoingDataTableFilterComposer(ComposerState(db, table)),
+          orderingComposer:
+              $$OngoingDataTableOrderingComposer(ComposerState(db, table)),
+          getChildManagerBuilder: (p) =>
+              $$OngoingDataTableProcessedTableManager(p),
+          getUpdateCompanionBuilder: ({
+            Value<String> data = const Value.absent(),
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              OngoingDataCompanion(
+            data: data,
+            rowid: rowid,
+          ),
+          getInsertCompanionBuilder: ({
+            required String data,
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              OngoingDataCompanion.insert(
+            data: data,
+            rowid: rowid,
+          ),
+        ));
+}
+
+class $$OngoingDataTableProcessedTableManager extends ProcessedTableManager<
+    _$GTDatabase,
+    $OngoingDataTable,
+    OngoingDatum,
+    $$OngoingDataTableFilterComposer,
+    $$OngoingDataTableOrderingComposer,
+    $$OngoingDataTableProcessedTableManager,
+    $$OngoingDataTableInsertCompanionBuilder,
+    $$OngoingDataTableUpdateCompanionBuilder> {
+  $$OngoingDataTableProcessedTableManager(super.$state);
+}
+
+class $$OngoingDataTableFilterComposer
+    extends FilterComposer<_$GTDatabase, $OngoingDataTable> {
+  $$OngoingDataTableFilterComposer(super.$state);
+  ColumnFilters<String> get data => $state.composableBuilder(
+      column: $state.table.data,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+}
+
+class $$OngoingDataTableOrderingComposer
+    extends OrderingComposer<_$GTDatabase, $OngoingDataTable> {
+  $$OngoingDataTableOrderingComposer(super.$state);
+  ColumnOrderings<String> get data => $state.composableBuilder(
+      column: $state.table.data,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+}
+
+class _$GTDatabaseManager {
+  final _$GTDatabase _db;
+  _$GTDatabaseManager(this._db);
+  $$CustomExercisesTableTableManager get customExercises =>
+      $$CustomExercisesTableTableManager(_db, _db.customExercises);
+  $$RoutineFoldersTableTableManager get routineFolders =>
+      $$RoutineFoldersTableTableManager(_db, _db.routineFolders);
+  $$RoutinesTableTableManager get routines =>
+      $$RoutinesTableTableManager(_db, _db.routines);
+  $$HistoryWorkoutsTableTableManager get historyWorkouts =>
+      $$HistoryWorkoutsTableTableManager(_db, _db.historyWorkouts);
+  $$PreferencesTableTableManager get preferences =>
+      $$PreferencesTableTableManager(_db, _db.preferences);
+  $$OngoingDataTableTableManager get ongoingData =>
+      $$OngoingDataTableTableManager(_db, _db.ongoingData);
 }

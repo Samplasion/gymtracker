@@ -120,7 +120,7 @@ Superset _$SupersetFromJson(Map<String, dynamic> json) => Superset(
       exercises: (json['exercises'] as List<dynamic>)
           .map((e) => Exercise.fromJson(e as Map<String, dynamic>))
           .toList(),
-      restTime: Duration(microseconds: json['restTime'] as int),
+      restTime: Duration(microseconds: (json['restTime'] as num).toInt()),
       notes: json['notes'] as String? ?? '',
       workoutID: json['workoutID'] as String?,
       supersedesID: json['supersedesID'] as String?,

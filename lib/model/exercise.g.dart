@@ -212,7 +212,7 @@ Exercise _$ExerciseFromJson(Map<String, dynamic> json) => Exercise.raw(
               ?.map((e) => $enumDecode(_$GTMuscleGroupEnumMap, e))
               .toSet() ??
           const <GTMuscleGroup>{},
-      restTime: Duration(microseconds: json['restTime'] as int),
+      restTime: Duration(microseconds: (json['restTime'] as num).toInt()),
       parentID: json['parentID'] as String?,
       notes: json['notes'] as String? ?? '',
       standard: json['standard'] as bool? ?? false,
@@ -268,4 +268,5 @@ const _$GTMuscleGroupEnumMap = {
   GTMuscleGroup.triceps: 'triceps',
   GTMuscleGroup.upperBack: 'upperBack',
   GTMuscleGroup.thighs: 'thighs',
+  GTMuscleGroup.forearms: 'forearms',
 };

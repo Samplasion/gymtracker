@@ -46,7 +46,8 @@ enum GTMuscleGroup {
   upperBack(GTMuscleCategory.back),
 
   // Added later: keep sorted by added date and don't rename
-  thighs(GTMuscleCategory.legs);
+  thighs(GTMuscleCategory.legs),
+  forearms(GTMuscleCategory.arms);
 
   const GTMuscleGroup([this.category]);
 

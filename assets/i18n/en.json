@@ -701,7 +701,10 @@
         "pilates": "Pilates",
         "running": "Running",
         "treadmill": "Treadmill",
-        "zumba": "Zumba"
+        "zumba": "Zumba",
+        "jumpRope": "Jump Rope",
+        "rowingMachine": "Rowing machine",
+        "bicycleCrunchesCardio": "Bicycle crunches (cardio)"
       }
     },
     "chest": {
@@ -723,7 +726,9 @@
         "verticalChestPress": "Vertical chest press",
         "cableFlyCrossovers": "Cable fly cross-overs",
         "pushUps": "Push-ups",
-        "pushUpsWeighted": "Push-ups (weighted)"
+        "pushUpsWeighted": "Push-ups (weighted)",
+        "cableChestPress": "Cable chest press",
+        "declinePushUps": "Decline push-ups"
       }
     },
     "biceps": {
@@ -736,7 +741,9 @@
         "dumbbellBicepsCurl": "Bicep curl (dumbbell)",
         "bicepsCurlMachine": "Bicep curl (machine)",
         "chinUps": "Chin Ups",
-        "hammerCurlDumbbell": "Hammer curls (dumbbells)"
+        "hammerCurlDumbbell": "Hammer curls (dumbbells)",
+        "concentrationCurl": "Concentration curls",
+        "scottCurl": "Scott curl"
       }
     },
     "abs": {
@@ -749,14 +756,19 @@
         "heelsUpCrunch": "Heels-up crunches",
         "fullBodyCrunch": "Full-body crunches",
         "plank": "Plank",
-        "hollowBodyHold": "Hollow body hold"
+        "hollowBodyHold": "Hollow body hold",
+        "russianTwist": "Russian Twist",
+        "bicycleCrunches": "Bicycle crunches",
+        "extendedReverseCrunchWithLegExtension": "Extended reverse crunch with leg extension",
+        "toeTouches": "Toe touches"
       }
     },
     "calves": {
       "name": "Calves",
       "exercises": {
         "calfRaiseStanding": "Calf raise (standing)",
-        "calfRaiseSeated": "Calf raise (seated)"
+        "calfRaiseSeated": "Calf raise (seated)",
+        "calfPressLegPressMachine": "Calf press (on Leg Press machine)"
       }
     },
     "quadriceps": {
@@ -767,14 +779,17 @@
         "legExtension": "Leg extension",
         "smithMachineLunges": "Smith machine lunges",
         "lunges": "Lunges",
-        "legPress45deg": "Leg press (45°)"
+        "legPress45deg": "Leg press (45°)",
+        "frontSquats": "Front squats",
+        "bulgarianSplitSquats": "Bulgarian split squats"
       }
     },
     "hamstrings": {
       "name": "Hamstrings",
       "exercises": {
         "legCurlProne": "Leg curl (prone)",
-        "legCurlSeated": "Leg curl (seated)"
+        "legCurlSeated": "Leg curl (seated)",
+        "romanianDeadlift": "Romanian deadlift"
       }
     },
     "shoulders": {
@@ -785,7 +800,9 @@
         "latRaisesCable": "Lat raises (cable)",
         "latRaisesDualCable": "Lat raises (cable, both arms)",
         "reverseFlysInclinedBench": "Reverse flys (inclined bench)",
-        "arnoldPress": "Arnold press"
+        "arnoldPress": "Arnold press",
+        "frontDumbbellRaise": "Front dumbbell raise",
+        "uprightRow": "Upright row"
       }
     },
     "back": {
@@ -798,7 +815,9 @@
         "underhandGripLatPulldowns": "Lat pulldowns (underhand grip)",
         "latPulldowns": "Lat pulldowns",
         "cableSeatedRowTriangleBar": "Cable seated row (triangle bar)",
-        "straightArmCablePushdown": "Straight-arm cable pushdowns"
+        "straightArmCablePushdown": "Straight-arm cable pushdowns",
+        "deadlift": "Deadlift",
+        "pullUps": "Pull-ups"
       }
     },
     "triceps": {
@@ -806,7 +825,9 @@
       "exercises": {
         "dips": "Dips",
         "overheadRopeTricepExtension": "Overhead rope tricep extension",
-        "tricepsRopePushdown": "Triceps rope pushdown"
+        "tricepsRopePushdown": "Triceps rope pushdown",
+        "tricepKickbacks": "Tricep kickbacks",
+        "skullCrushers": "Skull Crushers"
       }
     },
     "newCustomExercise": "New exercise",
@@ -816,7 +837,21 @@
         "gluteBridge": "Glute bridge",
         "hipThrust": "Hip thrust",
         "hipAdduction": "Hip adduction",
-        "hipAbduction": "Hip abduction"
+        "hipAbduction": "Hip abduction",
+        "clamshells": "Clamshells"
+      }
+    },
+    "forearms": {
+      "name": "Forearms",
+      "exercises": {
+        "wristCurlsBarbell": "Wrist curls (barbell)",
+        "reverseWristCurlsBarbell": "Reverse wrist curls (barbell)",
+        "wristCurlsDumbbell": "Wrist curls (dumbbell)",
+        "reverseWristCurlsDumbbell": "Reverse wrist curls (dumbbell)",
+        "wristRoller": "Wrist roller",
+        "farmerWalk": "Farmer's Walk",
+        "platePinch": "Plate pinch",
+        "reverseCurls": "Reverse curls"
       }
     }
   },

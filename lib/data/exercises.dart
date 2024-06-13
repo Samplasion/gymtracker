@@ -75,6 +75,24 @@ Map<String, ExerciseCategory> get exerciseStandardLibrary => {
             parameters: GTSetParameters.time,
             primaryMuscleGroup: GTMuscleGroup.none,
           ),
+          Exercise.standard(
+            id: "library.cardio.exercises.jumpRope",
+            name: "library.cardio.exercises.jumpRope".t,
+            parameters: GTSetParameters.time,
+            primaryMuscleGroup: GTMuscleGroup.none,
+          ),
+          Exercise.standard(
+            id: "library.cardio.exercises.rowingMachine",
+            name: "library.cardio.exercises.rowingMachine".t,
+            parameters: GTSetParameters.time,
+            primaryMuscleGroup: GTMuscleGroup.none,
+          ),
+          Exercise.standard(
+            id: "library.cardio.exercises.bicycleCrunchesCardio",
+            name: "library.cardio.exercises.bicycleCrunchesCardio".t,
+            parameters: GTSetParameters.time,
+            primaryMuscleGroup: GTMuscleGroup.abs,
+          ),
         ],
         icon: const Icon(GymTrackerIcons.cardio),
         color: Colors.orange,
@@ -185,6 +203,19 @@ Map<String, ExerciseCategory> get exerciseStandardLibrary => {
             primaryMuscleGroup: GTMuscleGroup.chest,
             secondaryMuscleGroups: {GTMuscleGroup.triceps},
           ),
+          Exercise.standard(
+            id: "library.chest.exercises.cableChestPress",
+            name: "library.chest.exercises.cableChestPress".t,
+            parameters: GTSetParameters.repsWeight,
+            primaryMuscleGroup: GTMuscleGroup.chest,
+          ),
+          Exercise.standard(
+            id: "library.chest.exercises.declinePushUps",
+            name: "library.chest.exercises.declinePushUps".t,
+            parameters: GTSetParameters.freeBodyReps,
+            primaryMuscleGroup: GTMuscleGroup.chest,
+            secondaryMuscleGroups: {GTMuscleGroup.triceps},
+          ),
         ],
         icon: Text("library.chest.name".t.characters.first.toUpperCase()),
         color: Colors.teal,
@@ -239,6 +270,18 @@ Map<String, ExerciseCategory> get exerciseStandardLibrary => {
             parameters: GTSetParameters.repsWeight,
             primaryMuscleGroup: GTMuscleGroup.biceps,
             secondaryMuscleGroups: {},
+          ),
+          Exercise.standard(
+            id: "library.biceps.exercises.concentrationCurl",
+            name: "library.biceps.exercises.concentrationCurl".t,
+            parameters: GTSetParameters.repsWeight,
+            primaryMuscleGroup: GTMuscleGroup.biceps,
+          ),
+          Exercise.standard(
+            id: "library.biceps.exercises.scottCurl",
+            name: "library.biceps.exercises.scottCurl".t,
+            parameters: GTSetParameters.repsWeight,
+            primaryMuscleGroup: GTMuscleGroup.biceps,
           ),
         ],
         icon: Text("library.biceps.name".t.characters.first.toUpperCase()),
@@ -296,6 +339,31 @@ Map<String, ExerciseCategory> get exerciseStandardLibrary => {
             primaryMuscleGroup: GTMuscleGroup.abs,
             secondaryMuscleGroups: {},
           ),
+          Exercise.standard(
+            id: "library.abs.exercises.russianTwist",
+            name: "library.abs.exercises.russianTwist".t,
+            parameters: GTSetParameters.repsWeight,
+            primaryMuscleGroup: GTMuscleGroup.abs,
+          ),
+          Exercise.standard(
+            id: "library.abs.exercises.bicycleCrunches",
+            name: "library.abs.exercises.bicycleCrunches".t,
+            parameters: GTSetParameters.freeBodyReps,
+            primaryMuscleGroup: GTMuscleGroup.abs,
+          ),
+          Exercise.standard(
+            id: "library.abs.exercises.extendedReverseCrunchWithLegExtension",
+            name:
+                "library.abs.exercises.extendedReverseCrunchWithLegExtension".t,
+            parameters: GTSetParameters.freeBodyReps,
+            primaryMuscleGroup: GTMuscleGroup.abs,
+          ),
+          Exercise.standard(
+            id: "library.abs.exercises.toeTouches",
+            name: "library.abs.exercises.toeTouches".t,
+            parameters: GTSetParameters.freeBodyReps,
+            primaryMuscleGroup: GTMuscleGroup.abs,
+          ),
         ],
         icon: Text("library.abs.name".t.characters.first.toUpperCase()),
         color: Colors.amber,
@@ -311,6 +379,12 @@ Map<String, ExerciseCategory> get exerciseStandardLibrary => {
           Exercise.standard(
             id: "library.calves.exercises.calfRaiseSeated",
             name: "library.calves.exercises.calfRaiseSeated".t,
+            parameters: GTSetParameters.repsWeight,
+            primaryMuscleGroup: GTMuscleGroup.calves,
+          ),
+          Exercise.standard(
+            id: "library.calves.exercises.calfPressLegPressMachine",
+            name: "library.calves.exercises.calfPressLegPressMachine".t,
             parameters: GTSetParameters.repsWeight,
             primaryMuscleGroup: GTMuscleGroup.calves,
           ),
@@ -357,6 +431,20 @@ Map<String, ExerciseCategory> get exerciseStandardLibrary => {
             parameters: GTSetParameters.repsWeight,
             primaryMuscleGroup: GTMuscleGroup.quadriceps,
           ),
+          Exercise.standard(
+            id: "library.quadriceps.exercises.frontSquats",
+            name: "library.quadriceps.exercises.frontSquats".t,
+            parameters: GTSetParameters.repsWeight,
+            primaryMuscleGroup: GTMuscleGroup.quadriceps,
+            secondaryMuscleGroups: {GTMuscleGroup.glutes},
+          ),
+          Exercise.standard(
+            id: "library.quadriceps.exercises.bulgarianSplitSquats",
+            name: "library.quadriceps.exercises.bulgarianSplitSquats".t,
+            parameters: GTSetParameters.repsWeight,
+            primaryMuscleGroup: GTMuscleGroup.quadriceps,
+            secondaryMuscleGroups: {GTMuscleGroup.glutes},
+          ),
         ],
         icon: Text("library.quadriceps.name".t.characters.first.toUpperCase()),
         color: Colors.indigo,
@@ -374,6 +462,13 @@ Map<String, ExerciseCategory> get exerciseStandardLibrary => {
             name: "library.hamstrings.exercises.legCurlSeated".t,
             parameters: GTSetParameters.repsWeight,
             primaryMuscleGroup: GTMuscleGroup.hamstrings,
+          ),
+          Exercise.standard(
+            id: "library.hamstrings.exercises.romanianDeadlift",
+            name: "library.hamstrings.exercises.romanianDeadlift".t,
+            parameters: GTSetParameters.repsWeight,
+            primaryMuscleGroup: GTMuscleGroup.hamstrings,
+            secondaryMuscleGroups: {GTMuscleGroup.lowerBack},
           ),
         ],
         icon: Text("library.hamstrings.name".t.characters.first.toUpperCase()),
@@ -419,6 +514,18 @@ Map<String, ExerciseCategory> get exerciseStandardLibrary => {
             primaryMuscleGroup: GTMuscleGroup.shoulders,
             secondaryMuscleGroups: {GTMuscleGroup.upperBack},
           ),
+          Exercise.standard(
+            id: "library.shoulders.exercises.frontDumbbellRaise",
+            name: "library.shoulders.exercises.frontDumbbellRaise".t,
+            parameters: GTSetParameters.repsWeight,
+            primaryMuscleGroup: GTMuscleGroup.shoulders,
+          ),
+          Exercise.standard(
+            id: "library.shoulders.exercises.uprightRow",
+            name: "library.shoulders.exercises.uprightRow".t,
+            parameters: GTSetParameters.repsWeight,
+            primaryMuscleGroup: GTMuscleGroup.shoulders,
+          ),
         ],
         icon: Text("library.shoulders.name".t.characters.first.toUpperCase()),
         color: Colors.cyan,
@@ -443,6 +550,16 @@ Map<String, ExerciseCategory> get exerciseStandardLibrary => {
             secondaryMuscleGroups: {
               GTMuscleGroup.glutes,
               GTMuscleGroup.hamstrings
+            },
+          ),
+          Exercise.standard(
+            id: "library.back.exercises.deadlift",
+            name: "library.back.exercises.deadlift".t,
+            parameters: GTSetParameters.repsWeight,
+            primaryMuscleGroup: GTMuscleGroup.lowerBack,
+            secondaryMuscleGroups: {
+              GTMuscleGroup.hamstrings,
+              GTMuscleGroup.glutes
             },
           ),
           Exercise.standard(
@@ -482,6 +599,13 @@ Map<String, ExerciseCategory> get exerciseStandardLibrary => {
             primaryMuscleGroup: GTMuscleGroup.upperBack,
             secondaryMuscleGroups: {GTMuscleGroup.triceps},
           ),
+          Exercise.standard(
+            id: "library.back.exercises.pullUps",
+            name: "library.back.exercises.pullUps".t,
+            parameters: GTSetParameters.freeBodyReps,
+            primaryMuscleGroup: GTMuscleGroup.upperBack,
+            secondaryMuscleGroups: {GTMuscleGroup.biceps},
+          ),
         ],
         icon: Text("library.back.name".t.characters.first.toUpperCase()),
         color: Colors.pink,
@@ -503,6 +627,18 @@ Map<String, ExerciseCategory> get exerciseStandardLibrary => {
           Exercise.standard(
             id: "library.triceps.exercises.tricepsRopePushdown",
             name: "library.triceps.exercises.tricepsRopePushdown".t,
+            parameters: GTSetParameters.repsWeight,
+            primaryMuscleGroup: GTMuscleGroup.triceps,
+          ),
+          Exercise.standard(
+            id: "library.triceps.exercises.skullCrushers",
+            name: "library.triceps.exercises.skullCrushers".t,
+            parameters: GTSetParameters.repsWeight,
+            primaryMuscleGroup: GTMuscleGroup.triceps,
+          ),
+          Exercise.standard(
+            id: "library.triceps.exercises.tricepKickbacks",
+            name: "library.triceps.exercises.tricepKickbacks".t,
             parameters: GTSetParameters.repsWeight,
             primaryMuscleGroup: GTMuscleGroup.triceps,
           ),
@@ -538,7 +674,74 @@ Map<String, ExerciseCategory> get exerciseStandardLibrary => {
             parameters: GTSetParameters.repsWeight,
             primaryMuscleGroup: GTMuscleGroup.glutes,
           ),
+          Exercise.standard(
+            id: "library.hips.exercises.clamshells",
+            name: "library.hips.exercises.clamshells".t,
+            // With resistance band
+            parameters: GTSetParameters.freeBodyReps,
+            primaryMuscleGroup: GTMuscleGroup.glutes,
+          ),
         ],
+      ),
+      "library.forearms.name".t: ExerciseCategory(
+        exercises: [
+          Exercise.standard(
+            id: "library.forearms.exercises.wristCurlsBarbell",
+            name: "library.forearms.exercises.wristCurlsBarbell".t,
+            parameters: GTSetParameters.repsWeight,
+            primaryMuscleGroup: GTMuscleGroup.forearms,
+          ),
+          Exercise.standard(
+            id: "library.forearms.exercises.reverseWristCurlsBarbell",
+            name: "library.forearms.exercises.reverseWristCurlsBarbell".t,
+            parameters: GTSetParameters.repsWeight,
+            primaryMuscleGroup: GTMuscleGroup.forearms,
+          ),
+          Exercise.standard(
+            id: "library.forearms.exercises.wristCurlsDumbbell",
+            name: "library.forearms.exercises.wristCurlsDumbbell".t,
+            parameters: GTSetParameters.repsWeight,
+            primaryMuscleGroup: GTMuscleGroup.forearms,
+          ),
+          Exercise.standard(
+            id: "library.forearms.exercises.reverseWristCurlsDumbbell",
+            name: "library.forearms.exercises.reverseWristCurlsDumbbell".t,
+            parameters: GTSetParameters.repsWeight,
+            primaryMuscleGroup: GTMuscleGroup.forearms,
+          ),
+          Exercise.standard(
+            id: "library.forearms.exercises.wristRoller",
+            name: "library.forearms.exercises.wristRoller".t,
+            parameters: GTSetParameters.time,
+            primaryMuscleGroup: GTMuscleGroup.forearms,
+          ),
+          Exercise.standard(
+            id: "library.forearms.exercises.farmerWalk",
+            name: "library.forearms.exercises.farmerWalk".t,
+            parameters: GTSetParameters.timeWeight,
+            primaryMuscleGroup: GTMuscleGroup.forearms,
+            secondaryMuscleGroups: {
+              GTMuscleGroup.shoulders,
+              GTMuscleGroup.traps
+            },
+          ),
+          Exercise.standard(
+            id: "library.forearms.exercises.platePinch",
+            name: "library.forearms.exercises.platePinch".t,
+            parameters: GTSetParameters.timeWeight,
+            primaryMuscleGroup: GTMuscleGroup.forearms,
+            secondaryMuscleGroups: {},
+          ),
+          Exercise.standard(
+            id: "library.forearms.exercises.reverseCurls",
+            name: "library.forearms.exercises.reverseCurls".t,
+            parameters: GTSetParameters.repsWeight,
+            primaryMuscleGroup: GTMuscleGroup.forearms,
+            secondaryMuscleGroups: {GTMuscleGroup.biceps},
+          ),
+        ],
+        icon: Text("library.forearms.name".t.characters.first.toUpperCase()),
+        color: Colors.lime,
       ),
     };
 

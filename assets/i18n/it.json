@@ -337,20 +337,20 @@
           "light": "Modalità bianco puro"
         }
       },
-      "export": {
-        "label": "Esporta dati (JSON)",
-        "filename": "Dati_GymTracker",
-        "failed": {
-          "title": "Impossibile esportare i dati",
-          "copy": "Il messaggio di errore è stato copiato negli appunti."
-        }
-      },
       "themeMode": {
         "label": "Tema",
         "values": {
           "system": "Sistema",
           "light": "Chiaro",
           "dark": "Scuro"
+        }
+      },
+      "export": {
+        "label": "Esporta dati (JSON)",
+        "filename": "Dati_GymTracker",
+        "failed": {
+          "title": "Impossibile esportare i dati",
+          "copy": "Il messaggio di errore è stato copiato negli appunti."
         }
       },
       "notifications": {
@@ -701,7 +701,10 @@
         "pilates": "Pilates",
         "running": "Corsa",
         "treadmill": "Tapis roulant",
-        "zumba": "Zumba"
+        "zumba": "Zumba",
+        "jumpRope": "Salto con la corda",
+        "rowingMachine": "Remoergometro",
+        "bicycleCrunchesCardio": "Bicycle crunch (cardio)"
       }
     },
     "chest": {
@@ -723,7 +726,9 @@
         "verticalChestPress": "Chest press (verticale)",
         "cableFlyCrossovers": "Croci ai cavi alti",
         "pushUps": "Push-up",
-        "pushUpsWeighted": "Push-up (zavorrati)"
+        "pushUpsWeighted": "Push-up (zavorrati)",
+        "cableChestPress": "Chest press ai cavi",
+        "declinePushUps": "Push-up declinati"
       }
     },
     "biceps": {
@@ -736,7 +741,9 @@
         "dumbbellBicepsCurl": "Bicep curl (manubri)",
         "bicepsCurlMachine": "Bicep curl (macchina)",
         "chinUps": "Chin up",
-        "hammerCurlDumbbell": "Hammer curl (manubri)"
+        "hammerCurlDumbbell": "Hammer curl (manubri)",
+        "concentrationCurl": "Curl concentrati",
+        "scottCurl": "Scott curl"
       }
     },
     "abs": {
@@ -749,14 +756,19 @@
         "heelsUpCrunch": "Crunch (caviglie alzate)",
         "fullBodyCrunch": "Full-body crunch",
         "plank": "Plank",
-        "hollowBodyHold": "Hollow body hold"
+        "hollowBodyHold": "Hollow body hold",
+        "russianTwist": "Russian twist",
+        "bicycleCrunches": "Bicycle crunch",
+        "extendedReverseCrunchWithLegExtension": "Crunch inverso con leg extension",
+        "toeTouches": "Toe touches"
       }
     },
     "calves": {
       "name": "Polpacci",
       "exercises": {
         "calfRaiseStanding": "Calf raise (in piedi)",
-        "calfRaiseSeated": "Calf raise (seduti)"
+        "calfRaiseSeated": "Calf raise (seduti)",
+        "calfPressLegPressMachine": "Pressa dei polpacci (sulla Leg Press machine)"
       }
     },
     "quadriceps": {
@@ -767,14 +779,17 @@
         "legExtension": "Leg extension",
         "smithMachineLunges": "Affondi al Multipower",
         "lunges": "Affondi",
-        "legPress45deg": "Leg press (45°)"
+        "legPress45deg": "Leg press (45°)",
+        "frontSquats": "Squat frontali",
+        "bulgarianSplitSquats": "Squat bulgari"
       }
     },
     "hamstrings": {
       "name": "Tendini del ginocchio",
       "exercises": {
         "legCurlProne": "Leg curl (sdraiati)",
-        "legCurlSeated": "Leg curl (seduti)"
+        "legCurlSeated": "Leg curl (seduti)",
+        "romanianDeadlift": "Stacchi rumeni"
       }
     },
     "shoulders": {
@@ -785,7 +800,9 @@
         "latRaisesCable": "Alzate laterali ai cavi",
         "latRaisesDualCable": "Alzate laterali ai cavi (entrambe le braccia)",
         "reverseFlysInclinedBench": "Croci inverse (panca inclinata)",
-        "arnoldPress": "Arnold press"
+        "arnoldPress": "Arnold press",
+        "frontDumbbellRaise": "Sollevamento frontale dei manubri",
+        "uprightRow": "Vogatore verticale"
       }
     },
     "back": {
@@ -798,7 +815,9 @@
         "underhandGripLatPulldowns": "Trazioni laterali (presa supina)",
         "latPulldowns": "Trazioni laterali",
         "cableSeatedRowTriangleBar": "Rematore al cavo (con triangolo)",
-        "straightArmCablePushdown": "Pulldown a braccia dritte"
+        "straightArmCablePushdown": "Pulldown a braccia dritte",
+        "deadlift": "Stacchi",
+        "pullUps": "Pull-up"
       }
     },
     "triceps": {
@@ -806,7 +825,9 @@
       "exercises": {
         "dips": "Dip",
         "overheadRopeTricepExtension": "Estensione dei tricipiti sopra la testa",
-        "tricepsRopePushdown": "Pushdown dei tricipiti con corda"
+        "tricepsRopePushdown": "Pushdown dei tricipiti con corda",
+        "tricepKickbacks": "Kickback per i tricipiti",
+        "skullCrushers": "Skull Crushers"
       }
     },
     "newCustomExercise": "Nuovo esercizio",
@@ -816,7 +837,21 @@
         "gluteBridge": "Ponte per i glutei",
         "hipThrust": "Hip thrust",
         "hipAdduction": "Hip adduction",
-        "hipAbduction": "Hip abduction"
+        "hipAbduction": "Hip abduction",
+        "clamshells": "Clamshell per i glutei"
+      }
+    },
+    "forearms": {
+      "name": "Avambracci",
+      "exercises": {
+        "wristCurlsBarbell": "Curl dei polsi (bilanciere)",
+        "reverseWristCurlsBarbell": "Curl dei polsi rovesciato (bilanciere)",
+        "wristCurlsDumbbell": "Curl dei polsi (manubri)",
+        "reverseWristCurlsDumbbell": "Curl dei polsi rovesciato (manubri)",
+        "wristRoller": "Wrist roller",
+        "farmerWalk": "Farmer Walk",
+        "platePinch": "Plate pinch",
+        "reverseCurls": "Reverse curl"
       }
     }
   },

@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -362,6 +363,9 @@ class _ExerciseInfoViewState extends State<ExerciseInfoView>
                 ),
             ],
             bottom: TabBar(
+              tabAlignment: Platform.isMacOS || Platform.isIOS
+                  ? TabAlignment.center
+                  : TabAlignment.startOffset,
               controller: tabController,
               tabs: [
                 Tab(

@@ -745,10 +745,13 @@ Map<String, ExerciseCategory> get exerciseStandardLibrary => {
       ),
     };
 
-Exercise? getStandardExerciseByID(String id) =>
+List<Exercise> get exerciseStandardLibraryAsList =>
     exerciseStandardLibrary.values.fold(
         <Exercise>[],
         (previousValue, element) => [
               ...previousValue,
               ...element.exercises,
-            ]).firstWhereOrNull((element) => element.id == id);
+            ]);
+
+Exercise? getStandardExerciseByID(String id) => exerciseStandardLibraryAsList
+    .firstWhereOrNull((element) => element.id == id);

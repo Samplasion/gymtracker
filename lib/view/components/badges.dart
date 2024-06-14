@@ -46,7 +46,15 @@ class BetaBadge extends StatelessWidget {
 }
 
 class CustomExerciseBadge extends StatelessWidget {
-  const CustomExerciseBadge({super.key});
+  final bool short;
+
+  const CustomExerciseBadge({this.short = false, super.key});
+
+  String get text {
+    final str = "exercise.custom".t.toUpperCase();
+    if (short) return str[0];
+    return str;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -57,7 +65,7 @@ class CustomExerciseBadge extends StatelessWidget {
         borderRadius: BorderRadius.circular(4),
       ),
       child: Text(
-        "exercise.custom".t.toUpperCase(),
+        text,
         style: TextStyle(
           fontSize: 12,
           color: Theme.of(context).colorScheme.onSecondaryContainer,

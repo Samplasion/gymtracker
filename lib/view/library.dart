@@ -16,6 +16,7 @@ import 'package:gymtracker/model/set.dart';
 import 'package:gymtracker/model/superset.dart';
 import 'package:gymtracker/model/workout.dart';
 import 'package:gymtracker/service/localizations.dart';
+import 'package:gymtracker/service/logger.dart';
 import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/utils/utils.dart';
@@ -52,6 +53,16 @@ class LibraryView extends GetView<ExercisesController> {
           slivers: [
             SliverAppBar.large(
               title: Text("library.title".t),
+              actions: [
+                if (kDebugMode) ...[
+                  IconButton(
+                    icon: const Icon(GymTrackerIcons.explanation),
+                    onPressed: () {
+                      Go.to(() => const DebugExercisesWithoutExplanationList());
+                    },
+                  ),
+                ],
+              ],
             ),
             SliverList(
               delegate: SliverChildListDelegate(
@@ -140,6 +151,9 @@ class LibraryExercisesView extends StatelessWidget {
                   exercise: sorted[index],
                   selected: false,
                   isConcrete: false,
+                  trailing: kDebugMode && sorted[index].hasExplanation
+                      ? const Icon(GymTrackerIcons.explanation)
+                      : null,
                   onTap: () {
                     Go.to(() => ExerciseInfoView(exercise: sorted[index]));
                   },
@@ -278,7 +292,7 @@ class _ExerciseInfoViewState extends State<ExerciseInfoView>
           bottom: false,
           child: _historyBody(exercise, chartHistory, history),
         ),
-        if (exercise.standard && exercise.exerciseExplanation != null)
+        if (exercise.standard && exercise.explanation != null)
           SafeArea(
             bottom: false,
             child: _explanationBody(exercise),
@@ -523,7 +537,28 @@ class _ExerciseInfoViewState extends State<ExerciseInfoView>
         SliverPadding(
           padding: const EdgeInsets.all(16),
           sliver: SliverToBoxAdapter(
-            child: MarkdownBody(data: exercise.exerciseExplanation!),
+            child: MarkdownBody(
+              data: exercise.explanation!,
+              styleSheet:
+                  MarkdownStyleSheet.fromTheme(Theme.of(context)).copyWith(
+                a: TextStyle(color: Theme.of(context).colorScheme.primary),
+              ),
+              onTapLink: (text, href, title) {
+                if (href == null) return;
+                final uri = Uri.tryParse(href);
+                if (uri == null) return;
+                if (uri.scheme == "exercise" && uri.host == "library") {
+                  final id = uri.pathSegments.first;
+                  logger.d(id);
+                  final exercise = getStandardExerciseByID(id);
+                  if (exercise != null) {
+                    Go.to(() => ExerciseInfoView(exercise: exercise));
+                  } else {
+                    logger.e("Exercise not found: $id");
+                  }
+                }
+              },
+            ),
           ),
         ),
         SliverPadding(
@@ -712,5 +747,37 @@ class ExerciseInfoTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListTile(title: Text(title), subtitle: Text(subtitle), onTap: onTap);
+  }
+}
+
+class DebugExercisesWithoutExplanationList extends StatelessWidget {
+  const DebugExercisesWithoutExplanationList({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final filtered =
+        exerciseStandardLibraryAsList.where((e) => !e.hasExplanation).toList();
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("exercise.info.explanation".t),
+      ),
+      body: ListView.builder(
+        itemCount: filtered.length,
+        itemBuilder: (context, index) {
+          final category = filtered[index].id.split(".")[1];
+          return ExerciseListTile(
+            exercise: filtered[index],
+            trailing: Text(category),
+            selected: false,
+            isConcrete: false,
+            onTap: () {
+              final name = filtered[index].id.split(".").last;
+
+              Clipboard.setData(ClipboardData(text: name));
+            },
+          );
+        },
+      ),
+    );
   }
 }

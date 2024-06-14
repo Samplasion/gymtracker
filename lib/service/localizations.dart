@@ -77,7 +77,7 @@ class GTLocalizations extends Translations with ChangeNotifier {
             cache: false);
         exerciseExplanations[locale.languageCode]![fullID] = bundle;
       } catch (e) {
-        logger.w(
+        logger.t(
             "[${locale.languageCode}] Failed to load explanation for $fullID");
         continue;
       }
@@ -176,19 +176,21 @@ extension ContextLocale on BuildContext {
 }
 
 extension ExerciseExplanation on Exercise {
-  String? get exerciseExplanation {
-    assert(standard);
+  bool get hasExplanation => explanation != null;
+
+  String? get explanation {
+    if (isCustom) return null;
 
     final locale = Get.locale!.languageCode;
     final loc = Get.find<GTLocalizations>();
     final explanation = loc._getAllExerciseExplanationsForLocale(locale)[id];
     if (explanation == null) {
       loc.logger
-          .w("No explanation found for $id in $locale. Falling back to en");
+          .t("No explanation found for $id in $locale. Falling back to en");
 
       final fallback = loc._getAllExerciseExplanationsForLocale("en")[id];
       if (fallback == null) {
-        loc.logger.e("No explanation found for $id in en either");
+        loc.logger.t("No explanation found for $id in en either");
         return null;
       }
 

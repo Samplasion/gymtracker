@@ -318,7 +318,16 @@ class _ExerciseInfoViewState extends State<ExerciseInfoView>
 
         return Scaffold(
           appBar: AppBar(
-            title: Text("exercise.info.title".t),
+            title: Text.rich(TextSpan(children: [
+              if (exercise.isCustom) ...[
+                const WidgetSpan(
+                  child: CustomExerciseBadge(short: true),
+                  alignment: PlaceholderAlignment.middle,
+                ),
+                const TextSpan(text: " "),
+              ],
+              TextSpan(text: exercise.displayName),
+            ])),
             actions: [
               if (exercise.isCustom)
                 PopupMenuButton(

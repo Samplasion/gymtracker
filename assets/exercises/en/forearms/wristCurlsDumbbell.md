@@ -13,3 +13,4 @@ This exercise involves curling your wrists to raise two dumbbells, in order to e
 
 ### Variants
 - **[Wrist curls (barbell)](exercise://library/library.forearms.exercises.wristCurlsBarbell):** A variant of wrist curls where you use your wrists to move a barbell.
+- **[Reverse wrist curls (dumbbell)](exercise://library/library.forearms.exercises.reverseWristCurlsDumbbell)**: Perform the exercise with an overhand grip (palms facing down) to target the forearm extensors.

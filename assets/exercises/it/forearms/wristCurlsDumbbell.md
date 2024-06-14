@@ -13,3 +13,4 @@ Questo esercizio prevede di piegare i polsi per sollevare due manubri, in modo d
 
 ### Varianti
 - **[Curl dei polsi (bilanciere)](exercise://library/library.forearms.exercises.wristCurlsBarbell):** Una variante dei curl dei polsi in cui usi i polsi per muovere un bilanciere.
+- **[Curl dei polsi rovesciato (manubri)](exercise://library/library.forearms.exercises.reverseWristCurlsDumbbell)**: Esegui l'esercizio con una presa prona (palmi rivolti verso il basso) per attivare gli estensori dell'avambraccio.

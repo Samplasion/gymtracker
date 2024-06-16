@@ -55,9 +55,11 @@ class RawMuscleCategoriesBarChart extends StatelessWidget {
 
     double rightSideReservedSize = 16;
     if (rightSideLabelBuilder != null) {
-      rightSideReservedSize = nonEmptyData
-          .map((e) => rightSideLabelBuilder!(e.key).computeSize().width + 16)
-          .max;
+      final rightLabelLengths = nonEmptyData
+          .map((e) => rightSideLabelBuilder!(e.key).computeSize().width + 16);
+      if (rightLabelLengths.isNotEmpty) {
+        rightSideReservedSize = rightLabelLengths.max;
+      }
     }
 
     return Column(

@@ -6,6 +6,7 @@ import 'package:gymtracker/controller/serviceable_controller.dart';
 import 'package:gymtracker/icons/gymtracker_icons.dart';
 import 'package:gymtracker/model/exercisable.dart';
 import 'package:gymtracker/model/exercise.dart';
+import 'package:gymtracker/model/set.dart';
 import 'package:gymtracker/model/superset.dart';
 import 'package:gymtracker/model/workout.dart';
 import 'package:gymtracker/service/localizations.dart';
@@ -470,6 +471,51 @@ class HistoryController extends GetxController with ServiceableController {
                         Exercise.replaced(
                           from: ex,
                           to: to.makeChild(),
+                        )
+                      else
+                        ex,
+                  ],
+                ),
+              ),
+          ],
+        ),
+    ]);
+  }
+
+  void removeWeightFromExercise(Exercise exercise) {
+    service.writeAllHistory([
+      for (final workout in service.workoutHistory)
+        workout.copyWith(
+          exercises: [
+            for (final ex in workout.exercises)
+              ex.map(
+                exercise: (ex) {
+                  if (exercise.isTheSameAs(ex)) {
+                    return ex.copyWith(
+                      parameters: GTSetParameters.freeBodyReps,
+                      sets: [
+                        for (final set in ex.sets)
+                          set.copyWith(
+                            parameters: GTSetParameters.freeBodyReps,
+                          ),
+                      ],
+                    );
+                  } else {
+                    return ex;
+                  }
+                },
+                superset: (ss) => ss.copyWith(
+                  exercises: [
+                    for (final ex in ss.exercises)
+                      if (exercise.isTheSameAs(ex))
+                        ex.copyWith(
+                          parameters: GTSetParameters.freeBodyReps,
+                          sets: [
+                            for (final set in ex.sets)
+                              set.copyWith(
+                                parameters: GTSetParameters.freeBodyReps,
+                              ),
+                          ],
                         )
                       else
                         ex,

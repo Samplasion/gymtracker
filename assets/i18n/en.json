@@ -1123,6 +1123,25 @@
       },
       "title": "Remove unused exercises",
       "description": "Clean up your library by removing all custom exercises you haven't used"
+    },
+    "removeWeightFromCustomExercise": {
+      "preview": {
+        "incompatible": {
+          "title": "Incompatible exercise",
+          "text": "You can only apply this migration to exercises in which you haven't ever used a weight."
+        },
+        "selected": "Selected exercise",
+        "affectedRoutines": "Affected routines",
+        "affectedWorkouts": "Affected workouts in history"
+      },
+      "fields": {
+        "exercise": {
+          "label": "Exercise",
+          "title": "Remove the Weight parameter from this exercise"
+        }
+      },
+      "title": "Remove Weight parameter",
+      "description": "Remove the Weight parameter from an exercise with \"Reps and Weight\" in which you've only ever used the Reps field."
     }
   },
   "exerciseFormPicker": {

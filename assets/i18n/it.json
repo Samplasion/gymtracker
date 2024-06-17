@@ -343,20 +343,20 @@
           "light": "Modalità bianco puro"
         }
       },
-      "themeMode": {
-        "label": "Tema",
-        "values": {
-          "system": "Sistema",
-          "light": "Chiaro",
-          "dark": "Scuro"
-        }
-      },
       "export": {
         "label": "Esporta dati (JSON)",
         "filename": "Dati_GymTracker",
         "failed": {
           "title": "Impossibile esportare i dati",
           "copy": "Il messaggio di errore è stato copiato negli appunti."
+        }
+      },
+      "themeMode": {
+        "label": "Tema",
+        "values": {
+          "system": "Sistema",
+          "light": "Chiaro",
+          "dark": "Scuro"
         }
       },
       "notifications": {
@@ -1123,6 +1123,25 @@
       },
       "title": "Rimuovi esercizi inutilizzati",
       "description": "Pulisci la tua libreria rimuovendo tutti gli esercizi personalizzati che non hai usato"
+    },
+    "removeWeightFromCustomExercise": {
+      "preview": {
+        "incompatible": {
+          "title": "Esercizio non compatibile",
+          "text": "Puoi applicare questa migrazione solo agli esercizi dove non hai mai usato il campo Peso."
+        },
+        "selected": "Esercizio selezionato",
+        "affectedRoutines": "Routine influenzate",
+        "affectedWorkouts": "Allenamenti cronologici influenzati"
+      },
+      "fields": {
+        "exercise": {
+          "label": "Esercizio",
+          "title": "Rimuovi il parametro Peso da questo esercizio"
+        }
+      },
+      "title": "Rimuovi parametro Peso",
+      "description": "Rimuovi il parametro Peso da un esercizio con \"Peso e ripetizioni\" dove hai sempre e solo usato il campo Ripetizioni."
     }
   },
   "exerciseFormPicker": {

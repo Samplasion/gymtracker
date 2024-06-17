@@ -116,6 +116,12 @@ class ExercisesController extends GetxController with ServiceableController {
   getExerciseByID(String id) {
     return exercises.firstWhereOrNull((element) => element.id == id);
   }
+
+  void removeWeightFromExercise(Exercise exercise) {
+    final newExercise =
+        exercise.copyWith(parameters: GTSetParameters.freeBodyReps);
+    saveEdit(newExercise);
+  }
 }
 
 extension ExerciseParent on Exercise {

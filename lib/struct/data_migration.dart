@@ -3,6 +3,7 @@ import 'package:gymtracker/controller/exercises_controller.dart';
 import 'package:gymtracker/controller/history_controller.dart';
 import 'package:gymtracker/controller/routines_controller.dart';
 import 'package:gymtracker/model/exercise.dart';
+import 'package:gymtracker/model/set.dart';
 import 'package:gymtracker/model/workout.dart';
 import 'package:gymtracker/utils/extensions.dart';
 
@@ -71,5 +72,46 @@ class RemoveUnusedExercisesMigration extends DataMigration {
     for (final exercise in affectedExercises) {
       exercisesController.deleteExercise(exercise);
     }
+  }
+}
+
+class RemoveWeightFromCustomExerciseMigration extends DataMigration {
+  final Exercise exercise;
+
+  RemoveWeightFromCustomExerciseMigration(this.exercise);
+
+  ExercisesController get exercisesController =>
+      Get.find<ExercisesController>();
+  RoutinesController get routinesController => Get.find<RoutinesController>();
+  HistoryController get historyController => Get.find<HistoryController>();
+
+  bool get isCompatible =>
+      exercise.isCustom &&
+      exercise.parameters == GTSetParameters.repsWeight &&
+      affectedHistory.every((workout) => workout.flattenedExercises
+          .whereType<Exercise>()
+          .where((ex) => exercise.isTheSameAs(ex))
+          .every(
+            (ex) =>
+                ex.sets.every((set) => set.weight == null || set.weight == 0),
+          ));
+
+  @override
+  List<Workout> get affectedRoutines => [
+        for (final workout in routinesController.workouts)
+          if (workout.hasExercise(exercise)) workout
+      ];
+
+  @override
+  List<Workout> get affectedHistory => [
+        for (final workout in historyController.history)
+          if (workout.hasExercise(exercise)) workout
+      ];
+
+  @override
+  void apply() {
+    exercisesController.removeWeightFromExercise(exercise);
+    routinesController.removeWeightFromExercise(exercise);
+    historyController.removeWeightFromExercise(exercise);
   }
 }

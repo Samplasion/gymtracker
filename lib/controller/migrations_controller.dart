@@ -47,6 +47,16 @@ class MigrationsController extends GetxController with ServiceableController {
                   migration: dataMigration)),
           (dataMigration) => dataMigration.apply(),
         ),
+        UIMigration<RemoveWeightFromCustomExerciseMigration>(
+          'migrations.removeWeightFromCustomExercise.title'.t,
+          'migrations.removeWeightFromCustomExercise.description'.t,
+          (uiMigration) => Go.to(() =>
+              RemoveWeightFromCustomExerciseMigrationSetupView(uiMigration)),
+          (dataMigration) => Go.to(() =>
+              RemoveWeightFromCustomExerciseMigrationPreviewView(
+                  migration: dataMigration)),
+          (dataMigration) => dataMigration.apply(),
+        ),
       ];
 
   @override

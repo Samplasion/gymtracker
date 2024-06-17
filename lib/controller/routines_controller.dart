@@ -215,13 +215,16 @@ class RoutinesController extends GetxController
     required List<WorkoutExercisable> exercises,
     required String id,
     required String? infobox,
+    GTRoutineFolder? folder,
   }) {
     return Workout(
-        name: name,
-        exercises: exercises,
-        id: id,
-        infobox: infobox,
-        weightUnit: settingsController.weightUnit.value);
+      name: name,
+      exercises: exercises,
+      id: id,
+      infobox: infobox,
+      weightUnit: settingsController.weightUnit.value,
+      folder: folder,
+    );
   }
 
   void editRoutine(Workout newRoutine) {

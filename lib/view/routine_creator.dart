@@ -241,6 +241,7 @@ class _RoutineCreatorState extends State<RoutineCreator> {
             infobox: infoboxController.document.toPlainText().trim().isEmpty
                 ? null
                 : infoboxController.toEncoded(),
+            folder: widget.base!.folder,
           ),
         );
       }

@@ -772,7 +772,7 @@ class DebugExercisesWithoutExplanationList extends StatelessWidget {
         exerciseStandardLibraryAsList.where((e) => !e.hasExplanation).toList();
     return Scaffold(
       appBar: AppBar(
-        title: Text("exercise.info.explanation".t),
+        title: Text("${"exercise.info.explanation".t} [${filtered.length}]"),
       ),
       body: ListView.builder(
         itemCount: filtered.length,

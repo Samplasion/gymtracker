@@ -559,7 +559,9 @@ Map<String, ExerciseCategory> get exerciseStandardLibrary => {
             primaryMuscleGroup: GTMuscleGroup.lowerBack,
             secondaryMuscleGroups: {
               GTMuscleGroup.hamstrings,
-              GTMuscleGroup.glutes
+              GTMuscleGroup.glutes,
+              GTMuscleGroup.quadriceps,
+              GTMuscleGroup.forearms
             },
           ),
           Exercise.standard(

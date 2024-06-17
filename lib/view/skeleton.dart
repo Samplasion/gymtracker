@@ -9,6 +9,7 @@ import 'package:gymtracker/controller/logger_controller.dart';
 import 'package:gymtracker/controller/notifications_controller.dart';
 import 'package:gymtracker/controller/routines_controller.dart';
 import 'package:gymtracker/controller/workout_controller.dart';
+import 'package:gymtracker/data/exercises.dart';
 import 'package:gymtracker/icons/gymtracker_icons.dart';
 import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/utils/constants.dart';
@@ -122,7 +123,12 @@ class _SkeletonViewState extends State<SkeletonView>
                     label: "routines.title".t,
                   ),
                   NavigationDestination(
-                    icon: const Icon(GymTrackerIcons.library),
+                    icon: Badge(
+                      label:
+                          Text(exerciseStandardLibraryAsList.length.toString()),
+                      isLabelVisible: _selectedIndex == 1 && kDebugMode,
+                      child: const Icon(GymTrackerIcons.library),
+                    ),
                     label: "library.title".t,
                   ),
                   NavigationDestination(

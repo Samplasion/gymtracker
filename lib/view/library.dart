@@ -444,6 +444,12 @@ class _ExerciseInfoViewState extends State<ExerciseInfoView>
                     ),
                   ],
                 ],
+                if (kDebugMode) ...[
+                  const TextSpan(text: "\n"),
+                  TextSpan(
+                    text: "Parameters: ${exercise.parameters}",
+                  ),
+                ]
               ]),
               style: Theme.of(context).textTheme.labelMedium!.copyWith(
                     color: Theme.of(context).colorScheme.onSurfaceVariant,

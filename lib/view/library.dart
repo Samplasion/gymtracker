@@ -244,6 +244,9 @@ class _ExerciseInfoViewState extends State<ExerciseInfoView>
     historySub = controller.history.listen((_) {
       historyStream.add(getHistory());
     });
+    if (!widget.exercise.hasExplanation) {
+      logger.i("Exercise ${widget.exercise.id} has no explanation");
+    }
   }
 
   @override

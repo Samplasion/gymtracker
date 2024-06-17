@@ -127,7 +127,9 @@
       "home": "Home",
       "history": "Cronologia",
       "explanation": "Spiegazione",
-      "explanationDisclaimer": "Nota che questa spiegazione è fornita a puro scopo informativo, e non sostituisce il parere di un trainer qualificato."
+      "explanationDisclaimer": "Nota che questa spiegazione è fornita a puro scopo informativo, e non sostituisce il parere di un trainer qualificato.",
+      "primaryMuscleGroup": "Gruppo muscolare: @muscleGroup",
+      "secondaryMuscleGroups": "Gruppi muscolari secondari: @muscleGroups"
     },
     "continuation": {
       "label": "Continuazione",
@@ -614,7 +616,8 @@
     "traps": "Trapezoidi",
     "triceps": "Tricipiti",
     "upperBack": "Schiena alta",
-    "thighs": "Cosce"
+    "thighs": "Cosce",
+    "forearms": "Avambracci"
   },
   "muscleCategories": {
     "arms": "Braccia",

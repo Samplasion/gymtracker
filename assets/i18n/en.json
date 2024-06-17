@@ -127,7 +127,9 @@
       "home": "Home",
       "history": "History",
       "explanation": "Explanation",
-      "explanationDisclaimer": "Note: this explanation is provided for reference only. Always consult a fitness professional."
+      "explanationDisclaimer": "Note: this explanation is provided for reference only. Always consult a fitness professional.",
+      "primaryMuscleGroup": "Muscle group: @muscleGroup",
+      "secondaryMuscleGroups": "Secondary muscle groups: @muscleGroups"
     },
     "continuation": {
       "label": "Continuation",
@@ -341,20 +343,20 @@
           "light": "Pure White mode"
         }
       },
-      "themeMode": {
-        "label": "Theme",
-        "values": {
-          "system": "System",
-          "light": "Light",
-          "dark": "Dark"
-        }
-      },
       "export": {
         "label": "Export data (JSON)",
         "filename": "GymTracker_Data",
         "failed": {
           "title": "Failed to export data",
           "copy": "The error message has been copied to the clipboard."
+        }
+      },
+      "themeMode": {
+        "label": "Theme",
+        "values": {
+          "system": "System",
+          "light": "Light",
+          "dark": "Dark"
         }
       },
       "notifications": {
@@ -614,7 +616,8 @@
     "traps": "Traps",
     "triceps": "Triceps",
     "upperBack": "Upper back",
-    "thighs": "Thighs"
+    "thighs": "Thighs",
+    "forearms": "Forearms"
   },
   "muscleCategories": {
     "arms": "Arms",

@@ -503,6 +503,7 @@ class _ExerciseInfoViewState extends State<ExerciseInfoView>
       List<(Exercise, int, Workout)> history) {
     return CustomScrollView(
       slivers: [
+        const SliverToBoxAdapter(child: SizedBox(height: 8)),
         SliverList.builder(
           itemCount: history.length,
           itemBuilder: (context, index) {
@@ -556,9 +557,7 @@ class _ExerciseInfoViewState extends State<ExerciseInfoView>
             ),
           ),
         ],
-        const SliverToBoxAdapter(
-          child: SizedBox(height: 8),
-        ),
+        const SliverToBoxAdapter(child: SizedBox(height: 8)),
         SliverPadding(
           padding: MediaQuery.of(context).padding.copyWith(
                 top: 0,

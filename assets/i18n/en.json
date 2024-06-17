@@ -845,7 +845,8 @@
         "hipThrust": "Hip thrust",
         "hipAdduction": "Hip adduction",
         "hipAbduction": "Hip abduction",
-        "clamshells": "Clamshells"
+        "clamshells": "Clamshells",
+        "hipThrustBarbell": "Hip Thrust (barbell)"
       }
     },
     "forearms": {

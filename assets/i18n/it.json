@@ -343,20 +343,20 @@
           "light": "Modalità bianco puro"
         }
       },
-      "export": {
-        "label": "Esporta dati (JSON)",
-        "filename": "Dati_GymTracker",
-        "failed": {
-          "title": "Impossibile esportare i dati",
-          "copy": "Il messaggio di errore è stato copiato negli appunti."
-        }
-      },
       "themeMode": {
         "label": "Tema",
         "values": {
           "system": "Sistema",
           "light": "Chiaro",
           "dark": "Scuro"
+        }
+      },
+      "export": {
+        "label": "Esporta dati (JSON)",
+        "filename": "Dati_GymTracker",
+        "failed": {
+          "title": "Impossibile esportare i dati",
+          "copy": "Il messaggio di errore è stato copiato negli appunti."
         }
       },
       "notifications": {
@@ -845,7 +845,8 @@
         "hipThrust": "Hip thrust",
         "hipAdduction": "Hip adduction",
         "hipAbduction": "Hip abduction",
-        "clamshells": "Clamshell per i glutei"
+        "clamshells": "Clamshell per i glutei",
+        "hipThrustBarbell": "Hip Thrust (bilanciere)"
       }
     },
     "forearms": {

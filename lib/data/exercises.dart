@@ -665,6 +665,12 @@ Map<String, ExerciseCategory> get exerciseStandardLibrary => {
             primaryMuscleGroup: GTMuscleGroup.glutes,
           ),
           Exercise.standard(
+            id: "library.hips.exercises.hipThrustBarbell",
+            name: "library.hips.exercises.hipThrustBarbell".t,
+            parameters: GTSetParameters.repsWeight,
+            primaryMuscleGroup: GTMuscleGroup.glutes,
+          ),
+          Exercise.standard(
             id: "library.hips.exercises.hipAdduction",
             name: "library.hips.exercises.hipAdduction".t,
             parameters: GTSetParameters.repsWeight,

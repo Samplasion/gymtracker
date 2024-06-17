@@ -637,14 +637,7 @@ class _ExerciseInfoViewState extends State<ExerciseInfoView>
   List<ListTileTheme> _getInfoTiles(Exercise exercise, BuildContext context) {
     final history = historyStream.value;
     if (history.isEmpty) return [];
-    return [
-      Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16),
-        child: Text("exercise.info.usefulData".t,
-            style: Theme.of(context).textTheme.labelLarge!.copyWith(
-                  color: Theme.of(context).colorScheme.primary,
-                )),
-      ),
+    final tiles = [
       if ([GTSetParameters.repsWeight, GTSetParameters.timeWeight]
           .contains(exercise.parameters))
         Builder(builder: (context) {
@@ -772,7 +765,18 @@ class _ExerciseInfoViewState extends State<ExerciseInfoView>
               Go.to(() => ExercisesView(workout: best.$3));
             },
           );
-        }),
+        })
+    ];
+    if (tiles.isEmpty) return [];
+    return [
+      Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        child: Text("exercise.info.usefulData".t,
+            style: Theme.of(context).textTheme.labelLarge!.copyWith(
+                  color: Theme.of(context).colorScheme.primary,
+                )),
+      ),
+      ...tiles,
     ].map((w) {
       // Restore default theme for this section only
       return ListTileTheme(

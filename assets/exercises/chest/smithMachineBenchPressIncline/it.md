@@ -1,5 +1,5 @@
 ### Panoramica
-Questo è un esercizio composto che colpisce principalmente i muscoli della parte superiore del torace (grande pettorale), nonché le spalle e i tricipiti. L'uso di una macchina Smith fornisce maggiore stabilità e controllo, rendendo più facile concentrarsi sull'attivazione e sulla forma muscolare.
+Questo è un esercizio che colpisce principalmente i muscoli della parte superiore del torace (grande pettorale), nonché le spalle e i tricipiti. L'uso del Multipower fornisce maggiore stabilità e controllo, rendendo più facile concentrarsi sull'attivazione e sulla forma muscolare.
 
 ### Esecuzione
 1. **Posizione iniziale:**

@@ -17,7 +17,7 @@ def generate_category_list():
     for line in lines:
       match = regex.search(line)
       if match:
-        categories.add(match.group(1))
+        categories.add((match.group(1), match.group(2)))
   return categories
 
 def main():
@@ -42,9 +42,8 @@ def main():
 
   categories = generate_category_list()
   directories = [
-    f"assets/exercises/{lang}/{category}"
-    for lang in langs
-    for category in categories
+    f"assets/exercises/{category}/{exercise}"
+    for (category, exercise) in categories
   ]
 
   for dir in directories:
@@ -55,7 +54,7 @@ def main():
     for dir in directories
   ]
 
-  lines[starting_idx + 1:ending_idx] = new_lines
+  lines[starting_idx + 1:ending_idx] = list(sorted(new_lines))
 
   with open('pubspec.yaml', 'w') as f:
     f.write('\n'.join(lines))

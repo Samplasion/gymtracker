@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
@@ -52,14 +53,10 @@ class GTLocalizations extends Translations with ChangeNotifier {
     Get.addTranslations(keys);
     notifyListeners();
 
-    for (final locale in supportedLocales) {
-      await loadExercises(locale);
-    }
+    await loadExercises();
   }
 
-  loadExercises(Locale locale) async {
-    exerciseExplanations.putIfAbsent(locale.languageCode, () => {});
-
+  loadExercises() async {
     final exercises = exerciseStandardLibrary.values
         .map((category) {
           return category.exercises.map((exercise) {
@@ -70,16 +67,23 @@ class GTLocalizations extends Translations with ChangeNotifier {
         .expand((element) => element)
         .toList();
 
-    for (final (fullID, category, id) in exercises) {
-      try {
-        final bundle = await rootBundle.loadString(
-            'assets/exercises/${locale.languageCode}/$category/$id.md',
-            cache: false);
-        exerciseExplanations[locale.languageCode]![fullID] = bundle;
-      } catch (e) {
-        logger.t(
-            "[${locale.languageCode}] Failed to load explanation for $fullID");
-        continue;
+    for (final locale in supportedLocales) {
+      exerciseExplanations.putIfAbsent(locale.languageCode, () => {});
+
+      for (final (fullID, category, id) in exercises) {
+        try {
+          final bundle = await rootBundle.loadString(
+              'assets/exercises/$category/$id/${locale.languageCode}.md',
+              cache: false);
+          exerciseExplanations[locale.languageCode]![fullID] = bundle;
+        } catch (e, s) {
+          logger.t(
+            "[${locale.languageCode}] Failed to load explanation for $fullID",
+            error: e,
+            stackTrace: s,
+          );
+          continue;
+        }
       }
     }
   }

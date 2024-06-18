@@ -23,6 +23,7 @@ class ExerciseCategory {
       );
 }
 
+// RUN tools/asset_expl.py TO GENERATE ASSET MAP IN pubspec.yaml
 Map<String, ExerciseCategory> get exerciseStandardLibrary => {
       "library.cardio.name".t: ExerciseCategory(
         exercises: [

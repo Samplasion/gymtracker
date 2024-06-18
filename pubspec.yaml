@@ -84,6 +84,7 @@ flutter:
     - assets/exercises/abs/crunches/
     - assets/exercises/abs/extendedReverseCrunchWithLegExtension/
     - assets/exercises/abs/fullBodyCrunch/
+    - assets/exercises/abs/heelTouches/
     - assets/exercises/abs/heelsUpCrunch/
     - assets/exercises/abs/hollowBodyHold/
     - assets/exercises/abs/kneeRaise/

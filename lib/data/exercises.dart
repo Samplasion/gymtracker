@@ -365,6 +365,12 @@ Map<String, ExerciseCategory> get exerciseStandardLibrary => {
             parameters: GTSetParameters.freeBodyReps,
             primaryMuscleGroup: GTMuscleGroup.abs,
           ),
+          Exercise.standard(
+            id: "library.abs.exercises.heelTouches",
+            name: "library.abs.exercises.heelTouches".t,
+            parameters: GTSetParameters.freeBodyReps,
+            primaryMuscleGroup: GTMuscleGroup.abs,
+          ),
         ],
         icon: Text("library.abs.name".t.characters.first.toUpperCase()),
         color: Colors.amber,

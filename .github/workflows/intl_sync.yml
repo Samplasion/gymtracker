@@ -1,0 +1,32 @@
+name: Accent sync
+
+on:
+  schedule:
+    - cron: "0 4 * * *"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16
+      - run: npm install -g accent-cli
+      - name: Decode accent.json
+        env:
+          STRING: ${{ secrets.ACCENT_JSON }}
+        run: |
+          echo $STRING > accent.json
+      - run: accent sync --add-translations --merge-type=passive --order-by=key
+      - uses: peter-evans/create-pull-request@v4
+        with:
+          add-paths: "*.json"
+          commit-message: "[INTL] Update localizations"
+          committer: GitHub <noreply@github.com>
+          author: ${{ github.actor }} <${{ github.actor }}@users.noreply.github.com>
+          branch: accent
+          draft: false
+          delete-branch: true
+          title: New translations are available to merge
+          body: Translation files have been updated, feel free to merge this pull request after review.

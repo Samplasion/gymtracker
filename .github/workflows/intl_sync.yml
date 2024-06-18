@@ -22,7 +22,7 @@ jobs:
       - uses: peter-evans/create-pull-request@v4
         with:
           add-paths: "*.json"
-          commit-message: "[INTL] Update localizations"
+          commit-message: "feat: Update localizations"
           committer: GitHub <noreply@github.com>
           author: ${{ github.actor }} <${{ github.actor }}@users.noreply.github.com>
           branch: accent

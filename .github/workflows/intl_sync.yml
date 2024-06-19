@@ -25,7 +25,7 @@ jobs:
           commit-message: "chore: Update localizations"
           committer: GitHub <noreply@github.com>
           author: ${{ github.actor }} <${{ github.actor }}@users.noreply.github.com>
-          branch: accent
+          branch: master
           draft: false
           delete-branch: true
           title: New translations are available to merge

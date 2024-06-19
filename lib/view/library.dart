@@ -595,55 +595,61 @@ class _ExerciseInfoViewState extends State<ExerciseInfoView>
   }
 
   Widget _explanationBody(Exercise exercise) {
-    return CustomScrollView(
-      slivers: [
-        SliverPadding(
-          padding: const EdgeInsets.all(16),
-          sliver: SliverToBoxAdapter(
-            child: MarkdownBody(
-              data: exercise.explanation!,
-              styleSheet:
-                  MarkdownStyleSheet.fromTheme(Theme.of(context)).copyWith(
-                a: TextStyle(color: Theme.of(context).colorScheme.primary),
+    return ThemedSubtree.builder(
+      color: category?.color ?? Theme.of(context).colorScheme.primary,
+      enabled: Get.find<SettingsController>().tintExercises.value,
+      builder: (context) {
+        return CustomScrollView(
+          slivers: [
+            SliverPadding(
+              padding: const EdgeInsets.all(16),
+              sliver: SliverToBoxAdapter(
+                child: MarkdownBody(
+                  data: exercise.explanation!,
+                  styleSheet:
+                      MarkdownStyleSheet.fromTheme(Theme.of(context)).copyWith(
+                    a: TextStyle(color: Theme.of(context).colorScheme.primary),
+                  ),
+                  onTapLink: (text, href, title) {
+                    if (href == null) return;
+                    final uri = Uri.tryParse(href);
+                    if (uri == null) return;
+                    if (uri.scheme == "exercise" && uri.host == "library") {
+                      final id = uri.pathSegments.first;
+                      logger.d(id);
+                      final exercise = getStandardExerciseByID(id);
+                      if (exercise != null) {
+                        Go.to(() => ExerciseInfoView(exercise: exercise));
+                      } else {
+                        logger.e("Exercise not found: $id");
+                      }
+                    }
+                  },
+                ),
               ),
-              onTapLink: (text, href, title) {
-                if (href == null) return;
-                final uri = Uri.tryParse(href);
-                if (uri == null) return;
-                if (uri.scheme == "exercise" && uri.host == "library") {
-                  final id = uri.pathSegments.first;
-                  logger.d(id);
-                  final exercise = getStandardExerciseByID(id);
-                  if (exercise != null) {
-                    Go.to(() => ExerciseInfoView(exercise: exercise));
-                  } else {
-                    logger.e("Exercise not found: $id");
-                  }
-                }
-              },
             ),
-          ),
-        ),
-        SliverPadding(
-          padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-          sliver: SliverToBoxAdapter(
-            child: Text(
-              "exercise.info.explanationDisclaimer".t,
-              style: context.theme.textTheme.labelSmall,
-            ),
-          ),
-        ),
-        SliverPadding(
-          padding: MediaQuery.of(context).padding.copyWith(
-                top: 0,
-                left: 0,
-                right: 0,
+            SliverPadding(
+              padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+              sliver: SliverToBoxAdapter(
+                child: Text(
+                  "exercise.info.explanationDisclaimer".t,
+                  style: context.theme.textTheme.labelSmall,
+                ),
               ),
-          sliver: const SliverToBoxAdapter(
-            child: SizedBox.shrink(),
-          ),
-        ),
-      ],
+            ),
+            SliverPadding(
+              padding: MediaQuery.of(context).padding.copyWith(
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                  ),
+              sliver: const SliverToBoxAdapter(
+                child: SizedBox.shrink(),
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 

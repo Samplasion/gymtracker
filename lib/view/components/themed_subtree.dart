@@ -4,7 +4,8 @@ import 'package:gymtracker/utils/theme.dart';
 
 class ThemedSubtree extends StatelessWidget {
   final Color color;
-  final Widget child;
+  final Widget? child;
+  final Widget Function(BuildContext)? builder;
   final bool enabled;
 
   const ThemedSubtree({
@@ -12,7 +13,14 @@ class ThemedSubtree extends StatelessWidget {
     required this.child,
     this.enabled = true,
     super.key,
-  });
+  }) : builder = null;
+
+  const ThemedSubtree.builder({
+    required this.color,
+    required this.builder,
+    this.enabled = true,
+    super.key,
+  }) : child = null;
 
   ColorScheme _getScheme(BuildContext context) {
     return ColorScheme.fromSeed(
@@ -21,12 +29,18 @@ class ThemedSubtree extends StatelessWidget {
     ).harmonized();
   }
 
+  Widget _childBuilder(BuildContext context) {
+    if (child != null) return child!;
+
+    return builder!(context);
+  }
+
   @override
   Widget build(BuildContext context) {
-    if (!enabled) return child;
+    if (!enabled) return _childBuilder(context);
     return Theme(
       data: getGymTrackerThemeFor(_getScheme(context)),
-      child: child,
+      child: Builder(builder: _childBuilder),
     );
   }
 }

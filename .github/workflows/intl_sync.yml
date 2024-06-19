@@ -19,7 +19,7 @@ jobs:
           STRING: ${{ secrets.ACCENT_JSON }}
         run: |
           echo $STRING > accent.json
-      - run: accent sync --add-translations --merge-type=passive --order-by=key
+      - run: accent sync --add-translations --merge-type=passive
       - uses: peter-evans/create-pull-request@v4
         with:
           commit-message: "chore: Update localizations"

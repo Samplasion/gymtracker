@@ -3,6 +3,7 @@ name: Accent sync
 on:
   schedule:
     - cron: "0 4 * * *"
+  workflow_dispatch: {}
 
 jobs:
   build:
@@ -21,8 +22,7 @@ jobs:
       - run: accent sync --add-translations --merge-type=passive --order-by=key
       - uses: peter-evans/create-pull-request@v4
         with:
-          add-paths: "*.json"
-          commit-message: "feat: Update localizations"
+          commit-message: "chore: Update localizations"
           committer: GitHub <noreply@github.com>
           author: ${{ github.actor }} <${{ github.actor }}@users.noreply.github.com>
           branch: accent

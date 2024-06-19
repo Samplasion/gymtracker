@@ -701,9 +701,6 @@
   },
   "library": {
     "title": "Library",
-    "custom": {
-      "name": "Custom exercises"
-    },
     "cardio": {
       "name": "Cardio",
       "exercises": {
@@ -848,8 +845,10 @@
       }
     },
     "newCustomExercise": "New exercise",
+    "custom": {
+      "name": "Custom exercises"
+    },
     "hips": {
-      "name": "Hips",
       "exercises": {
         "gluteBridge": "Glute bridge",
         "hipThrust": "Hip thrust",
@@ -857,7 +856,8 @@
         "hipAbduction": "Hip abduction",
         "clamshells": "Clamshells",
         "hipThrustBarbell": "Hip thrust (barbell)"
-      }
+      },
+      "name": "Hips"
     },
     "forearms": {
       "name": "Forearms",

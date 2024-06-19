@@ -697,7 +697,9 @@
   },
   "library": {
     "title": "Library",
-    "custom": "Custom exercises",
+    "custom": {
+      "name": "Custom exercises"
+    },
     "cardio": {
       "name": "Cardio",
       "exercises": {

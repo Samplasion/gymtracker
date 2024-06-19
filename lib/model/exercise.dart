@@ -23,6 +23,24 @@ enum GTMuscleCategory {
   shoulders,
 }
 
+enum GTExerciseMuscleCategory {
+  cardio,
+  chest,
+  biceps,
+  abs,
+  calves,
+  quadriceps,
+  hamstrings,
+  shoulders,
+  back,
+  triceps,
+  hips,
+  forearms,
+  custom;
+
+  String get localizedName => "library.$name.name".t;
+}
+
 enum GTMuscleGroup {
   abductors(GTMuscleCategory.legs),
   abs(GTMuscleCategory.core),
@@ -124,6 +142,21 @@ class Exercise extends WorkoutExercisable {
     return doneSets.fold(0, (value, element) => value! + (element.reps ?? 0));
   }
 
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  final GTExerciseMuscleCategory? _category;
+
+  GTExerciseMuscleCategory? get category {
+    if (isCustom) return GTExerciseMuscleCategory.custom;
+    if (standard && _category == null) {
+      final query = isAbstract ? id : parentID;
+      if (query != null) {
+        return getStandardExerciseByID(query)?.category;
+      }
+    }
+
+    return _category;
+  }
+
   Exercise.raw({
     String? id,
     required this.name,
@@ -138,7 +171,9 @@ class Exercise extends WorkoutExercisable {
     required this.supersetID,
     required this.workoutID,
     required this.supersedesID,
+    GTExerciseMuscleCategory? category,
   })  : id = id ?? const Uuid().v4(),
+        _category = category,
         assert(sets.isEmpty || parameters == sets[0].parameters,
             "The parameters must not change between the Exercise and its Sets"),
         assert(
@@ -172,6 +207,7 @@ class Exercise extends WorkoutExercisable {
         supersetID: supersetID,
         workoutID: workoutID,
         supersedesID: null,
+        category: GTExerciseMuscleCategory.custom,
       );
 
   factory Exercise.standard({
@@ -313,6 +349,10 @@ class Exercise extends WorkoutExercisable {
           ),
       ],
     );
+  }
+
+  Exercise withCategory(GTExerciseMuscleCategory category) {
+    return copyWith(category: category);
   }
 }
 

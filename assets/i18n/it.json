@@ -697,7 +697,9 @@
   },
   "library": {
     "title": "Libreria",
-    "custom": "Esercizi personalizzati",
+    "custom": {
+      "name": "Esercizi personalizzati"
+    },
     "cardio": {
       "name": "Cardio",
       "exercises": {

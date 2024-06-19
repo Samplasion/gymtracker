@@ -26,12 +26,10 @@ class ExerciseIcon extends StatelessWidget {
     Color backgroundColor = Theme.of(context).colorScheme.secondaryContainer;
     Color foregroundColor = Theme.of(context).colorScheme.onSecondaryContainer;
 
-    if (exercise is Exercise && exercise.standard) {
-      final color = exerciseStandardLibrary.entries
-          .firstWhereOrNull((element) => element.value.exercises
-              .any((e) => e.id == (exercise.parentID ?? exercise.id)))
-          ?.value
-          .color;
+    if (exercise is Exercise &&
+        exercise.standard &&
+        exercise.category != null) {
+      final color = exerciseStandardLibrary[exercise.category]?.color;
       if (color != null) {
         backgroundColor = getContainerColor(context, color);
         foregroundColor = getOnContainerColor(context, color);

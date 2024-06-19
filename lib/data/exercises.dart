@@ -21,11 +21,22 @@ class ExerciseCategory {
         icon: icon,
         color: color,
       );
+
+  copyWith({
+    List<Exercise>? exercises,
+    Widget? icon,
+    Color? color,
+  }) =>
+      ExerciseCategory(
+        exercises: exercises ?? this.exercises,
+        icon: icon ?? this.icon,
+        color: color ?? this.color,
+      );
 }
 
 // RUN tools/asset_expl.py TO GENERATE ASSET MAP IN pubspec.yaml
-Map<String, ExerciseCategory> get exerciseStandardLibrary => {
-      "library.cardio.name".t: ExerciseCategory(
+Map<GTExerciseMuscleCategory, ExerciseCategory> get exerciseStandardLibrary => {
+      GTExerciseMuscleCategory.cardio: ExerciseCategory(
         exercises: [
           Exercise.standard(
             id: "library.cardio.exercises.aerobics",
@@ -98,7 +109,7 @@ Map<String, ExerciseCategory> get exerciseStandardLibrary => {
         icon: const Icon(GymTrackerIcons.cardio),
         color: Colors.orange,
       ),
-      "library.chest.name".t: ExerciseCategory(
+      GTExerciseMuscleCategory.chest: ExerciseCategory(
         exercises: [
           Exercise.standard(
             id: "library.chest.exercises.barbellBenchPressFlat",
@@ -221,7 +232,7 @@ Map<String, ExerciseCategory> get exerciseStandardLibrary => {
         icon: Text("library.chest.name".t.characters.first.toUpperCase()),
         color: Colors.teal,
       ),
-      "library.biceps.name".t: ExerciseCategory(
+      GTExerciseMuscleCategory.biceps: ExerciseCategory(
         exercises: [
           Exercise.standard(
             id: "library.biceps.exercises.barbellBicepsCurl",
@@ -288,7 +299,7 @@ Map<String, ExerciseCategory> get exerciseStandardLibrary => {
         icon: Text("library.biceps.name".t.characters.first.toUpperCase()),
         color: Colors.blue,
       ),
-      "library.abs.name".t: ExerciseCategory(
+      GTExerciseMuscleCategory.abs: ExerciseCategory(
         exercises: [
           Exercise.standard(
             id: "library.abs.exercises.crunches",
@@ -375,7 +386,7 @@ Map<String, ExerciseCategory> get exerciseStandardLibrary => {
         icon: Text("library.abs.name".t.characters.first.toUpperCase()),
         color: Colors.amber,
       ),
-      "library.calves.name".t: ExerciseCategory(
+      GTExerciseMuscleCategory.calves: ExerciseCategory(
         exercises: [
           Exercise.standard(
             id: "library.calves.exercises.calfRaiseStanding",
@@ -399,7 +410,7 @@ Map<String, ExerciseCategory> get exerciseStandardLibrary => {
         icon: Text("library.calves.name".t.characters.first.toUpperCase()),
         color: Colors.green,
       ),
-      "library.quadriceps.name".t: ExerciseCategory(
+      GTExerciseMuscleCategory.quadriceps: ExerciseCategory(
         exercises: [
           Exercise.standard(
             id: "library.quadriceps.exercises.squatsBarbell",
@@ -456,7 +467,7 @@ Map<String, ExerciseCategory> get exerciseStandardLibrary => {
         icon: Text("library.quadriceps.name".t.characters.first.toUpperCase()),
         color: Colors.indigo,
       ),
-      "library.hamstrings.name".t: ExerciseCategory(
+      GTExerciseMuscleCategory.hamstrings: ExerciseCategory(
         exercises: [
           Exercise.standard(
             id: "library.hamstrings.exercises.legCurlProne",
@@ -481,7 +492,7 @@ Map<String, ExerciseCategory> get exerciseStandardLibrary => {
         icon: Text("library.hamstrings.name".t.characters.first.toUpperCase()),
         color: Colors.deepPurple,
       ),
-      "library.shoulders.name".t: ExerciseCategory(
+      GTExerciseMuscleCategory.shoulders: ExerciseCategory(
         exercises: [
           Exercise.standard(
             id: "library.shoulders.exercises.shoulderPressMachine",
@@ -543,7 +554,7 @@ Map<String, ExerciseCategory> get exerciseStandardLibrary => {
         icon: Text("library.shoulders.name".t.characters.first.toUpperCase()),
         color: Colors.cyan,
       ),
-      "library.back.name".t: ExerciseCategory(
+      GTExerciseMuscleCategory.back: ExerciseCategory(
         exercises: [
           Exercise.standard(
             id: "library.back.exercises.hyperExtensions",
@@ -625,7 +636,7 @@ Map<String, ExerciseCategory> get exerciseStandardLibrary => {
         icon: Text("library.back.name".t.characters.first.toUpperCase()),
         color: Colors.pink,
       ),
-      "library.triceps.name".t: ExerciseCategory(
+      GTExerciseMuscleCategory.triceps: ExerciseCategory(
         exercises: [
           Exercise.standard(
             id: "library.triceps.exercises.dips",
@@ -680,7 +691,7 @@ Map<String, ExerciseCategory> get exerciseStandardLibrary => {
         icon: Text("library.triceps.name".t.characters.first.toUpperCase()),
         color: Colors.yellow,
       ),
-      "library.hips.name".t: ExerciseCategory(
+      GTExerciseMuscleCategory.hips: ExerciseCategory(
         color: Colors.brown,
         icon: Text("library.hips.name".t.characters.first.toUpperCase()),
         exercises: [
@@ -723,7 +734,7 @@ Map<String, ExerciseCategory> get exerciseStandardLibrary => {
           ),
         ],
       ),
-      "library.forearms.name".t: ExerciseCategory(
+      GTExerciseMuscleCategory.forearms: ExerciseCategory(
         exercises: [
           Exercise.standard(
             id: "library.forearms.exercises.wristCurlsBarbell",
@@ -783,7 +794,11 @@ Map<String, ExerciseCategory> get exerciseStandardLibrary => {
         icon: Text("library.forearms.name".t.characters.first.toUpperCase()),
         color: Colors.lime,
       ),
-    };
+    }.map((key, value) => MapEntry(
+        key,
+        value.copyWith(
+            exercises:
+                value.exercises.map((e) => e.withCategory(key)).toList())));
 
 List<Exercise> get exerciseStandardLibraryAsList =>
     exerciseStandardLibrary.values.fold(
@@ -792,6 +807,10 @@ List<Exercise> get exerciseStandardLibraryAsList =>
               ...previousValue,
               ...element.exercises,
             ]);
+
+List<GTExerciseMuscleCategory> get sortedCategories =>
+    [...exerciseStandardLibrary.keys]..sort((a, b) =>
+        a.localizedName.toLowerCase().compareTo(b.localizedName.toLowerCase()));
 
 Exercise? getStandardExerciseByID(String id) => exerciseStandardLibraryAsList
     .firstWhereOrNull((element) => element.id == id);

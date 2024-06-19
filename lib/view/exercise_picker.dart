@@ -56,18 +56,16 @@ class _ExercisePickerState extends State<ExercisePicker> {
     return true;
   }
 
-  Map<String, ExerciseCategory> get exercises {
-    final sortedKeys = [...exerciseStandardLibrary.keys]
-      ..sort((a, b) => a.toLowerCase().compareTo(b.toLowerCase()));
+  Map<GTExerciseMuscleCategory, ExerciseCategory> get exercises {
     return {
       if (widget.filter.hasCustom)
-        "library.custom".t: ExerciseCategory(
+        GTExerciseMuscleCategory.custom: ExerciseCategory(
           exercises: controller.exercises.where(_filter).toList(),
           icon: const Icon(GymTrackerIcons.custom_exercises),
           color: Colors.yellow,
         ),
       if (widget.filter.hasLibrary)
-        for (final key in sortedKeys)
+        for (final key in sortedCategories)
           if (exerciseStandardLibrary[key]!
               .filtered(_filter)
               .exercises
@@ -137,7 +135,7 @@ class _ExercisePickerState extends State<ExercisePicker> {
                       getOnContainerColor(context, category.value.color),
                   child: category.value.icon,
                 ),
-                title: Text(category.key),
+                title: Text(category.key.localizedName),
                 subtitle: Text(
                   "general.exercises".plural(category.value.exercises.length),
                 ),
@@ -145,7 +143,7 @@ class _ExercisePickerState extends State<ExercisePicker> {
                   Go.to(
                     () => StatefulBuilder(builder: (context, setState) {
                       return LibraryPickerExercisesView(
-                        name: category.key,
+                        name: category.key.localizedName,
                         category: category.value,
                         singleSelection: widget.singlePick,
                         onSelected: (exercise) {

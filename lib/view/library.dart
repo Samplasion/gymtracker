@@ -33,16 +33,14 @@ import 'package:rxdart/rxdart.dart';
 class LibraryView extends GetView<ExercisesController> {
   const LibraryView({super.key});
 
-  Map<String, ExerciseCategory> get exercises {
-    final sortedKeys = [...exerciseStandardLibrary.keys]
-      ..sort((a, b) => a.toLowerCase().compareTo(b.toLowerCase()));
+  Map<GTExerciseMuscleCategory, ExerciseCategory> get exercises {
     return {
-      "library.custom".t: ExerciseCategory(
+      GTExerciseMuscleCategory.custom: ExerciseCategory(
         exercises: controller.exercises,
         icon: const Icon(GymTrackerIcons.custom_exercises),
         color: Colors.yellow,
       ),
-      for (final key in sortedKeys) key: exerciseStandardLibrary[key]!,
+      for (final key in sortedCategories) key: exerciseStandardLibrary[key]!,
     };
   }
 
@@ -77,16 +75,17 @@ class LibraryView extends GetView<ExercisesController> {
                             getOnContainerColor(context, category.value.color),
                         child: category.value.icon,
                       ),
-                      title: Text(category.key),
+                      title: Text(category.key.localizedName),
                       subtitle: Text(
                         "general.exercises"
                             .plural(category.value.exercises.length),
                       ),
                       onTap: () {
                         Go.to(() => LibraryExercisesView(
-                              name: category.key,
+                              name: category.key.localizedName,
                               category: category.value,
-                              isCustom: category.key == "library.custom".t,
+                              isCustom: category.key ==
+                                  GTExerciseMuscleCategory.custom,
                             ));
                       },
                     ),

@@ -810,7 +810,8 @@
         "reverseFlysInclinedBench": "Reverse flys (inclined bench)",
         "arnoldPress": "Arnold press",
         "frontDumbbellRaise": "Front dumbbell raise",
-        "uprightRow": "Upright row"
+        "uprightRow": "Upright row",
+        "pikePushUps": "Pike push-ups"
       }
     },
     "back": {
@@ -835,7 +836,9 @@
         "overheadRopeTricepExtension": "Overhead rope tricep extension",
         "tricepsRopePushdown": "Triceps rope pushdown",
         "tricepKickbacks": "Tricep kickbacks",
-        "skullCrushers": "Skull Crushers"
+        "skullCrushers": "Skull Crushers",
+        "benchDips": "Dips (bench)",
+        "diamondPushUps": "Diamond push-ups"
       }
     },
     "newCustomExercise": "New exercise",

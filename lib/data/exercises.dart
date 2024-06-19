@@ -533,6 +533,12 @@ Map<String, ExerciseCategory> get exerciseStandardLibrary => {
             parameters: GTSetParameters.repsWeight,
             primaryMuscleGroup: GTMuscleGroup.shoulders,
           ),
+          Exercise.standard(
+              id: "library.shoulders.exercises.pikePushUps",
+              name: "library.shoulders.exercises.pikePushUps".t,
+              parameters: GTSetParameters.repsWeight,
+              primaryMuscleGroup: GTMuscleGroup.shoulders,
+              secondaryMuscleGroups: {GTMuscleGroup.triceps}),
         ],
         icon: Text("library.shoulders.name".t.characters.first.toUpperCase()),
         color: Colors.cyan,
@@ -650,6 +656,25 @@ Map<String, ExerciseCategory> get exerciseStandardLibrary => {
             name: "library.triceps.exercises.tricepKickbacks".t,
             parameters: GTSetParameters.repsWeight,
             primaryMuscleGroup: GTMuscleGroup.triceps,
+          ),
+          Exercise.standard(
+            id: "library.triceps.exercises.benchDips",
+            name: "library.triceps.exercises.benchDips".t,
+            parameters: GTSetParameters.freeBodyReps,
+            primaryMuscleGroup: GTMuscleGroup.triceps,
+            secondaryMuscleGroups: {
+              GTMuscleGroup.shoulders,
+              GTMuscleGroup.chest,
+            },
+          ),
+          Exercise.standard(
+            id: "library.triceps.exercises.diamondPushUps",
+            name: "library.triceps.exercises.diamondPushUps".t,
+            parameters: GTSetParameters.freeBodyReps,
+            primaryMuscleGroup: GTMuscleGroup.triceps,
+            secondaryMuscleGroups: {
+              GTMuscleGroup.chest,
+            },
           ),
         ],
         icon: Text("library.triceps.name".t.characters.first.toUpperCase()),

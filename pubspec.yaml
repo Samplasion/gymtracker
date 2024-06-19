@@ -175,9 +175,12 @@ flutter:
     - assets/exercises/shoulders/latRaisesCable/
     - assets/exercises/shoulders/latRaisesDualCable/
     - assets/exercises/shoulders/latRaisesInclinedBench/
+    - assets/exercises/shoulders/pikePushUps/
     - assets/exercises/shoulders/reverseFlysInclinedBench/
     - assets/exercises/shoulders/shoulderPressMachine/
     - assets/exercises/shoulders/uprightRow/
+    - assets/exercises/triceps/benchDips/
+    - assets/exercises/triceps/diamondPushUps/
     - assets/exercises/triceps/dips/
     - assets/exercises/triceps/overheadRopeTricepExtension/
     - assets/exercises/triceps/skullCrushers/

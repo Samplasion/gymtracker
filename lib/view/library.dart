@@ -24,6 +24,7 @@ import 'package:gymtracker/utils/utils.dart';
 import 'package:gymtracker/view/charts/line_charts_by_workout.dart';
 import 'package:gymtracker/view/components/badges.dart';
 import 'package:gymtracker/view/components/context_menu.dart';
+import 'package:gymtracker/view/components/themed_subtree.dart';
 import 'package:gymtracker/view/exercise_creator.dart';
 import 'package:gymtracker/view/exercises.dart';
 import 'package:gymtracker/view/utils/exercise.dart';
@@ -115,102 +116,108 @@ class LibraryExercisesView extends StatelessWidget {
   Widget build(BuildContext context) {
     final sorted = [...category.exercises]
       ..sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(name),
+    return ThemedSubtree(
+      color: category.color,
+      enabled: Get.find<SettingsController>().tintExercises.value,
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(name),
+        ),
+        body: CustomScrollView(
+          slivers: [
+            if (isCustom) ...[
+              SliverToBoxAdapter(
+                child: ListTile(
+                  title: Text("library.newCustomExercise".t),
+                  leading: const CircleAvatar(
+                      child: Icon(GymTrackerIcons.create_exercise)),
+                  onTap: () {
+                    Go.showBottomModalScreen(
+                        (context, controller) => ExerciseCreator(
+                              base: null,
+                              scrollController: controller,
+                            ));
+                  },
+                ),
+              ),
+              const SliverToBoxAdapter(child: Divider()),
+            ],
+            SliverPadding(
+              padding: MediaQuery.of(context).padding.copyWith(
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                  ),
+              sliver: SliverList.builder(
+                itemCount: category.exercises.length,
+                itemBuilder: (context, index) {
+                  var exerciseListTile = ExerciseListTile(
+                    exercise: sorted[index],
+                    selected: false,
+                    isConcrete: false,
+                    trailing: kDebugMode && sorted[index].hasExplanation
+                        ? const Icon(GymTrackerIcons.explanation)
+                        : null,
+                    onTap: () {
+                      Go.to(() => ExerciseInfoView(exercise: sorted[index]));
+                    },
+                  );
+                  if (isCustom && kDebugMode) {
+                    return ContextMenuRegion(
+                      child: exerciseListTile,
+                      contextMenuBuilder: (context, offset) {
+                        return AdaptiveTextSelectionToolbar.buttonItems(
+                          anchors: TextSelectionToolbarAnchors(
+                            primaryAnchor: offset,
+                          ),
+                          buttonItems: <ContextMenuButtonItem>[
+                            ContextMenuButtonItem(
+                              onPressed: () {
+                                ContextMenuController.removeAny();
+                                final category =
+                                    sorted[index].primaryMuscleGroup.name;
+                                var name = sorted[index]
+                                    .name
+                                    .toLowerCase()
+                                    .replaceAllMapped(
+                                        RegExp(r"(\b[a-z](?=[a-z]{1}))"),
+                                        (match) =>
+                                            match.group(0)!.toUpperCase())
+                                    .replaceAllMapped(
+                                        RegExp(r'[^a-zA-Z0-9]'), (match) => '');
+                                name =
+                                    name[0].toLowerCase() + name.substring(1);
+
+                                final dart = """
+      Exercise.standard(
+        id: "library.$category.exercises.$name",
+        name: "library.$category.exercises.$name".t,
+        parameters: GTSetParameters.${sorted[index].parameters.name},
+        primaryMuscleGroup: GTMuscleGroup.${sorted[index].primaryMuscleGroup.name},
+        secondaryMuscleGroups: {${sorted[index].secondaryMuscleGroups.map((e) => "GTMuscleGroup.${e.name}").join(", ")}},
       ),
-      body: CustomScrollView(
-        slivers: [
-          if (isCustom) ...[
-            SliverToBoxAdapter(
-              child: ListTile(
-                title: Text("library.newCustomExercise".t),
-                leading: const CircleAvatar(
-                    child: Icon(GymTrackerIcons.create_exercise)),
-                onTap: () {
-                  Go.showBottomModalScreen(
-                      (context, controller) => ExerciseCreator(
-                            base: null,
-                            scrollController: controller,
-                          ));
+      """;
+                                Clipboard.setData(ClipboardData(text: dart));
+                              },
+                              label: 'Copy as standard exercise',
+                            ),
+                            ContextMenuButtonItem(
+                              onPressed: () {
+                                ContextMenuController.removeAny();
+                              },
+                              label: 'Close',
+                            ),
+                          ],
+                        );
+                      },
+                    );
+                  }
+                  return exerciseListTile;
                 },
               ),
             ),
-            const SliverToBoxAdapter(child: Divider()),
           ],
-          SliverPadding(
-            padding: MediaQuery.of(context).padding.copyWith(
-                  top: 0,
-                  left: 0,
-                  right: 0,
-                ),
-            sliver: SliverList.builder(
-              itemCount: category.exercises.length,
-              itemBuilder: (context, index) {
-                var exerciseListTile = ExerciseListTile(
-                  exercise: sorted[index],
-                  selected: false,
-                  isConcrete: false,
-                  trailing: kDebugMode && sorted[index].hasExplanation
-                      ? const Icon(GymTrackerIcons.explanation)
-                      : null,
-                  onTap: () {
-                    Go.to(() => ExerciseInfoView(exercise: sorted[index]));
-                  },
-                );
-                if (isCustom && kDebugMode) {
-                  return ContextMenuRegion(
-                    child: exerciseListTile,
-                    contextMenuBuilder: (context, offset) {
-                      return AdaptiveTextSelectionToolbar.buttonItems(
-                        anchors: TextSelectionToolbarAnchors(
-                          primaryAnchor: offset,
-                        ),
-                        buttonItems: <ContextMenuButtonItem>[
-                          ContextMenuButtonItem(
-                            onPressed: () {
-                              ContextMenuController.removeAny();
-                              final category =
-                                  sorted[index].primaryMuscleGroup.name;
-                              var name = sorted[index]
-                                  .name
-                                  .toLowerCase()
-                                  .replaceAllMapped(
-                                      RegExp(r"(\b[a-z](?=[a-z]{1}))"),
-                                      (match) => match.group(0)!.toUpperCase())
-                                  .replaceAllMapped(
-                                      RegExp(r'[^a-zA-Z0-9]'), (match) => '');
-                              name = name[0].toLowerCase() + name.substring(1);
-
-                              final dart = """
-Exercise.standard(
-  id: "library.$category.exercises.$name",
-  name: "library.$category.exercises.$name".t,
-  parameters: GTSetParameters.${sorted[index].parameters.name},
-  primaryMuscleGroup: GTMuscleGroup.${sorted[index].primaryMuscleGroup.name},
-  secondaryMuscleGroups: {${sorted[index].secondaryMuscleGroups.map((e) => "GTMuscleGroup.${e.name}").join(", ")}},
-),
-""";
-                              Clipboard.setData(ClipboardData(text: dart));
-                            },
-                            label: 'Copy as standard exercise',
-                          ),
-                          ContextMenuButtonItem(
-                            onPressed: () {
-                              ContextMenuController.removeAny();
-                            },
-                            label: 'Close',
-                          ),
-                        ],
-                      );
-                    },
-                  );
-                }
-                return exerciseListTile;
-              },
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }
@@ -302,99 +309,106 @@ class _ExerciseInfoViewState extends State<ExerciseInfoView>
           ),
       ];
 
+  late final category = exerciseStandardLibrary[widget.exercise.category];
+
   @override
   Widget build(BuildContext context) {
     final exercise = widget.exercise;
 
-    return StreamBuilder<List<(Exercise, int, Workout)>>(
-      stream: historyStream,
-      initialData: const <(Exercise, int, Workout)>[],
-      builder: (context, historySnapshot) {
-        final history = historySnapshot.data ?? [];
+    return ThemedSubtree(
+      color: category?.color ?? Theme.of(context).colorScheme.primary,
+      enabled: Get.find<SettingsController>().tintExercises.value,
+      child: StreamBuilder<List<(Exercise, int, Workout)>>(
+        stream: historyStream,
+        initialData: const <(Exercise, int, Workout)>[],
+        builder: (context, historySnapshot) {
+          final history = historySnapshot.data ?? [];
 
-        final infoTiles = _getInfoTiles(exercise, context);
-        final chartHistory = history.map((e) => (e.$3, e.$1)).toList();
-        chartHistory
-            .sort((a, b) => a.$1.startingDate!.compareTo(b.$1.startingDate!));
+          final infoTiles = _getInfoTiles(exercise, context);
+          final chartHistory = history.map((e) => (e.$3, e.$1)).toList();
+          chartHistory
+              .sort((a, b) => a.$1.startingDate!.compareTo(b.$1.startingDate!));
 
-        final tabs = getTabs(exercise, chartHistory, history, infoTiles);
+          final tabs = getTabs(exercise, chartHistory, history, infoTiles);
 
-        return Scaffold(
-          appBar: AppBar(
-            title: Text.rich(TextSpan(children: [
-              if (exercise.isCustom) ...[
-                const WidgetSpan(
-                  child: CustomExerciseBadge(short: true),
-                  alignment: PlaceholderAlignment.middle,
-                ),
-                const TextSpan(text: " "),
-              ],
-              TextSpan(text: exercise.displayName),
-            ])),
-            actions: [
-              if (exercise.isCustom)
-                PopupMenuButton(
-                  key: const Key("menu"),
-                  itemBuilder: (_) => [
-                    PopupMenuItem(
-                      child: Text("actions.edit".t),
-                      onTap: () async {
-                        Get.find<ExercisesController>()
-                            .editExercise(exercise, history);
-                      },
-                    ),
-                    if (history.isEmpty)
+          return Scaffold(
+            appBar: AppBar(
+              title: Text.rich(TextSpan(children: [
+                if (exercise.isCustom) ...[
+                  const WidgetSpan(
+                    child: CustomExerciseBadge(short: true),
+                    alignment: PlaceholderAlignment.middle,
+                  ),
+                  const TextSpan(text: " "),
+                ],
+                TextSpan(text: exercise.displayName),
+              ])),
+              actions: [
+                if (exercise.isCustom)
+                  PopupMenuButton(
+                    key: const Key("menu"),
+                    itemBuilder: (_) => [
                       PopupMenuItem(
-                        child: Text(
-                          "actions.remove".t,
-                          style: TextStyle(
-                            color: Theme.of(context).colorScheme.error,
-                          ),
-                        ),
+                        child: Text("actions.edit".t),
                         onTap: () async {
-                          final delete = await Go.confirm(
-                              "exercise.delete.title", "exercise.delete.body");
-                          if (delete) {
-                            Get.find<ExercisesController>()
-                                .deleteExercise(exercise);
-                            Get.back();
-                          }
+                          Get.find<ExercisesController>()
+                              .editExercise(exercise, history);
                         },
                       ),
-                  ],
-                ),
-            ],
-            bottom: TabBar(
-              tabAlignment: Platform.isMacOS || Platform.isIOS
-                  ? TabAlignment.center
-                  : TabAlignment.startOffset,
-              controller: tabController,
-              tabs: [
-                Tab(
-                  icon: const Icon(GymTrackerIcons.home),
-                  text: "exercise.info.home".t,
-                ),
-                Tab(
-                  icon: const Icon(GymTrackerIcons.history),
-                  text: "exercise.info.history".t,
-                ),
-                Tab(
-                  icon: const Icon(GymTrackerIcons.explanation),
-                  text: "exercise.info.explanation".t,
-                ),
-              ].take(tabs.length).toList(),
-              isScrollable: true,
+                      if (history.isEmpty)
+                        PopupMenuItem(
+                          child: Text(
+                            "actions.remove".t,
+                            style: TextStyle(
+                              color: Theme.of(context).colorScheme.error,
+                            ),
+                          ),
+                          onTap: () async {
+                            final delete = await Go.confirm(
+                                "exercise.delete.title",
+                                "exercise.delete.body");
+                            if (delete) {
+                              Get.find<ExercisesController>()
+                                  .deleteExercise(exercise);
+                              Get.back();
+                            }
+                          },
+                        ),
+                    ],
+                  ),
+              ],
+              bottom: TabBar(
+                tabAlignment: Platform.isMacOS || Platform.isIOS
+                    ? TabAlignment.center
+                    : TabAlignment.startOffset,
+                controller: tabController,
+                tabs: [
+                  Tab(
+                    icon: const Icon(GymTrackerIcons.home),
+                    text: "exercise.info.home".t,
+                  ),
+                  Tab(
+                    icon: const Icon(GymTrackerIcons.history),
+                    text: "exercise.info.history".t,
+                  ),
+                  Tab(
+                    icon: const Icon(GymTrackerIcons.explanation),
+                    text: "exercise.info.explanation".t,
+                  ),
+                ].take(tabs.length).toList(),
+                isScrollable: true,
+              ),
             ),
-          ),
-          body: ListTileTheme(
-            contentPadding: EdgeInsets.zero,
-            child: TabBarView(
-              controller: tabController,
-              children: tabs,
+            body: ListTileTheme(
+              contentPadding: EdgeInsets.zero,
+              child: TabBarView(
+                controller: tabController,
+                children: tabs,
+              ),
             ),
-          ),
-        );
-      },
+          );
+        },
+      ),
     );
   }
 

@@ -1,4 +1,3 @@
-import 'package:animations/animations.dart';
 import 'package:device_sim/device_sim.dart';
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:flutter/foundation.dart';
@@ -18,7 +17,6 @@ import 'package:gymtracker/service/database.dart';
 import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/service/logger.dart';
 import 'package:gymtracker/service/version.dart';
-import 'package:gymtracker/utils/constants.dart';
 import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/utils/theme.dart';
@@ -91,28 +89,15 @@ class MainApp extends StatelessWidget {
                               seedColor: seedColor,
                               brightness: Brightness.light,
                             ).harmonized();
-                  if (settings.amoledMode.isTrue) {
-                    lightScheme = lightScheme.neutralBackground();
-                  }
                   var darkScheme = (dark != null && settings.usesDynamicColor())
                       ? dark.harmonized()
                       : ColorScheme.fromSeed(
                           seedColor: seedColor,
                           brightness: Brightness.dark,
                         ).harmonized();
-                  if (settings.amoledMode.isTrue) {
-                    darkScheme = darkScheme.neutralBackground();
-                  }
                   return AnimatedBuilder(
                     animation: localizations,
                     builder: (context, _) {
-                      var pageTransitionsTheme =
-                          PageTransitionsTheme(builders: {
-                        TargetPlatform.android: _SharedAxisTransitionBuilder(),
-                        TargetPlatform.iOS:
-                            const CupertinoPageTransitionsBuilder(),
-                        TargetPlatform.macOS: _SharedAxisTransitionBuilder(),
-                      });
                       return GetMaterialApp(
                         useInheritedMediaQuery: true,
                         title: () {
@@ -133,32 +118,8 @@ class MainApp extends StatelessWidget {
                           GlobalCupertinoLocalizations.delegate,
                         ],
                         themeMode: settings.themeMode(),
-                        theme: ThemeData(
-                          useMaterial3: true,
-                          brightness: Brightness.light,
-                          colorScheme: lightScheme,
-                          pageTransitionsTheme: pageTransitionsTheme,
-                          extensions: [
-                            MoreColors.fromColorScheme(lightScheme),
-                          ],
-                          splashFactory: platformDependentSplashFactory,
-                          dialogTheme: DialogTheme(
-                            backgroundColor: lightScheme.surfaceContainer,
-                          ),
-                        ),
-                        darkTheme: ThemeData(
-                          useMaterial3: true,
-                          brightness: Brightness.dark,
-                          colorScheme: darkScheme,
-                          pageTransitionsTheme: pageTransitionsTheme,
-                          extensions: [
-                            MoreColors.fromColorScheme(darkScheme),
-                          ],
-                          splashFactory: platformDependentSplashFactory,
-                          dialogTheme: DialogTheme(
-                            backgroundColor: darkScheme.surfaceContainer,
-                          ),
-                        ),
+                        theme: getGymTrackerThemeFor(lightScheme),
+                        darkTheme: getGymTrackerThemeFor(darkScheme),
                         home: const _Loader(),
                         onGenerateRoute: (settings) {
                           return switch (settings.name) {
@@ -242,23 +203,6 @@ class __LoaderState extends State<_Loader> {
       body: const Center(
         child: CircularProgressIndicator(),
       ),
-    );
-  }
-}
-
-class _SharedAxisTransitionBuilder extends PageTransitionsBuilder {
-  @override
-  Widget buildTransitions<T>(
-      PageRoute<T> route,
-      BuildContext context,
-      Animation<double> animation,
-      Animation<double> secondaryAnimation,
-      Widget child) {
-    return SharedAxisTransition(
-      transitionType: SharedAxisTransitionType.horizontal,
-      animation: animation,
-      secondaryAnimation: secondaryAnimation,
-      child: child,
     );
   }
 }

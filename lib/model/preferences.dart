@@ -16,6 +16,7 @@ class Prefs implements Insertable<Preference> {
   final bool showSuggestedRoutines;
   final bool amoledMode;
   final ThemeMode themeMode;
+  final bool tintExercises;
 
   const Prefs({
     required this.usesDynamicColor,
@@ -26,6 +27,7 @@ class Prefs implements Insertable<Preference> {
     required this.showSuggestedRoutines,
     required this.amoledMode,
     required this.themeMode,
+    required this.tintExercises,
   });
 
   factory Prefs.fromDatabase(Preference row) =>
@@ -40,6 +42,7 @@ class Prefs implements Insertable<Preference> {
     showSuggestedRoutines: true,
     amoledMode: true,
     themeMode: ThemeMode.system,
+    tintExercises: true,
   );
 
   Map<String, dynamic> toJson() => {
@@ -54,6 +57,7 @@ class Prefs implements Insertable<Preference> {
         "showSuggestedRoutines": showSuggestedRoutines,
         "amoledMode": amoledMode,
         "themeMode": themeMode.name,
+        "tintExercises": tintExercises,
       };
 
   factory Prefs.fromJson(Map<String, dynamic> json) {
@@ -76,6 +80,7 @@ class Prefs implements Insertable<Preference> {
         (t) => t.name == json['themeMode'],
         orElse: () => defaults.themeMode,
       ),
+      tintExercises: json['tintExercises'] ?? defaults.tintExercises,
     );
   }
 
@@ -90,6 +95,7 @@ class Prefs implements Insertable<Preference> {
   showSuggestedRoutines: $showSuggestedRoutines,
   amoledMode: $amoledMode,
   themeMode: $themeMode,
+  tintExercises: $tintExercises,
 )""";
   }
 
@@ -109,6 +115,7 @@ class Prefs implements Insertable<Preference> {
     bool? showSuggestedRoutines,
     bool? amoledMode,
     ThemeMode? themeMode,
+    bool? tintExercises,
   }) {
     return Prefs(
       usesDynamicColor: usesDynamicColor ?? this.usesDynamicColor,
@@ -120,6 +127,7 @@ class Prefs implements Insertable<Preference> {
           showSuggestedRoutines ?? this.showSuggestedRoutines,
       amoledMode: amoledMode ?? this.amoledMode,
       themeMode: themeMode ?? this.themeMode,
+      tintExercises: tintExercises ?? this.tintExercises,
     );
   }
 }

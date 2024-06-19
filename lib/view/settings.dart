@@ -68,18 +68,6 @@ class SettingsView extends StatelessWidget {
                   );
                 },
               ),
-              ValueBuilder<bool?>(
-                initialValue: controller.amoledMode.value,
-                builder: (value, onChanged) => SwitchListTile(
-                  title: Text(
-                      "settings.options.amoledMode.label.${context.theme.brightness.name}"
-                          .t),
-                  value: value ?? Prefs.defaultValue.amoledMode,
-                  onChanged: onChanged,
-                ),
-                onUpdate: (v) => controller
-                    .setAmoledMode(v ?? Prefs.defaultValue.amoledMode),
-              ),
               Obx(
                 () => ValueBuilder<ThemeMode?>(
                   initialValue: controller.themeMode.value,
@@ -96,6 +84,29 @@ class SettingsView extends StatelessWidget {
                   onUpdate: (v) =>
                       controller.setThemeMode(v ?? ThemeMode.system),
                 ),
+              ),
+              ValueBuilder<bool?>(
+                initialValue: controller.amoledMode.value,
+                builder: (value, onChanged) => SwitchListTile(
+                  title: Text(
+                      "settings.options.amoledMode.label.${context.theme.brightness.name}"
+                          .t),
+                  value: value ?? Prefs.defaultValue.amoledMode,
+                  onChanged: onChanged,
+                ),
+                onUpdate: (v) => controller
+                    .setAmoledMode(v ?? Prefs.defaultValue.amoledMode),
+              ),
+              ValueBuilder<bool?>(
+                initialValue: controller.tintExercises.value,
+                builder: (value, onChanged) => SwitchListTile(
+                  title: Text("settings.options.tintExercises.label".t),
+                  subtitle: Text("settings.options.tintExercises.subtitle".t),
+                  value: value ?? Prefs.defaultValue.tintExercises,
+                  onChanged: onChanged,
+                ),
+                onUpdate: (v) => controller
+                    .setTintExercises(v ?? Prefs.defaultValue.tintExercises),
               ),
               Obx(
                 () => ValueBuilder<Locale?>(

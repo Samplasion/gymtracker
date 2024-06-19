@@ -33,6 +33,7 @@ class SettingsController extends GetxController with ServiceableController {
   RxBool showSuggestedRoutines = Prefs.defaultValue.showSuggestedRoutines.obs;
   RxBool amoledMode = Prefs.defaultValue.amoledMode.obs;
   Rx<ThemeMode> themeMode = Prefs.defaultValue.themeMode.obs;
+  RxBool tintExercises = Prefs.defaultValue.tintExercises.obs;
 
   void setUsesDynamicColor(bool usesDC) =>
       service.writeSettings(service.prefs$.value.copyWith(
@@ -72,6 +73,11 @@ class SettingsController extends GetxController with ServiceableController {
         themeMode: themeMode,
       ));
 
+  void setTintExercises(bool tintExercises) =>
+      service.writeSettings(service.prefs$.value.copyWith(
+        tintExercises: tintExercises,
+      ));
+
   @override
   void onInit() {
     super.onInit();
@@ -89,6 +95,7 @@ class SettingsController extends GetxController with ServiceableController {
       showSuggestedRoutines(prefs.showSuggestedRoutines);
       amoledMode(prefs.amoledMode);
       themeMode(prefs.themeMode);
+      tintExercises(prefs.tintExercises);
 
       notifyChildrens();
     });
@@ -106,6 +113,7 @@ class SettingsController extends GetxController with ServiceableController {
     showSuggestedRoutines(prefs.showSuggestedRoutines);
     amoledMode(prefs.amoledMode);
     themeMode(prefs.themeMode);
+    tintExercises(prefs.tintExercises);
 
     notifyChildrens();
   }

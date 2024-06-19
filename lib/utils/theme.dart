@@ -1,6 +1,9 @@
+import 'package:animations/animations.dart';
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:gymtracker/controller/settings_controller.dart';
+import 'package:gymtracker/utils/constants.dart';
 import 'package:gymtracker/utils/extensions.dart';
 
 const kDarkBackgroundBase = Color(0xFF000000);
@@ -9,6 +12,33 @@ const kDarkForeground = Color(0xFFE9E9E9);
 const kLightBackgroundBase = Color(0xFFFFFFFF);
 const kLightBackgroundLight1 = Color(0xFFF6F6F6);
 const kLightForeground = Color(0xFF1D1B1B);
+
+ThemeData getGymTrackerThemeFor(ColorScheme scheme) {
+  final settings = Get.find<SettingsController>();
+  if (settings.amoledMode.isTrue) {
+    scheme = scheme.neutralBackground();
+  }
+  var pageTransitionsTheme = PageTransitionsTheme(builders: {
+    TargetPlatform.android: _SharedAxisTransitionBuilder(),
+    TargetPlatform.iOS: const CupertinoPageTransitionsBuilder(),
+    TargetPlatform.macOS: _SharedAxisTransitionBuilder(),
+  });
+
+  final brightness = scheme.brightness;
+  return ThemeData(
+    useMaterial3: true,
+    brightness: brightness,
+    colorScheme: scheme,
+    pageTransitionsTheme: pageTransitionsTheme,
+    extensions: [
+      MoreColors.fromColorScheme(scheme),
+    ],
+    splashFactory: platformDependentSplashFactory,
+    dialogTheme: DialogTheme(
+      backgroundColor: scheme.surfaceContainer,
+    ),
+  );
+}
 
 @immutable
 class MoreColors extends ThemeExtension<MoreColors> {
@@ -155,4 +185,21 @@ extension MoreColorsOnColorScheme on ColorScheme {
       Theme.of(Get.context!).extension<MoreColors>()!.quinaryContainer;
   Color get onQuinaryContainer =>
       Theme.of(Get.context!).extension<MoreColors>()!.onQuinaryContainer;
+}
+
+class _SharedAxisTransitionBuilder extends PageTransitionsBuilder {
+  @override
+  Widget buildTransitions<T>(
+      PageRoute<T> route,
+      BuildContext context,
+      Animation<double> animation,
+      Animation<double> secondaryAnimation,
+      Widget child) {
+    return SharedAxisTransition(
+      transitionType: SharedAxisTransitionType.horizontal,
+      animation: animation,
+      secondaryAnimation: secondaryAnimation,
+      child: child,
+    );
+  }
 }

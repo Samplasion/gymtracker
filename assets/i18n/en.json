@@ -365,6 +365,10 @@
           "noPermission": "Tap to request permission",
           "noExactAlarmPermission": "Tap to request \"Exact alarms\" permission (Android 14+)"
         }
+      },
+      "tintExercises": {
+        "label": "Tint exercise pages",
+        "subtitle": "Apply the category color to exercise and category pages"
       }
     },
     "colorPicker": {

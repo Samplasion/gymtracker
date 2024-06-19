@@ -4,8 +4,8 @@ Lo Scott Curl, noto anche come Preacher Curl, è un esercizio di isolamento che 
 ### Esecuzione
 1. **Posizione iniziale:**
    - Regola la panca da Scott Curl in modo che l'imbottitura sostenga comodamente il petto e le ascelle.
-   - Siediti sulla panca e appoggiare la parte posteriore delle braccia sul cuscino.
-   - Afferra un bilanciere o una EZ bar con una presa subdola (palmi rivolti verso l'alto), alla larghezza delle spalle.
+   - Siediti sulla panca e appoggia la parte posteriore delle braccia sul cuscino.
+   - Afferra un bilanciere o una EZ bar con una presa supina (palmi rivolti verso l'alto), alla larghezza delle spalle.
    - Estendi completamente le braccia, permettendo alla barra di abbassarsi davanti a te. Questa è la tua posizione di partenza.
 
 2. **Fase di sollevamento:**

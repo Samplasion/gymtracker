@@ -343,14 +343,6 @@
           "light": "Modalità bianco puro"
         }
       },
-      "export": {
-        "label": "Esporta dati (JSON)",
-        "filename": "Dati_GymTracker",
-        "failed": {
-          "title": "Impossibile esportare i dati",
-          "copy": "Il messaggio di errore è stato copiato negli appunti."
-        }
-      },
       "themeMode": {
         "label": "Tema",
         "values": {
@@ -359,12 +351,24 @@
           "dark": "Scuro"
         }
       },
+      "export": {
+        "label": "Esporta dati (JSON)",
+        "filename": "Dati_GymTracker",
+        "failed": {
+          "title": "Impossibile esportare i dati",
+          "copy": "Il messaggio di errore è stato copiato negli appunti."
+        }
+      },
       "notifications": {
         "label": "Stato notifiche",
         "subtitle": {
           "noPermission": "Tocca per richiedere il permesso",
           "noExactAlarmPermission": "Tocca per richiedere il permesso \"Promemoria e avvisi\" (Android 14+)"
         }
+      },
+      "tintExercises": {
+        "label": "Colora pagine degli esercizi",
+        "subtitle": "Applica alle pagine degli esercizi il colore della categoria di appartenenza"
       }
     },
     "colorPicker": {
@@ -697,9 +701,6 @@
   },
   "library": {
     "title": "Libreria",
-    "custom": {
-      "name": "Esercizi personalizzati"
-    },
     "cardio": {
       "name": "Cardio",
       "exercises": {
@@ -769,7 +770,8 @@
         "russianTwist": "Russian twist",
         "bicycleCrunches": "Bicycle crunch",
         "extendedReverseCrunchWithLegExtension": "Crunch inverso con leg extension",
-        "toeTouches": "Toe touches"
+        "toeTouches": "Toe touches",
+        "heelTouches": "Heel touches"
       }
     },
     "calves": {
@@ -811,7 +813,8 @@
         "reverseFlysInclinedBench": "Croci inverse (panca inclinata)",
         "arnoldPress": "Arnold press",
         "frontDumbbellRaise": "Sollevamento frontale dei manubri",
-        "uprightRow": "Vogatore verticale"
+        "uprightRow": "Vogatore verticale",
+        "pikePushUps": "Pike push-up"
       }
     },
     "back": {
@@ -836,8 +839,13 @@
         "overheadRopeTricepExtension": "Estensione dei tricipiti sopra la testa",
         "tricepsRopePushdown": "Pushdown dei tricipiti con corda",
         "tricepKickbacks": "Kickback per i tricipiti",
-        "skullCrushers": "Skull Crushers"
+        "skullCrushers": "Skull Crushers",
+        "benchDips": "Dip alla panca",
+        "diamondPushUps": "Flessioni a diamante"
       }
+    },
+    "custom": {
+      "name": "Esercizi personalizzati"
     },
     "newCustomExercise": "Nuovo esercizio",
     "hips": {

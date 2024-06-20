@@ -86,6 +86,7 @@ class GymTrackerIcons {
   static const IconData routines = Icons.fitness_center_rounded;
   static const IconData sets = Icons.numbers_rounded;
   static const IconData settings = Icons.settings_rounded;
+  static const IconData share = Icons.share_rounded;
   static const IconData skip = Icons.skip_next_rounded;
   static const IconData stats = Icons.query_stats_rounded;
   static const IconData stopwatch = Icons.timer_rounded;

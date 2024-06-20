@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/service/logger.dart';
 import 'package:gymtracker/utils/go.dart';
+import 'package:gymtracker/utils/utils.dart';
 import 'package:logger/logger.dart';
 import 'package:rxdart/rxdart.dart';
 
@@ -125,6 +126,28 @@ class LoggerController extends GetxController {
     logs.clear();
     _onLogsUpdatedSubject.add(null);
     update();
+  }
+
+  void shareLogs() {
+    final logs = filteredLogs;
+    final maxLevelLength = logs
+        .map((log) => log.level.displayName.length)
+        .reduce((value, element) => value > element ? value : element);
+    final logsString = logs.map((log) {
+      final timestamp = log.timestamp.toIso8601String();
+      final level = log.level.displayName.toUpperCase();
+      final message = log.message;
+      final object = log.object;
+      final error = log.error;
+      final stackTrace = log.stackTrace;
+      final errorString = "${error ?? ""}\n\n${stackTrace ?? ""}".trim();
+      final firstLine = "${" " * (maxLevelLength - level.length)}[$level] ";
+      return "$firstLine$timestamp $object\n${" " * firstLine.length}$message\n\n$errorString"
+          .trimRight();
+    }).join('\n\n${"=" * (maxLevelLength + 2)}\n\n');
+
+    if (logsString.isEmpty) return;
+    shareText(logsString);
   }
 
   void dumpAllLevels() {

@@ -2,6 +2,7 @@ import 'package:dynamic_color/dynamic_color.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_quill/flutter_quill.dart';
 import 'package:gymtracker/utils/extensions.dart';
+import 'package:share_plus/share_plus.dart';
 
 bool doubleIsActuallyInt(double double, [double epsilon = 0.001]) {
   return doubleEquality(double, double.floorToDouble(), epsilon: epsilon);
@@ -77,4 +78,8 @@ DateTime min(DateTime a, DateTime b) {
 
 DateTime max(DateTime a, DateTime b) {
   return a.isAfter(b) ? a : b;
+}
+
+void shareText(String text) {
+  Share.share(text);
 }

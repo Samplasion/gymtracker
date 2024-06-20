@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:get/get.dart' hide ContextExtensionss;
 import 'package:gymtracker/controller/logger_controller.dart';
+import 'package:gymtracker/icons/gymtracker_icons.dart';
 import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/utils/constants.dart';
 import 'package:gymtracker/utils/utils.dart';
@@ -98,6 +99,10 @@ class _LogViewState extends ControlledState<LogView, LoggerController> {
               IconButton(
                 icon: const Icon(Icons.delete_forever),
                 onPressed: controller.clearLogs,
+              ),
+              IconButton(
+                icon: const Icon(GymTrackerIcons.share),
+                onPressed: controller.shareLogs,
               ),
               if (kDebugMode)
                 IconButton(

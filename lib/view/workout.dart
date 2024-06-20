@@ -7,6 +7,7 @@ import 'package:flutter_quill/flutter_quill.dart';
 import 'package:get/get.dart';
 import 'package:gymtracker/controller/countdown_controller.dart';
 import 'package:gymtracker/controller/routines_controller.dart';
+import 'package:gymtracker/controller/settings_controller.dart';
 import 'package:gymtracker/controller/stopwatch_controller.dart';
 import 'package:gymtracker/controller/workout_controller.dart';
 import 'package:gymtracker/icons/gymtracker_icons.dart';
@@ -35,15 +36,7 @@ import 'package:gymtracker/view/utils/timer.dart';
 import 'package:gymtracker/view/utils/weight_calculator.dart';
 import 'package:gymtracker/view/utils/workout.dart';
 
-WorkoutController get _controller {
-  if (Get.isRegistered<WorkoutController>()) {
-    return Get.find<WorkoutController>();
-  }
-
-  return Get.put(WorkoutController("Untitled workout", null, null));
-}
-
-WorkoutController? get safeController {
+WorkoutController? get _controller {
   if (Get.isRegistered<WorkoutController>()) {
     return Get.find<WorkoutController>();
   }
@@ -195,10 +188,13 @@ class _WorkoutViewState extends State<WorkoutView> {
             tooltip: "ongoingWorkout.weightCalculator".t,
             icon: const Icon(GymTrackerIcons.weight_calculator),
             onPressed: () {
+              final weightUnit = _controller == null
+                  ? settingsController.weightUnit.value
+                  : _controller!.weightUnit.value;
               showDialog(
                 context: context,
                 builder: (context) => WeightCalculator(
-                  weightUnit: _controller.weightUnit.value,
+                  weightUnit: weightUnit,
                 ),
               );
             },
@@ -218,7 +214,7 @@ class _WorkoutViewState extends State<WorkoutView> {
                   "ongoingWorkout.actions.changeWeightUnit".t,
                 ),
                 onTap: () {
-                  _controller.changeWeightUnitDialog();
+                  _controller?.changeWeightUnitDialog();
                 },
               ),
               PopupMenuItem(
@@ -226,7 +222,7 @@ class _WorkoutViewState extends State<WorkoutView> {
                   "ongoingWorkout.actions.changeDistanceUnit".t,
                 ),
                 onTap: () {
-                  _controller.changeDistanceUnitDialog();
+                  _controller?.changeDistanceUnitDialog();
                 },
               ),
               const PopupMenuDivider(),
@@ -236,7 +232,7 @@ class _WorkoutViewState extends State<WorkoutView> {
                 ),
                 onTap: () {
                   SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
-                    _controller.finishWorkoutWithDialog(context);
+                    _controller?.finishWorkoutWithDialog(context);
                   });
                 },
               ),
@@ -247,7 +243,7 @@ class _WorkoutViewState extends State<WorkoutView> {
                 ),
                 onTap: () {
                   SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
-                    _controller.cancelWorkoutWithDialog(context,
+                    _controller?.cancelWorkoutWithDialog(context,
                         onCanceled: () {
                       SchedulerBinding.instance
                           .addPostFrameCallback((timeStamp) {
@@ -282,13 +278,13 @@ class _WorkoutViewState extends State<WorkoutView> {
         bottom: false,
         child: Obx(
           () {
-            if (safeController != null &&
-                Workout.shouldShowAsInfobox(safeController!.infobox())) {
+            if (_controller != null &&
+                Workout.shouldShowAsInfobox(_controller!.infobox())) {
               return _buildListView();
             }
             return CustomMaterialIndicator(
               onRefresh: () async {
-                _controller.showEditNotesDialog();
+                _controller?.showEditNotesDialog();
               },
               indicatorBuilder: (context, controller) {
                 final cardTheme = ContextThemingUtils(context).theme.cardTheme;
@@ -325,40 +321,40 @@ class _WorkoutViewState extends State<WorkoutView> {
                 MediaQuery.of(context).padding.bottom,
           ),
       children: [
-        if (Get.isRegistered<WorkoutController>() &&
+        if (_controller != null &&
             Workout.shouldShowAsInfobox(
                 Get.find<WorkoutController>().infobox())) ...[
           Infobox(
-            text: _controller.infobox()!,
+            text: _controller!.infobox()!,
             onLongPress: () {
-              _controller.showEditNotesDialog();
+              _controller!.showEditNotesDialog();
             },
           ),
         ],
 
         // Avoid calling [get controller] in order to avoid
         // recreating it, thus starting a new workout.
-        if (Get.find<RoutinesController>().hasOngoingWorkout())
-          for (int i = 0; i < (safeController?.exercises.length ?? 0); i++)
-            if (_controller.exercises[i] is Exercise)
+        if (_controller != null)
+          for (int i = 0; i < _controller!.exercises.length; i++)
+            if (_controller!.exercises[i] is Exercise)
               WorkoutExerciseEditor(
-                key: ValueKey((_controller.exercises[i] as Exercise).id),
-                exercise: _controller.exercises[i] as Exercise,
+                key: ValueKey((_controller!.exercises[i] as Exercise).id),
+                exercise: _controller!.exercises[i] as Exercise,
                 index: (exerciseIndex: i, supersetIndex: null),
                 isCreating: false,
-                weightUnit: _controller.weightUnit.value,
-                distanceUnit: _controller.distanceUnit.value,
-                callbacks: _controller.callbacks,
+                weightUnit: _controller!.weightUnit.value,
+                distanceUnit: _controller!.distanceUnit.value,
+                callbacks: _controller!.callbacks,
               )
             else
               SupersetEditor(
-                superset: _controller.exercises[i] as Superset,
+                superset: _controller!.exercises[i] as Superset,
                 index: i,
                 isCreating: false,
-                key: ValueKey((_controller.exercises[i] as Superset).id),
-                weightUnit: _controller.weightUnit.value,
-                distanceUnit: _controller.distanceUnit.value,
-                callbacks: _controller.callbacks,
+                key: ValueKey((_controller!.exercises[i] as Superset).id),
+                weightUnit: _controller!.weightUnit.value,
+                distanceUnit: _controller!.distanceUnit.value,
+                callbacks: _controller!.callbacks,
               ),
         Padding(
           padding: const EdgeInsets.all(16),
@@ -367,14 +363,14 @@ class _WorkoutViewState extends State<WorkoutView> {
               title: 'ongoingWorkout.exercises.add'.t,
               type: SplitButtonSegmentType.filled,
               onTap: () async {
-                _controller.pickExercises();
+                _controller?.pickExercises();
               },
             ),
             SplitButtonSegment(
               title: "ongoingWorkout.exercises.addSuperset".t,
               onTap: () {
-                _controller.exercises.add(Superset.empty());
-                _controller.exercises.refresh();
+                _controller?.exercises.add(Superset.empty());
+                _controller?.exercises.refresh();
               },
             ),
           ]),
@@ -400,9 +396,9 @@ class WorkoutInfoBar extends StatelessWidget {
             children: [
               Obx(
                 () {
-                  if (safeController == null) return const SizedBox.shrink();
+                  if (_controller == null) return const SizedBox.shrink();
                   return TimerView(
-                    startingTime: safeController!.time.value,
+                    startingTime: _controller?.time.value ?? DateTime.now(),
                     builder: (context, text) {
                       return Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -436,7 +432,7 @@ class WorkoutInfoBar extends StatelessWidget {
                     () => TweenAnimationBuilder(
                       tween: Tween<double>(
                         begin: 0,
-                        end: safeController?.reps.toDouble() ?? 0,
+                        end: _controller?.reps.toDouble() ?? 0,
                       ),
                       curve: Curves.decelerate,
                       duration: const Duration(milliseconds: 400),
@@ -460,13 +456,13 @@ class WorkoutInfoBar extends StatelessWidget {
                     () => TweenAnimationBuilder(
                       tween: Tween<double>(
                         begin: 0,
-                        end: safeController?.liftedWeight ?? 0,
+                        end: _controller?.liftedWeight ?? 0,
                       ),
                       curve: Curves.decelerate,
                       duration: const Duration(milliseconds: 400),
                       builder: (context, value, _) {
                         if (doubleIsActuallyInt(
-                            safeController?.liftedWeight ?? 0)) {
+                            _controller?.liftedWeight ?? 0)) {
                           return Text("${value.round()}");
                         }
                         return Text(stringifyDouble(value));
@@ -484,7 +480,7 @@ class WorkoutInfoBar extends StatelessWidget {
             curve: Curves.linearToEaseOut,
             tween: Tween<double>(
               begin: 0,
-              end: safeController?.progress ?? 0,
+              end: _controller?.progress ?? 0,
             ),
             builder: (context, value, _) => LinearProgressIndicator(
               value: value,
@@ -521,7 +517,7 @@ class WorkoutTimerView extends StatelessWidget {
             TimerView(
               startingTime: () {
                 try {
-                  return Get.find<WorkoutController>().time.value;
+                  return _controller!.time.value;
                 } catch (e, s) {
                   logger.e("Error getting workout time",
                       error: e, stackTrace: s);
@@ -557,7 +553,7 @@ class WorkoutTimerView extends StatelessWidget {
                           () => TimerView(
                             startingTime: () {
                               try {
-                                return Get.find<WorkoutController>().time.value;
+                                return _controller!.time.value;
                               } catch (e, s) {
                                 logger.e(
                                   "Error getting workout time",
@@ -647,20 +643,22 @@ class _WorkoutFinishPageState extends State<WorkoutFinishPage> {
   late Duration workoutDuration;
   final formKey = GlobalKey<FormState>();
 
-  final titleController = TextEditingController(text: _controller.name.value);
+  final titleController =
+      TextEditingController(text: _controller?.name.value ?? "");
   final timeController = TextEditingController(
-    text: TimeInputField.encodeDuration(
-        DateTime.now().difference(_controller.time.value)),
+    text: TimeInputField.encodeDuration(_controller == null
+        ? Duration.zero
+        : DateTime.now().difference(_controller!.time.value)),
   );
   final dateController = TextEditingController();
   final infoboxController = QuillController(
-    document: (_controller.infobox.value ?? "").asQuillDocument(),
+    document: (_controller?.infobox.value ?? "").asQuillDocument(),
     selection: const TextSelection.collapsed(offset: 0),
   );
 
   late String? pwInitialItem = () {
     // Parent workout data
-    String? pwInitialItem = _controller.parentID.value;
+    String? pwInitialItem = _controller?.parentID.value;
     if (Get.find<RoutinesController>()
         .workouts
         .every((element) => element.id != pwInitialItem)) {
@@ -672,6 +670,14 @@ class _WorkoutFinishPageState extends State<WorkoutFinishPage> {
 
   @override
   Widget build(BuildContext context) {
+    if (_controller == null) {
+      return const Dialog.fullscreen(
+        child: SizedBox.shrink(),
+      );
+    }
+
+    final controller = _controller!;
+
     final padding = MediaQuery.of(context).viewPadding;
     return Dialog.fullscreen(
       child: Scaffold(
@@ -701,7 +707,7 @@ class _WorkoutFinishPageState extends State<WorkoutFinishPage> {
                 padding: padding,
                 children: [
                   const SizedBox(height: 8),
-                  if (!_controller.isContinuation.value)
+                  if (!controller.isContinuation.value)
                     TextFormField(
                       controller: titleController,
                       decoration: _decoration(
@@ -717,25 +723,25 @@ class _WorkoutFinishPageState extends State<WorkoutFinishPage> {
                   DateField(
                     decoration: _decoration(
                         "ongoingWorkout.finish.fields.startingTime.label".t),
-                    date: _controller.time.value,
-                    onSelect: (date) => setState(() => _controller.time(date)),
+                    date: controller.time.value,
+                    onSelect: (date) => setState(() => controller.time(date)),
                     firstDate: DateTime.fromMillisecondsSinceEpoch(0),
                     lastDate: DateTime.now().add(const Duration(days: 7)),
                   ),
-                  if (!_controller.isContinuation.value)
+                  if (!controller.isContinuation.value)
                     RoutineFormPicker(
-                      key: ValueKey(_controller.parentID.value),
+                      key: ValueKey(controller.parentID.value),
                       decoration: _decoration(
                           "ongoingWorkout.finish.fields.parent.label".t),
                       onChanged: (routine) {
                         setState(() {
-                          _controller.parentID.value = routine?.id;
+                          controller.parentID.value = routine?.id;
                         });
                       },
                       routine: Get.find<RoutinesController>()
                           .workouts
                           .firstWhereOrNull((element) =>
-                              element.id == _controller.parentID.value),
+                              element.id == controller.parentID.value),
                     ),
                   TimeInputField(
                     controller: timeController,
@@ -757,7 +763,7 @@ class _WorkoutFinishPageState extends State<WorkoutFinishPage> {
                     ),
                     onTapOutside: () {
                       logger.d("Quill Editor onTapOutside");
-                      _controller.infobox(jsonEncode(
+                      controller.infobox(jsonEncode(
                           infoboxController.document.toDelta().toJson()));
                     },
                   ),
@@ -787,8 +793,8 @@ class _WorkoutFinishPageState extends State<WorkoutFinishPage> {
   void _submit() {
     final isValid = formKey.currentState!.validate();
 
-    if (isValid) {
-      _controller.submit(
+    if (isValid && _controller != null) {
+      _controller!.submit(
         titleController.text,
         TimeInputField.parseDuration(timeController.text),
       );

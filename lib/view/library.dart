@@ -414,110 +414,117 @@ class _ExerciseInfoViewState extends State<ExerciseInfoView>
 
   Widget _homeBody(Exercise exercise, List<(Workout, Exercise)> chartHistory,
       List<(Exercise, int, Workout)> history, List<ListTileTheme> infoTiles) {
-    return CustomScrollView(
-      slivers: [
-        if (exercise.isCustom)
-          SliverPadding(
-            padding: const EdgeInsets.all(16).copyWith(bottom: 8),
-            sliver: const SliverToBoxAdapter(
-              child: Row(
-                children: [CustomExerciseBadge()],
-              ),
-            ),
-          ),
-        SliverPadding(
-          padding: const EdgeInsets.all(16)
-              .copyWith(top: exercise.isCustom ? 0 : 16),
-          sliver: SliverToBoxAdapter(
-            child: Text(
-              exercise.displayName,
-              style: Theme.of(context).textTheme.displayMedium,
-            ),
-          ),
-        ),
-        SliverToBoxAdapter(
-          child: Padding(
-            padding: const EdgeInsets.all(16).copyWith(top: 0),
-            child: Text.rich(
-              TextSpan(children: [
-                if (exercise.primaryMuscleGroup != GTMuscleGroup.none) ...[
-                  TextSpan(
-                      text: "exercise.info.primaryMuscleGroup".tParams({
-                    "muscleGroup":
-                        "muscleGroups.${exercise.primaryMuscleGroup.name}".t,
-                  })),
-                  if (exercise.secondaryMuscleGroups.isNotEmpty) ...[
-                    const TextSpan(text: "\n"),
-                    TextSpan(
-                      text: "exercise.info.secondaryMuscleGroups".tParams({
-                        "muscleGroups": exercise.secondaryMuscleGroups
-                            .map((e) => "muscleGroups.${e.name}".t)
-                            .join(", "),
-                      }),
-                    ),
-                  ],
-                ],
-                if (kDebugMode) ...[
-                  const TextSpan(text: "\n"),
-                  TextSpan(
-                    text: "Parameters: ${exercise.parameters}",
+    return ThemedSubtree.builder(
+      color: category?.color ?? Theme.of(context).colorScheme.primary,
+      enabled: Get.find<SettingsController>().tintExercises.value,
+      builder: (context) {
+        return CustomScrollView(
+          slivers: [
+            if (exercise.isCustom)
+              SliverPadding(
+                padding: const EdgeInsets.all(16).copyWith(bottom: 8),
+                sliver: const SliverToBoxAdapter(
+                  child: Row(
+                    children: [CustomExerciseBadge()],
                   ),
-                ]
-              ]),
-              style: Theme.of(context).textTheme.labelMedium!.copyWith(
-                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
+              ),
+            SliverPadding(
+              padding: const EdgeInsets.all(16)
+                  .copyWith(top: exercise.isCustom ? 0 : 16),
+              sliver: SliverToBoxAdapter(
+                child: Text(
+                  exercise.displayName,
+                  style: Theme.of(context).textTheme.displayMedium,
+                ),
+              ),
+            ),
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.all(16).copyWith(top: 0),
+                child: Text.rich(
+                  TextSpan(children: [
+                    if (exercise.primaryMuscleGroup != GTMuscleGroup.none) ...[
+                      TextSpan(
+                          text: "exercise.info.primaryMuscleGroup".tParams({
+                        "muscleGroup":
+                            "muscleGroups.${exercise.primaryMuscleGroup.name}"
+                                .t,
+                      })),
+                      if (exercise.secondaryMuscleGroups.isNotEmpty) ...[
+                        const TextSpan(text: "\n"),
+                        TextSpan(
+                          text: "exercise.info.secondaryMuscleGroups".tParams({
+                            "muscleGroups": exercise.secondaryMuscleGroups
+                                .map((e) => "muscleGroups.${e.name}".t)
+                                .join(", "),
+                          }),
+                        ),
+                      ],
+                    ],
+                    if (kDebugMode) ...[
+                      const TextSpan(text: "\n"),
+                      TextSpan(
+                        text: "Parameters: ${exercise.parameters}",
+                      ),
+                    ]
+                  ]),
+                  style: Theme.of(context).textTheme.labelMedium!.copyWith(
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      ),
+                ),
+              ),
+            ),
+            if (history.isEmpty) ...[
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Text("exercise.info.noHistory".t),
+                ),
+              ),
+            ],
+            if (chartHistory.isNotEmpty &&
+                ExerciseHistoryChart.shouldShow(chartHistory))
+              SliverPadding(
+                padding: const EdgeInsets.all(16),
+                sliver: SliverToBoxAdapter(
+                  child: ExerciseHistoryChart(
+                    key: ValueKey(chartHistory.length),
+                    children: chartHistory,
                   ),
+                ),
+              ),
+            if (history.isNotEmpty && infoTiles.length > 1)
+              SliverList(
+                delegate: SliverChildListDelegate(infoTiles),
+              ),
+            if (kDebugMode) ...[
+              const SliverToBoxAdapter(
+                child: SizedBox(height: 8),
+              ),
+              SliverToBoxAdapter(
+                child: Text(
+                  "id: ${widget.exercise.id}",
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            ],
+            const SliverToBoxAdapter(
+              child: SizedBox(height: 8),
             ),
-          ),
-        ),
-        if (history.isEmpty) ...[
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Text("exercise.info.noHistory".t),
-            ),
-          ),
-        ],
-        if (chartHistory.isNotEmpty &&
-            ExerciseHistoryChart.shouldShow(chartHistory))
-          SliverPadding(
-            padding: const EdgeInsets.all(16),
-            sliver: SliverToBoxAdapter(
-              child: ExerciseHistoryChart(
-                key: ValueKey(chartHistory.length),
-                children: chartHistory,
+            SliverPadding(
+              padding: MediaQuery.of(context).padding.copyWith(
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                  ),
+              sliver: const SliverToBoxAdapter(
+                child: SizedBox.shrink(),
               ),
             ),
-          ),
-        if (history.isNotEmpty && infoTiles.length > 1)
-          SliverList(
-            delegate: SliverChildListDelegate(infoTiles),
-          ),
-        if (kDebugMode) ...[
-          const SliverToBoxAdapter(
-            child: SizedBox(height: 8),
-          ),
-          SliverToBoxAdapter(
-            child: Text(
-              "id: ${widget.exercise.id}",
-              textAlign: TextAlign.center,
-            ),
-          ),
-        ],
-        const SliverToBoxAdapter(
-          child: SizedBox(height: 8),
-        ),
-        SliverPadding(
-          padding: MediaQuery.of(context).padding.copyWith(
-                top: 0,
-                left: 0,
-                right: 0,
-              ),
-          sliver: const SliverToBoxAdapter(
-            child: SizedBox.shrink(),
-          ),
-        ),
-      ],
+          ],
+        );
+      },
     );
   }
 

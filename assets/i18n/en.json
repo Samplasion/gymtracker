@@ -1042,6 +1042,9 @@
       "sets": {
         "label": "Sets"
       }
+    },
+    "workoutDistribution": {
+      "label": "Workout distribution"
     }
   },
   "richText": {

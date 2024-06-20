@@ -3,6 +3,7 @@ import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:get/get.dart';
+import 'package:gymtracker/controller/history_controller.dart';
 import 'package:gymtracker/controller/me_controller.dart';
 import 'package:gymtracker/controller/settings_controller.dart';
 import 'package:gymtracker/data/weights.dart';
@@ -14,6 +15,7 @@ import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/utils/theme.dart';
 import 'package:gymtracker/utils/utils.dart';
+import 'package:gymtracker/view/charts/density_calendar_chart.dart';
 import 'package:gymtracker/view/charts/weight_chart.dart';
 import 'package:gymtracker/view/me/calendar.dart';
 import 'package:gymtracker/view/me/statistics.dart';
@@ -77,6 +79,50 @@ class MeView extends GetView<MeController> {
                   ),
                 ),
                 const SizedBox(height: 24),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: SafeArea(
+                    top: false,
+                    bottom: false,
+                    child: SectionTitle("me.workoutDistribution.label".t),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: SafeArea(
+                    top: false,
+                    bottom: false,
+                    child: Card(
+                      clipBehavior: Clip.hardEdge,
+                      margin: EdgeInsets.zero,
+                      child: Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: Obx(
+                          () {
+                            final historyController =
+                                Get.find<HistoryController>();
+                            final firstDay =
+                                historyController.history.first.startingDate!;
+                            final now = DateTime.now();
+                            final allDays = now.difference(firstDay).inDays;
+                            return DensityCalendarChart(
+                              values: [
+                                for (int i = 0; i < allDays; i++)
+                                  historyController
+                                          .workoutsByDay[now
+                                              .subtract(Duration(days: i))
+                                              .startOfDay]
+                                          ?.length ??
+                                      0,
+                              ],
+                            );
+                          },
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 8),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   child: SafeArea(

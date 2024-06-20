@@ -181,6 +181,11 @@ extension NumIterableUtils<T extends num> on Iterable<T> {
     return max;
   }
 
+  T? get safeMin {
+    if (isEmpty) return null;
+    return min;
+  }
+
   T? get safeMax {
     if (isEmpty) return null;
     T max = first;

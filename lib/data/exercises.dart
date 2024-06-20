@@ -547,14 +547,14 @@ Map<GTExerciseMuscleCategory, ExerciseCategory> get exerciseStandardLibrary => {
           Exercise.standard(
             id: "library.shoulders.exercises.pikePushUps",
             name: "library.shoulders.exercises.pikePushUps".t,
-            parameters: GTSetParameters.repsWeight,
+            parameters: GTSetParameters.freeBodyReps,
             primaryMuscleGroup: GTMuscleGroup.shoulders,
             secondaryMuscleGroups: {GTMuscleGroup.triceps},
           ),
           Exercise.standard(
             id: "library.shoulders.exercises.handstandPushUps",
             name: "library.shoulders.exercises.handstandPushUps".t,
-            parameters: GTSetParameters.repsWeight,
+            parameters: GTSetParameters.freeBodyReps,
             primaryMuscleGroup: GTMuscleGroup.shoulders,
             secondaryMuscleGroups: {GTMuscleGroup.triceps},
           ),

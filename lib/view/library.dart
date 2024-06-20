@@ -656,7 +656,9 @@ class _ExerciseInfoViewState extends State<ExerciseInfoView>
   List<ListTileTheme> _getInfoTiles(Exercise exercise, BuildContext context) {
     final history = historyStream.value;
     if (history.isEmpty) return [];
-    final tiles = [
+
+    const nullTile = SizedBox.shrink();
+    final tiles = <Builder>[
       if ([GTSetParameters.repsWeight, GTSetParameters.timeWeight]
           .contains(exercise.parameters))
         Builder(builder: (context) {
@@ -680,6 +682,8 @@ class _ExerciseInfoViewState extends State<ExerciseInfoView>
               bestScore = value;
             }
           }
+
+          if (bestScore < 0) return nullTile;
 
           return ExerciseInfoTile(
             "exercise.info.heaviestWeight.label".t,
@@ -714,6 +718,8 @@ class _ExerciseInfoViewState extends State<ExerciseInfoView>
             }
           }
 
+          if (bestScore < 0) return nullTile;
+
           return ExerciseInfoTile(
             "exercise.info.best1rm.label".t,
             bestScore.userFacingWeight,
@@ -744,6 +750,8 @@ class _ExerciseInfoViewState extends State<ExerciseInfoView>
               }
             }
           }
+
+          if (bestReps == 0) return nullTile;
 
           return ExerciseInfoTile(
             "exercise.info.bestSetVolume.label".t,
@@ -777,6 +785,8 @@ class _ExerciseInfoViewState extends State<ExerciseInfoView>
             }
           }
 
+          if (bestScore < 0) return nullTile;
+
           return ExerciseInfoTile(
             "exercise.info.bestSessionVolume.label".t,
             bestScore.userFacingWeight,
@@ -786,7 +796,12 @@ class _ExerciseInfoViewState extends State<ExerciseInfoView>
           );
         })
     ];
+
     if (tiles.isEmpty) return [];
+    if (tiles
+        .map((bld) => bld.build(context))
+        .every((tile) => tile == nullTile)) return [];
+
     return [
       Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16),

@@ -254,6 +254,7 @@ class Workout {
   Map<String, dynamic> toJson() => {
         ..._$WorkoutToJson(this),
         'exercises': [for (final exercise in exercises) exercise.toJson()],
+        'folder': folder?.toJson(),
       };
 
   @override

@@ -27,7 +27,7 @@ class DensityCalendarChart extends StatelessWidget {
   final padding = 1.5;
   final minOpacity = 0.1;
   final maxOpacity = 1.0;
-  final start = DateTime.now();
+  late final start = DateTime.now();
 
   TextStyle _labelStyle(BuildContext context) =>
       context.theme.textTheme.labelSmall!;
@@ -57,6 +57,7 @@ class DensityCalendarChart extends StatelessWidget {
                   Column(
                     children: [
                       for (int j = 0; j < 7; j++) _day(context, j),
+                      _textRaw(context, ""),
                     ],
                   ),
                   for (int i = crossCount - 1; i >= 0; i--)
@@ -64,6 +65,12 @@ class DensityCalendarChart extends StatelessWidget {
                       children: [
                         for (int j = 0; j < 7; j++)
                           _square(context, 7 * i + j, runningMax),
+                        if (i == crossCount - 1 ||
+                            _getMonthNumberFor(index: 7 * i) !=
+                                _getMonthNumberFor(index: 7 * (i + 1)))
+                          _textRaw(context, _getMonthFor(index: 7 * i))
+                        else
+                          _textRaw(context, ""),
                       ],
                     ),
                 ],
@@ -143,6 +150,16 @@ class DensityCalendarChart extends StatelessWidget {
   }
 
   Widget _day(BuildContext context, int index) {
+    return _textRaw(
+        context,
+        DateFormat.E(Get.locale?.languageCode)
+            .format(start.subtract(Duration(days: index)))
+            .characters
+            .first
+            .toUpperCase());
+  }
+
+  Widget _textRaw(BuildContext context, String text) {
     return Container(
       margin: EdgeInsets.all(padding),
       constraints: BoxConstraints(
@@ -153,14 +170,22 @@ class DensityCalendarChart extends StatelessWidget {
       ),
       child: Center(
         child: Text(
-          DateFormat.E(Get.locale?.languageCode)
-              .format(start.subtract(Duration(days: index)))
-              .characters
-              .first
-              .toUpperCase(),
+          text,
           style: _labelStyle(context),
         ),
       ),
     );
+  }
+
+  String _getMonthFor({required int index}) {
+    return DateFormat.MMM(Get.locale?.languageCode)
+        .format(start.subtract(Duration(days: index)))
+        .characters
+        .first
+        .toUpperCase();
+  }
+
+  int _getMonthNumberFor({required int index}) {
+    return start.subtract(Duration(days: index)).month;
   }
 }

@@ -20,11 +20,9 @@ jobs:
         run: |
           echo $STRING > accent.json
       - run: accent sync --add-translations --merge-type=passive
-      - uses: peter-evans/create-pull-request@v4
+      - uses: peter-evans/create-pull-request@v6
         with:
           commit-message: "chore: Update localizations"
-          committer: GitHub <noreply@github.com>
-          author: ${{ github.actor }} <${{ github.actor }}@users.noreply.github.com>
           branch: accent
           draft: false
           delete-branch: true

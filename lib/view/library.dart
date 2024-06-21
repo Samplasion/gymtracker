@@ -133,9 +133,15 @@ class LibraryExercisesView extends StatelessWidget {
                       child: Icon(GymTrackerIcons.create_exercise)),
                   onTap: () {
                     Go.showBottomModalScreen(
-                        (context, controller) => ExerciseCreator(
-                              base: null,
-                              scrollController: controller,
+                        (context, controller) => ThemedSubtree(
+                              color: category.color,
+                              enabled: Get.find<SettingsController>()
+                                  .tintExercises
+                                  .value,
+                              child: ExerciseCreator(
+                                base: null,
+                                scrollController: controller,
+                              ),
                             ));
                   },
                 ),

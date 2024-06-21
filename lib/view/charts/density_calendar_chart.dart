@@ -8,17 +8,26 @@ import 'package:intl/intl.dart';
 
 class DensityCalendarChart extends StatelessWidget {
   final List<int> values;
+  final String Function(DateTime start, int daysInThePast, int value)
+      tooltipBuilder;
 
   DensityCalendarChart({
     super.key,
     required this.values,
+    this.tooltipBuilder = _defaultTooltipBuilder,
   })  : assert(values.isNotEmpty),
         assert(values.every((value) => value >= 0));
+
+  static String _defaultTooltipBuilder(
+      DateTime start, int daysInThePast, int value) {
+    return "${DateFormat.yMEd(Get.locale?.languageCode).format(start.subtract(Duration(days: daysInThePast)))}: $value";
+  }
 
   final maxSquareSize = 24.0;
   final padding = 1.5;
   final minOpacity = 0.1;
   final maxOpacity = 1.0;
+  final start = DateTime.now();
 
   TextStyle _labelStyle(BuildContext context) =>
       context.theme.textTheme.labelSmall!;
@@ -102,7 +111,7 @@ class DensityCalendarChart extends StatelessWidget {
   Widget _square(BuildContext context, int index, int max) {
     final val = index >= values.length ? 0 : values[index];
     return Tooltip(
-      message: val.toString(),
+      message: tooltipBuilder(start, index, val),
       child: _rawSquare(
         context,
         context.theme.colorScheme.tertiary.withOpacity(
@@ -145,7 +154,7 @@ class DensityCalendarChart extends StatelessWidget {
       child: Center(
         child: Text(
           DateFormat.E(Get.locale?.languageCode)
-              .format(DateTime.now().subtract(Duration(days: index)))
+              .format(start.subtract(Duration(days: index)))
               .characters
               .first
               .toUpperCase(),

@@ -22,6 +22,7 @@ import 'package:intl/intl.dart';
 typedef _SpeedDialData = (int, Duration, double, int, double);
 
 enum TimeFrame {
+  sevenDays(Duration(days: 7)),
   thirtyDays(Duration(days: 30)),
   threeMonths(Duration(days: 90)),
   year(Duration(days: 365)),

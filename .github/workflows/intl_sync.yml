@@ -30,3 +30,4 @@ jobs:
           delete-branch: true
           title: New translations are available to merge
           body: Translation files have been updated, feel free to merge this pull request after review.
+          assignees: Samplasion

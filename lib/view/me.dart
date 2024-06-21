@@ -108,6 +108,9 @@ class MeView extends GetView<MeController> {
                             final now = DateTime.now();
                             final allDays = now.difference(firstDay).inDays;
                             return DensityCalendarChart(
+                              tooltipBuilder: (now, daysBeforeNow, value) {
+                                return "${DateFormat.yMEd(Get.locale?.languageCode).format(now.subtract(Duration(days: daysBeforeNow)))}: ${"general.workouts".plural(value)}";
+                              },
                               values: [
                                 for (int i = 0; i < allDays; i++)
                                   historyController

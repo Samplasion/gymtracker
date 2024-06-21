@@ -343,20 +343,20 @@
           "light": "Pure White mode"
         }
       },
-      "export": {
-        "label": "Export data (JSON)",
-        "filename": "GymTracker_Data",
-        "failed": {
-          "title": "Failed to export data",
-          "copy": "The error message has been copied to the clipboard."
-        }
-      },
       "themeMode": {
         "label": "Theme",
         "values": {
           "system": "System",
           "light": "Light",
           "dark": "Dark"
+        }
+      },
+      "export": {
+        "label": "Export data (JSON)",
+        "filename": "GymTracker_Data",
+        "failed": {
+          "title": "Failed to export data",
+          "copy": "The error message has been copied to the clipboard."
         }
       },
       "notifications": {
@@ -767,10 +767,10 @@
         "fullBodyCrunch": "Full-body crunches",
         "plank": "Plank",
         "hollowBodyHold": "Hollow body hold",
-        "russianTwist": "Russian twist",
         "bicycleCrunches": "Bicycle crunches",
         "extendedReverseCrunchWithLegExtension": "Extended reverse crunch with leg extension",
         "toeTouches": "Toe touches",
+        "russianTwist": "Russian twist",
         "heelTouches": "Heel touches",
         "deadBugHoldCardio": "Dead bug hold (cardio)",
         "deadBugHold": "Dead bug hold",
@@ -1026,11 +1026,11 @@
     "stats": {
       "label": "Statistics",
       "timeFrame": {
-        "sevenDays": "Last 7 days",
         "thirtyDays": "Last 30 days",
         "threeMonths": "Last 3 months",
         "year": "Last year",
-        "allTime": "All time"
+        "allTime": "All time",
+        "sevenDays": "Last 7 days"
       },
       "workouts": {
         "label": "Workouts"

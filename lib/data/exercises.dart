@@ -382,6 +382,27 @@ Map<GTExerciseMuscleCategory, ExerciseCategory> get exerciseStandardLibrary => {
             parameters: GTSetParameters.freeBodyReps,
             primaryMuscleGroup: GTMuscleGroup.abs,
           ),
+          Exercise.standard(
+            id: "library.abs.exercises.deadBugHold",
+            name: "library.abs.exercises.deadBugHold".t,
+            parameters: GTSetParameters.freeBodyReps,
+            primaryMuscleGroup: GTMuscleGroup.abs,
+            secondaryMuscleGroups: {},
+          ),
+          Exercise.standard(
+            id: "library.abs.exercises.deadBugHoldCardio",
+            name: "library.abs.exercises.deadBugHoldCardio".t,
+            parameters: GTSetParameters.time,
+            primaryMuscleGroup: GTMuscleGroup.abs,
+            secondaryMuscleGroups: {},
+          ),
+          Exercise.standard(
+            id: "library.abs.exercises.hollowBodyHoldBentKnees",
+            name: "library.abs.exercises.hollowBodyHoldBentKnees".t,
+            parameters: GTSetParameters.time,
+            primaryMuscleGroup: GTMuscleGroup.abs,
+            secondaryMuscleGroups: {},
+          ),
         ],
         icon: Text("library.abs.name".t.characters.first.toUpperCase()),
         color: Colors.amber,
@@ -412,6 +433,16 @@ Map<GTExerciseMuscleCategory, ExerciseCategory> get exerciseStandardLibrary => {
       ),
       GTExerciseMuscleCategory.quadriceps: ExerciseCategory(
         exercises: [
+          Exercise.standard(
+            id: "library.quadriceps.exercises.bodyweightSquats",
+            name: "library.quadriceps.exercises.bodyweightSquats".t,
+            parameters: GTSetParameters.freeBodyReps,
+            primaryMuscleGroup: GTMuscleGroup.quadriceps,
+            secondaryMuscleGroups: {
+              GTMuscleGroup.glutes,
+              GTMuscleGroup.hamstrings,
+            },
+          ),
           Exercise.standard(
             id: "library.quadriceps.exercises.squatsBarbell",
             name: "library.quadriceps.exercises.squatsBarbell".t,

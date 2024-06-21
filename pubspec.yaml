@@ -82,11 +82,14 @@ flutter:
     - assets/exercises/abs/bicycleCrunches/
     - assets/exercises/abs/crunchMachine/
     - assets/exercises/abs/crunches/
+    - assets/exercises/abs/deadBugHold/
+    - assets/exercises/abs/deadBugHoldCardio/
     - assets/exercises/abs/extendedReverseCrunchWithLegExtension/
     - assets/exercises/abs/fullBodyCrunch/
     - assets/exercises/abs/heelTouches/
     - assets/exercises/abs/heelsUpCrunch/
     - assets/exercises/abs/hollowBodyHold/
+    - assets/exercises/abs/hollowBodyHoldBentKnees/
     - assets/exercises/abs/kneeRaise/
     - assets/exercises/abs/legRaise/
     - assets/exercises/abs/plank/
@@ -162,6 +165,7 @@ flutter:
     - assets/exercises/hips/hipAdduction/
     - assets/exercises/hips/hipThrust/
     - assets/exercises/hips/hipThrustBarbell/
+    - assets/exercises/quadriceps/bodyweightSquats/
     - assets/exercises/quadriceps/bulgarianSplitSquats/
     - assets/exercises/quadriceps/frontSquats/
     - assets/exercises/quadriceps/legExtension/

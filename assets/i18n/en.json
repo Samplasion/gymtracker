@@ -767,11 +767,14 @@
         "fullBodyCrunch": "Full-body crunches",
         "plank": "Plank",
         "hollowBodyHold": "Hollow body hold",
-        "russianTwist": "Russian Twist",
+        "russianTwist": "Russian twist",
         "bicycleCrunches": "Bicycle crunches",
         "extendedReverseCrunchWithLegExtension": "Extended reverse crunch with leg extension",
         "toeTouches": "Toe touches",
-        "heelTouches": "Heel touches"
+        "heelTouches": "Heel touches",
+        "deadBugHoldCardio": "Dead bug hold (cardio)",
+        "deadBugHold": "Dead bug hold",
+        "hollowBodyHoldBentKnees": "Bent hollow hold"
       }
     },
     "calves": {
@@ -792,7 +795,8 @@
         "lunges": "Lunges",
         "legPress45deg": "Leg press (45°)",
         "frontSquats": "Front squats",
-        "bulgarianSplitSquats": "Bulgarian split squats"
+        "bulgarianSplitSquats": "Bulgarian split squats",
+        "bodyweightSquats": "Squats"
       }
     },
     "hamstrings": {

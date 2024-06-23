@@ -55,22 +55,24 @@ class DensityCalendarChart extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Column(
+                    verticalDirection: VerticalDirection.up,
                     children: [
-                      for (int j = 0; j < 7; j++) _day(context, j),
                       _textRaw(context, ""),
+                      for (int j = 0; j < 7; j++) _day(context, j),
                     ],
                   ),
                   for (int i = crossCount - 1; i >= 0; i--)
                     Column(
+                      verticalDirection: VerticalDirection.up,
                       children: [
-                        for (int j = 0; j < 7; j++)
-                          _square(context, 7 * i + j, runningMax),
                         if (i == crossCount - 1 ||
                             _getMonthNumberFor(index: 7 * i) !=
                                 _getMonthNumberFor(index: 7 * (i + 1)))
                           _textRaw(context, _getMonthFor(index: 7 * i))
                         else
                           _textRaw(context, ""),
+                        for (int j = 0; j < 7; j++)
+                          _square(context, 7 * i + j, runningMax),
                       ],
                     ),
                 ],

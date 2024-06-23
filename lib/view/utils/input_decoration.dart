@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+const kGymTrackerInputBorderRadius = 24.0;
+
 class GymTrackerInputDecoration extends InputDecoration {
   const GymTrackerInputDecoration({
     String labelText = '',
@@ -8,7 +10,10 @@ class GymTrackerInputDecoration extends InputDecoration {
     super.alignLabelWithHint,
   }) : super(
           isDense: true,
-          border: const OutlineInputBorder(),
+          border: const OutlineInputBorder(
+            borderRadius:
+                BorderRadius.all(Radius.circular(kGymTrackerInputBorderRadius)),
+          ),
           labelText: labelText,
         );
 }

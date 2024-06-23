@@ -610,8 +610,8 @@
     "chest": "Petto",
     "forearm": "Avambraccio",
     "glutes": "Glutei",
-    "hamstrings": "Tendini del ginocchio",
-    "lats": "Lat",
+    "hamstrings": "Posteriori della coscia",
+    "lats": "Gran dorsale",
     "lowerBack": "Schiena bassa",
     "none": "Nessuno",
     "other": "Altro",
@@ -771,7 +771,10 @@
         "bicycleCrunches": "Bicycle crunch",
         "extendedReverseCrunchWithLegExtension": "Crunch inverso con leg extension",
         "toeTouches": "Toe touches",
-        "heelTouches": "Heel touches"
+        "heelTouches": "Heel touches",
+        "deadBugHoldCardio": "Dead bug hold (cardio)",
+        "deadBugHold": "Dead bug hold",
+        "hollowBodyHoldBentKnees": "Bent hollow hold"
       }
     },
     "calves": {
@@ -792,11 +795,12 @@
         "lunges": "Affondi",
         "legPress45deg": "Leg press (45°)",
         "frontSquats": "Squat frontali",
-        "bulgarianSplitSquats": "Squat bulgari"
+        "bulgarianSplitSquats": "Squat bulgari",
+        "bodyweightSquats": "Squat"
       }
     },
     "hamstrings": {
-      "name": "Tendini del ginocchio",
+      "name": "Posteriori della coscia",
       "exercises": {
         "legCurlProne": "Leg curl (sdraiati)",
         "legCurlSeated": "Leg curl (seduti)",
@@ -814,7 +818,8 @@
         "arnoldPress": "Arnold press",
         "frontDumbbellRaise": "Sollevamento frontale dei manubri",
         "uprightRow": "Vogatore verticale",
-        "pikePushUps": "Pike push-up"
+        "pikePushUps": "Pike push-up",
+        "handstandPushUps": "Flessioni in verticale"
       }
     },
     "back": {
@@ -1024,7 +1029,8 @@
         "thirtyDays": "Ultimi 30 giorni",
         "threeMonths": "Ultimi 3 mesi",
         "year": "Ultimo anno",
-        "allTime": "Tutto"
+        "allTime": "Tutto",
+        "sevenDays": "Ultimi 7 giorni"
       },
       "workouts": {
         "label": "Allenamenti"
@@ -1041,6 +1047,9 @@
       "sets": {
         "label": "Serie"
       }
+    },
+    "workoutDistribution": {
+      "label": "Distribuzione allenamenti"
     }
   },
   "richText": {

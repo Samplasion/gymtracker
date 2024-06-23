@@ -92,7 +92,7 @@ class DatabaseService extends GetxService with ChangeNotifier {
 
   void Function() onServiceChange(String service) {
     return () {
-      logger.i("$service service updated");
+      logger.t("$service service updated");
     };
   }
 

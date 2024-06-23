@@ -115,6 +115,7 @@ class OneLinePrefixPrinter extends LogPrinter {
   @override
   List<String> log(LogEvent event) {
     final lines = printer.log(event);
+    lines[0] = "[${event.time}] ${lines[0]}";
 
     final stack = _formatStackTrace(printer
         .formatStackTrace(event.stackTrace ?? StackTrace.current, 4)

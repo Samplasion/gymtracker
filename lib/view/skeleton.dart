@@ -274,3 +274,33 @@ class OngoingWorkoutBar extends StatelessWidget {
     );
   }
 }
+
+/// A widget that launches the actual root widget.
+///
+/// Used to force the root widget to be an
+/// animated route, so that exit animations work.
+class GymTrackerAppLoader extends StatefulWidget {
+  const GymTrackerAppLoader();
+
+  @override
+  State<GymTrackerAppLoader> createState() => __LoaderState();
+}
+
+class __LoaderState extends State<GymTrackerAppLoader> {
+  @override
+  void initState() {
+    super.initState();
+    Get.find<Coordinator>().awaitInitialized().then((_) {
+      SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
+        Go.off(() => const SkeletonView());
+      });
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return const Scaffold(
+      body: RoutinesView.skeleton(),
+    );
+  }
+}

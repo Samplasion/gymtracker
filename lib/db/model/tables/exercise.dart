@@ -67,6 +67,7 @@ abstract class LinkedExerciseBase extends Table {
   TextColumn get supersetId;
   IntColumn get sortOrder => integer()();
   TextColumn get supersedesId;
+  IntColumn get rpe => integer().nullable()();
 }
 
 class ConcreteExercise {
@@ -87,6 +88,7 @@ class ConcreteExercise {
   final String? supersetId;
   final int sortOrder;
   final String? supersedesId;
+  final int? rpe;
 
   const ConcreteExercise({
     required this.id,
@@ -106,6 +108,7 @@ class ConcreteExercise {
     required this.supersetId,
     required this.sortOrder,
     required this.supersedesId,
+    required this.rpe,
   })  : assert(
             isSuperset
                 ? true

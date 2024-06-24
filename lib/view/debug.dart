@@ -227,6 +227,7 @@ class _DebugViewState extends State<DebugView> {
 
 String generateJsonForMissingKeys(List<String> missingKeys) {
   missingKeys = missingKeys.where((key) => key != "appName").toList();
+  globalLogger.d("Missing keys: $missingKeys");
   Map<String, dynamic> keys = unflatten({
     for (final key in missingKeys) key: key.split(".").last,
   });

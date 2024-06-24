@@ -2,7 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
-import 'package:get/get.dart';
+import 'package:get/get.dart' hide ContextExtensionss;
 import 'package:gymtracker/data/distance.dart';
 import 'package:gymtracker/data/weights.dart';
 import 'package:gymtracker/icons/gymtracker_icons.dart';
@@ -10,6 +10,7 @@ import 'package:gymtracker/model/exercise.dart';
 import 'package:gymtracker/model/set.dart';
 import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/struct/editor_callback.dart';
+import 'package:gymtracker/struct/optional.dart';
 import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/utils/sets.dart';
@@ -139,10 +140,33 @@ class _WorkoutExerciseEditorState extends State<WorkoutExerciseEditor> {
                                   'ongoingWorkout.exercises.addToSuperset'.t),
                             ),
                           ),
+                        const PopupMenuDivider(),
+                        PopupMenuItem(
+                          onTap: () {
+                            showDialog<Optional<int?>>(
+                              context: context,
+                              builder: (context) {
+                                return _WorkoutSetRPEDialog(
+                                  currentRPE: widget.exercise.rpe,
+                                );
+                              },
+                            ).then((value) {
+                              if (value != null) {
+                                widget.callbacks.onExerciseChangeRPE(
+                                  widget.index,
+                                  value.safeUnwrap(),
+                                );
+                              }
+                            });
+                          },
+                          child: ListTile(
+                            leading: const Icon(GymTrackerIcons.rpe),
+                            title: Text('ongoingWorkout.exercises.setRPE'.t),
+                          ),
+                        ),
                         if (!widget.isCreating &&
                             CardioTimerScreen.supportsTimer(
                                 widget.exercise)) ...[
-                          const PopupMenuDivider(),
                           PopupMenuItem(
                             onTap: () {
                               Go.to(() => CardioTimerScreen.fromExercise(
@@ -173,6 +197,37 @@ class _WorkoutExerciseEditorState extends State<WorkoutExerciseEditor> {
                   ],
                 ),
               ),
+              if (widget.exercise.rpe != null) ...[
+                const SizedBox(height: 8),
+                SafeArea(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: Row(
+                      children: [
+                        Flexible(
+                          child: Wrap(
+                            alignment: WrapAlignment.start,
+                            spacing: 8,
+                            runSpacing: 8,
+                            children: [
+                              GTBadge(
+                                content: "ongoingWorkout.exercises.rpeBadge"
+                                    .tParams({
+                                  "rpe": "${widget.exercise.rpe}",
+                                }),
+                                background: getContainerColor(context,
+                                    rpeColor(context, widget.exercise.rpe!)),
+                                foreground: getOnContainerColor(context,
+                                    rpeColor(context, widget.exercise.rpe!)),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
               const SizedBox(height: 8),
               ListTile(
                 leading: const Icon(GymTrackerIcons.notes),
@@ -577,6 +632,79 @@ class _WorkoutExerciseSetEditorState extends State<WorkoutExerciseSetEditor> {
           );
         },
       ),
+    );
+  }
+}
+
+class _WorkoutSetRPEDialog extends StatefulWidget {
+  final int? currentRPE;
+
+  const _WorkoutSetRPEDialog({this.currentRPE});
+
+  @override
+  State<_WorkoutSetRPEDialog> createState() => __WorkoutSetRPEDialogState();
+}
+
+class __WorkoutSetRPEDialogState extends State<_WorkoutSetRPEDialog> {
+  // Average
+  late int currentRPE = widget.currentRPE ?? 5;
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: Text('exercise.editor.fields.rpe.label'.t),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          ListTile(
+            leading: const Icon(GymTrackerIcons.help),
+            title: Text('exercise.editor.fields.rpe.description.title'.t),
+            subtitle: Text('exercise.editor.fields.rpe.description.text'.t),
+          ),
+          ListTile(
+            leading: const Icon(GymTrackerIcons.rpe),
+            title: Text('exercise.editor.fields.rpe.level$currentRPE.title'.t),
+            subtitle:
+                Text('exercise.editor.fields.rpe.level$currentRPE.text'.t),
+          ),
+          Slider(
+            value: currentRPE.toDouble(),
+            secondaryTrackValue: widget.currentRPE?.toDouble(),
+            onChanged: (value) {
+              setState(() {
+                currentRPE = value.toInt();
+              });
+            },
+            min: 1,
+            max: 10,
+            divisions: 9,
+            label: currentRPE.toString(),
+            activeColor: rpeColor(context, currentRPE),
+            secondaryActiveColor:
+                rpeColor(context, widget.currentRPE ?? 5).withOpacity(0.54),
+          ),
+        ],
+      ),
+      actions: [
+        TextButton(
+          onPressed: () {
+            Navigator.pop(context);
+          },
+          child: Text(MaterialLocalizations.of(context).cancelButtonLabel),
+        ),
+        TextButton(
+          onPressed: () {
+            Navigator.pop<Optional<int?>>(context, const None());
+          },
+          child: Text("exercise.editor.fields.rpe.removeRPE".t),
+        ),
+        TextButton(
+          onPressed: () {
+            Navigator.pop<Optional<int?>>(context, Some(currentRPE));
+          },
+          child: Text(MaterialLocalizations.of(context).okButtonLabel),
+        ),
+      ],
     );
   }
 }

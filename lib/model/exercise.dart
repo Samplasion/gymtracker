@@ -101,7 +101,15 @@ class Exercise extends WorkoutExercisable {
   @override
   final String? supersedesID;
 
-  final bool _skeleton;
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @CopyWithField(immutable: true)
+  final bool skeleton;
+
+  /// Rate of Perceived Exertion
+  ///
+  /// This is a subjective measure of how intense the exercise was.
+  /// It is a number between 1 and 10.
+  final int? rpe;
 
   bool get isCustom => !standard;
   bool get isInSuperset => supersetID != null;
@@ -173,10 +181,10 @@ class Exercise extends WorkoutExercisable {
     required this.supersetID,
     required this.workoutID,
     required this.supersedesID,
+    this.rpe,
     GTExerciseMuscleCategory? category,
-    bool skeleton = false,
+    this.skeleton = false,
   })  : id = id ?? const Uuid().v4(),
-        _skeleton = skeleton,
         _category = category,
         assert(sets.isEmpty || parameters == sets[0].parameters,
             "The parameters must not change between the Exercise and its Sets"),
@@ -362,7 +370,7 @@ class Exercise extends WorkoutExercisable {
 
 extension Display on Exercise {
   String get displayName {
-    if (_skeleton) return name;
+    if (skeleton) return name;
     if (isCustom) return name;
 
     final candidate = isAbstract ? id : parentID!;

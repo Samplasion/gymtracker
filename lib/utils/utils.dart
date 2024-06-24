@@ -83,3 +83,30 @@ DateTime max(DateTime a, DateTime b) {
 void shareText(String text) {
   Share.share(text);
 }
+
+// https://stackoverflow.com/a/52104488
+Color lerpGradient(List<Color> colors, List<double> stops, double t) {
+  for (var s = 0; s < stops.length - 1; s++) {
+    final leftStop = stops[s], rightStop = stops[s + 1];
+    final leftColor = colors[s], rightColor = colors[s + 1];
+    if (t <= leftStop) {
+      return leftColor;
+    } else if (t < rightStop) {
+      final sectionT = (t - leftStop) / (rightStop - leftStop);
+      return Color.lerp(leftColor, rightColor, sectionT)!;
+    }
+  }
+  return colors.last;
+}
+
+Color rpeColor(BuildContext context, int currentRPE) {
+  return lerpGradient(
+    [
+      context.harmonizeColor(Colors.green),
+      context.harmonizeColor(Colors.yellow),
+      context.harmonizeColor(Colors.red),
+    ],
+    [0.2, 0.55, 1],
+    currentRPE / 10,
+  );
+}

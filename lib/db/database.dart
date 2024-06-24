@@ -38,7 +38,7 @@ part 'database.g.dart';
 // Used in the generated code
 const _uuid = Uuid();
 
-const DATABASE_VERSION = 4;
+const DATABASE_VERSION = 5;
 
 @DriftDatabase(tables: [
   CustomExercises,
@@ -73,19 +73,32 @@ class GTDatabase extends _$GTDatabase {
           await m.runMigrationSteps(
             from: from,
             to: to,
-            steps: migrationSteps(from2To3: (m, schema) async {
-              await m.addColumn(
-                schema.routineExercises,
-                schema.routineExercises.supersedesId,
-              );
-              await m.addColumn(
-                schema.historyWorkoutExercises,
-                schema.historyWorkoutExercises.supersedesId,
-              );
-            }, from3To4: (m, schema) async {
-              await m.createTable(schema.routineFolders);
-              await m.addColumn(schema.routines, schema.routines.folderId);
-            }),
+            steps: migrationSteps(
+              from2To3: (m, schema) async {
+                await m.addColumn(
+                  schema.routineExercises,
+                  schema.routineExercises.supersedesId,
+                );
+                await m.addColumn(
+                  schema.historyWorkoutExercises,
+                  schema.historyWorkoutExercises.supersedesId,
+                );
+              },
+              from3To4: (m, schema) async {
+                await m.createTable(schema.routineFolders);
+                await m.addColumn(schema.routines, schema.routines.folderId);
+              },
+              from4To5: (m, schema) async {
+                await m.addColumn(
+                  schema.routineExercises,
+                  schema.routineExercises.rpe,
+                );
+                await m.addColumn(
+                  schema.historyWorkoutExercises,
+                  schema.historyWorkoutExercises.rpe,
+                );
+              },
+            ),
           );
 
           if (kDebugMode) {
@@ -93,7 +106,7 @@ class GTDatabase extends _$GTDatabase {
             final wrongForeignKeys =
                 await customSelect('PRAGMA foreign_key_check').get();
             assert(wrongForeignKeys.isEmpty,
-                '${wrongForeignKeys.map((e) => e.data)}');
+                '${wrongForeignKeys.map((e) => e.data).toList()}');
           }
 
           await customStatement('PRAGMA foreign_keys = ON;');
@@ -598,6 +611,8 @@ extension WorkoutExercisableDatabaseUtils on model.WorkoutExercisable {
           ? Value(asExercise.supersetID)
           : const Value.absent(),
       supersedesId: Value.absentIfNull(supersedesID),
+      rpe:
+          this is model.Exercise ? Value(asExercise.rpe) : const Value.absent(),
     );
   }
 }

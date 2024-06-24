@@ -223,6 +223,34 @@ class WorkoutController extends GetxController with ServiceableController {
           exercises.refresh();
           save();
         },
+        onExerciseChangeRPE: (index, value) {
+          final (
+            exerciseIndex: exerciseIndex,
+            supersetIndex: supersetIndex,
+          ) = index;
+
+          if (supersetIndex == null) {
+            final ex = exercises[exerciseIndex];
+            // Type safety
+            exercises[exerciseIndex] = ex is Exercise
+                ? ex.copyWith(rpe: value)
+                : ex is Superset
+                    ? ex.copyWith(
+                        exercises: [
+                          for (final e in ex.exercises) e.copyWith(rpe: value),
+                        ],
+                      )
+                    : throw AssertionError("Unreachable yet");
+          } else {
+            final superset = exercises[supersetIndex] as Superset;
+            exercises[supersetIndex] = superset.copyWith(exercises: [
+              for (final e in superset.exercises) e.copyWith(rpe: value),
+            ]);
+          }
+
+          exercises.refresh();
+          save();
+        },
         onSetCreate: (index) {
           final (exerciseIndex: i, supersetIndex: supersetIndex) = index;
           final set = GTSet.empty(

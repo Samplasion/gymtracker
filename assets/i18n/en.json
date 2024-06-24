@@ -89,6 +89,55 @@
         },
         "notes": {
           "label": "Notes"
+        },
+        "rpe": {
+          "removeRPE": "Remove RPE",
+          "label": "Set RPE",
+          "description": {
+    "title": "What is RPE?",  
+"text":
+"Rate of Perceived Exertion (RPE) is a subjective measure of how hard an exercise feels to you. It's a scale from 1 to 10, where 1 is very light effort and 10 is maximum effort."
+          },
+          "level1": {
+            "title": "RPE 1",
+            "text": "Very light effort. It doesn't even feel like you're working out."
+          },
+          "level2": {
+            "title": "RPE 2",
+            "text": "Light effort. You can easily maintain a conversation."
+          },
+          "level3": {
+            "title": "RPE 3",
+            "text": "Moderate effort. You can maintain a conversation."
+          },
+          "level4": {
+            "title": "RPE 4",
+            "text": "Moderate effort. You can maintain a conversation, but it's a bit harder."
+          },
+          "level5": {
+            "title": "RPE 5",
+            "text": "Moderate to hard effort. You can maintain a conversation, but it's hard."
+          },
+          "level6": {
+            "title": "RPE 6",
+            "text": "Moderate to hard effort. You can barely maintain a conversation, and you're breathing heavily."
+          },
+          "level7": {
+            "title": "RPE 7",
+            "text": "Hard effort. You can't maintain a conversation, and you're breathing heavily."
+          },
+          "level8": {
+            "title": "RPE 8",
+            "text": "Hard effort. You can speak only a sentence at a time."
+          },
+          "level9": {
+            "title": "RPE 9",
+            "text": "Very hard effort. You're almost out of breath, and you can only speak a few word at a time."
+          },
+          "level10": {
+            "title": "RPE 10",
+            "text": "Maximum effort. You can't speak at all and you're out of breath."
+          }
         }
       },
       "cannotChangeParameters": {
@@ -417,7 +466,9 @@
       "reorder": "Reorder exercises…",
       "remove": "Remove exercise",
       "addToSuperset": "Add to superset…",
-      "startCardioTimer": "Start interval timer"
+      "startCardioTimer": "Start interval timer",
+      "rpeBadge": "RPE @rpe",
+      "setRPE": "Set RPE"
     },
     "info": {
       "time": "Time",

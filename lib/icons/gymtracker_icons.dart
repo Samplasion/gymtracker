@@ -62,6 +62,7 @@ class GymTrackerIcons {
   static const IconData folder_closed = Icons.folder_rounded;
   static const IconData folder_open = Icons.folder_open_rounded;
   static const IconData folder_root = Icons.home_rounded;
+  static const IconData help = Icons.help_rounded;
   static const IconData highlight = Icons.highlight_rounded;
   static const IconData history = Icons.history_rounded;
   static const IconData home = Icons.home_rounded;
@@ -84,6 +85,7 @@ class GymTrackerIcons {
   static const IconData reset = Icons.replay_rounded;
   static const IconData resume = Icons.play_arrow_rounded;
   static const IconData routines = Icons.fitness_center_rounded;
+  static const IconData rpe = Icons.fitness_center_rounded;
   static const IconData sets = Icons.numbers_rounded;
   static const IconData settings = Icons.settings_rounded;
   static const IconData share = Icons.share_rounded;

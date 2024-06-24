@@ -33,6 +33,8 @@ abstract class _$ExerciseCWProxy {
 
   Exercise supersedesID(String? supersedesID);
 
+  Exercise rpe(int? rpe);
+
   Exercise category(GTExerciseMuscleCategory? category);
 
   /// This function **does support** nullification of nullable fields. All `null` values passed to `non-nullable` fields will be ignored. You can also use `Exercise(...).copyWith.fieldName(...)` to override fields one at a time with nullification support.
@@ -55,6 +57,7 @@ abstract class _$ExerciseCWProxy {
     String? supersetID,
     String? workoutID,
     String? supersedesID,
+    int? rpe,
     GTExerciseMuscleCategory? category,
   });
 }
@@ -109,6 +112,9 @@ class _$ExerciseCWProxyImpl implements _$ExerciseCWProxy {
       this(supersedesID: supersedesID);
 
   @override
+  Exercise rpe(int? rpe) => this(rpe: rpe);
+
+  @override
   Exercise category(GTExerciseMuscleCategory? category) =>
       this(category: category);
 
@@ -134,6 +140,7 @@ class _$ExerciseCWProxyImpl implements _$ExerciseCWProxy {
     Object? supersetID = const $CopyWithPlaceholder(),
     Object? workoutID = const $CopyWithPlaceholder(),
     Object? supersedesID = const $CopyWithPlaceholder(),
+    Object? rpe = const $CopyWithPlaceholder(),
     Object? category = const $CopyWithPlaceholder(),
   }) {
     return Exercise.raw(
@@ -193,10 +200,15 @@ class _$ExerciseCWProxyImpl implements _$ExerciseCWProxy {
           ? _value.supersedesID
           // ignore: cast_nullable_to_non_nullable
           : supersedesID as String?,
+      rpe: rpe == const $CopyWithPlaceholder()
+          ? _value.rpe
+          // ignore: cast_nullable_to_non_nullable
+          : rpe as int?,
       category: category == const $CopyWithPlaceholder()
           ? _value.category
           // ignore: cast_nullable_to_non_nullable
           : category as GTExerciseMuscleCategory?,
+      skeleton: _value.skeleton,
     );
   }
 }
@@ -231,6 +243,7 @@ Exercise _$ExerciseFromJson(Map<String, dynamic> json) => Exercise.raw(
       supersetID: json['supersetID'] as String?,
       workoutID: json['workoutID'] as String?,
       supersedesID: json['supersedesID'] as String?,
+      rpe: (json['rpe'] as num?)?.toInt(),
       category: $enumDecodeNullable(
           _$GTExerciseMuscleCategoryEnumMap, json['category']),
     );
@@ -252,6 +265,7 @@ Map<String, dynamic> _$ExerciseToJson(Exercise instance) => <String, dynamic>{
       'workoutID': instance.workoutID,
       'standard': instance.standard,
       'supersedesID': instance.supersedesID,
+      'rpe': instance.rpe,
       'category': _$GTExerciseMuscleCategoryEnumMap[instance.category],
     };
 

@@ -345,6 +345,43 @@ class _WorkoutEditorState extends State<WorkoutEditor> {
 
           _setExercises(exercises);
         },
+        onExerciseChangeRPE: (index, rpe) {
+          final (
+            exerciseIndex: exerciseIndex,
+            supersetIndex: supersetIndex,
+          ) = index;
+
+          final exercises = workout.exercises.toList();
+
+          if (supersetIndex == null) {
+            final ex = exercises[exerciseIndex];
+            // Type safety
+            exercises[exerciseIndex] = ex is Exercise
+                ? ex.copyWith(rpe: rpe)
+                : ex is Superset
+                    ? ex.copyWith(
+                        exercises: [
+                          for (int j = 0; j < ex.exercises.length; j++)
+                            if (j == exerciseIndex)
+                              ex.exercises[j].copyWith(rpe: rpe)
+                            else
+                              ex.exercises[j]
+                        ],
+                      )
+                    : throw AssertionError("Unreachable yet");
+          } else {
+            final superset = exercises[supersetIndex] as Superset;
+            exercises[supersetIndex] = superset.copyWith(exercises: [
+              for (int j = 0; j < superset.exercises.length; j++)
+                if (j == exerciseIndex)
+                  superset.exercises[j].copyWith(rpe: rpe)
+                else
+                  superset.exercises[j]
+            ]);
+          }
+
+          _setExercises(exercises);
+        },
         onSetCreate: (index) {
           final (exerciseIndex: i, supersetIndex: supersetIndex) = index;
 

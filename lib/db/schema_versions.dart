@@ -655,9 +655,251 @@ i1.GeneratedColumn<String> _column_35(String aliasedName) =>
         type: i1.DriftSqlType.string,
         defaultConstraints: i1.GeneratedColumn.constraintIsAlways(
             'REFERENCES routine_folders (id)'));
+
+final class Schema5 extends i0.VersionedSchema {
+  Schema5({required super.database}) : super(version: 5);
+  @override
+  late final List<i1.DatabaseSchemaEntity> entities = [
+    customExercises,
+    routineFolders,
+    routines,
+    historyWorkouts,
+    historyWorkoutExercises,
+    routineExercises,
+    preferences,
+    ongoingData,
+    weightMeasurements,
+  ];
+  late final Shape0 customExercises = Shape0(
+      source: i0.VersionedTable(
+        entityName: 'custom_exercises',
+        withoutRowId: false,
+        isStrict: false,
+        tableConstraints: [
+          'PRIMARY KEY(id)',
+        ],
+        columns: [
+          _column_0,
+          _column_1,
+          _column_2,
+          _column_3,
+          _column_4,
+        ],
+        attachedDatabase: database,
+      ),
+      alias: null);
+  late final Shape6 routineFolders = Shape6(
+      source: i0.VersionedTable(
+        entityName: 'routine_folders',
+        withoutRowId: false,
+        isStrict: false,
+        tableConstraints: [
+          'PRIMARY KEY(id)',
+        ],
+        columns: [
+          _column_0,
+          _column_1,
+          _column_8,
+        ],
+        attachedDatabase: database,
+      ),
+      alias: null);
+  late final Shape7 routines = Shape7(
+      source: i0.VersionedTable(
+        entityName: 'routines',
+        withoutRowId: false,
+        isStrict: false,
+        tableConstraints: [
+          'PRIMARY KEY(id)',
+        ],
+        columns: [
+          _column_0,
+          _column_1,
+          _column_5,
+          _column_6,
+          _column_7,
+          _column_8,
+          _column_35,
+        ],
+        attachedDatabase: database,
+      ),
+      alias: null);
+  late final Shape2 historyWorkouts = Shape2(
+      source: i0.VersionedTable(
+        entityName: 'history_workouts',
+        withoutRowId: false,
+        isStrict: false,
+        tableConstraints: [
+          'PRIMARY KEY(id)',
+          'UNIQUE(completed_by, completes)',
+        ],
+        columns: [
+          _column_0,
+          _column_1,
+          _column_9,
+          _column_10,
+          _column_11,
+          _column_12,
+          _column_13,
+          _column_14,
+          _column_6,
+          _column_7,
+        ],
+        attachedDatabase: database,
+      ),
+      alias: null);
+  late final Shape8 historyWorkoutExercises = Shape8(
+      source: i0.VersionedTable(
+        entityName: 'history_workout_exercises',
+        withoutRowId: false,
+        isStrict: false,
+        tableConstraints: [
+          'PRIMARY KEY(id)',
+        ],
+        columns: [
+          _column_0,
+          _column_15,
+          _column_1,
+          _column_16,
+          _column_17,
+          _column_18,
+          _column_19,
+          _column_20,
+          _column_21,
+          _column_22,
+          _column_23,
+          _column_24,
+          _column_25,
+          _column_26,
+          _column_27,
+          _column_8,
+          _column_28,
+          _column_36,
+        ],
+        attachedDatabase: database,
+      ),
+      alias: null);
+  late final Shape8 routineExercises = Shape8(
+      source: i0.VersionedTable(
+        entityName: 'routine_exercises',
+        withoutRowId: false,
+        isStrict: false,
+        tableConstraints: [
+          'PRIMARY KEY(id)',
+        ],
+        columns: [
+          _column_0,
+          _column_29,
+          _column_1,
+          _column_16,
+          _column_17,
+          _column_18,
+          _column_19,
+          _column_20,
+          _column_21,
+          _column_22,
+          _column_23,
+          _column_24,
+          _column_25,
+          _column_26,
+          _column_30,
+          _column_8,
+          _column_31,
+          _column_36,
+        ],
+        attachedDatabase: database,
+      ),
+      alias: null);
+  late final Shape4 preferences = Shape4(
+      source: i0.VersionedTable(
+        entityName: 'preferences',
+        withoutRowId: false,
+        isStrict: false,
+        tableConstraints: [],
+        columns: [
+          _column_32,
+        ],
+        attachedDatabase: database,
+      ),
+      alias: null);
+  late final Shape4 ongoingData = Shape4(
+      source: i0.VersionedTable(
+        entityName: 'ongoing_data',
+        withoutRowId: false,
+        isStrict: false,
+        tableConstraints: [],
+        columns: [
+          _column_32,
+        ],
+        attachedDatabase: database,
+      ),
+      alias: null);
+  late final Shape5 weightMeasurements = Shape5(
+      source: i0.VersionedTable(
+        entityName: 'weight_measurements',
+        withoutRowId: false,
+        isStrict: false,
+        tableConstraints: [
+          'PRIMARY KEY(id)',
+        ],
+        columns: [
+          _column_0,
+          _column_33,
+          _column_34,
+          _column_6,
+        ],
+        attachedDatabase: database,
+      ),
+      alias: null);
+}
+
+class Shape8 extends i0.VersionedTable {
+  Shape8({required super.source, required super.alias}) : super.aliased();
+  i1.GeneratedColumn<String> get id =>
+      columnsByName['id']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<String> get routineId =>
+      columnsByName['routine_id']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<String> get name =>
+      columnsByName['name']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<String> get parameters =>
+      columnsByName['parameters']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<String> get sets =>
+      columnsByName['sets']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<String> get primaryMuscleGroup =>
+      columnsByName['primary_muscle_group']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<String> get secondaryMuscleGroups =>
+      columnsByName['secondary_muscle_groups']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<int> get restTime =>
+      columnsByName['rest_time']! as i1.GeneratedColumn<int>;
+  i1.GeneratedColumn<bool> get isCustom =>
+      columnsByName['is_custom']! as i1.GeneratedColumn<bool>;
+  i1.GeneratedColumn<String> get libraryExerciseId =>
+      columnsByName['library_exercise_id']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<String> get customExerciseId =>
+      columnsByName['custom_exercise_id']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<String> get notes =>
+      columnsByName['notes']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<bool> get isSuperset =>
+      columnsByName['is_superset']! as i1.GeneratedColumn<bool>;
+  i1.GeneratedColumn<bool> get isInSuperset =>
+      columnsByName['is_in_superset']! as i1.GeneratedColumn<bool>;
+  i1.GeneratedColumn<String> get supersetId =>
+      columnsByName['superset_id']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<int> get sortOrder =>
+      columnsByName['sort_order']! as i1.GeneratedColumn<int>;
+  i1.GeneratedColumn<String> get supersedesId =>
+      columnsByName['supersedes_id']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<int> get rpe =>
+      columnsByName['rpe']! as i1.GeneratedColumn<int>;
+}
+
+i1.GeneratedColumn<int> _column_36(String aliasedName) =>
+    i1.GeneratedColumn<int>('rpe', aliasedName, true,
+        type: i1.DriftSqlType.int);
 i0.MigrationStepWithVersion migrationSteps({
   required Future<void> Function(i1.Migrator m, Schema3 schema) from2To3,
   required Future<void> Function(i1.Migrator m, Schema4 schema) from3To4,
+  required Future<void> Function(i1.Migrator m, Schema5 schema) from4To5,
 }) {
   return (currentVersion, database) async {
     switch (currentVersion) {
@@ -671,6 +913,11 @@ i0.MigrationStepWithVersion migrationSteps({
         final migrator = i1.Migrator(database, schema);
         await from3To4(migrator, schema);
         return 4;
+      case 4:
+        final schema = Schema5(database: database);
+        final migrator = i1.Migrator(database, schema);
+        await from4To5(migrator, schema);
+        return 5;
       default:
         throw ArgumentError.value('Unknown migration from $currentVersion');
     }
@@ -680,9 +927,11 @@ i0.MigrationStepWithVersion migrationSteps({
 i1.OnUpgrade stepByStep({
   required Future<void> Function(i1.Migrator m, Schema3 schema) from2To3,
   required Future<void> Function(i1.Migrator m, Schema4 schema) from3To4,
+  required Future<void> Function(i1.Migrator m, Schema5 schema) from4To5,
 }) =>
     i0.VersionedSchema.stepByStepHelper(
         step: migrationSteps(
       from2To3: from2To3,
       from3To4: from3To4,
+      from4To5: from4To5,
     ));

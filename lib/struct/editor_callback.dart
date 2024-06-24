@@ -19,6 +19,8 @@ class EditorCallbacks {
       onExerciseChangeRestTime;
   final void Function(ExerciseIndex exerciseIndex, String notes)
       onExerciseNotesChange;
+  final void Function(ExerciseIndex exerciseIndex, int? newRPE)
+      onExerciseChangeRPE;
   final void Function(ExerciseIndex exerciseIndex) onSetCreate;
   final void Function(ExerciseIndex exerciseIndex, int setIndex) onSetRemove;
   final void Function(ExerciseIndex exerciseIndex, int setIndex, GTSetKind kind)
@@ -48,6 +50,10 @@ class EditorCallbacks {
           throw Exception(
               "onExerciseReorder is not available in creation mode.");
         }),
+        onExerciseChangeRPE = ((index, newRPE) {
+          throw Exception(
+              "onExerciseChangeRPE is not available in creation mode.");
+        }),
         onSetSetDone = ((ex, set, done) {
           throw Exception("onSetSetDone is not available in creation mode.");
         }),
@@ -62,6 +68,7 @@ class EditorCallbacks {
     required this.onExerciseRemove,
     required this.onExerciseChangeRestTime,
     required this.onExerciseNotesChange,
+    required this.onExerciseChangeRPE,
     required this.onSetCreate,
     required this.onSetRemove,
     required this.onSetSelectKind,

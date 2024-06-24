@@ -5,6 +5,7 @@ import 'package:gymtracker/model/workout.dart';
 import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/view/utils/timer.dart';
 import 'package:intl/intl.dart';
+import 'package:skeletonizer/skeletonizer.dart';
 
 class WorkoutHeader extends StatelessWidget {
   const WorkoutHeader({
@@ -30,12 +31,14 @@ class WorkoutHeader extends StatelessWidget {
         Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            CircleAvatar(
-              backgroundColor: bg,
-              foregroundColor: fg,
-              child: isSelected
-                  ? const Icon(GymTrackerIcons.done)
-                  : Text(workout.name.characters.first.toUpperCase()),
+            Skeleton.leaf(
+              child: CircleAvatar(
+                backgroundColor: bg,
+                foregroundColor: fg,
+                child: isSelected
+                    ? const Icon(GymTrackerIcons.done)
+                    : Text(workout.name.characters.first.toUpperCase()),
+              ),
             ),
             const SizedBox(width: 16),
             Expanded(

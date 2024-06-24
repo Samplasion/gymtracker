@@ -13,6 +13,7 @@ import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/utils/utils.dart';
 import 'package:gymtracker/view/components/badges.dart';
 import 'package:gymtracker/view/utils/timer.dart';
+import 'package:skeletonizer/skeletonizer.dart';
 
 class ExerciseIcon extends StatelessWidget {
   final WorkoutExercisable exercise;
@@ -110,7 +111,7 @@ class ExerciseListTile extends StatelessWidget {
       child: const Icon(GymTrackerIcons.done),
     );
     return ListTile(
-      leading: selected ? selectedIcon : unselectedIcon,
+      leading: Skeleton.leaf(child: selected ? selectedIcon : unselectedIcon),
       title: Text.rich(
         TextSpan(children: [
           if (exercise is Superset) ...[
@@ -128,7 +129,7 @@ class ExerciseListTile extends StatelessWidget {
               const WidgetSpan(
                 baseline: TextBaseline.ideographic,
                 alignment: PlaceholderAlignment.middle,
-                child: CustomExerciseBadge(),
+                child: Skeleton.ignore(child: CustomExerciseBadge()),
               ),
             ],
           ],

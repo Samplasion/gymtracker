@@ -101,6 +101,8 @@ class Exercise extends WorkoutExercisable {
   @override
   final String? supersedesID;
 
+  final bool _skeleton;
+
   bool get isCustom => !standard;
   bool get isInSuperset => supersetID != null;
   bool get isOrphan => parentID == null;
@@ -172,7 +174,9 @@ class Exercise extends WorkoutExercisable {
     required this.workoutID,
     required this.supersedesID,
     GTExerciseMuscleCategory? category,
+    bool skeleton = false,
   })  : id = id ?? const Uuid().v4(),
+        _skeleton = skeleton,
         _category = category,
         assert(sets.isEmpty || parameters == sets[0].parameters,
             "The parameters must not change between the Exercise and its Sets"),
@@ -358,6 +362,7 @@ class Exercise extends WorkoutExercisable {
 
 extension Display on Exercise {
   String get displayName {
+    if (_skeleton) return name;
     if (isCustom) return name;
 
     final candidate = isAbstract ? id : parentID!;

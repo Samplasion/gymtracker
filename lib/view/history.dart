@@ -7,16 +7,20 @@ import 'package:gymtracker/model/workout.dart';
 import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/service/logger.dart';
 import 'package:gymtracker/utils/go.dart';
+import 'package:gymtracker/utils/skeletons.dart';
 import 'package:gymtracker/view/exercises.dart';
 import 'package:gymtracker/view/me/calendar.dart';
 import 'package:gymtracker/view/utils/action_icon.dart';
 import 'package:gymtracker/view/utils/history_workout.dart';
 import 'package:gymtracker/view/utils/input_decoration.dart';
 import 'package:intl/intl.dart';
+import 'package:skeletonizer/skeletonizer.dart';
 
 const kHistoryWorkoutsAbridgedCount = 20;
 
 typedef MonthYear = (int month, int year);
+
+final List<Workout> fakeData = List.generate(7, (_) => skeletonWorkout());
 
 Map<MonthYear, List<Workout>> _getHistoryByMonthThread(List<Workout> raw) {
   final map = <MonthYear, List<Workout>>{};
@@ -104,75 +108,65 @@ class _HistoryViewState extends State<HistoryView> {
       body: FutureBuilder(
         future: historyByMonth,
         builder: (context, snapshot) {
-          final history = isSearching ? searchResults : snapshot.data ?? {};
+          final isLoading = !snapshot.hasData;
+          final history = isLoading
+              ? _getHistoryByMonthThread(fakeData)
+              : (isSearching ? searchResults : snapshot.data ?? {});
 
           return CustomScrollView(
+            physics: isLoading ? const NeverScrollableScrollPhysics() : null,
             keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
             slivers: [
-              _buildAppBar(),
-              if (!snapshot.hasData)
-                const SliverFillRemaining(
-                  child: Center(child: CircularProgressIndicator()),
-                )
-              else
-                SliverToBoxAdapter(
-                  child: AnimatedCrossFade(
-                    firstChild: const SizedBox(
-                      height: 100,
-                      child: Center(child: CircularProgressIndicator()),
-                    ),
-                    secondChild: const SizedBox.shrink(),
-                    crossFadeState:
-                        snapshot.connectionState != ConnectionState.done
-                            ? CrossFadeState.showFirst
-                            : CrossFadeState.showSecond,
-                    duration: const Duration(milliseconds: 300),
-                  ),
-                ),
+              _buildAppBar(isLoading),
               for (final date in history.keys) ...[
                 SliverStickyHeader.builder(
-                  builder: (context, state) => _buildHeader(state, date),
-                  sliver: SliverList(
-                    delegate: SliverChildBuilderDelegate(
-                      childCount: (history[date] ?? []).length,
-                      (context, index) {
-                        final thatDate = (history[date] ?? []);
+                  builder: (context, state) =>
+                      _buildHeader(state, date, isLoading),
+                  sliver: SliverSkeletonizer(
+                    enabled: isLoading,
+                    child: SliverList(
+                      delegate: SliverChildBuilderDelegate(
+                        childCount: (history[date] ?? []).length,
+                        (context, index) {
+                          final thatDate = (history[date] ?? []);
 
-                        _toggle() {
-                          if (snapshot.connectionState !=
-                              ConnectionState.done) {
-                            return;
-                          }
-                          setState(() {
-                            if (selectedEntries.contains(thatDate[index].id)) {
-                              selectedEntries.remove(thatDate[index].id);
-                            } else {
-                              selectedEntries.add(thatDate[index].id);
+                          _toggle() {
+                            if (snapshot.connectionState !=
+                                ConnectionState.done) {
+                              return;
                             }
-                          });
-                        }
-
-                        return SafeArea(
-                          top: false,
-                          bottom: false,
-                          child: HistoryWorkout(
-                            workout: thatDate[index],
-                            isSelected:
-                                selectedEntries.contains(thatDate[index].id),
-                            onTap: () {
-                              if (selectedEntries.isEmpty) {
-                                Go.to(() =>
-                                    ExercisesView(workout: thatDate[index]));
+                            setState(() {
+                              if (selectedEntries
+                                  .contains(thatDate[index].id)) {
+                                selectedEntries.remove(thatDate[index].id);
                               } else {
-                                _toggle();
+                                selectedEntries.add(thatDate[index].id);
                               }
-                            },
-                            onLongPress: () {
-                              _toggle();
-                            },
-                          ),
-                        );
-                      },
+                            });
+                          }
+
+                          return SafeArea(
+                            top: false,
+                            bottom: false,
+                            child: HistoryWorkout(
+                              workout: thatDate[index],
+                              isSelected:
+                                  selectedEntries.contains(thatDate[index].id),
+                              onTap: () {
+                                if (selectedEntries.isEmpty) {
+                                  Go.to(() =>
+                                      ExercisesView(workout: thatDate[index]));
+                                } else {
+                                  _toggle();
+                                }
+                              },
+                              onLongPress: () {
+                                _toggle();
+                              },
+                            ),
+                          );
+                        },
+                      ),
                     ),
                   ),
                 ),
@@ -201,7 +195,7 @@ class _HistoryViewState extends State<HistoryView> {
     );
   }
 
-  Widget _buildAppBar() {
+  Widget _buildAppBar(bool isLoading) {
     final searchBar = PreferredSize(
       preferredSize: const Size.fromHeight(kToolbarHeight / 1.25 + 32),
       child: Padding(
@@ -224,9 +218,7 @@ class _HistoryViewState extends State<HistoryView> {
           ),
           controller: searchTextController,
           focusNode: searchFocusNode,
-          // constraints: const BoxConstraints.tightFor(
-          //   height: kToolbarHeight / 1.25,
-          // ),
+          canRequestFocus: !isLoading,
           onChanged: (q) {
             setState(() {
               isSearching = q.isNotEmpty;
@@ -283,6 +275,7 @@ class _HistoryViewState extends State<HistoryView> {
   Widget _buildHeader(
     SliverStickyHeaderState state,
     MonthYear date,
+    bool isLoading,
   ) {
     final elevatedAppBarColor = ElevationOverlay.applySurfaceTint(
       Theme.of(context).colorScheme.surface,
@@ -299,11 +292,14 @@ class _HistoryViewState extends State<HistoryView> {
       child: SafeArea(
         top: false,
         bottom: false,
-        child: Text(
-          DateFormat.yMMMM(context.locale.languageCode).format(
-            DateTime(date.$2, date.$1),
+        child: Skeletonizer(
+          enabled: isLoading,
+          child: Text(
+            DateFormat.yMMMM(context.locale.languageCode).format(
+              DateTime(date.$2, date.$1),
+            ),
+            style: Theme.of(context).textTheme.titleMedium,
           ),
-          style: Theme.of(context).textTheme.titleMedium,
         ),
       ),
     );

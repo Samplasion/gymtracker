@@ -1,13 +1,9 @@
 // ignore_for_file: must_be_immutable
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
-import 'package:flutter/services.dart';
-import 'package:flutter/widgets.dart';
 import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/service/logger.dart';
-import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/view/utils/input_decoration.dart';
 import 'package:intl/intl.dart';
 

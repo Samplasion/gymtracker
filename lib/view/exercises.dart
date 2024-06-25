@@ -555,6 +555,11 @@ class ExerciseDataView extends StatelessWidget {
                 ],
               ),
             ),
+            if (workout.isConcrete &&
+                ExerciseBadgeRow.shouldShow(exercise)) ...[
+              const SizedBox(height: 8),
+              ExerciseBadgeRow(exercise: exercise),
+            ],
             if (exercise.notes.isNotEmpty)
               Padding(
                 padding:

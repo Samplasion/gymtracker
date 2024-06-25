@@ -10,6 +10,7 @@ import 'package:gymtracker/model/workout.dart';
 import 'package:gymtracker/service/database.dart';
 import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/service/logger.dart';
+import 'package:gymtracker/struct/optional.dart';
 import 'package:gymtracker/view/utils/exercise.dart';
 
 import '../../test/expectations.dart';
@@ -69,7 +70,9 @@ Future<void> testEditExerciseInRoutineAndHistoryFlow(
   expect(workout.isConcrete, true);
   // Simulate picking the exercise
   workout.exercises.add(
-    baseExercise.makeChild().instantiate(workout: workout.toRoutine()),
+    baseExercise
+        .makeChild()
+        .instantiate(workout: workout.toRoutine(), rpe: const None()),
   );
   globalLogger.d(workout.exercises.single);
   expect(baseExercise.isAbstract, true);

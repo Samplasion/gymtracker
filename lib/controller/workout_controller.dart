@@ -21,6 +21,7 @@ import 'package:gymtracker/model/workout.dart';
 import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/service/logger.dart';
 import 'package:gymtracker/struct/editor_callback.dart';
+import 'package:gymtracker/struct/optional.dart';
 import 'package:gymtracker/struct/stopwatch_extended.dart';
 import 'package:gymtracker/utils/constants.dart';
 import 'package:gymtracker/utils/extensions.dart';
@@ -933,6 +934,7 @@ class WorkoutController extends GetxController with ServiceableController {
     required bool Function(WorkoutExercisable exercise) exerciseFilter,
     bool Function(GTSet set)? setFilter,
     bool continuation = false,
+    required bool shouldKeepRPEs,
   }) {
     this
       ..name(workout.name)
@@ -944,6 +946,7 @@ class WorkoutController extends GetxController with ServiceableController {
                 workout: workout,
                 setFilter: setFilter,
                 isSupersedence: continuation && ex.isSupersedence,
+                rpe: shouldKeepRPEs ? Some(ex.rpe) : const None(),
               )
             else if (ex is Superset)
               ex.copyWith(
@@ -952,6 +955,7 @@ class WorkoutController extends GetxController with ServiceableController {
                           workout: workout,
                           setFilter: setFilter,
                           isSupersedence: continuation && e.isSupersedence,
+                          rpe: shouldKeepRPEs ? Some(e.rpe) : const None(),
                         ))
                     .toList(),
               ),

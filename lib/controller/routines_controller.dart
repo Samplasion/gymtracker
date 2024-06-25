@@ -147,6 +147,7 @@ class RoutinesController extends GetxController
         workout,
         parentID: workoutID,
         exerciseFilter: (ex) => true,
+        shouldKeepRPEs: workout?.isConcrete ?? false,
       );
     });
   }
@@ -184,6 +185,7 @@ class RoutinesController extends GetxController
         exerciseFilter: (ex) => ex.sets.any((set) => !set.done),
         // setFilter: (set) => !set.done,
         continuation: true,
+        shouldKeepRPEs: true,
       );
     });
   }
@@ -193,6 +195,7 @@ class RoutinesController extends GetxController
     String? parentID,
     required bool Function(WorkoutExercisable exercise) exerciseFilter,
     bool continuation = false,
+    required bool shouldKeepRPEs,
   }) {
     if (workout != null) {
       final clone = workout.withRegeneratedExerciseIDs(superseding: true);
@@ -201,6 +204,7 @@ class RoutinesController extends GetxController
         parentID: parentID,
         exerciseFilter: exerciseFilter,
         continuation: continuation,
+        shouldKeepRPEs: shouldKeepRPEs,
       );
     }
   }

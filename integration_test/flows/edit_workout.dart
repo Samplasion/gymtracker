@@ -10,6 +10,7 @@ import 'package:gymtracker/model/set.dart';
 import 'package:gymtracker/model/workout.dart';
 import 'package:gymtracker/service/database.dart';
 import 'package:gymtracker/service/localizations.dart';
+import 'package:gymtracker/struct/optional.dart';
 import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/view/exercises.dart';
 import 'package:gymtracker/view/utils/history_workout.dart';
@@ -49,7 +50,7 @@ Workout get baseRoutine {
     infobox: "Inject",
   );
   baseRoutine.exercises.first = (baseRoutine.exercises.first as Exercise)
-      .instantiate(workout: baseRoutine);
+      .instantiate(workout: baseRoutine, rpe: const None());
   return baseRoutine;
 }
 

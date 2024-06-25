@@ -140,45 +140,47 @@ class _WorkoutExerciseEditorState extends State<WorkoutExerciseEditor> {
                                   'ongoingWorkout.exercises.addToSuperset'.t),
                             ),
                           ),
-                        const PopupMenuDivider(),
-                        PopupMenuItem(
-                          onTap: () {
-                            showDialog<Optional<int?>>(
-                              context: context,
-                              builder: (context) {
-                                return _WorkoutSetRPEDialog(
-                                  currentRPE: widget.exercise.rpe,
-                                );
-                              },
-                            ).then((value) {
-                              if (value != null) {
-                                widget.callbacks.onExerciseChangeRPE(
-                                  widget.index,
-                                  value.safeUnwrap(),
-                                );
-                              }
-                            });
-                          },
-                          child: ListTile(
-                            leading: const Icon(GymTrackerIcons.rpe),
-                            title: Text('ongoingWorkout.exercises.setRPE'.t),
-                          ),
-                        ),
-                        if (!widget.isCreating &&
-                            CardioTimerScreen.supportsTimer(
-                                widget.exercise)) ...[
+                        if (!widget.isCreating) ...[
+                          const PopupMenuDivider(),
                           PopupMenuItem(
                             onTap: () {
-                              Go.to(() => CardioTimerScreen.fromExercise(
-                                  widget.exercise));
+                              showDialog<Optional<int?>>(
+                                context: context,
+                                builder: (context) {
+                                  return _WorkoutSetRPEDialog(
+                                    currentRPE: widget.exercise.rpe,
+                                  );
+                                },
+                              ).then((value) {
+                                if (value != null) {
+                                  widget.callbacks.onExerciseChangeRPE(
+                                    widget.index,
+                                    value.safeUnwrap(),
+                                  );
+                                }
+                              });
                             },
                             child: ListTile(
-                              leading: const Icon(GymTrackerIcons.cardio_timer),
-                              title: Text(
-                                  'ongoingWorkout.exercises.startCardioTimer'
-                                      .t),
+                              leading: const Icon(GymTrackerIcons.rpe),
+                              title: Text('ongoingWorkout.exercises.setRPE'.t),
                             ),
                           ),
+                          if (CardioTimerScreen.supportsTimer(
+                              widget.exercise)) ...[
+                            PopupMenuItem(
+                              onTap: () {
+                                Go.to(() => CardioTimerScreen.fromExercise(
+                                    widget.exercise));
+                              },
+                              child: ListTile(
+                                leading:
+                                    const Icon(GymTrackerIcons.cardio_timer),
+                                title: Text(
+                                    'ongoingWorkout.exercises.startCardioTimer'
+                                        .t),
+                              ),
+                            ),
+                          ],
                         ],
                         const PopupMenuDivider(),
                         PopupMenuItem(
@@ -197,36 +199,9 @@ class _WorkoutExerciseEditorState extends State<WorkoutExerciseEditor> {
                   ],
                 ),
               ),
-              if (widget.exercise.rpe != null) ...[
+              if (ExerciseBadgeRow.shouldShow(widget.exercise)) ...[
                 const SizedBox(height: 8),
-                SafeArea(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child: Row(
-                      children: [
-                        Flexible(
-                          child: Wrap(
-                            alignment: WrapAlignment.start,
-                            spacing: 8,
-                            runSpacing: 8,
-                            children: [
-                              GTBadge(
-                                content: "ongoingWorkout.exercises.rpeBadge"
-                                    .tParams({
-                                  "rpe": "${widget.exercise.rpe}",
-                                }),
-                                background: getContainerColor(context,
-                                    rpeColor(context, widget.exercise.rpe!)),
-                                foreground: getOnContainerColor(context,
-                                    rpeColor(context, widget.exercise.rpe!)),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
+                ExerciseBadgeRow(exercise: widget.exercise),
               ],
               const SizedBox(height: 8),
               ListTile(

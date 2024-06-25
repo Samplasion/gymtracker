@@ -7,6 +7,7 @@ import 'package:gymtracker/model/set.dart';
 import 'package:gymtracker/model/workout.dart';
 import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/service/logger.dart';
+import 'package:gymtracker/struct/optional.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:uuid/uuid.dart';
 
@@ -275,10 +276,17 @@ class Exercise extends WorkoutExercisable {
     required Workout workout,
     bool Function(GTSet set)? setFilter = _defaultSetFilter,
     bool isSupersedence = false,
+    required Optional<int?> rpe,
   }) {
     // We want to keep the parent ID of the exercise in the library (custom
     // or not) as to avoid a "linked list" type situation
-    final base = makeSibling();
+    var base = makeSibling();
+    logger.d((rpe, base.rpe));
+    if (!rpe.exists) {
+      base = base.copyWith.rpe(null);
+    } else {
+      base = base.copyWith.rpe(rpe.unwrap());
+    }
     return base.copyWith(
       workoutID: workout.id,
       sets: ([

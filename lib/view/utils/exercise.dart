@@ -222,3 +222,47 @@ class ExerciseListTile extends StatelessWidget {
     }
   }
 }
+
+class ExerciseBadgeRow extends StatelessWidget {
+  final Exercise exercise;
+
+  const ExerciseBadgeRow({required this.exercise, super.key});
+
+  static shouldShow(Exercise exercise) {
+    return [
+      exercise.rpe != null,
+    ].any((element) => element);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return SafeArea(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        child: Row(
+          children: [
+            Flexible(
+              child: Wrap(
+                alignment: WrapAlignment.start,
+                spacing: 8,
+                runSpacing: 8,
+                children: [
+                  if (exercise.rpe != null)
+                    GTBadge(
+                      content: "ongoingWorkout.exercises.rpeBadge".tParams({
+                        "rpe": "${exercise.rpe}",
+                      }),
+                      background: getContainerColor(
+                          context, rpeColor(context, exercise.rpe!)),
+                      foreground: getOnContainerColor(
+                          context, rpeColor(context, exercise.rpe!)),
+                    ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}

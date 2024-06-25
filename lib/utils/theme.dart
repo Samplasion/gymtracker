@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:gymtracker/controller/settings_controller.dart';
 import 'package:gymtracker/utils/constants.dart';
 import 'package:gymtracker/utils/extensions.dart';
+import 'package:gymtracker/view/utils/input_decoration.dart';
 
 const kDarkBackgroundBase = Color(0xFF000000);
 const kDarkBackgroundLight1 = Color(0xFF111111);
@@ -36,6 +37,15 @@ ThemeData getGymTrackerThemeFor(ColorScheme scheme) {
     splashFactory: platformDependentSplashFactory,
     dialogTheme: DialogTheme(
       backgroundColor: scheme.surfaceContainer,
+    ),
+    inputDecorationTheme: InputDecorationTheme(
+      isDense: true,
+      filled: true,
+      fillColor: scheme.secondaryContainer.withOpacity(0.40),
+      border: OutlineInputBorder(
+        borderSide: BorderSide.none,
+        borderRadius: BorderRadius.circular(kGymTrackerInputBorderRadius),
+      ),
     ),
   );
 }

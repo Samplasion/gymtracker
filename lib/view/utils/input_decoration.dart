@@ -9,11 +9,6 @@ class GymTrackerInputDecoration extends InputDecoration {
     super.suffixIcon,
     super.alignLabelWithHint,
   }) : super(
-          isDense: true,
-          border: const OutlineInputBorder(
-            borderRadius:
-                BorderRadius.all(Radius.circular(kGymTrackerInputBorderRadius)),
-          ),
           labelText: labelText,
         );
 }

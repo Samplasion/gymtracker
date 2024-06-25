@@ -89,6 +89,54 @@
         },
         "notes": {
           "label": "Note"
+        },
+        "rpe": {
+          "removeRPE": "Rimuove RPE",
+          "label": "Imposta RPE",
+          "description": {
+            "title": "Cos'è l'RPE?",
+            "text": "L'RPE (Rate of Perceived Exertion, tasso di sforzo percepito) è una misurazione soggettiva della difficoltà di un esercizio. Si misura da 1 a 10, dove 1 sta per \"sforzo molto basso\" e 10 sta per \"sforzo massimo\"."
+          },
+          "level1": {
+            "title": "RPE 1",
+            "text": "Sforzo molto basso. Non ti sembra neanche di starti allenando."
+          },
+          "level2": {
+            "title": "RPE 2",
+            "text": "Sforzo basso. Puoi facilmente sostenere una conversazione."
+          },
+          "level3": {
+            "title": "RPE 3",
+            "text": "Sforzo moderato. Riesci a sostenere una conversazione."
+          },
+          "level4": {
+            "title": "RPE 4",
+            "text": "Sforzo moderato. Riesci a sostenere una conversazione, ma è un po' più difficile."
+          },
+          "level5": {
+            "title": "RPE 5",
+            "text": "Sforzo moderato. Riesci a sostenere una conversazione, ma è difficile."
+          },
+          "level6": {
+            "title": "RPE 6",
+            "text": "Sforzo più che moderato. Puoi a malapena mantenere una conversazione, e respiri profondamente."
+          },
+          "level7": {
+            "title": "RPE 7",
+            "text": "Sforzo elevato. Non riesci a sostenere una conversazione, e respiri profondamente e affannosamente."
+          },
+          "level8": {
+            "title": "RPE 8",
+            "text": "Sforzo elevato. Riesci a parlare solo una frase alla volta."
+          },
+          "level9": {
+            "title": "RPE 9",
+            "text": "Sforzo molto elevato. Sei quasi senza fiato, e riesci a parlare solo poche parole alla volta."
+          },
+          "level10": {
+            "title": "RPE 10",
+            "text": "Sforzo massimo. Non riesci a parlare e sei senza fiato."
+          }
         }
       },
       "cannotChangeParameters": {
@@ -417,7 +465,9 @@
       "reorder": "Riordina esercizi…",
       "remove": "Rimuovi esercizio",
       "addToSuperset": "Aggiungi a superserie…",
-      "startCardioTimer": "Avvia timer a intervalli"
+      "startCardioTimer": "Avvia timer a intervalli",
+      "rpeBadge": "RPE @rpe",
+      "setRPE": "Imposta RPE"
     },
     "info": {
       "time": "Tempo",
@@ -849,10 +899,10 @@
         "diamondPushUps": "Flessioni a diamante"
       }
     },
+    "newCustomExercise": "Nuovo esercizio",
     "custom": {
       "name": "Esercizi personalizzati"
     },
-    "newCustomExercise": "Nuovo esercizio",
     "hips": {
       "name": "Anche",
       "exercises": {

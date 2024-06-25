@@ -94,9 +94,8 @@
           "removeRPE": "Remove RPE",
           "label": "Set RPE",
           "description": {
-    "title": "What is RPE?",  
-"text":
-"Rate of Perceived Exertion (RPE) is a subjective measure of how hard an exercise feels to you. It's a scale from 1 to 10, where 1 is very light effort and 10 is maximum effort."
+            "title": "What is RPE?",
+            "text": "Rate of Perceived Exertion (RPE) is a subjective measure of how hard an exercise feels to you. It's a scale from 1 to 10, where 1 is very light effort and 10 is maximum effort."
           },
           "level1": {
             "title": "RPE 1",

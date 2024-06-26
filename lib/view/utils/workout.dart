@@ -63,13 +63,10 @@ class _WorkoutExerciseEditorState extends State<WorkoutExerciseEditor> {
     return Scrollable(
       viewportBuilder: (BuildContext context, _) {
         var notesTextStyle = Theme.of(context).textTheme.bodyMedium!.copyWith(
-              fontStyle: widget.exercise.notes.isEmpty
-                  ? FontStyle.italic
-                  : FontStyle.normal,
-              fontWeight: widget.exercise.notes.isEmpty
-                  ? FontWeight.w600
-                  : FontWeight.normal,
               fontSize: widget.exercise.notes.isEmpty ? 15 : null,
+              color: widget.exercise.notes.isEmpty
+                  ? Theme.of(context).colorScheme.onSurface.withOpacity(0.75)
+                  : null,
             );
         return Padding(
           padding: const EdgeInsets.symmetric(vertical: 8),
@@ -209,7 +206,7 @@ class _WorkoutExerciseEditorState extends State<WorkoutExerciseEditor> {
                 leading: const Icon(GymTrackerIcons.notes),
                 title: widget.exercise.notes.asQuillDocument().isEmpty()
                     ? Text(
-                        "exercise.editor.fields.notes.label".t,
+                        "exercise.editor.fields.notes.tapToEdit".t,
                         style: notesTextStyle,
                       )
                     : MaybeRichText(

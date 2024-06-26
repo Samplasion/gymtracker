@@ -1,6 +1,7 @@
 import 'package:gymtracker/model/exercise.dart';
 import 'package:gymtracker/model/set.dart';
 import 'package:gymtracker/model/workout.dart';
+import 'package:gymtracker/struct/optional.dart';
 import 'package:test/test.dart';
 
 import '../expectations.dart';
@@ -24,7 +25,10 @@ void main() {
           exercises: [],
         );
 
-        final instantiated = base.instantiate(workout: workout);
+        final instantiated = base.instantiate(
+          workout: workout,
+          rpe: const None(),
+        );
         expectExercise(
           instantiated,
           Exercise.custom(
@@ -49,7 +53,10 @@ void main() {
           startingDate: DateTime.now(),
         );
 
-        final instantiated = base.instantiate(workout: workout);
+        final instantiated = base.instantiate(
+          workout: workout,
+          rpe: const None(),
+        );
         expectExercise(
           instantiated,
           Exercise.custom(

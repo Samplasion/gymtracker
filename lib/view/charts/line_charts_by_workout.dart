@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:gymtracker/controller/history_controller.dart';
 import 'package:gymtracker/controller/routines_controller.dart';
 import 'package:gymtracker/controller/settings_controller.dart';
+import 'package:gymtracker/controller/workout_controller.dart';
 import 'package:gymtracker/data/distance.dart';
 import 'package:gymtracker/data/weights.dart';
 import 'package:gymtracker/icons/gymtracker_icons.dart';
@@ -13,10 +14,12 @@ import 'package:gymtracker/model/workout.dart';
 import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/utils/go.dart';
+import 'package:gymtracker/utils/theme.dart';
 import 'package:gymtracker/view/charts/base_types.dart';
 import 'package:gymtracker/view/components/controlled.dart';
 import 'package:gymtracker/view/exercises.dart';
 import 'package:gymtracker/view/utils/timer.dart';
+import 'package:gymtracker/view/workout.dart';
 import 'package:intl/intl.dart';
 
 export 'package:gymtracker/view/charts/base_types.dart';
@@ -24,13 +27,15 @@ export 'package:gymtracker/view/charts/base_types.dart';
 class LineChartWithCategories<T> extends StatefulWidget {
   final Map<T, LineChartCategory> categories;
   final Map<T, List<LineChartPoint>> data;
-  final Widget Function(T, int, LineChartPoint) currentValueBuilder;
+  final Map<T, List<LineChartPoint>> predictedData;
+  final Widget Function(T, int, LineChartPoint, bool) currentValueBuilder;
   final String Function(T, double) leftTitleBuilder;
 
   LineChartWithCategories({
     super.key,
     required this.categories,
     required this.data,
+    this.predictedData = const {},
     required this.currentValueBuilder,
     required this.leftTitleBuilder,
   })  : assert(categories.isNotEmpty),
@@ -72,7 +77,13 @@ class _LineChartWithCategoriesState<T>
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         widget.currentValueBuilder(
-            selectedCategory, hoveredIndex, children[hoveredIndex]),
+            selectedCategory,
+            hoveredIndex,
+            hoveredIndex >= children.length
+                ? widget.predictedData[selectedCategory]!
+                    .elementAt(hoveredIndex - children.length)
+                : children[hoveredIndex],
+            hoveredIndex >= children.length),
         ConstrainedBox(
           constraints: BoxConstraints.loose(const Size.fromHeight(300)),
           child: Padding(
@@ -155,6 +166,34 @@ class _LineChartWithCategoriesState<T>
                   },
                 ),
                 lineBarsData: [
+                  if (widget.predictedData[selectedCategory]?.isNotEmpty ==
+                      true)
+                    LineChartBarData(
+                      dotData: const FlDotData(show: false),
+                      spots: [
+                        FlSpot(
+                          (children.length - 1).toDouble(),
+                          children.last.value,
+                        ),
+                        for (int i = 0;
+                            i < widget.predictedData[selectedCategory]!.length;
+                            i++)
+                          FlSpot(
+                            (children.length + i).toDouble(),
+                            widget.predictedData[selectedCategory]![i].value,
+                          ),
+                      ],
+                      isCurved: true,
+                      preventCurveOverShooting: true,
+                      color: colorScheme.quaternary,
+                      dashArray: [5, 10],
+                      barWidth: 2.5,
+                      isStrokeCapRound: true,
+                      belowBarData: BarAreaData(
+                        show: true,
+                        color: colorScheme.quaternary.withOpacity(0.3),
+                      ),
+                    ),
                   LineChartBarData(
                     dotData: const FlDotData(show: false),
                     spots: [
@@ -225,7 +264,10 @@ class _LineChartWithCategoriesState<T>
     return (double value, TitleMeta meta) {
       if (value % 1 != 0) return const SizedBox.shrink();
 
-      DateTime? cur = children[value.toInt()].date;
+      DateTime? cur =
+          value >= children.length ? null : children[value.toInt()].date;
+      if (cur == null) return const SizedBox.shrink();
+
       String text = DateFormat.Md(context.locale.languageCode).format(cur);
 
       if (value > 0) {
@@ -277,13 +319,19 @@ class RoutineHistoryChart extends StatefulWidget {
 
   static shouldShow(Workout workout) {
     final controller = Get.find<RoutinesController>();
+    final ongoingWorkout = Get.isRegistered<WorkoutController>()
+        ? Get.find<WorkoutController>().synthesizeTemporaryWorkout()
+        : null;
+    final added =
+        ongoingWorkout != null && ongoingWorkout.isChildOf(workout) ? 1 : 0;
     return !workout.isConcrete &&
         controller
-                .getChildren(
-                  workout,
-                  allowSynthesized: true,
-                )
-                .length >=
+                    .getChildren(
+                      workout,
+                      allowSynthesized: true,
+                    )
+                    .length +
+                added >=
             2;
   }
 }
@@ -296,6 +344,38 @@ enum _RoutineHistoryChartType {
 
 class _RoutineHistoryChartState
     extends ControlledState<RoutineHistoryChart, RoutinesController> {
+  Workout? get _currentSynthOngoing {
+    if (!Get.isRegistered<WorkoutController>()) return null;
+    final wo = Get.find<WorkoutController>().synthesizeTemporaryWorkout();
+    return wo.isChildOf(widget.routine) ? wo : null;
+  }
+
+  LineChartPoint? _getSynthesizedPointFor(_RoutineHistoryChartType type) {
+    if (_currentSynthOngoing == null) return null;
+    final wo = _currentSynthOngoing!;
+    switch (type) {
+      case _RoutineHistoryChartType.volume:
+        return LineChartPoint(
+          value: Weights.convert(
+            value: wo.liftedWeight,
+            from: wo.weightUnit,
+            to: settingsController.weightUnit.value,
+          ),
+          date: wo.startingDate!,
+        );
+      case _RoutineHistoryChartType.reps:
+        return LineChartPoint(
+          value: wo.reps.toDouble(),
+          date: wo.startingDate!,
+        );
+      case _RoutineHistoryChartType.duration:
+        return LineChartPoint(
+          value: wo.duration!.inSeconds.toDouble(),
+          date: wo.startingDate!,
+        );
+    }
+  }
+
   List<Workout> get children => controller.getChildren(
         widget.routine,
         allowSynthesized: true,
@@ -387,11 +467,20 @@ class _RoutineHistoryChartState
         for (final entry in values.entries)
           if (availableTypes.contains(entry.key)) entry.key: entry.value
       },
-      currentValueBuilder: (type, index, point) {
-        final style = Theme.of(context)
-            .textTheme
-            .bodyLarge!
-            .copyWith(fontWeight: FontWeight.bold);
+      predictedData: {
+        for (final type in availableTypes)
+          if (_currentSynthOngoing != null)
+            type: [_getSynthesizedPointFor(type)!]
+      },
+      currentValueBuilder: (type, index, point, isPredicted) {
+        final hoveredPoint =
+            index >= children.length ? _currentSynthOngoing! : children[index];
+
+        final style = Theme.of(context).textTheme.bodyLarge!.copyWith(
+              fontWeight: FontWeight.bold,
+              color:
+                  isPredicted ? Theme.of(context).colorScheme.quaternary : null,
+            );
         return TimerView.buildTimeString(
           context,
           Duration(seconds: point.value.toInt()),
@@ -407,18 +496,22 @@ class _RoutineHistoryChartState
                 const TextSpan(text: " "),
                 TextSpan(
                   text: DateFormat.yMd(context.locale.languageCode)
-                      .format(children[index].startingDate!),
+                      .format(hoveredPoint.startingDate!),
                   style: TextStyle(
                     color: Theme.of(context).colorScheme.primary,
                     decoration: TextDecoration.underline,
                   ),
                   recognizer: dateRecognizer
                     ..onTap = () {
-                      Go.to(
-                        () => ExercisesView(
-                            workout: Get.find<HistoryController>()
-                                .getByID(children[index].id)!),
-                      );
+                      if (index >= children.length) {
+                        Go.toNamed(WorkoutView.routeName);
+                      } else {
+                        Go.to(
+                          () => ExercisesView(
+                              workout: Get.find<HistoryController>()
+                                  .getByID(children[index].id)!),
+                        );
+                      }
                     },
                 ),
               ]),
@@ -585,11 +678,12 @@ class _ExerciseHistoryChartState
           .where((element) => availableTypes.contains(element.key))
           .toMap(),
       data: values,
-      currentValueBuilder: (type, index, point) {
-        final style = Theme.of(context)
-            .textTheme
-            .bodyLarge!
-            .copyWith(fontWeight: FontWeight.bold);
+      currentValueBuilder: (type, index, point, isPredicted) {
+        final style = Theme.of(context).textTheme.bodyLarge!.copyWith(
+              fontWeight: FontWeight.bold,
+              color:
+                  isPredicted ? Theme.of(context).colorScheme.quaternary : null,
+            );
         return TimerView.buildTimeString(
           context,
           Duration(seconds: point.value.toInt()),

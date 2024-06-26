@@ -395,6 +395,10 @@ class Workout {
       return hasExercise(parent);
     }
   }
+
+  bool isChildOf(Workout workout) {
+    return workout.id == parentID;
+  }
 }
 
 class SynthesizedWorkoutMethodException implements Exception {
@@ -491,6 +495,11 @@ class SynthesizedWorkout implements Workout {
 
   @override
   String? get infobox => components.first.infobox;
+
+  @override
+  bool isChildOf(Workout workout) {
+    return workout.id == parentID;
+  }
 
   @override
   bool get isComplete => components.every((e) => e.isComplete);

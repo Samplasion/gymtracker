@@ -982,4 +982,20 @@ class WorkoutController extends GetxController with ServiceableController {
       }
     }
   }
+
+  Workout synthesizeTemporaryWorkout() {
+    return Workout(
+      name: name.value,
+      exercises: exercises,
+      duration: DateTime.now().difference(time.value),
+      startingDate: time.value,
+      parentID: parentID.value,
+      infobox: infobox.value,
+      weightUnit: weightUnit.value,
+      distanceUnit: distanceUnit.value,
+      completedBy: null,
+      completes: continuesID.value,
+      folder: null,
+    );
+  }
 }

@@ -205,6 +205,7 @@ class _WorkoutExerciseEditorState extends State<WorkoutExerciseEditor> {
               ],
               const SizedBox(height: 8),
               ListTile(
+                titleAlignment: ListTileTitleAlignment.titleHeight,
                 leading: const Icon(GymTrackerIcons.notes),
                 title: widget.exercise.notes.asQuillDocument().isEmpty()
                     ? Text(

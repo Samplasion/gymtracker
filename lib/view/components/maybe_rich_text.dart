@@ -18,33 +18,35 @@ class MaybeRichText extends StatelessWidget {
 
     return DefaultTextStyle(
       style: textStyle,
-      child: QuillEditor.basic(
-        configurations: QuillEditorConfigurations(
-          controller: QuillController(
-            document: text.asQuillDocument(),
-            selection: const TextSelection.collapsed(offset: 0),
-            readOnly: true,
-          ),
-          customStyles: DefaultStyles(
-            paragraph: DefaultTextBlockStyle(
-              textStyle,
-              const VerticalSpacing(0, 0),
-              const VerticalSpacing(0, 0),
-              null,
+      child: AbsorbPointer(
+        child: QuillEditor.basic(
+          configurations: QuillEditorConfigurations(
+            controller: QuillController(
+              document: text.asQuillDocument(),
+              selection: const TextSelection.collapsed(offset: 0),
+              readOnly: true,
             ),
+            customStyles: DefaultStyles(
+              paragraph: DefaultTextBlockStyle(
+                textStyle,
+                const VerticalSpacing(0, 0),
+                const VerticalSpacing(0, 0),
+                null,
+              ),
+            ),
+            sharedConfigurations: QuillSharedConfigurations(
+              locale: Get.locale!,
+            ),
+            showCursor: false,
+            enableInteractiveSelection: false,
+            enableSelectionToolbar: false,
+            customStyleBuilder: (attr) {
+              if (attr.key == highlightAttribute.key) {
+                return getHighlightTextStyle(context);
+              }
+              return const TextStyle();
+            },
           ),
-          sharedConfigurations: QuillSharedConfigurations(
-            locale: Get.locale!,
-          ),
-          showCursor: false,
-          enableInteractiveSelection: false,
-          enableSelectionToolbar: false,
-          customStyleBuilder: (attr) {
-            if (attr.key == highlightAttribute.key) {
-              return getHighlightTextStyle(context);
-            }
-            return const TextStyle();
-          },
         ),
       ),
     );

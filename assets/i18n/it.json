@@ -88,7 +88,8 @@
           "label": "Gruppi muscolari secondari"
         },
         "notes": {
-          "label": "Note"
+          "label": "Note",
+          "tapToEdit": "Tocca per inserire note"
         },
         "rpe": {
           "removeRPE": "Rimuove RPE",
@@ -410,8 +411,8 @@
       "notifications": {
         "label": "Stato notifiche",
         "subtitle": {
-          "noPermission": "Tocca per richiedere il permesso",
-          "noExactAlarmPermission": "Tocca per richiedere il permesso \"Promemoria e avvisi\" (Android 14+)"
+          "noExactAlarmPermission": "Tocca per richiedere il permesso \"Promemoria e avvisi\" (Android 14+)",
+          "noPermission": "Tocca per richiedere il permesso"
         }
       },
       "tintExercises": {
@@ -899,10 +900,10 @@
         "diamondPushUps": "Flessioni a diamante"
       }
     },
-    "newCustomExercise": "Nuovo esercizio",
     "custom": {
       "name": "Esercizi personalizzati"
     },
+    "newCustomExercise": "Nuovo esercizio",
     "hips": {
       "name": "Anche",
       "exercises": {

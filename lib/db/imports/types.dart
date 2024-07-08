@@ -5,11 +5,14 @@ import 'package:gymtracker/db/imports/v2.dart';
 import 'package:gymtracker/db/imports/v3.dart';
 import 'package:gymtracker/db/imports/v4.dart';
 import 'package:gymtracker/db/imports/v5.dart';
+import 'package:gymtracker/db/imports/v6.dart';
+import 'package:gymtracker/db/imports/v7.dart';
 import 'package:gymtracker/model/exercisable.dart';
 import 'package:gymtracker/model/exercise.dart';
 import 'package:gymtracker/model/measurements.dart';
 import 'package:gymtracker/model/preferences.dart';
 import 'package:gymtracker/model/workout.dart';
+import 'package:gymtracker/struct/nutrition.dart';
 
 const converters = {
   1: VersionedJsonImportV1(),
@@ -17,6 +20,8 @@ const converters = {
   3: VersionedJsonImportV3(),
   4: VersionedJsonImportV4(),
   5: VersionedJsonImportV5(),
+  6: VersionedJsonImportV6(),
+  7: VersionedJsonImportV7(),
 };
 
 VersionedJsonImportBase getConverter(int version) {
@@ -48,6 +53,10 @@ class DatabaseSnapshot {
   final Prefs preferences;
   final List<WeightMeasurement> weightMeasurements;
   final List<GTRoutineFolder> folders;
+  final List<TaggedFood> foods;
+  final List<TaggedNutritionGoal> nutritionGoals;
+  final Map<String, Food> customBarcodeFoods;
+  final List<String> favoriteFoods;
 
   const DatabaseSnapshot({
     required this.customExercises,
@@ -58,6 +67,10 @@ class DatabaseSnapshot {
     required this.preferences,
     required this.weightMeasurements,
     required this.folders,
+    required this.foods,
+    required this.nutritionGoals,
+    required this.customBarcodeFoods,
+    required this.favoriteFoods,
   });
 
   @override
@@ -71,6 +84,8 @@ class DatabaseSnapshot {
   preferences: ${jsonEncode(preferences.toJson())},
   weightMeasurements: ${jsonEncode(weightMeasurements)},
   folders: ${jsonEncode(folders)},
+  foods: ${jsonEncode(foods)},
+  nutritionGoals: ${jsonEncode(nutritionGoals)},
 )""";
   }
 }

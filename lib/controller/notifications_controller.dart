@@ -24,21 +24,20 @@ class NotificationController extends GetxController implements Listenable {
   bool usesAndroidExactAlarmPermission = false;
   bool hasAndroidScheduleExactAlarmPermission = false;
 
+  final showSettingsTileStream = BehaviorSubject<bool>.seeded(true);
   Widget get settingsTile {
     return StreamBuilder(
       stream: status,
       builder: (_, __) {
-        if (hasPermission &&
-            (!usesAndroidExactAlarmPermission ||
-                hasAndroidScheduleExactAlarmPermission)) {
+        final hasPermission = !showSettingsTileStream.value;
+        if (showSettingsTileStream.value == false) {
           return const SizedBox.shrink();
         }
         if (!hasPermission) {
           return ListTile(
             leading: const Icon(GymTrackerIcons.notification_dialog),
             title: Text("settings.options.notifications.label".t),
-            subtitle:
-                Text("settings.options.notifications.subtitle.noPermission".t),
+            subtitle: Text("settings.permissions.tapToRequest".t),
             onTap: () {
               requestPermission();
             },
@@ -76,11 +75,19 @@ class NotificationController extends GetxController implements Listenable {
         true;
     hasAndroidScheduleExactAlarmPermission = result;
 
+    status.listen((_) {
+      logger.i("NotificationController status changed");
+      showSettingsTileStream.add(!(hasPermission &&
+          (!usesAndroidExactAlarmPermission ||
+              hasAndroidScheduleExactAlarmPermission)));
+    });
     hasPermission = await _getHasPermission();
 
     logger.i("Has permission: $hasPermission\n"
         "(Android) Uses \"Schedule exact alarms\" permission: $usesAndroidExactAlarmPermission\n"
         "(Android 14+) Has \"Schedule exact alarms\" permission: $hasAndroidScheduleExactAlarmPermission\n");
+
+    notifyListeners();
   }
 
   Future<bool> _getHasPermission() async {

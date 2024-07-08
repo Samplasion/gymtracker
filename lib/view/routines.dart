@@ -15,10 +15,12 @@ import 'package:gymtracker/view/components/badges.dart';
 import 'package:gymtracker/view/components/controlled.dart';
 import 'package:gymtracker/view/exercises.dart';
 import 'package:gymtracker/view/routine_creator.dart';
+import 'package:gymtracker/view/skeleton.dart';
 import 'package:gymtracker/view/utils/animated_selectable.dart';
 import 'package:gymtracker/view/utils/crossfade.dart';
 import 'package:gymtracker/view/utils/drag_handle.dart';
 import 'package:gymtracker/view/utils/input_decoration.dart';
+import 'package:gymtracker/view/utils/sliver_utils.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
 class RoutinesView extends StatefulWidget {
@@ -74,106 +76,102 @@ class _RoutinesViewState extends State<RoutinesView> with _RoutineList {
               : showSuggestedRoutines
                   ? controller.suggestions
                   : <RoutineSuggestion>[];
-          return Skeletonizer(
-            enabled: isLoading,
-            enableSwitchAnimation: true,
-            child: CustomScrollView(
-              slivers: [
-                // Hardcode the title while loading to avoid flickering
-                SliverAppBar.large(
-                  title: Text(isLoading ? "Routines" : "routines.title".t),
-                ),
-                SliverToBoxAdapter(
-                  child: ListTile(
-                    title: Text("routines.quickWorkout.title".t),
-                    subtitle: Text("routines.quickWorkout.subtitle".t),
-                    leading: Skeleton.leaf(
-                      child: CircleAvatar(
-                        foregroundColor:
-                            context.colorScheme.onQuaternaryContainer,
-                        backgroundColor:
-                            context.colorScheme.quaternaryContainer,
-                        child: const Icon(GymTrackerIcons.empty_workout),
-                      ),
+          return CustomScrollView(
+            slivers: [
+              // Hardcode the title while loading to avoid flickering
+              SliverAppBar.large(
+                title: Text(isLoading ? "Routines" : "routines.title".t),
+                leading: SkeletonDrawerButton(),
+              ),
+              SliverToBoxAdapter(
+                child: ListTile(
+                  title: Text("routines.quickWorkout.title".t),
+                  subtitle: Text("routines.quickWorkout.subtitle".t),
+                  leading: Skeleton.leaf(
+                    child: CircleAvatar(
+                      foregroundColor:
+                          context.colorScheme.onQuaternaryContainer,
+                      backgroundColor: context.colorScheme.quaternaryContainer,
+                      child: const Icon(GymTrackerIcons.empty_workout),
                     ),
-                    onTap: () {
-                      controller.startRoutine(context);
-                    },
                   ),
+                  onTap: () {
+                    controller.startRoutine(context);
+                  },
                 ),
-                if (showSuggestedRoutines && suggested.isNotEmpty) ...[
-                  const SliverToBoxAdapter(child: Divider()),
-                  SliverList(
-                    delegate: SliverChildBuilderDelegate(
-                      (context, index) {
-                        final (routine: workout, occurrences: frequency) =
-                            suggested[index];
-                        return Material(
-                          type: MaterialType.transparency,
-                          key: ValueKey(workout.id),
-                          child: ListTile(
-                            leading: _WorkoutIcon(workout: workout),
-                            title: Text.rich(TextSpan(
-                              children: [
-                                TextSpan(
-                                  text: workout.name,
+              ),
+              if (showSuggestedRoutines && suggested.isNotEmpty) ...[
+                const SliverToBoxAdapter(child: Divider()),
+                SliverList(
+                  delegate: SliverChildBuilderDelegate(
+                    (context, index) {
+                      final (routine: workout, occurrences: frequency) =
+                          suggested[index];
+                      return Material(
+                        type: MaterialType.transparency,
+                        key: ValueKey(workout.id),
+                        child: ListTile(
+                          leading: _WorkoutIcon(workout: workout),
+                          title: Text.rich(TextSpan(
+                            children: [
+                              TextSpan(
+                                text: workout.name,
+                              ),
+                              const TextSpan(text: " "),
+                              WidgetSpan(
+                                child: Skeleton.ignore(
+                                  child: GTBadge(content: frequency.toString()),
                                 ),
-                                const TextSpan(text: " "),
-                                WidgetSpan(
-                                  child: Skeleton.ignore(
-                                    child:
-                                        GTBadge(content: frequency.toString()),
-                                  ),
-                                  alignment: PlaceholderAlignment.middle,
-                                ),
-                              ],
-                            )),
-                            subtitle: Text("general.exercises"
-                                .plural(workout.displayExerciseCount)),
-                            onTap: () {
-                              onTapWorkout(workout);
-                            },
-                          ),
-                        );
-                      },
-                      childCount: suggested.length,
-                    ),
-                  ),
-                  const SliverToBoxAdapter(child: Divider()),
-                ],
-                ...routineList(
-                  isLoading ? fakeFolders.obs : controller.folders,
-                  isLoading ? fakeRoutines.obs : controller.rootRoutines,
-                ),
-                SliverToBoxAdapter(
-                  child: ListTile(
-                    title: Text("routines.newRoutine".t),
-                    leading: const Skeleton.leaf(
-                      child: CircleAvatar(
-                        child: Icon(GymTrackerIcons.create_routine),
-                      ),
-                    ),
-                    onTap: () {
-                      Go.to(() => const RoutineCreator());
+                                alignment: PlaceholderAlignment.middle,
+                              ),
+                            ],
+                          )),
+                          subtitle: Text("general.exercises"
+                              .plural(workout.displayExerciseCount)),
+                          onTap: () {
+                            onTapWorkout(workout);
+                          },
+                        ),
+                      );
                     },
+                    childCount: suggested.length,
                   ),
                 ),
-                SliverToBoxAdapter(
-                  child: ListTile(
-                    title: Text("routines.newFolder".t),
-                    leading: const Skeleton.leaf(
-                      child: CircleAvatar(
-                        child: Icon(GymTrackerIcons.create_folder),
-                      ),
-                    ),
-                    onTap: () {
-                      controller.createFolder();
-                    },
-                  ),
-                ),
-                const SliverToBoxAdapter(child: SizedBox(height: 8)),
+                const SliverToBoxAdapter(child: Divider()),
               ],
-            ),
+              ...routineList(
+                isLoading ? fakeFolders.obs : controller.folders,
+                isLoading ? fakeRoutines.obs : controller.rootRoutines,
+              ),
+              SliverToBoxAdapter(
+                child: ListTile(
+                  title: Text("routines.newRoutine".t),
+                  leading: const Skeleton.leaf(
+                    child: CircleAvatar(
+                      child: Icon(GymTrackerIcons.create_routine),
+                    ),
+                  ),
+                  onTap: () {
+                    Go.to(() => const RoutineCreator());
+                  },
+                ),
+              ),
+              SliverToBoxAdapter(
+                child: ListTile(
+                  title: Text("routines.newFolder".t),
+                  leading: const Skeleton.leaf(
+                    child: CircleAvatar(
+                      child: Icon(GymTrackerIcons.create_folder),
+                    ),
+                  ),
+                  onTap: () {
+                    controller.createFolder();
+                  },
+                ),
+              ),
+              const SliverToBoxAdapter(child: SizedBox(height: 8)),
+              const SliverBottomSafeArea(),
+            ],
           );
         }),
       ),

@@ -41,6 +41,10 @@ class VersionedJsonImportV4 extends VersionedJsonImportBase {
       folders: [
         for (final folder in json['folders']) GTRoutineFolder.fromJson(folder)
       ],
+      foods: [],
+      nutritionGoals: [],
+      customBarcodeFoods: {},
+      favoriteFoods: [],
     )..logger.t("Importing");
   }
 

@@ -20,3 +20,21 @@ class _ResponsiveBuilderState extends State<ResponsiveBuilder> {
     });
   }
 }
+
+class InfinityCompatibleResponsiveBuilder extends StatefulWidget {
+  final ResponsiveWidgetBuilder builder;
+
+  const InfinityCompatibleResponsiveBuilder({required this.builder, super.key});
+
+  @override
+  State<InfinityCompatibleResponsiveBuilder> createState() =>
+      _InfinityCompatibleResponsiveBuilderState();
+}
+
+class _InfinityCompatibleResponsiveBuilderState
+    extends State<InfinityCompatibleResponsiveBuilder> {
+  @override
+  Widget build(BuildContext context) {
+    return widget.builder(context, Breakpoints.currentBreakpoint);
+  }
+}

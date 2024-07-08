@@ -1,4 +1,6 @@
 PODS:
+  - camera_avfoundation (0.0.1):
+    - Flutter
   - device_info_plus (0.0.1):
     - Flutter
   - DKImagePickerController/Core (4.3.4):
@@ -42,6 +44,10 @@ PODS:
     - Flutter
   - flutter_timezone (0.0.1):
     - Flutter
+  - flutter_zxing (0.0.1):
+    - Flutter
+  - image_picker_ios (0.0.1):
+    - Flutter
   - integration_test (0.0.1):
     - Flutter
   - irondash_engine_context (0.0.1):
@@ -82,12 +88,15 @@ PODS:
     - Flutter
 
 DEPENDENCIES:
+  - camera_avfoundation (from `.symlinks/plugins/camera_avfoundation/ios`)
   - device_info_plus (from `.symlinks/plugins/device_info_plus/ios`)
   - file_picker (from `.symlinks/plugins/file_picker/ios`)
   - Flutter (from `Flutter`)
   - flutter_keyboard_visibility (from `.symlinks/plugins/flutter_keyboard_visibility/ios`)
   - flutter_local_notifications (from `.symlinks/plugins/flutter_local_notifications/ios`)
   - flutter_timezone (from `.symlinks/plugins/flutter_timezone/ios`)
+  - flutter_zxing (from `.symlinks/plugins/flutter_zxing/ios`)
+  - image_picker_ios (from `.symlinks/plugins/image_picker_ios/ios`)
   - integration_test (from `.symlinks/plugins/integration_test/ios`)
   - irondash_engine_context (from `.symlinks/plugins/irondash_engine_context/ios`)
   - package_info_plus (from `.symlinks/plugins/package_info_plus/ios`)
@@ -108,6 +117,8 @@ SPEC REPOS:
     - SwiftyGif
 
 EXTERNAL SOURCES:
+  camera_avfoundation:
+    :path: ".symlinks/plugins/camera_avfoundation/ios"
   device_info_plus:
     :path: ".symlinks/plugins/device_info_plus/ios"
   file_picker:
@@ -120,6 +131,10 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/flutter_local_notifications/ios"
   flutter_timezone:
     :path: ".symlinks/plugins/flutter_timezone/ios"
+  flutter_zxing:
+    :path: ".symlinks/plugins/flutter_zxing/ios"
+  image_picker_ios:
+    :path: ".symlinks/plugins/image_picker_ios/ios"
   integration_test:
     :path: ".symlinks/plugins/integration_test/ios"
   irondash_engine_context:
@@ -142,6 +157,7 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/url_launcher_ios/ios"
 
 SPEC CHECKSUMS:
+  camera_avfoundation: 759172d1a77ae7be0de08fc104cfb79738b8a59e
   device_info_plus: 97af1d7e84681a90d0693e63169a5d50e0839a0d
   DKImagePickerController: b512c28220a2b8ac7419f21c491fc8534b7601ac
   DKPhotoGallery: fdfad5125a9fdda9cc57df834d49df790dbb4179
@@ -150,6 +166,8 @@ SPEC CHECKSUMS:
   flutter_keyboard_visibility: 0339d06371254c3eb25eeb90ba8d17dca8f9c069
   flutter_local_notifications: 4cde75091f6327eb8517fa068a0a5950212d2086
   flutter_timezone: ffb07bdad3c6276af8dada0f11978d8a1f8a20bb
+  flutter_zxing: 19a866d17c8a87ee1026d68521c69d2f008635f6
+  image_picker_ios: c560581cceedb403a6ff17f2f816d7fea1421fc1
   integration_test: ce0a3ffa1de96d1a89ca0ac26fca7ea18a749ef4
   irondash_engine_context: 3458bf979b90d616ffb8ae03a150bafe2e860cc9
   package_info_plus: 58f0028419748fad15bf008b270aaa8e54380b1c
@@ -164,6 +182,6 @@ SPEC CHECKSUMS:
   SwiftyGif: 93a1cc87bf3a51916001cf8f3d63835fb64c819f
   url_launcher_ios: 5334b05cef931de560670eeae103fd3e431ac3fe
 
-PODFILE CHECKSUM: c4c93c5f6502fe2754f48404d3594bf779584011
+PODFILE CHECKSUM: f8f5185e4ed354b04e210a9ea3e21da852279d22
 
 COCOAPODS: 1.14.3

@@ -52,14 +52,8 @@ class RoutinesController extends GetxController
     super.onInit();
     protocolHandler.addListener(this);
 
-    Get.put(HistoryController());
-
-    if (service.hasOngoing) {
-      Get.put(WorkoutController.fromSavedData(service.getOngoingData()!));
-    }
-
     service.routines$.listen((event) {
-      logger.i("Updated with ${event.length} exercises");
+      logger.i("Updated with ${event.length} routines");
       workouts(event);
       coordinator.computeSuggestions();
       _recomputeFolders(service.folders$.valueOrNull ?? []);

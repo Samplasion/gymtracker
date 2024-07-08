@@ -4,6 +4,7 @@
 
 list(APPEND FLUTTER_PLUGIN_LIST
   dynamic_color
+  file_selector_linux
   irondash_engine_context
   sqlite3_flutter_libs
   super_native_extensions
@@ -11,6 +12,7 @@ list(APPEND FLUTTER_PLUGIN_LIST
 )
 
 list(APPEND FLUTTER_FFI_PLUGIN_LIST
+  flutter_zxing
 )
 
 set(PLUGIN_BUNDLED_LIBRARIES)

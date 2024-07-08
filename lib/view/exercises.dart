@@ -12,17 +12,16 @@ import 'package:gymtracker/data/weights.dart';
 import 'package:gymtracker/icons/gymtracker_icons.dart';
 import 'package:gymtracker/model/exercisable.dart';
 import 'package:gymtracker/model/exercise.dart';
-import 'package:gymtracker/model/set.dart';
 import 'package:gymtracker/model/superset.dart';
 import 'package:gymtracker/model/workout.dart';
 import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/service/logger.dart';
 import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/utils/go.dart';
-import 'package:gymtracker/utils/sets.dart';
 import 'package:gymtracker/view/charts/bar_charts.dart';
 import 'package:gymtracker/view/charts/line_charts_by_workout.dart';
 import 'package:gymtracker/view/components/badges.dart';
+import 'package:gymtracker/view/components/exercise_set_view.dart';
 import 'package:gymtracker/view/components/infobox.dart';
 import 'package:gymtracker/view/components/maybe_rich_text.dart';
 import 'package:gymtracker/view/components/parent_viewer.dart';
@@ -656,95 +655,6 @@ class ExerciseDataView extends StatelessWidget {
                 distanceUnit: distanceUnit,
               ),
             ),
-        ],
-      ),
-    );
-  }
-}
-
-class ExerciseSetView extends StatelessWidget {
-  final GTSet set;
-  final Exercise exercise;
-  final bool isConcrete;
-  final bool alt;
-  final Weights weightUnit;
-  final Distance distanceUnit;
-
-  const ExerciseSetView({
-    required this.set,
-    required this.exercise,
-    required this.isConcrete,
-    required this.alt,
-    required this.weightUnit,
-    required this.distanceUnit,
-    super.key,
-  });
-
-  List<Widget> get fields => [
-        if ([GTSetParameters.repsWeight, GTSetParameters.timeWeight]
-            .contains(set.parameters))
-          Text(Weights.convert(
-            value: set.weight!,
-            from: weightUnit,
-            to: settingsController.weightUnit.value,
-          ).userFacingWeight),
-        if ([
-          GTSetParameters.timeWeight,
-          GTSetParameters.time,
-        ].contains(set.parameters))
-          Text("exerciseList.fields.time".trParams({
-            "time":
-                "${(set.time!.inSeconds ~/ 60).toString().padLeft(2, "0")}:${(set.time!.inSeconds % 60).toString().padLeft(2, "0")}",
-          })),
-        if ([GTSetParameters.repsWeight, GTSetParameters.freeBodyReps]
-            .contains(set.parameters))
-          Text("exerciseList.fields.reps".plural(set.reps ?? 0)),
-        if ([GTSetParameters.distance].contains(set.parameters))
-          Text(Distance.convert(
-            value: set.distance!,
-            from: distanceUnit,
-            to: settingsController.distanceUnit.value,
-          ).userFacingDistance),
-      ];
-
-  @override
-  Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    var colorScheme = Theme.of(context).colorScheme;
-    return Container(
-      color: alt
-          ? scheme.surface.withOpacity(0)
-          : ElevationOverlay.applySurfaceTint(
-              scheme.surface,
-              scheme.surfaceTint,
-              0.7,
-            ),
-      padding: const EdgeInsets.all(8),
-      child: Row(
-        children: [
-          IconButton(
-            icon: buildSetType(
-              context,
-              set.kind,
-              set: set,
-              allSets: exercise.sets,
-            ),
-            onPressed: null,
-          ),
-          const SizedBox(width: 8),
-          for (int i = 0; i < fields.length; i++) ...[
-            if (i != 0) const SizedBox(width: 8),
-            Expanded(child: fields[i])
-          ],
-          const SizedBox(width: 8),
-          if (isConcrete) ...[
-            if (set.done)
-              Icon(GymTrackerIcons.checkbox_on, color: colorScheme.tertiary)
-            else
-              Icon(GymTrackerIcons.checkbox_off,
-                  color: colorScheme.onSurfaceVariant),
-            const SizedBox(width: 8),
-          ],
         ],
       ),
     );

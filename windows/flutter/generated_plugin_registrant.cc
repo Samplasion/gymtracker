@@ -7,6 +7,7 @@
 #include "generated_plugin_registrant.h"
 
 #include <dynamic_color/dynamic_color_plugin_c_api.h>
+#include <file_selector_windows/file_selector_windows.h>
 #include <irondash_engine_context/irondash_engine_context_plugin_c_api.h>
 #include <permission_handler_windows/permission_handler_windows_plugin.h>
 #include <protocol_handler_windows/protocol_handler_windows_plugin_c_api.h>
@@ -18,6 +19,8 @@
 void RegisterPlugins(flutter::PluginRegistry* registry) {
   DynamicColorPluginCApiRegisterWithRegistrar(
       registry->GetRegistrarForPlugin("DynamicColorPluginCApi"));
+  FileSelectorWindowsRegisterWithRegistrar(
+      registry->GetRegistrarForPlugin("FileSelectorWindows"));
   IrondashEngineContextPluginCApiRegisterWithRegistrar(
       registry->GetRegistrarForPlugin("IrondashEngineContextPluginCApi"));
   PermissionHandlerWindowsPluginRegisterWithRegistrar(

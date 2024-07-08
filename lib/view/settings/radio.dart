@@ -60,6 +60,7 @@ class _RadioModalTileState<T> extends State<RadioModalTile<T>>
           selectedValue: widget.selectedValue,
           values: widget.values,
           title: widget.title,
+          fullScreen: widget.values.length > 5,
           onChange: (value) {
             if (value != null && mounted) {
               setState(() {

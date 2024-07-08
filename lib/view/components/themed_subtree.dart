@@ -39,7 +39,7 @@ class ThemedSubtree extends StatelessWidget {
   Widget build(BuildContext context) {
     if (!enabled) return _childBuilder(context);
     return Theme(
-      data: getGymTrackerThemeFor(_getScheme(context)),
+      data: getGymTrackerThemeFor(context, _getScheme(context)),
       child: Builder(builder: _childBuilder),
     );
   }

@@ -25,7 +25,14 @@ class Go {
   static Route<T> materialRoute<T>(
     Widget Function() page, {
     RouteSettings? settings,
+    bool animation = true,
   }) {
+    if (!animation) {
+      return _NoAnimMaterialWithModalsPageRoute(
+        builder: (context) => page(),
+        settings: settings,
+      );
+    }
     return MaterialWithModalsPageRoute(
       builder: (context) => page(),
       settings: settings,
@@ -47,6 +54,12 @@ class Go {
   static Future<T?> off<T>(Widget Function() page) async {
     Navigator.of(Get.context!).pop();
     return to<T>(page);
+  }
+
+  static Future<T?> offWithoutAnimation<T>(Widget Function() page) async {
+    Navigator.of(Get.context!).pushReplacement(
+      materialRoute(page, animation: false),
+    );
   }
 
   static Future<T?> replaceStack<T>(Widget Function() page) async {
@@ -147,91 +160,153 @@ class Go {
     required Map<T, String> values,
     required Widget title,
     required void Function(T?)? onChange,
+    bool fullScreen = false,
   }) async {
     final T? oldValue = selectedValue;
     T? _value = selectedValue;
-    final revert = await showModalBottomSheet<bool>(
-      context: Get.context!,
-      builder: (context) {
-        return StatefulBuilder(
-          builder: (context, setState) {
-            return Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: DefaultTextStyle(
-                    style: Theme.of(context).textTheme.titleLarge!,
-                    child: title,
+
+    Widget builder(context) {
+      return StatefulBuilder(
+        builder: (context, setState) {
+          if (fullScreen) {
+            return Dialog.fullscreen(
+              child: Scaffold(
+                appBar: AppBar(
+                  title: title,
+                  leading: IconButton(
+                    icon: const Icon(GymTrackerIcons.close),
+                    onPressed: () {
+                      onChange?.call(oldValue);
+                      Navigator.of(context).pop(false);
+                    },
+                  ),
+                  actions: [
+                    IconButton(
+                      icon: const Icon(GymTrackerIcons.save),
+                      onPressed: () {
+                        if (onChange != null) {
+                          onChange(_value);
+                        }
+                        Navigator.of(context).pop(true);
+                      },
+                    ),
+                  ],
+                ),
+                body: ListView.builder(
+                  itemCount: values.length,
+                  itemBuilder: (context, index) {
+                    final entry = values.entries.elementAt(
+                      index,
+                    );
+
+                    return RadioListTile<T>(
+                      title: Text(entry.value),
+                      value: entry.key,
+                      groupValue: _value,
+                      activeColor: Theme.of(context).colorScheme.secondary,
+                      onChanged: (value) {
+                        setState(() {
+                          if (value != null) {
+                            _value = value;
+                            onChange?.call(value);
+                          }
+                        });
+                        SchedulerBinding.instance
+                            .addPostFrameCallback((timeStamp) {
+                          setState(() {});
+                        });
+                      },
+                    );
+                  },
+                ),
+              ),
+            );
+          }
+          return Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(16),
+                child: DefaultTextStyle(
+                  style: Theme.of(context).textTheme.titleLarge!,
+                  child: title,
+                ),
+              ),
+              Flexible(
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      for (final entry in values.entries)
+                        RadioListTile<T>(
+                          title: Text(entry.value),
+                          value: entry.key,
+                          groupValue: _value,
+                          activeColor: Theme.of(context).colorScheme.secondary,
+                          onChanged: (value) {
+                            setState(() {
+                              if (value != null) {
+                                _value = value;
+                                onChange?.call(value);
+                              }
+                            });
+                            SchedulerBinding.instance
+                                .addPostFrameCallback((timeStamp) {
+                              setState(() {});
+                            });
+                          },
+                        ),
+                    ],
                   ),
                 ),
-                Flexible(
-                  child: SingleChildScrollView(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
+              ),
+              Flexible(
+                child: SafeArea(
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Wrap(
+                      alignment: WrapAlignment.end,
                       children: [
-                        for (final entry in values.entries)
-                          RadioListTile<T>(
-                            title: Text(entry.value),
-                            value: entry.key,
-                            groupValue: _value,
-                            activeColor:
-                                Theme.of(context).colorScheme.secondary,
-                            onChanged: (value) {
-                              setState(() {
-                                if (value != null) {
-                                  _value = value;
-                                  onChange?.call(value);
-                                }
-                              });
-                              SchedulerBinding.instance
-                                  .addPostFrameCallback((timeStamp) {
-                                setState(() {});
-                              });
-                            },
-                          ),
+                        TextButton(
+                          child: Text(MaterialLocalizations.of(context)
+                              .cancelButtonLabel),
+                          onPressed: () {
+                            onChange?.call(oldValue);
+                            Navigator.of(context).pop(false);
+                          },
+                        ),
+                        TextButton(
+                          child: Text(
+                              MaterialLocalizations.of(context).okButtonLabel),
+                          onPressed: () {
+                            if (onChange != null) {
+                              onChange(_value);
+                            }
+                            Navigator.of(context).pop(true);
+                          },
+                        ),
                       ],
                     ),
                   ),
                 ),
-                Flexible(
-                  child: SafeArea(
-                    child: Padding(
-                      padding: const EdgeInsets.all(16),
-                      child: Wrap(
-                        alignment: WrapAlignment.end,
-                        children: [
-                          TextButton(
-                            child: Text(MaterialLocalizations.of(context)
-                                .cancelButtonLabel),
-                            onPressed: () {
-                              onChange?.call(oldValue);
-                              Navigator.of(context).pop(false);
-                            },
-                          ),
-                          TextButton(
-                            child: Text(MaterialLocalizations.of(context)
-                                .okButtonLabel),
-                            onPressed: () {
-                              if (onChange != null) {
-                                onChange(_value);
-                              }
-                              Navigator.of(context).pop(true);
-                            },
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            );
-          },
-        );
-      },
-    );
+              ),
+            ],
+          );
+        },
+      );
+    }
+
+    final revert = fullScreen
+        ? await showDialog<bool>(
+            context: Get.context!,
+            builder: builder,
+          )
+        : await showModalBottomSheet<bool>(
+            context: Get.context!,
+            builder: builder,
+          );
 
     if (revert != true) {
       globalLogger.i("[Go.showRadioModal]\nReverting");
@@ -245,3 +320,66 @@ class Go {
 }
 
 String _defaultT(String s) => s.t;
+
+class _NoAnimationPageTransitionsBuilder extends PageTransitionsBuilder {
+  const _NoAnimationPageTransitionsBuilder();
+
+  @override
+  Widget buildTransitions<T>(
+    PageRoute<T> route,
+    BuildContext context,
+    Animation<double> animation,
+    Animation<double> secondaryAnimation,
+    Widget child,
+  ) {
+    return child;
+  }
+}
+
+class _NoAnimMaterialWithModalsPageRoute<T>
+    extends MaterialWithModalsPageRoute<T> {
+  _NoAnimMaterialWithModalsPageRoute({
+    required super.builder,
+    super.settings,
+  });
+
+  @override
+  bool canTransitionTo(TransitionRoute<dynamic> nextRoute) {
+    // Don't perform outgoing animation if the next route is a fullscreen dialog.
+    return (nextRoute is MaterialPageRoute && !nextRoute.fullscreenDialog) ||
+        (nextRoute is MaterialWithModalsPageRoute &&
+            !nextRoute.fullscreenDialog) ||
+        (nextRoute is _NoAnimMaterialWithModalsPageRoute &&
+            !nextRoute.fullscreenDialog) ||
+        (nextRoute is ModalSheetRoute);
+  }
+
+  @override
+  Widget buildTransitions(
+    BuildContext context,
+    Animation<double> animation,
+    Animation<double> secondaryAnimation,
+    Widget child,
+  ) {
+    return Theme(
+      data: Theme.of(context).copyWith(
+        pageTransitionsTheme: const PageTransitionsTheme(
+          builders: {
+            TargetPlatform.android: _NoAnimationPageTransitionsBuilder(),
+            TargetPlatform.iOS: _NoAnimationPageTransitionsBuilder(),
+            TargetPlatform.macOS: _NoAnimationPageTransitionsBuilder(),
+          },
+        ),
+      ),
+      child: super.buildTransitions(
+        context,
+        animation,
+        secondaryAnimation,
+        Theme(
+          data: Theme.of(context),
+          child: child,
+        ),
+      ),
+    );
+  }
+}

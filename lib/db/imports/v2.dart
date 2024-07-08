@@ -39,6 +39,10 @@ class VersionedJsonImportV2 extends VersionedJsonImportBase {
           WeightMeasurement.fromJson(weight)
       ],
       folders: [],
+      foods: [],
+      nutritionGoals: [],
+      customBarcodeFoods: {},
+      favoriteFoods: [],
     )..logger.t("Importing");
   }
 
@@ -62,7 +66,7 @@ class VersionedJsonImportV2 extends VersionedJsonImportBase {
       'preferences': data.preferences.toJson(),
       'weightMeasurements': [
         for (final weight in data.weightMeasurements) weight.toJson()
-      ]
+      ],
     };
   }
 }

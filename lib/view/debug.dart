@@ -23,7 +23,9 @@ import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/utils/noise.dart';
 import 'package:gymtracker/utils/theme.dart';
 import 'package:gymtracker/view/settings/radio.dart';
+import 'package:gymtracker/view/skeleton.dart';
 import 'package:gymtracker/view/utils/import_routine.dart';
+import 'package:gymtracker/view/utils/sliver_utils.dart';
 import 'package:gymtracker/view/utils/timer.dart';
 import 'package:logger/logger.dart' as logger_lib;
 
@@ -44,8 +46,9 @@ class _DebugViewState extends State<DebugView> {
     return Scaffold(
       body: CustomScrollView(
         slivers: [
-          const SliverAppBar.large(
-            title: Text("Debug"),
+          SliverAppBar.large(
+            title: const Text("Debug"),
+            leading: SkeletonDrawerButton(),
           ),
           SliverList(
             delegate: SliverChildListDelegate([
@@ -217,8 +220,10 @@ class _DebugViewState extends State<DebugView> {
                   max: 15,
                 );
               }),
+              TextField(),
             ]),
           ),
+          const SliverBottomSafeArea(),
         ],
       ),
     );

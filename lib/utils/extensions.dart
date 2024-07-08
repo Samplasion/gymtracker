@@ -49,16 +49,16 @@ extension StringUtils on String {
   Document asQuillDocument() {
     final json = tryParseJson();
     if (json != null) {
-      logger.i(
+      logger.t(
           "[String#asQuillDocument] not a null json; interpreting it as a delta");
       try {
         return Document.fromJson(json);
       } catch (_) {
-        logger.i(
+        logger.t(
             "[String#asQuillDocument] not a valid delta; falling back to plaintext string");
       }
     } else {
-      logger.i("[String#asQuillDocument] not a json; creating delta");
+      logger.t("[String#asQuillDocument] not a json; creating delta");
     }
     return Document.fromDelta(Delta()..insert("${trim()}\n"));
   }
@@ -157,6 +157,19 @@ extension IterableUtils<T> on Iterable<T> {
       if (predicate(element)) return element;
     }
     return null;
+  }
+
+  ({List<T> matching, List<T> rest}) partition(bool Function(T) predicate) {
+    final List<T> matching = [];
+    final List<T> rest = [];
+    for (final element in this) {
+      if (predicate(element)) {
+        matching.add(element);
+      } else {
+        rest.add(element);
+      }
+    }
+    return (matching: matching, rest: rest);
   }
 }
 

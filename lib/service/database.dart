@@ -1,5 +1,7 @@
 import 'dart:async';
+import 'dart:io';
 
+import 'package:collection/collection.dart';
 import 'package:drift/drift.dart';
 import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
@@ -12,6 +14,9 @@ import 'package:gymtracker/model/preferences.dart';
 import 'package:gymtracker/model/superset.dart';
 import 'package:gymtracker/model/workout.dart';
 import 'package:gymtracker/service/logger.dart';
+import 'package:gymtracker/struct/date_sequence.dart';
+import 'package:gymtracker/struct/nutrition.dart' hide NutritionGoal;
+import 'package:gymtracker/struct/nutrition.dart' as gtn;
 import 'package:gymtracker/utils/extensions.dart';
 import 'package:rxdart/rxdart.dart';
 
@@ -26,6 +31,15 @@ class DatabaseService extends GetxService with ChangeNotifier {
   final weightMeasurements$ =
       BehaviorSubject<List<WeightMeasurement>>.seeded([]);
   final folders$ = BehaviorSubject<List<GTRoutineFolder>>.seeded([]);
+  final foods$ = BehaviorSubject<List<TaggedFood>>.seeded([]);
+  final nutritionGoals$ = BehaviorSubject<List<TaggedNutritionGoal>>.seeded([
+    TaggedNutritionGoal(
+      date: DateTime.now().startOfDay,
+      value: gtn.NutritionGoal.defaultGoal,
+    ),
+  ]);
+  final customBarcodeFoods$ = BehaviorSubject<Map<String, Food>>.seeded({});
+  final favoriteFoods$ = BehaviorSubject<List<Food>>.seeded([]);
 
   writeSettings(Prefs prefs) {
     db.setPreferences(prefs);
@@ -73,6 +87,20 @@ class DatabaseService extends GetxService with ChangeNotifier {
     db.watchRoutineFolders()
       ..pipe(folders$)
       ..listen((_) => onServiceChange("folders")());
+    db.watchFoods()
+      ..pipe(foods$)
+      ..listen((_) => onServiceChange("foods")());
+    db
+        .watchNutritionGoals()
+        .map((event) => DateSequence.normalized(event).values.toList())
+      ..pipe(nutritionGoals$)
+      ..listen((_) => onServiceChange("nutrition goals")());
+    db.watchCustomBarcodeFoods()
+      ..pipe(customBarcodeFoods$)
+      ..listen((_) => onServiceChange("custom barcode foods")());
+    db.watchFavoriteFoods()
+      ..pipe(favoriteFoods$)
+      ..listen((_) => onServiceChange("favorite foods")());
   }
 
   @visibleForTesting
@@ -291,6 +319,57 @@ class DatabaseService extends GetxService with ChangeNotifier {
     db.updateRoutineFolder(folder);
   }
 
+  addFood(TaggedFood food) {
+    db.insertFoods(food);
+  }
+
+  removeFood(TaggedFood food) {
+    db.deleteFoods(food.value.id!);
+  }
+
+  updateFood(TaggedFood food) {
+    db.updateFoods(food);
+  }
+
+  addNutritionGoal(TaggedNutritionGoal goal) {
+    final newGoals = nutritionGoals$.value;
+    newGoals.add(goal);
+
+    db.setNutritionGoals(DateSequence.normalized(newGoals).values.toList());
+  }
+
+  removeNutritionGoal(TaggedNutritionGoal goal) {
+    db.deleteNutritionGoal(goal.date.startOfDay);
+  }
+
+  updateNutritionGoal(TaggedNutritionGoal goal) {
+    db.updateNutritionGoal(goal);
+  }
+
+  addCustomBarcodeFood(String barcode, Food food) {
+    db.insertCustomBarcodeFood(barcode, food);
+  }
+
+  removeCustomBarcodeFood(String barcode) {
+    db.deleteCustomBarcodeFood(barcode);
+  }
+
+  addFavoriteFood(Food food) {
+    if (food.id == null) {
+      throw Exception("Food must have an ID to be favorited");
+    }
+
+    db.insertFavoriteFood(food.id!);
+  }
+
+  removeFavoriteFood(Food food) {
+    if (food.id == null) {
+      throw Exception("Food must have an ID to be unfavorited");
+    }
+
+    db.deleteFavoriteFood(food.id!);
+  }
+
   toJson() {
     final converter = getConverter(DATABASE_VERSION);
 
@@ -303,6 +382,11 @@ class DatabaseService extends GetxService with ChangeNotifier {
       preferences: prefs$.value,
       weightMeasurements: weightMeasurements$.value,
       folders: folders$.value,
+      foods: foods$.value,
+      nutritionGoals: nutritionGoals$.value,
+      customBarcodeFoods: customBarcodeFoods$.value,
+      favoriteFoods:
+          favoriteFoods$.value.map((f) => f.id).whereNotNull().toList(),
     ));
   }
 
@@ -337,6 +421,10 @@ class DatabaseService extends GetxService with ChangeNotifier {
         await db.setPreferences(snapshot.preferences);
         await _writeWeightMeasurements(snapshot.weightMeasurements);
         await db.writeAllRoutineFolders(snapshot.folders);
+        await db.setFoods(snapshot.foods);
+        await db.setNutritionGoals(snapshot.nutritionGoals);
+        await db.setCustomBarcodeFoods(snapshot.customBarcodeFoods);
+        await db.setFavoriteFoods(snapshot.favoriteFoods);
       });
     }
 
@@ -349,6 +437,7 @@ class DatabaseService extends GetxService with ChangeNotifier {
   }
 
   void writeToOngoing(Map<String, dynamic> data) {
+    logger.d("Writing ongoing workout data");
     db.setOngoing(data);
   }
 
@@ -439,6 +528,9 @@ class DatabaseService extends GetxService with ChangeNotifier {
 
     return setAllRoutines(newRoutines);
   }
+
+  bool get canExportRaw => true;
+  Future<File> exportRaw() => db.path;
 }
 
 class DatabaseImportVersionMismatch implements Exception {

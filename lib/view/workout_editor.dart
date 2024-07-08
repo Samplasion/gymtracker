@@ -382,6 +382,62 @@ class _WorkoutEditorState extends State<WorkoutEditor> {
 
           _setExercises(exercises);
         },
+        onExerciseSetReorder: (index, newIndices) {
+          final (
+            exerciseIndex: exerciseIndex,
+            supersetIndex: supersetIndex,
+          ) = index;
+
+          final exercises = workout.exercises.toList();
+
+          if (supersetIndex == null) {
+            final ex = exercises[exerciseIndex];
+            // Type safety
+            exercises[exerciseIndex] = ex is Exercise
+                ? ex.copyWith(
+                    sets: [
+                      for (int j = 0; j < ex.sets.length; j++)
+                        ex.sets[newIndices[j]]
+                    ],
+                  )
+                : ex is Superset
+                    ? ex.copyWith(
+                        exercises: [
+                          for (int j = 0; j < ex.exercises.length; j++)
+                            if (j == exerciseIndex)
+                              ex.exercises[j].copyWith(
+                                sets: [
+                                  for (int k = 0;
+                                      k < ex.exercises[j].sets.length;
+                                      k++)
+                                    ex.exercises[j].sets[newIndices[k]]
+                                ],
+                              )
+                            else
+                              ex.exercises[j]
+                        ],
+                      )
+                    : throw AssertionError("Unreachable yet");
+          } else {
+            final superset = exercises[supersetIndex] as Superset;
+            exercises[supersetIndex] = superset.copyWith(exercises: [
+              for (int j = 0; j < superset.exercises.length; j++)
+                if (j == exerciseIndex)
+                  superset.exercises[j].copyWith(
+                    sets: [
+                      for (int k = 0;
+                          k < superset.exercises[j].sets.length;
+                          k++)
+                        superset.exercises[j].sets[newIndices[k]]
+                    ],
+                  )
+                else
+                  superset.exercises[j]
+            ]);
+          }
+
+          _setExercises(exercises);
+        },
         onSetCreate: (index) {
           final (exerciseIndex: i, supersetIndex: supersetIndex) = index;
 

@@ -488,7 +488,6 @@ class RemoveWeightFromCustomExerciseMigrationPreviewView
               sliver: SliverToBoxAdapter(
                 child: SafeArea(
                   child: AlertBanner(
-                    // icon: Icons.warning,
                     color: Colors.amber,
                     title:
                         "migrations.removeWeightFromCustomExercise.preview.incompatible.title"

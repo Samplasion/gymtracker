@@ -27,8 +27,10 @@ import 'package:gymtracker/view/components/context_menu.dart';
 import 'package:gymtracker/view/components/themed_subtree.dart';
 import 'package:gymtracker/view/exercise_creator.dart';
 import 'package:gymtracker/view/exercises.dart';
+import 'package:gymtracker/view/skeleton.dart';
 import 'package:gymtracker/view/utils/exercise.dart';
 import 'package:gymtracker/view/utils/history_workout.dart';
+import 'package:gymtracker/view/utils/sliver_utils.dart';
 import 'package:rxdart/rxdart.dart';
 
 class LibraryView extends GetView<ExercisesController> {
@@ -53,6 +55,7 @@ class LibraryView extends GetView<ExercisesController> {
           slivers: [
             SliverAppBar.large(
               title: Text("library.title".t),
+              leading: const SkeletonDrawerButton(),
               actions: [
                 if (kDebugMode) ...[
                   IconButton(
@@ -93,6 +96,8 @@ class LibraryView extends GetView<ExercisesController> {
                 ],
               ),
             ),
+            const SliverToBoxAdapter(child: SizedBox(height: 8)),
+            const SliverBottomSafeArea(),
           ],
         ),
       ),

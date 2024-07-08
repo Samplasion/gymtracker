@@ -19,10 +19,12 @@ import 'package:gymtracker/view/charts/density_calendar_chart.dart';
 import 'package:gymtracker/view/charts/weight_chart.dart';
 import 'package:gymtracker/view/me/calendar.dart';
 import 'package:gymtracker/view/me/statistics.dart';
+import 'package:gymtracker/view/skeleton.dart';
 import 'package:gymtracker/view/utils/crossfade.dart';
 import 'package:gymtracker/view/utils/date_field.dart';
 import 'package:gymtracker/view/utils/input_decoration.dart';
 import 'package:gymtracker/view/utils/section_title.dart';
+import 'package:gymtracker/view/utils/sliver_utils.dart';
 import 'package:gymtracker/view/utils/speed_dial.dart';
 import 'package:intl/intl.dart';
 
@@ -38,9 +40,10 @@ class MeView extends GetView<MeController> {
         slivers: [
           SliverAppBar.large(
             title: Text("me.title".t),
+            leading: const SkeletonDrawerButton(),
           ),
           SliverPadding(
-            padding: const EdgeInsets.symmetric(vertical: 16),
+            padding: const EdgeInsets.only(top: 16),
             sliver: SliverList(
               delegate: SliverChildListDelegate([
                 Padding(
@@ -153,6 +156,8 @@ class MeView extends GetView<MeController> {
               ]),
             ),
           ),
+          const SliverToBoxAdapter(child: SizedBox(height: 8)),
+          const SliverBottomSafeArea(),
         ],
       ),
     );

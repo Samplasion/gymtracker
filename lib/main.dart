@@ -19,10 +19,12 @@ import 'package:gymtracker/service/version.dart';
 import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/utils/theme.dart';
+import 'package:gymtracker/view/debug/iphone15.dart';
 import 'package:gymtracker/view/error.dart';
 import 'package:gymtracker/view/skeleton.dart';
 import 'package:gymtracker/view/workout.dart';
 import 'package:protocol_handler/protocol_handler.dart';
+import 'package:relative_time/relative_time.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
@@ -31,6 +33,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   Get.put(LoggerController());
+  initLogger();
 
   final _databaseService = DatabaseService();
 
@@ -41,8 +44,6 @@ void main() async {
 
   await ColorService().init();
   await VersionService().init();
-
-  initLogger();
 
   final String currentTimeZone = await FlutterTimezone.getLocalTimezone();
   tz.initializeTimeZones();
@@ -82,14 +83,17 @@ class MainApp extends StatelessWidget {
             return Container(
               child: () {
                 final seedColor = settings.color();
+                if (light != null && dark != null && !settings.amoledMode()) {
+                  (light, dark) = fixDynamicSchemes(light!, dark!);
+                }
                 var lightScheme = (light != null && settings.usesDynamicColor())
-                    ? light.harmonized()
+                    ? light!.harmonized()
                     : ColorScheme.fromSeed(
                         seedColor: seedColor,
                         brightness: Brightness.light,
                       ).harmonized();
                 var darkScheme = (dark != null && settings.usesDynamicColor())
-                    ? dark.harmonized()
+                    ? dark!.harmonized()
                     : ColorScheme.fromSeed(
                         seedColor: seedColor,
                         brightness: Brightness.dark,
@@ -112,13 +116,14 @@ class MainApp extends StatelessWidget {
                       supportedLocales: GTLocalizations.supportedLocales,
                       fallbackLocale: const Locale('en'),
                       localizationsDelegates: const [
+                        RelativeTimeLocalizations.delegate,
                         GlobalMaterialLocalizations.delegate,
                         GlobalWidgetsLocalizations.delegate,
                         GlobalCupertinoLocalizations.delegate,
                       ],
                       themeMode: settings.themeMode(),
-                      theme: getGymTrackerThemeFor(lightScheme),
-                      darkTheme: getGymTrackerThemeFor(darkScheme),
+                      theme: getGymTrackerThemeFor(context, lightScheme),
+                      darkTheme: getGymTrackerThemeFor(context, darkScheme),
                       home: const GymTrackerAppLoader(),
                       onGenerateRoute: (settings) {
                         return switch (settings.name) {
@@ -165,12 +170,18 @@ class MainApp extends StatelessWidget {
       },
     );
 
-    return Obx(() {
-      if (debugController.showSimulator.isTrue) {
-        return DeviceSim(builder: (context) => application);
-      }
+    return RootRestorationScope(
+      restorationId: "org.js.samplasion.GymTracker-restoration-flt",
+      child: Obx(() {
+        if (debugController.showSimulator.isTrue) {
+          return DeviceSim(
+            builder: (context) => application,
+            devices: const [iphone13Mini, iphone15, ipad129Gen5],
+          );
+        }
 
-      return application;
-    });
+        return application;
+      }),
+    );
   }
 }

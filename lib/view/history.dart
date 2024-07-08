@@ -8,11 +8,13 @@ import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/service/logger.dart';
 import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/utils/skeletons.dart';
+import 'package:gymtracker/utils/theme.dart';
 import 'package:gymtracker/view/exercises.dart';
 import 'package:gymtracker/view/me/calendar.dart';
+import 'package:gymtracker/view/skeleton.dart';
 import 'package:gymtracker/view/utils/action_icon.dart';
 import 'package:gymtracker/view/utils/history_workout.dart';
-import 'package:gymtracker/view/utils/input_decoration.dart';
+import 'package:gymtracker/view/utils/sliver_utils.dart';
 import 'package:intl/intl.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
@@ -48,20 +50,15 @@ class _HistoryViewState extends State<HistoryView> {
   late Future<Map<MonthYear, List<Workout>>> historyByMonth = Future.value({});
   late Worker worker;
 
-  final searchTextController = TextEditingController();
-  final searchFocusNode = FocusNode();
-
-  bool isSearching = false;
+  final searchController = SearchController();
 
   Set<String> selectedEntries = {};
 
-  Map<MonthYear, List<Workout>> get searchResults {
-    if (!isSearching) return {};
+  Map<MonthYear, List<Workout>> getSearchResults(String query) {
+    if (query.isEmpty) return {};
     final controller = Get.find<HistoryController>();
     final matching = controller.userVisibleWorkouts.where((workout) {
-      return workout.name
-          .toLowerCase()
-          .contains(searchTextController.text.toLowerCase());
+      return workout.name.toLowerCase().contains(query.toLowerCase());
     }).toList();
     return _getHistoryByMonthThread(matching);
   }
@@ -98,6 +95,8 @@ class _HistoryViewState extends State<HistoryView> {
   @override
   void dispose() {
     logger.d("Dispose state");
+
+    searchController.dispose();
     worker.dispose();
     super.dispose();
   }
@@ -111,7 +110,7 @@ class _HistoryViewState extends State<HistoryView> {
           final isLoading = !snapshot.hasData;
           final history = isLoading
               ? _getHistoryByMonthThread(fakeData)
-              : (isSearching ? searchResults : snapshot.data ?? {});
+              : (snapshot.data ?? {});
 
           return CustomScrollView(
             physics: isLoading ? const NeverScrollableScrollPhysics() : null,
@@ -121,7 +120,7 @@ class _HistoryViewState extends State<HistoryView> {
               for (final date in history.keys) ...[
                 SliverStickyHeader.builder(
                   builder: (context, state) =>
-                      _buildHeader(state, date, isLoading),
+                      _buildHeader(state, date, isLoading, true),
                   sliver: SliverSkeletonizer(
                     enabled: isLoading,
                     child: SliverList(
@@ -145,37 +144,17 @@ class _HistoryViewState extends State<HistoryView> {
                             });
                           }
 
-                          return SafeArea(
-                            top: false,
-                            bottom: false,
-                            child: HistoryWorkout(
-                              workout: thatDate[index],
-                              isSelected:
-                                  selectedEntries.contains(thatDate[index].id),
-                              onTap: () {
-                                if (selectedEntries.isEmpty) {
-                                  Go.to(() =>
-                                      ExercisesView(workout: thatDate[index]));
-                                } else {
-                                  _toggle();
-                                }
-                              },
-                              onLongPress: () {
-                                _toggle();
-                              },
-                            ),
-                          );
+                          return _buildWorkout(thatDate[index], _toggle);
                         },
                       ),
                     ),
                   ),
                 ),
               ],
-              if (!isSearching &&
-                  Get.find<HistoryController>().userVisibleWorkouts.length >
-                      kHistoryWorkoutsAbridgedCount)
+              if (Get.find<HistoryController>().userVisibleWorkouts.length >
+                  kHistoryWorkoutsAbridgedCount)
                 SliverPadding(
-                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  padding: const EdgeInsets.only(top: 16),
                   sliver: SliverToBoxAdapter(
                     child: ListTile(
                       title: Text("history.showAll".t),
@@ -188,6 +167,8 @@ class _HistoryViewState extends State<HistoryView> {
                     ),
                   ),
                 ),
+              const SliverToBoxAdapter(child: SizedBox(height: 8)),
+              const SliverBottomSafeArea(),
             ],
           );
         },
@@ -195,80 +176,129 @@ class _HistoryViewState extends State<HistoryView> {
     );
   }
 
+  Widget _buildWorkout(
+    Workout workout,
+    void Function() _toggle, {
+    void Function()? onWillOpenView,
+  }) {
+    return SafeArea(
+      top: false,
+      bottom: false,
+      child: HistoryWorkout(
+        workout: workout,
+        isSelected: selectedEntries.contains(workout.id),
+        onTap: () {
+          if (selectedEntries.isEmpty) {
+            onWillOpenView?.call();
+            Go.to(() => ExercisesView(workout: workout));
+          } else {
+            _toggle();
+          }
+        },
+        onLongPress: () {
+          _toggle();
+        },
+      ),
+    );
+  }
+
   Widget _buildAppBar(bool isLoading) {
-    final searchBar = PreferredSize(
-      preferredSize: const Size.fromHeight(kToolbarHeight / 1.25 + 32),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: TextField(
-          decoration: GymTrackerInputDecoration(
-            labelText: "history.search".t,
-            suffixIcon: isSearching
-                ? IconButton(
-                    icon: const Icon(GymTrackerIcons.clear),
-                    onPressed: () {
-                      setState(() {
-                        searchTextController.clear();
-                        searchFocusNode.unfocus();
-                        isSearching = false;
-                      });
-                    },
-                  )
-                : null,
+    Widget widget;
+    if (selectedEntries.isEmpty) {
+      widget = SliverAppBar.large(
+        title: Text("history.title".t),
+        leading: const SkeletonDrawerButton(),
+        actions: [
+          SearchAnchor(
+            builder: (context, sController) => IconButton(
+              onPressed: () => sController.openView(),
+              icon: const Icon(GymTrackerIcons.search),
+            ),
+            viewBuilder: (suggestions) {
+              return CustomScrollView(
+                slivers: suggestions.toList(),
+              );
+            },
+            suggestionsBuilder: (context, sController) {
+              final results = getSearchResults(sController.text);
+              return [
+                for (final date in results.keys) ...[
+                  SliverStickyHeader.builder(
+                    builder: (context, state) =>
+                        _buildHeader(state, date, isLoading, false),
+                    sliver: SliverSkeletonizer(
+                      enabled: isLoading,
+                      child: SliverList(
+                        delegate: SliverChildBuilderDelegate(
+                          childCount: (results[date] ?? []).length,
+                          (context, index) {
+                            final thatDate = (results[date] ?? []);
+
+                            return _buildWorkout(thatDate[index], () {},
+                                onWillOpenView: () {
+                              sController.closeView(null);
+                            });
+                          },
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SliverToBoxAdapter(child: SizedBox(height: 8)),
+                  const SliverBottomSafeArea(),
+                ],
+              ];
+            },
           ),
-          controller: searchTextController,
-          focusNode: searchFocusNode,
-          canRequestFocus: !isLoading,
-          onChanged: (q) {
+        ],
+      );
+    } else {
+      widget = SliverAppBar.large(
+        backgroundColor: Theme.of(context).colorScheme.inverseSurface,
+        foregroundColor: Theme.of(context).colorScheme.onInverseSurface,
+        surfaceTintColor: Colors.transparent,
+        title: Text(
+          "general.selected".plural(selectedEntries.length),
+        ),
+        leading: IconButton(
+          icon: const Icon(GymTrackerIcons.close),
+          onPressed: () {
             setState(() {
-              isSearching = q.isNotEmpty;
+              selectedEntries.clear();
             });
           },
         ),
-      ),
-    );
-    if (selectedEntries.isEmpty) {
-      return SliverAppBar.medium(
-        title: Text("history.title".t),
-        bottom: searchBar,
+        actions: [
+          IconButton(
+            tooltip: "history.actions.deleteMultiple.title"
+                .plural(selectedEntries.length),
+            icon: const Icon(GymTrackerIcons.delete),
+            onPressed: () {
+              final controller = Get.find<HistoryController>();
+              controller.deleteWorkoutsWithDialog(
+                context,
+                workoutIDs: selectedEntries,
+                onDeleted: () {
+                  Go.snack("history.actions.deleteMultiple.done"
+                      .plural(selectedEntries.length));
+                  selectedEntries.clear();
+                },
+              );
+            },
+          ),
+        ],
       );
     }
 
-    return SliverAppBar.medium(
-      backgroundColor: Theme.of(context).colorScheme.inverseSurface,
-      foregroundColor: Theme.of(context).colorScheme.onInverseSurface,
-      surfaceTintColor: Colors.transparent,
-      title: Text(
-        "general.selected".plural(selectedEntries.length),
-      ),
-      bottom: searchBar,
-      leading: IconButton(
-        icon: const Icon(GymTrackerIcons.close),
-        onPressed: () {
-          setState(() {
-            selectedEntries.clear();
-          });
-        },
-      ),
-      actions: [
-        IconButton(
-          tooltip: "history.actions.deleteMultiple.title"
-              .plural(selectedEntries.length),
-          icon: const Icon(GymTrackerIcons.delete),
-          onPressed: () {
-            final controller = Get.find<HistoryController>();
-            controller.deleteWorkoutsWithDialog(
-              context,
-              workoutIDs: selectedEntries,
-              onDeleted: () {
-                Go.snack("history.actions.deleteMultiple.done"
-                    .plural(selectedEntries.length));
-                selectedEntries.clear();
-              },
-            );
-          },
+    var theme = Theme.of(context);
+    return Theme(
+      data: theme.copyWith(
+        appBarTheme: theme.appBarTheme.copyWith(
+          shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.zero,
+          ),
         ),
-      ],
+      ),
+      child: widget,
     );
   }
 
@@ -276,6 +306,7 @@ class _HistoryViewState extends State<HistoryView> {
     SliverStickyHeaderState state,
     MonthYear date,
     bool isLoading,
+    bool rounded,
   ) {
     final elevatedAppBarColor = ElevationOverlay.applySurfaceTint(
       Theme.of(context).colorScheme.surface,
@@ -284,11 +315,18 @@ class _HistoryViewState extends State<HistoryView> {
     );
     return Container(
       height: 32,
-      color: state.isPinned
-          ? elevatedAppBarColor
-          : Theme.of(context).colorScheme.surface,
       padding: const EdgeInsets.symmetric(horizontal: 16),
       alignment: Alignment.centerLeft,
+      decoration: BoxDecoration(
+        color: state.isPinned
+            ? elevatedAppBarColor
+            : Theme.of(context).colorScheme.surface,
+        borderRadius: rounded
+            ? const BorderRadius.vertical(
+                bottom: Radius.circular(kAppBarRadius),
+              )
+            : null,
+      ),
       child: SafeArea(
         top: false,
         bottom: false,

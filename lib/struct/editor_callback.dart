@@ -21,6 +21,8 @@ class EditorCallbacks {
       onExerciseNotesChange;
   final void Function(ExerciseIndex exerciseIndex, int? newRPE)
       onExerciseChangeRPE;
+  final void Function(ExerciseIndex index, List<int> newIndices)
+      onExerciseSetReorder;
   final void Function(ExerciseIndex exerciseIndex) onSetCreate;
   final void Function(ExerciseIndex exerciseIndex, int setIndex) onSetRemove;
   final void Function(ExerciseIndex exerciseIndex, int setIndex, GTSetKind kind)
@@ -39,6 +41,7 @@ class EditorCallbacks {
     required this.onExerciseRemove,
     required this.onExerciseChangeRestTime,
     required this.onExerciseNotesChange,
+    required this.onExerciseSetReorder,
     required this.onSetCreate,
     required this.onSetRemove,
     required this.onSetSelectKind,
@@ -69,6 +72,7 @@ class EditorCallbacks {
     required this.onExerciseChangeRestTime,
     required this.onExerciseNotesChange,
     required this.onExerciseChangeRPE,
+    required this.onExerciseSetReorder,
     required this.onSetCreate,
     required this.onSetRemove,
     required this.onSetSelectKind,

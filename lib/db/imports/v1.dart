@@ -93,6 +93,10 @@ class VersionedJsonImportV1 extends VersionedJsonImportBase {
       preferences: Prefs.fromJson(prefs),
       weightMeasurements: weightMeasurements,
       folders: [],
+      foods: [],
+      nutritionGoals: [],
+      customBarcodeFoods: {},
+      favoriteFoods: [],
     );
   }
 

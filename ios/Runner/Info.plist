@@ -64,5 +64,11 @@
 			</array>
 		</dict>
 	</array>
+	<key>NSCameraUsageDescription</key>
+	<string>We use the camera to enable you to scan barcodes for product identification.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>We use the camera to enable you to scan barcodes for product identification.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>We access your photos to let you scan barcodes for product identification.</string>
 </dict>
 </plist>

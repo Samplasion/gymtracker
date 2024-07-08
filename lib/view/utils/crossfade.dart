@@ -5,6 +5,8 @@ class Crossfade extends StatelessWidget {
   final Widget secondChild;
   final bool showSecond;
   final Clip clipBehavior;
+  final AlignmentGeometry alignment;
+  final Widget Function(Widget, Key, Widget, Key) layoutBuilder;
 
   const Crossfade({
     super.key,
@@ -12,6 +14,8 @@ class Crossfade extends StatelessWidget {
     required this.secondChild,
     required this.showSecond,
     this.clipBehavior = Clip.hardEdge,
+    this.alignment = Alignment.topCenter,
+    this.layoutBuilder = AnimatedCrossFade.defaultLayoutBuilder,
   });
 
   @override
@@ -25,6 +29,8 @@ class Crossfade extends StatelessWidget {
             showSecond ? CrossFadeState.showSecond : CrossFadeState.showFirst,
         duration: const Duration(milliseconds: 300),
         sizeCurve: Curves.easeInOutCirc,
+        alignment: alignment,
+        layoutBuilder: layoutBuilder,
       ),
     );
   }

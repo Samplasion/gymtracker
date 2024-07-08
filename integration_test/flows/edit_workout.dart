@@ -19,7 +19,8 @@ import 'package:gymtracker/view/workout.dart';
 import 'package:gymtracker/view/workout_editor.dart';
 
 Workout get baseRoutine {
-  final libEx = exerciseStandardLibrary["library.abs.name".t]!.exercises.first;
+  final libEx =
+      exerciseStandardLibrary[GTExerciseMuscleCategory.abs]!.exercises.first;
   final baseRoutine = Workout(
     name: "Test Routine",
     id: "test-routine",

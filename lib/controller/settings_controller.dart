@@ -12,11 +12,11 @@ import 'package:gymtracker/data/weights.dart';
 import 'package:gymtracker/model/preferences.dart';
 import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/service/logger.dart';
+import 'package:gymtracker/struct/nutrition.dart';
 import 'package:gymtracker/utils/constants.dart';
 import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/view/logs.dart';
 import 'package:gymtracker/view/migrations.dart';
-import 'package:gymtracker/view/settings.dart';
 import 'package:share_plus/share_plus.dart';
 
 Color defaultColor = Color(Colors.blue.value);
@@ -34,6 +34,10 @@ class SettingsController extends GetxController with ServiceableController {
   RxBool amoledMode = Prefs.defaultValue.amoledMode.obs;
   Rx<ThemeMode> themeMode = Prefs.defaultValue.themeMode.obs;
   RxBool tintExercises = Prefs.defaultValue.tintExercises.obs;
+  Rx<NutritionLanguage> nutritionLanguage =
+      Prefs.defaultValue.nutritionLanguage.obs;
+  Rx<NutritionCountry> nutritionCountry =
+      Prefs.defaultValue.nutritionCountry.obs;
 
   void setUsesDynamicColor(bool usesDC) =>
       service.writeSettings(service.prefs$.value.copyWith(
@@ -78,6 +82,16 @@ class SettingsController extends GetxController with ServiceableController {
         tintExercises: tintExercises,
       ));
 
+  void setNutritionLanguage(NutritionLanguage nutritionLanguage) =>
+      service.writeSettings(service.prefs$.value.copyWith(
+        nutritionLanguage: nutritionLanguage,
+      ));
+
+  void setNutritionCountry(NutritionCountry nutritionCountry) =>
+      service.writeSettings(service.prefs$.value.copyWith(
+        nutritionCountry: nutritionCountry,
+      ));
+
   @override
   void onInit() {
     super.onInit();
@@ -96,6 +110,8 @@ class SettingsController extends GetxController with ServiceableController {
       amoledMode(prefs.amoledMode);
       themeMode(prefs.themeMode);
       tintExercises(prefs.tintExercises);
+      nutritionLanguage(prefs.nutritionLanguage);
+      nutritionCountry(prefs.nutritionCountry);
 
       notifyChildrens();
     });
@@ -114,6 +130,8 @@ class SettingsController extends GetxController with ServiceableController {
     amoledMode(prefs.amoledMode);
     themeMode(prefs.themeMode);
     tintExercises(prefs.tintExercises);
+    nutritionLanguage(prefs.nutritionLanguage);
+    nutritionCountry(prefs.nutritionCountry);
 
     notifyChildrens();
   }
@@ -213,15 +231,49 @@ class SettingsController extends GetxController with ServiceableController {
     ]);
   }
 
-  advancedSettings() {
-    Go.to(() => const AdvancedSettingsView());
-  }
-
   showLogs() {
     Go.to(() => const LogView());
   }
 
   showMigrations() {
     Go.to(() => const AllMigrationsView());
+  }
+
+  bool get canExportRaw => service.canExportRaw;
+  exportRawDatabase(BuildContext context) async {
+    try {
+      final box = context.findRenderObject() as RenderBox?;
+      await Share.shareXFiles(
+        [
+          XFile(
+            (await service.exportRaw()).path,
+            mimeType: "application/octet-stream",
+            name:
+                "${"settings.options.export.filename".t}_${DateTime.now().toIso8601String()}.db",
+          )
+        ],
+        sharePositionOrigin: box!.localToGlobal(Offset.zero) & box.size,
+      );
+    } catch (e, s) {
+      logger.e(null, error: e, stackTrace: s);
+
+      Go.dialog(
+        "settings.options.export.failed.title".t,
+        "$e\n$s".trim(),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Clipboard.setData(ClipboardData(text: "$e\n$s".trim()));
+              Go.snack("settings.options.export.failed.copy".t);
+            },
+            child: Text(
+              // ignore: use_build_context_synchronously
+              MaterialLocalizations.of(context).copyButtonLabel,
+            ),
+          )
+        ],
+        bodyStyle: monospace,
+      );
+    }
   }
 }

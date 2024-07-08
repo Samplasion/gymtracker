@@ -1,9 +1,10 @@
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:get/get.dart';
+import 'package:get/get.dart' hide Rx;
 import 'package:gymtracker/controller/countdown_controller.dart';
 import 'package:gymtracker/controller/debug_controller.dart';
 import 'package:gymtracker/controller/error_controller.dart';
 import 'package:gymtracker/controller/exercises_controller.dart';
+import 'package:gymtracker/controller/food_controller.dart';
 import 'package:gymtracker/controller/history_controller.dart';
 import 'package:gymtracker/controller/me_controller.dart';
 import 'package:gymtracker/controller/migrations_controller.dart';
@@ -19,24 +20,39 @@ import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/service/logger.dart';
 import 'package:gymtracker/service/notifications.dart';
 import 'package:gymtracker/utils/go.dart';
+import 'package:rxdart/rxdart.dart';
 
 class Coordinator extends GetxController with ServiceableController {
   RxList<RoutineSuggestion> suggestions = <RoutineSuggestion>[].obs;
+  BehaviorSubject<bool> showPermissionTilesStream =
+      BehaviorSubject<bool>.seeded(true);
 
   @override
   void onServiceChange() {}
 
-  Future awaitInitialized() {
-    return Future.wait([
+  Future awaitInitialized() async {
+    await Future.wait([
       Get.find<SettingsController>().awaitInitialized(),
       Get.find<NotificationController>().initialize(),
     ]);
+
+    showPermissionTilesStream.add(
+        Get.find<NotificationController>().showSettingsTileStream.value ||
+            Get.find<FoodController>().showSettingsTileStream.value);
+    Rx.combineLatest([
+      Get.find<NotificationController>().showSettingsTileStream,
+      Get.find<FoodController>().showSettingsTileStream,
+    ], (e) {
+      logger.d("Show permission tiles: $e");
+      return e.any((element) => element);
+    }).pipe(showPermissionTilesStream);
   }
 
   init() {
     Get.put(DebugController());
     Get.put(NotificationsService());
     Get.put(NotificationController());
+    Get.put(HistoryController());
     Get.put(CountdownController());
     Get.put(ExercisesController());
     Get.put(StopwatchController());
@@ -44,6 +60,12 @@ class Coordinator extends GetxController with ServiceableController {
     Get.put(SettingsController());
     Get.put(ErrorController(), permanent: true);
     Get.put(MigrationsController());
+    Get.put(FoodController());
+
+    logger.d((service.hasOngoing, service.getOngoingData()));
+    if (service.hasOngoing) {
+      Get.put(WorkoutController.fromSavedData(service.getOngoingData()!));
+    }
   }
 
   bool hasExercise(Exercise exercise) {

@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:gymtracker/data/distance.dart';
 import 'package:gymtracker/data/weights.dart';
 import 'package:gymtracker/db/database.dart';
+import 'package:gymtracker/struct/nutrition.dart';
 import 'package:gymtracker/utils/extensions.dart';
 
 class Prefs implements Insertable<Preference> {
@@ -17,6 +18,8 @@ class Prefs implements Insertable<Preference> {
   final bool amoledMode;
   final ThemeMode themeMode;
   final bool tintExercises;
+  final NutritionLanguage nutritionLanguage;
+  final NutritionCountry nutritionCountry;
 
   const Prefs({
     required this.usesDynamicColor,
@@ -28,6 +31,8 @@ class Prefs implements Insertable<Preference> {
     required this.amoledMode,
     required this.themeMode,
     required this.tintExercises,
+    required this.nutritionLanguage,
+    required this.nutritionCountry,
   });
 
   factory Prefs.fromDatabase(Preference row) =>
@@ -40,9 +45,11 @@ class Prefs implements Insertable<Preference> {
     weightUnit: Weights.kg,
     distanceUnit: Distance.km,
     showSuggestedRoutines: true,
-    amoledMode: true,
+    amoledMode: false,
     themeMode: ThemeMode.system,
     tintExercises: true,
+    nutritionLanguage: NutritionLanguage.WORLD,
+    nutritionCountry: NutritionCountry.WORLD,
   );
 
   Map<String, dynamic> toJson() => {
@@ -58,6 +65,8 @@ class Prefs implements Insertable<Preference> {
         "amoledMode": amoledMode,
         "themeMode": themeMode.name,
         "tintExercises": tintExercises,
+        "nutritionLanguage": nutritionLanguage.stringValue,
+        "nutritionCountry": nutritionCountry.stringValue,
       };
 
   factory Prefs.fromJson(Map<String, dynamic> json) {
@@ -81,6 +90,12 @@ class Prefs implements Insertable<Preference> {
         orElse: () => defaults.themeMode,
       ),
       tintExercises: json['tintExercises'] ?? defaults.tintExercises,
+      nutritionLanguage: NutritionLanguage.fromString(
+        json['nutritionLanguage'] ?? defaults.nutritionLanguage.stringValue,
+      )!,
+      nutritionCountry: NutritionCountry.fromString(
+        json['nutritionCountry'] ?? defaults.nutritionCountry.stringValue,
+      )!,
     );
   }
 
@@ -96,6 +111,8 @@ class Prefs implements Insertable<Preference> {
   amoledMode: $amoledMode,
   themeMode: $themeMode,
   tintExercises: $tintExercises,
+  nutritionLanguage: $nutritionLanguage,
+  nutritionCountry: $nutritionCountry,
 )""";
   }
 
@@ -116,6 +133,8 @@ class Prefs implements Insertable<Preference> {
     bool? amoledMode,
     ThemeMode? themeMode,
     bool? tintExercises,
+    NutritionLanguage? nutritionLanguage,
+    NutritionCountry? nutritionCountry,
   }) {
     return Prefs(
       usesDynamicColor: usesDynamicColor ?? this.usesDynamicColor,
@@ -128,6 +147,8 @@ class Prefs implements Insertable<Preference> {
       amoledMode: amoledMode ?? this.amoledMode,
       themeMode: themeMode ?? this.themeMode,
       tintExercises: tintExercises ?? this.tintExercises,
+      nutritionLanguage: nutritionLanguage ?? this.nutritionLanguage,
+      nutritionCountry: nutritionCountry ?? this.nutritionCountry,
     );
   }
 }

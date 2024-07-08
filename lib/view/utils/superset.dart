@@ -45,6 +45,12 @@ class _SupersetEditorState extends State<SupersetEditor> {
   Widget build(BuildContext context) {
     final topLevelEntryIndex =
         (exerciseIndex: widget.index, supersetIndex: null);
+    var notesTextStyle = Theme.of(context).textTheme.bodyMedium!.copyWith(
+          fontSize: widget.superset.notes.isEmpty ? 15 : null,
+          color: widget.superset.notes.isEmpty
+              ? Theme.of(context).colorScheme.onSurface.withOpacity(0.75)
+              : null,
+        );
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: Column(
@@ -106,17 +112,9 @@ class _SupersetEditorState extends State<SupersetEditor> {
             leading: const Icon(GymTrackerIcons.notes),
             title: Text(
               widget.superset.notes.isEmpty
-                  ? "exercise.editor.fields.notes.label".t
+                  ? "exercise.editor.fields.notes.tapToEdit".t
                   : widget.superset.notes,
-              style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                    fontStyle: widget.superset.notes.isEmpty
-                        ? FontStyle.italic
-                        : FontStyle.normal,
-                    fontWeight: widget.superset.notes.isEmpty
-                        ? FontWeight.w600
-                        : FontWeight.normal,
-                    fontSize: widget.superset.notes.isEmpty ? 15 : null,
-                  ),
+              style: notesTextStyle,
             ),
             trailing: const Icon(GymTrackerIcons.edit),
             onTap: () {

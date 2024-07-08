@@ -12,11 +12,18 @@ bool doubleEquality(double a, double b, {required double epsilon}) {
   return (b - a).abs() < epsilon;
 }
 
-String stringifyDouble(double double, [double epsilon = 0.001]) {
+String stringifyDouble(
+  double double, {
+  double epsilon = 0.001,
+  String decimalSeparator = ".",
+}) {
   if (doubleIsActuallyInt(double, epsilon)) {
     return double.floor().toString();
   }
-  return double.toStringAsFixed(2).replaceAll(RegExp(r'0+$'), "");
+  return double.toStringAsFixed(2)
+      .replaceAll(RegExp(r'0+$'), "")
+      .replaceAll(RegExp(r'\.$'), "")
+      .replaceAll(".", decimalSeparator);
 }
 
 void reorder<T>(List<T> list, int oldIndex, int newIndex) {
@@ -109,4 +116,8 @@ Color rpeColor(BuildContext context, int currentRPE) {
     [0.2, 0.55, 1],
     currentRPE / 10,
   );
+}
+
+Future<T?> timeoutFuture<T>(Duration duration, Future<T> future) {
+  return Future.any([Future.delayed(duration), future]);
 }

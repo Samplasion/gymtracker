@@ -15,7 +15,9 @@ import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/utils/sets.dart';
 import 'package:gymtracker/utils/utils.dart';
+import 'package:gymtracker/view/components/alert_banner.dart';
 import 'package:gymtracker/view/components/badges.dart';
+import 'package:gymtracker/view/components/exercise_set_view.dart';
 import 'package:gymtracker/view/components/maybe_rich_text.dart';
 import 'package:gymtracker/view/components/parent_viewer.dart';
 import 'package:gymtracker/view/components/rich_text_dialog.dart';
@@ -137,8 +139,37 @@ class _WorkoutExerciseEditorState extends State<WorkoutExerciseEditor> {
                                   'ongoingWorkout.exercises.addToSuperset'.t),
                             ),
                           ),
+                        const PopupMenuDivider(),
+                        PopupMenuItem(
+                          enabled: widget.exercise.sets.isNotEmpty,
+                          onTap: widget.exercise.sets.isEmpty
+                              ? null
+                              : () async {
+                                  final newIndices =
+                                      await Go.toDialog<List<int>>(
+                                    () => _WorkoutReorderSetsDialog(
+                                      exercise: widget.exercise,
+                                      sets: widget.exercise.sets,
+                                      weightUnit: widget.weightUnit,
+                                      distanceUnit: widget.distanceUnit,
+                                      isConcrete: !widget.isCreating,
+                                    ),
+                                  );
+                                  if (newIndices != null) {
+                                    widget.callbacks.onExerciseSetReorder(
+                                      widget.index,
+                                      newIndices,
+                                    );
+                                  }
+                                },
+                          child: ListTile(
+                            leading: const Icon(GymTrackerIcons.reorder),
+                            title:
+                                Text('ongoingWorkout.exercises.reorderSets'.t),
+                            enabled: widget.exercise.sets.isNotEmpty,
+                          ),
+                        ),
                         if (!widget.isCreating) ...[
-                          const PopupMenuDivider(),
                           PopupMenuItem(
                             onTap: () {
                               showDialog<Optional<int?>>(
@@ -678,6 +709,94 @@ class __WorkoutSetRPEDialogState extends State<_WorkoutSetRPEDialog> {
           child: Text(MaterialLocalizations.of(context).okButtonLabel),
         ),
       ],
+    );
+  }
+}
+
+class _WorkoutReorderSetsDialog extends StatefulWidget {
+  const _WorkoutReorderSetsDialog({
+    required this.exercise,
+    required this.sets,
+    required this.weightUnit,
+    required this.distanceUnit,
+    required this.isConcrete,
+  });
+
+  final Exercise exercise;
+  final List<GTSet> sets;
+  final Weights weightUnit;
+  final Distance distanceUnit;
+  final bool isConcrete;
+
+  @override
+  State<_WorkoutReorderSetsDialog> createState() =>
+      __WorkoutReorderSetsDialogState();
+}
+
+class __WorkoutReorderSetsDialogState extends State<_WorkoutReorderSetsDialog> {
+  late var indices = List.generate(widget.sets.length, (index) => index);
+
+  @override
+  Widget build(BuildContext context) {
+    return Dialog.fullscreen(
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text('exercise.editor.fields.reorderSets.title'.t),
+          leading: IconButton(
+            icon: const Icon(GymTrackerIcons.close),
+            onPressed: () {
+              Navigator.pop(context);
+            },
+          ),
+          actions: [
+            IconButton(
+              icon: const Icon(GymTrackerIcons.save),
+              onPressed: () {
+                Navigator.pop(context, indices);
+              },
+            ),
+          ],
+        ),
+        body: CustomScrollView(
+          slivers: [
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+                child: AlertBanner(
+                  title: 'exercise.editor.fields.reorderSets.title'.t,
+                  text: Text('exercise.editor.fields.reorderSets.text'.t),
+                  color: AlertColor.secondary(context),
+                ),
+              ),
+            ),
+            SliverReorderableList(
+              onReorder: (oldIndex, newIndex) {
+                if (oldIndex < newIndex) {
+                  newIndex -= 1;
+                }
+                setState(() {
+                  indices.insert(newIndex, indices.removeAt(oldIndex));
+                });
+              },
+              itemBuilder: (context, j) {
+                final index = indices[j];
+                return ExerciseSetView(
+                  key: ValueKey(widget.sets[index]),
+                  set: widget.sets[index],
+                  exercise: widget.exercise,
+                  isConcrete: widget.isConcrete,
+                  alt: j % 2 == 0,
+                  weightUnit: widget.weightUnit,
+                  distanceUnit: widget.distanceUnit,
+                  draggable: true,
+                  index: j,
+                );
+              },
+              itemCount: widget.sets.length,
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

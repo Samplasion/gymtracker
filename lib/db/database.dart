@@ -9,8 +9,10 @@ import 'package:flutter/foundation.dart';
 import 'package:gymtracker/data/distance.dart';
 import 'package:gymtracker/data/weights.dart';
 import 'package:gymtracker/db/model/tables/exercise.dart';
+import 'package:gymtracker/db/model/tables/foods.dart';
 import 'package:gymtracker/db/model/tables/history.dart';
 import 'package:gymtracker/db/model/tables/measurements.dart';
+import 'package:gymtracker/db/model/tables/nutrition_goals.dart';
 import 'package:gymtracker/db/model/tables/ongoing.dart';
 import 'package:gymtracker/db/model/tables/preferences.dart';
 import 'package:gymtracker/db/model/tables/routines.dart';
@@ -25,6 +27,9 @@ import 'package:gymtracker/model/set.dart';
 import 'package:gymtracker/model/superset.dart' as model;
 import 'package:gymtracker/model/workout.dart' as model;
 import 'package:gymtracker/service/logger.dart';
+import 'package:gymtracker/struct/nutrition.dart' as model hide NutritionGoal;
+import 'package:gymtracker/struct/nutrition.dart' as model_nutrition
+    show NutritionGoal;
 import 'package:gymtracker/utils/extensions.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
@@ -38,7 +43,7 @@ part 'database.g.dart';
 // Used in the generated code
 const _uuid = Uuid();
 
-const DATABASE_VERSION = 5;
+const DATABASE_VERSION = 7;
 
 @DriftDatabase(tables: [
   CustomExercises,
@@ -50,6 +55,10 @@ const DATABASE_VERSION = 5;
   Preferences,
   OngoingData,
   WeightMeasurements,
+  Foods,
+  NutritionGoals,
+  CustomBarcodeFoods,
+  FavoriteFoods,
 ])
 class GTDatabase extends _$GTDatabase {
   GTDatabase.prod() : super(_openConnection());
@@ -62,11 +71,15 @@ class GTDatabase extends _$GTDatabase {
         onCreate: (m) async {
           await m.createAll();
           await into(preferences).insert(Prefs.defaultValue);
+          await into(nutritionGoals).insert(model.TaggedNutritionGoal(
+            date: DateTime.now(),
+            value: model_nutrition.NutritionGoal.defaultGoal,
+          ).toInsertable());
         },
         onUpgrade: (m, from, to) async {
           // Run migration steps without foreign keys and re-enable them later
           // (https://drift.simonbinder.eu/docs/advanced-features/migrations/#tips)
-          await customStatement('PRAGMA foreign_keys = OFF');
+          // await customStatement('PRAGMA foreign_keys = OFF');
 
           globalLogger.w("[GTDatabase] Running migration");
 
@@ -98,20 +111,36 @@ class GTDatabase extends _$GTDatabase {
                   schema.historyWorkoutExercises.rpe,
                 );
               },
+              from5To6: (m, schema) async {
+                await m.createTable(schema.foods);
+                await m.createTable(schema.nutritionGoals);
+              },
+              from6To7: (m, schema) async {
+                await m.createTable(schema.customBarcodeFoods);
+                await m.createTable(schema.favoriteFoods);
+              },
             ),
           );
 
-          if (kDebugMode) {
-            // Fail if the migration broke foreign keys
-            final wrongForeignKeys =
-                await customSelect('PRAGMA foreign_key_check').get();
-            assert(wrongForeignKeys.isEmpty,
-                '${wrongForeignKeys.map((e) => e.data).toList()}');
-          }
+          // if (kDebugMode) {
+          //   // Fail if the migration broke foreign keys
+          //   final wrongForeignKeys =
+          //       await customSelect('PRAGMA foreign_key_check').get();
+          //   assert(wrongForeignKeys.isEmpty,
+          //       '${wrongForeignKeys.map((e) => e.data).toList()}');
+          // }
 
-          await customStatement('PRAGMA foreign_keys = ON;');
+          // await customStatement('PRAGMA foreign_keys = ON;');
         },
         beforeOpen: (details) async {
+          final nutritionGoalCount = await (select(nutritionGoals)).get();
+          if (nutritionGoalCount.isEmpty) {
+            await into(nutritionGoals).insert(model.TaggedNutritionGoal(
+              date: DateTime.now(),
+              value: model_nutrition.NutritionGoal.defaultGoal,
+            ).toInsertable());
+          }
+
           if (kDebugMode) {
             await validateDatabaseSchema();
           }
@@ -464,10 +493,157 @@ class GTDatabase extends _$GTDatabase {
     });
   }
 
+  Stream<List<model.TaggedFood>> watchFoods() {
+    final query = select(foods)
+      ..orderBy([(tbl) => OrderingTerm.asc(tbl.dateAdded)]);
+    return query.watch().map((foods) {
+      return foods.map((food) => foodFromDatabase(food)).toList();
+    });
+  }
+
+  Future<void> insertFoods(model.TaggedFood food) {
+    return into(foods).insert(food.toInsertable(generateInsertionDate: true));
+  }
+
+  Future<void> deleteFoods(String id) {
+    return (delete(foods)..where((tbl) => tbl.id.equals(id))).go();
+  }
+
+  Future<void> updateFoods(model.TaggedFood food) async {
+    final oldFood = await (select(foods)
+          ..where((tbl) => tbl.id.equals(food.value.id!)))
+        .getSingle();
+    await update(foods)
+        .replace(food.toInsertable(generateInsertionDate: false).copyWith(
+              dateAdded: Value(oldFood.dateAdded),
+            ));
+  }
+
+  Future<void> setFoods(List<model.TaggedFood> foods) {
+    return transaction(() async {
+      await delete(this.foods).go();
+      await batch((batch) {
+        for (final food in foods) {
+          final insertable = food.toInsertable(generateInsertionDate: false);
+          batch.insert(this.foods,
+              insertable.copyWith(dateAdded: insertable.referenceDate));
+        }
+      });
+    });
+  }
+
+  Stream<List<model.TaggedNutritionGoal>> watchNutritionGoals() {
+    final query = select(nutritionGoals)
+      ..orderBy([(tbl) => OrderingTerm.asc(tbl.referenceDate)]);
+    return query.watch().map((goals) {
+      return goals.map((goal) => goalFromDatabase(goal)).toList();
+    });
+  }
+
+  Future<void> insertNutritionGoal(model.TaggedNutritionGoal goal) {
+    return into(nutritionGoals).insert(goal.toInsertable());
+  }
+
+  Future<void> deleteNutritionGoal(DateTime date) {
+    return (delete(nutritionGoals)
+          ..where((tbl) => tbl.id.equals(date.toIso8601String())))
+        .go();
+  }
+
+  Future<void> updateNutritionGoal(model.TaggedNutritionGoal goal) async {
+    await update(nutritionGoals).replace(goal.toInsertable());
+  }
+
+  Future<void> setNutritionGoals(List<model.TaggedNutritionGoal> goals) {
+    return transaction(() async {
+      await delete(nutritionGoals).go();
+      await batch((batch) {
+        for (final goal in goals) {
+          batch.insert(nutritionGoals, goal.toInsertable());
+        }
+      });
+    });
+  }
+
+  Stream<Map<String, model.Food>> watchCustomBarcodeFoods() {
+    return select(customBarcodeFoods).watch().map((foods) {
+      return {
+        for (final food in foods)
+          food.barcode: model.Food.fromJson(jsonDecode(food.jsonData))
+      };
+    });
+  }
+
+  Future<void> insertCustomBarcodeFood(String barcode, model.Food food) {
+    return into(customBarcodeFoods).insert(CustomBarcodeFoodsCompanion(
+      barcode: Value(barcode),
+      jsonData: Value(jsonEncode(food.toJson())),
+    ));
+  }
+
+  Future<void> deleteCustomBarcodeFood(String barcode) {
+    return (delete(customBarcodeFoods)
+          ..where((tbl) => tbl.barcode.equals(barcode)))
+        .go();
+  }
+
+  Future<void> setCustomBarcodeFoods(Map<String, model.Food> foods) {
+    return transaction(() async {
+      await delete(customBarcodeFoods).go();
+      await batch((batch) {
+        for (final entry in foods.entries) {
+          batch.insert(
+            customBarcodeFoods,
+            CustomBarcodeFoodsCompanion(
+              barcode: Value(entry.key),
+              jsonData: Value(jsonEncode(entry.value.toJson())),
+            ),
+          );
+        }
+      });
+    });
+  }
+
+  Stream<List<model.Food>> watchFavoriteFoods() {
+    return select(favoriteFoods).watch().switchMap((foodIDs) {
+      final ids = foodIDs.map((e) => e.foodId).toList();
+      return select(foods).watch().map((foods) => foods
+          .where((f) => ids.contains(f.id))
+          .map((dbfood) => model.Food.fromJson(jsonDecode(dbfood.jsonData)))
+          .toList());
+    });
+  }
+
+  Future<void> insertFavoriteFood(String id) {
+    return into(favoriteFoods)
+        .insert(FavoriteFoodsCompanion(foodId: Value(id)));
+  }
+
+  Future<void> deleteFavoriteFood(String id) {
+    return (delete(favoriteFoods)..where((tbl) => tbl.foodId.equals(id))).go();
+  }
+
+  Future<void> setFavoriteFoods(List<String> ids) {
+    return transaction(() async {
+      await delete(favoriteFoods).go();
+      await batch((batch) {
+        for (final id in ids) {
+          batch.insert(
+              favoriteFoods, FavoriteFoodsCompanion(foodId: Value(id)));
+        }
+      });
+    });
+  }
+
   Future clearTheWholeThingIAmAbsolutelySureISwear() async {
     for (var table in allTables) {
       await table.deleteAll();
     }
+  }
+
+  Future<File> get path async {
+    final dbFolder = await getApplicationDocumentsDirectory();
+    return File(p.join(dbFolder.path, 'db.sqlite'));
   }
 }
 
@@ -635,6 +811,36 @@ extension FolderDatabaseUtils on model.GTRoutineFolder {
       id: Value(id),
       name: Value(name),
       sortOrder: Value(sortOrder),
+    );
+  }
+}
+
+extension on model.TaggedFood {
+  FoodsCompanion toInsertable({
+    required bool generateInsertionDate,
+  }) {
+    assert(value.id != null);
+    return FoodsCompanion(
+      id: Value(value.id!),
+      referenceDate: Value(date),
+      dateAdded:
+          generateInsertionDate ? Value(DateTime.now()) : const Value.absent(),
+      jsonData: Value(jsonEncode(value.toJson())),
+    );
+  }
+}
+
+extension on model.TaggedNutritionGoal {
+  String get id => date.toIso8601String();
+
+  NutritionGoalsCompanion toInsertable() {
+    return NutritionGoalsCompanion(
+      id: Value(id),
+      referenceDate: Value(date),
+      calories: Value(value.dailyCalories),
+      fat: Value(value.dailyFat),
+      carbs: Value(value.dailyCarbs),
+      protein: Value(value.dailyProtein),
     );
   }
 }

@@ -470,10 +470,10 @@ class FoodController extends GetxController with ServiceableController {
         ),
       );
       return completer.future;
-      // } else if (result.products!.length == 1) {
-      //   final product = result.products!.first;
-      //   final food = _offFoodToGTFood(product, barcode: barcode);
-      //   return showAddFoodView(food);
+    } else if (result.products!.length == 1) {
+      final product = result.products!.first;
+      final food = _offFoodToGTFood(product, barcode: barcode);
+      return showAddFoodView(food);
     } else {
       final completer = Completer<Food?>();
       Go.to(() => SearchResultsView(

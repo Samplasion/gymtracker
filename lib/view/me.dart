@@ -106,8 +106,9 @@ class MeView extends GetView<MeController> {
                           () {
                             final historyController =
                                 Get.find<HistoryController>();
-                            final firstDay =
-                                historyController.history.first.startingDate!;
+                            final firstDay = historyController.history.isEmpty
+                                ? DateTime.now()
+                                : historyController.history.first.startingDate!;
                             final now = DateTime.now();
                             final allDays = now.difference(firstDay).inDays;
                             return DensityCalendarChart(

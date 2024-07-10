@@ -145,6 +145,14 @@ class Go {
     ).then((value) => value ?? false);
   }
 
+  static Future<T?> showBottomSheet<T>(
+      Widget Function(BuildContext) builder) async {
+    return await showModalBottomSheet<T>(
+      context: Get.context!,
+      builder: builder,
+    );
+  }
+
   static Future<T?> showBottomModalScreen<T>(
       Widget Function(BuildContext, ScrollController?) page) async {
     final context = Get.context!;

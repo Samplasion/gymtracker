@@ -28,6 +28,7 @@ import 'package:gymtracker/view/components/tweened_builder.dart';
 import 'package:gymtracker/view/skeleton.dart';
 import 'package:gymtracker/view/utils/crossfade.dart';
 import 'package:gymtracker/view/utils/input_decoration.dart';
+import 'package:gymtracker/view/utils/int_stepper_form_field.dart';
 import 'package:gymtracker/view/utils/search_anchor_plus.dart';
 import 'package:gymtracker/view/utils/sliver_utils.dart';
 import 'package:gymtracker/view/utils/speed_dial.dart';
@@ -407,6 +408,11 @@ class FoodListTile extends ControlledWidget<FoodController> {
   final void Function() onTap;
   final void Function() onDelete;
 
+  String get pieces {
+    if (food.pieces == 1) return "";
+    return "${food.pieces} × ";
+  }
+
   @override
   Widget build(BuildContext context) {
     return Slidable(
@@ -441,7 +447,7 @@ class FoodListTile extends ControlledWidget<FoodController> {
               TextSpan(text: food.name),
             ])),
             subtitle: Text(
-              "${food.brand != null ? "${food.brand}, " : ""}${food.unit.formatAmount(food.amount)}",
+              "${food.brand != null ? "${food.brand}, " : ""}${food.unit.formatAmount(food.amount, food.pieces)}",
             ),
             trailing: Text(
               "${food.nutritionalValues.calories.round()} ${"food.nutrimentUnits.kcal".t}",

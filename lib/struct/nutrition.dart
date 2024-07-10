@@ -224,6 +224,7 @@ typedef TaggedFood = DateTagged<Food>;
 class Food extends VagueFood {
   final String? id;
   final double amount;
+  final int pieces;
 
   const Food({
     required super.name,
@@ -235,6 +236,7 @@ class Food extends VagueFood {
     super.isDownloaded,
     super.barcode,
     super.unit,
+    this.pieces = 1,
   });
 
   factory Food.fromJson(Map<String, dynamic> json) {
@@ -251,6 +253,7 @@ class Food extends VagueFood {
       isDownloaded: json['isDownloaded'] ?? false,
       barcode: json['barcode'],
       unit: deserializeUnit(json['unit'] ?? 'g'),
+      pieces: (json['pieces'] as int?) ?? 1,
     );
   }
 
@@ -259,13 +262,14 @@ class Food extends VagueFood {
     return {
       'id': id,
       'amount': amount,
+      'pieces': pieces,
       ...super.toJson(),
     };
   }
 
   @override
   String toString() {
-    return 'Food(id: $id, name: $name, brand: $brand, nutritionalValuesPer100g: $nutritionalValuesPer100g, amount: $amount, servingSizes: $servingSizes, isDownloaded: $isDownloaded, barcode: $barcode, unit: $unit)';
+    return 'Food(id: $id, name: $name, brand: $brand, nutritionalValuesPer100g: $nutritionalValuesPer100g, amount: $amount, servingSizes: $servingSizes, isDownloaded: $isDownloaded, barcode: $barcode, unit: $unit, pieces: $pieces)';
   }
 
   @override
@@ -281,7 +285,8 @@ class Food extends VagueFood {
         listEquals(other.servingSizes, servingSizes) &&
         other.isDownloaded == isDownloaded &&
         other.barcode == barcode &&
-        other.unit == unit;
+        other.unit == unit &&
+        other.pieces == pieces;
   }
 
   @override
@@ -294,7 +299,8 @@ class Food extends VagueFood {
       servingSizes.hashCode ^
       isDownloaded.hashCode ^
       barcode.hashCode ^
-      unit.hashCode;
+      unit.hashCode ^
+      pieces.hashCode;
 
   int get hashCodeForSearch => Object.hash(
         name,
@@ -314,5 +320,5 @@ class Food extends VagueFood {
       other.unit == unit;
 
   NutritionValues get nutritionalValues =>
-      nutritionalValuesPer100g / 100 * amount;
+      nutritionalValuesPer100g / 100 * amount * pieces.toDouble();
 }

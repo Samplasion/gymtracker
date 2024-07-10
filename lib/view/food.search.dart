@@ -33,7 +33,7 @@ class _SearchFoodWithMacros extends ControlledWidget<FoodController> {
 
     final subtitlePieces = [
       if (food.brand != null) food.brand,
-      food.unit.formatAmount(food.amount),
+      food.unit.formatAmount(food.amount, food.pieces),
     ];
 
     var color = GTMaterialColor.primary;

@@ -53,6 +53,7 @@ class GymTrackerIcons {
   static const IconData create_routine = Icons.add_rounded;
   static const IconData custom_exercises = Icons.star_rounded;
   static const IconData debug = Icons.bug_report_rounded;
+  static const IconData decrease = Icons.remove_rounded;
   static const IconData delete = Icons.delete_rounded;
   static const IconData delete_forever = Icons.delete_forever_rounded;
   static const IconData distance = Icons.directions_run_rounded;
@@ -76,6 +77,7 @@ class GymTrackerIcons {
   static const IconData history = Icons.history_rounded;
   static const IconData home = Icons.home_rounded;
   static const IconData import = Icons.file_download_rounded;
+  static const IconData increase = Icons.add_rounded;
   static const IconData info = Icons.info_rounded;
   static const IconData info_outline = Icons.info_outline;
   static const IconData keyboard = Icons.keyboard_rounded;

@@ -481,6 +481,10 @@ class FoodController extends GetxController with ServiceableController {
                 result!.products!.map((e) => _offFoodToGTFood(e)).toList()),
             showAddCustom: false,
           )).then((value) {
+        if (value == null) {
+          completer.complete(null);
+          return;
+        }
         completer.complete(showAddFoodView(value));
       });
       return completer.future;
@@ -507,13 +511,6 @@ class FoodController extends GetxController with ServiceableController {
     final dayFoods = foods$.value.where((element) => element.date == value);
     if (!dayFoods.any((element) => element.value.id == updatedFood.id)) return;
 
-    // foods$.add(
-    //   foods$.value
-    //       .map((element) => element.value == updatedFood
-    //           ? DateTagged(date: element.date, value: updatedFood)
-    //           : element)
-    //       .toList(),
-    // );
     service.updateFood(DateTagged(
       date: value,
       value: updatedFood,

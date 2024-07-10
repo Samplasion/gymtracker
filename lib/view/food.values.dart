@@ -27,6 +27,7 @@ class _AddFoodViewState extends ControlledState<AddFoodView, FoodController> {
   final formKey = GlobalKey<FormState>();
 
   late double amount = shouldInheritAmount ? (widget.food as Food).amount : 100;
+  late int pieces = shouldInheritAmount ? (widget.food as Food).pieces : 1;
 
   late var servingSize = widget.isEditing
       ? null
@@ -152,6 +153,19 @@ class _AddFoodViewState extends ControlledState<AddFoodView, FoodController> {
                         ),
                         const SizedBox(height: 16),
                       ],
+                      IntStepperFormField(
+                        value: pieces,
+                        onChanged: (value) {
+                          if (value == null) return;
+                          setState(() {
+                            pieces = value;
+                          });
+                        },
+                        decoration: GymTrackerInputDecoration(
+                          labelText: "food.add.pieces".t,
+                        ),
+                      ),
+                      const SizedBox(height: 16),
                       Card(
                         child: Padding(
                           padding: const EdgeInsets.all(16),
@@ -159,7 +173,7 @@ class _AddFoodViewState extends ControlledState<AddFoodView, FoodController> {
                             children: [
                               NutritionTable(
                                 per100g: widget.food.nutritionalValuesPer100g,
-                                amount: amount,
+                                amount: amount * pieces,
                                 unit: widget.food.unit,
                               ),
                               if (widget.food.isDownloaded) ...[
@@ -207,7 +221,10 @@ class _AddFoodViewState extends ControlledState<AddFoodView, FoodController> {
 
               if (widget.isEditing) {
                 final food = widget.food as Food;
-                final updatedFood = food.copyWith(amount: amount);
+                final updatedFood = food.copyWith(
+                  amount: amount,
+                  pieces: pieces,
+                );
 
                 Get.back(result: updatedFood);
               } else {
@@ -219,6 +236,9 @@ class _AddFoodViewState extends ControlledState<AddFoodView, FoodController> {
                       widget.food.nutritionalValuesPer100g,
                   servingSizes: widget.food.servingSizes,
                   isDownloaded: true,
+                  barcode: widget.food.barcode,
+                  unit: widget.food.unit,
+                  pieces: pieces,
                 );
 
                 Get.back(result: food);
@@ -869,6 +889,7 @@ class _CustomAddFoodViewState
   late final nameController = TextEditingController();
   late final brandController = TextEditingController();
   double amount = 100;
+  int pieces = 1;
   late final amountController =
       TextEditingController(text: stringifyDouble(amount));
   NutritionUnit unit = NutritionUnit.G;
@@ -995,6 +1016,19 @@ class _CustomAddFoodViewState
                         ),
                       ],
                     ),
+                    const SizedBox(height: 8),
+                    IntStepperFormField(
+                      value: pieces,
+                      onChanged: (value) {
+                        if (value == null) return;
+                        setState(() {
+                          pieces = value;
+                        });
+                      },
+                      decoration: GymTrackerInputDecoration(
+                        labelText: "food.add.pieces".t,
+                      ),
+                    ),
                     const Divider(height: 32),
                     Text(
                       "food.add.nutritionalValuesPerAmountWithUnit".tParams({
@@ -1093,6 +1127,7 @@ class _CustomAddFoodViewState
                       id: controllers[id]!.text.parseDouble(),
                 }),
                 barcode: widget.barcode,
+                pieces: pieces,
               );
 
               if (widget.barcode != null) {
@@ -1583,6 +1618,12 @@ class _AddCombinedFoodViewState
 
 extension on NutritionUnit {
   String get t => "food.nutrimentUnits.${toCamelCase()}".t;
-  String formatAmount(double amount) =>
-      "${stringifyDouble(amount, decimalSeparator: Get.find<FoodController>().decimalSeparator)} $t";
+
+  // String formatAmount(double amount) =>
+  //     "${stringifyDouble(amount, decimalSeparator: Get.find<FoodController>().decimalSeparator)} $t";
+
+  String formatAmount(double amount, [int pieces = 1]) {
+    String pcs = pieces == 1 ? "" : "$pieces × ";
+    return "$pcs${stringifyDouble(amount, decimalSeparator: Get.find<FoodController>().decimalSeparator)} $t";
+  }
 }

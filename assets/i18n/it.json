@@ -1375,7 +1375,8 @@
           "brand": "Marca"
         }
       },
-      "nameEmpty": "Il nome non può essere vuoto"
+      "nameEmpty": "Il nome non può essere vuoto",
+      "pieces": "Pezzi"
     },
     "offAttribution": "Dati forniti da OpenFoodFacts",
     "edit": {

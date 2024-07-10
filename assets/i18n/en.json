@@ -1375,7 +1375,8 @@
           "brand": "Brand"
         }
       },
-      "nameEmpty": "The name must not be empty"
+      "nameEmpty": "The name must not be empty",
+      "pieces": "Quantity"
     },
     "offAttribution": "Data provided by OpenFoodFacts",
     "edit": {

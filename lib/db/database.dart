@@ -151,7 +151,7 @@ class GTDatabase extends _$GTDatabase {
           if (nutritionCategoriesCount.isEmpty) {
             await into(nutritionCategories).insert(NutritionCategoriesCompanion(
               referenceDate: Value(DateTime.now()),
-              jsonData: Value(jsonEncode({})),
+              jsonData: Value(jsonEncode([])),
             ));
           }
 

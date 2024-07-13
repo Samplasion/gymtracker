@@ -188,7 +188,7 @@ class _DateRangeBanner extends ControlledWidget<FoodController> {
 
   @override
   Widget build(BuildContext context) {
-    final effectRange = controller.getDateRange();
+    final effectRange = controller.getDateRangeForCategories();
     if (effectRange == null) {
       return const SliverToBoxAdapter(child: SizedBox());
     }

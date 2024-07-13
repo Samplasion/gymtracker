@@ -215,7 +215,10 @@ class _FoodViewState extends ControlledState<FoodView, FoodController> {
                         ])),
                         SliverPadding(
                           padding: const EdgeInsets.symmetric(horizontal: 16)
-                              .copyWith(bottom: 16),
+                              .copyWith(
+                                  bottom: controller.getCategories().isEmpty
+                                      ? 0
+                                      : 16),
                           sliver: SliverStack(
                             children: const [
                               SliverPositioned.fill(

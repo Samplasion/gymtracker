@@ -63,7 +63,7 @@ ThemeData getGymTrackerThemeFor(BuildContext context, ColorScheme scheme) {
   }
   var pageTransitionsTheme = PageTransitionsTheme(builders: {
     TargetPlatform.android: _SharedAxisTransitionBuilder(),
-    TargetPlatform.iOS: const CupertinoPageTransitionsBuilder(),
+    TargetPlatform.iOS: _SharedAxisTransitionBuilder(),
     TargetPlatform.macOS: _SharedAxisTransitionBuilder(),
   });
 

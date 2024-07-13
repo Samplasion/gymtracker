@@ -408,24 +408,29 @@ class _HomeUnassignedFoodsList extends ControlledWidget<FoodController> {
   @override
   Widget build(BuildContext context) {
     return StreamBuilder(
-      stream: controller.categories$,
+      stream: controller.foods$,
       builder: (context, snapshot) {
         return StreamBuilder(
-          stream: controller.day$,
+          stream: controller.categories$,
           builder: (context, snapshot) {
-            final unassigned = controller.getUnassignedFoods();
-            return SliverList.builder(
-              itemCount: unassigned.length,
-              itemBuilder: (context, index) {
-                final food = unassigned[index];
-                return FoodListTile(
-                  key: ValueKey(food),
-                  food: food,
-                  onTap: () {
-                    controller.showEditFoodView(food);
-                  },
-                  onDelete: () {
-                    controller.removeFood(controller.day$.value, food);
+            return StreamBuilder(
+              stream: controller.day$,
+              builder: (context, snapshot) {
+                final unassigned = controller.getUnassignedFoods();
+                return SliverList.builder(
+                  itemCount: unassigned.length,
+                  itemBuilder: (context, index) {
+                    final food = unassigned[index];
+                    return FoodListTile(
+                      key: ValueKey(food),
+                      food: food,
+                      onTap: () {
+                        controller.showEditFoodView(food);
+                      },
+                      onDelete: () {
+                        controller.removeFood(controller.day$.value, food);
+                      },
+                    );
                   },
                 );
               },

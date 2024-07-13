@@ -7,6 +7,7 @@ import 'package:gymtracker/db/imports/v4.dart';
 import 'package:gymtracker/db/imports/v5.dart';
 import 'package:gymtracker/db/imports/v6.dart';
 import 'package:gymtracker/db/imports/v7.dart';
+import 'package:gymtracker/db/imports/v8.dart';
 import 'package:gymtracker/model/exercisable.dart';
 import 'package:gymtracker/model/exercise.dart';
 import 'package:gymtracker/model/measurements.dart';
@@ -22,6 +23,7 @@ const converters = {
   5: VersionedJsonImportV5(),
   6: VersionedJsonImportV6(),
   7: VersionedJsonImportV7(),
+  8: VersionedJsonImportV8(),
 };
 
 VersionedJsonImportBase getConverter(int version) {
@@ -57,6 +59,7 @@ class DatabaseSnapshot {
   final List<TaggedNutritionGoal> nutritionGoals;
   final Map<String, Food> customBarcodeFoods;
   final List<String> favoriteFoods;
+  final Map<DateTime, List<NutritionCategory>> foodCategories;
 
   const DatabaseSnapshot({
     required this.customExercises,
@@ -71,6 +74,7 @@ class DatabaseSnapshot {
     required this.nutritionGoals,
     required this.customBarcodeFoods,
     required this.favoriteFoods,
+    required this.foodCategories,
   });
 
   @override
@@ -86,6 +90,9 @@ class DatabaseSnapshot {
   folders: ${jsonEncode(folders)},
   foods: ${jsonEncode(foods)},
   nutritionGoals: ${jsonEncode(nutritionGoals)},
+  customBarcodeFoods: ${jsonEncode(customBarcodeFoods)},
+  favoriteFoods: ${jsonEncode(favoriteFoods)},
+  foodCategories: ${jsonEncode(foodCategories)},
 )""";
   }
 }

@@ -266,7 +266,6 @@ class _MasterDetailViewState extends State<MasterDetailView> {
           child: focus == MDVFocus.details && selectedItem != null
               ? MDVConfiguration(
                   key: ValueKey<MDVFocus>(focus),
-                  // appBarSize: widget.pageDetailsAppBar,
                   selfPage: true,
                   goBack: () {
                     if (mounted) {
@@ -412,7 +411,7 @@ class DetailsView extends StatelessWidget {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
-    return ColoredBox(
+    return Material(
       color: _getCanvasColor(settings, colorScheme),
       child: Theme(
         data: theme.copyWith(

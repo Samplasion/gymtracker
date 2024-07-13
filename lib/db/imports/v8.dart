@@ -6,11 +6,11 @@ import 'package:gymtracker/model/preferences.dart';
 import 'package:gymtracker/model/workout.dart';
 import 'package:gymtracker/struct/nutrition.dart';
 
-class VersionedJsonImportV6 extends VersionedJsonImportBase {
+class VersionedJsonImportV8 extends VersionedJsonImportBase {
   @override
-  int get version => 6;
+  int get version => 8;
 
-  const VersionedJsonImportV6();
+  const VersionedJsonImportV8();
 
   @override
   DatabaseSnapshot process(Map<String, dynamic> json) {
@@ -56,9 +56,23 @@ class VersionedJsonImportV6 extends VersionedJsonImportBase {
             value: NutritionGoal.fromJson(goal['goal']),
           ),
       ],
-      customBarcodeFoods: {},
-      favoriteFoods: [],
-      foodCategories: {},
+      customBarcodeFoods: {
+        for (final food in (json['customBarcodeFoods'] as Map)
+            .cast<String, dynamic>()
+            .entries)
+          food.key: Food.fromJson(food.value),
+      },
+      favoriteFoods: [
+        for (final food in (json['favoriteFoods'] as List)) food as String,
+      ],
+      foodCategories: {
+        for (final category
+            in (json['foodCategories'] as Map).cast<String, dynamic>().entries)
+          DateTime.parse(category.key): (category.value as List)
+              .map((e) => NutritionCategory.fromJson(
+                  (e as Map).cast<String, dynamic>()))
+              .toList(),
+      },
     );
   }
 
@@ -112,6 +126,17 @@ class VersionedJsonImportV6 extends VersionedJsonImportBase {
             'goal': goal.value.toJson(),
           },
       ],
+      'customBarcodeFoods': {
+        for (final food in data.customBarcodeFoods.entries)
+          food.key: food.value.toJson(),
+      },
+      'favoriteFoods': data.favoriteFoods,
+      'foodCategories': {
+        for (final category in data.foodCategories.entries)
+          category.key.toIso8601String(): [
+            for (final cat in category.value) cat.toJson()
+          ],
+      },
     };
   }
 }

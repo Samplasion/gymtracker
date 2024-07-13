@@ -126,24 +126,28 @@ class AdvancedSettingsView extends ControlledWidget<SettingsController> {
                     await controller.importSettings(context);
                   },
                 ),
-                ListTile(
-                  title: Text("settings.options.export.label".t),
-                  leading: const Icon(GymTrackerIcons.export),
-                  trailing: const Icon(GymTrackerIcons.lt_chevron),
-                  onTap: () async {
-                    await controller.exportSettings(context);
-                  },
-                ),
-                if (controller.canExportRaw)
-                  ListTile(
-                    title: Text("settings.options.exportSQL.label".t),
-                    subtitle: Text("settings.options.exportSQL.text".t),
+                Builder(builder: (context) {
+                  return ListTile(
+                    title: Text("settings.options.export.label".t),
                     leading: const Icon(GymTrackerIcons.export),
                     trailing: const Icon(GymTrackerIcons.lt_chevron),
                     onTap: () async {
-                      await controller.exportRawDatabase(context);
+                      await controller.exportSettings(context);
                     },
-                  ),
+                  );
+                }),
+                if (controller.canExportRaw)
+                  Builder(builder: (context) {
+                    return ListTile(
+                      title: Text("settings.options.exportSQL.label".t),
+                      subtitle: Text("settings.options.exportSQL.text".t),
+                      leading: const Icon(GymTrackerIcons.export),
+                      trailing: const Icon(GymTrackerIcons.lt_chevron),
+                      onTap: () async {
+                        await controller.exportRawDatabase(context);
+                      },
+                    );
+                  }),
                 const Divider(),
                 ListTile(
                   title: Text("settings.advanced.options.logs.title".t),

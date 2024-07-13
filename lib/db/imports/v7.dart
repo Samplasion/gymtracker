@@ -65,6 +65,7 @@ class VersionedJsonImportV7 extends VersionedJsonImportBase {
       favoriteFoods: [
         for (final food in (json['favoriteFoods'] as List)) food as String,
       ],
+      foodCategories: {},
     );
   }
 

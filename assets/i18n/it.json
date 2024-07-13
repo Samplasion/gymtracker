@@ -1396,6 +1396,10 @@
           "text": "Nessun prodotto è stato trovato con codice @barcode.",
           "title": "Nessun prodotto",
           "createNew": "Crea nuovo prodotto"
+        },
+        "error": {
+          "title": "Si è verificato un errore",
+          "text": "Impossibile cercare il prodotto."
         }
       },
       "enterCode": "Inserisci a mano",
@@ -1896,6 +1900,45 @@
       "zm": "Zambia",
       "zw": "Zimbabwe",
       "world": "Mondo"
+    },
+    "categoryList": {
+      "dailyPercentage": "@percentage% del totale giornaliero – @calories",
+      "empty": "Non hai ancora configurato le categorie",
+      "unmodifiable": {
+        "title": "Impossibile modificare",
+        "text": "Puoi modificare solo le categorie nei giorni dopo o durante il giorno corrente."
+      },
+      "title": "Categorie",
+      "add": "Aggiungi"
+    },
+    "categoryEditor": {
+      "title": {
+        "add": "Aggiungi categoria",
+        "edit": "Modifica categoria"
+      },
+      "name": "Nome",
+      "dailyPercentage": "Percentuale giornaliera",
+      "fields": {
+        "name": {
+          "errors": {
+            "empty": "Il nome non può essere vuoto.",
+            "unique": "C'è già una categoria con questo nome."
+          }
+        }
+      },
+      "save": "Salva",
+      "icon": "Icona",
+      "effect": {
+        "from": "Eventuali modifiche verranno applicate a partire dal @from.",
+        "range": "Eventuali modifiche verranno applicate dal @from al @to.",
+        "title": "Range di applicazione"
+      },
+      "nonFulfillingSum": {
+        "title": "La somma non è 100%"
+      }
+    },
+    "categoryFoods": {
+      "empty": "Non hai ancora aggiunto cibi a questa categoria."
     }
   }
 }

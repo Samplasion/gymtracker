@@ -27,6 +27,8 @@ abstract class _$FoodCWProxy {
 
   Food pieces(int pieces);
 
+  Food category(String? category);
+
   /// This function **does support** nullification of nullable fields. All `null` values passed to `non-nullable` fields will be ignored. You can also use `Food(...).copyWith.fieldName(...)` to override fields one at a time with nullification support.
   ///
   /// Usage
@@ -44,6 +46,7 @@ abstract class _$FoodCWProxy {
     String? barcode,
     NutritionUnit? unit,
     int? pieces,
+    String? category,
   });
 }
 
@@ -86,6 +89,9 @@ class _$FoodCWProxyImpl implements _$FoodCWProxy {
   Food pieces(int pieces) => this(pieces: pieces);
 
   @override
+  Food category(String? category) => this(category: category);
+
+  @override
 
   /// This function **does support** nullification of nullable fields. All `null` values passed to `non-nullable` fields will be ignored. You can also use `Food(...).copyWith.fieldName(...)` to override fields one at a time with nullification support.
   ///
@@ -104,6 +110,7 @@ class _$FoodCWProxyImpl implements _$FoodCWProxy {
     Object? barcode = const $CopyWithPlaceholder(),
     Object? unit = const $CopyWithPlaceholder(),
     Object? pieces = const $CopyWithPlaceholder(),
+    Object? category = const $CopyWithPlaceholder(),
   }) {
     return Food(
       name: name == const $CopyWithPlaceholder() || name == null
@@ -150,6 +157,10 @@ class _$FoodCWProxyImpl implements _$FoodCWProxy {
           ? _value.pieces
           // ignore: cast_nullable_to_non_nullable
           : pieces as int,
+      category: category == const $CopyWithPlaceholder()
+          ? _value.category
+          // ignore: cast_nullable_to_non_nullable
+          : category as String?,
     );
   }
 }

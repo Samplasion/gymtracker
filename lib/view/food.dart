@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:flutter_zxing/flutter_zxing.dart';
 import 'package:gauge_indicator/gauge_indicator.dart';
@@ -20,6 +21,7 @@ import 'package:gymtracker/utils/extensions.dart' hide ContextThemingUtils;
 import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/utils/skeletons.dart';
 import 'package:gymtracker/utils/utils.dart';
+import 'package:gymtracker/view/components/alert_banner.dart';
 import 'package:gymtracker/view/components/badges.dart';
 import 'package:gymtracker/view/components/controlled.dart';
 import 'package:gymtracker/view/components/gradient_bottom_bar.dart';
@@ -29,13 +31,16 @@ import 'package:gymtracker/view/skeleton.dart';
 import 'package:gymtracker/view/utils/crossfade.dart';
 import 'package:gymtracker/view/utils/input_decoration.dart';
 import 'package:gymtracker/view/utils/int_stepper_form_field.dart';
+import 'package:gymtracker/view/utils/nutrition_category_icon_picker.dart';
 import 'package:gymtracker/view/utils/search_anchor_plus.dart';
 import 'package:gymtracker/view/utils/sliver_utils.dart';
 import 'package:gymtracker/view/utils/speed_dial.dart';
 import 'package:intl/intl.dart';
 import 'package:scrollable_clean_calendar/utils/extensions.dart';
 import 'package:skeletonizer/skeletonizer.dart';
+import 'package:sliver_tools/sliver_tools.dart';
 
+part 'food.categories.dart';
 part 'food.goals.dart';
 part 'food.search.dart';
 part 'food.values.dart';
@@ -208,23 +213,19 @@ class _FoodViewState extends ControlledState<FoodView, FoodController> {
                           ),
                           const SizedBox(height: 24),
                         ])),
-                        SliverList.builder(
-                          itemCount: foods.length,
-                          itemBuilder: (context, index) {
-                            final food = foods[index];
-                            return FoodListTile(
-                              key: ValueKey(food),
-                              food: food,
-                              onTap: () {
-                                controller.showEditFoodView(food);
-                              },
-                              onDelete: () {
-                                controller.removeFood(
-                                    controller.day$.value, food);
-                              },
-                            );
-                          },
+                        SliverPadding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16)
+                              .copyWith(bottom: 16),
+                          sliver: SliverStack(
+                            children: const [
+                              SliverPositioned.fill(
+                                child: Card(margin: EdgeInsets.zero),
+                              ),
+                              _HomeFoodCategoryList(),
+                            ],
+                          ),
                         ),
+                        const _HomeUnassignedFoodsList(),
                         SliverToBoxAdapter(
                           child: SizedBox(height: bottomPaddingWithFAB),
                         ),
@@ -396,6 +397,85 @@ class _FoodViewState extends ControlledState<FoodView, FoodController> {
   }
 }
 
+class _HomeUnassignedFoodsList extends ControlledWidget<FoodController> {
+  const _HomeUnassignedFoodsList({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder(
+      stream: controller.categories$,
+      builder: (context, snapshot) {
+        return StreamBuilder(
+          stream: controller.day$,
+          builder: (context, snapshot) {
+            final unassigned = controller.getUnassignedFoods();
+            return SliverList.builder(
+              itemCount: unassigned.length,
+              itemBuilder: (context, index) {
+                final food = unassigned[index];
+                return FoodListTile(
+                  key: ValueKey(food),
+                  food: food,
+                  onTap: () {
+                    controller.showEditFoodView(food);
+                  },
+                  onDelete: () {
+                    controller.removeFood(controller.day$.value, food);
+                  },
+                );
+              },
+            );
+          },
+        );
+      },
+    );
+  }
+}
+
+class _HomeFoodCategoryList extends ControlledWidget<FoodController> {
+  const _HomeFoodCategoryList();
+
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder(
+      stream: controller.categories$,
+      builder: (context, snapshot) {
+        return StreamBuilder(
+          stream: controller.day$,
+          builder: (context, snapshot) {
+            final foodCategories = controller.getCategories().values.toList();
+            print((
+              controller.day$.value,
+              foodCategories.map((c) => c.name).toList()
+            ));
+            return SliverList.builder(
+              itemCount: foodCategories.length,
+              itemBuilder: (context, index) {
+                final category = foodCategories[index];
+                return Material(
+                  clipBehavior: Clip.hardEdge,
+                  borderRadius: BorderRadius.vertical(
+                    top: Radius.circular(index == 0 ? 13 : 0),
+                    bottom: Radius.circular(
+                        index == foodCategories.length - 1 ? 13 : 0),
+                  ),
+                  color: Colors.transparent,
+                  child: _HomeFoodCategoryListTile(
+                    key: ValueKey(category),
+                    category: category,
+                  ),
+                );
+              },
+            );
+          },
+        );
+      },
+    );
+  }
+}
+
 class FoodListTile extends ControlledWidget<FoodController> {
   const FoodListTile({
     super.key,
@@ -447,7 +527,7 @@ class FoodListTile extends ControlledWidget<FoodController> {
               TextSpan(text: food.name),
             ])),
             subtitle: Text(
-              "${food.brand != null ? "${food.brand}, " : ""}${food.unit.formatAmount(food.amount, food.pieces)}",
+              "${food.brand != null ? "${food.brand}, " : ""}${food.unit.formatAmount(food.amount, pieces: food.pieces)}",
             ),
             trailing: Text(
               "${food.nutritionalValues.calories.round()} ${"food.nutrimentUnits.kcal".t}",
@@ -457,6 +537,88 @@ class FoodListTile extends ControlledWidget<FoodController> {
           );
         },
       ),
+    );
+  }
+}
+
+class _HomeFoodCategoryListTile extends ControlledWidget<FoodController> {
+  final NutritionCategory category;
+
+  const _HomeFoodCategoryListTile({
+    super.key,
+    required this.category,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder(
+      stream: controller.day$,
+      builder: (context, _) {
+        return StreamBuilder(
+          stream: controller.foods$,
+          builder: (context, _) {
+            final categoryFoods = controller.getFoodsForCategory(category);
+            final categoryMax = category.dailyPercentage *
+                controller.getGoal().dailyCalories.toDouble() /
+                100;
+            final categoryCalories = categoryFoods.fold<double>(
+                0,
+                (previousValue, element) =>
+                    previousValue + element.nutritionalValues.calories);
+            final progress = categoryCalories / categoryMax;
+
+            final subtitleParts = [
+              "${NutritionUnit.KCAL.formatAmount(categoryCalories, showUnit: false)} / ${NutritionUnit.KCAL.formatAmount(categoryMax)}",
+              if (categoryFoods.isNotEmpty)
+                categoryFoods.map((e) => e.name).join(", "),
+            ];
+
+            return ListTile(
+              leading: SizedBox(
+                width: 44,
+                height: 44,
+                child: RadialGauge(
+                  value: progress.clamp(0.025, 1),
+                  axis: GaugeAxis(
+                    min: 0,
+                    max: 1,
+                    degrees: 270,
+                    style: GaugeAxisStyle(
+                      thickness: 4,
+                      background:
+                          context.theme.colorScheme.surfaceContainerHighest,
+                    ),
+                    progressBar: GaugeProgressBar.rounded(
+                      // The rounded bar isn't properly clipped for small values
+                      color: progress < 0.025
+                          ? Colors.transparent
+                          : context.theme.colorScheme.primary,
+                    ),
+                    pointer: const GaugePointer.circle(
+                        radius: 0, color: Colors.transparent),
+                  ),
+                  child: Icon(category.icon.iconData, size: 20),
+                ),
+              ),
+              title: Text(category.name),
+              subtitle: Text(
+                subtitleParts.join(", "),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+              trailing: Text(
+                NumberFormat.decimalPercentPattern(
+                        decimalDigits: 0, locale: Get.locale?.languageCode)
+                    .format(progress),
+                style: context.theme.textTheme.bodyMedium,
+              ),
+              onTap: () {
+                controller.showCategoryFoodsView(category);
+              },
+            );
+          },
+        );
+      },
     );
   }
 }
@@ -480,7 +642,7 @@ SearchSuggestionBuilder _getSearchSuggestionBuilder({
               trailing: RotatedBox(
                 quarterTurns: -1,
                 child: IconButton(
-                  // Hardcoded icon (for now)
+                  // FIXME: Hardcoded icon (for now)
                   icon: const Icon(Icons.arrow_outward_rounded),
                   onPressed: () {
                     searchController.text = term;
@@ -537,6 +699,14 @@ class _FoodDayAppBar extends ControlledWidget<FoodController> {
     return SliverAppBar.large(
       leading: const Skeleton.keep(child: SkeletonDrawerButton()),
       actions: [
+        IconButton(
+          icon: const Icon(GymTrackerIcons.food_categories),
+          tooltip: "food.categoryList.title".t,
+          onPressed: () {
+            // controller.showNutritionGoalView();
+            Go.to(() => const FoodCategoryList());
+          },
+        ),
         IconButton(
           icon: const Icon(GymTrackerIcons.nutrition_goal),
           tooltip: "food.nutritionGoals.change.title".t,

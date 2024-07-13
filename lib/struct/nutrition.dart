@@ -1,11 +1,13 @@
 import 'package:copy_with_extension/copy_with_extension.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/struct/date_sequence.dart';
 import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/utils/utils.dart';
 import 'package:openfoodfacts/openfoodfacts.dart' hide Unit;
 
+part 'nutrition.categories.dart';
 part 'nutrition.g.dart';
 part 'nutrition.int.dart';
 part 'nutrition.values.dart';
@@ -225,6 +227,7 @@ class Food extends VagueFood {
   final String? id;
   final double amount;
   final int pieces;
+  final String? category;
 
   const Food({
     required super.name,
@@ -237,6 +240,7 @@ class Food extends VagueFood {
     super.barcode,
     super.unit,
     this.pieces = 1,
+    this.category,
   });
 
   factory Food.fromJson(Map<String, dynamic> json) {
@@ -254,6 +258,7 @@ class Food extends VagueFood {
       barcode: json['barcode'],
       unit: deserializeUnit(json['unit'] ?? 'g'),
       pieces: (json['pieces'] as int?) ?? 1,
+      category: json['category'],
     );
   }
 
@@ -263,13 +268,14 @@ class Food extends VagueFood {
       'id': id,
       'amount': amount,
       'pieces': pieces,
+      'category': category,
       ...super.toJson(),
     };
   }
 
   @override
   String toString() {
-    return 'Food(id: $id, name: $name, brand: $brand, nutritionalValuesPer100g: $nutritionalValuesPer100g, amount: $amount, servingSizes: $servingSizes, isDownloaded: $isDownloaded, barcode: $barcode, unit: $unit, pieces: $pieces)';
+    return 'Food(id: $id, name: $name, brand: $brand, nutritionalValuesPer100g: $nutritionalValuesPer100g, amount: $amount, servingSizes: $servingSizes, isDownloaded: $isDownloaded, barcode: $barcode, unit: $unit, pieces: $pieces, category: $category)';
   }
 
   @override
@@ -286,7 +292,8 @@ class Food extends VagueFood {
         other.isDownloaded == isDownloaded &&
         other.barcode == barcode &&
         other.unit == unit &&
-        other.pieces == pieces;
+        other.pieces == pieces &&
+        other.category == category;
   }
 
   @override
@@ -300,7 +307,8 @@ class Food extends VagueFood {
       isDownloaded.hashCode ^
       barcode.hashCode ^
       unit.hashCode ^
-      pieces.hashCode;
+      pieces.hashCode ^
+      category.hashCode;
 
   int get hashCodeForSearch => Object.hash(
         name,

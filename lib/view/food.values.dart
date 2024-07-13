@@ -334,13 +334,22 @@ class NutritionTable extends StatelessWidget {
   final NutritionValues per100g;
   final double amount;
   final NutritionUnit unit;
+  final bool _showHeader;
 
   const NutritionTable({
     super.key,
     required this.per100g,
     this.amount = 100,
     required this.unit,
-  });
+  }) : _showHeader = true;
+
+  const NutritionTable.arbitrary({
+    super.key,
+    required NutritionValues nutritionValues,
+    required this.unit,
+  })  : per100g = nutritionValues,
+        amount = 100,
+        _showHeader = false;
 
   static const verticalSpace = SizedBox(height: 12);
 
@@ -351,15 +360,17 @@ class NutritionTable extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Text(
-          "food.add.nutritionalValuesPerAmountWithUnit".tParams({
-            "amount": stringifyDouble(amount,
-                decimalSeparator: controller.decimalSeparator),
-            "unit": unit.t,
-          }),
-          style: Theme.of(context).textTheme.headlineSmall,
-        ),
-        verticalSpace,
+        if (_showHeader) ...[
+          Text(
+            "food.add.nutritionalValuesPerAmountWithUnit".tParams({
+              "amount": stringifyDouble(amount,
+                  decimalSeparator: controller.decimalSeparator),
+              "unit": unit.t,
+            }),
+            style: Theme.of(context).textTheme.headlineSmall,
+          ),
+          verticalSpace,
+        ],
         NutritionRow(
           id: "calories",
           value: nutritionalValues.calories,
@@ -1622,8 +1633,13 @@ extension on NutritionUnit {
   // String formatAmount(double amount) =>
   //     "${stringifyDouble(amount, decimalSeparator: Get.find<FoodController>().decimalSeparator)} $t";
 
-  String formatAmount(double amount, [int pieces = 1]) {
-    String pcs = pieces == 1 ? "" : "$pieces × ";
-    return "$pcs${stringifyDouble(amount, decimalSeparator: Get.find<FoodController>().decimalSeparator)} $t";
+  String formatAmount(
+    double amount, {
+    int pieces = 1,
+    bool showUnit = true,
+  }) {
+    final pcs = pieces == 1 ? "" : "$pieces × ";
+    final unit = showUnit ? " $t" : "";
+    return "$pcs${stringifyDouble(amount, decimalSeparator: Get.find<FoodController>().decimalSeparator)}$unit";
   }
 }

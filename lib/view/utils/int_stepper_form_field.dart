@@ -5,11 +5,14 @@ import 'package:gymtracker/icons/gymtracker_icons.dart';
 import 'package:gymtracker/service/logger.dart';
 import 'package:gymtracker/utils/go.dart';
 
+String _defaultBuilder(int value) => "$value";
+
 class IntStepperFormField extends StatefulWidget {
   final int value;
   final ValueChanged<int?> onChanged;
   final InputDecoration decoration;
   final int min, max;
+  final String Function(int) labelBuilder;
 
   const IntStepperFormField({
     super.key,
@@ -18,6 +21,7 @@ class IntStepperFormField extends StatefulWidget {
     required this.decoration,
     this.min = 1,
     this.max = 100,
+    this.labelBuilder = _defaultBuilder,
   });
 
   @override
@@ -39,6 +43,7 @@ class _IntStepperFormFieldState extends State<IntStepperFormField> {
           min: widget.min,
           max: widget.max,
           onChanged: widget.onChanged,
+          labelBuilder: widget.labelBuilder,
         ),
       ),
       child: InputDecorator(
@@ -73,7 +78,9 @@ class _IntStepperFormFieldState extends State<IntStepperFormField> {
   Widget _buildBody() {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 12),
-      child: Text(widget.value.toString()),
+      child: Text(
+        widget.labelBuilder(widget.value),
+      ),
     );
   }
 }
@@ -86,6 +93,7 @@ class _IntStepperFormFieldSheetContent extends StatefulWidget {
     required this.min,
     required this.max,
     required this.onChanged,
+    required this.labelBuilder,
   });
 
   final InputDecoration decoration;
@@ -94,6 +102,7 @@ class _IntStepperFormFieldSheetContent extends StatefulWidget {
   final int min;
   final int max;
   final ValueChanged<int> onChanged;
+  final String Function(int) labelBuilder;
 
   @override
   State<_IntStepperFormFieldSheetContent> createState() =>
@@ -134,7 +143,7 @@ class _IntStepperFormFieldSheetContentState
             },
             childCount: widget.max - widget.min + 1,
             itemBuilder: (context, index) =>
-                Center(child: Text((index + listOffset).toString())),
+                Center(child: Text(widget.labelBuilder(index + listOffset))),
             selectionOverlay: CupertinoPickerDefaultSelectionOverlay(
               background:
                   Theme.of(context).colorScheme.secondary.withAlpha(128),

@@ -1,7 +1,9 @@
 part of 'food.dart';
 
 class _AddCustomFoodFAB extends ControlledWidget<FoodController> {
-  const _AddCustomFoodFAB({required this.closeView});
+  final NutritionCategory? category;
+
+  const _AddCustomFoodFAB({required this.closeView, this.category});
 
   final void Function() closeView;
 
@@ -13,7 +15,7 @@ class _AddCustomFoodFAB extends ControlledWidget<FoodController> {
       onPressed: () {
         closeView();
         SchedulerBinding.instance.addPostFrameCallback((_) {
-          controller.showAddCustomFoodView();
+          controller.showAddCustomFoodView(category: category);
         });
       },
     );
@@ -33,7 +35,7 @@ class _SearchFoodWithMacros extends ControlledWidget<FoodController> {
 
     final subtitlePieces = [
       if (food.brand != null) food.brand,
-      food.unit.formatAmount(food.amount, food.pieces),
+      food.unit.formatAmount(food.amount, pieces: food.pieces),
     ];
 
     var color = GTMaterialColor.primary;

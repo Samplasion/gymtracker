@@ -18,13 +18,77 @@
 ///         License:   SIL (https://github.com/FortAwesome/Font-Awesome/blob/master/LICENSE.txt)
 ///         Homepage:  http://fortawesome.github.com/Font-Awesome/
 ///
+// ignore_for_file: non_constant_identifier_names
+
 import 'package:flutter/material.dart';
+
+class CompoundIcon extends StatelessWidget {
+  final IconData main;
+  final IconData accessory;
+  final double mainSize;
+  final double accessorySize;
+  final double holeSize;
+
+  const CompoundIcon({
+    super.key,
+    required this.main,
+    required this.accessory,
+    this.mainSize = 24,
+    this.accessorySize = 12,
+    this.holeSize = 0.7,
+  });
+
+  const CompoundIcon.sized({
+    super.key,
+    required this.main,
+    required this.accessory,
+    double size = 24,
+    this.holeSize = 0.7,
+  })  : mainSize = size,
+        accessorySize = size * 0.7;
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      children: [
+        ShaderMask(
+          shaderCallback: (Rect bounds) {
+            return RadialGradient(
+              center: AlignmentDirectional.bottomEnd
+                  .resolve(Directionality.of(context)),
+              // radius: 0.37,
+              radius: 1,
+              colors: [
+                Colors.white.withAlpha(0),
+                Colors.white,
+              ],
+              stops: [holeSize, holeSize],
+              tileMode: TileMode.clamp,
+            ).createShader(bounds);
+          },
+          child: Padding(
+            padding: const EdgeInsetsDirectional.fromSTEB(0, 0, 4, 4),
+            child: Icon(main, size: mainSize),
+          ),
+        ),
+        Positioned.directional(
+          textDirection: Directionality.of(context),
+          bottom: 0,
+          end: -2,
+          child: Icon(accessory, size: accessorySize),
+        ),
+      ],
+    );
+  }
+}
 
 class GymTrackerIcons {
   GymTrackerIcons._();
 
   static const _kFontFam = 'GymTracker';
   static const String? _kFontPkg = null;
+
+  static const compound = _GymTrackerCompoundIcons();
 
   static const IconData _fire =
       IconData(0xf06d, fontFamily: _kFontFam, fontPackage: _kFontPkg);
@@ -71,6 +135,7 @@ class GymTrackerIcons {
   static const IconData folder_open = Icons.folder_open_rounded;
   static const IconData folder_root = Icons.home_rounded;
   static const IconData food = Icons.fastfood_rounded;
+  static const IconData food_categories = Icons.local_dining_rounded;
   static const IconData gallery = Icons.photo_library_rounded;
   static const IconData help = Icons.help_rounded;
   static const IconData highlight = Icons.highlight_rounded;
@@ -125,4 +190,13 @@ class GymTrackerIcons {
   static const IconData weight_flat = Icons.trending_flat_rounded;
   static const IconData weight_up = Icons.trending_up_rounded;
   static const IconData workout = Icons.fitness_center_rounded;
+}
+
+class _GymTrackerCompoundIcons {
+  const _GymTrackerCompoundIcons();
+
+  Widget get add_food_category => const CompoundIcon.sized(
+        main: GymTrackerIcons.food_categories,
+        accessory: Icons.add_rounded,
+      );
 }

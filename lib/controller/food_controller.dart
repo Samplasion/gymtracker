@@ -25,6 +25,7 @@ import 'package:openfoodfacts/openfoodfacts.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:relative_time/relative_time.dart';
 import 'package:rxdart/rxdart.dart';
+import 'package:scrollable_clean_calendar/utils/extensions.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 typedef _Permissions = ({bool camera, bool gallery});
@@ -44,6 +45,9 @@ class FoodController extends GetxController with ServiceableController {
   );
   final customBarcodes$ = BehaviorSubject<Map<String, Food>>.seeded({});
   final favorites$ = BehaviorSubject<List<Food>>.seeded([]);
+  final categories$ =
+      BehaviorSubject<DateSequence<Map<String, NutritionCategory>>>.seeded(
+          DateSequence.empty());
   final permission$ = BehaviorSubject<_Permissions>.seeded((
     camera: false,
     gallery: false,
@@ -79,6 +83,13 @@ class FoodController extends GetxController with ServiceableController {
 
   String get decimalSeparator =>
       NumberFormat.decimalPattern(Get.locale?.languageCode).symbols.DECIMAL_SEP;
+
+  bool get canUpdateCategories {
+    return day$.value.isAfterOrAtSameMomentAs(DateTime.now()
+            .startOfDay) /*  &&
+        foods$.value.where((food) => food.date.isSameDay(day$.value)).isEmpty */
+        ;
+  }
 
   final showSettingsTileStream = BehaviorSubject<bool>.seeded(true);
   material.Widget get settingsTile {
@@ -152,6 +163,11 @@ class FoodController extends GetxController with ServiceableController {
       ..pipe(customBarcodes$)
       ..listen((foods) {
         logger.d("Custom barcode foods updated with ${foods.length} items");
+      });
+    service.nutritionCategories$
+      ..pipe(categories$)
+      ..listen((categories) {
+        logger.d("Categories updated with ${categories.length} items");
       });
     permission$
         .map((t) => !(t.camera && t.gallery))
@@ -292,10 +308,10 @@ class FoodController extends GetxController with ServiceableController {
     }
   }
 
-  void showAddCustomFoodView() {
+  void showAddCustomFoodView({NutritionCategory? category}) {
     Go.to(() => const CustomAddFoodView()).then((value) {
       if (value != null) {
-        addFood(day$.value, value);
+        addFood(day$.value, value, category: category);
       }
     });
   }
@@ -491,11 +507,12 @@ class FoodController extends GetxController with ServiceableController {
     }
   }
 
-  void addFood(DateTime dateTime, Food food) {
+  void addFood(DateTime dateTime, Food food, {NutritionCategory? category}) {
     service.addFood(DateTagged(
       date: dateTime.startOfDay,
       value: food.copyWith(
         id: DateTime.now().millisecondsSinceEpoch.toString(),
+        category: category?.name,
       ),
     ));
   }
@@ -544,14 +561,15 @@ class FoodController extends GetxController with ServiceableController {
     day$.add(day$.value.add(const Duration(days: 1)));
   }
 
-  void showSearchResultsView(String query) async {
+  void showSearchResultsView(String query,
+      {NutritionCategory? category}) async {
     final future = search(query);
     final food =
         await Go.to<VagueFood?>(() => SearchResultsView(foods: future));
     if (food != null) {
       showAddFoodView(food).then((value) {
         if (value != null) {
-          addFood(day$.value, value);
+          addFood(day$.value, value, category: category);
         }
       });
     }
@@ -591,6 +609,13 @@ class FoodController extends GetxController with ServiceableController {
     return goals[date];
   }
 
+  Map<String, NutritionCategory> getCategories() {
+    final date = day$.value.startOfDay;
+    final categories = categories$.value;
+    if (categories.isEmpty) return {};
+    return categories[date];
+  }
+
   bool canOpenOffPage(VagueFood food) => food.url != null;
   void openOffPage(VagueFood food) {
     final url = food.url;
@@ -627,6 +652,14 @@ class FoodController extends GetxController with ServiceableController {
   DateRange? getDateRange() {
     if (goals$.value.isEmpty) return null;
     final date = goals$.value.surroundingDates(day$.value);
+    return date.copyWith(
+      from: Some(day$.value),
+    );
+  }
+
+  DateRange? getDateRangeForCategories() {
+    if (categories$.value.isEmpty) return null;
+    final date = categories$.value.surroundingDates(day$.value);
     return date.copyWith(
       from: Some(day$.value),
     );
@@ -679,6 +712,80 @@ class FoodController extends GetxController with ServiceableController {
     addFood(today, foodCopy);
     Get.back();
     setDate(today);
+  }
+
+  void addCategory(NutritionCategory category) {
+    final date = day$.value;
+    if (categories$.value.isNotEmpty &&
+        categories$.value[date.startOfDay].containsKey(category.name)) {
+      throw StateError("Category already exists");
+    }
+    service.setNutritionCategoriesForDay(
+      date.startOfDay,
+      {
+        ...(categories$.value.isEmpty
+            ? {}
+            : categories$.value[date.startOfDay]),
+        category.name: category
+      },
+    );
+  }
+
+  void removeCategory(NutritionCategory category) {
+    final date = day$.value;
+    service.setNutritionCategoriesForDay(
+      date.startOfDay,
+      {
+        for (final entry in categories$.value[date.startOfDay].entries)
+          if (entry.key != category.name) entry.key: entry.value
+      },
+    );
+  }
+
+  Future<NutritionCategory?> showAddCategoryView() {
+    return Go.to(() => const FoodCategoryEditorView.clean());
+  }
+
+  bool isUniqueCategoryName(String value) {
+    if (categories$.value.isEmpty) return true;
+    return !categories$.value[day$.value.startOfDay].containsKey(value);
+  }
+
+  Future<void> editCategory(String oldName, NutritionCategory category) async {
+    final cat = await Go.to(() => FoodCategoryEditorView.edit(category));
+    if (cat != null) {
+      final date = day$.value;
+      service.setNutritionCategoriesForDay(
+        date.startOfDay,
+        {
+          for (final entry in categories$.value[date.startOfDay].entries)
+            if (entry.key != oldName) entry.key: entry.value else cat.name: cat
+        },
+      );
+    }
+  }
+
+  List<Food> getFoodsForCategory(NutritionCategory category) {
+    return getFoods().where((food) => food.category == category.name).toList();
+  }
+
+  List<Food> getUnassignedFoods() {
+    final categories = getCategories();
+    final names = categories.keys.toSet();
+    return getFoods()
+        .where(
+            (food) => food.category == null || !names.contains(food.category))
+        .toList();
+  }
+
+  Iterable<Food> getFoods() {
+    return foods$.value
+        .where((element) => element.date.isSameDay(day$.value))
+        .map((e) => e.value);
+  }
+
+  void showCategoryFoodsView(NutritionCategory category) {
+    Go.to(() => FoodCategoryFoodsView(category: category));
   }
 }
 

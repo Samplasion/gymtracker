@@ -4057,6 +4057,200 @@ class FavoriteFoodsCompanion extends UpdateCompanion<FavoriteFood> {
   }
 }
 
+class $NutritionCategoriesTable extends NutritionCategories
+    with TableInfo<$NutritionCategoriesTable, DBNutritionCategory> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $NutritionCategoriesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _referenceDateMeta =
+      const VerificationMeta('referenceDate');
+  @override
+  late final GeneratedColumn<DateTime> referenceDate =
+      GeneratedColumn<DateTime>('reference_date', aliasedName, false,
+          type: DriftSqlType.dateTime, requiredDuringInsert: true);
+  static const VerificationMeta _jsonDataMeta =
+      const VerificationMeta('jsonData');
+  @override
+  late final GeneratedColumn<String> jsonData = GeneratedColumn<String>(
+      'json_data', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  @override
+  List<GeneratedColumn> get $columns => [referenceDate, jsonData];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'nutrition_categories';
+  @override
+  VerificationContext validateIntegrity(
+      Insertable<DBNutritionCategory> instance,
+      {bool isInserting = false}) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('reference_date')) {
+      context.handle(
+          _referenceDateMeta,
+          referenceDate.isAcceptableOrUnknown(
+              data['reference_date']!, _referenceDateMeta));
+    } else if (isInserting) {
+      context.missing(_referenceDateMeta);
+    }
+    if (data.containsKey('json_data')) {
+      context.handle(_jsonDataMeta,
+          jsonData.isAcceptableOrUnknown(data['json_data']!, _jsonDataMeta));
+    } else if (isInserting) {
+      context.missing(_jsonDataMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => const {};
+  @override
+  DBNutritionCategory map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return DBNutritionCategory(
+      referenceDate: attachedDatabase.typeMapping.read(
+          DriftSqlType.dateTime, data['${effectivePrefix}reference_date'])!,
+      jsonData: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}json_data'])!,
+    );
+  }
+
+  @override
+  $NutritionCategoriesTable createAlias(String alias) {
+    return $NutritionCategoriesTable(attachedDatabase, alias);
+  }
+}
+
+class DBNutritionCategory extends DataClass
+    implements Insertable<DBNutritionCategory> {
+  final DateTime referenceDate;
+  final String jsonData;
+  const DBNutritionCategory(
+      {required this.referenceDate, required this.jsonData});
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['reference_date'] = Variable<DateTime>(referenceDate);
+    map['json_data'] = Variable<String>(jsonData);
+    return map;
+  }
+
+  NutritionCategoriesCompanion toCompanion(bool nullToAbsent) {
+    return NutritionCategoriesCompanion(
+      referenceDate: Value(referenceDate),
+      jsonData: Value(jsonData),
+    );
+  }
+
+  factory DBNutritionCategory.fromJson(Map<String, dynamic> json,
+      {ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return DBNutritionCategory(
+      referenceDate: serializer.fromJson<DateTime>(json['referenceDate']),
+      jsonData: serializer.fromJson<String>(json['jsonData']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'referenceDate': serializer.toJson<DateTime>(referenceDate),
+      'jsonData': serializer.toJson<String>(jsonData),
+    };
+  }
+
+  DBNutritionCategory copyWith({DateTime? referenceDate, String? jsonData}) =>
+      DBNutritionCategory(
+        referenceDate: referenceDate ?? this.referenceDate,
+        jsonData: jsonData ?? this.jsonData,
+      );
+  @override
+  String toString() {
+    return (StringBuffer('DBNutritionCategory(')
+          ..write('referenceDate: $referenceDate, ')
+          ..write('jsonData: $jsonData')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(referenceDate, jsonData);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is DBNutritionCategory &&
+          other.referenceDate == this.referenceDate &&
+          other.jsonData == this.jsonData);
+}
+
+class NutritionCategoriesCompanion
+    extends UpdateCompanion<DBNutritionCategory> {
+  final Value<DateTime> referenceDate;
+  final Value<String> jsonData;
+  final Value<int> rowid;
+  const NutritionCategoriesCompanion({
+    this.referenceDate = const Value.absent(),
+    this.jsonData = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  NutritionCategoriesCompanion.insert({
+    required DateTime referenceDate,
+    required String jsonData,
+    this.rowid = const Value.absent(),
+  })  : referenceDate = Value(referenceDate),
+        jsonData = Value(jsonData);
+  static Insertable<DBNutritionCategory> custom({
+    Expression<DateTime>? referenceDate,
+    Expression<String>? jsonData,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (referenceDate != null) 'reference_date': referenceDate,
+      if (jsonData != null) 'json_data': jsonData,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  NutritionCategoriesCompanion copyWith(
+      {Value<DateTime>? referenceDate,
+      Value<String>? jsonData,
+      Value<int>? rowid}) {
+    return NutritionCategoriesCompanion(
+      referenceDate: referenceDate ?? this.referenceDate,
+      jsonData: jsonData ?? this.jsonData,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (referenceDate.present) {
+      map['reference_date'] = Variable<DateTime>(referenceDate.value);
+    }
+    if (jsonData.present) {
+      map['json_data'] = Variable<String>(jsonData.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('NutritionCategoriesCompanion(')
+          ..write('referenceDate: $referenceDate, ')
+          ..write('jsonData: $jsonData, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$GTDatabase extends GeneratedDatabase {
   _$GTDatabase(QueryExecutor e) : super(e);
   _$GTDatabaseManager get managers => _$GTDatabaseManager(this);
@@ -4079,6 +4273,8 @@ abstract class _$GTDatabase extends GeneratedDatabase {
   late final $CustomBarcodeFoodsTable customBarcodeFoods =
       $CustomBarcodeFoodsTable(this);
   late final $FavoriteFoodsTable favoriteFoods = $FavoriteFoodsTable(this);
+  late final $NutritionCategoriesTable nutritionCategories =
+      $NutritionCategoriesTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -4096,7 +4292,8 @@ abstract class _$GTDatabase extends GeneratedDatabase {
         foods,
         nutritionGoals,
         customBarcodeFoods,
-        favoriteFoods
+        favoriteFoods,
+        nutritionCategories
       ];
 }
 
@@ -5499,6 +5696,103 @@ class $$FavoriteFoodsTableOrderingComposer
   }
 }
 
+typedef $$NutritionCategoriesTableInsertCompanionBuilder
+    = NutritionCategoriesCompanion Function({
+  required DateTime referenceDate,
+  required String jsonData,
+  Value<int> rowid,
+});
+typedef $$NutritionCategoriesTableUpdateCompanionBuilder
+    = NutritionCategoriesCompanion Function({
+  Value<DateTime> referenceDate,
+  Value<String> jsonData,
+  Value<int> rowid,
+});
+
+class $$NutritionCategoriesTableTableManager extends RootTableManager<
+    _$GTDatabase,
+    $NutritionCategoriesTable,
+    DBNutritionCategory,
+    $$NutritionCategoriesTableFilterComposer,
+    $$NutritionCategoriesTableOrderingComposer,
+    $$NutritionCategoriesTableProcessedTableManager,
+    $$NutritionCategoriesTableInsertCompanionBuilder,
+    $$NutritionCategoriesTableUpdateCompanionBuilder> {
+  $$NutritionCategoriesTableTableManager(
+      _$GTDatabase db, $NutritionCategoriesTable table)
+      : super(TableManagerState(
+          db: db,
+          table: table,
+          filteringComposer: $$NutritionCategoriesTableFilterComposer(
+              ComposerState(db, table)),
+          orderingComposer: $$NutritionCategoriesTableOrderingComposer(
+              ComposerState(db, table)),
+          getChildManagerBuilder: (p) =>
+              $$NutritionCategoriesTableProcessedTableManager(p),
+          getUpdateCompanionBuilder: ({
+            Value<DateTime> referenceDate = const Value.absent(),
+            Value<String> jsonData = const Value.absent(),
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              NutritionCategoriesCompanion(
+            referenceDate: referenceDate,
+            jsonData: jsonData,
+            rowid: rowid,
+          ),
+          getInsertCompanionBuilder: ({
+            required DateTime referenceDate,
+            required String jsonData,
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              NutritionCategoriesCompanion.insert(
+            referenceDate: referenceDate,
+            jsonData: jsonData,
+            rowid: rowid,
+          ),
+        ));
+}
+
+class $$NutritionCategoriesTableProcessedTableManager
+    extends ProcessedTableManager<
+        _$GTDatabase,
+        $NutritionCategoriesTable,
+        DBNutritionCategory,
+        $$NutritionCategoriesTableFilterComposer,
+        $$NutritionCategoriesTableOrderingComposer,
+        $$NutritionCategoriesTableProcessedTableManager,
+        $$NutritionCategoriesTableInsertCompanionBuilder,
+        $$NutritionCategoriesTableUpdateCompanionBuilder> {
+  $$NutritionCategoriesTableProcessedTableManager(super.$state);
+}
+
+class $$NutritionCategoriesTableFilterComposer
+    extends FilterComposer<_$GTDatabase, $NutritionCategoriesTable> {
+  $$NutritionCategoriesTableFilterComposer(super.$state);
+  ColumnFilters<DateTime> get referenceDate => $state.composableBuilder(
+      column: $state.table.referenceDate,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+
+  ColumnFilters<String> get jsonData => $state.composableBuilder(
+      column: $state.table.jsonData,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+}
+
+class $$NutritionCategoriesTableOrderingComposer
+    extends OrderingComposer<_$GTDatabase, $NutritionCategoriesTable> {
+  $$NutritionCategoriesTableOrderingComposer(super.$state);
+  ColumnOrderings<DateTime> get referenceDate => $state.composableBuilder(
+      column: $state.table.referenceDate,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  ColumnOrderings<String> get jsonData => $state.composableBuilder(
+      column: $state.table.jsonData,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+}
+
 class _$GTDatabaseManager {
   final _$GTDatabase _db;
   _$GTDatabaseManager(this._db);
@@ -5522,4 +5816,6 @@ class _$GTDatabaseManager {
       $$CustomBarcodeFoodsTableTableManager(_db, _db.customBarcodeFoods);
   $$FavoriteFoodsTableTableManager get favoriteFoods =>
       $$FavoriteFoodsTableTableManager(_db, _db.favoriteFoods);
+  $$NutritionCategoriesTableTableManager get nutritionCategories =>
+      $$NutritionCategoriesTableTableManager(_db, _db.nutritionCategories);
 }

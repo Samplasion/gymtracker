@@ -12,6 +12,7 @@ import 'package:gymtracker/db/model/tables/exercise.dart';
 import 'package:gymtracker/db/model/tables/foods.dart';
 import 'package:gymtracker/db/model/tables/history.dart';
 import 'package:gymtracker/db/model/tables/measurements.dart';
+import 'package:gymtracker/db/model/tables/nutrition_categories.dart';
 import 'package:gymtracker/db/model/tables/nutrition_goals.dart';
 import 'package:gymtracker/db/model/tables/ongoing.dart';
 import 'package:gymtracker/db/model/tables/preferences.dart';
@@ -43,7 +44,7 @@ part 'database.g.dart';
 // Used in the generated code
 const _uuid = Uuid();
 
-const DATABASE_VERSION = 7;
+const DATABASE_VERSION = 8;
 
 @DriftDatabase(tables: [
   CustomExercises,
@@ -59,6 +60,7 @@ const DATABASE_VERSION = 7;
   NutritionGoals,
   CustomBarcodeFoods,
   FavoriteFoods,
+  NutritionCategories,
 ])
 class GTDatabase extends _$GTDatabase {
   GTDatabase.prod() : super(_openConnection());
@@ -119,6 +121,9 @@ class GTDatabase extends _$GTDatabase {
                 await m.createTable(schema.customBarcodeFoods);
                 await m.createTable(schema.favoriteFoods);
               },
+              from7To8: (m, schema) async {
+                await m.createTable(schema.nutritionCategories);
+              },
             ),
           );
 
@@ -139,6 +144,15 @@ class GTDatabase extends _$GTDatabase {
               date: DateTime.now(),
               value: model_nutrition.NutritionGoal.defaultGoal,
             ).toInsertable());
+          }
+
+          final nutritionCategoriesCount =
+              await (select(nutritionCategories)).get();
+          if (nutritionCategoriesCount.isEmpty) {
+            await into(nutritionCategories).insert(NutritionCategoriesCompanion(
+              referenceDate: Value(DateTime.now()),
+              jsonData: Value(jsonEncode({})),
+            ));
           }
 
           if (kDebugMode) {
@@ -630,6 +644,53 @@ class GTDatabase extends _$GTDatabase {
         for (final id in ids) {
           batch.insert(
               favoriteFoods, FavoriteFoodsCompanion(foodId: Value(id)));
+        }
+      });
+    });
+  }
+
+  Stream<Map<DateTime, Map<String, model.NutritionCategory>>>
+      watchNutritionCategories() {
+    return select(nutritionCategories).watch().map((categories) {
+      return {
+        for (final category in categories)
+          category.referenceDate: Map.fromEntries(
+              (jsonDecode(category.jsonData) as List)
+                  .map((e) => model.NutritionCategory.fromJson(e))
+                  .map((c) => MapEntry(c.name, c))),
+      };
+    });
+  }
+
+  Future<void> insertNutritionCategories(
+      DateTime date, Map<String, model.NutritionCategory> categories) {
+    return into(nutritionCategories).insert(NutritionCategoriesCompanion(
+      referenceDate: Value(date),
+      jsonData:
+          Value(jsonEncode(categories.values.map((e) => e.toJson()).toList())),
+    ));
+  }
+
+  Future<void> deleteNutritionCategories(DateTime date) {
+    return (delete(nutritionCategories)
+          ..where((tbl) => tbl.referenceDate.equals(date)))
+        .go();
+  }
+
+  Future<void> setNutritionCategories(
+      Map<DateTime, Map<String, model.NutritionCategory>> categories) {
+    return transaction(() async {
+      await delete(nutritionCategories).go();
+      await batch((batch) {
+        for (final entry in categories.entries) {
+          batch.insert(
+            nutritionCategories,
+            NutritionCategoriesCompanion(
+              referenceDate: Value(entry.key),
+              jsonData: Value(jsonEncode(
+                  entry.value.values.map((e) => e.toJson()).toList())),
+            ),
+          );
         }
       });
     });

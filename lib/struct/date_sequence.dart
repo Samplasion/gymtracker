@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:gymtracker/struct/optional.dart';
 import 'package:gymtracker/utils/extensions.dart';
 
@@ -78,7 +79,10 @@ class DateRange {
 class DateSequence<T> {
   final Map<DateTime, DateTagged<T>> _map;
 
-  DateSequence._(this._map);
+  const DateSequence._(this._map);
+
+  /// Creates an empty date sequence.
+  factory DateSequence.empty() => const DateSequence._({});
 
   /// Creates a date sequence from a list of date-tagged values.
   ///
@@ -92,12 +96,12 @@ class DateSequence<T> {
 
   /// Creates a date sequence from a list of dates and values.
   ///
-  /// If a date appears multiple times, the last value is kept.
+  /// If a date appears multiple times, the **first** value is kept.
   /// Null values are ignored.
   factory DateSequence.fromDatesAndValues(
     Map<DateTime, T> values,
   ) {
-    final keys = values.keys.toList()..sort();
+    final keys = (values.keys.toList()..sort()).reversed;
     final map = <DateTime, DateTagged<T>>{
       for (final key in keys)
         if (values[key] != null)
@@ -117,18 +121,37 @@ class DateSequence<T> {
     final lastIndices = <DateTime, int>{
       for (var i = 0; i < list.length; i++) list[i].date: i,
     };
-    list.sort((a, b) => a.date.compareTo(b.date));
+    // list.sort((a, b) => a.date.compareTo(b.date));
+    bool equality(DateTagged<T> a, DateTagged<T> b) {
+      if (a.value is List) {
+        // print((
+        //   a,
+        //   b,
+        //   const ListEquality().equals(a.value as List, b.value as List)
+        // ));
+        return const ListEquality().equals(a.value as List, b.value as List);
+      } else if (a.value is Map) {
+        // print(
+        //     (a, b, const MapEquality().equals(a.value as Map, b.value as Map)));
+        return const MapEquality().equals(a.value as Map, b.value as Map);
+      }
+      return a.value == b.value;
+    }
+
     for (var i = 0; i < list.length; i++) {
       if (i == 0) {
         normalized.add(list[i]);
         continue;
       }
-      if (list[i].value != list[i - 1].value) {
-        normalized.add(list[i]);
+      print((i - 1, i, equality(list[i], list[i - 1])));
+      if (equality(list[i], list[i - 1])) {
+        // normalized[normalized.length - 1] = rawList[lastIndices[list[i].date]!];
+        normalized[normalized.length - 1] = list[i];
       } else {
-        normalized[normalized.length - 1] = list[lastIndices[list[i].date]!];
+        normalized.add(list[i]);
       }
     }
+    print("$rawList\n$list\n$lastIndices\n$normalized");
     return DateSequence.fromList(normalized);
   }
 
@@ -201,7 +224,7 @@ class DateSequence<T> {
       return DateRange._(from: keys.last, to: null);
     } else {
       for (var i = 0; i < keys.length - 1; i++) {
-        if (keys[i].isBefore(key) && keys[i + 1].isAfterOrAtSameMomentAs(key)) {
+        if (keys[i].isBeforeOrAtSameMomentAs(key) && keys[i + 1].isAfter(key)) {
           return DateRange._(from: keys[i], to: keys[i + 1]);
         }
       }
@@ -217,4 +240,9 @@ class DateSequence<T> {
 
   /// Returns the keys in the sequence.
   Iterable<DateTime> get keys => _map.keys.toList()..sort();
+
+  /// Returns a map representation of the sequence.
+  Map<DateTime, T> toMap() => {
+        for (final entry in _map.entries) entry.key: entry.value.value,
+      };
 }

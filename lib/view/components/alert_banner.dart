@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gymtracker/icons/gymtracker_icons.dart';
+import 'package:gymtracker/utils/colors.dart';
 import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/utils/theme.dart';
 
@@ -59,8 +60,11 @@ class AlertBanner extends StatelessWidget {
   })  : assert((text == null) != (textBuilder == null),
             "Either text or textBuilder must be null, but not both"),
         assert(
-          color == null || (color is AlertColor || color is MaterialColor),
-          "color must be either a MaterialColor or an AlertColor. You provided: ${color.runtimeType}",
+          color == null ||
+              (color is AlertColor ||
+                  color is MaterialColor ||
+                  color is GTMaterialColor),
+          "color must be either a MaterialColor, an AlertColor, or a GTMaterialColor. You provided: ${color.runtimeType}",
         ),
         _color = color;
 
@@ -72,14 +76,18 @@ class AlertBanner extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final primary = context.colorScheme.primary;
-    final color = _color == null
-        ? AlertColor.fromMaterialColor(context,
-            HarmonizedMaterialColor(Colors.blue).harmonizeWith(primary))
-        : _color is MaterialColor
-            ? AlertColor.fromMaterialColor(
-                context, (_color as MaterialColor).harmonizeWith(primary))
-            : _color as AlertColor;
+    final scheme = context.colorScheme;
+    final AlertColor color = _color == null
+        ? AlertColor(
+            scheme.primaryContainer,
+            scheme.onPrimaryContainer,
+          )
+        : _color is GTMaterialColor
+            ? AlertColor(
+                _color.getBackground(context), _color.getForeground(context))
+            : _color is MaterialColor
+                ? AlertColor.fromMaterialColor(context, _color)
+                : _color;
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: Container(

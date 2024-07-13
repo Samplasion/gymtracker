@@ -40,6 +40,9 @@ class DatabaseService extends GetxService with ChangeNotifier {
   ]);
   final customBarcodeFoods$ = BehaviorSubject<Map<String, Food>>.seeded({});
   final favoriteFoods$ = BehaviorSubject<List<Food>>.seeded([]);
+  final nutritionCategories$ =
+      BehaviorSubject<DateSequence<Map<String, NutritionCategory>>>.seeded(
+          DateSequence.empty());
 
   writeSettings(Prefs prefs) {
     db.setPreferences(prefs);
@@ -101,6 +104,11 @@ class DatabaseService extends GetxService with ChangeNotifier {
     db.watchFavoriteFoods()
       ..pipe(favoriteFoods$)
       ..listen((_) => onServiceChange("favorite foods")());
+    db
+        .watchNutritionCategories()
+        .map((event) => DateSequence.fromDatesAndValues(event).normalize())
+      ..pipe(nutritionCategories$)
+      ..listen((_) => onServiceChange("nutrition categories")());
   }
 
   @visibleForTesting
@@ -370,6 +378,15 @@ class DatabaseService extends GetxService with ChangeNotifier {
     db.deleteFavoriteFood(food.id!);
   }
 
+  void setNutritionCategoriesForDay(
+      DateTime date, Map<String, NutritionCategory> map) async {
+    final values = nutritionCategories$.value.toMap();
+    db.setNutritionCategories(DateSequence.fromDatesAndValues({
+      ...values,
+      date.startOfDay: map,
+    }).normalize().toMap());
+  }
+
   toJson() {
     final converter = getConverter(DATABASE_VERSION);
 
@@ -387,6 +404,9 @@ class DatabaseService extends GetxService with ChangeNotifier {
       customBarcodeFoods: customBarcodeFoods$.value,
       favoriteFoods:
           favoriteFoods$.value.map((f) => f.id).whereNotNull().toList(),
+      foodCategories: Map.fromEntries(nutritionCategories$.value.map((map) {
+        return MapEntry(map.date, map.value.values.toList());
+      })),
     ));
   }
 
@@ -425,6 +445,11 @@ class DatabaseService extends GetxService with ChangeNotifier {
         await db.setNutritionGoals(snapshot.nutritionGoals);
         await db.setCustomBarcodeFoods(snapshot.customBarcodeFoods);
         await db.setFavoriteFoods(snapshot.favoriteFoods);
+        await db.setNutritionCategories({
+          for (final entry in snapshot.foodCategories.entries)
+            entry.key:
+                Map.fromEntries(entry.value.map((e) => MapEntry(e.name, e))),
+        });
       });
     }
 

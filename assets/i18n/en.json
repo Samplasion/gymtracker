@@ -1900,6 +1900,45 @@
       "zm": "Zambia",
       "zw": "Zimbabwe",
       "world": "World"
+    },
+    "categoryList": {
+      "dailyPercentage": "@percentage% of daily total – @calories",
+      "empty": "You haven't set up any categories",
+      "unmodifiable": {
+        "title": "Unable to edit",
+        "text": "You can only edit categories on days on or after today's date"
+      },
+      "title": "Categories",
+      "add": "Add"
+    },
+    "categoryEditor": {
+      "title": {
+        "add": "Add category",
+        "edit": "Edit category"
+      },
+      "name": "Name",
+      "dailyPercentage": "Daily percentage",
+      "fields": {
+        "name": {
+          "errors": {
+            "empty": "The name must not be empty.",
+            "unique": "There is already a category with this name."
+          }
+        }
+      },
+      "save": "Save",
+      "icon": "Icon",
+      "effect": {
+        "from": "Any change will take effect from @from onward.",
+        "range": "Any change will take effect from @from to @to.",
+        "title": "Category effect range"
+      },
+      "nonFulfillingSum": {
+        "title": "The sum doesn't equal 100%"
+      }
+    },
+    "categoryFoods": {
+      "empty": "You haven't added foods to this category yet."
     }
   }
 }

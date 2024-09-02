@@ -58,17 +58,22 @@ class HistoryController extends GetxController with ServiceableController {
   }
 
   void computeStreaks() {
-    if (Get.context == null) {
-      logger.w("[computeStreaks] Context is null, ignoring.");
+    try {
+      if (Get.context == null) {
+        logger.w("[computeStreaks] Context is null, ignoring.");
+        return;
+      }
+
+      streaks(Streaks.fromMappedDays(
+        workoutsByDay,
+        firstDayOfWeek: GTLocalizations.firstDayOfWeekFor(Get.context!),
+        today: DateTime.now(),
+      ));
+
+      logger.i("Recomputed streaks: $streaks");
+    } catch (e, s) {
+      logger.e("Error computing streaks", error: e, stackTrace: s);
     }
-
-    streaks(Streaks.fromMappedDays(
-      workoutsByDay,
-      firstDayOfWeek: GTLocalizations.firstDayOfWeekFor(Get.context!),
-      today: DateTime.now(),
-    ));
-
-    logger.i("Recomputed streaks: $streaks");
   }
 
   Future<void> deleteWorkout(Workout workout) async {

@@ -37,7 +37,7 @@ class RoutinesView extends StatefulWidget {
 const _kFakeRoutineSeed = 2001;
 
 class _RoutinesViewState extends State<RoutinesView> with _RoutineList {
-  RoutinesController get controller => Get.put(RoutinesController());
+  RoutinesController get controller => Get.find<RoutinesController>();
   int selectedIndex = 0;
 
   List<({int occurrences, Workout routine})> get fakeSuggested => List.generate(

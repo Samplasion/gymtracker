@@ -52,6 +52,7 @@ class Coordinator extends GetxController with ServiceableController {
     Get.put(DebugController());
     Get.put(NotificationsService());
     Get.put(NotificationController());
+    Get.put(RoutinesController());
     Get.put(HistoryController());
     Get.put(CountdownController());
     Get.put(ExercisesController());

@@ -500,7 +500,7 @@ class OngoingWorkoutBar extends StatelessWidget {
 
   const OngoingWorkoutBar({required this.open, super.key});
 
-  RoutinesController get controller => Get.put(RoutinesController());
+  RoutinesController get controller => Get.find<RoutinesController>();
 
   static const defaultHeight = 64.0;
 

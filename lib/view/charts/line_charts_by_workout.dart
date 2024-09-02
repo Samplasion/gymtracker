@@ -12,6 +12,7 @@ import 'package:gymtracker/icons/gymtracker_icons.dart';
 import 'package:gymtracker/model/exercise.dart';
 import 'package:gymtracker/model/workout.dart';
 import 'package:gymtracker/service/localizations.dart';
+import 'package:gymtracker/service/logger.dart';
 import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/utils/theme.dart';
@@ -599,18 +600,23 @@ typedef _ExerciseHistoryChartChild = (Workout, Exercise);
 class ExerciseHistoryChart extends StatefulWidget {
   const ExerciseHistoryChart({
     required this.children,
+    required this.ongoing,
     super.key,
   });
 
   // ignore: library_private_types_in_public_api
   final List<_ExerciseHistoryChartChild> children;
 
+  // ignore: library_private_types_in_public_api
+  final _ExerciseHistoryChartChild? ongoing;
+
   @override
   State<ExerciseHistoryChart> createState() => _ExerciseHistoryChartState();
 
   // ignore: library_private_types_in_public_api
-  static shouldShow(List<_ExerciseHistoryChartChild> exercises) {
-    return exercises.length >= 2 && _calculateTypes(exercises).types.isNotEmpty;
+  static shouldShow(List<_ExerciseHistoryChartChild> exercises, bool ongoing) {
+    return exercises.length >= (ongoing ? 1 : 2) &&
+        _calculateTypes(exercises).types.isNotEmpty;
   }
 }
 
@@ -632,8 +638,11 @@ class _ExerciseHistoryChartState
   @override
   void initState() {
     super.initState();
-    final (types: availableTypes, values: values) =
-        _calculateTypes(widget.children);
+
+    widget.ongoing?.$2.logger.i("");
+
+    final (types: availableTypes, values: values) = _calculateTypes(
+        [...widget.children, if (widget.ongoing != null) widget.ongoing!]);
     this.values = values;
     this.availableTypes = availableTypes;
   }
@@ -677,13 +686,23 @@ class _ExerciseHistoryChartState
           .entries
           .where((element) => availableTypes.contains(element.key))
           .toMap(),
-      data: values,
+      data: {
+        for (final entry in values.entries)
+          entry.key: entry.value.take(widget.children.length).toList(),
+      },
+      predictedData: {
+        for (final entry in values.entries)
+          entry.key: entry.value.skip(widget.children.length).toList(),
+      },
       currentValueBuilder: (type, index, point, isPredicted) {
         final style = Theme.of(context).textTheme.bodyLarge!.copyWith(
               fontWeight: FontWeight.bold,
               color:
                   isPredicted ? Theme.of(context).colorScheme.quaternary : null,
             );
+        final date = isPredicted
+            ? widget.ongoing!.$1.startingDate!
+            : widget.children[index].$1.startingDate!;
         return TimerView.buildTimeString(
           context,
           Duration(seconds: point.value.toInt()),
@@ -700,19 +719,23 @@ class _ExerciseHistoryChartState
                 ),
                 const TextSpan(text: " "),
                 TextSpan(
-                  text: DateFormat.yMd(context.locale.languageCode)
-                      .format(widget.children[index].$1.startingDate!),
+                  text:
+                      DateFormat.yMd(context.locale.languageCode).format(date),
                   style: TextStyle(
                     color: Theme.of(context).colorScheme.primary,
                     decoration: TextDecoration.underline,
                   ),
                   recognizer: dateRecognizer
                     ..onTap = () {
-                      Go.to(
-                        () => ExercisesView(
-                            workout: Get.find<HistoryController>()
-                                .getByID(widget.children[index].$1.id)!),
-                      );
+                      if (isPredicted) {
+                        Go.toNamed(WorkoutView.routeName);
+                      } else {
+                        Go.to(
+                          () => ExercisesView(
+                              workout: Get.find<HistoryController>()
+                                  .getByID(widget.children[index].$1.id)!),
+                        );
+                      }
                     },
                 ),
               ]),

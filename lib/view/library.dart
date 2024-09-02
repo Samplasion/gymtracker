@@ -9,6 +9,7 @@ import 'package:get/get.dart' hide ContextExtensionss;
 import 'package:gymtracker/controller/exercises_controller.dart';
 import 'package:gymtracker/controller/history_controller.dart';
 import 'package:gymtracker/controller/settings_controller.dart';
+import 'package:gymtracker/controller/workout_controller.dart';
 import 'package:gymtracker/data/exercises.dart';
 import 'package:gymtracker/data/weights.dart';
 import 'package:gymtracker/icons/gymtracker_icons.dart';
@@ -425,6 +426,25 @@ class _ExerciseInfoViewState extends State<ExerciseInfoView>
 
   Widget _homeBody(Exercise exercise, List<(Workout, Exercise)> chartHistory,
       List<(Exercise, int, Workout)> history, List<ListTileTheme> infoTiles) {
+    final ongoingWorkout = Get.isRegistered<WorkoutController>()
+        ? Get.find<WorkoutController>().synthesizeTemporaryWorkout()
+        : null;
+    final ongoingWorkoutData = ongoingWorkout != null
+        ? (
+            ongoingWorkout,
+            exercise.copyWith(
+              sets: [
+                for (final set in ongoingWorkout.flattenedExercises
+                    .where((e) => e is Exercise && exercise.isTheSameAs(e))
+                    .fold([], (prev, e) {
+                  prev.addAll(e.sets);
+                  return prev;
+                }))
+                  if (set.done) set,
+              ],
+            ),
+          )
+        : null;
     return ThemedSubtree.builder(
       color: category?.color ?? Theme.of(context).colorScheme.primary,
       enabled: Get.find<SettingsController>().tintExercises.value,
@@ -495,13 +515,15 @@ class _ExerciseInfoViewState extends State<ExerciseInfoView>
               ),
             ],
             if (chartHistory.isNotEmpty &&
-                ExerciseHistoryChart.shouldShow(chartHistory))
+                ExerciseHistoryChart.shouldShow(
+                    chartHistory, ongoingWorkout != null))
               SliverPadding(
                 padding: const EdgeInsets.all(16),
                 sliver: SliverToBoxAdapter(
                   child: ExerciseHistoryChart(
                     key: ValueKey(chartHistory.length),
                     children: chartHistory,
+                    ongoing: ongoingWorkoutData,
                   ),
                 ),
               ),

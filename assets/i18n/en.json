@@ -452,6 +452,21 @@
         },
         "migrations": {
           "title": "Migrations"
+        },
+        "backups": {
+          "title": "Backups",
+          "restore": {
+            "title": "Restore this backup?",
+            "confirm": "You won't be able to undo this action. Be sure to create a backup now if you ever wish to go back. Restore?"
+          },
+          "restoring": "Restoring",
+          "create": "Create backup",
+          "creating": "Backing up",
+          "delete": {
+            "title": "Delete backup?",
+            "confirm": "This action cannot be undone."
+          },
+          "deleting": "Deleting"
         }
       }
     },

@@ -452,6 +452,21 @@
         },
         "migrations": {
           "title": "Migrazioni"
+        },
+        "backups": {
+          "title": "Backup",
+          "restore": {
+            "title": "Ripristinare questo backup?",
+            "confirm": "Non potrai annullare quest'azione. Assicurati di creare un backup ora se vuoi tornare indietro. Ripristinare?"
+          },
+          "restoring": "Ripristino",
+          "creating": "Creazione backup",
+          "delete": {
+            "title": "Eliminare questo backup?",
+            "confirm": "Non potrai annullare questa azione."
+          },
+          "deleting": "Eliminazione",
+          "create": "Crea backup"
         }
       }
     },

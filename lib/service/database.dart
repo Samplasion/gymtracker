@@ -18,10 +18,15 @@ import 'package:gymtracker/struct/date_sequence.dart';
 import 'package:gymtracker/struct/nutrition.dart' hide NutritionGoal;
 import 'package:gymtracker/struct/nutrition.dart' as gtn;
 import 'package:gymtracker/utils/extensions.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:rxdart/rxdart.dart';
 
+const _kMaxBackups = 10;
+const _kPeriodicBackupInterval = Duration(days: 1);
+
 class DatabaseService extends GetxService with ChangeNotifier {
-  late final GTDatabase db;
+  late GTDatabase _db;
+  GTDatabase get db => _db;
 
   final exercises$ = BehaviorSubject<List<Exercise>>.seeded([]);
   final routines$ = BehaviorSubject<List<Workout>>.seeded([]);
@@ -44,86 +49,177 @@ class DatabaseService extends GetxService with ChangeNotifier {
       BehaviorSubject<DateSequence<Map<String, NutritionCategory>>>.seeded(
           DateSequence.empty());
 
+  final backups = _DatabaseBackups();
+  BehaviorSubject<List<DatabaseBackup>> get _backups$ => BehaviorSubject();
+
+  eraseAllSubjects() {
+    exercises$.add([]);
+    routines$.add([]);
+    history$.add([]);
+    prefs$.add(Prefs.defaultValue);
+    ongoing$.add(null);
+    weightMeasurements$.add([]);
+    folders$.add([]);
+    foods$.add([]);
+    nutritionGoals$.add([
+      TaggedNutritionGoal(
+        date: DateTime.now().startOfDay,
+        value: gtn.NutritionGoal.defaultGoal,
+      ),
+    ]);
+    customBarcodeFoods$.add({});
+    favoriteFoods$.add([]);
+    nutritionCategories$.add(DateSequence.empty());
+  }
+
   writeSettings(Prefs prefs) {
-    db.setPreferences(prefs);
+    _db.setPreferences(prefs);
     notifyListeners();
   }
 
   @override
-  onInit() {
+  onInit() async {
     super.onInit();
+
+    await backups.init();
 
     onServiceChange("main")();
   }
 
-  Future ensureInitialized() async {
-    db = GTDatabase.prod();
+  Future ensureInitialized({
+    Function()? onDone,
+  }) async {
+    _db = GTDatabase.prod();
 
-    return _ensureInitialized();
+    return _innerEnsureInitialized(onDone: onDone);
   }
 
-  Future<void> _ensureInitialized() async {
-    db.getAllRoutines()
-      ..pipe(routines$)
-      ..listen((_) => onServiceChange("routines")());
-    db.getAllCustomExercises()
-      ..pipe(exercises$)
-      ..listen((_) => onServiceChange("exercises")());
-    db.getAllHistoryWorkouts()
-      ..pipe(history$)
-      ..listen((_) => onServiceChange("history")());
-    db.watchPreferences()
-      ..pipe(prefs$)
-      ..listen((prefs) {
-        notifyListeners();
-        onServiceChange("preferences")();
-        prefs.logger.i("Changed.");
-      });
-    db.watchOngoing()
-      ..pipe(ongoing$)
-      ..listen((event) {
-        onServiceChange("ongoing")();
-      });
-    db.watchWeightMeasurements()
-      ..pipe(weightMeasurements$)
-      ..listen((_) => onServiceChange("weight measurements")());
-    db.watchRoutineFolders()
-      ..pipe(folders$)
-      ..listen((_) => onServiceChange("folders")());
-    db.watchFoods()
-      ..pipe(foods$)
-      ..listen((_) => onServiceChange("foods")());
-    db
+  Future<void> _innerEnsureInitialized({
+    Function()? onDone,
+  }) async {
+    final initialized = [
+      "exercises",
+      "routines",
+      "history",
+      "prefs",
+      "weightMeasurements",
+      "folders",
+      "foods",
+      "nutritionGoals",
+      "customBarcodeFoods",
+      "favoriteFoods",
+      "nutritionCategories",
+    ].map((element) => false).toList();
+    check() {
+      if (initialized.every((element) => element)) {
+        onDone?.call();
+      }
+    }
+
+    Future.microtask(() {
+      final b = backups.list();
+      _backups$.add(b);
+    });
+
+    _db.getAllCustomExercises().listen((event) {
+      exercises$.add(event);
+      onServiceChange("exercises")();
+      initialized[0] = true;
+      check();
+    }, onError: (e, s) {
+      logger.e("Error loading exercises", error: e, stackTrace: s);
+    });
+    _db.getAllRoutines().listen((event) {
+      routines$.add(event);
+      onServiceChange("routines")();
+      initialized[1] = true;
+      check();
+    });
+    _db.getAllHistoryWorkouts().listen((event) {
+      history$.add(event);
+      onServiceChange("history")();
+      initialized[2] = true;
+      check();
+    });
+    _db.watchPreferences().listen((prefs) {
+      prefs$.add(prefs);
+      notifyListeners();
+      onServiceChange("preferences")();
+      initialized[3] = true;
+      check();
+      prefs.logger.i("Changed.");
+    });
+    _db.watchOngoing().listen((event) {
+      ongoing$.add(event);
+      onServiceChange("ongoing")();
+    });
+    _db.watchWeightMeasurements().listen((event) {
+      weightMeasurements$.add(event);
+      onServiceChange("weight measurements")();
+      initialized[4] = true;
+      check();
+    });
+    _db.watchRoutineFolders().listen((event) {
+      folders$.add(event);
+      onServiceChange("folders")();
+      initialized[5] = true;
+      check();
+    });
+    _db.watchFoods().listen((event) {
+      foods$.add(event);
+      onServiceChange("foods")();
+      initialized[6] = true;
+      check();
+    });
+    _db
         .watchNutritionGoals()
         .map((event) => DateSequence.normalized(event).values.toList())
-      ..pipe(nutritionGoals$)
-      ..listen((_) => onServiceChange("nutrition goals")());
-    db.watchCustomBarcodeFoods()
-      ..pipe(customBarcodeFoods$)
-      ..listen((_) => onServiceChange("custom barcode foods")());
-    db.watchFavoriteFoods()
-      ..pipe(favoriteFoods$)
-      ..listen((_) => onServiceChange("favorite foods")());
-    db
+        .listen((event) {
+      nutritionGoals$.add(event);
+      onServiceChange("nutrition goals")();
+      initialized[7] = true;
+      check();
+    });
+    _db.watchCustomBarcodeFoods().listen((event) {
+      customBarcodeFoods$.add(event);
+      onServiceChange("custom barcode foods")();
+      initialized[8] = true;
+      check();
+    });
+    _db.watchFavoriteFoods().listen((event) {
+      favoriteFoods$.add(event);
+      onServiceChange("favorite foods")();
+      initialized[9] = true;
+      check();
+    });
+    _db
         .watchNutritionCategories()
         .map((event) => DateSequence.fromDatesAndValues(event).normalize())
-      ..pipe(nutritionCategories$)
-      ..listen((_) => onServiceChange("nutrition categories")());
+        .listen((event) {
+      nutritionCategories$.add(event);
+      onServiceChange("nutrition categories")();
+      initialized[10] = true;
+      check();
+    });
+    backups.watch().listen((event) {
+      _backups$.add(event);
+      logger.i("Backups updated: ${event.length}");
+    });
   }
 
   @visibleForTesting
   Future ensureInitializedForTests(QueryExecutor e) async {
     // We're inside a @visibleForTesting method, so it's fine
     // ignore: invalid_use_of_visible_for_testing_member
-    db = GTDatabase.withQueryExecutor(e);
+    _db = GTDatabase.withQueryExecutor(e);
 
-    await _ensureInitialized();
+    await _innerEnsureInitialized();
   }
 
   @visibleForTesting
   Future teardown() async {
     logger.t("!!! Tearing down");
-    await db.clearTheWholeThingIAmAbsolutelySureISwear();
+    await _db.clearTheWholeThingIAmAbsolutelySureISwear();
   }
 
   void Function() onServiceChange(String service) {
@@ -145,11 +241,11 @@ class DatabaseService extends GetxService with ChangeNotifier {
   /// This method is only public for testing purposes.
   @visibleForTesting
   writeExercises(List<Exercise> exercises) {
-    return db.batch((batch) {
+    return _db.batch((batch) {
       batch.logger.i("Importing exercises");
-      batch.deleteAll(db.customExercises);
+      batch.deleteAll(_db.customExercises);
       batch.insertAll(
-        db.customExercises,
+        _db.customExercises,
         [for (final ex in exercises) ex.toInsertable()],
       );
     });
@@ -157,14 +253,14 @@ class DatabaseService extends GetxService with ChangeNotifier {
 
   setExercise(Exercise exercise) {
     if (exercises.any((element) => element.id == exercise.id)) {
-      db.updateCustomExercise(exercise);
+      _db.updateCustomExercise(exercise);
     } else {
-      db.insertCustomExercise(exercise);
+      _db.insertCustomExercise(exercise);
     }
   }
 
   removeExercise(Exercise exercise) {
-    db.deleteCustomExercise(exercise.id);
+    _db.deleteCustomExercise(exercise.id);
   }
 
   List<Workout> get routines {
@@ -172,12 +268,12 @@ class DatabaseService extends GetxService with ChangeNotifier {
   }
 
   Future _writeRoutines(List<Workout> routines) {
-    return db.transaction(() async {
-      await db.batch((batch) {
+    return _db.transaction(() async {
+      await _db.batch((batch) {
         batch.logger.i("Importing routines");
-        batch.deleteAll(db.routines);
+        batch.deleteAll(_db.routines);
         batch.insertAll(
-          db.routines,
+          _db.routines,
           routines.toSortedRoutineInsertables(),
         );
       });
@@ -196,9 +292,9 @@ class DatabaseService extends GetxService with ChangeNotifier {
         )
         .values
         .expand((list) => list.toSortedInsertables());
-    await db.delete(db.routineExercises).go();
-    await db.batch(
-        (b) => b.insertAll(db.routineExercises, routineExerciseInsertables));
+    await _db.delete(_db.routineExercises).go();
+    await _db.batch(
+        (b) => b.insertAll(_db.routineExercises, routineExerciseInsertables));
   }
 
   setAllRoutines(List<Workout> routines) {
@@ -210,9 +306,9 @@ class DatabaseService extends GetxService with ChangeNotifier {
     logger.d(
         "Do we have it already? ${routines.any((element) => element.id == routine.id)}");
     if (routines.any((element) => element.id == routine.id)) {
-      await db.updateRoutine(fixWorkout(routine));
+      await _db.updateRoutine(fixWorkout(routine));
     } else {
-      await db.insertRoutine(fixWorkout(routine));
+      await _db.insertRoutine(fixWorkout(routine));
     }
     if (routine.folder != null) {
       logger.i("Routine has a folder: ${routine.folder}");
@@ -228,7 +324,7 @@ class DatabaseService extends GetxService with ChangeNotifier {
   }
 
   removeRoutine(Workout routine) {
-    db.deleteRoutine(routine.id);
+    _db.deleteRoutine(routine.id);
   }
 
   bool hasRoutine(String id) {
@@ -240,12 +336,12 @@ class DatabaseService extends GetxService with ChangeNotifier {
   }
 
   Future writeAllHistory(List<Workout> history) {
-    return db.transaction(() async {
-      await db.batch((batch) {
+    return _db.transaction(() async {
+      await _db.batch((batch) {
         batch.logger.i("Importing routines");
-        batch.deleteAll(db.historyWorkouts);
+        batch.deleteAll(_db.historyWorkouts);
         batch.insertAll(
-          db.historyWorkouts,
+          _db.historyWorkouts,
           history.toSortedHistoryWorkoutInsertables(),
         );
       });
@@ -264,17 +360,17 @@ class DatabaseService extends GetxService with ChangeNotifier {
         )
         .values
         .expand((list) => list.toSortedInsertables());
-    await db.delete(db.historyWorkoutExercises).go();
-    await db.batch((b) =>
-        b.insertAll(db.historyWorkoutExercises, historyExerciseInsertables));
+    await _db.delete(_db.historyWorkoutExercises).go();
+    await _db.batch((b) =>
+        b.insertAll(_db.historyWorkoutExercises, historyExerciseInsertables));
   }
 
   Future setHistoryWorkout(Workout workout) async {
     logger.i("Setting history workout");
     if (workoutHistory.any((element) => element.id == workout.id)) {
-      await db.updateHistoryWorkout(fixWorkout(workout));
+      await _db.updateHistoryWorkout(fixWorkout(workout));
     } else {
-      await db.insertHistoryWorkout(fixWorkout(workout));
+      await _db.insertHistoryWorkout(fixWorkout(workout));
     }
   }
 
@@ -283,7 +379,7 @@ class DatabaseService extends GetxService with ChangeNotifier {
   }
 
   Future removeHistoryWorkoutById(String id) async {
-    await db.deleteHistoryWorkout(id);
+    await _db.deleteHistoryWorkout(id);
   }
 
   Workout? getHistoryWorkout(String id) {
@@ -295,7 +391,7 @@ class DatabaseService extends GetxService with ChangeNotifier {
   }
 
   Future _writeWeightMeasurements(List<WeightMeasurement> weightMeasurements) {
-    return db.setWeightMeasurements(weightMeasurements);
+    return _db.setWeightMeasurements(weightMeasurements);
   }
 
   getWeightMeasurement(String measurementID) {
@@ -305,61 +401,61 @@ class DatabaseService extends GetxService with ChangeNotifier {
 
   setWeightMeasurement(WeightMeasurement measurement) {
     if (getWeightMeasurement(measurement.id) == null) {
-      db.insertWeightMeasurement(measurement);
+      _db.insertWeightMeasurement(measurement);
     } else {
-      db.updateWeightMeasurement(measurement);
+      _db.updateWeightMeasurement(measurement);
     }
   }
 
   removeWeightMeasurement(WeightMeasurement measurement) {
-    db.deleteWeightMeasurement(measurement.id);
+    _db.deleteWeightMeasurement(measurement.id);
   }
 
   addFolder(GTRoutineFolder folder) {
-    db.insertRoutineFolder(folder);
+    _db.insertRoutineFolder(folder);
   }
 
   removeFolder(GTRoutineFolder folder) {
-    db.deleteRoutineFolder(folder.id);
+    _db.deleteRoutineFolder(folder.id);
   }
 
   updateFolder(GTRoutineFolder folder) {
-    db.updateRoutineFolder(folder);
+    _db.updateRoutineFolder(folder);
   }
 
   addFood(TaggedFood food) {
-    db.insertFoods(food);
+    _db.insertFoods(food);
   }
 
   removeFood(TaggedFood food) {
-    db.deleteFoods(food.value.id!);
+    _db.deleteFoods(food.value.id!);
   }
 
   updateFood(TaggedFood food) {
-    db.updateFoods(food);
+    _db.updateFoods(food);
   }
 
   addNutritionGoal(TaggedNutritionGoal goal) {
     final newGoals = nutritionGoals$.value;
     newGoals.add(goal);
 
-    db.setNutritionGoals(DateSequence.normalized(newGoals).values.toList());
+    _db.setNutritionGoals(DateSequence.normalized(newGoals).values.toList());
   }
 
   removeNutritionGoal(TaggedNutritionGoal goal) {
-    db.deleteNutritionGoal(goal.date.startOfDay);
+    _db.deleteNutritionGoal(goal.date.startOfDay);
   }
 
   updateNutritionGoal(TaggedNutritionGoal goal) {
-    db.updateNutritionGoal(goal);
+    _db.updateNutritionGoal(goal);
   }
 
   addCustomBarcodeFood(String barcode, Food food) {
-    db.insertCustomBarcodeFood(barcode, food);
+    _db.insertCustomBarcodeFood(barcode, food);
   }
 
   removeCustomBarcodeFood(String barcode) {
-    db.deleteCustomBarcodeFood(barcode);
+    _db.deleteCustomBarcodeFood(barcode);
   }
 
   addFavoriteFood(Food food) {
@@ -367,7 +463,7 @@ class DatabaseService extends GetxService with ChangeNotifier {
       throw Exception("Food must have an ID to be favorited");
     }
 
-    db.insertFavoriteFood(food.id!);
+    _db.insertFavoriteFood(food.id!);
   }
 
   removeFavoriteFood(Food food) {
@@ -375,13 +471,13 @@ class DatabaseService extends GetxService with ChangeNotifier {
       throw Exception("Food must have an ID to be unfavorited");
     }
 
-    db.deleteFavoriteFood(food.id!);
+    _db.deleteFavoriteFood(food.id!);
   }
 
   void setNutritionCategoriesForDay(
       DateTime date, Map<String, NutritionCategory> map) async {
     final values = nutritionCategories$.value.toMap();
-    db.setNutritionCategories(DateSequence.fromDatesAndValues({
+    _db.setNutritionCategories(DateSequence.fromDatesAndValues({
       ...values,
       date.startOfDay: map,
     }).normalize().toMap());
@@ -429,8 +525,8 @@ class DatabaseService extends GetxService with ChangeNotifier {
         rethrow;
       }
 
-      await db.transaction(() async {
-        await db.clearTheWholeThingIAmAbsolutelySureISwear();
+      await _db.transaction(() async {
+        await _db.clearTheWholeThingIAmAbsolutelySureISwear();
 
         logger.i("Created import transaction");
         await writeExercises(snapshot.customExercises);
@@ -438,14 +534,14 @@ class DatabaseService extends GetxService with ChangeNotifier {
         await _writeRoutineExercises(snapshot.routineExercises);
         await writeAllHistory(snapshot.historyWorkouts);
         await _writeHistoryExercises(snapshot.historyWorkoutExercises);
-        await db.setPreferences(snapshot.preferences);
+        await _db.setPreferences(snapshot.preferences);
         await _writeWeightMeasurements(snapshot.weightMeasurements);
-        await db.writeAllRoutineFolders(snapshot.folders);
-        await db.setFoods(snapshot.foods);
-        await db.setNutritionGoals(snapshot.nutritionGoals);
-        await db.setCustomBarcodeFoods(snapshot.customBarcodeFoods);
-        await db.setFavoriteFoods(snapshot.favoriteFoods);
-        await db.setNutritionCategories({
+        await _db.writeAllRoutineFolders(snapshot.folders);
+        await _db.setFoods(snapshot.foods);
+        await _db.setNutritionGoals(snapshot.nutritionGoals);
+        await _db.setCustomBarcodeFoods(snapshot.customBarcodeFoods);
+        await _db.setFavoriteFoods(snapshot.favoriteFoods);
+        await _db.setNutritionCategories({
           for (final entry in snapshot.foodCategories.entries)
             entry.key:
                 Map.fromEntries(entry.value.map((e) => MapEntry(e.name, e))),
@@ -463,7 +559,7 @@ class DatabaseService extends GetxService with ChangeNotifier {
 
   void writeToOngoing(Map<String, dynamic> data) {
     logger.d("Writing ongoing workout data");
-    db.setOngoing(data);
+    _db.setOngoing(data);
   }
 
   Map<String, dynamic>? getOngoingData() {
@@ -473,13 +569,13 @@ class DatabaseService extends GetxService with ChangeNotifier {
 
   void deleteOngoing() {
     logger.i("Requested deletion of ongoing workout data");
-    db.deleteOngoing();
+    _db.deleteOngoing();
   }
 
   bool get hasOngoing => ongoing$.valueOrNull != null;
 
   void transaction<T>(Future<T> Function() action) async {
-    await db.transaction(action);
+    await _db.transaction(action);
   }
 
   Future<void> applyExerciseModificationToHistory(Exercise exercise) {
@@ -555,7 +651,60 @@ class DatabaseService extends GetxService with ChangeNotifier {
   }
 
   bool get canExportRaw => true;
-  Future<File> exportRaw() => db.path;
+  Future<File> exportRaw() => _db.path;
+
+  Future<void> createBackup() {
+    return backups.store(_db);
+  }
+
+  Stream<List<DatabaseBackup>> listBackups() {
+    return backups.watch();
+  }
+
+  Future<void> restoreBackup(DatabaseBackup backup) async {
+    Completer c = Completer();
+    final p = (await _db.path);
+    await _db.close();
+    await backup.file.copy(p.absolute.path);
+    await ensureInitialized(
+      onDone: () {
+        if (!c.isCompleted) {
+          c.complete();
+        }
+      },
+    );
+
+    Future.delayed(const Duration(seconds: 20), () {
+      try {
+        if (!c.isCompleted) {
+          c.completeError("Initialization took too long");
+        }
+      } catch (_) {
+        // Do nothing.
+      }
+    });
+
+    return c.future;
+  }
+
+  deleteBackup(DatabaseBackup backup) {
+    return backups.delete(backup);
+  }
+
+  void schedulePeriodicBackup() {
+    final list = backups.list();
+    bool shouldCreate = list.isEmpty ||
+        list.first.date.isBefore(
+          DateTime.now().subtract(_kPeriodicBackupInterval),
+        );
+
+    if (shouldCreate) {
+      logger.i("Creating periodic backup");
+      createBackup();
+    } else {
+      logger.i("No need to create a backup");
+    }
+  }
 }
 
 class DatabaseImportVersionMismatch implements Exception {
@@ -588,4 +737,74 @@ Workout fixWorkout(Workout workout) {
   }
 
   return workout.copyWith(exercises: newExercises);
+}
+
+class DatabaseBackup {
+  final DateTime date;
+  final File file;
+  final int size;
+
+  const DatabaseBackup(this.date, this.file, [this.size = 0]);
+}
+
+class _DatabaseBackups {
+  late Directory _backupDir;
+  final BehaviorSubject<List<DatabaseBackup>> _backups$ = BehaviorSubject();
+
+  Future<void> init() async {
+    final root = await getApplicationDocumentsDirectory();
+    _backupDir = Directory("${root.path}/backups");
+    await _backupDir.create();
+    _backups$.add(list());
+    _backupDir.watch().listen((event) {
+      _backups$.add(list());
+    });
+  }
+
+  Future<DatabaseBackup> store(GTDatabase _db) async {
+    final now = DateTime.now();
+    final path = "${_backupDir.path}/${now.millisecondsSinceEpoch}.db";
+    await (await _db.path).copy(path);
+    _backups$.add(list());
+
+    // Delete old backups
+    final backups = list();
+    if (backups.length > _kMaxBackups) {
+      final toDelete = (backups..sort((a, b) => a.date.compareTo(b.date)))
+          .sublist(0, backups.length - _kMaxBackups);
+      for (final backup in toDelete) {
+        await backup.file.delete();
+      }
+    }
+
+    final file = File(path);
+    final size = await file.length();
+
+    return DatabaseBackup(now, file, size);
+  }
+
+  List<DatabaseBackup> list() {
+    return _backupDir
+        .listSync()
+        .whereType<File>()
+        .where((element) => element.path.endsWith(".db"))
+        .map((e) {
+      return DatabaseBackup(
+        DateTime.fromMillisecondsSinceEpoch(
+            int.parse(e.path.split("/").last.split(".").first)),
+        e,
+        e.lengthSync(),
+      );
+    }).toList()
+      ..sort((a, b) => b.date.compareTo(a.date));
+  }
+
+  Stream<List<DatabaseBackup>> watch() {
+    return _backups$.stream;
+  }
+
+  Future<void> delete(DatabaseBackup backup) async {
+    await backup.file.delete();
+    _backups$.add(list());
+  }
 }

@@ -16,6 +16,7 @@ import 'package:gymtracker/controller/stopwatch_controller.dart';
 import 'package:gymtracker/controller/workout_controller.dart';
 import 'package:gymtracker/model/exercise.dart';
 import 'package:gymtracker/model/workout.dart';
+import 'package:gymtracker/service/database.dart';
 import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/service/logger.dart';
 import 'package:gymtracker/service/notifications.dart';
@@ -46,6 +47,8 @@ class Coordinator extends GetxController with ServiceableController {
       logger.d("Show permission tiles: $e");
       return e.any((element) => element);
     }).pipe(showPermissionTilesStream);
+
+    schedulePeriodicBackup();
   }
 
   init() {
@@ -134,5 +137,15 @@ class Coordinator extends GetxController with ServiceableController {
   void onHotReload() {
     logger.i("[#reassemble()] called");
     Get.find<GTLocalizations>().init(false);
+  }
+
+  void scheduleBackup() {
+    Future.delayed(const Duration(seconds: 5), () async {
+      Get.find<DatabaseService>().createBackup();
+    });
+  }
+
+  void schedulePeriodicBackup() {
+    Get.find<DatabaseService>().schedulePeriodicBackup();
   }
 }

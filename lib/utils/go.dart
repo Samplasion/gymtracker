@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart' hide Material;
 import 'package:flutter/scheduler.dart';
 import 'package:get/get.dart';
@@ -320,6 +322,58 @@ class Go {
       globalLogger.i("[Go.showRadioModal]\nReverting");
       onChange?.call(oldValue);
     }
+  }
+
+  static Future<void> futureDialog<T>({
+    required Future<T> Function() future,
+    required String title,
+    String? body,
+  }) async {
+    final context = Get.context!;
+    final computation = future();
+
+    computation.then((_) => SchedulerBinding.instance.addPostFrameCallback((_) {
+          Navigator.of(context).pop();
+        }));
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) {
+        return PopScope(
+          canPop: false,
+          child: FutureBuilder<T>(
+            future: computation,
+            builder: (context, snapshot) {
+              return AlertDialog(
+                title: Text(title.t),
+                content: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    if (body != null) Text(body.t),
+                    if (snapshot.connectionState ==
+                        ConnectionState.waiting) ...[
+                      const SizedBox(height: 16),
+                      const CircularProgressIndicator(),
+                    ],
+                  ],
+                ),
+                actions: [
+                  if (snapshot.connectionState == ConnectionState.done)
+                    TextButton(
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                      child:
+                          Text(MaterialLocalizations.of(context).okButtonLabel),
+                    ),
+                ],
+              );
+            },
+          ),
+        );
+      },
+    );
   }
 
   static void popUntil(bool Function(Route route) predicate) {

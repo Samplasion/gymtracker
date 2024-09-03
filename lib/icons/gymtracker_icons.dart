@@ -101,6 +101,7 @@ class GymTrackerIcons {
   static const IconData advanced = Icons.settings_rounded;
   static const IconData app_icon = Icons.fitness_center_rounded;
   static const IconData appearance = Icons.palette_rounded;
+  static const IconData backup = Icons.save_alt_rounded;
   static const IconData breadcrumb_chevron = Icons.chevron_right_rounded;
   static const IconData calendar = Icons.calendar_month_rounded;
   static const IconData camera = Icons.camera_rounded;

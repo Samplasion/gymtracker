@@ -80,8 +80,10 @@ class ErrorController extends GetxController {
     if (args.details != null) {
       logger.e("",
           error: args.details!.exception, stackTrace: args.details!.stack);
+      print(args.details!.stack);
     } else {
       logger.e("", error: args.error, stackTrace: args.stack);
+      print(args.stack);
     }
   }
 }

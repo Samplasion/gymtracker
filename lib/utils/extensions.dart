@@ -480,3 +480,14 @@ extension MapOfListUtils<K, V> on Map<K, List<V>> {
     return res;
   }
 }
+
+// https://stackoverflow.com/a/72219124
+extension FileFormatter on num {
+  String readableFileSize({bool base1024 = true}) {
+    final base = base1024 ? 1024 : 1000;
+    if (this <= 0) return "0";
+    final units = ["B", "kB", "MB", "GB", "TB"];
+    int digitGroups = (log(this) / log(base)).round();
+    return "${NumberFormat("#,##0.#").format(this / pow(base, digitGroups))} ${units[digitGroups]}";
+  }
+}

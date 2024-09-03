@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get/get.dart';
+import 'package:gymtracker/controller/coordinator.dart';
 import 'package:gymtracker/controller/countdown_controller.dart';
 import 'package:gymtracker/controller/history_controller.dart';
 import 'package:gymtracker/controller/routines_controller.dart';
@@ -767,13 +768,16 @@ class WorkoutController extends GetxController with ServiceableController {
       await askToUpdateRoutine(workout);
 
       if (workout.doneSets.isNotEmpty) {
-        Go.showBottomModalScreen(
+        await Go.showBottomModalScreen(
           (context, controller) => WorkoutDoneSheet(
             workout: workout,
             controller: controller,
           ),
         );
       }
+
+      // Always keep at the very end
+      Get.find<Coordinator>().scheduleBackup();
     });
   }
 

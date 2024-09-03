@@ -600,7 +600,11 @@ class _ExerciseInfoViewState extends State<ExerciseInfoView>
                     OutlinedButton(
                       onPressed: () {
                         Go.to(
-                          () => ExercisesView(workout: history[index].$3),
+                          () => ExercisesView(
+                            workout: history[index].$3,
+                            highlightExercise: (e) =>
+                                e.id == history[index].$1.id,
+                          ),
                         );
                       },
                       child: Text("exercise.info.viewWorkout".t),

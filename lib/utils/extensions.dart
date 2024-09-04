@@ -491,3 +491,13 @@ extension FileFormatter on num {
     return "${NumberFormat("#,##0.#").format(this / pow(base, digitGroups))} ${units[digitGroups]}";
   }
 }
+
+extension PaddingUtils on EdgeInsets {
+  EdgeInsets get onlyHorizontal {
+    return EdgeInsets.only(left: left, right: right);
+  }
+
+  EdgeInsets get onlyVertical {
+    return EdgeInsets.only(top: top, bottom: bottom);
+  }
+}

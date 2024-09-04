@@ -6,6 +6,7 @@ import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/utils/constants.dart';
 import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/view/charts/bar_charts.dart';
+import 'package:gymtracker/view/utils/sliver_utils.dart';
 import 'package:gymtracker/view/utils/speed_dial.dart';
 import 'package:gymtracker/view/utils/timer.dart';
 
@@ -39,7 +40,8 @@ class WorkoutDoneSheet extends StatelessWidget {
             ),
           ),
           SliverPadding(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(16) +
+                MediaQuery.paddingOf(context).onlyHorizontal,
             sliver: SliverList.list(
               children: [
                 Text(
@@ -98,6 +100,8 @@ class WorkoutDoneSheet extends StatelessWidget {
               ],
             ),
           ),
+          const SliverToBoxAdapter(child: SizedBox(height: 8)),
+          const SliverBottomSafeArea(),
         ],
       ),
     );

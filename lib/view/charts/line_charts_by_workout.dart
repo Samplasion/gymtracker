@@ -547,6 +547,8 @@ class _RoutineHistoryChartState
   };
 
   for (final (wo, ex) in children) {
+    if (ex.doneSets.isEmpty) continue;
+
     if (ex.liftedWeight != null) {
       values[_ExerciseHistoryChartType.volume]!.add(LineChartPoint(
         value: Weights.convert(
@@ -615,7 +617,8 @@ class ExerciseHistoryChart extends StatefulWidget {
 
   // ignore: library_private_types_in_public_api
   static shouldShow(List<_ExerciseHistoryChartChild> exercises, bool ongoing) {
-    return exercises.length >= (ongoing ? 1 : 2) &&
+    return exercises.where((e) => e.$2.doneSets.isNotEmpty).length >=
+            (ongoing ? 1 : 2) &&
         _calculateTypes(exercises).types.isNotEmpty;
   }
 }

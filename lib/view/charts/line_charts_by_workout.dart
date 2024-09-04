@@ -331,6 +331,7 @@ class RoutineHistoryChart extends StatefulWidget {
                       workout,
                       allowSynthesized: true,
                     )
+                    .where((wo) => wo.doneSets.isNotEmpty)
                     .length +
                 added >=
             2;
@@ -377,10 +378,13 @@ class _RoutineHistoryChartState
     }
   }
 
-  List<Workout> get children => controller.getChildren(
+  List<Workout> get children => controller
+      .getChildren(
         widget.routine,
         allowSynthesized: true,
-      );
+      )
+      .where((wo) => wo.doneSets.isNotEmpty)
+      .toList();
 
   late final dateRecognizer = TapGestureRecognizer();
 

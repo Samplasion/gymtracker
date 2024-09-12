@@ -260,6 +260,8 @@ class Barbell extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    const interWeightSpacing = 5.0;
+
     final weightCounts = this.weightCounts;
     return Row(
       children: [
@@ -278,9 +280,9 @@ class Barbell extends StatelessWidget {
         const SizedBox(width: 4),
         for (final (weight, count) in weightCounts.reversed) ...[
           BarbellWeightPlate(weight: weight, count: count, format: format),
-          const SizedBox(width: 4),
+          const SizedBox(width: interWeightSpacing),
         ],
-        const SizedBox(width: 2),
+        const SizedBox(width: 1),
         Container(
           height: 28,
           width: 12,
@@ -319,9 +321,9 @@ class Barbell extends StatelessWidget {
             ),
           ),
         ),
-        const SizedBox(width: 2),
+        const SizedBox(width: 1),
         for (final (weight, count) in weightCounts) ...[
-          const SizedBox(width: 4),
+          const SizedBox(width: interWeightSpacing),
           BarbellWeightPlate(weight: weight, count: count, format: format),
         ],
         const SizedBox(width: 4),
@@ -358,6 +360,7 @@ class BarbellWeightPlate extends StatelessWidget {
   Widget build(BuildContext context) {
     return Badge(
       label: Text("x$count"),
+      offset: const Offset(-3, -6),
       backgroundColor: context.colorScheme.quinary,
       textColor: context.colorScheme.onQuinary,
       isLabelVisible: count > 1,

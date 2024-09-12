@@ -195,8 +195,15 @@ class _MasterDetailViewState extends State<MasterDetailView> {
                   child: ListView.builder(
                     itemBuilder: (BuildContext context, int index) {
                       if (index == widget.items.length) {
-                        return SizedBox(
-                          height: MediaQuery.of(context).padding.bottom,
+                        return Column(
+                          children: [
+                            SizedBox(
+                              height: MediaQuery.of(context).padding.bottom,
+                            ),
+                            if (kDebugMode) ...[
+                              Text("${selectedItem?.id}"),
+                            ],
+                          ],
                         );
                       }
                       final MasterItemBase itemBase = widget.items[index];

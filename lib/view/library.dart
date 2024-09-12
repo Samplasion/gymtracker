@@ -14,6 +14,7 @@ import 'package:gymtracker/controller/workout_controller.dart';
 import 'package:gymtracker/data/exercises.dart';
 import 'package:gymtracker/data/weights.dart';
 import 'package:gymtracker/icons/gymtracker_icons.dart';
+import 'package:gymtracker/model/exercisable.dart';
 import 'package:gymtracker/model/exercise.dart';
 import 'package:gymtracker/model/set.dart';
 import 'package:gymtracker/model/superset.dart';
@@ -40,10 +41,9 @@ class LibraryView extends GetView<ExercisesController> {
 
   Map<GTExerciseMuscleCategory, ExerciseCategory> get exercises {
     return {
-      GTExerciseMuscleCategory.custom: const ExerciseCategory(
-        // Will be populated by the controller
-        exercises: [],
-        icon: Icon(GymTrackerIcons.custom_exercises),
+      GTExerciseMuscleCategory.custom: ExerciseCategory(
+        exercises: Get.find<ExercisesController>().exercises.toList(),
+        icon: const Icon(GymTrackerIcons.custom_exercises),
         color: Colors.yellow,
       ),
       for (final key in sortedCategories) key: exerciseStandardLibrary[key]!,
@@ -53,67 +53,65 @@ class LibraryView extends GetView<ExercisesController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Obx(
-        () => CustomScrollView(
-          slivers: [
-            SliverAppBar.large(
-              title: Text("library.title".t),
-              leading: const SkeletonDrawerButton(),
-              actions: [
-                if (kDebugMode) ...[
-                  IconButton(
-                    icon: const Icon(GymTrackerIcons.explanation),
-                    onPressed: () {
-                      Go.to(() => const DebugExercisesWithoutExplanationList());
+      body: CustomScrollView(
+        slivers: [
+          SliverAppBar.large(
+            title: Text("library.title".t),
+            leading: const SkeletonDrawerButton(),
+            actions: [
+              if (kDebugMode) ...[
+                IconButton(
+                  icon: const Icon(GymTrackerIcons.explanation),
+                  onPressed: () {
+                    Go.to(() => const DebugExercisesWithoutExplanationList());
+                  },
+                ),
+              ],
+            ],
+          ),
+          SliverList(
+            delegate: SliverChildListDelegate(
+              [
+                for (final category in exercises.entries)
+                  ListTile(
+                    leading: CircleAvatar(
+                      backgroundColor:
+                          getContainerColor(context, category.value.color),
+                      foregroundColor:
+                          getOnContainerColor(context, category.value.color),
+                      child: category.value.icon,
+                    ),
+                    title: Text(category.key.localizedName),
+                    subtitle: Text(
+                      "general.exercises"
+                          .plural(category.value.exercises.length),
+                    ),
+                    onTap: () {
+                      Go.to(() => LibraryExercisesView(
+                            name: category.key.localizedName,
+                            category: category.value,
+                            getExercises: () {
+                              if (category.key ==
+                                  GTExerciseMuscleCategory.custom) {
+                                final list = Get.find<ExercisesController>()
+                                    .exercises
+                                    .toList();
+                                print(("AAAAAA", list.first.name));
+                                return list;
+                              }
+                              return category.value.exercises;
+                            },
+                            isCustom:
+                                category.key == GTExerciseMuscleCategory.custom,
+                          ));
                     },
                   ),
-                ],
               ],
             ),
-            SliverList(
-              delegate: SliverChildListDelegate(
-                [
-                  for (final category in exercises.entries)
-                    ListTile(
-                      leading: CircleAvatar(
-                        backgroundColor:
-                            getContainerColor(context, category.value.color),
-                        foregroundColor:
-                            getOnContainerColor(context, category.value.color),
-                        child: category.value.icon,
-                      ),
-                      title: Text(category.key.localizedName),
-                      subtitle: Text(
-                        "general.exercises"
-                            .plural(category.value.exercises.length),
-                      ),
-                      onTap: () {
-                        Go.to(() => LibraryExercisesView(
-                              name: category.key.localizedName,
-                              category: category.value,
-                              getExercises: () {
-                                if (category.key ==
-                                    GTExerciseMuscleCategory.custom) {
-                                  final list = Get.find<ExercisesController>()
-                                      .exercises
-                                      .toList();
-                                  print(("AAAAAA", list.first.name));
-                                  return list;
-                                }
-                                return category.value.exercises;
-                              },
-                              isCustom: category.key ==
-                                  GTExerciseMuscleCategory.custom,
-                            ));
-                      },
-                    ),
-                ],
-              ),
-            ),
-            const SliverToBoxAdapter(child: SizedBox(height: 8)),
-            const SliverBottomSafeArea(),
-          ],
-        ),
+          ),
+          const SliverToBoxAdapter(child: SizedBox(height: 8)),
+          const SliverBottomSafeArea(),
+        ],
       ),
     );
   }
@@ -335,7 +333,7 @@ class _ExerciseInfoViewState extends State<ExerciseInfoView>
                             MDVConfiguration.of(context)?.push(
                               context,
                               ExerciseInfoView(exercise: newExercise),
-                              id: jsonEncode(newExercise.toJson()),
+                              id: newExercise.key,
                             );
                           }
                         },
@@ -644,7 +642,7 @@ class _ExerciseInfoViewState extends State<ExerciseInfoView>
                           config.push(
                             context,
                             ExerciseInfoView(exercise: exercise),
-                            id: jsonEncode(exercise.toJson()),
+                            id: exercise.key,
                           );
                         }
                       } else {
@@ -909,7 +907,15 @@ extension _MDView on ExerciseListTile {
       subtitle: tile.subtitle,
       trailing: tile.trailing,
       detailsBuilder: detailsBuilder,
-      id: jsonEncode(exercise.toJson()),
+      id: exercise.key,
     );
+  }
+}
+
+extension _MDItemConfig on WorkoutExercisable {
+  String get key {
+    if (this is! Exercise) return "";
+    if (asExercise.standard) return id;
+    return jsonEncode(asExercise.toJson());
   }
 }

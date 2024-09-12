@@ -229,7 +229,6 @@ class _MasterDetailViewState extends State<MasterDetailView> {
                     elevation: selectedItem == null ? 0 : 10,
                     clipBehavior: Clip.antiAlias,
                     child: MDVConfiguration(
-                      // appBarSize: widget.lateralDetailsAppBar,
                       selfPage: false,
                       child: selectedItem?.detailsBuilder?.call(context) ??
                           Center(
@@ -258,7 +257,7 @@ class _MasterDetailViewState extends State<MasterDetailView> {
             return SharedAxisTransition(
               animation: primaryAnimation,
               secondaryAnimation: secondaryAnimation,
-              transitionType: SharedAxisTransitionType.scaled,
+              transitionType: SharedAxisTransitionType.horizontal,
               fillColor: Theme.of(context).colorScheme.surface,
               child: child,
             );

@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
@@ -24,7 +25,7 @@ import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/utils/utils.dart';
 import 'package:gymtracker/view/charts/line_charts_by_workout.dart';
 import 'package:gymtracker/view/components/badges.dart';
-import 'package:gymtracker/view/components/context_menu.dart';
+import 'package:gymtracker/view/components/master_detail.dart';
 import 'package:gymtracker/view/components/themed_subtree.dart';
 import 'package:gymtracker/view/exercise_creator.dart';
 import 'package:gymtracker/view/exercises.dart';
@@ -39,9 +40,10 @@ class LibraryView extends GetView<ExercisesController> {
 
   Map<GTExerciseMuscleCategory, ExerciseCategory> get exercises {
     return {
-      GTExerciseMuscleCategory.custom: ExerciseCategory(
-        exercises: controller.exercises,
-        icon: const Icon(GymTrackerIcons.custom_exercises),
+      GTExerciseMuscleCategory.custom: const ExerciseCategory(
+        // Will be populated by the controller
+        exercises: [],
+        icon: Icon(GymTrackerIcons.custom_exercises),
         color: Colors.yellow,
       ),
       for (final key in sortedCategories) key: exerciseStandardLibrary[key]!,
@@ -89,6 +91,17 @@ class LibraryView extends GetView<ExercisesController> {
                         Go.to(() => LibraryExercisesView(
                               name: category.key.localizedName,
                               category: category.value,
+                              getExercises: () {
+                                if (category.key ==
+                                    GTExerciseMuscleCategory.custom) {
+                                  final list = Get.find<ExercisesController>()
+                                      .exercises
+                                      .toList();
+                                  print(("AAAAAA", list.first.name));
+                                  return list;
+                                }
+                                return category.value.exercises;
+                              },
                               isCustom: category.key ==
                                   GTExerciseMuscleCategory.custom,
                             ));
@@ -110,31 +123,34 @@ class LibraryExercisesView extends StatelessWidget {
   const LibraryExercisesView({
     required this.name,
     required this.category,
+    required this.getExercises,
     required this.isCustom,
     super.key,
   });
 
   final String name;
   final ExerciseCategory category;
+  final List<Exercise> Function() getExercises;
   final bool isCustom;
 
   @override
   Widget build(BuildContext context) {
-    final sorted = [...category.exercises]
-      ..sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
     return ThemedSubtree(
       color: category.color,
       enabled: Get.find<SettingsController>().tintExercises.value,
-      child: Scaffold(
-        appBar: AppBar(
-          title: Text(name),
-        ),
-        body: CustomScrollView(
-          slivers: [
-            if (isCustom) ...[
-              SliverToBoxAdapter(
-                child: ListTile(
-                  title: Text("library.newCustomExercise".t),
+      child: StatefulBuilder(
+        builder: (context, refresh) {
+          final exercises = getExercises();
+
+          final sorted = exercises.toList()
+            ..sort((a, b) => a.displayName.compareTo(b.displayName));
+
+          return MasterDetailView(
+            appBarTitle: Text(name),
+            items: [
+              if (isCustom) ...[
+                MasterItem(
+                  Text("library.newCustomExercise".t),
                   leading: const CircleAvatar(
                       child: Icon(GymTrackerIcons.create_exercise)),
                   onTap: () {
@@ -151,94 +167,42 @@ class LibraryExercisesView extends StatelessWidget {
                             ));
                   },
                 ),
-              ),
-              const SliverToBoxAdapter(child: Divider()),
-            ],
-            SliverPadding(
-              padding: MediaQuery.of(context).padding.copyWith(
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                  ),
-              sliver: SliverList.builder(
-                itemCount: category.exercises.length,
-                itemBuilder: (context, index) {
-                  var exerciseListTile = ExerciseListTile(
+                const MasterItemDivider(),
+              ],
+              ...List.generate(
+                sorted.length,
+                (index) {
+                  MasterItem exerciseListTile = ExerciseListTile(
                     exercise: sorted[index],
                     selected: false,
                     isConcrete: false,
                     trailing: kDebugMode && sorted[index].hasExplanation
                         ? const Icon(GymTrackerIcons.explanation)
                         : null,
-                    onTap: () {
-                      Go.to(() => ExerciseInfoView(exercise: sorted[index]));
-                    },
-                  );
-                  if (isCustom && kDebugMode) {
-                    return ContextMenuRegion(
-                      child: exerciseListTile,
-                      contextMenuBuilder: (context, offset) {
-                        return AdaptiveTextSelectionToolbar.buttonItems(
-                          anchors: TextSelectionToolbarAnchors(
-                            primaryAnchor: offset,
-                          ),
-                          buttonItems: <ContextMenuButtonItem>[
-                            ContextMenuButtonItem(
-                              onPressed: () {
-                                ContextMenuController.removeAny();
-                                final category =
-                                    sorted[index].primaryMuscleGroup.name;
-                                var name = sorted[index]
-                                    .name
-                                    .toLowerCase()
-                                    .replaceAllMapped(
-                                        RegExp(r"(\b[a-z](?=[a-z]{1}))"),
-                                        (match) =>
-                                            match.group(0)!.toUpperCase())
-                                    .replaceAllMapped(
-                                        RegExp(r'[^a-zA-Z0-9]'), (match) => '');
-                                name =
-                                    name[0].toLowerCase() + name.substring(1);
-
-                                final dart = """
-      Exercise.standard(
-        id: "library.$category.exercises.$name",
-        name: "library.$category.exercises.$name".t,
-        parameters: GTSetParameters.${sorted[index].parameters.name},
-        primaryMuscleGroup: GTMuscleGroup.${sorted[index].primaryMuscleGroup.name},
-        secondaryMuscleGroups: {${sorted[index].secondaryMuscleGroups.map((e) => "GTMuscleGroup.${e.name}").join(", ")}},
-      ),
-      """;
-                                Clipboard.setData(ClipboardData(text: dart));
-                              },
-                              label: 'Copy as standard exercise',
-                            ),
-                            ContextMenuButtonItem(
-                              onPressed: () {
-                                ContextMenuController.removeAny();
-                              },
-                              label: 'Close',
-                            ),
-                          ],
-                        );
-                      },
+                  ).getAsMasterItem(context, detailsBuilder: (context) {
+                    return ExerciseInfoView(
+                      key: ValueKey(sorted[index].id),
+                      exercise: sorted[index],
+                      refresh: () => refresh(() {}),
                     );
-                  }
+                  });
+
                   return exerciseListTile;
                 },
               ),
-            ),
-          ],
-        ),
+            ],
+          );
+        },
       ),
     );
   }
 }
 
 class ExerciseInfoView extends StatefulWidget {
-  const ExerciseInfoView({required this.exercise, super.key});
+  const ExerciseInfoView({required this.exercise, this.refresh, super.key});
 
   final Exercise exercise;
+  final void Function()? refresh;
 
   @override
   State<ExerciseInfoView> createState() => _ExerciseInfoViewState();
@@ -327,9 +291,7 @@ class _ExerciseInfoViewState extends State<ExerciseInfoView>
   Widget build(BuildContext context) {
     final exercise = widget.exercise;
 
-    return ThemedSubtree(
-      color: category?.color ?? Theme.of(context).colorScheme.primary,
-      enabled: Get.find<SettingsController>().tintExercises.value,
+    return DetailsView(
       child: StreamBuilder<List<(Exercise, int, Workout)>>(
         stream: historyStream,
         initialData: const <(Exercise, int, Workout)>[],
@@ -355,6 +317,8 @@ class _ExerciseInfoViewState extends State<ExerciseInfoView>
                 ],
                 TextSpan(text: exercise.displayName),
               ])),
+              leading: MDVConfiguration.backButtonOf(context),
+              automaticallyImplyLeading: false,
               actions: [
                 if (exercise.isCustom)
                   PopupMenuButton(
@@ -363,8 +327,17 @@ class _ExerciseInfoViewState extends State<ExerciseInfoView>
                       PopupMenuItem(
                         child: Text("actions.edit".t),
                         onTap: () async {
-                          Get.find<ExercisesController>()
-                              .editExercise(exercise, history);
+                          final newExercise =
+                              await Get.find<ExercisesController>()
+                                  .editExercise(exercise, history);
+                          if (context.mounted && newExercise != null) {
+                            widget.refresh?.call();
+                            MDVConfiguration.of(context)?.push(
+                              context,
+                              ExerciseInfoView(exercise: newExercise),
+                              id: jsonEncode(newExercise.toJson()),
+                            );
+                          }
                         },
                       ),
                       if (history.isEmpty)
@@ -382,6 +355,7 @@ class _ExerciseInfoViewState extends State<ExerciseInfoView>
                             if (delete) {
                               Get.find<ExercisesController>()
                                   .deleteExercise(exercise);
+                              widget.refresh?.call();
                               Get.back();
                             }
                           },
@@ -569,7 +543,7 @@ class _ExerciseInfoViewState extends State<ExerciseInfoView>
         SliverList.builder(
           itemCount: history.length,
           itemBuilder: (context, index) {
-            return Card(
+            return Card.outlined(
               margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
               clipBehavior: Clip.antiAlias,
               child: Padding(
@@ -663,7 +637,16 @@ class _ExerciseInfoViewState extends State<ExerciseInfoView>
                       logger.d(id);
                       final exercise = getStandardExerciseByID(id);
                       if (exercise != null) {
-                        Go.to(() => ExerciseInfoView(exercise: exercise));
+                        final config = MDVConfiguration.of(context);
+                        if (config == null) {
+                          Go.to(() => ExerciseInfoView(exercise: exercise));
+                        } else {
+                          config.push(
+                            context,
+                            ExerciseInfoView(exercise: exercise),
+                            id: jsonEncode(exercise.toJson()),
+                          );
+                        }
                       } else {
                         logger.e("Exercise not found: $id");
                       }
@@ -910,6 +893,23 @@ class DebugExercisesWithoutExplanationList extends StatelessWidget {
           );
         },
       ),
+    );
+  }
+}
+
+extension _MDView on ExerciseListTile {
+  MasterItem getAsMasterItem(
+    BuildContext context, {
+    required Widget Function(BuildContext)? detailsBuilder,
+  }) {
+    final ListTile tile = build(context) as ListTile;
+    return MasterItem(
+      tile.title!,
+      leading: tile.leading,
+      subtitle: tile.subtitle,
+      trailing: tile.trailing,
+      detailsBuilder: detailsBuilder,
+      id: jsonEncode(exercise.toJson()),
     );
   }
 }

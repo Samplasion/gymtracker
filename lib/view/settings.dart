@@ -58,38 +58,39 @@ class SettingsView extends ControlledWidget<SettingsController> {
           leading: const SkeletonDrawerButton(),
           items: [
             MasterItem(
-              "settings.panes.appearance".t,
+              Text("settings.panes.appearance".t),
               leading: const Icon(GymTrackerIcons.appearance),
               detailsBuilder: (_) => const AppearanceSettingsPane(),
             ),
             MasterItem(
-              "settings.panes.units".t,
+              Text("settings.panes.units".t),
               leading: const Icon(GymTrackerIcons.units),
               detailsBuilder: (_) => const UnitsSettingsPane(),
             ),
             MasterItem(
-              "settings.panes.off".t,
+              Text("settings.panes.off".t),
               leading: const Icon(GymTrackerIcons.food),
               detailsBuilder: (_) => const OpenFoodFactsSettingsPane(),
             ),
             if (showPermissionsTile)
               MasterItem(
-                "settings.panes.permissions".t,
+                Text("settings.panes.permissions".t),
                 leading: const Icon(GymTrackerIcons.permissions),
                 detailsBuilder: (_) => const PermissionsSettingsPane(),
               ),
             const MasterItemWidget(child: Divider()),
             MasterItem(
-              "settings.advanced.title".t,
-              subtitle: "settings.advanced.subtitle".t,
+              Text("settings.advanced.title".t),
+              subtitle: Text("settings.advanced.subtitle".t),
               leading: const Icon(GymTrackerIcons.advanced),
               trailing: const Icon(GymTrackerIcons.lt_chevron),
               detailsBuilder: (_) => const AdvancedSettingsView(),
             ),
             MasterItem(
-              MaterialLocalizations.of(context).aboutListTileTitle("appName".t),
+              Text(MaterialLocalizations.of(context)
+                  .aboutListTileTitle("appName".t)),
               leading: const Icon(GymTrackerIcons.info),
-              subtitle: appVersion,
+              subtitle: Text(appVersion),
               onTap: () {
                 showAboutDialog(
                   context: context,

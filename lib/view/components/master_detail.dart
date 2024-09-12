@@ -24,6 +24,7 @@
 library;
 
 import 'package:animations/animations.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:gymtracker/utils/constants.dart';
 import 'package:gymtracker/view/utils/sliver_utils.dart';
@@ -82,6 +83,21 @@ class MDVConfiguration extends InheritedWidget {
   bool updateShouldNotify(MDVConfiguration oldWidget) {
     return selfPage != oldWidget.selfPage;
   }
+
+  void push(
+    BuildContext context,
+    Widget widget, {
+    String? id,
+  }) {
+    MasterDetailView._push(
+      context,
+      MasterItem(
+        Container(),
+        detailsBuilder: (_) => widget,
+        id: id,
+      ),
+    );
+  }
 }
 
 class MasterDetailView extends StatefulWidget {
@@ -105,6 +121,12 @@ class MasterDetailView extends StatefulWidget {
     this.detailsPanelCornersRadius = 16,
     super.key,
   });
+
+  static void _push(BuildContext context, MasterItem item) {
+    _MasterDetailViewState state =
+        context.findAncestorStateOfType<_MasterDetailViewState>()!;
+    state._push(item);
+  }
 
   @override
   State<MasterDetailView> createState() => _MasterDetailViewState();
@@ -211,7 +233,7 @@ class _MasterDetailViewState extends State<MasterDetailView> {
                   child,
                 ),
                 child: Padding(
-                  key: ValueKey<MasterItem?>(selectedItem),
+                  key: _getKey(),
                   padding: const EdgeInsetsDirectional.only(
                     end: 12,
                   ),
@@ -279,7 +301,7 @@ class _MasterDetailViewState extends State<MasterDetailView> {
                   ),
                 )
               : Scaffold(
-                  key: ValueKey<MasterItem?>(selectedItem),
+                  key: _getKey(),
                   body: CustomScrollView(
                     slivers: <Widget>[
                       SliverAppBar.large(
@@ -308,26 +330,39 @@ class _MasterDetailViewState extends State<MasterDetailView> {
     }
   }
 
+  ValueKey _getKey() {
+    if (selectedItem?.id != null) {
+      return ValueKey<String>(selectedItem!.id!);
+    }
+    return ValueKey<MasterItem?>(selectedItem);
+  }
+
   Widget _listTileBuilder(MasterItem item, {bool page = false}) {
     return ListTile(
-      title: Text(item.title),
-      subtitle: item.subtitle != null ? Text(item.subtitle!) : null,
+      title: item.title,
+      subtitle: item.subtitle,
       leading: item.leading,
       trailing: item.trailing,
-      selected: selectedItem == item,
+      selected: item.id == null
+          ? (selectedItem == item)
+          : (selectedItem?.id == item.id),
       onTap: () {
         if (item.onTap != null) {
           item.onTap!();
         } else {
-          if (mounted) {
-            setState(() {
-              focus = MDVFocus.details;
-              selectedItem = item;
-            });
-          }
+          _push(item);
         }
       },
     );
+  }
+
+  _push(MasterItem item) {
+    if (mounted) {
+      setState(() {
+        focus = MDVFocus.details;
+        selectedItem = item;
+      });
+    }
   }
 }
 
@@ -346,6 +381,10 @@ class MasterItemWidget extends StatelessWidget implements MasterItemBase {
   }
 }
 
+class MasterItemDivider extends MasterItemWidget {
+  const MasterItemDivider({super.key}) : super(child: const Divider());
+}
+
 class MasterItem extends MasterItemBase {
   const MasterItem(
     this.title, {
@@ -354,16 +393,17 @@ class MasterItem extends MasterItemBase {
     this.onTap,
     this.leading,
     this.trailing,
+    this.id,
   }) : assert(
           detailsBuilder != null || onTap != null,
           'You need to specify at least one of detailsBuilder or onTap.',
         );
 
   /// The title showed in the list tile
-  final String title;
+  final Widget title;
 
   /// The optional subtitle showed in the list tile
-  final String? subtitle;
+  final Widget? subtitle;
 
   /// [ListTile.leading] and [ListTile.trailing] corespondents
   final Widget? leading, trailing;
@@ -378,6 +418,9 @@ class MasterItem extends MasterItemBase {
   /// An override for the onTap callback so the list tile doesn't open a details
   /// page.
   final GestureTapCallback? onTap;
+
+  /// Used to highlight the current item.
+  final String? id;
 
   @override
   bool operator ==(Object other) {
@@ -410,12 +453,17 @@ class DetailsView extends StatelessWidget {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
+    var canvasColor = _getCanvasColor(settings, colorScheme);
     return Material(
-      color: _getCanvasColor(settings, colorScheme),
+      color: canvasColor,
       child: Theme(
         data: theme.copyWith(
           appBarTheme: theme.appBarTheme.copyWith(
-            backgroundColor: _getCanvasColor(settings, colorScheme),
+            backgroundColor: canvasColor,
+          ),
+          scaffoldBackgroundColor: canvasColor,
+          colorScheme: colorScheme.copyWith(
+            surface: canvasColor,
           ),
         ),
         child: child,

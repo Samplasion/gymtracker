@@ -9,7 +9,6 @@ import 'package:gymtracker/model/workout.dart';
 import 'package:gymtracker/service/logger.dart';
 import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/view/exercise_creator.dart';
-import 'package:gymtracker/view/library.dart';
 
 class ExercisesController extends GetxController with ServiceableController {
   RxList<Exercise> exercises = <Exercise>[].obs;
@@ -83,7 +82,7 @@ class ExercisesController extends GetxController with ServiceableController {
     service.setExercise(exercise);
   }
 
-  void editExercise(
+  Future<Exercise?> editExercise(
       Exercise exercise, List<(Exercise, int, Workout)> history) async {
     if (Get.isRegistered<WorkoutController>() &&
         Get.find<WorkoutController>().hasExercise(exercise)) {
@@ -92,7 +91,7 @@ class ExercisesController extends GetxController with ServiceableController {
         "exercise.editor.overwriteInWorkout.body",
       );
       if (!shouldOverwrite) {
-        return;
+        return null;
       }
     }
     final ex = await Go.showBottomModalScreen<Exercise>(
@@ -109,8 +108,8 @@ class ExercisesController extends GetxController with ServiceableController {
       if (isInUse) {
         Get.find<Coordinator>().applyExerciseModification(ex);
       }
-      Go.off(() => ExerciseInfoView(exercise: ex));
     }
+    return ex;
   }
 
   getExerciseByID(String id) {

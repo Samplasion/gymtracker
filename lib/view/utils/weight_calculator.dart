@@ -96,8 +96,10 @@ class _WeightCalculatorState extends State<WeightCalculator>
                       ),
                       onChanged: (value) {
                         setState(() {
-                          _weightController.text = stringifyDouble(
-                              double.parse(value).clamp(0, 10000));
+                          var dbl = value.tryParseDouble();
+                          _weightController.text = dbl == null
+                              ? ""
+                              : stringifyDouble(dbl.clamp(0, 10000));
                           if (value.endsWith(".")) {
                             _weightController.text += ".";
                           }

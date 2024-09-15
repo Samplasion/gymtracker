@@ -289,109 +289,112 @@ class _ExerciseInfoViewState extends State<ExerciseInfoView>
   Widget build(BuildContext context) {
     final exercise = widget.exercise;
 
-    return DetailsView(
-      child: StreamBuilder<List<(Exercise, int, Workout)>>(
-        stream: historyStream,
-        initialData: const <(Exercise, int, Workout)>[],
-        builder: (context, historySnapshot) {
-          final history = historySnapshot.data ?? [];
+    return ThemedSubtree(
+      color: category?.color ?? Theme.of(context).colorScheme.primary,
+      child: DetailsView(
+        child: StreamBuilder<List<(Exercise, int, Workout)>>(
+          stream: historyStream,
+          initialData: const <(Exercise, int, Workout)>[],
+          builder: (context, historySnapshot) {
+            final history = historySnapshot.data ?? [];
 
-          final infoTiles = _getInfoTiles(exercise, context);
-          final chartHistory = history.map((e) => (e.$3, e.$1)).toList();
-          chartHistory
-              .sort((a, b) => a.$1.startingDate!.compareTo(b.$1.startingDate!));
+            final infoTiles = _getInfoTiles(exercise, context);
+            final chartHistory = history.map((e) => (e.$3, e.$1)).toList();
+            chartHistory.sort(
+                (a, b) => a.$1.startingDate!.compareTo(b.$1.startingDate!));
 
-          final tabs = getTabs(exercise, chartHistory, history, infoTiles);
+            final tabs = getTabs(exercise, chartHistory, history, infoTiles);
 
-          return Scaffold(
-            appBar: AppBar(
-              title: Text.rich(TextSpan(children: [
-                if (exercise.isCustom) ...[
-                  const WidgetSpan(
-                    child: CustomExerciseBadge(short: true),
-                    alignment: PlaceholderAlignment.middle,
-                  ),
-                  const TextSpan(text: " "),
-                ],
-                TextSpan(text: exercise.displayName),
-              ])),
-              leading: MDVConfiguration.backButtonOf(context),
-              automaticallyImplyLeading: false,
-              actions: [
-                if (exercise.isCustom)
-                  PopupMenuButton(
-                    key: const Key("menu"),
-                    itemBuilder: (_) => [
-                      PopupMenuItem(
-                        child: Text("actions.edit".t),
-                        onTap: () async {
-                          final newExercise =
-                              await Get.find<ExercisesController>()
-                                  .editExercise(exercise, history);
-                          if (context.mounted && newExercise != null) {
-                            widget.refresh?.call();
-                            MDVConfiguration.of(context)?.push(
-                              context,
-                              ExerciseInfoView(exercise: newExercise),
-                              id: newExercise.key,
-                            );
-                          }
-                        },
-                      ),
-                      if (history.isEmpty)
+            return Scaffold(
+              appBar: AppBar(
+                title: Text.rich(TextSpan(children: [
+                  if (exercise.isCustom) ...[
+                    const WidgetSpan(
+                      child: CustomExerciseBadge(short: true),
+                      alignment: PlaceholderAlignment.middle,
+                    ),
+                    const TextSpan(text: " "),
+                  ],
+                  TextSpan(text: exercise.displayName),
+                ])),
+                leading: MDVConfiguration.backButtonOf(context),
+                automaticallyImplyLeading: MDVConfiguration.of(context) == null,
+                actions: [
+                  if (exercise.isCustom)
+                    PopupMenuButton(
+                      key: const Key("menu"),
+                      itemBuilder: (_) => [
                         PopupMenuItem(
-                          child: Text(
-                            "actions.remove".t,
-                            style: TextStyle(
-                              color: Theme.of(context).colorScheme.error,
-                            ),
-                          ),
+                          child: Text("actions.edit".t),
                           onTap: () async {
-                            final delete = await Go.confirm(
-                                "exercise.delete.title",
-                                "exercise.delete.body");
-                            if (delete) {
-                              Get.find<ExercisesController>()
-                                  .deleteExercise(exercise);
+                            final newExercise =
+                                await Get.find<ExercisesController>()
+                                    .editExercise(exercise, history);
+                            if (context.mounted && newExercise != null) {
                               widget.refresh?.call();
-                              Get.back();
+                              MDVConfiguration.of(context)?.push(
+                                context,
+                                ExerciseInfoView(exercise: newExercise),
+                                id: newExercise.key,
+                              );
                             }
                           },
                         ),
-                    ],
-                  ),
-              ],
-              bottom: TabBar(
-                tabAlignment: Platform.isMacOS || Platform.isIOS
-                    ? TabAlignment.center
-                    : TabAlignment.startOffset,
-                controller: tabController,
-                tabs: [
-                  Tab(
-                    icon: const Icon(GymTrackerIcons.home),
-                    text: "exercise.info.home".t,
-                  ),
-                  Tab(
-                    icon: const Icon(GymTrackerIcons.history),
-                    text: "exercise.info.history".t,
-                  ),
-                  Tab(
-                    icon: const Icon(GymTrackerIcons.explanation),
-                    text: "exercise.info.explanation".t,
-                  ),
-                ].take(tabs.length).toList(),
-                isScrollable: true,
+                        if (history.isEmpty)
+                          PopupMenuItem(
+                            child: Text(
+                              "actions.remove".t,
+                              style: TextStyle(
+                                color: Theme.of(context).colorScheme.error,
+                              ),
+                            ),
+                            onTap: () async {
+                              final delete = await Go.confirm(
+                                  "exercise.delete.title",
+                                  "exercise.delete.body");
+                              if (delete) {
+                                Get.find<ExercisesController>()
+                                    .deleteExercise(exercise);
+                                widget.refresh?.call();
+                                Get.back();
+                              }
+                            },
+                          ),
+                      ],
+                    ),
+                ],
+                bottom: TabBar(
+                  tabAlignment: Platform.isMacOS || Platform.isIOS
+                      ? TabAlignment.center
+                      : TabAlignment.startOffset,
+                  controller: tabController,
+                  tabs: [
+                    Tab(
+                      icon: const Icon(GymTrackerIcons.home),
+                      text: "exercise.info.home".t,
+                    ),
+                    Tab(
+                      icon: const Icon(GymTrackerIcons.history),
+                      text: "exercise.info.history".t,
+                    ),
+                    Tab(
+                      icon: const Icon(GymTrackerIcons.explanation),
+                      text: "exercise.info.explanation".t,
+                    ),
+                  ].take(tabs.length).toList(),
+                  isScrollable: true,
+                ),
               ),
-            ),
-            body: ListTileTheme(
-              contentPadding: EdgeInsets.zero,
-              child: TabBarView(
-                controller: tabController,
-                children: tabs,
+              body: ListTileTheme(
+                contentPadding: EdgeInsets.zero,
+                child: TabBarView(
+                  controller: tabController,
+                  children: tabs,
+                ),
               ),
-            ),
-          );
-        },
+            );
+          },
+        ),
       ),
     );
   }

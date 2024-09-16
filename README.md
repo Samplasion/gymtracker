@@ -23,10 +23,6 @@ protocol.
 
 ## Contributing
 
-### Localization
-
-You can help translate GymTracker by registering to [my Accent instance](https://intl.samplasion.js.org).
-
 ### Updating the database
 
 Once you make changes to the schema in `lib/db`, update the database version int

@@ -45,7 +45,7 @@ jobs:
           generate_release_notes: true
       - name: Upload artifacts
         if: github.event_name != 'release'
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: GymTracker iOS app
           path: out/ios/GymTracker-*
@@ -114,7 +114,7 @@ jobs:
           generate_release_notes: true
       - name: Upload artifacts
         if: github.event_name != 'release'
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: GymTracker Android app [${{ matrix.flag }}]
           path: out/android/GymTracker-*

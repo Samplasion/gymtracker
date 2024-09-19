@@ -65,6 +65,7 @@ dependencies:
   flutter_zxing: ^1.7.0
   url_launcher: ^6.3.0
   sliver_tools: ^0.2.12
+  csv: ^6.0.0
   
 dev_dependencies:
   flutter_test:

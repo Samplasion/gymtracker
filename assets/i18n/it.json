@@ -388,6 +388,16 @@
         "failed": {
           "title": "Impossibile importare i dati",
           "copy": "Il messaggio di errore è stato copiato negli appunti."
+        },
+        "utils": {
+          "hevy": {
+            "notes": "Importato da Hevy",
+            "titles": "(Importato da Hevy)"
+          }
+        },
+        "types": {
+          "gt": "GymTracker (JSON)",
+          "hevy": "Hevy (CSV)"
         }
       },
       "amoledMode": {

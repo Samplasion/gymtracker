@@ -1,12 +1,14 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:csv/csv.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:gymtracker/controller/serviceable_controller.dart';
+import 'package:gymtracker/data/converters.dart';
 import 'package:gymtracker/data/distance.dart';
 import 'package:gymtracker/data/weights.dart';
 import 'package:gymtracker/model/preferences.dart';
@@ -175,27 +177,43 @@ class SettingsController extends GetxController with ServiceableController {
   }
 
   Future importSettings(BuildContext context) async {
+    final choice = await Go.pick(
+      title: "settings.options.import.label".t,
+      values: {
+        "gt": "settings.options.import.types.gt".t,
+        "hevy": "settings.options.import.types.hevy".t,
+      },
+    );
+
+    if (choice == null) return;
+
     FilePickerResult? result = await FilePicker.platform.pickFiles();
+    String content;
+
+    if (kIsWeb && result?.files.single.bytes != null) {
+      content = String.fromCharCodes(result!.files.single.bytes!.toList());
+    } else if (!kIsWeb && result?.files.single.path != null) {
+      File file = File(result!.files.single.path!);
+      content = await file.readAsString();
+    } else {
+      // User canceled the picker
+      logger.i("Picker canceled");
+      return;
+    }
 
     try {
-      if (kIsWeb && result?.files.single.bytes != null) {
-        String content =
-            String.fromCharCodes(result!.files.single.bytes!.toList());
-        Map<String, dynamic> map = json.decode(content);
-
-        await service.fromJson(map);
-        Go.snack("settings.options.import.success".t);
-      } else if (!kIsWeb && result?.files.single.path != null) {
-        File file = File(result!.files.single.path!);
-        String content = await file.readAsString();
-        Map<String, dynamic> map = json.decode(content);
-
-        await service.fromJson(map);
-        Go.snack("settings.options.import.success".t);
-      } else {
-        // User canceled the picker
-        logger.i("Picker canceled");
+      switch (choice) {
+        case "gt":
+          // ignore: use_build_context_synchronously
+          await _importGTJson(context, content);
+          break;
+        case "hevy":
+          // ignore: use_build_context_synchronously
+          await _importHevy(context, content);
+          break;
       }
+
+      Go.snack("settings.options.import.success".t);
     } catch (e, s) {
       logger.e("", error: e, stackTrace: s);
 
@@ -204,18 +222,44 @@ class SettingsController extends GetxController with ServiceableController {
         errorString = "$errorString\n${e.stackTrace}";
       }
 
-      Go.dialog("settings.options.import.failed.title".t, errorString,
-          actions: [
-            TextButton(
-              onPressed: () {
-                Clipboard.setData(ClipboardData(text: errorString));
-                Go.snack("settings.options.import.failed.copy".t);
-              },
-              child: Text(
-                  // ignore: use_build_context_synchronously
-                  MaterialLocalizations.of(context).copyButtonLabel),
-            )
-          ]);
+      Go.dialog(
+        "settings.options.import.failed.title".t,
+        errorString,
+        actions: [
+          TextButton(
+            onPressed: () {
+              Clipboard.setData(ClipboardData(text: errorString));
+              Go.snack("settings.options.import.failed.copy".t);
+            },
+            child: Text(
+                // ignore: use_build_context_synchronously
+                MaterialLocalizations.of(context).copyButtonLabel),
+          )
+        ],
+      );
+    }
+  }
+
+  Future _importGTJson(BuildContext context, String content) async {
+    Map<String, dynamic> map = json.decode(content);
+
+    await service.fromJson(map);
+  }
+
+  Future _importHevy(BuildContext context, String content) async {
+    List<List<dynamic>> data =
+        const CsvToListConverter().convert(content, eol: "\n");
+    final header = data.removeAt(0);
+
+    if (header.contains("fat_percent")) {
+      final measurementData = convertHevyMeasurementData(data);
+
+      await service.addWeightMeasurements(measurementData.weightMeasurements);
+    } else {
+      final workoutData = convertHevyWorkoutData(data);
+
+      await service.addExercises(workoutData.customExercises);
+      await service.addHistoryWorkouts(workoutData.workouts);
     }
   }
 

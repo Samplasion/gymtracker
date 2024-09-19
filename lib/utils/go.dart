@@ -379,6 +379,74 @@ class Go {
   static void popUntil(bool Function(Route route) predicate) {
     Navigator.of(Get.context!).popUntil(predicate);
   }
+
+  static Future<T?> pick<T>({
+    required Map<T, String> values,
+    required String title,
+  }) async {
+    Widget builder(context) {
+      return StatefulBuilder(
+        builder: (context, setState) {
+          return SafeArea(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: DefaultTextStyle(
+                    style: Theme.of(context).textTheme.titleLarge!,
+                    child: Text(title),
+                  ),
+                ),
+                Flexible(
+                  child: SingleChildScrollView(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        for (final entry in values.entries)
+                          ListTile(
+                            title: Text(entry.value),
+                            onTap: () {
+                              Navigator.of(context).pop(entry.key);
+                            },
+                          ),
+                      ],
+                    ),
+                  ),
+                ),
+                Flexible(
+                  child: SafeArea(
+                    child: Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Wrap(
+                        alignment: WrapAlignment.end,
+                        children: [
+                          TextButton(
+                            child: Text(MaterialLocalizations.of(context)
+                                .closeButtonLabel),
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          );
+        },
+      );
+    }
+
+    return await showModalBottomSheet<T>(
+      context: Get.context!,
+      builder: builder,
+    );
+  }
 }
 
 String _defaultT(String s) => s.t;

@@ -178,7 +178,12 @@ class WeightDistributionBarChart extends StatelessWidget {
   const WeightDistributionBarChart({required this.workout, super.key});
 
   static bool shouldShow(Workout workout) =>
-      workout.isConcrete && workout.liftedWeight > 0;
+      workout.isConcrete &&
+      workout.liftedWeight > 0 &&
+      workout.flattenedExercises.whereType<Exercise>().any((ex) => [
+            ex.primaryMuscleGroup,
+            ...ex.secondaryMuscleGroups
+          ].any((c) => c.category != null));
 
   @override
   Widget build(BuildContext context) {

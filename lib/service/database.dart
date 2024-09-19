@@ -240,7 +240,7 @@ class DatabaseService extends GetxService with ChangeNotifier {
 
   /// This method is only public for testing purposes.
   @visibleForTesting
-  writeExercises(List<Exercise> exercises) {
+  Future<void> writeExercises(List<Exercise> exercises) {
     return _db.batch((batch) {
       batch.logger.i("Importing exercises");
       batch.deleteAll(_db.customExercises);
@@ -257,6 +257,13 @@ class DatabaseService extends GetxService with ChangeNotifier {
     } else {
       _db.insertCustomExercise(exercise);
     }
+  }
+
+  Future<void> addExercises(List<Exercise> customExercises) async {
+    if (customExercises.isEmpty) return;
+
+    final allExercises = exercises + customExercises;
+    return writeExercises(allExercises);
   }
 
   removeExercise(Exercise exercise) {
@@ -335,7 +342,7 @@ class DatabaseService extends GetxService with ChangeNotifier {
     return history$.value;
   }
 
-  Future writeAllHistory(List<Workout> history) {
+  Future<void> writeAllHistory(List<Workout> history) {
     return _db.transaction(() async {
       await _db.batch((batch) {
         batch.logger.i("Importing routines");
@@ -374,6 +381,13 @@ class DatabaseService extends GetxService with ChangeNotifier {
     }
   }
 
+  Future<void> addHistoryWorkouts(List<Workout> workouts) async {
+    if (workouts.isEmpty) return;
+
+    final allWorkouts = workoutHistory + workouts;
+    return writeAllHistory(allWorkouts);
+  }
+
   removeHistoryWorkout(Workout workout) {
     removeHistoryWorkoutById(workout.id);
   }
@@ -392,6 +406,14 @@ class DatabaseService extends GetxService with ChangeNotifier {
 
   Future _writeWeightMeasurements(List<WeightMeasurement> weightMeasurements) {
     return _db.setWeightMeasurements(weightMeasurements);
+  }
+
+  Future<void> addWeightMeasurements(
+      List<WeightMeasurement> measurements) async {
+    if (measurements.isEmpty) return;
+
+    final allMeasurements = weightMeasurements$.value + measurements;
+    return _writeWeightMeasurements(allMeasurements);
   }
 
   getWeightMeasurement(String measurementID) {

@@ -31,7 +31,14 @@ class ExerciseParentViewGesture extends StatelessWidget {
     logger.t(
         "onTap: ${exercise.id}'s parent is ${exercise.parentID} ($parent) enabled: $enabled");
     if (enabled) {
-      Go.to(() => ExerciseInfoView(exercise: parent));
+      Go.to(() => ExerciseInfoView(exercise: parent, refresh: _refresh));
+    }
+  }
+
+  void _refresh() {
+    final parent = exercise.getParent();
+    if (parent != null) {
+      Go.off(() => ExerciseInfoView(exercise: parent, refresh: _refresh));
     }
   }
 }

@@ -11,6 +11,7 @@ import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/utils/utils.dart';
 import 'package:gymtracker/view/exercise_creator.dart';
 import 'package:gymtracker/view/utils/exercise.dart';
+import 'package:gymtracker/view/utils/sliver_utils.dart';
 
 enum ExercisePickerFilter {
   all,
@@ -174,6 +175,8 @@ class _ExercisePickerState extends State<ExercisePicker> {
               ),
           ]),
         ),
+        const SliverToBoxAdapter(child: SizedBox(height: 8)),
+        const SliverBottomSafeArea(),
       ],
     );
   }

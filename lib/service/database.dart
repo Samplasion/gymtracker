@@ -251,11 +251,11 @@ class DatabaseService extends GetxService with ChangeNotifier {
     });
   }
 
-  setExercise(Exercise exercise) {
+  Future<void> setExercise(Exercise exercise) {
     if (exercises.any((element) => element.id == exercise.id)) {
-      _db.updateCustomExercise(exercise);
+      return _db.updateCustomExercise(exercise);
     } else {
-      _db.insertCustomExercise(exercise);
+      return _db.insertCustomExercise(exercise);
     }
   }
 

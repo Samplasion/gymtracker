@@ -80,12 +80,12 @@ class Coordinator extends GetxController with ServiceableController {
     return isInWorkout || isInHistory || isInRoutines;
   }
 
-  void applyExerciseModification(Exercise ex) {
+  Future<void> applyExerciseModification(Exercise ex) async {
     if (Get.find<HistoryController>().hasExercise(ex)) {
-      Get.find<HistoryController>().applyExerciseModification(ex);
+      await Get.find<HistoryController>().applyExerciseModification(ex);
     }
     if (Get.find<RoutinesController>().hasExercise(ex)) {
-      Get.find<RoutinesController>().applyExerciseModification(ex);
+      await Get.find<RoutinesController>().applyExerciseModification(ex);
     }
     if (Get.isRegistered<WorkoutController>() &&
         Get.find<WorkoutController>().hasExercise(ex)) {

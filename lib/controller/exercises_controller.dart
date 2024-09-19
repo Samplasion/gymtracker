@@ -78,8 +78,8 @@ class ExercisesController extends GetxController with ServiceableController {
     service.removeExercise(exercise);
   }
 
-  void saveEdit(Exercise exercise) {
-    service.setExercise(exercise);
+  Future<void> saveEdit(Exercise exercise) {
+    return service.setExercise(exercise);
   }
 
   Future<Exercise?> editExercise(
@@ -104,9 +104,9 @@ class ExercisesController extends GetxController with ServiceableController {
     logger.d(("IS IN USE", isInUse));
     if (ex != null) {
       assert(ex.id == exercise.id);
-      Get.find<ExercisesController>().saveEdit(ex);
+      await Get.find<ExercisesController>().saveEdit(ex);
       if (isInUse) {
-        Get.find<Coordinator>().applyExerciseModification(ex);
+        await Get.find<Coordinator>().applyExerciseModification(ex);
       }
     }
     return ex;

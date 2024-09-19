@@ -353,10 +353,10 @@ class HistoryController extends GetxController with ServiceableController {
     return map;
   }
 
-  void applyExerciseModification(Exercise exercise) {
+  Future<void> applyExerciseModification(Exercise exercise) {
     assert(exercise.isCustom);
 
-    service.applyExerciseModificationToHistory(exercise);
+    return service.applyExerciseModificationToHistory(exercise);
   }
 
   bool hasExercise(Exercise exercise) {

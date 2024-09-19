@@ -456,10 +456,10 @@ class RoutinesController extends GetxController
     );
   }
 
-  void applyExerciseModification(Exercise exercise) {
+  Future<void> applyExerciseModification(Exercise exercise) {
     assert(exercise.isCustom);
 
-    service.applyExerciseModificationToRoutines(exercise);
+    return service.applyExerciseModificationToRoutines(exercise);
   }
 
   void viewHistory({required Workout routine}) {

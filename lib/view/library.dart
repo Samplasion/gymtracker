@@ -96,7 +96,6 @@ class LibraryView extends GetView<ExercisesController> {
                                 final list = Get.find<ExercisesController>()
                                     .exercises
                                     .toList();
-                                print(("AAAAAA", list.first.name));
                                 return list;
                               }
                               return category.value.exercises;

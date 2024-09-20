@@ -47,7 +47,7 @@ echo
 
 build() {
     echo "📦 Building the iOS app..."
-    flutter build ipa --$flavor --build-number=$NOW --dart-define=BUILD=$BUILD --no-codesign 1> /dev/null
+    flutter build ipa --$flavor --build-number=$NOW --dart-define=BUILD=$BUILD --no-codesign
 }
 
 cleanup() {

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart' hide Localizations;
 import 'package:flutter/scheduler.dart';
 import 'package:get/get.dart';
 import 'package:gymtracker/controller/coordinator.dart';
+import 'package:gymtracker/controller/exercises_controller.dart';
 import 'package:gymtracker/controller/history_controller.dart';
 import 'package:gymtracker/controller/logger_controller.dart';
 import 'package:gymtracker/controller/notifications_controller.dart';
@@ -325,7 +326,8 @@ class _SkeletonViewState extends State<SkeletonView>
                 const TextSpan(text: " "),
                 WidgetSpan(
                   child: GTBadge(
-                    content: exerciseStandardLibraryAsList.length.toString(),
+                    content:
+                        "${exerciseStandardLibraryAsList.length} + ${Get.find<ExercisesController>().exercises.length}",
                     color: GTMaterialColor.quinary,
                     size: GTBadgeSize.small,
                     invert: true,

@@ -25,6 +25,7 @@ class _LogViewState extends ControlledState<LogView, LoggerController> {
       throw Exception("Are you trying to cause an infinite loop?");
 
   final ScrollController _scrollController = ScrollController();
+  final FocusNode _focusNode = FocusNode();
 
   StreamSubscription? sub;
 
@@ -51,6 +52,8 @@ class _LogViewState extends ControlledState<LogView, LoggerController> {
   @override
   void dispose() {
     sub?.cancel();
+    _scrollController.dispose();
+    _focusNode.dispose();
     super.dispose();
   }
 
@@ -113,13 +116,19 @@ class _LogViewState extends ControlledState<LogView, LoggerController> {
           ),
           body: ColoredBox(
             color: Colors.black,
-            child: SafeArea(
-              child: ListView.separated(
-                controller: _scrollController,
-                itemCount: controller.filteredLogs.length,
-                itemBuilder: (context, index) => _buildLogTile(context, index),
-                separatorBuilder: (context, index) => const Divider(height: 1),
-                padding: const EdgeInsets.only(bottom: 8),
+            child: SelectableRegion(
+              focusNode: _focusNode,
+              selectionControls: materialTextSelectionControls,
+              child: SafeArea(
+                child: ListView.separated(
+                  controller: _scrollController,
+                  itemCount: controller.filteredLogs.length,
+                  itemBuilder: (context, index) =>
+                      _buildLogTile(context, index),
+                  separatorBuilder: (context, index) =>
+                      const Divider(height: 1),
+                  padding: const EdgeInsets.only(bottom: 8),
+                ),
               ),
             ),
           ),

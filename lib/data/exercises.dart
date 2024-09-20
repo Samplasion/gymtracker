@@ -589,6 +589,13 @@ Map<GTExerciseMuscleCategory, ExerciseCategory> get exerciseStandardLibrary => {
             primaryMuscleGroup: GTMuscleGroup.shoulders,
             secondaryMuscleGroups: {GTMuscleGroup.triceps},
           ),
+          Exercise.standard(
+            id: "library.shoulders.exercises.bentOverLateralRaises",
+            name: "library.shoulders.exercises.bentOverLateralRaises".t,
+            parameters: GTSetParameters.repsWeight,
+            primaryMuscleGroup: GTMuscleGroup.shoulders,
+            secondaryMuscleGroups: {GTMuscleGroup.upperBack},
+          ),
         ],
         icon: Text("library.shoulders.name".t.characters.first.toUpperCase()),
         color: Colors.cyan,

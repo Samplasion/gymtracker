@@ -1,9 +1,11 @@
 import 'dart:async';
 import 'dart:math';
 
+import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:get/get.dart';
+import 'package:gymtracker/gen/assets.gen.dart';
 import 'package:gymtracker/icons/gymtracker_icons.dart';
 import 'package:gymtracker/model/exercise.dart';
 import 'package:gymtracker/service/localizations.dart';
@@ -270,9 +272,16 @@ class _CardioTimerScreenState extends State<CardioTimerScreen> {
   bool get _isWorkout => _times[_currentTime].$2;
   Timer? _timer;
 
+  final lowPlayer = AudioPlayer();
+  final highPlayer = AudioPlayer();
+
   @override
   void initState() {
     super.initState();
+
+    lowPlayer.setSourceAsset(GTAssets.audio.beepLow);
+    highPlayer.setSourceAsset(GTAssets.audio.beepHigh);
+
     SchedulerBinding.instance.addPostFrameCallback((_) {
       _startTimer();
     });
@@ -281,6 +290,7 @@ class _CardioTimerScreenState extends State<CardioTimerScreen> {
   void _startTimer() {
     _timer?.cancel();
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      _onWillTick(_time);
       setState(() {
         if (_time > 0) {
           _time--;
@@ -293,8 +303,20 @@ class _CardioTimerScreenState extends State<CardioTimerScreen> {
     });
   }
 
+  void _onWillTick(int seconds) async {
+    if (seconds > 1 && seconds <= 4) {
+      await lowPlayer.stop();
+      lowPlayer.resume();
+    } else if (seconds == 1) {
+      await highPlayer.stop();
+      highPlayer.resume();
+    }
+  }
+
   @override
   void dispose() {
+    lowPlayer.dispose();
+    highPlayer.dispose();
     _timer?.cancel();
     super.dispose();
   }
@@ -309,14 +331,14 @@ class _CardioTimerScreenState extends State<CardioTimerScreen> {
     final fontSize = MediaQuery.of(context).size.width / 4;
     return PopScope(
       canPop: false,
-      onPopInvoked: (didPop) async {
+      onPopInvokedWithResult: <T>(didPop, T res) async {
         if (!didPop) {
           final shouldPop = await Go.confirm(
             "cardioTimer.confirmExit.title".t,
             "cardioTimer.confirmExit.message".t,
           );
           if (shouldPop) {
-            Get.back();
+            Get.back<T>(result: res);
           }
         }
       },
@@ -331,6 +353,9 @@ class _CardioTimerScreenState extends State<CardioTimerScreen> {
               backgroundColor: backgroundColor,
               foregroundColor: textColor,
               surfaceTintColor: Colors.transparent,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(0),
+              ),
             ),
             body: Container(
               color: backgroundColor,

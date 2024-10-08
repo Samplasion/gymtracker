@@ -81,6 +81,7 @@ dev_dependencies:
     sdk: flutter
   test: ^1.24.3
   flutter_gen_runner: ^5.8.0
+  audioplayers: ^6.1.0
 
 flutter_gen:
   assets:

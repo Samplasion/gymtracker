@@ -1,3 +1,4 @@
+import 'package:audioplayers/audioplayers.dart';
 import 'package:device_sim/device_sim.dart';
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:flutter/foundation.dart';
@@ -25,12 +26,16 @@ import 'package:gymtracker/view/skeleton.dart';
 import 'package:gymtracker/view/workout.dart';
 import 'package:protocol_handler/protocol_handler.dart';
 import 'package:relative_time/relative_time.dart';
-import 'package:skeletonizer/skeletonizer.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  AudioCache.instance = AudioCache(prefix: '');
+  AudioPlayer.global.setAudioContext(AudioContextConfig(
+    focus: AudioContextConfigFocus.duckOthers,
+  ).build());
 
   Get.put(LoggerController());
   initLogger();

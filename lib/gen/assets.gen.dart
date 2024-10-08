@@ -10,11 +10,14 @@
 class $AssetsAudioGen {
   const $AssetsAudioGen();
 
-  /// File path: assets/audio/alarm.wav
-  String get alarm => 'assets/audio/alarm.wav';
+  /// File path: assets/audio/beep_high.wav
+  String get beepHigh => 'assets/audio/beep_high.wav';
+
+  /// File path: assets/audio/beep_low.wav
+  String get beepLow => 'assets/audio/beep_low.wav';
 
   /// List of all assets
-  List<String> get values => [alarm];
+  List<String> get values => [beepHigh, beepLow];
 }
 
 class $AssetsExercisesGen {

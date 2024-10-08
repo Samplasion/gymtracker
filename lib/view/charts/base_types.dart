@@ -18,4 +18,9 @@ class LineChartPoint {
     required this.date,
     required this.value,
   });
+
+  @override
+  String toString() {
+    return "LineChartPoint(date: $date, value: $value)";
+  }
 }

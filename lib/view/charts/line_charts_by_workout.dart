@@ -541,7 +541,7 @@ class _RoutineHistoryChartState
 ({
   Set<_ExerciseHistoryChartType> types,
   Map<_ExerciseHistoryChartType, List<LineChartPoint>> values,
-}) _calculateTypes(List<_ExerciseHistoryChartChild> children) {
+}) _calculateTypes(List<ExerciseHistoryChartChild> children) {
   final types = <_ExerciseHistoryChartType>{};
   final values = <_ExerciseHistoryChartType, List<LineChartPoint>>{
     _ExerciseHistoryChartType.volume: [],
@@ -601,7 +601,7 @@ class _RoutineHistoryChartState
   );
 }
 
-typedef _ExerciseHistoryChartChild = (Workout, Exercise);
+typedef ExerciseHistoryChartChild = (Workout, Exercise);
 
 class ExerciseHistoryChart extends StatefulWidget {
   const ExerciseHistoryChart({
@@ -610,17 +610,15 @@ class ExerciseHistoryChart extends StatefulWidget {
     super.key,
   });
 
-  // ignore: library_private_types_in_public_api
-  final List<_ExerciseHistoryChartChild> children;
+  final List<ExerciseHistoryChartChild> children;
 
-  // ignore: library_private_types_in_public_api
-  final _ExerciseHistoryChartChild? ongoing;
+  final ExerciseHistoryChartChild? ongoing;
 
   @override
   State<ExerciseHistoryChart> createState() => _ExerciseHistoryChartState();
 
   // ignore: library_private_types_in_public_api
-  static shouldShow(List<_ExerciseHistoryChartChild> exercises, bool ongoing) {
+  static shouldShow(List<ExerciseHistoryChartChild> exercises, bool ongoing) {
     return exercises.where((e) => e.$2.doneSets.isNotEmpty).length >=
             (ongoing ? 1 : 2) &&
         _calculateTypes(exercises).types.isNotEmpty;
@@ -641,6 +639,11 @@ class _ExerciseHistoryChartState
   late _ExerciseHistoryChartType type = availableTypes.first;
   late final Map<_ExerciseHistoryChartType, List<LineChartPoint>> values;
   late final Set<_ExerciseHistoryChartType> availableTypes;
+  late final List<ExerciseHistoryChartChild> children = widget.children
+      .where(
+        (e) => e.$2.doneSets.isNotEmpty,
+      )
+      .toList();
 
   @override
   void initState() {
@@ -649,7 +652,7 @@ class _ExerciseHistoryChartState
     widget.ongoing?.$2.logger.i("");
 
     final (types: availableTypes, values: values) = _calculateTypes(
-        [...widget.children, if (widget.ongoing != null) widget.ongoing!]);
+        [...children, if (widget.ongoing != null) widget.ongoing!]);
     this.values = values;
     this.availableTypes = availableTypes;
   }
@@ -671,6 +674,8 @@ class _ExerciseHistoryChartState
 
   @override
   Widget build(BuildContext context) {
+    final partition = children.length;
+
     return LineChartWithCategories(
       categories: {
         _ExerciseHistoryChartType.volume: LineChartCategory(
@@ -695,11 +700,11 @@ class _ExerciseHistoryChartState
           .toMap(),
       data: {
         for (final entry in values.entries)
-          entry.key: entry.value.take(widget.children.length).toList(),
+          entry.key: entry.value.take(partition).toList(),
       },
       predictedData: {
         for (final entry in values.entries)
-          entry.key: entry.value.skip(widget.children.length).toList(),
+          entry.key: entry.value.skip(partition).toList(),
       },
       currentValueBuilder: (type, index, point, isPredicted) {
         final style = Theme.of(context).textTheme.bodyLarge!.copyWith(
@@ -709,7 +714,7 @@ class _ExerciseHistoryChartState
             );
         final date = isPredicted
             ? widget.ongoing!.$1.startingDate!
-            : widget.children[index].$1.startingDate!;
+            : children[index].$1.startingDate!;
         return TimerView.buildTimeString(
           context,
           Duration(seconds: point.value.toInt()),
@@ -740,7 +745,7 @@ class _ExerciseHistoryChartState
                         Go.to(
                           () => ExercisesView(
                               workout: Get.find<HistoryController>()
-                                  .getByID(widget.children[index].$1.id)!),
+                                  .getByID(children[index].$1.id)!),
                         );
                       }
                     },

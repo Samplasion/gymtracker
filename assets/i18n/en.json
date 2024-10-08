@@ -1000,7 +1000,9 @@
     },
     "actions": {
       "finish": "Finish editing",
-      "changeWeightUnit": "Change weight unit"
+      "changeWeightUnit": "Change weight unit",
+      "discardChanges": "Unsaved changes",
+      "discardChangesContent": "This page contains unsaved changes. Do you wish to go back and discard your changes?"
     },
     "finish": {
       "title": "Finish editing",

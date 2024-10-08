@@ -121,3 +121,7 @@ Color rpeColor(BuildContext context, int currentRPE) {
 Future<T?> timeoutFuture<T>(Duration duration, Future<T> future) {
   return Future.any([Future.delayed(duration), future]);
 }
+
+bool setEquality<T>(Set<T> a, Set<T> b) {
+  return a.length == b.length && a.every(b.contains);
+}

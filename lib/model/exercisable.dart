@@ -80,4 +80,13 @@ abstract class WorkoutExercisable {
   });
 
   WorkoutExercisable clone() => WorkoutExercisable.fromJson(toJson());
+
+  static bool deepEquality(WorkoutExercisable a, WorkoutExercisable b) {
+    if (a.runtimeType != b.runtimeType) return false;
+    return switch (a) {
+      Exercise() => Exercise.deepEquality(a, b as Exercise),
+      Superset() => Superset.deepEquality(a, b as Superset),
+      _ => throw TypeError(),
+    };
+  }
 }

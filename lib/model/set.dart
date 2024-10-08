@@ -175,6 +175,18 @@ class GTSet {
     }
     return false;
   }
+
+  static bool deepEquality(GTSet a, GTSet b) {
+    return a == b &&
+        a.id == b.id &&
+        a.kind == b.kind &&
+        a.parameters == b.parameters &&
+        a.reps == b.reps &&
+        a.weight == b.weight &&
+        a.time == b.time &&
+        a.distance == b.distance &&
+        a.done == b.done;
+  }
 }
 
 class SetParametersError extends Error {

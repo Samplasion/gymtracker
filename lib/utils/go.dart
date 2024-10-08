@@ -131,13 +131,17 @@ class Go {
           actions: [
             TextButton(
               onPressed: () {
-                Get.back(result: false);
+                SchedulerBinding.instance.addPostFrameCallback((_) {
+                  Get.back(result: false);
+                });
               },
               child: Text(MaterialLocalizations.of(context).cancelButtonLabel),
             ),
             TextButton(
               onPressed: () {
-                Get.back(result: true);
+                SchedulerBinding.instance.addPostFrameCallback((_) {
+                  Get.back(result: true);
+                });
               },
               child: Text(MaterialLocalizations.of(context).okButtonLabel),
             ),

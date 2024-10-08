@@ -399,6 +399,25 @@ class Workout {
   bool isChildOf(Workout workout) {
     return workout.id == parentID;
   }
+
+  static bool deepEquality(Workout a, Workout b) {
+    return a.id == b.id &&
+        a.name == b.name &&
+        a.exercises.length == b.exercises.length &&
+        [
+          for (int i = 0; i < a.exercises.length; i++)
+            WorkoutExercisable.deepEquality(a.exercises[i], b.exercises[i])
+        ].every((element) => element) &&
+        a.duration == b.duration &&
+        a.startingDate == b.startingDate &&
+        a.infobox == b.infobox &&
+        a.parentID == b.parentID &&
+        a.weightUnit == b.weightUnit &&
+        a.distanceUnit == b.distanceUnit &&
+        a.completedBy == b.completedBy &&
+        a.completes == b.completes &&
+        a.folder == b.folder;
+  }
 }
 
 class SynthesizedWorkoutMethodException implements Exception {

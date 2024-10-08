@@ -61,134 +61,163 @@ class _WorkoutEditorState extends State<WorkoutEditor> {
 
   late final historyController = Get.find<HistoryController>();
 
+  bool shouldPop() {
+    return Workout.deepEquality(workout, widget.baseWorkout);
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(0),
+    final nav = Navigator.of(context);
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: <T>(didPop, result) async {
+        if (didPop) return;
+        if (shouldPop()) {
+          SchedulerBinding.instance.addPostFrameCallback((_) {
+            nav.pop(result);
+          });
+        } else {
+          SchedulerBinding.instance.addPostFrameCallback((_) async {
+            final confirm = await Go.confirm(
+              "historyEditor.actions.discardChanges".t,
+              "historyEditor.actions.discardChangesContent".t,
+            );
+
+            if (confirm) {
+              SchedulerBinding.instance.addPostFrameCallback((_) {
+                nav.pop(result);
+              });
+            }
+          });
+        }
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(0),
+          ),
+          title: Text("historyEditor.title".tParams({"name": workout.name})),
+          actions: [
+            IconButton(
+              tooltip: "ongoingWorkout.weightCalculator".t,
+              icon: const Icon(GTIcons.weight_calculator),
+              onPressed: () {
+                showDialog(
+                  context: context,
+                  builder: (context) => WeightCalculator(
+                    weightUnit: workout.weightUnit,
+                  ),
+                );
+              },
+            ),
+            PopupMenuButton(
+              key: const Key("main-menu"),
+              itemBuilder: (context) => <PopupMenuEntry<dynamic>>[
+                PopupMenuItem(
+                  child: Text(
+                    "historyEditor.actions.changeWeightUnit".t,
+                  ),
+                  onTap: () {
+                    setState(() {
+                      changeWeightUnitDialog();
+                    });
+                  },
+                ),
+                PopupMenuItem(
+                  child: Text(
+                    "ongoingWorkout.actions.changeDistanceUnit".t,
+                  ),
+                  onTap: () {
+                    setState(() {
+                      changeDistanceUnitDialog();
+                    });
+                  },
+                ),
+                const PopupMenuDivider(),
+                PopupMenuItem(
+                  child: Text(
+                    "historyEditor.actions.finish".t,
+                  ),
+                  onTap: () {
+                    SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
+                      historyController.finishEditingWorkoutWithDialog(
+                        context,
+                        workout,
+                      );
+                    });
+                  },
+                ),
+              ],
+            ),
+          ],
+          bottom: PreferredSize(
+            preferredSize: Size(
+                10, (AppBarTheme.of(context).toolbarHeight ?? kToolbarHeight)),
+            child: WorkoutInfoBar(
+              reps: workout.reps,
+              liftedWeight: workout.liftedWeight,
+              progress: workout.progress,
+            ),
+          ),
         ),
-        title: Text("historyEditor.title".tParams({"name": workout.name})),
-        actions: [
-          IconButton(
-            tooltip: "ongoingWorkout.weightCalculator".t,
-            icon: const Icon(GTIcons.weight_calculator),
-            onPressed: () {
-              showDialog(
-                context: context,
-                builder: (context) => WeightCalculator(
+        resizeToAvoidBottomInset: true,
+        body: ListView(
+          children: [
+            if (workout.shouldShowInfobox) Infobox(text: workout.infobox!),
+            for (int i = 0; i < workout.exercises.length; i++)
+              if (workout.exercises[i] is Exercise)
+                WorkoutExerciseEditor(
+                  key: ValueKey((workout.exercises[i] as Exercise).id),
+                  exercise: workout.exercises[i] as Exercise,
+                  index: (exerciseIndex: i, supersetIndex: null),
+                  isCreating: false,
                   weightUnit: workout.weightUnit,
+                  distanceUnit: workout.distanceUnit,
+                  callbacks: callbacks,
+                )
+              else
+                SupersetEditor(
+                  superset: workout.exercises[i] as Superset,
+                  index: i,
+                  isCreating: false,
+                  key: ValueKey((workout.exercises[i] as Superset).id),
+                  weightUnit: workout.weightUnit,
+                  distanceUnit: workout.distanceUnit,
+                  callbacks: callbacks,
                 ),
-              );
-            },
-          ),
-          PopupMenuButton(
-            key: const Key("main-menu"),
-            itemBuilder: (context) => <PopupMenuEntry<dynamic>>[
-              PopupMenuItem(
-                child: Text(
-                  "historyEditor.actions.changeWeightUnit".t,
-                ),
-                onTap: () {
-                  setState(() {
-                    changeWeightUnitDialog();
-                  });
-                },
-              ),
-              PopupMenuItem(
-                child: Text(
-                  "ongoingWorkout.actions.changeDistanceUnit".t,
-                ),
-                onTap: () {
-                  setState(() {
-                    changeDistanceUnitDialog();
-                  });
-                },
-              ),
-              const PopupMenuDivider(),
-              PopupMenuItem(
-                child: Text(
-                  "historyEditor.actions.finish".t,
-                ),
-                onTap: () {
-                  SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
-                    historyController.finishEditingWorkoutWithDialog(
-                      context,
-                      workout,
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: SplitButton(segments: [
+                SplitButtonSegment(
+                  title: 'historyEditor.exercises.add'.t,
+                  type: SplitButtonSegmentType.filled,
+                  onTap: () async {
+                    final exs = await Go.to<List<Exercise>>(
+                        () => const ExercisePicker(singlePick: false));
+                    if (exs == null || exs.isEmpty) return;
+                    workout.exercises.addAll(
+                      exs.map((ex) => ex.makeChild().copyWith.sets([
+                            GTSet.empty(
+                              kind: GTSetKind.normal,
+                              parameters: ex.parameters,
+                            ),
+                          ])),
                     );
-                  });
-                },
-              ),
-            ],
-          ),
-        ],
-        bottom: PreferredSize(
-          preferredSize: Size(
-              10, (AppBarTheme.of(context).toolbarHeight ?? kToolbarHeight)),
-          child: WorkoutInfoBar(
-            reps: workout.reps,
-            liftedWeight: workout.liftedWeight,
-            progress: workout.progress,
-          ),
+                    setState(() {});
+                  },
+                ),
+                SplitButtonSegment(
+                  title: "historyEditor.exercises.addSuperset".t,
+                  onTap: () {
+                    setState(() {
+                      workout.exercises.add(Superset.empty());
+                    });
+                  },
+                ),
+              ]),
+            ),
+          ],
         ),
-      ),
-      resizeToAvoidBottomInset: true,
-      body: ListView(
-        children: [
-          if (workout.shouldShowInfobox) Infobox(text: workout.infobox!),
-          for (int i = 0; i < workout.exercises.length; i++)
-            if (workout.exercises[i] is Exercise)
-              WorkoutExerciseEditor(
-                key: ValueKey((workout.exercises[i] as Exercise).id),
-                exercise: workout.exercises[i] as Exercise,
-                index: (exerciseIndex: i, supersetIndex: null),
-                isCreating: false,
-                weightUnit: workout.weightUnit,
-                distanceUnit: workout.distanceUnit,
-                callbacks: callbacks,
-              )
-            else
-              SupersetEditor(
-                superset: workout.exercises[i] as Superset,
-                index: i,
-                isCreating: false,
-                key: ValueKey((workout.exercises[i] as Superset).id),
-                weightUnit: workout.weightUnit,
-                distanceUnit: workout.distanceUnit,
-                callbacks: callbacks,
-              ),
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: SplitButton(segments: [
-              SplitButtonSegment(
-                title: 'historyEditor.exercises.add'.t,
-                type: SplitButtonSegmentType.filled,
-                onTap: () async {
-                  final exs = await Go.to<List<Exercise>>(
-                      () => const ExercisePicker(singlePick: false));
-                  if (exs == null || exs.isEmpty) return;
-                  workout.exercises.addAll(
-                    exs.map((ex) => ex.makeChild().copyWith.sets([
-                          GTSet.empty(
-                            kind: GTSetKind.normal,
-                            parameters: ex.parameters,
-                          ),
-                        ])),
-                  );
-                  setState(() {});
-                },
-              ),
-              SplitButtonSegment(
-                title: "historyEditor.exercises.addSuperset".t,
-                onTap: () {
-                  setState(() {
-                    workout.exercises.add(Superset.empty());
-                  });
-                },
-              ),
-            ]),
-          ),
-        ],
       ),
     );
   }

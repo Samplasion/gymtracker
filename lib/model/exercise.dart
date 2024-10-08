@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:copy_with_extension/copy_with_extension.dart';
 import 'package:gymtracker/data/distance.dart';
 import 'package:gymtracker/data/exercises.dart';
@@ -8,6 +10,7 @@ import 'package:gymtracker/model/workout.dart';
 import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/service/logger.dart';
 import 'package:gymtracker/struct/optional.dart';
+import 'package:gymtracker/utils/utils.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:uuid/uuid.dart';
 
@@ -373,6 +376,27 @@ class Exercise extends WorkoutExercisable {
 
   Exercise withCategory(GTExerciseMuscleCategory category) {
     return copyWith(category: category);
+  }
+
+  static bool deepEquality(Exercise a, Exercise b) {
+    return a.id == b.id &&
+        a.name == b.name &&
+        a.parameters == b.parameters &&
+        a.primaryMuscleGroup == b.primaryMuscleGroup &&
+        setEquality(a.secondaryMuscleGroups, b.secondaryMuscleGroups) &&
+        a.restTime == b.restTime &&
+        a.parentID == b.parentID &&
+        a.notes == b.notes &&
+        a.supersetID == b.supersetID &&
+        a.workoutID == b.workoutID &&
+        a.supersedesID == b.supersedesID &&
+        a.standard == b.standard &&
+        a.skeleton == b.skeleton &&
+        a.rpe == b.rpe &&
+        [
+          for (var i = 0; i < a.sets.length; i++)
+            GTSet.deepEquality(a.sets[i], b.sets[i])
+        ].every((element) => element);
   }
 }
 

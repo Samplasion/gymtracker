@@ -90,4 +90,17 @@ class Superset extends WorkoutExercisable {
       ],
     );
   }
+
+  static bool deepEquality(Superset a, Superset b) {
+    if (a.id != b.id) return false;
+    if (a.restTime != b.restTime) return false;
+    if (a.notes != b.notes) return false;
+    if (a.workoutID != b.workoutID) return false;
+    if (a.supersedesID != b.supersedesID) return false;
+    if (a.exercises.length != b.exercises.length) return false;
+    for (var i = 0; i < a.exercises.length; i++) {
+      if (!Exercise.deepEquality(a.exercises[i], b.exercises[i])) return false;
+    }
+    return true;
+  }
 }

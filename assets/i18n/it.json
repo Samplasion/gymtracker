@@ -1000,7 +1000,9 @@
     },
     "actions": {
       "finish": "Termina modifica",
-      "changeWeightUnit": "Cambia unità di peso"
+      "changeWeightUnit": "Cambia unità di peso",
+      "discardChanges": "Modifiche effettuate",
+      "discardChangesContent": "Questa pagina contiene modifiche non salvate. Vuoi comunque tornare indietro e perdere tutte le modifiche?"
     },
     "finish": {
       "title": "Termina modifica",

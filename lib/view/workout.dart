@@ -73,6 +73,9 @@ class _WorkoutViewState extends State<WorkoutView> {
 
     return Scaffold(
       appBar: AppBar(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(0),
+        ),
         title: Obx(() {
           if (stopwatchController.globalStopwatch.isStopped.isFalse ||
               stopwatchController.globalStopwatch.currentDuration.inSeconds >

@@ -65,6 +65,9 @@ class _WorkoutEditorState extends State<WorkoutEditor> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(0),
+        ),
         title: Text("historyEditor.title".tParams({"name": workout.name})),
         actions: [
           IconButton(

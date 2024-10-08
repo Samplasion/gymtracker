@@ -34,7 +34,9 @@ void main() async {
 
   AudioCache.instance = AudioCache(prefix: '');
   AudioPlayer.global.setAudioContext(AudioContextConfig(
-    focus: AudioContextConfigFocus.duckOthers,
+    // TODO: Prevent indefinite ducking
+    // focus: AudioContextConfigFocus.duckOthers,
+    focus: AudioContextConfigFocus.mixWithOthers,
   ).build());
 
   Get.put(LoggerController());

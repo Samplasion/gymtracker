@@ -43,7 +43,7 @@ class LibraryView extends GetView<ExercisesController> {
     return {
       GTExerciseMuscleCategory.custom: ExerciseCategory(
         exercises: Get.find<ExercisesController>().exercises.toList(),
-        icon: const Icon(GTIcons.custom_exercises),
+        iconGetter: () => const Icon(GTIcons.custom_exercises),
         color: Colors.yellow,
       ),
       for (final key in sortedCategories) key: exerciseStandardLibrary[key]!,

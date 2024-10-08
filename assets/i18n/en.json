@@ -810,7 +810,8 @@
         "zumba": "Zumba",
         "jumpRope": "Jump Rope",
         "rowingMachine": "Rowing machine",
-        "bicycleCrunchesCardio": "Bicycle crunches (cardio)"
+        "bicycleCrunchesCardio": "Bicycle crunches (timed)",
+        "crunchesTimed": "Crunches (Timed)"
       }
     },
     "chest": {

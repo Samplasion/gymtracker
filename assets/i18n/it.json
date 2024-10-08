@@ -810,7 +810,8 @@
         "zumba": "Zumba",
         "jumpRope": "Salto con la corda",
         "rowingMachine": "Remoergometro",
-        "bicycleCrunchesCardio": "Bicycle crunch (cardio)"
+        "bicycleCrunchesCardio": "Bicycle crunch a tempo",
+        "crunchesTimed": "Crunch a tempo"
       }
     },
     "chest": {

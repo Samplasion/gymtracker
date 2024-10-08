@@ -62,7 +62,7 @@ class _ExercisePickerState extends State<ExercisePicker> {
       if (widget.filter.hasCustom)
         GTExerciseMuscleCategory.custom: ExerciseCategory(
           exercises: controller.exercises.where(_filter).toList(),
-          icon: const Icon(GTIcons.custom_exercises),
+          iconGetter: () => const Icon(GTIcons.custom_exercises),
           color: Colors.yellow,
         ),
       if (widget.filter.hasLibrary)

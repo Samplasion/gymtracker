@@ -117,7 +117,7 @@ class _CardioTimerSetupScreenState extends State<CardioTimerSetupScreen> {
                 })),
                 trailing: (i > 0)
                     ? IconButton(
-                        icon: const Icon(GymTrackerIcons.delete),
+                        icon: const Icon(GTIcons.delete),
                         tooltip: "actions.remove".t,
                         onPressed: () {
                           setState(() {
@@ -218,7 +218,7 @@ class _CardioTimerSetupScreenState extends State<CardioTimerSetupScreen> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: _submit,
-        child: const Icon(GymTrackerIcons.done),
+        child: const Icon(GTIcons.done),
       ),
     );
   }

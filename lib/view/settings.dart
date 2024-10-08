@@ -59,37 +59,37 @@ class SettingsView extends ControlledWidget<SettingsController> {
           items: [
             MasterItem(
               Text("settings.panes.appearance".t),
-              leading: const Icon(GymTrackerIcons.appearance),
+              leading: const Icon(GTIcons.appearance),
               detailsBuilder: (_) => const AppearanceSettingsPane(),
             ),
             MasterItem(
               Text("settings.panes.units".t),
-              leading: const Icon(GymTrackerIcons.units),
+              leading: const Icon(GTIcons.units),
               detailsBuilder: (_) => const UnitsSettingsPane(),
             ),
             MasterItem(
               Text("settings.panes.off".t),
-              leading: const Icon(GymTrackerIcons.food),
+              leading: const Icon(GTIcons.food),
               detailsBuilder: (_) => const OpenFoodFactsSettingsPane(),
             ),
             if (showPermissionsTile)
               MasterItem(
                 Text("settings.panes.permissions".t),
-                leading: const Icon(GymTrackerIcons.permissions),
+                leading: const Icon(GTIcons.permissions),
                 detailsBuilder: (_) => const PermissionsSettingsPane(),
               ),
             const MasterItemWidget(child: Divider()),
             MasterItem(
               Text("settings.advanced.title".t),
               subtitle: Text("settings.advanced.subtitle".t),
-              leading: const Icon(GymTrackerIcons.advanced),
-              trailing: const Icon(GymTrackerIcons.lt_chevron),
+              leading: const Icon(GTIcons.advanced),
+              trailing: const Icon(GTIcons.lt_chevron),
               detailsBuilder: (_) => const AdvancedSettingsView(),
             ),
             MasterItem(
               Text(MaterialLocalizations.of(context)
                   .aboutListTileTitle("appName".t)),
-              leading: const Icon(GymTrackerIcons.info),
+              leading: const Icon(GTIcons.info),
               subtitle: Text(appVersion),
               onTap: () {
                 showAboutDialog(

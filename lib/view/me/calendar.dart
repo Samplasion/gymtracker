@@ -71,7 +71,7 @@ class _MeCalendarPageState
                       kSpeedDialButtonHeight,
                   buttons: [
                     SpeedDialButton(
-                      icon: Icon(GymTrackerIcons.streak_weeks,
+                      icon: Icon(GTIcons.streak_weeks,
                           color: context.harmonizeColor(Colors.orange)),
                       text: Text(
                           "me.calendar.streakWeeks".plural(streaks.weekStreak)),
@@ -79,7 +79,7 @@ class _MeCalendarPageState
                       dense: true,
                     ),
                     SpeedDialButton(
-                      icon: Icon(GymTrackerIcons.streak_rest,
+                      icon: Icon(GTIcons.streak_rest,
                           color: context
                               .harmonizeColor(Colors.deepPurple.shade300)),
                       text: Text(

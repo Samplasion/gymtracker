@@ -140,11 +140,11 @@ class _WeightMeasurementDataPageState extends State<WeightMeasurementDataPage> {
                             controller.latestWeightMeasurement!.weight;
                         final normalized = (diff * 100).truncate();
                         if (normalized > 10) {
-                          return GymTrackerIcons.weight_up;
+                          return GTIcons.weight_up;
                         } else if (normalized < -10) {
-                          return GymTrackerIcons.weight_down;
+                          return GTIcons.weight_down;
                         } else {
-                          return GymTrackerIcons.weight_flat;
+                          return GTIcons.weight_flat;
                         }
                       }()),
                     ),
@@ -156,7 +156,7 @@ class _WeightMeasurementDataPageState extends State<WeightMeasurementDataPage> {
                       Go.dialog("me.allData.predictedWeight.dialog.title",
                           "me.allData.predictedWeight.dialog.text");
                     },
-                    trailing: const Icon(GymTrackerIcons.info),
+                    trailing: const Icon(GTIcons.info),
                   ),
                   const Divider(),
                 ],
@@ -227,7 +227,7 @@ class _WeightMeasurementDataPageState extends State<WeightMeasurementDataPage> {
                           },
                           backgroundColor: scheme.error,
                           foregroundColor: scheme.onError,
-                          icon: GymTrackerIcons.delete_forever,
+                          icon: GTIcons.delete_forever,
                           label: 'actions.remove'.t,
                         ),
                       ],
@@ -238,7 +238,7 @@ class _WeightMeasurementDataPageState extends State<WeightMeasurementDataPage> {
                           DateFormat.MMMd(context.locale.languageCode)
                               .add_Hm()
                               .format(measurement.time)),
-                      trailing: const Icon(GymTrackerIcons.lt_chevron),
+                      trailing: const Icon(GTIcons.lt_chevron),
                       onTap: () {
                         Go.to(() => WeightMeasurementDataDetailsPage(
                               measurementID: measurement.id,
@@ -292,9 +292,9 @@ class WeightMeasurementDataDetailsPage extends StatelessWidget {
               ),
             ),
             ListTile(
-              leading: const Icon(GymTrackerIcons.edit),
+              leading: const Icon(GTIcons.edit),
               title: Text("actions.edit".t),
-              trailing: const Icon(GymTrackerIcons.lt_chevron),
+              trailing: const Icon(GTIcons.lt_chevron),
               onTap: () async {
                 var newMeasurement =
                     await Go.showBottomModalScreen<WeightMeasurement>(
@@ -312,12 +312,12 @@ class WeightMeasurementDataDetailsPage extends StatelessWidget {
             ),
             ListTile(
               iconColor: scheme.error,
-              leading: const Icon(GymTrackerIcons.delete_forever),
+              leading: const Icon(GTIcons.delete_forever),
               title: Text(
                 "actions.remove".t,
                 style: TextStyle(color: scheme.error),
               ),
-              trailing: const Icon(GymTrackerIcons.lt_chevron),
+              trailing: const Icon(GTIcons.lt_chevron),
               onTap: () {
                 Get.back();
 
@@ -379,7 +379,7 @@ class _WeightMeasurementAddSheet extends State<WeightMeasurementAddSheet> {
       appBar: AppBar(
         title: Text("me.weight.label".t),
         actions: [
-          IconButton(onPressed: submit, icon: const Icon(GymTrackerIcons.done)),
+          IconButton(onPressed: submit, icon: const Icon(GTIcons.done)),
         ],
       ),
       body: SafeArea(

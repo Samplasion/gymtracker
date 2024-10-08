@@ -454,15 +454,15 @@ class _RoutineHistoryChartState
       categories: {
         _RoutineHistoryChartType.volume: LineChartCategory(
           title: "exercise.chart.views.volume".t,
-          icon: const Icon(GymTrackerIcons.volume, size: 16),
+          icon: const Icon(GTIcons.volume, size: 16),
         ),
         _RoutineHistoryChartType.reps: LineChartCategory(
           title: "exercise.chart.views.reps".t,
-          icon: const Icon(GymTrackerIcons.reps, size: 16),
+          icon: const Icon(GTIcons.reps, size: 16),
         ),
         _RoutineHistoryChartType.duration: LineChartCategory(
           title: "exercise.chart.views.duration".t,
-          icon: const Icon(GymTrackerIcons.duration, size: 16),
+          icon: const Icon(GTIcons.duration, size: 16),
         ),
       }
           .entries
@@ -675,19 +675,19 @@ class _ExerciseHistoryChartState
       categories: {
         _ExerciseHistoryChartType.volume: LineChartCategory(
           title: "exercise.chart.views.volume".t,
-          icon: const Icon(GymTrackerIcons.volume, size: 16),
+          icon: const Icon(GTIcons.volume, size: 16),
         ),
         _ExerciseHistoryChartType.reps: LineChartCategory(
           title: "exercise.chart.views.reps".t,
-          icon: const Icon(GymTrackerIcons.reps, size: 16),
+          icon: const Icon(GTIcons.reps, size: 16),
         ),
         _ExerciseHistoryChartType.time: LineChartCategory(
           title: "exercise.chart.views.time".t,
-          icon: const Icon(GymTrackerIcons.time, size: 16),
+          icon: const Icon(GTIcons.time, size: 16),
         ),
         _ExerciseHistoryChartType.distance: LineChartCategory(
           title: "exercise.chart.views.distance".t,
-          icon: const Icon(GymTrackerIcons.distance, size: 16),
+          icon: const Icon(GTIcons.distance, size: 16),
         ),
       }
           .entries

@@ -213,7 +213,7 @@ class _WeightCalculatorState extends State<WeightCalculator>
                             Navigator.pop(context);
                           },
                           label: Text("general.dialogs.actions.ok".t),
-                          icon: const Icon(GymTrackerIcons.done),
+                          icon: const Icon(GTIcons.done),
                         ),
                       ],
                     ),

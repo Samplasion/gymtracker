@@ -69,7 +69,7 @@ class _WorkoutEditorState extends State<WorkoutEditor> {
         actions: [
           IconButton(
             tooltip: "ongoingWorkout.weightCalculator".t,
-            icon: const Icon(GymTrackerIcons.weight_calculator),
+            icon: const Icon(GTIcons.weight_calculator),
             onPressed: () {
               showDialog(
                 context: context,
@@ -873,7 +873,7 @@ class _WorkoutFinishEditingPageState extends State<WorkoutFinishEditingPage> {
             actions: [
               IconButton(
                 key: const Key("submit"),
-                icon: const Icon(GymTrackerIcons.done),
+                icon: const Icon(GTIcons.done),
                 onPressed: _submit,
               )
             ],
@@ -1013,7 +1013,7 @@ class _WorkoutExerciseReorderDialogState
             ),
             actions: [
               IconButton(
-                icon: const Icon(GymTrackerIcons.done),
+                icon: const Icon(GTIcons.done),
                 onPressed: _submit,
               )
             ],

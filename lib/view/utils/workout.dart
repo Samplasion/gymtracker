@@ -112,7 +112,7 @@ class _WorkoutExerciseEditorState extends State<WorkoutExerciseEditor> {
                               );
                             },
                             child: ListTile(
-                              leading: const Icon(GymTrackerIcons.reorder),
+                              leading: const Icon(GTIcons.reorder),
                               title: Text('ongoingWorkout.exercises.reorder'.t),
                             ),
                           ),
@@ -122,7 +122,7 @@ class _WorkoutExerciseEditorState extends State<WorkoutExerciseEditor> {
                             widget.callbacks.onExerciseReplace(widget.index);
                           },
                           child: ListTile(
-                            leading: const Icon(GymTrackerIcons.replace),
+                            leading: const Icon(GTIcons.replace),
                             title: Text('ongoingWorkout.exercises.replace'.t),
                           ),
                         ),
@@ -133,8 +133,7 @@ class _WorkoutExerciseEditorState extends State<WorkoutExerciseEditor> {
                                   widget.index.exerciseIndex);
                             },
                             child: ListTile(
-                              leading:
-                                  const Icon(GymTrackerIcons.add_to_superset),
+                              leading: const Icon(GTIcons.add_to_superset),
                               title: Text(
                                   'ongoingWorkout.exercises.addToSuperset'.t),
                             ),
@@ -163,7 +162,7 @@ class _WorkoutExerciseEditorState extends State<WorkoutExerciseEditor> {
                                   }
                                 },
                           child: ListTile(
-                            leading: const Icon(GymTrackerIcons.reorder),
+                            leading: const Icon(GTIcons.reorder),
                             title:
                                 Text('ongoingWorkout.exercises.reorderSets'.t),
                             enabled: widget.exercise.sets.isNotEmpty,
@@ -189,7 +188,7 @@ class _WorkoutExerciseEditorState extends State<WorkoutExerciseEditor> {
                               });
                             },
                             child: ListTile(
-                              leading: const Icon(GymTrackerIcons.rpe),
+                              leading: const Icon(GTIcons.rpe),
                               title: Text('ongoingWorkout.exercises.setRPE'.t),
                             ),
                           ),
@@ -201,8 +200,7 @@ class _WorkoutExerciseEditorState extends State<WorkoutExerciseEditor> {
                                     widget.exercise));
                               },
                               child: ListTile(
-                                leading:
-                                    const Icon(GymTrackerIcons.cardio_timer),
+                                leading: const Icon(GTIcons.cardio_timer),
                                 title: Text(
                                     'ongoingWorkout.exercises.startCardioTimer'
                                         .t),
@@ -218,7 +216,7 @@ class _WorkoutExerciseEditorState extends State<WorkoutExerciseEditor> {
                           child: ListTile(
                             textColor: Theme.of(context).colorScheme.error,
                             iconColor: Theme.of(context).colorScheme.error,
-                            leading: const Icon(GymTrackerIcons.delete),
+                            leading: const Icon(GTIcons.delete),
                             title: Text('ongoingWorkout.exercises.remove'.t),
                           ),
                         ),
@@ -234,7 +232,7 @@ class _WorkoutExerciseEditorState extends State<WorkoutExerciseEditor> {
               const SizedBox(height: 8),
               ListTile(
                 titleAlignment: ListTileTitleAlignment.titleHeight,
-                leading: const Icon(GymTrackerIcons.notes),
+                leading: const Icon(GTIcons.notes),
                 title: widget.exercise.notes.asQuillDocument().isEmpty()
                     ? Text(
                         "exercise.editor.fields.notes.tapToEdit".t,
@@ -244,7 +242,7 @@ class _WorkoutExerciseEditorState extends State<WorkoutExerciseEditor> {
                         text: widget.exercise.notes,
                         style: notesTextStyle,
                       ),
-                trailing: const Icon(GymTrackerIcons.edit),
+                trailing: const Icon(GTIcons.edit),
                 onTap: () {
                   showDialog(
                     context: context,
@@ -402,7 +400,7 @@ class _WorkoutExerciseSetEditorState extends State<WorkoutExerciseSetEditor> {
           suffix: Text("units.${widget.weightUnit.name}".t),
           suffixIcon: _weightFocusNode.hasFocus
               ? IconButton(
-                  icon: const Icon(GymTrackerIcons.weight_calculator),
+                  icon: const Icon(GTIcons.weight_calculator),
                   onPressed: () {
                     Go.toDialog(
                       () => WeightCalculator(
@@ -515,7 +513,7 @@ class _WorkoutExerciseSetEditorState extends State<WorkoutExerciseSetEditor> {
             onPressed: (_) => widget.onDelete(),
             backgroundColor: scheme.error,
             foregroundColor: scheme.onError,
-            icon: GymTrackerIcons.delete_forever,
+            icon: GTIcons.delete_forever,
             label: 'actions.remove'.t,
           ),
         ],
@@ -661,12 +659,12 @@ class __WorkoutSetRPEDialogState extends State<_WorkoutSetRPEDialog> {
         mainAxisSize: MainAxisSize.min,
         children: [
           ListTile(
-            leading: const Icon(GymTrackerIcons.help),
+            leading: const Icon(GTIcons.help),
             title: Text('exercise.editor.fields.rpe.description.title'.t),
             subtitle: Text('exercise.editor.fields.rpe.description.text'.t),
           ),
           ListTile(
-            leading: const Icon(GymTrackerIcons.rpe),
+            leading: const Icon(GTIcons.rpe),
             title: Text('exercise.editor.fields.rpe.level$currentRPE.title'.t),
             subtitle:
                 Text('exercise.editor.fields.rpe.level$currentRPE.text'.t),
@@ -743,14 +741,14 @@ class __WorkoutReorderSetsDialogState extends State<_WorkoutReorderSetsDialog> {
         appBar: AppBar(
           title: Text('exercise.editor.fields.reorderSets.title'.t),
           leading: IconButton(
-            icon: const Icon(GymTrackerIcons.close),
+            icon: const Icon(GTIcons.close),
             onPressed: () {
               Navigator.pop(context);
             },
           ),
           actions: [
             IconButton(
-              icon: const Icon(GymTrackerIcons.save),
+              icon: const Icon(GTIcons.save),
               onPressed: () {
                 Navigator.pop(context, indices);
               },

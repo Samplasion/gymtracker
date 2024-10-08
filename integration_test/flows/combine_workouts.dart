@@ -78,16 +78,16 @@ Future<void> testCombineWorkoutsFlow(
 
   expect(find.byType(WorkoutFinishPage), findsOneWidget);
 
-  await tester.tap(find.widgetWithIcon(IconButton, GymTrackerIcons.done));
+  await tester.tap(find.widgetWithIcon(IconButton, GTIcons.done));
   await tester.pumpAndSettle();
 
   expect(find.byType(WorkoutDoneSheet), findsOneWidget);
 
-  await tester.tap(find.byIcon(GymTrackerIcons.done));
+  await tester.tap(find.byIcon(GTIcons.done));
   await tester.pumpAndSettle();
 
   // Go to the history page
-  await tester.tap(find.byIcon(GymTrackerIcons.history));
+  await tester.tap(find.byIcon(GTIcons.history));
   await tester.pumpAndSettle();
 
   // Verify that the workout is in the history
@@ -142,12 +142,12 @@ Future<void> testCombineWorkoutsFlow(
 
   expect(find.byType(WorkoutFinishPage), findsOneWidget);
 
-  await tester.tap(find.widgetWithIcon(IconButton, GymTrackerIcons.done));
+  await tester.tap(find.widgetWithIcon(IconButton, GTIcons.done));
   await tester.pumpAndSettle();
 
   expect(find.byType(WorkoutDoneSheet), findsOneWidget);
 
-  await tester.tap(find.byIcon(GymTrackerIcons.done));
+  await tester.tap(find.byIcon(GTIcons.done));
   await tester.pumpAndSettle();
 
   // Verify that we're now at the history page

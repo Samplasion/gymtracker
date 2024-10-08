@@ -130,7 +130,7 @@ class _MeStatisticsPageState
                 value: speedDialData.$1,
                 builder: (context, value) {
                   return SpeedDialButton(
-                    icon: const Icon(GymTrackerIcons.workout),
+                    icon: const Icon(GTIcons.workout),
                     text: Text("${value.toInt()}"),
                     subtitle: Text("me.stats.workouts.label".t),
                   );
@@ -140,7 +140,7 @@ class _MeStatisticsPageState
                 value: speedDialData.$2.inMilliseconds,
                 builder: (context, value) {
                   return SpeedDialButton(
-                    icon: const Icon(GymTrackerIcons.duration),
+                    icon: const Icon(GTIcons.duration),
                     text: TimerView.buildTimeString(
                       context,
                       Duration(milliseconds: value),
@@ -154,7 +154,7 @@ class _MeStatisticsPageState
                 value: speedDialData.$3,
                 builder: (context, value) {
                   return SpeedDialButton(
-                    icon: const Icon(GymTrackerIcons.volume),
+                    icon: const Icon(GTIcons.volume),
                     text: Text(
                       "exerciseList.fields.weight".trParams({
                         "weight": NumberFormat.compact(
@@ -173,7 +173,7 @@ class _MeStatisticsPageState
                 value: speedDialData.$4,
                 builder: (context, value) {
                   return SpeedDialButton(
-                    icon: const Icon(GymTrackerIcons.sets),
+                    icon: const Icon(GTIcons.sets),
                     text: Text("$value"),
                     subtitle: Text("me.stats.sets.label".t),
                   );
@@ -183,7 +183,7 @@ class _MeStatisticsPageState
                 value: speedDialData.$5,
                 builder: (context, value) {
                   return SpeedDialButton(
-                    icon: const Icon(GymTrackerIcons.distance),
+                    icon: const Icon(GTIcons.distance),
                     text: Text(
                       "exerciseList.fields.distance".trParams({
                         "distance": NumberFormat.compact(

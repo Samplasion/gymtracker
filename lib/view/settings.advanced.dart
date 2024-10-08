@@ -17,8 +17,8 @@ class AdvancedSettingsView extends ControlledWidget<SettingsController> {
               delegate: SliverChildListDelegate([
                 ListTile(
                   title: Text("settings.options.import.label".t),
-                  leading: const Icon(GymTrackerIcons.import),
-                  trailing: const Icon(GymTrackerIcons.lt_chevron),
+                  leading: const Icon(GTIcons.import),
+                  trailing: const Icon(GTIcons.lt_chevron),
                   onTap: () async {
                     await controller.importSettings(context);
                   },
@@ -26,8 +26,8 @@ class AdvancedSettingsView extends ControlledWidget<SettingsController> {
                 Builder(builder: (context) {
                   return ListTile(
                     title: Text("settings.options.export.label".t),
-                    leading: const Icon(GymTrackerIcons.export),
-                    trailing: const Icon(GymTrackerIcons.lt_chevron),
+                    leading: const Icon(GTIcons.export),
+                    trailing: const Icon(GTIcons.lt_chevron),
                     onTap: () async {
                       await controller.exportSettings(context);
                     },
@@ -38,8 +38,8 @@ class AdvancedSettingsView extends ControlledWidget<SettingsController> {
                     return ListTile(
                       title: Text("settings.options.exportSQL.label".t),
                       subtitle: Text("settings.options.exportSQL.text".t),
-                      leading: const Icon(GymTrackerIcons.export),
-                      trailing: const Icon(GymTrackerIcons.lt_chevron),
+                      leading: const Icon(GTIcons.export),
+                      trailing: const Icon(GTIcons.lt_chevron),
                       onTap: () async {
                         await controller.exportRawDatabase(context);
                       },
@@ -48,16 +48,16 @@ class AdvancedSettingsView extends ControlledWidget<SettingsController> {
                 const Divider(),
                 ListTile(
                   title: Text("settings.advanced.options.logs.title".t),
-                  leading: const Icon(GymTrackerIcons.logs),
-                  trailing: const Icon(GymTrackerIcons.lt_chevron),
+                  leading: const Icon(GTIcons.logs),
+                  trailing: const Icon(GTIcons.lt_chevron),
                   onTap: () async {
                     await controller.showLogs();
                   },
                 ),
                 ListTile(
                   title: Text("settings.advanced.options.migrations.title".t),
-                  leading: const Icon(GymTrackerIcons.migration),
-                  trailing: const Icon(GymTrackerIcons.lt_chevron),
+                  leading: const Icon(GTIcons.migration),
+                  trailing: const Icon(GTIcons.lt_chevron),
                   onTap: () async {
                     await controller.showMigrations();
                   },
@@ -76,8 +76,8 @@ class AdvancedSettingsView extends ControlledWidget<SettingsController> {
                       ],
                     ),
                   ),
-                  leading: const Icon(GymTrackerIcons.backup),
-                  trailing: const Icon(GymTrackerIcons.lt_chevron),
+                  leading: const Icon(GTIcons.backup),
+                  trailing: const Icon(GTIcons.lt_chevron),
                   onTap: () async {
                     await controller.showBackups();
                   },
@@ -149,7 +149,7 @@ class _BackupListViewState
                         subtitle:
                             Text(backup.size.readableFileSize(base1024: true)),
                         trailing: IconButton(
-                          icon: const Icon(GymTrackerIcons.delete),
+                          icon: const Icon(GTIcons.delete),
                           onPressed: () async {
                             final delete = await Go.confirm(
                               "settings.advanced.options.backups.delete.title"
@@ -196,7 +196,7 @@ class _BackupListViewState
                   delegate: SliverChildListDelegate([
                     ListTile(
                       title: Text("settings.advanced.options.backups.create".t),
-                      leading: const Icon(GymTrackerIcons.backup),
+                      leading: const Icon(GTIcons.backup),
                       onTap: () async {
                         await Go.futureDialog(
                           future: () async {

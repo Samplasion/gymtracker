@@ -69,7 +69,7 @@ class _ExercisesToSupersetDialogState extends State<ExercisesToSupersetDialog> {
           title: Text("ongoingWorkout.exercisesToSuperset.title".t),
           actions: [
             IconButton(
-              icon: const Icon(GymTrackerIcons.done),
+              icon: const Icon(GTIcons.done),
               onPressed: status.isValid
                   ? () => Navigator.of(context).pop(selected.toList())
                   : null,

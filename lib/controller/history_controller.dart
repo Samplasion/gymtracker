@@ -162,7 +162,7 @@ class HistoryController extends GetxController with ServiceableController {
       context: context,
       builder: (context) {
         return AlertDialog(
-          icon: const Icon(GymTrackerIcons.info),
+          icon: const Icon(GTIcons.info),
           title: Text("workouts.actions.delete.title".t),
           content: Text(
             "workouts.actions.delete.text".t,
@@ -200,7 +200,7 @@ class HistoryController extends GetxController with ServiceableController {
       context: context,
       builder: (context) {
         return AlertDialog(
-          icon: const Icon(GymTrackerIcons.info),
+          icon: const Icon(GTIcons.info),
           title: Text(
               "history.actions.deleteMultiple.title".plural(workoutIDs.length)),
           content: Text(
@@ -415,7 +415,7 @@ class HistoryController extends GetxController with ServiceableController {
     final shouldCombine = await Go.confirm(
       "exercise.continuation.combine.confirm.title",
       "exercise.continuation.combine.confirm.body",
-      icon: const Icon(GymTrackerIcons.combine),
+      icon: const Icon(GTIcons.combine),
     );
 
     logger.t("Should combine: $shouldCombine");

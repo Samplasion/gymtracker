@@ -108,7 +108,7 @@ class ExerciseListTile extends StatelessWidget {
     final selectedIcon = CircleAvatar(
       backgroundColor: foregroundColor,
       foregroundColor: backgroundColor,
-      child: const Icon(GymTrackerIcons.done),
+      child: const Icon(GTIcons.done),
     );
     return ListTile(
       leading: Skeleton.leaf(child: selected ? selectedIcon : unselectedIcon),
@@ -118,7 +118,7 @@ class ExerciseListTile extends StatelessWidget {
             const WidgetSpan(
               baseline: TextBaseline.ideographic,
               alignment: PlaceholderAlignment.middle,
-              child: Icon(GymTrackerIcons.superset),
+              child: Icon(GTIcons.superset),
             ),
             const TextSpan(text: " "),
             TextSpan(text: "superset".plural(exercise.exercises.length)),

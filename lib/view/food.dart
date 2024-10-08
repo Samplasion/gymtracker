@@ -248,19 +248,19 @@ class _FoodViewState extends ControlledState<FoodView, FoodController> {
         buttons: [
           // Back, calendar, forward
           IconButton(
-            icon: const Icon(GymTrackerIcons.previousDay),
+            icon: const Icon(GTIcons.previousDay),
             onPressed: () {
               controller.previousDay();
             },
           ),
           IconButton(
-            icon: const Icon(GymTrackerIcons.showDatePicker),
+            icon: const Icon(GTIcons.showDatePicker),
             onPressed: () {
               controller.showDatePicker();
             },
           ),
           IconButton(
-            icon: const Icon(GymTrackerIcons.nextDay),
+            icon: const Icon(GTIcons.nextDay),
             onPressed: () {
               controller.nextDay();
             },
@@ -365,7 +365,7 @@ class _FoodViewState extends ControlledState<FoodView, FoodController> {
       hintText: 'food.searchBar.hint'.t,
       barTrailing: [
         IconButton(
-          icon: const Icon(GymTrackerIcons.combine),
+          icon: const Icon(GTIcons.combine),
           tooltip: "food.combine.title".t,
           onPressed: () {
             controller.showCombineFoodsView().then((food) {
@@ -376,7 +376,7 @@ class _FoodViewState extends ControlledState<FoodView, FoodController> {
           },
         ),
         IconButton(
-          icon: const Icon(GymTrackerIcons.scan_barcode),
+          icon: const Icon(GTIcons.scan_barcode),
           tooltip: "food.barcodeReader.title".t,
           onPressed: () {
             controller.showScanBarcodeView().then((food) {
@@ -514,7 +514,7 @@ class FoodListTile extends ControlledWidget<FoodController> {
             onPressed: (_) => onDelete(),
             backgroundColor: context.theme.colorScheme.error,
             foregroundColor: context.theme.colorScheme.onError,
-            icon: GymTrackerIcons.delete_forever,
+            icon: GTIcons.delete_forever,
             label: 'actions.remove'.t,
           ),
         ],
@@ -526,7 +526,7 @@ class FoodListTile extends ControlledWidget<FoodController> {
             title: Text.rich(TextSpan(children: [
               if (controller.isFavorite(food)) ...[
                 WidgetSpan(
-                  child: Icon(GymTrackerIcons.favorite,
+                  child: Icon(GTIcons.favorite,
                       size: 14, color: Theme.of(context).colorScheme.tertiary),
                   alignment: PlaceholderAlignment.middle,
                 ),
@@ -645,7 +645,7 @@ SearchSuggestionBuilder _getSearchSuggestionBuilder({
         return [
           ...searchHistory.map((term) {
             return ListTile(
-              leading: const Icon(GymTrackerIcons.history),
+              leading: const Icon(GTIcons.history),
               title: Text(term),
               trailing: RotatedBox(
                 quarterTurns: -1,
@@ -708,7 +708,7 @@ class _FoodDayAppBar extends ControlledWidget<FoodController> {
       leading: const Skeleton.keep(child: SkeletonDrawerButton()),
       actions: [
         IconButton(
-          icon: const Icon(GymTrackerIcons.food_categories),
+          icon: const Icon(GTIcons.food_categories),
           tooltip: "food.categoryList.title".t,
           onPressed: () {
             // controller.showNutritionGoalView();
@@ -716,7 +716,7 @@ class _FoodDayAppBar extends ControlledWidget<FoodController> {
           },
         ),
         IconButton(
-          icon: const Icon(GymTrackerIcons.nutrition_goal),
+          icon: const Icon(GTIcons.nutrition_goal),
           tooltip: "food.nutritionGoals.change.title".t,
           onPressed: () {
             controller.showNutritionGoalView();

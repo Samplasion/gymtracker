@@ -43,7 +43,7 @@ class LibraryView extends GetView<ExercisesController> {
     return {
       GTExerciseMuscleCategory.custom: ExerciseCategory(
         exercises: Get.find<ExercisesController>().exercises.toList(),
-        icon: const Icon(GymTrackerIcons.custom_exercises),
+        icon: const Icon(GTIcons.custom_exercises),
         color: Colors.yellow,
       ),
       for (final key in sortedCategories) key: exerciseStandardLibrary[key]!,
@@ -61,7 +61,7 @@ class LibraryView extends GetView<ExercisesController> {
             actions: [
               if (kDebugMode) ...[
                 IconButton(
-                  icon: const Icon(GymTrackerIcons.explanation),
+                  icon: const Icon(GTIcons.explanation),
                   onPressed: () {
                     Go.to(() => const DebugExercisesWithoutExplanationList());
                   },
@@ -148,8 +148,8 @@ class LibraryExercisesView extends StatelessWidget {
               if (isCustom) ...[
                 MasterItem(
                   Text("library.newCustomExercise".t),
-                  leading: const CircleAvatar(
-                      child: Icon(GymTrackerIcons.create_exercise)),
+                  leading:
+                      const CircleAvatar(child: Icon(GTIcons.create_exercise)),
                   onTap: () {
                     Go.showBottomModalScreen(
                         (context, controller) => ThemedSubtree(
@@ -174,7 +174,7 @@ class LibraryExercisesView extends StatelessWidget {
                     selected: false,
                     isConcrete: false,
                     trailing: kDebugMode && sorted[index].hasExplanation
-                        ? const Icon(GymTrackerIcons.explanation)
+                        ? const Icon(GTIcons.explanation)
                         : null,
                   ).getAsMasterItem(context, detailsBuilder: (context) {
                     return ExerciseInfoView(
@@ -369,15 +369,15 @@ class _ExerciseInfoViewState extends State<ExerciseInfoView>
                   controller: tabController,
                   tabs: [
                     Tab(
-                      icon: const Icon(GymTrackerIcons.home),
+                      icon: const Icon(GTIcons.home),
                       text: "exercise.info.home".t,
                     ),
                     Tab(
-                      icon: const Icon(GymTrackerIcons.history),
+                      icon: const Icon(GTIcons.history),
                       text: "exercise.info.history".t,
                     ),
                     Tab(
-                      icon: const Icon(GymTrackerIcons.explanation),
+                      icon: const Icon(GTIcons.explanation),
                       text: "exercise.info.explanation".t,
                     ),
                   ].take(tabs.length).toList(),

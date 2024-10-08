@@ -310,14 +310,14 @@ class _SkeletonViewState extends State<SkeletonView>
       const _GTDrawerHeader(),
       const SizedBox(height: 16),
       NavigationDrawerDestination(
-        icon: const Icon(GymTrackerIcons.routines),
+        icon: const Icon(GTIcons.routines),
         label: Text(
           "routines.title".t,
           textAlign: TextAlign.center,
         ),
       ),
       NavigationDrawerDestination(
-        icon: const Icon(GymTrackerIcons.library),
+        icon: const Icon(GTIcons.library),
         label: Text.rich(
           TextSpan(
             children: [
@@ -341,7 +341,7 @@ class _SkeletonViewState extends State<SkeletonView>
         ),
       ),
       NavigationDrawerDestination(
-        icon: const Icon(GymTrackerIcons.history),
+        icon: const Icon(GTIcons.history),
         label: Text.rich(
           TextSpan(
             children: [
@@ -365,21 +365,21 @@ class _SkeletonViewState extends State<SkeletonView>
         ),
       ),
       NavigationDrawerDestination(
-        icon: const Icon(GymTrackerIcons.profile),
+        icon: const Icon(GTIcons.profile),
         label: Text(
           "me.title".t,
           textAlign: TextAlign.center,
         ),
       ),
       NavigationDrawerDestination(
-        icon: const Icon(GymTrackerIcons.food),
+        icon: const Icon(GTIcons.food),
         label: Text(
           "food.title".t,
           textAlign: TextAlign.center,
         ),
       ),
       NavigationDrawerDestination(
-        icon: const Icon(GymTrackerIcons.settings),
+        icon: const Icon(GTIcons.settings),
         label: Text(
           "settings.title".t,
           textAlign: TextAlign.center,
@@ -387,12 +387,12 @@ class _SkeletonViewState extends State<SkeletonView>
       ),
       if (kDebugMode)
         const NavigationDrawerDestination(
-          icon: Icon(GymTrackerIcons.debug),
+          icon: Icon(GTIcons.debug),
           label: Text("Debug"),
         ),
       if (LoggerController.shouldShowPane)
         const NavigationDrawerDestination(
-          icon: Icon(GymTrackerIcons.logs),
+          icon: Icon(GTIcons.logs),
           label: Text("Logs"),
         ),
       const SafeArea(
@@ -566,7 +566,7 @@ class OngoingWorkoutBar extends StatelessWidget {
                         Crossfade(
                           firstChild: TextButton.icon(
                             onPressed: resumeWorkout,
-                            icon: const Icon(GymTrackerIcons.resume),
+                            icon: const Icon(GTIcons.resume),
                             clipBehavior: Clip.hardEdge,
                             label: Text(
                               isPhone
@@ -579,7 +579,7 @@ class OngoingWorkoutBar extends StatelessWidget {
                           secondChild: IconButton(
                             onPressed: resumeWorkout,
                             icon: Icon(
-                              GymTrackerIcons.resume,
+                              GTIcons.resume,
                               color: Theme.of(context).colorScheme.primary,
                             ),
                           ),
@@ -595,7 +595,7 @@ class OngoingWorkoutBar extends StatelessWidget {
                                     Theme.of(context).colorScheme.error,
                               ),
                               onPressed: () => cancelWorkout(context),
-                              icon: const Icon(GymTrackerIcons.close),
+                              icon: const Icon(GTIcons.close),
                               clipBehavior: Clip.hardEdge,
                               label: Text(
                                 isPhone
@@ -611,7 +611,7 @@ class OngoingWorkoutBar extends StatelessWidget {
                                     Theme.of(context).colorScheme.error,
                               ),
                               onPressed: () => cancelWorkout(context),
-                              icon: const Icon(GymTrackerIcons.close),
+                              icon: const Icon(GTIcons.close),
                             ),
                             showSecond: isPhone,
                           ),
@@ -709,7 +709,7 @@ class __LoaderState extends State<GymTrackerAppLoader> {
                     const SizedBox(height: 16),
                     for (var i = 0; i < 6; i++)
                       NavigationDrawerDestination(
-                        icon: const Icon(GymTrackerIcons.app_icon),
+                        icon: const Icon(GTIcons.app_icon),
                         label: Text(BoneMock.words(i % 3 + 1)),
                         backgroundColor: Colors.transparent,
                       ),

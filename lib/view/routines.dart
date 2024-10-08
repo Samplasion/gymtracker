@@ -92,7 +92,7 @@ class _RoutinesViewState extends State<RoutinesView> with _RoutineList {
                       foregroundColor:
                           context.colorScheme.onQuaternaryContainer,
                       backgroundColor: context.colorScheme.quaternaryContainer,
-                      child: const Icon(GymTrackerIcons.empty_workout),
+                      child: const Icon(GTIcons.empty_workout),
                     ),
                   ),
                   onTap: () {
@@ -148,7 +148,7 @@ class _RoutinesViewState extends State<RoutinesView> with _RoutineList {
                   title: Text("routines.newRoutine".t),
                   leading: const Skeleton.leaf(
                     child: CircleAvatar(
-                      child: Icon(GymTrackerIcons.create_routine),
+                      child: Icon(GTIcons.create_routine),
                     ),
                   ),
                   onTap: () {
@@ -161,7 +161,7 @@ class _RoutinesViewState extends State<RoutinesView> with _RoutineList {
                   title: Text("routines.newFolder".t),
                   leading: const Skeleton.leaf(
                     child: CircleAvatar(
-                      child: Icon(GymTrackerIcons.create_folder),
+                      child: Icon(GTIcons.create_folder),
                     ),
                   ),
                   onTap: () {
@@ -271,7 +271,7 @@ class _EditFolderModalState
     return Scaffold(
       appBar: AppBar(title: Text("routines.editFolder".t), actions: [
         IconButton(
-          icon: const Icon(GymTrackerIcons.delete),
+          icon: const Icon(GTIcons.delete),
           tooltip: "actions.remove".t,
           onPressed: () {
             controller.deleteFolder(widget.folder);
@@ -289,7 +289,7 @@ class _EditFolderModalState
             ));
           },
           tooltip: "actions.save".t,
-          icon: const Icon(GymTrackerIcons.done),
+          icon: const Icon(GTIcons.done),
         ),
       ]),
       body: Form(
@@ -346,10 +346,10 @@ mixin _RoutineList<T extends StatefulWidget> on State<T> {
               final shouldHighlight = candidateItems.isNotEmpty;
               var backgroundColor = Theme.of(context).colorScheme.secondary;
               var foregroundColor = Theme.of(context).colorScheme.onSecondary;
-              var icon = GymTrackerIcons.folder_closed;
+              var icon = GTIcons.folder_closed;
 
               if (shouldHighlight || isExpanded) {
-                icon = GymTrackerIcons.folder_open;
+                icon = GTIcons.folder_open;
               }
 
               final elevation = shouldHighlight || isExpanded ? 4.0 : 0.0;
@@ -401,7 +401,7 @@ mixin _RoutineList<T extends StatefulWidget> on State<T> {
                               Animatable.fromCallback((value) =>
                                   mapRange(value, 0.0, 1.0, 0.25, 0.75)),
                             ),
-                            child: const Icon(GymTrackerIcons.lt_chevron),
+                            child: const Icon(GTIcons.lt_chevron),
                           );
                         },
                       ),
@@ -516,7 +516,7 @@ mixin _RoutineList<T extends StatefulWidget> on State<T> {
                             Theme.of(context).colorScheme.secondary,
                         foregroundColor:
                             Theme.of(context).colorScheme.onSecondary,
-                        child: const Icon(GymTrackerIcons.folder_open),
+                        child: const Icon(GTIcons.folder_open),
                       ),
                     ),
                   ),
@@ -606,7 +606,7 @@ class _RoutinePickerState
                   leading: CircleAvatar(
                     backgroundColor: context.colorScheme.tertiaryContainer,
                     foregroundColor: context.colorScheme.onTertiaryContainer,
-                    child: const Icon(GymTrackerIcons.no_routine),
+                    child: const Icon(GTIcons.no_routine),
                   ),
                   title: Text("routines.none".t),
                   onTap: () {
@@ -647,10 +647,10 @@ class TerseRoutineListTile extends StatelessWidget {
     String text;
 
     if (routine!.folder != null) {
-      icon = const Icon(GymTrackerIcons.folder_closed, size: 20);
+      icon = const Icon(GTIcons.folder_closed, size: 20);
       text = routine!.folder!.name;
     } else {
-      icon = const Icon(GymTrackerIcons.folder_root, size: 20);
+      icon = const Icon(GTIcons.folder_root, size: 20);
       text = "routineFormPicker.fields.routine.options.root".t;
     }
 
@@ -677,7 +677,7 @@ class TerseRoutineListTile extends StatelessWidget {
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
       ),
-      trailing: const Icon(GymTrackerIcons.lt_chevron),
+      trailing: const Icon(GTIcons.lt_chevron),
       onTap: onTap,
       contentPadding: contentPadding,
       visualDensity: VisualDensity.standard,

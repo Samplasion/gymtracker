@@ -82,8 +82,8 @@ class CompoundIcon extends StatelessWidget {
   }
 }
 
-class GymTrackerIcons {
-  GymTrackerIcons._();
+class GTIcons {
+  GTIcons._();
 
   static const _kFontFam = 'GymTracker';
   static const String? _kFontPkg = null;
@@ -197,7 +197,7 @@ class _GymTrackerCompoundIcons {
   const _GymTrackerCompoundIcons();
 
   Widget get add_food_category => const CompoundIcon.sized(
-        main: GymTrackerIcons.food_categories,
+        main: GTIcons.food_categories,
         accessory: Icons.add_rounded,
       );
 }

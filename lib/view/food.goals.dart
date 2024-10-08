@@ -60,7 +60,7 @@ class _ChangeGoalScreenState
       appBar:
           AppBar(title: Text('food.nutritionGoals.change.title'.t), actions: [
         IconButton(
-          icon: const Icon(GymTrackerIcons.history),
+          icon: const Icon(GTIcons.history),
           tooltip: "food.nutritionGoals.history.title".t,
           onPressed: () {
             controller.showGoalHistory();
@@ -183,7 +183,7 @@ class _ChangeGoalScreenState
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: _submitForm,
-        icon: const Icon(GymTrackerIcons.save),
+        icon: const Icon(GTIcons.save),
         label: Text('food.nutritionGoals.change.save'.t),
       ),
     );
@@ -292,7 +292,7 @@ class GoalHistoryView extends ControlledWidget<FoodController> {
                             }),
                           ),
                         ])),
-                        trailing: const Icon(GymTrackerIcons.lt_chevron),
+                        trailing: const Icon(GTIcons.lt_chevron),
                         onTap: () {
                           controller.setDate(keys[index]);
                           Go.popUntil((route) => route.isFirst);

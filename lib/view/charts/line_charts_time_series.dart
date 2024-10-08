@@ -235,7 +235,7 @@ class _LineChartTimeSeriesState<T> extends State<LineChartTimeSeries<T>> {
                 children: [
                   Text("timeSeriesChart.interval.${type.name}".t),
                   const SizedBox(width: 4),
-                  const Icon(GymTrackerIcons.dropdown),
+                  const Icon(GTIcons.dropdown),
                 ],
               ),
             ),

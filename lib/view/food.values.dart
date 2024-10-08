@@ -65,8 +65,8 @@ class _AddFoodViewState extends ControlledState<AddFoodView, FoodController> {
               stream: controller.favorites$,
               builder: (BuildContext context, _) {
                 final icon = controller.isFavorite(widget.food as Food)
-                    ? GymTrackerIcons.remove_from_faves
-                    : GymTrackerIcons.add_to_faves;
+                    ? GTIcons.remove_from_faves
+                    : GTIcons.add_to_faves;
                 return AnimatedRotation(
                   turns: controller.isFavorite(widget.food as Food) ? 0 : 2 / 5,
                   duration: const Duration(milliseconds: 1200),
@@ -1232,7 +1232,7 @@ class FoodBarcodeReaderView extends ControlledWidget<FoodController> {
       appBar: AppBar(title: Text("food.barcodeReader.title".t), actions: [
         if (kDebugMode)
           IconButton(
-            icon: const Icon(GymTrackerIcons.debug),
+            icon: const Icon(GTIcons.debug),
             onPressed: () async {
               // String imgUrl =
               //     "https://upload.wikimedia.org/wikipedia/commons/c/cb/Ean13.jpg";
@@ -1273,7 +1273,7 @@ class FoodBarcodeReaderView extends ControlledWidget<FoodController> {
           await Go.off(
               () => ManualBarcodeInsertionScreen(handleCode: handleCode));
         },
-        child: const Icon(GymTrackerIcons.keyboard),
+        child: const Icon(GTIcons.keyboard),
       ),
     );
   }
@@ -1356,7 +1356,7 @@ class _ManualBarcodeInsertionScreenState
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: ok,
-        child: const Icon(GymTrackerIcons.search),
+        child: const Icon(GTIcons.search),
       ),
     );
   }
@@ -1595,7 +1595,7 @@ class _AddCombinedFoodViewState
       hintText: 'food.searchBar.hint'.t,
       barTrailing: [
         IconButton(
-          icon: const Icon(GymTrackerIcons.scan_barcode),
+          icon: const Icon(GTIcons.scan_barcode),
           tooltip: "food.barcodeReader.title".t,
           onPressed: () {
             controller.showScanBarcodeView().then((value) {

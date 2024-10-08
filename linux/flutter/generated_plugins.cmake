@@ -3,11 +3,10 @@
 #
 
 list(APPEND FLUTTER_PLUGIN_LIST
+  audioplayers_linux
   dynamic_color
   file_selector_linux
-  irondash_engine_context
   sqlite3_flutter_libs
-  super_native_extensions
   url_launcher_linux
 )
 

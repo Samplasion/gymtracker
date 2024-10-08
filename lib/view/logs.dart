@@ -95,16 +95,16 @@ class _LogViewState extends ControlledState<LogView, LoggerController> {
                 backgroundColor: levelColors.$1,
                 textColor: levelColors.$2,
                 child: IconButton(
-                  icon: const Icon(GymTrackerIcons.filter_list),
+                  icon: const Icon(GTIcons.filter_list),
                   onPressed: controller.showLevelRadioModal,
                 ),
               ),
               IconButton(
-                icon: const Icon(GymTrackerIcons.delete_forever),
+                icon: const Icon(GTIcons.delete_forever),
                 onPressed: controller.clearLogs,
               ),
               IconButton(
-                icon: const Icon(GymTrackerIcons.share),
+                icon: const Icon(GTIcons.share),
                 onPressed: controller.shareLogs,
               ),
               if (kDebugMode)

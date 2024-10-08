@@ -89,7 +89,7 @@ Future<void> createWorkout(
     workoutName,
   );
 
-  await tester.tap(find.widgetWithIcon(IconButton, GymTrackerIcons.done));
+  await tester.tap(find.widgetWithIcon(IconButton, GTIcons.done));
   await tester.pumpAndSettle();
 
   expect(find.byType(WorkoutFinishPage), findsNothing);
@@ -97,7 +97,7 @@ Future<void> createWorkout(
 
   // No Workout done sheet because we haven't marked any of the sets as done
   // expect(find.byType(WorkoutDoneSheet), findsOneWidget);
-  // await tester.tap(find.widgetWithIcon(IconButton, GymTrackerIcons.done));
+  // await tester.tap(find.widgetWithIcon(IconButton, GTIcons.done));
   // await tester.pumpAndSettle();
 }
 

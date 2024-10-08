@@ -60,7 +60,7 @@ class _ExerciseCreatorState extends State<ExerciseCreator> {
           actions: [
             IconButton(
               key: const Key("done"),
-              icon: const Icon(GymTrackerIcons.done),
+              icon: const Icon(GTIcons.done),
               onPressed: _submit,
             )
           ],

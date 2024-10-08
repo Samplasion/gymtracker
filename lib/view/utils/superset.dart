@@ -71,7 +71,7 @@ class _SupersetEditorState extends State<SupersetEditor> {
                     onTap: () =>
                         widget.callbacks.onExerciseReorder(widget.index),
                     child: ListTile(
-                      leading: const Icon(GymTrackerIcons.reorder),
+                      leading: const Icon(GTIcons.reorder),
                       title: Text('ongoingWorkout.exercises.reorder'.t),
                     ),
                   ),
@@ -81,7 +81,7 @@ class _SupersetEditorState extends State<SupersetEditor> {
                   onTap: () =>
                       widget.callbacks.onExerciseReplace(topLevelEntryIndex),
                   child: ListTile(
-                    leading: const Icon(GymTrackerIcons.replace),
+                    leading: const Icon(GTIcons.replace),
                     title:
                         Text('ongoingWorkout.superset.replaceWithExercise'.t),
                   ),
@@ -101,7 +101,7 @@ class _SupersetEditorState extends State<SupersetEditor> {
                   child: ListTile(
                     textColor: Theme.of(context).colorScheme.error,
                     iconColor: Theme.of(context).colorScheme.error,
-                    leading: const Icon(GymTrackerIcons.delete),
+                    leading: const Icon(GTIcons.delete),
                     title: Text('ongoingWorkout.superset.remove'.t),
                   ),
                 ),
@@ -109,14 +109,14 @@ class _SupersetEditorState extends State<SupersetEditor> {
             ),
           ),
           ListTile(
-            leading: const Icon(GymTrackerIcons.notes),
+            leading: const Icon(GTIcons.notes),
             title: Text(
               widget.superset.notes.isEmpty
                   ? "exercise.editor.fields.notes.tapToEdit".t
                   : widget.superset.notes,
               style: notesTextStyle,
             ),
-            trailing: const Icon(GymTrackerIcons.edit),
+            trailing: const Icon(GTIcons.edit),
             onTap: () {
               showDialog(
                 context: context,
@@ -198,7 +198,7 @@ class _SupersetEditorState extends State<SupersetEditor> {
           ),
           ListTile(
             title: Text("routines.editor.superset.addExercise".t),
-            leading: const Icon(GymTrackerIcons.add_exercise),
+            leading: const Icon(GTIcons.add_exercise),
             onTap: () {
               widget.callbacks.onSupersetAddExercise(widget.index);
             },

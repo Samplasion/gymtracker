@@ -50,11 +50,11 @@ class _IntStepperFormFieldState extends State<IntStepperFormField> {
         decoration: widget.decoration.copyWith(
           contentPadding: const EdgeInsets.fromLTRB(12.0, 0, 12.0, 0),
           prefixIcon: IconButton(
-            icon: const Icon(GymTrackerIcons.decrease),
+            icon: const Icon(GTIcons.decrease),
             onPressed: _decrease,
           ),
           suffixIcon: IconButton(
-            icon: const Icon(GymTrackerIcons.increase),
+            icon: const Icon(GTIcons.increase),
             onPressed: _increase,
           ),
         ),

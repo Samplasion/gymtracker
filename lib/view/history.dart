@@ -212,7 +212,7 @@ class _HistoryViewState extends State<HistoryView> {
           SearchAnchor(
             builder: (context, sController) => IconButton(
               onPressed: () => sController.openView(),
-              icon: const Icon(GymTrackerIcons.search),
+              icon: const Icon(GTIcons.search),
             ),
             viewBuilder: (suggestions) {
               return CustomScrollView(
@@ -260,7 +260,7 @@ class _HistoryViewState extends State<HistoryView> {
           "general.selected".plural(selectedEntries.length),
         ),
         leading: IconButton(
-          icon: const Icon(GymTrackerIcons.close),
+          icon: const Icon(GTIcons.close),
           onPressed: () {
             setState(() {
               selectedEntries.clear();
@@ -271,7 +271,7 @@ class _HistoryViewState extends State<HistoryView> {
           IconButton(
             tooltip: "history.actions.deleteMultiple.title"
                 .plural(selectedEntries.length),
-            icon: const Icon(GymTrackerIcons.delete),
+            icon: const Icon(GTIcons.delete),
             onPressed: () {
               final controller = Get.find<HistoryController>();
               controller.deleteWorkoutsWithDialog(

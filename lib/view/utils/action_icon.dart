@@ -5,5 +5,5 @@ class ListTileActionIcon extends StatelessWidget {
   const ListTileActionIcon({super.key});
 
   @override
-  Widget build(BuildContext context) => const Icon(GymTrackerIcons.lt_chevron);
+  Widget build(BuildContext context) => const Icon(GTIcons.lt_chevron);
 }

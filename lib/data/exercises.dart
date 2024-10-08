@@ -106,7 +106,7 @@ Map<GTExerciseMuscleCategory, ExerciseCategory> get exerciseStandardLibrary => {
             primaryMuscleGroup: GTMuscleGroup.abs,
           ),
         ],
-        icon: const Icon(GymTrackerIcons.cardio),
+        icon: const Icon(GTIcons.cardio),
         color: Colors.orange,
       ),
       GTExerciseMuscleCategory.chest: ExerciseCategory(

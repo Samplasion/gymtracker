@@ -80,6 +80,12 @@ dev_dependencies:
   flutter_driver:
     sdk: flutter
   test: ^1.24.3
+  flutter_gen_runner: ^5.8.0
+
+flutter_gen:
+  assets:
+    outputs:
+      class_name: GTAssets
 
 flutter:
   fonts:
@@ -89,8 +95,8 @@ flutter:
 
   uses-material-design: true
   assets:
-    - assets/i18n/en.json
-    - assets/i18n/it.json
+    - assets/audio/
+    - assets/i18n/
     #tool begin exercise-explainations
     - assets/exercises/abs/bicycleCrunches/
     - assets/exercises/abs/crunchMachine/

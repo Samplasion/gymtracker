@@ -293,7 +293,7 @@ class RoutinesController extends GetxController
       context: context,
       builder: (context) {
         return AlertDialog(
-          icon: const Icon(GymTrackerIcons.info),
+          icon: const Icon(GTIcons.info),
           title: Text("routines.actions.delete.title".t),
           content: Text(
             "routines.actions.delete.text".t,

@@ -132,7 +132,7 @@ Future<void> testEditExerciseInRoutineAndHistoryFlow(
   await tester.pumpAndSettle();
 
   // Save the routine
-  final saveButton = find.widgetWithIcon(IconButton, GymTrackerIcons.done);
+  final saveButton = find.widgetWithIcon(IconButton, GTIcons.done);
   await tester.tap(saveButton);
 
   // Trigger a frame.

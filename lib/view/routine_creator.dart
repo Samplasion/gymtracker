@@ -87,7 +87,7 @@ class _RoutineCreatorState extends State<RoutineCreator> {
         }()),
         actions: [
           IconButton(
-            icon: const Icon(GymTrackerIcons.done),
+            icon: const Icon(GTIcons.done),
             onPressed: _submit,
           )
         ],
@@ -130,8 +130,7 @@ class _RoutineCreatorState extends State<RoutineCreator> {
                 )),
             ListTile(
               title: Text("routines.editor.exercises.add".t),
-              leading:
-                  const CircleAvatar(child: Icon(GymTrackerIcons.add_exercise)),
+              leading: const CircleAvatar(child: Icon(GTIcons.add_exercise)),
               onTap: () {
                 Go.to<List<Exercise>>(() => const ExercisePicker(
                       singlePick: false,
@@ -155,8 +154,7 @@ class _RoutineCreatorState extends State<RoutineCreator> {
             ),
             ListTile(
               title: Text("routines.editor.superset.add".t),
-              leading:
-                  const CircleAvatar(child: Icon(GymTrackerIcons.add_superset)),
+              leading: const CircleAvatar(child: Icon(GTIcons.add_superset)),
               onTap: () {
                 Go.to<List<Exercise>>(() => const ExercisePicker(
                       singlePick: false,

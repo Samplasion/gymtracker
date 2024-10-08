@@ -96,7 +96,7 @@ class Go {
       context: Get.context!,
       builder: (context) {
         return AlertDialog(
-          icon: icon ?? const Icon(GymTrackerIcons.info),
+          icon: icon ?? const Icon(GTIcons.info),
           title: Text(title.t),
           content: Text(body.t, style: bodyStyle),
           scrollable: scrollable,
@@ -125,7 +125,7 @@ class Go {
       context: Get.context!,
       builder: (context) {
         return AlertDialog(
-          icon: icon ?? const Icon(GymTrackerIcons.info),
+          icon: icon ?? const Icon(GTIcons.info),
           title: Text(title.t),
           content: Text(body.t),
           actions: [
@@ -184,7 +184,7 @@ class Go {
                 appBar: AppBar(
                   title: title,
                   leading: IconButton(
-                    icon: const Icon(GymTrackerIcons.close),
+                    icon: const Icon(GTIcons.close),
                     onPressed: () {
                       onChange?.call(oldValue);
                       Navigator.of(context).pop(false);
@@ -192,7 +192,7 @@ class Go {
                   ),
                   actions: [
                     IconButton(
-                      icon: const Icon(GymTrackerIcons.save),
+                      icon: const Icon(GTIcons.save),
                       onPressed: () {
                         if (onChange != null) {
                           onChange(_value);

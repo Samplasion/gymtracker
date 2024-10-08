@@ -54,7 +54,7 @@ class _RadioModalTileState<T> extends State<RadioModalTile<T>>
     return ListTile(
       title: widget.title,
       subtitle: widget.subtitle ?? Text(subtitle),
-      trailing: const Icon(GymTrackerIcons.lt_chevron),
+      trailing: const Icon(GTIcons.lt_chevron),
       onTap: () {
         Go.showRadioModal(
           selectedValue: widget.selectedValue,

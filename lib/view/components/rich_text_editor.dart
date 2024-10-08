@@ -106,7 +106,7 @@ class _GTRichTextEditorState extends State<GTRichTextEditor> {
                 customButtons: [
                   QuillToolbarCustomButtonOptions(
                     // TODO: Figure out how to make this appear on when the text is highlighted
-                    icon: const Icon(GymTrackerIcons.highlight),
+                    icon: const Icon(GTIcons.highlight),
                     tooltip: "richText.highlight".t,
                     onPressed: () {
                       // If the selection is already highlighted, remove the highlight

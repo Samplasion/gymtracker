@@ -112,7 +112,7 @@ Future<void> testEditWorkoutFlow(
   expect(find.byType(WorkoutTimerView), findsOneWidget);
 
   // Avoid the above issue for the next pumpAndSettle calls
-  await tester.tap(find.widgetWithIcon(IconButton, GymTrackerIcons.skip));
+  await tester.tap(find.widgetWithIcon(IconButton, GTIcons.skip));
   await tester.pumpAndSettle();
 
   await tester.tap(find.byKey(const Key('main-menu')));
@@ -122,7 +122,7 @@ Future<void> testEditWorkoutFlow(
 
   expect(find.byType(WorkoutFinishPage), findsOneWidget);
 
-  await tester.tap(find.widgetWithIcon(IconButton, GymTrackerIcons.done));
+  await tester.tap(find.widgetWithIcon(IconButton, GTIcons.done));
   await tester.pumpAndSettle();
 
   expect(find.byType(WorkoutFinishPage), findsNothing);
@@ -133,10 +133,10 @@ Future<void> testEditWorkoutFlow(
 
   // Close the Good Job sheet
   expect(find.byType(WorkoutDoneSheet), findsOneWidget);
-  await tester.tap(find.byIcon(GymTrackerIcons.done));
+  await tester.tap(find.byIcon(GTIcons.done));
   await tester.pumpAndSettle();
 
-  await tester.tap(find.byIcon(GymTrackerIcons.history));
+  await tester.tap(find.byIcon(GTIcons.history));
   await tester.pumpAndSettle();
 
   await tester.tap(find.byType(HistoryWorkout));

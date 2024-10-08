@@ -325,8 +325,8 @@ class _ExercisesViewState extends State<ExercisesView> {
               const SliverToBoxAdapter(child: Divider()),
               SliverToBoxAdapter(
                 child: ListTile(
-                  leading: const CircleAvatar(
-                      child: Icon(GymTrackerIcons.continuation)),
+                  leading:
+                      const CircleAvatar(child: Icon(GTIcons.continuation)),
                   title: Text("exercise.continuation.label".t),
                   subtitle: Text("exercise.continuation.description".t),
                   onTap: () {
@@ -667,7 +667,7 @@ class OverwriteDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      icon: const Icon(GymTrackerIcons.info),
+      icon: const Icon(GTIcons.info),
       title: Text("ongoingWorkout.overwrite.title".t),
       content: Text(
         "ongoingWorkout.overwrite.text".t,

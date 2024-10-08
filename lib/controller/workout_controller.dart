@@ -680,7 +680,7 @@ class WorkoutController extends GetxController with ServiceableController {
       context: context,
       builder: (context) {
         return AlertDialog(
-          icon: const Icon(GymTrackerIcons.info),
+          icon: const Icon(GTIcons.info),
           title: Text("ongoingWorkout.cancel.title".t),
           content: Text(
             "ongoingWorkout.cancel.text".t,

@@ -92,10 +92,9 @@ class ExerciseSetView extends StatelessWidget {
           const SizedBox(width: 8),
           if (isConcrete) ...[
             if (set.done)
-              Icon(GymTrackerIcons.checkbox_on, color: colorScheme.tertiary)
+              Icon(GTIcons.checkbox_on, color: colorScheme.tertiary)
             else
-              Icon(GymTrackerIcons.checkbox_off,
-                  color: colorScheme.onSurfaceVariant),
+              Icon(GTIcons.checkbox_off, color: colorScheme.onSurfaceVariant),
             const SizedBox(width: 8),
           ],
           if (draggable) ...[

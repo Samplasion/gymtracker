@@ -72,7 +72,7 @@ class FoodCategoryList extends ControlledWidget<FoodController> {
                           onPressed: (_) => controller.removeCategory(category),
                           backgroundColor: context.theme.colorScheme.error,
                           foregroundColor: context.theme.colorScheme.onError,
-                          icon: GymTrackerIcons.delete_forever,
+                          icon: GTIcons.delete_forever,
                           label: 'actions.remove'.t,
                         ),
                       ],
@@ -95,7 +95,7 @@ class FoodCategoryList extends ControlledWidget<FoodController> {
                 }
               }
             : null,
-        icon: GymTrackerIcons.compound.add_food_category,
+        icon: GTIcons.compound.add_food_category,
         label: Text("food.categoryList.add".t),
         disabledElevation: 0,
         backgroundColor: getFabBackgroundColor(context),
@@ -129,7 +129,7 @@ class FoodCategoryListTile extends StatelessWidget {
         },
       )),
       trailing: controller.canUpdateCategories
-          ? const Icon(GymTrackerIcons.lt_chevron)
+          ? const Icon(GTIcons.lt_chevron)
           : null,
       onTap: controller.canUpdateCategories
           ? () {
@@ -513,7 +513,7 @@ class FoodCategoryFoodsView extends ControlledWidget<FoodController> {
       hintText: 'food.searchBar.hint'.t,
       barTrailing: [
         IconButton(
-          icon: const Icon(GymTrackerIcons.combine),
+          icon: const Icon(GTIcons.combine),
           tooltip: "food.combine.title".t,
           onPressed: () {
             controller.showCombineFoodsView().then((food) {
@@ -528,7 +528,7 @@ class FoodCategoryFoodsView extends ControlledWidget<FoodController> {
           },
         ),
         IconButton(
-          icon: const Icon(GymTrackerIcons.scan_barcode),
+          icon: const Icon(GTIcons.scan_barcode),
           tooltip: "food.barcodeReader.title".t,
           onPressed: () {
             controller.showScanBarcodeView().then((food) {

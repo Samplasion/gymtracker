@@ -60,7 +60,7 @@ class MeView extends GetView<MeController> {
                       buttonHeight: (_) => kSpeedDialButtonHeight / 1.3,
                       buttons: [
                         SpeedDialButton(
-                          icon: const Icon(GymTrackerIcons.calendar),
+                          icon: const Icon(GTIcons.calendar),
                           text: Text(
                             "me.calendar.label".t,
                             style: Theme.of(context).textTheme.bodySmall,
@@ -70,7 +70,7 @@ class MeView extends GetView<MeController> {
                           },
                         ),
                         SpeedDialButton(
-                          icon: const Icon(GymTrackerIcons.stats),
+                          icon: const Icon(GTIcons.stats),
                           text: Text(
                             "me.stats.label".t,
                             style: Theme.of(context).textTheme.bodySmall,
@@ -147,7 +147,7 @@ class MeView extends GetView<MeController> {
                 Obx(
                   () => ListTile(
                     title: Text("me.weight.allData.label".t),
-                    trailing: const Icon(GymTrackerIcons.lt_chevron),
+                    trailing: const Icon(GTIcons.lt_chevron),
                     enabled: controller.weightMeasurements.isNotEmpty,
                     onTap: () {
                       Go.to(() => const WeightMeasurementDataPage());

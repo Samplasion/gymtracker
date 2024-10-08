@@ -148,11 +148,11 @@ Future<void> testEditExerciseWhileWorkoutIsOngoingFlow(
     "Workout",
   );
 
-  await tester.tap(find.widgetWithIcon(IconButton, GymTrackerIcons.done));
+  await tester.tap(find.widgetWithIcon(IconButton, GTIcons.done));
   await tester.pumpAndSettle();
 
   // expect(find.byType(WorkoutDoneSheet), findsOneWidget);
-  // await tester.tap(find.widgetWithIcon(IconButton, GymTrackerIcons.done));
+  // await tester.tap(find.widgetWithIcon(IconButton, GTIcons.done));
   // await tester.pumpAndSettle();
 
   // Wait for the database changes to flush

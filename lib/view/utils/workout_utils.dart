@@ -36,7 +36,7 @@ class WorkoutHeader extends StatelessWidget {
                 backgroundColor: bg,
                 foregroundColor: fg,
                 child: isSelected
-                    ? const Icon(GymTrackerIcons.done)
+                    ? const Icon(GTIcons.done)
                     : Text(workout.name.characters.first.toUpperCase()),
               ),
             ),

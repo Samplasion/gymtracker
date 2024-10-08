@@ -81,7 +81,7 @@ Future<void> testEditWorkoutCombinationFlow(
   await databaseService.setHistoryWorkout(historyWorkoutBase);
   expect(historyWorkoutBase.isContinuable, true);
 
-  await tester.tap(find.byIcon(GymTrackerIcons.history));
+  await tester.tap(find.byIcon(GTIcons.history));
   await tester.pumpAndSettle();
 
   expect(find.byType(HistoryWorkout), findsOneWidget);
@@ -105,7 +105,7 @@ Future<void> testEditWorkoutCombinationFlow(
 
   expect(find.byType(WorkoutFinishPage), findsOneWidget);
 
-  await tester.tap(find.widgetWithIcon(IconButton, GymTrackerIcons.done));
+  await tester.tap(find.widgetWithIcon(IconButton, GTIcons.done));
   await tester.pumpAndSettle();
 
   expect(find.byType(WorkoutFinishPage), findsNothing);
@@ -123,7 +123,7 @@ Future<void> testEditWorkoutCombinationFlow(
 
   // Close the Good Job sheet
   expect(find.byType(WorkoutDoneSheet), findsOneWidget);
-  await tester.tap(find.byIcon(GymTrackerIcons.done));
+  await tester.tap(find.byIcon(GTIcons.done));
   await tester.pumpAndSettle();
 
   await tester.fling(

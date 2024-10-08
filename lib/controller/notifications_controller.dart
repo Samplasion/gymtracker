@@ -35,7 +35,7 @@ class NotificationController extends GetxController implements Listenable {
         }
         if (!hasPermission) {
           return ListTile(
-            leading: const Icon(GymTrackerIcons.notification_dialog),
+            leading: const Icon(GTIcons.notification_dialog),
             title: Text("settings.options.notifications.label".t),
             subtitle: Text("settings.permissions.tapToRequest".t),
             onTap: () {
@@ -47,7 +47,7 @@ class NotificationController extends GetxController implements Listenable {
             usesAndroidExactAlarmPermission &&
             !hasAndroidScheduleExactAlarmPermission) {
           return ListTile(
-            leading: const Icon(GymTrackerIcons.notification_dialog),
+            leading: const Icon(GTIcons.notification_dialog),
             title: Text("settings.options.notifications.label".t),
             subtitle: Text(
                 "settings.options.notifications.subtitle.noExactAlarmPermission"
@@ -140,7 +140,7 @@ class NotificationController extends GetxController implements Listenable {
     final shouldAsk = await Go.confirm(
       "androidRequestExactAlarmsPermission.title",
       "androidRequestExactAlarmsPermission.message",
-      icon: const Icon(GymTrackerIcons.notification_dialog),
+      icon: const Icon(GTIcons.notification_dialog),
     );
 
     if (shouldAsk) {

@@ -27,7 +27,7 @@ class GTRichTextEditDialog extends StatelessWidget {
               onPressed: () {
                 onNotesChange(controller.document.toEncoded());
               },
-              icon: const Icon(GymTrackerIcons.done),
+              icon: const Icon(GTIcons.done),
             ),
           ],
         ),

@@ -12,12 +12,12 @@ class DragHandle extends StatelessWidget {
     if (UniversalPlatform.isAndroid || UniversalPlatform.isIOS) {
       return ReorderableDelayedDragStartListener(
         index: index,
-        child: const Icon(GymTrackerIcons.drag_handle),
+        child: const Icon(GTIcons.drag_handle),
       );
     } else {
       return ReorderableDragStartListener(
         index: index,
-        child: const Icon(GymTrackerIcons.drag_handle),
+        child: const Icon(GTIcons.drag_handle),
       );
     }
   }

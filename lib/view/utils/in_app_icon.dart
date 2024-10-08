@@ -33,7 +33,7 @@ class InAppIcon extends StatelessWidget {
           ),
         ),
         Icon(
-          GymTrackerIcons.app_icon,
+          GTIcons.app_icon,
           color: Theme.of(context).colorScheme.onPrimary,
           size: iconSize,
         ),

@@ -27,7 +27,7 @@ class Infobox extends StatelessWidget {
                   TextSpan(children: [
                     WidgetSpan(
                       child: Icon(
-                        GymTrackerIcons.notes,
+                        GTIcons.notes,
                         color: Theme.of(context).colorScheme.onSurfaceVariant,
                       ),
                       alignment: PlaceholderAlignment.middle,

@@ -205,8 +205,8 @@ class WeightChartTimeSeries extends StatelessWidget {
             ]
         },
         categories: {
-          _chartCategory: LineChartCategory(
-              title: "Weight", icon: const Icon(GymTrackerIcons.info))
+          _chartCategory:
+              LineChartCategory(title: "Weight", icon: const Icon(GTIcons.info))
         },
         minY: minY - padding,
         maxY: maxY + padding,

@@ -11,7 +11,7 @@ class _AddCustomFoodFAB extends ControlledWidget<FoodController> {
   Widget build(BuildContext context) {
     return FloatingActionButton.extended(
       label: Text("food.addCustom.title".t),
-      icon: const Icon(GymTrackerIcons.add_food),
+      icon: const Icon(GTIcons.add_food),
       onPressed: () {
         closeView();
         SchedulerBinding.instance.addPostFrameCallback((_) {
@@ -39,11 +39,11 @@ class _SearchFoodWithMacros extends ControlledWidget<FoodController> {
     ];
 
     var color = GTMaterialColor.primary;
-    var icon = GymTrackerIcons.history;
+    var icon = GTIcons.history;
 
     if (controller.isFavorite(food)) {
       color = GTMaterialColor.tertiary;
-      icon = GymTrackerIcons.favorite;
+      icon = GTIcons.favorite;
     }
 
     return Card(

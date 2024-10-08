@@ -62,7 +62,7 @@ class _ExercisePickerState extends State<ExercisePicker> {
       if (widget.filter.hasCustom)
         GTExerciseMuscleCategory.custom: ExerciseCategory(
           exercises: controller.exercises.where(_filter).toList(),
-          icon: const Icon(GymTrackerIcons.custom_exercises),
+          icon: const Icon(GTIcons.custom_exercises),
           color: Colors.yellow,
         ),
       if (widget.filter.hasLibrary)
@@ -84,7 +84,7 @@ class _ExercisePickerState extends State<ExercisePicker> {
           if (!widget.singlePick)
             IconButton(
               key: const Key('pick'),
-              icon: const Icon(GymTrackerIcons.done),
+              icon: const Icon(GTIcons.done),
               onPressed: _submit,
             )
         ],
@@ -102,7 +102,7 @@ class _ExercisePickerState extends State<ExercisePicker> {
           );
         },
         label: Text("actions.create".t),
-        icon: const Icon(GymTrackerIcons.create_exercise),
+        icon: const Icon(GTIcons.create_exercise),
       ),
     );
   }
@@ -117,7 +117,7 @@ class _ExercisePickerState extends State<ExercisePicker> {
                 leading: CircleAvatar(
                   backgroundColor: context.colorScheme.tertiaryContainer,
                   foregroundColor: context.colorScheme.onTertiaryContainer,
-                  child: const Icon(GymTrackerIcons.no_routine),
+                  child: const Icon(GTIcons.no_routine),
                 ),
                 title: Text("exercises.none.title".t),
                 subtitle: Text("exercises.none.subtitle".t),
@@ -227,7 +227,7 @@ class _LibraryPickerExercisesViewState
         actions: [
           IconButton(
             key: const Key('pick'),
-            icon: const Icon(GymTrackerIcons.done),
+            icon: const Icon(GTIcons.done),
             onPressed: widget.onSubmit,
           )
         ],

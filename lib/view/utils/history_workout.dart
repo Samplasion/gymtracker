@@ -100,7 +100,7 @@ class TerseWorkoutListTile extends StatelessWidget {
       subtitle: Text(DateFormat.yMd(context.locale.languageCode)
           .add_Hm()
           .format(workout.startingDate ?? DateTime.now())),
-      trailing: onTap == null ? null : const Icon(GymTrackerIcons.lt_chevron),
+      trailing: onTap == null ? null : const Icon(GTIcons.lt_chevron),
       onTap: onTap,
       contentPadding: contentPadding,
     );

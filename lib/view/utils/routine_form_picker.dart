@@ -82,7 +82,7 @@ class _RoutineFormPickerState
         title: Text(
           "routineFormPicker.fields.routine.options.none".t,
         ),
-        trailing: const Icon(GymTrackerIcons.lt_chevron),
+        trailing: const Icon(GTIcons.lt_chevron),
         contentPadding: EdgeInsets.zero,
         visualDensity: VisualDensity.standard,
         mouseCursor: MouseCursor.defer,

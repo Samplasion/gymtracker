@@ -104,7 +104,7 @@ class FoodController extends GetxController with ServiceableController {
           children: [
             if (!permission$.value.camera)
               material.ListTile(
-                leading: const material.Icon(GymTrackerIcons.camera),
+                leading: const material.Icon(GTIcons.camera),
                 title: material.Text("food.addCustomFood.permission.camera".t),
                 subtitle: material.Text("settings.permissions.tapToRequest".t),
                 onTap: () {
@@ -113,7 +113,7 @@ class FoodController extends GetxController with ServiceableController {
               ),
             if (!permission$.value.gallery)
               material.ListTile(
-                leading: const material.Icon(GymTrackerIcons.gallery),
+                leading: const material.Icon(GTIcons.gallery),
                 title: material.Text("food.addCustomFood.permission.gallery".t),
                 subtitle: material.Text("settings.permissions.tapToRequest".t),
                 onTap: () {
@@ -342,13 +342,13 @@ class FoodController extends GetxController with ServiceableController {
             children: [
               if (!permission$.value.camera)
                 material.ListTile(
-                  leading: const material.Icon(GymTrackerIcons.camera),
+                  leading: const material.Icon(GTIcons.camera),
                   title:
                       material.Text("food.addCustomFood.permission.camera".t),
                 ),
               if (!permission$.value.gallery)
                 material.ListTile(
-                  leading: const material.Icon(GymTrackerIcons.gallery),
+                  leading: const material.Icon(GTIcons.gallery),
                   title:
                       material.Text("food.addCustomFood.permission.gallery".t),
                 ),

@@ -111,7 +111,7 @@ class AlertBanner extends StatelessWidget {
                     padding: const EdgeInsets.only(
                         right: 16, left: 8, top: 8, bottom: 8),
                     child: Icon(
-                      GymTrackerIcons.info_outline,
+                      GTIcons.info_outline,
                       color: color.foreground,
                     ),
                   ),

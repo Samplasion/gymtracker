@@ -34,7 +34,7 @@ class AllMigrationsView extends ControlledWidget<MigrationsController> {
                 ListTile(
                   title: Text(migration.title),
                   subtitle: Text(migration.description),
-                  trailing: const Icon(GymTrackerIcons.lt_chevron),
+                  trailing: const Icon(GTIcons.lt_chevron),
                   onTap: migration.action,
                 ),
             ]),

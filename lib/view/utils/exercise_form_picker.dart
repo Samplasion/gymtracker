@@ -53,7 +53,7 @@ class ExerciseFormPicker extends StatelessWidget {
         title: Text(
           "exerciseFormPicker.fields.exercise.options.none".t,
         ),
-        trailing: const Icon(GymTrackerIcons.lt_chevron),
+        trailing: const Icon(GTIcons.lt_chevron),
         contentPadding: EdgeInsets.zero,
         visualDensity: VisualDensity.standard,
         mouseCursor: MouseCursor.defer,
@@ -66,7 +66,7 @@ class ExerciseFormPicker extends StatelessWidget {
         exercise: exercise!,
         selected: false,
         isConcrete: false,
-        trailing: const Icon(GymTrackerIcons.lt_chevron),
+        trailing: const Icon(GTIcons.lt_chevron),
         contentPadding: EdgeInsets.zero,
         visualDensity: VisualDensity.standard,
         mouseCursor: MouseCursor.defer,

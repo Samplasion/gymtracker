@@ -7,6 +7,7 @@ import 'package:drift/native.dart';
 import 'package:drift_dev/api/migrations.dart';
 import 'package:flutter/foundation.dart';
 import 'package:gymtracker/data/distance.dart';
+import 'package:gymtracker/data/exercises.dart';
 import 'package:gymtracker/data/weights.dart';
 import 'package:gymtracker/db/model/tables/exercise.dart';
 import 'package:gymtracker/db/model/tables/foods.dart';
@@ -84,7 +85,7 @@ class GTDatabase extends _$GTDatabase {
           // (https://drift.simonbinder.eu/docs/advanced-features/migrations/#tips)
           // await customStatement('PRAGMA foreign_keys = OFF');
 
-          globalLogger.w("[GTDatabase] Running migration");
+          globalLogger.w("[GTDatabase] Running migration [$from->$to]");
 
           await m.runMigrationSteps(
             from: from,
@@ -138,6 +139,24 @@ class GTDatabase extends _$GTDatabase {
                   schema.routineExercises,
                   schema.routineExercises.equipment,
                 );
+
+                // Update existing exercises with equipment
+                await m.database.transaction(() async {
+                  for (final exercise in exerciseStandardLibraryAsList) {
+                    await (m.database.update(
+                            (m.database as GTDatabase).historyWorkoutExercises)
+                          ..where((tbl) =>
+                              tbl.libraryExerciseId.equals(exercise.id)))
+                        .write(HistoryWorkoutExercisesCompanion(
+                            equipment: Value(exercise.equipment)));
+                    await (m.database
+                            .update((m.database as GTDatabase).routineExercises)
+                          ..where((tbl) =>
+                              tbl.libraryExerciseId.equals(exercise.id)))
+                        .write(RoutineExercisesCompanion(
+                            equipment: Value(exercise.equipment)));
+                  }
+                });
               },
             ),
           );

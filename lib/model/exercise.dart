@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:copy_with_extension/copy_with_extension.dart';
 import 'package:gymtracker/data/distance.dart';
 import 'package:gymtracker/data/exercises.dart';

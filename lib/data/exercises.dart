@@ -742,6 +742,13 @@ final Map<GTExerciseMuscleCategory, ExerciseCategory> exerciseStandardLibrary =
           GTMuscleGroup.chest,
         },
       ),
+      Exercise.standard(
+        id: "library.triceps.exercises.tricepsMachine",
+        name: "library.triceps.exercises.tricepsMachine".t,
+        parameters: GTSetParameters.repsWeight,
+        primaryMuscleGroup: GTMuscleGroup.triceps,
+        secondaryMuscleGroups: {},
+      ),
     ],
     iconGetter: () =>
         Text("library.triceps.name".t.characters.first.toUpperCase()),

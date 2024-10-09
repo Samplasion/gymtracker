@@ -212,5 +212,6 @@ flutter:
     - assets/exercises/triceps/overheadRopeTricepExtension/
     - assets/exercises/triceps/skullCrushers/
     - assets/exercises/triceps/tricepKickbacks/
+    - assets/exercises/triceps/tricepsMachine/
     - assets/exercises/triceps/tricepsRopePushdown/
     #tool end exercise-explanations

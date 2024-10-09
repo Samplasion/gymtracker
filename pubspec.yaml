@@ -98,7 +98,7 @@ flutter:
   assets:
     - assets/audio/
     - assets/i18n/
-    #tool begin exercise-explainations
+    #tool begin exercise-explanations
     - assets/exercises/abs/bicycleCrunches/
     - assets/exercises/abs/crunchMachine/
     - assets/exercises/abs/crunches/
@@ -141,6 +141,7 @@ flutter:
     - assets/exercises/cardio/aerobics/
     - assets/exercises/cardio/bicycleCrunchesCardio/
     - assets/exercises/cardio/biking/
+    - assets/exercises/cardio/crunchesTimed/
     - assets/exercises/cardio/ergometer/
     - assets/exercises/cardio/ergometerHorizontal/
     - assets/exercises/cardio/jumpRope/
@@ -212,4 +213,4 @@ flutter:
     - assets/exercises/triceps/skullCrushers/
     - assets/exercises/triceps/tricepKickbacks/
     - assets/exercises/triceps/tricepsRopePushdown/
-    #tool end exercise-explainations
+    #tool end exercise-explanations

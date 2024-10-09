@@ -29,9 +29,9 @@ def main():
   ending_idx = -1
 
   for idx, line in enumerate(lines):
-    if '#tool begin exercise-explainations' in line:
+    if '#tool begin exercise-explanations' in line:
       starting_idx = idx
-    if '#tool end exercise-explainations' in line:
+    if '#tool end exercise-explanations' in line:
       ending_idx = idx
   
   if starting_idx == -1 or ending_idx == -1:

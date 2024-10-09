@@ -257,7 +257,7 @@ class EquipmentDistributionBarChart extends StatelessWidget {
     return GTRawBarChart(
       title: "exerciseList.workoutEquipmentDistributionBarChart.label".t,
       data: equipmentPercentages,
-      color: context.colorScheme.quinary,
+      color: context.colorScheme.tertiary,
       labelBuilder: (eq, percentage) =>
           "${"equipment.${eq.name}".t} (${percentage.round()}%)",
     );

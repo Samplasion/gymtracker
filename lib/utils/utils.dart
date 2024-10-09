@@ -125,3 +125,16 @@ Future<T?> timeoutFuture<T>(Duration duration, Future<T> future) {
 bool setEquality<T>(Set<T> a, Set<T> b) {
   return a.length == b.length && a.every(b.contains);
 }
+
+(List<T>, List<T>) partition<T>(List<T> list, bool Function(T) predicate) {
+  final first = <T>[];
+  final second = <T>[];
+  for (final element in list) {
+    if (predicate(element)) {
+      first.add(element);
+    } else {
+      second.add(element);
+    }
+  }
+  return (first, second);
+}

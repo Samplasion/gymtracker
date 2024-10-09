@@ -37,6 +37,8 @@ abstract class _$ExerciseCWProxy {
 
   Exercise category(GTExerciseMuscleCategory? category);
 
+  Exercise equipment(GTGymEquipment equipment);
+
   /// This function **does support** nullification of nullable fields. All `null` values passed to `non-nullable` fields will be ignored. You can also use `Exercise(...).copyWith.fieldName(...)` to override fields one at a time with nullification support.
   ///
   /// Usage
@@ -59,6 +61,7 @@ abstract class _$ExerciseCWProxy {
     String? supersedesID,
     int? rpe,
     GTExerciseMuscleCategory? category,
+    GTGymEquipment? equipment,
   });
 }
 
@@ -119,6 +122,9 @@ class _$ExerciseCWProxyImpl implements _$ExerciseCWProxy {
       this(category: category);
 
   @override
+  Exercise equipment(GTGymEquipment equipment) => this(equipment: equipment);
+
+  @override
 
   /// This function **does support** nullification of nullable fields. All `null` values passed to `non-nullable` fields will be ignored. You can also use `Exercise(...).copyWith.fieldName(...)` to override fields one at a time with nullification support.
   ///
@@ -142,6 +148,7 @@ class _$ExerciseCWProxyImpl implements _$ExerciseCWProxy {
     Object? supersedesID = const $CopyWithPlaceholder(),
     Object? rpe = const $CopyWithPlaceholder(),
     Object? category = const $CopyWithPlaceholder(),
+    Object? equipment = const $CopyWithPlaceholder(),
   }) {
     return Exercise.raw(
       id: id == const $CopyWithPlaceholder()
@@ -209,6 +216,10 @@ class _$ExerciseCWProxyImpl implements _$ExerciseCWProxy {
           // ignore: cast_nullable_to_non_nullable
           : category as GTExerciseMuscleCategory?,
       skeleton: _value.skeleton,
+      equipment: equipment == const $CopyWithPlaceholder() || equipment == null
+          ? _value.equipment
+          // ignore: cast_nullable_to_non_nullable
+          : equipment as GTGymEquipment,
     );
   }
 }
@@ -246,6 +257,7 @@ Exercise _$ExerciseFromJson(Map<String, dynamic> json) => Exercise.raw(
       rpe: (json['rpe'] as num?)?.toInt(),
       category: $enumDecodeNullable(
           _$GTExerciseMuscleCategoryEnumMap, json['category']),
+      equipment: $enumDecode(_$GTGymEquipmentEnumMap, json['equipment']),
     );
 
 Map<String, dynamic> _$ExerciseToJson(Exercise instance) => <String, dynamic>{
@@ -266,6 +278,7 @@ Map<String, dynamic> _$ExerciseToJson(Exercise instance) => <String, dynamic>{
       'standard': instance.standard,
       'supersedesID': instance.supersedesID,
       'rpe': instance.rpe,
+      'equipment': _$GTGymEquipmentEnumMap[instance.equipment]!,
       'category': _$GTExerciseMuscleCategoryEnumMap[instance.category],
     };
 
@@ -314,4 +327,17 @@ const _$GTExerciseMuscleCategoryEnumMap = {
   GTExerciseMuscleCategory.hips: 'hips',
   GTExerciseMuscleCategory.forearms: 'forearms',
   GTExerciseMuscleCategory.custom: 'custom',
+};
+
+const _$GTGymEquipmentEnumMap = {
+  GTGymEquipment.none: 'none',
+  GTGymEquipment.barbell: 'barbell',
+  GTGymEquipment.dumbbell: 'dumbbell',
+  GTGymEquipment.cable: 'cable',
+  GTGymEquipment.machine: 'machine',
+  GTGymEquipment.kettlebell: 'kettlebell',
+  GTGymEquipment.plates: 'plates',
+  GTGymEquipment.resistanceBand: 'resistanceBand',
+  GTGymEquipment.suspensionBands: 'suspensionBands',
+  GTGymEquipment.other: 'other',
 };

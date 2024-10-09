@@ -142,6 +142,12 @@
         "reorderSets": {
           "title": "Reorder sets",
           "text": "Drag the handles to reorder the sets"
+        },
+        "gymEquipment": {
+          "errors": {
+            "empty": "Select equipment"
+          },
+          "label": "Equipment"
         }
       },
       "cannotChangeParameters": {
@@ -157,6 +163,9 @@
       "title": "Select exercises",
       "errors": {
         "empty": "You must select an exercise."
+      },
+      "filter": {
+        "equipment": "Equipment"
       }
     },
     "custom": "Custom",
@@ -182,7 +191,8 @@
       "explanation": "Explanation",
       "explanationDisclaimer": "Note: this explanation is provided for reference only. Always consult a fitness professional.",
       "primaryMuscleGroup": "Muscle group: @muscleGroup",
-      "secondaryMuscleGroups": "Secondary muscle groups: @muscleGroups"
+      "secondaryMuscleGroups": "Secondary muscle groups: @muscleGroups",
+      "equipment": "Equipment: @equipment"
     },
     "continuation": {
       "label": "Continuation",
@@ -653,6 +663,9 @@
     },
     "workoutWeightDistributionBarChart": {
       "label": "Muscle distribution (by lifted weight)"
+    },
+    "workoutEquipmentDistributionBarChart": {
+      "label": "Equipment Distribution (by sets)"
     }
   },
   "general": {
@@ -811,7 +824,7 @@
         "jumpRope": "Jump Rope",
         "rowingMachine": "Rowing machine",
         "bicycleCrunchesCardio": "Bicycle crunches (timed)",
-        "crunchesTimed": "Crunches (Timed)"
+        "crunchesTimed": "Crunches (timed)"
       }
     },
     "chest": {
@@ -901,7 +914,8 @@
       "exercises": {
         "legCurlProne": "Leg curl (prone)",
         "legCurlSeated": "Leg curl (seated)",
-        "romanianDeadlift": "Romanian deadlift"
+        "romanianDeadlift": "Romanian deadlift",
+        "romanianDeadliftDumbbell": "Romanian deadlift (dumbbells)"
       }
     },
     "shoulders": {
@@ -944,7 +958,8 @@
         "tricepKickbacks": "Tricep kickbacks",
         "skullCrushers": "Skull Crushers",
         "benchDips": "Dips (bench)",
-        "diamondPushUps": "Diamond push-ups"
+        "diamondPushUps": "Diamond push-ups",
+        "tricepsMachine": "Triceps Machine"
       }
     },
     "newCustomExercise": "New exercise",
@@ -1969,5 +1984,17 @@
     "categoryFoods": {
       "empty": "You haven't added foods to this category yet."
     }
+  },
+  "equipment": {
+    "none": "Bodyweight",
+    "barbell": "Barbell",
+    "dumbbell": "Dumbbells",
+    "cable": "Cables",
+    "machine": "Machine",
+    "kettlebell": "Kettlebell",
+    "plates": "Plates",
+    "resistanceBand": "Resistance band",
+    "suspensionBands": "Suspension bands",
+    "other": "Other"
   }
 }

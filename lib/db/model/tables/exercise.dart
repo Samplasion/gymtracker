@@ -1,6 +1,7 @@
 import 'package:drift/drift.dart';
 import 'package:gymtracker/db/model/tables/set.dart' show GTSetListConverter;
-import 'package:gymtracker/model/exercise.dart' show GTMuscleGroup;
+import 'package:gymtracker/model/exercise.dart'
+    show GTGymEquipment, GTMuscleGroup;
 import 'package:gymtracker/model/set.dart';
 import 'package:uuid/uuid.dart';
 
@@ -20,26 +21,9 @@ class CustomExercises extends Table {
   TextColumn get secondaryMuscleGroups => text().map(
         const MuscleGroupSetConverter(),
       )();
-}
-
-class MuscleGroupSetConverter
-    extends TypeConverter<Set<GTMuscleGroup>, String> {
-  const MuscleGroupSetConverter();
-
-  @override
-  Set<GTMuscleGroup> fromSql(String fromDb) {
-    if (fromDb.trim().isEmpty) return {};
-    return fromDb
-        .split(',')
-        .map((e) =>
-            GTMuscleGroup.values.firstWhere((element) => element.name == e))
-        .toSet();
-  }
-
-  @override
-  String toSql(Set<GTMuscleGroup> value) {
-    return value.map((e) => e.name).join(',');
-  }
+  TextColumn get equipment => textEnum<GTGymEquipment>()
+      .nullable()
+      .clientDefault(() => GTGymEquipment.none.name)();
 }
 
 // @UseRowClass(ConcreteExercise)
@@ -68,6 +52,9 @@ abstract class LinkedExerciseBase extends Table {
   IntColumn get sortOrder => integer()();
   TextColumn get supersedesId;
   IntColumn get rpe => integer().nullable()();
+  TextColumn get equipment => textEnum<GTGymEquipment>()
+      .nullable()
+      .clientDefault(() => GTGymEquipment.none.name)();
 }
 
 class ConcreteExercise {
@@ -89,6 +76,7 @@ class ConcreteExercise {
   final int sortOrder;
   final String? supersedesId;
   final int? rpe;
+  final GTGymEquipment equipment;
 
   const ConcreteExercise({
     required this.id,
@@ -109,7 +97,9 @@ class ConcreteExercise {
     required this.sortOrder,
     required this.supersedesId,
     required this.rpe,
-  })  : assert(
+    required GTGymEquipment? equipment,
+  })  : equipment = equipment ?? GTGymEquipment.none,
+        assert(
             isSuperset
                 ? true
                 : isCustom
@@ -118,4 +108,24 @@ class ConcreteExercise {
             "Concrete exercises must have a parent ID (ID: $id, customExerciseId: $customExerciseId, libraryExerciseId: $libraryExerciseId)"),
         assert(isInSuperset ? supersetId != null : true,
             "If isInSuperset is true, supersetId must be set (ID: $id)");
+}
+
+class MuscleGroupSetConverter
+    extends TypeConverter<Set<GTMuscleGroup>, String> {
+  const MuscleGroupSetConverter();
+
+  @override
+  Set<GTMuscleGroup> fromSql(String fromDb) {
+    if (fromDb.trim().isEmpty) return {};
+    return fromDb
+        .split(',')
+        .map((e) =>
+            GTMuscleGroup.values.firstWhere((element) => element.name == e))
+        .toSet();
+  }
+
+  @override
+  String toSql(Set<GTMuscleGroup> value) {
+    return value.map((e) => e.name).join(',');
+  }
 }

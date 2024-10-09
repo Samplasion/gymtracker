@@ -120,6 +120,7 @@ ConvertedHevyWorkoutData convertHevyWorkoutData(List<List> rowsAsListOfValues) {
                   ? null
                   : "${workoutDbKey}_superset_$supersetID",
               workoutID: workoutDbKey,
+              equipment: GTGymEquipment.none,
             ),
           );
 

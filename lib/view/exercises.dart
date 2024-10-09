@@ -77,6 +77,13 @@ class _ExercisesViewState extends State<ExercisesView> {
             workout: _getSynthesizedWorkout(),
           ),
         ),
+      if (EquipmentDistributionBarChart.shouldShow(_getSynthesizedWorkout()))
+        Padding(
+          padding: const EdgeInsets.all(16),
+          child: EquipmentDistributionBarChart(
+            workout: _getSynthesizedWorkout(),
+          ),
+        ),
     ].separated();
 
     return Scaffold(

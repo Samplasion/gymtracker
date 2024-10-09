@@ -18,6 +18,7 @@ void main() {
         notes: "Notes",
         workoutID: null,
         supersetID: null,
+        equipment: GTGymEquipment.none,
       );
       test("instantiates a child of the exercise in a routine", () {
         final workout = Workout(
@@ -42,6 +43,7 @@ void main() {
             notes: "Notes",
             workoutID: workout.id,
             supersetID: null,
+            equipment: GTGymEquipment.none,
           ),
         );
       });
@@ -71,6 +73,7 @@ void main() {
             notes: "Notes",
             workoutID: workout.id,
             supersetID: null,
+            equipment: GTGymEquipment.none,
           ),
         );
       });
@@ -99,6 +102,7 @@ void main() {
           sets: sets,
           workoutID: null,
           supersetID: null,
+          equipment: GTGymEquipment.none,
         );
         final to = Exercise.custom(
           id: "",
@@ -112,6 +116,7 @@ void main() {
           sets: [],
           workoutID: null,
           supersetID: null,
+          equipment: GTGymEquipment.none,
         );
 
         final result = Exercise.replaced(from: from, to: to);
@@ -127,6 +132,7 @@ void main() {
           sets: sets,
           workoutID: null,
           supersetID: null,
+          equipment: GTGymEquipment.none,
         );
         expectExercise(result, expected);
       });
@@ -153,6 +159,7 @@ void main() {
           ],
           workoutID: null,
           supersetID: null,
+          equipment: GTGymEquipment.none,
         );
 
         final otherParameters =
@@ -171,6 +178,7 @@ void main() {
             sets: [],
             workoutID: null,
             supersetID: null,
+            equipment: GTGymEquipment.none,
           );
 
           final result = Exercise.replaced(from: from, to: to);
@@ -196,6 +204,7 @@ void main() {
             ],
             workoutID: null,
             supersetID: null,
+            equipment: GTGymEquipment.none,
           );
 
           expectExercise(result, expected);
@@ -216,6 +225,7 @@ void main() {
           sets: [],
           workoutID: null,
           supersetID: null,
+          equipment: GTGymEquipment.none,
         );
 
         final result = base.copyWith(
@@ -252,6 +262,7 @@ void main() {
           sets: [],
           workoutID: null,
           supersetID: null,
+          equipment: GTGymEquipment.none,
         );
         final result = Exercise.replaced(from: base, to: base);
 

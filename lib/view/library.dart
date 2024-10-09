@@ -467,6 +467,13 @@ class _ExerciseInfoViewState extends State<ExerciseInfoView>
                         ),
                       ],
                     ],
+                    const TextSpan(text: "\n"),
+                    TextSpan(
+                      text: "exercise.info.equipment".tParams({
+                        "equipment":
+                            "equipment.${exercise.gymEquipment.name}".t,
+                      }),
+                    ),
                     if (kDebugMode) ...[
                       const TextSpan(text: "\n"),
                       TextSpan(

@@ -114,6 +114,7 @@ WorkoutExercisable exerciseFromDatabaseExercise(ConcreteExercise data) {
       supersetID: data.supersetId,
       supersedesID: data.supersedesId,
       rpe: data.rpe,
+      equipment: data.equipment,
     );
   }
 }

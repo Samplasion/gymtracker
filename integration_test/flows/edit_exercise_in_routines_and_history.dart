@@ -26,6 +26,7 @@ final Exercise baseExercise = Exercise.custom(
   notes: "Base Notes",
   workoutID: null,
   supersetID: null,
+  equipment: GTGymEquipment.none,
 );
 
 Future<void> testEditExerciseInRoutineAndHistoryFlow(
@@ -204,6 +205,7 @@ Future<void> testEditExerciseInRoutineAndHistoryFlow(
       notes: "Base Notes",
       workoutID: null,
       supersetID: null,
+      equipment: GTGymEquipment.none,
     ),
   );
 
@@ -228,6 +230,7 @@ Future<void> testEditExerciseInRoutineAndHistoryFlow(
       notes: "Base Notes",
       workoutID: historyWorkout.id,
       supersetID: null,
+      equipment: GTGymEquipment.none,
     ),
   );
 
@@ -252,6 +255,7 @@ Future<void> testEditExerciseInRoutineAndHistoryFlow(
       notes: "",
       workoutID: databaseService.routines.single.id,
       supersetID: null,
+      equipment: GTGymEquipment.none,
     ),
   );
 }

@@ -91,6 +91,7 @@ Future<void> testCreateExerciseFlow(
       notes: "",
       supersetID: null,
       workoutID: null,
+      equipment: GTGymEquipment.none,
     ),
   );
 }

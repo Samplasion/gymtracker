@@ -11,26 +11,23 @@ import 'package:gymtracker/utils/theme.dart';
 const kBarHeight = 24.0;
 const kBarPadding = 24.0;
 
-class RawMuscleCategoriesBarChart extends StatelessWidget {
+class GTRawBarChart<T> extends StatelessWidget {
   final String title;
-  final Map<GTMuscleCategory, double> data;
-  final String Function(GTMuscleCategory, double) labelBuilder;
+  final Map<T, double> data;
+  final String Function(T, double) labelBuilder;
   final Color? color;
-  final String Function(GTMuscleCategory)? rightSideLabelBuilder;
+  final String Function(T)? rightSideLabelBuilder;
   final EdgeInsetsGeometry padding;
 
-  RawMuscleCategoriesBarChart({
+  GTRawBarChart({
     super.key,
     required this.title,
     required this.data,
-    this.labelBuilder = defaultLabelBuilder,
+    required this.labelBuilder,
     this.color,
     this.rightSideLabelBuilder,
     this.padding = const EdgeInsets.all(16),
   });
-
-  static String defaultLabelBuilder(GTMuscleCategory cat, double percentage) =>
-      "${"muscleCategories.${cat.name}".t} (${percentage.round()}%)";
 
   late final nonEmptyData = () {
     final ned = data.entries.where((e) => e.value > 0).toList();
@@ -42,7 +39,7 @@ class RawMuscleCategoriesBarChart extends StatelessWidget {
   Widget build(BuildContext context) {
     final max = data.values.sum;
 
-    String _getLabel(GTMuscleCategory cat) {
+    String _getLabel(T cat) {
       final percentage = ((data[cat] ?? 0) * 100 / max);
       return labelBuilder(cat, percentage);
     }
@@ -164,10 +161,12 @@ class WorkoutMuscleCategoriesBarChart extends GetWidget<HistoryController> {
     final data =
         controller.calculateMuscleCategoryDistributionFor(workouts: [workout]);
 
-    return RawMuscleCategoriesBarChart(
+    return GTRawBarChart(
       title: "exerciseList.workoutMuscleCategoriesBarChart.label".t,
       data: data,
       color: context.colorScheme.quaternary,
+      labelBuilder: (cat, percentage) =>
+          "${"muscleCategories.${cat.name}".t} (${percentage.round()}%)",
     );
   }
 }
@@ -214,13 +213,53 @@ class WeightDistributionBarChart extends StatelessWidget {
       for (final entry in mappedWeights.entries) entry.key: entry.value / max,
     };
 
-    return RawMuscleCategoriesBarChart(
+    return GTRawBarChart(
       title: "exerciseList.workoutWeightDistributionBarChart.label".t,
       data: percentages,
       color: context.colorScheme.quinary,
       rightSideLabelBuilder: (category) {
         return mappedWeights[category]!.userFacingWeight;
       },
+      labelBuilder: (cat, percentage) =>
+          "${"muscleCategories.${cat.name}".t} (${percentage.round()}%)",
+    );
+  }
+}
+
+class EquipmentDistributionBarChart extends StatelessWidget {
+  final Workout workout;
+
+  const EquipmentDistributionBarChart({required this.workout, super.key});
+
+  static bool shouldShow(Workout workout) => workout.flattenedExercises
+      .whereType<Exercise>()
+      .any((ex) => ex.doneSets.isNotEmpty || !workout.isConcrete);
+
+  @override
+  Widget build(BuildContext context) {
+    final setsPerEquipment = <GTGymEquipment, int>{};
+
+    final exs = workout.flattenedExercises.whereType<Exercise>();
+    for (final ex in exs) {
+      setsPerEquipment[ex.gymEquipment] =
+          (setsPerEquipment[ex.gymEquipment] ?? 0) +
+              ex.sets
+                  .where((element) => element.done || !workout.isConcrete)
+                  .length;
+    }
+
+    final sum = setsPerEquipment.values.sum;
+    final equipmentPercentages = {
+      for (final entry in setsPerEquipment.entries)
+        entry.key: entry.value.toDouble() / sum.toDouble(),
+    };
+
+    return GTRawBarChart(
+      title: "exerciseList.workoutEquipmentDistributionBarChart.label".t,
+      data: equipmentPercentages,
+      color: context.colorScheme.quinary,
+      labelBuilder: (eq, percentage) =>
+          "${"equipment.${eq.name}".t} (${percentage.round()}%)",
     );
   }
 }

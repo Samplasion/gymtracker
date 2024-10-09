@@ -47,9 +47,25 @@ class $CustomExercisesTable extends CustomExercises
               type: DriftSqlType.string, requiredDuringInsert: true)
           .withConverter<Set<GTMuscleGroup>>(
               $CustomExercisesTable.$convertersecondaryMuscleGroups);
+  static const VerificationMeta _equipmentMeta =
+      const VerificationMeta('equipment');
   @override
-  List<GeneratedColumn> get $columns =>
-      [id, name, parameters, primaryMuscleGroup, secondaryMuscleGroups];
+  late final GeneratedColumnWithTypeConverter<GTGymEquipment?, String>
+      equipment = GeneratedColumn<String>('equipment', aliasedName, true,
+              type: DriftSqlType.string,
+              requiredDuringInsert: false,
+              clientDefault: () => GTGymEquipment.none.name)
+          .withConverter<GTGymEquipment?>(
+              $CustomExercisesTable.$converterequipmentn);
+  @override
+  List<GeneratedColumn> get $columns => [
+        id,
+        name,
+        parameters,
+        primaryMuscleGroup,
+        secondaryMuscleGroups,
+        equipment
+      ];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -73,6 +89,7 @@ class $CustomExercisesTable extends CustomExercises
     context.handle(_primaryMuscleGroupMeta, const VerificationResult.success());
     context.handle(
         _secondaryMuscleGroupsMeta, const VerificationResult.success());
+    context.handle(_equipmentMeta, const VerificationResult.success());
     return context;
   }
 
@@ -96,6 +113,9 @@ class $CustomExercisesTable extends CustomExercises
           .$convertersecondaryMuscleGroups
           .fromSql(attachedDatabase.typeMapping.read(DriftSqlType.string,
               data['${effectivePrefix}secondary_muscle_groups'])!),
+      equipment: $CustomExercisesTable.$converterequipmentn.fromSql(
+          attachedDatabase.typeMapping
+              .read(DriftSqlType.string, data['${effectivePrefix}equipment'])),
     );
   }
 
@@ -112,6 +132,11 @@ class $CustomExercisesTable extends CustomExercises
       const EnumNameConverter<GTMuscleGroup>(GTMuscleGroup.values);
   static TypeConverter<Set<GTMuscleGroup>, String>
       $convertersecondaryMuscleGroups = const MuscleGroupSetConverter();
+  static JsonTypeConverter2<GTGymEquipment, String, String>
+      $converterequipment =
+      const EnumNameConverter<GTGymEquipment>(GTGymEquipment.values);
+  static JsonTypeConverter2<GTGymEquipment?, String?, String?>
+      $converterequipmentn = JsonTypeConverter2.asNullable($converterequipment);
 }
 
 class CustomExercise extends DataClass implements Insertable<CustomExercise> {
@@ -120,12 +145,14 @@ class CustomExercise extends DataClass implements Insertable<CustomExercise> {
   final GTSetParameters parameters;
   final GTMuscleGroup primaryMuscleGroup;
   final Set<GTMuscleGroup> secondaryMuscleGroups;
+  final GTGymEquipment? equipment;
   const CustomExercise(
       {required this.id,
       required this.name,
       required this.parameters,
       required this.primaryMuscleGroup,
-      required this.secondaryMuscleGroups});
+      required this.secondaryMuscleGroups,
+      this.equipment});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
@@ -145,6 +172,10 @@ class CustomExercise extends DataClass implements Insertable<CustomExercise> {
           .$convertersecondaryMuscleGroups
           .toSql(secondaryMuscleGroups));
     }
+    if (!nullToAbsent || equipment != null) {
+      map['equipment'] = Variable<String>(
+          $CustomExercisesTable.$converterequipmentn.toSql(equipment));
+    }
     return map;
   }
 
@@ -155,6 +186,9 @@ class CustomExercise extends DataClass implements Insertable<CustomExercise> {
       parameters: Value(parameters),
       primaryMuscleGroup: Value(primaryMuscleGroup),
       secondaryMuscleGroups: Value(secondaryMuscleGroups),
+      equipment: equipment == null && nullToAbsent
+          ? const Value.absent()
+          : Value(equipment),
     );
   }
 
@@ -170,6 +204,8 @@ class CustomExercise extends DataClass implements Insertable<CustomExercise> {
           .fromJson(serializer.fromJson<String>(json['primaryMuscleGroup'])),
       secondaryMuscleGroups: serializer
           .fromJson<Set<GTMuscleGroup>>(json['secondaryMuscleGroups']),
+      equipment: $CustomExercisesTable.$converterequipmentn
+          .fromJson(serializer.fromJson<String?>(json['equipment'])),
     );
   }
   @override
@@ -185,6 +221,8 @@ class CustomExercise extends DataClass implements Insertable<CustomExercise> {
           .toJson(primaryMuscleGroup)),
       'secondaryMuscleGroups':
           serializer.toJson<Set<GTMuscleGroup>>(secondaryMuscleGroups),
+      'equipment': serializer.toJson<String?>(
+          $CustomExercisesTable.$converterequipmentn.toJson(equipment)),
     };
   }
 
@@ -193,7 +231,8 @@ class CustomExercise extends DataClass implements Insertable<CustomExercise> {
           String? name,
           GTSetParameters? parameters,
           GTMuscleGroup? primaryMuscleGroup,
-          Set<GTMuscleGroup>? secondaryMuscleGroups}) =>
+          Set<GTMuscleGroup>? secondaryMuscleGroups,
+          Value<GTGymEquipment?> equipment = const Value.absent()}) =>
       CustomExercise(
         id: id ?? this.id,
         name: name ?? this.name,
@@ -201,6 +240,7 @@ class CustomExercise extends DataClass implements Insertable<CustomExercise> {
         primaryMuscleGroup: primaryMuscleGroup ?? this.primaryMuscleGroup,
         secondaryMuscleGroups:
             secondaryMuscleGroups ?? this.secondaryMuscleGroups,
+        equipment: equipment.present ? equipment.value : this.equipment,
       );
   CustomExercise copyWithCompanion(CustomExercisesCompanion data) {
     return CustomExercise(
@@ -214,6 +254,7 @@ class CustomExercise extends DataClass implements Insertable<CustomExercise> {
       secondaryMuscleGroups: data.secondaryMuscleGroups.present
           ? data.secondaryMuscleGroups.value
           : this.secondaryMuscleGroups,
+      equipment: data.equipment.present ? data.equipment.value : this.equipment,
     );
   }
 
@@ -224,14 +265,15 @@ class CustomExercise extends DataClass implements Insertable<CustomExercise> {
           ..write('name: $name, ')
           ..write('parameters: $parameters, ')
           ..write('primaryMuscleGroup: $primaryMuscleGroup, ')
-          ..write('secondaryMuscleGroups: $secondaryMuscleGroups')
+          ..write('secondaryMuscleGroups: $secondaryMuscleGroups, ')
+          ..write('equipment: $equipment')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(
-      id, name, parameters, primaryMuscleGroup, secondaryMuscleGroups);
+  int get hashCode => Object.hash(id, name, parameters, primaryMuscleGroup,
+      secondaryMuscleGroups, equipment);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -240,7 +282,8 @@ class CustomExercise extends DataClass implements Insertable<CustomExercise> {
           other.name == this.name &&
           other.parameters == this.parameters &&
           other.primaryMuscleGroup == this.primaryMuscleGroup &&
-          other.secondaryMuscleGroups == this.secondaryMuscleGroups);
+          other.secondaryMuscleGroups == this.secondaryMuscleGroups &&
+          other.equipment == this.equipment);
 }
 
 class CustomExercisesCompanion extends UpdateCompanion<CustomExercise> {
@@ -249,6 +292,7 @@ class CustomExercisesCompanion extends UpdateCompanion<CustomExercise> {
   final Value<GTSetParameters> parameters;
   final Value<GTMuscleGroup> primaryMuscleGroup;
   final Value<Set<GTMuscleGroup>> secondaryMuscleGroups;
+  final Value<GTGymEquipment?> equipment;
   final Value<int> rowid;
   const CustomExercisesCompanion({
     this.id = const Value.absent(),
@@ -256,6 +300,7 @@ class CustomExercisesCompanion extends UpdateCompanion<CustomExercise> {
     this.parameters = const Value.absent(),
     this.primaryMuscleGroup = const Value.absent(),
     this.secondaryMuscleGroups = const Value.absent(),
+    this.equipment = const Value.absent(),
     this.rowid = const Value.absent(),
   });
   CustomExercisesCompanion.insert({
@@ -264,6 +309,7 @@ class CustomExercisesCompanion extends UpdateCompanion<CustomExercise> {
     required GTSetParameters parameters,
     required GTMuscleGroup primaryMuscleGroup,
     required Set<GTMuscleGroup> secondaryMuscleGroups,
+    this.equipment = const Value.absent(),
     this.rowid = const Value.absent(),
   })  : name = Value(name),
         parameters = Value(parameters),
@@ -275,6 +321,7 @@ class CustomExercisesCompanion extends UpdateCompanion<CustomExercise> {
     Expression<String>? parameters,
     Expression<String>? primaryMuscleGroup,
     Expression<String>? secondaryMuscleGroups,
+    Expression<String>? equipment,
     Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
@@ -285,6 +332,7 @@ class CustomExercisesCompanion extends UpdateCompanion<CustomExercise> {
         'primary_muscle_group': primaryMuscleGroup,
       if (secondaryMuscleGroups != null)
         'secondary_muscle_groups': secondaryMuscleGroups,
+      if (equipment != null) 'equipment': equipment,
       if (rowid != null) 'rowid': rowid,
     });
   }
@@ -295,6 +343,7 @@ class CustomExercisesCompanion extends UpdateCompanion<CustomExercise> {
       Value<GTSetParameters>? parameters,
       Value<GTMuscleGroup>? primaryMuscleGroup,
       Value<Set<GTMuscleGroup>>? secondaryMuscleGroups,
+      Value<GTGymEquipment?>? equipment,
       Value<int>? rowid}) {
     return CustomExercisesCompanion(
       id: id ?? this.id,
@@ -303,6 +352,7 @@ class CustomExercisesCompanion extends UpdateCompanion<CustomExercise> {
       primaryMuscleGroup: primaryMuscleGroup ?? this.primaryMuscleGroup,
       secondaryMuscleGroups:
           secondaryMuscleGroups ?? this.secondaryMuscleGroups,
+      equipment: equipment ?? this.equipment,
       rowid: rowid ?? this.rowid,
     );
   }
@@ -330,6 +380,10 @@ class CustomExercisesCompanion extends UpdateCompanion<CustomExercise> {
           .$convertersecondaryMuscleGroups
           .toSql(secondaryMuscleGroups.value));
     }
+    if (equipment.present) {
+      map['equipment'] = Variable<String>(
+          $CustomExercisesTable.$converterequipmentn.toSql(equipment.value));
+    }
     if (rowid.present) {
       map['rowid'] = Variable<int>(rowid.value);
     }
@@ -344,6 +398,7 @@ class CustomExercisesCompanion extends UpdateCompanion<CustomExercise> {
           ..write('parameters: $parameters, ')
           ..write('primaryMuscleGroup: $primaryMuscleGroup, ')
           ..write('secondaryMuscleGroups: $secondaryMuscleGroups, ')
+          ..write('equipment: $equipment, ')
           ..write('rowid: $rowid')
           ..write(')'))
         .toString();
@@ -1661,6 +1716,16 @@ class $HistoryWorkoutExercisesTable extends HistoryWorkoutExercises
   late final GeneratedColumn<int> rpe = GeneratedColumn<int>(
       'rpe', aliasedName, true,
       type: DriftSqlType.int, requiredDuringInsert: false);
+  static const VerificationMeta _equipmentMeta =
+      const VerificationMeta('equipment');
+  @override
+  late final GeneratedColumnWithTypeConverter<GTGymEquipment?, String>
+      equipment = GeneratedColumn<String>('equipment', aliasedName, true,
+              type: DriftSqlType.string,
+              requiredDuringInsert: false,
+              clientDefault: () => GTGymEquipment.none.name)
+          .withConverter<GTGymEquipment?>(
+              $HistoryWorkoutExercisesTable.$converterequipmentn);
   @override
   List<GeneratedColumn> get $columns => [
         id,
@@ -1680,7 +1745,8 @@ class $HistoryWorkoutExercisesTable extends HistoryWorkoutExercises
         supersetId,
         sortOrder,
         supersedesId,
-        rpe
+        rpe,
+        equipment
       ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -1776,6 +1842,7 @@ class $HistoryWorkoutExercisesTable extends HistoryWorkoutExercises
       context.handle(
           _rpeMeta, rpe.isAcceptableOrUnknown(data['rpe']!, _rpeMeta));
     }
+    context.handle(_equipmentMeta, const VerificationResult.success());
     return context;
   }
 
@@ -1827,6 +1894,9 @@ class $HistoryWorkoutExercisesTable extends HistoryWorkoutExercises
           .read(DriftSqlType.string, data['${effectivePrefix}supersedes_id']),
       rpe: attachedDatabase.typeMapping
           .read(DriftSqlType.int, data['${effectivePrefix}rpe']),
+      equipment: $HistoryWorkoutExercisesTable.$converterequipmentn.fromSql(
+          attachedDatabase.typeMapping
+              .read(DriftSqlType.string, data['${effectivePrefix}equipment'])),
     );
   }
 
@@ -1856,6 +1926,11 @@ class $HistoryWorkoutExercisesTable extends HistoryWorkoutExercises
   static TypeConverter<Set<GTMuscleGroup>?, String?>
       $convertersecondaryMuscleGroupsn =
       NullAwareTypeConverter.wrap($convertersecondaryMuscleGroups);
+  static JsonTypeConverter2<GTGymEquipment, String, String>
+      $converterequipment =
+      const EnumNameConverter<GTGymEquipment>(GTGymEquipment.values);
+  static JsonTypeConverter2<GTGymEquipment?, String?, String?>
+      $converterequipmentn = JsonTypeConverter2.asNullable($converterequipment);
 }
 
 class HistoryWorkoutExercisesCompanion
@@ -1878,6 +1953,7 @@ class HistoryWorkoutExercisesCompanion
   final Value<int> sortOrder;
   final Value<String?> supersedesId;
   final Value<int?> rpe;
+  final Value<GTGymEquipment?> equipment;
   final Value<int> rowid;
   const HistoryWorkoutExercisesCompanion({
     this.id = const Value.absent(),
@@ -1898,6 +1974,7 @@ class HistoryWorkoutExercisesCompanion
     this.sortOrder = const Value.absent(),
     this.supersedesId = const Value.absent(),
     this.rpe = const Value.absent(),
+    this.equipment = const Value.absent(),
     this.rowid = const Value.absent(),
   });
   HistoryWorkoutExercisesCompanion.insert({
@@ -1919,6 +1996,7 @@ class HistoryWorkoutExercisesCompanion
     required int sortOrder,
     this.supersedesId = const Value.absent(),
     this.rpe = const Value.absent(),
+    this.equipment = const Value.absent(),
     this.rowid = const Value.absent(),
   })  : routineId = Value(routineId),
         name = Value(name),
@@ -1945,6 +2023,7 @@ class HistoryWorkoutExercisesCompanion
     Expression<int>? sortOrder,
     Expression<String>? supersedesId,
     Expression<int>? rpe,
+    Expression<String>? equipment,
     Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
@@ -1968,6 +2047,7 @@ class HistoryWorkoutExercisesCompanion
       if (sortOrder != null) 'sort_order': sortOrder,
       if (supersedesId != null) 'supersedes_id': supersedesId,
       if (rpe != null) 'rpe': rpe,
+      if (equipment != null) 'equipment': equipment,
       if (rowid != null) 'rowid': rowid,
     });
   }
@@ -1991,6 +2071,7 @@ class HistoryWorkoutExercisesCompanion
       Value<int>? sortOrder,
       Value<String?>? supersedesId,
       Value<int?>? rpe,
+      Value<GTGymEquipment?>? equipment,
       Value<int>? rowid}) {
     return HistoryWorkoutExercisesCompanion(
       id: id ?? this.id,
@@ -2012,6 +2093,7 @@ class HistoryWorkoutExercisesCompanion
       sortOrder: sortOrder ?? this.sortOrder,
       supersedesId: supersedesId ?? this.supersedesId,
       rpe: rpe ?? this.rpe,
+      equipment: equipment ?? this.equipment,
       rowid: rowid ?? this.rowid,
     );
   }
@@ -2080,6 +2162,11 @@ class HistoryWorkoutExercisesCompanion
     if (rpe.present) {
       map['rpe'] = Variable<int>(rpe.value);
     }
+    if (equipment.present) {
+      map['equipment'] = Variable<String>($HistoryWorkoutExercisesTable
+          .$converterequipmentn
+          .toSql(equipment.value));
+    }
     if (rowid.present) {
       map['rowid'] = Variable<int>(rowid.value);
     }
@@ -2107,6 +2194,7 @@ class HistoryWorkoutExercisesCompanion
           ..write('sortOrder: $sortOrder, ')
           ..write('supersedesId: $supersedesId, ')
           ..write('rpe: $rpe, ')
+          ..write('equipment: $equipment, ')
           ..write('rowid: $rowid')
           ..write(')'))
         .toString();
@@ -2254,6 +2342,16 @@ class $RoutineExercisesTable extends RoutineExercises
   late final GeneratedColumn<int> rpe = GeneratedColumn<int>(
       'rpe', aliasedName, true,
       type: DriftSqlType.int, requiredDuringInsert: false);
+  static const VerificationMeta _equipmentMeta =
+      const VerificationMeta('equipment');
+  @override
+  late final GeneratedColumnWithTypeConverter<GTGymEquipment?, String>
+      equipment = GeneratedColumn<String>('equipment', aliasedName, true,
+              type: DriftSqlType.string,
+              requiredDuringInsert: false,
+              clientDefault: () => GTGymEquipment.none.name)
+          .withConverter<GTGymEquipment?>(
+              $RoutineExercisesTable.$converterequipmentn);
   @override
   List<GeneratedColumn> get $columns => [
         id,
@@ -2273,7 +2371,8 @@ class $RoutineExercisesTable extends RoutineExercises
         supersetId,
         sortOrder,
         supersedesId,
-        rpe
+        rpe,
+        equipment
       ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -2369,6 +2468,7 @@ class $RoutineExercisesTable extends RoutineExercises
       context.handle(
           _rpeMeta, rpe.isAcceptableOrUnknown(data['rpe']!, _rpeMeta));
     }
+    context.handle(_equipmentMeta, const VerificationResult.success());
     return context;
   }
 
@@ -2419,6 +2519,9 @@ class $RoutineExercisesTable extends RoutineExercises
           .read(DriftSqlType.string, data['${effectivePrefix}supersedes_id']),
       rpe: attachedDatabase.typeMapping
           .read(DriftSqlType.int, data['${effectivePrefix}rpe']),
+      equipment: $RoutineExercisesTable.$converterequipmentn.fromSql(
+          attachedDatabase.typeMapping
+              .read(DriftSqlType.string, data['${effectivePrefix}equipment'])),
     );
   }
 
@@ -2448,6 +2551,11 @@ class $RoutineExercisesTable extends RoutineExercises
   static TypeConverter<Set<GTMuscleGroup>?, String?>
       $convertersecondaryMuscleGroupsn =
       NullAwareTypeConverter.wrap($convertersecondaryMuscleGroups);
+  static JsonTypeConverter2<GTGymEquipment, String, String>
+      $converterequipment =
+      const EnumNameConverter<GTGymEquipment>(GTGymEquipment.values);
+  static JsonTypeConverter2<GTGymEquipment?, String?, String?>
+      $converterequipmentn = JsonTypeConverter2.asNullable($converterequipment);
 }
 
 class RoutineExercisesCompanion extends UpdateCompanion<ConcreteExercise> {
@@ -2469,6 +2577,7 @@ class RoutineExercisesCompanion extends UpdateCompanion<ConcreteExercise> {
   final Value<int> sortOrder;
   final Value<String?> supersedesId;
   final Value<int?> rpe;
+  final Value<GTGymEquipment?> equipment;
   final Value<int> rowid;
   const RoutineExercisesCompanion({
     this.id = const Value.absent(),
@@ -2489,6 +2598,7 @@ class RoutineExercisesCompanion extends UpdateCompanion<ConcreteExercise> {
     this.sortOrder = const Value.absent(),
     this.supersedesId = const Value.absent(),
     this.rpe = const Value.absent(),
+    this.equipment = const Value.absent(),
     this.rowid = const Value.absent(),
   });
   RoutineExercisesCompanion.insert({
@@ -2510,6 +2620,7 @@ class RoutineExercisesCompanion extends UpdateCompanion<ConcreteExercise> {
     required int sortOrder,
     this.supersedesId = const Value.absent(),
     this.rpe = const Value.absent(),
+    this.equipment = const Value.absent(),
     this.rowid = const Value.absent(),
   })  : routineId = Value(routineId),
         name = Value(name),
@@ -2536,6 +2647,7 @@ class RoutineExercisesCompanion extends UpdateCompanion<ConcreteExercise> {
     Expression<int>? sortOrder,
     Expression<String>? supersedesId,
     Expression<int>? rpe,
+    Expression<String>? equipment,
     Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
@@ -2559,6 +2671,7 @@ class RoutineExercisesCompanion extends UpdateCompanion<ConcreteExercise> {
       if (sortOrder != null) 'sort_order': sortOrder,
       if (supersedesId != null) 'supersedes_id': supersedesId,
       if (rpe != null) 'rpe': rpe,
+      if (equipment != null) 'equipment': equipment,
       if (rowid != null) 'rowid': rowid,
     });
   }
@@ -2582,6 +2695,7 @@ class RoutineExercisesCompanion extends UpdateCompanion<ConcreteExercise> {
       Value<int>? sortOrder,
       Value<String?>? supersedesId,
       Value<int?>? rpe,
+      Value<GTGymEquipment?>? equipment,
       Value<int>? rowid}) {
     return RoutineExercisesCompanion(
       id: id ?? this.id,
@@ -2603,6 +2717,7 @@ class RoutineExercisesCompanion extends UpdateCompanion<ConcreteExercise> {
       sortOrder: sortOrder ?? this.sortOrder,
       supersedesId: supersedesId ?? this.supersedesId,
       rpe: rpe ?? this.rpe,
+      equipment: equipment ?? this.equipment,
       rowid: rowid ?? this.rowid,
     );
   }
@@ -2670,6 +2785,10 @@ class RoutineExercisesCompanion extends UpdateCompanion<ConcreteExercise> {
     if (rpe.present) {
       map['rpe'] = Variable<int>(rpe.value);
     }
+    if (equipment.present) {
+      map['equipment'] = Variable<String>(
+          $RoutineExercisesTable.$converterequipmentn.toSql(equipment.value));
+    }
     if (rowid.present) {
       map['rowid'] = Variable<int>(rowid.value);
     }
@@ -2697,6 +2816,7 @@ class RoutineExercisesCompanion extends UpdateCompanion<ConcreteExercise> {
           ..write('sortOrder: $sortOrder, ')
           ..write('supersedesId: $supersedesId, ')
           ..write('rpe: $rpe, ')
+          ..write('equipment: $equipment, ')
           ..write('rowid: $rowid')
           ..write(')'))
         .toString();
@@ -4421,6 +4541,7 @@ typedef $$CustomExercisesTableCreateCompanionBuilder = CustomExercisesCompanion
   required GTSetParameters parameters,
   required GTMuscleGroup primaryMuscleGroup,
   required Set<GTMuscleGroup> secondaryMuscleGroups,
+  Value<GTGymEquipment?> equipment,
   Value<int> rowid,
 });
 typedef $$CustomExercisesTableUpdateCompanionBuilder = CustomExercisesCompanion
@@ -4430,6 +4551,7 @@ typedef $$CustomExercisesTableUpdateCompanionBuilder = CustomExercisesCompanion
   Value<GTSetParameters> parameters,
   Value<GTMuscleGroup> primaryMuscleGroup,
   Value<Set<GTMuscleGroup>> secondaryMuscleGroups,
+  Value<GTGymEquipment?> equipment,
   Value<int> rowid,
 });
 
@@ -4457,6 +4579,7 @@ class $$CustomExercisesTableTableManager extends RootTableManager<
             Value<GTMuscleGroup> primaryMuscleGroup = const Value.absent(),
             Value<Set<GTMuscleGroup>> secondaryMuscleGroups =
                 const Value.absent(),
+            Value<GTGymEquipment?> equipment = const Value.absent(),
             Value<int> rowid = const Value.absent(),
           }) =>
               CustomExercisesCompanion(
@@ -4465,6 +4588,7 @@ class $$CustomExercisesTableTableManager extends RootTableManager<
             parameters: parameters,
             primaryMuscleGroup: primaryMuscleGroup,
             secondaryMuscleGroups: secondaryMuscleGroups,
+            equipment: equipment,
             rowid: rowid,
           ),
           createCompanionCallback: ({
@@ -4473,6 +4597,7 @@ class $$CustomExercisesTableTableManager extends RootTableManager<
             required GTSetParameters parameters,
             required GTMuscleGroup primaryMuscleGroup,
             required Set<GTMuscleGroup> secondaryMuscleGroups,
+            Value<GTGymEquipment?> equipment = const Value.absent(),
             Value<int> rowid = const Value.absent(),
           }) =>
               CustomExercisesCompanion.insert(
@@ -4481,6 +4606,7 @@ class $$CustomExercisesTableTableManager extends RootTableManager<
             parameters: parameters,
             primaryMuscleGroup: primaryMuscleGroup,
             secondaryMuscleGroups: secondaryMuscleGroups,
+            equipment: equipment,
             rowid: rowid,
           ),
         ));
@@ -4516,6 +4642,13 @@ class $$CustomExercisesTableFilterComposer
   ColumnWithTypeConverterFilters<Set<GTMuscleGroup>, Set<GTMuscleGroup>, String>
       get secondaryMuscleGroups => $state.composableBuilder(
           column: $state.table.secondaryMuscleGroups,
+          builder: (column, joinBuilders) => ColumnWithTypeConverterFilters(
+              column,
+              joinBuilders: joinBuilders));
+
+  ColumnWithTypeConverterFilters<GTGymEquipment?, GTGymEquipment, String>
+      get equipment => $state.composableBuilder(
+          column: $state.table.equipment,
           builder: (column, joinBuilders) => ColumnWithTypeConverterFilters(
               column,
               joinBuilders: joinBuilders));
@@ -4578,6 +4711,11 @@ class $$CustomExercisesTableOrderingComposer
 
   ColumnOrderings<String> get secondaryMuscleGroups => $state.composableBuilder(
       column: $state.table.secondaryMuscleGroups,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  ColumnOrderings<String> get equipment => $state.composableBuilder(
+      column: $state.table.equipment,
       builder: (column, joinBuilders) =>
           ColumnOrderings(column, joinBuilders: joinBuilders));
 }
@@ -5193,6 +5331,7 @@ typedef $$HistoryWorkoutExercisesTableCreateCompanionBuilder
   required int sortOrder,
   Value<String?> supersedesId,
   Value<int?> rpe,
+  Value<GTGymEquipment?> equipment,
   Value<int> rowid,
 });
 typedef $$HistoryWorkoutExercisesTableUpdateCompanionBuilder
@@ -5215,6 +5354,7 @@ typedef $$HistoryWorkoutExercisesTableUpdateCompanionBuilder
   Value<int> sortOrder,
   Value<String?> supersedesId,
   Value<int?> rpe,
+  Value<GTGymEquipment?> equipment,
   Value<int> rowid,
 });
 
@@ -5255,6 +5395,7 @@ class $$HistoryWorkoutExercisesTableTableManager extends RootTableManager<
             Value<int> sortOrder = const Value.absent(),
             Value<String?> supersedesId = const Value.absent(),
             Value<int?> rpe = const Value.absent(),
+            Value<GTGymEquipment?> equipment = const Value.absent(),
             Value<int> rowid = const Value.absent(),
           }) =>
               HistoryWorkoutExercisesCompanion(
@@ -5276,6 +5417,7 @@ class $$HistoryWorkoutExercisesTableTableManager extends RootTableManager<
             sortOrder: sortOrder,
             supersedesId: supersedesId,
             rpe: rpe,
+            equipment: equipment,
             rowid: rowid,
           ),
           createCompanionCallback: ({
@@ -5298,6 +5440,7 @@ class $$HistoryWorkoutExercisesTableTableManager extends RootTableManager<
             required int sortOrder,
             Value<String?> supersedesId = const Value.absent(),
             Value<int?> rpe = const Value.absent(),
+            Value<GTGymEquipment?> equipment = const Value.absent(),
             Value<int> rowid = const Value.absent(),
           }) =>
               HistoryWorkoutExercisesCompanion.insert(
@@ -5319,6 +5462,7 @@ class $$HistoryWorkoutExercisesTableTableManager extends RootTableManager<
             sortOrder: sortOrder,
             supersedesId: supersedesId,
             rpe: rpe,
+            equipment: equipment,
             rowid: rowid,
           ),
         ));
@@ -5405,6 +5549,13 @@ class $$HistoryWorkoutExercisesTableFilterComposer
       column: $state.table.rpe,
       builder: (column, joinBuilders) =>
           ColumnFilters(column, joinBuilders: joinBuilders));
+
+  ColumnWithTypeConverterFilters<GTGymEquipment?, GTGymEquipment, String>
+      get equipment => $state.composableBuilder(
+          column: $state.table.equipment,
+          builder: (column, joinBuilders) => ColumnWithTypeConverterFilters(
+              column,
+              joinBuilders: joinBuilders));
 
   $$HistoryWorkoutsTableFilterComposer get routineId {
     final $$HistoryWorkoutsTableFilterComposer composer =
@@ -5538,6 +5689,11 @@ class $$HistoryWorkoutExercisesTableOrderingComposer
       builder: (column, joinBuilders) =>
           ColumnOrderings(column, joinBuilders: joinBuilders));
 
+  ColumnOrderings<String> get equipment => $state.composableBuilder(
+      column: $state.table.equipment,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
   $$HistoryWorkoutsTableOrderingComposer get routineId {
     final $$HistoryWorkoutsTableOrderingComposer composer =
         $state.composerBuilder(
@@ -5617,6 +5773,7 @@ typedef $$RoutineExercisesTableCreateCompanionBuilder
   required int sortOrder,
   Value<String?> supersedesId,
   Value<int?> rpe,
+  Value<GTGymEquipment?> equipment,
   Value<int> rowid,
 });
 typedef $$RoutineExercisesTableUpdateCompanionBuilder
@@ -5639,6 +5796,7 @@ typedef $$RoutineExercisesTableUpdateCompanionBuilder
   Value<int> sortOrder,
   Value<String?> supersedesId,
   Value<int?> rpe,
+  Value<GTGymEquipment?> equipment,
   Value<int> rowid,
 });
 
@@ -5679,6 +5837,7 @@ class $$RoutineExercisesTableTableManager extends RootTableManager<
             Value<int> sortOrder = const Value.absent(),
             Value<String?> supersedesId = const Value.absent(),
             Value<int?> rpe = const Value.absent(),
+            Value<GTGymEquipment?> equipment = const Value.absent(),
             Value<int> rowid = const Value.absent(),
           }) =>
               RoutineExercisesCompanion(
@@ -5700,6 +5859,7 @@ class $$RoutineExercisesTableTableManager extends RootTableManager<
             sortOrder: sortOrder,
             supersedesId: supersedesId,
             rpe: rpe,
+            equipment: equipment,
             rowid: rowid,
           ),
           createCompanionCallback: ({
@@ -5722,6 +5882,7 @@ class $$RoutineExercisesTableTableManager extends RootTableManager<
             required int sortOrder,
             Value<String?> supersedesId = const Value.absent(),
             Value<int?> rpe = const Value.absent(),
+            Value<GTGymEquipment?> equipment = const Value.absent(),
             Value<int> rowid = const Value.absent(),
           }) =>
               RoutineExercisesCompanion.insert(
@@ -5743,6 +5904,7 @@ class $$RoutineExercisesTableTableManager extends RootTableManager<
             sortOrder: sortOrder,
             supersedesId: supersedesId,
             rpe: rpe,
+            equipment: equipment,
             rowid: rowid,
           ),
         ));
@@ -5829,6 +5991,13 @@ class $$RoutineExercisesTableFilterComposer
       column: $state.table.rpe,
       builder: (column, joinBuilders) =>
           ColumnFilters(column, joinBuilders: joinBuilders));
+
+  ColumnWithTypeConverterFilters<GTGymEquipment?, GTGymEquipment, String>
+      get equipment => $state.composableBuilder(
+          column: $state.table.equipment,
+          builder: (column, joinBuilders) => ColumnWithTypeConverterFilters(
+              column,
+              joinBuilders: joinBuilders));
 
   $$RoutinesTableFilterComposer get routineId {
     final $$RoutinesTableFilterComposer composer = $state.composerBuilder(
@@ -5952,6 +6121,11 @@ class $$RoutineExercisesTableOrderingComposer
 
   ColumnOrderings<int> get rpe => $state.composableBuilder(
       column: $state.table.rpe,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  ColumnOrderings<String> get equipment => $state.composableBuilder(
+      column: $state.table.equipment,
       builder: (column, joinBuilders) =>
           ColumnOrderings(column, joinBuilders: joinBuilders));
 

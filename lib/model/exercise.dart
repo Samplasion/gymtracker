@@ -74,6 +74,21 @@ enum GTMuscleGroup {
   final GTMuscleCategory? category;
 }
 
+enum GTGymEquipment {
+  none,
+  barbell,
+  dumbbell,
+  cable,
+  machine,
+  kettlebell,
+  plates,
+  resistanceBand,
+  suspensionBands,
+  other;
+
+  String get localizedName => "equipment.$name".t;
+}
+
 @JsonSerializable(constructor: "raw")
 @CopyWith(constructor: "raw")
 class Exercise extends WorkoutExercisable {
@@ -103,6 +118,8 @@ class Exercise extends WorkoutExercisable {
   @override
   final String? supersedesID;
 
+  /// Whether this exercise is a skeleton exercise, that is, it is not
+  /// a real exercise but a placeholder for loading screens.
   @JsonKey(includeFromJson: false, includeToJson: false)
   @CopyWithField(immutable: true)
   final bool skeleton;
@@ -112,6 +129,23 @@ class Exercise extends WorkoutExercisable {
   /// This is a subjective measure of how intense the exercise was.
   /// It is a number between 1 and 10.
   final int? rpe;
+
+  // Not actually deprecated, but the name is reserved for copyWith
+  @Deprecated("Use [gymEquipment] instead")
+  @JsonKey(name: "equipment", defaultValue: GTGymEquipment.none)
+  @CopyWithField(immutable: true)
+  // Named like this because of a conflict with the generated copyWith
+  final GTGymEquipment equipment;
+
+  /// The equipment needed for this exercise.
+  GTGymEquipment get gymEquipment {
+    if (standard && !isAbstract) {
+      // ignore: deprecated_member_use_from_same_package
+      return getStandardExerciseByID(parentID!)!.equipment;
+    }
+    // ignore: deprecated_member_use_from_same_package
+    return equipment;
+  }
 
   bool get isCustom => !standard;
   bool get isInSuperset => supersetID != null;
@@ -186,6 +220,7 @@ class Exercise extends WorkoutExercisable {
     this.rpe,
     GTExerciseMuscleCategory? category,
     this.skeleton = false,
+    required this.equipment,
   })  : id = id ?? const Uuid().v4(),
         _category = category,
         assert(sets.isEmpty || parameters == sets[0].parameters,
@@ -206,6 +241,7 @@ class Exercise extends WorkoutExercisable {
     required String notes,
     required String? supersetID,
     required String? workoutID,
+    required GTGymEquipment equipment,
   }) =>
       Exercise.raw(
         id: id,
@@ -222,6 +258,7 @@ class Exercise extends WorkoutExercisable {
         workoutID: workoutID,
         supersedesID: null,
         category: GTExerciseMuscleCategory.custom,
+        equipment: equipment,
       );
 
   factory Exercise.standard({
@@ -230,6 +267,7 @@ class Exercise extends WorkoutExercisable {
     required GTSetParameters parameters,
     required GTMuscleGroup primaryMuscleGroup,
     Set<GTMuscleGroup> secondaryMuscleGroups = const <GTMuscleGroup>{},
+    required GTGymEquipment equipment,
   }) {
     return Exercise.raw(
       id: id,
@@ -244,6 +282,7 @@ class Exercise extends WorkoutExercisable {
       supersetID: null,
       workoutID: null,
       supersedesID: null,
+      equipment: equipment,
     );
   }
 

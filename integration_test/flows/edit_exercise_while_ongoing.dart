@@ -27,6 +27,7 @@ final Exercise baseExercise = Exercise.custom(
   notes: "Base Notes",
   workoutID: "routineID",
   supersetID: "supersetID",
+  equipment: GTGymEquipment.none,
 );
 
 Future<void> testEditExerciseWhileWorkoutIsOngoingFlow(
@@ -173,6 +174,7 @@ Future<void> testEditExerciseWhileWorkoutIsOngoingFlow(
       notes: "",
       workoutID: null,
       supersetID: null,
+      equipment: GTGymEquipment.none,
     ),
   );
 }

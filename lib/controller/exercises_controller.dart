@@ -46,6 +46,7 @@ class ExercisesController extends GetxController with ServiceableController {
       notes: '',
       supersetID: null,
       workoutID: null,
+      equipment: GTGymEquipment.none,
     );
   }
 

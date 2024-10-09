@@ -43,6 +43,7 @@ void main() {
         notes: 'Test Notes',
         workoutID: null,
         supersetID: null,
+        equipment: GTGymEquipment.none,
       ),
       Exercise.custom(
         id: "2",
@@ -71,6 +72,7 @@ void main() {
         notes: 'Test Notes',
         workoutID: null,
         supersetID: null,
+        equipment: GTGymEquipment.none,
       ),
     ],
     duration: const Duration(seconds: 60),
@@ -108,6 +110,7 @@ void main() {
       notes: 'Test Notes $number',
       workoutID: null,
       supersetID: null,
+      equipment: GTGymEquipment.none,
     );
   }
 
@@ -293,6 +296,7 @@ void main() {
               notes: 'Test Notes',
               workoutID: null,
               supersetID: null,
+              equipment: GTGymEquipment.none,
             ),
           ]
         ]);
@@ -485,6 +489,7 @@ void main() {
               notes: 'Test Notes',
               workoutID: null,
               supersetID: null,
+              equipment: GTGymEquipment.none,
             ),
             Exercise.custom(
               id: "2",
@@ -513,6 +518,7 @@ void main() {
               notes: 'Test Notes',
               workoutID: null,
               supersetID: null,
+              equipment: GTGymEquipment.none,
             ),
           ],
           duration: const Duration(seconds: 60),
@@ -571,6 +577,7 @@ void main() {
                 notes: 'Test Notes',
                 workoutID: null,
                 supersetID: null,
+                equipment: GTGymEquipment.none,
               ),
               Exercise.custom(
                 id: "2",
@@ -591,6 +598,7 @@ void main() {
                 notes: 'Test Notes',
                 workoutID: null,
                 supersetID: null,
+                equipment: GTGymEquipment.none,
               ),
             ],
             duration: const Duration(seconds: 60),

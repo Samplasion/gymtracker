@@ -10,6 +10,7 @@ import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/utils/utils.dart';
 import 'package:gymtracker/view/exercise_creator.dart';
+import 'package:gymtracker/view/utils/crossfade.dart';
 import 'package:gymtracker/view/utils/exercise.dart';
 import 'package:gymtracker/view/utils/sliver_utils.dart';
 
@@ -50,11 +51,20 @@ class _ExercisePickerState extends State<ExercisePicker> {
 
   Set<Exercise> selectedExercises = {};
 
+  Set<GTGymEquipment> equipmentFilter = GTGymEquipment.values.toSet();
+  bool _showFilterRow = false;
+
   bool _filter(Exercise exercise) {
+    bool show = true;
+    show &= equipmentFilter.contains(exercise.gymEquipment);
     if (widget.individualFilter != null) {
-      return widget.individualFilter!(exercise);
+      show &= widget.individualFilter!(exercise);
     }
-    return true;
+    return show;
+  }
+
+  bool get _hasCustomFilters {
+    return equipmentFilter.length != GTGymEquipment.values.length;
   }
 
   Map<GTExerciseMuscleCategory, ExerciseCategory> get exercises {
@@ -81,12 +91,23 @@ class _ExercisePickerState extends State<ExercisePicker> {
       appBar: AppBar(
         title: Text("exercise.picker.title".t),
         actions: [
+          IconButton(
+            icon: Badge(
+              isLabelVisible: _hasCustomFilters,
+              child: const Icon(GTIcons.filter_list),
+            ),
+            onPressed: () {
+              setState(() {
+                _showFilterRow = !_showFilterRow;
+              });
+            },
+          ),
           if (!widget.singlePick)
             IconButton(
               key: const Key('pick'),
               icon: const Icon(GTIcons.done),
               onPressed: _submit,
-            )
+            ),
         ],
       ),
       body: widget.filter.hasCustom
@@ -110,6 +131,7 @@ class _ExercisePickerState extends State<ExercisePicker> {
   CustomScrollView _innerScrollView(BuildContext context) {
     return CustomScrollView(
       slivers: [
+        _filterSection(context),
         SliverList(
           delegate: SliverChildListDelegate([
             if (widget.allowNone) ...[
@@ -178,6 +200,70 @@ class _ExercisePickerState extends State<ExercisePicker> {
         const SliverToBoxAdapter(child: SizedBox(height: 8)),
         const SliverBottomSafeArea(),
       ],
+    );
+  }
+
+  SliverToBoxAdapter _filterSection(BuildContext context) {
+    final part = partition(
+        GTGymEquipment.values.toList(), (el) => equipmentFilter.contains(el));
+    final equipments = part.$1 + part.$2;
+    return SliverToBoxAdapter(
+      child: Crossfade(
+        firstChild: Container(
+          color: context.colorScheme.surfaceContainerLowest,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SizedBox(height: 8),
+              SafeArea(
+                top: false,
+                bottom: false,
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
+                  child: Text(
+                    "exercise.picker.filter.equipment".t,
+                    style: context.textTheme.labelMedium,
+                  ),
+                ),
+              ),
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                physics: const ClampingScrollPhysics(),
+                child: SafeArea(
+                  top: false,
+                  bottom: false,
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(12, 8, 12, 8),
+                    child: Row(
+                      children: [
+                        for (final equipment in equipments)
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 4),
+                            child: FilterChip(
+                              label: Text(equipment.localizedName),
+                              selected: equipmentFilter.contains(equipment),
+                              onSelected: (selected) {
+                                setState(() {
+                                  if (selected) {
+                                    equipmentFilter.add(equipment);
+                                  } else {
+                                    equipmentFilter.remove(equipment);
+                                  }
+                                });
+                              },
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+        secondChild: const SizedBox.shrink(),
+        showSecond: !_showFilterRow,
+      ),
     );
   }
 

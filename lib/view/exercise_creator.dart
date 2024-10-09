@@ -33,6 +33,8 @@ class _ExerciseCreatorState extends State<ExerciseCreator> {
   late GTMuscleGroup? primaryGroup = widget.base?.primaryMuscleGroup;
   late Set<GTMuscleGroup> otherGroups =
       widget.base?.secondaryMuscleGroups ?? {};
+  late GTGymEquipment equipment =
+      widget.base?.gymEquipment ?? GTGymEquipment.none;
 
   ExercisesController get controller => Get.put(ExercisesController());
 
@@ -41,6 +43,7 @@ class _ExerciseCreatorState extends State<ExerciseCreator> {
     final muscleGroups = GTMuscleGroup.values.toList();
     muscleGroups.sort((a, b) =>
         "muscleGroups.${a.name}".t.compareTo("muscleGroups.${b.name}".t));
+    final equipments = GTGymEquipment.values.toList();
 
     return Dialog.fullscreen(
       child: Scaffold(
@@ -120,6 +123,30 @@ class _ExerciseCreatorState extends State<ExerciseCreator> {
                     },
                     value: params,
                   ),
+                ),
+                DropdownButtonFormField<GTGymEquipment>(
+                  decoration: _decoration(
+                      "exercise.editor.fields.gymEquipment.label".t),
+                  items: [
+                    for (final equipment in equipments)
+                      DropdownMenuItem(
+                        value: equipment,
+                        child: Text("equipment.${equipment.name}".t),
+                      ),
+                  ],
+                  onChanged: (value) {
+                    if (value == null) return;
+                    setState(() => equipment = value);
+                  },
+                  validator: (value) {
+                    if (value == null) {
+                      // Theoretically unreachable
+                      return "exercise.editor.fields.gymEquipment.errors.empty"
+                          .t;
+                    }
+                    return null;
+                  },
+                  value: equipment,
                 ),
                 DropdownButtonFormField<GTMuscleGroup>(
                   decoration: _decoration(
@@ -231,6 +258,7 @@ class _ExerciseCreatorState extends State<ExerciseCreator> {
               sets: [],
               workoutID: widget.base!.workoutID,
               supersetID: null,
+              equipment: equipment,
             ),
           ),
         );

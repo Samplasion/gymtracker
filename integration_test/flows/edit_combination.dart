@@ -49,6 +49,7 @@ final ex = Exercise.raw(
   supersetID: null,
   supersedesID: null,
   workoutID: "base",
+  equipment: GTGymEquipment.none,
 );
 final historyWorkoutBase = Workout(
   id: "base",

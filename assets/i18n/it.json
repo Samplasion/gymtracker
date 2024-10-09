@@ -142,6 +142,12 @@
         "reorderSets": {
           "title": "Riordina serie",
           "text": "Trascina le maniglie per riordinare le serie"
+        },
+        "gymEquipment": {
+          "errors": {
+            "empty": "Seleziona attrezzatura"
+          },
+          "label": "Attrezzatura"
         }
       },
       "cannotChangeParameters": {
@@ -157,6 +163,9 @@
       "title": "Seleziona esercizi",
       "errors": {
         "empty": "Devi selezionare un esercizio."
+      },
+      "filter": {
+        "equipment": "Attrezzatura"
       }
     },
     "custom": "Personalizzato",
@@ -182,7 +191,8 @@
       "explanation": "Spiegazione",
       "explanationDisclaimer": "Nota che questa spiegazione è fornita a puro scopo informativo, e non sostituisce il parere di un trainer qualificato.",
       "primaryMuscleGroup": "Gruppo muscolare: @muscleGroup",
-      "secondaryMuscleGroups": "Gruppi muscolari secondari: @muscleGroups"
+      "secondaryMuscleGroups": "Gruppi muscolari secondari: @muscleGroups",
+      "equipment": "Attrezzatura: @equipment"
     },
     "continuation": {
       "label": "Continuazione",
@@ -653,6 +663,9 @@
     },
     "workoutWeightDistributionBarChart": {
       "label": "Distribuzione muscolare (per peso sollevato)"
+    },
+    "workoutEquipmentDistributionBarChart": {
+      "label": "Distribuzione attrezzatura (per serie effettuate)"
     }
   },
   "general": {
@@ -901,7 +914,8 @@
       "exercises": {
         "legCurlProne": "Leg curl (sdraiati)",
         "legCurlSeated": "Leg curl (seduti)",
-        "romanianDeadlift": "Stacchi rumeni"
+        "romanianDeadlift": "Stacchi rumeni",
+        "romanianDeadliftDumbbell": "Stacchi romeni (manubri)"
       }
     },
     "shoulders": {
@@ -944,7 +958,8 @@
         "tricepKickbacks": "Kickback per i tricipiti",
         "skullCrushers": "Skull Crushers",
         "benchDips": "Dip alla panca",
-        "diamondPushUps": "Flessioni a diamante"
+        "diamondPushUps": "Flessioni a diamante",
+        "tricepsMachine": "Triceps machine"
       }
     },
     "custom": {
@@ -1969,5 +1984,17 @@
     "categoryFoods": {
       "empty": "Non hai ancora aggiunto cibi a questa categoria."
     }
+  },
+  "equipment": {
+    "none": "Corpo libero",
+    "barbell": "Bilanciere",
+    "dumbbell": "Manubri",
+    "cable": "Cavi",
+    "machine": "Macchinario",
+    "kettlebell": "Kettlebell",
+    "plates": "Piatti",
+    "resistanceBand": "Banda di resistenza",
+    "suspensionBands": "Fasce di sospensione",
+    "other": "Altro"
   }
 }

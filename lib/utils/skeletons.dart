@@ -52,6 +52,7 @@ Exercise skeletonExercise({
         ),
       ),
       skeleton: true,
+      equipment: GTGymEquipment.none,
     );
 
 List<Food> skeletonFoods(int length) => ([

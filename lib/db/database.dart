@@ -22,6 +22,7 @@ import 'package:gymtracker/db/schema_versions.dart';
 import 'package:gymtracker/db/utils.dart';
 import 'package:gymtracker/model/exercisable.dart' as model;
 import 'package:gymtracker/model/exercise.dart' as model;
+import 'package:gymtracker/model/exercise.dart' show GTGymEquipment;
 import 'package:gymtracker/model/measurements.dart';
 import 'package:gymtracker/model/preferences.dart';
 import 'package:gymtracker/model/set.dart';
@@ -44,7 +45,7 @@ part 'database.g.dart';
 // Used in the generated code
 const _uuid = Uuid();
 
-const DATABASE_VERSION = 8;
+const DATABASE_VERSION = 9;
 
 @DriftDatabase(tables: [
   CustomExercises,
@@ -123,6 +124,20 @@ class GTDatabase extends _$GTDatabase {
               },
               from7To8: (m, schema) async {
                 await m.createTable(schema.nutritionCategories);
+              },
+              from8To9: (m, schema) async {
+                await m.addColumn(
+                  schema.customExercises,
+                  schema.customExercises.equipment,
+                );
+                await m.addColumn(
+                  schema.historyWorkoutExercises,
+                  schema.historyWorkoutExercises.equipment,
+                );
+                await m.addColumn(
+                  schema.routineExercises,
+                  schema.routineExercises.equipment,
+                );
               },
             ),
           );
@@ -751,6 +766,8 @@ model.Exercise exerciseFromData(CustomExercise row) {
     sets: [],
     workoutID: null,
     supersedesID: null,
+    rpe: null,
+    equipment: row.equipment ?? GTGymEquipment.none,
   );
 }
 

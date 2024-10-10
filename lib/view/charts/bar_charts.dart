@@ -259,7 +259,7 @@ class EquipmentDistributionBarChart extends StatelessWidget {
       data: equipmentPercentages,
       color: context.colorScheme.tertiary,
       labelBuilder: (eq, percentage) =>
-          "${"equipment.${eq.name}".t} (${percentage.round()}%)",
+          "${eq.localizedName} (${percentage.round()}%)",
     );
   }
 }

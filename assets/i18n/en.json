@@ -1988,15 +1988,45 @@
     }
   },
   "equipment": {
-    "none": "Bodyweight",
-    "barbell": "Barbell",
-    "dumbbell": "Dumbbells",
-    "cable": "Cables",
-    "machine": "Machine",
-    "kettlebell": "Kettlebell",
-    "plates": "Plates",
-    "resistanceBand": "Resistance band",
-    "suspensionBands": "Suspension bands",
-    "other": "Other"
+    "none": {
+      "long": "Bodyweight",
+      "short": "Bodywt."
+    },
+    "barbell": {
+      "long": "Barbell",
+      "short": "Barb."
+    },
+    "dumbbell": {
+      "long": "Dumbbells",
+      "short": "Dumbb."
+    },
+    "cable": {
+      "long": "Cables",
+      "short": "Cables"
+    },
+    "machine": {
+      "long": "Machine",
+      "short": "Machine"
+    },
+    "kettlebell": {
+      "long": "Kettlebell",
+      "short": "Kettleb."
+    },
+    "plates": {
+      "long": "Plates",
+      "short": "Plates"
+    },
+    "resistanceBand": {
+      "long": "Resistance band",
+      "short": "Res. band"
+    },
+    "suspensionBands": {
+      "long": "Suspension bands",
+      "short": "Susp. bands"
+    },
+    "other": {
+      "long": "Other",
+      "short": "Other"
+    }
   }
 }

@@ -86,7 +86,8 @@ enum GTGymEquipment {
   suspensionBands,
   other;
 
-  String get localizedName => "equipment.$name".t;
+  String get localizedName => "equipment.$name.long".t;
+  String get localizedNameShort => "equipment.$name.short".t;
 }
 
 @JsonSerializable(constructor: "raw")

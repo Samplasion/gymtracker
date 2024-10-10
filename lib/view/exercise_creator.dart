@@ -131,7 +131,7 @@ class _ExerciseCreatorState extends State<ExerciseCreator> {
                     for (final equipment in equipments)
                       DropdownMenuItem(
                         value: equipment,
-                        child: Text("equipment.${equipment.name}".t),
+                        child: Text(equipment.localizedName),
                       ),
                   ],
                   onChanged: (value) {

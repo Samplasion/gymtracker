@@ -51,7 +51,7 @@ class _GymEquipmentRadialChartState
         getTitle: (i, angle) {
           if (angle > 90 && angle < 270) angle -= 180;
           return RadarChartTitle(
-            text: "equipment.${entries[i].key.name}".t,
+            text: entries[i].key.localizedNameShort,
             angle: angle,
             positionPercentageOffset: 0.1,
           );

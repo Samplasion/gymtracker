@@ -86,8 +86,6 @@ class _MeStatisticsPageState
   @override
   Widget build(BuildContext context) {
     final speedDialData = this.speedDialData;
-    FlutterView view = WidgetsBinding.instance.platformDispatcher.views.first;
-    final Size(:width, :height) = view.physicalSize;
 
     return Scaffold(
       appBar: AppBar(
@@ -129,24 +127,19 @@ class _MeStatisticsPageState
           ),
           const SizedBox(height: 16),
           SizedBox(
-            // width: max(200, min(context.width, context.height / 3)),
-            // height: max(200, min(context.width, context.height / 3)),
-            // child: MuscleCategoryGraph(
-            //   workouts: periodWorkouts,
-            // ),
-            width: max(200, min(width, height / 3)),
-            height: max(200, min(width, height / 3)),
+            width: max(200, min(context.width, context.height / 3)),
+            height: max(200, min(context.width, context.height / 3 + 32)),
             child: TabBarView(
               controller: _controller,
               children: [
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  padding: const EdgeInsets.all(16),
                   child: MuscleCategoryGraph(
                     workouts: periodWorkouts,
                   ),
                 ),
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  padding: const EdgeInsets.all(16),
                   child: GymEquipmentRadialChart(
                     workouts: periodWorkouts,
                   ),

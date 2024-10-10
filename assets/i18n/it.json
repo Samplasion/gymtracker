@@ -1988,15 +1988,45 @@
     }
   },
   "equipment": {
-    "none": "Corpo libero",
-    "barbell": "Bilanciere",
-    "dumbbell": "Manubri",
-    "cable": "Cavi",
-    "machine": "Macchinario",
-    "kettlebell": "Kettlebell",
-    "plates": "Piatti",
-    "resistanceBand": "Banda di resistenza",
-    "suspensionBands": "Fasce di sospensione",
-    "other": "Altro"
+    "none": {
+      "long": "Corpo libero",
+      "short": "C. libero"
+    },
+    "barbell": {
+      "long": "Bilanciere",
+      "short": "Bilanc."
+    },
+    "dumbbell": {
+      "long": "Manubri",
+      "short": "Manubri"
+    },
+    "cable": {
+      "long": "Cavi",
+      "short": "Cavi"
+    },
+    "machine": {
+      "long": "Macchinario",
+      "short": "Macch."
+    },
+    "kettlebell": {
+      "long": "Kettlebell",
+      "short": "Kettleb."
+    },
+    "plates": {
+      "long": "Piatti",
+      "short": "Piatti"
+    },
+    "resistanceBand": {
+      "long": "Banda di resistenza",
+      "short": "B. di res."
+    },
+    "suspensionBands": {
+      "long": "Fasce di sospensione",
+      "short": "F. di sosp."
+    },
+    "other": {
+      "long": "Altro",
+      "short": "Altro"
+    }
   }
 }

@@ -355,7 +355,7 @@ class Exercise extends WorkoutExercisable {
   }
 
   static Exercise replaced({required Exercise from, required Exercise to}) {
-    return to.copyWith(
+    final res = to.copyWith(
       workoutID: from.workoutID,
       supersetID: from.supersetID,
       notes: from.notes,
@@ -374,6 +374,7 @@ class Exercise extends WorkoutExercisable {
                 ),
             ],
     );
+    return res;
   }
 
   @override

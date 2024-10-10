@@ -886,6 +886,9 @@ extension WorkoutExercisableDatabaseUtils on model.WorkoutExercisable {
       supersedesId: Value.absentIfNull(supersedesID),
       rpe:
           this is model.Exercise ? Value(asExercise.rpe) : const Value.absent(),
+      equipment: this is model.Exercise
+          ? Value(asExercise.gymEquipment)
+          : const Value(GTGymEquipment.none),
     );
   }
 }
@@ -898,6 +901,7 @@ extension ExerciseDatabaseUtils on model.Exercise {
       parameters: Value(parameters),
       primaryMuscleGroup: Value(primaryMuscleGroup),
       secondaryMuscleGroups: Value(secondaryMuscleGroups),
+      equipment: Value(gymEquipment),
     );
   }
 }

@@ -130,6 +130,7 @@ flutter:
     - assets/exercises/biceps/cableBicepsCurl/
     - assets/exercises/biceps/chinUps/
     - assets/exercises/biceps/concentrationCurl/
+    - assets/exercises/biceps/dualCableHighCurl/
     - assets/exercises/biceps/dumbbellBicepsCurl/
     - assets/exercises/biceps/hammerCurlDumbbell/
     - assets/exercises/biceps/scottCurl/
@@ -161,6 +162,7 @@ flutter:
     - assets/exercises/chest/dumbbellBenchPressFlat/
     - assets/exercises/chest/dumbbellBenchPressIncline/
     - assets/exercises/chest/dumbbellHexPress/
+    - assets/exercises/chest/lowCableFly/
     - assets/exercises/chest/pushUps/
     - assets/exercises/chest/pushUpsWeighted/
     - assets/exercises/chest/seatedCableChestFlys/
@@ -180,6 +182,7 @@ flutter:
     - assets/exercises/hamstrings/legCurlProne/
     - assets/exercises/hamstrings/legCurlSeated/
     - assets/exercises/hamstrings/romanianDeadlift/
+    - assets/exercises/hamstrings/romanianDeadliftDumbbell/
     - assets/exercises/hips/clamshells/
     - assets/exercises/hips/gluteBridge/
     - assets/exercises/hips/hipAbduction/

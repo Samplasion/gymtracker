@@ -848,7 +848,8 @@
         "pushUps": "Push-ups",
         "pushUpsWeighted": "Push-ups (weighted)",
         "cableChestPress": "Cable chest press",
-        "declinePushUps": "Decline push-ups"
+        "declinePushUps": "Decline push-ups",
+        "lowCableFly": "Low cable fly"
       }
     },
     "biceps": {
@@ -863,7 +864,8 @@
         "chinUps": "Chin Ups",
         "hammerCurlDumbbell": "Hammer curls (dumbbells)",
         "concentrationCurl": "Concentration curls",
-        "scottCurl": "Scott curl"
+        "scottCurl": "Scott curl",
+        "dualCableHighCurl": "Dual-cable high curls"
       }
     },
     "abs": {

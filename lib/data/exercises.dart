@@ -239,6 +239,7 @@ final Map<GTExerciseMuscleCategory, ExerciseCategory> exerciseStandardLibrary =
         secondaryMuscleGroups: {GTMuscleGroup.triceps},
         equipment: GTGymEquipment.other,
       ),
+      // Note to self: this is the one at the weird close together cable machines
       Exercise.standard(
         id: "library.chest.exercises.cableChestPress",
         name: "library.chest.exercises.cableChestPress".t,
@@ -253,6 +254,13 @@ final Map<GTExerciseMuscleCategory, ExerciseCategory> exerciseStandardLibrary =
         primaryMuscleGroup: GTMuscleGroup.chest,
         secondaryMuscleGroups: {GTMuscleGroup.triceps},
         equipment: GTGymEquipment.none,
+      ),
+      Exercise.standard(
+        id: "library.chest.exercises.lowCableFly",
+        name: "library.chest.exercises.lowCableFly".t,
+        parameters: GTSetParameters.repsWeight,
+        primaryMuscleGroup: GTMuscleGroup.chest,
+        equipment: GTGymEquipment.cable,
       ),
     ],
     iconGetter: () =>
@@ -332,6 +340,13 @@ final Map<GTExerciseMuscleCategory, ExerciseCategory> exerciseStandardLibrary =
         parameters: GTSetParameters.repsWeight,
         primaryMuscleGroup: GTMuscleGroup.biceps,
         equipment: GTGymEquipment.dumbbell,
+      ),
+      Exercise.standard(
+        id: "library.biceps.exercises.dualCableHighCurl",
+        name: "library.biceps.exercises.dualCableHighCurl".t,
+        parameters: GTSetParameters.repsWeight,
+        primaryMuscleGroup: GTMuscleGroup.biceps,
+        equipment: GTGymEquipment.cable,
       ),
     ],
     iconGetter: () =>

@@ -848,7 +848,8 @@
         "pushUps": "Push-up",
         "pushUpsWeighted": "Push-up (zavorrati)",
         "cableChestPress": "Chest press ai cavi",
-        "declinePushUps": "Push-up declinati"
+        "declinePushUps": "Push-up declinati",
+        "lowCableFly": "Croci ai cavi bassi"
       }
     },
     "biceps": {
@@ -863,7 +864,8 @@
         "chinUps": "Chin up",
         "hammerCurlDumbbell": "Hammer curl (manubri)",
         "concentrationCurl": "Curl concentrati",
-        "scottCurl": "Scott curl"
+        "scottCurl": "Scott curl",
+        "dualCableHighCurl": "Curl ai cavi alti"
       }
     },
     "abs": {

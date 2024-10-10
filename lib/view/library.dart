@@ -87,22 +87,27 @@ class LibraryView extends GetView<ExercisesController> {
                           .plural(category.value.exercises.length),
                     ),
                     onTap: () {
-                      Go.to(() => LibraryExercisesView(
-                            name: category.key.localizedName,
-                            category: category.value,
-                            getExercises: () {
-                              if (category.key ==
-                                  GTExerciseMuscleCategory.custom) {
-                                final list = Get.find<ExercisesController>()
-                                    .exercises
-                                    .toList();
-                                return list;
-                              }
-                              return category.value.exercises;
-                            },
-                            isCustom:
-                                category.key == GTExerciseMuscleCategory.custom,
-                          ));
+                      final exStream =
+                          category.key == GTExerciseMuscleCategory.custom
+                              ? Get.find<ExercisesController>().exercises$
+                              : Stream.value(category.value.exercises);
+                      Go.to(
+                        () => StreamBuilder<List<Exercise>>(
+                          stream: exStream,
+                          builder: (context, snapshot) {
+                            final exercises = snapshot.data ?? [];
+                            return LibraryExercisesView(
+                              name: category.key.localizedName,
+                              category: category.value,
+                              getExercises: () {
+                                return exercises;
+                              },
+                              isCustom: category.key ==
+                                  GTExerciseMuscleCategory.custom,
+                            );
+                          },
+                        ),
+                      );
                     },
                   ),
               ],
@@ -135,62 +140,66 @@ class LibraryExercisesView extends StatelessWidget {
     return ThemedSubtree(
       color: category.color,
       enabled: Get.find<SettingsController>().tintExercises.value,
-      child: StatefulBuilder(
-        builder: (context, refresh) {
-          final exercises = getExercises();
+      child: isCustom ? _buildInnerView(context) : _buildInnerView(context),
+    );
+  }
 
-          final sorted = exercises.toList()
-            ..sort((a, b) => a.displayName.compareTo(b.displayName));
+  Widget _buildInnerView(BuildContext context) {
+    return StatefulBuilder(
+      builder: (context, refresh) {
+        final exercises = getExercises();
 
-          return MasterDetailView(
-            appBarTitle: Text(name),
-            items: [
-              if (isCustom) ...[
-                MasterItem(
-                  Text("library.newCustomExercise".t),
-                  leading:
-                      const CircleAvatar(child: Icon(GTIcons.create_exercise)),
-                  onTap: () {
-                    Go.showBottomModalScreen(
-                        (context, controller) => ThemedSubtree(
-                              color: category.color,
-                              enabled: Get.find<SettingsController>()
-                                  .tintExercises
-                                  .value,
-                              child: ExerciseCreator(
-                                base: null,
-                                scrollController: controller,
-                              ),
-                            ));
-                  },
-                ),
-                const MasterItemDivider(),
-              ],
-              ...List.generate(
-                sorted.length,
-                (index) {
-                  MasterItem exerciseListTile = ExerciseListTile(
-                    exercise: sorted[index],
-                    selected: false,
-                    isConcrete: false,
-                    trailing: kDebugMode && sorted[index].hasExplanation
-                        ? const Icon(GTIcons.explanation)
-                        : null,
-                  ).getAsMasterItem(context, detailsBuilder: (context) {
-                    return ExerciseInfoView(
-                      key: ValueKey(sorted[index].id),
-                      exercise: sorted[index],
-                      refresh: () => refresh(() {}),
-                    );
-                  });
+        final sorted = exercises.toList()
+          ..sort((a, b) => a.displayName.compareTo(b.displayName));
 
-                  return exerciseListTile;
+        return MasterDetailView(
+          appBarTitle: Text(name),
+          items: [
+            if (isCustom) ...[
+              MasterItem(
+                Text("library.newCustomExercise".t),
+                leading:
+                    const CircleAvatar(child: Icon(GTIcons.create_exercise)),
+                onTap: () {
+                  Go.showBottomModalScreen(
+                      (context, controller) => ThemedSubtree(
+                            color: category.color,
+                            enabled: Get.find<SettingsController>()
+                                .tintExercises
+                                .value,
+                            child: ExerciseCreator(
+                              base: null,
+                              scrollController: controller,
+                            ),
+                          ));
                 },
               ),
+              const MasterItemDivider(),
             ],
-          );
-        },
-      ),
+            ...List.generate(
+              sorted.length,
+              (index) {
+                MasterItem exerciseListTile = ExerciseListTile(
+                  exercise: sorted[index],
+                  selected: false,
+                  isConcrete: false,
+                  trailing: kDebugMode && sorted[index].hasExplanation
+                      ? const Icon(GTIcons.explanation)
+                      : null,
+                ).getAsMasterItem(context, detailsBuilder: (context) {
+                  return ExerciseInfoView(
+                    key: ValueKey(sorted[index].id),
+                    exercise: sorted[index],
+                    refresh: () => refresh(() {}),
+                  );
+                });
+
+                return exerciseListTile;
+              },
+            ),
+          ],
+        );
+      },
     );
   }
 }

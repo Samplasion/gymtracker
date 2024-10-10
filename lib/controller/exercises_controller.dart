@@ -9,9 +9,12 @@ import 'package:gymtracker/model/workout.dart';
 import 'package:gymtracker/service/logger.dart';
 import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/view/exercise_creator.dart';
+import 'package:rxdart/rxdart.dart';
 
 class ExercisesController extends GetxController with ServiceableController {
   RxList<Exercise> exercises = <Exercise>[].obs;
+  BehaviorSubject<List<Exercise>> exercises$ =
+      BehaviorSubject<List<Exercise>>.seeded([]);
 
   @override
   onInit() {
@@ -19,6 +22,7 @@ class ExercisesController extends GetxController with ServiceableController {
     service.exercises$.listen((event) {
       logger.i("Updated with ${event.length} exercises");
       exercises(event);
+      exercises$.add(event);
     });
   }
 

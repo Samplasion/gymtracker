@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:gymtracker/controller/history_controller.dart';
@@ -11,6 +12,7 @@ import 'package:gymtracker/model/workout.dart';
 import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/utils/constants.dart';
 import 'package:gymtracker/utils/extensions.dart';
+import 'package:gymtracker/view/charts/gym_equipment.dart';
 import 'package:gymtracker/view/charts/muscle_category.dart';
 import 'package:gymtracker/view/components/controlled.dart';
 import 'package:gymtracker/view/components/tweened_builder.dart';
@@ -41,7 +43,10 @@ class MeStatisticsPage extends StatefulWidget {
 }
 
 class _MeStatisticsPageState
-    extends ControlledState<MeStatisticsPage, HistoryController> {
+    extends ControlledState<MeStatisticsPage, HistoryController>
+    with SingleTickerProviderStateMixin {
+  late final _controller = TabController(length: 2, vsync: this);
+
   TimeFrame timeFrame = TimeFrame.thirtyDays;
 
   List<Workout> get periodWorkouts {
@@ -81,10 +86,28 @@ class _MeStatisticsPageState
   @override
   Widget build(BuildContext context) {
     final speedDialData = this.speedDialData;
+    FlutterView view = WidgetsBinding.instance.platformDispatcher.views.first;
+    final Size(:width, :height) = view.physicalSize;
 
     return Scaffold(
       appBar: AppBar(
         title: Text("me.stats.label".t),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(0),
+        ),
+        bottom: TabBar(
+          controller: _controller,
+          tabs: [
+            Tab(
+              // icon: const Icon(GTIcons.muscleCategory),
+              text: "me.stats.muscleCategory".t,
+            ),
+            Tab(
+              // icon: const Icon(GTIcons.gymEquipment),
+              text: "me.stats.gymEquipment".t,
+            ),
+          ],
+        ),
       ),
       body: ListView(
         padding: const EdgeInsets.all(16) +
@@ -106,10 +129,29 @@ class _MeStatisticsPageState
           ),
           const SizedBox(height: 16),
           SizedBox(
-            width: max(200, min(context.width, context.height / 3)),
-            height: max(200, min(context.width, context.height / 3)),
-            child: MuscleCategoryGraph(
-              workouts: periodWorkouts,
+            // width: max(200, min(context.width, context.height / 3)),
+            // height: max(200, min(context.width, context.height / 3)),
+            // child: MuscleCategoryGraph(
+            //   workouts: periodWorkouts,
+            // ),
+            width: max(200, min(width, height / 3)),
+            height: max(200, min(width, height / 3)),
+            child: TabBarView(
+              controller: _controller,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: MuscleCategoryGraph(
+                    workouts: periodWorkouts,
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: GymEquipmentRadialChart(
+                    workouts: periodWorkouts,
+                  ),
+                ),
+              ],
             ),
           ),
           const Divider(height: 32),

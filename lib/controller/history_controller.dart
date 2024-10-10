@@ -353,6 +353,26 @@ class HistoryController extends GetxController with ServiceableController {
     return map;
   }
 
+  Map<GTGymEquipment, double> calculateGymEquipmentDistributionFor({
+    required List<Workout> workouts,
+  }) {
+    Map<GTGymEquipment, double> map = {
+      for (final equipment in GTGymEquipment.values) equipment: 0,
+    };
+
+    for (final workout in workouts) {
+      for (final exercise in workout.flattenedExercises.whereType<Exercise>()) {
+        for (final set in exercise.sets) {
+          if (set.done || !workout.isConcrete) {
+            map[exercise.gymEquipment] = map[exercise.gymEquipment]! + 1;
+          }
+        }
+      }
+    }
+
+    return map;
+  }
+
   Future<void> applyExerciseModification(Exercise exercise) {
     assert(exercise.isCustom);
 

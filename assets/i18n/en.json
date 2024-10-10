@@ -1161,7 +1161,9 @@
       },
       "sets": {
         "label": "Sets"
-      }
+      },
+      "muscleCategory": "Muscle groups",
+      "gymEquipment": "Equipment"
     },
     "workoutDistribution": {
       "label": "Workout distribution"

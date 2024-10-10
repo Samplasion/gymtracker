@@ -1161,7 +1161,9 @@
       },
       "sets": {
         "label": "Serie"
-      }
+      },
+      "muscleCategory": "Gruppi muscolari",
+      "gymEquipment": "Attrezzatura"
     },
     "workoutDistribution": {
       "label": "Distribuzione allenamenti"

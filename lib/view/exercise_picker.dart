@@ -306,7 +306,7 @@ class _LibraryPickerExercisesViewState
   @override
   Widget build(BuildContext context) {
     final sorted = [...widget.category.exercises]
-      ..sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
+      ..sort((a, b) => a.displayName.compareTo(b.displayName));
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.name),

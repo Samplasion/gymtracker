@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="a" data-name="Livello 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
+  <rect x="121.47" y="808" width="380" height="83" rx="12" ry="12" fill="currentColor" stroke-width="0"/>
+  <path d="M485.47,816.91s-60.14-205.84-174.34-207.42h.34c-114.21,1.58-174.34,207.42-174.34,207.42" fill="none" stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="30"/>
+  <path d="M289.47-.49h45v600.49c0,6.62-5.38,12-12,12h-21c-6.62,0-12-5.38-12-12V-.49h0Z" fill="currentColor" stroke-width="0"/>
+  <rect x="522.53" y="698.6" width="380" height="83" rx="12" ry="12" fill="currentColor" stroke-width="0"/>
+  <path d="M886.53,707.51s-60.14-205.84-174.34-207.42h.34c-114.21,1.58-174.34,207.42-174.34,207.42" fill="none" stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="30"/>
+  <path d="M690.53-.49h45v489c0,6.62-5.38,12-12,12h-21c-6.62,0-12-5.38-12-12V-.49h0Z" fill="currentColor" stroke-width="0"/>
+</svg>

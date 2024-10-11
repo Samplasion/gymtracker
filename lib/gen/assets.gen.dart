@@ -74,6 +74,13 @@ class $AssetsI18nGen {
   List<String> get values => [en, it];
 }
 
+class $AssetsSvgGen {
+  const $AssetsSvgGen();
+
+  /// Directory path: assets/svg/equipment
+  $AssetsSvgEquipmentGen get equipment => const $AssetsSvgEquipmentGen();
+}
+
 class $AssetsExercisesAbsGen {
   const $AssetsExercisesAbsGen();
 
@@ -306,6 +313,54 @@ class $AssetsExercisesTricepsGen {
   /// Directory path: assets/exercises/triceps/tricepsRopePushdown
   $AssetsExercisesTricepsTricepsRopePushdownGen get tricepsRopePushdown =>
       const $AssetsExercisesTricepsTricepsRopePushdownGen();
+}
+
+class $AssetsSvgEquipmentGen {
+  const $AssetsSvgEquipmentGen();
+
+  /// File path: assets/svg/equipment/barbell.svg
+  String get barbell => 'assets/svg/equipment/barbell.svg';
+
+  /// File path: assets/svg/equipment/cable.svg
+  String get cable => 'assets/svg/equipment/cable.svg';
+
+  /// File path: assets/svg/equipment/dumbbell.svg
+  String get dumbbell => 'assets/svg/equipment/dumbbell.svg';
+
+  /// File path: assets/svg/equipment/kettlebell.svg
+  String get kettlebell => 'assets/svg/equipment/kettlebell.svg';
+
+  /// File path: assets/svg/equipment/machine.svg
+  String get machine => 'assets/svg/equipment/machine.svg';
+
+  /// File path: assets/svg/equipment/none.svg
+  String get none => 'assets/svg/equipment/none.svg';
+
+  /// File path: assets/svg/equipment/other.svg
+  String get other => 'assets/svg/equipment/other.svg';
+
+  /// File path: assets/svg/equipment/plates.svg
+  String get plates => 'assets/svg/equipment/plates.svg';
+
+  /// File path: assets/svg/equipment/resistanceBand.svg
+  String get resistanceBand => 'assets/svg/equipment/resistanceBand.svg';
+
+  /// File path: assets/svg/equipment/suspensionBands.svg
+  String get suspensionBands => 'assets/svg/equipment/suspensionBands.svg';
+
+  /// List of all assets
+  List<String> get values => [
+        barbell,
+        cable,
+        dumbbell,
+        kettlebell,
+        machine,
+        none,
+        other,
+        plates,
+        resistanceBand,
+        suspensionBands
+      ];
 }
 
 class $AssetsExercisesAbsCrunchesGen {
@@ -914,4 +969,5 @@ class GTAssets {
   static const $AssetsAudioGen audio = $AssetsAudioGen();
   static const $AssetsExercisesGen exercises = $AssetsExercisesGen();
   static const $AssetsI18nGen i18n = $AssetsI18nGen();
+  static const $AssetsSvgGen svg = $AssetsSvgGen();
 }

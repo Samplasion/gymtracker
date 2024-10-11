@@ -9,6 +9,7 @@ import 'package:gymtracker/service/logger.dart';
 import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/utils/utils.dart';
+import 'package:gymtracker/view/components/equipment_icon.dart';
 import 'package:gymtracker/view/exercise_creator.dart';
 import 'package:gymtracker/view/utils/crossfade.dart';
 import 'package:gymtracker/view/utils/exercise.dart';
@@ -238,6 +239,13 @@ class _ExercisePickerState extends State<ExercisePicker> {
                           Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 4),
                             child: FilterChip(
+                              showCheckmark: false,
+                              avatar: ClipOval(
+                                clipBehavior: Clip.hardEdge,
+                                child: CircleAvatar(
+                                  child: EquipmentIcon(equipment: equipment),
+                                ),
+                              ),
                               label: Text(equipment.localizedName),
                               selected: equipmentFilter.contains(equipment),
                               onSelected: (selected) {

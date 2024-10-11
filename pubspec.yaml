@@ -66,6 +66,7 @@ dependencies:
   url_launcher: ^6.3.0
   sliver_tools: ^0.2.12
   csv: ^6.0.0
+  flutter_svg: ^2.0.10+1
   
 dev_dependencies:
   flutter_test:
@@ -98,6 +99,7 @@ flutter:
   assets:
     - assets/audio/
     - assets/i18n/
+    - assets/svg/equipment/
     #tool begin exercise-explanations
     - assets/exercises/abs/bicycleCrunches/
     - assets/exercises/abs/crunchMachine/

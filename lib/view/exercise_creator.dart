@@ -6,6 +6,7 @@ import 'package:gymtracker/model/exercise.dart';
 import 'package:gymtracker/model/set.dart';
 import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/utils/go.dart';
+import 'package:gymtracker/view/components/equipment_icon.dart';
 import 'package:gymtracker/view/utils/input_decoration.dart';
 
 class ExerciseCreator extends StatefulWidget {
@@ -131,7 +132,22 @@ class _ExerciseCreatorState extends State<ExerciseCreator> {
                     for (final equipment in equipments)
                       DropdownMenuItem(
                         value: equipment,
-                        child: Text(equipment.localizedName),
+                        child: Text.rich(
+                          TextSpan(
+                            children: [
+                              WidgetSpan(
+                                child: EquipmentIcon(
+                                  equipment: equipment,
+                                  color:
+                                      Theme.of(context).colorScheme.onSurface,
+                                ),
+                                alignment: PlaceholderAlignment.middle,
+                              ),
+                              const TextSpan(text: " "),
+                              TextSpan(text: equipment.localizedName),
+                            ],
+                          ),
+                        ),
                       ),
                   ],
                   onChanged: (value) {

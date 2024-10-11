@@ -12,6 +12,7 @@ import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/utils/utils.dart';
 import 'package:gymtracker/view/components/badges.dart';
+import 'package:gymtracker/view/components/equipment_icon.dart';
 import 'package:gymtracker/view/utils/timer.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
@@ -44,10 +45,11 @@ class ExerciseIcon extends StatelessWidget {
     );
   }
 
-  Text _getName() {
+  Widget _getName() {
     if (exercise is Exercise) {
-      return Text(
-          (exercise as Exercise).displayName.characters.first.toUpperCase());
+      // return Text(
+      //     (exercise as Exercise).displayName.characters.first.toUpperCase());
+      return EquipmentIcon(equipment: exercise.asExercise.gymEquipment);
     } else if (exercise is Superset) {
       return Text((exercise as Superset).exercises.length.toString());
     } else {

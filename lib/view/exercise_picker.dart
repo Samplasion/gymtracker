@@ -204,9 +204,7 @@ class _ExercisePickerState extends State<ExercisePicker> {
   }
 
   SliverToBoxAdapter _filterSection(BuildContext context) {
-    final part = partition(
-        GTGymEquipment.values.toList(), (el) => equipmentFilter.contains(el));
-    final equipments = part.$1 + part.$2;
+    final equipments = GTGymEquipment.values.toList();
     return SliverToBoxAdapter(
       child: Crossfade(
         firstChild: Container(

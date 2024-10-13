@@ -849,7 +849,8 @@
         "pushUpsWeighted": "Push-ups (weighted)",
         "cableChestPress": "Cable chest press",
         "declinePushUps": "Decline push-ups",
-        "lowCableFly": "Low cable fly"
+        "lowCableFly": "Low cable fly",
+        "inclinePushUps": "Incline push-ups"
       }
     },
     "biceps": {
@@ -884,9 +885,10 @@
         "toeTouches": "Toe touches",
         "russianTwist": "Russian twist",
         "heelTouches": "Heel touches",
-        "deadBugHoldCardio": "Dead bug hold (cardio)",
+        "deadBugHoldCardio": "Dead bug hold (timed)",
         "deadBugHold": "Dead bug hold",
-        "hollowBodyHoldBentKnees": "Bent hollow hold"
+        "hollowBodyHoldBentKnees": "Bent hollow hold",
+        "obliqueCrunches": "Oblique crunches"
       }
     },
     "calves": {
@@ -908,7 +910,8 @@
         "legPress45deg": "Leg press (45°)",
         "frontSquats": "Front squats",
         "bulgarianSplitSquats": "Bulgarian split squats",
-        "bodyweightSquats": "Squats"
+        "bodyweightSquats": "Squats",
+        "hackSquats": "Hack squats"
       }
     },
     "hamstrings": {
@@ -933,7 +936,8 @@
         "uprightRow": "Upright row",
         "pikePushUps": "Pike push-ups",
         "handstandPushUps": "Handstand push-ups",
-        "bentOverLateralRaises": "Bent-Over Lateral Raises"
+        "bentOverLateralRaises": "Bent-Over Lateral Raises",
+        "shoulderPress": "Shoulder press"
       }
     },
     "back": {
@@ -989,7 +993,9 @@
         "wristRoller": "Wrist roller",
         "farmerWalk": "Farmer's Walk",
         "platePinch": "Plate pinch",
-        "reverseCurls": "Reverse curls"
+        "reverseCurls": "Reverse curls (barbell)",
+        "reverseCurlsDumbbell": "Reverse curls (dumbbell)",
+        "cableSingleArmReverseCurl": "Cable single-arm reverse curls"
       }
     }
   },

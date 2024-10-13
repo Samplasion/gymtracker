@@ -77,8 +77,17 @@ class $AssetsI18nGen {
 class $AssetsSvgGen {
   const $AssetsSvgGen();
 
+  /// File path: assets/svg/body_back.svg
+  String get bodyBack => 'assets/svg/body_back.svg';
+
+  /// File path: assets/svg/body_front.svg
+  String get bodyFront => 'assets/svg/body_front.svg';
+
   /// Directory path: assets/svg/equipment
   $AssetsSvgEquipmentGen get equipment => const $AssetsSvgEquipmentGen();
+
+  /// List of all assets
+  List<String> get values => [bodyBack, bodyFront];
 }
 
 class $AssetsExercisesAbsGen {

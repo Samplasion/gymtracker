@@ -849,7 +849,8 @@
         "pushUpsWeighted": "Push-up (zavorrati)",
         "cableChestPress": "Chest press ai cavi",
         "declinePushUps": "Push-up declinati",
-        "lowCableFly": "Croci ai cavi bassi"
+        "lowCableFly": "Croci ai cavi bassi",
+        "inclinePushUps": "Push-up inclinati"
       }
     },
     "biceps": {
@@ -884,9 +885,10 @@
         "extendedReverseCrunchWithLegExtension": "Crunch inverso con leg extension",
         "toeTouches": "Toe touches",
         "heelTouches": "Heel touches",
-        "deadBugHoldCardio": "Dead bug hold (cardio)",
+        "deadBugHoldCardio": "Dead bug hold (a tempo)",
         "deadBugHold": "Dead bug hold",
-        "hollowBodyHoldBentKnees": "Bent hollow hold"
+        "hollowBodyHoldBentKnees": "Bent hollow hold",
+        "obliqueCrunches": "Crunch obliqui"
       }
     },
     "calves": {
@@ -908,7 +910,8 @@
         "legPress45deg": "Leg press (45°)",
         "frontSquats": "Squat frontali",
         "bulgarianSplitSquats": "Squat bulgari",
-        "bodyweightSquats": "Squat"
+        "bodyweightSquats": "Squat",
+        "hackSquats": "Hack squat"
       }
     },
     "hamstrings": {
@@ -933,7 +936,8 @@
         "uprightRow": "Vogatore verticale",
         "pikePushUps": "Pike push-up",
         "handstandPushUps": "Flessioni in verticale",
-        "bentOverLateralRaises": "Alzate laterali al cavo basso con busto a 90°"
+        "bentOverLateralRaises": "Alzate laterali al cavo basso con busto a 90°",
+        "shoulderPress": "Shoulder press"
       }
     },
     "back": {
@@ -989,7 +993,9 @@
         "wristRoller": "Wrist roller",
         "farmerWalk": "Farmer Walk",
         "platePinch": "Plate pinch",
-        "reverseCurls": "Reverse curl"
+        "reverseCurls": "Reverse curl (bilanciere)",
+        "reverseCurlsDumbbell": "Reverse curl (manubri)",
+        "cableSingleArmReverseCurl": "Reverse curl a braccio singolo al cavo"
       }
     }
   },

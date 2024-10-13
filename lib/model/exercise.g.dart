@@ -210,6 +210,7 @@ class _$ExerciseCWProxyImpl implements _$ExerciseCWProxy {
           : category as GTExerciseMuscleCategory?,
       skeleton: _value.skeleton,
       equipment: _value.equipment,
+      muscleHighlight: _value.muscleHighlight,
     );
   }
 }
@@ -289,7 +290,6 @@ const _$GTMuscleGroupEnumMap = {
   GTMuscleGroup.biceps: 'biceps',
   GTMuscleGroup.calves: 'calves',
   GTMuscleGroup.chest: 'chest',
-  GTMuscleGroup.forearm: 'forearm',
   GTMuscleGroup.glutes: 'glutes',
   GTMuscleGroup.hamstrings: 'hamstrings',
   GTMuscleGroup.lats: 'lats',
@@ -303,6 +303,9 @@ const _$GTMuscleGroupEnumMap = {
   GTMuscleGroup.upperBack: 'upperBack',
   GTMuscleGroup.thighs: 'thighs',
   GTMuscleGroup.forearms: 'forearms',
+  GTMuscleGroup.obliques: 'obliques',
+  GTMuscleGroup.hands: 'hands',
+  GTMuscleGroup.tibialis: 'tibialis',
 };
 
 const _$GTExerciseMuscleCategoryEnumMap = {

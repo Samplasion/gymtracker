@@ -27,6 +27,7 @@ import 'package:gymtracker/utils/utils.dart';
 import 'package:gymtracker/view/charts/line_charts_by_workout.dart';
 import 'package:gymtracker/view/components/badges.dart';
 import 'package:gymtracker/view/components/master_detail.dart';
+import 'package:gymtracker/view/components/muscles.dart';
 import 'package:gymtracker/view/components/themed_subtree.dart';
 import 'package:gymtracker/view/exercise_creator.dart';
 import 'package:gymtracker/view/exercises.dart';
@@ -453,6 +454,13 @@ class _ExerciseInfoViewState extends State<ExerciseInfoView>
                 ),
               ),
             ),
+            if (exercise.muscleHighlight.isNotEmpty)
+              SliverPadding(
+                padding: const EdgeInsets.all(16),
+                sliver: SliverToBoxAdapter(
+                  child: MusclesView(muscles: exercise.muscleHighlight),
+                ),
+              ),
             SliverToBoxAdapter(
               child: Padding(
                 padding: const EdgeInsets.all(16).copyWith(top: 0),
@@ -486,6 +494,10 @@ class _ExerciseInfoViewState extends State<ExerciseInfoView>
                       const TextSpan(text: "\n"),
                       TextSpan(
                         text: "Parameters: ${exercise.parameters}",
+                      ),
+                      const TextSpan(text: "\n"),
+                      TextSpan(
+                        text: "Muscle Highlight: ${exercise.muscleHighlight}",
                       ),
                     ]
                   ]),

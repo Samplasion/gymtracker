@@ -154,7 +154,7 @@ class _MeStatisticsPageState
                 .map((e) => e.flattenedExercises.whereType<Exercise>())
                 .expand((e) => e)
                 .toList()),
-            curve: Curves.easeOutCirc,
+            curve: Curves.easeOutSine,
           ),
           const Divider(height: 32),
           SpeedDial(

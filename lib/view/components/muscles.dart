@@ -8,7 +8,7 @@ import 'package:gymtracker/controller/exercises_controller.dart';
 import 'package:gymtracker/data/exercises.dart';
 import 'package:gymtracker/gen/assets.gen.dart';
 import 'package:gymtracker/model/exercise.dart';
-import 'package:gymtracker/utils/hsv_rainbow.dart';
+import 'package:rainbow_color/rainbow_color.dart';
 import 'package:xml/xml.dart';
 import 'package:xml/xpath.dart';
 
@@ -49,7 +49,7 @@ class _MusclesViewState extends State<MusclesView> {
   Future<(String, String)> _loadSvg() async {
     Completer<(String, String)> completer = Completer();
     SchedulerBinding.instance.addPostFrameCallback((_) async {
-      final themeColor = HSVRainbow(spectrum: _gradientColors);
+      final themeColor = Rainbow(spectrum: _gradientColors);
       final dividerColor = Theme.of(context).colorScheme.outline;
 
       var frontSvg = await rootBundle.loadString(GTAssets.svg.bodyFront);
@@ -75,7 +75,7 @@ class _MusclesViewState extends State<MusclesView> {
 
   String _processSvg(
     String rawSvg, {
-    required HSVRainbow gradient,
+    required Rainbow gradient,
     required Color divider,
   }) {
     final xml = XmlDocument.parse(rawSvg);
@@ -194,7 +194,8 @@ Map<GTMuscleHighlight, double> getIntensities(List<Exercise> exercises) {
     }
 
     for (final muscle in highlight.keys) {
-      intensities[muscle] = intensities[muscle]! + highlight[muscle]!.value;
+      intensities[muscle] = intensities[muscle]! +
+          (highlight[muscle]!.value * exercise.doneSets.length);
     }
   }
 

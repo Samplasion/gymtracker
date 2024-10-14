@@ -1032,6 +1032,8 @@ class WorkoutController extends GetxController with ServiceableController {
     }
   }
 
+  /// Helper method used in debug mode to show "Good job" dialog while workout
+  /// is running
   Workout synthesizeTemporaryWorkout() {
     return Workout(
       name: name.value,

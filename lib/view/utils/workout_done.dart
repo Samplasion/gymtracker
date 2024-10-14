@@ -1,20 +1,48 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart' hide ContextExtensionss;
 import 'package:gymtracker/icons/gymtracker_icons.dart';
+import 'package:gymtracker/model/exercise.dart';
 import 'package:gymtracker/model/workout.dart';
 import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/utils/constants.dart';
 import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/view/charts/bar_charts.dart';
+import 'package:gymtracker/view/components/muscles.dart';
 import 'package:gymtracker/view/utils/sliver_utils.dart';
 import 'package:gymtracker/view/utils/speed_dial.dart';
 import 'package:gymtracker/view/utils/timer.dart';
 
-class WorkoutDoneSheet extends StatelessWidget {
+class WorkoutDoneSheet extends StatefulWidget {
   final Workout workout;
   final ScrollController? controller;
 
   const WorkoutDoneSheet({required this.workout, this.controller, super.key});
+
+  @override
+  State<WorkoutDoneSheet> createState() => _WorkoutDoneSheetState();
+}
+
+class _WorkoutDoneSheetState extends State<WorkoutDoneSheet> {
+  Workout get workout => widget.workout;
+  ScrollController? get controller => widget.controller;
+
+  late Map<GTMuscleHighlight, double> muscleChartHighlights;
+
+  @override
+  initState() {
+    super.initState();
+    muscleChartHighlights = getIntensities(
+        workout.flattenedExercises.whereType<Exercise>().toList());
+  }
+
+  @override
+  didUpdateWidget(WorkoutDoneSheet oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.workout != widget.workout) {
+      muscleChartHighlights = getIntensities(
+          workout.flattenedExercises.whereType<Exercise>().toList());
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -56,6 +84,15 @@ class WorkoutDoneSheet extends StatelessWidget {
                   const SizedBox(height: 16),
                   WorkoutMuscleCategoriesBarChart(workout: workout),
                 ],
+                if (EquipmentDistributionBarChart.shouldShow(workout)) ...[
+                  const SizedBox(height: 16),
+                  EquipmentDistributionBarChart(workout: workout),
+                ],
+                const SizedBox(height: 16),
+                MusclesView(
+                  muscles: muscleChartHighlights,
+                  curve: Curves.easeOutSine,
+                ),
                 const SizedBox(height: 16),
                 SpeedDial(
                   crossAxisCountBuilder: (bp) => switch (bp) {

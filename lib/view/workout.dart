@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:custom_refresh_indicator/custom_refresh_indicator.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_quill/flutter_quill.dart';
@@ -35,6 +36,7 @@ import 'package:gymtracker/view/utils/time.dart';
 import 'package:gymtracker/view/utils/timer.dart';
 import 'package:gymtracker/view/utils/weight_calculator.dart';
 import 'package:gymtracker/view/utils/workout.dart';
+import 'package:gymtracker/view/utils/workout_done.dart';
 
 WorkoutController? get _controller {
   if (Get.isRegistered<WorkoutController>()) {
@@ -257,6 +259,20 @@ class _WorkoutViewState extends State<WorkoutView> {
                   });
                 },
               ),
+              if (kDebugMode) ...[
+                PopupMenuItem(
+                  child: const Text("Show Good Job dialog"),
+                  onTap: () {
+                    SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
+                      Go.showBottomModalScreen((context, controller) =>
+                          WorkoutDoneSheet(
+                            workout: _controller!.synthesizeTemporaryWorkout(),
+                            controller: controller,
+                          ));
+                    });
+                  },
+                ),
+              ],
             ],
           ),
         ],

@@ -163,6 +163,7 @@ enum GTMuscleHighlight {
         GTMuscleGroup.quadriceps => {
             GTMuscleHighlight.outerQuadricep,
             GTMuscleHighlight.rectusFemoris,
+            GTMuscleHighlight.innerQuadricep,
           },
         GTMuscleGroup.shoulders => {
             GTMuscleHighlight.anteriorDeltoid,

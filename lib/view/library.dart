@@ -458,7 +458,13 @@ class _ExerciseInfoViewState extends State<ExerciseInfoView>
               SliverPadding(
                 padding: const EdgeInsets.all(16),
                 sliver: SliverToBoxAdapter(
-                  child: MusclesView(muscles: exercise.muscleHighlight),
+                  child: MusclesView(
+                    muscles: {
+                      for (final MapEntry(:key, :value)
+                          in exercise.muscleHighlight.entries)
+                        key: value.value,
+                    },
+                  ),
                 ),
               ),
             SliverToBoxAdapter(

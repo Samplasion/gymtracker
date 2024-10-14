@@ -1,6 +1,5 @@
 import 'dart:math';
 
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:gymtracker/controller/history_controller.dart';
@@ -8,6 +7,7 @@ import 'package:gymtracker/controller/settings_controller.dart';
 import 'package:gymtracker/data/distance.dart';
 import 'package:gymtracker/data/weights.dart';
 import 'package:gymtracker/icons/gymtracker_icons.dart';
+import 'package:gymtracker/model/exercise.dart';
 import 'package:gymtracker/model/workout.dart';
 import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/utils/constants.dart';
@@ -15,6 +15,7 @@ import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/view/charts/gym_equipment.dart';
 import 'package:gymtracker/view/charts/muscle_category.dart';
 import 'package:gymtracker/view/components/controlled.dart';
+import 'package:gymtracker/view/components/muscles.dart';
 import 'package:gymtracker/view/components/tweened_builder.dart';
 import 'package:gymtracker/view/utils/input_decoration.dart';
 import 'package:gymtracker/view/utils/speed_dial.dart';
@@ -146,6 +147,14 @@ class _MeStatisticsPageState
                 ),
               ],
             ),
+          ),
+          const SizedBox(height: 16),
+          MusclesView(
+            muscles: getIntensities(periodWorkouts
+                .map((e) => e.flattenedExercises.whereType<Exercise>())
+                .expand((e) => e)
+                .toList()),
+            curve: Curves.easeOutCirc,
           ),
           const Divider(height: 32),
           SpeedDial(

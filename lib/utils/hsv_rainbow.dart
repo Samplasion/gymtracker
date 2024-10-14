@@ -43,7 +43,7 @@ class HSVRainbow {
   /// Return the interpolated color along the spectrum for domain item.
   /// If the number is outside the bounds of the domain, then the nearest
   /// edge color is returned.
-  HSVColor operator [](num number) => _colorAt(number);
+  Color operator [](num number) => _colorAt(number).toColor();
 
   HSVColor _colorAt(num number) {
     final v = mapRange(

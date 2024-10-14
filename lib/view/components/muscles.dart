@@ -4,24 +4,30 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:gymtracker/controller/exercises_controller.dart';
+import 'package:gymtracker/data/exercises.dart';
 import 'package:gymtracker/gen/assets.gen.dart';
 import 'package:gymtracker/model/exercise.dart';
 import 'package:gymtracker/utils/hsv_rainbow.dart';
-import 'package:gymtracker/utils/theme.dart';
 import 'package:xml/xml.dart';
 import 'package:xml/xpath.dart';
 
 class MusclesView extends StatefulWidget {
-  final Map<GTMuscleHighlight, GTMuscleHighlightIntensity> muscles;
+  final Map<GTMuscleHighlight, double> muscles;
+  final Curve curve;
 
-  const MusclesView({super.key, required this.muscles});
+  const MusclesView({
+    super.key,
+    required this.muscles,
+    this.curve = Curves.linear,
+  });
 
   @override
   State<MusclesView> createState() => _MusclesViewState();
 }
 
 class _MusclesViewState extends State<MusclesView> {
-  late final Future<(String, String)> _svgFuture;
+  late Future<(String, String)> _svgFuture;
 
   @override
   initState() {
@@ -29,6 +35,15 @@ class _MusclesViewState extends State<MusclesView> {
 
     super.initState();
     _svgFuture = _loadSvg();
+  }
+
+  @override
+  didUpdateWidget(MusclesView oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.muscles != widget.muscles ||
+        oldWidget.curve != widget.curve) {
+      _svgFuture = _loadSvg();
+    }
   }
 
   Future<(String, String)> _loadSvg() async {
@@ -53,11 +68,8 @@ class _MusclesViewState extends State<MusclesView> {
 
   List<Color> get _gradientColors {
     return [
-      Theme.of(context).colorScheme.primary.withAlpha(0),
-      // Theme.of(context).colorScheme.primary,
+      Theme.of(context).colorScheme.surface,
       Theme.of(context).colorScheme.tertiary,
-      Theme.of(context).colorScheme.quaternary,
-      Theme.of(context).colorScheme.quinary,
     ];
   }
 
@@ -75,10 +87,10 @@ class _MusclesViewState extends State<MusclesView> {
     });
 
     for (final highlight in names) {
-      final value = widget.muscles[highlight]?.value ?? 0;
+      final value = widget.muscles[highlight] ?? 0;
       xml.xpath("//g[@data-name=\"${highlight.svgName}\"]/path").forEach((e) {
         e.setAttribute("fill",
-            "#${gradient[value].toColor().value.toRadixString(16).substring(2)}");
+            "#${gradient[widget.curve.transform(value.isNaN ? 0 : value)].value.toRadixString(16).substring(2)}");
         e.setAttribute(
             "opacity", value == 0 ? "0" : _getOpacity(value).toString());
       });
@@ -87,14 +99,14 @@ class _MusclesViewState extends State<MusclesView> {
     return xml.toXmlString(pretty: true);
   }
 
-  double _getOpacity(double value) => ((value + 3) / 4);
+  double _getOpacity(double value) {
+    return 1;
+    // const steep = 2;
+    // return ((value + steep - 1) / steep);
+  }
 
   @override
   Widget build(BuildContext context) {
-    print([
-      for (double i = 0; i <= 1; i += 1 / (_gradientColors.length - 1))
-        _getOpacity(i)
-    ]);
     return FutureBuilder<(String, String)>(
       future: _svgFuture,
       builder: (context, snapshot) {
@@ -162,4 +174,36 @@ class _MusclesViewState extends State<MusclesView> {
       },
     );
   }
+}
+
+Map<GTMuscleHighlight, double> getIntensities(List<Exercise> exercises) {
+  final intensities = <GTMuscleHighlight, double>{
+    for (final muscle in GTMuscleHighlight.values) muscle: 0,
+  };
+
+  for (final exercise in exercises) {
+    var highlight = exercise.muscleHighlight;
+    if (exercise.isStandardLibraryExercise) {
+      final standard = getStandardExerciseByID(exercise.id);
+      if (standard != null) {
+        highlight = standard.muscleHighlight;
+      }
+    } else {
+      final parent = exercise.getParent();
+      highlight = parent?.muscleHighlight ?? highlight;
+    }
+
+    for (final muscle in highlight.keys) {
+      intensities[muscle] = intensities[muscle]! + highlight[muscle]!.value;
+    }
+  }
+
+  final max = intensities.values
+      .reduce((value, element) => value > element ? value : element);
+
+  for (final muscle in GTMuscleHighlight.values) {
+    intensities[muscle] = intensities[muscle]! / max;
+  }
+
+  return intensities;
 }

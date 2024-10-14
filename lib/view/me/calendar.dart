@@ -114,7 +114,6 @@ class _MeCalendarPageState
                 return Badge(
                   label: Text(count.toString()),
                   isLabelVisible: count > 0,
-                  alignment: AlignmentDirectional.bottomEnd,
                   offset: const Offset(2, 2),
                   child: _pattern(context, values),
                 );

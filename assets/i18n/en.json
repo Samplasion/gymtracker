@@ -332,6 +332,7 @@
   },
   "history": {
     "title": "History",
+    "empty": "No history",
     "andMore": {
       "one": "…and one more exercise",
       "two": "…and %s more exercises",

@@ -117,6 +117,26 @@ class _HistoryViewState extends State<HistoryView> {
             keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
             slivers: [
               _buildAppBar(isLoading),
+              if (history.isEmpty)
+                SliverFillRemaining(
+                  child: Center(
+                    child: Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            GTIcons.history,
+                            size: 64,
+                            color: Theme.of(context).colorScheme.onSurface,
+                          ),
+                          const SizedBox(height: 16),
+                          Text("history.empty".t),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
               for (final date in history.keys) ...[
                 SliverStickyHeader.builder(
                   builder: (context, state) =>

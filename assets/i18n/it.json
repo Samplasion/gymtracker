@@ -332,6 +332,7 @@
   },
   "history": {
     "title": "Cronologia",
+    "empty": "Nessun allenamento",
     "andMore": {
       "one": "…e un altro",
       "two": "…e altri %s",

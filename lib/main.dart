@@ -63,7 +63,7 @@ void main() async {
 
 const applicationKey = Key("GymTracker");
 
-class MainApp extends StatelessWidget {
+class MainApp extends StatefulWidget {
   final GTLocalizations localizations;
   final DatabaseService databaseService;
 
@@ -74,12 +74,23 @@ class MainApp extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
-    Get.put(databaseService);
+  State<MainApp> createState() => _MainAppState();
+}
+
+class _MainAppState extends State<MainApp> {
+  @override
+  void initState() {
+    super.initState();
+    Get.put(widget.databaseService);
     Get.put(Coordinator()..init());
+    Get.put(widget.localizations);
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final debugController = Get.find<DebugController>();
     final settings = Get.find<SettingsController>();
-    final localizations = Get.put(this.localizations);
+    final localizations = widget.localizations;
 
     final application = DynamicColorBuilder(
       key: applicationKey,

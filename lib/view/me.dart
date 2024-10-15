@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
@@ -84,52 +86,58 @@ class MeView extends GetView<MeController> {
                   ),
                 ),
                 const SizedBox(height: 24),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: SafeArea(
-                    top: false,
-                    bottom: false,
-                    child: SectionTitle("me.workoutDistribution.label".t),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: SafeArea(
-                    top: false,
-                    bottom: false,
-                    child: Card(
-                      clipBehavior: Clip.hardEdge,
-                      margin: EdgeInsets.zero,
-                      child: Padding(
-                        padding: const EdgeInsets.all(16),
-                        child: Obx(
-                          () {
-                            final historyController =
-                                Get.find<HistoryController>();
-                            final firstDay = historyController.history.isEmpty
-                                ? DateTime.now()
-                                : historyController.history.first.startingDate!;
-                            final now = DateTime.now();
-                            final allDays = now.difference(firstDay).inDays;
-                            return DensityCalendarChart(
-                              tooltipBuilder: (now, daysBeforeNow, value) {
-                                return "${DateFormat.yMEd(Get.locale?.languageCode).format(now.subtract(Duration(days: daysBeforeNow)))}: ${"general.workouts".plural(value)}";
-                              },
-                              values: [
-                                for (int i = 0; i < allDays; i++)
-                                  historyController
-                                          .workoutsByDay[now
-                                              .subtract(Duration(days: i))
-                                              .startOfDay]
-                                          ?.length ??
-                                      0,
-                              ],
-                            );
-                          },
+                Obx(
+                  () {
+                    final historyController = Get.find<HistoryController>();
+                    if (historyController.history.isEmpty) {
+                      return const SizedBox.shrink();
+                    }
+                    final firstDay =
+                        historyController.history.first.startingDate!;
+                    final now = DateTime.now();
+                    final allDays =
+                        math.max(1, now.difference(firstDay).inDays);
+                    final values = [
+                      for (int i = 0; i < allDays; i++)
+                        historyController
+                                .workoutsByDay[
+                                    now.subtract(Duration(days: i)).startOfDay]
+                                ?.length ??
+                            0,
+                    ];
+                    print((firstDay, now, allDays, values));
+                    if (values.isEmpty) {
+                      return const SizedBox.shrink();
+                    }
+                    return Padding(
+                      padding: const EdgeInsets.all(16).copyWith(top: 0),
+                      child: SafeArea(
+                        top: false,
+                        bottom: false,
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            SectionTitle("me.workoutDistribution.label".t),
+                            const SizedBox(height: 16),
+                            Card(
+                              clipBehavior: Clip.hardEdge,
+                              margin: EdgeInsets.zero,
+                              child: Padding(
+                                padding: const EdgeInsets.all(16),
+                                child: DensityCalendarChart(
+                                  tooltipBuilder: (now, daysBeforeNow, value) {
+                                    return "${DateFormat.yMEd(Get.locale?.languageCode).format(now.subtract(Duration(days: daysBeforeNow)))}: ${"general.workouts".plural(value)}";
+                                  },
+                                  values: values,
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
-                    ),
-                  ),
+                    );
+                  },
                 ),
                 const SizedBox(height: 8),
                 Padding(

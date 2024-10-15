@@ -105,7 +105,6 @@ class MeView extends GetView<MeController> {
                                 ?.length ??
                             0,
                     ];
-                    print((firstDay, now, allDays, values));
                     if (values.isEmpty) {
                       return const SizedBox.shrink();
                     }

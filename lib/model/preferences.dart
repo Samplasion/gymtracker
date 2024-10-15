@@ -71,11 +71,13 @@ class Prefs implements Insertable<Preference> {
 
   factory Prefs.fromJson(Map<String, dynamic> json) {
     const defaults = Prefs.defaultValue;
-    final lang = (json['locale'] as List).map((v) => "$v").toList();
+    final lang = (json['locale'] as List?)?.map((v) => "$v").toList();
     return Prefs(
       usesDynamicColor: json['usesDynamicColor'] ?? defaults.usesDynamicColor,
       color: json['color'] == null ? defaults.color : Color(json['color']),
-      locale: lang.isEmpty ? defaults.locale : Locale(lang[0], lang.getAt(1)),
+      locale: lang == null || lang.isEmpty
+          ? defaults.locale
+          : Locale(lang[0], lang.getAt(1)),
       weightUnit: json['weightUnit'] == null
           ? defaults.weightUnit
           : Weights.values.firstWhere((w) => w.name == json['weightUnit']),

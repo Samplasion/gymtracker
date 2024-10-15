@@ -401,7 +401,6 @@ class Exercise extends WorkoutExercisable {
     required GTGymEquipment equipment,
     Map<GTMuscleHighlight, GTMuscleHighlightIntensity>? muscleHighlight,
   }) {
-    print((id, muscleHighlight));
     return Exercise.raw(
       id: id,
       name: name,

@@ -1,4 +1,5 @@
 import 'package:gymtracker/db/imports/types.dart';
+import 'package:gymtracker/model/achievements.dart';
 import 'package:gymtracker/model/exercisable.dart';
 import 'package:gymtracker/model/exercise.dart';
 import 'package:gymtracker/model/measurements.dart';
@@ -6,11 +7,11 @@ import 'package:gymtracker/model/preferences.dart';
 import 'package:gymtracker/model/workout.dart';
 import 'package:gymtracker/struct/nutrition.dart';
 
-class VersionedJsonImportV7 extends VersionedJsonImportBase {
+class VersionedJsonImportV10 extends VersionedJsonImportBase {
   @override
-  int get version => 7;
+  int get version => 10;
 
-  const VersionedJsonImportV7();
+  const VersionedJsonImportV10();
 
   @override
   DatabaseSnapshot process(Map<String, dynamic> json) {
@@ -65,8 +66,19 @@ class VersionedJsonImportV7 extends VersionedJsonImportBase {
       favoriteFoods: [
         for (final food in (json['favoriteFoods'] as List)) food as String,
       ],
-      foodCategories: {},
-      achievements: [],
+      foodCategories: {
+        for (final category
+            in (json['foodCategories'] as Map).cast<String, dynamic>().entries)
+          DateTime.parse(category.key): (category.value as List)
+              .map((e) => NutritionCategory.fromJson(
+                  (e as Map).cast<String, dynamic>()))
+              .toList(),
+      },
+      achievements: [
+        for (final achievement in (json['achievementCompletions'] as List))
+          AchievementCompletion.fromJson(
+              (achievement as Map).cast<String, dynamic>()),
+      ],
     );
   }
 
@@ -125,6 +137,15 @@ class VersionedJsonImportV7 extends VersionedJsonImportBase {
           food.key: food.value.toJson(),
       },
       'favoriteFoods': data.favoriteFoods,
+      'foodCategories': {
+        for (final category in data.foodCategories.entries)
+          category.key.toIso8601String(): [
+            for (final cat in category.value) cat.toJson()
+          ],
+      },
+      'achievementCompletions': [
+        for (final achievement in data.achievements) achievement.toJson(),
+      ],
     };
   }
 }

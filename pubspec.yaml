@@ -103,6 +103,7 @@ flutter:
     - assets/i18n/
     - assets/svg/
     - assets/svg/equipment/
+    - assets/svg/trophies/
     #tool begin exercise-explanations
     - assets/exercises/abs/bicycleCrunches/
     - assets/exercises/abs/crunchMachine/

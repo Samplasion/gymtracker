@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:gymtracker/db/imports/v1.dart';
+import 'package:gymtracker/db/imports/v10.dart';
 import 'package:gymtracker/db/imports/v2.dart';
 import 'package:gymtracker/db/imports/v3.dart';
 import 'package:gymtracker/db/imports/v4.dart';
@@ -9,6 +10,7 @@ import 'package:gymtracker/db/imports/v6.dart';
 import 'package:gymtracker/db/imports/v7.dart';
 import 'package:gymtracker/db/imports/v8.dart';
 import 'package:gymtracker/db/imports/v9.dart';
+import 'package:gymtracker/model/achievements.dart';
 import 'package:gymtracker/model/exercisable.dart';
 import 'package:gymtracker/model/exercise.dart';
 import 'package:gymtracker/model/measurements.dart';
@@ -26,6 +28,7 @@ const converters = {
   7: VersionedJsonImportV7(),
   8: VersionedJsonImportV8(),
   9: VersionedJsonImportV9(),
+  10: VersionedJsonImportV10(),
 };
 
 VersionedJsonImportBase getConverter(int version) {
@@ -62,6 +65,7 @@ class DatabaseSnapshot {
   final Map<String, Food> customBarcodeFoods;
   final List<String> favoriteFoods;
   final Map<DateTime, List<NutritionCategory>> foodCategories;
+  final List<AchievementCompletion> achievements;
 
   const DatabaseSnapshot({
     required this.customExercises,
@@ -77,6 +81,7 @@ class DatabaseSnapshot {
     required this.customBarcodeFoods,
     required this.favoriteFoods,
     required this.foodCategories,
+    required this.achievements,
   });
 
   @override
@@ -95,6 +100,7 @@ class DatabaseSnapshot {
   customBarcodeFoods: ${jsonEncode(customBarcodeFoods)},
   favoriteFoods: ${jsonEncode(favoriteFoods)},
   foodCategories: ${jsonEncode(foodCategories)},
+  achievements: ${jsonEncode(achievements)},
 )""";
   }
 }

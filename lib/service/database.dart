@@ -7,8 +7,10 @@ import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 import 'package:gymtracker/db/database.dart';
 import 'package:gymtracker/db/imports/types.dart';
+import 'package:gymtracker/model/achievements.dart';
 import 'package:gymtracker/model/exercisable.dart';
 import 'package:gymtracker/model/exercise.dart';
+
 import 'package:gymtracker/model/measurements.dart';
 import 'package:gymtracker/model/preferences.dart';
 import 'package:gymtracker/model/superset.dart';
@@ -48,6 +50,7 @@ class DatabaseService extends GetxService with ChangeNotifier {
   final nutritionCategories$ =
       BehaviorSubject<DateSequence<Map<String, NutritionCategory>>>.seeded(
           DateSequence.empty());
+  final completions$ = BehaviorSubject<List<AchievementCompletion>>.seeded([]);
 
   final backups = _DatabaseBackups();
   BehaviorSubject<List<DatabaseBackup>> get _backups$ => BehaviorSubject();
@@ -70,6 +73,7 @@ class DatabaseService extends GetxService with ChangeNotifier {
     customBarcodeFoods$.add({});
     favoriteFoods$.add([]);
     nutritionCategories$.add(DateSequence.empty());
+    completions$.add([]);
   }
 
   writeSettings(Prefs prefs) {
@@ -109,6 +113,7 @@ class DatabaseService extends GetxService with ChangeNotifier {
       "customBarcodeFoods",
       "favoriteFoods",
       "nutritionCategories",
+      "achievements",
     ].map((element) => false).toList();
     check() {
       if (initialized.every((element) => element)) {
@@ -199,6 +204,12 @@ class DatabaseService extends GetxService with ChangeNotifier {
       nutritionCategories$.add(event);
       onServiceChange("nutrition categories")();
       initialized[10] = true;
+      check();
+    });
+    db.watchAchievementCompletions().listen((event) {
+      completions$.add(event);
+      onServiceChange("nutrition categories")();
+      initialized[11] = true;
       check();
     });
     backups.watch().listen((event) {
@@ -505,6 +516,17 @@ class DatabaseService extends GetxService with ChangeNotifier {
     }).normalize().toMap());
   }
 
+  Future<void> insertAchievementCompletion(AchievementCompletion completion) =>
+      db.insertAchievementCompletion(completion);
+  Future<void> insertAchievementCompletions(
+          List<AchievementCompletion> completions) =>
+      db.insertAchievementCompletions(completions);
+  Future<void> deleteAchievementCompletion(String achievementID, int level) =>
+      db.deleteAchievementCompletion(achievementID, level);
+  Future<void> setAchievementCompletions(
+          List<AchievementCompletion> completions) =>
+      db.setAchievementCompletions(completions);
+
   toJson() {
     final converter = getConverter(DATABASE_VERSION);
 
@@ -525,6 +547,7 @@ class DatabaseService extends GetxService with ChangeNotifier {
       foodCategories: Map.fromEntries(nutritionCategories$.value.map((map) {
         return MapEntry(map.date, map.value.values.toList());
       })),
+      achievements: completions$.value,
     ));
   }
 

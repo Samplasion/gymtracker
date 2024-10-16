@@ -501,3 +501,38 @@ extension PaddingUtils on EdgeInsets {
     return EdgeInsets.only(top: top, bottom: bottom);
   }
 }
+
+extension IntUtils on int {
+  String toRomanNumeral() {
+    if (this < 1 || this > 3999) {
+      throw ArgumentError(
+          "Roman numerals can only represent numbers between 1 and 3999");
+    }
+
+    const letters = {
+      1000: "M",
+      900: "CM",
+      500: "D",
+      400: "CD",
+      100: "C",
+      90: "XC",
+      50: "L",
+      40: "XL",
+      10: "X",
+      9: "IX",
+      5: "V",
+      4: "IV",
+      1: "I",
+    };
+
+    StringBuffer result = StringBuffer();
+
+    for (int i = this; i > 0;) {
+      final entry = letters.entries.firstWhere((entry) => entry.key <= i);
+      result.write(entry.value);
+      i -= entry.key;
+    }
+
+    return result.toString();
+  }
+}

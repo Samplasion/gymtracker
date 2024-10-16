@@ -59,6 +59,7 @@ class VersionedJsonImportV6 extends VersionedJsonImportBase {
       customBarcodeFoods: {},
       favoriteFoods: [],
       foodCategories: {},
+      achievements: [],
     );
   }
 

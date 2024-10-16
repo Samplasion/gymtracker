@@ -9,6 +9,7 @@ import 'package:flutter/foundation.dart';
 import 'package:gymtracker/data/distance.dart';
 import 'package:gymtracker/data/exercises.dart';
 import 'package:gymtracker/data/weights.dart';
+import 'package:gymtracker/db/model/tables/achievements.dart';
 import 'package:gymtracker/db/model/tables/exercise.dart';
 import 'package:gymtracker/db/model/tables/foods.dart';
 import 'package:gymtracker/db/model/tables/history.dart';
@@ -21,6 +22,7 @@ import 'package:gymtracker/db/model/tables/routines.dart';
 import 'package:gymtracker/db/model/tables/set.dart';
 import 'package:gymtracker/db/schema_versions.dart';
 import 'package:gymtracker/db/utils.dart';
+import 'package:gymtracker/model/achievements.dart';
 import 'package:gymtracker/model/exercisable.dart' as model;
 import 'package:gymtracker/model/exercise.dart' as model;
 import 'package:gymtracker/model/exercise.dart' show GTGymEquipment;
@@ -46,7 +48,7 @@ part 'database.g.dart';
 // Used in the generated code
 const _uuid = Uuid();
 
-const DATABASE_VERSION = 9;
+const DATABASE_VERSION = 10;
 
 @DriftDatabase(tables: [
   CustomExercises,
@@ -63,6 +65,7 @@ const DATABASE_VERSION = 9;
   CustomBarcodeFoods,
   FavoriteFoods,
   NutritionCategories,
+  Achievements,
 ])
 class GTDatabase extends _$GTDatabase {
   GTDatabase.prod() : super(_openConnection());
@@ -157,6 +160,9 @@ class GTDatabase extends _$GTDatabase {
                             equipment: Value(exercise.equipment)));
                   }
                 });
+              },
+              from9To10: (m, schema) async {
+                await m.createTable(schema.achievements);
               },
             ),
           );
@@ -726,6 +732,66 @@ class GTDatabase extends _$GTDatabase {
             ),
           );
         }
+      });
+    });
+  }
+
+  Stream<List<AchievementCompletion>> watchAchievementCompletions() {
+    return select(achievements).watch();
+  }
+
+  Future<void> insertAchievementCompletion(AchievementCompletion completion) {
+    return into(achievements).insert(AchievementsCompanion(
+      achievementID: Value(completion.achievementID),
+      level: Value(completion.level),
+      completedAt: Value(completion.completedAt),
+    ));
+  }
+
+  Future<void> insertAchievementCompletions(
+      List<AchievementCompletion> completions) {
+    return batch((batch) async {
+      batch.insertAll(
+        achievements,
+        completions
+            .map(
+              (completion) => AchievementsCompanion.insert(
+                achievementID: completion.achievementID,
+                level: completion.level,
+                completedAt: completion.completedAt,
+              ),
+            )
+            .toList(),
+      );
+    });
+  }
+
+  Future<void> deleteAchievementCompletion(String achievementID, int level) {
+    return (delete(achievements)
+          ..where((tbl) {
+            return tbl.achievementID.equals(achievementID) &
+                tbl.level.equals(level);
+          }))
+        .go();
+  }
+
+  Future<void> setAchievementCompletions(
+      List<AchievementCompletion> completions) {
+    return transaction(() async {
+      await delete(achievements).go();
+      await batch((batch) {
+        batch.insertAll(
+          achievements,
+          completions
+              .map(
+                (completion) => AchievementsCompanion.insert(
+                  achievementID: completion.achievementID,
+                  level: completion.level,
+                  completedAt: completion.completedAt,
+                ),
+              )
+              .toList(),
+        );
       });
     });
   }

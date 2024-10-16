@@ -93,6 +93,7 @@ class GTIcons {
   static const IconData _fire =
       IconData(0xf06d, fontFamily: _kFontFam, fontPackage: _kFontPkg);
 
+  static const IconData achievements = Icons.emoji_events_rounded;
   static const IconData add_exercise = Icons.add_rounded;
   static const IconData add_food = Icons.post_add_rounded;
   static const IconData add_superset = Icons.add_circle_rounded;

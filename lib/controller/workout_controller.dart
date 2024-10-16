@@ -14,6 +14,7 @@ import 'package:gymtracker/controller/stopwatch_controller.dart';
 import 'package:gymtracker/data/distance.dart';
 import 'package:gymtracker/data/weights.dart';
 import 'package:gymtracker/icons/gymtracker_icons.dart';
+import 'package:gymtracker/model/achievements.dart';
 import 'package:gymtracker/model/exercisable.dart';
 import 'package:gymtracker/model/exercise.dart';
 import 'package:gymtracker/model/set.dart';
@@ -768,10 +769,13 @@ class WorkoutController extends GetxController with ServiceableController {
       await askToUpdateRoutine(workout);
 
       if (workout.doneSets.isNotEmpty) {
+        final achievements = Get.find<Coordinator>()
+            .maybeUnlockAchievements(AchievementTrigger.workout);
         await Go.showBottomModalScreen(
           (context, controller) => WorkoutDoneSheet(
             workout: workout,
             controller: controller,
+            achievements: achievements,
           ),
         );
       }

@@ -7,10 +7,10 @@ class EquipmentIcon extends StatelessWidget {
   final Color? color;
 
   const EquipmentIcon({
-    Key? key,
+    super.key,
     required this.equipment,
     this.color,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

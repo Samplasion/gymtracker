@@ -60,5 +60,20 @@
 			");",
 		],
 		"description": "Load main app in integration test",
+	},
+	"Controller": {
+		"scope": "dart",
+		"prefix": "controller",
+		"body": [
+			"import 'package:get/get.dart';",
+			"import 'package:gymtracker/controller/serviceable_controller.dart';",
+			"",
+			"class $1Controller extends GetxController with ServiceableController {",
+			"  @override",
+			"  void onServiceChange() {}",
+			"  ",
+			"  $0",
+			"}",
+		],
 	}
 }

@@ -73,6 +73,7 @@ class VersionedJsonImportV8 extends VersionedJsonImportBase {
                   (e as Map).cast<String, dynamic>()))
               .toList(),
       },
+      achievements: [],
     );
   }
 

@@ -619,7 +619,8 @@
     },
     "goodJob": {
       "title": "Good job!",
-      "body": "Here's some statistics about the workout you've just finished."
+      "body": "Here's some statistics about the workout you've just finished.",
+      "achievements": "Achievements"
     },
     "exercisesToSuperset": {
       "title": "Create new superset",
@@ -2036,6 +2037,27 @@
     "other": {
       "long": "Other",
       "short": "Other"
+    }
+  },
+  "achievements": {
+    "title": "Achievements",
+    "locked": "Locked",
+    "unlockedOn": "Unlocked on: @date",
+    "firstSteps": {
+      "title": "First steps",
+      "description": {
+        "1": "Complete your first workout",
+        "2": "Log your first meal",
+        "3": "Log your first weight"
+      }
+    },
+    "foodWatcher": {
+      "title": "Food blogger",
+      "description": {
+        "1": "Log your meals two days in a row",
+        "2": "Log your meals a week in a row",
+        "3": "Log your meals a month in a row"
+      }
     }
   }
 }

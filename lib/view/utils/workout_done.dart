@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart' hide ContextExtensionss;
 import 'package:gymtracker/icons/gymtracker_icons.dart';
+import 'package:gymtracker/model/achievements.dart';
 import 'package:gymtracker/model/exercise.dart';
 import 'package:gymtracker/model/workout.dart';
 import 'package:gymtracker/service/localizations.dart';
@@ -8,6 +9,8 @@ import 'package:gymtracker/utils/constants.dart';
 import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/view/charts/bar_charts.dart';
 import 'package:gymtracker/view/components/muscles.dart';
+import 'package:gymtracker/view/utils/achievements.dart';
+import 'package:gymtracker/view/utils/section_title.dart';
 import 'package:gymtracker/view/utils/sliver_utils.dart';
 import 'package:gymtracker/view/utils/speed_dial.dart';
 import 'package:gymtracker/view/utils/timer.dart';
@@ -15,8 +18,14 @@ import 'package:gymtracker/view/utils/timer.dart';
 class WorkoutDoneSheet extends StatefulWidget {
   final Workout workout;
   final ScrollController? controller;
+  final Map<Achievement, AchievementCompletion> achievements;
 
-  const WorkoutDoneSheet({required this.workout, this.controller, super.key});
+  const WorkoutDoneSheet({
+    required this.workout,
+    this.controller,
+    this.achievements = const {},
+    super.key,
+  });
 
   @override
   State<WorkoutDoneSheet> createState() => _WorkoutDoneSheetState();
@@ -67,6 +76,28 @@ class _WorkoutDoneSheetState extends State<WorkoutDoneSheet> {
                       context.theme.textTheme.titleLarge!.fontSize!,
             ),
           ),
+          if (widget.achievements.isNotEmpty) ...[
+            SliverPadding(
+              padding: const EdgeInsets.all(16) +
+                  MediaQuery.paddingOf(context).onlyHorizontal,
+              sliver: SliverToBoxAdapter(
+                child: SectionTitle(
+                  'ongoingWorkout.goodJob.achievements'.t,
+                ),
+              ),
+            ),
+            SliverList.builder(
+              itemCount: widget.achievements.length,
+              itemBuilder: (context, index) {
+                final achievement = widget.achievements.keys.elementAt(index);
+                final completion = widget.achievements.values.elementAt(index);
+                return AchievementListTile(
+                  achievement: achievement,
+                  completion: completion,
+                );
+              },
+            ),
+          ],
           SliverPadding(
             padding: const EdgeInsets.all(16) +
                 MediaQuery.paddingOf(context).onlyHorizontal,

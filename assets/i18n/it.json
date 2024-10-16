@@ -2037,5 +2037,26 @@
       "long": "Altro",
       "short": "Altro"
     }
+  },
+  "achievements": {
+    "title": "Conquiste",
+    "locked": "Bloccato",
+    "unlockedOn": "Sbloccato: @date",
+    "firstSteps": {
+      "title": "Primi passi",
+      "description": {
+        "1": "Completa il tuo primo allenamento",
+        "2": "Traccia il tuo primo pasto",
+        "3": "Traccia il tuo primo peso"
+      }
+    },
+    "foodWatcher": {
+      "title": "Food blogger",
+      "description": {
+        "1": "Traccia i tui pasti per 2 giorni di fila",
+        "2": "Traccia i tui pasti per 7 giorni di fila",
+        "3": "Traccia i tui pasti per un intero mese di fila"
+      }
+    }
   }
 }

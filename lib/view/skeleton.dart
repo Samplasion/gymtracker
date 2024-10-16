@@ -18,6 +18,7 @@ import 'package:gymtracker/utils/colors.dart';
 import 'package:gymtracker/utils/constants.dart';
 import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/utils/go.dart';
+import 'package:gymtracker/view/achievements.dart';
 import 'package:gymtracker/view/components/badges.dart';
 import 'package:gymtracker/view/debug.dart';
 import 'package:gymtracker/view/food.dart';
@@ -173,6 +174,7 @@ class _SkeletonViewState extends State<SkeletonView>
         const HistoryView(),
         const MeView(),
         const FoodView(),
+        const AchievementsView(),
         const SettingsView(),
         if (kDebugMode) const DebugView(),
         if (LoggerController.shouldShowPane) const LogView(),
@@ -375,6 +377,13 @@ class _SkeletonViewState extends State<SkeletonView>
         icon: const Icon(GTIcons.food),
         label: Text(
           "food.title".t,
+          textAlign: TextAlign.center,
+        ),
+      ),
+      NavigationDrawerDestination(
+        icon: const Icon(GTIcons.achievements),
+        label: Text(
+          "achievements.title".t,
           textAlign: TextAlign.center,
         ),
       ),

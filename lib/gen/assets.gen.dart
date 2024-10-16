@@ -86,6 +86,9 @@ class $AssetsSvgGen {
   /// Directory path: assets/svg/equipment
   $AssetsSvgEquipmentGen get equipment => const $AssetsSvgEquipmentGen();
 
+  /// Directory path: assets/svg/trophies
+  $AssetsSvgTrophiesGen get trophies => const $AssetsSvgTrophiesGen();
+
   /// List of all assets
   List<String> get values => [bodyBack, bodyFront];
 }
@@ -370,6 +373,22 @@ class $AssetsSvgEquipmentGen {
         resistanceBand,
         suspensionBands
       ];
+}
+
+class $AssetsSvgTrophiesGen {
+  const $AssetsSvgTrophiesGen();
+
+  /// File path: assets/svg/trophies/firstSteps.svg
+  String get firstSteps => 'assets/svg/trophies/firstSteps.svg';
+
+  /// File path: assets/svg/trophies/foodWatcher.svg
+  String get foodWatcher => 'assets/svg/trophies/foodWatcher.svg';
+
+  /// File path: assets/svg/trophies/generic.svg
+  String get generic => 'assets/svg/trophies/generic.svg';
+
+  /// List of all assets
+  List<String> get values => [firstSteps, foodWatcher, generic];
 }
 
 class $AssetsExercisesAbsCrunchesGen {

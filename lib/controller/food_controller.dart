@@ -6,9 +6,11 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart' as material;
 import 'package:fuzzywuzzy/fuzzywuzzy.dart';
 import 'package:get/get.dart';
+import 'package:gymtracker/controller/coordinator.dart';
 import 'package:gymtracker/controller/serviceable_controller.dart';
 import 'package:gymtracker/controller/settings_controller.dart';
 import 'package:gymtracker/icons/gymtracker_icons.dart';
+import 'package:gymtracker/model/achievements.dart';
 import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/service/logger.dart';
 import 'package:gymtracker/service/version.dart';
@@ -515,6 +517,7 @@ class FoodController extends GetxController with ServiceableController {
         category: category?.name,
       ),
     ));
+    Get.find<Coordinator>().maybeUnlockAchievements(AchievementTrigger.food);
   }
 
   void removeFood(DateTime dateTime, Food food) {
@@ -522,6 +525,7 @@ class FoodController extends GetxController with ServiceableController {
       date: dateTime.startOfDay,
       value: food,
     ));
+    Get.find<Coordinator>().maybeUnlockAchievements(AchievementTrigger.food);
   }
 
   void updateFood(DateTime value, Food updatedFood) {
@@ -532,6 +536,7 @@ class FoodController extends GetxController with ServiceableController {
       date: value,
       value: updatedFood,
     ));
+    Get.find<Coordinator>().maybeUnlockAchievements(AchievementTrigger.food);
   }
 
   void previousDay() {
@@ -807,7 +812,7 @@ Future<SearchResult> searchOFF(
       "search_simple": "1",
       "action": "process",
       "json": "1",
-      "cc": country!.offTag,
+      "cc": country?.offTag,
       "lc": language.code,
     },
   );

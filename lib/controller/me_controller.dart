@@ -1,6 +1,8 @@
 import 'package:get/get.dart' hide Rx;
+import 'package:gymtracker/controller/coordinator.dart';
 import 'package:gymtracker/controller/serviceable_controller.dart';
 import 'package:gymtracker/data/weights.dart';
+import 'package:gymtracker/model/achievements.dart';
 import 'package:gymtracker/model/measurements.dart';
 import 'package:gymtracker/model/preferences.dart';
 import 'package:gymtracker/service/logger.dart';
@@ -38,10 +40,12 @@ class MeController extends GetxController with ServiceableController {
 
   void addWeightMeasurement(WeightMeasurement measurement) {
     service.setWeightMeasurement(measurement);
+    Get.find<Coordinator>().maybeUnlockAchievements(AchievementTrigger.weight);
   }
 
   void removeWeightMeasurement(WeightMeasurement measurement) {
     service.removeWeightMeasurement(measurement);
+    Get.find<Coordinator>().maybeUnlockAchievements(AchievementTrigger.weight);
   }
 
   WeightMeasurement? getWeightMeasurementByID(String measurementID) {

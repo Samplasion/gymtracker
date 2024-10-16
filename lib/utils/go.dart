@@ -74,11 +74,17 @@ class Go {
     SnackBarAction? action,
     bool assertive = false,
   }) async {
-    final snackBar = SnackBar(
+    return customSnack(SnackBar(
       content: Text(text),
       behavior: SnackBarBehavior.floating,
       action: action,
-    );
+    ));
+  }
+
+  static Future customSnack(
+    SnackBar snackBar, {
+    bool assertive = false,
+  }) async {
     var messenger = ScaffoldMessenger.of(Get.context!);
     if (assertive) messenger.clearSnackBars();
     messenger.showSnackBar(snackBar);

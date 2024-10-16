@@ -4488,6 +4488,164 @@ class NutritionCategoriesCompanion
   }
 }
 
+class $AchievementsTable extends Achievements
+    with TableInfo<$AchievementsTable, AchievementCompletion> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $AchievementsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _achievementIDMeta =
+      const VerificationMeta('achievementID');
+  @override
+  late final GeneratedColumn<String> achievementID = GeneratedColumn<String>(
+      'achievement_i_d', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _levelMeta = const VerificationMeta('level');
+  @override
+  late final GeneratedColumn<int> level = GeneratedColumn<int>(
+      'level', aliasedName, false,
+      type: DriftSqlType.int, requiredDuringInsert: true);
+  static const VerificationMeta _completedAtMeta =
+      const VerificationMeta('completedAt');
+  @override
+  late final GeneratedColumn<DateTime> completedAt = GeneratedColumn<DateTime>(
+      'completed_at', aliasedName, false,
+      type: DriftSqlType.dateTime, requiredDuringInsert: true);
+  @override
+  List<GeneratedColumn> get $columns => [achievementID, level, completedAt];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'achievements';
+  @override
+  VerificationContext validateIntegrity(
+      Insertable<AchievementCompletion> instance,
+      {bool isInserting = false}) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('achievement_i_d')) {
+      context.handle(
+          _achievementIDMeta,
+          achievementID.isAcceptableOrUnknown(
+              data['achievement_i_d']!, _achievementIDMeta));
+    } else if (isInserting) {
+      context.missing(_achievementIDMeta);
+    }
+    if (data.containsKey('level')) {
+      context.handle(
+          _levelMeta, level.isAcceptableOrUnknown(data['level']!, _levelMeta));
+    } else if (isInserting) {
+      context.missing(_levelMeta);
+    }
+    if (data.containsKey('completed_at')) {
+      context.handle(
+          _completedAtMeta,
+          completedAt.isAcceptableOrUnknown(
+              data['completed_at']!, _completedAtMeta));
+    } else if (isInserting) {
+      context.missing(_completedAtMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {achievementID, level};
+  @override
+  AchievementCompletion map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return AchievementCompletion(
+      achievementID: attachedDatabase.typeMapping.read(
+          DriftSqlType.string, data['${effectivePrefix}achievement_i_d'])!,
+      level: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}level'])!,
+      completedAt: attachedDatabase.typeMapping
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}completed_at'])!,
+    );
+  }
+
+  @override
+  $AchievementsTable createAlias(String alias) {
+    return $AchievementsTable(attachedDatabase, alias);
+  }
+}
+
+class AchievementsCompanion extends UpdateCompanion<AchievementCompletion> {
+  final Value<String> achievementID;
+  final Value<int> level;
+  final Value<DateTime> completedAt;
+  final Value<int> rowid;
+  const AchievementsCompanion({
+    this.achievementID = const Value.absent(),
+    this.level = const Value.absent(),
+    this.completedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  AchievementsCompanion.insert({
+    required String achievementID,
+    required int level,
+    required DateTime completedAt,
+    this.rowid = const Value.absent(),
+  })  : achievementID = Value(achievementID),
+        level = Value(level),
+        completedAt = Value(completedAt);
+  static Insertable<AchievementCompletion> custom({
+    Expression<String>? achievementID,
+    Expression<int>? level,
+    Expression<DateTime>? completedAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (achievementID != null) 'achievement_i_d': achievementID,
+      if (level != null) 'level': level,
+      if (completedAt != null) 'completed_at': completedAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  AchievementsCompanion copyWith(
+      {Value<String>? achievementID,
+      Value<int>? level,
+      Value<DateTime>? completedAt,
+      Value<int>? rowid}) {
+    return AchievementsCompanion(
+      achievementID: achievementID ?? this.achievementID,
+      level: level ?? this.level,
+      completedAt: completedAt ?? this.completedAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (achievementID.present) {
+      map['achievement_i_d'] = Variable<String>(achievementID.value);
+    }
+    if (level.present) {
+      map['level'] = Variable<int>(level.value);
+    }
+    if (completedAt.present) {
+      map['completed_at'] = Variable<DateTime>(completedAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('AchievementsCompanion(')
+          ..write('achievementID: $achievementID, ')
+          ..write('level: $level, ')
+          ..write('completedAt: $completedAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$GTDatabase extends GeneratedDatabase {
   _$GTDatabase(QueryExecutor e) : super(e);
   $GTDatabaseManager get managers => $GTDatabaseManager(this);
@@ -4512,6 +4670,7 @@ abstract class _$GTDatabase extends GeneratedDatabase {
   late final $FavoriteFoodsTable favoriteFoods = $FavoriteFoodsTable(this);
   late final $NutritionCategoriesTable nutritionCategories =
       $NutritionCategoriesTable(this);
+  late final $AchievementsTable achievements = $AchievementsTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -4530,7 +4689,8 @@ abstract class _$GTDatabase extends GeneratedDatabase {
         nutritionGoals,
         customBarcodeFoods,
         favoriteFoods,
-        nutritionCategories
+        nutritionCategories,
+        achievements
       ];
 }
 
@@ -6931,6 +7091,102 @@ class $$NutritionCategoriesTableOrderingComposer
           ColumnOrderings(column, joinBuilders: joinBuilders));
 }
 
+typedef $$AchievementsTableCreateCompanionBuilder = AchievementsCompanion
+    Function({
+  required String achievementID,
+  required int level,
+  required DateTime completedAt,
+  Value<int> rowid,
+});
+typedef $$AchievementsTableUpdateCompanionBuilder = AchievementsCompanion
+    Function({
+  Value<String> achievementID,
+  Value<int> level,
+  Value<DateTime> completedAt,
+  Value<int> rowid,
+});
+
+class $$AchievementsTableTableManager extends RootTableManager<
+    _$GTDatabase,
+    $AchievementsTable,
+    AchievementCompletion,
+    $$AchievementsTableFilterComposer,
+    $$AchievementsTableOrderingComposer,
+    $$AchievementsTableCreateCompanionBuilder,
+    $$AchievementsTableUpdateCompanionBuilder> {
+  $$AchievementsTableTableManager(_$GTDatabase db, $AchievementsTable table)
+      : super(TableManagerState(
+          db: db,
+          table: table,
+          filteringComposer:
+              $$AchievementsTableFilterComposer(ComposerState(db, table)),
+          orderingComposer:
+              $$AchievementsTableOrderingComposer(ComposerState(db, table)),
+          updateCompanionCallback: ({
+            Value<String> achievementID = const Value.absent(),
+            Value<int> level = const Value.absent(),
+            Value<DateTime> completedAt = const Value.absent(),
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              AchievementsCompanion(
+            achievementID: achievementID,
+            level: level,
+            completedAt: completedAt,
+            rowid: rowid,
+          ),
+          createCompanionCallback: ({
+            required String achievementID,
+            required int level,
+            required DateTime completedAt,
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              AchievementsCompanion.insert(
+            achievementID: achievementID,
+            level: level,
+            completedAt: completedAt,
+            rowid: rowid,
+          ),
+        ));
+}
+
+class $$AchievementsTableFilterComposer
+    extends FilterComposer<_$GTDatabase, $AchievementsTable> {
+  $$AchievementsTableFilterComposer(super.$state);
+  ColumnFilters<String> get achievementID => $state.composableBuilder(
+      column: $state.table.achievementID,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+
+  ColumnFilters<int> get level => $state.composableBuilder(
+      column: $state.table.level,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+
+  ColumnFilters<DateTime> get completedAt => $state.composableBuilder(
+      column: $state.table.completedAt,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+}
+
+class $$AchievementsTableOrderingComposer
+    extends OrderingComposer<_$GTDatabase, $AchievementsTable> {
+  $$AchievementsTableOrderingComposer(super.$state);
+  ColumnOrderings<String> get achievementID => $state.composableBuilder(
+      column: $state.table.achievementID,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  ColumnOrderings<int> get level => $state.composableBuilder(
+      column: $state.table.level,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  ColumnOrderings<DateTime> get completedAt => $state.composableBuilder(
+      column: $state.table.completedAt,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+}
+
 class $GTDatabaseManager {
   final _$GTDatabase _db;
   $GTDatabaseManager(this._db);
@@ -6963,4 +7219,6 @@ class $GTDatabaseManager {
       $$FavoriteFoodsTableTableManager(_db, _db.favoriteFoods);
   $$NutritionCategoriesTableTableManager get nutritionCategories =>
       $$NutritionCategoriesTableTableManager(_db, _db.nutritionCategories);
+  $$AchievementsTableTableManager get achievements =>
+      $$AchievementsTableTableManager(_db, _db.achievements);
 }

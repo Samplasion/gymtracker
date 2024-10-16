@@ -46,6 +46,7 @@ class VersionedJsonImportV4 extends VersionedJsonImportBase {
       customBarcodeFoods: {},
       favoriteFoods: [],
       foodCategories: {},
+      achievements: [],
     )..logger.t("Importing");
   }
 

@@ -1,5 +1,6 @@
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get/get.dart' hide Rx;
+import 'package:gymtracker/controller/achievements_controller.dart';
 import 'package:gymtracker/controller/countdown_controller.dart';
 import 'package:gymtracker/controller/debug_controller.dart';
 import 'package:gymtracker/controller/error_controller.dart';
@@ -14,6 +15,7 @@ import 'package:gymtracker/controller/serviceable_controller.dart';
 import 'package:gymtracker/controller/settings_controller.dart';
 import 'package:gymtracker/controller/stopwatch_controller.dart';
 import 'package:gymtracker/controller/workout_controller.dart';
+import 'package:gymtracker/model/achievements.dart';
 import 'package:gymtracker/model/exercise.dart';
 import 'package:gymtracker/model/workout.dart';
 import 'package:gymtracker/service/database.dart';
@@ -65,6 +67,7 @@ class Coordinator extends GetxController with ServiceableController {
     Get.put(ErrorController(), permanent: true);
     Get.put(MigrationsController());
     Get.put(FoodController());
+    Get.put(AchievementsController());
 
     logger.d((service.hasOngoing, service.getOngoingData()));
     if (service.hasOngoing) {
@@ -147,5 +150,10 @@ class Coordinator extends GetxController with ServiceableController {
 
   void schedulePeriodicBackup() {
     Get.find<DatabaseService>().schedulePeriodicBackup();
+  }
+
+  Map<Achievement, AchievementCompletion> maybeUnlockAchievements(
+      AchievementTrigger trigger) {
+    return Get.find<AchievementsController>().maybeUnlockAchievements(trigger);
   }
 }

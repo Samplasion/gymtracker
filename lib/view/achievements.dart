@@ -10,6 +10,7 @@ import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/view/components/controlled.dart';
 import 'package:gymtracker/view/skeleton.dart';
 import 'package:gymtracker/view/utils/achievements.dart';
+import 'package:gymtracker/view/utils/sliver_utils.dart';
 import 'package:intl/intl.dart';
 
 class AchievementsView extends StatefulWidget {
@@ -62,6 +63,8 @@ class _AchievementsViewState
               ),
             ),
           ),
+          const SliverToBoxAdapter(child: SizedBox(height: 8)),
+          const SliverBottomSafeArea(),
         ],
       ),
     );

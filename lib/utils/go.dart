@@ -74,11 +74,14 @@ class Go {
     SnackBarAction? action,
     bool assertive = false,
   }) async {
-    return customSnack(SnackBar(
-      content: Text(text),
-      behavior: SnackBarBehavior.floating,
-      action: action,
-    ));
+    return customSnack(
+      SnackBar(
+        content: Text(text),
+        behavior: SnackBarBehavior.floating,
+        action: action,
+      ),
+      assertive: assertive,
+    );
   }
 
   static Future customSnack(

@@ -2046,16 +2046,40 @@
       "title": "Primi passi",
       "description": {
         "1": "Completa il tuo primo allenamento",
-        "2": "Traccia il tuo primo pasto",
-        "3": "Traccia il tuo primo peso"
+        "2": "Traccia il tuo primo peso",
+        "3": "Traccia il tuo primo pasto"
       }
     },
     "foodWatcher": {
       "title": "Food blogger",
       "description": {
-        "1": "Traccia i tui pasti per 2 giorni di fila",
-        "2": "Traccia i tui pasti per 7 giorni di fila",
-        "3": "Traccia i tui pasti per un intero mese di fila"
+        "1": "Traccia i tuoi pasti per 2 giorni di fila",
+        "2": "Traccia i tuoi pasti per 7 giorni di fila",
+        "3": "Traccia i tuoi pasti per un intero mese di fila"
+      }
+    },
+    "marathoner": {
+      "title": "Maratoneta",
+      "description": {
+        "1": "Corri una 5km",
+        "2": "Corri una mezza maratona",
+        "3": "Corri un'intera maratona"
+      }
+    },
+    "earlyBird": {
+      "title": "Mattiniero",
+      "description": "Inizia un allenamento prima delle 8 del mattino"
+    },
+    "nightOwl": {
+      "title": "Notturno",
+      "description": "Inizia un allenamento dopo le 8 di sera"
+    },
+    "realGymBro": {
+      "title": "Vero Gym Bro",
+      "description": {
+        "1": "Traccia un totale di 100 ore di allenamenti",
+        "2": "Traccia un totale di 500 ore di allenamenti",
+        "3": "Traccia un totale di 1000 ore di allenamenti"
       }
     }
   }

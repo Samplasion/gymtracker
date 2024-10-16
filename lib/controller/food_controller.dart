@@ -144,6 +144,8 @@ class FoodController extends GetxController with ServiceableController {
       ..pipe(foods$)
       ..listen((foods) {
         logger.d("Foods updated with ${foods.length} items");
+        Get.find<Coordinator>()
+            .maybeUnlockAchievements(AchievementTrigger.food);
       });
     service.nutritionGoals$.listen((goals) {
       logger.d("Goals updated with ${goals.length} items");
@@ -517,7 +519,6 @@ class FoodController extends GetxController with ServiceableController {
         category: category?.name,
       ),
     ));
-    Get.find<Coordinator>().maybeUnlockAchievements(AchievementTrigger.food);
   }
 
   void removeFood(DateTime dateTime, Food food) {
@@ -525,7 +526,6 @@ class FoodController extends GetxController with ServiceableController {
       date: dateTime.startOfDay,
       value: food,
     ));
-    Get.find<Coordinator>().maybeUnlockAchievements(AchievementTrigger.food);
   }
 
   void updateFood(DateTime value, Food updatedFood) {
@@ -536,7 +536,6 @@ class FoodController extends GetxController with ServiceableController {
       date: value,
       value: updatedFood,
     ));
-    Get.find<Coordinator>().maybeUnlockAchievements(AchievementTrigger.food);
   }
 
   void previousDay() {

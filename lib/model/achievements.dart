@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:gymtracker/utils/extensions.dart';
 
 enum AchievementTrigger {
@@ -9,12 +10,14 @@ enum AchievementTrigger {
 final class Achievement {
   final String id, nameKey, iconKey;
   final List<AchievementLevel> levels;
+  final Color color;
 
   const Achievement({
     required this.id,
     required this.nameKey,
     required this.iconKey,
     required this.levels,
+    this.color = Colors.amber,
   });
 
   AchievementLevel? nextLevel(AchievementCompletion completion) {

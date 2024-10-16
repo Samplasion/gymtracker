@@ -32,7 +32,12 @@ class MeController extends GetxController with ServiceableController {
         },
       ),
     );
-    weightMeasurements.bindStream(service.weightMeasurements$);
+    service.weightMeasurements$.listen((event) {
+      logger.i("Updated with ${event.length} weight measurements");
+      weightMeasurements(event);
+      Get.find<Coordinator>()
+          .maybeUnlockAchievements(AchievementTrigger.weight);
+    });
   }
 
   @override
@@ -40,12 +45,10 @@ class MeController extends GetxController with ServiceableController {
 
   void addWeightMeasurement(WeightMeasurement measurement) {
     service.setWeightMeasurement(measurement);
-    Get.find<Coordinator>().maybeUnlockAchievements(AchievementTrigger.weight);
   }
 
   void removeWeightMeasurement(WeightMeasurement measurement) {
     service.removeWeightMeasurement(measurement);
-    Get.find<Coordinator>().maybeUnlockAchievements(AchievementTrigger.weight);
   }
 
   WeightMeasurement? getWeightMeasurementByID(String measurementID) {

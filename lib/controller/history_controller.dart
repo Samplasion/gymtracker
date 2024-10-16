@@ -2,8 +2,10 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:get/get.dart';
+import 'package:gymtracker/controller/coordinator.dart';
 import 'package:gymtracker/controller/serviceable_controller.dart';
 import 'package:gymtracker/icons/gymtracker_icons.dart';
+import 'package:gymtracker/model/achievements.dart';
 import 'package:gymtracker/model/exercisable.dart';
 import 'package:gymtracker/model/exercise.dart';
 import 'package:gymtracker/model/set.dart';
@@ -18,6 +20,7 @@ import 'package:gymtracker/view/exercises.dart';
 import 'package:gymtracker/view/workout_editor.dart';
 
 class HistoryController extends GetxController with ServiceableController {
+  /// History, sorted from oldest to newest
   RxList<Workout> history = <Workout>[].obs;
 
   int get userVisibleLength => userVisibleWorkouts.length;
@@ -29,6 +32,7 @@ class HistoryController extends GetxController with ServiceableController {
 
   Rx<Streaks> streaks = Streaks.zero.obs;
 
+  bool _init = false;
   @override
   onInit() {
     super.onInit();
@@ -41,6 +45,13 @@ class HistoryController extends GetxController with ServiceableController {
       _computeWorkoutsByDay();
       computeStreaks();
       coordinator.computeSuggestions();
+
+      if (_init) {
+        Get.find<Coordinator>()
+            .maybeUnlockAchievements(AchievementTrigger.workout);
+      }
+
+      _init = true;
     });
   }
 

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:gymtracker/gen/assets.gen.dart';
 import 'package:gymtracker/model/achievements.dart';
 import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/utils/extensions.dart';
@@ -24,7 +26,7 @@ class AchievementListTile extends StatelessWidget {
   }
 }
 
-class AchievementIcon extends StatelessWidget {
+class AchievementIcon extends StatefulWidget {
   final Achievement achievement;
   final Color? color;
   final double size;
@@ -39,18 +41,45 @@ class AchievementIcon extends StatelessWidget {
   });
 
   @override
+  State<AchievementIcon> createState() => _AchievementIconState();
+}
+
+class _AchievementIconState extends State<AchievementIcon> {
+  late Future<String> _icon;
+
+  @override
+  void initState() {
+    super.initState();
+    _icon = rootBundle
+        .loadString("assets/svg/trophies/${widget.achievement.iconKey}.svg")
+        .catchError((e) {
+      return rootBundle.loadString(GTAssets.svg.trophies.generic);
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final key = "assets/svg/trophies/${achievement.iconKey}.svg";
-    return SvgPicture.asset(
-      key,
-      width: size,
-      height: size,
-      theme: SvgTheme(
-        currentColor: enabled
-            ? (color ?? context.harmonizeColor(Colors.amber))
-            : Theme.of(context).colorScheme.outline,
-      ),
-    );
+    return FutureBuilder<String>(
+        future: _icon,
+        builder: (context, snapshot) {
+          if (!snapshot.hasData) {
+            return SizedBox.square(
+              dimension: widget.size,
+              child: const CircularProgressIndicator(),
+            );
+          }
+          return SvgPicture.string(
+            snapshot.data!,
+            width: widget.size,
+            height: widget.size,
+            theme: SvgTheme(
+              currentColor: widget.enabled
+                  ? (widget.color ??
+                      context.harmonizeColor(widget.achievement.color))
+                  : Theme.of(context).colorScheme.outline,
+            ),
+          );
+        });
   }
 }
 

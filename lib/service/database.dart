@@ -102,6 +102,7 @@ class DatabaseService extends GetxService with ChangeNotifier {
     Function()? onDone,
   }) async {
     final initialized = [
+      "achievements",
       "exercises",
       "routines",
       "history",
@@ -113,7 +114,6 @@ class DatabaseService extends GetxService with ChangeNotifier {
       "customBarcodeFoods",
       "favoriteFoods",
       "nutritionCategories",
-      "achievements",
     ].map((element) => false).toList();
     check() {
       if (initialized.every((element) => element)) {
@@ -126,10 +126,16 @@ class DatabaseService extends GetxService with ChangeNotifier {
       _backups$.add(b);
     });
 
+    db.watchAchievementCompletions().listen((event) {
+      completions$.add(event);
+      onServiceChange("nutrition categories")();
+      initialized[0] = true;
+      check();
+    });
     _db.getAllCustomExercises().listen((event) {
       exercises$.add(event);
       onServiceChange("exercises")();
-      initialized[0] = true;
+      initialized[1] = true;
       check();
     }, onError: (e, s) {
       logger.e("Error loading exercises", error: e, stackTrace: s);
@@ -137,20 +143,20 @@ class DatabaseService extends GetxService with ChangeNotifier {
     _db.getAllRoutines().listen((event) {
       routines$.add(event);
       onServiceChange("routines")();
-      initialized[1] = true;
+      initialized[2] = true;
       check();
     });
     _db.getAllHistoryWorkouts().listen((event) {
       history$.add(event);
       onServiceChange("history")();
-      initialized[2] = true;
+      initialized[3] = true;
       check();
     });
     _db.watchPreferences().listen((prefs) {
       prefs$.add(prefs);
       notifyListeners();
       onServiceChange("preferences")();
-      initialized[3] = true;
+      initialized[4] = true;
       check();
       prefs.logger.i("Changed.");
     });
@@ -161,19 +167,19 @@ class DatabaseService extends GetxService with ChangeNotifier {
     _db.watchWeightMeasurements().listen((event) {
       weightMeasurements$.add(event);
       onServiceChange("weight measurements")();
-      initialized[4] = true;
+      initialized[5] = true;
       check();
     });
     _db.watchRoutineFolders().listen((event) {
       folders$.add(event);
       onServiceChange("folders")();
-      initialized[5] = true;
+      initialized[6] = true;
       check();
     });
     _db.watchFoods().listen((event) {
       foods$.add(event);
       onServiceChange("foods")();
-      initialized[6] = true;
+      initialized[7] = true;
       check();
     });
     _db
@@ -182,19 +188,19 @@ class DatabaseService extends GetxService with ChangeNotifier {
         .listen((event) {
       nutritionGoals$.add(event);
       onServiceChange("nutrition goals")();
-      initialized[7] = true;
+      initialized[8] = true;
       check();
     });
     _db.watchCustomBarcodeFoods().listen((event) {
       customBarcodeFoods$.add(event);
       onServiceChange("custom barcode foods")();
-      initialized[8] = true;
+      initialized[9] = true;
       check();
     });
     _db.watchFavoriteFoods().listen((event) {
       favoriteFoods$.add(event);
       onServiceChange("favorite foods")();
-      initialized[9] = true;
+      initialized[10] = true;
       check();
     });
     _db
@@ -202,12 +208,6 @@ class DatabaseService extends GetxService with ChangeNotifier {
         .map((event) => DateSequence.fromDatesAndValues(event).normalize())
         .listen((event) {
       nutritionCategories$.add(event);
-      onServiceChange("nutrition categories")();
-      initialized[10] = true;
-      check();
-    });
-    db.watchAchievementCompletions().listen((event) {
-      completions$.add(event);
       onServiceChange("nutrition categories")();
       initialized[11] = true;
       check();

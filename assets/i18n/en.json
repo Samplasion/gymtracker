@@ -2047,8 +2047,8 @@
       "title": "First steps",
       "description": {
         "1": "Complete your first workout",
-        "2": "Log your first meal",
-        "3": "Log your first weight"
+        "2": "Log your first weight",
+        "3": "Log your first meal"
       }
     },
     "foodWatcher": {
@@ -2057,6 +2057,30 @@
         "1": "Log your meals two days in a row",
         "2": "Log your meals a week in a row",
         "3": "Log your meals a month in a row"
+      }
+    },
+    "marathoner": {
+      "title": "Marathoner",
+      "description": {
+        "1": "Run a 5km",
+        "2": "Run a half marathon",
+        "3": "Run a full marathon"
+      }
+    },
+    "earlyBird": {
+      "title": "Early Bird",
+      "description": "Start a workout before 8am"
+    },
+    "nightOwl": {
+      "title": "Night Owl",
+      "description": "Start a workout after 8pm"
+    },
+    "realGymBro": {
+      "title": "Real Gym Bro",
+      "description": {
+        "1": "Log a total of 100 hours worth of workouts",
+        "2": "Log a total of 500 hours worth of workouts",
+        "3": "Log a total of 1000 hours worth of workouts"
       }
     }
   }

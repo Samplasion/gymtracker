@@ -454,10 +454,6 @@ class _HomeFoodCategoryList extends ControlledWidget<FoodController> {
           stream: controller.day$,
           builder: (context, snapshot) {
             final foodCategories = controller.getCategories().values.toList();
-            print((
-              controller.day$.value,
-              foodCategories.map((c) => c.name).toList()
-            ));
             return SliverList.builder(
               itemCount: foodCategories.length,
               itemBuilder: (context, index) {

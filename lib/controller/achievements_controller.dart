@@ -22,8 +22,6 @@ class AchievementsController extends GetxController with ServiceableController {
           ? achievement.levels.first
           : achievement.nextLevel(completion);
 
-      logger.d(nextLevel);
-
       if (nextLevel == null) {
         continue;
       }

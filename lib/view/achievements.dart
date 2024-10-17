@@ -48,14 +48,10 @@ class _AchievementsViewState
                         achievement: achievements[key]!,
                         level: level,
                         onTap: (achievement, level) {
-                          if (controller.isUnlocked(achievement, level)) {
-                            Go.toDialog(() => AchievementGetDialog(
-                                  achievement: achievement,
-                                  level: level,
-                                ));
-                          } else {
-                            Go.snack("achievements.locked".t, assertive: true);
-                          }
+                          Go.toDialog(() => AchievementGetDialog(
+                                achievement: achievement,
+                                level: level,
+                              ));
                         },
                       ),
                   ],
@@ -145,7 +141,7 @@ class AchievementGetDialog extends ControlledWidget<AchievementsController> {
 
   @override
   Widget build(BuildContext context) {
-    final completion = controller.getCompletion(achievement, level)!;
+    final completion = controller.getCompletion(achievement, level);
     return AlertDialog(
       content: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -155,7 +151,7 @@ class AchievementGetDialog extends ControlledWidget<AchievementsController> {
             const SizedBox(height: 32),
             AchievementIcon(
               achievement: achievement,
-              enabled: true,
+              enabled: completion != null,
               size: min(context.width, 96),
             ),
             const SizedBox(height: 16),
@@ -172,11 +168,13 @@ class AchievementGetDialog extends ControlledWidget<AchievementsController> {
             ),
             const SizedBox(height: 16),
             Text(
-              "achievements.unlockedOn".tParams({
-                "date": DateFormat.yMMMMEEEEd(context.locale.languageCode)
-                    .add_Hms()
-                    .format(completion.completedAt),
-              }),
+              completion == null
+                  ? "achievements.locked".t
+                  : "achievements.unlockedOn".tParams({
+                      "date": DateFormat.yMMMMEEEEd(context.locale.languageCode)
+                          .add_Hms()
+                          .format(completion.completedAt),
+                    }),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 16),

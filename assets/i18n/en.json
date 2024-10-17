@@ -2062,9 +2062,9 @@
     "marathoner": {
       "title": "Marathoner",
       "description": {
-        "1": "Run a 5km",
-        "2": "Run a half marathon",
-        "3": "Run a full marathon"
+        "1": "Run or bike a 5km",
+        "2": "Run or bike a half marathon",
+        "3": "Run or bike a full marathon"
       }
     },
     "earlyBird": {
@@ -2081,6 +2081,37 @@
         "1": "Log a total of 100 hours worth of workouts",
         "2": "Log a total of 500 hours worth of workouts",
         "3": "Log a total of 1000 hours worth of workouts"
+      }
+    },
+    "workoutFreak": {
+      "title": "Workout Freak",
+      "description": {
+        "1": "Log a workout every day of the month",
+        "2": "Log a workout every day of the year"
+      }
+    },
+    "trailblazer": {
+      "title": "Trailblazer",
+      "description": {
+        "1": "Run or bike a total of 100km",
+        "2": "Run or bike a total of 500km",
+        "3": "Run or bike a total of 1000km"
+      }
+    },
+    "cycleChampion": {
+      "title": "Cycle Champion",
+      "description": {
+        "1": "Cycle a total of 100km",
+        "2": "Cycle a total of 500km",
+        "3": "Cycle a total of 1000km"
+      }
+    },
+    "professionalWeightlifter": {
+      "title": "Professional Weightlifter",
+      "description": {
+        "1": "Lift your body weight in a single set",
+        "2": "Lift 1.5x your body weight in a single set",
+        "3": "Lift 3x your body weight in a single set"
       }
     }
   }

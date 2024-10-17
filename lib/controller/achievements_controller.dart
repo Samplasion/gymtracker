@@ -16,8 +16,7 @@ class AchievementsController extends GetxController with ServiceableController {
     final unlocked = <Achievement, AchievementCompletion>{};
 
     for (final MapEntry(key: id, value: achievement) in achievements.entries) {
-      final completion =
-          _getHighestLevelCompletionFor(achievement: achievement);
+      final completion = _getHighestLevelCompletionFor(achievement.id);
       final nextLevel = completion == null
           ? achievement.levels.first
           : achievement.nextLevel(completion);
@@ -67,10 +66,9 @@ class AchievementsController extends GetxController with ServiceableController {
     }
   }
 
-  AchievementCompletion? _getHighestLevelCompletionFor(
-      {required Achievement achievement}) {
+  AchievementCompletion? _getHighestLevelCompletionFor(String achievementID) {
     final completions = _completions$.value
-        .where((completion) => completion.achievementID == achievement.id)
+        .where((completion) => completion.achievementID == achievementID)
         .toList();
     if (completions.isEmpty) return null;
     completions.sort((a, b) => a.level.compareTo(b.level));
@@ -79,13 +77,27 @@ class AchievementsController extends GetxController with ServiceableController {
 
   AchievementCompletion? getCompletion(
           Achievement achievement, AchievementLevel level) =>
-      _completions$.value.firstWhereOrNull((completion) =>
-          completion.achievementID == achievement.id &&
-          completion.level == level.level);
+      _getCompletionInternal(achievement.id, level.level);
 
   bool isUnlocked(Achievement achievement, AchievementLevel level) =>
       getCompletion(achievement, level) != null;
 
+  AchievementCompletion? _getCompletionInternal(
+          String achievementID, int level) =>
+      _completions$.value.firstWhereOrNull((completion) =>
+          completion.achievementID == achievementID &&
+          completion.level == level);
+
   @override
   void onServiceChange() {}
+}
+
+extension AchievementLevelDescription on Achievement {
+  bool shouldShowDescriptionFor(int level) {
+    if (level == 1) return true;
+
+    final controller = Get.find<AchievementsController>();
+    final completion = controller._getHighestLevelCompletionFor(id);
+    return completion != null && completion.level + 1 >= level;
+  }
 }

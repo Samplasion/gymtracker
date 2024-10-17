@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:gymtracker/gen/assets.gen.dart';
+import 'package:gymtracker/icons/gymtracker_icons.dart';
 import 'package:gymtracker/model/achievements.dart';
 import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/utils/extensions.dart';
@@ -68,16 +69,42 @@ class _AchievementIconState extends State<AchievementIcon> {
               child: const CircularProgressIndicator(),
             );
           }
-          return SvgPicture.string(
+          var svgPicture = SvgPicture.string(
             snapshot.data!,
             width: widget.size,
             height: widget.size,
             theme: SvgTheme(
-              currentColor: widget.enabled
-                  ? (widget.color ??
-                      context.harmonizeColor(widget.achievement.color))
-                  : Theme.of(context).colorScheme.outline,
+              currentColor: (widget.color ??
+                  context.harmonizeColor(widget.achievement.color)),
             ),
+          );
+          if (widget.enabled) return svgPicture;
+          return Stack(
+            children: [
+              ShaderMask(
+                shaderCallback: (bounds) => LinearGradient(
+                  colors: [
+                    Colors.transparent,
+                    Theme.of(context).colorScheme.outline,
+                  ],
+                  begin: Alignment.center,
+                  end: Alignment.center,
+                ).createShader(bounds),
+                blendMode: BlendMode.srcIn,
+                child: svgPicture,
+              ),
+              Positioned.fill(
+                child: Center(
+                  child: Padding(
+                    padding: EdgeInsets.only(bottom: widget.size / 4),
+                    child: Icon(
+                      GTIcons.achievement_locked,
+                      color: Theme.of(context).colorScheme.onSurface,
+                    ),
+                  ),
+                ),
+              ),
+            ],
           );
         });
   }

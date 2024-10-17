@@ -1,12 +1,20 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:gymtracker/controller/food_controller.dart';
 import 'package:gymtracker/controller/history_controller.dart';
+import 'package:gymtracker/controller/me_controller.dart';
 import 'package:gymtracker/data/distance.dart';
+import 'package:gymtracker/data/weights.dart';
+import 'package:gymtracker/gen/exercises.gen.dart';
 import 'package:gymtracker/model/achievements.dart';
+import 'package:gymtracker/model/exercise.dart';
+import 'package:gymtracker/model/workout.dart';
+import 'package:gymtracker/service/logger.dart';
 import 'package:gymtracker/utils/extensions.dart';
 import 'package:scrollable_clean_calendar/utils/extensions.dart';
 
+// TODO: Change to final field once I'm done adding the bulk of achievements
 Map<String, Achievement> get achievements => {
       "firstSteps": Achievement(
         id: "firstSteps",
@@ -43,7 +51,7 @@ Map<String, Achievement> get achievements => {
         id: "foodWatcher",
         nameKey: "achievements.foodWatcher.title",
         iconKey: "foodWatcher",
-        color: Colors.deepOrange,
+        color: Colors.orange,
         levels: [
           AchievementLevel(
             level: 1,
@@ -268,4 +276,322 @@ Map<String, Achievement> get achievements => {
           ),
         ],
       ),
+      // 1. Log a workout every day of a month
+      // 2. Log a workout every day of a year
+      "workoutFreak": Achievement(
+        id: "workoutFreak",
+        nameKey: "achievements.workoutFreak.title",
+        iconKey: "workoutFreak",
+        color: Colors.green,
+        levels: [
+          AchievementLevel(
+            level: 1,
+            nameKey: "achievements.workoutFreak.title",
+            descriptionKey: "achievements.workoutFreak.description.1",
+            trigger: AchievementTrigger.workout,
+            checkCompletion: () {
+              final today = DateTime.now().startOfDay;
+              if (today.month != today.add(const Duration(days: 1)).month) {
+                return false;
+              }
+              final monthStart = today.subtract(
+                Duration(days: today.day - 1),
+              );
+
+              final historyController = Get.find<HistoryController>();
+
+              final thisMonthWorkouts = historyController.history
+                  .where((element) =>
+                      element.startingDate!
+                          .isAfterOrAtSameMomentAs(monthStart) &&
+                      element.startingDate!
+                          .isBefore(today.add(const Duration(days: 1))))
+                  .toList();
+
+              for (var i = 0; i < today.day; i++) {
+                final day = monthStart.add(Duration(days: i));
+                if (kDebugMode) {
+                  globalLogger.d(
+                      "(achievements.workoutFreak.1) Checking for $day: ${thisMonthWorkouts.where((element) => element.startingDate!.isSameDay(day)).length} workout");
+                }
+                if (!thisMonthWorkouts
+                    .any((element) => element.startingDate!.isSameDay(day))) {
+                  return false;
+                }
+              }
+
+              return true;
+            },
+          ),
+          AchievementLevel(
+            level: 2,
+            nameKey: "achievements.workoutFreak.title",
+            descriptionKey: "achievements.workoutFreak.description.2",
+            trigger: AchievementTrigger.workout,
+            checkCompletion: () {
+              final today = DateTime.now().startOfDay;
+              if (today.year != today.add(const Duration(days: 1)).year) {
+                return false;
+              }
+              final yearStart = DateTime(today.year, 1, 1);
+
+              final historyController = Get.find<HistoryController>();
+
+              final thisYearWorkouts = historyController.history
+                  .where((element) =>
+                      element.startingDate!
+                          .isAfterOrAtSameMomentAs(yearStart) &&
+                      element.startingDate!
+                          .isBefore(today.add(const Duration(days: 1))))
+                  .toList();
+
+              final diff = today.difference(yearStart).inDays;
+              for (var i = 0; i < diff; i++) {
+                final day = yearStart.add(Duration(days: i));
+                if (kDebugMode) {
+                  globalLogger.d(
+                      "(achievements.workoutFreak.2) Checking for $day: ${thisYearWorkouts.where((element) => element.startingDate!.isSameDay(day)).length} workout");
+                }
+                if (!thisYearWorkouts
+                    .any((element) => element.startingDate!.isSameDay(day))) {
+                  return false;
+                }
+              }
+
+              return true;
+            },
+          ),
+        ],
+      ),
+      // Trailblazer:
+      // 1. Run or bike a total of 100km
+      // 2. Run or bike a total of 500km
+      // 3. Run or bike a total of 1000km
+      "trailblazer": Achievement(
+        id: "trailblazer",
+        nameKey: "achievements.trailblazer.title",
+        iconKey: "trailblazer",
+        color: Colors.brown,
+        levels: [
+          AchievementLevel(
+            level: 1,
+            nameKey: "achievements.trailblazer.title",
+            descriptionKey: "achievements.trailblazer.description.1",
+            trigger: AchievementTrigger.workout,
+            checkCompletion: () {
+              final workouts = Get.find<HistoryController>().history;
+              final sumOfDistances = workouts
+                  .map((e) => Distance.convert(
+                        value: e.distanceRun,
+                        from: e.distanceUnit,
+                        to: Distance.km,
+                      ))
+                  .reduce((value, element) => value + element);
+
+              return sumOfDistances >= 100;
+            },
+          ),
+          AchievementLevel(
+            level: 2,
+            nameKey: "achievements.trailblazer.title",
+            descriptionKey: "achievements.trailblazer.description.2",
+            trigger: AchievementTrigger.workout,
+            checkCompletion: () {
+              final workouts = Get.find<HistoryController>().history;
+              final sumOfDistances = workouts
+                  .map((e) => Distance.convert(
+                        value: e.distanceRun,
+                        from: e.distanceUnit,
+                        to: Distance.km,
+                      ))
+                  .reduce((value, element) => value + element);
+
+              return sumOfDistances >= 500;
+            },
+          ),
+          AchievementLevel(
+            level: 3,
+            nameKey: "achievements.trailblazer.title",
+            descriptionKey: "achievements.trailblazer.description.3",
+            trigger: AchievementTrigger.workout,
+            checkCompletion: () {
+              final workouts = Get.find<HistoryController>().history;
+              final sumOfDistances = workouts
+                  .map((e) => Distance.convert(
+                        value: e.distanceRun,
+                        from: e.distanceUnit,
+                        to: Distance.km,
+                      ))
+                  .reduce((value, element) => value + element);
+
+              return sumOfDistances >= 1000;
+            },
+          ),
+        ],
+      ),
+      // Cycle Champion
+      // 1. Cycle a total of 100km
+      // 2. Cycle a total of 500km
+      // 3. Cycle a total of 1000km
+      "cycleChampion": Achievement(
+        id: "cycleChampion",
+        nameKey: "achievements.cycleChampion.title",
+        iconKey: "cycleChampion",
+        color: Colors.blue,
+        levels: [
+          AchievementLevel(
+            level: 1,
+            nameKey: "achievements.cycleChampion.title",
+            descriptionKey: "achievements.cycleChampion.description.1",
+            trigger: AchievementTrigger.workout,
+            checkCompletion: () {
+              final workouts = Get.find<HistoryController>().history;
+              final sumOfDistances = workouts
+                  .map((e) => _distanceByFiltering(e, filter: (e) {
+                        return e.isStandardLibraryExercise &&
+                            [
+                              GTStandardLibrary.cardio.biking,
+                              GTStandardLibrary.cardio.ergometer,
+                              GTStandardLibrary.cardio.ergometerHorizontal,
+                            ].contains(e.parentID);
+                      }))
+                  .reduce((value, element) => value + element);
+
+              return sumOfDistances >= 100;
+            },
+          ),
+          AchievementLevel(
+            level: 2,
+            nameKey: "achievements.cycleChampion.title",
+            descriptionKey: "achievements.cycleChampion.description.2",
+            trigger: AchievementTrigger.workout,
+            checkCompletion: () {
+              final workouts = Get.find<HistoryController>().history;
+              final sumOfDistances = workouts
+                  .map((e) => _distanceByFiltering(e,
+                      filter: (e) =>
+                          e.isStandardLibraryExercise &&
+                          [
+                            GTStandardLibrary.cardio.biking,
+                            GTStandardLibrary.cardio.ergometer,
+                            GTStandardLibrary.cardio.ergometerHorizontal,
+                          ].contains(e.parentID)))
+                  .reduce((value, element) => value + element);
+
+              return sumOfDistances >= 500;
+            },
+          ),
+          AchievementLevel(
+            level: 3,
+            nameKey: "achievements.cycleChampion.title",
+            descriptionKey: "achievements.cycleChampion.description.3",
+            trigger: AchievementTrigger.workout,
+            checkCompletion: () {
+              final workouts = Get.find<HistoryController>().history;
+              final sumOfDistances = workouts
+                  .map((e) => _distanceByFiltering(e,
+                      filter: (e) =>
+                          e.isStandardLibraryExercise &&
+                          [
+                            GTStandardLibrary.cardio.biking,
+                            GTStandardLibrary.cardio.ergometer,
+                            GTStandardLibrary.cardio.ergometerHorizontal,
+                          ].contains(e.parentID)))
+                  .reduce((value, element) => value + element);
+
+              return sumOfDistances >= 1000;
+            },
+          ),
+        ],
+      ),
+      // Professional Weightlifter
+      // 1. Lift 1x your body weight in a single set
+      // 2. Lift 1.5x your body weight in a single set
+      // 3. Lift 3x your body weight in a single set
+      "professionalWeightlifter": Achievement(
+        id: "professionalWeightlifter",
+        nameKey: "achievements.professionalWeightlifter.title",
+        iconKey: "professionalWeightlifter",
+        color: Colors.blueGrey,
+        levels: [
+          AchievementLevel(
+            level: 1,
+            nameKey: "achievements.professionalWeightlifter.title",
+            descriptionKey:
+                "achievements.professionalWeightlifter.description.1",
+            trigger: AchievementTrigger.workout,
+            checkCompletion: () {
+              return _professionalWeightlifter(1);
+            },
+          ),
+          AchievementLevel(
+            level: 2,
+            nameKey: "achievements.professionalWeightlifter.title",
+            descriptionKey:
+                "achievements.professionalWeightlifter.description.2",
+            trigger: AchievementTrigger.workout,
+            checkCompletion: () {
+              return _professionalWeightlifter(1.5);
+            },
+          ),
+          AchievementLevel(
+            level: 3,
+            nameKey: "achievements.professionalWeightlifter.title",
+            descriptionKey:
+                "achievements.professionalWeightlifter.description.3",
+            trigger: AchievementTrigger.workout,
+            checkCompletion: () {
+              return _professionalWeightlifter(3);
+            },
+          ),
+        ],
+      ),
     };
+
+bool _professionalWeightlifter(double coefficient) {
+  final weight = Get.find<MeController>().latestWeightMeasurement;
+  if (weight == null) return false;
+
+  final latestWorkout = Get.find<HistoryController>().history.last;
+  final exercises = latestWorkout.flattenedExercises.whereType<Exercise>();
+
+  for (final ex in exercises) {
+    for (final set in ex.doneSets) {
+      if (set.weight != null &&
+          Weights.convert(
+                  value: set.weight!,
+                  from: latestWorkout.weightUnit,
+                  to: Weights.kg) >=
+              Weights.convert(
+                      value: weight.weight,
+                      from: weight.weightUnit,
+                      to: Weights.kg) *
+                  coefficient) return true;
+    }
+  }
+
+  return false;
+}
+
+bool _defaultFilter(Exercise _) => true;
+double _distanceByFiltering(
+  Workout workout, {
+  bool Function(Exercise) filter = _defaultFilter,
+}) {
+  var filteredExercises =
+      workout.flattenedExercises.whereType<Exercise>().where(filter).map((e) {
+    final sets = e.sets
+        .where((element) => element.done || !workout.isConcrete)
+        .map((e) => e.distance ?? 0);
+    return sets.isEmpty
+        ? 0.0
+        : sets.reduce((value, element) => value + element);
+  });
+  return Distance.convert(
+    value: filteredExercises.isEmpty
+        ? 0
+        : filteredExercises.reduce((value, element) => value + element),
+    from: workout.distanceUnit,
+    to: Distance.km,
+  );
+}

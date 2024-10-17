@@ -114,7 +114,9 @@ class AchievementGridTile extends ControlledWidget<AchievementsController> {
                     overflow: TextOverflow.ellipsis,
                   ),
                   Text(
-                    level.descriptionKey.t,
+                    achievement.shouldShowDescriptionFor(level.level)
+                        ? level.descriptionKey.t
+                        : "???",
                     textAlign: TextAlign.center,
                     style: context.theme.textTheme.bodySmall,
                     maxLines: 2,
@@ -163,7 +165,9 @@ class AchievementGetDialog extends ControlledWidget<AchievementsController> {
               style: context.theme.textTheme.bodyLarge,
             ),
             Text(
-              level.descriptionKey.t,
+              achievement.shouldShowDescriptionFor(level.level)
+                  ? level.descriptionKey.t
+                  : "???",
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 16),

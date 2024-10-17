@@ -2061,9 +2061,9 @@
     "marathoner": {
       "title": "Maratoneta",
       "description": {
-        "1": "Corri una 5km",
-        "2": "Corri una mezza maratona",
-        "3": "Corri un'intera maratona"
+        "1": "Percorri una 5km",
+        "2": "Percorri una mezza maratona",
+        "3": "Percorri un'intera maratona"
       }
     },
     "earlyBird": {
@@ -2080,6 +2080,37 @@
         "1": "Traccia un totale di 100 ore di allenamenti",
         "2": "Traccia un totale di 500 ore di allenamenti",
         "3": "Traccia un totale di 1000 ore di allenamenti"
+      }
+    },
+    "workoutFreak": {
+      "title": "Maniaco dell'allenamento",
+      "description": {
+        "1": "Traccia un allenamento al giorno per tutto un mese",
+        "2": "Traccia un allenamento al giorno per tutto un anno"
+      }
+    },
+    "trailblazer": {
+      "title": "Pioniere",
+      "description": {
+        "1": "Percorri un totale di 100km",
+        "2": "Percorri un totale di 500km",
+        "3": "Percorri un totale di 1000km"
+      }
+    },
+    "cycleChampion": {
+      "title": "Ciclista campione",
+      "description": {
+        "1": "Pedala per un totale di 100km",
+        "2": "Pedala per un totale di 500km",
+        "3": "Pedala per un totale di 1000km"
+      }
+    },
+    "professionalWeightlifter": {
+      "title": "Sollevatore di coriandoli",
+      "description": {
+        "1": "Solleva il tuo peso corporeo in una serie",
+        "2": "Solleva 1.5x volte il tuo peso corporeo in una serie",
+        "3": "Solleva 3x volte il tuo peso corporeo in una serie"
       }
     }
   }

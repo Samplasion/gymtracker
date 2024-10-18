@@ -29,21 +29,24 @@ Map<String, Achievement> get achievements => {
             nameKey: "achievements.firstSteps.title",
             descriptionKey: "achievements.firstSteps.description.1",
             trigger: AchievementTrigger.workout,
-            checkCompletion: (progress) => true,
+            checkCompletion: (progress) =>
+                Get.find<HistoryController>().history.isNotEmpty,
           ),
           AchievementLevel(
             level: 2,
             nameKey: "achievements.firstSteps.title",
             descriptionKey: "achievements.firstSteps.description.2",
             trigger: AchievementTrigger.weight,
-            checkCompletion: (progress) => true,
+            checkCompletion: (progress) =>
+                Get.find<MeController>().weightMeasurements.isNotEmpty,
           ),
           AchievementLevel(
             level: 3,
             nameKey: "achievements.firstSteps.title",
             descriptionKey: "achievements.firstSteps.description.3",
             trigger: AchievementTrigger.food,
-            checkCompletion: (progress) => true,
+            checkCompletion: (progress) =>
+                Get.find<FoodController>().foods$.value.isNotEmpty,
           ),
         ],
       ),

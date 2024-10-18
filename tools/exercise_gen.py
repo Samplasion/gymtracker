@@ -1,10 +1,14 @@
 #! /usr/bin/env python3
 
 import sys
+import json
 import os
 import re
 
 cwd = os.getcwd()
+
+with open(f'{cwd}/assets/i18n/en.json', 'r') as f:
+  localizedNames = json.load(f)
 
 def generate_exercises():
   categories = {}
@@ -34,9 +38,10 @@ def main():
     
     classNames.append((category, f"$GTStandardLibrary{category.capitalize()}Exercises"))
 
-    for exercise in categories[category]:
+    for exercise in sorted(categories[category], key=lambda x: x.lower()):
+      localizedName = localizedNames['library'][category]['exercises'][exercise]
       klass += f"""
-      /// {exercise}
+      /// {localizedName}
       String get {exercise} => 'library.{category}.exercises.{exercise}';
       """
     
@@ -62,6 +67,11 @@ def main():
 
   with open(f'{cwd}/lib/gen/exercises.gen.dart', 'w') as f:
     f.write(file)
+  
+  # Format file using dart format
+  os.system("dart format lib/gen/exercises.gen.dart")
+
+  print("Exercises generated successfully!")
 
 if __name__ == "__main__":
   main()

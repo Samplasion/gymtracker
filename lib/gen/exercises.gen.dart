@@ -20,285 +20,285 @@ class GTStandardLibrary {
 class $GTStandardLibraryCardioExercises {
   const $GTStandardLibraryCardioExercises._();
 
-  /// pilates
-  String get pilates => 'library.cardio.exercises.pilates';
-
-  /// running
-  String get running => 'library.cardio.exercises.running';
-
-  /// rowingMachine
-  String get rowingMachine => 'library.cardio.exercises.rowingMachine';
-
-  /// treadmill
-  String get treadmill => 'library.cardio.exercises.treadmill';
-
-  /// aerobics
+  /// Aerobics
   String get aerobics => 'library.cardio.exercises.aerobics';
 
-  /// crunchesTimed
-  String get crunchesTimed => 'library.cardio.exercises.crunchesTimed';
-
-  /// biking
-  String get biking => 'library.cardio.exercises.biking';
-
-  /// ergometerHorizontal
-  String get ergometerHorizontal =>
-      'library.cardio.exercises.ergometerHorizontal';
-
-  /// zumba
-  String get zumba => 'library.cardio.exercises.zumba';
-
-  /// ergometer
-  String get ergometer => 'library.cardio.exercises.ergometer';
-
-  /// bicycleCrunchesCardio
+  /// Bicycle crunches (timed)
   String get bicycleCrunchesCardio =>
       'library.cardio.exercises.bicycleCrunchesCardio';
 
-  /// jumpRope
+  /// Biking
+  String get biking => 'library.cardio.exercises.biking';
+
+  /// Crunches (timed)
+  String get crunchesTimed => 'library.cardio.exercises.crunchesTimed';
+
+  /// Ergometer
+  String get ergometer => 'library.cardio.exercises.ergometer';
+
+  /// Ergometer (horizontal)
+  String get ergometerHorizontal =>
+      'library.cardio.exercises.ergometerHorizontal';
+
+  /// Jump Rope
   String get jumpRope => 'library.cardio.exercises.jumpRope';
+
+  /// Pilates
+  String get pilates => 'library.cardio.exercises.pilates';
+
+  /// Rowing machine
+  String get rowingMachine => 'library.cardio.exercises.rowingMachine';
+
+  /// Running
+  String get running => 'library.cardio.exercises.running';
+
+  /// Treadmill
+  String get treadmill => 'library.cardio.exercises.treadmill';
+
+  /// Zumba
+  String get zumba => 'library.cardio.exercises.zumba';
 }
 
 class $GTStandardLibraryChestExercises {
   const $GTStandardLibraryChestExercises._();
 
-  /// butterflyMachine
-  String get butterflyMachine => 'library.chest.exercises.butterflyMachine';
-
-  /// pushUps
-  String get pushUps => 'library.chest.exercises.pushUps';
-
-  /// barbellBenchPressFlat
-  String get barbellBenchPressFlat =>
-      'library.chest.exercises.barbellBenchPressFlat';
-
-  /// pushUpsWeighted
-  String get pushUpsWeighted => 'library.chest.exercises.pushUpsWeighted';
-
-  /// smithMachineBenchPressDecline
-  String get smithMachineBenchPressDecline =>
-      'library.chest.exercises.smithMachineBenchPressDecline';
-
-  /// dumbbellBenchPressFlat
-  String get dumbbellBenchPressFlat =>
-      'library.chest.exercises.dumbbellBenchPressFlat';
-
-  /// cableFlyCrossovers
-  String get cableFlyCrossovers => 'library.chest.exercises.cableFlyCrossovers';
-
-  /// dumbbellBenchPressIncline
-  String get dumbbellBenchPressIncline =>
-      'library.chest.exercises.dumbbellBenchPressIncline';
-
-  /// smithMachineBenchPressIncline
-  String get smithMachineBenchPressIncline =>
-      'library.chest.exercises.smithMachineBenchPressIncline';
-
-  /// dumbbellBenchPressDecline
-  String get dumbbellBenchPressDecline =>
-      'library.chest.exercises.dumbbellBenchPressDecline';
-
-  /// verticalChestPress
-  String get verticalChestPress => 'library.chest.exercises.verticalChestPress';
-
-  /// smithMachineBenchPressFlat
-  String get smithMachineBenchPressFlat =>
-      'library.chest.exercises.smithMachineBenchPressFlat';
-
-  /// barbellBenchPressIncline
-  String get barbellBenchPressIncline =>
-      'library.chest.exercises.barbellBenchPressIncline';
-
-  /// smithMachineHexPress
-  String get smithMachineHexPress =>
-      'library.chest.exercises.smithMachineHexPress';
-
-  /// seatedCableChestFlys
-  String get seatedCableChestFlys =>
-      'library.chest.exercises.seatedCableChestFlys';
-
-  /// cableChestPress
-  String get cableChestPress => 'library.chest.exercises.cableChestPress';
-
-  /// declinePushUps
-  String get declinePushUps => 'library.chest.exercises.declinePushUps';
-
-  /// inclinePushUps
-  String get inclinePushUps => 'library.chest.exercises.inclinePushUps';
-
-  /// barbellBenchPressDecline
+  /// Bench press (barbell, decline)
   String get barbellBenchPressDecline =>
       'library.chest.exercises.barbellBenchPressDecline';
 
-  /// lowCableFly
+  /// Bench press (barbell)
+  String get barbellBenchPressFlat =>
+      'library.chest.exercises.barbellBenchPressFlat';
+
+  /// Bench press (barbell, incline)
+  String get barbellBenchPressIncline =>
+      'library.chest.exercises.barbellBenchPressIncline';
+
+  /// Butterfly Machine
+  String get butterflyMachine => 'library.chest.exercises.butterflyMachine';
+
+  /// Cable chest press
+  String get cableChestPress => 'library.chest.exercises.cableChestPress';
+
+  /// Cable fly cross-overs
+  String get cableFlyCrossovers => 'library.chest.exercises.cableFlyCrossovers';
+
+  /// Decline push-ups
+  String get declinePushUps => 'library.chest.exercises.declinePushUps';
+
+  /// Bench press (dumbbell, decline)
+  String get dumbbellBenchPressDecline =>
+      'library.chest.exercises.dumbbellBenchPressDecline';
+
+  /// Bench press (dumbbell)
+  String get dumbbellBenchPressFlat =>
+      'library.chest.exercises.dumbbellBenchPressFlat';
+
+  /// Bench press (dumbbell, incline)
+  String get dumbbellBenchPressIncline =>
+      'library.chest.exercises.dumbbellBenchPressIncline';
+
+  /// Dumbbell Hex Press
+  String get dumbbellHexPress => 'library.chest.exercises.dumbbellHexPress';
+
+  /// Incline push-ups
+  String get inclinePushUps => 'library.chest.exercises.inclinePushUps';
+
+  /// Low cable fly
   String get lowCableFly => 'library.chest.exercises.lowCableFly';
 
-  /// dumbbellHexPress
-  String get dumbbellHexPress => 'library.chest.exercises.dumbbellHexPress';
+  /// Push-ups
+  String get pushUps => 'library.chest.exercises.pushUps';
+
+  /// Push-ups (weighted)
+  String get pushUpsWeighted => 'library.chest.exercises.pushUpsWeighted';
+
+  /// Seated cable chest flys
+  String get seatedCableChestFlys =>
+      'library.chest.exercises.seatedCableChestFlys';
+
+  /// Bench press (Smith machine, decline)
+  String get smithMachineBenchPressDecline =>
+      'library.chest.exercises.smithMachineBenchPressDecline';
+
+  /// Bench press (Smith machine)
+  String get smithMachineBenchPressFlat =>
+      'library.chest.exercises.smithMachineBenchPressFlat';
+
+  /// Bench press (Smith machine, incline)
+  String get smithMachineBenchPressIncline =>
+      'library.chest.exercises.smithMachineBenchPressIncline';
+
+  /// Smith Machine Hex Press
+  String get smithMachineHexPress =>
+      'library.chest.exercises.smithMachineHexPress';
+
+  /// Vertical chest press
+  String get verticalChestPress => 'library.chest.exercises.verticalChestPress';
 }
 
 class $GTStandardLibraryBicepsExercises {
   const $GTStandardLibraryBicepsExercises._();
 
-  /// spiderCurls
-  String get spiderCurls => 'library.biceps.exercises.spiderCurls';
-
-  /// bicepsCurlMachine
-  String get bicepsCurlMachine => 'library.biceps.exercises.bicepsCurlMachine';
-
-  /// hammerCurlDumbbell
-  String get hammerCurlDumbbell =>
-      'library.biceps.exercises.hammerCurlDumbbell';
-
-  /// scottCurl
-  String get scottCurl => 'library.biceps.exercises.scottCurl';
-
-  /// concentrationCurl
-  String get concentrationCurl => 'library.biceps.exercises.concentrationCurl';
-
-  /// barbellBicepsCurl
+  /// Bicep curl (barbell)
   String get barbellBicepsCurl => 'library.biceps.exercises.barbellBicepsCurl';
 
-  /// cableBicepsCurl
+  /// Bicep curl (machine)
+  String get bicepsCurlMachine => 'library.biceps.exercises.bicepsCurlMachine';
+
+  /// Bicep curl (cable)
   String get cableBicepsCurl => 'library.biceps.exercises.cableBicepsCurl';
 
-  /// dumbbellBicepsCurl
+  /// Chin Ups
+  String get chinUps => 'library.biceps.exercises.chinUps';
+
+  /// Concentration curls
+  String get concentrationCurl => 'library.biceps.exercises.concentrationCurl';
+
+  /// Dual-cable high curls
+  String get dualCableHighCurl => 'library.biceps.exercises.dualCableHighCurl';
+
+  /// Bicep curl (dumbbell)
   String get dumbbellBicepsCurl =>
       'library.biceps.exercises.dumbbellBicepsCurl';
 
-  /// chinUps
-  String get chinUps => 'library.biceps.exercises.chinUps';
+  /// Hammer curls (dumbbells)
+  String get hammerCurlDumbbell =>
+      'library.biceps.exercises.hammerCurlDumbbell';
 
-  /// dualCableHighCurl
-  String get dualCableHighCurl => 'library.biceps.exercises.dualCableHighCurl';
+  /// Scott curl
+  String get scottCurl => 'library.biceps.exercises.scottCurl';
 
-  /// singleArmCableHammerCurls
+  /// Hammer curls (cable, single arm)
   String get singleArmCableHammerCurls =>
       'library.biceps.exercises.singleArmCableHammerCurls';
+
+  /// Spider curls
+  String get spiderCurls => 'library.biceps.exercises.spiderCurls';
 }
 
 class $GTStandardLibraryAbsExercises {
   const $GTStandardLibraryAbsExercises._();
 
-  /// extendedReverseCrunchWithLegExtension
+  /// Bicycle crunches
+  String get bicycleCrunches => 'library.abs.exercises.bicycleCrunches';
+
+  /// Crunches
+  String get crunches => 'library.abs.exercises.crunches';
+
+  /// Crunch (machine)
+  String get crunchMachine => 'library.abs.exercises.crunchMachine';
+
+  /// Dead bug hold
+  String get deadBugHold => 'library.abs.exercises.deadBugHold';
+
+  /// Dead bug hold (timed)
+  String get deadBugHoldCardio => 'library.abs.exercises.deadBugHoldCardio';
+
+  /// Extended reverse crunch with leg extension
   String get extendedReverseCrunchWithLegExtension =>
       'library.abs.exercises.extendedReverseCrunchWithLegExtension';
 
-  /// heelsUpCrunch
-  String get heelsUpCrunch => 'library.abs.exercises.heelsUpCrunch';
-
-  /// deadBugHold
-  String get deadBugHold => 'library.abs.exercises.deadBugHold';
-
-  /// fullBodyCrunch
+  /// Full-body crunches
   String get fullBodyCrunch => 'library.abs.exercises.fullBodyCrunch';
 
-  /// hollowBodyHold
-  String get hollowBodyHold => 'library.abs.exercises.hollowBodyHold';
+  /// Heels-up crunches
+  String get heelsUpCrunch => 'library.abs.exercises.heelsUpCrunch';
 
-  /// plank
-  String get plank => 'library.abs.exercises.plank';
-
-  /// deadBugHoldCardio
-  String get deadBugHoldCardio => 'library.abs.exercises.deadBugHoldCardio';
-
-  /// heelTouches
+  /// Heel touches
   String get heelTouches => 'library.abs.exercises.heelTouches';
 
-  /// russianTwist
-  String get russianTwist => 'library.abs.exercises.russianTwist';
+  /// Hollow body hold
+  String get hollowBodyHold => 'library.abs.exercises.hollowBodyHold';
 
-  /// legRaise
-  String get legRaise => 'library.abs.exercises.legRaise';
-
-  /// obliqueCrunches
-  String get obliqueCrunches => 'library.abs.exercises.obliqueCrunches';
-
-  /// toeTouches
-  String get toeTouches => 'library.abs.exercises.toeTouches';
-
-  /// hollowBodyHoldBentKnees
+  /// Bent hollow hold
   String get hollowBodyHoldBentKnees =>
       'library.abs.exercises.hollowBodyHoldBentKnees';
 
-  /// bicycleCrunches
-  String get bicycleCrunches => 'library.abs.exercises.bicycleCrunches';
-
-  /// crunches
-  String get crunches => 'library.abs.exercises.crunches';
-
-  /// crunchMachine
-  String get crunchMachine => 'library.abs.exercises.crunchMachine';
-
-  /// kneeRaise
+  /// Knee raise
   String get kneeRaise => 'library.abs.exercises.kneeRaise';
+
+  /// Leg raise
+  String get legRaise => 'library.abs.exercises.legRaise';
+
+  /// Oblique crunches
+  String get obliqueCrunches => 'library.abs.exercises.obliqueCrunches';
+
+  /// Plank
+  String get plank => 'library.abs.exercises.plank';
+
+  /// Russian twist
+  String get russianTwist => 'library.abs.exercises.russianTwist';
+
+  /// Toe touches
+  String get toeTouches => 'library.abs.exercises.toeTouches';
 }
 
 class $GTStandardLibraryCalvesExercises {
   const $GTStandardLibraryCalvesExercises._();
 
-  /// calfRaiseSeated
-  String get calfRaiseSeated => 'library.calves.exercises.calfRaiseSeated';
-
-  /// calfRaiseStanding
-  String get calfRaiseStanding => 'library.calves.exercises.calfRaiseStanding';
-
-  /// calfPressLegPressMachine
+  /// Calf press (on Leg Press machine)
   String get calfPressLegPressMachine =>
       'library.calves.exercises.calfPressLegPressMachine';
+
+  /// Calf raise (seated)
+  String get calfRaiseSeated => 'library.calves.exercises.calfRaiseSeated';
+
+  /// Calf raise (standing)
+  String get calfRaiseStanding => 'library.calves.exercises.calfRaiseStanding';
 }
 
 class $GTStandardLibraryQuadricepsExercises {
   const $GTStandardLibraryQuadricepsExercises._();
 
-  /// smithMachineLunges
-  String get smithMachineLunges =>
-      'library.quadriceps.exercises.smithMachineLunges';
-
-  /// bodyweightSquats
+  /// Squats
   String get bodyweightSquats =>
       'library.quadriceps.exercises.bodyweightSquats';
 
-  /// legExtension
-  String get legExtension => 'library.quadriceps.exercises.legExtension';
-
-  /// bulgarianSplitSquats
+  /// Bulgarian split squats
   String get bulgarianSplitSquats =>
       'library.quadriceps.exercises.bulgarianSplitSquats';
 
-  /// frontSquats
+  /// Front squats
   String get frontSquats => 'library.quadriceps.exercises.frontSquats';
 
-  /// legPress
+  /// Hack squats
+  String get hackSquats => 'library.quadriceps.exercises.hackSquats';
+
+  /// Leg extension
+  String get legExtension => 'library.quadriceps.exercises.legExtension';
+
+  /// Leg press
   String get legPress => 'library.quadriceps.exercises.legPress';
 
-  /// legPress45deg
+  /// Leg press (45°)
   String get legPress45deg => 'library.quadriceps.exercises.legPress45deg';
 
-  /// lunges
+  /// Lunges
   String get lunges => 'library.quadriceps.exercises.lunges';
 
-  /// squatsBarbell
-  String get squatsBarbell => 'library.quadriceps.exercises.squatsBarbell';
+  /// Smith machine lunges
+  String get smithMachineLunges =>
+      'library.quadriceps.exercises.smithMachineLunges';
 
-  /// hackSquats
-  String get hackSquats => 'library.quadriceps.exercises.hackSquats';
+  /// Squats (barbell)
+  String get squatsBarbell => 'library.quadriceps.exercises.squatsBarbell';
 }
 
 class $GTStandardLibraryHamstringsExercises {
   const $GTStandardLibraryHamstringsExercises._();
 
-  /// legCurlProne
+  /// Leg curl (prone)
   String get legCurlProne => 'library.hamstrings.exercises.legCurlProne';
 
-  /// legCurlSeated
+  /// Leg curl (seated)
   String get legCurlSeated => 'library.hamstrings.exercises.legCurlSeated';
 
-  /// romanianDeadlift
+  /// Romanian deadlift
   String get romanianDeadlift =>
       'library.hamstrings.exercises.romanianDeadlift';
 
-  /// romanianDeadliftDumbbell
+  /// Romanian deadlift (dumbbells)
   String get romanianDeadliftDumbbell =>
       'library.hamstrings.exercises.romanianDeadliftDumbbell';
 }
@@ -306,84 +306,84 @@ class $GTStandardLibraryHamstringsExercises {
 class $GTStandardLibraryShouldersExercises {
   const $GTStandardLibraryShouldersExercises._();
 
-  /// shoulderPressMachine
-  String get shoulderPressMachine =>
-      'library.shoulders.exercises.shoulderPressMachine';
+  /// Arnold press
+  String get arnoldPress => 'library.shoulders.exercises.arnoldPress';
 
-  /// reverseFlysInclinedBench
-  String get reverseFlysInclinedBench =>
-      'library.shoulders.exercises.reverseFlysInclinedBench';
+  /// Bent-Over Lateral Raises
+  String get bentOverLateralRaises =>
+      'library.shoulders.exercises.bentOverLateralRaises';
 
-  /// frontDumbbellRaise
+  /// Front dumbbell raise
   String get frontDumbbellRaise =>
       'library.shoulders.exercises.frontDumbbellRaise';
 
-  /// shoulderPress
-  String get shoulderPress => 'library.shoulders.exercises.shoulderPress';
-
-  /// arnoldPress
-  String get arnoldPress => 'library.shoulders.exercises.arnoldPress';
-
-  /// pikePushUps
-  String get pikePushUps => 'library.shoulders.exercises.pikePushUps';
-
-  /// handstandPushUps
+  /// Handstand push-ups
   String get handstandPushUps => 'library.shoulders.exercises.handstandPushUps';
 
-  /// uprightRow
-  String get uprightRow => 'library.shoulders.exercises.uprightRow';
+  /// Lat raises (cable)
+  String get latRaisesCable => 'library.shoulders.exercises.latRaisesCable';
 
-  /// latRaisesInclinedBench
-  String get latRaisesInclinedBench =>
-      'library.shoulders.exercises.latRaisesInclinedBench';
-
-  /// latRaisesDualCable
+  /// Lat raises (cable, both arms)
   String get latRaisesDualCable =>
       'library.shoulders.exercises.latRaisesDualCable';
 
-  /// latRaisesCable
-  String get latRaisesCable => 'library.shoulders.exercises.latRaisesCable';
+  /// Lat raises (inclined bench)
+  String get latRaisesInclinedBench =>
+      'library.shoulders.exercises.latRaisesInclinedBench';
 
-  /// bentOverLateralRaises
-  String get bentOverLateralRaises =>
-      'library.shoulders.exercises.bentOverLateralRaises';
+  /// Pike push-ups
+  String get pikePushUps => 'library.shoulders.exercises.pikePushUps';
+
+  /// Reverse flys (inclined bench)
+  String get reverseFlysInclinedBench =>
+      'library.shoulders.exercises.reverseFlysInclinedBench';
+
+  /// Shoulder press
+  String get shoulderPress => 'library.shoulders.exercises.shoulderPress';
+
+  /// Shoulder press (machine)
+  String get shoulderPressMachine =>
+      'library.shoulders.exercises.shoulderPressMachine';
+
+  /// Upright row
+  String get uprightRow => 'library.shoulders.exercises.uprightRow';
 }
 
 class $GTStandardLibraryBackExercises {
   const $GTStandardLibraryBackExercises._();
 
-  /// hyperExtensions
-  String get hyperExtensions => 'library.back.exercises.hyperExtensions';
-
-  /// straightArmCablePushdown
-  String get straightArmCablePushdown =>
-      'library.back.exercises.straightArmCablePushdown';
-
-  /// pullUps
-  String get pullUps => 'library.back.exercises.pullUps';
-
-  /// barbellRow
+  /// Barbell row
   String get barbellRow => 'library.back.exercises.barbellRow';
 
-  /// underhandGripLatPulldowns
-  String get underhandGripLatPulldowns =>
-      'library.back.exercises.underhandGripLatPulldowns';
-
-  /// cableSeatedRowTriangleBar
+  /// Cable seated row (triangle bar)
   String get cableSeatedRowTriangleBar =>
       'library.back.exercises.cableSeatedRowTriangleBar';
 
-  /// triangleBarLatPulldowns
+  /// Deadlift
+  String get deadlift => 'library.back.exercises.deadlift';
+
+  /// Hyperextensions
+  String get hyperExtensions => 'library.back.exercises.hyperExtensions';
+
+  /// Lat pulldowns
+  String get latPulldowns => 'library.back.exercises.latPulldowns';
+
+  /// Pull-ups
+  String get pullUps => 'library.back.exercises.pullUps';
+
+  /// Straight-arm cable pushdowns
+  String get straightArmCablePushdown =>
+      'library.back.exercises.straightArmCablePushdown';
+
+  /// Lat pulldowns (triangle bar)
   String get triangleBarLatPulldowns =>
       'library.back.exercises.triangleBarLatPulldowns';
 
-  /// deadlift
-  String get deadlift => 'library.back.exercises.deadlift';
+  /// Lat pulldowns (underhand grip)
+  String get underhandGripLatPulldowns =>
+      'library.back.exercises.underhandGripLatPulldowns';
 
-  /// latPulldowns
-  String get latPulldowns => 'library.back.exercises.latPulldowns';
-
-  /// weightedHyperExtensions
+  /// Hyperextensions (weighted)
   String get weightedHyperExtensions =>
       'library.back.exercises.weightedHyperExtensions';
 }
@@ -391,91 +391,91 @@ class $GTStandardLibraryBackExercises {
 class $GTStandardLibraryTricepsExercises {
   const $GTStandardLibraryTricepsExercises._();
 
-  /// overheadRopeTricepExtension
+  /// Dips (bench)
+  String get benchDips => 'library.triceps.exercises.benchDips';
+
+  /// Diamond push-ups
+  String get diamondPushUps => 'library.triceps.exercises.diamondPushUps';
+
+  /// Dips
+  String get dips => 'library.triceps.exercises.dips';
+
+  /// Overhead rope tricep extension
   String get overheadRopeTricepExtension =>
       'library.triceps.exercises.overheadRopeTricepExtension';
 
-  /// diamondPushUps
-  String get diamondPushUps => 'library.triceps.exercises.diamondPushUps';
+  /// Skull Crushers
+  String get skullCrushers => 'library.triceps.exercises.skullCrushers';
 
-  /// tricepsRopePushdown
-  String get tricepsRopePushdown =>
-      'library.triceps.exercises.tricepsRopePushdown';
-
-  /// dips
-  String get dips => 'library.triceps.exercises.dips';
-
-  /// benchDips
-  String get benchDips => 'library.triceps.exercises.benchDips';
-
-  /// tricepsMachine
-  String get tricepsMachine => 'library.triceps.exercises.tricepsMachine';
-
-  /// tricepKickbacks
+  /// Tricep kickbacks
   String get tricepKickbacks => 'library.triceps.exercises.tricepKickbacks';
 
-  /// skullCrushers
-  String get skullCrushers => 'library.triceps.exercises.skullCrushers';
+  /// Triceps Machine
+  String get tricepsMachine => 'library.triceps.exercises.tricepsMachine';
+
+  /// Triceps rope pushdown
+  String get tricepsRopePushdown =>
+      'library.triceps.exercises.tricepsRopePushdown';
 }
 
 class $GTStandardLibraryHipsExercises {
   const $GTStandardLibraryHipsExercises._();
 
-  /// hipThrust
-  String get hipThrust => 'library.hips.exercises.hipThrust';
-
-  /// hipAbduction
-  String get hipAbduction => 'library.hips.exercises.hipAbduction';
-
-  /// gluteBridge
-  String get gluteBridge => 'library.hips.exercises.gluteBridge';
-
-  /// hipThrustBarbell
-  String get hipThrustBarbell => 'library.hips.exercises.hipThrustBarbell';
-
-  /// clamshells
+  /// Clamshells
   String get clamshells => 'library.hips.exercises.clamshells';
 
-  /// hipAdduction
+  /// Glute bridge
+  String get gluteBridge => 'library.hips.exercises.gluteBridge';
+
+  /// Hip abduction
+  String get hipAbduction => 'library.hips.exercises.hipAbduction';
+
+  /// Hip adduction
   String get hipAdduction => 'library.hips.exercises.hipAdduction';
+
+  /// Hip thrust
+  String get hipThrust => 'library.hips.exercises.hipThrust';
+
+  /// Hip thrust (barbell)
+  String get hipThrustBarbell => 'library.hips.exercises.hipThrustBarbell';
 }
 
 class $GTStandardLibraryForearmsExercises {
   const $GTStandardLibraryForearmsExercises._();
 
-  /// reverseWristCurlsBarbell
-  String get reverseWristCurlsBarbell =>
-      'library.forearms.exercises.reverseWristCurlsBarbell';
-
-  /// platePinch
-  String get platePinch => 'library.forearms.exercises.platePinch';
-
-  /// wristRoller
-  String get wristRoller => 'library.forearms.exercises.wristRoller';
-
-  /// reverseCurlsDumbbell
-  String get reverseCurlsDumbbell =>
-      'library.forearms.exercises.reverseCurlsDumbbell';
-
-  /// wristCurlsBarbell
-  String get wristCurlsBarbell =>
-      'library.forearms.exercises.wristCurlsBarbell';
-
-  /// farmerWalk
-  String get farmerWalk => 'library.forearms.exercises.farmerWalk';
-
-  /// cableSingleArmReverseCurl
+  /// Cable single-arm reverse curls
   String get cableSingleArmReverseCurl =>
       'library.forearms.exercises.cableSingleArmReverseCurl';
 
-  /// wristCurlsDumbbell
+  /// Farmer's Walk
+  String get farmerWalk => 'library.forearms.exercises.farmerWalk';
+
+  /// Plate pinch
+  String get platePinch => 'library.forearms.exercises.platePinch';
+
+  /// Reverse curls (barbell)
+  String get reverseCurls => 'library.forearms.exercises.reverseCurls';
+
+  /// Reverse curls (dumbbell)
+  String get reverseCurlsDumbbell =>
+      'library.forearms.exercises.reverseCurlsDumbbell';
+
+  /// Reverse wrist curls (barbell)
+  String get reverseWristCurlsBarbell =>
+      'library.forearms.exercises.reverseWristCurlsBarbell';
+
+  /// Reverse wrist curls (dumbbell)
+  String get reverseWristCurlsDumbbell =>
+      'library.forearms.exercises.reverseWristCurlsDumbbell';
+
+  /// Wrist curls (barbell)
+  String get wristCurlsBarbell =>
+      'library.forearms.exercises.wristCurlsBarbell';
+
+  /// Wrist curls (dumbbell)
   String get wristCurlsDumbbell =>
       'library.forearms.exercises.wristCurlsDumbbell';
 
-  /// reverseCurls
-  String get reverseCurls => 'library.forearms.exercises.reverseCurls';
-
-  /// reverseWristCurlsDumbbell
-  String get reverseWristCurlsDumbbell =>
-      'library.forearms.exercises.reverseWristCurlsDumbbell';
+  /// Wrist roller
+  String get wristRoller => 'library.forearms.exercises.wristRoller';
 }

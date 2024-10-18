@@ -73,8 +73,7 @@ class _MeCalendarPageState
                     SpeedDialButton(
                       icon: Icon(GTIcons.streak_weeks,
                           color: context.harmonizeColor(Colors.orange)),
-                      text: Text(
-                          "me.calendar.streakWeeks".plural(streaks.weekStreak)),
+                      text: Text("time.weeks".plural(streaks.weekStreak)),
                       subtitle: Text("me.calendar.streak".t),
                       dense: true,
                     ),
@@ -82,8 +81,7 @@ class _MeCalendarPageState
                       icon: Icon(GTIcons.streak_rest,
                           color: context
                               .harmonizeColor(Colors.deepPurple.shade300)),
-                      text: Text(
-                          "me.calendar.streakDays".plural(streaks.restDays)),
+                      text: Text("time.days".plural(streaks.restDays)),
                       subtitle: Text("me.calendar.rest".t),
                       dense: true,
                     ),

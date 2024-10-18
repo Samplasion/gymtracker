@@ -774,6 +774,30 @@
       "few": "@hours ore, @minutes:@seconds",
       "many": "@hours di ore, @minutes:@seconds",
       "other": "@hours ore, @minutes:@seconds"
+    },
+    "justHours": {
+      "zero": "%s",
+      "one": "%s ora",
+      "two": "%s ore",
+      "few": "%s ore",
+      "many": "%s di ore",
+      "other": "%s ore"
+    },
+    "days": {
+      "zero": "0 giorni",
+      "one": "1 giorno",
+      "two": "2 giorni",
+      "few": "%s giorni",
+      "many": "%s di giorni",
+      "other": "%s giorni"
+    },
+    "weeks": {
+      "zero": "0 settimane",
+      "one": "1 settimana",
+      "two": "2 settimane",
+      "few": "%s settimane",
+      "many": "%s di settimane",
+      "other": "%s settimane"
     }
   },
   "locales": {
@@ -1129,23 +1153,7 @@
       "label": "Calendario",
       "empty": "Non ti sei allenato questo giorno",
       "streak": "Serie",
-      "rest": "Riposo",
-      "streakDays": {
-        "zero": "0 giorni",
-        "one": "1 giorno",
-        "two": "2 giorni",
-        "few": "%s giorni",
-        "many": "%s giorni",
-        "other": "%s giorni"
-      },
-      "streakWeeks": {
-        "zero": "0 settimane",
-        "one": "1 settimana",
-        "two": "2 settimane",
-        "few": "%s settimane",
-        "many": "%s settimane",
-        "other": "%s settimane"
-      }
+      "rest": "Riposo"
     },
     "stats": {
       "label": "Statistiche",

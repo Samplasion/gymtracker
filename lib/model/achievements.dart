@@ -55,7 +55,10 @@ final class AchievementLevel {
   final String nameKey;
   final String descriptionKey;
   final AchievementTrigger trigger;
-  final bool Function() checkCompletion;
+  final bool Function(double? progress) checkCompletion;
+  final double Function()? progress;
+  final String Function(double value)? progressText;
+  final double Function()? progressMax;
 
   const AchievementLevel({
     required this.level,
@@ -63,7 +66,14 @@ final class AchievementLevel {
     required this.descriptionKey,
     required this.trigger,
     required this.checkCompletion,
-  });
+    this.progress,
+    this.progressText,
+    this.progressMax,
+  })  : assert(progress == null || progressMax != null),
+        assert(progressMax == null || progress != null),
+        assert(progressText == null || progress != null);
+
+  bool get canShowProgress => progress != null && progressMax != null;
 
   @override
   String toString() {

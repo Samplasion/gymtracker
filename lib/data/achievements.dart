@@ -4,14 +4,17 @@ import 'package:get/get.dart';
 import 'package:gymtracker/controller/food_controller.dart';
 import 'package:gymtracker/controller/history_controller.dart';
 import 'package:gymtracker/controller/me_controller.dart';
+import 'package:gymtracker/controller/settings_controller.dart';
 import 'package:gymtracker/data/distance.dart';
 import 'package:gymtracker/data/weights.dart';
 import 'package:gymtracker/gen/exercises.gen.dart';
 import 'package:gymtracker/model/achievements.dart';
 import 'package:gymtracker/model/exercise.dart';
 import 'package:gymtracker/model/workout.dart';
+import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/service/logger.dart';
 import 'package:gymtracker/utils/extensions.dart';
+import 'package:intl/intl.dart';
 import 'package:scrollable_clean_calendar/utils/extensions.dart';
 
 // TODO: Change to final field once I'm done adding the bulk of achievements
@@ -26,21 +29,21 @@ Map<String, Achievement> get achievements => {
             nameKey: "achievements.firstSteps.title",
             descriptionKey: "achievements.firstSteps.description.1",
             trigger: AchievementTrigger.workout,
-            checkCompletion: () => true,
+            checkCompletion: (progress) => true,
           ),
           AchievementLevel(
             level: 2,
             nameKey: "achievements.firstSteps.title",
             descriptionKey: "achievements.firstSteps.description.2",
             trigger: AchievementTrigger.weight,
-            checkCompletion: () => true,
+            checkCompletion: (progress) => true,
           ),
           AchievementLevel(
             level: 3,
             nameKey: "achievements.firstSteps.title",
             descriptionKey: "achievements.firstSteps.description.3",
             trigger: AchievementTrigger.food,
-            checkCompletion: () => true,
+            checkCompletion: (progress) => true,
           ),
         ],
       ),
@@ -58,20 +61,15 @@ Map<String, Achievement> get achievements => {
             nameKey: "achievements.foodWatcher.title",
             descriptionKey: "achievements.foodWatcher.description.1",
             trigger: AchievementTrigger.food,
-            checkCompletion: () {
-              final today = DateTime.now();
-              final yesterday = today.subtract(const Duration(days: 1));
-
-              final foodController = Get.find<FoodController>();
-
-              final todayFoods = foodController.foods$.value
-                  .where((element) => element.date.isSameDay(today))
-                  .toList();
-              final yesterdayFoods = foodController.foods$.value
-                  .where((element) => element.date.isSameDay(yesterday))
-                  .toList();
-
-              return todayFoods.isNotEmpty && yesterdayFoods.isNotEmpty;
+            progress: () {
+              final periodFoods = _foodWatcher();
+              return periodFoods.length.toDouble();
+            },
+            progressMax: () => 2,
+            progressText: (value) => "time.days".plural(value.toInt()),
+            checkCompletion: (progress) {
+              const days = 2;
+              return progress! >= days;
             },
           ),
           AchievementLevel(
@@ -79,29 +77,15 @@ Map<String, Achievement> get achievements => {
             nameKey: "achievements.foodWatcher.title",
             descriptionKey: "achievements.foodWatcher.description.2",
             trigger: AchievementTrigger.food,
-            checkCompletion: () {
-              final today = DateTime.now();
-              final weekAgo =
-                  today.subtract(const Duration(days: 6)).startOfDay;
-
-              final foodController = Get.find<FoodController>();
-
-              final thisWeekFoods = foodController.foods$.value
-                  .where((element) =>
-                      element.date.isAfterOrAtSameMomentAs(weekAgo) &&
-                      element.date.isBefore(
-                          today.add(const Duration(days: 1)).startOfDay))
-                  .toList();
-
-              for (var i = 0; i < 7; i++) {
-                final day = weekAgo.add(Duration(days: i));
-                if (!thisWeekFoods
-                    .any((element) => element.date.isSameDay(day))) {
-                  return false;
-                }
-              }
-
-              return true;
+            progress: () {
+              final periodFoods = _foodWatcher();
+              return periodFoods.length.toDouble();
+            },
+            progressMax: () => 7,
+            progressText: (value) => "time.days".plural(value.toInt()),
+            checkCompletion: (progress) {
+              const days = 7;
+              return progress! >= days;
             },
           ),
           AchievementLevel(
@@ -109,29 +93,15 @@ Map<String, Achievement> get achievements => {
             nameKey: "achievements.foodWatcher.title",
             descriptionKey: "achievements.foodWatcher.description.3",
             trigger: AchievementTrigger.food,
-            checkCompletion: () {
-              final today = DateTime.now();
-              final weekAgo =
-                  today.subtract(const Duration(days: 29)).startOfDay;
-
-              final foodController = Get.find<FoodController>();
-
-              final thisWeekFoods = foodController.foods$.value
-                  .where((element) =>
-                      element.date.isAfterOrAtSameMomentAs(weekAgo) &&
-                      element.date.isBefore(
-                          today.add(const Duration(days: 1)).startOfDay))
-                  .toList();
-
-              for (var i = 0; i < 30; i++) {
-                final day = weekAgo.add(Duration(days: i));
-                if (!thisWeekFoods
-                    .any((element) => element.date.isSameDay(day))) {
-                  return false;
-                }
-              }
-
-              return true;
+            progress: () {
+              final periodFoods = _foodWatcher();
+              return periodFoods.length.toDouble();
+            },
+            progressMax: () => 30,
+            progressText: (value) => "time.days".plural(value.toInt()),
+            checkCompletion: (progress) {
+              const days = 30;
+              return progress! >= days;
             },
           ),
         ],
@@ -150,7 +120,7 @@ Map<String, Achievement> get achievements => {
             nameKey: "achievements.marathoner.title",
             descriptionKey: "achievements.marathoner.description.1",
             trigger: AchievementTrigger.workout,
-            checkCompletion: () {
+            checkCompletion: (progress) {
               final latestWorkout = Get.find<HistoryController>().history.last;
               return Distance.convert(
                       value: latestWorkout.distanceRun,
@@ -164,7 +134,7 @@ Map<String, Achievement> get achievements => {
             nameKey: "achievements.marathoner.title",
             descriptionKey: "achievements.marathoner.description.2",
             trigger: AchievementTrigger.workout,
-            checkCompletion: () {
+            checkCompletion: (progress) {
               final latestWorkout = Get.find<HistoryController>().history.last;
               return Distance.convert(
                     value: latestWorkout.distanceRun,
@@ -179,7 +149,7 @@ Map<String, Achievement> get achievements => {
             nameKey: "achievements.marathoner.title",
             descriptionKey: "achievements.marathoner.description.3",
             trigger: AchievementTrigger.workout,
-            checkCompletion: () {
+            checkCompletion: (progress) {
               final latestWorkout = Get.find<HistoryController>().history.last;
               return Distance.convert(
                     value: latestWorkout.distanceRun,
@@ -201,8 +171,10 @@ Map<String, Achievement> get achievements => {
             nameKey: "achievements.earlyBird.title",
             descriptionKey: "achievements.earlyBird.description",
             trigger: AchievementTrigger.workout,
-            checkCompletion: () {
-              final latestWorkout = Get.find<HistoryController>().history.last;
+            checkCompletion: (progress) {
+              var history = Get.find<HistoryController>().history;
+              if (history.isEmpty) return false;
+              final latestWorkout = history.last;
               return latestWorkout.startingDate!.hour < 8;
             },
           ),
@@ -219,8 +191,10 @@ Map<String, Achievement> get achievements => {
             nameKey: "achievements.nightOwl.title",
             descriptionKey: "achievements.nightOwl.description",
             trigger: AchievementTrigger.workout,
-            checkCompletion: () {
-              final latestWorkout = Get.find<HistoryController>().history.last;
+            checkCompletion: (progress) {
+              var history = Get.find<HistoryController>().history;
+              if (history.isEmpty) return false;
+              final latestWorkout = history.last;
               return latestWorkout.startingDate!.hour >= 20;
             },
           ),
@@ -237,42 +211,51 @@ Map<String, Achievement> get achievements => {
             nameKey: "achievements.realGymBro.title",
             descriptionKey: "achievements.realGymBro.description.1",
             trigger: AchievementTrigger.workout,
-            checkCompletion: () {
+            progress: () {
               final workouts = Get.find<HistoryController>().history;
-              final sumOfDurations = workouts
-                  .map((e) => e.duration!)
-                  .reduce((value, element) => value + element);
-
-              return sumOfDurations >= const Duration(hours: 100);
+              return workouts
+                      .map((e) => e.duration!)
+                      .reduce((value, element) => value + element)
+                      .inMinutes /
+                  60;
             },
+            progressMax: () => 100,
+            progressText: (value) => "time.justHours".plural(value.toInt()),
+            checkCompletion: (progress) => progress! >= 100,
           ),
           AchievementLevel(
             level: 2,
             nameKey: "achievements.realGymBro.title",
             descriptionKey: "achievements.realGymBro.description.2",
             trigger: AchievementTrigger.workout,
-            checkCompletion: () {
+            progress: () {
               final workouts = Get.find<HistoryController>().history;
-              final sumOfDurations = workouts
-                  .map((e) => e.duration!)
-                  .reduce((value, element) => value + element);
-
-              return sumOfDurations >= const Duration(hours: 500);
+              return workouts
+                      .map((e) => e.duration!)
+                      .reduce((value, element) => value + element)
+                      .inMinutes /
+                  60;
             },
+            progressMax: () => 500,
+            progressText: (value) => "time.justHours".plural(value.toInt()),
+            checkCompletion: (progress) => progress! >= 500,
           ),
           AchievementLevel(
             level: 3,
             nameKey: "achievements.realGymBro.title",
             descriptionKey: "achievements.realGymBro.description.3",
             trigger: AchievementTrigger.workout,
-            checkCompletion: () {
+            progress: () {
               final workouts = Get.find<HistoryController>().history;
-              final sumOfDurations = workouts
-                  .map((e) => e.duration!)
-                  .reduce((value, element) => value + element);
-
-              return sumOfDurations >= const Duration(hours: 1000);
+              return workouts
+                      .map((e) => e.duration!)
+                      .reduce((value, element) => value + element)
+                      .inMinutes /
+                  60;
             },
+            progressMax: () => 1000,
+            progressText: (value) => "time.justHours".plural(value.toInt()),
+            checkCompletion: (progress) => progress! >= 1000,
           ),
         ],
       ),
@@ -289,7 +272,15 @@ Map<String, Achievement> get achievements => {
             nameKey: "achievements.workoutFreak.title",
             descriptionKey: "achievements.workoutFreak.description.1",
             trigger: AchievementTrigger.workout,
-            checkCompletion: () {
+            progress: () {
+              return _workoutFreak(_WorkoutFreakPeriod.month).length.toDouble();
+            },
+            progressMax: () {
+              final today = DateTime.now();
+              return DateTime(today.year, today.month + 1, 0).day.toDouble();
+            },
+            progressText: (value) => "time.days".plural(value.toInt()),
+            checkCompletion: (progress) {
               final today = DateTime.now().startOfDay;
               if (today.month != today.add(const Duration(days: 1)).month) {
                 return false;
@@ -328,7 +319,15 @@ Map<String, Achievement> get achievements => {
             nameKey: "achievements.workoutFreak.title",
             descriptionKey: "achievements.workoutFreak.description.2",
             trigger: AchievementTrigger.workout,
-            checkCompletion: () {
+            progress: () {
+              return _workoutFreak(_WorkoutFreakPeriod.month).length.toDouble();
+            },
+            progressMax: () {
+              final today = DateTime.now();
+              return today.isLeapYear ? 366 : 365;
+            },
+            progressText: (value) => "time.days".plural(value.toInt()),
+            checkCompletion: (progress) {
               final today = DateTime.now().startOfDay;
               if (today.year != today.add(const Duration(days: 1)).year) {
                 return false;
@@ -378,54 +377,42 @@ Map<String, Achievement> get achievements => {
             nameKey: "achievements.trailblazer.title",
             descriptionKey: "achievements.trailblazer.description.1",
             trigger: AchievementTrigger.workout,
-            checkCompletion: () {
-              final workouts = Get.find<HistoryController>().history;
-              final sumOfDistances = workouts
-                  .map((e) => Distance.convert(
-                        value: e.distanceRun,
-                        from: e.distanceUnit,
-                        to: Distance.km,
-                      ))
-                  .reduce((value, element) => value + element);
-
-              return sumOfDistances >= 100;
-            },
+            progress: _trailblazer,
+            progressMax: () => 100,
+            progressText: (value) => "exerciseList.fields.distance".trParams({
+              "distance": NumberFormat.compact(locale: Get.locale!.languageCode)
+                  .format(value),
+              "unit": "units.${settingsController.distanceUnit.value.name}".t,
+            }),
+            checkCompletion: (progress) => progress! >= 100,
           ),
           AchievementLevel(
             level: 2,
             nameKey: "achievements.trailblazer.title",
             descriptionKey: "achievements.trailblazer.description.2",
             trigger: AchievementTrigger.workout,
-            checkCompletion: () {
-              final workouts = Get.find<HistoryController>().history;
-              final sumOfDistances = workouts
-                  .map((e) => Distance.convert(
-                        value: e.distanceRun,
-                        from: e.distanceUnit,
-                        to: Distance.km,
-                      ))
-                  .reduce((value, element) => value + element);
-
-              return sumOfDistances >= 500;
-            },
+            progress: _trailblazer,
+            progressMax: () => 500,
+            progressText: (value) => "exerciseList.fields.distance".trParams({
+              "distance": NumberFormat.compact(locale: Get.locale!.languageCode)
+                  .format(value),
+              "unit": "units.${settingsController.distanceUnit.value.name}".t,
+            }),
+            checkCompletion: (progress) => progress! >= 500,
           ),
           AchievementLevel(
             level: 3,
             nameKey: "achievements.trailblazer.title",
             descriptionKey: "achievements.trailblazer.description.3",
             trigger: AchievementTrigger.workout,
-            checkCompletion: () {
-              final workouts = Get.find<HistoryController>().history;
-              final sumOfDistances = workouts
-                  .map((e) => Distance.convert(
-                        value: e.distanceRun,
-                        from: e.distanceUnit,
-                        to: Distance.km,
-                      ))
-                  .reduce((value, element) => value + element);
-
-              return sumOfDistances >= 1000;
-            },
+            progress: _trailblazer,
+            progressMax: () => 1000,
+            progressText: (value) => "exerciseList.fields.distance".trParams({
+              "distance": NumberFormat.compact(locale: Get.locale!.languageCode)
+                  .format(value),
+              "unit": "units.${settingsController.distanceUnit.value.name}".t,
+            }),
+            checkCompletion: (progress) => progress! >= 1000,
           ),
         ],
       ),
@@ -444,63 +431,42 @@ Map<String, Achievement> get achievements => {
             nameKey: "achievements.cycleChampion.title",
             descriptionKey: "achievements.cycleChampion.description.1",
             trigger: AchievementTrigger.workout,
-            checkCompletion: () {
-              final workouts = Get.find<HistoryController>().history;
-              final sumOfDistances = workouts
-                  .map((e) => _distanceByFiltering(e, filter: (e) {
-                        return e.isStandardLibraryExercise &&
-                            [
-                              GTStandardLibrary.cardio.biking,
-                              GTStandardLibrary.cardio.ergometer,
-                              GTStandardLibrary.cardio.ergometerHorizontal,
-                            ].contains(e.parentID);
-                      }))
-                  .reduce((value, element) => value + element);
-
-              return sumOfDistances >= 100;
-            },
+            progress: _cycleChampion,
+            progressMax: () => 100,
+            progressText: (value) => "exerciseList.fields.distance".trParams({
+              "distance": NumberFormat.compact(locale: Get.locale!.languageCode)
+                  .format(value),
+              "unit": "units.${settingsController.distanceUnit.value.name}".t,
+            }),
+            checkCompletion: (progress) => progress! >= 100,
           ),
           AchievementLevel(
             level: 2,
             nameKey: "achievements.cycleChampion.title",
             descriptionKey: "achievements.cycleChampion.description.2",
             trigger: AchievementTrigger.workout,
-            checkCompletion: () {
-              final workouts = Get.find<HistoryController>().history;
-              final sumOfDistances = workouts
-                  .map((e) => _distanceByFiltering(e,
-                      filter: (e) =>
-                          e.isStandardLibraryExercise &&
-                          [
-                            GTStandardLibrary.cardio.biking,
-                            GTStandardLibrary.cardio.ergometer,
-                            GTStandardLibrary.cardio.ergometerHorizontal,
-                          ].contains(e.parentID)))
-                  .reduce((value, element) => value + element);
-
-              return sumOfDistances >= 500;
-            },
+            progress: _cycleChampion,
+            progressMax: () => 500,
+            progressText: (value) => "exerciseList.fields.distance".trParams({
+              "distance": NumberFormat.compact(locale: Get.locale!.languageCode)
+                  .format(value),
+              "unit": "units.${settingsController.distanceUnit.value.name}".t,
+            }),
+            checkCompletion: (progress) => progress! >= 500,
           ),
           AchievementLevel(
             level: 3,
             nameKey: "achievements.cycleChampion.title",
             descriptionKey: "achievements.cycleChampion.description.3",
             trigger: AchievementTrigger.workout,
-            checkCompletion: () {
-              final workouts = Get.find<HistoryController>().history;
-              final sumOfDistances = workouts
-                  .map((e) => _distanceByFiltering(e,
-                      filter: (e) =>
-                          e.isStandardLibraryExercise &&
-                          [
-                            GTStandardLibrary.cardio.biking,
-                            GTStandardLibrary.cardio.ergometer,
-                            GTStandardLibrary.cardio.ergometerHorizontal,
-                          ].contains(e.parentID)))
-                  .reduce((value, element) => value + element);
-
-              return sumOfDistances >= 1000;
-            },
+            progress: _cycleChampion,
+            progressMax: () => 1000,
+            progressText: (value) => "exerciseList.fields.distance".trParams({
+              "distance": NumberFormat.compact(locale: Get.locale!.languageCode)
+                  .format(value),
+              "unit": "units.${settingsController.distanceUnit.value.name}".t,
+            }),
+            checkCompletion: (progress) => progress! >= 1000,
           ),
         ],
       ),
@@ -520,7 +486,7 @@ Map<String, Achievement> get achievements => {
             descriptionKey:
                 "achievements.professionalWeightlifter.description.1",
             trigger: AchievementTrigger.workout,
-            checkCompletion: () {
+            checkCompletion: (progress) {
               return _professionalWeightlifter(1);
             },
           ),
@@ -530,7 +496,7 @@ Map<String, Achievement> get achievements => {
             descriptionKey:
                 "achievements.professionalWeightlifter.description.2",
             trigger: AchievementTrigger.workout,
-            checkCompletion: () {
+            checkCompletion: (progress) {
               return _professionalWeightlifter(1.5);
             },
           ),
@@ -540,13 +506,90 @@ Map<String, Achievement> get achievements => {
             descriptionKey:
                 "achievements.professionalWeightlifter.description.3",
             trigger: AchievementTrigger.workout,
-            checkCompletion: () {
+            checkCompletion: (progress) {
               return _professionalWeightlifter(3);
             },
           ),
         ],
       ),
     };
+
+List<DateTime> _foodWatcher() {
+  final today = DateTime.now().startOfDay;
+
+  final foodController = Get.find<FoodController>();
+  if (foodController.foods$.value.isEmpty) return [];
+
+  // Return the longest continuous streak of days of all time
+  final streaks = <List<DateTime>>[];
+  var currentStreak = <DateTime>[];
+  final difference =
+      foodController.firstDay!.startOfDay.difference(today).abs().inDays;
+  for (var i = 0; i < difference; i++) {
+    final day = today.subtract(Duration(days: i));
+    if (foodController.getFoodsForDay(day).isNotEmpty) {
+      currentStreak.add(day);
+    } else {
+      if (currentStreak.isNotEmpty) {
+        streaks.add(currentStreak);
+        currentStreak = [];
+      }
+    }
+  }
+
+  if (currentStreak.isNotEmpty) {
+    streaks.add(currentStreak);
+  }
+
+  return streaks.isEmpty
+      ? []
+      : streaks.reduce(
+          (value, element) => value.length > element.length ? value : element);
+}
+
+enum _WorkoutFreakPeriod { month, year }
+
+List<DateTime> _workoutFreak(_WorkoutFreakPeriod period) {
+  final today = DateTime.now().startOfDay;
+
+  final historyController = Get.find<HistoryController>();
+
+  final periodWorkouts = historyController.history.where((element) {
+    final yearMatches = element.startingDate!.year == today.year;
+    if (period == _WorkoutFreakPeriod.year) return yearMatches;
+    return yearMatches && element.startingDate!.month == today.month;
+  }).toList();
+
+  return periodWorkouts.map((w) => w.startingDate!.startOfDay).toSet().toList();
+}
+
+double _trailblazer() {
+  final workouts = Get.find<HistoryController>().history;
+  if (workouts.isEmpty) return 0.0;
+  return workouts
+      .map((e) => Distance.convert(
+            value: e.distanceRun,
+            from: e.distanceUnit,
+            to: Distance.km,
+          ))
+      .reduce((value, element) => value + element);
+}
+
+double _cycleChampion() {
+  final workouts = Get.find<HistoryController>().history;
+  if (workouts.isEmpty) return 0.0;
+  final sumOfDistances = workouts
+      .map((e) => _distanceByFiltering(e, filter: (e) {
+            return e.isStandardLibraryExercise &&
+                [
+                  GTStandardLibrary.cardio.biking,
+                  GTStandardLibrary.cardio.ergometer,
+                  GTStandardLibrary.cardio.ergometerHorizontal,
+                ].contains(e.parentID);
+          }))
+      .reduce((value, element) => value + element);
+  return sumOfDistances;
+}
 
 bool _professionalWeightlifter(double coefficient) {
   final weight = Get.find<MeController>().latestWeightMeasurement;

@@ -775,6 +775,30 @@
       "few": "@hours hours, @minutes:@seconds",
       "many": "@hours hours, @minutes:@seconds",
       "other": "@hours hours, @minutes:@seconds"
+    },
+    "justHours": {
+      "zero": "%s",
+      "one": "%s hour",
+      "two": "%s hours",
+      "few": "%s hours",
+      "many": "%s hours",
+      "other": "%s hours"
+    },
+    "days": {
+      "zero": "0 days",
+      "one": "1 day",
+      "two": "2 days",
+      "few": "%s days",
+      "many": "%s days",
+      "other": "%s days"
+    },
+    "weeks": {
+      "zero": "0 weeks",
+      "one": "1 week",
+      "two": "2 weeks",
+      "few": "%s weeks",
+      "many": "%s weeks",
+      "other": "%s weeks"
     }
   },
   "locales": {
@@ -1130,23 +1154,7 @@
       "label": "Calendar",
       "empty": "You haven't worked out on this date",
       "streak": "Streak",
-      "rest": "Rest",
-      "streakDays": {
-        "zero": "0 days",
-        "one": "1 day",
-        "two": "2 days",
-        "few": "%s days",
-        "many": "%s days",
-        "other": "%s days"
-      },
-      "streakWeeks": {
-        "zero": "0 weeks",
-        "one": "1 week",
-        "two": "2 weeks",
-        "few": "%s weeks",
-        "many": "%s weeks",
-        "other": "%s weeks"
-      }
+      "rest": "Rest"
     },
     "stats": {
       "label": "Statistics",

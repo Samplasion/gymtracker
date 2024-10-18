@@ -29,7 +29,8 @@ class AchievementsController extends GetxController with ServiceableController {
         continue;
       }
 
-      final hasJustUnlocked = nextLevel.checkCompletion();
+      final hasJustUnlocked =
+          nextLevel.checkCompletion(nextLevel.progress?.call());
 
       logger.d((id, nextLevel.level, hasJustUnlocked));
 

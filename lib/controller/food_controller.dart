@@ -93,6 +93,24 @@ class FoodController extends GetxController with ServiceableController {
         ;
   }
 
+  DateTime? get firstDay => foods$.value.isEmpty
+      ? null
+      : (foods$.value.toList()
+            ..sort((a, b) {
+              return a.date.compareTo(b.date);
+            }))
+          .first
+          .date;
+
+  DateTime? get lastDay => foods$.value.isEmpty
+      ? null
+      : (foods$.value.toList()
+            ..sort((a, b) {
+              return b.date.compareTo(a.date);
+            }))
+          .first
+          .date;
+
   final showSettingsTileStream = BehaviorSubject<bool>.seeded(true);
   material.Widget get settingsTile {
     return material.StreamBuilder(
@@ -790,6 +808,12 @@ class FoodController extends GetxController with ServiceableController {
 
   void showCategoryFoodsView(NutritionCategory category) {
     Go.to(() => FoodCategoryFoodsView(category: category));
+  }
+
+  List<DateTagged<Food>> getFoodsForDay(DateTime day) {
+    return foods$.value
+        .where((element) => element.date.isSameDay(day))
+        .toList();
   }
 }
 

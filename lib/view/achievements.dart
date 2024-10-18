@@ -183,18 +183,35 @@ class AchievementGetDialog extends ControlledWidget<AchievementsController> {
                   : "???",
               textAlign: TextAlign.center,
             ),
+            if (completion == null &&
+                level.canShowProgress &&
+                achievement.shouldShowDescriptionFor(level.level)) ...[
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                child: LinearProgressIndicator(
+                  value: level.progress!() / level.progressMax!(),
+                ),
+              ),
+              Text(
+                _getProgressText(),
+                textAlign: TextAlign.center,
+              ),
+            ],
             const SizedBox(height: 16),
-            Text(
-              completion == null
-                  ? "achievements.locked".t
-                  : "achievements.unlockedOn".tParams({
-                      "date": DateFormat.yMMMMEEEEd(context.locale.languageCode)
-                          .add_Hms()
-                          .format(completion.completedAt),
-                    }),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 16),
+            if (completion != null || !level.canShowProgress) ...[
+              Text(
+                completion == null
+                    ? "achievements.locked".t
+                    : "achievements.unlockedOn".tParams({
+                        "date":
+                            DateFormat.yMMMMEEEEd(context.locale.languageCode)
+                                .add_Hms()
+                                .format(completion.completedAt),
+                      }),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 16),
+            ],
           ],
         ),
       ),
@@ -205,5 +222,17 @@ class AchievementGetDialog extends ControlledWidget<AchievementsController> {
         ),
       ],
     );
+  }
+
+  String _getProgressText() {
+    assert(level.canShowProgress);
+    final progress = level.progress!();
+    final progressMax = level.progressMax!();
+
+    if (level.progressText != null) {
+      return "${level.progressText!(progress)} / ${level.progressText!(progressMax)}";
+    } else {
+      return "$progress / $progressMax";
+    }
   }
 }

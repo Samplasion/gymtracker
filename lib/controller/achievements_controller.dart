@@ -11,36 +11,50 @@ class AchievementsController extends GetxController with ServiceableController {
   BehaviorSubject<List<AchievementCompletion>> get _completions$ =>
       service.completions$;
 
-  Map<Achievement, AchievementCompletion> maybeUnlockAchievements(
+  Map<Achievement, List<AchievementCompletion>> maybeUnlockAchievements(
       AchievementTrigger trigger) {
-    final unlocked = <Achievement, AchievementCompletion>{};
+    final unlocked = <Achievement, List<AchievementCompletion>>{};
 
     for (final MapEntry(key: id, value: achievement) in achievements.entries) {
-      final completion = _getHighestLevelCompletionFor(achievement.id);
-      final nextLevel = completion == null
-          ? achievement.levels.first
-          : achievement.nextLevel(completion);
+      var completion = _getHighestLevelCompletionFor(achievement.id);
+      AchievementLevel? nextLevel;
 
-      if (nextLevel == null) {
-        continue;
-      }
+      bool isFirstTime = true;
 
-      if (nextLevel.trigger != trigger) {
-        continue;
-      }
+      innerLoop:
+      do {
+        nextLevel = completion == null
+            ? achievement.levels.first
+            : achievement.nextLevel(completion);
 
-      final hasJustUnlocked =
-          nextLevel.checkCompletion(nextLevel.progress?.call());
+        if (nextLevel == null) {
+          break innerLoop;
+        }
 
-      logger.d((id, nextLevel.level, hasJustUnlocked));
+        if (nextLevel.trigger != trigger && isFirstTime) {
+          break innerLoop;
+        }
 
-      if (hasJustUnlocked) {
-        unlocked[achievement] = AchievementCompletion(
-          achievementID: id,
-          level: nextLevel.level,
-          completedAt: DateTime.now(),
-        );
-      }
+        final hasJustUnlocked =
+            nextLevel.checkCompletion(nextLevel.progress?.call());
+
+        logger.d((id, nextLevel.level, hasJustUnlocked));
+
+        if (hasJustUnlocked) {
+          unlocked.putIfAbsent(achievement, () => []);
+          final c = AchievementCompletion(
+            achievementID: id,
+            level: nextLevel.level,
+            completedAt: DateTime.now(),
+          );
+          unlocked[achievement]!.add(c);
+          completion = c;
+        } else {
+          break innerLoop;
+        }
+
+        isFirstTime = false;
+      } while (true);
     }
 
     _markUnlockAchievements(unlocked);
@@ -50,20 +64,23 @@ class AchievementsController extends GetxController with ServiceableController {
   }
 
   void _markUnlockAchievements(
-      Map<Achievement, AchievementCompletion> unlocked) {
-    service.insertAchievementCompletions(unlocked.values.toList());
+      Map<Achievement, List<AchievementCompletion>> unlocked) {
+    service.insertAchievementCompletions(
+        unlocked.values.expand((e) => e).toList());
   }
 
   void _showUnlockAchievements(
-      Map<Achievement, AchievementCompletion> unlocked) {
-    for (final MapEntry(key: achievement, value: completion)
+      Map<Achievement, List<AchievementCompletion>> unlocked) {
+    for (final MapEntry(key: achievement, value: completions)
         in unlocked.entries) {
-      logger.i(
-          "Unlocked achievement: ${achievement.id} at level ${completion.level}");
-      Go.customSnack(AchievementSnackBar(
-        achievement: achievement,
-        completion: completion,
-      ));
+      for (final completion in completions) {
+        logger.i(
+            "Unlocked achievement: ${achievement.id} at level ${completion.level}");
+        Go.customSnack(AchievementSnackBar(
+          achievement: achievement,
+          completion: completion,
+        ));
+      }
     }
   }
 

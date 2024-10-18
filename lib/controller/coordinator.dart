@@ -152,7 +152,7 @@ class Coordinator extends GetxController with ServiceableController {
     Get.find<DatabaseService>().schedulePeriodicBackup();
   }
 
-  Map<Achievement, AchievementCompletion> maybeUnlockAchievements(
+  Map<Achievement, List<AchievementCompletion>> maybeUnlockAchievements(
       AchievementTrigger trigger) {
     return Get.find<AchievementsController>().maybeUnlockAchievements(trigger);
   }

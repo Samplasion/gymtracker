@@ -6,6 +6,7 @@ import 'package:gymtracker/controller/achievements_controller.dart';
 import 'package:gymtracker/data/achievements.dart';
 import 'package:gymtracker/model/achievements.dart';
 import 'package:gymtracker/service/localizations.dart';
+import 'package:gymtracker/utils/constants.dart';
 import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/view/components/controlled.dart';
 import 'package:gymtracker/view/skeleton.dart';
@@ -39,6 +40,7 @@ class _AchievementsViewState
                 maxCrossAxisExtent: 300,
                 mainAxisSpacing: 16,
                 crossAxisSpacing: 16,
+                childAspectRatio: 1,
               ),
               delegate: SliverChildListDelegate(
                 [
@@ -84,45 +86,60 @@ class AchievementGridTile extends ControlledWidget<AchievementsController> {
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
-      builder: (context, size) {
-        return Card(
-          clipBehavior: Clip.antiAlias,
-          margin: EdgeInsets.zero,
-          child: InkWell(
-            onTap: () => onTap(achievement, level),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Column(
-                children: [
-                  const SizedBox(height: 16),
-                  const Spacer(),
-                  AchievementIcon(
-                    achievement: achievement,
-                    enabled: enabled,
-                    size: size.maxHeight / 2.6,
-                  ),
-                  const Spacer(),
-                  Text(
-                    level.localizedName,
-                    textAlign: TextAlign.center,
-                    style: context.theme.textTheme.bodyLarge,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  Text(
-                    achievement.shouldShowDescriptionFor(level.level)
-                        ? level.descriptionKey.t
-                        : "???",
-                    textAlign: TextAlign.center,
-                    style: context.theme.textTheme.bodySmall,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  const SizedBox(height: 16),
-                ],
-              ),
+      builder: (context, cardSize) {
+        var child = InkWell(
+          onTap: () => onTap(achievement, level),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Column(
+              children: [
+                const SizedBox(height: 16),
+                // const Spacer(),
+                Expanded(
+                  child: LayoutBuilder(builder: (context, size) {
+                    return Center(
+                      child: AchievementIcon(
+                        achievement: achievement,
+                        enabled: enabled,
+                        size: min(
+                          size.maxHeight,
+                          switch (Breakpoints.currentBreakpoint) {
+                            Breakpoints.xxs => 48,
+                            _ => cardSize.maxHeight / 3,
+                          },
+                        ),
+                      ),
+                    );
+                  }),
+                ),
+                // const Spacer(),
+                Text(
+                  level.localizedName,
+                  textAlign: TextAlign.center,
+                  style: context.theme.textTheme.bodyLarge,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                Text(
+                  achievement.shouldShowDescriptionFor(level.level)
+                      ? level.descriptionKey.t
+                      : "???",
+                  textAlign: TextAlign.center,
+                  style: context.theme.textTheme.bodySmall,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                const SizedBox(height: 16),
+              ],
             ),
           ),
+        );
+
+        return Card.outlined(
+          clipBehavior: Clip.antiAlias,
+          margin: EdgeInsets.zero,
+          elevation: 0,
+          child: child,
         );
       },
     );

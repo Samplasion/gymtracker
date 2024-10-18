@@ -406,7 +406,8 @@ final Map<GTExerciseMuscleCategory, ExerciseCategory> exerciseStandardLibrary =
         parameters: GTSetParameters.repsWeight,
         primaryMuscleGroup: GTMuscleGroup.chest,
         secondaryMuscleGroups: {GTMuscleGroup.triceps},
-        equipment: GTGymEquipment.none,
+        // TODO: Add T-Bar as equipment
+        equipment: GTGymEquipment.barbell,
       ),
     ],
     iconGetter: () =>
@@ -1169,7 +1170,7 @@ final Map<GTExerciseMuscleCategory, ExerciseCategory> exerciseStandardLibrary =
           GTMuscleGroup.biceps,
           GTMuscleGroup.lowerBack,
         },
-        equipment: GTGymEquipment.none,
+        equipment: GTGymEquipment.barbell,
       ),
     ],
     iconGetter: () =>

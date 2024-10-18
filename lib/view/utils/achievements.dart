@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -61,26 +63,36 @@ class _AchievementIconState extends State<AchievementIcon> {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<String>(
-        future: _icon,
-        builder: (context, snapshot) {
-          if (!snapshot.hasData) {
-            return SizedBox.square(
-              dimension: widget.size,
-              child: const CircularProgressIndicator(),
-            );
-          }
-          var svgPicture = SvgPicture.string(
-            snapshot.data!,
-            width: widget.size,
-            height: widget.size,
-            theme: SvgTheme(
-              currentColor: (widget.color ??
-                  context.harmonizeColor(widget.achievement.color)),
-            ),
+      future: _icon,
+      builder: (context, snapshot) {
+        if (!snapshot.hasData) {
+          return SizedBox.square(
+            dimension: widget.size,
+            child: const CircularProgressIndicator(),
           );
-          if (widget.enabled) return svgPicture;
-          return Stack(
-            children: [
+        }
+        var svgPicture = SvgPicture.string(
+          snapshot.data!,
+          width: widget.size,
+          height: widget.size,
+          theme: SvgTheme(
+            currentColor: (widget.color ??
+                context.harmonizeColor(widget.achievement.color)),
+          ),
+        );
+        if (widget.enabled) return svgPicture;
+        return Stack(
+          children: [
+            if (Platform.isIOS)
+              SvgPicture.asset(
+                GTAssets.svg.trophies.generic,
+                width: widget.size,
+                height: widget.size,
+                theme: SvgTheme(
+                  currentColor: context.theme.colorScheme.outline,
+                ),
+              )
+            else
               ShaderMask(
                 shaderCallback: (bounds) => LinearGradient(
                   colors: [
@@ -93,20 +105,21 @@ class _AchievementIconState extends State<AchievementIcon> {
                 blendMode: BlendMode.srcIn,
                 child: svgPicture,
               ),
-              Positioned.fill(
-                child: Center(
-                  child: Padding(
-                    padding: EdgeInsets.only(bottom: widget.size / 4),
-                    child: Icon(
-                      GTIcons.achievement_locked,
-                      color: Theme.of(context).colorScheme.onSurface,
-                    ),
+            Positioned.fill(
+              child: Center(
+                child: Padding(
+                  padding: EdgeInsets.only(bottom: widget.size / 4),
+                  child: Icon(
+                    GTIcons.achievement_locked,
+                    color: Theme.of(context).colorScheme.onSurface,
                   ),
                 ),
               ),
-            ],
-          );
-        });
+            ),
+          ],
+        );
+      },
+    );
   }
 }
 
@@ -149,6 +162,32 @@ class AchievementSnackBar extends SnackBar {
               }),
             ],
           ),
+        );
+}
+
+class AchievementBanner extends MaterialBanner {
+  final Achievement achievement;
+  final AchievementCompletion completion;
+
+  AchievementBanner({
+    required this.achievement,
+    required this.completion,
+    super.key,
+  }) : super(
+          content: AchievementListTile(
+            achievement: achievement,
+            completion: completion,
+          ),
+          actions: [
+            Builder(builder: (context) {
+              return TextButton(
+                onPressed: () {
+                  ScaffoldMessenger.of(context).hideCurrentMaterialBanner();
+                },
+                child: Text(MaterialLocalizations.of(context).okButtonLabel),
+              );
+            }),
+          ],
         );
 }
 

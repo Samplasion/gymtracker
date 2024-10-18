@@ -93,6 +93,43 @@ class Go {
     messenger.showSnackBar(snackBar);
   }
 
+  static Future banner(
+    String text, {
+    List<Widget>? actions,
+    Color? color,
+    Color? textColor,
+    bool assertive = false,
+  }) async {
+    return customBanner(
+      MaterialBanner(
+        content: Text(text),
+        actions: actions ??
+            [
+              TextButton(
+                onPressed: () {
+                  ScaffoldMessenger.of(Get.context!)
+                      .hideCurrentMaterialBanner();
+                },
+                child:
+                    Text(MaterialLocalizations.of(Get.context!).okButtonLabel),
+              ),
+            ],
+        backgroundColor: color,
+        contentTextStyle: TextStyle(color: textColor),
+      ),
+      assertive: assertive,
+    );
+  }
+
+  static Future customBanner(
+    MaterialBanner banner, {
+    bool assertive = false,
+  }) async {
+    var messenger = ScaffoldMessenger.of(Get.context!);
+    if (assertive) messenger.hideCurrentMaterialBanner();
+    messenger.showMaterialBanner(banner);
+  }
+
   static void dialog(
     String title,
     String body, {

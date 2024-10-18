@@ -121,7 +121,9 @@ Map<String, Achievement> get achievements => {
             descriptionKey: "achievements.marathoner.description.1",
             trigger: AchievementTrigger.workout,
             checkCompletion: (progress) {
-              final latestWorkout = Get.find<HistoryController>().history.last;
+              final history = Get.find<HistoryController>().history;
+              if (history.isEmpty) return false;
+              final latestWorkout = history.last;
               return Distance.convert(
                       value: latestWorkout.distanceRun,
                       from: latestWorkout.distanceUnit,
@@ -135,7 +137,9 @@ Map<String, Achievement> get achievements => {
             descriptionKey: "achievements.marathoner.description.2",
             trigger: AchievementTrigger.workout,
             checkCompletion: (progress) {
-              final latestWorkout = Get.find<HistoryController>().history.last;
+              final history = Get.find<HistoryController>().history;
+              if (history.isEmpty) return false;
+              final latestWorkout = history.last;
               return Distance.convert(
                     value: latestWorkout.distanceRun,
                     from: latestWorkout.distanceUnit,
@@ -150,7 +154,9 @@ Map<String, Achievement> get achievements => {
             descriptionKey: "achievements.marathoner.description.3",
             trigger: AchievementTrigger.workout,
             checkCompletion: (progress) {
-              final latestWorkout = Get.find<HistoryController>().history.last;
+              final history = Get.find<HistoryController>().history;
+              if (history.isEmpty) return false;
+              final latestWorkout = history.last;
               return Distance.convert(
                     value: latestWorkout.distanceRun,
                     from: latestWorkout.distanceUnit,
@@ -213,6 +219,7 @@ Map<String, Achievement> get achievements => {
             trigger: AchievementTrigger.workout,
             progress: () {
               final workouts = Get.find<HistoryController>().history;
+              if (workouts.isEmpty) return 0;
               return workouts
                       .map((e) => e.duration!)
                       .reduce((value, element) => value + element)
@@ -230,6 +237,7 @@ Map<String, Achievement> get achievements => {
             trigger: AchievementTrigger.workout,
             progress: () {
               final workouts = Get.find<HistoryController>().history;
+              if (workouts.isEmpty) return 0;
               return workouts
                       .map((e) => e.duration!)
                       .reduce((value, element) => value + element)
@@ -247,6 +255,7 @@ Map<String, Achievement> get achievements => {
             trigger: AchievementTrigger.workout,
             progress: () {
               final workouts = Get.find<HistoryController>().history;
+              if (workouts.isEmpty) return 0;
               return workouts
                       .map((e) => e.duration!)
                       .reduce((value, element) => value + element)

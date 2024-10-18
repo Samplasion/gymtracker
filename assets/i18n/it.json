@@ -875,7 +875,8 @@
         "cableChestPress": "Chest press ai cavi",
         "declinePushUps": "Push-up declinati",
         "lowCableFly": "Croci ai cavi bassi",
-        "inclinePushUps": "Push-up inclinati"
+        "inclinePushUps": "Push-up inclinati",
+        "tBarPress": "Pressa con bilanciere a T"
       }
     },
     "biceps": {
@@ -977,7 +978,8 @@
         "cableSeatedRowTriangleBar": "Rematore al cavo (con triangolo)",
         "straightArmCablePushdown": "Pulldown a braccia dritte",
         "deadlift": "Stacchi",
-        "pullUps": "Pull-up"
+        "pullUps": "Pull-up",
+        "tBarRow": "Rematore con bilanciere a T"
       }
     },
     "triceps": {
@@ -1021,6 +1023,12 @@
         "reverseCurls": "Reverse curl (bilanciere)",
         "reverseCurlsDumbbell": "Reverse curl (manubri)",
         "cableSingleArmReverseCurl": "Reverse curl a braccio singolo al cavo"
+      }
+    },
+    "obliques": {
+      "exercises": {
+        "sidewaysPlank": "Plank laterale",
+        "sidewaysPlankReachThrough": "Plank laterale con rotazione"
       }
     }
   },

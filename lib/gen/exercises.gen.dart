@@ -7,6 +7,7 @@ class GTStandardLibrary {
   static const chest = $GTStandardLibraryChestExercises._();
   static const biceps = $GTStandardLibraryBicepsExercises._();
   static const abs = $GTStandardLibraryAbsExercises._();
+  static const obliques = $GTStandardLibraryObliquesExercises._();
   static const calves = $GTStandardLibraryCalvesExercises._();
   static const quadriceps = $GTStandardLibraryQuadricepsExercises._();
   static const hamstrings = $GTStandardLibraryHamstringsExercises._();
@@ -133,6 +134,9 @@ class $GTStandardLibraryChestExercises {
   String get smithMachineHexPress =>
       'library.chest.exercises.smithMachineHexPress';
 
+  /// T-Bar press
+  String get tBarPress => 'library.chest.exercises.tBarPress';
+
   /// Vertical chest press
   String get verticalChestPress => 'library.chest.exercises.verticalChestPress';
 }
@@ -232,6 +236,17 @@ class $GTStandardLibraryAbsExercises {
 
   /// Toe touches
   String get toeTouches => 'library.abs.exercises.toeTouches';
+}
+
+class $GTStandardLibraryObliquesExercises {
+  const $GTStandardLibraryObliquesExercises._();
+
+  /// Sideways plank
+  String get sidewaysPlank => 'library.obliques.exercises.sidewaysPlank';
+
+  /// Side plank reach through
+  String get sidewaysPlankReachThrough =>
+      'library.obliques.exercises.sidewaysPlankReachThrough';
 }
 
 class $GTStandardLibraryCalvesExercises {
@@ -374,6 +389,9 @@ class $GTStandardLibraryBackExercises {
   /// Straight-arm cable pushdowns
   String get straightArmCablePushdown =>
       'library.back.exercises.straightArmCablePushdown';
+
+  /// T-Bar row
+  String get tBarRow => 'library.back.exercises.tBarRow';
 
   /// Lat pulldowns (triangle bar)
   String get triangleBarLatPulldowns =>

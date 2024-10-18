@@ -329,6 +329,31 @@ class _ExerciseInfoViewState extends State<ExerciseInfoView>
                 leading: MDVConfiguration.backButtonOf(context),
                 automaticallyImplyLeading: MDVConfiguration.of(context) == null,
                 actions: [
+                  if (exercise.isCustom && kDebugMode) ...[
+                    IconButton(
+                      icon: const Icon(Icons.copy),
+                      onPressed: () {
+                        final category = exercise.primaryMuscleGroup.name;
+                        var name = exercise.name
+                            .toLowerCase()
+                            .replaceAllMapped(RegExp(r"(\b[a-z](?=[a-z]{1}))"),
+                                (match) => match.group(0)!.toUpperCase())
+                            .replaceAllMapped(
+                                RegExp(r'[^a-zA-Z0-9]'), (match) => '');
+                        name = name[0].toLowerCase() + name.substring(1);
+
+                        final dart = """      Exercise.standard(
+        id: "library.$category.exercises.$name",
+        name: "library.$category.exercises.$name".t,
+        parameters: GTSetParameters.${exercise.parameters.name},
+        primaryMuscleGroup: GTMuscleGroup.${exercise.primaryMuscleGroup.name},
+        secondaryMuscleGroups: {${exercise.secondaryMuscleGroups.map((e) => "GTMuscleGroup.${e.name}").join(", ")}},
+        equipment: ${exercise.gymEquipment},
+      ),""";
+                        Clipboard.setData(ClipboardData(text: dart));
+                      },
+                    ),
+                  ],
                   if (exercise.isCustom)
                     PopupMenuButton(
                       key: const Key("menu"),

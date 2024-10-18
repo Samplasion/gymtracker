@@ -574,6 +574,7 @@ class DatabaseService extends GetxService with ChangeNotifier {
         await _db.clearTheWholeThingIAmAbsolutelySureISwear();
 
         logger.i("Created import transaction");
+        await setAchievementCompletions(snapshot.achievements);
         await writeExercises(snapshot.customExercises);
         await _writeRoutines(snapshot.routines);
         await _writeRoutineExercises(snapshot.routineExercises);

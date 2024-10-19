@@ -2136,6 +2136,22 @@
         "2": "Lift 1.5x your body weight in a single set",
         "3": "Lift 3x your body weight in a single set"
       }
+    },
+    "programPlanner": {
+      "title": "Program Planner",
+      "description": "Create three routines"
+    },
+    "perfectPlanner": {
+      "title": "Professional Weightlifter",
+      "description": "Create a routine folder"
+    },
+    "routineMaster": {
+      "title": "Routine Master",
+      "description": {
+        "1": "Follow a routine for 3 consecutive months",
+        "2": "Follow a routine for 6 consecutive months",
+        "3": "Follow a routine for 12 consecutive months"
+      }
     }
   }
 }

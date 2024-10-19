@@ -4,12 +4,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart' hide ContextExtensionss;
+import 'package:gymtracker/controller/coordinator.dart';
 import 'package:gymtracker/controller/countdown_controller.dart';
 import 'package:gymtracker/controller/history_controller.dart';
 import 'package:gymtracker/controller/serviceable_controller.dart';
 import 'package:gymtracker/controller/settings_controller.dart';
 import 'package:gymtracker/controller/workout_controller.dart';
 import 'package:gymtracker/icons/gymtracker_icons.dart';
+import 'package:gymtracker/model/achievements.dart';
 import 'package:gymtracker/model/exercisable.dart';
 import 'package:gymtracker/model/exercise.dart';
 import 'package:gymtracker/model/set.dart';
@@ -47,6 +49,7 @@ class RoutinesController extends GetxController
   List<Workout> get rootRoutines =>
       workouts.where((r) => r.folder == null).toList();
 
+  bool _init = false;
   @override
   onInit() {
     super.onInit();
@@ -57,6 +60,13 @@ class RoutinesController extends GetxController
       workouts(event);
       coordinator.computeSuggestions();
       _recomputeFolders(service.folders$.valueOrNull ?? []);
+
+      if (_init) {
+        Get.find<Coordinator>()
+            .maybeUnlockAchievements(AchievementTrigger.routines);
+      }
+
+      _init = true;
     });
     service.folders$.listen((fld) {
       _recomputeFolders(fld);

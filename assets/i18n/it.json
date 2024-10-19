@@ -2135,6 +2135,22 @@
         "2": "Solleva 1.5x volte il tuo peso corporeo in una serie",
         "3": "Solleva 3x volte il tuo peso corporeo in una serie"
       }
+    },
+    "programPlanner": {
+      "title": "Pianificatore compulsivo",
+      "description": "Crea tre routine"
+    },
+    "perfectPlanner": {
+      "title": "Pianificatore perfetto",
+      "description": "Crea una cartella di routine"
+    },
+    "routineMaster": {
+      "title": "Maestro delle routine",
+      "description": {
+        "1": "Segui una routine per 3 mesi consecutivi",
+        "2": "Segui una routine per 6 mesi consecutivi",
+        "3": "Segui una routine per 12 mesi consecutivi"
+      }
     }
   }
 }

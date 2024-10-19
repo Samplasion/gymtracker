@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:gymtracker/controller/food_controller.dart';
 import 'package:gymtracker/controller/history_controller.dart';
 import 'package:gymtracker/controller/me_controller.dart';
+import 'package:gymtracker/controller/routines_controller.dart';
 import 'package:gymtracker/controller/settings_controller.dart';
 import 'package:gymtracker/data/distance.dart';
 import 'package:gymtracker/data/weights.dart';
@@ -524,6 +525,88 @@ Map<String, Achievement> get achievements => {
           ),
         ],
       ),
+      // Create three routines
+      "programPlanner": Achievement(
+        id: "programPlanner",
+        nameKey: "achievements.programPlanner.title",
+        iconKey: "programPlanner",
+        color: Colors.blue,
+        levels: [
+          AchievementLevel(
+            level: 1,
+            nameKey: "achievements.programPlanner.title",
+            descriptionKey: "achievements.programPlanner.description",
+            trigger: AchievementTrigger.routines,
+            progress: () =>
+                Get.find<RoutinesController>().workouts.length.toDouble(),
+            progressMax: () => 3,
+            progressText: (value) => value.toInt().toString(),
+            checkCompletion: (progress) {
+              return progress! >= 3;
+            },
+          ),
+        ],
+      ),
+      // Create a routine folder
+      "perfectPlanner": Achievement(
+        id: "perfectPlanner",
+        nameKey: "achievements.perfectPlanner.title",
+        iconKey: "perfectPlanner",
+        color: const Color.fromARGB(255, 233, 187, 2),
+        levels: [
+          AchievementLevel(
+            level: 1,
+            nameKey: "achievements.perfectPlanner.title",
+            descriptionKey: "achievements.perfectPlanner.description",
+            trigger: AchievementTrigger.routines,
+            checkCompletion: (progress) {
+              return Get.find<RoutinesController>().folders.isNotEmpty;
+            },
+          ),
+        ],
+      ),
+      // Routine Master
+      // 1. Follow a routine for 3 consecutive months
+      // 2. Follow a routine for 6 consecutive months
+      // 2. Follow a routine for 12 consecutive months
+      "routineMaster": Achievement(
+        id: "routineMaster",
+        nameKey: "achievements.routineMaster.title",
+        iconKey: "routineMaster",
+        color: Colors.pink,
+        levels: [
+          AchievementLevel(
+            level: 1,
+            nameKey: "achievements.routineMaster.title",
+            descriptionKey: "achievements.routineMaster.description.1",
+            trigger: AchievementTrigger.workout,
+            progress: () => _routineMaster().length.toDouble(),
+            progressMax: () => 3,
+            progressText: (v) => v.toInt().toString(),
+            checkCompletion: (progress) => progress! >= 3,
+          ),
+          AchievementLevel(
+            level: 2,
+            nameKey: "achievements.routineMaster.title",
+            descriptionKey: "achievements.routineMaster.description.2",
+            trigger: AchievementTrigger.workout,
+            progress: () => _routineMaster().length.toDouble(),
+            progressMax: () => 6,
+            progressText: (v) => v.toInt().toString(),
+            checkCompletion: (progress) => progress! >= 6,
+          ),
+          AchievementLevel(
+            level: 3,
+            nameKey: "achievements.routineMaster.title",
+            descriptionKey: "achievements.routineMaster.description.3",
+            trigger: AchievementTrigger.workout,
+            progress: () => _routineMaster().length.toDouble(),
+            progressMax: () => 12,
+            progressText: (v) => v.toInt().toString(),
+            checkCompletion: (progress) => progress! >= 12,
+          ),
+        ],
+      ),
     };
 
 List<DateTime> _foodWatcher() {
@@ -626,6 +709,77 @@ bool _professionalWeightlifter(double coefficient) {
   }
 
   return false;
+}
+
+List _routineMaster() {
+  final routines = Get.find<RoutinesController>().workouts;
+  if (routines.isEmpty) return [];
+
+  int longestStreak = 0;
+  List<DateTime> longestStreakDates = [];
+  String longestStreakRoutineName = '';
+
+  for (var routine in routines) {
+    final workouts = Get.find<HistoryController>()
+        .history
+        .where((wo) => wo.parentID == routine.id);
+    if (workouts.isEmpty) continue;
+
+    // Group workouts by year and month
+    final Map<String, List<Workout>> groupedWorkouts = {};
+    for (var workout in workouts) {
+      final yearMonth =
+          '${workout.startingDate!.year}-${workout.startingDate!.month.toString().padLeft(2, "0")}';
+      if (!groupedWorkouts.containsKey(yearMonth)) {
+        groupedWorkouts[yearMonth] = [];
+      }
+      groupedWorkouts[yearMonth]!.add(workout);
+    }
+
+    // Check for the longest streak of at least n consecutive months
+    final sortedKeys = groupedWorkouts.keys.toList()..sort();
+    for (int i = 0; i < sortedKeys.length; i++) {
+      int currentStreak = 1;
+      List<DateTime> currentStreakDates = groupedWorkouts[sortedKeys[i]]!
+          .map((wo) => wo.startingDate!)
+          .toList();
+
+      for (int j = i; j < sortedKeys.length - 1; j++) {
+        final current = DateTime.parse('${sortedKeys[j]}-01');
+        final next = DateTime.parse('${sortedKeys[j + 1]}-01');
+        if ((next.month == current.month + 1 && next.year == current.year) ||
+            (next.month == 1 &&
+                current.month == 12 &&
+                next.year == current.year + 1)) {
+          currentStreak++;
+          currentStreakDates.addAll(groupedWorkouts[sortedKeys[j + 1]]!
+              .map((wo) => wo.startingDate!)
+              .toList());
+        } else {
+          break;
+        }
+      }
+
+      if (currentStreak > longestStreak) {
+        longestStreak = currentStreak;
+        longestStreakDates = currentStreakDates;
+        longestStreakRoutineName = routine.name;
+      }
+    }
+  }
+
+  if (longestStreakRoutineName.isNotEmpty) {
+    print('Longest streak routine: $longestStreakRoutineName');
+  }
+
+  final Set<String> yearMonthPairs = {};
+
+  for (var date in longestStreakDates) {
+    final yearMonth = '${date.year}-${date.month}';
+    yearMonthPairs.add(yearMonth);
+  }
+
+  return yearMonthPairs.toList();
 }
 
 bool _defaultFilter(Exercise _) => true;

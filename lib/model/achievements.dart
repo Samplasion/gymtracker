@@ -5,6 +5,7 @@ enum AchievementTrigger {
   workout,
   food,
   weight,
+  routines,
 }
 
 final class Achievement {

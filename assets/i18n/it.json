@@ -731,7 +731,10 @@
     "triceps": "Tricipiti",
     "upperBack": "Schiena alta",
     "thighs": "Cosce",
-    "forearms": "Avambracci"
+    "forearms": "Avambracci",
+    "hands": "Mani",
+    "obliques": "Obliqui",
+    "tibialis": "Tibiali"
   },
   "muscleCategories": {
     "arms": "Braccia",

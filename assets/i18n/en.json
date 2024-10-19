@@ -732,7 +732,10 @@
     "triceps": "Triceps",
     "upperBack": "Upper back",
     "thighs": "Thighs",
-    "forearms": "Forearms"
+    "forearms": "Forearms",
+    "hands": "Hands",
+    "obliques": "Obliques",
+    "tibialis": "Tibialis"
   },
   "muscleCategories": {
     "arms": "Arms",

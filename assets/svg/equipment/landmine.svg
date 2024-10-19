@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="a" data-name="Livello 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
+  <rect x="60" y="702.51" width="341" height="97" rx="31.56" ry="31.56" fill="currentColor" stroke-width="0"/>
+  <rect x="183" y="613.51" width="92" height="138" rx="15.7" ry="15.7" fill="currentColor" stroke-width="0"/>
+  <line x1="932" y1="438.51" x2="218" y2="633.51" fill="none" stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="60"/>
+  <rect x="753" y="303.51" width="112" height="337" rx="36.91" ry="36.91" transform="translate(-95.77 229.82) rotate(-15.28)" fill="currentColor" stroke-width="0"/>
+  <circle cx="229" cy="630.51" r="40" fill="currentColor" stroke-width="0"/>
+</svg>

@@ -2049,6 +2049,10 @@
       "long": "Fasce di sospensione",
       "short": "F. di sosp."
     },
+    "landmine": {
+      "long": "Landmine",
+      "short": "Landmine"
+    },
     "other": {
       "long": "Altro",
       "short": "Altro"

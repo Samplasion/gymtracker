@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <svg id="a" data-name="Livello 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
-  <rect x="121.47" y="808" width="380" height="83" rx="12" ry="12" fill="currentColor" stroke-width="0"/>
-  <path d="M485.47,816.91s-60.14-205.84-174.34-207.42h.34c-114.21,1.58-174.34,207.42-174.34,207.42" fill="none" stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="30"/>
-  <path d="M289.47-.49h45v600.49c0,6.62-5.38,12-12,12h-21c-6.62,0-12-5.38-12-12V-.49h0Z" fill="currentColor" stroke-width="0"/>
-  <rect x="522.53" y="698.6" width="380" height="83" rx="12" ry="12" fill="currentColor" stroke-width="0"/>
-  <path d="M886.53,707.51s-60.14-205.84-174.34-207.42h.34c-114.21,1.58-174.34,207.42-174.34,207.42" fill="none" stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="30"/>
-  <path d="M690.53-.49h45v489c0,6.62-5.38,12-12,12h-21c-6.62,0-12-5.38-12-12V-.49h0Z" fill="currentColor" stroke-width="0"/>
+  <rect x="86.97" y="805.51" width="423.07" height="87.98" rx="22.5" ry="22.5" fill="currentColor" stroke-width="0"/>
+  <path d="M472.5,816.91s-60.14-205.84-174.34-207.42h.34c-114.21,1.58-174.34,207.42-174.34,207.42" fill="none" stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="60"/>
+  <path d="M267.47-.49h63.07c5.8,0,10.5,4.7,10.5,10.5v599.49c0,12.42-10.08,22.5-22.5,22.5h-39.07c-12.42,0-22.5-10.08-22.5-22.5V10.01c0-5.8,4.7-10.5,10.5-10.5Z" fill="currentColor" stroke-width="0"/>
+  <rect x="510.1" y="694.51" width="426.93" height="93.19" rx="22.5" ry="22.5" fill="currentColor" stroke-width="0"/>
+  <path d="M897.57,708.51s-60.14-205.84-174.34-207.42h.34c-114.21,1.58-174.34,207.42-174.34,207.42" fill="none" stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="60"/>
+  <path d="M699.6.51h48.93c5.8,0,10.5,4.7,10.5,10.5v488c0,12.42-10.08,22.5-22.5,22.5h-24.93c-12.42,0-22.5-10.08-22.5-22.5V11.01c0-5.8,4.7-10.5,10.5-10.5Z" fill="currentColor" stroke-width="0"/>
 </svg>

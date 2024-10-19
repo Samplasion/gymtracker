@@ -2050,6 +2050,10 @@
       "long": "Suspension bands",
       "short": "Susp. bands"
     },
+    "landmine": {
+      "long": "Landmine platform",
+      "short": "Landmine"
+    },
     "other": {
       "long": "Other",
       "short": "Other"

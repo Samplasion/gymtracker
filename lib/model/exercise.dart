@@ -207,6 +207,7 @@ enum GTGymEquipment {
   plates,
   resistanceBand,
   suspensionBands,
+  landmine,
   other;
 
   String get localizedName => "equipment.$name.long".t;

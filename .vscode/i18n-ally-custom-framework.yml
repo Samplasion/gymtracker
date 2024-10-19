@@ -2,6 +2,7 @@ languageIds:
   - dart
 usageMatchRegex:
   - "['\"]({key})['\"]\\s*\\.t"
+  - "(?:name|description)Key: ['\"]({key})['\"]"
 refactorTemplates:
   - '"$1".t'
 monopoly: true

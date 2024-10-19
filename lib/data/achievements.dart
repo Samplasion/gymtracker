@@ -26,6 +26,7 @@ Map<String, Achievement> get achievements => {
         iconKey: "firstSteps",
         levels: [
           AchievementLevel(
+            achievementID: "firstSteps",
             level: 1,
             nameKey: "achievements.firstSteps.title",
             descriptionKey: "achievements.firstSteps.description.1",
@@ -34,6 +35,7 @@ Map<String, Achievement> get achievements => {
                 Get.find<HistoryController>().history.isNotEmpty,
           ),
           AchievementLevel(
+            achievementID: "firstSteps",
             level: 2,
             nameKey: "achievements.firstSteps.title",
             descriptionKey: "achievements.firstSteps.description.2",
@@ -42,6 +44,7 @@ Map<String, Achievement> get achievements => {
                 Get.find<MeController>().weightMeasurements.isNotEmpty,
           ),
           AchievementLevel(
+            achievementID: "firstSteps",
             level: 3,
             nameKey: "achievements.firstSteps.title",
             descriptionKey: "achievements.firstSteps.description.3",
@@ -61,6 +64,7 @@ Map<String, Achievement> get achievements => {
         color: Colors.orange,
         levels: [
           AchievementLevel(
+            achievementID: "foodWatcher",
             level: 1,
             nameKey: "achievements.foodWatcher.title",
             descriptionKey: "achievements.foodWatcher.description.1",
@@ -77,6 +81,7 @@ Map<String, Achievement> get achievements => {
             },
           ),
           AchievementLevel(
+            achievementID: "foodWatcher",
             level: 2,
             nameKey: "achievements.foodWatcher.title",
             descriptionKey: "achievements.foodWatcher.description.2",
@@ -93,6 +98,7 @@ Map<String, Achievement> get achievements => {
             },
           ),
           AchievementLevel(
+            achievementID: "foodWatcher",
             level: 3,
             nameKey: "achievements.foodWatcher.title",
             descriptionKey: "achievements.foodWatcher.description.3",
@@ -120,6 +126,7 @@ Map<String, Achievement> get achievements => {
         color: Colors.red,
         levels: [
           AchievementLevel(
+            achievementID: "marathoner",
             level: 1,
             nameKey: "achievements.marathoner.title",
             descriptionKey: "achievements.marathoner.description.1",
@@ -136,6 +143,7 @@ Map<String, Achievement> get achievements => {
             },
           ),
           AchievementLevel(
+            achievementID: "marathoner",
             level: 2,
             nameKey: "achievements.marathoner.title",
             descriptionKey: "achievements.marathoner.description.2",
@@ -153,6 +161,7 @@ Map<String, Achievement> get achievements => {
             },
           ),
           AchievementLevel(
+            achievementID: "marathoner",
             level: 3,
             nameKey: "achievements.marathoner.title",
             descriptionKey: "achievements.marathoner.description.3",
@@ -177,6 +186,7 @@ Map<String, Achievement> get achievements => {
         iconKey: "earlyBird",
         levels: [
           AchievementLevel(
+            achievementID: "earlyBird",
             level: 1,
             nameKey: "achievements.earlyBird.title",
             descriptionKey: "achievements.earlyBird.description",
@@ -197,6 +207,7 @@ Map<String, Achievement> get achievements => {
         color: Colors.deepPurple,
         levels: [
           AchievementLevel(
+            achievementID: "nightOwl",
             level: 1,
             nameKey: "achievements.nightOwl.title",
             descriptionKey: "achievements.nightOwl.description",
@@ -217,6 +228,7 @@ Map<String, Achievement> get achievements => {
         color: Colors.cyan,
         levels: [
           AchievementLevel(
+            achievementID: "realGymBro",
             level: 1,
             nameKey: "achievements.realGymBro.title",
             descriptionKey: "achievements.realGymBro.description.1",
@@ -235,6 +247,7 @@ Map<String, Achievement> get achievements => {
             checkCompletion: (progress) => progress! >= 100,
           ),
           AchievementLevel(
+            achievementID: "realGymBro",
             level: 2,
             nameKey: "achievements.realGymBro.title",
             descriptionKey: "achievements.realGymBro.description.2",
@@ -253,6 +266,7 @@ Map<String, Achievement> get achievements => {
             checkCompletion: (progress) => progress! >= 500,
           ),
           AchievementLevel(
+            achievementID: "realGymBro",
             level: 3,
             nameKey: "achievements.realGymBro.title",
             descriptionKey: "achievements.realGymBro.description.3",
@@ -281,6 +295,7 @@ Map<String, Achievement> get achievements => {
         color: Colors.green,
         levels: [
           AchievementLevel(
+            achievementID: "workoutFreak",
             level: 1,
             nameKey: "achievements.workoutFreak.title",
             descriptionKey: "achievements.workoutFreak.description.1",
@@ -328,6 +343,7 @@ Map<String, Achievement> get achievements => {
             },
           ),
           AchievementLevel(
+            achievementID: "workoutFreak",
             level: 2,
             nameKey: "achievements.workoutFreak.title",
             descriptionKey: "achievements.workoutFreak.description.2",
@@ -386,6 +402,7 @@ Map<String, Achievement> get achievements => {
         color: Colors.brown,
         levels: [
           AchievementLevel(
+            achievementID: "trailblazer",
             level: 1,
             nameKey: "achievements.trailblazer.title",
             descriptionKey: "achievements.trailblazer.description.1",
@@ -400,6 +417,7 @@ Map<String, Achievement> get achievements => {
             checkCompletion: (progress) => progress! >= 100,
           ),
           AchievementLevel(
+            achievementID: "trailblazer",
             level: 2,
             nameKey: "achievements.trailblazer.title",
             descriptionKey: "achievements.trailblazer.description.2",
@@ -414,6 +432,7 @@ Map<String, Achievement> get achievements => {
             checkCompletion: (progress) => progress! >= 500,
           ),
           AchievementLevel(
+            achievementID: "trailblazer",
             level: 3,
             nameKey: "achievements.trailblazer.title",
             descriptionKey: "achievements.trailblazer.description.3",
@@ -440,6 +459,7 @@ Map<String, Achievement> get achievements => {
         color: Colors.blue,
         levels: [
           AchievementLevel(
+            achievementID: "cycleChampion",
             level: 1,
             nameKey: "achievements.cycleChampion.title",
             descriptionKey: "achievements.cycleChampion.description.1",
@@ -454,6 +474,7 @@ Map<String, Achievement> get achievements => {
             checkCompletion: (progress) => progress! >= 100,
           ),
           AchievementLevel(
+            achievementID: "cycleChampion",
             level: 2,
             nameKey: "achievements.cycleChampion.title",
             descriptionKey: "achievements.cycleChampion.description.2",
@@ -468,6 +489,7 @@ Map<String, Achievement> get achievements => {
             checkCompletion: (progress) => progress! >= 500,
           ),
           AchievementLevel(
+            achievementID: "cycleChampion",
             level: 3,
             nameKey: "achievements.cycleChampion.title",
             descriptionKey: "achievements.cycleChampion.description.3",
@@ -494,6 +516,7 @@ Map<String, Achievement> get achievements => {
         color: Colors.blueGrey,
         levels: [
           AchievementLevel(
+            achievementID: "professionalWeightlifter",
             level: 1,
             nameKey: "achievements.professionalWeightlifter.title",
             descriptionKey:
@@ -504,6 +527,7 @@ Map<String, Achievement> get achievements => {
             },
           ),
           AchievementLevel(
+            achievementID: "professionalWeightlifter",
             level: 2,
             nameKey: "achievements.professionalWeightlifter.title",
             descriptionKey:
@@ -514,6 +538,7 @@ Map<String, Achievement> get achievements => {
             },
           ),
           AchievementLevel(
+            achievementID: "professionalWeightlifter",
             level: 3,
             nameKey: "achievements.professionalWeightlifter.title",
             descriptionKey:
@@ -533,6 +558,7 @@ Map<String, Achievement> get achievements => {
         color: Colors.blue,
         levels: [
           AchievementLevel(
+            achievementID: "programPlanner",
             level: 1,
             nameKey: "achievements.programPlanner.title",
             descriptionKey: "achievements.programPlanner.description",
@@ -555,6 +581,7 @@ Map<String, Achievement> get achievements => {
         color: const Color.fromARGB(255, 233, 187, 2),
         levels: [
           AchievementLevel(
+            achievementID: "perfectPlanner",
             level: 1,
             nameKey: "achievements.perfectPlanner.title",
             descriptionKey: "achievements.perfectPlanner.description",
@@ -576,6 +603,7 @@ Map<String, Achievement> get achievements => {
         color: Colors.pink,
         levels: [
           AchievementLevel(
+            achievementID: "routineMaster",
             level: 1,
             nameKey: "achievements.routineMaster.title",
             descriptionKey: "achievements.routineMaster.description.1",
@@ -586,6 +614,7 @@ Map<String, Achievement> get achievements => {
             checkCompletion: (progress) => progress! >= 3,
           ),
           AchievementLevel(
+            achievementID: "routineMaster",
             level: 2,
             nameKey: "achievements.routineMaster.title",
             descriptionKey: "achievements.routineMaster.description.2",
@@ -596,6 +625,7 @@ Map<String, Achievement> get achievements => {
             checkCompletion: (progress) => progress! >= 6,
           ),
           AchievementLevel(
+            achievementID: "routineMaster",
             level: 3,
             nameKey: "achievements.routineMaster.title",
             descriptionKey: "achievements.routineMaster.description.3",
@@ -604,6 +634,54 @@ Map<String, Achievement> get achievements => {
             progressMax: () => 12,
             progressText: (v) => v.toInt().toString(),
             checkCompletion: (progress) => progress! >= 12,
+          ),
+        ],
+      ),
+      // Intensity innovator
+      // Update a routine
+      "intensityInnovator": Achievement(
+        id: "intensityInnovator",
+        nameKey: "achievements.intensityInnovator.title",
+        iconKey: "intensityInnovator",
+        color: Colors.teal,
+        levels: [
+          AchievementLevel(
+            achievementID: "intensityInnovator",
+            level: 1,
+            nameKey: "achievements.intensityInnovator.title",
+            descriptionKey: "achievements.intensityInnovator.description",
+            trigger: AchievementTrigger.workout,
+            checkCompletion: (_) {
+              final routines = Get.find<RoutinesController>().workouts;
+              final workouts = Get.find<HistoryController>().history;
+              if (routines.isEmpty || workouts.isEmpty) return false;
+
+              for (final routine in routines) {
+                final rHistory =
+                    workouts.where((wo) => wo.parentID == routine.id).toList();
+                if (rHistory.length < 2) continue;
+
+                for (int i = rHistory.length - 1; i > 0; i--) {
+                  final newW = rHistory[i];
+                  final oldW = rHistory[i - 1];
+
+                  // Check that the current newer workout is the same as the routine
+                  if (!WorkoutDifference.fromWorkouts(
+                          oldWorkout: newW, newWorkout: routine)
+                      .isEmpty) {
+                    continue;
+                  }
+
+                  if (!WorkoutDifference.fromWorkouts(
+                          oldWorkout: oldW, newWorkout: newW)
+                      .isEmpty) {
+                    return true;
+                  }
+                }
+              }
+
+              return false;
+            },
           ),
         ],
       ),

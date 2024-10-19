@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:gymtracker/data/achievements.dart';
 import 'package:gymtracker/gen/assets.gen.dart';
 import 'package:gymtracker/icons/gymtracker_icons.dart';
 import 'package:gymtracker/model/achievements.dart';
@@ -192,5 +193,8 @@ class AchievementBanner extends MaterialBanner {
 }
 
 extension AchievementLevelName on AchievementLevel {
-  String get localizedName => "${nameKey.t} ${level.toRomanNumeral()}";
+  String get localizedName {
+    if (achievements[achievementID]!.levels.length == 1) return nameKey.t;
+    return "${nameKey.t} ${level.toRomanNumeral()}";
+  }
 }

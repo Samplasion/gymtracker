@@ -2151,6 +2151,10 @@
         "2": "Segui una routine per 6 mesi consecutivi",
         "3": "Segui una routine per 12 mesi consecutivi"
       }
+    },
+    "intensityInnovator": {
+      "title": "Intensità incendiaria",
+      "description": "Modifica una routine aumentando pesi o ripetizioni"
     }
   }
 }

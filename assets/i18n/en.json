@@ -2152,6 +2152,10 @@
         "2": "Follow a routine for 6 consecutive months",
         "3": "Follow a routine for 12 consecutive months"
       }
+    },
+    "intensityInnovator": {
+      "title": "Intensity Innovator",
+      "description": "Update a routine by increasing your weight/reps"
     }
   }
 }

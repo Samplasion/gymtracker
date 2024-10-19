@@ -52,6 +52,7 @@ final class Achievement {
 }
 
 final class AchievementLevel {
+  final String achievementID;
   final int level;
   final String nameKey;
   final String descriptionKey;
@@ -62,6 +63,7 @@ final class AchievementLevel {
   final double Function()? progressMax;
 
   const AchievementLevel({
+    required this.achievementID,
     required this.level,
     required this.nameKey,
     required this.descriptionKey,
@@ -78,7 +80,7 @@ final class AchievementLevel {
 
   @override
   String toString() {
-    return "AchievementLevel{level: $level, descriptionKey: $descriptionKey, trigger: $trigger, checkCompletion: $checkCompletion}";
+    return "AchievementLevel{achievementID: $achievementID, level: $level, descriptionKey: $descriptionKey, trigger: $trigger, checkCompletion: $checkCompletion, progress: $progress, progressText: $progressText, progressMax: $progressMax}";
   }
 }
 

@@ -650,6 +650,8 @@ class ShareRoutineAlertDialog extends StatefulWidget {
 class _ShareRoutineAlertDialogState extends State<ShareRoutineAlertDialog> {
   ScreenshotController screenshotController = ScreenshotController();
 
+  bool get showQr => widget.uri.toString().length <= 2953;
+
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
@@ -660,23 +662,26 @@ class _ShareRoutineAlertDialogState extends State<ShareRoutineAlertDialog> {
         children: [
           Text("workouts.actions.share.alert.body".t),
           const SizedBox(height: 16),
-          SizedBox(
-            width: 480.0,
-            height: 480.0,
-            child: QrImageView(
-              data: widget.uri.toString(),
-              version: QrVersions.auto,
-              eyeStyle: QrEyeStyle(
-                eyeShape: QrEyeShape.square,
-                color: context.theme.colorScheme.onSurface,
+          if (showQr)
+            SizedBox(
+              width: 480.0,
+              height: 480.0,
+              child: QrImageView(
+                data: widget.uri.toString(),
+                version: QrVersions.auto,
+                eyeStyle: QrEyeStyle(
+                  eyeShape: QrEyeShape.square,
+                  color: context.theme.colorScheme.onSurface,
+                ),
+                dataModuleStyle: QrDataModuleStyle(
+                  dataModuleShape: QrDataModuleShape.square,
+                  color: context.theme.colorScheme.onSurface,
+                ),
+                padding: const EdgeInsets.all(16),
               ),
-              dataModuleStyle: QrDataModuleStyle(
-                dataModuleShape: QrDataModuleShape.square,
-                color: context.theme.colorScheme.onSurface,
-              ),
-              padding: const EdgeInsets.all(16),
-            ),
-          ),
+            )
+          else
+            Text("workouts.actions.share.alert.noQr".t),
           const SizedBox(height: 16),
           Text(
             widget.uri.toString(),
@@ -703,12 +708,13 @@ class _ShareRoutineAlertDialogState extends State<ShareRoutineAlertDialog> {
           },
           child: Text("workouts.actions.share.alert.actions.share".t),
         ),
-        FilledButton.tonal(
-          onPressed: () {
-            shareImage();
-          },
-          child: Text("workouts.actions.share.alert.actions.shareQR".t),
-        ),
+        if (showQr)
+          FilledButton.tonal(
+            onPressed: () {
+              shareImage();
+            },
+            child: Text("workouts.actions.share.alert.actions.shareQR".t),
+          ),
       ],
     );
   }

@@ -256,7 +256,8 @@
             "share": "Copia",
             "shareQR": "Condividi QR",
             "shared": "Il link è stato copiato."
-          }
+          },
+          "noQr": "Impossibile generare codice QR: routine troppo grande. Usa il link in basso per condividere la tua routine."
         }
       }
     }

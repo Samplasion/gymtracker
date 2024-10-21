@@ -1083,9 +1083,21 @@ Duration _swimsuitSeason(Iterable<Workout> subset) {
     }
 
     var timedCardio = cardioExercises.where((ex) => ex.parameters.hasTime);
-    if (timedCardio.isEmpty) return duration;
+    var untimedCardio = cardioExercises.where((ex) => !ex.parameters.hasTime);
 
-    return duration + timedCardio.map((ex) => ex.time!).reduce((a, b) => a + b);
+    final timedDuration = timedCardio.isEmpty
+        ? Duration.zero
+        : timedCardio.map((ex) => ex.time!).reduce((a, b) => a + b);
+    final untimedDuration = untimedCardio.isEmpty
+        ? Duration.zero
+        : untimedCardio
+            .map((exercise) =>
+                workout.duration! *
+                exercise.doneSets.length *
+                (1 / workout.doneSets.length))
+            .reduce((a, b) => a + b);
+
+    return duration + timedDuration + untimedDuration;
   });
 }
 

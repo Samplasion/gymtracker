@@ -38,25 +38,28 @@ def main():
     
     classNames.append((category, f"$GTStandardLibrary{category.capitalize()}Exercises"))
 
-    for exercise in sorted(categories[category], key=lambda x: x.lower()):
+    sort = sorted(categories[category], key=lambda x: x.lower())
+    for exercise in sort:
       localizedName = localizedNames['library'][category]['exercises'][exercise]
       klass += f"""
       /// {localizedName}
       String get {exercise} => 'library.{category}.exercises.{exercise}';
       """
     
-    klass += """
-    }
+    klass += f"""
+      List<String> get values => [{', '.join(sort)}];
+
+    }}
     """
   
     classes.append(klass)
   
-  file = """
+  file = """// GENERATED CODE - DO NOT EDIT BY HAND
 // coverage:ignore-file
 // ignore_for_file: type=lint
 // ignore_for_file: directives_ordering,unnecessary_import,implicit_dynamic_list_literal,deprecated_member_use
 
-  class GTStandardLibrary {
+class GTStandardLibrary {
   """
 
   for name, t in classNames:

@@ -7,6 +7,7 @@ import 'package:gymtracker/controller/debug_controller.dart';
 import 'package:gymtracker/data/exercises.dart';
 import 'package:gymtracker/model/exercise.dart';
 import 'package:gymtracker/service/logger.dart';
+import 'package:gymtracker/utils/extensions.dart';
 import 'package:intl/intl.dart';
 
 class GTLocalizations extends Translations with ChangeNotifier {
@@ -157,7 +158,7 @@ extension Fallback on String {
 }
 
 extension Plural on String {
-  String plural(int howMany, {Map<String, String>? args}) {
+  String plural(num howMany, {Map<String, String>? args}) {
     return Intl.plural(
       howMany,
       zero: "$this.zero",
@@ -168,9 +169,9 @@ extension Plural on String {
       other: "$this.other",
       locale: Get.locale!.languageCode,
     ).tParams({
-      "howMany": howMany.toString(),
+      "howMany": howMany.localized,
       ...?args,
-    }).replaceAll("%s", howMany.toString());
+    }).replaceAll("%s", howMany.localized);
   }
 }
 

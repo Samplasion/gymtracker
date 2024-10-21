@@ -1,3 +1,4 @@
+// GENERATED CODE - DO NOT EDIT BY HAND
 // coverage:ignore-file
 // ignore_for_file: type=lint
 // ignore_for_file: directives_ordering,unnecessary_import,implicit_dynamic_list_literal,deprecated_member_use
@@ -58,6 +59,21 @@ class $GTStandardLibraryCardioExercises {
 
   /// Zumba
   String get zumba => 'library.cardio.exercises.zumba';
+
+  List<String> get values => [
+        aerobics,
+        bicycleCrunchesCardio,
+        biking,
+        crunchesTimed,
+        ergometer,
+        ergometerHorizontal,
+        jumpRope,
+        pilates,
+        rowingMachine,
+        running,
+        treadmill,
+        zumba
+      ];
 }
 
 class $GTStandardLibraryChestExercises {
@@ -139,6 +155,31 @@ class $GTStandardLibraryChestExercises {
 
   /// Vertical chest press
   String get verticalChestPress => 'library.chest.exercises.verticalChestPress';
+
+  List<String> get values => [
+        barbellBenchPressDecline,
+        barbellBenchPressFlat,
+        barbellBenchPressIncline,
+        butterflyMachine,
+        cableChestPress,
+        cableFlyCrossovers,
+        declinePushUps,
+        dumbbellBenchPressDecline,
+        dumbbellBenchPressFlat,
+        dumbbellBenchPressIncline,
+        dumbbellHexPress,
+        inclinePushUps,
+        lowCableFly,
+        pushUps,
+        pushUpsWeighted,
+        seatedCableChestFlys,
+        smithMachineBenchPressDecline,
+        smithMachineBenchPressFlat,
+        smithMachineBenchPressIncline,
+        smithMachineHexPress,
+        tBarPress,
+        verticalChestPress
+      ];
 }
 
 class $GTStandardLibraryBicepsExercises {
@@ -179,6 +220,20 @@ class $GTStandardLibraryBicepsExercises {
 
   /// Spider curls
   String get spiderCurls => 'library.biceps.exercises.spiderCurls';
+
+  List<String> get values => [
+        barbellBicepsCurl,
+        bicepsCurlMachine,
+        cableBicepsCurl,
+        chinUps,
+        concentrationCurl,
+        dualCableHighCurl,
+        dumbbellBicepsCurl,
+        hammerCurlDumbbell,
+        scottCurl,
+        singleArmCableHammerCurls,
+        spiderCurls
+      ];
 }
 
 class $GTStandardLibraryAbsExercises {
@@ -236,6 +291,26 @@ class $GTStandardLibraryAbsExercises {
 
   /// Toe touches
   String get toeTouches => 'library.abs.exercises.toeTouches';
+
+  List<String> get values => [
+        bicycleCrunches,
+        crunches,
+        crunchMachine,
+        deadBugHold,
+        deadBugHoldCardio,
+        extendedReverseCrunchWithLegExtension,
+        fullBodyCrunch,
+        heelsUpCrunch,
+        heelTouches,
+        hollowBodyHold,
+        hollowBodyHoldBentKnees,
+        kneeRaise,
+        legRaise,
+        obliqueCrunches,
+        plank,
+        russianTwist,
+        toeTouches
+      ];
 }
 
 class $GTStandardLibraryObliquesExercises {
@@ -247,6 +322,8 @@ class $GTStandardLibraryObliquesExercises {
   /// Side plank reach through
   String get sidewaysPlankReachThrough =>
       'library.obliques.exercises.sidewaysPlankReachThrough';
+
+  List<String> get values => [sidewaysPlank, sidewaysPlankReachThrough];
 }
 
 class $GTStandardLibraryCalvesExercises {
@@ -261,6 +338,9 @@ class $GTStandardLibraryCalvesExercises {
 
   /// Calf raise (standing)
   String get calfRaiseStanding => 'library.calves.exercises.calfRaiseStanding';
+
+  List<String> get values =>
+      [calfPressLegPressMachine, calfRaiseSeated, calfRaiseStanding];
 }
 
 class $GTStandardLibraryQuadricepsExercises {
@@ -298,6 +378,19 @@ class $GTStandardLibraryQuadricepsExercises {
 
   /// Squats (barbell)
   String get squatsBarbell => 'library.quadriceps.exercises.squatsBarbell';
+
+  List<String> get values => [
+        bodyweightSquats,
+        bulgarianSplitSquats,
+        frontSquats,
+        hackSquats,
+        legExtension,
+        legPress,
+        legPress45deg,
+        lunges,
+        smithMachineLunges,
+        squatsBarbell
+      ];
 }
 
 class $GTStandardLibraryHamstringsExercises {
@@ -316,6 +409,9 @@ class $GTStandardLibraryHamstringsExercises {
   /// Romanian deadlift (dumbbells)
   String get romanianDeadliftDumbbell =>
       'library.hamstrings.exercises.romanianDeadliftDumbbell';
+
+  List<String> get values =>
+      [legCurlProne, legCurlSeated, romanianDeadlift, romanianDeadliftDumbbell];
 }
 
 class $GTStandardLibraryShouldersExercises {
@@ -362,6 +458,21 @@ class $GTStandardLibraryShouldersExercises {
 
   /// Upright row
   String get uprightRow => 'library.shoulders.exercises.uprightRow';
+
+  List<String> get values => [
+        arnoldPress,
+        bentOverLateralRaises,
+        frontDumbbellRaise,
+        handstandPushUps,
+        latRaisesCable,
+        latRaisesDualCable,
+        latRaisesInclinedBench,
+        pikePushUps,
+        reverseFlysInclinedBench,
+        shoulderPress,
+        shoulderPressMachine,
+        uprightRow
+      ];
 }
 
 class $GTStandardLibraryBackExercises {
@@ -404,6 +515,20 @@ class $GTStandardLibraryBackExercises {
   /// Hyperextensions (weighted)
   String get weightedHyperExtensions =>
       'library.back.exercises.weightedHyperExtensions';
+
+  List<String> get values => [
+        barbellRow,
+        cableSeatedRowTriangleBar,
+        deadlift,
+        hyperExtensions,
+        latPulldowns,
+        pullUps,
+        straightArmCablePushdown,
+        tBarRow,
+        triangleBarLatPulldowns,
+        underhandGripLatPulldowns,
+        weightedHyperExtensions
+      ];
 }
 
 class $GTStandardLibraryTricepsExercises {
@@ -434,6 +559,17 @@ class $GTStandardLibraryTricepsExercises {
   /// Triceps rope pushdown
   String get tricepsRopePushdown =>
       'library.triceps.exercises.tricepsRopePushdown';
+
+  List<String> get values => [
+        benchDips,
+        diamondPushUps,
+        dips,
+        overheadRopeTricepExtension,
+        skullCrushers,
+        tricepKickbacks,
+        tricepsMachine,
+        tricepsRopePushdown
+      ];
 }
 
 class $GTStandardLibraryHipsExercises {
@@ -456,6 +592,15 @@ class $GTStandardLibraryHipsExercises {
 
   /// Hip thrust (barbell)
   String get hipThrustBarbell => 'library.hips.exercises.hipThrustBarbell';
+
+  List<String> get values => [
+        clamshells,
+        gluteBridge,
+        hipAbduction,
+        hipAdduction,
+        hipThrust,
+        hipThrustBarbell
+      ];
 }
 
 class $GTStandardLibraryForearmsExercises {
@@ -496,4 +641,17 @@ class $GTStandardLibraryForearmsExercises {
 
   /// Wrist roller
   String get wristRoller => 'library.forearms.exercises.wristRoller';
+
+  List<String> get values => [
+        cableSingleArmReverseCurl,
+        farmerWalk,
+        platePinch,
+        reverseCurls,
+        reverseCurlsDumbbell,
+        reverseWristCurlsBarbell,
+        reverseWristCurlsDumbbell,
+        wristCurlsBarbell,
+        wristCurlsDumbbell,
+        wristRoller
+      ];
 }

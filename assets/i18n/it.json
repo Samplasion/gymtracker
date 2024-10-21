@@ -2160,6 +2160,18 @@
     "completionist": {
       "title": "Completista",
       "description": "Prova almeno una volta tutti gli esercizi della libreria"
+    },
+    "notDrunk": {
+      "title": "Non sono sbronzo ma brillo!",
+      "description": "Completa un allenamento di domenica mattina superando un record personale di volume o distanza"
+    },
+    "steamedHams": {
+      "description": "Supera un record personale di massimale in un allenamento impiegando meno tempo del solito",
+      "title": "Vitellone al vapore"
+    },
+    "swimsuitSeason": {
+      "title": "Prova costume",
+      "description": "Accumula 168h di allenamento cardio tra marzo e giugno di un anno"
     }
   }
 }

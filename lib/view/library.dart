@@ -17,7 +17,6 @@ import 'package:gymtracker/icons/gymtracker_icons.dart';
 import 'package:gymtracker/model/exercisable.dart';
 import 'package:gymtracker/model/exercise.dart';
 import 'package:gymtracker/model/set.dart';
-import 'package:gymtracker/model/superset.dart';
 import 'package:gymtracker/model/workout.dart';
 import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/service/logger.dart';
@@ -245,31 +244,8 @@ class _ExerciseInfoViewState extends State<ExerciseInfoView>
     super.dispose();
   }
 
-  List<(Exercise, int, Workout)> getHistory() {
-    final controller = Get.find<HistoryController>();
-    final history = <(Exercise, int, Workout)>[];
-    for (final workout in controller.history) {
-      history.addAll(
-        [
-          for (int i = 0; i < workout.exercises.length; i++)
-            if (workout.exercises[i] is Exercise) ...[
-              (workout.exercises[i] as Exercise, i),
-            ] else if (workout.exercises[i] is Superset) ...[
-              for (final e in (workout.exercises[i] as Superset).exercises)
-                (e, i),
-            ],
-        ]
-            .where(
-              (element) => widget.exercise.isTheSameAs(element.$1),
-            )
-            .map((e) => (e.$1, e.$2, workout)),
-      );
-    }
-    history.sort((a, b) =>
-        (b.$3.startingDate ?? DateTime.fromMillisecondsSinceEpoch(0)).compareTo(
-            a.$3.startingDate ?? DateTime.fromMillisecondsSinceEpoch(0)));
-    return history;
-  }
+  List<(Exercise, int, Workout)> getHistory() =>
+      Get.find<HistoryController>().getHistoryOf(widget.exercise);
 
   List<Widget> getTabs(
           Exercise exercise,

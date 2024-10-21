@@ -2161,6 +2161,18 @@
     "completionist": {
       "title": "Completionist",
       "description": "Try all library exercises at least once"
+    },
+    "notDrunk": {
+      "title": "I'm not drunk, I swear!",
+      "description": "Work out on a Sunday morning breaking a personal best in lifted weight or distance"
+    },
+    "steamedHams": {
+      "description": "Set a new one-rep max personal record in a faster-than-usual workout",
+      "title": "Steamed Hams"
+    },
+    "swimsuitSeason": {
+      "title": "Swimsuit Season",
+      "description": "Do a total of 168 hours of cardio exercises from March to June of a year"
     }
   }
 }

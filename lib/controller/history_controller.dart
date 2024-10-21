@@ -562,6 +562,33 @@ class HistoryController extends GetxController with ServiceableController {
         ),
     ]);
   }
+
+  List<(Exercise ex, int index, Workout workout)> getHistoryOf(
+      Exercise exercise) {
+    final controller = this;
+    final history = <(Exercise, int, Workout)>[];
+    for (final workout in controller.history) {
+      history.addAll(
+        [
+          for (int i = 0; i < workout.exercises.length; i++)
+            if (workout.exercises[i] is Exercise) ...[
+              (workout.exercises[i] as Exercise, i),
+            ] else if (workout.exercises[i] is Superset) ...[
+              for (final e in (workout.exercises[i] as Superset).exercises)
+                (e, i),
+            ],
+        ]
+            .where(
+              (element) => exercise.isTheSameAs(element.$1),
+            )
+            .map((e) => (e.$1, e.$2, workout)),
+      );
+    }
+    history.sort((a, b) =>
+        (b.$3.startingDate ?? DateTime.fromMillisecondsSinceEpoch(0)).compareTo(
+            a.$3.startingDate ?? DateTime.fromMillisecondsSinceEpoch(0)));
+    return history;
+  }
 }
 
 extension WorkoutHistory on Workout {

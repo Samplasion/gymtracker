@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:gymtracker/controller/exercises_controller.dart';
 import 'package:gymtracker/controller/food_controller.dart';
 import 'package:gymtracker/controller/history_controller.dart';
 import 'package:gymtracker/controller/me_controller.dart';
@@ -12,6 +13,7 @@ import 'package:gymtracker/data/weights.dart';
 import 'package:gymtracker/gen/exercises.gen.dart';
 import 'package:gymtracker/model/achievements.dart';
 import 'package:gymtracker/model/exercise.dart';
+import 'package:gymtracker/model/set.dart';
 import 'package:gymtracker/model/workout.dart';
 import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/service/logger.dart';
@@ -719,7 +721,150 @@ Map<String, Achievement> get achievements => {
           ),
         ],
       ),
+      "notDrunk": Achievement(
+        id: "notDrunk",
+        nameKey: "achievements.notDrunk.title",
+        iconKey: "notDrunk",
+        color: Colors.purpleAccent,
+        levels: [
+          AchievementLevel(
+            achievementID: "notDrunk",
+            level: 1,
+            nameKey: "achievements.notDrunk.title",
+            descriptionKey: "achievements.notDrunk.description",
+            trigger: AchievementTrigger.workout,
+            checkCompletion: (_) {
+              // Work out...
+              final history = Get.find<HistoryController>().history;
+              if (history.length < 2) return false;
+
+              // ...on a Sunday morning...
+              final workout = history.last;
+              final date = workout.startingDate!;
+              if (date.hour > 12 || (date.hour == 12 && date.minute >= 00)) {
+                return false;
+              }
+              if (date.weekday != DateTime.sunday) return false;
+
+              // ...breaking a personal best
+              final exercises = workout.flattenedExercises
+                  .whereType<Exercise>()
+                  .where((exercise) =>
+                      exercise.parameters.hasDistance ||
+                      exercise.parameters.hasWeight);
+              if (exercises.isEmpty) return false;
+              for (final exercise in exercises) {
+                final params = exercise.parameters;
+
+                final previousExercises = getHistoryOf(exercise)
+                    .where((data) => data.$3.startingDate!.isBefore(date));
+                for (final (previousEx, _, _) in previousExercises) {
+                  // If the previous exercise is "better" than the current one
+                  // then we haven't broken the PB. Return false
+                  if (params.hasDistance) {
+                    if ((previousEx.distanceRun ?? 0) >=
+                        exercise.distanceRun!) {
+                      return false;
+                    }
+                  } else if (params.hasWeight) {
+                    if ((previousEx.liftedWeight ?? 0) >=
+                        exercise.liftedWeight!) {
+                      return false;
+                    }
+                  }
+                }
+              }
+
+              return true;
+            },
+          ),
+        ],
+      ),
+      "steamedHams": Achievement(
+        id: "steamedHams",
+        nameKey: "achievements.steamedHams.title",
+        iconKey: "steamedHams",
+        color: Colors.orange.shade400,
+        levels: [
+          AchievementLevel(
+            achievementID: "steamedHams",
+            level: 1,
+            nameKey: "achievements.steamedHams.title",
+            descriptionKey: "achievements.steamedHams.description",
+            trigger: AchievementTrigger.workout,
+            checkCompletion: (_) {
+              final routines = Get.find<RoutinesController>().workouts;
+              if (routines.isEmpty) return false;
+
+              final history = Get.find<HistoryController>().history;
+              if (history.isEmpty) return false;
+
+              return history
+                  .map((w) => _steamedHams(w, history))
+                  .any((el) => el);
+            },
+          ),
+        ],
+      ),
+      "swimsuitSeason": Achievement(
+        id: "swimsuitSeason",
+        nameKey: "achievements.swimsuitSeason.title",
+        iconKey: "swimsuitSeason",
+        color: Colors.blueAccent,
+        levels: [
+          AchievementLevel(
+            achievementID: "swimsuitSeason",
+            level: 1,
+            nameKey: "achievements.swimsuitSeason.title",
+            descriptionKey: "achievements.swimsuitSeason.description",
+            trigger: AchievementTrigger.workout,
+            progress: () {
+              final year = DateTime.now().year;
+              final history = Get.find<HistoryController>().history;
+              if (history.isEmpty) return 0;
+              final subset = history.where((workout) =>
+                  workout.startingDate!.isAfter(DateTime(year, 3, 1)) &&
+                  workout.endingDate!.isBefore(DateTime(year, 7, 1)));
+              if (subset.isEmpty) return 0;
+              return _swimsuitSeason(subset).inMinutes / 60;
+            },
+            progressMax: () => 168,
+            progressText: (value) => "time.justHours".plural(value),
+            checkCompletion: (_) {
+              const trigger = Duration(hours: 168);
+
+              // Work out...
+              final history = Get.find<HistoryController>().history;
+              if (history.isEmpty) return false;
+
+              for (int year = DateTime.now().year;
+                  year >= history.first.startingDate!.year;
+                  year--) {
+                final subset = history.where((workout) =>
+                    workout.startingDate!.isAfter(DateTime(year, 3, 1)) &&
+                    workout.endingDate!.isBefore(DateTime(year, 7, 1)));
+                if (subset.isEmpty) return false;
+                final hours = _swimsuitSeason(subset);
+                if (hours > trigger) return true;
+              }
+
+              return false;
+            },
+          ),
+        ],
+      ),
     };
+
+_calculate1RM(Exercise exercise) {
+  assert(exercise.parameters == GTSetParameters.repsWeight);
+  return exercise.sets
+          .where((set) => set.done)
+          .map((set) => set.oneRepMax)
+          .whereType<num>()
+          .safeMax
+          ?.toDouble() ??
+      -1;
+}
 
 List<DateTime> _foodWatcher() {
   final today = DateTime.now().startOfDay;
@@ -881,7 +1026,7 @@ List _routineMaster() {
   }
 
   if (longestStreakRoutineName.isNotEmpty) {
-    print('Longest streak routine: $longestStreakRoutineName');
+    globalLogger.d('Longest streak routine: $longestStreakRoutineName');
   }
 
   final Set<String> yearMonthPairs = {};
@@ -892,6 +1037,56 @@ List _routineMaster() {
   }
 
   return yearMonthPairs.toList();
+}
+
+bool _steamedHams(Workout workout, List<Workout> history) {
+  if (workout.parentID == null) return false;
+  final workoutHistory = history.where((w) {
+    return w.parentID == workout.parentID;
+  }).where((w) => w.startingDate!.isBefore(workout.startingDate!));
+  if (workoutHistory.isEmpty) return false;
+
+  bool _exFilter(Exercise ex) => ex.parameters == GTSetParameters.repsWeight;
+  for (final historyWorkout in workoutHistory) {
+    if (historyWorkout.duration! <= workout.duration!) return false;
+
+    for (final exercise
+        in workout.flattenedExercises.whereType<Exercise>().where(_exFilter)) {
+      final cur1RM = _calculate1RM(exercise);
+
+      for (final oldExercise in historyWorkout.flattenedExercises
+          .whereType<Exercise>()
+          .where(_exFilter)
+          .where((ex) => ex.isTheSameAs(exercise))) {
+        final old1RM = _calculate1RM(oldExercise);
+        if (old1RM < cur1RM) {
+          print((workout, exercise));
+          return true;
+        }
+      }
+    }
+  }
+
+  return false;
+}
+
+Duration _swimsuitSeason(Iterable<Workout> subset) {
+  return subset.fold(Duration.zero, (duration, workout) {
+    final cardioExercises = workout.flattenedExercises
+        .whereType<Exercise>()
+        .where((ex) =>
+            ex.parentID != null &&
+            GTStandardLibrary.cardio.values.contains(ex.parentID!));
+
+    if (cardioExercises.length == workout.flattenedExercises.length) {
+      return workout.duration! + duration;
+    }
+
+    var timedCardio = cardioExercises.where((ex) => ex.parameters.hasTime);
+    if (timedCardio.isEmpty) return duration;
+
+    return duration + timedCardio.map((ex) => ex.time!).reduce((a, b) => a + b);
+  });
 }
 
 bool _defaultFilter(Exercise _) => true;
@@ -915,4 +1110,9 @@ double _distanceByFiltering(
     from: workout.distanceUnit,
     to: Distance.km,
   );
+}
+
+List<(Exercise, int, Workout)> getHistoryOf(Exercise exercise) {
+  final parent = exercise.isAbstract ? exercise : exercise.getParent()!;
+  return Get.find<HistoryController>().getHistoryOf(parent);
 }

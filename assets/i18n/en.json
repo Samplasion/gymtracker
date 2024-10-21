@@ -2157,6 +2157,10 @@
     "intensityInnovator": {
       "title": "Intensity Innovator",
       "description": "Update a routine by increasing your weight/reps"
+    },
+    "completionist": {
+      "title": "Completionist",
+      "description": "Try all library exercises at least once"
     }
   }
 }

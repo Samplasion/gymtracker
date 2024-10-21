@@ -7,6 +7,7 @@ import 'package:gymtracker/controller/me_controller.dart';
 import 'package:gymtracker/controller/routines_controller.dart';
 import 'package:gymtracker/controller/settings_controller.dart';
 import 'package:gymtracker/data/distance.dart';
+import 'package:gymtracker/data/exercises.dart';
 import 'package:gymtracker/data/weights.dart';
 import 'package:gymtracker/gen/exercises.gen.dart';
 import 'package:gymtracker/model/achievements.dart';
@@ -681,6 +682,39 @@ Map<String, Achievement> get achievements => {
               }
 
               return false;
+            },
+          ),
+        ],
+      ),
+      "completionist": Achievement(
+        id: "completionist",
+        nameKey: "achievements.completionist.title",
+        iconKey: "completionist",
+        color: Colors.green,
+        levels: [
+          AchievementLevel(
+            achievementID: "completionist",
+            level: 1,
+            nameKey: "achievements.completionist.title",
+            descriptionKey: "achievements.completionist.description",
+            trigger: AchievementTrigger.workout,
+            progress: () {
+              final exercises = <String>{};
+              final history = Get.find<HistoryController>().history;
+              for (final wo in history) {
+                final exs = wo.flattenedExercises.whereType<Exercise>();
+                for (final ex in exs) {
+                  if (ex.isStandardLibraryExercise && ex.parentID != null) {
+                    exercises.add(ex.parentID!);
+                  }
+                }
+              }
+              return exercises.length.toDouble();
+            },
+            progressMax: () => exerciseStandardLibraryAsList.length.toDouble(),
+            progressText: (v) => v.toInt().toString(),
+            checkCompletion: (progress) {
+              return progress! >= exerciseStandardLibraryAsList.length;
             },
           ),
         ],

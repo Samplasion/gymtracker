@@ -2156,6 +2156,10 @@
     "intensityInnovator": {
       "title": "Intensità incendiaria",
       "description": "Modifica una routine aumentando pesi o ripetizioni"
+    },
+    "completionist": {
+      "title": "Completista",
+      "description": "Prova almeno una volta tutti gli esercizi della libreria"
     }
   }
 }

@@ -2172,6 +2172,10 @@
     "swimsuitSeason": {
       "title": "Prova costume",
       "description": "Accumula 168h di allenamento cardio tra marzo e giugno di un anno"
+    },
+    "pbBreaker": {
+      "title": "Primato personale",
+      "description": "Supera il massimale di un esercizio"
     }
   }
 }

@@ -598,7 +598,7 @@ Map<String, Achievement> get achievements => {
       // Routine Master
       // 1. Follow a routine for 3 consecutive months
       // 2. Follow a routine for 6 consecutive months
-      // 2. Follow a routine for 12 consecutive months
+      // 3. Follow a routine for 12 consecutive months
       "routineMaster": Achievement(
         id: "routineMaster",
         nameKey: "achievements.routineMaster.title",
@@ -637,6 +637,25 @@ Map<String, Achievement> get achievements => {
             progressMax: () => 12,
             progressText: (v) => v.toInt().toString(),
             checkCompletion: (progress) => progress! >= 12,
+          ),
+        ],
+      ),
+      // Personal Best Breaker
+      // Set a new one-rep max personal record in one exercise
+      "pbBreaker": Achievement(
+        id: "pbBreaker",
+        nameKey: "achievements.pbBreaker.title",
+        iconKey: "pbBreaker",
+        color: Colors.orangeAccent,
+        levels: [
+          AchievementLevel(
+            achievementID: "pbBreaker",
+            level: 1,
+            nameKey: "achievements.pbBreaker.title",
+            descriptionKey: "achievements.pbBreaker.description",
+            trigger: AchievementTrigger.workout,
+            checkCompletion: (_) =>
+                _pbBreaker(Get.find<HistoryController>().history).isNotEmpty,
           ),
         ],
       ),
@@ -855,15 +874,17 @@ Map<String, Achievement> get achievements => {
       ),
     };
 
-_calculate1RM(Exercise exercise) {
+double _calculate1RM(Exercise exercise, Weights unit) {
   assert(exercise.parameters == GTSetParameters.repsWeight);
-  return exercise.sets
-          .where((set) => set.done)
-          .map((set) => set.oneRepMax)
-          .whereType<num>()
-          .safeMax
-          ?.toDouble() ??
-      -1;
+  var value = exercise.sets
+      .where((set) => set.done)
+      .map((set) => set.oneRepMax)
+      .whereType<num>()
+      .safeMax
+      ?.toDouble();
+  return value == null
+      ? -1
+      : Weights.convert(value: value, from: unit, to: Weights.kg);
 }
 
 List<DateTime> _foodWatcher() {
@@ -1039,6 +1060,44 @@ List _routineMaster() {
   return yearMonthPairs.toList();
 }
 
+List<Exercise> _pbBreaker(List<Workout> history) {
+  if (history.isEmpty) return [];
+
+  List<Exercise> _exercisesBreaking1RM(Workout workout) {
+    if (workout.parentID == null) return [];
+    final workoutHistory =
+        history.where((w) => w.startingDate!.isBefore(workout.startingDate!));
+    if (workoutHistory.isEmpty) return [];
+
+    List<Exercise> maxExercises = [];
+    bool _exFilter(Exercise ex) => ex.parameters == GTSetParameters.repsWeight;
+    for (final exercise
+        in workout.flattenedExercises.whereType<Exercise>().where(_exFilter)) {
+      final cur1RM = _calculate1RM(exercise, workout.weightUnit);
+
+      // I'm running out of good short variable names LMAO
+      final historySameExercises = workoutHistory
+          .map((w) => w.flattenedExercises
+              .where((e) =>
+                  e.isExercise && e.asExercise.parentID == exercise.parentID)
+              .map((ex) => (ex.asExercise, w.weightUnit))
+              .toList())
+          .expand((e) => e)
+          .cast<(Exercise, Weights)>();
+      if (historySameExercises.isEmpty) continue;
+      final oldMax = historySameExercises
+          .map((tuple) => _calculate1RM(tuple.$1, tuple.$2))
+          .max;
+      if (cur1RM > oldMax) maxExercises.add(exercise);
+    }
+
+    return maxExercises;
+  }
+
+  return history.map(_exercisesBreaking1RM).fold(
+      [], (max, potential) => potential.length > max.length ? potential : max);
+}
+
 bool _steamedHams(Workout workout, List<Workout> history) {
   if (workout.parentID == null) return false;
   final workoutHistory = history.where((w) {
@@ -1052,15 +1111,14 @@ bool _steamedHams(Workout workout, List<Workout> history) {
 
     for (final exercise
         in workout.flattenedExercises.whereType<Exercise>().where(_exFilter)) {
-      final cur1RM = _calculate1RM(exercise);
+      final cur1RM = _calculate1RM(exercise, workout.weightUnit);
 
       for (final oldExercise in historyWorkout.flattenedExercises
           .whereType<Exercise>()
           .where(_exFilter)
           .where((ex) => ex.isTheSameAs(exercise))) {
-        final old1RM = _calculate1RM(oldExercise);
+        final old1RM = _calculate1RM(oldExercise, historyWorkout.weightUnit);
         if (old1RM < cur1RM) {
-          print((workout, exercise));
           return true;
         }
       }

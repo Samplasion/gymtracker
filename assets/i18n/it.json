@@ -2116,17 +2116,35 @@
     "trailblazer": {
       "title": "Pioniere",
       "description": {
-        "1": "Percorri un totale di 100km",
-        "2": "Percorri un totale di 500km",
-        "3": "Percorri un totale di 1000km"
+        "1": {
+          "km": "Percorri un totale di 100 km",
+          "mi": "Percorri un totale di 100 km (@mi)"
+        },
+        "2": {
+          "km": "Percorri un totale di 500 km",
+          "mi": "Percorri un totale di 500 km (@mi)"
+        },
+        "3": {
+          "km": "Percorri un totale di 1000 km",
+          "mi": "Percorri un totale di 1000 km (@mi)"
+        }
       }
     },
     "cycleChampion": {
       "title": "Ciclista campione",
       "description": {
-        "1": "Pedala per un totale di 100km",
-        "2": "Pedala per un totale di 500km",
-        "3": "Pedala per un totale di 1000km"
+        "1": {
+          "km": "Pedala per un totale di 100 km",
+          "mi": "Pedala per un totale di 100 km (@mi)"
+        },
+        "2": {
+          "km": "Pedala per un totale di 500 km",
+          "mi": "Pedala per un totale di 500 km (@mi)"
+        },
+        "3": {
+          "km": "Pedala per un totale di 1000 km",
+          "mi": "Pedala per un totale di 1000 km (@mi)"
+        }
       }
     },
     "professionalWeightlifter": {

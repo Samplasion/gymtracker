@@ -122,7 +122,7 @@ class AchievementGridTile extends ControlledWidget<AchievementsController> {
                 ),
                 Text(
                   achievement.shouldShowDescriptionFor(level.level)
-                      ? level.descriptionKey.t
+                      ? level.localizedDescription
                       : "???",
                   textAlign: TextAlign.center,
                   style: context.theme.textTheme.bodySmall,
@@ -179,7 +179,7 @@ class AchievementGetDialog extends ControlledWidget<AchievementsController> {
             ),
             Text(
               achievement.shouldShowDescriptionFor(level.level)
-                  ? level.descriptionKey.t
+                  ? level.localizedDescription
                   : "???",
               textAlign: TextAlign.center,
             ),

@@ -1,3 +1,6 @@
+import 'package:gymtracker/service/localizations.dart';
+import 'package:gymtracker/utils/extensions.dart';
+
 enum Distance {
   km,
   mi;
@@ -17,4 +20,9 @@ enum Distance {
     // Unreachable
     return -1;
   }
+
+  String format(double value) => "exerciseList.fields.distance".tParams({
+        "distance": value.localized,
+        "unit": "units.$name".t,
+      });
 }

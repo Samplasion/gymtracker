@@ -20,7 +20,6 @@ import 'package:gymtracker/view/components/tweened_builder.dart';
 import 'package:gymtracker/view/utils/input_decoration.dart';
 import 'package:gymtracker/view/utils/speed_dial.dart';
 import 'package:gymtracker/view/utils/timer.dart';
-import 'package:intl/intl.dart';
 
 typedef _SpeedDialData = (int, Duration, double, int, double);
 
@@ -200,14 +199,7 @@ class _MeStatisticsPageState
                   return SpeedDialButton(
                     icon: const Icon(GTIcons.volume),
                     text: Text(
-                      "exerciseList.fields.weight".trParams({
-                        "weight": NumberFormat.compact(
-                                locale: Get.locale!.languageCode)
-                            .format(value),
-                        "unit":
-                            "units.${settingsController.weightUnit.value.name}"
-                                .t,
-                      }),
+                      value.userFacingWeight,
                     ),
                     subtitle: Text("me.stats.volume.label".t),
                   );
@@ -229,14 +221,7 @@ class _MeStatisticsPageState
                   return SpeedDialButton(
                     icon: const Icon(GTIcons.distance),
                     text: Text(
-                      "exerciseList.fields.distance".trParams({
-                        "distance": NumberFormat.compact(
-                                locale: Get.locale!.languageCode)
-                            .format(value),
-                        "unit":
-                            "units.${settingsController.distanceUnit.value.name}"
-                                .t,
-                      }),
+                      value.userFacingDistance,
                     ),
                     subtitle: Text("me.stats.distance.label".t),
                   );

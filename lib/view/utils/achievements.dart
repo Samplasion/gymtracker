@@ -25,7 +25,7 @@ class AchievementListTile extends StatelessWidget {
     return ListTile(
       leading: AchievementIcon(achievement: achievement),
       title: Text(achievement.getLevel(completion)!.localizedName),
-      subtitle: Text(achievement.getLevel(completion)!.descriptionKey.t),
+      subtitle: Text(achievement.getLevel(completion)!.localizedDescription),
     );
   }
 }
@@ -152,7 +152,7 @@ class AchievementSnackBar extends SnackBar {
                         ),
                       ),
                       Text(
-                        achievement.getLevel(completion)!.descriptionKey.t,
+                        achievement.getLevel(completion)!.localizedDescription,
                         style: context.theme.textTheme.bodySmall!.copyWith(
                           color: context.theme.colorScheme.onInverseSurface,
                         ),
@@ -192,9 +192,12 @@ class AchievementBanner extends MaterialBanner {
         );
 }
 
-extension AchievementLevelName on AchievementLevel {
+extension AchievementLevelLocalized on AchievementLevel {
   String get localizedName {
     if (achievements[achievementID]!.levels.length == 1) return nameKey.t;
     return "${nameKey.t} ${level.toRomanNumeral()}";
   }
+
+  String get localizedDescription =>
+      descriptionKey.tParams(descriptionParameters);
 }

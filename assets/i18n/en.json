@@ -2117,17 +2117,35 @@
     "trailblazer": {
       "title": "Trailblazer",
       "description": {
-        "1": "Run or bike a total of 100km",
-        "2": "Run or bike a total of 500km",
-        "3": "Run or bike a total of 1000km"
+        "1": {
+          "km": "Run or bike a total of 100 km",
+          "mi": "Run or bike a total of 100 km (@mi)"
+        },
+        "2": {
+          "km": "Run or bike a total of 500 km",
+          "mi": "Run or bike a total of 500 km (@mi)"
+        },
+        "3": {
+          "km": "Run or bike a total of 1000 km",
+          "mi": "Run or bike a total of 1000 km (@mi)"
+        }
       }
     },
     "cycleChampion": {
       "title": "Cycle Champion",
       "description": {
-        "1": "Cycle a total of 100km",
-        "2": "Cycle a total of 500km",
-        "3": "Cycle a total of 1000km"
+        "1": {
+          "km": "Cycle a total of 100km",
+          "mi": "Cycle a total of 100km (@mi)"
+        },
+        "2": {
+          "km": "Cycle a total of 500km",
+          "mi": "Cycle a total of 500km (@mi)"
+        },
+        "3": {
+          "km": "Cycle a total of 1000km",
+          "mi": "Cycle a total of 1000km (@mi)"
+        }
       }
     },
     "professionalWeightlifter": {

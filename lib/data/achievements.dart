@@ -18,7 +18,6 @@ import 'package:gymtracker/model/workout.dart';
 import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/service/logger.dart';
 import 'package:gymtracker/utils/extensions.dart';
-import 'package:intl/intl.dart';
 import 'package:scrollable_clean_calendar/utils/extensions.dart';
 
 // TODO: Change to final field once I'm done adding the bulk of achievements
@@ -408,45 +407,69 @@ Map<String, Achievement> get achievements => {
             achievementID: "trailblazer",
             level: 1,
             nameKey: "achievements.trailblazer.title",
-            descriptionKey: "achievements.trailblazer.description.1",
+            descriptionKey:
+                "achievements.trailblazer.description.1.${settingsController.distanceUnit.value.name}",
+            descriptionParameters: {
+              "mi": Distance.mi.format(Distance.convert(
+                value: 100,
+                from: Distance.km,
+                to: Distance.mi,
+              )),
+            },
             trigger: AchievementTrigger.workout,
             progress: _trailblazer,
             progressMax: () => 100,
-            progressText: (value) => "exerciseList.fields.distance".trParams({
-              "distance": NumberFormat.compact(locale: Get.locale!.languageCode)
-                  .format(value),
-              "unit": "units.${settingsController.distanceUnit.value.name}".t,
-            }),
+            progressText: (value) => Distance.convert(
+              value: value,
+              from: Distance.km,
+              to: settingsController.distanceUnit.value,
+            ).userFacingDistance,
             checkCompletion: (progress) => progress! >= 100,
           ),
           AchievementLevel(
             achievementID: "trailblazer",
             level: 2,
             nameKey: "achievements.trailblazer.title",
-            descriptionKey: "achievements.trailblazer.description.2",
+            descriptionKey:
+                "achievements.trailblazer.description.2.${settingsController.distanceUnit.value.name}",
+            descriptionParameters: {
+              "mi": Distance.mi.format(Distance.convert(
+                value: 500,
+                from: Distance.km,
+                to: Distance.mi,
+              )),
+            },
             trigger: AchievementTrigger.workout,
             progress: _trailblazer,
             progressMax: () => 500,
-            progressText: (value) => "exerciseList.fields.distance".trParams({
-              "distance": NumberFormat.compact(locale: Get.locale!.languageCode)
-                  .format(value),
-              "unit": "units.${settingsController.distanceUnit.value.name}".t,
-            }),
+            progressText: (value) => Distance.convert(
+              value: value,
+              from: Distance.km,
+              to: settingsController.distanceUnit.value,
+            ).userFacingDistance,
             checkCompletion: (progress) => progress! >= 500,
           ),
           AchievementLevel(
             achievementID: "trailblazer",
             level: 3,
             nameKey: "achievements.trailblazer.title",
-            descriptionKey: "achievements.trailblazer.description.3",
+            descriptionKey:
+                "achievements.trailblazer.description.3.${settingsController.distanceUnit.value.name}",
+            descriptionParameters: {
+              "mi": Distance.mi.format(Distance.convert(
+                value: 1000,
+                from: Distance.km,
+                to: Distance.mi,
+              )),
+            },
             trigger: AchievementTrigger.workout,
             progress: _trailblazer,
             progressMax: () => 1000,
-            progressText: (value) => "exerciseList.fields.distance".trParams({
-              "distance": NumberFormat.compact(locale: Get.locale!.languageCode)
-                  .format(value),
-              "unit": "units.${settingsController.distanceUnit.value.name}".t,
-            }),
+            progressText: (value) => Distance.convert(
+              value: value,
+              from: Distance.km,
+              to: settingsController.distanceUnit.value,
+            ).userFacingDistance,
             checkCompletion: (progress) => progress! >= 1000,
           ),
         ],
@@ -465,45 +488,69 @@ Map<String, Achievement> get achievements => {
             achievementID: "cycleChampion",
             level: 1,
             nameKey: "achievements.cycleChampion.title",
-            descriptionKey: "achievements.cycleChampion.description.1",
+            descriptionKey:
+                "achievements.cycleChampion.description.1.${settingsController.distanceUnit.value.name}",
+            descriptionParameters: {
+              "mi": Distance.mi.format(Distance.convert(
+                value: 100,
+                from: Distance.km,
+                to: Distance.mi,
+              )),
+            },
             trigger: AchievementTrigger.workout,
             progress: _cycleChampion,
             progressMax: () => 100,
-            progressText: (value) => "exerciseList.fields.distance".trParams({
-              "distance": NumberFormat.compact(locale: Get.locale!.languageCode)
-                  .format(value),
-              "unit": "units.${settingsController.distanceUnit.value.name}".t,
-            }),
+            progressText: (value) => Distance.convert(
+              value: value,
+              from: Distance.km,
+              to: settingsController.distanceUnit.value,
+            ).userFacingDistance,
             checkCompletion: (progress) => progress! >= 100,
           ),
           AchievementLevel(
             achievementID: "cycleChampion",
             level: 2,
             nameKey: "achievements.cycleChampion.title",
-            descriptionKey: "achievements.cycleChampion.description.2",
+            descriptionKey:
+                "achievements.cycleChampion.description.2.${settingsController.distanceUnit.value.name}",
+            descriptionParameters: {
+              "mi": Distance.mi.format(Distance.convert(
+                value: 500,
+                from: Distance.km,
+                to: Distance.mi,
+              )),
+            },
             trigger: AchievementTrigger.workout,
             progress: _cycleChampion,
             progressMax: () => 500,
-            progressText: (value) => "exerciseList.fields.distance".trParams({
-              "distance": NumberFormat.compact(locale: Get.locale!.languageCode)
-                  .format(value),
-              "unit": "units.${settingsController.distanceUnit.value.name}".t,
-            }),
+            progressText: (value) => Distance.convert(
+              value: value,
+              from: Distance.km,
+              to: settingsController.distanceUnit.value,
+            ).userFacingDistance,
             checkCompletion: (progress) => progress! >= 500,
           ),
           AchievementLevel(
             achievementID: "cycleChampion",
             level: 3,
             nameKey: "achievements.cycleChampion.title",
-            descriptionKey: "achievements.cycleChampion.description.3",
+            descriptionKey:
+                "achievements.cycleChampion.description.3.${settingsController.distanceUnit.value.name}",
+            descriptionParameters: {
+              "mi": Distance.mi.format(Distance.convert(
+                value: 1000,
+                from: Distance.km,
+                to: Distance.mi,
+              )),
+            },
             trigger: AchievementTrigger.workout,
             progress: _cycleChampion,
             progressMax: () => 1000,
-            progressText: (value) => "exerciseList.fields.distance".trParams({
-              "distance": NumberFormat.compact(locale: Get.locale!.languageCode)
-                  .format(value),
-              "unit": "units.${settingsController.distanceUnit.value.name}".t,
-            }),
+            progressText: (value) => Distance.convert(
+              value: value,
+              from: Distance.km,
+              to: settingsController.distanceUnit.value,
+            ).userFacingDistance,
             checkCompletion: (progress) => progress! >= 1000,
           ),
         ],

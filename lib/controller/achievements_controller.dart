@@ -2,6 +2,7 @@ import 'package:get/get.dart';
 import 'package:gymtracker/controller/serviceable_controller.dart';
 import 'package:gymtracker/data/achievements.dart';
 import 'package:gymtracker/model/achievements.dart';
+import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/service/logger.dart';
 import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/view/utils/achievements.dart';

@@ -2208,6 +2208,14 @@
           "lb": "Solleva 300 kg (@lb) in una ripetizione"
         }
       }
+    },
+    "midnightRain": {
+      "title": "Midnight Rain",
+      "description": "Inizia un allenamento prima di mezzanotte e finiscilo dopo la mezzanotte"
+    },
+    "equipmentSpecialist": {
+      "description": "Crea e segui una routine che utilizza esclusivamente un tipo di attrezzo",
+      "title": "Specialista dell'attrezzatura"
     }
   }
 }

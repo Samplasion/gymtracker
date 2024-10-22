@@ -391,6 +391,10 @@ class $AssetsSvgTrophiesGen {
   /// File path: assets/svg/trophies/earlyBird.svg
   String get earlyBird => 'assets/svg/trophies/earlyBird.svg';
 
+  /// File path: assets/svg/trophies/equipmentSpecialist.svg
+  String get equipmentSpecialist =>
+      'assets/svg/trophies/equipmentSpecialist.svg';
+
   /// File path: assets/svg/trophies/firstSteps.svg
   String get firstSteps => 'assets/svg/trophies/firstSteps.svg';
 
@@ -405,6 +409,9 @@ class $AssetsSvgTrophiesGen {
 
   /// File path: assets/svg/trophies/marathoner.svg
   String get marathoner => 'assets/svg/trophies/marathoner.svg';
+
+  /// File path: assets/svg/trophies/midnightRain.svg
+  String get midnightRain => 'assets/svg/trophies/midnightRain.svg';
 
   /// File path: assets/svg/trophies/nightOwl.svg
   String get nightOwl => 'assets/svg/trophies/nightOwl.svg';
@@ -431,6 +438,9 @@ class $AssetsSvgTrophiesGen {
   /// File path: assets/svg/trophies/routineMaster.svg
   String get routineMaster => 'assets/svg/trophies/routineMaster.svg';
 
+  /// File path: assets/svg/trophies/sparta.svg
+  String get sparta => 'assets/svg/trophies/sparta.svg';
+
   /// File path: assets/svg/trophies/steamedHams.svg
   String get steamedHams => 'assets/svg/trophies/steamedHams.svg';
 
@@ -448,11 +458,13 @@ class $AssetsSvgTrophiesGen {
         completionist,
         cycleChampion,
         earlyBird,
+        equipmentSpecialist,
         firstSteps,
         foodWatcher,
         generic,
         intensityInnovator,
         marathoner,
+        midnightRain,
         nightOwl,
         notDrunk,
         pbBreaker,
@@ -461,6 +473,7 @@ class $AssetsSvgTrophiesGen {
         programPlanner,
         realGymBro,
         routineMaster,
+        sparta,
         steamedHams,
         swimsuitSeason,
         trailblazer,

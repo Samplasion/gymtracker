@@ -2209,6 +2209,14 @@
           "lb": "Lift 300 kg (@lb) in one rep"
         }
       }
+    },
+    "midnightRain": {
+      "description": "Start a workout before midnight and end it after midnight",
+      "title": "Midnight Rain"
+    },
+    "equipmentSpecialist": {
+      "description": "Create and follow a routine that exclusively uses specific equipment",
+      "title": "Equipment Specialist"
     }
   }
 }

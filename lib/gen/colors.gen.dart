@@ -66,4 +66,31 @@ class GTColors {
       900: Color(0xFF500000),
     },
   );
+
+  /// MaterialColor:
+  ///   50: #FFE1E4ED
+  ///   100: #FFB5BBD2
+  ///   200: #FF838EB4
+  ///   300: #FF516196
+  ///   400: #FF2C3F80
+  ///   500: #FF071D69
+  ///   600: #FF061A61
+  ///   700: #FF051556
+  ///   800: #FF04114C
+  ///   900: #FF020A3B
+  static const MaterialColor midnights = MaterialColor(
+    0xFF071D69,
+    <int, Color>{
+      50: Color(0xFFE1E4ED),
+      100: Color(0xFFB5BBD2),
+      200: Color(0xFF838EB4),
+      300: Color(0xFF516196),
+      400: Color(0xFF2C3F80),
+      500: Color(0xFF071D69),
+      600: Color(0xFF061A61),
+      700: Color(0xFF051556),
+      800: Color(0xFF04114C),
+      900: Color(0xFF020A3B),
+    },
+  );
 }

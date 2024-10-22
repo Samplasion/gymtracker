@@ -960,6 +960,83 @@ Map<String, Achievement> get achievements => {
           ),
         ],
       ),
+      "midnightRain": Achievement(
+        id: "midnightRain",
+        nameKey: "achievements.midnightRain.title",
+        iconKey: "midnightRain",
+        color: GTColors.midnights.shade400,
+        levels: [
+          AchievementLevel(
+            achievementID: "midnightRain",
+            level: 1,
+            nameKey: "achievements.midnightRain.title",
+            descriptionKey: "achievements.midnightRain.description",
+            trigger: AchievementTrigger.workout,
+            checkCompletion: (_) {
+              final history = Get.find<HistoryController>().history;
+              if (history.isEmpty) return false;
+
+              _logic(Workout workout) {
+                final startingDay = workout.startingDate!.startOfDay;
+                final endingDay = workout.endingDate!.startOfDay;
+
+                return startingDay != endingDay;
+              }
+
+              return history.any(_logic);
+            },
+          ),
+        ],
+      ),
+      "equipmentSpecialist": Achievement(
+        id: "equipmentSpecialist",
+        nameKey: "achievements.equipmentSpecialist.title",
+        iconKey: "equipmentSpecialist",
+        color: Colors.lightGreen,
+        levels: [
+          AchievementLevel(
+            achievementID: "equipmentSpecialist",
+            level: 1,
+            nameKey: "achievements.equipmentSpecialist.title",
+            descriptionKey: "achievements.equipmentSpecialist.description",
+            trigger: AchievementTrigger.workout,
+            checkCompletion: (_) {
+              final history = Get.find<HistoryController>().history;
+              if (history.isEmpty) return false;
+
+              final routines = Get.find<RoutinesController>().workouts;
+              if (routines.isEmpty) return false;
+
+              bool _checksOut(Workout w) {
+                return w.flattenedExercises
+                            .whereType<Exercise>()
+                            .map((exercise) {
+                              return exercise.gymEquipment;
+                            })
+                            .toSet()
+                            .length ==
+                        1 &&
+                    w.flattenedExercises
+                            .whereType<Exercise>()
+                            .first
+                            .asExercise
+                            .gymEquipment !=
+                        GTGymEquipment.none;
+              }
+
+              _logic(Workout routine) {
+                final routineHistory =
+                    history.where((workout) => workout.parentID == routine.id);
+                if (routineHistory.isEmpty) return false;
+
+                return _checksOut(routine) && routineHistory.every(_checksOut);
+              }
+
+              return routines.any(_logic);
+            },
+          ),
+        ],
+      ),
     };
 
 double _calculate1RM(Exercise exercise, Weights unit) {

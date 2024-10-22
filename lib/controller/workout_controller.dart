@@ -647,7 +647,12 @@ class WorkoutController extends GetxController with ServiceableController {
 
   /// Writes the ongoing workout to the database so that we can restore it on app restart.
   void save() {
-    if (Get.find<RoutinesController>().hasOngoingWorkout.isFalse) return;
+    // TODO: Figure out if this is still necessary
+    if (Get.find<RoutinesController>().hasOngoingWorkout.isFalse) {
+      logger
+          .d("Not saving ongoing workout because there is no ongoing workout");
+      return;
+    }
     final stopwatchController = Get.find<StopwatchController>();
 
     service.writeToOngoing({

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:audioplayers/audioplayers.dart';
 import 'package:device_sim/device_sim.dart';
 import 'package:dynamic_color/dynamic_color.dart';
@@ -47,7 +49,9 @@ void main() async {
   final l = GTLocalizations();
   await l.init();
 
-  await _databaseService.ensureInitialized();
+  final _compl = Completer();
+  _databaseService.ensureInitialized(onDone: () => _compl.complete());
+  await _compl.future;
 
   await ColorService().init();
   await VersionService().init();

@@ -107,6 +107,7 @@ class DatabaseService extends GetxService with ChangeNotifier {
       "routines",
       "history",
       "prefs",
+      "ongoing",
       "weightMeasurements",
       "folders",
       "foods",
@@ -163,23 +164,24 @@ class DatabaseService extends GetxService with ChangeNotifier {
     _db.watchOngoing().listen((event) {
       ongoing$.add(event);
       onServiceChange("ongoing")();
+      initialized[5] = true;
     });
     _db.watchWeightMeasurements().listen((event) {
       weightMeasurements$.add(event);
       onServiceChange("weight measurements")();
-      initialized[5] = true;
+      initialized[6] = true;
       check();
     });
     _db.watchRoutineFolders().listen((event) {
       folders$.add(event);
       onServiceChange("folders")();
-      initialized[6] = true;
+      initialized[7] = true;
       check();
     });
     _db.watchFoods().listen((event) {
       foods$.add(event);
       onServiceChange("foods")();
-      initialized[7] = true;
+      initialized[8] = true;
       check();
     });
     _db
@@ -188,19 +190,19 @@ class DatabaseService extends GetxService with ChangeNotifier {
         .listen((event) {
       nutritionGoals$.add(event);
       onServiceChange("nutrition goals")();
-      initialized[8] = true;
+      initialized[9] = true;
       check();
     });
     _db.watchCustomBarcodeFoods().listen((event) {
       customBarcodeFoods$.add(event);
       onServiceChange("custom barcode foods")();
-      initialized[9] = true;
+      initialized[10] = true;
       check();
     });
     _db.watchFavoriteFoods().listen((event) {
       favoriteFoods$.add(event);
       onServiceChange("favorite foods")();
-      initialized[10] = true;
+      initialized[11] = true;
       check();
     });
     _db
@@ -209,7 +211,7 @@ class DatabaseService extends GetxService with ChangeNotifier {
         .listen((event) {
       nutritionCategories$.add(event);
       onServiceChange("nutrition categories")();
-      initialized[11] = true;
+      initialized[12] = true;
       check();
     });
     backups.watch().listen((event) {

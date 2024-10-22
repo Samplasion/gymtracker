@@ -2067,6 +2067,7 @@
     "title": "Achievements",
     "locked": "Locked",
     "unlockedOn": "Unlocked on: @date",
+    "history": "History",
     "firstSteps": {
       "title": "First steps",
       "description": {

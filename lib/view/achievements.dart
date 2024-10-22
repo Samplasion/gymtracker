@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:gymtracker/controller/achievements_controller.dart';
 import 'package:gymtracker/data/achievements.dart';
+import 'package:gymtracker/icons/gymtracker_icons.dart';
 import 'package:gymtracker/model/achievements.dart';
 import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/utils/constants.dart';
@@ -32,6 +33,13 @@ class _AchievementsViewState
           SliverAppBar.large(
             title: Text("achievements.title".t),
             leading: const SkeletonDrawerButton(),
+            actions: [
+              IconButton(
+                icon: const Icon(GTIcons.history),
+                onPressed: () => Go.to(() => const AchievementHistoryScreen()),
+                tooltip: "achievements.history".t,
+              ),
+            ],
           ),
           SliverPadding(
             padding: const EdgeInsets.all(16),
@@ -234,5 +242,71 @@ class AchievementGetDialog extends ControlledWidget<AchievementsController> {
     } else {
       return "$progress / $progressMax";
     }
+  }
+}
+
+class AchievementHistoryScreen
+    extends ControlledWidget<AchievementsController> {
+  const AchievementHistoryScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("achievements.history".t),
+      ),
+      body: CustomScrollView(
+        slivers: [
+          StreamBuilder<List<AchievementCompletion>>(
+            stream: controller.completionStream,
+            builder: (context, snapshot) {
+              if (!snapshot.hasData) {
+                return const SliverFillRemaining(
+                  child: Center(
+                    child: CircularProgressIndicator(),
+                  ),
+                );
+              }
+              return SliverList.builder(
+                itemCount: snapshot.data!.length,
+                itemBuilder: (context, index) {
+                  final completion = snapshot.data![index];
+                  final achievement =
+                      controller.getAchievement(completion.achievementID);
+                  final level =
+                      controller.getLevel(achievement, completion.level)!;
+                  return ListTile(
+                    leading: AchievementIcon(
+                      achievement: achievement,
+                      enabled: true,
+                      size: 48,
+                    ),
+                    title: Text(level.localizedName),
+                    subtitle: Text.rich(
+                      TextSpan(
+                        children: [
+                          TextSpan(text: level.localizedDescription),
+                          const TextSpan(text: "\n"),
+                          TextSpan(
+                            text: "achievements.unlockedOn".tParams({
+                              "date": DateFormat.yMMMMEEEEd(
+                                      context.locale.languageCode)
+                                  .add_Hms()
+                                  .format(completion.completedAt),
+                            }),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                },
+              );
+            },
+          ),
+          const SliverToBoxAdapter(child: SizedBox(height: 8)),
+          const SliverBottomSafeArea(),
+        ],
+      ),
+    );
   }
 }

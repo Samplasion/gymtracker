@@ -2066,6 +2066,7 @@
     "title": "Conquiste",
     "locked": "Bloccato",
     "unlockedOn": "Sbloccato: @date",
+    "history": "Cronologia",
     "firstSteps": {
       "title": "Primi passi",
       "description": {

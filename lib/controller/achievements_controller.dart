@@ -2,7 +2,6 @@ import 'package:get/get.dart';
 import 'package:gymtracker/controller/serviceable_controller.dart';
 import 'package:gymtracker/data/achievements.dart';
 import 'package:gymtracker/model/achievements.dart';
-import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/service/logger.dart';
 import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/view/utils/achievements.dart';
@@ -11,6 +10,14 @@ import 'package:rxdart/rxdart.dart';
 class AchievementsController extends GetxController with ServiceableController {
   BehaviorSubject<List<AchievementCompletion>> get _completions$ =>
       service.completions$;
+
+  Stream<List<AchievementCompletion>> get completionStream =>
+      _completions$.stream.map((completions) => completions.toList()
+        ..sort((a, b) {
+          final date = b.completedAt.compareTo(a.completedAt);
+          final level = b.level.compareTo(a.level);
+          return date == 0 ? level : date;
+        }));
 
   Map<Achievement, List<AchievementCompletion>> maybeUnlockAchievements(
       AchievementTrigger trigger) {
@@ -106,6 +113,14 @@ class AchievementsController extends GetxController with ServiceableController {
       _completions$.value.firstWhereOrNull((completion) =>
           completion.achievementID == achievementID &&
           completion.level == level);
+
+  Achievement getAchievement(String achievementID) {
+    return achievements[achievementID]!;
+  }
+
+  AchievementLevel? getLevel(Achievement achievement, int level) {
+    return achievement.levels.firstWhereOrNull((l) => l.level == level);
+  }
 
   @override
   void onServiceChange() {}

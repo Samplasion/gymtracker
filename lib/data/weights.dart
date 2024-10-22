@@ -1,3 +1,5 @@
+import 'package:gymtracker/service/localizations.dart';
+import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/utils/utils.dart';
 import 'package:json_annotation/json_annotation.dart';
 
@@ -34,6 +36,11 @@ enum Weights {
     // Unreachable
     return -1;
   }
+
+  String format(double value) => "exerciseList.fields.weight".tParams({
+        "weight": value.localized,
+        "unit": "units.$name".t,
+      });
 }
 
 enum Bars {

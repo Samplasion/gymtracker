@@ -2150,9 +2150,9 @@
     "professionalWeightlifter": {
       "title": "Sollevatore di coriandoli",
       "description": {
-        "1": "Solleva il tuo peso corporeo in una serie",
-        "2": "Solleva 1.5x volte il tuo peso corporeo in una serie",
-        "3": "Solleva 3x volte il tuo peso corporeo in una serie"
+        "1": "Solleva il tuo peso corporeo in una ripetizione",
+        "2": "Solleva 1.5x volte il tuo peso corporeo in una ripetizione",
+        "3": "Solleva 3x volte il tuo peso corporeo in una ripetizione"
       }
     },
     "programPlanner": {
@@ -2194,6 +2194,19 @@
     "pbBreaker": {
       "title": "Primato personale",
       "description": "Supera il massimale di un esercizio"
+    },
+    "sparta": {
+      "title": "Questa è Sparta",
+      "description": {
+        "1": {
+          "kg": "Solleva 300 lb (@kg) in una ripetizione",
+          "lb": "Solleva 300 lb in una ripetizione"
+        },
+        "2": {
+          "kg": "Solleva 300 kg in una ripetizione",
+          "lb": "Solleva 300 kg (@lb) in una ripetizione"
+        }
+      }
     }
   }
 }

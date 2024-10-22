@@ -2151,9 +2151,9 @@
     "professionalWeightlifter": {
       "title": "Professional Weightlifter",
       "description": {
-        "1": "Lift your body weight in a single set",
-        "2": "Lift 1.5x your body weight in a single set",
-        "3": "Lift 3x your body weight in a single set"
+        "1": "Lift your body weight in a single rep",
+        "2": "Lift 1.5x your body weight in a single rep",
+        "3": "Lift 3x your body weight in a single rep"
       }
     },
     "programPlanner": {
@@ -2161,7 +2161,7 @@
       "description": "Create three routines"
     },
     "perfectPlanner": {
-      "title": "Professional Weightlifter",
+      "title": "Perfect Planner",
       "description": "Create a routine folder"
     },
     "routineMaster": {
@@ -2195,6 +2195,19 @@
     "pbBreaker": {
       "title": "Personal Best Breaker",
       "description": "Set a new one-rep max personal record in one exercise"
+    },
+    "sparta": {
+      "title": "This Is Sparta",
+      "description": {
+        "1": {
+          "kg": "Lift 300 lbs (@kg) in one rep",
+          "lb": "Lift 300 lbs in one rep"
+        },
+        "2": {
+          "kg": "Lift 300 kg in one rep",
+          "lb": "Lift 300 kg (@lb) in one rep"
+        }
+      }
     }
   }
 }

@@ -342,6 +342,9 @@ class $AssetsSvgEquipmentGen {
   /// File path: assets/svg/equipment/kettlebell.svg
   String get kettlebell => 'assets/svg/equipment/kettlebell.svg';
 
+  /// File path: assets/svg/equipment/landmine.svg
+  String get landmine => 'assets/svg/equipment/landmine.svg';
+
   /// File path: assets/svg/equipment/machine.svg
   String get machine => 'assets/svg/equipment/machine.svg';
 
@@ -366,6 +369,7 @@ class $AssetsSvgEquipmentGen {
         cable,
         dumbbell,
         kettlebell,
+        landmine,
         machine,
         none,
         other,
@@ -378,6 +382,15 @@ class $AssetsSvgEquipmentGen {
 class $AssetsSvgTrophiesGen {
   const $AssetsSvgTrophiesGen();
 
+  /// File path: assets/svg/trophies/completionist.svg
+  String get completionist => 'assets/svg/trophies/completionist.svg';
+
+  /// File path: assets/svg/trophies/cycleChampion.svg
+  String get cycleChampion => 'assets/svg/trophies/cycleChampion.svg';
+
+  /// File path: assets/svg/trophies/earlyBird.svg
+  String get earlyBird => 'assets/svg/trophies/earlyBird.svg';
+
   /// File path: assets/svg/trophies/firstSteps.svg
   String get firstSteps => 'assets/svg/trophies/firstSteps.svg';
 
@@ -387,8 +400,72 @@ class $AssetsSvgTrophiesGen {
   /// File path: assets/svg/trophies/generic.svg
   String get generic => 'assets/svg/trophies/generic.svg';
 
+  /// File path: assets/svg/trophies/intensityInnovator.svg
+  String get intensityInnovator => 'assets/svg/trophies/intensityInnovator.svg';
+
+  /// File path: assets/svg/trophies/marathoner.svg
+  String get marathoner => 'assets/svg/trophies/marathoner.svg';
+
+  /// File path: assets/svg/trophies/nightOwl.svg
+  String get nightOwl => 'assets/svg/trophies/nightOwl.svg';
+
+  /// File path: assets/svg/trophies/notDrunk.svg
+  String get notDrunk => 'assets/svg/trophies/notDrunk.svg';
+
+  /// File path: assets/svg/trophies/pbBreaker.svg
+  String get pbBreaker => 'assets/svg/trophies/pbBreaker.svg';
+
+  /// File path: assets/svg/trophies/perfectPlanner.svg
+  String get perfectPlanner => 'assets/svg/trophies/perfectPlanner.svg';
+
+  /// File path: assets/svg/trophies/professionalWeightlifter.svg
+  String get professionalWeightlifter =>
+      'assets/svg/trophies/professionalWeightlifter.svg';
+
+  /// File path: assets/svg/trophies/programPlanner.svg
+  String get programPlanner => 'assets/svg/trophies/programPlanner.svg';
+
+  /// File path: assets/svg/trophies/realGymBro.svg
+  String get realGymBro => 'assets/svg/trophies/realGymBro.svg';
+
+  /// File path: assets/svg/trophies/routineMaster.svg
+  String get routineMaster => 'assets/svg/trophies/routineMaster.svg';
+
+  /// File path: assets/svg/trophies/steamedHams.svg
+  String get steamedHams => 'assets/svg/trophies/steamedHams.svg';
+
+  /// File path: assets/svg/trophies/swimsuitSeason.svg
+  String get swimsuitSeason => 'assets/svg/trophies/swimsuitSeason.svg';
+
+  /// File path: assets/svg/trophies/trailblazer.svg
+  String get trailblazer => 'assets/svg/trophies/trailblazer.svg';
+
+  /// File path: assets/svg/trophies/workoutFreak.svg
+  String get workoutFreak => 'assets/svg/trophies/workoutFreak.svg';
+
   /// List of all assets
-  List<String> get values => [firstSteps, foodWatcher, generic];
+  List<String> get values => [
+        completionist,
+        cycleChampion,
+        earlyBird,
+        firstSteps,
+        foodWatcher,
+        generic,
+        intensityInnovator,
+        marathoner,
+        nightOwl,
+        notDrunk,
+        pbBreaker,
+        perfectPlanner,
+        professionalWeightlifter,
+        programPlanner,
+        realGymBro,
+        routineMaster,
+        steamedHams,
+        swimsuitSeason,
+        trailblazer,
+        workoutFreak
+      ];
 }
 
 class $AssetsExercisesAbsCrunchesGen {

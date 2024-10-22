@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="burgundy" type="material">#660033</color>
+    <color name="maroon" type="material">#800000</color>
+</resources>

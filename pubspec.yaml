@@ -90,6 +90,11 @@ flutter_gen:
   assets:
     outputs:
       class_name: GTAssets
+  colors:
+    inputs:
+      - assets/color/colors.xml
+    outputs:
+        class_name: GTColors
 
 flutter:
   fonts:

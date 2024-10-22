@@ -10,6 +10,7 @@ import 'package:gymtracker/controller/settings_controller.dart';
 import 'package:gymtracker/data/distance.dart';
 import 'package:gymtracker/data/exercises.dart';
 import 'package:gymtracker/data/weights.dart';
+import 'package:gymtracker/gen/colors.gen.dart';
 import 'package:gymtracker/gen/exercises.gen.dart';
 import 'package:gymtracker/model/achievements.dart';
 import 'package:gymtracker/model/exercise.dart';
@@ -919,6 +920,46 @@ Map<String, Achievement> get achievements => {
           ),
         ],
       ),
+      "sparta": Achievement(
+        id: "sparta",
+        nameKey: "achievements.sparta.title",
+        iconKey: "sparta",
+        color: GTColors.burgundy.shade400,
+        levels: [
+          AchievementLevel(
+            achievementID: "sparta",
+            level: 1,
+            nameKey: "achievements.sparta.title",
+            descriptionKey:
+                "achievements.sparta.description.1.${settingsController.weightUnit.value.name}",
+            descriptionParameters: {
+              "kg": Weights.kg.format(Weights.convert(
+                value: 300,
+                from: Weights.lb,
+                to: Weights.kg,
+              )),
+            },
+            trigger: AchievementTrigger.workout,
+            checkCompletion: (_) => _sparta(Weights.lb),
+          ),
+          AchievementLevel(
+            achievementID: "sparta",
+            level: 2,
+            nameKey: "achievements.sparta.title",
+            descriptionKey:
+                "achievements.sparta.description.2.${settingsController.weightUnit.value.name}",
+            descriptionParameters: {
+              "lb": Weights.lb.format(Weights.convert(
+                value: 300,
+                from: Weights.kg,
+                to: Weights.lb,
+              )),
+            },
+            trigger: AchievementTrigger.workout,
+            checkCompletion: (_) => _sparta(Weights.kg),
+          ),
+        ],
+      ),
     };
 
 double _calculate1RM(Exercise exercise, Weights unit) {
@@ -1015,7 +1056,10 @@ bool _professionalWeightlifter(double coefficient) {
   final weight = Get.find<MeController>().latestWeightMeasurement;
   if (weight == null) return false;
 
-  final latestWorkout = Get.find<HistoryController>().history.last;
+  final history = Get.find<HistoryController>().history;
+  if (history.isEmpty) return false;
+
+  final latestWorkout = history.last;
   final exercises = latestWorkout.flattenedExercises.whereType<Exercise>();
 
   for (final ex in exercises) {
@@ -1204,6 +1248,31 @@ Duration _swimsuitSeason(Iterable<Workout> subset) {
 
     return duration + timedDuration + untimedDuration;
   });
+}
+
+bool _sparta(Weights unit) {
+  const threshold = 300.0;
+
+  final history = Get.find<HistoryController>().history;
+  if (history.isEmpty) return false;
+
+  final latestWorkout = history.last;
+  final exercises = latestWorkout.flattenedExercises.whereType<Exercise>();
+
+  for (final ex in exercises) {
+    for (final set in ex.doneSets) {
+      if (set.weight != null &&
+          Weights.convert(
+                  value: set.weight!,
+                  from: latestWorkout.weightUnit,
+                  to: Weights.kg) >=
+              Weights.convert(value: threshold, from: unit, to: Weights.kg)) {
+        return true;
+      }
+    }
+  }
+
+  return false;
 }
 
 bool _defaultFilter(Exercise _) => true;

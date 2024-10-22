@@ -334,5 +334,6 @@ const _$GTGymEquipmentEnumMap = {
   GTGymEquipment.plates: 'plates',
   GTGymEquipment.resistanceBand: 'resistanceBand',
   GTGymEquipment.suspensionBands: 'suspensionBands',
+  GTGymEquipment.landmine: 'landmine',
   GTGymEquipment.other: 'other',
 };

@@ -382,6 +382,9 @@ class $AssetsSvgEquipmentGen {
 class $AssetsSvgTrophiesGen {
   const $AssetsSvgTrophiesGen();
 
+  /// File path: assets/svg/trophies/bodyweightBeast.svg
+  String get bodyweightBeast => 'assets/svg/trophies/bodyweightBeast.svg';
+
   /// File path: assets/svg/trophies/completionist.svg
   String get completionist => 'assets/svg/trophies/completionist.svg';
 
@@ -455,6 +458,7 @@ class $AssetsSvgTrophiesGen {
 
   /// List of all assets
   List<String> get values => [
+        bodyweightBeast,
         completionist,
         cycleChampion,
         earlyBird,

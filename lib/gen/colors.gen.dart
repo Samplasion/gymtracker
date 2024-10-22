@@ -93,4 +93,31 @@ class GTColors {
       900: Color(0xFF020A3B),
     },
   );
+
+  /// MaterialColor:
+  ///   50: #FFFDF5F1
+  ///   100: #FFFAE5DC
+  ///   200: #FFF7D4C5
+  ///   300: #FFF3C2AE
+  ///   400: #FFF1B59C
+  ///   500: #FFEEA88B
+  ///   600: #FFECA083
+  ///   700: #FFE99778
+  ///   800: #FFE78D6E
+  ///   900: #FFE27D5B
+  static const MaterialColor peach = MaterialColor(
+    0xFFEEA88B,
+    <int, Color>{
+      50: Color(0xFFFDF5F1),
+      100: Color(0xFFFAE5DC),
+      200: Color(0xFFF7D4C5),
+      300: Color(0xFFF3C2AE),
+      400: Color(0xFFF1B59C),
+      500: Color(0xFFEEA88B),
+      600: Color(0xFFECA083),
+      700: Color(0xFFE99778),
+      800: Color(0xFFE78D6E),
+      900: Color(0xFFE27D5B),
+    },
+  );
 }

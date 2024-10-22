@@ -2217,6 +2217,10 @@
     "equipmentSpecialist": {
       "description": "Create and follow a routine that exclusively uses specific equipment",
       "title": "Equipment Specialist"
+    },
+    "bodyweightBeast": {
+      "title": "Bodyweight Beast",
+      "description": "Create a bodyweight-only routine and follow it for a month"
     }
   }
 }

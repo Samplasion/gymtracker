@@ -2216,6 +2216,10 @@
     "equipmentSpecialist": {
       "description": "Crea e segui una routine che utilizza esclusivamente un tipo di attrezzo",
       "title": "Specialista dell'attrezzatura"
+    },
+    "bodyweightBeast": {
+      "description": "Crea una routine solo di corpo libero e seguila per almeno un mese",
+      "title": "Controllo corporeo"
     }
   }
 }

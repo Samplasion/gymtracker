@@ -1037,6 +1037,54 @@ Map<String, Achievement> get achievements => {
           ),
         ],
       ),
+      "bodyweightBeast": Achievement(
+        id: "bodyweightBeast",
+        nameKey: "achievements.bodyweightBeast.title",
+        iconKey: "bodyweightBeast",
+        color: GTColors.peach,
+        levels: [
+          AchievementLevel(
+            achievementID: "bodyweightBeast",
+            level: 1,
+            nameKey: "achievements.bodyweightBeast.title",
+            descriptionKey: "achievements.bodyweightBeast.description",
+            trigger: AchievementTrigger.workout,
+            checkCompletion: (_) {
+              final history = Get.find<HistoryController>().history;
+              if (history.isEmpty) return false;
+
+              final routines = Get.find<RoutinesController>().workouts;
+              if (routines.isEmpty) return false;
+
+              bool _checksOut(Workout w) {
+                return w.flattenedExercises
+                    .whereType<Exercise>()
+                    .every((exercise) {
+                  return exercise.gymEquipment == GTGymEquipment.none;
+                });
+              }
+
+              _logic(Workout routine) {
+                final routineHistory =
+                    history.where((workout) => workout.parentID == routine.id);
+                if (routineHistory.length < 2) return false;
+
+                final firstStart = routineHistory.first.startingDate!;
+                final daysInMonth =
+                    DateTime(firstStart.year, firstStart.month + 1, 0).day;
+
+                final lastStart = routineHistory.last.startingDate!;
+
+                return _checksOut(routine) &&
+                    routineHistory.every(_checksOut) &&
+                    lastStart.difference(firstStart).inDays >= daysInMonth;
+              }
+
+              return routines.any(_logic);
+            },
+          ),
+        ],
+      ),
     };
 
 double _calculate1RM(Exercise exercise, Weights unit) {

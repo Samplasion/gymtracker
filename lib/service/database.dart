@@ -85,8 +85,6 @@ class DatabaseService extends GetxService with ChangeNotifier {
   onInit() async {
     super.onInit();
 
-    await backups.init();
-
     onServiceChange("main")();
   }
 
@@ -101,6 +99,8 @@ class DatabaseService extends GetxService with ChangeNotifier {
   Future<void> _innerEnsureInitialized({
     Function()? onDone,
   }) async {
+    await backups.init();
+
     final initialized = [
       "achievements",
       "exercises",

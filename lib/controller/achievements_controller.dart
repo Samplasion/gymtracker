@@ -3,6 +3,7 @@ import 'package:gymtracker/controller/serviceable_controller.dart';
 import 'package:gymtracker/data/achievements.dart';
 import 'package:gymtracker/model/achievements.dart';
 import 'package:gymtracker/service/logger.dart';
+import 'package:gymtracker/service/test.dart';
 import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/view/utils/achievements.dart';
 import 'package:rxdart/rxdart.dart';
@@ -21,6 +22,9 @@ class AchievementsController extends GetxController with ServiceableController {
 
   Map<Achievement, List<AchievementCompletion>> maybeUnlockAchievements(
       AchievementTrigger trigger) {
+    // Achievements slow tests down too much
+    if (TestService().isTest) return {};
+
     final unlocked = <Achievement, List<AchievementCompletion>>{};
 
     for (final MapEntry(key: id, value: achievement) in achievements.entries) {

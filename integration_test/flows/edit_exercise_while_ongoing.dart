@@ -68,7 +68,7 @@ Future<void> testEditExerciseWhileWorkoutIsOngoingFlow(
   await tester
       .tap(find.widgetWithText(FilledButton, 'ongoingWorkout.exercises.add'.t));
   await tester.pumpAndSettle(wait);
-  await tester.tap(find.widgetWithText(ListTile, 'library.custom'.t));
+  await tester.tap(find.byIcon(GTIcons.custom_exercises));
   await tester.pumpAndSettle(wait);
   // TODO: Pick more precisely
   await tester.tap(find.byType(ExerciseListTile));
@@ -81,8 +81,7 @@ Future<void> testEditExerciseWhileWorkoutIsOngoingFlow(
   expect(
       (ongoingWorkout.exercises.single as Exercise).parentID, baseExercise.id);
 
-  await tester.tap(find.widgetWithText(
-      CircleAvatar, baseExercise.displayName.characters.first));
+  await tester.tap(find.byType(CircleAvatar)); // faccio parte del codice di questo progetto adesso, voglio i nomi nei titoli finali 
   await tester.pumpAndSettle(wait);
   await tester.tap(find.byKey(const Key('menu')));
   await tester.pumpAndSettle(wait);

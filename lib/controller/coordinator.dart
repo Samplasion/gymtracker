@@ -27,13 +27,14 @@ import 'package:rxdart/rxdart.dart';
 
 class Coordinator extends GetxController with ServiceableController {
   RxList<RoutineSuggestion> suggestions = <RoutineSuggestion>[].obs;
-  BehaviorSubject<bool> showPermissionTilesStream =
-      BehaviorSubject<bool>.seeded(true);
+  late BehaviorSubject<bool> showPermissionTilesStream;
 
   @override
   void onServiceChange() {}
 
   Future awaitInitialized() async {
+    showPermissionTilesStream = BehaviorSubject<bool>.seeded(true);
+
     await Future.wait([
       Get.find<SettingsController>().awaitInitialized(),
       Get.find<NotificationController>().initialize(),
@@ -51,6 +52,29 @@ class Coordinator extends GetxController with ServiceableController {
     }).pipe(showPermissionTilesStream);
 
     schedulePeriodicBackup();
+  }
+
+  @override
+  void onClose() async {
+    await showPermissionTilesStream.drain(true);
+    showPermissionTilesStream.close();
+
+    Get.delete<DebugController>();
+    Get.delete<NotificationsService>();
+    Get.delete<NotificationController>();
+    Get.delete<RoutinesController>();
+    Get.delete<HistoryController>();
+    Get.delete<CountdownController>();
+    Get.delete<ExercisesController>();
+    Get.delete<StopwatchController>();
+    Get.delete<MeController>();
+    Get.delete<SettingsController>();
+    Get.delete<ErrorController>();
+    Get.delete<MigrationsController>();
+    Get.delete<FoodController>();
+    Get.delete<AchievementsController>();
+
+    super.onClose();
   }
 
   init() {

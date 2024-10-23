@@ -52,9 +52,15 @@ Future<void> testDefaultUnitsFlow(
   await tester.pumpAndSettle();
 
   // Go to the settings and change the units
-  await tester.tap(find.byIcon(GTIcons.settings));
+  await tester.tap(
+    find.descendant(
+        of: find.byType(NavigationDrawerDestination),
+        matching: find.byIcon(GTIcons.settings)),
+  );
   await tester.pumpAndSettle();
 
+  await tester.tap(find.text("settings.panes.units".t));
+  await tester.pumpAndSettle();
   await tester.tap(find.text("settings.options.weightUnit.label".t));
   await tester.pumpAndSettle();
   await tester.tap(find.text("weightUnits.lb".t));
@@ -76,7 +82,11 @@ Future<void> testDefaultUnitsFlow(
   expect(settingsController.distanceUnit.value, Distance.mi);
 
   // Go back
-  await tester.tap(find.byIcon(GTIcons.library));
+  await tester.tap(
+    find.descendant(
+        of: find.byType(NavigationDrawerDestination),
+        matching: find.byIcon(GTIcons.routines)),
+  );
   await tester.pumpAndSettle();
 
   // Start another workout and check that the units have changed

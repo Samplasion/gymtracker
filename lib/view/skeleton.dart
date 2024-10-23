@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:animations/animations.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart' hide Localizations;
@@ -32,6 +34,7 @@ import 'package:gymtracker/view/utils/crossfade.dart';
 import 'package:gymtracker/view/utils/in_app_icon.dart';
 import 'package:gymtracker/view/utils/timer.dart';
 import 'package:gymtracker/view/workout.dart';
+import 'package:rxdart/rxdart.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
 const _kDrawerSize = 304.0;
@@ -50,8 +53,9 @@ class SkeletonDrawerButton extends StatefulWidget {
 
 class _SkeletonDrawerButtonState extends State<SkeletonDrawerButton> {
   _SkeletonViewState? _skeleton;
+  StreamSubscription<bool>? _skeletonSub;
 
-  _onStateChange() {
+  _onStateChange(_) {
     logger.d("SkeletonDrawerButton: _onStateChange");
     if (mounted) setState(() {});
   }
@@ -59,25 +63,32 @@ class _SkeletonDrawerButtonState extends State<SkeletonDrawerButton> {
   @override
   void initState() {
     super.initState();
-    SkeletonView._of(context)?.addListener(_onStateChange);
+    // SkeletonView._of(context)?.addListener(_onStateChange);
+    _skeleton = SkeletonView._of(context);
+    _skeletonSub = _skeleton?.isSidebarCollapsedStream.listen(_onStateChange);
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
+    _skeletonSub?.cancel();
     _skeleton = SkeletonView._of(context);
+    _skeletonSub = _skeleton?.isSidebarCollapsedStream.listen(_onStateChange);
   }
 
   @override
   void dispose() {
-    _skeleton?.removeListener(_onStateChange);
+    _skeletonSub?.cancel();
+    _skeleton = null;
+    _skeletonSub = null;
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    final skeleton = SkeletonView._of(context);
     void _toggleSidebar() {
-      setState(() => SkeletonView._of(context)?.toggleSidebar());
+      setState(() => skeleton?.toggleSidebar());
       SchedulerBinding.instance.addPostFrameCallback((_) {
         if (mounted) setState(() {});
       });
@@ -132,21 +143,22 @@ class SkeletonView extends StatefulWidget {
 }
 
 class _SkeletonViewState extends State<SkeletonView>
-    with WidgetsBindingObserver, ChangeNotifier {
+    with WidgetsBindingObserver {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey();
-  bool isSidebarCollapsed = false;
+  final BehaviorSubject<bool> _isSidebarCollapsed$ = BehaviorSubject.seeded(false);
+
+  bool get isSidebarCollapsed => _isSidebarCollapsed$.value;
+  Stream<bool> get isSidebarCollapsedStream => _isSidebarCollapsed$.stream;
 
   openDrawer() {
     _scaffoldKey.currentState!.openDrawer();
   }
 
   toggleSidebar() {
-    isSidebarCollapsed = !isSidebarCollapsed;
+    _isSidebarCollapsed$.add(!isSidebarCollapsed);
     SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
       setState(() {});
-      notifyListeners();
     });
-    notifyListeners();
   }
 
   @override

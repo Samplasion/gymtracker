@@ -136,7 +136,11 @@ Future<void> testEditWorkoutFlow(
   await tester.tap(find.byIcon(GTIcons.done));
   await tester.pumpAndSettle();
 
-  await tester.tap(find.byIcon(GTIcons.history));
+  await tester.tap(
+    find.descendant(
+        of: find.byType(NavigationDrawer),
+        matching: find.byIcon(GTIcons.history)),
+  );
   await tester.pumpAndSettle();
 
   await tester.tap(find.byType(HistoryWorkout));

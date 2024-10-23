@@ -87,7 +87,11 @@ Future<void> testWorkoutFromRoutineFlow(
   await tester.pumpAndSettle();
 
   // Check the history view
-  await tester.tap(find.byIcon(GTIcons.history));
+  await tester.tap(
+    find.descendant(
+        of: find.byType(NavigationDrawer),
+        matching: find.byIcon(GTIcons.history)),
+  );
   await tester.pumpAndSettle(const Duration(seconds: 2));
 
   expect(find.byType(HistoryWorkout), findsOneWidget);

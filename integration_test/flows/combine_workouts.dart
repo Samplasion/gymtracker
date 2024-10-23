@@ -87,7 +87,11 @@ Future<void> testCombineWorkoutsFlow(
   await tester.pumpAndSettle();
 
   // Go to the history page
-  await tester.tap(find.byIcon(GTIcons.history));
+  await tester.tap(
+    find.descendant(
+        of: find.byType(NavigationDrawerDestination),
+        matching: find.byIcon(GTIcons.history)),
+  );
   await tester.pumpAndSettle();
 
   // Verify that the workout is in the history

@@ -106,8 +106,11 @@ Future<void> createRoutineFromWorkout(
   GTLocalizations l,
   DatabaseService databaseService,
 ) async {
-  await tester
-      .tap(find.widgetWithText(NavigationDestination, 'history.title'.t));
+  await tester.tap(
+    find.descendant(
+        of: find.byType(NavigationDrawer),
+        matching: find.byIcon(GTIcons.history)),
+  );
   await tester.pumpAndSettle();
   expect(find.byType(HistoryWorkout), findsOneWidget);
   await tester.tap(find.widgetWithText(HistoryWorkout, workoutName));
@@ -122,8 +125,11 @@ Future<void> createRoutineFromWorkout(
   await tester.tap(find.byType(BackButton));
   await tester.pumpAndSettle();
 
-  await tester
-      .tap(find.widgetWithText(NavigationDestination, 'routines.title'.t));
+  await tester.tap(
+    find.descendant(
+        of: find.byType(NavigationDrawerDestination),
+        matching: find.byIcon(GTIcons.routines)),
+  );
   await tester.pumpAndSettle();
   expect(find.byType(HistoryWorkout), findsNothing);
   expect(find.widgetWithText(ListTile, workoutName), findsOneWidget);

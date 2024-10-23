@@ -11,7 +11,6 @@ import 'package:gymtracker/service/database.dart';
 import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/service/logger.dart';
 import 'package:gymtracker/struct/optional.dart';
-import 'package:gymtracker/view/utils/exercise.dart';
 
 import '../../test/expectations.dart';
 
@@ -116,7 +115,7 @@ Future<void> testEditExerciseInRoutineAndHistoryFlow(
   expect(find.text('Select exercises'), findsOneWidget);
 
   // Add an exercise
-  await tester.tap(find.widgetWithText(ListTile, 'library.custom'.t));
+  await tester.tap(find.widgetWithIcon(ListTile, GTIcons.custom_exercises));
   await tester.pumpAndSettle();
 
   final exercise = find.byType(ListTile);
@@ -139,17 +138,20 @@ Future<void> testEditExerciseInRoutineAndHistoryFlow(
   // Trigger a frame.
   await tester.pumpAndSettle();
 
-  expect(find.text('library.title'.t), findsOneWidget);
+  expect(find.text('library.title'.t), findsAny);
 
-  await tester
-      .tap(find.widgetWithText(NavigationDestination, 'library.title'.t));
+  await tester.tap(
+    find.descendant(
+        of: find.byType(NavigationDrawer),
+        matching: find.byIcon(GTIcons.library)),
+  );
   await tester.pumpAndSettle();
-  await tester.tap(find.widgetWithText(ListTile, 'library.custom'.t));
+  await tester.tap(find.widgetWithIcon(ListTile, GTIcons.custom_exercises));
   await tester.pumpAndSettle();
   // TODO: Pick more precisely
   expect(databaseService.exercises.length, 1);
   expect(databaseService.exercises.single.name, baseExercise.name);
-  await tester.tap(find.byType(ExerciseListTile));
+  await tester.tap(find.byType(ListTile).last);
   await tester.pumpAndSettle();
   await tester.tap(find.byKey(const Key('menu')));
   await tester.pumpAndSettle();

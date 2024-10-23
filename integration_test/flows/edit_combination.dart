@@ -82,7 +82,11 @@ Future<void> testEditWorkoutCombinationFlow(
   await databaseService.setHistoryWorkout(historyWorkoutBase);
   expect(historyWorkoutBase.isContinuable, true);
 
-  await tester.tap(find.byIcon(GTIcons.history));
+  await tester.tap(
+    find.descendant(
+        of: find.byType(NavigationDrawerDestination),
+        matching: find.byIcon(GTIcons.history)),
+  );
   await tester.pumpAndSettle();
 
   expect(find.byType(HistoryWorkout), findsOneWidget);

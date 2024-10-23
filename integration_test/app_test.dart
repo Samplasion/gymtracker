@@ -30,6 +30,7 @@ void main() async {
   await databaseService.ensureInitializedForTests(NativeDatabase.memory());
 
   setUp(() async {
+    IntegrationTestWidgetsFlutterBinding.instance.reset();
     await ColorService().init();
     await VersionService().init();
 
@@ -40,7 +41,11 @@ void main() async {
     await l.initTests(const [Locale("en")]);
   });
 
-  tearDown(() {
+  tearDown(() async {
+    print("Waiting for asynchronous code to finish");
+    // Is there a better way to wait for all asynchronous code to finish?
+    await Future.delayed(const Duration(seconds: 10));
+
     print("\n${"=" * 10}\nTearing down the database");
     return databaseService.teardown();
   });

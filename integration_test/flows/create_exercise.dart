@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:gymtracker/icons/gymtracker_icons.dart';
 import 'package:gymtracker/main.dart';
 import 'package:gymtracker/model/exercise.dart';
 import 'package:gymtracker/model/set.dart';
@@ -24,12 +25,15 @@ Future<void> testCreateExerciseFlow(
   await tester.pumpAndSettle(const Duration(seconds: 5));
 
   // Verify that the app has started.
-  expect(find.text('library.title'.t), findsOneWidget);
+  expect(find.text('library.title'.t), findsAny);
 
-  await tester
-      .tap(find.widgetWithText(NavigationDestination, 'library.title'.t));
+  await tester.tap(
+    find.descendant(
+        of: find.byType(NavigationDrawer),
+        matching: find.byIcon(GTIcons.library)),
+  );
   await tester.pumpAndSettle();
-  await tester.tap(find.widgetWithText(ListTile, 'library.custom'.t));
+  await tester.tap(find.widgetWithIcon(ListTile, GTIcons.custom_exercises));
   await tester.pumpAndSettle();
   await tester
       .tap(find.widgetWithText(ListTile, 'library.newCustomExercise'.t));

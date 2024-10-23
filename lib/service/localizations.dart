@@ -89,12 +89,13 @@ class GTLocalizations extends Translations with ChangeNotifier {
   }
 
   @visibleForTesting
-  initTests(List<Locale> locales) async {
+  Future<void> initTests(List<Locale> locales) async {
     for (final locale in locales) {
       final bundle = await rootBundle
           .loadString('assets/i18n/${locale.languageCode}.json');
       keys[locale.languageCode] = flattenTranslations(jsonDecode(bundle));
     }
+    Get.addTranslations(keys);
     notifyListeners();
   }
 

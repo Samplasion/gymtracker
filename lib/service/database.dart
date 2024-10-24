@@ -809,8 +809,9 @@ class _DatabaseBackups {
     });
   }
 
-  Future<DatabaseBackup> store(GTDatabase _db) async {
-    final now = DateTime.now();
+  Future<DatabaseBackup?> store(GTDatabase _db) async {
+    try {
+      final now = DateTime.now();
     final path = "${_backupDir.path}/${now.millisecondsSinceEpoch}.db";
     await (await _db.path).copy(path);
     _backups$.add(list());
@@ -829,6 +830,9 @@ class _DatabaseBackups {
     final size = await file.length();
 
     return DatabaseBackup(now, file, size);
+    } on PathNotFoundException catch (e, s) {
+      logger.e("Path not found", error: e, stackTrace: s);
+    }
   }
 
   List<DatabaseBackup> list() {

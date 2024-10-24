@@ -804,9 +804,11 @@ class _DatabaseBackups {
     _backupDir = Directory("${root.path}/backups");
     await _backupDir.create();
     _backups$.add(list());
-    _backupDir.watch().listen((event) {
+    if (!(Platform.isIOS || Platform.isAndroid)) {
+      _backupDir.watch().listen((event) {
       _backups$.add(list());
     });
+    }
   }
 
   Future<DatabaseBackup?> store(GTDatabase _db) async {
@@ -814,7 +816,6 @@ class _DatabaseBackups {
       final now = DateTime.now();
     final path = "${_backupDir.path}/${now.millisecondsSinceEpoch}.db";
     await (await _db.path).copy(path);
-    _backups$.add(list());
 
     // Delete old backups
     final backups = list();
@@ -825,6 +826,7 @@ class _DatabaseBackups {
         await backup.file.delete();
       }
     }
+    _backups$.add(list());
 
     final file = File(path);
     final size = await file.length();

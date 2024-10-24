@@ -29,7 +29,7 @@ def run_group(group):
   print(f'Running {len(group)} tests')
   for test in group:
     print(f'Running {test}')
-    os.system(f'flutter test -d macos --plain-name="{test}"')
+    os.system(f'flutter test integration_test -d macos --plain-name="{test}"')
 
 def main():
   group = 0

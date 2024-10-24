@@ -6,7 +6,11 @@ on:
 
 jobs:
   test:
+    name: Integration tests (${{ matrix.flag }}/3)
     runs-on: macOS-latest
+    strategy:
+      matrix:
+        flag: [1, 2, 3]
 
     steps:
       - uses: actions/checkout@v4
@@ -25,4 +29,4 @@ jobs:
       - name: Build
         run: flutter build macos
 
-      - run: flutter test integration_test -d macos
+      - run: tools/test.py ${{matrix.flag}}

@@ -181,7 +181,7 @@ Future<void> testCombineWorkoutsFlow(
   expect(find.byType(ExercisesView), findsOneWidget);
 
   // Scroll to the bottom
-  await tester.fling(find.byType(ExercisesView), const Offset(0, -400), 1000);
+  await tester.fling(find.byType(ExercisesView), const Offset(0, -500), 1000);
   await tester.pumpAndSettle();
 
   // Tap the "Continuation" button

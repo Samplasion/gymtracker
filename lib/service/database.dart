@@ -96,6 +96,7 @@ class DatabaseService extends GetxService with ChangeNotifier {
     return _innerEnsureInitialized(onDone: onDone);
   }
 
+  bool _isInit = false;
   Future<void> _innerEnsureInitialized({
     Function()? onDone,
   }) async {
@@ -117,7 +118,8 @@ class DatabaseService extends GetxService with ChangeNotifier {
       "nutritionCategories",
     ].map((element) => false).toList();
     check() {
-      if (initialized.every((element) => element)) {
+      if (initialized.every((element) => element) && !_isInit) {
+        _isInit = true;
         onDone?.call();
       }
     }

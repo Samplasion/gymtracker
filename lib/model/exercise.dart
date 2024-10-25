@@ -22,7 +22,9 @@ enum GTMuscleCategory {
   chest,
   core,
   legs,
-  shoulders,
+  shoulders;
+
+  String get localizedName => "muscleCategories.$name".t;
 }
 
 enum GTExerciseMuscleCategory {

@@ -524,7 +524,8 @@
       "addToSuperset": "Aggiungi a superserie…",
       "startCardioTimer": "Avvia timer a intervalli",
       "rpeBadge": "RPE @rpe",
-      "setRPE": "Imposta RPE"
+      "setRPE": "Imposta RPE",
+      "generate": "Genera"
     },
     "info": {
       "time": "Tempo",
@@ -2220,6 +2221,22 @@
     "bodyweightBeast": {
       "description": "Crea una routine solo di corpo libero e seguila per almeno un mese",
       "title": "Controllo corporeo"
+    }
+  },
+  "workoutGenerator": {
+    "title": "Genera allenamento",
+    "muscleGroups": "Seleziona gruppi muscolari",
+    "equipment": "Seleziona attrezzatura",
+    "actions": {
+      "generate": "Genera"
+    },
+    "success": {
+      "undo": "Annulla",
+      "title": "Allenamento generato con successo"
+    },
+    "empty": {
+      "title": "Allenamento vuoto",
+      "text": "Cambia i filtri e riprova"
     }
   }
 }

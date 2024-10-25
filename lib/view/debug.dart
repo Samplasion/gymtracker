@@ -46,8 +46,8 @@ class _DebugViewState extends State<DebugView> {
     return Scaffold(
       body: CustomScrollView(
         slivers: [
-          SliverAppBar.large(
-            title: const Text("Debug"),
+          const SliverAppBar.large(
+            title: Text("Debug"),
             leading: SkeletonDrawerButton(),
           ),
           SliverList(
@@ -220,7 +220,6 @@ class _DebugViewState extends State<DebugView> {
                   max: 15,
                 );
               }),
-              TextField(),
             ]),
           ),
           const SliverBottomSafeArea(),

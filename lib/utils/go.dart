@@ -70,15 +70,20 @@ class Go {
   }
 
   static Future snack(
-    String text, {
+    Object text, {
     SnackBarAction? action,
     bool assertive = false,
+    Duration duration = const Duration(milliseconds: 4000),
+    Color? backgroundColor,
   }) async {
+    assert(text is String || text is Widget, "Text must be a String or Widget");
     return customSnack(
       SnackBar(
-        content: Text(text),
+        content: text is String ? Text(text) : text as Widget,
         behavior: SnackBarBehavior.floating,
         action: action,
+        duration: duration,
+        backgroundColor: backgroundColor,
       ),
       assertive: assertive,
     );

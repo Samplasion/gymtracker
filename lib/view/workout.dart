@@ -21,6 +21,7 @@ import 'package:gymtracker/service/logger.dart';
 import 'package:gymtracker/utils/constants.dart';
 import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/utils/go.dart';
+import 'package:gymtracker/utils/theme.dart';
 import 'package:gymtracker/utils/utils.dart';
 import 'package:gymtracker/view/components/infobox.dart';
 import 'package:gymtracker/view/components/rich_text_editor.dart';
@@ -394,6 +395,27 @@ class _WorkoutViewState extends State<WorkoutView> {
             ),
           ]),
         ),
+        if (_controller?.exercises.isEmpty ?? false)
+          Center(
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: FilledButton.icon(
+                style: ButtonStyle(
+                  foregroundColor: WidgetStateProperty.all(
+                    Theme.of(context).colorScheme.onQuinary,
+                  ),
+                  backgroundColor: WidgetStateProperty.all(
+                    Theme.of(context).colorScheme.quinary,
+                  ),
+                ),
+                onPressed: () {
+                  _controller?.generateWorkout();
+                },
+                label: Text("ongoingWorkout.exercises.generate".t),
+                icon: const Icon(GTIcons.generate),
+              ),
+            ),
+          ),
       ],
     );
   }

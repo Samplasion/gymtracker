@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
@@ -12,6 +13,7 @@ import 'package:gymtracker/controller/serviceable_controller.dart';
 import 'package:gymtracker/controller/settings_controller.dart';
 import 'package:gymtracker/controller/stopwatch_controller.dart';
 import 'package:gymtracker/data/distance.dart';
+import 'package:gymtracker/data/exercises.dart';
 import 'package:gymtracker/data/weights.dart';
 import 'package:gymtracker/icons/gymtracker_icons.dart';
 import 'package:gymtracker/model/exercisable.dart';
@@ -27,11 +29,13 @@ import 'package:gymtracker/struct/stopwatch_extended.dart';
 import 'package:gymtracker/utils/constants.dart';
 import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/utils/go.dart';
+import 'package:gymtracker/utils/theme.dart';
 import 'package:gymtracker/utils/utils.dart';
 import 'package:gymtracker/view/components/rich_text_dialog.dart';
 import 'package:gymtracker/view/exercise_picker.dart';
 import 'package:gymtracker/view/utils/exercises_to_superset.dart';
 import 'package:gymtracker/view/utils/workout_done.dart';
+import 'package:gymtracker/view/utils/workout_generator.dart';
 import 'package:gymtracker/view/workout.dart';
 
 class WorkoutController extends GetxController with ServiceableController {
@@ -1053,5 +1057,90 @@ class WorkoutController extends GetxController with ServiceableController {
       completes: continuesID.value,
       folder: null,
     );
+  }
+
+  void generateWorkout() async {
+    if (this.exercises.isNotEmpty) {
+      return;
+    }
+
+    final _res =
+        await Go.toDialog<(Set<GTMuscleCategory>, Set<GTGymEquipment>)>(
+      () => const WorkoutGeneratorSetupScreen(),
+    );
+    if (_res == null) return;
+
+    final (muscleGroups, equipment) = _res;
+    final exercises = _workoutGenerator(
+      muscleGroups: muscleGroups,
+      equipment: equipment,
+    );
+
+    if (exercises.isEmpty) {
+      Go.dialog("workoutGenerator.empty.title", "workoutGenerator.empty.text");
+      return;
+    }
+
+    this.exercises(exercises);
+
+    Go.snack(
+      ListTile(
+        leading: const Icon(GTIcons.generate),
+        title: Text("workoutGenerator.success.title".t),
+        textColor: Get.context?.colorScheme.onQuinaryContainer,
+        iconColor: Get.context?.colorScheme.onQuinaryContainer,
+      ),
+        backgroundColor: Get.context?.colorScheme.quinaryContainer,
+      action: SnackBarAction(
+        label: "workoutGenerator.success.undo".t,
+        backgroundColor: Get.context?.colorScheme.quinary,
+        textColor: Get.context?.colorScheme.onQuinary,
+        onPressed: () {
+          this.exercises([]);
+        },
+      ),
+      duration: const Duration(milliseconds: 2250) * exercises.length,
+    );
+  }
+
+  List<Exercise> _workoutGenerator({
+    required Set<GTMuscleCategory> muscleGroups,
+    required Set<GTGymEquipment> equipment,
+  }) {
+    final filteredLibrary = exerciseStandardLibraryAsList
+        .where((exercise) =>
+            muscleGroups.contains(exercise.primaryMuscleGroup.category) &&
+            equipment.contains(exercise.gymEquipment))
+        .toList();
+    final exercises = <Exercise>[];
+
+    for (final group in muscleGroups) {
+      final groupExercises = filteredLibrary
+          .where((exercise) => exercise.primaryMuscleGroup.category == group)
+          .toList();
+      groupExercises.shuffle();
+
+      final toAdd = Random().nextInt(4) + 2;
+      int i = 0;
+      exercises.addAll(groupExercises.take(toAdd).map((e) {
+        i++;
+        return e.makeChild().copyWith(
+          restTime: const Duration(minutes: 1),
+          sets: [
+            for (int j = 0; j < (i == toAdd - 1 && i > 3 ? 2 : 3); j++)
+              GTSet(
+                weight: 0,
+                reps: 10,
+                time: const Duration(minutes: 1),
+                distance: 0,
+                kind: GTSetKind.normal,
+                parameters: e.parameters,
+              ),
+          ],
+        );
+      }));
+    }
+
+    return exercises;
   }
 }

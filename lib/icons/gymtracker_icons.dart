@@ -92,6 +92,8 @@ class GTIcons {
 
   static const IconData _fire =
       IconData(0xf06d, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData _sparkles =
+      IconData(0xf06e, fontFamily: _kFontFam, fontPackage: _kFontPkg);
 
   static const IconData achievements = Icons.emoji_events_rounded;
   static const IconData achievement_locked = Icons.lock_rounded;
@@ -140,6 +142,7 @@ class GTIcons {
   static const IconData food = Icons.fastfood_rounded;
   static const IconData food_categories = Icons.local_dining_rounded;
   static const IconData gallery = Icons.photo_library_rounded;
+  static const IconData generate = _sparkles;
   static const IconData help = Icons.help_rounded;
   static const IconData highlight = Icons.highlight_rounded;
   static const IconData history = Icons.history_rounded;

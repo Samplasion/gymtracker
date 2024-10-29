@@ -16,8 +16,8 @@
       "normal": "Serie normale",
       "warmUp": "Riscaldamento",
       "drop": "Drop set",
-      "failure": "A morire",
-      "failureStripping": "A morire, con stripping"
+      "failure": "A cedimento",
+      "failureStripping": "A cedimento con stripping"
     },
     "kinds": {
       "help": {
@@ -25,8 +25,8 @@
         "warmUp": "Una serie di riscaldamento è una serie leggera di un esercizio che esegui prima delle serie di lavoro effettive. Il suo scopo è preparare i muscoli per il lavoro pesante imminente.",
         "normal": "Una serie normale è una serie regolare di un esercizio, in cui esegui un certo numero di ripetizioni con un certo peso.",
         "drop": "Una serie di drop (\"Drop set\") è una serie in cui abbassi il peso dopo aver raggiunto il fallimento muscolare e continui a eseguire ripetizioni con il peso inferiore.",
-        "failure": "Una serie \"a morire\" è una serie in cui esegui ripetizioni fino a raggiungere il fallimento muscolare.",
-        "failureStripping": "Una serie \"a morire\" con stripping è una serie \"a morire\" che parte immediatamente dalla serie precedente (quindi senza recupero), in cui esegui ripetizioni fino a raggiungere il fallimento muscolare."
+        "failure": "Una serie a cedimento è una serie in cui esegui ripetizioni fino a raggiungere il fallimento muscolare.",
+        "failureStripping": "Una serie a cedimento con stripping è una serie a cedimento che parte immediatamente dalla serie precedente (quindi senza recupero), in cui esegui ripetizioni fino a raggiungere il fallimento muscolare."
       }
     }
   },

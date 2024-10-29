@@ -410,7 +410,7 @@ Map<String, Achievement> get achievements => {
             nameKey: "achievements.trailblazer.title",
             descriptionKey:
                 "achievements.trailblazer.description.1.${settingsController.distanceUnit.value.name}",
-            descriptionParameters: {
+            descriptionParameters: () => {
               "mi": Distance.mi.format(Distance.convert(
                 value: 100,
                 from: Distance.km,
@@ -433,7 +433,7 @@ Map<String, Achievement> get achievements => {
             nameKey: "achievements.trailblazer.title",
             descriptionKey:
                 "achievements.trailblazer.description.2.${settingsController.distanceUnit.value.name}",
-            descriptionParameters: {
+            descriptionParameters: () => {
               "mi": Distance.mi.format(Distance.convert(
                 value: 500,
                 from: Distance.km,
@@ -456,7 +456,7 @@ Map<String, Achievement> get achievements => {
             nameKey: "achievements.trailblazer.title",
             descriptionKey:
                 "achievements.trailblazer.description.3.${settingsController.distanceUnit.value.name}",
-            descriptionParameters: {
+            descriptionParameters: () => {
               "mi": Distance.mi.format(Distance.convert(
                 value: 1000,
                 from: Distance.km,
@@ -491,7 +491,7 @@ Map<String, Achievement> get achievements => {
             nameKey: "achievements.cycleChampion.title",
             descriptionKey:
                 "achievements.cycleChampion.description.1.${settingsController.distanceUnit.value.name}",
-            descriptionParameters: {
+            descriptionParameters: () => {
               "mi": Distance.mi.format(Distance.convert(
                 value: 100,
                 from: Distance.km,
@@ -514,7 +514,7 @@ Map<String, Achievement> get achievements => {
             nameKey: "achievements.cycleChampion.title",
             descriptionKey:
                 "achievements.cycleChampion.description.2.${settingsController.distanceUnit.value.name}",
-            descriptionParameters: {
+            descriptionParameters: () => {
               "mi": Distance.mi.format(Distance.convert(
                 value: 500,
                 from: Distance.km,
@@ -537,7 +537,7 @@ Map<String, Achievement> get achievements => {
             nameKey: "achievements.cycleChampion.title",
             descriptionKey:
                 "achievements.cycleChampion.description.3.${settingsController.distanceUnit.value.name}",
-            descriptionParameters: {
+            descriptionParameters: () => {
               "mi": Distance.mi.format(Distance.convert(
                 value: 1000,
                 from: Distance.km,
@@ -932,7 +932,7 @@ Map<String, Achievement> get achievements => {
             nameKey: "achievements.sparta.title",
             descriptionKey:
                 "achievements.sparta.description.1.${settingsController.weightUnit.value.name}",
-            descriptionParameters: {
+            descriptionParameters: () => {
               "kg": Weights.kg.format(Weights.convert(
                 value: 300,
                 from: Weights.lb,
@@ -948,7 +948,7 @@ Map<String, Achievement> get achievements => {
             nameKey: "achievements.sparta.title",
             descriptionKey:
                 "achievements.sparta.description.2.${settingsController.weightUnit.value.name}",
-            descriptionParameters: {
+            descriptionParameters: () => {
               "lb": Weights.lb.format(Weights.convert(
                 value: 300,
                 from: Weights.kg,

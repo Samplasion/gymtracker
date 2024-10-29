@@ -31,7 +31,14 @@ class Streaks {
     keys.sort();
 
     today = today.startOfDay;
-    var lastMonday = getLastDayOfWeek(today, firstDayOfWeek);
+    var lastMonday = getLastFirstDayOfWeek(today, firstDayOfWeek);
+
+    // Don't count the current week if it's not finished yet
+    if (!keys.any((element) =>
+          element.isAfterOrAtSameMomentAs(lastMonday) &&
+          element.isBefore(today))) {
+            lastMonday = lastMonday.subtract(const Duration(days: 7));
+          }
 
     globalLogger.t("Last first-DOW: $lastMonday");
 

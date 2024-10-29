@@ -51,12 +51,13 @@ final class Achievement {
   }
 }
 
+Map<String, String> _defaultParameters() => {};
 final class AchievementLevel {
   final String achievementID;
   final int level;
   final String nameKey;
   final String descriptionKey;
-  final Map<String, String> descriptionParameters;
+  final Map<String, String> Function() descriptionParameters;
   final AchievementTrigger trigger;
   final bool Function(double? progress) checkCompletion;
   final double Function()? progress;
@@ -68,7 +69,7 @@ final class AchievementLevel {
     required this.level,
     required this.nameKey,
     required this.descriptionKey,
-    this.descriptionParameters = const {},
+    this.descriptionParameters = _defaultParameters,
     required this.trigger,
     required this.checkCompletion,
     this.progress,

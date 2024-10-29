@@ -199,5 +199,5 @@ extension AchievementLevelLocalized on AchievementLevel {
   }
 
   String get localizedDescription =>
-      descriptionKey.tParams(descriptionParameters);
+      descriptionKey.tParams(descriptionParameters());
 }

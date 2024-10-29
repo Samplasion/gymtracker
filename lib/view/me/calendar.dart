@@ -7,8 +7,9 @@ import 'package:gymtracker/controller/me_controller.dart';
 import 'package:gymtracker/icons/gymtracker_icons.dart';
 import 'package:gymtracker/model/workout.dart';
 import 'package:gymtracker/service/localizations.dart';
+import 'package:gymtracker/service/logger.dart';
 import 'package:gymtracker/utils/constants.dart';
-import 'package:gymtracker/utils/extensions.dart';
+import 'package:gymtracker/utils/extensions.dart' hide ContextThemingUtils;
 import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/view/components/controlled.dart';
 import 'package:gymtracker/view/exercises.dart';
@@ -44,6 +45,28 @@ class _MeCalendarPageState
     },
     weekdayStart: GTLocalizations.firstDayOfWeekFor(context),
   );
+  late Worker worker;
+
+  @override
+  void initState() {
+    super.initState();
+    historyController.queueStreaksRecomputation();
+    worker = ever(
+      historyController.history,
+      (callback) {
+        logger.i("History updated");
+        if (mounted) {
+          setState(() {});
+        }
+      },
+    );
+  }
+
+  @override
+  void dispose() {
+    worker.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -72,7 +95,7 @@ class _MeCalendarPageState
                   buttons: [
                     SpeedDialButton(
                       icon: Icon(GTIcons.streak_weeks,
-                          color: context.harmonizeColor(Colors.orange)),
+                          color: streaks.weekStreak == 0 ? context.theme.colorScheme.outline : context.harmonizeColor(Colors.orange),),
                       text: Text("time.weeks".plural(streaks.weekStreak)),
                       subtitle: Text("me.calendar.streak".t),
                       dense: true,

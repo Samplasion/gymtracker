@@ -36,6 +36,7 @@ class Coordinator extends GetxController with ServiceableController {
     showPermissionTilesStream = BehaviorSubject<bool>.seeded(true);
 
     await Future.wait([
+      Go.awaitInitialization(),
       Get.find<SettingsController>().awaitInitialized(),
       Get.find<NotificationController>().initialize(),
     ]);

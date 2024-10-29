@@ -43,7 +43,9 @@ class HistoryController extends GetxController with ServiceableController {
           .compareTo(b.startingDate ?? DateTime.fromMillisecondsSinceEpoch(0)));
       history(event);
       _computeWorkoutsByDay();
-      computeStreaks();
+      SchedulerBinding.instance.addPostFrameCallback((_) {
+        computeStreaks();
+      });
       coordinator.computeSuggestions();
 
       if (_init) {
@@ -66,6 +68,12 @@ class HistoryController extends GetxController with ServiceableController {
       _counts[date]!.add(workout);
     }
     workoutsByDay = _counts;
+  }
+
+  void queueStreaksRecomputation() {
+    if (streaks.value == Streaks.zero) {
+      computeStreaks();
+    }
   }
 
   void computeStreaks() {

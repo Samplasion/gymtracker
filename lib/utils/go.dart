@@ -502,6 +502,17 @@ class Go {
       builder: builder,
     );
   }
+
+  static Future<void> awaitInitialization() {
+    final completer = Completer<void>();
+    final sub =
+        Stream.periodic(const Duration(milliseconds: 100)).listen((event) {
+      if (Get.context != null) {
+        completer.complete();
+      }
+    });
+    return completer.future.whenComplete(() => sub.cancel());
+  }
 }
 
 String _defaultT(String s) => s.t;

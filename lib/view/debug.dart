@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:drift/drift.dart' show GeneratedDatabase;
 import 'package:drift_db_viewer/drift_db_viewer.dart';
 import 'package:flat/flat.dart';
 import 'package:flutter/material.dart';
@@ -96,7 +97,7 @@ class _DebugViewState extends State<DebugView> {
               ListTile(
                 title: const Text("Database inspector"),
                 onTap: () {
-                  Go.to(() => DriftDbViewer(Get.find<DatabaseService>().db));
+                  Go.to(() => DriftDbViewer(Get.find<DatabaseService>().db as GeneratedDatabase));
                 },
               ),
               FutureBuilder(

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
@@ -50,6 +51,97 @@ const _uuid = Uuid();
 
 const DATABASE_VERSION = 10;
 
+abstract class GTDatabase {
+  Future<T> transaction<T>(Future<T> Function() action, {bool requireNew});
+
+  Stream<List<model.Workout>> getAllRoutines();
+  Future<List<model.Workout>> getAllRoutinesFuture();
+  Future<model.Workout> getRoutine(String id);
+  Future<void> insertRoutine(model.Workout routine);
+  Future<void> deleteRoutine(String id);
+  Future<void> updateRoutine(model.Workout routine);
+  Future<void> writeAllRoutines(List<model.Workout> routines);
+  Future<void> overwriteAllRoutineExercises(
+      List<model.WorkoutExercisable> routineExercises);
+
+  Stream<List<model.GTRoutineFolder>> watchRoutineFolders();
+  Future<void> insertRoutineFolder(model.GTRoutineFolder folder);
+  Future<void> deleteRoutineFolder(String id);
+  Future<void> updateRoutineFolder(model.GTRoutineFolder folder);
+  Future writeAllRoutineFolders(List<model.GTRoutineFolder> folders);
+
+  Stream<List<model.Workout>> getAllHistoryWorkouts();
+  Future<List<model.Workout>> getAllHistoryWorkoutsFuture();
+  Future<model.Workout> getHistoryWorkout(String id);
+  Future<void> insertHistoryWorkout(model.Workout workout);
+  Future<void> deleteHistoryWorkout(String id);
+  Future<void> updateHistoryWorkout(model.Workout workout);
+  Future<void> writeAllHistoryWorkouts(List<model.Workout> routines);
+  Future<void> overwriteAllHistoryWorkoutExercises(
+      List<model.WorkoutExercisable> historyWorkoutExercises);
+
+  Stream<List<model.Exercise>> getAllCustomExercises();
+  Future<void> insertCustomExercise(model.Exercise exercise);
+  Future<void> deleteCustomExercise(String id);
+  Future<void> updateCustomExercise(model.Exercise exercise);
+  Future<void> writeAllCustomExercises(List<model.Exercise> exercises);
+
+  Stream<Prefs> watchPreferences();
+  Future<void> setPreferences(Prefs prefs);
+
+  Stream<Map<String, dynamic>?> watchOngoing();
+  Future<void> setOngoing(Map<String, dynamic> ongoing);
+  Future deleteOngoing();
+
+  Stream<List<WeightMeasurement>> watchWeightMeasurements();
+  Future<void> insertWeightMeasurement(WeightMeasurement measurement);
+  Future<void> deleteWeightMeasurement(String id);
+  Future<void> updateWeightMeasurement(WeightMeasurement measurement);
+  Future<void> setWeightMeasurements(List<WeightMeasurement> measurements);
+
+  Stream<List<model.TaggedFood>> watchFoods();
+  Future<void> insertFoods(model.TaggedFood food);
+  Future<void> deleteFoods(String id);
+  Future<void> updateFoods(model.TaggedFood food);
+  Future<void> setFoods(List<model.TaggedFood> foods);
+
+  Stream<List<model.TaggedNutritionGoal>> watchNutritionGoals();
+  Future<void> insertNutritionGoal(model.TaggedNutritionGoal goal);
+  Future<void> deleteNutritionGoal(DateTime date);
+  Future<void> updateNutritionGoal(model.TaggedNutritionGoal goal);
+  Future<void> setNutritionGoals(List<model.TaggedNutritionGoal> goals);
+
+  Stream<Map<String, model.Food>> watchCustomBarcodeFoods();
+  Future<void> insertCustomBarcodeFood(String barcode, model.Food food);
+  Future<void> deleteCustomBarcodeFood(String barcode);
+  Future<void> setCustomBarcodeFoods(Map<String, model.Food> foods);
+
+  Stream<List<model.Food>> watchFavoriteFoods();
+  Future<void> insertFavoriteFood(String id);
+  Future<void> deleteFavoriteFood(String id);
+  Future<void> setFavoriteFoods(List<String> ids);
+
+  Stream<Map<DateTime, Map<String, model.NutritionCategory>>>
+      watchNutritionCategories();
+  Future<void> insertNutritionCategories(
+      DateTime date, Map<String, model.NutritionCategory> categories);
+  Future<void> deleteNutritionCategories(DateTime date);
+  Future<void> setNutritionCategories(
+      Map<DateTime, Map<String, model.NutritionCategory>> categories);
+
+  Stream<List<AchievementCompletion>> watchAchievementCompletions();
+  Future<void> insertAchievementCompletion(AchievementCompletion completion);
+  Future<void> insertAchievementCompletions(
+      List<AchievementCompletion> completions);
+  Future<void> deleteAchievementCompletion(String achievementID, int level);
+  Future<void> setAchievementCompletions(
+      List<AchievementCompletion> completions);
+
+  Future clearTheWholeThingIAmAbsolutelySureISwear();
+  Future<File> get path;
+  Future<void> close();
+}
+
 @DriftDatabase(tables: [
   CustomExercises,
   HistoryWorkouts,
@@ -67,11 +159,11 @@ const DATABASE_VERSION = 10;
   NutritionCategories,
   Achievements,
 ])
-class GTDatabase extends _$GTDatabase {
-  GTDatabase.prod() : super(_openConnection());
+class GTDatabaseImpl extends _$GTDatabaseImpl implements GTDatabase {
+  GTDatabaseImpl.prod() : super(_openConnection());
 
   @visibleForTesting
-  GTDatabase.withQueryExecutor(super.e);
+  GTDatabaseImpl.withQueryExecutor(super.e);
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -146,17 +238,19 @@ class GTDatabase extends _$GTDatabase {
                 // Update existing exercises with equipment
                 await m.database.transaction(() async {
                   for (final exercise in exerciseStandardLibraryAsList) {
-                    await (m.database.update(
-                            (m.database as GTDatabase).historyWorkoutExercises)
+                    await (m.database.update((m.database as GTDatabaseImpl)
+                            .historyWorkoutExercises)
                           ..where((tbl) =>
                               tbl.libraryExerciseId.equals(exercise.id)))
                         .write(HistoryWorkoutExercisesCompanion(
+                            // ignore: deprecated_member_use_from_same_package
                             equipment: Value(exercise.equipment)));
-                    await (m.database
-                            .update((m.database as GTDatabase).routineExercises)
+                    await (m.database.update(
+                            (m.database as GTDatabaseImpl).routineExercises)
                           ..where((tbl) =>
                               tbl.libraryExerciseId.equals(exercise.id)))
                         .write(RoutineExercisesCompanion(
+                            // ignore: deprecated_member_use_from_same_package
                             equipment: Value(exercise.equipment)));
                   }
                 });
@@ -204,6 +298,7 @@ class GTDatabase extends _$GTDatabase {
   @override
   int get schemaVersion => DATABASE_VERSION;
 
+  @override
   Stream<List<model.Workout>> getAllRoutines() {
     logger.i("Getting all routines");
 
@@ -243,8 +338,10 @@ class GTDatabase extends _$GTDatabase {
     });
   }
 
+  @override
   Future<List<model.Workout>> getAllRoutinesFuture() => getAllRoutines().first;
 
+  @override
   Future<model.Workout> getRoutine(String id) async {
     final routine =
         await (select(routines)..where((tbl) => tbl.id.equals(id))).getSingle();
@@ -262,6 +359,7 @@ class GTDatabase extends _$GTDatabase {
     return workoutFromDatabase(routine, rawExercises, dbFolder: folder);
   }
 
+  @override
   Future<void> insertRoutine(model.Workout routine) async {
     final newSortOrder = await routines.count().getSingle();
     return batch((batch) {
@@ -276,6 +374,7 @@ class GTDatabase extends _$GTDatabase {
     });
   }
 
+  @override
   Future<void> deleteRoutine(String id) async {
     final remainingIDs = (await (select(routines)
           ..where((tbl) => tbl.id.isNotValue(id))
@@ -297,6 +396,7 @@ class GTDatabase extends _$GTDatabase {
     });
   }
 
+  @override
   Future<void> updateRoutine(model.Workout routine) async {
     final sortOrder = (await (select(routines)
               ..where((tbl) => tbl.id.equals(routine.id)))
@@ -317,17 +417,51 @@ class GTDatabase extends _$GTDatabase {
     });
   }
 
+  @override
+  Future writeAllRoutines(List<model.Workout> routines) {
+    return transaction(() async {
+      await batch((batch) {
+        batch.deleteAll(this.routines);
+        batch.insertAll(
+          this.routines,
+          routines.toSortedRoutineInsertables(),
+        );
+      });
+      await overwriteAllRoutineExercises(routines.flattenedExercises);
+    });
+  }
+
+  @override
+  Future<void> overwriteAllRoutineExercises(
+      List<model.WorkoutExercisable> routineExercises) async {
+    final routineExerciseInsertables = routineExercises
+        .fold(
+          <String, List<model.WorkoutExercisable>>{},
+          (m, r) {
+            return m..putIfAbsent(r.workoutID!, () => []).add(r);
+          },
+        )
+        .values
+        .expand((list) => list.toSortedInsertables());
+    await delete(this.routineExercises).go();
+    await batch(
+        (b) => b.insertAll(this.routineExercises, routineExerciseInsertables));
+  }
+
+  @override
   Stream<List<model.GTRoutineFolder>> watchRoutineFolders() {
     return select(routineFolders)
         .watch()
         .map((l) => [for (final row in l) folderFromDatabase(row)]);
   }
 
+  @override
   Future<void> insertRoutineFolder(model.GTRoutineFolder folder) async {
     await into(routineFolders).insert(folder.toInsertable());
     await _recomputeFolderSortOrders();
   }
 
+  @override
   Future<void> deleteRoutineFolder(String id) async {
     final allRoutines = await (select(routines)
           ..orderBy([(r) => OrderingTerm(expression: r.sortOrder)]))
@@ -354,10 +488,12 @@ class GTDatabase extends _$GTDatabase {
     await _recomputeFolderSortOrders();
   }
 
+  @override
   Future<void> updateRoutineFolder(model.GTRoutineFolder folder) async {
     await (update(routineFolders).replace(folder.toInsertable()));
   }
 
+  @override
   Future writeAllRoutineFolders(List<model.GTRoutineFolder> folders) {
     return batch((batch) {
       batch.deleteWhere(routineFolders, (_) => const Constant(true));
@@ -384,6 +520,7 @@ class GTDatabase extends _$GTDatabase {
     });
   }
 
+  @override
   Stream<List<model.Workout>> getAllHistoryWorkouts() {
     logger.i("Getting all history workouts");
 
@@ -414,9 +551,11 @@ class GTDatabase extends _$GTDatabase {
     });
   }
 
+  @override
   Future<List<model.Workout>> getAllHistoryWorkoutsFuture() =>
       getAllHistoryWorkouts().first;
 
+  @override
   Future<model.Workout> getHistoryWorkout(String id) async {
     final workout = await (select(historyWorkouts)
           ..where((tbl) => tbl.id.equals(id)))
@@ -429,6 +568,7 @@ class GTDatabase extends _$GTDatabase {
     return historyWorkoutFromDatabase(workout, rawExercises);
   }
 
+  @override
   Future<void> insertHistoryWorkout(model.Workout workout) async {
     logger.e(workout);
     logger.e(workout.toHistoryWorkoutInsertable());
@@ -445,6 +585,7 @@ class GTDatabase extends _$GTDatabase {
     });
   }
 
+  @override
   Future<void> deleteHistoryWorkout(String id) async {
     await (delete(historyWorkouts)..where((tbl) => tbl.id.equals(id))).go();
     await (delete(historyWorkoutExercises)
@@ -452,6 +593,7 @@ class GTDatabase extends _$GTDatabase {
         .go();
   }
 
+  @override
   Future<void> updateHistoryWorkout(model.Workout workout) async {
     return batch((batch) {
       batch.replace(
@@ -467,6 +609,39 @@ class GTDatabase extends _$GTDatabase {
     });
   }
 
+  @override
+  Future writeAllHistoryWorkouts(List<model.Workout> historyWorkouts) {
+    return transaction(() async {
+      await batch((batch) {
+        batch.deleteAll(this.historyWorkouts);
+        batch.insertAll(
+          this.historyWorkouts,
+          historyWorkouts.toSortedHistoryWorkoutInsertables(),
+        );
+      });
+      await overwriteAllHistoryWorkoutExercises(
+          historyWorkouts.flattenedExercises);
+    });
+  }
+
+  @override
+  Future<void> overwriteAllHistoryWorkoutExercises(
+      List<model.WorkoutExercisable> historyWorkoutExercises) async {
+    final historyExerciseInsertables = historyWorkoutExercises
+        .fold(
+          <String, List<model.WorkoutExercisable>>{},
+          (m, r) {
+            return m..putIfAbsent(r.workoutID!, () => []).add(r);
+          },
+        )
+        .values
+        .expand((list) => list.toSortedInsertables());
+    await delete(this.historyWorkoutExercises).go();
+    await batch((b) =>
+        b.insertAll(this.historyWorkoutExercises, historyExerciseInsertables));
+  }
+
+  @override
   Stream<List<model.Exercise>> getAllCustomExercises() {
     logger.i("Getting all custom exercises");
     return select(customExercises).watch().map((rows) {
@@ -474,24 +649,40 @@ class GTDatabase extends _$GTDatabase {
     });
   }
 
+  @override
   Future<void> insertCustomExercise(model.Exercise exercise) async {
     await into(customExercises).insert(exercise.toInsertable());
   }
 
+  @override
   Future<void> deleteCustomExercise(String id) async {
     await (delete(customExercises)..where((tbl) => tbl.id.equals(id))).go();
   }
 
+  @override
   Future<void> updateCustomExercise(model.Exercise exercise) async {
     await (update(customExercises).replace(exercise.toInsertable()));
   }
 
+  @override
+  Future<void> writeAllCustomExercises(exercises) async {
+    return batch((batch) {
+      batch.deleteAll(customExercises);
+      batch.insertAll(
+        customExercises,
+        [for (final ex in exercises) ex.toInsertable()],
+      );
+    });
+  }
+
+  @override
   Stream<Prefs> watchPreferences() {
     return select(preferences)
         .watch()
         .map((l) => l.isEmpty ? Prefs.defaultValue : Prefs.fromDatabase(l[0]));
   }
 
+  @override
   Future<void> setPreferences(Prefs prefs) {
     return transaction(() async {
       await delete(preferences).go();
@@ -499,6 +690,7 @@ class GTDatabase extends _$GTDatabase {
     });
   }
 
+  @override
   Stream<Map<String, dynamic>?> watchOngoing() {
     return select(ongoingData).watch().map((l) {
       if (l.isEmpty) return null;
@@ -506,6 +698,7 @@ class GTDatabase extends _$GTDatabase {
     });
   }
 
+  @override
   Future<void> setOngoing(Map<String, dynamic> ongoing) {
     return transaction(() async {
       await deleteOngoing();
@@ -514,28 +707,34 @@ class GTDatabase extends _$GTDatabase {
     });
   }
 
+  @override
   Future deleteOngoing() {
     return delete(ongoingData).go();
   }
 
+  @override
   Stream<List<WeightMeasurement>> watchWeightMeasurements() {
     final query = select(weightMeasurements)
       ..orderBy([(tbl) => OrderingTerm.asc(tbl.time)]);
     return query.watch();
   }
 
+  @override
   Future<void> insertWeightMeasurement(WeightMeasurement measurement) {
     return into(weightMeasurements).insert(measurement);
   }
 
+  @override
   Future<void> deleteWeightMeasurement(String id) {
     return (delete(weightMeasurements)..where((tbl) => tbl.id.equals(id))).go();
   }
 
+  @override
   Future<void> updateWeightMeasurement(WeightMeasurement measurement) {
     return (update(weightMeasurements).replace(measurement));
   }
 
+  @override
   Future<void> setWeightMeasurements(List<WeightMeasurement> measurements) {
     return transaction(() async {
       await delete(weightMeasurements).go();
@@ -547,6 +746,7 @@ class GTDatabase extends _$GTDatabase {
     });
   }
 
+  @override
   Stream<List<model.TaggedFood>> watchFoods() {
     final query = select(foods)
       ..orderBy([(tbl) => OrderingTerm.asc(tbl.dateAdded)]);
@@ -555,14 +755,17 @@ class GTDatabase extends _$GTDatabase {
     });
   }
 
+  @override
   Future<void> insertFoods(model.TaggedFood food) {
     return into(foods).insert(food.toInsertable(generateInsertionDate: true));
   }
 
+  @override
   Future<void> deleteFoods(String id) {
     return (delete(foods)..where((tbl) => tbl.id.equals(id))).go();
   }
 
+  @override
   Future<void> updateFoods(model.TaggedFood food) async {
     final oldFood = await (select(foods)
           ..where((tbl) => tbl.id.equals(food.value.id!)))
@@ -573,6 +776,7 @@ class GTDatabase extends _$GTDatabase {
             ));
   }
 
+  @override
   Future<void> setFoods(List<model.TaggedFood> foods) {
     return transaction(() async {
       await delete(this.foods).go();
@@ -586,6 +790,7 @@ class GTDatabase extends _$GTDatabase {
     });
   }
 
+  @override
   Stream<List<model.TaggedNutritionGoal>> watchNutritionGoals() {
     final query = select(nutritionGoals)
       ..orderBy([(tbl) => OrderingTerm.asc(tbl.referenceDate)]);
@@ -594,20 +799,24 @@ class GTDatabase extends _$GTDatabase {
     });
   }
 
+  @override
   Future<void> insertNutritionGoal(model.TaggedNutritionGoal goal) {
     return into(nutritionGoals).insert(goal.toInsertable());
   }
 
+  @override
   Future<void> deleteNutritionGoal(DateTime date) {
     return (delete(nutritionGoals)
           ..where((tbl) => tbl.id.equals(date.toIso8601String())))
         .go();
   }
 
+  @override
   Future<void> updateNutritionGoal(model.TaggedNutritionGoal goal) async {
     await update(nutritionGoals).replace(goal.toInsertable());
   }
 
+  @override
   Future<void> setNutritionGoals(List<model.TaggedNutritionGoal> goals) {
     return transaction(() async {
       await delete(nutritionGoals).go();
@@ -619,6 +828,7 @@ class GTDatabase extends _$GTDatabase {
     });
   }
 
+  @override
   Stream<Map<String, model.Food>> watchCustomBarcodeFoods() {
     return select(customBarcodeFoods).watch().map((foods) {
       return {
@@ -628,6 +838,7 @@ class GTDatabase extends _$GTDatabase {
     });
   }
 
+  @override
   Future<void> insertCustomBarcodeFood(String barcode, model.Food food) {
     return into(customBarcodeFoods).insert(CustomBarcodeFoodsCompanion(
       barcode: Value(barcode),
@@ -635,12 +846,14 @@ class GTDatabase extends _$GTDatabase {
     ));
   }
 
+  @override
   Future<void> deleteCustomBarcodeFood(String barcode) {
     return (delete(customBarcodeFoods)
           ..where((tbl) => tbl.barcode.equals(barcode)))
         .go();
   }
 
+  @override
   Future<void> setCustomBarcodeFoods(Map<String, model.Food> foods) {
     return transaction(() async {
       await delete(customBarcodeFoods).go();
@@ -658,6 +871,7 @@ class GTDatabase extends _$GTDatabase {
     });
   }
 
+  @override
   Stream<List<model.Food>> watchFavoriteFoods() {
     return select(favoriteFoods).watch().switchMap((foodIDs) {
       final ids = foodIDs.map((e) => e.foodId).toList();
@@ -668,15 +882,18 @@ class GTDatabase extends _$GTDatabase {
     });
   }
 
+  @override
   Future<void> insertFavoriteFood(String id) {
     return into(favoriteFoods)
         .insert(FavoriteFoodsCompanion(foodId: Value(id)));
   }
 
+  @override
   Future<void> deleteFavoriteFood(String id) {
     return (delete(favoriteFoods)..where((tbl) => tbl.foodId.equals(id))).go();
   }
 
+  @override
   Future<void> setFavoriteFoods(List<String> ids) {
     return transaction(() async {
       await delete(favoriteFoods).go();
@@ -689,6 +906,7 @@ class GTDatabase extends _$GTDatabase {
     });
   }
 
+  @override
   Stream<Map<DateTime, Map<String, model.NutritionCategory>>>
       watchNutritionCategories() {
     return select(nutritionCategories).watch().map((categories) {
@@ -702,6 +920,7 @@ class GTDatabase extends _$GTDatabase {
     });
   }
 
+  @override
   Future<void> insertNutritionCategories(
       DateTime date, Map<String, model.NutritionCategory> categories) {
     return into(nutritionCategories).insert(NutritionCategoriesCompanion(
@@ -711,12 +930,14 @@ class GTDatabase extends _$GTDatabase {
     ));
   }
 
+  @override
   Future<void> deleteNutritionCategories(DateTime date) {
     return (delete(nutritionCategories)
           ..where((tbl) => tbl.referenceDate.equals(date)))
         .go();
   }
 
+  @override
   Future<void> setNutritionCategories(
       Map<DateTime, Map<String, model.NutritionCategory>> categories) {
     return transaction(() async {
@@ -736,10 +957,12 @@ class GTDatabase extends _$GTDatabase {
     });
   }
 
+  @override
   Stream<List<AchievementCompletion>> watchAchievementCompletions() {
     return select(achievements).watch();
   }
 
+  @override
   Future<void> insertAchievementCompletion(AchievementCompletion completion) {
     return into(achievements).insert(AchievementsCompanion(
       achievementID: Value(completion.achievementID),
@@ -748,6 +971,7 @@ class GTDatabase extends _$GTDatabase {
     ));
   }
 
+  @override
   Future<void> insertAchievementCompletions(
       List<AchievementCompletion> completions) {
     return batch((batch) async {
@@ -766,6 +990,7 @@ class GTDatabase extends _$GTDatabase {
     });
   }
 
+  @override
   Future<void> deleteAchievementCompletion(String achievementID, int level) {
     return (delete(achievements)
           ..where((tbl) {
@@ -775,6 +1000,7 @@ class GTDatabase extends _$GTDatabase {
         .go();
   }
 
+  @override
   Future<void> setAchievementCompletions(
       List<AchievementCompletion> completions) {
     return transaction(() async {
@@ -796,12 +1022,14 @@ class GTDatabase extends _$GTDatabase {
     });
   }
 
+  @override
   Future clearTheWholeThingIAmAbsolutelySureISwear() async {
     for (var table in allTables) {
       await table.deleteAll();
     }
   }
 
+  @override
   Future<File> get path async {
     final dbFolder = await getApplicationDocumentsDirectory();
     return File(p.join(dbFolder.path, 'db.sqlite'));

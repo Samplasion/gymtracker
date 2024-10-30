@@ -4646,9 +4646,9 @@ class AchievementsCompanion extends UpdateCompanion<AchievementCompletion> {
   }
 }
 
-abstract class _$GTDatabase extends GeneratedDatabase {
-  _$GTDatabase(QueryExecutor e) : super(e);
-  $GTDatabaseManager get managers => $GTDatabaseManager(this);
+abstract class _$GTDatabaseImpl extends GeneratedDatabase {
+  _$GTDatabaseImpl(QueryExecutor e) : super(e);
+  $GTDatabaseImplManager get managers => $GTDatabaseImplManager(this);
   late final $CustomExercisesTable customExercises =
       $CustomExercisesTable(this);
   late final $RoutineFoldersTable routineFolders = $RoutineFoldersTable(this);
@@ -4716,7 +4716,7 @@ typedef $$CustomExercisesTableUpdateCompanionBuilder = CustomExercisesCompanion
 });
 
 class $$CustomExercisesTableTableManager extends RootTableManager<
-    _$GTDatabase,
+    _$GTDatabaseImpl,
     $CustomExercisesTable,
     CustomExercise,
     $$CustomExercisesTableFilterComposer,
@@ -4724,7 +4724,7 @@ class $$CustomExercisesTableTableManager extends RootTableManager<
     $$CustomExercisesTableCreateCompanionBuilder,
     $$CustomExercisesTableUpdateCompanionBuilder> {
   $$CustomExercisesTableTableManager(
-      _$GTDatabase db, $CustomExercisesTable table)
+      _$GTDatabaseImpl db, $CustomExercisesTable table)
       : super(TableManagerState(
           db: db,
           table: table,
@@ -4773,7 +4773,7 @@ class $$CustomExercisesTableTableManager extends RootTableManager<
 }
 
 class $$CustomExercisesTableFilterComposer
-    extends FilterComposer<_$GTDatabase, $CustomExercisesTable> {
+    extends FilterComposer<_$GTDatabaseImpl, $CustomExercisesTable> {
   $$CustomExercisesTableFilterComposer(super.$state);
   ColumnFilters<String> get id => $state.composableBuilder(
       column: $state.table.id,
@@ -4847,7 +4847,7 @@ class $$CustomExercisesTableFilterComposer
 }
 
 class $$CustomExercisesTableOrderingComposer
-    extends OrderingComposer<_$GTDatabase, $CustomExercisesTable> {
+    extends OrderingComposer<_$GTDatabaseImpl, $CustomExercisesTable> {
   $$CustomExercisesTableOrderingComposer(super.$state);
   ColumnOrderings<String> get id => $state.composableBuilder(
       column: $state.table.id,
@@ -4896,14 +4896,15 @@ typedef $$RoutineFoldersTableUpdateCompanionBuilder = RoutineFoldersCompanion
 });
 
 class $$RoutineFoldersTableTableManager extends RootTableManager<
-    _$GTDatabase,
+    _$GTDatabaseImpl,
     $RoutineFoldersTable,
     RoutineFolder,
     $$RoutineFoldersTableFilterComposer,
     $$RoutineFoldersTableOrderingComposer,
     $$RoutineFoldersTableCreateCompanionBuilder,
     $$RoutineFoldersTableUpdateCompanionBuilder> {
-  $$RoutineFoldersTableTableManager(_$GTDatabase db, $RoutineFoldersTable table)
+  $$RoutineFoldersTableTableManager(
+      _$GTDatabaseImpl db, $RoutineFoldersTable table)
       : super(TableManagerState(
           db: db,
           table: table,
@@ -4939,7 +4940,7 @@ class $$RoutineFoldersTableTableManager extends RootTableManager<
 }
 
 class $$RoutineFoldersTableFilterComposer
-    extends FilterComposer<_$GTDatabase, $RoutineFoldersTable> {
+    extends FilterComposer<_$GTDatabaseImpl, $RoutineFoldersTable> {
   $$RoutineFoldersTableFilterComposer(super.$state);
   ColumnFilters<String> get id => $state.composableBuilder(
       column: $state.table.id,
@@ -4971,7 +4972,7 @@ class $$RoutineFoldersTableFilterComposer
 }
 
 class $$RoutineFoldersTableOrderingComposer
-    extends OrderingComposer<_$GTDatabase, $RoutineFoldersTable> {
+    extends OrderingComposer<_$GTDatabaseImpl, $RoutineFoldersTable> {
   $$RoutineFoldersTableOrderingComposer(super.$state);
   ColumnOrderings<String> get id => $state.composableBuilder(
       column: $state.table.id,
@@ -5011,14 +5012,14 @@ typedef $$RoutinesTableUpdateCompanionBuilder = RoutinesCompanion Function({
 });
 
 class $$RoutinesTableTableManager extends RootTableManager<
-    _$GTDatabase,
+    _$GTDatabaseImpl,
     $RoutinesTable,
     Routine,
     $$RoutinesTableFilterComposer,
     $$RoutinesTableOrderingComposer,
     $$RoutinesTableCreateCompanionBuilder,
     $$RoutinesTableUpdateCompanionBuilder> {
-  $$RoutinesTableTableManager(_$GTDatabase db, $RoutinesTable table)
+  $$RoutinesTableTableManager(_$GTDatabaseImpl db, $RoutinesTable table)
       : super(TableManagerState(
           db: db,
           table: table,
@@ -5070,7 +5071,7 @@ class $$RoutinesTableTableManager extends RootTableManager<
 }
 
 class $$RoutinesTableFilterComposer
-    extends FilterComposer<_$GTDatabase, $RoutinesTable> {
+    extends FilterComposer<_$GTDatabaseImpl, $RoutinesTable> {
   $$RoutinesTableFilterComposer(super.$state);
   ColumnFilters<String> get id => $state.composableBuilder(
       column: $state.table.id,
@@ -5148,7 +5149,7 @@ class $$RoutinesTableFilterComposer
 }
 
 class $$RoutinesTableOrderingComposer
-    extends OrderingComposer<_$GTDatabase, $RoutinesTable> {
+    extends OrderingComposer<_$GTDatabaseImpl, $RoutinesTable> {
   $$RoutinesTableOrderingComposer(super.$state);
   ColumnOrderings<String> get id => $state.composableBuilder(
       column: $state.table.id,
@@ -5224,7 +5225,7 @@ typedef $$HistoryWorkoutsTableUpdateCompanionBuilder = HistoryWorkoutsCompanion
 });
 
 class $$HistoryWorkoutsTableTableManager extends RootTableManager<
-    _$GTDatabase,
+    _$GTDatabaseImpl,
     $HistoryWorkoutsTable,
     HistoryWorkout,
     $$HistoryWorkoutsTableFilterComposer,
@@ -5232,7 +5233,7 @@ class $$HistoryWorkoutsTableTableManager extends RootTableManager<
     $$HistoryWorkoutsTableCreateCompanionBuilder,
     $$HistoryWorkoutsTableUpdateCompanionBuilder> {
   $$HistoryWorkoutsTableTableManager(
-      _$GTDatabase db, $HistoryWorkoutsTable table)
+      _$GTDatabaseImpl db, $HistoryWorkoutsTable table)
       : super(TableManagerState(
           db: db,
           table: table,
@@ -5296,7 +5297,7 @@ class $$HistoryWorkoutsTableTableManager extends RootTableManager<
 }
 
 class $$HistoryWorkoutsTableFilterComposer
-    extends FilterComposer<_$GTDatabase, $HistoryWorkoutsTable> {
+    extends FilterComposer<_$GTDatabaseImpl, $HistoryWorkoutsTable> {
   $$HistoryWorkoutsTableFilterComposer(super.$state);
   ColumnFilters<String> get id => $state.composableBuilder(
       column: $state.table.id,
@@ -5395,7 +5396,7 @@ class $$HistoryWorkoutsTableFilterComposer
 }
 
 class $$HistoryWorkoutsTableOrderingComposer
-    extends OrderingComposer<_$GTDatabase, $HistoryWorkoutsTable> {
+    extends OrderingComposer<_$GTDatabaseImpl, $HistoryWorkoutsTable> {
   $$HistoryWorkoutsTableOrderingComposer(super.$state);
   ColumnOrderings<String> get id => $state.composableBuilder(
       column: $state.table.id,
@@ -5519,7 +5520,7 @@ typedef $$HistoryWorkoutExercisesTableUpdateCompanionBuilder
 });
 
 class $$HistoryWorkoutExercisesTableTableManager extends RootTableManager<
-    _$GTDatabase,
+    _$GTDatabaseImpl,
     $HistoryWorkoutExercisesTable,
     ConcreteExercise,
     $$HistoryWorkoutExercisesTableFilterComposer,
@@ -5527,7 +5528,7 @@ class $$HistoryWorkoutExercisesTableTableManager extends RootTableManager<
     $$HistoryWorkoutExercisesTableCreateCompanionBuilder,
     $$HistoryWorkoutExercisesTableUpdateCompanionBuilder> {
   $$HistoryWorkoutExercisesTableTableManager(
-      _$GTDatabase db, $HistoryWorkoutExercisesTable table)
+      _$GTDatabaseImpl db, $HistoryWorkoutExercisesTable table)
       : super(TableManagerState(
           db: db,
           table: table,
@@ -5629,7 +5630,7 @@ class $$HistoryWorkoutExercisesTableTableManager extends RootTableManager<
 }
 
 class $$HistoryWorkoutExercisesTableFilterComposer
-    extends FilterComposer<_$GTDatabase, $HistoryWorkoutExercisesTable> {
+    extends FilterComposer<_$GTDatabaseImpl, $HistoryWorkoutExercisesTable> {
   $$HistoryWorkoutExercisesTableFilterComposer(super.$state);
   ColumnFilters<String> get id => $state.composableBuilder(
       column: $state.table.id,
@@ -5777,7 +5778,7 @@ class $$HistoryWorkoutExercisesTableFilterComposer
 }
 
 class $$HistoryWorkoutExercisesTableOrderingComposer
-    extends OrderingComposer<_$GTDatabase, $HistoryWorkoutExercisesTable> {
+    extends OrderingComposer<_$GTDatabaseImpl, $HistoryWorkoutExercisesTable> {
   $$HistoryWorkoutExercisesTableOrderingComposer(super.$state);
   ColumnOrderings<String> get id => $state.composableBuilder(
       column: $state.table.id,
@@ -5961,7 +5962,7 @@ typedef $$RoutineExercisesTableUpdateCompanionBuilder
 });
 
 class $$RoutineExercisesTableTableManager extends RootTableManager<
-    _$GTDatabase,
+    _$GTDatabaseImpl,
     $RoutineExercisesTable,
     ConcreteExercise,
     $$RoutineExercisesTableFilterComposer,
@@ -5969,7 +5970,7 @@ class $$RoutineExercisesTableTableManager extends RootTableManager<
     $$RoutineExercisesTableCreateCompanionBuilder,
     $$RoutineExercisesTableUpdateCompanionBuilder> {
   $$RoutineExercisesTableTableManager(
-      _$GTDatabase db, $RoutineExercisesTable table)
+      _$GTDatabaseImpl db, $RoutineExercisesTable table)
       : super(TableManagerState(
           db: db,
           table: table,
@@ -6071,7 +6072,7 @@ class $$RoutineExercisesTableTableManager extends RootTableManager<
 }
 
 class $$RoutineExercisesTableFilterComposer
-    extends FilterComposer<_$GTDatabase, $RoutineExercisesTable> {
+    extends FilterComposer<_$GTDatabaseImpl, $RoutineExercisesTable> {
   $$RoutineExercisesTableFilterComposer(super.$state);
   ColumnFilters<String> get id => $state.composableBuilder(
       column: $state.table.id,
@@ -6212,7 +6213,7 @@ class $$RoutineExercisesTableFilterComposer
 }
 
 class $$RoutineExercisesTableOrderingComposer
-    extends OrderingComposer<_$GTDatabase, $RoutineExercisesTable> {
+    extends OrderingComposer<_$GTDatabaseImpl, $RoutineExercisesTable> {
   $$RoutineExercisesTableOrderingComposer(super.$state);
   ColumnOrderings<String> get id => $state.composableBuilder(
       column: $state.table.id,
@@ -6353,14 +6354,14 @@ typedef $$PreferencesTableUpdateCompanionBuilder = PreferencesCompanion
 });
 
 class $$PreferencesTableTableManager extends RootTableManager<
-    _$GTDatabase,
+    _$GTDatabaseImpl,
     $PreferencesTable,
     Preference,
     $$PreferencesTableFilterComposer,
     $$PreferencesTableOrderingComposer,
     $$PreferencesTableCreateCompanionBuilder,
     $$PreferencesTableUpdateCompanionBuilder> {
-  $$PreferencesTableTableManager(_$GTDatabase db, $PreferencesTable table)
+  $$PreferencesTableTableManager(_$GTDatabaseImpl db, $PreferencesTable table)
       : super(TableManagerState(
           db: db,
           table: table,
@@ -6388,7 +6389,7 @@ class $$PreferencesTableTableManager extends RootTableManager<
 }
 
 class $$PreferencesTableFilterComposer
-    extends FilterComposer<_$GTDatabase, $PreferencesTable> {
+    extends FilterComposer<_$GTDatabaseImpl, $PreferencesTable> {
   $$PreferencesTableFilterComposer(super.$state);
   ColumnFilters<String> get data => $state.composableBuilder(
       column: $state.table.data,
@@ -6397,7 +6398,7 @@ class $$PreferencesTableFilterComposer
 }
 
 class $$PreferencesTableOrderingComposer
-    extends OrderingComposer<_$GTDatabase, $PreferencesTable> {
+    extends OrderingComposer<_$GTDatabaseImpl, $PreferencesTable> {
   $$PreferencesTableOrderingComposer(super.$state);
   ColumnOrderings<String> get data => $state.composableBuilder(
       column: $state.table.data,
@@ -6417,14 +6418,14 @@ typedef $$OngoingDataTableUpdateCompanionBuilder = OngoingDataCompanion
 });
 
 class $$OngoingDataTableTableManager extends RootTableManager<
-    _$GTDatabase,
+    _$GTDatabaseImpl,
     $OngoingDataTable,
     OngoingDatum,
     $$OngoingDataTableFilterComposer,
     $$OngoingDataTableOrderingComposer,
     $$OngoingDataTableCreateCompanionBuilder,
     $$OngoingDataTableUpdateCompanionBuilder> {
-  $$OngoingDataTableTableManager(_$GTDatabase db, $OngoingDataTable table)
+  $$OngoingDataTableTableManager(_$GTDatabaseImpl db, $OngoingDataTable table)
       : super(TableManagerState(
           db: db,
           table: table,
@@ -6452,7 +6453,7 @@ class $$OngoingDataTableTableManager extends RootTableManager<
 }
 
 class $$OngoingDataTableFilterComposer
-    extends FilterComposer<_$GTDatabase, $OngoingDataTable> {
+    extends FilterComposer<_$GTDatabaseImpl, $OngoingDataTable> {
   $$OngoingDataTableFilterComposer(super.$state);
   ColumnFilters<String> get data => $state.composableBuilder(
       column: $state.table.data,
@@ -6461,7 +6462,7 @@ class $$OngoingDataTableFilterComposer
 }
 
 class $$OngoingDataTableOrderingComposer
-    extends OrderingComposer<_$GTDatabase, $OngoingDataTable> {
+    extends OrderingComposer<_$GTDatabaseImpl, $OngoingDataTable> {
   $$OngoingDataTableOrderingComposer(super.$state);
   ColumnOrderings<String> get data => $state.composableBuilder(
       column: $state.table.data,
@@ -6487,7 +6488,7 @@ typedef $$WeightMeasurementsTableUpdateCompanionBuilder
 });
 
 class $$WeightMeasurementsTableTableManager extends RootTableManager<
-    _$GTDatabase,
+    _$GTDatabaseImpl,
     $WeightMeasurementsTable,
     WeightMeasurement,
     $$WeightMeasurementsTableFilterComposer,
@@ -6495,7 +6496,7 @@ class $$WeightMeasurementsTableTableManager extends RootTableManager<
     $$WeightMeasurementsTableCreateCompanionBuilder,
     $$WeightMeasurementsTableUpdateCompanionBuilder> {
   $$WeightMeasurementsTableTableManager(
-      _$GTDatabase db, $WeightMeasurementsTable table)
+      _$GTDatabaseImpl db, $WeightMeasurementsTable table)
       : super(TableManagerState(
           db: db,
           table: table,
@@ -6535,7 +6536,7 @@ class $$WeightMeasurementsTableTableManager extends RootTableManager<
 }
 
 class $$WeightMeasurementsTableFilterComposer
-    extends FilterComposer<_$GTDatabase, $WeightMeasurementsTable> {
+    extends FilterComposer<_$GTDatabaseImpl, $WeightMeasurementsTable> {
   $$WeightMeasurementsTableFilterComposer(super.$state);
   ColumnFilters<String> get id => $state.composableBuilder(
       column: $state.table.id,
@@ -6561,7 +6562,7 @@ class $$WeightMeasurementsTableFilterComposer
 }
 
 class $$WeightMeasurementsTableOrderingComposer
-    extends OrderingComposer<_$GTDatabase, $WeightMeasurementsTable> {
+    extends OrderingComposer<_$GTDatabaseImpl, $WeightMeasurementsTable> {
   $$WeightMeasurementsTableOrderingComposer(super.$state);
   ColumnOrderings<String> get id => $state.composableBuilder(
       column: $state.table.id,
@@ -6600,14 +6601,14 @@ typedef $$FoodsTableUpdateCompanionBuilder = FoodsCompanion Function({
 });
 
 class $$FoodsTableTableManager extends RootTableManager<
-    _$GTDatabase,
+    _$GTDatabaseImpl,
     $FoodsTable,
     DBFood,
     $$FoodsTableFilterComposer,
     $$FoodsTableOrderingComposer,
     $$FoodsTableCreateCompanionBuilder,
     $$FoodsTableUpdateCompanionBuilder> {
-  $$FoodsTableTableManager(_$GTDatabase db, $FoodsTable table)
+  $$FoodsTableTableManager(_$GTDatabaseImpl db, $FoodsTable table)
       : super(TableManagerState(
           db: db,
           table: table,
@@ -6647,7 +6648,7 @@ class $$FoodsTableTableManager extends RootTableManager<
 }
 
 class $$FoodsTableFilterComposer
-    extends FilterComposer<_$GTDatabase, $FoodsTable> {
+    extends FilterComposer<_$GTDatabaseImpl, $FoodsTable> {
   $$FoodsTableFilterComposer(super.$state);
   ColumnFilters<String> get id => $state.composableBuilder(
       column: $state.table.id,
@@ -6684,7 +6685,7 @@ class $$FoodsTableFilterComposer
 }
 
 class $$FoodsTableOrderingComposer
-    extends OrderingComposer<_$GTDatabase, $FoodsTable> {
+    extends OrderingComposer<_$GTDatabaseImpl, $FoodsTable> {
   $$FoodsTableOrderingComposer(super.$state);
   ColumnOrderings<String> get id => $state.composableBuilder(
       column: $state.table.id,
@@ -6729,14 +6730,15 @@ typedef $$NutritionGoalsTableUpdateCompanionBuilder = NutritionGoalsCompanion
 });
 
 class $$NutritionGoalsTableTableManager extends RootTableManager<
-    _$GTDatabase,
+    _$GTDatabaseImpl,
     $NutritionGoalsTable,
     DBNutritionGoal,
     $$NutritionGoalsTableFilterComposer,
     $$NutritionGoalsTableOrderingComposer,
     $$NutritionGoalsTableCreateCompanionBuilder,
     $$NutritionGoalsTableUpdateCompanionBuilder> {
-  $$NutritionGoalsTableTableManager(_$GTDatabase db, $NutritionGoalsTable table)
+  $$NutritionGoalsTableTableManager(
+      _$GTDatabaseImpl db, $NutritionGoalsTable table)
       : super(TableManagerState(
           db: db,
           table: table,
@@ -6784,7 +6786,7 @@ class $$NutritionGoalsTableTableManager extends RootTableManager<
 }
 
 class $$NutritionGoalsTableFilterComposer
-    extends FilterComposer<_$GTDatabase, $NutritionGoalsTable> {
+    extends FilterComposer<_$GTDatabaseImpl, $NutritionGoalsTable> {
   $$NutritionGoalsTableFilterComposer(super.$state);
   ColumnFilters<String> get id => $state.composableBuilder(
       column: $state.table.id,
@@ -6818,7 +6820,7 @@ class $$NutritionGoalsTableFilterComposer
 }
 
 class $$NutritionGoalsTableOrderingComposer
-    extends OrderingComposer<_$GTDatabase, $NutritionGoalsTable> {
+    extends OrderingComposer<_$GTDatabaseImpl, $NutritionGoalsTable> {
   $$NutritionGoalsTableOrderingComposer(super.$state);
   ColumnOrderings<String> get id => $state.composableBuilder(
       column: $state.table.id,
@@ -6865,7 +6867,7 @@ typedef $$CustomBarcodeFoodsTableUpdateCompanionBuilder
 });
 
 class $$CustomBarcodeFoodsTableTableManager extends RootTableManager<
-    _$GTDatabase,
+    _$GTDatabaseImpl,
     $CustomBarcodeFoodsTable,
     CustomBarcodeFood,
     $$CustomBarcodeFoodsTableFilterComposer,
@@ -6873,7 +6875,7 @@ class $$CustomBarcodeFoodsTableTableManager extends RootTableManager<
     $$CustomBarcodeFoodsTableCreateCompanionBuilder,
     $$CustomBarcodeFoodsTableUpdateCompanionBuilder> {
   $$CustomBarcodeFoodsTableTableManager(
-      _$GTDatabase db, $CustomBarcodeFoodsTable table)
+      _$GTDatabaseImpl db, $CustomBarcodeFoodsTable table)
       : super(TableManagerState(
           db: db,
           table: table,
@@ -6905,7 +6907,7 @@ class $$CustomBarcodeFoodsTableTableManager extends RootTableManager<
 }
 
 class $$CustomBarcodeFoodsTableFilterComposer
-    extends FilterComposer<_$GTDatabase, $CustomBarcodeFoodsTable> {
+    extends FilterComposer<_$GTDatabaseImpl, $CustomBarcodeFoodsTable> {
   $$CustomBarcodeFoodsTableFilterComposer(super.$state);
   ColumnFilters<String> get barcode => $state.composableBuilder(
       column: $state.table.barcode,
@@ -6919,7 +6921,7 @@ class $$CustomBarcodeFoodsTableFilterComposer
 }
 
 class $$CustomBarcodeFoodsTableOrderingComposer
-    extends OrderingComposer<_$GTDatabase, $CustomBarcodeFoodsTable> {
+    extends OrderingComposer<_$GTDatabaseImpl, $CustomBarcodeFoodsTable> {
   $$CustomBarcodeFoodsTableOrderingComposer(super.$state);
   ColumnOrderings<String> get barcode => $state.composableBuilder(
       column: $state.table.barcode,
@@ -6944,14 +6946,15 @@ typedef $$FavoriteFoodsTableUpdateCompanionBuilder = FavoriteFoodsCompanion
 });
 
 class $$FavoriteFoodsTableTableManager extends RootTableManager<
-    _$GTDatabase,
+    _$GTDatabaseImpl,
     $FavoriteFoodsTable,
     FavoriteFood,
     $$FavoriteFoodsTableFilterComposer,
     $$FavoriteFoodsTableOrderingComposer,
     $$FavoriteFoodsTableCreateCompanionBuilder,
     $$FavoriteFoodsTableUpdateCompanionBuilder> {
-  $$FavoriteFoodsTableTableManager(_$GTDatabase db, $FavoriteFoodsTable table)
+  $$FavoriteFoodsTableTableManager(
+      _$GTDatabaseImpl db, $FavoriteFoodsTable table)
       : super(TableManagerState(
           db: db,
           table: table,
@@ -6979,7 +6982,7 @@ class $$FavoriteFoodsTableTableManager extends RootTableManager<
 }
 
 class $$FavoriteFoodsTableFilterComposer
-    extends FilterComposer<_$GTDatabase, $FavoriteFoodsTable> {
+    extends FilterComposer<_$GTDatabaseImpl, $FavoriteFoodsTable> {
   $$FavoriteFoodsTableFilterComposer(super.$state);
   $$FoodsTableFilterComposer get foodId {
     final $$FoodsTableFilterComposer composer = $state.composerBuilder(
@@ -6995,7 +6998,7 @@ class $$FavoriteFoodsTableFilterComposer
 }
 
 class $$FavoriteFoodsTableOrderingComposer
-    extends OrderingComposer<_$GTDatabase, $FavoriteFoodsTable> {
+    extends OrderingComposer<_$GTDatabaseImpl, $FavoriteFoodsTable> {
   $$FavoriteFoodsTableOrderingComposer(super.$state);
   $$FoodsTableOrderingComposer get foodId {
     final $$FoodsTableOrderingComposer composer = $state.composerBuilder(
@@ -7024,7 +7027,7 @@ typedef $$NutritionCategoriesTableUpdateCompanionBuilder
 });
 
 class $$NutritionCategoriesTableTableManager extends RootTableManager<
-    _$GTDatabase,
+    _$GTDatabaseImpl,
     $NutritionCategoriesTable,
     DBNutritionCategory,
     $$NutritionCategoriesTableFilterComposer,
@@ -7032,7 +7035,7 @@ class $$NutritionCategoriesTableTableManager extends RootTableManager<
     $$NutritionCategoriesTableCreateCompanionBuilder,
     $$NutritionCategoriesTableUpdateCompanionBuilder> {
   $$NutritionCategoriesTableTableManager(
-      _$GTDatabase db, $NutritionCategoriesTable table)
+      _$GTDatabaseImpl db, $NutritionCategoriesTable table)
       : super(TableManagerState(
           db: db,
           table: table,
@@ -7064,7 +7067,7 @@ class $$NutritionCategoriesTableTableManager extends RootTableManager<
 }
 
 class $$NutritionCategoriesTableFilterComposer
-    extends FilterComposer<_$GTDatabase, $NutritionCategoriesTable> {
+    extends FilterComposer<_$GTDatabaseImpl, $NutritionCategoriesTable> {
   $$NutritionCategoriesTableFilterComposer(super.$state);
   ColumnFilters<DateTime> get referenceDate => $state.composableBuilder(
       column: $state.table.referenceDate,
@@ -7078,7 +7081,7 @@ class $$NutritionCategoriesTableFilterComposer
 }
 
 class $$NutritionCategoriesTableOrderingComposer
-    extends OrderingComposer<_$GTDatabase, $NutritionCategoriesTable> {
+    extends OrderingComposer<_$GTDatabaseImpl, $NutritionCategoriesTable> {
   $$NutritionCategoriesTableOrderingComposer(super.$state);
   ColumnOrderings<DateTime> get referenceDate => $state.composableBuilder(
       column: $state.table.referenceDate,
@@ -7107,14 +7110,14 @@ typedef $$AchievementsTableUpdateCompanionBuilder = AchievementsCompanion
 });
 
 class $$AchievementsTableTableManager extends RootTableManager<
-    _$GTDatabase,
+    _$GTDatabaseImpl,
     $AchievementsTable,
     AchievementCompletion,
     $$AchievementsTableFilterComposer,
     $$AchievementsTableOrderingComposer,
     $$AchievementsTableCreateCompanionBuilder,
     $$AchievementsTableUpdateCompanionBuilder> {
-  $$AchievementsTableTableManager(_$GTDatabase db, $AchievementsTable table)
+  $$AchievementsTableTableManager(_$GTDatabaseImpl db, $AchievementsTable table)
       : super(TableManagerState(
           db: db,
           table: table,
@@ -7150,7 +7153,7 @@ class $$AchievementsTableTableManager extends RootTableManager<
 }
 
 class $$AchievementsTableFilterComposer
-    extends FilterComposer<_$GTDatabase, $AchievementsTable> {
+    extends FilterComposer<_$GTDatabaseImpl, $AchievementsTable> {
   $$AchievementsTableFilterComposer(super.$state);
   ColumnFilters<String> get achievementID => $state.composableBuilder(
       column: $state.table.achievementID,
@@ -7169,7 +7172,7 @@ class $$AchievementsTableFilterComposer
 }
 
 class $$AchievementsTableOrderingComposer
-    extends OrderingComposer<_$GTDatabase, $AchievementsTable> {
+    extends OrderingComposer<_$GTDatabaseImpl, $AchievementsTable> {
   $$AchievementsTableOrderingComposer(super.$state);
   ColumnOrderings<String> get achievementID => $state.composableBuilder(
       column: $state.table.achievementID,
@@ -7187,9 +7190,9 @@ class $$AchievementsTableOrderingComposer
           ColumnOrderings(column, joinBuilders: joinBuilders));
 }
 
-class $GTDatabaseManager {
-  final _$GTDatabase _db;
-  $GTDatabaseManager(this._db);
+class $GTDatabaseImplManager {
+  final _$GTDatabaseImpl _db;
+  $GTDatabaseImplManager(this._db);
   $$CustomExercisesTableTableManager get customExercises =>
       $$CustomExercisesTableTableManager(_db, _db.customExercises);
   $$RoutineFoldersTableTableManager get routineFolders =>

@@ -91,7 +91,7 @@ class DatabaseService extends GetxService with ChangeNotifier {
   Future ensureInitialized({
     Function()? onDone,
   }) async {
-    _db = GTDatabase.prod();
+    _db = GTDatabaseImpl.prod();
 
     return _innerEnsureInitialized(onDone: onDone);
   }
@@ -226,7 +226,7 @@ class DatabaseService extends GetxService with ChangeNotifier {
   Future ensureInitializedForTests(QueryExecutor e) async {
     // We're inside a @visibleForTesting method, so it's fine
     // ignore: invalid_use_of_visible_for_testing_member
-    _db = GTDatabase.withQueryExecutor(e);
+    _db = GTDatabaseImpl.withQueryExecutor(e);
 
     await _innerEnsureInitialized();
   }
@@ -256,14 +256,7 @@ class DatabaseService extends GetxService with ChangeNotifier {
   /// This method is only public for testing purposes.
   @visibleForTesting
   Future<void> writeExercises(List<Exercise> exercises) {
-    return _db.batch((batch) {
-      batch.logger.i("Importing exercises");
-      batch.deleteAll(_db.customExercises);
-      batch.insertAll(
-        _db.customExercises,
-        [for (final ex in exercises) ex.toInsertable()],
-      );
-    });
+    return _db.writeAllCustomExercises(exercises);
   }
 
   Future<void> setExercise(Exercise exercise) {
@@ -290,33 +283,7 @@ class DatabaseService extends GetxService with ChangeNotifier {
   }
 
   Future _writeRoutines(List<Workout> routines) {
-    return _db.transaction(() async {
-      await _db.batch((batch) {
-        batch.logger.i("Importing routines");
-        batch.deleteAll(_db.routines);
-        batch.insertAll(
-          _db.routines,
-          routines.toSortedRoutineInsertables(),
-        );
-      });
-      await _writeRoutineExercises(routines.flattenedExercises);
-    });
-  }
-
-  Future _writeRoutineExercises(
-      List<WorkoutExercisable> routineExercises) async {
-    final routineExerciseInsertables = routineExercises
-        .fold(
-          <String, List<WorkoutExercisable>>{},
-          (m, r) {
-            return m..putIfAbsent(r.workoutID!, () => []).add(r);
-          },
-        )
-        .values
-        .expand((list) => list.toSortedInsertables());
-    await _db.delete(_db.routineExercises).go();
-    await _db.batch(
-        (b) => b.insertAll(_db.routineExercises, routineExerciseInsertables));
+    return _db.writeAllRoutines(routines);
   }
 
   setAllRoutines(List<Workout> routines) {
@@ -358,33 +325,7 @@ class DatabaseService extends GetxService with ChangeNotifier {
   }
 
   Future<void> writeAllHistory(List<Workout> history) {
-    return _db.transaction(() async {
-      await _db.batch((batch) {
-        batch.logger.i("Importing routines");
-        batch.deleteAll(_db.historyWorkouts);
-        batch.insertAll(
-          _db.historyWorkouts,
-          history.toSortedHistoryWorkoutInsertables(),
-        );
-      });
-      await _writeHistoryExercises(history.flattenedExercises);
-    });
-  }
-
-  Future _writeHistoryExercises(
-      List<WorkoutExercisable> historyWorkoutExercises) async {
-    final historyExerciseInsertables = historyWorkoutExercises
-        .fold(
-          <String, List<WorkoutExercisable>>{},
-          (m, r) {
-            return m..putIfAbsent(r.workoutID!, () => []).add(r);
-          },
-        )
-        .values
-        .expand((list) => list.toSortedInsertables());
-    await _db.delete(_db.historyWorkoutExercises).go();
-    await _db.batch((b) =>
-        b.insertAll(_db.historyWorkoutExercises, historyExerciseInsertables));
+    return _db.writeAllHistoryWorkouts(history);
   }
 
   Future setHistoryWorkout(Workout workout) async {
@@ -581,9 +522,9 @@ class DatabaseService extends GetxService with ChangeNotifier {
         await setAchievementCompletions(snapshot.achievements);
         await writeExercises(snapshot.customExercises);
         await _writeRoutines(snapshot.routines);
-        await _writeRoutineExercises(snapshot.routineExercises);
+        await _db.overwriteAllRoutineExercises(snapshot.routineExercises);
         await writeAllHistory(snapshot.historyWorkouts);
-        await _writeHistoryExercises(snapshot.historyWorkoutExercises);
+        await _db.overwriteAllHistoryWorkoutExercises(snapshot.historyWorkoutExercises);
         await _db.setPreferences(snapshot.preferences);
         await _writeWeightMeasurements(snapshot.weightMeasurements);
         await _db.writeAllRoutineFolders(snapshot.folders);
@@ -808,32 +749,32 @@ class _DatabaseBackups {
     _backups$.add(list());
     if (!(Platform.isIOS || Platform.isAndroid)) {
       _backupDir.watch().listen((event) {
-      _backups$.add(list());
-    });
+        _backups$.add(list());
+      });
     }
   }
 
   Future<DatabaseBackup?> store(GTDatabase _db) async {
     try {
       final now = DateTime.now();
-    final path = "${_backupDir.path}/${now.millisecondsSinceEpoch}.db";
-    await (await _db.path).copy(path);
+      final path = "${_backupDir.path}/${now.millisecondsSinceEpoch}.db";
+      await (await _db.path).copy(path);
 
-    // Delete old backups
-    final backups = list();
-    if (backups.length > _kMaxBackups) {
-      final toDelete = (backups..sort((a, b) => a.date.compareTo(b.date)))
-          .sublist(0, backups.length - _kMaxBackups);
-      for (final backup in toDelete) {
-        await backup.file.delete();
+      // Delete old backups
+      final backups = list();
+      if (backups.length > _kMaxBackups) {
+        final toDelete = (backups..sort((a, b) => a.date.compareTo(b.date)))
+            .sublist(0, backups.length - _kMaxBackups);
+        for (final backup in toDelete) {
+          await backup.file.delete();
+        }
       }
-    }
-    _backups$.add(list());
+      _backups$.add(list());
 
-    final file = File(path);
-    final size = await file.length();
+      final file = File(path);
+      final size = await file.length();
 
-    return DatabaseBackup(now, file, size);
+      return DatabaseBackup(now, file, size);
     } on PathNotFoundException catch (e, s) {
       logger.e("Path not found", error: e, stackTrace: s);
     }

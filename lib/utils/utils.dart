@@ -31,6 +31,20 @@ void reorder<T>(List<T> list, int oldIndex, int newIndex) {
   list.insert(newIndex, list.removeAt(oldIndex));
 }
 
+Color getThemedColor(BuildContext context, Color color) {
+  final theme = Theme.of(context);
+  return ColorScheme.fromSeed(seedColor: color, brightness: theme.brightness)
+      .primary
+      .harmonizeWith(theme.colorScheme.primary);
+}
+
+Color getOnThemedColor(BuildContext context, Color color) {
+  final theme = Theme.of(context);
+  return ColorScheme.fromSeed(seedColor: color, brightness: theme.brightness)
+      .onPrimary
+      .harmonizeWith(theme.colorScheme.primary);
+}
+
 Color getContainerColor(BuildContext context, Color color) {
   final theme = Theme.of(context);
   return ColorScheme.fromSeed(seedColor: color, brightness: theme.brightness)

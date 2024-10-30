@@ -11,6 +11,7 @@ import 'package:gymtracker/controller/routines_controller.dart';
 import 'package:gymtracker/controller/settings_controller.dart';
 import 'package:gymtracker/controller/stopwatch_controller.dart';
 import 'package:gymtracker/controller/workout_controller.dart';
+import 'package:gymtracker/gen/colors.gen.dart';
 import 'package:gymtracker/icons/gymtracker_icons.dart';
 import 'package:gymtracker/model/exercisable.dart';
 import 'package:gymtracker/model/exercise.dart';
@@ -21,7 +22,6 @@ import 'package:gymtracker/service/logger.dart';
 import 'package:gymtracker/utils/constants.dart';
 import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/utils/go.dart';
-import 'package:gymtracker/utils/theme.dart';
 import 'package:gymtracker/utils/utils.dart';
 import 'package:gymtracker/view/components/infobox.dart';
 import 'package:gymtracker/view/components/rich_text_editor.dart';
@@ -402,10 +402,10 @@ class _WorkoutViewState extends State<WorkoutView> {
               child: FilledButton.icon(
                 style: ButtonStyle(
                   foregroundColor: WidgetStateProperty.all(
-                    Theme.of(context).colorScheme.onQuinary,
+                    getOnThemedColor(context, GTColors.ai),
                   ),
                   backgroundColor: WidgetStateProperty.all(
-                    Theme.of(context).colorScheme.quinary,
+                    getThemedColor(context, GTColors.ai),
                   ),
                 ),
                 onPressed: () {

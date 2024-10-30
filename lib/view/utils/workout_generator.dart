@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:gymtracker/gen/colors.gen.dart';
 import 'package:gymtracker/model/exercise.dart';
 import 'package:gymtracker/service/localizations.dart';
-import 'package:gymtracker/utils/extensions.dart';
-import 'package:gymtracker/utils/theme.dart';
+import 'package:gymtracker/utils/utils.dart';
 import 'package:gymtracker/view/components/equipment_icon.dart';
 import 'package:gymtracker/view/components/themed_subtree.dart';
 
@@ -23,7 +23,7 @@ class _WorkoutGeneratorSetupScreenState
   @override
   Widget build(BuildContext context) {
     return ThemedSubtree(
-      color: context.colorScheme.quinary,
+      color: getThemedColor(context, GTColors.ai),
       child: AlertDialog(
         title: Text("workoutGenerator.title".t),
         content: SingleChildScrollView(

@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'dart:async';
 import 'dart:math';
 
@@ -15,6 +17,7 @@ import 'package:gymtracker/controller/stopwatch_controller.dart';
 import 'package:gymtracker/data/distance.dart';
 import 'package:gymtracker/data/exercises.dart';
 import 'package:gymtracker/data/weights.dart';
+import 'package:gymtracker/gen/colors.gen.dart';
 import 'package:gymtracker/icons/gymtracker_icons.dart';
 import 'package:gymtracker/model/exercisable.dart';
 import 'package:gymtracker/model/exercise.dart';
@@ -29,7 +32,6 @@ import 'package:gymtracker/struct/stopwatch_extended.dart';
 import 'package:gymtracker/utils/constants.dart';
 import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/utils/go.dart';
-import 'package:gymtracker/utils/theme.dart';
 import 'package:gymtracker/utils/utils.dart';
 import 'package:gymtracker/view/components/rich_text_dialog.dart';
 import 'package:gymtracker/view/exercise_picker.dart';
@@ -1083,18 +1085,24 @@ class WorkoutController extends GetxController with ServiceableController {
 
     this.exercises(exercises);
 
+    final context = Get.context;
+    final onThemedColor = context == null ? null : getOnThemedColor(context, GTColors.ai),
+        themedColor = context == null ? null : getThemedColor(context, GTColors.ai),
+        containerColor = context == null ? null : getContainerColor(context, GTColors.ai),
+        onContainerColor = context == null ? null : getOnContainerColor(context, GTColors.ai);
+
     Go.snack(
       ListTile(
         leading: const Icon(GTIcons.generate),
         title: Text("workoutGenerator.success.title".t),
-        textColor: Get.context?.colorScheme.onQuinaryContainer,
-        iconColor: Get.context?.colorScheme.onQuinaryContainer,
+        textColor: onContainerColor,
+        iconColor: onContainerColor,
       ),
-        backgroundColor: Get.context?.colorScheme.quinaryContainer,
+      backgroundColor: containerColor,
       action: SnackBarAction(
         label: "workoutGenerator.success.undo".t,
-        backgroundColor: Get.context?.colorScheme.quinary,
-        textColor: Get.context?.colorScheme.onQuinary,
+        backgroundColor: themedColor,
+        textColor: onThemedColor,
         onPressed: () {
           this.exercises([]);
         },

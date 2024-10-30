@@ -14,6 +14,33 @@ class GTColors {
   GTColors._();
 
   /// MaterialColor:
+  ///   50: #FFF3E0FF
+  ///   100: #FFE2B3FF
+  ///   200: #FFCE80FF
+  ///   300: #FFBA4DFF
+  ///   400: #FFAC26FF
+  ///   500: #FF9D00FF
+  ///   600: #FF9500FF
+  ///   700: #FF8B00FF
+  ///   800: #FF8100FF
+  ///   900: #FF6F00FF
+  static const MaterialColor ai = MaterialColor(
+    0xFF9D00FF,
+    <int, Color>{
+      50: Color(0xFFF3E0FF),
+      100: Color(0xFFE2B3FF),
+      200: Color(0xFFCE80FF),
+      300: Color(0xFFBA4DFF),
+      400: Color(0xFFAC26FF),
+      500: Color(0xFF9D00FF),
+      600: Color(0xFF9500FF),
+      700: Color(0xFF8B00FF),
+      800: Color(0xFF8100FF),
+      900: Color(0xFF6F00FF),
+    },
+  );
+
+  /// MaterialColor:
   ///   50: #FFEDE0E7
   ///   100: #FFD1B3C2
   ///   200: #FFB38099

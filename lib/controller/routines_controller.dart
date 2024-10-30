@@ -446,7 +446,7 @@ class RoutinesController extends GetxController
       scheme: "gymtracker",
       host: "routine",
       queryParameters: {
-        "json": jsonEncode(routine.toJson()).compressed,
+        "json": jsonEncode(routine.shareWorkout()).compressed,
       },
     );
     showDialog(

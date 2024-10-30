@@ -256,6 +256,11 @@ class Workout {
         'exercises': [for (final exercise in exercises) exercise.toJson()],
         'folder': folder?.toJson(),
       };
+  
+  Map<String, dynamic> shareWorkout() => {
+      ...toJson(),
+      'folder': null,
+    };
 
   @override
   String toString() {
@@ -599,6 +604,11 @@ class SynthesizedWorkout implements Workout {
   @override
   bool hasExercise(Exercise exercise) {
     throw SynthesizedWorkoutMethodException("hasExercise");
+  }
+  
+  @override
+  Map<String, dynamic> shareWorkout() {
+    throw SynthesizedWorkoutMethodException("shareWorkout");
   }
 }
 

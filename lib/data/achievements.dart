@@ -313,36 +313,8 @@ Map<String, Achievement> get achievements => {
             progressText: (value) => "time.days".plural(value.toInt()),
             checkCompletion: (progress) {
               final today = DateTime.now().startOfDay;
-              if (today.month != today.add(const Duration(days: 1)).month) {
-                return false;
-              }
-              final monthStart = today.subtract(
-                Duration(days: today.day - 1),
-              );
-
-              final historyController = Get.find<HistoryController>();
-
-              final thisMonthWorkouts = historyController.history
-                  .where((element) =>
-                      element.startingDate!
-                          .isAfterOrAtSameMomentAs(monthStart) &&
-                      element.startingDate!
-                          .isBefore(today.add(const Duration(days: 1))))
-                  .toList();
-
-              for (var i = 0; i < today.day; i++) {
-                final day = monthStart.add(Duration(days: i));
-                if (kDebugMode) {
-                  globalLogger.d(
-                      "(achievements.workoutFreak.1) Checking for $day: ${thisMonthWorkouts.where((element) => element.startingDate!.isSameDay(day)).length} workout");
-                }
-                if (!thisMonthWorkouts
-                    .any((element) => element.startingDate!.isSameDay(day))) {
-                  return false;
-                }
-              }
-
-              return true;
+              final daysInMonth = DateTime(today.year, today.month + 1, 0).day;
+              return progress! >= daysInMonth;
             },
           ),
           AchievementLevel(
@@ -352,7 +324,7 @@ Map<String, Achievement> get achievements => {
             descriptionKey: "achievements.workoutFreak.description.2",
             trigger: AchievementTrigger.workout,
             progress: () {
-              return _workoutFreak(_WorkoutFreakPeriod.month).length.toDouble();
+              return _workoutFreak(_WorkoutFreakPeriod.year).length.toDouble();
             },
             progressMax: () {
               final today = DateTime.now();
@@ -361,35 +333,8 @@ Map<String, Achievement> get achievements => {
             progressText: (value) => "time.days".plural(value.toInt()),
             checkCompletion: (progress) {
               final today = DateTime.now().startOfDay;
-              if (today.year != today.add(const Duration(days: 1)).year) {
-                return false;
-              }
-              final yearStart = DateTime(today.year, 1, 1);
-
-              final historyController = Get.find<HistoryController>();
-
-              final thisYearWorkouts = historyController.history
-                  .where((element) =>
-                      element.startingDate!
-                          .isAfterOrAtSameMomentAs(yearStart) &&
-                      element.startingDate!
-                          .isBefore(today.add(const Duration(days: 1))))
-                  .toList();
-
-              final diff = today.difference(yearStart).inDays;
-              for (var i = 0; i < diff; i++) {
-                final day = yearStart.add(Duration(days: i));
-                if (kDebugMode) {
-                  globalLogger.d(
-                      "(achievements.workoutFreak.2) Checking for $day: ${thisYearWorkouts.where((element) => element.startingDate!.isSameDay(day)).length} workout");
-                }
-                if (!thisYearWorkouts
-                    .any((element) => element.startingDate!.isSameDay(day))) {
-                  return false;
-                }
-              }
-
-              return true;
+              final daysInYear = today.isLeapYear ? 366 : 365;
+              return progress! >= daysInYear;
             },
           ),
         ],
@@ -1144,7 +1089,7 @@ List<DateTime> _workoutFreak(_WorkoutFreakPeriod period) {
     final yearMatches = element.startingDate!.year == today.year;
     if (period == _WorkoutFreakPeriod.year) return yearMatches;
     return yearMatches && element.startingDate!.month == today.month;
-  }).toList();
+  });
 
   return periodWorkouts.map((w) => w.startingDate!.startOfDay).toSet().toList();
 }

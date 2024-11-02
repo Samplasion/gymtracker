@@ -17,11 +17,13 @@ class WorkoutGeneratorSetupScreen extends StatefulWidget {
 
 class _WorkoutGeneratorSetupScreenState
     extends State<WorkoutGeneratorSetupScreen> {
-  final muscleGroups = <GTMuscleCategory>{};
+  final muscleGroups = <GTMuscleGroup>{};
   final equipment = GTGymEquipment.values.toSet();
 
   @override
   Widget build(BuildContext context) {
+    final allMuscleGroups = GTMuscleGroup.values.toList();
+    allMuscleGroups.sort((a, b) => a.localizedName.compareTo(b.localizedName));
     return ThemedSubtree(
       color: getThemedColor(context, GTColors.ai),
       child: AlertDialog(
@@ -36,7 +38,7 @@ class _WorkoutGeneratorSetupScreenState
                 spacing: 8,
                 runSpacing: 8,
                 children: [
-                  for (final group in GTMuscleCategory.values)
+                  for (final group in allMuscleGroups)
                     ChoiceChip.elevated(
                       label: Text(group.localizedName),
                       selected: muscleGroups.contains(group),

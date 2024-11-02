@@ -76,6 +76,8 @@ enum GTMuscleGroup {
   const GTMuscleGroup([this.category]);
 
   final GTMuscleCategory? category;
+
+  String get localizedName => "muscleGroups.$name".t;
 }
 
 enum GTMuscleHighlightIntensity {

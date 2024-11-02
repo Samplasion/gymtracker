@@ -1,7 +1,6 @@
 // ignore_for_file: use_build_context_synchronously
 
 import 'dart:async';
-import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
@@ -1066,8 +1065,7 @@ class WorkoutController extends GetxController with ServiceableController {
       return;
     }
 
-    final _res =
-        await Go.toDialog<(Set<GTMuscleCategory>, Set<GTGymEquipment>)>(
+    final _res = await Go.toDialog<(Set<GTMuscleGroup>, Set<GTGymEquipment>)>(
       () => const WorkoutGeneratorSetupScreen(),
     );
     if (_res == null) return;
@@ -1086,10 +1084,14 @@ class WorkoutController extends GetxController with ServiceableController {
     this.exercises(exercises);
 
     final context = Get.context;
-    final onThemedColor = context == null ? null : getOnThemedColor(context, GTColors.ai),
-        themedColor = context == null ? null : getThemedColor(context, GTColors.ai),
-        containerColor = context == null ? null : getContainerColor(context, GTColors.ai),
-        onContainerColor = context == null ? null : getOnContainerColor(context, GTColors.ai);
+    final onThemedColor =
+            context == null ? null : getOnThemedColor(context, GTColors.ai),
+        themedColor =
+            context == null ? null : getThemedColor(context, GTColors.ai),
+        containerColor =
+            context == null ? null : getContainerColor(context, GTColors.ai),
+        onContainerColor =
+            context == null ? null : getOnContainerColor(context, GTColors.ai);
 
     Go.snack(
       ListTile(
@@ -1112,23 +1114,35 @@ class WorkoutController extends GetxController with ServiceableController {
   }
 
   List<Exercise> _workoutGenerator({
-    required Set<GTMuscleCategory> muscleGroups,
+    required Set<GTMuscleGroup> muscleGroups,
     required Set<GTGymEquipment> equipment,
   }) {
     final filteredLibrary = exerciseStandardLibraryAsList
         .where((exercise) =>
-            muscleGroups.contains(exercise.primaryMuscleGroup.category) &&
+            (muscleGroups.contains(exercise.primaryMuscleGroup) ||
+                muscleGroups
+                    .intersection(exercise.secondaryMuscleGroups)
+                    .isNotEmpty) &&
             equipment.contains(exercise.gymEquipment))
         .toList();
     final exercises = <Exercise>[];
 
     for (final group in muscleGroups) {
       final groupExercises = filteredLibrary
-          .where((exercise) => exercise.primaryMuscleGroup.category == group)
+          .where((exercise) =>
+              exercise.primaryMuscleGroup == group ||
+              muscleGroups
+                  .intersection(exercise.secondaryMuscleGroups)
+                  .isNotEmpty)
           .toList();
       groupExercises.shuffle();
 
-      final toAdd = Random().nextInt(4) + 2;
+      final toAdd = switch (muscleGroups.length) {
+        1 => 4,
+        2 => 2,
+        3 => muscleGroups.toList().indexOf(group) == 0 ? 2 : 1,
+        _ => 1,
+      };
       int i = 0;
       exercises.addAll(groupExercises.take(toAdd).map((e) {
         i++;

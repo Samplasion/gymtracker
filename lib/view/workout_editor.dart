@@ -307,11 +307,14 @@ class _WorkoutEditorState extends State<WorkoutEditor> {
                     from: old,
                     to: ex.first.makeChild(),
                   )
-                : ex.first.makeChild().copyWith(sets: [
-                    GTSet.empty(
-                        kind: GTSetKind.normal,
-                        parameters: ex.first.parameters),
-                  ]);
+                : ex.first.makeChild().copyWith(
+                    sets: [
+                      if (!ex.first.parameters.isSetless)
+                        GTSet.empty(
+                            kind: GTSetKind.normal,
+                            parameters: ex.first.parameters),
+                    ],
+                  );
             final newExercises = workout.exercises.toList();
             if (supersetIndex == null) {
               newExercises[i] = newExercise;

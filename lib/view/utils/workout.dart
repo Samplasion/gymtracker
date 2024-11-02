@@ -138,7 +138,9 @@ class _WorkoutExerciseEditorState extends State<WorkoutExerciseEditor> {
                                   'ongoingWorkout.exercises.addToSuperset'.t),
                             ),
                           ),
-                        const PopupMenuDivider(),
+                        if (!widget.exercise.parameters.isSetless ||
+                            !widget.isCreating)
+                          const PopupMenuDivider(),
                         if (!widget.exercise.parameters.isSetless)
                           PopupMenuItem(
                             enabled: widget.exercise.sets.isNotEmpty,
@@ -164,8 +166,8 @@ class _WorkoutExerciseEditorState extends State<WorkoutExerciseEditor> {
                                   },
                             child: ListTile(
                               leading: const Icon(GTIcons.reorder),
-                              title:
-                                  Text('ongoingWorkout.exercises.reorderSets'.t),
+                              title: Text(
+                                  'ongoingWorkout.exercises.reorderSets'.t),
                               enabled: widget.exercise.sets.isNotEmpty,
                             ),
                           ),

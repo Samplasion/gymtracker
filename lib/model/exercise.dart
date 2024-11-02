@@ -502,15 +502,16 @@ class Exercise extends WorkoutExercisable {
       sets: to.parameters == from.parameters
           ? [for (final set in from.sets) set.copyWith()]
           : [
-              for (final set in from.sets)
-                GTSet(
-                  parameters: to.parameters,
-                  kind: set.kind,
-                  reps: 0,
-                  weight: 0,
-                  time: Duration.zero,
-                  distance: 0,
-                ),
+              if (!to.parameters.isSetless)
+                for (final set in from.sets)
+                  GTSet(
+                    parameters: to.parameters,
+                    kind: set.kind,
+                    reps: 0,
+                    weight: 0,
+                    time: Duration.zero,
+                    distance: 0,
+                  ),
             ],
     );
     return res;

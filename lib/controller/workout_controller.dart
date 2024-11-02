@@ -165,9 +165,10 @@ class WorkoutController extends GetxController with ServiceableController {
                     to: ex.first.makeChild(),
                   )
                 : ex.first.makeChild().copyWith(sets: [
-                    GTSet.empty(
-                        kind: GTSetKind.normal,
-                        parameters: ex.first.parameters),
+                    if (!ex.first.parameters.isSetless)
+                      GTSet.empty(
+                          kind: GTSetKind.normal,
+                          parameters: ex.first.parameters),
                   ]);
             if (supersetIndex == null) {
               exercises[i] = newExercise;

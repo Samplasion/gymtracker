@@ -259,10 +259,11 @@ class _RoutineCreatorController extends GetxController {
                 () => const ExercisePicker(singlePick: true));
             if (ex == null || ex.isEmpty) return;
             final newExercise = ex.first.makeChild().copyWith.sets([
-              GTSet.empty(
-                kind: GTSetKind.normal,
-                parameters: ex.first.parameters,
-              ),
+              if (!ex.first.parameters.isSetless)
+                GTSet.empty(
+                  kind: GTSetKind.normal,
+                  parameters: ex.first.parameters,
+                ),
             ]);
             if (supersetIndex == null) {
               exercises[i].data = newExercise;

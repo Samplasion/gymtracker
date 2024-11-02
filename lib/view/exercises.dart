@@ -572,15 +572,16 @@ class ExerciseDataView extends StatelessWidget {
                     const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 child: MaybeRichText(text: exercise.notes),
               ),
-            for (int i = 0; i < exercise.sets.length; i++)
-              ExerciseSetView(
-                set: exercise.sets[i],
-                exercise: exercise,
-                isConcrete: workout.isConcrete,
-                alt: i % 2 == 0,
-                weightUnit: weightUnit,
-                distanceUnit: distanceUnit,
-              ),
+            if (!exercise.parameters.isSetless)
+              for (int i = 0; i < exercise.sets.length; i++)
+                ExerciseSetView(
+                  set: exercise.sets[i],
+                  exercise: exercise,
+                  isConcrete: workout.isConcrete,
+                  alt: i % 2 == 0,
+                  weightUnit: weightUnit,
+                  distanceUnit: distanceUnit,
+                ),
           ],
         ),
       ),

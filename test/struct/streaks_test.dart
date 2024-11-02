@@ -50,7 +50,7 @@ void main() {
             today: today,
           ),
           const Streaks(
-            weekStreak: 0,
+            weekStreak: 1,
             restDays: 5,
           ),
         );
@@ -114,7 +114,7 @@ void main() {
             today: today,
           ),
           const Streaks(
-            weekStreak: 0,
+            weekStreak: 1,
             restDays: 5,
           ),
         );

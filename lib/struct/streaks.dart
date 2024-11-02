@@ -36,7 +36,7 @@ class Streaks {
     // Don't count the current week if it's not finished yet
     if (!keys.any((element) =>
           element.isAfterOrAtSameMomentAs(lastMonday) &&
-          element.isBefore(today))) {
+          element.isBefore(lastMonday.add(const Duration(days: 7))))) {
             lastMonday = lastMonday.subtract(const Duration(days: 7));
           }
 

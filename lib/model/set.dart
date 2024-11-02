@@ -23,7 +23,12 @@ enum GTSetParameters {
   timeWeight,
   freeBodyReps,
   time,
-  distance;
+  distance,
+  setless(true);
+
+  const GTSetParameters([this.hidden = false]);
+
+  final bool hidden;
 
   bool get hasReps =>
       this == GTSetParameters.repsWeight ||
@@ -33,6 +38,7 @@ enum GTSetParameters {
   bool get hasTime =>
       this == GTSetParameters.timeWeight || this == GTSetParameters.time;
   bool get hasDistance => this == GTSetParameters.distance;
+  bool get isSetless => this == GTSetParameters.setless;
 }
 
 @JsonSerializable()
@@ -84,6 +90,8 @@ class GTSet {
         return time != null;
       case GTSetParameters.distance:
         return distance != null;
+      case GTSetParameters.setless:
+        return true;
     }
   }
 
@@ -123,6 +131,11 @@ class GTSet {
           kind: kind,
           parameters: parameters,
           distance: 0,
+        );
+      case GTSetParameters.setless:
+        return GTSet(
+          kind: kind,
+          parameters: parameters,
         );
     }
   }

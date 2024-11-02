@@ -1036,6 +1036,12 @@
         "sidewaysPlank": "Sideways plank",
         "sidewaysPlankReachThrough": "Side plank reach through"
       }
+    },
+    "other": {
+      "name": "Other",
+      "exercises": {
+        "stretching": "Stretching"
+      }
     }
   },
   "infobox": {

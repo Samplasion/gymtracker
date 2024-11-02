@@ -904,10 +904,11 @@ class WorkoutController extends GetxController with ServiceableController {
       exs.map(
         (ex) => ex.makeChild().copyWith.sets(
           [
-            GTSet.empty(
-              kind: GTSetKind.normal,
-              parameters: ex.parameters,
-            ),
+            if (!ex.parameters.isSetless)
+              GTSet.empty(
+                kind: GTSetKind.normal,
+                parameters: ex.parameters,
+              ),
           ],
         ),
       ),
@@ -928,10 +929,11 @@ class WorkoutController extends GetxController with ServiceableController {
         ...exs.map(
           (ex) => ex.makeChild().copyWith.sets(
             [
-              GTSet.empty(
-                kind: GTSetKind.normal,
-                parameters: ex.parameters,
-              ),
+              if (!ex.parameters.isSetless)
+                GTSet.empty(
+                  kind: GTSetKind.normal,
+                  parameters: ex.parameters,
+                ),
             ],
           ),
         ),

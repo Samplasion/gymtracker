@@ -139,35 +139,36 @@ class _WorkoutExerciseEditorState extends State<WorkoutExerciseEditor> {
                             ),
                           ),
                         const PopupMenuDivider(),
-                        PopupMenuItem(
-                          enabled: widget.exercise.sets.isNotEmpty,
-                          onTap: widget.exercise.sets.isEmpty
-                              ? null
-                              : () async {
-                                  final newIndices =
-                                      await Go.toDialog<List<int>>(
-                                    () => _WorkoutReorderSetsDialog(
-                                      exercise: widget.exercise,
-                                      sets: widget.exercise.sets,
-                                      weightUnit: widget.weightUnit,
-                                      distanceUnit: widget.distanceUnit,
-                                      isConcrete: !widget.isCreating,
-                                    ),
-                                  );
-                                  if (newIndices != null) {
-                                    widget.callbacks.onExerciseSetReorder(
-                                      widget.index,
-                                      newIndices,
-                                    );
-                                  }
-                                },
-                          child: ListTile(
-                            leading: const Icon(GTIcons.reorder),
-                            title:
-                                Text('ongoingWorkout.exercises.reorderSets'.t),
+                        if (!widget.exercise.parameters.isSetless)
+                          PopupMenuItem(
                             enabled: widget.exercise.sets.isNotEmpty,
+                            onTap: widget.exercise.sets.isEmpty
+                                ? null
+                                : () async {
+                                    final newIndices =
+                                        await Go.toDialog<List<int>>(
+                                      () => _WorkoutReorderSetsDialog(
+                                        exercise: widget.exercise,
+                                        sets: widget.exercise.sets,
+                                        weightUnit: widget.weightUnit,
+                                        distanceUnit: widget.distanceUnit,
+                                        isConcrete: !widget.isCreating,
+                                      ),
+                                    );
+                                    if (newIndices != null) {
+                                      widget.callbacks.onExerciseSetReorder(
+                                        widget.index,
+                                        newIndices,
+                                      );
+                                    }
+                                  },
+                            child: ListTile(
+                              leading: const Icon(GTIcons.reorder),
+                              title:
+                                  Text('ongoingWorkout.exercises.reorderSets'.t),
+                              enabled: widget.exercise.sets.isNotEmpty,
+                            ),
                           ),
-                        ),
                         if (!widget.isCreating) ...[
                           PopupMenuItem(
                             onTap: () {
@@ -259,47 +260,51 @@ class _WorkoutExerciseEditorState extends State<WorkoutExerciseEditor> {
                   );
                 },
               ),
-              if (!widget.isInSuperset)
-                Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: TimeInputField(
-                    controller: timeController,
-                    decoration: GymTrackerInputDecoration(
-                      labelText: "exercise.fields.restTime".t,
+              if (!widget.exercise.parameters.isSetless) ...[
+                if (!widget.isInSuperset)
+                  Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: TimeInputField(
+                      controller: timeController,
+                      decoration: GymTrackerInputDecoration(
+                        labelText: "exercise.fields.restTime".t,
+                      ),
+                      onChangedTime: (value) => widget.callbacks
+                          .onExerciseChangeRestTime(
+                              widget.index, value ?? Duration.zero),
                     ),
-                    onChangedTime: (value) => widget.callbacks
-                        .onExerciseChangeRestTime(
-                            widget.index, value ?? Duration.zero),
                   ),
+                for (int i = 0; i < widget.exercise.sets.length; i++)
+                  WorkoutExerciseSetEditor(
+                    key: ValueKey(widget.exercise.sets[i].id),
+                    set: widget.exercise.sets[i],
+                    exercise: widget.exercise,
+                    onDelete: () =>
+                        widget.callbacks.onSetRemove(widget.index, i),
+                    alt: i % 2 == 0,
+                    isCreating: widget.isCreating,
+                    onSetSelectKind: (val) =>
+                        widget.callbacks.onSetSelectKind(widget.index, i, val),
+                    onSetSetDone: (val) => widget.callbacks.onSetSetDone(
+                      widget.index,
+                      i,
+                      val,
+                    ),
+                    onSetValueChange: (set) =>
+                        widget.callbacks.onSetValueChange(
+                      widget.index,
+                      i,
+                      set,
+                    ),
+                    weightUnit: widget.weightUnit,
+                    distanceUnit: widget.distanceUnit,
+                  ),
+                const SizedBox(height: 8),
+                FilledButton.tonal(
+                  onPressed: () => widget.callbacks.onSetCreate(widget.index),
+                  child: Text('exercise.actions.addSet'.t),
                 ),
-              for (int i = 0; i < widget.exercise.sets.length; i++)
-                WorkoutExerciseSetEditor(
-                  key: ValueKey(widget.exercise.sets[i].id),
-                  set: widget.exercise.sets[i],
-                  exercise: widget.exercise,
-                  onDelete: () => widget.callbacks.onSetRemove(widget.index, i),
-                  alt: i % 2 == 0,
-                  isCreating: widget.isCreating,
-                  onSetSelectKind: (val) =>
-                      widget.callbacks.onSetSelectKind(widget.index, i, val),
-                  onSetSetDone: (val) => widget.callbacks.onSetSetDone(
-                    widget.index,
-                    i,
-                    val,
-                  ),
-                  onSetValueChange: (set) => widget.callbacks.onSetValueChange(
-                    widget.index,
-                    i,
-                    set,
-                  ),
-                  weightUnit: widget.weightUnit,
-                  distanceUnit: widget.distanceUnit,
-                ),
-              const SizedBox(height: 8),
-              FilledButton.tonal(
-                onPressed: () => widget.callbacks.onSetCreate(widget.index),
-                child: Text('exercise.actions.addSet'.t),
-              ),
+              ],
               if (kDebugMode) ...[
                 Text(
                   "id: ${widget.exercise.id}",

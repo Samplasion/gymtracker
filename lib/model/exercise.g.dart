@@ -281,6 +281,7 @@ const _$GTSetParametersEnumMap = {
   GTSetParameters.freeBodyReps: 'freeBodyReps',
   GTSetParameters.time: 'time',
   GTSetParameters.distance: 'distance',
+  GTSetParameters.setless: 'setless',
 };
 
 const _$GTMuscleGroupEnumMap = {
@@ -322,6 +323,7 @@ const _$GTExerciseMuscleCategoryEnumMap = {
   GTExerciseMuscleCategory.hips: 'hips',
   GTExerciseMuscleCategory.forearms: 'forearms',
   GTExerciseMuscleCategory.custom: 'custom',
+  GTExerciseMuscleCategory.other: 'other',
 };
 
 const _$GTGymEquipmentEnumMap = {

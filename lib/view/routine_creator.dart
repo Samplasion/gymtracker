@@ -140,10 +140,11 @@ class _RoutineCreatorState extends State<RoutineCreator> {
                     _controller.exercises.addAll(result!
                         .map((ex) {
                           return ex.makeChild().copyWith.sets([
-                            GTSet.empty(
-                              kind: GTSetKind.normal,
-                              parameters: ex.parameters,
-                            ),
+                            if (!ex.parameters.isSetless)
+                              GTSet.empty(
+                                kind: GTSetKind.normal,
+                                parameters: ex.parameters,
+                              ),
                           ]);
                         })
                         .toList()
@@ -476,10 +477,11 @@ class _RoutineCreatorController extends GetxController {
                 () => const ExercisePicker(singlePick: true));
             if (ex == null || ex.isEmpty) return;
             final newExercise = ex.first.makeChild().copyWith.sets([
-              GTSet.empty(
-                kind: GTSetKind.normal,
-                parameters: ex.first.parameters,
-              ),
+              if (!ex.first.parameters.isSetless)
+                GTSet.empty(
+                  kind: GTSetKind.normal,
+                  parameters: ex.first.parameters,
+                ),
             ]);
             exercises[supersetIndex].data =
                 (exercises[supersetIndex].data as Superset)

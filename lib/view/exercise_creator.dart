@@ -105,12 +105,13 @@ class _ExerciseCreatorState extends State<ExerciseCreator> {
                         "exercise.editor.fields.parameters.label".t),
                     items: [
                       for (final param in GTSetParameters.values)
-                        DropdownMenuItem(
-                          value: param,
-                          child: Text(
-                              "exercise.editor.fields.parameters.values.${param.name}"
-                                  .t),
-                        ),
+                        if (!param.hidden)
+                          DropdownMenuItem(
+                            value: param,
+                            child: Text(
+                                "exercise.editor.fields.parameters.values.${param.name}"
+                                    .t),
+                          ),
                     ],
                     onChanged: widget.shouldChangeParameters
                         ? (GTSetParameters? v) => setState(() => params = v!)

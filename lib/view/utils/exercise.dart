@@ -195,6 +195,9 @@ class ExerciseListTile extends StatelessWidget {
         case GTSetParameters.distance:
           formattedSets =
               exercise.sets.map((set) => _buildDistance(set.distance));
+        
+        case GTSetParameters.setless:
+          formattedSets = [""];
       }
 
       final text =

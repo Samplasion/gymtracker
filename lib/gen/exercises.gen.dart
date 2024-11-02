@@ -17,6 +17,7 @@ class GTStandardLibrary {
   static const triceps = $GTStandardLibraryTricepsExercises._();
   static const hips = $GTStandardLibraryHipsExercises._();
   static const forearms = $GTStandardLibraryForearmsExercises._();
+  static const other = $GTStandardLibraryOtherExercises._();
 }
 
 class $GTStandardLibraryCardioExercises {
@@ -654,4 +655,13 @@ class $GTStandardLibraryForearmsExercises {
         wristCurlsDumbbell,
         wristRoller
       ];
+}
+
+class $GTStandardLibraryOtherExercises {
+  const $GTStandardLibraryOtherExercises._();
+
+  /// Stretching
+  String get stretching => 'library.other.exercises.stretching';
+
+  List<String> get values => [stretching];
 }

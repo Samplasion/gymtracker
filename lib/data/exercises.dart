@@ -1396,6 +1396,20 @@ final Map<GTExerciseMuscleCategory, ExerciseCategory> exerciseStandardLibrary =
         Text("library.forearms.name".t.characters.first.toUpperCase()),
     color: Colors.lime,
   ),
+  GTExerciseMuscleCategory.other: ExerciseCategory(
+    exercises: [
+      Exercise.standard(
+        id: "library.other.exercises.stretching",
+        name: "library.other.exercises.stretching".t,
+        parameters: GTSetParameters.setless,
+        primaryMuscleGroup: GTMuscleGroup.none,
+        equipment: GTGymEquipment.none,
+      ),
+    ],
+    iconGetter: () =>
+        Text("library.other.name".t.characters.first.toUpperCase()),
+    color: Colors.grey,
+  ),
 }.map((key, value) => MapEntry(
         key,
         value.copyWith(

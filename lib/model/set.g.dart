@@ -175,4 +175,5 @@ const _$GTSetParametersEnumMap = {
   GTSetParameters.freeBodyReps: 'freeBodyReps',
   GTSetParameters.time: 'time',
   GTSetParameters.distance: 'distance',
+  GTSetParameters.setless: 'setless',
 };

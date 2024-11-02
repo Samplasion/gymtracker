@@ -197,10 +197,11 @@ class _WorkoutEditorState extends State<WorkoutEditor> {
                     if (exs == null || exs.isEmpty) return;
                     workout.exercises.addAll(
                       exs.map((ex) => ex.makeChild().copyWith.sets([
-                            GTSet.empty(
-                              kind: GTSetKind.normal,
-                              parameters: ex.parameters,
-                            ),
+                            if (!ex.parameters.isSetless)
+                              GTSet.empty(
+                                kind: GTSetKind.normal,
+                                parameters: ex.parameters,
+                              ),
                           ])),
                     );
                     setState(() {});
@@ -724,10 +725,11 @@ class _WorkoutEditorState extends State<WorkoutEditor> {
             exercises[supersetIndex] = superset.copyWith(exercises: [
               ...superset.exercises,
               ...exs.map((ex) => ex.makeChild().copyWith.sets([
-                    GTSet.empty(
-                      kind: GTSetKind.normal,
-                      parameters: ex.parameters,
-                    ),
+                    if (!ex.parameters.isSetless)
+                      GTSet.empty(
+                        kind: GTSetKind.normal,
+                        parameters: ex.parameters,
+                      ),
                   ])),
             ]);
             _setExercises(exercises);

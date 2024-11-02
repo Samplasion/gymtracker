@@ -40,7 +40,8 @@ enum GTExerciseMuscleCategory {
   triceps,
   hips,
   forearms,
-  custom;
+  custom,
+  other;
 
   String get localizedName => "library.$name.name".t;
 }

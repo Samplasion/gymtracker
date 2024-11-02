@@ -1035,6 +1035,12 @@
         "sidewaysPlank": "Plank laterale",
         "sidewaysPlankReachThrough": "Plank laterale con rotazione"
       }
+    },
+    "other": {
+      "name": "Altro",
+      "exercises": {
+        "stretching": "Stretching"
+      }
     }
   },
   "infobox": {

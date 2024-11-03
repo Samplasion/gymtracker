@@ -529,7 +529,7 @@ class ExerciseDataView extends StatelessWidget {
                           ),
                           style: Theme.of(context).textTheme.titleMedium,
                         ),
-                        if (!isInSuperset)
+                        if (!isInSuperset && !exercise.parameters.isSetless)
                           TimerView.buildTimeString(
                             context,
                             workout.exercises[index].restTime,

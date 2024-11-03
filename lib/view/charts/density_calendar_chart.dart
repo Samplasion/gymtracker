@@ -1,9 +1,10 @@
 import "dart:math" as math;
+import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:gymtracker/utils/extensions.dart' hide ContextThemingUtils;
-import 'package:gymtracker/utils/utils.dart';
+import 'package:gymtracker/utils/utils.dart' hide max;
 import 'package:intl/intl.dart';
 
 class DensityCalendarChart extends StatelessWidget {
@@ -39,7 +40,7 @@ class DensityCalendarChart extends StatelessWidget {
         final crossCount =
             (size.maxWidth / (maxSquareSize + 2 * padding)).floor() - 1;
 
-        final squareCount = 7 * crossCount;
+        final squareCount = max(0, 7 * crossCount);
         final sublist = (values + List.generate(squareCount, (_) => 0))
             .take(squareCount)
             .toList();
@@ -119,13 +120,15 @@ class DensityCalendarChart extends StatelessWidget {
 
   Widget _square(BuildContext context, int index, int max) {
     final val = index >= values.length ? 0 : values[index];
+    var opacity =
+        mapRange(val.toDouble(), 0, max.toDouble(), minOpacity, maxOpacity)
+            .clamp(0, 1).toDouble();
+    if (val == max && val == 0) opacity = minOpacity;
     return Tooltip(
       message: tooltipBuilder(start, index, val),
       child: _rawSquare(
         context,
-        context.theme.colorScheme.tertiary.withOpacity(
-            mapRange(val.toDouble(), 0, max.toDouble(), minOpacity, maxOpacity)
-                .clamp(0, 1)),
+        context.theme.colorScheme.tertiary.withOpacity(opacity),
       ),
     );
   }

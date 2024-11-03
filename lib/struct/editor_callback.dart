@@ -48,6 +48,7 @@ class EditorCallbacks {
     required this.onSetValueChange,
     required this.onSupersetAddExercise,
     required this.onSupersetExercisesReorderPair,
+    required this.onGroupExercisesIntoSuperset,
   })  : mode = EditorMode.creation,
         onExerciseReorder = ((index) {
           throw Exception(
@@ -59,10 +60,6 @@ class EditorCallbacks {
         }),
         onSetSetDone = ((ex, set, done) {
           throw Exception("onSetSetDone is not available in creation mode.");
-        }),
-        onGroupExercisesIntoSuperset = ((index) {
-          throw Exception(
-              "onGroupExercisesIntoSuperset is not available in creation mode.");
         });
 
   EditorCallbacks.editor({

@@ -17,6 +17,7 @@ import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/utils/utils.dart';
 import 'package:gymtracker/view/components/rich_text_editor.dart';
 import 'package:gymtracker/view/exercise_picker.dart';
+import 'package:gymtracker/view/utils/exercises_to_superset.dart';
 import 'package:gymtracker/view/utils/input_decoration.dart';
 import 'package:gymtracker/view/utils/superset.dart';
 import 'package:gymtracker/view/utils/workout.dart';
@@ -501,6 +502,33 @@ class _RoutineCreatorController extends GetxController {
           _controller.exercises[supersetIndex].data = superset.copyWith(
             exercises: supersetExercises,
           );
+          _controller.exercises.refresh();
+        },
+        onGroupExercisesIntoSuperset: (startingIndex) async {
+          final indices = await Go.toDialog(() => ExercisesToSupersetDialog(
+              exercises: [
+                for (final ex in _controller.exercises)
+                  ex.data
+              ], startingIndex: startingIndex));
+
+          if (indices == null || indices.length < 2) return;
+
+          final newSuperset = Superset(
+            restTime: Duration.zero,
+            workoutID: null,
+            exercises: [
+              for (final index in indices) exercises[index].data as Exercise,
+            ],
+          );
+
+          final newExercises = [
+            for (int i = 0; i < indices.first; i++) exercises[i],
+            _DateWrapped(newSuperset),
+            for (int i = indices.last + 1; i < exercises.length; i++)
+              exercises[i],
+          ];
+          
+          _controller.exercises(newExercises);
           _controller.exercises.refresh();
         },
       );

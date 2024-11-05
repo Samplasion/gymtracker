@@ -15,7 +15,6 @@ class Prefs implements Insertable<Preference> {
   final Weights weightUnit;
   final Distance distanceUnit;
   final bool showSuggestedRoutines;
-  final bool amoledMode;
   final ThemeMode themeMode;
   final bool tintExercises;
   final NutritionLanguage nutritionLanguage;
@@ -28,7 +27,6 @@ class Prefs implements Insertable<Preference> {
     required this.weightUnit,
     required this.distanceUnit,
     required this.showSuggestedRoutines,
-    required this.amoledMode,
     required this.themeMode,
     required this.tintExercises,
     required this.nutritionLanguage,
@@ -45,7 +43,6 @@ class Prefs implements Insertable<Preference> {
     weightUnit: Weights.kg,
     distanceUnit: Distance.km,
     showSuggestedRoutines: true,
-    amoledMode: false,
     themeMode: ThemeMode.system,
     tintExercises: true,
     nutritionLanguage: NutritionLanguage.WORLD,
@@ -62,7 +59,6 @@ class Prefs implements Insertable<Preference> {
         "weightUnit": weightUnit.name,
         "distanceUnit": distanceUnit.name,
         "showSuggestedRoutines": showSuggestedRoutines,
-        "amoledMode": amoledMode,
         "themeMode": themeMode.name,
         "tintExercises": tintExercises,
         "nutritionLanguage": nutritionLanguage.stringValue,
@@ -86,7 +82,6 @@ class Prefs implements Insertable<Preference> {
           : Distance.values.firstWhere((d) => d.name == json['distanceUnit']),
       showSuggestedRoutines:
           json['showSuggestedRoutines'] ?? defaults.showSuggestedRoutines,
-      amoledMode: json['amoledMode'] ?? defaults.amoledMode,
       themeMode: ThemeMode.values.firstWhere(
         (t) => t.name == json['themeMode'],
         orElse: () => defaults.themeMode,
@@ -110,7 +105,6 @@ class Prefs implements Insertable<Preference> {
   weightUnit: $weightUnit,
   distanceUnit: $distanceUnit,
   showSuggestedRoutines: $showSuggestedRoutines,
-  amoledMode: $amoledMode,
   themeMode: $themeMode,
   tintExercises: $tintExercises,
   nutritionLanguage: $nutritionLanguage,
@@ -132,7 +126,6 @@ class Prefs implements Insertable<Preference> {
     Weights? weightUnit,
     Distance? distanceUnit,
     bool? showSuggestedRoutines,
-    bool? amoledMode,
     ThemeMode? themeMode,
     bool? tintExercises,
     NutritionLanguage? nutritionLanguage,
@@ -146,7 +139,6 @@ class Prefs implements Insertable<Preference> {
       distanceUnit: distanceUnit ?? this.distanceUnit,
       showSuggestedRoutines:
           showSuggestedRoutines ?? this.showSuggestedRoutines,
-      amoledMode: amoledMode ?? this.amoledMode,
       themeMode: themeMode ?? this.themeMode,
       tintExercises: tintExercises ?? this.tintExercises,
       nutritionLanguage: nutritionLanguage ?? this.nutritionLanguage,

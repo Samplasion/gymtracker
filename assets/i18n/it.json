@@ -423,12 +423,6 @@
           "hevy": "Hevy (CSV)"
         }
       },
-      "amoledMode": {
-        "label": {
-          "dark": "Modalità AMOLED",
-          "light": "Modalità bianco puro"
-        }
-      },
       "themeMode": {
         "label": "Tema",
         "values": {

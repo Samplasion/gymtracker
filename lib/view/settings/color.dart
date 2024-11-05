@@ -99,6 +99,7 @@ class _ColorModalTileState extends State<ColorModalTile>
                             Colors.amber: "",
                             Colors.orange: "",
                             Colors.deepOrange: "",
+                            Colors.grey: "",
                           },
                           onColorChanged: (Color value) {
                             _setState(() {

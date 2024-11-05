@@ -86,18 +86,6 @@ class AppearanceSettingsPane extends ControlledWidget<SettingsController> {
                   ),
                 ),
                 ValueBuilder<bool?>(
-                  initialValue: controller.amoledMode.value,
-                  builder: (value, onChanged) => SwitchListTile(
-                    title: Text(
-                        "settings.options.amoledMode.label.${context.theme.brightness.name}"
-                            .t),
-                    value: value ?? Prefs.defaultValue.amoledMode,
-                    onChanged: onChanged,
-                  ),
-                  onUpdate: (v) => controller
-                      .setAmoledMode(v ?? Prefs.defaultValue.amoledMode),
-                ),
-                ValueBuilder<bool?>(
                   initialValue: controller.tintExercises.value,
                   builder: (value, onChanged) => SwitchListTile(
                     title: Text("settings.options.tintExercises.label".t),

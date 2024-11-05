@@ -69,6 +69,7 @@ dependencies:
   flutter_svg: ^2.0.10+1
   xml: ^6.5.0
   rainbow_color: ^2.0.1
+  flex_color_scheme: ^8.0.0
   
 dev_dependencies:
   flutter_test:

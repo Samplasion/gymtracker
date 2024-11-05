@@ -423,12 +423,6 @@
           "hevy": "Hevy (CSV)"
         }
       },
-      "amoledMode": {
-        "label": {
-          "dark": "AMOLED mode",
-          "light": "Pure White mode"
-        }
-      },
       "export": {
         "label": "Export data (JSON)",
         "filename": "GymTracker_Data",

@@ -104,22 +104,17 @@ class _MainAppState extends State<MainApp> {
           builder: (context, _) {
             return Container(
               child: () {
-                final seedColor = settings.color();
-                if (light != null && dark != null && !settings.amoledMode()) {
-                  (light, dark) = fixDynamicSchemes(light!, dark!);
-                }
-                var lightScheme = (light != null && settings.usesDynamicColor())
-                    ? light!.harmonized()
-                    : ColorScheme.fromSeed(
-                        seedColor: seedColor,
-                        brightness: Brightness.light,
-                      ).harmonized();
-                var darkScheme = (dark != null && settings.usesDynamicColor())
-                    ? dark!.harmonized()
-                    : ColorScheme.fromSeed(
-                        seedColor: seedColor,
-                        brightness: Brightness.dark,
-                      ).harmonized();
+                var platformSeedColor = ({
+                      Brightness.light: light?.primary,
+                      Brightness.dark: dark?.primary,
+                    }[switch (settings.themeMode()) {
+                      ThemeMode.light => Brightness.light,
+                      ThemeMode.dark => Brightness.dark,
+                      ThemeMode.system => MediaQuery.of(context).platformBrightness,
+                    }]);
+                final seedColor =
+                    settings.usesDynamicColor() ? platformSeedColor ?? settings.color() : settings.color();
+
                 return AnimatedBuilder(
                   animation: localizations,
                   builder: (context, _) {
@@ -144,8 +139,8 @@ class _MainAppState extends State<MainApp> {
                         GlobalCupertinoLocalizations.delegate,
                       ],
                       themeMode: settings.themeMode(),
-                      theme: getGymTrackerThemeFor(context, lightScheme),
-                      darkTheme: getGymTrackerThemeFor(context, darkScheme),
+                      theme: getGymTrackerThemeFor(context, seedColor, Brightness.light,),
+                      darkTheme: getGymTrackerThemeFor(context, seedColor, Brightness.dark,),
                       home: const GymTrackerAppLoader(),
                       onGenerateRoute: (settings) {
                         return switch (settings.name) {

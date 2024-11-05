@@ -1,8 +1,8 @@
 import 'package:animations/animations.dart';
 import 'package:dynamic_color/dynamic_color.dart';
+import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:gymtracker/controller/settings_controller.dart';
 import 'package:gymtracker/utils/constants.dart';
 import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/view/utils/input_decoration.dart';
@@ -15,66 +15,35 @@ const kLightBackgroundLight1 = Color(0xFFF6F6F6);
 const kLightForeground = Color(0xFF1D1B1B);
 const kAppBarRadius = 16.0;
 
-// Begin code borrowed from https://github.com/material-foundation/flutter-packages/issues/582#issuecomment-2081174158
-(ColorScheme light, ColorScheme dark) fixDynamicSchemes(
-    ColorScheme lightDynamic, ColorScheme darkDynamic) {
-  var lightBase = ColorScheme.fromSeed(seedColor: lightDynamic.primary);
-  var darkBase = ColorScheme.fromSeed(
-      seedColor: darkDynamic.primary, brightness: Brightness.dark);
-
-  var lightAdditionalColours = _extractAdditionalColours(lightBase);
-  var darkAdditionalColours = _extractAdditionalColours(darkBase);
-
-  var lightScheme = _insertAdditionalColours(lightBase, lightAdditionalColours);
-  var darkScheme = _insertAdditionalColours(darkBase, darkAdditionalColours);
-
-  return (lightScheme.harmonized(), darkScheme.harmonized());
-}
-
-List<Color> _extractAdditionalColours(ColorScheme scheme) => [
-      scheme.surface,
-      scheme.surfaceDim,
-      scheme.surfaceBright,
-      scheme.surfaceContainerLowest,
-      scheme.surfaceContainerLow,
-      scheme.surfaceContainer,
-      scheme.surfaceContainerHigh,
-      scheme.surfaceContainerHighest,
-    ];
-
-ColorScheme _insertAdditionalColours(
-        ColorScheme scheme, List<Color> additionalColours) =>
-    scheme.copyWith(
-      surface: additionalColours[0],
-      surfaceDim: additionalColours[1],
-      surfaceBright: additionalColours[2],
-      surfaceContainerLowest: additionalColours[3],
-      surfaceContainerLow: additionalColours[4],
-      surfaceContainer: additionalColours[5],
-      surfaceContainerHigh: additionalColours[6],
-      surfaceContainerHighest: additionalColours[7],
-    );
-// End borrowed code
-
-ThemeData getGymTrackerThemeFor(BuildContext context, ColorScheme scheme) {
-  final settings = Get.find<SettingsController>();
-  if (settings.amoledMode.isTrue) {
-    scheme = scheme.neutralBackground();
-  }
+ThemeData getGymTrackerThemeFor(
+    BuildContext context, Color seedColor, Brightness brightness) {
+  late FlexColorScheme scheme = switch (brightness) {
+    Brightness.light => FlexColorScheme.light(
+        colors: FlexSchemeColor.from(
+          primary: seedColor,
+          secondary: seedColor,
+          brightness: brightness,
+        ),
+      ),
+    Brightness.dark => FlexColorScheme.dark(
+        colors: FlexSchemeColor.from(
+          primary: seedColor,
+          secondary: seedColor,
+          brightness: brightness,
+        ),
+      ),
+  };
   var pageTransitionsTheme = PageTransitionsTheme(builders: {
     TargetPlatform.android: _SharedAxisTransitionBuilder(),
     TargetPlatform.iOS: _SharedAxisTransitionBuilder(),
     TargetPlatform.macOS: _SharedAxisTransitionBuilder(),
   });
+  final equivalentScheme = scheme.toScheme;
 
-  final brightness = scheme.brightness;
-  return ThemeData(
-    useMaterial3: true,
-    brightness: brightness,
-    colorScheme: scheme,
+  return scheme.toTheme.copyWith(
     pageTransitionsTheme: pageTransitionsTheme,
     extensions: [
-      MoreColors.fromColorScheme(scheme),
+      MoreColors.fromColorScheme(equivalentScheme),
     ],
     splashFactory: platformDependentSplashFactory,
     appBarTheme: const AppBarTheme(
@@ -84,25 +53,14 @@ ThemeData getGymTrackerThemeFor(BuildContext context, ColorScheme scheme) {
         ),
       ),
     ),
-    dialogTheme: DialogTheme(
-      backgroundColor: scheme.surfaceContainer,
-    ),
     inputDecorationTheme: InputDecorationTheme(
       isDense: true,
       filled: true,
-      fillColor: scheme.secondaryContainer.withOpacity(0.45),
+      fillColor: equivalentScheme.surfaceContainerHighest.withOpacity(0.45),
       border: OutlineInputBorder(
         borderSide: BorderSide.none,
         borderRadius: BorderRadius.circular(kGymTrackerInputBorderRadius),
       ),
-    ),
-    searchBarTheme: SearchBarThemeData(
-      backgroundColor: scheme.isOled
-          ? WidgetStatePropertyAll(scheme.surfaceContainerLowest)
-          : null,
-    ),
-    cardTheme: CardTheme(
-      color: scheme.surfaceContainerLow,
     ),
     navigationRailTheme: NavigationRailThemeData(
       selectedLabelTextStyle: Theme.of(context).textTheme.labelMedium!.copyWith(
@@ -134,6 +92,21 @@ class MoreColors extends ThemeExtension<MoreColors> {
   });
 
   factory MoreColors.fromColorScheme(ColorScheme colorScheme) {
+    // Grayscale mode
+    final primary = colorScheme.primary;
+    if (primary.red == primary.green && primary.green == primary.blue) {
+      return MoreColors(
+        quaternary: colorScheme.primary,
+        onQuaternary: colorScheme.onPrimary,
+        quaternaryContainer: colorScheme.primaryContainer,
+        onQuaternaryContainer: colorScheme.onPrimaryContainer,
+        quinary: colorScheme.secondary,
+        onQuinary: colorScheme.onSecondary,
+        quinaryContainer: colorScheme.secondaryContainer,
+        onQuinaryContainer: colorScheme.onSecondaryContainer,
+      );
+    }
+
     final quaternary = colorScheme.primary.pentadicColors[4];
     final quatCS = ColorScheme.fromSeed(
       seedColor: quaternary,
@@ -225,38 +198,6 @@ class MoreColors extends ThemeExtension<MoreColors> {
   @override
   String toString() =>
       'MoreColors(quaternary: $quaternary, onQuaternary: $onQuaternary, quaternaryContainer: $quaternaryContainer, onQuaternaryContainer: $onQuaternaryContainer)';
-}
-
-extension NeutralBackgroundColorScheme on ColorScheme {
-  ColorScheme neutralBackground() {
-    final isDark = brightness == Brightness.dark;
-    final bg = isDark ? kDarkBackgroundBase : kLightBackgroundBase;
-    final fg = isDark ? kDarkForeground : kLightForeground;
-    final surface = isDark ? kDarkBackgroundLight1 : kLightBackgroundBase;
-    final surfaceTint = isDark ? Colors.white : Colors.grey[800];
-    final surfaceBright = Colors.grey[isDark ? 800 : 200];
-    return copyWith(
-      background: bg,
-      onBackground: fg,
-      surface: bg,
-      onSurface: fg,
-      surfaceDim: surface,
-      surfaceTint: surfaceTint,
-      // surfaceContainer: Colors.grey[isDark ? 900 : 100],
-      surfaceBright: surfaceBright,
-      surfaceContainerLowest:
-          ElevationOverlay.applySurfaceTint(bg, surfaceTint, 0.5),
-      surfaceContainerLow:
-          ElevationOverlay.applySurfaceTint(bg, surfaceTint, 0.8),
-      surfaceContainer: ElevationOverlay.applySurfaceTint(bg, surfaceTint, 4.5),
-      surfaceContainerHigh:
-          ElevationOverlay.applySurfaceTint(bg, surfaceTint, 6),
-      surfaceContainerHighest:
-          ElevationOverlay.applySurfaceTint(bg, surfaceTint, 9),
-    );
-  }
-
-  bool get isOled => surface == kDarkBackgroundBase;
 }
 
 extension MoreColorsOnColorScheme on ColorScheme {

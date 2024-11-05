@@ -34,7 +34,6 @@ class SettingsController extends GetxController with ServiceableController {
   Rx<Weights> weightUnit = Prefs.defaultValue.weightUnit.obs;
   Rx<Distance> distanceUnit = Prefs.defaultValue.distanceUnit.obs;
   RxBool showSuggestedRoutines = Prefs.defaultValue.showSuggestedRoutines.obs;
-  RxBool amoledMode = Prefs.defaultValue.amoledMode.obs;
   Rx<ThemeMode> themeMode = Prefs.defaultValue.themeMode.obs;
   RxBool tintExercises = Prefs.defaultValue.tintExercises.obs;
   Rx<NutritionLanguage> nutritionLanguage =
@@ -68,11 +67,6 @@ class SettingsController extends GetxController with ServiceableController {
   void setShowSuggestedRoutines(bool show) =>
       service.writeSettings(service.prefs$.value.copyWith(
         showSuggestedRoutines: show,
-      ));
-
-  void setAmoledMode(bool amoledMode) =>
-      service.writeSettings(service.prefs$.value.copyWith(
-        amoledMode: amoledMode,
       ));
 
   void setThemeMode(ThemeMode themeMode) =>
@@ -110,7 +104,6 @@ class SettingsController extends GetxController with ServiceableController {
       weightUnit(prefs.weightUnit);
       distanceUnit(prefs.distanceUnit);
       showSuggestedRoutines(prefs.showSuggestedRoutines);
-      amoledMode(prefs.amoledMode);
       themeMode(prefs.themeMode);
       tintExercises(prefs.tintExercises);
       nutritionLanguage(prefs.nutritionLanguage);
@@ -130,7 +123,6 @@ class SettingsController extends GetxController with ServiceableController {
     weightUnit(prefs.weightUnit);
     distanceUnit(prefs.distanceUnit);
     showSuggestedRoutines(prefs.showSuggestedRoutines);
-    amoledMode(prefs.amoledMode);
     themeMode(prefs.themeMode);
     tintExercises(prefs.tintExercises);
     nutritionLanguage(prefs.nutritionLanguage);

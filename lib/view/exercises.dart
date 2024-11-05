@@ -581,7 +581,9 @@ class ExerciseDataView extends StatelessWidget {
                   alt: i % 2 == 0,
                   weightUnit: weightUnit,
                   distanceUnit: distanceUnit,
-                ),
+                )
+            else
+              const SizedBox(height: 16),
           ],
         ),
       ),

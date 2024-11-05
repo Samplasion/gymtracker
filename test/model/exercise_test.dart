@@ -192,15 +192,16 @@ void main() {
             restTime: const Duration(minutes: 1),
             notes: "From notes",
             sets: [
-              for (final set in from.sets)
-                GTSet(
-                  kind: set.kind,
-                  parameters: params,
-                  reps: 0,
-                  weight: 0,
-                  time: Duration.zero,
-                  distance: 0,
-                ),
+              if (params != GTSetParameters.setless)
+                for (final set in from.sets)
+                  GTSet(
+                    kind: set.kind,
+                    parameters: params,
+                    reps: 0,
+                    weight: 0,
+                    time: Duration.zero,
+                    distance: 0,
+                  ),
             ],
             workoutID: null,
             supersetID: null,

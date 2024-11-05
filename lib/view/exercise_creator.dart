@@ -29,13 +29,15 @@ class _ExerciseCreatorState extends State<ExerciseCreator> {
   final formKey = GlobalKey<FormState>();
   late final titleController = TextEditingController(text: widget.base?.name);
 
-  late GTSetParameters params =
-      widget.base?.parameters ?? GTSetParameters.repsWeight;
+  late GTSetParameters params = (widget.base?.parameters.isSetless ?? false)
+      ? GTSetParameters.repsWeight
+      : widget.base?.parameters ?? GTSetParameters.repsWeight;
   late GTMuscleGroup? primaryGroup = widget.base?.primaryMuscleGroup;
   late Set<GTMuscleGroup> otherGroups =
       widget.base?.secondaryMuscleGroups ?? {};
   late GTGymEquipment equipment =
       widget.base?.gymEquipment ?? GTGymEquipment.none;
+  late bool isSetless = widget.base?.parameters.isSetless ?? false;
 
   ExercisesController get controller => Get.put(ExercisesController());
 
@@ -92,12 +94,14 @@ class _ExerciseCreatorState extends State<ExerciseCreator> {
                   },
                 ),
                 GestureDetector(
-                  onTap: widget.shouldChangeParameters
+                  onTap: widget.shouldChangeParameters && !isSetless
                       ? null
                       : () {
+                          final key =
+                              isSetless ? "setless" : "cannotChangeParameters";
                           Go.dialog(
-                            "exercise.editor.cannotChangeParameters.title",
-                            "exercise.editor.cannotChangeParameters.text",
+                            "exercise.editor.$key.title",
+                            "exercise.editor.$key.text",
                           );
                         },
                   child: DropdownButtonFormField(
@@ -113,7 +117,7 @@ class _ExerciseCreatorState extends State<ExerciseCreator> {
                                     .t),
                           ),
                     ],
-                    onChanged: widget.shouldChangeParameters
+                    onChanged: widget.shouldChangeParameters && !isSetless
                         ? (GTSetParameters? v) => setState(() => params = v!)
                         : null,
                     validator: (value) {
@@ -229,6 +233,37 @@ class _ExerciseCreatorState extends State<ExerciseCreator> {
                       ),
                   ],
                 ),
+                // Advanced
+                Card.outlined(
+                  margin: EdgeInsets.zero,
+                  child: ExpansionTile(
+                    shape: const Border(),
+                    collapsedShape: const Border(),
+                    title: Text("exercise.editor.advanced.title".t),
+                    children: [
+                      GestureDetector(
+                        onTap: widget.shouldChangeParameters
+                            ? null
+                            : () {
+                                Go.dialog(
+                                  "exercise.editor.cannotChangeParameters.title".t,
+                                  "exercise.editor.cannotChangeParameters.text".t,
+                                );
+                              },
+                        child: CheckboxListTile(
+                          title: Text("exercise.editor.advanced.setless.title".t),
+                          subtitle: Text("exercise.editor.advanced.setless.text".t),
+                          value: isSetless,
+                          onChanged: widget.shouldChangeParameters ? (value) {
+                            setState(() {
+                              isSetless = value!;
+                            });
+                          } : null,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               ].map((c) => Padding(
                     padding: const EdgeInsets.symmetric(
                       vertical: 16,
@@ -249,6 +284,7 @@ class _ExerciseCreatorState extends State<ExerciseCreator> {
 
   void _submit() async {
     final isValid = formKey.currentState!.validate();
+    final params = isSetless ? GTSetParameters.setless : this.params;
 
     if (isValid) {
       if (widget.base == null) {

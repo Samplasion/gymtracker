@@ -154,9 +154,20 @@
         "title": "You cannot change the parameters of this exercise",
         "text": "You can only change the parameters of an exercise you haven't performed yet."
       },
+      "setless": {
+        "title": "You cannot change the parameters of this exercise",
+        "text": "Disable the \"No sets\" option to enable this field."
+      },
       "overwriteInWorkout": {
         "title": "This exercise appears in your ongoing workout",
         "body": "You can modify it, but if you change the parameters you'll have to fill them in again. Do you want to continue?"
+      },
+      "advanced": {
+        "setless": {
+          "title": "No sets",
+          "text": "Disable set functionality for this exercise. This option effectively makes this a placeholder exercise in your workouts."
+        },
+        "title": "Advanced"
       }
     },
     "picker": {

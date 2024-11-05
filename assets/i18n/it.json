@@ -154,9 +154,20 @@
         "title": "Non puoi cambiare i parametri di questo esercizio",
         "text": "Puoi cambiare i parametri solo degli esercizi che non hai ancora eseguito."
       },
+      "setless": {
+        "title": "Non puoi cambiare i parametri di questo esercizio",
+        "text": "Disabilita l'opzione \"Senza serie\" per modificare questo campo."
+      },
       "overwriteInWorkout": {
         "title": "Questo esercizio fa parte del tuo allenamento in corso",
         "body": "Puoi modificarlo, ma se cambi i parametri dovrai riempire nuovamente i valori. Vuoi continuare?"
+      },
+      "advanced": {
+        "setless": {
+          "text": "Disabilita la funzionalità delle serie. Questa opzione rende l'esercizio un segnaposto nei tuoi allenamenti.",
+          "title": "Senza serie"
+        },
+        "title": "Avanzate"
       }
     },
     "picker": {

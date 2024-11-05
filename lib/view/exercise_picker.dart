@@ -86,6 +86,8 @@ class _ExercisePickerState extends State<ExercisePicker> {
     };
   }
 
+  late var badges = computeBadges();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -114,18 +116,7 @@ class _ExercisePickerState extends State<ExercisePicker> {
       body: widget.filter.hasCustom
           ? Obx(() => _innerScrollView(context))
           : _innerScrollView(context),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () {
-          Go.showBottomModalScreen(
-            (context, scrollController) => ExerciseCreator(
-              base: null,
-              scrollController: scrollController,
-            ),
-          );
-        },
-        label: Text("actions.create".t),
-        icon: const Icon(GTIcons.create_exercise),
-      ),
+      floatingActionButton: const _CreateExerciseFab(),
     );
   }
 
@@ -152,12 +143,16 @@ class _ExercisePickerState extends State<ExercisePicker> {
             ],
             for (final category in exercises.entries)
               ListTile(
-                leading: CircleAvatar(
-                  backgroundColor:
-                      getContainerColor(context, category.value.color),
-                  foregroundColor:
-                      getOnContainerColor(context, category.value.color),
-                  child: category.value.icon,
+                leading: Badge(
+                  isLabelVisible: badges[category.key]!.isLabelVisible,
+                  label: badges[category.key]!.label,
+                  child: CircleAvatar(
+                    backgroundColor:
+                        getContainerColor(context, category.value.color),
+                    foregroundColor:
+                        getOnContainerColor(context, category.value.color),
+                    child: category.value.icon,
+                  ),
                 ),
                 title: Text(category.key.localizedName),
                 subtitle: Text(
@@ -170,6 +165,7 @@ class _ExercisePickerState extends State<ExercisePicker> {
                         name: category.key.localizedName,
                         category: category.value,
                         singleSelection: widget.singlePick,
+                        selectedExercises: selectedExercises,
                         onSelected: (exercise) {
                           final isSelected =
                               selectedExercises.contains(exercise);
@@ -184,16 +180,16 @@ class _ExercisePickerState extends State<ExercisePicker> {
                                 selectedExercises.add(exercise);
                               }
                             }
+                            badges = computeBadges();
                           });
                         },
                         onSubmit: () {
                           Get.back();
                           _submit();
                         },
-                        selectedExercises: selectedExercises,
                       );
                     }),
-                  );
+                  ).then((_) => setState(() {}));
                 },
               ),
           ]),
@@ -281,6 +277,43 @@ class _ExercisePickerState extends State<ExercisePicker> {
     ScaffoldMessenger.of(context).clearSnackBars();
     final List<Exercise> exercises = selectedExercises.map((e) => e).toList();
     Get.back(result: exercises, closeOverlays: true);
+  }
+
+  Map<GTExerciseMuscleCategory, ({bool isLabelVisible, StatelessWidget label})>
+      computeBadges() {
+    return {
+      for (final category in exercises.entries)
+        category.key: (
+          isLabelVisible: category.value.exercises
+              .any((e) => selectedExercises.contains(e)),
+          label: widget.singlePick
+              ? const Icon(GTIcons.checkbox_on)
+              : Text(category.value.exercises
+                  .where((e) => selectedExercises.contains(e))
+                  .length
+                  .toString())
+        )
+    };
+  }
+}
+
+class _CreateExerciseFab extends StatelessWidget {
+  const _CreateExerciseFab();
+
+  @override
+  Widget build(BuildContext context) {
+    return FloatingActionButton.extended(
+      onPressed: () {
+        Go.showBottomModalScreen(
+          (context, scrollController) => ExerciseCreator(
+            base: null,
+            scrollController: scrollController,
+          ),
+        );
+      },
+      label: Text("actions.create".t),
+      icon: const Icon(GTIcons.create_exercise),
+    );
   }
 }
 

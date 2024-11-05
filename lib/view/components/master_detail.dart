@@ -480,11 +480,8 @@ class DetailsView extends StatelessWidget {
 }
 
 Color _getCanvasColor(MDVConfiguration? settings, ColorScheme colorScheme) {
-  return ElevationOverlay.applySurfaceTint(
-    colorScheme.surface,
-    colorScheme.surfaceTint,
-    (settings?.selfPage ?? true) ? 0 : 1,
-  );
+  if (settings?.selfPage ?? true) return colorScheme.surface;
+  return colorScheme.surfaceContainerLow;
 }
 
 class CustomPageRouteBuilder<T> extends PageRoute<T> {

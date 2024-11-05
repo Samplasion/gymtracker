@@ -279,7 +279,7 @@ class _ExercisePickerState extends State<ExercisePicker> {
     Get.back(result: exercises, closeOverlays: true);
   }
 
-  Map<GTExerciseMuscleCategory, ({bool isLabelVisible, StatelessWidget label})>
+  Map<GTExerciseMuscleCategory, ({bool isLabelVisible, Widget? label})>
       computeBadges() {
     return {
       for (final category in exercises.entries)
@@ -287,7 +287,7 @@ class _ExercisePickerState extends State<ExercisePicker> {
           isLabelVisible: category.value.exercises
               .any((e) => selectedExercises.contains(e)),
           label: widget.singlePick
-              ? const Icon(GTIcons.checkbox_on)
+              ? null
               : Text(category.value.exercises
                   .where((e) => selectedExercises.contains(e))
                   .length

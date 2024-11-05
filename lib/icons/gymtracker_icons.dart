@@ -165,6 +165,7 @@ class GTIcons {
   static const IconData nutrition_goal = Icons.outlined_flag_rounded;
   static const IconData pause = Icons.pause_rounded;
   static const IconData permissions = Icons.security_rounded;
+  static const IconData picked = Icons.done_rounded;
   static const IconData previousDay = Icons.arrow_back;
   static const IconData profile = Icons.person_rounded;
   static const IconData remove_from_faves = Icons.star_rounded;

@@ -276,6 +276,7 @@ class _ExerciseInfoViewState extends State<ExerciseInfoView>
 
     return ThemedSubtree(
       color: category?.color ?? Theme.of(context).colorScheme.primary,
+      enabled: Get.find<SettingsController>().tintExercises.value,
       child: DetailsView(
         child: StreamBuilder<List<(Exercise, int, Workout)>>(
           stream: historyStream,

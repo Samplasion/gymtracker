@@ -1,4 +1,3 @@
-import 'package:dynamic_color/dynamic_color.dart';
 import 'package:flutter/material.dart';
 import 'package:gymtracker/utils/theme.dart';
 
@@ -21,13 +20,6 @@ class ThemedSubtree extends StatelessWidget {
     this.enabled = true,
     super.key,
   }) : child = null;
-
-  ColorScheme _getScheme(BuildContext context) {
-    return ColorScheme.fromSeed(
-      seedColor: color,
-      brightness: Theme.of(context).brightness,
-    ).harmonized();
-  }
 
   Widget _childBuilder(BuildContext context) {
     if (child != null) return child!;

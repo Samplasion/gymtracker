@@ -31,6 +31,7 @@ class LineChartWithCategories<T> extends StatefulWidget {
   final Map<T, List<LineChartPoint>> predictedData;
   final Widget Function(T, int, LineChartPoint, bool) currentValueBuilder;
   final String Function(T, double) leftTitleBuilder;
+  final double minYAxisInterval;
 
   LineChartWithCategories({
     super.key,
@@ -39,9 +40,11 @@ class LineChartWithCategories<T> extends StatefulWidget {
     this.predictedData = const {},
     required this.currentValueBuilder,
     required this.leftTitleBuilder,
+    this.minYAxisInterval = 100,
   })  : assert(categories.isNotEmpty),
         assert(categories.length == data.length),
-        assert(categories.keys.every((key) => data.keys.contains(key)));
+        assert(categories.keys.every((key) => data.keys.contains(key))),
+        assert(minYAxisInterval > 0);
 
   @override
   State<LineChartWithCategories<T>> createState() =>
@@ -70,9 +73,28 @@ class _LineChartWithCategoriesState<T>
     return sizes.max;
   }();
 
+  late final Map<T, (double, double)> _categoryYAxisRanges = {
+    for (final entry in widget.data.entries)
+      entry.key: _range((
+        entry.value.map((e) => e.value).min,
+        entry.value.map((e) => e.value).max
+      )),
+  };
+
+  (double, double) _range((double, double) y) {
+    final range = y.$2 - y.$1;
+    if (range < widget.minYAxisInterval) {
+      final avg = (y.$1 + y.$2) / 2;
+      final half = widget.minYAxisInterval / 2;
+      return (avg - half, avg + half);
+    }
+    return y;
+  }
+
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+    final (yMin, yMax) = _categoryYAxisRanges[selectedCategory]!;
     return Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -94,6 +116,8 @@ class _LineChartWithCategoriesState<T>
             ),
             child: LineChart(
               LineChartData(
+                minY: yMin,
+                maxY: yMax,
                 gridData: FlGridData(
                   show: true,
                   drawVerticalLine: true,

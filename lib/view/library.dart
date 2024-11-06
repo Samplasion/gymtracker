@@ -67,6 +67,7 @@ class LibraryView extends GetView<ExercisesController> {
                   },
                 ),
               ],
+              _search(),
             ],
           ),
           SliverList(
@@ -117,6 +118,33 @@ class LibraryView extends GetView<ExercisesController> {
           const SliverBottomSafeArea(),
         ],
       ),
+    );
+  }
+
+  SearchAnchor _search() {
+    return SearchAnchor(
+      builder: (context, sController) => IconButton(
+        onPressed: () => sController.openView(),
+        icon: const Icon(GTIcons.search),
+      ),
+      viewBuilder: (suggestions) {
+        return ListView(
+          children: suggestions.toList(),
+        );
+      },
+      suggestionsBuilder: (context, sController) {
+        final results = controller.search(sController.text);
+        return results.map(
+          (ex) => ExerciseListTile(
+            exercise: ex,
+            selected: false,
+            isConcrete: false,
+            onTap: () {
+              Go.to(() => ExerciseInfoView(exercise: ex));
+            },
+          ),
+        );
+      },
     );
   }
 }

@@ -105,6 +105,7 @@ class _ExercisePickerState extends State<ExercisePicker> {
               });
             },
           ),
+          _search(),
           if (!widget.singlePick)
             IconButton(
               key: const Key('pick'),
@@ -294,6 +295,49 @@ class _ExercisePickerState extends State<ExercisePicker> {
                   .toString())
         )
     };
+  }
+
+  SearchAnchor _search() {
+    return SearchAnchor(
+      builder: (context, sController) => IconButton(
+        onPressed: () => sController.openView(),
+        icon: const Icon(GTIcons.search),
+      ),
+      viewBuilder: (suggestions) {
+        return suggestions.toList().getAt(0) ?? const SizedBox.shrink();
+      },
+      suggestionsBuilder: (context, sController) {
+        final results = controller.search(sController.text);
+        return [
+          StatefulBuilder(builder: (context, ss) {
+            return ListView.builder(
+              itemCount: results.length,
+              itemBuilder: (context, index) {
+                final ex = results[index];
+                return ExerciseListTile(
+                  exercise: ex,
+                  selected: selectedExercises.contains(ex),
+                  isConcrete: false,
+                  onTap: () {
+                    setState(() {
+                      if (selectedExercises.contains(ex)) {
+                        selectedExercises.remove(ex);
+                      } else if (widget.singlePick) {
+                        selectedExercises = {ex};
+                      } else {
+                        selectedExercises.add(ex);
+                      }
+                      badges = computeBadges();
+                    });
+                    ss(() {});
+                  },
+                );
+              },
+            );
+          }),
+        ];
+      },
+    );
   }
 }
 

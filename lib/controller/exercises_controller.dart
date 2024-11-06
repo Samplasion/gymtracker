@@ -1,3 +1,4 @@
+import 'package:fuzzywuzzy/fuzzywuzzy.dart';
 import 'package:get/get.dart';
 import 'package:gymtracker/controller/coordinator.dart';
 import 'package:gymtracker/controller/serviceable_controller.dart';
@@ -125,6 +126,17 @@ class ExercisesController extends GetxController with ServiceableController {
     final newExercise =
         exercise.copyWith(parameters: GTSetParameters.freeBodyReps);
     saveEdit(newExercise);
+  }
+
+  List<Exercise> search(String text) {
+    final allExercises = exercises$.value + exerciseStandardLibraryAsList;
+    final results = extractTop<Exercise>(
+      query: text,
+      choices: allExercises.toList(),
+      limit: 20,
+      getter: (exercise) => "${exercise.name} ${exercise.id} ${exercise.primaryMuscleGroup.localizedName}",
+    ).map((e) => e.choice).toList();
+    return results;
   }
 }
 

@@ -67,7 +67,7 @@ class LibraryView extends GetView<ExercisesController> {
                   },
                 ),
               ],
-              _search(),
+              _search(context),
             ],
           ),
           SliverList(
@@ -121,15 +121,20 @@ class LibraryView extends GetView<ExercisesController> {
     );
   }
 
-  SearchAnchor _search() {
+  SearchAnchor _search(BuildContext context) {
     return SearchAnchor(
       builder: (context, sController) => IconButton(
         onPressed: () => sController.openView(),
         icon: const Icon(GTIcons.search),
       ),
       viewBuilder: (suggestions) {
-        return ListView(
-          children: suggestions.toList(),
+        return MediaQuery(
+          data: MediaQuery.of(context).copyWith(
+            padding: MediaQuery.of(context).padding.copyWith(top: 0),
+          ),
+          child: ListView(
+            children: suggestions.toList(),
+          ),
         );
       },
       suggestionsBuilder: (context, sController) {
@@ -140,6 +145,7 @@ class LibraryView extends GetView<ExercisesController> {
             selected: false,
             isConcrete: false,
             onTap: () {
+              sController.closeView(null);
               Go.to(() => ExerciseInfoView(exercise: ex));
             },
           ),

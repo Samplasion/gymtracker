@@ -304,7 +304,12 @@ class _ExercisePickerState extends State<ExercisePicker> {
         icon: const Icon(GTIcons.search),
       ),
       viewBuilder: (suggestions) {
-        return suggestions.toList().getAt(0) ?? const SizedBox.shrink();
+        return MediaQuery(
+          data: MediaQuery.of(context).copyWith(
+            padding: MediaQuery.of(context).padding.copyWith(top: 0),
+          ),
+          child: suggestions.toList().getAt(0) ?? const SizedBox.shrink(),
+        );
       },
       suggestionsBuilder: (context, sController) {
         final results = controller.search(sController.text);

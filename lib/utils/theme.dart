@@ -107,31 +107,48 @@ class MoreColors extends ThemeExtension<MoreColors> {
       );
     }
 
+    ColorScheme _buildScheme({
+      required Color seedColor,
+      required Brightness brightness,
+    }) {
+      return switch (brightness) {
+        Brightness.light => FlexColorScheme.light(
+            colors: FlexSchemeColor.from(
+              primary: seedColor,
+              brightness: brightness,
+            ),
+          ),
+        Brightness.dark => FlexColorScheme.dark(
+            colors: FlexSchemeColor.from(
+              primary: seedColor,
+              brightness: brightness,
+            ),
+          ),
+      }
+          .toScheme;
+    }
+
     final quaternary = colorScheme.primary.pentadicColors[4];
-    final quatCS = ColorScheme.fromSeed(
-      seedColor: quaternary,
+    final quatCS = _buildScheme(
+      seedColor: quaternary.harmonizeWith(colorScheme.primary),
       brightness: colorScheme.brightness,
     );
 
     final quinary = colorScheme.primary.pentadicColors[3];
-    final quinCS = ColorScheme.fromSeed(
-      seedColor: quinary,
+    final quinCS = _buildScheme(
+      seedColor: quinary.harmonizeWith(colorScheme.primary),
       brightness: colorScheme.brightness,
     );
 
     return MoreColors(
-      quaternary: quatCS.primary.harmonizeWith(colorScheme.primary),
-      onQuaternary: quatCS.onPrimary.harmonizeWith(colorScheme.primary),
-      quaternaryContainer:
-          quatCS.primaryContainer.harmonizeWith(colorScheme.primary),
-      onQuaternaryContainer:
-          quatCS.onPrimaryContainer.harmonizeWith(colorScheme.primary),
-      quinary: quinCS.primary.harmonizeWith(colorScheme.primary),
-      onQuinary: quinCS.onPrimary.harmonizeWith(colorScheme.primary),
-      quinaryContainer:
-          quinCS.primaryContainer.harmonizeWith(colorScheme.primary),
-      onQuinaryContainer:
-          quinCS.onPrimaryContainer.harmonizeWith(colorScheme.primary),
+      quaternary: quatCS.primary,
+      onQuaternary: quatCS.onPrimary,
+      quaternaryContainer: quatCS.primaryContainer,
+      onQuaternaryContainer: quatCS.onPrimaryContainer,
+      quinary: quinCS.primary,
+      onQuinary: quinCS.onPrimary,
+      quinaryContainer: quinCS.primaryContainer,
+      onQuinaryContainer: quinCS.onPrimaryContainer,
     );
   }
 

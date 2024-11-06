@@ -76,9 +76,9 @@ class LibraryView extends GetView<ExercisesController> {
                   ListTile(
                     leading: CircleAvatar(
                       backgroundColor:
-                          getContainerColor(context, category.value.color),
+                          getThemedColor(context, category.value.color),
                       foregroundColor:
-                          getOnContainerColor(context, category.value.color),
+                          getOnThemedColor(context, category.value.color),
                       child: category.value.icon,
                     ),
                     title: Text(category.key.localizedName),

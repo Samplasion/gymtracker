@@ -33,30 +33,54 @@ void reorder<T>(List<T> list, int oldIndex, int newIndex) {
 
 Color getThemedColor(BuildContext context, Color color) {
   final theme = Theme.of(context);
-  return ColorScheme.fromSeed(seedColor: color, brightness: theme.brightness)
+  return ColorScheme.fromSeed(
+          seedColor: color.maybeGrayscale(context),
+          brightness: theme.brightness)
       .primary
-      .harmonizeWith(theme.colorScheme.primary);
+      .harmonizeWith(theme.colorScheme.primary)
+      .maybeGrayscale(context);
 }
 
 Color getOnThemedColor(BuildContext context, Color color) {
   final theme = Theme.of(context);
-  return ColorScheme.fromSeed(seedColor: color, brightness: theme.brightness)
+  return ColorScheme.fromSeed(
+          seedColor: color.maybeGrayscale(context),
+          brightness: theme.brightness)
       .onPrimary
-      .harmonizeWith(theme.colorScheme.primary);
+      .harmonizeWith(theme.colorScheme.primary)
+      .maybeGrayscale(context);
 }
 
 Color getContainerColor(BuildContext context, Color color) {
   final theme = Theme.of(context);
-  return ColorScheme.fromSeed(seedColor: color, brightness: theme.brightness)
+  return ColorScheme.fromSeed(
+          seedColor: color.maybeGrayscale(context),
+          brightness: theme.brightness)
       .primaryContainer
-      .harmonizeWith(theme.colorScheme.primary);
+      .harmonizeWith(theme.colorScheme.primary)
+      .maybeGrayscale(context);
 }
 
 Color getOnContainerColor(BuildContext context, Color color) {
   final theme = Theme.of(context);
-  return ColorScheme.fromSeed(seedColor: color, brightness: theme.brightness)
+  return ColorScheme.fromSeed(
+          seedColor: color.maybeGrayscale(context),
+          brightness: theme.brightness)
       .onPrimaryContainer
-      .harmonizeWith(theme.colorScheme.primary);
+      .harmonizeWith(theme.colorScheme.primary)
+      .maybeGrayscale(context);
+}
+
+extension GrayscaleColor on Color {
+  Color maybeGrayscale(BuildContext context) {
+    final primary = Theme.of(context).colorScheme.primary;
+    if (primary.red == primary.green && primary.green == primary.blue) {
+      return HSVColor.fromColor(this)
+          .withSaturation(0)
+          .toColor();
+    }
+    return this;
+  }
 }
 
 double oneRepMax({required double weight, required int reps}) {

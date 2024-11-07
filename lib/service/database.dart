@@ -90,15 +90,17 @@ class DatabaseService extends GetxService with ChangeNotifier {
 
   Future ensureInitialized({
     Function()? onDone,
+    bool overrideInitializationCheck = false,
   }) async {
     _db = GTDatabaseImpl.prod();
 
-    return _innerEnsureInitialized(onDone: onDone);
+    return _innerEnsureInitialized(onDone: onDone, overrideInitializationCheck: overrideInitializationCheck,);
   }
 
   bool _isInit = false;
   Future<void> _innerEnsureInitialized({
     Function()? onDone,
+    bool overrideInitializationCheck = false,
   }) async {
     await backups.init();
 
@@ -118,7 +120,8 @@ class DatabaseService extends GetxService with ChangeNotifier {
       "nutritionCategories",
     ].map((element) => false).toList();
     check() {
-      if (initialized.every((element) => element) && !_isInit) {
+      final shouldCall = !_isInit || overrideInitializationCheck;
+      if (initialized.every((element) => element) && shouldCall) {
         _isInit = true;
         onDone?.call();
       }
@@ -519,12 +522,15 @@ class DatabaseService extends GetxService with ChangeNotifier {
         await _db.clearTheWholeThingIAmAbsolutelySureISwear();
 
         logger.i("Created import transaction");
+        // Keep this above other calls to prevent double computation of
+        // achievements
         await setAchievementCompletions(snapshot.achievements);
         await writeExercises(snapshot.customExercises);
         await _writeRoutines(snapshot.routines);
         await _db.overwriteAllRoutineExercises(snapshot.routineExercises);
         await writeAllHistory(snapshot.historyWorkouts);
-        await _db.overwriteAllHistoryWorkoutExercises(snapshot.historyWorkoutExercises);
+        await _db.overwriteAllHistoryWorkoutExercises(
+            snapshot.historyWorkoutExercises);
         await _db.setPreferences(snapshot.preferences);
         await _writeWeightMeasurements(snapshot.weightMeasurements);
         await _db.writeAllRoutineFolders(snapshot.folders);
@@ -663,6 +669,7 @@ class DatabaseService extends GetxService with ChangeNotifier {
           c.complete();
         }
       },
+      overrideInitializationCheck: true,
     );
 
     Future.delayed(const Duration(seconds: 60), () {

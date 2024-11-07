@@ -17,7 +17,8 @@ class LineChartTimeSeries<T> extends StatefulWidget {
   final Map<T, LineChartCategory> categories;
   final Map<T, List<LineChartPoint>> data;
   final Map<T, List<LineChartPoint>>? predictions;
-  final Widget Function(T, int, LineChartPoint, bool) currentValueBuilder;
+  final Widget Function(T selectedCategory, int hoveredIndex,
+      LineChartPoint point, bool isPredicted) currentValueBuilder;
   final String Function(T, double) leftTitleBuilder;
   final double? minY;
   final double? maxY;
@@ -101,7 +102,7 @@ class _LineChartTimeSeriesState<T> extends State<LineChartTimeSeries<T>> {
       );
 
   DateTime get startingDate =>
-      DateTime.now().startOfDay.subtract(type.duration);
+      children.last.date.startOfDay.subtract(type.duration);
   List<LineChartPoint> get filteredChildren => children.where((point) {
         return point.date.isAfter(startingDate);
       }).toList();
@@ -188,6 +189,10 @@ class _LineChartTimeSeriesState<T> extends State<LineChartTimeSeries<T>> {
       maxY = maxY! + 2;
     }
 
+    // Add some padding
+    minY = minY! * 0.95;
+    maxY = maxY! * 1.05;
+
     if (minY!.isInfinite) minY = widget.minY;
     if (maxY!.isInfinite) maxY = widget.maxY;
 
@@ -227,6 +232,7 @@ class _LineChartTimeSeriesState<T> extends State<LineChartTimeSeries<T>> {
                   title: Text("timeSeriesChart.selectInterval".t),
                   onChange: (value) {
                     setState(() => type = value as _LineChartTimeSeriesType);
+                    _recalculateMinMax();
                   },
                 );
               },
@@ -440,6 +446,7 @@ class _LineChartTimeSeriesState<T> extends State<LineChartTimeSeries<T>> {
                       onSelected: (sel) {
                         if (sel) {
                           setState(() => this.selectedCategory = entry.key);
+                          _recalculateMinMax();
                         }
                       },
                     ),

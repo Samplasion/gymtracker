@@ -17,6 +17,7 @@ import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/utils/theme.dart';
 import 'package:gymtracker/view/charts/base_types.dart';
+import 'package:gymtracker/view/charts/line_charts_time_series.dart';
 import 'package:gymtracker/view/components/controlled.dart';
 import 'package:gymtracker/view/exercises.dart';
 import 'package:gymtracker/view/utils/timer.dart';
@@ -412,6 +413,13 @@ class _RoutineHistoryChartState
 
   late final dateRecognizer = TapGestureRecognizer();
 
+  late final Map<int, int> startingDateIndices = {
+    for (int i = 0; i < children.length; i++)
+      children[i].startingDate!.millisecondsSinceEpoch ~/ 60000: i,
+    if (_currentSynthOngoing case final ongoing?)
+      ongoing.startingDate!.millisecondsSinceEpoch ~/ 60000: children.length,
+  };
+
   late final Map<_RoutineHistoryChartType, List<LineChartPoint>> values = () {
     final values = <_RoutineHistoryChartType, List<LineChartPoint>>{
       _RoutineHistoryChartType.volume: [],
@@ -474,6 +482,14 @@ class _RoutineHistoryChartState
 
   @override
   Widget build(BuildContext context) {
+    final deltaStartingTime = children.first.startingDate!
+        .difference(
+          children.last.startingDate!,
+        )
+        .abs();
+    if (deltaStartingTime >= const Duration(days: 90)) {
+      return _buildTimeChart(context);
+    }
     return LineChartWithCategories(
       categories: {
         _RoutineHistoryChartType.volume: LineChartCategory(
@@ -526,6 +542,96 @@ class _RoutineHistoryChartState
                 TextSpan(
                   text: DateFormat.yMd(context.locale.languageCode)
                       .format(hoveredPoint.startingDate!),
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.primary,
+                    decoration: TextDecoration.underline,
+                  ),
+                  recognizer: dateRecognizer
+                    ..onTap = () {
+                      if (index >= children.length) {
+                        Go.toNamed(WorkoutView.routeName);
+                      } else {
+                        Go.to(
+                          () => ExercisesView(
+                              workout: Get.find<HistoryController>()
+                                  .getByID(children[index].id)!),
+                        );
+                      }
+                    },
+                ),
+              ]),
+            );
+          },
+          style: style,
+        );
+      },
+      leftTitleBuilder: (type, point) {
+        return TimerView.buildTimeString(
+          context,
+          Duration(seconds: point.toInt()),
+          builder: (time) {
+            return buildType(type, time, point);
+          },
+        );
+      },
+    );
+  }
+
+  Widget _buildTimeChart(BuildContext context) {
+    return LineChartTimeSeries(
+      categories: {
+        _RoutineHistoryChartType.volume: LineChartCategory(
+          title: "exercise.chart.views.volume".t,
+          icon: const Icon(GTIcons.volume, size: 16),
+        ),
+        _RoutineHistoryChartType.reps: LineChartCategory(
+          title: "exercise.chart.views.reps".t,
+          icon: const Icon(GTIcons.reps, size: 16),
+        ),
+        _RoutineHistoryChartType.duration: LineChartCategory(
+          title: "exercise.chart.views.duration".t,
+          icon: const Icon(GTIcons.duration, size: 16),
+        ),
+      }
+          .entries
+          .where((element) => availableTypes.contains(element.key))
+          .toMap(),
+      data: {
+        for (final entry in values.entries)
+          if (availableTypes.contains(entry.key)) entry.key: entry.value
+      },
+      predictions: {
+        for (final type in availableTypes)
+          if (_currentSynthOngoing != null)
+            type: [_getSynthesizedPointFor(type)!]
+      },
+      currentValueBuilder: (type, index, point, isPredicted) {
+        index = startingDateIndices[index] ?? children.length + 2;
+        if (_currentSynthOngoing == null && index >= children.length) {
+          return const SizedBox.shrink();
+        }
+
+        final style = Theme.of(context).textTheme.bodyLarge!.copyWith(
+              fontWeight: FontWeight.bold,
+              color:
+                  isPredicted ? Theme.of(context).colorScheme.quaternary : null,
+            );
+        return TimerView.buildTimeString(
+          context,
+          Duration(seconds: point.value.toInt()),
+          builder: (time) {
+            return Text.rich(
+              TextSpan(children: [
+                TextSpan(
+                  children: [
+                    TextSpan(text: buildType(type, time, point.value))
+                  ],
+                  style: style,
+                ),
+                const TextSpan(text: " "),
+                TextSpan(
+                  text: DateFormat.yMd(context.locale.languageCode)
+                      .format(point.date),
                   style: TextStyle(
                     color: Theme.of(context).colorScheme.primary,
                     decoration: TextDecoration.underline,

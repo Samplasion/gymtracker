@@ -665,7 +665,7 @@ class DatabaseService extends GetxService with ChangeNotifier {
       },
     );
 
-    Future.delayed(const Duration(seconds: 20), () {
+    Future.delayed(const Duration(seconds: 60), () {
       try {
         if (!c.isCompleted) {
           c.completeError("Initialization took too long");

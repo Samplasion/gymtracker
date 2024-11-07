@@ -964,11 +964,14 @@ class GTDatabaseImpl extends _$GTDatabaseImpl implements GTDatabase {
 
   @override
   Future<void> insertAchievementCompletion(AchievementCompletion completion) {
-    return into(achievements).insert(AchievementsCompanion(
-      achievementID: Value(completion.achievementID),
-      level: Value(completion.level),
-      completedAt: Value(completion.completedAt),
-    ));
+    return into(achievements).insert(
+      AchievementsCompanion(
+        achievementID: Value(completion.achievementID),
+        level: Value(completion.level),
+        completedAt: Value(completion.completedAt),
+      ),
+      mode: InsertMode.insertOrIgnore,
+    );
   }
 
   @override
@@ -986,6 +989,7 @@ class GTDatabaseImpl extends _$GTDatabaseImpl implements GTDatabase {
               ),
             )
             .toList(),
+        mode: InsertMode.insertOrIgnore,
       );
     });
   }
@@ -1017,6 +1021,7 @@ class GTDatabaseImpl extends _$GTDatabaseImpl implements GTDatabase {
                 ),
               )
               .toList(),
+          mode: InsertMode.insertOrIgnore,
         );
       });
     });

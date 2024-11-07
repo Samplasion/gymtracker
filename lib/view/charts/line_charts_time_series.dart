@@ -8,6 +8,7 @@ import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/utils/theme.dart';
+import 'package:gymtracker/utils/utils.dart' show doubleEquality;
 import 'package:gymtracker/view/charts/base_types.dart';
 import 'package:intl/intl.dart';
 
@@ -295,8 +296,12 @@ class _LineChartTimeSeriesState<T> extends State<LineChartTimeSeries<T>> {
                     rightTitles: const AxisTitles(
                       sideTitles: SideTitles(showTitles: false),
                     ),
-                    topTitles: const AxisTitles(
-                      sideTitles: SideTitles(showTitles: false),
+                    topTitles: AxisTitles(
+                      sideTitles: SideTitles(
+                        interval: const Duration(days: 1).inMinutes.toDouble(),
+                        showTitles: true,
+                        getTitlesWidget: topTitleWidgets(context),
+                      ),
                     ),
                     leftTitles: AxisTitles(
                       sideTitles: SideTitles(
@@ -457,6 +462,40 @@ class _LineChartTimeSeriesState<T> extends State<LineChartTimeSeries<T>> {
           ),
       ],
     );
+  }
+
+  Widget Function(double, TitleMeta) topTitleWidgets(BuildContext context) {
+    return (double value, TitleMeta meta) {
+      DateTime? cur =
+          DateTime.fromMillisecondsSinceEpoch(value.toInt() * 60000);
+
+      if (cur.day != 1 && !doubleEquality(value, meta.min, epsilon: 0.001)) {
+        return const SizedBox.shrink();
+      }
+
+      String text;
+      if (cur.month != DateTime.january) {
+        text = DateFormat.MMM(context.locale.languageCode)
+          .format(cur)
+          .characters
+          .first
+          .toUpperCase();
+      } else {
+        text = "${DateFormat.MMM(context.locale.languageCode)
+          .format(cur)
+          .characters
+          .first
+          .toUpperCase()} ${DateFormat.y(context.locale.languageCode).format(cur)}";
+      }
+
+      return SideTitleWidget(
+        axisSide: meta.axisSide,
+        child: Text(
+          text,
+          style: Theme.of(context).textTheme.labelSmall,
+        ),
+      );
+    };
   }
 
   Widget Function(double, TitleMeta) bottomTitleWidgets(BuildContext context) {

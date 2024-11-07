@@ -87,6 +87,10 @@ extension DateUtils on DateTime {
 }
 
 extension ColorUtils on Color {
+  bool get isGray => red == green && green == blue;
+
+  Color get grayscale => HSVColor.fromColor(this).withSaturation(0).toColor();
+
   Brightness estimateForegroundBrightness() {
     final luminance = computeLuminance();
     return luminance > 0.5 ? Brightness.dark : Brightness.light;

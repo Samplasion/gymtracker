@@ -33,51 +33,57 @@ void reorder<T>(List<T> list, int oldIndex, int newIndex) {
 
 Color getThemedColor(BuildContext context, Color color) {
   final theme = Theme.of(context);
-  return ColorScheme.fromSeed(
+  final result = ColorScheme.fromSeed(
           seedColor: color.maybeGrayscale(context),
           brightness: theme.brightness)
       .primary
       .harmonizeWith(theme.colorScheme.primary)
       .maybeGrayscale(context);
+  if (color.isGray) return result.grayscale;
+  return result;
 }
 
 Color getOnThemedColor(BuildContext context, Color color) {
   final theme = Theme.of(context);
-  return ColorScheme.fromSeed(
+  final result = ColorScheme.fromSeed(
           seedColor: color.maybeGrayscale(context),
           brightness: theme.brightness)
       .onPrimary
       .harmonizeWith(theme.colorScheme.primary)
       .maybeGrayscale(context);
+  if (color.isGray) return result.grayscale;
+  return result;
 }
 
 Color getContainerColor(BuildContext context, Color color) {
   final theme = Theme.of(context);
-  return ColorScheme.fromSeed(
+  final result = ColorScheme.fromSeed(
           seedColor: color.maybeGrayscale(context),
           brightness: theme.brightness)
       .primaryContainer
       .harmonizeWith(theme.colorScheme.primary)
       .maybeGrayscale(context);
+  if (color.isGray) return result.grayscale;
+  return result;
 }
 
 Color getOnContainerColor(BuildContext context, Color color) {
   final theme = Theme.of(context);
-  return ColorScheme.fromSeed(
+  final result = ColorScheme.fromSeed(
           seedColor: color.maybeGrayscale(context),
           brightness: theme.brightness)
       .onPrimaryContainer
       .harmonizeWith(theme.colorScheme.primary)
       .maybeGrayscale(context);
+  if (color.isGray) return result.grayscale;
+  return result;
 }
 
 extension GrayscaleColor on Color {
   Color maybeGrayscale(BuildContext context) {
     final primary = Theme.of(context).colorScheme.primary;
-    if (primary.red == primary.green && primary.green == primary.blue) {
-      return HSVColor.fromColor(this)
-          .withSaturation(0)
-          .toColor();
+    if (primary.isGray) {
+      return grayscale;
     }
     return this;
   }

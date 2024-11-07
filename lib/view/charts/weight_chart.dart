@@ -179,7 +179,7 @@ class WeightChartTimeSeries extends StatelessWidget {
         ...relevantWeights.map((m) => m.convertedWeight),
         if (predictedWeight != null) predictedWeight!.weight
       ].max;
-      final padding = [(maxY - minY) / 5, 2.5].min;
+      // final padding = [(maxY - minY) / 5, 2.5].min;
 
       return LineChartTimeSeries(
         data: {
@@ -208,8 +208,8 @@ class WeightChartTimeSeries extends StatelessWidget {
           _chartCategory:
               LineChartCategory(title: "Weight", icon: const Icon(GTIcons.info))
         },
-        minY: minY - padding,
-        maxY: maxY + padding,
+        minY: minY,
+        maxY: maxY,
         currentValueBuilder: (_, __, point, isPredicted) => Text.rich(
           TextSpan(children: [
             TextSpan(

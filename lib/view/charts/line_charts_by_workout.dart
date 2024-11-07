@@ -470,6 +470,7 @@ class _RoutineHistoryChartState
   }
 
   String buildType(_RoutineHistoryChartType type, TextSpan time, double y) {
+    if (y < 0) return "";
     switch (type) {
       case _RoutineHistoryChartType.volume:
         return y.userFacingWeight;
@@ -602,8 +603,11 @@ class _RoutineHistoryChartState
       },
       predictions: {
         for (final type in availableTypes)
-          if (_currentSynthOngoing != null)
-            type: [_getSynthesizedPointFor(type)!]
+          if (_currentSynthOngoing != null && availableTypes.contains(type))
+            type: [
+              values[type]!.last,
+              _getSynthesizedPointFor(type)!,
+            ]
       },
       currentValueBuilder: (type, index, point, isPredicted) {
         index = startingDateIndices[index] ?? children.length + 2;

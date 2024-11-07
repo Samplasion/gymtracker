@@ -190,8 +190,9 @@ class _LineChartTimeSeriesState<T> extends State<LineChartTimeSeries<T>> {
     }
 
     // Add some padding
-    minY = minY! * 0.95;
-    maxY = maxY! * 1.05;
+    final delta = maxY! - minY!;
+    minY = minY! - 0.05 * delta;
+    maxY = maxY! + 0.05 * delta;
 
     if (minY!.isInfinite) minY = widget.minY;
     if (maxY!.isInfinite) maxY = widget.maxY;

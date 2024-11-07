@@ -469,30 +469,37 @@ class _LineChartTimeSeriesState<T> extends State<LineChartTimeSeries<T>> {
       DateTime? cur =
           DateTime.fromMillisecondsSinceEpoch(value.toInt() * 60000);
 
-      if (cur.day != 1 && !doubleEquality(value, meta.min, epsilon: 0.001)) {
+      var isStarting = doubleEquality(value, meta.min, epsilon: 0.001);
+      if (cur.day != 1 && !isStarting) {
         return const SizedBox.shrink();
       }
 
       String text;
-      if (cur.month != DateTime.january) {
+      if (cur.month != DateTime.january && !isStarting) {
         text = DateFormat.MMM(context.locale.languageCode)
-          .format(cur)
-          .characters
-          .first
-          .toUpperCase();
+            .format(cur)
+            .characters
+            .first
+            .toUpperCase();
       } else {
-        text = "${DateFormat.MMM(context.locale.languageCode)
-          .format(cur)
-          .characters
-          .first
-          .toUpperCase()} ${DateFormat.y(context.locale.languageCode).format(cur)}";
+        final m = DateFormat.MMM(context.locale.languageCode)
+            .format(cur)
+            .characters
+            .first
+            .toUpperCase();
+        final y = DateFormat("yy", context.locale.languageCode).format(cur);
+        text = "$m '$y";
       }
 
       return SideTitleWidget(
         axisSide: meta.axisSide,
-        child: Text(
-          text,
-          style: Theme.of(context).textTheme.labelSmall,
+        child: ColoredBox(
+          color: Theme.of(context).cardTheme.color ?? Colors.transparent,
+          child: Text(
+            text,
+            style: Theme.of(context).textTheme.labelSmall,
+            textAlign: isStarting ? TextAlign.center : TextAlign.end,
+          ),
         ),
       );
     };

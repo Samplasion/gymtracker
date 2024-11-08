@@ -65,6 +65,8 @@ class _LineChartWithCategoriesState<T>
       final categorySizes = e.value.map((point) {
         return widget
             .leftTitleBuilder(e.key, point.value)
+            // Worst case scenario for numbers
+            .replaceAll(RegExp(r"[0-9]"), "m")
             .computeSize(
               style: context.textTheme.labelSmall!,
             )

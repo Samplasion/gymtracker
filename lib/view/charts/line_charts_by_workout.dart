@@ -25,6 +25,8 @@ import 'package:intl/intl.dart';
 
 export 'package:gymtracker/view/charts/base_types.dart';
 
+const _kDeltaTimeForTimeChart = Duration(days: 90);
+
 class LineChartWithCategories<T> extends StatefulWidget {
   final Map<T, LineChartCategory> categories;
   final Map<T, List<LineChartPoint>> data;
@@ -323,20 +325,20 @@ class _LineChartWithCategoriesState<T>
   Widget Function(double, TitleMeta) leftTitleWidgets(BuildContext context) {
     return (double value, TitleMeta meta) {
       return SideTitleWidget(
-          axisSide: meta.axisSide,
-          child: Text.rich(
-            TextSpan(children: [
-              TextSpan(
-                text: widget.leftTitleBuilder(
-                  selectedCategory,
-                  value,
-                ),
-                style: context.textTheme.labelSmall!,
+        axisSide: meta.axisSide,
+        child: Text.rich(
+          TextSpan(children: [
+            TextSpan(
+              text: widget.leftTitleBuilder(
+                selectedCategory,
+                value,
               ),
-            ]),
-            textAlign: TextAlign.end,
-          ),
-        );
+              style: context.textTheme.labelSmall!,
+            ),
+          ]),
+          textAlign: TextAlign.end,
+        ),
+      );
     };
   }
 }
@@ -497,7 +499,7 @@ class _RoutineHistoryChartState
           children.last.startingDate!,
         )
         .abs();
-    if (deltaStartingTime >= const Duration(days: 90)) {
+    if (deltaStartingTime >= _kDeltaTimeForTimeChart) {
       return _buildTimeChart(context);
     }
     return LineChartWithCategories(
@@ -815,104 +817,138 @@ class _ExerciseHistoryChartState
         _ExerciseHistoryChartType.distance => y.userFacingDistance,
       };
 
+  late final Map<int, int> startingDateIndices = {
+    for (int i = 0; i < children.length; i++)
+      children[i].$1.startingDate!.millisecondsSinceEpoch ~/ 60000: i,
+    if (widget.ongoing case final ongoing?)
+      ongoing.$1.startingDate!.millisecondsSinceEpoch ~/ 60000: children.length,
+  };
+
   @override
   Widget build(BuildContext context) {
     final partition = children.length;
 
-    return LineChartWithCategories(
-      categories: {
-        _ExerciseHistoryChartType.volume: LineChartCategory(
-          title: "exercise.chart.views.volume".t,
-          icon: const Icon(GTIcons.volume, size: 16),
-        ),
-        _ExerciseHistoryChartType.reps: LineChartCategory(
-          title: "exercise.chart.views.reps".t,
-          icon: const Icon(GTIcons.reps, size: 16),
-        ),
-        _ExerciseHistoryChartType.time: LineChartCategory(
-          title: "exercise.chart.views.time".t,
-          icon: const Icon(GTIcons.time, size: 16),
-        ),
-        _ExerciseHistoryChartType.distance: LineChartCategory(
-          title: "exercise.chart.views.distance".t,
-          icon: const Icon(GTIcons.distance, size: 16),
-        ),
-      }
-          .entries
-          .where((element) => availableTypes.contains(element.key))
-          .toMap(),
-      data: {
-        for (final entry in values.entries)
-          entry.key: entry.value.take(partition).toList(),
-      },
-      predictedData: {
-        for (final entry in values.entries)
-          entry.key: entry.value.skip(partition).toList(),
-      },
-      currentValueBuilder: (type, index, point, isPredicted) {
-        final style = Theme.of(context).textTheme.bodyLarge!.copyWith(
-              fontWeight: FontWeight.bold,
-              color:
-                  isPredicted ? Theme.of(context).colorScheme.quaternary : null,
-            );
-        final date = isPredicted
-            ? widget.ongoing!.$1.startingDate!
-            : children[index].$1.startingDate!;
-        return TimerView.buildTimeString(
-          context,
-          Duration(seconds: point.value.toInt()),
-          builder: (time) {
-            return Text.rich(
-              TextSpan(children: [
-                TextSpan(
-                  children: [
-                    TextSpan(
-                      text: buildType(type, time, point.value),
-                    )
-                  ],
-                  style: style,
+    final categories = {
+      _ExerciseHistoryChartType.volume: LineChartCategory(
+        title: "exercise.chart.views.volume".t,
+        icon: const Icon(GTIcons.volume, size: 16),
+      ),
+      _ExerciseHistoryChartType.reps: LineChartCategory(
+        title: "exercise.chart.views.reps".t,
+        icon: const Icon(GTIcons.reps, size: 16),
+      ),
+      _ExerciseHistoryChartType.time: LineChartCategory(
+        title: "exercise.chart.views.time".t,
+        icon: const Icon(GTIcons.time, size: 16),
+      ),
+      _ExerciseHistoryChartType.distance: LineChartCategory(
+        title: "exercise.chart.views.distance".t,
+        icon: const Icon(GTIcons.distance, size: 16),
+      ),
+    }.entries.where((element) => availableTypes.contains(element.key)).toMap();
+    final data = {
+      for (final entry in values.entries)
+        entry.key: entry.value.take(partition).toList(),
+    };
+    final predictedData = {
+      for (final entry in values.entries)
+        entry.key: entry.value.skip(partition).toList(),
+    };
+    Widget currentValueBuilder(type, index, point, isPredicted) {
+      final style = Theme.of(context).textTheme.bodyLarge!.copyWith(
+            fontWeight: FontWeight.bold,
+            color:
+                isPredicted ? Theme.of(context).colorScheme.quaternary : null,
+          );
+      final date = isPredicted
+          ? widget.ongoing!.$1.startingDate!
+          : children[index].$1.startingDate!;
+      return TimerView.buildTimeString(
+        context,
+        Duration(seconds: point.value.toInt()),
+        builder: (time) {
+          return Text.rich(
+            TextSpan(children: [
+              TextSpan(
+                children: [
+                  TextSpan(
+                    text: buildType(type, time, point.value),
+                  )
+                ],
+                style: style,
+              ),
+              const TextSpan(text: " "),
+              TextSpan(
+                text: DateFormat.yMd(context.locale.languageCode).format(date),
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.primary,
+                  decoration: TextDecoration.underline,
                 ),
-                const TextSpan(text: " "),
-                TextSpan(
-                  text:
-                      DateFormat.yMd(context.locale.languageCode).format(date),
-                  style: TextStyle(
-                    color: Theme.of(context).colorScheme.primary,
-                    decoration: TextDecoration.underline,
-                  ),
-                  recognizer: dateRecognizer
-                    ..onTap = () {
-                      if (isPredicted) {
-                        Go.toNamed(WorkoutView.routeName);
-                      } else {
-                        Go.to(
-                          () => ExercisesView(
-                              workout: Get.find<HistoryController>()
-                                  .getByID(children[index].$1.id)!),
-                        );
-                      }
-                    },
-                ),
-              ]),
-            );
-          },
-          style: style,
-        );
-      },
-      leftTitleBuilder: (type, point) {
-        if (point.isNegative) return "";
-        
-        final style = context.textTheme.labelSmall!;
+                recognizer: dateRecognizer
+                  ..onTap = () {
+                    if (isPredicted) {
+                      Go.toNamed(WorkoutView.routeName);
+                    } else {
+                      Go.to(
+                        () => ExercisesView(
+                          workout: Get.find<HistoryController>()
+                              .getByID(children[index].$1.id)!,
+                          highlightExercise: (ex) =>
+                              ex.id == children[index].$2.id,
+                        ),
+                      );
+                    }
+                  },
+              ),
+            ]),
+          );
+        },
+        style: style,
+      );
+    }
 
-        return TimerView.buildTimeString(
-          context,
-          Duration(seconds: point.toInt()),
-          builder: (time) {
-            return buildType(type, time, point);
-          },
-          style: style,
-        );
-      },
+    String leftTitleBuilder(type, point) {
+      if (point.isNegative) return "";
+
+      final style = context.textTheme.labelSmall!;
+
+      return TimerView.buildTimeString(
+        context,
+        Duration(seconds: point.toInt()),
+        builder: (time) {
+          return buildType(type, time, point);
+        },
+        style: style,
+      );
+    }
+
+    final deltaStartingTime = children.first.$1.startingDate!
+        .difference(
+          children.last.$1.startingDate!,
+        )
+        .abs();
+    if (deltaStartingTime >= _kDeltaTimeForTimeChart) {
+      return LineChartTimeSeries(
+        categories: categories,
+        data: data,
+        predictions: predictedData,
+        currentValueBuilder: (type, index, point, isPredicted) =>
+            currentValueBuilder(
+          type,
+          startingDateIndices[index] ?? children.length + 2,
+          point,
+          isPredicted,
+        ),
+        leftTitleBuilder: leftTitleBuilder,
+      );
+    }
+
+    return LineChartWithCategories(
+      categories: categories,
+      data: data,
+      predictedData: predictedData,
+      currentValueBuilder: currentValueBuilder,
+      leftTitleBuilder: leftTitleBuilder,
     );
   }
 }

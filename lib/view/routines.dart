@@ -190,8 +190,8 @@ class _WorkoutIcon extends StatelessWidget {
   Widget build(BuildContext context) {
     return Skeleton.leaf(
       child: CircleAvatar(
-        backgroundColor: Theme.of(context).colorScheme.secondaryContainer,
-        foregroundColor: Theme.of(context).colorScheme.onSecondaryContainer,
+        backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+        foregroundColor: Theme.of(context).colorScheme.onPrimaryContainer,
         child: Text(workout.name.characters.first.toUpperCase()),
       ),
     );
@@ -657,9 +657,9 @@ class TerseRoutineListTile extends StatelessWidget {
     return ListTile(
       leading: showIcon
           ? CircleAvatar(
-              backgroundColor: Theme.of(context).colorScheme.secondaryContainer,
+              backgroundColor: Theme.of(context).colorScheme.primaryContainer,
               foregroundColor:
-                  Theme.of(context).colorScheme.onSecondaryContainer,
+                  Theme.of(context).colorScheme.onPrimaryContainer,
               child: Text(routine!.name.characters.first.toUpperCase()),
             )
           : null,

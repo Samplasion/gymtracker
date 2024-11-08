@@ -25,8 +25,8 @@ class ExerciseIcon extends StatelessWidget {
   Widget build(BuildContext context) {
     final exercise = this.exercise;
 
-    Color backgroundColor = Theme.of(context).colorScheme.secondaryContainer;
-    Color foregroundColor = Theme.of(context).colorScheme.onSecondaryContainer;
+    Color backgroundColor = Theme.of(context).colorScheme.primaryContainer;
+    Color foregroundColor = Theme.of(context).colorScheme.onPrimaryContainer;
 
     if (exercise is Exercise &&
         exercise.standard &&

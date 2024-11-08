@@ -1,6 +1,7 @@
 import 'package:flex_color_picker/flex_color_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:gymtracker/gen/colors.gen.dart';
 
 typedef OnChange<T> = void Function(T value);
 
@@ -83,23 +84,26 @@ class _ColorModalTileState extends State<ColorModalTile>
                           // Whatever, we don't need to know the color name
                           // because we calculate it later
                           customColorSwatchesAndNames: {
-                            Colors.red: "",
-                            Colors.pink: "",
-                            Colors.purple: "",
-                            Colors.deepPurple: "",
-                            Colors.indigo: "",
-                            Colors.blue: "",
-                            Colors.lightBlue: "",
-                            Colors.cyan: "",
-                            Colors.teal: "",
-                            Colors.green: "",
-                            Colors.lightGreen: "",
-                            Colors.lime: "",
-                            Colors.yellow: "",
-                            Colors.amber: "",
-                            Colors.orange: "",
-                            Colors.deepOrange: "",
-                            Colors.grey: "",
+                            GTColors.themeRed: "",
+                            GTColors.themeLightRed: "",
+                            GTColors.themeLightPink: "",
+                            GTColors.themePink: "",
+                            GTColors.themePurple: "",
+                            GTColors.themeDeepPurple: "",
+                            GTColors.themeIndigo: "",
+                            GTColors.themeBlue: "",
+                            GTColors.themeLightBlue: "",
+                            GTColors.themeCyan: "",
+                            GTColors.themeTeal: "",
+                            GTColors.themeGreen: "",
+                            GTColors.themeLightGreen: "",
+                            GTColors.themeLime: "",
+                            GTColors.themeYellow: "",
+                            GTColors.themeAmber: "",
+                            GTColors.themeOrange: "",
+                            GTColors.themeDeepOrange: "",
+                            GTColors.themeGray: "",
+                            GTColors.themeBlueGray: "",
                           },
                           onColorChanged: (Color value) {
                             _setState(() {

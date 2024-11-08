@@ -5,4 +5,26 @@
     <color name="midnights" type="material">#071d69</color>
     <color name="ai" type="material">#9d00ff</color>
     <color name="peach" type="material">#eea88b</color>
+
+    <!-- Selectable theme colors -->
+    <color name="themeRed" type="material">#c44040</color>
+    <color name="themeLightRed" type="material">#f44336</color>
+    <color name="themeLightPink" type="material">#ffa0bf</color>
+    <color name="themePink" type="material">#ff4081</color>
+    <color name="themePurple" type="material">#ab47bc</color>
+    <color name="themeDeepPurple" type="material">#7e57c2</color>
+    <color name="themeIndigo" type="material">#475ac2</color>
+    <color name="themeBlue" type="material">#2196f3</color>
+    <color name="themeLightBlue" type="material">#03a9f4</color>
+    <color name="themeCyan" type="material">#00bcd4</color>
+    <color name="themeTeal" type="material">#009688</color>
+    <color name="themeGreen" type="material">#4caf50</color>
+    <color name="themeLightGreen" type="material">#8bc34a</color>
+    <color name="themeLime" type="material">#cddc39</color>
+    <color name="themeYellow" type="material">#ffeb3b</color>
+    <color name="themeAmber" type="material">#ffc107</color>
+    <color name="themeOrange" type="material">#ff9800</color>
+    <color name="themeDeepOrange" type="material">#ff5722</color>
+    <color name="themeGray" type="material">#9e9e9e</color>
+    <color name="themeBlueGray" type="material">#607d8b</color>
 </resources>

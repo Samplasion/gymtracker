@@ -16,7 +16,6 @@ import 'package:gymtracker/service/logger.dart';
 import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/utils/theme.dart';
-import 'package:gymtracker/view/charts/base_types.dart';
 import 'package:gymtracker/view/charts/line_charts_time_series.dart';
 import 'package:gymtracker/view/components/controlled.dart';
 import 'package:gymtracker/view/exercises.dart';
@@ -77,8 +76,16 @@ class _LineChartWithCategoriesState<T>
   late final Map<T, (double, double)> _categoryYAxisRanges = {
     for (final entry in widget.data.entries)
       entry.key: _range((
-        entry.value.map((e) => e.value).min,
-        entry.value.map((e) => e.value).max
+        [
+          ...entry.value.map((e) => e.value),
+          if (widget.predictedData[entry.key] != null)
+            ...widget.predictedData[entry.key]!.map((e) => e.value)
+        ].min,
+        [
+          ...entry.value.map((e) => e.value),
+          if (widget.predictedData[entry.key] != null)
+            ...widget.predictedData[entry.key]!.map((e) => e.value)
+        ].max
       )),
   };
 
@@ -314,7 +321,9 @@ class _LineChartWithCategoriesState<T>
   }
 
   Widget Function(double, TitleMeta) leftTitleWidgets(BuildContext context) {
-    return (double value, TitleMeta meta) => SideTitleWidget(
+    return (double value, TitleMeta meta) {
+      if (value < 0) return const SizedBox.shrink();
+      return SideTitleWidget(
           axisSide: meta.axisSide,
           child: Text.rich(
             TextSpan(children: [
@@ -329,6 +338,7 @@ class _LineChartWithCategoriesState<T>
             textAlign: TextAlign.end,
           ),
         );
+    };
   }
 }
 

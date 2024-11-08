@@ -322,7 +322,6 @@ class _LineChartWithCategoriesState<T>
 
   Widget Function(double, TitleMeta) leftTitleWidgets(BuildContext context) {
     return (double value, TitleMeta meta) {
-      if (value < 0) return const SizedBox.shrink();
       return SideTitleWidget(
           axisSide: meta.axisSide,
           child: Text.rich(
@@ -901,6 +900,8 @@ class _ExerciseHistoryChartState
         );
       },
       leftTitleBuilder: (type, point) {
+        if (point.isNegative) return "";
+        
         final style = context.textTheme.labelSmall!;
 
         return TimerView.buildTimeString(

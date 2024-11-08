@@ -494,7 +494,7 @@ class _LineChartTimeSeriesState<T> extends State<LineChartTimeSeries<T>> {
       return SideTitleWidget(
         axisSide: meta.axisSide,
         child: ColoredBox(
-          color: Theme.of(context).cardTheme.color ?? Colors.transparent,
+          color: Theme.of(context).cardColor,
           child: Text(
             text,
             style: Theme.of(context).textTheme.labelSmall,

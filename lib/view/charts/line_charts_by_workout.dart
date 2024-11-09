@@ -936,7 +936,8 @@ class _ExerciseHistoryChartState
         predictions: {
           for (final MapEntry(:key, :value) in predictedData.entries)
             key: [
-              data[key]!.last,
+              if (value.isNotEmpty)
+                data[key]!.last,
               ...value,
             ],
         },

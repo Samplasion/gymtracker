@@ -933,7 +933,13 @@ class _ExerciseHistoryChartState
       return LineChartTimeSeries(
         categories: categories,
         data: data,
-        predictions: predictedData,
+        predictions: {
+          for (final MapEntry(:key, :value) in predictedData.entries)
+            key: [
+              data[key]!.last,
+              ...value,
+            ],
+        },
         currentValueBuilder: (type, index, point, isPredicted) =>
             currentValueBuilder(
           type,

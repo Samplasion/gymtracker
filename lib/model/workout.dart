@@ -295,6 +295,7 @@ class Workout {
                       id: const Uuid().v4(),
                       workoutID: newRoutineID,
                       supersetID: newSupersetID,
+                      supersedesID: null,
                       sets: [
                         for (final set in exercise.sets)
                           set.copyWith(done: false),
@@ -305,6 +306,7 @@ class Workout {
             },
             exercise: (single) => single.copyWith(
               id: const Uuid().v4(),
+              supersedesID: null,
               sets: [
                 for (final set in single.sets)
                   set.copyWith(
@@ -461,7 +463,7 @@ class SynthesizedWorkout implements Workout {
   String get id => components.first.id;
 
   @override
-  String? get parentID => null;
+  String? get parentID => components.first.parentID;
 
   @override
   Weights get weightUnit => components.first.weightUnit;

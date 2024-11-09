@@ -793,6 +793,19 @@ class WorkoutController extends GetxController with ServiceableController {
   }
 
   Future<void> askToUpdateRoutine(Workout workout) async {
+    // if (workout.isContinuation) return;
+    if (workout.isContinuation) {
+      final orig = workout.originalWorkoutForContinuation!;
+      workout = SynthesizedWorkout([
+        orig.copyWith(
+          completedBy: workout.id,
+        ),
+        workout.copyWith(
+          completes: orig.id,
+        ),
+      ]);
+    }
+
     final routinesController = Get.find<RoutinesController>();
 
     if (workout.parentID != null &&

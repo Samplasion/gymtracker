@@ -10,6 +10,7 @@ import 'package:gymtracker/utils/extensions.dart';
 import 'package:test/test.dart';
 
 import '../expectations.dart';
+import '../helpers.dart';
 
 void main() {
   final workout = Workout(
@@ -826,6 +827,262 @@ void main() {
                 superseding: true),
             throwsA(isA<SynthesizedWorkoutMethodException>()));
       });
+    });
+  });
+
+  group('getExercisesLinearly -', () {
+    test(
+        'should return the concatenated list of exercises from two workouts that aren\'t continued from one another',
+        () {
+      final workout1 = workout.copyWith(
+        exercises: [
+          Exercise.custom(
+            id: "1",
+            name: 'Exercise 1',
+            parameters: GTSetParameters.repsWeight,
+            sets: [
+              GTSet(
+                reps: 10,
+                weight: 100,
+                time: const Duration(seconds: 60),
+                parameters: GTSetParameters.repsWeight,
+                kind: GTSetKind.normal,
+              ),
+            ],
+            primaryMuscleGroup: GTMuscleGroup.abs,
+            secondaryMuscleGroups: {GTMuscleGroup.lowerBack},
+            restTime: const Duration(seconds: 60),
+            parentID: null,
+            notes: 'Notes 1',
+            workoutID: null,
+            supersetID: null,
+            equipment: GTGymEquipment.none,
+          ),
+        ],
+      );
+
+      final workout2 = workout.copyWith(
+        exercises: [
+          Exercise.custom(
+            id: "1",
+            name: 'Exercise 1',
+            parameters: GTSetParameters.repsWeight,
+            sets: [
+              GTSet(
+                reps: 10,
+                weight: 100,
+                time: const Duration(seconds: 60),
+                parameters: GTSetParameters.repsWeight,
+                kind: GTSetKind.normal,
+              ),
+            ],
+            primaryMuscleGroup: GTMuscleGroup.abs,
+            secondaryMuscleGroups: {GTMuscleGroup.lowerBack},
+            restTime: const Duration(seconds: 60),
+            parentID: null,
+            notes: 'Notes 1',
+            workoutID: null,
+            supersetID: null,
+            equipment: GTGymEquipment.none,
+          ),
+          Exercise.custom(
+            id: "2",
+            name: 'Exercise 2',
+            parameters: GTSetParameters.repsWeight,
+            sets: [
+              GTSet(
+                reps: 10,
+                weight: 100,
+                time: const Duration(seconds: 60),
+                parameters: GTSetParameters.repsWeight,
+                kind: GTSetKind.normal,
+              ),
+            ],
+            primaryMuscleGroup: GTMuscleGroup.abs,
+            secondaryMuscleGroups: {GTMuscleGroup.lowerBack},
+            restTime: const Duration(seconds: 60),
+            parentID: null,
+            notes: 'Notes 2',
+            workoutID: null,
+            supersetID: null,
+            equipment: GTGymEquipment.none,
+          ),
+        ],
+      );
+
+      final combinedExercises = getExercisesLinearly(workout1, workout2);
+
+      expect(combinedExercises.length, 3);
+      expectExercise(
+          combinedExercises[0] as Exercise, workout1.exercises[0] as Exercise);
+      expectExercise(
+          combinedExercises[1] as Exercise, workout2.exercises[0] as Exercise);
+      expectExercise(
+          combinedExercises[2] as Exercise, workout2.exercises[1] as Exercise);
+    });
+
+    test(
+        "should return a linear view of exercises if the workouts are one a continuation of the other",
+        () {
+      final workout1 = workout.copyWith(
+        completedBy: "2",
+        exercises: [
+          Exercise.custom(
+            id: "1",
+            name: 'Exercise 1',
+            parameters: GTSetParameters.repsWeight,
+            sets: [
+              GTSet(
+                reps: 10,
+                weight: 100,
+                time: const Duration(seconds: 60),
+                parameters: GTSetParameters.repsWeight,
+                kind: GTSetKind.normal,
+              ),
+            ],
+            primaryMuscleGroup: GTMuscleGroup.abs,
+            secondaryMuscleGroups: {GTMuscleGroup.lowerBack},
+            restTime: const Duration(seconds: 60),
+            parentID: null,
+            notes: 'Notes 1',
+            workoutID: null,
+            supersetID: null,
+            equipment: GTGymEquipment.none,
+          ),
+        ],
+      );
+
+      final workout2 = workout.copyWith(
+        id: "2",
+        completes: "1",
+        exercises: [
+          Exercise.raw(
+            id: "4",
+            name: 'Exercise 1',
+            parameters: GTSetParameters.repsWeight,
+            sets: [
+              GTSet(
+                reps: 10,
+                weight: 100,
+                time: const Duration(seconds: 60),
+                parameters: GTSetParameters.repsWeight,
+                kind: GTSetKind.normal,
+              ),
+            ],
+            primaryMuscleGroup: GTMuscleGroup.abs,
+            secondaryMuscleGroups: {GTMuscleGroup.lowerBack},
+            restTime: const Duration(seconds: 60),
+            parentID: null,
+            notes: 'Notes 1',
+            workoutID: null,
+            supersetID: null,
+            equipment: GTGymEquipment.none,
+            standard: false,
+            supersedesID: "1",
+          ),
+        ],
+      );
+
+      final combinedExercises = getExercisesLinearly(workout1, workout2);
+
+      expect(combinedExercises.length, 1);
+      expectExercise(
+        combinedExercises[0] as Exercise,
+        (workout2.exercises[0] as Exercise).copyWith(
+          id: workout1.exercises[0].id,
+          supersedesID: null,
+        ),
+      );
+    });
+
+    test("returns replaced exercises in supersets", () {
+      final w1 = workout.copyWith(
+        id: "1",
+        completedBy: "2",
+        exercises: [
+          exerciseHelper("1", "Exercise 1"),
+          supersetHelper(
+            "2",
+            exercises: [
+              exerciseHelper("3", "Exercise 3"),
+              exerciseHelper("4", "Exercise 4"),
+            ],
+          ),
+        ],
+      );
+      final w2 = workout.copyWith(
+        id: "2",
+        completes: "1",
+        exercises: [
+          exerciseHelper("5", "Exercise 1").copyWith.supersedesID("1"),
+          supersetHelper(
+            "6",
+            exercises: [
+              exerciseHelper("7", "Exercise 3").copyWith.supersedesID("3"),
+              exerciseHelper("8", "Exercise 4"),
+            ],
+          ).copyWith.supersedesID("2"),
+        ],
+      );
+
+      final combinedExercises = getExercisesLinearly(w1, w2);
+
+      expect(combinedExercises.length, 2);
+      expectExercise(
+        combinedExercises[0] as Exercise,
+        (w2.exercises[0] as Exercise).copyWith(
+          id: w1.exercises[0].id,
+          supersedesID: null,
+        ),
+      );
+      expect(combinedExercises[1] is Superset, true);
+      expect(combinedExercises[1].asSuperset.exercises.length, 2);
+
+      expectExercise(
+        combinedExercises[1].asSuperset.exercises[0],
+        w2.exercises[1].asSuperset.exercises[0].copyWith(
+          id: w1.exercises[1].asSuperset.exercises[0].id,
+          supersetID: w1.exercises[1].id,
+          supersedesID: null,
+        ),
+      );
+      expectExercise(
+        combinedExercises[1].asSuperset.exercises[1],
+        w2.exercises[1].asSuperset.exercises[1].copyWith
+            .supersetID(w1.exercises[1].id),
+      );
+    });
+
+    test(
+        "replaces the correct exercise when multiple exercises supersede the same ID",
+        () {
+      final w1 = workout.copyWith(
+        id: "1",
+        completedBy: "2",
+        exercises: [
+          exerciseHelper("1", "Exercise 1"),
+        ],
+      );
+      final w2 = workout.copyWith(
+        id: "2",
+        completes: "1",
+        exercises: [
+          exerciseHelper("5", "Exercise 1", parameters: GTSetParameters.time)
+              .copyWith
+              .supersedesID("1"),
+          exerciseHelper("5", "Exercise 1",
+                  parameters: GTSetParameters.distance)
+              .copyWith
+              .supersedesID("1"),
+        ],
+      );
+
+      final combinedExercises = getExercisesLinearly(w1, w2);
+
+      expect(combinedExercises.length, 1);
+      expect(combinedExercises[0] is Exercise, true);
+      expect(
+          combinedExercises[0].asExercise.parameters, GTSetParameters.distance);
     });
   });
 }

@@ -256,11 +256,11 @@ class Workout {
         'exercises': [for (final exercise in exercises) exercise.toJson()],
         'folder': folder?.toJson(),
       };
-  
+
   Map<String, dynamic> shareWorkout() => {
-      ...toJson(),
-      'folder': null,
-    };
+        ...toJson(),
+        'folder': null,
+      };
 
   @override
   String toString() {
@@ -607,7 +607,7 @@ class SynthesizedWorkout implements Workout {
   bool hasExercise(Exercise exercise) {
     throw SynthesizedWorkoutMethodException("hasExercise");
   }
-  
+
   @override
   Map<String, dynamic> shareWorkout() {
     throw SynthesizedWorkoutMethodException("shareWorkout");
@@ -721,7 +721,44 @@ bool linearExercisesUseNewAlgorithm(Workout base, Workout cont) {
   return cont.isSupersedence && cont.isCompletionOf(base);
 }
 
-/// Weird name for a function that returns exercises, overriding superseded exercises.
+// Weird name for a function that returns exercises, overriding superseded exercises.
+/// Returns the user-expected exercises in a workout, accounting for
+/// continued workouts if the workouts are related.
+///
+/// How this works is:
+/// - If the two workouts are not related*, the exercises are simply concatenated.
+/// - If the two workouts continue each other:
+///   - Lay out the exercises in the base workout.
+///   - Append the exercises in the continuation that are *not* superseded (i.e.
+///     any exercise that may have been added in the continuation).
+///   - Replace the exercises in the base workout that *are* superseded with the
+///     corresponding exercises in the continuation.
+///
+/// Superseding supersets are copied in bulk. Exercises in the superset that
+/// supersede other exercises carry the superseded exercises' id, as usual,
+/// but no other edge case is handled.
+///
+/// \*Two workouts are related if the continuation completes the base; that is,
+/// the continuation has the base's ID in its `completes` field, and the base
+/// has the continuation's ID in its `completedBy` field.
+///
+/// The resulting workout is something like this (B - base exercise,
+/// C - continuation exercise, S - superseded):
+///
+/// ```
+/// Workout(
+///   exercises: [
+///     B1,
+///     B2,
+///     S3,
+///     B4,
+///     S5,
+///     C1,
+///     C2,
+///     C3,
+///   ],
+/// );
+/// ```
 List<WorkoutExercisable> getExercisesLinearly(
   Workout base,
   Workout cont, {
@@ -766,7 +803,9 @@ List<WorkoutExercisable> getExercisesLinearly(
                 final exercises = [
                   for (final exercise in superset.exercises)
                     exercise.copyWith(
-                      id: exercise.supersedesID,
+                      id: exercise.isSupersedence
+                          ? exercise.supersedesID
+                          : exercise.id,
                       supersetID: superset.id,
                       supersedesID: null,
                     ),

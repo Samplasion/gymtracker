@@ -875,6 +875,9 @@
         "smithMachineBenchPressFlat": "Bench press (Smith machine)",
         "smithMachineBenchPressIncline": "Bench press (Smith machine, incline)",
         "smithMachineBenchPressDecline": "Bench press (Smith machine, decline)",
+        "cableBenchPressFlat": "Bench press (cables)",
+        "cableBenchPressIncline": "Bench press (cables, incline)",
+        "cableBenchPressDecline": "Bench press (cables, decline)",
         "butterflyMachine": "Butterfly Machine",
         "dumbbellHexPress": "Dumbbell Hex Press",
         "smithMachineHexPress": "Smith Machine Hex Press",
@@ -887,7 +890,8 @@
         "declinePushUps": "Decline push-ups",
         "lowCableFly": "Low cable fly",
         "inclinePushUps": "Incline push-ups",
-        "tBarPress": "T-Bar press"
+        "tBarPress": "T-Bar press",
+        "inclineBenchFlys": "Incline bench flys"
       }
     },
     "biceps": {
@@ -925,7 +929,9 @@
         "deadBugHoldCardio": "Dead bug hold (timed)",
         "deadBugHold": "Dead bug hold",
         "hollowBodyHoldBentKnees": "Bent hollow hold",
-        "obliqueCrunches": "Oblique crunches"
+        "obliqueCrunches": "Oblique crunches",
+        "legRaiseParallelBars": "Leg raise (parallel bars)",
+        "lateralHyperextensions": "Lateral hyperextensions"
       }
     },
     "calves": {
@@ -964,9 +970,9 @@
       "name": "Shoulders",
       "exercises": {
         "shoulderPressMachine": "Shoulder press (machine)",
-        "latRaisesInclinedBench": "Lat raises (inclined bench)",
-        "latRaisesCable": "Lat raises (cable)",
-        "latRaisesDualCable": "Lat raises (cable, both arms)",
+        "latRaisesInclinedBench": "Lateral raises (inclined bench)",
+        "latRaisesCable": "Lateral raises (cable)",
+        "latRaisesDualCable": "Lateral raises (cable, both arms)",
         "reverseFlysInclinedBench": "Reverse flys (inclined bench)",
         "arnoldPress": "Arnold press",
         "frontDumbbellRaise": "Front dumbbell raise",
@@ -974,7 +980,12 @@
         "pikePushUps": "Pike push-ups",
         "handstandPushUps": "Handstand push-ups",
         "bentOverLateralRaises": "Bent-Over Lateral Raises",
-        "shoulderPress": "Shoulder press"
+        "shoulderPress": "Shoulder press",
+        "latRaisesDumbbells": "Lateral raises (dumbbells)",
+        "deltoidMachine": "Deltoid machine",
+        "shrugsBarbell": "Front shrugs (barbell)",
+        "militaryPressSmithMachine": "Multipower military press",
+        "reverseButterfly": "Reverse butterfly machine"
       }
     },
     "back": {
@@ -990,7 +1001,12 @@
         "straightArmCablePushdown": "Straight-arm cable pushdowns",
         "deadlift": "Deadlift",
         "pullUps": "Pull-ups",
-        "tBarRow": "T-Bar row"
+        "tBarRow": "T-Bar row",
+        "rowMachine": "Seated row machine",
+        "latPulldownsWideGrip": "Lat pulldowns (wide grip)",
+        "latPulldownsNarrowGrip": "Lat pulldowns (narrow grip)",
+        "tBarRowWideProneGrip": "T-Bar machine row (wide prone grip)",
+        "dumbbellRow": "Dumbbell row"
       }
     },
     "triceps": {
@@ -1003,7 +1019,8 @@
         "skullCrushers": "Skull Crushers",
         "benchDips": "Dips (bench)",
         "diamondPushUps": "Diamond push-ups",
-        "tricepsMachine": "Triceps Machine"
+        "tricepsMachine": "Triceps Machine",
+        "overheadTricepExtension": "Overhead triceps extension"
       }
     },
     "newCustomExercise": "New exercise",

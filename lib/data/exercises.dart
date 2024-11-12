@@ -261,6 +261,60 @@ final Map<GTExerciseMuscleCategory, ExerciseCategory> exerciseStandardLibrary =
         equipment: GTGymEquipment.dumbbell,
       ),
       Exercise.standard(
+        id: "library.chest.exercises.cableBenchPressFlat",
+        name: "library.chest.exercises.cableBenchPressFlat".t,
+        parameters: GTSetParameters.repsWeight,
+        primaryMuscleGroup: GTMuscleGroup.chest,
+        secondaryMuscleGroups: {GTMuscleGroup.triceps},
+        equipment: GTGymEquipment.barbell,
+        muscleHighlight: {
+          GTMuscleHighlight.midLowerPectoralis:
+              GTMuscleHighlightIntensity.primary,
+          GTMuscleHighlight.lateralHeadTriceps:
+              GTMuscleHighlightIntensity.secondary,
+          GTMuscleHighlight.medialHeadTriceps:
+              GTMuscleHighlightIntensity.secondary,
+          GTMuscleHighlight.anteriorDeltoid:
+              GTMuscleHighlightIntensity.tertiary,
+        },
+      ),
+      Exercise.standard(
+        id: "library.chest.exercises.cableBenchPressIncline",
+        name: "library.chest.exercises.cableBenchPressIncline".t,
+        parameters: GTSetParameters.repsWeight,
+        primaryMuscleGroup: GTMuscleGroup.chest,
+        secondaryMuscleGroups: {GTMuscleGroup.triceps},
+        equipment: GTGymEquipment.barbell,
+        muscleHighlight: {
+          GTMuscleHighlight.midLowerPectoralis:
+              GTMuscleHighlightIntensity.primary,
+          GTMuscleHighlight.lateralHeadTriceps:
+              GTMuscleHighlightIntensity.secondary,
+          GTMuscleHighlight.medialHeadTriceps:
+              GTMuscleHighlightIntensity.secondary,
+          GTMuscleHighlight.anteriorDeltoid:
+              GTMuscleHighlightIntensity.tertiary,
+        },
+      ),
+      Exercise.standard(
+        id: "library.chest.exercises.cableBenchPressDecline",
+        name: "library.chest.exercises.cableBenchPressDecline".t,
+        parameters: GTSetParameters.repsWeight,
+        primaryMuscleGroup: GTMuscleGroup.chest,
+        secondaryMuscleGroups: {GTMuscleGroup.triceps},
+        equipment: GTGymEquipment.barbell,
+        muscleHighlight: {
+          GTMuscleHighlight.midLowerPectoralis:
+              GTMuscleHighlightIntensity.primary,
+          GTMuscleHighlight.lateralHeadTriceps:
+              GTMuscleHighlightIntensity.secondary,
+          GTMuscleHighlight.medialHeadTriceps:
+              GTMuscleHighlightIntensity.secondary,
+          GTMuscleHighlight.anteriorDeltoid:
+              GTMuscleHighlightIntensity.tertiary,
+        },
+      ),
+      Exercise.standard(
         id: "library.chest.exercises.butterflyMachine",
         name: "library.chest.exercises.butterflyMachine".t,
         parameters: GTSetParameters.repsWeight,
@@ -408,6 +462,13 @@ final Map<GTExerciseMuscleCategory, ExerciseCategory> exerciseStandardLibrary =
         secondaryMuscleGroups: {GTMuscleGroup.triceps},
         equipment: GTGymEquipment.landmine,
       ),
+      Exercise.standard(
+        id: "library.chest.exercises.inclineBenchFlys",
+        name: "library.chest.exercises.inclineBenchFlys".t,
+        parameters: GTSetParameters.repsWeight,
+        primaryMuscleGroup: GTMuscleGroup.chest,
+        equipment: GTGymEquipment.dumbbell,
+      ),
     ],
     iconGetter: () =>
         Text("library.chest.name".t.characters.first.toUpperCase()),
@@ -541,6 +602,18 @@ final Map<GTExerciseMuscleCategory, ExerciseCategory> exerciseStandardLibrary =
       Exercise.standard(
         id: "library.abs.exercises.legRaise",
         name: "library.abs.exercises.legRaise".t,
+        parameters: GTSetParameters.freeBodyReps,
+        primaryMuscleGroup: GTMuscleGroup.abs,
+        equipment: GTGymEquipment.none,
+        muscleHighlight: {
+          GTMuscleHighlight.lowerAbdominals: GTMuscleHighlightIntensity.primary,
+          GTMuscleHighlight.upperAbdominals:
+              GTMuscleHighlightIntensity.secondary,
+        },
+      ),
+      Exercise.standard(
+        id: "library.abs.exercises.legRaiseParallelBars",
+        name: "library.abs.exercises.legRaiseParallelBars".t,
         parameters: GTSetParameters.freeBodyReps,
         primaryMuscleGroup: GTMuscleGroup.abs,
         equipment: GTGymEquipment.none,
@@ -722,6 +795,14 @@ final Map<GTExerciseMuscleCategory, ExerciseCategory> exerciseStandardLibrary =
         parameters: GTSetParameters.time,
         primaryMuscleGroup: GTMuscleGroup.obliques,
         equipment: GTGymEquipment.none,
+      ),
+      Exercise.standard(
+        id: "library.abs.exercises.lateralHyperextensions",
+        name: "library.abs.exercises.lateralHyperextensions".t,
+        parameters: GTSetParameters.repsWeight,
+        primaryMuscleGroup: GTMuscleGroup.obliques,
+        secondaryMuscleGroups: {},
+        equipment: GTGymEquipment.kettlebell,
       ),
     ],
     iconGetter: () => Text("library.abs.name".t.characters.first.toUpperCase()),
@@ -932,6 +1013,13 @@ final Map<GTExerciseMuscleCategory, ExerciseCategory> exerciseStandardLibrary =
         equipment: GTGymEquipment.cable,
       ),
       Exercise.standard(
+        id: "library.shoulders.exercises.latRaisesDumbbells",
+        name: "library.shoulders.exercises.latRaisesDumbbells".t,
+        parameters: GTSetParameters.repsWeight,
+        primaryMuscleGroup: GTMuscleGroup.shoulders,
+        equipment: GTGymEquipment.dumbbell,
+      ),
+      Exercise.standard(
         id: "library.shoulders.exercises.reverseFlysInclinedBench",
         name: "library.shoulders.exercises.reverseFlysInclinedBench".t,
         parameters: GTSetParameters.repsWeight,
@@ -1006,27 +1094,64 @@ final Map<GTExerciseMuscleCategory, ExerciseCategory> exerciseStandardLibrary =
         equipment: GTGymEquipment.none,
       ),
       Exercise.standard(
-          id: "library.shoulders.exercises.bentOverLateralRaises",
-          name: "library.shoulders.exercises.bentOverLateralRaises".t,
-          parameters: GTSetParameters.repsWeight,
-          primaryMuscleGroup: GTMuscleGroup.shoulders,
-          secondaryMuscleGroups: {
-            GTMuscleGroup.upperBack,
-            GTMuscleGroup.traps,
-            GTMuscleGroup.biceps,
-          },
-          equipment: GTGymEquipment.cable,
-          muscleHighlight: {
-            GTMuscleHighlight.lateralDeltoid:
-                GTMuscleHighlightIntensity.primary,
-            GTMuscleHighlight.posteriorDeltoid:
-                GTMuscleHighlightIntensity.primary,
-            GTMuscleHighlight.trapsMiddle: GTMuscleHighlightIntensity.secondary,
-            GTMuscleHighlight.longHeadBicep:
-                GTMuscleHighlightIntensity.tertiary,
-            GTMuscleHighlight.shortHeadBicep:
-                GTMuscleHighlightIntensity.tertiary,
-          }),
+        id: "library.shoulders.exercises.bentOverLateralRaises",
+        name: "library.shoulders.exercises.bentOverLateralRaises".t,
+        parameters: GTSetParameters.repsWeight,
+        primaryMuscleGroup: GTMuscleGroup.shoulders,
+        secondaryMuscleGroups: {
+          GTMuscleGroup.upperBack,
+          GTMuscleGroup.traps,
+          GTMuscleGroup.biceps,
+        },
+        equipment: GTGymEquipment.cable,
+        muscleHighlight: {
+          GTMuscleHighlight.lateralDeltoid: GTMuscleHighlightIntensity.primary,
+          GTMuscleHighlight.posteriorDeltoid:
+              GTMuscleHighlightIntensity.primary,
+          GTMuscleHighlight.trapsMiddle: GTMuscleHighlightIntensity.secondary,
+          GTMuscleHighlight.longHeadBicep: GTMuscleHighlightIntensity.tertiary,
+          GTMuscleHighlight.shortHeadBicep: GTMuscleHighlightIntensity.tertiary,
+        },
+      ),
+      Exercise.standard(
+        id: "library.shoulders.exercises.deltoidMachine",
+        name: "library.shoulders.exercises.deltoidMachine".t,
+        parameters: GTSetParameters.repsWeight,
+        primaryMuscleGroup: GTMuscleGroup.shoulders,
+        equipment: GTGymEquipment.machine,
+      ),
+      Exercise.standard(
+        id: "library.shoulders.exercises.shrugsBarbell",
+        name: "library.shoulders.exercises.shrugsBarbell".t,
+        parameters: GTSetParameters.repsWeight,
+        primaryMuscleGroup: GTMuscleGroup.shoulders,
+        equipment: GTGymEquipment.barbell,
+        muscleHighlight: {
+          GTMuscleHighlight.upperTrapezius:
+              GTMuscleHighlightIntensity.primary,
+          GTMuscleHighlight.lowerTrapezius:
+              GTMuscleHighlightIntensity.primary,
+          GTMuscleHighlight.trapsMiddle: GTMuscleHighlightIntensity.primary,
+          GTMuscleHighlight.lateralDeltoid: GTMuscleHighlightIntensity.secondary,
+          GTMuscleHighlight.posteriorDeltoid:
+              GTMuscleHighlightIntensity.secondary,
+        }
+      ),
+      Exercise.standard(
+        id: "library.shoulders.exercises.militaryPressSmithMachine",
+        name: "library.shoulders.exercises.militaryPressSmithMachine".t,
+        parameters: GTSetParameters.repsWeight,
+        primaryMuscleGroup: GTMuscleGroup.shoulders,
+        equipment: GTGymEquipment.machine,
+      ),
+      Exercise.standard(
+        id: "library.shoulders.exercises.reverseButterfly",
+        name: "library.shoulders.exercises.reverseButterfly".t,
+        parameters: GTSetParameters.repsWeight,
+        primaryMuscleGroup: GTMuscleGroup.shoulders,
+        secondaryMuscleGroups: {GTMuscleGroup.upperBack},
+        equipment: GTGymEquipment.machine,
+      ),
     ],
     iconGetter: () =>
         Text("library.shoulders.name".t.characters.first.toUpperCase()),
@@ -1085,6 +1210,14 @@ final Map<GTExerciseMuscleCategory, ExerciseCategory> exerciseStandardLibrary =
         equipment: GTGymEquipment.barbell,
       ),
       Exercise.standard(
+        id: "library.back.exercises.dumbbellRow",
+        name: "library.back.exercises.dumbbellRow".t,
+        parameters: GTSetParameters.repsWeight,
+        primaryMuscleGroup: GTMuscleGroup.upperBack,
+        secondaryMuscleGroups: {GTMuscleGroup.biceps, GTMuscleGroup.forearms},
+        equipment: GTGymEquipment.dumbbell,
+      ),
+      Exercise.standard(
         id: "library.back.exercises.triangleBarLatPulldowns",
         name: "library.back.exercises.triangleBarLatPulldowns".t,
         parameters: GTSetParameters.repsWeight,
@@ -1117,6 +1250,36 @@ final Map<GTExerciseMuscleCategory, ExerciseCategory> exerciseStandardLibrary =
       Exercise.standard(
         id: "library.back.exercises.latPulldowns",
         name: "library.back.exercises.latPulldowns".t,
+        parameters: GTSetParameters.repsWeight,
+        primaryMuscleGroup: GTMuscleGroup.traps,
+        secondaryMuscleGroups: {GTMuscleGroup.biceps, GTMuscleGroup.upperBack},
+        equipment: GTGymEquipment.machine,
+        muscleHighlight: {
+          GTMuscleHighlight.lowerTrapezius: GTMuscleHighlightIntensity.tertiary,
+          GTMuscleHighlight.longHeadBicep: GTMuscleHighlightIntensity.secondary,
+          GTMuscleHighlight.shortHeadBicep:
+              GTMuscleHighlightIntensity.secondary,
+          GTMuscleHighlight.lats: GTMuscleHighlightIntensity.primary,
+        },
+      ),
+      Exercise.standard(
+        id: "library.back.exercises.latPulldownsWideGrip",
+        name: "library.back.exercises.latPulldownsWideGrip".t,
+        parameters: GTSetParameters.repsWeight,
+        primaryMuscleGroup: GTMuscleGroup.traps,
+        secondaryMuscleGroups: {GTMuscleGroup.biceps, GTMuscleGroup.upperBack},
+        equipment: GTGymEquipment.machine,
+        muscleHighlight: {
+          GTMuscleHighlight.lowerTrapezius: GTMuscleHighlightIntensity.tertiary,
+          GTMuscleHighlight.longHeadBicep: GTMuscleHighlightIntensity.secondary,
+          GTMuscleHighlight.shortHeadBicep:
+              GTMuscleHighlightIntensity.secondary,
+          GTMuscleHighlight.lats: GTMuscleHighlightIntensity.primary,
+        },
+      ),
+      Exercise.standard(
+        id: "library.back.exercises.latPulldownsNarrowGrip",
+        name: "library.back.exercises.latPulldownsNarrowGrip".t,
         parameters: GTSetParameters.repsWeight,
         primaryMuscleGroup: GTMuscleGroup.traps,
         secondaryMuscleGroups: {GTMuscleGroup.biceps, GTMuscleGroup.upperBack},
@@ -1170,6 +1333,32 @@ final Map<GTExerciseMuscleCategory, ExerciseCategory> exerciseStandardLibrary =
           GTMuscleGroup.lowerBack,
         },
         equipment: GTGymEquipment.landmine,
+      ),
+      Exercise.standard(
+        id: "library.back.exercises.tBarRowWideProneGrip",
+        name: "library.back.exercises.tBarRowWideProneGrip".t,
+        parameters: GTSetParameters.repsWeight,
+        primaryMuscleGroup: GTMuscleGroup.lats,
+        secondaryMuscleGroups: {
+          GTMuscleGroup.biceps,
+          GTMuscleGroup.lowerBack,
+        },
+        equipment: GTGymEquipment.machine,
+      ),
+      Exercise.standard(
+        id: "library.back.exercises.rowMachine",
+        name: "library.back.exercises.rowMachine".t,
+        parameters: GTSetParameters.repsWeight,
+        primaryMuscleGroup: GTMuscleGroup.lats,
+        secondaryMuscleGroups: {GTMuscleGroup.biceps, GTMuscleGroup.traps},
+        equipment: GTGymEquipment.machine,
+        muscleHighlight: {
+          GTMuscleHighlight.lats: GTMuscleHighlightIntensity.primary,
+          GTMuscleHighlight.longHeadBicep: GTMuscleHighlightIntensity.secondary,
+          GTMuscleHighlight.shortHeadBicep:
+              GTMuscleHighlightIntensity.secondary,
+          GTMuscleHighlight.lowerTrapezius: GTMuscleHighlightIntensity.tertiary,
+        },
       ),
     ],
     iconGetter: () =>
@@ -1251,6 +1440,13 @@ final Map<GTExerciseMuscleCategory, ExerciseCategory> exerciseStandardLibrary =
         primaryMuscleGroup: GTMuscleGroup.triceps,
         secondaryMuscleGroups: {},
         equipment: GTGymEquipment.machine,
+      ),
+      Exercise.standard(
+        id: "library.triceps.exercises.overheadTricepExtension",
+        name: "library.triceps.exercises.overheadTricepExtension".t,
+        parameters: GTSetParameters.repsWeight,
+        primaryMuscleGroup: GTMuscleGroup.triceps,
+        equipment: GTGymEquipment.dumbbell,
       ),
     ],
     iconGetter: () =>

@@ -95,6 +95,18 @@ class $GTStandardLibraryChestExercises {
   /// Butterfly Machine
   String get butterflyMachine => 'library.chest.exercises.butterflyMachine';
 
+  /// Bench press (cables, decline)
+  String get cableBenchPressDecline =>
+      'library.chest.exercises.cableBenchPressDecline';
+
+  /// Bench press (cables)
+  String get cableBenchPressFlat =>
+      'library.chest.exercises.cableBenchPressFlat';
+
+  /// Bench press (cables, incline)
+  String get cableBenchPressIncline =>
+      'library.chest.exercises.cableBenchPressIncline';
+
   /// Cable chest press
   String get cableChestPress => 'library.chest.exercises.cableChestPress';
 
@@ -118,6 +130,9 @@ class $GTStandardLibraryChestExercises {
 
   /// Dumbbell Hex Press
   String get dumbbellHexPress => 'library.chest.exercises.dumbbellHexPress';
+
+  /// Incline bench flys
+  String get inclineBenchFlys => 'library.chest.exercises.inclineBenchFlys';
 
   /// Incline push-ups
   String get inclinePushUps => 'library.chest.exercises.inclinePushUps';
@@ -162,6 +177,9 @@ class $GTStandardLibraryChestExercises {
         barbellBenchPressFlat,
         barbellBenchPressIncline,
         butterflyMachine,
+        cableBenchPressDecline,
+        cableBenchPressFlat,
+        cableBenchPressIncline,
         cableChestPress,
         cableFlyCrossovers,
         declinePushUps,
@@ -169,6 +187,7 @@ class $GTStandardLibraryChestExercises {
         dumbbellBenchPressFlat,
         dumbbellBenchPressIncline,
         dumbbellHexPress,
+        inclineBenchFlys,
         inclinePushUps,
         lowCableFly,
         pushUps,
@@ -278,8 +297,16 @@ class $GTStandardLibraryAbsExercises {
   /// Knee raise
   String get kneeRaise => 'library.abs.exercises.kneeRaise';
 
+  /// Lateral hyperextensions
+  String get lateralHyperextensions =>
+      'library.abs.exercises.lateralHyperextensions';
+
   /// Leg raise
   String get legRaise => 'library.abs.exercises.legRaise';
+
+  /// Leg raise (parallel bars)
+  String get legRaiseParallelBars =>
+      'library.abs.exercises.legRaiseParallelBars';
 
   /// Oblique crunches
   String get obliqueCrunches => 'library.abs.exercises.obliqueCrunches';
@@ -306,7 +333,9 @@ class $GTStandardLibraryAbsExercises {
         hollowBodyHold,
         hollowBodyHoldBentKnees,
         kneeRaise,
+        lateralHyperextensions,
         legRaise,
+        legRaiseParallelBars,
         obliqueCrunches,
         plank,
         russianTwist,
@@ -425,6 +454,9 @@ class $GTStandardLibraryShouldersExercises {
   String get bentOverLateralRaises =>
       'library.shoulders.exercises.bentOverLateralRaises';
 
+  /// Deltoid machine
+  String get deltoidMachine => 'library.shoulders.exercises.deltoidMachine';
+
   /// Front dumbbell raise
   String get frontDumbbellRaise =>
       'library.shoulders.exercises.frontDumbbellRaise';
@@ -432,19 +464,30 @@ class $GTStandardLibraryShouldersExercises {
   /// Handstand push-ups
   String get handstandPushUps => 'library.shoulders.exercises.handstandPushUps';
 
-  /// Lat raises (cable)
+  /// Lateral raises (cable)
   String get latRaisesCable => 'library.shoulders.exercises.latRaisesCable';
 
-  /// Lat raises (cable, both arms)
+  /// Lateral raises (cable, both arms)
   String get latRaisesDualCable =>
       'library.shoulders.exercises.latRaisesDualCable';
 
-  /// Lat raises (inclined bench)
+  /// Lateral raises (dumbbells)
+  String get latRaisesDumbbells =>
+      'library.shoulders.exercises.latRaisesDumbbells';
+
+  /// Lateral raises (inclined bench)
   String get latRaisesInclinedBench =>
       'library.shoulders.exercises.latRaisesInclinedBench';
 
+  /// Multipower military press
+  String get militaryPressSmithMachine =>
+      'library.shoulders.exercises.militaryPressSmithMachine';
+
   /// Pike push-ups
   String get pikePushUps => 'library.shoulders.exercises.pikePushUps';
+
+  /// Reverse butterfly machine
+  String get reverseButterfly => 'library.shoulders.exercises.reverseButterfly';
 
   /// Reverse flys (inclined bench)
   String get reverseFlysInclinedBench =>
@@ -457,21 +500,29 @@ class $GTStandardLibraryShouldersExercises {
   String get shoulderPressMachine =>
       'library.shoulders.exercises.shoulderPressMachine';
 
+  /// Front shrugs (barbell)
+  String get shrugsBarbell => 'library.shoulders.exercises.shrugsBarbell';
+
   /// Upright row
   String get uprightRow => 'library.shoulders.exercises.uprightRow';
 
   List<String> get values => [
         arnoldPress,
         bentOverLateralRaises,
+        deltoidMachine,
         frontDumbbellRaise,
         handstandPushUps,
         latRaisesCable,
         latRaisesDualCable,
+        latRaisesDumbbells,
         latRaisesInclinedBench,
+        militaryPressSmithMachine,
         pikePushUps,
+        reverseButterfly,
         reverseFlysInclinedBench,
         shoulderPress,
         shoulderPressMachine,
+        shrugsBarbell,
         uprightRow
       ];
 }
@@ -489,14 +540,28 @@ class $GTStandardLibraryBackExercises {
   /// Deadlift
   String get deadlift => 'library.back.exercises.deadlift';
 
+  /// Dumbbell row
+  String get dumbbellRow => 'library.back.exercises.dumbbellRow';
+
   /// Hyperextensions
   String get hyperExtensions => 'library.back.exercises.hyperExtensions';
 
   /// Lat pulldowns
   String get latPulldowns => 'library.back.exercises.latPulldowns';
 
+  /// Lat pulldowns (narrow grip)
+  String get latPulldownsNarrowGrip =>
+      'library.back.exercises.latPulldownsNarrowGrip';
+
+  /// Lat pulldowns (wide grip)
+  String get latPulldownsWideGrip =>
+      'library.back.exercises.latPulldownsWideGrip';
+
   /// Pull-ups
   String get pullUps => 'library.back.exercises.pullUps';
+
+  /// Seated row machine
+  String get rowMachine => 'library.back.exercises.rowMachine';
 
   /// Straight-arm cable pushdowns
   String get straightArmCablePushdown =>
@@ -504,6 +569,10 @@ class $GTStandardLibraryBackExercises {
 
   /// T-Bar row
   String get tBarRow => 'library.back.exercises.tBarRow';
+
+  /// T-Bar machine row (wide prone grip)
+  String get tBarRowWideProneGrip =>
+      'library.back.exercises.tBarRowWideProneGrip';
 
   /// Lat pulldowns (triangle bar)
   String get triangleBarLatPulldowns =>
@@ -521,11 +590,16 @@ class $GTStandardLibraryBackExercises {
         barbellRow,
         cableSeatedRowTriangleBar,
         deadlift,
+        dumbbellRow,
         hyperExtensions,
         latPulldowns,
+        latPulldownsNarrowGrip,
+        latPulldownsWideGrip,
         pullUps,
+        rowMachine,
         straightArmCablePushdown,
         tBarRow,
+        tBarRowWideProneGrip,
         triangleBarLatPulldowns,
         underhandGripLatPulldowns,
         weightedHyperExtensions
@@ -548,6 +622,10 @@ class $GTStandardLibraryTricepsExercises {
   String get overheadRopeTricepExtension =>
       'library.triceps.exercises.overheadRopeTricepExtension';
 
+  /// Overhead triceps extension
+  String get overheadTricepExtension =>
+      'library.triceps.exercises.overheadTricepExtension';
+
   /// Skull Crushers
   String get skullCrushers => 'library.triceps.exercises.skullCrushers';
 
@@ -566,6 +644,7 @@ class $GTStandardLibraryTricepsExercises {
         diamondPushUps,
         dips,
         overheadRopeTricepExtension,
+        overheadTricepExtension,
         skullCrushers,
         tricepKickbacks,
         tricepsMachine,

@@ -25,6 +25,7 @@ jobs:
           DOTENV: ${{ secrets.DOTENV }}
         run: |
           echo $DOTENV > .env
+          set -a; source .env; set +a
           dart run build_runner clean && dart run build_runner build --delete-conflicting-outputs
       - name: Run Flutter tests
         run: flutter test

@@ -37,6 +37,7 @@ jobs:
           DOTENV: ${{ secrets.DOTENV }}
         run: |
           echo $DOTENV > .env
+          set -a; source .env; set +a
           dart run build_runner clean && dart run build_runner build --delete-conflicting-outputs
       - name: Install Rust
         uses: actions-rust-lang/setup-rust-toolchain@v1
@@ -111,6 +112,13 @@ jobs:
 
       - name: Install Rust
         uses: actions-rust-lang/setup-rust-toolchain@v1
+      - name: Build env
+        env:
+          DOTENV: ${{ secrets.DOTENV }}
+        run: |
+          echo $DOTENV > .env
+          set -a; source .env; set +a
+          dart run build_runner clean && dart run build_runner build --delete-conflicting-outputs
       - name: Build
         run: tools/build_android.sh -${{ matrix.flag }}
       - name: Release

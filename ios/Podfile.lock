@@ -1,4 +1,6 @@
 PODS:
+  - app_links (0.0.2):
+    - Flutter
   - audioplayers_darwin (0.0.1):
     - Flutter
   - camera_avfoundation (0.0.1):
@@ -66,6 +68,9 @@ PODS:
   - SDWebImage/Core (5.15.0)
   - share_plus (0.0.1):
     - Flutter
+  - shared_preferences_foundation (0.0.1):
+    - Flutter
+    - FlutterMacOS
   - "sqlite3 (3.46.1+1)":
     - "sqlite3/common (= 3.46.1+1)"
   - "sqlite3/common (3.46.1+1)"
@@ -89,6 +94,7 @@ PODS:
     - Flutter
 
 DEPENDENCIES:
+  - app_links (from `.symlinks/plugins/app_links/ios`)
   - audioplayers_darwin (from `.symlinks/plugins/audioplayers_darwin/ios`)
   - camera_avfoundation (from `.symlinks/plugins/camera_avfoundation/ios`)
   - device_info_plus (from `.symlinks/plugins/device_info_plus/ios`)
@@ -105,6 +111,7 @@ DEPENDENCIES:
   - permission_handler_apple (from `.symlinks/plugins/permission_handler_apple/ios`)
   - protocol_handler_ios (from `.symlinks/plugins/protocol_handler_ios/ios`)
   - share_plus (from `.symlinks/plugins/share_plus/ios`)
+  - shared_preferences_foundation (from `.symlinks/plugins/shared_preferences_foundation/darwin`)
   - sqlite3_flutter_libs (from `.symlinks/plugins/sqlite3_flutter_libs/ios`)
   - url_launcher_ios (from `.symlinks/plugins/url_launcher_ios/ios`)
 
@@ -117,6 +124,8 @@ SPEC REPOS:
     - SwiftyGif
 
 EXTERNAL SOURCES:
+  app_links:
+    :path: ".symlinks/plugins/app_links/ios"
   audioplayers_darwin:
     :path: ".symlinks/plugins/audioplayers_darwin/ios"
   camera_avfoundation:
@@ -149,12 +158,15 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/protocol_handler_ios/ios"
   share_plus:
     :path: ".symlinks/plugins/share_plus/ios"
+  shared_preferences_foundation:
+    :path: ".symlinks/plugins/shared_preferences_foundation/darwin"
   sqlite3_flutter_libs:
     :path: ".symlinks/plugins/sqlite3_flutter_libs/ios"
   url_launcher_ios:
     :path: ".symlinks/plugins/url_launcher_ios/ios"
 
 SPEC CHECKSUMS:
+  app_links: e7a6750a915a9e161c58d91bc610e8cd1d4d0ad0
   audioplayers_darwin: 877d9a4d06331c5c374595e46e16453ac7eafa40
   camera_avfoundation: dd002b0330f4981e1bbcb46ae9b62829237459a4
   device_info_plus: 97af1d7e84681a90d0693e63169a5d50e0839a0d
@@ -174,6 +186,7 @@ SPEC CHECKSUMS:
   protocol_handler_ios: a5db8abc38526ee326988b808be621e5fd568990
   SDWebImage: 9bec4c5cdd9579e1f57104735ee0c37df274d593
   share_plus: 8875f4f2500512ea181eef553c3e27dba5135aad
+  shared_preferences_foundation: fcdcbc04712aee1108ac7fda236f363274528f78
   sqlite3: 0bb0e6389d824e40296f531b858a2a0b71c0d2fb
   sqlite3_flutter_libs: c00457ebd31e59fa6bb830380ddba24d44fbcd3b
   SwiftyGif: 93a1cc87bf3a51916001cf8f3d63835fb64c819f

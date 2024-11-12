@@ -24,9 +24,12 @@ jobs:
       - run: flutter pub get
       
       - name: Build env
+        env:
+          DOTENV: ${{ secrets.DOTENV }}
         run: |
+          echo $DOTENV > .env
           dart run build_runner clean && dart run build_runner build --delete-conflicting-outputs
-          
+
       # Build the app before running the integration tests
       # This is apparently necessary for the integration tests to work
       # without timing out

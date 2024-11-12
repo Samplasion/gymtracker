@@ -20,10 +20,8 @@ jobs:
           flutter-version: "3.24.3"
       - name: Get Flutter packages
         run: flutter pub get
-      - name: Install environment variables
-        env:
-          DOTENV: ${{ secrets.DOTENV }}
+      - name: Build env
         run: |
-          echo $DOTENV > .env
+          dart run build_runner clean && dart run build_runner build --delete-conflicting-outputs
       - name: Run Flutter tests
         run: flutter test

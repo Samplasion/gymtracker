@@ -6,7 +6,6 @@ import 'package:dynamic_color/dynamic_color.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart' hide Localizations;
 import 'package:flutter/services.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:get/get.dart';
@@ -17,6 +16,7 @@ import 'package:gymtracker/controller/settings_controller.dart';
 import 'package:gymtracker/model/preferences.dart';
 import 'package:gymtracker/service/color.dart';
 import 'package:gymtracker/service/database.dart';
+import 'package:gymtracker/service/env.dart';
 import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/service/logger.dart';
 import 'package:gymtracker/service/version.dart';
@@ -36,11 +36,9 @@ import 'package:timezone/timezone.dart' as tz;
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  await dotenv.load(fileName: ".env");
-
   await Supabase.initialize(
-    url: dotenv.env['SUPABASE_INSTANCE']!,
-    anonKey: dotenv.env['SUPABASE_ANON_KEY']!,
+    url: Env.supabaseInstance,
+    anonKey: Env.supabaseAnonKey,
   );
 
   AudioCache.instance = AudioCache(prefix: '');

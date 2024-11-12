@@ -32,11 +32,9 @@ jobs:
         run: brew install bash
       - name: Export brew path
         run: echo "/usr/local/bin" >> $GITHUB_PATH
-      - name: Install environment variables
-        env:
-          DOTENV: ${{ secrets.DOTENV }}
+      - name: Build env
         run: |
-          echo $DOTENV > .env
+          dart run build_runner clean && dart run build_runner build --delete-conflicting-outputs
       - name: Install Rust
         uses: actions-rust-lang/setup-rust-toolchain@v1
       - name: Build
@@ -107,11 +105,7 @@ jobs:
           echo 'keyAlias=${{ secrets.SECRET_KEY_ALIAS }}' >> key.properties
           echo 'storeFile=${{ env.TMP_KEYSTORE_FILE_PATH }}' >> key.properties
           mv key.properties android/
-      - name: Install environment variables
-        env:
-          DOTENV: ${{ secrets.DOTENV }}
-        run: |
-          echo $DOTENV > .env
+
       - name: Install Rust
         uses: actions-rust-lang/setup-rust-toolchain@v1
       - name: Build

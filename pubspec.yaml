@@ -69,10 +69,11 @@ dependencies:
   flutter_svg: ^2.0.10+1
   xml: ^6.5.0
   rainbow_color: ^2.0.1
+  audioplayers: ^6.1.0
   flex_color_scheme: ^8.0.0
   supabase_flutter: ^2.8.0
-  flutter_dotenv: ^5.2.1
   pub_semver: ^2.1.4
+  envied: ^0.5.4+1
   
 dev_dependencies:
   flutter_test:
@@ -88,7 +89,7 @@ dev_dependencies:
     sdk: flutter
   test: ^1.24.3
   flutter_gen_runner: ^5.8.0
-  audioplayers: ^6.1.0
+  envied_generator: ^0.5.4+1
 
 flutter_gen:
   assets:
@@ -108,7 +109,6 @@ flutter:
 
   uses-material-design: true
   assets:
-    - .env
     - assets/audio/
     - assets/i18n/
     - assets/svg/

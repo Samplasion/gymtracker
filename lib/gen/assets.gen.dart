@@ -1088,8 +1088,12 @@ class $AssetsExercisesTricepsTricepsRopePushdownGen {
 class GTAssets {
   GTAssets._();
 
+  static const String aEnv = '.env';
   static const $AssetsAudioGen audio = $AssetsAudioGen();
   static const $AssetsExercisesGen exercises = $AssetsExercisesGen();
   static const $AssetsI18nGen i18n = $AssetsI18nGen();
   static const $AssetsSvgGen svg = $AssetsSvgGen();
+
+  /// List of all assets
+  static List<String> get values => [aEnv];
 }

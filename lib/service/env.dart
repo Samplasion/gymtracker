@@ -1,0 +1,12 @@
+import 'package:envied/envied.dart';
+
+part 'env.g.dart';
+
+@envied
+abstract class Env {
+  @EnviedField(varName: 'SUPABASE_INSTANCE')
+  static const String supabaseInstance = _Env.supabaseInstance;
+
+  @EnviedField(varName: 'SUPABASE_ANON_KEY')
+  static const String supabaseAnonKey = _Env.supabaseAnonKey;
+}

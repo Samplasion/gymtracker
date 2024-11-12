@@ -51,3 +51,4 @@ accent.json
 
 # Env
 .env
+env.g.dart

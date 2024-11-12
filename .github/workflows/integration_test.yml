@@ -22,6 +22,12 @@ jobs:
           cache: true
 
       - run: flutter pub get
+      
+      - name: Install environment variables
+        env:
+          DOTENV: ${{ secrets.DOTENV }}
+        run: |
+          echo $DOTENV > .env
 
       # Build the app before running the integration tests
       # This is apparently necessary for the integration tests to work

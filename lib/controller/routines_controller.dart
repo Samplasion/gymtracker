@@ -635,6 +635,12 @@ class RoutinesController extends GetxController
         ),
     ]);
   }
+
+  void installRoutines(List<Workout> routines) {
+    for (final routine in routines) {
+      service.setRoutine(routine);
+    }
+  }
 }
 
 class ShareRoutineAlertDialog extends StatefulWidget {

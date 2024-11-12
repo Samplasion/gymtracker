@@ -2267,5 +2267,16 @@
       "title": "Empty workout",
       "text": "Change your filters and try again"
     }
+  },
+  "boutique": {
+    "title": "Programs",
+    "package": {
+      "install": "Install",
+      "installed": "The package has been installed."
+    },
+    "errors": {
+      "unknown": "Loading failed. Check your Internet connection and retry.",
+      "version": "This version of the app is not compatible with the program shop. Update to the latest version and try again."
+    }
   }
 }

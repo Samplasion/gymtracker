@@ -874,6 +874,9 @@
         "smithMachineBenchPressFlat": "Panca piana (Multipower)",
         "smithMachineBenchPressIncline": "Panca inclinata (Multipower, in avanti)",
         "smithMachineBenchPressDecline": "Panca inclinata (Multipower, all'indietro)",
+        "cableBenchPressFlat": "Panca piana (cavi)",
+        "cableBenchPressIncline": "Panca inclinata (cavi, in avanti)",
+        "cableBenchPressDecline": "Panca inclinata (cavi, all'indietro)",
         "butterflyMachine": "Butterfly machine",
         "dumbbellHexPress": "Hex Press (manubri)",
         "smithMachineHexPress": "Hex Press al Multipower",
@@ -886,7 +889,8 @@
         "declinePushUps": "Push-up declinati",
         "lowCableFly": "Croci ai cavi bassi",
         "inclinePushUps": "Push-up inclinati",
-        "tBarPress": "Pressa con bilanciere a T"
+        "tBarPress": "Pressa con bilanciere a T",
+        "inclineBenchFlys": "Croci su panca inclinata"
       }
     },
     "biceps": {
@@ -924,7 +928,9 @@
         "deadBugHoldCardio": "Dead bug hold (a tempo)",
         "deadBugHold": "Dead bug hold",
         "hollowBodyHoldBentKnees": "Bent hollow hold",
-        "obliqueCrunches": "Crunch obliqui"
+        "obliqueCrunches": "Crunch obliqui",
+        "legRaiseParallelBars": "Sollevamento delle gambe alle parallele",
+        "lateralHyperextensions": "Iperestensioni laterali"
       }
     },
     "calves": {
@@ -973,7 +979,12 @@
         "pikePushUps": "Pike push-up",
         "handstandPushUps": "Flessioni in verticale",
         "bentOverLateralRaises": "Alzate laterali al cavo basso con busto a 90°",
-        "shoulderPress": "Shoulder press"
+        "shoulderPress": "Shoulder press",
+        "latRaisesDumbbells": "Alzate laterali (manubri)",
+        "deltoidMachine": "Deltoid machine",
+        "shrugsBarbell": "Scrollate con bilanciere davanti",
+        "militaryPressSmithMachine": "Lento avanti al multipower",
+        "reverseButterfly": "Reverse butterfly machine"
       }
     },
     "back": {
@@ -989,7 +1000,12 @@
         "straightArmCablePushdown": "Pulldown a braccia dritte",
         "deadlift": "Stacchi",
         "pullUps": "Pull-up",
-        "tBarRow": "Rematore con bilanciere a T"
+        "tBarRow": "Rematore con bilanciere a T",
+        "rowMachine": "Vogatore (macchinario)",
+        "latPulldownsNarrowGrip": "Lat machine (presa stretta)",
+        "latPulldownsWideGrip": "Lat machine (presa larga)",
+        "tBarRowWideProneGrip": "Rematore T-Bar machine (presa larga prona)",
+        "dumbbellRow": "Rematore con manubrio"
       }
     },
     "triceps": {
@@ -1002,7 +1018,8 @@
         "skullCrushers": "Skull Crushers",
         "benchDips": "Dip alla panca",
         "diamondPushUps": "Flessioni a diamante",
-        "tricepsMachine": "Triceps machine"
+        "tricepsMachine": "Triceps machine",
+        "overheadTricepExtension": "Estensione verticale dei tricipiti con manubri"
       }
     },
     "custom": {
@@ -2248,6 +2265,17 @@
     "empty": {
       "title": "Allenamento vuoto",
       "text": "Cambia i filtri e riprova"
+    }
+  },
+  "boutique": {
+    "title": "Schede",
+    "package": {
+      "install": "Installa",
+      "installed": "Il pacchetto è stato installato."
+    },
+    "errors": {
+      "unknown": "Caricamento fallito. Controlla la connessione a Internet e riprova.",
+      "version": "Questa versione dell'app non è compatibile con lo store di schede. Aggiorna all'ultima versione dell'app e riprova."
     }
   }
 }

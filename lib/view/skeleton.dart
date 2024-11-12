@@ -21,6 +21,7 @@ import 'package:gymtracker/utils/constants.dart';
 import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/view/achievements.dart';
+import 'package:gymtracker/view/boutique.dart';
 import 'package:gymtracker/view/components/badges.dart';
 import 'package:gymtracker/view/debug.dart';
 import 'package:gymtracker/view/food.dart';
@@ -184,6 +185,7 @@ class _SkeletonViewState extends State<SkeletonView>
         const RoutinesView(),
         const LibraryView(),
         const HistoryView(),
+        const BoutiqueView(),
         const MeView(),
         const FoodView(),
         const AchievementsView(),
@@ -375,6 +377,13 @@ class _SkeletonViewState extends State<SkeletonView>
               ],
             ],
           ),
+          textAlign: TextAlign.center,
+        ),
+      ),
+      NavigationDrawerDestination(
+        icon: const Icon(GTIcons.boutique),
+        label: Text(
+          "boutique.title".t,
           textAlign: TextAlign.center,
         ),
       ),

@@ -1,5 +1,7 @@
 import 'dart:math';
 
+import 'package:flutter/material.dart';
+import 'package:gymtracker/model/boutique.dart';
 import 'package:gymtracker/model/exercise.dart';
 import 'package:gymtracker/model/set.dart';
 import 'package:gymtracker/model/workout.dart';
@@ -123,3 +125,18 @@ List<Food> skeletonFoods(int length) => ([
         ),
       ],
     ]);
+
+BoutiqueCategory skeletonBoutiqueCategory([int? seed]) => BoutiqueCategory(
+  id: BoneMock.chars(10),
+  name: {
+    "en": BoneMock.words(Random(seed).nextInt(2) + 1),
+  },
+  color: [
+    Colors.red,
+    Colors.orange,
+    Colors.yellow,
+    Colors.green,
+    Colors.blue,
+    Colors.indigo,
+  ][Random(seed).nextInt(6)],
+);

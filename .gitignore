@@ -48,3 +48,6 @@ out/
 
 # Internationalization
 accent.json
+
+# Env
+.env

@@ -70,6 +70,9 @@ dependencies:
   xml: ^6.5.0
   rainbow_color: ^2.0.1
   flex_color_scheme: ^8.0.0
+  supabase_flutter: ^2.8.0
+  flutter_dotenv: ^5.2.1
+  pub_semver: ^2.1.4
   
 dev_dependencies:
   flutter_test:
@@ -105,6 +108,7 @@ flutter:
 
   uses-material-design: true
   assets:
+    - .env
     - assets/audio/
     - assets/i18n/
     - assets/svg/

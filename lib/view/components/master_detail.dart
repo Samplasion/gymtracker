@@ -104,6 +104,7 @@ class MasterDetailView extends StatefulWidget {
   final Breakpoints breakpoint;
   final double masterWidth;
   final Widget? appBarTitle;
+  final List<Widget> appBarActions;
   final Widget? leading;
   final List items;
   final Widget? nothingSelectedWidget;
@@ -114,6 +115,7 @@ class MasterDetailView extends StatefulWidget {
     this.breakpoint = Breakpoints.l,
     this.masterWidth = 320,
     this.appBarTitle,
+    this.appBarActions = const [],
     this.leading,
     this.items = const [],
     this.nothingSelectedWidget,
@@ -160,6 +162,7 @@ class _MasterDetailViewState extends State<MasterDetailView> {
         appBar: AppBar(
           title: widget.appBarTitle,
           leading: widget.leading,
+          actions: widget.appBarActions,
           notificationPredicate: (notification) {
             return focus == MDVFocus.master;
           },
@@ -227,43 +230,57 @@ class _MasterDetailViewState extends State<MasterDetailView> {
               ),
             ),
             Expanded(
-              child: AnimatedSwitcher(
-                duration: widget.transitionAnimationDuration,
-                transitionBuilder:
-                    (Widget child, Animation<double> animation) =>
-                        const FadeUpwardsPageTransitionsBuilder()
-                            .buildTransitions<void>(
-                  null,
-                  null,
-                  animation,
-                  null,
-                  child,
-                ),
-                child: Padding(
-                  key: _getKey(),
-                  padding: const EdgeInsetsDirectional.only(
-                    end: 12,
+              child: SafeArea(
+                left: false,
+                top: false,
+                bottom: false,
+                child: MediaQuery(
+                  data: MediaQuery.of(context).copyWith(
+                    padding: MediaQuery.of(context).padding.copyWith(
+                          left: 0,
+                          right: 0,
+                        ),
                   ),
-                  child: Material(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.vertical(
-                        top: Radius.circular(widget.detailsPanelCornersRadius),
+                  child: AnimatedSwitcher(
+                    duration: widget.transitionAnimationDuration,
+                    transitionBuilder:
+                        (Widget child, Animation<double> animation) =>
+                            const FadeUpwardsPageTransitionsBuilder()
+                                .buildTransitions<void>(
+                      null,
+                      null,
+                      animation,
+                      null,
+                      child,
+                    ),
+                    child: Padding(
+                      key: _getKey(),
+                      padding: const EdgeInsetsDirectional.only(
+                        end: 12,
                       ),
-                    ),
-                    color: ElevationOverlay.applySurfaceTint(
-                      colorScheme.surface,
-                      colorScheme.surfaceTint,
-                      selectedItem == null ? 0 : 1,
-                    ),
-                    elevation: selectedItem == null ? 0 : 10,
-                    clipBehavior: Clip.antiAlias,
-                    child: MDVConfiguration(
-                      selfPage: false,
-                      child: selectedItem?.detailsBuilder?.call(context) ??
-                          Center(
-                            child: widget.nothingSelectedWidget ??
-                                const SizedBox(),
+                      child: Material(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.vertical(
+                            top: Radius.circular(
+                                widget.detailsPanelCornersRadius),
                           ),
+                        ),
+                        color: ElevationOverlay.applySurfaceTint(
+                          colorScheme.surface,
+                          colorScheme.surfaceTint,
+                          selectedItem == null ? 0 : 1,
+                        ),
+                        elevation: selectedItem == null ? 0 : 10,
+                        clipBehavior: Clip.antiAlias,
+                        child: MDVConfiguration(
+                          selfPage: false,
+                          child: selectedItem?.detailsBuilder?.call(context) ??
+                              Center(
+                                child: widget.nothingSelectedWidget ??
+                                    const SizedBox(),
+                              ),
+                        ),
+                      ),
                     ),
                   ),
                 ),
@@ -314,6 +331,7 @@ class _MasterDetailViewState extends State<MasterDetailView> {
                       SliverAppBar.large(
                         title: widget.appBarTitle,
                         leading: widget.leading,
+                        actions: widget.appBarActions,
                       ),
                       SliverList(
                         delegate: SliverChildBuilderDelegate(

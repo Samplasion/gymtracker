@@ -1,6 +1,7 @@
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get/get.dart' hide Rx;
 import 'package:gymtracker/controller/achievements_controller.dart';
+import 'package:gymtracker/controller/boutique_controller.dart';
 import 'package:gymtracker/controller/countdown_controller.dart';
 import 'package:gymtracker/controller/debug_controller.dart';
 import 'package:gymtracker/controller/error_controller.dart';
@@ -32,21 +33,23 @@ class Coordinator extends GetxController with ServiceableController {
   @override
   void onServiceChange() {}
 
+  T get<T>() => Get.find<T>();
+
   Future awaitInitialized() async {
     showPermissionTilesStream = BehaviorSubject<bool>.seeded(true);
 
     await Future.wait([
       Go.awaitInitialization(),
-      Get.find<SettingsController>().awaitInitialized(),
-      Get.find<NotificationController>().initialize(),
+      get<SettingsController>().awaitInitialized(),
+      get<NotificationController>().initialize(),
     ]);
 
     showPermissionTilesStream.add(
-        Get.find<NotificationController>().showSettingsTileStream.value ||
-            Get.find<FoodController>().showSettingsTileStream.value);
+        get<NotificationController>().showSettingsTileStream.value ||
+            get<FoodController>().showSettingsTileStream.value);
     Rx.combineLatest([
-      Get.find<NotificationController>().showSettingsTileStream,
-      Get.find<FoodController>().showSettingsTileStream,
+      get<NotificationController>().showSettingsTileStream,
+      get<FoodController>().showSettingsTileStream,
     ], (e) {
       logger.d("Show permission tiles: $e");
       return e.any((element) => element);
@@ -74,6 +77,7 @@ class Coordinator extends GetxController with ServiceableController {
     Get.delete<MigrationsController>();
     Get.delete<FoodController>();
     Get.delete<AchievementsController>();
+    Get.delete<BoutiqueController>();
 
     super.onClose();
   }
@@ -93,6 +97,7 @@ class Coordinator extends GetxController with ServiceableController {
     Get.put(MigrationsController());
     Get.put(FoodController());
     Get.put(AchievementsController());
+    Get.put(BoutiqueController());
 
     logger.d((service.hasOngoing, service.getOngoingData()));
     if (service.hasOngoing) {
@@ -102,43 +107,43 @@ class Coordinator extends GetxController with ServiceableController {
 
   bool hasExercise(Exercise exercise) {
     final isInWorkout = Get.isRegistered<WorkoutController>() &&
-        Get.find<WorkoutController>().hasExercise(exercise);
-    final isInHistory = Get.find<HistoryController>().hasExercise(exercise);
-    final isInRoutines = Get.find<RoutinesController>().hasExercise(exercise);
+        get<WorkoutController>().hasExercise(exercise);
+    final isInHistory = get<HistoryController>().hasExercise(exercise);
+    final isInRoutines = get<RoutinesController>().hasExercise(exercise);
     return isInWorkout || isInHistory || isInRoutines;
   }
 
   Future<void> applyExerciseModification(Exercise ex) async {
-    if (Get.find<HistoryController>().hasExercise(ex)) {
-      await Get.find<HistoryController>().applyExerciseModification(ex);
+    if (get<HistoryController>().hasExercise(ex)) {
+      await get<HistoryController>().applyExerciseModification(ex);
     }
-    if (Get.find<RoutinesController>().hasExercise(ex)) {
-      await Get.find<RoutinesController>().applyExerciseModification(ex);
+    if (get<RoutinesController>().hasExercise(ex)) {
+      await get<RoutinesController>().applyExerciseModification(ex);
     }
     if (Get.isRegistered<WorkoutController>() &&
-        Get.find<WorkoutController>().hasExercise(ex)) {
-      Get.find<WorkoutController>().applyExerciseModification(ex);
+        get<WorkoutController>().hasExercise(ex)) {
+      get<WorkoutController>().applyExerciseModification(ex);
     }
   }
 
   void saveWorkoutAsRoutine(Workout workout) {
-    final newID = Get.find<RoutinesController>().importWorkout(workout);
+    final newID = get<RoutinesController>().importWorkout(workout);
     if (workout.parentID == null) {
-      Get.find<HistoryController>().setParentID(workout, newParentID: newID);
+      get<HistoryController>().setParentID(workout, newParentID: newID);
     }
     Go.snack("workouts.actions.saveAsRoutine.done".t);
   }
 
   List<Workout> getRoutineHistory({required Workout routine}) {
-    return Get.find<HistoryController>().getRoutineHistory(routine);
+    return get<HistoryController>().getRoutineHistory(routine);
   }
 
   computeSuggestions() {
     final today = DateTime.now().weekday;
     final candidates = <Workout, int>{};
-    final controller = Get.find<HistoryController>();
+    final controller = get<HistoryController>();
     final history = controller.history;
-    for (final routine in Get.find<RoutinesController>().workouts) {
+    for (final routine in get<RoutinesController>().workouts) {
       final occurrences = history.where((wo) => wo.parentID == routine.id);
       candidates[routine] =
           occurrences.where((wo) => wo.startingDate?.weekday == today).length;
@@ -158,27 +163,31 @@ class Coordinator extends GetxController with ServiceableController {
 
   void onNotificationTapped(NotificationResponse value) {
     if (Get.isRegistered<WorkoutController>()) {
-      Get.find<WorkoutController>().onNotificationTapped(value);
+      get<WorkoutController>().onNotificationTapped(value);
     }
   }
 
   void onHotReload() {
     logger.i("[#reassemble()] called");
-    Get.find<GTLocalizations>().init(false);
+    get<GTLocalizations>().init(false);
   }
 
   void scheduleBackup() {
     Future.delayed(const Duration(seconds: 5), () async {
-      Get.find<DatabaseService>().createBackup();
+      get<DatabaseService>().createBackup();
     });
   }
 
   void schedulePeriodicBackup() {
-    Get.find<DatabaseService>().schedulePeriodicBackup();
+    get<DatabaseService>().schedulePeriodicBackup();
   }
 
   Map<Achievement, List<AchievementCompletion>> maybeUnlockAchievements(
       AchievementTrigger trigger) {
-    return Get.find<AchievementsController>().maybeUnlockAchievements(trigger);
+    return get<AchievementsController>().maybeUnlockAchievements(trigger);
+  }
+
+  void installRoutines(List<Workout> routines) {
+    get<RoutinesController>().installRoutines(routines);
   }
 }

@@ -1,4 +1,5 @@
 export 'achievements.dart';
+export 'boutique.dart';
 export 'exercisable.dart';
 export 'exercise.dart';
 export 'measurements.dart';

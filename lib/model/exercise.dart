@@ -271,7 +271,7 @@ class Exercise extends WorkoutExercisable {
   GTGymEquipment get gymEquipment {
     if (standard && !isAbstract) {
       // ignore: deprecated_member_use_from_same_package
-      return getStandardExerciseByID(parentID!)!.equipment;
+      return getStandardExerciseByID(parentID!)?.equipment ?? equipment;
     }
     // ignore: deprecated_member_use_from_same_package
     return equipment;

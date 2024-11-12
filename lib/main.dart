@@ -6,6 +6,7 @@ import 'package:dynamic_color/dynamic_color.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart' hide Localizations;
 import 'package:flutter/services.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:get/get.dart';
@@ -28,11 +29,19 @@ import 'package:gymtracker/view/skeleton.dart';
 import 'package:gymtracker/view/workout.dart';
 import 'package:protocol_handler/protocol_handler.dart';
 import 'package:relative_time/relative_time.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  await dotenv.load(fileName: ".env");
+
+  await Supabase.initialize(
+    url: dotenv.env['SUPABASE_INSTANCE']!,
+    anonKey: dotenv.env['SUPABASE_ANON_KEY']!,
+  );
 
   AudioCache.instance = AudioCache(prefix: '');
   AudioPlayer.global.setAudioContext(AudioContextConfig(
@@ -105,15 +114,16 @@ class _MainAppState extends State<MainApp> {
             return Container(
               child: () {
                 var platformSeedColor = ({
-                      Brightness.light: light?.primary,
-                      Brightness.dark: dark?.primary,
-                    }[switch (settings.themeMode()) {
-                      ThemeMode.light => Brightness.light,
-                      ThemeMode.dark => Brightness.dark,
-                      ThemeMode.system => MediaQuery.of(context).platformBrightness,
-                    }]);
-                final seedColor =
-                    settings.usesDynamicColor() ? platformSeedColor ?? settings.color() : settings.color();
+                  Brightness.light: light?.primary,
+                  Brightness.dark: dark?.primary,
+                }[switch (settings.themeMode()) {
+                  ThemeMode.light => Brightness.light,
+                  ThemeMode.dark => Brightness.dark,
+                  ThemeMode.system => MediaQuery.of(context).platformBrightness,
+                }]);
+                final seedColor = settings.usesDynamicColor()
+                    ? platformSeedColor ?? settings.color()
+                    : settings.color();
 
                 return AnimatedBuilder(
                   animation: localizations,
@@ -139,8 +149,16 @@ class _MainAppState extends State<MainApp> {
                         GlobalCupertinoLocalizations.delegate,
                       ],
                       themeMode: settings.themeMode(),
-                      theme: getGymTrackerThemeFor(context, seedColor, Brightness.light,),
-                      darkTheme: getGymTrackerThemeFor(context, seedColor, Brightness.dark,),
+                      theme: getGymTrackerThemeFor(
+                        context,
+                        seedColor,
+                        Brightness.light,
+                      ),
+                      darkTheme: getGymTrackerThemeFor(
+                        context,
+                        seedColor,
+                        Brightness.dark,
+                      ),
                       home: const GymTrackerAppLoader(),
                       onGenerateRoute: (settings) {
                         return switch (settings.name) {

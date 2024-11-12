@@ -13,6 +13,7 @@ import 'package:gymtracker/utils/theme.dart';
 import 'package:gymtracker/utils/utils.dart';
 import 'package:gymtracker/view/components/badges.dart';
 import 'package:gymtracker/view/components/controlled.dart';
+import 'package:gymtracker/view/components/routines.dart';
 import 'package:gymtracker/view/exercises.dart';
 import 'package:gymtracker/view/routine_creator.dart';
 import 'package:gymtracker/view/skeleton.dart';
@@ -111,7 +112,7 @@ class _RoutinesViewState extends State<RoutinesView> with _RoutineList {
                         type: MaterialType.transparency,
                         key: ValueKey(workout.id),
                         child: ListTile(
-                          leading: _WorkoutIcon(workout: workout),
+                          leading: WorkoutIcon(workout: workout),
                           title: Text.rich(TextSpan(
                             children: [
                               TextSpan(
@@ -179,25 +180,6 @@ class _RoutinesViewState extends State<RoutinesView> with _RoutineList {
   }
 }
 
-class _WorkoutIcon extends StatelessWidget {
-  const _WorkoutIcon({
-    required this.workout,
-  });
-
-  final Workout workout;
-
-  @override
-  Widget build(BuildContext context) {
-    return Skeleton.leaf(
-      child: CircleAvatar(
-        backgroundColor: Theme.of(context).colorScheme.primaryContainer,
-        foregroundColor: Theme.of(context).colorScheme.onPrimaryContainer,
-        child: Text(workout.name.characters.first.toUpperCase()),
-      ),
-    );
-  }
-}
-
 class _DraggingListItem extends StatelessWidget {
   const _DraggingListItem({
     required this.dragKey,
@@ -226,7 +208,7 @@ class _DraggingListItem extends StatelessWidget {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    _WorkoutIcon(workout: workout),
+                    WorkoutIcon(workout: workout),
                     Text(
                       workout.name,
                       style: Theme.of(context).textTheme.titleMedium,
@@ -550,15 +532,11 @@ mixin _RoutineList<T extends StatefulWidget> on State<T> {
       },
       child: Material(
         type: MaterialType.transparency,
-        child: ListTile(
-          leading: _WorkoutIcon(workout: workout),
-          trailing: DragHandle(index: index),
-          title: Text(workout.name),
-          subtitle:
-              Text("general.exercises".plural(workout.displayExerciseCount)),
-          onTap: () {
-            onTapWorkout(workout);
-          },
+        child: RoutineListTile(
+          routine: workout,trailing: DragHandle(index: index),
+onTap: () {
+        onTapWorkout(workout);
+      },
         ),
       ),
     );

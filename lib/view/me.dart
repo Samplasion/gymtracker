@@ -7,11 +7,13 @@ import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:get/get.dart';
 import 'package:gymtracker/controller/history_controller.dart';
 import 'package:gymtracker/controller/me_controller.dart';
+import 'package:gymtracker/controller/online_controller.dart';
 import 'package:gymtracker/controller/settings_controller.dart';
 import 'package:gymtracker/data/weights.dart';
 import 'package:gymtracker/icons/gymtracker_icons.dart';
 import 'package:gymtracker/model/measurements.dart';
 import 'package:gymtracker/service/localizations.dart';
+import 'package:gymtracker/service/online.dart';
 import 'package:gymtracker/utils/constants.dart';
 import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/utils/go.dart';
@@ -19,17 +21,21 @@ import 'package:gymtracker/utils/theme.dart';
 import 'package:gymtracker/utils/utils.dart';
 import 'package:gymtracker/view/charts/density_calendar_chart.dart';
 import 'package:gymtracker/view/charts/weight_chart.dart';
+import 'package:gymtracker/view/components/controlled.dart';
+import 'package:gymtracker/view/components/icon_grid.dart';
 import 'package:gymtracker/view/me/calendar.dart';
 import 'package:gymtracker/view/me/statistics.dart';
 import 'package:gymtracker/view/skeleton.dart';
 import 'package:gymtracker/view/utils/crossfade.dart';
 import 'package:gymtracker/view/utils/date_field.dart';
 import 'package:gymtracker/view/utils/input_decoration.dart';
+import 'package:gymtracker/view/utils/online_profile_card.dart';
 import 'package:gymtracker/view/utils/section_title.dart';
 import 'package:gymtracker/view/utils/sliver_utils.dart';
 import 'package:gymtracker/view/utils/speed_dial.dart';
 import 'package:intl/intl.dart';
 
+part 'me.profile.dart';
 part 'me.weight.dart';
 
 class MeView extends GetView<MeController> {
@@ -43,6 +49,12 @@ class MeView extends GetView<MeController> {
           SliverAppBar.large(
             title: Text("me.title".t),
             leading: const SkeletonDrawerButton(),
+          ),
+          const SliverPadding(
+            padding: EdgeInsets.only(top: 16, left: 16, right: 16),
+            sliver: SliverToBoxAdapter(
+              child: OnlineProfileCard(),
+            ),
           ),
           SliverPadding(
             padding: const EdgeInsets.only(top: 16),

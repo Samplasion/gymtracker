@@ -1225,6 +1225,13 @@
     },
     "workoutDistribution": {
       "label": "Distribuzione allenamenti"
+    },
+    "profile": {
+      "title": "Profilo",
+      "logout": "Esci",
+      "edit": {
+        "title": "Modifica profilo"
+      }
     }
   },
   "richText": {
@@ -2276,6 +2283,50 @@
     "errors": {
       "unknown": "Caricamento fallito. Controlla la connessione a Internet e riprova.",
       "version": "Questa versione dell'app non è compatibile con lo store di schede. Aggiorna all'ultima versione dell'app e riprova."
+    }
+  },
+  "login": {
+    "title": "Login",
+    "tabs": {
+      "signIn": "Accedi",
+      "signUp": "Registrati"
+    },
+    "errors": {
+      "generic": "Si è verificato un errore. Riprova tra qualche minuto.",
+      "username": "Lo username deve essere di 3-20 caratteri e può contenere caratteri alfanumerici, trattini e trattini bassi.",
+      "email": "Inserisci un indirizzo email valido.",
+      "password": {
+        "invalid": {
+          "header": "La password deve:",
+          "length": "- Essere lunga almeno 8 caratteri",
+          "uppercase": "- Contenere almeno una lettera maiuscola",
+          "lowercase": "- Contenere almeno una lettera minuscola",
+          "number": "- Contenere almeno un numero",
+          "specialCharacter": "- Contenere almeno un carattere speciale"
+        }
+      }
+    },
+    "fields": {
+      "email": {
+        "label": "Email",
+        "hint": "mario.rossi@example.com"
+      },
+      "password": {
+        "label": "Password",
+        "hint": "Password"
+      },
+      "username": {
+        "label": "Username",
+        "hint": "Username"
+      }
+    },
+    "buttons": {
+      "signIn": "Accedi",
+      "signUp": "Registrati"
+    },
+    "upsell": {
+      "title": "Accesso non effettuato",
+      "subtitle": "Accedi per usufruire di allenamenti di gruppo, sincronizzazione su più dispositivi e tanto altro."
     }
   }
 }

@@ -11,6 +11,7 @@ import 'package:gymtracker/controller/history_controller.dart';
 import 'package:gymtracker/controller/me_controller.dart';
 import 'package:gymtracker/controller/migrations_controller.dart';
 import 'package:gymtracker/controller/notifications_controller.dart';
+import 'package:gymtracker/controller/online_controller.dart';
 import 'package:gymtracker/controller/routines_controller.dart';
 import 'package:gymtracker/controller/serviceable_controller.dart';
 import 'package:gymtracker/controller/settings_controller.dart';
@@ -42,6 +43,7 @@ class Coordinator extends GetxController with ServiceableController {
       Go.awaitInitialization(),
       get<SettingsController>().awaitInitialized(),
       get<NotificationController>().initialize(),
+      get<OnlineController>().init(),
     ]);
 
     showPermissionTilesStream.add(
@@ -78,6 +80,7 @@ class Coordinator extends GetxController with ServiceableController {
     Get.delete<FoodController>();
     Get.delete<AchievementsController>();
     Get.delete<BoutiqueController>();
+    Get.delete<OnlineController>();
 
     super.onClose();
   }
@@ -98,6 +101,7 @@ class Coordinator extends GetxController with ServiceableController {
     Get.put(FoodController());
     Get.put(AchievementsController());
     Get.put(BoutiqueController());
+    Get.put(OnlineController());
 
     logger.d((service.hasOngoing, service.getOngoingData()));
     if (service.hasOngoing) {

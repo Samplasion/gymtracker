@@ -1226,6 +1226,13 @@
     },
     "workoutDistribution": {
       "label": "Workout distribution"
+    },
+    "profile": {
+      "title": "Profile",
+      "logout": "Log out",
+      "edit": {
+        "title": "Edit profile"
+      }
     }
   },
   "richText": {
@@ -2277,6 +2284,50 @@
     "errors": {
       "unknown": "Loading failed. Check your Internet connection and retry.",
       "version": "This version of the app is not compatible with the program shop. Update to the latest version and try again."
+    }
+  },
+  "login": {
+    "title": "Login",
+    "tabs": {
+      "signIn": "Sign in",
+      "signUp": "Sign up"
+    },
+    "errors": {
+      "generic": "An unexpected error has occurred. Try again in a few minutes.",
+      "username": "Your username must be 8-10 characters long and can include only alphanumeric characters, hyphens, and underscores.",
+      "email": "Enter a valid email address.",
+      "password": {
+        "invalid": {
+          "header": "Your password must:",
+          "length": "- Be at least 8 characters long",
+          "uppercase": "- Contain at least one uppercase character",
+          "lowercase": "- Contain at least one lowercase character",
+          "number": "- Contain at least one number",
+          "specialCharacter": "- Contain at least one special character"
+        }
+      }
+    },
+    "fields": {
+      "email": {
+        "label": "Email",
+        "hint": "john.doe@example.com"
+      },
+      "password": {
+        "label": "Password",
+        "hint": "Password"
+      },
+      "username": {
+        "label": "Username",
+        "hint": "Username"
+      }
+    },
+    "buttons": {
+      "signIn": "Sign in",
+      "signUp": "Sign up"
+    },
+    "upsell": {
+      "title": "Not signed in",
+      "subtitle": "Sign in to gain access to group workouts, cross-device synchronization and much more."
     }
   }
 }

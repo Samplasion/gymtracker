@@ -95,6 +95,7 @@ class GTIcons {
   static const IconData _sparkles =
       IconData(0xf06e, fontFamily: _kFontFam, fontPackage: _kFontPkg);
 
+  static const IconData account = Icons.account_circle_rounded;
   static const IconData achievements = Icons.emoji_events_rounded;
   static const IconData achievement_locked = Icons.lock_rounded;
   static const IconData add_exercise = Icons.add_rounded;
@@ -201,6 +202,7 @@ class GTIcons {
 
   static const Map<String, IconData> values = {
     // tool-start:generate
+    'account': account,
     'achievements': achievements,
     'achievement_locked': achievement_locked,
     'add_exercise': add_exercise,

@@ -890,7 +890,8 @@
         "lowCableFly": "Low cable fly",
         "inclinePushUps": "Incline push-ups",
         "tBarPress": "T-Bar press",
-        "inclineBenchFlys": "Incline bench flys"
+        "inclineBenchFlys": "Incline bench flys",
+        "benchFlys": "Bench flys"
       }
     },
     "biceps": {
@@ -983,8 +984,9 @@
         "latRaisesDumbbells": "Lateral raises (dumbbells)",
         "deltoidMachine": "Deltoid machine",
         "shrugsBarbell": "Front shrugs (barbell)",
-        "militaryPressSmithMachine": "Multipower military press",
-        "reverseButterfly": "Reverse butterfly machine"
+        "militaryPressSmithMachine": "Smith machine military press",
+        "reverseButterfly": "Reverse butterfly machine",
+        "militaryPressBarbell": "Barbell military press"
       }
     },
     "back": {

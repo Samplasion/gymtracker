@@ -469,6 +469,14 @@ final Map<GTExerciseMuscleCategory, ExerciseCategory> exerciseStandardLibrary =
         primaryMuscleGroup: GTMuscleGroup.chest,
         equipment: GTGymEquipment.dumbbell,
       ),
+      Exercise.standard(
+        id: "library.chest.exercises.benchFlys",
+        name: "library.chest.exercises.benchFlys".t,
+        parameters: GTSetParameters.repsWeight,
+        primaryMuscleGroup: GTMuscleGroup.chest,
+        secondaryMuscleGroups: {GTMuscleGroup.biceps},
+        equipment: GTGymEquipment.dumbbell,
+      ),
     ],
     iconGetter: () =>
         Text("library.chest.name".t.characters.first.toUpperCase()),
@@ -1143,6 +1151,13 @@ final Map<GTExerciseMuscleCategory, ExerciseCategory> exerciseStandardLibrary =
         parameters: GTSetParameters.repsWeight,
         primaryMuscleGroup: GTMuscleGroup.shoulders,
         equipment: GTGymEquipment.machine,
+      ),
+      Exercise.standard(
+        id: "library.shoulders.exercises.militaryPressBarbell",
+        name: "library.shoulders.exercises.militaryPressBarbell".t,
+        parameters: GTSetParameters.repsWeight,
+        primaryMuscleGroup: GTMuscleGroup.shoulders,
+        equipment: GTGymEquipment.barbell,
       ),
       Exercise.standard(
         id: "library.shoulders.exercises.reverseButterfly",

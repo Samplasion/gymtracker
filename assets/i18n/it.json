@@ -890,7 +890,8 @@
         "lowCableFly": "Croci ai cavi bassi",
         "inclinePushUps": "Push-up inclinati",
         "tBarPress": "Pressa con bilanciere a T",
-        "inclineBenchFlys": "Croci su panca inclinata"
+        "inclineBenchFlys": "Croci su panca inclinata",
+        "benchFlys": "Croci su panca piana"
       }
     },
     "biceps": {
@@ -984,7 +985,8 @@
         "deltoidMachine": "Deltoid machine",
         "shrugsBarbell": "Scrollate con bilanciere davanti",
         "militaryPressSmithMachine": "Lento avanti al multipower",
-        "reverseButterfly": "Reverse butterfly machine"
+        "reverseButterfly": "Reverse butterfly machine",
+        "militaryPressBarbell": "Lento avanti con bilanciere"
       }
     },
     "back": {

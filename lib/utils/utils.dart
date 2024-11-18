@@ -182,3 +182,16 @@ bool setEquality<T>(Set<T> a, Set<T> b) {
   }
   return (first, second);
 }
+
+bool throws<T>(T Function() function, {
+  void Function(T?, dynamic, StackTrace?)? results,
+}) {
+  try {
+    final value = function();
+    results?.call(value, null, null);
+    return false;
+  } catch (e, s) {
+    results?.call(null, e, s);
+    return true;
+  }
+}

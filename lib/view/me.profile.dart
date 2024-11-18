@@ -128,6 +128,10 @@ class MeProfilePage extends ControlledWidget<OnlineController> {
                   onPressed: () {
                     controller.logout().then((_) {
                       Get.back();
+                    }).catchError((e) {
+                      Go.dialog("me.profile.errors.logout.title".t, "me.profile.errors.logout.subtitle".tParams({
+                        "error": e.toString(),
+                      }));
                     });
                   },
                   child: Text("me.profile.logout".t),
@@ -221,9 +225,8 @@ class __ProfileEditPageState
                 onChanged: (_) => _checkCredentials(),
                 decoration: InputDecoration(
                   labelText: "login.fields.username.label".t,
-                  errorText: _state.usernameError
-                      ? "login.errors.username".t
-                      : null,
+                  errorText:
+                      _state.usernameError ? "login.errors.username".t : null,
                 ),
               ),
               const SizedBox(height: 16),
@@ -232,9 +235,7 @@ class __ProfileEditPageState
                 onChanged: (_) => _checkCredentials(),
                 decoration: InputDecoration(
                   labelText: "login.fields.email.label".t,
-                  errorText: _state.emailError
-                      ? "login.errors.email".t
-                      : null,
+                  errorText: _state.emailError ? "login.errors.email".t : null,
                 ),
               ),
             ],

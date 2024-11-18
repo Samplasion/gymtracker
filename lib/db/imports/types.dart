@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
+import 'package:gymtracker/db/database.dart';
 import 'package:gymtracker/db/imports/v1.dart';
 import 'package:gymtracker/db/imports/v10.dart';
 import 'package:gymtracker/db/imports/v2.dart';
@@ -103,4 +105,10 @@ class DatabaseSnapshot {
   achievements: ${jsonEncode(achievements)},
 )""";
   }
+
+  Map<String, dynamic> toJson() => getConverter(DATABASE_VERSION).export(this);
+}
+
+bool deepEquals(DatabaseSnapshot a, DatabaseSnapshot b) {
+  return mapEquals(a.toJson(), b.toJson());
 }

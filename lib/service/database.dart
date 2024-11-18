@@ -85,7 +85,7 @@ class DatabaseService extends GetxService with ChangeNotifier {
   onInit() async {
     super.onInit();
 
-    onServiceChange("main")();
+    onDatabaseUpdated("main")();
   }
 
   Future ensureInitialized({
@@ -94,7 +94,10 @@ class DatabaseService extends GetxService with ChangeNotifier {
   }) async {
     _db = GTDatabaseImpl.prod();
 
-    return _innerEnsureInitialized(onDone: onDone, overrideInitializationCheck: overrideInitializationCheck,);
+    return _innerEnsureInitialized(
+      onDone: onDone,
+      overrideInitializationCheck: overrideInitializationCheck,
+    );
   }
 
   bool _isInit = false;
@@ -134,13 +137,13 @@ class DatabaseService extends GetxService with ChangeNotifier {
 
     db.watchAchievementCompletions().listen((event) {
       completions$.add(event);
-      onServiceChange("nutrition categories")();
+      onDatabaseUpdated("nutrition categories")();
       initialized[0] = true;
       check();
     });
     _db.getAllCustomExercises().listen((event) {
       exercises$.add(event);
-      onServiceChange("exercises")();
+      onDatabaseUpdated("exercises")();
       initialized[1] = true;
       check();
     }, onError: (e, s) {
@@ -148,44 +151,44 @@ class DatabaseService extends GetxService with ChangeNotifier {
     });
     _db.getAllRoutines().listen((event) {
       routines$.add(event);
-      onServiceChange("routines")();
+      onDatabaseUpdated("routines")();
       initialized[2] = true;
       check();
     });
     _db.getAllHistoryWorkouts().listen((event) {
       history$.add(event);
-      onServiceChange("history")();
+      onDatabaseUpdated("history")();
       initialized[3] = true;
       check();
     });
     _db.watchPreferences().listen((prefs) {
       prefs$.add(prefs);
       notifyListeners();
-      onServiceChange("preferences")();
+      onDatabaseUpdated("preferences")();
       initialized[4] = true;
       check();
       prefs.logger.i("Changed.");
     });
     _db.watchOngoing().listen((event) {
       ongoing$.add(event);
-      onServiceChange("ongoing")();
+      onDatabaseUpdated("ongoing")();
       initialized[5] = true;
     });
     _db.watchWeightMeasurements().listen((event) {
       weightMeasurements$.add(event);
-      onServiceChange("weight measurements")();
+      onDatabaseUpdated("weight measurements")();
       initialized[6] = true;
       check();
     });
     _db.watchRoutineFolders().listen((event) {
       folders$.add(event);
-      onServiceChange("folders")();
+      onDatabaseUpdated("folders")();
       initialized[7] = true;
       check();
     });
     _db.watchFoods().listen((event) {
       foods$.add(event);
-      onServiceChange("foods")();
+      onDatabaseUpdated("foods")();
       initialized[8] = true;
       check();
     });
@@ -194,19 +197,19 @@ class DatabaseService extends GetxService with ChangeNotifier {
         .map((event) => DateSequence.normalized(event).values.toList())
         .listen((event) {
       nutritionGoals$.add(event);
-      onServiceChange("nutrition goals")();
+      onDatabaseUpdated("nutrition goals")();
       initialized[9] = true;
       check();
     });
     _db.watchCustomBarcodeFoods().listen((event) {
       customBarcodeFoods$.add(event);
-      onServiceChange("custom barcode foods")();
+      onDatabaseUpdated("custom barcode foods")();
       initialized[10] = true;
       check();
     });
     _db.watchFavoriteFoods().listen((event) {
       favoriteFoods$.add(event);
-      onServiceChange("favorite foods")();
+      onDatabaseUpdated("favorite foods")();
       initialized[11] = true;
       check();
     });
@@ -215,7 +218,7 @@ class DatabaseService extends GetxService with ChangeNotifier {
         .map((event) => DateSequence.fromDatesAndValues(event).normalize())
         .listen((event) {
       nutritionCategories$.add(event);
-      onServiceChange("nutrition categories")();
+      onDatabaseUpdated("nutrition categories")();
       initialized[12] = true;
       check();
     });
@@ -240,7 +243,7 @@ class DatabaseService extends GetxService with ChangeNotifier {
     await _db.clearTheWholeThingIAmAbsolutelySureISwear();
   }
 
-  void Function() onServiceChange(String service) {
+  void Function() onDatabaseUpdated(String service) {
     return () {
       logger.t("$service service updated");
     };
@@ -475,28 +478,30 @@ class DatabaseService extends GetxService with ChangeNotifier {
           List<AchievementCompletion> completions) =>
       db.setAchievementCompletions(completions);
 
+  DatabaseSnapshot get currentSnapshot => DatabaseSnapshot(
+        customExercises: exercises,
+        routines: routines,
+        routineExercises: routines.flattenedExercises,
+        historyWorkouts: workoutHistory,
+        historyWorkoutExercises: workoutHistory.flattenedExercises,
+        preferences: prefs$.value,
+        weightMeasurements: weightMeasurements$.value,
+        folders: folders$.value,
+        foods: foods$.value,
+        nutritionGoals: nutritionGoals$.value,
+        customBarcodeFoods: customBarcodeFoods$.value,
+        favoriteFoods:
+            favoriteFoods$.value.map((f) => f.id).whereNotNull().toList(),
+        foodCategories: Map.fromEntries(nutritionCategories$.value.map((map) {
+          return MapEntry(map.date, map.value.values.toList());
+        })),
+        achievements: completions$.value,
+      );
+
   toJson() {
     final converter = getConverter(DATABASE_VERSION);
 
-    return converter.export(DatabaseSnapshot(
-      customExercises: exercises,
-      routines: routines,
-      routineExercises: routines.flattenedExercises,
-      historyWorkouts: workoutHistory,
-      historyWorkoutExercises: workoutHistory.flattenedExercises,
-      preferences: prefs$.value,
-      weightMeasurements: weightMeasurements$.value,
-      folders: folders$.value,
-      foods: foods$.value,
-      nutritionGoals: nutritionGoals$.value,
-      customBarcodeFoods: customBarcodeFoods$.value,
-      favoriteFoods:
-          favoriteFoods$.value.map((f) => f.id).whereNotNull().toList(),
-      foodCategories: Map.fromEntries(nutritionCategories$.value.map((map) {
-        return MapEntry(map.date, map.value.values.toList());
-      })),
-      achievements: completions$.value,
-    ));
+    return converter.export(currentSnapshot);
   }
 
   Future fromJson(Map<String, dynamic> json) async {
@@ -518,32 +523,7 @@ class DatabaseService extends GetxService with ChangeNotifier {
         rethrow;
       }
 
-      await _db.transaction(() async {
-        await _db.clearTheWholeThingIAmAbsolutelySureISwear();
-
-        logger.i("Created import transaction");
-        // Keep this above other calls to prevent double computation of
-        // achievements
-        await setAchievementCompletions(snapshot.achievements);
-        await writeExercises(snapshot.customExercises);
-        await _writeRoutines(snapshot.routines);
-        await _db.overwriteAllRoutineExercises(snapshot.routineExercises);
-        await writeAllHistory(snapshot.historyWorkouts);
-        await _db.overwriteAllHistoryWorkoutExercises(
-            snapshot.historyWorkoutExercises);
-        await _db.setPreferences(snapshot.preferences);
-        await _writeWeightMeasurements(snapshot.weightMeasurements);
-        await _db.writeAllRoutineFolders(snapshot.folders);
-        await _db.setFoods(snapshot.foods);
-        await _db.setNutritionGoals(snapshot.nutritionGoals);
-        await _db.setCustomBarcodeFoods(snapshot.customBarcodeFoods);
-        await _db.setFavoriteFoods(snapshot.favoriteFoods);
-        await _db.setNutritionCategories({
-          for (final entry in snapshot.foodCategories.entries)
-            entry.key:
-                Map.fromEntries(entry.value.map((e) => MapEntry(e.name, e))),
-        });
-      });
+      overrideDatabase(snapshot);
     }
 
     try {
@@ -702,6 +682,37 @@ class DatabaseService extends GetxService with ChangeNotifier {
     } else {
       logger.i("No need to create a backup");
     }
+  }
+
+  Future<void> overrideDatabase(DatabaseSnapshot snapshot) async {
+    await _db.transaction(() async {
+      await _db.clearTheWholeThingIAmAbsolutelySureISwear();
+
+      logger.i("Created import transaction");
+      // Keep this above other calls to prevent double computation of
+      // achievements
+      await setAchievementCompletions(snapshot.achievements);
+      await writeExercises(snapshot.customExercises);
+      await _writeRoutines(snapshot.routines);
+      await _db.overwriteAllRoutineExercises(snapshot.routineExercises);
+      await writeAllHistory(snapshot.historyWorkouts);
+      await _db.overwriteAllHistoryWorkoutExercises(
+          snapshot.historyWorkoutExercises);
+      await _db.setPreferences(snapshot.preferences);
+      await _writeWeightMeasurements(snapshot.weightMeasurements);
+      await _db.writeAllRoutineFolders(snapshot.folders);
+      await _db.setFoods(snapshot.foods);
+      await _db.setNutritionGoals(snapshot.nutritionGoals);
+      await _db.setCustomBarcodeFoods(snapshot.customBarcodeFoods);
+      await _db.setFavoriteFoods(snapshot.favoriteFoods);
+      await _db.setNutritionCategories({
+        for (final entry in snapshot.foodCategories.entries)
+          entry.key:
+              Map.fromEntries(entry.value.map((e) => MapEntry(e.name, e))),
+      });
+
+      logger.i("Imported database snapshot");
+    });
   }
 }
 

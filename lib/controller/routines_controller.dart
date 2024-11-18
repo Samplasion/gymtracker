@@ -111,6 +111,7 @@ class RoutinesController extends GetxController
       weightUnit: settingsController.weightUnit.value,
     );
     service.setRoutine(routine);
+    coordinator.scheduleBackup();
 
     Get.back();
   }
@@ -215,6 +216,7 @@ class RoutinesController extends GetxController
 
   void deleteWorkout(Workout workout) {
     service.removeRoutine(workout);
+    coordinator.scheduleBackup();
     Get.find<HistoryController>().unbindAllFromParent(workout.id);
   }
 
@@ -238,6 +240,7 @@ class RoutinesController extends GetxController
   void editRoutine(Workout newRoutine) {
     if (service.hasRoutine(newRoutine.id)) {
       service.setRoutine(newRoutine);
+      coordinator.scheduleBackup();
     }
   }
 
@@ -252,6 +255,7 @@ class RoutinesController extends GetxController
     final old = service.routines.toList();
     old.removeWhere((r) => r.folder == null);
     service.setAllRoutines([...list, ...old]);
+    coordinator.scheduleBackup();
 
     // Optimistically reorder the list
     workouts([...list, ...old]);
@@ -264,6 +268,7 @@ class RoutinesController extends GetxController
     final old = service.routines.toList();
     old.removeWhere((r) => r.folder?.id == folder.id);
     service.setAllRoutines([...list, ...old]);
+    coordinator.scheduleBackup();
 
     // Optimistically reorder the list
     workouts([...list, ...old]);
@@ -291,6 +296,7 @@ class RoutinesController extends GetxController
     final routine = workout.toRoutine();
     logger.d((routine, routine.exercises));
     service.setRoutine(routine);
+    coordinator.scheduleBackup();
     return routine.id;
   }
 
@@ -358,6 +364,7 @@ class RoutinesController extends GetxController
         .copyWith
         .folder(oldRoutine.folder);
     service.setRoutine(newRoutine);
+    coordinator.scheduleBackup();
   }
 
   @override
@@ -503,11 +510,13 @@ class RoutinesController extends GetxController
       name: "routines.newFolder".t,
     );
     service.addFolder(folder);
+    coordinator.scheduleBackup();
   }
 
   void moveToFolder(Workout data, GTRoutineFolder folder) {
     final routine = data.copyWith(folder: folder);
     service.setRoutine(routine);
+    coordinator.scheduleBackup();
   }
 
   void moveToRoot(Workout data) {
@@ -515,6 +524,7 @@ class RoutinesController extends GetxController
 
     final routine = data.copyWith(folder: null);
     service.setRoutine(routine);
+    coordinator.scheduleBackup();
   }
 
   void _recomputeFolders(List<GTRoutineFolder> fld) {
@@ -534,6 +544,7 @@ class RoutinesController extends GetxController
     );
     if (newFolder != null) {
       service.updateFolder(newFolder);
+      coordinator.scheduleBackup();
     }
   }
 
@@ -545,6 +556,7 @@ class RoutinesController extends GetxController
     if (!shouldDelete) return;
     Get.back();
     service.removeFolder(folder);
+    coordinator.scheduleBackup();
   }
 
   Future<Workout?> pickRoutine({
@@ -589,6 +601,7 @@ class RoutinesController extends GetxController
           ],
         ),
     ]);
+    coordinator.scheduleBackup();
   }
 
   void removeWeightFromExercise(Exercise exercise) {
@@ -634,12 +647,14 @@ class RoutinesController extends GetxController
           ],
         ),
     ]);
+    coordinator.scheduleBackup();
   }
 
   void installRoutines(List<Workout> routines) {
     for (final routine in routines) {
       service.setRoutine(routine);
     }
+    coordinator.scheduleBackup();
   }
 }
 

@@ -1232,6 +1232,10 @@
       "edit": {
         "title": "Modifica profilo"
       }
+    },
+    "sync": {
+      "label": "Modifiche non salvate",
+      "subtitle": "Tap to sync your changes with the cloud."
     }
   },
   "richText": {
@@ -2328,5 +2332,16 @@
       "title": "Accesso non effettuato",
       "subtitle": "Accedi per usufruire di allenamenti di gruppo, sincronizzazione su più dispositivi e tanto altro."
     }
+  },
+  "sync": {
+    "conflict": {
+      "title": "Trovati dati contrastanti",
+      "message": "Premei OK per scaricare i dati nel cloud e sovrascrivere i dati locali. Premi Annulla per cancellare i dati nel cloud e caricare i dati locali."
+    },
+    "overwrite": {
+      "title": "Dati più vecchi",
+      "message": "Vuoi sovrascrivere i dati sul server con i dati locali?"
+    },
+    "inProgress": "Sincronizzo"
   }
 }

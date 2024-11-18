@@ -100,6 +100,7 @@ class HistoryController extends GetxController with ServiceableController {
     if (workout.completedBy != null) {
       await service.removeHistoryWorkoutById(workout.completedBy!);
     }
+    coordinator.scheduleBackup();
   }
 
   void setParentID(Workout workout, {String? newParentID}) {

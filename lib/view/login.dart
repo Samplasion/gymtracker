@@ -35,14 +35,16 @@ class _LoginController extends GetxController
 
   void signIn(String email, String password) {
     if (status.isLoading) return;
-    if (_credentials$.value.hasErrorWithoutUsername) return;
+    if (_credentials$.value.emailError) return;
     if (password.isEmpty) return;
     change(null, status: RxStatus.loading());
     _controller.login(email: email, password: password).then((_) {
       change(null, status: RxStatus.success());
       Get.back();
     }).catchError((e) {
-      change(null, status: RxStatus.error(e.toString()));
+      String message = e.toString();
+      if (e is AuthException) message = "login.errors.noInternet".t;
+      change(null, status: RxStatus.error(message));
     });
   }
 
@@ -61,7 +63,9 @@ class _LoginController extends GetxController
       change(null, status: RxStatus.success());
       Get.back();
     }).catchError((e) {
-      change(null, status: RxStatus.error(e.toString()));
+      String message = e.toString();
+      if (e is AuthException) message = "login.errors.noInternet".t;
+      change(null, status: RxStatus.error(message));
     });
   }
 }

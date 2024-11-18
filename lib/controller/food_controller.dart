@@ -537,6 +537,7 @@ class FoodController extends GetxController with ServiceableController {
         category: category?.name,
       ),
     ));
+    coordinator.scheduleBackup();
   }
 
   void removeFood(DateTime dateTime, Food food) {
@@ -544,6 +545,7 @@ class FoodController extends GetxController with ServiceableController {
       date: dateTime.startOfDay,
       value: food,
     ));
+    coordinator.scheduleBackup();
   }
 
   void updateFood(DateTime value, Food updatedFood) {
@@ -554,6 +556,7 @@ class FoodController extends GetxController with ServiceableController {
       date: value,
       value: updatedFood,
     ));
+    coordinator.scheduleBackup();
   }
 
   void previousDay() {
@@ -692,6 +695,7 @@ class FoodController extends GetxController with ServiceableController {
       date: day$.value.startOfDay,
       value: newGoal,
     ));
+    coordinator.scheduleBackup();
   }
 
   void showGoalHistory() {
@@ -708,10 +712,12 @@ class FoodController extends GetxController with ServiceableController {
 
   void removeFavorite(Food food) {
     service.removeFavoriteFood(food);
+    coordinator.scheduleBackup();
   }
 
   void addFavorite(Food food) {
     service.addFavoriteFood(food);
+    coordinator.scheduleBackup();
   }
 
   bool isFavorite(Food food) {
@@ -751,6 +757,7 @@ class FoodController extends GetxController with ServiceableController {
         category.name: category
       },
     );
+    coordinator.scheduleBackup();
   }
 
   void removeCategory(NutritionCategory category) {
@@ -762,6 +769,7 @@ class FoodController extends GetxController with ServiceableController {
           if (entry.key != category.name) entry.key: entry.value
       },
     );
+    coordinator.scheduleBackup();
   }
 
   Future<NutritionCategory?> showAddCategoryView() {

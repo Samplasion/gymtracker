@@ -626,8 +626,7 @@
     },
     "goodJob": {
       "title": "Good job!",
-      "body": "Here's some statistics about the workout you've just finished.",
-      "achievements": "Achievements"
+      "body": "Here's some statistics about the workout you've just finished."
     },
     "exercisesToSuperset": {
       "title": "Create new superset",
@@ -1232,7 +1231,17 @@
       "logout": "Log out",
       "edit": {
         "title": "Edit profile"
+      },
+      "errors": {
+        "logout": {
+          "title": "An error occurred while logging out",
+          "subtitle": "Couldn't log out: @error"
+        }
       }
+    },
+    "sync": {
+      "label": "Unsynced changes",
+      "subtitle": "Tap to sync your changes with the cloud."
     }
   },
   "richText": {
@@ -2305,7 +2314,8 @@
           "number": "- Contain at least one number",
           "specialCharacter": "- Contain at least one special character"
         }
-      }
+      },
+      "noInternet": "No Internet connection."
     },
     "fields": {
       "email": {
@@ -2329,5 +2339,16 @@
       "title": "Not signed in",
       "subtitle": "Sign in to gain access to group workouts, cross-device synchronization and much more."
     }
+  },
+  "sync": {
+    "conflict": {
+      "title": "Conflicting data found",
+      "message": "Press OK to download the data in the cloud and overwrite the local data. Press Cancel to erase the data in the cloud and upload the local data."
+    },
+    "overwrite": {
+      "title": "Older data found",
+      "message": "Do you wish to overwrite the data in the cloud with your local data?"
+    },
+    "inProgress": "Synchronizing"
   }
 }

@@ -7,9 +7,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:gymtracker/controller/coordinator.dart';
 import 'package:gymtracker/controller/debug_controller.dart';
 import 'package:gymtracker/controller/history_controller.dart';
 import 'package:gymtracker/controller/me_controller.dart';
+import 'package:gymtracker/controller/online_controller.dart';
 import 'package:gymtracker/controller/routines_controller.dart';
 import 'package:gymtracker/controller/stopwatch_controller.dart';
 import 'package:gymtracker/controller/workout_controller.dart';
@@ -20,6 +22,7 @@ import 'package:gymtracker/service/database.dart';
 import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/service/logger.dart';
 import 'package:gymtracker/utils/constants.dart';
+import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/utils/noise.dart';
 import 'package:gymtracker/utils/theme.dart';
@@ -97,7 +100,8 @@ class _DebugViewState extends State<DebugView> {
               ListTile(
                 title: const Text("Database inspector"),
                 onTap: () {
-                  Go.to(() => DriftDbViewer(Get.find<DatabaseService>().db as GeneratedDatabase));
+                  Go.to(() => DriftDbViewer(
+                      Get.find<DatabaseService>().db as GeneratedDatabase));
                 },
               ),
               FutureBuilder(
@@ -181,6 +185,40 @@ class _DebugViewState extends State<DebugView> {
                 title: const Text("Add random weights..."),
                 onTap: () async {
                   Go.toDialog(() => const _DebugAddRandomWeightAlert());
+                },
+              ),
+              ListTile(
+                title: const Text("Simulate succesful login sequence"),
+                onTap: () async {
+                  Get.find<Coordinator>().onSuccessfulLogin();
+                },
+              ),
+              // ListTile(
+              //   title: const Text("Simulate sync upload"),
+              //   onTap: () async {
+              //     Get.find<OnlineController>().also((c) {
+              //       c.onStandardSyncUpload(
+              //           currentSnapshot: c.service.currentSnapshot);
+              //     });
+              //   },
+              // ),
+              // ListTile(
+              //   title: const Text("Simulate sync download"),
+              //   onTap: () async {
+              //     Get.find<OnlineController>().also((c) {
+              //       c.onStandardSyncDownload(
+              //           currentSnapshot: c.service.currentSnapshot);
+              //     });
+              //   },
+              // ),
+              ListTile(
+                title: const Text("Simulate sync"),
+                onTap: () async {
+                  Get.find<OnlineController>().also((c) {
+                    c.sync(
+                      currentSnapshot: c.service.currentSnapshot,
+                    );
+                  });
                 },
               ),
 

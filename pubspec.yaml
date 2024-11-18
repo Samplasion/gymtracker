@@ -74,6 +74,7 @@ dependencies:
   supabase_flutter: ^2.8.0
   pub_semver: ^2.1.4
   envied: ^0.5.4+1
+  shared_preferences: ^2.3.3
   
 dev_dependencies:
   flutter_test:

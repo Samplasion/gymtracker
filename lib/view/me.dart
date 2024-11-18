@@ -56,6 +56,7 @@ class MeView extends GetView<MeController> {
               child: OnlineProfileCard(),
             ),
           ),
+          const SliverToBoxAdapter(child: _MeSyncCard()),
           SliverPadding(
             padding: const EdgeInsets.only(top: 16),
             sliver: SliverList(
@@ -180,6 +181,80 @@ class MeView extends GetView<MeController> {
           const SliverBottomSafeArea(),
         ],
       ),
+    );
+  }
+}
+
+class _MeSyncCard extends StatefulWidget {
+  const _MeSyncCard({super.key});
+
+  @override
+  State<_MeSyncCard> createState() => __MeSyncCardState();
+}
+
+class __MeSyncCardState extends ControlledState<_MeSyncCard, OnlineController> {
+  Future<bool> show = Future.value(false);
+  bool loading = true;
+
+  @override
+  initState() {
+    super.initState();
+    _reload();
+  }
+
+  void _reload() =>
+      show = controller.getShouldShowManualSync().whenComplete(() {
+          if (mounted) {
+            setState(() {
+              loading = false;
+            });
+          }
+      });
+
+  @override
+  Widget build(BuildContext context) {
+    if (controller.accountSync == null) {
+      return const SizedBox.shrink();
+    }
+
+    return FutureBuilder<bool>(
+      future: show,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const SizedBox.shrink();
+        }
+        if (!snapshot.hasData || snapshot.data == false) {
+          return const SizedBox.shrink();
+        }
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16).copyWith(top: 16),
+          child: SafeArea(
+            top: false,
+            bottom: false,
+            child: Card(
+              clipBehavior: Clip.hardEdge,
+              margin: EdgeInsets.zero,
+              child: ListTile(
+                title: Text("me.sync.label".t),
+                subtitle: Text("me.sync.subtitle".t),
+                trailing: const Icon(GTIcons.lt_chevron),
+                onTap: loading
+                    ? null
+                    : () {
+                        setState(() {
+                          loading = true;
+                        });
+                        controller.manualSync().then((_) {
+                          Future.delayed(const Duration(seconds: 5), () async {
+                            _reload();
+                          });
+                        });
+                      },
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 }

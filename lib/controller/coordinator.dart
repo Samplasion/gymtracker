@@ -17,6 +17,7 @@ import 'package:gymtracker/controller/serviceable_controller.dart';
 import 'package:gymtracker/controller/settings_controller.dart';
 import 'package:gymtracker/controller/stopwatch_controller.dart';
 import 'package:gymtracker/controller/workout_controller.dart';
+import 'package:gymtracker/db/imports/types.dart';
 import 'package:gymtracker/model/achievements.dart';
 import 'package:gymtracker/model/exercise.dart';
 import 'package:gymtracker/model/workout.dart';
@@ -43,7 +44,15 @@ class Coordinator extends GetxController with ServiceableController {
       Go.awaitInitialization(),
       get<SettingsController>().awaitInitialized(),
       get<NotificationController>().initialize(),
-      get<OnlineController>().init(),
+      get<OnlineController>().init().then((_) {
+        if (get<OnlineController>().accountSync == null) return;
+        // get<OnlineController>().onStandardSyncDownload(
+        //   currentSnapshot: get<DatabaseService>().currentSnapshot,
+        // );
+        get<OnlineController>().sync(
+          currentSnapshot: get<DatabaseService>().currentSnapshot,
+        );
+      }),
     ]);
 
     showPermissionTilesStream.add(
@@ -179,6 +188,15 @@ class Coordinator extends GetxController with ServiceableController {
   void scheduleBackup() {
     Future.delayed(const Duration(seconds: 5), () async {
       get<DatabaseService>().createBackup();
+
+      if (get<OnlineController>().accountSync != null) {
+        // get<OnlineController>().onStandardSyncUpload(
+        //   currentSnapshot: get<DatabaseService>().currentSnapshot,
+        // );
+        get<OnlineController>().sync(
+          currentSnapshot: get<DatabaseService>().currentSnapshot,
+        );
+      }
     });
   }
 
@@ -193,5 +211,15 @@ class Coordinator extends GetxController with ServiceableController {
 
   void installRoutines(List<Workout> routines) {
     get<RoutinesController>().installRoutines(routines);
+  }
+
+  void onSuccessfulLogin() {
+    get<OnlineController>().checkLocalAndRemoteDatabases(
+      currentSnapshot: get<DatabaseService>().currentSnapshot,
+    );
+  }
+
+  Future<void> overrideDatabase(DatabaseSnapshot snapshot) {
+    return get<DatabaseService>().overrideDatabase(snapshot);
   }
 }

@@ -67,6 +67,7 @@ class VersionedJsonImportV7 extends VersionedJsonImportBase {
       ],
       foodCategories: {},
       achievements: [],
+      bodyMeasurements: [],
     );
   }
 

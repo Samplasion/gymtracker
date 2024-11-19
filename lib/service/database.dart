@@ -51,6 +51,8 @@ class DatabaseService extends GetxService with ChangeNotifier {
       BehaviorSubject<DateSequence<Map<String, NutritionCategory>>>.seeded(
           DateSequence.empty());
   final completions$ = BehaviorSubject<List<AchievementCompletion>>.seeded([]);
+  final bodyMeasurements$ =
+      BehaviorSubject<List<BodyMeasurement>>.seeded([]);
 
   final backups = _DatabaseBackups();
   BehaviorSubject<List<DatabaseBackup>> get _backups$ => BehaviorSubject();
@@ -74,6 +76,7 @@ class DatabaseService extends GetxService with ChangeNotifier {
     favoriteFoods$.add([]);
     nutritionCategories$.add(DateSequence.empty());
     completions$.add([]);
+    bodyMeasurements$.add([]);
   }
 
   writeSettings(Prefs prefs) {
@@ -121,6 +124,7 @@ class DatabaseService extends GetxService with ChangeNotifier {
       "customBarcodeFoods",
       "favoriteFoods",
       "nutritionCategories",
+      "bodyMeasurements",
     ].map((element) => false).toList();
     check() {
       final shouldCall = !_isInit || overrideInitializationCheck;
@@ -220,6 +224,12 @@ class DatabaseService extends GetxService with ChangeNotifier {
       nutritionCategories$.add(event);
       onDatabaseUpdated("nutrition categories")();
       initialized[12] = true;
+      check();
+    });
+    _db.watchBodyMeasurements().listen((event) {
+      bodyMeasurements$.add(event);
+      onDatabaseUpdated("body measurements")();
+      initialized[13] = true;
       check();
     });
     backups.watch().listen((event) {
@@ -478,6 +488,35 @@ class DatabaseService extends GetxService with ChangeNotifier {
           List<AchievementCompletion> completions) =>
       db.setAchievementCompletions(completions);
 
+  Future _writeBodyMeasurements(List<BodyMeasurement> measurements) {
+    return _db.setBodyMeasurements(measurements);
+  }
+
+  Future<void> addBodyMeasurements(
+      List<BodyMeasurement> measurements) async {
+    if (measurements.isEmpty) return;
+
+    final allMeasurements = bodyMeasurements$.value + measurements;
+    return _writeBodyMeasurements(allMeasurements);
+  }
+
+  getBodyMeasurement(String measurementID) {
+    return bodyMeasurements$.value
+        .firstWhereOrNull((element) => element.id == measurementID);
+  }
+
+  setBodyMeasurement(BodyMeasurement measurement) {
+    if (getBodyMeasurement(measurement.id) == null) {
+      _db.insertBodyMeasurement(measurement);
+    } else {
+      _db.updateBodyMeasurement(measurement);
+    }
+  }
+
+  removeBodyMeasurement(BodyMeasurement measurement) {
+    _db.deleteBodyMeasurement(measurement.id);
+  }
+
   DatabaseSnapshot get currentSnapshot => DatabaseSnapshot(
         customExercises: exercises,
         routines: routines,
@@ -496,6 +535,7 @@ class DatabaseService extends GetxService with ChangeNotifier {
           return MapEntry(map.date, map.value.values.toList());
         })),
         achievements: completions$.value,
+        bodyMeasurements: bodyMeasurements$.value,
       );
 
   toJson() {

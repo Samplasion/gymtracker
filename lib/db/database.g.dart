@@ -3311,6 +3311,183 @@ class WeightMeasurementsCompanion extends UpdateCompanion<WeightMeasurement> {
   }
 }
 
+class $BodyMeasurementsTable extends BodyMeasurements
+    with TableInfo<$BodyMeasurementsTable, BodyMeasurement> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $BodyMeasurementsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+      'id', aliasedName, false,
+      type: DriftSqlType.string,
+      requiredDuringInsert: false,
+      clientDefault: () => _uuid.v4());
+  static const VerificationMeta _valueMeta = const VerificationMeta('value');
+  @override
+  late final GeneratedColumn<double> value = GeneratedColumn<double>(
+      'value', aliasedName, false,
+      type: DriftSqlType.double, requiredDuringInsert: true);
+  static const VerificationMeta _timeMeta = const VerificationMeta('time');
+  @override
+  late final GeneratedColumn<DateTime> time = GeneratedColumn<DateTime>(
+      'time', aliasedName, false,
+      type: DriftSqlType.dateTime, requiredDuringInsert: true);
+  static const VerificationMeta _typeMeta = const VerificationMeta('type');
+  @override
+  late final GeneratedColumnWithTypeConverter<BodyMeasurementPart, String>
+      type = GeneratedColumn<String>('type', aliasedName, false,
+              type: DriftSqlType.string, requiredDuringInsert: true)
+          .withConverter<BodyMeasurementPart>(
+              $BodyMeasurementsTable.$convertertype);
+  @override
+  List<GeneratedColumn> get $columns => [id, value, time, type];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'body_measurements';
+  @override
+  VerificationContext validateIntegrity(Insertable<BodyMeasurement> instance,
+      {bool isInserting = false}) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('value')) {
+      context.handle(
+          _valueMeta, value.isAcceptableOrUnknown(data['value']!, _valueMeta));
+    } else if (isInserting) {
+      context.missing(_valueMeta);
+    }
+    if (data.containsKey('time')) {
+      context.handle(
+          _timeMeta, time.isAcceptableOrUnknown(data['time']!, _timeMeta));
+    } else if (isInserting) {
+      context.missing(_timeMeta);
+    }
+    context.handle(_typeMeta, const VerificationResult.success());
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  BodyMeasurement map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return BodyMeasurement(
+      id: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}id'])!,
+      value: attachedDatabase.typeMapping
+          .read(DriftSqlType.double, data['${effectivePrefix}value'])!,
+      time: attachedDatabase.typeMapping
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}time'])!,
+      type: $BodyMeasurementsTable.$convertertype.fromSql(attachedDatabase
+          .typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}type'])!),
+    );
+  }
+
+  @override
+  $BodyMeasurementsTable createAlias(String alias) {
+    return $BodyMeasurementsTable(attachedDatabase, alias);
+  }
+
+  static JsonTypeConverter2<BodyMeasurementPart, String, String>
+      $convertertype =
+      const EnumNameConverter<BodyMeasurementPart>(BodyMeasurementPart.values);
+}
+
+class BodyMeasurementsCompanion extends UpdateCompanion<BodyMeasurement> {
+  final Value<String> id;
+  final Value<double> value;
+  final Value<DateTime> time;
+  final Value<BodyMeasurementPart> type;
+  final Value<int> rowid;
+  const BodyMeasurementsCompanion({
+    this.id = const Value.absent(),
+    this.value = const Value.absent(),
+    this.time = const Value.absent(),
+    this.type = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  BodyMeasurementsCompanion.insert({
+    this.id = const Value.absent(),
+    required double value,
+    required DateTime time,
+    required BodyMeasurementPart type,
+    this.rowid = const Value.absent(),
+  })  : value = Value(value),
+        time = Value(time),
+        type = Value(type);
+  static Insertable<BodyMeasurement> custom({
+    Expression<String>? id,
+    Expression<double>? value,
+    Expression<DateTime>? time,
+    Expression<String>? type,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (value != null) 'value': value,
+      if (time != null) 'time': time,
+      if (type != null) 'type': type,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  BodyMeasurementsCompanion copyWith(
+      {Value<String>? id,
+      Value<double>? value,
+      Value<DateTime>? time,
+      Value<BodyMeasurementPart>? type,
+      Value<int>? rowid}) {
+    return BodyMeasurementsCompanion(
+      id: id ?? this.id,
+      value: value ?? this.value,
+      time: time ?? this.time,
+      type: type ?? this.type,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (value.present) {
+      map['value'] = Variable<double>(value.value);
+    }
+    if (time.present) {
+      map['time'] = Variable<DateTime>(time.value);
+    }
+    if (type.present) {
+      map['type'] = Variable<String>(
+          $BodyMeasurementsTable.$convertertype.toSql(type.value));
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('BodyMeasurementsCompanion(')
+          ..write('id: $id, ')
+          ..write('value: $value, ')
+          ..write('time: $time, ')
+          ..write('type: $type, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 class $FoodsTable extends Foods with TableInfo<$FoodsTable, DBFood> {
   @override
   final GeneratedDatabase attachedDatabase;
@@ -4663,6 +4840,8 @@ abstract class _$GTDatabaseImpl extends GeneratedDatabase {
   late final $OngoingDataTable ongoingData = $OngoingDataTable(this);
   late final $WeightMeasurementsTable weightMeasurements =
       $WeightMeasurementsTable(this);
+  late final $BodyMeasurementsTable bodyMeasurements =
+      $BodyMeasurementsTable(this);
   late final $FoodsTable foods = $FoodsTable(this);
   late final $NutritionGoalsTable nutritionGoals = $NutritionGoalsTable(this);
   late final $CustomBarcodeFoodsTable customBarcodeFoods =
@@ -4685,6 +4864,7 @@ abstract class _$GTDatabaseImpl extends GeneratedDatabase {
         preferences,
         ongoingData,
         weightMeasurements,
+        bodyMeasurements,
         foods,
         nutritionGoals,
         customBarcodeFoods,
@@ -6585,6 +6765,122 @@ class $$WeightMeasurementsTableOrderingComposer
           ColumnOrderings(column, joinBuilders: joinBuilders));
 }
 
+typedef $$BodyMeasurementsTableCreateCompanionBuilder
+    = BodyMeasurementsCompanion Function({
+  Value<String> id,
+  required double value,
+  required DateTime time,
+  required BodyMeasurementPart type,
+  Value<int> rowid,
+});
+typedef $$BodyMeasurementsTableUpdateCompanionBuilder
+    = BodyMeasurementsCompanion Function({
+  Value<String> id,
+  Value<double> value,
+  Value<DateTime> time,
+  Value<BodyMeasurementPart> type,
+  Value<int> rowid,
+});
+
+class $$BodyMeasurementsTableTableManager extends RootTableManager<
+    _$GTDatabaseImpl,
+    $BodyMeasurementsTable,
+    BodyMeasurement,
+    $$BodyMeasurementsTableFilterComposer,
+    $$BodyMeasurementsTableOrderingComposer,
+    $$BodyMeasurementsTableCreateCompanionBuilder,
+    $$BodyMeasurementsTableUpdateCompanionBuilder> {
+  $$BodyMeasurementsTableTableManager(
+      _$GTDatabaseImpl db, $BodyMeasurementsTable table)
+      : super(TableManagerState(
+          db: db,
+          table: table,
+          filteringComposer:
+              $$BodyMeasurementsTableFilterComposer(ComposerState(db, table)),
+          orderingComposer:
+              $$BodyMeasurementsTableOrderingComposer(ComposerState(db, table)),
+          updateCompanionCallback: ({
+            Value<String> id = const Value.absent(),
+            Value<double> value = const Value.absent(),
+            Value<DateTime> time = const Value.absent(),
+            Value<BodyMeasurementPart> type = const Value.absent(),
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              BodyMeasurementsCompanion(
+            id: id,
+            value: value,
+            time: time,
+            type: type,
+            rowid: rowid,
+          ),
+          createCompanionCallback: ({
+            Value<String> id = const Value.absent(),
+            required double value,
+            required DateTime time,
+            required BodyMeasurementPart type,
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              BodyMeasurementsCompanion.insert(
+            id: id,
+            value: value,
+            time: time,
+            type: type,
+            rowid: rowid,
+          ),
+        ));
+}
+
+class $$BodyMeasurementsTableFilterComposer
+    extends FilterComposer<_$GTDatabaseImpl, $BodyMeasurementsTable> {
+  $$BodyMeasurementsTableFilterComposer(super.$state);
+  ColumnFilters<String> get id => $state.composableBuilder(
+      column: $state.table.id,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+
+  ColumnFilters<double> get value => $state.composableBuilder(
+      column: $state.table.value,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+
+  ColumnFilters<DateTime> get time => $state.composableBuilder(
+      column: $state.table.time,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+
+  ColumnWithTypeConverterFilters<BodyMeasurementPart, BodyMeasurementPart,
+          String>
+      get type => $state.composableBuilder(
+          column: $state.table.type,
+          builder: (column, joinBuilders) => ColumnWithTypeConverterFilters(
+              column,
+              joinBuilders: joinBuilders));
+}
+
+class $$BodyMeasurementsTableOrderingComposer
+    extends OrderingComposer<_$GTDatabaseImpl, $BodyMeasurementsTable> {
+  $$BodyMeasurementsTableOrderingComposer(super.$state);
+  ColumnOrderings<String> get id => $state.composableBuilder(
+      column: $state.table.id,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  ColumnOrderings<double> get value => $state.composableBuilder(
+      column: $state.table.value,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  ColumnOrderings<DateTime> get time => $state.composableBuilder(
+      column: $state.table.time,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  ColumnOrderings<String> get type => $state.composableBuilder(
+      column: $state.table.type,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+}
+
 typedef $$FoodsTableCreateCompanionBuilder = FoodsCompanion Function({
   Value<String> id,
   required DateTime dateAdded,
@@ -7212,6 +7508,8 @@ class $GTDatabaseImplManager {
       $$OngoingDataTableTableManager(_db, _db.ongoingData);
   $$WeightMeasurementsTableTableManager get weightMeasurements =>
       $$WeightMeasurementsTableTableManager(_db, _db.weightMeasurements);
+  $$BodyMeasurementsTableTableManager get bodyMeasurements =>
+      $$BodyMeasurementsTableTableManager(_db, _db.bodyMeasurements);
   $$FoodsTableTableManager get foods =>
       $$FoodsTableTableManager(_db, _db.foods);
   $$NutritionGoalsTableTableManager get nutritionGoals =>

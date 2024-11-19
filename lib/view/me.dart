@@ -35,8 +35,8 @@ import 'package:gymtracker/view/utils/sliver_utils.dart';
 import 'package:gymtracker/view/utils/speed_dial.dart';
 import 'package:intl/intl.dart';
 
+part 'me.body.dart';
 part 'me.profile.dart';
-part 'me.weight.dart';
 
 class MeView extends GetView<MeController> {
   const MeView({super.key});
@@ -157,7 +157,7 @@ class MeView extends GetView<MeController> {
                   child: SafeArea(
                     top: false,
                     bottom: false,
-                    child: SectionTitle("me.weight.label".t),
+                    child: SectionTitle("me.bodyMeasurements".t),
                   ),
                 ),
                 const Padding(

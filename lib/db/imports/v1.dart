@@ -99,6 +99,7 @@ class VersionedJsonImportV1 extends VersionedJsonImportBase {
       favoriteFoods: [],
       foodCategories: {},
       achievements: [],
+      bodyMeasurements: [],
     );
   }
 

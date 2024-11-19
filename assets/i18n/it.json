@@ -1238,7 +1238,8 @@
     "sync": {
       "label": "Modifiche non salvate",
       "subtitle": "Tap to sync your changes with the cloud."
-    }
+    },
+    "bodyMeasurements": "Misurazioni corporee"
   },
   "richText": {
     "highlight": "Evidenzia"
@@ -2371,5 +2372,52 @@
       "message": "Vuoi sovrascrivere i dati sul server con i dati locali?"
     },
     "inProgress": "Sincronizzo"
+  },
+  "bodyMeasurement": {
+    "neck": {
+      "label": "Collo"
+    },
+    "waist": {
+      "label": "Vita"
+    },
+    "bodyFat": {
+      "label": "Percentuale di grasso corporeo"
+    },
+    "shoulder": {
+      "label": "Spalla"
+    },
+    "chest": {
+      "label": "Petto"
+    },
+    "leftBicep": {
+      "label": "Bicipite sinistro"
+    },
+    "rightBicep": {
+      "label": "Bicipite destro"
+    },
+    "leftForearm": {
+      "label": "Avambraccio sinistro"
+    },
+    "rightForearm": {
+      "label": "Avambraccio destro"
+    },
+    "abdomen": {
+      "label": "Addome"
+    },
+    "hips": {
+      "label": "Anche"
+    },
+    "leftThigh": {
+      "label": "Coscia sinistra"
+    },
+    "rightThigh": {
+      "label": "Coscia destra"
+    },
+    "leftCalf": {
+      "label": "Polpaccio sinistro"
+    },
+    "rightCalf": {
+      "label": "Polpaccio destro"
+    }
   }
 }

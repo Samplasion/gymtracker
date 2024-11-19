@@ -45,6 +45,7 @@ class VersionedJsonImportV2 extends VersionedJsonImportBase {
       favoriteFoods: [],
       foodCategories: {},
       achievements: [],
+      bodyMeasurements: [],
     )..logger.t("Importing");
   }
 

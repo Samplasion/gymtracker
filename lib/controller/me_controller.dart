@@ -10,6 +10,7 @@ import 'package:rxdart/rxdart.dart';
 
 class MeController extends GetxController with ServiceableController {
   RxList<WeightMeasurement> weightMeasurements = <WeightMeasurement>[].obs;
+  RxList<BodyMeasurement> bodyMeasurements = <BodyMeasurement>[].obs;
 
   BehaviorSubject<PredictedWeightMeasurement?> predictedWeight =
       BehaviorSubject<PredictedWeightMeasurement?>();
@@ -37,6 +38,12 @@ class MeController extends GetxController with ServiceableController {
       weightMeasurements(event);
       Get.find<Coordinator>()
           .maybeUnlockAchievements(AchievementTrigger.weight);
+    });
+    service.bodyMeasurements$.listen((event) {
+      logger.i("Updated with ${event.length} body measurements");
+      bodyMeasurements(event);
+      // Get.find<Coordinator>()
+      //     .maybeUnlockAchievements(AchievementTrigger.body);
     });
   }
 
@@ -93,5 +100,17 @@ class MeController extends GetxController with ServiceableController {
       time: nextTime,
       weightUnit: weightUnit,
     );
+  }
+
+  void addBodyMeasurement(BodyMeasurement measurement) {
+    service.setBodyMeasurement(measurement);
+  }
+
+  void removeBodyMeasurement(BodyMeasurement measurement) {
+    service.removeBodyMeasurement(measurement);
+  }
+
+  BodyMeasurement? getBodyMeasurementByID(String measurementID) {
+    return service.getBodyMeasurement(measurementID);
   }
 }

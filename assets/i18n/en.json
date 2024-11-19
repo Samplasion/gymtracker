@@ -1244,7 +1244,8 @@
     "sync": {
       "label": "Unsynced changes",
       "subtitle": "Tap to sync your changes with the cloud."
-    }
+    },
+    "bodyMeasurements": "Body measurements"
   },
   "richText": {
     "highlight": "Highlight"
@@ -2378,5 +2379,52 @@
       "message": "Do you wish to overwrite the data in the cloud with your local data?"
     },
     "inProgress": "Synchronizing"
+  },
+  "bodyMeasurement": {
+    "neck": {
+      "label": "Neck"
+    },
+    "waist": {
+      "label": "Waist"
+    },
+    "bodyFat": {
+      "label": "Body fat percentage"
+    },
+    "shoulder": {
+      "label": "Shoulder"
+    },
+    "chest": {
+      "label": "Chest"
+    },
+    "leftBicep": {
+      "label": "Left biceps"
+    },
+    "rightBicep": {
+      "label": "Right biceps"
+    },
+    "leftForearm": {
+      "label": "Left forearm"
+    },
+    "rightForearm": {
+      "label": "Right forearm"
+    },
+    "abdomen": {
+      "label": "Abdomen"
+    },
+    "hips": {
+      "label": "Hips"
+    },
+    "leftThigh": {
+      "label": "Left thigh"
+    },
+    "rightThigh": {
+      "label": "Right thigh"
+    },
+    "leftCalf": {
+      "label": "Left calf"
+    },
+    "rightCalf": {
+      "label": "Right calf"
+    }
   }
 }

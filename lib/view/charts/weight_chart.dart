@@ -1,11 +1,11 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
-import 'package:gymtracker/icons/gymtracker_icons.dart';
 import 'package:gymtracker/model/measurements.dart';
 import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/utils/constants.dart';
 import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/utils/theme.dart';
+import 'package:gymtracker/utils/utils.dart';
 import 'package:gymtracker/view/charts/line_charts_time_series.dart';
 import 'package:gymtracker/view/components/responsive_builder.dart';
 import 'package:intl/intl.dart';
@@ -161,39 +161,50 @@ class WeightChart extends StatelessWidget {
 class WeightChartTimeSeries extends StatelessWidget {
   final List<WeightMeasurement> weights;
   final PredictedWeightMeasurement? predictedWeight;
+  final List<BodyMeasurement> bodyMeasurements;
+  final ValueChanged<BodyMeasurementPart?>? onSelectCategory;
 
-  const WeightChartTimeSeries(
-      {required this.weights, this.predictedWeight, super.key});
+  const WeightChartTimeSeries({
+    required this.weights,
+    this.predictedWeight,
+    required this.bodyMeasurements,
+    this.onSelectCategory,
+    super.key,
+  });
 
-  static const _chartCategory = "weight";
+  Map<BodyMeasurementPart, List<BodyMeasurement>> get measurementsByPart => {
+        for (final part in BodyMeasurementPart.values)
+          part: bodyMeasurements
+              .where((element) => element.type == part)
+              .toList(),
+      };
 
   @override
   Widget build(BuildContext context) {
     return ResponsiveBuilder(builder: (context, breakpoint) {
       final relevantWeights = weights.toList();
-      final minY = [
-        ...relevantWeights.map((m) => m.convertedWeight),
-        if (predictedWeight != null) predictedWeight!.weight
-      ].min;
-      final maxY = [
-        ...relevantWeights.map((m) => m.convertedWeight),
-        if (predictedWeight != null) predictedWeight!.weight
-      ].max;
-      // final padding = [(maxY - minY) / 5, 2.5].min;
 
       return LineChartTimeSeries(
         data: {
-          _chartCategory: [
+          null: [
             for (int i = 0; i < relevantWeights.length; i++)
               LineChartPoint(
                 value: relevantWeights[i].convertedWeight,
                 date: relevantWeights[i].time,
               ),
-          ]
+          ],
+          for (final part in BodyMeasurementPart.values)
+            part: [
+              for (int i = 0; i < (measurementsByPart[part]?.length ?? 0); i++)
+                LineChartPoint(
+                  value: measurementsByPart[part]![i].value,
+                  date: measurementsByPart[part]![i].time,
+                ),
+            ],
         },
         predictions: {
           if (predictedWeight != null)
-            _chartCategory: [
+            null: [
               LineChartPoint(
                 value: relevantWeights.last.convertedWeight,
                 date: relevantWeights.last.time,
@@ -205,17 +216,36 @@ class WeightChartTimeSeries extends StatelessWidget {
             ]
         },
         categories: {
-          _chartCategory:
-              LineChartCategory(title: "Weight", icon: const Icon(GTIcons.info))
+          null: LineChartCategory(
+            title: "me.addWeight.weight.label".t,
+            icon: Text(
+              "me.addWeight.weight.label".t.characters.first,
+              style: const TextStyle(fontSize: 10),
+            ),
+          ),
+          for (final part in BodyMeasurementPart.values)
+            part: LineChartCategory(
+              title: "bodyMeasurement.${part.name}.label".t,
+              icon: Text(
+                "bodyMeasurement.${part.name}.label"
+                    .t
+                    .characters
+                    .first
+                    .toUpperCase(),
+                style: const TextStyle(fontSize: 10),
+              ),
+            ),
         },
-        minY: minY,
-        maxY: maxY,
-        currentValueBuilder: (_, __, point, isPredicted) => Text.rich(
+        // minY: minY,
+        // maxY: maxY,
+        currentValueBuilder: (type, __, point, isPredicted) => Text.rich(
           TextSpan(children: [
             TextSpan(
               children: [
                 TextSpan(
-                  text: point.value.userFacingWeight,
+                  text: type == null
+                      ? point.value.userFacingWeight
+                      : "${stringifyDouble(point.value, decimalSeparator: NumberFormat(context.locale.languageCode).symbols.DECIMAL_SEP)} ${type.unit}",
                 )
               ],
               style: Theme.of(context).textTheme.bodyLarge!.copyWith(
@@ -235,7 +265,10 @@ class WeightChartTimeSeries extends StatelessWidget {
             ),
           ]),
         ),
-        leftTitleBuilder: (_, value) => value.userFacingWeight,
+        leftTitleBuilder: (type, value) => type == null
+            ? value.userFacingWeight
+            : "${stringifyDouble(value, decimalSeparator: NumberFormat(context.locale.languageCode).symbols.DECIMAL_SEP)} ${type.unit}",
+        onCategoryChanged: onSelectCategory,
       );
     });
   }

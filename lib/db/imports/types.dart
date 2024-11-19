@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:gymtracker/db/database.dart';
 import 'package:gymtracker/db/imports/v1.dart';
 import 'package:gymtracker/db/imports/v10.dart';
+import 'package:gymtracker/db/imports/v11.dart';
 import 'package:gymtracker/db/imports/v2.dart';
 import 'package:gymtracker/db/imports/v3.dart';
 import 'package:gymtracker/db/imports/v4.dart';
@@ -31,6 +32,7 @@ const converters = {
   8: VersionedJsonImportV8(),
   9: VersionedJsonImportV9(),
   10: VersionedJsonImportV10(),
+  11: VersionedJsonImportV11(),
 };
 
 VersionedJsonImportBase getConverter(int version) {
@@ -68,6 +70,7 @@ class DatabaseSnapshot {
   final List<String> favoriteFoods;
   final Map<DateTime, List<NutritionCategory>> foodCategories;
   final List<AchievementCompletion> achievements;
+  final List<BodyMeasurement> bodyMeasurements;
 
   const DatabaseSnapshot({
     required this.customExercises,
@@ -84,6 +87,7 @@ class DatabaseSnapshot {
     required this.favoriteFoods,
     required this.foodCategories,
     required this.achievements,
+    required this.bodyMeasurements,
   });
 
   @override
@@ -103,6 +107,7 @@ class DatabaseSnapshot {
   favoriteFoods: ${jsonEncode(favoriteFoods)},
   foodCategories: ${jsonEncode(foodCategories)},
   achievements: ${jsonEncode(achievements)},
+  bodyMeasurements: ${jsonEncode(bodyMeasurements)},
 )""";
   }
 

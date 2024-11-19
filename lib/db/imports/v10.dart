@@ -79,6 +79,7 @@ class VersionedJsonImportV10 extends VersionedJsonImportBase {
           AchievementCompletion.fromJson(
               (achievement as Map).cast<String, dynamic>()),
       ],
+      bodyMeasurements: [],
     );
   }
 

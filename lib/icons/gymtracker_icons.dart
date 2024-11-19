@@ -100,6 +100,7 @@ class GTIcons {
   static const IconData achievement_locked = Icons.lock_rounded;
   static const IconData add_exercise = Icons.add_rounded;
   static const IconData add_food = Icons.post_add_rounded;
+  static const IconData add_measurement = Icons.add_rounded;
   static const IconData add_superset = Icons.add_circle_rounded;
   static const IconData add_to_faves = Icons.star_border_rounded;
   static const IconData add_to_superset = Icons.group_work_rounded;
@@ -207,6 +208,7 @@ class GTIcons {
     'achievement_locked': achievement_locked,
     'add_exercise': add_exercise,
     'add_food': add_food,
+    'add_measurement': add_measurement,
     'add_superset': add_superset,
     'add_to_faves': add_to_faves,
     'add_to_superset': add_to_superset,

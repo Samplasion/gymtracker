@@ -23,6 +23,7 @@ class LineChartTimeSeries<T> extends StatefulWidget {
   final String Function(T, double) leftTitleBuilder;
   final double? minY;
   final double? maxY;
+  final ValueChanged<T>? onCategoryChanged;
 
   LineChartTimeSeries({
     super.key,
@@ -33,6 +34,7 @@ class LineChartTimeSeries<T> extends StatefulWidget {
     this.predictions,
     this.minY,
     this.maxY,
+    this.onCategoryChanged,
   })  : assert(categories.isNotEmpty),
         assert(data.isNotEmpty),
         assert(categories.length == data.length),
@@ -78,15 +80,16 @@ class _LineChartTimeSeriesState<T> extends State<LineChartTimeSeries<T>> {
   late final double leftReservedSize = () {
     final sizes = widget.data.entries.map((e) {
       final categorySizes = e.value.map((point) {
-        return widget
-            .leftTitleBuilder(e.key, point.value)
-            // Worst case scenario for numbers
-            .replaceAll(RegExp(r"[0-9]"), "m")
-            .computeSize(
-              style: context.textTheme.labelSmall!,
-            )
-            .width;
-      }).toList();
+            return widget
+                .leftTitleBuilder(e.key, point.value)
+                // Worst case scenario for numbers
+                .replaceAll(RegExp(r"[0-9]"), "m")
+                .computeSize(
+                  style: context.textTheme.labelSmall!,
+                )
+                .width;
+          }).toList() +
+          [0];
       return categorySizes.max;
     }).toList();
     return sizes.max;
@@ -104,8 +107,8 @@ class _LineChartTimeSeriesState<T> extends State<LineChartTimeSeries<T>> {
         ),
       );
 
-  DateTime get startingDate =>
-      children.last.date.startOfDay.subtract(type.duration);
+  DateTime get startingDate => (children.isEmpty ? DateTime.now() : 
+      children.last.date).startOfDay.subtract(type.duration);
   List<LineChartPoint> get filteredChildren => children.where((point) {
         return point.date.isAfter(startingDate);
       }).toList();
@@ -215,16 +218,17 @@ class _LineChartTimeSeriesState<T> extends State<LineChartTimeSeries<T>> {
         Row(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Expanded(
-              child: widget.currentValueBuilder(
-                selectedCategory,
-                hoveredIndex,
-                dataIndices[selectedCategory]![hoveredIndex]!,
-                // Whether this point is predicted
-                !children.any((element) =>
-                    element.date.minutesSinceEpoch == hoveredIndex),
-              ),
-            ),
+            if (dataIndices[selectedCategory]?[hoveredIndex] != null)
+              Expanded(
+                child: widget.currentValueBuilder(
+                  selectedCategory,
+                  hoveredIndex,
+                  dataIndices[selectedCategory]![hoveredIndex]!,
+                  // Whether this point is predicted
+                  !children.any((element) =>
+                      element.date.minutesSinceEpoch == hoveredIndex),
+                ),
+              ) else const Spacer(),
             TextButton(
               onPressed: () {
                 Go.showRadioModal(
@@ -420,7 +424,7 @@ class _LineChartTimeSeriesState<T> extends State<LineChartTimeSeries<T>> {
                           show: true,
                           checkToShowSpotLine: (spot) =>
                               spot.x ==
-                              filteredChildren.last.date.minutesSinceEpoch,
+                              (filteredChildren.isEmpty ? 0 : filteredChildren.last.date.minutesSinceEpoch),
                           flLineStyle: FlLine(color: colorScheme.primary),
                         ),
                         color: colorScheme.primary.withOpacity(0.3),
@@ -451,9 +455,10 @@ class _LineChartTimeSeriesState<T> extends State<LineChartTimeSeries<T>> {
                             : entry.value.icon,
                       ),
                       selected: this.selectedCategory == entry.key,
-                      onSelected: (sel) {
+                      onSelected: widget.data[entry.key]?.isEmpty != false ? null : (sel) {
                         if (sel) {
                           setState(() => this.selectedCategory = entry.key);
+                          widget.onCategoryChanged?.call(entry.key);
                           _recalculateMinMax();
                         }
                       },

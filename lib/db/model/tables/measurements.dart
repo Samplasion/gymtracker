@@ -15,3 +15,14 @@ class WeightMeasurements extends Table {
   Column<DateTime> get time => dateTime()();
   TextColumn get weightUnit => textEnum<Weights>()();
 }
+
+@UseRowClass(BodyMeasurement)
+class BodyMeasurements extends Table {
+  @override
+  Set<Column<Object>> get primaryKey => {id};
+
+  TextColumn get id => text().clientDefault(() => _uuid.v4())();
+  RealColumn get value => real()();
+  Column<DateTime> get time => dateTime()();
+  TextColumn get type => textEnum<BodyMeasurementPart>()();
+}

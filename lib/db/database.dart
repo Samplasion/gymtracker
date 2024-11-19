@@ -49,7 +49,7 @@ part 'database.g.dart';
 // Used in the generated code
 const _uuid = Uuid();
 
-const DATABASE_VERSION = 10;
+const DATABASE_VERSION = 11;
 
 abstract class GTDatabase {
   Future<T> transaction<T>(Future<T> Function() action, {bool requireNew});
@@ -137,6 +137,12 @@ abstract class GTDatabase {
   Future<void> setAchievementCompletions(
       List<AchievementCompletion> completions);
 
+  Stream<List<BodyMeasurement>> watchBodyMeasurements();
+  Future<void> insertBodyMeasurement(BodyMeasurement measurement);
+  Future<void> deleteBodyMeasurement(String id);
+  Future<void> updateBodyMeasurement(BodyMeasurement measurement);
+  Future<void> setBodyMeasurements(List<BodyMeasurement> measurements);
+
   Future clearTheWholeThingIAmAbsolutelySureISwear();
   Future<File> get path;
   Future<void> close();
@@ -152,6 +158,7 @@ abstract class GTDatabase {
   Preferences,
   OngoingData,
   WeightMeasurements,
+  BodyMeasurements,
   Foods,
   NutritionGoals,
   CustomBarcodeFoods,
@@ -257,6 +264,9 @@ class GTDatabaseImpl extends _$GTDatabaseImpl implements GTDatabase {
               },
               from9To10: (m, schema) async {
                 await m.createTable(schema.achievements);
+              },
+              from10To11: (m, schema) async {
+                await m.createTable(schema.bodyMeasurements);
               },
             ),
           );
@@ -1023,6 +1033,40 @@ class GTDatabaseImpl extends _$GTDatabaseImpl implements GTDatabase {
               .toList(),
           mode: InsertMode.insertOrIgnore,
         );
+      });
+    });
+  }
+
+  @override
+  Stream<List<BodyMeasurement>> watchBodyMeasurements() {
+    final query = select(bodyMeasurements)
+      ..orderBy([(tbl) => OrderingTerm.asc(tbl.time)]);
+    return query.watch();
+  }
+
+  @override
+  Future<void> insertBodyMeasurement(BodyMeasurement measurement) {
+    return into(bodyMeasurements).insert(measurement);
+  }
+
+  @override
+  Future<void> deleteBodyMeasurement(String id) {
+    return (delete(bodyMeasurements)..where((tbl) => tbl.id.equals(id))).go();
+  }
+
+  @override
+  Future<void> updateBodyMeasurement(BodyMeasurement measurement) {
+    return (update(bodyMeasurements).replace(measurement));
+  }
+
+  @override
+  Future<void> setBodyMeasurements(List<BodyMeasurement> measurements) {
+    return transaction(() async {
+      await delete(bodyMeasurements).go();
+      await batch((batch) {
+        for (final measurement in measurements) {
+          batch.insert(bodyMeasurements, measurement);
+        }
       });
     });
   }

@@ -1,4 +1,5 @@
 import 'package:gymtracker/db/imports/types.dart';
+import 'package:gymtracker/model/achievements.dart';
 import 'package:gymtracker/model/exercisable.dart';
 import 'package:gymtracker/model/exercise.dart';
 import 'package:gymtracker/model/measurements.dart';
@@ -6,11 +7,11 @@ import 'package:gymtracker/model/preferences.dart';
 import 'package:gymtracker/model/workout.dart';
 import 'package:gymtracker/struct/nutrition.dart';
 
-class VersionedJsonImportV8 extends VersionedJsonImportBase {
+class VersionedJsonImportV11 extends VersionedJsonImportBase {
   @override
-  int get version => 8;
+  int get version => 11;
 
-  const VersionedJsonImportV8();
+  const VersionedJsonImportV11();
 
   @override
   DatabaseSnapshot process(Map<String, dynamic> json) {
@@ -73,8 +74,15 @@ class VersionedJsonImportV8 extends VersionedJsonImportBase {
                   (e as Map).cast<String, dynamic>()))
               .toList(),
       },
-      achievements: [],
-      bodyMeasurements: [],
+      achievements: [
+        for (final achievement in (json['achievementCompletions'] as List))
+          AchievementCompletion.fromJson(
+              (achievement as Map).cast<String, dynamic>()),
+      ],
+      bodyMeasurements: [
+        for (final weight in (json['bodyMeasurements'] as List))
+          BodyMeasurement.fromJson(weight),
+      ],
     );
   }
 
@@ -139,6 +147,12 @@ class VersionedJsonImportV8 extends VersionedJsonImportBase {
             for (final cat in category.value) cat.toJson()
           ],
       },
+      'achievementCompletions': [
+        for (final achievement in data.achievements) achievement.toJson(),
+      ],
+      'bodyMeasurements': [
+        for (final weight in data.bodyMeasurements) weight.toJson()
+      ],
     };
   }
 }

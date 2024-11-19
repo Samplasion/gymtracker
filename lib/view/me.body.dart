@@ -169,21 +169,16 @@ class _WeightMeasurementDataPageState extends State<WeightMeasurementDataPage> {
                 ],
                 Padding(
                   padding: const EdgeInsets.all(16),
-                  child: StreamBuilder(
-                      stream: controller.bodyMeasurements.stream,
-                      initialData: controller.bodyMeasurements,
-                      builder: (context, snapshot) {
-                        return WeightChartTimeSeries(
-                          weights: controller.weightMeasurements,
-                          bodyMeasurements: snapshot.data ?? [],
-                          predictedWeight: predictedWeight,
-                          onSelectCategory: (part) {
-                            setState(() {
-                              selected = part;
-                            });
-                          },
-                        );
-                      }),
+                  child: WeightChartTimeSeries(
+                    weights: controller.weightMeasurements,
+                    bodyMeasurements: controller.bodyMeasurements,
+                    predictedWeight: predictedWeight,
+                    onSelectCategory: (part) {
+                      setState(() {
+                        selected = part;
+                      });
+                    },
+                  ),
                 ),
               ],
             ),
@@ -223,123 +218,123 @@ class _WeightMeasurementDataPageState extends State<WeightMeasurementDataPage> {
         ],
       ),
       body: StreamBuilder(
-          stream: controller.bodyMeasurements.stream,
-          initialData: controller.bodyMeasurements,
-          builder: (context, snapshot) {
-            final allBodyMeasurements = [...snapshot.data!.reversed];
-            Map<BodyMeasurementPart, List<BodyMeasurement>> bodyMeasurements = {
-              for (final part in BodyMeasurementPart.values)
-                part: allBodyMeasurements
-                    .where((element) => element.type == part)
-                    .toList(),
-            };
+        stream: controller.bodyMeasurements.stream,
+        initialData: controller.bodyMeasurements,
+        builder: (context, snapshot) {
+          final allBodyMeasurements = snapshot.data!.reversed;
+          Map<BodyMeasurementPart, List<BodyMeasurement>> bodyMeasurements = {
+            for (final part in BodyMeasurementPart.values)
+              part: allBodyMeasurements
+                  .where((element) => element.type == part)
+                  .toList(),
+          };
 
-            return StreamBuilder(
-              stream: controller.weightMeasurements.stream,
-              initialData: controller.weightMeasurements,
-              builder: (context, snapshot) {
-                final weightMeasurements = [...snapshot.data!.reversed];
+          return StreamBuilder(
+            stream: controller.weightMeasurements.stream,
+            initialData: controller.weightMeasurements,
+            builder: (context, snapshot) {
+              final weightMeasurements = [...snapshot.data!.reversed];
 
-                if (weightMeasurements.isEmpty) {
-                  return Center(
-                    child: Text(
-                      "me.allData.none".t,
-                      style: Theme.of(context).textTheme.titleLarge,
-                    ),
-                  );
-                }
-
-                final selectedLength = selected == null
-                    ? weightMeasurements.length
-                    : bodyMeasurements[selected]!.length;
-                return CustomScrollView(
-                  slivers: [
-                    SliverToBoxAdapter(child: chart),
-                    SliverList.builder(
-                      itemBuilder: (context, index) {
-                        final measurement = (selected == null
-                            ? weightMeasurements[index]
-                            : bodyMeasurements[selected]![index]);
-                        return Slidable(
-                          key: ValueKey(measurement.id),
-                          endActionPane: ActionPane(
-                            extentRatio: 1 / 3,
-                            dragDismissible: false,
-                            motion: const BehindMotion(),
-                            children: [
-                              SlidableAction(
-                                onPressed: (_) {
-                                  if (selected == null) {
-                                    controller.removeWeightMeasurement(
-                                        measurement as WeightMeasurement);
-                                  } else {
-                                    controller.removeBodyMeasurement(
-                                        measurement as BodyMeasurement);
-                                  }
-                                  Go.snack(
-                                    "me.allData.removed.text".t,
-                                    action: SnackBarAction(
-                                      label: "actions.undo".t,
-                                      onPressed: () {
-                                        if (selected == null) {
-                                          controller.addWeightMeasurement(
-                                              measurement as WeightMeasurement);
-                                        } else {
-                                          controller.addBodyMeasurement(
-                                              measurement as BodyMeasurement);
-                                        }
-                                      },
-                                    ),
-                                    assertive: true,
-                                  );
-                                },
-                                backgroundColor: scheme.error,
-                                foregroundColor: scheme.onError,
-                                icon: GTIcons.delete_forever,
-                                label: 'actions.remove'.t,
-                              ),
-                            ],
-                          ),
-                          child: selected == null
-                              ? ListTile(
-                                  title: Text((measurement as WeightMeasurement)
-                                      .convertedWeight
-                                      .userFacingWeight),
-                                  subtitle: Text(DateFormat.MMMd(
-                                          context.locale.languageCode)
-                                      .add_Hm()
-                                      .format(measurement.time)),
-                                  trailing: const Icon(GTIcons.lt_chevron),
-                                  onTap: () {
-                                    Go.to(
-                                        () => WeightMeasurementDataDetailsPage(
-                                              measurementID: measurement.id,
-                                            ));
-                                  },
-                                )
-                              : ListTile(
-                                  title: Text(
-                                      "${stringifyDouble(measurement.value, decimalSeparator: NumberFormat(context.locale.languageCode).symbols.DECIMAL_SEP)} ${selected!.unit}"),
-                                  subtitle: Text(DateFormat.MMMd(
-                                          context.locale.languageCode)
-                                      .add_Hm()
-                                      .format(measurement.time)),
-                                  trailing: const Icon(GTIcons.lt_chevron),
-                                  onTap: () {
-                                    Go.to(() => BodyMeasurementDataDetailsPage(
-                                          measurementID: measurement.id,
-                                        ));
-                                  },
-                                ),
-                        );
-                      },
-                      itemCount: selectedLength,
-                    ),
-                  ],
+              if (weightMeasurements.isEmpty) {
+                return Center(
+                  child: Text(
+                    "me.allData.none".t,
+                    style: Theme.of(context).textTheme.titleLarge,
+                  ),
                 );
-              },
-            );
-          }),
+              }
+
+              final selectedLength = selected == null
+                  ? weightMeasurements.length
+                  : bodyMeasurements[selected]!.length;
+              return CustomScrollView(
+                slivers: [
+                  SliverToBoxAdapter(child: chart),
+                  SliverList.builder(
+                    itemBuilder: (context, index) {
+                      final measurement = (selected == null
+                          ? weightMeasurements[index]
+                          : bodyMeasurements[selected]![index]);
+                      return Slidable(
+                        key: ValueKey(measurement.id),
+                        endActionPane: ActionPane(
+                          extentRatio: 1 / 3,
+                          dragDismissible: false,
+                          motion: const BehindMotion(),
+                          children: [
+                            SlidableAction(
+                              onPressed: (_) {
+                                if (selected == null) {
+                                  controller.removeWeightMeasurement(
+                                      measurement as WeightMeasurement);
+                                } else {
+                                  controller.removeBodyMeasurement(
+                                      measurement as BodyMeasurement);
+                                }
+                                Go.snack(
+                                  "me.allData.removed.text".t,
+                                  action: SnackBarAction(
+                                    label: "actions.undo".t,
+                                    onPressed: () {
+                                      if (selected == null) {
+                                        controller.addWeightMeasurement(
+                                            measurement as WeightMeasurement);
+                                      } else {
+                                        controller.addBodyMeasurement(
+                                            measurement as BodyMeasurement);
+                                      }
+                                    },
+                                  ),
+                                  assertive: true,
+                                );
+                              },
+                              backgroundColor: scheme.error,
+                              foregroundColor: scheme.onError,
+                              icon: GTIcons.delete_forever,
+                              label: 'actions.remove'.t,
+                            ),
+                          ],
+                        ),
+                        child: selected == null
+                            ? ListTile(
+                                title: Text((measurement as WeightMeasurement)
+                                    .convertedWeight
+                                    .userFacingWeight),
+                                subtitle: Text(
+                                    DateFormat.MMMd(context.locale.languageCode)
+                                        .add_Hm()
+                                        .format(measurement.time)),
+                                trailing: const Icon(GTIcons.lt_chevron),
+                                onTap: () {
+                                  Go.to(() => WeightMeasurementDataDetailsPage(
+                                        measurementID: measurement.id,
+                                      ));
+                                },
+                              )
+                            : ListTile(
+                                title: Text(
+                                    "${stringifyDouble(measurement.value, decimalSeparator: NumberFormat(context.locale.languageCode).symbols.DECIMAL_SEP)} ${selected!.unit}"),
+                                subtitle: Text(
+                                    DateFormat.MMMd(context.locale.languageCode)
+                                        .add_Hm()
+                                        .format(measurement.time)),
+                                trailing: const Icon(GTIcons.lt_chevron),
+                                onTap: () {
+                                  Go.to(() => BodyMeasurementDataDetailsPage(
+                                        measurementID: measurement.id,
+                                      ));
+                                },
+                              ),
+                      );
+                    },
+                    itemCount: selectedLength,
+                  ),
+                ],
+              );
+            },
+          );
+        },
+      ),
     );
   }
 }

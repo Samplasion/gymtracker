@@ -158,7 +158,7 @@ class WeightChart extends StatelessWidget {
   }
 }
 
-class WeightChartTimeSeries extends StatelessWidget {
+class WeightChartTimeSeries extends StatefulWidget {
   final List<WeightMeasurement> weights;
   final PredictedWeightMeasurement? predictedWeight;
   final List<BodyMeasurement> bodyMeasurements;
@@ -172,19 +172,44 @@ class WeightChartTimeSeries extends StatelessWidget {
     super.key,
   });
 
-  Map<BodyMeasurementPart, List<BodyMeasurement>> get measurementsByPart => {
+  @override
+  State<WeightChartTimeSeries> createState() => _WeightChartTimeSeriesState();
+}
+
+class _WeightChartTimeSeriesState extends State<WeightChartTimeSeries> {
+  late Map<BodyMeasurementPart, List<BodyMeasurement>> measurementsByPart;
+
+  @override
+  void initState() {
+    super.initState();
+    measurementsByPart = {
+      for (final part in BodyMeasurementPart.values)
+        part: widget.bodyMeasurements
+            .where((element) => element.type == part)
+            .toList(),
+    };
+  }
+
+  @override
+  void didUpdateWidget(WeightChartTimeSeries oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // Only check for length; we're optimizing for performance here
+    if (oldWidget.bodyMeasurements.length != widget.bodyMeasurements.length) {
+      measurementsByPart = {
         for (final part in BodyMeasurementPart.values)
-          part: bodyMeasurements
+          part: widget.bodyMeasurements
               .where((element) => element.type == part)
               .toList(),
       };
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return ResponsiveBuilder(builder: (context, breakpoint) {
-      final relevantWeights = weights.toList();
+      final relevantWeights = widget.weights;
 
-      return LineChartTimeSeries(
+      return LineChartTimeSeries<BodyMeasurementPart?>(
         data: {
           null: [
             for (int i = 0; i < relevantWeights.length; i++)
@@ -203,15 +228,15 @@ class WeightChartTimeSeries extends StatelessWidget {
             ],
         },
         predictions: {
-          if (predictedWeight != null)
+          if (widget.predictedWeight != null)
             null: [
               LineChartPoint(
                 value: relevantWeights.last.convertedWeight,
                 date: relevantWeights.last.time,
               ),
               LineChartPoint(
-                value: predictedWeight!.weight,
-                date: predictedWeight!.time,
+                value: widget.predictedWeight!.weight,
+                date: widget.predictedWeight!.time,
               ),
             ]
         },
@@ -236,8 +261,6 @@ class WeightChartTimeSeries extends StatelessWidget {
               ),
             ),
         },
-        // minY: minY,
-        // maxY: maxY,
         currentValueBuilder: (type, __, point, isPredicted) => Text.rich(
           TextSpan(children: [
             TextSpan(
@@ -268,7 +291,7 @@ class WeightChartTimeSeries extends StatelessWidget {
         leftTitleBuilder: (type, value) => type == null
             ? value.userFacingWeight
             : "${stringifyDouble(value, decimalSeparator: NumberFormat(context.locale.languageCode).symbols.DECIMAL_SEP)} ${type.unit}",
-        onCategoryChanged: onSelectCategory,
+        onCategoryChanged: widget.onSelectCategory,
       );
     });
   }

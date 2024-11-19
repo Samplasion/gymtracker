@@ -750,6 +750,7 @@ class DatabaseService extends GetxService with ChangeNotifier {
           entry.key:
               Map.fromEntries(entry.value.map((e) => MapEntry(e.name, e))),
       });
+      await _writeBodyMeasurements(snapshot.bodyMeasurements);
 
       logger.i("Imported database snapshot");
     });

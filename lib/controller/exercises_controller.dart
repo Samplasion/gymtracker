@@ -134,7 +134,7 @@ class ExercisesController extends GetxController with ServiceableController {
       query: text,
       choices: allExercises.toList(),
       limit: 20,
-      getter: (exercise) => "${exercise.name} ${exercise.id} ${exercise.primaryMuscleGroup.localizedName}",
+      getter: (exercise) => "${exercise.displayName} ${exercise.id} ${exercise.primaryMuscleGroup.localizedName}",
     ).map((e) => e.choice).toList();
     return results;
   }

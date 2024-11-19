@@ -656,6 +656,50 @@ class RoutinesController extends GetxController
     }
     coordinator.scheduleBackup();
   }
+
+  void applyWeightMultiplier(Exercise exercise, double multiplier) {
+    service.setAllRoutines([
+      for (final routine in service.routines)
+        routine.copyWith(
+          exercises: [
+            for (final ex in routine.exercises)
+              ex.map(
+                exercise: (ex) {
+                  if (exercise.isTheSameAs(ex)) {
+                    return ex.copyWith(
+                      sets: [
+                        for (final set in ex.sets)
+                          set.copyWith(
+                            weight: set.weight! * multiplier,
+                          ),
+                      ],
+                    );
+                  } else {
+                    return ex;
+                  }
+                },
+                superset: (ss) => ss.copyWith(
+                  exercises: [
+                    for (final ex in ss.exercises)
+                      if (exercise.isTheSameAs(ex))
+                        ex.copyWith(
+                          sets: [
+                            for (final set in ex.sets)
+                              set.copyWith(
+                                weight: set.weight! * multiplier,
+                              ),
+                          ],
+                        )
+                      else
+                        ex,
+                  ],
+                ),
+              ),
+          ],
+        ),
+    ]);
+    coordinator.scheduleBackup();
+  }
 }
 
 class ShareRoutineAlertDialog extends StatefulWidget {

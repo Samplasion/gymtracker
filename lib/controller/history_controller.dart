@@ -598,6 +598,49 @@ class HistoryController extends GetxController with ServiceableController {
             a.$3.startingDate ?? DateTime.fromMillisecondsSinceEpoch(0)));
     return history;
   }
+
+  void applyWeightMultiplier(Exercise exercise, double multiplier) {
+    service.writeAllHistory([
+      for (final workout in service.workoutHistory)
+        workout.copyWith(
+          exercises: [
+            for (final ex in workout.exercises)
+              ex.map(
+                exercise: (ex) {
+                  if (exercise.isTheSameAs(ex)) {
+                    return ex.copyWith(
+                      sets: [
+                        for (final set in ex.sets)
+                          set.copyWith(
+                            weight: set.weight! * multiplier,
+                          ),
+                      ],
+                    );
+                  } else {
+                    return ex;
+                  }
+                },
+                superset: (ss) => ss.copyWith(
+                  exercises: [
+                    for (final ex in ss.exercises)
+                      if (exercise.isTheSameAs(ex))
+                        ex.copyWith(
+                          sets: [
+                            for (final set in ex.sets)
+                              set.copyWith(
+                                weight: set.weight! * multiplier,
+                              ),
+                          ],
+                        )
+                      else
+                        ex,
+                  ],
+                ),
+              ),
+          ],
+        ),
+    ]);
+  }
 }
 
 extension WorkoutHistory on Workout {

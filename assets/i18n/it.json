@@ -1349,6 +1349,32 @@
       },
       "title": "Rimuovi parametro Peso",
       "description": "Rimuovi il parametro Peso da un esercizio con \"Peso e ripetizioni\" dove hai sempre e solo usato il campo Ripetizioni."
+    },
+    "genericMultiplyWeight": {
+      "title": "Moltiplica peso di un esercizio per @multiplier",
+      "fields": {
+        "exercise": {
+          "title": "Moltiplica il peso di questo esercizio...",
+          "label": "Esercizio"
+        }
+      },
+      "preview": {
+        "incompatible": {
+          "title": "Esercizio non compatibile",
+          "text": "Cambia la tua selezione e riprova."
+        },
+        "selected": "Esercizio selezionato",
+        "affectedRoutines": "Routine modificate",
+        "affectedWorkouts": "Allenamenti precedenti modificati"
+      }
+    },
+    "doubleExerciseWeight": {
+      "title": "Raddoppia peso dell'esercizio",
+      "description": "Raddoppia il parametro del peso in tutte le occorrenze di un esercizio."
+    },
+    "halveExerciseWeight": {
+      "title": "Dimezza peso dell'esercizio",
+      "description": "Dimezza il parametro del peso in tutte le occorrenze di un esercizio."
     }
   },
   "exerciseFormPicker": {

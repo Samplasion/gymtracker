@@ -57,6 +57,32 @@ class MigrationsController extends GetxController with ServiceableController {
                   migration: dataMigration)),
           (dataMigration) => dataMigration.apply(),
         ),
+        UIMigration<GenericMultiplyWeightInExerciseMigration>(
+          'migrations.doubleExerciseWeight.title'.t,
+          'migrations.doubleExerciseWeight.description'.t,
+          (uiMigration) =>
+              Go.to(() => GenericMultiplyWeightInExerciseMigrationSetupView(
+                    uiMigration,
+                    multiplier: 2,
+                  )),
+          (dataMigration) => Go.to(() =>
+              GenericMultiplyWeightInExerciseMigrationPreviewView(
+                  migration: dataMigration)),
+          (dataMigration) => dataMigration.apply(),
+        ),
+        UIMigration<GenericMultiplyWeightInExerciseMigration>(
+          'migrations.halveExerciseWeight.title'.t,
+          'migrations.halveExerciseWeight.description'.t,
+          (uiMigration) =>
+              Go.to(() => GenericMultiplyWeightInExerciseMigrationSetupView(
+                    uiMigration,
+                    multiplier: 0.5,
+                  )),
+          (dataMigration) => Go.to(() =>
+              GenericMultiplyWeightInExerciseMigrationPreviewView(
+                  migration: dataMigration)),
+          (dataMigration) => dataMigration.apply(),
+        ),
       ];
 
   @override

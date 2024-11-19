@@ -115,3 +115,50 @@ class RemoveWeightFromCustomExerciseMigration extends DataMigration {
     historyController.removeWeightFromExercise(exercise);
   }
 }
+
+
+class GenericMultiplyWeightInExerciseMigration extends DataMigration {
+  final Exercise exercise;
+  final double multiplier;
+
+  GenericMultiplyWeightInExerciseMigration(this.exercise, this.multiplier);
+
+  ExercisesController get exercisesController =>
+      Get.find<ExercisesController>();
+  RoutinesController get routinesController => Get.find<RoutinesController>();
+  HistoryController get historyController => Get.find<HistoryController>();
+
+  bool get isCompatible =>
+      exercise.parameters == GTSetParameters.repsWeight &&
+      affectedHistory.every((workout) => workout.flattenedExercises
+          .whereType<Exercise>()
+          .where((ex) => exercise.isTheSameAs(ex))
+          .every(
+            (ex) =>
+                ex.sets.every((set) => set.weight != null),
+          ));
+
+  @override
+  List<Workout> get affectedRoutines => [
+        for (final workout in routinesController.workouts)
+          if (workout.hasExercise(exercise)) workout
+      ];
+
+  @override
+  List<Workout> get affectedHistory => [
+        for (final workout in historyController.history)
+          if (workout.hasExercise(exercise)) workout
+      ];
+
+  @override
+  void apply() {
+    if (exercise.isCustom) {
+      exercisesController.
+      applyWeightMultiplier(exercise, multiplier);
+    }
+    routinesController.
+      applyWeightMultiplier(exercise, multiplier);
+    historyController.
+      applyWeightMultiplier(exercise, multiplier);
+  }
+}

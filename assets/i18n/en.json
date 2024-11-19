@@ -1355,6 +1355,32 @@
       },
       "title": "Remove Weight parameter",
       "description": "Remove the Weight parameter from an exercise with \"Reps and Weight\" in which you've only ever used the Reps field."
+    },
+    "genericMultiplyWeight": {
+      "title": "Multiply exercise weight by @multiplier",
+      "fields": {
+        "exercise": {
+          "title": "Multiply the weight of this exercise...",
+          "label": "Exercise"
+        }
+      },
+      "preview": {
+        "incompatible": {
+          "title": "Incompatible exercise",
+          "text": "Change your selection and try again."
+        },
+        "selected": "Selected exercise",
+        "affectedRoutines": "Affected routines",
+        "affectedWorkouts": "Affected history workouts"
+      }
+    },
+    "doubleExerciseWeight": {
+      "title": "Double exercise weight",
+      "description": "Double the weight parameter in all occurrences of an exercise."
+    },
+    "halveExerciseWeight": {
+      "title": "Halve exercise weight",
+      "description": "Halve the weight parameter in all occurrences of an exercise."
     }
   },
   "exerciseFormPicker": {

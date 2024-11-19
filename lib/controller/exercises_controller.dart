@@ -128,6 +128,12 @@ class ExercisesController extends GetxController with ServiceableController {
     saveEdit(newExercise);
   }
 
+  void applyWeightMultiplier(Exercise exercise, double multiplier) {
+    final newExercise =
+        exercise.copyWith(sets: exercise.sets.map((e) => e.copyWith(weight: e.weight! * multiplier)).toList());
+    saveEdit(newExercise);
+  }
+
   List<Exercise> search(String text) {
     final allExercises = exercises$.value + exerciseStandardLibraryAsList;
     final results = extractTop<Exercise>(

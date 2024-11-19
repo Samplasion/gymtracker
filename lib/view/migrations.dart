@@ -16,6 +16,7 @@ import 'package:gymtracker/view/utils/exercise.dart';
 import 'package:gymtracker/view/utils/exercise_form_picker.dart';
 import 'package:gymtracker/view/utils/history_workout.dart';
 import 'package:gymtracker/view/utils/input_decoration.dart';
+import 'package:intl/intl.dart';
 
 class AllMigrationsView extends ControlledWidget<MigrationsController> {
   const AllMigrationsView({super.key});
@@ -570,6 +571,252 @@ class RemoveWeightFromCustomExerciseMigrationPreviewView
                     bottom: false,
                     child: Text(
                       "migrations.removeWeightFromCustomExercise.preview.affectedWorkouts"
+                          .t,
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                  ),
+                ]),
+              ),
+            ),
+            SliverPadding(
+              padding: const EdgeInsets.only(bottom: 16),
+              sliver: SliverList.builder(
+                itemBuilder: (context, i) {
+                  return TerseWorkoutListTile(
+                    workout: affectedWorkouts[i],
+                    contentPadding:
+                        const EdgeInsets.symmetric(horizontal: 16.0),
+                    onTap: () {
+                      Go.to(() => ExercisesView(
+                            workout: affectedWorkouts[i],
+                            highlightExercise: (we) {
+                              if (!we.isExercise) return false;
+                              final ex = we.asExercise;
+                              return migration.exercise.isTheSameAs(ex);
+                            },
+                          ));
+                    },
+                  );
+                },
+                itemCount: affectedWorkouts.length,
+              ),
+            ),
+          ],
+          SliverToBoxAdapter(
+            child: SizedBox(
+              height: MediaQuery.of(context).padding.bottom,
+            ),
+          ),
+        ],
+      ),
+      bottomNavigationBar: Container(
+        color: context.colorScheme.surfaceContainerHigh,
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: SafeArea(
+            child: FilledButton(
+              onPressed: !isCompatible
+                  ? null
+                  : () {
+                      if (affectedWorkouts.isEmpty &&
+                          affectedRoutines.isEmpty) {
+                        return null;
+                      }
+                      return () {
+                        controller.applyMigration(migration);
+                      };
+                    }(),
+              child: Text("migrations.common.actions.apply".t),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class GenericMultiplyWeightInExerciseMigrationSetupView extends StatefulWidget {
+  final UIMigration<GenericMultiplyWeightInExerciseMigration> migration;
+  final double multiplier;
+
+  const GenericMultiplyWeightInExerciseMigrationSetupView(
+    this.migration, {
+    super.key,
+    required this.multiplier,
+  });
+
+  @override
+  State<GenericMultiplyWeightInExerciseMigrationSetupView> createState() =>
+      _GenericMultiplyWeightInExerciseMigrationSetupViewState();
+}
+
+class _GenericMultiplyWeightInExerciseMigrationSetupViewState
+    extends ControlledState<GenericMultiplyWeightInExerciseMigrationSetupView,
+        MigrationsController> {
+  Exercise? ex;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("migrations.genericMultiplyWeight.title".tParams({
+          "multiplier": NumberFormat.decimalPattern(context.locale.languageCode)
+              .format(widget.multiplier),
+        })),
+      ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16),
+        child: SafeArea(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Text(
+                "migrations.genericMultiplyWeight.fields.exercise.title".t,
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
+              const SizedBox(height: 8),
+              ExerciseFormPicker(
+                exercise: ex,
+                onChanged: (ex) => setState(() => this.ex = ex),
+                filter: ExercisePickerFilter.all,
+                individualFilter: (ex) {
+                  return ex.parameters == GTSetParameters.repsWeight;
+                },
+                decoration: GymTrackerInputDecoration(
+                  labelText:
+                      "migrations.genericMultiplyWeight.fields.exercise.label"
+                          .t,
+                ),
+              ),
+              const SizedBox(height: 24),
+              ElevatedButton(
+                onPressed: _nextCallback(),
+                child: Text("migrations.common.actions.next".t),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  void Function()? _nextCallback() {
+    if (ex == null) return null;
+    return () {
+      widget.migration.preview(
+          GenericMultiplyWeightInExerciseMigration(ex!, widget.multiplier));
+    };
+  }
+}
+
+class GenericMultiplyWeightInExerciseMigrationPreviewView
+    extends ControlledWidget<MigrationsController> {
+  final GenericMultiplyWeightInExerciseMigration migration;
+
+  GenericMultiplyWeightInExerciseMigrationPreviewView({
+    super.key,
+    required this.migration,
+  });
+
+  late final affectedWorkouts = migration.affectedHistory;
+  late final affectedRoutines = migration.affectedRoutines;
+  late final isCompatible = migration.isCompatible;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("migrations.common.preview".t),
+      ),
+      body: CustomScrollView(
+        slivers: [
+          if (!isCompatible)
+            SliverPadding(
+              padding: const EdgeInsets.all(16).copyWith(bottom: 0),
+              sliver: SliverToBoxAdapter(
+                child: SafeArea(
+                  child: AlertBanner(
+                    color: Colors.amber,
+                    title:
+                        "migrations.genericMultiplyWeight.preview.incompatible.title"
+                            .t,
+                    text: Text(
+                      "migrations.genericMultiplyWeight.preview.incompatible.text"
+                          .t,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          SliverPadding(
+            padding: const EdgeInsets.all(16),
+            sliver: SliverList(
+              delegate: SliverChildListDelegate([
+                SafeArea(
+                  bottom: false,
+                  child: Text(
+                    "migrations.genericMultiplyWeight.preview.selected".t,
+                    style: Theme.of(context).textTheme.titleMedium,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                ExerciseListTile(
+                  exercise: migration.exercise,
+                  selected: false,
+                  isConcrete: false,
+                  contentPadding: EdgeInsets.zero,
+                ),
+                if (affectedRoutines.isNotEmpty) ...[
+                  const SizedBox(height: 16),
+                  SafeArea(
+                    bottom: false,
+                    child: Text(
+                      "migrations.genericMultiplyWeight.preview.affectedRoutines"
+                          .t,
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                  ),
+                ],
+              ]),
+            ),
+          ),
+          if (affectedRoutines.isNotEmpty)
+            SliverPadding(
+              padding: const EdgeInsets.only(bottom: 16),
+              sliver: SliverList.builder(
+                itemBuilder: (context, index) {
+                  return MouseRegion(
+                    cursor: SystemMouseCursors.click,
+                    child: TerseRoutineListTile(
+                      routine: affectedRoutines[index],
+                      contentPadding:
+                          const EdgeInsets.symmetric(horizontal: 16.0),
+                      showIcon: true,
+                      onTap: () {
+                        Go.to(() => ExercisesView(
+                              workout: affectedRoutines[index],
+                              highlightExercise: (we) {
+                                if (!we.isExercise) return false;
+                                final ex = we.asExercise;
+                                return migration.exercise.isTheSameAs(ex);
+                              },
+                            ));
+                      },
+                    ),
+                  );
+                },
+                itemCount: affectedRoutines.length,
+              ),
+            ),
+          if (affectedWorkouts.isNotEmpty) ...[
+            SliverPadding(
+              padding: const EdgeInsets.all(16).copyWith(top: 0),
+              sliver: SliverList(
+                delegate: SliverChildListDelegate([
+                  SafeArea(
+                    bottom: false,
+                    child: Text(
+                      "migrations.genericMultiplyWeight.preview.affectedWorkouts"
                           .t,
                       style: Theme.of(context).textTheme.titleMedium,
                     ),

@@ -178,7 +178,6 @@ class WeightChartTimeSeries extends StatefulWidget {
 
 class _WeightChartTimeSeriesState extends State<WeightChartTimeSeries> {
   late Map<BodyMeasurementPart, List<BodyMeasurement>> measurementsByPart;
-  late Map<BodyMeasurementPart?, List<LineChartPoint>> data;
 
   @override
   void initState() {
@@ -189,7 +188,6 @@ class _WeightChartTimeSeriesState extends State<WeightChartTimeSeries> {
             .where((element) => element.type == part)
             .toList(),
     };
-    _computeData();
   }
 
   @override
@@ -203,101 +201,98 @@ class _WeightChartTimeSeriesState extends State<WeightChartTimeSeries> {
               .where((element) => element.type == part)
               .toList(),
       };
-      _computeData();
     }
-  }
-
-  void _computeData() {
-    final relevantWeights = widget.weights;
-    data = {
-      null: [
-        for (int i = 0; i < relevantWeights.length; i++)
-          LineChartPoint(
-            value: relevantWeights[i].convertedWeight,
-            date: relevantWeights[i].time,
-          ),
-      ],
-      for (final part in BodyMeasurementPart.values)
-        part: [
-          for (int i = 0; i < (measurementsByPart[part]?.length ?? 0); i++)
-            LineChartPoint(
-              value: measurementsByPart[part]![i].value,
-              date: measurementsByPart[part]![i].time,
-            ),
-        ],
-    };
   }
 
   @override
   Widget build(BuildContext context) {
-    final relevantWeights = widget.weights;
-    return LineChartTimeSeries<BodyMeasurementPart?>(
-      data: data,
-      predictions: {
-        if (widget.predictedWeight != null)
+    return ResponsiveBuilder(builder: (context, breakpoint) {
+      final relevantWeights = widget.weights;
+
+      return LineChartTimeSeries<BodyMeasurementPart?>(
+        data: {
           null: [
-            LineChartPoint(
-              value: relevantWeights.last.convertedWeight,
-              date: relevantWeights.last.time,
-            ),
-            LineChartPoint(
-              value: widget.predictedWeight!.weight,
-              date: widget.predictedWeight!.time,
-            ),
-          ]
-      },
-      categories: {
-        null: LineChartCategory(
-          title: "me.addWeight.weight.label".t,
-          icon: Text(
-            "me.addWeight.weight.label".t.characters.first,
-            style: const TextStyle(fontSize: 10),
-          ),
-        ),
-        for (final part in BodyMeasurementPart.values)
-          part: LineChartCategory(
-            title: "bodyMeasurement.${part.name}.label".t,
+            for (int i = 0; i < relevantWeights.length; i++)
+              LineChartPoint(
+                value: relevantWeights[i].convertedWeight,
+                date: relevantWeights[i].time,
+              ),
+          ],
+          for (final part in BodyMeasurementPart.values)
+            part: [
+              for (int i = 0; i < (measurementsByPart[part]?.length ?? 0); i++)
+                LineChartPoint(
+                  value: measurementsByPart[part]![i].value,
+                  date: measurementsByPart[part]![i].time,
+                ),
+            ],
+        },
+        predictions: {
+          if (widget.predictedWeight != null)
+            null: [
+              LineChartPoint(
+                value: relevantWeights.last.convertedWeight,
+                date: relevantWeights.last.time,
+              ),
+              LineChartPoint(
+                value: widget.predictedWeight!.weight,
+                date: widget.predictedWeight!.time,
+              ),
+            ]
+        },
+        categories: {
+          null: LineChartCategory(
+            title: "me.addWeight.weight.label".t,
             icon: Text(
-              "bodyMeasurement.${part.name}.label"
-                  .t
-                  .characters
-                  .first
-                  .toUpperCase(),
+              "me.addWeight.weight.label".t.characters.first,
               style: const TextStyle(fontSize: 10),
             ),
           ),
-      },
-      currentValueBuilder: (type, __, point, isPredicted) => Text.rich(
-        TextSpan(children: [
-          TextSpan(
-            children: [
-              TextSpan(
-                text: type == null
-                    ? point.value.userFacingWeight
-                    : "${stringifyDouble(point.value, decimalSeparator: NumberFormat(context.locale.languageCode).symbols.DECIMAL_SEP)} ${type.unit}",
-              )
-            ],
-            style: Theme.of(context).textTheme.bodyLarge!.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: isPredicted
-                      ? Theme.of(context).colorScheme.quaternary
-                      : null,
-                ),
-          ),
-          const TextSpan(text: " "),
-          TextSpan(
-            text:
-                DateFormat.yMd(context.locale.languageCode).format(point.date),
-            style: TextStyle(
-              color: Theme.of(context).colorScheme.onSurfaceVariant,
+          for (final part in BodyMeasurementPart.values)
+            part: LineChartCategory(
+              title: "bodyMeasurement.${part.name}.label".t,
+              icon: Text(
+                "bodyMeasurement.${part.name}.label"
+                    .t
+                    .characters
+                    .first
+                    .toUpperCase(),
+                style: const TextStyle(fontSize: 10),
+              ),
             ),
-          ),
-        ]),
-      ),
-      leftTitleBuilder: (type, value) => type == null
-          ? value.userFacingWeight
-          : "${stringifyDouble(value, decimalSeparator: NumberFormat(context.locale.languageCode).symbols.DECIMAL_SEP)} ${type.unit}",
-      onCategoryChanged: widget.onSelectCategory,
-    );
+        },
+        currentValueBuilder: (type, __, point, isPredicted) => Text.rich(
+          TextSpan(children: [
+            TextSpan(
+              children: [
+                TextSpan(
+                  text: type == null
+                      ? point.value.userFacingWeight
+                      : "${stringifyDouble(point.value, decimalSeparator: NumberFormat(context.locale.languageCode).symbols.DECIMAL_SEP)} ${type.unit}",
+                )
+              ],
+              style: Theme.of(context).textTheme.bodyLarge!.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: isPredicted
+                        ? Theme.of(context).colorScheme.quaternary
+                        : null,
+                  ),
+            ),
+            const TextSpan(text: " "),
+            TextSpan(
+              text: DateFormat.yMd(context.locale.languageCode)
+                  .format(point.date),
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
+            ),
+          ]),
+        ),
+        leftTitleBuilder: (type, value) => type == null
+            ? value.userFacingWeight
+            : "${stringifyDouble(value, decimalSeparator: NumberFormat(context.locale.languageCode).symbols.DECIMAL_SEP)} ${type.unit}",
+        onCategoryChanged: widget.onSelectCategory,
+      );
+    });
   }
 }

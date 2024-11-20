@@ -107,10 +107,8 @@ class _LineChartTimeSeriesState<T> extends State<LineChartTimeSeries<T>> {
         ),
       );
 
-  DateTime get startingDate =>
-      (children.isEmpty ? DateTime.now() : children.last.date)
-          .startOfDay
-          .subtract(type.duration);
+  DateTime get startingDate => (children.isEmpty ? DateTime.now() : 
+      children.last.date).startOfDay.subtract(type.duration);
   List<LineChartPoint> get filteredChildren => children.where((point) {
         return point.date.isAfter(startingDate);
       }).toList();
@@ -230,9 +228,7 @@ class _LineChartTimeSeriesState<T> extends State<LineChartTimeSeries<T>> {
                   !children.any((element) =>
                       element.date.minutesSinceEpoch == hoveredIndex),
                 ),
-              )
-            else
-              const Spacer(),
+              ) else const Spacer(),
             TextButton(
               onPressed: () {
                 Go.showRadioModal(
@@ -410,12 +406,13 @@ class _LineChartTimeSeriesState<T> extends State<LineChartTimeSeries<T>> {
                       ),
                     LineChartBarData(
                       dotData: const FlDotData(),
-                      spots: children.map((point) {
-                        return FlSpot(
-                          point.date.minutesSinceEpoch.toDouble(),
-                          point.value,
-                        );
-                      }).toList(),
+                      spots: [
+                        for (int i = 0; i < children.length; i++)
+                          FlSpot(
+                            children[i].date.minutesSinceEpoch.toDouble(),
+                            children[i].value,
+                          ),
+                      ],
                       isCurved: type == _LineChartTimeSeriesType.threeMonths,
                       preventCurveOverShooting: true,
                       color: colorScheme.primary,
@@ -427,10 +424,7 @@ class _LineChartTimeSeriesState<T> extends State<LineChartTimeSeries<T>> {
                           show: true,
                           checkToShowSpotLine: (spot) =>
                               spot.x ==
-                              (filteredChildren.isEmpty
-                                  ? 0
-                                  : filteredChildren
-                                      .last.date.minutesSinceEpoch),
+                              (filteredChildren.isEmpty ? 0 : filteredChildren.last.date.minutesSinceEpoch),
                           flLineStyle: FlLine(color: colorScheme.primary),
                         ),
                         color: colorScheme.primary.withOpacity(0.3),
@@ -438,12 +432,8 @@ class _LineChartTimeSeriesState<T> extends State<LineChartTimeSeries<T>> {
                     ),
                   ],
                 ),
-                duration: children.length > 50
-                    ? Duration.zero
-                    : const Duration(milliseconds: 350),
-                curve: children.length > 50
-                    ? Curves.linear
-                    : Curves.linearToEaseOut,
+                duration: const Duration(milliseconds: 350),
+                curve: Curves.linearToEaseOut,
               ),
             ),
           ),
@@ -465,16 +455,13 @@ class _LineChartTimeSeriesState<T> extends State<LineChartTimeSeries<T>> {
                             : entry.value.icon,
                       ),
                       selected: this.selectedCategory == entry.key,
-                      onSelected: widget.data[entry.key]?.isEmpty != false
-                          ? null
-                          : (sel) {
-                              if (sel) {
-                                setState(
-                                    () => this.selectedCategory = entry.key);
-                                widget.onCategoryChanged?.call(entry.key);
-                                _recalculateMinMax();
-                              }
-                            },
+                      onSelected: widget.data[entry.key]?.isEmpty != false ? null : (sel) {
+                        if (sel) {
+                          setState(() => this.selectedCategory = entry.key);
+                          widget.onCategoryChanged?.call(entry.key);
+                          _recalculateMinMax();
+                        }
+                      },
                     ),
                 ],
               ),

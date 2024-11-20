@@ -510,7 +510,11 @@ class OnlineController extends GetxController with ServiceableController {
     }
     final time = DateTime.now();
     return _service.getAvatarUrl(id).then((uri) {
-      _avatarCache[id] = _CachedData(time, uri);
+      if (uri == null) {
+        _avatarCache.remove(id);
+      } else {
+        _avatarCache[id] = _CachedData(time, uri);
+      }
       return uri;
     });
   }

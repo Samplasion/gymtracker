@@ -22,7 +22,7 @@ import 'package:gymtracker/utils/utils.dart';
 import 'package:gymtracker/view/charts/density_calendar_chart.dart';
 import 'package:gymtracker/view/charts/weight_chart.dart';
 import 'package:gymtracker/view/components/controlled.dart';
-import 'package:gymtracker/view/components/icon_grid.dart';
+import 'package:gymtracker/view/components/online.dart';
 import 'package:gymtracker/view/me/calendar.dart';
 import 'package:gymtracker/view/me/statistics.dart';
 import 'package:gymtracker/view/skeleton.dart';

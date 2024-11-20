@@ -5,6 +5,7 @@ import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/service/online.dart';
 import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/view/components/controlled.dart';
+import 'package:gymtracker/view/components/online.dart';
 import 'package:gymtracker/view/login.dart';
 import 'package:gymtracker/view/me.dart';
 
@@ -56,9 +57,7 @@ class OnlineProfileCard extends ControlledWidget<OnlineController> {
       margin: EdgeInsets.zero,
       clipBehavior: Clip.hardEdge,
       child: ListTile(
-        leading: const CircleAvatar(
-          child: Icon(GTIcons.account),
-        ),
+        leading: UserAvatar(id: account.id),
         title: Text(account.name),
         subtitle: account.email != null ? Text(account.email!) : null,
         onTap: () {

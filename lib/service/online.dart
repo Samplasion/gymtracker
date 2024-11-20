@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:gymtracker/db/imports/types.dart';
+import 'package:gymtracker/service/logger.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 export 'package:supabase_flutter/supabase_flutter.dart' show AuthException;
@@ -27,6 +28,7 @@ abstract class OnlineService with ChangeNotifier {
       required String username});
   Future<void> updateAccount({required String email, required String username});
   Future<void> logout();
+  Future<Uri?> getAvatarUrl(String id);
 
   Future<Map<String, dynamic>?> getSnapshot();
   Future<void> uploadSnapshot(
@@ -50,13 +52,13 @@ class OnlineServiceImpl with ChangeNotifier implements OnlineService {
     notifyListeners();
   }
 
-  _mapAccount(User? user) {
+  _mapAccount(User? user, Map<String, dynamic> data) {
     if (user == null) {
       return null;
     }
     return OnlineAccount(
       id: user.id,
-      name: user.userMetadata?["username"] ?? "",
+      name: data["username"]!,
       email: user.email,
     );
   }
@@ -64,15 +66,32 @@ class OnlineServiceImpl with ChangeNotifier implements OnlineService {
   @override
   Future<OnlineAccount?> getAccount() async {
     final user = _client.currentUser;
-    _setAccount(_mapAccount(user));
+    if (user == null) {
+      _setAccount(null);
+      return null;
+    }
+
+    final row = await _db.from("profiles").select().eq('id', user.id).limit(1);
+    _setAccount(_mapAccount(user, row.single));
     return _account;
   }
 
   @override
   Future<void> login({required String email, required String password}) async {
-    final response =
-        await _client.signInWithPassword(email: email, password: password);
-    _setAccount(_mapAccount(response.user));
+    final response = await _client.signInWithPassword(
+      email: email,
+      password: password,
+    );
+    if (response.user == null) {
+      throw const AuthException("No user found");
+    }
+
+    final row = await _db
+        .from("profiles")
+        .select()
+        .eq('id', response.user!.id)
+        .limit(1);
+    _setAccount(_mapAccount(response.user, row.single));
   }
 
   @override
@@ -88,7 +107,16 @@ class OnlineServiceImpl with ChangeNotifier implements OnlineService {
         "username": username,
       },
     );
-    _setAccount(_mapAccount(response.user));
+    if (response.user == null) {
+      throw const AuthException("No user found");
+    }
+
+    final row = await _db
+        .from("profiles")
+        .select()
+        .eq('id', response.user!.id)
+        .limit(1);
+    _setAccount(_mapAccount(response.user, row.single));
   }
 
   @override
@@ -100,6 +128,15 @@ class OnlineServiceImpl with ChangeNotifier implements OnlineService {
     if (user == null) {
       return;
     }
+
+    final row = await _db
+        .from("profiles")
+        .update({
+          "username": username,
+        })
+        .eq('id', user.id)
+        .select()
+        .limit(1);
     final response = await _client.updateUser(
       UserAttributes(
         email: email,
@@ -109,7 +146,11 @@ class OnlineServiceImpl with ChangeNotifier implements OnlineService {
         },
       ),
     );
-    _setAccount(_mapAccount(response.user));
+    if (response.user == null) {
+      throw const AuthException("No user found");
+    }
+
+    _setAccount(_mapAccount(response.user, row.single));
   }
 
   @override
@@ -125,8 +166,11 @@ class OnlineServiceImpl with ChangeNotifier implements OnlineService {
   }
 
   @override
-  Future<void> uploadSnapshot(DatabaseSnapshot snapshot,
-      {DateTime? timestamp,required String version,}) async {
+  Future<void> uploadSnapshot(
+    DatabaseSnapshot snapshot, {
+    DateTime? timestamp,
+    required String version,
+  }) async {
     final user = ArgumentError.checkNotNull(_client.currentUser);
 
     // await _db.from("user_sync_data").delete().eq("user_id", user.id);
@@ -147,5 +191,27 @@ class OnlineServiceImpl with ChangeNotifier implements OnlineService {
   Future<void> deleteSnapshot() async {
     final user = ArgumentError.checkNotNull(_client.currentUser);
     await _db.from("user_sync_data").delete().eq("user_id", user.id);
+  }
+
+  @override
+  Future<Uri?> getAvatarUrl(String id) async {
+    // Avatar is stored in the public storage in the profile_pictures bucket
+    // as <user-id>
+    try {
+      final response =
+          await _db.storage.from("profile_pictures").createSignedUrl(
+                id,
+                const Duration(hours: 1).inSeconds,
+                transform: const TransformOptions(
+                  resize: ResizeMode.cover,
+                  width: 256,
+                  height: 256,
+                ),
+              );
+      return Uri.parse(response);
+    } catch (e) {
+      logger.e(e);
+      return null;
+    }
   }
 }

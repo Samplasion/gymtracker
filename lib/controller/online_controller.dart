@@ -21,6 +21,13 @@ enum SyncMode {
   allSynced,
 }
 
+class _CachedData<T> {
+  final DateTime downloaded;
+  final T data;
+
+  const _CachedData(this.downloaded, this.data);
+}
+
 class OnlineController extends GetxController with ServiceableController {
   bool _isInit = false;
 
@@ -44,6 +51,8 @@ class OnlineController extends GetxController with ServiceableController {
       );
   set _lastSuccessfulSync(DateTime value) =>
       _prefs.setInt("last_successful_sync", value.millisecondsSinceEpoch);
+
+  final Map<String, _CachedData<Uri?>> _avatarCache = {};
 
   /// Disabled if the remote data was synced using a newer version of the app
   bool _isSyncEnabled = true;
@@ -160,8 +169,7 @@ class OnlineController extends GetxController with ServiceableController {
     try {
       await _service.logout();
     } catch (e, s) {
-      logger.e("An error occurred while logging out",
-          error: e, stackTrace: s);
+      logger.e("An error occurred while logging out", error: e, stackTrace: s);
       rethrow;
     }
   }
@@ -490,6 +498,21 @@ class OnlineController extends GetxController with ServiceableController {
       },
       title: 'sync.inProgress',
     );
+  }
+
+  Future<Uri?> getAvatarUrl(String id) async {
+    if (_avatarCache.containsKey(id)) {
+      final cached = _avatarCache[id]!;
+      if (DateTime.now().difference(cached.downloaded) <
+          const Duration(hours: 1)) {
+        return cached.data;
+      }
+    }
+    final time = DateTime.now();
+    return _service.getAvatarUrl(id).then((uri) {
+      _avatarCache[id] = _CachedData(time, uri);
+      return uri;
+    });
   }
 
   @override

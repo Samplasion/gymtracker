@@ -2337,7 +2337,8 @@
           "number": "- Contenere almeno un numero",
           "specialCharacter": "- Contenere almeno un carattere speciale"
         }
-      }
+      },
+      "noInternet": "Nessuna connessione a Internet."
     },
     "fields": {
       "email": {

@@ -1,66 +1,5 @@
 part of 'me.dart';
 
-class _UserAvatar extends StatelessWidget {
-  const _UserAvatar();
-
-  @override
-  Widget build(BuildContext context) {
-    return CircleAvatar(
-      radius: 48,
-      child: LayoutBuilder(
-        builder: (context, constraints) {
-          final size = constraints.maxWidth / 2;
-          return Icon(
-            GTIcons.account,
-            size: size,
-          );
-        },
-      ),
-    );
-  }
-}
-
-class _UserHeader extends StatelessWidget {
-  const _UserHeader();
-
-  @override
-  Widget build(BuildContext context) {
-    const height = 348.0;
-    return SizedBox(
-      height: height,
-      child: Stack(
-        children: [
-          SizedBox(
-            height: height - 48,
-            child: IconGrid(
-              bigScale: 2,
-              child: CircleAvatar(
-                backgroundColor: Theme.of(context).colorScheme.outlineVariant,
-                foregroundColor: Theme.of(context).colorScheme.onSurface,
-                child: const Icon(GTIcons.app_icon),
-              ),
-            ),
-          ),
-          Positioned(
-            bottom: 0,
-            left: 32,
-            child: Container(
-              width: 104,
-              height: 104,
-              decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.surface,
-                shape: BoxShape.circle,
-              ),
-              alignment: Alignment.center,
-              child: const _UserAvatar(),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
 class MeProfilePage extends ControlledWidget<OnlineController> {
   const MeProfilePage({super.key});
 
@@ -106,7 +45,7 @@ class MeProfilePage extends ControlledWidget<OnlineController> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const _UserHeader(),
+          UserHeader(account: account),
           Padding(
             padding: const EdgeInsets.all(16),
             child: Column(
@@ -129,9 +68,11 @@ class MeProfilePage extends ControlledWidget<OnlineController> {
                     controller.logout().then((_) {
                       Get.back();
                     }).catchError((e) {
-                      Go.dialog("me.profile.errors.logout.title".t, "me.profile.errors.logout.subtitle".tParams({
-                        "error": e.toString(),
-                      }));
+                      Go.dialog(
+                          "me.profile.errors.logout.title".t,
+                          "me.profile.errors.logout.subtitle".tParams({
+                            "error": e.toString(),
+                          }));
                     });
                   },
                   child: Text("me.profile.logout".t),

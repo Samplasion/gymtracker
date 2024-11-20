@@ -43,7 +43,13 @@ class _LoginController extends GetxController
       Get.back();
     }).catchError((e) {
       String message = e.toString();
-      if (e is AuthException) message = "login.errors.noInternet".t;
+      if (e is AuthException) {
+        if (e.message.contains("Socket")) {
+          message = "login.errors.noInternet".t;
+        } else {
+          message = e.message;
+        }
+      }
       change(null, status: RxStatus.error(message));
     });
   }
@@ -64,7 +70,13 @@ class _LoginController extends GetxController
       Get.back();
     }).catchError((e) {
       String message = e.toString();
-      if (e is AuthException) message = "login.errors.noInternet".t;
+      if (e is AuthException) {
+        if (e.message.contains("Socket")) {
+          message = "login.errors.noInternet".t;
+        } else {
+          message = e.message;
+        }
+      }
       change(null, status: RxStatus.error(message));
     });
   }
@@ -322,7 +334,8 @@ class _AuthScreenState extends ControlledState<AuthScreen, OnlineController>
         ),
         const SizedBox(height: 16),
         StreamBuilder<Set<PasswordValidationErrors>>(
-            stream: loginController._credentials$.map((state) => state.passwordErrors),
+            stream: loginController._credentials$
+                .map((state) => state.passwordErrors),
             builder: (context, snapshot) {
               return ElevatedButton.icon(
                 onPressed: fieldsEnabled && (snapshot.data?.isEmpty ?? true)

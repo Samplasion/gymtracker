@@ -38,6 +38,10 @@ class OnlineController extends GetxController with ServiceableController {
   Stream<OnlineAccount?> get account => _account$.stream;
   OnlineAccount? get accountSync => _account$.value;
 
+  final _isOnlineServiceEnabled$ = BehaviorSubject<bool>.seeded(true);
+  Stream<bool> get isOnlineServiceEnabled => _isOnlineServiceEnabled$.stream;
+  bool get isOnlineServiceEnabledSync => _isOnlineServiceEnabled$.value;
+
   DateTime get _lastModified => DateTime.fromMillisecondsSinceEpoch(
         _prefs.getInt("last_modified") ?? 0,
         isUtc: true,
@@ -117,7 +121,10 @@ class OnlineController extends GetxController with ServiceableController {
   Future<void> init() async {
     _isInit = true;
     _prefs = await SharedPreferences.getInstance();
-    _service.addListener(() {
+    _service.addListener(() async {
+      var acc = _service.account;
+      _isOnlineServiceEnabled$
+          .add(acc != null && await _service.getHasOnlinePrivileges());
       _account$.add(_service.account);
       _isSyncEnabled = true;
     });
@@ -215,6 +222,11 @@ class OnlineController extends GetxController with ServiceableController {
   Future<void> checkLocalAndRemoteDatabases({
     required DatabaseSnapshot currentSnapshot,
   }) async {
+    if (!isOnlineServiceEnabledSync) {
+      logger.i("User doesn't have online privileges; skipping");
+      return;
+    }
+
     final currentVersion = Version.parse(VersionService().packageInfo.version);
 
     final localLastModified = _lastModified;
@@ -283,6 +295,11 @@ class OnlineController extends GetxController with ServiceableController {
   Future<void> sync({required DatabaseSnapshot currentSnapshot}) async {
     try {
       if (accountSync == null) return;
+
+      if (!isOnlineServiceEnabledSync) {
+        logger.i("User doesn't have online privileges; skipping");
+        return;
+      }
 
       if (!_isSyncEnabled) {
         logger.w("Sync is disabled, skipping");
@@ -419,6 +436,12 @@ class OnlineController extends GetxController with ServiceableController {
 
   Future<bool> getShouldShowManualSync() async {
     if (accountSync == null) return false;
+
+    if (!isOnlineServiceEnabledSync) {
+      logger.i("User doesn't have online privileges; skipping");
+      return false;
+    }
+
     if (!_isSyncEnabled) {
       logger.w("Sync is disabled, skipping");
       return false;

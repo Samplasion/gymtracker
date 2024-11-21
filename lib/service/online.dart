@@ -29,6 +29,7 @@ abstract class OnlineService with ChangeNotifier {
   Future<void> updateAccount({required String email, required String username});
   Future<void> logout();
   Future<Uri?> getAvatarUrl(String id);
+  Future<bool> getHasOnlinePrivileges();
 
   Future<Map<String, dynamic>?> getSnapshot();
   Future<void> uploadSnapshot(
@@ -157,6 +158,18 @@ class OnlineServiceImpl with ChangeNotifier implements OnlineService {
   Future<void> logout() async {
     await _client.signOut();
     _setAccount(null);
+  }
+
+  @override
+  Future<bool> getHasOnlinePrivileges() async {
+    final user = _client.currentUser;
+    if (user == null) {
+      return false;
+    }
+
+    final response =
+        await _db.from("profiles").select().eq('id', user.id).limit(1);
+    return response.single['has_online'] as bool? ?? false;
   }
 
   @override

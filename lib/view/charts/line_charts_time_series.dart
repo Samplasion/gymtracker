@@ -107,11 +107,32 @@ class _LineChartTimeSeriesState<T> extends State<LineChartTimeSeries<T>> {
         ),
       );
 
-  DateTime get startingDate => (children.isEmpty ? DateTime.now() : 
-      children.last.date).startOfDay.subtract(type.duration);
+  DateTime get startingDate =>
+      (children.isEmpty ? DateTime.now() : children.last.date)
+          .startOfDay
+          .subtract(type.duration);
   List<LineChartPoint> get filteredChildren => children.where((point) {
         return point.date.isAfter(startingDate);
       }).toList();
+  List<LineChartPoint> get visibleChildren {
+    final result = <LineChartPoint>[];
+
+    for (int i = 0; i < children.length; i++) {
+      final point = children[i];
+
+      if (i < children.length - 1 &&
+          children[i + 1].date.isBefore(currentMinDate)) {
+        continue;
+      }
+      if (i > 1 && children[i - 1].date.isAfter(currentMaxDate)) {
+        break;
+      }
+
+      result.add(point);
+    }
+
+    return result;
+  }
 
   DateTime get absoluteMinimum => children.first.date.startOfDay;
   DateTime get absoluteMaximum {
@@ -206,10 +227,17 @@ class _LineChartTimeSeriesState<T> extends State<LineChartTimeSeries<T>> {
     setState(() {});
   }
 
+  bool _isDragging = false;
+
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final predictionColor = colorScheme.quaternary;
+    // The visible children optimization is actually counterproductive
+    // when there are too many points (for some reason)
+    final visibleChildren = type == _LineChartTimeSeriesType.threeMonths
+        ? this.visibleChildren
+        : this.children;
 
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -228,7 +256,9 @@ class _LineChartTimeSeriesState<T> extends State<LineChartTimeSeries<T>> {
                   !children.any((element) =>
                       element.date.minutesSinceEpoch == hoveredIndex),
                 ),
-              ) else const Spacer(),
+              )
+            else
+              const Spacer(),
             TextButton(
               onPressed: () {
                 Go.showRadioModal(
@@ -257,11 +287,16 @@ class _LineChartTimeSeriesState<T> extends State<LineChartTimeSeries<T>> {
         ),
         GestureDetector(
           behavior: HitTestBehavior.opaque,
+          onHorizontalDragStart: (details) {
+            setState(() => _isDragging = true);
+          },
           onHorizontalDragUpdate: _onDrag,
           onHorizontalDragEnd: (details) {
+            setState(() => _isDragging = false);
             _recalculateMinMax();
           },
           onHorizontalDragCancel: () {
+            setState(() => _isDragging = false);
             _recalculateMinMax();
           },
           child: ConstrainedBox(
@@ -407,10 +442,13 @@ class _LineChartTimeSeriesState<T> extends State<LineChartTimeSeries<T>> {
                     LineChartBarData(
                       dotData: const FlDotData(),
                       spots: [
-                        for (int i = 0; i < children.length; i++)
+                        for (int i = 0; i < visibleChildren.length; i++)
                           FlSpot(
-                            children[i].date.minutesSinceEpoch.toDouble(),
-                            children[i].value,
+                            visibleChildren[i]
+                                .date
+                                .minutesSinceEpoch
+                                .toDouble(),
+                            visibleChildren[i].value,
                           ),
                       ],
                       isCurved: type == _LineChartTimeSeriesType.threeMonths,
@@ -424,7 +462,10 @@ class _LineChartTimeSeriesState<T> extends State<LineChartTimeSeries<T>> {
                           show: true,
                           checkToShowSpotLine: (spot) =>
                               spot.x ==
-                              (filteredChildren.isEmpty ? 0 : filteredChildren.last.date.minutesSinceEpoch),
+                              (filteredChildren.isEmpty
+                                  ? 0
+                                  : filteredChildren
+                                      .last.date.minutesSinceEpoch),
                           flLineStyle: FlLine(color: colorScheme.primary),
                         ),
                         color: colorScheme.primary.withOpacity(0.3),
@@ -432,7 +473,7 @@ class _LineChartTimeSeriesState<T> extends State<LineChartTimeSeries<T>> {
                     ),
                   ],
                 ),
-                duration: const Duration(milliseconds: 350),
+                duration: Duration(milliseconds: _isDragging ? 0 : 350),
                 curve: Curves.linearToEaseOut,
               ),
             ),
@@ -455,13 +496,16 @@ class _LineChartTimeSeriesState<T> extends State<LineChartTimeSeries<T>> {
                             : entry.value.icon,
                       ),
                       selected: this.selectedCategory == entry.key,
-                      onSelected: widget.data[entry.key]?.isEmpty != false ? null : (sel) {
-                        if (sel) {
-                          setState(() => this.selectedCategory = entry.key);
-                          widget.onCategoryChanged?.call(entry.key);
-                          _recalculateMinMax();
-                        }
-                      },
+                      onSelected: widget.data[entry.key]?.isEmpty != false
+                          ? null
+                          : (sel) {
+                              if (sel) {
+                                setState(
+                                    () => this.selectedCategory = entry.key);
+                                widget.onCategoryChanged?.call(entry.key);
+                                _recalculateMinMax();
+                              }
+                            },
                     ),
                 ],
               ),

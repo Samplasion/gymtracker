@@ -28,7 +28,11 @@ import 'package:gymtracker/service/notifications.dart';
 import 'package:gymtracker/utils/go.dart';
 import 'package:rxdart/rxdart.dart';
 
-class Coordinator extends GetxController with ServiceableController {
+class Coordinator extends GetxController
+    with LoggerConfigurationMixin, ServiceableController {
+  @override
+  int get loggerMethodCount => 0;
+
   RxList<RoutineSuggestion> suggestions = <RoutineSuggestion>[].obs;
   late BehaviorSubject<bool> showPermissionTilesStream;
 
@@ -46,9 +50,6 @@ class Coordinator extends GetxController with ServiceableController {
       get<NotificationController>().initialize(),
       get<OnlineController>().init().then((_) {
         if (get<OnlineController>().accountSync == null) return;
-        // get<OnlineController>().onStandardSyncDownload(
-        //   currentSnapshot: get<DatabaseService>().currentSnapshot,
-        // );
         get<OnlineController>().sync(
           currentSnapshot: get<DatabaseService>().currentSnapshot,
         );
@@ -112,7 +113,6 @@ class Coordinator extends GetxController with ServiceableController {
     Get.put(BoutiqueController());
     Get.put(OnlineController());
 
-    logger.d((service.hasOngoing, service.getOngoingData()));
     if (service.hasOngoing) {
       Get.put(WorkoutController.fromSavedData(service.getOngoingData()!));
     }
@@ -171,7 +171,7 @@ class Coordinator extends GetxController with ServiceableController {
           .take(5)
     ]);
     logger
-        .i("Recomputed suggested routines with ${suggestions().length} values");
+        .d("Recomputed suggested routines with ${suggestions().length} values");
   }
 
   void onNotificationTapped(NotificationResponse value) {
@@ -181,7 +181,7 @@ class Coordinator extends GetxController with ServiceableController {
   }
 
   void onHotReload() {
-    logger.i("[#reassemble()] called");
+    logger.t("[#reassemble()] called");
     get<GTLocalizations>().init(false);
   }
 
@@ -190,9 +190,6 @@ class Coordinator extends GetxController with ServiceableController {
       get<DatabaseService>().createBackup();
 
       if (get<OnlineController>().accountSync != null) {
-        // get<OnlineController>().onStandardSyncUpload(
-        //   currentSnapshot: get<DatabaseService>().currentSnapshot,
-        // );
         get<OnlineController>().sync(
           currentSnapshot: get<DatabaseService>().currentSnapshot,
         );

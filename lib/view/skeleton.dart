@@ -43,6 +43,7 @@ const _kRailSize = 80.0;
 
 class SkeletonDrawerButton extends StatefulWidget {
   const SkeletonDrawerButton({
+    super.key,
     this.isInRail = false,
   });
 
@@ -52,12 +53,16 @@ class SkeletonDrawerButton extends StatefulWidget {
   State<SkeletonDrawerButton> createState() => _SkeletonDrawerButtonState();
 }
 
-class _SkeletonDrawerButtonState extends State<SkeletonDrawerButton> {
+class _SkeletonDrawerButtonState extends State<SkeletonDrawerButton>
+    with LoggerConfigurationMixin {
+  @override
+  int get loggerMethodCount => 0;
+
   _SkeletonViewState? _skeleton;
   StreamSubscription<bool>? _skeletonSub;
 
   _onStateChange(_) {
-    logger.d("SkeletonDrawerButton: _onStateChange");
+    logger.t("SkeletonDrawerButton: _onStateChange");
     if (mounted) setState(() {});
   }
 
@@ -146,7 +151,8 @@ class SkeletonView extends StatefulWidget {
 class _SkeletonViewState extends State<SkeletonView>
     with WidgetsBindingObserver {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey();
-  final BehaviorSubject<bool> _isSidebarCollapsed$ = BehaviorSubject.seeded(false);
+  final BehaviorSubject<bool> _isSidebarCollapsed$ =
+      BehaviorSubject.seeded(false);
 
   bool get isSidebarCollapsed => _isSidebarCollapsed$.value;
   Stream<bool> get isSidebarCollapsedStream => _isSidebarCollapsed$.stream;

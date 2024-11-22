@@ -114,11 +114,11 @@ class OneLinePrefixPrinter extends LogPrinter {
 
   @override
   List<String> log(LogEvent event) {
-    final lines = printer.log(event);
+    final lines = printer.copyWith(methodCount: 0).log(event);
     lines[0] = "[${event.time}] ${lines[0]}";
 
     final stack = _formatStackTrace(printer
-        .formatStackTrace(event.stackTrace ?? StackTrace.current, 4)
+        .formatStackTrace(event.stackTrace ?? StackTrace.current, printer.methodCount)
         ?.trim()
         .split("\n"));
     if (stack != null && stack.isNotEmpty) {
@@ -177,21 +177,35 @@ class ObjectLogger<T> extends Logger {
   }
 }
 
+mixin LoggerConfigurationMixin on Object {
+  int get loggerErrorMethodCount => 8;
+  int get loggerMethodCount => 4;
+}
+
 extension ObjectLoggerExt on Object {
   Logger get logger => ObjectLogger(
         this,
         printer: _oneLinePrefixPrinter.copyWith(
-          printer: _oneLinePrefixPrinter.printer
-              .copyWith(errorMethodCount: loggerErrorMethodCount),
+          printer: _oneLinePrefixPrinter.printer.copyWith(
+            errorMethodCount: _loggerErrorMethodCount,
+            methodCount: _loggerMethodCount,
+          ),
         ),
       );
 
-  int get loggerErrorMethodCount => 8;
+  int get _loggerErrorMethodCount => (this is LoggerConfigurationMixin)
+      ? (this as LoggerConfigurationMixin).loggerErrorMethodCount
+      : 8;
+
+  int get _loggerMethodCount => (this is LoggerConfigurationMixin)
+      ? (this as LoggerConfigurationMixin).loggerMethodCount
+      : 4;
 }
 
 extension on PrettyPrinter {
   PrettyPrinter copyWith({
     int? errorMethodCount,
+    int? methodCount,
   }) {
     return PrettyPrinter(
       errorMethodCount: errorMethodCount ?? this.errorMethodCount,
@@ -199,7 +213,7 @@ extension on PrettyPrinter {
       colors: colors,
       lineLength: lineLength,
       noBoxingByDefault: noBoxingByDefault,
-      methodCount: methodCount,
+      methodCount: methodCount ?? this.methodCount,
       levelColors: levelColors,
     );
   }

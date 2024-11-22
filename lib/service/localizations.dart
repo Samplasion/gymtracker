@@ -76,12 +76,7 @@ class GTLocalizations extends Translations with ChangeNotifier {
               'assets/exercises/$category/$id/${locale.languageCode}.md',
               cache: false);
           exerciseExplanations[locale.languageCode]![fullID] = bundle;
-        } catch (e, s) {
-          logger.t(
-            "[${locale.languageCode}] Failed to load explanation for $fullID",
-            error: e,
-            stackTrace: s,
-          );
+        } catch (e) {
           continue;
         }
       }
@@ -104,7 +99,7 @@ class GTLocalizations extends Translations with ChangeNotifier {
     super.notifyListeners();
     Get.delete<GTLocalizations>();
     Get.put(this);
-    logger.i("notified listeners");
+    logger.t("notified listeners");
   }
 
   /// Returns the first day of the week for the given [context].
@@ -190,12 +185,9 @@ extension ExerciseExplanation on Exercise {
     final loc = Get.find<GTLocalizations>();
     final explanation = loc._getAllExerciseExplanationsForLocale(locale)[id];
     if (explanation == null) {
-      loc.logger
-          .t("No explanation found for $id in $locale. Falling back to en");
-
       final fallback = loc._getAllExerciseExplanationsForLocale("en")[id];
+      
       if (fallback == null) {
-        loc.logger.t("No explanation found for $id in en either");
         return null;
       }
 

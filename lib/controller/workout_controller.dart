@@ -472,6 +472,18 @@ class WorkoutController extends GetxController with ServiceableController {
               Get.find<CountdownController>().setCountdown(supersetIndex == null
                   ? exercise.restTime
                   : superset!.restTime);
+            } else {
+              logger.i("""
+Not starting countdown because the following conditions are not met:
+either:
+ - This is an exercise (${supersetIndex == null})
+ - This is the last exercise in a superset (${supersetIndex != null &&
+                i == (exercises[supersetIndex] as Superset).exercises.length - 1})
+and:
+ - The rest time is greater than 0 (${(supersetIndex == null && exercise.restTime.inSeconds > 0) || (supersetIndex != null && (exercises[supersetIndex] as Superset).restTime.inSeconds > 0)})
+and:
+ - The next set is not a stripping set (${!(nextSet != null && nextSet.kind == GTSetKind.failureStripping)})
+""".trim());
             }
           }
           exercises.refresh();

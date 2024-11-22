@@ -83,14 +83,14 @@ class LoggerController extends GetxController {
   // Whether to show the logger pane in the bottom nav bar
   static const shouldShowPane =
       kDebugMode || bool.hasEnvironment('SHOW_LOGGER_PANE');
-  static const keptLogs = shouldShowPane ? 500 : 50;
+  static const keptLogs = shouldShowPane ? 500 : 100;
 
   Stream get onLogsUpdated => _onLogsUpdatedSubject.stream;
   final _onLogsUpdatedSubject = BehaviorSubject();
 
   final List<Log> logs = [];
 
-  Level level = kDebugMode ? Level.debug : Level.warning;
+  Level level = kDebugMode ? Level.debug : Level.info;
 
   List<Log> get filteredLogs {
     return logs.where((log) => log.level.value >= level.value).toList();

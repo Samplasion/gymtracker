@@ -66,13 +66,11 @@ class _HistoryViewState extends State<HistoryView> {
   @override
   void initState() {
     super.initState();
-    logger.d("Init state");
     _recompute();
     final controller = Get.find<HistoryController>();
     worker = ever(
       controller.history,
       (callback) {
-        logger.i("History updated");
         _recompute();
       },
     );
@@ -94,8 +92,6 @@ class _HistoryViewState extends State<HistoryView> {
 
   @override
   void dispose() {
-    logger.d("Dispose state");
-
     searchController.dispose();
     worker.dispose();
     super.dispose();

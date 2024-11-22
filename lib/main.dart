@@ -99,7 +99,7 @@ class MainApp extends StatefulWidget {
   State<MainApp> createState() => _MainAppState();
 }
 
-class _MainAppState extends State<MainApp> {
+class _MainAppState extends State<MainApp> with LoggerConfigurationMixin {
   @override
   void initState() {
     super.initState();
@@ -107,6 +107,9 @@ class _MainAppState extends State<MainApp> {
     Get.put(Coordinator()..init());
     Get.put(widget.localizations);
   }
+
+  @override
+  int loggerMethodCount = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -201,7 +204,7 @@ class _MainAppState extends State<MainApp> {
                         if (isError == true) {
                           logger.e(text);
                         } else {
-                          logger.d(text);
+                          logger.t(text);
                         }
                       },
                     );

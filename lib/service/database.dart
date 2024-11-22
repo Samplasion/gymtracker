@@ -26,7 +26,10 @@ import 'package:rxdart/rxdart.dart';
 const _kMaxBackups = 10;
 const _kPeriodicBackupInterval = Duration(days: 1);
 
-class DatabaseService extends GetxService with ChangeNotifier {
+class DatabaseService extends GetxService with ChangeNotifier, LoggerConfigurationMixin {
+  @override
+  int get loggerMethodCount => 0;
+
   late GTDatabase _db;
   GTDatabase get db => _db;
 
@@ -575,7 +578,7 @@ class DatabaseService extends GetxService with ChangeNotifier {
   }
 
   void writeToOngoing(Map<String, dynamic> data) {
-    logger.d("Writing ongoing workout data");
+    logger.t("Writing ongoing workout data");
     _db.setOngoing(data);
   }
 
@@ -585,7 +588,7 @@ class DatabaseService extends GetxService with ChangeNotifier {
   }
 
   void deleteOngoing() {
-    logger.i("Requested deletion of ongoing workout data");
+    logger.d("Requested deletion of ongoing workout data");
     _db.deleteOngoing();
   }
 

@@ -72,8 +72,8 @@ const availableLevels = [
   if (kDebugMode) ...[
     Level.trace,
     Level.debug,
-    Level.info,
   ],
+  Level.info,
   Level.warning,
   Level.error,
   Level.fatal,

@@ -1008,6 +1008,10 @@
         "latPulldownsNarrowGrip": "Lat pulldowns (narrow grip)",
         "tBarRowWideProneGrip": "T-Bar machine row (wide prone grip)",
         "dumbbellRow": "Dumbbell row"
+      },
+      "exercise": {
+        "dualLowRowMachine": "Dual low row machine",
+        "dualHighRowMachine": "Dual high row machine"
       }
     },
     "triceps": {

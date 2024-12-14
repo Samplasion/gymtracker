@@ -995,9 +995,9 @@
         "hyperExtensions": "Iperestensioni",
         "weightedHyperExtensions": "Iperestensioni con peso",
         "barbellRow": "Rematore col bilanciere",
-        "triangleBarLatPulldowns": "Trazioni laterali (con triangolo)",
-        "underhandGripLatPulldowns": "Trazioni laterali (presa supina)",
-        "latPulldowns": "Trazioni laterali",
+        "triangleBarLatPulldowns": "Lat machine (con triangolo)",
+        "underhandGripLatPulldowns": "Lat machine (presa supina)",
+        "latPulldowns": "Lat machine",
         "cableSeatedRowTriangleBar": "Rematore al cavo (con triangolo)",
         "straightArmCablePushdown": "Pulldown a braccia dritte",
         "deadlift": "Stacchi",
@@ -1008,6 +1008,10 @@
         "latPulldownsWideGrip": "Lat machine (presa larga)",
         "tBarRowWideProneGrip": "Rematore T-Bar machine (presa larga prona)",
         "dumbbellRow": "Rematore con manubrio"
+      },
+      "exercise": {
+        "dualLowRowMachine": "Dual low row machine",
+        "dualHighRowMachine": "Dual high row machine"
       }
     },
     "triceps": {

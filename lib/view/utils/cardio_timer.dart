@@ -331,14 +331,14 @@ class _CardioTimerScreenState extends State<CardioTimerScreen> {
     final fontSize = MediaQuery.of(context).size.width / 4;
     return PopScope(
       canPop: false,
-      onPopInvokedWithResult: <T>(didPop, T res) async {
+      onPopInvokedWithResult: (didPop, dynamic res) async {
         if (!didPop) {
           final shouldPop = await Go.confirm(
             "cardioTimer.confirmExit.title".t,
             "cardioTimer.confirmExit.message".t,
           );
           if (shouldPop) {
-            Get.back<T>(result: res);
+            Get.back(result: res);
           }
         }
       },

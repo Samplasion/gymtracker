@@ -2,7 +2,7 @@
   "conventionalCommits.scopes": [
     "i18n"
   ],
-  "dart.flutterSdkPath": "~/fvm/default",
+  "dart.flutterSdkPath": "~/.puro/envs/stable/flutter",
   "i18n-ally.localesPaths": [
     "assets/i18n"
   ]

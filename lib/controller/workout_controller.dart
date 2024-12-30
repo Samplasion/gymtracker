@@ -477,13 +477,13 @@ class WorkoutController extends GetxController with ServiceableController {
 Not starting countdown because the following conditions are not met:
 either:
  - This is an exercise (${supersetIndex == null})
- - This is the last exercise in a superset (${supersetIndex != null &&
-                i == (exercises[supersetIndex] as Superset).exercises.length - 1})
+ - This is the last exercise in a superset (${supersetIndex != null && i == (exercises[supersetIndex] as Superset).exercises.length - 1})
 and:
  - The rest time is greater than 0 (${(supersetIndex == null && exercise.restTime.inSeconds > 0) || (supersetIndex != null && (exercises[supersetIndex] as Superset).restTime.inSeconds > 0)})
 and:
  - The next set is not a stripping set (${!(nextSet != null && nextSet.kind == GTSetKind.failureStripping)})
-""".trim());
+"""
+                  .trim());
             }
           }
           exercises.refresh();
@@ -927,17 +927,19 @@ and:
         () => const ExercisePicker(singlePick: false));
     if (exs == null || exs.isEmpty) return;
     exercises.addAll(
-      exs.map(
-        (ex) => ex.makeChild().copyWith.sets(
-          [
-            if (!ex.parameters.isSetless)
-              GTSet.empty(
-                kind: GTSetKind.normal,
-                parameters: ex.parameters,
-              ),
-          ],
-        ),
-      ),
+      exs
+          .map(
+            (ex) => ex.makeChild().copyWith.sets(
+              [
+                if (!ex.parameters.isSetless)
+                  GTSet.empty(
+                    kind: GTSetKind.normal,
+                    parameters: ex.parameters,
+                  ),
+              ],
+            ),
+          )
+          .toList(),
     );
     exercises.refresh();
     save();

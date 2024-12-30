@@ -67,6 +67,7 @@ class _MusclesViewState extends State<MusclesView> {
   }
 
   List<Color> get _gradientColors {
+    if (!mounted) return [Colors.black, Colors.black];
     return [
       Theme.of(context).colorScheme.surface,
       Theme.of(context).colorScheme.tertiary,

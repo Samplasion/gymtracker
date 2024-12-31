@@ -629,6 +629,7 @@ class OngoingWorkoutBar extends StatelessWidget {
                               style: TextButton.styleFrom(
                                 foregroundColor:
                                     Theme.of(context).colorScheme.error,
+                                iconColor: Theme.of(context).colorScheme.error,
                               ),
                               onPressed: () => cancelWorkout(context),
                               icon: const Icon(GTIcons.close),

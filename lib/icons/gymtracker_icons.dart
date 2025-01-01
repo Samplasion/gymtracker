@@ -135,6 +135,7 @@ class GTIcons {
   static const IconData duration = Icons.access_time_rounded;
   static const IconData edit = Icons.edit_rounded;
   static const IconData empty_workout = Icons.timer_rounded;
+  static const IconData exertion = Icons.fitness_center_rounded;
   static const IconData explanation = Icons.note_alt_outlined;
   static const IconData export = Icons.file_upload_rounded;
   static const IconData favorite = Icons.star_rounded;

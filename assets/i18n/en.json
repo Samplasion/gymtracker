@@ -37,7 +37,9 @@
         "reps": "Reps",
         "duration": "Workout Duration",
         "time": "Time",
-        "distance": "Distance"
+        "distance": "Distance",
+        "exertion": "Exertion rate",
+        "exertionInfo": "The rate of exertion estimates the intensity of a workout by calculating the average of the lifted weight and the duration of the workout."
       }
     },
     "fields": {

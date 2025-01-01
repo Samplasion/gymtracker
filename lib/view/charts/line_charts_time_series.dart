@@ -489,7 +489,20 @@ class _LineChartTimeSeriesState<T> extends State<LineChartTimeSeries<T>> {
                 children: [
                   for (final entry in widget.categories.entries)
                     ChoiceChip(
-                      label: Text(entry.value.title),
+                      tooltip: entry.value.info,
+                      label: Text.rich(TextSpan(children: [
+                        TextSpan(text: entry.value.title),
+                        if (entry.value.info != null) ...[
+                          const TextSpan(text: "   "),
+                          WidgetSpan(
+                            child: Icon(
+                              GTIcons.info,
+                              size: 16,
+                              color: colorScheme.onSurface,
+                            ),
+                          ),
+                        ]
+                      ])),
                       avatar: CircleAvatar(
                         child: this.selectedCategory == entry.key
                             ? const SizedBox.shrink()

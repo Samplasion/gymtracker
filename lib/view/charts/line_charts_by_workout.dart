@@ -266,7 +266,20 @@ class _LineChartWithCategoriesState<T>
               children: [
                 for (final entry in widget.categories.entries)
                   ChoiceChip(
-                    label: Text(entry.value.title),
+                    tooltip: entry.value.info,
+                    label: Text.rich(TextSpan(children: [
+                      TextSpan(text: entry.value.title),
+                      if (entry.value.info != null) ...[
+                        const TextSpan(text: "   "),
+                        WidgetSpan(
+                          child: Icon(
+                            GTIcons.info,
+                            size: 16,
+                            color: colorScheme.onSurface,
+                          ),
+                        ),
+                      ]
+                    ])),
                     avatar: CircleAvatar(
                       child: this.selectedCategory == entry.key
                           ? const SizedBox.shrink()
@@ -380,6 +393,7 @@ enum _RoutineHistoryChartType {
   volume,
   reps,
   duration,
+  exertion,
 }
 
 class _RoutineHistoryChartState
@@ -413,6 +427,11 @@ class _RoutineHistoryChartState
           value: wo.duration!.inSeconds.toDouble(),
           date: wo.startingDate!,
         );
+      case _RoutineHistoryChartType.exertion:
+        return LineChartPoint(
+          value: wo.exertion.toDouble(),
+          date: wo.startingDate!,
+        );
     }
   }
 
@@ -438,6 +457,7 @@ class _RoutineHistoryChartState
       _RoutineHistoryChartType.volume: [],
       _RoutineHistoryChartType.reps: [],
       _RoutineHistoryChartType.duration: [],
+      _RoutineHistoryChartType.exertion: [],
     };
 
     for (final wo in children) {
@@ -457,6 +477,10 @@ class _RoutineHistoryChartState
         value: wo.duration!.inSeconds.toDouble(),
         date: wo.startingDate!,
       ));
+      values[_RoutineHistoryChartType.exertion]!.add(LineChartPoint(
+        value: wo.exertion.toDouble(),
+        date: wo.startingDate!,
+      ));
     }
 
     return values;
@@ -472,6 +496,10 @@ class _RoutineHistoryChartState
     }
 
     types.add(_RoutineHistoryChartType.duration);
+
+    if (values[_RoutineHistoryChartType.exertion]!.any((v) => v.value != 0)) {
+      types.add(_RoutineHistoryChartType.exertion);
+    }
 
     return types;
   }();
@@ -491,21 +519,12 @@ class _RoutineHistoryChartState
         return "exerciseList.fields.reps".plural(y.toInt());
       case _RoutineHistoryChartType.duration:
         return time.text!;
+      case _RoutineHistoryChartType.exertion:
+        return "${Weights.kg.format(y)}/min";
     }
   }
 
-  @override
-  Widget build(BuildContext context) {
-    final deltaStartingTime = children.first.startingDate!
-        .difference(
-          children.last.startingDate!,
-        )
-        .abs();
-    if (deltaStartingTime >= _kDeltaTimeForTimeChart) {
-      return _buildTimeChart(context);
-    }
-    return LineChartWithCategories(
-      categories: {
+  Map<_RoutineHistoryChartType, LineChartCategory> get categories => {
         _RoutineHistoryChartType.volume: LineChartCategory(
           title: "exercise.chart.views.volume".t,
           icon: const Icon(GTIcons.volume, size: 16),
@@ -518,8 +537,25 @@ class _RoutineHistoryChartState
           title: "exercise.chart.views.duration".t,
           icon: const Icon(GTIcons.duration, size: 16),
         ),
-      }
-          .entries
+        _RoutineHistoryChartType.exertion: LineChartCategory(
+          title: "exercise.chart.views.exertion".t,
+          icon: const Icon(GTIcons.exertion, size: 16),
+          info: "exercise.chart.views.exertionInfo".t,
+        ),
+      };
+
+  @override
+  Widget build(BuildContext context) {
+    final deltaStartingTime = children.first.startingDate!
+        .difference(
+          children.last.startingDate!,
+        )
+        .abs();
+    if (deltaStartingTime >= _kDeltaTimeForTimeChart) {
+      return _buildTimeChart(context);
+    }
+    return LineChartWithCategories(
+      categories: categories.entries
           .where((element) => availableTypes.contains(element.key))
           .toMap(),
       data: {
@@ -593,21 +629,7 @@ class _RoutineHistoryChartState
 
   Widget _buildTimeChart(BuildContext context) {
     return LineChartTimeSeries(
-      categories: {
-        _RoutineHistoryChartType.volume: LineChartCategory(
-          title: "exercise.chart.views.volume".t,
-          icon: const Icon(GTIcons.volume, size: 16),
-        ),
-        _RoutineHistoryChartType.reps: LineChartCategory(
-          title: "exercise.chart.views.reps".t,
-          icon: const Icon(GTIcons.reps, size: 16),
-        ),
-        _RoutineHistoryChartType.duration: LineChartCategory(
-          title: "exercise.chart.views.duration".t,
-          icon: const Icon(GTIcons.duration, size: 16),
-        ),
-      }
-          .entries
+      categories: categories.entries
           .where((element) => availableTypes.contains(element.key))
           .toMap(),
       data: {
@@ -640,9 +662,7 @@ class _RoutineHistoryChartState
             return Text.rich(
               TextSpan(children: [
                 TextSpan(
-                  children: [
-                    TextSpan(text: buildType(type, time, point.value))
-                  ],
+                  text: buildType(type, time, point.value),
                   style: style,
                 ),
                 const TextSpan(text: " "),
@@ -936,8 +956,7 @@ class _ExerciseHistoryChartState
         predictions: {
           for (final MapEntry(:key, :value) in predictedData.entries)
             key: [
-              if (value.isNotEmpty)
-                data[key]!.last,
+              if (value.isNotEmpty) data[key]!.last,
               ...value,
             ],
         },

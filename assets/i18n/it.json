@@ -37,7 +37,9 @@
         "reps": "Ripetizioni",
         "duration": "Durata allenamento",
         "time": "Tempo",
-        "distance": "Distanza"
+        "distance": "Distanza",
+        "exertion": "Tasso di esercizio",
+        "exertionInfo": "Il tasso di esercizio stima l'intensità di un allenamento calcolando la media del peso sollevato e della durata dell'allenamento."
       }
     },
     "fields": {

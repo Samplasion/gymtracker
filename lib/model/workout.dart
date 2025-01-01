@@ -175,6 +175,17 @@ class Workout {
   bool get isSupersedence =>
       completes != null && exercises.any((element) => element.isSupersedence);
 
+  double get exertion => (doneSets.fold(
+          0.0,
+          (a, b) =>
+              a +
+              Weights.convert(
+                value: b.weight?.toDouble() ?? 0,
+                from: weightUnit,
+                to: Weights.kg,
+              )) /
+      max(1, duration!.inMinutes));
+
   Workout({
     String? id,
     required this.name,
@@ -515,6 +526,10 @@ class SynthesizedWorkout implements Workout {
             ])
         .toList();
   }
+
+  @override
+  double get exertion =>
+      components.fold(0.0, (a, b) => a + b.exertion) / components.length;
 
   @override
   GTRoutineFolder? get folder => null;

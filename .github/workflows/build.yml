@@ -48,14 +48,14 @@ jobs:
         if: github.event_name == 'release'
         uses: softprops/action-gh-release@v1
         with:
-          files: out/ios/GymTracker-*
+          files: out/ios/GymBro-*
           generate_release_notes: true
       - name: Upload artifacts
         if: github.event_name != 'release'
         uses: actions/upload-artifact@v4
         with:
-          name: GymTracker iOS app
-          path: out/ios/GymTracker-*
+          name: Gym Bro iOS app
+          path: out/ios/GymBro-*
   build_android:
     name: Build Android app [${{ matrix.flag }}]
     continue-on-error: true
@@ -125,11 +125,11 @@ jobs:
         if: github.event_name == 'release'
         uses: softprops/action-gh-release@v1
         with:
-          files: out/android/GymTracker-*
+          files: out/android/GymBro-*
           generate_release_notes: true
       - name: Upload artifacts
         if: github.event_name != 'release'
         uses: actions/upload-artifact@v4
         with:
-          name: GymTracker Android app [${{ matrix.flag }}]
-          path: out/android/GymTracker-*
+          name: Gym Bro Android app [${{ matrix.flag }}]
+          path: out/android/GymBro-*

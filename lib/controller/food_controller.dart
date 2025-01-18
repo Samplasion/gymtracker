@@ -154,7 +154,7 @@ class FoodController extends GetxController with ServiceableController {
     super.onInit();
 
     OpenFoodAPIConfiguration.userAgent = UserAgent(
-      name: 'GymTracker',
+      name: "appName".t,
       version: VersionService().packageInfo.version,
       system: "${Platform.operatingSystem} ${Platform.operatingSystemVersion}",
     );

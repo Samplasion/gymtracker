@@ -1,6 +1,6 @@
 {
-    "name": "gymtracker",
-    "short_name": "gymtracker",
+    "name": "Gym Bro",
+    "short_name": "Gym Bro",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

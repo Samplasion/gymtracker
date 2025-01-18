@@ -1,5 +1,5 @@
 {
-  "appName": "GymTracker",
+  "appName": "Gym Bro",
   "appInfo": {
     "version": "Version @version (build @build)",
     "shortDescription": "The best workout tracker for your gym sessions."
@@ -421,13 +421,13 @@
           }
         },
         "types": {
-          "gt": "GymTracker (JSON)",
+          "gt": "Gym Bro (JSON)",
           "hevy": "Hevy (CSV)"
         }
       },
       "export": {
         "label": "Export data (JSON)",
-        "filename": "GymTracker_Data",
+        "filename": "GymBro_Data",
         "failed": {
           "title": "Failed to export data",
           "copy": "The error message has been copied to the clipboard."
@@ -452,7 +452,7 @@
         "subtitle": "Apply the category color to exercise and category pages"
       },
       "exportSQL": {
-        "text": "Export the full GymTracker database. It cannot be imported back later (but your data won't be deleted).",
+        "text": "Export the full Gym Bro database. It cannot be imported back later (but your data won't be deleted).",
         "label": "Export full database (SQL)"
       },
       "nutritionLanguage": "Food search language",

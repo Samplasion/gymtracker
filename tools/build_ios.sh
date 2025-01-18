@@ -3,7 +3,7 @@
 set -e
 
 # Set up environment
-name="GymTracker"
+name="GymBro"
 flavor="release"
 NOW=$(date +"%s")
 BUILD=$(git rev-parse HEAD | cut -c1-7)

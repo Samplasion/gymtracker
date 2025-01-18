@@ -94,6 +94,8 @@ class GTIcons {
       IconData(0xf06d, fontFamily: _kFontFam, fontPackage: _kFontPkg);
   static const IconData _sparkles =
       IconData(0xf06e, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData _appIcon =
+      IconData(0xf06f, fontFamily: _kFontFam, fontPackage: _kFontPkg);
 
   static const IconData account = Icons.account_circle_rounded;
   static const IconData achievements = Icons.emoji_events_rounded;
@@ -105,7 +107,7 @@ class GTIcons {
   static const IconData add_to_faves = Icons.star_border_rounded;
   static const IconData add_to_superset = Icons.group_work_rounded;
   static const IconData advanced = Icons.settings_rounded;
-  static const IconData app_icon = Icons.fitness_center_rounded;
+  static const IconData app_icon = _appIcon;
   static const IconData appearance = Icons.palette_rounded;
   static const IconData backup = Icons.save_alt_rounded;
   static const IconData boutique = Icons.shopping_bag_rounded;

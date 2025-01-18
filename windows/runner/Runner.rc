@@ -90,12 +90,12 @@ BEGIN
         BLOCK "040904e4"
         BEGIN
             VALUE "CompanyName", "org.js.samplasion" "\0"
-            VALUE "FileDescription", "gymtracker" "\0"
+            VALUE "FileDescription", "GymBro" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
-            VALUE "InternalName", "gymtracker" "\0"
+            VALUE "InternalName", "GymBro" "\0"
             VALUE "LegalCopyright", "Copyright (C) 2023 org.js.samplasion. All rights reserved." "\0"
-            VALUE "OriginalFilename", "gymtracker.exe" "\0"
-            VALUE "ProductName", "gymtracker" "\0"
+            VALUE "OriginalFilename", "GymBro.exe" "\0"
+            VALUE "ProductName", "GymBro" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
     END

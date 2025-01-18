@@ -682,7 +682,8 @@
     "dialogs": {
       "actions": {
         "ok": "OK",
-        "cancel": "Annulla"
+        "cancel": "Annulla",
+        "close": "Chiudi"
       }
     },
     "exercises": {
@@ -839,7 +840,8 @@
     },
     "barbells": {
       "label": "Bilanciere"
-    }
+    },
+    "insert": "Inserisci peso"
   },
   "androidNotificationChannel": {
     "name": "Timer tempo di recupero",

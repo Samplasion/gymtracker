@@ -13,22 +13,29 @@ import 'package:gymtracker/view/utils/input_decoration.dart';
 class WeightCalculator extends StatefulWidget {
   final double? startingWeight;
   final Weights weightUnit;
+  final bool showInsertButton;
+  final void Function(double)? onPressInsert;
 
   const WeightCalculator({
     super.key,
     this.startingWeight,
     required this.weightUnit,
-  });
+    this.showInsertButton = false,
+    this.onPressInsert,
+  }) : assert(showInsertButton ? onPressInsert != null : true,
+            "If showInsertButton is true, onPressInsert must be provided");
 
   @override
   State<WeightCalculator> createState() => _WeightCalculatorState();
 }
 
+const double kClampMax = 10020;
+
 class _WeightCalculatorState extends State<WeightCalculator>
     with SingleTickerProviderStateMixin {
   late final _weightController = TextEditingController(
       text: widget.startingWeight != null
-          ? stringifyDouble(widget.startingWeight!)
+          ? stringifyDouble(widget.startingWeight!.clamp(0, kClampMax))
           : null);
   Bars selectedBarbell = Bars.normal;
   late final animationController = AnimationController(
@@ -96,12 +103,20 @@ class _WeightCalculatorState extends State<WeightCalculator>
                       ),
                       onChanged: (value) {
                         setState(() {
+                          final selection = _weightController.selection;
                           var dbl = value.tryParseDouble();
                           _weightController.text = dbl == null
                               ? ""
-                              : stringifyDouble(dbl.clamp(0, 10000));
+                              : stringifyDouble(dbl.clamp(0, kClampMax));
                           if (value.endsWith(".")) {
                             _weightController.text += ".";
+                          }
+                          // Might fail if the user spams a digit (we're clamping it to 10000)
+                          // but I don't care about that
+                          try {
+                            _weightController.selection = selection;
+                          } catch (e) {
+                            globalLogger.e(e);
                           }
                         });
                       },
@@ -208,12 +223,23 @@ class _WeightCalculatorState extends State<WeightCalculator>
                     child: Wrap(
                       alignment: WrapAlignment.end,
                       children: [
+                        if (widget.showInsertButton)
+                          TextButton.icon(
+                            onPressed: () {
+                              widget.onPressInsert!(
+                                _weightController.text.tryParseDouble() ?? 0,
+                              );
+                              Navigator.pop(context);
+                            },
+                            label: Text("weightCalculator.insert".t),
+                            icon: const Icon(GTIcons.insert),
+                          ),
                         TextButton.icon(
                           onPressed: () {
                             Navigator.pop(context);
                           },
-                          label: Text("general.dialogs.actions.ok".t),
-                          icon: const Icon(GTIcons.done),
+                          label: Text("general.dialogs.actions.close".t),
+                          icon: const Icon(GTIcons.close),
                         ),
                       ],
                     ),

@@ -682,7 +682,8 @@
     "dialogs": {
       "actions": {
         "ok": "OK",
-        "cancel": "Cancel"
+        "cancel": "Cancel",
+        "close": "Close"
       }
     },
     "exercises": {
@@ -839,7 +840,8 @@
     },
     "barbells": {
       "label": "Barbell"
-    }
+    },
+    "insert": "Insert weight"
   },
   "androidNotificationChannel": {
     "name": "Rest timeout",

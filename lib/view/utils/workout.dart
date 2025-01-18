@@ -9,6 +9,7 @@ import 'package:gymtracker/icons/gymtracker_icons.dart';
 import 'package:gymtracker/model/exercise.dart';
 import 'package:gymtracker/model/set.dart';
 import 'package:gymtracker/service/localizations.dart';
+import 'package:gymtracker/service/logger.dart';
 import 'package:gymtracker/struct/editor_callback.dart';
 import 'package:gymtracker/struct/optional.dart';
 import 'package:gymtracker/utils/extensions.dart';
@@ -413,6 +414,11 @@ class _WorkoutExerciseSetEditorState extends State<WorkoutExerciseSetEditor> {
                       () => WeightCalculator(
                         startingWeight: weightController.text.tryParseDouble(),
                         weightUnit: widget.weightUnit,
+                        showInsertButton: true,
+                        onPressInsert: (weight) {
+                          weightController.text = stringifyDouble(weight);
+                          _updateSetWeight(weight);
+                        },
                       ),
                     );
                   },
@@ -420,10 +426,7 @@ class _WorkoutExerciseSetEditorState extends State<WorkoutExerciseSetEditor> {
               : null,
         ),
         onChanged: (value) {
-          final newSet = widget.set.copyWith(
-            weight: value.isEmpty ? null : value.tryParseDouble(),
-          );
-          widget.onSetValueChange(newSet);
+          _updateSetWeight(value.isEmpty ? null : value.tryParseDouble());
         },
       );
   Widget get timeField => TimeInputField(
@@ -642,6 +645,11 @@ class _WorkoutExerciseSetEditorState extends State<WorkoutExerciseSetEditor> {
         },
       ),
     );
+  }
+
+  void _updateSetWeight(double? value) {
+    final newSet = widget.set.copyWith(weight: value);
+    widget.onSetValueChange(newSet);
   }
 }
 

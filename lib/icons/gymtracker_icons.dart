@@ -154,6 +154,7 @@ class GTIcons {
   static const IconData import = Icons.file_download_rounded;
   static const IconData increase = Icons.add_rounded;
   static const IconData info = Icons.info_rounded;
+  static const IconData insert = Icons.open_in_browser_outlined;
   static const IconData info_outline = Icons.info_outline;
   static const IconData keyboard = Icons.keyboard_rounded;
   static const IconData library = Icons.local_library_rounded;

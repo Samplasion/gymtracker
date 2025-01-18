@@ -7,7 +7,7 @@ on:
 jobs:
   test:
     name: Integration tests (${{ matrix.flag }}/3)
-    runs-on: macOS-latest
+    runs-on: macos-13
     strategy:
       matrix:
         flag: [1, 2, 3]

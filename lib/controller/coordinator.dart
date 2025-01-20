@@ -26,6 +26,7 @@ import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/service/logger.dart';
 import 'package:gymtracker/service/notifications.dart';
 import 'package:gymtracker/utils/go.dart';
+import 'package:protocol_handler/protocol_handler.dart';
 import 'package:rxdart/rxdart.dart';
 
 class Coordinator extends GetxController
@@ -68,6 +69,7 @@ class Coordinator extends GetxController
     }).pipe(showPermissionTilesStream);
 
     schedulePeriodicBackup();
+    loadColdbootDeeplink();
   }
 
   @override
@@ -115,6 +117,19 @@ class Coordinator extends GetxController
 
     if (service.hasOngoing) {
       Get.put(WorkoutController.fromSavedData(service.getOngoingData()!));
+    }
+  }
+
+  /// If the app was launched by a deeplink while it was closed, this method
+  /// will be called to handle the deeplink as if it was received in the
+  /// foreground.
+  void loadColdbootDeeplink() async {
+    final deeplink = await protocolHandler.getInitialUrl();
+    if (deeplink != null) {
+      logger.d("Coldboot deeplink: $deeplink");
+      for (final listener in protocolHandler.listeners) {
+        listener.onProtocolUrlReceived(deeplink);
+      }
     }
   }
 

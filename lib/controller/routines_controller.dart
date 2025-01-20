@@ -413,9 +413,13 @@ class RoutinesController extends GetxController
       return;
     }
 
-    Go.showBottomModalScreen(
-      (context, _) => ImportRoutineModal(workout: workout),
-    );
+    // Scheduling this allows us to show the modal if the app was
+    // invoked from a cold start.
+    SchedulerBinding.instance.addPostFrameCallback((_) {
+      Go.showBottomModalScreen(
+        (context, _) => ImportRoutineModal(workout: workout),
+      );
+    });
   }
 
   void onUnknownUrlReceived(Uri parsed) {

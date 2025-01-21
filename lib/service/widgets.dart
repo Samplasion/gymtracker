@@ -4,11 +4,11 @@ import 'package:home_widget/home_widget.dart';
 
 const String appGroupId = 'group.gymtrackerwidget';
 const String iOSWidgetName = 'Widgets';
-const String androidWidgetName = 'Widget';
+const String androidWidgetName = 'org.js.samplasion.gymtracker.StreakWidget';
 
 final isSupported = Platform.isIOS || Platform.isAndroid;
 
-class WidgetsService {
+abstract class WidgetsService {
   static WidgetsService instance() {
     if (isSupported) {
       return _WidgetsService();
@@ -17,7 +17,7 @@ class WidgetsService {
     }
   }
 
-  updateWeeklyStreak(int streak) {}
+  updateWeeklyStreak(int streak);
 }
 
 class _WidgetsService extends WidgetsService {
@@ -36,7 +36,7 @@ class _WidgetsService extends WidgetsService {
   _update() {
     HomeWidget.updateWidget(
       iOSName: iOSWidgetName,
-      androidName: androidWidgetName,
+      qualifiedAndroidName: androidWidgetName,
     );
   }
 }

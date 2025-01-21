@@ -1,0 +1,35 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/streak_widget"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?android:attr/colorBackground"
+    android:gravity="center"
+    android:orientation="vertical"
+    android:theme="@style/Theme.Android.AppWidgetContainer">
+
+    <ImageView
+        android:id="@+id/flame"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:importantForAccessibility="no"
+        android:src="@drawable/fire"
+        android:tint="?android:attr/colorAccent" />
+
+    <TextView
+        android:id="@+id/streakText"
+        style="@style/Widget.Android.AppWidget.InnerView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="0dp"
+        android:layout_marginLeft="0dp"
+        android:layout_marginTop="8dp"
+        android:background="?android:attr/colorBackground"
+        android:text="3 weeks"
+        android:textColor="?android:attr/colorAccent"
+        android:textSize="28sp"
+        android:textFontWeight="700"
+        tools:ignore="HardcodedText" />
+
+</LinearLayout>

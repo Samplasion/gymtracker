@@ -21,6 +21,7 @@ import 'package:gymtracker/model/measurements.dart';
 import 'package:gymtracker/service/database.dart';
 import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/service/logger.dart';
+import 'package:gymtracker/service/widgets.dart';
 import 'package:gymtracker/utils/constants.dart';
 import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/utils/go.dart';
@@ -219,6 +220,13 @@ class _DebugViewState extends State<DebugView> {
                       currentSnapshot: c.service.currentSnapshot,
                     );
                   });
+                },
+              ),
+              ListTile(
+                title: const Text("Update home widgets"),
+                onTap: () async {
+                  WidgetsService.instance().updateWeeklyStreak(
+                      Get.find<HistoryController>().streaks.value.weekStreak);
                 },
               ),
 

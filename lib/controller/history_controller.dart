@@ -13,6 +13,7 @@ import 'package:gymtracker/model/superset.dart';
 import 'package:gymtracker/model/workout.dart';
 import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/service/logger.dart';
+import 'package:gymtracker/service/widgets.dart';
 import 'package:gymtracker/struct/streaks.dart';
 import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/utils/go.dart';
@@ -90,6 +91,10 @@ class HistoryController extends GetxController with ServiceableController {
       ));
 
       logger.i("Recomputed streaks: $streaks");
+
+      WidgetsService().updateWeeklyStreak(streaks.value.weekStreak);
+
+      logger.i("Updated widget with streak: ${streaks.value.weekStreak}");
     } catch (e, s) {
       logger.e("Error computing streaks", error: e, stackTrace: s);
     }

@@ -75,6 +75,7 @@ dependencies:
   pub_semver: ^2.1.4
   envied: ^0.5.4+1
   shared_preferences: ^2.3.3
+  home_widget: ^0.7.0
   
 dev_dependencies:
   flutter_test:

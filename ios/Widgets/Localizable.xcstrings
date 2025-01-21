@@ -41,30 +41,6 @@
         }
       }
     },
-    "A an example control that runs a timer." : {
-
-    },
-    "Bottom %@" : {
-
-    },
-    "Configuration" : {
-
-    },
-    "Hello %@" : {
-
-    },
-    "L" : {
-
-    },
-    "Leading" : {
-
-    },
-    "Off" : {
-
-    },
-    "On" : {
-
-    },
     "Show off your weekly streak." : {
       "extractionState" : "manual",
       "localizations" : {
@@ -75,12 +51,6 @@
           }
         }
       }
-    },
-    "Start a timer" : {
-
-    },
-    "Start Timer" : {
-
     },
     "Streak" : {
       "extractionState" : "manual",
@@ -115,27 +85,6 @@
           }
         }
       }
-    },
-    "T %@" : {
-
-    },
-    "This is an example widget." : {
-
-    },
-    "Timer" : {
-
-    },
-    "Timer is running" : {
-
-    },
-    "Timer Name" : {
-
-    },
-    "Timer Name Configuration" : {
-
-    },
-    "Trailing" : {
-
     },
     "" : {
       "shouldTranslate" : false

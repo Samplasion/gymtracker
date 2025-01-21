@@ -92,7 +92,7 @@ class HistoryController extends GetxController with ServiceableController {
 
       logger.i("Recomputed streaks: $streaks");
 
-      WidgetsService().updateWeeklyStreak(streaks.value.weekStreak);
+      WidgetsService.instance().updateWeeklyStreak(streaks.value.weekStreak);
 
       logger.i("Updated widget with streak: ${streaks.value.weekStreak}");
     } catch (e, s) {

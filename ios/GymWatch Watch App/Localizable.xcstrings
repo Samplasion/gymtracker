@@ -1,0 +1,26 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "Start a workout from your iPhone." : {
+      "localizations" : {
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Comincia un allenamento da iPhone."
+          }
+        }
+      }
+    },
+    "You're done! Use your iPhone to end the workout." : {
+      "localizations" : {
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fatto! Usa iPhone per terminare l’allenamento."
+          }
+        }
+      }
+    }
+  },
+  "version" : "1.0"
+}

@@ -8,10 +8,14 @@ import 'package:flutter_quill/flutter_quill.dart';
 import 'package:flutter_quill/quill_delta.dart';
 import 'package:get/get.dart' hide ContextExtensionss;
 import 'package:gymtracker/controller/settings_controller.dart';
+import 'package:gymtracker/data/distance.dart';
+import 'package:gymtracker/data/weights.dart';
 import 'package:gymtracker/model/exercisable.dart';
+import 'package:gymtracker/model/set.dart';
 import 'package:gymtracker/model/workout.dart';
 import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/service/logger.dart';
+import 'package:gymtracker/view/utils/timer.dart';
 import 'package:intl/intl.dart' hide TextDirection;
 
 extension StringUtils on String {
@@ -549,5 +553,51 @@ extension ScopeFunctions<T> on T {
   T also(void Function(T) block) {
     block(this);
     return this;
+  }
+}
+
+extension GTSetUtils on GTSet {
+  String getHumanReadableDescription({
+    required Weights weightUnit,
+    required Distance distanceUnit,
+  }) {
+    final context = Get.context;
+
+    String _buildWeight(double weight) => Weights.convert(
+            value: weight,
+            from: weightUnit,
+            to: settingsController.weightUnit.value)
+        .userFacingWeight;
+    String _buildReps(int? reps) =>
+        "exerciseList.fields.reps".plural(reps ?? 0);
+    String _buildTime(Duration time) => context == null
+        ? time.toString()
+        : TimerView.buildTimeString(context, time,
+            builder: (time) => time.text!);
+    String _buildDistance(double? distance) => Distance.convert(
+            value: distance ?? 0,
+            from: distanceUnit,
+            to: settingsController.distanceUnit.value)
+        .userFacingDistance;
+
+    switch (parameters) {
+      case GTSetParameters.repsWeight:
+        return "${_buildReps(reps)} ${_buildWeight(weight ?? 0)}";
+
+      case GTSetParameters.freeBodyReps:
+        return _buildReps(reps);
+
+      case GTSetParameters.timeWeight:
+        return "${_buildReps(reps)} ${_buildTime(time ?? Duration.zero)}";
+
+      case GTSetParameters.time:
+        return _buildTime(time ?? Duration.zero);
+
+      case GTSetParameters.distance:
+        return _buildDistance(distance);
+
+      case GTSetParameters.setless:
+        return "";
+    }
   }
 }

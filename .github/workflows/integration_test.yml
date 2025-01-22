@@ -7,7 +7,7 @@ on:
 jobs:
   test:
     name: Integration tests (${{ matrix.flag }}/3)
-    runs-on: macos-13
+    runs-on: macos-15
     strategy:
       matrix:
         flag: [1, 2, 3]
@@ -17,7 +17,7 @@ jobs:
 
       - uses: subosito/flutter-action@v2
         with:
-          flutter-version: "3.24.3"
+          flutter-version: "3.27.1"
           channel: "stable"
           cache: true
 

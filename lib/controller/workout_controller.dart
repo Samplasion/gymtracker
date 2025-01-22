@@ -5,7 +5,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:get/get.dart';
+import 'package:get/get.dart' hide ContextExtensionss;
 import 'package:gymtracker/controller/coordinator.dart';
 import 'package:gymtracker/controller/countdown_controller.dart';
 import 'package:gymtracker/controller/history_controller.dart';
@@ -25,6 +25,7 @@ import 'package:gymtracker/model/superset.dart';
 import 'package:gymtracker/model/workout.dart';
 import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/service/logger.dart';
+import 'package:gymtracker/service/watch.dart';
 import 'package:gymtracker/struct/editor_callback.dart';
 import 'package:gymtracker/struct/optional.dart';
 import 'package:gymtracker/struct/stopwatch_extended.dart';
@@ -68,6 +69,21 @@ class WorkoutController extends GetxController with ServiceableController {
       error: Error(),
       stackTrace: StackTrace.current,
     );
+
+    exercises.listen((_) {
+      logger.i("Syncing exercises to watch");
+      _initFirstSync();
+    });
+  }
+
+  _initFirstSync() {
+    SchedulerBinding.instance.addPostFrameCallback((_) {
+      if (Get.context == null) {
+        _initFirstSync();
+        return;
+      }
+      refreshWatchData();
+    });
   }
 
   factory WorkoutController.fromSavedData(Map<String, dynamic> data) {
@@ -649,6 +665,7 @@ and:
     SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
       Get.find<RoutinesController>().hasOngoingWorkout(true);
       save();
+      refreshWatchData();
     });
   }
 
@@ -1195,4 +1212,129 @@ and:
 
     return exercises;
   }
+
+  // TODO: Make it so this method returns the set immediately after the last done set
+  ({int exerciseIndex, int? supersetIndex})? get currentExerciseIndex {
+    int i = 0;
+    int j = 0;
+    for (final ex in exercises) {
+      if (ex is Exercise) {
+        if (ex.sets.any((set) => !set.done)) {
+          return (exerciseIndex: i, supersetIndex: null);
+        }
+        j++;
+      } else if (ex is Superset) {
+        for (final e in ex.exercises) {
+          if (e.sets.any((set) => !set.done)) {
+            return (exerciseIndex: j, supersetIndex: i);
+          }
+          j++;
+        }
+      }
+      i++;
+    }
+    return null;
+  }
+
+  void markThisSetAsDone() {
+    final index = currentExerciseIndex;
+    if (index == null) return;
+
+    final (exerciseIndex: exerciseIndex, supersetIndex: supersetIndex) = index;
+    final exercise = supersetIndex == null
+        ? (exercises[exerciseIndex] as Exercise)
+        : (exercises[supersetIndex] as Superset).exercises[exerciseIndex];
+    final setIndex = exercise.sets.indexWhere((set) => !set.done);
+    if (setIndex == -1) return;
+
+    final set = exercise.sets[setIndex];
+    final newSet = set.copyWith(done: true);
+
+    if (supersetIndex == null) {
+      final ex = exercises[exerciseIndex] as Exercise;
+      exercises[exerciseIndex] = ex.copyWith(
+        sets: [
+          for (int j = 0; j < ex.sets.length; j++)
+            if (j == setIndex) newSet else ex.sets[j]
+        ],
+      );
+    } else {
+      final superset = exercises[supersetIndex] as Superset;
+      exercises[supersetIndex] = superset.copyWith(exercises: [
+        for (int j = 0; j < superset.exercises.length; j++)
+          if (j == exerciseIndex)
+            superset.exercises[j].copyWith(
+              sets: [
+                for (int k = 0; k < superset.exercises[j].sets.length; k++)
+                  if (k == setIndex) newSet else superset.exercises[j].sets[k]
+              ],
+            )
+          else
+            superset.exercises[j]
+      ]);
+    }
+
+    exercises.refresh();
+    save();
+
+    refreshWatchData();
+  }
+
+  refreshWatchData() {
+    String name;
+    int color;
+    GTSet? set;
+
+    final index = currentExerciseIndex;
+    if (index != null) {
+      final (exerciseIndex: exerciseIndex, supersetIndex: supersetIndex) =
+          index;
+      final exercise = supersetIndex == null
+          ? (exercises[exerciseIndex] as Exercise)
+          : (exercises[supersetIndex] as Superset).exercises[exerciseIndex];
+      name = exercise.displayName;
+      color = _colorToValue(exercise.standard && exercise.category != null
+          ? exerciseStandardLibrary[exercise.category]?.color ??
+              Get.context?.theme.colorScheme.primary ??
+              Colors.red
+          : Get.context?.theme.colorScheme.primary ?? Colors.red);
+      set = exercise.sets.firstWhereOrNull((set) => !set.done);
+
+      SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
+        WatchService.instance().setExerciseParameters(
+          set != null,
+          name,
+          color,
+          set?.getHumanReadableDescription(
+                  weightUnit: weightUnit.value,
+                  distanceUnit: distanceUnit.value) ??
+              "",
+        );
+      });
+    } else {
+      SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
+        WatchService.instance().setExerciseParameters(false, "", 0, "");
+      });
+    }
+  }
+}
+
+int _colorToValue(Color color) {
+  globalLogger.i((
+    (color.a * 255),
+    (color.r * 255),
+    (color.g * 255),
+    (color.b * 255)
+  ).toString());
+  globalLogger.i((
+    ((color.a * 255).toInt() << 24),
+    ((color.r * 255).toInt() << 16),
+    ((color.g * 255).toInt() << 8),
+    ((color.b * 255).toInt() << 0)
+  ).toString());
+  int v = ((color.a * 255).toInt() << 24) |
+      ((color.r * 255).toInt() << 16) |
+      ((color.g * 255).toInt() << 8) |
+      ((color.b * 255).toInt() << 0);
+  return v;
 }

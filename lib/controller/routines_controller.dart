@@ -20,6 +20,7 @@ import 'package:gymtracker/model/workout.dart';
 import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/service/logger.dart';
 import 'package:gymtracker/service/share.dart';
+import 'package:gymtracker/service/watch.dart';
 import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/utils/utils.dart' as utils;
@@ -70,6 +71,9 @@ class RoutinesController extends GetxController
     });
     service.folders$.listen((fld) {
       _recomputeFolders(fld);
+    });
+    hasOngoingWorkout.listen((value) {
+      WatchService.instance().setIsWorkoutRunning(value);
     });
   }
 

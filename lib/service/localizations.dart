@@ -186,7 +186,7 @@ extension ExerciseExplanation on Exercise {
     final explanation = loc._getAllExerciseExplanationsForLocale(locale)[id];
     if (explanation == null) {
       final fallback = loc._getAllExerciseExplanationsForLocale("en")[id];
-      
+
       if (fallback == null) {
         return null;
       }

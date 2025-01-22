@@ -92,6 +92,7 @@ dev_dependencies:
   test: ^1.24.3
   flutter_gen_runner: ^5.8.0
   envied_generator: ^0.5.4+1
+  pigeon: ^22.7.2
 
 flutter_gen:
   assets:

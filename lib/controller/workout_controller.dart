@@ -1293,11 +1293,12 @@ and:
           ? (exercises[exerciseIndex] as Exercise)
           : (exercises[supersetIndex] as Superset).exercises[exerciseIndex];
       name = exercise.displayName;
-      color = _colorToValue(exercise.standard && exercise.category != null
-          ? exerciseStandardLibrary[exercise.category]?.color ??
-              Get.context?.theme.colorScheme.primary ??
-              Colors.red
-          : Get.context?.theme.colorScheme.primary ?? Colors.red);
+      color = (exercise.standard && exercise.category != null
+              ? exerciseStandardLibrary[exercise.category]?.color ??
+                  Get.context?.theme.colorScheme.primary ??
+                  Colors.red
+              : Get.context?.theme.colorScheme.primary ?? Colors.red)
+          .hexValue;
       set = exercise.sets.firstWhereOrNull((set) => !set.done);
 
       SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
@@ -1317,24 +1318,4 @@ and:
       });
     }
   }
-}
-
-int _colorToValue(Color color) {
-  globalLogger.i((
-    (color.a * 255),
-    (color.r * 255),
-    (color.g * 255),
-    (color.b * 255)
-  ).toString());
-  globalLogger.i((
-    ((color.a * 255).toInt() << 24),
-    ((color.r * 255).toInt() << 16),
-    ((color.g * 255).toInt() << 8),
-    ((color.b * 255).toInt() << 0)
-  ).toString());
-  int v = ((color.a * 255).toInt() << 24) |
-      ((color.r * 255).toInt() << 16) |
-      ((color.g * 255).toInt() << 8) |
-      ((color.b * 255).toInt() << 0);
-  return v;
 }

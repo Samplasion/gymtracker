@@ -16,13 +16,14 @@ import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/service/logger.dart';
 import 'package:gymtracker/struct/nutrition.dart';
 import 'package:gymtracker/utils/constants.dart';
+import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/view/logs.dart';
 import 'package:gymtracker/view/migrations.dart';
 import 'package:gymtracker/view/settings.dart';
 import 'package:share_plus/share_plus.dart';
 
-Color defaultColor = Color(Colors.blue.value);
+Color defaultColor = Color(Colors.blue.hexValue);
 
 SettingsController get settingsController => Get.find<SettingsController>();
 

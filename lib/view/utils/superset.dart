@@ -48,7 +48,10 @@ class _SupersetEditorState extends State<SupersetEditor> {
     var notesTextStyle = Theme.of(context).textTheme.bodyMedium!.copyWith(
           fontSize: widget.superset.notes.isEmpty ? 15 : null,
           color: widget.superset.notes.isEmpty
-              ? Theme.of(context).colorScheme.onSurface.withOpacity(0.75)
+              ? Theme.of(context)
+                  .colorScheme
+                  .onSurface
+                  .withAlpha(0.75 * 255 ~/ 100)
               : null,
         );
     return Card(

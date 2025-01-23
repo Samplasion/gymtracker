@@ -200,7 +200,8 @@ class _LogViewState extends ControlledState<LogView, LoggerController> {
               Text(
                 " ${DateFormat.Md(Get.locale!.languageCode).format(log.timestamp)} "
                 "${DateFormat.Hms().format(log.timestamp)} ",
-                style: textStyle.copyWith(color: fore.withOpacity(0.7)),
+                style:
+                    textStyle.copyWith(color: fore.withAlpha(0.7 * 255 ~/ 100)),
               ),
             ],
           ),

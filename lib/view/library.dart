@@ -896,7 +896,9 @@ class _ExerciseInfoViewState extends State<ExerciseInfoView>
     if (tiles.isEmpty) return [];
     if (tiles
         .map((bld) => bld.build(context))
-        .every((tile) => tile == nullTile)) return [];
+        .every((tile) => tile == nullTile)) {
+      return [];
+    }
 
     return [
       Padding(

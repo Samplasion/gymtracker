@@ -95,15 +95,17 @@ class DensityCalendarChart extends StatelessWidget {
                     i++)
                   _rawSquare(
                     context,
-                    context.theme.colorScheme.tertiary.withOpacity(mapRange(
-                      i.toDouble(),
-                      0,
-                      math.min((runningMax - runningMin + 1).toDouble(),
-                              math.min(8, crossCount - 2)) -
-                          1,
-                      minOpacity,
-                      maxOpacity,
-                    ).clamp(0, 1)),
+                    context.theme.colorScheme.tertiary.withAlpha(mapRange(
+                          i.toDouble(),
+                          0,
+                          math.min((runningMax - runningMin + 1).toDouble(),
+                                  math.min(8, crossCount - 2)) -
+                              1,
+                          minOpacity,
+                          maxOpacity,
+                        ).clamp(0, 1) *
+                        255 ~/
+                        100),
                   ),
                 const SizedBox(width: 16),
                 Text(
@@ -122,13 +124,14 @@ class DensityCalendarChart extends StatelessWidget {
     final val = index >= values.length ? 0 : values[index];
     var opacity =
         mapRange(val.toDouble(), 0, max.toDouble(), minOpacity, maxOpacity)
-            .clamp(0, 1).toDouble();
+            .clamp(0, 1)
+            .toDouble();
     if (val == max && val == 0) opacity = minOpacity;
     return Tooltip(
       message: tooltipBuilder(start, index, val),
       child: _rawSquare(
         context,
-        context.theme.colorScheme.tertiary.withOpacity(opacity),
+        context.theme.colorScheme.tertiary.withAlpha(opacity * 255 ~/ 100),
       ),
     );
   }
@@ -145,7 +148,7 @@ class DensityCalendarChart extends StatelessWidget {
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(6),
         border: Border.all(
-          color: context.theme.dividerColor.withOpacity(0.35),
+          color: context.theme.dividerColor.withAlpha(0.35 * 255 ~/ 100),
           width: 0.8,
         ),
         color: color,

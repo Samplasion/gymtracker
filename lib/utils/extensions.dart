@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
+import 'dart:math' as math;
 
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:flutter/material.dart';
@@ -15,6 +16,7 @@ import 'package:gymtracker/model/set.dart';
 import 'package:gymtracker/model/workout.dart';
 import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/service/logger.dart';
+import 'package:gymtracker/utils/utils.dart';
 import 'package:gymtracker/view/utils/timer.dart';
 import 'package:intl/intl.dart' hide TextDirection;
 
@@ -91,7 +93,14 @@ extension DateUtils on DateTime {
 }
 
 extension ColorUtils on Color {
-  bool get isGray => red == green && green == blue;
+  bool get isGray =>
+      doubleEquality(r, g, epsilon: 0.001) &&
+      doubleEquality(g, b, epsilon: 0.001);
+  int get hexValue =>
+      ((a * 255).toInt() << 24) |
+      ((r * 255).toInt() << 16) |
+      ((g * 255).toInt() << 8) |
+      ((b * 255).toInt() << 0);
 
   Color get grayscale => HSVColor.fromColor(this).withSaturation(0).toColor();
 
@@ -407,7 +416,7 @@ extension SeparatedWidgetList on Iterable<Widget> {
     final self = toList();
     final List<Widget> widgets = [];
 
-    for (int i = 0; i < max(0, self.length * 2 - 1); i++) {
+    for (int i = 0; i < math.max(0, self.length * 2 - 1); i++) {
       final int itemIndex = i ~/ 2;
       if (i.isEven) {
         widgets.add(self[itemIndex]);
@@ -441,7 +450,7 @@ extension EmptyDocument on Document {
 extension HarmonizedMaterialColor on MaterialColor {
   MaterialColor harmonizeWith(Color color) {
     return MaterialColor(
-      color.harmonizeWith(this).value,
+      color.harmonizeWith(this).hexValue,
       {
         50: this[50]!.harmonizeWith(color),
         100: this[100]!.harmonizeWith(color),

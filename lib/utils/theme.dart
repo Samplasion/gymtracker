@@ -56,7 +56,8 @@ ThemeData getGymTrackerThemeFor(
     inputDecorationTheme: InputDecorationTheme(
       isDense: true,
       filled: true,
-      fillColor: equivalentScheme.surfaceContainerHighest.withOpacity(0.45),
+      fillColor:
+          equivalentScheme.surfaceContainerHighest.withAlpha(0.45 * 255 ~/ 100),
       border: OutlineInputBorder(
         borderSide: BorderSide.none,
         borderRadius: BorderRadius.circular(kGymTrackerInputBorderRadius),
@@ -94,7 +95,7 @@ class MoreColors extends ThemeExtension<MoreColors> {
   factory MoreColors.fromColorScheme(ColorScheme colorScheme) {
     // Grayscale mode
     final primary = colorScheme.primary;
-    if (primary.red == primary.green && primary.green == primary.blue) {
+    if (primary.isGray) {
       return MoreColors(
         quaternary: colorScheme.primary,
         onQuaternary: colorScheme.onPrimary,

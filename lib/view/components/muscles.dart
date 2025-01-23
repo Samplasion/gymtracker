@@ -8,6 +8,7 @@ import 'package:gymtracker/controller/exercises_controller.dart';
 import 'package:gymtracker/data/exercises.dart';
 import 'package:gymtracker/gen/assets.gen.dart';
 import 'package:gymtracker/model/exercise.dart';
+import 'package:gymtracker/utils/extensions.dart';
 import 'package:rainbow_color/rainbow_color.dart';
 import 'package:xml/xml.dart';
 import 'package:xml/xpath.dart';
@@ -84,14 +85,14 @@ class _MusclesViewState extends State<MusclesView> {
 
     xml.xpath("//*[@stroke]").forEach((e) {
       e.setAttribute(
-          "stroke", "#${divider.value.toRadixString(16).substring(2)}");
+          "stroke", "#${divider.hexValue.toRadixString(16).substring(2)}");
     });
 
     for (final highlight in names) {
       final value = widget.muscles[highlight] ?? 0;
       xml.xpath("//g[@data-name=\"${highlight.svgName}\"]/path").forEach((e) {
         e.setAttribute("fill",
-            "#${gradient[widget.curve.transform(value.isNaN ? 0 : value)].value.toRadixString(16).substring(2)}");
+            "#${gradient[widget.curve.transform(value.isNaN ? 0 : value)].hexValue.toRadixString(16).substring(2)}");
         e.setAttribute(
             "opacity", value == 0 ? "0" : _getOpacity(value).toString());
       });
@@ -146,9 +147,12 @@ class _MusclesViewState extends State<MusclesView> {
                   gradient: LinearGradient(
                     colors: [
                       for (int i = 0; i < _gradientColors.length; i++)
-                        _gradientColors[i].withOpacity(i == 0
-                            ? 0
-                            : _getOpacity(i / (_gradientColors.length - 1))),
+                        _gradientColors[i].withAlpha((i == 0
+                                ? 0
+                                : _getOpacity(
+                                    i / (_gradientColors.length - 1))) *
+                            255 ~/
+                            100),
                     ],
                     begin: Alignment.centerLeft,
                     end: Alignment.centerRight,

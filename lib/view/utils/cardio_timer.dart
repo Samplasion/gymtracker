@@ -393,7 +393,7 @@ class _CardioTimerScreenState extends State<CardioTimerScreen> {
                         minHeight:
                             max(4, MediaQuery.of(context).viewPadding.bottom),
                         value: value,
-                        backgroundColor: textColor.withOpacity(0.5),
+                        backgroundColor: textColor.withAlpha(0.5 * 255 ~/ 100),
                         color: textColor,
                       ),
                     ),

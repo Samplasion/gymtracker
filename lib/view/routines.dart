@@ -82,7 +82,7 @@ class _RoutinesViewState extends State<RoutinesView> with _RoutineList {
               // Hardcode the title while loading to avoid flickering
               SliverAppBar.large(
                 title: Text(isLoading ? "Routines" : "routines.title".t),
-                leading: SkeletonDrawerButton(),
+                leading: const SkeletonDrawerButton(),
               ),
               SliverToBoxAdapter(
                 child: ListTile(

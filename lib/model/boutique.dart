@@ -4,6 +4,7 @@ import 'dart:ui';
 import 'package:gymtracker/db/model/tables/exercise.dart';
 import 'package:gymtracker/db/utils.dart';
 import 'package:gymtracker/model/model.dart';
+import 'package:gymtracker/utils/extensions.dart';
 
 class BoutiqueSettings {
   final String compatibility;
@@ -55,7 +56,7 @@ class BoutiqueCategory {
       'id': id,
       'name': name,
       'icon': icon,
-      'color': color?.value,
+      'color': color?.hexValue,
       'is_hidden': isHidden,
     };
   }
@@ -89,8 +90,9 @@ class BoutiquePackage {
                   sets: (e['sets'] as List)
                       .map((e) => GTSet.fromJson(e))
                       .toList(),
-                  primaryMuscleGroup: e['is_superset'] == 1 ? null: 
-                      GTMuscleGroup.values.byName(e['primary_muscle_group']),
+                  primaryMuscleGroup: e['is_superset'] == 1
+                      ? null
+                      : GTMuscleGroup.values.byName(e['primary_muscle_group']),
                   secondaryMuscleGroups: {
                     if (e['secondary_muscle_groups'] != null)
                       for (final e in jsonDecode(e['secondary_muscle_groups']))
@@ -107,8 +109,9 @@ class BoutiquePackage {
                   sortOrder: e['sort_order'],
                   supersedesId: null,
                   rpe: null,
-                  equipment: e['is_superset'] == 1 ? null :
-                  GTGymEquipment.values.byName(e['equipment']),
+                  equipment: e['is_superset'] == 1
+                      ? null
+                      : GTGymEquipment.values.byName(e['equipment']),
                 ))
             .toList());
         return Workout.fromJson({

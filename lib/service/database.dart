@@ -26,7 +26,8 @@ import 'package:rxdart/rxdart.dart';
 const _kMaxBackups = 10;
 const _kPeriodicBackupInterval = Duration(days: 1);
 
-class DatabaseService extends GetxService with ChangeNotifier, LoggerConfigurationMixin {
+class DatabaseService extends GetxService
+    with ChangeNotifier, LoggerConfigurationMixin {
   @override
   int get loggerMethodCount => 0;
 
@@ -54,8 +55,7 @@ class DatabaseService extends GetxService with ChangeNotifier, LoggerConfigurati
       BehaviorSubject<DateSequence<Map<String, NutritionCategory>>>.seeded(
           DateSequence.empty());
   final completions$ = BehaviorSubject<List<AchievementCompletion>>.seeded([]);
-  final bodyMeasurements$ =
-      BehaviorSubject<List<BodyMeasurement>>.seeded([]);
+  final bodyMeasurements$ = BehaviorSubject<List<BodyMeasurement>>.seeded([]);
 
   final backups = _DatabaseBackups();
   BehaviorSubject<List<DatabaseBackup>> get _backups$ => BehaviorSubject();
@@ -495,8 +495,7 @@ class DatabaseService extends GetxService with ChangeNotifier, LoggerConfigurati
     return _db.setBodyMeasurements(measurements);
   }
 
-  Future<void> addBodyMeasurements(
-      List<BodyMeasurement> measurements) async {
+  Future<void> addBodyMeasurements(List<BodyMeasurement> measurements) async {
     if (measurements.isEmpty) return;
 
     final allMeasurements = bodyMeasurements$.value + measurements;
@@ -532,8 +531,7 @@ class DatabaseService extends GetxService with ChangeNotifier, LoggerConfigurati
         foods: foods$.value,
         nutritionGoals: nutritionGoals$.value,
         customBarcodeFoods: customBarcodeFoods$.value,
-        favoriteFoods:
-            favoriteFoods$.value.map((f) => f.id).whereNotNull().toList(),
+        favoriteFoods: favoriteFoods$.value.map((f) => f.id).nonNulls.toList(),
         foodCategories: Map.fromEntries(nutritionCategories$.value.map((map) {
           return MapEntry(map.date, map.value.values.toList());
         })),

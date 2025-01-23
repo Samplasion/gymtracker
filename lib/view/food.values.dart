@@ -1252,8 +1252,10 @@ class FoodBarcodeReaderView extends ControlledWidget<FoodController> {
       ]),
       body: ReaderWidget(
         showToggleCamera: false,
-        actionButtonsBackgroundColor:
-            Theme.of(context).colorScheme.surfaceContainerHigh.withOpacity(0.5),
+        actionButtonsBackgroundColor: Theme.of(context)
+            .colorScheme
+            .surfaceContainerHigh
+            .withAlpha(0.5 * 255 ~/ 100),
         codeFormat: Format.linearCodes,
         scannerOverlay: DynamicScannerOverlay(
           borderColor: context.theme.colorScheme.primary,

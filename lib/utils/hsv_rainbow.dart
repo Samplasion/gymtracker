@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/utils/utils.dart';
 
 class HSVRainbow {
@@ -51,14 +52,6 @@ class HSVRainbow {
     final lower = v.floor();
     final upper = v.ceil();
     return HSVColor.lerp(_spectrum[lower], _spectrum[upper], v - lower)!;
-  }
-
-  static String _colorToHex(Color c) {
-    return "#${(c.value & 0xFFFFFFFF).toRadixString(16).padLeft(8, '0').toUpperCase()}";
-  }
-
-  static HSVColor _hexToColor(String h) {
-    return HSVColor.fromColor(Color(int.parse(h, radix: 16)));
   }
 
   // @override

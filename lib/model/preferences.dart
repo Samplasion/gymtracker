@@ -51,7 +51,7 @@ class Prefs implements Insertable<Preference> {
 
   Map<String, dynamic> toJson() => {
         "usesDynamicColor": usesDynamicColor,
-        "color": color.value,
+        "color": color.hexValue,
         "locale": [
           locale.languageCode,
           if (locale.scriptCode != null) locale.scriptCode!

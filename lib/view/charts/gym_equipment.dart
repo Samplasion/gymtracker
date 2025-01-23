@@ -35,7 +35,7 @@ class _GymEquipmentRadialChartState
                 RadarEntry(value: entries[i].value),
             ],
             borderColor: context.colorScheme.primary,
-            fillColor: context.colorScheme.primary.withOpacity(0.3),
+            fillColor: context.colorScheme.primary.withAlpha(0.3 * 255 ~/ 100),
             entryRadius: 0,
           ),
         ],

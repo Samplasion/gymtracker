@@ -436,7 +436,7 @@ class _LineChartTimeSeriesState<T> extends State<LineChartTimeSeries<T>> {
                             flLineStyle:
                                 FlLine(color: predictionColor, dashArray: [5]),
                           ),
-                          color: predictionColor.withOpacity(0.3),
+                          color: predictionColor.withAlpha(0.3 * 255 ~/ 100),
                         ),
                       ),
                     LineChartBarData(
@@ -468,7 +468,7 @@ class _LineChartTimeSeriesState<T> extends State<LineChartTimeSeries<T>> {
                                       .last.date.minutesSinceEpoch),
                           flLineStyle: FlLine(color: colorScheme.primary),
                         ),
-                        color: colorScheme.primary.withOpacity(0.3),
+                        color: colorScheme.primary.withAlpha(0.3 * 255 ~/ 100),
                       ),
                     ),
                   ],

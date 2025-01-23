@@ -94,8 +94,12 @@ class _MeCalendarPageState
                       kSpeedDialButtonHeight,
                   buttons: [
                     SpeedDialButton(
-                      icon: Icon(GTIcons.streak_weeks,
-                          color: streaks.weekStreak == 0 ? context.theme.colorScheme.outline : context.harmonizeColor(Colors.orange),),
+                      icon: Icon(
+                        GTIcons.streak_weeks,
+                        color: streaks.weekStreak == 0
+                            ? context.theme.colorScheme.outline
+                            : context.harmonizeColor(Colors.orange),
+                      ),
                       text: Text("time.weeks".plural(streaks.weekStreak)),
                       subtitle: Text("me.calendar.streak".t),
                       dense: true,
@@ -154,9 +158,11 @@ class _MeCalendarPageState
 
     if (values.day.startOfDay.isBefore(values.minDate.startOfDay) ||
         values.day.startOfDay.isAfter(values.maxDate.startOfDay)) {
-      bgColor = Theme.of(context).colorScheme.surface.withOpacity(.4);
+      bgColor =
+          Theme.of(context).colorScheme.surface.withAlpha(.4 * 255 ~/ 100);
       txtStyle = (Theme.of(context).textTheme.bodyLarge)!.copyWith(
-        color: Theme.of(context).colorScheme.onSurface.withOpacity(.5),
+        color:
+            Theme.of(context).colorScheme.onSurface.withAlpha(.5 * 255 ~/ 100),
       );
     }
 

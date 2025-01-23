@@ -18,7 +18,7 @@ class AlertColor {
     final fgShade = dark ? 200 : 900;
 
     return AlertColor(
-      dark ? color[400]!.withOpacity(25 / 255) : color[100]!,
+      dark ? color[400]!.withAlpha(25) : color[100]!,
       color[fgShade]!,
     );
   }
@@ -144,8 +144,8 @@ class AlertBanner extends StatelessWidget {
                                       TextSpan(
                                         children: [txt.text],
                                         style: TextStyle(
-                                          color: color.foreground
-                                              .withOpacity(textOpacity),
+                                          color: color.foreground.withAlpha(
+                                              textOpacity * 255 ~/ 100),
                                         ),
                                       ),
                                     )
@@ -153,8 +153,8 @@ class AlertBanner extends StatelessWidget {
                                       text: TextSpan(
                                         children: [txt.text],
                                         style: TextStyle(
-                                          color: color.foreground
-                                              .withOpacity(textOpacity),
+                                          color: color.foreground.withAlpha(
+                                              textOpacity * 255 ~/ 100),
                                         ),
                                       ),
                                     )

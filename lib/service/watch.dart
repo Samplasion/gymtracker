@@ -51,6 +51,7 @@ class _UnsupportedWatchService extends WatchService
   }
 }
 
+// ignore: camel_case_types
 class _iOSWatchService extends WatchService implements GymWatchFlutterAPI {
   final _watch = GymWatchHostAPI();
 
@@ -66,11 +67,13 @@ class _iOSWatchService extends WatchService implements GymWatchFlutterAPI {
     Get.find<WorkoutController>().markThisSetAsDone();
   }
 
+  @override
   void setIsWorkoutRunning(bool isWorkoutRunning) {
     logger.i("Setting isWorkoutRunning on watch: $isWorkoutRunning");
     _watch.setIsWorkoutRunning(isWorkoutRunning);
   }
 
+  @override
   void setExerciseParameters(
     bool hasExercise,
     String exerciseName,

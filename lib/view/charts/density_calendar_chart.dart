@@ -95,17 +95,17 @@ class DensityCalendarChart extends StatelessWidget {
                     i++)
                   _rawSquare(
                     context,
-                    context.theme.colorScheme.tertiary.withAlpha(mapRange(
-                          i.toDouble(),
-                          0,
-                          math.min((runningMax - runningMin + 1).toDouble(),
-                                  math.min(8, crossCount - 2)) -
-                              1,
-                          minOpacity,
-                          maxOpacity,
-                        ).clamp(0, 1) *
-                        255 ~/
-                        100),
+                    context.theme.colorScheme.tertiary.withAlpha((mapRange(
+                              i.toDouble(),
+                              0,
+                              math.min((runningMax - runningMin + 1).toDouble(),
+                                      math.min(8, crossCount - 2)) -
+                                  1,
+                              minOpacity,
+                              maxOpacity,
+                            ).clamp(0, 1) *
+                            255)
+                        .round()),
                   ),
                 const SizedBox(width: 16),
                 Text(
@@ -131,7 +131,7 @@ class DensityCalendarChart extends StatelessWidget {
       message: tooltipBuilder(start, index, val),
       child: _rawSquare(
         context,
-        context.theme.colorScheme.tertiary.withAlpha(opacity * 255 ~/ 100),
+        context.theme.colorScheme.tertiary.withAlpha((opacity * 255).round()),
       ),
     );
   }
@@ -148,7 +148,7 @@ class DensityCalendarChart extends StatelessWidget {
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(6),
         border: Border.all(
-          color: context.theme.dividerColor.withAlpha(0.35 * 255 ~/ 100),
+          color: context.theme.dividerColor.withAlpha((0.35 * 255).round()),
           width: 0.8,
         ),
         color: color,

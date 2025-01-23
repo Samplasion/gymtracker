@@ -70,7 +70,7 @@ class _WorkoutExerciseEditorState extends State<WorkoutExerciseEditor> {
                   ? Theme.of(context)
                       .colorScheme
                       .onSurface
-                      .withAlpha(0.75 * 255 ~/ 100)
+                      .withAlpha((0.75 * 255).round())
                   : null,
             );
         return Padding(
@@ -508,7 +508,7 @@ class _WorkoutExerciseSetEditorState extends State<WorkoutExerciseSetEditor> {
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     final defaultColor = widget.alt
-        ? scheme.surface.withAlpha(0 * 255 ~/ 100)
+        ? scheme.surface.withAlpha((0 * 255).round())
         : ElevationOverlay.applySurfaceTint(
             scheme.surface,
             scheme.surfaceTint,
@@ -536,7 +536,7 @@ class _WorkoutExerciseSetEditorState extends State<WorkoutExerciseSetEditor> {
         tween: ColorTween(
           begin: defaultColor,
           end: widget.set.done && !widget.isCreating
-              ? scheme.tertiaryContainer.withAlpha(0.5 * 255 ~/ 100)
+              ? scheme.tertiaryContainer.withAlpha((0.5 * 255).round())
               : defaultColor,
         ),
         builder: (context, value, _) {
@@ -700,7 +700,7 @@ class __WorkoutSetRPEDialogState extends State<_WorkoutSetRPEDialog> {
             label: currentRPE.toString(),
             activeColor: rpeColor(context, currentRPE),
             secondaryActiveColor: rpeColor(context, widget.currentRPE ?? 5)
-                .withAlpha(0.54 * 255 ~/ 100),
+                .withAlpha((0.54 * 255).round()),
           ),
         ],
       ),

@@ -35,7 +35,8 @@ class _MuscleCategoryGraphState
                 RadarEntry(value: entries[i].value),
             ],
             borderColor: context.colorScheme.primary,
-            fillColor: context.colorScheme.primary.withAlpha(0.3 * 255 ~/ 100),
+            fillColor:
+                context.colorScheme.primary.withAlpha((0.3 * 255).round()),
             entryRadius: 0,
           ),
         ],

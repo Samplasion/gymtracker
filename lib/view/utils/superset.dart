@@ -51,7 +51,7 @@ class _SupersetEditorState extends State<SupersetEditor> {
               ? Theme.of(context)
                   .colorScheme
                   .onSurface
-                  .withAlpha(0.75 * 255 ~/ 100)
+                  .withAlpha((0.75 * 255).round())
               : null,
         );
     return Card(

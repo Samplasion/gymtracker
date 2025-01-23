@@ -38,9 +38,9 @@ class WeightCard extends StatelessWidget {
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
                       colors: [
-                        context.cardColor().withAlpha(0.99 * 255 ~/ 100),
-                        context.cardColor().withAlpha(0.8 * 255 ~/ 100),
-                        context.cardColor().withAlpha(0.5 * 255 ~/ 100),
+                        context.cardColor().withAlpha((0.99 * 255).round()),
+                        context.cardColor().withAlpha((0.8 * 255).round()),
+                        context.cardColor().withAlpha((0.5 * 255).round()),
                       ],
                     ),
                   ),

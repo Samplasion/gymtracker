@@ -147,12 +147,12 @@ class _MusclesViewState extends State<MusclesView> {
                   gradient: LinearGradient(
                     colors: [
                       for (int i = 0; i < _gradientColors.length; i++)
-                        _gradientColors[i].withAlpha((i == 0
-                                ? 0
-                                : _getOpacity(
-                                    i / (_gradientColors.length - 1))) *
-                            255 ~/
-                            100),
+                        _gradientColors[i].withAlpha(((i == 0
+                                    ? 0
+                                    : _getOpacity(
+                                        i / (_gradientColors.length - 1))) *
+                                255)
+                            .round()),
                     ],
                     begin: Alignment.centerLeft,
                     end: Alignment.centerRight,

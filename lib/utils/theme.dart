@@ -56,8 +56,8 @@ ThemeData getGymTrackerThemeFor(
     inputDecorationTheme: InputDecorationTheme(
       isDense: true,
       filled: true,
-      fillColor:
-          equivalentScheme.surfaceContainerHighest.withAlpha(0.45 * 255 ~/ 100),
+      fillColor: equivalentScheme.surfaceContainerHighest
+          .withAlpha((0.45 * 255).round()),
       border: OutlineInputBorder(
         borderSide: BorderSide.none,
         borderRadius: BorderRadius.circular(kGymTrackerInputBorderRadius),

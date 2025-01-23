@@ -145,7 +145,7 @@ class AlertBanner extends StatelessWidget {
                                         children: [txt.text],
                                         style: TextStyle(
                                           color: color.foreground.withAlpha(
-                                              textOpacity * 255 ~/ 100),
+                                              (textOpacity * 255).round()),
                                         ),
                                       ),
                                     )
@@ -154,7 +154,7 @@ class AlertBanner extends StatelessWidget {
                                         children: [txt.text],
                                         style: TextStyle(
                                           color: color.foreground.withAlpha(
-                                              textOpacity * 255 ~/ 100),
+                                              (textOpacity * 255).round()),
                                         ),
                                       ),
                                     )

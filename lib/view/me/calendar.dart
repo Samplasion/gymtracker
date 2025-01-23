@@ -159,10 +159,12 @@ class _MeCalendarPageState
     if (values.day.startOfDay.isBefore(values.minDate.startOfDay) ||
         values.day.startOfDay.isAfter(values.maxDate.startOfDay)) {
       bgColor =
-          Theme.of(context).colorScheme.surface.withAlpha(.4 * 255 ~/ 100);
+          Theme.of(context).colorScheme.surface.withAlpha((.4 * 255).round());
       txtStyle = (Theme.of(context).textTheme.bodyLarge)!.copyWith(
-        color:
-            Theme.of(context).colorScheme.onSurface.withAlpha(.5 * 255 ~/ 100),
+        color: Theme.of(context)
+            .colorScheme
+            .onSurface
+            .withAlpha((.5 * 255).round()),
       );
     }
 

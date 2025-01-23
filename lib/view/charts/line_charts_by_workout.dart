@@ -228,8 +228,8 @@ class _LineChartWithCategoriesState<T>
                       isStrokeCapRound: true,
                       belowBarData: BarAreaData(
                         show: true,
-                        color:
-                            colorScheme.quaternary.withAlpha(0.3 * 255 ~/ 100),
+                        color: colorScheme.quaternary
+                            .withAlpha((0.3 * 255).round()),
                       ),
                     ),
                   LineChartBarData(
@@ -248,7 +248,7 @@ class _LineChartWithCategoriesState<T>
                     isStrokeCapRound: true,
                     belowBarData: BarAreaData(
                       show: true,
-                      color: colorScheme.primary.withAlpha(0.3 * 255 ~/ 100),
+                      color: colorScheme.primary.withAlpha((0.3 * 255).round()),
                     ),
                   ),
                 ],

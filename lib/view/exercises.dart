@@ -493,7 +493,7 @@ class ExerciseDataView extends StatelessWidget {
     final exercise = this.exercise as Exercise;
     return ColoredBox(
       color: highlight
-          ? Theme.of(context).colorScheme.tertiary.withAlpha(0.15 * 255 ~/ 100)
+          ? Theme.of(context).colorScheme.tertiary.withAlpha((0.15 * 255).round())
           : Colors.transparent,
       child: Padding(
         padding: EdgeInsets.only(top: highlight ? 8 : 0),

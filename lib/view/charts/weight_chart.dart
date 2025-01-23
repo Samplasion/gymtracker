@@ -101,8 +101,8 @@ class WeightChart extends StatelessWidget {
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                   colors: [
-                    colorScheme.primary.withAlpha(0.8 * 255 ~/ 100),
-                    colorScheme.primary.withAlpha(0 * 255 ~/ 100),
+                    colorScheme.primary.withAlpha((0.8 * 255).round()),
+                    colorScheme.primary.withAlpha((0 * 255).round()),
                   ],
                 ),
               ),
@@ -143,8 +143,8 @@ class WeightChart extends StatelessWidget {
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
                     colors: [
-                      predictionColor.withAlpha(0.8 * 255 ~/ 100),
-                      predictionColor.withAlpha(0 * 255 ~/ 100),
+                      predictionColor.withAlpha((0.8 * 255).round()),
+                      predictionColor.withAlpha((0 * 255).round()),
                     ],
                   ),
                 ),

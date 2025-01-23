@@ -533,10 +533,11 @@ mixin _RoutineList<T extends StatefulWidget> on State<T> {
       child: Material(
         type: MaterialType.transparency,
         child: RoutineListTile(
-          routine: workout,trailing: DragHandle(index: index),
-onTap: () {
-        onTapWorkout(workout);
-      },
+          routine: workout,
+          trailing: DragHandle(index: index),
+          onTap: () {
+            onTapWorkout(workout);
+          },
         ),
       ),
     );
@@ -636,8 +637,7 @@ class TerseRoutineListTile extends StatelessWidget {
       leading: showIcon
           ? CircleAvatar(
               backgroundColor: Theme.of(context).colorScheme.primaryContainer,
-              foregroundColor:
-                  Theme.of(context).colorScheme.onPrimaryContainer,
+              foregroundColor: Theme.of(context).colorScheme.onPrimaryContainer,
               child: Text(routine!.name.characters.first.toUpperCase()),
             )
           : null,

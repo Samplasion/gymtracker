@@ -63,8 +63,8 @@ class ExerciseSetView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
-    var colorScheme = Theme.of(context).colorScheme;
-    return Container(
+    final colorScheme = Theme.of(context).colorScheme;
+    final container = Container(
       color: alt
           ? scheme.surface.withOpacity(0)
           : ElevationOverlay.applySurfaceTint(
@@ -97,12 +97,12 @@ class ExerciseSetView extends StatelessWidget {
               Icon(GTIcons.checkbox_off, color: colorScheme.onSurfaceVariant),
             const SizedBox(width: 8),
           ],
-          if (draggable) ...[
-            DragHandle(index: index!),
-            const SizedBox(width: 8),
-          ],
         ],
       ),
     );
+
+    if (draggable) return DraggableChild(index: index!, child: container);
+
+    return container;
   }
 }

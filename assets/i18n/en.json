@@ -2434,5 +2434,31 @@
     "rightCalf": {
       "label": "Right calf"
     }
+  },
+  "onboarding": {
+    "buttons": {
+      "next": "Next",
+      "done": "Let's start!"
+    },
+    "welcome": {
+      "title": "Welcome to Gym Bro",
+      "text": "Your workout buddy.\nWe need to check a few permissions before starting."
+    },
+    "notifications": {
+      "title": "Notifications",
+      "text": "Allow Gym Bro to send you rest time notifications.",
+      "notifications": "Notifications",
+      "exactAlarm": "Immediate notifications (for rest time)"
+    },
+    "camera": {
+      "title": "Camera and gallery",
+      "text": "Allow Gym Bro to access your camera in order to scan barcodes in the food tracker.",
+      "camera": "Camera",
+      "gallery": "Gallery"
+    },
+    "done": {
+      "title": "Get started",
+      "text": "We hope you'll enjoy Gym Bro."
+    }
   }
 }

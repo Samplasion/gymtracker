@@ -90,7 +90,7 @@ class VersionedJsonImportV1 extends VersionedJsonImportBase {
       ]),
       historyWorkouts: history,
       historyWorkoutExercises: actualHistory,
-      preferences: Prefs.fromJson(prefs),
+      preferences: Prefs.fromJson(prefs, true),
       weightMeasurements: weightMeasurements,
       folders: [],
       foods: [],

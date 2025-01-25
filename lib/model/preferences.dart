@@ -19,6 +19,7 @@ class Prefs implements Insertable<Preference> {
   final bool tintExercises;
   final NutritionLanguage nutritionLanguage;
   final NutritionCountry nutritionCountry;
+  final bool onboardingComplete;
 
   const Prefs({
     required this.usesDynamicColor,
@@ -31,10 +32,11 @@ class Prefs implements Insertable<Preference> {
     required this.tintExercises,
     required this.nutritionLanguage,
     required this.nutritionCountry,
+    required this.onboardingComplete,
   });
 
   factory Prefs.fromDatabase(Preference row) =>
-      Prefs.fromJson(jsonDecode(row.data));
+      Prefs.fromJson(jsonDecode(row.data), row.onboardingComplete);
 
   static const defaultValue = Prefs(
     usesDynamicColor: true,
@@ -47,6 +49,7 @@ class Prefs implements Insertable<Preference> {
     tintExercises: true,
     nutritionLanguage: NutritionLanguage.WORLD,
     nutritionCountry: NutritionCountry.WORLD,
+    onboardingComplete: false,
   );
 
   Map<String, dynamic> toJson() => {
@@ -65,7 +68,7 @@ class Prefs implements Insertable<Preference> {
         "nutritionCountry": nutritionCountry.stringValue,
       };
 
-  factory Prefs.fromJson(Map<String, dynamic> json) {
+  factory Prefs.fromJson(Map<String, dynamic> json, bool onboardingComplete) {
     const defaults = Prefs.defaultValue;
     final lang = (json['locale'] as List?)?.map((v) => "$v").toList();
     return Prefs(
@@ -93,6 +96,7 @@ class Prefs implements Insertable<Preference> {
       nutritionCountry: NutritionCountry.fromString(
         json['nutritionCountry'] ?? defaults.nutritionCountry.stringValue,
       )!,
+      onboardingComplete: onboardingComplete,
     );
   }
 
@@ -116,6 +120,7 @@ class Prefs implements Insertable<Preference> {
   Map<String, Expression<Object>> toColumns(bool nullToAbsent) {
     return PreferencesCompanion(
       data: Value(jsonEncode(toJson())),
+      onboardingComplete: Value(onboardingComplete),
     ).toColumns(nullToAbsent);
   }
 
@@ -143,6 +148,23 @@ class Prefs implements Insertable<Preference> {
       tintExercises: tintExercises ?? this.tintExercises,
       nutritionLanguage: nutritionLanguage ?? this.nutritionLanguage,
       nutritionCountry: nutritionCountry ?? this.nutritionCountry,
+      onboardingComplete: onboardingComplete,
+    );
+  }
+
+  Prefs copyWithOnboardingComplete() {
+    return Prefs(
+      usesDynamicColor: usesDynamicColor,
+      color: color,
+      locale: locale,
+      weightUnit: weightUnit,
+      distanceUnit: distanceUnit,
+      showSuggestedRoutines: showSuggestedRoutines,
+      themeMode: themeMode,
+      tintExercises: tintExercises,
+      nutritionLanguage: nutritionLanguage,
+      nutritionCountry: nutritionCountry,
+      onboardingComplete: true,
     );
   }
 }

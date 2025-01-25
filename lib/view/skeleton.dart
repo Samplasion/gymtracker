@@ -172,9 +172,9 @@ class _SkeletonViewState extends State<SkeletonView>
   void initState() {
     super.initState();
 
-    SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
-      Get.find<NotificationController>().androidRequestExactAlarmsPermission();
-    });
+    // SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
+    //   Get.find<NotificationController>().androidRequestExactAlarmsPermission();
+    // });
 
     WidgetsBinding.instance.addObserver(this);
   }
@@ -719,7 +719,7 @@ class __LoaderState extends State<GymTrackerAppLoader> {
     super.initState();
     Get.find<Coordinator>().awaitInitialized().then((_) {
       SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
-        Go.offWithoutAnimation(() => const SkeletonView());
+        Get.find<Coordinator>().bootProcedure();
       });
     });
   }

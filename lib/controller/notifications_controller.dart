@@ -24,6 +24,11 @@ class NotificationController extends GetxController implements Listenable {
   bool usesAndroidExactAlarmPermission = false;
   bool hasAndroidScheduleExactAlarmPermission = false;
 
+  bool get shouldShowAndroidExactAlarmPermissionRequest =>
+      hasPermission &&
+      usesAndroidExactAlarmPermission &&
+      !hasAndroidScheduleExactAlarmPermission;
+
   final showSettingsTileStream = BehaviorSubject<bool>.seeded(true);
   Widget get settingsTile {
     return StreamBuilder(
@@ -43,9 +48,7 @@ class NotificationController extends GetxController implements Listenable {
             },
           );
         }
-        if (hasPermission &&
-            usesAndroidExactAlarmPermission &&
-            !hasAndroidScheduleExactAlarmPermission) {
+        if (shouldShowAndroidExactAlarmPermissionRequest) {
           return ListTile(
             leading: const Icon(GTIcons.notification_dialog),
             title: Text("settings.options.notifications.label".t),
@@ -157,8 +160,7 @@ class NotificationController extends GetxController implements Listenable {
 
   void scheduleRestOverNotification(DateTime targetTime) {
     if (!hasPermission) return;
-    if (usesAndroidExactAlarmPermission &&
-        !hasAndroidScheduleExactAlarmPermission) return;
+    if (shouldShowAndroidExactAlarmPermissionRequest) return;
 
     final androidDetails = AndroidNotificationDetails(
       'org.js.samplasion.gymtracker.RestTimeoutChannel',

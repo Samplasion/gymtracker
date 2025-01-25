@@ -2428,5 +2428,31 @@
     "rightCalf": {
       "label": "Polpaccio destro"
     }
+  },
+  "onboarding": {
+    "buttons": {
+      "next": "Avanti",
+      "done": "Iniziamo!"
+    },
+    "welcome": {
+      "title": "Ti diamo il benvenuto a Gym Bro",
+      "text": "Il tuo compagno di allenamento.\nDobbiamo verificare alcune autorizzazioni prima di iniziare."
+    },
+    "notifications": {
+      "title": "Notifiche",
+      "text": "Consenti a Gym Bro di inviarti notifiche sui tempi di recupero.",
+      "notifications": "Notifiche",
+      "exactAlarm": "Notifiche immediate (per il tempo di recupero)"
+    },
+    "camera": {
+      "title": "Fotocamera e galleria",
+      "text": "Consenti a Gym Bro di accedere alla fotocamera al fine di scansionare i codici a barre nel diario alimentare.",
+      "gallery": "Galleria",
+      "camera": "Fotocamera"
+    },
+    "done": {
+      "title": "Ecco fatto",
+      "text": "Puoi iniziare i tuoi allenamenti con Gym Bro."
+    }
   }
 }

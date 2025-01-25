@@ -2834,8 +2834,18 @@ class $PreferencesTable extends Preferences
   late final GeneratedColumn<String> data = GeneratedColumn<String>(
       'data', aliasedName, false,
       type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _onboardingCompleteMeta =
+      const VerificationMeta('onboardingComplete');
   @override
-  List<GeneratedColumn> get $columns => [data];
+  late final GeneratedColumn<bool> onboardingComplete = GeneratedColumn<bool>(
+      'onboarding_complete', aliasedName, false,
+      type: DriftSqlType.bool,
+      requiredDuringInsert: false,
+      defaultConstraints: GeneratedColumn.constraintIsAlways(
+          'CHECK ("onboarding_complete" IN (0, 1))'),
+      defaultValue: const Constant(false));
+  @override
+  List<GeneratedColumn> get $columns => [data, onboardingComplete];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -2852,6 +2862,12 @@ class $PreferencesTable extends Preferences
     } else if (isInserting) {
       context.missing(_dataMeta);
     }
+    if (data.containsKey('onboarding_complete')) {
+      context.handle(
+          _onboardingCompleteMeta,
+          onboardingComplete.isAcceptableOrUnknown(
+              data['onboarding_complete']!, _onboardingCompleteMeta));
+    }
     return context;
   }
 
@@ -2863,6 +2879,8 @@ class $PreferencesTable extends Preferences
     return Preference(
       data: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}data'])!,
+      onboardingComplete: attachedDatabase.typeMapping.read(
+          DriftSqlType.bool, data['${effectivePrefix}onboarding_complete'])!,
     );
   }
 
@@ -2874,17 +2892,20 @@ class $PreferencesTable extends Preferences
 
 class Preference extends DataClass implements Insertable<Preference> {
   final String data;
-  const Preference({required this.data});
+  final bool onboardingComplete;
+  const Preference({required this.data, required this.onboardingComplete});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
     map['data'] = Variable<String>(data);
+    map['onboarding_complete'] = Variable<bool>(onboardingComplete);
     return map;
   }
 
   PreferencesCompanion toCompanion(bool nullToAbsent) {
     return PreferencesCompanion(
       data: Value(data),
+      onboardingComplete: Value(onboardingComplete),
     );
   }
 
@@ -2893,6 +2914,7 @@ class Preference extends DataClass implements Insertable<Preference> {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return Preference(
       data: serializer.fromJson<String>(json['data']),
+      onboardingComplete: serializer.fromJson<bool>(json['onboardingComplete']),
     );
   }
   @override
@@ -2900,58 +2922,75 @@ class Preference extends DataClass implements Insertable<Preference> {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
       'data': serializer.toJson<String>(data),
+      'onboardingComplete': serializer.toJson<bool>(onboardingComplete),
     };
   }
 
-  Preference copyWith({String? data}) => Preference(
+  Preference copyWith({String? data, bool? onboardingComplete}) => Preference(
         data: data ?? this.data,
+        onboardingComplete: onboardingComplete ?? this.onboardingComplete,
       );
   Preference copyWithCompanion(PreferencesCompanion data) {
     return Preference(
       data: data.data.present ? data.data.value : this.data,
+      onboardingComplete: data.onboardingComplete.present
+          ? data.onboardingComplete.value
+          : this.onboardingComplete,
     );
   }
 
   @override
   String toString() {
     return (StringBuffer('Preference(')
-          ..write('data: $data')
+          ..write('data: $data, ')
+          ..write('onboardingComplete: $onboardingComplete')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => data.hashCode;
+  int get hashCode => Object.hash(data, onboardingComplete);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      (other is Preference && other.data == this.data);
+      (other is Preference &&
+          other.data == this.data &&
+          other.onboardingComplete == this.onboardingComplete);
 }
 
 class PreferencesCompanion extends UpdateCompanion<Preference> {
   final Value<String> data;
+  final Value<bool> onboardingComplete;
   final Value<int> rowid;
   const PreferencesCompanion({
     this.data = const Value.absent(),
+    this.onboardingComplete = const Value.absent(),
     this.rowid = const Value.absent(),
   });
   PreferencesCompanion.insert({
     required String data,
+    this.onboardingComplete = const Value.absent(),
     this.rowid = const Value.absent(),
   }) : data = Value(data);
   static Insertable<Preference> custom({
     Expression<String>? data,
+    Expression<bool>? onboardingComplete,
     Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
       if (data != null) 'data': data,
+      if (onboardingComplete != null) 'onboarding_complete': onboardingComplete,
       if (rowid != null) 'rowid': rowid,
     });
   }
 
-  PreferencesCompanion copyWith({Value<String>? data, Value<int>? rowid}) {
+  PreferencesCompanion copyWith(
+      {Value<String>? data,
+      Value<bool>? onboardingComplete,
+      Value<int>? rowid}) {
     return PreferencesCompanion(
       data: data ?? this.data,
+      onboardingComplete: onboardingComplete ?? this.onboardingComplete,
       rowid: rowid ?? this.rowid,
     );
   }
@@ -2961,6 +3000,9 @@ class PreferencesCompanion extends UpdateCompanion<Preference> {
     final map = <String, Expression>{};
     if (data.present) {
       map['data'] = Variable<String>(data.value);
+    }
+    if (onboardingComplete.present) {
+      map['onboarding_complete'] = Variable<bool>(onboardingComplete.value);
     }
     if (rowid.present) {
       map['rowid'] = Variable<int>(rowid.value);
@@ -2972,6 +3014,7 @@ class PreferencesCompanion extends UpdateCompanion<Preference> {
   String toString() {
     return (StringBuffer('PreferencesCompanion(')
           ..write('data: $data, ')
+          ..write('onboardingComplete: $onboardingComplete, ')
           ..write('rowid: $rowid')
           ..write(')'))
         .toString();
@@ -6525,11 +6568,13 @@ class $$RoutineExercisesTableOrderingComposer
 typedef $$PreferencesTableCreateCompanionBuilder = PreferencesCompanion
     Function({
   required String data,
+  Value<bool> onboardingComplete,
   Value<int> rowid,
 });
 typedef $$PreferencesTableUpdateCompanionBuilder = PreferencesCompanion
     Function({
   Value<String> data,
+  Value<bool> onboardingComplete,
   Value<int> rowid,
 });
 
@@ -6551,18 +6596,22 @@ class $$PreferencesTableTableManager extends RootTableManager<
               $$PreferencesTableOrderingComposer(ComposerState(db, table)),
           updateCompanionCallback: ({
             Value<String> data = const Value.absent(),
+            Value<bool> onboardingComplete = const Value.absent(),
             Value<int> rowid = const Value.absent(),
           }) =>
               PreferencesCompanion(
             data: data,
+            onboardingComplete: onboardingComplete,
             rowid: rowid,
           ),
           createCompanionCallback: ({
             required String data,
+            Value<bool> onboardingComplete = const Value.absent(),
             Value<int> rowid = const Value.absent(),
           }) =>
               PreferencesCompanion.insert(
             data: data,
+            onboardingComplete: onboardingComplete,
             rowid: rowid,
           ),
         ));
@@ -6575,6 +6624,11 @@ class $$PreferencesTableFilterComposer
       column: $state.table.data,
       builder: (column, joinBuilders) =>
           ColumnFilters(column, joinBuilders: joinBuilders));
+
+  ColumnFilters<bool> get onboardingComplete => $state.composableBuilder(
+      column: $state.table.onboardingComplete,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
 }
 
 class $$PreferencesTableOrderingComposer
@@ -6582,6 +6636,11 @@ class $$PreferencesTableOrderingComposer
   $$PreferencesTableOrderingComposer(super.$state);
   ColumnOrderings<String> get data => $state.composableBuilder(
       column: $state.table.data,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  ColumnOrderings<bool> get onboardingComplete => $state.composableBuilder(
+      column: $state.table.onboardingComplete,
       builder: (column, joinBuilders) =>
           ColumnOrderings(column, joinBuilders: joinBuilders));
 }

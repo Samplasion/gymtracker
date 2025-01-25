@@ -33,7 +33,7 @@ class VersionedJsonImportV7 extends VersionedJsonImportBase {
         for (final exercise in json['workoutExercises'])
           WorkoutExercisable.fromJson(exercise)
       ],
-      preferences: Prefs.fromJson(json['preferences']),
+      preferences: Prefs.fromJson(json['preferences'], true),
       weightMeasurements: [
         for (final weight in json['weightMeasurements'])
           WeightMeasurement.fromJson(weight)

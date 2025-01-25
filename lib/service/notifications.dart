@@ -12,9 +12,9 @@ class NotificationsService extends GetxService {
 
     const androidInit = AndroidInitializationSettings('ic_launcher_foreground');
     const darwinInit = DarwinInitializationSettings(
-      requestAlertPermission: true,
-      requestBadgePermission: true,
-      requestSoundPermission: true,
+      requestAlertPermission: false,
+      requestBadgePermission: false,
+      requestSoundPermission: false,
     );
     plugin.initialize(
       const InitializationSettings(

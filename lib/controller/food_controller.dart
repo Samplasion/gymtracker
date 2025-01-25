@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:collection/collection.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart' as material;
+import 'package:flutter/widgets.dart';
 import 'package:fuzzywuzzy/fuzzywuzzy.dart';
 import 'package:get/get.dart';
 import 'package:gymtracker/controller/coordinator.dart';
@@ -374,7 +375,7 @@ class FoodController extends GetxController with ServiceableController {
                   title:
                       material.Text("food.addCustomFood.permission.gallery".t),
                 ),
-              material.ButtonBar(
+              OverflowBar(
                 children: [
                   material.TextButton(
                     onPressed: Get.back,
@@ -616,10 +617,10 @@ class FoodController extends GetxController with ServiceableController {
       return (camera: true, gallery: true);
       // return (camera: false, gallery: false);
     } else {
-      Map<Permission, PermissionStatus> statuses = await [
-        Permission.camera,
-        Permission.photos,
-      ].request();
+      Map<Permission, PermissionStatus> statuses = {
+        Permission.camera: await Permission.camera.status,
+        Permission.photos: await Permission.photos.status,
+      };
 
       final camera = statuses[Permission.camera]!.isGranted;
       final gallery = statuses[Permission.photos]!.isGranted;

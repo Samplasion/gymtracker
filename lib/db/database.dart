@@ -49,7 +49,7 @@ part 'database.g.dart';
 // Used in the generated code
 const _uuid = Uuid();
 
-const DATABASE_VERSION = 11;
+const DATABASE_VERSION = 12;
 
 abstract class GTDatabase {
   Future<T> transaction<T>(Future<T> Function() action, {bool requireNew});
@@ -267,6 +267,12 @@ class GTDatabaseImpl extends _$GTDatabaseImpl implements GTDatabase {
               },
               from10To11: (m, schema) async {
                 await m.createTable(schema.bodyMeasurements);
+              },
+              from11To12: (m, schema) async {
+                await m.addColumn(
+                  schema.preferences,
+                  schema.preferences.onboardingComplete,
+                );
               },
             ),
           );

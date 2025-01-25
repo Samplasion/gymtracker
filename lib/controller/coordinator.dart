@@ -26,6 +26,8 @@ import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/service/logger.dart';
 import 'package:gymtracker/service/notifications.dart';
 import 'package:gymtracker/utils/go.dart';
+import 'package:gymtracker/view/onboarding.dart';
+import 'package:gymtracker/view/skeleton.dart';
 import 'package:protocol_handler/protocol_handler.dart';
 import 'package:rxdart/rxdart.dart';
 
@@ -233,5 +235,18 @@ class Coordinator extends GetxController
 
   Future<void> overrideDatabase(DatabaseSnapshot snapshot) {
     return get<DatabaseService>().overrideDatabase(snapshot);
+  }
+
+  void bootProcedure() {
+    if (!service.prefs$.value.onboardingComplete) {
+      Go.offWithoutAnimation(() => const OnboardingScreen());
+    } else {
+      Go.offWithoutAnimation(() => const SkeletonView());
+    }
+  }
+
+  void onFinishedOnboarding() {
+    service.writeSettings(service.prefs$.value.copyWithOnboardingComplete());
+    Go.offWithoutAnimation(() => const SkeletonView());
   }
 }

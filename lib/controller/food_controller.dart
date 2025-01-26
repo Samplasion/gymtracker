@@ -651,6 +651,7 @@ class FoodController extends GetxController with ServiceableController {
   }
 
   Future<void> requestPermission(Permission perm) async {
+    logger.d("Requesting permission: $perm");
     final status = await perm.request();
     if (status.isGranted) {
       logger.i("Permission granted: $perm");
@@ -659,6 +660,15 @@ class FoodController extends GetxController with ServiceableController {
       openAppSettings();
     } else {
       logger.w("Permission denied: $perm");
+      Go.snack(
+        "food.permission.denied".t,
+        action: material.SnackBarAction(
+          label: "food.permission.openSettings".t,
+          onPressed: () {
+            openAppSettings();
+          },
+        ),
+      );
     }
 
     permission$.add((

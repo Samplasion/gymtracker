@@ -2091,6 +2091,10 @@
     },
     "categoryFoods": {
       "empty": "Non hai ancora aggiunto cibi a questa categoria."
+    },
+    "permission": {
+      "denied": "Non siamo stati in grado di ottenere quest'autorizzazione. Vuoi aprire le impostazioni delle autorizzazioni?",
+      "openSettings": "Apri le impostazioni dell'app"
     }
   },
   "equipment": {

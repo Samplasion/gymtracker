@@ -2097,6 +2097,10 @@
     },
     "categoryFoods": {
       "empty": "You haven't added foods to this category yet."
+    },
+    "permission": {
+      "denied": "We weren't able to get this permission. Would you like to open the permission settings?",
+      "openSettings": "Open app settings"
     }
   },
   "equipment": {

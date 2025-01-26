@@ -25,7 +25,6 @@ import 'package:gymtracker/model/superset.dart';
 import 'package:gymtracker/model/workout.dart';
 import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/service/logger.dart';
-import 'package:gymtracker/service/watch.dart';
 import 'package:gymtracker/struct/editor_callback.dart';
 import 'package:gymtracker/struct/optional.dart';
 import 'package:gymtracker/struct/stopwatch_extended.dart';
@@ -69,21 +68,6 @@ class WorkoutController extends GetxController with ServiceableController {
       error: Error(),
       stackTrace: StackTrace.current,
     );
-
-    exercises.listen((_) {
-      logger.i("Syncing exercises to watch");
-      _initFirstSync();
-    });
-  }
-
-  _initFirstSync() {
-    SchedulerBinding.instance.addPostFrameCallback((_) {
-      if (Get.context == null) {
-        _initFirstSync();
-        return;
-      }
-      refreshWatchData();
-    });
   }
 
   factory WorkoutController.fromSavedData(Map<String, dynamic> data) {
@@ -665,7 +649,6 @@ and:
     SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
       Get.find<RoutinesController>().hasOngoingWorkout(true);
       save();
-      refreshWatchData();
     });
   }
 
@@ -1276,46 +1259,5 @@ and:
 
     exercises.refresh();
     save();
-
-    refreshWatchData();
-  }
-
-  refreshWatchData() {
-    String name;
-    int color;
-    GTSet? set;
-
-    final index = currentExerciseIndex;
-    if (index != null) {
-      final (exerciseIndex: exerciseIndex, supersetIndex: supersetIndex) =
-          index;
-      final exercise = supersetIndex == null
-          ? (exercises[exerciseIndex] as Exercise)
-          : (exercises[supersetIndex] as Superset).exercises[exerciseIndex];
-      name = exercise.displayName;
-      color = (exercise.standard && exercise.category != null
-              ? exerciseStandardLibrary[exercise.category]?.color ??
-                  Get.context?.theme.colorScheme.primary ??
-                  Colors.red
-              : Get.context?.theme.colorScheme.primary ?? Colors.red)
-          .hexValue;
-      set = exercise.sets.firstWhereOrNull((set) => !set.done);
-
-      SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
-        WatchService.instance().setExerciseParameters(
-          set != null,
-          name,
-          color,
-          set?.getHumanReadableDescription(
-                  weightUnit: weightUnit.value,
-                  distanceUnit: distanceUnit.value) ??
-              "",
-        );
-      });
-    } else {
-      SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
-        WatchService.instance().setExerciseParameters(false, "", 0, "");
-      });
-    }
   }
 }

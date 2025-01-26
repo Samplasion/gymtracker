@@ -43,8 +43,6 @@ jobs:
           dart run build_runner clean && dart run build_runner build --delete-conflicting-outputs
       - name: Install Rust
         uses: actions-rust-lang/setup-rust-toolchain@v1
-      - name: Generate Pigeon bindings
-        run: dart run pigeon --input watch_channels.dart
       # - name: Install iOS platform
       #   run: sudo xcodebuild -downloadPlatform iOS
       - name: Build
@@ -125,8 +123,6 @@ jobs:
           echo $DOTENV > .env
           set -a; source .env; set +a
           dart run build_runner clean && dart run build_runner build --delete-conflicting-outputs
-      - name: Generate Pigeon bindings
-        run: dart run pigeon --input watch_channels.dart
       - name: Build
         run: tools/build_android.sh -${{ matrix.flag }}
       - name: Release

@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:gymtracker/service/logger.dart';
 import 'package:home_widget/home_widget.dart';
 
 const String appGroupId = 'group.gymtrackerwidget';
@@ -34,10 +35,14 @@ class _WidgetsService extends WidgetsService {
   }
 
   _update() {
-    HomeWidget.updateWidget(
-      iOSName: iOSWidgetName,
-      qualifiedAndroidName: androidWidgetName,
-    );
+    try {
+      HomeWidget.updateWidget(
+        iOSName: iOSWidgetName,
+        qualifiedAndroidName: androidWidgetName,
+      );
+    } catch (e) {
+      logger.e(e);
+    }
   }
 }
 

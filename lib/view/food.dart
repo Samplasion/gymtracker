@@ -401,9 +401,7 @@ class _FoodViewState extends ControlledState<FoodView, FoodController> {
 }
 
 class _HomeUnassignedFoodsList extends ControlledWidget<FoodController> {
-  const _HomeUnassignedFoodsList({
-    super.key,
-  });
+  const _HomeUnassignedFoodsList();
 
   @override
   Widget build(BuildContext context) {

@@ -9,7 +9,6 @@ import 'package:gymtracker/controller/coordinator.dart';
 import 'package:gymtracker/controller/exercises_controller.dart';
 import 'package:gymtracker/controller/history_controller.dart';
 import 'package:gymtracker/controller/logger_controller.dart';
-import 'package:gymtracker/controller/notifications_controller.dart';
 import 'package:gymtracker/controller/routines_controller.dart';
 import 'package:gymtracker/controller/workout_controller.dart';
 import 'package:gymtracker/data/exercises.dart';

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/utils/utils.dart';
 
 class HSVRainbow {

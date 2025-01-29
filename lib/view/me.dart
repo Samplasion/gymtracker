@@ -186,7 +186,7 @@ class MeView extends GetView<MeController> {
 }
 
 class _MeSyncCard extends StatefulWidget {
-  const _MeSyncCard({super.key});
+  const _MeSyncCard();
 
   @override
   State<_MeSyncCard> createState() => __MeSyncCardState();
@@ -204,11 +204,11 @@ class __MeSyncCardState extends ControlledState<_MeSyncCard, OnlineController> {
 
   void _reload() =>
       show = controller.getShouldShowManualSync().whenComplete(() {
-          if (mounted) {
-            setState(() {
-              loading = false;
-            });
-          }
+        if (mounted) {
+          setState(() {
+            loading = false;
+          });
+        }
       });
 
   @override
@@ -218,52 +218,53 @@ class __MeSyncCardState extends ControlledState<_MeSyncCard, OnlineController> {
     }
 
     return StreamBuilder<bool>(
-      stream: controller.isOnlineServiceEnabled,
-      builder: (context, snapshot) {
-        if (snapshot.data != true) {
-          return const SizedBox.shrink();
-        }
-        
-        return FutureBuilder<bool>(
-          future: show,
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return const SizedBox.shrink();
-            }
-            if (!snapshot.hasData || snapshot.data == false) {
-              return const SizedBox.shrink();
-            }
-            return Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16).copyWith(top: 16),
-              child: SafeArea(
-                top: false,
-                bottom: false,
-                child: Card(
-                  clipBehavior: Clip.hardEdge,
-                  margin: EdgeInsets.zero,
-                  child: ListTile(
-                    title: Text("me.sync.label".t),
-                    subtitle: Text("me.sync.subtitle".t),
-                    trailing: const Icon(GTIcons.lt_chevron),
-                    onTap: loading
-                        ? null
-                        : () {
-                            setState(() {
-                              loading = true;
-                            });
-                            controller.manualSync().then((_) {
-                              Future.delayed(const Duration(seconds: 5), () async {
-                                _reload();
+        stream: controller.isOnlineServiceEnabled,
+        builder: (context, snapshot) {
+          if (snapshot.data != true) {
+            return const SizedBox.shrink();
+          }
+
+          return FutureBuilder<bool>(
+            future: show,
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const SizedBox.shrink();
+              }
+              if (!snapshot.hasData || snapshot.data == false) {
+                return const SizedBox.shrink();
+              }
+              return Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16)
+                    .copyWith(top: 16),
+                child: SafeArea(
+                  top: false,
+                  bottom: false,
+                  child: Card(
+                    clipBehavior: Clip.hardEdge,
+                    margin: EdgeInsets.zero,
+                    child: ListTile(
+                      title: Text("me.sync.label".t),
+                      subtitle: Text("me.sync.subtitle".t),
+                      trailing: const Icon(GTIcons.lt_chevron),
+                      onTap: loading
+                          ? null
+                          : () {
+                              setState(() {
+                                loading = true;
                               });
-                            });
-                          },
+                              controller.manualSync().then((_) {
+                                Future.delayed(const Duration(seconds: 5),
+                                    () async {
+                                  _reload();
+                                });
+                              });
+                            },
+                    ),
                   ),
                 ),
-              ),
-            );
-          },
-        );
-      }
-    );
+              );
+            },
+          );
+        });
   }
 }

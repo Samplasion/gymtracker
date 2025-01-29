@@ -404,6 +404,9 @@ class _WorkoutViewState extends State<WorkoutView> {
                   foregroundColor: WidgetStateProperty.all(
                     getOnThemedColor(context, GTColors.ai),
                   ),
+                  iconColor: WidgetStateProperty.all(
+                    getOnThemedColor(context, GTColors.ai),
+                  ),
                   backgroundColor: WidgetStateProperty.all(
                     getThemedColor(context, GTColors.ai),
                   ),

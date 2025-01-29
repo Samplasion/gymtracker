@@ -248,6 +248,7 @@ class SettingsController extends GetxController with ServiceableController {
       final measurementData = convertHevyMeasurementData(data);
 
       await service.addWeightMeasurements(measurementData.weightMeasurements);
+      await service.addBodyMeasurements(measurementData.bodyMeasurements);
     } else {
       final workoutData = convertHevyWorkoutData(data);
 

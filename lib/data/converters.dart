@@ -25,6 +25,7 @@ typedef ConvertedHevyWorkoutData = ({
 
 typedef ConvertedHevyMeasurementData = ({
   List<WeightMeasurement> weightMeasurements,
+  List<BodyMeasurement> bodyMeasurements,
 });
 
 ConvertedHevyWorkoutData convertHevyWorkoutData(List<List> rowsAsListOfValues) {
@@ -231,26 +232,28 @@ ConvertedHevyMeasurementData convertHevyMeasurementData(
 
   // "date","weight_kg","fat_percent","neck_cm","shoulder_cm","chest_cm","left_bicep_cm","right_bicep_cm","left_forearm_cm","right_forearm_cm","abdomen_cm","waist_cm","hips_cm","left_thigh_cm","right_thigh_cm","left_calf_cm","right_calf_cm"
   final weightMeasurements = <WeightMeasurement>[];
+  final bodyMeasurements = <BodyMeasurement>[];
 
   for (var row in rowsAsListOfValues) {
     final date = _parseHevyDateTime("${row[0]}");
     final weightKg = "${row[1]}".tryParseDouble();
-    // TODO: Implement the rest of the measurements
-    // final fatPercent = "${row[2]}".tryParseDouble();
-    // final neckCm = "${row[3]}".tryParseDouble();
-    // final shoulderCm = "${row[4]}".tryParseDouble();
-    // final chestCm = "${row[5]}".tryParseDouble();
-    // final leftBicepCm = "${row[6]}".tryParseDouble();
-    // final rightBicepCm = "${row[7]}".tryParseDouble();
-    // final leftForearmCm = "${row[8]}".tryParseDouble();
-    // final rightForearmCm = "${row[9]}".tryParseDouble();
-    // final abdomenCm = "${row[10]}".tryParseDouble();
-    // final waistCm = "${row[11]}".tryParseDouble();
-    // final hipsCm = "${row[12]}".tryParseDouble();
-    // final leftThighCm = "${row[13]}".tryParseDouble();
-    // final rightThighCm = "${row[14]}".tryParseDouble();
-    // final leftCalfCm = "${row[15]}".tryParseDouble();
-    // final rightCalfCm = "${row[16]}".tryParseDouble();
+    const types = [
+      BodyMeasurementPart.bodyFat,
+      BodyMeasurementPart.neck,
+      BodyMeasurementPart.shoulder,
+      BodyMeasurementPart.chest,
+      BodyMeasurementPart.leftBicep,
+      BodyMeasurementPart.rightBicep,
+      BodyMeasurementPart.leftForearm,
+      BodyMeasurementPart.rightForearm,
+      BodyMeasurementPart.abdomen,
+      BodyMeasurementPart.waist,
+      BodyMeasurementPart.hips,
+      BodyMeasurementPart.leftThigh,
+      BodyMeasurementPart.rightThigh,
+      BodyMeasurementPart.leftCalf,
+      BodyMeasurementPart.rightCalf,
+    ];
 
     if (weightKg != null) {
       weightMeasurements.add(
@@ -262,9 +265,27 @@ ConvertedHevyMeasurementData convertHevyMeasurementData(
         ),
       );
     }
+
+    for (int i = 0; i < types.length; i++) {
+      final value = "${row[i + 2]}".tryParseDouble();
+
+      if (value == null) continue;
+
+      bodyMeasurements.add(
+        BodyMeasurement(
+          id: "hevy_bm_${date.millisecondsSinceEpoch}_$now",
+          time: date,
+          value: value,
+          type: types[i],
+        ),
+      );
+    }
   }
 
-  return (weightMeasurements: weightMeasurements,);
+  return (
+    weightMeasurements: weightMeasurements,
+    bodyMeasurements: bodyMeasurements,
+  );
 }
 
 // Parses "16 Mar 2024, 09:50"

@@ -785,7 +785,12 @@ class _ExerciseInfoViewState extends State<ExerciseInfoView>
             "exercise.info.heaviestWeight.label".t,
             bestScore.userFacingWeight,
             onTap: () {
-              Go.to(() => ExercisesView(workout: best.$3));
+              Go.to(() => ExercisesView(
+                    workout: best.$3,
+                    highlightExercise: (ex) {
+                      return ex.id == best.$1.id;
+                    },
+                  ));
             },
           );
         }),
@@ -820,7 +825,12 @@ class _ExerciseInfoViewState extends State<ExerciseInfoView>
             "exercise.info.best1rm.label".t,
             bestScore.userFacingWeight,
             onTap: () {
-              Go.to(() => ExercisesView(workout: best.$3));
+              Go.to(() => ExercisesView(
+                    workout: best.$3,
+                    highlightExercise: (ex) {
+                      return ex.id == best.$1.id;
+                    },
+                  ));
             },
           );
         }),
@@ -853,7 +863,12 @@ class _ExerciseInfoViewState extends State<ExerciseInfoView>
             "exercise.info.bestSetVolume.label".t,
             "${bestWeight.userFacingWeight} × $bestReps",
             onTap: () {
-              Go.to(() => ExercisesView(workout: best.$3));
+              Go.to(() => ExercisesView(
+                    workout: best.$3,
+                    highlightExercise: (ex) {
+                      return ex.id == best.$1.id;
+                    },
+                  ));
             },
           );
         }),
@@ -887,7 +902,12 @@ class _ExerciseInfoViewState extends State<ExerciseInfoView>
             "exercise.info.bestSessionVolume.label".t,
             bestScore.userFacingWeight,
             onTap: () {
-              Go.to(() => ExercisesView(workout: best.$3));
+              Go.to(() => ExercisesView(
+                    workout: best.$3,
+                    highlightExercise: (ex) {
+                      return ex.id == best.$1.id;
+                    },
+                  ));
             },
           );
         })

@@ -1143,7 +1143,7 @@ and:
     );
   }
 
-  List<Exercise> _workoutGenerator({
+  List<WorkoutExercisable> _workoutGenerator({
     required Set<GTMuscleGroup> muscleGroups,
     required Set<GTGymEquipment> equipment,
   }) {
@@ -1193,7 +1193,7 @@ and:
       }));
     }
 
-    return exercises;
+    return exercises.cast<WorkoutExercisable>();
   }
 
   // TODO: Make it so this method returns the set immediately after the last done set

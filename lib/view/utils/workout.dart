@@ -395,7 +395,7 @@ class _WorkoutExerciseSetEditorState extends State<WorkoutExerciseSetEditor> {
     super.dispose();
   }
 
-  TextField get weightField => TextField(
+  Widget get weightField => TextField(
         focusNode: _weightFocusNode,
         controller: weightController,
         keyboardType: const TextInputType.numberWithOptions(
@@ -408,8 +408,15 @@ class _WorkoutExerciseSetEditorState extends State<WorkoutExerciseSetEditor> {
         decoration: GymTrackerInputDecoration(
           labelText: "exercise.fields.weight".t,
           suffix: Text("units.${widget.weightUnit.name}".t),
+          suffixIconConstraints: const BoxConstraints(
+            minHeight: 24,
+          ),
           suffixIcon: _weightFocusNode.hasFocus
               ? IconButton(
+                  padding: const EdgeInsets.all(8),
+                  style: IconButton.styleFrom(
+                    minimumSize: const Size(0, 0),
+                  ),
                   icon: const Icon(GTIcons.weight_calculator),
                   onPressed: () {
                     Go.toDialog(

@@ -1,6 +1,7 @@
 import 'package:animations/animations.dart';
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:flex_color_scheme/flex_color_scheme.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:gymtracker/utils/constants.dart';
@@ -40,43 +41,94 @@ ThemeData getGymTrackerThemeFor(
   });
   final equivalentScheme = scheme.toScheme;
 
-  return scheme.toTheme.copyWith(
-    pageTransitionsTheme: pageTransitionsTheme,
-    extensions: [
-      MoreColors.fromColorScheme(equivalentScheme),
-    ],
-    splashFactory: platformDependentSplashFactory,
-    appBarTheme: const AppBarTheme(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(
-          bottom: Radius.circular(kAppBarRadius),
-        ),
-      ),
-    ),
-    inputDecorationTheme: InputDecorationTheme(
-      isDense: true,
-      filled: true,
-      fillColor: equivalentScheme.surfaceContainerHighest
-          .withAlpha((0.45 * 255).round()),
-      border: OutlineInputBorder(
-        borderSide: BorderSide.none,
-        borderRadius: BorderRadius.circular(kGymTrackerInputBorderRadius),
-      ),
-    ),
-    navigationRailTheme: NavigationRailThemeData(
-      selectedLabelTextStyle: Theme.of(context).textTheme.labelMedium!.copyWith(
-            color: scheme.onSurface,
-            fontSize: 10,
-            overflow: TextOverflow.fade,
-          ),
-      unselectedLabelTextStyle:
-          Theme.of(context).textTheme.labelMedium!.copyWith(
-                color: scheme.onSurface,
-                fontSize: 10,
-                overflow: TextOverflow.fade,
-              ),
-    ),
+  var subThemesData = FlexSubThemesData(
+    interactionEffects: true,
+    blendOnColors: true,
+    scaffoldBackgroundBaseColor: FlexScaffoldBaseColor.lowestBase,
+    defaultRadius: 8.0,
+    cardRadius: 12,
+    inputDecoratorIsFilled: true,
+    inputDecoratorIsDense: true,
+    inputDecoratorContentPadding:
+        const EdgeInsetsDirectional.fromSTEB(12, 8, 12, 8),
+    inputDecoratorBorderType: FlexInputBorderType.outline,
+    inputDecoratorBorderSchemeColor: SchemeColor.primary,
+    inputDecoratorUnfocusedHasBorder: false,
+    chipSelectedSchemeColor: SchemeColor.primaryContainer,
+    chipSecondarySelectedSchemeColor: SchemeColor.primaryContainer,
+    popupMenuSchemeColor: SchemeColor.surfaceContainerHigh,
+    alignedDropdown: true,
+    tooltipRadius: 4,
+    tooltipSchemeColor: SchemeColor.inverseSurface,
+    snackBarElevation: 6,
+    snackBarBackgroundSchemeColor: SchemeColor.inverseSurface,
+    navigationRailUseIndicator: true,
+    navigationRailLabelType: NavigationRailLabelType.all,
+    drawerIndicatorSchemeColor: SchemeColor.primaryContainer,
+    inputDecoratorFillColor: equivalentScheme.surfaceContainerHighest
+        .withAlpha((0.45 * 255).round()),
+    navigationRailMinWidth: 96,
   );
+
+  return switch (brightness) {
+    Brightness.light => FlexThemeData.light(
+        colors: FlexSchemeColor.from(
+          primary: seedColor,
+          secondary: seedColor,
+          tertiary: seedColor,
+          brightness: brightness,
+        ),
+        usedColors: 3,
+        subThemesData: subThemesData,
+        keyColors: const FlexKeyColors(
+          useSecondary: true,
+          keepPrimary: true,
+          keepSecondary: true,
+          keepSecondaryContainer: true,
+          useTertiary: true,
+          keepTertiary: true,
+        ),
+        tones: FlexSchemeVariant.jolly
+            .tones(Brightness.light)
+            .monochromeSurfaces()
+            .surfacesUseBW(),
+        visualDensity: FlexColorScheme.comfortablePlatformDensity,
+        cupertinoOverrideTheme: const CupertinoThemeData(applyThemeToAll: true),
+        extensions: [
+          MoreColors.fromColorScheme(equivalentScheme),
+        ],
+        pageTransitionsTheme: pageTransitionsTheme,
+        splashFactory: platformDependentSplashFactory,
+      ),
+    Brightness.dark => FlexThemeData.dark(
+        colors: FlexSchemeColor.from(
+          primary: seedColor,
+          secondary: seedColor,
+          brightness: brightness,
+        ),
+        usedColors: 3,
+        subThemesData: subThemesData,
+        keyColors: const FlexKeyColors(
+          useSecondary: true,
+          keepPrimary: true,
+          keepSecondary: true,
+          keepSecondaryContainer: true,
+          useTertiary: true,
+          keepTertiary: true,
+        ),
+        tones: FlexSchemeVariant.jolly
+            .tones(Brightness.dark)
+            .monochromeSurfaces()
+            .surfacesUseBW(),
+        visualDensity: FlexColorScheme.comfortablePlatformDensity,
+        cupertinoOverrideTheme: const CupertinoThemeData(applyThemeToAll: true),
+        extensions: [
+          MoreColors.fromColorScheme(equivalentScheme),
+        ],
+        pageTransitionsTheme: pageTransitionsTheme,
+        splashFactory: platformDependentSplashFactory,
+      ),
+  };
 }
 
 @immutable

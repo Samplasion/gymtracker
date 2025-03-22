@@ -38,7 +38,7 @@ import 'package:rxdart/rxdart.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
 const _kDrawerSize = 304.0;
-const _kRailSize = 80.0;
+const _kRailSize = 96.0;
 
 class SkeletonDrawerButton extends StatefulWidget {
   const SkeletonDrawerButton({

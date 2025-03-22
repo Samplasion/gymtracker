@@ -10,6 +10,7 @@ class GymTrackerInputDecoration extends InputDecoration {
     super.suffixIcon,
     super.alignLabelWithHint,
     super.contentPadding,
+    super.suffixIconConstraints,
   }) : super(
           labelText: labelText,
         );

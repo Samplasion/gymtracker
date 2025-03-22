@@ -93,6 +93,10 @@ extension DateUtils on DateTime {
 }
 
 extension ColorUtils on Color {
+  double get a => this.alpha.toDouble() / 255;
+  double get r => this.red.toDouble() / 255;
+  double get g => this.green.toDouble() / 255;
+  double get b => this.blue.toDouble() / 255;
   bool get isGray =>
       doubleEquality(r, g, epsilon: 0.001) &&
       doubleEquality(g, b, epsilon: 0.001);

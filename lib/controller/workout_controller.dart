@@ -1111,7 +1111,8 @@ and:
       return;
     }
 
-    this.exercises(exercises);
+    this.exercises.addAll(exercises);
+    this.exercises.refresh();
 
     final context = Get.context;
     final onThemedColor =
@@ -1155,7 +1156,7 @@ and:
                     .isNotEmpty) &&
             equipment.contains(exercise.gymEquipment))
         .toList();
-    final exercises = <Exercise>[];
+    final exercises = <WorkoutExercisable>[];
 
     for (final group in muscleGroups) {
       final groupExercises = filteredLibrary
@@ -1193,7 +1194,7 @@ and:
       }));
     }
 
-    return exercises.cast<WorkoutExercisable>();
+    return exercises;
   }
 
   // TODO: Make it so this method returns the set immediately after the last done set
@@ -1259,5 +1260,9 @@ and:
 
     exercises.refresh();
     save();
+  }
+
+  void addSuperset() {
+    exercises.add(Superset.empty());
   }
 }

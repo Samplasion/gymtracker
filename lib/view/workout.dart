@@ -389,7 +389,7 @@ class _WorkoutViewState extends State<WorkoutView> {
             SplitButtonSegment(
               title: "ongoingWorkout.exercises.addSuperset".t,
               onTap: () {
-                _controller?.exercises.add(Superset.empty());
+                _controller?.addSuperset();
                 _controller?.exercises.refresh();
               },
             ),

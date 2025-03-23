@@ -265,20 +265,39 @@ class _WorkoutExerciseEditorState extends State<WorkoutExerciseEditor> {
                   );
                 },
               ),
-              if (!widget.exercise.parameters.isSetless) ...[
-                if (!widget.isInSuperset)
-                  Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: TimeInputField(
-                      controller: timeController,
-                      decoration: GymTrackerInputDecoration(
-                        labelText: "exercise.fields.restTime".t,
+              if (!widget.isInSuperset)
+                Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: TimeInputField(
+                          controller: timeController,
+                          decoration: GymTrackerInputDecoration(
+                            labelText: "exercise.fields.restTime".t,
+                          ),
+                          onChangedTime: (value) => widget.callbacks
+                              .onExerciseChangeRestTime(
+                                  widget.index, value ?? Duration.zero),
+                        ),
                       ),
-                      onChangedTime: (value) => widget.callbacks
-                          .onExerciseChangeRestTime(
-                              widget.index, value ?? Duration.zero),
-                    ),
+                      if (widget.exercise.parameters.isSetless &&
+                          !widget.isCreating) ...[
+                        const SizedBox(width: 8),
+                        IconButton(
+                          onPressed: () => widget.callbacks.onSetSetDone(
+                            widget.index,
+                            -1,
+                            true,
+                          ),
+                          icon: const Icon(GTIcons.time),
+                          tooltip: "exercise.fields.startRestTime".t,
+                        ),
+                      ],
+                    ],
                   ),
+                ),
+              if (!widget.exercise.parameters.isSetless) ...[
                 for (int i = 0; i < widget.exercise.sets.length; i++)
                   WorkoutExerciseSetEditor(
                     key: ValueKey(widget.exercise.sets[i].id),

@@ -406,10 +406,21 @@ class WorkoutController extends GetxController with ServiceableController {
         },
         onSetSetDone: (index, setIndex, done) {
           final (exerciseIndex: i, supersetIndex: supersetIndex) = index;
-
           final exercise = supersetIndex == null
               ? (exercises[i] as Exercise)
               : (exercises[supersetIndex] as Superset).exercises[i];
+
+          if (setIndex < 0) {
+            // setIndex = -1 means "forcefully start the timer",
+            // so just start the timer
+            final superset = supersetIndex == null
+                ? null
+                : (exercises[supersetIndex] as Superset);
+            Get.find<CountdownController>().setCountdown(
+                supersetIndex == null ? exercise.restTime : superset!.restTime);
+
+            return;
+          }
           final set = exercise.sets[setIndex];
 
           final newSet = set.copyWith(done: done);

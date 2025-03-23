@@ -5,6 +5,7 @@ import 'package:gymtracker/db/database.dart';
 import 'package:gymtracker/db/imports/v1.dart';
 import 'package:gymtracker/db/imports/v10.dart';
 import 'package:gymtracker/db/imports/v11.dart';
+import 'package:gymtracker/db/imports/v12.dart';
 import 'package:gymtracker/db/imports/v2.dart';
 import 'package:gymtracker/db/imports/v3.dart';
 import 'package:gymtracker/db/imports/v4.dart';
@@ -33,6 +34,7 @@ const converters = {
   9: VersionedJsonImportV9(),
   10: VersionedJsonImportV10(),
   11: VersionedJsonImportV11(),
+  12: VersionedJsonImportV12(),
 };
 
 VersionedJsonImportBase getConverter(int version) {
@@ -117,3 +119,4 @@ class DatabaseSnapshot {
 bool deepEquals(DatabaseSnapshot a, DatabaseSnapshot b) {
   return mapEquals(a.toJson(), b.toJson());
 }
+

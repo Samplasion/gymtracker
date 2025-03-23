@@ -23,6 +23,7 @@ import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/utils/utils.dart' as utils show stringifyDouble;
 import 'package:gymtracker/utils/utils.dart';
 import 'package:gymtracker/view/food.dart';
+import 'package:gymtracker/view/utils/date_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:openfoodfacts/openfoodfacts.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -565,6 +566,22 @@ class FoodController extends GetxController with ServiceableController {
   }
 
   void showDatePicker() {
+    material
+        .showModalBottomSheet<DateTime>(
+      context: Get.context!,
+      builder: (_) => DatePickerPlus(
+        initialDate: day$.value,
+        firstDate: DateTime(2000),
+        lastDate: DateTime(2099, 12, 31),
+        markDate: (date) => foods$.value.any((element) => element.date == date),
+      ),
+    )
+        .then((value) {
+      if (value != null) {
+        day$.add(value.startOfDay);
+      }
+    });
+    return;
     material
         .showDatePicker(
       context: Get.context!,

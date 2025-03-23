@@ -28,7 +28,8 @@ class MusclesView extends StatefulWidget {
 }
 
 class _MusclesViewState extends State<MusclesView> {
-  late Future<(String, String)> _svgFuture;
+  late Future<(String, String)> _svgFuture =
+      Future.value(("#ffffff", "#ffffff"));
 
   @override
   initState() {
@@ -49,9 +50,10 @@ class _MusclesViewState extends State<MusclesView> {
 
   Future<(String, String)> _loadSvg() async {
     Completer<(String, String)> completer = Completer();
+    await Future.delayed(Duration.zero);
+    final dividerColor = Theme.of(context).colorScheme.outline;
     SchedulerBinding.instance.addPostFrameCallback((_) async {
       final themeColor = Rainbow(spectrum: _gradientColors);
-      final dividerColor = Theme.of(context).colorScheme.outline;
 
       var frontSvg = await rootBundle.loadString(GTAssets.svg.bodyFront);
       var backSvg = await rootBundle.loadString(GTAssets.svg.bodyBack);

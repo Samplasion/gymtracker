@@ -68,6 +68,7 @@ ThemeData getGymTrackerThemeFor(
     inputDecoratorFillColor: equivalentScheme.surfaceContainerHighest
         .withAlpha((0.45 * 255).round()),
     navigationRailMinWidth: 96,
+    menuSchemeColor: SchemeColor.surfaceContainerHigh,
   );
 
   return switch (brightness) {
@@ -80,6 +81,7 @@ ThemeData getGymTrackerThemeFor(
         ),
         usedColors: 3,
         subThemesData: subThemesData,
+        appBarStyle: FlexAppBarStyle.scaffoldBackground,
         keyColors: const FlexKeyColors(
           useSecondary: true,
           keepPrimary: true,
@@ -90,8 +92,8 @@ ThemeData getGymTrackerThemeFor(
         ),
         tones: FlexSchemeVariant.jolly
             .tones(Brightness.light)
-            .monochromeSurfaces()
-            .surfacesUseBW(),
+            .surfacesUseBW()
+            .monochromeSurfaces(),
         visualDensity: FlexColorScheme.comfortablePlatformDensity,
         cupertinoOverrideTheme: const CupertinoThemeData(applyThemeToAll: true),
         extensions: [
@@ -108,6 +110,7 @@ ThemeData getGymTrackerThemeFor(
         ),
         usedColors: 3,
         subThemesData: subThemesData,
+        appBarStyle: FlexAppBarStyle.scaffoldBackground,
         keyColors: const FlexKeyColors(
           useSecondary: true,
           keepPrimary: true,
@@ -118,8 +121,8 @@ ThemeData getGymTrackerThemeFor(
         ),
         tones: FlexSchemeVariant.jolly
             .tones(Brightness.dark)
-            .monochromeSurfaces()
-            .surfacesUseBW(),
+            .surfacesUseBW()
+            .monochromeSurfaces(),
         visualDensity: FlexColorScheme.comfortablePlatformDensity,
         cupertinoOverrideTheme: const CupertinoThemeData(applyThemeToAll: true),
         extensions: [

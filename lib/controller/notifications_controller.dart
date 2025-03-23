@@ -162,6 +162,14 @@ class NotificationController extends GetxController implements Listenable {
     if (!hasPermission) return;
     if (shouldShowAndroidExactAlarmPermissionRequest) return;
 
+    final targetTimeTZ = TZDateTime.from(targetTime, local);
+    final now = TZDateTime.now(local);
+
+    if (now.add(const Duration(milliseconds: 500)).isAfter(targetTimeTZ)) {
+      logger.i("Rest time is in the past. Not scheduling notification.");
+      return;
+    }
+
     final androidDetails = AndroidNotificationDetails(
       'org.js.samplasion.gymtracker.RestTimeoutChannel',
       'androidNotificationChannel.name'.t,
@@ -183,7 +191,7 @@ class NotificationController extends GetxController implements Listenable {
       NotificationIDs.restTimer,
       'appName'.t,
       'ongoingWorkout.restOver'.t,
-      TZDateTime.from(targetTime, local),
+      targetTimeTZ,
       notificationDetails,
       uiLocalNotificationDateInterpretation:
           UILocalNotificationDateInterpretation.wallClockTime,

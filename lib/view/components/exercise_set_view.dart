@@ -97,6 +97,7 @@ class ExerciseSetView extends StatelessWidget {
               Icon(GTIcons.checkbox_off, color: colorScheme.onSurfaceVariant),
             const SizedBox(width: 8),
           ],
+          if (draggable) DragHandle(index: index!),
         ],
       ),
     );

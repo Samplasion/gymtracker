@@ -566,30 +566,14 @@ class FoodController extends GetxController with ServiceableController {
   }
 
   void showDatePicker() {
-    material
-        .showModalBottomSheet<DateTime>(
-      context: Get.context!,
-      builder: (_) => DatePickerPlus(
+    Go.showBottomModalScreen<DateTime>(
+      (_, controller) => DatePickerPlus(
         initialDate: day$.value,
         firstDate: DateTime(2000),
         lastDate: DateTime(2099, 12, 31),
         markDate: (date) => foods$.value.any((element) => element.date == date),
       ),
-    )
-        .then((value) {
-      if (value != null) {
-        day$.add(value.startOfDay);
-      }
-    });
-    return;
-    material
-        .showDatePicker(
-      context: Get.context!,
-      initialDate: day$.value,
-      firstDate: DateTime(2000),
-      lastDate: DateTime(2099, 12, 31),
-    )
-        .then((value) {
+    ).then((value) {
       if (value != null) {
         day$.add(value.startOfDay);
       }

@@ -72,7 +72,7 @@ class ExerciseSetView extends StatelessWidget {
               scheme.surfaceTint,
               0.7,
             ),
-      padding: const EdgeInsets.all(8),
+      padding: const EdgeInsets.fromLTRB(8, 4, 8, 4),
       child: Row(
         children: [
           IconButton(

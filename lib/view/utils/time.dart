@@ -124,12 +124,18 @@ class _TimeInputFieldState
           : const TextInputType.numberWithOptions(decimal: false),
       decoration:
           (widget.decoration ?? const GymTrackerInputDecoration()).copyWith(
+        suffixIconConstraints: BoxConstraints(
+          minHeight: 24,
+          minWidth: 24,
+        ),
+        isDense: true,
         suffixIcon: () {
           if (!widget.timerInteractive) return null;
           var isActive = _isActive;
           return SelectableAnimatedBuilder(
             isSelected: isActive,
             builder: (context, animation) => IconButton(
+              visualDensity: VisualDensity.compact,
               icon: AnimatedIcon(
                 progress: animation,
                 icon: AnimatedIcons.play_pause,

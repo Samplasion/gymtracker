@@ -267,7 +267,7 @@ class _WorkoutExerciseEditorState extends State<WorkoutExerciseEditor> {
               ),
               if (!widget.isInSuperset)
                 Padding(
-                  padding: const EdgeInsets.all(16),
+                  padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
                   child: Row(
                     children: [
                       Expanded(
@@ -568,7 +568,7 @@ class _WorkoutExerciseSetEditorState extends State<WorkoutExerciseSetEditor> {
         builder: (context, value, _) {
           return Container(
             color: value,
-            padding: const EdgeInsets.all(8),
+            padding: const EdgeInsets.fromLTRB(8, 4, 8, 4),
             child: Row(
               children: [
                 PopupMenuButton(

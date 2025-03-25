@@ -228,3 +228,36 @@ class OnlineServiceImpl with ChangeNotifier implements OnlineService {
     }
   }
 }
+
+class TestOnlineServiceImpl extends OnlineService {
+  @override
+  OnlineAccount? get account => null;
+
+  @override
+  Future<void> deleteSnapshot() async {}
+
+  @override
+  Future<OnlineAccount?> getAccount() async => null;
+
+  @override
+  Future<Uri?> getAvatarUrl(String id) async => null;
+  @override
+  Future<bool> getHasOnlinePrivileges() async => false;
+  @override
+  Future<Map<String, dynamic>?> getSnapshot() async => null;
+  @override
+  Future<void> login({required String email, required String password}) async {}
+  @override
+  Future<void> logout() async {}
+  @override
+  Future<void> register(
+      {required String email,
+      required String password,
+      required String username}) async {}
+  @override
+  Future<void> updateAccount(
+      {required String email, required String username}) async {}
+  @override
+  Future<void> uploadSnapshot(DatabaseSnapshot snapshot,
+      {DateTime? timestamp, required String version}) async {}
+}

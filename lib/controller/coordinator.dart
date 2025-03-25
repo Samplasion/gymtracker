@@ -25,6 +25,7 @@ import 'package:gymtracker/service/database.dart';
 import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/service/logger.dart';
 import 'package:gymtracker/service/notifications.dart';
+import 'package:gymtracker/service/test.dart';
 import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/view/onboarding.dart';
 import 'package:gymtracker/view/skeleton.dart';
@@ -238,7 +239,8 @@ class Coordinator extends GetxController
   }
 
   void bootProcedure() {
-    if (!service.prefs$.value.onboardingComplete) {
+    final isTest = TestService().isTest;
+    if (!isTest && !service.prefs$.value.onboardingComplete) {
       Go.offWithoutAnimation(() => const OnboardingScreen());
     } else {
       Go.offWithoutAnimation(() => const SkeletonView());

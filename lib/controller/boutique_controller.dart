@@ -6,6 +6,7 @@ import 'package:gymtracker/controller/serviceable_controller.dart';
 import 'package:gymtracker/model/model.dart';
 import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/service/logger.dart';
+import 'package:gymtracker/service/test.dart';
 import 'package:gymtracker/service/version.dart';
 import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/view/utils/boutique_debug_converter.dart';
@@ -14,7 +15,15 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:uuid/uuid.dart';
 
 class BoutiqueController extends GetxController with ServiceableController {
-  final _BoutiqueRepository _repository = _BoutiqueRepositoryImpl();
+  late final _BoutiqueRepository _repository;
+
+  BoutiqueController() {
+    if (TestService().isTest) {
+      _repository = _TestBoutiqueRepositoryImpl();
+    } else {
+      _repository = _BoutiqueRepositoryImpl();
+    }
+  }
 
   Future<void> _checkVersion() async {
     final settings = await _repository.getSettings();
@@ -255,6 +264,26 @@ abstract class _BoutiqueRepository {
     String categoryId, {
     required String language,
   });
+}
+
+class _TestBoutiqueRepositoryImpl implements _BoutiqueRepository {
+  @override
+  Future<List<BoutiqueCategory>> getCategories() async {
+    return [];
+  }
+
+  @override
+  Future<List<BoutiquePackage>> getPackages(
+    String categoryId, {
+    required String language,
+  }) async {
+    return [];
+  }
+
+  @override
+  Future<BoutiqueSettings> getSettings() async {
+    return BoutiqueSettings(compatibility: "0.0.0");
+  }
 }
 
 class _BoutiqueRepositoryImpl implements _BoutiqueRepository {

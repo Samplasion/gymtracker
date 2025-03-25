@@ -5,6 +5,7 @@ import 'package:gymtracker/db/imports/types.dart';
 import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/service/logger.dart';
 import 'package:gymtracker/service/online.dart';
+import 'package:gymtracker/service/test.dart';
 import 'package:gymtracker/service/version.dart';
 import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/utils/utils.dart';
@@ -31,8 +32,16 @@ class _CachedData<T> {
 class OnlineController extends GetxController with ServiceableController {
   bool _isInit = false;
 
-  final OnlineService _service = OnlineServiceImpl();
+  late final OnlineService _service;
   late SharedPreferences _prefs;
+
+  OnlineController() {
+    if (TestService().isTest) {
+      _service = TestOnlineServiceImpl();
+    } else {
+      _service = OnlineServiceImpl();
+    }
+  }
 
   final _account$ = BehaviorSubject<OnlineAccount?>.seeded(null);
   Stream<OnlineAccount?> get account => _account$.stream;

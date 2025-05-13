@@ -786,12 +786,6 @@ class _FoodDayAppBar extends ControlledWidget<FoodController> {
             builder: (context, snapshot) {
               return Text.rich(TextSpan(children: [
                 TextSpan(text: controller.relativeDayText),
-                const TextSpan(text: " "),
-                const WidgetSpan(
-                  child: BetaBadge(),
-                  alignment: PlaceholderAlignment.aboveBaseline,
-                  baseline: TextBaseline.alphabetic,
-                ),
               ]));
             },
           ),

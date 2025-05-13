@@ -68,11 +68,6 @@ class AdvancedSettingsView extends ControlledWidget<SettingsController> {
                       children: [
                         TextSpan(
                             text: "settings.advanced.options.backups.title".t),
-                        const TextSpan(text: " "),
-                        const WidgetSpan(
-                          child: BetaBadge(),
-                          alignment: PlaceholderAlignment.middle,
-                        ),
                       ],
                     ),
                   ),

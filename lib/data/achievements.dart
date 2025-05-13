@@ -839,7 +839,7 @@ Map<String, Achievement> get achievements => {
               if (subset.isEmpty) return 0;
               return _swimsuitSeason(subset).inMinutes / 60;
             },
-            progressMax: () => 168,
+            progressMax: () => 24,
             progressText: (value) => "time.justHours".plural(value),
             checkCompletion: (_) {
               const trigger = Duration(hours: 24);

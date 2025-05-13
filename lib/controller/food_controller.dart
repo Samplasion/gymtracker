@@ -562,6 +562,7 @@ class FoodController extends GetxController with ServiceableController {
     coordinator.scheduleBackup();
   }
 
+  bool canGoToPreviousDay() => day$.value.isAfter(DateTime(2000));
   void previousDay() {
     day$.add(day$.value.subtract(const Duration(days: 1)));
   }
@@ -586,6 +587,9 @@ class FoodController extends GetxController with ServiceableController {
     day$.add(key);
   }
 
+  bool canGoToNextDay() => day$.value.isBefore(DateTime(2100).subtract(
+        const Duration(days: 1),
+      ));
   void nextDay() {
     day$.add(day$.value.add(const Duration(days: 1)));
   }

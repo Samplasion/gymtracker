@@ -242,31 +242,39 @@ class _FoodViewState extends ControlledState<FoodView, FoodController> {
         },
       ),
       extendBody: true,
-      bottomNavigationBar: GradientBottomBar(
-        alignment: MainAxisAlignment.spaceBetween,
-        center: true,
-        buttons: [
-          // Back, calendar, forward
-          IconButton(
-            icon: const Icon(GTIcons.previousDay),
-            onPressed: () {
-              controller.previousDay();
-            },
-          ),
-          IconButton(
-            icon: const Icon(GTIcons.showDatePicker),
-            onPressed: () {
-              controller.showDatePicker();
-            },
-          ),
-          IconButton(
-            icon: const Icon(GTIcons.nextDay),
-            onPressed: () {
-              controller.nextDay();
-            },
-          ),
-        ],
-      ),
+      bottomNavigationBar: StreamBuilder(
+          stream: controller.day$,
+          builder: (context, snapshot) {
+            return GradientBottomBar(
+              alignment: MainAxisAlignment.spaceBetween,
+              center: true,
+              buttons: [
+                // Back, calendar, forward
+                IconButton(
+                  icon: const Icon(GTIcons.previousDay),
+                  onPressed: controller.canGoToPreviousDay()
+                      ? () {
+                          controller.previousDay();
+                        }
+                      : null,
+                ),
+                IconButton(
+                  icon: const Icon(GTIcons.showDatePicker),
+                  onPressed: () {
+                    controller.showDatePicker();
+                  },
+                ),
+                IconButton(
+                  icon: const Icon(GTIcons.nextDay),
+                  onPressed: controller.canGoToNextDay()
+                      ? () {
+                          controller.nextDay();
+                        }
+                      : null,
+                ),
+              ],
+            );
+          }),
     );
   }
 

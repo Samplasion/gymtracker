@@ -41,6 +41,7 @@ enum GTExerciseMuscleCategory {
   triceps,
   hips,
   forearms,
+  glutes,
   custom,
   other;
 
@@ -600,7 +601,9 @@ extension Display on Exercise {
     if (skeleton) return name;
     if (isCustom) return name;
 
-    final candidate = isAbstract ? id : parentID!;
+    final candidate = isAbstract
+        ? name
+        : (getStandardExerciseByID(parentID!)?.name ?? parentID!);
 
     if (candidate.existsAsTranslationKey) return candidate.t;
     if (!isOrphan && parentID!.existsAsTranslationKey) return parentID!.t;

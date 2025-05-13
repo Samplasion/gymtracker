@@ -1039,12 +1039,7 @@
     "hips": {
       "name": "Anche",
       "exercises": {
-        "gluteBridge": "Ponte per i glutei",
-        "hipThrust": "Hip thrust",
-        "hipAdduction": "Hip adduction",
-        "hipAbduction": "Hip abduction",
-        "clamshells": "Clamshell per i glutei",
-        "hipThrustBarbell": "Hip thrust (bilanciere)"
+        "hipAdduction": "Hip adduction"
       }
     },
     "forearms": {
@@ -1072,6 +1067,16 @@
       "name": "Altro",
       "exercises": {
         "stretching": "Stretching"
+      }
+    },
+    "glutes": {
+      "name": "Glutei",
+      "exercises": {
+        "gluteBridge": "Ponte per i glutei",
+        "hipThrust": "Hip thrust",
+        "hipAbduction": "Hip abduction",
+        "clamshells": "Clamshell per i glutei",
+        "hipThrustBarbell": "Hip thrust (bilanciere)"
       }
     }
   },

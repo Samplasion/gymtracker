@@ -71,6 +71,7 @@ class _WorkoutDoneSheetState extends State<WorkoutDoneSheet> {
             ],
             flexibleSpace: FlexibleSpaceBar(
               title: Text('ongoingWorkout.goodJob.title'.t),
+              centerTitle: true,
               expandedTitleScale:
                   context.theme.textTheme.displaySmall!.fontSize! /
                       context.theme.textTheme.titleLarge!.fontSize!,

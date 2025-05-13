@@ -9,6 +9,7 @@ import 'package:gymtracker/controller/history_controller.dart';
 import 'package:gymtracker/controller/me_controller.dart';
 import 'package:gymtracker/controller/online_controller.dart';
 import 'package:gymtracker/controller/settings_controller.dart';
+import 'package:gymtracker/data/configuration.dart';
 import 'package:gymtracker/data/weights.dart';
 import 'package:gymtracker/icons/gymtracker_icons.dart';
 import 'package:gymtracker/model/measurements.dart';
@@ -50,13 +51,15 @@ class MeView extends GetView<MeController> {
             title: Text("me.title".t),
             leading: const SkeletonDrawerButton(),
           ),
-          const SliverPadding(
-            padding: EdgeInsets.only(top: 16, left: 16, right: 16),
-            sliver: SliverToBoxAdapter(
-              child: OnlineProfileCard(),
+          if (Configuration.isOnlineAccountEnabled) ...[
+            const SliverPadding(
+              padding: EdgeInsets.only(top: 16, left: 16, right: 16),
+              sliver: SliverToBoxAdapter(
+                child: OnlineProfileCard(),
+              ),
             ),
-          ),
-          const SliverToBoxAdapter(child: _MeSyncCard()),
+            const SliverToBoxAdapter(child: _MeSyncCard()),
+          ],
           SliverPadding(
             padding: const EdgeInsets.only(top: 16),
             sliver: SliverList(

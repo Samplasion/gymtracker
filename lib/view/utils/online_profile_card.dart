@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gymtracker/controller/online_controller.dart';
+import 'package:gymtracker/data/configuration.dart';
 import 'package:gymtracker/icons/gymtracker_icons.dart';
 import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/service/online.dart';
@@ -14,6 +15,8 @@ class OnlineProfileCard extends ControlledWidget<OnlineController> {
 
   @override
   Widget build(BuildContext context) {
+    if (!Configuration.isOnlineAccountEnabled) return Container();
+
     return StreamBuilder<OnlineAccount?>(
       stream: controller.account,
       builder: (context, snapshot) {

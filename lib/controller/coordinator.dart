@@ -17,6 +17,7 @@ import 'package:gymtracker/controller/serviceable_controller.dart';
 import 'package:gymtracker/controller/settings_controller.dart';
 import 'package:gymtracker/controller/stopwatch_controller.dart';
 import 'package:gymtracker/controller/workout_controller.dart';
+import 'package:gymtracker/data/configuration.dart';
 import 'package:gymtracker/db/imports/types.dart';
 import 'package:gymtracker/model/achievements.dart';
 import 'package:gymtracker/model/exercise.dart';
@@ -52,12 +53,13 @@ class Coordinator extends GetxController
       Go.awaitInitialization(),
       get<SettingsController>().awaitInitialized(),
       get<NotificationController>().initialize(),
-      get<OnlineController>().init().then((_) {
-        if (get<OnlineController>().accountSync == null) return;
-        get<OnlineController>().sync(
-          currentSnapshot: get<DatabaseService>().currentSnapshot,
-        );
-      }),
+      if (Configuration.isOnlineAccountEnabled)
+        get<OnlineController>().init().then((_) {
+          if (get<OnlineController>().accountSync == null) return;
+          get<OnlineController>().sync(
+            currentSnapshot: get<DatabaseService>().currentSnapshot,
+          );
+        }),
     ]);
 
     showPermissionTilesStream.add(
@@ -95,7 +97,9 @@ class Coordinator extends GetxController
     Get.delete<FoodController>();
     Get.delete<AchievementsController>();
     Get.delete<BoutiqueController>();
-    Get.delete<OnlineController>();
+    if (Configuration.isOnlineAccountEnabled) {
+      Get.delete<OnlineController>();
+    }
 
     super.onClose();
   }
@@ -116,7 +120,9 @@ class Coordinator extends GetxController
     Get.put(FoodController());
     Get.put(AchievementsController());
     Get.put(BoutiqueController());
-    Get.put(OnlineController());
+    if (Configuration.isOnlineAccountEnabled) {
+      Get.put(OnlineController());
+    }
 
     if (service.hasOngoing) {
       Get.put(WorkoutController.fromSavedData(service.getOngoingData()!));
@@ -207,7 +213,8 @@ class Coordinator extends GetxController
     Future.delayed(const Duration(seconds: 5), () async {
       get<DatabaseService>().createBackup();
 
-      if (get<OnlineController>().accountSync != null) {
+      if (Configuration.isOnlineAccountEnabled &&
+          get<OnlineController>().accountSync != null) {
         get<OnlineController>().sync(
           currentSnapshot: get<DatabaseService>().currentSnapshot,
         );

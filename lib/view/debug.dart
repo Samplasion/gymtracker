@@ -15,6 +15,7 @@ import 'package:gymtracker/controller/online_controller.dart';
 import 'package:gymtracker/controller/routines_controller.dart';
 import 'package:gymtracker/controller/stopwatch_controller.dart';
 import 'package:gymtracker/controller/workout_controller.dart';
+import 'package:gymtracker/data/configuration.dart';
 import 'package:gymtracker/data/weights.dart';
 import 'package:gymtracker/model/exercise.dart';
 import 'package:gymtracker/model/measurements.dart';
@@ -213,14 +214,18 @@ class _DebugViewState extends State<DebugView> {
               //   },
               // ),
               ListTile(
-                title: const Text("Simulate sync"),
-                onTap: () async {
-                  Get.find<OnlineController>().also((c) {
-                    c.sync(
-                      currentSnapshot: c.service.currentSnapshot,
-                    );
-                  });
-                },
+                title: const Text(Configuration.isOnlineAccountEnabled
+                    ? "Simulate sync"
+                    : "[Online disabled]"),
+                onTap: Configuration.isOnlineAccountEnabled
+                    ? () async {
+                        Get.find<OnlineController>().also((c) {
+                          c.sync(
+                            currentSnapshot: c.service.currentSnapshot,
+                          );
+                        });
+                      }
+                    : null,
               ),
               ListTile(
                 title: const Text("Update home widgets"),

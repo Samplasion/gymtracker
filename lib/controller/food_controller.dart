@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:collection/collection.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart' as material;
+import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:fuzzywuzzy/fuzzywuzzy.dart';
 import 'package:get/get.dart';
@@ -653,16 +654,54 @@ class FoodController extends GetxController with ServiceableController {
 
   Future<void> requestPermission(Permission perm) async {
     logger.d("Requesting permission: $perm");
-    final status = await perm.request();
-    if (status.isGranted) {
-      logger.i("Permission granted: $perm");
-    } else if (status.isPermanentlyDenied) {
-      logger.w("Permission permanently denied: $perm");
-      openAppSettings();
-    } else {
-      logger.w("Permission denied: $perm");
+    try {
+      final status = await perm.request();
+      if (status.isGranted) {
+        logger.i("Permission granted: $perm");
+      } else if (status.isPermanentlyDenied) {
+        logger.w("Permission permanently denied: $perm");
+        openAppSettings();
+      } else {
+        logger.w("Permission denied: $perm");
+        Go.snack(
+          "food.permission.denied".t,
+          action: material.SnackBarAction(
+            label: "food.permission.openSettings".t,
+            onPressed: () {
+              openAppSettings();
+            },
+          ),
+        );
+      }
+
+      permission$.add((
+        camera: perm == Permission.camera
+            ? status.isGranted
+            : permission$.value.camera,
+        gallery: perm == Permission.photos
+            ? status.isGranted
+            : permission$.value.gallery,
+      ));
+    } on PlatformException catch (e) {
+      if (e.code == "ERROR_ALREADY_REQUESTING_PERMISSIONS") {
+        logger.i("Permission already being requested: $perm", error: e);
+        return;
+      }
+
+      logger.e("Error requesting permission: $e");
       Go.snack(
-        "food.permission.denied".t,
+        "food.permission.error".t,
+        action: material.SnackBarAction(
+          label: "food.permission.openSettings".t,
+          onPressed: () {
+            openAppSettings();
+          },
+        ),
+      );
+    } catch (e) {
+      logger.e("Error requesting permission: $e");
+      Go.snack(
+        "food.permission.error".t,
         action: material.SnackBarAction(
           label: "food.permission.openSettings".t,
           onPressed: () {
@@ -671,15 +710,6 @@ class FoodController extends GetxController with ServiceableController {
         ),
       );
     }
-
-    permission$.add((
-      camera: perm == Permission.camera
-          ? status.isGranted
-          : permission$.value.camera,
-      gallery: perm == Permission.photos
-          ? status.isGranted
-          : permission$.value.gallery,
-    ));
   }
 
   void showNutritionGoalView() {

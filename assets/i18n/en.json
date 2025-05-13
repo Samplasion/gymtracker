@@ -2100,7 +2100,8 @@
     },
     "permission": {
       "denied": "We weren't able to get this permission. Would you like to open the permission settings?",
-      "openSettings": "Open app settings"
+      "openSettings": "Open app settings",
+      "error": "An error has occurred."
     }
   },
   "equipment": {

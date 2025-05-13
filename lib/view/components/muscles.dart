@@ -51,6 +51,13 @@ class _MusclesViewState extends State<MusclesView> {
   Future<(String, String)> _loadSvg() async {
     Completer<(String, String)> completer = Completer();
     await Future.delayed(Duration.zero);
+    if (!mounted || !context.mounted) {
+      completer.complete((
+        "",
+        "",
+      ));
+      return completer.future;
+    }
     final dividerColor = Theme.of(context).colorScheme.outline;
     SchedulerBinding.instance.addPostFrameCallback((_) async {
       final themeColor = Rainbow(spectrum: _gradientColors);

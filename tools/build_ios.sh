@@ -45,9 +45,15 @@ echo Build number: $NOW
 echo Flavor: $flavor
 echo 
 
+if [[ -z "${CI}" ]]; then
+  CODESIGN=""
+else
+  CODESIGN="--no-codesign"
+fi
+
 build() {
     echo "📦 Building the iOS app..."
-    flutter build ipa --$flavor --build-number=$NOW --dart-define=BUILD=$BUILD --no-codesign
+    flutter build ipa --$flavor --build-number=$NOW --dart-define=BUILD=$BUILD $CODESIGN
 }
 
 cleanup() {

@@ -211,12 +211,15 @@ class Go {
   }
 
   static Future<T?> showBottomModalScreen<T>(
-      Widget Function(BuildContext, ScrollController?) page) async {
+    Widget Function(BuildContext, ScrollController?) page, {
+    bool enableDrag = true,
+  }) async {
     final context = Get.context!;
     return showCupertinoModalBottomSheet(
       context: context,
       builder: (context) => page(context, ModalScrollController.of(context)),
       duration: const Duration(milliseconds: 250),
+      enableDrag: enableDrag,
     );
   }
 

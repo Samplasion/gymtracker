@@ -574,6 +574,7 @@ class FoodController extends GetxController with ServiceableController {
         lastDate: DateTime(2099, 12, 31),
         markDate: (date) => foods$.value.any((element) => element.date == date),
       ),
+      enableDrag: false,
     ).then((value) {
       if (value != null) {
         day$.add(value.startOfDay);

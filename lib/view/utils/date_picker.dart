@@ -2,12 +2,14 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/utils/constants.dart';
 import 'package:gymtracker/utils/extensions.dart';
 import 'package:scrollable_clean_calendar/controllers/clean_calendar_controller.dart';
 import 'package:scrollable_clean_calendar/models/day_values_model.dart';
 import 'package:scrollable_clean_calendar/scrollable_clean_calendar.dart';
 import 'package:scrollable_clean_calendar/utils/enums.dart';
+import 'package:scrollable_clean_calendar/utils/extensions.dart';
 
 class DatePickerPlus extends StatefulWidget {
   final DateTime initialDate;
@@ -44,6 +46,13 @@ class _DatePickerPlusState extends State<DatePickerPlus> {
     return Scaffold(
       appBar: AppBar(
         title: Text(MaterialLocalizations.of(context).datePickerHelpText),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.today),
+            tooltip: "food.datePicker.today".t,
+            onPressed: () => Get.back(result: DateTime.now()),
+          ),
+        ],
       ),
       body: LayoutBuilder(builder: (context, constraints) {
         final width = constraints.maxWidth;
@@ -88,6 +97,13 @@ class _DatePickerPlusState extends State<DatePickerPlus> {
             .colorScheme
             .onSurface
             .withAlpha((.5 * 255).round()),
+      );
+    }
+
+    if (values.day.isSameDay(DateTime.now())) {
+      bgColor = Theme.of(context).colorScheme.tertiaryContainer;
+      txtStyle = (Theme.of(context).textTheme.bodyLarge)!.copyWith(
+        color: Theme.of(context).colorScheme.onTertiaryContainer,
       );
     }
 

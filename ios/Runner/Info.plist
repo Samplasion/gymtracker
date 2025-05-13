@@ -22,10 +22,29 @@
 	<string>$(FLUTTER_BUILD_NAME)</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLName</key>
+			<string></string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>gymtracker</string>
+			</array>
+		</dict>
+	</array>
 	<key>CFBundleVersion</key>
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NSCameraUsageDescription</key>
+	<string>We use the camera to enable you to scan barcodes for product identification.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>We use the camera to enable you to scan barcodes for product identification.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>We access your photos to let you scan barcodes for product identification.</string>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
 	<key>UIBackgroundModes</key>
@@ -51,24 +70,5 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
-	<key>CFBundleURLTypes</key>
-	<array>
-		<dict>
-			<key>CFBundleTypeRole</key>
-			<string>Editor</string>
-			<key>CFBundleURLName</key>
-			<string></string>
-			<key>CFBundleURLSchemes</key>
-			<array>
-				<string>gymtracker</string>
-			</array>
-		</dict>
-	</array>
-	<key>NSCameraUsageDescription</key>
-	<string>We use the camera to enable you to scan barcodes for product identification.</string>
-	<key>NSMicrophoneUsageDescription</key>
-	<string>We use the camera to enable you to scan barcodes for product identification.</string>
-	<key>NSPhotoLibraryUsageDescription</key>
-	<string>We access your photos to let you scan barcodes for product identification.</string>
 </dict>
 </plist>

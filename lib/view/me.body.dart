@@ -378,9 +378,11 @@ class WeightMeasurementDataDetailsPage extends StatelessWidget {
               title: Text("actions.edit".t),
               trailing: const Icon(GTIcons.lt_chevron),
               onTap: () async {
-                var newMeasurement =
-                    await Go.showBottomModalScreen<(WeightMeasurement, Null)>(
-                        (context, controller) {
+                var newMeasurement = await Go.showBottomModalScreen<
+                    (
+                      WeightMeasurement,
+                      List<BodyMeasurement>?
+                    )>((context, controller) {
                   return WeightMeasurementAddSheet(
                     controller: controller,
                     baseWeight: measurement,
@@ -469,7 +471,10 @@ class BodyMeasurementDataDetailsPage extends StatelessWidget {
                   trailing: const Icon(GTIcons.lt_chevron),
                   onTap: () async {
                     var newMeasurement = await Go.showBottomModalScreen<
-                        (Null, List<BodyMeasurement>)>((context, controller) {
+                        (
+                          WeightMeasurement?,
+                          List<BodyMeasurement>
+                        )>((context, controller) {
                       return WeightMeasurementAddSheet(
                         controller: controller,
                         baseBody: measurement,

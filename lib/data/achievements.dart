@@ -842,7 +842,7 @@ Map<String, Achievement> get achievements => {
             progressMax: () => 168,
             progressText: (value) => "time.justHours".plural(value),
             checkCompletion: (_) {
-              const trigger = Duration(hours: 168);
+              const trigger = Duration(hours: 24);
 
               // Work out...
               final history = Get.find<HistoryController>().history;

@@ -163,12 +163,18 @@ class _FoodViewState extends ControlledState<FoodView, FoodController> {
                                   children: [
                                     Expanded(
                                         child: getCalorieGauge(true, false)),
-                                    SizedBox(
-                                      width: 256,
-                                      child: Column(
-                                        children: goals.separated(
-                                            separatorBuilder: (_) =>
-                                                const SizedBox(height: 16)),
+                                    Card(
+                                      child: SizedBox(
+                                        width: 256,
+                                        child: Column(
+                                          children: goals.separated(
+                                              separatorBuilder: (_) => Divider(
+                                                    color: context
+                                                        .theme
+                                                        .colorScheme
+                                                        .outlineVariant,
+                                                  )),
+                                        ),
                                       ),
                                     ),
                                     const SizedBox(width: 16),
@@ -187,17 +193,40 @@ class _FoodViewState extends ControlledState<FoodView, FoodController> {
                                   child: SafeArea(
                                     top: false,
                                     bottom: false,
-                                    child: SpeedDial(
-                                      spacing: 8,
-                                      crossAxisCountBuilder: (breakpoint) =>
-                                          switch (breakpoint) {
-                                        Breakpoints.xxs => 1,
-                                        _ => 3,
-                                      },
-                                      buttonHeight: (_) =>
-                                          kSpeedDialButtonHeight * 1.8,
-                                      buttons: goals,
-                                    ),
+                                    child: LayoutBuilder(
+                                        builder: (context, constraints) {
+                                      final breakpoint =
+                                          Breakpoints.currentBreakpoint;
+                                      final actualGoals = goals
+                                          .map((goal) => SizedBox(
+                                                width: constraints.maxWidth /
+                                                    (goals.length + 0.5),
+                                                child: goal,
+                                              ))
+                                          .toList();
+                                      return Card(
+                                          margin: EdgeInsets.zero,
+                                          child: SizedBox(
+                                            child: breakpoint == Breakpoints.xxs
+                                                ? Column(
+                                                    children: goals.separated(
+                                                        separatorBuilder: (_) =>
+                                                            Divider(
+                                                              color: context
+                                                                  .theme
+                                                                  .colorScheme
+                                                                  .outlineVariant,
+                                                            )))
+                                                : Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .spaceEvenly,
+                                                    children: actualGoals.separated(
+                                                        separatorBuilder: (_) =>
+                                                            const _FauxVerticalDivider()),
+                                                  ),
+                                          ));
+                                    }),
                                   ),
                                 ),
                               ],
@@ -403,6 +432,31 @@ class _FoodViewState extends ControlledState<FoodView, FoodController> {
       keyboardType: TextInputType.text,
       viewFloatingActionButton: _AddCustomFoodFAB(
         closeView: () => Get.back(),
+      ),
+    );
+  }
+}
+
+class _FauxVerticalDivider extends StatelessWidget {
+  const _FauxVerticalDivider({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: 1,
+      height: 48,
+      child: Center(
+        child: Container(
+          width: 1,
+          decoration: BoxDecoration(
+            border: Border.all(
+              color: context.theme.colorScheme.outlineVariant,
+              width: 1,
+            ),
+          ),
+        ),
       ),
     );
   }
@@ -890,48 +944,46 @@ class FoodNutritionalSingleGoalSDButton extends StatelessWidget {
         decimalDigits: 0,
         locale: Get.locale?.languageCode,
       ).format(value / goal),
-      child: CustomSpeedDialButton(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 8),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              Text(
-                text,
-                style: Theme.of(context).textTheme.labelMedium,
-                textAlign: TextAlign.center,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 8),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            Text(
+              text,
+              style: Theme.of(context).textTheme.labelMedium,
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 8),
+            Text(
+              "${value.round()} / ${goal.round()} ${NutritionUnit.G.t}",
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 12),
+            Skeleton.leaf(
+              child: TweenedDoubleBuilder(
+                curve: Curves.elasticOut,
+                duration: const Duration(seconds: 2),
+                value: value,
+                builder: (context, value) {
+                  final sdc = SpeedDialConfiguration.maybeOf(context);
+                  final hzPadding = sdc == null
+                      ? 8.0
+                      : sdc.crossAxisCount == 1
+                          ? 8.0
+                          : 0.0;
+                  return Padding(
+                    padding: EdgeInsets.symmetric(horizontal: hzPadding),
+                    child: LinearProgressIndicator(
+                      borderRadius: BorderRadius.circular(8),
+                      value: value / goal,
+                      minHeight: 8,
+                    ),
+                  );
+                },
               ),
-              const SizedBox(height: 8),
-              Text(
-                "${value.round()} / ${goal.round()} ${NutritionUnit.G.t}",
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 12),
-              Skeleton.leaf(
-                child: TweenedDoubleBuilder(
-                  curve: Curves.elasticOut,
-                  duration: const Duration(seconds: 2),
-                  value: value,
-                  builder: (context, value) {
-                    final sdc = SpeedDialConfiguration.maybeOf(context);
-                    final hzPadding = sdc == null
-                        ? 8.0
-                        : sdc.crossAxisCount == 1
-                            ? 8.0
-                            : 0.0;
-                    return Padding(
-                      padding: EdgeInsets.symmetric(horizontal: hzPadding),
-                      child: LinearProgressIndicator(
-                        borderRadius: BorderRadius.circular(8),
-                        value: value / goal,
-                        minHeight: 8,
-                      ),
-                    );
-                  },
-                ),
-              )
-            ],
-          ),
+            )
+          ],
         ),
       ),
     );

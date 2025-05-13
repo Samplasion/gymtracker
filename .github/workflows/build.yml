@@ -67,9 +67,7 @@ jobs:
     strategy:
       matrix:
         # a = apk, b = bundle
-        # flag: [a, b]
-        # Temporarily disable bundle build
-        flag: [a]
+        flag: [a, b]
     env:
       SEGMENT_DOWNLOAD_TIMEOUT_MINS: '5'
     steps:

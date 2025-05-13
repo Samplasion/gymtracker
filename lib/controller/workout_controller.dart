@@ -159,17 +159,19 @@ class WorkoutController extends GetxController with ServiceableController {
             final ex = await Go.to<List<Exercise>>(
                 () => const ExercisePicker(singlePick: true));
             if (ex == null || ex.isEmpty) return;
-            final newExercise = old is Exercise
-                ? Exercise.replaced(
-                    from: old,
-                    to: ex.first.makeChild(),
-                  )
-                : ex.first.makeChild().copyWith(sets: [
-                    if (!ex.first.parameters.isSetless)
-                      GTSet.empty(
-                          kind: GTSetKind.normal,
-                          parameters: ex.first.parameters),
-                  ]);
+            final newExercise = (old is Exercise
+                    ? Exercise.replaced(
+                        from: old,
+                        to: ex.first.makeChild(),
+                      )
+                    : ex.first.makeChild().copyWith(sets: [
+                        if (!ex.first.parameters.isSetless)
+                          GTSet.empty(
+                              kind: GTSetKind.normal,
+                              parameters: ex.first.parameters),
+                      ]))
+                .copyWith
+                .supersedesID(old.supersedesID);
             if (supersetIndex == null) {
               exercises[i] = newExercise;
             } else {

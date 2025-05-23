@@ -50,7 +50,7 @@ class ExercisePicker extends StatefulWidget {
 class _ExercisePickerState extends State<ExercisePicker> {
   ExercisesController get controller => Get.put(ExercisesController());
 
-  Set<Exercise> selectedExercises = {};
+  Map<String, Exercise> selectedExercises = {};
 
   Set<GTGymEquipment> equipmentFilter = GTGymEquipment.values.toSet();
   bool _showFilterRow = false;
@@ -169,16 +169,16 @@ class _ExercisePickerState extends State<ExercisePicker> {
                         selectedExercises: selectedExercises,
                         onSelected: (exercise) {
                           final isSelected =
-                              selectedExercises.contains(exercise);
+                              selectedExercises.containsKey(exercise.id);
                           isSelected.logger.d("outer picker");
                           setState(() {
                             if (isSelected) {
-                              selectedExercises.remove(exercise);
+                              selectedExercises.remove(exercise.id);
                             } else {
                               if (widget.singlePick) {
-                                selectedExercises = {exercise};
+                                selectedExercises = {exercise.id: exercise};
                               } else {
-                                selectedExercises.add(exercise);
+                                selectedExercises[exercise.id] = exercise;
                               }
                             }
                             badges = computeBadges();
@@ -276,7 +276,8 @@ class _ExercisePickerState extends State<ExercisePicker> {
       return;
     }
     ScaffoldMessenger.of(context).clearSnackBars();
-    final List<Exercise> exercises = selectedExercises.map((e) => e).toList();
+    final List<Exercise> exercises =
+        selectedExercises.entries.map((e) => e.value).toList();
     Get.back(result: exercises, closeOverlays: true);
   }
 
@@ -286,11 +287,11 @@ class _ExercisePickerState extends State<ExercisePicker> {
       for (final category in exercises.entries)
         category.key: (
           isLabelVisible: category.value.exercises
-              .any((e) => selectedExercises.contains(e)),
+              .any((e) => selectedExercises.containsKey(e.id)),
           label: widget.singlePick
               ? null
               : Text(category.value.exercises
-                  .where((e) => selectedExercises.contains(e))
+                  .where((e) => selectedExercises.containsKey(e.id))
                   .length
                   .toString())
         )
@@ -321,16 +322,16 @@ class _ExercisePickerState extends State<ExercisePicker> {
                 final ex = results[index];
                 return ExerciseListTile(
                   exercise: ex,
-                  selected: selectedExercises.contains(ex),
+                  selected: selectedExercises.containsKey(ex.id),
                   isConcrete: false,
                   onTap: () {
                     setState(() {
-                      if (selectedExercises.contains(ex)) {
-                        selectedExercises.remove(ex);
+                      if (selectedExercises.containsKey(ex.id)) {
+                        selectedExercises.remove(ex.id);
                       } else if (widget.singlePick) {
-                        selectedExercises = {ex};
+                        selectedExercises = {ex.id: ex};
                       } else {
-                        selectedExercises.add(ex);
+                        selectedExercises[ex.id] = ex;
                       }
                       badges = computeBadges();
                     });
@@ -382,7 +383,7 @@ class LibraryPickerExercisesView extends StatefulWidget {
   final ValueChanged<Exercise> onSelected;
   final bool singleSelection;
   final VoidCallback onSubmit;
-  final Set<Exercise> selectedExercises;
+  final Map<String, Exercise> selectedExercises;
 
   @override
   State<LibraryPickerExercisesView> createState() =>
@@ -409,9 +410,10 @@ class _LibraryPickerExercisesViewState
       body: ListView.builder(
         itemCount: widget.category.exercises.length,
         itemBuilder: (context, index) {
+          print((sorted[index], sorted[index].id));
           return ExerciseListTile(
             exercise: sorted[index],
-            selected: widget.selectedExercises.contains(sorted[index]),
+            selected: widget.selectedExercises.containsKey(sorted[index].id),
             isConcrete: false,
             onTap: () {
               setState(() {

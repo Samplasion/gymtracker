@@ -322,6 +322,7 @@ const _$GTExerciseMuscleCategoryEnumMap = {
   GTExerciseMuscleCategory.triceps: 'triceps',
   GTExerciseMuscleCategory.hips: 'hips',
   GTExerciseMuscleCategory.forearms: 'forearms',
+  GTExerciseMuscleCategory.glutes: 'glutes',
   GTExerciseMuscleCategory.custom: 'custom',
   GTExerciseMuscleCategory.other: 'other',
 };

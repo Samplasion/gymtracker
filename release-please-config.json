@@ -1,0 +1,9 @@
+{
+  "release-type": "dart",
+  "include-component-in-tag": false,
+  "packages": {
+    ".": {
+      "package-name": "Gym Bro"
+    }
+  }
+}

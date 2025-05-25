@@ -63,18 +63,19 @@ cleanup() {
     echo "🗑  Removing previous releases..."
     rm -rf $CUR/out/ios/*
     rm -rf $CUR/out/ios/**/*
-
-    echo "🌐 Generating payload..."
-    mkdir -p $CUR/out/ios/Payload/Runner.app
 }
 
 copy() {
+    # echo "🌐 Generating payload..."
+    # mkdir -p $CUR/out/ios/Payload/Runner.app
+    # echo "📑 Copying output files from their directory to our organized directory..."
+    # cp -r $CUR/build/ios/archive/Runner.xcarchive/Products/Applications/Runner.app/* $CUR/out/ios/Payload/Runner.app
+    # cd $CUR/out/ios
+    # zip -r $name-ios-$VER+$NOW-$flavor.ipa Payload
+    # rm -rf Payload
+    # cd -
     echo "📑 Copying output files from their directory to our organized directory..."
-    cp -r $CUR/build/ios/archive/Runner.xcarchive/Products/Applications/Runner.app/* $CUR/out/ios/Payload/Runner.app
-    cd $CUR/out/ios
-    zip -r $name-ios-$VER+$NOW-$flavor.ipa Payload
-    rm -rf Payload
-    cd -
+    cp -r $CUR/build/ios/ipa/*.ipa $CUR/out/ios/$name-ios-$VER+$NOW-$flavor.ipa || true
 }
 
 eval $run

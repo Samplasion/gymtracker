@@ -1550,7 +1550,11 @@
       "title": "Add custom"
     },
     "search": {
-      "title": "Search results"
+      "title": "Search results",
+      "error": {
+        "serverError": "The OpenFoodFacts server has not provided a response. Please try again later.",
+        "generic": "An error has occurred while communicating with the OpenFoodFacts server. Please try again."
+      }
     },
     "barcodeReader": {
       "title": "Scan barcode",

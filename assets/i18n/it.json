@@ -1544,7 +1544,11 @@
       "title": "Aggiungi personalizzato"
     },
     "search": {
-      "title": "Risultati"
+      "title": "Risultati",
+      "error": {
+        "serverError": "Il server OpenFoodFacts non ha fornito una risposta. Riprova più tardi.",
+        "generic": "Si è verificato un errore durante la comunicazione con il server OpenFoodFacts. Riprova più tardi."
+      }
     },
     "barcodeReader": {
       "title": "Scansiona codice a barre",

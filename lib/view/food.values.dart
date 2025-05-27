@@ -1176,6 +1176,19 @@ class SearchResultsView extends ControlledWidget<FoodController> {
         builder: (context, snapshot) {
           final isLoading = snapshot.connectionState == ConnectionState.waiting;
 
+          if (snapshot.hasError) {
+            return Center(
+              child: Text(
+                snapshot.error is DioException &&
+                        (snapshot.error as DioException).type ==
+                            DioExceptionType.badResponse
+                    ? "food.search.error.serverError".t
+                    : "food.search.error.generic".t,
+                style: Theme.of(context).textTheme.bodyLarge,
+              ),
+            );
+          }
+
           final foods = !isLoading && snapshot.hasData
               ? snapshot.data!
               : skeletonFoods(20).cast<VagueFood>();

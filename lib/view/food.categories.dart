@@ -544,7 +544,7 @@ class FoodCategoryFoodsView extends ControlledWidget<FoodController> {
         ),
       ],
       onSubmitted: (query) {
-        controller.showSearchResultsView(query);
+        controller.showSearchResultsView(query, category: category);
       },
       textCapitalization: TextCapitalization.sentences,
       textInputAction: TextInputAction.search,

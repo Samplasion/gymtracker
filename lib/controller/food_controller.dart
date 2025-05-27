@@ -226,17 +226,6 @@ class FoodController extends GetxController with ServiceableController {
     final completer = Completer<List<VagueFood>>();
     final terms = [/* query, */ ...query.split(" ")];
     logger.d("Initiating OFF search for $query with terms $terms");
-    // final result = await OpenFoodAPIClient.searchProducts(
-    //   null,
-    //   ProductSearchQueryConfiguration(
-    //     language: OpenFoodFactsLanguage./* ... */,
-    //     country: OpenFoodFactsCountry./* ... */,
-    //     parametersList: [
-    //       SearchTerms(terms: terms),
-    //     ],
-    //     version: ProductQueryVersion.v3,
-    //   ),
-    // );
     final result = await searchOFF(query);
     final foods = (result.products ?? []).map(_offFoodToGTFood).toList();
     logger.d("Found ${foods.length} foods for $query");

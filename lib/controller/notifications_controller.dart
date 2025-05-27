@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get/get.dart';
 import 'package:gymtracker/icons/gymtracker_icons.dart';
@@ -121,7 +122,18 @@ class NotificationController extends GetxController implements Listenable {
   requestPermission() async {
     if (hasPermission) return;
 
-    await Permission.notification.request().then((status) => status.isGranted);
+    try {
+      await Permission.notification
+          .request()
+          .then((status) => status.isGranted);
+    } on PlatformException catch (e) {
+      if (e.code == "ERROR_ALREADY_REQUESTING_PERMISSIONS") {
+        logger.i("Permission already being requested.", error: e);
+        return;
+      }
+
+      rethrow;
+    }
 
     hasPermission = await _getHasPermission();
 

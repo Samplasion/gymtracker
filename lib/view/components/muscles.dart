@@ -118,6 +118,7 @@ class _MusclesViewState extends State<MusclesView> {
 
   @override
   Widget build(BuildContext context) {
+    return Container();
     return FutureBuilder<(String, String)>(
       future: _svgFuture,
       builder: (context, snapshot) {

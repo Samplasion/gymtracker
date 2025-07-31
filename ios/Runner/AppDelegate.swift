@@ -2,12 +2,14 @@ import UIKit
 import Flutter
 import flutter_local_notifications
 import WatchConnectivity
+import ActivityKit
+import GymBroWidgetsExtension
 
 @main
 @objc class AppDelegate: FlutterAppDelegate {
     var session: WCSession?
-    var flutterWatchApi: GymWatchFlutterAPI?
-    var applicationContext: [String: Any] = [:]
+    var flutterNativeApi: GymBroNativeFlutterAPI?
+    var applicationContext: TypedApplicationContext = TypedApplicationContext(isRunning: false, hasExercise: false, percentageDone: 0)
     
     override func application(
         _ application: UIApplication,
@@ -24,21 +26,129 @@ import WatchConnectivity
         
         GeneratedPluginRegistrant.register(with: self)
         
+        // Init communication channel with Flutter
+        let controller = window?.rootViewController as! FlutterViewController
+        let api: GymBroNativeHostAPI = GymBroNativeHostAPIImpl(controller: controller, didUpdateApplicationContext: { ctx in
+            self.applicationContext = ctx
+            if ctx.isRunning && !self.getHasLiveActivity() {
+                self.startLiveActivity()
+            } else if !ctx.isRunning {
+                self.stopLiveActivity()
+            }
+            self.updateLiveActivity()
+        })
+        
+        GymBroNativeHostAPISetup.setUp(binaryMessenger: controller.binaryMessenger, api: api)
+        flutterNativeApi = GymBroNativeFlutterAPI(binaryMessenger: controller.binaryMessenger)
+        
         if WCSession.isSupported() {
             session = WCSession.default
             session?.delegate = self
             session?.activate()
             
-            let controller = window?.rootViewController as! FlutterViewController
-            let api: GymWatchHostAPI = GymWatchHostAPIImpl(session: session!, controller: controller, didUpdateApplicationContext: { ctx in
-                self.applicationContext = ctx
-            })
-            
-            GymWatchHostAPISetup.setUp(binaryMessenger: controller.binaryMessenger, api: api)
-            flutterWatchApi = GymWatchFlutterAPI(binaryMessenger: controller.binaryMessenger)
+            (api as! GymBroNativeHostAPIImpl).setSession(session!)
         }
         
         return super.application(application, didFinishLaunchingWithOptions: launchOptions)
+    }
+    
+    // MARK: live activity functions
+    
+    func getHasLiveActivity() -> Bool {
+        return ActivityAuthorizationInfo().areActivitiesEnabled && !Activity<GymBroWidgetsAttributes>.activities.isEmpty
+    }
+        
+    func startLiveActivity() {
+        if #available(iOS 16.1, *) {
+            if ActivityAuthorizationInfo().areActivitiesEnabled {
+                do {
+                    let attributes = GymBroWidgetsAttributes()
+                    
+                    let initialState = GymBroWidgetsAttributes.ContentState(
+                        hasExercise: applicationContext.hasExercise,
+                        exerciseName: applicationContext.exerciseName,
+                        exerciseColor: applicationContext.exerciseColor,
+                        exerciseParameters: applicationContext.exerciseParameters,
+                        restTimeEnd: nil,
+                        start: applicationContext.startingTime,
+                        percentageDone: applicationContext.percentageDone
+                    )
+                    
+                    let activity = try Activity.request(
+                        attributes: attributes,
+                        contentState: initialState
+                    )
+                    
+                } catch {
+                    let errorMessage = """
+                        Couldn't start activity
+                        ------------------------
+                        \(String(describing: error))
+                        """
+                    print(errorMessage)
+                }
+            } else {
+                print("Live Activities are not enabled.")
+            }
+        } else {
+            print("Unsupported iOS version. Live Activities are only available on iOS 16.1 and later.")
+        }
+    }
+    
+    
+    func updateLiveActivity() {
+        guard let activity = Activity<GymBroWidgetsAttributes>.activities.first else {
+            print("There is no active live activity to update.")
+            return
+        }
+        
+        let contentState = GymBroWidgetsAttributes.ContentState(
+            hasExercise: applicationContext.hasExercise,
+            exerciseName: applicationContext.exerciseName,
+            exerciseColor: applicationContext.exerciseColor,
+            exerciseParameters: applicationContext.exerciseParameters,
+            restTimeStart: applicationContext.restTimeStart,
+            restTimeEnd: applicationContext.restTimeEnd,
+            start: applicationContext.startingTime,
+            percentageDone: applicationContext.percentageDone
+        )
+        
+        Task {
+            if #available(iOS 16.2, *) {
+                await activity.update(
+                    ActivityContent<GymBroWidgetsAttributes.ContentState>(
+                        state: contentState,
+                        staleDate: Date.now + 12 * 3600 // Content expires in 12 hours
+                    )
+                )
+            } else {
+                await activity.update(using: contentState)
+            }
+            print("Live Activity updated!")
+        }
+    }
+    
+    
+    func stopLiveActivity() {
+        guard let activity = Activity<GymBroWidgetsAttributes>.activities.first else {
+            print("No active Live Activity found.")
+            return
+        }
+        
+        Task {
+            let state = GymBroWidgetsAttributes.ContentState(
+                hasExercise: false,
+                start: applicationContext.startingTime,
+                percentageDone: 0
+            )
+            if #available(iOS 16.2, *) {
+                await activity.end(ActivityContent(state: state, staleDate: nil), dismissalPolicy: .immediate)
+            } else {
+                await activity.end(using: state, dismissalPolicy: .immediate)
+            }
+            print("Live Activity ended successfully.")
+            
+        }
     }
 }
 
@@ -50,7 +160,7 @@ extension AppDelegate: WCSessionDelegate {
         }
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 5.0) {
-            self.flutterWatchApi?.requestTrainingData(completion: { result in
+            self.flutterNativeApi?.requestTrainingData(completion: { result in
                 switch result {
                 case .success(_): break
                 case .failure(let error):
@@ -62,7 +172,7 @@ extension AppDelegate: WCSessionDelegate {
         print("Activated session with activationState: \(activationState)")
         // Request fresh data from the app
         do {
-            try session.updateApplicationContext(applicationContext)
+            try session.updateApplicationContext(applicationContext.toDictionary())
         } catch {
             print("Error updating application context: \(error)")
         }
@@ -77,7 +187,7 @@ extension AppDelegate: WCSessionDelegate {
             guard let method = message["method"] as? String else { return }
             
             if method == "markThisSetAsDone" {
-                self.flutterWatchApi?.markThisSetAsDone(completion: { result in
+                self.flutterNativeApi?.markThisSetAsDone(completion: { result in
                     switch result {
                     case .success(): break
                     case .failure(let error):
@@ -85,7 +195,7 @@ extension AppDelegate: WCSessionDelegate {
                     }
                 })
             } else if method == "requestTrainingData" {
-                self.flutterWatchApi?.requestTrainingData(completion: { result in
+                self.flutterNativeApi?.requestTrainingData(completion: { result in
                     switch result {
                     case .success(_): break
                     case .failure(let error):
@@ -99,43 +209,88 @@ extension AppDelegate: WCSessionDelegate {
     }
 }
 
-private class GymWatchHostAPIImpl: GymWatchHostAPI {
-    let session: WCSession
+struct TypedApplicationContext {
+    var isRunning: Bool
+    var hasExercise: Bool
+    var exerciseName: String?
+    var exerciseColor: Int64?
+    var exerciseParameters: String?
+    var startingTime: Date = Date()
+    var restTimeStart: Date?
+    var restTimeEnd: Date?
+    var percentageDone: Double
+    
+    func toDictionary() -> [String: Any] {
+        if isRunning {
+            return [
+                "value": true,
+                "hasExercise": hasExercise,
+                "exerciseName": exerciseName as Any,
+                "exerciseColor": exerciseColor as Any,
+                "exerciseParameters": exerciseParameters as Any,
+                "startingTime": startingTime as Any,
+                "restTimeStart": restTimeStart as Any,
+                "restTimeEnd": restTimeEnd as Any,
+                "percentageDone": percentageDone as Any
+            ]
+        } else {
+            return [
+                "value": false
+            ]
+        }
+    }
+}
+
+private class GymBroNativeHostAPIImpl: GymBroNativeHostAPI {
+    var session: WCSession?
     let controller: UIViewController
-    let didUpdateApplicationContext: ([String: Any]) -> Void
+    let didUpdateApplicationContext: (TypedApplicationContext) -> Void
     
-    var applicationContext: [String: Any] = [
-        "value": false,
-    ]
+    var applicationContext: TypedApplicationContext = TypedApplicationContext(isRunning: false, hasExercise: false, percentageDone: 0)
     
-    init(session: WCSession, controller: UIViewController, didUpdateApplicationContext: @escaping ([String: Any]) -> Void) {
-        self.session = session
+    init(controller: UIViewController, didUpdateApplicationContext: @escaping (TypedApplicationContext) -> Void) {
         self.controller = controller
         self.didUpdateApplicationContext = didUpdateApplicationContext
     }
     
+    func startWorkout() throws {
+        return try setIsWorkoutRunning(isWorkoutRunning: true)
+    }
+    
+    func stopWorkout() throws {
+        return try setIsWorkoutRunning(isWorkoutRunning: false)
+    }
+    
     func setIsWorkoutRunning(isWorkoutRunning: Bool) throws {
-        applicationContext["value"] = isWorkoutRunning
-        session.sendMessage(["method": "setIsWorkoutRunning", "value": isWorkoutRunning], replyHandler: nil)
+        applicationContext.isRunning = isWorkoutRunning
+        session?.sendMessage(["method": "setIsWorkoutRunning", "value": isWorkoutRunning], replyHandler: nil)
         
         didUpdateApplicationContext(applicationContext)
     }
     
-    func setExerciseParameters(hasExercise: Bool, exerciseName: String, exerciseColor: Int64, exerciseParameters: String) throws {
-        applicationContext.merge([
-            "hasExercise": hasExercise,
-            "exerciseName": exerciseName,
-            "exerciseColor": exerciseColor,
-            "exerciseParameters": exerciseParameters
-        ], uniquingKeysWith: { old, new in new })
-        session.sendMessage([
+    func setExerciseParameters(parameters: [String?: Any?]) throws {
+        let decoded = NativeWorkoutStateMessage.decodeWorkoutState(from: parameters)!
+        
+        applicationContext.hasExercise = decoded.hasExercise
+        applicationContext.exerciseName = decoded.exerciseName
+        applicationContext.exerciseColor = decoded.exerciseColor
+        applicationContext.exerciseParameters = decoded.exerciseParameters
+        applicationContext.startingTime = decoded.startingTime
+        applicationContext.restTimeStart = decoded.restTimeStart
+        applicationContext.restTimeEnd = decoded.restTimeEnd
+        applicationContext.percentageDone = decoded.percentageDone
+        session?.sendMessage([
             "method": "setExerciseParameters",
-            "hasExercise": hasExercise,
-            "exerciseName": exerciseName,
-            "exerciseColor": exerciseColor,
-            "exerciseParameters": exerciseParameters
+            "hasExercise": decoded.hasExercise,
+            "exerciseName": decoded.exerciseName,
+            "exerciseColor": decoded.exerciseColor,
+            "exerciseParameters": decoded.exerciseParameters
         ], replyHandler: nil)
         
         didUpdateApplicationContext(applicationContext)
+    }
+    
+    func setSession(_ session: WCSession) {
+        self.session = session
     }
 }

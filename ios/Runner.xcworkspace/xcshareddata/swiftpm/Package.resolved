@@ -1,0 +1,15 @@
+{
+  "originHash" : "0048e09a20eccc46f7f1831d9b3dd4a2bca0087f3c0f9a3d07a3a47c84ef127d",
+  "pins" : [
+    {
+      "identity" : "contrastkit",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/markbattistella/ContrastKit",
+      "state" : {
+        "revision" : "9d88652723f702167ec8a6d1bdcc8801cfed5ed8",
+        "version" : "1.0.2"
+      }
+    }
+  ],
+  "version" : 3
+}

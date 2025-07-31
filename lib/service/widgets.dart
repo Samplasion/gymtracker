@@ -3,8 +3,8 @@ import 'dart:io';
 import 'package:gymtracker/service/logger.dart';
 import 'package:home_widget/home_widget.dart';
 
-const String appGroupId = 'group.gymtrackerwidget';
-const String iOSWidgetName = 'Widgets';
+const String appGroupId = 'group.samplasion.gymtracker';
+const String iOSWidgetName = 'GymBroWidgets';
 const String androidWidgetName = 'org.js.samplasion.gymtracker.StreakWidget';
 
 final isSupported = Platform.isIOS || Platform.isAndroid;

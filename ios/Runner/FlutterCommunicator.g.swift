@@ -89,42 +89,51 @@ class FlutterCommunicatorPigeonCodec: FlutterStandardMessageCodec, @unchecked Se
 }
 
 /// Generated protocol from Pigeon that represents a handler of messages from Flutter.
-protocol GymWatchHostAPI {
-  func setIsWorkoutRunning(isWorkoutRunning: Bool) throws
-  func setExerciseParameters(hasExercise: Bool, exerciseName: String, exerciseColor: Int64, exerciseParameters: String) throws
+protocol GymBroNativeHostAPI {
+  func startWorkout() throws
+  func stopWorkout() throws
+  func setExerciseParameters(parameters: [String?: Any?]) throws
 }
 
 /// Generated setup class from Pigeon to handle messages through the `binaryMessenger`.
-class GymWatchHostAPISetup {
+class GymBroNativeHostAPISetup {
   static var codec: FlutterStandardMessageCodec { FlutterCommunicatorPigeonCodec.shared }
-  /// Sets up an instance of `GymWatchHostAPI` to handle messages through the `binaryMessenger`.
-  static func setUp(binaryMessenger: FlutterBinaryMessenger, api: GymWatchHostAPI?, messageChannelSuffix: String = "") {
+  /// Sets up an instance of `GymBroNativeHostAPI` to handle messages through the `binaryMessenger`.
+  static func setUp(binaryMessenger: FlutterBinaryMessenger, api: GymBroNativeHostAPI?, messageChannelSuffix: String = "") {
     let channelSuffix = messageChannelSuffix.count > 0 ? ".\(messageChannelSuffix)" : ""
-    let setIsWorkoutRunningChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.gymtracker.GymWatchHostAPI.setIsWorkoutRunning\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    let startWorkoutChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.gymtracker.GymBroNativeHostAPI.startWorkout\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
     if let api = api {
-      setIsWorkoutRunningChannel.setMessageHandler { message, reply in
-        let args = message as! [Any?]
-        let isWorkoutRunningArg = args[0] as! Bool
+      startWorkoutChannel.setMessageHandler { _, reply in
         do {
-          try api.setIsWorkoutRunning(isWorkoutRunning: isWorkoutRunningArg)
+          try api.startWorkout()
           reply(wrapResult(nil))
         } catch {
           reply(wrapError(error))
         }
       }
     } else {
-      setIsWorkoutRunningChannel.setMessageHandler(nil)
+      startWorkoutChannel.setMessageHandler(nil)
     }
-    let setExerciseParametersChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.gymtracker.GymWatchHostAPI.setExerciseParameters\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    let stopWorkoutChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.gymtracker.GymBroNativeHostAPI.stopWorkout\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      stopWorkoutChannel.setMessageHandler { _, reply in
+        do {
+          try api.stopWorkout()
+          reply(wrapResult(nil))
+        } catch {
+          reply(wrapError(error))
+        }
+      }
+    } else {
+      stopWorkoutChannel.setMessageHandler(nil)
+    }
+    let setExerciseParametersChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.gymtracker.GymBroNativeHostAPI.setExerciseParameters\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
     if let api = api {
       setExerciseParametersChannel.setMessageHandler { message, reply in
         let args = message as! [Any?]
-        let hasExerciseArg = args[0] as! Bool
-        let exerciseNameArg = args[1] as! String
-        let exerciseColorArg = args[2] as! Int64
-        let exerciseParametersArg = args[3] as! String
+        let parametersArg = args[0] as! [String?: Any?]
         do {
-          try api.setExerciseParameters(hasExercise: hasExerciseArg, exerciseName: exerciseNameArg, exerciseColor: exerciseColorArg, exerciseParameters: exerciseParametersArg)
+          try api.setExerciseParameters(parameters: parametersArg)
           reply(wrapResult(nil))
         } catch {
           reply(wrapError(error))
@@ -136,11 +145,11 @@ class GymWatchHostAPISetup {
   }
 }
 /// Generated protocol from Pigeon that represents Flutter messages that can be called from Swift.
-protocol GymWatchFlutterAPIProtocol {
+protocol GymBroNativeFlutterAPIProtocol {
   func markThisSetAsDone(completion: @escaping (Result<Void, PigeonError>) -> Void)
   func requestTrainingData(completion: @escaping (Result<Void, PigeonError>) -> Void)
 }
-class GymWatchFlutterAPI: GymWatchFlutterAPIProtocol {
+class GymBroNativeFlutterAPI: GymBroNativeFlutterAPIProtocol {
   private let binaryMessenger: FlutterBinaryMessenger
   private let messageChannelSuffix: String
   init(binaryMessenger: FlutterBinaryMessenger, messageChannelSuffix: String = "") {
@@ -151,7 +160,7 @@ class GymWatchFlutterAPI: GymWatchFlutterAPIProtocol {
     return FlutterCommunicatorPigeonCodec.shared
   }
   func markThisSetAsDone(completion: @escaping (Result<Void, PigeonError>) -> Void) {
-    let channelName: String = "dev.flutter.pigeon.gymtracker.GymWatchFlutterAPI.markThisSetAsDone\(messageChannelSuffix)"
+    let channelName: String = "dev.flutter.pigeon.gymtracker.GymBroNativeFlutterAPI.markThisSetAsDone\(messageChannelSuffix)"
     let channel = FlutterBasicMessageChannel(name: channelName, binaryMessenger: binaryMessenger, codec: codec)
     channel.sendMessage(nil) { response in
       guard let listResponse = response as? [Any?] else {
@@ -169,7 +178,7 @@ class GymWatchFlutterAPI: GymWatchFlutterAPIProtocol {
     }
   }
   func requestTrainingData(completion: @escaping (Result<Void, PigeonError>) -> Void) {
-    let channelName: String = "dev.flutter.pigeon.gymtracker.GymWatchFlutterAPI.requestTrainingData\(messageChannelSuffix)"
+    let channelName: String = "dev.flutter.pigeon.gymtracker.GymBroNativeFlutterAPI.requestTrainingData\(messageChannelSuffix)"
     let channel = FlutterBasicMessageChannel(name: channelName, binaryMessenger: binaryMessenger, codec: codec)
     channel.sendMessage(nil) { response in
       guard let listResponse = response as? [Any?] else {

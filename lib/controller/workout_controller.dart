@@ -20,11 +20,13 @@ import 'package:gymtracker/gen/colors.gen.dart';
 import 'package:gymtracker/icons/gymtracker_icons.dart';
 import 'package:gymtracker/model/exercisable.dart';
 import 'package:gymtracker/model/exercise.dart';
+import 'package:gymtracker/model/native.dart';
 import 'package:gymtracker/model/set.dart';
 import 'package:gymtracker/model/superset.dart';
 import 'package:gymtracker/model/workout.dart';
 import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/service/logger.dart';
+import 'package:gymtracker/service/native.dart';
 import 'package:gymtracker/struct/editor_callback.dart';
 import 'package:gymtracker/struct/optional.dart';
 import 'package:gymtracker/struct/stopwatch_extended.dart';
@@ -68,6 +70,22 @@ class WorkoutController extends GetxController with ServiceableController {
       error: Error(),
       stackTrace: StackTrace.current,
     );
+
+    exercises.listen((_) {
+      logger.i("Syncing exercises to native channels");
+      _initFirstSync();
+    });
+  }
+
+  _initFirstSync() {
+    SchedulerBinding.instance.addPostFrameCallback((_) {
+      // Wait for the context to be available
+      if (Get.context == null) {
+        _initFirstSync();
+        return;
+      }
+      refreshWatchData();
+    });
   }
 
   factory WorkoutController.fromSavedData(Map<String, dynamic> data) {
@@ -500,6 +518,7 @@ and:
             }
           }
           exercises.refresh();
+          refreshWatchData();
           save();
         },
         onSetValueChange: (index, setIndex, set) {
@@ -661,7 +680,10 @@ and:
     super.onInit();
     SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
       Get.find<RoutinesController>().hasOngoingWorkout(true);
+      NativeService.instance().setIsWorkoutRunning(true);
       save();
+
+      refreshWatchData();
     });
   }
 
@@ -672,6 +694,7 @@ and:
     removeRelevantStopwatches();
     SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
       Get.find<RoutinesController>().hasOngoingWorkout(false);
+      NativeService.instance().setIsWorkoutRunning(false);
       service.deleteOngoing();
     });
   }
@@ -1273,6 +1296,59 @@ and:
 
     exercises.refresh();
     save();
+
+    refreshWatchData();
+  }
+
+  refreshWatchData() {
+    final ctdctrl = Get.find<CountdownController>();
+    final startingTime = ctdctrl.startingTime.value;
+    final endingTime = ctdctrl.targetTime.value;
+
+    final index = currentExerciseIndex;
+    NativeWorkoutStateMessage message;
+
+    if (index != null) {
+      final (exerciseIndex: exerciseIndex, supersetIndex: supersetIndex) =
+          index;
+      final exercise = supersetIndex == null
+          ? (exercises[exerciseIndex] as Exercise)
+          : (exercises[supersetIndex] as Superset).exercises[exerciseIndex];
+      final name = exercise.displayName;
+      final color = (exercise.standard && exercise.category != null
+          ? exerciseStandardLibrary[exercise.category]?.color ??
+              Get.context?.theme.colorScheme.primary ??
+              Colors.red
+          : Get.context?.theme.colorScheme.primary ?? Colors.red);
+      final set = exercise.sets.firstWhereOrNull((set) => !set.done);
+
+      message = NativeWorkoutStateMessage(
+        hasExercise: set != null,
+        exerciseName: name,
+        exerciseColor: color,
+        exerciseParameters: set?.getHumanReadableDescription(
+                weightUnit: weightUnit.value,
+                distanceUnit: distanceUnit.value) ??
+            "",
+        startingTime: time.value,
+        restTimeStart: startingTime,
+        restTimeEnd: endingTime,
+        percentageDone: progress,
+      );
+    } else {
+      message = NativeWorkoutStateMessage(
+        hasExercise: false,
+        exerciseName: "",
+        exerciseColor: Colors.transparent,
+        exerciseParameters: "",
+        startingTime: time.value,
+        percentageDone: progress,
+      );
+    }
+
+    SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
+      NativeService.instance().setExerciseParameters(message);
+    });
   }
 
   void addSuperset() {

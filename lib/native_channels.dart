@@ -24,3 +24,12 @@ abstract class GymBroNativeFlutterAPI {
   // Called by the native OS to read the app's workout data
   void requestTrainingData();
 }
+
+@FlutterApi()
+abstract class GymBroNativeLoggerChannel {
+  // Called by the native OS to log messages
+  void logMessage(String message);
+
+  // Called by the native OS to log errors
+  void logError(String error);
+}

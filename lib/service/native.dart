@@ -48,13 +48,14 @@ class _UnsupportedNativeService extends NativeService
 
 // ignore: camel_case_types
 class _iOSNativeService extends NativeService
-    implements GymBroNativeFlutterAPI {
+    implements GymBroNativeFlutterAPI, GymBroNativeLoggerChannel {
   final _watch = GymBroNativeHostAPI();
 
   static final _iOSNativeService _instance = _iOSNativeService._internal();
   factory _iOSNativeService() => _instance;
   _iOSNativeService._internal() : super._() {
     GymBroNativeFlutterAPI.setUp(this);
+    GymBroNativeLoggerChannel.setUp(this);
   }
 
   @override
@@ -88,5 +89,15 @@ class _iOSNativeService extends NativeService
       return;
     }
     Get.find<WorkoutController>().refreshWatchData();
+  }
+
+  @override
+  void logMessage(String message) {
+    logger.i("[Native] $message");
+  }
+
+  @override
+  void logError(String error) {
+    logger.e("[Native] $error");
   }
 }

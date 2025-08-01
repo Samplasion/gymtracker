@@ -176,3 +176,65 @@ abstract class GymBroNativeFlutterAPI {
     }
   }
 }
+
+abstract class GymBroNativeLoggerChannel {
+  static const MessageCodec<Object?> pigeonChannelCodec = _PigeonCodec();
+
+  void logMessage(String message);
+
+  void logError(String error);
+
+  static void setUp(GymBroNativeLoggerChannel? api, {BinaryMessenger? binaryMessenger, String messageChannelSuffix = '',}) {
+    messageChannelSuffix = messageChannelSuffix.isNotEmpty ? '.$messageChannelSuffix' : '';
+    {
+      final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
+          'dev.flutter.pigeon.gymtracker.GymBroNativeLoggerChannel.logMessage$messageChannelSuffix', pigeonChannelCodec,
+          binaryMessenger: binaryMessenger);
+      if (api == null) {
+        pigeonVar_channel.setMessageHandler(null);
+      } else {
+        pigeonVar_channel.setMessageHandler((Object? message) async {
+          assert(message != null,
+          'Argument for dev.flutter.pigeon.gymtracker.GymBroNativeLoggerChannel.logMessage was null.');
+          final List<Object?> args = (message as List<Object?>?)!;
+          final String? arg_message = (args[0] as String?);
+          assert(arg_message != null,
+              'Argument for dev.flutter.pigeon.gymtracker.GymBroNativeLoggerChannel.logMessage was null, expected non-null String.');
+          try {
+            api.logMessage(arg_message!);
+            return wrapResponse(empty: true);
+          } on PlatformException catch (e) {
+            return wrapResponse(error: e);
+          }          catch (e) {
+            return wrapResponse(error: PlatformException(code: 'error', message: e.toString()));
+          }
+        });
+      }
+    }
+    {
+      final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
+          'dev.flutter.pigeon.gymtracker.GymBroNativeLoggerChannel.logError$messageChannelSuffix', pigeonChannelCodec,
+          binaryMessenger: binaryMessenger);
+      if (api == null) {
+        pigeonVar_channel.setMessageHandler(null);
+      } else {
+        pigeonVar_channel.setMessageHandler((Object? message) async {
+          assert(message != null,
+          'Argument for dev.flutter.pigeon.gymtracker.GymBroNativeLoggerChannel.logError was null.');
+          final List<Object?> args = (message as List<Object?>?)!;
+          final String? arg_error = (args[0] as String?);
+          assert(arg_error != null,
+              'Argument for dev.flutter.pigeon.gymtracker.GymBroNativeLoggerChannel.logError was null, expected non-null String.');
+          try {
+            api.logError(arg_error!);
+            return wrapResponse(empty: true);
+          } on PlatformException catch (e) {
+            return wrapResponse(error: e);
+          }          catch (e) {
+            return wrapResponse(error: PlatformException(code: 'error', message: e.toString()));
+          }
+        });
+      }
+    }
+  }
+}

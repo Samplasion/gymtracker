@@ -10,6 +10,7 @@ import GymBroWidgetsExtension
     var session: WCSession?
     var flutterNativeApi: GymBroNativeFlutterAPI?
     var applicationContext: TypedApplicationContext = TypedApplicationContext(isRunning: false, hasExercise: false, percentageDone: 0)
+    var logger: FlutterLogger?;
     
     override func application(
         _ application: UIApplication,
@@ -40,6 +41,7 @@ import GymBroWidgetsExtension
         
         GymBroNativeHostAPISetup.setUp(binaryMessenger: controller.binaryMessenger, api: api)
         flutterNativeApi = GymBroNativeFlutterAPI(binaryMessenger: controller.binaryMessenger)
+        logger = FlutterLogger(binaryMessenger: controller.binaryMessenger)
         
         if WCSession.isSupported() {
             session = WCSession.default
@@ -85,20 +87,20 @@ import GymBroWidgetsExtension
                         ------------------------
                         \(String(describing: error))
                         """
-                    print(errorMessage)
+                    logger!.error(errorMessage)
                 }
             } else {
-                print("Live Activities are not enabled.")
+                logger!.error("Live Activities are not enabled.")
             }
         } else {
-            print("Unsupported iOS version. Live Activities are only available on iOS 16.1 and later.")
+            logger!.error("Unsupported iOS version. Live Activities are only available on iOS 16.1 and later.")
         }
     }
     
     
     func updateLiveActivity() {
         guard let activity = Activity<GymBroWidgetsAttributes>.activities.first else {
-            print("There is no active live activity to update.")
+            logger!.log("There is no active live activity to update.")
             return
         }
         
@@ -124,14 +126,14 @@ import GymBroWidgetsExtension
             } else {
                 await activity.update(using: contentState)
             }
-            print("Live Activity updated!")
+            logger!.log("Live Activity updated!")
         }
     }
     
     
     func stopLiveActivity() {
         guard let activity = Activity<GymBroWidgetsAttributes>.activities.first else {
-            print("No active Live Activity found.")
+            logger!.log("No active Live Activity found.")
             return
         }
         
@@ -146,8 +148,7 @@ import GymBroWidgetsExtension
             } else {
                 await activity.end(using: state, dismissalPolicy: .immediate)
             }
-            print("Live Activity ended successfully.")
-            
+            logger!.log("Live Activity ended successfully.")
         }
     }
 }
@@ -155,7 +156,7 @@ import GymBroWidgetsExtension
 extension AppDelegate: WCSessionDelegate {
     func session(_ session: WCSession, activationDidCompleteWith activationState: WCSessionActivationState, error: (any Error)?) {
         if let error = error {
-            print("Error activating session: \(error)")
+            logger!.error("Error activating session: \(error)")
             return
         }
         
@@ -164,17 +165,17 @@ extension AppDelegate: WCSessionDelegate {
                 switch result {
                 case .success(_): break
                 case .failure(let error):
-                    print("Error requesting training data: \(error)")
+                    self.logger!.error("Error requesting training data: \(error)")
                 }
             })
         }
 
-        print("Activated session with activationState: \(activationState)")
+        logger!.log("Activated session with activationState: \(activationState)")
         // Request fresh data from the app
         do {
             try session.updateApplicationContext(applicationContext.toDictionary())
         } catch {
-            print("Error updating application context: \(error)")
+            logger!.error("Error updating application context: \(error)")
         }
     }
     
@@ -191,7 +192,7 @@ extension AppDelegate: WCSessionDelegate {
                     switch result {
                     case .success(): break
                     case .failure(let error):
-                        print("Error marking set as done: \(error)")
+                        self.logger!.error("Error marking set as done: \(error)")
                     }
                 })
             } else if method == "requestTrainingData" {
@@ -199,10 +200,11 @@ extension AppDelegate: WCSessionDelegate {
                     switch result {
                     case .success(_): break
                     case .failure(let error):
-                        print("Error requesting training data: \(error)")
+                        self.logger!.error("Error requesting training data: \(error)")
                     }
                 })
             } else {
+                logger!.error("Received unknown message from watch: \(method)")
                 fatalError("Received unknown message from watch: \(method)")
             }
         }

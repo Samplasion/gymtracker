@@ -1233,19 +1233,24 @@ and:
     return exercises;
   }
 
-  // TODO: Make it so this method returns the set immediately after the last done set
   ({int exerciseIndex, int? supersetIndex})? get currentExerciseIndex {
     int i = 0;
-    int j = 0;
     for (final ex in exercises) {
+      int j = 0;
       if (ex is Exercise) {
         if (ex.sets.any((set) => !set.done)) {
           return (exerciseIndex: i, supersetIndex: null);
         }
         j++;
       } else if (ex is Superset) {
+        final set = ex.getNextSet();
+        if (set == null) {
+          i++;
+          continue;
+        }
+
         for (final e in ex.exercises) {
-          if (e.sets.any((set) => !set.done)) {
+          if (e.sets.any((s) => s.id == set.id)) {
             return (exerciseIndex: j, supersetIndex: i);
           }
           j++;

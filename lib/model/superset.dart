@@ -4,6 +4,7 @@ import 'package:gymtracker/data/weights.dart';
 import 'package:gymtracker/model/exercisable.dart';
 import 'package:gymtracker/model/exercise.dart';
 import 'package:gymtracker/model/set.dart';
+import 'package:gymtracker/utils/extensions.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:uuid/uuid.dart';
 
@@ -71,6 +72,23 @@ class Superset extends WorkoutExercisable {
   Superset clone() => Superset.fromJson(toJson());
 
   void withRegenerateID() => copyWith.id(const Uuid().v4());
+
+  GTSet? getNextSet() {
+    // Get the exercise with the least sets done
+    // If there are multiple, return the first one
+    if (exercises.isEmpty) return null;
+    final exerciseWithLeastSets = exercises.reduce((a, b) {
+      return a.doneSets.length < b.doneSets.length ? a : b;
+    });
+    return exercises
+        .firstWhereOrNull(
+          (ex) => ex.doneSets.length == exerciseWithLeastSets.doneSets.length,
+        )
+        ?.sets
+        .firstWhereOrNull(
+          (set) => !set.done,
+        );
+  }
 
   @override
   Superset changeUnits(

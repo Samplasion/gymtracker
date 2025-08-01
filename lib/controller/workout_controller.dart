@@ -1346,9 +1346,10 @@ and:
       );
     }
 
-    SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
-      NativeService.instance().setExerciseParameters(message);
-    });
+    // TODO: Figure out why this was needed
+    // SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
+    // });
+    NativeService.instance().setExerciseParameters(message);
   }
 
   void addSuperset() {

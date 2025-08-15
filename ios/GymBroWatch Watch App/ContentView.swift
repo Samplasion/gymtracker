@@ -39,25 +39,42 @@ struct ContentView: View {
                 
                 VStack {
                     if (viewModel.hasNextSet) {
+                        Spacer()
                         Text(viewModel.exerciseName)
                             .font(.system(size: 18, weight: .semibold))
                             .multilineTextAlignment(.center)
                         Text(viewModel.exerciseParameters)
                             .font(.system(size: 14, weight: .regular))
                             .multilineTextAlignment(.center)
-                        Image(systemName: "checkmark.circle")
-                            .imageScale(.large)
-                            .foregroundStyle(.tint)
-                            .font(.title)
-                            .padding(EdgeInsets(top: 8, leading: 0, bottom: 0, trailing: 0))
-                            .onTapGesture {
-                                viewModel.markThisSetAsDone()
-                            }
+                        if (viewModel.isLoading) {
+                            ProgressView()
+                                .progressViewStyle(CircularProgressViewStyle())
+                                .imageScale(.large)
+                                .foregroundStyle(.tint)
+                                .font(.title)
+                                .tint(viewModel.exerciseColor.asARGBColor())
+                                .brightness(0.15)
+                        } else {
+                            Image(systemName: "checkmark.circle")
+                                .imageScale(.large)
+                                .foregroundStyle(.tint)
+                                .font(.title)
+                                .padding(EdgeInsets(top: 8, leading: 0, bottom: 0, trailing: 0))
+                                .onTapGesture {
+                                    viewModel.markThisSetAsDone()
+                                }
+                                .tint(viewModel.exerciseColor.asARGBColor())
+                                .brightness(0.15)
+                        }
+                        Spacer()
+                        TimerView(timerEndDate: viewModel.restTimeEnd ?? Date(timeIntervalSinceNow: -60))
                             .tint(viewModel.exerciseColor.asARGBColor())
-                            .brightness(0.15)
                     } else {
                         Text("Well done! Use your iPhone to end the workout.")
                             .multilineTextAlignment(.center)
+                            .padding(EdgeInsets(top: 8, leading: 0, bottom: 0, trailing: 0))
+                        TimerView(timerEndDate: viewModel.restTimeEnd ?? Date() - 60)
+                            .padding(EdgeInsets(top: 8, leading: 0, bottom: 0, trailing: 0))
                     }
                 }
                 .padding()
@@ -66,13 +83,13 @@ struct ContentView: View {
     }
 }
 
-extension Int {
+extension Int64 {
     func asARGBColor() -> Color {
         let b = self & 0xff;
         let g = (self >> 8) & 0xff;
         let r = (self >> 16) & 0xff;
-        let a = (self >> 24) & 0xff;
+//        let a = (self >> 24) & 0xff;
         
-        return Color(red: Double(r) / 255.0, green: Double(g) / 255.0, blue: Double(b) / 255.0, opacity: Double(a) / 255.0)
+        return Color(red: Double(r) / 255.0, green: Double(g) / 255.0, blue: Double(b) / 255.0, opacity: 1)
     }
 }

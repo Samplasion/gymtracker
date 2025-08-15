@@ -46,9 +46,10 @@ import GymBroWidgetsExtension
         if WCSession.isSupported() {
             session = WCSession.default
             session?.delegate = self
-            session?.activate()
             
             (api as! GymBroNativeHostAPIImpl).setSession(session!)
+            
+            session?.activate()
         }
         
         return super.application(application, didFinishLaunchingWithOptions: launchOptions)
@@ -179,23 +180,19 @@ extension AppDelegate: WCSessionDelegate {
         }
     }
     
-    func sessionDidBecomeInactive(_ session: WCSession) {}
+    func sessionDidBecomeInactive(_ session: WCSession) {
+        logger!.log("Watch session became inactive")
+    }
     
-    func sessionDidDeactivate(_ session: WCSession) {}
+    func sessionDidDeactivate(_ session: WCSession) {
+        logger!.log("Watch session deactivated")
+    }
     
     func session(_ session: WCSession, didReceiveMessage message: [String : Any]) {
         Task {
             guard let method = message["method"] as? String else { return }
             
-            if method == "markThisSetAsDone" {
-                self.flutterNativeApi?.markThisSetAsDone(completion: { result in
-                    switch result {
-                    case .success(): break
-                    case .failure(let error):
-                        self.logger!.error("Error marking set as done: \(error)")
-                    }
-                })
-            } else if method == "requestTrainingData" {
+            if method == "requestTrainingData" {
                 self.flutterNativeApi?.requestTrainingData(completion: { result in
                     switch result {
                     case .success(_): break
@@ -203,11 +200,41 @@ extension AppDelegate: WCSessionDelegate {
                         self.logger!.error("Error requesting training data: \(error)")
                     }
                 })
+            } else if method == "log" {
+                if let messageString = message["message"] as? String {
+                    self.logger!.log("[Watch] \(messageString)")
+                } else {
+                    self.logger!.error("Unknown log message from watch")
+                }
             } else {
                 logger!.error("Received unknown message from watch: \(method)")
                 fatalError("Received unknown message from watch: \(method)")
             }
         }
+    }
+    
+    func session(_ session: WCSession, didReceiveMessage message: [String : Any], replyHandler: @escaping ([String : Any]) -> Void) {
+        Task {
+            guard let method = message["method"] as? String else { return }
+            
+            if method == "markThisSetAsDone" {
+                self.flutterNativeApi?.markThisSetAsDone(completion: { result in
+                    switch result {
+                    case .success(): replyHandler(["success": true])
+                    case .failure(let error):
+                        replyHandler(["success": false])
+                        self.logger!.error("Error marking set as done: \(error)")
+                    }
+                })
+            } else {
+                logger!.error("Received unknown message from watch: \(method)")
+                fatalError("Received unknown message from watch: \(method)")
+            }
+        }
+    }
+    
+    func sessionReachabilityDidChange(_ session: WCSession) {
+        logger!.log("Session \(session.hashValue) reachability did change: \(session.activationState)")
     }
 }
 
@@ -283,10 +310,13 @@ private class GymBroNativeHostAPIImpl: GymBroNativeHostAPI {
         applicationContext.percentageDone = decoded.percentageDone
         session?.sendMessage([
             "method": "setExerciseParameters",
+            "value": true,
             "hasExercise": decoded.hasExercise,
             "exerciseName": decoded.exerciseName,
-            "exerciseColor": decoded.exerciseColor,
-            "exerciseParameters": decoded.exerciseParameters
+            "exerciseColor": decoded.exerciseColor.hexString,
+            "exerciseParameters": decoded.exerciseParameters,
+            "restTimeEnd": Int(decoded.restTimeEnd?.timeIntervalSinceReferenceDate ?? 0),
+            "message": try decoded.toJSONString() as Any
         ], replyHandler: nil)
         
         didUpdateApplicationContext(applicationContext)
@@ -294,5 +324,11 @@ private class GymBroNativeHostAPIImpl: GymBroNativeHostAPI {
     
     func setSession(_ session: WCSession) {
         self.session = session
+    }
+}
+
+extension Int64 {
+    var hexString: String {
+        return "#" + String(self, radix: 16).padding(toLength: 8, withPad: "0", startingAt: 0).dropFirst(2)
     }
 }

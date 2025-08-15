@@ -1,6 +1,41 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    " " : {
+      "shouldTranslate" : false
+    },
+    "%@:%@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@:%2$@"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@:%2$@"
+          }
+        }
+      }
+    },
+    "%lld hours, %@:%@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$lldh, %2$@:%3$@"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$lldh, %2$@:%3$@"
+          }
+        }
+      }
+    },
     "Start a workout from your iPhone." : {
       "localizations" : {
         "it" : {

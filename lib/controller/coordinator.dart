@@ -258,4 +258,12 @@ class Coordinator extends GetxController
     service.writeSettings(service.prefs$.value.copyWithOnboardingComplete());
     Go.offWithoutAnimation(() => const SkeletonView());
   }
+
+  void syncNative() {
+    if (Get.isRegistered<WorkoutController>()) {
+      get<WorkoutController>().refreshWatchData();
+    } else {
+      logger.w("No WorkoutController registered, cannot sync native data.");
+    }
+  }
 }

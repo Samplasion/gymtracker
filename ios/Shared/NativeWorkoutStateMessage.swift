@@ -41,6 +41,19 @@ struct NativeWorkoutStateMessage: Codable {
         try container.encodeIfPresent(restTimeEnd?.millisecondsSinceEpoch, forKey: .restTimeEnd)
         try container.encode(percentageDone, forKey: .percentageDone)
     }
+    
+    func toJSON() throws -> [String: Any]? {
+        let data = try JSONEncoder().encode(self)
+        return try JSONSerialization.jsonObject(with: data) as? [String: Any]
+    }
+    
+    func toJSONString() throws -> String? {
+        if let data = try? JSONSerialization.data(withJSONObject: toJSON() as Any),
+           let jsonString = String(data: data, encoding: .utf8) {
+            return jsonString
+        }
+        return nil
+    }
 
     // Decoding
     init(from decoder: Decoder) throws {
@@ -62,6 +75,15 @@ struct NativeWorkoutStateMessage: Codable {
             restTimeEnd = nil
         }
         percentageDone = try container.decode(Double.self, forKey: .percentageDone)
+    }
+    
+    static func decodeWorkoutState(fromString string: String) -> NativeWorkoutStateMessage? {
+        if let data = string.data(using: .utf8),
+           let dict = try? JSONSerialization.jsonObject(with: data) as? [String: Any] {
+            return decodeWorkoutState(from: dict)
+        }
+        
+        return nil
     }
     
     static func decodeWorkoutState(from dictionary: [String?: Any?]) -> NativeWorkoutStateMessage? {

@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:get/get.dart';
+import 'package:gymtracker/controller/coordinator.dart';
 import 'package:gymtracker/controller/notifications_controller.dart';
 import 'package:gymtracker/service/logger.dart';
 
@@ -33,6 +34,8 @@ class CountdownController extends GetxController {
   _onUpdate() {
     timer?.cancel();
     notificationController.cancelRestOverNotification();
+
+    Get.find<Coordinator>().syncNative();
 
     if (targetTime.value != null) {
       timer = Timer(targetTime.value!.difference(DateTime.now()), _onRing);

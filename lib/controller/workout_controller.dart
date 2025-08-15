@@ -425,101 +425,7 @@ class WorkoutController extends GetxController with ServiceableController {
           save();
         },
         onSetSetDone: (index, setIndex, done) {
-          final (exerciseIndex: i, supersetIndex: supersetIndex) = index;
-          final exercise = supersetIndex == null
-              ? (exercises[i] as Exercise)
-              : (exercises[supersetIndex] as Superset).exercises[i];
-
-          if (setIndex < 0) {
-            // setIndex = -1 means "forcefully start the timer",
-            // so just start the timer
-            final superset = supersetIndex == null
-                ? null
-                : (exercises[supersetIndex] as Superset);
-            Get.find<CountdownController>().setCountdown(
-                supersetIndex == null ? exercise.restTime : superset!.restTime);
-
-            return;
-          }
-          final set = exercise.sets[setIndex];
-
-          final newSet = set.copyWith(done: done);
-
-          if (supersetIndex == null) {
-            final ex = exercises[i] as Exercise;
-            exercises[i] = ex.copyWith(
-              sets: [
-                for (int j = 0; j < ex.sets.length; j++)
-                  if (j == setIndex) newSet else ex.sets[j]
-              ],
-            );
-          } else {
-            final superset = exercises[supersetIndex] as Superset;
-            exercises[supersetIndex] = superset.copyWith(exercises: [
-              for (int j = 0; j < superset.exercises.length; j++)
-                if (j == i)
-                  superset.exercises[j].copyWith(
-                    sets: [
-                      for (int k = 0;
-                          k < superset.exercises[j].sets.length;
-                          k++)
-                        if (k == setIndex)
-                          newSet
-                        else
-                          superset.exercises[j].sets[k]
-                    ],
-                  )
-                else
-                  superset.exercises[j]
-            ]);
-          }
-
-          if (done) {
-            final nextSet = exercise.sets.getAt(setIndex + 1);
-            final superset = supersetIndex == null
-                ? null
-                : (exercises[supersetIndex] as Superset);
-
-            bool shouldStart = false;
-            shouldStart |=
-                (supersetIndex == null && exercise.restTime.inSeconds > 0);
-            shouldStart |= supersetIndex != null &&
-                superset!.restTime.inSeconds > 0 &&
-                i == superset.exercises.length - 1;
-
-            if (nextSet != null && nextSet.kind == GTSetKind.failureStripping) {
-              shouldStart = false;
-            }
-
-            // Start a countdown if:
-            // either:
-            //  - This is an exercise
-            //  - This is the last exercise in a superset
-            // and:
-            //  - The rest time is greater than 0
-            // and:
-            //  - The next set is not a stripping set
-            if (shouldStart) {
-              Get.find<CountdownController>().setCountdown(supersetIndex == null
-                  ? exercise.restTime
-                  : superset!.restTime);
-            } else {
-              logger.i("""
-Not starting countdown because the following conditions are not met:
-either:
- - This is an exercise (${supersetIndex == null})
- - This is the last exercise in a superset (${supersetIndex != null && i == (exercises[supersetIndex] as Superset).exercises.length - 1})
-and:
- - The rest time is greater than 0 (${(supersetIndex == null && exercise.restTime.inSeconds > 0) || (supersetIndex != null && (exercises[supersetIndex] as Superset).restTime.inSeconds > 0)})
-and:
- - The next set is not a stripping set (${!(nextSet != null && nextSet.kind == GTSetKind.failureStripping)})
-"""
-                  .trim());
-            }
-          }
-          exercises.refresh();
-          refreshWatchData();
-          save();
+          markSetAsDone(index, setIndex, done);
         },
         onSetValueChange: (index, setIndex, set) {
           final (
@@ -1261,23 +1167,29 @@ and:
     return null;
   }
 
-  void markThisSetAsDone() {
-    final index = currentExerciseIndex;
-    if (index == null) return;
-
-    final (exerciseIndex: exerciseIndex, supersetIndex: supersetIndex) = index;
+  void markSetAsDone(ExerciseIndex index, int setIndex, bool done) {
+    final (exerciseIndex: i, supersetIndex: supersetIndex) = index;
     final exercise = supersetIndex == null
-        ? (exercises[exerciseIndex] as Exercise)
-        : (exercises[supersetIndex] as Superset).exercises[exerciseIndex];
-    final setIndex = exercise.sets.indexWhere((set) => !set.done);
-    if (setIndex == -1) return;
+        ? (exercises[i] as Exercise)
+        : (exercises[supersetIndex] as Superset).exercises[i];
 
+    if (setIndex < 0) {
+      // setIndex = -1 means "forcefully start the timer",
+      // so just start the timer
+      final superset =
+          supersetIndex == null ? null : (exercises[supersetIndex] as Superset);
+      Get.find<CountdownController>().setCountdown(
+          supersetIndex == null ? exercise.restTime : superset!.restTime);
+
+      return;
+    }
     final set = exercise.sets[setIndex];
-    final newSet = set.copyWith(done: true);
+
+    final newSet = set.copyWith(done: done);
 
     if (supersetIndex == null) {
-      final ex = exercises[exerciseIndex] as Exercise;
-      exercises[exerciseIndex] = ex.copyWith(
+      final ex = exercises[i] as Exercise;
+      exercises[i] = ex.copyWith(
         sets: [
           for (int j = 0; j < ex.sets.length; j++)
             if (j == setIndex) newSet else ex.sets[j]
@@ -1287,7 +1199,7 @@ and:
       final superset = exercises[supersetIndex] as Superset;
       exercises[supersetIndex] = superset.copyWith(exercises: [
         for (int j = 0; j < superset.exercises.length; j++)
-          if (j == exerciseIndex)
+          if (j == i)
             superset.exercises[j].copyWith(
               sets: [
                 for (int k = 0; k < superset.exercises[j].sets.length; k++)
@@ -1299,10 +1211,63 @@ and:
       ]);
     }
 
-    exercises.refresh();
-    save();
+    if (done) {
+      final nextSet = exercise.sets.getAt(setIndex + 1);
+      final superset =
+          supersetIndex == null ? null : (exercises[supersetIndex] as Superset);
 
+      bool shouldStart = false;
+      shouldStart |= (supersetIndex == null && exercise.restTime.inSeconds > 0);
+      shouldStart |= supersetIndex != null &&
+          superset!.restTime.inSeconds > 0 &&
+          i == superset.exercises.length - 1;
+
+      if (nextSet != null && nextSet.kind == GTSetKind.failureStripping) {
+        shouldStart = false;
+      }
+
+      // Start a countdown if:
+      // either:
+      //  - This is an exercise
+      //  - This is the last exercise in a superset
+      // and:
+      //  - The rest time is greater than 0
+      // and:
+      //  - The next set is not a stripping set
+      if (shouldStart) {
+        Get.find<CountdownController>().setCountdown(
+            supersetIndex == null ? exercise.restTime : superset!.restTime);
+      } else {
+        logger.i("""
+Not starting countdown because the following conditions are not met:
+either:
+ - This is an exercise (${supersetIndex == null})
+ - This is the last exercise in a superset (${supersetIndex != null && i == (exercises[supersetIndex] as Superset).exercises.length - 1})
+and:
+ - The rest time is greater than 0 (${(supersetIndex == null && exercise.restTime.inSeconds > 0) || (supersetIndex != null && (exercises[supersetIndex] as Superset).restTime.inSeconds > 0)})
+and:
+ - The next set is not a stripping set (${!(nextSet != null && nextSet.kind == GTSetKind.failureStripping)})
+"""
+            .trim());
+      }
+    }
+    exercises.refresh();
     refreshWatchData();
+    save();
+  }
+
+  void autoMarkNextSetDone() {
+    final index = currentExerciseIndex;
+    if (index == null) return;
+
+    final (exerciseIndex: exerciseIndex, supersetIndex: supersetIndex) = index;
+    final exercise = supersetIndex == null
+        ? (exercises[exerciseIndex] as Exercise)
+        : (exercises[supersetIndex] as Superset).exercises[exerciseIndex];
+    final setIndex = exercise.sets.indexWhere((set) => !set.done);
+    if (setIndex == -1) return;
+
+    return markSetAsDone(index, setIndex, true);
   }
 
   refreshWatchData() {
@@ -1313,6 +1278,14 @@ and:
     final index = currentExerciseIndex;
     NativeWorkoutStateMessage message;
 
+    final settingsController = Get.find<SettingsController>();
+    // This is going to be null if the user has enabled tinting,
+    // so that we can use the null-aware operator to fall back to the exercise
+    // color
+    final theme = settingsController.tintExercises.value
+        ? null
+        : settingsController.color.value;
+
     if (index != null) {
       final (exerciseIndex: exerciseIndex, supersetIndex: supersetIndex) =
           index;
@@ -1320,11 +1293,12 @@ and:
           ? (exercises[exerciseIndex] as Exercise)
           : (exercises[supersetIndex] as Superset).exercises[exerciseIndex];
       final name = exercise.displayName;
-      final color = (exercise.standard && exercise.category != null
-          ? exerciseStandardLibrary[exercise.category]?.color ??
-              Get.context?.theme.colorScheme.primary ??
-              Colors.red
-          : Get.context?.theme.colorScheme.primary ?? Colors.red);
+      final color = theme ??
+          (exercise.standard && exercise.category != null
+              ? exerciseStandardLibrary[exercise.category]?.color ??
+                  Get.context?.theme.colorScheme.primary ??
+                  Colors.red
+              : Get.context?.theme.colorScheme.primary ?? Colors.red);
       final set = exercise.sets.firstWhereOrNull((set) => !set.done);
 
       message = NativeWorkoutStateMessage(
@@ -1347,6 +1321,8 @@ and:
         exerciseColor: Colors.transparent,
         exerciseParameters: "",
         startingTime: time.value,
+        restTimeStart: startingTime,
+        restTimeEnd: endingTime,
         percentageDone: progress,
       );
     }

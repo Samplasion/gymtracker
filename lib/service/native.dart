@@ -61,7 +61,7 @@ class _iOSNativeService extends NativeService
   @override
   void markThisSetAsDone() {
     logger.i("Received markThisSetAsDone from watch.");
-    Get.find<WorkoutController>().markThisSetAsDone();
+    Get.find<WorkoutController>().autoMarkNextSetDone();
   }
 
   @override

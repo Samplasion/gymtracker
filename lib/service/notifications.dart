@@ -10,7 +10,7 @@ class NotificationsService extends GetxService {
   onInit() {
     super.onInit();
 
-    const androidInit = AndroidInitializationSettings('ic_launcher_foreground');
+    const androidInit = AndroidInitializationSettings('ic_notifications');
     const darwinInit = DarwinInitializationSettings(
       requestAlertPermission: false,
       requestBadgePermission: false,

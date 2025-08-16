@@ -51,6 +51,8 @@ class CountdownController extends GetxController {
     targetTime.value = null;
     startingTime.value = null;
 
+    Get.find<Coordinator>().syncNative();
+
     logger.i('Rest timer finished');
   }
 

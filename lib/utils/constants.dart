@@ -65,6 +65,7 @@ enum Breakpoints {
 
 class NotificationIDs {
   static const restTimer = 0;
+  static const androidLiveActivity = 1;
 }
 
 const monospace = TextStyle(

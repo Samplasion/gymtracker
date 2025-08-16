@@ -5,6 +5,11 @@ import 'package:pigeon/pigeon.dart';
   dartOptions: DartOptions(),
   swiftOut: 'ios/Runner/FlutterCommunicator.g.swift',
   swiftOptions: SwiftOptions(),
+  kotlinOut:
+      'android/app/src/main/java/org/js/samplasion/gymtracker/FlutterCommunicator.kt',
+  kotlinOptions: KotlinOptions(
+    package: "org.js.samplasion.gymtracker",
+  ),
   dartPackageName: 'gymtracker',
 ))
 @HostApi()

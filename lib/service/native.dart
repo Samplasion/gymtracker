@@ -8,8 +8,8 @@ import 'package:gymtracker/service/native.g.dart';
 
 abstract class NativeService {
   static NativeService instance() {
-    if (Platform.isIOS) {
-      return _iOSNativeService();
+    if (Platform.isIOS || Platform.isAndroid) {
+      return _NativeServiceImpl();
     } else {
       return _UnsupportedNativeService._();
     }
@@ -47,26 +47,26 @@ class _UnsupportedNativeService extends NativeService
 }
 
 // ignore: camel_case_types
-class _iOSNativeService extends NativeService
+class _NativeServiceImpl extends NativeService
     implements GymBroNativeFlutterAPI, GymBroNativeLoggerChannel {
   final _watch = GymBroNativeHostAPI();
 
-  static final _iOSNativeService _instance = _iOSNativeService._internal();
-  factory _iOSNativeService() => _instance;
-  _iOSNativeService._internal() : super._() {
+  static final _NativeServiceImpl _instance = _NativeServiceImpl._internal();
+  factory _NativeServiceImpl() => _instance;
+  _NativeServiceImpl._internal() : super._() {
     GymBroNativeFlutterAPI.setUp(this);
     GymBroNativeLoggerChannel.setUp(this);
   }
 
   @override
   void markThisSetAsDone() {
-    logger.i("Received markThisSetAsDone from watch.");
+    logger.i("Received markThisSetAsDone from native.");
     Get.find<WorkoutController>().autoMarkNextSetDone();
   }
 
   @override
   void setIsWorkoutRunning(bool isWorkoutRunning) {
-    logger.i("Setting isWorkoutRunning on watch: $isWorkoutRunning");
+    logger.i("Setting isWorkoutRunning on native side: $isWorkoutRunning");
     if (isWorkoutRunning) {
       _watch.startWorkout();
     } else {
@@ -76,14 +76,14 @@ class _iOSNativeService extends NativeService
 
   @override
   void setExerciseParameters(NativeWorkoutStateMessage parameters) {
-    logger
-        .i("""Setting exercise parameters on watch: ${parameters.toJson()}""");
+    logger.i(
+        """Setting exercise parameters on native side: ${parameters.toJson()}""");
     _watch.setExerciseParameters(parameters.toJson());
   }
 
   @override
   void requestTrainingData() {
-    logger.i("Received requestTrainingData from watch.");
+    logger.i("Received requestTrainingData from native.");
     if (!Get.isRegistered<WorkoutController>()) {
       _watch.stopWorkout();
       return;

@@ -5,6 +5,7 @@
       "shouldTranslate" : false
     },
     "%@:%@" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -21,6 +22,7 @@
       }
     },
     "%lld hours, %@:%@" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {

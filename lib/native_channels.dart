@@ -18,6 +18,7 @@ abstract class GymBroNativeHostAPI {
   void startWorkout();
   void stopWorkout();
   void setExerciseParameters(Map<String?, Object?> parameters);
+  void updateHomeWidgetParameters(Map<String, int> parameters);
 }
 
 @FlutterApi()

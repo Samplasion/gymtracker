@@ -15,7 +15,7 @@ struct Provider: AppIntentTimelineProvider {
     typealias Intent = ConfigurationAppIntent
     
     func placeholder(in context: Context) -> WorkoutStreakEntry {
-        WorkoutStreakEntry(date: Date(), streak: 3)
+        WorkoutStreakEntry(date: Date(), streak: 3, dailyRestStreak: 2, totalWorkouts: 54)
     }
 
     func snapshot(for configuration: ConfigurationAppIntent, in context: Context) async -> WorkoutStreakEntry {
@@ -26,7 +26,9 @@ struct Provider: AppIntentTimelineProvider {
             // Get the data from the user defaults to display
             let userDefaults = UserDefaults(suiteName: "group.samplasion.gymtracker")
             let streak = userDefaults?.integer(forKey: "weekly_streak") ?? 0
-            entry = WorkoutStreakEntry(date: Date(), streak: streak)
+            let rest = userDefaults?.integer(forKey: "daily_rest_streak") ?? 0
+            let total = userDefaults?.integer(forKey: "total_workouts") ?? 0
+            entry = WorkoutStreakEntry(date: Date(), streak: streak, dailyRestStreak: rest, totalWorkouts: total)
       }
         return entry
     }
@@ -34,21 +36,26 @@ struct Provider: AppIntentTimelineProvider {
     func timeline(for configuration: ConfigurationAppIntent, in context: Context) async -> Timeline<WorkoutStreakEntry> {
         return Timeline(entries: [await snapshot(for: configuration, in: context)], policy: .atEnd)
     }
-
-//    func relevances() async -> WidgetRelevances<ConfigurationAppIntent> {
-//        // Generate a list containing the contexts this widget is relevant in.
-//    }
 }
 
 struct WorkoutStreakEntry: TimelineEntry {
     var date: Date
-    
     let streak: Int
+    let dailyRestStreak: Int
+    let totalWorkouts: Int
+}
+
+enum GBWidgetView {
+    case streak
+    case rest
+    case total
 }
 
 @available(iOS 17.0, *)
-struct WidgetsEntryView  : View {
+struct WidgetsEntryView: View {
+    @Environment(\.widgetFamily) var widgetFamily
     var entry: Provider.Entry
+    let widgetView: GBWidgetView
     
     var bundle: URL {
         let bundle = Bundle.main
@@ -61,9 +68,14 @@ struct WidgetsEntryView  : View {
         return bundle.bundleURL
     }
     
-    init(entry: Provider.Entry) {
+    init(entry: Provider.Entry, widgetView: GBWidgetView) {
         self.entry = entry
+        self.widgetView = widgetView
         CTFontManagerRegisterFontsForURL(bundle.appending(path: "/fonts/GymTracker.ttf") as CFURL, CTFontManagerScope.process, nil)
+        for family in UIFont.familyNames.sorted() {
+            let names = UIFont.fontNames(forFamilyName: family)
+            print("Family: \(family) Font names: \(names)")
+        }
     }
     
     var isOn: Bool {
@@ -75,39 +87,159 @@ struct WidgetsEntryView  : View {
     }
 
     var body: some View {
-        let k: LocalizedStringKey = "\(entry.streak) weeks"
-        VStack {
-            Spacer()
-            Text("\u{f06d}").font(Font.custom("GymTracker", size: 48))
+        let streak: LocalizedStringKey = "\(entry.streak) weeks"
+        let rest: LocalizedStringKey = "\(entry.dailyRestStreak) days"
+        let total: LocalizedStringKey = "\(entry.totalWorkouts) workouts"
+        
+        @ViewBuilder
+        var widgetContent: some View {
+            switch (widgetFamily) {
+            case .systemSmall:
+                VStack {
+                    Spacer()
+                    GBWidgetIcon(widgetView: widgetView, size: 48, color: color)
+                    Spacer()
+                    switch (widgetView) {
+                    case .streak: Text("Streak").font(.caption)
+                    case .rest: Text("Rest").font(.caption)
+                    case .total: Text("Total").font(.caption)
+                    }
+                    switch (widgetView) {
+                    case .streak: Text(streak).fontWeight(.semibold)
+                    case .rest: Text(rest).fontWeight(.semibold)
+                    case .total: Text(total).fontWeight(.semibold)
+                    }
+                    
+                    Spacer()
+                }
+            case .accessoryCircular:
+                VStack {
+                    Spacer()
+                    GBWidgetIcon(widgetView: widgetView, size: 24, color: color)
+                    Spacer()
+                    switch (widgetView) {
+                    case .streak: Text("\(entry.streak)").font(.caption)
+                            .fontWeight(.semibold)
+                    case .rest: Text("\(entry.dailyRestStreak)").font(.caption)
+                            .fontWeight(.semibold)
+                    case .total: Text("\(entry.totalWorkouts)").font(.caption)
+                            .fontWeight(.semibold)
+                    }
+                    Spacer()
+                }
+            case .accessoryRectangular:
+                HStack {
+                    Spacer()
+                    GBWidgetIcon(widgetView: widgetView, size: 32, color: color)
+                    Spacer()
+                    VStack {
+                        switch (widgetView) {
+                        case .streak: Text("Streak").font(.caption)
+                        case .rest: Text("Rest").font(.caption)
+                        case .total: Text("Total").font(.caption)
+                        }
+                        switch (widgetView) {
+                        case .streak: Text(streak).fontWeight(.semibold)
+                        case .rest: Text(rest).fontWeight(.semibold)
+                        case .total: Text(total).fontWeight(.semibold)
+                        }
+                    }
+                    Spacer()
+                }
+            case .accessoryInline:
+                let icon = GBWidgetIcon(widgetView: widgetView, size: 26, color: color)
+                HStack {
+                    icon.asSFUI
+                    switch (widgetView) {
+                    case .streak: Text(streak).font(.caption).fontWeight(.semibold)
+                    case .rest: Text(rest).font(.caption).fontWeight(.semibold)
+                    case .total: Text(total).font(.caption).fontWeight(.semibold)
+                    }
+                }
+            @unknown default:
+                fatalError()
+            }
+        }
+        return widgetContent
+    }
+}
+
+struct GBWidgetIcon: View {
+    let widgetView: GBWidgetView
+    let size: Double
+    let color: Color
+    
+    var body: some View {
+        switch (widgetView) {
+            case .streak: Text("\u{f06d}").font(Font.custom("GymTracker", size: size))
                 .foregroundColor(color)
-            Spacer()
-            Text("Streak")
-                .font(.caption)
-            Text(k)
-                .fontWeight(.semibold)
-            Spacer()
+            case .rest: Image(systemName: "moon.fill").frame(width: CGFloat(size), height: CGFloat(size))
+                .tint(color)
+            case .total: Image(systemName: "gym.bag.fill").frame(width: CGFloat(size), height: CGFloat(size))
+                .tint(color)
+        }
+    }
+    
+    @ViewBuilder
+    var asSFUI: some View {
+        if widgetView == .streak {
+            Image(systemName: "flame.fill").frame(width: CGFloat(size), height: CGFloat(size)).tint(color)
+        } else {
+            body
         }
     }
 }
 
 @available(iOS 17.0, *)
-struct GymBroWidgets: Widget {
+struct GymBroWidgetsStreak: Widget {
     let kind: String = "GymBroWidgets"
 
     var body: some WidgetConfiguration {
         AppIntentConfiguration(kind: kind, intent: ConfigurationAppIntent.self, provider: Provider()) { entry in
-            WidgetsEntryView(entry: entry)
+            WidgetsEntryView(entry: entry, widgetView: .streak)
                 .containerBackground(.fill.tertiary, for: .widget)
         }
             .configurationDisplayName("Streaks")
             .description("Show off your weekly streak.")
-            .supportedFamilies([.systemSmall])
+            .supportedFamilies([.systemSmall, .accessoryCircular, .accessoryRectangular, .accessoryInline])
     }
 }
 
+@available(iOS 17.0, *)
+struct GymBroWidgetsRest: Widget {
+    let kind: String = "GymBroWidgetsRest"
+
+    var body: some WidgetConfiguration {
+        AppIntentConfiguration(kind: kind, intent: ConfigurationAppIntent.self, provider: Provider()) { entry in
+            WidgetsEntryView(entry: entry, widgetView: .rest)
+                .containerBackground(.fill.tertiary, for: .widget)
+        }
+            .configurationDisplayName("Rest")
+            .description("See your rest day streak.")
+            .supportedFamilies([.systemSmall, .accessoryCircular, .accessoryRectangular, .accessoryInline])
+    }
+}
+
+@available(iOS 17.0, *)
+struct GymBroWidgetsTotal: Widget {
+    let kind: String = "GymBroWidgetsTotal"
+
+    var body: some WidgetConfiguration {
+        AppIntentConfiguration(kind: kind, intent: ConfigurationAppIntent.self, provider: Provider()) { entry in
+            WidgetsEntryView(entry: entry, widgetView: .total)
+                .containerBackground(.fill.tertiary, for: .widget)
+        }
+            .configurationDisplayName("Workouts")
+            .description("Keep track of your total workouts.")
+            .supportedFamilies([.systemSmall, .accessoryCircular, .accessoryRectangular, .accessoryInline])
+    }
+}
+
+//@available(iOS 17, *)
 //#Preview(as: .systemSmall) {
-//    Widgets()
+//    GymBroWidgets()
 //} timeline: {
-//    WorkoutStreakEntry(date: .now, streak: 0)
-//    WorkoutStreakEntry(date: .now.advanced(by: 1), streak: 1)
+//    WorkoutStreakEntry(date: .now, streak: 0, dailyRestStreak: 0, totalWorkouts: 0)
+//    WorkoutStreakEntry(date: .now.advanced(by: 1), streak: 1, dailyRestStreak: 0, totalWorkouts: 1)
 //}
+//

@@ -62,6 +62,7 @@ interface GymBroNativeHostAPI {
   fun startWorkout()
   fun stopWorkout()
   fun setExerciseParameters(parameters: Map<String?, Any?>)
+  fun updateHomeWidgetParameters(parameters: Map<String, Long>)
 
   companion object {
     /** The codec used by GymBroNativeHostAPI. */
@@ -112,6 +113,24 @@ interface GymBroNativeHostAPI {
             val parametersArg = args[0] as Map<String?, Any?>
             val wrapped: List<Any?> = try {
               api.setExerciseParameters(parametersArg)
+              listOf(null)
+            } catch (exception: Throwable) {
+              wrapError(exception)
+            }
+            reply.reply(wrapped)
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.gymtracker.GymBroNativeHostAPI.updateHomeWidgetParameters$separatedMessageChannelSuffix", codec)
+        if (api != null) {
+          channel.setMessageHandler { message, reply ->
+            val args = message as List<Any?>
+            val parametersArg = args[0] as Map<String, Long>
+            val wrapped: List<Any?> = try {
+              api.updateHomeWidgetParameters(parametersArg)
               listOf(null)
             } catch (exception: Throwable) {
               wrapError(exception)

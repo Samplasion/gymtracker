@@ -15,6 +15,9 @@
 		7E08EFA32E42A001002D2095 /* NativeWorkoutStateMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7EE0DA532E3B9DCF007A1B07 /* NativeWorkoutStateMessage.swift */; };
 		7E683CB72D405CFC005EA05C /* FlutterCommunicator.g.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E683CB62D405CFC005EA05C /* FlutterCommunicator.g.swift */; };
 		7EC152AA2DD687B000893E0D /* dummy.txt in Resources */ = {isa = PBXBuildFile; fileRef = 7EC152A92DD687B000893E0D /* dummy.txt */; };
+		7EC6628C2EFDB99D000CD218 /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7E18FD3D2D3F0B850056CFF4 /* WidgetKit.framework */; };
+		7EC6628D2EFDB99D000CD218 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7E18FD3F2D3F0B850056CFF4 /* SwiftUI.framework */; };
+		7EC662982EFDB99E000CD218 /* GymBroWatchWidgetsExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 7EC6628B2EFDB99D000CD218 /* GymBroWatchWidgetsExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		7EE0D9452E394FCB007A1B07 /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7E18FD3D2D3F0B850056CFF4 /* WidgetKit.framework */; };
 		7EE0D9462E394FCB007A1B07 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7E18FD3F2D3F0B850056CFF4 /* SwiftUI.framework */; };
 		7EE0D9532E394FCB007A1B07 /* GymBroWidgetsExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 7EE0D9442E394FCB007A1B07 /* GymBroWidgetsExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
@@ -32,6 +35,13 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		7EC662962EFDB99E000CD218 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 97C146E61CF9000F007C117D /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 7EC6628A2EFDB99D000CD218;
+			remoteInfo = GymBroWatchWidgetsExtension;
+		};
 		7EE0D9512E394FCB007A1B07 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 97C146E61CF9000F007C117D /* Project object */;
@@ -71,6 +81,17 @@
 			name = "Embed Watch Content";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		7EC6626A2EFDAC4F000CD218 /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				7EC662982EFDB99E000CD218 /* GymBroWatchWidgetsExtension.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
@@ -89,6 +110,8 @@
 		7E683CB62D405CFC005EA05C /* FlutterCommunicator.g.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlutterCommunicator.g.swift; sourceTree = "<group>"; };
 		7E97206D2573E144DEEF5C82 /* Pods-Runner.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Runner.release.xcconfig"; path = "Target Support Files/Pods-Runner/Pods-Runner.release.xcconfig"; sourceTree = "<group>"; };
 		7EC152A82DD687B000893E0D /* it */ = {isa = PBXFileReference; lastKnownFileType = text; name = it; path = it.lproj/dummy.txt; sourceTree = "<group>"; };
+		7EC6628B2EFDB99D000CD218 /* GymBroWatchWidgetsExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = GymBroWatchWidgetsExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		7EC662A02EFDBCC6000CD218 /* GymBroWatchWidgetsExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = GymBroWatchWidgetsExtension.entitlements; sourceTree = "<group>"; };
 		7EE0D9442E394FCB007A1B07 /* GymBroWidgetsExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = GymBroWidgetsExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		7EE0DA132E3A0251007A1B07 /* GymBroWidgetsExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = GymBroWidgetsExtension.entitlements; sourceTree = "<group>"; };
 		7EE0DA532E3B9DCF007A1B07 /* NativeWorkoutStateMessage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NativeWorkoutStateMessage.swift; sourceTree = "<group>"; };
@@ -105,6 +128,20 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		7EC6629D2EFDB99E000CD218 /* Exceptions for "GymBroWatchWidgets" folder in "GymBroWatchWidgetsExtension" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 7EC6628A2EFDB99D000CD218 /* GymBroWatchWidgetsExtension */;
+		};
+		7EC6629F2EFDBA50000CD218 /* Exceptions for "GymBroWidgets" folder in "GymBroWatchWidgetsExtension" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Localizable.xcstrings,
+			);
+			target = 7EC6628A2EFDB99D000CD218 /* GymBroWatchWidgetsExtension */;
+		};
 		7EE0D9542E394FCB007A1B07 /* Exceptions for "GymBroWidgets" folder in "GymBroWidgetsExtension" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
@@ -122,23 +159,43 @@
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
+		7EC6628E2EFDB99D000CD218 /* GymBroWatchWidgets */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				7EC6629D2EFDB99E000CD218 /* Exceptions for "GymBroWatchWidgets" folder in "GymBroWatchWidgetsExtension" target */,
+			);
+			path = GymBroWatchWidgets;
+			sourceTree = "<group>";
+		};
 		7EE0D9472E394FCB007A1B07 /* GymBroWidgets */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
 				7EE0D95B2E396E78007A1B07 /* Exceptions for "GymBroWidgets" folder in "Runner" target */,
 				7EE0D9542E394FCB007A1B07 /* Exceptions for "GymBroWidgets" folder in "GymBroWidgetsExtension" target */,
+				7EC6629F2EFDBA50000CD218 /* Exceptions for "GymBroWidgets" folder in "GymBroWatchWidgetsExtension" target */,
 			);
 			path = GymBroWidgets;
 			sourceTree = "<group>";
 		};
 		7EE0DE1C2E3D0CD5007A1B07 /* GymBroWatch Watch App */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+			);
 			path = "GymBroWatch Watch App";
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		7EC662882EFDB99D000CD218 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				7EC6628D2EFDB99D000CD218 /* SwiftUI.framework in Frameworks */,
+				7EC6628C2EFDB99D000CD218 /* WidgetKit.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		7EE0D9412E394FCB007A1B07 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -213,11 +270,13 @@
 		97C146E51CF9000F007C117D = {
 			isa = PBXGroup;
 			children = (
+				7EC662A02EFDBCC6000CD218 /* GymBroWatchWidgetsExtension.entitlements */,
 				7E08EFA22E429FF5002D2095 /* Shared */,
 				9740EEB11CF90186004384FC /* Flutter */,
 				97C146F01CF9000F007C117D /* Runner */,
 				7EE0D9472E394FCB007A1B07 /* GymBroWidgets */,
 				7EE0DE1C2E3D0CD5007A1B07 /* GymBroWatch Watch App */,
+				7EC6628E2EFDB99D000CD218 /* GymBroWatchWidgets */,
 				97C146EF1CF9000F007C117D /* Products */,
 				1953102A146007BBFA8B590F /* Pods */,
 				82D27AC9AF3209D89BAA80BA /* Frameworks */,
@@ -231,6 +290,7 @@
 				97C146EE1CF9000F007C117D /* Runner.app */,
 				7EE0D9442E394FCB007A1B07 /* GymBroWidgetsExtension.appex */,
 				7EE0DE1B2E3D0CD5007A1B07 /* GymBroWatch Watch App.app */,
+				7EC6628B2EFDB99D000CD218 /* GymBroWatchWidgetsExtension.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -257,6 +317,26 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		7EC6628A2EFDB99D000CD218 /* GymBroWatchWidgetsExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 7EC662992EFDB99E000CD218 /* Build configuration list for PBXNativeTarget "GymBroWatchWidgetsExtension" */;
+			buildPhases = (
+				7EC662872EFDB99D000CD218 /* Sources */,
+				7EC662882EFDB99D000CD218 /* Frameworks */,
+				7EC662892EFDB99D000CD218 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				7EC6628E2EFDB99D000CD218 /* GymBroWatchWidgets */,
+			);
+			name = GymBroWatchWidgetsExtension;
+			productName = GymBroWatchWidgetsExtension;
+			productReference = 7EC6628B2EFDB99D000CD218 /* GymBroWatchWidgetsExtension.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
 		7EE0D9432E394FCB007A1B07 /* GymBroWidgetsExtension */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 7EE0D9552E394FCB007A1B07 /* Build configuration list for PBXNativeTarget "GymBroWidgetsExtension" */;
@@ -287,10 +367,12 @@
 				7EE0DE172E3D0CD5007A1B07 /* Sources */,
 				7EE0DE182E3D0CD5007A1B07 /* Frameworks */,
 				7EE0DE192E3D0CD5007A1B07 /* Resources */,
+				7EC6626A2EFDAC4F000CD218 /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				7EC662972EFDB99E000CD218 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				7EE0DE1C2E3D0CD5007A1B07 /* GymBroWatch Watch App */,
@@ -334,10 +416,13 @@
 		97C146E61CF9000F007C117D /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastSwiftUpdateCheck = 1620;
+				LastSwiftUpdateCheck = 2600;
 				LastUpgradeCheck = 1510;
 				ORGANIZATIONNAME = "";
 				TargetAttributes = {
+					7EC6628A2EFDB99D000CD218 = {
+						CreatedOnToolsVersion = 26.0.1;
+					};
 					7EE0D9432E394FCB007A1B07 = {
 						CreatedOnToolsVersion = 16.2;
 					};
@@ -370,11 +455,19 @@
 				97C146ED1CF9000F007C117D /* Runner */,
 				7EE0D9432E394FCB007A1B07 /* GymBroWidgetsExtension */,
 				7EE0DE1A2E3D0CD5007A1B07 /* GymBroWatch Watch App */,
+				7EC6628A2EFDB99D000CD218 /* GymBroWatchWidgetsExtension */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		7EC662892EFDB99D000CD218 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		7EE0D9422E394FCB007A1B07 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -530,6 +623,13 @@
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		7EC662872EFDB99D000CD218 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		7EE0D9402E394FCB007A1B07 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -562,6 +662,11 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		7EC662972EFDB99E000CD218 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 7EC6628A2EFDB99D000CD218 /* GymBroWatchWidgetsExtension */;
+			targetProxy = 7EC662962EFDB99E000CD218 /* PBXContainerItemProxy */;
+		};
 		7EE0D9522E394FCB007A1B07 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 7EE0D9432E394FCB007A1B07 /* GymBroWidgetsExtension */;
@@ -678,6 +783,149 @@
 				SWIFT_OBJC_BRIDGING_HEADER = "Runner/Runner-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 				VERSIONING_SYSTEM = "apple-generic";
+			};
+			name = Profile;
+		};
+		7EC6629A2EFDB99E000CD218 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_ENTITLEMENTS = GymBroWatchWidgetsExtension.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 66PDR4DQPS;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = GymBroWatchWidgets/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = GymBroWatchWidgets;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+					"@executable_path/../../../../Frameworks",
+				);
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MARKETING_VERSION = 1.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = org.js.samplasion.gymbro.watchkitapp.GymBroWatchWidgets;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 26.0;
+			};
+			name = Debug;
+		};
+		7EC6629B2EFDB99E000CD218 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_ENTITLEMENTS = GymBroWatchWidgetsExtension.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 66PDR4DQPS;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = GymBroWatchWidgets/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = GymBroWatchWidgets;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+					"@executable_path/../../../../Frameworks",
+				);
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MARKETING_VERSION = 1.0;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = org.js.samplasion.gymbro.watchkitapp.GymBroWatchWidgets;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SUPPORTED_PLATFORMS = "watchsimulator watchos";
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 26.0;
+			};
+			name = Release;
+		};
+		7EC6629C2EFDB99E000CD218 /* Profile */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_ENTITLEMENTS = GymBroWatchWidgetsExtension.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 66PDR4DQPS;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = GymBroWatchWidgets/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = GymBroWatchWidgets;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+					"@executable_path/../../../../Frameworks",
+				);
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MARKETING_VERSION = 1.0;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = org.js.samplasion.gymbro.watchkitapp.GymBroWatchWidgets;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SUPPORTED_PLATFORMS = "watchsimulator watchos";
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 26.0;
 			};
 			name = Profile;
 		};
@@ -822,6 +1070,7 @@
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_ENTITLEMENTS = "GymBroWatch Watch App/GymBroWatch Watch App.entitlements";
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 13;
@@ -868,6 +1117,7 @@
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_ENTITLEMENTS = "GymBroWatch Watch App/GymBroWatch Watch App.entitlements";
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 13;
@@ -912,6 +1162,7 @@
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_ENTITLEMENTS = "GymBroWatch Watch App/GymBroWatch Watch App.entitlements";
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 13;
@@ -1113,6 +1364,16 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		7EC662992EFDB99E000CD218 /* Build configuration list for PBXNativeTarget "GymBroWatchWidgetsExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				7EC6629A2EFDB99E000CD218 /* Debug */,
+				7EC6629B2EFDB99E000CD218 /* Release */,
+				7EC6629C2EFDB99E000CD218 /* Profile */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		7EE0D9552E394FCB007A1B07 /* Build configuration list for PBXNativeTarget "GymBroWidgetsExtension" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (

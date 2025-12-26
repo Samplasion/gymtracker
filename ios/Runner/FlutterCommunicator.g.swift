@@ -93,6 +93,7 @@ protocol GymBroNativeHostAPI {
   func startWorkout() throws
   func stopWorkout() throws
   func setExerciseParameters(parameters: [String?: Any?]) throws
+  func updateHomeWidgetParameters(parameters: [String: Int64]) throws
 }
 
 /// Generated setup class from Pigeon to handle messages through the `binaryMessenger`.
@@ -141,6 +142,21 @@ class GymBroNativeHostAPISetup {
       }
     } else {
       setExerciseParametersChannel.setMessageHandler(nil)
+    }
+    let updateHomeWidgetParametersChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.gymtracker.GymBroNativeHostAPI.updateHomeWidgetParameters\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      updateHomeWidgetParametersChannel.setMessageHandler { message, reply in
+        let args = message as! [Any?]
+        let parametersArg = args[0] as! [String: Int64]
+        do {
+          try api.updateHomeWidgetParameters(parameters: parametersArg)
+          reply(wrapResult(nil))
+        } catch {
+          reply(wrapError(error))
+        }
+      }
+    } else {
+      updateHomeWidgetParametersChannel.setMessageHandler(nil)
     }
   }
 }

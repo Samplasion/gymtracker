@@ -57,3 +57,6 @@ accent.json
 # Env
 .env
 env.g.dart
+
+# FVM Version Cache
+.fvm/

@@ -4,8 +4,16 @@ import 'package:gymtracker/service/logger.dart';
 import 'package:home_widget/home_widget.dart';
 
 const String appGroupId = 'group.samplasion.gymtracker';
-const String iOSWidgetName = 'GymBroWidgets';
+const iOSWidgetName = [
+  'GymBroWidgets',
+  'GymBroWidgetsRest',
+  'GymBroWidgetsTotal'
+];
 const String androidWidgetName = 'org.js.samplasion.gymtracker.StreakWidget';
+
+const streakKey = "weekly_streak";
+const restKey = "daily_rest_streak";
+const totalWorkoutsKey = "total_workouts";
 
 final isSupported = Platform.isIOS || Platform.isAndroid;
 
@@ -18,7 +26,9 @@ abstract class WidgetsService {
     }
   }
 
-  updateWeeklyStreak(int streak);
+  Future<void> updateWeeklyStreak(int streak);
+  Future<void> updateRestStreak(int streak);
+  Future<void> updateWorkouts(int total);
 }
 
 class _WidgetsService extends WidgetsService {
@@ -29,17 +39,32 @@ class _WidgetsService extends WidgetsService {
   }
 
   @override
-  updateWeeklyStreak(int streak) {
-    HomeWidget.saveWidgetData<int>("weekly_streak", streak);
+  updateWeeklyStreak(int streak) async {
+    await HomeWidget.saveWidgetData<int>("weekly_streak", streak);
     _update();
   }
 
-  _update() {
+  @override
+  updateRestStreak(int streak) async {
+    await HomeWidget.saveWidgetData<int>("daily_rest_streak", streak);
+    _update();
+  }
+
+  @override
+  updateWorkouts(int workouts) async {
+    await HomeWidget.saveWidgetData<int>("total_workouts", workouts);
+    _update();
+  }
+
+  _update() async {
     try {
-      HomeWidget.updateWidget(
-        iOSName: iOSWidgetName,
-        qualifiedAndroidName: androidWidgetName,
-      );
+      for (final name in iOSWidgetName) {
+        await HomeWidget.updateWidget(
+          iOSName: name,
+          qualifiedAndroidName: androidWidgetName,
+        );
+      }
+      logger.i("Updated widget.");
     } catch (e) {
       logger.e(e);
     }
@@ -48,5 +73,11 @@ class _WidgetsService extends WidgetsService {
 
 class _WidgetsServiceUnsupported extends WidgetsService {
   @override
-  updateWeeklyStreak(int streak) {}
+  updateWeeklyStreak(int streak) async {}
+
+  @override
+  updateRestStreak(int streak) async {}
+
+  @override
+  updateWorkouts(int total) async {}
 }

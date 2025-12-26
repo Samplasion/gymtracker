@@ -41,59 +41,12 @@ extension Int64 {
 
 struct GymBroWidgetsLiveActivity: Widget {
     var body: some WidgetConfiguration {
-        ActivityConfiguration(for: GymBroWidgetsAttributes.self) { context in
-            var primaryColor = Color.primary
-            var boldPrimaryColor = Color.primary
-            
-            if let baseColor = context.state.exerciseColor?.toColor() {
-                primaryColor = baseColor.level(.level700)
-                boldPrimaryColor = baseColor.level(.level600)
+        let v = ActivityConfiguration(for: GymBroWidgetsAttributes.self) { context in
+            if #available(iOS 18.0, *) {
+                GymBroLiveActivityViewDisambiguation(context: context)
+            } else {
+                GymBroLiveActivityDefaultView(context: context)
             }
-            
-            let padding = 16.0
-            
-            return VStack(alignment: .leading) {
-                if (!context.state.hasExercise) {
-                    HStack {
-                        Spacer()
-                        Image(systemName: "checkmark.circle")
-                        Spacer()
-                    }
-                } else {
-                    Text("\(context.state.exerciseName!)")
-                        .font(.headline)
-                    Text("\(context.state.exerciseParameters!)")
-                }
-                Label {
-                    TimerView(
-                        context: context,
-                        multilineTextAlignment: .leading
-                    )
-                } icon: {
-                    Image(systemName: "clock")
-                }
-                    .font(.body)
-                    .foregroundStyle(primaryColor)
-                if (context.state.hasRest && context.state.restTimeEnd! > Date.now) {
-                    Label {
-                        Text(
-                            context.state.restTimeEnd!,
-                            style: .timer
-                        )
-                            .monospacedDigit()
-                    } icon: {
-                        Image(systemName: "timer")
-                    }
-                    .foregroundStyle(boldPrimaryColor)
-                }
-            }
-                .padding(EdgeInsets(
-                    top: padding,
-                    leading: padding,
-                    bottom: padding,
-                    trailing: padding
-                ))
-                .activitySystemActionForegroundColor(Color.black)
         } dynamicIsland: { context in
             var primaryColor = Color.primary
             var boldPrimaryColor = Color.primary
@@ -128,8 +81,8 @@ struct GymBroWidgetsLiveActivity: Widget {
                     } icon: {
                         Image(systemName: "clock")
                     }
-                        .font(.body)
-                        .foregroundStyle(primaryColor)
+                    .font(.body)
+                    .foregroundStyle(primaryColor)
                 }
                 DynamicIslandExpandedRegion(.bottom) {
                     VStack {
@@ -168,14 +121,14 @@ struct GymBroWidgetsLiveActivity: Widget {
                                 currentValueLabel: { ExerciseInitials(context: context)
                                 }
                             )
-                                .padding(EdgeInsets(
-                                    top: 0,
-                                    leading: 0,
-                                    bottom: 0,
-                                    trailing: context.state.hasExercise ? 7 : 0
-                                ))
-                                .frame(width: 30)
-                                .progressViewStyle(.circular)
+                            .padding(EdgeInsets(
+                                top: 0,
+                                leading: 0,
+                                bottom: 0,
+                                trailing: context.state.hasExercise ? 7 : 0
+                            ))
+                            .frame(width: 30)
+                            .progressViewStyle(.circular)
                         }
                     } else {
                         ExerciseInitials(context: context)
@@ -211,18 +164,158 @@ struct GymBroWidgetsLiveActivity: Widget {
                             }
                         }
                     )
-                        .progressViewStyle(.circular)
-                        .frame(width: 40)
-                        .padding(EdgeInsets(
-                            top: 0,
-                            leading: 0,
-                            bottom: 0,
-                            trailing: context.state.hasExercise ? 7 : 0
-                        ))
+                    .progressViewStyle(.circular)
+                    .frame(width: 40)
+                    .padding(EdgeInsets(
+                        top: 0,
+                        leading: 0,
+                        bottom: 0,
+                        trailing: context.state.hasExercise ? 7 : 0
+                    ))
                 }
             }
             .keylineTint(primaryColor)
         }
+        if #available(iOS 18.0, *) {
+            return v.supplementalActivityFamilies([ActivityFamily.small])
+        } else {
+            return v
+        }
+    }
+}
+
+@available(iOS 18.0, *)
+struct GymBroLiveActivityViewDisambiguation: View {
+    @Environment(\.activityFamily) var activityFamily
+    let context: ActivityViewContext<GymBroWidgetsAttributes>
+    
+    var body: some View {
+            switch activityFamily {
+            case .small:
+                GymBroLiveActivitySmallAccessoryView(context: context)
+            case .medium:
+                GymBroLiveActivityDefaultView(context: context)
+            @unknown default:
+                GymBroLiveActivityDefaultView(context: context)
+            }
+        }
+}
+
+struct GymBroLiveActivityDefaultView: View {
+    let context: ActivityViewContext<GymBroWidgetsAttributes>
+    
+    var body: some View {
+        var primaryColor = Color.primary
+        var boldPrimaryColor = Color.primary
+        
+        if let baseColor = context.state.exerciseColor?.toColor() {
+            primaryColor = baseColor.level(.level700)
+            boldPrimaryColor = baseColor.level(.level600)
+        }
+        
+        let padding = 16.0
+        
+        return VStack(alignment: .leading) {
+            if (!context.state.hasExercise) {
+                HStack {
+                    Spacer()
+                    Image(systemName: "checkmark.circle")
+                    Spacer()
+                }
+            } else {
+                Text("\(context.state.exerciseName!)")
+                    .font(.headline)
+                Text("\(context.state.exerciseParameters!)")
+            }
+            Label {
+                TimerView(
+                    context: context,
+                    multilineTextAlignment: .leading
+                )
+            } icon: {
+                Image(systemName: "clock")
+            }
+            .font(.body)
+            .foregroundStyle(primaryColor)
+            if (context.state.hasRest && context.state.restTimeEnd! > Date.now) {
+                Label {
+                    Text(
+                        context.state.restTimeEnd!,
+                        style: .timer
+                    )
+                    .monospacedDigit()
+                } icon: {
+                    Image(systemName: "timer")
+                }
+                .foregroundStyle(boldPrimaryColor)
+            }
+        }
+        .padding(EdgeInsets(
+            top: padding,
+            leading: padding,
+            bottom: padding,
+            trailing: padding
+        ))
+        .activitySystemActionForegroundColor(Color.black)
+    }
+}
+
+struct GymBroLiveActivitySmallAccessoryView: View {
+    let context: ActivityViewContext<GymBroWidgetsAttributes>
+    
+    var body: some View {
+        var primaryColor = Color.primary
+        var boldPrimaryColor = Color.primary
+        
+        if let baseColor = context.state.exerciseColor?.toColor() {
+            primaryColor = baseColor.level(.level700)
+            boldPrimaryColor = baseColor.level(.level600)
+        }
+        
+        let padding = 16.0
+        
+        return VStack(alignment: .leading) {
+            if (!context.state.hasExercise) {
+                HStack {
+                    Spacer()
+                    Image(systemName: "checkmark.circle")
+                    Spacer()
+                }
+            } else {
+                Text("\(context.state.exerciseName!)")
+                    .font(.headline)
+                Text("\(context.state.exerciseParameters!)")
+            }
+            Label {
+                TimerView(
+                    context: context,
+                    multilineTextAlignment: .leading
+                )
+            } icon: {
+                Image(systemName: "clock")
+            }
+            .font(.body)
+            .foregroundStyle(primaryColor)
+            if (context.state.hasRest && context.state.restTimeEnd! > Date.now) {
+                Label {
+                    Text(
+                        context.state.restTimeEnd!,
+                        style: .timer
+                    )
+                    .monospacedDigit()
+                } icon: {
+                    Image(systemName: "timer")
+                }
+                .foregroundStyle(boldPrimaryColor)
+            }
+        }
+        .padding(EdgeInsets(
+            top: padding,
+            leading: padding,
+            bottom: padding,
+            trailing: padding
+        ))
+        .activitySystemActionForegroundColor(Color.black)
     }
 }
 
@@ -337,6 +430,16 @@ fileprivate struct ContentStates {
 
 @available(iOS 17, *)
 #Preview("Minimal", as: .dynamicIsland(.minimal), using: GymBroWidgetsAttributes()) {
+    GymBroWidgetsLiveActivity()
+} contentStates: {
+    ContentStates.long
+    ContentStates.notResting
+    ContentStates.done
+}
+
+
+@available(iOS 17, *)
+#Preview("Watch", as: .content, using: GymBroWidgetsAttributes()) {
     GymBroWidgetsLiveActivity()
 } contentStates: {
     ContentStates.long

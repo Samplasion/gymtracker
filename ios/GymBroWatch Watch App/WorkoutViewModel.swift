@@ -9,6 +9,7 @@ import Foundation
 import WatchConnectivity
 #if canImport(WatchKit)
 import WatchKit
+import WidgetKit
 #endif
 
 @MainActor
@@ -107,6 +108,28 @@ extension WorkoutViewModel: @preconcurrency WCSessionDelegate {
         self.exerciseParameters = exerciseParameters
         self.restTimeEnd = restTimeEnd == 0 ? nil : Date(timeIntervalSinceReferenceDate: Double(restTimeEnd))
     }
+
+    private func onUpdateHomeWidgetParameters(_ message: [String: Any]) {
+        guard message["value"] != nil else {
+            log("Invalid message format: \(message)\nReason: missing payload")
+            return
+        }
+        
+        let defaults = UserDefaults(suiteName: "group.samplasion.gymtracker")
+        guard let defaults = defaults else {
+            log("Couldn't update home widget parameters.\nReason: UserDefault object is nil. Current defaults: \(String(describing: defaults))")
+            return
+        }
+        for (key, numberPayload) in (message["value"] as! [String: Int64]) {
+            defaults.set(numberPayload, forKey: key)
+        }
+        log("Updated watch home data: \(message)")
+        if #available(watchOS 9.0, *) {
+            WidgetCenter.shared.reloadAllTimelines()
+        } else {
+            // Fallback on earlier versions
+        }
+    }
     
 #if os(watchOS)
     nonisolated func session(_ session: WCSession, didReceiveMessage message: [String : Any]) {
@@ -118,6 +141,8 @@ extension WorkoutViewModel: @preconcurrency WCSessionDelegate {
                 onSetIsWorkoutRunning(message)
             } else if method == "setExerciseParameters" {
                 onSetExerciseParameters(message)
+            } else if method == "updateHomeWidgetParameters" {
+                onUpdateHomeWidgetParameters(message)
             } else {
                 log("Received unknown message from phone: \(method)")
             }

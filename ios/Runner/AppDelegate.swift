@@ -325,6 +325,10 @@ private class GymBroNativeHostAPIImpl: GymBroNativeHostAPI {
     func setSession(_ session: WCSession) {
         self.session = session
     }
+    
+    func updateHomeWidgetParameters(parameters: [String: Int64]) throws {
+        self.session?.sendMessage(["method": "updateHomeWidgetParameters", "value": parameters], replyHandler: nil)
+    }
 }
 
 extension Int64 {

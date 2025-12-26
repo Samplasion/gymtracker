@@ -2,9 +2,9 @@
   "conventionalCommits.scopes": [
     "i18n"
   ],
-  "dart.flutterSdkPath": "/Users/samplasion/.puro/envs/gymtracker/flutter",
+  "dart.flutterSdkPath": ".fvm/versions/3.24.3",
   "i18n-ally.localesPaths": [
     "assets/i18n"
   ],
-    "dart.sdkPath": "/Users/samplasion/.puro/envs/gymtracker/flutter/bin/cache/dart-sdk"
+  "dart.sdkPath": "/Users/samplasion/.puro/envs/gymtracker/flutter/bin/cache/dart-sdk"
 }

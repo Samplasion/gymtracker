@@ -22,6 +22,7 @@ import 'package:gymtracker/model/measurements.dart';
 import 'package:gymtracker/service/database.dart';
 import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/service/logger.dart';
+import 'package:gymtracker/service/native.dart';
 import 'package:gymtracker/service/widgets.dart';
 import 'package:gymtracker/utils/constants.dart';
 import 'package:gymtracker/utils/extensions.dart';
@@ -232,6 +233,17 @@ class _DebugViewState extends State<DebugView> {
                 onTap: () async {
                   WidgetsService.instance().updateWeeklyStreak(
                       Get.find<HistoryController>().streaks.value.weekStreak);
+                  WidgetsService.instance().updateRestStreak(
+                      Get.find<HistoryController>().streaks.value.restDays);
+                  WidgetsService.instance().updateWorkouts(
+                      Get.find<HistoryController>().history.length);
+                  NativeService.instance().updateHomeWidgetParameters(
+                    weekStreak:
+                        Get.find<HistoryController>().streaks.value.weekStreak,
+                    restDays:
+                        Get.find<HistoryController>().streaks.value.restDays,
+                    workouts: Get.find<HistoryController>().history.length,
+                  );
                 },
               ),
 

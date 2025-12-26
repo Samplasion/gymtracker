@@ -106,6 +106,10 @@ class MainActivity: FlutterActivity() {
             createOrUpdateOngoingLiveNotification()
         }
 
+        override fun updateHomeWidgetParameters(parameters: Map<String, Long>) {
+            // no-op; used on iOS to update watch complications
+        }
+
         private fun createOrUpdateOngoingLiveNotification() {
             log("Creating ongoing live notification")
             createNotificationChannel()

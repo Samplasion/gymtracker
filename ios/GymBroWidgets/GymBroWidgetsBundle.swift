@@ -12,7 +12,9 @@ import SwiftUI
 struct GymBroWidgetsBundle: WidgetBundle {
     var body: some Widget {
         if #available(iOS 17.0, *) {
-            GymBroWidgets()
+            GymBroWidgetsTotal()
+            GymBroWidgetsStreak()
+            GymBroWidgetsRest()
         }
         GymBroWidgetsLiveActivity()
     }

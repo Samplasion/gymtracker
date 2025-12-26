@@ -5,6 +5,8 @@ import 'package:gymtracker/controller/workout_controller.dart';
 import 'package:gymtracker/model/native.dart';
 import 'package:gymtracker/service/logger.dart';
 import 'package:gymtracker/service/native.g.dart';
+import 'package:gymtracker/service/widgets.dart'
+    show streakKey, restKey, totalWorkoutsKey;
 
 abstract class NativeService {
   static NativeService instance() {
@@ -19,6 +21,11 @@ abstract class NativeService {
 
   void setIsWorkoutRunning(bool isWorkoutRunning);
   void setExerciseParameters(NativeWorkoutStateMessage parameters);
+  Future<void> updateHomeWidgetParameters({
+    required int weekStreak,
+    required int restDays,
+    required int workouts,
+  });
 }
 
 class _UnsupportedNativeService extends NativeService
@@ -27,12 +34,12 @@ class _UnsupportedNativeService extends NativeService
 
   @override
   void markThisSetAsDone() {
-    /// no-op
+    // no-op
   }
 
   @override
   void requestTrainingData() {
-    /// no-op
+    // no-op
   }
 
   @override
@@ -42,6 +49,15 @@ class _UnsupportedNativeService extends NativeService
 
   @override
   void setIsWorkoutRunning(bool isWorkoutRunning) {
+    // no-op
+  }
+
+  @override
+  Future<void> updateHomeWidgetParameters({
+    required int weekStreak,
+    required int restDays,
+    required int workouts,
+  }) async {
     // no-op
   }
 }
@@ -99,5 +115,20 @@ class _NativeServiceImpl extends NativeService
   @override
   void logError(String error) {
     logger.e("[Native] $error");
+  }
+
+  @override
+  Future<void> updateHomeWidgetParameters(
+      {required int weekStreak, required int restDays, required int workouts}) {
+    logger.i("""Sending complication data to native side: ${(
+      weekStreak: weekStreak,
+      restDays: restDays,
+      workouts: workouts
+    )}""");
+    return _watch.updateHomeWidgetParameters({
+      streakKey: weekStreak,
+      restKey: restDays,
+      totalWorkoutsKey: workouts,
+    });
   }
 }

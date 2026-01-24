@@ -49,19 +49,20 @@ class NutritionCategory {
 }
 
 enum NutritionCategoryIcon {
-  fork_and_spoon(Icons.local_dining_rounded),
-  water(Icons.local_drink_rounded),
-  fruit(Icons.eco_rounded),
-  pizza(Icons.local_pizza_rounded),
-  hamburger(Icons.fastfood_rounded),
-  ice_cream(Icons.icecream_rounded),
-  cake(Icons.cake_rounded),
-  coffee(Icons.coffee_rounded),
-  wine(Icons.local_bar_rounded);
+  fork_and_spoon(Icons.local_dining_rounded, "🍴"),
+  water(Icons.local_drink_rounded, "💧"),
+  fruit(Icons.eco_rounded, "🍎"),
+  pizza(Icons.local_pizza_rounded, "🍔"),
+  hamburger(Icons.fastfood_rounded, "🍔"),
+  ice_cream(Icons.icecream_rounded, "🍰"),
+  cake(Icons.cake_rounded, "🍰"),
+  coffee(Icons.coffee_rounded, "☕"),
+  wine(Icons.local_bar_rounded, "🍷");
 
-  const NutritionCategoryIcon(this.iconData);
+  const NutritionCategoryIcon(this.iconData, this.emoji);
 
   final IconData iconData;
+  final String emoji;
 
   static NutritionCategoryIcon fromString(String value) {
     return NutritionCategoryIcon.values.firstWhere(

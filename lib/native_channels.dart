@@ -18,7 +18,12 @@ abstract class GymBroNativeHostAPI {
   void startWorkout();
   void stopWorkout();
   void setExerciseParameters(Map<String?, Object?> parameters);
-  void updateHomeWidgetParameters(Map<String, int> parameters);
+  void updateHomeWidgetParameters(
+      Map<String, int> parameters, List<int> workoutDensityChartData);
+  void requestHealthPermission();
+
+  // Food
+  void updateFoodParameters(Map<String?, Object?> parameters);
 }
 
 @FlutterApi()
@@ -29,6 +34,13 @@ abstract class GymBroNativeFlutterAPI {
 
   // Called by the native OS to read the app's workout data
   void requestTrainingData();
+
+  // Sends the current workout metrics
+  void handleWorkoutMetrics(double? energy, double? heartRate);
+
+  // Update set parameters from native interfaces
+  void updateSetParameters(
+      double? weight, double? timeSeconds, int? reps, double? distance);
 }
 
 @FlutterApi()

@@ -4,6 +4,20 @@
     " " : {
       "shouldTranslate" : false
     },
+    "%@" : {
+
+    },
+    "%@ %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ %2$@"
+          }
+        }
+      },
+      "shouldTranslate" : false
+    },
     "%@:%@" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -17,6 +31,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "%1$@:%2$@"
+          }
+        }
+      }
+    },
+    "%@/%@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@/%2$@"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ / %2$@"
           }
         }
       }
@@ -38,6 +68,166 @@
         }
       }
     },
+    "Activity Rings" : {
+      "localizations" : {
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anelli Attività"
+          }
+        }
+      }
+    },
+    "Avg. Heart Rate" : {
+      "localizations" : {
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Battito cardiaco"
+          }
+        }
+      }
+    },
+    "Calories" : {
+      "localizations" : {
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Calorie"
+          }
+        }
+      }
+    },
+    "Carbs" : {
+      "localizations" : {
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Carboidrati"
+          }
+        }
+      }
+    },
+    "Diary" : {
+      "localizations" : {
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Diario alimentare"
+          }
+        }
+      }
+    },
+    "Distance" : {
+      "localizations" : {
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Distanza"
+          }
+        }
+      }
+    },
+    "Done" : {
+      "localizations" : {
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fine"
+          }
+        }
+      }
+    },
+    "Eaten" : {
+      "localizations" : {
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Consumate"
+          }
+        }
+      }
+    },
+    "Edit Set" : {
+      "localizations" : {
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modifica serie"
+          }
+        }
+      }
+    },
+    "Fats" : {
+      "localizations" : {
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Grassi"
+          }
+        }
+      }
+    },
+    "Food" : {
+      "localizations" : {
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alimentazione"
+          }
+        }
+      }
+    },
+    "Nutrition split" : {
+      "localizations" : {
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Valori nutrizionali"
+          }
+        }
+      }
+    },
+    "Protein" : {
+      "localizations" : {
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Proteine"
+          }
+        }
+      }
+    },
+    "Remaining" : {
+      "localizations" : {
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rimanenti"
+          }
+        }
+      }
+    },
+    "Reps" : {
+      "localizations" : {
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ripetizioni"
+          }
+        }
+      }
+    },
+    "Saving Workout" : {
+      "localizations" : {
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Salvataggio allenamento…"
+          }
+        }
+      }
+    },
     "Start a workout from your iPhone." : {
       "localizations" : {
         "it" : {
@@ -48,12 +238,83 @@
         }
       }
     },
+    "Summary" : {
+      "localizations" : {
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Riepilogo"
+          }
+        }
+      }
+    },
+    "There's no data for this set. Please add some data from your iPhone first." : {
+      "localizations" : {
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Non ci sono dati per questa serie. Aggiungi dei dati da iPhone e riprova."
+          }
+        }
+      }
+    },
+    "Time" : {
+      "localizations" : {
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tempo"
+          }
+        }
+      }
+    },
+    "Total Energy" : {
+      "localizations" : {
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Energia totale"
+          }
+        }
+      }
+    },
+    "Total Time" : {
+      "localizations" : {
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Durata"
+          }
+        }
+      }
+    },
+    "Weight" : {
+      "localizations" : {
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Peso"
+          }
+        }
+      }
+    },
     "Well done! Use your iPhone to end the workout." : {
+      "extractionState" : "stale",
       "localizations" : {
         "it" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ben fatto! Usa iPhone per terminare l’allenamento."
+          }
+        }
+      }
+    },
+    "Workout" : {
+      "localizations" : {
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Allenamento"
           }
         }
       }

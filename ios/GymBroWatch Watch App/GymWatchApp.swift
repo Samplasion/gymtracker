@@ -6,12 +6,19 @@
 //
 
 import SwiftUI
+import WatchKit
 
 @main
 struct GymWatchSwiftUIApp: App {
+    @WKApplicationDelegateAdaptor(GBAppDelegate.self) private var appDelegate
+    private let workoutManager = WorkoutManager.shared
+    
     var body: some Scene {
         WindowGroup {
-            ContentView(viewModel: WorkoutViewModel())
+            PagingView()
+                .environmentObject(workoutManager)
+                .environmentObject(appDelegate.workoutViewModel)
+                .environmentObject(appDelegate.foodViewModel)
         }
     }
 }

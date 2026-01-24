@@ -190,6 +190,9 @@ class MainActivity: FlutterActivity() {
                 cancel(NOTIFICATION_ID)
             }
         }
+        override fun updateHomeWidgetParameters(parameters: Map<String, Long>, workoutDensityChartData: List<Long>) {
+            // no-op; a plugin does this for us
+        }
     }
 }
 

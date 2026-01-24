@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:flutter/material.dart';
 import 'package:gymtracker/service/logger.dart';
 import 'package:home_widget/home_widget.dart';
 
@@ -12,8 +13,9 @@ const iOSWidgetName = [
 const String androidWidgetName = 'org.js.samplasion.gymtracker.StreakWidget';
 
 const streakKey = "weekly_streak";
-const restKey = "daily_rest_streak";
+const restKey = "daily_rest_streak_since";
 const totalWorkoutsKey = "total_workouts";
+const workoutDensityKey = "workout_density_chart_data";
 
 final isSupported = Platform.isIOS || Platform.isAndroid;
 

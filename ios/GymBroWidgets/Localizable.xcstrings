@@ -245,6 +245,9 @@
         }
       }
     },
+    "Workout density" : {
+
+    },
     "Workouts" : {
       "localizations" : {
         "en" : {
@@ -260,6 +263,9 @@
           }
         }
       }
+    },
+    "Your workout density over the last 18 weeks." : {
+
     },
     "" : {
       "shouldTranslate" : false

@@ -7,6 +7,7 @@ import 'package:flutter/scheduler.dart';
 import 'package:flutter_quill/flutter_quill.dart';
 import 'package:get/get.dart';
 import 'package:gymtracker/controller/countdown_controller.dart';
+import 'package:gymtracker/controller/health_controller.dart';
 import 'package:gymtracker/controller/routines_controller.dart';
 import 'package:gymtracker/controller/settings_controller.dart';
 import 'package:gymtracker/controller/stopwatch_controller.dart';
@@ -38,6 +39,7 @@ import 'package:gymtracker/view/utils/timer.dart';
 import 'package:gymtracker/view/utils/weight_calculator.dart';
 import 'package:gymtracker/view/utils/workout.dart';
 import 'package:gymtracker/view/utils/workout_done.dart';
+import 'package:intl/intl.dart';
 
 WorkoutController? get _controller {
   if (Get.isRegistered<WorkoutController>()) {
@@ -431,91 +433,191 @@ class WorkoutInfoBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final healthController = Get.find<HealthController>();
     return Column(
       children: [
         Padding(
           padding:
               const EdgeInsets.symmetric(horizontal: 16).copyWith(bottom: 16),
-          child: Row(
-            children: [
-              Obx(
-                () {
-                  if (_controller == null) return const SizedBox.shrink();
-                  return TimerView(
-                    startingTime: _controller?.time.value ?? DateTime.now(),
-                    builder: (context, text) {
-                      return Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            "ongoingWorkout.info.time".t,
-                            style: Theme.of(context).textTheme.labelMedium,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
+          child: StreamBuilder(
+            stream: healthController.energyStream,
+            builder: (context, snapshot) {
+              final activeEnergy = snapshot.data;
+              return StreamBuilder(
+                stream: healthController.heartRateStream,
+                builder: (context, snapshot) {
+                  final heartRate = snapshot.data;
+                  return Row(
+                    children: [
+                      Expanded(
+                        flex: 4,
+                        child: Obx(
+                          () {
+                            if (_controller == null)
+                              return const SizedBox.shrink();
+                            return TimerView(
+                              startingTime:
+                                  _controller?.time.value ?? DateTime.now(),
+                              builder: (context, text) {
+                                return Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      "ongoingWorkout.info.time".t,
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .labelMedium,
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                    Hero(
+                                      tag: "Ongoing",
+                                      child: text,
+                                    ),
+                                  ],
+                                );
+                              },
+                            );
+                          },
+                        ),
+                      ),
+                      Expanded(
+                        flex: 4,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              "ongoingWorkout.info.reps".t,
+                              style: Theme.of(context).textTheme.labelMedium,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            Obx(
+                              () => TweenAnimationBuilder(
+                                tween: Tween<double>(
+                                  begin: 0,
+                                  end: _controller?.reps.toDouble() ?? 0,
+                                ),
+                                curve: Curves.decelerate,
+                                duration: const Duration(milliseconds: 400),
+                                builder: (context, value, _) {
+                                  return Text("${value.round()}");
+                                },
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Expanded(
+                        flex: 4,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              "ongoingWorkout.info.volume".t,
+                              style: Theme.of(context).textTheme.labelMedium,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            Obx(
+                              () => TweenAnimationBuilder(
+                                tween: Tween<double>(
+                                  begin: 0,
+                                  end: _controller?.liftedWeight ?? 0,
+                                ),
+                                curve: Curves.decelerate,
+                                duration: const Duration(milliseconds: 400),
+                                builder: (context, value, _) {
+                                  if (doubleIsActuallyInt(
+                                      _controller?.liftedWeight ?? 0)) {
+                                    return Text("${value.round()}");
+                                  }
+                                  return Text(stringifyDouble(value));
+                                },
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      if (heartRate != null) ...[
+                        Expanded(
+                          flex: 3,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                "ongoingWorkout.info.heartRate".t,
+                                style: Theme.of(context).textTheme.labelMedium,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              TweenAnimationBuilder(
+                                tween: Tween<double>(
+                                  begin: 0,
+                                  end: heartRate,
+                                ),
+                                curve: Curves.decelerate,
+                                duration: const Duration(milliseconds: 400),
+                                builder: (context, value, _) {
+                                  return Text.rich(TextSpan(children: [
+                                    const WidgetSpan(
+                                      child: Icon(GTIcons.heart_rate, size: 14),
+                                      alignment: PlaceholderAlignment.middle,
+                                    ),
+                                    const TextSpan(text: " "),
+                                    TextSpan(text: "${value.round()}"),
+                                  ]));
+                                },
+                              ),
+                            ],
                           ),
-                          Hero(
-                            tag: "Ongoing",
-                            child: text,
+                        ),
+                      ],
+                      if (activeEnergy != null) ...[
+                        Expanded(
+                          flex: 3,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                "ongoingWorkout.info.activeEnergy".t,
+                                style: Theme.of(context).textTheme.labelMedium,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              TweenAnimationBuilder(
+                                tween: Tween<double>(
+                                  begin: 0,
+                                  end: activeEnergy,
+                                ),
+                                curve: Curves.decelerate,
+                                duration: const Duration(milliseconds: 400),
+                                builder: (context, value, _) {
+                                  return Text.rich(TextSpan(children: [
+                                    const WidgetSpan(
+                                      child:
+                                          Icon(GTIcons.active_energy, size: 14),
+                                      alignment: PlaceholderAlignment.middle,
+                                    ),
+                                    const TextSpan(text: " "),
+                                    TextSpan(
+                                        text: NumberFormat.decimalPatternDigits(
+                                                locale:
+                                                    context.locale.languageCode,
+                                                decimalDigits: 1)
+                                            .format(value)),
+                                  ]));
+                                },
+                              ),
+                            ],
                           ),
-                        ],
-                      );
-                    },
+                        ),
+                      ],
+                    ].toList(),
                   );
                 },
-              ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    "ongoingWorkout.info.reps".t,
-                    style: Theme.of(context).textTheme.labelMedium,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  Obx(
-                    () => TweenAnimationBuilder(
-                      tween: Tween<double>(
-                        begin: 0,
-                        end: _controller?.reps.toDouble() ?? 0,
-                      ),
-                      curve: Curves.decelerate,
-                      duration: const Duration(milliseconds: 400),
-                      builder: (context, value, _) {
-                        return Text("${value.round()}");
-                      },
-                    ),
-                  ),
-                ],
-              ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    "ongoingWorkout.info.volume".t,
-                    style: Theme.of(context).textTheme.labelMedium,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  Obx(
-                    () => TweenAnimationBuilder(
-                      tween: Tween<double>(
-                        begin: 0,
-                        end: _controller?.liftedWeight ?? 0,
-                      ),
-                      curve: Curves.decelerate,
-                      duration: const Duration(milliseconds: 400),
-                      builder: (context, value, _) {
-                        if (doubleIsActuallyInt(
-                            _controller?.liftedWeight ?? 0)) {
-                          return Text("${value.round()}");
-                        }
-                        return Text(stringifyDouble(value));
-                      },
-                    ),
-                  ),
-                ],
-              ),
-            ].map((w) => Expanded(child: w)).toList(),
+              );
+            },
           ),
         ),
         Obx(

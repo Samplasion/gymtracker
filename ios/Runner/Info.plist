@@ -2,10 +2,6 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>ITSAppUsesNonExemptEncryption</key>
-	<false/>
-	<key>NSSupportsLiveActivities</key>
-	<true/>
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
 	<key>CFBundleDevelopmentRegion</key>
@@ -41,14 +37,24 @@
 	</array>
 	<key>CFBundleVersion</key>
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSCameraUsageDescription</key>
 	<string>We use the camera to enable you to scan barcodes for product identification.</string>
+	<key>NSHealthClinicalHealthRecordsShareUsageDescription</key>
+	<string>We access your heart rate and burned calories to save workouts in your Health history.</string>
+	<key>NSHealthShareUsageDescription</key>
+	<string>We access your heart rate and burned calories to save workouts in your Health history.</string>
+	<key>NSHealthUpdateUsageDescription</key>
+	<string>We access your heart rate and burned calories to save workouts in your Health history.</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>We use the camera to enable you to scan barcodes for product identification.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>We access your photos to let you scan barcodes for product identification.</string>
+	<key>NSSupportsLiveActivities</key>
+	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
 	<key>UILaunchStoryboardName</key>

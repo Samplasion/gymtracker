@@ -17,6 +17,7 @@ class TimeInputField extends StatefulWidget {
   final void Function(Duration?)? onChangedTime;
   final bool timerInteractive;
   final String? setID;
+  final FocusNode? focusNode;
 
   const TimeInputField({
     required this.controller,
@@ -26,6 +27,7 @@ class TimeInputField extends StatefulWidget {
     this.validator,
     this.timerInteractive = false,
     this.setID,
+    this.focusNode,
     super.key,
   }) : assert(timerInteractive ? (setID != null) : true,
             "If timerInteractive is true, setID must be provided");
@@ -50,7 +52,7 @@ class TimeInputField extends StatefulWidget {
 class _TimeInputFieldState
     extends ControlledState<TimeInputField, StopwatchController> {
   late String numericalValue = _toTimeString(widget.controller.text);
-  final node = FocusNode();
+  late final node = widget.focusNode ?? FocusNode();
 
   @override
   void initState() {
@@ -124,7 +126,7 @@ class _TimeInputFieldState
           : const TextInputType.numberWithOptions(decimal: false),
       decoration:
           (widget.decoration ?? const GymTrackerInputDecoration()).copyWith(
-        suffixIconConstraints: BoxConstraints(
+        suffixIconConstraints: const BoxConstraints(
           minHeight: 24,
           minWidth: 24,
         ),

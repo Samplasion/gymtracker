@@ -62,7 +62,9 @@ interface GymBroNativeHostAPI {
   fun startWorkout()
   fun stopWorkout()
   fun setExerciseParameters(parameters: Map<String?, Any?>)
-  fun updateHomeWidgetParameters(parameters: Map<String, Long>)
+  fun updateHomeWidgetParameters(parameters: Map<String, Long>, workoutDensityChartData: List<Long>)
+  fun requestHealthPermission()
+  fun updateFoodParameters(parameters: Map<String?, Any?>)
 
   companion object {
     /** The codec used by GymBroNativeHostAPI. */
@@ -129,8 +131,43 @@ interface GymBroNativeHostAPI {
           channel.setMessageHandler { message, reply ->
             val args = message as List<Any?>
             val parametersArg = args[0] as Map<String, Long>
+            val workoutDensityChartDataArg = args[1] as List<Long>
             val wrapped: List<Any?> = try {
-              api.updateHomeWidgetParameters(parametersArg)
+              api.updateHomeWidgetParameters(parametersArg, workoutDensityChartDataArg)
+              listOf(null)
+            } catch (exception: Throwable) {
+              wrapError(exception)
+            }
+            reply.reply(wrapped)
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.gymtracker.GymBroNativeHostAPI.requestHealthPermission$separatedMessageChannelSuffix", codec)
+        if (api != null) {
+          channel.setMessageHandler { _, reply ->
+            val wrapped: List<Any?> = try {
+              api.requestHealthPermission()
+              listOf(null)
+            } catch (exception: Throwable) {
+              wrapError(exception)
+            }
+            reply.reply(wrapped)
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.gymtracker.GymBroNativeHostAPI.updateFoodParameters$separatedMessageChannelSuffix", codec)
+        if (api != null) {
+          channel.setMessageHandler { message, reply ->
+            val args = message as List<Any?>
+            val parametersArg = args[0] as Map<String?, Any?>
+            val wrapped: List<Any?> = try {
+              api.updateFoodParameters(parametersArg)
               listOf(null)
             } catch (exception: Throwable) {
               wrapError(exception)
@@ -175,6 +212,40 @@ class GymBroNativeFlutterAPI(private val binaryMessenger: BinaryMessenger, priva
     val channelName = "dev.flutter.pigeon.gymtracker.GymBroNativeFlutterAPI.requestTrainingData$separatedMessageChannelSuffix"
     val channel = BasicMessageChannel<Any?>(binaryMessenger, channelName, codec)
     channel.send(null) {
+      if (it is List<*>) {
+        if (it.size > 1) {
+          callback(Result.failure(FlutterError(it[0] as String, it[1] as String, it[2] as String?)))
+        } else {
+          callback(Result.success(Unit))
+        }
+      } else {
+        callback(Result.failure(createConnectionError(channelName)))
+      } 
+    }
+  }
+  fun handleWorkoutMetrics(energyArg: Double?, heartRateArg: Double?, callback: (Result<Unit>) -> Unit)
+{
+    val separatedMessageChannelSuffix = if (messageChannelSuffix.isNotEmpty()) ".$messageChannelSuffix" else ""
+    val channelName = "dev.flutter.pigeon.gymtracker.GymBroNativeFlutterAPI.handleWorkoutMetrics$separatedMessageChannelSuffix"
+    val channel = BasicMessageChannel<Any?>(binaryMessenger, channelName, codec)
+    channel.send(listOf(energyArg, heartRateArg)) {
+      if (it is List<*>) {
+        if (it.size > 1) {
+          callback(Result.failure(FlutterError(it[0] as String, it[1] as String, it[2] as String?)))
+        } else {
+          callback(Result.success(Unit))
+        }
+      } else {
+        callback(Result.failure(createConnectionError(channelName)))
+      } 
+    }
+  }
+  fun updateSetParameters(weightArg: Double?, timeSecondsArg: Double?, repsArg: Long?, distanceArg: Double?, callback: (Result<Unit>) -> Unit)
+{
+    val separatedMessageChannelSuffix = if (messageChannelSuffix.isNotEmpty()) ".$messageChannelSuffix" else ""
+    val channelName = "dev.flutter.pigeon.gymtracker.GymBroNativeFlutterAPI.updateSetParameters$separatedMessageChannelSuffix"
+    val channel = BasicMessageChannel<Any?>(binaryMessenger, channelName, codec)
+    channel.send(listOf(weightArg, timeSecondsArg, repsArg, distanceArg)) {
       if (it is List<*>) {
         if (it.size > 1) {
           callback(Result.failure(FlutterError(it[0] as String, it[1] as String, it[2] as String?)))

@@ -1,14 +1,18 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:get/get.dart' hide ContextExtensionss;
+import 'package:gymtracker/controller/workout_controller.dart';
 import 'package:gymtracker/data/distance.dart';
 import 'package:gymtracker/data/weights.dart';
 import 'package:gymtracker/icons/gymtracker_icons.dart';
 import 'package:gymtracker/model/exercise.dart';
 import 'package:gymtracker/model/set.dart';
 import 'package:gymtracker/service/localizations.dart';
+import 'package:gymtracker/service/logger.dart';
 import 'package:gymtracker/struct/editor_callback.dart';
 import 'package:gymtracker/struct/optional.dart';
 import 'package:gymtracker/utils/extensions.dart';
@@ -300,8 +304,10 @@ class _WorkoutExerciseEditorState extends State<WorkoutExerciseEditor> {
               if (!widget.exercise.parameters.isSetless) ...[
                 for (int i = 0; i < widget.exercise.sets.length; i++)
                   WorkoutExerciseSetEditor(
-                    key: ValueKey(widget.exercise.sets[i].id),
+                    key: ValueKey((widget.index, i)),
                     set: widget.exercise.sets[i],
+                    index: widget.index,
+                    setIndex: i,
                     exercise: widget.exercise,
                     onDelete: () =>
                         widget.callbacks.onSetRemove(widget.index, i),
@@ -358,6 +364,8 @@ class _WorkoutExerciseEditorState extends State<WorkoutExerciseEditor> {
 class WorkoutExerciseSetEditor extends StatefulWidget {
   final Exercise exercise;
   final GTSet set;
+  final WorkoutExerciseIndex index;
+  final int setIndex;
   final bool alt;
   final bool isCreating;
   final VoidCallback onDelete;
@@ -370,6 +378,8 @@ class WorkoutExerciseSetEditor extends StatefulWidget {
   const WorkoutExerciseSetEditor({
     required this.exercise,
     required this.set,
+    required this.index,
+    required this.setIndex,
     required this.alt,
     required this.isCreating,
     required this.onSetSelectKind,
@@ -399,6 +409,11 @@ class _WorkoutExerciseSetEditorState extends State<WorkoutExerciseSetEditor> {
       TextEditingController(text: stringifyDouble(widget.set.distance ?? 0));
 
   final _weightFocusNode = FocusNode();
+  final _timeFocusNode = FocusNode();
+  final _repsFocusNode = FocusNode();
+  final _distanceFocusNode = FocusNode();
+
+  StreamSubscription? subscription;
 
   @override
   void initState() {
@@ -406,10 +421,47 @@ class _WorkoutExerciseSetEditorState extends State<WorkoutExerciseSetEditor> {
     _weightFocusNode.addListener(() {
       setState(() {});
     });
+    if (!Get.isRegistered<WorkoutController>()) return;
+    // Update data if a different actor edits it (such as a paired Apple Watch)
+    subscription = Get.find<WorkoutController>().exercises.listen((exs) {
+      logger.i(
+          "[${widget.index} -> ${widget.setIndex}] Refreshing because of exercise update");
+      // if (Get.isRegistered<WorkoutController>()) {
+      //   logger.w(
+      //       "Called subscription listener, but WorkoutController has been discarded. Check for leaks.");
+      //   subscription?.cancel();
+      //   return;
+      // }
+      final newExercise = exs.exerciseAt(widget.index);
+      if (newExercise == null) return;
+      if (newExercise.sets.length <= widget.setIndex) return;
+      final newSet = newExercise.sets[widget.setIndex];
+      if (!_weightFocusNode.hasFocus && newSet.weight != null) {
+        weightController.text = stringifyDouble(newSet.weight ?? 0);
+      }
+      if (!_timeFocusNode.hasFocus && newSet.time != null) {
+        timeController.text = TimeInputField.encodeDuration(newSet.time!);
+      }
+      if (!_repsFocusNode.hasFocus && newSet.reps != null) {
+        repsController.text = newSet.reps.toString();
+      }
+      if (!_distanceFocusNode.hasFocus && newSet.distance != null) {
+        distanceController.text = stringifyDouble(newSet.distance ?? 0);
+      }
+      if (!mounted) {
+        logger.w(
+            "[${widget.index} -> ${widget.setIndex}] Called subscription listener, but state is not mounted. Check for leaks.");
+        return;
+      }
+      setState(() {});
+    });
   }
 
   @override
   void dispose() {
+    logger.i(
+        "[${widget.index} -> ${widget.setIndex}] Canceling subscription: $subscription");
+    subscription?.cancel();
     _weightFocusNode.dispose();
     super.dispose();
   }
@@ -458,6 +510,7 @@ class _WorkoutExerciseSetEditorState extends State<WorkoutExerciseSetEditor> {
         },
       );
   Widget get timeField => TimeInputField(
+        focusNode: _timeFocusNode,
         timerInteractive: () {
           if (widget.isCreating) return false;
           return !widget.set.done;
@@ -475,6 +528,7 @@ class _WorkoutExerciseSetEditorState extends State<WorkoutExerciseSetEditor> {
         },
       );
   TextField get repsField => TextField(
+        focusNode: _repsFocusNode,
         controller: repsController,
         keyboardType: const TextInputType.numberWithOptions(
           decimal: true,
@@ -494,6 +548,7 @@ class _WorkoutExerciseSetEditorState extends State<WorkoutExerciseSetEditor> {
         },
       );
   TextField get distanceField => TextField(
+        focusNode: _distanceFocusNode,
         controller: distanceController,
         keyboardType: const TextInputType.numberWithOptions(
           decimal: true,

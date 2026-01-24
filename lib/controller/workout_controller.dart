@@ -41,6 +41,8 @@ import 'package:gymtracker/view/utils/workout_done.dart';
 import 'package:gymtracker/view/utils/workout_generator.dart';
 import 'package:gymtracker/view/workout.dart';
 
+typedef WorkoutExerciseIndex = ExerciseIndex;
+
 class WorkoutController extends GetxController with ServiceableController {
   RxString name;
   Rx<DateTime> time;
@@ -658,7 +660,7 @@ class WorkoutController extends GetxController with ServiceableController {
               child: Text("ongoingWorkout.cancel.actions.no".t),
             ),
             FilledButton.tonal(
-              onPressed: () {
+              onPressed: () async {
                 Get.back();
                 Get.delete<WorkoutController>();
 
@@ -1139,7 +1141,7 @@ class WorkoutController extends GetxController with ServiceableController {
     return exercises;
   }
 
-  ({int exerciseIndex, int? supersetIndex})? get currentExerciseIndex {
+  WorkoutExerciseIndex? get currentExerciseIndex {
     int i = 0;
     for (final ex in exercises) {
       int j = 0;
@@ -1251,6 +1253,7 @@ and:
             .trim());
       }
     }
+
     exercises.refresh();
     refreshWatchData();
     save();
@@ -1313,6 +1316,7 @@ and:
         restTimeStart: startingTime,
         restTimeEnd: endingTime,
         percentageDone: progress,
+        set: set,
       );
     } else {
       message = NativeWorkoutStateMessage(
@@ -1324,6 +1328,7 @@ and:
         restTimeStart: startingTime,
         restTimeEnd: endingTime,
         percentageDone: progress,
+        set: null,
       );
     }
 
@@ -1335,5 +1340,47 @@ and:
 
   void addSuperset() {
     exercises.add(Superset.empty());
+  }
+
+  Exercise? getExercise(ExerciseIndex index) {
+    return exercises.exerciseAt(index);
+  }
+
+  void updateSetParameters(
+      double? weight, double? timeSeconds, int? reps, double? distance) {
+    final index = currentExerciseIndex;
+    if (index == null) return;
+
+    final exercise = index.supersetIndex == null
+        ? (exercises[index.exerciseIndex] as Exercise)
+        : (exercises[index.supersetIndex!] as Superset)
+            .exercises[index.exerciseIndex];
+    final setIndex = exercise.sets.indexWhere((set) => !set.done);
+    if (setIndex == -1) return;
+
+    if (index.supersetIndex != null) {
+      final sup = exercises[index.supersetIndex!].asSuperset;
+      final ex = sup.exercises[index.exerciseIndex];
+      ex.sets[setIndex] = ex.sets[setIndex].copyWith(
+        weight: weight,
+        time:
+            timeSeconds == null ? null : Duration(seconds: timeSeconds.floor()),
+        reps: reps,
+        distance: distance,
+      );
+    } else {
+      final ex = exercises[index.exerciseIndex].asExercise;
+      ex.sets[setIndex] = ex.sets[setIndex].copyWith(
+        weight: weight,
+        time:
+            timeSeconds == null ? null : Duration(seconds: timeSeconds.floor()),
+        reps: reps,
+        distance: distance,
+      );
+    }
+
+    exercises.refresh();
+    refreshWatchData();
+    save();
   }
 }

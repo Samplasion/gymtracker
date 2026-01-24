@@ -384,7 +384,7 @@ class FoodCategoryFoodsView extends ControlledWidget<FoodController> {
     return StreamBuilder(
       stream: controller.foods$,
       builder: (context, snapshot) {
-        final foods = controller.getFoodsForCategory(category);
+        final foods = controller.getFoodsForCategory(category).toList();
         return Scaffold(
           body: CustomScrollView(
             slivers: [

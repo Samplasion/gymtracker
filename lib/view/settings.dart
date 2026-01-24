@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart' hide Rx, ContextExtensionss;
 import 'package:gymtracker/controller/coordinator.dart';
 import 'package:gymtracker/controller/food_controller.dart';
+import 'package:gymtracker/controller/health_controller.dart';
 import 'package:gymtracker/controller/notifications_controller.dart';
 import 'package:gymtracker/controller/settings_controller.dart';
 import 'package:gymtracker/data/distance.dart';

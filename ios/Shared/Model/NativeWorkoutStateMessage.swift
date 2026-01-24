@@ -17,6 +17,7 @@ struct NativeWorkoutStateMessage: Codable {
     let restTimeStart: Date?
     let restTimeEnd: Date?
     let percentageDone: Double
+    let set: GTSet?
 
     enum CodingKeys: String, CodingKey {
         case hasExercise
@@ -26,7 +27,9 @@ struct NativeWorkoutStateMessage: Codable {
         case startingTime
         case restTimeStart
         case restTimeEnd
+        case workoutStart
         case percentageDone
+        case set
     }
 
     // Encoding
@@ -40,6 +43,7 @@ struct NativeWorkoutStateMessage: Codable {
         try container.encodeIfPresent(restTimeStart?.millisecondsSinceEpoch, forKey: .restTimeStart)
         try container.encodeIfPresent(restTimeEnd?.millisecondsSinceEpoch, forKey: .restTimeEnd)
         try container.encode(percentageDone, forKey: .percentageDone)
+        try container.encodeIfPresent(set, forKey: .set)
     }
     
     func toJSON() throws -> [String: Any]? {
@@ -75,12 +79,17 @@ struct NativeWorkoutStateMessage: Codable {
             restTimeEnd = nil
         }
         percentageDone = try container.decode(Double.self, forKey: .percentageDone)
+        set = try container.decodeIfPresent(GTSet.self, forKey: .set)
     }
     
     static func decodeWorkoutState(fromString string: String) -> NativeWorkoutStateMessage? {
-        if let data = string.data(using: .utf8),
-           let dict = try? JSONSerialization.jsonObject(with: data) as? [String: Any] {
-            return decodeWorkoutState(from: dict)
+        do {
+            if let data = string.data(using: .utf8),
+               let dict = try JSONSerialization.jsonObject(with: data) as? [String: Any] {
+                return decodeWorkoutState(from: dict)
+            }
+        } catch {
+            print("Error decoding workout state: \(error.localizedDescription)")
         }
         
         return nil

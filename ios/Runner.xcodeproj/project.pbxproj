@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 54;
+	objectVersion = 77;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -12,7 +12,9 @@
 		74858FAF1ED2DC5600515810 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74858FAE1ED2DC5600515810 /* AppDelegate.swift */; };
 		7E08EEFC2E428211002D2095 /* Flutter.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7E08EEFB2E428211002D2095 /* Flutter.xcframework */; };
 		7E08EEFF2E428216002D2095 /* Flutter.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7E08EEFB2E428211002D2095 /* Flutter.xcframework */; };
-		7E08EFA32E42A001002D2095 /* NativeWorkoutStateMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7EE0DA532E3B9DCF007A1B07 /* NativeWorkoutStateMessage.swift */; };
+		7E388F802EFEDE1A00DF1010 /* WorkoutManager+iOS.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E388F7F2EFEDE1A00DF1010 /* WorkoutManager+iOS.swift */; };
+		7E3890E12F00018200DF1010 /* TypedApplicationContext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E3890E02F00018200DF1010 /* TypedApplicationContext.swift */; };
+		7E3890E22F00018200DF1010 /* TypedApplicationContext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E3890E02F00018200DF1010 /* TypedApplicationContext.swift */; };
 		7E683CB72D405CFC005EA05C /* FlutterCommunicator.g.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E683CB62D405CFC005EA05C /* FlutterCommunicator.g.swift */; };
 		7EC152AA2DD687B000893E0D /* dummy.txt in Resources */ = {isa = PBXBuildFile; fileRef = 7EC152A92DD687B000893E0D /* dummy.txt */; };
 		7EC6628C2EFDB99D000CD218 /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7E18FD3D2D3F0B850056CFF4 /* WidgetKit.framework */; };
@@ -23,7 +25,6 @@
 		7EE0D9532E394FCB007A1B07 /* GymBroWidgetsExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 7EE0D9442E394FCB007A1B07 /* GymBroWidgetsExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		7EE0D9AB2E398DB6007A1B07 /* ContrastKit in Frameworks */ = {isa = PBXBuildFile; productRef = 7EE0D9AA2E398DB6007A1B07 /* ContrastKit */; };
 		7EE0D9AD2E398E57007A1B07 /* ContrastKit in Frameworks */ = {isa = PBXBuildFile; productRef = 7EE0D9AC2E398E57007A1B07 /* ContrastKit */; };
-		7EE0DA542E3B9DCF007A1B07 /* NativeWorkoutStateMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7EE0DA532E3B9DCF007A1B07 /* NativeWorkoutStateMessage.swift */; };
 		7EE0DE282E3D0CD7007A1B07 /* GymBroWatch Watch App.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = 7EE0DE1B2E3D0CD5007A1B07 /* GymBroWatch Watch App.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		7EE0DE802E3D6EA6007A1B07 /* FlutterLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7EE0DE7F2E3D6EA6007A1B07 /* FlutterLogger.swift */; };
 		7EE0DE812E3D6EA6007A1B07 /* FlutterLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7EE0DE7F2E3D6EA6007A1B07 /* FlutterLogger.swift */; };
@@ -106,6 +107,8 @@
 		7E08EEFB2E428211002D2095 /* Flutter.xcframework */ = {isa = PBXFileReference; expectedSignature = "AppleDeveloperProgram:S8QB4VV633:FLUTTER.IO LLC"; lastKnownFileType = wrapper.xcframework; name = Flutter.xcframework; path = ../../../.puro/shared/caches/36335019a8eab588c3c2ea783c618d90505be233/artifacts/engine/ios/Flutter.xcframework; sourceTree = "<group>"; };
 		7E18FD3D2D3F0B850056CFF4 /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
 		7E18FD3F2D3F0B850056CFF4 /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
+		7E388F7F2EFEDE1A00DF1010 /* WorkoutManager+iOS.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "WorkoutManager+iOS.swift"; sourceTree = "<group>"; };
+		7E3890E02F00018200DF1010 /* TypedApplicationContext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TypedApplicationContext.swift; sourceTree = "<group>"; };
 		7E683BF22D3F117A005EA05C /* Runner.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Runner.entitlements; sourceTree = "<group>"; };
 		7E683CB62D405CFC005EA05C /* FlutterCommunicator.g.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlutterCommunicator.g.swift; sourceTree = "<group>"; };
 		7E97206D2573E144DEEF5C82 /* Pods-Runner.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Runner.release.xcconfig"; path = "Target Support Files/Pods-Runner/Pods-Runner.release.xcconfig"; sourceTree = "<group>"; };
@@ -114,7 +117,6 @@
 		7EC662A02EFDBCC6000CD218 /* GymBroWatchWidgetsExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = GymBroWatchWidgetsExtension.entitlements; sourceTree = "<group>"; };
 		7EE0D9442E394FCB007A1B07 /* GymBroWidgetsExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = GymBroWidgetsExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		7EE0DA132E3A0251007A1B07 /* GymBroWidgetsExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = GymBroWidgetsExtension.entitlements; sourceTree = "<group>"; };
-		7EE0DA532E3B9DCF007A1B07 /* NativeWorkoutStateMessage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NativeWorkoutStateMessage.swift; sourceTree = "<group>"; };
 		7EE0DE1B2E3D0CD5007A1B07 /* GymBroWatch Watch App.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "GymBroWatch Watch App.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		7EE0DE7F2E3D6EA6007A1B07 /* FlutterLogger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlutterLogger.swift; sourceTree = "<group>"; };
 		9740EEB21CF90195004384FC /* Debug.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = Debug.xcconfig; path = Flutter/Debug.xcconfig; sourceTree = "<group>"; };
@@ -128,6 +130,27 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		7E3AB0C02F0A904800C99337 /* Exceptions for "Shared" folder in "Runner" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				WorkoutStreakEntry.swift,
+			);
+			target = 97C146ED1CF9000F007C117D /* Runner */;
+		};
+		7E3AB0C12F0A904800C99337 /* Exceptions for "Shared" folder in "GymBroWidgetsExtension" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				WorkoutStreakEntry.swift,
+			);
+			target = 7EE0D9432E394FCB007A1B07 /* GymBroWidgetsExtension */;
+		};
+		7E3AB0C32F0A904800C99337 /* Exceptions for "Shared" folder in "GymBroWatchWidgetsExtension" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				WorkoutStreakEntry.swift,
+			);
+			target = 7EC6628A2EFDB99D000CD218 /* GymBroWatchWidgetsExtension */;
+		};
 		7EC6629D2EFDB99E000CD218 /* Exceptions for "GymBroWatchWidgets" folder in "GymBroWatchWidgetsExtension" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
@@ -159,6 +182,16 @@
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
+		7E388F772EFEDD8F00DF1010 /* Shared */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				7E3AB0C02F0A904800C99337 /* Exceptions for "Shared" folder in "Runner" target */,
+				7E3AB0C12F0A904800C99337 /* Exceptions for "Shared" folder in "GymBroWidgetsExtension" target */,
+				7E3AB0C32F0A904800C99337 /* Exceptions for "Shared" folder in "GymBroWatchWidgetsExtension" target */,
+			);
+			path = Shared;
+			sourceTree = "<group>";
+		};
 		7EC6628E2EFDB99D000CD218 /* GymBroWatchWidgets */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
@@ -179,8 +212,6 @@
 		};
 		7EE0DE1C2E3D0CD5007A1B07 /* GymBroWatch Watch App */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-			);
 			path = "GymBroWatch Watch App";
 			sourceTree = "<group>";
 		};
@@ -237,14 +268,6 @@
 			path = Pods;
 			sourceTree = "<group>";
 		};
-		7E08EFA22E429FF5002D2095 /* Shared */ = {
-			isa = PBXGroup;
-			children = (
-				7EE0DA532E3B9DCF007A1B07 /* NativeWorkoutStateMessage.swift */,
-			);
-			path = Shared;
-			sourceTree = "<group>";
-		};
 		82D27AC9AF3209D89BAA80BA /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
@@ -271,7 +294,7 @@
 			isa = PBXGroup;
 			children = (
 				7EC662A02EFDBCC6000CD218 /* GymBroWatchWidgetsExtension.entitlements */,
-				7E08EFA22E429FF5002D2095 /* Shared */,
+				7E388F772EFEDD8F00DF1010 /* Shared */,
 				9740EEB11CF90186004384FC /* Flutter */,
 				97C146F01CF9000F007C117D /* Runner */,
 				7EE0D9472E394FCB007A1B07 /* GymBroWidgets */,
@@ -308,8 +331,10 @@
 				97C147021CF9000F007C117D /* Info.plist */,
 				1498D2321E8E86230040F4C2 /* GeneratedPluginRegistrant.h */,
 				1498D2331E8E89220040F4C2 /* GeneratedPluginRegistrant.m */,
+				7E3890E02F00018200DF1010 /* TypedApplicationContext.swift */,
 				74858FAE1ED2DC5600515810 /* AppDelegate.swift */,
 				74858FAD1ED2DC5600515810 /* Runner-Bridging-Header.h */,
+				7E388F7F2EFEDE1A00DF1010 /* WorkoutManager+iOS.swift */,
 			);
 			path = Runner;
 			sourceTree = "<group>";
@@ -375,6 +400,7 @@
 				7EC662972EFDB99E000CD218 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
+				7E388F772EFEDD8F00DF1010 /* Shared */,
 				7EE0DE1C2E3D0CD5007A1B07 /* GymBroWatch Watch App */,
 			);
 			name = "GymBroWatch Watch App";
@@ -404,6 +430,9 @@
 			dependencies = (
 				7EE0D9522E394FCB007A1B07 /* PBXTargetDependency */,
 				7EE0DE272E3D0CD7007A1B07 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				7E388F772EFEDD8F00DF1010 /* Shared */,
 			);
 			name = Runner;
 			productName = Runner;
@@ -572,9 +601,13 @@
 			inputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-Runner/Pods-Runner-frameworks-${CONFIGURATION}-input-files.xcfilelist",
 			);
+			inputPaths = (
+			);
 			name = "[CP] Embed Pods Frameworks";
 			outputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-Runner/Pods-Runner-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -611,9 +644,13 @@
 			inputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-Runner/Pods-Runner-resources-${CONFIGURATION}-input-files.xcfilelist",
 			);
+			inputPaths = (
+			);
 			name = "[CP] Copy Pods Resources";
 			outputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-Runner/Pods-Runner-resources-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -643,7 +680,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				7E08EFA32E42A001002D2095 /* NativeWorkoutStateMessage.swift in Sources */,
+				7E3890E22F00018200DF1010 /* TypedApplicationContext.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -651,9 +688,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				7E388F802EFEDE1A00DF1010 /* WorkoutManager+iOS.swift in Sources */,
+				7E3890E12F00018200DF1010 /* TypedApplicationContext.swift in Sources */,
 				74858FAF1ED2DC5600515810 /* AppDelegate.swift in Sources */,
 				1498D2341E8E89220040F4C2 /* GeneratedPluginRegistrant.m in Sources */,
-				7EE0DA542E3B9DCF007A1B07 /* NativeWorkoutStateMessage.swift in Sources */,
 				7E683CB72D405CFC005EA05C /* FlutterCommunicator.g.swift in Sources */,
 				7EE0DE802E3D6EA6007A1B07 /* FlutterLogger.swift in Sources */,
 			);
@@ -1082,6 +1120,9 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "GymBroWatch-Watch-App-Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = "Gym Bro";
+				INFOPLIST_KEY_NSHealthClinicalHealthRecordsShareUsageDescription = "We read your heart rate and show it in the workout view.";
+				INFOPLIST_KEY_NSHealthShareUsageDescription = "We read your heart rate and show it in the workout view.";
+				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "We store the results of successful workouts in your Health history.";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = org.js.samplasion.gymbro;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -1129,6 +1170,9 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "GymBroWatch-Watch-App-Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = "Gym Bro";
+				INFOPLIST_KEY_NSHealthClinicalHealthRecordsShareUsageDescription = "We read your heart rate and show it in the workout view.";
+				INFOPLIST_KEY_NSHealthShareUsageDescription = "We read your heart rate and show it in the workout view.";
+				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "We store the results of successful workouts in your Health history.";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = org.js.samplasion.gymbro;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -1174,6 +1218,9 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "GymBroWatch-Watch-App-Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = "Gym Bro";
+				INFOPLIST_KEY_NSHealthClinicalHealthRecordsShareUsageDescription = "We read your heart rate and show it in the workout view.";
+				INFOPLIST_KEY_NSHealthShareUsageDescription = "We read your heart rate and show it in the workout view.";
+				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "We store the results of successful workouts in your Health history.";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = org.js.samplasion.gymbro;
 				LD_RUNPATH_SEARCH_PATHS = (

@@ -7,6 +7,7 @@ import 'package:gymtracker/controller/debug_controller.dart';
 import 'package:gymtracker/controller/error_controller.dart';
 import 'package:gymtracker/controller/exercises_controller.dart';
 import 'package:gymtracker/controller/food_controller.dart';
+import 'package:gymtracker/controller/health_controller.dart';
 import 'package:gymtracker/controller/history_controller.dart';
 import 'package:gymtracker/controller/me_controller.dart';
 import 'package:gymtracker/controller/migrations_controller.dart';
@@ -64,10 +65,12 @@ class Coordinator extends GetxController
 
     showPermissionTilesStream.add(
         get<NotificationController>().showSettingsTileStream.value ||
-            get<FoodController>().showSettingsTileStream.value);
+            get<FoodController>().showSettingsTileStream.value ||
+            !get<HealthController>().hasPermissionStream.value);
     Rx.combineLatest([
       get<NotificationController>().showSettingsTileStream,
       get<FoodController>().showSettingsTileStream,
+      get<HealthController>().hasPermissionStream.map((e) => !e),
     ], (e) {
       logger.d("Show permission tiles: $e");
       return e.any((element) => element);
@@ -97,6 +100,7 @@ class Coordinator extends GetxController
     Get.delete<FoodController>();
     Get.delete<AchievementsController>();
     Get.delete<BoutiqueController>();
+    Get.delete<HealthController>();
     if (Configuration.isOnlineAccountEnabled) {
       Get.delete<OnlineController>();
     }
@@ -120,6 +124,7 @@ class Coordinator extends GetxController
     Get.put(FoodController());
     Get.put(AchievementsController());
     Get.put(BoutiqueController());
+    Get.put(HealthController());
     if (Configuration.isOnlineAccountEnabled) {
       Get.put(OnlineController());
     }

@@ -12,11 +12,14 @@ import 'package:gymtracker/controller/settings_controller.dart';
 import 'package:gymtracker/data/distance.dart';
 import 'package:gymtracker/data/weights.dart';
 import 'package:gymtracker/model/exercisable.dart';
+import 'package:gymtracker/model/exercise.dart';
 import 'package:gymtracker/model/set.dart';
 import 'package:gymtracker/model/workout.dart';
 import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/service/logger.dart';
+import 'package:gymtracker/struct/editor_callback.dart';
 import 'package:gymtracker/utils/utils.dart';
+import 'package:gymtracker/view/components/parent_viewer.dart';
 import 'package:gymtracker/view/utils/timer.dart';
 import 'package:intl/intl.dart' hide TextDirection;
 
@@ -365,6 +368,15 @@ extension WorkoutIterableUtils on Iterable<Workout> {
           )));
     }
     return result;
+  }
+}
+
+extension WorkoutExerciseIterableUtils on List<WorkoutExercisable> {
+  Exercise? exerciseAt(ExerciseIndex index) {
+    return index.supersetIndex == null
+        ? (this[index.exerciseIndex].asExercise)
+        : (this[index.supersetIndex!].asSuperset)
+            .exercises[index.exerciseIndex];
   }
 }
 

@@ -50,6 +50,8 @@ PODS:
     - Flutter
   - flutter_zxing (0.0.1):
     - Flutter
+  - health (13.1.3):
+    - Flutter
   - home_widget (0.0.1):
     - Flutter
   - image_picker_ios (0.0.1):
@@ -106,6 +108,7 @@ DEPENDENCIES:
   - flutter_local_notifications (from `.symlinks/plugins/flutter_local_notifications/ios`)
   - flutter_timezone (from `.symlinks/plugins/flutter_timezone/ios`)
   - flutter_zxing (from `.symlinks/plugins/flutter_zxing/ios`)
+  - health (from `.symlinks/plugins/health/ios`)
   - home_widget (from `.symlinks/plugins/home_widget/ios`)
   - image_picker_ios (from `.symlinks/plugins/image_picker_ios/ios`)
   - integration_test (from `.symlinks/plugins/integration_test/ios`)
@@ -147,6 +150,8 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/flutter_timezone/ios"
   flutter_zxing:
     :path: ".symlinks/plugins/flutter_zxing/ios"
+  health:
+    :path: ".symlinks/plugins/health/ios"
   home_widget:
     :path: ".symlinks/plugins/home_widget/ios"
   image_picker_ios:
@@ -183,6 +188,7 @@ SPEC CHECKSUMS:
   flutter_local_notifications: ad39620c743ea4c15127860f4b5641649a988100
   flutter_timezone: ee50ce7786b5fde27e2fe5375bbc8c9661ffc13f
   flutter_zxing: e741c4f3335db8910e5c396c4291cdfb320859dc
+  health: f496ad838f4bd227191f5bc05060b6f6138b44fd
   home_widget: f169fc41fd807b4d46ab6615dc44d62adbf9f64f
   image_picker_ios: 7fe1ff8e34c1790d6fff70a32484959f563a928a
   integration_test: 4a889634ef21a45d28d50d622cf412dc6d9f586e

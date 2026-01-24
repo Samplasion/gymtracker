@@ -10,11 +10,12 @@ import SwiftUI
 
 @main
 struct GymBroWatchWidgetsBundle: WidgetBundle {
-    var body: some Widget {
-        if #available(iOS 17, *) {
-            GymBroWidgetsTotal()
-            GymBroWidgetsStreak()
-            GymBroWidgetsRest()
-        }
+  var body: some Widget {
+    if #available(iOS 17, *) {
+      GymBroWidgetsTotal()
+      GymBroWidgetsStreak()
+      GymBroWidgetsRest()
+      GymBroWidgetsDensity()
     }
+  }
 }

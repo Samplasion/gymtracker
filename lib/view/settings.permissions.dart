@@ -17,6 +17,7 @@ class PermissionsSettingsPane extends ControlledWidget<SettingsController> {
               delegate: SliverChildListDelegate([
                 Get.find<NotificationController>().settingsTile,
                 Get.find<FoodController>().settingsTile,
+                Get.find<HealthController>().settingsTile,
               ]),
             ),
             const SliverToBoxAdapter(child: SizedBox(height: 8)),

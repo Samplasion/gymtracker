@@ -100,6 +100,7 @@ class GTIcons {
   static const IconData account = Icons.account_circle_rounded;
   static const IconData achievements = Icons.emoji_events_rounded;
   static const IconData achievement_locked = Icons.lock_rounded;
+  static const IconData active_energy = _fire;
   static const IconData add_exercise = Icons.add_rounded;
   static const IconData add_food = Icons.post_add_rounded;
   static const IconData add_measurement = Icons.add_rounded;
@@ -149,6 +150,8 @@ class GTIcons {
   static const IconData food_categories = Icons.local_dining_rounded;
   static const IconData gallery = Icons.photo_library_rounded;
   static const IconData generate = _sparkles;
+  static const IconData health = Icons.health_and_safety;
+  static const IconData heart_rate = Icons.favorite;
   static const IconData help = Icons.help_rounded;
   static const IconData highlight = Icons.highlight_rounded;
   static const IconData history = Icons.history_rounded;

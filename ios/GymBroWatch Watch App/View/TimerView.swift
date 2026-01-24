@@ -17,9 +17,7 @@ struct TimerView: View {
             timerLogic()
         }
     }
-    
-    let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
-    
+        
     private func timerLogic() {
         timeDelta = timerEndDate.timeIntervalSinceNow.rounded(.toNearestOrAwayFromZero)
         showTimer = timeDelta > 0
@@ -33,9 +31,6 @@ struct TimerView: View {
             } else {
                 _TimerViewInner(text: convertTimeInterval(timeDelta))
             }
-        }
-        .onReceive(timer) { _ in
-            timerLogic()
         }
     }
 }

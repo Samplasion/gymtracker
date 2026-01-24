@@ -15,7 +15,7 @@ struct Provider: AppIntentTimelineProvider {
     typealias Intent = ConfigurationAppIntent
     
     func placeholder(in context: Context) -> WorkoutStreakEntry {
-        WorkoutStreakEntry(date: Date(), streak: 3, dailyRestStreak: 2, totalWorkouts: 54)
+        WorkoutStreakEntry(date: Date(), streak: 3, dailyRestStreak: .now.addingTimeInterval(-60*60*24*2), totalWorkouts: 54, workoutDensityChartData: [])
     }
 
     func snapshot(for configuration: ConfigurationAppIntent, in context: Context) async -> WorkoutStreakEntry {
@@ -26,9 +26,10 @@ struct Provider: AppIntentTimelineProvider {
             // Get the data from the user defaults to display
             let userDefaults = UserDefaults(suiteName: "group.samplasion.gymtracker")
             let streak = userDefaults?.integer(forKey: "weekly_streak") ?? 0
-            let rest = userDefaults?.integer(forKey: "daily_rest_streak") ?? 0
+            let restTimestamp = Double(userDefaults?.integer(forKey: "daily_rest_streak_since") ?? 0)
+            let rest = Date(timeIntervalSince1970: restTimestamp / 1000)
             let total = userDefaults?.integer(forKey: "total_workouts") ?? 0
-            entry = WorkoutStreakEntry(date: Date(), streak: streak, dailyRestStreak: rest, totalWorkouts: total)
+            entry = WorkoutStreakEntry(date: Date(), streak: streak, dailyRestStreak: rest, totalWorkouts: total, workoutDensityChartData: [])
       }
         return entry
     }
@@ -36,13 +37,6 @@ struct Provider: AppIntentTimelineProvider {
     func timeline(for configuration: ConfigurationAppIntent, in context: Context) async -> Timeline<WorkoutStreakEntry> {
         return Timeline(entries: [await snapshot(for: configuration, in: context)], policy: .atEnd)
     }
-}
-
-struct WorkoutStreakEntry: TimelineEntry {
-    var date: Date
-    let streak: Int
-    let dailyRestStreak: Int
-    let totalWorkouts: Int
 }
 
 enum GBWidgetView {
@@ -88,7 +82,7 @@ struct WidgetsEntryView: View {
 
     var body: some View {
         let streak: LocalizedStringKey = "\(entry.streak) weeks"
-        let rest: LocalizedStringKey = "\(entry.dailyRestStreak) days"
+        let rest: LocalizedStringKey = "\(entry.restStreakDays) days"
         let total: LocalizedStringKey = "\(entry.totalWorkouts) workouts"
         
         @ViewBuilder
@@ -120,7 +114,7 @@ struct WidgetsEntryView: View {
                     switch (widgetView) {
                     case .streak: Text("\(entry.streak)").font(.caption)
                             .fontWeight(.semibold)
-                    case .rest: Text("\(entry.dailyRestStreak)").font(.caption)
+                    case .rest: Text("\(entry.restStreakDays)").font(.caption)
                             .fontWeight(.semibold)
                     case .total: Text("\(entry.totalWorkouts)").font(.caption)
                             .fontWeight(.semibold)

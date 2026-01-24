@@ -6,7 +6,8 @@ import 'package:gymtracker/model/native.dart';
 import 'package:gymtracker/service/logger.dart';
 import 'package:gymtracker/service/native.g.dart';
 import 'package:gymtracker/service/widgets.dart'
-    show streakKey, restKey, totalWorkoutsKey;
+    show restKey, streakKey, totalWorkoutsKey, workoutDensityKey;
+import 'package:rxdart/rxdart.dart';
 
 abstract class NativeService {
   static NativeService instance() {
@@ -19,18 +20,28 @@ abstract class NativeService {
 
   NativeService._();
 
+  Stream<double?> get energyStream;
+  Stream<double?> get heartRateStream;
+
   void setIsWorkoutRunning(bool isWorkoutRunning);
   void setExerciseParameters(NativeWorkoutStateMessage parameters);
   Future<void> updateHomeWidgetParameters({
     required int weekStreak,
-    required int restDays,
+    required DateTime lastWorkoutDay,
     required int workouts,
+    required List<int> workoutDensityChartData,
   });
+  void setFoodParameters(NativeFoodStateMessage parameters);
 }
 
 class _UnsupportedNativeService extends NativeService
     implements GymBroNativeFlutterAPI {
   _UnsupportedNativeService._() : super._();
+
+  @override
+  Stream<double?> get energyStream => const Stream<double?>.empty();
+  @override
+  Stream<double?> get heartRateStream => const Stream<double?>.empty();
 
   @override
   void markThisSetAsDone() {
@@ -55,9 +66,26 @@ class _UnsupportedNativeService extends NativeService
   @override
   Future<void> updateHomeWidgetParameters({
     required int weekStreak,
-    required int restDays,
+    required DateTime lastWorkoutDay,
     required int workouts,
+    required List<int> workoutDensityChartData,
   }) async {
+    // no-op
+  }
+
+  @override
+  void handleWorkoutMetrics(double? energy, double? heartRate) {
+    // no-op
+  }
+
+  @override
+  void updateSetParameters(
+      double? weight, double? timeSeconds, int? reps, double? distance) {
+    // no-op
+  }
+
+  @override
+  void setFoodParameters(NativeFoodStateMessage parameters) {
     // no-op
   }
 }
@@ -74,6 +102,14 @@ class _NativeServiceImpl extends NativeService
     GymBroNativeLoggerChannel.setUp(this);
   }
 
+  final _energy$ = BehaviorSubject<double?>();
+  final _heartRate$ = BehaviorSubject<double?>();
+
+  @override
+  Stream<double?> get energyStream => _energy$.stream;
+  @override
+  Stream<double?> get heartRateStream => _heartRate$.stream;
+
   @override
   void markThisSetAsDone() {
     logger.i("Received markThisSetAsDone from native.");
@@ -86,6 +122,8 @@ class _NativeServiceImpl extends NativeService
     if (isWorkoutRunning) {
       _watch.startWorkout();
     } else {
+      _energy$.add(null);
+      _heartRate$.add(null);
       _watch.stopWorkout();
     }
   }
@@ -101,6 +139,7 @@ class _NativeServiceImpl extends NativeService
   void requestTrainingData() {
     logger.i("Received requestTrainingData from native.");
     if (!Get.isRegistered<WorkoutController>()) {
+      // Cancel workout
       _watch.stopWorkout();
       return;
     }
@@ -118,17 +157,49 @@ class _NativeServiceImpl extends NativeService
   }
 
   @override
-  Future<void> updateHomeWidgetParameters(
-      {required int weekStreak, required int restDays, required int workouts}) {
+  Future<void> updateHomeWidgetParameters({
+    required int weekStreak,
+    required DateTime lastWorkoutDay,
+    required int workouts,
+    required List<int> workoutDensityChartData,
+  }) {
     logger.i("""Sending complication data to native side: ${(
       weekStreak: weekStreak,
-      restDays: restDays,
-      workouts: workouts
+      restDays: lastWorkoutDay,
+      workouts: workouts,
+      workoutDensityChartData: workoutDensityChartData,
     )}""");
     return _watch.updateHomeWidgetParameters({
       streakKey: weekStreak,
-      restKey: restDays,
+      restKey: lastWorkoutDay.millisecondsSinceEpoch,
       totalWorkoutsKey: workouts,
-    });
+    }, workoutDensityChartData);
+  }
+
+  @override
+  void handleWorkoutMetrics(double? energy, double? heartRate) {
+    logger.i(
+        "Native side sent the following metrics: $energy kcal, $heartRate bpm");
+    if (energy != null) _energy$.add(energy);
+    if (heartRate != null) _heartRate$.add(heartRate);
+    if (energy == null && heartRate == null) {
+      // If both are null, reset
+      _energy$.add(null);
+      _heartRate$.add(null);
+    }
+  }
+
+  @override
+  void updateSetParameters(
+      double? weight, double? timeSeconds, int? reps, double? distance) {
+    Get.find<WorkoutController>()
+        .updateSetParameters(weight, timeSeconds, reps, distance);
+  }
+
+  @override
+  void setFoodParameters(NativeFoodStateMessage parameters) {
+    logger.i(
+        """Setting food parameters on native side: ${parameters.toJson()}""");
+    _watch.updateFoodParameters(parameters.toJson());
   }
 }

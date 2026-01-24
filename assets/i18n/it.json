@@ -537,7 +537,9 @@
     "info": {
       "time": "Tempo",
       "reps": "Ripetizioni",
-      "volume": "Volume sollevato"
+      "volume": "Volume sollevato",
+      "heartRate": "BPM",
+      "activeEnergy": "KCAL"
     },
     "finish": {
       "title": "Termina allenamento",

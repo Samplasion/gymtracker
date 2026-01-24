@@ -13,8 +13,10 @@ import 'package:gymtracker/controller/serviceable_controller.dart';
 import 'package:gymtracker/controller/settings_controller.dart';
 import 'package:gymtracker/icons/gymtracker_icons.dart';
 import 'package:gymtracker/model/achievements.dart';
+import 'package:gymtracker/model/native.dart';
 import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/service/logger.dart';
+import 'package:gymtracker/service/native.dart';
 import 'package:gymtracker/service/version.dart';
 import 'package:gymtracker/struct/date_sequence.dart';
 import 'package:gymtracker/struct/nutrition.dart';
@@ -167,6 +169,7 @@ class FoodController extends GetxController with ServiceableController {
         logger.d("Foods updated with ${foods.length} items");
         Get.find<Coordinator>()
             .maybeUnlockAchievements(AchievementTrigger.food);
+        updateNativeData();
       });
     service.nutritionGoals$.listen((goals) {
       logger.d("Goals updated with ${goals.length} items");
@@ -178,6 +181,7 @@ class FoodController extends GetxController with ServiceableController {
                 value: NutritionGoal.defaultGoal,
               ),
           ]));
+      updateNativeData();
     });
     service.favoriteFoods$
       ..pipe(favorites$)
@@ -193,6 +197,7 @@ class FoodController extends GetxController with ServiceableController {
       ..pipe(categories$)
       ..listen((categories) {
         logger.d("Categories updated with ${categories.length} items");
+        updateNativeData();
       });
     permission$
         .map((t) => !(t.camera && t.gallery))
@@ -625,14 +630,14 @@ class FoodController extends GetxController with ServiceableController {
     }
   }
 
-  NutritionGoal getGoal() {
-    final date = day$.value.startOfDay;
+  NutritionGoal getGoal([DateTime? reference]) {
+    final date = (reference ?? day$.value).startOfDay;
     final goals = goals$.value;
     return goals[date];
   }
 
-  Map<String, NutritionCategory> getCategories() {
-    final date = day$.value.startOfDay;
+  Map<String, NutritionCategory> getCategories([DateTime? reference]) {
+    final date = (reference ?? day$.value).startOfDay;
     final categories = categories$.value;
     if (categories.isEmpty) return {};
     return categories[date];
@@ -831,8 +836,11 @@ class FoodController extends GetxController with ServiceableController {
     }
   }
 
-  List<Food> getFoodsForCategory(NutritionCategory category) {
-    return getFoods().where((food) => food.category == category.name).toList();
+  Iterable<Food> getFoodsForCategory(NutritionCategory category,
+      [DateTime? reference]) {
+    return getFoodsForDay(reference ?? day$.value)
+        .where((food) => food.value.category == category.name)
+        .map((f) => f.value);
   }
 
   List<Food> getUnassignedFoods() {
@@ -858,6 +866,65 @@ class FoodController extends GetxController with ServiceableController {
     return foods$.value
         .where((element) => element.date.isSameDay(day))
         .toList();
+  }
+
+  void updateNativeData() {
+    logger.i("Syncing food data to native services.");
+    final now = DateTime.now();
+    final goal = getGoal(now);
+    final foods = getFoodsForDay(now);
+
+    final foodProteinIntake = foods.fold<double>(
+        0,
+        (previousValue, element) =>
+            previousValue + element.value.nutritionalValues.protein);
+    final foodCarbsIntake = foods.fold<double>(
+        0,
+        (previousValue, element) =>
+            previousValue + element.value.nutritionalValues.carbs);
+    final foodFatsIntake = foods.fold<double>(
+        0,
+        (previousValue, element) =>
+            previousValue + element.value.nutritionalValues.fat);
+
+    NativeService.instance().setFoodParameters(NativeFoodStateMessage(
+      calorieGoal: goal.dailyCalories,
+      calorieIntake: getFoodsForDay(now).fold<double>(
+          0,
+          (previousValue, element) =>
+              previousValue + element.value.nutritionalValues.calories),
+      categories: getCategories(now).values.map((c) {
+        final foodsForCategory = getFoodsForCategory(c, now);
+
+        double proteinSum = 0, carbsSum = 0, fatsSum = 0;
+
+        for (final food in foodsForCategory) {
+          proteinSum += food.nutritionalValues.protein;
+          carbsSum += food.nutritionalValues.carbs;
+          fatsSum += food.nutritionalValues.fat;
+        }
+
+        return NativeFoodCategory(
+            name: c.name,
+            emoji: c.icon.emoji,
+            nutritionSplit: NativeFoodNutritionSplit(
+              protein: proteinSum,
+              proteinGoal: goal.dailyProtein / c.dailyPercentage.toDouble(),
+              carbs: carbsSum,
+              carbsGoal: goal.dailyCarbs / c.dailyPercentage.toDouble(),
+              fats: fatsSum,
+              fatsGoal: goal.dailyFat / c.dailyPercentage.toDouble(),
+            ));
+      }).toList(),
+      totalNutritionSplit: NativeFoodNutritionSplit(
+        protein: foodProteinIntake,
+        proteinGoal: goal.dailyProtein,
+        carbs: foodCarbsIntake,
+        carbsGoal: goal.dailyCarbs,
+        fats: foodFatsIntake,
+        fatsGoal: goal.dailyFat,
+      ),
+    ));
   }
 }
 

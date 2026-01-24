@@ -238,12 +238,27 @@ class _DebugViewState extends State<DebugView> {
                   WidgetsService.instance().updateWorkouts(
                       Get.find<HistoryController>().history.length);
                   NativeService.instance().updateHomeWidgetParameters(
-                    weekStreak:
-                        Get.find<HistoryController>().streaks.value.weekStreak,
-                    restDays:
-                        Get.find<HistoryController>().streaks.value.restDays,
-                    workouts: Get.find<HistoryController>().history.length,
-                  );
+                      weekStreak: Get.find<HistoryController>()
+                          .streaks
+                          .value
+                          .weekStreak,
+                      lastWorkoutDay: Get.find<HistoryController>().let((self) {
+                        return ([
+                          self.userVisibleWorkouts.first.startingDate!,
+                          self.userVisibleWorkouts.last.startingDate!
+                        ]..sort())
+                            .last;
+                      }),
+                      workouts: Get.find<HistoryController>().userVisibleLength,
+                      workoutDensityChartData: [
+                        for (int i = 0; i < 7 * 18; i++)
+                          Get.find<HistoryController>()
+                                  .workoutsByDay[DateTime.now()
+                                      .subtract(Duration(days: i))
+                                      .startOfDay]
+                                  ?.length ??
+                              0,
+                      ]);
                 },
               ),
 

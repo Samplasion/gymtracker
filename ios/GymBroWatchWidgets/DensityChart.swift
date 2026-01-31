@@ -43,9 +43,9 @@ struct DensityChart: View {
           }
         }
       }
-      .frame(height: 50)
       .tint(.accent)
     }
+    .padding(8)
     .frame(
       minWidth: 0,
       maxWidth: .infinity,

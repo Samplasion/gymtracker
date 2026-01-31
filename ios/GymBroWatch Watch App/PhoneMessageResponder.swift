@@ -70,7 +70,7 @@ class PhoneMessageResponder: NSObject {
                     foodDelegate?.set(foodParameters: params)
                 }
             default:
-                log("Unknown user info kind: \(applicationContext)")
+                log("Unknown application context kind: \(applicationContext)")
                 break
             }
         }

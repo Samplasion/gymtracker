@@ -248,16 +248,17 @@ struct GymBroWidgetsDensity: Widget {
   var body: some WidgetConfiguration {
     StaticConfiguration(kind: kind, provider: Provider()) { entry in
       if #available(watchOS 10.0, *) {
-        DensityChart(values: entry.workoutDensityChartData)
+        DensityChart(values: entry.calculatedWorkoutDensityChartData)
           .containerBackground(.fill.tertiary, for: .widget)
       } else {
-        DensityChart(values: entry.workoutDensityChartData)
+        DensityChart(values: entry.calculatedWorkoutDensityChartData)
           .background(.clear)
       }
     }
     .configurationDisplayName("Workout density")
     .description("Your workout density over the last 18 weeks.")
     .supportedFamilies([.accessoryRectangular])
+    .contentMarginsDisabled()
   }
 }
 

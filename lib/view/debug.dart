@@ -242,12 +242,16 @@ class _DebugViewState extends State<DebugView> {
                           .streaks
                           .value
                           .weekStreak,
-                      lastWorkoutDay: Get.find<HistoryController>().let((self) {
+                      lastWorkoutDay: Get.find<HistoryController>()
+                          .userVisibleWorkouts
+                          .let((self) {
+                        if (self.isEmpty) return DateTime.now().startOfDay;
                         return ([
-                          self.userVisibleWorkouts.first.startingDate!,
-                          self.userVisibleWorkouts.last.startingDate!
+                          self.first.startingDate!,
+                          self.last.startingDate!
                         ]..sort())
-                            .last;
+                            .last
+                            .startOfDay;
                       }),
                       workouts: Get.find<HistoryController>().userVisibleLength,
                       workoutDensityChartData: [

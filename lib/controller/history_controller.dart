@@ -96,20 +96,16 @@ class HistoryController extends GetxController with ServiceableController {
       WidgetsService.instance().updateWeeklyStreak(streaks.value.weekStreak);
       WidgetsService.instance().updateRestStreak(streaks.value.restDays);
       WidgetsService.instance().updateWorkouts(userVisibleWorkouts.length);
-      logger.f(([
-        userVisibleWorkouts.first.startingDate!,
-        userVisibleWorkouts.last.startingDate!
-      ]..sort())
-          .last);
       const daysBack = 7 * 18; // 18 weeks
       final now = DateTime.now();
       NativeService.instance().updateHomeWidgetParameters(
         weekStreak: streaks.value.weekStreak,
-        lastWorkoutDay: ([
-          userVisibleWorkouts.first.startingDate!,
-          userVisibleWorkouts.last.startingDate!
-        ]..sort())
-            .last,
+        lastWorkoutDay: userVisibleWorkouts.let((self) {
+          if (self.isEmpty) return DateTime.now().startOfDay;
+          return ([self.first.startingDate!, self.last.startingDate!]..sort())
+              .last
+              .startOfDay;
+        }),
         workouts: userVisibleWorkouts.length,
         workoutDensityChartData: [
           for (int i = 0; i < daysBack; i++)

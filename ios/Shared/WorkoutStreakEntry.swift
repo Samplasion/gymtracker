@@ -39,8 +39,8 @@ struct WorkoutStreakEntry: TimelineEntry {
       return Array(repeating: 0, count: self.restStreakDays)
     } else {
       // "Slide" the workouts
-      currentData.removeFirst(self.restStreakDays)
-      currentData.append(contentsOf: Array(repeating: 0, count: self.restStreakDays))
+      currentData.removeLast(self.restStreakDays)
+      currentData.insert(contentsOf: Array(repeating: 0, count: self.restStreakDays), at: 0)
       return currentData
     }
   }

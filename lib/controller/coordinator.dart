@@ -203,6 +203,12 @@ class Coordinator extends GetxController
         .d("Recomputed suggested routines with ${suggestions().length} values");
   }
 
+  computeStreaks() {
+    if (Get.isRegistered<HistoryController>()) {
+      get<HistoryController>().computeStreaks();
+    }
+  }
+
   void onNotificationTapped(NotificationResponse value) {
     if (Get.isRegistered<WorkoutController>()) {
       get<WorkoutController>().onNotificationTapped(value);
@@ -265,6 +271,7 @@ class Coordinator extends GetxController
   }
 
   void syncNative() {
+    computeStreaks();
     if (Get.isRegistered<WorkoutController>()) {
       get<WorkoutController>().refreshWatchData();
     } else {

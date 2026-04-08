@@ -246,7 +246,14 @@
       }
     },
     "Workout density" : {
-
+      "localizations" : {
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Distribuzione degli allenamenti"
+          }
+        }
+      }
     },
     "Workouts" : {
       "localizations" : {
@@ -265,7 +272,24 @@
       }
     },
     "Your workout density over the last 18 weeks." : {
-
+      "localizations" : {
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La distribuzione dei tuoi allenamenti nelle ultime settimane."
+          }
+        }
+      }
+    },
+    "Your workout density over the last weeks." : {
+      "localizations" : {
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La distribuzione dei tuoi allenamenti nelle ultime settimane."
+          }
+        }
+      }
     },
     "" : {
       "shouldTranslate" : false

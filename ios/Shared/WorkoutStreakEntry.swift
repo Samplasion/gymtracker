@@ -35,7 +35,7 @@ struct WorkoutStreakEntry: TimelineEntry {
       return []
     }
     
-    if self.restStreakDays > workoutDensityChartData.count {
+    if self.restStreakDays >= workoutDensityChartData.count {
       return Array(repeating: 0, count: self.restStreakDays)
     } else {
       // "Slide" the workouts

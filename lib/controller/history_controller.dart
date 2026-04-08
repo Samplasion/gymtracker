@@ -98,6 +98,15 @@ class HistoryController extends GetxController with ServiceableController {
       WidgetsService.instance().updateWorkouts(userVisibleWorkouts.length);
       const daysBack = 7 * 18; // 18 weeks
       final now = DateTime.now();
+      var workoutDensityChartData = [
+        for (int i = 0; i < daysBack; i++)
+          workoutsByDay[now.subtract(Duration(days: i)).startOfDay]?.length ??
+              0,
+      ];
+      // The dynamic calculation of rest day slots is done downstream
+      while (workoutDensityChartData[0] == 0) {
+        workoutDensityChartData.add(workoutDensityChartData.removeAt(0));
+      }
       NativeService.instance().updateHomeWidgetParameters(
         weekStreak: streaks.value.weekStreak,
         lastWorkoutDay: userVisibleWorkouts.let((self) {
@@ -107,11 +116,7 @@ class HistoryController extends GetxController with ServiceableController {
               .startOfDay;
         }),
         workouts: userVisibleWorkouts.length,
-        workoutDensityChartData: [
-          for (int i = 0; i < daysBack; i++)
-            workoutsByDay[now.subtract(Duration(days: i)).startOfDay]?.length ??
-                0,
-        ],
+        workoutDensityChartData: workoutDensityChartData,
       );
 
       logger.i(

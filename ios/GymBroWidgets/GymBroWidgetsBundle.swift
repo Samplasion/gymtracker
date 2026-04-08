@@ -10,12 +10,14 @@ import SwiftUI
 
 @main
 struct GymBroWidgetsBundle: WidgetBundle {
-    var body: some Widget {
-        if #available(iOS 17.0, *) {
-            GymBroWidgetsTotal()
-            GymBroWidgetsStreak()
-            GymBroWidgetsRest()
-        }
-        GymBroWidgetsLiveActivity()
+  var body: some Widget {
+    if #available(iOS 17.0, *) {
+      GymBroWidgetsTotal()
+      GymBroWidgetsStreak()
+      GymBroWidgetsRest()
+      GymBroWidgetsDensity()
     }
+    GymBroWidgetsLiveActivity()
+  }
 }
+

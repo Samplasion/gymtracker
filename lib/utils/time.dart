@@ -4,7 +4,7 @@
 String stringifyTime(int seconds) {
   final mins = (seconds ~/ 100) + ((seconds % 100) ~/ 60);
   final secs = (seconds % 100) % 60;
-  return "$mins:$secs";
+  return "$mins:${secs.toString().padLeft(2, '0')}";
 }
 
 int parseTime(String time) {

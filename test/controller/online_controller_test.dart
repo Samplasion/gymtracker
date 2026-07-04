@@ -1,5 +1,4 @@
 import 'package:gymtracker/controller/online_controller.dart';
-import 'package:gymtracker/data/configuration.dart';
 import 'package:test/test.dart';
 
 typedef _SyncModeTestCase = ({
@@ -9,9 +8,6 @@ typedef _SyncModeTestCase = ({
 });
 
 void main() {
-  if (!Configuration.isOnlineAccountEnabled) {
-    return;
-  }
   group('OnlineController', () {
     group("getSyncMode", () {
       final tests = <SyncMode, List<_SyncModeTestCase>>{

@@ -1084,5 +1084,289 @@ void main() {
       expect(
           combinedExercises[0].asExercise.parameters, GTSetParameters.distance);
     });
+
+    test("Non-superseding continuation exercises appended after base exercises",
+        () {
+      final w1 = workout.copyWith(
+        id: "1",
+        completedBy: "2",
+        exercises: [
+          exerciseHelper("1", "Exercise 1"),
+        ],
+      );
+      final w2 = workout.copyWith(
+        id: "2",
+        completes: "1",
+        exercises: [
+          exerciseHelper("2", "Exercise 2"),
+        ],
+      );
+      final combined = getExercisesLinearly(w1, w2);
+      expect(combined.length, 2);
+      expect(combined[0].id, "1");
+      expect(combined[1].id, "2");
+    });
+
+    test("Mixed continuation: some exercises supersede, some are new", () {
+      final w1 = workout.copyWith(
+        id: "1",
+        completedBy: "2",
+        exercises: [
+          exerciseHelper("1", "Exercise 1"),
+        ],
+      );
+      final w2 = workout.copyWith(
+        id: "2",
+        completes: "1",
+        exercises: [
+          exerciseHelper("3", "Exercise 1").copyWith.supersedesID("1"),
+          exerciseHelper("2", "Exercise 2"),
+        ],
+      );
+      final combined = getExercisesLinearly(w1, w2);
+      expect(combined.length, 2);
+      expect(combined[0].id, "1");
+      expect(combined[1].id, "2");
+    });
+
+    test("overrideSupersedencesWithNull = false", () {
+      final w1 = workout.copyWith(
+        id: "1",
+        completedBy: "2",
+        exercises: [
+          exerciseHelper("1", "Exercise 1"),
+        ],
+      );
+      final w2 = workout.copyWith(
+        id: "2",
+        completes: "1",
+        exercises: [
+          exerciseHelper("3", "Exercise 1").copyWith.supersedesID("1"),
+        ],
+      );
+      final combined =
+          getExercisesLinearly(w1, w2, overrideSupersedencesWithNull: false);
+      expect(combined.length, 1);
+    });
+
+    test("Unit conversion on the superseding path", () {
+      final w1 = workout.copyWith(
+        id: "1",
+        completedBy: "2",
+        weightUnit: Weights.kg,
+        exercises: [
+          exerciseHelper("1", "Exercise 1", sets: [
+            GTSet(
+              reps: 10,
+              weight: 10,
+              time: Duration.zero,
+              parameters: GTSetParameters.repsWeight,
+              kind: GTSetKind.normal,
+            ),
+          ]),
+        ],
+      );
+      final w2 = workout.copyWith(
+        id: "2",
+        completes: "1",
+        weightUnit: Weights.lb,
+        exercises: [
+          exerciseHelper("3", "Exercise 1", sets: [
+            GTSet(
+              reps: 10,
+              weight: 22.0462, // 22.0462 lbs is 10 kg
+              time: Duration.zero,
+              parameters: GTSetParameters.repsWeight,
+              kind: GTSetKind.normal,
+            ),
+          ]).copyWith.supersedesID("1"),
+        ],
+      );
+      final combined = getExercisesLinearly(w1, w2);
+      expect(combined.length, 1);
+      expectDouble(combined[0].asExercise.sets[0].weight!, 10.0, epsilon: 0.1);
+    });
+
+    test("Empty base exercises + non-empty cont", () {
+      final w1 = workout.copyWith(
+        id: "1",
+        completedBy: "2",
+        exercises: [],
+      );
+      final w2 = workout.copyWith(
+        id: "2",
+        completes: "1",
+        exercises: [
+          exerciseHelper("2", "Exercise 2"),
+        ],
+      );
+      final combined = getExercisesLinearly(w1, w2);
+      expect(combined.length, 1);
+      expect(combined[0].id, "2");
+    });
+
+    test("Empty cont exercises + non-empty base", () {
+      final w1 = workout.copyWith(
+        id: "1",
+        completedBy: "2",
+        exercises: [
+          exerciseHelper("1", "Exercise 1"),
+        ],
+      );
+      final w2 = workout.copyWith(
+        id: "2",
+        completes: "1",
+        exercises: [],
+      );
+      final combined = getExercisesLinearly(w1, w2);
+      expect(combined.length, 1);
+      expect(combined[0].id, "1");
+    });
+
+    test("Both empty", () {
+      final w1 = workout.copyWith(
+        id: "1",
+        completedBy: "2",
+        exercises: [],
+      );
+      final w2 = workout.copyWith(
+        id: "2",
+        completes: "1",
+        exercises: [],
+      );
+      final combined = getExercisesLinearly(w1, w2);
+      expect(combined.length, 0);
+    });
+
+    test("Superset with ALL inner exercises superseding", () {
+      final w1 = workout.copyWith(
+        id: "1",
+        completedBy: "2",
+        exercises: [
+          supersetHelper("ss1", exercises: [
+            exerciseHelper("1", "E1"),
+            exerciseHelper("2", "E2"),
+          ]),
+        ],
+      );
+      final w2 = workout.copyWith(
+        id: "2",
+        completes: "1",
+        exercises: [
+          supersetHelper("ss2", exercises: [
+            exerciseHelper("3", "E1").copyWith.supersedesID("1"),
+            exerciseHelper("4", "E2").copyWith.supersedesID("2"),
+          ]).copyWith.supersedesID("ss1"),
+        ],
+      );
+      final combined = getExercisesLinearly(w1, w2);
+      expect(combined.length, 1);
+      expect(combined[0] is Superset, true);
+      expect(combined[0].asSuperset.exercises[0].id, "1");
+      expect(combined[0].asSuperset.exercises[1].id, "2");
+    });
+
+    test("Order preservation matches base then new cont", () {
+      final w1 = workout.copyWith(
+        id: "1",
+        completedBy: "2",
+        exercises: [
+          exerciseHelper("1", "E1"),
+          exerciseHelper("2", "E2"),
+        ],
+      );
+      final w2 = workout.copyWith(
+        id: "2",
+        completes: "1",
+        exercises: [
+          exerciseHelper("4", "E2").copyWith.supersedesID("2"),
+          exerciseHelper("5", "E1").copyWith.supersedesID("1"),
+          exerciseHelper("3", "E3"),
+        ],
+      );
+      final combined = getExercisesLinearly(w1, w2);
+      expect(combined.length, 3);
+      expect(combined[0].id, "1");
+      expect(combined[1].id, "2");
+      expect(combined[2].id, "3");
+    });
+  });
+
+  group('Workout model helper methods -', () {
+    test("Workout.toRoutine() works correctly", () {
+      final w = workout.copyWith(
+        id: "1",
+        name: "Test Workout",
+        duration: const Duration(hours: 1),
+        exercises: [
+          exerciseHelper("1", "E1", sets: [
+            GTSet(
+              reps: 10,
+              weight: 10,
+              time: Duration.zero,
+              parameters: GTSetParameters.repsWeight,
+              kind: GTSetKind.normal,
+              done: true,
+            ),
+          ]),
+        ],
+      );
+      final r = w.toRoutine();
+      expect(r.isConcrete, false);
+      expect(r.name, "Test Workout");
+      expect(r.exercises.first.sets.first.done, false);
+    });
+
+    test("Workout.withFilters() works correctly", () {
+      final w = workout.copyWith(
+        exercises: [
+          exerciseHelper("1", "E1"),
+          exerciseHelper("2", "E2"),
+        ],
+      );
+      final filtered = w.withFilters(exerciseFilter: (ex) => ex.id == "1");
+      expect(filtered.exercises.length, 1);
+      expect(filtered.exercises.first.id, "1");
+    });
+
+    test("Workout.hasExercise() works correctly", () {
+      final w = workout.copyWith(
+        exercises: [
+          exerciseHelper("1", "E1").copyWith(parentID: "parent1"),
+        ],
+      );
+      expect(
+          w.hasExercise(exerciseHelper("dummy", "E1").copyWith(id: "parent1")),
+          true);
+      expect(
+          w.hasExercise(exerciseHelper("dummy", "E1").copyWith(id: "parent2")),
+          false);
+    });
+
+    test("Workout.isCompletionOf() works correctly", () {
+      final w1 = workout.copyWith(id: "1", completedBy: "2");
+      final w2 = workout.copyWith(id: "2", completes: "1");
+      expect(w2.isCompletionOf(w1), true);
+      expect(w1.isCompletionOf(w2), false);
+    });
+  });
+
+  group('SynthesizedWorkout -', () {
+    test("exercises delegates to getExercisesLinearly", () {
+      final w1 = workout.copyWith(
+        id: "1",
+        completedBy: "2",
+        exercises: [exerciseHelper("1", "E1")],
+      );
+      final w2 = workout.copyWith(
+        id: "2",
+        completes: "1",
+        exercises: [exerciseHelper("2", "E2")],
+      );
+      final s = SynthesizedWorkout([w1, w2]);
+      expect(s.exercises.length, 2);
+      expect(s.exercises[0].id, "1");
+      expect(s.exercises[1].id, "2");
+    });
   });
 }

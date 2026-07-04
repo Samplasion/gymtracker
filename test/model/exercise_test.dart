@@ -271,5 +271,57 @@ void main() {
         expectExercise(result, base);
       });
     });
+
+    group("additional methods", () {
+      final base = Exercise.custom(
+        id: "base-id",
+        parentID: "parent-id",
+        name: "Exercise",
+        parameters: GTSetParameters.repsWeight,
+        primaryMuscleGroup: GTMuscleGroup.shoulders,
+        restTime: const Duration(minutes: 2),
+        notes: "Notes",
+        sets: [],
+        workoutID: null,
+        supersetID: null,
+        equipment: GTGymEquipment.none,
+      );
+
+      test("isTheSameAs", () {
+        final sameId = base.copyWith(name: "Different Name");
+        final sameParentId = Exercise.custom(
+          id: "other-id",
+          parentID: "base-id",
+          name: "Child",
+          parameters: GTSetParameters.repsWeight,
+          primaryMuscleGroup: GTMuscleGroup.shoulders,
+          restTime: const Duration(minutes: 2),
+          notes: "Notes",
+          sets: [],
+          workoutID: null,
+          supersetID: null,
+          equipment: GTGymEquipment.none,
+        );
+        final completelyDifferent = base.copyWith(id: "diff-id", parentID: "diff-parent");
+
+        expect(base.isTheSameAs(sameId), true);
+        expect(base.isTheSameAs(sameParentId), true);
+        expect(base.isTheSameAs(completelyDifferent), false);
+      });
+
+      test("isSiblingOf", () {
+        final sibling = base.copyWith(id: "sibling-id");
+        final notSibling = base.copyWith(parentID: "other-parent-id");
+
+        expect(base.isSiblingOf(sibling), true);
+        expect(base.isSiblingOf(notSibling), false);
+      });
+
+      test("clone", () {
+        final cloned = base.clone();
+        expectExercise(cloned, base);
+        expect(cloned.id, base.id);
+      });
+    });
   });
 }

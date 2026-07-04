@@ -3,9 +3,9 @@
 <plist version="1.0">
 <dict>
 	<key>CFBundleShortVersionString</key>
-	<string>0.14.1</string>
+	<string>0.14.2</string>
 	<key>CFBundleVersion</key>
-	<string>1777241521</string>
+	<string>1783175013</string>
 	<key>UIBackgroundModes</key>
 	<array/>
 	<key>WKApplication</key>

@@ -66,7 +66,7 @@ Future<void> testCreateRoutineFlow(
   await tester.pumpAndSettle();
 
   // Scroll down
-  await tester.drag(find.byType(ListView), const Offset(0.0, -600.0));
+  await tester.drag(findMainListView(tester), const Offset(0.0, -600.0));
 
   // Trigger a frame.
   await tester.pumpAndSettle();
@@ -79,7 +79,7 @@ Future<void> testCreateRoutineFlow(
   await tester.pumpAndSettle();
 
   // Scroll down
-  await tester.drag(find.byType(ListView), const Offset(0.0, -600.0));
+  await tester.drag(findMainListView(tester), const Offset(0.0, -600.0));
 
   // Trigger a frame.
   await tester.pumpAndSettle();
@@ -99,7 +99,7 @@ Future<void> testCreateRoutineFlow(
   FocusManager.instance.primaryFocus?.unfocus();
 
   // Scroll down
-  await tester.drag(find.byType(ListView), const Offset(0.0, -600.0));
+  await tester.drag(findMainListView(tester), const Offset(0.0, -600.0));
 
   // Trigger a frame.
   await tester.pumpAndSettle();
@@ -114,7 +114,7 @@ Future<void> testCreateRoutineFlow(
   }
 
   // Scroll down
-  await tester.drag(find.byType(ListView), const Offset(0.0, -600.0));
+  await tester.drag(findMainListView(tester), const Offset(0.0, -600.0));
 
   // Trigger a frame.
   await tester.pumpAndSettle();

@@ -13,6 +13,7 @@ import 'package:gymtracker/service/logger.dart';
 import 'package:gymtracker/struct/optional.dart';
 
 import '../../test/expectations.dart';
+import '../utils.dart';
 
 final Exercise baseExercise = Exercise.custom(
   id: "ourNewID",
@@ -99,7 +100,7 @@ Future<void> testEditExerciseInRoutineAndHistoryFlow(
   await tester.enterText(nameField, "Test Routine");
 
   // Scroll down
-  await tester.drag(find.byType(ListView), const Offset(0.0, -600.0));
+  await tester.drag(findMainListView(tester), const Offset(0.0, -600.0));
 
   // Trigger a frame.
   await tester.pumpAndSettle();

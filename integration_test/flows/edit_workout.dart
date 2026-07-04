@@ -17,6 +17,7 @@ import 'package:gymtracker/view/utils/history_workout.dart';
 import 'package:gymtracker/view/utils/workout_done.dart';
 import 'package:gymtracker/view/workout.dart';
 import 'package:gymtracker/view/workout_editor.dart';
+import '../utils.dart';
 
 Workout get baseRoutine {
   final libEx =
@@ -154,16 +155,16 @@ Future<void> testEditWorkoutFlow(
   await tester.pumpAndSettle();
 
   final addSetButton = find.widgetWithText(FilledButton, "+ Add Set");
-  await tester.drag(find.byType(ListView), const Offset(0.0, -600.0));
+  await tester.drag(findMainListView(tester), const Offset(0.0, -600.0));
   await tester.pumpAndSettle();
   await tester.tap(addSetButton);
   await tester.pumpAndSettle();
-  await tester.drag(find.byType(ListView), const Offset(0.0, -600.0));
+  await tester.drag(findMainListView(tester), const Offset(0.0, -600.0));
   await tester.pumpAndSettle();
   await tester.tap(addSetButton);
   await tester.pumpAndSettle();
 
-  await tester.drag(find.byType(ListView), const Offset(0.0, -600.0));
+  await tester.drag(findMainListView(tester), const Offset(0.0, -600.0));
   final fourthSetTypeButton = find.descendant(
     of: find.byType(IconButton),
     matching: find.text('4'),
@@ -175,7 +176,7 @@ Future<void> testEditWorkoutFlow(
   await tester.pumpAndSettle();
 
   // Now it finds the fifth set
-  await tester.drag(find.byType(ListView), const Offset(0.0, -600.0));
+  await tester.drag(findMainListView(tester), const Offset(0.0, -600.0));
   await tester.pumpAndSettle();
   await tester.tap(fourthSetTypeButton);
   await tester.pumpAndSettle();
@@ -184,7 +185,7 @@ Future<void> testEditWorkoutFlow(
 
   await tester.dragUntilVisible(
     find.widgetWithText(FilledButton, "+ Add exercise"),
-    find.byType(ListView),
+    findMainListView(tester),
     const Offset(0, -100),
   );
 
@@ -199,7 +200,7 @@ Future<void> testEditWorkoutFlow(
   await tester.tap(find.byKey(const Key("pick")));
   await tester.pumpAndSettle();
 
-  await tester.drag(find.byType(ListView), const Offset(0.0, -600.0));
+  await tester.drag(findMainListView(tester), const Offset(0.0, -600.0));
   await tester.pumpAndSettle();
   await tester.enterText(find.widgetWithText(TextField, "Time"), "100");
   await tester.pumpAndSettle();

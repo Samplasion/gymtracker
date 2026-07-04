@@ -61,8 +61,10 @@ void main() {
           () => GTSet(
             kind: GTSetKind.normal,
             parameters: GTSetParameters.repsWeight,
+            reps: null,
+            weight: null,
           ).oneRepMax,
-          throwsA(anything),
+          throwsA(anyOf(isA<SetParametersError>(), isA<AssertionError>())),
         );
       });
     });

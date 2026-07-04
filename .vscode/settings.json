@@ -6,5 +6,5 @@
   "i18n-ally.localesPaths": [
     "assets/i18n"
   ],
-  "dart.sdkPath": "/Users/samplasion/.puro/envs/gymtracker/flutter/bin/cache/dart-sdk"
+  "dart.sdkPath": ".fvm/versions/3.24.3/flutter/bin/cache/dart-sdk"
 }

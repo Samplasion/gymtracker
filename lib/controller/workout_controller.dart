@@ -37,11 +37,17 @@ import 'package:gymtracker/utils/utils.dart';
 import 'package:gymtracker/view/components/rich_text_dialog.dart';
 import 'package:gymtracker/view/exercise_picker.dart';
 import 'package:gymtracker/view/utils/exercises_to_superset.dart';
+import 'package:gymtracker/view/utils/workout_navigation.dart';
 import 'package:gymtracker/view/utils/workout_done.dart';
 import 'package:gymtracker/view/utils/workout_generator.dart';
 import 'package:gymtracker/view/workout.dart';
 
 typedef WorkoutExerciseIndex = ExerciseIndex;
+typedef WorkoutSetCursor = ({
+  int exerciseIndex,
+  int? supersetIndex,
+  int setIndex,
+});
 
 class WorkoutController extends GetxController with ServiceableController {
   RxString name;
@@ -50,6 +56,8 @@ class WorkoutController extends GetxController with ServiceableController {
   Rx<String?> infobox;
   RxBool isContinuation = false.obs;
   Rx<String?> continuesID = Rx(null);
+  final Rx<WorkoutSetCursor?> _setCursor = Rx<WorkoutSetCursor?>(null);
+  final Rx<WorkoutSetCursor?> _previousSetCursor = Rx<WorkoutSetCursor?>(null);
   late Rx<Weights> weightUnit;
   late Rx<Distance> distanceUnit;
   RxList<WorkoutExercisable> exercises = <WorkoutExercisable>[].obs;
@@ -74,6 +82,7 @@ class WorkoutController extends GetxController with ServiceableController {
     );
 
     exercises.listen((_) {
+      _syncSetCursorWithWorkout();
       logger.i("Syncing exercises to native channels");
       _initFirstSync();
     });
@@ -211,6 +220,8 @@ class WorkoutController extends GetxController with ServiceableController {
           });
         },
         onExerciseRemove: (index) {
+          final previousCursor = _setCursor.value;
+          _previousSetCursor.value = previousCursor;
           final (
             exerciseIndex: exerciseIndex,
             supersetIndex: supersetIndex,
@@ -224,6 +235,11 @@ class WorkoutController extends GetxController with ServiceableController {
                 if (j != exerciseIndex) superset.exercises[j]
             ]);
           }
+
+          _setCursor.value = _healCursorAfterExerciseDeletion(
+            previousCursor,
+            index,
+          );
           exercises.refresh();
           save();
         },
@@ -359,6 +375,8 @@ class WorkoutController extends GetxController with ServiceableController {
           save();
         },
         onSetRemove: (index, setIndex) {
+          final previousCursor = _setCursor.value;
+          _previousSetCursor.value = previousCursor;
           final (exerciseIndex: i, supersetIndex: supersetIndex) = index;
 
           if (supersetIndex == null) {
@@ -380,6 +398,12 @@ class WorkoutController extends GetxController with ServiceableController {
                   superset.exercises[j]
             ]);
           }
+
+          _setCursor.value = _healCursorAfterSetDeletion(
+            previousCursor,
+            index,
+            setIndex,
+          );
 
           exercises.refresh();
           save();
@@ -1010,8 +1034,8 @@ class WorkoutController extends GetxController with ServiceableController {
     logger.t((value.id, NotificationIDs.restTimer));
     if (value.id == NotificationIDs.restTimer) {
       logger.t((Go.getTopmostRouteName(), WorkoutView.routeName));
-      if (Go.getTopmostRouteName() != WorkoutView.routeName) {
-        Go.toNamed(WorkoutView.routeName);
+      if (!isWorkoutRouteName(Go.getTopmostRouteName())) {
+        Go.toNamed(getPreferredWorkoutRouteName());
       }
     }
   }
@@ -1141,36 +1165,353 @@ class WorkoutController extends GetxController with ServiceableController {
     return exercises;
   }
 
-  WorkoutExerciseIndex? get currentExerciseIndex {
-    int i = 0;
-    for (final ex in exercises) {
-      int j = 0;
-      if (ex is Exercise) {
-        if (ex.sets.any((set) => !set.done)) {
-          return (exerciseIndex: i, supersetIndex: null);
-        }
-        j++;
-      } else if (ex is Superset) {
-        final set = ex.getNextSet();
-        if (set == null) {
-          i++;
-          continue;
-        }
+  WorkoutSetCursor? get currentSetCursor {
+    _syncSetCursorWithWorkout();
+    return _setCursor.value;
+  }
 
-        for (final e in ex.exercises) {
-          if (e.sets.any((s) => s.id == set.id)) {
-            return (exerciseIndex: j, supersetIndex: i);
+  WorkoutSetCursor? get previousSetCursor {
+    final cursor = _previousSetCursor.value;
+    if (cursor == null) return null;
+    if (!_isCursorValid(cursor)) return null;
+    return cursor;
+  }
+
+  WorkoutExerciseIndex? get currentExerciseIndex {
+    final cursor = currentSetCursor;
+    if (cursor == null) return null;
+    return (
+      exerciseIndex: cursor.exerciseIndex,
+      supersetIndex: cursor.supersetIndex,
+    );
+  }
+
+  bool moveSetCursorToNext() {
+    final cursor = currentSetCursor;
+    if (cursor == null) return false;
+
+    final ordered = _orderedSetCursors;
+    final position =
+        ordered.indexWhere((candidate) => _isSameSetCursor(candidate, cursor));
+    if (position == -1 || position >= ordered.length - 1) {
+      return false;
+    }
+
+    for (int i = position + 1; i < ordered.length; i++) {
+      final candidate = ordered[i];
+      if (!_setForCursor(candidate).done) {
+        _previousSetCursor.value = cursor;
+        _setCursor.value = candidate;
+        refreshWatchData();
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  bool moveSetCursorToPrevious() {
+    final cursor = currentSetCursor;
+    if (cursor == null) return false;
+
+    final ordered = _orderedSetCursors;
+    final position =
+        ordered.indexWhere((candidate) => _isSameSetCursor(candidate, cursor));
+    if (position <= 0) {
+      return false;
+    }
+
+    for (int i = position - 1; i >= 0; i--) {
+      final candidate = ordered[i];
+      if (!_setForCursor(candidate).done) {
+        _previousSetCursor.value = cursor;
+        _setCursor.value = candidate;
+        refreshWatchData();
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  bool moveSetCursorToFirstUndone() {
+    final cursor = _firstUndoneCursor();
+    if (cursor == null) return false;
+
+    _previousSetCursor.value = _setCursor.value;
+    _setCursor.value = cursor;
+    refreshWatchData();
+    return true;
+  }
+
+  bool moveSetCursorToLastUndone() {
+    final ordered = _orderedSetCursors;
+    for (int i = ordered.length - 1; i >= 0; i--) {
+      final candidate = ordered[i];
+      if (!_setForCursor(candidate).done) {
+        _previousSetCursor.value = _setCursor.value;
+        _setCursor.value = candidate;
+        refreshWatchData();
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  bool selectSetCursor(WorkoutSetCursor cursor) {
+    if (!_isCursorSelectable(cursor)) {
+      return false;
+    }
+
+    _previousSetCursor.value = _setCursor.value;
+    _setCursor.value = cursor;
+    refreshWatchData();
+    return true;
+  }
+
+  bool selectSetCursorByIndex(ExerciseIndex index, int setIndex) {
+    return selectSetCursor((
+      exerciseIndex: index.exerciseIndex,
+      supersetIndex: index.supersetIndex,
+      setIndex: setIndex,
+    ));
+  }
+
+  List<WorkoutSetCursor> get _orderedSetCursors {
+    final cursors = <WorkoutSetCursor>[];
+
+    for (int i = 0; i < exercises.length; i++) {
+      final ex = exercises[i];
+      if (ex is Exercise) {
+        for (int setIndex = 0; setIndex < ex.sets.length; setIndex++) {
+          cursors.add((
+            exerciseIndex: i,
+            supersetIndex: null,
+            setIndex: setIndex,
+          ));
+        }
+      } else if (ex is Superset) {
+        final maxSets = ex.exercises.fold<int>(
+            0,
+            (value, exercise) =>
+                value > exercise.sets.length ? value : exercise.sets.length);
+
+        for (int setIndex = 0; setIndex < maxSets; setIndex++) {
+          for (int exerciseIndex = 0;
+              exerciseIndex < ex.exercises.length;
+              exerciseIndex++) {
+            final exercise = ex.exercises[exerciseIndex];
+            if (setIndex < exercise.sets.length) {
+              cursors.add((
+                exerciseIndex: exerciseIndex,
+                supersetIndex: i,
+                setIndex: setIndex,
+              ));
+            }
           }
-          j++;
         }
       }
-      i++;
+    }
+
+    return cursors;
+  }
+
+  void _syncSetCursorWithWorkout() {
+    final current = _setCursor.value;
+    final ordered = _orderedSetCursors;
+    final hasUndone = ordered.any((cursor) => !_setForCursor(cursor).done);
+
+    if (ordered.isEmpty || !hasUndone) {
+      _previousSetCursor.value = _setCursor.value;
+      _setCursor.value = null;
+      return;
+    }
+
+    if (current != null && _isCursorSelectable(current)) {
+      return;
+    }
+
+    _previousSetCursor.value = _setCursor.value;
+    _setCursor.value =
+        ordered.firstWhere((cursor) => !_setForCursor(cursor).done);
+  }
+
+  bool _isCursorSelectable(WorkoutSetCursor cursor) {
+    if (!_isCursorValid(cursor)) {
+      return false;
+    }
+
+    return !_setForCursor(cursor).done;
+  }
+
+  bool _isCursorValid(WorkoutSetCursor cursor) {
+    if (cursor.supersetIndex == null) {
+      final exerciseIndex = cursor.exerciseIndex;
+      if (exerciseIndex < 0 || exerciseIndex >= exercises.length) {
+        return false;
+      }
+      final exercise = exercises[exerciseIndex];
+      if (exercise is! Exercise) return false;
+      return cursor.setIndex >= 0 && cursor.setIndex < exercise.sets.length;
+    }
+
+    final supersetIndex = cursor.supersetIndex!;
+    if (supersetIndex < 0 || supersetIndex >= exercises.length) {
+      return false;
+    }
+    final superset = exercises[supersetIndex];
+    if (superset is! Superset) return false;
+    if (cursor.exerciseIndex < 0 ||
+        cursor.exerciseIndex >= superset.exercises.length) {
+      return false;
+    }
+
+    final exercise = superset.exercises[cursor.exerciseIndex];
+    return cursor.setIndex >= 0 && cursor.setIndex < exercise.sets.length;
+  }
+
+  GTSet _setForCursor(WorkoutSetCursor cursor) {
+    if (cursor.supersetIndex == null) {
+      return (exercises[cursor.exerciseIndex] as Exercise)
+          .sets[cursor.setIndex];
+    }
+
+    return (exercises[cursor.supersetIndex!] as Superset)
+        .exercises[cursor.exerciseIndex]
+        .sets[cursor.setIndex];
+  }
+
+  bool _isSameSetCursor(WorkoutSetCursor a, WorkoutSetCursor b) {
+    return a.exerciseIndex == b.exerciseIndex &&
+        a.supersetIndex == b.supersetIndex &&
+        a.setIndex == b.setIndex;
+  }
+
+  WorkoutSetCursor? _firstUndoneCursorAfter(WorkoutSetCursor cursor) {
+    final ordered = _orderedSetCursors;
+    final position =
+        ordered.indexWhere((candidate) => _isSameSetCursor(candidate, cursor));
+    if (position == -1) return null;
+
+    for (int i = position + 1; i < ordered.length; i++) {
+      final candidate = ordered[i];
+      if (!_setForCursor(candidate).done) {
+        return candidate;
+      }
+    }
+
+    return null;
+  }
+
+  WorkoutSetCursor? _firstUndoneCursor() {
+    for (final cursor in _orderedSetCursors) {
+      if (!_setForCursor(cursor).done) {
+        return cursor;
+      }
     }
     return null;
   }
 
+  WorkoutSetCursor? _healCursorAfterExerciseDeletion(
+    WorkoutSetCursor? previousCursor,
+    ExerciseIndex deletedIndex,
+  ) {
+    if (previousCursor == null) return null;
+
+    final (
+      exerciseIndex: deletedExerciseIndex,
+      supersetIndex: deletedSupersetIndex,
+    ) = deletedIndex;
+
+    if (deletedSupersetIndex == null) {
+      if (previousCursor.supersetIndex == null) {
+        if (previousCursor.exerciseIndex == deletedExerciseIndex) {
+          return _firstUndoneCursor();
+        }
+
+        if (previousCursor.exerciseIndex > deletedExerciseIndex) {
+          return (
+            exerciseIndex: previousCursor.exerciseIndex - 1,
+            supersetIndex: null,
+            setIndex: previousCursor.setIndex,
+          );
+        }
+
+        return previousCursor;
+      }
+
+      if (previousCursor.supersetIndex == deletedExerciseIndex) {
+        return _firstUndoneCursor();
+      }
+
+      if (previousCursor.supersetIndex! > deletedExerciseIndex) {
+        return (
+          exerciseIndex: previousCursor.exerciseIndex,
+          supersetIndex: previousCursor.supersetIndex! - 1,
+          setIndex: previousCursor.setIndex,
+        );
+      }
+
+      return previousCursor;
+    }
+
+    if (previousCursor.supersetIndex != deletedSupersetIndex) {
+      return previousCursor;
+    }
+
+    if (previousCursor.exerciseIndex == deletedExerciseIndex) {
+      return _firstUndoneCursor();
+    }
+
+    if (previousCursor.exerciseIndex > deletedExerciseIndex) {
+      return (
+        exerciseIndex: previousCursor.exerciseIndex - 1,
+        supersetIndex: previousCursor.supersetIndex,
+        setIndex: previousCursor.setIndex,
+      );
+    }
+
+    return previousCursor;
+  }
+
+  WorkoutSetCursor? _healCursorAfterSetDeletion(
+    WorkoutSetCursor? previousCursor,
+    ExerciseIndex deletedExercise,
+    int deletedSetIndex,
+  ) {
+    if (previousCursor == null) return null;
+
+    final isSameExercise =
+        previousCursor.exerciseIndex == deletedExercise.exerciseIndex &&
+            previousCursor.supersetIndex == deletedExercise.supersetIndex;
+    if (!isSameExercise) {
+      return previousCursor;
+    }
+
+    if (previousCursor.setIndex == deletedSetIndex) {
+      return _firstUndoneCursor();
+    }
+
+    if (previousCursor.setIndex > deletedSetIndex) {
+      return (
+        exerciseIndex: previousCursor.exerciseIndex,
+        supersetIndex: previousCursor.supersetIndex,
+        setIndex: previousCursor.setIndex - 1,
+      );
+    }
+
+    return previousCursor;
+  }
+
   void markSetAsDone(ExerciseIndex index, int setIndex, bool done) {
     final (exerciseIndex: i, supersetIndex: supersetIndex) = index;
+    final targetCursor = (
+      exerciseIndex: i,
+      supersetIndex: supersetIndex,
+      setIndex: setIndex,
+    );
+    final currentCursor = currentSetCursor;
     final exercise = supersetIndex == null
         ? (exercises[i] as Exercise)
         : (exercises[supersetIndex] as Superset).exercises[i];
@@ -1254,23 +1595,32 @@ and:
       }
     }
 
+    _syncSetCursorWithWorkout();
+    if (done &&
+        currentCursor != null &&
+        _isSameSetCursor(currentCursor, targetCursor)) {
+      _previousSetCursor.value = currentCursor;
+      _setCursor.value =
+          _firstUndoneCursorAfter(currentCursor) ?? _firstUndoneCursor();
+    }
+
     exercises.refresh();
     refreshWatchData();
     save();
   }
 
   void autoMarkNextSetDone() {
-    final index = currentExerciseIndex;
-    if (index == null) return;
+    final cursor = currentSetCursor;
+    if (cursor == null) return;
 
-    final (exerciseIndex: exerciseIndex, supersetIndex: supersetIndex) = index;
-    final exercise = supersetIndex == null
-        ? (exercises[exerciseIndex] as Exercise)
-        : (exercises[supersetIndex] as Superset).exercises[exerciseIndex];
-    final setIndex = exercise.sets.indexWhere((set) => !set.done);
-    if (setIndex == -1) return;
-
-    return markSetAsDone(index, setIndex, true);
+    markSetAsDone(
+      (
+        exerciseIndex: cursor.exerciseIndex,
+        supersetIndex: cursor.supersetIndex,
+      ),
+      cursor.setIndex,
+      true,
+    );
   }
 
   refreshWatchData() {
@@ -1278,7 +1628,7 @@ and:
     final startingTime = ctdctrl.startingTime.value;
     final endingTime = ctdctrl.targetTime.value;
 
-    final index = currentExerciseIndex;
+    final cursor = currentSetCursor;
     NativeWorkoutStateMessage message;
 
     final settingsController = Get.find<SettingsController>();
@@ -1289,9 +1639,11 @@ and:
         ? null
         : settingsController.color.value;
 
-    if (index != null) {
-      final (exerciseIndex: exerciseIndex, supersetIndex: supersetIndex) =
-          index;
+    if (cursor != null) {
+      final (exerciseIndex: exerciseIndex, supersetIndex: supersetIndex) = (
+        exerciseIndex: cursor.exerciseIndex,
+        supersetIndex: cursor.supersetIndex,
+      );
       final exercise = supersetIndex == null
           ? (exercises[exerciseIndex] as Exercise)
           : (exercises[supersetIndex] as Superset).exercises[exerciseIndex];
@@ -1302,16 +1654,18 @@ and:
                   Get.context?.theme.colorScheme.primary ??
                   Colors.red
               : Get.context?.theme.colorScheme.primary ?? Colors.red);
-      final set = exercise.sets.firstWhereOrNull((set) => !set.done);
+      final set = exercise.sets[cursor.setIndex];
+      final setTypeLabel = _setTypeLabelForWatch(set, exercise.sets);
 
       message = NativeWorkoutStateMessage(
-        hasExercise: set != null,
+        hasExercise: true,
         exerciseName: name,
         exerciseColor: color,
-        exerciseParameters: set?.getHumanReadableDescription(
-                weightUnit: weightUnit.value,
-                distanceUnit: distanceUnit.value) ??
-            "",
+        exerciseParameters: set.getHumanReadableDescription(
+          weightUnit: weightUnit.value,
+          distanceUnit: distanceUnit.value,
+        ),
+        setTypeLabel: setTypeLabel,
         startingTime: time.value,
         restTimeStart: startingTime,
         restTimeEnd: endingTime,
@@ -1324,6 +1678,7 @@ and:
         exerciseName: "",
         exerciseColor: Colors.transparent,
         exerciseParameters: "",
+        setTypeLabel: "",
         startingTime: time.value,
         restTimeStart: startingTime,
         restTimeEnd: endingTime,
@@ -1342,25 +1697,38 @@ and:
     exercises.add(Superset.empty());
   }
 
+  String _setTypeLabelForWatch(GTSet set, List<GTSet> allSets) {
+    switch (set.kind) {
+      case GTSetKind.warmUp:
+        return "set.kindShort.warmUp".t;
+      case GTSetKind.normal:
+        final normalSets =
+            allSets.where((element) => element.kind == GTSetKind.normal);
+        final normalSetIndex =
+            normalSets.toList().indexWhere((element) => element.id == set.id);
+        return (normalSetIndex >= 0 ? normalSetIndex + 1 : 1).toString();
+      case GTSetKind.drop:
+        return "set.kindShort.drop".t;
+      case GTSetKind.failure:
+        return "set.kindShort.failure".t;
+      case GTSetKind.failureStripping:
+        return "set.kindShort.failureStripping".t;
+    }
+  }
+
   Exercise? getExercise(ExerciseIndex index) {
     return exercises.exerciseAt(index);
   }
 
   void updateSetParameters(
       double? weight, double? timeSeconds, int? reps, double? distance) {
-    final index = currentExerciseIndex;
-    if (index == null) return;
+    final cursor = currentSetCursor;
+    if (cursor == null) return;
 
-    final exercise = index.supersetIndex == null
-        ? (exercises[index.exerciseIndex] as Exercise)
-        : (exercises[index.supersetIndex!] as Superset)
-            .exercises[index.exerciseIndex];
-    final setIndex = exercise.sets.indexWhere((set) => !set.done);
-    if (setIndex == -1) return;
-
-    if (index.supersetIndex != null) {
-      final sup = exercises[index.supersetIndex!].asSuperset;
-      final ex = sup.exercises[index.exerciseIndex];
+    if (cursor.supersetIndex != null) {
+      final sup = exercises[cursor.supersetIndex!].asSuperset;
+      final ex = sup.exercises[cursor.exerciseIndex];
+      final setIndex = cursor.setIndex;
       ex.sets[setIndex] = ex.sets[setIndex].copyWith(
         weight: weight,
         time:
@@ -1369,7 +1737,8 @@ and:
         distance: distance,
       );
     } else {
-      final ex = exercises[index.exerciseIndex].asExercise;
+      final ex = exercises[cursor.exerciseIndex].asExercise;
+      final setIndex = cursor.setIndex;
       ex.sets[setIndex] = ex.sets[setIndex].copyWith(
         weight: weight,
         time:

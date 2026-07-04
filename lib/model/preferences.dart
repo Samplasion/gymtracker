@@ -17,6 +17,7 @@ class Prefs implements Insertable<Preference> {
   final bool showSuggestedRoutines;
   final ThemeMode themeMode;
   final bool tintExercises;
+  final bool defaultToSimpleWorkoutView;
   final NutritionLanguage nutritionLanguage;
   final NutritionCountry nutritionCountry;
   final bool onboardingComplete;
@@ -30,6 +31,7 @@ class Prefs implements Insertable<Preference> {
     required this.showSuggestedRoutines,
     required this.themeMode,
     required this.tintExercises,
+    required this.defaultToSimpleWorkoutView,
     required this.nutritionLanguage,
     required this.nutritionCountry,
     required this.onboardingComplete,
@@ -47,6 +49,7 @@ class Prefs implements Insertable<Preference> {
     showSuggestedRoutines: true,
     themeMode: ThemeMode.system,
     tintExercises: true,
+    defaultToSimpleWorkoutView: false,
     nutritionLanguage: NutritionLanguage.WORLD,
     nutritionCountry: NutritionCountry.WORLD,
     onboardingComplete: false,
@@ -64,6 +67,7 @@ class Prefs implements Insertable<Preference> {
         "showSuggestedRoutines": showSuggestedRoutines,
         "themeMode": themeMode.name,
         "tintExercises": tintExercises,
+        "defaultToSimpleWorkoutView": defaultToSimpleWorkoutView,
         "nutritionLanguage": nutritionLanguage.stringValue,
         "nutritionCountry": nutritionCountry.stringValue,
       };
@@ -90,6 +94,8 @@ class Prefs implements Insertable<Preference> {
         orElse: () => defaults.themeMode,
       ),
       tintExercises: json['tintExercises'] ?? defaults.tintExercises,
+      defaultToSimpleWorkoutView: json['defaultToSimpleWorkoutView'] ??
+          defaults.defaultToSimpleWorkoutView,
       nutritionLanguage: NutritionLanguage.fromString(
         json['nutritionLanguage'] ?? defaults.nutritionLanguage.stringValue,
       )!,
@@ -111,6 +117,7 @@ class Prefs implements Insertable<Preference> {
   showSuggestedRoutines: $showSuggestedRoutines,
   themeMode: $themeMode,
   tintExercises: $tintExercises,
+  defaultToSimpleWorkoutView: $defaultToSimpleWorkoutView,
   nutritionLanguage: $nutritionLanguage,
   nutritionCountry: $nutritionCountry,
 )""";
@@ -133,6 +140,7 @@ class Prefs implements Insertable<Preference> {
     bool? showSuggestedRoutines,
     ThemeMode? themeMode,
     bool? tintExercises,
+    bool? defaultToSimpleWorkoutView,
     NutritionLanguage? nutritionLanguage,
     NutritionCountry? nutritionCountry,
   }) {
@@ -146,6 +154,8 @@ class Prefs implements Insertable<Preference> {
           showSuggestedRoutines ?? this.showSuggestedRoutines,
       themeMode: themeMode ?? this.themeMode,
       tintExercises: tintExercises ?? this.tintExercises,
+      defaultToSimpleWorkoutView:
+          defaultToSimpleWorkoutView ?? this.defaultToSimpleWorkoutView,
       nutritionLanguage: nutritionLanguage ?? this.nutritionLanguage,
       nutritionCountry: nutritionCountry ?? this.nutritionCountry,
       onboardingComplete: onboardingComplete,
@@ -162,6 +172,7 @@ class Prefs implements Insertable<Preference> {
       showSuggestedRoutines: showSuggestedRoutines,
       themeMode: themeMode,
       tintExercises: tintExercises,
+      defaultToSimpleWorkoutView: defaultToSimpleWorkoutView,
       nutritionLanguage: nutritionLanguage,
       nutritionCountry: nutritionCountry,
       onboardingComplete: true,

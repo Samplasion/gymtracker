@@ -451,6 +451,10 @@
         "label": "Colora pagine degli esercizi",
         "subtitle": "Applica alle pagine degli esercizi il colore della categoria di appartenenza"
       },
+      "defaultToSimpleWorkoutView": {
+        "label": "Usa la vista semplificata dell'allenamento come predefinita",
+        "subtitle": "Apri la schermata compatta quando avvii o riprendi un allenamento"
+      },
       "exportSQL": {
         "text": "Esporta il file del database di Gym Bro. Non potrai reimportarlo (ma i dati non saranno cancellati).",
         "label": "Esporta database completo (SQL)"
@@ -597,6 +601,22 @@
       "start": "Avvia",
       "pause": "Pausa",
       "reset": "Resetta"
+    },
+    "simple": {
+      "nextUp": "Prossimo:",
+      "switchToFull": "Passa alla vista completa",
+      "restTimer": "Avvia timer di recupero",
+      "setControls": "Controlli serie",
+      "previousSet": "Serie precedente",
+      "nextSet": "Serie successiva",
+      "setKind": "Tipo di serie",
+      "editSet": "Modifica parametri serie",
+      "supersetNotes": "Note superserie",
+      "markAsDone": "Segna serie come completata",
+      "markAsUndone": "Segna serie come non completata"
+    },
+    "toolbox": {
+      "title": "Strumenti"
     },
     "updateRoutine": {
       "differenceTitle": "Aggiorna routine",

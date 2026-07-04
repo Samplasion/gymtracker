@@ -27,7 +27,7 @@ import 'package:gymtracker/view/exercises.dart';
 import 'package:gymtracker/view/routines.dart';
 import 'package:gymtracker/view/utils/history_workout.dart';
 import 'package:gymtracker/view/utils/import_routine.dart';
-import 'package:gymtracker/view/workout.dart';
+import 'package:gymtracker/view/utils/workout_navigation.dart';
 import 'package:protocol_handler/protocol_handler.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:screenshot/screenshot.dart';
@@ -146,7 +146,7 @@ class RoutinesController extends GetxController
     if (Navigator.of(context).canPop()) {
       Get.back();
     }
-    Go.toNamed(WorkoutView.routeName);
+    Go.toNamed(getPreferredWorkoutRouteName());
     Future.delayed(const Duration(milliseconds: 100)).then((_) {
       _clone(
         workout,
@@ -182,7 +182,7 @@ class RoutinesController extends GetxController
     if (Navigator.of(context).canPop()) {
       Get.back();
     }
-    Go.toNamed(WorkoutView.routeName);
+    Go.toNamed(getPreferredWorkoutRouteName());
     Future.delayed(const Duration(milliseconds: 100)).then((_) {
       _clone(
         workout,

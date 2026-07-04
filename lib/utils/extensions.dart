@@ -607,7 +607,7 @@ extension GTSetUtils on GTSet {
 
     switch (parameters) {
       case GTSetParameters.repsWeight:
-        return "${_buildReps(reps)} ${_buildWeight(weight ?? 0)}";
+        return "${_buildWeight(weight ?? 0)} × ${_buildReps(reps)}";
 
       case GTSetParameters.freeBodyReps:
         return _buildReps(reps);

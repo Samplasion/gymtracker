@@ -20,7 +20,7 @@ import 'package:gymtracker/view/charts/line_charts_time_series.dart';
 import 'package:gymtracker/view/components/controlled.dart';
 import 'package:gymtracker/view/exercises.dart';
 import 'package:gymtracker/view/utils/timer.dart';
-import 'package:gymtracker/view/workout.dart';
+import 'package:gymtracker/view/utils/workout_navigation.dart';
 import 'package:intl/intl.dart';
 
 export 'package:gymtracker/view/charts/base_types.dart';
@@ -600,7 +600,7 @@ class _RoutineHistoryChartState
                   recognizer: dateRecognizer
                     ..onTap = () {
                       if (index >= children.length) {
-                        Go.toNamed(WorkoutView.routeName);
+                        Go.toNamed(getPreferredWorkoutRouteName());
                       } else {
                         Go.to(
                           () => ExercisesView(
@@ -677,7 +677,7 @@ class _RoutineHistoryChartState
                   recognizer: dateRecognizer
                     ..onTap = () {
                       if (index >= children.length) {
-                        Go.toNamed(WorkoutView.routeName);
+                        Go.toNamed(getPreferredWorkoutRouteName());
                       } else {
                         Go.to(
                           () => ExercisesView(
@@ -910,7 +910,7 @@ class _ExerciseHistoryChartState
                 recognizer: dateRecognizer
                   ..onTap = () {
                     if (isPredicted) {
-                      Go.toNamed(WorkoutView.routeName);
+                      Go.toNamed(getPreferredWorkoutRouteName());
                     } else {
                       Go.to(
                         () => ExercisesView(

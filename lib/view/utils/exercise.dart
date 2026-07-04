@@ -18,8 +18,9 @@ import 'package:skeletonizer/skeletonizer.dart';
 
 class ExerciseIcon extends StatelessWidget {
   final WorkoutExercisable exercise;
+  final double radius;
 
-  const ExerciseIcon({required this.exercise, super.key});
+  const ExerciseIcon({required this.exercise, this.radius = 20, super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -39,6 +40,7 @@ class ExerciseIcon extends StatelessWidget {
     }
 
     return CircleAvatar(
+      radius: radius,
       backgroundColor: backgroundColor,
       foregroundColor: foregroundColor,
       child: _getName(),
@@ -49,7 +51,8 @@ class ExerciseIcon extends StatelessWidget {
     if (exercise is Exercise) {
       // return Text(
       //     (exercise as Exercise).displayName.characters.first.toUpperCase());
-      return EquipmentIcon(equipment: exercise.asExercise.gymEquipment);
+      return EquipmentIcon(
+          equipment: exercise.asExercise.gymEquipment, size: radius + 4);
     } else if (exercise is Superset) {
       return Text((exercise as Superset).exercises.length.toString());
     } else {
@@ -195,7 +198,7 @@ class ExerciseListTile extends StatelessWidget {
         case GTSetParameters.distance:
           formattedSets =
               exercise.sets.map((set) => _buildDistance(set.distance));
-        
+
         case GTSetParameters.setless:
           formattedSets = [""];
       }

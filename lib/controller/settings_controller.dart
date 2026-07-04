@@ -37,6 +37,8 @@ class SettingsController extends GetxController with ServiceableController {
   RxBool showSuggestedRoutines = Prefs.defaultValue.showSuggestedRoutines.obs;
   Rx<ThemeMode> themeMode = Prefs.defaultValue.themeMode.obs;
   RxBool tintExercises = Prefs.defaultValue.tintExercises.obs;
+  RxBool defaultToSimpleWorkoutView =
+      Prefs.defaultValue.defaultToSimpleWorkoutView.obs;
   Rx<NutritionLanguage> nutritionLanguage =
       Prefs.defaultValue.nutritionLanguage.obs;
   Rx<NutritionCountry> nutritionCountry =
@@ -80,6 +82,11 @@ class SettingsController extends GetxController with ServiceableController {
         tintExercises: tintExercises,
       ));
 
+  void setDefaultToSimpleWorkoutView(bool value) =>
+      service.writeSettings(service.prefs$.value.copyWith(
+        defaultToSimpleWorkoutView: value,
+      ));
+
   void setNutritionLanguage(NutritionLanguage nutritionLanguage) =>
       service.writeSettings(service.prefs$.value.copyWith(
         nutritionLanguage: nutritionLanguage,
@@ -107,6 +114,7 @@ class SettingsController extends GetxController with ServiceableController {
       showSuggestedRoutines(prefs.showSuggestedRoutines);
       themeMode(prefs.themeMode);
       tintExercises(prefs.tintExercises);
+      defaultToSimpleWorkoutView(prefs.defaultToSimpleWorkoutView);
       nutritionLanguage(prefs.nutritionLanguage);
       nutritionCountry(prefs.nutritionCountry);
 
@@ -126,6 +134,7 @@ class SettingsController extends GetxController with ServiceableController {
     showSuggestedRoutines(prefs.showSuggestedRoutines);
     themeMode(prefs.themeMode);
     tintExercises(prefs.tintExercises);
+    defaultToSimpleWorkoutView(prefs.defaultToSimpleWorkoutView);
     nutritionLanguage(prefs.nutritionLanguage);
     nutritionCountry(prefs.nutritionCountry);
 

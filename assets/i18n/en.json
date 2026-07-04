@@ -451,6 +451,10 @@
         "label": "Tint exercise pages",
         "subtitle": "Apply the category color to exercise and category pages"
       },
+      "defaultToSimpleWorkoutView": {
+        "label": "Use simplified workout view by default",
+        "subtitle": "Open the compact workout screen when starting or resuming a workout"
+      },
       "exportSQL": {
         "text": "Export the full Gym Bro database. It cannot be imported back later (but your data won't be deleted).",
         "label": "Export full database (SQL)"
@@ -597,6 +601,22 @@
       "start": "Start",
       "pause": "Pause",
       "reset": "Reset"
+    },
+    "simple": {
+      "nextUp": "Next up:",
+      "switchToFull": "Switch to full view",
+      "restTimer": "Start rest timer",
+      "setControls": "Set controls",
+      "previousSet": "Previous set",
+      "nextSet": "Next set",
+      "setKind": "Set type",
+      "editSet": "Edit set parameters",
+      "supersetNotes": "Superset notes",
+      "markAsDone": "Mark set as done",
+      "markAsUndone": "Mark set as not done"
+    },
+    "toolbox": {
+      "title": "Tools"
     },
     "updateRoutine": {
       "differenceTitle": "Change routine?",

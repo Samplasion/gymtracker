@@ -107,6 +107,23 @@ class AppearanceSettingsPane extends ControlledWidget<SettingsController> {
                   onUpdate: (v) =>
                       controller.setShowSuggestedRoutines(v ?? false),
                 ),
+                ValueBuilder<bool?>(
+                  initialValue: controller.defaultToSimpleWorkoutView.value,
+                  builder: (value, onChanged) => SwitchListTile(
+                    title: Text(
+                      "settings.options.defaultToSimpleWorkoutView.label".t,
+                    ),
+                    subtitle: Text(
+                      "settings.options.defaultToSimpleWorkoutView.subtitle".t,
+                    ),
+                    value:
+                        value ?? Prefs.defaultValue.defaultToSimpleWorkoutView,
+                    onChanged: onChanged,
+                  ),
+                  onUpdate: (v) => controller.setDefaultToSimpleWorkoutView(
+                    v ?? Prefs.defaultValue.defaultToSimpleWorkoutView,
+                  ),
+                ),
                 Get.find<NotificationController>().settingsTile,
               ]),
             ),

@@ -183,6 +183,7 @@ class GTIcons {
   static const IconData replace = Icons.refresh_rounded;
   static const IconData reps = Icons.numbers_rounded;
   static const IconData reset = Icons.replay_rounded;
+  static const IconData rest_timer = Icons.punch_clock_rounded;
   static const IconData resume = Icons.play_arrow_rounded;
   static const IconData routines = Icons.fitness_center_rounded;
   static const IconData rpe = Icons.fitness_center_rounded;
@@ -200,6 +201,7 @@ class GTIcons {
   static const IconData streak_weeks = _fire;
   static const IconData superset = Icons.layers_rounded;
   static const IconData time = Icons.timer_rounded;
+  static const IconData tools = Icons.build_rounded;
   static const IconData units = Icons.numbers_rounded;
   static const IconData volume = Icons.line_weight_rounded;
   static const IconData weight_calculator = Icons.calculate_rounded;

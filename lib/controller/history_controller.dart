@@ -104,8 +104,10 @@ class HistoryController extends GetxController with ServiceableController {
               0,
       ];
       // The dynamic calculation of rest day slots is done downstream
-      while (workoutDensityChartData[0] == 0) {
+      int steps = workoutDensityChartData.length;
+      while (workoutDensityChartData[0] == 0 && steps > 0) {
         workoutDensityChartData.add(workoutDensityChartData.removeAt(0));
+        steps--;
       }
       NativeService.instance().updateHomeWidgetParameters(
         weekStreak: streaks.value.weekStreak,

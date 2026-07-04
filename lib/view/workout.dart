@@ -1,15 +1,12 @@
 import 'dart:convert';
 
 import 'package:custom_refresh_indicator/custom_refresh_indicator.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
 import 'package:flutter_quill/flutter_quill.dart';
 import 'package:get/get.dart';
 import 'package:gymtracker/controller/countdown_controller.dart';
 import 'package:gymtracker/controller/health_controller.dart';
 import 'package:gymtracker/controller/routines_controller.dart';
-import 'package:gymtracker/controller/settings_controller.dart';
 import 'package:gymtracker/controller/stopwatch_controller.dart';
 import 'package:gymtracker/controller/workout_controller.dart';
 import 'package:gymtracker/gen/colors.gen.dart';
@@ -22,12 +19,10 @@ import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/service/logger.dart';
 import 'package:gymtracker/utils/constants.dart';
 import 'package:gymtracker/utils/extensions.dart';
-import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/utils/utils.dart';
 import 'package:gymtracker/view/components/infobox.dart';
 import 'package:gymtracker/view/components/rich_text_editor.dart';
 import 'package:gymtracker/view/components/split_button.dart';
-import 'package:gymtracker/view/utils/cardio_timer.dart';
 import 'package:gymtracker/view/utils/crossfade.dart';
 import 'package:gymtracker/view/utils/date_field.dart';
 import 'package:gymtracker/view/utils/exercise.dart';
@@ -36,9 +31,8 @@ import 'package:gymtracker/view/utils/routine_form_picker.dart';
 import 'package:gymtracker/view/utils/superset.dart';
 import 'package:gymtracker/view/utils/time.dart';
 import 'package:gymtracker/view/utils/timer.dart';
-import 'package:gymtracker/view/utils/weight_calculator.dart';
 import 'package:gymtracker/view/utils/workout.dart';
-import 'package:gymtracker/view/utils/workout_done.dart';
+import 'package:gymtracker/view/utils/workout_menus.dart';
 import 'package:intl/intl.dart';
 
 WorkoutController? get _controller {
@@ -122,161 +116,21 @@ class _WorkoutViewState extends State<WorkoutView> {
           return Text("ongoingWorkout.title".t);
         }),
         actions: [
-          IconButton(
-            tooltip: "ongoingWorkout.stopwatch.label".t,
-            icon: const Icon(GTIcons.stopwatch),
-            onPressed: () {
-              GlobalStopwatch getStopwatch() =>
-                  stopwatchController.globalStopwatch;
-              showDialog(
-                context: context,
-                builder: (context) => AlertDialog(
-                  title: Text("ongoingWorkout.stopwatch.label".t),
-                  content: TimerView(
-                    startingTime: DateTime.now(),
-                    builder: (context, _) {
-                      return Obx(
-                        () => Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            TimerView.buildTimeString(
-                              context,
-                              getStopwatch().currentDuration,
-                              style: Theme.of(context).textTheme.displaySmall,
-                            ),
-                            const SizedBox(height: 16),
-                            OverflowBar(
-                              alignment: MainAxisAlignment.end,
-                              overflowAlignment: OverflowBarAlignment.end,
-                              children: [
-                                if (getStopwatch().isStopped())
-                                  TextButton.icon(
-                                    key: const Key("start"),
-                                    icon: const Icon(GTIcons.resume),
-                                    label: Text(
-                                        "ongoingWorkout.stopwatch.start".t),
-                                    onPressed: () {
-                                      getStopwatch().start();
-                                    },
-                                  )
-                                else
-                                  TextButton.icon(
-                                    key: const Key("pause"),
-                                    icon: const Icon(GTIcons.pause),
-                                    label: Text(
-                                        "ongoingWorkout.stopwatch.pause".t),
-                                    onPressed: () {
-                                      getStopwatch().pause();
-                                    },
-                                  ),
-                                if (getStopwatch().isStopped() &&
-                                    getStopwatch().currentDuration.inSeconds >
-                                        0)
-                                  TextButton.icon(
-                                    key: const Key("reset"),
-                                    icon: const Icon(GTIcons.reset),
-                                    label: Text(
-                                        "ongoingWorkout.stopwatch.reset".t),
-                                    onPressed: () {
-                                      getStopwatch().reset();
-                                    },
-                                  ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      );
-                    },
-                  ),
-                ),
-              );
-            },
-          ),
-          IconButton(
-            tooltip: "ongoingWorkout.weightCalculator".t,
-            icon: const Icon(GTIcons.weight_calculator),
-            onPressed: () {
-              final weightUnit = _controller == null
-                  ? settingsController.weightUnit.value
-                  : _controller!.weightUnit.value;
-              showDialog(
-                context: context,
-                builder: (context) => WeightCalculator(
-                  weightUnit: weightUnit,
-                ),
-              );
-            },
-          ),
-          IconButton(
-            tooltip: "cardioTimer.name".t,
-            icon: const Icon(GTIcons.cardio_timer),
-            onPressed: () {
-              Go.to(() => const CardioTimerSetupScreen());
-            },
+          PopupMenuButton(
+            itemBuilder: (context) => buildToolboxMenuEntries(
+              context,
+              _controller,
+            ),
+            tooltip: "ongoingWorkout.toolbox.title".t,
+            icon: const Icon(GTIcons.tools),
           ),
           PopupMenuButton(
             key: const Key("main-menu"),
-            itemBuilder: (context) => <PopupMenuEntry<dynamic>>[
-              PopupMenuItem(
-                child: Text(
-                  "ongoingWorkout.actions.changeWeightUnit".t,
-                ),
-                onTap: () {
-                  _controller?.changeWeightUnitDialog();
-                },
-              ),
-              PopupMenuItem(
-                child: Text(
-                  "ongoingWorkout.actions.changeDistanceUnit".t,
-                ),
-                onTap: () {
-                  _controller?.changeDistanceUnitDialog();
-                },
-              ),
-              const PopupMenuDivider(),
-              PopupMenuItem(
-                child: Text(
-                  "ongoingWorkout.actions.finish".t,
-                ),
-                onTap: () {
-                  SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
-                    _controller?.finishWorkoutWithDialog(context);
-                  });
-                },
-              ),
-              PopupMenuItem(
-                child: Text(
-                  "ongoingWorkout.actions.cancel".t,
-                  style: TextStyle(color: Theme.of(context).colorScheme.error),
-                ),
-                onTap: () {
-                  SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
-                    _controller?.cancelWorkoutWithDialog(context,
-                        onCanceled: () {
-                      SchedulerBinding.instance
-                          .addPostFrameCallback((timeStamp) {
-                        Get.back(closeOverlays: true);
-                        Get.delete<WorkoutController>();
-                      });
-                    });
-                  });
-                },
-              ),
-              if (kDebugMode) ...[
-                PopupMenuItem(
-                  child: const Text("Show Good Job dialog"),
-                  onTap: () {
-                    SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
-                      Go.showBottomModalScreen((context, controller) =>
-                          WorkoutDoneSheet(
-                            workout: _controller!.synthesizeTemporaryWorkout(),
-                            controller: controller,
-                          ));
-                    });
-                  },
-                ),
-              ],
-            ],
+            itemBuilder: (context) {
+              final controller = _controller;
+              if (controller == null) return <PopupMenuEntry<dynamic>>[];
+              return buildWorkoutControlMenuEntries(context, controller);
+            },
           ),
         ],
         bottom: PreferredSize(
@@ -453,8 +307,9 @@ class WorkoutInfoBar extends StatelessWidget {
                         flex: 4,
                         child: Obx(
                           () {
-                            if (_controller == null)
+                            if (_controller == null) {
                               return const SizedBox.shrink();
+                            }
                             return TimerView(
                               startingTime:
                                   _controller?.time.value ?? DateTime.now(),
@@ -482,7 +337,7 @@ class WorkoutInfoBar extends StatelessWidget {
                         ),
                       ),
                       Expanded(
-                        flex: 4,
+                        flex: 3,
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -509,7 +364,7 @@ class WorkoutInfoBar extends StatelessWidget {
                         ),
                       ),
                       Expanded(
-                        flex: 4,
+                        flex: 3,
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [

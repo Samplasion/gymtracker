@@ -28,6 +28,7 @@ import 'package:gymtracker/utils/theme.dart';
 import 'package:gymtracker/view/debug/iphone15.dart';
 import 'package:gymtracker/view/error.dart';
 import 'package:gymtracker/view/skeleton.dart';
+import 'package:gymtracker/view/utils/workout_simple.dart';
 import 'package:gymtracker/view/workout.dart';
 import 'package:protocol_handler/protocol_handler.dart';
 import 'package:relative_time/relative_time.dart';
@@ -180,6 +181,10 @@ class _MainAppState extends State<MainApp> with LoggerConfigurationMixin {
                         return switch (settings.name) {
                           WorkoutView.routeName => Go.materialRoute(
                               () => const WorkoutView(),
+                              settings: settings,
+                            ),
+                          WorkoutSimpleView.routeName => Go.materialRoute(
+                              () => const WorkoutSimpleView(),
                               settings: settings,
                             ),
                           ErrorView.routeName => Go.materialRoute(

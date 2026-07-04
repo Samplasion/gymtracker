@@ -33,7 +33,7 @@ import 'package:gymtracker/view/settings.dart';
 import 'package:gymtracker/view/utils/crossfade.dart';
 import 'package:gymtracker/view/utils/in_app_icon.dart';
 import 'package:gymtracker/view/utils/timer.dart';
-import 'package:gymtracker/view/workout.dart';
+import 'package:gymtracker/view/utils/workout_navigation.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
@@ -309,7 +309,7 @@ class _SkeletonViewState extends State<SkeletonView>
                   child: OngoingWorkoutBar(
                     open: () => SchedulerBinding.instance
                         .addPostFrameCallback((timeStamp) {
-                      Go.toNamed(WorkoutView.routeName);
+                      Go.toNamed(getPreferredWorkoutRouteName());
                     }),
                   ),
                 ),

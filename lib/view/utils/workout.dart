@@ -368,6 +368,7 @@ class WorkoutExerciseSetEditor extends StatefulWidget {
   final int setIndex;
   final bool alt;
   final bool isCreating;
+  final bool showDoneCheckbox;
   final VoidCallback onDelete;
   final void Function(GTSetKind) onSetSelectKind;
   final void Function(bool) onSetSetDone;
@@ -382,6 +383,7 @@ class WorkoutExerciseSetEditor extends StatefulWidget {
     required this.setIndex,
     required this.alt,
     required this.isCreating,
+    this.showDoneCheckbox = true,
     required this.onSetSelectKind,
     required this.onSetSetDone,
     required this.onDelete,
@@ -464,6 +466,26 @@ class _WorkoutExerciseSetEditorState extends State<WorkoutExerciseSetEditor> {
     subscription?.cancel();
     _weightFocusNode.dispose();
     super.dispose();
+  }
+
+  @override
+  void didUpdateWidget(WorkoutExerciseSetEditor oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // If the set has changed, update the controllers
+    if (oldWidget.set != widget.set) {
+      if (!_weightFocusNode.hasFocus && widget.set.weight != null) {
+        weightController.text = stringifyDouble(widget.set.weight ?? 0);
+      }
+      if (!_timeFocusNode.hasFocus && widget.set.time != null) {
+        timeController.text = TimeInputField.encodeDuration(widget.set.time!);
+      }
+      if (!_repsFocusNode.hasFocus && widget.set.reps != null) {
+        repsController.text = widget.set.reps.toString();
+      }
+      if (!_distanceFocusNode.hasFocus && widget.set.distance != null) {
+        distanceController.text = stringifyDouble(widget.set.distance ?? 0);
+      }
+    }
   }
 
   Widget get weightField => TextField(
@@ -708,7 +730,7 @@ class _WorkoutExerciseSetEditorState extends State<WorkoutExerciseSetEditor> {
                   Flexible(child: fields[i])
                 ],
                 const SizedBox(width: 8),
-                if (!widget.isCreating) ...[
+                if (!widget.isCreating && widget.showDoneCheckbox) ...[
                   ValueBuilder<bool?>(
                     builder: (_, update) => Checkbox(
                       value: widget.set.done,

@@ -248,6 +248,24 @@ extension AppDelegate: WCSessionDelegate {
                         self.logger!.error("Error marking set as done: \(error)")
                     }
                 })
+            } else if method == "moveWorkoutCursorNext" {
+                self.flutterNativeApi?.moveWorkoutCursorNext(completion: { result in
+                    switch result {
+                    case .success(let moved): replyHandler(["success": moved])
+                    case .failure(let error):
+                        replyHandler(["success": false])
+                        self.logger!.error("Error moving workout cursor to next set: \(error)")
+                    }
+                })
+            } else if method == "moveWorkoutCursorPrevious" {
+                self.flutterNativeApi?.moveWorkoutCursorPrevious(completion: { result in
+                    switch result {
+                    case .success(let moved): replyHandler(["success": moved])
+                    case .failure(let error):
+                        replyHandler(["success": false])
+                        self.logger!.error("Error moving workout cursor to previous set: \(error)")
+                    }
+                })
             } else if method == "updateSetParameters" {
                 self.flutterNativeApi?.updateSetParameters(weight: message["weight"] as? Double, timeSeconds: message["time"] as? Double, reps: Int64(message["reps"] as? Int ?? 0), distance: message["distance"] as? Double, completion: { result in
                     switch result {
@@ -306,7 +324,7 @@ extension AppDelegate: GymBroNativeHostAPI {
     
     func setIsWorkoutRunning(isWorkoutRunning: Bool) throws {
         applicationContext.isRunning = isWorkoutRunning
-        session?.sendMessage(["method": "setIsWorkoutRunning", "value": isWorkoutRunning], replyHandler: nil)
+        sendMessage(["method": "setIsWorkoutRunning", "value": isWorkoutRunning], replyHandler: nil, errorHandler: nil)
         
         didUpdateApplicationContext(applicationContext)
     }
@@ -339,9 +357,50 @@ extension AppDelegate: GymBroNativeHostAPI {
 //        }
 //        session?.sendMessage(msg, replyHandler: nil, errorHandler: { [self] err in logger?.error("\(#file) \(#function): \(err.localizedDescription)\n\(msg)")})
         let msg = (try? decoded.toJSON()) ?? [:]
-        session?.sendMessage(["method": "setExerciseParameters", "data": msg], replyHandler: nil, errorHandler: { [self] err in logger?.error("\(#file) \(#function): \(err.localizedDescription)\n\(msg)")})
+        sendMessage(["method": "setExerciseParameters", "data": msg], replyHandler: nil, errorHandler: { [self] err in logger?.error("\(#file) \(#function): \(err.localizedDescription)\n\(msg)")})
         
         didUpdateApplicationContext(applicationContext)
+    }
+
+    func sendMessage(_ message: [String: Any],
+                                 replyHandler: (([String: Any]) -> Void)?,
+                                 errorHandler: ((Error) -> Void)?) {
+        guard let communicationReadySession = session else {
+            // watchOS: A session is always valid, so it will never come here.
+            print("Cannot send direct message: No reachable session")
+            let error = NSError.init(domain: "WCErrorDomain",
+                                    code: 7007,
+                                    userInfo: nil)
+            errorHandler?(error)
+            return
+        }
+
+        /* The following trySendingMessageToWatch sometimews fails with
+        Error Domain=WCErrorDomain Code=7007 "WatchConnectivity session on paired device is not reachable."
+        In this case, the transfer is retried a number of times.
+        */
+        let maxNrRetries = 5
+        var availableRetries = maxNrRetries
+
+        func trySendingMessageToWatch(_ message: [String: Any]) {
+            communicationReadySession.sendMessage(message, 
+                replyHandler: replyHandler, 
+                errorHandler: { [self] error in
+                    self.logger?.error("sending message to watch failed: error: \(error)")
+                    let nsError = error as NSError
+                    if nsError.domain == "WCErrorDomain" && nsError.code == 7007 && availableRetries > 0 {
+                        availableRetries = availableRetries - 1
+                      let randomDelay = Double.random(in: 0.3...1.0)
+                        DispatchQueue.main.asyncAfter(deadline: .now() + randomDelay, execute: {
+                            trySendingMessageToWatch(message)
+                        })
+                    } else {
+                        errorHandler?(error)
+                    }
+            })
+        } // trySendingMessageToWatch
+
+        trySendingMessageToWatch(message)
     }
     
     func setSession(_ session: WCSession) {
@@ -362,7 +421,7 @@ extension AppDelegate: GymBroNativeHostAPI {
         logger?.log("Updated home widget data: \(parameters)")
         WidgetCenter.shared.reloadAllTimelines()
         
-        self.session?.sendMessage(["method": "updateHomeWidgetParameters", "value": parameters, "workoutDensityChartData": workoutDensityChartData], replyHandler: nil)
+        self.sendMessage(["method": "updateHomeWidgetParameters", "value": parameters, "workoutDensityChartData": workoutDensityChartData], replyHandler: nil, errorHandler: nil)
     }
     
     func requestHealthPermission() {

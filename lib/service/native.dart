@@ -6,7 +6,7 @@ import 'package:gymtracker/model/native.dart';
 import 'package:gymtracker/service/logger.dart';
 import 'package:gymtracker/service/native.g.dart';
 import 'package:gymtracker/service/widgets.dart'
-    show restKey, streakKey, totalWorkoutsKey, workoutDensityKey;
+    show restKey, streakKey, totalWorkoutsKey;
 import 'package:rxdart/rxdart.dart';
 
 abstract class NativeService {
@@ -46,6 +46,16 @@ class _UnsupportedNativeService extends NativeService
   @override
   void markThisSetAsDone() {
     // no-op
+  }
+
+  @override
+  bool moveWorkoutCursorNext() {
+    return false;
+  }
+
+  @override
+  bool moveWorkoutCursorPrevious() {
+    return false;
   }
 
   @override
@@ -114,6 +124,18 @@ class _NativeServiceImpl extends NativeService
   void markThisSetAsDone() {
     logger.i("Received markThisSetAsDone from native.");
     Get.find<WorkoutController>().autoMarkNextSetDone();
+  }
+
+  @override
+  bool moveWorkoutCursorNext() {
+    logger.i("Received moveWorkoutCursorNext from native.");
+    return Get.find<WorkoutController>().moveSetCursorToNext();
+  }
+
+  @override
+  bool moveWorkoutCursorPrevious() {
+    logger.i("Received moveWorkoutCursorPrevious from native.");
+    return Get.find<WorkoutController>().moveSetCursorToPrevious();
   }
 
   @override

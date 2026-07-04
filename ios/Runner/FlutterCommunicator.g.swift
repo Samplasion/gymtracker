@@ -194,6 +194,8 @@ class GymBroNativeHostAPISetup {
 /// Generated protocol from Pigeon that represents Flutter messages that can be called from Swift.
 protocol GymBroNativeFlutterAPIProtocol {
   func markThisSetAsDone(completion: @escaping (Result<Void, PigeonError>) -> Void)
+  func moveWorkoutCursorNext(completion: @escaping (Result<Bool, PigeonError>) -> Void)
+  func moveWorkoutCursorPrevious(completion: @escaping (Result<Bool, PigeonError>) -> Void)
   func requestTrainingData(completion: @escaping (Result<Void, PigeonError>) -> Void)
   func handleWorkoutMetrics(energy energyArg: Double?, heartRate heartRateArg: Double?, completion: @escaping (Result<Void, PigeonError>) -> Void)
   func updateSetParameters(weight weightArg: Double?, timeSeconds timeSecondsArg: Double?, reps repsArg: Int64?, distance distanceArg: Double?, completion: @escaping (Result<Void, PigeonError>) -> Void)
@@ -223,6 +225,48 @@ class GymBroNativeFlutterAPI: GymBroNativeFlutterAPIProtocol {
         completion(.failure(PigeonError(code: code, message: message, details: details)))
       } else {
         completion(.success(Void()))
+      }
+    }
+  }
+  func moveWorkoutCursorNext(completion: @escaping (Result<Bool, PigeonError>) -> Void) {
+    let channelName: String = "dev.flutter.pigeon.gymtracker.GymBroNativeFlutterAPI.moveWorkoutCursorNext\(messageChannelSuffix)"
+    let channel = FlutterBasicMessageChannel(name: channelName, binaryMessenger: binaryMessenger, codec: codec)
+    channel.sendMessage(nil) { response in
+      guard let listResponse = response as? [Any?] else {
+        completion(.failure(createConnectionError(withChannelName: channelName)))
+        return
+      }
+      if listResponse.count > 1 {
+        let code: String = listResponse[0] as! String
+        let message: String? = nilOrValue(listResponse[1])
+        let details: String? = nilOrValue(listResponse[2])
+        completion(.failure(PigeonError(code: code, message: message, details: details)))
+      } else if listResponse[0] == nil {
+        completion(.failure(PigeonError(code: "null-error", message: "Flutter api returned null value for non-null return value.", details: "")))
+      } else {
+        let result = listResponse[0] as! Bool
+        completion(.success(result))
+      }
+    }
+  }
+  func moveWorkoutCursorPrevious(completion: @escaping (Result<Bool, PigeonError>) -> Void) {
+    let channelName: String = "dev.flutter.pigeon.gymtracker.GymBroNativeFlutterAPI.moveWorkoutCursorPrevious\(messageChannelSuffix)"
+    let channel = FlutterBasicMessageChannel(name: channelName, binaryMessenger: binaryMessenger, codec: codec)
+    channel.sendMessage(nil) { response in
+      guard let listResponse = response as? [Any?] else {
+        completion(.failure(createConnectionError(withChannelName: channelName)))
+        return
+      }
+      if listResponse.count > 1 {
+        let code: String = listResponse[0] as! String
+        let message: String? = nilOrValue(listResponse[1])
+        let details: String? = nilOrValue(listResponse[2])
+        completion(.failure(PigeonError(code: code, message: message, details: details)))
+      } else if listResponse[0] == nil {
+        completion(.failure(PigeonError(code: "null-error", message: "Flutter api returned null value for non-null return value.", details: "")))
+      } else {
+        let result = listResponse[0] as! Bool
+        completion(.success(result))
       }
     }
   }

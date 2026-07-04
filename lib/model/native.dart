@@ -8,6 +8,7 @@ class NativeWorkoutStateMessage {
   final String exerciseName;
   final Color exerciseColor;
   final String exerciseParameters;
+  final String setTypeLabel;
   final DateTime startingTime;
   final DateTime? restTimeStart;
   final DateTime? restTimeEnd;
@@ -19,6 +20,7 @@ class NativeWorkoutStateMessage {
     required this.exerciseName,
     required this.exerciseColor,
     required this.exerciseParameters,
+    required this.setTypeLabel,
     required this.startingTime,
     this.restTimeStart,
     this.restTimeEnd,
@@ -32,6 +34,7 @@ class NativeWorkoutStateMessage {
       'exerciseName': exerciseName,
       'exerciseColor': exerciseColor.hexValue,
       'exerciseParameters': exerciseParameters,
+      'setTypeLabel': setTypeLabel,
       'startingTime': startingTime.millisecondsSinceEpoch,
       'restTimeStart': restTimeStart?.millisecondsSinceEpoch,
       'restTimeEnd': restTimeEnd?.millisecondsSinceEpoch,

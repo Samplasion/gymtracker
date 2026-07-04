@@ -27,6 +27,7 @@ class WorkoutViewModel: NSObject, ObservableObject {
     @Published var exerciseName: String = ""
     @Published var exerciseColor: Int64 = 0
     @Published var exerciseParameters: String = ""
+    @Published var setTypeLabel: String = ""
     @Published var restTimeEnd: Date? = nil {
         willSet {
             if newValue != restTimeEnd {
@@ -66,6 +67,38 @@ class WorkoutViewModel: NSObject, ObservableObject {
     func markThisSetAsDone() {
         isLoading = true
         session!.sendMessage(["method": "markThisSetAsDone"], replyHandler: { response in
+            Task {
+                await self.playVibration(pattern: (response["success"] != nil) && (response["success"] as? Bool) == true ? .success : .failure)
+                self.isLoading = false
+            }
+        }, errorHandler: { error in
+            self.log(error.localizedDescription)
+            Task {
+                await self.playVibration(pattern: .failure)
+                self.isLoading = false
+            }
+        })
+    }
+
+    func moveWorkoutCursorNext() {
+        isLoading = true
+        session!.sendMessage(["method": "moveWorkoutCursorNext"], replyHandler: { response in
+            Task {
+                await self.playVibration(pattern: (response["success"] != nil) && (response["success"] as? Bool) == true ? .success : .failure)
+                self.isLoading = false
+            }
+        }, errorHandler: { error in
+            self.log(error.localizedDescription)
+            Task {
+                await self.playVibration(pattern: .failure)
+                self.isLoading = false
+            }
+        })
+    }
+
+    func moveWorkoutCursorPrevious() {
+        isLoading = true
+        session!.sendMessage(["method": "moveWorkoutCursorPrevious"], replyHandler: { response in
             Task {
                 await self.playVibration(pattern: (response["success"] != nil) && (response["success"] as? Bool) == true ? .success : .failure)
                 self.isLoading = false
@@ -233,6 +266,7 @@ extension WorkoutViewModel: @MainActor WorkoutMessageDelegate {
         self.exerciseName = exerciseParameters.exerciseName
         self.exerciseColor = exerciseParameters.exerciseColor
         self.exerciseParameters = exerciseParameters.exerciseParameters
+        self.setTypeLabel = exerciseParameters.setTypeLabel
         self.restTimeEnd = exerciseParameters.restTimeEnd
         self.workoutStart = exerciseParameters.startingTime
         self.set = exerciseParameters.set

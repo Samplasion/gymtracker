@@ -13,6 +13,7 @@ struct NativeWorkoutStateMessage: Codable {
     let exerciseName: String
     let exerciseColor: Int64
     let exerciseParameters: String
+    let setTypeLabel: String
     let startingTime: Date
     let restTimeStart: Date?
     let restTimeEnd: Date?
@@ -24,6 +25,7 @@ struct NativeWorkoutStateMessage: Codable {
         case exerciseName
         case exerciseColor
         case exerciseParameters
+        case setTypeLabel
         case startingTime
         case restTimeStart
         case restTimeEnd
@@ -39,6 +41,7 @@ struct NativeWorkoutStateMessage: Codable {
         try container.encode(exerciseName, forKey: .exerciseName)
         try container.encode(exerciseColor, forKey: .exerciseColor)
         try container.encode(exerciseParameters, forKey: .exerciseParameters)
+        try container.encode(setTypeLabel, forKey: .setTypeLabel)
         try container.encode(startingTime.millisecondsSinceEpoch, forKey: .startingTime)
         try container.encodeIfPresent(restTimeStart?.millisecondsSinceEpoch, forKey: .restTimeStart)
         try container.encodeIfPresent(restTimeEnd?.millisecondsSinceEpoch, forKey: .restTimeEnd)
@@ -66,6 +69,7 @@ struct NativeWorkoutStateMessage: Codable {
         exerciseName = try container.decode(String.self, forKey: .exerciseName)
         exerciseColor = try container.decode(Int64.self, forKey: .exerciseColor)
         exerciseParameters = try container.decode(String.self, forKey: .exerciseParameters)
+        setTypeLabel = try container.decodeIfPresent(String.self, forKey: .setTypeLabel) ?? ""
         let startMillis = try container.decode(Int.self, forKey: .startingTime)
         startingTime = Date(milliseconds: startMillis)
         if let restStartMillis = try container.decodeIfPresent(Int.self, forKey: .restTimeStart) {

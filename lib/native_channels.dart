@@ -32,6 +32,10 @@ abstract class GymBroNativeFlutterAPI {
   // Marks the current set as done
   void markThisSetAsDone();
 
+  // Move the focused workout set cursor one step forward/backward
+  bool moveWorkoutCursorNext();
+  bool moveWorkoutCursorPrevious();
+
   // Called by the native OS to read the app's workout data
   void requestTrainingData();
 

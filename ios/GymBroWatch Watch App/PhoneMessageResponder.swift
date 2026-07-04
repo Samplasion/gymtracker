@@ -78,8 +78,49 @@ class PhoneMessageResponder: NSObject {
     
     func log(_ message: String) {
         NSLog(message)
-        session?.sendMessage(["method": "log", "message": message], replyHandler: nil);
+      sendMessage(["method": "log", "message": message], replyHandler: nil, errorHandler: nil);
     }
+  
+  func sendMessage(_ message: [String: Any],
+                   replyHandler: (([String: Any]) -> Void)?,
+                   errorHandler: ((Error) -> Void)?) {
+    guard let communicationReadySession = session else {
+      // watchOS: A session is always valid, so it will never come here.
+      print("Cannot send direct message: No reachable session")
+      let error = NSError.init(domain: "WCErrorDomain",
+                               code: 7007,
+                               userInfo: nil)
+      errorHandler?(error)
+      return
+    }
+    
+    /* The following trySendingMessageToWatch sometimews fails with
+     Error Domain=WCErrorDomain Code=7007 "WatchConnectivity session on paired device is not reachable."
+     In this case, the transfer is retried a number of times.
+     */
+    let maxNrRetries = 5
+    var availableRetries = maxNrRetries
+    
+    func trySendingMessageToWatch(_ message: [String: Any]) {
+      communicationReadySession.sendMessage(message,
+                                            replyHandler: replyHandler,
+                                            errorHandler: { error in
+        print("sending message to watch failed: error: \(error)")
+        let nsError = error as NSError
+        if nsError.domain == "WCErrorDomain" && nsError.code == 7007 && availableRetries > 0 {
+          availableRetries = availableRetries - 1
+          let randomDelay = Double.random(in: 0.3...1.0)
+          DispatchQueue.main.asyncAfter(deadline: .now() + randomDelay, execute: {
+            trySendingMessageToWatch(message)
+          })
+        } else {
+          errorHandler?(error)
+        }
+      })
+    } // trySendingMessageToWatch
+    
+    trySendingMessageToWatch(message)
+  }
     
     @MainActor
     func sessionReachabilityDidChange(_ session: WCSession) {

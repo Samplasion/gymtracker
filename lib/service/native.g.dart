@@ -198,6 +198,10 @@ abstract class GymBroNativeFlutterAPI {
 
   void markThisSetAsDone();
 
+  bool moveWorkoutCursorNext();
+
+  bool moveWorkoutCursorPrevious();
+
   void requestTrainingData();
 
   void handleWorkoutMetrics(double? energy, double? heartRate);
@@ -217,6 +221,44 @@ abstract class GymBroNativeFlutterAPI {
           try {
             api.markThisSetAsDone();
             return wrapResponse(empty: true);
+          } on PlatformException catch (e) {
+            return wrapResponse(error: e);
+          }          catch (e) {
+            return wrapResponse(error: PlatformException(code: 'error', message: e.toString()));
+          }
+        });
+      }
+    }
+    {
+      final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
+          'dev.flutter.pigeon.gymtracker.GymBroNativeFlutterAPI.moveWorkoutCursorNext$messageChannelSuffix', pigeonChannelCodec,
+          binaryMessenger: binaryMessenger);
+      if (api == null) {
+        pigeonVar_channel.setMessageHandler(null);
+      } else {
+        pigeonVar_channel.setMessageHandler((Object? message) async {
+          try {
+            final bool output = api.moveWorkoutCursorNext();
+            return wrapResponse(result: output);
+          } on PlatformException catch (e) {
+            return wrapResponse(error: e);
+          }          catch (e) {
+            return wrapResponse(error: PlatformException(code: 'error', message: e.toString()));
+          }
+        });
+      }
+    }
+    {
+      final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
+          'dev.flutter.pigeon.gymtracker.GymBroNativeFlutterAPI.moveWorkoutCursorPrevious$messageChannelSuffix', pigeonChannelCodec,
+          binaryMessenger: binaryMessenger);
+      if (api == null) {
+        pigeonVar_channel.setMessageHandler(null);
+      } else {
+        pigeonVar_channel.setMessageHandler((Object? message) async {
+          try {
+            final bool output = api.moveWorkoutCursorPrevious();
+            return wrapResponse(result: output);
           } on PlatformException catch (e) {
             return wrapResponse(error: e);
           }          catch (e) {

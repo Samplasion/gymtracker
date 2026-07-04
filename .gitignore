@@ -60,3 +60,4 @@ env.g.dart
 
 # FVM Version Cache
 .fvm/
+ios/.derived-data-log-*

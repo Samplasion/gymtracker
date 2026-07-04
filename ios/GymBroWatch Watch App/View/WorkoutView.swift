@@ -15,6 +15,7 @@ struct WorkoutView: View {
   @Environment(\.isLuminanceReduced) var isLuminanceReduced
   @State private var selection: Tab = .workout
   @State private var isSheetActive = false
+  @State private var editingSetID: String? = nil
   
   private enum Tab {
     case workout, music
@@ -42,6 +43,16 @@ struct WorkoutView: View {
         .tabViewStyle(.page)
       }
     }
+    .sheet(isPresented: $presentEditSheet, onDismiss: {
+      editingSetID = nil
+    }, content: {
+      if #available(watchOS 9, *) {
+        SetEditSheet(model: workoutViewModel)
+//              .tint(workoutViewModel.exerciseColor.asARGBColor())
+      } else {
+        EmptyView()
+      }
+    })
   }
   
   @ViewBuilder
@@ -79,6 +90,7 @@ struct WorkoutView: View {
                   .multilineTextAlignment(.center)
                 if #available(watchOS 9, *) {
                   Button(action: {
+                    editingSetID = workoutViewModel.set?.id
                     presentEditSheet = true
                   }, label: {
                     (
@@ -207,18 +219,13 @@ struct WorkoutView: View {
             .scenePadding()
             .padding([.top], 30)
             .onChange(of: workoutViewModel.set.map { s in s.id }, perform: { _ in
+              print("WorkoutView: set changed, dismissing edit sheet if open")
+              guard presentEditSheet else { return }
+              guard let editingSetID, editingSetID != workoutViewModel.set?.id else { return }
               presentEditSheet = false
             })
           }
         }
-        .sheet(isPresented: $presentEditSheet, content: {
-          if #available(watchOS 9, *) {
-            SetEditSheet(model: workoutViewModel)
-//              .tint(workoutViewModel.exerciseColor.asARGBColor())
-          } else {
-            EmptyView()
-          }
-        })
       case .notStarted, .cancelled, .ended:
         Text("Start a workout from your iPhone.")
           .multilineTextAlignment(.center)

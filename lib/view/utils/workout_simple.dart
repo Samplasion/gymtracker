@@ -291,6 +291,12 @@ class _CurrentSetView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (!Get.isRegistered<WorkoutController>()) {
+      return const Center(
+        child: CircularProgressIndicator(),
+      );
+    }
+
     final controller = Get.find<WorkoutController>();
 
     if (isRestActive) {

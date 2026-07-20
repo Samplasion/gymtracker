@@ -96,6 +96,7 @@ protocol GymBroNativeHostAPI {
   func updateHomeWidgetParameters(parameters: [String: Int64], workoutDensityChartData: [Int64]) throws
   func requestHealthPermission() throws
   func updateFoodParameters(parameters: [String?: Any?]) throws
+  func updateShadowRoutines(routines: [String: String]) throws
 }
 
 /// Generated setup class from Pigeon to handle messages through the `binaryMessenger`.
@@ -188,6 +189,21 @@ class GymBroNativeHostAPISetup {
       }
     } else {
       updateFoodParametersChannel.setMessageHandler(nil)
+    }
+    let updateShadowRoutinesChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.gymtracker.GymBroNativeHostAPI.updateShadowRoutines\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      updateShadowRoutinesChannel.setMessageHandler { message, reply in
+        let args = message as! [Any?]
+        let routinesArg = args[0] as! [String: String]
+        do {
+          try api.updateShadowRoutines(routines: routinesArg)
+          reply(wrapResult(nil))
+        } catch {
+          reply(wrapError(error))
+        }
+      }
+    } else {
+      updateShadowRoutinesChannel.setMessageHandler(nil)
     }
   }
 }

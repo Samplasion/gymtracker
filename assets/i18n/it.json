@@ -741,7 +741,8 @@
       "many": "%s routine",
       "other": "%s routine"
     },
-    "optional": "(facoltativo)"
+    "optional": "(facoltativo)",
+    "unnamed": "Unnamed"
   },
   "muscleGroups": {
     "abductors": "Abduttori",

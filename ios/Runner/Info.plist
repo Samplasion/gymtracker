@@ -76,5 +76,15 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
+	<key>NSAppIntentsConfiguration</key>
+	<dict>
+			<key>NSAppIntentsPackage</key>
+			<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
+	</dict>
+	<key>NSAppIntentsMetadata</key>
+	<dict>
+			<key>NSAppIntentsSupported</key>
+			<true/>
+	</dict>
 </dict>
 </plist>

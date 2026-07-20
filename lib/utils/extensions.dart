@@ -19,7 +19,6 @@ import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/service/logger.dart';
 import 'package:gymtracker/struct/editor_callback.dart';
 import 'package:gymtracker/utils/utils.dart';
-import 'package:gymtracker/view/components/parent_viewer.dart';
 import 'package:gymtracker/view/utils/timer.dart';
 import 'package:intl/intl.dart' hide TextDirection;
 
@@ -194,6 +193,11 @@ extension IterableUtils<T> on Iterable<T> {
       }
     }
     return (matching: matching, rest: rest);
+  }
+
+  T? get safeFirst {
+    if (isEmpty) return null;
+    return first;
   }
 }
 

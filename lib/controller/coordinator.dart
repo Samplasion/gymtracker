@@ -9,6 +9,7 @@ import 'package:gymtracker/controller/exercises_controller.dart';
 import 'package:gymtracker/controller/food_controller.dart';
 import 'package:gymtracker/controller/health_controller.dart';
 import 'package:gymtracker/controller/history_controller.dart';
+import 'package:gymtracker/controller/intents_controller.dart';
 import 'package:gymtracker/controller/me_controller.dart';
 import 'package:gymtracker/controller/migrations_controller.dart';
 import 'package:gymtracker/controller/notifications_controller.dart';
@@ -62,6 +63,7 @@ class Coordinator extends GetxController
           );
         }),
     ]);
+    IntentsController.initialize();
 
     showPermissionTilesStream.add(
         get<NotificationController>().showSettingsTileStream.value ||

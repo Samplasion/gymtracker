@@ -32,6 +32,8 @@ abstract class NativeService {
     required List<int> workoutDensityChartData,
   });
   void setFoodParameters(NativeFoodStateMessage parameters);
+
+  void updateShadowRoutines(Map<String, String> routines);
 }
 
 class _UnsupportedNativeService extends NativeService
@@ -96,6 +98,11 @@ class _UnsupportedNativeService extends NativeService
 
   @override
   void setFoodParameters(NativeFoodStateMessage parameters) {
+    // no-op
+  }
+
+  @override
+  void updateShadowRoutines(Map<String, String> routines) {
     // no-op
   }
 }
@@ -223,5 +230,12 @@ class _NativeServiceImpl extends NativeService
     logger.i(
         """Setting food parameters on native side: ${parameters.toJson()}""");
     _watch.updateFoodParameters(parameters.toJson());
+  }
+
+  @override
+  void updateShadowRoutines(Map<String, String> routines) {
+    logger.i(
+        """Updating shadow routines on native side: ${routines.toString()}""");
+    _watch.updateShadowRoutines(routines);
   }
 }

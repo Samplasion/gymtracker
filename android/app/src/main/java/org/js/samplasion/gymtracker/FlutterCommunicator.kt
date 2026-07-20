@@ -65,6 +65,7 @@ interface GymBroNativeHostAPI {
   fun updateHomeWidgetParameters(parameters: Map<String, Long>, workoutDensityChartData: List<Long>)
   fun requestHealthPermission()
   fun updateFoodParameters(parameters: Map<String?, Any?>)
+  fun updateShadowRoutines(routines: Map<String, String>)
 
   companion object {
     /** The codec used by GymBroNativeHostAPI. */
@@ -168,6 +169,24 @@ interface GymBroNativeHostAPI {
             val parametersArg = args[0] as Map<String?, Any?>
             val wrapped: List<Any?> = try {
               api.updateFoodParameters(parametersArg)
+              listOf(null)
+            } catch (exception: Throwable) {
+              wrapError(exception)
+            }
+            reply.reply(wrapped)
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.gymtracker.GymBroNativeHostAPI.updateShadowRoutines$separatedMessageChannelSuffix", codec)
+        if (api != null) {
+          channel.setMessageHandler { message, reply ->
+            val args = message as List<Any?>
+            val routinesArg = args[0] as Map<String, String>
+            val wrapped: List<Any?> = try {
+              api.updateShadowRoutines(routinesArg)
               listOf(null)
             } catch (exception: Throwable) {
               wrapError(exception)

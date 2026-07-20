@@ -24,6 +24,9 @@ abstract class GymBroNativeHostAPI {
 
   // Food
   void updateFoodParameters(Map<String?, Object?> parameters);
+
+  // Misc
+  void updateShadowRoutines(Map<String, String> routines);
 }
 
 @FlutterApi()

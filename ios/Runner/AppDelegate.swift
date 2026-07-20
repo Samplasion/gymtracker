@@ -1,4 +1,5 @@
 import UIKit
+import AppIntents
 import WidgetKit
 import HealthKit
 import Flutter
@@ -6,6 +7,7 @@ import flutter_local_notifications
 import WatchConnectivity
 import ActivityKit
 import GymBroWidgetsExtension
+import flutter_app_intents
 
 @main
 @objc class AppDelegate: FlutterAppDelegate {
@@ -486,4 +488,30 @@ extension AppDelegate {
             }
         }
     }
+}
+
+// MARK: - Intents
+
+extension AppDelegate {
+  func updateShadowRoutines(routines: [String: String]) throws {
+    print("Updating shadow routines: \(routines) (in key \(RoutineQuery.userDefaultsKey))")
+    UserDefaults.standard.set(routines, forKey: RoutineQuery.userDefaultsKey)
+  }
+}
+
+@available(iOS 16.0, *)
+struct AppShortcuts: AppShortcutsProvider {
+  static var appShortcuts: [AppShortcut] {
+    return [
+      AppShortcut(
+        intent: StartRoutineIntent(),
+        phrases: [
+          "Start my \(\.$routine) routine in \(.applicationName)",
+          "Begin \(\.$routine) in \(.applicationName)"
+        ],
+        shortTitle: "Start Routine",
+        systemImageName: "dumbbell.fill"
+      )
+    ]
+  }
 }

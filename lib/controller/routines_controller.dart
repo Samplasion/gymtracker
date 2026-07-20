@@ -7,6 +7,7 @@ import 'package:get/get.dart' hide ContextExtensionss;
 import 'package:gymtracker/controller/coordinator.dart';
 import 'package:gymtracker/controller/countdown_controller.dart';
 import 'package:gymtracker/controller/history_controller.dart';
+import 'package:gymtracker/controller/intents_controller.dart';
 import 'package:gymtracker/controller/serviceable_controller.dart';
 import 'package:gymtracker/controller/settings_controller.dart';
 import 'package:gymtracker/controller/workout_controller.dart';
@@ -19,6 +20,7 @@ import 'package:gymtracker/model/superset.dart';
 import 'package:gymtracker/model/workout.dart';
 import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/service/logger.dart';
+import 'package:gymtracker/service/native.dart';
 import 'package:gymtracker/service/share.dart';
 import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/utils/go.dart';
@@ -65,6 +67,10 @@ class RoutinesController extends GetxController
         Get.find<Coordinator>()
             .maybeUnlockAchievements(AchievementTrigger.routines);
       }
+
+      NativeService.instance().updateShadowRoutines({
+        for (final routine in event) routine.id: routine.name,
+      });
 
       _init = true;
     });
@@ -116,6 +122,11 @@ class RoutinesController extends GetxController
     Get.back();
   }
 
+  /// Starts a new workout from the given [workout] routine.
+  /// If [workout] is null, it will start a new empty workout.
+  ///
+  /// If [IntentsController] is supported, this method will donate the intent
+  /// to Siri.
   Future<void> startRoutine(BuildContext context, [Workout? workout]) async {
     final isEmpty = workout == null;
 
@@ -134,6 +145,11 @@ class RoutinesController extends GetxController
     String? workoutID;
     if (!isEmpty) {
       workoutID = workout.isConcrete ? workout.parentID : workout.id;
+
+      IntentsController.donateRoutineStarted(
+        routineId: workout.id,
+        routineDisplayName: workout.name,
+      );
     }
 
     // We aren't naming the workout here because the _clone()

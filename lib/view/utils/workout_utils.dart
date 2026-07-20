@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:gymtracker/icons/gymtracker_icons.dart';
 import 'package:gymtracker/model/workout.dart';
 import 'package:gymtracker/service/localizations.dart';
+import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/view/utils/timer.dart';
 import 'package:intl/intl.dart';
 import 'package:skeletonizer/skeletonizer.dart';
@@ -37,7 +38,8 @@ class WorkoutHeader extends StatelessWidget {
                 foregroundColor: fg,
                 child: isSelected
                     ? const Icon(GTIcons.done)
-                    : Text(workout.name.characters.first.toUpperCase()),
+                    : Text(
+                        workout.name.characters.safeFirst?.toUpperCase() ?? ""),
               ),
             ),
             const SizedBox(width: 16),

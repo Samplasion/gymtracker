@@ -8,7 +8,8 @@ import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
 class WorkoutIcon extends StatelessWidget {
-  const WorkoutIcon({super.key, 
+  const WorkoutIcon({
+    super.key,
     required this.workout,
   });
 
@@ -41,12 +42,17 @@ class RoutineListTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final name = routine.name;
     return ListTile(
       leading: WorkoutIcon(workout: routine),
       trailing: trailing,
-      title: Text(routine.name),
-      subtitle:
-          Text("general.exercises".plural(routine.displayExerciseCount)),
+      title: Text(
+        name.isEmpty ? "general.unnamed".t : name,
+        style: TextStyle(
+          fontStyle: name.isEmpty ? FontStyle.italic : null,
+        ),
+      ),
+      subtitle: Text("general.exercises".plural(routine.displayExerciseCount)),
       onTap: onTap,
     );
   }
@@ -74,13 +80,13 @@ class RoutinePreview extends StatelessWidget {
         ),
         if (routine.shouldShowInfobox)
           SliverPadding(
-          padding: 
-              MediaQuery.of(context).padding.onlyHorizontal,
-          sliver: SliverToBoxAdapter(
-            child: Infobox(
-              text: routine.infobox!,
+            padding: MediaQuery.of(context).padding.onlyHorizontal,
+            sliver: SliverToBoxAdapter(
+              child: Infobox(
+                text: routine.infobox!,
+              ),
             ),
-          ),),
+          ),
         SliverPadding(
           padding: const EdgeInsets.all(16) +
               MediaQuery.of(context).padding.copyWith(top: 0),

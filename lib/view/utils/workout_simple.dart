@@ -39,6 +39,12 @@ class WorkoutSimpleView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (!Get.isRegistered<WorkoutController>()) {
+      return const Center(
+        child: CircularProgressIndicator(),
+      );
+    }
+
     final controller = Get.find<WorkoutController>();
     final countdownController = Get.find<CountdownController>();
     final stopwatchController = Get.find<StopwatchController>();

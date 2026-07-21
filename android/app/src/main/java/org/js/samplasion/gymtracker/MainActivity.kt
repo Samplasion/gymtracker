@@ -106,10 +106,6 @@ class MainActivity: FlutterActivity() {
             createOrUpdateOngoingLiveNotification()
         }
 
-        override fun updateHomeWidgetParameters(parameters: Map<String, Long>) {
-            // no-op; used on iOS to update watch complications
-        }
-
         private fun createOrUpdateOngoingLiveNotification() {
             log("Creating ongoing live notification")
             createNotificationChannel()
@@ -190,8 +186,21 @@ class MainActivity: FlutterActivity() {
                 cancel(NOTIFICATION_ID)
             }
         }
+
         override fun updateHomeWidgetParameters(parameters: Map<String, Long>, workoutDensityChartData: List<Long>) {
             // no-op; a plugin does this for us
+        }
+        
+        override fun requestHealthPermission() {
+            // no-op; used on iOS only
+        }
+
+        override fun updateFoodParameters(parameters: Map<String?, Any?>) {
+            // no-op; used on iOS only
+        }
+
+        override fun updateShadowRoutines(routines: Map<String, String>) {
+            // no-op; used on iOS only
         }
     }
 }

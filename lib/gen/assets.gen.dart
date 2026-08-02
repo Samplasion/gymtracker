@@ -1,3 +1,5 @@
+// dart format width=80
+
 /// GENERATED CODE - DO NOT MODIFY BY HAND
 /// *****************************************************
 ///  FlutterGen
@@ -5,7 +7,7 @@
 
 // coverage:ignore-file
 // ignore_for_file: type=lint
-// ignore_for_file: directives_ordering,unnecessary_import,implicit_dynamic_list_literal,deprecated_member_use
+// ignore_for_file: deprecated_member_use,directives_ordering,implicit_dynamic_list_literal,unnecessary_import
 
 class $AssetsAudioGen {
   const $AssetsAudioGen();
@@ -74,6 +76,16 @@ class $AssetsI18nGen {
   List<String> get values => [en, it];
 }
 
+class $AssetsLegalGen {
+  const $AssetsLegalGen();
+
+  /// Directory path: assets/legal/en
+  $AssetsLegalEnGen get en => const $AssetsLegalEnGen();
+
+  /// Directory path: assets/legal/it
+  $AssetsLegalItGen get it => const $AssetsLegalItGen();
+}
+
 class $AssetsSvgGen {
   const $AssetsSvgGen();
 
@@ -102,8 +114,8 @@ class $AssetsExercisesAbsGen {
 
   /// Directory path: assets/exercises/abs/extendedReverseCrunchWithLegExtension
   $AssetsExercisesAbsExtendedReverseCrunchWithLegExtensionGen
-      get extendedReverseCrunchWithLegExtension =>
-          const $AssetsExercisesAbsExtendedReverseCrunchWithLegExtensionGen();
+  get extendedReverseCrunchWithLegExtension =>
+      const $AssetsExercisesAbsExtendedReverseCrunchWithLegExtensionGen();
 
   /// Directory path: assets/exercises/abs/heelTouches
   $AssetsExercisesAbsHeelTouchesGen get heelTouches =>
@@ -151,8 +163,8 @@ class $AssetsExercisesBicepsGen {
 
   /// Directory path: assets/exercises/biceps/singleArmCableHammerCurls
   $AssetsExercisesBicepsSingleArmCableHammerCurlsGen
-      get singleArmCableHammerCurls =>
-          const $AssetsExercisesBicepsSingleArmCableHammerCurlsGen();
+  get singleArmCableHammerCurls =>
+      const $AssetsExercisesBicepsSingleArmCableHammerCurlsGen();
 
   /// Directory path: assets/exercises/biceps/spiderCurls
   $AssetsExercisesBicepsSpiderCurlsGen get spiderCurls =>
@@ -180,8 +192,8 @@ class $AssetsExercisesChestGen {
 
   /// Directory path: assets/exercises/chest/smithMachineBenchPressIncline
   $AssetsExercisesChestSmithMachineBenchPressInclineGen
-      get smithMachineBenchPressIncline =>
-          const $AssetsExercisesChestSmithMachineBenchPressInclineGen();
+  get smithMachineBenchPressIncline =>
+      const $AssetsExercisesChestSmithMachineBenchPressInclineGen();
 
   /// Directory path: assets/exercises/chest/verticalChestPress
   $AssetsExercisesChestVerticalChestPressGen get verticalChestPress =>
@@ -205,13 +217,13 @@ class $AssetsExercisesForearmsGen {
 
   /// Directory path: assets/exercises/forearms/reverseWristCurlsBarbell
   $AssetsExercisesForearmsReverseWristCurlsBarbellGen
-      get reverseWristCurlsBarbell =>
-          const $AssetsExercisesForearmsReverseWristCurlsBarbellGen();
+  get reverseWristCurlsBarbell =>
+      const $AssetsExercisesForearmsReverseWristCurlsBarbellGen();
 
   /// Directory path: assets/exercises/forearms/reverseWristCurlsDumbbell
   $AssetsExercisesForearmsReverseWristCurlsDumbbellGen
-      get reverseWristCurlsDumbbell =>
-          const $AssetsExercisesForearmsReverseWristCurlsDumbbellGen();
+  get reverseWristCurlsDumbbell =>
+      const $AssetsExercisesForearmsReverseWristCurlsDumbbellGen();
 
   /// Directory path: assets/exercises/forearms/wristCurlsBarbell
   $AssetsExercisesForearmsWristCurlsBarbellGen get wristCurlsBarbell =>
@@ -311,8 +323,8 @@ class $AssetsExercisesTricepsGen {
 
   /// Directory path: assets/exercises/triceps/overheadRopeTricepExtension
   $AssetsExercisesTricepsOverheadRopeTricepExtensionGen
-      get overheadRopeTricepExtension =>
-          const $AssetsExercisesTricepsOverheadRopeTricepExtensionGen();
+  get overheadRopeTricepExtension =>
+      const $AssetsExercisesTricepsOverheadRopeTricepExtensionGen();
 
   /// Directory path: assets/exercises/triceps/skullCrushers
   $AssetsExercisesTricepsSkullCrushersGen get skullCrushers =>
@@ -325,6 +337,32 @@ class $AssetsExercisesTricepsGen {
   /// Directory path: assets/exercises/triceps/tricepsRopePushdown
   $AssetsExercisesTricepsTricepsRopePushdownGen get tricepsRopePushdown =>
       const $AssetsExercisesTricepsTricepsRopePushdownGen();
+}
+
+class $AssetsLegalEnGen {
+  const $AssetsLegalEnGen();
+
+  /// File path: assets/legal/en/pp.md
+  String get pp => 'assets/legal/en/pp.md';
+
+  /// File path: assets/legal/en/tos.md
+  String get tos => 'assets/legal/en/tos.md';
+
+  /// List of all assets
+  List<String> get values => [pp, tos];
+}
+
+class $AssetsLegalItGen {
+  const $AssetsLegalItGen();
+
+  /// File path: assets/legal/it/pp.md
+  String get pp => 'assets/legal/it/pp.md';
+
+  /// File path: assets/legal/it/tos.md
+  String get tos => 'assets/legal/it/tos.md';
+
+  /// List of all assets
+  List<String> get values => [pp, tos];
 }
 
 class $AssetsSvgEquipmentGen {
@@ -365,18 +403,18 @@ class $AssetsSvgEquipmentGen {
 
   /// List of all assets
   List<String> get values => [
-        barbell,
-        cable,
-        dumbbell,
-        kettlebell,
-        landmine,
-        machine,
-        none,
-        other,
-        plates,
-        resistanceBand,
-        suspensionBands
-      ];
+    barbell,
+    cable,
+    dumbbell,
+    kettlebell,
+    landmine,
+    machine,
+    none,
+    other,
+    plates,
+    resistanceBand,
+    suspensionBands,
+  ];
 }
 
 class $AssetsSvgTrophiesGen {
@@ -458,31 +496,31 @@ class $AssetsSvgTrophiesGen {
 
   /// List of all assets
   List<String> get values => [
-        bodyweightBeast,
-        completionist,
-        cycleChampion,
-        earlyBird,
-        equipmentSpecialist,
-        firstSteps,
-        foodWatcher,
-        generic,
-        intensityInnovator,
-        marathoner,
-        midnightRain,
-        nightOwl,
-        notDrunk,
-        pbBreaker,
-        perfectPlanner,
-        professionalWeightlifter,
-        programPlanner,
-        realGymBro,
-        routineMaster,
-        sparta,
-        steamedHams,
-        swimsuitSeason,
-        trailblazer,
-        workoutFreak
-      ];
+    bodyweightBeast,
+    completionist,
+    cycleChampion,
+    earlyBird,
+    equipmentSpecialist,
+    firstSteps,
+    foodWatcher,
+    generic,
+    intensityInnovator,
+    marathoner,
+    midnightRain,
+    nightOwl,
+    notDrunk,
+    pbBreaker,
+    perfectPlanner,
+    professionalWeightlifter,
+    programPlanner,
+    realGymBro,
+    routineMaster,
+    sparta,
+    steamedHams,
+    swimsuitSeason,
+    trailblazer,
+    workoutFreak,
+  ];
 }
 
 class $AssetsExercisesAbsCrunchesGen {
@@ -1085,11 +1123,10 @@ class $AssetsExercisesTricepsTricepsRopePushdownGen {
   List<String> get values => [en, it];
 }
 
-class GTAssets {
-  GTAssets._();
-
+abstract final class GTAssets {
   static const $AssetsAudioGen audio = $AssetsAudioGen();
   static const $AssetsExercisesGen exercises = $AssetsExercisesGen();
   static const $AssetsI18nGen i18n = $AssetsI18nGen();
+  static const $AssetsLegalGen legal = $AssetsLegalGen();
   static const $AssetsSvgGen svg = $AssetsSvgGen();
 }

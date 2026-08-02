@@ -4,14 +4,17 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart' hide ContextExtensionss;
 import 'package:gymtracker/controller/boutique_controller.dart';
+import 'package:gymtracker/controller/purchases_controller.dart';
 import 'package:gymtracker/icons/gymtracker_icons.dart';
 import 'package:gymtracker/model/boutique.dart';
 import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/utils/skeletons.dart';
 import 'package:gymtracker/utils/utils.dart';
+import 'package:gymtracker/view/components/badges.dart';
 import 'package:gymtracker/view/components/controlled.dart';
 import 'package:gymtracker/view/components/master_detail.dart';
+import 'package:gymtracker/view/components/pro_builder.dart';
 import 'package:gymtracker/view/components/routines.dart';
 import 'package:gymtracker/view/utils/sliver_utils.dart';
 import 'package:skeletonizer/skeletonizer.dart';
@@ -46,16 +49,15 @@ class _BoutiqueViewState
   Widget build(BuildContext context) {
     return NestedScrollView(
       headerSliverBuilder: (context, innerBoxIsScrolled) => [
-        SliverAppBar.large(
-          title: Text("boutique.title".t),
-        ),
+        SliverAppBar.large(title: Text("boutique.title".t)),
       ],
       body: RefreshIndicator(
         onRefresh: _refresh,
         child: CustomScrollView(
           slivers: [
             FutureBuilder<
-                BoutiqueResponse<List<BoutiqueCategory>, BoutiqueError>>(
+              BoutiqueResponse<List<BoutiqueCategory>, BoutiqueError>
+            >(
               future: _categories,
               builder: (context, snapshot) {
                 if (snapshot.error != null || snapshot.data?.isError == true) {
@@ -75,13 +77,15 @@ class _BoutiqueViewState
 
                 final isLoading =
                     snapshot.connectionState != ConnectionState.done ||
-                        !snapshot.hasData;
+                    !snapshot.hasData;
                 final data = isLoading
-                    ? List.generate(5,
-                        (index) => skeletonBoutiqueCategory(0x1989 + 3 * index))
+                    ? List.generate(
+                        5,
+                        (index) => skeletonBoutiqueCategory(0x1989 + 3 * index),
+                      )
                     : snapshot.data!.success!
-                        .where((e) => !e.isHidden)
-                        .toList();
+                          .where((e) => !e.isHidden)
+                          .toList();
                 return SliverList.builder(
                   itemBuilder: (context, index) {
                     final category = data[index];
@@ -160,17 +164,18 @@ class BoutiqueCategoryCard extends StatelessWidget {
                 ),
               ),
               Padding(
-                padding:
-                    const EdgeInsets.symmetric(vertical: 32.0, horizontal: 16),
+                padding: const EdgeInsets.symmetric(
+                  vertical: 32.0,
+                  horizontal: 16,
+                ),
                 child: Row(
                   children: [
                     Expanded(
                       child: Text(
                         getName(context),
-                        style: Theme.of(context)
-                            .textTheme
-                            .titleLarge!
-                            .copyWith(color: foreground),
+                        style: Theme.of(
+                          context,
+                        ).textTheme.titleLarge!.copyWith(color: foreground),
                       ),
                     ),
                     const SizedBox(width: 16),
@@ -194,10 +199,7 @@ class BoutiqueCategoryCard extends StatelessWidget {
 class BoutiqueCategoryView extends StatefulWidget {
   final BoutiqueCategory category;
 
-  const BoutiqueCategoryView({
-    required this.category,
-    super.key,
-  });
+  const BoutiqueCategoryView({required this.category, super.key});
 
   @override
   State<BoutiqueCategoryView> createState() => _BoutiqueCategoryViewState();
@@ -226,7 +228,8 @@ class _BoutiqueCategoryViewState
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<
-        BoutiqueResponse<List<BoutiquePackage>, BoutiqueError>>(
+      BoutiqueResponse<List<BoutiquePackage>, BoutiqueError>
+    >(
       future: _packages,
       builder: (context, snapshot) {
         if (snapshot.hasData && snapshot.data!.success != null) {
@@ -234,9 +237,11 @@ class _BoutiqueCategoryViewState
         }
         return Scaffold(
           appBar: AppBar(
-            title: Text(widget.category.name[context.locale.languageCode] ??
-                widget.category.name['en'] ??
-                ''),
+            title: Text(
+              widget.category.name[context.locale.languageCode] ??
+                  widget.category.name['en'] ??
+                  '',
+            ),
           ),
           body: () {
             if (!snapshot.hasData) {
@@ -267,9 +272,11 @@ class _BoutiqueCategoryViewState
     return RefreshIndicator(
       onRefresh: _refresh,
       child: MasterDetailView(
-        appBarTitle: Text(widget.category.name[context.locale.languageCode] ??
-            widget.category.name['en'] ??
-            ''),
+        appBarTitle: Text(
+          widget.category.name[context.locale.languageCode] ??
+              widget.category.name['en'] ??
+              '',
+        ),
         appBarActions: [
           if (kDebugMode)
             IconButton(
@@ -282,16 +289,19 @@ class _BoutiqueCategoryViewState
             MasterItem(
               Text(package.name),
               id: package.id,
-              subtitle: Text.rich(TextSpan(children: [
-                TextSpan(text: "${package.description}\n"),
+              subtitle: Text.rich(
                 TextSpan(
-                  text: "general.routines".plural(package.routines.length),
-                  style: Theme.of(context).textTheme.labelSmall,
+                  children: [
+                    TextSpan(text: "${package.description}\n"),
+                    TextSpan(
+                      text: "general.routines".plural(package.routines.length),
+                      style: Theme.of(context).textTheme.labelSmall,
+                    ),
+                  ],
                 ),
-              ])),
-              detailsBuilder: (context) => DetailsView(
-                child: BoutiquePackageView(package: package),
               ),
+              detailsBuilder: (context) =>
+                  DetailsView(child: BoutiquePackageView(package: package)),
             ),
         ],
       ),
@@ -302,10 +312,7 @@ class _BoutiqueCategoryViewState
 class BoutiquePackageView extends StatelessWidget {
   final BoutiquePackage package;
 
-  const BoutiquePackageView({
-    required this.package,
-    super.key,
-  });
+  const BoutiquePackageView({required this.package, super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -333,13 +340,32 @@ class BoutiquePackageView extends StatelessWidget {
           ),
           SliverToBoxAdapter(
             child: Center(
-              child: FilledButton(
-                onPressed: isEmpty
-                    ? null
-                    : () {
-                        Get.find<BoutiqueController>().install(package);
-                      },
-                child: Text("boutique.package.install".t),
+              child: ProBuilder(
+                builder: (context, subscriptionInfo) {
+                  final isPro = subscriptionInfo?.hasProFeatures ?? false;
+                  return FilledButton(
+                    onPressed: isEmpty
+                        ? null
+                        : () {
+                            if (!isPro) {
+                              Get.find<PurchasesController>().presentPaywall();
+                              return;
+                            }
+                            Get.find<BoutiqueController>().install(package);
+                          },
+                    child: Text.rich(
+                      TextSpan(
+                        children: [
+                          TextSpan(text: "boutique.package.install".t),
+                          if (!isPro) ...[
+                            TextSpan(text: " " * 2),
+                            WidgetSpan(child: ProBadge(), alignment: .middle),
+                          ],
+                        ],
+                      ),
+                    ),
+                  );
+                },
               ),
             ),
           ),
@@ -350,12 +376,14 @@ class BoutiquePackageView extends StatelessWidget {
               return RoutineListTile(
                 routine: routine,
                 onTap: () {
-                  Go.to(() => Scaffold(
-                        body: RoutinePreview(
-                          routine: routine,
-                          automaticallyImplyLeading: true,
-                        ),
-                      ));
+                  Go.to(
+                    () => Scaffold(
+                      body: RoutinePreview(
+                        routine: routine,
+                        automaticallyImplyLeading: true,
+                      ),
+                    ),
+                  );
                 },
               );
             },

@@ -557,7 +557,7 @@ class _LineChartTimeSeriesState<T> extends State<LineChartTimeSeries<T>> {
       }
 
       return SideTitleWidget(
-        axisSide: meta.axisSide,
+        meta: meta,
         child: ColoredBox(
           color: Theme.of(context).cardColor,
           child: Text(
@@ -577,7 +577,7 @@ class _LineChartTimeSeriesState<T> extends State<LineChartTimeSeries<T>> {
       String text = DateFormat.Md(context.locale.languageCode).format(cur);
 
       return SideTitleWidget(
-        axisSide: meta.axisSide,
+        meta: meta,
         angle: -pi / 4,
         child: Text(
           text,
@@ -589,7 +589,7 @@ class _LineChartTimeSeriesState<T> extends State<LineChartTimeSeries<T>> {
 
   Widget Function(double, TitleMeta) leftTitleWidgets(BuildContext context) {
     return (double value, TitleMeta meta) => SideTitleWidget(
-          axisSide: meta.axisSide,
+          meta: meta,
           child: Text.rich(
             TextSpan(children: [
               TextSpan(

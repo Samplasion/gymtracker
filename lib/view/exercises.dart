@@ -5,8 +5,10 @@ import 'package:get/get.dart';
 import 'package:gymtracker/controller/coordinator.dart';
 import 'package:gymtracker/controller/history_controller.dart';
 import 'package:gymtracker/controller/history_controller.dart' as history;
+import 'package:gymtracker/controller/purchases_controller.dart';
 import 'package:gymtracker/controller/routines_controller.dart';
 import 'package:gymtracker/controller/settings_controller.dart';
+import 'package:gymtracker/data/configuration.dart';
 import 'package:gymtracker/data/distance.dart';
 import 'package:gymtracker/data/weights.dart';
 import 'package:gymtracker/icons/gymtracker_icons.dart';
@@ -25,6 +27,7 @@ import 'package:gymtracker/view/components/exercise_set_view.dart';
 import 'package:gymtracker/view/components/infobox.dart';
 import 'package:gymtracker/view/components/maybe_rich_text.dart';
 import 'package:gymtracker/view/components/parent_viewer.dart';
+import 'package:gymtracker/view/components/pro_builder.dart';
 import 'package:gymtracker/view/components/stats.dart';
 import 'package:gymtracker/view/routine_creator.dart';
 import 'package:gymtracker/view/utils/exercise.dart';
@@ -66,9 +69,7 @@ class _ExercisesViewState extends State<ExercisesView> {
       if (WeightDistributionBarChart.shouldShow(_getSynthesizedWorkout()))
         Padding(
           padding: const EdgeInsets.all(16),
-          child: WeightDistributionBarChart(
-            workout: _getSynthesizedWorkout(),
-          ),
+          child: WeightDistributionBarChart(workout: _getSynthesizedWorkout()),
         ),
       if (WorkoutMuscleCategoriesBarChart.shouldShow(_getSynthesizedWorkout()))
         Padding(
@@ -90,123 +91,170 @@ class _ExercisesViewState extends State<ExercisesView> {
       appBar: AppBar(
         title: Text(workout.name),
         actions: [
-          PopupMenuButton(
-            key: const Key('menu'),
-            itemBuilder: (context) => [
-              if (workout.isConcrete) ...[
-                PopupMenuItem(
-                  key: const Key("save-as-routine"),
-                  child: Text("workouts.actions.saveAsRoutine.button".t),
-                  onTap: () {
-                    Get.find<Coordinator>().saveWorkoutAsRoutine(workout);
-                  },
-                ),
-                PopupMenuItem(
-                  key: const Key("edit-workout"),
-                  child: Text(
-                    "workouts.actions.edit.label".t,
-                  ),
-                  onTap: () {
-                    SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
-                      Go.to(() => WorkoutEditor(baseWorkout: workout));
-                    });
-                  },
-                ),
-                if (workout.hasContinuation)
-                  PopupMenuItem(
-                    key: const Key("edit-workout-cont"),
-                    child: Text(
-                      "workouts.actions.editContinuation.label".t,
+          ProBuilder(
+            builder: (context, subscriptionInfo) {
+              final routinesController = Get.find<RoutinesController>();
+              final shouldDisallowSaving =
+                  (subscriptionInfo == null ||
+                      !subscriptionInfo.hasProFeatures) &&
+                  routinesController.workouts.length >=
+                      Configuration.trialRoutineLimit;
+              return PopupMenuButton(
+                key: const Key('menu'),
+                itemBuilder: (context) => [
+                  if (workout.isConcrete) ...[
+                    PopupMenuItem(
+                      key: const Key("save-as-routine"),
+                      child: Text.rich(
+                        TextSpan(
+                          children: [
+                            TextSpan(
+                              text: "workouts.actions.saveAsRoutine.button".t,
+                            ),
+                            if (shouldDisallowSaving) ...[
+                              const TextSpan(text: " "),
+                              WidgetSpan(
+                                alignment: PlaceholderAlignment.middle,
+                                child: ProBadge(),
+                              ),
+                            ],
+                          ],
+                        ),
+                      ),
+                      onTap: () {
+                        if (shouldDisallowSaving) {
+                          SchedulerBinding.instance.addPostFrameCallback((
+                            timeStamp,
+                          ) {
+                            Get.find<PurchasesController>().presentPaywall();
+                          });
+                          return;
+                        }
+                        Get.find<Coordinator>().saveWorkoutAsRoutine(workout);
+                      },
                     ),
-                    onTap: () {
-                      SchedulerBinding.instance
-                          .addPostFrameCallback((timeStamp) {
-                        Go.to(() =>
-                            WorkoutEditor(baseWorkout: workout.continuation!));
-                      });
-                    },
-                  ),
-                PopupMenuItem(
-                  textStyle: TextStyle(
-                    color: Theme.of(context).colorScheme.error,
-                  ),
-                  child: Text(
-                    "workouts.actions.delete.title".t,
-                    style: TextStyle(
-                      color: Theme.of(context).colorScheme.error,
-                    ),
-                  ),
-                  onTap: () {
-                    Get.find<history.HistoryController>()
-                        .deleteWorkoutWithDialog(context, workout: workout,
-                            onCanceled: () {
-                      SchedulerBinding.instance
-                          .addPostFrameCallback((timeStamp) {
-                        Get.back();
-                        Go.snack("workouts.actions.delete.done".t);
-                      });
-                    });
-                  },
-                ),
-              ] else ...[
-                PopupMenuItem(
-                  child: Text("workouts.actions.share.button".t),
-                  onTap: () {
-                    controller.shareRoutine(workout);
-                  },
-                ),
-                PopupMenuItem(
-                  child: Text(
-                    "routines.actions.viewHistory".t,
-                  ),
-                  onTap: () {
-                    Get.find<RoutinesController>()
-                        .viewHistory(routine: workout);
-                  },
-                ),
-                PopupMenuItem(
-                  child: Text("routines.actions.edit".t),
-                  onTap: () {
-                    SchedulerBinding.instance
-                        .addPostFrameCallback((timeStamp) async {
-                      final newRoutine = await Go.to<Workout>(
-                          () => RoutineCreator(base: workout));
-
-                      logger.d("newRoutine: $newRoutine");
-
-                      if (newRoutine != null) {
-                        Get.find<RoutinesController>().editRoutine(newRoutine);
-                        setState(() {
-                          workout = newRoutine;
+                    PopupMenuItem(
+                      key: const Key("edit-workout"),
+                      child: Text("workouts.actions.edit.label".t),
+                      onTap: () {
+                        SchedulerBinding.instance.addPostFrameCallback((
+                          timeStamp,
+                        ) {
+                          Go.to(() => WorkoutEditor(baseWorkout: workout));
                         });
-                      }
-                    });
-                  },
-                ),
-                PopupMenuItem(
-                  textStyle: TextStyle(
-                    color: Theme.of(context).colorScheme.error,
-                  ),
-                  child: Text(
-                    "routines.actions.delete.title".t,
-                    style: TextStyle(
-                      color: Theme.of(context).colorScheme.error,
+                      },
                     ),
-                  ),
-                  onTap: () {
-                    Get.find<RoutinesController>()
-                        .deleteRoutineWithDialog(context, workout: workout,
-                            onCanceled: () {
-                      SchedulerBinding.instance
-                          .addPostFrameCallback((timeStamp) {
-                        Get.back();
-                        Go.snack("routines.actions.delete.done".t);
-                      });
-                    });
-                  },
-                ),
-              ],
-            ],
+                    if (workout.hasContinuation)
+                      PopupMenuItem(
+                        key: const Key("edit-workout-cont"),
+                        child: Text(
+                          "workouts.actions.editContinuation.label".t,
+                        ),
+                        onTap: () {
+                          SchedulerBinding.instance.addPostFrameCallback((
+                            timeStamp,
+                          ) {
+                            Go.to(
+                              () => WorkoutEditor(
+                                baseWorkout: workout.continuation!,
+                              ),
+                            );
+                          });
+                        },
+                      ),
+                    PopupMenuItem(
+                      textStyle: TextStyle(
+                        color: Theme.of(context).colorScheme.error,
+                      ),
+                      child: Text(
+                        "workouts.actions.delete.title".t,
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.error,
+                        ),
+                      ),
+                      onTap: () {
+                        Get.find<history.HistoryController>()
+                            .deleteWorkoutWithDialog(
+                              context,
+                              workout: workout,
+                              onCanceled: () {
+                                SchedulerBinding.instance.addPostFrameCallback((
+                                  timeStamp,
+                                ) {
+                                  Get.back();
+                                  Go.snack("workouts.actions.delete.done".t);
+                                });
+                              },
+                            );
+                      },
+                    ),
+                  ] else ...[
+                    PopupMenuItem(
+                      child: Text("workouts.actions.share.button".t),
+                      onTap: () {
+                        controller.shareRoutine(workout);
+                      },
+                    ),
+                    PopupMenuItem(
+                      child: Text("routines.actions.viewHistory".t),
+                      onTap: () {
+                        Get.find<RoutinesController>().viewHistory(
+                          routine: workout,
+                        );
+                      },
+                    ),
+                    PopupMenuItem(
+                      child: Text("routines.actions.edit".t),
+                      onTap: () {
+                        SchedulerBinding.instance.addPostFrameCallback((
+                          timeStamp,
+                        ) async {
+                          final newRoutine = await Go.to<Workout>(
+                            () => RoutineCreator(base: workout),
+                          );
+
+                          logger.d("newRoutine: $newRoutine");
+
+                          if (newRoutine != null) {
+                            Get.find<RoutinesController>().editRoutine(
+                              newRoutine,
+                            );
+                            setState(() {
+                              workout = newRoutine;
+                            });
+                          }
+                        });
+                      },
+                    ),
+                    PopupMenuItem(
+                      textStyle: TextStyle(
+                        color: Theme.of(context).colorScheme.error,
+                      ),
+                      child: Text(
+                        "routines.actions.delete.title".t,
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.error,
+                        ),
+                      ),
+                      onTap: () {
+                        Get.find<RoutinesController>().deleteRoutineWithDialog(
+                          context,
+                          workout: workout,
+                          onCanceled: () {
+                            SchedulerBinding.instance.addPostFrameCallback((
+                              timeStamp,
+                            ) {
+                              Get.back();
+                              Go.snack("routines.actions.delete.done".t);
+                            });
+                          },
+                        );
+                      },
+                    ),
+                  ],
+                ],
+              );
+            },
           ),
         ],
       ),
@@ -228,22 +276,52 @@ class _ExercisesViewState extends State<ExercisesView> {
                       ),
                       if (workout.isConcrete) ...[
                         const Divider(height: 32),
-                        WorkoutStatsRow(
-                          workout: _getSynthesizedWorkout(),
-                        ),
+                        WorkoutStatsRow(workout: _getSynthesizedWorkout()),
                       ],
                       const Divider(height: 32),
-                      FilledButton(
-                        onPressed: () {
-                          controller.startRoutine(context, workout);
+                      ProBuilder(
+                        builder: (context, subscriptionInfo) {
+                          final historyController =
+                              Get.find<HistoryController>();
+                          final shouldDisallowRunning =
+                              (subscriptionInfo == null ||
+                                  !subscriptionInfo.hasProFeatures) &&
+                              historyController.history.length >=
+                                  Configuration.trialWorkoutLimit;
+                          return FilledButton(
+                            onPressed: () {
+                              if (shouldDisallowRunning) {
+                                Get.find<PurchasesController>()
+                                    .presentPaywall();
+                                return;
+                              }
+
+                              controller.startRoutine(context, workout);
+                            },
+                            child: Text.rich(
+                              TextSpan(
+                                children: [
+                                  TextSpan(
+                                    text: () {
+                                      if (workout.isConcrete) {
+                                        return "workouts.actions.start".t;
+                                      } else {
+                                        return "routines.actions.start".t;
+                                      }
+                                    }(),
+                                  ),
+                                  if (shouldDisallowRunning) ...[
+                                    const TextSpan(text: " "),
+                                    const WidgetSpan(
+                                      alignment: PlaceholderAlignment.middle,
+                                      child: ProBadge(),
+                                    ),
+                                  ],
+                                ],
+                              ),
+                            ),
+                          );
                         },
-                        child: Text(() {
-                          if (workout.isConcrete) {
-                            return "workouts.actions.start".t;
-                          } else {
-                            return "routines.actions.start".t;
-                          }
-                        }()),
                       ),
                       if (controller.isWorkoutContinuable(workout)) ...[
                         const SizedBox(height: 8),
@@ -270,39 +348,36 @@ class _ExercisesViewState extends State<ExercisesView> {
                 ),
               ),
             if (workout.shouldShowInfobox)
-              SliverToBoxAdapter(
-                child: Infobox(
-                  text: workout.infobox!,
-                ),
-              ),
+              SliverToBoxAdapter(child: Infobox(text: workout.infobox!)),
             SliverList(
-              delegate: SliverChildBuilderDelegate(
-                (context, index) {
-                  final exercise = workout.exercises[index];
-                  return Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 8),
-                    child: ExerciseDataView(
-                      exercise: exercise,
-                      workout: workout,
-                      index: index,
-                      isInSuperset: false,
-                      highlight: widget.highlightExercise(exercise),
-                      weightUnit: workout.weightUnit,
-                      distanceUnit: workout.distanceUnit,
-                    ),
-                  );
-                },
-                childCount: workout.exercises.length,
-              ),
+              delegate: SliverChildBuilderDelegate((context, index) {
+                final exercise = workout.exercises[index];
+                return Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 8),
+                  child: ExerciseDataView(
+                    exercise: exercise,
+                    workout: workout,
+                    index: index,
+                    isInSuperset: false,
+                    highlight: widget.highlightExercise(exercise),
+                    weightUnit: workout.weightUnit,
+                    distanceUnit: workout.distanceUnit,
+                  ),
+                );
+              }, childCount: workout.exercises.length),
             ),
             if (kDebugMode) ...[
               SliverToBoxAdapter(
-                child:
-                    Text("own id: ${workout.id}", textAlign: TextAlign.center),
+                child: Text(
+                  "own id: ${workout.id}",
+                  textAlign: TextAlign.center,
+                ),
               ),
               SliverToBoxAdapter(
-                child: Text("parent: ${workout.parentID}",
-                    textAlign: TextAlign.center),
+                child: Text(
+                  "parent: ${workout.parentID}",
+                  textAlign: TextAlign.center,
+                ),
               ),
               SliverToBoxAdapter(
                 child: Text(
@@ -332,8 +407,9 @@ class _ExercisesViewState extends State<ExercisesView> {
               const SliverToBoxAdapter(child: Divider()),
               SliverToBoxAdapter(
                 child: ListTile(
-                  leading:
-                      const CircleAvatar(child: Icon(GTIcons.continuation)),
+                  leading: const CircleAvatar(
+                    child: Icon(GTIcons.continuation),
+                  ),
                   title: Text("exercise.continuation.label".t),
                   subtitle: Text("exercise.continuation.description".t),
                   onTap: () {
@@ -342,24 +418,21 @@ class _ExercisesViewState extends State<ExercisesView> {
                 ),
               ),
               SliverList(
-                delegate: SliverChildBuilderDelegate(
-                  (context, index) {
-                    final exercise = workout.continuation!.exercises[index];
-                    return Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 8),
-                      child: ExerciseDataView(
-                        exercise: exercise,
-                        workout: workout.continuation!,
-                        index: index,
-                        isInSuperset: false,
-                        highlight: widget.highlightExercise(exercise),
-                        weightUnit: workout.continuation!.weightUnit,
-                        distanceUnit: workout.continuation!.distanceUnit,
-                      ),
-                    );
-                  },
-                  childCount: workout.continuation!.exercises.length,
-                ),
+                delegate: SliverChildBuilderDelegate((context, index) {
+                  final exercise = workout.continuation!.exercises[index];
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 8),
+                    child: ExerciseDataView(
+                      exercise: exercise,
+                      workout: workout.continuation!,
+                      index: index,
+                      isInSuperset: false,
+                      highlight: widget.highlightExercise(exercise),
+                      weightUnit: workout.continuation!.weightUnit,
+                      distanceUnit: workout.continuation!.distanceUnit,
+                    ),
+                  );
+                }, childCount: workout.continuation!.exercises.length),
               ),
               if (kDebugMode) ...[
                 SliverToBoxAdapter(
@@ -386,14 +459,10 @@ class _ExercisesViewState extends State<ExercisesView> {
               ],
             ],
             SliverPadding(
-              padding: MediaQuery.of(context).padding.copyWith(
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                  ),
-              sliver: const SliverToBoxAdapter(
-                child: SizedBox.shrink(),
-              ),
+              padding: MediaQuery.of(
+                context,
+              ).padding.copyWith(top: 0, left: 0, right: 0),
+              sliver: const SliverToBoxAdapter(child: SizedBox.shrink()),
             ),
           ],
         ),
@@ -409,8 +478,10 @@ class _ExercisesViewState extends State<ExercisesView> {
   }
 
   void rename(String? value) {
-    final newWorkout =
-        Get.find<history.HistoryController>().rename(workout, newName: value);
+    final newWorkout = Get.find<history.HistoryController>().rename(
+      workout,
+      newName: value,
+    );
     SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
       setState(() => workout = newWorkout);
     });
@@ -418,10 +489,7 @@ class _ExercisesViewState extends State<ExercisesView> {
 }
 
 class WorkoutStatsRow extends StatelessWidget {
-  const WorkoutStatsRow({
-    super.key,
-    required this.workout,
-  });
+  const WorkoutStatsRow({super.key, required this.workout});
 
   final Workout workout;
 
@@ -493,10 +561,9 @@ class ExerciseDataView extends StatelessWidget {
     final exercise = this.exercise as Exercise;
     return ColoredBox(
       color: highlight
-          ? Theme.of(context)
-              .colorScheme
-              .tertiary
-              .withAlpha((0.15 * 255).round())
+          ? Theme.of(
+              context,
+            ).colorScheme.tertiary.withAlpha((0.15 * 255).round())
           : Colors.transparent,
       child: Padding(
         padding: EdgeInsets.only(top: highlight ? 8 : 0),
@@ -540,14 +607,13 @@ class ExerciseDataView extends StatelessWidget {
                               TextSpan(
                                 children: [
                                   TextSpan(text: "exerciseList.restTime".t),
-                                  time
+                                  time,
                                 ],
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .labelMedium!
+                                style: Theme.of(context).textTheme.labelMedium!
                                     .copyWith(
-                                      color:
-                                          Theme.of(context).colorScheme.primary,
+                                      color: Theme.of(
+                                        context,
+                                      ).colorScheme.primary,
                                     ),
                               ),
                             ),
@@ -571,8 +637,10 @@ class ExerciseDataView extends StatelessWidget {
             ],
             if (exercise.notes.isNotEmpty)
               Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 8,
+                ),
                 child: MaybeRichText(text: exercise.notes),
               ),
             if (!exercise.parameters.isSetless)
@@ -601,8 +669,10 @@ class ExerciseDataView extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8)
-                .copyWith(top: 16),
+            padding: const EdgeInsets.symmetric(
+              horizontal: 16,
+              vertical: 8,
+            ).copyWith(top: 16),
             child: Row(
               children: [
                 ExerciseIcon(exercise: superset),
@@ -615,8 +685,10 @@ class ExerciseDataView extends StatelessWidget {
                         TextSpan(
                           children: [
                             TextSpan(
-                                text: "superset"
-                                    .plural(superset.exercises.length)),
+                              text: "superset".plural(
+                                superset.exercises.length,
+                              ),
+                            ),
                           ],
                         ),
                         style: Theme.of(context).textTheme.titleMedium,
@@ -628,11 +700,9 @@ class ExerciseDataView extends StatelessWidget {
                           TextSpan(
                             children: [
                               TextSpan(text: "exerciseList.restTime".t),
-                              time
+                              time,
                             ],
-                            style: Theme.of(context)
-                                .textTheme
-                                .labelMedium!
+                            style: Theme.of(context).textTheme.labelMedium!
                                 .copyWith(
                                   color: Theme.of(context).colorScheme.primary,
                                 ),
@@ -640,9 +710,7 @@ class ExerciseDataView extends StatelessWidget {
                         ),
                         style: const TextStyle(),
                       ),
-                      if (kDebugMode) ...[
-                        Text(superset.id),
-                      ],
+                      if (kDebugMode) ...[Text(superset.id)],
                     ],
                   ),
                 ),
@@ -682,9 +750,7 @@ class OverwriteDialog extends StatelessWidget {
     return AlertDialog(
       icon: const Icon(GTIcons.info),
       title: Text("ongoingWorkout.overwrite.title".t),
-      content: Text(
-        "ongoingWorkout.overwrite.text".t,
-      ),
+      content: Text("ongoingWorkout.overwrite.text".t),
       actions: [
         TextButton(
           onPressed: () {

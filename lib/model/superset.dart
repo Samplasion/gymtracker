@@ -30,14 +30,14 @@ class Superset extends WorkoutExercisable {
     String? id,
     required List<Exercise> exercises,
     required this.restTime,
-    this.notes = "",
+    this.notes = '',
     required this.workoutID,
     this.supersedesID,
-  })  : id = id ?? const Uuid().v4(),
-        exercises = [
-          for (final exercise in exercises)
-            exercise.copyWith(workoutID: workoutID, supersetID: id),
-        ];
+  }) : id = id ?? const Uuid().v4(),
+       exercises = [
+         for (final exercise in exercises)
+           exercise.copyWith(workoutID: workoutID, supersetID: id),
+       ];
 
   factory Superset.empty() {
     return Superset(
@@ -52,16 +52,14 @@ class Superset extends WorkoutExercisable {
       _$SupersetFromJson(json);
 
   @override
-  List<GTSet> get sets => [
-        for (final ex in exercises) ...ex.sets,
-      ];
+  List<GTSet> get sets => [for (final ex in exercises) ...ex.sets];
 
   @override
   Map<String, dynamic> toJson() => {
-        ..._$SupersetToJson(this),
-        'exercises': [for (final exercise in exercises) exercise.toJson()],
-        'type': 'superset',
-      };
+    ..._$SupersetToJson(this),
+    'exercises': [for (final exercise in exercises) exercise.toJson()],
+    'type': 'superset',
+  };
 
   @override
   String toString() {
@@ -85,17 +83,16 @@ class Superset extends WorkoutExercisable {
           (ex) => ex.doneSets.length == exerciseWithLeastSets.doneSets.length,
         )
         ?.sets
-        .firstWhereOrNull(
-          (set) => !set.done,
-        );
+        .firstWhereOrNull((set) => !set.done);
   }
 
   @override
-  Superset changeUnits(
-      {required Weights fromWeightUnit,
-      required Weights toWeightUnit,
-      required Distance fromDistanceUnit,
-      required Distance toDistanceUnit}) {
+  Superset changeUnits({
+    required Weights fromWeightUnit,
+    required Weights toWeightUnit,
+    required Distance fromDistanceUnit,
+    required Distance toDistanceUnit,
+  }) {
     return copyWith(
       exercises: [
         for (final exercise in exercises)

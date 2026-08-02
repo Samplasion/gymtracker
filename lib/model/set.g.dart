@@ -23,62 +23,64 @@ abstract class _$GTSetCWProxy {
 
   GTSet done(bool done);
 
-  /// This function **does support** nullification of nullable fields. All `null` values passed to `non-nullable` fields will be ignored. You can also use `GTSet(...).copyWith.fieldName(...)` to override fields one at a time with nullification support.
+  /// Creates a new instance with the provided field values.
+  /// Passing `null` to a nullable field nullifies it, while `null` for a non-nullable field is ignored. To update a single field use `GTSet(...).copyWith.fieldName(value)`.
   ///
-  /// Usage
+  /// Example:
   /// ```dart
   /// GTSet(...).copyWith(id: 12, name: "My name")
-  /// ````
+  /// ```
   GTSet call({
     String? id,
-    GTSetKind? kind,
-    GTSetParameters? parameters,
+    GTSetKind kind,
+    GTSetParameters parameters,
     int? reps,
     double? weight,
     Duration? time,
     double? distance,
-    bool? done,
+    bool done,
   });
 }
 
-/// Proxy class for `copyWith` functionality. This is a callable class and can be used as follows: `instanceOfGTSet.copyWith(...)`. Additionally contains functions for specific fields e.g. `instanceOfGTSet.copyWith.fieldName(...)`
+/// Callable proxy for `copyWith` functionality.
+/// Use as `instanceOfGTSet.copyWith(...)` or call `instanceOfGTSet.copyWith.fieldName(value)` for a single field.
 class _$GTSetCWProxyImpl implements _$GTSetCWProxy {
   const _$GTSetCWProxyImpl(this._value);
 
   final GTSet _value;
 
   @override
-  GTSet id(String? id) => this(id: id);
+  GTSet id(String? id) => call(id: id);
 
   @override
-  GTSet kind(GTSetKind kind) => this(kind: kind);
+  GTSet kind(GTSetKind kind) => call(kind: kind);
 
   @override
-  GTSet parameters(GTSetParameters parameters) => this(parameters: parameters);
+  GTSet parameters(GTSetParameters parameters) => call(parameters: parameters);
 
   @override
-  GTSet reps(int? reps) => this(reps: reps);
+  GTSet reps(int? reps) => call(reps: reps);
 
   @override
-  GTSet weight(double? weight) => this(weight: weight);
+  GTSet weight(double? weight) => call(weight: weight);
 
   @override
-  GTSet time(Duration? time) => this(time: time);
+  GTSet time(Duration? time) => call(time: time);
 
   @override
-  GTSet distance(double? distance) => this(distance: distance);
+  GTSet distance(double? distance) => call(distance: distance);
 
   @override
-  GTSet done(bool done) => this(done: done);
+  GTSet done(bool done) => call(done: done);
 
   @override
-
-  /// This function **does support** nullification of nullable fields. All `null` values passed to `non-nullable` fields will be ignored. You can also use `GTSet(...).copyWith.fieldName(...)` to override fields one at a time with nullification support.
+  /// Creates a new instance with the provided field values.
+  /// Passing `null` to a nullable field nullifies it, while `null` for a non-nullable field is ignored. To update a single field use `GTSet(...).copyWith.fieldName(value)`.
   ///
-  /// Usage
+  /// Example:
   /// ```dart
   /// GTSet(...).copyWith(id: 12, name: "My name")
-  /// ````
+  /// ```
   GTSet call({
     Object? id = const $CopyWithPlaceholder(),
     Object? kind = const $CopyWithPlaceholder(),
@@ -100,9 +102,9 @@ class _$GTSetCWProxyImpl implements _$GTSetCWProxy {
           : kind as GTSetKind,
       parameters:
           parameters == const $CopyWithPlaceholder() || parameters == null
-              ? _value.parameters
-              // ignore: cast_nullable_to_non_nullable
-              : parameters as GTSetParameters,
+          ? _value.parameters
+          // ignore: cast_nullable_to_non_nullable
+          : parameters as GTSetParameters,
       reps: reps == const $CopyWithPlaceholder()
           ? _value.reps
           // ignore: cast_nullable_to_non_nullable
@@ -128,7 +130,8 @@ class _$GTSetCWProxyImpl implements _$GTSetCWProxy {
 }
 
 extension $GTSetCopyWith on GTSet {
-  /// Returns a callable class that can be used as follows: `instanceOfGTSet.copyWith(...)` or like so:`instanceOfGTSet.copyWith.fieldName(...)`.
+  /// Returns a callable class used to build a new instance with modified fields.
+  /// Example: `instanceOfGTSet.copyWith(...)` or `instanceOfGTSet.copyWith.fieldName(...)`.
   // ignore: library_private_types_in_public_api
   _$GTSetCWProxy get copyWith => _$GTSetCWProxyImpl(this);
 }
@@ -138,28 +141,28 @@ extension $GTSetCopyWith on GTSet {
 // **************************************************************************
 
 GTSet _$GTSetFromJson(Map<String, dynamic> json) => GTSet(
-      id: json['id'] as String?,
-      kind: $enumDecode(_$GTSetKindEnumMap, json['kind']),
-      parameters: $enumDecode(_$GTSetParametersEnumMap, json['parameters']),
-      reps: (json['reps'] as num?)?.toInt() ?? 0,
-      weight: (json['weight'] as num?)?.toDouble() ?? 0,
-      time: json['time'] == null
-          ? Duration.zero
-          : Duration(microseconds: (json['time'] as num).toInt()),
-      distance: (json['distance'] as num?)?.toDouble() ?? 0,
-      done: json['done'] as bool? ?? false,
-    );
+  id: json['id'] as String?,
+  kind: $enumDecode(_$GTSetKindEnumMap, json['kind']),
+  parameters: $enumDecode(_$GTSetParametersEnumMap, json['parameters']),
+  reps: (json['reps'] as num?)?.toInt() ?? 0,
+  weight: (json['weight'] as num?)?.toDouble() ?? 0,
+  time: json['time'] == null
+      ? Duration.zero
+      : Duration(microseconds: (json['time'] as num).toInt()),
+  distance: (json['distance'] as num?)?.toDouble() ?? 0,
+  done: json['done'] as bool? ?? false,
+);
 
 Map<String, dynamic> _$GTSetToJson(GTSet instance) => <String, dynamic>{
-      'id': instance.id,
-      'kind': _$GTSetKindEnumMap[instance.kind]!,
-      'parameters': _$GTSetParametersEnumMap[instance.parameters]!,
-      'reps': instance.reps,
-      'weight': instance.weight,
-      'time': instance.time?.inMicroseconds,
-      'distance': instance.distance,
-      'done': instance.done,
-    };
+  'id': instance.id,
+  'kind': _$GTSetKindEnumMap[instance.kind]!,
+  'parameters': _$GTSetParametersEnumMap[instance.parameters]!,
+  'reps': instance.reps,
+  'weight': instance.weight,
+  'time': instance.time?.inMicroseconds,
+  'distance': instance.distance,
+  'done': instance.done,
+};
 
 const _$GTSetKindEnumMap = {
   GTSetKind.warmUp: 'warmUp',

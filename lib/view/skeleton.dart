@@ -1,7 +1,9 @@
 import 'dart:async';
+import 'dart:ui';
 
 import 'package:animations/animations.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart' hide Localizations;
 import 'package:flutter/scheduler.dart';
 import 'package:get/get.dart';
@@ -9,12 +11,14 @@ import 'package:gymtracker/controller/coordinator.dart';
 import 'package:gymtracker/controller/exercises_controller.dart';
 import 'package:gymtracker/controller/history_controller.dart';
 import 'package:gymtracker/controller/logger_controller.dart';
+import 'package:gymtracker/controller/purchases_controller.dart';
 import 'package:gymtracker/controller/routines_controller.dart';
 import 'package:gymtracker/controller/workout_controller.dart';
 import 'package:gymtracker/data/exercises.dart';
 import 'package:gymtracker/icons/gymtracker_icons.dart';
 import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/service/logger.dart';
+import 'package:gymtracker/service/version.dart';
 import 'package:gymtracker/utils/colors.dart';
 import 'package:gymtracker/utils/constants.dart';
 import 'package:gymtracker/utils/extensions.dart';
@@ -22,9 +26,12 @@ import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/view/achievements.dart';
 import 'package:gymtracker/view/boutique.dart';
 import 'package:gymtracker/view/components/badges.dart';
+import 'package:gymtracker/view/components/pro_builder.dart';
 import 'package:gymtracker/view/debug.dart';
+import 'package:gymtracker/view/feed.dart';
 import 'package:gymtracker/view/food.dart';
 import 'package:gymtracker/view/history.dart';
+import 'package:gymtracker/view/legal.dart';
 import 'package:gymtracker/view/library.dart';
 import 'package:gymtracker/view/logs.dart';
 import 'package:gymtracker/view/me.dart';
@@ -36,15 +43,14 @@ import 'package:gymtracker/view/utils/timer.dart';
 import 'package:gymtracker/view/utils/workout_navigation.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:skeletonizer/skeletonizer.dart';
+import 'package:soft_edge_blur/soft_edge_blur.dart';
 
 const _kDrawerSize = 304.0;
 const _kRailSize = 96.0;
+const _kNavBarHeight = 80.0;
 
 class SkeletonDrawerButton extends StatefulWidget {
-  const SkeletonDrawerButton({
-    super.key,
-    this.isInRail = false,
-  });
+  const SkeletonDrawerButton({super.key, this.isInRail = false});
 
   final bool isInRail;
 
@@ -105,6 +111,7 @@ class _SkeletonDrawerButtonState extends State<SkeletonDrawerButton>
       return IconButton(
         icon: const Icon(sidebarIcon),
         onPressed: _toggleSidebar,
+        tooltip: MaterialLocalizations.of(context).openAppDrawerTooltip,
       );
     } else if (SkeletonView.isTwoPane(context)) {
       var hide = _skeleton?.isSidebarCollapsed == true;
@@ -117,10 +124,12 @@ class _SkeletonDrawerButtonState extends State<SkeletonDrawerButton>
           alignment: Alignment.center,
         ),
         onPressed: hide ? null : _toggleSidebar,
+        tooltip: MaterialLocalizations.of(context).openAppDrawerTooltip,
       );
     } else {
       return IconButton(
         icon: const Icon(Icons.menu),
+        tooltip: MaterialLocalizations.of(context).openAppDrawerTooltip,
         onPressed: () {
           setState(() => SkeletonView._of(context)?.openDrawer());
           SchedulerBinding.instance.addPostFrameCallback((_) {
@@ -138,8 +147,12 @@ class SkeletonView extends StatefulWidget {
   @override
   State<SkeletonView> createState() => _SkeletonViewState();
 
-  static _SkeletonViewState? _of(BuildContext context) {
+  static SkeletonViewState? of(BuildContext context) {
     return context.findAncestorStateOfType<_SkeletonViewState>();
+  }
+
+  static _SkeletonViewState? _of(BuildContext context) {
+    return of(context) as _SkeletonViewState?;
   }
 
   static bool isTwoPane(BuildContext context) {
@@ -147,11 +160,17 @@ class SkeletonView extends StatefulWidget {
   }
 }
 
+abstract class SkeletonViewState {
+  void goToRoutines();
+}
+
 class _SkeletonViewState extends State<SkeletonView>
-    with WidgetsBindingObserver {
+    with WidgetsBindingObserver
+    implements SkeletonViewState {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey();
-  final BehaviorSubject<bool> _isSidebarCollapsed$ =
-      BehaviorSubject.seeded(false);
+  final BehaviorSubject<bool> _isSidebarCollapsed$ = BehaviorSubject.seeded(
+    false,
+  );
 
   bool get isSidebarCollapsed => _isSidebarCollapsed$.value;
   Stream<bool> get isSidebarCollapsedStream => _isSidebarCollapsed$.stream;
@@ -165,6 +184,11 @@ class _SkeletonViewState extends State<SkeletonView>
     SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
       setState(() {});
     });
+  }
+
+  @override
+  void goToRoutines() {
+    setState(() => _selectedIndex = 2);
   }
 
   @override
@@ -187,17 +211,10 @@ class _SkeletonViewState extends State<SkeletonView>
   int _selectedIndex = 0;
 
   List<Widget> get pages => [
-        const RoutinesView(),
-        const LibraryView(),
-        const HistoryView(),
-        const BoutiqueView(),
-        const MeView(),
-        const FoodView(),
-        const AchievementsView(),
-        const SettingsView(),
-        if (kDebugMode) const DebugView(),
-        if (LoggerController.shouldShowPane) const LogView(),
-      ];
+    const FeedView(),
+    const MeView(),
+    const RoutinesView(),
+  ];
 
   @override
   void reassemble() {
@@ -228,59 +245,59 @@ class _SkeletonViewState extends State<SkeletonView>
             alignment: Alignment.centerLeft,
             layoutBuilder:
                 (topChild, topChildKey, bottomChild, bottomChildKey) {
-              return SizedBox(
-                height: context.height,
-                child: Stack(
-                  clipBehavior: Clip.none,
-                  alignment: AlignmentDirectional.centerStart,
-                  children: <Widget>[
-                    Positioned(
-                      key: bottomChildKey,
-                      // Instead of forcing the positioned child to a width
-                      // with left / right, just stick it to the top.
-                      top: 0,
-                      child: bottomChild,
+                  return SizedBox(
+                    height: context.height,
+                    child: Stack(
+                      clipBehavior: Clip.none,
+                      alignment: AlignmentDirectional.centerStart,
+                      children: <Widget>[
+                        Positioned(
+                          key: bottomChildKey,
+                          // Instead of forcing the positioned child to a width
+                          // with left / right, just stick it to the top.
+                          top: 0,
+                          child: bottomChild,
+                        ),
+                        Positioned(key: topChildKey, child: topChild),
+                      ],
                     ),
-                    Positioned(
-                      key: topChildKey,
-                      child: topChild,
-                    ),
-                  ],
-                ),
-              );
-            },
+                  );
+                },
           ),
           Expanded(
             child: PageTransitionSwitcher(
-              transitionBuilder: (
-                Widget child,
-                Animation<double> primaryAnimation,
-                Animation<double> secondaryAnimation,
-              ) {
-                return FadeThroughTransition(
-                  animation: primaryAnimation,
-                  secondaryAnimation: secondaryAnimation,
-                  child: child,
-                );
-              },
+              transitionBuilder:
+                  (
+                    Widget child,
+                    Animation<double> primaryAnimation,
+                    Animation<double> secondaryAnimation,
+                  ) {
+                    return FadeThroughTransition(
+                      animation: primaryAnimation,
+                      secondaryAnimation: secondaryAnimation,
+                      child: child,
+                    );
+                  },
               child: KeyedSubtree(
                 key: ValueKey<int>(_selectedIndex),
                 child: Obx(
                   () => MediaQuery(
                     data: MediaQuery.of(context).copyWith(
                       padding: safeArea.copyWith(
-                        bottom: safeArea.bottom +
+                        bottom:
+                            safeArea.bottom +
                             (Get.find<RoutinesController>()
                                     .hasOngoingWorkout
                                     .isTrue
                                 ? OngoingWorkoutBar.defaultHeight
-                                : 0),
+                                : 0) +
+                            (showMDView ? 0 : _kNavBarHeight),
                         left: showMDView ? 0 : safeArea.left,
                       ),
                       // TODO: Assess the utility of this
-                      viewInsets: MediaQuery.of(context).viewInsets.copyWith(
-                            bottom: 0,
-                          ),
+                      viewInsets: MediaQuery.of(
+                        context,
+                      ).viewInsets.copyWith(bottom: 0),
                     ),
                     child: pages[_selectedIndex],
                   ),
@@ -292,223 +309,318 @@ class _SkeletonViewState extends State<SkeletonView>
       ),
       drawer: showMDView ? null : _drawer(false),
       extendBody: true,
-      bottomNavigationBar: Obx(
-        () {
-          var hasWorkout =
-              Get.find<RoutinesController>().hasOngoingWorkout.isTrue;
-          return Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              if (hasWorkout)
-                MediaQuery(
+      bottomNavigationBar: () {
+        var hasWorkout = Get.find<RoutinesController>().hasOngoingWorkout;
+        return Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            StreamBuilder<bool>(
+              stream: hasWorkout.stream,
+              initialData: false,
+              builder: (context, asyncSnapshot) {
+                final hasWorkout = asyncSnapshot.data ?? false;
+                return MediaQuery(
                   data: MediaQuery.of(context).copyWith(
                     padding: safeArea.copyWith(
                       left: safeArea.left + leftNavigationSize,
+                      bottom: 0,
                     ),
                   ),
-                  child: OngoingWorkoutBar(
-                    open: () => SchedulerBinding.instance
-                        .addPostFrameCallback((timeStamp) {
-                      Go.toNamed(getPreferredWorkoutRouteName());
-                    }),
+                  child: Crossfade(
+                    firstChild: const SizedBox(),
+                    secondChild: OngoingWorkoutBar(
+                      open: () => SchedulerBinding.instance
+                          .addPostFrameCallback((timeStamp) {
+                            Go.toNamed(getPreferredWorkoutRouteName());
+                          }),
+                    ),
+                    showSecond: hasWorkout,
                   ),
-                ),
-            ],
-          );
-        },
-      ),
+                );
+              },
+            ),
+            Crossfade(
+              firstChild: ProBuilder(
+                builder: (context, subscriptionInfo) {
+                  final isSubscribed = subscriptionInfo?.hasProFeatures == true;
+                  return NavigationBar(
+                    onDestinationSelected: _onBottomDestinationTap,
+                    selectedIndex: _selectedIndex,
+                    destinations: [
+                      NavigationDestination(
+                        icon: const Icon(GTIcons.home),
+                        label: "feed.title".t,
+                      ),
+                      NavigationDestination(
+                        icon: const Icon(GTIcons.profile),
+                        label: "me.title".t,
+                      ),
+                      NavigationDestination(
+                        icon: const Icon(GTIcons.muscle),
+                        label: "workoutPage.title".t,
+                      ),
+                      if (!isSubscribed)
+                        NavigationDestination(
+                          icon: const Icon(GTIcons.pro),
+                          label: "pro.title".t,
+                        ),
+                    ],
+                  );
+                },
+              ),
+              secondChild: SizedBox.shrink(),
+              showSecond: showMDView,
+            ),
+          ],
+        );
+      }(),
     );
   }
 
+  void _onBottomDestinationTap(int i) {
+    if (i == 3) {
+      Get.find<PurchasesController>().presentPaywall();
+      return;
+    }
+    setState(() => _selectedIndex = i);
+  }
+
   Widget _drawer(bool expanded) {
-    final safeArea = MediaQuery.of(context).padding;
-    final destinations = [
-      const SafeArea(
-        bottom: false,
-        minimum: EdgeInsets.only(top: 16),
-        child: SizedBox(),
-      ),
-      const _GTDrawerHeader(),
-      const SizedBox(height: 16),
-      NavigationDrawerDestination(
-        icon: const Icon(GTIcons.routines),
-        label: Text(
-          "routines.title".t,
-          textAlign: TextAlign.center,
-        ),
-      ),
-      NavigationDrawerDestination(
-        icon: const Icon(GTIcons.library),
-        label: Text.rich(
-          TextSpan(
-            children: [
-              TextSpan(text: "library.title".t),
-              if (_selectedIndex == 1 && kDebugMode) ...[
-                const TextSpan(text: " "),
-                WidgetSpan(
-                  child: GTBadge(
-                    content:
-                        "${exerciseStandardLibraryAsList.length} + ${Get.find<ExercisesController>().exercises.length}",
-                    color: GTMaterialColor.quinary,
-                    size: GTBadgeSize.small,
-                    invert: true,
-                  ),
-                  alignment: PlaceholderAlignment.middle,
-                ),
-              ],
-            ],
+    return ProBuilder(
+      builder: (context, info) {
+        final safeArea = MediaQuery.of(context).padding;
+        final isSubscribed = info != null && info.hasProFeatures;
+        final offset = () {
+          int offset = 1; // Settings
+          if (kDebugMode) offset += 1;
+          if (LoggerController.shouldShowPane) offset += 1;
+          return offset;
+        }();
+        final destinations = [
+          NavigationDrawerDestination(
+            icon: const Icon(GTIcons.home),
+            label: Text("feed.title".t),
           ),
-          textAlign: TextAlign.center,
-        ),
-      ),
-      NavigationDrawerDestination(
-        icon: const Icon(GTIcons.history),
-        label: Text.rich(
-          TextSpan(
-            children: [
-              TextSpan(text: "history.title".t),
-              if (_selectedIndex == 2) ...[
-                const TextSpan(text: " "),
-                WidgetSpan(
-                  child: GTBadge(
-                    content:
-                        "${Get.find<HistoryController>().userVisibleLength}",
-                    color: GTMaterialColor.quinary,
-                    size: GTBadgeSize.small,
-                    invert: true,
-                  ),
-                  alignment: PlaceholderAlignment.middle,
-                ),
-              ],
-            ],
+          NavigationDrawerDestination(
+            icon: const Icon(GTIcons.profile),
+            label: Text("me.title".t),
           ),
-          textAlign: TextAlign.center,
-        ),
-      ),
-      NavigationDrawerDestination(
-        icon: const Icon(GTIcons.boutique),
-        label: Text(
-          "boutique.title".t,
-          textAlign: TextAlign.center,
-        ),
-      ),
-      NavigationDrawerDestination(
-        icon: const Icon(GTIcons.profile),
-        label: Text(
-          "me.title".t,
-          textAlign: TextAlign.center,
-        ),
-      ),
-      NavigationDrawerDestination(
-        icon: const Icon(GTIcons.food),
-        label: Text(
-          "food.title".t,
-          textAlign: TextAlign.center,
-        ),
-      ),
-      NavigationDrawerDestination(
-        icon: const Icon(GTIcons.achievements),
-        label: Text(
-          "achievements.title".t,
-          textAlign: TextAlign.center,
-        ),
-      ),
-      NavigationDrawerDestination(
-        icon: const Icon(GTIcons.settings),
-        label: Text(
-          "settings.title".t,
-          textAlign: TextAlign.center,
-        ),
-      ),
-      if (kDebugMode)
-        const NavigationDrawerDestination(
-          icon: Icon(GTIcons.debug),
-          label: Text("Debug"),
-        ),
-      if (LoggerController.shouldShowPane)
-        const NavigationDrawerDestination(
-          icon: Icon(GTIcons.logs),
-          label: Text("Logs"),
-        ),
-      const SafeArea(
-        top: false,
-        minimum: EdgeInsets.only(bottom: 16),
-        child: SizedBox(),
-      ),
-    ];
-    return _DrawerContainer(
-      child: MediaQuery(
-        data: MediaQueryData(
-          padding: safeArea.copyWith(
-            right: expanded ? 0 : safeArea.right,
-            bottom: safeArea.bottom +
-                (Get.find<RoutinesController>().hasOngoingWorkout.isTrue
-                    ? OngoingWorkoutBar.defaultHeight
-                    : 0),
+          NavigationDrawerDestination(
+            icon: const Icon(GTIcons.muscle),
+            label: Text("workoutPage.title".t),
           ),
-        ),
-        child: ConstrainedBox(
-          constraints: BoxConstraints.tightFor(height: context.height),
-          child: Crossfade(
-            firstChild: SizedBox(
-              height: context.height,
-              child: NavigationDrawer(
-                selectedIndex: _selectedIndex,
-                onDestinationSelected: (i) {
-                  if (!expanded) {
-                    _scaffoldKey.currentState!.closeDrawer();
-                  }
-                  setState(() => _selectedIndex = i);
-                },
-                children: destinations,
+          if (!isSubscribed)
+            NavigationDrawerDestination(
+              icon: const Icon(GTIcons.pro),
+              label: Text("pro.title".t),
+            ),
+          NavigationDrawerDestination(
+            icon: const Icon(GTIcons.settings),
+            label: Text("settings.title".t, textAlign: TextAlign.center),
+          ),
+          if (kDebugMode)
+            const NavigationDrawerDestination(
+              icon: Icon(GTIcons.debug),
+              label: Text("Debug"),
+            ),
+          if (LoggerController.shouldShowPane)
+            const NavigationDrawerDestination(
+              icon: Icon(GTIcons.logs),
+              label: Text("Logs"),
+            ),
+        ];
+
+        void jumpOffTapHandler(int index) {
+          if (expanded) {
+            if (index < destinations.length - offset) {
+              _scaffoldKey.currentState!.closeDrawer();
+              _onBottomDestinationTap(index);
+              return;
+            } else {
+              index -= destinations.length - offset;
+            }
+          }
+          switch (index) {
+            case 0:
+              Go.to(() => SettingsView());
+              break;
+            case 1:
+              Go.to(() => DebugView());
+              break;
+            case 2:
+              Go.to(() => LogView());
+              break;
+          }
+        }
+
+        return _DrawerContainer(
+          child: MediaQuery(
+            data: MediaQueryData(
+              padding: safeArea.copyWith(
+                right: expanded ? 0 : safeArea.right,
+                bottom: safeArea.bottom,
               ),
             ),
-            secondChild: SizedBox(
-              width: _kRailSize + safeArea.left,
-              height: context.height,
-              child: ScrollableNavigationRail(
-                leading: const SkeletonDrawerButton(isInRail: true),
-                backgroundColor: Colors.transparent,
-                selectedIndex: _selectedIndex,
-                onDestinationSelected: (i) {
-                  setState(() => _selectedIndex = i);
-                },
-                labelType: NavigationRailLabelType.all,
-                destinations: destinations
-                    .whereType<NavigationDrawerDestination>()
-                    .map((d) => NavigationRailDestination(
-                          icon: d.icon,
-                          label: d.label,
-                        ))
-                    .toList(),
+            child: ConstrainedBox(
+              constraints: BoxConstraints.tightFor(height: context.height),
+              child: Crossfade(
+                firstChild: SizedBox(
+                  height: context.height,
+                  child: NavigationDrawer(
+                    selectedIndex: expanded ? _selectedIndex : null,
+                    onDestinationSelected: (i) {
+                      if (!expanded) {
+                        _scaffoldKey.currentState!.closeDrawer();
+                      }
+                      jumpOffTapHandler(i);
+                    },
+                    header: ColoredBox(
+                      color: Theme.of(context).colorScheme.surfaceContainerLow,
+                      child: Column(
+                        children: [
+                          const SafeArea(
+                            bottom: false,
+                            minimum: EdgeInsets.only(top: 16),
+                            child: SizedBox(),
+                          ),
+                          const _GTDrawerHeader(),
+                          const SizedBox(height: 16),
+                          const Divider(thickness: 1, height: 1),
+                        ],
+                      ),
+                    ),
+                    footer: ColoredBox(
+                      color: Theme.of(context).colorScheme.surfaceContainerLow,
+                      child: SafeArea(child: const _GTDrawerFooter()),
+                    ),
+                    children: [
+                      const SizedBox(height: 16),
+                      if (expanded)
+                        ...destinations
+                      else
+                        ...destinations.skip(destinations.length - offset),
+                    ],
+                  ),
+                ),
+                secondChild: SizedBox(
+                  width: _kRailSize + safeArea.left,
+                  height: context.height,
+                  child: ScrollableNavigationRail(
+                    leading: const SkeletonDrawerButton(isInRail: true),
+                    backgroundColor: Colors.transparent,
+                    selectedIndex: _selectedIndex,
+                    onDestinationSelected: jumpOffTapHandler,
+                    labelType: NavigationRailLabelType.all,
+                    destinations: destinations
+                        .whereType<NavigationDrawerDestination>()
+                        .map(
+                          (d) => NavigationRailDestination(
+                            icon: d.icon,
+                            label: d.label,
+                          ),
+                        )
+                        .toList(),
+                  ),
+                ),
+                showSecond: expanded && isSidebarCollapsed,
+                layoutBuilder:
+                    (topChild, topChildKey, bottomChild, bottomChildKey) {
+                      return SizedBox(
+                        height: context.height,
+                        child: Stack(
+                          clipBehavior: Clip.none,
+                          // alignment: AlignmentDirectional.centerStart,
+                          alignment: Alignment.center,
+                          children: <Widget>[
+                            Positioned(
+                              key: bottomChildKey,
+                              // Instead of forcing the positioned child to a width
+                              // with left / right, just stick it to the top.
+                              top: 0,
+                              child: bottomChild,
+                            ),
+                            Positioned(key: topChildKey, child: topChild),
+                          ],
+                        ),
+                      );
+                    },
               ),
             ),
-            showSecond: expanded && isSidebarCollapsed,
-            layoutBuilder:
-                (topChild, topChildKey, bottomChild, bottomChildKey) {
-              return SizedBox(
-                height: context.height,
-                child: Stack(
-                  clipBehavior: Clip.none,
-                  // alignment: AlignmentDirectional.centerStart,
-                  alignment: Alignment.center,
-                  children: <Widget>[
-                    Positioned(
-                      key: bottomChildKey,
-                      // Instead of forcing the positioned child to a width
-                      // with left / right, just stick it to the top.
-                      top: 0,
-                      child: bottomChild,
-                    ),
-                    Positioned(
-                      key: topChildKey,
-                      child: topChild,
-                    ),
-                  ],
-                ),
-              );
-            },
           ),
+        );
+      },
+    );
+  }
+}
+
+class _GTDrawerFooter extends StatefulWidget {
+  const _GTDrawerFooter();
+
+  @override
+  State<_GTDrawerFooter> createState() => __GTDrawerFooterState();
+}
+
+class __GTDrawerFooterState extends State<_GTDrawerFooter> {
+  final _termsGestureDetector = TapGestureRecognizer();
+  final _privacyGestureDetector = TapGestureRecognizer();
+
+  @override
+  void initState() {
+    super.initState();
+    _termsGestureDetector.onTap = () {
+      Go.to(() => TosViewerPage());
+    };
+    _privacyGestureDetector.onTap = () {
+      Go.to(() => PrivacyViewerPage());
+    };
+  }
+
+  @override
+  void dispose() {
+    _termsGestureDetector.dispose();
+    _privacyGestureDetector.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 8, bottom: 4),
+      child: Text.rich(
+        textAlign: TextAlign.start,
+        TextSpan(
+          children: [
+            TextSpan(
+              text: "appInfo.version".tParams({
+                "version": VersionService().packageInfo.version,
+                "build":
+                    const String.fromEnvironment(
+                      "BUILD",
+                      defaultValue: "[NO_VALUE]",
+                    ).replaceAll(
+                      "[NO_VALUE]",
+                      VersionService().packageInfo.buildNumber,
+                    ),
+              }),
+              style: Theme.of(context).textTheme.bodySmall,
+            ),
+            const TextSpan(text: "\n"),
+            TextSpan(
+              text: "appInfo.terms".t,
+              style: Theme.of(context).textTheme.bodySmall!.copyWith(
+                color: Theme.of(context).colorScheme.primary,
+              ),
+              recognizer: _termsGestureDetector,
+            ),
+            const TextSpan(text: " • "),
+            TextSpan(
+              text: "appInfo.privacy".t,
+              style: Theme.of(context).textTheme.bodySmall!.copyWith(
+                color: Theme.of(context).colorScheme.primary,
+              ),
+              recognizer: _privacyGestureDetector,
+            ),
+          ],
         ),
       ),
     );
@@ -523,9 +635,15 @@ class _GTDrawerHeader extends StatelessWidget {
     return ListTile(
       title: Text(
         "appName".t,
-        style: Theme.of(context).textTheme.bodyLarge!.copyWith(
-              fontWeight: FontWeight.bold,
-            ),
+        style: Theme.of(
+          context,
+        ).textTheme.bodyLarge!.copyWith(fontWeight: FontWeight.bold),
+      ),
+      subtitle: Text(
+        "appInfo.shortDescription".t,
+        style: Theme.of(
+          context,
+        ).textTheme.bodySmall!.copyWith(fontWeight: FontWeight.w400),
       ),
       leading: const Skeleton.leaf(child: InAppIcon.proportional(size: 38)),
     );
@@ -545,114 +663,140 @@ class OngoingWorkoutBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
-        final isPhone = Breakpoints.computeBreakpoint(constraints.maxWidth) <=
+        final isPhone =
+            Breakpoints.computeBreakpoint(constraints.maxWidth) <=
             Breakpoints.xs;
         final safeArea = MediaQuery.of(context).padding;
-        final gradientColor = Theme.of(context).colorScheme.surfaceContainerLow;
+        final gradientColor = Theme.of(context).colorScheme.surfaceContainer;
+        final controller = Get.isRegistered<WorkoutController>()
+            ? Get.find<WorkoutController>()
+            : null;
         return Container(
           alignment: Alignment.topCenter,
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [
-                gradientColor.withAlpha(0),
-                gradientColor,
-              ],
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              stops: [
-                0,
-                (defaultHeight / 2) / (1.5 * defaultHeight + safeArea.bottom),
-              ],
-            ),
-          ),
+          // decoration: BoxDecoration(
+          //   gradient: LinearGradient(
+          //     colors: [gradientColor.withAlpha(0), gradientColor],
+          //     begin: Alignment.topCenter,
+          //     end: Alignment.bottomCenter,
+          //     stops: [
+          //       0,
+          //       (defaultHeight / 2) / (1.5 * defaultHeight + safeArea.bottom),
+          //     ],
+          //   ),
+          // ),
           child: AnimatedContainer(
             duration: const Duration(milliseconds: 300),
             curve: Curves.easeInOutCirc,
             padding: safeArea.copyWith(top: 0),
             child: SizedBox(
               height: defaultHeight,
-              child: Card(
-                elevation: 1,
-                color: context.colorScheme.surfaceContainerHighest,
-                margin: const EdgeInsets.fromLTRB(8, 0, 8, 8),
-                shape: RoundedRectangleBorder(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(8, 0, 8, 8),
+                child: ClipRRect(
                   borderRadius: BorderRadius.circular(13),
-                ),
-                child: Container(
-                  constraints: const BoxConstraints(minHeight: 64),
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  child: Center(
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Expanded(
-                          child: Obx(
-                            () => TimerView(
-                              startingTime:
-                                  Get.isRegistered<WorkoutController>()
-                                      ? Get.find<WorkoutController>().time.value
-                                      : DateTime.now(),
-                              builder: (_, time) => time,
-                            ),
+                  child: BackdropFilter(
+                    filterConfig: ImageFilterConfig.blur(
+                      sigmaX: 16,
+                      sigmaY: 16,
+                    ),
+                    child: Card(
+                      elevation: 1,
+                      color: context.colorScheme.surfaceContainerHighest
+                          .withAlpha(128),
+                      margin: EdgeInsets.zero,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(13),
+                        side: BorderSide(
+                          color: context.colorScheme.surfaceContainerHighest,
+                        ),
+                      ),
+                      child: Container(
+                        constraints: const BoxConstraints(minHeight: 64),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 8,
+                        ),
+                        child: Center(
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Expanded(
+                                child: controller == null
+                                    ? SizedBox.shrink()
+                                    : Obx(
+                                        () => TimerView(
+                                          startingTime: controller.time.value,
+                                          builder: (_, time) => time,
+                                        ),
+                                      ),
+                              ),
+                              const SizedBox(width: 8),
+                              Crossfade(
+                                firstChild: TextButton.icon(
+                                  onPressed: resumeWorkout,
+                                  icon: const Icon(GTIcons.resume),
+                                  clipBehavior: Clip.hardEdge,
+                                  label: Text(
+                                    isPhone
+                                        ? ""
+                                        : "ongoingWorkout.actions.short.resume"
+                                              .t,
+                                    overflow: TextOverflow.clip,
+                                    maxLines: 1,
+                                  ),
+                                ),
+                                secondChild: IconButton(
+                                  onPressed: resumeWorkout,
+                                  icon: Icon(
+                                    GTIcons.resume,
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.primary,
+                                  ),
+                                ),
+                                showSecond: isPhone,
+                              ),
+                              const SizedBox(width: 8),
+                              ClipRect(
+                                clipBehavior: Clip.hardEdge,
+                                child: Crossfade(
+                                  firstChild: TextButton.icon(
+                                    style: TextButton.styleFrom(
+                                      foregroundColor: Theme.of(
+                                        context,
+                                      ).colorScheme.error,
+                                      iconColor: Theme.of(
+                                        context,
+                                      ).colorScheme.error,
+                                    ),
+                                    onPressed: () => cancelWorkout(context),
+                                    icon: const Icon(GTIcons.close),
+                                    clipBehavior: Clip.hardEdge,
+                                    label: Text(
+                                      isPhone
+                                          ? ""
+                                          : "ongoingWorkout.actions.short.cancel"
+                                                .t,
+                                      overflow: TextOverflow.clip,
+                                      maxLines: 1,
+                                    ),
+                                  ),
+                                  secondChild: IconButton(
+                                    style: IconButton.styleFrom(
+                                      foregroundColor: Theme.of(
+                                        context,
+                                      ).colorScheme.error,
+                                    ),
+                                    onPressed: () => cancelWorkout(context),
+                                    icon: const Icon(GTIcons.close),
+                                  ),
+                                  showSecond: isPhone,
+                                ),
+                              ),
+                            ],
                           ),
                         ),
-                        const SizedBox(width: 8),
-                        Crossfade(
-                          firstChild: TextButton.icon(
-                            onPressed: resumeWorkout,
-                            icon: const Icon(GTIcons.resume),
-                            clipBehavior: Clip.hardEdge,
-                            label: Text(
-                              isPhone
-                                  ? ""
-                                  : "ongoingWorkout.actions.short.resume".t,
-                              overflow: TextOverflow.clip,
-                              maxLines: 1,
-                            ),
-                          ),
-                          secondChild: IconButton(
-                            onPressed: resumeWorkout,
-                            icon: Icon(
-                              GTIcons.resume,
-                              color: Theme.of(context).colorScheme.primary,
-                            ),
-                          ),
-                          showSecond: isPhone,
-                        ),
-                        const SizedBox(width: 8),
-                        ClipRect(
-                          clipBehavior: Clip.hardEdge,
-                          child: Crossfade(
-                            firstChild: TextButton.icon(
-                              style: TextButton.styleFrom(
-                                foregroundColor:
-                                    Theme.of(context).colorScheme.error,
-                                iconColor: Theme.of(context).colorScheme.error,
-                              ),
-                              onPressed: () => cancelWorkout(context),
-                              icon: const Icon(GTIcons.close),
-                              clipBehavior: Clip.hardEdge,
-                              label: Text(
-                                isPhone
-                                    ? ""
-                                    : "ongoingWorkout.actions.short.cancel".t,
-                                overflow: TextOverflow.clip,
-                                maxLines: 1,
-                              ),
-                            ),
-                            secondChild: IconButton(
-                              style: IconButton.styleFrom(
-                                foregroundColor:
-                                    Theme.of(context).colorScheme.error,
-                              ),
-                              onPressed: () => cancelWorkout(context),
-                              icon: const Icon(GTIcons.close),
-                            ),
-                            showSecond: isPhone,
-                          ),
-                        ),
-                      ],
+                      ),
                     ),
                   ),
                 ),
@@ -753,9 +897,7 @@ class __LoaderState extends State<GymTrackerAppLoader> {
                 ),
               ),
             ],
-            const Expanded(
-              child: RoutinesView.skeleton(),
-            ),
+            const Expanded(child: FeedView.skeleton()),
           ],
         ),
       ),

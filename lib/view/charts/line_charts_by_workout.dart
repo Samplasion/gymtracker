@@ -329,7 +329,7 @@ class _LineChartWithCategoriesState<T>
       }
 
       return SideTitleWidget(
-        axisSide: meta.axisSide,
+        meta: meta,
         child: Text(
           text,
           style: Theme.of(context).textTheme.labelSmall,
@@ -341,7 +341,7 @@ class _LineChartWithCategoriesState<T>
   Widget Function(double, TitleMeta) leftTitleWidgets(BuildContext context) {
     return (double value, TitleMeta meta) {
       return SideTitleWidget(
-        axisSide: meta.axisSide,
+        meta: meta,
         child: Text.rich(
           TextSpan(children: [
             TextSpan(

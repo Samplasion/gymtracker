@@ -1,0 +1,129 @@
+{
+  "appPolicies" : {
+    "eula" : "",
+    "policies" : [
+      {
+        "locale" : "en_US",
+        "policyText" : "",
+        "policyURL" : ""
+      }
+    ]
+  },
+  "identifier" : "17088070",
+  "nonRenewingSubscriptions" : [
+
+  ],
+  "products" : [
+    {
+      "displayPrice" : "59.99",
+      "familyShareable" : false,
+      "internalID" : "6793231463",
+      "localizations" : [
+        {
+          "description" : "Accesso completo a Gym Bro senza scadenze",
+          "displayName" : "Gym Bro Pro - Accesso Perpetuo",
+          "locale" : "it"
+        }
+      ],
+      "productID" : "gymbro_pro_lifetime",
+      "referenceName" : "Pro Lifetime",
+      "type" : "NonConsumable"
+    }
+  ],
+  "settings" : {
+    "_applicationInternalID" : "6745848077",
+    "_askToBuyEnabled" : false,
+    "_billingGracePeriodEnabled" : false,
+    "_billingIssuesEnabled" : false,
+    "_developerTeamID" : "66PDR4DQPS",
+    "_disableDialogs" : false,
+    "_failTransactionsEnabled" : false,
+    "_lastSynchronizedDate" : 806433359.09738505,
+    "_locale" : "en_US",
+    "_renewalBillingIssuesEnabled" : false,
+    "_storefront" : "USA",
+    "_storeKitErrors" : [
+
+    ],
+    "_timeRate" : 0
+  },
+  "subscriptionGroups" : [
+    {
+      "id" : "22251476",
+      "localizations" : [
+        {
+          "description" : "",
+          "displayName" : "Gym Bro Pro",
+          "locale" : "it"
+        }
+      ],
+      "name" : "Gym Bro Pro",
+      "subscriptions" : [
+        {
+          "adHocOffers" : [
+
+          ],
+          "codeOffers" : [
+
+          ],
+          "displayPrice" : "2.99",
+          "familyShareable" : false,
+          "groupNumber" : 2,
+          "internalID" : "6793147599",
+          "introductoryOffers" : [
+
+          ],
+          "localizations" : [
+            {
+              "description" : "Ottieni accesso illimitato per un mese.",
+              "displayName" : "Mensile",
+              "locale" : "it"
+            }
+          ],
+          "productID" : "gymbro_monthly_sub",
+          "recurringSubscriptionPeriod" : "P1M",
+          "referenceName" : "Gym Bro Monthly",
+          "subscriptionGroupID" : "22251476",
+          "type" : "RecurringSubscription",
+          "winbackOffers" : [
+
+          ]
+        },
+        {
+          "adHocOffers" : [
+
+          ],
+          "codeOffers" : [
+
+          ],
+          "displayPrice" : "22.99",
+          "familyShareable" : false,
+          "groupNumber" : 1,
+          "internalID" : "6792895778",
+          "introductoryOffers" : [
+
+          ],
+          "localizations" : [
+            {
+              "description" : "Ottieni accesso a tutte le funzioni per un anno.",
+              "displayName" : "Annuale",
+              "locale" : "it"
+            }
+          ],
+          "productID" : "gymbro_yearly_sub",
+          "recurringSubscriptionPeriod" : "P1Y",
+          "referenceName" : "Gym Bro Yearly",
+          "subscriptionGroupID" : "22251476",
+          "type" : "RecurringSubscription",
+          "winbackOffers" : [
+
+          ]
+        }
+      ]
+    }
+  ],
+  "version" : {
+    "major" : 5,
+    "minor" : 0
+  }
+}

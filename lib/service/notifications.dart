@@ -17,7 +17,7 @@ class NotificationsService extends GetxService {
       requestSoundPermission: false,
     );
     plugin.initialize(
-      const InitializationSettings(
+      settings: const InitializationSettings(
         android: androidInit,
         macOS: darwinInit,
         iOS: darwinInit,

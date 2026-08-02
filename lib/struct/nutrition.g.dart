@@ -29,76 +29,78 @@ abstract class _$FoodCWProxy {
 
   Food category(String? category);
 
-  /// This function **does support** nullification of nullable fields. All `null` values passed to `non-nullable` fields will be ignored. You can also use `Food(...).copyWith.fieldName(...)` to override fields one at a time with nullification support.
+  /// Creates a new instance with the provided field values.
+  /// Passing `null` to a nullable field nullifies it, while `null` for a non-nullable field is ignored. To update a single field use `Food(...).copyWith.fieldName(value)`.
   ///
-  /// Usage
+  /// Example:
   /// ```dart
   /// Food(...).copyWith(id: 12, name: "My name")
-  /// ````
+  /// ```
   Food call({
-    String? name,
+    String name,
     String? brand,
-    NutritionValues? nutritionalValuesPer100g,
-    double? amount,
-    List<ServingSize>? servingSizes,
+    NutritionValues nutritionalValuesPer100g,
+    double amount,
+    List<ServingSize> servingSizes,
     String? id,
-    bool? isDownloaded,
+    bool isDownloaded,
     String? barcode,
-    NutritionUnit? unit,
-    int? pieces,
+    NutritionUnit unit,
+    int pieces,
     String? category,
   });
 }
 
-/// Proxy class for `copyWith` functionality. This is a callable class and can be used as follows: `instanceOfFood.copyWith(...)`. Additionally contains functions for specific fields e.g. `instanceOfFood.copyWith.fieldName(...)`
+/// Callable proxy for `copyWith` functionality.
+/// Use as `instanceOfFood.copyWith(...)` or call `instanceOfFood.copyWith.fieldName(value)` for a single field.
 class _$FoodCWProxyImpl implements _$FoodCWProxy {
   const _$FoodCWProxyImpl(this._value);
 
   final Food _value;
 
   @override
-  Food name(String name) => this(name: name);
+  Food name(String name) => call(name: name);
 
   @override
-  Food brand(String? brand) => this(brand: brand);
+  Food brand(String? brand) => call(brand: brand);
 
   @override
   Food nutritionalValuesPer100g(NutritionValues nutritionalValuesPer100g) =>
-      this(nutritionalValuesPer100g: nutritionalValuesPer100g);
+      call(nutritionalValuesPer100g: nutritionalValuesPer100g);
 
   @override
-  Food amount(double amount) => this(amount: amount);
+  Food amount(double amount) => call(amount: amount);
 
   @override
   Food servingSizes(List<ServingSize> servingSizes) =>
-      this(servingSizes: servingSizes);
+      call(servingSizes: servingSizes);
 
   @override
-  Food id(String? id) => this(id: id);
+  Food id(String? id) => call(id: id);
 
   @override
-  Food isDownloaded(bool isDownloaded) => this(isDownloaded: isDownloaded);
+  Food isDownloaded(bool isDownloaded) => call(isDownloaded: isDownloaded);
 
   @override
-  Food barcode(String? barcode) => this(barcode: barcode);
+  Food barcode(String? barcode) => call(barcode: barcode);
 
   @override
-  Food unit(NutritionUnit unit) => this(unit: unit);
+  Food unit(NutritionUnit unit) => call(unit: unit);
 
   @override
-  Food pieces(int pieces) => this(pieces: pieces);
+  Food pieces(int pieces) => call(pieces: pieces);
 
   @override
-  Food category(String? category) => this(category: category);
+  Food category(String? category) => call(category: category);
 
   @override
-
-  /// This function **does support** nullification of nullable fields. All `null` values passed to `non-nullable` fields will be ignored. You can also use `Food(...).copyWith.fieldName(...)` to override fields one at a time with nullification support.
+  /// Creates a new instance with the provided field values.
+  /// Passing `null` to a nullable field nullifies it, while `null` for a non-nullable field is ignored. To update a single field use `Food(...).copyWith.fieldName(value)`.
   ///
-  /// Usage
+  /// Example:
   /// ```dart
   /// Food(...).copyWith(id: 12, name: "My name")
-  /// ````
+  /// ```
   Food call({
     Object? name = const $CopyWithPlaceholder(),
     Object? brand = const $CopyWithPlaceholder(),
@@ -123,28 +125,28 @@ class _$FoodCWProxyImpl implements _$FoodCWProxy {
           : brand as String?,
       nutritionalValuesPer100g:
           nutritionalValuesPer100g == const $CopyWithPlaceholder() ||
-                  nutritionalValuesPer100g == null
-              ? _value.nutritionalValuesPer100g
-              // ignore: cast_nullable_to_non_nullable
-              : nutritionalValuesPer100g as NutritionValues,
+              nutritionalValuesPer100g == null
+          ? _value.nutritionalValuesPer100g
+          // ignore: cast_nullable_to_non_nullable
+          : nutritionalValuesPer100g as NutritionValues,
       amount: amount == const $CopyWithPlaceholder() || amount == null
           ? _value.amount
           // ignore: cast_nullable_to_non_nullable
           : amount as double,
       servingSizes:
           servingSizes == const $CopyWithPlaceholder() || servingSizes == null
-              ? _value.servingSizes
-              // ignore: cast_nullable_to_non_nullable
-              : servingSizes as List<ServingSize>,
+          ? _value.servingSizes
+          // ignore: cast_nullable_to_non_nullable
+          : servingSizes as List<ServingSize>,
       id: id == const $CopyWithPlaceholder()
           ? _value.id
           // ignore: cast_nullable_to_non_nullable
           : id as String?,
       isDownloaded:
           isDownloaded == const $CopyWithPlaceholder() || isDownloaded == null
-              ? _value.isDownloaded
-              // ignore: cast_nullable_to_non_nullable
-              : isDownloaded as bool,
+          ? _value.isDownloaded
+          // ignore: cast_nullable_to_non_nullable
+          : isDownloaded as bool,
       barcode: barcode == const $CopyWithPlaceholder()
           ? _value.barcode
           // ignore: cast_nullable_to_non_nullable
@@ -166,7 +168,8 @@ class _$FoodCWProxyImpl implements _$FoodCWProxy {
 }
 
 extension $FoodCopyWith on Food {
-  /// Returns a callable class that can be used as follows: `instanceOfFood.copyWith(...)` or like so:`instanceOfFood.copyWith.fieldName(...)`.
+  /// Returns a callable class used to build a new instance with modified fields.
+  /// Example: `instanceOfFood.copyWith(...)` or `instanceOfFood.copyWith.fieldName(...)`.
   // ignore: library_private_types_in_public_api
   _$FoodCWProxy get copyWith => _$FoodCWProxyImpl(this);
 }

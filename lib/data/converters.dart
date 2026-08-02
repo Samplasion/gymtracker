@@ -74,8 +74,9 @@ ConvertedHevyWorkoutData convertHevyWorkoutData(List<List> rowsAsListOfValues) {
               "${description ?? ""}\n\n${"settings.options.import.utils.hevy.notes".t}"
                   .trim(),
           startingDate: _parseHevyDateTime(startTime),
-          duration: _parseHevyDateTime(endTime)
-              .difference(_parseHevyDateTime(startTime)),
+          duration: _parseHevyDateTime(
+            endTime,
+          ).difference(_parseHevyDateTime(startTime)),
           weightUnit: Weights.kg,
           distanceUnit: Distance.km,
         ),
@@ -98,37 +99,39 @@ ConvertedHevyWorkoutData convertHevyWorkoutData(List<List> rowsAsListOfValues) {
     if (workouts[key]!.$2.isEmpty ||
         !workouts[key]!.$2.last.asExercise.name.startsWith(exerciseTitle)) {
       workouts[key]!.$2.add(
-            Exercise.custom(
-              id: exerciseDbKey,
-              parentID: parentExerciseDbKey,
-              name:
-                  "$exerciseTitle ${"settings.options.import.utils.hevy.titles".t}",
-              parameters: _guessParams(
-                weight: weightKg,
-                reps: reps,
-                distance: distanceKm,
-                time: durationSeconds,
-              ),
-              primaryMuscleGroup: GTMuscleGroup.none,
-              secondaryMuscleGroups: {},
-              sets: [],
-              restTime: Duration.zero,
-              notes: exerciseNotes,
-              supersetID: supersetID == null || "$supersetID".isEmpty
-                  ? null
-                  : "${workoutDbKey}_superset_$supersetID",
-              workoutID: workoutDbKey,
-              equipment: GTGymEquipment.none,
-            ),
-          );
+        Exercise.custom(
+          id: exerciseDbKey,
+          parentID: parentExerciseDbKey,
+          name:
+              "$exerciseTitle ${"settings.options.import.utils.hevy.titles".t}",
+          parameters: _guessParams(
+            weight: weightKg,
+            reps: reps,
+            distance: distanceKm,
+            time: durationSeconds,
+          ),
+          primaryMuscleGroup: GTMuscleGroup.none,
+          secondaryMuscleGroups: {},
+          sets: [],
+          restTime: Duration.zero,
+          notes: exerciseNotes,
+          supersetID: supersetID == null || "$supersetID".isEmpty
+              ? null
+              : "${workoutDbKey}_superset_$supersetID",
+          workoutID: workoutDbKey,
+          equipment: GTGymEquipment.none,
+        ),
+      );
 
       if (exercisesToAdd[workouts[key]!.$2.last.parentID] == null) {
-        exercisesToAdd[workouts[key]!.$2.last.parentID!] =
-            workouts[key]!.$2.last.copyWith(
-                  id: workouts[key]!.$2.last.parentID,
-                  parentID: null,
-                  notes: null,
-                );
+        exercisesToAdd[workouts[key]!.$2.last.parentID!] = workouts[key]!
+            .$2
+            .last
+            .copyWith(
+              id: workouts[key]!.$2.last.parentID,
+              parentID: null,
+              notes: workouts[key]!.$2.last.notes,
+            );
       }
     }
 
@@ -169,8 +172,9 @@ ConvertedHevyWorkoutData convertHevyWorkoutData(List<List> rowsAsListOfValues) {
     final supers = <String, List<Exercise>>{};
 
     for (final e in workout.value.$2) {
-      final exerciseParameters =
-          _getStrongestParameter(sets[e.id]!.map((e) => e.parameters).toList());
+      final exerciseParameters = _getStrongestParameter(
+        sets[e.id]!.map((e) => e.parameters).toList(),
+      );
       final obj = e.copyWith(
         sets: sets[e.id]!
             .map((e) => e.copyWith(parameters: exerciseParameters))
@@ -181,7 +185,7 @@ ConvertedHevyWorkoutData convertHevyWorkoutData(List<List> rowsAsListOfValues) {
         rpe: rpes[e.id] == null || rpes[e.id]!.isEmpty
             ? null
             : (rpes[e.id]!.reduce((a, b) => a + b) / rpes[e.id]!.length)
-                .round(),
+                  .round(),
       );
 
       if (obj.supersetID == null) {
@@ -214,20 +218,16 @@ ConvertedHevyWorkoutData convertHevyWorkoutData(List<List> rowsAsListOfValues) {
       supers.clear();
     }
 
-    res.add(workout.value.$1.copyWith(
-      exercises: exs,
-    ));
+    res.add(workout.value.$1.copyWith(exercises: exs));
   }
 
   final customExercises = exercisesToAdd.values.toList();
-  return (
-    workouts: res,
-    customExercises: customExercises,
-  );
+  return (workouts: res, customExercises: customExercises);
 }
 
 ConvertedHevyMeasurementData convertHevyMeasurementData(
-    List<List> rowsAsListOfValues) {
+  List<List> rowsAsListOfValues,
+) {
   final now = DateTime.now().millisecondsSinceEpoch;
 
   // "date","weight_kg","fat_percent","neck_cm","shoulder_cm","chest_cm","left_bicep_cm","right_bicep_cm","left_forearm_cm","right_forearm_cm","abdomen_cm","waist_cm","hips_cm","left_thigh_cm","right_thigh_cm","left_calf_cm","right_calf_cm"

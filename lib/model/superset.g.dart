@@ -19,55 +19,57 @@ abstract class _$SupersetCWProxy {
 
   Superset supersedesID(String? supersedesID);
 
-  /// This function **does support** nullification of nullable fields. All `null` values passed to `non-nullable` fields will be ignored. You can also use `Superset(...).copyWith.fieldName(...)` to override fields one at a time with nullification support.
+  /// Creates a new instance with the provided field values.
+  /// Passing `null` to a nullable field nullifies it, while `null` for a non-nullable field is ignored. To update a single field use `Superset(...).copyWith.fieldName(value)`.
   ///
-  /// Usage
+  /// Example:
   /// ```dart
   /// Superset(...).copyWith(id: 12, name: "My name")
-  /// ````
+  /// ```
   Superset call({
     String? id,
-    List<Exercise>? exercises,
-    Duration? restTime,
-    String? notes,
+    List<Exercise> exercises,
+    Duration restTime,
+    String notes,
     String? workoutID,
     String? supersedesID,
   });
 }
 
-/// Proxy class for `copyWith` functionality. This is a callable class and can be used as follows: `instanceOfSuperset.copyWith(...)`. Additionally contains functions for specific fields e.g. `instanceOfSuperset.copyWith.fieldName(...)`
+/// Callable proxy for `copyWith` functionality.
+/// Use as `instanceOfSuperset.copyWith(...)` or call `instanceOfSuperset.copyWith.fieldName(value)` for a single field.
 class _$SupersetCWProxyImpl implements _$SupersetCWProxy {
   const _$SupersetCWProxyImpl(this._value);
 
   final Superset _value;
 
   @override
-  Superset id(String? id) => this(id: id);
+  Superset id(String? id) => call(id: id);
 
   @override
-  Superset exercises(List<Exercise> exercises) => this(exercises: exercises);
+  Superset exercises(List<Exercise> exercises) => call(exercises: exercises);
 
   @override
-  Superset restTime(Duration restTime) => this(restTime: restTime);
+  Superset restTime(Duration restTime) => call(restTime: restTime);
 
   @override
-  Superset notes(String notes) => this(notes: notes);
+  Superset notes(String notes) => call(notes: notes);
 
   @override
-  Superset workoutID(String? workoutID) => this(workoutID: workoutID);
+  Superset workoutID(String? workoutID) => call(workoutID: workoutID);
 
   @override
   Superset supersedesID(String? supersedesID) =>
-      this(supersedesID: supersedesID);
+      call(supersedesID: supersedesID);
 
   @override
-
-  /// This function **does support** nullification of nullable fields. All `null` values passed to `non-nullable` fields will be ignored. You can also use `Superset(...).copyWith.fieldName(...)` to override fields one at a time with nullification support.
+  /// Creates a new instance with the provided field values.
+  /// Passing `null` to a nullable field nullifies it, while `null` for a non-nullable field is ignored. To update a single field use `Superset(...).copyWith.fieldName(value)`.
   ///
-  /// Usage
+  /// Example:
   /// ```dart
   /// Superset(...).copyWith(id: 12, name: "My name")
-  /// ````
+  /// ```
   Superset call({
     Object? id = const $CopyWithPlaceholder(),
     Object? exercises = const $CopyWithPlaceholder(),
@@ -106,7 +108,8 @@ class _$SupersetCWProxyImpl implements _$SupersetCWProxy {
 }
 
 extension $SupersetCopyWith on Superset {
-  /// Returns a callable class that can be used as follows: `instanceOfSuperset.copyWith(...)` or like so:`instanceOfSuperset.copyWith.fieldName(...)`.
+  /// Returns a callable class used to build a new instance with modified fields.
+  /// Example: `instanceOfSuperset.copyWith(...)` or `instanceOfSuperset.copyWith.fieldName(...)`.
   // ignore: library_private_types_in_public_api
   _$SupersetCWProxy get copyWith => _$SupersetCWProxyImpl(this);
 }
@@ -116,21 +119,21 @@ extension $SupersetCopyWith on Superset {
 // **************************************************************************
 
 Superset _$SupersetFromJson(Map<String, dynamic> json) => Superset(
-      id: json['id'] as String?,
-      exercises: (json['exercises'] as List<dynamic>)
-          .map((e) => Exercise.fromJson(e as Map<String, dynamic>))
-          .toList(),
-      restTime: Duration(microseconds: (json['restTime'] as num).toInt()),
-      notes: json['notes'] as String? ?? '',
-      workoutID: json['workoutID'] as String?,
-      supersedesID: json['supersedesID'] as String?,
-    );
+  id: json['id'] as String?,
+  exercises: (json['exercises'] as List<dynamic>)
+      .map((e) => Exercise.fromJson(e as Map<String, dynamic>))
+      .toList(),
+  restTime: Duration(microseconds: (json['restTime'] as num).toInt()),
+  notes: json['notes'] as String? ?? '',
+  workoutID: json['workoutID'] as String?,
+  supersedesID: json['supersedesID'] as String?,
+);
 
 Map<String, dynamic> _$SupersetToJson(Superset instance) => <String, dynamic>{
-      'id': instance.id,
-      'exercises': instance.exercises,
-      'restTime': instance.restTime.inMicroseconds,
-      'notes': instance.notes,
-      'workoutID': instance.workoutID,
-      'supersedesID': instance.supersedesID,
-    };
+  'id': instance.id,
+  'exercises': instance.exercises,
+  'restTime': instance.restTime.inMicroseconds,
+  'notes': instance.notes,
+  'workoutID': instance.workoutID,
+  'supersedesID': instance.supersedesID,
+};

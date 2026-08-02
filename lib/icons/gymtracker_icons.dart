@@ -18,6 +18,8 @@
 ///         License:   SIL (https://github.com/FortAwesome/Font-Awesome/blob/master/LICENSE.txt)
 ///         Homepage:  http://fortawesome.github.com/Font-Awesome/
 ///
+///
+/// Edit with https://www.glyphrstudio.com/.
 // ignore_for_file: non_constant_identifier_names
 
 import 'package:flutter/material.dart';
@@ -28,6 +30,8 @@ class CompoundIcon extends StatelessWidget {
   final double mainSize;
   final double accessorySize;
   final double holeSize;
+  final Color? mainColor;
+  final Color? accessoryColor;
 
   const CompoundIcon({
     super.key,
@@ -36,6 +40,8 @@ class CompoundIcon extends StatelessWidget {
     this.mainSize = 24,
     this.accessorySize = 12,
     this.holeSize = 0.7,
+    this.mainColor,
+    this.accessoryColor,
   });
 
   const CompoundIcon.sized({
@@ -44,40 +50,63 @@ class CompoundIcon extends StatelessWidget {
     required this.accessory,
     double size = 24,
     this.holeSize = 0.7,
-  })  : mainSize = size,
-        accessorySize = size * 0.7;
+    this.mainColor,
+    this.accessoryColor,
+  }) : mainSize = size,
+       accessorySize = size * 0.6;
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        ShaderMask(
-          shaderCallback: (Rect bounds) {
-            return RadialGradient(
-              center: AlignmentDirectional.bottomEnd
-                  .resolve(Directionality.of(context)),
-              // radius: 0.37,
-              radius: 1,
-              colors: [
-                Colors.white.withAlpha(0),
-                Colors.white,
-              ],
-              stops: [holeSize, holeSize],
-              tileMode: TileMode.clamp,
-            ).createShader(bounds);
-          },
-          child: Padding(
-            padding: const EdgeInsetsDirectional.fromSTEB(0, 0, 4, 4),
-            child: Icon(main, size: mainSize),
+    return SizedBox(
+      width: mainSize,
+      height: mainSize,
+      child: Stack(
+        clipBehavior: .none,
+        fit: .passthrough,
+        children: [
+          SizedBox(
+            width: mainSize,
+            height: mainSize,
+            child: ShaderMask(
+              shaderCallback: (Rect bounds) {
+                return RadialGradient(
+                  center: AlignmentDirectional.bottomEnd.resolve(
+                    Directionality.of(context),
+                  ),
+                  // radius: 0.37,
+                  radius: 1,
+                  colors: [Colors.white.withAlpha(0), Colors.white],
+                  stops: [holeSize, holeSize],
+                  tileMode: TileMode.clamp,
+                ).createShader(bounds);
+              },
+              child: Padding(
+                padding: const EdgeInsetsDirectional.fromSTEB(0, 0, 4, 4),
+                child: Icon(main, size: mainSize, color: mainColor),
+              ),
+              // child: Icon(main, size: mainSize, color: mainColor),
+            ),
           ),
-        ),
-        Positioned.directional(
-          textDirection: Directionality.of(context),
-          bottom: 0,
-          end: -2,
-          child: Icon(accessory, size: accessorySize),
-        ),
-      ],
+          Positioned.directional(
+            textDirection: Directionality.of(context),
+            bottom: -3,
+            end: -1,
+            child: Icon(accessory, size: accessorySize, color: accessoryColor),
+          ),
+        ],
+      ),
+    );
+  }
+
+  CompoundIcon withColors({Color? mainColor, Color? accessoryColor}) {
+    return CompoundIcon(
+      main: main,
+      accessory: accessory,
+      mainSize: mainSize,
+      accessorySize: accessorySize,
+      holeSize: holeSize,
+      mainColor: mainColor ?? this.mainColor,
+      accessoryColor: accessoryColor ?? this.accessoryColor,
     );
   }
 }
@@ -90,12 +119,31 @@ class GTIcons {
 
   static const compound = _GymTrackerCompoundIcons();
 
-  static const IconData _fire =
-      IconData(0xf06d, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData _sparkles =
-      IconData(0xf06e, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData _appIcon =
-      IconData(0xf06f, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData _fire = IconData(
+    0xf06d,
+    fontFamily: _kFontFam,
+    fontPackage: _kFontPkg,
+  );
+  static const IconData _sparkles = IconData(
+    0xf06e,
+    fontFamily: _kFontFam,
+    fontPackage: _kFontPkg,
+  );
+  static const IconData _appIcon = IconData(
+    0xf06f,
+    fontFamily: _kFontFam,
+    fontPackage: _kFontPkg,
+  );
+  static const IconData _pro = IconData(
+    0xf070,
+    fontFamily: _kFontFam,
+    fontPackage: _kFontPkg,
+  );
+  static const IconData _muscle = IconData(
+    0xf06f,
+    fontFamily: _kFontFam,
+    fontPackage: _kFontPkg,
+  );
 
   static const IconData account = Icons.account_circle_rounded;
   static const IconData achievements = Icons.emoji_events_rounded;
@@ -166,6 +214,7 @@ class GTIcons {
   static const IconData logs = Icons.assignment_rounded;
   static const IconData lt_chevron = Icons.chevron_right_rounded;
   static const IconData migration = Icons.keyboard_double_arrow_right_rounded;
+  static const IconData muscle = _muscle;
   static const IconData nextDay = Icons.arrow_forward;
   static const IconData no_routine = Icons.circle_outlined;
   static const IconData notes = Icons.note_alt_outlined;
@@ -177,6 +226,7 @@ class GTIcons {
   static const IconData permissions = Icons.security_rounded;
   static const IconData picked = Icons.done_rounded;
   static const IconData previousDay = Icons.arrow_back;
+  static const IconData pro = _pro;
   static const IconData profile = Icons.person_rounded;
   static const IconData remove_from_faves = Icons.star_rounded;
   static const IconData reorder = Icons.compare_arrows_rounded;
@@ -215,6 +265,7 @@ class GTIcons {
     'account': account,
     'achievements': achievements,
     'achievement_locked': achievement_locked,
+    'active_energy': active_energy,
     'add_exercise': add_exercise,
     'add_food': add_food,
     'add_measurement': add_measurement,
@@ -252,6 +303,7 @@ class GTIcons {
     'duration': duration,
     'edit': edit,
     'empty_workout': empty_workout,
+    'exertion': exertion,
     'explanation': explanation,
     'export': export,
     'favorite': favorite,
@@ -263,6 +315,8 @@ class GTIcons {
     'food_categories': food_categories,
     'gallery': gallery,
     'generate': generate,
+    'health': health,
+    'heart_rate': heart_rate,
     'help': help,
     'highlight': highlight,
     'history': history,
@@ -270,6 +324,7 @@ class GTIcons {
     'import': import,
     'increase': increase,
     'info': info,
+    'insert': insert,
     'info_outline': info_outline,
     'keyboard': keyboard,
     'library': library,
@@ -286,12 +341,14 @@ class GTIcons {
     'permissions': permissions,
     'picked': picked,
     'previousDay': previousDay,
+    'pro': pro,
     'profile': profile,
     'remove_from_faves': remove_from_faves,
     'reorder': reorder,
     'replace': replace,
     'reps': reps,
     'reset': reset,
+    'rest_timer': rest_timer,
     'resume': resume,
     'routines': routines,
     'rpe': rpe,
@@ -309,6 +366,7 @@ class GTIcons {
     'streak_weeks': streak_weeks,
     'superset': superset,
     'time': time,
+    'tools': tools,
     'units': units,
     'volume': volume,
     'weight_calculator': weight_calculator,
@@ -323,8 +381,11 @@ class GTIcons {
 class _GymTrackerCompoundIcons {
   const _GymTrackerCompoundIcons();
 
-  Widget get add_food_category => const CompoundIcon.sized(
-        main: GTIcons.food_categories,
-        accessory: Icons.add_rounded,
-      );
+  CompoundIcon get add_food_category => const CompoundIcon.sized(
+    main: GTIcons.food_categories,
+    accessory: Icons.add_rounded,
+  );
+
+  CompoundIcon get pro =>
+      const CompoundIcon.sized(main: GTIcons._appIcon, accessory: GTIcons._pro);
 }

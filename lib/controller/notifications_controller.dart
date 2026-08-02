@@ -200,19 +200,17 @@ class NotificationController extends GetxController implements Listenable {
       iOS: darwinDetails,
     );
     service.plugin.zonedSchedule(
-      NotificationIDs.restTimer,
-      'appName'.t,
-      'ongoingWorkout.restOver'.t,
-      targetTimeTZ,
-      notificationDetails,
-      uiLocalNotificationDateInterpretation:
-          UILocalNotificationDateInterpretation.wallClockTime,
+      id: NotificationIDs.restTimer,
+      title: 'appName'.t,
+      body: 'ongoingWorkout.restOver'.t,
+      scheduledDate: targetTimeTZ,
+      notificationDetails: notificationDetails,
       androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
     );
   }
 
   void cancelRestOverNotification() {
-    service.plugin.cancel(NotificationIDs.restTimer);
+    service.plugin.cancel(id: NotificationIDs.restTimer);
   }
 
   void notifyListeners() {

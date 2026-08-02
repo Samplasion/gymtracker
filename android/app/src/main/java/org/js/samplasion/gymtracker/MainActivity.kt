@@ -18,6 +18,7 @@ import androidx.core.app.NotificationCompat.Action
 import androidx.core.app.NotificationCompat.EXTRA_NOTIFICATION_ID
 import androidx.core.app.NotificationManagerCompat
 import io.flutter.embedding.android.FlutterActivity
+import io.flutter.embedding.android.FlutterFragmentActivity
 import io.flutter.embedding.engine.FlutterEngine
 import java.time.Instant
 import java.time.LocalDateTime
@@ -32,7 +33,7 @@ const val ACTION_MARK = "org.js.samplasion.MARK_COMPLETED"
 /// The ID for the platform-specific live activity notification
 const val NOTIFICATION_ID = 1
 
-class MainActivity: FlutterActivity() {
+class MainActivity: FlutterFragmentActivity() {
     lateinit var nativeApi: GymBroNativeFlutterAPI
     lateinit var logger: GymBroNativeLoggerChannel
     val api = GymBroNativeHostAPIImpl()
@@ -84,7 +85,7 @@ class MainActivity: FlutterActivity() {
         private val notificationBuilder = NotificationCompat.Builder(this@MainActivity, CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_notifications)
             .setContentTitle("Live Activity")
-            .setContentText("blah blah blah")
+            .setContentText("Live workout status")
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             .setOngoing(true)
             .setSilent(true)

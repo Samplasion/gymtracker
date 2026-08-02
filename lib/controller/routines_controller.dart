@@ -21,6 +21,7 @@ import 'package:gymtracker/model/workout.dart';
 import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/service/logger.dart';
 import 'package:gymtracker/service/native.dart';
+import 'package:gymtracker/service/protocol.dart';
 import 'package:gymtracker/service/share.dart';
 import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/utils/go.dart';
@@ -30,14 +31,10 @@ import 'package:gymtracker/view/routines.dart';
 import 'package:gymtracker/view/utils/history_workout.dart';
 import 'package:gymtracker/view/utils/import_routine.dart';
 import 'package:gymtracker/view/utils/workout_navigation.dart';
-import 'package:protocol_handler/protocol_handler.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:screenshot/screenshot.dart';
 
-typedef RoutineSuggestion = ({
-  Workout routine,
-  int occurrences,
-});
+typedef RoutineSuggestion = ({Workout routine, int occurrences});
 
 class RoutinesController extends GetxController
     with ServiceableController, ProtocolListener {
@@ -55,7 +52,7 @@ class RoutinesController extends GetxController
   @override
   onInit() {
     super.onInit();
-    protocolHandler.addListener(this);
+    ProtocolService().addListener(this);
 
     service.routines$.listen((event) {
       logger.i("Updated with ${event.length} routines");
@@ -64,8 +61,9 @@ class RoutinesController extends GetxController
       _recomputeFolders(service.folders$.valueOrNull ?? []);
 
       if (_init) {
-        Get.find<Coordinator>()
-            .maybeUnlockAchievements(AchievementTrigger.routines);
+        Get.find<Coordinator>().maybeUnlockAchievements(
+          AchievementTrigger.routines,
+        );
       }
 
       NativeService.instance().updateShadowRoutines({
@@ -81,7 +79,7 @@ class RoutinesController extends GetxController
 
   @override
   onClose() {
-    protocolHandler.removeListener(this);
+    ProtocolService().removeListener(this);
     super.onClose();
   }
 
@@ -177,10 +175,7 @@ class RoutinesController extends GetxController
     return workout.isContinuable;
   }
 
-  Future<void> continueWorkout(
-    BuildContext context,
-    Workout workout,
-  ) async {
+  Future<void> continueWorkout(BuildContext context, Workout workout) async {
     if (hasOngoingWorkout.isTrue) {
       final result = await showDialog<bool>(
         context: context,
@@ -290,19 +285,13 @@ class RoutinesController extends GetxController
     workouts([...list, ...old]);
   }
 
-  List<Workout> getChildren(
-    Workout routine, {
-    bool allowSynthesized = false,
-  }) {
+  List<Workout> getChildren(Workout routine, {bool allowSynthesized = false}) {
     final historyCont = Get.find<HistoryController>();
     return [
       for (final workout in historyCont.history)
         if (workout.parentID == routine.id && !workout.isContinuation)
           if (allowSynthesized)
-            workout.synthesizeContinuations(
-              previous: false,
-              next: true,
-            )
+            workout.synthesizeContinuations(previous: false, next: true)
           else
             workout,
     ];
@@ -327,9 +316,7 @@ class RoutinesController extends GetxController
         return AlertDialog(
           icon: const Icon(GTIcons.info),
           title: Text("routines.actions.delete.title".t),
-          content: Text(
-            "routines.actions.delete.text".t,
-          ),
+          content: Text("routines.actions.delete.text".t),
           actions: [
             TextButton(
               onPressed: () {
@@ -384,7 +371,7 @@ class RoutinesController extends GetxController
   }
 
   @override
-  onProtocolUrlReceived(String url) {
+  void onProtocolUrlReceived(String url) {
     final Uri parsed = Uri.parse(url);
     logger.i('Url received: $parsed');
 
@@ -472,9 +459,7 @@ class RoutinesController extends GetxController
     final uri = Uri(
       scheme: "gymtracker",
       host: "routine",
-      queryParameters: {
-        "json": jsonEncode(routine.shareWorkout()).compressed,
-      },
+      queryParameters: {"json": jsonEncode(routine.shareWorkout()).compressed},
     );
     showDialog(
       context: Get.context!,
@@ -486,9 +471,10 @@ class RoutinesController extends GetxController
     return workouts.any(
       (routine) => routine.exercises.any((element) {
         return element.map(
-            exercise: (ex) => exercise.isParentOf(ex),
-            superset: (ss) =>
-                ss.exercises.any((element) => exercise.isParentOf(element)));
+          exercise: (ex) => exercise.isParentOf(ex),
+          superset: (ss) =>
+              ss.exercises.any((element) => exercise.isParentOf(element)),
+        );
       }),
     );
   }
@@ -506,7 +492,8 @@ class RoutinesController extends GetxController
         appBar: AppBar(title: Text("routines.actions.viewHistory".t)),
         body: Scrollbar(
           child: ListView.builder(
-            padding: const EdgeInsets.symmetric(vertical: 8) +
+            padding:
+                const EdgeInsets.symmetric(vertical: 8) +
                 MediaQuery.of(Get.context!).padding.copyWith(top: 0),
             itemCount: history.length,
             itemBuilder: (context, index) {
@@ -526,9 +513,7 @@ class RoutinesController extends GetxController
   }
 
   void createFolder() {
-    final folder = GTRoutineFolder.generate(
-      name: "routines.newFolder".t,
-    );
+    final folder = GTRoutineFolder.generate(name: "routines.newFolder".t);
     service.addFolder(folder);
     coordinator.scheduleBackup();
   }
@@ -550,12 +535,11 @@ class RoutinesController extends GetxController
   void _recomputeFolders(List<GTRoutineFolder> fld) {
     final res = <String, List<Workout>>{};
     for (final folder in fld) {
-      res[folder.id] =
-          service.routines.where((r) => r.folder?.id == folder.id).toList();
+      res[folder.id] = service.routines
+          .where((r) => r.folder?.id == folder.id)
+          .toList();
     }
-    folders({
-      for (final folder in fld) folder: res[folder.id] ?? [],
-    });
+    folders({for (final folder in fld) folder: res[folder.id] ?? []});
   }
 
   Future<void> editFolderScreen(GTRoutineFolder folder) async {
@@ -597,10 +581,7 @@ class RoutinesController extends GetxController
               ex.map(
                 exercise: (ex) {
                   if (from.isTheSameAs(ex)) {
-                    return Exercise.replaced(
-                      from: ex,
-                      to: to.makeChild(),
-                    );
+                    return Exercise.replaced(from: ex, to: to.makeChild());
                   } else {
                     return ex;
                   }
@@ -609,10 +590,7 @@ class RoutinesController extends GetxController
                   exercises: [
                     for (final ex in ss.exercises)
                       if (from.isTheSameAs(ex))
-                        Exercise.replaced(
-                          from: ex,
-                          to: to.makeChild(),
-                        )
+                        Exercise.replaced(from: ex, to: to.makeChild())
                       else
                         ex,
                   ],
@@ -689,9 +667,7 @@ class RoutinesController extends GetxController
                     return ex.copyWith(
                       sets: [
                         for (final set in ex.sets)
-                          set.copyWith(
-                            weight: set.weight! * multiplier,
-                          ),
+                          set.copyWith(weight: set.weight! * multiplier),
                       ],
                     );
                   } else {
@@ -705,9 +681,7 @@ class RoutinesController extends GetxController
                         ex.copyWith(
                           sets: [
                             for (final set in ex.sets)
-                              set.copyWith(
-                                weight: set.weight! * multiplier,
-                              ),
+                              set.copyWith(weight: set.weight! * multiplier),
                           ],
                         )
                       else

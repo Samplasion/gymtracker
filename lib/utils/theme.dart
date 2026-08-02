@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:gymtracker/utils/constants.dart';
 import 'package:gymtracker/utils/extensions.dart';
-import 'package:gymtracker/view/utils/input_decoration.dart';
 
 const kDarkBackgroundBase = Color(0xFF000000);
 const kDarkBackgroundLight1 = Color(0xFF111111);
@@ -17,40 +16,50 @@ const kLightForeground = Color(0xFF1D1B1B);
 const kAppBarRadius = 16.0;
 
 ThemeData getGymTrackerThemeFor(
-    BuildContext context, Color seedColor, Brightness brightness) {
+  BuildContext context,
+  Color seedColor,
+  Brightness brightness,
+) {
   late FlexColorScheme scheme = switch (brightness) {
     Brightness.light => FlexColorScheme.light(
-        colors: FlexSchemeColor.from(
-          primary: seedColor,
-          secondary: seedColor,
-          brightness: brightness,
-        ),
+      colors: FlexSchemeColor.from(
+        primary: seedColor,
+        secondary: seedColor,
+        brightness: brightness,
       ),
+    ),
     Brightness.dark => FlexColorScheme.dark(
-        colors: FlexSchemeColor.from(
-          primary: seedColor,
-          secondary: seedColor,
-          brightness: brightness,
-        ),
+      colors: FlexSchemeColor.from(
+        primary: seedColor,
+        secondary: seedColor,
+        brightness: brightness,
       ),
+    ),
   };
-  var pageTransitionsTheme = PageTransitionsTheme(builders: {
-    TargetPlatform.android: _SharedAxisTransitionBuilder(),
-    TargetPlatform.iOS: _SharedAxisTransitionBuilder(),
-    TargetPlatform.macOS: _SharedAxisTransitionBuilder(),
-  });
+  var pageTransitionsTheme = PageTransitionsTheme(
+    builders: {
+      TargetPlatform.android: _SharedAxisTransitionBuilder(),
+      TargetPlatform.iOS: _SharedAxisTransitionBuilder(),
+      TargetPlatform.macOS: _SharedAxisTransitionBuilder(),
+    },
+  );
   final equivalentScheme = scheme.toScheme;
 
   var subThemesData = FlexSubThemesData(
     interactionEffects: true,
     blendOnColors: true,
+    appBarScrolledUnderElevation: 64,
     scaffoldBackgroundBaseColor: FlexScaffoldBaseColor.lowestBase,
     defaultRadius: 8.0,
     cardRadius: 12,
     inputDecoratorIsFilled: true,
     inputDecoratorIsDense: true,
-    inputDecoratorContentPadding:
-        const EdgeInsetsDirectional.fromSTEB(12, 8, 12, 8),
+    inputDecoratorContentPadding: const EdgeInsetsDirectional.fromSTEB(
+      12,
+      8,
+      12,
+      8,
+    ),
     inputDecoratorBorderType: FlexInputBorderType.outline,
     inputDecoratorBorderSchemeColor: SchemeColor.primary,
     inputDecoratorUnfocusedHasBorder: false,
@@ -58,79 +67,78 @@ ThemeData getGymTrackerThemeFor(
     chipSecondarySelectedSchemeColor: SchemeColor.primaryContainer,
     popupMenuSchemeColor: SchemeColor.surfaceContainerHigh,
     alignedDropdown: true,
-    tooltipRadius: 4,
+    tooltipRadius: 12,
     tooltipSchemeColor: SchemeColor.inverseSurface,
     snackBarElevation: 6,
     snackBarBackgroundSchemeColor: SchemeColor.inverseSurface,
     navigationRailUseIndicator: true,
     navigationRailLabelType: NavigationRailLabelType.all,
     drawerIndicatorSchemeColor: SchemeColor.primaryContainer,
-    inputDecoratorFillColor: equivalentScheme.surfaceContainerHighest
-        .withAlpha((0.45 * 255).round()),
+    inputDecoratorFillColor: equivalentScheme.surfaceContainerHighest.withAlpha(
+      (0.45 * 255).round(),
+    ),
     navigationRailMinWidth: 96,
     menuSchemeColor: SchemeColor.surfaceContainerHigh,
+    navigationBarIndicatorSchemeColor: .primary,
+    navigationBarBackgroundSchemeColor: .secondaryContainer,
   );
 
   return switch (brightness) {
     Brightness.light => FlexThemeData.light(
-        colors: FlexSchemeColor.from(
-          primary: seedColor,
-          secondary: seedColor,
-          tertiary: seedColor,
-          brightness: brightness,
-        ),
-        usedColors: 3,
-        subThemesData: subThemesData,
-        appBarStyle: FlexAppBarStyle.scaffoldBackground,
-        keyColors: const FlexKeyColors(
-          useSecondary: true,
-          keepPrimary: true,
-          keepSecondary: true,
-          keepSecondaryContainer: true,
-          useTertiary: true,
-          keepTertiary: true,
-        ),
-        tones: FlexSchemeVariant.jolly
-            .tones(Brightness.light)
-            .surfacesUseBW()
-            .monochromeSurfaces(),
-        visualDensity: FlexColorScheme.comfortablePlatformDensity,
-        cupertinoOverrideTheme: const CupertinoThemeData(applyThemeToAll: true),
-        extensions: [
-          MoreColors.fromColorScheme(equivalentScheme),
-        ],
-        pageTransitionsTheme: pageTransitionsTheme,
-        splashFactory: platformDependentSplashFactory,
+      colors: FlexSchemeColor.from(
+        primary: seedColor,
+        secondary: seedColor,
+        tertiary: seedColor,
+        brightness: brightness,
       ),
+      usedColors: 3,
+      subThemesData: subThemesData,
+      appBarStyle: FlexAppBarStyle.scaffoldBackground,
+      keyColors: const FlexKeyColors(
+        useSecondary: true,
+        keepPrimary: true,
+        keepSecondary: true,
+        keepSecondaryContainer: true,
+        useTertiary: true,
+        keepTertiary: true,
+      ),
+      tones: FlexSchemeVariant.jolly
+          .tones(Brightness.light)
+          .surfacesUseBW()
+          .monochromeSurfaces(),
+      visualDensity: FlexColorScheme.comfortablePlatformDensity,
+      cupertinoOverrideTheme: const CupertinoThemeData(applyThemeToAll: true),
+      extensions: [MoreColors.fromColorScheme(equivalentScheme)],
+      pageTransitionsTheme: pageTransitionsTheme,
+      splashFactory: platformDependentSplashFactory,
+    ),
     Brightness.dark => FlexThemeData.dark(
-        colors: FlexSchemeColor.from(
-          primary: seedColor,
-          secondary: seedColor,
-          brightness: brightness,
-        ),
-        usedColors: 3,
-        subThemesData: subThemesData,
-        appBarStyle: FlexAppBarStyle.scaffoldBackground,
-        keyColors: const FlexKeyColors(
-          useSecondary: true,
-          keepPrimary: true,
-          keepSecondary: true,
-          keepSecondaryContainer: true,
-          useTertiary: true,
-          keepTertiary: true,
-        ),
-        tones: FlexSchemeVariant.jolly
-            .tones(Brightness.dark)
-            .surfacesUseBW()
-            .monochromeSurfaces(),
-        visualDensity: FlexColorScheme.comfortablePlatformDensity,
-        cupertinoOverrideTheme: const CupertinoThemeData(applyThemeToAll: true),
-        extensions: [
-          MoreColors.fromColorScheme(equivalentScheme),
-        ],
-        pageTransitionsTheme: pageTransitionsTheme,
-        splashFactory: platformDependentSplashFactory,
+      colors: FlexSchemeColor.from(
+        primary: seedColor,
+        secondary: seedColor,
+        brightness: brightness,
       ),
+      usedColors: 3,
+      subThemesData: subThemesData,
+      appBarStyle: FlexAppBarStyle.scaffoldBackground,
+      keyColors: const FlexKeyColors(
+        useSecondary: true,
+        keepPrimary: true,
+        keepSecondary: true,
+        keepSecondaryContainer: true,
+        useTertiary: true,
+        keepTertiary: true,
+      ),
+      tones: FlexSchemeVariant.jolly
+          .tones(Brightness.dark)
+          .surfacesUseBW()
+          .monochromeSurfaces(),
+      visualDensity: FlexColorScheme.comfortablePlatformDensity,
+      cupertinoOverrideTheme: const CupertinoThemeData(applyThemeToAll: true),
+      extensions: [MoreColors.fromColorScheme(equivalentScheme)],
+      pageTransitionsTheme: pageTransitionsTheme,
+      splashFactory: platformDependentSplashFactory,
+    ),
   };
 }
 
@@ -169,19 +177,18 @@ class MoreColors extends ThemeExtension<MoreColors> {
     }) {
       return switch (brightness) {
         Brightness.light => FlexColorScheme.light(
-            colors: FlexSchemeColor.from(
-              primary: seedColor,
-              brightness: brightness,
-            ),
+          colors: FlexSchemeColor.from(
+            primary: seedColor,
+            brightness: brightness,
           ),
+        ),
         Brightness.dark => FlexColorScheme.dark(
-            colors: FlexSchemeColor.from(
-              primary: seedColor,
-              brightness: brightness,
-            ),
+          colors: FlexSchemeColor.from(
+            primary: seedColor,
+            brightness: brightness,
           ),
-      }
-          .toScheme;
+        ),
+      }.toScheme;
     }
 
     final quaternary = colorScheme.primary.pentadicColors[4];
@@ -252,18 +259,18 @@ class MoreColors extends ThemeExtension<MoreColors> {
           Color.lerp(onQuaternary, other.onQuaternary, t) ?? onQuaternary,
       quaternaryContainer:
           Color.lerp(quaternaryContainer, other.quaternaryContainer, t) ??
-              quaternaryContainer,
+          quaternaryContainer,
       onQuaternaryContainer:
           Color.lerp(onQuaternaryContainer, other.onQuaternaryContainer, t) ??
-              onQuaternaryContainer,
+          onQuaternaryContainer,
       quinary: Color.lerp(quinary, other.quinary, t) ?? quinary,
       onQuinary: Color.lerp(onQuinary, other.onQuinary, t) ?? onQuinary,
       quinaryContainer:
           Color.lerp(quinaryContainer, other.quinaryContainer, t) ??
-              quinaryContainer,
+          quinaryContainer,
       onQuinaryContainer:
           Color.lerp(onQuinaryContainer, other.onQuinaryContainer, t) ??
-              onQuinaryContainer,
+          onQuinaryContainer,
     );
   }
 
@@ -294,11 +301,12 @@ extension MoreColorsOnColorScheme on ColorScheme {
 class _SharedAxisTransitionBuilder extends PageTransitionsBuilder {
   @override
   Widget buildTransitions<T>(
-      PageRoute<T> route,
-      BuildContext context,
-      Animation<double> animation,
-      Animation<double> secondaryAnimation,
-      Widget child) {
+    PageRoute<T> route,
+    BuildContext context,
+    Animation<double> animation,
+    Animation<double> secondaryAnimation,
+    Widget child,
+  ) {
     return SharedAxisTransition(
       transitionType: SharedAxisTransitionType.horizontal,
       animation: animation,

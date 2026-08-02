@@ -38,9 +38,10 @@ void main() async {
     await ColorService().init();
     await VersionService().init();
 
-    final String currentTimeZone = await FlutterTimezone.getLocalTimezone();
+    final TimezoneInfo currentTimeZone =
+        await FlutterTimezone.getLocalTimezone();
     tz.initializeTimeZones();
-    tz.setLocalLocation(tz.getLocation(currentTimeZone));
+    tz.setLocalLocation(tz.getLocation(currentTimeZone.identifier));
 
     await l.initTests(const [Locale("en")]);
   });

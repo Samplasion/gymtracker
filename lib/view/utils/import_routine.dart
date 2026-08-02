@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:gymtracker/controller/purchases_controller.dart';
 import 'package:gymtracker/controller/routines_controller.dart';
 import 'package:gymtracker/model/workout.dart';
 import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/utils/go.dart';
+import 'package:gymtracker/view/components/badges.dart';
 import 'package:gymtracker/view/components/gradient_bottom_bar.dart';
+import 'package:gymtracker/view/components/pro_builder.dart';
 import 'package:gymtracker/view/components/routines.dart';
 
 class ImportRoutineModal extends StatefulWidget {
@@ -18,8 +21,9 @@ class ImportRoutineModal extends StatefulWidget {
 
 class _ImportRoutineModalState extends State<ImportRoutineModal>
     with SingleTickerProviderStateMixin {
-  late AnimationController controller =
-      BottomSheet.createAnimationController(this);
+  late AnimationController controller = BottomSheet.createAnimationController(
+    this,
+  );
   Workout get workout => widget.workout;
 
   @override
@@ -44,13 +48,33 @@ class _ImportRoutineModalState extends State<ImportRoutineModal>
             onPressed: () => Get.back(),
             child: Text(MaterialLocalizations.of(context).cancelButtonLabel),
           ),
-          FilledButton(
-            onPressed: () {
-              Get.back();
-              Get.find<RoutinesController>().importWorkout(workout);
-              Go.snack("importRoutine.import.done".t);
+          ProBuilder(
+            builder: (context, subscriptionInfo) {
+              final shouldDisable =
+                  subscriptionInfo == null || !subscriptionInfo.hasProFeatures;
+              return FilledButton(
+                onPressed: () {
+                  if (shouldDisable) {
+                    Get.find<PurchasesController>().presentPaywall();
+                    return;
+                  }
+                  Get.back();
+                  Get.find<RoutinesController>().importWorkout(workout);
+                  Go.snack("importRoutine.import.done".t);
+                },
+                child: Text.rich(
+                  TextSpan(
+                    text: 'importRoutine.import.label'.t,
+                    children: [
+                      if (shouldDisable) ...[
+                        const TextSpan(text: " "),
+                        WidgetSpan(child: ProBadge()),
+                      ],
+                    ],
+                  ),
+                ),
+              );
             },
-            child: Text('importRoutine.import.label'.t),
           ),
         ],
       ),

@@ -57,17 +57,14 @@ class _GTRichTextEditorState extends State<GTRichTextEditor> {
         children: [
           QuillEditor.basic(
             focusNode: _focusNode,
-            configurations: QuillEditorConfigurations(
-              controller: widget.infoboxController,
-              sharedConfigurations: QuillSharedConfigurations(
-                locale: Get.locale!,
-              ),
+            controller: widget.infoboxController,
+            config: QuillEditorConfig(
               minHeight: context.textTheme.bodyMedium!.height! *
                   context.textTheme.bodyMedium!.fontSize! *
                   3,
               scrollable: true,
               expands: false,
-              isOnTapOutsideEnabled: true,
+              onTapOutsideEnabled: true,
               autoFocus: widget.autofocus,
               keyboardAppearance: context.theme.brightness,
               onTapOutside: (_, __) {
@@ -83,8 +80,9 @@ class _GTRichTextEditorState extends State<GTRichTextEditor> {
           ),
           if (shouldShowToolbar) ...[
             const Divider(),
-            QuillToolbar.simple(
-              configurations: QuillSimpleToolbarConfigurations(
+            QuillSimpleToolbar(
+              controller: widget.infoboxController,
+              config: QuillSimpleToolbarConfig(
                 showDividers: false,
                 showFontFamily: false,
                 showSearchButton: false,
@@ -99,10 +97,6 @@ class _GTRichTextEditorState extends State<GTRichTextEditor> {
                 showSuperscript: false,
                 showSubscript: false,
                 toolbarSectionSpacing: 0,
-                controller: widget.infoboxController,
-                sharedConfigurations: QuillSharedConfigurations(
-                  locale: Get.locale!,
-                ),
                 customButtons: [
                   QuillToolbarCustomButtonOptions(
                     // TODO: Figure out how to make this appear on when the text is highlighted

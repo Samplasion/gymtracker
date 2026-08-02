@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_sticky_header/flutter_sticky_header.dart';
 import 'package:get/get.dart';
 import 'package:gymtracker/controller/history_controller.dart';
+import 'package:gymtracker/data/configuration.dart';
 import 'package:gymtracker/icons/gymtracker_icons.dart';
 import 'package:gymtracker/model/workout.dart';
 import 'package:gymtracker/service/localizations.dart';
@@ -9,6 +10,7 @@ import 'package:gymtracker/service/logger.dart';
 import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/utils/skeletons.dart';
 import 'package:gymtracker/utils/theme.dart';
+import 'package:gymtracker/view/components/subscription_nag.dart';
 import 'package:gymtracker/view/exercises.dart';
 import 'package:gymtracker/view/me/calendar.dart';
 import 'package:gymtracker/view/skeleton.dart';
@@ -27,10 +29,7 @@ final List<Workout> fakeData = List.generate(7, (_) => skeletonWorkout());
 Map<MonthYear, List<Workout>> _getHistoryByMonthThread(List<Workout> raw) {
   final map = <MonthYear, List<Workout>>{};
   for (final workout in raw.reversed.take(kHistoryWorkoutsAbridgedCount)) {
-    final key = (
-      workout.startingDate!.month,
-      workout.startingDate!.year,
-    );
+    final key = (workout.startingDate!.month, workout.startingDate!.year);
     if (!map.containsKey(key)) {
       map[key] = [];
     }
@@ -68,20 +67,17 @@ class _HistoryViewState extends State<HistoryView> {
     super.initState();
     _recompute();
     final controller = Get.find<HistoryController>();
-    worker = ever(
-      controller.history,
-      (callback) {
-        _recompute();
-      },
-    );
+    worker = ever(controller.history, (callback) {
+      _recompute();
+    });
   }
 
-  _recompute() {
+  void _recompute() {
     final controller = Get.find<HistoryController>();
     try {
-      historyByMonth = Future.value(_getHistoryByMonthThread(
-        controller.userVisibleWorkouts,
-      ));
+      historyByMonth = Future.value(
+        _getHistoryByMonthThread(controller.userVisibleWorkouts),
+      );
       if (mounted) {
         setState(() {});
       }
@@ -133,6 +129,17 @@ class _HistoryViewState extends State<HistoryView> {
                     ),
                   ),
                 ),
+
+              SliverToBoxAdapter(
+                child: SubscriptionNag(
+                  stringKey: "history",
+                  shouldHide: (subscriptionInfo) {
+                    return subscriptionInfo.hasProFeatures ||
+                        history.values.fold(0, (a, b) => a + b.length) <
+                            Configuration.trialWorkoutAlertLimit;
+                  },
+                ),
+              ),
               for (final date in history.keys) ...[
                 SliverStickyHeader.builder(
                   builder: (context, state) =>
@@ -151,8 +158,9 @@ class _HistoryViewState extends State<HistoryView> {
                               return;
                             }
                             setState(() {
-                              if (selectedEntries
-                                  .contains(thatDate[index].id)) {
+                              if (selectedEntries.contains(
+                                thatDate[index].id,
+                              )) {
                                 selectedEntries.remove(thatDate[index].id);
                               } else {
                                 selectedEntries.add(thatDate[index].id);
@@ -176,9 +184,7 @@ class _HistoryViewState extends State<HistoryView> {
                       title: Text("history.showAll".t),
                       trailing: const ListTileActionIcon(),
                       onTap: () {
-                        Go.to(
-                          () => const MeCalendarPage(),
-                        );
+                        Go.to(() => const MeCalendarPage());
                       },
                     ),
                   ),
@@ -223,7 +229,6 @@ class _HistoryViewState extends State<HistoryView> {
     if (selectedEntries.isEmpty) {
       widget = SliverAppBar.large(
         title: Text("history.title".t),
-        leading: const SkeletonDrawerButton(),
         actions: [
           SearchAnchor(
             builder: (context, sController) => IconButton(
@@ -231,9 +236,7 @@ class _HistoryViewState extends State<HistoryView> {
               icon: const Icon(GTIcons.search),
             ),
             viewBuilder: (suggestions) {
-              return CustomScrollView(
-                slivers: suggestions.toList(),
-              );
+              return CustomScrollView(slivers: suggestions.toList());
             },
             suggestionsBuilder: (context, sController) {
               final results = getSearchResults(sController.text);
@@ -250,10 +253,13 @@ class _HistoryViewState extends State<HistoryView> {
                           (context, index) {
                             final thatDate = (results[date] ?? []);
 
-                            return _buildWorkout(thatDate[index], () {},
-                                onWillOpenView: () {
-                              sController.closeView(null);
-                            });
+                            return _buildWorkout(
+                              thatDate[index],
+                              () {},
+                              onWillOpenView: () {
+                                sController.closeView(null);
+                              },
+                            );
                           },
                         ),
                       ),
@@ -272,9 +278,7 @@ class _HistoryViewState extends State<HistoryView> {
         backgroundColor: Theme.of(context).colorScheme.inverseSurface,
         foregroundColor: Theme.of(context).colorScheme.onInverseSurface,
         surfaceTintColor: Colors.transparent,
-        title: Text(
-          "general.selected".plural(selectedEntries.length),
-        ),
+        title: Text("general.selected".plural(selectedEntries.length)),
         leading: IconButton(
           icon: const Icon(GTIcons.close),
           onPressed: () {
@@ -285,8 +289,9 @@ class _HistoryViewState extends State<HistoryView> {
         ),
         actions: [
           IconButton(
-            tooltip: "history.actions.deleteMultiple.title"
-                .plural(selectedEntries.length),
+            tooltip: "history.actions.deleteMultiple.title".plural(
+              selectedEntries.length,
+            ),
             icon: const Icon(GTIcons.delete),
             onPressed: () {
               final controller = Get.find<HistoryController>();
@@ -294,8 +299,11 @@ class _HistoryViewState extends State<HistoryView> {
                 context,
                 workoutIDs: selectedEntries,
                 onDeleted: () {
-                  Go.snack("history.actions.deleteMultiple.done"
-                      .plural(selectedEntries.length));
+                  Go.snack(
+                    "history.actions.deleteMultiple.done".plural(
+                      selectedEntries.length,
+                    ),
+                  );
                   selectedEntries.clear();
                 },
               );
@@ -309,9 +317,7 @@ class _HistoryViewState extends State<HistoryView> {
     return Theme(
       data: theme.copyWith(
         appBarTheme: theme.appBarTheme.copyWith(
-          shape: const RoundedRectangleBorder(
-            borderRadius: BorderRadius.zero,
-          ),
+          shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
         ),
       ),
       child: widget,
@@ -349,9 +355,9 @@ class _HistoryViewState extends State<HistoryView> {
         child: Skeletonizer(
           enabled: isLoading,
           child: Text(
-            DateFormat.yMMMM(context.locale.languageCode).format(
-              DateTime(date.$2, date.$1),
-            ),
+            DateFormat.yMMMM(
+              context.locale.languageCode,
+            ).format(DateTime(date.$2, date.$1)),
             style: Theme.of(context).textTheme.titleMedium,
           ),
         ),

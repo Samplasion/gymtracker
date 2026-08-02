@@ -1,215 +1,28 @@
 PODS:
-  - app_links (0.0.2):
-    - Flutter
-  - audioplayers_darwin (0.0.1):
-    - Flutter
-  - camera_avfoundation (0.0.1):
-    - Flutter
-  - device_info_plus (0.0.1):
-    - Flutter
-  - DKImagePickerController/Core (4.3.9):
-    - DKImagePickerController/ImageDataManager
-    - DKImagePickerController/Resource
-  - DKImagePickerController/ImageDataManager (4.3.9)
-  - DKImagePickerController/PhotoGallery (4.3.9):
-    - DKImagePickerController/Core
-    - DKPhotoGallery
-  - DKImagePickerController/Resource (4.3.9)
-  - DKPhotoGallery (0.0.19):
-    - DKPhotoGallery/Core (= 0.0.19)
-    - DKPhotoGallery/Model (= 0.0.19)
-    - DKPhotoGallery/Preview (= 0.0.19)
-    - DKPhotoGallery/Resource (= 0.0.19)
-    - SDWebImage
-    - SwiftyGif
-  - DKPhotoGallery/Core (0.0.19):
-    - DKPhotoGallery/Model
-    - DKPhotoGallery/Preview
-    - SDWebImage
-    - SwiftyGif
-  - DKPhotoGallery/Model (0.0.19):
-    - SDWebImage
-    - SwiftyGif
-  - DKPhotoGallery/Preview (0.0.19):
-    - DKPhotoGallery/Model
-    - DKPhotoGallery/Resource
-    - SDWebImage
-    - SwiftyGif
-  - DKPhotoGallery/Resource (0.0.19):
-    - SDWebImage
-    - SwiftyGif
-  - file_picker (0.0.1):
-    - DKImagePickerController/PhotoGallery
-    - Flutter
   - Flutter (1.0.0)
   - flutter_app_intents (0.1.0):
     - Flutter
-  - flutter_keyboard_visibility (0.0.1):
-    - Flutter
-  - flutter_local_notifications (0.0.1):
-    - Flutter
-  - flutter_timezone (0.0.1):
-    - Flutter
-  - flutter_zxing (0.0.1):
-    - Flutter
-  - health (13.1.3):
-    - Flutter
-  - home_widget (0.0.1):
-    - Flutter
-  - image_picker_ios (0.0.1):
-    - Flutter
-  - integration_test (0.0.1):
-    - Flutter
-  - package_info_plus (0.4.5):
-    - Flutter
-  - path_provider_foundation (0.0.1):
-    - Flutter
-    - FlutterMacOS
-  - permission_handler_apple (9.3.0):
-    - Flutter
-  - protocol_handler_ios (0.0.1):
-    - Flutter
-  - SDWebImage (5.21.5):
-    - SDWebImage/Core (= 5.21.5)
-  - SDWebImage/Core (5.21.5)
-  - share_plus (0.0.1):
-    - Flutter
-  - shared_preferences_foundation (0.0.1):
-    - Flutter
-    - FlutterMacOS
-  - "sqlite3 (3.46.1+1)":
-    - "sqlite3/common (= 3.46.1+1)"
-  - "sqlite3/common (3.46.1+1)"
-  - "sqlite3/dbstatvtab (3.46.1+1)":
-    - sqlite3/common
-  - "sqlite3/fts5 (3.46.1+1)":
-    - sqlite3/common
-  - "sqlite3/perf-threadsafe (3.46.1+1)":
-    - sqlite3/common
-  - "sqlite3/rtree (3.46.1+1)":
-    - sqlite3/common
-  - sqlite3_flutter_libs (0.0.1):
-    - Flutter
-    - "sqlite3 (~> 3.46.0+1)"
-    - sqlite3/dbstatvtab
-    - sqlite3/fts5
-    - sqlite3/perf-threadsafe
-    - sqlite3/rtree
-  - SwiftyGif (5.4.5)
-  - url_launcher_ios (0.0.1):
+  - health (13.3.1):
     - Flutter
 
 DEPENDENCIES:
-  - app_links (from `.symlinks/plugins/app_links/ios`)
-  - audioplayers_darwin (from `.symlinks/plugins/audioplayers_darwin/ios`)
-  - camera_avfoundation (from `.symlinks/plugins/camera_avfoundation/ios`)
-  - device_info_plus (from `.symlinks/plugins/device_info_plus/ios`)
-  - file_picker (from `.symlinks/plugins/file_picker/ios`)
   - Flutter (from `Flutter`)
   - flutter_app_intents (from `.symlinks/plugins/flutter_app_intents/ios`)
-  - flutter_keyboard_visibility (from `.symlinks/plugins/flutter_keyboard_visibility/ios`)
-  - flutter_local_notifications (from `.symlinks/plugins/flutter_local_notifications/ios`)
-  - flutter_timezone (from `.symlinks/plugins/flutter_timezone/ios`)
-  - flutter_zxing (from `.symlinks/plugins/flutter_zxing/ios`)
   - health (from `.symlinks/plugins/health/ios`)
-  - home_widget (from `.symlinks/plugins/home_widget/ios`)
-  - image_picker_ios (from `.symlinks/plugins/image_picker_ios/ios`)
-  - integration_test (from `.symlinks/plugins/integration_test/ios`)
-  - package_info_plus (from `.symlinks/plugins/package_info_plus/ios`)
-  - path_provider_foundation (from `.symlinks/plugins/path_provider_foundation/darwin`)
-  - permission_handler_apple (from `.symlinks/plugins/permission_handler_apple/ios`)
-  - protocol_handler_ios (from `.symlinks/plugins/protocol_handler_ios/ios`)
-  - share_plus (from `.symlinks/plugins/share_plus/ios`)
-  - shared_preferences_foundation (from `.symlinks/plugins/shared_preferences_foundation/darwin`)
-  - sqlite3_flutter_libs (from `.symlinks/plugins/sqlite3_flutter_libs/ios`)
-  - url_launcher_ios (from `.symlinks/plugins/url_launcher_ios/ios`)
-
-SPEC REPOS:
-  trunk:
-    - DKImagePickerController
-    - DKPhotoGallery
-    - SDWebImage
-    - sqlite3
-    - SwiftyGif
 
 EXTERNAL SOURCES:
-  app_links:
-    :path: ".symlinks/plugins/app_links/ios"
-  audioplayers_darwin:
-    :path: ".symlinks/plugins/audioplayers_darwin/ios"
-  camera_avfoundation:
-    :path: ".symlinks/plugins/camera_avfoundation/ios"
-  device_info_plus:
-    :path: ".symlinks/plugins/device_info_plus/ios"
-  file_picker:
-    :path: ".symlinks/plugins/file_picker/ios"
   Flutter:
     :path: Flutter
   flutter_app_intents:
     :path: ".symlinks/plugins/flutter_app_intents/ios"
-  flutter_keyboard_visibility:
-    :path: ".symlinks/plugins/flutter_keyboard_visibility/ios"
-  flutter_local_notifications:
-    :path: ".symlinks/plugins/flutter_local_notifications/ios"
-  flutter_timezone:
-    :path: ".symlinks/plugins/flutter_timezone/ios"
-  flutter_zxing:
-    :path: ".symlinks/plugins/flutter_zxing/ios"
   health:
     :path: ".symlinks/plugins/health/ios"
-  home_widget:
-    :path: ".symlinks/plugins/home_widget/ios"
-  image_picker_ios:
-    :path: ".symlinks/plugins/image_picker_ios/ios"
-  integration_test:
-    :path: ".symlinks/plugins/integration_test/ios"
-  package_info_plus:
-    :path: ".symlinks/plugins/package_info_plus/ios"
-  path_provider_foundation:
-    :path: ".symlinks/plugins/path_provider_foundation/darwin"
-  permission_handler_apple:
-    :path: ".symlinks/plugins/permission_handler_apple/ios"
-  protocol_handler_ios:
-    :path: ".symlinks/plugins/protocol_handler_ios/ios"
-  share_plus:
-    :path: ".symlinks/plugins/share_plus/ios"
-  shared_preferences_foundation:
-    :path: ".symlinks/plugins/shared_preferences_foundation/darwin"
-  sqlite3_flutter_libs:
-    :path: ".symlinks/plugins/sqlite3_flutter_libs/ios"
-  url_launcher_ios:
-    :path: ".symlinks/plugins/url_launcher_ios/ios"
 
 SPEC CHECKSUMS:
-  app_links: 3da4c36b46cac3bf24eb897f1a6ce80bda109874
-  audioplayers_darwin: ccf9c770ee768abb07e26d90af093f7bab1c12ab
-  camera_avfoundation: 04b44aeb14070126c6529e5ab82cc7c9fca107cf
-  device_info_plus: 71ffc6ab7634ade6267c7a93088ed7e4f74e5896
-  DKImagePickerController: 946cec48c7873164274ecc4624d19e3da4c1ef3c
-  DKPhotoGallery: b3834fecb755ee09a593d7c9e389d8b5d6deed60
-  file_picker: 9b3292d7c8bc68c8a7bf8eb78f730e49c8efc517
-  Flutter: e0871f40cf51350855a761d2e70bf5af5b9b5de7
+  Flutter: cabc95a1d2626b1b06e7179b784ebcf0c0cde467
   flutter_app_intents: e77f999f398c841ab584a1925dbce33ee0168fb5
-  flutter_keyboard_visibility: 4625131e43015dbbe759d9b20daaf77e0e3f6619
-  flutter_local_notifications: ad39620c743ea4c15127860f4b5641649a988100
-  flutter_timezone: ee50ce7786b5fde27e2fe5375bbc8c9661ffc13f
-  flutter_zxing: e741c4f3335db8910e5c396c4291cdfb320859dc
-  health: f496ad838f4bd227191f5bc05060b6f6138b44fd
-  home_widget: f169fc41fd807b4d46ab6615dc44d62adbf9f64f
-  image_picker_ios: 7fe1ff8e34c1790d6fff70a32484959f563a928a
-  integration_test: 4a889634ef21a45d28d50d622cf412dc6d9f586e
-  package_info_plus: 580e9a5f1b6ca5594e7c9ed5f92d1dfb2a66b5e1
-  path_provider_foundation: 080d55be775b7414fd5a5ef3ac137b97b097e564
-  permission_handler_apple: 4ed2196e43d0651e8ff7ca3483a069d469701f2d
-  protocol_handler_ios: 59f23ee71f3ec602d67902ca7f669a80957888d5
-  SDWebImage: e9c98383c7572d713c1a0d7dd2783b10599b9838
-  share_plus: 011d6fb4f9d2576b83179a3a5c5e323202cdabcf
-  shared_preferences_foundation: 9e1978ff2562383bd5676f64ec4e9aa8fa06a6f7
-  sqlite3: 0bb0e6389d824e40296f531b858a2a0b71c0d2fb
-  sqlite3_flutter_libs: 9379996d65aa23dcda7585a5b58766cebe0aa042
-  SwiftyGif: 706c60cf65fa2bc5ee0313beece843c8eb8194d4
-  url_launcher_ios: 694010445543906933d732453a59da0a173ae33d
+  health: 4decf5d74e8f54c58a8c07a385fc72f629a831d9
 
-PODFILE CHECKSUM: 0a195aa99a18b38058c996cec56f57deeb536828
+PODFILE CHECKSUM: 62d29e7215d9ba84a421ef9a3e214bc5b0962d88
 
 COCOAPODS: 1.16.2

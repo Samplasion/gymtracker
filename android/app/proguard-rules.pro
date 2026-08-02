@@ -40,6 +40,12 @@
 -keep class io.flutter.plugins.**  { *; }
 -keep class com.dexterous.** { *; }
 
+# RevenueCat
+-keep class com.android.billingclient.** { *; }
+-keep class com.revenuecat.purchases.** { *; }
+-dontwarn com.android.billingclient.api.QueryPurchaseHistoryParams$Builder
+-dontwarn com.android.billingclient.api.QueryPurchaseHistoryParams
+
 -dontwarn com.google.android.play.core.splitcompat.SplitCompatApplication
 -dontwarn com.google.android.play.core.splitinstall.SplitInstallException
 -dontwarn com.google.android.play.core.splitinstall.SplitInstallManager

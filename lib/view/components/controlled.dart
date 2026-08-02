@@ -3,7 +3,16 @@ import 'package:get/get.dart';
 
 typedef ControlledWidget<T extends GetLifeCycleBase?> = GetWidget<T>;
 
-abstract class ControlledState<T extends StatefulWidget,
-    C extends GetLifeCycleBase?> extends State<T> {
+abstract class ControlledState<
+  T extends StatefulWidget,
+  C extends GetLifeCycleBase?
+>
+    extends State<T> {
   C get controller => Get.find<C>();
+}
+
+abstract class ControlledWidgetAny<T> extends StatelessWidget {
+  const ControlledWidgetAny({super.key});
+
+  T get controller => Get.find<T>();
 }

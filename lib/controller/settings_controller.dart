@@ -189,7 +189,7 @@ class SettingsController extends GetxController with ServiceableController {
 
     if (choice == null) return;
 
-    FilePickerResult? result = await FilePicker.platform.pickFiles();
+    FilePickerResult? result = await FilePicker.pickFiles();
     String content;
 
     if (kIsWeb && result?.files.single.bytes != null) {
@@ -249,8 +249,7 @@ class SettingsController extends GetxController with ServiceableController {
   }
 
   Future _importHevy(BuildContext context, String content) async {
-    List<List<dynamic>> data =
-        const CsvToListConverter().convert(content, eol: "\n");
+    List<List<dynamic>> data = const CsvDecoder().convert(content);
     final header = data.removeAt(0);
 
     if (header.contains("fat_percent")) {

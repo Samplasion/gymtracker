@@ -14,6 +14,7 @@ import 'package:gymtracker/controller/me_controller.dart';
 import 'package:gymtracker/controller/migrations_controller.dart';
 import 'package:gymtracker/controller/notifications_controller.dart';
 import 'package:gymtracker/controller/online_controller.dart';
+import 'package:gymtracker/controller/purchases_controller.dart';
 import 'package:gymtracker/controller/routines_controller.dart';
 import 'package:gymtracker/controller/serviceable_controller.dart';
 import 'package:gymtracker/controller/settings_controller.dart';
@@ -28,12 +29,25 @@ import 'package:gymtracker/service/database.dart';
 import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/service/logger.dart';
 import 'package:gymtracker/service/notifications.dart';
+import 'package:gymtracker/service/protocol.dart';
+import 'package:gymtracker/service/purchases.dart';
 import 'package:gymtracker/service/test.dart';
 import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/view/onboarding.dart';
 import 'package:gymtracker/view/skeleton.dart';
-import 'package:protocol_handler/protocol_handler.dart';
 import 'package:rxdart/rxdart.dart';
+
+enum ScheduledEvent {
+  onboardingComplete,
+  userWillLogin,
+  userDidLogin,
+  userWillLogout,
+  userDidLogout,
+  userDidUpdate,
+  userDidUpdateSubscription,
+}
+
+class EventScheduler {}
 
 class Coordinator extends GetxController
     with LoggerConfigurationMixin, ServiceableController {
@@ -42,6 +56,8 @@ class Coordinator extends GetxController
 
   RxList<RoutineSuggestion> suggestions = <RoutineSuggestion>[].obs;
   late BehaviorSubject<bool> showPermissionTilesStream;
+
+  final Map<ScheduledEvent, List<Function>> _listeners = {};
 
   @override
   void onServiceChange() {}
@@ -66,17 +82,21 @@ class Coordinator extends GetxController
     IntentsController.initialize();
 
     showPermissionTilesStream.add(
-        get<NotificationController>().showSettingsTileStream.value ||
-            get<FoodController>().showSettingsTileStream.value ||
-            !get<HealthController>().hasPermissionStream.value);
-    Rx.combineLatest([
-      get<NotificationController>().showSettingsTileStream,
-      get<FoodController>().showSettingsTileStream,
-      get<HealthController>().hasPermissionStream.map((e) => !e),
-    ], (e) {
-      logger.d("Show permission tiles: $e");
-      return e.any((element) => element);
-    }).pipe(showPermissionTilesStream);
+      get<NotificationController>().showSettingsTileStream.value ||
+          get<FoodController>().showSettingsTileStream.value ||
+          !get<HealthController>().hasPermissionStream.value,
+    );
+    Rx.combineLatest(
+      [
+        get<NotificationController>().showSettingsTileStream,
+        get<FoodController>().showSettingsTileStream,
+        get<HealthController>().hasPermissionStream.map((e) => !e),
+      ],
+      (e) {
+        logger.d("Show permission tiles: $e");
+        return e.any((element) => element);
+      },
+    ).pipe(showPermissionTilesStream);
 
     schedulePeriodicBackup();
     loadColdbootDeeplink();
@@ -103,6 +123,7 @@ class Coordinator extends GetxController
     Get.delete<AchievementsController>();
     Get.delete<BoutiqueController>();
     Get.delete<HealthController>();
+    Get.delete<PurchasesController>();
     if (Configuration.isOnlineAccountEnabled) {
       Get.delete<OnlineController>();
     }
@@ -127,6 +148,8 @@ class Coordinator extends GetxController
     Get.put(AchievementsController());
     Get.put(BoutiqueController());
     Get.put(HealthController());
+    Get.put(PurchasesService(this)..init());
+    Get.put(PurchasesController(get<PurchasesService>(), this));
     if (Configuration.isOnlineAccountEnabled) {
       Get.put(OnlineController());
     }
@@ -140,17 +163,18 @@ class Coordinator extends GetxController
   /// will be called to handle the deeplink as if it was received in the
   /// foreground.
   void loadColdbootDeeplink() async {
-    final deeplink = await protocolHandler.getInitialUrl();
+    final deeplink = await ProtocolService().getInitialUrl();
     if (deeplink != null) {
       logger.d("Coldboot deeplink: $deeplink");
-      for (final listener in protocolHandler.listeners) {
+      for (final listener in ProtocolService().listeners) {
         listener.onProtocolUrlReceived(deeplink);
       }
     }
   }
 
   bool hasExercise(Exercise exercise) {
-    final isInWorkout = Get.isRegistered<WorkoutController>() &&
+    final isInWorkout =
+        Get.isRegistered<WorkoutController>() &&
         get<WorkoutController>().hasExercise(exercise);
     final isInHistory = get<HistoryController>().hasExercise(exercise);
     final isInRoutines = get<RoutinesController>().hasExercise(exercise);
@@ -189,8 +213,9 @@ class Coordinator extends GetxController
     final history = controller.history;
     for (final routine in get<RoutinesController>().workouts) {
       final occurrences = history.where((wo) => wo.parentID == routine.id);
-      candidates[routine] =
-          occurrences.where((wo) => wo.startingDate?.weekday == today).length;
+      candidates[routine] = occurrences
+          .where((wo) => wo.startingDate?.weekday == today)
+          .length;
     }
     candidates.removeWhere((k, v) => v == 0);
 
@@ -199,10 +224,11 @@ class Coordinator extends GetxController
     suggestions([
       ...listCandidates
           .map((a) => (routine: a.key, occurrences: a.value))
-          .take(5)
+          .take(5),
     ]);
-    logger
-        .d("Recomputed suggested routines with ${suggestions().length} values");
+    logger.d(
+      "Recomputed suggested routines with ${suggestions().length} values",
+    );
   }
 
   computeStreaks() {
@@ -240,7 +266,8 @@ class Coordinator extends GetxController
   }
 
   Map<Achievement, List<AchievementCompletion>> maybeUnlockAchievements(
-      AchievementTrigger trigger) {
+    AchievementTrigger trigger,
+  ) {
     return get<AchievementsController>().maybeUnlockAchievements(trigger);
   }
 
@@ -278,6 +305,28 @@ class Coordinator extends GetxController
       get<WorkoutController>().refreshWatchData();
     } else {
       logger.w("No WorkoutController registered, cannot sync native data.");
+    }
+  }
+
+  void addEventListener(ScheduledEvent event, Function callback) {
+    if (_listeners[event] == null) {
+      _listeners[event] = [];
+    }
+    _listeners[event]!.add(callback);
+  }
+
+  void removeEventListener(ScheduledEvent event, Function callback) {
+    _listeners[event]?.remove(callback);
+  }
+
+  void trigger(ScheduledEvent event) {
+    logger.d(
+      "Event triggered: $event [${_listeners[event]?.length ?? "no"} listeners]",
+    );
+    if (_listeners[event] != null) {
+      for (var callback in _listeners[event]!) {
+        callback();
+      }
     }
   }
 }

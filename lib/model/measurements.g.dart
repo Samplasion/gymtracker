@@ -15,47 +15,49 @@ abstract class _$WeightMeasurementCWProxy {
 
   WeightMeasurement weightUnit(Weights weightUnit);
 
-  /// This function **does support** nullification of nullable fields. All `null` values passed to `non-nullable` fields will be ignored. You can also use `WeightMeasurement(...).copyWith.fieldName(...)` to override fields one at a time with nullification support.
+  /// Creates a new instance with the provided field values.
+  /// Passing `null` to a nullable field nullifies it, while `null` for a non-nullable field is ignored. To update a single field use `WeightMeasurement(...).copyWith.fieldName(value)`.
   ///
-  /// Usage
+  /// Example:
   /// ```dart
   /// WeightMeasurement(...).copyWith(id: 12, name: "My name")
-  /// ````
+  /// ```
   WeightMeasurement call({
-    String? id,
-    double? weight,
-    DateTime? time,
-    Weights? weightUnit,
+    String id,
+    double weight,
+    DateTime time,
+    Weights weightUnit,
   });
 }
 
-/// Proxy class for `copyWith` functionality. This is a callable class and can be used as follows: `instanceOfWeightMeasurement.copyWith(...)`. Additionally contains functions for specific fields e.g. `instanceOfWeightMeasurement.copyWith.fieldName(...)`
+/// Callable proxy for `copyWith` functionality.
+/// Use as `instanceOfWeightMeasurement.copyWith(...)` or call `instanceOfWeightMeasurement.copyWith.fieldName(value)` for a single field.
 class _$WeightMeasurementCWProxyImpl implements _$WeightMeasurementCWProxy {
   const _$WeightMeasurementCWProxyImpl(this._value);
 
   final WeightMeasurement _value;
 
   @override
-  WeightMeasurement id(String id) => this(id: id);
+  WeightMeasurement id(String id) => call(id: id);
 
   @override
-  WeightMeasurement weight(double weight) => this(weight: weight);
+  WeightMeasurement weight(double weight) => call(weight: weight);
 
   @override
-  WeightMeasurement time(DateTime time) => this(time: time);
+  WeightMeasurement time(DateTime time) => call(time: time);
 
   @override
   WeightMeasurement weightUnit(Weights weightUnit) =>
-      this(weightUnit: weightUnit);
+      call(weightUnit: weightUnit);
 
   @override
-
-  /// This function **does support** nullification of nullable fields. All `null` values passed to `non-nullable` fields will be ignored. You can also use `WeightMeasurement(...).copyWith.fieldName(...)` to override fields one at a time with nullification support.
+  /// Creates a new instance with the provided field values.
+  /// Passing `null` to a nullable field nullifies it, while `null` for a non-nullable field is ignored. To update a single field use `WeightMeasurement(...).copyWith.fieldName(value)`.
   ///
-  /// Usage
+  /// Example:
   /// ```dart
   /// WeightMeasurement(...).copyWith(id: 12, name: "My name")
-  /// ````
+  /// ```
   WeightMeasurement call({
     Object? id = const $CopyWithPlaceholder(),
     Object? weight = const $CopyWithPlaceholder(),
@@ -77,15 +79,16 @@ class _$WeightMeasurementCWProxyImpl implements _$WeightMeasurementCWProxy {
           : time as DateTime,
       weightUnit:
           weightUnit == const $CopyWithPlaceholder() || weightUnit == null
-              ? _value.weightUnit
-              // ignore: cast_nullable_to_non_nullable
-              : weightUnit as Weights,
+          ? _value.weightUnit
+          // ignore: cast_nullable_to_non_nullable
+          : weightUnit as Weights,
     );
   }
 }
 
 extension $WeightMeasurementCopyWith on WeightMeasurement {
-  /// Returns a callable class that can be used as follows: `instanceOfWeightMeasurement.copyWith(...)` or like so:`instanceOfWeightMeasurement.copyWith.fieldName(...)`.
+  /// Returns a callable class used to build a new instance with modified fields.
+  /// Example: `instanceOfWeightMeasurement.copyWith(...)` or `instanceOfWeightMeasurement.copyWith.fieldName(...)`.
   // ignore: library_private_types_in_public_api
   _$WeightMeasurementCWProxy get copyWith =>
       _$WeightMeasurementCWProxyImpl(this);
@@ -111,7 +114,4 @@ Map<String, dynamic> _$WeightMeasurementToJson(WeightMeasurement instance) =>
       'id': instance.id,
     };
 
-const _$WeightsEnumMap = {
-  Weights.kg: 'kg',
-  Weights.lb: 'lb',
-};
+const _$WeightsEnumMap = {Weights.kg: 'kg', Weights.lb: 'lb'};

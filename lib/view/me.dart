@@ -20,10 +20,13 @@ import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/utils/theme.dart';
 import 'package:gymtracker/utils/utils.dart';
+import 'package:gymtracker/view/achievements.dart';
 import 'package:gymtracker/view/charts/density_calendar_chart.dart';
 import 'package:gymtracker/view/charts/weight_chart.dart';
 import 'package:gymtracker/view/components/controlled.dart';
 import 'package:gymtracker/view/components/online.dart';
+import 'package:gymtracker/view/food.dart';
+import 'package:gymtracker/view/history.dart';
 import 'package:gymtracker/view/me/calendar.dart';
 import 'package:gymtracker/view/me/statistics.dart';
 import 'package:gymtracker/view/skeleton.dart';
@@ -54,9 +57,7 @@ class MeView extends GetView<MeController> {
           if (Configuration.isOnlineAccountEnabled) ...[
             const SliverPadding(
               padding: EdgeInsets.only(top: 16, left: 16, right: 16),
-              sliver: SliverToBoxAdapter(
-                child: OnlineProfileCard(),
-              ),
+              sliver: SliverToBoxAdapter(child: OnlineProfileCard()),
             ),
             const SliverToBoxAdapter(child: _MeSyncCard()),
           ],
@@ -72,9 +73,9 @@ class MeView extends GetView<MeController> {
                     child: SpeedDial(
                       crossAxisCountBuilder: (breakpoint) =>
                           switch (breakpoint) {
-                        Breakpoints.xxs => 1,
-                        _ => 2,
-                      },
+                            Breakpoints.xxs => 1,
+                            _ => 2,
+                          },
                       buttonHeight: (_) => kSpeedDialButtonHeight / 1.3,
                       buttons: [
                         SpeedDialButton(
@@ -97,63 +98,92 @@ class MeView extends GetView<MeController> {
                             Go.to(() => const MeStatisticsPage());
                           },
                         ),
+                        SpeedDialButton(
+                          icon: const Icon(GTIcons.food),
+                          text: Text(
+                            "food.title".t,
+                            style: Theme.of(context).textTheme.bodySmall,
+                          ),
+                          onTap: () {
+                            Go.to(() => const FoodView());
+                          },
+                        ),
+                        SpeedDialButton(
+                          icon: const Icon(GTIcons.achievements),
+                          text: Text(
+                            "achievements.title".t,
+                            style: Theme.of(context).textTheme.bodySmall,
+                          ),
+                          onTap: () {
+                            Go.to(() => const AchievementsView());
+                          },
+                        ),
                       ],
                     ),
                   ),
                 ),
                 const SizedBox(height: 24),
-                Obx(
-                  () {
-                    final historyController = Get.find<HistoryController>();
-                    if (historyController.history.isEmpty) {
-                      return const SizedBox.shrink();
-                    }
-                    final firstDay =
-                        historyController.history.first.startingDate!;
-                    final now = DateTime.now();
-                    final allDays =
-                        math.max(1, now.difference(firstDay).inDays);
-                    final values = [
-                      for (int i = 0; i < allDays; i++)
-                        historyController
-                                .workoutsByDay[
-                                    now.subtract(Duration(days: i)).startOfDay]
-                                ?.length ??
-                            0,
-                    ];
-                    if (values.isEmpty) {
-                      return const SizedBox.shrink();
-                    }
-                    return Padding(
-                      padding: const EdgeInsets.all(16).copyWith(top: 0),
-                      child: SafeArea(
-                        top: false,
-                        bottom: false,
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            SectionTitle("me.workoutDistribution.label".t),
-                            const SizedBox(height: 16),
-                            Card(
-                              clipBehavior: Clip.hardEdge,
-                              margin: EdgeInsets.zero,
-                              child: Padding(
-                                padding: const EdgeInsets.all(16),
-                                child: DensityCalendarChart(
-                                  tooltipBuilder: (now, daysBeforeNow, value) {
-                                    return "${DateFormat.yMEd(Get.locale?.languageCode).format(now.subtract(Duration(days: daysBeforeNow)))}: ${"general.workouts".plural(value)}";
-                                  },
-                                  values: values,
-                                ),
+                Obx(() {
+                  final historyController = Get.find<HistoryController>();
+                  if (historyController.history.isEmpty) {
+                    return const SizedBox.shrink();
+                  }
+                  final firstDay =
+                      historyController.history.first.startingDate!;
+                  final now = DateTime.now();
+                  final allDays = math.max(1, now.difference(firstDay).inDays);
+                  final values = [
+                    for (int i = 0; i < allDays; i++)
+                      historyController
+                              .workoutsByDay[now
+                                  .subtract(Duration(days: i))
+                                  .startOfDay]
+                              ?.length ??
+                          0,
+                  ];
+                  if (values.isEmpty) {
+                    return const SizedBox.shrink();
+                  }
+                  return Padding(
+                    padding: const EdgeInsets.all(16).copyWith(top: 0),
+                    child: SafeArea(
+                      top: false,
+                      bottom: false,
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          SectionTitle("me.workoutDistribution.label".t),
+                          const SizedBox(height: 16),
+                          Card(
+                            clipBehavior: Clip.hardEdge,
+                            margin: EdgeInsets.zero,
+                            child: Padding(
+                              padding: const EdgeInsets.all(16),
+                              child: Column(
+                                children: [
+                                  DensityCalendarChart(
+                                    tooltipBuilder: (now, daysBeforeNow, value) {
+                                      return "${DateFormat.yMEd(Get.locale?.languageCode).format(now.subtract(Duration(days: daysBeforeNow)))}: ${"general.workouts".plural(value)}";
+                                    },
+                                    values: values,
+                                  ),
+                                  ListTile(
+                                    title: Text("history.title".t),
+                                    onTap: () {
+                                      Go.to(() => const HistoryView());
+                                    },
+                                    trailing: const Icon(GTIcons.lt_chevron),
+                                  ),
+                                ],
                               ),
                             ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
-                    );
-                  },
-                ),
+                    ),
+                  );
+                }),
                 const SizedBox(height: 8),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -221,53 +251,57 @@ class __MeSyncCardState extends ControlledState<_MeSyncCard, OnlineController> {
     }
 
     return StreamBuilder<bool>(
-        stream: controller.isOnlineServiceEnabled,
-        builder: (context, snapshot) {
-          if (snapshot.data != true) {
-            return const SizedBox.shrink();
-          }
+      stream: controller.isOnlineServiceEnabled,
+      builder: (context, snapshot) {
+        if (snapshot.data != true) {
+          return const SizedBox.shrink();
+        }
 
-          return FutureBuilder<bool>(
-            future: show,
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return const SizedBox.shrink();
-              }
-              if (!snapshot.hasData || snapshot.data == false) {
-                return const SizedBox.shrink();
-              }
-              return Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16)
-                    .copyWith(top: 16),
-                child: SafeArea(
-                  top: false,
-                  bottom: false,
-                  child: Card(
-                    clipBehavior: Clip.hardEdge,
-                    margin: EdgeInsets.zero,
-                    child: ListTile(
-                      title: Text("me.sync.label".t),
-                      subtitle: Text("me.sync.subtitle".t),
-                      trailing: const Icon(GTIcons.lt_chevron),
-                      onTap: loading
-                          ? null
-                          : () {
-                              setState(() {
-                                loading = true;
-                              });
-                              controller.manualSync().then((_) {
-                                Future.delayed(const Duration(seconds: 5),
-                                    () async {
+        return FutureBuilder<bool>(
+          future: show,
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const SizedBox.shrink();
+            }
+            if (!snapshot.hasData || snapshot.data == false) {
+              return const SizedBox.shrink();
+            }
+            return Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 16,
+              ).copyWith(top: 16),
+              child: SafeArea(
+                top: false,
+                bottom: false,
+                child: Card(
+                  clipBehavior: Clip.hardEdge,
+                  margin: EdgeInsets.zero,
+                  child: ListTile(
+                    title: Text("me.sync.label".t),
+                    subtitle: Text("me.sync.subtitle".t),
+                    trailing: const Icon(GTIcons.lt_chevron),
+                    onTap: loading
+                        ? null
+                        : () {
+                            setState(() {
+                              loading = true;
+                            });
+                            controller.manualSync().then((_) {
+                              Future.delayed(
+                                const Duration(seconds: 5),
+                                () async {
                                   _reload();
-                                });
-                              });
-                            },
-                    ),
+                                },
+                              );
+                            });
+                          },
                   ),
                 ),
-              );
-            },
-          );
-        });
+              ),
+            );
+          },
+        );
+      },
+    );
   }
 }

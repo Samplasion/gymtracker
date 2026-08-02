@@ -9,8 +9,10 @@ import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:get/get.dart' hide ContextExtensionss;
 import 'package:gymtracker/controller/exercises_controller.dart';
 import 'package:gymtracker/controller/history_controller.dart';
+import 'package:gymtracker/controller/purchases_controller.dart';
 import 'package:gymtracker/controller/settings_controller.dart';
 import 'package:gymtracker/controller/workout_controller.dart';
+import 'package:gymtracker/data/configuration.dart';
 import 'package:gymtracker/data/exercises.dart';
 import 'package:gymtracker/data/weights.dart';
 import 'package:gymtracker/icons/gymtracker_icons.dart';
@@ -27,14 +29,16 @@ import 'package:gymtracker/view/charts/line_charts_by_workout.dart';
 import 'package:gymtracker/view/components/badges.dart';
 import 'package:gymtracker/view/components/master_detail.dart';
 import 'package:gymtracker/view/components/muscles.dart';
+import 'package:gymtracker/view/components/pro_builder.dart';
+import 'package:gymtracker/view/components/subscription_nag.dart';
 import 'package:gymtracker/view/components/themed_subtree.dart';
 import 'package:gymtracker/view/exercise_creator.dart';
 import 'package:gymtracker/view/exercises.dart';
-import 'package:gymtracker/view/skeleton.dart';
 import 'package:gymtracker/view/utils/exercise.dart';
 import 'package:gymtracker/view/utils/history_workout.dart';
 import 'package:gymtracker/view/utils/sliver_utils.dart';
 import 'package:rxdart/rxdart.dart';
+import 'package:skeletonizer/skeletonizer.dart';
 
 class LibraryView extends GetView<ExercisesController> {
   const LibraryView({super.key});
@@ -44,7 +48,7 @@ class LibraryView extends GetView<ExercisesController> {
       GTExerciseMuscleCategory.custom: ExerciseCategory(
         exercises: Get.find<ExercisesController>().exercises.toList(),
         iconGetter: () => const Icon(GTIcons.custom_exercises),
-        color: Colors.yellow,
+        color: Colors.amber,
       ),
       for (final key in sortedCategories) key: exerciseStandardLibrary[key]!,
     };
@@ -57,7 +61,6 @@ class LibraryView extends GetView<ExercisesController> {
         slivers: [
           SliverAppBar.large(
             title: Text("library.title".t),
-            leading: const SkeletonDrawerButton(),
             actions: [
               if (kDebugMode) ...[
                 IconButton(
@@ -71,48 +74,49 @@ class LibraryView extends GetView<ExercisesController> {
             ],
           ),
           SliverList(
-            delegate: SliverChildListDelegate(
-              [
-                for (final category in exercises.entries)
-                  ListTile(
-                    leading: CircleAvatar(
-                      backgroundColor:
-                          getThemedColor(context, category.value.color),
-                      foregroundColor:
-                          getOnThemedColor(context, category.value.color),
-                      child: category.value.icon,
+            delegate: SliverChildListDelegate([
+              for (final category in exercises.entries)
+                ListTile(
+                  leading: CircleAvatar(
+                    backgroundColor: getThemedColor(
+                      context,
+                      category.value.color,
                     ),
-                    title: Text(category.key.localizedName),
-                    subtitle: Text(
-                      "general.exercises"
-                          .plural(category.value.exercises.length),
+                    foregroundColor: getOnThemedColor(
+                      context,
+                      category.value.color,
                     ),
-                    onTap: () {
-                      final exStream =
-                          category.key == GTExerciseMuscleCategory.custom
-                              ? Get.find<ExercisesController>().exercises$
-                              : Stream.value(category.value.exercises);
-                      Go.to(
-                        () => StreamBuilder<List<Exercise>>(
-                          stream: exStream,
-                          builder: (context, snapshot) {
-                            final exercises = snapshot.data ?? [];
-                            return LibraryExercisesView(
-                              name: category.key.localizedName,
-                              category: category.value,
-                              getExercises: () {
-                                return exercises;
-                              },
-                              isCustom: category.key ==
-                                  GTExerciseMuscleCategory.custom,
-                            );
-                          },
-                        ),
-                      );
-                    },
+                    child: category.value.icon,
                   ),
-              ],
-            ),
+                  title: Text(category.key.localizedName),
+                  subtitle: Text(
+                    "general.exercises".plural(category.value.exercises.length),
+                  ),
+                  onTap: () {
+                    final exStream =
+                        category.key == GTExerciseMuscleCategory.custom
+                        ? Get.find<ExercisesController>().exercises$
+                        : Stream.value(category.value.exercises);
+                    Go.to(
+                      () => StreamBuilder<List<Exercise>>(
+                        stream: exStream,
+                        builder: (context, snapshot) {
+                          final exercises = snapshot.data ?? [];
+                          return LibraryExercisesView(
+                            name: category.key.localizedName,
+                            category: category.value,
+                            getExercises: () {
+                              return exercises;
+                            },
+                            isCustom:
+                                category.key == GTExerciseMuscleCategory.custom,
+                          );
+                        },
+                      ),
+                    );
+                  },
+                ),
+            ]),
           ),
           const SliverToBoxAdapter(child: SizedBox(height: 8)),
           const SliverBottomSafeArea(),
@@ -129,12 +133,10 @@ class LibraryView extends GetView<ExercisesController> {
       ),
       viewBuilder: (suggestions) {
         return MediaQuery(
-          data: MediaQuery.of(context).copyWith(
-            padding: MediaQuery.of(context).padding.copyWith(top: 0),
-          ),
-          child: ListView(
-            children: suggestions.toList(),
-          ),
+          data: MediaQuery.of(
+            context,
+          ).copyWith(padding: MediaQuery.of(context).padding.copyWith(top: 0)),
+          child: ListView(children: suggestions.toList()),
         );
       },
       suggestionsBuilder: (context, sController) {
@@ -155,7 +157,7 @@ class LibraryView extends GetView<ExercisesController> {
   }
 }
 
-class LibraryExercisesView extends StatelessWidget {
+class LibraryExercisesView extends GetView<ExercisesController> {
   const LibraryExercisesView({
     required this.name,
     required this.category,
@@ -186,52 +188,96 @@ class LibraryExercisesView extends StatelessWidget {
         final sorted = exercises.toList()
           ..sort((a, b) => a.displayName.compareTo(b.displayName));
 
-        return MasterDetailView(
-          appBarTitle: Text(name),
-          items: [
-            if (isCustom) ...[
-              MasterItem(
-                Text("library.newCustomExercise".t),
-                leading:
-                    const CircleAvatar(child: Icon(GTIcons.create_exercise)),
-                onTap: () {
-                  Go.showBottomModalScreen(
-                      (context, controller) => ThemedSubtree(
-                            color: category.color,
-                            enabled: Get.find<SettingsController>()
-                                .tintExercises
-                                .value,
-                            child: ExerciseCreator(
-                              base: null,
-                              scrollController: controller,
+        return StreamBuilder(
+          stream: controller.exercises$,
+          builder: (context, asyncSnapshot) {
+            return ProBuilder(
+              builder: (context, info) {
+                final shouldDisable =
+                    (info == null || !info.hasProFeatures) &&
+                    controller.exercises.length >=
+                        Configuration.trialCustomExerciseLimit;
+                return MasterDetailView(
+                  appBarTitle: Text(name),
+                  items: [
+                    if (isCustom) ...[
+                      MasterItem(
+                        Text.rich(
+                          TextSpan(
+                            children: [
+                              TextSpan(text: "library.newCustomExercise".t),
+                              if (shouldDisable) ...[
+                                const TextSpan(text: " "),
+                                WidgetSpan(
+                                  child: Skeleton.ignore(child: ProBadge()),
+                                  alignment: PlaceholderAlignment.middle,
+                                ),
+                              ],
+                            ],
+                          ),
+                        ),
+                        leading: const CircleAvatar(
+                          child: Icon(GTIcons.create_exercise),
+                        ),
+                        onTap: () {
+                          if (shouldDisable) {
+                            Get.find<PurchasesController>().presentPaywall();
+                            return;
+                          }
+                          Go.showBottomModalScreen(
+                            (context, controller) => ThemedSubtree(
+                              color: category.color,
+                              enabled: Get.find<SettingsController>()
+                                  .tintExercises
+                                  .value,
+                              child: ExerciseCreator(
+                                base: null,
+                                scrollController: controller,
+                              ),
                             ),
-                          ));
-                },
-              ),
-              const MasterItemDivider(),
-            ],
-            ...List.generate(
-              sorted.length,
-              (index) {
-                MasterItem exerciseListTile = ExerciseListTile(
-                  exercise: sorted[index],
-                  selected: false,
-                  isConcrete: false,
-                  trailing: kDebugMode && sorted[index].hasExplanation
-                      ? const Icon(GTIcons.explanation)
-                      : null,
-                ).getAsMasterItem(context, detailsBuilder: (context) {
-                  return ExerciseInfoView(
-                    key: ValueKey(sorted[index].id),
-                    exercise: sorted[index],
-                    refresh: () => refresh(() {}),
-                  );
-                });
+                          );
+                        },
+                      ),
+                      const MasterItemDivider(),
+                    ],
+                    MasterItemWidget(
+                      child: SubscriptionNag.unresponsive(
+                        stringKey: "library",
+                        subscriptionInfo: info,
+                        shouldHide: (subscriptionInfo) {
+                          return subscriptionInfo.hasProFeatures ||
+                              controller.exercises.length <
+                                  Configuration.trialCustomExerciseAlertLimit;
+                        },
+                      ),
+                    ),
+                    ...List.generate(sorted.length, (index) {
+                      MasterItem exerciseListTile =
+                          ExerciseListTile(
+                            exercise: sorted[index],
+                            selected: false,
+                            isConcrete: false,
+                            trailing: kDebugMode && sorted[index].hasExplanation
+                                ? const Icon(GTIcons.explanation)
+                                : null,
+                          ).getAsMasterItem(
+                            context,
+                            detailsBuilder: (context) {
+                              return ExerciseInfoView(
+                                key: ValueKey(sorted[index].id),
+                                exercise: sorted[index],
+                                refresh: () => refresh(() {}),
+                              );
+                            },
+                          );
 
-                return exerciseListTile;
+                      return exerciseListTile;
+                    }),
+                  ],
+                );
               },
-            ),
-          ],
+            );
+          },
         );
       },
     );
@@ -250,8 +296,9 @@ class ExerciseInfoView extends StatefulWidget {
 
 class _ExerciseInfoViewState extends State<ExerciseInfoView>
     with SingleTickerProviderStateMixin {
-  final historyStream =
-      BehaviorSubject<List<(Exercise, int, Workout)>>.seeded([]);
+  final historyStream = BehaviorSubject<List<(Exercise, int, Workout)>>.seeded(
+    [],
+  );
   late final StreamSubscription historySub;
   late final tabController = TabController(
     length: getTabs(widget.exercise, [], [], []).length,
@@ -282,25 +329,22 @@ class _ExerciseInfoViewState extends State<ExerciseInfoView>
       Get.find<HistoryController>().getHistoryOf(widget.exercise);
 
   List<Widget> getTabs(
-          Exercise exercise,
-          List<(Workout, Exercise)> chartHistory,
-          List<(Exercise, int, Workout)> history,
-          List<ListTileTheme> infoTiles) =>
-      [
-        SafeArea(
-          bottom: false,
-          child: _homeBody(exercise, chartHistory, history, infoTiles),
-        ),
-        SafeArea(
-          bottom: false,
-          child: _historyBody(exercise, chartHistory, history),
-        ),
-        if (exercise.standard && exercise.explanation != null)
-          SafeArea(
-            bottom: false,
-            child: _explanationBody(exercise),
-          ),
-      ];
+    Exercise exercise,
+    List<(Workout, Exercise)> chartHistory,
+    List<(Exercise, int, Workout)> history,
+    List<ListTileTheme> infoTiles,
+  ) => [
+    SafeArea(
+      bottom: false,
+      child: _homeBody(exercise, chartHistory, history, infoTiles),
+    ),
+    SafeArea(
+      bottom: false,
+      child: _historyBody(exercise, chartHistory, history),
+    ),
+    if (exercise.standard && exercise.explanation != null)
+      SafeArea(bottom: false, child: _explanationBody(exercise)),
+  ];
 
   late final category = exerciseStandardLibrary[widget.exercise.category];
 
@@ -321,22 +365,27 @@ class _ExerciseInfoViewState extends State<ExerciseInfoView>
             final infoTiles = _getInfoTiles(exercise, context);
             final chartHistory = history.map((e) => (e.$3, e.$1)).toList();
             chartHistory.sort(
-                (a, b) => a.$1.startingDate!.compareTo(b.$1.startingDate!));
+              (a, b) => a.$1.startingDate!.compareTo(b.$1.startingDate!),
+            );
 
             final tabs = getTabs(exercise, chartHistory, history, infoTiles);
 
             return Scaffold(
               appBar: AppBar(
-                title: Text.rich(TextSpan(children: [
-                  if (exercise.isCustom) ...[
-                    const WidgetSpan(
-                      child: CustomExerciseBadge(short: true),
-                      alignment: PlaceholderAlignment.middle,
-                    ),
-                    const TextSpan(text: " "),
-                  ],
-                  TextSpan(text: exercise.displayName),
-                ])),
+                title: Text.rich(
+                  TextSpan(
+                    children: [
+                      if (exercise.isCustom) ...[
+                        const WidgetSpan(
+                          child: CustomExerciseBadge(short: true),
+                          alignment: PlaceholderAlignment.middle,
+                        ),
+                        const TextSpan(text: " "),
+                      ],
+                      TextSpan(text: exercise.displayName),
+                    ],
+                  ),
+                ),
                 leading: MDVConfiguration.backButtonOf(context),
                 automaticallyImplyLeading: MDVConfiguration.of(context) == null,
                 actions: [
@@ -347,13 +396,18 @@ class _ExerciseInfoViewState extends State<ExerciseInfoView>
                         final category = exercise.primaryMuscleGroup.name;
                         var name = exercise.name
                             .toLowerCase()
-                            .replaceAllMapped(RegExp(r"(\b[a-z](?=[a-z]{1}))"),
-                                (match) => match.group(0)!.toUpperCase())
                             .replaceAllMapped(
-                                RegExp(r'[^a-zA-Z0-9]'), (match) => '');
+                              RegExp(r"(\b[a-z](?=[a-z]{1}))"),
+                              (match) => match.group(0)!.toUpperCase(),
+                            )
+                            .replaceAllMapped(
+                              RegExp(r'[^a-zA-Z0-9]'),
+                              (match) => '',
+                            );
                         name = name[0].toLowerCase() + name.substring(1);
 
-                        final dart = """      Exercise.standard(
+                        final dart =
+                            """      Exercise.standard(
         id: "library.$category.exercises.$name",
         name: "library.$category.exercises.$name".t,
         parameters: GTSetParameters.${exercise.parameters.name},
@@ -395,11 +449,13 @@ class _ExerciseInfoViewState extends State<ExerciseInfoView>
                             ),
                             onTap: () async {
                               final delete = await Go.confirm(
-                                  "exercise.delete.title",
-                                  "exercise.delete.body");
+                                "exercise.delete.title",
+                                "exercise.delete.body",
+                              );
                               if (delete) {
-                                Get.find<ExercisesController>()
-                                    .deleteExercise(exercise);
+                                Get.find<ExercisesController>().deleteExercise(
+                                  exercise,
+                                );
                                 widget.refresh?.call();
                                 Get.back();
                               }
@@ -432,10 +488,7 @@ class _ExerciseInfoViewState extends State<ExerciseInfoView>
               ),
               body: ListTileTheme(
                 contentPadding: EdgeInsets.zero,
-                child: TabBarView(
-                  controller: tabController,
-                  children: tabs,
-                ),
+                child: TabBarView(controller: tabController, children: tabs),
               ),
             );
           },
@@ -444,8 +497,12 @@ class _ExerciseInfoViewState extends State<ExerciseInfoView>
     );
   }
 
-  Widget _homeBody(Exercise exercise, List<(Workout, Exercise)> chartHistory,
-      List<(Exercise, int, Workout)> history, List<ListTileTheme> infoTiles) {
+  Widget _homeBody(
+    Exercise exercise,
+    List<(Workout, Exercise)> chartHistory,
+    List<(Exercise, int, Workout)> history,
+    List<ListTileTheme> infoTiles,
+  ) {
     final ongoingWorkout = Get.isRegistered<WorkoutController>()
         ? Get.find<WorkoutController>().synthesizeTemporaryWorkout()
         : null;
@@ -454,12 +511,13 @@ class _ExerciseInfoViewState extends State<ExerciseInfoView>
             ongoingWorkout,
             exercise.copyWith(
               sets: [
-                for (final set in ongoingWorkout.flattenedExercises
-                    .where((e) => e is Exercise && exercise.isTheSameAs(e))
-                    .fold([], (prev, e) {
-                  prev.addAll(e.sets);
-                  return prev;
-                }))
+                for (final set
+                    in ongoingWorkout.flattenedExercises
+                        .where((e) => e is Exercise && exercise.isTheSameAs(e))
+                        .fold([], (prev, e) {
+                          prev.addAll(e.sets);
+                          return prev;
+                        }))
                   if (set.done) set,
               ],
             ),
@@ -475,14 +533,13 @@ class _ExerciseInfoViewState extends State<ExerciseInfoView>
               SliverPadding(
                 padding: const EdgeInsets.all(16).copyWith(bottom: 8),
                 sliver: const SliverToBoxAdapter(
-                  child: Row(
-                    children: [CustomExerciseBadge()],
-                  ),
+                  child: Row(children: [CustomExerciseBadge()]),
                 ),
               ),
             SliverPadding(
-              padding: const EdgeInsets.all(16)
-                  .copyWith(top: exercise.isCustom ? 0 : 16),
+              padding: const EdgeInsets.all(
+                16,
+              ).copyWith(top: exercise.isCustom ? 0 : 16),
               sliver: SliverToBoxAdapter(
                 child: Text(
                   exercise.displayName,
@@ -507,45 +564,48 @@ class _ExerciseInfoViewState extends State<ExerciseInfoView>
               child: Padding(
                 padding: const EdgeInsets.all(16).copyWith(top: 0),
                 child: Text.rich(
-                  TextSpan(children: [
-                    if (exercise.primaryMuscleGroup != GTMuscleGroup.none) ...[
-                      TextSpan(
+                  TextSpan(
+                    children: [
+                      if (exercise.primaryMuscleGroup !=
+                          GTMuscleGroup.none) ...[
+                        TextSpan(
                           text: "exercise.info.primaryMuscleGroup".tParams({
-                        "muscleGroup":
-                            "muscleGroups.${exercise.primaryMuscleGroup.name}"
-                                .t,
-                      })),
-                      if (exercise.secondaryMuscleGroups.isNotEmpty) ...[
+                            "muscleGroup":
+                                "muscleGroups.${exercise.primaryMuscleGroup.name}"
+                                    .t,
+                          }),
+                        ),
+                        if (exercise.secondaryMuscleGroups.isNotEmpty) ...[
+                          const TextSpan(text: "\n"),
+                          TextSpan(
+                            text: "exercise.info.secondaryMuscleGroups"
+                                .tParams({
+                                  "muscleGroups": exercise.secondaryMuscleGroups
+                                      .map((e) => "muscleGroups.${e.name}".t)
+                                      .join(", "),
+                                }),
+                          ),
+                        ],
+                      ],
+                      const TextSpan(text: "\n"),
+                      TextSpan(
+                        text: "exercise.info.equipment".tParams({
+                          "equipment": exercise.gymEquipment.localizedName,
+                        }),
+                      ),
+                      if (kDebugMode) ...[
+                        const TextSpan(text: "\n"),
+                        TextSpan(text: "Parameters: ${exercise.parameters}"),
                         const TextSpan(text: "\n"),
                         TextSpan(
-                          text: "exercise.info.secondaryMuscleGroups".tParams({
-                            "muscleGroups": exercise.secondaryMuscleGroups
-                                .map((e) => "muscleGroups.${e.name}".t)
-                                .join(", "),
-                          }),
+                          text: "Muscle Highlight: ${exercise.muscleHighlight}",
                         ),
                       ],
                     ],
-                    const TextSpan(text: "\n"),
-                    TextSpan(
-                      text: "exercise.info.equipment".tParams({
-                        "equipment": exercise.gymEquipment.localizedName,
-                      }),
-                    ),
-                    if (kDebugMode) ...[
-                      const TextSpan(text: "\n"),
-                      TextSpan(
-                        text: "Parameters: ${exercise.parameters}",
-                      ),
-                      const TextSpan(text: "\n"),
-                      TextSpan(
-                        text: "Muscle Highlight: ${exercise.muscleHighlight}",
-                      ),
-                    ]
-                  ]),
+                  ),
                   style: Theme.of(context).textTheme.labelMedium!.copyWith(
-                        color: Theme.of(context).colorScheme.onSurfaceVariant,
-                      ),
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
                 ),
               ),
             ),
@@ -559,7 +619,9 @@ class _ExerciseInfoViewState extends State<ExerciseInfoView>
             ],
             if (chartHistory.isNotEmpty &&
                 ExerciseHistoryChart.shouldShow(
-                    chartHistory, ongoingWorkout != null))
+                  chartHistory,
+                  ongoingWorkout != null,
+                ))
               SliverPadding(
                 padding: const EdgeInsets.all(16),
                 sliver: SliverToBoxAdapter(
@@ -571,13 +633,9 @@ class _ExerciseInfoViewState extends State<ExerciseInfoView>
                 ),
               ),
             if (history.isNotEmpty && infoTiles.length > 1)
-              SliverList(
-                delegate: SliverChildListDelegate(infoTiles),
-              ),
+              SliverList(delegate: SliverChildListDelegate(infoTiles)),
             if (kDebugMode) ...[
-              const SliverToBoxAdapter(
-                child: SizedBox(height: 8),
-              ),
+              const SliverToBoxAdapter(child: SizedBox(height: 8)),
               SliverToBoxAdapter(
                 child: Text(
                   "id: ${widget.exercise.id}",
@@ -585,18 +643,12 @@ class _ExerciseInfoViewState extends State<ExerciseInfoView>
                 ),
               ),
             ],
-            const SliverToBoxAdapter(
-              child: SizedBox(height: 8),
-            ),
+            const SliverToBoxAdapter(child: SizedBox(height: 8)),
             SliverPadding(
-              padding: MediaQuery.of(context).padding.copyWith(
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                  ),
-              sliver: const SliverToBoxAdapter(
-                child: SizedBox.shrink(),
-              ),
+              padding: MediaQuery.of(
+                context,
+              ).padding.copyWith(top: 0, left: 0, right: 0),
+              sliver: const SliverToBoxAdapter(child: SizedBox.shrink()),
             ),
           ],
         );
@@ -604,8 +656,11 @@ class _ExerciseInfoViewState extends State<ExerciseInfoView>
     );
   }
 
-  Widget _historyBody(Exercise exercise, List<(Workout, Exercise)> chartHistory,
-      List<(Exercise, int, Workout)> history) {
+  Widget _historyBody(
+    Exercise exercise,
+    List<(Workout, Exercise)> chartHistory,
+    List<(Exercise, int, Workout)> history,
+  ) {
     return CustomScrollView(
       slivers: [
         const SliverToBoxAdapter(child: SizedBox(height: 8)),
@@ -616,8 +671,9 @@ class _ExerciseInfoViewState extends State<ExerciseInfoView>
               margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
               clipBehavior: Clip.antiAlias,
               child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 8)
-                    .copyWith(bottom: 16),
+                padding: const EdgeInsets.symmetric(
+                  vertical: 8,
+                ).copyWith(bottom: 16),
                 child: Column(
                   children: [
                     ExerciseDataView(
@@ -634,9 +690,7 @@ class _ExerciseInfoViewState extends State<ExerciseInfoView>
                       padding: const EdgeInsets.symmetric(horizontal: 16),
                       child: Column(
                         children: [
-                          TerseWorkoutListTile(
-                            workout: history[index].$3,
-                          ),
+                          TerseWorkoutListTile(workout: history[index].$3),
                         ],
                       ),
                     ),
@@ -651,7 +705,7 @@ class _ExerciseInfoViewState extends State<ExerciseInfoView>
                         );
                       },
                       child: Text("exercise.info.viewWorkout".t),
-                    )
+                    ),
                   ],
                 ),
               ),
@@ -668,14 +722,10 @@ class _ExerciseInfoViewState extends State<ExerciseInfoView>
         ],
         const SliverToBoxAdapter(child: SizedBox(height: 8)),
         SliverPadding(
-          padding: MediaQuery.of(context).padding.copyWith(
-                top: 0,
-                left: 0,
-                right: 0,
-              ),
-          sliver: const SliverToBoxAdapter(
-            child: SizedBox.shrink(),
-          ),
+          padding: MediaQuery.of(
+            context,
+          ).padding.copyWith(top: 0, left: 0, right: 0),
+          sliver: const SliverToBoxAdapter(child: SizedBox.shrink()),
         ),
       ],
     );
@@ -693,10 +743,12 @@ class _ExerciseInfoViewState extends State<ExerciseInfoView>
               sliver: SliverToBoxAdapter(
                 child: MarkdownBody(
                   data: exercise.explanation!,
-                  styleSheet:
-                      MarkdownStyleSheet.fromTheme(Theme.of(context)).copyWith(
-                    a: TextStyle(color: Theme.of(context).colorScheme.primary),
-                  ),
+                  styleSheet: MarkdownStyleSheet.fromTheme(Theme.of(context))
+                      .copyWith(
+                        a: TextStyle(
+                          color: Theme.of(context).colorScheme.primary,
+                        ),
+                      ),
                   onTapLink: (text, href, title) {
                     if (href == null) return;
                     final uri = Uri.tryParse(href);
@@ -734,14 +786,10 @@ class _ExerciseInfoViewState extends State<ExerciseInfoView>
               ),
             ),
             SliverPadding(
-              padding: MediaQuery.of(context).padding.copyWith(
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                  ),
-              sliver: const SliverToBoxAdapter(
-                child: SizedBox.shrink(),
-              ),
+              padding: MediaQuery.of(
+                context,
+              ).padding.copyWith(top: 0, left: 0, right: 0),
+              sliver: const SliverToBoxAdapter(child: SizedBox.shrink()),
             ),
           ],
         );
@@ -755,16 +803,19 @@ class _ExerciseInfoViewState extends State<ExerciseInfoView>
 
     const nullTile = SizedBox.shrink();
     final tiles = <Builder>[
-      if ([GTSetParameters.repsWeight, GTSetParameters.timeWeight]
-          .contains(exercise.parameters))
-        Builder(builder: (context) {
-          var best = history.first;
-          var bestScore = -1.0;
+      if ([
+        GTSetParameters.repsWeight,
+        GTSetParameters.timeWeight,
+      ].contains(exercise.parameters))
+        Builder(
+          builder: (context) {
+            var best = history.first;
+            var bestScore = -1.0;
 
-          for (final hist in history) {
-            final (Exercise exercise, int _, Workout workout) = hist;
-            if (exercise.sets.where((set) => set.done).isEmpty) continue;
-            final value = Weights.convert(
+            for (final hist in history) {
+              final (Exercise exercise, int _, Workout workout) = hist;
+              if (exercise.sets.where((set) => set.done).isEmpty) continue;
+              final value = Weights.convert(
                 value: exercise.sets
                     .where((set) => set.done)
                     .map((set) => set.weight)
@@ -772,116 +823,133 @@ class _ExerciseInfoViewState extends State<ExerciseInfoView>
                     .max
                     .toDouble(),
                 from: workout.weightUnit,
-                to: settingsController.weightUnit.value);
-            if (value > bestScore) {
-              best = hist;
-              bestScore = value;
-            }
-          }
-
-          if (bestScore < 0) return nullTile;
-
-          return ExerciseInfoTile(
-            "exercise.info.heaviestWeight.label".t,
-            bestScore.userFacingWeight,
-            onTap: () {
-              Go.to(() => ExercisesView(
-                    workout: best.$3,
-                    highlightExercise: (ex) {
-                      return ex.id == best.$1.id;
-                    },
-                  ));
-            },
-          );
-        }),
-      if ([GTSetParameters.repsWeight].contains(exercise.parameters))
-        Builder(builder: (context) {
-          var best = history.first;
-          var bestScore = -1.0;
-
-          for (final hist in history) {
-            final (Exercise exercise, int _, Workout workout) = hist;
-            if (exercise.sets.where((set) => set.done).isEmpty) continue;
-            var val = exercise.sets
-                .where((set) => set.done)
-                .map((set) => set.oneRepMax)
-                .whereType<num>()
-                .safeMax
-                ?.toDouble();
-            if (val == null) continue;
-            final value = Weights.convert(
-                value: val,
-                from: workout.weightUnit,
-                to: settingsController.weightUnit.value);
-            if (value > bestScore) {
-              best = hist;
-              bestScore = value;
-            }
-          }
-
-          if (bestScore < 0) return nullTile;
-
-          return ExerciseInfoTile(
-            "exercise.info.best1rm.label".t,
-            bestScore.userFacingWeight,
-            onTap: () {
-              Go.to(() => ExercisesView(
-                    workout: best.$3,
-                    highlightExercise: (ex) {
-                      return ex.id == best.$1.id;
-                    },
-                  ));
-            },
-          );
-        }),
-      if ([GTSetParameters.repsWeight].contains(exercise.parameters))
-        Builder(builder: (context) {
-          var best = history.first;
-          var bestWeight = 0.0;
-          var bestReps = 0;
-          var bestScore = -1.0;
-
-          for (final hist in history) {
-            final (Exercise exercise, int _, Workout workout) = hist;
-            for (final set in exercise.sets.where((set) => set.done)) {
-              final value = Weights.convert(
-                  value: set.weight!,
-                  from: workout.weightUnit,
-                  to: settingsController.weightUnit.value);
-              if ((value * set.reps!) > bestScore) {
+                to: settingsController.weightUnit.value,
+              );
+              if (value > bestScore) {
                 best = hist;
-                bestScore = (value * set.reps!);
-                bestWeight = value;
-                bestReps = set.reps!;
+                bestScore = value;
               }
             }
-          }
 
-          if (bestReps == 0) return nullTile;
+            if (bestScore < 0) return nullTile;
 
-          return ExerciseInfoTile(
-            "exercise.info.bestSetVolume.label".t,
-            "${bestWeight.userFacingWeight} × $bestReps",
-            onTap: () {
-              Go.to(() => ExercisesView(
+            return ExerciseInfoTile(
+              "exercise.info.heaviestWeight.label".t,
+              bestScore.userFacingWeight,
+              onTap: () {
+                Go.to(
+                  () => ExercisesView(
                     workout: best.$3,
                     highlightExercise: (ex) {
                       return ex.id == best.$1.id;
                     },
-                  ));
-            },
-          );
-        }),
-      if ([GTSetParameters.repsWeight, GTSetParameters.timeWeight]
-          .contains(exercise.parameters))
-        Builder(builder: (context) {
-          var best = history.first;
-          var bestScore = -1.0;
+                  ),
+                );
+              },
+            );
+          },
+        ),
+      if ([GTSetParameters.repsWeight].contains(exercise.parameters))
+        Builder(
+          builder: (context) {
+            var best = history.first;
+            var bestScore = -1.0;
 
-          for (final hist in history) {
-            final (Exercise exercise, int _, Workout workout) = hist;
-            if (exercise.sets.where((set) => set.done).isEmpty) continue;
-            final value = Weights.convert(
+            for (final hist in history) {
+              final (Exercise exercise, int _, Workout workout) = hist;
+              if (exercise.sets.where((set) => set.done).isEmpty) continue;
+              var val = exercise.sets
+                  .where((set) => set.done)
+                  .map((set) => set.oneRepMax)
+                  .whereType<num>()
+                  .safeMax
+                  ?.toDouble();
+              if (val == null) continue;
+              final value = Weights.convert(
+                value: val,
+                from: workout.weightUnit,
+                to: settingsController.weightUnit.value,
+              );
+              if (value > bestScore) {
+                best = hist;
+                bestScore = value;
+              }
+            }
+
+            if (bestScore < 0) return nullTile;
+
+            return ExerciseInfoTile(
+              "exercise.info.best1rm.label".t,
+              bestScore.userFacingWeight,
+              onTap: () {
+                Go.to(
+                  () => ExercisesView(
+                    workout: best.$3,
+                    highlightExercise: (ex) {
+                      return ex.id == best.$1.id;
+                    },
+                  ),
+                );
+              },
+            );
+          },
+        ),
+      if ([GTSetParameters.repsWeight].contains(exercise.parameters))
+        Builder(
+          builder: (context) {
+            var best = history.first;
+            var bestWeight = 0.0;
+            var bestReps = 0;
+            var bestScore = -1.0;
+
+            for (final hist in history) {
+              final (Exercise exercise, int _, Workout workout) = hist;
+              for (final set in exercise.sets.where((set) => set.done)) {
+                final value = Weights.convert(
+                  value: set.weight!,
+                  from: workout.weightUnit,
+                  to: settingsController.weightUnit.value,
+                );
+                if ((value * set.reps!) > bestScore) {
+                  best = hist;
+                  bestScore = (value * set.reps!);
+                  bestWeight = value;
+                  bestReps = set.reps!;
+                }
+              }
+            }
+
+            if (bestReps == 0) return nullTile;
+
+            return ExerciseInfoTile(
+              "exercise.info.bestSetVolume.label".t,
+              "${bestWeight.userFacingWeight} × $bestReps",
+              onTap: () {
+                Go.to(
+                  () => ExercisesView(
+                    workout: best.$3,
+                    highlightExercise: (ex) {
+                      return ex.id == best.$1.id;
+                    },
+                  ),
+                );
+              },
+            );
+          },
+        ),
+      if ([
+        GTSetParameters.repsWeight,
+        GTSetParameters.timeWeight,
+      ].contains(exercise.parameters))
+        Builder(
+          builder: (context) {
+            var best = history.first;
+            var bestScore = -1.0;
+
+            for (final hist in history) {
+              final (Exercise exercise, int _, Workout workout) = hist;
+              if (exercise.sets.where((set) => set.done).isEmpty) continue;
+              final value = Weights.convert(
                 value: exercise.sets
                     .where((set) => set.done)
                     .map((set) => set.weight! * (set.reps ?? 1))
@@ -889,28 +957,32 @@ class _ExerciseInfoViewState extends State<ExerciseInfoView>
                     .sum
                     .toDouble(),
                 from: workout.weightUnit,
-                to: settingsController.weightUnit.value);
-            if (value > bestScore) {
-              best = hist;
-              bestScore = value;
+                to: settingsController.weightUnit.value,
+              );
+              if (value > bestScore) {
+                best = hist;
+                bestScore = value;
+              }
             }
-          }
 
-          if (bestScore < 0) return nullTile;
+            if (bestScore < 0) return nullTile;
 
-          return ExerciseInfoTile(
-            "exercise.info.bestSessionVolume.label".t,
-            bestScore.userFacingWeight,
-            onTap: () {
-              Go.to(() => ExercisesView(
+            return ExerciseInfoTile(
+              "exercise.info.bestSessionVolume.label".t,
+              bestScore.userFacingWeight,
+              onTap: () {
+                Go.to(
+                  () => ExercisesView(
                     workout: best.$3,
                     highlightExercise: (ex) {
                       return ex.id == best.$1.id;
                     },
-                  ));
-            },
-          );
-        })
+                  ),
+                );
+              },
+            );
+          },
+        ),
     ];
 
     if (tiles.isEmpty) return [];
@@ -923,18 +995,17 @@ class _ExerciseInfoViewState extends State<ExerciseInfoView>
     return [
       Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16),
-        child: Text("exercise.info.usefulData".t,
-            style: Theme.of(context).textTheme.labelLarge!.copyWith(
-                  color: Theme.of(context).colorScheme.primary,
-                )),
+        child: Text(
+          "exercise.info.usefulData".t,
+          style: Theme.of(context).textTheme.labelLarge!.copyWith(
+            color: Theme.of(context).colorScheme.primary,
+          ),
+        ),
       ),
       ...tiles,
     ].map((w) {
       // Restore default theme for this section only
-      return ListTileTheme(
-        data: Theme.of(context).listTileTheme,
-        child: w,
-      );
+      return ListTileTheme(data: Theme.of(context).listTileTheme, child: w);
     }).toList();
   }
 }
@@ -943,12 +1014,7 @@ class ExerciseInfoTile extends StatelessWidget {
   final String title, subtitle;
   final VoidCallback? onTap;
 
-  const ExerciseInfoTile(
-    this.title,
-    this.subtitle, {
-    this.onTap,
-    super.key,
-  });
+  const ExerciseInfoTile(this.title, this.subtitle, {this.onTap, super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -961,8 +1027,9 @@ class DebugExercisesWithoutExplanationList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final filtered =
-        exerciseStandardLibraryAsList.where((e) => !e.hasExplanation).toList();
+    final filtered = exerciseStandardLibraryAsList
+        .where((e) => !e.hasExplanation)
+        .toList();
     return Scaffold(
       appBar: AppBar(
         title: Text("${"exercise.info.explanation".t} [${filtered.length}]"),

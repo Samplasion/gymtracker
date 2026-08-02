@@ -4,6 +4,7 @@ import 'package:gymtracker/controller/coordinator.dart';
 import 'package:gymtracker/controller/food_controller.dart';
 import 'package:gymtracker/controller/health_controller.dart';
 import 'package:gymtracker/controller/notifications_controller.dart';
+import 'package:gymtracker/controller/purchases_controller.dart';
 import 'package:gymtracker/controller/settings_controller.dart';
 import 'package:gymtracker/data/distance.dart';
 import 'package:gymtracker/data/weights.dart';
@@ -16,12 +17,10 @@ import 'package:gymtracker/service/version.dart';
 import 'package:gymtracker/struct/nutrition.dart';
 import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/utils/go.dart';
-import 'package:gymtracker/view/components/badges.dart';
 import 'package:gymtracker/view/components/controlled.dart';
 import 'package:gymtracker/view/components/master_detail.dart';
 import 'package:gymtracker/view/settings/color.dart';
 import 'package:gymtracker/view/settings/radio.dart';
-import 'package:gymtracker/view/skeleton.dart';
 import 'package:gymtracker/view/utils/in_app_icon.dart';
 import 'package:gymtracker/view/utils/sliver_utils.dart';
 import 'package:intl/intl.dart';
@@ -42,10 +41,7 @@ class SettingsView extends ControlledWidget<SettingsController> {
       "build": const String.fromEnvironment(
         "BUILD",
         defaultValue: "[NO_VALUE]",
-      ).replaceAll(
-        "[NO_VALUE]",
-        VersionService().packageInfo.buildNumber,
-      ),
+      ).replaceAll("[NO_VALUE]", VersionService().packageInfo.buildNumber),
     });
 
     return StreamBuilder<Object>(
@@ -56,7 +52,6 @@ class SettingsView extends ControlledWidget<SettingsController> {
 
         return MasterDetailView(
           appBarTitle: Text("settings.title".t),
-          leading: const SkeletonDrawerButton(),
           items: [
             MasterItem(
               Text("settings.panes.appearance".t),
@@ -88,8 +83,18 @@ class SettingsView extends ControlledWidget<SettingsController> {
               detailsBuilder: (_) => const AdvancedSettingsView(),
             ),
             MasterItem(
-              Text(MaterialLocalizations.of(context)
-                  .aboutListTileTitle("appName".t)),
+              Text("settings.pro.title".t),
+              leading: GTIcons.compound.pro,
+              onTap: () {
+                Get.find<PurchasesController>().presentCustomerCenter();
+              },
+            ),
+            MasterItem(
+              Text(
+                MaterialLocalizations.of(
+                  context,
+                ).aboutListTileTitle("appName".t),
+              ),
               leading: const Icon(GTIcons.info),
               subtitle: Text(appVersion),
               onTap: () {
@@ -97,9 +102,7 @@ class SettingsView extends ControlledWidget<SettingsController> {
                   context: context,
                   applicationName: "appName".t,
                   applicationVersion: appVersion,
-                  children: [
-                    Text("appInfo.shortDescription".t),
-                  ],
+                  children: [Text("appInfo.shortDescription".t)],
                   applicationIcon: const InAppIcon.proportional(),
                 );
               },

@@ -49,9 +49,9 @@ class MDVConfiguration extends InheritedWidget {
     this.goBack,
     super.key,
   }) : assert(
-          selfPage == (goBack != null),
-          'goBack must be specified only when selfPage is true',
-        );
+         selfPage == (goBack != null),
+         'goBack must be specified only when selfPage is true',
+       );
 
   /// If details is a page by itself. Is false if the details should be showed
   /// in lateral view.
@@ -65,8 +65,8 @@ class MDVConfiguration extends InheritedWidget {
 
   /// Obtains the settings to be used by a details item or one of it's ancestors.
   static MDVConfiguration? of(BuildContext context) {
-    final MDVConfiguration? result =
-        context.dependOnInheritedWidgetOfExactType<MDVConfiguration>();
+    final MDVConfiguration? result = context
+        .dependOnInheritedWidgetOfExactType<MDVConfiguration>();
     return result;
   }
 
@@ -84,18 +84,10 @@ class MDVConfiguration extends InheritedWidget {
     return selfPage != oldWidget.selfPage;
   }
 
-  void push(
-    BuildContext context,
-    Widget widget, {
-    String? id,
-  }) {
+  void push(BuildContext context, Widget widget, {String? id}) {
     MasterDetailView._push(
       context,
-      MasterItem(
-        Container(),
-        detailsBuilder: (_) => widget,
-        id: id,
-      ),
+      MasterItem(Container(), detailsBuilder: (_) => widget, id: id),
     );
   }
 }
@@ -125,8 +117,8 @@ class MasterDetailView extends StatefulWidget {
   });
 
   static void _push(BuildContext context, MasterItem item) {
-    _MasterDetailViewState state =
-        context.findAncestorStateOfType<_MasterDetailViewState>()!;
+    _MasterDetailViewState state = context
+        .findAncestorStateOfType<_MasterDetailViewState>()!;
     state._push(item);
   }
 
@@ -137,10 +129,21 @@ class MasterDetailView extends StatefulWidget {
 class _MasterDetailViewState extends State<MasterDetailView> {
   MDVFocus focus = MDVFocus.master;
   MasterItem? selectedItem;
+  ScrollController masterScrollController = ScrollController();
+  final bucket = PageStorageBucket();
 
   @override
   void initState() {
     super.initState();
+    masterScrollController.addListener(() {
+      print("Master scroll offset: ${masterScrollController.offset}");
+    });
+  }
+
+  @override
+  void dispose() {
+    masterScrollController.dispose();
+    super.dispose();
   }
 
   @override
@@ -172,9 +175,7 @@ class _MasterDetailViewState extends State<MasterDetailView> {
           mainAxisSize: MainAxisSize.max,
           children: <Widget>[
             Container(
-              constraints: BoxConstraints(
-                maxWidth: widget.masterWidth,
-              ),
+              constraints: BoxConstraints(maxWidth: widget.masterWidth),
               child: ListTileTheme(
                 data: ListTileThemeData(
                   selectedColor: colorScheme.onSecondaryContainer,
@@ -191,40 +192,42 @@ class _MasterDetailViewState extends State<MasterDetailView> {
                 ),
                 style: ListTileStyle.drawer,
                 child: DividerTheme(
-                  data: const DividerThemeData(
-                    indent: 32,
-                    endIndent: 32,
-                  ),
-                  child: ListView.builder(
-                    itemBuilder: (BuildContext context, int index) {
-                      if (index == widget.items.length) {
-                        return Column(
-                          children: [
-                            SizedBox(
-                              height: MediaQuery.of(context).padding.bottom,
-                            ),
-                            if (kDebugMode) ...[
-                              Text("${selectedItem?.id}"),
+                  data: const DividerThemeData(indent: 32, endIndent: 32),
+                  child: Scrollbar(
+                    controller: masterScrollController,
+                    child: ListView.builder(
+                      controller: masterScrollController,
+                      itemBuilder: (BuildContext context, int index) {
+                        if (index == widget.items.length) {
+                          return Column(
+                            children: [
+                              SizedBox(
+                                height: MediaQuery.of(context).padding.bottom,
+                              ),
+                              if (kDebugMode) ...[Text("${selectedItem?.id}")],
                             ],
-                          ],
+                          );
+                        }
+                        final MasterItemBase itemBase = widget.items[index];
+                        if (itemBase is Widget) {
+                          return itemBase as Widget;
+                        }
+                        final MasterItem item = itemBase as MasterItem;
+                        return Padding(
+                          padding: EdgeInsets.symmetric(
+                            horizontal:
+                                theme
+                                    .listTileTheme
+                                    .contentPadding
+                                    ?.horizontal ??
+                                16,
+                            vertical: 2,
+                          ),
+                          child: _listTileBuilder(item),
                         );
-                      }
-                      final MasterItemBase itemBase = widget.items[index];
-                      if (itemBase is Widget) {
-                        return itemBase as Widget;
-                      }
-                      final MasterItem item = itemBase as MasterItem;
-                      return Padding(
-                        padding: EdgeInsets.symmetric(
-                          horizontal:
-                              theme.listTileTheme.contentPadding?.horizontal ??
-                                  16,
-                          vertical: 2,
-                        ),
-                        child: _listTileBuilder(item),
-                      );
-                    },
-                    itemCount: widget.items.length + 1,
+                      },
+                      itemCount: widget.items.length + 1,
+                    ),
                   ),
                 ),
               ),
@@ -236,10 +239,9 @@ class _MasterDetailViewState extends State<MasterDetailView> {
                 bottom: false,
                 child: MediaQuery(
                   data: MediaQuery.of(context).copyWith(
-                    padding: MediaQuery.of(context).padding.copyWith(
-                          left: 0,
-                          right: 0,
-                        ),
+                    padding: MediaQuery.of(
+                      context,
+                    ).padding.copyWith(left: 0, right: 0),
                   ),
                   child: AnimatedSwitcher(
                     duration: widget.transitionAnimationDuration,
@@ -247,22 +249,21 @@ class _MasterDetailViewState extends State<MasterDetailView> {
                         (Widget child, Animation<double> animation) =>
                             const FadeUpwardsPageTransitionsBuilder()
                                 .buildTransitions<void>(
-                      null,
-                      null,
-                      animation,
-                      null,
-                      child,
-                    ),
+                                  null,
+                                  null,
+                                  animation,
+                                  null,
+                                  child,
+                                ),
                     child: Padding(
                       key: _getKey(),
-                      padding: const EdgeInsetsDirectional.only(
-                        end: 12,
-                      ),
+                      padding: const EdgeInsetsDirectional.only(end: 12),
                       child: Material(
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.vertical(
                             top: Radius.circular(
-                                widget.detailsPanelCornersRadius),
+                              widget.detailsPanelCornersRadius,
+                            ),
                           ),
                         ),
                         color: ElevationOverlay.applySurfaceTint(
@@ -274,9 +275,11 @@ class _MasterDetailViewState extends State<MasterDetailView> {
                         clipBehavior: Clip.antiAlias,
                         child: MDVConfiguration(
                           selfPage: false,
-                          child: selectedItem?.detailsBuilder?.call(context) ??
+                          child:
+                              selectedItem?.detailsBuilder?.call(context) ??
                               Center(
-                                child: widget.nothingSelectedWidget ??
+                                child:
+                                    widget.nothingSelectedWidget ??
                                     const SizedBox(),
                               ),
                         ),
@@ -290,66 +293,87 @@ class _MasterDetailViewState extends State<MasterDetailView> {
         ),
       );
     } else {
-      return ClipRect(
-        clipBehavior: Clip.hardEdge,
-        child: PageTransitionSwitcher(
-          duration: const Duration(milliseconds: 500),
-          reverse: focus == MDVFocus.master,
-          transitionBuilder: (
-            Widget child,
-            Animation<double> primaryAnimation,
-            Animation<double> secondaryAnimation,
-          ) {
-            return SharedAxisTransition(
-              animation: primaryAnimation,
-              secondaryAnimation: secondaryAnimation,
-              transitionType: SharedAxisTransitionType.horizontal,
-              fillColor: Theme.of(context).colorScheme.surface,
-              child: child,
-            );
-          },
-          child: focus == MDVFocus.details && selectedItem != null
-              ? MDVConfiguration(
-                  key: ValueKey<MDVFocus>(focus),
-                  selfPage: true,
-                  goBack: () {
-                    if (mounted) {
-                      setState(() {
-                        focus = MDVFocus.master;
-                        selectedItem = null;
-                      });
-                    }
-                  },
-                  child: Scaffold(
-                    body: selectedItem!.detailsBuilder!(context),
-                  ),
-                )
-              : Scaffold(
-                  key: _getKey(),
-                  body: CustomScrollView(
-                    slivers: <Widget>[
-                      SliverAppBar.large(
-                        title: widget.appBarTitle,
-                        leading: widget.leading,
-                        actions: widget.appBarActions,
+      return PageStorage(
+        bucket: bucket,
+        child: ClipRect(
+          clipBehavior: Clip.hardEdge,
+          child: PageTransitionSwitcher(
+            duration: const Duration(milliseconds: 500),
+            reverse: focus == MDVFocus.master,
+            transitionBuilder:
+                (
+                  Widget child,
+                  Animation<double> primaryAnimation,
+                  Animation<double> secondaryAnimation,
+                ) {
+                  return SharedAxisTransition(
+                    animation: primaryAnimation,
+                    secondaryAnimation: secondaryAnimation,
+                    transitionType: SharedAxisTransitionType.horizontal,
+                    fillColor: Theme.of(context).colorScheme.surface,
+                    child: child,
+                  );
+                },
+            child: focus == MDVFocus.details && selectedItem != null
+                ? PopScope(
+                    key: _getKey(),
+                    canPop: focus == MDVFocus.master,
+                    onPopInvokedWithResult: (didPop, result) {
+                      if (!didPop) {
+                        setState(() {
+                          focus = MDVFocus.master;
+                          selectedItem = null;
+                        });
+                      }
+                    },
+                    child: MDVConfiguration(
+                      key: ValueKey<MDVFocus>(focus),
+                      selfPage: true,
+                      goBack: () {
+                        if (mounted) {
+                          setState(() {
+                            focus = MDVFocus.master;
+                            selectedItem = null;
+                          });
+                        }
+                      },
+                      child: Scaffold(
+                        body: selectedItem!.detailsBuilder!(context),
                       ),
-                      SliverList(
-                        delegate: SliverChildBuilderDelegate(
-                          (BuildContext context, int index) {
-                            final MasterItemBase itemBase = widget.items[index];
-                            if (itemBase is Widget) {
-                              return itemBase as Widget;
-                            }
-                            final MasterItem item = itemBase as MasterItem;
-                            return _listTileBuilder(item, page: true);
-                          },
-                          childCount: widget.items.length,
-                        ),
+                    ),
+                  )
+                : Scaffold(
+                    key: PageStorageKey<String>('master'),
+                    body: Scrollbar(
+                      controller: masterScrollController,
+                      child: CustomScrollView(
+                        controller: masterScrollController,
+                        slivers: <Widget>[
+                          SliverAppBar.medium(
+                            title: widget.appBarTitle,
+                            leading: widget.leading,
+                            actions: widget.appBarActions,
+                          ),
+                          SliverList(
+                            delegate: SliverChildBuilderDelegate((
+                              BuildContext context,
+                              int index,
+                            ) {
+                              final MasterItemBase itemBase =
+                                  widget.items[index];
+                              if (itemBase is Widget) {
+                                return itemBase as Widget;
+                              }
+                              final MasterItem item = itemBase as MasterItem;
+                              return _listTileBuilder(item, page: true);
+                            }, childCount: widget.items.length),
+                          ),
+                          const SliverBottomSafeArea(),
+                        ],
                       ),
-                      const SliverBottomSafeArea(),
-                    ],
+                    ),
                   ),
-                ),
+          ),
         ),
       );
     }
@@ -381,7 +405,7 @@ class _MasterDetailViewState extends State<MasterDetailView> {
     );
   }
 
-  _push(MasterItem item) {
+  void _push(MasterItem item) {
     if (mounted) {
       setState(() {
         focus = MDVFocus.details;
@@ -420,9 +444,9 @@ class MasterItem extends MasterItemBase {
     this.trailing,
     this.id,
   }) : assert(
-          detailsBuilder != null || onTap != null,
-          'You need to specify at least one of detailsBuilder or onTap.',
-        );
+         detailsBuilder != null || onTap != null,
+         'You need to specify at least one of detailsBuilder or onTap.',
+       );
 
   /// The title showed in the list tile
   final Widget title;
@@ -483,13 +507,9 @@ class DetailsView extends StatelessWidget {
       color: canvasColor,
       child: Theme(
         data: theme.copyWith(
-          appBarTheme: theme.appBarTheme.copyWith(
-            backgroundColor: canvasColor,
-          ),
+          appBarTheme: theme.appBarTheme.copyWith(backgroundColor: canvasColor),
           scaffoldBackgroundColor: canvasColor,
-          colorScheme: colorScheme.copyWith(
-            surface: canvasColor,
-          ),
+          colorScheme: colorScheme.copyWith(surface: canvasColor),
         ),
         child: child,
       ),
@@ -514,8 +534,11 @@ class CustomPageRouteBuilder<T> extends PageRoute<T> {
   String? get barrierLabel => null;
 
   @override
-  Widget buildPage(BuildContext context, Animation<double> animation,
-      Animation<double> secondaryAnimation) {
+  Widget buildPage(
+    BuildContext context,
+    Animation<double> animation,
+    Animation<double> secondaryAnimation,
+  ) {
     return pageBuilder(context, this);
   }
 
@@ -533,11 +556,11 @@ class CustomPageRouteBuilder<T> extends PageRoute<T> {
     Widget child,
   ) {
     return Theme.of(context).pageTransitionsTheme.buildTransitions(
-          this,
-          context,
-          animation,
-          secondaryAnimation,
-          child,
-        );
+      this,
+      context,
+      animation,
+      secondaryAnimation,
+      child,
+    );
   }
 }

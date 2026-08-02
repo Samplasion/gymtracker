@@ -8,10 +8,7 @@ import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
 class WorkoutIcon extends StatelessWidget {
-  const WorkoutIcon({
-    super.key,
-    required this.workout,
-  });
+  const WorkoutIcon({super.key, required this.workout});
 
   final Workout workout;
 
@@ -48,9 +45,7 @@ class RoutineListTile extends StatelessWidget {
       trailing: trailing,
       title: Text(
         name.isEmpty ? "general.unnamed".t : name,
-        style: TextStyle(
-          fontStyle: name.isEmpty ? FontStyle.italic : null,
-        ),
+        style: TextStyle(fontStyle: name.isEmpty ? FontStyle.italic : null),
       ),
       subtitle: Text("general.exercises".plural(routine.displayExerciseCount)),
       onTap: onTap,
@@ -73,7 +68,7 @@ class RoutinePreview extends StatelessWidget {
     return CustomScrollView(
       controller: ModalScrollController.of(context),
       slivers: [
-        SliverAppBar.medium(
+        SliverAppBar.large(
           title: SafeArea(child: Text(routine.name)),
           automaticallyImplyLeading: automaticallyImplyLeading,
           shadowColor: Colors.transparent,
@@ -81,14 +76,11 @@ class RoutinePreview extends StatelessWidget {
         if (routine.shouldShowInfobox)
           SliverPadding(
             padding: MediaQuery.of(context).padding.onlyHorizontal,
-            sliver: SliverToBoxAdapter(
-              child: Infobox(
-                text: routine.infobox!,
-              ),
-            ),
+            sliver: SliverToBoxAdapter(child: Infobox(text: routine.infobox!)),
           ),
         SliverPadding(
-          padding: const EdgeInsets.all(16) +
+          padding:
+              const EdgeInsets.all(16) +
               MediaQuery.of(context).padding.copyWith(top: 0),
           sliver: DecoratedSliver(
             decoration: BoxDecoration(
@@ -101,24 +93,21 @@ class RoutinePreview extends StatelessWidget {
             sliver: SliverPadding(
               padding: const EdgeInsets.all(1),
               sliver: SliverList(
-                delegate: SliverChildBuilderDelegate(
-                  (context, index) {
-                    final exercise = routine.exercises[index];
-                    return Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 8),
-                      child: ExerciseDataView(
-                        exercise: exercise,
-                        workout: routine,
-                        index: index,
-                        isInSuperset: false,
-                        highlight: false,
-                        weightUnit: routine.weightUnit,
-                        distanceUnit: routine.distanceUnit,
-                      ),
-                    );
-                  },
-                  childCount: routine.exercises.length,
-                ),
+                delegate: SliverChildBuilderDelegate((context, index) {
+                  final exercise = routine.exercises[index];
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 8),
+                    child: ExerciseDataView(
+                      exercise: exercise,
+                      workout: routine,
+                      index: index,
+                      isInSuperset: false,
+                      highlight: false,
+                      weightUnit: routine.weightUnit,
+                      distanceUnit: routine.distanceUnit,
+                    ),
+                  );
+                }, childCount: routine.exercises.length),
               ),
             ),
           ),

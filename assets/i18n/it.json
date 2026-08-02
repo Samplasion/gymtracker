@@ -2,7 +2,9 @@
   "appName": "Gym Bro",
   "appInfo": {
     "version": "Versione @version (build @build)",
-    "shortDescription": "Il miglior tracker per i tuoi allenamenti."
+    "shortDescription": "Il miglior tracker per i tuoi allenamenti.",
+    "terms": "Termini di servizio",
+    "privacy": "Informativa sulla privacy"
   },
   "set": {
     "kind": "Tipo serie",
@@ -511,6 +513,9 @@
     },
     "permissions": {
       "tapToRequest": "Tocca per richiedere l'autorizzazione"
+    },
+    "pro": {
+      "title": "Gestisci il tuo abbonamento"
     }
   },
   "ongoingWorkout": {
@@ -2494,5 +2499,56 @@
       "title": "Ecco fatto",
       "text": "Puoi iniziare i tuoi allenamenti con Gym Bro."
     }
+  },
+  "nags": {
+    "routines": {
+      "title": "Stai usando Gym Bro da un po' di tempo, vero?",
+      "subtitle": "Con Gym Bro Pro, puoi creare routine illimitate. Dai un'occhiata alla versione Pro e porta i tuoi allenamenti al livello successivo!"
+    },
+    "button": "Unisciti ora!",
+    "library": {
+      "title": "Stai esplorando Gym Bro da un po' di tempo, vero?",
+      "subtitle": "Con Gym Bro Pro, puoi creare esercizi illimitati. Dai un'occhiata alla versione Pro e porta i tuoi allenamenti al livello successivo!"
+    },
+    "history": {
+      "title": "Stai sfruttando Gym Bro da un bel po' di tempo, sembra!",
+      "subtitle": "Con Gym Bro Pro, puoi iniziare allenamenti illimitati. Dai un'occhiata alla versione Pro e porta i tuoi allenamenti al livello successivo!"
+    },
+    "food": {
+      "title": "Aspetta un attimo, non puoi ancora farlo.",
+      "subtitle": "Con la versione Pro, puoi vedere i dati storici dei tuoi pasti. Dai un'occhiata alla versione Pro e porta la tua nutrizione al livello successivo!"
+    }
+  },
+  "feed": {
+    "title": "Feed",
+    "empty": {
+      "title": "Nessuna attività",
+      "text": "Non ci sono ancora attività da mostrare. Inizia un allenamento o sblocca un traguardo per vedere le tue attività qui."
+    },
+    "startWorkout": "Inizia un allenamento",
+    "workout": {
+      "title": {
+        "you": "Tu"
+      },
+      "subtitle": {
+        "you": "hai completato un allenamento",
+        "friend": "ha completato un allenamento"
+      }
+    },
+    "achievement": {
+      "title": {
+        "you": "Tu"
+      },
+      "subtitle": {
+        "you": "hai sbloccato un traguardo",
+        "friend": "ha sbloccato un traguardo"
+      }
+    }
+  },
+  "workoutPage": {
+    "title": "Allenati"
+  },
+  "pro": {
+    "title": "PRO"
   }
 }

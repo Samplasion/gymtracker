@@ -131,6 +131,7 @@ class AchievementSnackBar extends SnackBar {
   AchievementSnackBar({
     required this.achievement,
     required this.completion,
+    bool inverted = true,
     super.key,
   }) : super(
           behavior: SnackBarBehavior.floating,
@@ -147,14 +148,14 @@ class AchievementSnackBar extends SnackBar {
                       Text(
                         achievement.getLevel(completion)!.localizedName,
                         style: context.theme.textTheme.bodyLarge!.copyWith(
-                          color: context.theme.colorScheme.onInverseSurface,
+                          color: inverted ? context.theme.colorScheme.onInverseSurface : null,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                       Text(
                         achievement.getLevel(completion)!.localizedDescription,
                         style: context.theme.textTheme.bodySmall!.copyWith(
-                          color: context.theme.colorScheme.onInverseSurface,
+                          color: inverted ? context.theme.colorScheme.onInverseSurface : null,
                         ),
                       ),
                     ],

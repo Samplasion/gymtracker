@@ -41,7 +41,9 @@ class ExercisePicker extends StatefulWidget {
     this.individualFilter,
     super.key,
   }) : assert(
-            allowNone ? singlePick : true, "Cannot allow none and multi pick");
+         allowNone ? singlePick : true,
+         "Cannot allow none and multi pick",
+       );
 
   @override
   State<ExercisePicker> createState() => _ExercisePickerState();
@@ -74,7 +76,7 @@ class _ExercisePickerState extends State<ExercisePicker> {
         GTExerciseMuscleCategory.custom: ExerciseCategory(
           exercises: controller.exercises.where(_filter).toList(),
           iconGetter: () => const Icon(GTIcons.custom_exercises),
-          color: Colors.yellow,
+          color: context.harmonizeColor(Colors.yellow),
         ),
       if (widget.filter.hasLibrary)
         for (final key in sortedCategories)
@@ -148,10 +150,14 @@ class _ExercisePickerState extends State<ExercisePicker> {
                   isLabelVisible: badges[category.key]!.isLabelVisible,
                   label: badges[category.key]!.label,
                   child: CircleAvatar(
-                    backgroundColor:
-                        getContainerColor(context, category.value.color),
-                    foregroundColor:
-                        getOnContainerColor(context, category.value.color),
+                    backgroundColor: getContainerColor(
+                      context,
+                      category.value.color,
+                    ),
+                    foregroundColor: getOnContainerColor(
+                      context,
+                      category.value.color,
+                    ),
                     child: category.value.icon,
                   ),
                 ),
@@ -161,35 +167,38 @@ class _ExercisePickerState extends State<ExercisePicker> {
                 ),
                 onTap: () {
                   Go.to(
-                    () => StatefulBuilder(builder: (context, setState) {
-                      return LibraryPickerExercisesView(
-                        name: category.key.localizedName,
-                        category: category.value,
-                        singleSelection: widget.singlePick,
-                        selectedExercises: selectedExercises,
-                        onSelected: (exercise) {
-                          final isSelected =
-                              selectedExercises.containsKey(exercise.id);
-                          isSelected.logger.d("outer picker");
-                          setState(() {
-                            if (isSelected) {
-                              selectedExercises.remove(exercise.id);
-                            } else {
-                              if (widget.singlePick) {
-                                selectedExercises = {exercise.id: exercise};
+                    () => StatefulBuilder(
+                      builder: (context, setState) {
+                        return LibraryPickerExercisesView(
+                          name: category.key.localizedName,
+                          category: category.value,
+                          singleSelection: widget.singlePick,
+                          selectedExercises: selectedExercises,
+                          onSelected: (exercise) {
+                            final isSelected = selectedExercises.containsKey(
+                              exercise.id,
+                            );
+                            isSelected.logger.d("outer picker");
+                            setState(() {
+                              if (isSelected) {
+                                selectedExercises.remove(exercise.id);
                               } else {
-                                selectedExercises[exercise.id] = exercise;
+                                if (widget.singlePick) {
+                                  selectedExercises = {exercise.id: exercise};
+                                } else {
+                                  selectedExercises[exercise.id] = exercise;
+                                }
                               }
-                            }
-                            badges = computeBadges();
-                          });
-                        },
-                        onSubmit: () {
-                          Get.back();
-                          _submit();
-                        },
-                      );
-                    }),
+                              badges = computeBadges();
+                            });
+                          },
+                          onSubmit: () {
+                            Get.back();
+                            _submit();
+                          },
+                        );
+                      },
+                    ),
                   ).then((_) => setState(() {}));
                 },
               ),
@@ -276,25 +285,29 @@ class _ExercisePickerState extends State<ExercisePicker> {
       return;
     }
     ScaffoldMessenger.of(context).clearSnackBars();
-    final List<Exercise> exercises =
-        selectedExercises.entries.map((e) => e.value).toList();
+    final List<Exercise> exercises = selectedExercises.entries
+        .map((e) => e.value)
+        .toList();
     Get.back(result: exercises, closeOverlays: true);
   }
 
   Map<GTExerciseMuscleCategory, ({bool isLabelVisible, Widget? label})>
-      computeBadges() {
+  computeBadges() {
     return {
       for (final category in exercises.entries)
         category.key: (
-          isLabelVisible: category.value.exercises
-              .any((e) => selectedExercises.containsKey(e.id)),
+          isLabelVisible: category.value.exercises.any(
+            (e) => selectedExercises.containsKey(e.id),
+          ),
           label: widget.singlePick
               ? null
-              : Text(category.value.exercises
-                  .where((e) => selectedExercises.containsKey(e.id))
-                  .length
-                  .toString())
-        )
+              : Text(
+                  category.value.exercises
+                      .where((e) => selectedExercises.containsKey(e.id))
+                      .length
+                      .toString(),
+                ),
+        ),
     };
   }
 
@@ -306,41 +319,43 @@ class _ExercisePickerState extends State<ExercisePicker> {
       ),
       viewBuilder: (suggestions) {
         return MediaQuery(
-          data: MediaQuery.of(context).copyWith(
-            padding: MediaQuery.of(context).padding.copyWith(top: 0),
-          ),
+          data: MediaQuery.of(
+            context,
+          ).copyWith(padding: MediaQuery.of(context).padding.copyWith(top: 0)),
           child: suggestions.toList().getAt(0) ?? const SizedBox.shrink(),
         );
       },
       suggestionsBuilder: (context, sController) {
         final results = controller.search(sController.text);
         return [
-          StatefulBuilder(builder: (context, ss) {
-            return ListView.builder(
-              itemCount: results.length,
-              itemBuilder: (context, index) {
-                final ex = results[index];
-                return ExerciseListTile(
-                  exercise: ex,
-                  selected: selectedExercises.containsKey(ex.id),
-                  isConcrete: false,
-                  onTap: () {
-                    setState(() {
-                      if (selectedExercises.containsKey(ex.id)) {
-                        selectedExercises.remove(ex.id);
-                      } else if (widget.singlePick) {
-                        selectedExercises = {ex.id: ex};
-                      } else {
-                        selectedExercises[ex.id] = ex;
-                      }
-                      badges = computeBadges();
-                    });
-                    ss(() {});
-                  },
-                );
-              },
-            );
-          }),
+          StatefulBuilder(
+            builder: (context, ss) {
+              return ListView.builder(
+                itemCount: results.length,
+                itemBuilder: (context, index) {
+                  final ex = results[index];
+                  return ExerciseListTile(
+                    exercise: ex,
+                    selected: selectedExercises.containsKey(ex.id),
+                    isConcrete: false,
+                    onTap: () {
+                      setState(() {
+                        if (selectedExercises.containsKey(ex.id)) {
+                          selectedExercises.remove(ex.id);
+                        } else if (widget.singlePick) {
+                          selectedExercises = {ex.id: ex};
+                        } else {
+                          selectedExercises[ex.id] = ex;
+                        }
+                        badges = computeBadges();
+                      });
+                      ss(() {});
+                    },
+                  );
+                },
+              );
+            },
+          ),
         ];
       },
     );
@@ -355,10 +370,8 @@ class _CreateExerciseFab extends StatelessWidget {
     return FloatingActionButton.extended(
       onPressed: () {
         Go.showBottomModalScreen(
-          (context, scrollController) => ExerciseCreator(
-            base: null,
-            scrollController: scrollController,
-          ),
+          (context, scrollController) =>
+              ExerciseCreator(base: null, scrollController: scrollController),
         );
       },
       label: Text("actions.create".t),
@@ -404,7 +417,7 @@ class _LibraryPickerExercisesViewState
             key: const Key('pick'),
             icon: const Icon(GTIcons.done),
             onPressed: widget.onSubmit,
-          )
+          ),
         ],
       ),
       body: ListView.builder(

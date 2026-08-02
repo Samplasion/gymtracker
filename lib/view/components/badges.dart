@@ -1,16 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:gymtracker/icons/gymtracker_icons.dart';
 import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/utils/colors.dart';
+import 'package:gymtracker/utils/theme.dart';
 
 enum GTBadgeSize {
   small(fontSize: 10, padding: 2.5),
   medium(fontSize: 12, padding: 4),
   large(fontSize: 14, padding: 6);
 
-  const GTBadgeSize({
-    required this.fontSize,
-    required this.padding,
-  });
+  const GTBadgeSize({required this.fontSize, required this.padding});
 
   final double fontSize;
   final double padding;
@@ -23,6 +22,7 @@ class GTBadge extends StatelessWidget {
   final GTMaterialColor color;
   final GTBadgeSize size;
   final bool invert;
+  final Widget? icon;
 
   const GTBadge({
     super.key,
@@ -32,6 +32,7 @@ class GTBadge extends StatelessWidget {
     this.color = GTMaterialColor.tertiary,
     this.size = GTBadgeSize.medium,
     this.invert = false,
+    this.icon,
   });
 
   @override
@@ -47,12 +48,17 @@ class GTBadge extends StatelessWidget {
         color: background,
         borderRadius: BorderRadius.circular(4),
       ),
-      child: Text(
-        content,
-        style: TextStyle(
-          fontSize: size.fontSize,
-          color: foreground,
+      child: Text.rich(
+        TextSpan(
+          children: [
+            if (icon != null) ...[
+              WidgetSpan(child: icon!, alignment: PlaceholderAlignment.middle),
+              const TextSpan(text: " "),
+            ],
+            TextSpan(text: content),
+          ],
         ),
+        style: TextStyle(fontSize: size.fontSize, color: foreground),
       ),
     );
   }
@@ -92,6 +98,31 @@ class CustomExerciseBadge extends StatelessWidget {
           fontSize: 12,
           color: Theme.of(context).colorScheme.onPrimaryContainer,
         ),
+      ),
+    );
+  }
+}
+
+class ProBadge extends StatelessWidget {
+  final bool short;
+
+  const ProBadge({this.short = false, super.key});
+
+  String get text {
+    final str = "PRO";
+    if (short) return "";
+    return str;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return GTBadge(
+      content: text,
+      color: GTMaterialColor.quaternary,
+      icon: Icon(
+        GTIcons.pro,
+        size: 12,
+        color: Theme.of(context).colorScheme.onQuaternaryContainer,
       ),
     );
   }

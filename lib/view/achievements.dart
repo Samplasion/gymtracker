@@ -32,7 +32,6 @@ class _AchievementsViewState
         slivers: [
           SliverAppBar.large(
             title: Text("achievements.title".t),
-            leading: const SkeletonDrawerButton(),
             actions: [
               IconButton(
                 icon: const Icon(GTIcons.history),
@@ -50,23 +49,23 @@ class _AchievementsViewState
                 crossAxisSpacing: 16,
                 childAspectRatio: 1,
               ),
-              delegate: SliverChildListDelegate(
-                [
-                  for (final key in achievementKeys) ...[
-                    for (final level in achievements[key]!.levels)
-                      AchievementGridTile(
-                        achievement: achievements[key]!,
-                        level: level,
-                        onTap: (achievement, level) {
-                          Go.toDialog(() => AchievementGetDialog(
-                                achievement: achievement,
-                                level: level,
-                              ));
-                        },
-                      ),
-                  ],
+              delegate: SliverChildListDelegate([
+                for (final key in achievementKeys) ...[
+                  for (final level in achievements[key]!.levels)
+                    AchievementGridTile(
+                      achievement: achievements[key]!,
+                      level: level,
+                      onTap: (achievement, level) {
+                        Go.toDialog(
+                          () => AchievementGetDialog(
+                            achievement: achievement,
+                            level: level,
+                          ),
+                        );
+                      },
+                    ),
                 ],
-              ),
+              ]),
             ),
           ),
           const SliverToBoxAdapter(child: SizedBox(height: 8)),
@@ -104,21 +103,23 @@ class AchievementGridTile extends ControlledWidget<AchievementsController> {
                 const SizedBox(height: 16),
                 // const Spacer(),
                 Expanded(
-                  child: LayoutBuilder(builder: (context, size) {
-                    return Center(
-                      child: AchievementIcon(
-                        achievement: achievement,
-                        enabled: enabled,
-                        size: min(
-                          size.maxHeight,
-                          switch (Breakpoints.currentBreakpoint) {
-                            Breakpoints.xxs => 48,
-                            _ => cardSize.maxHeight / 3,
-                          },
+                  child: LayoutBuilder(
+                    builder: (context, size) {
+                      return Center(
+                        child: AchievementIcon(
+                          achievement: achievement,
+                          enabled: enabled,
+                          size: min(
+                            size.maxHeight,
+                            switch (Breakpoints.currentBreakpoint) {
+                              Breakpoints.xxs => 48,
+                              _ => cardSize.maxHeight / 3,
+                            },
+                          ),
                         ),
-                      ),
-                    );
-                  }),
+                      );
+                    },
+                  ),
                 ),
                 // const Spacer(),
                 Text(
@@ -200,10 +201,7 @@ class AchievementGetDialog extends ControlledWidget<AchievementsController> {
                   value: level.progress!() / level.progressMax!(),
                 ),
               ),
-              Text(
-                _getProgressText(),
-                textAlign: TextAlign.center,
-              ),
+              Text(_getProgressText(), textAlign: TextAlign.center),
             ],
             const SizedBox(height: 16),
             if (completion != null || !level.canShowProgress) ...[
@@ -211,10 +209,9 @@ class AchievementGetDialog extends ControlledWidget<AchievementsController> {
                 completion == null
                     ? "achievements.locked".t
                     : "achievements.unlockedOn".tParams({
-                        "date":
-                            DateFormat.yMMMMEEEEd(context.locale.languageCode)
-                                .add_Hms()
-                                .format(completion.completedAt),
+                        "date": DateFormat.yMMMMEEEEd(
+                          context.locale.languageCode,
+                        ).add_Hms().format(completion.completedAt),
                       }),
                 textAlign: TextAlign.center,
               ),
@@ -252,9 +249,7 @@ class AchievementHistoryScreen
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text("achievements.history".t),
-      ),
+      appBar: AppBar(title: Text("achievements.history".t)),
       body: CustomScrollView(
         slivers: [
           StreamBuilder<List<AchievementCompletion>>(
@@ -262,19 +257,20 @@ class AchievementHistoryScreen
             builder: (context, snapshot) {
               if (!snapshot.hasData) {
                 return const SliverFillRemaining(
-                  child: Center(
-                    child: CircularProgressIndicator(),
-                  ),
+                  child: Center(child: CircularProgressIndicator()),
                 );
               }
               return SliverList.builder(
                 itemCount: snapshot.data!.length,
                 itemBuilder: (context, index) {
                   final completion = snapshot.data![index];
-                  final achievement =
-                      controller.getAchievement(completion.achievementID);
-                  final level =
-                      controller.getLevel(achievement, completion.level)!;
+                  final achievement = controller.getAchievement(
+                    completion.achievementID,
+                  );
+                  final level = controller.getLevel(
+                    achievement,
+                    completion.level,
+                  )!;
                   return ListTile(
                     leading: AchievementIcon(
                       achievement: achievement,
@@ -290,9 +286,8 @@ class AchievementHistoryScreen
                           TextSpan(
                             text: "achievements.unlockedOn".tParams({
                               "date": DateFormat.yMMMMEEEEd(
-                                      context.locale.languageCode)
-                                  .add_Hms()
-                                  .format(completion.completedAt),
+                                context.locale.languageCode,
+                              ).add_Hms().format(completion.completedAt),
                             }),
                           ),
                         ],

@@ -29,12 +29,15 @@ import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/utils/noise.dart';
 import 'package:gymtracker/utils/theme.dart';
+import 'package:gymtracker/view/components/muscles.dart';
+import 'package:gymtracker/view/paywall.dart';
 import 'package:gymtracker/view/settings/radio.dart';
 import 'package:gymtracker/view/skeleton.dart';
 import 'package:gymtracker/view/utils/import_routine.dart';
 import 'package:gymtracker/view/utils/sliver_utils.dart';
 import 'package:gymtracker/view/utils/timer.dart';
 import 'package:logger/logger.dart' as logger_lib;
+import 'package:purchases_ui_flutter/purchases_ui_flutter.dart';
 
 class DebugView extends StatefulWidget {
   const DebugView({super.key});
@@ -53,33 +56,30 @@ class _DebugViewState extends State<DebugView> {
     return Scaffold(
       body: CustomScrollView(
         slivers: [
-          const SliverAppBar.large(
-            title: Text("Debug"),
-            leading: SkeletonDrawerButton(),
-          ),
+          const SliverAppBar.large(title: Text("Debug")),
           SliverList(
             delegate: SliverChildListDelegate([
               Obx(() {
-                final missingKeys =
-                    generateJsonForMissingKeys([...controller.missingKeys]);
+                final missingKeys = generateJsonForMissingKeys([
+                  ...controller.missingKeys,
+                ]);
                 return ListTile(
                   title: const Text("Missing translations"),
-                  subtitle: Text(
-                    missingKeys,
-                    style: monospace,
-                  ),
+                  subtitle: Text(missingKeys, style: monospace),
                   onTap: () {
                     logger.d("\n$missingKeys\n");
                     Clipboard.setData(ClipboardData(text: missingKeys));
                     Go.snack(
-                        "The missing keys have been copied to the clipboard");
+                      "The missing keys have been copied to the clipboard",
+                    );
                   },
                 );
               }),
               ListTile(
                 title: const Text("Fix history std. exercise labels"),
                 subtitle: const Text(
-                    "Fixes the labels of the standard exercises in the history"),
+                  "Fixes the labels of the standard exercises in the history",
+                ),
                 onTap: () {
                   final hc = Get.find<HistoryController>();
                   final db = Get.find<DatabaseService>();
@@ -103,8 +103,11 @@ class _DebugViewState extends State<DebugView> {
               ListTile(
                 title: const Text("Database inspector"),
                 onTap: () {
-                  Go.to(() => DriftDbViewer(
-                      Get.find<DatabaseService>().db as GeneratedDatabase));
+                  Go.to(
+                    () => DriftDbViewer(
+                      Get.find<DatabaseService>().db as GeneratedDatabase,
+                    ),
+                  );
                 },
               ),
               FutureBuilder(
@@ -115,8 +118,8 @@ class _DebugViewState extends State<DebugView> {
                     title: const Text("Reload translation keys"),
                     onTap: () async {
                       controller.missingKeys.clear();
-                      _loadTranslationsFuture =
-                          Get.find<GTLocalizations>().init(false);
+                      _loadTranslationsFuture = Get.find<GTLocalizations>()
+                          .init(false);
                       _loadTranslationsFuture.then((_) {
                         Go.snack("Reloaded");
                       });
@@ -167,7 +170,8 @@ class _DebugViewState extends State<DebugView> {
               ListTile(
                 title: const Text("Recompute streaks"),
                 subtitle: Text(
-                    "Current value: ${Get.find<HistoryController>().streaks.value}"),
+                  "Current value: ${Get.find<HistoryController>().streaks.value}",
+                ),
                 onTap: () {
                   Get.find<HistoryController>().computeStreaks();
                 },
@@ -215,15 +219,15 @@ class _DebugViewState extends State<DebugView> {
               //   },
               // ),
               ListTile(
-                title: const Text(Configuration.isOnlineAccountEnabled
-                    ? "Simulate sync"
-                    : "[Online disabled]"),
+                title: const Text(
+                  Configuration.isOnlineAccountEnabled
+                      ? "Simulate sync"
+                      : "[Online disabled]",
+                ),
                 onTap: Configuration.isOnlineAccountEnabled
                     ? () async {
                         Get.find<OnlineController>().also((c) {
-                          c.sync(
-                            currentSnapshot: c.service.currentSnapshot,
-                          );
+                          c.sync(currentSnapshot: c.service.currentSnapshot);
                         });
                       }
                     : null,
@@ -232,37 +236,55 @@ class _DebugViewState extends State<DebugView> {
                 title: const Text("Update home widgets"),
                 onTap: () async {
                   WidgetsService.instance().updateWeeklyStreak(
-                      Get.find<HistoryController>().streaks.value.weekStreak);
+                    Get.find<HistoryController>().streaks.value.weekStreak,
+                  );
                   WidgetsService.instance().updateRestStreak(
-                      Get.find<HistoryController>().streaks.value.restDays);
+                    Get.find<HistoryController>().streaks.value.restDays,
+                  );
                   WidgetsService.instance().updateWorkouts(
-                      Get.find<HistoryController>().history.length);
+                    Get.find<HistoryController>().history.length,
+                  );
                   NativeService.instance().updateHomeWidgetParameters(
-                      weekStreak: Get.find<HistoryController>()
-                          .streaks
-                          .value
-                          .weekStreak,
-                      lastWorkoutDay: Get.find<HistoryController>()
-                          .userVisibleWorkouts
-                          .let((self) {
-                        if (self.isEmpty) return DateTime.now().startOfDay;
-                        return ([
-                          self.first.startingDate!,
-                          self.last.startingDate!
-                        ]..sort())
-                            .last
-                            .startOfDay;
-                      }),
-                      workouts: Get.find<HistoryController>().userVisibleLength,
-                      workoutDensityChartData: [
-                        for (int i = 0; i < 7 * 18; i++)
-                          Get.find<HistoryController>()
-                                  .workoutsByDay[DateTime.now()
-                                      .subtract(Duration(days: i))
-                                      .startOfDay]
-                                  ?.length ??
-                              0,
-                      ]);
+                    weekStreak:
+                        Get.find<HistoryController>().streaks.value.weekStreak,
+                    lastWorkoutDay: Get.find<HistoryController>()
+                        .userVisibleWorkouts
+                        .let((self) {
+                          if (self.isEmpty) return DateTime.now().startOfDay;
+                          return ([
+                            self.first.startingDate!,
+                            self.last.startingDate!,
+                          ]..sort()).last.startOfDay;
+                        }),
+                    workouts: Get.find<HistoryController>().userVisibleLength,
+                    workoutDensityChartData: [
+                      for (int i = 0; i < 7 * 18; i++)
+                        Get.find<HistoryController>()
+                                .workoutsByDay[DateTime.now()
+                                    .subtract(Duration(days: i))
+                                    .startOfDay]
+                                ?.length ??
+                            0,
+                    ],
+                  );
+                },
+              ),
+              ListTile(
+                title: Text("Muscle view"),
+                onTap: () {
+                  Go.to(() => const _DebugMuscleView());
+                },
+              ),
+              ListTile(
+                title: Text("Paywall"),
+                onTap: () {
+                  Go.to(() => const PaywallScreen());
+                },
+              ),
+              ListTile(
+                title: Text("Customer Center"),
+                onTap: () async {
+                  await RevenueCatUI.presentCustomerCenter();
                 },
               ),
 
@@ -284,25 +306,28 @@ class _DebugViewState extends State<DebugView> {
                         builder: (ctx, _) => ListTile(
                           title: Text(entry.key),
                           subtitle: Text(
-                              "Running: ${!entry.value.isStopped()}, Current time: ${entry.value.currentTime}"),
+                            "Running: ${!entry.value.isStopped()}, Current time: ${entry.value.currentTime}",
+                          ),
                         ),
                         startingTime: DateTime.now(),
                       ),
                   ],
                 );
               }),
-              StatefulBuilder(builder: (context, setState) {
-                return Slider(
-                  value: timeDilation,
-                  onChanged: ((value) {
-                    setState(() {
-                      timeDilation = value;
-                    });
-                  }),
-                  min: 1,
-                  max: 15,
-                );
-              }),
+              StatefulBuilder(
+                builder: (context, setState) {
+                  return Slider(
+                    value: timeDilation,
+                    onChanged: ((value) {
+                      setState(() {
+                        timeDilation = value;
+                      });
+                    }),
+                    min: 1,
+                    max: 15,
+                  );
+                },
+              ),
             ]),
           ),
           const SliverBottomSafeArea(),
@@ -343,9 +368,7 @@ class _WorkoutTitleGeneratorAlertState
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Generate workout title"),
-      ),
+      appBar: AppBar(title: const Text("Generate workout title")),
       body: ListView(
         padding: const EdgeInsets.all(16.0),
         children: [
@@ -379,9 +402,7 @@ class ColorsPane extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Colors"),
-      ),
+      appBar: AppBar(title: const Text("Colors")),
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(15),
@@ -401,190 +422,223 @@ class ColorSchemeView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        ColorGroup(children: [
-          ColorChip(
-            label: 'primary',
-            color: colorScheme.primary,
-            onColor: colorScheme.onPrimary,
-          ),
-          ColorChip(
+        ColorGroup(
+          children: [
+            ColorChip(
+              label: 'primary',
+              color: colorScheme.primary,
+              onColor: colorScheme.onPrimary,
+            ),
+            ColorChip(
               label: 'onPrimary',
               color: colorScheme.onPrimary,
-              onColor: colorScheme.primary),
-          ColorChip(
-            label: 'primaryContainer',
-            color: colorScheme.primaryContainer,
-            onColor: colorScheme.onPrimaryContainer,
-          ),
-          ColorChip(
-            label: 'onPrimaryContainer',
-            color: colorScheme.onPrimaryContainer,
-            onColor: colorScheme.primaryContainer,
-          ),
-        ]),
+              onColor: colorScheme.primary,
+            ),
+            ColorChip(
+              label: 'primaryContainer',
+              color: colorScheme.primaryContainer,
+              onColor: colorScheme.onPrimaryContainer,
+            ),
+            ColorChip(
+              label: 'onPrimaryContainer',
+              color: colorScheme.onPrimaryContainer,
+              onColor: colorScheme.primaryContainer,
+            ),
+          ],
+        ),
         _divider,
-        ColorGroup(children: [
-          ColorChip(
-            label: 'secondary',
-            color: colorScheme.secondary,
-            onColor: colorScheme.onSecondary,
-          ),
-          ColorChip(
-            label: 'onSecondary',
-            color: colorScheme.onSecondary,
-            onColor: colorScheme.secondary,
-          ),
-          ColorChip(
-            label: 'secondaryContainer',
-            color: colorScheme.secondaryContainer,
-            onColor: colorScheme.onSecondaryContainer,
-          ),
-          ColorChip(
+        ColorGroup(
+          children: [
+            ColorChip(
+              label: 'secondary',
+              color: colorScheme.secondary,
+              onColor: colorScheme.onSecondary,
+            ),
+            ColorChip(
+              label: 'onSecondary',
+              color: colorScheme.onSecondary,
+              onColor: colorScheme.secondary,
+            ),
+            ColorChip(
+              label: 'secondaryContainer',
+              color: colorScheme.secondaryContainer,
+              onColor: colorScheme.onSecondaryContainer,
+            ),
+            ColorChip(
               label: 'onSecondaryContainer',
               color: colorScheme.onSecondaryContainer,
-              onColor: colorScheme.secondaryContainer),
-        ]),
-        _divider,
-        ColorGroup(
-          children: [
-            ColorChip(
-                label: 'tertiary',
-                color: colorScheme.tertiary,
-                onColor: colorScheme.onTertiary),
-            ColorChip(
-                label: 'onTertiary',
-                color: colorScheme.onTertiary,
-                onColor: colorScheme.tertiary),
-            ColorChip(
-                label: 'tertiaryContainer',
-                color: colorScheme.tertiaryContainer,
-                onColor: colorScheme.onTertiaryContainer),
-            ColorChip(
-                label: 'onTertiaryContainer',
-                color: colorScheme.onTertiaryContainer,
-                onColor: colorScheme.tertiaryContainer),
+              onColor: colorScheme.secondaryContainer,
+            ),
           ],
         ),
         _divider,
         ColorGroup(
           children: [
             ColorChip(
-                label: 'quaternary',
-                color: colorScheme.quaternary,
-                onColor: colorScheme.onQuaternary),
+              label: 'tertiary',
+              color: colorScheme.tertiary,
+              onColor: colorScheme.onTertiary,
+            ),
             ColorChip(
-                label: 'onQuaternary',
-                color: colorScheme.onQuaternary,
-                onColor: colorScheme.quaternary),
+              label: 'onTertiary',
+              color: colorScheme.onTertiary,
+              onColor: colorScheme.tertiary,
+            ),
             ColorChip(
-                label: 'quaternaryContainer',
-                color: colorScheme.quaternaryContainer,
-                onColor: colorScheme.onQuaternaryContainer),
+              label: 'tertiaryContainer',
+              color: colorScheme.tertiaryContainer,
+              onColor: colorScheme.onTertiaryContainer,
+            ),
             ColorChip(
-                label: 'onQuaternaryContainer',
-                color: colorScheme.onQuaternaryContainer,
-                onColor: colorScheme.quaternaryContainer),
+              label: 'onTertiaryContainer',
+              color: colorScheme.onTertiaryContainer,
+              onColor: colorScheme.tertiaryContainer,
+            ),
           ],
         ),
         _divider,
         ColorGroup(
           children: [
             ColorChip(
-                label: 'quinary',
-                color: colorScheme.quinary,
-                onColor: colorScheme.onQuinary),
+              label: 'quaternary',
+              color: colorScheme.quaternary,
+              onColor: colorScheme.onQuaternary,
+            ),
             ColorChip(
-                label: 'onQuinary',
-                color: colorScheme.onQuinary,
-                onColor: colorScheme.quinary),
+              label: 'onQuaternary',
+              color: colorScheme.onQuaternary,
+              onColor: colorScheme.quaternary,
+            ),
             ColorChip(
-                label: 'quinaryContainer',
-                color: colorScheme.quinaryContainer,
-                onColor: colorScheme.onQuinaryContainer),
+              label: 'quaternaryContainer',
+              color: colorScheme.quaternaryContainer,
+              onColor: colorScheme.onQuaternaryContainer,
+            ),
             ColorChip(
-                label: 'onQuinaryContainer',
-                color: colorScheme.onQuinaryContainer,
-                onColor: colorScheme.quinaryContainer),
+              label: 'onQuaternaryContainer',
+              color: colorScheme.onQuaternaryContainer,
+              onColor: colorScheme.quaternaryContainer,
+            ),
           ],
         ),
         _divider,
         ColorGroup(
           children: [
             ColorChip(
-                label: 'error',
-                color: colorScheme.error,
-                onColor: colorScheme.onError),
+              label: 'quinary',
+              color: colorScheme.quinary,
+              onColor: colorScheme.onQuinary,
+            ),
             ColorChip(
-                label: 'onError',
-                color: colorScheme.onError,
-                onColor: colorScheme.error),
+              label: 'onQuinary',
+              color: colorScheme.onQuinary,
+              onColor: colorScheme.quinary,
+            ),
             ColorChip(
-                label: 'errorContainer',
-                color: colorScheme.errorContainer,
-                onColor: colorScheme.onErrorContainer),
+              label: 'quinaryContainer',
+              color: colorScheme.quinaryContainer,
+              onColor: colorScheme.onQuinaryContainer,
+            ),
             ColorChip(
-                label: 'onErrorContainer',
-                color: colorScheme.onErrorContainer,
-                onColor: colorScheme.errorContainer),
+              label: 'onQuinaryContainer',
+              color: colorScheme.onQuinaryContainer,
+              onColor: colorScheme.quinaryContainer,
+            ),
           ],
         ),
         _divider,
         ColorGroup(
           children: [
             ColorChip(
-                label: 'background',
-                color: colorScheme.surface,
-                onColor: colorScheme.onSurface),
+              label: 'error',
+              color: colorScheme.error,
+              onColor: colorScheme.onError,
+            ),
             ColorChip(
-                label: 'onBackground',
-                color: colorScheme.onSurface,
-                onColor: colorScheme.surface),
+              label: 'onError',
+              color: colorScheme.onError,
+              onColor: colorScheme.error,
+            ),
+            ColorChip(
+              label: 'errorContainer',
+              color: colorScheme.errorContainer,
+              onColor: colorScheme.onErrorContainer,
+            ),
+            ColorChip(
+              label: 'onErrorContainer',
+              color: colorScheme.onErrorContainer,
+              onColor: colorScheme.errorContainer,
+            ),
           ],
         ),
         _divider,
         ColorGroup(
           children: [
             ColorChip(
-                label: 'surfaceContainer',
-                color: colorScheme.surfaceContainer,
-                onColor: colorScheme.onSurface),
+              label: 'background',
+              color: colorScheme.surface,
+              onColor: colorScheme.onSurface,
+            ),
             ColorChip(
-                label: 'surfaceBright',
-                color: colorScheme.surfaceBright,
-                onColor: colorScheme.onSurface),
-            ColorChip(
-                label: 'surfaceDim',
-                color: colorScheme.surfaceDim,
-                onColor: colorScheme.onSurface),
-            ColorChip(
-                label: 'surface',
-                color: colorScheme.surface,
-                onColor: colorScheme.onSurface),
-            ColorChip(
-                label: 'onSurface',
-                color: colorScheme.onSurface,
-                onColor: colorScheme.surface),
+              label: 'onBackground',
+              color: colorScheme.onSurface,
+              onColor: colorScheme.surface,
+            ),
           ],
         ),
         _divider,
         ColorGroup(
           children: [
             ColorChip(
-                label: 'surfaceContainerHighest',
-                color: colorScheme.surfaceContainerHighest,
-                onColor: colorScheme.onSurface),
+              label: 'surfaceContainer',
+              color: colorScheme.surfaceContainer,
+              onColor: colorScheme.onSurface,
+            ),
             ColorChip(
-                label: 'surfaceContainerHigh',
-                color: colorScheme.surfaceContainerHigh,
-                onColor: colorScheme.onSurface),
+              label: 'surfaceBright',
+              color: colorScheme.surfaceBright,
+              onColor: colorScheme.onSurface,
+            ),
             ColorChip(
-                label: 'surfaceContainerLow',
-                color: colorScheme.surfaceContainerLow,
-                onColor: colorScheme.onSurface),
+              label: 'surfaceDim',
+              color: colorScheme.surfaceDim,
+              onColor: colorScheme.onSurface,
+            ),
             ColorChip(
-                label: 'surfaceContainerLowest',
-                color: colorScheme.surfaceContainerLowest,
-                onColor: colorScheme.onSurface),
+              label: 'surface',
+              color: colorScheme.surface,
+              onColor: colorScheme.onSurface,
+            ),
+            ColorChip(
+              label: 'onSurface',
+              color: colorScheme.onSurface,
+              onColor: colorScheme.surface,
+            ),
+          ],
+        ),
+        _divider,
+        ColorGroup(
+          children: [
+            ColorChip(
+              label: 'surfaceContainerHighest',
+              color: colorScheme.surfaceContainerHighest,
+              onColor: colorScheme.onSurface,
+            ),
+            ColorChip(
+              label: 'surfaceContainerHigh',
+              color: colorScheme.surfaceContainerHigh,
+              onColor: colorScheme.onSurface,
+            ),
+            ColorChip(
+              label: 'surfaceContainerLow',
+              color: colorScheme.surfaceContainerLow,
+              onColor: colorScheme.onSurface,
+            ),
+            ColorChip(
+              label: 'surfaceContainerLowest',
+              color: colorScheme.surfaceContainerLowest,
+              onColor: colorScheme.onSurface,
+            ),
           ],
         ),
         _divider,
@@ -597,17 +651,20 @@ class ColorSchemeView extends StatelessWidget {
             ),
             ColorChip(label: 'shadow', color: colorScheme.shadow),
             ColorChip(
-                label: 'inverseSurface',
-                color: colorScheme.inverseSurface,
-                onColor: colorScheme.onInverseSurface),
+              label: 'inverseSurface',
+              color: colorScheme.inverseSurface,
+              onColor: colorScheme.onInverseSurface,
+            ),
             ColorChip(
-                label: 'onInverseSurface',
-                color: colorScheme.onInverseSurface,
-                onColor: colorScheme.inverseSurface),
+              label: 'onInverseSurface',
+              color: colorScheme.onInverseSurface,
+              onColor: colorScheme.inverseSurface,
+            ),
             ColorChip(
-                label: 'inversePrimary',
-                color: colorScheme.inversePrimary,
-                onColor: colorScheme.primary),
+              label: 'inversePrimary',
+              color: colorScheme.inversePrimary,
+              onColor: colorScheme.primary,
+            ),
           ],
         ),
       ],
@@ -625,9 +682,7 @@ class ColorGroup extends StatelessWidget {
     return RepaintBoundary(
       child: Card(
         clipBehavior: Clip.antiAlias,
-        child: Column(
-          children: children,
-        ),
+        child: Column(children: children),
       ),
     );
   }
@@ -665,7 +720,9 @@ class ColorChip extends StatelessWidget {
         padding: const EdgeInsets.all(16),
         child: Row(
           children: [
-            Expanded(child: Text(label, style: TextStyle(color: labelColor))),
+            Expanded(
+              child: Text(label, style: TextStyle(color: labelColor)),
+            ),
           ],
         ),
       ),
@@ -687,9 +744,7 @@ class _DebugMaterialBannerTestState extends State<_DebugMaterialBannerTest> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("MaterialBanner test"),
-      ),
+      appBar: AppBar(title: const Text("MaterialBanner test")),
       body: Column(
         children: [
           if (selected.length >= 5)
@@ -792,9 +847,7 @@ class __DebugAddRandomWeightAlertState
               for (var i = 0; i < numberOfWeights; i++)
                 WeightMeasurement.generateID(
                   weight: startingWeight + noise[i] * 20,
-                  time: now.subtract(Duration(
-                    days: i * displacement,
-                  )),
+                  time: now.subtract(Duration(days: i * displacement)),
                   weightUnit: Weights.kg,
                 ),
             ];
@@ -806,6 +859,56 @@ class __DebugAddRandomWeightAlertState
           child: const Text("Add"),
         ),
       ],
+    );
+  }
+}
+
+class _DebugMuscleView extends StatefulWidget {
+  const _DebugMuscleView({super.key});
+
+  @override
+  State<_DebugMuscleView> createState() => _DebugMuscleViewState();
+}
+
+class _DebugMuscleViewState extends State<_DebugMuscleView> {
+  final selectedMuscles = <GTMuscleHighlight>{};
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text("Muscle view")),
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: [
+                for (final muscle in GTMuscleHighlight.values)
+                  FilterChip(
+                    label: Text(muscle.name),
+                    selected: selectedMuscles.contains(muscle),
+                    onSelected: (selected) {
+                      setState(() {
+                        if (selected) {
+                          selectedMuscles.add(muscle);
+                        } else {
+                          selectedMuscles.remove(muscle);
+                        }
+                      });
+                    },
+                  ),
+              ],
+            ),
+            MusclesView(
+              muscles: {
+                for (final muscle in GTMuscleHighlight.values)
+                  muscle: selectedMuscles.contains(muscle) ? 1.0 : 0.0,
+              },
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

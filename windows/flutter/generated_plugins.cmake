@@ -7,15 +7,16 @@ list(APPEND FLUTTER_PLUGIN_LIST
   audioplayers_windows
   dynamic_color
   file_selector_windows
+  flutter_timezone
   permission_handler_windows
-  protocol_handler_windows
   share_plus
-  sqlite3_flutter_libs
   url_launcher_windows
 )
 
 list(APPEND FLUTTER_FFI_PLUGIN_LIST
+  flutter_local_notifications_windows
   flutter_zxing
+  jni
 )
 
 set(PLUGIN_BUNDLED_LIBRARIES)

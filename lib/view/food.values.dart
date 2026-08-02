@@ -1270,7 +1270,7 @@ class FoodBarcodeReaderView extends ControlledWidget<FoodController> {
             .surfaceContainerHigh
             .withAlpha((0.5 * 255).round()),
         codeFormat: Format.linearCodes,
-        scannerOverlay: DynamicScannerOverlay(
+        scannerOverlay: ScannerOverlayBorder(
           borderColor: context.theme.colorScheme.primary,
           borderRadius: 8,
           borderLength: 32,

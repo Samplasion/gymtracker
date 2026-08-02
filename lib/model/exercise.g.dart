@@ -37,23 +37,24 @@ abstract class _$ExerciseCWProxy {
 
   Exercise category(GTExerciseMuscleCategory? category);
 
-  /// This function **does support** nullification of nullable fields. All `null` values passed to `non-nullable` fields will be ignored. You can also use `Exercise(...).copyWith.fieldName(...)` to override fields one at a time with nullification support.
+  /// Creates a new instance with the provided field values.
+  /// Passing `null` to a nullable field nullifies it, while `null` for a non-nullable field is ignored. To update a single field use `Exercise(...).copyWith.fieldName(value)`.
   ///
-  /// Usage
+  /// Example:
   /// ```dart
   /// Exercise(...).copyWith(id: 12, name: "My name")
-  /// ````
+  /// ```
   Exercise call({
     String? id,
-    String? name,
-    GTSetParameters? parameters,
-    List<GTSet>? sets,
-    GTMuscleGroup? primaryMuscleGroup,
-    Set<GTMuscleGroup>? secondaryMuscleGroups,
-    Duration? restTime,
+    String name,
+    GTSetParameters parameters,
+    List<GTSet> sets,
+    GTMuscleGroup primaryMuscleGroup,
+    Set<GTMuscleGroup> secondaryMuscleGroups,
+    Duration restTime,
     String? parentID,
-    String? notes,
-    bool? standard,
+    String notes,
+    bool standard,
     String? supersetID,
     String? workoutID,
     String? supersedesID,
@@ -62,70 +63,71 @@ abstract class _$ExerciseCWProxy {
   });
 }
 
-/// Proxy class for `copyWith` functionality. This is a callable class and can be used as follows: `instanceOfExercise.copyWith(...)`. Additionally contains functions for specific fields e.g. `instanceOfExercise.copyWith.fieldName(...)`
+/// Callable proxy for `copyWith` functionality.
+/// Use as `instanceOfExercise.copyWith(...)` or call `instanceOfExercise.copyWith.fieldName(value)` for a single field.
 class _$ExerciseCWProxyImpl implements _$ExerciseCWProxy {
   const _$ExerciseCWProxyImpl(this._value);
 
   final Exercise _value;
 
   @override
-  Exercise id(String? id) => this(id: id);
+  Exercise id(String? id) => call(id: id);
 
   @override
-  Exercise name(String name) => this(name: name);
+  Exercise name(String name) => call(name: name);
 
   @override
   Exercise parameters(GTSetParameters parameters) =>
-      this(parameters: parameters);
+      call(parameters: parameters);
 
   @override
-  Exercise sets(List<GTSet> sets) => this(sets: sets);
+  Exercise sets(List<GTSet> sets) => call(sets: sets);
 
   @override
   Exercise primaryMuscleGroup(GTMuscleGroup primaryMuscleGroup) =>
-      this(primaryMuscleGroup: primaryMuscleGroup);
+      call(primaryMuscleGroup: primaryMuscleGroup);
 
   @override
   Exercise secondaryMuscleGroups(Set<GTMuscleGroup> secondaryMuscleGroups) =>
-      this(secondaryMuscleGroups: secondaryMuscleGroups);
+      call(secondaryMuscleGroups: secondaryMuscleGroups);
 
   @override
-  Exercise restTime(Duration restTime) => this(restTime: restTime);
+  Exercise restTime(Duration restTime) => call(restTime: restTime);
 
   @override
-  Exercise parentID(String? parentID) => this(parentID: parentID);
+  Exercise parentID(String? parentID) => call(parentID: parentID);
 
   @override
-  Exercise notes(String notes) => this(notes: notes);
+  Exercise notes(String notes) => call(notes: notes);
 
   @override
-  Exercise standard(bool standard) => this(standard: standard);
+  Exercise standard(bool standard) => call(standard: standard);
 
   @override
-  Exercise supersetID(String? supersetID) => this(supersetID: supersetID);
+  Exercise supersetID(String? supersetID) => call(supersetID: supersetID);
 
   @override
-  Exercise workoutID(String? workoutID) => this(workoutID: workoutID);
+  Exercise workoutID(String? workoutID) => call(workoutID: workoutID);
 
   @override
   Exercise supersedesID(String? supersedesID) =>
-      this(supersedesID: supersedesID);
+      call(supersedesID: supersedesID);
 
   @override
-  Exercise rpe(int? rpe) => this(rpe: rpe);
+  Exercise rpe(int? rpe) => call(rpe: rpe);
 
   @override
   Exercise category(GTExerciseMuscleCategory? category) =>
-      this(category: category);
+      call(category: category);
 
   @override
-
-  /// This function **does support** nullification of nullable fields. All `null` values passed to `non-nullable` fields will be ignored. You can also use `Exercise(...).copyWith.fieldName(...)` to override fields one at a time with nullification support.
+  /// Creates a new instance with the provided field values.
+  /// Passing `null` to a nullable field nullifies it, while `null` for a non-nullable field is ignored. To update a single field use `Exercise(...).copyWith.fieldName(value)`.
   ///
-  /// Usage
+  /// Example:
   /// ```dart
   /// Exercise(...).copyWith(id: 12, name: "My name")
-  /// ````
+  /// ```
   Exercise call({
     Object? id = const $CopyWithPlaceholder(),
     Object? name = const $CopyWithPlaceholder(),
@@ -154,24 +156,25 @@ class _$ExerciseCWProxyImpl implements _$ExerciseCWProxy {
           : name as String,
       parameters:
           parameters == const $CopyWithPlaceholder() || parameters == null
-              ? _value.parameters
-              // ignore: cast_nullable_to_non_nullable
-              : parameters as GTSetParameters,
+          ? _value.parameters
+          // ignore: cast_nullable_to_non_nullable
+          : parameters as GTSetParameters,
       sets: sets == const $CopyWithPlaceholder() || sets == null
           ? _value.sets
           // ignore: cast_nullable_to_non_nullable
           : sets as List<GTSet>,
-      primaryMuscleGroup: primaryMuscleGroup == const $CopyWithPlaceholder() ||
+      primaryMuscleGroup:
+          primaryMuscleGroup == const $CopyWithPlaceholder() ||
               primaryMuscleGroup == null
           ? _value.primaryMuscleGroup
           // ignore: cast_nullable_to_non_nullable
           : primaryMuscleGroup as GTMuscleGroup,
       secondaryMuscleGroups:
           secondaryMuscleGroups == const $CopyWithPlaceholder() ||
-                  secondaryMuscleGroups == null
-              ? _value.secondaryMuscleGroups
-              // ignore: cast_nullable_to_non_nullable
-              : secondaryMuscleGroups as Set<GTMuscleGroup>,
+              secondaryMuscleGroups == null
+          ? _value.secondaryMuscleGroups
+          // ignore: cast_nullable_to_non_nullable
+          : secondaryMuscleGroups as Set<GTMuscleGroup>,
       restTime: restTime == const $CopyWithPlaceholder() || restTime == null
           ? _value.restTime
           // ignore: cast_nullable_to_non_nullable
@@ -216,7 +219,8 @@ class _$ExerciseCWProxyImpl implements _$ExerciseCWProxy {
 }
 
 extension $ExerciseCopyWith on Exercise {
-  /// Returns a callable class that can be used as follows: `instanceOfExercise.copyWith(...)` or like so:`instanceOfExercise.copyWith.fieldName(...)`.
+  /// Returns a callable class used to build a new instance with modified fields.
+  /// Example: `instanceOfExercise.copyWith(...)` or `instanceOfExercise.copyWith.fieldName(...)`.
   // ignore: library_private_types_in_public_api
   _$ExerciseCWProxy get copyWith => _$ExerciseCWProxyImpl(this);
 }
@@ -226,54 +230,58 @@ extension $ExerciseCopyWith on Exercise {
 // **************************************************************************
 
 Exercise _$ExerciseFromJson(Map<String, dynamic> json) => Exercise.raw(
-      id: json['id'] as String?,
-      name: json['name'] as String,
-      parameters: $enumDecode(_$GTSetParametersEnumMap, json['parameters']),
-      sets: (json['sets'] as List<dynamic>)
-          .map((e) => GTSet.fromJson(e as Map<String, dynamic>))
-          .toList(),
-      primaryMuscleGroup:
-          $enumDecode(_$GTMuscleGroupEnumMap, json['primaryMuscleGroup']),
-      secondaryMuscleGroups: (json['secondaryMuscleGroups'] as List<dynamic>?)
-              ?.map((e) => $enumDecode(_$GTMuscleGroupEnumMap, e))
-              .toSet() ??
-          const <GTMuscleGroup>{},
-      restTime: Duration(microseconds: (json['restTime'] as num).toInt()),
-      parentID: json['parentID'] as String?,
-      notes: json['notes'] as String? ?? '',
-      standard: json['standard'] as bool? ?? false,
-      supersetID: json['supersetID'] as String?,
-      workoutID: json['workoutID'] as String?,
-      supersedesID: json['supersedesID'] as String?,
-      rpe: (json['rpe'] as num?)?.toInt(),
-      category: $enumDecodeNullable(
-          _$GTExerciseMuscleCategoryEnumMap, json['category']),
-      equipment:
-          $enumDecodeNullable(_$GTGymEquipmentEnumMap, json['equipment']) ??
-              GTGymEquipment.none,
-    );
+  id: json['id'] as String?,
+  name: json['name'] as String,
+  parameters: $enumDecode(_$GTSetParametersEnumMap, json['parameters']),
+  sets: (json['sets'] as List<dynamic>)
+      .map((e) => GTSet.fromJson(e as Map<String, dynamic>))
+      .toList(),
+  primaryMuscleGroup: $enumDecode(
+    _$GTMuscleGroupEnumMap,
+    json['primaryMuscleGroup'],
+  ),
+  secondaryMuscleGroups:
+      (json['secondaryMuscleGroups'] as List<dynamic>?)
+          ?.map((e) => $enumDecode(_$GTMuscleGroupEnumMap, e))
+          .toSet() ??
+      const <GTMuscleGroup>{},
+  restTime: Duration(microseconds: (json['restTime'] as num).toInt()),
+  parentID: json['parentID'] as String?,
+  notes: json['notes'] as String? ?? '',
+  standard: json['standard'] as bool? ?? false,
+  supersetID: json['supersetID'] as String?,
+  workoutID: json['workoutID'] as String?,
+  supersedesID: json['supersedesID'] as String?,
+  rpe: (json['rpe'] as num?)?.toInt(),
+  category: $enumDecodeNullable(
+    _$GTExerciseMuscleCategoryEnumMap,
+    json['category'],
+  ),
+  equipment:
+      $enumDecodeNullable(_$GTGymEquipmentEnumMap, json['equipment']) ??
+      GTGymEquipment.none,
+);
 
 Map<String, dynamic> _$ExerciseToJson(Exercise instance) => <String, dynamic>{
-      'id': instance.id,
-      'name': instance.name,
-      'parameters': _$GTSetParametersEnumMap[instance.parameters]!,
-      'sets': instance.sets,
-      'primaryMuscleGroup':
-          _$GTMuscleGroupEnumMap[instance.primaryMuscleGroup]!,
-      'secondaryMuscleGroups': instance.secondaryMuscleGroups
-          .map((e) => _$GTMuscleGroupEnumMap[e]!)
-          .toList(),
-      'restTime': instance.restTime.inMicroseconds,
-      'parentID': instance.parentID,
-      'notes': instance.notes,
-      'supersetID': instance.supersetID,
-      'workoutID': instance.workoutID,
-      'standard': instance.standard,
-      'supersedesID': instance.supersedesID,
-      'rpe': instance.rpe,
-      'equipment': _$GTGymEquipmentEnumMap[instance.equipment]!,
-      'category': _$GTExerciseMuscleCategoryEnumMap[instance.category],
-    };
+  'id': instance.id,
+  'name': instance.name,
+  'parameters': _$GTSetParametersEnumMap[instance.parameters]!,
+  'sets': instance.sets,
+  'primaryMuscleGroup': _$GTMuscleGroupEnumMap[instance.primaryMuscleGroup]!,
+  'secondaryMuscleGroups': instance.secondaryMuscleGroups
+      .map((e) => _$GTMuscleGroupEnumMap[e]!)
+      .toList(),
+  'restTime': instance.restTime.inMicroseconds,
+  'parentID': instance.parentID,
+  'notes': instance.notes,
+  'supersetID': instance.supersetID,
+  'workoutID': instance.workoutID,
+  'standard': instance.standard,
+  'supersedesID': instance.supersedesID,
+  'rpe': instance.rpe,
+  'equipment': _$GTGymEquipmentEnumMap[instance.equipment]!,
+  'category': _$GTExerciseMuscleCategoryEnumMap[instance.category],
+};
 
 const _$GTSetParametersEnumMap = {
   GTSetParameters.repsWeight: 'repsWeight',

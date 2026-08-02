@@ -41,6 +41,16 @@
 	<false/>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NSAppIntentsConfiguration</key>
+	<dict>
+		<key>NSAppIntentsPackage</key>
+		<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
+	</dict>
+	<key>NSAppIntentsMetadata</key>
+	<dict>
+		<key>NSAppIntentsSupported</key>
+		<true/>
+	</dict>
 	<key>NSCameraUsageDescription</key>
 	<string>We use the camera to enable you to scan barcodes for product identification.</string>
 	<key>NSHealthClinicalHealthRecordsShareUsageDescription</key>
@@ -49,6 +59,8 @@
 	<string>We access your heart rate and burned calories to save workouts in your Health history.</string>
 	<key>NSHealthUpdateUsageDescription</key>
 	<string>We access your heart rate and burned calories to save workouts in your Health history.</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>We access your location to provide you with In-App Purchase data.</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>We use the camera to enable you to scan barcodes for product identification.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
@@ -76,15 +88,7 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
-	<key>NSAppIntentsConfiguration</key>
-	<dict>
-			<key>NSAppIntentsPackage</key>
-			<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
-	</dict>
-	<key>NSAppIntentsMetadata</key>
-	<dict>
-			<key>NSAppIntentsSupported</key>
-			<true/>
-	</dict>
+	<key>FlutterDeepLinkingEnabled</key>
+	<false/>
 </dict>
 </plist>

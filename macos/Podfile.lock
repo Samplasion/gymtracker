@@ -23,6 +23,12 @@ PODS:
     - FlutterMacOS
   - protocol_handler_macos (0.0.1):
     - FlutterMacOS
+  - purchases_flutter (8.11.0):
+    - FlutterMacOS
+    - PurchasesHybridCommon (= 14.3.0)
+  - PurchasesHybridCommon (14.3.0):
+    - RevenueCat (= 5.32.0)
+  - RevenueCat (5.32.0)
   - share_plus (0.0.1):
     - FlutterMacOS
   - shared_preferences_foundation (0.0.1):
@@ -62,6 +68,7 @@ DEPENDENCIES:
   - package_info_plus (from `Flutter/ephemeral/.symlinks/plugins/package_info_plus/macos`)
   - path_provider_foundation (from `Flutter/ephemeral/.symlinks/plugins/path_provider_foundation/darwin`)
   - protocol_handler_macos (from `Flutter/ephemeral/.symlinks/plugins/protocol_handler_macos/macos`)
+  - purchases_flutter (from `Flutter/ephemeral/.symlinks/plugins/purchases_flutter/macos`)
   - share_plus (from `Flutter/ephemeral/.symlinks/plugins/share_plus/macos`)
   - shared_preferences_foundation (from `Flutter/ephemeral/.symlinks/plugins/shared_preferences_foundation/darwin`)
   - sqlite3_flutter_libs (from `Flutter/ephemeral/.symlinks/plugins/sqlite3_flutter_libs/macos`)
@@ -69,6 +76,8 @@ DEPENDENCIES:
 
 SPEC REPOS:
   trunk:
+    - PurchasesHybridCommon
+    - RevenueCat
     - sqlite3
 
 EXTERNAL SOURCES:
@@ -96,6 +105,8 @@ EXTERNAL SOURCES:
     :path: Flutter/ephemeral/.symlinks/plugins/path_provider_foundation/darwin
   protocol_handler_macos:
     :path: Flutter/ephemeral/.symlinks/plugins/protocol_handler_macos/macos
+  purchases_flutter:
+    :path: Flutter/ephemeral/.symlinks/plugins/purchases_flutter/macos
   share_plus:
     :path: Flutter/ephemeral/.symlinks/plugins/share_plus/macos
   shared_preferences_foundation:
@@ -118,6 +129,9 @@ SPEC CHECKSUMS:
   package_info_plus: a8a591e70e87ce97ce5d21b2594f69cea9e0312f
   path_provider_foundation: 080d55be775b7414fd5a5ef3ac137b97b097e564
   protocol_handler_macos: f9cd7b13bcaf6b0425f7410cbe52376cb843a936
+  purchases_flutter: 7835f4491185946188319847e425ef71ac492971
+  PurchasesHybridCommon: 7f0944cc5411bdcd1ea5d69affa6a6f9aaf87b13
+  RevenueCat: 7e1d0768fb287c9983173c9b28e39ccbeeb828a9
   share_plus: 11c7b7fa7020465584eca3ff6392c5bc1e399d6e
   shared_preferences_foundation: 9e1978ff2562383bd5676f64ec4e9aa8fa06a6f7
   sqlite3: 0bb0e6389d824e40296f531b858a2a0b71c0d2fb

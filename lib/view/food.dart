@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:ui';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
@@ -24,7 +25,9 @@ import 'package:gymtracker/utils/utils.dart';
 import 'package:gymtracker/view/components/alert_banner.dart';
 import 'package:gymtracker/view/components/controlled.dart';
 import 'package:gymtracker/view/components/gradient_bottom_bar.dart';
+import 'package:gymtracker/view/components/pro_builder.dart';
 import 'package:gymtracker/view/components/stats.dart';
+import 'package:gymtracker/view/components/subscription_nag.dart';
 import 'package:gymtracker/view/components/tweened_builder.dart';
 import 'package:gymtracker/view/skeleton.dart';
 import 'package:gymtracker/view/utils/crossfade.dart';
@@ -83,185 +86,289 @@ class _FoodViewState extends ControlledState<FoodView, FoodController> {
         bottomNavigationBarHeight + kFloatingActionButtonMargin + 56;
     final searchBar = _buildOFFSearchBar();
     return Scaffold(
-      body: StreamBuilder(
-        stream: controller.goals$,
-        builder: (context, _) {
+      body: ProBuilder(
+        builder: (context, subscriptionInfo) {
+          final isUnsubbed =
+              subscriptionInfo == null || !subscriptionInfo.hasProFeatures;
           return StreamBuilder(
-            stream: controller.day$,
+            stream: controller.goals$,
             builder: (context, _) {
               return StreamBuilder(
-                stream: controller.foods$,
-                builder: (context, connection) {
-                  final nutritionGoal = controller.getGoal();
-                  final isLoading = !connection.hasData ||
-                      connection.connectionState == ConnectionState.waiting;
-
-                  final foods = connection.data
-                          ?.where((food) =>
-                              food.date.isSameDay(controller.day$.value))
-                          .map((fv) => fv.value)
-                          .toList()
-                          .reversed
-                          .toList() ??
-                      skeletonFoods(10);
-
-                  getCalorieGauge(bool showSpacers, bool applySafeArea) =>
-                      _getCalGauge(
-                        applySafeArea,
-                        context,
-                        showSpacers,
-                        foods,
-                        nutritionGoal,
+                stream: controller.day$,
+                builder: (context, _) {
+                  final isTooFar =
+                      controller.day$.value.isBefore(
+                        DateTime.now().startOfDay.subtract(Duration(days: 7)),
+                      ) ||
+                      controller.day$.value.isAfter(
+                        DateTime.now().startOfDay.add(Duration(days: 7)),
                       );
+                  final shouldDisable = isUnsubbed && isTooFar;
+                  return StreamBuilder(
+                    stream: controller.foods$,
+                    builder: (context, connection) {
+                      final nutritionGoal = controller.getGoal();
+                      final isLoading =
+                          !connection.hasData ||
+                          connection.connectionState == ConnectionState.waiting;
 
-                  var goals = [
-                    FoodNutritionalSingleGoalSDButton(
-                      text: "food.home.carbs".t,
-                      value: foods.fold<double>(
-                          0,
-                          (previousValue, element) =>
-                              previousValue + element.nutritionalValues.carbs),
-                      goal: nutritionGoal.dailyCarbs,
-                      key: macroTile1Key,
-                    ),
-                    FoodNutritionalSingleGoalSDButton(
-                      text: "food.home.protein".t,
-                      value: foods.fold<double>(
-                          0,
-                          (previousValue, element) =>
-                              previousValue +
-                              element.nutritionalValues.protein),
-                      goal: nutritionGoal.dailyProtein,
-                      key: macroTile2Key,
-                    ),
-                    FoodNutritionalSingleGoalSDButton(
-                      text: "food.home.fat".t,
-                      value: foods.fold<double>(
-                          0,
-                          (previousValue, element) =>
-                              previousValue + element.nutritionalValues.fat),
-                      goal: nutritionGoal.dailyFat,
-                      key: macroTile3Key,
-                    ),
-                  ];
+                      final foods =
+                          connection.data
+                              ?.where(
+                                (food) =>
+                                    food.date.isSameDay(controller.day$.value),
+                              )
+                              .map((fv) => fv.value)
+                              .toList()
+                              .reversed
+                              .toList() ??
+                          skeletonFoods(10);
 
-                  return Skeletonizer(
-                    enabled: isLoading,
-                    child: CustomScrollView(
-                      slivers: [
-                        const _FoodDayAppBar(),
-                        SliverList(
-                            delegate: SliverChildListDelegate([
-                          const SizedBox(height: 16),
-                          if (Breakpoints.currentBreakpoint > Breakpoints.l)
-                            SafeArea(
-                              bottom: false,
-                              child: IntrinsicHeight(
-                                child: Row(
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    Expanded(
-                                        child: getCalorieGauge(true, false)),
-                                    Card(
-                                      child: SizedBox(
-                                        width: 256,
-                                        child: Column(
-                                          children: goals.separated(
-                                              separatorBuilder: (_) => Divider(
-                                                    color: context
-                                                        .theme
-                                                        .colorScheme
-                                                        .outlineVariant,
-                                                  )),
+                      getCalorieGauge(bool showSpacers, bool applySafeArea) =>
+                          _getCalGauge(
+                            applySafeArea,
+                            context,
+                            showSpacers,
+                            foods,
+                            nutritionGoal,
+                          );
+
+                      var goals = [
+                        FoodNutritionalSingleGoalSDButton(
+                          text: "food.home.carbs".t,
+                          value: foods.fold<double>(
+                            0,
+                            (previousValue, element) =>
+                                previousValue + element.nutritionalValues.carbs,
+                          ),
+                          goal: nutritionGoal.dailyCarbs,
+                          key: macroTile1Key,
+                        ),
+                        FoodNutritionalSingleGoalSDButton(
+                          text: "food.home.protein".t,
+                          value: foods.fold<double>(
+                            0,
+                            (previousValue, element) =>
+                                previousValue +
+                                element.nutritionalValues.protein,
+                          ),
+                          goal: nutritionGoal.dailyProtein,
+                          key: macroTile2Key,
+                        ),
+                        FoodNutritionalSingleGoalSDButton(
+                          text: "food.home.fat".t,
+                          value: foods.fold<double>(
+                            0,
+                            (previousValue, element) =>
+                                previousValue + element.nutritionalValues.fat,
+                          ),
+                          goal: nutritionGoal.dailyFat,
+                          key: macroTile3Key,
+                        ),
+                      ];
+
+                      return Skeletonizer(
+                        enabled: isLoading,
+                        child: CustomScrollView(
+                          slivers: [
+                            const _FoodDayAppBar(),
+                            SliverStack(
+                              children: [
+                                SliverIgnorePointer(
+                                  ignoring: shouldDisable,
+                                  sliver: MultiSliver(
+                                    children: [
+                                      SliverList(
+                                        delegate: SliverChildListDelegate([
+                                          const SizedBox(height: 16),
+                                          if (Breakpoints.currentBreakpoint >
+                                              Breakpoints.l)
+                                            SafeArea(
+                                              bottom: false,
+                                              child: IntrinsicHeight(
+                                                child: Row(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.center,
+                                                  children: [
+                                                    Expanded(
+                                                      child: getCalorieGauge(
+                                                        true,
+                                                        false,
+                                                      ),
+                                                    ),
+                                                    Card(
+                                                      child: SizedBox(
+                                                        width: 256,
+                                                        child: Column(
+                                                          children: goals.separated(
+                                                            separatorBuilder:
+                                                                (_) => Divider(
+                                                                  color: context
+                                                                      .theme
+                                                                      .colorScheme
+                                                                      .outlineVariant,
+                                                                ),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                    const SizedBox(width: 16),
+                                                  ],
+                                                ),
+                                              ),
+                                            )
+                                          else
+                                            Column(
+                                              children: [
+                                                getCalorieGauge(false, true),
+                                                const SizedBox(height: 8),
+                                                Padding(
+                                                  padding:
+                                                      const EdgeInsets.symmetric(
+                                                        horizontal: 16,
+                                                      ),
+                                                  child: SafeArea(
+                                                    top: false,
+                                                    bottom: false,
+                                                    child: LayoutBuilder(
+                                                      builder: (context, constraints) {
+                                                        final breakpoint =
+                                                            Breakpoints
+                                                                .currentBreakpoint;
+                                                        final actualGoals = goals
+                                                            .map(
+                                                              (
+                                                                goal,
+                                                              ) => SizedBox(
+                                                                width:
+                                                                    constraints
+                                                                        .maxWidth /
+                                                                    (goals.length +
+                                                                        0.5),
+                                                                child: goal,
+                                                              ),
+                                                            )
+                                                            .toList();
+                                                        return Card(
+                                                          margin:
+                                                              EdgeInsets.zero,
+                                                          child: SizedBox(
+                                                            child:
+                                                                breakpoint ==
+                                                                    Breakpoints
+                                                                        .xxs
+                                                                ? Column(
+                                                                    children: goals.separated(
+                                                                      separatorBuilder: (_) => Divider(
+                                                                        color: context
+                                                                            .theme
+                                                                            .colorScheme
+                                                                            .outlineVariant,
+                                                                      ),
+                                                                    ),
+                                                                  )
+                                                                : Row(
+                                                                    mainAxisAlignment:
+                                                                        MainAxisAlignment
+                                                                            .spaceEvenly,
+                                                                    children: actualGoals.separated(
+                                                                      separatorBuilder:
+                                                                          (_) =>
+                                                                              const _FauxVerticalDivider(),
+                                                                    ),
+                                                                  ),
+                                                          ),
+                                                        );
+                                                      },
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          const SizedBox(height: 16),
+                                          Padding(
+                                            padding:
+                                                const EdgeInsets.symmetric(
+                                                  horizontal: 16,
+                                                ) +
+                                                MediaQuery.of(
+                                                  context,
+                                                ).padding.copyWith(
+                                                  top: 0,
+                                                  bottom: 0,
+                                                ),
+                                            child: Skeleton.leaf(
+                                              child: searchBar,
+                                            ),
+                                          ),
+                                          const SizedBox(height: 24),
+                                        ]),
+                                      ),
+                                      SliverPadding(
+                                        padding:
+                                            const EdgeInsets.symmetric(
+                                              horizontal: 16,
+                                            ).copyWith(
+                                              bottom:
+                                                  controller
+                                                      .getCategories()
+                                                      .isEmpty
+                                                  ? 0
+                                                  : 16,
+                                            ),
+                                        sliver: SliverStack(
+                                          children: const [
+                                            SliverPositioned.fill(
+                                              child: Card(
+                                                margin: EdgeInsets.zero,
+                                              ),
+                                            ),
+                                            _HomeFoodCategoryList(),
+                                          ],
+                                        ),
+                                      ),
+                                      const _HomeUnassignedFoodsList(),
+                                      SliverToBoxAdapter(
+                                        child: SizedBox(
+                                          height: bottomPaddingWithFAB,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                if (shouldDisable) ...[
+                                  SliverPositioned.fill(
+                                    child: GestureDetector(
+                                      behavior: HitTestBehavior.opaque,
+                                      child: BackdropFilter(
+                                        filter: ImageFilter.blur(
+                                          sigmaX: 8,
+                                          sigmaY: 8,
+                                        ),
+                                        child: Container(
+                                          color: Colors.transparent,
                                         ),
                                       ),
                                     ),
-                                    const SizedBox(width: 16),
-                                  ],
-                                ),
-                              ),
-                            )
-                          else
-                            Column(
-                              children: [
-                                getCalorieGauge(false, true),
-                                const SizedBox(height: 8),
-                                Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 16),
-                                  child: SafeArea(
-                                    top: false,
-                                    bottom: false,
-                                    child: LayoutBuilder(
-                                        builder: (context, constraints) {
-                                      final breakpoint =
-                                          Breakpoints.currentBreakpoint;
-                                      final actualGoals = goals
-                                          .map((goal) => SizedBox(
-                                                width: constraints.maxWidth /
-                                                    (goals.length + 0.5),
-                                                child: goal,
-                                              ))
-                                          .toList();
-                                      return Card(
-                                          margin: EdgeInsets.zero,
-                                          child: SizedBox(
-                                            child: breakpoint == Breakpoints.xxs
-                                                ? Column(
-                                                    children: goals.separated(
-                                                        separatorBuilder: (_) =>
-                                                            Divider(
-                                                              color: context
-                                                                  .theme
-                                                                  .colorScheme
-                                                                  .outlineVariant,
-                                                            )))
-                                                : Row(
-                                                    mainAxisAlignment:
-                                                        MainAxisAlignment
-                                                            .spaceEvenly,
-                                                    children: actualGoals.separated(
-                                                        separatorBuilder: (_) =>
-                                                            const _FauxVerticalDivider()),
-                                                  ),
-                                          ));
-                                    }),
                                   ),
-                                ),
+                                  SliverFillRemaining(
+                                    child: Column(
+                                      mainAxisAlignment: .center,
+                                      children: [
+                                        SubscriptionNag(
+                                          stringKey: "food",
+                                          shouldHide: (_) => false,
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
                               ],
                             ),
-                          const SizedBox(height: 16),
-                          Padding(
-                            padding:
-                                const EdgeInsets.symmetric(horizontal: 16) +
-                                    MediaQuery.of(context)
-                                        .padding
-                                        .copyWith(top: 0, bottom: 0),
-                            child: Skeleton.leaf(child: searchBar),
-                          ),
-                          const SizedBox(height: 24),
-                        ])),
-                        SliverPadding(
-                          padding: const EdgeInsets.symmetric(horizontal: 16)
-                              .copyWith(
-                                  bottom: controller.getCategories().isEmpty
-                                      ? 0
-                                      : 16),
-                          sliver: SliverStack(
-                            children: const [
-                              SliverPositioned.fill(
-                                child: Card(margin: EdgeInsets.zero),
-                              ),
-                              _HomeFoodCategoryList(),
-                            ],
-                          ),
+                          ],
                         ),
-                        const _HomeUnassignedFoodsList(),
-                        SliverToBoxAdapter(
-                          child: SizedBox(height: bottomPaddingWithFAB),
-                        ),
-                      ],
-                    ),
+                      );
+                    },
                   );
                 },
               );
@@ -271,56 +378,64 @@ class _FoodViewState extends ControlledState<FoodView, FoodController> {
       ),
       extendBody: true,
       bottomNavigationBar: StreamBuilder(
-          stream: controller.day$,
-          builder: (context, snapshot) {
-            return GradientBottomBar(
-              alignment: MainAxisAlignment.spaceBetween,
-              center: true,
-              buttons: [
-                // Back, calendar, forward
-                IconButton(
-                  icon: const Icon(GTIcons.previousDay),
-                  onPressed: controller.canGoToPreviousDay()
-                      ? () {
-                          controller.previousDay();
-                        }
-                      : null,
-                ),
-                IconButton(
-                  icon: const Icon(GTIcons.showDatePicker),
-                  onPressed: () {
-                    controller.showDatePicker();
-                  },
-                ),
-                IconButton(
-                  icon: const Icon(GTIcons.nextDay),
-                  onPressed: controller.canGoToNextDay()
-                      ? () {
-                          controller.nextDay();
-                        }
-                      : null,
-                ),
-              ],
-            );
-          }),
+        stream: controller.day$,
+        builder: (context, snapshot) {
+          return GradientBottomBar(
+            alignment: MainAxisAlignment.spaceBetween,
+            center: true,
+            buttons: [
+              // Back, calendar, forward
+              IconButton(
+                icon: const Icon(GTIcons.previousDay),
+                onPressed: controller.canGoToPreviousDay()
+                    ? () {
+                        controller.previousDay();
+                      }
+                    : null,
+              ),
+              IconButton(
+                icon: const Icon(GTIcons.showDatePicker),
+                onPressed: () {
+                  controller.showDatePicker();
+                },
+              ),
+              IconButton(
+                icon: const Icon(GTIcons.nextDay),
+                onPressed: controller.canGoToNextDay()
+                    ? () {
+                        controller.nextDay();
+                      }
+                    : null,
+              ),
+            ],
+          );
+        },
+      ),
     );
   }
 
-  Card _getCalGauge(bool applySafeArea, BuildContext context, bool showSpacers,
-      List<Food> foods, NutritionGoal nutritionGoal) {
+  Card _getCalGauge(
+    bool applySafeArea,
+    BuildContext context,
+    bool showSpacers,
+    List<Food> foods,
+    NutritionGoal nutritionGoal,
+  ) {
     final eaten = FoodNutritionGaugeInfoSideView(
       value: foods.fold<double>(
-          0,
-          (previousValue, element) =>
-              previousValue + element.nutritionalValues.calories),
+        0,
+        (previousValue, element) =>
+            previousValue + element.nutritionalValues.calories,
+      ),
       text: "food.home.eaten".t,
       key: eatenKey,
     );
     final gauge = FoodNutritionEatenCaloriesGauge(
       value: foods.fold<double>(
-          0,
-          (previousValue, element) =>
-              previousValue + element.nutritionalValues.calories),
+        0,
+        (previousValue, element) =>
+            previousValue + element.nutritionalValues.calories,
+      ),
       goal: nutritionGoal.dailyCalories,
       key: gaugeKey,
     );
@@ -331,7 +446,8 @@ class _FoodViewState extends ControlledState<FoodView, FoodController> {
     );
 
     return Card(
-      margin: const EdgeInsets.symmetric(horizontal: 16) +
+      margin:
+          const EdgeInsets.symmetric(horizontal: 16) +
           (applySafeArea
               ? MediaQuery.of(context).padding.copyWith(top: 0, bottom: 0)
               : EdgeInsets.zero),
@@ -360,7 +476,7 @@ class _FoodViewState extends ControlledState<FoodView, FoodController> {
                             : 2,
                         child: Container(),
                       ),
-                      Flexible(child: goal)
+                      Flexible(child: goal),
                     ],
                   ),
                   gauge,
@@ -429,17 +545,13 @@ class _FoodViewState extends ControlledState<FoodView, FoodController> {
       textCapitalization: TextCapitalization.sentences,
       textInputAction: TextInputAction.search,
       keyboardType: TextInputType.text,
-      viewFloatingActionButton: _AddCustomFoodFAB(
-        closeView: () => Get.back(),
-      ),
+      viewFloatingActionButton: _AddCustomFoodFAB(closeView: () => Get.back()),
     );
   }
 }
 
 class _FauxVerticalDivider extends StatelessWidget {
-  const _FauxVerticalDivider({
-    super.key,
-  });
+  const _FauxVerticalDivider({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -522,7 +634,8 @@ class _HomeFoodCategoryList extends ControlledWidget<FoodController> {
                   borderRadius: BorderRadius.vertical(
                     top: Radius.circular(index == 0 ? 13 : 0),
                     bottom: Radius.circular(
-                        index == foodCategories.length - 1 ? 13 : 0),
+                      index == foodCategories.length - 1 ? 13 : 0,
+                    ),
                   ),
                   color: Colors.transparent,
                   child: _HomeFoodCategoryListTile(
@@ -578,17 +691,24 @@ class FoodListTile extends ControlledWidget<FoodController> {
         stream: controller.favorites$,
         builder: (context, snapshot) {
           return ListTile(
-            title: Text.rich(TextSpan(children: [
-              if (controller.isFavorite(food)) ...[
-                WidgetSpan(
-                  child: Icon(GTIcons.favorite,
-                      size: 14, color: Theme.of(context).colorScheme.tertiary),
-                  alignment: PlaceholderAlignment.middle,
-                ),
-                const TextSpan(text: " "),
-              ],
-              TextSpan(text: food.name),
-            ])),
+            title: Text.rich(
+              TextSpan(
+                children: [
+                  if (controller.isFavorite(food)) ...[
+                    WidgetSpan(
+                      child: Icon(
+                        GTIcons.favorite,
+                        size: 14,
+                        color: Theme.of(context).colorScheme.tertiary,
+                      ),
+                      alignment: PlaceholderAlignment.middle,
+                    ),
+                    const TextSpan(text: " "),
+                  ],
+                  TextSpan(text: food.name),
+                ],
+              ),
+            ),
             subtitle: Text(
               "${food.brand != null ? "${food.brand}, " : ""}${food.unit.formatAmount(food.amount, pieces: food.pieces)}",
             ),
@@ -607,10 +727,7 @@ class FoodListTile extends ControlledWidget<FoodController> {
 class _HomeFoodCategoryListTile extends ControlledWidget<FoodController> {
   final NutritionCategory category;
 
-  const _HomeFoodCategoryListTile({
-    super.key,
-    required this.category,
-  });
+  const _HomeFoodCategoryListTile({super.key, required this.category});
 
   @override
   Widget build(BuildContext context) {
@@ -621,13 +738,15 @@ class _HomeFoodCategoryListTile extends ControlledWidget<FoodController> {
           stream: controller.foods$,
           builder: (context, _) {
             final categoryFoods = controller.getFoodsForCategory(category);
-            final categoryMax = category.dailyPercentage *
+            final categoryMax =
+                category.dailyPercentage *
                 controller.getGoal().dailyCalories.toDouble() /
                 100;
             final categoryCalories = categoryFoods.fold<double>(
-                0,
-                (previousValue, element) =>
-                    previousValue + element.nutritionalValues.calories);
+              0,
+              (previousValue, element) =>
+                  previousValue + element.nutritionalValues.calories,
+            );
             final progress = categoryCalories / categoryMax;
 
             final subtitleParts = [
@@ -645,7 +764,7 @@ class _HomeFoodCategoryListTile extends ControlledWidget<FoodController> {
                   axis: GaugeAxis(
                     min: 0,
                     max: 1,
-                    degrees: 270,
+                    sweepDegrees: 270,
                     style: GaugeAxisStyle(
                       thickness: 4,
                       background:
@@ -658,7 +777,9 @@ class _HomeFoodCategoryListTile extends ControlledWidget<FoodController> {
                           : context.theme.colorScheme.primary,
                     ),
                     pointer: const GaugePointer.circle(
-                        radius: 0, color: Colors.transparent),
+                      radius: 0,
+                      color: Colors.transparent,
+                    ),
                   ),
                   child: Icon(category.icon.iconData, size: 20),
                 ),
@@ -671,8 +792,9 @@ class _HomeFoodCategoryListTile extends ControlledWidget<FoodController> {
               ),
               trailing: Text(
                 NumberFormat.decimalPercentPattern(
-                        decimalDigits: 0, locale: Get.locale?.languageCode)
-                    .format(progress),
+                  decimalDigits: 0,
+                  locale: Get.locale?.languageCode,
+                ).format(progress),
                 style: context.theme.textTheme.bodyMedium,
               ),
               onTap: () {
@@ -694,8 +816,11 @@ SearchSuggestionBuilder _getSearchSuggestionBuilder({
   return (BuildContext context, SearchController searchController) {
     final foods = controller.foods$.value.map((fv) => fv.value).toList();
     if (searchController.text.isEmpty) {
-      var searchHistory =
-          foods.reversed.map((e) => e.name).toSet().take(10).toList();
+      var searchHistory = foods.reversed
+          .map((e) => e.name)
+          .toSet()
+          .take(10)
+          .toList();
       if (searchHistory.isNotEmpty) {
         return [
           ...searchHistory.map((term) {
@@ -710,7 +835,8 @@ SearchSuggestionBuilder _getSearchSuggestionBuilder({
                   onPressed: () {
                     searchController.text = term;
                     searchController.selection = TextSelection.collapsed(
-                        offset: searchController.text.length);
+                      offset: searchController.text.length,
+                    );
                   },
                 ),
               ),
@@ -719,21 +845,19 @@ SearchSuggestionBuilder _getSearchSuggestionBuilder({
         ];
       }
 
-      return [
-        ListTile(
-          title: Text("food.searchBar.noHistory".t),
-        )
-      ];
+      return [ListTile(title: Text("food.searchBar.noHistory".t))];
     }
 
     final res = controller.getSuggestions(searchController.text);
     if (res.isEmpty) {
       return [
         ListTile(
-          title: Text("food.searchBar.noResults".tParams({
-            "query": searchController.text,
-          })),
-        )
+          title: Text(
+            "food.searchBar.noResults".tParams({
+              "query": searchController.text,
+            }),
+          ),
+        ),
       ];
     }
     return [
@@ -749,7 +873,7 @@ SearchSuggestionBuilder _getSearchSuggestionBuilder({
           },
         );
       }),
-      const SizedBox(height: 8)
+      const SizedBox(height: 8),
     ];
   };
 }
@@ -760,7 +884,6 @@ class _FoodDayAppBar extends ControlledWidget<FoodController> {
   @override
   Widget build(BuildContext context) {
     return SliverAppBar.large(
-      leading: const Skeleton.keep(child: SkeletonDrawerButton()),
       actions: [
         IconButton(
           icon: const Icon(GTIcons.food_categories),
@@ -783,9 +906,11 @@ class _FoodDayAppBar extends ControlledWidget<FoodController> {
           child: StreamBuilder(
             stream: controller.day$,
             builder: (context, snapshot) {
-              return Text.rich(TextSpan(children: [
-                TextSpan(text: controller.relativeDayText),
-              ]));
+              return Text.rich(
+                TextSpan(
+                  children: [TextSpan(text: controller.relativeDayText)],
+                ),
+              );
             },
           ),
         ),
@@ -808,10 +933,7 @@ class FoodNutritionGaugeInfoSideView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Text(
-          text,
-          style: Theme.of(context).textTheme.bodySmall,
-        ),
+        Text(text, style: Theme.of(context).textTheme.bodySmall),
         const SizedBox(height: 8, width: 8),
         TweenedDoubleBuilder(
           curve: Curves.fastOutSlowIn,
@@ -855,7 +977,7 @@ class FoodNutritionEatenCaloriesGauge extends StatelessWidget {
             axis: GaugeAxis(
               min: 0,
               max: goal,
-              degrees: 270,
+              sweepDegrees: 270,
               style: GaugeAxisStyle(
                 thickness: 12,
                 background: context.theme.colorScheme.surfaceContainerHighest,
@@ -864,7 +986,9 @@ class FoodNutritionEatenCaloriesGauge extends StatelessWidget {
                 color: context.theme.colorScheme.primary,
               ),
               pointer: const GaugePointer.circle(
-                  radius: 0, color: Colors.transparent),
+                radius: 0,
+                color: Colors.transparent,
+              ),
             ),
             child: Skeleton.replace(
               replacement: Column(
@@ -963,8 +1087,8 @@ class FoodNutritionalSingleGoalSDButton extends StatelessWidget {
                   final hzPadding = sdc == null
                       ? 8.0
                       : sdc.crossAxisCount == 1
-                          ? 8.0
-                          : 0.0;
+                      ? 8.0
+                      : 0.0;
                   return Padding(
                     padding: EdgeInsets.symmetric(horizontal: hzPadding),
                     child: LinearProgressIndicator(
@@ -975,7 +1099,7 @@ class FoodNutritionalSingleGoalSDButton extends StatelessWidget {
                   );
                 },
               ),
-            )
+            ),
           ],
         ),
       ),

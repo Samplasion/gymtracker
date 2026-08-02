@@ -20,22 +20,20 @@ class MaybeRichText extends StatelessWidget {
       style: textStyle,
       child: AbsorbPointer(
         child: QuillEditor.basic(
-          configurations: QuillEditorConfigurations(
-            controller: QuillController(
-              document: text.asQuillDocument(),
-              selection: const TextSelection.collapsed(offset: 0),
-              readOnly: true,
-            ),
+          controller: QuillController(
+            document: text.asQuillDocument(),
+            selection: const TextSelection.collapsed(offset: 0),
+            readOnly: true,
+          ),
+          config: QuillEditorConfig(
             customStyles: DefaultStyles(
               paragraph: DefaultTextBlockStyle(
                 textStyle,
+                const HorizontalSpacing(0, 0),
                 const VerticalSpacing(0, 0),
                 const VerticalSpacing(0, 0),
                 null,
               ),
-            ),
-            sharedConfigurations: QuillSharedConfigurations(
-              locale: Get.locale!,
             ),
             showCursor: false,
             enableInteractiveSelection: false,

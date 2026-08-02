@@ -31,18 +31,15 @@ extension StringUtils on String {
     return double.tryParse(replaceAll(",", "."));
   }
 
-  Size computeSize({
-    TextStyle? style,
-  }) {
+  Size computeSize({TextStyle? style}) {
     final TextPainter textPainter = TextPainter(
       text: TextSpan(
-          text: this, style: style ?? Get.context!.theme.textTheme.bodyMedium),
+        text: this,
+        style: style ?? Get.context!.theme.textTheme.bodyMedium,
+      ),
       maxLines: 1,
       textDirection: TextDirection.ltr,
-    )..layout(
-        minWidth: 0,
-        maxWidth: double.infinity,
-      );
+    )..layout(minWidth: 0, maxWidth: double.infinity);
     return textPainter.size;
   }
 
@@ -58,12 +55,14 @@ extension StringUtils on String {
     final json = tryParseJson();
     if (json != null) {
       logger.t(
-          "[String#asQuillDocument] not a null json; interpreting it as a delta");
+        "[String#asQuillDocument] not a null json; interpreting it as a delta",
+      );
       try {
         return Document.fromJson(json);
       } catch (_) {
         logger.t(
-            "[String#asQuillDocument] not a valid delta; falling back to plaintext string");
+          "[String#asQuillDocument] not a valid delta; falling back to plaintext string",
+        );
       }
     } else {
       logger.t("[String#asQuillDocument] not a json; creating delta");
@@ -95,10 +94,6 @@ extension DateUtils on DateTime {
 }
 
 extension ColorUtils on Color {
-  double get a => alpha.toDouble() / 255;
-  double get r => red.toDouble() / 255;
-  double get g => green.toDouble() / 255;
-  double get b => blue.toDouble() / 255;
   bool get isGray =>
       doubleEquality(r, g, epsilon: 0.001) &&
       doubleEquality(g, b, epsilon: 0.001);
@@ -239,11 +234,11 @@ extension NumIterableUtils<T extends num> on Iterable<T> {
   }
 
   T get _zero => switch (T) {
-        double => 0.0,
-        num => 0,
-        int => 0,
-        _ => 0 as dynamic,
-      };
+    const (double) => 0.0,
+    const (num) => 0,
+    const (int) => 0,
+    _ => 0 as dynamic,
+  };
 
   T get sum {
     T sum = _zero;
@@ -261,10 +256,8 @@ extension BuildContextUtils on BuildContext {
 }
 
 extension NumGenericUtils<T extends num> on T {
-  String get localized => NumberFormat(
-        "###,###.##",
-        Get.locale!.languageCode,
-      ).format(this);
+  String get localized =>
+      NumberFormat("###,###.##", Get.locale!.languageCode).format(this);
 }
 
 extension NumUtils on num {
@@ -366,10 +359,14 @@ extension WorkoutIterableUtils on Iterable<Workout> {
   List<WorkoutExercisable> get flattenedExercises {
     List<WorkoutExercisable> result = [];
     for (final workout in this) {
-      result.addAll(workout.exercises.expand((element) => element.map(
+      result.addAll(
+        workout.exercises.expand(
+          (element) => element.map(
             exercise: (ex) => [ex],
             superset: (ss) => [ss, ...ss.exercises],
-          )));
+          ),
+        ),
+      );
     }
     return result;
   }
@@ -377,10 +374,16 @@ extension WorkoutIterableUtils on Iterable<Workout> {
 
 extension WorkoutExerciseIterableUtils on List<WorkoutExercisable> {
   Exercise? exerciseAt(ExerciseIndex index) {
-    return index.supersetIndex == null
-        ? (this[index.exerciseIndex].asExercise)
-        : (this[index.supersetIndex!].asSuperset)
-            .exercises[index.exerciseIndex];
+    if (index.supersetIndex == null) {
+      if (index.exerciseIndex >= length) return null;
+      return (this[index.exerciseIndex].asExercise);
+    } else {
+      if (index.supersetIndex! >= length) return null;
+      final exercises = this[index.supersetIndex!].asSuperset.exercises;
+      if (index.exerciseIndex >= exercises.length) return null;
+      return (this[index.supersetIndex!].asSuperset).exercises[index
+          .exerciseIndex];
+    }
   }
 }
 
@@ -390,10 +393,12 @@ extension WorkoutUtils on Workout {
   /// {@macro flattenedExercises}
   List<WorkoutExercisable> get flattenedExercises {
     return exercises
-        .expand((element) => element.map(
-              exercise: (ex) => [ex],
-              superset: (ss) => [ss, ...ss.exercises],
-            ))
+        .expand(
+          (element) => element.map(
+            exercise: (ex) => [ex],
+            superset: (ss) => [ss, ...ss.exercises],
+          ),
+        )
         .toList();
   }
 }
@@ -469,21 +474,18 @@ extension EmptyDocument on Document {
 
 extension HarmonizedMaterialColor on MaterialColor {
   MaterialColor harmonizeWith(Color color) {
-    return MaterialColor(
-      color.harmonizeWith(this).hexValue,
-      {
-        50: this[50]!.harmonizeWith(color),
-        100: this[100]!.harmonizeWith(color),
-        200: this[200]!.harmonizeWith(color),
-        300: this[300]!.harmonizeWith(color),
-        400: this[400]!.harmonizeWith(color),
-        500: this[500]!.harmonizeWith(color),
-        600: this[600]!.harmonizeWith(color),
-        700: this[700]!.harmonizeWith(color),
-        800: this[800]!.harmonizeWith(color),
-        900: this[900]!.harmonizeWith(color),
-      },
-    );
+    return MaterialColor(color.harmonizeWith(this).hexValue, {
+      50: this[50]!.harmonizeWith(color),
+      100: this[100]!.harmonizeWith(color),
+      200: this[200]!.harmonizeWith(color),
+      300: this[300]!.harmonizeWith(color),
+      400: this[400]!.harmonizeWith(color),
+      500: this[500]!.harmonizeWith(color),
+      600: this[600]!.harmonizeWith(color),
+      700: this[700]!.harmonizeWith(color),
+      800: this[800]!.harmonizeWith(color),
+      900: this[900]!.harmonizeWith(color),
+    });
   }
 }
 
@@ -543,7 +545,8 @@ extension IntUtils on int {
   String toRomanNumeral() {
     if (this < 1 || this > 3999) {
       throw ArgumentError(
-          "Roman numerals can only represent numbers between 1 and 3999");
+        "Roman numerals can only represent numbers between 1 and 3999",
+      );
     }
 
     const letters = {
@@ -593,21 +596,24 @@ extension GTSetUtils on GTSet {
     final context = Get.context;
 
     String _buildWeight(double weight) => Weights.convert(
-            value: weight,
-            from: weightUnit,
-            to: settingsController.weightUnit.value)
-        .userFacingWeight;
+      value: weight,
+      from: weightUnit,
+      to: settingsController.weightUnit.value,
+    ).userFacingWeight;
     String _buildReps(int? reps) =>
         "exerciseList.fields.reps".plural(reps ?? 0);
     String _buildTime(Duration time) => context == null
         ? time.toString()
-        : TimerView.buildTimeString(context, time,
-            builder: (time) => time.text!);
+        : TimerView.buildTimeString(
+            context,
+            time,
+            builder: (time) => time.text!,
+          );
     String _buildDistance(double? distance) => Distance.convert(
-            value: distance ?? 0,
-            from: distanceUnit,
-            to: settingsController.distanceUnit.value)
-        .userFacingDistance;
+      value: distance ?? 0,
+      from: distanceUnit,
+      to: settingsController.distanceUnit.value,
+    ).userFacingDistance;
 
     switch (parameters) {
       case GTSetParameters.repsWeight:

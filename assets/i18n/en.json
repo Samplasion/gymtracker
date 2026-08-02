@@ -2,7 +2,9 @@
   "appName": "Gym Bro",
   "appInfo": {
     "version": "Version @version (build @build)",
-    "shortDescription": "The best workout tracker for your gym sessions."
+    "shortDescription": "The best workout tracker for your gym sessions.",
+    "terms": "Terms of service",
+    "privacy": "Privacy policy"
   },
   "set": {
     "kind": "Set kind",
@@ -511,6 +513,9 @@
     },
     "permissions": {
       "tapToRequest": "Tap to request permission"
+    },
+    "pro": {
+      "title": "Manage your subscription"
     }
   },
   "ongoingWorkout": {
@@ -2500,5 +2505,56 @@
       "title": "Get started",
       "text": "We hope you'll enjoy Gym Bro."
     }
+  },
+  "nags": {
+    "routines": {
+      "title": "You've been using Gym Bro for a while now",
+      "subtitle": "With the Pro version, you can create unlimited routines. Check out the Pro version and take your workouts to the next level!"
+    },
+    "button": "Join now!",
+    "library": {
+      "title": "You've been exploring Gym Bro for a while now.",
+      "subtitle": "With the Pro version, you can create unlimited exercises. Check out the Pro version and take your workouts to the next level!"
+    },
+    "history": {
+      "title": "You've been enjoying Gym Bro for a while now, it appears!",
+      "subtitle": "With the Pro version, you can start unlimited workouts. Check out the Pro version and take your workouts to the next level!"
+    },
+    "food": {
+      "title": "Woah, hold on! You can't do that yet.",
+      "subtitle": "With the Pro version, you can see historical data. Check out the Pro version and take your nutrition to the next level!"
+    }
+  },
+  "feed": {
+    "title": "Feed",
+    "empty": {
+      "title": "Your feed is empty",
+      "text": "Start some workouts or log some meals to see them here."
+    },
+    "startWorkout": "Start a workout",
+    "workout": {
+      "title": {
+        "you": "You"
+      },
+      "subtitle": {
+        "you": "completed a workout",
+        "friend": "completed a workout"
+      }
+    },
+    "achievement": {
+      "title": {
+        "you": "You"
+      },
+      "subtitle": {
+        "you": "unlocked an achievement",
+        "friend": "unlocked an achievement"
+      }
+    }
+  },
+  "workoutPage": {
+    "title": "Work Out"
+  },
+  "pro": {
+    "title": "PRO"
   }
 }

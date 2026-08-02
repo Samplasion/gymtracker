@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:collection/collection.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart' as material;
+import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:fuzzywuzzy/fuzzywuzzy.dart';
@@ -54,7 +55,8 @@ class FoodController extends GetxController with ServiceableController {
   final favorites$ = BehaviorSubject<List<Food>>.seeded([]);
   final categories$ =
       BehaviorSubject<DateSequence<Map<String, NutritionCategory>>>.seeded(
-          DateSequence.empty());
+        DateSequence.empty(),
+      );
   final permission$ = BehaviorSubject<_Permissions>.seeded((
     camera: false,
     gallery: false,
@@ -92,29 +94,25 @@ class FoodController extends GetxController with ServiceableController {
       NumberFormat.decimalPattern(Get.locale?.languageCode).symbols.DECIMAL_SEP;
 
   bool get canUpdateCategories {
-    return day$.value.isAfterOrAtSameMomentAs(DateTime.now()
-            .startOfDay) /*  &&
-        foods$.value.where((food) => food.date.isSameDay(day$.value)).isEmpty */
-        ;
+    return day$.value.isAfterOrAtSameMomentAs(DateTime.now().startOfDay) /*  &&
+        foods$.value.where((food) => food.date.isSameDay(day$.value)).isEmpty */;
   }
 
   DateTime? get firstDay => foods$.value.isEmpty
       ? null
-      : (foods$.value.toList()
-            ..sort((a, b) {
+      : (foods$.value.toList()..sort((a, b) {
               return a.date.compareTo(b.date);
             }))
-          .first
-          .date;
+            .first
+            .date;
 
   DateTime? get lastDay => foods$.value.isEmpty
       ? null
-      : (foods$.value.toList()
-            ..sort((a, b) {
+      : (foods$.value.toList()..sort((a, b) {
               return b.date.compareTo(a.date);
             }))
-          .first
-          .date;
+            .first
+            .date;
 
   final showSettingsTileStream = BehaviorSubject<bool>.seeded(true);
   material.Widget get settingsTile {
@@ -167,20 +165,25 @@ class FoodController extends GetxController with ServiceableController {
       ..pipe(foods$)
       ..listen((foods) {
         logger.d("Foods updated with ${foods.length} items");
-        Get.find<Coordinator>()
-            .maybeUnlockAchievements(AchievementTrigger.food);
+        Get.find<Coordinator>().maybeUnlockAchievements(
+          AchievementTrigger.food,
+        );
         updateNativeData();
       });
     service.nutritionGoals$.listen((goals) {
       logger.d("Goals updated with ${goals.length} items");
-      goals$.add(DateSequence.fromList(goals +
-          [
-            if (goals.isEmpty)
-              TaggedNutritionGoal(
-                date: DateTime.now().startOfDay,
-                value: NutritionGoal.defaultGoal,
-              ),
-          ]));
+      goals$.add(
+        DateSequence.fromList(
+          goals +
+              [
+                if (goals.isEmpty)
+                  TaggedNutritionGoal(
+                    date: DateTime.now().startOfDay,
+                    value: NutritionGoal.defaultGoal,
+                  ),
+              ],
+        ),
+      );
       updateNativeData();
     });
     service.favoriteFoods$
@@ -205,13 +208,10 @@ class FoodController extends GetxController with ServiceableController {
     _getPermissions().then(permission$.add);
   }
 
-  String getRelativeTime(DateTime date) =>
-      date.relativeTime(Get.context!, timeUnits: [
-        TimeUnit.day,
-        TimeUnit.week,
-        TimeUnit.month,
-        TimeUnit.year,
-      ]);
+  String getRelativeTime(DateTime date) => date.relativeTime(
+    Get.context!,
+    timeUnits: [TimeUnit.day, TimeUnit.week, TimeUnit.month, TimeUnit.year],
+  );
 
   List<DateTagged<Food>> getSuggestions(String query) {
     final uniqueChoices = EqualitySet.from(
@@ -241,8 +241,9 @@ class FoodController extends GetxController with ServiceableController {
   VagueFood _offFoodToGTFood(Product product, {String? barcode}) {
     final nameBrand = product
         .getProductNameBrand(
-            settingsController.nutritionLanguage.value.offApiLanguage,
-            kNameBrandSeparator)
+          settingsController.nutritionLanguage.value.offApiLanguage,
+          kNameBrandSeparator,
+        )
         .split(kNameBrandSeparator);
     final name = nameBrand.first;
     final brand = nameBrand.length > 1 && nameBrand.last.trim().isNotEmpty
@@ -250,7 +251,8 @@ class FoodController extends GetxController with ServiceableController {
         : null;
 
     final liquidRegex = RegExp(r"(?:\d|\b)(ml|l|cl)\b");
-    final isLikelyToBeLiquid = (product.quantity != null &&
+    final isLikelyToBeLiquid =
+        (product.quantity != null &&
             product.quantity!.toLowerCase().contains(liquidRegex)) ||
         (product.servingSize != null &&
             product.servingSize!.toLowerCase().contains(liquidRegex));
@@ -263,8 +265,8 @@ class FoodController extends GetxController with ServiceableController {
         product.quantity,
         (product.quantity ?? "").toLowerCase().contains(liquidRegex),
         product.servingSize,
-        (product.servingSize ?? "").toLowerCase().contains(liquidRegex)
-      )
+        (product.servingSize ?? "").toLowerCase().contains(liquidRegex),
+      ),
     ));
 
     return VagueFood(
@@ -274,8 +276,11 @@ class FoodController extends GetxController with ServiceableController {
         if (product.packagingQuantity != null && product.packagingQuantity! > 0)
           ServingSize(
             amount: product.packagingQuantity!,
-            name: product.packagingTextInLanguages?[settingsController
-                    .nutritionLanguage.value.offApiLanguage] ??
+            name:
+                product.packagingTextInLanguages?[settingsController
+                    .nutritionLanguage
+                    .value
+                    .offApiLanguage] ??
                 (product.packagingTextInLanguages?.values.toList() as List?)
                     ?.getAt(0),
           ),
@@ -308,18 +313,17 @@ class FoodController extends GetxController with ServiceableController {
 
   void showEditFoodView(Food food) async {
     final updatedFood = await Go.to(
-        () => AddFoodView(food: food, isEditing: true, inheritAmount: true));
+      () => AddFoodView(food: food, isEditing: true, inheritAmount: true),
+    );
     if (updatedFood != null) {
-      updateFood(
-        day$.value,
-        updatedFood,
-      );
+      updateFood(day$.value, updatedFood);
     }
   }
 
   Future<Food> showEditFoodViewForCombination(Food food) async {
     final updatedFood = await Go.to(
-        () => AddFoodView(food: food, isEditing: true, inheritAmount: true));
+      () => AddFoodView(food: food, isEditing: true, inheritAmount: true),
+    );
     if (updatedFood != null) {
       return updatedFood;
     } else {
@@ -343,11 +347,13 @@ class FoodController extends GetxController with ServiceableController {
     Completer<Food?> completer = Completer();
     if (permission$.value.camera) {
       _isScanningBarcode = false;
-      Go.to(() => FoodBarcodeReaderView(
-            onFoodReceived: (food) {
-              completer.complete(food);
-            },
-          ));
+      Go.to(
+        () => FoodBarcodeReaderView(
+          onFoodReceived: (food) {
+            completer.complete(food);
+          },
+        ),
+      );
     } else {
       logger.w("Permission status: ${permission$.value}");
       material.showDialog(
@@ -362,26 +368,31 @@ class FoodController extends GetxController with ServiceableController {
               if (!permission$.value.camera)
                 material.ListTile(
                   leading: const material.Icon(GTIcons.camera),
-                  title:
-                      material.Text("food.addCustomFood.permission.camera".t),
+                  title: material.Text(
+                    "food.addCustomFood.permission.camera".t,
+                  ),
                 ),
               if (!permission$.value.gallery)
                 material.ListTile(
                   leading: const material.Icon(GTIcons.gallery),
-                  title:
-                      material.Text("food.addCustomFood.permission.gallery".t),
+                  title: material.Text(
+                    "food.addCustomFood.permission.gallery".t,
+                  ),
                 ),
               OverflowBar(
                 children: [
                   material.TextButton(
                     onPressed: Get.back,
                     child: material.Text(
-                        material.MaterialLocalizations.of(context)
-                            .closeButtonLabel),
+                      material.MaterialLocalizations.of(
+                        context,
+                      ).closeButtonLabel,
+                    ),
                   ),
                   material.TextButton(
                     child: material.Text(
-                        "food.addCustomFood.permission.openAppSettings".t),
+                      "food.addCustomFood.permission.openAppSettings".t,
+                    ),
                     onPressed: () async {
                       openAppSettings();
                       completer.complete(null);
@@ -390,14 +401,15 @@ class FoodController extends GetxController with ServiceableController {
                   ),
                   material.TextButton(
                     child: material.Text(
-                        "food.addCustomFood.permission.recheck".t),
+                      "food.addCustomFood.permission.recheck".t,
+                    ),
                     onPressed: () async {
                       _getPermissions()
                           .then(permission$.add)
                           .then((_) => Get.back())
                           .then((_) {
-                        completer.complete(showScanBarcodeView());
-                      });
+                            completer.complete(showScanBarcodeView());
+                          });
                     },
                   ),
                 ],
@@ -426,9 +438,7 @@ class FoodController extends GetxController with ServiceableController {
       barrierDismissible: false,
       builder: (context) => const material.PopScope(
         canPop: false,
-        child: material.Center(
-          child: material.CircularProgressIndicator(),
-        ),
+        child: material.Center(child: material.CircularProgressIndicator()),
       ),
     );
 
@@ -442,19 +452,20 @@ class FoodController extends GetxController with ServiceableController {
           ProductSearchQueryConfiguration(
             language: settingsController.nutritionLanguage.value.offApiLanguage,
             country: settingsController.nutritionCountry.value.offApiCountry,
-            parametersList: [
-              BarcodeParameter(barcode),
-            ],
+            parametersList: [BarcodeParameter(barcode)],
             version: ProductQueryVersion.v3,
           ),
         ),
       );
     } catch (e) {
       logger.e("Error while searching for barcode $barcode: $e");
-      Go.dialog(
-        "food.barcodeReader.scanResult.error.title".t,
-        "food.barcodeReader.scanResult.error.text".t,
-      );
+      Get.back();
+      SchedulerBinding.instance.addPostFrameCallback((_) {
+        Go.dialog(
+          "food.barcodeReader.scanResult.error.title".t,
+          "food.barcodeReader.scanResult.error.text".t,
+        );
+      });
       return null;
     }
 
@@ -476,19 +487,22 @@ class FoodController extends GetxController with ServiceableController {
           canPop: false,
           child: material.AlertDialog(
             title: material.Text(
-                "food.barcodeReader.scanResult.noProductFound.title".t),
+              "food.barcodeReader.scanResult.noProductFound.title".t,
+            ),
             content: material.Text(
-                "food.barcodeReader.scanResult.noProductFound.text".tParams({
-              "barcode": barcode,
-            })),
+              "food.barcodeReader.scanResult.noProductFound.text".tParams({
+                "barcode": barcode,
+              }),
+            ),
             actions: [
               material.TextButton(
                 onPressed: () {
                   completer.complete(null);
                   Get.back();
                 },
-                child: material.Text(material.MaterialLocalizations.of(context)
-                    .closeButtonLabel),
+                child: material.Text(
+                  material.MaterialLocalizations.of(context).closeButtonLabel,
+                ),
               ),
               material.TextButton(
                 onPressed: () {
@@ -498,7 +512,8 @@ class FoodController extends GetxController with ServiceableController {
                   });
                 },
                 child: material.Text(
-                    "food.barcodeReader.scanResult.noProductFound.createNew".t),
+                  "food.barcodeReader.scanResult.noProductFound.createNew".t,
+                ),
               ),
             ],
           ),
@@ -511,11 +526,14 @@ class FoodController extends GetxController with ServiceableController {
       return showAddFoodView(food);
     } else {
       final completer = Completer<Food?>();
-      Go.to(() => SearchResultsView(
-            foods: Future.value(
-                result!.products!.map((e) => _offFoodToGTFood(e)).toList()),
-            showAddCustom: false,
-          )).then((value) {
+      Go.to(
+        () => SearchResultsView(
+          foods: Future.value(
+            result!.products!.map((e) => _offFoodToGTFood(e)).toList(),
+          ),
+          showAddCustom: false,
+        ),
+      ).then((value) {
         if (value == null) {
           completer.complete(null);
           return;
@@ -527,21 +545,20 @@ class FoodController extends GetxController with ServiceableController {
   }
 
   void addFood(DateTime dateTime, Food food, {NutritionCategory? category}) {
-    service.addFood(DateTagged(
-      date: dateTime.startOfDay,
-      value: food.copyWith(
-        id: DateTime.now().millisecondsSinceEpoch.toString(),
-        category: category?.name,
+    service.addFood(
+      DateTagged(
+        date: dateTime.startOfDay,
+        value: food.copyWith(
+          id: DateTime.now().millisecondsSinceEpoch.toString(),
+          category: category?.name,
+        ),
       ),
-    ));
+    );
     coordinator.scheduleBackup();
   }
 
   void removeFood(DateTime dateTime, Food food) {
-    service.removeFood(DateTagged(
-      date: dateTime.startOfDay,
-      value: food,
-    ));
+    service.removeFood(DateTagged(date: dateTime.startOfDay, value: food));
     coordinator.scheduleBackup();
   }
 
@@ -549,10 +566,7 @@ class FoodController extends GetxController with ServiceableController {
     final dayFoods = foods$.value.where((element) => element.date == value);
     if (!dayFoods.any((element) => element.value.id == updatedFood.id)) return;
 
-    service.updateFood(DateTagged(
-      date: value,
-      value: updatedFood,
-    ));
+    service.updateFood(DateTagged(date: value, value: updatedFood));
     coordinator.scheduleBackup();
   }
 
@@ -581,18 +595,20 @@ class FoodController extends GetxController with ServiceableController {
     day$.add(key);
   }
 
-  bool canGoToNextDay() => day$.value.isBefore(DateTime(2100).subtract(
-        const Duration(days: 1),
-      ));
+  bool canGoToNextDay() =>
+      day$.value.isBefore(DateTime(2100).subtract(const Duration(days: 1)));
   void nextDay() {
     day$.add(day$.value.add(const Duration(days: 1)));
   }
 
-  void showSearchResultsView(String query,
-      {NutritionCategory? category}) async {
+  void showSearchResultsView(
+    String query, {
+    NutritionCategory? category,
+  }) async {
     final future = search(query);
-    final food =
-        await Go.to<VagueFood?>(() => SearchResultsView(foods: future));
+    final food = await Go.to<VagueFood?>(
+      () => SearchResultsView(foods: future),
+    );
     if (food != null) {
       showAddFoodView(food).then((value) {
         if (value != null) {
@@ -604,8 +620,9 @@ class FoodController extends GetxController with ServiceableController {
 
   Future<Food?> showSearchResultsViewForCombination(String query) async {
     final future = search(query);
-    final food =
-        await Go.to<VagueFood?>(() => SearchResultsView(foods: future));
+    final food = await Go.to<VagueFood?>(
+      () => SearchResultsView(foods: future),
+    );
     if (food != null) {
       return showAddFoodView(food);
     }
@@ -718,24 +735,19 @@ class FoodController extends GetxController with ServiceableController {
   DateRange? getDateRange() {
     if (goals$.value.isEmpty) return null;
     final date = goals$.value.surroundingDates(day$.value);
-    return date.copyWith(
-      from: Some(day$.value),
-    );
+    return date.copyWith(from: Some(day$.value));
   }
 
   DateRange? getDateRangeForCategories() {
     if (categories$.value.isEmpty) return null;
     final date = categories$.value.surroundingDates(day$.value);
-    return date.copyWith(
-      from: Some(day$.value),
-    );
+    return date.copyWith(from: Some(day$.value));
   }
 
   void saveNewGoal(NutritionGoal newGoal) {
-    service.addNutritionGoal(TaggedNutritionGoal(
-      date: day$.value.startOfDay,
-      value: newGoal,
-    ));
+    service.addNutritionGoal(
+      TaggedNutritionGoal(date: day$.value.startOfDay, value: newGoal),
+    );
     coordinator.scheduleBackup();
   }
 
@@ -789,27 +801,19 @@ class FoodController extends GetxController with ServiceableController {
         categories$.value[date.startOfDay].containsKey(category.name)) {
       throw StateError("Category already exists");
     }
-    service.setNutritionCategoriesForDay(
-      date.startOfDay,
-      {
-        ...(categories$.value.isEmpty
-            ? {}
-            : categories$.value[date.startOfDay]),
-        category.name: category
-      },
-    );
+    service.setNutritionCategoriesForDay(date.startOfDay, {
+      ...(categories$.value.isEmpty ? {} : categories$.value[date.startOfDay]),
+      category.name: category,
+    });
     coordinator.scheduleBackup();
   }
 
   void removeCategory(NutritionCategory category) {
     final date = day$.value;
-    service.setNutritionCategoriesForDay(
-      date.startOfDay,
-      {
-        for (final entry in categories$.value[date.startOfDay].entries)
-          if (entry.key != category.name) entry.key: entry.value
-      },
-    );
+    service.setNutritionCategoriesForDay(date.startOfDay, {
+      for (final entry in categories$.value[date.startOfDay].entries)
+        if (entry.key != category.name) entry.key: entry.value,
+    });
     coordinator.scheduleBackup();
   }
 
@@ -826,21 +830,20 @@ class FoodController extends GetxController with ServiceableController {
     final cat = await Go.to(() => FoodCategoryEditorView.edit(category));
     if (cat != null) {
       final date = day$.value;
-      service.setNutritionCategoriesForDay(
-        date.startOfDay,
-        {
-          for (final entry in categories$.value[date.startOfDay].entries)
-            if (entry.key != oldName) entry.key: entry.value else cat.name: cat
-        },
-      );
+      service.setNutritionCategoriesForDay(date.startOfDay, {
+        for (final entry in categories$.value[date.startOfDay].entries)
+          if (entry.key != oldName) entry.key: entry.value else cat.name: cat,
+      });
     }
   }
 
-  Iterable<Food> getFoodsForCategory(NutritionCategory category,
-      [DateTime? reference]) {
-    return getFoodsForDay(reference ?? day$.value)
-        .where((food) => food.value.category == category.name)
-        .map((f) => f.value);
+  Iterable<Food> getFoodsForCategory(
+    NutritionCategory category, [
+    DateTime? reference,
+  ]) {
+    return getFoodsForDay(
+      reference ?? day$.value,
+    ).where((food) => food.value.category == category.name).map((f) => f.value);
   }
 
   List<Food> getUnassignedFoods() {
@@ -848,7 +851,8 @@ class FoodController extends GetxController with ServiceableController {
     final names = categories.keys.toSet();
     return getFoods()
         .where(
-            (food) => food.category == null || !names.contains(food.category))
+          (food) => food.category == null || !names.contains(food.category),
+        )
         .toList();
   }
 
@@ -875,36 +879,41 @@ class FoodController extends GetxController with ServiceableController {
     final foods = getFoodsForDay(now);
 
     final foodProteinIntake = foods.fold<double>(
-        0,
-        (previousValue, element) =>
-            previousValue + element.value.nutritionalValues.protein);
+      0,
+      (previousValue, element) =>
+          previousValue + element.value.nutritionalValues.protein,
+    );
     final foodCarbsIntake = foods.fold<double>(
-        0,
-        (previousValue, element) =>
-            previousValue + element.value.nutritionalValues.carbs);
+      0,
+      (previousValue, element) =>
+          previousValue + element.value.nutritionalValues.carbs,
+    );
     final foodFatsIntake = foods.fold<double>(
-        0,
-        (previousValue, element) =>
-            previousValue + element.value.nutritionalValues.fat);
+      0,
+      (previousValue, element) =>
+          previousValue + element.value.nutritionalValues.fat,
+    );
 
-    NativeService.instance().setFoodParameters(NativeFoodStateMessage(
-      calorieGoal: goal.dailyCalories,
-      calorieIntake: getFoodsForDay(now).fold<double>(
+    NativeService.instance().setFoodParameters(
+      NativeFoodStateMessage(
+        calorieGoal: goal.dailyCalories,
+        calorieIntake: getFoodsForDay(now).fold<double>(
           0,
           (previousValue, element) =>
-              previousValue + element.value.nutritionalValues.calories),
-      categories: getCategories(now).values.map((c) {
-        final foodsForCategory = getFoodsForCategory(c, now);
+              previousValue + element.value.nutritionalValues.calories,
+        ),
+        categories: getCategories(now).values.map((c) {
+          final foodsForCategory = getFoodsForCategory(c, now);
 
-        double proteinSum = 0, carbsSum = 0, fatsSum = 0;
+          double proteinSum = 0, carbsSum = 0, fatsSum = 0;
 
-        for (final food in foodsForCategory) {
-          proteinSum += food.nutritionalValues.protein;
-          carbsSum += food.nutritionalValues.carbs;
-          fatsSum += food.nutritionalValues.fat;
-        }
+          for (final food in foodsForCategory) {
+            proteinSum += food.nutritionalValues.protein;
+            carbsSum += food.nutritionalValues.carbs;
+            fatsSum += food.nutritionalValues.fat;
+          }
 
-        return NativeFoodCategory(
+          return NativeFoodCategory(
             name: c.name,
             emoji: c.icon.emoji,
             nutritionSplit: NativeFoodNutritionSplit(
@@ -914,17 +923,19 @@ class FoodController extends GetxController with ServiceableController {
               carbsGoal: goal.dailyCarbs / c.dailyPercentage.toDouble(),
               fats: fatsSum,
               fatsGoal: goal.dailyFat / c.dailyPercentage.toDouble(),
-            ));
-      }).toList(),
-      totalNutritionSplit: NativeFoodNutritionSplit(
-        protein: foodProteinIntake,
-        proteinGoal: goal.dailyProtein,
-        carbs: foodCarbsIntake,
-        carbsGoal: goal.dailyCarbs,
-        fats: foodFatsIntake,
-        fatsGoal: goal.dailyFat,
+            ),
+          );
+        }).toList(),
+        totalNutritionSplit: NativeFoodNutritionSplit(
+          protein: foodProteinIntake,
+          proteinGoal: goal.dailyProtein,
+          carbs: foodCarbsIntake,
+          carbsGoal: goal.dailyCarbs,
+          fats: foodFatsIntake,
+          fatsGoal: goal.dailyFat,
+        ),
       ),
-    ));
+    );
   }
 }
 
@@ -938,18 +949,14 @@ Future<SearchResult> searchOFF(
   language ??= settingsController.nutritionLanguage.value.offApiLanguage;
   country ??= settingsController.nutritionCountry.value.offApiCountry;
 
-  final uri = Uri.https(
-    "world.openfoodfacts.org",
-    "/cgi/search.pl",
-    {
-      "search_terms": query,
-      "search_simple": "1",
-      "action": "process",
-      "json": "1",
-      "cc": country?.offTag,
-      "lc": language.code,
-    },
-  );
+  final uri = Uri.https("world.openfoodfacts.org", "/cgi/search.pl", {
+    "search_terms": query,
+    "search_simple": "1",
+    "action": "process",
+    "json": "1",
+    "cc": country?.offTag,
+    "lc": language.code,
+  });
 
   final res = await Dio().getUri(uri);
 

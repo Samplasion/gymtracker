@@ -10,6 +10,8 @@ import 'package:gymtracker/service/logger.dart';
 import 'package:gymtracker/utils/extensions.dart';
 import 'package:intl/intl.dart';
 
+const kSystemLocaleSentinel = Locale("SYSTEM");
+
 class GTLocalizations extends Translations with ChangeNotifier {
   @override
   final Map<String, Map<String, String>> keys = {};
@@ -24,17 +26,21 @@ class GTLocalizations extends Translations with ChangeNotifier {
     return Localizations.of<GTLocalizations>(context, GTLocalizations)!;
   }
 
-  Map<String, String> flattenTranslations(Map<String, dynamic> json,
-      [String prefix = '']) {
+  Map<String, String> flattenTranslations(
+    Map<String, dynamic> json, [
+    String prefix = '',
+  ]) {
     final Map<String, String> translations = {};
     json.forEach((String key, dynamic value) {
       if (value is Map) {
         translations.addAll(
-            flattenTranslations(value as Map<String, dynamic>, '$prefix$key.'));
+          flattenTranslations(value as Map<String, dynamic>, '$prefix$key.'),
+        );
       } else if (value is List) {
         for (var i = 0; i < value.length; i++) {
           translations.addAll(
-              flattenTranslations({i.toString(): value[i]}, '$prefix$key.'));
+            flattenTranslations({i.toString(): value[i]}, '$prefix$key.'),
+          );
         }
       } else {
         translations['$prefix$key'] = value.toString();
@@ -45,8 +51,10 @@ class GTLocalizations extends Translations with ChangeNotifier {
 
   Future init([bool cache = true]) async {
     for (final locale in supportedLocales) {
-      final bundle = await rootBundle
-          .loadString('assets/i18n/${locale.languageCode}.json', cache: cache);
+      final bundle = await rootBundle.loadString(
+        'assets/i18n/${locale.languageCode}.json',
+        cache: cache,
+      );
       keys[locale.languageCode] = flattenTranslations(jsonDecode(bundle));
     }
     Get.translations.clear();
@@ -73,8 +81,9 @@ class GTLocalizations extends Translations with ChangeNotifier {
       for (final (fullID, category, id) in exercises) {
         try {
           final bundle = await rootBundle.loadString(
-              'assets/exercises/$category/$id/${locale.languageCode}.md',
-              cache: false);
+            'assets/exercises/$category/$id/${locale.languageCode}.md',
+            cache: false,
+          );
           exerciseExplanations[locale.languageCode]![fullID] = bundle;
         } catch (e) {
           continue;
@@ -86,8 +95,9 @@ class GTLocalizations extends Translations with ChangeNotifier {
   @visibleForTesting
   Future<void> initTests(List<Locale> locales) async {
     for (final locale in locales) {
-      final bundle = await rootBundle
-          .loadString('assets/i18n/${locale.languageCode}.json');
+      final bundle = await rootBundle.loadString(
+        'assets/i18n/${locale.languageCode}.json',
+      );
       keys[locale.languageCode] = flattenTranslations(jsonDecode(bundle));
     }
     Get.addTranslations(keys);
@@ -147,8 +157,7 @@ extension Fallback on String {
   }
 
   bool get existsAsTranslationKey {
-    return Get.find<GTLocalizations>()
-        .keys[Get.locale!.languageCode]!
+    return Get.find<GTLocalizations>().keys[Get.locale!.languageCode]!
         .containsKey(this);
   }
 }
@@ -156,18 +165,17 @@ extension Fallback on String {
 extension Plural on String {
   String plural(num howMany, {Map<String, String>? args}) {
     return Intl.plural(
-      howMany,
-      zero: "$this.zero",
-      one: "$this.one",
-      two: "$this.two",
-      few: "$this.few",
-      many: "$this.many",
-      other: "$this.other",
-      locale: Get.locale!.languageCode,
-    ).tParams({
-      "howMany": howMany.localized,
-      ...?args,
-    }).replaceAll("%s", howMany.localized);
+          howMany,
+          zero: "$this.zero",
+          one: "$this.one",
+          two: "$this.two",
+          few: "$this.few",
+          many: "$this.many",
+          other: "$this.other",
+          locale: Get.locale!.languageCode,
+        )
+        .tParams({"howMany": howMany.localized, ...?args})
+        .replaceAll("%s", howMany.localized);
   }
 }
 

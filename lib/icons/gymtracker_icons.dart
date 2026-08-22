@@ -134,8 +134,13 @@ class GTIcons {
     fontFamily: _kFontFam,
     fontPackage: _kFontPkg,
   );
-  static const IconData _pro = IconData(
+  static const IconData _crown = IconData(
     0xf070,
+    fontFamily: _kFontFam,
+    fontPackage: _kFontPkg,
+  );
+  static const IconData _pro = IconData(
+    0xf071,
     fontFamily: _kFontFam,
     fontPackage: _kFontPkg,
   );
@@ -185,8 +190,10 @@ class GTIcons {
   static const IconData dropdown = Icons.arrow_drop_down_rounded;
   static const IconData duration = Icons.access_time_rounded;
   static const IconData edit = Icons.edit_rounded;
+  static const IconData edit_profile = Icons.manage_accounts_rounded;
   static const IconData empty_workout = Icons.timer_rounded;
   static const IconData exertion = Icons.fitness_center_rounded;
+  static const IconData exit = Icons.exit_to_app_rounded;
   static const IconData explanation = Icons.note_alt_outlined;
   static const IconData export = Icons.file_upload_rounded;
   static const IconData favorite = Icons.star_rounded;
@@ -196,6 +203,7 @@ class GTIcons {
   static const IconData folder_root = Icons.home_rounded;
   static const IconData food = Icons.fastfood_rounded;
   static const IconData food_categories = Icons.local_dining_rounded;
+  static const IconData friend_requests = Icons.person_add_rounded;
   static const IconData gallery = Icons.photo_library_rounded;
   static const IconData generate = _sparkles;
   static const IconData health = Icons.health_and_safety;
@@ -226,6 +234,7 @@ class GTIcons {
   static const IconData permissions = Icons.security_rounded;
   static const IconData picked = Icons.done_rounded;
   static const IconData previousDay = Icons.arrow_back;
+  // static const IconData pro = _pro;
   static const IconData pro = _pro;
   static const IconData profile = Icons.person_rounded;
   static const IconData remove_from_faves = Icons.star_rounded;
@@ -302,6 +311,7 @@ class GTIcons {
     'dropdown': dropdown,
     'duration': duration,
     'edit': edit,
+    'edit_profile': edit_profile,
     'empty_workout': empty_workout,
     'exertion': exertion,
     'explanation': explanation,
@@ -313,6 +323,7 @@ class GTIcons {
     'folder_root': folder_root,
     'food': food,
     'food_categories': food_categories,
+    'friend_requests': friend_requests,
     'gallery': gallery,
     'generate': generate,
     'health': health,

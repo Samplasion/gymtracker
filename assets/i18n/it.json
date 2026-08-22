@@ -2,7 +2,7 @@
   "appName": "Gym Bro",
   "appInfo": {
     "version": "Versione @version (build @build)",
-    "shortDescription": "Il miglior tracker per i tuoi allenamenti.",
+    "shortDescription": "Compagno di allenamenti",
     "terms": "Termini di servizio",
     "privacy": "Informativa sulla privacy"
   },
@@ -96,51 +96,51 @@
           "tapToEdit": "Tocca per inserire note"
         },
         "rpe": {
-          "removeRPE": "Rimuove RPE",
+          "removeRPE": "Rimuovi RPE",
           "label": "Imposta RPE",
           "description": {
             "title": "Cos'è l'RPE?",
-            "text": "L'RPE (Rate of Perceived Exertion, tasso di sforzo percepito) è una misurazione soggettiva della difficoltà di un esercizio. Si misura da 1 a 10, dove 1 sta per \"sforzo molto basso\" e 10 sta per \"sforzo massimo\"."
+            "text": "L'RPE (Rate of Perceived Exertion, tasso di sforzo percepito) è una misurazione soggettiva della difficoltà di un esercizio. Si misura da 1 a 10, dove 1 sta per \"sforzo molto basso\" e 10 sta per \"sforzo massimo\". Si può misurare in base alla stima delle ripetizioni rimanenti al termine di una serie (ad esempio, RPE 8 significa che potresti fare altre 2 ripetizioni prima di cedere)."
           },
           "level1": {
             "title": "RPE 1",
-            "text": "Sforzo molto basso. Non ti sembra neanche di starti allenando."
+            "text": "Sforzo molto basso."
           },
           "level2": {
             "title": "RPE 2",
-            "text": "Sforzo basso. Puoi facilmente sostenere una conversazione."
+            "text": "Sforzo basso."
           },
           "level3": {
             "title": "RPE 3",
-            "text": "Sforzo moderato. Riesci a sostenere una conversazione."
+            "text": "Sforzo basso."
           },
           "level4": {
             "title": "RPE 4",
-            "text": "Sforzo moderato. Riesci a sostenere una conversazione, ma è un po' più difficile."
+            "text": "Sforzo moderato."
           },
           "level5": {
             "title": "RPE 5",
-            "text": "Sforzo moderato. Riesci a sostenere una conversazione, ma è difficile."
+            "text": "Sforzo moderato."
           },
           "level6": {
             "title": "RPE 6",
-            "text": "Sforzo più che moderato. Puoi a malapena mantenere una conversazione, e respiri profondamente."
+            "text": "Sforzo moderatamente elevato."
           },
           "level7": {
             "title": "RPE 7",
-            "text": "Sforzo elevato. Non riesci a sostenere una conversazione, e respiri profondamente e affannosamente."
+            "text": "Sforzo elevato."
           },
           "level8": {
             "title": "RPE 8",
-            "text": "Sforzo elevato. Riesci a parlare solo una frase alla volta."
+            "text": "Sforzo elevato. Puoi effettuare al massimo 2 ripetizioni in più."
           },
           "level9": {
             "title": "RPE 9",
-            "text": "Sforzo molto elevato. Sei quasi senza fiato, e riesci a parlare solo poche parole alla volta."
+            "text": "Sforzo molto elevato. Puoi effettuare al massimo un'altra ripetizione."
           },
           "level10": {
             "title": "RPE 10",
-            "text": "Sforzo massimo. Non riesci a parlare e sei senza fiato."
+            "text": "Sforzo massimo. Non puoi effettuare altre ripetizioni."
           }
         },
         "reorderSets": {
@@ -344,7 +344,13 @@
     "dropHere": "Rilascia qui",
     "moveToRoot": "Rilascia la routine qui per muoverla nella schermata principale.",
     "none": "Nessuna routine",
-    "pick": "Seleziona routine"
+    "pick": "Seleziona routine",
+    "rootFolder": "Home",
+    "emptyFolder": "Questa cartella è vuota",
+    "emptyFolderSubtitle": "Tieni premuto e trascina una routine dalla pagina Home per aggiungerla a questa cartella.",
+    "folder": "Cartella",
+    "nullFolder": "Cartella eliminata",
+    "nullFolderSubtitle": "Puoi tornare alla pagina Home."
   },
   "history": {
     "title": "Cronologia",
@@ -398,7 +404,10 @@
         "label": "Colore dell'applicazione"
       },
       "locale": {
-        "label": "Lingua dell'applicazione"
+        "label": "Lingua dell'applicazione",
+        "values": {
+          "system": "Sistema"
+        }
       },
       "weightUnit": {
         "label": "Unità di peso"
@@ -462,7 +471,10 @@
         "label": "Esporta database completo (SQL)"
       },
       "nutritionLanguage": "Lingua di ricerca alimenti",
-      "nutritionCountry": "Paese di ricerca alimenti"
+      "nutritionCountry": "Paese di ricerca alimenti",
+      "health": {
+        "label": "Salute e parametri vitali"
+      }
     },
     "colorPicker": {
       "heading": {
@@ -503,6 +515,22 @@
           "deleting": "Eliminazione",
           "create": "Crea backup"
         }
+      },
+      "deleteAccount": {
+        "title": "Elimina il tuo account",
+        "warning": {
+          "title": "Vuoi eliminare definitivamente l'account?",
+          "content": "Perderai immediatamente tutti i tuoi dati. Non potrai annullare questa operazione. Sei sicuro di voler continuare?"
+        },
+        "confirmation": {
+          "title": "Conferma eliminazione",
+          "content": "Digita il tuo username (@username) per procedere.",
+          "hint": "Username",
+          "error": {
+            "mismatch": "Digita il tuo username."
+          }
+        },
+        "deleting": "Eliminazione in corso..."
       }
     },
     "panes": {
@@ -516,6 +544,11 @@
     },
     "pro": {
       "title": "Gestisci il tuo abbonamento"
+    },
+    "logout": "Esci",
+    "logoutWarning": {
+      "title": "Vuoi uscire?",
+      "content": "Potrai rientrare dalla scheda Profilo."
     }
   },
   "ongoingWorkout": {
@@ -687,7 +720,8 @@
         "many": "%s di rip.",
         "other": "%s rip."
       },
-      "distance": "@distance @unit"
+      "distance": "@distance @unit",
+      "rpe": "RPE @rpe"
     },
     "workoutMuscleCategoriesBarChart": {
       "label": "Distribuzione muscolare (per serie effettuate)"
@@ -2369,6 +2403,10 @@
     "errors": {
       "unknown": "Caricamento fallito. Controlla la connessione a Internet e riprova.",
       "version": "Questa versione dell'app non è compatibile con lo store di schede. Aggiorna all'ultima versione dell'app e riprova."
+    },
+    "marketingUpdating": {
+      "title": "Stiamo rimodernando lo store.",
+      "description": "Torna più tardi per delle schede nuove ed entusiasmanti!"
     }
   },
   "login": {
@@ -2380,6 +2418,7 @@
     "errors": {
       "generic": "Si è verificato un errore. Riprova tra qualche minuto.",
       "username": "Lo username deve essere di 3-20 caratteri e può contenere caratteri alfanumerici, trattini e trattini bassi.",
+      "usernameTaken": "Questo username è già in uso.",
       "email": "Inserisci un indirizzo email valido.",
       "password": {
         "invalid": {
@@ -2414,6 +2453,12 @@
     "upsell": {
       "title": "Accesso non effettuato",
       "subtitle": "Accedi per usufruire di allenamenti di gruppo, sincronizzazione su più dispositivi e tanto altro."
+    },
+    "verifyEmail": {
+      "title": "Ti abbiamo inviato un'email di verifica",
+      "done": "Ho verificato la mia email",
+      "description": "Controlla la tua casella di posta elettronica per confermare la tua email. Dopodiché tocca il pulsante sottostante per accedere.",
+      "notVerified": "Verifica il tuo indirizzo email e riprova."
     }
   },
   "sync": {
@@ -2498,25 +2543,29 @@
     "done": {
       "title": "Ecco fatto",
       "text": "Puoi iniziare i tuoi allenamenti con Gym Bro."
+    },
+    "login": {
+      "title": "Accedi",
+      "text": "Sincronizza i tuoi dati, guarda gli allenamenti dei tuoi amici e molto altro!"
     }
   },
   "nags": {
     "routines": {
       "title": "Stai usando Gym Bro da un po' di tempo, vero?",
-      "subtitle": "Con Gym Bro Pro, puoi creare routine illimitate. Dai un'occhiata alla versione Pro e porta i tuoi allenamenti al livello successivo!"
+      "subtitle": "Con Gym Bro Pro, puoi creare routine illimitate. Diventa un Pro Bro e porta i tuoi allenamenti al livello successivo!"
     },
     "button": "Unisciti ora!",
     "library": {
       "title": "Stai esplorando Gym Bro da un po' di tempo, vero?",
-      "subtitle": "Con Gym Bro Pro, puoi creare esercizi illimitati. Dai un'occhiata alla versione Pro e porta i tuoi allenamenti al livello successivo!"
+      "subtitle": "Con Gym Bro Pro, puoi creare esercizi illimitati. Diventa un Pro Bro e porta i tuoi allenamenti al livello successivo!"
     },
     "history": {
       "title": "Stai sfruttando Gym Bro da un bel po' di tempo, sembra!",
-      "subtitle": "Con Gym Bro Pro, puoi iniziare allenamenti illimitati. Dai un'occhiata alla versione Pro e porta i tuoi allenamenti al livello successivo!"
+      "subtitle": "Con Gym Bro Pro, puoi iniziare allenamenti illimitati. Diventa un Pro Bro e porta i tuoi allenamenti al livello successivo!"
     },
     "food": {
       "title": "Aspetta un attimo, non puoi ancora farlo.",
-      "subtitle": "Con la versione Pro, puoi vedere i dati storici dei tuoi pasti. Dai un'occhiata alla versione Pro e porta la tua nutrizione al livello successivo!"
+      "subtitle": "Con la versione Pro, puoi vedere i dati storici dei tuoi pasti. Diventa un Pro Bro e porta la tua nutrizione al livello successivo!"
     }
   },
   "feed": {
@@ -2528,7 +2577,8 @@
     "startWorkout": "Inizia un allenamento",
     "workout": {
       "title": {
-        "you": "Tu"
+        "you": "Tu",
+        "unknown": "Utente Sconosciuto"
       },
       "subtitle": {
         "you": "hai completato un allenamento",
@@ -2543,6 +2593,12 @@
         "you": "hai sbloccato un traguardo",
         "friend": "ha sbloccato un traguardo"
       }
+    },
+    "userButton": {
+      "loading": "Caricamento profilo utente in corso..."
+    },
+    "noSync": {
+      "text": "La sincronizzazione è in pausa: non sei connesso a Internet. Potrebbero volerci alcuni minuti. Non preoccuparti, i dati verranno mantenuti in locale e trasferiti in un secondo momento."
     }
   },
   "workoutPage": {
@@ -2550,5 +2606,82 @@
   },
   "pro": {
     "title": "PRO"
+  },
+  "userProfile": {
+    "title": "Profilo",
+    "addFriend": "Aggiungi amico",
+    "unfriend": "Rimuovi amico",
+    "requestSent": "Richiesta inviata",
+    "accept": "Accetta",
+    "decline": "Rifiuta",
+    "unfriendConfirmation": {
+      "title": "Rimuovere @name dagli amici?",
+      "subtitle": "Non apparirà più nel tuo feed, e tu non apparirai nel suo.",
+      "confirm": "Rimuovi",
+      "cancel": "Annulla"
+    },
+    "reject": "Rifiuta",
+    "stats": {
+      "friends": "Amici",
+      "workouts": "Allenamenti",
+      "achievements": "Traguardi"
+    },
+    "feed": {
+      "unavailable": {
+        "title": "Allenamenti non visibili",
+        "description": "I dati degli allenamenti sono visibili solo agli amici."
+      }
+    },
+    "edit": {
+      "tooltip": "Modifica profilo",
+      "title": "Modifica profilo",
+      "fullName": "Nome completo",
+      "fullNameHint": "Inserisci il tuo nome completo",
+      "profilePicture": "Immagine del profilo",
+      "changePicture": "Cambia immagine",
+      "removePicture": "Rimuovi immagine",
+      "uploading": "Caricamento...",
+      "saving": "Salvataggio...",
+      "success": "Profilo aggiornato con successo!",
+      "error": "Errore durante l'aggiornamento del profilo",
+      "cropTitle": "Ritaglia foto",
+      "cropInstructions": "Trascina e pizzica per posizionare la foto",
+      "done": "Fatto"
+    },
+    "crop": {
+      "buttons": {
+        "confirm": "Ritaglia",
+        "cancel": "Annulla"
+      }
+    },
+    "error": {
+      "title": "Errore",
+      "retry": "Riprova"
+    },
+    "errors": {
+      "noInternet": "Sei offline. Controlla la connessione a Internet e riprova."
+    }
+  },
+  "friendRequests": {
+    "title": "Richieste di amicizia",
+    "subtitle": "ti ha inviato una richiesta di amicizia",
+    "empty": {
+      "title": "Nessuna richiesta",
+      "text": "Non hai richieste di amicizia in sospeso al momento."
+    }
+  },
+  "profileSearch": {
+    "title": "Cerca profili",
+    "searchHint": "Cerca nome utente...",
+    "noResults": {
+      "title": "Nessun profilo trovato",
+      "text": "Prova a cercare un nome utente diverso."
+    }
+  },
+  "you": "Tu",
+  "error": {
+    "title": "Si è verificato un errore",
+    "retry": "Riprova",
+    "logs": "Apri log"
   }
 }

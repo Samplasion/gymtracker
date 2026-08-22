@@ -1,3 +1,5 @@
+// ignore_for_file: experimental_member_use
+
 import 'dart:async';
 import 'dart:io';
 
@@ -8,6 +10,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart' hide Localizations;
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_quill/flutter_quill.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:get/get.dart';
@@ -23,11 +26,17 @@ import 'package:gymtracker/service/env.dart';
 import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/service/logger.dart';
 import 'package:gymtracker/service/version.dart';
+import 'package:gymtracker/struct/navigation_observer.dart';
 import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/utils/theme.dart';
+import 'package:gymtracker/view/charts/density_calendar_chart.dart'
+    show DensityCalendarChart;
+import 'package:gymtracker/view/charts/line_charts_time_series.dart';
+import 'package:gymtracker/view/charts/weight_chart.dart';
 import 'package:gymtracker/view/debug/iphone15.dart';
 import 'package:gymtracker/view/error.dart';
+import 'package:gymtracker/view/me.dart';
 import 'package:gymtracker/view/paywall.dart';
 import 'package:gymtracker/view/skeleton.dart';
 import 'package:gymtracker/view/utils/workout_simple.dart';
@@ -221,6 +230,8 @@ class _MainAppState extends State<MainApp> with LoggerConfigurationMixin {
                 return AnimatedBuilder(
                   animation: localizations,
                   builder: (context, _) {
+                    final systemLocale =
+                        WidgetsBinding.instance.platformDispatcher.locale;
                     return GetMaterialApp(
                       useInheritedMediaQuery: true,
                       title: () {
@@ -232,7 +243,9 @@ class _MainAppState extends State<MainApp> with LoggerConfigurationMixin {
                       }(),
                       translations: localizations,
                       locale:
-                          settings.locale.value ?? Prefs.defaultValue.locale,
+                          settings.locale.value ??
+                          Prefs.defaultValue.locale ??
+                          systemLocale,
                       supportedLocales: GTLocalizations.supportedLocales,
                       fallbackLocale: const Locale('en'),
                       localizationsDelegates: const [
@@ -240,6 +253,7 @@ class _MainAppState extends State<MainApp> with LoggerConfigurationMixin {
                         GlobalMaterialLocalizations.delegate,
                         GlobalWidgetsLocalizations.delegate,
                         GlobalCupertinoLocalizations.delegate,
+                        FlutterQuillLocalizations.delegate,
                       ],
                       themeMode: settings.themeMode(),
                       theme: getGymTrackerThemeFor(
@@ -296,6 +310,7 @@ class _MainAppState extends State<MainApp> with LoggerConfigurationMixin {
                           logger.t(text);
                         }
                       },
+                      navigatorObservers: [LoggerNavigationObserver()],
                     );
                   },
                 );

@@ -2,7 +2,7 @@
   "appName": "Gym Bro",
   "appInfo": {
     "version": "Version @version (build @build)",
-    "shortDescription": "The best workout tracker for your gym sessions.",
+    "shortDescription": "Workout Buddy",
     "terms": "Terms of service",
     "privacy": "Privacy policy"
   },
@@ -100,47 +100,47 @@
           "label": "Set RPE",
           "description": {
             "title": "What is RPE?",
-            "text": "Rate of Perceived Exertion (RPE) is a subjective measure of how hard an exercise feels to you. It's a scale from 1 to 10, where 1 is very light effort and 10 is maximum effort."
+            "text": "Rate of Perceived Exertion (RPE) is a subjective measure of how hard an exercise feels to you. It's a scale from 1 to 10, where 1 is very light effort and 10 is maximum effort. You can measure it by estimating how many more reps you could perform before reaching failure. For example, if you could perform 3 more reps before failure, the RPE would be 7."
           },
           "level1": {
             "title": "RPE 1",
-            "text": "Very light effort. It doesn't even feel like you're working out."
+            "text": "Very light effort."
           },
           "level2": {
             "title": "RPE 2",
-            "text": "Light effort. You can easily maintain a conversation."
+            "text": "Light effort."
           },
           "level3": {
             "title": "RPE 3",
-            "text": "Moderate effort. You can maintain a conversation."
+            "text": "Moderately light effort."
           },
           "level4": {
             "title": "RPE 4",
-            "text": "Moderate effort. You can maintain a conversation, but it's a bit harder."
+            "text": "Moderate effort."
           },
           "level5": {
             "title": "RPE 5",
-            "text": "Moderate to hard effort. You can maintain a conversation, but it's hard."
+            "text": "Moderate effort."
           },
           "level6": {
             "title": "RPE 6",
-            "text": "Moderate to hard effort. You can barely maintain a conversation, and you're breathing heavily."
+            "text": "Moderate to hard effort."
           },
           "level7": {
             "title": "RPE 7",
-            "text": "Hard effort. You can't maintain a conversation, and you're breathing heavily."
+            "text": "Hard effort."
           },
           "level8": {
             "title": "RPE 8",
-            "text": "Hard effort. You can speak only a sentence at a time."
+            "text": "Hard effort. You can perform at most 2 more reps."
           },
           "level9": {
             "title": "RPE 9",
-            "text": "Very hard effort. You're almost out of breath, and you can only speak a few word at a time."
+            "text": "Very hard effort. You can perform at most 1 more rep."
           },
           "level10": {
             "title": "RPE 10",
-            "text": "Maximum effort. You can't speak at all and you're out of breath."
+            "text": "Maximum effort. You cannot perform any more reps."
           }
         },
         "reorderSets": {
@@ -344,7 +344,13 @@
     "dropHere": "Drop here",
     "moveToRoot": "Drop the routine here to move it to the home screen",
     "none": "No routine",
-    "pick": "Select a routine"
+    "pick": "Select a routine",
+    "rootFolder": "Home",
+    "emptyFolder": "This folder is empty",
+    "emptyFolderSubtitle": "Press and hold a routine from the Home page to add it to this folder.",
+    "folder": "Folder",
+    "nullFolder": "You've deleted this folder",
+    "nullFolderSubtitle": "You can go back to the Home page."
   },
   "history": {
     "title": "History",
@@ -398,7 +404,10 @@
         "label": "App color"
       },
       "locale": {
-        "label": "App language"
+        "label": "App language",
+        "values": {
+          "system": "System"
+        }
       },
       "weightUnit": {
         "label": "Weight unit"
@@ -462,7 +471,10 @@
         "label": "Export full database (SQL)"
       },
       "nutritionLanguage": "Food search language",
-      "nutritionCountry": "Food search country"
+      "nutritionCountry": "Food search country",
+      "health": {
+        "label": "Health and Vitals"
+      }
     },
     "colorPicker": {
       "heading": {
@@ -503,6 +515,22 @@
           },
           "deleting": "Deleting"
         }
+      },
+      "deleteAccount": {
+        "title": "Delete your account",
+        "warning": {
+          "title": "Permanently delete your account?",
+          "content": "You will instantly lose all your data. You won't be able to undo this. Are you sure you want to continue?"
+        },
+        "confirmation": {
+          "title": "Confirm deletion",
+          "content": "Type your username (@username) to proceed.",
+          "hint": "Username",
+          "error": {
+            "mismatch": "Type your username."
+          }
+        },
+        "deleting": "Deleting..."
       }
     },
     "panes": {
@@ -516,6 +544,11 @@
     },
     "pro": {
       "title": "Manage your subscription"
+    },
+    "logout": "Sign out",
+    "logoutWarning": {
+      "title": "Sign out?",
+      "content": "You can always sign back in from the Profile tab."
     }
   },
   "ongoingWorkout": {
@@ -687,7 +720,8 @@
         "many": "%s reps",
         "other": "%s reps"
       },
-      "distance": "@distance @unit"
+      "distance": "@distance @unit",
+      "rpe": "RPE @rpe"
     },
     "stats": {
       "time": "Duration",
@@ -2375,6 +2409,10 @@
     "errors": {
       "unknown": "Loading failed. Check your Internet connection and retry.",
       "version": "This version of the app is not compatible with the program shop. Update to the latest version and try again."
+    },
+    "marketingUpdating": {
+      "title": "We're modernizing the Routine store.",
+      "description": "Come back later for some exciting new programs!"
     }
   },
   "login": {
@@ -2386,6 +2424,7 @@
     "errors": {
       "generic": "An unexpected error has occurred. Try again in a few minutes.",
       "username": "Your username must be 8-10 characters long and can include only alphanumeric characters, hyphens, and underscores.",
+      "usernameTaken": "This username is already taken.",
       "email": "Enter a valid email address.",
       "password": {
         "invalid": {
@@ -2420,6 +2459,12 @@
     "upsell": {
       "title": "Not signed in",
       "subtitle": "Sign in to gain access to group workouts, cross-device synchronization and much more."
+    },
+    "verifyEmail": {
+      "title": "We've sent you a verification email",
+      "description": "Check your inbox to confirm your email. Once you're done, come back and tap the button to sign in.",
+      "done": "I've verified my email",
+      "notVerified": "Verify your email address and try again."
     }
   },
   "sync": {
@@ -2504,25 +2549,29 @@
     "done": {
       "title": "Get started",
       "text": "We hope you'll enjoy Gym Bro."
+    },
+    "login": {
+      "title": "Sign in",
+      "text": "Sync your data, see your friends' workouts, and much more!"
     }
   },
   "nags": {
     "routines": {
       "title": "You've been using Gym Bro for a while now",
-      "subtitle": "With the Pro version, you can create unlimited routines. Check out the Pro version and take your workouts to the next level!"
+      "subtitle": "With the Pro version, you can create unlimited routines. Become a Pro Bro and take your workouts to the next level!"
     },
     "button": "Join now!",
     "library": {
       "title": "You've been exploring Gym Bro for a while now.",
-      "subtitle": "With the Pro version, you can create unlimited exercises. Check out the Pro version and take your workouts to the next level!"
+      "subtitle": "With the Pro version, you can create unlimited exercises. Become a Pro Bro and take your workouts to the next level!"
     },
     "history": {
       "title": "You've been enjoying Gym Bro for a while now, it appears!",
-      "subtitle": "With the Pro version, you can start unlimited workouts. Check out the Pro version and take your workouts to the next level!"
+      "subtitle": "With the Pro version, you can start unlimited workouts. Become a Pro Bro and take your workouts to the next level!"
     },
     "food": {
       "title": "Woah, hold on! You can't do that yet.",
-      "subtitle": "With the Pro version, you can see historical data. Check out the Pro version and take your nutrition to the next level!"
+      "subtitle": "With the Pro version, you can see historical data. Become a Pro Bro and take your nutrition to the next level!"
     }
   },
   "feed": {
@@ -2534,7 +2583,8 @@
     "startWorkout": "Start a workout",
     "workout": {
       "title": {
-        "you": "You"
+        "you": "You",
+        "unknown": "Unknown User"
       },
       "subtitle": {
         "you": "completed a workout",
@@ -2549,6 +2599,12 @@
         "you": "unlocked an achievement",
         "friend": "unlocked an achievement"
       }
+    },
+    "userButton": {
+      "loading": "Loading user profile..."
+    },
+    "noSync": {
+      "text": "Syncing is paused: you are not connected to the Internet. It may take a few minutes. Don't worry, the data will be kept locally and transferred later."
     }
   },
   "workoutPage": {
@@ -2556,5 +2612,82 @@
   },
   "pro": {
     "title": "PRO"
+  },
+  "userProfile": {
+    "title": "Profile",
+    "addFriend": "Add Friend",
+    "unfriend": "Unfriend",
+    "requestSent": "Friend Request Sent",
+    "accept": "Accept",
+    "decline": "Decline",
+    "unfriendConfirmation": {
+      "title": "Unfriend @name?",
+      "subtitle": "They will no longer appear in your feed, and you won't appear in theirs.",
+      "confirm": "Unfriend",
+      "cancel": "Cancel"
+    },
+    "reject": "Reject",
+    "stats": {
+      "friends": "Friends",
+      "workouts": "Workouts",
+      "achievements": "Achievements"
+    },
+    "feed": {
+      "unavailable": {
+        "title": "Workouts not visible",
+        "description": "Workout data is only visible to friends."
+      }
+    },
+    "edit": {
+      "tooltip": "Edit Profile",
+      "title": "Edit Profile",
+      "fullName": "Full Name",
+      "fullNameHint": "Enter your full name",
+      "profilePicture": "Profile Picture",
+      "changePicture": "Change Picture",
+      "removePicture": "Remove Picture",
+      "uploading": "Uploading...",
+      "saving": "Saving...",
+      "success": "Profile updated successfully!",
+      "error": "Error updating profile",
+      "cropTitle": "Crop Photo",
+      "cropInstructions": "Drag and pinch to position your photo",
+      "done": "Done"
+    },
+    "crop": {
+      "buttons": {
+        "confirm": "Crop",
+        "cancel": "Cancel"
+      }
+    },
+    "error": {
+      "title": "Error",
+      "retry": "Retry"
+    },
+    "errors": {
+      "noInternet": "You appear to be offline. Check your Internet connection and try again."
+    }
+  },
+  "friendRequests": {
+    "title": "Friend Requests",
+    "subtitle": "sent you a friend request",
+    "empty": {
+      "title": "No friend requests",
+      "text": "You don't have any pending friend requests right now."
+    }
+  },
+  "profileSearch": {
+    "title": "Search Profiles",
+    "searchHint": "Search username...",
+    "noResults": {
+      "title": "No profiles found",
+      "text": "Try searching for a different username."
+    }
+  },
+  "you": "You",
+  "error": {
+    "title": "An unknown error occurred",
+    "retry": "Try again",
+    "logs": "Open logs"
   }
 }

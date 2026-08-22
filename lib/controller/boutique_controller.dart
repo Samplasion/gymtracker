@@ -25,6 +25,10 @@ class BoutiqueController extends GetxController with ServiceableController {
     }
   }
 
+  Future<BoutiqueSettings> getSettings() async {
+    return _repository.getSettings();
+  }
+
   Future<void> _checkVersion() async {
     final settings = await _repository.getSettings();
     final range = VersionConstraint.parse(settings.compatibility);
@@ -41,7 +45,8 @@ class BoutiqueController extends GetxController with ServiceableController {
     } catch (e, s) {
       logger.e("ERROR", error: e, stackTrace: s);
       return BoutiqueResponse.error(
-          e is BoutiqueError ? e : BoutiqueError.unknown);
+        e is BoutiqueError ? e : BoutiqueError.unknown,
+      );
     }
   }
 
@@ -51,13 +56,16 @@ class BoutiqueController extends GetxController with ServiceableController {
   }) async {
     try {
       await _checkVersion();
-      final response =
-          await _repository.getPackages(categoryId, language: language);
+      final response = await _repository.getPackages(
+        categoryId,
+        language: language,
+      );
       return BoutiqueResponse.success(response);
     } catch (e, s) {
       logger.e("ERROR", error: e, stackTrace: s);
       return BoutiqueResponse.error(
-          e is BoutiqueError ? e : BoutiqueError.unknown);
+        e is BoutiqueError ? e : BoutiqueError.unknown,
+      );
     }
   }
 
@@ -69,14 +77,16 @@ class BoutiqueController extends GetxController with ServiceableController {
 
   void routineConverter(String categoryID) async {
     final packages = (await getPackages(categoryID, language: 'en')).success!;
-    Go.to(() => BoutiqueDebugConverter(
-          packages: packages,
-          onPicked: (routine, package) {
-            final packageID = package.id;
-            final sql = _boutiqueSql(routine, packageID);
-            Clipboard.setData(ClipboardData(text: sql));
-          },
-        ));
+    Go.to(
+      () => BoutiqueDebugConverter(
+        packages: packages,
+        onPicked: (routine, package) {
+          final packageID = package.id;
+          final sql = _boutiqueSql(routine, packageID);
+          Clipboard.setData(ClipboardData(text: sql));
+        },
+      ),
+    );
   }
 
   String _boutiqueSql(Workout routine, String packageID) {
@@ -87,7 +97,8 @@ class BoutiqueController extends GetxController with ServiceableController {
     final routineID = _generateUUID();
 
     String result = '';
-    result += """
+    result +=
+        """
 INSERT INTO
   boutique_routines (
     id,
@@ -111,7 +122,8 @@ values
   """;
 
     void _handleExercise(Exercise exercise, Superset? superset, int sortOrder) {
-      result += """
+      result +=
+          """
 INSERT INTO boutique_routine_exercises (
   id,
   routine_id,
@@ -136,10 +148,7 @@ INSERT INTO boutique_routine_exercises (
   '$routineID',
   '{"en":"${exercise.name}"}',
   '${exercise.parameters.name}',
-  '${jsonEncode(exercise.sets.map((s) => s.copyWith(
-                id: _generateUUID(),
-                weight: 0,
-              )).toList())}',
+  '${jsonEncode(exercise.sets.map((s) => s.copyWith(id: _generateUUID(), weight: 0)).toList())}',
   '${exercise.primaryMuscleGroup.name}',
   '${jsonEncode(exercise.secondaryMuscleGroups.map((e) => e.name).toList())}',
   ${exercise.restTime.inSeconds},
@@ -165,7 +174,8 @@ INSERT INTO boutique_routine_exercises (
       } else {
         final superset = exercise as Superset;
         final supersetID = _generateUUID();
-        result += """
+        result +=
+            """
 INSERT INTO boutique_routine_exercises (
   id,
   routine_id,
@@ -208,7 +218,10 @@ INSERT INTO boutique_routine_exercises (
 
         for (int j = 0; j < superset.exercises.length; j++) {
           _handleExercise(
-              superset.exercises[j], superset.copyWith.id(supersetID), j);
+            superset.exercises[j],
+            superset.copyWith.id(supersetID),
+            j,
+          );
         }
       }
     }
@@ -222,10 +235,7 @@ INSERT INTO boutique_routine_exercises (
 
 typedef BoutiqueApiResponse<T> = Future<BoutiqueResponse<T, BoutiqueError>>;
 
-enum BoutiqueError {
-  unknown,
-  version,
-}
+enum BoutiqueError { unknown, version }
 
 sealed class BoutiqueResponse<Ok, Error> {
   const BoutiqueResponse();
@@ -282,7 +292,7 @@ class _TestBoutiqueRepositoryImpl implements _BoutiqueRepository {
 
   @override
   Future<BoutiqueSettings> getSettings() async {
-    return BoutiqueSettings(compatibility: "0.0.0");
+    return BoutiqueSettings(compatibility: "0.0.0", enabled: false);
   }
 }
 
@@ -291,7 +301,11 @@ class _BoutiqueRepositoryImpl implements _BoutiqueRepository {
 
   @override
   Future<BoutiqueSettings> getSettings() async {
-    final response = await _db.from('boutique_settings').select().single();
+    final response = await _db
+        .from('boutique_settings')
+        .select()
+        .limit(1)
+        .single();
     return BoutiqueSettings.fromJson(response);
   }
 
@@ -331,11 +345,13 @@ class _BoutiqueRepositoryImpl implements _BoutiqueRepository {
                     for (final json in json['boutique_routine_exercises'])
                       {
                         ...json,
-                        'type':
-                            json['is_superset'] == 1 ? 'superset' : 'exercise',
+                        'type': json['is_superset'] == 1
+                            ? 'superset'
+                            : 'exercise',
                         'name':
                             json['name'][language] ?? json['name']['en'] ?? "",
-                        'notes': json['notes']?[language] ??
+                        'notes':
+                            json['notes']?[language] ??
                             json['notes']?['en'] ??
                             "",
                         'sets': jsonDecode(json['sets']),

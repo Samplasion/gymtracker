@@ -12,6 +12,7 @@ import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/utils/skeletons.dart';
 import 'package:gymtracker/utils/utils.dart';
 import 'package:gymtracker/view/components/badges.dart';
+import 'package:gymtracker/view/components/content_unavailable.dart';
 import 'package:gymtracker/view/components/controlled.dart';
 import 'package:gymtracker/view/components/master_detail.dart';
 import 'package:gymtracker/view/components/pro_builder.dart';
@@ -31,6 +32,7 @@ class BoutiqueView extends StatefulWidget {
 class _BoutiqueViewState
     extends ControlledState<BoutiqueView, BoutiqueController> {
   BoutiqueApiResponse<List<BoutiqueCategory>>? _categories;
+  Future<BoutiqueSettings>? _settings;
 
   @override
   void initState() {
@@ -40,6 +42,7 @@ class _BoutiqueViewState
 
   Future _refresh() async {
     setState(() {
+      _settings = controller.getSettings();
       _categories = controller.getCategories();
     });
     return _categories;
@@ -47,64 +50,107 @@ class _BoutiqueViewState
 
   @override
   Widget build(BuildContext context) {
-    return NestedScrollView(
-      headerSliverBuilder: (context, innerBoxIsScrolled) => [
-        SliverAppBar.large(title: Text("boutique.title".t)),
-      ],
-      body: RefreshIndicator(
-        onRefresh: _refresh,
-        child: CustomScrollView(
-          slivers: [
-            FutureBuilder<
-              BoutiqueResponse<List<BoutiqueCategory>, BoutiqueError>
-            >(
-              future: _categories,
-              builder: (context, snapshot) {
-                if (snapshot.error != null || snapshot.data?.isError == true) {
-                  return SliverFillRemaining(
-                    child: Center(
-                      child: Padding(
-                        padding: const EdgeInsets.all(16),
-                        child: Text(
-                          "boutique.errors.${snapshot.data!.error?.name ?? "unknown"}"
-                              .t,
-                          textAlign: TextAlign.center,
+    return Scaffold(
+      body: NestedScrollView(
+        headerSliverBuilder: (context, innerBoxIsScrolled) => [
+          SliverAppBar.large(title: Text("boutique.title".t)),
+        ],
+        body: RefreshIndicator(
+          onRefresh: _refresh,
+          child: CustomScrollView(
+            slivers: [
+              FutureBuilder<BoutiqueSettings>(
+                future: _settings,
+                initialData: BoutiqueSettings.defaultSettings,
+                builder: (context, snapshot) {
+                  if (snapshot.error != null || snapshot.data == null) {
+                    return SliverFillRemaining(
+                      child: Center(
+                        child: Padding(
+                          padding: const EdgeInsets.all(16),
+                          child: Text(
+                            "boutique.errors.unknown".t,
+                            textAlign: TextAlign.center,
+                          ),
                         ),
                       ),
-                    ),
-                  );
-                }
-
-                final isLoading =
-                    snapshot.connectionState != ConnectionState.done ||
-                    !snapshot.hasData;
-                final data = isLoading
-                    ? List.generate(
-                        5,
-                        (index) => skeletonBoutiqueCategory(0x1989 + 3 * index),
-                      )
-                    : snapshot.data!.success!
-                          .where((e) => !e.isHidden)
-                          .toList();
-                return SliverList.builder(
-                  itemBuilder: (context, index) {
-                    final category = data[index];
-                    return Skeletonizer(
-                      enabled: isLoading,
-                      child: BoutiqueCategoryCard(
-                        category: category,
-                        enabled: !isLoading,
-                      ),
                     );
-                  },
-                  itemCount: data.length,
-                );
-              },
-            ),
-            const SliverToBoxAdapter(child: SizedBox(height: 8)),
-            const SliverBottomSafeArea(),
-          ],
+                  }
+
+                  final settings = snapshot.data!;
+                  if (!settings.enabled) {
+                    return _boutiqueDisabledOrEmpty(context);
+                  }
+
+                  return FutureBuilder<
+                    BoutiqueResponse<List<BoutiqueCategory>, BoutiqueError>
+                  >(
+                    future: _categories,
+                    builder: (context, snapshot) {
+                      if (snapshot.error != null ||
+                          snapshot.data?.isError == true) {
+                        return SliverFillRemaining(
+                          child: Center(
+                            child: Padding(
+                              padding: const EdgeInsets.all(16),
+                              child: Text(
+                                "boutique.errors.${snapshot.data!.error?.name ?? "unknown"}"
+                                    .t,
+                                textAlign: TextAlign.center,
+                              ),
+                            ),
+                          ),
+                        );
+                      }
+
+                      final isLoading =
+                          snapshot.connectionState != ConnectionState.done ||
+                          !snapshot.hasData;
+                      final data = isLoading
+                          ? List.generate(
+                              5,
+                              (index) =>
+                                  skeletonBoutiqueCategory(0x1989 + 3 * index),
+                            )
+                          : snapshot.data!.success!
+                                .where((e) => !e.isHidden)
+                                .toList();
+
+                      if (data.isEmpty)
+                        return _boutiqueDisabledOrEmpty(context);
+
+                      return SliverList.builder(
+                        itemBuilder: (context, index) {
+                          final category = data[index];
+                          return Skeletonizer(
+                            enabled: isLoading,
+                            child: BoutiqueCategoryCard(
+                              category: category,
+                              enabled: !isLoading,
+                            ),
+                          );
+                        },
+                        itemCount: data.length,
+                      );
+                    },
+                  );
+                },
+              ),
+              const SliverToBoxAdapter(child: SizedBox(height: 8)),
+              const SliverBottomSafeArea(),
+            ],
+          ),
         ),
+      ),
+    );
+  }
+
+  Widget _boutiqueDisabledOrEmpty(BuildContext context) {
+    return SliverFillRemaining(
+      child: ContentUnavailableView(
+        icon: const Icon(GTIcons.boutique),
+        title: Text("boutique.marketingUpdating.title".t),
+        description: Text("boutique.marketingUpdating.description".t),
       ),
     );
   }

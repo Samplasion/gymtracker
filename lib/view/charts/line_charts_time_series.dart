@@ -2,7 +2,9 @@ import 'dart:math';
 
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:get/get.dart';
+import 'package:gymtracker/controller/purchases_controller.dart';
 import 'package:gymtracker/icons/gymtracker_icons.dart';
 import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/utils/extensions.dart';
@@ -10,6 +12,8 @@ import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/utils/theme.dart';
 import 'package:gymtracker/utils/utils.dart' show doubleEquality;
 import 'package:gymtracker/view/charts/base_types.dart';
+import 'package:gymtracker/view/components/badges.dart';
+import 'package:gymtracker/view/components/pro_builder.dart';
 import 'package:intl/intl.dart';
 
 export 'package:gymtracker/view/charts/base_types.dart';
@@ -18,8 +22,13 @@ class LineChartTimeSeries<T> extends StatefulWidget {
   final Map<T, LineChartCategory> categories;
   final Map<T, List<LineChartPoint>> data;
   final Map<T, List<LineChartPoint>>? predictions;
-  final Widget Function(T selectedCategory, int hoveredIndex,
-      LineChartPoint point, bool isPredicted) currentValueBuilder;
+  final Widget Function(
+    T selectedCategory,
+    int hoveredIndex,
+    LineChartPoint point,
+    bool isPredicted,
+  )
+  currentValueBuilder;
   final String Function(T, double) leftTitleBuilder;
   final double? minY;
   final double? maxY;
@@ -35,27 +44,29 @@ class LineChartTimeSeries<T> extends StatefulWidget {
     this.minY,
     this.maxY,
     this.onCategoryChanged,
-  })  : assert(categories.isNotEmpty),
-        assert(data.isNotEmpty),
-        assert(categories.length == data.length),
-        assert(categories.keys.every((key) => data.keys.contains(key)));
+  }) : assert(categories.isNotEmpty),
+       assert(data.isNotEmpty),
+       assert(categories.length == data.length),
+       assert(categories.keys.every((key) => data.keys.contains(key)));
 
   @override
   State<LineChartTimeSeries<T>> createState() => _LineChartTimeSeriesState<T>();
 }
 
 enum _LineChartTimeSeriesType {
-  threeMonths(Duration(days: 90)),
+  threeMonths(Duration(days: 90), isPro: false),
   sixMonths(Duration(days: 180), dragOffset: 2),
   oneYear(Duration(days: 365), dragOffset: 4);
 
   const _LineChartTimeSeriesType(
     this.duration, {
     this.dragOffset = 1,
+    this.isPro = true,
   });
 
   final Duration duration;
   final double dragOffset;
+  final bool isPro;
 }
 
 class _LineChartTimeSeriesState<T> extends State<LineChartTimeSeries<T>> {
@@ -79,14 +90,13 @@ class _LineChartTimeSeriesState<T> extends State<LineChartTimeSeries<T>> {
 
   late final double leftReservedSize = () {
     final sizes = widget.data.entries.map((e) {
-      final categorySizes = e.value.map((point) {
+      final categorySizes =
+          e.value.map((point) {
             return widget
                 .leftTitleBuilder(e.key, point.value)
                 // Worst case scenario for numbers
                 .replaceAll(RegExp(r"[0-9]"), "m")
-                .computeSize(
-                  style: context.textTheme.labelSmall!,
-                )
+                .computeSize(style: context.textTheme.labelSmall!)
                 .width;
           }).toList() +
           [0];
@@ -96,24 +106,22 @@ class _LineChartTimeSeriesState<T> extends State<LineChartTimeSeries<T>> {
   }();
 
   late final Map<T, Map<int, LineChartPoint>> dataIndices = widget.data
-      .combinedWith(
-        widget.predictions ?? {},
-      )
+      .combinedWith(widget.predictions ?? {})
       .map(
         (key, value) => MapEntry(
           key,
-          Map.fromEntries(value
-              .map((point) => MapEntry(point.date.minutesSinceEpoch, point))),
+          Map.fromEntries(
+            value.map((point) => MapEntry(point.date.minutesSinceEpoch, point)),
+          ),
         ),
       );
 
   DateTime get startingDate =>
-      (children.isEmpty ? DateTime.now() : children.last.date)
-          .startOfDay
+      (children.isEmpty ? DateTime.now() : children.last.date).startOfDay
           .subtract(type.duration);
   List<LineChartPoint> get filteredChildren => children.where((point) {
-        return point.date.isAfter(startingDate);
-      }).toList();
+    return point.date.isAfter(startingDate);
+  }).toList();
   List<LineChartPoint> get visibleChildren {
     final result = <LineChartPoint>[];
 
@@ -155,7 +163,7 @@ class _LineChartTimeSeriesState<T> extends State<LineChartTimeSeries<T>> {
     return maxDate;
   }
 
-  _onDrag(DragUpdateDetails details) {
+  void _onDrag(DragUpdateDetails details) {
     final days = -details.delta.dx / 2 * type.dragOffset;
     var newOffset = Duration(hours: (days * 24).toInt());
 
@@ -188,27 +196,38 @@ class _LineChartTimeSeriesState<T> extends State<LineChartTimeSeries<T>> {
     _recalculateMinMax();
   }
 
-  _recalculateMinMax() {
+  void _recalculateMinMax() {
     final shownValues = children
-        .where((element) =>
-            element.date.isAfterOrAtSameMomentAs(currentMinDate) &&
-            element.date.isBeforeOrAtSameMomentAs(currentMaxDate))
+        .where(
+          (element) =>
+              element.date.isAfterOrAtSameMomentAs(currentMinDate) &&
+              element.date.isBeforeOrAtSameMomentAs(currentMaxDate),
+        )
         .map((e) => e.value)
         .toList();
-    final shownPredictions = widget.predictions?[selectedCategory]
-            ?.where((element) =>
-                element.date.isAfterOrAtSameMomentAs(currentMinDate) &&
-                element.date.isBeforeOrAtSameMomentAs(currentMaxDate))
+    final shownPredictions =
+        widget.predictions?[selectedCategory]
+            ?.where(
+              (element) =>
+                  element.date.isAfterOrAtSameMomentAs(currentMinDate) &&
+                  element.date.isBeforeOrAtSameMomentAs(currentMaxDate),
+            )
             .map((e) => e.value)
             .toList() ??
         [];
     final shownPoints = [...shownValues, ...shownPredictions];
 
-    minY = max(widget.minY ?? double.negativeInfinity,
-            [double.infinity, ...shownPoints].min) -
+    minY =
+        max(
+          widget.minY ?? double.negativeInfinity,
+          [double.infinity, ...shownPoints].min,
+        ) -
         2;
-    maxY = min(widget.maxY ?? double.infinity,
-            [double.negativeInfinity, ...shownPoints].max) +
+    maxY =
+        min(
+          widget.maxY ?? double.infinity,
+          [double.negativeInfinity, ...shownPoints].max,
+        ) +
         2;
 
     if (maxY!.isFinite && minY!.isFinite && maxY! - minY! < 5) {
@@ -237,7 +256,7 @@ class _LineChartTimeSeriesState<T> extends State<LineChartTimeSeries<T>> {
     // when there are too many points (for some reason)
     final visibleChildren = type == _LineChartTimeSeriesType.threeMonths
         ? this.visibleChildren
-        : this.children;
+        : children;
 
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -253,232 +272,286 @@ class _LineChartTimeSeriesState<T> extends State<LineChartTimeSeries<T>> {
                   hoveredIndex,
                   dataIndices[selectedCategory]![hoveredIndex]!,
                   // Whether this point is predicted
-                  !children.any((element) =>
-                      element.date.minutesSinceEpoch == hoveredIndex),
+                  !children.any(
+                    (element) => element.date.minutesSinceEpoch == hoveredIndex,
+                  ),
                 ),
               )
             else
               const Spacer(),
-            TextButton(
-              onPressed: () {
-                Go.showRadioModal(
-                  selectedValue: type,
-                  values: {
-                    for (final type in _LineChartTimeSeriesType.values)
-                      type: "timeSeriesChart.interval.${type.name}".t
+            ProBuilder(
+              builder: (context, subState) {
+                final shouldBlock = subState?.hasProFeatures != true;
+                return TextButton(
+                  onPressed: () {
+                    Go.showRadioModalNew(
+                      selectedValue: type,
+                      values: {
+                        for (final type in _LineChartTimeSeriesType.values)
+                          type: Text.rich(
+                            TextSpan(
+                              children: [
+                                TextSpan(
+                                  text:
+                                      "timeSeriesChart.interval.${type.name}".t,
+                                ),
+                                if (type.isPro && shouldBlock) ...[
+                                  const TextSpan(text: " "),
+                                  WidgetSpan(
+                                    child: ProBadge(),
+                                    alignment: .middle,
+                                  ),
+                                ],
+                              ],
+                            ),
+                          ),
+                      },
+                      title: Text("timeSeriesChart.selectInterval".t),
+                      onChange: (value) {
+                        if (value == null) return;
+                        if (shouldBlock && value.isPro) {
+                          Navigator.of(context).pop();
+                          SchedulerBinding.instance.addPostFrameCallback((_) {
+                            Get.find<PurchasesController>().presentPaywall();
+                          });
+                          return;
+                        }
+                        setState(() => type = value);
+                        _recalculateMinMax();
+                      },
+                    );
                   },
-                  title: Text("timeSeriesChart.selectInterval".t),
-                  onChange: (value) {
-                    setState(() => type = value as _LineChartTimeSeriesType);
-                    _recalculateMinMax();
-                  },
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text("timeSeriesChart.interval.${type.name}".t),
+                      const SizedBox(width: 4),
+                      const Icon(GTIcons.dropdown),
+                    ],
+                  ),
                 );
               },
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text("timeSeriesChart.interval.${type.name}".t),
-                  const SizedBox(width: 4),
-                  const Icon(GTIcons.dropdown),
-                ],
-              ),
             ),
           ],
         ),
-        GestureDetector(
-          behavior: HitTestBehavior.opaque,
-          onHorizontalDragStart: (details) {
-            setState(() => _isDragging = true);
-          },
-          onHorizontalDragUpdate: _onDrag,
-          onHorizontalDragEnd: (details) {
-            setState(() => _isDragging = false);
-            _recalculateMinMax();
-          },
-          onHorizontalDragCancel: () {
-            setState(() => _isDragging = false);
-            _recalculateMinMax();
-          },
-          child: ConstrainedBox(
-            constraints: BoxConstraints.loose(const Size.fromHeight(300)),
-            child: Padding(
-              padding: const EdgeInsets.only(
-                top: 16,
-                right: 16,
-              ),
-              child: LineChart(
-                LineChartData(
-                  clipData: const FlClipData.all(),
-                  gridData: FlGridData(
-                    show: true,
-                    drawVerticalLine: true,
-                    verticalInterval:
-                        const Duration(days: 1).inMinutes.toDouble(),
-                    checkToShowVerticalLine: (value) {
-                      final date = DateTime.fromMillisecondsSinceEpoch(
-                          value.toInt() * 60000);
-                      return date.day == 1;
-                    },
-                    getDrawingHorizontalLine: (value) {
-                      return FlLine(
-                        color: colorScheme.outlineVariant,
-                        strokeWidth: 1,
-                      );
-                    },
-                    getDrawingVerticalLine: (value) {
-                      return FlLine(
-                        color: colorScheme.outlineVariant,
-                        strokeWidth: 1,
-                      );
-                    },
-                  ),
-                  titlesData: FlTitlesData(
-                    show: true,
-                    rightTitles: const AxisTitles(
-                      sideTitles: SideTitles(showTitles: false),
-                    ),
-                    topTitles: AxisTitles(
-                      sideTitles: SideTitles(
-                        interval: const Duration(days: 1).inMinutes.toDouble(),
-                        showTitles: true,
-                        getTitlesWidget: topTitleWidgets(context),
-                      ),
-                    ),
-                    leftTitles: AxisTitles(
-                      sideTitles: SideTitles(
-                        showTitles: true,
-                        reservedSize:
-                            [context.width / 5, leftReservedSize].min + 8,
-                        getTitlesWidget: leftTitleWidgets(context),
-                      ),
-                    ),
-                    bottomTitles: AxisTitles(
-                      sideTitles: SideTitles(
-                        showTitles: true,
-                        reservedSize: 30,
-                        getTitlesWidget: bottomTitleWidgets(context),
-                      ),
-                    ),
-                  ),
-                  borderData: FlBorderData(
-                    border: Border.all(color: colorScheme.outline),
-                  ),
-                  showingTooltipIndicators: [],
-                  lineTouchData: LineTouchData(
-                    touchTooltipData: LineTouchTooltipData(
-                      getTooltipColor: (_) => Colors.transparent,
-                      getTooltipItems: (items) => <LineTooltipItem?>[
-                        ...items.map((_) => const LineTooltipItem(
-                              "hhh",
-                              TextStyle(color: Colors.transparent),
-                            ))
-                      ],
-                    ),
-                    touchSpotThreshold: 10000,
-                    enabled: true,
-                    touchCallback: (event, response) {
-                      final allLines = response?.lineBarSpots ?? [];
-                      if (allLines.isEmpty) {
-                        return;
-                      }
-                      allLines.sort((a, b) => a.distance.compareTo(b.distance));
-
-                      final touchLineBarSpot = allLines.first;
-
-                      final index = touchLineBarSpot.x.toInt();
-                      final availableIndices = {
-                        ...dataIndices[selectedCategory]!.keys
-                      };
-
-                      if (index != hoveredIndex &&
-                          availableIndices.contains(index)) {
-                        setState(() => hoveredIndex = index);
-                      }
-                    },
-                  ),
-                  minX: currentMinDate.minutesSinceEpoch.toDouble(),
-                  maxX: currentMaxDate.minutesSinceEpoch.toDouble(),
-                  minY: minY,
-                  maxY: maxY,
-                  lineBarsData: [
-                    if (widget.predictions?[selectedCategory] != null)
-                      LineChartBarData(
-                        dotData: FlDotData(
-                          show: true,
-                          checkToShowDot: (spot, barData) {
-                            return !filteredChildren.any((element) =>
-                                element.date.minutesSinceEpoch ==
-                                spot.x.toInt());
-                          },
-                        ),
-                        spots: [
-                          for (final point
-                              in widget.predictions![selectedCategory]!)
-                            FlSpot(
-                              point.date.minutesSinceEpoch.toDouble(),
-                              point.value,
-                            ),
-                        ],
-                        isCurved: true,
-                        preventCurveOverShooting: true,
-                        color: predictionColor,
-                        barWidth: 3,
-                        isStrokeCapRound: true,
-                        dashArray: [5, 10],
-                        belowBarData: BarAreaData(
-                          show: true,
-                          spotsLine: BarAreaSpotsLine(
-                            show: true,
-                            checkToShowSpotLine: (spot) =>
-                                spot.x ==
-                                widget.predictions![selectedCategory]?.last.date
-                                    .minutesSinceEpoch,
-                            flLineStyle:
-                                FlLine(color: predictionColor, dashArray: [5]),
-                          ),
-                          color: predictionColor.withAlpha((0.3 * 255).round()),
-                        ),
-                      ),
-                    LineChartBarData(
-                      dotData: const FlDotData(),
-                      spots: [
-                        for (int i = 0; i < visibleChildren.length; i++)
-                          FlSpot(
-                            visibleChildren[i]
-                                .date
-                                .minutesSinceEpoch
-                                .toDouble(),
-                            visibleChildren[i].value,
-                          ),
-                      ],
-                      isCurved: type == _LineChartTimeSeriesType.threeMonths,
-                      preventCurveOverShooting: true,
-                      color: colorScheme.primary,
-                      barWidth: 3,
-                      isStrokeCapRound: true,
-                      belowBarData: BarAreaData(
+        ProBuilder(
+          builder: (context, subStats) {
+            final shouldBlock = subStats?.hasProFeatures != true;
+            return GestureDetector(
+              behavior: HitTestBehavior.opaque,
+              onHorizontalDragStart: (details) {
+                if (shouldBlock) return;
+                setState(() => _isDragging = true);
+              },
+              onHorizontalDragUpdate: shouldBlock ? null : _onDrag,
+              onHorizontalDragEnd: (details) {
+                if (shouldBlock) return;
+                setState(() => _isDragging = false);
+                _recalculateMinMax();
+              },
+              onHorizontalDragCancel: () {
+                if (shouldBlock) return;
+                setState(() => _isDragging = false);
+                _recalculateMinMax();
+              },
+              child: ConstrainedBox(
+                constraints: BoxConstraints.loose(const Size.fromHeight(300)),
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 16, right: 16),
+                  child: LineChart(
+                    LineChartData(
+                      clipData: const FlClipData.all(),
+                      gridData: FlGridData(
                         show: true,
-                        spotsLine: BarAreaSpotsLine(
-                          show: true,
-                          checkToShowSpotLine: (spot) =>
-                              spot.x ==
-                              (filteredChildren.isEmpty
-                                  ? 0
-                                  : filteredChildren
-                                      .last.date.minutesSinceEpoch),
-                          flLineStyle: FlLine(color: colorScheme.primary),
-                        ),
-                        color:
-                            colorScheme.primary.withAlpha((0.3 * 255).round()),
+                        drawVerticalLine: true,
+                        verticalInterval: const Duration(
+                          days: 1,
+                        ).inMinutes.toDouble(),
+                        checkToShowVerticalLine: (value) {
+                          final date = DateTime.fromMillisecondsSinceEpoch(
+                            value.toInt() * 60000,
+                          );
+                          return date.day == 1;
+                        },
+                        getDrawingHorizontalLine: (value) {
+                          return FlLine(
+                            color: colorScheme.outlineVariant,
+                            strokeWidth: 1,
+                          );
+                        },
+                        getDrawingVerticalLine: (value) {
+                          return FlLine(
+                            color: colorScheme.outlineVariant,
+                            strokeWidth: 1,
+                          );
+                        },
                       ),
+                      titlesData: FlTitlesData(
+                        show: true,
+                        rightTitles: const AxisTitles(
+                          sideTitles: SideTitles(showTitles: false),
+                        ),
+                        topTitles: AxisTitles(
+                          sideTitles: SideTitles(
+                            interval: const Duration(
+                              days: 1,
+                            ).inMinutes.toDouble(),
+                            showTitles: true,
+                            getTitlesWidget: topTitleWidgets(context),
+                          ),
+                        ),
+                        leftTitles: AxisTitles(
+                          sideTitles: SideTitles(
+                            showTitles: true,
+                            reservedSize:
+                                [context.width / 5, leftReservedSize].min + 8,
+                            getTitlesWidget: leftTitleWidgets(context),
+                          ),
+                        ),
+                        bottomTitles: AxisTitles(
+                          sideTitles: SideTitles(
+                            showTitles: true,
+                            reservedSize: 30,
+                            getTitlesWidget: bottomTitleWidgets(context),
+                          ),
+                        ),
+                      ),
+                      borderData: FlBorderData(
+                        border: Border.all(color: colorScheme.outline),
+                      ),
+                      showingTooltipIndicators: [],
+                      lineTouchData: LineTouchData(
+                        touchTooltipData: LineTouchTooltipData(
+                          getTooltipColor: (_) => Colors.transparent,
+                          getTooltipItems: (items) => <LineTooltipItem?>[
+                            ...items.map(
+                              (_) => const LineTooltipItem(
+                                "hhh",
+                                TextStyle(color: Colors.transparent),
+                              ),
+                            ),
+                          ],
+                        ),
+                        touchSpotThreshold: 10000,
+                        enabled: true,
+                        touchCallback: (event, response) {
+                          final allLines = response?.lineBarSpots ?? [];
+                          if (allLines.isEmpty) {
+                            return;
+                          }
+                          allLines.sort(
+                            (a, b) => a.distance.compareTo(b.distance),
+                          );
+
+                          final touchLineBarSpot = allLines.first;
+
+                          final index = touchLineBarSpot.x.toInt();
+                          final availableIndices = {
+                            ...dataIndices[selectedCategory]!.keys,
+                          };
+
+                          if (index != hoveredIndex &&
+                              availableIndices.contains(index)) {
+                            setState(() => hoveredIndex = index);
+                          }
+                        },
+                      ),
+                      minX: currentMinDate.minutesSinceEpoch.toDouble(),
+                      maxX: currentMaxDate.minutesSinceEpoch.toDouble(),
+                      minY: minY,
+                      maxY: maxY,
+                      lineBarsData: [
+                        if (widget.predictions?[selectedCategory] != null)
+                          LineChartBarData(
+                            dotData: FlDotData(
+                              show: true,
+                              checkToShowDot: (spot, barData) {
+                                return !filteredChildren.any(
+                                  (element) =>
+                                      element.date.minutesSinceEpoch ==
+                                      spot.x.toInt(),
+                                );
+                              },
+                            ),
+                            spots: [
+                              for (final point
+                                  in widget.predictions![selectedCategory]!)
+                                FlSpot(
+                                  point.date.minutesSinceEpoch.toDouble(),
+                                  point.value,
+                                ),
+                            ],
+                            isCurved: true,
+                            preventCurveOverShooting: true,
+                            color: predictionColor,
+                            barWidth: 3,
+                            isStrokeCapRound: true,
+                            dashArray: [5, 10],
+                            belowBarData: BarAreaData(
+                              show: true,
+                              spotsLine: BarAreaSpotsLine(
+                                show: true,
+                                checkToShowSpotLine: (spot) =>
+                                    spot.x ==
+                                    widget
+                                        .predictions![selectedCategory]
+                                        ?.last
+                                        .date
+                                        .minutesSinceEpoch,
+                                flLineStyle: FlLine(
+                                  color: predictionColor,
+                                  dashArray: [5],
+                                ),
+                              ),
+                              color: predictionColor.withAlpha(
+                                (0.3 * 255).round(),
+                              ),
+                            ),
+                          ),
+                        LineChartBarData(
+                          dotData: const FlDotData(),
+                          spots: [
+                            for (int i = 0; i < visibleChildren.length; i++)
+                              FlSpot(
+                                visibleChildren[i].date.minutesSinceEpoch
+                                    .toDouble(),
+                                visibleChildren[i].value,
+                              ),
+                          ],
+                          isCurved:
+                              type == _LineChartTimeSeriesType.threeMonths,
+                          preventCurveOverShooting: true,
+                          color: colorScheme.primary,
+                          barWidth: 3,
+                          isStrokeCapRound: true,
+                          belowBarData: BarAreaData(
+                            show: true,
+                            spotsLine: BarAreaSpotsLine(
+                              show: true,
+                              checkToShowSpotLine: (spot) =>
+                                  spot.x ==
+                                  (filteredChildren.isEmpty
+                                      ? 0
+                                      : filteredChildren
+                                            .last
+                                            .date
+                                            .minutesSinceEpoch),
+                              flLineStyle: FlLine(color: colorScheme.primary),
+                            ),
+                            color: colorScheme.primary.withAlpha(
+                              (0.3 * 255).round(),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
-                  ],
+                    duration: Duration(milliseconds: _isDragging ? 0 : 350),
+                    curve: Curves.linearToEaseOut,
+                  ),
                 ),
-                duration: Duration(milliseconds: _isDragging ? 0 : 350),
-                curve: Curves.linearToEaseOut,
               ),
-            ),
-          ),
+            );
+          },
         ),
         if (widget.categories.length > 1)
           Flexible(
@@ -491,31 +564,34 @@ class _LineChartTimeSeriesState<T> extends State<LineChartTimeSeries<T>> {
                   for (final entry in widget.categories.entries)
                     ChoiceChip(
                       tooltip: entry.value.info,
-                      label: Text.rich(TextSpan(children: [
-                        TextSpan(text: entry.value.title),
-                        if (entry.value.info != null) ...[
-                          const TextSpan(text: "   "),
-                          WidgetSpan(
-                            child: Icon(
-                              GTIcons.info,
-                              size: 16,
-                              color: colorScheme.onSurface,
-                            ),
-                          ),
-                        ]
-                      ])),
+                      label: Text.rich(
+                        TextSpan(
+                          children: [
+                            TextSpan(text: entry.value.title),
+                            if (entry.value.info != null) ...[
+                              const TextSpan(text: "   "),
+                              WidgetSpan(
+                                child: Icon(
+                                  GTIcons.info,
+                                  size: 16,
+                                  color: colorScheme.onSurface,
+                                ),
+                              ),
+                            ],
+                          ],
+                        ),
+                      ),
                       avatar: CircleAvatar(
-                        child: this.selectedCategory == entry.key
+                        child: selectedCategory == entry.key
                             ? const SizedBox.shrink()
                             : entry.value.icon,
                       ),
-                      selected: this.selectedCategory == entry.key,
+                      selected: selectedCategory == entry.key,
                       onSelected: widget.data[entry.key]?.isEmpty != false
                           ? null
                           : (sel) {
                               if (sel) {
-                                setState(
-                                    () => this.selectedCategory = entry.key);
+                                setState(() => selectedCategory = entry.key);
                                 widget.onCategoryChanged?.call(entry.key);
                                 _recalculateMinMax();
                               }
@@ -531,8 +607,9 @@ class _LineChartTimeSeriesState<T> extends State<LineChartTimeSeries<T>> {
 
   Widget Function(double, TitleMeta) topTitleWidgets(BuildContext context) {
     return (double value, TitleMeta meta) {
-      DateTime? cur =
-          DateTime.fromMillisecondsSinceEpoch(value.toInt() * 60000);
+      DateTime? cur = DateTime.fromMillisecondsSinceEpoch(
+        value.toInt() * 60000,
+      );
 
       var isStarting = doubleEquality(value, meta.min, epsilon: 0.001);
       if (cur.day != 1 && !isStarting) {
@@ -541,17 +618,13 @@ class _LineChartTimeSeriesState<T> extends State<LineChartTimeSeries<T>> {
 
       String text;
       if (cur.month != DateTime.january && !isStarting) {
-        text = DateFormat.MMM(context.locale.languageCode)
-            .format(cur)
-            .characters
-            .first
-            .toUpperCase();
+        text = DateFormat.MMM(
+          context.locale.languageCode,
+        ).format(cur).characters.first.toUpperCase();
       } else {
-        final m = DateFormat.MMM(context.locale.languageCode)
-            .format(cur)
-            .characters
-            .first
-            .toUpperCase();
+        final m = DateFormat.MMM(
+          context.locale.languageCode,
+        ).format(cur).characters.first.toUpperCase();
         final y = DateFormat("yy", context.locale.languageCode).format(cur);
         text = "$m '$y";
       }
@@ -572,36 +645,33 @@ class _LineChartTimeSeriesState<T> extends State<LineChartTimeSeries<T>> {
 
   Widget Function(double, TitleMeta) bottomTitleWidgets(BuildContext context) {
     return (double value, TitleMeta meta) {
-      DateTime? cur =
-          DateTime.fromMillisecondsSinceEpoch(value.toInt() * 60000);
+      DateTime? cur = DateTime.fromMillisecondsSinceEpoch(
+        value.toInt() * 60000,
+      );
       String text = DateFormat.Md(context.locale.languageCode).format(cur);
 
       return SideTitleWidget(
         meta: meta,
         angle: -pi / 4,
-        child: Text(
-          text,
-          style: Theme.of(context).textTheme.labelSmall,
-        ),
+        child: Text(text, style: Theme.of(context).textTheme.labelSmall),
       );
     };
   }
 
   Widget Function(double, TitleMeta) leftTitleWidgets(BuildContext context) {
     return (double value, TitleMeta meta) => SideTitleWidget(
-          meta: meta,
-          child: Text.rich(
-            TextSpan(children: [
-              TextSpan(
-                text: widget.leftTitleBuilder(
-                  selectedCategory,
-                  value,
-                ),
-                style: context.textTheme.labelSmall!,
-              ),
-            ]),
-            textAlign: TextAlign.end,
-          ),
-        );
+      meta: meta,
+      child: Text.rich(
+        TextSpan(
+          children: [
+            TextSpan(
+              text: widget.leftTitleBuilder(selectedCategory, value),
+              style: context.textTheme.labelSmall!,
+            ),
+          ],
+        ),
+        textAlign: TextAlign.end,
+      ),
+    );
   }
 }

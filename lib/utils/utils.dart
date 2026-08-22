@@ -1,6 +1,8 @@
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_quill/flutter_quill.dart';
+import 'package:gymtracker/model/model.dart' show GTMuscleCategory;
+import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/utils/extensions.dart';
 import 'package:share_plus/share_plus.dart';
 
@@ -31,14 +33,16 @@ void reorder<T>(List<T> list, int oldIndex, int newIndex) {
   list.insert(newIndex, list.removeAt(oldIndex));
 }
 
+void reorderNew<T>(List<T> list, int oldIndex, int newIndex) {
+  list.insert(newIndex, list.removeAt(oldIndex));
+}
+
 Color getThemedColor(BuildContext context, Color color) {
   final theme = Theme.of(context);
   final result = ColorScheme.fromSeed(
-          seedColor: color.maybeGrayscale(context),
-          brightness: theme.brightness)
-      .primary
-      .harmonizeWith(theme.colorScheme.primary)
-      .maybeGrayscale(context);
+    seedColor: color.maybeGrayscale(context),
+    brightness: theme.brightness,
+  ).primary.harmonizeWith(theme.colorScheme.primary).maybeGrayscale(context);
   if (color.isGray) return result.grayscale;
   return result;
 }
@@ -46,35 +50,35 @@ Color getThemedColor(BuildContext context, Color color) {
 Color getOnThemedColor(BuildContext context, Color color) {
   final theme = Theme.of(context);
   final result = ColorScheme.fromSeed(
-          seedColor: color.maybeGrayscale(context),
-          brightness: theme.brightness)
-      .onPrimary
-      .harmonizeWith(theme.colorScheme.primary)
-      .maybeGrayscale(context);
+    seedColor: color.maybeGrayscale(context),
+    brightness: theme.brightness,
+  ).onPrimary.harmonizeWith(theme.colorScheme.primary).maybeGrayscale(context);
   if (color.isGray) return result.grayscale;
   return result;
 }
 
 Color getContainerColor(BuildContext context, Color color) {
   final theme = Theme.of(context);
-  final result = ColorScheme.fromSeed(
-          seedColor: color.maybeGrayscale(context),
-          brightness: theme.brightness)
-      .primaryContainer
-      .harmonizeWith(theme.colorScheme.primary)
-      .maybeGrayscale(context);
+  final result =
+      ColorScheme.fromSeed(
+            seedColor: color.maybeGrayscale(context),
+            brightness: theme.brightness,
+          ).primaryContainer
+          .harmonizeWith(theme.colorScheme.primary)
+          .maybeGrayscale(context);
   if (color.isGray) return result.grayscale;
   return result;
 }
 
 Color getOnContainerColor(BuildContext context, Color color) {
   final theme = Theme.of(context);
-  final result = ColorScheme.fromSeed(
-          seedColor: color.maybeGrayscale(context),
-          brightness: theme.brightness)
-      .onPrimaryContainer
-      .harmonizeWith(theme.colorScheme.primary)
-      .maybeGrayscale(context);
+  final result =
+      ColorScheme.fromSeed(
+            seedColor: color.maybeGrayscale(context),
+            brightness: theme.brightness,
+          ).onPrimaryContainer
+          .harmonizeWith(theme.colorScheme.primary)
+          .maybeGrayscale(context);
   if (color.isGray) return result.grayscale;
   return result;
 }
@@ -150,7 +154,7 @@ Color lerpGradient(List<Color> colors, List<double> stops, double t) {
   return colors.last;
 }
 
-Color rpeColor(BuildContext context, int currentRPE) {
+Color rpeColor(BuildContext context, double currentRPE) {
   return lerpGradient(
     [
       context.harmonizeColor(Colors.green),
@@ -183,7 +187,8 @@ bool setEquality<T>(Set<T> a, Set<T> b) {
   return (first, second);
 }
 
-bool throws<T>(T Function() function, {
+bool throws<T>(
+  T Function() function, {
   void Function(T?, dynamic, StackTrace?)? results,
 }) {
   try {
@@ -194,4 +199,14 @@ bool throws<T>(T Function() function, {
     results?.call(null, e, s);
     return true;
   }
+}
+
+String generateWorkoutTitle(Set<GTMuscleCategory> selectedGroups) {
+  return "titleGenerator.template".tParams({
+    "muscles": "titleGenerator.title"
+        .tByIndexWithParams(selectedGroups.length, {
+          for (int i = 0; i < selectedGroups.length; i++)
+            "$i": "muscleCategories.${selectedGroups.elementAt(i).name}".t,
+        }),
+  }).trim();
 }

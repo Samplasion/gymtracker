@@ -4,9 +4,12 @@ import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:flutter/widgets.dart';
 import 'package:gymtracker/controller/coordinator.dart';
+import 'package:gymtracker/main.dart';
 import 'package:gymtracker/model/subscription.dart';
 import 'package:gymtracker/service/env.dart';
+import 'package:gymtracker/provider/events.dart';
 import 'package:gymtracker/service/logger.dart';
 import 'package:purchases_flutter/purchases_flutter.dart' hide LogLevel;
 import 'package:purchases_flutter/purchases_flutter.dart'
@@ -41,6 +44,8 @@ class PurchasesService {
       isPurchasingEnabled.isNotEmpty &&
       isPurchasingEnabled.contains(PurchasesCheckType.write);
 
+  bool _isInitialized = false;
+
   Future<void> init() async {
     if (kIsWeb) {
       isPurchasingEnabled = {PurchasesCheckType.read};
@@ -48,8 +53,10 @@ class PurchasesService {
       await _RestPurchases.instance.init();
       Purchases.addCustomerInfoUpdateListener((info) {
         _customerInfo$.add(info);
-        eventScheduler.trigger(ScheduledEvent.userDidUpdateSubscription);
       });
+
+      _isInitialized = true;
+      logger.i("Initialized PurchasesService with RevenueCat (web).");
       return;
     }
 
@@ -58,26 +65,28 @@ class PurchasesService {
     PurchasesConfiguration configuration;
     if (Platform.isAndroid) {
       configuration = PurchasesConfiguration(_revenuecatProjectGoogleApiKey);
-    } else if (Platform.isIOS || Platform.isMacOS) {
+    } else if (Platform.isIOS) {
       configuration = PurchasesConfiguration(_revenuecatProjectAppleApiKey);
+    } else if (Platform.isMacOS) {
+      await _RestPurchases.instance.init();
+      configuration = PurchasesConfiguration(_revenuecatProjectMacOSApiKey);
     } else {
       return;
     }
 
     await Purchases.configure(configuration);
-    isPurchasingEnabled = {PurchasesCheckType.read, PurchasesCheckType.write};
-
-    eventScheduler.addEventListener(ScheduledEvent.userDidUpdate, () {});
+    isPurchasingEnabled = {
+      PurchasesCheckType.read,
+      if (!Platform.isMacOS) PurchasesCheckType.write,
+    };
 
     SchedulerBinding.instance.addPostFrameCallback((_) async {
       Purchases.addCustomerInfoUpdateListener((info) {
         _customerInfo$.add(info);
-        eventScheduler.trigger(ScheduledEvent.userDidUpdateSubscription);
       });
       Purchases.getCustomerInfo().then(
         (info) {
           _customerInfo$.add(info);
-          eventScheduler.trigger(ScheduledEvent.userDidUpdateSubscription);
         },
         onError: (error) {
           logger.e("Error getting customer info: $error", error: error);
@@ -85,6 +94,9 @@ class PurchasesService {
         },
       );
     });
+
+    _isInitialized = true;
+    logger.i("Initialized PurchasesService with RevenueCat.");
   }
 
   void _checkPurchasesEnabled(PurchasesCheckType type) {
@@ -105,9 +117,19 @@ class PurchasesService {
 
   Future login(String userId) async {
     _checkPurchasesEnabled(PurchasesCheckType.read);
-    if (isPurchasingEnabled.contains(PurchasesCheckType.read) &&
-        !isPurchasingEnabled.contains(PurchasesCheckType.write)) {
+    if (!isPurchasingEnabled.contains(PurchasesCheckType.write)) {
+      logger.w(
+        "Called login() on a device that does not support purchases. Using REST API instead.",
+      );
       await _RestPurchases.instance.login(userId);
+      _RestPurchases.instance
+          .getCustomerInfo()
+          .then((info) {
+            _customerInfo$.add(info);
+          })
+          .catchError((error) {
+            logger.e("Error getting customer info: $error", error: error);
+          });
       return;
     }
     return Purchases.logIn(userId);
@@ -115,8 +137,10 @@ class PurchasesService {
 
   Future logout() async {
     _checkPurchasesEnabled(PurchasesCheckType.read);
-    if (isPurchasingEnabled.contains(PurchasesCheckType.read) &&
-        !isPurchasingEnabled.contains(PurchasesCheckType.write)) {
+    if (!isPurchasingEnabled.contains(PurchasesCheckType.write)) {
+      logger.w(
+        "Called logout() on a device that does not support purchases. Using REST API instead.",
+      );
       await _RestPurchases.instance.logout();
       return;
     }
@@ -126,10 +150,9 @@ class PurchasesService {
   Future<EntitlementInfo?> getCustomerInfo() async {
     _checkPurchasesEnabled(PurchasesCheckType.read);
     final customerInfo =
-        await (isPurchasingEnabled.contains(PurchasesCheckType.read) &&
-                !isPurchasingEnabled.contains(PurchasesCheckType.write)
-            ? _RestPurchases.instance.getCustomerInfo()
-            : Purchases.getCustomerInfo());
+        await (isPurchasingEnabled.contains(PurchasesCheckType.write)
+            ? Purchases.getCustomerInfo()
+            : _RestPurchases.instance.getCustomerInfo());
 
     return customerInfo?.entitlements.active[_proAccessEntitlementID];
   }
@@ -142,11 +165,6 @@ class PurchasesService {
   }
 
   bool canPresentNativePaywall() {
-    print((
-      !kIsWeb,
-      !Platform.isMacOS,
-      isPurchasingEnabled.contains(PurchasesCheckType.write),
-    ));
     return !kIsWeb &&
         !Platform.isMacOS &&
         isPurchasingEnabled.contains(PurchasesCheckType.write);
@@ -160,7 +178,9 @@ class PurchasesService {
     return Purchases.getOfferings();
   }
 
-  Future purchaseSubscription(Subscription selectedSubscription) async {
+  Future<PurchaseResult> purchaseSubscription(
+    Subscription selectedSubscription,
+  ) async {
     _checkPurchasesEnabled(PurchasesCheckType.write);
     final offerings = await getOfferings();
     if (offerings.current == null) {
@@ -176,7 +196,10 @@ class PurchasesService {
         "Selected package not found in the current offerings.",
       ),
     );
-    return Purchases.purchase(PurchaseParams.package(selectedPackage));
+    final result = await Purchases.purchase(
+      PurchaseParams.package(selectedPackage),
+    );
+    return result;
   }
 
   Future<CustomerInfo> restorePurchases() async {
@@ -186,6 +209,10 @@ class PurchasesService {
 
   Future<void> presentCustomerCenter() async {
     RevenueCatUI.presentCustomerCenter();
+  }
+
+  bool isInitialized() {
+    return _isInitialized;
   }
 }
 
@@ -199,28 +226,26 @@ class _RestPurchases {
   static _RestPurchases? _instance;
 
   // It works with API v1.
-  static const revenuecatProjectWebApiKey = _revenuecatProjectAppleApiKey;
+  static const revenuecatProjectWebApiKey = _revenuecatProjectMacOSApiKey;
   static const base = "https://api.revenuecat.com/v1/";
 
   // State
-  late Dio dio;
+  Dio dio = Dio(
+    BaseOptions(
+      baseUrl: base,
+      connectTimeout: const Duration(seconds: 5),
+      receiveTimeout: const Duration(seconds: 5),
+      headers: {
+        "Authorization": "Bearer $revenuecatProjectWebApiKey",
+        "Accept": "application/json",
+        "Content-Type": "application/json",
+      },
+    ),
+  );
   String? userID;
   StreamController<CustomerInfo?>? _customerInfoStreamController;
 
-  Future<void> init() async {
-    dio = Dio(
-      BaseOptions(
-        baseUrl: base,
-        connectTimeout: const Duration(seconds: 5),
-        receiveTimeout: const Duration(seconds: 5),
-        headers: {
-          "Authorization": "Bearer $revenuecatProjectWebApiKey",
-          "Accept": "application/json",
-          "Content-Type": "application/json",
-        },
-      ),
-    );
-  }
+  Future<void> init() async {}
 
   Future<void> login(String userId) async {
     userID = userId;
@@ -244,7 +269,10 @@ class _RestPurchases {
 
   Future<CustomerInfo?> getCustomerInfo() async {
     if (userID == null) {
-      throw Exception("User is not logged in");
+      logger.w(
+        "Called getCustomerInfo() without a logged-in user. Returning null.",
+      );
+      return null;
     }
     final res = await dio.get("subscribers/$userID");
     if (res.statusCode != 200) {

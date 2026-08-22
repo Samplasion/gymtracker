@@ -22,22 +22,20 @@ class MeController extends GetxController with ServiceableController {
   void onInit() {
     super.onInit();
     predictedWeight.addStream(
-      Rx.combineLatest2(
-        service.weightMeasurements$,
-        service.prefs$,
-        (List<WeightMeasurement> measurements, Prefs prefs) {
-          final weightUnit = prefs.weightUnit;
-          logger.i(
-              "Updated predicted weight: ${predictNextWeight(measurements, weightUnit)}");
-          return predictNextWeight(measurements, weightUnit);
-        },
-      ),
+      Rx.combineLatest2(service.weightMeasurements$, service.prefs$, (
+        List<WeightMeasurement> measurements,
+        Prefs prefs,
+      ) {
+        final weightUnit = prefs.weightUnit;
+        logger.i(
+          "Updated predicted weight: ${predictNextWeight(measurements, weightUnit)}",
+        );
+        return predictNextWeight(measurements, weightUnit);
+      }),
     );
     service.weightMeasurements$.listen((event) {
       logger.i("Updated with ${event.length} weight measurements");
       weightMeasurements(event);
-      Get.find<Coordinator>()
-          .maybeUnlockAchievements(AchievementTrigger.weight);
     });
     service.bodyMeasurements$.listen((event) {
       logger.i("Updated with ${event.length} body measurements");
@@ -51,10 +49,12 @@ class MeController extends GetxController with ServiceableController {
   void onServiceChange() {}
 
   void addWeightMeasurement(WeightMeasurement measurement) {
+    Get.find<Coordinator>().maybeUnlockAchievements(AchievementTrigger.weight);
     service.setWeightMeasurement(measurement);
   }
 
   void removeWeightMeasurement(WeightMeasurement measurement) {
+    Get.find<Coordinator>().maybeUnlockAchievements(AchievementTrigger.weight);
     service.removeWeightMeasurement(measurement);
   }
 
@@ -63,8 +63,10 @@ class MeController extends GetxController with ServiceableController {
   }
 
   PredictedWeightMeasurement? predictNextWeight(
-      List<WeightMeasurement> measurements, Weights weightUnit,
-      [int _sampleSize = 10]) {
+    List<WeightMeasurement> measurements,
+    Weights weightUnit, [
+    int _sampleSize = 10,
+  ]) {
     final sampleSize = _sampleSize.clamp(0, measurements.length);
     if (sampleSize < 2) {
       return null;

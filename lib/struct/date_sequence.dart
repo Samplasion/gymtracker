@@ -10,16 +10,10 @@ class DateTagged<T> {
   /// The value.
   final T value;
 
-  const DateTagged._({
-    required this.date,
-    required this.value,
-  });
+  const DateTagged._({required this.date, required this.value});
 
   /// Creates a date-tagged value.
-  factory DateTagged({
-    required DateTime date,
-    required T value,
-  }) {
+  factory DateTagged({required DateTime date, required T value}) {
     return DateTagged._(date: date.startOfDay, value: value);
   }
 
@@ -53,10 +47,7 @@ class DateRange {
   /// The end of the range, exclusive.
   final DateTime? to;
 
-  const DateRange._({
-    required this.from,
-    required this.to,
-  });
+  const DateRange._({required this.from, required this.to});
 
   Duration get duration {
     if (from == null || to == null) {
@@ -65,10 +56,7 @@ class DateRange {
     return to!.difference(from!);
   }
 
-  DateRange copyWith({
-    Optional<DateTime>? from,
-    Optional<DateTime>? to,
-  }) {
+  DateRange copyWith({Optional<DateTime>? from, Optional<DateTime>? to}) {
     return DateRange._(
       from: from == null ? this.from : from.safeUnwrap(),
       to: to == null ? this.to : to.safeUnwrap(),
@@ -98,9 +86,7 @@ class DateSequence<T> {
   ///
   /// If a date appears multiple times, the **first** value is kept.
   /// Null values are ignored.
-  factory DateSequence.fromDatesAndValues(
-    Map<DateTime, T> values,
-  ) {
+  factory DateSequence.fromDatesAndValues(Map<DateTime, T> values) {
     final keys = (values.keys.toList()..sort()).reversed;
     final map = <DateTime, DateTagged<T>>{
       for (final key in keys)
@@ -143,7 +129,6 @@ class DateSequence<T> {
         normalized.add(list[i]);
         continue;
       }
-      print((i - 1, i, equality(list[i], list[i - 1])));
       if (equality(list[i], list[i - 1])) {
         // normalized[normalized.length - 1] = rawList[lastIndices[list[i].date]!];
         normalized[normalized.length - 1] = list[i];
@@ -151,7 +136,6 @@ class DateSequence<T> {
         normalized.add(list[i]);
       }
     }
-    print("$rawList\n$list\n$lastIndices\n$normalized");
     return DateSequence.fromList(normalized);
   }
 
@@ -243,6 +227,6 @@ class DateSequence<T> {
 
   /// Returns a map representation of the sequence.
   Map<DateTime, T> toMap() => {
-        for (final entry in _map.entries) entry.key: entry.value.value,
-      };
+    for (final entry in _map.entries) entry.key: entry.value.value,
+  };
 }

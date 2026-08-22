@@ -9,6 +9,7 @@ import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/utils/sets.dart';
 import 'package:gymtracker/view/utils/drag_handle.dart';
+import 'package:gymtracker/view/utils/workout.dart';
 
 class ExerciseSetView extends StatelessWidget {
   final GTSet set;
@@ -19,6 +20,7 @@ class ExerciseSetView extends StatelessWidget {
   final Distance distanceUnit;
   final bool draggable;
   final int? index;
+  final bool showRPE;
 
   const ExerciseSetView({
     required this.set,
@@ -27,38 +29,58 @@ class ExerciseSetView extends StatelessWidget {
     required this.alt,
     required this.weightUnit,
     required this.distanceUnit,
+    this.showRPE = false,
     this.draggable = false,
     this.index,
     super.key,
-  }) : assert(draggable ? index != null : true,
-            "index must be provided when draggable is true");
+  }) : assert(
+         draggable ? index != null : true,
+         "index must be provided when draggable is true",
+       );
 
   List<Widget> get fields => [
-        if ([GTSetParameters.repsWeight, GTSetParameters.timeWeight]
-            .contains(set.parameters))
-          Text(Weights.convert(
+    if ([
+      GTSetParameters.repsWeight,
+      GTSetParameters.timeWeight,
+    ].contains(set.parameters))
+      Expanded(
+        child: Text(
+          Weights.convert(
             value: set.weight!,
             from: weightUnit,
             to: settingsController.weightUnit.value,
-          ).userFacingWeight),
-        if ([
-          GTSetParameters.timeWeight,
-          GTSetParameters.time,
-        ].contains(set.parameters))
-          Text("exerciseList.fields.time".tParams({
+          ).userFacingWeight,
+        ),
+      ),
+    if ([
+      GTSetParameters.timeWeight,
+      GTSetParameters.time,
+    ].contains(set.parameters))
+      Expanded(
+        child: Text(
+          "exerciseList.fields.time".tParams({
             "time":
                 "${(set.time!.inSeconds ~/ 60).toString().padLeft(2, "0")}:${(set.time!.inSeconds % 60).toString().padLeft(2, "0")}",
-          })),
-        if ([GTSetParameters.repsWeight, GTSetParameters.freeBodyReps]
-            .contains(set.parameters))
-          Text("exerciseList.fields.reps".plural(set.reps ?? 0)),
-        if ([GTSetParameters.distance].contains(set.parameters))
-          Text(Distance.convert(
+          }),
+        ),
+      ),
+    if ([
+      GTSetParameters.repsWeight,
+      GTSetParameters.freeBodyReps,
+    ].contains(set.parameters))
+      Expanded(child: Text("exerciseList.fields.reps".plural(set.reps ?? 0))),
+    if ([GTSetParameters.distance].contains(set.parameters))
+      Expanded(
+        child: Text(
+          Distance.convert(
             value: set.distance!,
             from: distanceUnit,
             to: settingsController.distanceUnit.value,
-          ).userFacingDistance),
-      ];
+          ).userFacingDistance,
+        ),
+      ),
+    if (showRPE) RPECompactColumn(rpe: set.rpe),
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -87,7 +109,7 @@ class ExerciseSetView extends StatelessWidget {
           const SizedBox(width: 8),
           for (int i = 0; i < fields.length; i++) ...[
             if (i != 0) const SizedBox(width: 8),
-            Expanded(child: fields[i])
+            fields[i],
           ],
           const SizedBox(width: 8),
           if (isConcrete) ...[

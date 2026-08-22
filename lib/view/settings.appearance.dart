@@ -24,12 +24,14 @@ class AppearanceSettingsPane extends ControlledWidget<SettingsController> {
                       title: Text("settings.options.locale.label".t),
                       onChange: onChange,
                       values: {
+                        kSystemLocaleSentinel:
+                            "settings.options.locale.values.system".t,
                         for (final locale in GTLocalizations.supportedLocales)
                           locale: "locales.${locale.languageCode}".t,
                       },
                       selectedValue: value,
                     ),
-                    onUpdate: (v) => controller.setLocale(v ?? currentLocale),
+                    onUpdate: (v) => controller.setLocale(v),
                   ),
                 ),
                 if (ColorService().supportsDynamicColor)
@@ -45,7 +47,8 @@ class AppearanceSettingsPane extends ControlledWidget<SettingsController> {
                 AnimatedBuilder(
                   animation: controller.service,
                   builder: (context, _) {
-                    final state = (!ColorService().supportsDynamicColor ||
+                    final state =
+                        (!ColorService().supportsDynamicColor ||
                             !controller.usesDynamicColor.value)
                         ? CrossFadeState.showFirst
                         : CrossFadeState.showSecond;
@@ -58,8 +61,9 @@ class AppearanceSettingsPane extends ControlledWidget<SettingsController> {
                             onChange: onChange,
                             selectedValue: value ?? Prefs.defaultValue.color,
                           ),
-                          onUpdate: (v) => controller
-                              .setColor(v ?? Prefs.defaultValue.color),
+                          onUpdate: (v) => controller.setColor(
+                            v ?? Prefs.defaultValue.color,
+                          ),
                         ),
                       ),
                       secondChild: const SizedBox.shrink(),
@@ -93,14 +97,16 @@ class AppearanceSettingsPane extends ControlledWidget<SettingsController> {
                     value: value ?? Prefs.defaultValue.tintExercises,
                     onChanged: onChanged,
                   ),
-                  onUpdate: (v) => controller
-                      .setTintExercises(v ?? Prefs.defaultValue.tintExercises),
+                  onUpdate: (v) => controller.setTintExercises(
+                    v ?? Prefs.defaultValue.tintExercises,
+                  ),
                 ),
                 ValueBuilder<bool?>(
                   initialValue: controller.showSuggestedRoutines.value,
                   builder: (value, onChanged) => SwitchListTile(
-                    title:
-                        Text("settings.options.showSuggestedRoutines.label".t),
+                    title: Text(
+                      "settings.options.showSuggestedRoutines.label".t,
+                    ),
                     value: value ?? false,
                     onChanged: onChanged,
                   ),

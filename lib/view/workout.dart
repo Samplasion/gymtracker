@@ -72,9 +72,7 @@ class _WorkoutViewState extends State<WorkoutView> {
 
     return Scaffold(
       appBar: AppBar(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(0),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(0)),
         title: Obx(() {
           if (stopwatchController.globalStopwatch.isStopped.isFalse ||
               stopwatchController.globalStopwatch.currentDuration.inSeconds >
@@ -86,7 +84,8 @@ class _WorkoutViewState extends State<WorkoutView> {
                     context,
                     stopwatchController.globalStopwatch.currentDuration,
                     style: TextStyle(
-                        color: Theme.of(context).colorScheme.secondary),
+                      color: Theme.of(context).colorScheme.secondary,
+                    ),
                     builder: (time) => TextSpan(
                       children: [
                         TextSpan(
@@ -117,10 +116,8 @@ class _WorkoutViewState extends State<WorkoutView> {
         }),
         actions: [
           PopupMenuButton(
-            itemBuilder: (context) => buildToolboxMenuEntries(
-              context,
-              _controller,
-            ),
+            itemBuilder: (context) =>
+                buildToolboxMenuEntries(context, _controller),
             tooltip: "ongoingWorkout.toolbox.title".t,
             icon: const Icon(GTIcons.tools),
           ),
@@ -135,7 +132,9 @@ class _WorkoutViewState extends State<WorkoutView> {
         ],
         bottom: PreferredSize(
           preferredSize: Size(
-              10, (AppBarTheme.of(context).toolbarHeight ?? kToolbarHeight)),
+            10,
+            (AppBarTheme.of(context).toolbarHeight ?? kToolbarHeight),
+          ),
           child: const WorkoutInfoBar(),
         ),
       ),
@@ -152,54 +151,55 @@ class _WorkoutViewState extends State<WorkoutView> {
       }),
       body: SafeArea(
         bottom: false,
-        child: Obx(
-          () {
-            if (_controller != null &&
-                Workout.shouldShowAsInfobox(_controller!.infobox())) {
-              return _buildListView();
-            }
-            return CustomMaterialIndicator(
-              onRefresh: () async {
-                _controller?.showEditNotesDialog();
-              },
-              indicatorBuilder: (context, controller) {
-                final cardTheme = ContextThemingUtils(context).theme.cardTheme;
-                return Container(
-                  decoration: BoxDecoration(
-                    color: ElevationOverlay.applySurfaceTint(
-                      cardTheme.color ??
-                          ContextThemingUtils(context).theme.cardColor,
-                      cardTheme.surfaceTintColor,
-                      cardTheme.elevation ?? 4,
-                    ),
-                    shape: BoxShape.circle,
+        child: Obx(() {
+          if (_controller != null &&
+              Workout.shouldShowAsInfobox(_controller!.infobox())) {
+            return _buildListView();
+          }
+          return CustomMaterialIndicator(
+            onRefresh: () async {
+              _controller?.showEditNotesDialog();
+            },
+            indicatorBuilder: (context, controller) {
+              final cardTheme = ContextThemingUtils(context).theme.cardTheme;
+              return Container(
+                decoration: BoxDecoration(
+                  color: ElevationOverlay.applySurfaceTint(
+                    cardTheme.color ??
+                        ContextThemingUtils(context).theme.cardColor,
+                    cardTheme.surfaceTintColor,
+                    cardTheme.elevation ?? 4,
                   ),
-                  alignment: Alignment.center,
-                  child: Icon(
-                    GTIcons.notes_add,
-                    color: context.colorScheme.primary,
-                  ),
-                );
-              },
-              child: _buildListView(),
-            );
-          },
-        ),
+                  shape: BoxShape.circle,
+                ),
+                alignment: Alignment.center,
+                child: Icon(
+                  GTIcons.notes_add,
+                  color: context.colorScheme.primary,
+                ),
+              );
+            },
+            child: _buildListView(),
+          );
+        }),
       ),
     );
   }
 
-  ListView _buildListView() {
+  Widget _buildListView() {
     return ListView(
-      padding: const EdgeInsets.symmetric(vertical: 8) +
+      padding:
+          const EdgeInsets.symmetric(vertical: 8) +
           EdgeInsets.only(
-            bottom: MediaQuery.of(context).viewInsets.bottom +
+            bottom:
+                MediaQuery.of(context).viewInsets.bottom +
                 MediaQuery.of(context).padding.bottom,
           ),
       children: [
         if (_controller != null &&
             Workout.shouldShowAsInfobox(
-                Get.find<WorkoutController>().infobox())) ...[
+              Get.find<WorkoutController>().infobox(),
+            )) ...[
           Infobox(
             text: _controller!.infobox()!,
             onLongPress: () {
@@ -234,22 +234,24 @@ class _WorkoutViewState extends State<WorkoutView> {
               ),
         Padding(
           padding: const EdgeInsets.all(16),
-          child: SplitButton(segments: [
-            SplitButtonSegment(
-              title: 'ongoingWorkout.exercises.add'.t,
-              type: SplitButtonSegmentType.filled,
-              onTap: () async {
-                _controller?.pickExercises();
-              },
-            ),
-            SplitButtonSegment(
-              title: "ongoingWorkout.exercises.addSuperset".t,
-              onTap: () {
-                _controller?.addSuperset();
-                _controller?.exercises.refresh();
-              },
-            ),
-          ]),
+          child: SplitButton(
+            segments: [
+              SplitButtonSegment(
+                title: 'ongoingWorkout.exercises.add'.t,
+                type: SplitButtonSegmentType.filled,
+                onTap: () async {
+                  _controller?.pickExercises();
+                },
+              ),
+              SplitButtonSegment(
+                title: "ongoingWorkout.exercises.addSuperset".t,
+                onTap: () {
+                  _controller?.addSuperset();
+                  _controller?.exercises.refresh();
+                },
+              ),
+            ],
+          ),
         ),
         if (_controller?.exercises.isEmpty ?? false)
           Center(
@@ -281,9 +283,7 @@ class _WorkoutViewState extends State<WorkoutView> {
 }
 
 class WorkoutInfoBar extends StatelessWidget {
-  const WorkoutInfoBar({
-    super.key,
-  });
+  const WorkoutInfoBar({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -291,8 +291,9 @@ class WorkoutInfoBar extends StatelessWidget {
     return Column(
       children: [
         Padding(
-          padding:
-              const EdgeInsets.symmetric(horizontal: 16).copyWith(bottom: 16),
+          padding: const EdgeInsets.symmetric(
+            horizontal: 16,
+          ).copyWith(bottom: 16),
           child: StreamBuilder(
             stream: healthController.energyStream,
             builder: (context, snapshot) {
@@ -305,36 +306,31 @@ class WorkoutInfoBar extends StatelessWidget {
                     children: [
                       Expanded(
                         flex: 4,
-                        child: Obx(
-                          () {
-                            if (_controller == null) {
-                              return const SizedBox.shrink();
-                            }
-                            return TimerView(
-                              startingTime:
-                                  _controller?.time.value ?? DateTime.now(),
-                              builder: (context, text) {
-                                return Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      "ongoingWorkout.info.time".t,
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .labelMedium,
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                    Hero(
-                                      tag: "Ongoing",
-                                      child: text,
-                                    ),
-                                  ],
-                                );
-                              },
-                            );
-                          },
-                        ),
+                        child: Obx(() {
+                          if (_controller == null) {
+                            return const SizedBox.shrink();
+                          }
+                          return TimerView(
+                            startingTime:
+                                _controller?.time.value ?? DateTime.now(),
+                            builder: (context, text) {
+                              return Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    "ongoingWorkout.info.time".t,
+                                    style: Theme.of(
+                                      context,
+                                    ).textTheme.labelMedium,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                  Hero(tag: "Ongoing", child: text),
+                                ],
+                              );
+                            },
+                          );
+                        }),
                       ),
                       Expanded(
                         flex: 3,
@@ -384,7 +380,8 @@ class WorkoutInfoBar extends StatelessWidget {
                                 duration: const Duration(milliseconds: 400),
                                 builder: (context, value, _) {
                                   if (doubleIsActuallyInt(
-                                      _controller?.liftedWeight ?? 0)) {
+                                    _controller?.liftedWeight ?? 0,
+                                  )) {
                                     return Text("${value.round()}");
                                   }
                                   return Text(stringifyDouble(value));
@@ -407,21 +404,26 @@ class WorkoutInfoBar extends StatelessWidget {
                                 overflow: TextOverflow.ellipsis,
                               ),
                               TweenAnimationBuilder(
-                                tween: Tween<double>(
-                                  begin: 0,
-                                  end: heartRate,
-                                ),
+                                tween: Tween<double>(begin: 0, end: heartRate),
                                 curve: Curves.decelerate,
                                 duration: const Duration(milliseconds: 400),
                                 builder: (context, value, _) {
-                                  return Text.rich(TextSpan(children: [
-                                    const WidgetSpan(
-                                      child: Icon(GTIcons.heart_rate, size: 14),
-                                      alignment: PlaceholderAlignment.middle,
+                                  return Text.rich(
+                                    TextSpan(
+                                      children: [
+                                        const WidgetSpan(
+                                          child: Icon(
+                                            GTIcons.heart_rate,
+                                            size: 14,
+                                          ),
+                                          alignment:
+                                              PlaceholderAlignment.middle,
+                                        ),
+                                        const TextSpan(text: " "),
+                                        TextSpan(text: "${value.round()}"),
+                                      ],
                                     ),
-                                    const TextSpan(text: " "),
-                                    TextSpan(text: "${value.round()}"),
-                                  ]));
+                                  );
                                 },
                               ),
                             ],
@@ -448,20 +450,29 @@ class WorkoutInfoBar extends StatelessWidget {
                                 curve: Curves.decelerate,
                                 duration: const Duration(milliseconds: 400),
                                 builder: (context, value, _) {
-                                  return Text.rich(TextSpan(children: [
-                                    const WidgetSpan(
-                                      child:
-                                          Icon(GTIcons.active_energy, size: 14),
-                                      alignment: PlaceholderAlignment.middle,
-                                    ),
-                                    const TextSpan(text: " "),
+                                  return Text.rich(
                                     TextSpan(
-                                        text: NumberFormat.decimalPatternDigits(
+                                      children: [
+                                        const WidgetSpan(
+                                          child: Icon(
+                                            GTIcons.active_energy,
+                                            size: 14,
+                                          ),
+                                          alignment:
+                                              PlaceholderAlignment.middle,
+                                        ),
+                                        const TextSpan(text: " "),
+                                        TextSpan(
+                                          text:
+                                              NumberFormat.decimalPatternDigits(
                                                 locale:
                                                     context.locale.languageCode,
-                                                decimalDigits: 1)
-                                            .format(value)),
-                                  ]));
+                                                decimalDigits: 1,
+                                              ).format(value),
+                                        ),
+                                      ],
+                                    ),
+                                  );
                                 },
                               ),
                             ],
@@ -479,13 +490,9 @@ class WorkoutInfoBar extends StatelessWidget {
           () => TweenAnimationBuilder<double>(
             duration: const Duration(milliseconds: 300),
             curve: Curves.linearToEaseOut,
-            tween: Tween<double>(
-              begin: 0,
-              end: _controller?.progress ?? 0,
-            ),
-            builder: (context, value, _) => LinearProgressIndicator(
-              value: value,
-            ),
+            tween: Tween<double>(begin: 0, end: _controller?.progress ?? 0),
+            builder: (context, value, _) =>
+                LinearProgressIndicator(value: value),
           ),
         ),
       ],
@@ -505,9 +512,7 @@ class WorkoutTimerView extends StatelessWidget {
       elevation: 8,
       margin: EdgeInsets.zero,
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(
-          top: Radius.circular(13),
-        ),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(13)),
       ),
       clipBehavior: Clip.antiAlias,
       child: SafeArea(
@@ -520,8 +525,11 @@ class WorkoutTimerView extends StatelessWidget {
                 try {
                   return _controller!.time.value;
                 } catch (e, s) {
-                  logger.e("Error getting workout time",
-                      error: e, stackTrace: s);
+                  logger.e(
+                    "Error getting workout time",
+                    error: e,
+                    stackTrace: s,
+                  );
                   return DateTime.now();
                 }
               }(),
@@ -543,8 +551,10 @@ class WorkoutTimerView extends StatelessWidget {
               bottom: false,
               child: Container(
                 constraints: const BoxConstraints(minHeight: 64),
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 8,
+                ),
                 child: Center(
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.center,
@@ -567,9 +577,7 @@ class WorkoutTimerView extends StatelessWidget {
                             builder: (_, time) => TimerView.buildTimeString(
                               context,
                               countdownController.remaining,
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .bodyMedium!
+                              style: Theme.of(context).textTheme.bodyMedium!
                                   .copyWith(fontWeight: FontWeight.bold),
                             ),
                           ),
@@ -644,12 +652,15 @@ class _WorkoutFinishPageState extends State<WorkoutFinishPage> {
   late Duration workoutDuration;
   final formKey = GlobalKey<FormState>();
 
-  final titleController =
-      TextEditingController(text: _controller?.name.value ?? "");
+  final titleController = TextEditingController(
+    text: _controller?.name.value ?? "",
+  );
   final timeController = TextEditingController(
-    text: TimeInputField.encodeDuration(_controller == null
-        ? Duration.zero
-        : DateTime.now().difference(_controller!.time.value)),
+    text: TimeInputField.encodeDuration(
+      _controller == null
+          ? Duration.zero
+          : DateTime.now().difference(_controller!.time.value),
+    ),
   );
   final dateController = TextEditingController();
   final infoboxController = QuillController(
@@ -660,9 +671,9 @@ class _WorkoutFinishPageState extends State<WorkoutFinishPage> {
   late String? pwInitialItem = () {
     // Parent workout data
     String? pwInitialItem = _controller?.parentID.value;
-    if (Get.find<RoutinesController>()
-        .workouts
-        .every((element) => element.id != pwInitialItem)) {
+    if (Get.find<RoutinesController>().workouts.every(
+      (element) => element.id != pwInitialItem,
+    )) {
       pwInitialItem = null;
     }
 
@@ -672,9 +683,7 @@ class _WorkoutFinishPageState extends State<WorkoutFinishPage> {
   @override
   Widget build(BuildContext context) {
     if (_controller == null) {
-      return const Dialog.fullscreen(
-        child: SizedBox.shrink(),
-      );
+      return const Dialog.fullscreen(child: SizedBox.shrink());
     }
 
     final controller = _controller!;
@@ -692,10 +701,7 @@ class _WorkoutFinishPageState extends State<WorkoutFinishPage> {
               child: Divider(height: 1),
             ),
             actions: [
-              IconButton(
-                icon: const Icon(GTIcons.done),
-                onPressed: _submit,
-              )
+              IconButton(icon: const Icon(GTIcons.done), onPressed: _submit),
             ],
           ),
         ),
@@ -706,77 +712,94 @@ class _WorkoutFinishPageState extends State<WorkoutFinishPage> {
               data: MediaQuery.of(context).copyWith(padding: EdgeInsets.zero),
               child: ListView(
                 padding: padding,
-                children: [
-                  const SizedBox(height: 8),
-                  if (!controller.isContinuation.value)
-                    TextFormField(
-                      controller: titleController,
-                      decoration: _decoration(
-                          "ongoingWorkout.finish.fields.name.label".t),
-                      validator: (string) {
-                        if (string == null || string.isEmpty) {
-                          return "ongoingWorkout.finish.fields.name.errors.empty"
-                              .t;
-                        }
-                        return null;
-                      },
-                    ),
-                  DateField(
-                    decoration: _decoration(
-                        "ongoingWorkout.finish.fields.startingTime.label".t),
-                    date: controller.time.value,
-                    onSelect: (date) => setState(() => controller.time(date)),
-                    firstDate: DateTime.fromMillisecondsSinceEpoch(0),
-                    lastDate: DateTime.now().add(const Duration(days: 7)),
-                  ),
-                  if (!controller.isContinuation.value)
-                    RoutineFormPicker(
-                      key: ValueKey(controller.parentID.value),
-                      decoration: _decoration(
-                          "ongoingWorkout.finish.fields.parent.label".t),
-                      onChanged: (routine) {
-                        setState(() {
-                          controller.parentID.value = routine?.id;
-                        });
-                      },
-                      routine: Get.find<RoutinesController>()
-                          .workouts
-                          .firstWhereOrNull((element) =>
-                              element.id == controller.parentID.value),
-                    ),
-                  TimeInputField(
-                    controller: timeController,
-                    decoration: _decoration(
-                        "ongoingWorkout.finish.fields.duration.label".t),
-                    validator: (duration) {
-                      if (duration == null || duration.inSeconds == 0) {
-                        return "ongoingWorkout.finish.fields.duration.errors.empty"
-                            .t;
-                      }
-                      return null;
-                    },
-                  ),
-                  GTRichTextEditor(
-                    infoboxController: infoboxController,
-                    decoration: GymTrackerInputDecoration(
-                      labelText: "ongoingWorkout.finish.fields.infobox.label".t,
-                      alignLabelWithHint: true,
-                    ),
-                    onTapOutside: () {
-                      logger.d("Quill Editor onTapOutside");
-                      controller.infobox(jsonEncode(
-                          infoboxController.document.toDelta().toJson()));
-                    },
-                  ),
-                ]
-                    .map((c) => Padding(
-                          padding: const EdgeInsets.symmetric(
-                            vertical: 16,
-                            horizontal: 16,
-                          ).copyWith(top: 0),
-                          child: c,
-                        ))
-                    .toList(),
+                children:
+                    [
+                          const SizedBox(height: 8),
+                          if (!controller.isContinuation.value)
+                            TextFormField(
+                              controller: titleController,
+                              decoration: _decoration(
+                                "ongoingWorkout.finish.fields.name.label".t,
+                              ),
+                              validator: (string) {
+                                if (string == null || string.isEmpty) {
+                                  return "ongoingWorkout.finish.fields.name.errors.empty"
+                                      .t;
+                                }
+                                return null;
+                              },
+                            ),
+                          DateField(
+                            decoration: _decoration(
+                              "ongoingWorkout.finish.fields.startingTime.label"
+                                  .t,
+                            ),
+                            date: controller.time.value,
+                            onSelect: (date) =>
+                                setState(() => controller.time(date)),
+                            firstDate: DateTime.fromMillisecondsSinceEpoch(0),
+                            lastDate: DateTime.now().add(
+                              const Duration(days: 7),
+                            ),
+                          ),
+                          if (!controller.isContinuation.value)
+                            RoutineFormPicker(
+                              key: ValueKey(controller.parentID.value),
+                              decoration: _decoration(
+                                "ongoingWorkout.finish.fields.parent.label".t,
+                              ),
+                              onChanged: (routine) {
+                                setState(() {
+                                  controller.parentID.value = routine?.id;
+                                });
+                              },
+                              routine: Get.find<RoutinesController>().workouts
+                                  .firstWhereOrNull(
+                                    (element) =>
+                                        element.id == controller.parentID.value,
+                                  ),
+                            ),
+                          TimeInputField(
+                            controller: timeController,
+                            decoration: _decoration(
+                              "ongoingWorkout.finish.fields.duration.label".t,
+                            ),
+                            validator: (duration) {
+                              if (duration == null || duration.inSeconds == 0) {
+                                return "ongoingWorkout.finish.fields.duration.errors.empty"
+                                    .t;
+                              }
+                              return null;
+                            },
+                          ),
+                          GTRichTextEditor(
+                            infoboxController: infoboxController,
+                            decoration: GymTrackerInputDecoration(
+                              labelText:
+                                  "ongoingWorkout.finish.fields.infobox.label"
+                                      .t,
+                              alignLabelWithHint: true,
+                            ),
+                            onTapOutside: () {
+                              logger.d("Quill Editor onTapOutside");
+                              controller.infobox(
+                                jsonEncode(
+                                  infoboxController.document.toDelta().toJson(),
+                                ),
+                              );
+                            },
+                          ),
+                        ]
+                        .map(
+                          (c) => Padding(
+                            padding: const EdgeInsets.symmetric(
+                              vertical: 16,
+                              horizontal: 16,
+                            ).copyWith(top: 0),
+                            child: c,
+                          ),
+                        )
+                        .toList(),
               ),
             ),
           ),
@@ -786,9 +809,7 @@ class _WorkoutFinishPageState extends State<WorkoutFinishPage> {
   }
 
   InputDecoration _decoration(String label) {
-    return GymTrackerInputDecoration(
-      labelText: label,
-    );
+    return GymTrackerInputDecoration(labelText: label);
   }
 
   void _submit() {
@@ -831,10 +852,7 @@ class _WorkoutExerciseReorderDialogState
               child: Divider(height: 1),
             ),
             actions: [
-              IconButton(
-                icon: const Icon(GTIcons.done),
-                onPressed: _submit,
-              )
+              IconButton(icon: const Icon(GTIcons.done), onPressed: _submit),
             ],
           ),
         ),

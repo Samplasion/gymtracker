@@ -252,9 +252,9 @@ class _WeightMeasurementDataPageState extends State<WeightMeasurementDataPage> {
                   SliverToBoxAdapter(child: chart),
                   SliverList.builder(
                     itemBuilder: (context, index) {
-                      final measurement = (selected == null
+                      final GenericMeasurement measurement = (selected == null
                           ? weightMeasurements[index]
-                          : bodyMeasurements[selected]![index]);
+                          : bodyMeasurements[selected]![index]) as GenericMeasurement;
                       return Slidable(
                         key: ValueKey(measurement.id),
                         endActionPane: ActionPane(

@@ -51,12 +51,15 @@ List<PopupMenuEntry<dynamic>> buildWorkoutControlMenuEntries(
       ),
       onTap: () {
         SchedulerBinding.instance.addPostFrameCallback((_) {
-          controller.cancelWorkoutWithDialog(context, onCanceled: () {
-            SchedulerBinding.instance.addPostFrameCallback((_) {
-              Get.back(closeOverlays: true);
-              Get.delete<WorkoutController>();
-            });
-          });
+          controller.cancelWorkoutWithDialog(
+            context,
+            onCanceled: () {
+              SchedulerBinding.instance.addPostFrameCallback((_) {
+                Get.back(closeOverlays: true);
+                Get.delete<WorkoutController>();
+              });
+            },
+          );
         });
       },
     ),
@@ -168,9 +171,7 @@ List<PopupMenuEntry<dynamic>> buildToolboxMenuEntries(
         final weightUnit = controller.weightUnit.value;
         showDialog(
           context: context,
-          builder: (context) => WeightCalculator(
-            weightUnit: weightUnit,
-          ),
+          builder: (context) => WeightCalculator(weightUnit: weightUnit),
         );
       },
     ),
@@ -346,25 +347,6 @@ List<PopupMenuEntry<dynamic>> buildExerciseControlMenuEntries({
 
   if (!isCreating) {
     items.addAll([
-      PopupMenuItem(
-        onTap: () {
-          showDialog(
-            context: context,
-            builder: (context) {
-              return _SetRpeDialog(currentRPE: exercise.rpe);
-            },
-          ).then((value) {
-            if (value != null) {
-              callbacks.onExerciseChangeRPE(index, value.safeUnwrap());
-            }
-          });
-        },
-        child: ListTile(
-          leading: const Icon(GTIcons.rpe),
-          title: Text('ongoingWorkout.exercises.setRPE'.t),
-          mouseCursor: SystemMouseCursors.click,
-        ),
-      ),
       if (CardioTimerScreen.supportsTimer(exercise))
         PopupMenuItem(
           onTap: () {
@@ -488,7 +470,7 @@ class _WorkoutReorderSetsDialogState extends State<WorkoutReorderSetsDialog> {
 }
 
 class _SetRpeDialog extends StatefulWidget {
-  final int? currentRPE;
+  final double? currentRPE;
 
   const _SetRpeDialog({this.currentRPE});
 
@@ -497,7 +479,7 @@ class _SetRpeDialog extends StatefulWidget {
 }
 
 class _SetRpeDialogState extends State<_SetRpeDialog> {
-  late int currentRPE = widget.currentRPE ?? 5;
+  late double currentRPE = widget.currentRPE ?? 5.0;
 
   @override
   Widget build(BuildContext context) {
@@ -514,15 +496,16 @@ class _SetRpeDialogState extends State<_SetRpeDialog> {
           ListTile(
             leading: const Icon(GTIcons.rpe),
             title: Text('exercise.editor.fields.rpe.level$currentRPE.title'.t),
-            subtitle:
-                Text('exercise.editor.fields.rpe.level$currentRPE.text'.t),
+            subtitle: Text(
+              'exercise.editor.fields.rpe.level$currentRPE.text'.t,
+            ),
           ),
           Slider(
             value: currentRPE.toDouble(),
             secondaryTrackValue: widget.currentRPE?.toDouble(),
             onChanged: (value) {
               setState(() {
-                currentRPE = value.toInt();
+                currentRPE = value;
               });
             },
             min: 1,
@@ -530,8 +513,10 @@ class _SetRpeDialogState extends State<_SetRpeDialog> {
             divisions: 9,
             label: currentRPE.toString(),
             activeColor: rpeColor(context, currentRPE),
-            secondaryActiveColor: rpeColor(context, widget.currentRPE ?? 5)
-                .withAlpha((0.54 * 255).round()),
+            secondaryActiveColor: rpeColor(
+              context,
+              widget.currentRPE ?? 5.0,
+            ).withAlpha((0.54 * 255).round()),
           ),
         ],
       ),
@@ -544,13 +529,13 @@ class _SetRpeDialogState extends State<_SetRpeDialog> {
         ),
         TextButton(
           onPressed: () {
-            Navigator.pop<Optional<int?>>(context, const None());
+            Navigator.pop<Optional<double?>>(context, const None());
           },
           child: Text('exercise.editor.fields.rpe.removeRPE'.t),
         ),
         TextButton(
           onPressed: () {
-            Navigator.pop<Optional<int?>>(context, Some(currentRPE));
+            Navigator.pop<Optional<double?>>(context, Some(currentRPE));
           },
           child: Text(MaterialLocalizations.of(context).okButtonLabel),
         ),

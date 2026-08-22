@@ -423,7 +423,6 @@ class _LibraryPickerExercisesViewState
       body: ListView.builder(
         itemCount: widget.category.exercises.length,
         itemBuilder: (context, index) {
-          print((sorted[index], sorted[index].id));
           return ExerciseListTile(
             exercise: sorted[index],
             selected: widget.selectedExercises.containsKey(sorted[index].id),

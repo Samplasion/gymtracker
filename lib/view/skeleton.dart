@@ -8,31 +8,21 @@ import 'package:flutter/material.dart' hide Localizations;
 import 'package:flutter/scheduler.dart';
 import 'package:get/get.dart';
 import 'package:gymtracker/controller/coordinator.dart';
-import 'package:gymtracker/controller/exercises_controller.dart';
-import 'package:gymtracker/controller/history_controller.dart';
 import 'package:gymtracker/controller/logger_controller.dart';
 import 'package:gymtracker/controller/purchases_controller.dart';
 import 'package:gymtracker/controller/routines_controller.dart';
 import 'package:gymtracker/controller/workout_controller.dart';
-import 'package:gymtracker/data/exercises.dart';
 import 'package:gymtracker/icons/gymtracker_icons.dart';
 import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/service/logger.dart';
 import 'package:gymtracker/service/version.dart';
-import 'package:gymtracker/utils/colors.dart';
 import 'package:gymtracker/utils/constants.dart';
 import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/utils/go.dart';
-import 'package:gymtracker/view/achievements.dart';
-import 'package:gymtracker/view/boutique.dart';
-import 'package:gymtracker/view/components/badges.dart';
 import 'package:gymtracker/view/components/pro_builder.dart';
 import 'package:gymtracker/view/debug.dart';
 import 'package:gymtracker/view/feed.dart';
-import 'package:gymtracker/view/food.dart';
-import 'package:gymtracker/view/history.dart';
 import 'package:gymtracker/view/legal.dart';
-import 'package:gymtracker/view/library.dart';
 import 'package:gymtracker/view/logs.dart';
 import 'package:gymtracker/view/me.dart';
 import 'package:gymtracker/view/routines.dart';
@@ -43,11 +33,10 @@ import 'package:gymtracker/view/utils/timer.dart';
 import 'package:gymtracker/view/utils/workout_navigation.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:skeletonizer/skeletonizer.dart';
-import 'package:soft_edge_blur/soft_edge_blur.dart';
 
 const _kDrawerSize = 304.0;
 const _kRailSize = 96.0;
-const _kNavBarHeight = 80.0;
+const _kNavBarHeight = kNavBarHeight;
 
 class SkeletonDrawerButton extends StatefulWidget {
   const SkeletonDrawerButton({super.key, this.isInRail = false});
@@ -286,18 +275,19 @@ class _SkeletonViewState extends State<SkeletonView>
                       padding: safeArea.copyWith(
                         bottom:
                             safeArea.bottom +
-                            (Get.find<RoutinesController>()
-                                    .hasOngoingWorkout
-                                    .isTrue
-                                ? OngoingWorkoutBar.defaultHeight
+                            ((Get.find<RoutinesController>()
+                                        .hasOngoingWorkout
+                                        .isTrue ||
+                                    Get.isRegistered<WorkoutController>())
+                                ? (OngoingWorkoutBar.defaultHeight + 32)
                                 : 0) +
                             (showMDView ? 0 : _kNavBarHeight),
                         left: showMDView ? 0 : safeArea.left,
                       ),
                       // TODO: Assess the utility of this
-                      viewInsets: MediaQuery.of(
-                        context,
-                      ).viewInsets.copyWith(bottom: 0),
+                      // viewInsets: MediaQuery.of(
+                      //   context,
+                      // ).viewInsets.copyWith(bottom: 0),
                     ),
                     child: pages[_selectedIndex],
                   ),
@@ -310,35 +300,33 @@ class _SkeletonViewState extends State<SkeletonView>
       drawer: showMDView ? null : _drawer(false),
       extendBody: true,
       bottomNavigationBar: () {
-        var hasWorkout = Get.find<RoutinesController>().hasOngoingWorkout;
         return Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            StreamBuilder<bool>(
-              stream: hasWorkout.stream,
-              initialData: false,
-              builder: (context, asyncSnapshot) {
-                final hasWorkout = asyncSnapshot.data ?? false;
-                return MediaQuery(
-                  data: MediaQuery.of(context).copyWith(
-                    padding: safeArea.copyWith(
-                      left: safeArea.left + leftNavigationSize,
-                      bottom: 0,
-                    ),
+            Obx(() {
+              var hasWorkout =
+                  Get.find<RoutinesController>().hasOngoingWorkout() ||
+                  Get.isRegistered<WorkoutController>();
+              return MediaQuery(
+                data: MediaQuery.of(context).copyWith(
+                  padding: safeArea.copyWith(
+                    left: safeArea.left + leftNavigationSize,
+                    bottom: 0,
                   ),
-                  child: Crossfade(
-                    firstChild: const SizedBox(),
-                    secondChild: OngoingWorkoutBar(
-                      open: () => SchedulerBinding.instance
-                          .addPostFrameCallback((timeStamp) {
-                            Go.toNamed(getPreferredWorkoutRouteName());
-                          }),
-                    ),
-                    showSecond: hasWorkout,
+                ),
+                child: Crossfade(
+                  firstChild: const SizedBox(),
+                  secondChild: OngoingWorkoutBar(
+                    open: () => SchedulerBinding.instance.addPostFrameCallback((
+                      timeStamp,
+                    ) {
+                      Go.toNamed(getPreferredWorkoutRouteName());
+                    }),
                   ),
-                );
-              },
-            ),
+                  showSecond: hasWorkout,
+                ),
+              );
+            }),
             Crossfade(
               firstChild: ProBuilder(
                 builder: (context, subscriptionInfo) {
@@ -346,6 +334,7 @@ class _SkeletonViewState extends State<SkeletonView>
                   return NavigationBar(
                     onDestinationSelected: _onBottomDestinationTap,
                     selectedIndex: _selectedIndex,
+                    height: _kNavBarHeight,
                     destinations: [
                       NavigationDestination(
                         icon: const Icon(GTIcons.home),

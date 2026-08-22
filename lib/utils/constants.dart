@@ -39,22 +39,22 @@ enum Breakpoints {
   }
 
   Breakpoints next() => switch (this) {
-        xxs => xs,
-        xs => s,
-        s => m,
-        m => l,
-        l => xl,
-        xl => xl,
-      };
+    xxs => xs,
+    xs => s,
+    s => m,
+    m => l,
+    l => xl,
+    xl => xl,
+  };
 
   Breakpoints previous() => switch (this) {
-        xxs => xxs,
-        xs => xxs,
-        s => xs,
-        m => s,
-        l => m,
-        xl => l,
-      };
+    xxs => xxs,
+    xs => xxs,
+    s => xs,
+    m => s,
+    l => m,
+    xl => l,
+  };
 
   bool operator <(Breakpoints other) =>
       screenWidth <= other.previous().screenWidth;
@@ -79,3 +79,5 @@ InteractiveInkFeatureFactory get platformDependentSplashFactory =>
       TargetPlatform.iOS || TargetPlatform.macOS => NoSplash.splashFactory,
       _ => InkRipple.splashFactory,
     };
+
+const kNavBarHeight = 80.0;

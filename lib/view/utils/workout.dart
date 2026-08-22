@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
@@ -31,6 +30,7 @@ import 'package:gymtracker/view/utils/exercise.dart';
 import 'package:gymtracker/view/utils/input_decoration.dart';
 import 'package:gymtracker/view/utils/time.dart';
 import 'package:gymtracker/view/utils/weight_calculator.dart';
+import 'package:intl/intl.dart';
 
 class WorkoutExerciseEditor extends StatefulWidget {
   final Exercise exercise;
@@ -69,14 +69,13 @@ class _WorkoutExerciseEditorState extends State<WorkoutExerciseEditor> {
     return Scrollable(
       viewportBuilder: (BuildContext context, _) {
         var notesTextStyle = Theme.of(context).textTheme.bodyMedium!.copyWith(
-              fontSize: widget.exercise.notes.isEmpty ? 15 : null,
-              color: widget.exercise.notes.isEmpty
-                  ? Theme.of(context)
-                      .colorScheme
-                      .onSurface
-                      .withAlpha((0.75 * 255).round())
-                  : null,
-            );
+          fontSize: widget.exercise.notes.isEmpty ? 15 : null,
+          color: widget.exercise.notes.isEmpty
+              ? Theme.of(
+                  context,
+                ).colorScheme.onSurface.withAlpha((0.75 * 255).round())
+              : null,
+        );
         return Padding(
           padding: const EdgeInsets.symmetric(vertical: 8),
           child: Column(
@@ -96,7 +95,8 @@ class _WorkoutExerciseEditorState extends State<WorkoutExerciseEditor> {
                     const SizedBox(width: 16),
                     Expanded(
                       child: Text.rich(
-                          TextSpan(children: [
+                        TextSpan(
+                          children: [
                             TextSpan(text: widget.exercise.displayName),
                             if (widget.exercise.isCustom) ...[
                               const TextSpan(text: " "),
@@ -106,8 +106,10 @@ class _WorkoutExerciseEditorState extends State<WorkoutExerciseEditor> {
                                 child: CustomExerciseBadge(),
                               ),
                             ],
-                          ]),
-                          style: Theme.of(context).textTheme.titleMedium),
+                          ],
+                        ),
+                        style: Theme.of(context).textTheme.titleMedium,
+                      ),
                     ),
                     PopupMenuButton(
                       itemBuilder: (context) => <PopupMenuEntry<dynamic>>[
@@ -137,12 +139,14 @@ class _WorkoutExerciseEditorState extends State<WorkoutExerciseEditor> {
                           PopupMenuItem(
                             onTap: () {
                               widget.callbacks.onGroupExercisesIntoSuperset(
-                                  widget.index.exerciseIndex);
+                                widget.index.exerciseIndex,
+                              );
                             },
                             child: ListTile(
                               leading: const Icon(GTIcons.add_to_superset),
                               title: Text(
-                                  'ongoingWorkout.exercises.addToSuperset'.t),
+                                'ongoingWorkout.exercises.addToSuperset'.t,
+                              ),
                             ),
                           ),
                         if (!widget.exercise.parameters.isSetless ||
@@ -156,14 +160,14 @@ class _WorkoutExerciseEditorState extends State<WorkoutExerciseEditor> {
                                 : () async {
                                     final newIndices =
                                         await Go.toDialog<List<int>>(
-                                      () => _WorkoutReorderSetsDialog(
-                                        exercise: widget.exercise,
-                                        sets: widget.exercise.sets,
-                                        weightUnit: widget.weightUnit,
-                                        distanceUnit: widget.distanceUnit,
-                                        isConcrete: !widget.isCreating,
-                                      ),
-                                    );
+                                          () => _WorkoutReorderSetsDialog(
+                                            exercise: widget.exercise,
+                                            sets: widget.exercise.sets,
+                                            weightUnit: widget.weightUnit,
+                                            distanceUnit: widget.distanceUnit,
+                                            isConcrete: !widget.isCreating,
+                                          ),
+                                        );
                                     if (newIndices != null) {
                                       widget.callbacks.onExerciseSetReorder(
                                         widget.index,
@@ -174,46 +178,28 @@ class _WorkoutExerciseEditorState extends State<WorkoutExerciseEditor> {
                             child: ListTile(
                               leading: const Icon(GTIcons.reorder),
                               title: Text(
-                                  'ongoingWorkout.exercises.reorderSets'.t),
+                                'ongoingWorkout.exercises.reorderSets'.t,
+                              ),
                               enabled: widget.exercise.sets.isNotEmpty,
                             ),
                           ),
                         if (!widget.isCreating) ...[
-                          PopupMenuItem(
-                            onTap: () {
-                              showDialog<Optional<int?>>(
-                                context: context,
-                                builder: (context) {
-                                  return _WorkoutSetRPEDialog(
-                                    currentRPE: widget.exercise.rpe,
-                                  );
-                                },
-                              ).then((value) {
-                                if (value != null) {
-                                  widget.callbacks.onExerciseChangeRPE(
-                                    widget.index,
-                                    value.safeUnwrap(),
-                                  );
-                                }
-                              });
-                            },
-                            child: ListTile(
-                              leading: const Icon(GTIcons.rpe),
-                              title: Text('ongoingWorkout.exercises.setRPE'.t),
-                            ),
-                          ),
                           if (CardioTimerScreen.supportsTimer(
-                              widget.exercise)) ...[
+                            widget.exercise,
+                          )) ...[
                             PopupMenuItem(
                               onTap: () {
-                                Go.to(() => CardioTimerScreen.fromExercise(
-                                    widget.exercise));
+                                Go.to(
+                                  () => CardioTimerScreen.fromExercise(
+                                    widget.exercise,
+                                  ),
+                                );
                               },
                               child: ListTile(
                                 leading: const Icon(GTIcons.cardio_timer),
                                 title: Text(
-                                    'ongoingWorkout.exercises.startCardioTimer'
-                                        .t),
+                                  'ongoingWorkout.exercises.startCardioTimer'.t,
+                                ),
                               ),
                             ),
                           ],
@@ -260,8 +246,10 @@ class _WorkoutExerciseEditorState extends State<WorkoutExerciseEditor> {
                       return GTRichTextEditDialog(
                         controller: notesController,
                         onNotesChange: (text) {
-                          widget.callbacks
-                              .onExerciseNotesChange(widget.index, text);
+                          widget.callbacks.onExerciseNotesChange(
+                            widget.index,
+                            text,
+                          );
                           Get.back();
                         },
                       );
@@ -280,9 +268,11 @@ class _WorkoutExerciseEditorState extends State<WorkoutExerciseEditor> {
                           decoration: GymTrackerInputDecoration(
                             labelText: "exercise.fields.restTime".t,
                           ),
-                          onChangedTime: (value) => widget.callbacks
-                              .onExerciseChangeRestTime(
-                                  widget.index, value ?? Duration.zero),
+                          onChangedTime: (value) =>
+                              widget.callbacks.onExerciseChangeRestTime(
+                                widget.index,
+                                value ?? Duration.zero,
+                              ),
                         ),
                       ),
                       if (widget.exercise.parameters.isSetless &&
@@ -315,17 +305,12 @@ class _WorkoutExerciseEditorState extends State<WorkoutExerciseEditor> {
                     isCreating: widget.isCreating,
                     onSetSelectKind: (val) =>
                         widget.callbacks.onSetSelectKind(widget.index, i, val),
-                    onSetSetDone: (val) => widget.callbacks.onSetSetDone(
-                      widget.index,
-                      i,
-                      val,
-                    ),
+                    onSetSetDone: (val) =>
+                        widget.callbacks.onSetSetDone(widget.index, i, val),
+                    onSetChangeRPE: (val) =>
+                        widget.callbacks.onSetChangeRPE(widget.index, i, val),
                     onSetValueChange: (set) =>
-                        widget.callbacks.onSetValueChange(
-                      widget.index,
-                      i,
-                      set,
-                    ),
+                        widget.callbacks.onSetValueChange(widget.index, i, set),
                     weightUnit: widget.weightUnit,
                     distanceUnit: widget.distanceUnit,
                   ),
@@ -335,20 +320,20 @@ class _WorkoutExerciseEditorState extends State<WorkoutExerciseEditor> {
                   child: Text('exercise.actions.addSet'.t),
                 ),
               ],
-              if (kDebugMode) ...[
-                Text(
-                  "id: ${widget.exercise.id}",
-                  textAlign: TextAlign.center,
-                ),
-                Text(
-                  "parent: ${widget.exercise.parentID}",
-                  textAlign: TextAlign.center,
-                ),
-                Text(
-                  "supersede: ${widget.exercise.supersedesID}",
-                  textAlign: TextAlign.center,
-                ),
-              ],
+              // if (kDebugMode) ...[
+              //   Text(
+              //     "id: ${widget.exercise.id}",
+              //     textAlign: TextAlign.center,
+              //   ),
+              //   Text(
+              //     "parent: ${widget.exercise.parentID}",
+              //     textAlign: TextAlign.center,
+              //   ),
+              //   Text(
+              //     "supersede: ${widget.exercise.supersedesID}",
+              //     textAlign: TextAlign.center,
+              //   ),
+              // ],
               if (widget.createDivider) ...[
                 const SizedBox(height: 8),
                 const Divider(),
@@ -372,6 +357,7 @@ class WorkoutExerciseSetEditor extends StatefulWidget {
   final VoidCallback onDelete;
   final void Function(GTSetKind) onSetSelectKind;
   final void Function(bool) onSetSetDone;
+  final void Function(double?) onSetChangeRPE;
   final void Function(GTSet) onSetValueChange;
   final Weights weightUnit;
   final Distance distanceUnit;
@@ -385,6 +371,7 @@ class WorkoutExerciseSetEditor extends StatefulWidget {
     required this.isCreating,
     this.showDoneCheckbox = true,
     required this.onSetSelectKind,
+    required this.onSetChangeRPE,
     required this.onSetSetDone,
     required this.onDelete,
     required this.onSetValueChange,
@@ -399,16 +386,20 @@ class WorkoutExerciseSetEditor extends StatefulWidget {
 }
 
 class _WorkoutExerciseSetEditorState extends State<WorkoutExerciseSetEditor> {
-  late var weightController =
-      TextEditingController(text: stringifyDouble(widget.set.weight ?? 0));
+  late var weightController = TextEditingController(
+    text: stringifyDouble(widget.set.weight ?? 0),
+  );
   late var timeController = TextEditingController(
-      text: widget.set.time == null
-          ? "0"
-          : TimeInputField.encodeDuration(widget.set.time!));
-  late var repsController =
-      TextEditingController(text: (widget.set.reps ?? 0).toString());
-  late var distanceController =
-      TextEditingController(text: stringifyDouble(widget.set.distance ?? 0));
+    text: widget.set.time == null
+        ? "0"
+        : TimeInputField.encodeDuration(widget.set.time!),
+  );
+  late var repsController = TextEditingController(
+    text: (widget.set.reps ?? 0).toString(),
+  );
+  late var distanceController = TextEditingController(
+    text: stringifyDouble(widget.set.distance ?? 0),
+  );
 
   final _weightFocusNode = FocusNode();
   final _timeFocusNode = FocusNode();
@@ -427,7 +418,8 @@ class _WorkoutExerciseSetEditorState extends State<WorkoutExerciseSetEditor> {
     // Update data if a different actor edits it (such as a paired Apple Watch)
     subscription = Get.find<WorkoutController>().exercises.listen((exs) {
       logger.i(
-          "[${widget.index} -> ${widget.setIndex}] Refreshing because of exercise update");
+        "[${widget.index} -> ${widget.setIndex}] Refreshing because of exercise update",
+      );
       // if (Get.isRegistered<WorkoutController>()) {
       //   logger.w(
       //       "Called subscription listener, but WorkoutController has been discarded. Check for leaks.");
@@ -452,7 +444,8 @@ class _WorkoutExerciseSetEditorState extends State<WorkoutExerciseSetEditor> {
       }
       if (!mounted) {
         logger.w(
-            "[${widget.index} -> ${widget.setIndex}] Called subscription listener, but state is not mounted. Check for leaks.");
+          "[${widget.index} -> ${widget.setIndex}] Called subscription listener, but state is not mounted. Check for leaks.",
+        );
         return;
       }
       setState(() {});
@@ -462,7 +455,8 @@ class _WorkoutExerciseSetEditorState extends State<WorkoutExerciseSetEditor> {
   @override
   void dispose() {
     logger.i(
-        "[${widget.index} -> ${widget.setIndex}] Canceling subscription: $subscription");
+      "[${widget.index} -> ${widget.setIndex}] Canceling subscription: $subscription",
+    );
     subscription?.cancel();
     _weightFocusNode.dispose();
     super.dispose();
@@ -489,123 +483,117 @@ class _WorkoutExerciseSetEditorState extends State<WorkoutExerciseSetEditor> {
   }
 
   Widget get weightField => TextField(
-        focusNode: _weightFocusNode,
-        controller: weightController,
-        keyboardType: const TextInputType.numberWithOptions(
-          decimal: true,
-          signed: true,
-        ),
-        inputFormatters: [
-          FilteringTextInputFormatter.allow(RegExp("[0123456789.,]")),
-        ],
-        decoration: GymTrackerInputDecoration(
-          labelText: "exercise.fields.weight".t,
-          suffix: Text("units.${widget.weightUnit.name}".t),
-          suffixIconConstraints: const BoxConstraints(
-            minHeight: 24,
-          ),
-          suffixIcon: _weightFocusNode.hasFocus
-              ? IconButton(
-                  padding: const EdgeInsets.all(8),
-                  style: IconButton.styleFrom(
-                    minimumSize: const Size(0, 0),
+    focusNode: _weightFocusNode,
+    controller: weightController,
+    keyboardType: const TextInputType.numberWithOptions(
+      decimal: true,
+      signed: true,
+    ),
+    inputFormatters: [
+      FilteringTextInputFormatter.allow(RegExp("[0123456789.,]")),
+    ],
+    decoration: GymTrackerInputDecoration(
+      labelText: "exercise.fields.weight".t,
+      suffix: Text("units.${widget.weightUnit.name}".t),
+      suffixIconConstraints: const BoxConstraints(minHeight: 24),
+      suffixIcon: _weightFocusNode.hasFocus
+          ? IconButton(
+              padding: const EdgeInsets.all(8),
+              style: IconButton.styleFrom(minimumSize: const Size(0, 0)),
+              icon: const Icon(GTIcons.weight_calculator),
+              onPressed: () {
+                Go.toDialog(
+                  () => WeightCalculator(
+                    startingWeight: weightController.text.tryParseDouble(),
+                    weightUnit: widget.weightUnit,
+                    showInsertButton: true,
+                    onPressInsert: (weight) {
+                      weightController.text = stringifyDouble(weight);
+                      _updateSetWeight(weight);
+                    },
                   ),
-                  icon: const Icon(GTIcons.weight_calculator),
-                  onPressed: () {
-                    Go.toDialog(
-                      () => WeightCalculator(
-                        startingWeight: weightController.text.tryParseDouble(),
-                        weightUnit: widget.weightUnit,
-                        showInsertButton: true,
-                        onPressInsert: (weight) {
-                          weightController.text = stringifyDouble(weight);
-                          _updateSetWeight(weight);
-                        },
-                      ),
-                    );
-                  },
-                )
-              : null,
-        ),
-        onChanged: (value) {
-          _updateSetWeight(value.isEmpty ? null : value.tryParseDouble());
-        },
-      );
+                );
+              },
+            )
+          : null,
+    ),
+    onChanged: (value) {
+      _updateSetWeight(value.isEmpty ? null : value.tryParseDouble());
+    },
+  );
   Widget get timeField => TimeInputField(
-        focusNode: _timeFocusNode,
-        timerInteractive: () {
-          if (widget.isCreating) return false;
-          return !widget.set.done;
-        }(),
-        setID: widget.set.id,
-        controller: timeController,
-        decoration: GymTrackerInputDecoration(
-          labelText: "exercise.fields.time".t,
-        ),
-        onChanged: (value) {
-          final newSet = widget.set.copyWith(
-            time: value.isEmpty ? null : TimeInputField.parseDuration(value),
-          );
-          widget.onSetValueChange(newSet);
-        },
+    focusNode: _timeFocusNode,
+    timerInteractive: () {
+      if (widget.isCreating) return false;
+      return !widget.set.done;
+    }(),
+    setID: widget.set.id,
+    controller: timeController,
+    decoration: GymTrackerInputDecoration(labelText: "exercise.fields.time".t),
+    onChanged: (value) {
+      final newSet = widget.set.copyWith(
+        time: value.isEmpty ? null : TimeInputField.parseDuration(value),
       );
+      widget.onSetValueChange(newSet);
+    },
+  );
   TextField get repsField => TextField(
-        focusNode: _repsFocusNode,
-        controller: repsController,
-        keyboardType: const TextInputType.numberWithOptions(
-          decimal: true,
-          signed: true,
-        ),
-        inputFormatters: [
-          FilteringTextInputFormatter.digitsOnly,
-        ],
-        decoration: GymTrackerInputDecoration(
-          labelText: "exercise.fields.reps".t,
-        ),
-        onChanged: (value) {
-          final newSet = widget.set.copyWith(
-            reps: value.isEmpty ? null : int.tryParse(value),
-          );
-          widget.onSetValueChange(newSet);
-        },
+    focusNode: _repsFocusNode,
+    controller: repsController,
+    keyboardType: const TextInputType.numberWithOptions(
+      decimal: true,
+      signed: true,
+    ),
+    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+    decoration: GymTrackerInputDecoration(labelText: "exercise.fields.reps".t),
+    onChanged: (value) {
+      final newSet = widget.set.copyWith(
+        reps: value.isEmpty ? null : int.tryParse(value),
       );
+      widget.onSetValueChange(newSet);
+    },
+  );
   TextField get distanceField => TextField(
-        focusNode: _distanceFocusNode,
-        controller: distanceController,
-        keyboardType: const TextInputType.numberWithOptions(
-          decimal: true,
-          signed: true,
-        ),
-        inputFormatters: [
-          FilteringTextInputFormatter.allow(RegExp("[0123456789.,]")),
-        ],
-        decoration: GymTrackerInputDecoration(
-          labelText: "exercise.fields.distance".t,
-          suffix: Text("units.${widget.distanceUnit.name}".t),
-        ),
-        onChanged: (value) {
-          final newSet = widget.set.copyWith(
-            distance: value.isEmpty ? null : value.tryParseDouble(),
-          );
-          widget.onSetValueChange(newSet);
-        },
+    focusNode: _distanceFocusNode,
+    controller: distanceController,
+    keyboardType: const TextInputType.numberWithOptions(
+      decimal: true,
+      signed: true,
+    ),
+    inputFormatters: [
+      FilteringTextInputFormatter.allow(RegExp("[0123456789.,]")),
+    ],
+    decoration: GymTrackerInputDecoration(
+      labelText: "exercise.fields.distance".t,
+      suffix: Text("units.${widget.distanceUnit.name}".t),
+    ),
+    onChanged: (value) {
+      final newSet = widget.set.copyWith(
+        distance: value.isEmpty ? null : value.tryParseDouble(),
       );
+      widget.onSetValueChange(newSet);
+    },
+  );
 
   List<Widget> get fields => [
-        if ([GTSetParameters.repsWeight, GTSetParameters.timeWeight]
-            .contains(widget.set.parameters))
-          weightField,
-        if ([
-          GTSetParameters.timeWeight,
-          GTSetParameters.time,
-        ].contains(widget.set.parameters))
-          timeField,
-        if ([GTSetParameters.repsWeight, GTSetParameters.freeBodyReps]
-            .contains(widget.set.parameters))
-          repsField,
-        if ([GTSetParameters.distance].contains(widget.set.parameters))
-          distanceField,
-      ];
+    if ([
+      GTSetParameters.repsWeight,
+      GTSetParameters.timeWeight,
+    ].contains(widget.set.parameters))
+      weightField,
+    if ([
+      GTSetParameters.timeWeight,
+      GTSetParameters.time,
+    ].contains(widget.set.parameters))
+      timeField,
+    if ([
+      GTSetParameters.repsWeight,
+      GTSetParameters.freeBodyReps,
+    ].contains(widget.set.parameters))
+      repsField,
+    if ([GTSetParameters.distance].contains(widget.set.parameters))
+      distanceField,
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -691,10 +679,12 @@ class _WorkoutExerciseSetEditorState extends State<WorkoutExerciseSetEditor> {
                                         allSets: widget.exercise.sets,
                                         fontSize: 16,
                                       ),
-                                      title:
-                                          Text('set.kindLong.${kind.name}'.t),
-                                      subtitle:
-                                          Text('set.kinds.help.${kind.name}'.t),
+                                      title: Text(
+                                        'set.kindLong.${kind.name}'.t,
+                                      ),
+                                      subtitle: Text(
+                                        'set.kinds.help.${kind.name}'.t,
+                                      ),
                                     ),
                                 ],
                               ),
@@ -703,8 +693,11 @@ class _WorkoutExerciseSetEditorState extends State<WorkoutExerciseSetEditor> {
                                   onPressed: () {
                                     Navigator.pop(context);
                                   },
-                                  child: Text(MaterialLocalizations.of(context)
-                                      .okButtonLabel),
+                                  child: Text(
+                                    MaterialLocalizations.of(
+                                      context,
+                                    ).okButtonLabel,
+                                  ),
                                 ),
                               ],
                             );
@@ -727,8 +720,24 @@ class _WorkoutExerciseSetEditorState extends State<WorkoutExerciseSetEditor> {
                 const SizedBox(width: 8),
                 for (int i = 0; i < fields.length; i++) ...[
                   if (i != 0) const SizedBox(width: 8),
-                  Flexible(child: fields[i])
+                  Flexible(child: fields[i]),
                 ],
+                const SizedBox(width: 8),
+                IconButton(
+                  onPressed: () {
+                    showDialog<Optional<double?>>(
+                      context: context,
+                      builder: (context) {
+                        return WorkoutSetRPEDialog(currentRPE: widget.set.rpe);
+                      },
+                    ).then((value) {
+                      if (value != null) {
+                        widget.onSetChangeRPE(value.safeUnwrap());
+                      }
+                    });
+                  },
+                  icon: RPECompactColumn(rpe: widget.set.rpe),
+                ),
                 const SizedBox(width: 8),
                 if (!widget.isCreating && widget.showDoneCheckbox) ...[
                   ValueBuilder<bool?>(
@@ -758,18 +767,76 @@ class _WorkoutExerciseSetEditorState extends State<WorkoutExerciseSetEditor> {
   }
 }
 
-class _WorkoutSetRPEDialog extends StatefulWidget {
-  final int? currentRPE;
+class RPECompactColumn extends StatelessWidget {
+  const RPECompactColumn({super.key, required this.rpe});
 
-  const _WorkoutSetRPEDialog({this.currentRPE});
+  final double? rpe;
+
+  Size _textSize(String text, TextStyle style) {
+    final TextPainter textPainter = TextPainter(
+      text: TextSpan(text: text, style: style),
+      maxLines: 1,
+      textDirection: .ltr,
+    )..layout(minWidth: 0, maxWidth: double.infinity);
+    return textPainter.size;
+  }
 
   @override
-  State<_WorkoutSetRPEDialog> createState() => __WorkoutSetRPEDialogState();
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    // Assuming 9.9 is our maximal "em-size"
+    final width =
+        _textSize(
+          NumberFormat.compact(locale: context.locale.languageCode).format(9.9),
+          TextStyle(fontSize: 12),
+        ).width +
+        4; // Add some padding
+    return SizedBox(
+      width: width,
+      child: Center(
+        child: Column(
+          children: [
+            Text(
+              "RPE",
+              style: TextStyle(
+                fontSize: 8,
+                color: rpe == null
+                    ? scheme.onSurface.withAlpha((0.5 * 255).round())
+                    : rpeColor(context, rpe!),
+              ),
+            ),
+            Text(
+              rpe == null
+                  ? "-"
+                  : NumberFormat.compact(
+                      locale: context.locale.languageCode,
+                    ).format(rpe),
+              style: TextStyle(
+                fontSize: 12,
+                color: rpe == null
+                    ? scheme.onSurface.withAlpha((0.5 * 255).round())
+                    : rpeColor(context, rpe!),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }
 
-class __WorkoutSetRPEDialogState extends State<_WorkoutSetRPEDialog> {
+class WorkoutSetRPEDialog extends StatefulWidget {
+  final double? currentRPE;
+
+  const WorkoutSetRPEDialog({this.currentRPE});
+
+  @override
+  State<WorkoutSetRPEDialog> createState() => _WorkoutSetRPEDialogState();
+}
+
+class _WorkoutSetRPEDialogState extends State<WorkoutSetRPEDialog> {
   // Average
-  late int currentRPE = widget.currentRPE ?? 5;
+  late double currentRPE = widget.currentRPE ?? 5.0;
 
   @override
   Widget build(BuildContext context) {
@@ -778,32 +845,54 @@ class __WorkoutSetRPEDialogState extends State<_WorkoutSetRPEDialog> {
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          ListTile(
-            leading: const Icon(GTIcons.help),
-            title: Text('exercise.editor.fields.rpe.description.title'.t),
-            subtitle: Text('exercise.editor.fields.rpe.description.text'.t),
-          ),
-          ListTile(
-            leading: const Icon(GTIcons.rpe),
-            title: Text('exercise.editor.fields.rpe.level$currentRPE.title'.t),
-            subtitle:
-                Text('exercise.editor.fields.rpe.level$currentRPE.text'.t),
+          Expanded(
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
+                  ListTile(
+                    leading: const Icon(GTIcons.help),
+                    subtitle: Text(
+                      'exercise.editor.fields.rpe.description.text'.t,
+                    ),
+                  ),
+                  ListTile(
+                    leading: const Icon(GTIcons.rpe),
+                    title: Text(
+                      'exercise.editor.fields.rpe.level${currentRPE.toInt()}.title'
+                          .t,
+                    ),
+                    subtitle: Text(
+                      'exercise.editor.fields.rpe.level${currentRPE.toInt()}.text'
+                          .t,
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ),
           Slider(
+            year2023: false,
             value: currentRPE.toDouble(),
             secondaryTrackValue: widget.currentRPE?.toDouble(),
             onChanged: (value) {
               setState(() {
-                currentRPE = value.toInt();
+                currentRPE = value;
               });
             },
             min: 1,
             max: 10,
-            divisions: 9,
-            label: currentRPE.toString(),
+            divisions: 18,
+            label: NumberFormat.compact(
+              locale: context.locale.languageCode,
+            ).format(currentRPE),
             activeColor: rpeColor(context, currentRPE),
-            secondaryActiveColor: rpeColor(context, widget.currentRPE ?? 5)
-                .withAlpha((0.54 * 255).round()),
+            secondaryActiveColor: rpeColor(
+              context,
+              widget.currentRPE ?? 5,
+            ).withAlpha((0.54 * 255).round()),
+            inactiveColor: Theme.of(
+              context,
+            ).colorScheme.onSurface.withAlpha((0.12 * 255).round()),
           ),
         ],
       ),
@@ -816,13 +905,13 @@ class __WorkoutSetRPEDialogState extends State<_WorkoutSetRPEDialog> {
         ),
         TextButton(
           onPressed: () {
-            Navigator.pop<Optional<int?>>(context, const None());
+            Navigator.pop<Optional<double?>>(context, const None());
           },
           child: Text("exercise.editor.fields.rpe.removeRPE".t),
         ),
         TextButton(
           onPressed: () {
-            Navigator.pop<Optional<int?>>(context, Some(currentRPE));
+            Navigator.pop<Optional<double?>>(context, Some(currentRPE));
           },
           child: Text(MaterialLocalizations.of(context).okButtonLabel),
         ),

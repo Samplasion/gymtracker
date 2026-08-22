@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_quill/flutter_quill.dart';
@@ -57,20 +59,50 @@ class _RoutineCreatorState extends State<RoutineCreator> {
     document: (widget.base?.infobox ?? "").asQuillDocument(),
     selection: const TextSelection.collapsed(offset: 0),
   );
+  bool _titleIsTouched = false;
 
   RoutinesController get workoutsController => Get.find<RoutinesController>();
+
+  StreamSubscription? _titleUpdateStreamSubscription;
 
   @override
   void initState() {
     super.initState();
     if (widget.base != null) {
+      _titleIsTouched = true;
       _controller.exercises(
-          widget.base!.exercises.map((e) => e.clone()).toList().wrap());
+        widget.base!.exercises.map((e) => e.clone()).toList().wrap(),
+      );
+    } else {
+      titleController.text = generateWorkoutTitle({});
+      _titleUpdateStreamSubscription = _controller.exercises.listen((
+        exercises,
+      ) {
+        if (!_titleIsTouched) {
+          titleController.text = generateWorkoutTitle(
+            exercises
+                .map((e) => e.data)
+                .expand((e) {
+                  if (e is Exercise) {
+                    return {e.primaryMuscleGroup.category};
+                  } else if (e is Superset) {
+                    return e.exercises.expand(
+                      (ex) => {ex.primaryMuscleGroup.category},
+                    );
+                  }
+                  return <GTMuscleCategory>{};
+                })
+                .whereType<GTMuscleCategory>()
+                .toSet(),
+          );
+        }
+      });
     }
   }
 
   @override
   void dispose() {
+    _titleUpdateStreamSubscription?.cancel();
     Get.delete<_RoutineCreatorController>();
     super.dispose();
   }
@@ -87,10 +119,7 @@ class _RoutineCreatorState extends State<RoutineCreator> {
           }
         }()),
         actions: [
-          IconButton(
-            icon: const Icon(GTIcons.done),
-            onPressed: _submit,
-          )
+          IconButton(icon: const Icon(GTIcons.done), onPressed: _submit),
         ],
       ),
       body: Form(
@@ -104,12 +133,19 @@ class _RoutineCreatorState extends State<RoutineCreator> {
                 decoration: GymTrackerInputDecoration(
                   labelText: "routines.editor.fields.name.label".t,
                 ),
-                autovalidateMode: AutovalidateMode.onUserInteraction,
+                autovalidateMode: AutovalidateMode.always,
                 validator: (string) {
                   if (string == null || string.isEmpty) {
                     return "routines.editor.fields.name.errors.empty".t;
                   }
                   return null;
+                },
+                onChanged: (value) {
+                  if (!_titleIsTouched) {
+                    setState(() {
+                      _titleIsTouched = true;
+                    });
+                  }
                 },
               ),
               GTRichTextEditor(
@@ -120,36 +156,42 @@ class _RoutineCreatorState extends State<RoutineCreator> {
                 ),
                 onTapOutside: () {},
               ),
-              Text("routines.editor.exercises.title".t,
-                  style: Theme.of(context).textTheme.titleMedium),
-            ].map((c) => Padding(
-                  padding: const EdgeInsets.symmetric(
-                    vertical: 16,
-                    horizontal: 16,
-                  ).copyWith(top: 0),
-                  child: c,
-                )),
+              Text(
+                "routines.editor.exercises.title".t,
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
+            ].map(
+              (c) => Padding(
+                padding: const EdgeInsets.symmetric(
+                  vertical: 16,
+                  horizontal: 16,
+                ).copyWith(top: 0),
+                child: c,
+              ),
+            ),
             ListTile(
               title: Text("routines.editor.exercises.add".t),
               leading: const CircleAvatar(child: Icon(GTIcons.add_exercise)),
               onTap: () {
-                Go.to<List<Exercise>>(() => const ExercisePicker(
-                      singlePick: false,
-                    )).then((result) {
+                Go.to<List<Exercise>>(
+                  () => const ExercisePicker(singlePick: false),
+                ).then((result) {
                   result ??= [];
                   setState(() {
-                    _controller.exercises.addAll(result!
-                        .map((ex) {
-                          return ex.makeChild().copyWith.sets([
-                            if (!ex.parameters.isSetless)
-                              GTSet.empty(
-                                kind: GTSetKind.normal,
-                                parameters: ex.parameters,
-                              ),
-                          ]);
-                        })
-                        .toList()
-                        .wrap());
+                    _controller.exercises.addAll(
+                      result!
+                          .map((ex) {
+                            return ex.makeChild().copyWith.sets([
+                              if (!ex.parameters.isSetless)
+                                GTSet.empty(
+                                  kind: GTSetKind.normal,
+                                  parameters: ex.parameters,
+                                ),
+                            ]);
+                          })
+                          .toList()
+                          .wrap(),
+                    );
                   });
                 });
               },
@@ -158,19 +200,21 @@ class _RoutineCreatorState extends State<RoutineCreator> {
               title: Text("routines.editor.superset.add".t),
               leading: const CircleAvatar(child: Icon(GTIcons.add_superset)),
               onTap: () {
-                Go.to<List<Exercise>>(() => const ExercisePicker(
-                      singlePick: false,
-                    )).then((result) {
+                Go.to<List<Exercise>>(
+                  () => const ExercisePicker(singlePick: false),
+                ).then((result) {
                   result ??= [];
                   setState(() {
                     // controller.exercises.addAll(result!.wrap());
-                    _controller.exercises.add(_DateWrapped(
-                      Superset(
-                        restTime: Duration.zero,
-                        exercises: [for (final ex in result!) ex.makeChild()],
-                        workoutID: widget.base?.id,
+                    _controller.exercises.add(
+                      _DateWrapped(
+                        Superset(
+                          restTime: Duration.zero,
+                          exercises: [for (final ex in result!) ex.makeChild()],
+                          workoutID: widget.base?.id,
+                        ),
                       ),
-                    ));
+                    );
                   });
                 });
               },
@@ -197,30 +241,50 @@ class _RoutineCreatorState extends State<RoutineCreator> {
     );
   }
 
-  Widget exerciseEntry(int i) =>
-      _controller.exercises[i].data.map(exercise: (ex) {
-        return WorkoutExerciseEditor(
-          key: ValueKey("${ex.name}${_controller.exercises[i].date}"),
-          exercise: ex,
-          index: (exerciseIndex: i, supersetIndex: null),
-          isCreating: true,
-          weightUnit: Get.find<SettingsController>().weightUnit.value,
-          distanceUnit: Get.find<SettingsController>().distanceUnit.value,
-          callbacks: _controller.callbacks,
-        );
-      }, superset: (ss) {
-        return SupersetEditor(
-          key: ValueKey("superset-${ss.id}${_controller.exercises[i].date}"),
-          superset: ss,
-          index: i,
-          isCreating: true,
-          weightUnit: Get.find<SettingsController>().weightUnit.value,
-          distanceUnit: Get.find<SettingsController>().distanceUnit.value,
-          callbacks: _controller.callbacks,
-        );
-      });
+  Widget exerciseEntry(int i) => _controller.exercises[i].data.map(
+    exercise: (ex) {
+      return WorkoutExerciseEditor(
+        key: ValueKey("${ex.name}${_controller.exercises[i].date}"),
+        exercise: ex,
+        index: (exerciseIndex: i, supersetIndex: null),
+        isCreating: true,
+        weightUnit: Get.find<SettingsController>().weightUnit.value,
+        distanceUnit: Get.find<SettingsController>().distanceUnit.value,
+        callbacks: _controller.callbacks,
+      );
+    },
+    superset: (ss) {
+      return SupersetEditor(
+        key: ValueKey("superset-${ss.id}${_controller.exercises[i].date}"),
+        superset: ss,
+        index: i,
+        isCreating: true,
+        weightUnit: Get.find<SettingsController>().weightUnit.value,
+        distanceUnit: Get.find<SettingsController>().distanceUnit.value,
+        callbacks: _controller.callbacks,
+      );
+    },
+  );
 
   void _submit() {
+    if (!_titleIsTouched) {
+      titleController.text = generateWorkoutTitle(
+        _controller.exercises
+            .unwrap()
+            .expand((e) {
+              if (e is Exercise) {
+                return {e.primaryMuscleGroup.category};
+              } else if (e is Superset) {
+                return e.exercises.expand(
+                  (ex) => {ex.primaryMuscleGroup.category},
+                );
+              }
+              return <GTMuscleCategory>{};
+            })
+            .whereType<GTMuscleCategory>()
+            .toSet(),
+      );
+    }
     final isValid = formKey.currentState!.validate();
 
     if (isValid) {
@@ -253,283 +317,298 @@ class _RoutineCreatorController extends GetxController {
   final exercises = <_DateWrapped<WorkoutExercisable>>[].obs;
 
   EditorCallbacks get callbacks => EditorCallbacks.creation(
-        onExerciseReplace: (index) {
-          final (exerciseIndex: i, supersetIndex: supersetIndex) = index;
-          SchedulerBinding.instance.addPostFrameCallback((timeStamp) async {
-            final ex = await Go.to<List<Exercise>>(
-                () => const ExercisePicker(singlePick: true));
-            if (ex == null || ex.isEmpty) return;
-            final newExercise = ex.first.makeChild().copyWith.sets([
-              if (!ex.first.parameters.isSetless)
-                GTSet.empty(
-                  kind: GTSetKind.normal,
-                  parameters: ex.first.parameters,
-                ),
-            ]);
-            if (supersetIndex == null) {
-              exercises[i].data = newExercise;
-            } else {
-              exercises[supersetIndex].data =
-                  (exercises[supersetIndex].data as Superset)
-                      .copyWith(exercises: [
-                for (int j = 0;
+    onExerciseReplace: (index) {
+      final (exerciseIndex: i, supersetIndex: supersetIndex) = index;
+      SchedulerBinding.instance.addPostFrameCallback((timeStamp) async {
+        final ex = await Go.to<List<Exercise>>(
+          () => const ExercisePicker(singlePick: true),
+        );
+        if (ex == null || ex.isEmpty) return;
+        final newExercise = ex.first.makeChild().copyWith.sets([
+          if (!ex.first.parameters.isSetless)
+            GTSet.empty(
+              kind: GTSetKind.normal,
+              parameters: ex.first.parameters,
+            ),
+        ]);
+        if (supersetIndex == null) {
+          exercises[i].data = newExercise;
+        } else {
+          exercises[supersetIndex].data =
+              (exercises[supersetIndex].data as Superset).copyWith(
+                exercises: [
+                  for (
+                    int j = 0;
                     j < (exercises[supersetIndex] as Superset).exercises.length;
-                    j++)
-                  if (j == i)
-                    newExercise
-                  else
-                    (exercises[supersetIndex] as Superset).exercises[j]
-              ]);
-            }
-            _controller.exercises.refresh();
-          });
-        },
-        onExerciseRemove: (index) {
-          final (exerciseIndex: i, supersetIndex: supersetIndex) = index;
-          if (supersetIndex == null) {
-            exercises.removeAt(i);
-          } else {
-            exercises[supersetIndex].data =
-                (exercises[supersetIndex].data as Superset)
-                    .copyWith(exercises: [
-              for (int j = 0;
-                  j < (exercises[supersetIndex] as Superset).exercises.length;
-                  j++)
-                if (j != i) (exercises[supersetIndex] as Superset).exercises[j]
-            ]);
-          }
-          _controller.exercises.refresh();
-        },
-        onExerciseChangeRestTime: (index, value) {
-          final (exerciseIndex: i, supersetIndex: supersetIndex) = index;
-          if (supersetIndex == null) {
-            final ex = exercises[i].data;
-            // Type safety
-            exercises[i].data = ex is Exercise
-                ? ex.copyWith(
-                    restTime: value,
+                    j++
                   )
-                : ex is Superset
-                    ? ex.copyWith(
-                        restTime: value,
-                      )
-                    : throw AssertionError("Unreachable yet");
-          } else {
-            // We don't support rest time for individual exercises in a superset
-            throw UnimplementedError();
-          }
-          _controller.exercises.refresh();
-        },
-        onExerciseSetReorder: (index, newIndices) {
-          final (exerciseIndex: i, supersetIndex: supersetIndex) = index;
-          if (supersetIndex == null) {
-            final ex = exercises[i].data as Exercise;
-            final newSets = [
-              for (final newIndex in newIndices) ex.sets[newIndex]
-            ];
-            exercises[i].data = ex.copyWith(sets: newSets);
-          } else {
-            final superset = exercises[supersetIndex].data as Superset;
-            exercises[supersetIndex].data = superset.copyWith(exercises: [
-              for (int j = 0; j < superset.exercises.length; j++)
-                if (j == i)
-                  superset.exercises[j].copyWith(
-                    sets: [
-                      for (final newIndex in newIndices)
-                        superset.exercises[j].sets[newIndex]
-                    ],
-                  )
-                else
-                  superset.exercises[j]
-            ]);
-          }
-          _controller.exercises.refresh();
-        },
-        onSetCreate: (index) {
-          final (exerciseIndex: i, supersetIndex: supersetIndex) = index;
-          if (supersetIndex == null) {
-            final ex = exercises[i].data as Exercise;
-            ex.sets.add(
-              GTSet.empty(
-                kind: GTSetKind.normal,
-                parameters: ex.parameters,
-              ),
-            );
-          } else {
-            final ex = (exercises[supersetIndex].data as Superset).exercises[i];
-            ex.sets.add(
-              GTSet.empty(
-                kind: GTSetKind.normal,
-                parameters: ex.parameters,
-              ),
-            );
-          }
-          _controller.exercises.refresh();
-        },
-        onSetRemove: (exerciseIndex, index) {
-          final (exerciseIndex: i, supersetIndex: supersetIndex) =
-              exerciseIndex;
-          if (supersetIndex == null) {
-            final ex = exercises[i].data as Exercise;
-            exercises[i].data = ex.copyWith(
-              sets: [
-                for (int j = 0; j < ex.sets.length; j++)
-                  if (j != index) ex.sets[j]
-              ],
-            );
-          } else {
-            final ex = (exercises[supersetIndex].data as Superset).exercises[i];
-            (exercises[supersetIndex].data as Superset).exercises[i] =
-                ex.copyWith(
-              sets: [
-                for (int j = 0; j < ex.sets.length; j++)
-                  if (j != index) ex.sets[j]
-              ],
-            );
-          }
+                    if (j == i)
+                      newExercise
+                    else
+                      (exercises[supersetIndex] as Superset).exercises[j],
+                ],
+              );
+        }
+        _controller.exercises.refresh();
+      });
+    },
+    onExerciseRemove: (index) {
+      final (exerciseIndex: i, supersetIndex: supersetIndex) = index;
+      if (supersetIndex == null) {
+        exercises.removeAt(i);
+      } else {
+        exercises[supersetIndex]
+            .data = (exercises[supersetIndex].data as Superset).copyWith(
+          exercises: [
+            for (
+              int j = 0;
+              j < (exercises[supersetIndex] as Superset).exercises.length;
+              j++
+            )
+              if (j != i) (exercises[supersetIndex] as Superset).exercises[j],
+          ],
+        );
+      }
+      _controller.exercises.refresh();
+    },
+    onExerciseChangeRestTime: (index, value) {
+      final (exerciseIndex: i, supersetIndex: supersetIndex) = index;
+      if (supersetIndex == null) {
+        final ex = exercises[i].data;
+        // Type safety
+        exercises[i].data = ex is Exercise
+            ? ex.copyWith(restTime: value)
+            : ex is Superset
+            ? ex.copyWith(restTime: value)
+            : throw AssertionError("Unreachable yet");
+      } else {
+        // We don't support rest time for individual exercises in a superset
+        throw UnimplementedError();
+      }
+      _controller.exercises.refresh();
+    },
+    onExerciseSetReorder: (index, newIndices) {
+      final (exerciseIndex: i, supersetIndex: supersetIndex) = index;
+      if (supersetIndex == null) {
+        final ex = exercises[i].data as Exercise;
+        final newSets = [for (final newIndex in newIndices) ex.sets[newIndex]];
+        exercises[i].data = ex.copyWith(sets: newSets);
+      } else {
+        final superset = exercises[supersetIndex].data as Superset;
+        exercises[supersetIndex].data = superset.copyWith(
+          exercises: [
+            for (int j = 0; j < superset.exercises.length; j++)
+              if (j == i)
+                superset.exercises[j].copyWith(
+                  sets: [
+                    for (final newIndex in newIndices)
+                      superset.exercises[j].sets[newIndex],
+                  ],
+                )
+              else
+                superset.exercises[j],
+          ],
+        );
+      }
+      _controller.exercises.refresh();
+    },
+    onSetCreate: (index) {
+      final (exerciseIndex: i, supersetIndex: supersetIndex) = index;
+      if (supersetIndex == null) {
+        final ex = exercises[i].data as Exercise;
+        ex.sets.add(
+          GTSet.empty(kind: GTSetKind.normal, parameters: ex.parameters),
+        );
+      } else {
+        final ex = (exercises[supersetIndex].data as Superset).exercises[i];
+        ex.sets.add(
+          GTSet.empty(kind: GTSetKind.normal, parameters: ex.parameters),
+        );
+      }
+      _controller.exercises.refresh();
+    },
+    onSetRemove: (exerciseIndex, index) {
+      final (exerciseIndex: i, supersetIndex: supersetIndex) = exerciseIndex;
+      if (supersetIndex == null) {
+        final ex = exercises[i].data as Exercise;
+        exercises[i].data = ex.copyWith(
+          sets: [
+            for (int j = 0; j < ex.sets.length; j++)
+              if (j != index) ex.sets[j],
+          ],
+        );
+      } else {
+        final ex = (exercises[supersetIndex].data as Superset).exercises[i];
+        (exercises[supersetIndex].data as Superset).exercises[i] = ex.copyWith(
+          sets: [
+            for (int j = 0; j < ex.sets.length; j++)
+              if (j != index) ex.sets[j],
+          ],
+        );
+      }
 
-          _controller.exercises.refresh();
-        },
-        onSetSelectKind: (index, setIndex, kind) {
-          final (exerciseIndex: i, supersetIndex: supersetIndex) = index;
-          if (supersetIndex == null) {
-            final ex = exercises[i].data as Exercise;
-            exercises[i].data = ex.copyWith(
-              sets: [
-                for (int j = 0; j < ex.sets.length; j++)
-                  if (j == setIndex)
-                    ex.sets[j].copyWith(kind: kind)
-                  else
-                    ex.sets[j]
-              ],
-            );
-          } else {
-            final ex = (exercises[supersetIndex].data as Superset).exercises[i];
-            (exercises[supersetIndex].data as Superset).exercises[i] =
-                ex.copyWith(
-              sets: [
-                for (int j = 0; j < ex.sets.length; j++)
-                  if (j == setIndex)
-                    ex.sets[j].copyWith(kind: kind)
-                  else
-                    ex.sets[j]
-              ],
-            );
-          }
-          _controller.exercises.refresh();
-        },
-        onSetValueChange: (index, setIndex, newSet) {
-          final (exerciseIndex: i, supersetIndex: supersetIndex) = index;
-          if (supersetIndex == null) {
-            final ex = exercises[i].data as Exercise;
-            exercises[i].data = ex.copyWith(
-              sets: [
-                for (int j = 0; j < ex.sets.length; j++)
-                  if (j == setIndex) newSet else ex.sets[j]
-              ],
-            );
-          } else {
-            final ex = (exercises[supersetIndex].data as Superset).exercises[i];
-            (exercises[supersetIndex].data as Superset).exercises[i] =
-                ex.copyWith(
-              sets: [
-                for (int j = 0; j < ex.sets.length; j++)
-                  if (j == setIndex) newSet else ex.sets[j]
-              ],
-            );
-          }
-          _controller.exercises.refresh();
-        },
-        onExerciseNotesChange: (index, notes) {
-          final (
-            exerciseIndex: exerciseIndex,
-            supersetIndex: supersetIndex,
-          ) = index;
+      _controller.exercises.refresh();
+    },
+    onSetSelectKind: (index, setIndex, kind) {
+      final (exerciseIndex: i, supersetIndex: supersetIndex) = index;
+      if (supersetIndex == null) {
+        final ex = exercises[i].data as Exercise;
+        exercises[i].data = ex.copyWith(
+          sets: [
+            for (int j = 0; j < ex.sets.length; j++)
+              if (j == setIndex)
+                ex.sets[j].copyWith(kind: kind)
+              else
+                ex.sets[j],
+          ],
+        );
+      } else {
+        final ex = (exercises[supersetIndex].data as Superset).exercises[i];
+        (exercises[supersetIndex].data as Superset).exercises[i] = ex.copyWith(
+          sets: [
+            for (int j = 0; j < ex.sets.length; j++)
+              if (j == setIndex)
+                ex.sets[j].copyWith(kind: kind)
+              else
+                ex.sets[j],
+          ],
+        );
+      }
+      _controller.exercises.refresh();
+    },
+    onSetChangeRPE: (exerciseIndex, setIndex, newRPE) {
+      final (exerciseIndex: i, supersetIndex: supersetIndex) = exerciseIndex;
+      if (supersetIndex == null) {
+        final ex = exercises[i].data as Exercise;
+        exercises[i].data = ex.copyWith(
+          sets: [
+            for (int j = 0; j < ex.sets.length; j++)
+              if (j == setIndex)
+                ex.sets[j].copyWith(rpe: newRPE)
+              else
+                ex.sets[j],
+          ],
+        );
+      } else {
+        final ex = (exercises[supersetIndex].data as Superset).exercises[i];
+        (exercises[supersetIndex].data as Superset).exercises[i] = ex.copyWith(
+          sets: [
+            for (int j = 0; j < ex.sets.length; j++)
+              if (j == setIndex)
+                ex.sets[j].copyWith(rpe: newRPE)
+              else
+                ex.sets[j],
+          ],
+        );
+      }
+      _controller.exercises.refresh();
+    },
+    onSetValueChange: (index, setIndex, newSet) {
+      final (exerciseIndex: i, supersetIndex: supersetIndex) = index;
+      if (supersetIndex == null) {
+        final ex = exercises[i].data as Exercise;
+        exercises[i].data = ex.copyWith(
+          sets: [
+            for (int j = 0; j < ex.sets.length; j++)
+              if (j == setIndex) newSet else ex.sets[j],
+          ],
+        );
+      } else {
+        final ex = (exercises[supersetIndex].data as Superset).exercises[i];
+        (exercises[supersetIndex].data as Superset).exercises[i] = ex.copyWith(
+          sets: [
+            for (int j = 0; j < ex.sets.length; j++)
+              if (j == setIndex) newSet else ex.sets[j],
+          ],
+        );
+      }
+      _controller.exercises.refresh();
+    },
+    onExerciseNotesChange: (index, notes) {
+      final (exerciseIndex: exerciseIndex, supersetIndex: supersetIndex) =
+          index;
 
-          if (supersetIndex == null) {
-            final ex = exercises[exerciseIndex].data;
-            // Type safety
-            exercises[exerciseIndex].data = ex is Exercise
-                ? ex.copyWith(
-                    notes: notes,
-                  )
-                : ex is Superset
-                    ? ex.copyWith(
-                        notes: notes,
-                      )
-                    : throw AssertionError("Unreachable yet");
-          } else {
-            final superset = exercises[supersetIndex].data as Superset;
-            exercises[supersetIndex].data = superset.copyWith(exercises: [
-              for (int j = 0; j < superset.exercises.length; j++)
-                if (j == exerciseIndex)
-                  superset.exercises[j].copyWith(
-                    notes: notes,
-                  )
-                else
-                  superset.exercises[j]
-            ]);
-          }
+      if (supersetIndex == null) {
+        final ex = exercises[exerciseIndex].data;
+        // Type safety
+        exercises[exerciseIndex].data = ex is Exercise
+            ? ex.copyWith(notes: notes)
+            : ex is Superset
+            ? ex.copyWith(notes: notes)
+            : throw AssertionError("Unreachable yet");
+      } else {
+        final superset = exercises[supersetIndex].data as Superset;
+        exercises[supersetIndex].data = superset.copyWith(
+          exercises: [
+            for (int j = 0; j < superset.exercises.length; j++)
+              if (j == exerciseIndex)
+                superset.exercises[j].copyWith(notes: notes)
+              else
+                superset.exercises[j],
+          ],
+        );
+      }
 
-          exercises.refresh();
-        },
-        onSupersetAddExercise: (supersetIndex) {
-          SchedulerBinding.instance.addPostFrameCallback((timeStamp) async {
-            final ex = await Go.to<List<Exercise>>(
-                () => const ExercisePicker(singlePick: true));
-            if (ex == null || ex.isEmpty) return;
-            final newExercise = ex.first.makeChild().copyWith.sets([
-              if (!ex.first.parameters.isSetless)
-                GTSet.empty(
-                  kind: GTSetKind.normal,
-                  parameters: ex.first.parameters,
-                ),
-            ]);
-            exercises[supersetIndex].data =
-                (exercises[supersetIndex].data as Superset)
-                    .copyWith(exercises: [
-              ...((exercises[supersetIndex].data as Superset).exercises),
-              newExercise,
-            ]);
-            _controller.exercises.refresh();
-          });
-        },
-        onSupersetExercisesReorderPair:
-            (supersetIndex, oldExIndex, newExIndex) {
-          final superset = exercises[supersetIndex].data as Superset;
-          final supersetExercises = superset.exercises.toList();
-          reorder(supersetExercises, oldExIndex, newExIndex);
-          _controller.exercises[supersetIndex].data = superset.copyWith(
-            exercises: supersetExercises,
-          );
-          _controller.exercises.refresh();
-        },
-        onGroupExercisesIntoSuperset: (startingIndex) async {
-          final indices = await Go.toDialog(() => ExercisesToSupersetDialog(
+      exercises.refresh();
+    },
+    onSupersetAddExercise: (supersetIndex) {
+      SchedulerBinding.instance.addPostFrameCallback((timeStamp) async {
+        final ex = await Go.to<List<Exercise>>(
+          () => const ExercisePicker(singlePick: true),
+        );
+        if (ex == null || ex.isEmpty) return;
+        final newExercise = ex.first.makeChild().copyWith.sets([
+          if (!ex.first.parameters.isSetless)
+            GTSet.empty(
+              kind: GTSetKind.normal,
+              parameters: ex.first.parameters,
+            ),
+        ]);
+        exercises[supersetIndex].data =
+            (exercises[supersetIndex].data as Superset).copyWith(
               exercises: [
-                for (final ex in _controller.exercises)
-                  ex.data
-              ], startingIndex: startingIndex));
-
-          if (indices == null || indices.length < 2) return;
-
-          final newSuperset = Superset(
-            restTime: Duration.zero,
-            workoutID: null,
-            exercises: [
-              for (final index in indices) exercises[index].data as Exercise,
-            ],
-          );
-
-          final newExercises = [
-            for (int i = 0; i < indices.first; i++) exercises[i],
-            _DateWrapped(newSuperset),
-            for (int i = indices.last + 1; i < exercises.length; i++)
-              exercises[i],
-          ];
-          
-          _controller.exercises(newExercises);
-          _controller.exercises.refresh();
-        },
+                ...((exercises[supersetIndex].data as Superset).exercises),
+                newExercise,
+              ],
+            );
+        _controller.exercises.refresh();
+      });
+    },
+    onSupersetExercisesReorderPair: (supersetIndex, oldExIndex, newExIndex) {
+      final superset = exercises[supersetIndex].data as Superset;
+      final supersetExercises = superset.exercises.toList();
+      reorder(supersetExercises, oldExIndex, newExIndex);
+      _controller.exercises[supersetIndex].data = superset.copyWith(
+        exercises: supersetExercises,
       );
+      _controller.exercises.refresh();
+    },
+    onGroupExercisesIntoSuperset: (startingIndex) async {
+      final indices = await Go.toDialog(
+        () => ExercisesToSupersetDialog(
+          exercises: [for (final ex in _controller.exercises) ex.data],
+          startingIndex: startingIndex,
+        ),
+      );
+
+      if (indices == null || indices.length < 2) return;
+
+      final newSuperset = Superset(
+        restTime: Duration.zero,
+        workoutID: null,
+        exercises: [
+          for (final index in indices) exercises[index].data as Exercise,
+        ],
+      );
+
+      final newExercises = [
+        for (int i = 0; i < indices.first; i++) exercises[i],
+        _DateWrapped(newSuperset),
+        for (int i = indices.last + 1; i < exercises.length; i++) exercises[i],
+      ];
+
+      _controller.exercises(newExercises);
+      _controller.exercises.refresh();
+    },
+  );
 }

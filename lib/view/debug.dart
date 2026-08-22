@@ -11,7 +11,8 @@ import 'package:gymtracker/controller/coordinator.dart';
 import 'package:gymtracker/controller/debug_controller.dart';
 import 'package:gymtracker/controller/history_controller.dart';
 import 'package:gymtracker/controller/me_controller.dart';
-import 'package:gymtracker/controller/online_controller.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:gymtracker/provider/online.dart';
 import 'package:gymtracker/controller/routines_controller.dart';
 import 'package:gymtracker/controller/stopwatch_controller.dart';
 import 'package:gymtracker/controller/workout_controller.dart';
@@ -29,7 +30,9 @@ import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/utils/noise.dart';
 import 'package:gymtracker/utils/theme.dart';
+import 'package:gymtracker/utils/utils.dart';
 import 'package:gymtracker/view/components/muscles.dart';
+import 'package:gymtracker/view/onboarding.dart';
 import 'package:gymtracker/view/paywall.dart';
 import 'package:gymtracker/view/settings/radio.dart';
 import 'package:gymtracker/view/skeleton.dart';
@@ -39,14 +42,14 @@ import 'package:gymtracker/view/utils/timer.dart';
 import 'package:logger/logger.dart' as logger_lib;
 import 'package:purchases_ui_flutter/purchases_ui_flutter.dart';
 
-class DebugView extends StatefulWidget {
+class DebugView extends ConsumerStatefulWidget {
   const DebugView({super.key});
 
   @override
-  State<DebugView> createState() => _DebugViewState();
+  ConsumerState<DebugView> createState() => _DebugViewState();
 }
 
-class _DebugViewState extends State<DebugView> {
+class _DebugViewState extends ConsumerState<DebugView> {
   Future<void> _loadTranslationsFuture = Future.value();
 
   @override
@@ -194,12 +197,12 @@ class _DebugViewState extends State<DebugView> {
                   Go.toDialog(() => const _DebugAddRandomWeightAlert());
                 },
               ),
-              ListTile(
-                title: const Text("Simulate succesful login sequence"),
-                onTap: () async {
-                  Get.find<Coordinator>().onSuccessfulLogin();
-                },
-              ),
+              // ListTile(
+              //   title: const Text("Simulate succesful login sequence"),
+              //   onTap: () async {
+              //     Get.find<Coordinator>().onSuccessfulLogin();
+              //   },
+              // ),
               // ListTile(
               //   title: const Text("Simulate sync upload"),
               //   onTap: () async {
@@ -219,18 +222,12 @@ class _DebugViewState extends State<DebugView> {
               //   },
               // ),
               ListTile(
-                title: const Text(
-                  Configuration.isOnlineAccountEnabled
-                      ? "Simulate sync"
-                      : "[Online disabled]",
-                ),
-                onTap: Configuration.isOnlineAccountEnabled
-                    ? () async {
-                        Get.find<OnlineController>().also((c) {
-                          c.sync(currentSnapshot: c.service.currentSnapshot);
-                        });
-                      }
-                    : null,
+                title: const Text("Simulate sync"),
+                onTap: () async {
+                  // Get.find<OnlineController>().also((c) {
+                  //   c.sync(currentSnapshot: c.service.currentSnapshot);
+                  // });
+                },
               ),
               ListTile(
                 title: const Text("Update home widgets"),
@@ -285,6 +282,34 @@ class _DebugViewState extends State<DebugView> {
                 title: Text("Customer Center"),
                 onTap: () async {
                   await RevenueCatUI.presentCustomerCenter();
+                },
+              ),
+              ListTile(
+                title: Text("Onboarding"),
+                onTap: () {
+                  Go.to(() => const OnboardingScreen());
+                },
+              ),
+              ListTile(
+                title: Text("Sync state"),
+                onTap: () {
+                  ref.read(onlineProvider.notifier).syncManager.let((m) {
+                    print(
+                      "Sync state: ${m.syncingEnabled}, ${m.nFullSyncs} full syncs",
+                    );
+                    print(
+                      "Is syncing from backend: ${m.isSyncingFromBackend}, is syncing to backend: ${m.isSyncingToBackend}",
+                    );
+                    print(
+                      "${m.syncables.length} syncables: ${m.syncables.join(", ")}",
+                    );
+                    for (final syncable in m.syncables) {
+                      print(
+                        "- Syncable $syncable: ${m.nSyncedFromBackend(syncable)} syncs from backend, ${m.nSyncedToBackend(syncable)} syncs to backend",
+                      );
+                    }
+                    // m.syncTables();
+                  });
                 },
               ),
 
@@ -362,8 +387,7 @@ class _WorkoutTitleGeneratorAlertState
     extends State<WorkoutTitleGeneratorAlert> {
   final Set<GTMuscleCategory> _selectedCategories = {};
 
-  String _generate() =>
-      WorkoutController.generateWorkoutTitle(_selectedCategories);
+  String _generate() => generateWorkoutTitle(_selectedCategories);
 
   @override
   Widget build(BuildContext context) {

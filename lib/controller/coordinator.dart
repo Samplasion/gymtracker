@@ -13,18 +13,18 @@ import 'package:gymtracker/controller/intents_controller.dart';
 import 'package:gymtracker/controller/me_controller.dart';
 import 'package:gymtracker/controller/migrations_controller.dart';
 import 'package:gymtracker/controller/notifications_controller.dart';
-import 'package:gymtracker/controller/online_controller.dart';
 import 'package:gymtracker/controller/purchases_controller.dart';
 import 'package:gymtracker/controller/routines_controller.dart';
 import 'package:gymtracker/controller/serviceable_controller.dart';
 import 'package:gymtracker/controller/settings_controller.dart';
 import 'package:gymtracker/controller/stopwatch_controller.dart';
 import 'package:gymtracker/controller/workout_controller.dart';
-import 'package:gymtracker/data/configuration.dart';
 import 'package:gymtracker/db/imports/types.dart';
+import 'package:gymtracker/main.dart';
 import 'package:gymtracker/model/achievements.dart';
 import 'package:gymtracker/model/exercise.dart';
 import 'package:gymtracker/model/workout.dart';
+import 'package:gymtracker/provider/online.dart';
 import 'package:gymtracker/service/database.dart';
 import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/service/logger.dart';
@@ -57,8 +57,6 @@ class Coordinator extends GetxController
   RxList<RoutineSuggestion> suggestions = <RoutineSuggestion>[].obs;
   late BehaviorSubject<bool> showPermissionTilesStream;
 
-  final Map<ScheduledEvent, List<Function>> _listeners = {};
-
   @override
   void onServiceChange() {}
 
@@ -71,14 +69,10 @@ class Coordinator extends GetxController
       Go.awaitInitialization(),
       get<SettingsController>().awaitInitialized(),
       get<NotificationController>().initialize(),
-      if (Configuration.isOnlineAccountEnabled)
-        get<OnlineController>().init().then((_) {
-          if (get<OnlineController>().accountSync == null) return;
-          get<OnlineController>().sync(
-            currentSnapshot: get<DatabaseService>().currentSnapshot,
-          );
-        }),
+      globalContainer.read(onlineProvider.future),
+      get<PurchasesService>().init(),
     ]);
+    get<AchievementsController>().init();
     IntentsController.initialize();
 
     showPermissionTilesStream.add(
@@ -124,14 +118,12 @@ class Coordinator extends GetxController
     Get.delete<BoutiqueController>();
     Get.delete<HealthController>();
     Get.delete<PurchasesController>();
-    if (Configuration.isOnlineAccountEnabled) {
-      Get.delete<OnlineController>();
-    }
+    globalContainer.invalidate(onlineProvider);
 
     super.onClose();
   }
 
-  init() {
+  void init() {
     Get.put(DebugController());
     Get.put(NotificationsService());
     Get.put(NotificationController());
@@ -145,14 +137,14 @@ class Coordinator extends GetxController
     Get.put(ErrorController(), permanent: true);
     Get.put(MigrationsController());
     Get.put(FoodController());
-    Get.put(AchievementsController());
+    final online = globalContainer.read(onlineProvider.notifier);
+    Get.put(AchievementsController(online.onlineService));
     Get.put(BoutiqueController());
     Get.put(HealthController());
-    Get.put(PurchasesService(this)..init());
-    Get.put(PurchasesController(get<PurchasesService>(), this));
-    if (Configuration.isOnlineAccountEnabled) {
-      Get.put(OnlineController());
-    }
+    Get.put(PurchasesService(this));
+    Get.put(
+      PurchasesController(get<PurchasesService>(), this, online.onlineService),
+    );
 
     if (service.hasOngoing) {
       Get.put(WorkoutController.fromSavedData(service.getOngoingData()!));
@@ -251,13 +243,6 @@ class Coordinator extends GetxController
   void scheduleBackup() {
     Future.delayed(const Duration(seconds: 5), () async {
       get<DatabaseService>().createBackup();
-
-      if (Configuration.isOnlineAccountEnabled &&
-          get<OnlineController>().accountSync != null) {
-        get<OnlineController>().sync(
-          currentSnapshot: get<DatabaseService>().currentSnapshot,
-        );
-      }
     });
   }
 
@@ -273,12 +258,6 @@ class Coordinator extends GetxController
 
   void installRoutines(List<Workout> routines) {
     get<RoutinesController>().installRoutines(routines);
-  }
-
-  void onSuccessfulLogin() {
-    get<OnlineController>().checkLocalAndRemoteDatabases(
-      currentSnapshot: get<DatabaseService>().currentSnapshot,
-    );
   }
 
   Future<void> overrideDatabase(DatabaseSnapshot snapshot) {
@@ -305,28 +284,6 @@ class Coordinator extends GetxController
       get<WorkoutController>().refreshWatchData();
     } else {
       logger.w("No WorkoutController registered, cannot sync native data.");
-    }
-  }
-
-  void addEventListener(ScheduledEvent event, Function callback) {
-    if (_listeners[event] == null) {
-      _listeners[event] = [];
-    }
-    _listeners[event]!.add(callback);
-  }
-
-  void removeEventListener(ScheduledEvent event, Function callback) {
-    _listeners[event]?.remove(callback);
-  }
-
-  void trigger(ScheduledEvent event) {
-    logger.d(
-      "Event triggered: $event [${_listeners[event]?.length ?? "no"} listeners]",
-    );
-    if (_listeners[event] != null) {
-      for (var callback in _listeners[event]!) {
-        callback();
-      }
     }
   }
 }

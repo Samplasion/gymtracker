@@ -1,29 +1,88 @@
+import 'dart:async';
+
 import 'package:get/get.dart';
 import 'package:gymtracker/controller/serviceable_controller.dart';
 import 'package:gymtracker/data/achievements.dart';
+import 'package:gymtracker/main.dart';
 import 'package:gymtracker/model/achievements.dart';
+import 'package:gymtracker/provider/events.dart';
+import 'package:gymtracker/provider/online.dart';
 import 'package:gymtracker/service/logger.dart';
+import 'package:gymtracker/service/online.dart';
 import 'package:gymtracker/service/test.dart';
 import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/view/utils/achievements.dart';
 import 'package:rxdart/rxdart.dart';
+import 'package:uuid/uuid.dart';
 
 class AchievementsController extends GetxController with ServiceableController {
+  final OnlineService _onlineService;
+
+  bool get _disableUnlocks =>
+      _disableUnlocksWillLogin || _disableUnlocksDidLogin;
+
+  bool _disableUnlocksWillLogin = false;
+  bool _disableUnlocksDidLogin = false;
+
+  StreamSubscription<GBUserWillLoginEvent>? _eventSubscriptionWillLogin;
+  StreamSubscription<GBUserDidLoginEvent>? _eventSubscriptionDidLogin;
+
+  AchievementsController(this._onlineService);
+
+  void init() {
+    final eventBus = globalContainer.read(eventBusProvider);
+    _eventSubscriptionWillLogin = eventBus.on<GBUserWillLoginEvent>().listen((
+      event,
+    ) {
+      _disableUnlocksWillLogin = true;
+
+      logger.i("Disabling achievement unlocks due to user login");
+      Timer(const Duration(seconds: 30), () {
+        _disableUnlocksWillLogin = false;
+        logger.i("Re-enabling achievement unlocks 30s after user login");
+      });
+    });
+    _eventSubscriptionDidLogin = eventBus.on<GBUserDidLoginEvent>().listen((
+      event,
+    ) {
+      _disableUnlocksDidLogin = true;
+
+      logger.i("Disabling achievement unlocks due to user login");
+      Timer(const Duration(seconds: 30), () {
+        _disableUnlocksDidLogin = false;
+        logger.i("Re-enabling achievement unlocks 30s after user login");
+      });
+    });
+  }
+
+  @override
+  void onClose() {
+    _eventSubscriptionWillLogin?.cancel();
+    _eventSubscriptionDidLogin?.cancel();
+  }
+
   BehaviorSubject<List<AchievementCompletion>> get _completions$ =>
       service.completions$;
 
   Stream<List<AchievementCompletion>> get completionStream =>
-      _completions$.stream.map((completions) => completions.toList()
-        ..sort((a, b) {
-          final date = b.completedAt.compareTo(a.completedAt);
-          final level = b.level.compareTo(a.level);
-          return date == 0 ? level : date;
-        }));
+      _completions$.stream.map(
+        (completions) => completions.toList()
+          ..sort((a, b) {
+            final date = b.completedAt.compareTo(a.completedAt);
+            final level = b.level.compareTo(a.level);
+            return date == 0 ? level : date;
+          }),
+      );
 
   Map<Achievement, List<AchievementCompletion>> maybeUnlockAchievements(
-      AchievementTrigger trigger) {
+    AchievementTrigger trigger,
+  ) {
+    if (_disableUnlocks) return {};
+
     // Achievements slow tests down too much
     if (TestService().isTest) return {};
+
+    logger.i("Checking for achievements to unlock for trigger: $trigger");
 
     final unlocked = <Achievement, List<AchievementCompletion>>{};
 
@@ -47,17 +106,22 @@ class AchievementsController extends GetxController with ServiceableController {
           break innerLoop;
         }
 
-        final hasJustUnlocked =
-            nextLevel.checkCompletion(nextLevel.progress?.call());
+        final hasJustUnlocked = nextLevel.checkCompletion(
+          nextLevel.progress?.call(),
+        );
 
         logger.d((id, nextLevel.level, hasJustUnlocked));
 
         if (hasJustUnlocked) {
           unlocked.putIfAbsent(achievement, () => []);
           final c = AchievementCompletion(
+            id: Uuid().v4(),
             achievementID: id,
             level: nextLevel.level,
-            completedAt: DateTime.now(),
+            completedAt: DateTime.now().toUtc(),
+            updatedAt: DateTime.now().toUtc(),
+            deleted: false,
+            userId: _onlineService.account?.id,
           );
           unlocked[achievement]!.add(c);
           completion = c;
@@ -76,22 +140,35 @@ class AchievementsController extends GetxController with ServiceableController {
   }
 
   void _markUnlockAchievements(
-      Map<Achievement, List<AchievementCompletion>> unlocked) {
+    Map<Achievement, List<AchievementCompletion>> unlocked,
+  ) {
     service.insertAchievementCompletions(
-        unlocked.values.expand((e) => e).toList());
+      unlocked.values.expand((e) => e).toList(),
+    );
   }
 
   void _showUnlockAchievements(
-      Map<Achievement, List<AchievementCompletion>> unlocked) {
+    Map<Achievement, List<AchievementCompletion>> unlocked,
+  ) {
+    if (globalContainer.read(onlineProvider.notifier).isSyncing) {
+      return;
+    }
     for (final MapEntry(key: achievement, value: completions)
         in unlocked.entries) {
       for (final completion in completions) {
+        if (_completions$.valueOrNull?.any((element) {
+              return element.level == completion.level &&
+                  element.achievementID == completion.achievementID;
+            }) ??
+            false) {
+          continue;
+        }
         logger.i(
-            "Unlocked achievement: ${achievement.id} at level ${completion.level}");
-        Go.customSnack(AchievementSnackBar(
-          achievement: achievement,
-          completion: completion,
-        ));
+          "Unlocked achievement: ${achievement.id} at level ${completion.level}",
+        );
+        Go.customSnack(
+          AchievementSnackBar(achievement: achievement, completion: completion),
+        );
       }
     }
   }
@@ -106,17 +183,20 @@ class AchievementsController extends GetxController with ServiceableController {
   }
 
   AchievementCompletion? getCompletion(
-          Achievement achievement, AchievementLevel level) =>
-      _getCompletionInternal(achievement.id, level.level);
+    Achievement achievement,
+    AchievementLevel level,
+  ) => _getCompletionInternal(achievement.id, level.level);
 
   bool isUnlocked(Achievement achievement, AchievementLevel level) =>
       getCompletion(achievement, level) != null;
 
   AchievementCompletion? _getCompletionInternal(
-          String achievementID, int level) =>
-      _completions$.value.firstWhereOrNull((completion) =>
-          completion.achievementID == achievementID &&
-          completion.level == level);
+    String achievementID,
+    int level,
+  ) => _completions$.value.firstWhereOrNull(
+    (completion) =>
+        completion.achievementID == achievementID && completion.level == level,
+  );
 
   Achievement getAchievement(String achievementID) {
     return achievements[achievementID]!;

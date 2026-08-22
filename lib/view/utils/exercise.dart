@@ -52,7 +52,9 @@ class ExerciseIcon extends StatelessWidget {
       // return Text(
       //     (exercise as Exercise).displayName.characters.first.toUpperCase());
       return EquipmentIcon(
-          equipment: exercise.asExercise.gymEquipment, size: radius + 4);
+        equipment: exercise.asExercise.gymEquipment,
+        size: radius + 4,
+      );
     } else if (exercise is Superset) {
       return Text((exercise as Superset).exercises.length.toString());
     } else {
@@ -85,10 +87,14 @@ class ExerciseListTile extends StatelessWidget {
     this.mouseCursor,
     this.contentPadding,
     super.key,
-  })  : assert((weightUnit == null) == !isConcrete,
-            "Weight unit must be set if the exercise is concrete"),
-        assert((distanceUnit == null) == !isConcrete,
-            "Distance unit must be set if the exercise is concrete");
+  }) : assert(
+         (weightUnit == null) == !isConcrete,
+         "Weight unit must be set if the exercise is concrete",
+       ),
+       assert(
+         (distanceUnit == null) == !isConcrete,
+         "Distance unit must be set if the exercise is concrete",
+       );
 
   @override
   Widget build(BuildContext context) {
@@ -100,8 +106,11 @@ class ExerciseListTile extends StatelessWidget {
 
     if (exercise is Exercise && exercise.standard) {
       final color = exerciseStandardLibrary.entries
-          .firstWhereOrNull((element) => element.value.exercises
-              .any((e) => e.id == (exercise.parentID ?? exercise.id)))
+          .firstWhereOrNull(
+            (element) => element.value.exercises.any(
+              (e) => e.id == (exercise.parentID ?? exercise.id),
+            ),
+          )
           ?.value
           .color;
       if (color != null) {
@@ -118,31 +127,31 @@ class ExerciseListTile extends StatelessWidget {
     return ListTile(
       leading: Skeleton.leaf(child: selected ? selectedIcon : unselectedIcon),
       title: Text.rich(
-        TextSpan(children: [
-          if (exercise is Superset) ...[
-            const WidgetSpan(
-              baseline: TextBaseline.ideographic,
-              alignment: PlaceholderAlignment.middle,
-              child: Icon(GTIcons.superset),
-            ),
-            const TextSpan(text: " "),
-            TextSpan(text: "superset".plural(exercise.exercises.length)),
-          ] else if (exercise is Exercise) ...[
-            TextSpan(text: exercise.displayName),
-            if (exercise.isCustom) ...[
-              const TextSpan(text: " "),
+        TextSpan(
+          children: [
+            if (exercise is Superset) ...[
               const WidgetSpan(
                 baseline: TextBaseline.ideographic,
                 alignment: PlaceholderAlignment.middle,
-                child: Skeleton.ignore(child: CustomExerciseBadge()),
+                child: Icon(GTIcons.superset),
               ),
+              const TextSpan(text: " "),
+              TextSpan(text: "superset".plural(exercise.exercises.length)),
+            ] else if (exercise is Exercise) ...[
+              TextSpan(text: exercise.displayName),
+              if (exercise.isCustom) ...[
+                const TextSpan(text: " "),
+                const WidgetSpan(
+                  baseline: TextBaseline.ideographic,
+                  alignment: PlaceholderAlignment.middle,
+                  child: Skeleton.ignore(child: CustomExerciseBadge()),
+                ),
+              ],
             ],
           ],
-        ]),
+        ),
       ),
-      subtitle: _buildSubtitle(
-        context,
-      ),
+      subtitle: _buildSubtitle(context),
       onTap: onTap,
       trailing: trailing,
       visualDensity: visualDensity,
@@ -152,18 +161,18 @@ class ExerciseListTile extends StatelessWidget {
   }
 
   String _buildWeight(double weight) => Weights.convert(
-          value: weight,
-          from: weightUnit!,
-          to: settingsController.weightUnit.value)
-      .userFacingWeight;
+    value: weight,
+    from: weightUnit!,
+    to: settingsController.weightUnit.value,
+  ).userFacingWeight;
   String _buildReps(int? reps) => "exerciseList.fields.reps".plural(reps ?? 0);
   String _buildTime(BuildContext context, Duration time) =>
       TimerView.buildTimeString(context, time, builder: (time) => time.text!);
   String _buildDistance(double? distance) => Distance.convert(
-          value: distance ?? 0,
-          from: distanceUnit!,
-          to: settingsController.distanceUnit.value)
-      .userFacingDistance;
+    value: distance ?? 0,
+    from: distanceUnit!,
+    to: settingsController.distanceUnit.value,
+  ).userFacingDistance;
 
   Text? _buildSubtitle(BuildContext context) {
     final exercise = this.exercise;
@@ -181,51 +190,56 @@ class ExerciseListTile extends StatelessWidget {
 
       switch (exercise.parameters) {
         case GTSetParameters.repsWeight:
-          formattedSets = exercise.sets.map((set) =>
-              "${_buildReps(set.reps)} ${_buildWeight(set.weight ?? 0)}");
+          formattedSets = exercise.sets.map(
+            (set) => "${_buildReps(set.reps)} ${_buildWeight(set.weight ?? 0)}",
+          );
 
         case GTSetParameters.freeBodyReps:
           formattedSets = exercise.sets.map((set) => _buildReps(set.reps));
 
         case GTSetParameters.timeWeight:
-          formattedSets = exercise.sets.map((set) =>
-              "${_buildReps(set.reps)} ${_buildTime(context, set.time ?? Duration.zero)}");
+          formattedSets = exercise.sets.map(
+            (set) =>
+                "${_buildReps(set.reps)} ${_buildTime(context, set.time ?? Duration.zero)}",
+          );
 
         case GTSetParameters.time:
-          formattedSets = exercise.sets
-              .map((set) => _buildTime(context, set.time ?? Duration.zero));
+          formattedSets = exercise.sets.map(
+            (set) => _buildTime(context, set.time ?? Duration.zero),
+          );
 
         case GTSetParameters.distance:
-          formattedSets =
-              exercise.sets.map((set) => _buildDistance(set.distance));
+          formattedSets = exercise.sets.map(
+            (set) => _buildDistance(set.distance),
+          );
 
         case GTSetParameters.setless:
           formattedSets = [""];
       }
 
-      final text =
-          formattedSets.fold(<(String, int)>[], (previousValue, element) {
-        if (previousValue.isEmpty || previousValue.last.$1 != element) {
-          return [...previousValue, (element, 1)];
-        }
-        return [
-          ...previousValue.sublist(0, previousValue.length - 1),
-          (element, previousValue.last.$2 + 1)
-        ];
-      }).map((e) {
-        if (e.$2 == 1 &&
-            ![GTSetParameters.time, GTSetParameters.distance]
-                .contains(exercise.parameters)) {
-          return e.$1;
-        }
-        return "${e.$2} × ${e.$1}";
-      }).join(", ");
+      final text = formattedSets
+          .fold(<(String, int)>[], (previousValue, element) {
+            if (previousValue.isEmpty || previousValue.last.$1 != element) {
+              return [...previousValue, (element, 1)];
+            }
+            return [
+              ...previousValue.sublist(0, previousValue.length - 1),
+              (element, previousValue.last.$2 + 1),
+            ];
+          })
+          .map((e) {
+            if (e.$2 == 1 &&
+                ![
+                  GTSetParameters.time,
+                  GTSetParameters.distance,
+                ].contains(exercise.parameters)) {
+              return e.$1;
+            }
+            return "${e.$2} × ${e.$1}";
+          })
+          .join(", ");
       if (text.isNotEmpty) {
-        return Text(
-          text,
-          maxLines: 2,
-          overflow: TextOverflow.ellipsis,
-        );
+        return Text(text, maxLines: 2, overflow: TextOverflow.ellipsis);
       }
     }
   }
@@ -237,9 +251,7 @@ class ExerciseBadgeRow extends StatelessWidget {
   const ExerciseBadgeRow({required this.exercise, super.key});
 
   static shouldShow(Exercise exercise) {
-    return [
-      exercise.rpe != null,
-    ].any((element) => element);
+    return [exercise.rpe != null].any((element) => element);
   }
 
   @override
@@ -255,16 +267,17 @@ class ExerciseBadgeRow extends StatelessWidget {
                 spacing: 8,
                 runSpacing: 8,
                 children: [
-                  if (exercise.rpe != null)
-                    GTBadge(
-                      content: "ongoingWorkout.exercises.rpeBadge".tParams({
-                        "rpe": "${exercise.rpe}",
-                      }),
-                      background: getContainerColor(
-                          context, rpeColor(context, exercise.rpe!)),
-                      foreground: getOnContainerColor(
-                          context, rpeColor(context, exercise.rpe!)),
-                    ),
+                  // TODO: RPE
+                  // if (exercise.rpe != null)
+                  //   GTBadge(
+                  //     content: "ongoingWorkout.exercises.rpeBadge".tParams({
+                  //       "rpe": "${exercise.rpe}",
+                  //     }),
+                  //     background: getContainerColor(
+                  //         context, rpeColor(context, exercise.rpe!)),
+                  //     foreground: getOnContainerColor(
+                  //         context, rpeColor(context, exercise.rpe!)),
+                  //   ),
                 ],
               ),
             ),

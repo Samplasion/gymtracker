@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
@@ -7,6 +8,7 @@ import 'package:dynamic_color/dynamic_color.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_quill/flutter_quill.dart';
 import 'package:flutter_quill/quill_delta.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:get/get.dart' hide ContextExtensionss;
 import 'package:gymtracker/controller/settings_controller.dart';
 import 'package:gymtracker/data/distance.dart';
@@ -634,5 +636,19 @@ extension GTSetUtils on GTSet {
       case GTSetParameters.setless:
         return "";
     }
+  }
+}
+
+extension CacheForExtension on Ref {
+  /// Keeps the provider alive for [duration].
+  void cacheFor(Duration duration) {
+    // Immediately prevent the state from getting destroyed.
+    final link = keepAlive();
+    // After duration has elapsed, we re-enable automatic disposal.
+    final timer = Timer(duration, link.close);
+
+    // Optional: when the provider is recomputed (such as with ref.watch),
+    // we cancel the pending timer.
+    onDispose(timer.cancel);
   }
 }

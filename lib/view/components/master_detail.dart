@@ -135,9 +135,6 @@ class _MasterDetailViewState extends State<MasterDetailView> {
   @override
   void initState() {
     super.initState();
-    masterScrollController.addListener(() {
-      print("Master scroll offset: ${masterScrollController.offset}");
-    });
   }
 
   @override

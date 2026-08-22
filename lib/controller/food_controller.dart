@@ -165,9 +165,6 @@ class FoodController extends GetxController with ServiceableController {
       ..pipe(foods$)
       ..listen((foods) {
         logger.d("Foods updated with ${foods.length} items");
-        Get.find<Coordinator>().maybeUnlockAchievements(
-          AchievementTrigger.food,
-        );
         updateNativeData();
       });
     service.nutritionGoals$.listen((goals) {
@@ -554,11 +551,13 @@ class FoodController extends GetxController with ServiceableController {
         ),
       ),
     );
+    Get.find<Coordinator>().maybeUnlockAchievements(AchievementTrigger.food);
     coordinator.scheduleBackup();
   }
 
   void removeFood(DateTime dateTime, Food food) {
     service.removeFood(DateTagged(date: dateTime.startOfDay, value: food));
+    Get.find<Coordinator>().maybeUnlockAchievements(AchievementTrigger.food);
     coordinator.scheduleBackup();
   }
 

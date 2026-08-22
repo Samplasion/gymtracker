@@ -10,12 +10,18 @@ class AddFoodView extends StatefulWidget {
     required this.food,
     this.isEditing = false,
     this.inheritAmount = false,
-  })  : assert(isEditing ? inheritAmount : true,
-            "When editing, the amount must be inherited"),
-        assert(isEditing ? food is Food : true,
-            "When editing, the food must be a Food"),
-        assert(inheritAmount ? food is Food : true,
-            "When inheriting the amount, the food must be a Food");
+  }) : assert(
+         isEditing ? inheritAmount : true,
+         "When editing, the amount must be inherited",
+       ),
+       assert(
+         isEditing ? food is Food : true,
+         "When editing, the food must be a Food",
+       ),
+       assert(
+         inheritAmount ? food is Food : true,
+         "When inheriting the amount, the food must be a Food",
+       );
 
   @override
   State<AddFoodView> createState() => _AddFoodViewState();
@@ -35,8 +41,10 @@ class _AddFoodViewState extends ControlledState<AddFoodView, FoodController> {
           (element) => element.amount == amount,
         );
   late var amountController = TextEditingController(
-      text: controller.stringifyDouble(
-          shouldInheritAmount ? (widget.food as Food).amount : amount));
+    text: controller.stringifyDouble(
+      shouldInheritAmount ? (widget.food as Food).amount : amount,
+    ),
+  );
 
   @override
   dispose() {
@@ -53,12 +61,14 @@ class _AddFoodViewState extends ControlledState<AddFoodView, FoodController> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text([
-          if (widget.food.brand != null &&
-              widget.food.brand != widget.food.name)
-            widget.food.brand,
-          widget.food.name,
-        ].join(", ")),
+        title: Text(
+          [
+            if (widget.food.brand != null &&
+                widget.food.brand != widget.food.name)
+              widget.food.brand,
+            widget.food.name,
+          ].join(", "),
+        ),
         actions: [
           if (widget.food is Food)
             StreamBuilder(
@@ -96,7 +106,8 @@ class _AddFoodViewState extends ControlledState<AddFoodView, FoodController> {
           child: Builder(
             builder: (context) {
               return Padding(
-                padding: MediaQuery.paddingOf(context).copyWith(top: 0) +
+                padding:
+                    MediaQuery.paddingOf(context).copyWith(top: 0) +
                     const EdgeInsets.all(16),
                 child: Form(
                   key: formKey,
@@ -115,7 +126,8 @@ class _AddFoodViewState extends ControlledState<AddFoodView, FoodController> {
                               (servingSize) => DropdownMenuItem(
                                 value: servingSize,
                                 child: Text(
-                                    "${(servingSize.name != null && servingSize.name!.trim().isNotEmpty) ? servingSize.name! : "food.add.unnamedServingSize".t} (${widget.food.unit.formatAmount(servingSize.amount)})"),
+                                  "${(servingSize.name != null && servingSize.name!.trim().isNotEmpty) ? servingSize.name! : "food.add.unnamedServingSize".t} (${widget.food.unit.formatAmount(servingSize.amount)})",
+                                ),
                               ),
                             ),
                             DropdownMenuItem(
@@ -132,7 +144,7 @@ class _AddFoodViewState extends ControlledState<AddFoodView, FoodController> {
                                 amount = amountController.text.isEmpty
                                     ? 100
                                     : amountController.text.tryParseDouble() ??
-                                        100;
+                                          100;
                               }
                             });
                           },
@@ -179,14 +191,15 @@ class _AddFoodViewState extends ControlledState<AddFoodView, FoodController> {
                               if (widget.food.isDownloaded) ...[
                                 const SizedBox(height: 16),
                                 OpenFoodFactsTableAttribution(
-                                    food: widget.food),
+                                  food: widget.food,
+                                ),
                               ],
                             ],
                           ),
                         ),
                       ),
-                      if (kDebugMode)
-                        Text("${widget.food.toJson()}", style: monospace),
+                      // if (kDebugMode)
+                      //   Text("${widget.food.toJson()}", style: monospace),
                     ],
                   ),
                 ),
@@ -244,8 +257,9 @@ class _AddFoodViewState extends ControlledState<AddFoodView, FoodController> {
                 Get.back(result: food);
               }
             },
-            child:
-                Text(widget.isEditing ? 'food.edit.edit'.t : 'food.add.add'.t),
+            child: Text(
+              widget.isEditing ? 'food.edit.edit'.t : 'food.add.add'.t,
+            ),
           ),
         ],
       ),
@@ -272,10 +286,10 @@ class OpenFoodFactsTableAttribution extends ControlledWidget<FoodController> {
         child: Text(
           "food.offAttribution".t,
           style: Theme.of(context).textTheme.labelSmall!.copyWith(
-                color: canOpen
-                    ? Theme.of(context).colorScheme.secondary
-                    : Theme.of(context).colorScheme.onSurface,
-              ),
+            color: canOpen
+                ? Theme.of(context).colorScheme.secondary
+                : Theme.of(context).colorScheme.onSurface,
+          ),
         ),
       ),
     );
@@ -347,9 +361,9 @@ class NutritionTable extends StatelessWidget {
     super.key,
     required NutritionValues nutritionValues,
     required this.unit,
-  })  : per100g = nutritionValues,
-        amount = 100,
-        _showHeader = false;
+  }) : per100g = nutritionValues,
+       amount = 100,
+       _showHeader = false;
 
   static const verticalSpace = SizedBox(height: 12);
 
@@ -363,8 +377,10 @@ class NutritionTable extends StatelessWidget {
         if (_showHeader) ...[
           Text(
             "food.add.nutritionalValuesPerAmountWithUnit".tParams({
-              "amount": stringifyDouble(amount,
-                  decimalSeparator: controller.decimalSeparator),
+              "amount": stringifyDouble(
+                amount,
+                decimalSeparator: controller.decimalSeparator,
+              ),
               "unit": unit.t,
             }),
             style: Theme.of(context).textTheme.headlineSmall,
@@ -383,146 +399,63 @@ class NutritionTable extends StatelessWidget {
           bold: true,
         ),
         verticalSpace,
-        NutritionRow(
-          id: "carbs",
-          value: nutritionalValues.carbs,
-          bold: true,
-        ),
-        NutritionRow(
-          id: "sugar",
-          value: nutritionalValues.sugar,
-        ),
+        NutritionRow(id: "carbs", value: nutritionalValues.carbs, bold: true),
+        NutritionRow(id: "sugar", value: nutritionalValues.sugar),
         verticalSpace,
-        NutritionRow(
-          id: "fat",
-          value: nutritionalValues.fat,
-          bold: true,
-        ),
-        NutritionRow(
-          id: "saturatedFat",
-          value: nutritionalValues.saturatedFat,
-        ),
+        NutritionRow(id: "fat", value: nutritionalValues.fat, bold: true),
+        NutritionRow(id: "saturatedFat", value: nutritionalValues.saturatedFat),
         verticalSpace,
         if (nutritionalValues.salt != null)
-          NutritionRow(
-            id: "salt",
-            value: nutritionalValues.salt!,
-          ),
+          NutritionRow(id: "salt", value: nutritionalValues.salt!),
         if (nutritionalValues.sodium != null)
-          NutritionRow(
-            id: "sodium",
-            value: nutritionalValues.sodium!,
-          ),
+          NutritionRow(id: "sodium", value: nutritionalValues.sodium!),
         if (nutritionalValues.fiber != null)
-          NutritionRow(
-            id: "fiber",
-            value: nutritionalValues.fiber!,
-          ),
+          NutritionRow(id: "fiber", value: nutritionalValues.fiber!),
         if (nutritionalValues.addedSugars != null)
           NutritionRow(
             id: "addedSugars",
             value: nutritionalValues.addedSugars!,
           ),
         if (nutritionalValues.caffeine != null)
-          NutritionRow(
-            id: "caffeine",
-            value: nutritionalValues.caffeine!,
-          ),
+          NutritionRow(id: "caffeine", value: nutritionalValues.caffeine!),
         if (nutritionalValues.calcium != null)
-          NutritionRow(
-            id: "calcium",
-            value: nutritionalValues.calcium!,
-          ),
+          NutritionRow(id: "calcium", value: nutritionalValues.calcium!),
         if (nutritionalValues.iron != null)
-          NutritionRow(
-            id: "iron",
-            value: nutritionalValues.iron!,
-          ),
+          NutritionRow(id: "iron", value: nutritionalValues.iron!),
         if (nutritionalValues.vitaminC != null)
-          NutritionRow(
-            id: "vitaminC",
-            value: nutritionalValues.vitaminC!,
-          ),
+          NutritionRow(id: "vitaminC", value: nutritionalValues.vitaminC!),
         if (nutritionalValues.magnesium != null)
-          NutritionRow(
-            id: "magnesium",
-            value: nutritionalValues.magnesium!,
-          ),
+          NutritionRow(id: "magnesium", value: nutritionalValues.magnesium!),
         if (nutritionalValues.phosphorus != null)
-          NutritionRow(
-            id: "phosphorus",
-            value: nutritionalValues.phosphorus!,
-          ),
+          NutritionRow(id: "phosphorus", value: nutritionalValues.phosphorus!),
         if (nutritionalValues.potassium != null)
-          NutritionRow(
-            id: "potassium",
-            value: nutritionalValues.potassium!,
-          ),
+          NutritionRow(id: "potassium", value: nutritionalValues.potassium!),
         if (nutritionalValues.zinc != null)
-          NutritionRow(
-            id: "zinc",
-            value: nutritionalValues.zinc!,
-          ),
+          NutritionRow(id: "zinc", value: nutritionalValues.zinc!),
         if (nutritionalValues.copper != null)
-          NutritionRow(
-            id: "copper",
-            value: nutritionalValues.copper!,
-          ),
+          NutritionRow(id: "copper", value: nutritionalValues.copper!),
         if (nutritionalValues.selenium != null)
-          NutritionRow(
-            id: "selenium",
-            value: nutritionalValues.selenium!,
-          ),
+          NutritionRow(id: "selenium", value: nutritionalValues.selenium!),
         if (nutritionalValues.vitaminA != null)
-          NutritionRow(
-            id: "vitaminA",
-            value: nutritionalValues.vitaminA!,
-          ),
+          NutritionRow(id: "vitaminA", value: nutritionalValues.vitaminA!),
         if (nutritionalValues.vitaminE != null)
-          NutritionRow(
-            id: "vitaminE",
-            value: nutritionalValues.vitaminE!,
-          ),
+          NutritionRow(id: "vitaminE", value: nutritionalValues.vitaminE!),
         if (nutritionalValues.vitaminD != null)
-          NutritionRow(
-            id: "vitaminD",
-            value: nutritionalValues.vitaminD!,
-          ),
+          NutritionRow(id: "vitaminD", value: nutritionalValues.vitaminD!),
         if (nutritionalValues.vitaminB1 != null)
-          NutritionRow(
-            id: "vitaminB1",
-            value: nutritionalValues.vitaminB1!,
-          ),
+          NutritionRow(id: "vitaminB1", value: nutritionalValues.vitaminB1!),
         if (nutritionalValues.vitaminB2 != null)
-          NutritionRow(
-            id: "vitaminB2",
-            value: nutritionalValues.vitaminB2!,
-          ),
+          NutritionRow(id: "vitaminB2", value: nutritionalValues.vitaminB2!),
         if (nutritionalValues.vitaminPP != null)
-          NutritionRow(
-            id: "vitaminPP",
-            value: nutritionalValues.vitaminPP!,
-          ),
+          NutritionRow(id: "vitaminPP", value: nutritionalValues.vitaminPP!),
         if (nutritionalValues.vitaminB6 != null)
-          NutritionRow(
-            id: "vitaminB6",
-            value: nutritionalValues.vitaminB6!,
-          ),
+          NutritionRow(id: "vitaminB6", value: nutritionalValues.vitaminB6!),
         if (nutritionalValues.vitaminB12 != null)
-          NutritionRow(
-            id: "vitaminB12",
-            value: nutritionalValues.vitaminB12!,
-          ),
+          NutritionRow(id: "vitaminB12", value: nutritionalValues.vitaminB12!),
         if (nutritionalValues.vitaminB9 != null)
-          NutritionRow(
-            id: "vitaminB9",
-            value: nutritionalValues.vitaminB9!,
-          ),
+          NutritionRow(id: "vitaminB9", value: nutritionalValues.vitaminB9!),
         if (nutritionalValues.vitaminK != null)
-          NutritionRow(
-            id: "vitaminK",
-            value: nutritionalValues.vitaminK!,
-          ),
+          NutritionRow(id: "vitaminK", value: nutritionalValues.vitaminK!),
         if (nutritionalValues.cholesterol != null)
           NutritionRow(
             id: "cholesterol",
@@ -544,15 +477,9 @@ class NutritionTable extends StatelessWidget {
             value: nutritionalValues.caprylicAcid!,
           ),
         if (nutritionalValues.capricAcid != null)
-          NutritionRow(
-            id: "capricAcid",
-            value: nutritionalValues.capricAcid!,
-          ),
+          NutritionRow(id: "capricAcid", value: nutritionalValues.capricAcid!),
         if (nutritionalValues.lauricAcid != null)
-          NutritionRow(
-            id: "lauricAcid",
-            value: nutritionalValues.lauricAcid!,
-          ),
+          NutritionRow(id: "lauricAcid", value: nutritionalValues.lauricAcid!),
         if (nutritionalValues.myristicAcid != null)
           NutritionRow(
             id: "myristicAcid",
@@ -569,10 +496,7 @@ class NutritionTable extends StatelessWidget {
             value: nutritionalValues.stearicAcid!,
           ),
         if (nutritionalValues.oleicAcid != null)
-          NutritionRow(
-            id: "oleicAcid",
-            value: nutritionalValues.oleicAcid!,
-          ),
+          NutritionRow(id: "oleicAcid", value: nutritionalValues.oleicAcid!),
         if (nutritionalValues.linoleicAcid != null)
           NutritionRow(
             id: "linoleicAcid",
@@ -589,10 +513,7 @@ class NutritionTable extends StatelessWidget {
             value: nutritionalValues.eicosapentaenoicAcid!,
           ),
         if (nutritionalValues.erucicAcid != null)
-          NutritionRow(
-            id: "erucicAcid",
-            value: nutritionalValues.erucicAcid!,
-          ),
+          NutritionRow(id: "erucicAcid", value: nutritionalValues.erucicAcid!),
         if (nutritionalValues.monounsaturatedFat != null)
           NutritionRow(
             id: "monounsaturatedFat",
@@ -604,65 +525,32 @@ class NutritionTable extends StatelessWidget {
             value: nutritionalValues.polyunsaturatedFat!,
           ),
         if (nutritionalValues.alcohol != null)
-          NutritionRow(
-            id: "alcohol",
-            value: nutritionalValues.alcohol!,
-          ),
+          NutritionRow(id: "alcohol", value: nutritionalValues.alcohol!),
         if (nutritionalValues.pantothenicAcid != null)
           NutritionRow(
             id: "pantothenicAcid",
             value: nutritionalValues.pantothenicAcid!,
           ),
         if (nutritionalValues.biotin != null)
-          NutritionRow(
-            id: "biotin",
-            value: nutritionalValues.biotin!,
-          ),
+          NutritionRow(id: "biotin", value: nutritionalValues.biotin!),
         if (nutritionalValues.chloride != null)
-          NutritionRow(
-            id: "chloride",
-            value: nutritionalValues.chloride!,
-          ),
+          NutritionRow(id: "chloride", value: nutritionalValues.chloride!),
         if (nutritionalValues.chromium != null)
-          NutritionRow(
-            id: "chromium",
-            value: nutritionalValues.chromium!,
-          ),
+          NutritionRow(id: "chromium", value: nutritionalValues.chromium!),
         if (nutritionalValues.fluoride != null)
-          NutritionRow(
-            id: "fluoride",
-            value: nutritionalValues.fluoride!,
-          ),
+          NutritionRow(id: "fluoride", value: nutritionalValues.fluoride!),
         if (nutritionalValues.iodine != null)
-          NutritionRow(
-            id: "iodine",
-            value: nutritionalValues.iodine!,
-          ),
+          NutritionRow(id: "iodine", value: nutritionalValues.iodine!),
         if (nutritionalValues.manganese != null)
-          NutritionRow(
-            id: "manganese",
-            value: nutritionalValues.manganese!,
-          ),
+          NutritionRow(id: "manganese", value: nutritionalValues.manganese!),
         if (nutritionalValues.molybdenum != null)
-          NutritionRow(
-            id: "molybdenum",
-            value: nutritionalValues.molybdenum!,
-          ),
+          NutritionRow(id: "molybdenum", value: nutritionalValues.molybdenum!),
         if (nutritionalValues.omega3 != null)
-          NutritionRow(
-            id: "omega3",
-            value: nutritionalValues.omega3!,
-          ),
+          NutritionRow(id: "omega3", value: nutritionalValues.omega3!),
         if (nutritionalValues.omega6 != null)
-          NutritionRow(
-            id: "omega6",
-            value: nutritionalValues.omega6!,
-          ),
+          NutritionRow(id: "omega6", value: nutritionalValues.omega6!),
         if (nutritionalValues.omega9 != null)
-          NutritionRow(
-            id: "omega9",
-            value: nutritionalValues.omega9!,
-          ),
+          NutritionRow(id: "omega9", value: nutritionalValues.omega9!),
         if (nutritionalValues.betaCarotene != null)
           NutritionRow(
             id: "betaCarotene",
@@ -729,10 +617,7 @@ class NutritionTable extends StatelessWidget {
             value: nutritionalValues.lignocericAcid!,
           ),
         if (nutritionalValues.meadAcid != null)
-          NutritionRow(
-            id: "meadAcid",
-            value: nutritionalValues.meadAcid!,
-          ),
+          NutritionRow(id: "meadAcid", value: nutritionalValues.meadAcid!),
         if (nutritionalValues.melissicAcid != null)
           NutritionRow(
             id: "melissicAcid",
@@ -749,10 +634,7 @@ class NutritionTable extends StatelessWidget {
             value: nutritionalValues.nervonicAcid!,
           ),
         if (nutritionalValues.transFat != null)
-          NutritionRow(
-            id: "transFat",
-            value: nutritionalValues.transFat!,
-          ),
+          NutritionRow(id: "transFat", value: nutritionalValues.transFat!),
       ],
     );
   }
@@ -773,8 +655,10 @@ class NutritionRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = Get.find<FoodController>();
-    var stringifiedValue =
-        stringifyDouble(value, decimalSeparator: controller.decimalSeparator);
+    var stringifiedValue = stringifyDouble(
+      value,
+      decimalSeparator: controller.decimalSeparator,
+    );
     if (value < 0.01 && value != 0) {
       stringifiedValue = "<0${controller.decimalSeparator}01";
     }
@@ -901,8 +785,9 @@ class _CustomAddFoodViewState
   late final brandController = TextEditingController();
   double amount = 100;
   int pieces = 1;
-  late final amountController =
-      TextEditingController(text: stringifyDouble(amount));
+  late final amountController = TextEditingController(
+    text: stringifyDouble(amount),
+  );
   NutritionUnit unit = NutritionUnit.G;
 
   final required = {
@@ -937,182 +822,185 @@ class _CustomAddFoodViewState
     final colorScheme = Theme.of(context).colorScheme;
     final gradientColor = colorScheme.surfaceContainerHigh;
     return Scaffold(
-      appBar: AppBar(
-        title: Text("food.add.customFood.title".t),
-      ),
+      appBar: AppBar(title: Text("food.add.customFood.title".t)),
       extendBody: true,
       body: SingleChildScrollView(
         child: GradientBottomBar.wrap(
           context: context,
-          child: Builder(builder: (context) {
-            return Padding(
-              padding: MediaQuery.paddingOf(context).copyWith(top: 0) +
-                  const EdgeInsets.all(16),
-              child: Form(
-                key: formKey,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    TextFormField(
-                      controller: nameController,
-                      decoration: GymTrackerInputDecoration(
-                        labelText: "food.add.customFood.fields.name".t,
-                      ),
-                      autovalidateMode: AutovalidateMode.onUserInteraction,
-                      validator: (value) {
-                        if ((value == null || value.trim().isEmpty)) {
-                          return "food.add.nameEmpty".t;
-                        }
+          child: Builder(
+            builder: (context) {
+              return Padding(
+                padding:
+                    MediaQuery.paddingOf(context).copyWith(top: 0) +
+                    const EdgeInsets.all(16),
+                child: Form(
+                  key: formKey,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      TextFormField(
+                        controller: nameController,
+                        decoration: GymTrackerInputDecoration(
+                          labelText: "food.add.customFood.fields.name".t,
+                        ),
+                        autovalidateMode: AutovalidateMode.onUserInteraction,
+                        validator: (value) {
+                          if ((value == null || value.trim().isEmpty)) {
+                            return "food.add.nameEmpty".t;
+                          }
 
-                        return null;
-                      },
-                      restorationId: "_CustomAddFoodViewState_name",
-                    ),
-                    const SizedBox(height: 8),
-                    TextFormField(
-                      controller: brandController,
-                      decoration: GymTrackerInputDecoration(
-                        labelText: "food.add.customFood.fields.brand".t,
+                          return null;
+                        },
+                        restorationId: "_CustomAddFoodViewState_name",
                       ),
-                      restorationId: "_CustomAddFoodViewState_brand",
-                    ),
-                    const SizedBox(height: 8),
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Expanded(
-                          child: _AmountFormField(
-                            controller: amountController,
-                            clarifyUnit: false,
-                            onChanged: (value) {
+                      const SizedBox(height: 8),
+                      TextFormField(
+                        controller: brandController,
+                        decoration: GymTrackerInputDecoration(
+                          labelText: "food.add.customFood.fields.brand".t,
+                        ),
+                        restorationId: "_CustomAddFoodViewState_brand",
+                      ),
+                      const SizedBox(height: 8),
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Expanded(
+                            child: _AmountFormField(
+                              controller: amountController,
+                              clarifyUnit: false,
+                              onChanged: (value) {
+                                setState(() {
+                                  amount = value.tryParseDouble() ?? 100;
+                                });
+                              },
+                              restorationId: "_CustomAddFoodViewState_amount",
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          SegmentedButton<NutritionUnit>(
+                            style: ButtonStyle(
+                              padding: WidgetStateProperty.all(
+                                EdgeInsets.symmetric(
+                                  // Reduce padding on mobile to compensate for the
+                                  // larger target size
+                                  vertical:
+                                      Theme.of(context).materialTapTargetSize ==
+                                          MaterialTapTargetSize.padded
+                                      ? 14
+                                      : 18,
+                                ),
+                              ),
+                            ),
+                            showSelectedIcon: false,
+                            segments: <ButtonSegment<NutritionUnit>>[
+                              ButtonSegment<NutritionUnit>(
+                                label: Text("food.nutrimentUnits.g".t),
+                                value: NutritionUnit.G,
+                              ),
+                              ButtonSegment<NutritionUnit>(
+                                label: Text("food.nutrimentUnits.milliL".t),
+                                value: NutritionUnit.MILLI_L,
+                              ),
+                            ],
+                            onSelectionChanged: (value) {
                               setState(() {
-                                amount = value.tryParseDouble() ?? 100;
+                                unit = value.first;
                               });
                             },
-                            restorationId: "_CustomAddFoodViewState_amount",
+                            selected: {unit},
                           ),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                      IntStepperFormField(
+                        value: pieces,
+                        onChanged: (value) {
+                          if (value == null) return;
+                          setState(() {
+                            pieces = value;
+                          });
+                        },
+                        decoration: GymTrackerInputDecoration(
+                          labelText: "food.add.pieces".t,
                         ),
-                        const SizedBox(width: 8),
-                        SegmentedButton<NutritionUnit>(
-                          style: ButtonStyle(
-                            padding: WidgetStateProperty.all(
-                              EdgeInsets.symmetric(
-                                // Reduce padding on mobile to compensate for the
-                                // larger target size
-                                vertical:
-                                    Theme.of(context).materialTapTargetSize ==
-                                            MaterialTapTargetSize.padded
-                                        ? 14
-                                        : 18,
+                      ),
+                      const Divider(height: 32),
+                      Text(
+                        "food.add.nutritionalValuesPerAmountWithUnit".tParams({
+                          "amount": "100",
+                          "unit": "food.nutrimentUnits.${unit.toCamelCase()}".t,
+                        }),
+                        style: Theme.of(context).textTheme.headlineSmall,
+                      ),
+                      for (var id in controllers.keys) ...[
+                        Crossfade(
+                          showSecond: alwaysShown.contains(id) || expanded,
+                          firstChild: const SizedBox(),
+                          secondChild: Column(
+                            children: [
+                              const SizedBox(height: 8),
+                              TextFormField(
+                                controller: controllers[id],
+                                decoration: GymTrackerInputDecoration(
+                                  labelText:
+                                      "${"food.nutriments.$id".t} (${"food.nutrimentUnits.${kNutritionValueToUnit[id]!.toCamelCase()}".t})",
+                                  suffix: Text(
+                                    "food.nutrimentUnits.${kNutritionValueToUnit[id]!.toCamelCase()}"
+                                        .t,
+                                  ),
+                                  hintText: required.contains(id)
+                                      ? null
+                                      : "general.optional".t,
+                                ),
+                                keyboardType: _kKeyboardType,
+                                autovalidateMode:
+                                    AutovalidateMode.onUserInteraction,
+                                validator: (value) {
+                                  if (required.contains(id)) {
+                                    if ((value == null || value.isEmpty)) {
+                                      return "food.add.amountEmpty".t;
+                                    }
+                                  } else {
+                                    return null;
+                                  }
+                                  if (value.tryParseDouble() == null) {
+                                    return "food.add.amountInvalid".t;
+                                  }
+                                  final double parsedValue = value
+                                      .parseDouble();
+                                  if (parsedValue < 0 ||
+                                      parsedValue.isNaN ||
+                                      parsedValue.isInfinite) {
+                                    return "food.add.amountInvalid".t;
+                                  }
+                                  return null;
+                                },
+                                restorationId: "_CustomAddFoodViewState_$id",
                               ),
-                            ),
+                            ],
                           ),
-                          showSelectedIcon: false,
-                          segments: <ButtonSegment<NutritionUnit>>[
-                            ButtonSegment<NutritionUnit>(
-                              label: Text("food.nutrimentUnits.g".t),
-                              value: NutritionUnit.G,
-                            ),
-                            ButtonSegment<NutritionUnit>(
-                              label: Text("food.nutrimentUnits.milliL".t),
-                              value: NutritionUnit.MILLI_L,
-                            ),
-                          ],
-                          onSelectionChanged: (value) {
-                            setState(() {
-                              unit = value.first;
-                            });
-                          },
-                          selected: {unit},
                         ),
                       ],
-                    ),
-                    const SizedBox(height: 8),
-                    IntStepperFormField(
-                      value: pieces,
-                      onChanged: (value) {
-                        if (value == null) return;
-                        setState(() {
-                          pieces = value;
-                        });
-                      },
-                      decoration: GymTrackerInputDecoration(
-                        labelText: "food.add.pieces".t,
-                      ),
-                    ),
-                    const Divider(height: 32),
-                    Text(
-                      "food.add.nutritionalValuesPerAmountWithUnit".tParams({
-                        "amount": "100",
-                        "unit": "food.nutrimentUnits.${unit.toCamelCase()}".t
-                      }),
-                      style: Theme.of(context).textTheme.headlineSmall,
-                    ),
-                    for (var id in controllers.keys) ...[
+                      const SizedBox(height: 8),
                       Crossfade(
-                        showSecond: alwaysShown.contains(id) || expanded,
+                        showSecond: !expanded,
                         firstChild: const SizedBox(),
-                        secondChild: Column(
-                          children: [
-                            const SizedBox(height: 8),
-                            TextFormField(
-                              controller: controllers[id],
-                              decoration: GymTrackerInputDecoration(
-                                labelText:
-                                    "${"food.nutriments.$id".t} (${"food.nutrimentUnits.${kNutritionValueToUnit[id]!.toCamelCase()}".t})",
-                                suffix: Text(
-                                    "food.nutrimentUnits.${kNutritionValueToUnit[id]!.toCamelCase()}"
-                                        .t),
-                                hintText: required.contains(id)
-                                    ? null
-                                    : "general.optional".t,
-                              ),
-                              keyboardType: _kKeyboardType,
-                              autovalidateMode:
-                                  AutovalidateMode.onUserInteraction,
-                              validator: (value) {
-                                if (required.contains(id)) {
-                                  if ((value == null || value.isEmpty)) {
-                                    return "food.add.amountEmpty".t;
-                                  }
-                                } else {
-                                  return null;
-                                }
-                                if (value.tryParseDouble() == null) {
-                                  return "food.add.amountInvalid".t;
-                                }
-                                final double parsedValue = value.parseDouble();
-                                if (parsedValue < 0 ||
-                                    parsedValue.isNaN ||
-                                    parsedValue.isInfinite) {
-                                  return "food.add.amountInvalid".t;
-                                }
-                                return null;
-                              },
-                              restorationId: "_CustomAddFoodViewState_$id",
-                            ),
-                          ],
+                        secondChild: TextButton(
+                          onPressed: () {
+                            setState(() {
+                              expanded = true;
+                            });
+                          },
+                          child: Text("food.add.customFood.showMore".t),
                         ),
                       ),
                     ],
-                    const SizedBox(height: 8),
-                    Crossfade(
-                      showSecond: !expanded,
-                      firstChild: const SizedBox(),
-                      secondChild: TextButton(
-                        onPressed: () {
-                          setState(() {
-                            expanded = true;
-                          });
-                        },
-                        child: Text("food.add.customFood.showMore".t),
-                      ),
-                    ),
-                  ],
+                  ),
                 ),
-              ),
-            );
-          }),
+              );
+            },
+          ),
         ),
       ),
       bottomNavigationBar: GradientBottomBar(
@@ -1168,24 +1056,30 @@ class SearchResultsView extends ControlledWidget<FoodController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text("food.search.title".t),
-      ),
+      appBar: AppBar(title: Text("food.search.title".t)),
       body: FutureBuilder<List<VagueFood>>(
         future: foods,
         builder: (context, snapshot) {
           final isLoading = snapshot.connectionState == ConnectionState.waiting;
 
           if (snapshot.hasError) {
-            return Center(
-              child: Text(
-                snapshot.error is DioException &&
-                        (snapshot.error as DioException).type ==
-                            DioExceptionType.badResponse
-                    ? "food.search.error.serverError".t
-                    : "food.search.error.generic".t,
-                style: Theme.of(context).textTheme.bodyLarge,
-              ),
+            return CustomScrollView(
+              slivers: [
+                SliverToBoxAdapter(
+                  child: ErrorViewComponent(
+                    title:
+                        snapshot.error is DioException &&
+                            (snapshot.error as DioException).type ==
+                                DioExceptionType.badResponse
+                        ? "food.search.error.serverError".t
+                        : "food.search.error.generic".t,
+                    error: snapshot.error,
+                    // retryCallback: () {
+                    //   controller.searchFoodByName(controller.searchQuery$.value);
+                    // },
+                  ),
+                ),
+              ],
             );
           }
 
@@ -1214,22 +1108,25 @@ class SearchResultsView extends ControlledWidget<FoodController> {
                   },
                 ),
                 SliverSafeArea(
-                  sliver: SliverList.list(children: [
-                    ListTile(
-                      title: Text(
-                        "food.offAttribution".t,
-                        style: Theme.of(context).textTheme.labelSmall,
+                  sliver: SliverList.list(
+                    children: [
+                      ListTile(
+                        title: Text(
+                          "food.offAttribution".t,
+                          style: Theme.of(context).textTheme.labelSmall,
+                        ),
                       ),
-                    ),
-                  ]),
+                    ],
+                  ),
                 ),
               ],
             ),
           );
         },
       ),
-      floatingActionButton:
-          showAddCustom ? _AddCustomFoodFAB(closeView: () => Get.back()) : null,
+      floatingActionButton: showAddCustom
+          ? _AddCustomFoodFAB(closeView: () => Get.back())
+          : null,
     );
   }
 }
@@ -1242,33 +1139,35 @@ class FoodBarcodeReaderView extends ControlledWidget<FoodController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("food.barcodeReader.title".t), actions: [
-        if (kDebugMode)
-          IconButton(
-            icon: const Icon(GTIcons.debug),
-            onPressed: () async {
-              // String imgUrl =
-              //     "https://upload.wikimedia.org/wikipedia/commons/c/cb/Ean13.jpg";
-              String imgUrl =
-                  "https://barcode.orcascan.com/?type=ean13&data=8000965154468&fontsize=Fit&format=png";
-              Code resultFromUrl = await zx.readBarcodeImageUrl(
-                imgUrl,
-                DecodeParams(
-                  imageFormat: ImageFormat.rgb,
-                  format: Format.linearCodes,
-                  tryHarder: true,
-                ),
-              );
-              handleCode(resultFromUrl);
-            },
-          ),
-      ]),
+      appBar: AppBar(
+        title: Text("food.barcodeReader.title".t),
+        actions: [
+          if (kDebugMode)
+            IconButton(
+              icon: const Icon(GTIcons.debug),
+              onPressed: () async {
+                // String imgUrl =
+                //     "https://upload.wikimedia.org/wikipedia/commons/c/cb/Ean13.jpg";
+                String imgUrl =
+                    "https://barcode.orcascan.com/?type=ean13&data=8000965154468&fontsize=Fit&format=png";
+                Code resultFromUrl = await zx.readBarcodeImageUrl(
+                  imgUrl,
+                  DecodeParams(
+                    imageFormat: ImageFormat.rgb,
+                    format: Format.linearCodes,
+                    tryHarder: true,
+                  ),
+                );
+                handleCode(resultFromUrl);
+              },
+            ),
+        ],
+      ),
       body: ReaderWidget(
         showToggleCamera: false,
-        actionButtonsBackgroundColor: Theme.of(context)
-            .colorScheme
-            .surfaceContainerHigh
-            .withAlpha((0.5 * 255).round()),
+        actionButtonsBackgroundColor: Theme.of(
+          context,
+        ).colorScheme.surfaceContainerHigh.withAlpha((0.5 * 255).round()),
         codeFormat: Format.linearCodes,
         scannerOverlay: ScannerOverlayBorder(
           borderColor: context.theme.colorScheme.primary,
@@ -1286,7 +1185,8 @@ class FoodBarcodeReaderView extends ControlledWidget<FoodController> {
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
           await Go.off(
-              () => ManualBarcodeInsertionScreen(handleCode: handleCode));
+            () => ManualBarcodeInsertionScreen(handleCode: handleCode),
+          );
         },
         child: const Icon(GTIcons.keyboard),
       ),
@@ -1327,10 +1227,7 @@ class _ManualBarcodeInsertionScreenState
   void ok() {
     if (!formKey.currentState!.validate()) return;
 
-    final code = Code(
-      isValid: true,
-      text: controller.text,
-    );
+    final code = Code(isValid: true, text: controller.text);
     Get.back();
     SchedulerBinding.instance.addPostFrameCallback((_) {
       widget.handleCode(code);
@@ -1340,9 +1237,7 @@ class _ManualBarcodeInsertionScreenState
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text("food.barcodeReader.enterCode".tr),
-      ),
+      appBar: AppBar(title: Text("food.barcodeReader.enterCode".tr)),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Form(
@@ -1389,22 +1284,22 @@ class _AddCombinedFoodViewState
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
   final TextEditingController nameController = TextEditingController();
   final TextEditingController brandController = TextEditingController();
-  final TextEditingController amountController =
-      TextEditingController(text: "100");
+  final TextEditingController amountController = TextEditingController(
+    text: "100",
+  );
 
   var amount = 100.0;
   var unit = NutritionUnit.G;
   var constituents = <Food>[];
 
   NutritionValues get nutritionalValues => NutritionValues.sum(
-      constituents.map((food) => (food.amount, food.nutritionalValues)));
+    constituents.map((food) => (food.amount, food.nutritionalValues)),
+  );
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text("food.combine.title".t),
-      ),
+      appBar: AppBar(title: Text("food.combine.title".t)),
       extendBody: true,
       body: Form(
         key: formKey,
@@ -1416,143 +1311,140 @@ class _AddCombinedFoodViewState
               SliverPadding(
                 padding: const EdgeInsets.all(16),
                 sliver: SliverList(
-                  delegate: SliverChildListDelegate.fixed(
-                    [
-                      TextFormField(
-                        controller: nameController,
-                        decoration: GymTrackerInputDecoration(
-                          labelText: "food.add.customFood.fields.name".t,
-                        ),
-                        autovalidateMode: AutovalidateMode.onUserInteraction,
-                        validator: (value) {
-                          if ((value == null || value.trim().isEmpty)) {
-                            return "food.add.nameEmpty".t;
-                          }
+                  delegate: SliverChildListDelegate.fixed([
+                    TextFormField(
+                      controller: nameController,
+                      decoration: GymTrackerInputDecoration(
+                        labelText: "food.add.customFood.fields.name".t,
+                      ),
+                      autovalidateMode: AutovalidateMode.onUserInteraction,
+                      validator: (value) {
+                        if ((value == null || value.trim().isEmpty)) {
+                          return "food.add.nameEmpty".t;
+                        }
 
-                          return null;
-                        },
-                        restorationId: "_AddCombinedFoodViewState_name",
+                        return null;
+                      },
+                      restorationId: "_AddCombinedFoodViewState_name",
+                    ),
+                    const SizedBox(height: 8),
+                    TextFormField(
+                      controller: brandController,
+                      decoration: GymTrackerInputDecoration(
+                        labelText: "food.add.customFood.fields.brand".t,
                       ),
-                      const SizedBox(height: 8),
-                      TextFormField(
-                        controller: brandController,
-                        decoration: GymTrackerInputDecoration(
-                          labelText: "food.add.customFood.fields.brand".t,
-                        ),
-                        restorationId: "_AddCombinedFoodViewState_brand",
-                      ),
-                      const SizedBox(height: 8),
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Expanded(
-                            child: _AmountFormField(
-                              controller: amountController,
-                              clarifyUnit: false,
-                              onChanged: (value) {
-                                setState(() {
-                                  amount = value.tryParseDouble() ?? 100;
-                                });
-                              },
-                              restorationId: "_AddCombinedFoodViewState_amount",
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          SegmentedButton<NutritionUnit>(
-                            style: ButtonStyle(
-                              padding: WidgetStateProperty.all(
-                                EdgeInsets.symmetric(
-                                  // Reduce padding on mobile to compensate for the
-                                  // larger target size
-                                  vertical:
-                                      Theme.of(context).materialTapTargetSize ==
-                                              MaterialTapTargetSize.padded
-                                          ? 14
-                                          : 18,
-                                ),
-                              ),
-                            ),
-                            showSelectedIcon: false,
-                            segments: <ButtonSegment<NutritionUnit>>[
-                              ButtonSegment<NutritionUnit>(
-                                label: Text("food.nutrimentUnits.g".t),
-                                value: NutritionUnit.G,
-                              ),
-                              ButtonSegment<NutritionUnit>(
-                                label: Text("food.nutrimentUnits.milliL".t),
-                                value: NutritionUnit.MILLI_L,
-                              ),
-                            ],
-                            onSelectionChanged: (value) {
+                      restorationId: "_AddCombinedFoodViewState_brand",
+                    ),
+                    const SizedBox(height: 8),
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Expanded(
+                          child: _AmountFormField(
+                            controller: amountController,
+                            clarifyUnit: false,
+                            onChanged: (value) {
                               setState(() {
-                                unit = value.first;
+                                amount = value.tryParseDouble() ?? 100;
                               });
                             },
-                            selected: {unit},
+                            restorationId: "_AddCombinedFoodViewState_amount",
                           ),
-                        ],
-                      ),
-                      const Divider(height: 32),
-                      _getSearchBar(),
-                    ],
-                  ),
+                        ),
+                        const SizedBox(width: 8),
+                        SegmentedButton<NutritionUnit>(
+                          style: ButtonStyle(
+                            padding: WidgetStateProperty.all(
+                              EdgeInsets.symmetric(
+                                // Reduce padding on mobile to compensate for the
+                                // larger target size
+                                vertical:
+                                    Theme.of(context).materialTapTargetSize ==
+                                        MaterialTapTargetSize.padded
+                                    ? 14
+                                    : 18,
+                              ),
+                            ),
+                          ),
+                          showSelectedIcon: false,
+                          segments: <ButtonSegment<NutritionUnit>>[
+                            ButtonSegment<NutritionUnit>(
+                              label: Text("food.nutrimentUnits.g".t),
+                              value: NutritionUnit.G,
+                            ),
+                            ButtonSegment<NutritionUnit>(
+                              label: Text("food.nutrimentUnits.milliL".t),
+                              value: NutritionUnit.MILLI_L,
+                            ),
+                          ],
+                          onSelectionChanged: (value) {
+                            setState(() {
+                              unit = value.first;
+                            });
+                          },
+                          selected: {unit},
+                        ),
+                      ],
+                    ),
+                    const Divider(height: 32),
+                    _getSearchBar(),
+                  ]),
                 ),
               ),
               SliverList.builder(
                 itemBuilder: (context, i) => FoodListTile(
-                    key: ValueKey(constituents[i]),
-                    food: constituents[i],
-                    onDelete: () {
-                      setState(() {
-                        constituents.removeAt(i);
-                      });
-                    },
-                    onTap: () {
-                      controller
-                          .showEditFoodViewForCombination(constituents[i])
-                          .then((value) {
-                        setState(() {
-                          constituents[i] = value;
+                  key: ValueKey(constituents[i]),
+                  food: constituents[i],
+                  onDelete: () {
+                    setState(() {
+                      constituents.removeAt(i);
+                    });
+                  },
+                  onTap: () {
+                    controller
+                        .showEditFoodViewForCombination(constituents[i])
+                        .then((value) {
+                          setState(() {
+                            constituents[i] = value;
+                          });
                         });
-                      });
-                    }),
+                  },
+                ),
                 itemCount: constituents.length,
               ),
               SliverPadding(
                 padding: const EdgeInsets.all(16).copyWith(top: 0),
                 sliver: SliverList(
-                  delegate: SliverChildListDelegate.fixed(
-                    [
-                      if (constituents.isNotEmpty) ...[
-                        const Divider(height: 32),
-                        Card(
-                          child: Padding(
-                            padding: const EdgeInsets.all(16),
-                            child: Column(
-                              children: [
-                                NutritionTable(
-                                  per100g: nutritionalValues,
-                                  amount: amount,
-                                  unit: unit,
-                                ),
-                                if (constituents
-                                    .any((food) => food.isDownloaded)) ...[
-                                  const SizedBox(height: 16),
-                                  OpenFoodFactsTableAttribution(
-                                    food: VagueFood(
-                                      name: "",
-                                      nutritionalValuesPer100g:
-                                          nutritionalValues,
-                                    ),
+                  delegate: SliverChildListDelegate.fixed([
+                    if (constituents.isNotEmpty) ...[
+                      const Divider(height: 32),
+                      Card(
+                        child: Padding(
+                          padding: const EdgeInsets.all(16),
+                          child: Column(
+                            children: [
+                              NutritionTable(
+                                per100g: nutritionalValues,
+                                amount: amount,
+                                unit: unit,
+                              ),
+                              if (constituents.any(
+                                (food) => food.isDownloaded,
+                              )) ...[
+                                const SizedBox(height: 16),
+                                OpenFoodFactsTableAttribution(
+                                  food: VagueFood(
+                                    name: "",
+                                    nutritionalValuesPer100g: nutritionalValues,
                                   ),
-                                ],
+                                ),
                               ],
-                            ),
+                            ],
                           ),
                         ),
-                      ],
+                      ),
                     ],
-                  ),
+                  ]),
                 ),
               ),
               const SliverToBoxAdapter(child: SizedBox(height: 8)),
@@ -1582,8 +1474,9 @@ class _AddCombinedFoodViewState
                       amount: amount,
                       unit: unit,
                       nutritionalValuesPer100g: nutritionalValues,
-                      isDownloaded:
-                          constituents.any((food) => food.isDownloaded),
+                      isDownloaded: constituents.any(
+                        (food) => food.isDownloaded,
+                      ),
                     );
 
                     Get.back(result: food);
@@ -1635,9 +1528,7 @@ class _AddCombinedFoodViewState
       textCapitalization: TextCapitalization.sentences,
       textInputAction: TextInputAction.search,
       keyboardType: TextInputType.text,
-      viewFloatingActionButton: _AddCustomFoodFAB(
-        closeView: () => Get.back(),
-      ),
+      viewFloatingActionButton: _AddCustomFoodFAB(closeView: () => Get.back()),
     );
   }
 }
@@ -1648,11 +1539,7 @@ extension on NutritionUnit {
   // String formatAmount(double amount) =>
   //     "${stringifyDouble(amount, decimalSeparator: Get.find<FoodController>().decimalSeparator)} $t";
 
-  String formatAmount(
-    double amount, {
-    int pieces = 1,
-    bool showUnit = true,
-  }) {
+  String formatAmount(double amount, {int pieces = 1, bool showUnit = true}) {
     final pcs = pieces == 1 ? "" : "$pieces × ";
     final unit = showUnit ? " $t" : "";
     return "$pcs${stringifyDouble(amount, decimalSeparator: Get.find<FoodController>().decimalSeparator)}$unit";

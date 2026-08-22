@@ -1,117 +1,32 @@
 part of 'me.dart';
 
-class MeProfilePage extends ControlledWidget<OnlineController> {
-  const MeProfilePage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("me.profile.title".t),
-        actions: [
-          IconButton(
-            onPressed: () {
-              Go.to(() => const _ProfileEditPage());
-            },
-            icon: const Icon(GTIcons.edit),
-          ),
-        ],
-      ),
-      body: StreamBuilder(
-        stream: controller.account,
-        builder: (context, snapshot) {
-          if (snapshot.hasError) {
-            return Container();
-          }
-
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return Container();
-          }
-
-          if (snapshot.data == null) {
-            return _buildLoggedOut(context);
-          }
-
-          return _buildLoggedIn(context, snapshot.data!);
-        },
-      ),
-    );
-  }
-
-  Widget _buildLoggedOut(BuildContext context) => Container();
-
-  Widget _buildLoggedIn(BuildContext context, OnlineAccount account) {
-    return SingleChildScrollView(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          UserHeader(account: account),
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  account.name,
-                  style: context.textTheme.titleLarge
-                      ?.copyWith(fontWeight: FontWeight.bold),
-                ),
-                if (account.email != null)
-                  Text(
-                    account.email!,
-                    style:
-                        TextStyle(color: Theme.of(context).colorScheme.outline),
-                  ),
-                const SizedBox(height: 16),
-                ElevatedButton(
-                  onPressed: () {
-                    controller.logout().then((_) {
-                      Get.back();
-                    }).catchError((e) {
-                      Go.dialog(
-                          "me.profile.errors.logout.title".t,
-                          "me.profile.errors.logout.subtitle".tParams({
-                            "error": e.toString(),
-                          }));
-                    });
-                  },
-                  child: Text("me.profile.logout".t),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _ProfileEditPage extends StatefulWidget {
+class _ProfileEditPage extends ConsumerStatefulWidget {
   const _ProfileEditPage();
 
   @override
-  State<_ProfileEditPage> createState() => __ProfileEditPageState();
+  ConsumerState<_ProfileEditPage> createState() => __ProfileEditPageState();
 }
 
-class __ProfileEditPageState
-    extends ControlledState<_ProfileEditPage, OnlineController> {
+class __ProfileEditPageState extends ConsumerState<_ProfileEditPage> {
   var _state = CredentialsState.empty();
 
   late final TextEditingController _usernameController = TextEditingController(
-    text: controller.accountSync?.name,
+    text: ref.read(onlineProvider).value?.name,
   );
   late final TextEditingController _emailController = TextEditingController(
-    text: controller.accountSync?.email,
+    text: ref.read(onlineProvider).value?.email,
   );
 
   var isLoading = false;
 
   void _checkCredentials() {
-    final state = controller.checkCredentials(
-      email: _emailController.text,
-      password: "",
-      username: _usernameController.text,
-    );
+    final state = ref
+        .read(onlineProvider.notifier)
+        .checkCredentials(
+          email: _emailController.text,
+          password: "",
+          username: _usernameController.text,
+        );
     setState(() {
       _state = state;
     });
@@ -122,10 +37,12 @@ class __ProfileEditPageState
       isLoading = true;
     });
     try {
-      await controller.updateAccount(
-        username: _usernameController.text,
-        email: _emailController.text,
-      );
+      await ref
+          .read(onlineProvider.notifier)
+          .updateAccount(
+            username: _usernameController.text,
+            email: _emailController.text,
+          );
     } finally {
       setState(() {
         isLoading = false;
@@ -166,8 +83,9 @@ class __ProfileEditPageState
                 onChanged: (_) => _checkCredentials(),
                 decoration: InputDecoration(
                   labelText: "login.fields.username.label".t,
-                  errorText:
-                      _state.usernameError ? "login.errors.username".t : null,
+                  errorText: _state.usernameError
+                      ? "login.errors.username".t
+                      : null,
                 ),
               ),
               const SizedBox(height: 16),

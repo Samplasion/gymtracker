@@ -1,7 +1,4 @@
 class Configuration {
-  /// Whether to show online account features.
-  static const isOnlineAccountEnabled = false;
-
   /// How many routines are available in trial mode.
   static const trialRoutineLimit = 4;
 

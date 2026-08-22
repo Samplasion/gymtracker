@@ -59,9 +59,9 @@ class Go {
   }
 
   static Future<T?> offWithoutAnimation<T>(Widget Function() page) async {
-    Navigator.of(Get.context!).pushReplacement(
-      materialRoute(page, animation: false),
-    );
+    Navigator.of(
+      Get.context!,
+    ).pushReplacement(materialRoute(page, animation: false));
   }
 
   static Future<T?> replaceStack<T>(Widget Function() page) async {
@@ -89,10 +89,7 @@ class Go {
     );
   }
 
-  static Future customSnack(
-    SnackBar snackBar, {
-    bool assertive = false,
-  }) async {
+  static Future customSnack(SnackBar snackBar, {bool assertive = false}) async {
     var messenger = ScaffoldMessenger.of(Get.context!);
     if (assertive) messenger.clearSnackBars();
     messenger.showSnackBar(snackBar);
@@ -108,15 +105,18 @@ class Go {
     return customBanner(
       MaterialBanner(
         content: Text(text),
-        actions: actions ??
+        actions:
+            actions ??
             [
               TextButton(
                 onPressed: () {
-                  ScaffoldMessenger.of(Get.context!)
-                      .hideCurrentMaterialBanner();
+                  ScaffoldMessenger.of(
+                    Get.context!,
+                  ).hideCurrentMaterialBanner();
                 },
-                child:
-                    Text(MaterialLocalizations.of(Get.context!).okButtonLabel),
+                child: Text(
+                  MaterialLocalizations.of(Get.context!).okButtonLabel,
+                ),
               ),
             ],
         backgroundColor: color,
@@ -202,8 +202,80 @@ class Go {
     ).then((value) => value ?? false);
   }
 
+  static Future<String?> textPrompt(
+    String title,
+    String body, {
+    Widget? icon,
+    required TextEditingController controller,
+    String Function(String) transformText = _defaultT,
+    String? Function(String?)? validator,
+    String? hintText,
+  }) {
+    return showDialog<String>(
+      context: Get.context!,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            final isValid =
+                validator?.call(controller.text) == null &&
+                controller.text.trim().isNotEmpty;
+            return AlertDialog(
+              icon: icon ?? const Icon(GTIcons.info),
+              title: Text(transformText(title)),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(transformText(body)),
+                  const SizedBox(height: 16),
+                  TextFormField(
+                    autofocus: true,
+                    validator: validator,
+                    controller: controller,
+                    decoration: InputDecoration(
+                      border: const OutlineInputBorder(),
+                      hintText: hintText == null
+                          ? null
+                          : transformText(hintText),
+                      errorText: validator?.call(controller.text),
+                    ),
+                    onChanged: (value) {
+                      setState(() {});
+                    },
+                  ),
+                ],
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    SchedulerBinding.instance.addPostFrameCallback((_) {
+                      Get.back(result: null);
+                    });
+                  },
+                  child: Text(
+                    MaterialLocalizations.of(context).cancelButtonLabel,
+                  ),
+                ),
+                TextButton(
+                  onPressed: isValid
+                      ? () {
+                          SchedulerBinding.instance.addPostFrameCallback((_) {
+                            Get.back(result: controller.text);
+                          });
+                        }
+                      : null,
+                  child: Text(MaterialLocalizations.of(context).okButtonLabel),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+
   static Future<T?> showBottomSheet<T>(
-      Widget Function(BuildContext) builder) async {
+    Widget Function(BuildContext) builder,
+  ) async {
     return await showModalBottomSheet<T>(
       context: Get.context!,
       builder: builder,
@@ -223,6 +295,7 @@ class Go {
     );
   }
 
+  @Deprecated('Use showRadioModalNew instead')
   static Future<void> showRadioModal<T>({
     required T? selectedValue,
     required Map<T, String> values,
@@ -263,9 +336,7 @@ class Go {
                 body: ListView.builder(
                   itemCount: values.length,
                   itemBuilder: (context, index) {
-                    final entry = values.entries.elementAt(
-                      index,
-                    );
+                    final entry = values.entries.elementAt(index);
 
                     return RadioListTile<T>(
                       title: Text(entry.value),
@@ -279,8 +350,9 @@ class Go {
                             onChange?.call(value);
                           }
                         });
-                        SchedulerBinding.instance
-                            .addPostFrameCallback((timeStamp) {
+                        SchedulerBinding.instance.addPostFrameCallback((
+                          timeStamp,
+                        ) {
                           setState(() {});
                         });
                       },
@@ -320,8 +392,9 @@ class Go {
                                 onChange?.call(value);
                               }
                             });
-                            SchedulerBinding.instance
-                                .addPostFrameCallback((timeStamp) {
+                            SchedulerBinding.instance.addPostFrameCallback((
+                              timeStamp,
+                            ) {
                               setState(() {});
                             });
                           },
@@ -338,8 +411,9 @@ class Go {
                       alignment: WrapAlignment.end,
                       children: [
                         TextButton(
-                          child: Text(MaterialLocalizations.of(context)
-                              .cancelButtonLabel),
+                          child: Text(
+                            MaterialLocalizations.of(context).cancelButtonLabel,
+                          ),
                           onPressed: () {
                             onChange?.call(oldValue);
                             Navigator.of(context).pop(false);
@@ -347,7 +421,8 @@ class Go {
                         ),
                         TextButton(
                           child: Text(
-                              MaterialLocalizations.of(context).okButtonLabel),
+                            MaterialLocalizations.of(context).okButtonLabel,
+                          ),
                           onPressed: () {
                             if (onChange != null) {
                               onChange(_value);
@@ -367,10 +442,165 @@ class Go {
     }
 
     final revert = fullScreen
-        ? await showDialog<bool>(
+        ? await showDialog<bool>(context: Get.context!, builder: builder)
+        : await showModalBottomSheet<bool>(
             context: Get.context!,
             builder: builder,
-          )
+          );
+
+    if (revert != true) {
+      globalLogger.i("[Go.showRadioModal]\nReverting");
+      onChange?.call(oldValue);
+    }
+  }
+
+  static Future<void> showRadioModalNew<T>({
+    required T? selectedValue,
+    required Map<T, Widget> values,
+    required Widget title,
+    required void Function(T?)? onChange,
+    bool fullScreen = false,
+  }) async {
+    final T? oldValue = selectedValue;
+    T? _value = selectedValue;
+
+    Widget builder(context) {
+      return StatefulBuilder(
+        builder: (context, setState) {
+          if (fullScreen) {
+            return Dialog.fullscreen(
+              child: Scaffold(
+                appBar: AppBar(
+                  title: title,
+                  leading: IconButton(
+                    icon: const Icon(GTIcons.close),
+                    onPressed: () {
+                      onChange?.call(oldValue);
+                      Navigator.of(context).pop(false);
+                    },
+                  ),
+                  actions: [
+                    IconButton(
+                      icon: const Icon(GTIcons.save),
+                      onPressed: () {
+                        if (onChange != null) {
+                          onChange(_value);
+                        }
+                        Navigator.of(context).pop(true);
+                      },
+                    ),
+                  ],
+                ),
+                body: ListView.builder(
+                  itemCount: values.length,
+                  itemBuilder: (context, index) {
+                    final entry = values.entries.elementAt(index);
+
+                    return RadioListTile<T>(
+                      title: entry.value,
+                      value: entry.key,
+                      groupValue: _value,
+                      activeColor: Theme.of(context).colorScheme.secondary,
+                      onChanged: (value) {
+                        setState(() {
+                          if (value != null) {
+                            _value = value;
+                            onChange?.call(value);
+                          }
+                        });
+                        SchedulerBinding.instance.addPostFrameCallback((
+                          timeStamp,
+                        ) {
+                          setState(() {});
+                        });
+                      },
+                    );
+                  },
+                ),
+              ),
+            );
+          }
+          return Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(16),
+                child: DefaultTextStyle(
+                  style: Theme.of(context).textTheme.titleLarge!,
+                  child: title,
+                ),
+              ),
+              Flexible(
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      for (final entry in values.entries)
+                        RadioListTile<T>(
+                          title: entry.value,
+                          value: entry.key,
+                          groupValue: _value,
+                          activeColor: Theme.of(context).colorScheme.secondary,
+                          onChanged: (value) {
+                            setState(() {
+                              if (value != null) {
+                                _value = value;
+                                onChange?.call(value);
+                              }
+                            });
+                            SchedulerBinding.instance.addPostFrameCallback((
+                              timeStamp,
+                            ) {
+                              setState(() {});
+                            });
+                          },
+                        ),
+                    ],
+                  ),
+                ),
+              ),
+              Flexible(
+                child: SafeArea(
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Wrap(
+                      alignment: WrapAlignment.end,
+                      children: [
+                        TextButton(
+                          child: Text(
+                            MaterialLocalizations.of(context).cancelButtonLabel,
+                          ),
+                          onPressed: () {
+                            onChange?.call(oldValue);
+                            Navigator.of(context).pop(false);
+                          },
+                        ),
+                        TextButton(
+                          child: Text(
+                            MaterialLocalizations.of(context).okButtonLabel,
+                          ),
+                          onPressed: () {
+                            if (onChange != null) {
+                              onChange(_value);
+                            }
+                            Navigator.of(context).pop(true);
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          );
+        },
+      );
+    }
+
+    final revert = fullScreen
+        ? await showDialog<bool>(context: Get.context!, builder: builder)
         : await showModalBottomSheet<bool>(
             context: Get.context!,
             builder: builder,
@@ -389,10 +619,14 @@ class Go {
   }) async {
     final context = Get.context!;
     final computation = future();
+    final completer = Completer<void>();
 
-    computation.then((_) => SchedulerBinding.instance.addPostFrameCallback((_) {
-          Navigator.of(context).pop();
-        }));
+    computation.then(
+      (_) => SchedulerBinding.instance.addPostFrameCallback((_) {
+        Navigator.of(context).pop();
+        completer.complete();
+      }),
+    );
 
     showDialog(
       context: context,
@@ -422,8 +656,9 @@ class Go {
                       onPressed: () {
                         Navigator.of(context).pop();
                       },
-                      child:
-                          Text(MaterialLocalizations.of(context).okButtonLabel),
+                      child: Text(
+                        MaterialLocalizations.of(context).okButtonLabel,
+                      ),
                     ),
                 ],
               );
@@ -432,6 +667,8 @@ class Go {
         );
       },
     );
+
+    return completer.future;
   }
 
   static void popUntil(bool Function(Route route) predicate) {
@@ -482,8 +719,11 @@ class Go {
                         alignment: WrapAlignment.end,
                         children: [
                           TextButton(
-                            child: Text(MaterialLocalizations.of(context)
-                                .closeButtonLabel),
+                            child: Text(
+                              MaterialLocalizations.of(
+                                context,
+                              ).closeButtonLabel,
+                            ),
                             onPressed: () {
                               Navigator.of(context).pop();
                             },
@@ -508,8 +748,9 @@ class Go {
 
   static Future<void> awaitInitialization() {
     final completer = Completer<void>();
-    final sub =
-        Stream.periodic(const Duration(milliseconds: 100)).listen((event) {
+    final sub = Stream.periodic(const Duration(milliseconds: 100)).listen((
+      event,
+    ) {
       if (Get.context != null) {
         completer.complete();
       }
@@ -537,10 +778,7 @@ class _NoAnimationPageTransitionsBuilder extends PageTransitionsBuilder {
 
 class _NoAnimMaterialWithModalsPageRoute<T>
     extends MaterialWithModalsPageRoute<T> {
-  _NoAnimMaterialWithModalsPageRoute({
-    required super.builder,
-    super.settings,
-  });
+  _NoAnimMaterialWithModalsPageRoute({required super.builder, super.settings});
 
   @override
   bool canTransitionTo(TransitionRoute<dynamic> nextRoute) {
@@ -574,10 +812,7 @@ class _NoAnimMaterialWithModalsPageRoute<T>
         context,
         animation,
         secondaryAnimation,
-        Theme(
-          data: Theme.of(context),
-          child: child,
-        ),
+        Theme(data: Theme.of(context), child: child),
       ),
     );
   }

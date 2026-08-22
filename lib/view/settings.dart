@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:get/get.dart' hide Rx, ContextExtensionss;
 import 'package:gymtracker/controller/coordinator.dart';
 import 'package:gymtracker/controller/food_controller.dart';
@@ -10,6 +12,7 @@ import 'package:gymtracker/data/distance.dart';
 import 'package:gymtracker/data/weights.dart';
 import 'package:gymtracker/icons/gymtracker_icons.dart';
 import 'package:gymtracker/model/preferences.dart';
+import 'package:gymtracker/provider/online.dart';
 import 'package:gymtracker/service/color.dart';
 import 'package:gymtracker/service/database.dart';
 import 'package:gymtracker/service/localizations.dart';
@@ -19,6 +22,7 @@ import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/view/components/controlled.dart';
 import 'package:gymtracker/view/components/master_detail.dart';
+import 'package:gymtracker/view/onboarding.dart';
 import 'package:gymtracker/view/settings/color.dart';
 import 'package:gymtracker/view/settings/radio.dart';
 import 'package:gymtracker/view/utils/in_app_icon.dart';
@@ -31,11 +35,12 @@ part 'settings.off.dart';
 part 'settings.permissions.dart';
 part 'settings.units.dart';
 
-class SettingsView extends ControlledWidget<SettingsController> {
+class SettingsView extends ConsumerWidget {
   const SettingsView({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final account = ref.watch(onlineProvider).value;
     var appVersion = "appInfo.version".tParams({
       "version": VersionService().packageInfo.version,
       "build": const String.fromEnvironment(
@@ -107,6 +112,26 @@ class SettingsView extends ControlledWidget<SettingsController> {
                 );
               },
             ),
+            if (account != null) ...[
+              const MasterItemWidget(child: Divider()),
+              MasterItem(
+                Text("settings.logout".t),
+                subtitle: Text("@${account.name}"),
+                leading: const Icon(GTIcons.exit),
+                trailing: const Icon(GTIcons.lt_chevron),
+                onTap: () async {
+                  final exit = await Go.confirm(
+                    "settings.logoutWarning.title".t,
+                    "settings.logoutWarning.content".t,
+                  );
+                  if (!exit) return;
+                  ref.read(onlineProvider.notifier).logout();
+                  if (context.mounted) {
+                    Go.replaceStack(() => const OnboardingScreen());
+                  }
+                },
+              ),
+            ],
           ],
         );
       },

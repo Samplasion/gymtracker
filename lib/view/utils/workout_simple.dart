@@ -12,6 +12,7 @@ import 'package:gymtracker/model/exercise.dart';
 import 'package:gymtracker/model/set.dart';
 import 'package:gymtracker/model/superset.dart';
 import 'package:gymtracker/service/localizations.dart';
+import 'package:gymtracker/struct/optional.dart';
 import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/utils/sets.dart';
@@ -31,6 +32,7 @@ import 'package:gymtracker/view/utils/weight_calculator.dart';
 import 'package:gymtracker/view/utils/workout.dart';
 import 'package:gymtracker/view/utils/workout_menus.dart';
 import 'package:gymtracker/view/workout.dart';
+import 'package:intl/intl.dart';
 
 class WorkoutSimpleView extends StatelessWidget {
   const WorkoutSimpleView({super.key});
@@ -40,9 +42,7 @@ class WorkoutSimpleView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (!Get.isRegistered<WorkoutController>()) {
-      return const Center(
-        child: CircularProgressIndicator(),
-      );
+      return const Center(child: CircularProgressIndicator());
     }
 
     final controller = Get.find<WorkoutController>();
@@ -57,7 +57,8 @@ class WorkoutSimpleView extends StatelessWidget {
       final canShowAddExercise = current == null
           ? !isWorkoutComplete
           : _isLastSetInWorkout(controller, current.cursor);
-      final canShowAddSet = current != null &&
+      final canShowAddSet =
+          current != null &&
           _isLastSetInExercise(current.cursor, current.exercise);
       final accentColor = settings.tintExercises.value && current != null
           ? current.exerciseColor
@@ -74,10 +75,7 @@ class WorkoutSimpleView extends StatelessWidget {
                       controller.finishWorkoutWithDialog(context);
                     },
                     onAddExercise: () async {
-                      await _addExerciseAndAdvanceCursor(
-                        controller,
-                        current,
-                      );
+                      await _addExerciseAndAdvanceCursor(controller, current);
                     },
                     showAddExercise: canShowAddExercise,
                   )
@@ -88,10 +86,7 @@ class WorkoutSimpleView extends StatelessWidget {
                     showAddExercise: canShowAddExercise,
                     showAddSet: canShowAddSet,
                     onAddExercise: () async {
-                      await _addExerciseAndAdvanceCursor(
-                        controller,
-                        current,
-                      );
+                      await _addExerciseAndAdvanceCursor(controller, current);
                     },
                     onAddSet: () {
                       controller.callbacks.onSetCreate(current.index);
@@ -124,9 +119,8 @@ class WorkoutSimpleView extends StatelessWidget {
             onCalculator: () {
               showDialog(
                 context: context,
-                builder: (context) => WeightCalculator(
-                  weightUnit: controller.weightUnit.value,
-                ),
+                builder: (context) =>
+                    WeightCalculator(weightUnit: controller.weightUnit.value),
               );
             },
             onDone: controller.autoMarkNextSetDone,
@@ -165,8 +159,9 @@ class WorkoutSimpleView extends StatelessWidget {
                               WidgetSpan(
                                 child: Icon(
                                   GTIcons.stopwatch,
-                                  color:
-                                      Theme.of(context).colorScheme.secondary,
+                                  color: Theme.of(
+                                    context,
+                                  ).colorScheme.secondary,
                                 ),
                                 alignment: PlaceholderAlignment.middle,
                               ),
@@ -196,10 +191,8 @@ class WorkoutSimpleView extends StatelessWidget {
               icon: const Icon(GTIcons.rest_timer),
             ),
             PopupMenuButton(
-              itemBuilder: (context) => buildToolboxMenuEntries(
-                context,
-                controller,
-              ),
+              itemBuilder: (context) =>
+                  buildToolboxMenuEntries(context, controller),
               tooltip: "ongoingWorkout.toolbox.title".t,
               icon: const Icon(GTIcons.tools),
             ),
@@ -214,8 +207,9 @@ class WorkoutSimpleView extends StatelessWidget {
                     ),
                     onTap: () {
                       SchedulerBinding.instance.addPostFrameCallback((_) {
-                        Navigator.of(context)
-                            .popAndPushNamed(WorkoutView.routeName);
+                        Navigator.of(
+                          context,
+                        ).popAndPushNamed(WorkoutView.routeName);
                       });
                     },
                   ),
@@ -239,7 +233,7 @@ class WorkoutSimpleView extends StatelessWidget {
                       mouseCursor: SystemMouseCursors.click,
                       enabled: current != null,
                     ),
-                  )
+                  ),
                 ];
 
                 return items;
@@ -298,9 +292,7 @@ class _CurrentSetView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (!Get.isRegistered<WorkoutController>()) {
-      return const Center(
-        child: CircularProgressIndicator(),
-      );
+      return const Center(child: CircularProgressIndicator());
     }
 
     final controller = Get.find<WorkoutController>();
@@ -308,6 +300,10 @@ class _CurrentSetView extends StatelessWidget {
     if (isRestActive) {
       return _NextSetRestView(data: data);
     }
+
+    final rpeButtonColor = data.set.rpe == null
+        ? null
+        : rpeColor(context, data.set.rpe!);
 
     return PageTransitionSwitcher(
       reverse: !_isSetIndexAfter(data.cursor, controller.previousSetCursor)
@@ -322,21 +318,19 @@ class _CurrentSetView extends StatelessWidget {
           child: child,
         );
       },
-      child: Center(
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.fromLTRB(24, 24, 24, 12),
         key: ValueKey<String>(
-            'current-set-${data.index}-${data.cursor.setIndex}'),
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.fromLTRB(24, 24, 24, 12),
+          'current-set-${data.index}-${data.cursor.setIndex}',
+        ),
+        child: Center(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               ExerciseParentViewGesture(
                 exercise: data.exercise,
-                child: ExerciseIcon(
-                  radius: 32,
-                  exercise: data.exercise,
-                ),
+                child: ExerciseIcon(radius: 32, exercise: data.exercise),
               ),
               const SizedBox(height: 20),
               if (data.isInSuperset)
@@ -357,30 +351,31 @@ class _CurrentSetView extends StatelessWidget {
                 ),
               const SizedBox(height: 4),
               Text.rich(
-                TextSpan(children: [
-                  TextSpan(
-                    text: data.exercise.displayName,
-                  ),
-                  const TextSpan(text: ' '),
-                  WidgetSpan(
-                    alignment: PlaceholderAlignment.middle,
-                    child: PopupMenuButton(
-                      itemBuilder: (context) => buildExerciseControlMenuEntries(
-                        context: context,
-                        index: data.index,
-                        exercise: data.exercise,
-                        isCreating: false,
-                        callbacks: controller.callbacks,
-                        weightUnit: controller.weightUnit.value,
-                        distanceUnit: controller.distanceUnit.value,
+                TextSpan(
+                  children: [
+                    TextSpan(text: data.exercise.displayName),
+                    const TextSpan(text: ' '),
+                    WidgetSpan(
+                      alignment: PlaceholderAlignment.middle,
+                      child: PopupMenuButton(
+                        itemBuilder: (context) =>
+                            buildExerciseControlMenuEntries(
+                              context: context,
+                              index: data.index,
+                              exercise: data.exercise,
+                              isCreating: false,
+                              callbacks: controller.callbacks,
+                              weightUnit: controller.weightUnit.value,
+                              distanceUnit: controller.distanceUnit.value,
+                            ),
                       ),
                     ),
-                  ),
-                ]),
+                  ],
+                ),
                 textAlign: TextAlign.center,
                 style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                      fontWeight: FontWeight.w700,
-                    ),
+                  fontWeight: FontWeight.w700,
+                ),
               ),
               const SizedBox(height: 16),
               Row(
@@ -403,26 +398,62 @@ class _CurrentSetView extends StatelessWidget {
                     label: Text(
                       data.parametersLabel,
                       style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                            fontWeight: FontWeight.w600,
-                          ),
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                   ),
                 ],
               ),
               const SizedBox(height: 4),
-              TextButton.icon(
-                onPressed: () => _showRestTimeEditor(context, data),
-                style: TextButton.styleFrom(
-                  visualDensity: VisualDensity.compact,
-                ),
-                icon: const Icon(
-                  GTIcons.edit,
-                  size: 16,
-                ),
-                label: Text(
-                  '${'exercise.fields.restTime'.t}: ${TimeInputField.encodeDuration(data.restTime)}',
-                  style: Theme.of(context).textTheme.bodySmall,
-                ),
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                alignment: .center,
+                children: [
+                  TextButton.icon(
+                    onPressed: () =>
+                        showDialog<Optional<double?>>(
+                          context: context,
+                          builder: (context) {
+                            return WorkoutSetRPEDialog(
+                              currentRPE: data.set.rpe,
+                            );
+                          },
+                        ).then((value) {
+                          if (value != null) {
+                            controller.callbacks.onSetChangeRPE(
+                              data.index,
+                              data.cursor.setIndex,
+                              value.safeUnwrap(),
+                            );
+                          }
+                        }),
+                    style: TextButton.styleFrom(
+                      foregroundColor: rpeButtonColor,
+                      iconColor: rpeButtonColor,
+                      surfaceTintColor: rpeButtonColor,
+                      visualDensity: VisualDensity.compact,
+                    ),
+                    icon: const Icon(GTIcons.rpe, size: 16),
+                    label: Text(
+                      'RPE ${data.set.rpe == null ? "-" : NumberFormat.compact(locale: context.locale.languageCode).format(data.set.rpe)}',
+                      style: Theme.of(
+                        context,
+                      ).textTheme.bodySmall?.copyWith(color: rpeButtonColor),
+                    ),
+                  ),
+                  TextButton.icon(
+                    onPressed: () => _showRestTimeEditor(context, data),
+                    style: TextButton.styleFrom(
+                      visualDensity: VisualDensity.compact,
+                    ),
+                    icon: const Icon(GTIcons.edit, size: 16),
+                    label: Text(
+                      '${'exercise.fields.restTime'.t}: ${TimeInputField.encodeDuration(data.restTime)}',
+                      style: Theme.of(context).textTheme.bodySmall,
+                    ),
+                  ),
+                ],
               ),
               const SizedBox(height: 8),
               _NotesBox(
@@ -432,12 +463,8 @@ class _CurrentSetView extends StatelessWidget {
                   context,
                   initialText: data.exercise.notes,
                   onSave: (text) {
-                    Get.find<WorkoutController>()
-                        .callbacks
-                        .onExerciseNotesChange(
-                          data.index,
-                          text,
-                        );
+                    Get.find<WorkoutController>().callbacks
+                        .onExerciseNotesChange(data.index, text);
                   },
                 ),
               ),
@@ -450,15 +477,11 @@ class _CurrentSetView extends StatelessWidget {
                     context,
                     initialText: data.supersetNotes!,
                     onSave: (text) {
-                      Get.find<WorkoutController>()
-                          .callbacks
-                          .onExerciseNotesChange(
-                        (
-                          exerciseIndex: data.cursor.supersetIndex!,
-                          supersetIndex: null,
-                        ),
-                        text,
-                      );
+                      Get.find<WorkoutController>().callbacks
+                          .onExerciseNotesChange((
+                            exerciseIndex: data.cursor.supersetIndex!,
+                            supersetIndex: null,
+                          ), text);
                     },
                   ),
                 ),
@@ -502,7 +525,9 @@ class _NextSetRestView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final textColor = Theme.of(context).colorScheme.onSurface.withOpacity(0.75);
+    final textColor = Theme.of(
+      context,
+    ).colorScheme.onSurface.withValues(alpha: 0.75);
 
     return Center(
       child: SingleChildScrollView(
@@ -514,19 +539,20 @@ class _NextSetRestView extends StatelessWidget {
             Text(
               'exercise.fields.restTime'.t,
               style: Theme.of(context).textTheme.displaySmall?.copyWith(
-                    fontWeight: FontWeight.w700,
-                    color: textColor,
-                  ),
+                fontWeight: FontWeight.w700,
+                color: textColor,
+              ),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 14),
             Text(
-              'ongoingWorkout.simple.nextUp'
-                  .tParams({'exercise': data.exercise.displayName}),
+              'ongoingWorkout.simple.nextUp'.tParams({
+                'exercise': data.exercise.displayName,
+              }),
               style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.w600,
-                    color: textColor,
-                  ),
+                fontWeight: FontWeight.w600,
+                color: textColor,
+              ),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 8),
@@ -549,8 +575,9 @@ class _NextSetRestView extends StatelessWidget {
                                 const SizedBox(width: 4),
                                 Text(
                                   'superset'.plural(data.supersetExerciseCount),
-                                  style:
-                                      Theme.of(context).textTheme.labelMedium,
+                                  style: Theme.of(
+                                    context,
+                                  ).textTheme.labelMedium,
                                 ),
                               ],
                             ),
@@ -558,9 +585,7 @@ class _NextSetRestView extends StatelessWidget {
                           ],
                           Text(
                             data.exercise.displayName,
-                            style: Theme.of(context)
-                                .textTheme
-                                .titleMedium
+                            style: Theme.of(context).textTheme.titleMedium
                                 ?.copyWith(fontWeight: FontWeight.w700),
                           ),
                           const SizedBox(height: 4),
@@ -642,119 +667,114 @@ class _BottomPanel extends StatelessWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Obx(
-                () {
-                  final showRestControls =
-                      countdownController.targetTime.value != null;
-                  return Crossfade(
-                    showSecond: showRestControls,
-                    firstChild: const SizedBox.shrink(
-                      key: ValueKey<String>('rest-controls-hidden'),
-                    ),
-                    secondChild: Padding(
-                      key: const ValueKey<String>('rest-controls-visible'),
-                      padding: const EdgeInsets.only(top: 8),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(
-                                GTIcons.cardio_timer,
-                                size: 18,
-                                color: accentColor,
+              Obx(() {
+                final showRestControls =
+                    countdownController.targetTime.value != null;
+                return Crossfade(
+                  showSecond: showRestControls,
+                  firstChild: const SizedBox.shrink(
+                    key: ValueKey<String>('rest-controls-hidden'),
+                  ),
+                  secondChild: Padding(
+                    key: const ValueKey<String>('rest-controls-visible'),
+                    padding: const EdgeInsets.only(top: 8),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              GTIcons.cardio_timer,
+                              size: 18,
+                              color: accentColor,
+                            ),
+                            const SizedBox(width: 6),
+                            TimerView(
+                              startingTime:
+                                  countdownController.startingTime.value ??
+                                  DateTime.now(),
+                              builder: (context, _) {
+                                return TimerView.buildTimeString(
+                                  context,
+                                  countdownController.remaining,
+                                  style: Theme.of(context).textTheme.titleSmall
+                                      ?.copyWith(
+                                        fontWeight: FontWeight.w700,
+                                        color: accentColor,
+                                      ),
+                                );
+                              },
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 6),
+                        TimerView(
+                          startingTime: () {
+                            try {
+                              return Get.find<WorkoutController>().time.value;
+                            } catch (_) {
+                              return DateTime.now();
+                            }
+                          }(),
+                          builder: (context, _) {
+                            return TweenAnimationBuilder<double>(
+                              tween: Tween<double>(
+                                begin: 1,
+                                end: countdownController.progress,
                               ),
-                              const SizedBox(width: 6),
-                              TimerView(
-                                startingTime:
-                                    countdownController.startingTime.value ??
-                                        DateTime.now(),
-                                builder: (context, _) {
-                                  return TimerView.buildTimeString(
-                                    context,
-                                    countdownController.remaining,
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .titleSmall
-                                        ?.copyWith(
-                                          fontWeight: FontWeight.w700,
-                                          color: accentColor,
-                                        ),
-                                  );
-                                },
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 6),
-                          TimerView(
-                            startingTime: () {
-                              try {
-                                return Get.find<WorkoutController>().time.value;
-                              } catch (_) {
-                                return DateTime.now();
-                              }
-                            }(),
-                            builder: (context, _) {
-                              return TweenAnimationBuilder<double>(
-                                tween: Tween<double>(
-                                  begin: 1,
-                                  end: countdownController.progress,
-                                ),
-                                duration: const Duration(milliseconds: 220),
-                                builder: (context, value, _) {
-                                  return LinearProgressIndicator(
-                                    value: value,
-                                    minHeight: 3,
-                                    valueColor: AlwaysStoppedAnimation<Color>(
-                                      accentColor,
-                                    ),
-                                    backgroundColor:
-                                        accentColor.withOpacity(0.18),
-                                  );
-                                },
-                              );
-                            },
-                          ),
-                          const SizedBox(height: 6),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              TextButton(
-                                onPressed:
-                                    countdownController.subtract15Seconds,
-                                child: Text(
-                                  'timer.subtract15s'.t,
-                                  style: TextStyle(
-                                    color: Theme.of(context).colorScheme.error,
+                              duration: const Duration(milliseconds: 220),
+                              builder: (context, value, _) {
+                                return LinearProgressIndicator(
+                                  value: value,
+                                  minHeight: 3,
+                                  valueColor: AlwaysStoppedAnimation<Color>(
+                                    accentColor,
                                   ),
-                                ),
-                              ),
-                              const SizedBox(width: 4),
-                              TextButton(
-                                onPressed: countdownController.add15Seconds,
-                                child: Text(
-                                  'timer.add15s'.t,
-                                  style: TextStyle(
-                                    color:
-                                        Theme.of(context).colorScheme.tertiary,
+                                  backgroundColor: accentColor.withValues(
+                                    alpha: 0.18,
                                   ),
+                                );
+                              },
+                            );
+                          },
+                        ),
+                        const SizedBox(height: 6),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            TextButton(
+                              onPressed: countdownController.subtract15Seconds,
+                              child: Text(
+                                'timer.subtract15s'.t,
+                                style: TextStyle(
+                                  color: Theme.of(context).colorScheme.error,
                                 ),
                               ),
-                              const SizedBox(width: 4),
-                              TextButton.icon(
-                                onPressed: countdownController.removeCountdown,
-                                icon: const Icon(GTIcons.skip),
-                                label: Text('timer.skip'.t),
+                            ),
+                            const SizedBox(width: 4),
+                            TextButton(
+                              onPressed: countdownController.add15Seconds,
+                              child: Text(
+                                'timer.add15s'.t,
+                                style: TextStyle(
+                                  color: Theme.of(context).colorScheme.tertiary,
+                                ),
                               ),
-                            ],
-                          ),
-                        ],
-                      ),
+                            ),
+                            const SizedBox(width: 4),
+                            TextButton.icon(
+                              onPressed: countdownController.removeCountdown,
+                              icon: const Icon(GTIcons.skip),
+                              label: Text('timer.skip'.t),
+                            ),
+                          ],
+                        ),
+                      ],
                     ),
-                  );
-                },
-              ),
+                  ),
+                );
+              }),
               Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
@@ -764,9 +784,7 @@ class _BottomPanel extends StatelessWidget {
                       return TimerView.buildTimeString(
                         context,
                         DateTime.now().difference(workoutStart),
-                        style: Theme.of(context)
-                            .textTheme
-                            .headlineMedium
+                        style: Theme.of(context).textTheme.headlineMedium
                             ?.copyWith(fontWeight: FontWeight.w800),
                       );
                     },
@@ -804,8 +822,9 @@ class _BottomPanel extends StatelessWidget {
                       _RoundControlButton(
                         icon: GTIcons.nextDay,
                         tooltip: 'ongoingWorkout.simple.nextSet'.t,
-                        onPressed:
-                            (!controlsDisabled && canGoNext) ? onNext : null,
+                        onPressed: (!controlsDisabled && canGoNext)
+                            ? onNext
+                            : null,
                         onLongPress: (!controlsDisabled && canGoNext)
                             ? onGoToLastSet
                             : null,
@@ -945,9 +964,7 @@ class _SimpleSetEditDialogState extends State<_SimpleSetEditDialog> {
     final controller = Get.find<WorkoutController>();
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text('ongoingWorkout.simple.editSet'.t),
-      ),
+      appBar: AppBar(title: Text('ongoingWorkout.simple.editSet'.t)),
       body: SafeArea(
         child: ListView(
           padding: const EdgeInsets.fromLTRB(12, 12, 12, 24),
@@ -976,6 +993,11 @@ class _SimpleSetEditDialogState extends State<_SimpleSetEditDialog> {
                 widget.data.index,
                 widget.data.cursor.setIndex,
                 done,
+              ),
+              onSetChangeRPE: (newRPE) => controller.callbacks.onSetChangeRPE(
+                widget.data.index,
+                widget.data.cursor.setIndex,
+                newRPE,
               ),
               onSetValueChange: (set) {
                 setState(() {
@@ -1070,8 +1092,8 @@ _CurrentSetData? _currentSetData(WorkoutController controller) {
   final supersetExerciseCount = cursor.supersetIndex == null
       ? 1
       : ((controller.exercises[cursor.supersetIndex!] as Superset)
-          .exercises
-          .length);
+            .exercises
+            .length);
   final context = Get.context;
   final fallbackColor = context?.theme.colorScheme.primary ?? Colors.grey;
   final exerciseColor = exercise.standard && exercise.category != null
@@ -1155,7 +1177,9 @@ Future<void> _showRestTimeEditor(
 }
 
 Exercise? _exerciseAtCursor(
-    WorkoutController controller, WorkoutSetCursor cursor) {
+  WorkoutController controller,
+  WorkoutSetCursor cursor,
+) {
   if (cursor.supersetIndex == null) {
     final ex = controller.exercises[cursor.exerciseIndex];
     return ex is Exercise ? ex : null;
@@ -1177,16 +1201,14 @@ List<_SetRef> _orderedSetRefs(WorkoutController controller) {
     final candidate = controller.exercises[i];
     if (candidate is Exercise) {
       for (int setIndex = 0; setIndex < candidate.sets.length; setIndex++) {
-        refs.add(_SetRef(
-          cursor: (
-            exerciseIndex: i,
-            supersetIndex: null,
-            setIndex: setIndex,
+        refs.add(
+          _SetRef(
+            cursor: (exerciseIndex: i, supersetIndex: null, setIndex: setIndex),
+            exercise: candidate,
+            set: candidate.sets[setIndex],
+            isInSuperset: false,
           ),
-          exercise: candidate,
-          set: candidate.sets[setIndex],
-          isInSuperset: false,
-        ));
+        );
       }
       continue;
     }
@@ -1200,21 +1222,25 @@ List<_SetRef> _orderedSetRefs(WorkoutController controller) {
     );
 
     for (int setIndex = 0; setIndex < maxSets; setIndex++) {
-      for (int exerciseIndex = 0;
-          exerciseIndex < candidate.exercises.length;
-          exerciseIndex++) {
+      for (
+        int exerciseIndex = 0;
+        exerciseIndex < candidate.exercises.length;
+        exerciseIndex++
+      ) {
         final exercise = candidate.exercises[exerciseIndex];
         if (setIndex >= exercise.sets.length) continue;
-        refs.add(_SetRef(
-          cursor: (
-            exerciseIndex: exerciseIndex,
-            supersetIndex: i,
-            setIndex: setIndex,
+        refs.add(
+          _SetRef(
+            cursor: (
+              exerciseIndex: exerciseIndex,
+              supersetIndex: i,
+              setIndex: setIndex,
+            ),
+            exercise: exercise,
+            set: exercise.sets[setIndex],
+            isInSuperset: true,
           ),
-          exercise: exercise,
-          set: exercise.sets[setIndex],
-          isInSuperset: true,
-        ));
+        );
       }
     }
   }
@@ -1255,10 +1281,13 @@ bool _hasNextSet(WorkoutController controller, WorkoutSetCursor? cursor) {
 }
 
 _NextUpData? _nextUpData(
-    WorkoutController controller, _CurrentSetData current) {
+  WorkoutController controller,
+  _CurrentSetData current,
+) {
   final ordered = _orderedSetRefs(controller);
-  final currentIndex =
-      ordered.indexWhere((ref) => _sameCursor(ref.cursor, current.cursor));
+  final currentIndex = ordered.indexWhere(
+    (ref) => _sameCursor(ref.cursor, current.cursor),
+  );
   if (currentIndex == -1) return null;
 
   for (int i = currentIndex + 1; i < ordered.length; i++) {
@@ -1356,8 +1385,9 @@ bool _isLastSetInWorkout(
   WorkoutSetCursor cursor,
 ) {
   final ordered = _orderedSetRefs(controller);
-  final currentIndex =
-      ordered.indexWhere((entry) => _sameCursor(entry.cursor, cursor));
+  final currentIndex = ordered.indexWhere(
+    (entry) => _sameCursor(entry.cursor, cursor),
+  );
   return currentIndex == ordered.length - 1;
 }
 
@@ -1425,13 +1455,10 @@ Future<void> _addExerciseAndAdvanceCursor(
   final firstNewExerciseIndex = previousLength;
   final firstNewExercise = controller.exercises[firstNewExerciseIndex];
   if (firstNewExercise is Exercise && firstNewExercise.sets.isNotEmpty) {
-    controller.selectSetCursorByIndex(
-      (
-        exerciseIndex: firstNewExerciseIndex,
-        supersetIndex: null,
-      ),
-      0,
-    );
+    controller.selectSetCursorByIndex((
+      exerciseIndex: firstNewExerciseIndex,
+      supersetIndex: null,
+    ), 0);
     return;
   }
 
@@ -1457,22 +1484,17 @@ class _SetTypeBadge extends StatelessWidget {
   Widget build(BuildContext context) {
     return PopupMenuButton(
       tooltip: 'set.kind'.t,
-      icon: buildSetType(
-        context,
-        set.kind,
-        set: set,
-        allSets: exercise.sets,
-      ),
+      icon: buildSetType(context, set.kind, set: set, allSets: exercise.sets),
       itemBuilder: (context) => buildSetKindMenuEntries(
         context: context,
         exercise: exercise,
         set: set,
         onSetSelectKind: (kind) {
           Get.find<WorkoutController>().callbacks.onSetSelectKind(
-                index,
-                setIndex,
-                kind,
-              );
+            index,
+            setIndex,
+            kind,
+          );
         },
       ),
     );
@@ -1484,23 +1506,18 @@ class _NotesBox extends StatelessWidget {
   final String text;
   final VoidCallback? onTap;
 
-  const _NotesBox({
-    required this.title,
-    required this.text,
-    this.onTap,
-  });
+  const _NotesBox({required this.title, required this.text, this.onTap});
 
   @override
   Widget build(BuildContext context) {
     final notesTextStyle = Theme.of(context).textTheme.bodyMedium!.copyWith(
-          fontSize: text.isEmpty ? 15 : null,
-          color: text.isEmpty
-              ? Theme.of(context)
-                  .colorScheme
-                  .onSurface
-                  .withAlpha((0.75 * 255).round())
-              : null,
-        );
+      fontSize: text.isEmpty ? 15 : null,
+      color: text.isEmpty
+          ? Theme.of(
+              context,
+            ).colorScheme.onSurface.withAlpha((0.75 * 255).round())
+          : null,
+    );
 
     return Card(
       margin: EdgeInsets.zero,
@@ -1526,9 +1543,9 @@ class _NotesBox extends StatelessWidget {
                     TextSpan(text: title),
                   ],
                 ),
-                style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                      fontWeight: FontWeight.w700,
-                    ),
+                style: Theme.of(
+                  context,
+                ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w700),
               ),
               const SizedBox(height: 4),
               text.asQuillDocument().isEmpty()
@@ -1536,10 +1553,7 @@ class _NotesBox extends StatelessWidget {
                       'exercise.editor.fields.notes.tapToEdit'.t,
                       style: notesTextStyle,
                     )
-                  : MaybeRichText(
-                      text: text,
-                      style: notesTextStyle,
-                    ),
+                  : MaybeRichText(text: text, style: notesTextStyle),
             ],
           ),
         ),

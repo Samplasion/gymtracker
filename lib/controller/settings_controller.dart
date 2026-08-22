@@ -11,7 +11,9 @@ import 'package:gymtracker/controller/serviceable_controller.dart';
 import 'package:gymtracker/data/converters.dart';
 import 'package:gymtracker/data/distance.dart';
 import 'package:gymtracker/data/weights.dart';
+import 'package:gymtracker/main.dart';
 import 'package:gymtracker/model/preferences.dart';
+import 'package:gymtracker/provider/locale.dart';
 import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/service/logger.dart';
 import 'package:gymtracker/struct/nutrition.dart';
@@ -44,58 +46,54 @@ class SettingsController extends GetxController with ServiceableController {
   Rx<NutritionCountry> nutritionCountry =
       Prefs.defaultValue.nutritionCountry.obs;
 
-  void setUsesDynamicColor(bool usesDC) =>
-      service.writeSettings(service.prefs$.value.copyWith(
-        usesDynamicColor: usesDC,
-      ));
+  void setUsesDynamicColor(bool usesDC) => service.writeSettings(
+    service.prefs$.value.copyWith(usesDynamicColor: usesDC),
+  );
 
   void setColor(Color color) =>
       service.writeSettings(service.prefs$.value.copyWith(color: color));
 
-  void setLocale(Locale locale) {
-    Get.updateLocale(locale);
+  void setLocale(Locale? locale) {
+    if (locale == kSystemLocaleSentinel) {
+      locale = null;
+    }
+    Get.updateLocale(locale ?? globalContainer.read(platformLocaleProvider));
     service.writeSettings(service.prefs$.value.copyWith(locale: locale));
   }
 
-  void setWeightUnit(Weights weightUnit) =>
-      service.writeSettings(service.prefs$.value.copyWith(
-        weightUnit: weightUnit,
-      ));
+  void setWeightUnit(Weights weightUnit) => service.writeSettings(
+    service.prefs$.value.copyWith(weightUnit: weightUnit),
+  );
 
-  void setDistanceUnit(Distance distanceUnit) =>
-      service.writeSettings(service.prefs$.value.copyWith(
-        distanceUnit: distanceUnit,
-      ));
+  void setDistanceUnit(Distance distanceUnit) => service.writeSettings(
+    service.prefs$.value.copyWith(distanceUnit: distanceUnit),
+  );
 
-  void setShowSuggestedRoutines(bool show) =>
-      service.writeSettings(service.prefs$.value.copyWith(
-        showSuggestedRoutines: show,
-      ));
+  void setShowSuggestedRoutines(bool show) => service.writeSettings(
+    service.prefs$.value.copyWith(showSuggestedRoutines: show),
+  );
 
-  void setThemeMode(ThemeMode themeMode) =>
-      service.writeSettings(service.prefs$.value.copyWith(
-        themeMode: themeMode,
-      ));
+  void setThemeMode(ThemeMode themeMode) => service.writeSettings(
+    service.prefs$.value.copyWith(themeMode: themeMode),
+  );
 
-  void setTintExercises(bool tintExercises) =>
-      service.writeSettings(service.prefs$.value.copyWith(
-        tintExercises: tintExercises,
-      ));
+  void setTintExercises(bool tintExercises) => service.writeSettings(
+    service.prefs$.value.copyWith(tintExercises: tintExercises),
+  );
 
-  void setDefaultToSimpleWorkoutView(bool value) =>
-      service.writeSettings(service.prefs$.value.copyWith(
-        defaultToSimpleWorkoutView: value,
-      ));
+  void setDefaultToSimpleWorkoutView(bool value) => service.writeSettings(
+    service.prefs$.value.copyWith(defaultToSimpleWorkoutView: value),
+  );
 
   void setNutritionLanguage(NutritionLanguage nutritionLanguage) =>
-      service.writeSettings(service.prefs$.value.copyWith(
-        nutritionLanguage: nutritionLanguage,
-      ));
+      service.writeSettings(
+        service.prefs$.value.copyWith(nutritionLanguage: nutritionLanguage),
+      );
 
   void setNutritionCountry(NutritionCountry nutritionCountry) =>
-      service.writeSettings(service.prefs$.value.copyWith(
-        nutritionCountry: nutritionCountry,
-      ));
+      service.writeSettings(
+        service.prefs$.value.copyWith(nutritionCountry: nutritionCountry),
+      );
 
   @override
   void onInit() {
@@ -104,11 +102,15 @@ class SettingsController extends GetxController with ServiceableController {
     service.prefs$.listen((prefs) {
       hasInitialized(true);
 
-      Get.updateLocale(prefs.locale);
+      var locale = prefs.locale ?? globalContainer.read(platformLocaleProvider);
+      if (locale == kSystemLocaleSentinel || locale == null) {
+        locale = globalContainer.read(platformLocaleProvider);
+      }
+      Get.updateLocale(locale!);
 
       usesDynamicColor(prefs.usesDynamicColor);
       color(prefs.color);
-      locale(prefs.locale);
+      this.locale(locale);
       weightUnit(prefs.weightUnit);
       distanceUnit(prefs.distanceUnit);
       showSuggestedRoutines(prefs.showSuggestedRoutines);
@@ -125,10 +127,14 @@ class SettingsController extends GetxController with ServiceableController {
   @override
   void onServiceChange() {
     final prefs = service.prefs$.value;
+    var locale = prefs.locale ?? globalContainer.read(platformLocaleProvider);
+    if (locale == kSystemLocaleSentinel || locale == null) {
+      locale = globalContainer.read(platformLocaleProvider);
+    }
 
     usesDynamicColor(prefs.usesDynamicColor);
     color(prefs.color);
-    locale(prefs.locale);
+    this.locale(locale);
     weightUnit(prefs.weightUnit);
     distanceUnit(prefs.distanceUnit);
     showSuggestedRoutines(prefs.showSuggestedRoutines);
@@ -144,17 +150,14 @@ class SettingsController extends GetxController with ServiceableController {
   Future exportSettings(BuildContext context) async {
     try {
       final box = context.findRenderObject() as RenderBox?;
-      await Share.shareXFiles(
-        [
-          XFile.fromData(
-            Uint8List.fromList(utf8.encode(json.encode(service.toJson()))),
-            mimeType: "application/json",
-            name:
-                "${"settings.options.export.filename".t}_${DateTime.now().toIso8601String()}.json",
-          )
-        ],
-        sharePositionOrigin: box!.localToGlobal(Offset.zero) & box.size,
-      );
+      await Share.shareXFiles([
+        XFile.fromData(
+          Uint8List.fromList(utf8.encode(json.encode(service.toJson()))),
+          mimeType: "application/json",
+          name:
+              "${"settings.options.export.filename".t}_${DateTime.now().toIso8601String()}.json",
+        ),
+      ], sharePositionOrigin: box!.localToGlobal(Offset.zero) & box.size);
     } catch (e, s) {
       logger.e(null, error: e, stackTrace: s);
 
@@ -171,7 +174,7 @@ class SettingsController extends GetxController with ServiceableController {
               // ignore: use_build_context_synchronously
               MaterialLocalizations.of(context).copyButtonLabel,
             ),
-          )
+          ),
         ],
         bodyStyle: monospace,
       );
@@ -181,22 +184,19 @@ class SettingsController extends GetxController with ServiceableController {
   Future importSettings(BuildContext context) async {
     final choice = await Go.pick(
       title: "settings.options.import.label".t,
-      values: {
-        "gt": "settings.options.import.types.gt".t,
-        "hevy": "settings.options.import.types.hevy".t,
-      },
+      values: {"hevy": "settings.options.import.types.hevy".t},
     );
 
     if (choice == null) return;
 
-    FilePickerResult? result = await FilePicker.pickFiles();
+    PlatformFile? result = await FilePicker.pickFile();
+    Uint8List? bytes = await result?.readAsBytes();
     String content;
 
-    if (kIsWeb && result?.files.single.bytes != null) {
-      content = String.fromCharCodes(result!.files.single.bytes!.toList());
-    } else if (!kIsWeb && result?.files.single.path != null) {
-      File file = File(result!.files.single.path!);
-      content = await file.readAsString();
+    if (kIsWeb && bytes != null) {
+      content = String.fromCharCodes(bytes.toList());
+    } else if (!kIsWeb && result != null) {
+      content = await result.xFile.readAsString();
     } else {
       // User canceled the picker
       logger.i("Picker canceled");
@@ -205,10 +205,6 @@ class SettingsController extends GetxController with ServiceableController {
 
     try {
       switch (choice) {
-        case "gt":
-          // ignore: use_build_context_synchronously
-          await _importGTJson(context, content);
-          break;
         case "hevy":
           // ignore: use_build_context_synchronously
           await _importHevy(context, content);
@@ -234,9 +230,10 @@ class SettingsController extends GetxController with ServiceableController {
               Go.snack("settings.options.import.failed.copy".t);
             },
             child: Text(
-                // ignore: use_build_context_synchronously
-                MaterialLocalizations.of(context).copyButtonLabel),
-          )
+              // ignore: use_build_context_synchronously
+              MaterialLocalizations.of(context).copyButtonLabel,
+            ),
+          ),
         ],
       );
     }
@@ -290,17 +287,14 @@ class SettingsController extends GetxController with ServiceableController {
   exportRawDatabase(BuildContext context) async {
     try {
       final box = context.findRenderObject() as RenderBox?;
-      await Share.shareXFiles(
-        [
-          XFile(
-            (await service.exportRaw()).path,
-            mimeType: "application/octet-stream",
-            name:
-                "${"settings.options.export.filename".t}_${DateTime.now().toIso8601String()}.db",
-          )
-        ],
-        sharePositionOrigin: box!.localToGlobal(Offset.zero) & box.size,
-      );
+      await Share.shareXFiles([
+        XFile(
+          (await service.exportRaw()).path,
+          mimeType: "application/octet-stream",
+          name:
+              "${"settings.options.export.filename".t}_${DateTime.now().toIso8601String()}.db",
+        ),
+      ], sharePositionOrigin: box!.localToGlobal(Offset.zero) & box.size);
     } catch (e, s) {
       logger.e(null, error: e, stackTrace: s);
 
@@ -317,7 +311,7 @@ class SettingsController extends GetxController with ServiceableController {
               // ignore: use_build_context_synchronously
               MaterialLocalizations.of(context).copyButtonLabel,
             ),
-          )
+          ),
         ],
         bodyStyle: monospace,
       );

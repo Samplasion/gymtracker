@@ -1,9 +1,16 @@
+import 'dart:io';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:gymtracker/controller/coordinator.dart';
+import 'package:gymtracker/main.dart';
 import 'package:gymtracker/model/subscription.dart';
+import 'package:gymtracker/provider/events.dart';
 import 'package:gymtracker/service/logger.dart';
+import 'package:gymtracker/service/online.dart';
 import 'package:gymtracker/service/purchases.dart';
+import 'package:gymtracker/utils/go.dart';
+import 'package:gymtracker/view/paywall.dart';
 import 'package:purchases_flutter/models/entitlement_info_wrapper.dart';
 import 'package:purchases_flutter/models/package_wrapper.dart';
 import 'package:purchases_flutter/models/period_unit.dart' show PeriodUnit;
@@ -13,33 +20,45 @@ import 'package:rxdart/subjects.dart';
 class PurchasesController extends ChangeNotifier {
   final PurchasesService purchasesService;
   final Coordinator eventScheduler;
+  final OnlineService onlineService;
 
   final _subscriptionInfo$ = BehaviorSubject.seeded(SubscriptionInfo.empty);
   late final Stream<SubscriptionInfo> subscriptionInfoStream =
       _subscriptionInfo$.stream;
   SubscriptionInfo get subscriptionInfo => _subscriptionInfo$.value;
 
-  PurchasesController(this.purchasesService, this.eventScheduler) {
-    eventScheduler.addEventListener(
-      ScheduledEvent.userDidLogin,
-      _authChangeRoutine,
-    );
-    eventScheduler.addEventListener(
-      ScheduledEvent.userDidLogout,
-      _authChangeRoutine,
-    );
-    eventScheduler.addEventListener(
-      ScheduledEvent.userDidUpdateSubscription,
-      () {
-        purchasesService.getCustomerInfo().then((entitlement) {
-          final subscriptionInfo = _mapEntitlementToSubscriptionInfo(
-            entitlement,
+  PurchasesController(
+    this.purchasesService,
+    this.eventScheduler,
+    this.onlineService,
+  ) {
+    purchasesService.entitlementStream.listen((entitlement) async {
+      globalContainer
+          .read(eventBusProvider)
+          .emit(
+            GBUserDidUpdateSubscriptionEvent(
+              user: onlineService.account,
+              subscription: null,
+            ),
           );
-          _subscriptionInfo$.add(subscriptionInfo);
-          notifyListeners();
-        });
-      },
+    });
+    final eventBus = globalContainer.read(eventBusProvider);
+    eventBus.on<GBUserDidLoginEvent>().listen(
+      (event) => _authChangeRoutine(event.account),
     );
+    eventBus.on<GBUserWillLogoutEvent>().listen(
+      (event) => _authChangeRoutine(event.account),
+    );
+    eventBus.on<GBUserDidUpdateSubscriptionEvent>().listen((event) async {
+      while (!purchasesService.isInitialized()) {
+        await Future.delayed(const Duration(milliseconds: 100));
+      }
+      purchasesService.getCustomerInfo().then((entitlement) {
+        final subscriptionInfo = _mapEntitlementToSubscriptionInfo(entitlement);
+        _subscriptionInfo$.add(subscriptionInfo);
+        notifyListeners();
+      });
+    });
     _subscriptionInfo$.add(SubscriptionInfo.empty);
     purchasesService.entitlementStream.listen((entitlement) async {
       // final user = authService.user.valueOrNull;
@@ -54,7 +73,7 @@ class PurchasesController extends ChangeNotifier {
     });
   }
 
-  Future<void> _authChangeRoutine() async {
+  Future<void> _authChangeRoutine(OnlineAccount? account) async {
     if (purchasesService.isPurchasingEnabled.isEmpty) {
       logger.d("Purchases are disabled");
       _subscriptionInfo$.add(
@@ -68,7 +87,7 @@ class PurchasesController extends ChangeNotifier {
       return;
     }
 
-    final user = null;
+    final user = account;
     logger.d("Logging in with RevCat. ");
     if (user == null) {
       logger.d("Logging out from RevCat");
@@ -77,21 +96,21 @@ class PurchasesController extends ChangeNotifier {
     } else {
       try {
         logger.d("Logging in to Purchases");
-        await purchasesService.login(user.uid);
-        if (user.isForcedPro) {
-          logger.d(
-            "User is forced pro, setting subscription info to forced pro",
-          );
-          _subscriptionInfo$.add(
-            const SubscriptionInfo(
-              isPro: false,
-              isTrial: false,
-              isForcedPro: true,
-              isAboutToExpire: false,
-            ),
-          );
-          return;
-        }
+        await purchasesService.login(user.id);
+        // if (user.isForcedPro) {
+        //   logger.d(
+        //     "User is forced pro, setting subscription info to forced pro",
+        //   );
+        //   _subscriptionInfo$.add(
+        //     const SubscriptionInfo(
+        //       isPro: false,
+        //       isTrial: false,
+        //       isForcedPro: true,
+        //       isAboutToExpire: false,
+        //     ),
+        //   );
+        //   return;
+        // }
         final entitlement = await purchasesService.getCustomerInfo();
         final subscriptionInfo = _mapEntitlementToSubscriptionInfo(entitlement);
         _subscriptionInfo$.add(subscriptionInfo);
@@ -108,6 +127,9 @@ class PurchasesController extends ChangeNotifier {
   }
 
   Future<void> presentPaywall() {
+    if (!canPresentNativePaywall()) {
+      return Go.to(() => PaywallScreen());
+    }
     return purchasesService.presentPaywall();
   }
 
@@ -200,7 +222,14 @@ class PurchasesController extends ChangeNotifier {
     return purchasesService
         .purchaseSubscription(selectedSubscription)
         .then((_) {
-          eventScheduler.trigger(ScheduledEvent.userDidUpdateSubscription);
+          globalContainer
+              .read(eventBusProvider)
+              .emit(
+                GBUserDidUpdateSubscriptionEvent(
+                  user: onlineService.account,
+                  subscription: selectedSubscription,
+                ),
+              );
           return SubscriptionPurchaseStatus.success;
         })
         .onError((error, stackTrace) {

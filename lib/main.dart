@@ -36,6 +36,7 @@ import 'package:relative_time/relative_time.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
+import 'package:sentry_flutter/sentry_flutter.dart';
 
 class MyHttpOverrides extends HttpOverrides {
   @override
@@ -46,16 +47,28 @@ class MyHttpOverrides extends HttpOverrides {
   }
 }
 
+// TODO: Move ProviderContainer back inside the widget tree once Getx is fully migrated.
+late final ProviderContainer globalContainer;
+
 void main() async {
+  if (kDebugMode) {
+    print(
+      "Health check: ${Platform.operatingSystem} ${Platform.operatingSystemVersion}",
+    );
+  }
+
+  globalContainer = ProviderContainer();
+
   initLicenses();
 
   WidgetsFlutterBinding.ensureInitialized();
+  SentryWidgetsFlutterBinding.ensureInitialized();
 
   HttpOverrides.global = MyHttpOverrides();
 
   await Supabase.initialize(
     url: Env.supabaseInstance,
-    anonKey: Env.supabaseAnonKey,
+    publishableKey: Env.supabaseAnonKey,
   );
 
   AudioCache.instance = AudioCache(prefix: '');
@@ -86,11 +99,66 @@ void main() async {
   tz.initializeTimeZones();
   tz.setLocalLocation(tz.getLocation(currentTimeZone.identifier));
 
-  runApp(
-    ProviderScope(
-      child: MainApp(localizations: l, databaseService: _databaseService),
+  await SentryFlutter.init(
+    _sentryInit,
+    appRunner: () => runApp(
+      SentryWidget(
+        child: UncontrolledProviderScope(
+          container: globalContainer,
+          child: MainApp(localizations: l, databaseService: _databaseService),
+        ),
+      ),
     ),
   );
+}
+
+FutureOr<void> _sentryInit(SentryFlutterOptions options) {
+  options.dsn =
+      'https://7d93abf745f54d8f8edb3812690bbbac@o1165851.ingest.us.sentry.io/6256038';
+  options.sendDefaultPii = false;
+  options.tracesSampleRate = kDebugMode ? 1.0 : 0.2;
+  options.profilesSampleRate = 1.0;
+
+  options.replay.sessionSampleRate = 0.1;
+  options.replay.onErrorSampleRate = 1.0;
+
+  options.feedback.title = 'Report a Bug';
+  options.feedback.isNameRequired = false;
+  options.feedback.showName = true;
+  options.feedback.isEmailRequired = false;
+  options.feedback.showEmail = true;
+  options.feedback.useSentryUser = true;
+  options.feedback.showBranding = false;
+
+  options.privacy.mask<DensityCalendarChart>();
+  options.privacy.mask<WeightCard>();
+  options.privacy.mask<WeightChartTimeSeries>();
+  options.privacy.mask<LineChartTimeSeries>();
+
+  options.privacy.maskCallback((el, widget) {
+    SentryMaskingDecision shouldMask = .continueProcessing;
+
+    // Hide sensitive data in certain widgets, such as charts that may contain personal information.
+    // Since we disable our chart wrappers with the methods above, if this fails
+    // in the release build, we still don't receive any sensitive data.
+    if ([
+      "AxisChartScaffoldWidget",
+      "LineChartLeaf",
+    ].contains(widget.runtimeType.toString())) {
+      shouldMask = .mask;
+    }
+
+    return shouldMask;
+  });
+
+  options.enableLogs = true;
+  options.beforeSendLog = (log) {
+    if (log.level.toSeverityNumber() <=
+        SentryLogLevel.warn.toSeverityNumber()) {
+      return null;
+    }
+    return log;
+  };
 }
 
 const applicationKey = Key("GymTracker");

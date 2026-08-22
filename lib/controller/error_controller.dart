@@ -5,6 +5,7 @@ import 'package:gymtracker/service/logger.dart';
 import 'package:gymtracker/service/test.dart';
 import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/view/error.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class ErrorController extends GetxController {
   int get loggerErrorMethodCount => 24;
@@ -51,8 +52,16 @@ class ErrorController extends GetxController {
 
   void sendError(Object error, StackTrace stack) {
     if (Go.getTopmostRouteName() == ErrorView.routeName) {
-      logger.i("We are already in ErrorView. Here's the error:");
-      logger.w("", error: error, stackTrace: stack);
+      logger.w(
+        "We are already in ErrorView. Here's the error:",
+        error: error,
+        stackTrace: stack,
+      );
+      return;
+    }
+
+    if (ignoreError(error)) {
+      logger.w("Ignoring error", error: error);
       return;
     }
 
@@ -69,21 +78,33 @@ class ErrorController extends GetxController {
     Object? error,
     StackTrace? stack,
   }) {
-    return ErrorViewArguments(
-      details: details,
-      error: error,
-      stack: stack,
-    );
+    return ErrorViewArguments(details: details, error: error, stack: stack);
   }
 
   void dumpError(ErrorViewArguments args) {
     if (args.details != null) {
-      logger.e("",
-          error: args.details!.exception, stackTrace: args.details!.stack);
+      logger.e(
+        "",
+        error: args.details!.exception,
+        stackTrace: args.details!.stack,
+      );
       print(args.details!.stack);
     } else {
       logger.e("", error: args.error, stackTrace: args.stack);
       print(args.stack);
     }
+  }
+
+  bool ignoreError(Object error) {
+    if (error is AuthRetryableFetchException) {
+      // No Internet connection: ignore error
+      return [
+        "WebSocketChannelException",
+        "ClientException with SocketException",
+        "Connection closed before full header was received",
+        "Connection terminated during handshake",
+      ].any((string) => error.message.contains(string));
+    }
+    return false;
   }
 }

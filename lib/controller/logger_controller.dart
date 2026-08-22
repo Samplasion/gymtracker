@@ -7,6 +7,7 @@ import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/utils/utils.dart';
 import 'package:logger/logger.dart';
 import 'package:rxdart/rxdart.dart';
+import 'package:sentry_flutter/sentry_flutter.dart';
 
 class Log {
   final dynamic message;
@@ -69,10 +70,7 @@ extension LevelExt on Level {
 }
 
 const availableLevels = [
-  if (kDebugMode) ...[
-    Level.trace,
-    Level.debug,
-  ],
+  if (kDebugMode) ...[Level.trace, Level.debug],
   Level.info,
   Level.warning,
   Level.error,
@@ -102,6 +100,19 @@ class LoggerController extends GetxController {
       logs.removeRange(0, logs.length - keptLogs);
     }
     _onLogsUpdatedSubject.add(null);
+
+    final function = switch (log.level) {
+      Level.trace || Level.verbose => Sentry.logger.trace,
+      Level.debug => Sentry.logger.debug,
+      Level.info => Sentry.logger.info,
+      Level.warning => Sentry.logger.warn,
+      Level.error => Sentry.logger.error,
+      Level.fatal || Level.wtf => Sentry.logger.fatal,
+      Level.all => Sentry.logger.info,
+      Level.off || Level.nothing => Sentry.logger.info,
+    };
+
+    function(_stringifyLog(log));
     update();
   }
 
@@ -133,18 +144,20 @@ class LoggerController extends GetxController {
     final maxLevelLength = logs
         .map((log) => log.level.displayName.length)
         .reduce((value, element) => value > element ? value : element);
-    final logsString = logs.map((log) {
-      final timestamp = log.timestamp.toIso8601String();
-      final level = log.level.displayName.toUpperCase();
-      final message = log.message;
-      final object = log.object;
-      final error = log.error;
-      final stackTrace = log.stackTrace;
-      final errorString = "${error ?? ""}\n\n${stackTrace ?? ""}".trim();
-      final firstLine = "${" " * (maxLevelLength - level.length)}[$level] ";
-      return "$firstLine$timestamp $object\n${" " * firstLine.length}$message\n\n$errorString"
-          .trimRight();
-    }).join('\n\n${"=" * (maxLevelLength + 2)}\n\n');
+    final logsString = logs
+        .map((log) {
+          final timestamp = log.timestamp.toIso8601String();
+          final level = log.level.displayName.toUpperCase();
+          final message = log.message;
+          final object = log.object;
+          final error = log.error;
+          final stackTrace = log.stackTrace;
+          final errorString = "${error ?? ""}\n\n${stackTrace ?? ""}".trim();
+          final firstLine = "${" " * (maxLevelLength - level.length)}[$level] ";
+          return "$firstLine$timestamp $object\n${" " * firstLine.length}$message\n\n$errorString"
+              .trimRight();
+        })
+        .join('\n\n${"=" * (maxLevelLength + 2)}\n\n');
 
     if (logsString.isEmpty) return;
     shareText(logsString);
@@ -154,7 +167,22 @@ class LoggerController extends GetxController {
     if (!kDebugMode) return;
     for (final lvl in availableLevels) {
       logger.log(
-          lvl, "This is an example ${lvl.displayName.toLowerCase()} message");
+        lvl,
+        "This is an example ${lvl.displayName.toLowerCase()} message",
+      );
     }
+  }
+
+  String _stringifyLog(Log log) {
+    final timestamp = log.timestamp.toIso8601String();
+    final level = log.level.displayName.toUpperCase();
+    final message = log.message;
+    final object = log.object;
+    final error = log.error;
+    final stackTrace = log.stackTrace;
+    final errorString = "${error ?? ""}\n\n${stackTrace ?? ""}".trim();
+    final firstLine = "[$level] ";
+    return "$firstLine$timestamp $object\n${" " * firstLine.length}$message\n\n$errorString"
+        .trimRight();
   }
 }

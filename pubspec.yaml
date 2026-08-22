@@ -1,22 +1,23 @@
 name: gymtracker
 description: A new Flutter project.
 publish_to: "none"
-version: 0.15.0
+version: 0.15.1
 
 environment:
   sdk: ">=3.11.0 <4.0.0"
 
 dependencies:
+  sentry_flutter: ^9.27.0
   animations: ^2.0.7
   copy_with_extension: ^14.0.0
   custom_refresh_indicator: ^4.0.1
-  device_info_plus: ^12.1.0
+  device_info_plus: ^13.2.0
   device_sim: ^0.1.2
   drift: 2.33.0
   drift_db_viewer: ^2.0.0
   dynamic_color: ^1.6.2
   fast_noise: ^2.0.0
-  file_picker: ^11.0.3
+  file_picker: ^12.0.0
   fl_chart: ^1.2.0
   flat: ^0.5.0
   flex_color_picker: ^3.3.0
@@ -86,8 +87,11 @@ dependencies:
   riverpod_annotation: ^4.0.3
   freezed_annotation: ^3.1.0
   soft_edge_blur: ^0.1.3
+  syncable: ^1.0.3
+  online_offline: ^1.0.1
   
 dev_dependencies:
+  sentry_dart_plugin: ^3.4.0
   flutter_test:
     sdk: flutter
   flutter_quill_test: ^11.1.0
@@ -253,3 +257,9 @@ flutter:
     - assets/exercises/triceps/tricepsMachine/
     - assets/exercises/triceps/tricepsRopePushdown/
     #tool end exercise-explanations
+
+sentry:
+  upload_debug_symbols: true
+  upload_source_maps: true
+  project: gym-bro
+  org: techtonic-fault

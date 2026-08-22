@@ -1,15 +1,6 @@
 {
   "pins" : [
     {
-      "identity" : "contrastkit",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/markbattistella/ContrastKit",
-      "state" : {
-        "revision" : "9d88652723f702167ec8a6d1bdcc8801cfed5ed8",
-        "version" : "1.0.2"
-      }
-    },
-    {
       "identity" : "purchases-hybrid-common",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/RevenueCat/purchases-hybrid-common.git",

@@ -2,27 +2,21 @@ PODS:
   - Flutter (1.0.0)
   - flutter_app_intents (0.1.0):
     - Flutter
-  - health (13.3.1):
-    - Flutter
 
 DEPENDENCIES:
   - Flutter (from `Flutter`)
   - flutter_app_intents (from `.symlinks/plugins/flutter_app_intents/ios`)
-  - health (from `.symlinks/plugins/health/ios`)
 
 EXTERNAL SOURCES:
   Flutter:
     :path: Flutter
   flutter_app_intents:
     :path: ".symlinks/plugins/flutter_app_intents/ios"
-  health:
-    :path: ".symlinks/plugins/health/ios"
 
 SPEC CHECKSUMS:
   Flutter: cabc95a1d2626b1b06e7179b784ebcf0c0cde467
   flutter_app_intents: e77f999f398c841ab584a1925dbce33ee0168fb5
-  health: 4decf5d74e8f54c58a8c07a385fc72f629a831d9
 
 PODFILE CHECKSUM: 62d29e7215d9ba84a421ef9a3e214bc5b0962d88
 
-COCOAPODS: 1.16.2
+COCOAPODS: 1.17.0

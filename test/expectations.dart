@@ -1,5 +1,34 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:gymtracker/model/exercise.dart';
+import 'package:gymtracker/model/superset.dart';
+import 'package:gymtracker/model/workout.dart';
+
+void expectWorkout(Workout result, Workout expected) {
+  expect(result.id, expected.id);
+  expect(result.name, expected.name);
+  expect(result.exercises.length, expected.exercises.length);
+  expect(result.duration, expected.duration);
+  expect(result.startingDate, expected.startingDate);
+  // The conversion roundtrip coalesces null infoboxes to the empty string
+  expect(result.infobox ?? '', expected.infobox ?? '');
+  expect(result.parentID, expected.parentID);
+  expect(result.weightUnit, expected.weightUnit);
+  expect(result.distanceUnit, expected.distanceUnit);
+  expect(result.completedBy, expected.completedBy);
+  expect(result.completes, expected.completes);
+  expect(result.folder, expected.folder);
+  for (int i = 0; i < result.exercises.length; i++) {
+    expect(result.exercises[i].runtimeType, expected.exercises[i].runtimeType);
+    if (result.exercises[i] is Exercise) {
+      expectExercise(
+        result.exercises[i] as Exercise,
+        expected.exercises[i] as Exercise,
+      );
+    } else if (result.exercises[i] is Superset) {
+      // expectSuperset(result.exercises[i] as Superset, expected.exercises[i] as Superset);
+    }
+  }
+}
 
 void expectAbstractExercise(Exercise result, Exercise expected) {
   expect(result.id, expected.id);

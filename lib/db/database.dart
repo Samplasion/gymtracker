@@ -747,6 +747,9 @@ class GTDatabaseImpl extends _$GTDatabaseImpl
   @override
   Future<void> updateRoutine(model.Workout routine) async {
     final now = DateTime.now().toUtc();
+    if (routine.id.isEmpty) {
+      throw ArgumentError("Routine ID cannot be empty");
+    }
     final sortOrder =
         (await (select(routines)..where(
                   (tbl) =>
@@ -846,8 +849,6 @@ class GTDatabaseImpl extends _$GTDatabaseImpl
         );
       });
       await overwriteAllRoutineExercises(routines.flattenedExercises);
-
-      print("DONE OVERWRITING ALL ROUTINES");
     });
   }
 
@@ -875,12 +876,6 @@ class GTDatabaseImpl extends _$GTDatabaseImpl
       final toDeleteIds = oldExs
           .where((r) => !routineExercises.any((newR) => newR.id == r.id))
           .map((r) => r.id)
-          .toList();
-      final updatedExs = oldExs
-          .where((r) => routineExercises.any((newR) => newR.id == r.id))
-          .toList();
-      final insertedExs = oldExs
-          .where((newR) => !oldExs.any((r) => r.id == newR.id))
           .toList();
       await (update(
         this.routineExercises,
@@ -1124,6 +1119,15 @@ class GTDatabaseImpl extends _$GTDatabaseImpl
   @override
   Future<void> updateHistoryWorkout(model.Workout workout) async {
     final now = DateTime.now().toUtc();
+    if (workout.id.isEmpty) {
+      throw ArgumentError("Routine ID cannot be empty");
+    }
+    if (workout.duration == null) {
+      throw ArgumentError("Workout duration cannot be null");
+    }
+    if (workout.startingDate == null) {
+      throw ArgumentError("Workout starting date cannot be null");
+    }
     return transaction(() async {
       final oldExercises =
           (await (select(

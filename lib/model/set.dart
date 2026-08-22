@@ -53,6 +53,7 @@ class GTSet {
   final Duration? time;
   final double? distance;
   final bool done;
+  final double? rpe;
 
   GTSet({
     String? id,
@@ -63,14 +64,17 @@ class GTSet {
     this.time = Duration.zero,
     this.distance = 0,
     this.done = false,
-  })  : id = id ?? const Uuid().v4(),
-        assert(_validateParameters(
-          parameters: parameters,
-          reps: reps,
-          weight: weight,
-          time: time,
-          distance: distance,
-        ));
+    this.rpe,
+  }) : id = id ?? const Uuid().v4(),
+       assert(
+         _validateParameters(
+           parameters: parameters,
+           reps: reps,
+           weight: weight,
+           time: time,
+           distance: distance,
+         ),
+       );
 
   static bool _validateParameters({
     required GTSetParameters parameters,
@@ -101,12 +105,7 @@ class GTSet {
   }) {
     switch (parameters) {
       case GTSetParameters.repsWeight:
-        return GTSet(
-          kind: kind,
-          parameters: parameters,
-          reps: 0,
-          weight: 0,
-        );
+        return GTSet(kind: kind, parameters: parameters, reps: 0, weight: 0);
       case GTSetParameters.timeWeight:
         return GTSet(
           kind: kind,
@@ -115,28 +114,13 @@ class GTSet {
           weight: 0,
         );
       case GTSetParameters.freeBodyReps:
-        return GTSet(
-          kind: kind,
-          parameters: parameters,
-          reps: 0,
-        );
+        return GTSet(kind: kind, parameters: parameters, reps: 0);
       case GTSetParameters.time:
-        return GTSet(
-          kind: kind,
-          parameters: parameters,
-          time: Duration.zero,
-        );
+        return GTSet(kind: kind, parameters: parameters, time: Duration.zero);
       case GTSetParameters.distance:
-        return GTSet(
-          kind: kind,
-          parameters: parameters,
-          distance: 0,
-        );
+        return GTSet(kind: kind, parameters: parameters, distance: 0);
       case GTSetParameters.setless:
-        return GTSet(
-          kind: kind,
-          parameters: parameters,
-        );
+        return GTSet(kind: kind, parameters: parameters);
     }
   }
 
@@ -171,7 +155,8 @@ class GTSet {
       weight.hashCode ^
       time.hashCode ^
       distance.hashCode ^
-      done.hashCode;
+      done.hashCode ^
+      rpe.hashCode;
 
   @override
   bool operator ==(Object other) {
@@ -206,10 +191,7 @@ class SetParametersError extends Error {
   final GTSetParameters parameters;
   final GTSetParameters expectedParameters;
 
-  SetParametersError(
-    this.parameters, {
-    required this.expectedParameters,
-  });
+  SetParametersError(this.parameters, {required this.expectedParameters});
 
   @override
   String toString() {

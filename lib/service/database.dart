@@ -9,12 +9,12 @@ import 'package:gymtracker/db/imports/types.dart';
 import 'package:gymtracker/model/achievements.dart';
 import 'package:gymtracker/model/exercisable.dart';
 import 'package:gymtracker/model/exercise.dart';
-
 import 'package:gymtracker/model/measurements.dart';
 import 'package:gymtracker/model/preferences.dart';
 import 'package:gymtracker/model/superset.dart';
 import 'package:gymtracker/model/workout.dart';
 import 'package:gymtracker/service/logger.dart';
+import 'package:gymtracker/service/online.dart';
 import 'package:gymtracker/struct/date_sequence.dart';
 import 'package:gymtracker/struct/nutrition.dart' hide NutritionGoal;
 import 'package:gymtracker/struct/nutrition.dart' as gtn;
@@ -22,7 +22,7 @@ import 'package:gymtracker/utils/extensions.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:rxdart/rxdart.dart';
 
-const _kMaxBackups = 10;
+const _kMaxBackups = 50;
 const _kPeriodicBackupInterval = Duration(days: 1);
 
 class DatabaseService extends GetxService
@@ -38,8 +38,9 @@ class DatabaseService extends GetxService
   final history$ = BehaviorSubject<List<Workout>>.seeded([]);
   final prefs$ = BehaviorSubject<Prefs>.seeded(Prefs.defaultValue);
   final ongoing$ = BehaviorSubject<Map<String, dynamic>?>.seeded(null);
-  final weightMeasurements$ =
-      BehaviorSubject<List<WeightMeasurement>>.seeded([]);
+  final weightMeasurements$ = BehaviorSubject<List<WeightMeasurement>>.seeded(
+    [],
+  );
   final folders$ = BehaviorSubject<List<GTRoutineFolder>>.seeded([]);
   final foods$ = BehaviorSubject<List<TaggedFood>>.seeded([]);
   final nutritionGoals$ = BehaviorSubject<List<TaggedNutritionGoal>>.seeded([
@@ -52,14 +53,15 @@ class DatabaseService extends GetxService
   final favoriteFoods$ = BehaviorSubject<List<Food>>.seeded([]);
   final nutritionCategories$ =
       BehaviorSubject<DateSequence<Map<String, NutritionCategory>>>.seeded(
-          DateSequence.empty());
+        DateSequence.empty(),
+      );
   final completions$ = BehaviorSubject<List<AchievementCompletion>>.seeded([]);
   final bodyMeasurements$ = BehaviorSubject<List<BodyMeasurement>>.seeded([]);
 
   final backups = _DatabaseBackups();
   BehaviorSubject<List<DatabaseBackup>> get _backups$ => BehaviorSubject();
 
-  eraseAllSubjects() {
+  void eraseAllSubjects() {
     exercises$.add([]);
     routines$.add([]);
     history$.add([]);
@@ -81,7 +83,7 @@ class DatabaseService extends GetxService
     bodyMeasurements$.add([]);
   }
 
-  writeSettings(Prefs prefs) {
+  void writeSettings(Prefs prefs) {
     _db.setPreferences(prefs);
     notifyListeners();
   }
@@ -93,7 +95,7 @@ class DatabaseService extends GetxService
     onDatabaseUpdated("main")();
   }
 
-  Future ensureInitialized({
+  Future<void> ensureInitialized({
     Function()? onDone,
     bool overrideInitializationCheck = false,
   }) async {
@@ -147,14 +149,17 @@ class DatabaseService extends GetxService
       initialized[0] = true;
       check();
     });
-    _db.getAllCustomExercises().listen((event) {
-      exercises$.add(event);
-      onDatabaseUpdated("exercises")();
-      initialized[1] = true;
-      check();
-    }, onError: (e, s) {
-      logger.e("Error loading exercises", error: e, stackTrace: s);
-    });
+    _db.getAllCustomExercises().listen(
+      (event) {
+        exercises$.add(event);
+        onDatabaseUpdated("exercises")();
+        initialized[1] = true;
+        check();
+      },
+      onError: (e, s) {
+        logger.e("Error loading exercises", error: e, stackTrace: s);
+      },
+    );
     _db.getAllRoutines().listen((event) {
       routines$.add(event);
       onDatabaseUpdated("routines")();
@@ -202,11 +207,11 @@ class DatabaseService extends GetxService
         .watchNutritionGoals()
         .map((event) => DateSequence.normalized(event).values.toList())
         .listen((event) {
-      nutritionGoals$.add(event);
-      onDatabaseUpdated("nutrition goals")();
-      initialized[9] = true;
-      check();
-    });
+          nutritionGoals$.add(event);
+          onDatabaseUpdated("nutrition goals")();
+          initialized[9] = true;
+          check();
+        });
     _db.watchCustomBarcodeFoods().listen((event) {
       customBarcodeFoods$.add(event);
       onDatabaseUpdated("custom barcode foods")();
@@ -223,11 +228,11 @@ class DatabaseService extends GetxService
         .watchNutritionCategories()
         .map((event) => DateSequence.fromDatesAndValues(event).normalize())
         .listen((event) {
-      nutritionCategories$.add(event);
-      onDatabaseUpdated("nutrition categories")();
-      initialized[12] = true;
-      check();
-    });
+          nutritionCategories$.add(event);
+          onDatabaseUpdated("nutrition categories")();
+          initialized[12] = true;
+          check();
+        });
     _db.watchBodyMeasurements().listen((event) {
       bodyMeasurements$.add(event);
       onDatabaseUpdated("body measurements")();
@@ -241,7 +246,10 @@ class DatabaseService extends GetxService
   }
 
   @visibleForTesting
-  Future ensureInitializedForTests(QueryExecutor e) async {
+  Future ensureInitializedForTests(
+    QueryExecutor e,
+    OnlineService? onlineService,
+  ) async {
     // We're inside a @visibleForTesting method, so it's fine
     // ignore: invalid_use_of_visible_for_testing_member
     _db = GTDatabaseImpl.withQueryExecutor(e);
@@ -292,7 +300,7 @@ class DatabaseService extends GetxService
     return writeExercises(allExercises);
   }
 
-  removeExercise(Exercise exercise) {
+  void removeExercise(Exercise exercise) {
     _db.deleteCustomExercise(exercise.id);
   }
 
@@ -304,14 +312,15 @@ class DatabaseService extends GetxService
     return _db.writeAllRoutines(routines);
   }
 
-  setAllRoutines(List<Workout> routines) {
+  Future<void> setAllRoutines(List<Workout> routines) {
     return _writeRoutines(routines).then((_) => notifyListeners());
   }
 
-  setRoutine(Workout routine) async {
+  Future<void> setRoutine(Workout routine) async {
     logger.i("Setting routine");
     logger.d(
-        "Do we have it already? ${routines.any((element) => element.id == routine.id)}");
+      "Do we have it already? ${routines.any((element) => element.id == routine.id)}",
+    );
     if (routines.any((element) => element.id == routine.id)) {
       await _db.updateRoutine(fixWorkout(routine));
     } else {
@@ -319,8 +328,9 @@ class DatabaseService extends GetxService
     }
     if (routine.folder != null) {
       logger.i("Routine has a folder: ${routine.folder}");
-      final oldFolder = folders$.value
-          .firstWhereOrNull((element) => element.id == routine.folder!.id);
+      final oldFolder = folders$.value.firstWhereOrNull(
+        (element) => element.id == routine.folder!.id,
+      );
       logger.d("Do we have it already? ${oldFolder != null} ($oldFolder)");
       if (oldFolder == null) {
         addFolder(routine.folder!);
@@ -330,7 +340,7 @@ class DatabaseService extends GetxService
     }
   }
 
-  removeRoutine(Workout routine) {
+  void removeRoutine(Workout routine) {
     _db.deleteRoutine(routine.id);
   }
 
@@ -362,7 +372,7 @@ class DatabaseService extends GetxService
     return writeAllHistory(allWorkouts);
   }
 
-  removeHistoryWorkout(Workout workout) {
+  void removeHistoryWorkout(Workout workout) {
     removeHistoryWorkoutById(workout.id);
   }
 
@@ -383,19 +393,21 @@ class DatabaseService extends GetxService
   }
 
   Future<void> addWeightMeasurements(
-      List<WeightMeasurement> measurements) async {
+    List<WeightMeasurement> measurements,
+  ) async {
     if (measurements.isEmpty) return;
 
     final allMeasurements = weightMeasurements$.value + measurements;
     return _writeWeightMeasurements(allMeasurements);
   }
 
-  getWeightMeasurement(String measurementID) {
-    return weightMeasurements$.value
-        .firstWhereOrNull((element) => element.id == measurementID);
+  WeightMeasurement? getWeightMeasurement(String measurementID) {
+    return weightMeasurements$.value.firstWhereOrNull(
+      (element) => element.id == measurementID,
+    );
   }
 
-  setWeightMeasurement(WeightMeasurement measurement) {
+  void setWeightMeasurement(WeightMeasurement measurement) {
     if (getWeightMeasurement(measurement.id) == null) {
       _db.insertWeightMeasurement(measurement);
     } else {
@@ -403,58 +415,58 @@ class DatabaseService extends GetxService
     }
   }
 
-  removeWeightMeasurement(WeightMeasurement measurement) {
+  void removeWeightMeasurement(WeightMeasurement measurement) {
     _db.deleteWeightMeasurement(measurement.id);
   }
 
-  addFolder(GTRoutineFolder folder) {
+  void addFolder(GTRoutineFolder folder) {
     _db.insertRoutineFolder(folder);
   }
 
-  removeFolder(GTRoutineFolder folder) {
+  void removeFolder(GTRoutineFolder folder) {
     _db.deleteRoutineFolder(folder.id);
   }
 
-  updateFolder(GTRoutineFolder folder) {
+  void updateFolder(GTRoutineFolder folder) {
     _db.updateRoutineFolder(folder);
   }
 
-  addFood(TaggedFood food) {
+  void addFood(TaggedFood food) {
     _db.insertFoods(food);
   }
 
-  removeFood(TaggedFood food) {
+  void removeFood(TaggedFood food) {
     _db.deleteFoods(food.value.id!);
   }
 
-  updateFood(TaggedFood food) {
+  void updateFood(TaggedFood food) {
     _db.updateFoods(food);
   }
 
-  addNutritionGoal(TaggedNutritionGoal goal) {
+  void addNutritionGoal(TaggedNutritionGoal goal) {
     final newGoals = nutritionGoals$.value;
     newGoals.add(goal);
 
     _db.setNutritionGoals(DateSequence.normalized(newGoals).values.toList());
   }
 
-  removeNutritionGoal(TaggedNutritionGoal goal) {
+  void removeNutritionGoal(TaggedNutritionGoal goal) {
     _db.deleteNutritionGoal(goal.date.startOfDay);
   }
 
-  updateNutritionGoal(TaggedNutritionGoal goal) {
+  void updateNutritionGoal(TaggedNutritionGoal goal) {
     _db.updateNutritionGoal(goal);
   }
 
-  addCustomBarcodeFood(String barcode, Food food) {
+  void addCustomBarcodeFood(String barcode, Food food) {
     _db.insertCustomBarcodeFood(barcode, food);
   }
 
-  removeCustomBarcodeFood(String barcode) {
+  void removeCustomBarcodeFood(String barcode) {
     _db.deleteCustomBarcodeFood(barcode);
   }
 
-  addFavoriteFood(Food food) {
+  void addFavoriteFood(Food food) {
     if (food.id == null) {
       throw Exception("Food must have an ID to be favorited");
     }
@@ -462,7 +474,7 @@ class DatabaseService extends GetxService
     _db.insertFavoriteFood(food.id!);
   }
 
-  removeFavoriteFood(Food food) {
+  void removeFavoriteFood(Food food) {
     if (food.id == null) {
       throw Exception("Food must have an ID to be unfavorited");
     }
@@ -471,24 +483,28 @@ class DatabaseService extends GetxService
   }
 
   void setNutritionCategoriesForDay(
-      DateTime date, Map<String, NutritionCategory> map) async {
+    DateTime date,
+    Map<String, NutritionCategory> map,
+  ) async {
     final values = nutritionCategories$.value.toMap();
-    _db.setNutritionCategories(DateSequence.fromDatesAndValues({
-      ...values,
-      date.startOfDay: map,
-    }).normalize().toMap());
+    _db.setNutritionCategories(
+      DateSequence.fromDatesAndValues({
+        ...values,
+        date.startOfDay: map,
+      }).normalize().toMap(),
+    );
   }
 
   Future<void> insertAchievementCompletion(AchievementCompletion completion) =>
       db.insertAchievementCompletion(completion);
   Future<void> insertAchievementCompletions(
-          List<AchievementCompletion> completions) =>
-      db.insertAchievementCompletions(completions);
+    List<AchievementCompletion> completions,
+  ) => db.insertAchievementCompletions(completions);
   Future<void> deleteAchievementCompletion(String achievementID, int level) =>
       db.deleteAchievementCompletion(achievementID, level);
   Future<void> setAchievementCompletions(
-          List<AchievementCompletion> completions) =>
-      db.setAchievementCompletions(completions);
+    List<AchievementCompletion> completions,
+  ) => db.setAchievementCompletions(completions);
 
   Future _writeBodyMeasurements(List<BodyMeasurement> measurements) {
     return _db.setBodyMeasurements(measurements);
@@ -501,12 +517,13 @@ class DatabaseService extends GetxService
     return _writeBodyMeasurements(allMeasurements);
   }
 
-  getBodyMeasurement(String measurementID) {
-    return bodyMeasurements$.value
-        .firstWhereOrNull((element) => element.id == measurementID);
+  BodyMeasurement? getBodyMeasurement(String measurementID) {
+    return bodyMeasurements$.value.firstWhereOrNull(
+      (element) => element.id == measurementID,
+    );
   }
 
-  setBodyMeasurement(BodyMeasurement measurement) {
+  void setBodyMeasurement(BodyMeasurement measurement) {
     if (getBodyMeasurement(measurement.id) == null) {
       _db.insertBodyMeasurement(measurement);
     } else {
@@ -514,31 +531,33 @@ class DatabaseService extends GetxService
     }
   }
 
-  removeBodyMeasurement(BodyMeasurement measurement) {
+  void removeBodyMeasurement(BodyMeasurement measurement) {
     _db.deleteBodyMeasurement(measurement.id);
   }
 
   DatabaseSnapshot get currentSnapshot => DatabaseSnapshot(
-        customExercises: exercises,
-        routines: routines,
-        routineExercises: routines.flattenedExercises,
-        historyWorkouts: workoutHistory,
-        historyWorkoutExercises: workoutHistory.flattenedExercises,
-        preferences: prefs$.value,
-        weightMeasurements: weightMeasurements$.value,
-        folders: folders$.value,
-        foods: foods$.value,
-        nutritionGoals: nutritionGoals$.value,
-        customBarcodeFoods: customBarcodeFoods$.value,
-        favoriteFoods: favoriteFoods$.value.map((f) => f.id).nonNulls.toList(),
-        foodCategories: Map.fromEntries(nutritionCategories$.value.map((map) {
-          return MapEntry(map.date, map.value.values.toList());
-        })),
-        achievements: completions$.value,
-        bodyMeasurements: bodyMeasurements$.value,
-      );
+    customExercises: exercises,
+    routines: routines,
+    routineExercises: routines.flattenedExercises,
+    historyWorkouts: workoutHistory,
+    historyWorkoutExercises: workoutHistory.flattenedExercises,
+    preferences: prefs$.value,
+    weightMeasurements: weightMeasurements$.value,
+    folders: folders$.value,
+    foods: foods$.value,
+    nutritionGoals: nutritionGoals$.value,
+    customBarcodeFoods: customBarcodeFoods$.value,
+    favoriteFoods: favoriteFoods$.value.map((f) => f.id).nonNulls.toList(),
+    foodCategories: Map.fromEntries(
+      nutritionCategories$.value.map((map) {
+        return MapEntry(map.date, map.value.values.toList());
+      }),
+    ),
+    achievements: completions$.value,
+    bodyMeasurements: bodyMeasurements$.value,
+  );
 
-  toJson() {
+  Map<String, dynamic> toJson() {
     final converter = getConverter(DATABASE_VERSION);
 
     return converter.export(currentSnapshot);
@@ -552,8 +571,9 @@ class DatabaseService extends GetxService
     }
 
     Future innerImportJson(Map<String, dynamic> json) async {
-      final converter =
-          getConverter(json['version'] as int? ?? DATABASE_VERSION);
+      final converter = getConverter(
+        json['version'] as int? ?? DATABASE_VERSION,
+      );
       final snapshot = converter.process(json);
 
       try {
@@ -605,21 +625,23 @@ class DatabaseService extends GetxService
         res[i].when(
           exercise: (e) {
             if (exercise.isParentOf(e)) {
-              res[i] = Exercise.replaced(from: e, to: exercise).copyWith(
-                id: e.id,
-                parentID: e.parentID,
-              );
+              res[i] = Exercise.replaced(
+                from: e,
+                to: exercise,
+              ).copyWith(id: e.id, parentID: e.parentID);
             }
           },
           superset: (superset) {
             for (int j = 0; j < superset.exercises.length; j++) {
               if (exercise.isParentOf(superset.exercises[j])) {
                 (res[i] as Superset).exercises[j] =
-                    Exercise.replaced(from: superset.exercises[j], to: exercise)
-                        .copyWith(
-                  id: superset.exercises[j].id,
-                  parentID: superset.exercises[j].parentID,
-                );
+                    Exercise.replaced(
+                      from: superset.exercises[j],
+                      to: exercise,
+                    ).copyWith(
+                      id: superset.exercises[j].id,
+                      parentID: superset.exercises[j].parentID,
+                    );
               }
             }
           },
@@ -641,21 +663,23 @@ class DatabaseService extends GetxService
         res[i].when(
           exercise: (e) {
             if (exercise.isParentOf(e)) {
-              res[i] = Exercise.replaced(from: e, to: exercise).copyWith(
-                id: e.id,
-                parentID: e.parentID,
-              );
+              res[i] = Exercise.replaced(
+                from: e,
+                to: exercise,
+              ).copyWith(id: e.id, parentID: e.parentID);
             }
           },
           superset: (superset) {
             for (int j = 0; j < superset.exercises.length; j++) {
               if (exercise.isParentOf(superset.exercises[j])) {
                 (res[i] as Superset).exercises[j] =
-                    Exercise.replaced(from: superset.exercises[j], to: exercise)
-                        .copyWith(
-                  id: superset.exercises[j].id,
-                  parentID: superset.exercises[j].parentID,
-                );
+                    Exercise.replaced(
+                      from: superset.exercises[j],
+                      to: exercise,
+                    ).copyWith(
+                      id: superset.exercises[j].id,
+                      parentID: superset.exercises[j].parentID,
+                    );
               }
             }
           },
@@ -705,13 +729,14 @@ class DatabaseService extends GetxService
     return c.future;
   }
 
-  deleteBackup(DatabaseBackup backup) {
+  Future<void> deleteBackup(DatabaseBackup backup) {
     return backups.delete(backup);
   }
 
   void schedulePeriodicBackup() {
     final list = backups.list();
-    bool shouldCreate = list.isEmpty ||
+    bool shouldCreate =
+        list.isEmpty ||
         list.first.date.isBefore(
           DateTime.now().subtract(_kPeriodicBackupInterval),
         );
@@ -737,7 +762,8 @@ class DatabaseService extends GetxService
       await _db.overwriteAllRoutineExercises(snapshot.routineExercises);
       await writeAllHistory(snapshot.historyWorkouts);
       await _db.overwriteAllHistoryWorkoutExercises(
-          snapshot.historyWorkoutExercises);
+        snapshot.historyWorkoutExercises,
+      );
       await _db.setPreferences(snapshot.preferences);
       await _writeWeightMeasurements(snapshot.weightMeasurements);
       await _db.writeAllRoutineFolders(snapshot.folders);
@@ -747,13 +773,21 @@ class DatabaseService extends GetxService
       await _db.setFavoriteFoods(snapshot.favoriteFoods);
       await _db.setNutritionCategories({
         for (final entry in snapshot.foodCategories.entries)
-          entry.key:
-              Map.fromEntries(entry.value.map((e) => MapEntry(e.name, e))),
+          entry.key: Map.fromEntries(
+            entry.value.map((e) => MapEntry(e.name, e)),
+          ),
       });
       await _writeBodyMeasurements(snapshot.bodyMeasurements);
 
       logger.i("Imported database snapshot");
     });
+  }
+
+  void setCurrentUserId(String? id) {
+    _db.setCurrentUserId(id);
+
+    eraseAllSubjects();
+    _innerEnsureInitialized(overrideInitializationCheck: true);
   }
 }
 
@@ -771,19 +805,23 @@ class DatabaseImportVersionMismatch implements Exception {
 Workout fixWorkout(Workout workout) {
   final newExercises = <WorkoutExercisable>[];
   for (final exercise in workout.exercises) {
-    newExercises.add(exercise.map(exercise: (ex) {
-      return ex.copyWith(
-        workoutID: workout.id,
-        supersetID: null,
-      );
-    }, superset: (ss) {
-      return ss.copyWith(
-        workoutID: workout.id,
-        exercises: ss.exercises
-            .map((e) => e.copyWith(workoutID: workout.id, supersetID: ss.id))
-            .toList(),
-      );
-    }));
+    newExercises.add(
+      exercise.map(
+        exercise: (ex) {
+          return ex.copyWith(workoutID: workout.id, supersetID: null);
+        },
+        superset: (ss) {
+          return ss.copyWith(
+            workoutID: workout.id,
+            exercises: ss.exercises
+                .map(
+                  (e) => e.copyWith(workoutID: workout.id, supersetID: ss.id),
+                )
+                .toList(),
+          );
+        },
+      ),
+    );
   }
 
   return workout.copyWith(exercises: newExercises);
@@ -845,13 +883,15 @@ class _DatabaseBackups {
         .whereType<File>()
         .where((element) => element.path.endsWith(".db"))
         .map((e) {
-      return DatabaseBackup(
-        DateTime.fromMillisecondsSinceEpoch(
-            int.parse(e.path.split("/").last.split(".").first)),
-        e,
-        e.lengthSync(),
-      );
-    }).toList()
+          return DatabaseBackup(
+            DateTime.fromMillisecondsSinceEpoch(
+              int.parse(e.path.split("/").last.split(".").first),
+            ),
+            e,
+            e.lengthSync(),
+          );
+        })
+        .toList()
       ..sort((a, b) => b.date.compareTo(a.date));
   }
 

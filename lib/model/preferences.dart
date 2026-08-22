@@ -11,7 +11,7 @@ import 'package:gymtracker/utils/extensions.dart';
 class Prefs implements Insertable<Preference> {
   final bool usesDynamicColor;
   final Color color;
-  final Locale locale;
+  final Locale? locale;
   final Weights weightUnit;
   final Distance distanceUnit;
   final bool showSuggestedRoutines;
@@ -21,6 +21,7 @@ class Prefs implements Insertable<Preference> {
   final NutritionLanguage nutritionLanguage;
   final NutritionCountry nutritionCountry;
   final bool onboardingComplete;
+  final bool anonymizedLogging;
 
   const Prefs({
     required this.usesDynamicColor,
@@ -35,6 +36,7 @@ class Prefs implements Insertable<Preference> {
     required this.nutritionLanguage,
     required this.nutritionCountry,
     required this.onboardingComplete,
+    required this.anonymizedLogging,
   });
 
   factory Prefs.fromDatabase(Preference row) =>
@@ -43,7 +45,7 @@ class Prefs implements Insertable<Preference> {
   static const defaultValue = Prefs(
     usesDynamicColor: true,
     color: Color(0xFF2196F3),
-    locale: Locale("en"),
+    locale: null,
     weightUnit: Weights.kg,
     distanceUnit: Distance.km,
     showSuggestedRoutines: true,
@@ -53,24 +55,27 @@ class Prefs implements Insertable<Preference> {
     nutritionLanguage: NutritionLanguage.WORLD,
     nutritionCountry: NutritionCountry.WORLD,
     onboardingComplete: false,
+    anonymizedLogging: true,
   );
 
   Map<String, dynamic> toJson() => {
-        "usesDynamicColor": usesDynamicColor,
-        "color": color.hexValue,
-        "locale": [
-          locale.languageCode,
-          if (locale.scriptCode != null) locale.scriptCode!
-        ],
-        "weightUnit": weightUnit.name,
-        "distanceUnit": distanceUnit.name,
-        "showSuggestedRoutines": showSuggestedRoutines,
-        "themeMode": themeMode.name,
-        "tintExercises": tintExercises,
-        "defaultToSimpleWorkoutView": defaultToSimpleWorkoutView,
-        "nutritionLanguage": nutritionLanguage.stringValue,
-        "nutritionCountry": nutritionCountry.stringValue,
-      };
+    "usesDynamicColor": usesDynamicColor,
+    "color": color.hexValue,
+    "locale": locale == null
+        ? null
+        : [
+            locale!.languageCode,
+            if (locale!.scriptCode != null) locale!.scriptCode!,
+          ],
+    "weightUnit": weightUnit.name,
+    "distanceUnit": distanceUnit.name,
+    "showSuggestedRoutines": showSuggestedRoutines,
+    "themeMode": themeMode.name,
+    "tintExercises": tintExercises,
+    "defaultToSimpleWorkoutView": defaultToSimpleWorkoutView,
+    "nutritionLanguage": nutritionLanguage.stringValue,
+    "nutritionCountry": nutritionCountry.stringValue,
+  };
 
   factory Prefs.fromJson(Map<String, dynamic> json, bool onboardingComplete) {
     const defaults = Prefs.defaultValue;
@@ -94,7 +99,8 @@ class Prefs implements Insertable<Preference> {
         orElse: () => defaults.themeMode,
       ),
       tintExercises: json['tintExercises'] ?? defaults.tintExercises,
-      defaultToSimpleWorkoutView: json['defaultToSimpleWorkoutView'] ??
+      defaultToSimpleWorkoutView:
+          json['defaultToSimpleWorkoutView'] ??
           defaults.defaultToSimpleWorkoutView,
       nutritionLanguage: NutritionLanguage.fromString(
         json['nutritionLanguage'] ?? defaults.nutritionLanguage.stringValue,
@@ -102,6 +108,8 @@ class Prefs implements Insertable<Preference> {
       nutritionCountry: NutritionCountry.fromString(
         json['nutritionCountry'] ?? defaults.nutritionCountry.stringValue,
       )!,
+      anonymizedLogging:
+          json['anonymizedLogging'] ?? defaults.anonymizedLogging,
       onboardingComplete: onboardingComplete,
     );
   }
@@ -120,6 +128,8 @@ class Prefs implements Insertable<Preference> {
   defaultToSimpleWorkoutView: $defaultToSimpleWorkoutView,
   nutritionLanguage: $nutritionLanguage,
   nutritionCountry: $nutritionCountry,
+  anonymizedLogging: $anonymizedLogging,
+  onboardingComplete: $onboardingComplete,
 )""";
   }
 
@@ -143,11 +153,12 @@ class Prefs implements Insertable<Preference> {
     bool? defaultToSimpleWorkoutView,
     NutritionLanguage? nutritionLanguage,
     NutritionCountry? nutritionCountry,
+    bool? anonymizedLogging,
   }) {
     return Prefs(
       usesDynamicColor: usesDynamicColor ?? this.usesDynamicColor,
       color: color ?? this.color,
-      locale: locale ?? this.locale,
+      locale: locale,
       weightUnit: weightUnit ?? this.weightUnit,
       distanceUnit: distanceUnit ?? this.distanceUnit,
       showSuggestedRoutines:
@@ -159,6 +170,7 @@ class Prefs implements Insertable<Preference> {
       nutritionLanguage: nutritionLanguage ?? this.nutritionLanguage,
       nutritionCountry: nutritionCountry ?? this.nutritionCountry,
       onboardingComplete: onboardingComplete,
+      anonymizedLogging: anonymizedLogging ?? this.anonymizedLogging,
     );
   }
 
@@ -176,6 +188,7 @@ class Prefs implements Insertable<Preference> {
       nutritionLanguage: nutritionLanguage,
       nutritionCountry: nutritionCountry,
       onboardingComplete: true,
+      anonymizedLogging: anonymizedLogging,
     );
   }
 }

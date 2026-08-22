@@ -2,23 +2,35 @@ import 'package:drift/drift.dart';
 import 'package:gymtracker/data/distance.dart';
 import 'package:gymtracker/data/weights.dart';
 import 'package:gymtracker/db/model/tables/exercise.dart';
+import 'package:gymtracker/model/routines.dart';
+import 'package:syncable/syncable.dart';
 import 'package:uuid/uuid.dart';
 
 const _uuid = Uuid();
 
-class RoutineFolders extends Table {
+@UseRowClass(RoutineFolder)
+class RoutineFolders extends Table implements SyncableTable {
   @override
-  Set<Column<Object>> get primaryKey => {id};
+  Set<Column<Object>> get primaryKey => {id, userId};
 
+  @override
   TextColumn get id => text().clientDefault(() => _uuid.v4())();
   TextColumn get name => text()();
   IntColumn get sortOrder => integer()();
+  @override
+  DateTimeColumn get updatedAt => dateTime().nullable()();
+  @override
+  BoolColumn get deleted => boolean().withDefault(const Constant(false))();
+  @override
+  TextColumn get userId => text().nullable()();
 }
 
-class Routines extends Table {
+@UseRowClass(Routine)
+class Routines extends Table implements SyncableTable {
   @override
-  Set<Column<Object>> get primaryKey => {id};
+  Set<Column<Object>> get primaryKey => {id, userId};
 
+  @override
   TextColumn get id => text().clientDefault(() => _uuid.v4())();
   TextColumn get name => text()();
   TextColumn get infobox => text()();
@@ -27,9 +39,17 @@ class Routines extends Table {
   IntColumn get sortOrder => integer()();
   TextColumn get folderId =>
       text().nullable().references(RoutineFolders, #id)();
+  @override
+  DateTimeColumn get updatedAt => dateTime().withDefault(
+    Constant(DateTime.fromMicrosecondsSinceEpoch(0, isUtc: true)),
+  )();
+  @override
+  BoolColumn get deleted => boolean().withDefault(const Constant(false))();
+  @override
+  TextColumn get userId => text().nullable()();
 }
 
-@UseRowClass(ConcreteExercise)
+@UseRowClass(RoutineExercise)
 class RoutineExercises extends LinkedExerciseBase {
   @override
   TextColumn get routineId => text().references(Routines, #id)();

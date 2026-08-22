@@ -15,6 +15,12 @@ abstract class _$WeightMeasurementCWProxy {
 
   WeightMeasurement weightUnit(Weights weightUnit);
 
+  WeightMeasurement updatedAt(DateTime? updatedAt);
+
+  WeightMeasurement deleted(bool? deleted);
+
+  WeightMeasurement userId(String? userId);
+
   /// Creates a new instance with the provided field values.
   /// Passing `null` to a nullable field nullifies it, while `null` for a non-nullable field is ignored. To update a single field use `WeightMeasurement(...).copyWith.fieldName(value)`.
   ///
@@ -27,6 +33,9 @@ abstract class _$WeightMeasurementCWProxy {
     double weight,
     DateTime time,
     Weights weightUnit,
+    DateTime? updatedAt,
+    bool? deleted,
+    String? userId,
   });
 }
 
@@ -51,6 +60,16 @@ class _$WeightMeasurementCWProxyImpl implements _$WeightMeasurementCWProxy {
       call(weightUnit: weightUnit);
 
   @override
+  WeightMeasurement updatedAt(DateTime? updatedAt) =>
+      call(updatedAt: updatedAt);
+
+  @override
+  WeightMeasurement deleted(bool? deleted) => call(deleted: deleted);
+
+  @override
+  WeightMeasurement userId(String? userId) => call(userId: userId);
+
+  @override
   /// Creates a new instance with the provided field values.
   /// Passing `null` to a nullable field nullifies it, while `null` for a non-nullable field is ignored. To update a single field use `WeightMeasurement(...).copyWith.fieldName(value)`.
   ///
@@ -63,6 +82,9 @@ class _$WeightMeasurementCWProxyImpl implements _$WeightMeasurementCWProxy {
     Object? weight = const $CopyWithPlaceholder(),
     Object? time = const $CopyWithPlaceholder(),
     Object? weightUnit = const $CopyWithPlaceholder(),
+    Object? updatedAt = const $CopyWithPlaceholder(),
+    Object? deleted = const $CopyWithPlaceholder(),
+    Object? userId = const $CopyWithPlaceholder(),
   }) {
     return WeightMeasurement(
       id: id == const $CopyWithPlaceholder() || id == null
@@ -82,6 +104,18 @@ class _$WeightMeasurementCWProxyImpl implements _$WeightMeasurementCWProxy {
           ? _value.weightUnit
           // ignore: cast_nullable_to_non_nullable
           : weightUnit as Weights,
+      updatedAt: updatedAt == const $CopyWithPlaceholder()
+          ? _value.updatedAt
+          // ignore: cast_nullable_to_non_nullable
+          : updatedAt as DateTime?,
+      deleted: deleted == const $CopyWithPlaceholder()
+          ? _value.deleted
+          // ignore: cast_nullable_to_non_nullable
+          : deleted as bool?,
+      userId: userId == const $CopyWithPlaceholder()
+          ? _value.userId
+          // ignore: cast_nullable_to_non_nullable
+          : userId as String?,
     );
   }
 }
@@ -104,6 +138,11 @@ WeightMeasurement _$WeightMeasurementFromJson(Map<String, dynamic> json) =>
       weight: (json['weight'] as num).toDouble(),
       time: DateTime.parse(json['time'] as String),
       weightUnit: $enumDecode(_$WeightsEnumMap, json['weightUnit']),
+      updatedAt: json['updatedAt'] == null
+          ? null
+          : DateTime.parse(json['updatedAt'] as String),
+      deleted: json['deleted'] as bool?,
+      userId: json['userId'] as String?,
     );
 
 Map<String, dynamic> _$WeightMeasurementToJson(WeightMeasurement instance) =>
@@ -112,6 +151,9 @@ Map<String, dynamic> _$WeightMeasurementToJson(WeightMeasurement instance) =>
       'time': instance.time.toIso8601String(),
       'weightUnit': _$WeightsEnumMap[instance.weightUnit]!,
       'id': instance.id,
+      'updatedAt': instance.updatedAt.toIso8601String(),
+      'deleted': instance.deleted,
+      'userId': instance.userId,
     };
 
 const _$WeightsEnumMap = {Weights.kg: 'kg', Weights.lb: 'lb'};

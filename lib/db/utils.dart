@@ -4,6 +4,8 @@ import 'package:gymtracker/db/database.dart';
 import 'package:gymtracker/db/model/tables/exercise.dart';
 import 'package:gymtracker/model/exercisable.dart';
 import 'package:gymtracker/model/exercise.dart';
+import 'package:gymtracker/model/history.dart';
+import 'package:gymtracker/model/routines.dart';
 import 'package:gymtracker/model/superset.dart';
 import 'package:gymtracker/model/workout.dart' as model;
 import 'package:gymtracker/struct/nutrition.dart' as model;
@@ -127,16 +129,21 @@ model.GTRoutineFolder folderFromDatabase(RoutineFolder folder) {
   );
 }
 
+DateTime databaseDateToLocalDay(DateTime dbDateTime) {
+  final utc = dbDateTime.toUtc();
+  return DateTime(utc.year, utc.month, utc.day);
+}
+
 model.TaggedFood foodFromDatabase(DBFood food) {
   return model.TaggedFood(
-    date: food.referenceDate,
+    date: databaseDateToLocalDay(food.referenceDate),
     value: model.Food.fromJson(jsonDecode(food.jsonData)).copyWith.id(food.id),
   );
 }
 
 model.TaggedNutritionGoal goalFromDatabase(DBNutritionGoal goal) {
   return model.TaggedNutritionGoal(
-    date: goal.referenceDate,
+    date: databaseDateToLocalDay(goal.referenceDate),
     value: model.NutritionGoal(
       dailyCalories: goal.calories,
       dailyProtein: goal.protein,

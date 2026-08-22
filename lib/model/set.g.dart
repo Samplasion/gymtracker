@@ -23,6 +23,8 @@ abstract class _$GTSetCWProxy {
 
   GTSet done(bool done);
 
+  GTSet rpe(double? rpe);
+
   /// Creates a new instance with the provided field values.
   /// Passing `null` to a nullable field nullifies it, while `null` for a non-nullable field is ignored. To update a single field use `GTSet(...).copyWith.fieldName(value)`.
   ///
@@ -39,6 +41,7 @@ abstract class _$GTSetCWProxy {
     Duration? time,
     double? distance,
     bool done,
+    double? rpe,
   });
 }
 
@@ -74,6 +77,9 @@ class _$GTSetCWProxyImpl implements _$GTSetCWProxy {
   GTSet done(bool done) => call(done: done);
 
   @override
+  GTSet rpe(double? rpe) => call(rpe: rpe);
+
+  @override
   /// Creates a new instance with the provided field values.
   /// Passing `null` to a nullable field nullifies it, while `null` for a non-nullable field is ignored. To update a single field use `GTSet(...).copyWith.fieldName(value)`.
   ///
@@ -90,6 +96,7 @@ class _$GTSetCWProxyImpl implements _$GTSetCWProxy {
     Object? time = const $CopyWithPlaceholder(),
     Object? distance = const $CopyWithPlaceholder(),
     Object? done = const $CopyWithPlaceholder(),
+    Object? rpe = const $CopyWithPlaceholder(),
   }) {
     return GTSet(
       id: id == const $CopyWithPlaceholder()
@@ -125,6 +132,10 @@ class _$GTSetCWProxyImpl implements _$GTSetCWProxy {
           ? _value.done
           // ignore: cast_nullable_to_non_nullable
           : done as bool,
+      rpe: rpe == const $CopyWithPlaceholder()
+          ? _value.rpe
+          // ignore: cast_nullable_to_non_nullable
+          : rpe as double?,
     );
   }
 }
@@ -151,6 +162,7 @@ GTSet _$GTSetFromJson(Map<String, dynamic> json) => GTSet(
       : Duration(microseconds: (json['time'] as num).toInt()),
   distance: (json['distance'] as num?)?.toDouble() ?? 0,
   done: json['done'] as bool? ?? false,
+  rpe: (json['rpe'] as num?)?.toDouble(),
 );
 
 Map<String, dynamic> _$GTSetToJson(GTSet instance) => <String, dynamic>{
@@ -162,6 +174,7 @@ Map<String, dynamic> _$GTSetToJson(GTSet instance) => <String, dynamic>{
   'time': instance.time?.inMicroseconds,
   'distance': instance.distance,
   'done': instance.done,
+  'rpe': instance.rpe,
 };
 
 const _$GTSetKindEnumMap = {

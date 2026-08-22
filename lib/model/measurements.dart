@@ -4,6 +4,7 @@ import 'package:gymtracker/controller/settings_controller.dart';
 import 'package:gymtracker/data/weights.dart';
 import 'package:gymtracker/db/database.dart';
 import 'package:json_annotation/json_annotation.dart';
+import 'package:syncable/syncable.dart';
 import 'package:uuid/uuid.dart';
 
 part 'measurements.g.dart';
@@ -37,7 +38,7 @@ class PredictedWeightMeasurement {
 @CopyWith()
 @JsonSerializable()
 class WeightMeasurement extends PredictedWeightMeasurement
-    implements Insertable<WeightMeasurement>, GenericMeasurement {
+    implements Insertable<WeightMeasurement>, GenericMeasurement, Syncable {
   @override
   final String id;
 
@@ -45,29 +46,68 @@ class WeightMeasurement extends PredictedWeightMeasurement
   double get value => weight;
 
   double get convertedWeight => Weights.convert(
-        value: weight,
-        from: weightUnit,
-        to: settingsController.weightUnit.value,
-      );
+    value: weight,
+    from: weightUnit,
+    to: settingsController.weightUnit.value,
+  );
 
-  const WeightMeasurement({
+  @override
+  final DateTime updatedAt;
+  @override
+  final bool deleted;
+  @override
+  final String? userId;
+
+  WeightMeasurement({
     required this.id,
     required super.weight,
     required super.time,
     required super.weightUnit,
-  });
+    DateTime? updatedAt,
+    bool? deleted,
+    this.userId,
+  }) : updatedAt = updatedAt ?? DateTime.now().toUtc(),
+       deleted = deleted ?? false;
 
   WeightMeasurement.generateID({
     required super.weight,
     required super.time,
     required super.weightUnit,
-  }) : id = const Uuid().v4();
+    DateTime? updatedAt,
+    bool? deleted,
+    this.userId,
+  }) : id = const Uuid().v4(),
+       updatedAt = updatedAt ?? DateTime.now().toUtc(),
+       deleted = deleted ?? false;
 
-  factory WeightMeasurement.fromJson(Map<String, dynamic> json) =>
-      _$WeightMeasurementFromJson(json);
+  factory WeightMeasurement.fromJson(Map<String, dynamic> json) {
+    return WeightMeasurement(
+      id: json['id'] as String,
+      weight: (json['weight'] as num).toDouble(),
+      time: DateTime.parse(json['time'] as String),
+      weightUnit: Weights.values.byName(
+        json['weightUnit'] as String? ?? json['weight_unit'] as String? ?? 'kg',
+      ),
+      updatedAt: DateTime.parse(
+        json['updatedAt'] as String? ??
+            json['updated_at'] as String? ??
+            DateTime.utc(2000).toIso8601String(),
+      ),
+      deleted: json['deleted'] as bool? ?? false,
+      userId: json['user_id'] as String?,
+    );
+  }
 
   @override
-  Map<String, dynamic> toJson() => _$WeightMeasurementToJson(this);
+  Map<String, dynamic> toJson() => {
+    'id': id,
+    'weight': weight,
+    'time': time.toUtc().toIso8601String(),
+    'weight_unit': weightUnit.name,
+    'updated_at': updatedAt.toUtc().toIso8601String(),
+    'deleted': deleted,
+    'user_id': userId,
+  };
 
   @override
   String toString() =>
@@ -80,7 +120,25 @@ class WeightMeasurement extends PredictedWeightMeasurement
       weight: Value(weight),
       time: Value(time),
       weightUnit: Value(weightUnit),
+      updatedAt: Value(updatedAt.toUtc()),
+      deleted: Value(deleted),
+      userId: userId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(userId),
     ).toColumns(nullToAbsent);
+  }
+
+  @override
+  WeightMeasurementsCompanion toCompanion() {
+    return WeightMeasurementsCompanion(
+      id: Value(id),
+      weight: Value(weight),
+      time: Value(time),
+      weightUnit: Value(weightUnit),
+      updatedAt: Value(updatedAt.toUtc()),
+      deleted: Value(deleted),
+      userId: Value(userId),
+    );
   }
 }
 
@@ -106,7 +164,8 @@ enum BodyMeasurementPart {
   final String unit;
 }
 
-class BodyMeasurement implements Insertable<BodyMeasurement>, GenericMeasurement { 
+class BodyMeasurement
+    implements Insertable<BodyMeasurement>, GenericMeasurement, Syncable {
   @override
   final String id;
   @override
@@ -114,40 +173,66 @@ class BodyMeasurement implements Insertable<BodyMeasurement>, GenericMeasurement
   @override
   final DateTime time;
   final BodyMeasurementPart type;
+  @override
+  final DateTime updatedAt;
+  @override
+  final bool deleted;
+  @override
+  final String? userId;
 
-  const BodyMeasurement({
+  BodyMeasurement({
     required this.id,
     required this.value,
     required this.time,
     required this.type,
-  });
+    DateTime? updatedAt,
+    bool? deleted,
+    this.userId,
+  }) : updatedAt = updatedAt ?? DateTime.now().toUtc(),
+       deleted = deleted ?? false;
 
   BodyMeasurement.generateID({
     required this.value,
     required this.time,
     required this.type,
-  }) : id = const Uuid().v4();
+    DateTime? updatedAt,
+    bool? deleted,
+    this.userId,
+  }) : id = const Uuid().v4(),
+       updatedAt = updatedAt ?? DateTime.now().toUtc(),
+       deleted = deleted ?? false;
 
   factory BodyMeasurement.fromJson(Map<String, dynamic> json) {
     final type = json['type'];
     if (type is String) {
       return BodyMeasurement(
         id: json['id'],
-        value: json['value'],
+        value: json['value'] is num ? json['value'].toDouble() : json['value'],
         time: DateTime.parse(json['time']),
         type: BodyMeasurementPart.values.byName(type),
+        updatedAt: DateTime.parse(
+          json['updatedAt'] ??
+              json['updated_at'] ??
+              DateTime.utc(2000).toIso8601String(),
+        ),
+        deleted: json['deleted'] as bool? ?? false,
+        userId: json['user_id'] as String?,
       );
     } else {
       throw Exception('Invalid type $type');
     }
   }
 
+  @override
   Map<String, dynamic> toJson() => {
-        'id': id,
-        'value': value,
-        'time': time.toIso8601String(),
-        'type': type.name,
-      };
+    'id': id,
+    'value': value,
+    'time': time.toUtc().toIso8601String(),
+    'type': type.name,
+    'updated_at': updatedAt.toUtc().toIso8601String(),
+    'deleted': deleted,
+    'user_id': userId,
+  };
 
   @override
   Map<String, Expression<Object>> toColumns(bool nullToAbsent) {
@@ -156,7 +241,25 @@ class BodyMeasurement implements Insertable<BodyMeasurement>, GenericMeasurement
       value: Value(value),
       time: Value(time),
       type: Value(type),
+      updatedAt: Value(updatedAt.toUtc()),
+      deleted: Value(deleted),
+      userId: userId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(userId),
     ).toColumns(nullToAbsent);
+  }
+
+  @override
+  BodyMeasurementsCompanion toCompanion() {
+    return BodyMeasurementsCompanion(
+      id: Value(id),
+      value: Value(value),
+      time: Value(time),
+      type: Value(type),
+      updatedAt: Value(updatedAt.toUtc()),
+      deleted: Value(deleted),
+      userId: Value(userId),
+    );
   }
 
   @override

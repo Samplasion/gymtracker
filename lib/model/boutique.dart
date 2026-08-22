@@ -8,21 +8,24 @@ import 'package:gymtracker/utils/extensions.dart';
 
 class BoutiqueSettings {
   final String compatibility;
+  final bool enabled;
 
-  BoutiqueSettings({
-    required this.compatibility,
-  });
+  const BoutiqueSettings({required this.compatibility, required this.enabled});
+
+  static const defaultSettings = BoutiqueSettings(
+    compatibility: "0.0.0",
+    enabled: false,
+  );
 
   factory BoutiqueSettings.fromJson(Map<String, dynamic> json) {
     return BoutiqueSettings(
       compatibility: json['compatibility'],
+      enabled: json['enabled'],
     );
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'compatibility': compatibility,
-    };
+    return {'compatibility': compatibility, 'enabled': enabled};
   }
 }
 
@@ -81,8 +84,10 @@ class BoutiquePackage {
       name: json['name'],
       description: json['description'],
       routines: (json['routines'] as List).map((e) {
-        final exercises = databaseExercisesToExercises((e['exercises'] as List)
-            .map((e) => ConcreteExercise(
+        final exercises = databaseExercisesToExercises(
+          (e['exercises'] as List)
+              .map(
+                (e) => ConcreteExercise(
                   id: e['id'],
                   routineId: e['routine_id'],
                   name: "${e['name']}",
@@ -112,13 +117,13 @@ class BoutiquePackage {
                   equipment: e['is_superset'] == 1
                       ? null
                       : GTGymEquipment.values.byName(e['equipment']),
-                ))
-            .toList());
-        return Workout.fromJson({
-          ...e,
-          'exercises': [],
-        }.cast<String, dynamic>())
-            .copyWith(exercises: exercises);
+                ),
+              )
+              .toList(),
+        );
+        return Workout.fromJson(
+          {...e, 'exercises': []}.cast<String, dynamic>(),
+        ).copyWith(exercises: exercises);
       }).toList(),
     );
   }

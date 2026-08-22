@@ -3,14 +3,18 @@ import 'package:gymtracker/data/distance.dart';
 import 'package:gymtracker/data/weights.dart';
 import 'package:gymtracker/db/model/tables/exercise.dart';
 import 'package:gymtracker/db/model/tables/routines.dart';
+import 'package:gymtracker/model/history.dart';
+import 'package:syncable/syncable.dart';
 import 'package:uuid/uuid.dart';
 
 const _uuid = Uuid();
 
-class HistoryWorkouts extends Table {
+@UseRowClass(HistoryWorkout)
+class HistoryWorkouts extends Table implements SyncableTable {
   @override
-  Set<Column<Object>> get primaryKey => {id};
+  Set<Column<Object>> get primaryKey => {id, userId};
 
+  @override
   TextColumn get id => text().clientDefault(() => _uuid.v4())();
   TextColumn get name => text()();
   TextColumn get infobox => text().nullable()();
@@ -23,14 +27,22 @@ class HistoryWorkouts extends Table {
       text().nullable().references(HistoryWorkouts, #id)();
   TextColumn get weightUnit => textEnum<Weights>()();
   TextColumn get distanceUnit => textEnum<Distance>()();
+  @override
+  DateTimeColumn get updatedAt => dateTime().withDefault(
+    Constant(DateTime.fromMicrosecondsSinceEpoch(0, isUtc: true)),
+  )();
+  @override
+  BoolColumn get deleted => boolean().withDefault(const Constant(false))();
+  @override
+  TextColumn get userId => text().nullable()();
 
   @override
   List<Set<Column>> get uniqueKeys => [
-        {completedBy, completes}
-      ];
+    {completedBy, completes},
+  ];
 }
 
-@UseRowClass(ConcreteExercise)
+@UseRowClass(HistoryWorkoutExercise)
 class HistoryWorkoutExercises extends LinkedExerciseBase {
   @override
   TextColumn get routineId => text().references(HistoryWorkouts, #id)();

@@ -277,6 +277,9 @@ ConvertedHevyMeasurementData convertHevyMeasurementData(
           time: date,
           value: value,
           type: types[i],
+          updatedAt: DateTime.fromMillisecondsSinceEpoch(0, isUtc: true),
+          deleted: false,
+          userId: null,
         ),
       );
     }

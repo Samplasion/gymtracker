@@ -2,17 +2,27 @@ import 'package:gymtracker/data/achievements.dart';
 import 'package:gymtracker/model/achievements.dart';
 import 'package:gymtracker/model/workout.dart';
 import 'package:gymtracker/service/database.dart';
+import 'package:gymtracker/service/online.dart';
 
-enum FeedSource { ownHistory, ownAchievements }
+enum FeedSource {
+  ownHistory,
+  ownAchievements,
+  friendsHistory,
+  friendsAchievements,
+}
 
-sealed class FeedAuthorship {}
+sealed class FeedAuthorship {
+  final String? userID;
 
-class FeedAuthorshipOwn extends FeedAuthorship {}
+  FeedAuthorship({this.userID});
+}
+
+class FeedAuthorshipOwn extends FeedAuthorship {
+  FeedAuthorshipOwn({super.userID});
+}
 
 class FeedAuthorshipFriend extends FeedAuthorship {
-  final String friendID;
-
-  FeedAuthorshipFriend({required this.friendID});
+  FeedAuthorshipFriend({required String super.userID});
 }
 
 sealed class FeedItem {
@@ -40,8 +50,9 @@ class FeedItemAchievement extends FeedItem {
 
 class FeedService {
   final DatabaseService _databaseService;
+  final OnlineService _onlineService;
 
-  FeedService(this._databaseService);
+  FeedService(this._databaseService, this._onlineService);
 
   Future<({List<FeedItem> feed, bool hasMore})> getFeedItems({
     required Set<FeedSource> sources,
@@ -67,7 +78,9 @@ class FeedService {
             workouts.map(
               (workout) => FeedItemWorkout(
                 workout: workout,
-                authorship: FeedAuthorshipOwn(),
+                authorship: FeedAuthorshipOwn(
+                  userID: _onlineService.account?.id,
+                ),
               ),
             ),
           );
@@ -89,7 +102,9 @@ class FeedService {
               (tuple) => FeedItemAchievement(
                 achievement: tuple.$1!,
                 completion: tuple.$2,
-                authorship: FeedAuthorshipOwn(),
+                authorship: FeedAuthorshipOwn(
+                  userID: _onlineService.account?.id,
+                ),
               ),
             ),
           );
@@ -97,6 +112,10 @@ class FeedService {
               hasMore ||
               _databaseService.completions$.value.length >
                   fetchedAchievements.length;
+          break;
+        case FeedSource.friendsHistory:
+        case FeedSource.friendsAchievements:
+          // Network feed items are handled via OnlineService, not local FeedService
           break;
       }
     }

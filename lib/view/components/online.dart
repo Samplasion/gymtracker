@@ -1,20 +1,21 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-import 'package:gymtracker/controller/online_controller.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:gymtracker/provider/online.dart';
 import 'package:gymtracker/icons/gymtracker_icons.dart';
 import 'package:gymtracker/service/online.dart';
 import 'package:gymtracker/view/components/icon_grid.dart';
+import 'package:gymtracker/view/utils/social.dart';
 
-class UserAvatar extends StatelessWidget {
+class UserAvatar extends ConsumerWidget {
   final String id;
   final double? radius;
 
   const UserAvatar({required this.id, this.radius, super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return FutureBuilder(
-      future: Get.find<OnlineController>().getAvatarUrl(id),
+      future: ref.read(onlineProvider.notifier).getAvatarUrl(id),
       builder: (context, snapshot) {
         return CircleAvatar(
           radius: radius,
@@ -72,7 +73,7 @@ class UserHeader extends StatelessWidget {
                 shape: BoxShape.circle,
               ),
               alignment: Alignment.center,
-              child: UserAvatar(id: account.id, radius: 64),
+              child: UserAccountIcon(id: account.id, radius: 64),
             ),
           ),
         ],

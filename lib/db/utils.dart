@@ -39,7 +39,9 @@ model.Workout workoutFromDatabase(
 }
 
 model.Workout historyWorkoutFromDatabase(
-    HistoryWorkout routine, List<ConcreteExercise> rawExercises) {
+  HistoryWorkout routine,
+  List<ConcreteExercise> rawExercises,
+) {
   final entries = databaseExercisesToExercises(rawExercises);
 
   return model.Workout(
@@ -58,10 +60,9 @@ model.Workout historyWorkoutFromDatabase(
 }
 
 List<WorkoutExercisable> databaseExercisesToExercises(
-    List<ConcreteExercise> data) {
-  final sortOrders = <String, int>{
-    for (final e in data) e.id: e.sortOrder,
-  };
+  List<ConcreteExercise> data,
+) {
+  final sortOrders = <String, int>{for (final e in data) e.id: e.sortOrder};
   final exercises = data
       .map((e) => (e, exerciseFromDatabaseExercise(e), e.isInSuperset))
       .toList();
@@ -79,15 +80,17 @@ List<WorkoutExercisable> databaseExercisesToExercises(
 }
 
 WorkoutExercisable exerciseFromDatabaseExercise(ConcreteExercise data) {
-  assert(() {
-    if (!data.isSuperset) {
-      return data.parameters != null &&
-          data.primaryMuscleGroup != null &&
-          data.secondaryMuscleGroups != null;
-    }
-    return true;
-  }(),
-      "Non-superset exercises must have set parameters, kinds and muscle groups.");
+  assert(
+    () {
+      if (!data.isSuperset) {
+        return data.parameters != null &&
+            data.primaryMuscleGroup != null &&
+            data.secondaryMuscleGroups != null;
+      }
+      return true;
+    }(),
+    "Non-superset exercises must have set parameters, kinds and muscle groups.",
+  );
   if (data.isSuperset) {
     return Superset(
       id: data.id,
@@ -109,8 +112,9 @@ WorkoutExercisable exerciseFromDatabaseExercise(ConcreteExercise data) {
       sets: data.sets!,
       primaryMuscleGroup: data.primaryMuscleGroup!,
       secondaryMuscleGroups: data.secondaryMuscleGroups!,
-      parentID:
-          data.isCustom ? data.customExerciseId! : data.libraryExerciseId!,
+      parentID: data.isCustom
+          ? data.customExerciseId!
+          : data.libraryExerciseId!,
       standard: !data.isCustom,
       workoutID: data.routineId,
       supersetID: data.supersetId,
@@ -126,6 +130,7 @@ model.GTRoutineFolder folderFromDatabase(RoutineFolder folder) {
     id: folder.id,
     name: folder.name,
     sortOrder: folder.sortOrder,
+    notes: folder.notes ?? "",
   );
 }
 

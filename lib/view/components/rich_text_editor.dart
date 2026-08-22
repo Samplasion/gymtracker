@@ -9,13 +9,13 @@ import 'package:gymtracker/view/utils/input_decoration.dart';
 class GTRichTextEditor extends StatefulWidget {
   const GTRichTextEditor({
     super.key,
-    required this.infoboxController,
+    required this.controller,
     required this.decoration,
     this.onTapOutside,
     this.autofocus = false,
   });
 
-  final QuillController infoboxController;
+  final QuillController controller;
   final InputDecoration decoration;
   final VoidCallback? onTapOutside;
   final bool autofocus;
@@ -57,9 +57,10 @@ class _GTRichTextEditorState extends State<GTRichTextEditor> {
         children: [
           QuillEditor.basic(
             focusNode: _focusNode,
-            controller: widget.infoboxController,
+            controller: widget.controller,
             config: QuillEditorConfig(
-              minHeight: context.textTheme.bodyMedium!.height! *
+              minHeight:
+                  context.textTheme.bodyMedium!.height! *
                   context.textTheme.bodyMedium!.fontSize! *
                   3,
               scrollable: true,
@@ -81,7 +82,7 @@ class _GTRichTextEditorState extends State<GTRichTextEditor> {
           if (shouldShowToolbar) ...[
             const Divider(),
             QuillSimpleToolbar(
-              controller: widget.infoboxController,
+              controller: widget.controller,
               config: QuillSimpleToolbarConfig(
                 showDividers: false,
                 showFontFamily: false,
@@ -104,19 +105,19 @@ class _GTRichTextEditorState extends State<GTRichTextEditor> {
                     tooltip: "richText.highlight".t,
                     onPressed: () {
                       // If the selection is already highlighted, remove the highlight
-                      final attr = widget.infoboxController.getSelectionStyle();
-                      final isHighlighted =
-                          attr.containsKey(highlightAttribute.key);
+                      final attr = widget.controller.getSelectionStyle();
+                      final isHighlighted = attr.containsKey(
+                        highlightAttribute.key,
+                      );
                       if (isHighlighted) {
-                        widget.infoboxController.formatSelection(
+                        widget.controller.formatSelection(
                           Attribute.clone(highlightAttribute, null),
                         );
                       } else {
-                        widget.infoboxController
-                            .formatSelection(highlightAttribute);
+                        widget.controller.formatSelection(highlightAttribute);
                       }
                     },
-                  )
+                  ),
                 ],
               ),
             ),

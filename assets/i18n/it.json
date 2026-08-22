@@ -350,7 +350,8 @@
     "emptyFolderSubtitle": "Tieni premuto e trascina una routine dalla pagina Home per aggiungerla a questa cartella.",
     "folder": "Cartella",
     "nullFolder": "Cartella eliminata",
-    "nullFolderSubtitle": "Puoi tornare alla pagina Home."
+    "nullFolderSubtitle": "Puoi tornare alla pagina Home.",
+    "folderNotes": "Note"
   },
   "history": {
     "title": "Cronologia",

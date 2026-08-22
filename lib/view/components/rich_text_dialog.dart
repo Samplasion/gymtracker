@@ -35,7 +35,7 @@ class GTRichTextEditDialog extends StatelessWidget {
           child: Padding(
             padding: const EdgeInsets.all(24),
             child: GTRichTextEditor(
-              infoboxController: controller,
+              controller: controller,
               autofocus: true,
               decoration: GymTrackerInputDecoration(
                 labelText: "exercise.editor.fields.notes.label".t,

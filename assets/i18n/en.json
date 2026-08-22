@@ -350,7 +350,8 @@
     "emptyFolderSubtitle": "Press and hold a routine from the Home page to add it to this folder.",
     "folder": "Folder",
     "nullFolder": "You've deleted this folder",
-    "nullFolderSubtitle": "You can go back to the Home page."
+    "nullFolderSubtitle": "You can go back to the Home page.",
+    "folderNotes": "Notes"
   },
   "history": {
     "title": "History",

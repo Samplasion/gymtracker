@@ -1,6 +1,9 @@
+import 'dart:convert';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:flutter_quill/flutter_quill.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:get/get.dart';
 import 'package:gymtracker/controller/history_controller.dart';
@@ -24,7 +27,9 @@ import 'package:gymtracker/view/components/badges.dart';
 import 'package:gymtracker/view/components/content_unavailable.dart';
 import 'package:gymtracker/view/components/controlled.dart';
 import 'package:gymtracker/view/components/error_view.dart';
+import 'package:gymtracker/view/components/infobox.dart';
 import 'package:gymtracker/view/components/pro_builder.dart';
+import 'package:gymtracker/view/components/rich_text_editor.dart';
 import 'package:gymtracker/view/components/routines.dart';
 import 'package:gymtracker/view/components/subscription_nag.dart';
 import 'package:gymtracker/view/exercises.dart';
@@ -355,211 +360,6 @@ class _RoutinesViewState extends ConsumerState<RoutinesView> with _RoutineList {
         ],
       ),
     );
-
-    return IgnorePointer(
-      ignoring: isLoading,
-      child: Scaffold(
-        body: Obx(() {
-          final suggested = isLoading
-              ? fakeSuggested
-              : showSuggestedRoutines
-              ? controller.suggestions
-              : <RoutineSuggestion>[];
-          return CustomScrollView(
-            controller: _scrollController,
-            slivers: [
-              // Hardcode the title while loading to avoid flickering
-              SliverAppBar.large(
-                title: Text(isLoading ? "Routines" : "routines.title".t),
-                leading: const SkeletonDrawerButton(),
-                actions: [
-                  IconButton(
-                    onPressed: () {
-                      Go.to(() => const BoutiqueView());
-                    },
-                    icon: const Icon(GTIcons.boutique),
-                    tooltip: "boutique.title".t,
-                  ),
-                  IconButton(
-                    onPressed: () {
-                      Go.to(() => const LibraryView());
-                    },
-                    icon: const Icon(GTIcons.library),
-                    tooltip: "library.title".t,
-                  ),
-                ],
-              ),
-              SliverToBoxAdapter(
-                child: SubscriptionNag(
-                  stringKey: "routines",
-                  shouldHide: (subscriptionInfo) {
-                    return subscriptionInfo.hasProFeatures ||
-                        controller.workouts.length <
-                            Configuration.trialRoutineAlertLimit;
-                  },
-                ),
-              ),
-              SliverToBoxAdapter(
-                child: ProBuilder(
-                  builder: (context, subscriptionInfo) {
-                    final historyController = Get.find<HistoryController>();
-                    final shouldDisable =
-                        (subscriptionInfo == null ||
-                            !subscriptionInfo.hasProFeatures) &&
-                        historyController.history.length >=
-                            Configuration.trialWorkoutLimit;
-                    return ListTile(
-                      title: Text("routines.quickWorkout.title".t),
-                      subtitle: Text("routines.quickWorkout.subtitle".t),
-                      leading: Skeleton.leaf(
-                        child: CircleAvatar(
-                          foregroundColor:
-                              context.colorScheme.onQuaternaryContainer,
-                          backgroundColor:
-                              context.colorScheme.quaternaryContainer,
-                          child: const Icon(GTIcons.empty_workout),
-                        ),
-                      ),
-                      onTap: () {
-                        if (shouldDisable) {
-                          Get.find<PurchasesController>().presentPaywall();
-                          return;
-                        }
-                        controller.startRoutine(context);
-                      },
-                    );
-                  },
-                ),
-              ),
-              if (showSuggestedRoutines && suggested.isNotEmpty) ...[
-                const SliverToBoxAdapter(child: Divider()),
-                SliverList(
-                  delegate: SliverChildBuilderDelegate((context, index) {
-                    final (routine: workout, occurrences: frequency) =
-                        suggested[index];
-                    return Material(
-                      type: MaterialType.transparency,
-                      key: ValueKey(workout.id),
-                      child: ListTile(
-                        leading: WorkoutIcon(workout: workout),
-                        title: Text.rich(
-                          TextSpan(
-                            children: [
-                              TextSpan(text: workout.name),
-                              const TextSpan(text: " "),
-                              WidgetSpan(
-                                child: Skeleton.ignore(
-                                  child: GTBadge(content: frequency.toString()),
-                                ),
-                                alignment: PlaceholderAlignment.middle,
-                              ),
-                            ],
-                          ),
-                        ),
-                        subtitle: Text(
-                          "general.exercises".plural(
-                            workout.displayExerciseCount,
-                          ),
-                        ),
-                        onTap: () {
-                          onTapWorkout(workout);
-                        },
-                      ),
-                    );
-                  }, childCount: suggested.length),
-                ),
-                const SliverToBoxAdapter(child: Divider()),
-              ],
-              ...routineList(
-                isLoading ? fakeFolders.obs : controller.folders,
-                isLoading ? fakeRoutines.obs : controller.rootRoutines,
-                foldersInNewPage: true,
-              ),
-              SliverToBoxAdapter(
-                child: ProBuilder(
-                  builder: (context, subscriptionInfo) {
-                    final shouldDisable =
-                        (subscriptionInfo == null ||
-                            !subscriptionInfo.hasProFeatures) &&
-                        controller.workouts.length >=
-                            Configuration.trialRoutineLimit;
-                    return ListTile(
-                      title: Text.rich(
-                        TextSpan(
-                          children: [
-                            TextSpan(text: "routines.newRoutine".t),
-                            if (shouldDisable) ...[
-                              const TextSpan(text: " "),
-                              WidgetSpan(
-                                child: Skeleton.ignore(child: ProBadge()),
-                                alignment: PlaceholderAlignment.middle,
-                              ),
-                            ],
-                          ],
-                        ),
-                      ),
-                      leading: Skeleton.leaf(
-                        child: CircleAvatar(
-                          child: Icon(GTIcons.create_routine),
-                        ),
-                      ),
-                      onTap: shouldDisable
-                          ? () {
-                              Get.find<PurchasesController>().presentPaywall();
-                            }
-                          : () {
-                              Go.to(() => const RoutineCreator());
-                            },
-                    );
-                  },
-                ),
-              ),
-              if (controller.workouts.isNotEmpty)
-                SliverToBoxAdapter(
-                  child: ProBuilder(
-                    builder: (context, subscriptionInfo) {
-                      final shouldDisable =
-                          (subscriptionInfo == null ||
-                          !subscriptionInfo.hasProFeatures);
-
-                      return ListTile(
-                        title: Text.rich(
-                          TextSpan(
-                            children: [
-                              TextSpan(text: "routines.newFolder".t),
-                              if (shouldDisable) ...[
-                                const TextSpan(text: " "),
-                                WidgetSpan(
-                                  child: Skeleton.ignore(child: ProBadge()),
-                                  alignment: PlaceholderAlignment.middle,
-                                ),
-                              ],
-                            ],
-                          ),
-                        ),
-                        leading: const Skeleton.leaf(
-                          child: CircleAvatar(
-                            child: Icon(GTIcons.create_folder),
-                          ),
-                        ),
-                        onTap: () {
-                          if (shouldDisable) {
-                            Get.find<PurchasesController>().presentPaywall();
-                            return;
-                          }
-                          controller.createFolder();
-                        },
-                      );
-                    },
-                  ),
-                ),
-              const SliverToBoxAdapter(child: SizedBox(height: 8)),
-              const SliverBottomSafeArea(),
-            ],
-          );
-        }),
-      ),
-    );
   }
 }
 
@@ -628,6 +428,9 @@ class _EditFolderModalState
   late final TextEditingController _controller = TextEditingController(
     text: widget.folder.name,
   );
+  late final QuillController _notesController = quillControllerFromText(
+    widget.folder.notes,
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -648,7 +451,14 @@ class _EditFolderModalState
                 return;
               }
 
-              Get.back(result: widget.folder.copyWith(name: _controller.text));
+              Navigator.of(context).pop<GTRoutineFolder>(
+                widget.folder.copyWith(
+                  name: _controller.text,
+                  notes: jsonEncode(
+                    _notesController.document.toDelta().toJson(),
+                  ),
+                ),
+              );
             },
             tooltip: "actions.save".t,
             icon: const Icon(GTIcons.done),
@@ -661,6 +471,7 @@ class _EditFolderModalState
           padding: const EdgeInsets.all(16),
           child: Column(
             mainAxisSize: MainAxisSize.min,
+            spacing: 16,
             children: [
               TextFormField(
                 decoration: GymTrackerInputDecoration(
@@ -673,6 +484,13 @@ class _EditFolderModalState
                   }
                   return null;
                 },
+              ),
+              GTRichTextEditor(
+                controller: _notesController,
+                decoration: InputDecoration(
+                  labelText: "routines.folderNotes".t,
+                  alignLabelWithHint: true,
+                ),
               ),
             ],
           ),
@@ -1019,6 +837,9 @@ class _RoutinesFolderViewState extends ConsumerState<_RoutinesFolderView>
                 }
 
                 return [
+                  if (folder.notes.asQuillDocument().length > 1)
+                    SliverToBoxAdapter(child: Infobox(text: folder.notes)),
+
                   SliverToBoxAdapter(
                     child: DragTarget<Workout>(
                       onWillAcceptWithDetails: (data) {

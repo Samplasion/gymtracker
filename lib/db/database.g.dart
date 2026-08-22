@@ -472,6 +472,16 @@ class $RoutineFoldersTable extends RoutineFolders
     type: DriftSqlType.int,
     requiredDuringInsert: true,
   );
+  static const VerificationMeta _notesMeta = const VerificationMeta('notes');
+  @override
+  late final GeneratedColumn<String> notes = GeneratedColumn<String>(
+    'notes',
+    aliasedName,
+    true,
+    additionalChecks: GeneratedColumn.checkTextLength(maxTextLength: 100000),
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
   @override
   List<GeneratedColumn> get $columns => [
     id,
@@ -480,6 +490,7 @@ class $RoutineFoldersTable extends RoutineFolders
     deleted,
     name,
     sortOrder,
+    notes,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -530,6 +541,12 @@ class $RoutineFoldersTable extends RoutineFolders
     } else if (isInserting) {
       context.missing(_sortOrderMeta);
     }
+    if (data.containsKey('notes')) {
+      context.handle(
+        _notesMeta,
+        notes.isAcceptableOrUnknown(data['notes']!, _notesMeta),
+      );
+    }
     return context;
   }
 
@@ -551,6 +568,10 @@ class $RoutineFoldersTable extends RoutineFolders
         DriftSqlType.int,
         data['${effectivePrefix}sort_order'],
       )!,
+      notes: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}notes'],
+      ),
       updatedAt: attachedDatabase.typeMapping.read(
         DriftSqlType.dateTime,
         data['${effectivePrefix}updated_at'],
@@ -579,6 +600,7 @@ class RoutineFoldersCompanion extends UpdateCompanion<RoutineFolder> {
   final Value<bool> deleted;
   final Value<String> name;
   final Value<int> sortOrder;
+  final Value<String?> notes;
   final Value<int> rowid;
   const RoutineFoldersCompanion({
     this.id = const Value.absent(),
@@ -587,6 +609,7 @@ class RoutineFoldersCompanion extends UpdateCompanion<RoutineFolder> {
     this.deleted = const Value.absent(),
     this.name = const Value.absent(),
     this.sortOrder = const Value.absent(),
+    this.notes = const Value.absent(),
     this.rowid = const Value.absent(),
   });
   RoutineFoldersCompanion.insert({
@@ -596,6 +619,7 @@ class RoutineFoldersCompanion extends UpdateCompanion<RoutineFolder> {
     this.deleted = const Value.absent(),
     required String name,
     required int sortOrder,
+    this.notes = const Value.absent(),
     this.rowid = const Value.absent(),
   }) : name = Value(name),
        sortOrder = Value(sortOrder);
@@ -606,6 +630,7 @@ class RoutineFoldersCompanion extends UpdateCompanion<RoutineFolder> {
     Expression<bool>? deleted,
     Expression<String>? name,
     Expression<int>? sortOrder,
+    Expression<String>? notes,
     Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
@@ -615,6 +640,7 @@ class RoutineFoldersCompanion extends UpdateCompanion<RoutineFolder> {
       if (deleted != null) 'deleted': deleted,
       if (name != null) 'name': name,
       if (sortOrder != null) 'sort_order': sortOrder,
+      if (notes != null) 'notes': notes,
       if (rowid != null) 'rowid': rowid,
     });
   }
@@ -626,6 +652,7 @@ class RoutineFoldersCompanion extends UpdateCompanion<RoutineFolder> {
     Value<bool>? deleted,
     Value<String>? name,
     Value<int>? sortOrder,
+    Value<String?>? notes,
     Value<int>? rowid,
   }) {
     return RoutineFoldersCompanion(
@@ -635,6 +662,7 @@ class RoutineFoldersCompanion extends UpdateCompanion<RoutineFolder> {
       deleted: deleted ?? this.deleted,
       name: name ?? this.name,
       sortOrder: sortOrder ?? this.sortOrder,
+      notes: notes ?? this.notes,
       rowid: rowid ?? this.rowid,
     );
   }
@@ -660,6 +688,9 @@ class RoutineFoldersCompanion extends UpdateCompanion<RoutineFolder> {
     if (sortOrder.present) {
       map['sort_order'] = Variable<int>(sortOrder.value);
     }
+    if (notes.present) {
+      map['notes'] = Variable<String>(notes.value);
+    }
     if (rowid.present) {
       map['rowid'] = Variable<int>(rowid.value);
     }
@@ -675,6 +706,7 @@ class RoutineFoldersCompanion extends UpdateCompanion<RoutineFolder> {
           ..write('deleted: $deleted, ')
           ..write('name: $name, ')
           ..write('sortOrder: $sortOrder, ')
+          ..write('notes: $notes, ')
           ..write('rowid: $rowid')
           ..write(')'))
         .toString();
@@ -6777,6 +6809,7 @@ typedef $$RoutineFoldersTableCreateCompanionBuilder =
       Value<bool> deleted,
       required String name,
       required int sortOrder,
+      Value<String?> notes,
       Value<int> rowid,
     });
 typedef $$RoutineFoldersTableUpdateCompanionBuilder =
@@ -6787,6 +6820,7 @@ typedef $$RoutineFoldersTableUpdateCompanionBuilder =
       Value<bool> deleted,
       Value<String> name,
       Value<int> sortOrder,
+      Value<String?> notes,
       Value<int> rowid,
     });
 
@@ -6858,6 +6892,11 @@ class $$RoutineFoldersTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
+  ColumnFilters<String> get notes => $composableBuilder(
+    column: $table.notes,
+    builder: (column) => ColumnFilters(column),
+  );
+
   Expression<bool> routinesRefs(
     Expression<bool> Function($$RoutinesTableFilterComposer f) f,
   ) {
@@ -6922,6 +6961,11 @@ class $$RoutineFoldersTableOrderingComposer
     column: $table.sortOrder,
     builder: (column) => ColumnOrderings(column),
   );
+
+  ColumnOrderings<String> get notes => $composableBuilder(
+    column: $table.notes,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$RoutineFoldersTableAnnotationComposer
@@ -6950,6 +6994,9 @@ class $$RoutineFoldersTableAnnotationComposer
 
   GeneratedColumn<int> get sortOrder =>
       $composableBuilder(column: $table.sortOrder, builder: (column) => column);
+
+  GeneratedColumn<String> get notes =>
+      $composableBuilder(column: $table.notes, builder: (column) => column);
 
   Expression<T> routinesRefs<T extends Object>(
     Expression<T> Function($$RoutinesTableAnnotationComposer a) f,
@@ -7013,6 +7060,7 @@ class $$RoutineFoldersTableTableManager
                 Value<bool> deleted = const Value.absent(),
                 Value<String> name = const Value.absent(),
                 Value<int> sortOrder = const Value.absent(),
+                Value<String?> notes = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => RoutineFoldersCompanion(
                 id: id,
@@ -7021,6 +7069,7 @@ class $$RoutineFoldersTableTableManager
                 deleted: deleted,
                 name: name,
                 sortOrder: sortOrder,
+                notes: notes,
                 rowid: rowid,
               ),
           createCompanionCallback:
@@ -7031,6 +7080,7 @@ class $$RoutineFoldersTableTableManager
                 Value<bool> deleted = const Value.absent(),
                 required String name,
                 required int sortOrder,
+                Value<String?> notes = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => RoutineFoldersCompanion.insert(
                 id: id,
@@ -7039,6 +7089,7 @@ class $$RoutineFoldersTableTableManager
                 deleted: deleted,
                 name: name,
                 sortOrder: sortOrder,
+                notes: notes,
                 rowid: rowid,
               ),
           withReferenceMapper: (p0) => p0

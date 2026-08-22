@@ -21,32 +21,31 @@ class GTRoutineFolder {
   final String id;
   final String name;
   final int sortOrder;
+  final String notes;
 
   const GTRoutineFolder({
     required this.id,
     required this.name,
     required this.sortOrder,
+    required this.notes,
   });
 
-  GTRoutineFolder.generate({
-    required this.name,
-  })  : id = const Uuid().v4(), // Is overridden by the database
-        sortOrder = 9999999;
+  GTRoutineFolder.generate({required this.name})
+    : id = const Uuid().v4(), // Is overridden by the database
+      sortOrder = 9999999,
+      notes = "";
 
   factory GTRoutineFolder.fromJson(Map<String, dynamic> json) {
     return GTRoutineFolder(
       id: json['id'] as String,
       name: json['name'] as String,
       sortOrder: json['sortOrder'] as int,
+      notes: json['notes'] as String? ?? "",
     );
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'name': name,
-      'sortOrder': sortOrder,
-    };
+    return {'id': id, 'name': name, 'sortOrder': sortOrder, 'notes': notes};
   }
 
   @override
@@ -58,11 +57,13 @@ class GTRoutineFolder {
     String? id,
     String? name,
     int? sortOrder,
+    String? notes,
   }) {
     return GTRoutineFolder(
       id: id ?? this.id,
       name: name ?? this.name,
       sortOrder: sortOrder ?? this.sortOrder,
+      notes: notes ?? this.notes,
     );
   }
 
@@ -73,15 +74,16 @@ class GTRoutineFolder {
           runtimeType == other.runtimeType &&
           id == other.id &&
           name == other.name &&
-          sortOrder == other.sortOrder;
+          sortOrder == other.sortOrder &&
+          notes == other.notes;
 
   @override
-  int get hashCode => id.hashCode ^ name.hashCode ^ sortOrder.hashCode;
+  int get hashCode =>
+      id.hashCode ^ name.hashCode ^ sortOrder.hashCode ^ notes.hashCode;
 }
 
 @CopyWith()
 @JsonSerializable()
-
 /// Represents a workout, that is, a named sequence of exercises.
 ///
 /// A workout can be concrete. A concrete workout represent the
@@ -154,17 +156,19 @@ class Workout {
 
   List<GTSet> get allSets => [for (final ex in exercises) ...ex.sets];
   List<GTSet> get doneSets => [
-        for (final set in allSets)
-          if (set.done) set
-      ];
+    for (final set in allSets)
+      if (set.done) set,
+  ];
 
   double get progress => allSets.isEmpty
       ? 0
       : allSets.where((set) => set.done).length / allSets.length;
   int get reps =>
       doneSets.fold(0, (value, element) => value + (element.reps ?? 0));
-  double get liftedWeight => doneSets.fold(0.0,
-      (value, element) => value + (element.weight ?? 0) * (element.reps ?? 1));
+  double get liftedWeight => doneSets.fold(
+    0.0,
+    (value, element) => value + (element.weight ?? 0) * (element.reps ?? 1),
+  );
   double get distanceRun =>
       doneSets.fold(0.0, (value, element) => value + (element.distance ?? 0));
 
@@ -175,15 +179,17 @@ class Workout {
   bool get isSupersedence =>
       completes != null && exercises.any((element) => element.isSupersedence);
 
-  double get exertion => (doneSets.fold(
-          0.0,
-          (a, b) =>
-              a +
-              Weights.convert(
-                value: b.weight?.toDouble() ?? 0,
-                from: weightUnit,
-                to: Weights.kg,
-              )) /
+  double get exertion =>
+      (doneSets.fold(
+        0.0,
+        (a, b) =>
+            a +
+            Weights.convert(
+              value: b.weight?.toDouble() ?? 0,
+              from: weightUnit,
+              to: Weights.kg,
+            ),
+      ) /
       max(1, duration!.inMinutes));
 
   Workout({
@@ -199,16 +205,18 @@ class Workout {
     this.weightUnit = Weights.kg,
     this.distanceUnit = Distance.km,
     this.folder,
-  })  : id = id ?? const Uuid().v4(),
-        assert(() {
-          if (completedBy == null && completes == null) return true;
-          return (completedBy == null) != (completes == null);
-        }(),
-            "Both completedBy and completes cannot be defined at the same time."),
-        assert(() {
-          if (folder != null) return duration == null;
-          return true;
-        }(), "A concrete workout cannot be in a folder.");
+  }) : id = id ?? const Uuid().v4(),
+       assert(
+         () {
+           if (completedBy == null && completes == null) return true;
+           return (completedBy == null) != (completes == null);
+         }(),
+         "Both completedBy and completes cannot be defined at the same time.",
+       ),
+       assert(() {
+         if (folder != null) return duration == null;
+         return true;
+       }(), "A concrete workout cannot be in a folder.");
 
   static bool canCombine(Workout workout1, Workout workout2) {
     return workout1.isConcrete == workout2.isConcrete && !workout1.isConcrete ||
@@ -218,17 +226,22 @@ class Workout {
   }
 
   static Workout combine(Workout workout1, Workout workout2) {
-    assert(workout1.isConcrete == workout2.isConcrete,
-        "Both workouts must be concrete or not concrete.");
+    assert(
+      workout1.isConcrete == workout2.isConcrete,
+      "Both workouts must be concrete or not concrete.",
+    );
     if (workout1.isConcrete) {
       assert(
-          workout1.completedBy == workout2.id &&
-              workout2.completes == workout1.id &&
-              workout1.completedBy != null &&
-              workout2.completes != null,
-          "Workout 1 must be completed by workout 2.");
-      assert(workout1.startingDate!.isBefore(workout2.startingDate!),
-          "Workout 1 must start before workout 2.");
+        workout1.completedBy == workout2.id &&
+            workout2.completes == workout1.id &&
+            workout1.completedBy != null &&
+            workout2.completes != null,
+        "Workout 1 must be completed by workout 2.",
+      );
+      assert(
+        workout1.startingDate!.isBefore(workout2.startingDate!),
+        "Workout 1 must start before workout 2.",
+      );
     }
 
     // NOTE: We don't care about IDs in this method since they get fixed
@@ -243,14 +256,17 @@ class Workout {
     final result = Workout(
       name: workout1.name,
       exercises: exercises,
-      duration: (workout1.duration ?? Duration.zero) +
+      duration:
+          (workout1.duration ?? Duration.zero) +
           (workout2.duration ?? Duration.zero),
       startingDate: workout1.startingDate,
       weightUnit: workout1.weightUnit,
       distanceUnit: workout1.distanceUnit,
-      parentID:
-          workout1.parentID == workout2.parentID ? workout1.parentID : null,
-      infobox: workout1.infobox?.richCombine(workout2.infobox ?? "") ??
+      parentID: workout1.parentID == workout2.parentID
+          ? workout1.parentID
+          : null,
+      infobox:
+          workout1.infobox?.richCombine(workout2.infobox ?? "") ??
           workout2.infobox,
     );
 
@@ -263,15 +279,12 @@ class Workout {
       _$WorkoutFromJson(json);
 
   Map<String, dynamic> toJson() => {
-        ..._$WorkoutToJson(this),
-        'exercises': [for (final exercise in exercises) exercise.toJson()],
-        'folder': folder?.toJson(),
-      };
+    ..._$WorkoutToJson(this),
+    'exercises': [for (final exercise in exercises) exercise.toJson()],
+    'folder': folder?.toJson(),
+  };
 
-  Map<String, dynamic> shareWorkout() => {
-        ...toJson(),
-        'folder': null,
-      };
+  Map<String, dynamic> shareWorkout() => {...toJson(), 'folder': null};
 
   @override
   String toString() {
@@ -284,9 +297,7 @@ class Workout {
   ///
   /// If [routineID] is not provided, a new ID is generated. Otherwise, the
   /// provided ID is used.
-  Workout toRoutine({
-    String? routineID,
-  }) {
+  Workout toRoutine({String? routineID}) {
     final newRoutineID = routineID ?? const Uuid().v4();
     return copyWith(
       duration: null,
@@ -320,10 +331,7 @@ class Workout {
               supersedesID: null,
               sets: [
                 for (final set in single.sets)
-                  set.copyWith(
-                    id: const Uuid().v4(),
-                    done: false,
-                  ),
+                  set.copyWith(id: const Uuid().v4(), done: false),
               ],
             ),
           ),
@@ -368,27 +376,29 @@ class Workout {
   Workout withRegeneratedExerciseIDs({required bool superseding}) {
     final newExercises = <WorkoutExercisable>[];
     for (final exercise in exercises) {
-      newExercises.add(exercise.map(
-        superset: (superset) {
-          final newSupersetID = const Uuid().v4();
-          return superset.copyWith(
-            exercises: [
-              for (final exercise in superset.exercises)
-                exercise.copyWith(
-                  id: const Uuid().v4(),
-                  supersetID: newSupersetID,
-                  supersedesID: superseding ? exercise.id : null,
-                ),
-            ],
-            id: newSupersetID,
-            supersedesID: superseding ? superset.id : null,
-          );
-        },
-        exercise: (single) => single.copyWith(
-          id: const Uuid().v4(),
-          supersedesID: superseding ? single.id : null,
+      newExercises.add(
+        exercise.map(
+          superset: (superset) {
+            final newSupersetID = const Uuid().v4();
+            return superset.copyWith(
+              exercises: [
+                for (final exercise in superset.exercises)
+                  exercise.copyWith(
+                    id: const Uuid().v4(),
+                    supersetID: newSupersetID,
+                    supersedesID: superseding ? exercise.id : null,
+                  ),
+              ],
+              id: newSupersetID,
+              supersedesID: superseding ? superset.id : null,
+            );
+          },
+          exercise: (single) => single.copyWith(
+            id: const Uuid().v4(),
+            supersedesID: superseding ? single.id : null,
+          ),
         ),
-      ));
+      );
     }
     return copyWith(exercises: newExercises);
   }
@@ -424,7 +434,7 @@ class Workout {
         a.exercises.length == b.exercises.length &&
         [
           for (int i = 0; i < a.exercises.length; i++)
-            WorkoutExercisable.deepEquality(a.exercises[i], b.exercises[i])
+            WorkoutExercisable.deepEquality(a.exercises[i], b.exercises[i]),
         ].every((element) => element) &&
         a.duration == b.duration &&
         a.startingDate == b.startingDate &&
@@ -453,13 +463,16 @@ class SynthesizedWorkout implements Workout {
   final List<Workout> components;
 
   SynthesizedWorkout(this.components)
-      : assert(components.isNotEmpty),
-        assert(components.every((wo) => wo is! SynthesizedWorkout),
-            "Cannot nest synthesized workouts"),
-        assert(
-            components.every((e) => e.isConcrete) ||
-                components.every((e) => !e.isConcrete),
-            "All components must be either routines or concrete");
+    : assert(components.isNotEmpty),
+      assert(
+        components.every((wo) => wo is! SynthesizedWorkout),
+        "Cannot nest synthesized workouts",
+      ),
+      assert(
+        components.every((e) => e.isConcrete) ||
+            components.every((e) => !e.isConcrete),
+        "All components must be either routines or concrete",
+      );
 
   @override
   String? get completedBy => null;
@@ -499,7 +512,9 @@ class SynthesizedWorkout implements Workout {
 
   @override
   Duration get duration => components.fold(
-      Duration.zero, (a, b) => a + (b.duration ?? Duration.zero));
+    Duration.zero,
+    (a, b) => a + (b.duration ?? Duration.zero),
+  );
 
   @override
   DateTime get endingDate => startingDate!.add(duration);
@@ -509,21 +524,20 @@ class SynthesizedWorkout implements Workout {
     // If we have two components, account for the possibility that the second
     // workout completes the first.
     if (components.length == 2) {
-      return getExercisesLinearly(
-        components.first,
-        components.last,
-      );
+      return getExercisesLinearly(components.first, components.last);
     }
     return components
-        .expand((w) => [
-              for (final e in w.exercises)
-                e.changeUnits(
-                  fromWeightUnit: w.weightUnit,
-                  toWeightUnit: weightUnit,
-                  fromDistanceUnit: w.distanceUnit,
-                  toDistanceUnit: distanceUnit,
-                )
-            ])
+        .expand(
+          (w) => [
+            for (final e in w.exercises)
+              e.changeUnits(
+                fromWeightUnit: w.weightUnit,
+                toWeightUnit: weightUnit,
+                fromDistanceUnit: w.distanceUnit,
+                toDistanceUnit: distanceUnit,
+              ),
+          ],
+        )
         .toList();
   }
 
@@ -562,14 +576,15 @@ class SynthesizedWorkout implements Workout {
 
   @override
   double get liftedWeight => components.fold(
-      0.0,
-      (a, b) =>
-          a +
-          Weights.convert(
-            value: b.liftedWeight,
-            from: b.weightUnit,
-            to: weightUnit,
-          ));
+    0.0,
+    (a, b) =>
+        a +
+        Weights.convert(
+          value: b.liftedWeight,
+          from: b.weightUnit,
+          to: weightUnit,
+        ),
+  );
 
   @override
   String get name => components.first.name;
@@ -607,9 +622,10 @@ class SynthesizedWorkout implements Workout {
   }
 
   @override
-  Workout withFilters(
-      {bool Function(WorkoutExercisable p1)? exerciseFilter,
-      bool Function(WorkoutExercisable p1, GTSet p2)? setFilter}) {
+  Workout withFilters({
+    bool Function(WorkoutExercisable p1)? exerciseFilter,
+    bool Function(WorkoutExercisable p1, GTSet p2)? setFilter,
+  }) {
     throw SynthesizedWorkoutMethodException("withFilters");
   }
 
@@ -666,9 +682,11 @@ class WorkoutDifference {
             oldCandidate.exercises.length != newCandidate.exercises.length;
       }
 
-      for (int j = 0;
-          j < min(oldCandidate.sets.length, newCandidate.sets.length);
-          j++) {
+      for (
+        int j = 0;
+        j < min(oldCandidate.sets.length, newCandidate.sets.length);
+        j++
+      ) {
         final oldSet = oldCandidate.sets[j];
         final newSet = newCandidate.sets[j];
 
@@ -729,10 +747,9 @@ class WorkoutDifference {
 }
 
 bool linearExercisesUseNewAlgorithm(Workout base, Workout cont) {
-  globalLogger.w('[linearExercisesUseNewAlgorithm] usesNewAlgorithm: ${(
-    cont.isSupersedence,
-    cont.isCompletionOf(base)
-  )}');
+  globalLogger.w(
+    '[linearExercisesUseNewAlgorithm] usesNewAlgorithm: ${(cont.isSupersedence, cont.isCompletionOf(base))}',
+  );
   return cont.isSupersedence && cont.isCompletionOf(base);
 }
 
@@ -792,7 +809,9 @@ List<WorkoutExercisable> getExercisesLinearly(
         id: base.exercises.firstWhere((e) => e.id == id),
       for (final id
           in cont.exercises.where((e) => !e.isSupersedence).map((e) => e.id))
-        id: cont.exercises.firstWhere((e) => e.id == id).changeUnits(
+        id: cont.exercises
+            .firstWhere((e) => e.id == id)
+            .changeUnits(
               fromWeightUnit: cont.weightUnit,
               toWeightUnit: base.weightUnit,
               fromDistanceUnit: cont.distanceUnit,
@@ -810,10 +829,8 @@ List<WorkoutExercisable> getExercisesLinearly(
               toDistanceUnit: base.distanceUnit,
             )
             .map(
-              exercise: (ex) => ex.copyWith(
-                id: ex.supersedesID,
-                supersedesID: null,
-              ),
+              exercise: (ex) =>
+                  ex.copyWith(id: ex.supersedesID, supersedesID: null),
               superset: (superset) {
                 final exercises = [
                   for (final exercise in superset.exercises)
@@ -841,15 +858,21 @@ List<WorkoutExercisable> getExercisesLinearly(
       final exercise = exerciseMap[id]!;
 
       if (overrideSupersedencesWithNull) {
-        exercises.add(exercise.map(exercise: (ex) {
-          return ex.copyWith.supersedesID(null);
-        }, superset: (s) {
-          return s.copyWith(
-            supersedesID: null,
-            exercises:
-                s.exercises.map((e) => e.copyWith.supersedesID(null)).toList(),
-          );
-        }));
+        exercises.add(
+          exercise.map(
+            exercise: (ex) {
+              return ex.copyWith.supersedesID(null);
+            },
+            superset: (s) {
+              return s.copyWith(
+                supersedesID: null,
+                exercises: s.exercises
+                    .map((e) => e.copyWith.supersedesID(null))
+                    .toList(),
+              );
+            },
+          ),
+        );
       } else {
         exercises.add(exercise);
       }

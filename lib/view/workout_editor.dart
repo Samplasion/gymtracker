@@ -970,7 +970,7 @@ class _WorkoutFinishEditingPageState extends State<WorkoutFinishEditingPage> {
                         ),
                         if (!widget.workout.isContinuation)
                           GTRichTextEditor(
-                            infoboxController: infoboxController,
+                            controller: infoboxController,
                             decoration: GymTrackerInputDecoration(
                               labelText:
                                   "historyEditor.finish.fields.infobox.label".t,

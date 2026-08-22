@@ -8,6 +8,8 @@ import 'package:uuid/uuid.dart';
 
 const _uuid = Uuid();
 
+/// This class represents a routine folder for the purpose of syncing.
+/// For any other purpose, use the [GTRoutineFolder] class.
 final class RoutineFolder implements Syncable {
   @override
   final String id;
@@ -19,11 +21,13 @@ final class RoutineFolder implements Syncable {
   final bool deleted;
   @override
   final String? userId;
+  final String? notes;
 
   RoutineFolder({
     required this.id,
     required this.name,
     required this.sortOrder,
+    required this.notes,
     DateTime? updatedAt,
     bool? deleted,
     this.userId,
@@ -42,6 +46,7 @@ final class RoutineFolder implements Syncable {
           : null,
       deleted: json['deleted'] as bool? ?? false,
       userId: json['user_id'] as String? ?? json['userId'] as String?,
+      notes: json['notes'] as String?,
     );
   }
 
@@ -51,6 +56,7 @@ final class RoutineFolder implements Syncable {
     'name': name,
     'sort_order': sortOrder,
     'updated_at': updatedAt.toUtc().toIso8601String(),
+    'notes': notes,
     'deleted': deleted,
     'user_id': userId,
   };
@@ -64,6 +70,7 @@ final class RoutineFolder implements Syncable {
       updatedAt: Value(updatedAt),
       deleted: Value(deleted),
       userId: Value(userId),
+      notes: Value(notes),
     );
   }
 }

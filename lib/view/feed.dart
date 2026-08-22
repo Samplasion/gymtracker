@@ -49,12 +49,12 @@ class _FeedViewState extends ConsumerState<FeedView> {
 
   @override
   Widget build(BuildContext context) {
-    final isLoading = widget._skeleton || ref.watch(feedProvider).isLoading;
+    final feed = ref.watch(feedProvider);
+    final isLoading = widget._skeleton || feed.isLoading;
     final routinesController = Get.find<RoutinesController>();
     final List<RoutineSuggestion> suggested = isLoading
         ? fakeWorkouts.map((w) => (routine: w, occurrences: 0)).toList()
         : routinesController.suggestions.take(3).toList();
-    final feed = ref.watch(feedProvider);
     final account = ref.watch(onlineProvider);
 
     return Scaffold(

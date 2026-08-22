@@ -773,7 +773,7 @@ class _WorkoutFinishPageState extends State<WorkoutFinishPage> {
                             },
                           ),
                           GTRichTextEditor(
-                            infoboxController: infoboxController,
+                            controller: infoboxController,
                             decoration: GymTrackerInputDecoration(
                               labelText:
                                   "ongoingWorkout.finish.fields.infobox.label"

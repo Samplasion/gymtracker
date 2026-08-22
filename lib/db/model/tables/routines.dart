@@ -17,6 +17,9 @@ class RoutineFolders extends Table implements SyncableTable {
   TextColumn get id => text().clientDefault(() => _uuid.v4())();
   TextColumn get name => text()();
   IntColumn get sortOrder => integer()();
+  // Max: 100 000 to account for JSON data caused by the rich notes format
+  // The actual limit is far less
+  TextColumn get notes => text().nullable().withLength(max: 100000)();
   @override
   DateTimeColumn get updatedAt => dateTime().nullable()();
   @override

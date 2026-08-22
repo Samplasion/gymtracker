@@ -56,7 +56,7 @@ part 'database.g.dart';
 // Used in the generated code
 const _uuid = Uuid();
 
-const DATABASE_VERSION = 16;
+const DATABASE_VERSION = 17;
 
 abstract class GTDatabase extends GeneratedDatabase with SyncableDatabase {
   GTDatabase(super.e);
@@ -508,6 +508,12 @@ class GTDatabaseImpl extends _$GTDatabaseImpl
             await m.alterTable(TableMigration(schema.routineFolders));
             await m.alterTable(TableMigration(schema.routines));
             await m.alterTable(TableMigration(schema.routineExercises));
+          },
+          from16To17: (m, schema) async {
+            await m.addColumn(
+              schema.routineFolders,
+              schema.routineFolders.notes,
+            );
           },
         ),
       );
@@ -2319,6 +2325,7 @@ extension FolderDatabaseUtils on model.GTRoutineFolder {
       updatedAt: Value(DateTime.now().toUtc()),
       deleted: const Value(false),
       userId: Value(userId),
+      notes: Value(notes),
     );
   }
 }

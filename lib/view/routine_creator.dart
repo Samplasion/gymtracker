@@ -149,7 +149,7 @@ class _RoutineCreatorState extends State<RoutineCreator> {
                 },
               ),
               GTRichTextEditor(
-                infoboxController: infoboxController,
+                controller: infoboxController,
                 decoration: GymTrackerInputDecoration(
                   labelText: "routines.editor.fields.infobox.label".t,
                   alignLabelWithHint: true,

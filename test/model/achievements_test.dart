@@ -36,12 +36,20 @@ void main() {
       final comp1 = AchievementCompletion(
         achievementID: "test_ach",
         level: 1,
-        completedAt: DateTime(2026, 1, 1),
+        completedAt: DateTime.utc(2026, 1, 1),
+        id: "completion_1",
+        updatedAt: DateTime.utc(2026, 1, 1),
+        deleted: false,
+        userId: "user_1",
       );
       final comp2 = AchievementCompletion(
         achievementID: "test_ach",
         level: 2,
-        completedAt: DateTime(2026, 1, 2),
+        completedAt: DateTime.utc(2026, 1, 2),
+        id: "completion_2",
+        updatedAt: DateTime.utc(2026, 1, 2),
+        deleted: false,
+        userId: "user_1",
       );
 
       expect(achievement.nextLevel(comp1), level2);
@@ -50,7 +58,11 @@ void main() {
       final compDiff = AchievementCompletion(
         achievementID: "different_ach",
         level: 1,
-        completedAt: DateTime.now(),
+        completedAt: DateTime.utc(2026, 1, 3),
+        id: "completion_3",
+        updatedAt: DateTime.utc(2026, 1, 3),
+        deleted: false,
+        userId: "user_1",
       );
       expect(() => achievement.nextLevel(compDiff), throwsArgumentError);
     });
@@ -59,12 +71,20 @@ void main() {
       final comp1 = AchievementCompletion(
         achievementID: "test_ach",
         level: 1,
-        completedAt: DateTime.now(),
+        completedAt: DateTime.utc(2026, 1, 1),
+        id: "completion_4",
+        updatedAt: DateTime.utc(2026, 1, 1),
+        deleted: false,
+        userId: "user_1",
       );
       final comp2 = AchievementCompletion(
         achievementID: "test_ach",
         level: 2,
-        completedAt: DateTime.now(),
+        completedAt: DateTime.utc(2026, 1, 2),
+        id: "completion_5",
+        updatedAt: DateTime.utc(2026, 1, 2),
+        deleted: false,
+        userId: "user_1",
       );
 
       expect(achievement.isCompleted(comp1), false);
@@ -75,12 +95,20 @@ void main() {
       final comp1 = AchievementCompletion(
         achievementID: "test_ach",
         level: 1,
-        completedAt: DateTime.now(),
+        completedAt: DateTime.utc(2026, 1, 1),
+        id: "completion_6",
+        updatedAt: DateTime.utc(2026, 1, 1),
+        deleted: false,
+        userId: "user_1",
       );
       final comp2 = AchievementCompletion(
         achievementID: "test_ach",
         level: 2,
-        completedAt: DateTime.now(),
+        completedAt: DateTime.utc(2026, 1, 2),
+        id: "completion_7",
+        updatedAt: DateTime.utc(2026, 1, 2),
+        deleted: false,
+        userId: "user_1",
       );
 
       expect(achievement.getLevel(comp1), level1);
@@ -91,18 +119,36 @@ void main() {
       final comp = AchievementCompletion(
         achievementID: "ach_id",
         level: 3,
-        completedAt: DateTime(2026, 1, 1, 12, 0, 0),
+        completedAt: DateTime.utc(2026, 1, 1, 12, 0, 0),
+        id: "completion_8",
+        updatedAt: DateTime.utc(2026, 1, 1, 12, 0, 0),
+        deleted: false,
+        userId: "user_1",
       );
 
       final json = comp.toJson();
-      expect(json["achievementID"], "ach_id");
+      expect(json["achievement_id"], "ach_id");
       expect(json["level"], 3);
-      expect(json["completedAt"], "2026-01-01T12:00:00.000");
+      expect(json["completed_at"], "2026-01-01T12:00:00.000Z");
+      expect(json["id"], "completion_8");
+      expect(json["updated_at"], "2026-01-01T12:00:00.000Z");
+      expect(json["deleted"], false);
+      expect(json["user_id"], "user_1");
 
       final deserialized = AchievementCompletion.fromJson(json);
       expect(deserialized.achievementID, "ach_id");
       expect(deserialized.level, 3);
-      expect(deserialized.completedAt.toIso8601String(), "2026-01-01T12:00:00.000");
+      expect(
+        deserialized.completedAt.toIso8601String(),
+        "2026-01-01T12:00:00.000Z",
+      );
+      expect(deserialized.id, "completion_8");
+      expect(
+        deserialized.updatedAt.toIso8601String(),
+        "2026-01-01T12:00:00.000Z",
+      );
+      expect(deserialized.deleted, false);
+      expect(deserialized.userId, "user_1");
     });
   });
 }

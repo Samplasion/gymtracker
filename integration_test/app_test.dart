@@ -31,7 +31,7 @@ void main() async {
   TestService().isTest = true;
   late DatabaseService databaseService = DatabaseService();
   final l = GTLocalizations();
-  await databaseService.ensureInitializedForTests(NativeDatabase.memory());
+  await databaseService.ensureInitializedForTests(NativeDatabase.memory(), null);
 
   setUp(() async {
     IntegrationTestWidgetsFlutterBinding.instance.reset();

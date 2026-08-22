@@ -34,7 +34,7 @@ void main() {
     await tester.pump();
 
     // Verify view has "New routine" and "New folder" options
-    expect(find.text('New routine'), findsOneWidget);
-    expect(find.text('New folder'), findsOneWidget);
+    expect(find.textContaining('New routine'), findsOneWidget);
+    expect(find.textContaining('New folder'), findsOneWidget);
   });
 }

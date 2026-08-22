@@ -12,6 +12,10 @@ import 'package:gymtracker/controller/settings_controller.dart';
 import 'package:gymtracker/controller/stopwatch_controller.dart';
 import 'package:gymtracker/data/distance.dart';
 import 'package:gymtracker/data/weights.dart';
+import 'package:gymtracker/controller/purchases_controller.dart';
+import 'package:gymtracker/model/subscription.dart';
+import 'package:gymtracker/model/workout.dart';
+import 'package:gymtracker/model/exercise.dart';
 import 'package:gymtracker/service/database.dart';
 import 'package:mocktail/mocktail.dart';
 
@@ -104,6 +108,13 @@ class MockAchievementsController extends Mock
   final onDelete = MockInternalFinalCallback<void>();
 }
 
+class MockPurchasesController extends Mock implements PurchasesController {
+  @override
+  final onStart = MockInternalFinalCallback<void>();
+  @override
+  final onDelete = MockInternalFinalCallback<void>();
+}
+
 // Global setup helper
 class MockServices {
   static late MockDatabaseService databaseService;
@@ -117,6 +128,7 @@ class MockServices {
   static late MockMeController meController;
   static late MockFoodController foodController;
   static late MockAchievementsController achievementsController;
+  static late MockPurchasesController purchasesController;
 
   static void setup() {
     Get.reset();
@@ -132,6 +144,7 @@ class MockServices {
     meController = MockMeController();
     foodController = MockFoodController();
     achievementsController = MockAchievementsController();
+    purchasesController = MockPurchasesController();
 
     Get.put<DatabaseService>(databaseService);
     Get.put<Coordinator>(coordinator);
@@ -144,9 +157,12 @@ class MockServices {
     Get.put<MeController>(meController);
     Get.put<FoodController>(foodController);
     Get.put<AchievementsController>(achievementsController);
+    Get.put<PurchasesController>(purchasesController);
 
     // Default stubbing for critical common stuff
     registerFallbackValue(const Duration(seconds: 0));
+    registerFallbackValue(Workout(name: '', exercises: []));
+    registerFallbackValue(<Workout>[]);
 
     // SettingsController weight/distance
     when(() => settingsController.weightUnit).thenReturn(Weights.kg.obs);
@@ -161,6 +177,15 @@ class MockServices {
 
     // RoutinesController hasOngoingWorkout
     when(() => routinesController.hasOngoingWorkout).thenReturn(false.obs);
+    when(() => routinesController.workouts).thenReturn(<Workout>[].obs);
+    when(() => routinesController.isWorkoutContinuable(any())).thenReturn(false);
+
+    // HistoryController history & userVisibleWorkouts
+    when(() => historyController.history).thenReturn(<Workout>[].obs);
+    when(() => historyController.userVisibleWorkouts).thenReturn(<Workout>[]);
+    when(() => historyController.calculateMuscleCategoryDistributionFor(
+          workouts: any(named: 'workouts'),
+        )).thenReturn(<GTMuscleCategory, double>{});
 
     // DatabaseService empty lists/maps or no-ops
     when(() => databaseService.deleteOngoing()).thenAnswer((_) async {});
@@ -181,6 +206,12 @@ class MockServices {
 
     // Coordinator methods
     when(() => coordinator.onServiceChange()).thenAnswer((_) {});
+
+    // PurchasesController
+    when(() => purchasesController.subscriptionInfoStream)
+        .thenAnswer((_) => Stream.value(SubscriptionInfo.empty));
+    when(() => purchasesController.subscriptionInfo)
+        .thenReturn(SubscriptionInfo.empty);
   }
 
   static void tearDown() {

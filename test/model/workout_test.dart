@@ -28,6 +28,7 @@ void main() {
             time: const Duration(seconds: 60),
             parameters: GTSetParameters.repsWeight,
             kind: GTSetKind.normal,
+            rpe: 5,
           ),
           GTSet(
             reps: 10,
@@ -35,6 +36,7 @@ void main() {
             time: const Duration(seconds: 60),
             parameters: GTSetParameters.repsWeight,
             kind: GTSetKind.normal,
+            rpe: 5,
           ),
         ],
         primaryMuscleGroup: GTMuscleGroup.abs,
@@ -57,6 +59,7 @@ void main() {
             time: const Duration(seconds: 60),
             parameters: GTSetParameters.repsWeight,
             kind: GTSetKind.normal,
+            rpe: 5,
           ),
           GTSet(
             reps: 10,
@@ -64,6 +67,7 @@ void main() {
             time: const Duration(seconds: 60),
             parameters: GTSetParameters.repsWeight,
             kind: GTSetKind.normal,
+            rpe: 5,
           ),
         ],
         primaryMuscleGroup: GTMuscleGroup.abs,
@@ -95,6 +99,7 @@ void main() {
           time: const Duration(seconds: 60),
           parameters: GTSetParameters.repsWeight,
           kind: GTSetKind.normal,
+          rpe: 5,
         ),
         GTSet(
           reps: 10,
@@ -102,6 +107,7 @@ void main() {
           time: const Duration(seconds: 60),
           parameters: GTSetParameters.repsWeight,
           kind: GTSetKind.normal,
+          rpe: 5,
         ),
       ],
       primaryMuscleGroup: GTMuscleGroup.abs,
@@ -149,171 +155,204 @@ void main() {
         );
       });
 
-      group("difference should be correctly calculated (changed exercises)",
-          () {
-        test('with an added set', () {
-          final workout2 = workout.clone();
-          workout2.exercises[0].sets.add(GTSet(
-            reps: 10,
-            weight: 100,
-            time: const Duration(seconds: 60),
-            parameters: GTSetParameters.repsWeight,
-            kind: GTSetKind.normal,
-          ));
-          expect(
-            WorkoutDifference.fromWorkouts(
-              oldWorkout: workout,
-              newWorkout: workout2,
-            ),
-            const WorkoutDifference.raw(
-              addedExercises: 0,
-              removedExercises: 0,
-              changedExercises: 1,
-            ),
-          );
-        });
-        test('with a removed set', () {
-          final workout2 = workout.clone();
-          workout2.exercises[0].sets.removeLast();
-          expect(
-            WorkoutDifference.fromWorkouts(
-              oldWorkout: workout,
-              newWorkout: workout2,
-            ),
-            const WorkoutDifference.raw(
-              addedExercises: 0,
-              removedExercises: 0,
-              changedExercises: 1,
-            ),
-          );
-        });
-        test('with a changed set kind', () {
-          final workout2 = workout.clone();
-          workout2.exercises[0].sets[0] = workout2.exercises[0].sets[0].copyWith
-              .kind(GTSetKind.failureStripping);
-          expect(
-            WorkoutDifference.fromWorkouts(
-              oldWorkout: workout,
-              newWorkout: workout2,
-            ),
-            const WorkoutDifference.raw(
-              addedExercises: 0,
-              removedExercises: 0,
-              changedExercises: 1,
-            ),
-          );
-        });
-        test('with a different set weight', () {
-          final workout2 = workout.clone();
-          workout2.exercises[0].sets[0] =
-              workout2.exercises[0].sets[0].copyWith.weight(200);
-          expect(
-            WorkoutDifference.fromWorkouts(
-              oldWorkout: workout,
-              newWorkout: workout2,
-            ),
-            const WorkoutDifference.raw(
-              addedExercises: 0,
-              removedExercises: 0,
-              changedExercises: 1,
-            ),
-          );
-        });
-        test('with different reps weight', () {
-          final workout2 = workout.clone();
-          workout2.exercises[0].sets[0] =
-              workout2.exercises[0].sets[0].copyWith.weight(200);
-          expect(
-            WorkoutDifference.fromWorkouts(
-              oldWorkout: workout,
-              newWorkout: workout2,
-            ),
-            const WorkoutDifference.raw(
-              addedExercises: 0,
-              removedExercises: 0,
-              changedExercises: 1,
-            ),
-          );
-        });
-        test('with changed notes', () {
-          final workout2 = workout.clone();
-          workout2.exercises[0] = (workout2.exercises[0] as Exercise)
-              .copyWith(notes: "These notes have been changed");
-          expect(
-            WorkoutDifference.fromWorkouts(
-              oldWorkout: workout,
-              newWorkout: workout2,
-            ),
-            const WorkoutDifference.raw(
-              addedExercises: 0,
-              removedExercises: 0,
-              changedExercises: 1,
-            ),
-          );
-        });
+      group(
+        "difference should be correctly calculated (changed exercises)",
+        () {
+          test('with an added set', () {
+            final workout2 = workout.clone();
+            workout2.exercises[0].sets.add(
+              GTSet(
+                reps: 10,
+                weight: 100,
+                time: const Duration(seconds: 60),
+                parameters: GTSetParameters.repsWeight,
+                kind: GTSetKind.normal,
+              ),
+            );
+            expect(
+              WorkoutDifference.fromWorkouts(
+                oldWorkout: workout,
+                newWorkout: workout2,
+              ),
+              const WorkoutDifference.raw(
+                addedExercises: 0,
+                removedExercises: 0,
+                changedExercises: 1,
+              ),
+            );
+          });
+          test('with a removed set', () {
+            final workout2 = workout.clone();
+            workout2.exercises[0].sets.removeLast();
+            expect(
+              WorkoutDifference.fromWorkouts(
+                oldWorkout: workout,
+                newWorkout: workout2,
+              ),
+              const WorkoutDifference.raw(
+                addedExercises: 0,
+                removedExercises: 0,
+                changedExercises: 1,
+              ),
+            );
+          });
+          test('with a changed set kind', () {
+            final workout2 = workout.clone();
+            workout2.exercises[0].sets[0] = workout2
+                .exercises[0]
+                .sets[0]
+                .copyWith
+                .kind(GTSetKind.failureStripping);
+            expect(
+              WorkoutDifference.fromWorkouts(
+                oldWorkout: workout,
+                newWorkout: workout2,
+              ),
+              const WorkoutDifference.raw(
+                addedExercises: 0,
+                removedExercises: 0,
+                changedExercises: 1,
+              ),
+            );
+          });
+          test('with a different set weight', () {
+            final workout2 = workout.clone();
+            workout2.exercises[0].sets[0] = workout2
+                .exercises[0]
+                .sets[0]
+                .copyWith
+                .weight(200);
+            expect(
+              WorkoutDifference.fromWorkouts(
+                oldWorkout: workout,
+                newWorkout: workout2,
+              ),
+              const WorkoutDifference.raw(
+                addedExercises: 0,
+                removedExercises: 0,
+                changedExercises: 1,
+              ),
+            );
+          });
+          test('with different reps weight', () {
+            final workout2 = workout.clone();
+            workout2.exercises[0].sets[0] = workout2
+                .exercises[0]
+                .sets[0]
+                .copyWith
+                .weight(200);
+            expect(
+              WorkoutDifference.fromWorkouts(
+                oldWorkout: workout,
+                newWorkout: workout2,
+              ),
+              const WorkoutDifference.raw(
+                addedExercises: 0,
+                removedExercises: 0,
+                changedExercises: 1,
+              ),
+            );
+          });
+          test('with different rep RPE', () {
+            final workout2 = workout.clone();
+            workout2.exercises[0].sets[0] = workout2
+                .exercises[0]
+                .sets[0]
+                .copyWith
+                .rpe(9);
+            expect(
+              WorkoutDifference.fromWorkouts(
+                oldWorkout: workout,
+                newWorkout: workout2,
+              ),
+              const WorkoutDifference.raw(
+                addedExercises: 0,
+                removedExercises: 0,
+                changedExercises: 1,
+              ),
+            );
+          });
+          test('with changed notes', () {
+            final workout2 = workout.clone();
+            workout2.exercises[0] = (workout2.exercises[0] as Exercise)
+                .copyWith(notes: "These notes have been changed");
+            expect(
+              WorkoutDifference.fromWorkouts(
+                oldWorkout: workout,
+                newWorkout: workout2,
+              ),
+              const WorkoutDifference.raw(
+                addedExercises: 0,
+                removedExercises: 0,
+                changedExercises: 1,
+              ),
+            );
+          });
 
-        test("with reordered exercises", () {
-          final workout1 = workout.clone();
-          workout1.exercises.add(newExercise());
-          final workout2 = workout1.clone();
-          final exs = workout2.exercises.reversed.toList();
-          workout2.exercises
-            ..clear()
-            ..addAll(exs);
-          expect(
-            WorkoutDifference.fromWorkouts(
-              oldWorkout: workout1,
-              newWorkout: workout2,
-            ),
-            const WorkoutDifference.raw(
-              addedExercises: 0,
-              removedExercises: 0,
-              changedExercises: 2,
-            ),
-          );
-        });
-      });
+          test("with reordered exercises", () {
+            final workout1 = workout.clone();
+            workout1.exercises.add(newExercise());
+            final workout2 = workout1.clone();
+            final exs = workout2.exercises.reversed.toList();
+            workout2.exercises
+              ..clear()
+              ..addAll(exs);
+            expect(
+              WorkoutDifference.fromWorkouts(
+                oldWorkout: workout1,
+                newWorkout: workout2,
+              ),
+              const WorkoutDifference.raw(
+                addedExercises: 0,
+                removedExercises: 0,
+                changedExercises: 2,
+              ),
+            );
+          });
+        },
+      );
 
       test("with failure and stripping sets", () {
-        final workout1 = workout.copyWith(exercises: [
-          for (final kind in GTSetKind.values
-              .where((kind) => !kind.shouldKeepInRoutine)) ...[
-            Exercise.custom(
-              name: "Test Exercise $kind",
-              parameters: GTSetParameters.repsWeight,
-              sets: [
-                GTSet(
-                  reps: 10,
-                  weight: 100,
-                  time: const Duration(seconds: 60),
-                  parameters: GTSetParameters.repsWeight,
-                  kind: kind,
-                ),
-              ],
-              primaryMuscleGroup: GTMuscleGroup.abs,
-              secondaryMuscleGroups: {GTMuscleGroup.lowerBack},
-              restTime: const Duration(seconds: 60),
-              parentID: null,
-              notes: 'Test Notes',
-              workoutID: null,
-              supersetID: null,
-              equipment: GTGymEquipment.none,
-            ),
-          ]
-        ]);
-        final workout2 = workout1.copyWith(exercises: [
-          for (final ex in workout1.exercises.whereType<Exercise>()) ...[
-            ex.copyWith(
-              sets: [
-                for (final set in ex.sets) ...[
-                  set.copyWith(
-                    reps: 20,
+        final workout1 = workout.copyWith(
+          exercises: [
+            for (final kind in GTSetKind.values.where(
+              (kind) => !kind.shouldKeepInRoutine,
+            )) ...[
+              Exercise.custom(
+                name: "Test Exercise $kind",
+                parameters: GTSetParameters.repsWeight,
+                sets: [
+                  GTSet(
+                    reps: 10,
+                    weight: 100,
+                    time: const Duration(seconds: 60),
+                    parameters: GTSetParameters.repsWeight,
+                    kind: kind,
                   ),
                 ],
-              ],
-            ),
+                primaryMuscleGroup: GTMuscleGroup.abs,
+                secondaryMuscleGroups: {GTMuscleGroup.lowerBack},
+                restTime: const Duration(seconds: 60),
+                parentID: null,
+                notes: 'Test Notes',
+                workoutID: null,
+                supersetID: null,
+                equipment: GTGymEquipment.none,
+              ),
+            ],
           ],
-        ]);
+        );
+        final workout2 = workout1.copyWith(
+          exercises: [
+            for (final ex in workout1.exercises.whereType<Exercise>()) ...[
+              ex.copyWith(
+                sets: [
+                  for (final set in ex.sets) ...[set.copyWith(reps: 20)],
+                ],
+              ),
+            ],
+          ],
+        );
 
         expect(
           WorkoutDifference.fromWorkouts(
@@ -332,10 +371,7 @@ void main() {
         final workout2 = workout.clone();
         workout2.exercises[0] = Superset(
           restTime: const Duration(seconds: 60),
-          exercises: [
-            workout2.exercises[0] as Exercise,
-            newExercise(),
-          ],
+          exercises: [workout2.exercises[0] as Exercise, newExercise()],
           notes: "Superset notes",
           workoutID: null,
         );
@@ -354,9 +390,7 @@ void main() {
         final workout3 = workout2.clone();
         (workout3.exercises[0] as Superset).exercises
           ..add(newExercise())
-          ..add(
-            newExercise(),
-          );
+          ..add(newExercise());
         expect(
           WorkoutDifference.fromWorkouts(
             oldWorkout: workout2,
@@ -370,8 +404,8 @@ void main() {
         );
 
         final workout4 = workout3.clone();
-        workout4.exercises[0] =
-            (workout4.exercises[0] as Superset).copyWith.notes("Changed notes");
+        workout4.exercises[0] = (workout4.exercises[0] as Superset).copyWith
+            .notes("Changed notes");
         expect(
           WorkoutDifference.fromWorkouts(
             oldWorkout: workout3,
@@ -385,8 +419,7 @@ void main() {
         );
 
         final workout5 = workout4.clone();
-        workout5.exercises[0] = (workout5.exercises[0] as Superset)
-            .copyWith
+        workout5.exercises[0] = (workout5.exercises[0] as Superset).copyWith
             .restTime(const Duration(seconds: 120));
         expect(
           WorkoutDifference.fromWorkouts(
@@ -421,7 +454,8 @@ void main() {
         (workout7.exercises[1] as Superset).exercises
           ..clear()
           ..addAll(
-              (workout6.exercises[0] as Superset).exercises.reversed.toList());
+            (workout6.exercises[0] as Superset).exercises.reversed.toList(),
+          );
         expect(
           WorkoutDifference.fromWorkouts(
             // S, E
@@ -439,20 +473,26 @@ void main() {
     });
 
     group("shouldShowAsInfobox(text) -", () {
-      test("returns false for empty strings",
-          () => expect(Workout.shouldShowAsInfobox(""), false));
-      test("returns false for newline strings",
-          () => expect(Workout.shouldShowAsInfobox("\n"), false));
       test(
-          "returns false for empty rich texts",
-          () => expect(
-              Workout.shouldShowAsInfobox('[{"insert": "\\n"}]'), false));
+        "returns false for empty strings",
+        () => expect(Workout.shouldShowAsInfobox(""), false),
+      );
+      test(
+        "returns false for newline strings",
+        () => expect(Workout.shouldShowAsInfobox("\n"), false),
+      );
+      test(
+        "returns false for empty rich texts",
+        () => expect(Workout.shouldShowAsInfobox('[{"insert": "\\n"}]'), false),
+      );
       test("returns true for everything else", () {
         expect(Workout.shouldShowAsInfobox('hello'), true);
         expect(
-            Workout.shouldShowAsInfobox(
-                '[{"insert":"Mitochondria is the "},{"insert":"powerhouse","attributes":{"bold":true}},{"insert":" of the "},{"insert":"cell","attributes":{"italic":true}},{"insert":".\\n"}]'),
-            true);
+          Workout.shouldShowAsInfobox(
+            '[{"insert":"Mitochondria is the "},{"insert":"powerhouse","attributes":{"bold":true}},{"insert":" of the "},{"insert":"cell","attributes":{"italic":true}},{"insert":".\\n"}]',
+          ),
+          true,
+        );
       });
     });
 
@@ -617,8 +657,10 @@ void main() {
             workout2,
           );
 
-          expect(Workout.canCombine(workout1.copyWith(exercises: []), workout2),
-              true);
+          expect(
+            Workout.canCombine(workout1.copyWith(exercises: []), workout2),
+            true,
+          );
           expect(combined.weightUnit, Weights.kg);
           expect(combined.distanceUnit, Distance.km);
           expectDouble(combined.exercises[0].sets[0].weight!, 45.359237);
@@ -641,70 +683,73 @@ void main() {
         );
 
         expect(Workout.canCombine(workout1, workout2), false);
-        expect(() => Workout.combine(workout1, workout2),
-            throwsA(isA<AssertionError>()));
+        expect(
+          () => Workout.combine(workout1, workout2),
+          throwsA(isA<AssertionError>()),
+        );
       });
 
-      test("asserts if the first workout isn't a continuation of the second",
-          () {
-        final workout2 = Workout(
-          id: "2",
-          name: 'Test Workout 2',
-          exercises: [],
-          startingDate: DateTime.now(),
-          duration: const Duration(minutes: 1),
-        );
+      test(
+        "asserts if the first workout isn't a continuation of the second",
+        () {
+          final workout2 = Workout(
+            id: "2",
+            name: 'Test Workout 2',
+            exercises: [],
+            startingDate: DateTime.now(),
+            duration: const Duration(minutes: 1),
+          );
 
-        expect(
-          Workout.canCombine(
+          expect(
+            Workout.canCombine(
               workout,
-              workout2.copyWith(
-                completes: "fake id",
-              )),
-          false,
-        );
-        expect(
-            () => Workout.combine(
-                  workout,
-                  workout2.copyWith(
-                    completes: "fake id",
-                  ),
-                ),
-            throwsA(isA<AssertionError>()));
-
-        expect(
-          Workout.canCombine(
-            workout2.copyWith(
-              // Avoid previously tested assertion
-              startingDate:
-                  DateTime.now().subtract(const Duration(minutes: 10)),
-              completes: "fake id",
+              workout2.copyWith(completes: "fake id"),
             ),
-            workout.copyWith.completes("fake id"),
-          ),
-          false,
-        );
-        expect(
+            false,
+          );
+          expect(
             () => Workout.combine(
-                  workout2.copyWith(
-                    // Avoid previously tested assertion
-                    startingDate:
-                        DateTime.now().subtract(const Duration(minutes: 10)),
-                    completes: "fake id",
-                  ),
-                  workout.copyWith.completes("fake id"),
+              workout,
+              workout2.copyWith(completes: "fake id"),
+            ),
+            throwsA(isA<AssertionError>()),
+          );
+
+          expect(
+            Workout.canCombine(
+              workout2.copyWith(
+                // Avoid previously tested assertion
+                startingDate: DateTime.now().subtract(
+                  const Duration(minutes: 10),
                 ),
-            throwsA(isA<AssertionError>()));
-      });
+                completes: "fake id",
+              ),
+              workout.copyWith.completes("fake id"),
+            ),
+            false,
+          );
+          expect(
+            () => Workout.combine(
+              workout2.copyWith(
+                // Avoid previously tested assertion
+                startingDate: DateTime.now().subtract(
+                  const Duration(minutes: 10),
+                ),
+                completes: "fake id",
+              ),
+              workout.copyWith.completes("fake id"),
+            ),
+            throwsA(isA<AssertionError>()),
+          );
+        },
+      );
     });
   });
   group('SynthesizedWorkout class -', () {
     final routine1 = Workout(
       id: "r1",
       name: "R1",
-      exercises: [
-        newExercise().copyWith.workoutID("r2"),
-      ],
+      exercises: [newExercise().copyWith.workoutID("r2")],
     );
     final routine2 = Workout(
       id: "r2",
@@ -734,15 +779,18 @@ void main() {
       });
       test("if we're nesting synthesized workouts", () {
         expect(
-            () => SynthesizedWorkout([
-                  routine1,
-                  SynthesizedWorkout([routine2])
-                ]),
-            throwsA(isA<AssertionError>()));
+          () => SynthesizedWorkout([
+            routine1,
+            SynthesizedWorkout([routine2]),
+          ]),
+          throwsA(isA<AssertionError>()),
+        );
       });
       test("if the workouts aren't all concrete or not concrete", () {
-        expect(() => SynthesizedWorkout([routine1, workout2]),
-            throwsA(isA<AssertionError>()));
+        expect(
+          () => SynthesizedWorkout([routine1, workout2]),
+          throwsA(isA<AssertionError>()),
+        );
       });
     });
 
@@ -755,36 +803,57 @@ void main() {
         expect(synthesizedRoutine.id, routine1.id);
         expect(synthesizedRoutine.name, routine1.name);
         expect(synthesizedRoutine.allSets, routine1.allSets + routine2.allSets);
-        expect(synthesizedRoutine.exercises.length,
-            (routine1.exercises + routine2.exercises).length);
+        expect(
+          synthesizedRoutine.exercises.length,
+          (routine1.exercises + routine2.exercises).length,
+        );
         for (int i = 0; i < synthesizedWorkout.exercises.length; i++) {
           if (synthesizedWorkout.exercises[i] is Superset) continue;
-          expectExercise(synthesizedWorkout.exercises[i] as Exercise,
-              (routine1.exercises + routine2.exercises)[i] as Exercise);
+          expectExercise(
+            synthesizedWorkout.exercises[i] as Exercise,
+            (routine1.exercises + routine2.exercises)[i] as Exercise,
+          );
         }
-        expect(synthesizedRoutine.displayExerciseCount,
-            routine1.displayExerciseCount + routine2.displayExerciseCount);
-        expect(synthesizedRoutine.progress,
-            (routine1.progress + routine2.progress) / 2);
-        expect(synthesizedRoutine.liftedWeight,
-            routine1.liftedWeight + routine2.liftedWeight);
-        expect(synthesizedRoutine.distanceRun,
-            routine1.distanceRun + routine2.distanceRun);
+        expect(
+          synthesizedRoutine.displayExerciseCount,
+          routine1.displayExerciseCount + routine2.displayExerciseCount,
+        );
+        expect(
+          synthesizedRoutine.progress,
+          (routine1.progress + routine2.progress) / 2,
+        );
+        expect(
+          synthesizedRoutine.liftedWeight,
+          routine1.liftedWeight + routine2.liftedWeight,
+        );
+        expect(
+          synthesizedRoutine.distanceRun,
+          routine1.distanceRun + routine2.distanceRun,
+        );
       });
 
       test("methods should throw", () {
-        expect(() => synthesizedRoutine.clone(),
-            throwsA(isA<SynthesizedWorkoutMethodException>()));
-        expect(() => synthesizedRoutine.regenerateID(),
-            throwsA(isA<SynthesizedWorkoutMethodException>()));
-        expect(() => synthesizedRoutine.toRoutine(),
-            throwsA(isA<SynthesizedWorkoutMethodException>()));
-        expect(() => synthesizedRoutine.withFilters(),
-            throwsA(isA<SynthesizedWorkoutMethodException>()));
         expect(
-            () => synthesizedRoutine.withRegeneratedExerciseIDs(
-                superseding: true),
-            throwsA(isA<SynthesizedWorkoutMethodException>()));
+          () => synthesizedRoutine.clone(),
+          throwsA(isA<SynthesizedWorkoutMethodException>()),
+        );
+        expect(
+          () => synthesizedRoutine.regenerateID(),
+          throwsA(isA<SynthesizedWorkoutMethodException>()),
+        );
+        expect(
+          () => synthesizedRoutine.toRoutine(),
+          throwsA(isA<SynthesizedWorkoutMethodException>()),
+        );
+        expect(
+          () => synthesizedRoutine.withFilters(),
+          throwsA(isA<SynthesizedWorkoutMethodException>()),
+        );
+        expect(
+          () =>
+              synthesizedRoutine.withRegeneratedExerciseIDs(superseding: true),
+          throwsA(isA<SynthesizedWorkoutMethodException>()),
+        );
       });
     });
     group("synthesized workout -", () {
@@ -793,207 +862,238 @@ void main() {
         expect(synthesizedWorkout.id, workout1.id);
         expect(synthesizedWorkout.name, workout1.name);
         expect(synthesizedWorkout.allSets, workout1.allSets + workout2.allSets);
-        expect(synthesizedWorkout.exercises.length,
-            (workout1.exercises + workout2.exercises).length);
+        expect(
+          synthesizedWorkout.exercises.length,
+          (workout1.exercises + workout2.exercises).length,
+        );
         for (int i = 0; i < synthesizedWorkout.exercises.length; i++) {
           if (synthesizedWorkout.exercises[i] is Superset) continue;
-          expectExercise(synthesizedWorkout.exercises[i] as Exercise,
-              (workout1.exercises + workout2.exercises)[i] as Exercise);
+          expectExercise(
+            synthesizedWorkout.exercises[i] as Exercise,
+            (workout1.exercises + workout2.exercises)[i] as Exercise,
+          );
         }
-        expect(synthesizedWorkout.displayExerciseCount,
-            workout1.displayExerciseCount + workout2.displayExerciseCount);
-        expect(synthesizedWorkout.progress,
-            (workout1.progress + workout2.progress) / 2);
-        expect(synthesizedWorkout.liftedWeight,
-            workout1.liftedWeight + workout2.liftedWeight);
-        expect(synthesizedWorkout.distanceRun,
-            workout1.distanceRun + workout2.distanceRun);
+        expect(
+          synthesizedWorkout.displayExerciseCount,
+          workout1.displayExerciseCount + workout2.displayExerciseCount,
+        );
+        expect(
+          synthesizedWorkout.progress,
+          (workout1.progress + workout2.progress) / 2,
+        );
+        expect(
+          synthesizedWorkout.liftedWeight,
+          workout1.liftedWeight + workout2.liftedWeight,
+        );
+        expect(
+          synthesizedWorkout.distanceRun,
+          workout1.distanceRun + workout2.distanceRun,
+        );
         expect(synthesizedWorkout.startingDate, workout1.startingDate);
-        expect(synthesizedWorkout.duration,
-            workout1.duration! + workout2.duration!);
+        expect(
+          synthesizedWorkout.duration,
+          workout1.duration! + workout2.duration!,
+        );
       });
 
       test("methods should throw", () {
-        expect(() => synthesizedWorkout.clone(),
-            throwsA(isA<SynthesizedWorkoutMethodException>()));
-        expect(() => synthesizedWorkout.regenerateID(),
-            throwsA(isA<SynthesizedWorkoutMethodException>()));
-        expect(() => synthesizedWorkout.toRoutine(),
-            throwsA(isA<SynthesizedWorkoutMethodException>()));
-        expect(() => synthesizedWorkout.withFilters(),
-            throwsA(isA<SynthesizedWorkoutMethodException>()));
         expect(
-            () => synthesizedWorkout.withRegeneratedExerciseIDs(
-                superseding: true),
-            throwsA(isA<SynthesizedWorkoutMethodException>()));
+          () => synthesizedWorkout.clone(),
+          throwsA(isA<SynthesizedWorkoutMethodException>()),
+        );
+        expect(
+          () => synthesizedWorkout.regenerateID(),
+          throwsA(isA<SynthesizedWorkoutMethodException>()),
+        );
+        expect(
+          () => synthesizedWorkout.toRoutine(),
+          throwsA(isA<SynthesizedWorkoutMethodException>()),
+        );
+        expect(
+          () => synthesizedWorkout.withFilters(),
+          throwsA(isA<SynthesizedWorkoutMethodException>()),
+        );
+        expect(
+          () =>
+              synthesizedWorkout.withRegeneratedExerciseIDs(superseding: true),
+          throwsA(isA<SynthesizedWorkoutMethodException>()),
+        );
       });
     });
   });
 
   group('getExercisesLinearly -', () {
     test(
-        'should return the concatenated list of exercises from two workouts that aren\'t continued from one another',
-        () {
-      final workout1 = workout.copyWith(
-        exercises: [
-          Exercise.custom(
-            id: "1",
-            name: 'Exercise 1',
-            parameters: GTSetParameters.repsWeight,
-            sets: [
-              GTSet(
-                reps: 10,
-                weight: 100,
-                time: const Duration(seconds: 60),
-                parameters: GTSetParameters.repsWeight,
-                kind: GTSetKind.normal,
-              ),
-            ],
-            primaryMuscleGroup: GTMuscleGroup.abs,
-            secondaryMuscleGroups: {GTMuscleGroup.lowerBack},
-            restTime: const Duration(seconds: 60),
-            parentID: null,
-            notes: 'Notes 1',
-            workoutID: null,
-            supersetID: null,
-            equipment: GTGymEquipment.none,
-          ),
-        ],
-      );
+      'should return the concatenated list of exercises from two workouts that aren\'t continued from one another',
+      () {
+        final workout1 = workout.copyWith(
+          exercises: [
+            Exercise.custom(
+              id: "1",
+              name: 'Exercise 1',
+              parameters: GTSetParameters.repsWeight,
+              sets: [
+                GTSet(
+                  reps: 10,
+                  weight: 100,
+                  time: const Duration(seconds: 60),
+                  parameters: GTSetParameters.repsWeight,
+                  kind: GTSetKind.normal,
+                ),
+              ],
+              primaryMuscleGroup: GTMuscleGroup.abs,
+              secondaryMuscleGroups: {GTMuscleGroup.lowerBack},
+              restTime: const Duration(seconds: 60),
+              parentID: null,
+              notes: 'Notes 1',
+              workoutID: null,
+              supersetID: null,
+              equipment: GTGymEquipment.none,
+            ),
+          ],
+        );
 
-      final workout2 = workout.copyWith(
-        exercises: [
-          Exercise.custom(
-            id: "1",
-            name: 'Exercise 1',
-            parameters: GTSetParameters.repsWeight,
-            sets: [
-              GTSet(
-                reps: 10,
-                weight: 100,
-                time: const Duration(seconds: 60),
-                parameters: GTSetParameters.repsWeight,
-                kind: GTSetKind.normal,
-              ),
-            ],
-            primaryMuscleGroup: GTMuscleGroup.abs,
-            secondaryMuscleGroups: {GTMuscleGroup.lowerBack},
-            restTime: const Duration(seconds: 60),
-            parentID: null,
-            notes: 'Notes 1',
-            workoutID: null,
-            supersetID: null,
-            equipment: GTGymEquipment.none,
-          ),
-          Exercise.custom(
-            id: "2",
-            name: 'Exercise 2',
-            parameters: GTSetParameters.repsWeight,
-            sets: [
-              GTSet(
-                reps: 10,
-                weight: 100,
-                time: const Duration(seconds: 60),
-                parameters: GTSetParameters.repsWeight,
-                kind: GTSetKind.normal,
-              ),
-            ],
-            primaryMuscleGroup: GTMuscleGroup.abs,
-            secondaryMuscleGroups: {GTMuscleGroup.lowerBack},
-            restTime: const Duration(seconds: 60),
-            parentID: null,
-            notes: 'Notes 2',
-            workoutID: null,
-            supersetID: null,
-            equipment: GTGymEquipment.none,
-          ),
-        ],
-      );
+        final workout2 = workout.copyWith(
+          exercises: [
+            Exercise.custom(
+              id: "1",
+              name: 'Exercise 1',
+              parameters: GTSetParameters.repsWeight,
+              sets: [
+                GTSet(
+                  reps: 10,
+                  weight: 100,
+                  time: const Duration(seconds: 60),
+                  parameters: GTSetParameters.repsWeight,
+                  kind: GTSetKind.normal,
+                ),
+              ],
+              primaryMuscleGroup: GTMuscleGroup.abs,
+              secondaryMuscleGroups: {GTMuscleGroup.lowerBack},
+              restTime: const Duration(seconds: 60),
+              parentID: null,
+              notes: 'Notes 1',
+              workoutID: null,
+              supersetID: null,
+              equipment: GTGymEquipment.none,
+            ),
+            Exercise.custom(
+              id: "2",
+              name: 'Exercise 2',
+              parameters: GTSetParameters.repsWeight,
+              sets: [
+                GTSet(
+                  reps: 10,
+                  weight: 100,
+                  time: const Duration(seconds: 60),
+                  parameters: GTSetParameters.repsWeight,
+                  kind: GTSetKind.normal,
+                ),
+              ],
+              primaryMuscleGroup: GTMuscleGroup.abs,
+              secondaryMuscleGroups: {GTMuscleGroup.lowerBack},
+              restTime: const Duration(seconds: 60),
+              parentID: null,
+              notes: 'Notes 2',
+              workoutID: null,
+              supersetID: null,
+              equipment: GTGymEquipment.none,
+            ),
+          ],
+        );
 
-      final combinedExercises = getExercisesLinearly(workout1, workout2);
+        final combinedExercises = getExercisesLinearly(workout1, workout2);
 
-      expect(combinedExercises.length, 3);
-      expectExercise(
-          combinedExercises[0] as Exercise, workout1.exercises[0] as Exercise);
-      expectExercise(
-          combinedExercises[1] as Exercise, workout2.exercises[0] as Exercise);
-      expectExercise(
-          combinedExercises[2] as Exercise, workout2.exercises[1] as Exercise);
-    });
+        expect(combinedExercises.length, 3);
+        expectExercise(
+          combinedExercises[0] as Exercise,
+          workout1.exercises[0] as Exercise,
+        );
+        expectExercise(
+          combinedExercises[1] as Exercise,
+          workout2.exercises[0] as Exercise,
+        );
+        expectExercise(
+          combinedExercises[2] as Exercise,
+          workout2.exercises[1] as Exercise,
+        );
+      },
+    );
 
     test(
-        "should return a linear view of exercises if the workouts are one a continuation of the other",
-        () {
-      final workout1 = workout.copyWith(
-        completedBy: "2",
-        exercises: [
-          Exercise.custom(
-            id: "1",
-            name: 'Exercise 1',
-            parameters: GTSetParameters.repsWeight,
-            sets: [
-              GTSet(
-                reps: 10,
-                weight: 100,
-                time: const Duration(seconds: 60),
-                parameters: GTSetParameters.repsWeight,
-                kind: GTSetKind.normal,
-              ),
-            ],
-            primaryMuscleGroup: GTMuscleGroup.abs,
-            secondaryMuscleGroups: {GTMuscleGroup.lowerBack},
-            restTime: const Duration(seconds: 60),
-            parentID: null,
-            notes: 'Notes 1',
-            workoutID: null,
-            supersetID: null,
-            equipment: GTGymEquipment.none,
+      "should return a linear view of exercises if the workouts are one a continuation of the other",
+      () {
+        final workout1 = workout.copyWith(
+          completedBy: "2",
+          exercises: [
+            Exercise.custom(
+              id: "1",
+              name: 'Exercise 1',
+              parameters: GTSetParameters.repsWeight,
+              sets: [
+                GTSet(
+                  reps: 10,
+                  weight: 100,
+                  time: const Duration(seconds: 60),
+                  parameters: GTSetParameters.repsWeight,
+                  kind: GTSetKind.normal,
+                ),
+              ],
+              primaryMuscleGroup: GTMuscleGroup.abs,
+              secondaryMuscleGroups: {GTMuscleGroup.lowerBack},
+              restTime: const Duration(seconds: 60),
+              parentID: null,
+              notes: 'Notes 1',
+              workoutID: null,
+              supersetID: null,
+              equipment: GTGymEquipment.none,
+            ),
+          ],
+        );
+
+        final workout2 = workout.copyWith(
+          id: "2",
+          completes: "1",
+          exercises: [
+            Exercise.raw(
+              id: "4",
+              name: 'Exercise 1',
+              parameters: GTSetParameters.repsWeight,
+              sets: [
+                GTSet(
+                  reps: 10,
+                  weight: 100,
+                  time: const Duration(seconds: 60),
+                  parameters: GTSetParameters.repsWeight,
+                  kind: GTSetKind.normal,
+                ),
+              ],
+              primaryMuscleGroup: GTMuscleGroup.abs,
+              secondaryMuscleGroups: {GTMuscleGroup.lowerBack},
+              restTime: const Duration(seconds: 60),
+              parentID: null,
+              notes: 'Notes 1',
+              workoutID: null,
+              supersetID: null,
+              equipment: GTGymEquipment.none,
+              standard: false,
+              supersedesID: "1",
+            ),
+          ],
+        );
+
+        final combinedExercises = getExercisesLinearly(workout1, workout2);
+
+        expect(combinedExercises.length, 1);
+        expectExercise(
+          combinedExercises[0] as Exercise,
+          (workout2.exercises[0] as Exercise).copyWith(
+            id: workout1.exercises[0].id,
+            supersedesID: null,
           ),
-        ],
-      );
-
-      final workout2 = workout.copyWith(
-        id: "2",
-        completes: "1",
-        exercises: [
-          Exercise.raw(
-            id: "4",
-            name: 'Exercise 1',
-            parameters: GTSetParameters.repsWeight,
-            sets: [
-              GTSet(
-                reps: 10,
-                weight: 100,
-                time: const Duration(seconds: 60),
-                parameters: GTSetParameters.repsWeight,
-                kind: GTSetKind.normal,
-              ),
-            ],
-            primaryMuscleGroup: GTMuscleGroup.abs,
-            secondaryMuscleGroups: {GTMuscleGroup.lowerBack},
-            restTime: const Duration(seconds: 60),
-            parentID: null,
-            notes: 'Notes 1',
-            workoutID: null,
-            supersetID: null,
-            equipment: GTGymEquipment.none,
-            standard: false,
-            supersedesID: "1",
-          ),
-        ],
-      );
-
-      final combinedExercises = getExercisesLinearly(workout1, workout2);
-
-      expect(combinedExercises.length, 1);
-      expectExercise(
-        combinedExercises[0] as Exercise,
-        (workout2.exercises[0] as Exercise).copyWith(
-          id: workout1.exercises[0].id,
-          supersedesID: null,
-        ),
-      );
-    });
+        );
+      },
+    );
 
     test("returns replaced exercises in supersets", () {
       final w1 = workout.copyWith(
@@ -1048,72 +1148,73 @@ void main() {
       );
       expectExercise(
         combinedExercises[1].asSuperset.exercises[1],
-        w2.exercises[1].asSuperset.exercises[1].copyWith
-            .supersetID(w1.exercises[1].id),
+        w2.exercises[1].asSuperset.exercises[1].copyWith.supersetID(
+          w1.exercises[1].id,
+        ),
       );
     });
 
     test(
-        "replaces the correct exercise when multiple exercises supersede the same ID",
-        () {
-      final w1 = workout.copyWith(
-        id: "1",
-        completedBy: "2",
-        exercises: [
-          exerciseHelper("1", "Exercise 1"),
-        ],
-      );
-      final w2 = workout.copyWith(
-        id: "2",
-        completes: "1",
-        exercises: [
-          exerciseHelper("5", "Exercise 1", parameters: GTSetParameters.time)
-              .copyWith
-              .supersedesID("1"),
-          exerciseHelper("5", "Exercise 1",
-                  parameters: GTSetParameters.distance)
-              .copyWith
-              .supersedesID("1"),
-        ],
-      );
+      "replaces the correct exercise when multiple exercises supersede the same ID",
+      () {
+        final w1 = workout.copyWith(
+          id: "1",
+          completedBy: "2",
+          exercises: [exerciseHelper("1", "Exercise 1")],
+        );
+        final w2 = workout.copyWith(
+          id: "2",
+          completes: "1",
+          exercises: [
+            exerciseHelper(
+              "5",
+              "Exercise 1",
+              parameters: GTSetParameters.time,
+            ).copyWith.supersedesID("1"),
+            exerciseHelper(
+              "5",
+              "Exercise 1",
+              parameters: GTSetParameters.distance,
+            ).copyWith.supersedesID("1"),
+          ],
+        );
 
-      final combinedExercises = getExercisesLinearly(w1, w2);
+        final combinedExercises = getExercisesLinearly(w1, w2);
 
-      expect(combinedExercises.length, 1);
-      expect(combinedExercises[0] is Exercise, true);
-      expect(
-          combinedExercises[0].asExercise.parameters, GTSetParameters.distance);
-    });
+        expect(combinedExercises.length, 1);
+        expect(combinedExercises[0] is Exercise, true);
+        expect(
+          combinedExercises[0].asExercise.parameters,
+          GTSetParameters.distance,
+        );
+      },
+    );
 
-    test("Non-superseding continuation exercises appended after base exercises",
-        () {
-      final w1 = workout.copyWith(
-        id: "1",
-        completedBy: "2",
-        exercises: [
-          exerciseHelper("1", "Exercise 1"),
-        ],
-      );
-      final w2 = workout.copyWith(
-        id: "2",
-        completes: "1",
-        exercises: [
-          exerciseHelper("2", "Exercise 2"),
-        ],
-      );
-      final combined = getExercisesLinearly(w1, w2);
-      expect(combined.length, 2);
-      expect(combined[0].id, "1");
-      expect(combined[1].id, "2");
-    });
+    test(
+      "Non-superseding continuation exercises appended after base exercises",
+      () {
+        final w1 = workout.copyWith(
+          id: "1",
+          completedBy: "2",
+          exercises: [exerciseHelper("1", "Exercise 1")],
+        );
+        final w2 = workout.copyWith(
+          id: "2",
+          completes: "1",
+          exercises: [exerciseHelper("2", "Exercise 2")],
+        );
+        final combined = getExercisesLinearly(w1, w2);
+        expect(combined.length, 2);
+        expect(combined[0].id, "1");
+        expect(combined[1].id, "2");
+      },
+    );
 
     test("Mixed continuation: some exercises supersede, some are new", () {
       final w1 = workout.copyWith(
         id: "1",
         completedBy: "2",
-        exercises: [
-          exerciseHelper("1", "Exercise 1"),
-        ],
+        exercises: [exerciseHelper("1", "Exercise 1")],
       );
       final w2 = workout.copyWith(
         id: "2",
@@ -1133,9 +1234,7 @@ void main() {
       final w1 = workout.copyWith(
         id: "1",
         completedBy: "2",
-        exercises: [
-          exerciseHelper("1", "Exercise 1"),
-        ],
+        exercises: [exerciseHelper("1", "Exercise 1")],
       );
       final w2 = workout.copyWith(
         id: "2",
@@ -1144,8 +1243,11 @@ void main() {
           exerciseHelper("3", "Exercise 1").copyWith.supersedesID("1"),
         ],
       );
-      final combined =
-          getExercisesLinearly(w1, w2, overrideSupersedencesWithNull: false);
+      final combined = getExercisesLinearly(
+        w1,
+        w2,
+        overrideSupersedencesWithNull: false,
+      );
       expect(combined.length, 1);
     });
 
@@ -1155,15 +1257,19 @@ void main() {
         completedBy: "2",
         weightUnit: Weights.kg,
         exercises: [
-          exerciseHelper("1", "Exercise 1", sets: [
-            GTSet(
-              reps: 10,
-              weight: 10,
-              time: Duration.zero,
-              parameters: GTSetParameters.repsWeight,
-              kind: GTSetKind.normal,
-            ),
-          ]),
+          exerciseHelper(
+            "1",
+            "Exercise 1",
+            sets: [
+              GTSet(
+                reps: 10,
+                weight: 10,
+                time: Duration.zero,
+                parameters: GTSetParameters.repsWeight,
+                kind: GTSetKind.normal,
+              ),
+            ],
+          ),
         ],
       );
       final w2 = workout.copyWith(
@@ -1171,15 +1277,19 @@ void main() {
         completes: "1",
         weightUnit: Weights.lb,
         exercises: [
-          exerciseHelper("3", "Exercise 1", sets: [
-            GTSet(
-              reps: 10,
-              weight: 22.0462, // 22.0462 lbs is 10 kg
-              time: Duration.zero,
-              parameters: GTSetParameters.repsWeight,
-              kind: GTSetKind.normal,
-            ),
-          ]).copyWith.supersedesID("1"),
+          exerciseHelper(
+            "3",
+            "Exercise 1",
+            sets: [
+              GTSet(
+                reps: 10,
+                weight: 22.0462, // 22.0462 lbs is 10 kg
+                time: Duration.zero,
+                parameters: GTSetParameters.repsWeight,
+                kind: GTSetKind.normal,
+              ),
+            ],
+          ).copyWith.supersedesID("1"),
         ],
       );
       final combined = getExercisesLinearly(w1, w2);
@@ -1188,17 +1298,11 @@ void main() {
     });
 
     test("Empty base exercises + non-empty cont", () {
-      final w1 = workout.copyWith(
-        id: "1",
-        completedBy: "2",
-        exercises: [],
-      );
+      final w1 = workout.copyWith(id: "1", completedBy: "2", exercises: []);
       final w2 = workout.copyWith(
         id: "2",
         completes: "1",
-        exercises: [
-          exerciseHelper("2", "Exercise 2"),
-        ],
+        exercises: [exerciseHelper("2", "Exercise 2")],
       );
       final combined = getExercisesLinearly(w1, w2);
       expect(combined.length, 1);
@@ -1209,31 +1313,17 @@ void main() {
       final w1 = workout.copyWith(
         id: "1",
         completedBy: "2",
-        exercises: [
-          exerciseHelper("1", "Exercise 1"),
-        ],
+        exercises: [exerciseHelper("1", "Exercise 1")],
       );
-      final w2 = workout.copyWith(
-        id: "2",
-        completes: "1",
-        exercises: [],
-      );
+      final w2 = workout.copyWith(id: "2", completes: "1", exercises: []);
       final combined = getExercisesLinearly(w1, w2);
       expect(combined.length, 1);
       expect(combined[0].id, "1");
     });
 
     test("Both empty", () {
-      final w1 = workout.copyWith(
-        id: "1",
-        completedBy: "2",
-        exercises: [],
-      );
-      final w2 = workout.copyWith(
-        id: "2",
-        completes: "1",
-        exercises: [],
-      );
+      final w1 = workout.copyWith(id: "1", completedBy: "2", exercises: []);
+      final w2 = workout.copyWith(id: "2", completes: "1", exercises: []);
       final combined = getExercisesLinearly(w1, w2);
       expect(combined.length, 0);
     });
@@ -1243,20 +1333,23 @@ void main() {
         id: "1",
         completedBy: "2",
         exercises: [
-          supersetHelper("ss1", exercises: [
-            exerciseHelper("1", "E1"),
-            exerciseHelper("2", "E2"),
-          ]),
+          supersetHelper(
+            "ss1",
+            exercises: [exerciseHelper("1", "E1"), exerciseHelper("2", "E2")],
+          ),
         ],
       );
       final w2 = workout.copyWith(
         id: "2",
         completes: "1",
         exercises: [
-          supersetHelper("ss2", exercises: [
-            exerciseHelper("3", "E1").copyWith.supersedesID("1"),
-            exerciseHelper("4", "E2").copyWith.supersedesID("2"),
-          ]).copyWith.supersedesID("ss1"),
+          supersetHelper(
+            "ss2",
+            exercises: [
+              exerciseHelper("3", "E1").copyWith.supersedesID("1"),
+              exerciseHelper("4", "E2").copyWith.supersedesID("2"),
+            ],
+          ).copyWith.supersedesID("ss1"),
         ],
       );
       final combined = getExercisesLinearly(w1, w2);
@@ -1270,10 +1363,7 @@ void main() {
       final w1 = workout.copyWith(
         id: "1",
         completedBy: "2",
-        exercises: [
-          exerciseHelper("1", "E1"),
-          exerciseHelper("2", "E2"),
-        ],
+        exercises: [exerciseHelper("1", "E1"), exerciseHelper("2", "E2")],
       );
       final w2 = workout.copyWith(
         id: "2",
@@ -1299,16 +1389,20 @@ void main() {
         name: "Test Workout",
         duration: const Duration(hours: 1),
         exercises: [
-          exerciseHelper("1", "E1", sets: [
-            GTSet(
-              reps: 10,
-              weight: 10,
-              time: Duration.zero,
-              parameters: GTSetParameters.repsWeight,
-              kind: GTSetKind.normal,
-              done: true,
-            ),
-          ]),
+          exerciseHelper(
+            "1",
+            "E1",
+            sets: [
+              GTSet(
+                reps: 10,
+                weight: 10,
+                time: Duration.zero,
+                parameters: GTSetParameters.repsWeight,
+                kind: GTSetKind.normal,
+                done: true,
+              ),
+            ],
+          ),
         ],
       );
       final r = w.toRoutine();
@@ -1319,10 +1413,7 @@ void main() {
 
     test("Workout.withFilters() works correctly", () {
       final w = workout.copyWith(
-        exercises: [
-          exerciseHelper("1", "E1"),
-          exerciseHelper("2", "E2"),
-        ],
+        exercises: [exerciseHelper("1", "E1"), exerciseHelper("2", "E2")],
       );
       final filtered = w.withFilters(exerciseFilter: (ex) => ex.id == "1");
       expect(filtered.exercises.length, 1);
@@ -1331,16 +1422,16 @@ void main() {
 
     test("Workout.hasExercise() works correctly", () {
       final w = workout.copyWith(
-        exercises: [
-          exerciseHelper("1", "E1").copyWith(parentID: "parent1"),
-        ],
+        exercises: [exerciseHelper("1", "E1").copyWith(parentID: "parent1")],
       );
       expect(
-          w.hasExercise(exerciseHelper("dummy", "E1").copyWith(id: "parent1")),
-          true);
+        w.hasExercise(exerciseHelper("dummy", "E1").copyWith(id: "parent1")),
+        true,
+      );
       expect(
-          w.hasExercise(exerciseHelper("dummy", "E1").copyWith(id: "parent2")),
-          false);
+        w.hasExercise(exerciseHelper("dummy", "E1").copyWith(id: "parent2")),
+        false,
+      );
     });
 
     test("Workout.isCompletionOf() works correctly", () {

@@ -723,7 +723,11 @@ class _WorkoutExerciseSetEditorState extends State<WorkoutExerciseSetEditor> {
                   Flexible(child: fields[i]),
                 ],
                 const SizedBox(width: 8),
-                IconButton(
+                TextButton(
+                  style: TextButton.styleFrom(
+                    padding: EdgeInsets.symmetric(horizontal: 2),
+                    minimumSize: const Size(36, 36),
+                  ),
                   onPressed: () {
                     showDialog<Optional<double?>>(
                       context: context,
@@ -736,7 +740,7 @@ class _WorkoutExerciseSetEditorState extends State<WorkoutExerciseSetEditor> {
                       }
                     });
                   },
-                  icon: RPECompactColumn(rpe: widget.set.rpe),
+                  child: RPECompactColumn(rpe: widget.set.rpe),
                 ),
                 const SizedBox(width: 8),
                 if (!widget.isCreating && widget.showDoneCheckbox) ...[

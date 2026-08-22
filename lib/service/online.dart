@@ -1,17 +1,16 @@
-import 'dart:typed_data';
+import 'dart:io' show SocketException;
+
 import 'package:flutter/foundation.dart';
-import 'package:get/get.dart';
 import 'package:gymtracker/data/achievements.dart';
-import 'package:gymtracker/db/database.dart';
 import 'package:gymtracker/db/imports/types.dart';
 import 'package:gymtracker/db/model/tables/exercise.dart';
 import 'package:gymtracker/db/utils.dart';
 import 'package:gymtracker/model/achievements.dart';
 import 'package:gymtracker/model/history.dart';
 import 'package:gymtracker/model/workout.dart';
-import 'package:gymtracker/service/database.dart';
 import 'package:gymtracker/service/feed.dart';
 import 'package:gymtracker/service/logger.dart';
+import 'package:http/http.dart' show ClientException;
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 export 'package:supabase_flutter/supabase_flutter.dart' show AuthException;
@@ -112,9 +111,22 @@ class OnlineServiceImpl with ChangeNotifier implements OnlineService {
       return null;
     }
 
-    final row = await _db.from("profiles").select().eq('id', user.id).limit(1);
-    _setAccount(_mapAccount(user, row.first));
-    return _account;
+    try {
+      final row = await _db
+          .from("profiles")
+          .select()
+          .eq('id', user.id)
+          .limit(1);
+      _setAccount(_mapAccount(user, row.first));
+      return _account;
+    } on ClientException catch (e, s) {
+      if (e is SocketException) {
+        logger.e("Unable to connect", error: e, stackTrace: s);
+        // Ignore and use cached data.
+        return _account;
+      }
+      rethrow;
+    }
   }
 
   @override

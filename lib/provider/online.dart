@@ -3,7 +3,6 @@ import 'dart:typed_data';
 
 import 'package:drift/drift.dart' show Value;
 import 'package:get/get.dart' hide Value;
-import 'package:gymtracker/controller/coordinator.dart';
 import 'package:gymtracker/db/database.dart';
 import 'package:gymtracker/db/model/tables/exercise.dart';
 import 'package:gymtracker/main.dart';
@@ -13,9 +12,9 @@ import 'package:gymtracker/model/measurements.dart';
 import 'package:gymtracker/model/routines.dart';
 import 'package:gymtracker/provider/connectivity.dart';
 import 'package:gymtracker/provider/events.dart';
+import 'package:gymtracker/provider/friend.dart';
 import 'package:gymtracker/service/database.dart';
 import 'package:gymtracker/service/logger.dart';
-import 'package:gymtracker/provider/friend.dart';
 import 'package:gymtracker/service/online.dart';
 import 'package:gymtracker/service/test.dart';
 import 'package:gymtracker/struct/cache.dart';
@@ -434,6 +433,7 @@ class Online extends _$Online {
 
   // Handle network changes without re-running build()
   void _onNetworkStatusChanged(bool isOnline) {
+    logger.d("We are now ${isOnline ? "ONLINE" : "OFFLINE"}.");
     if (isOnline) {
       // Avoid double-enabling sync if already enabled.
       if (!_syncManager.syncingEnabled) {

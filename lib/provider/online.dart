@@ -319,6 +319,7 @@ class Online extends _$Online {
       syncTimestampStorage: _SharedPrefsStorage(_prefs),
       syncInterval: const Duration(minutes: 5),
     );
+    _isInit = true;
 
     _syncManager.registerSyncable<AchievementCompletion>(
       backendTable: 'achievements_v2',
@@ -422,13 +423,18 @@ class Online extends _$Online {
       companionConstructor: NutritionGoalsCompanion.new,
     );
 
-    final account = await _service.getAccount();
-    // Emit login event at app start
-    if (account != null) {
-      globalContainer.read(eventBusProvider).emit(GBUserDidLoginEvent(account));
+    try {
+      final account = await _service.getAccount();
+      // Emit login event at app start
+      if (account != null) {
+        globalContainer
+            .read(eventBusProvider)
+            .emit(GBUserDidLoginEvent(account));
+      }
+    } catch (e) {
+      logger.e("Got an error while first fetching account", error: e);
+      // Ignore this error
     }
-
-    _isInit = true;
   }
 
   // Handle network changes without re-running build()

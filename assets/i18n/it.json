@@ -2610,7 +2610,9 @@
     },
     "noSync": {
       "text": "La sincronizzazione è in pausa: non sei connesso a Internet. Potrebbero volerci alcuni minuti. Non preoccuparti, i dati verranno mantenuti in locale e trasferiti in un secondo momento."
-    }
+    },
+    "noMoreData": "Hai raggiunto la fine del feed :)",
+    "loadMore": "Carica altro"
   },
   "workoutPage": {
     "title": "Allenati"

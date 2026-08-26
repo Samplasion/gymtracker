@@ -135,6 +135,7 @@ class Feed extends _$Feed {
     if (!isConnected) return;
 
     _isLoadingMore = true;
+    state = state;
     try {
       final updatedItems = await _fetchPage(isConnected);
       state = AsyncValue.data(List.from(updatedItems));

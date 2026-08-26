@@ -11,12 +11,12 @@ import 'package:gymtracker/provider/connectivity.dart';
 import 'package:gymtracker/provider/feed.dart';
 import 'package:gymtracker/provider/friend.dart';
 import 'package:gymtracker/provider/online.dart';
-import 'package:gymtracker/service/feed.dart';
 import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/utils/constants.dart';
 import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/utils/skeletons.dart';
 import 'package:gymtracker/view/components/content_unavailable.dart';
+import 'package:gymtracker/view/components/icon_grid.dart';
 import 'package:gymtracker/view/components/loading_indicator.dart';
 import 'package:gymtracker/view/components/routines.dart';
 import 'package:gymtracker/view/exercises.dart';
@@ -32,11 +32,7 @@ import 'package:skeletonizer/skeletonizer.dart';
 import 'package:sliver_tools/sliver_tools.dart';
 
 class FeedView extends ConsumerStatefulWidget {
-  final bool _skeleton;
-
-  const FeedView({super.key}) : _skeleton = false;
-
-  const FeedView.skeleton({super.key}) : _skeleton = true;
+  const FeedView({super.key});
 
   @override
   ConsumerState<FeedView> createState() => _FeedViewState();
@@ -51,11 +47,11 @@ class _FeedViewState extends ConsumerState<FeedView> {
   @override
   Widget build(BuildContext context) {
     final feed = ref.watch(feedProvider);
-    final isLoading = widget._skeleton || feed.isLoading;
+    final feedNotifier = ref.watch(feedProvider.notifier);
     final routinesController = Get.find<RoutinesController>();
-    final List<RoutineSuggestion> suggested = isLoading
-        ? fakeWorkouts.map((w) => (routine: w, occurrences: 0)).toList()
-        : routinesController.suggestions.take(3).toList();
+    final List<RoutineSuggestion> suggested = routinesController.suggestions
+        .take(3)
+        .toList();
     final account = ref.watch(onlineProvider);
 
     return Scaffold(
@@ -83,7 +79,6 @@ class _FeedViewState extends ConsumerState<FeedView> {
               ),
             ),
       body: NestedScrollView(
-        physics: widget._skeleton ? const NeverScrollableScrollPhysics() : null,
         headerSliverBuilder: (context, innerBoxIsScrolled) => [
           SliverAppBar.large(
             title: Text("feed.title".t),
@@ -155,20 +150,17 @@ class _FeedViewState extends ConsumerState<FeedView> {
               child: CustomScrollView(
                 slivers: [
                   SliverToBoxAdapter(
-                    child: Skeleton.ignore(
-                      ignore: !widget._skeleton,
-                      child: SafeArea(
-                        top: false,
-                        bottom: false,
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                          child: FilledButton.icon(
-                            onPressed: () {
-                              SkeletonView.of(context)?.goToRoutines();
-                            },
-                            icon: const Icon(GTIcons.workout),
-                            label: Text("feed.startWorkout".t),
-                          ),
+                    child: SafeArea(
+                      top: false,
+                      bottom: false,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                        child: FilledButton.icon(
+                          onPressed: () {
+                            SkeletonView.of(context)?.goToRoutines();
+                          },
+                          icon: const Icon(GTIcons.workout),
+                          label: Text("feed.startWorkout".t),
                         ),
                       ),
                     ),
@@ -180,138 +172,217 @@ class _FeedViewState extends ConsumerState<FeedView> {
                         horizontal: 16,
                         vertical: 8,
                       ),
-                      sliver: SliverSkeletonizer(
-                        enabled: isLoading,
-                        child: SliverStack(
-                          children: [
-                            SliverPositioned.fill(
-                              child: Card.outlined(
-                                clipBehavior: Clip.none,
-                                margin: EdgeInsets.zero,
+                      sliver: SliverStack(
+                        children: [
+                          SliverPositioned.fill(
+                            child: Card.outlined(
+                              clipBehavior: Clip.none,
+                              margin: EdgeInsets.zero,
+                            ),
+                          ),
+                          MultiSliver(
+                            children: [
+                              SliverToBoxAdapter(
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 16,
+                                    vertical: 16,
+                                  ).copyWith(bottom: 8),
+                                  child: Text(
+                                    "routines.quickWorkout.title".t,
+                                    style: Theme.of(
+                                      context,
+                                    ).textTheme.titleMedium,
+                                  ),
+                                ),
                               ),
-                            ),
-                            MultiSliver(
-                              children: [
-                                SliverToBoxAdapter(
-                                  child: Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 16,
-                                      vertical: 16,
-                                    ).copyWith(bottom: 8),
-                                    child: Text(
-                                      "routines.quickWorkout.title".t,
-                                      style: Theme.of(
-                                        context,
-                                      ).textTheme.titleMedium,
-                                    ),
-                                  ),
-                                ),
-                                SliverList(
-                                  delegate: SliverChildBuilderDelegate((
-                                    context,
-                                    index,
-                                  ) {
-                                    final (
-                                      routine: workout,
-                                      occurrences: frequency,
-                                    ) = suggested[index];
-                                    return Material(
-                                      type: MaterialType.transparency,
-                                      key: ValueKey(workout.id),
-                                      child: ListTile(
-                                        leading: WorkoutIcon(workout: workout),
-                                        title: Text(workout.name),
-                                        subtitle: Text(
-                                          "general.exercises".plural(
-                                            workout.displayExerciseCount,
-                                          ),
-                                        ),
-                                        onTap: () {
-                                          Go.to(
-                                            () =>
-                                                ExercisesView(workout: workout),
-                                          );
-                                        },
-                                      ),
-                                    );
-                                  }, childCount: suggested.length),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
-                  SliverToBoxAdapter(child: _NoSyncCard()),
-                  SliverSkeletonizer(
-                    enabled: isLoading,
-                    child: widget._skeleton
-                        ? SliverList(
-                            delegate: SliverChildBuilderDelegate((
-                              context,
-                              index,
-                            ) {
-                              final item = fakeWorkouts[index];
-                              return SafeArea(
-                                top: false,
-                                bottom: false,
-                                child: FeedItemWorkoutCard(
-                                  item: FeedItemWorkout(
-                                    workout: item,
-                                    authorship: FeedAuthorshipOwn(),
-                                  ),
-                                ),
-                              );
-                            }, childCount: fakeWorkouts.length),
-                          )
-                        : feed.when(
-                            data: (feedItems) {
-                              if (feedItems.isEmpty) {
-                                return SliverFillRemaining(
-                                  fillOverscroll: true,
-                                  hasScrollBody: false,
-                                  child: Center(
-                                    child: ContentUnavailableView(
-                                      icon: const Icon(Icons.feed_outlined),
-                                      title: Text("feed.empty.title".t),
-                                      description: Text("feed.empty.text".t),
-                                    ),
-                                  ),
-                                );
-                              }
-                              return SliverList(
+                              SliverList(
                                 delegate: SliverChildBuilderDelegate((
                                   context,
                                   index,
                                 ) {
-                                  final item = feedItems[index];
-                                  return SafeArea(
-                                    top: false,
-                                    bottom: false,
-                                    child: FeedItemCard(
-                                      item: item,
-                                      onUserPressed: (id) {
-                                        if (id != null) {
-                                          Go.to(
-                                            () => UserProfilePage(userID: id),
-                                          );
-                                        }
+                                  final (
+                                    routine: workout,
+                                    occurrences: frequency,
+                                  ) = suggested[index];
+                                  return Material(
+                                    type: MaterialType.transparency,
+                                    key: ValueKey(workout.id),
+                                    child: ListTile(
+                                      leading: WorkoutIcon(workout: workout),
+                                      title: Text(workout.name),
+                                      subtitle: Text(
+                                        "general.exercises".plural(
+                                          workout.displayExerciseCount,
+                                        ),
+                                      ),
+                                      onTap: () {
+                                        Go.to(
+                                          () => ExercisesView(workout: workout),
+                                        );
                                       },
                                     ),
                                   );
-                                }, childCount: feedItems.length),
-                              );
-                            },
-                            loading: () => SliverFillRemaining(
-                              child: Center(child: GBLoadingIndicator()),
-                            ),
-                            error: (error, stackTrace) => SliverFillRemaining(
-                              child: Center(child: Text("Error loading feed")),
+                                }, childCount: suggested.length),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                  SliverToBoxAdapter(child: _NoSyncCard()),
+                  feed.when(
+                    data: (feedItems) {
+                      if (feedItems.isEmpty) {
+                        return SliverFillRemaining(
+                          fillOverscroll: true,
+                          hasScrollBody: false,
+                          child: Center(
+                            child: ContentUnavailableView(
+                              icon: const Icon(Icons.feed_outlined),
+                              title: Text("feed.empty.title".t),
+                              description: Text("feed.empty.text".t),
                             ),
                           ),
+                        );
+                      }
+                      return SliverList(
+                        delegate: SliverChildBuilderDelegate((context, index) {
+                          final item = feedItems[index];
+                          return SafeArea(
+                            top: false,
+                            bottom: false,
+                            child: FeedItemCard(
+                              item: item,
+                              onUserPressed: (id) {
+                                if (id != null) {
+                                  Go.to(() => UserProfilePage(userID: id));
+                                }
+                              },
+                            ),
+                          );
+                        }, childCount: feedItems.length),
+                      );
+                    },
+                    loading: () => SliverFillRemaining(
+                      child: Center(child: GBLoadingIndicator()),
+                    ),
+                    error: (error, stackTrace) => SliverFillRemaining(
+                      child: Center(child: Text("Error loading feed")),
+                    ),
                   ),
-                  const SliverToBoxAdapter(child: SizedBox(height: 8)),
+                  if (feedNotifier.isLoadingMore) ...[
+                    SliverToBoxAdapter(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 16.0),
+                        child: Center(child: GBLoadingIndicator()),
+                      ),
+                    ),
+                  ],
+                  if (feedNotifier.hasMore) ...[
+                    SliverToBoxAdapter(
+                      child: Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: FilledButton(
+                          onPressed: feedNotifier.isLoadingMore
+                              ? null
+                              : () {
+                                  feedNotifier.fetchMore();
+                                  // Due to how we've implemented the load more
+                                  // mechanism, we need to call setState here to
+                                  // trigger a rebuild in order to show the
+                                  // loading indicator while the fetch is in
+                                  // progress, without hiding the data.
+                                  setState(() {});
+                                },
+                          child: Text("feed.loadMore".t),
+                        ),
+                      ),
+                    ),
+                  ] else ...[
+                    SliverToBoxAdapter(
+                      child: Stack(
+                        children: [
+                          Positioned.fill(
+                            child: DecoratedBox(
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  colors: [
+                                    Theme.of(context).scaffoldBackgroundColor,
+                                    Theme.of(
+                                      context,
+                                    ).colorScheme.secondaryContainer,
+                                  ],
+                                  stops: const [0.2, 1],
+                                  begin: Alignment.topCenter,
+                                  end: Alignment.bottomCenter,
+                                ),
+                              ),
+                              child: SizedBox.expand(),
+                            ),
+                          ),
+                          Positioned.fill(
+                            child: IconGrid(
+                              bigScale: 2,
+                              child: CircleAvatar(
+                                backgroundColor: Theme.of(
+                                  context,
+                                ).colorScheme.outlineVariant,
+                                foregroundColor: Theme.of(
+                                  context,
+                                ).colorScheme.onSurfaceVariant,
+                                child: const Icon(GTIcons.app_icon),
+                              ),
+                            ),
+                          ),
+                          Positioned.fill(
+                            child: DecoratedBox(
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  colors: [
+                                    Theme.of(context).scaffoldBackgroundColor,
+                                    Theme.of(context)
+                                        .colorScheme
+                                        .secondaryContainer
+                                        .withAlpha(128),
+                                    Theme.of(context)
+                                        .colorScheme
+                                        .secondaryContainer
+                                        .withAlpha(0),
+                                  ],
+                                  stops: const [0, 0.7, 1],
+                                  begin: Alignment.topCenter,
+                                  end: Alignment.bottomCenter,
+                                ),
+                              ),
+                              child: SizedBox.expand(),
+                            ),
+                          ),
+                          SizedBox(
+                            height: 150,
+                            child: Padding(
+                              padding: const EdgeInsets.all(16.0),
+                              child: Center(
+                                child: Text(
+                                  "feed.noMoreData".t,
+                                  style: Theme.of(context).textTheme.bodySmall
+                                      ?.copyWith(
+                                        color: Theme.of(
+                                          context,
+                                        ).colorScheme.onSecondaryContainer,
+                                      ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                  if (feedNotifier.hasMore) ...[
+                    const SliverToBoxAdapter(child: SizedBox(height: 8)),
+                  ],
                   const SliverBottomSafeArea(),
                 ],
               ),
@@ -409,7 +480,7 @@ class ProfileSearchDelegate extends SearchDelegate<Friend?> {
 }
 
 class _NoSyncCard extends ConsumerWidget {
-  const _NoSyncCard({super.key});
+  const _NoSyncCard();
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {

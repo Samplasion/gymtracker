@@ -2616,7 +2616,9 @@
     },
     "noSync": {
       "text": "Syncing is paused: you are not connected to the Internet. It may take a few minutes. Don't worry, the data will be kept locally and transferred later."
-    }
+    },
+    "noMoreData": "You've reached the end of your feed :)",
+    "loadMore": "Load more"
   },
   "workoutPage": {
     "title": "Work Out"

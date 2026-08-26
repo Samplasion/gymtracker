@@ -294,10 +294,15 @@ class Online extends _$Online {
   }
 
   Future<void> deleteAccount() async {
+    globalContainer
+        .read(eventBusProvider)
+        .emit(GBUserWillLogoutEvent(_service.account));
     await Get.find<DatabaseService>().db
         .clearTheWholeThingIAmAbsolutelySureISwear();
     return _service.deleteAccount().then((_) {
       globalContainer.read(eventBusProvider).emit(GBUserDidLogoutEvent());
+      // Trigger a rebuild so everyone knows the user is no more more :(
+      ref.invalidateSelf();
     });
   }
 

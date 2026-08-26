@@ -79,7 +79,6 @@ class ExerciseSetView extends StatelessWidget {
           ).userFacingDistance,
         ),
       ),
-    if (showRPE) RPECompactColumn(rpe: set.rpe),
   ];
 
   @override
@@ -96,6 +95,7 @@ class ExerciseSetView extends StatelessWidget {
             ),
       padding: const EdgeInsets.fromLTRB(8, 4, 8, 4),
       child: Row(
+        spacing: 8,
         children: [
           IconButton(
             icon: buildSetType(
@@ -106,18 +106,13 @@ class ExerciseSetView extends StatelessWidget {
             ),
             onPressed: null,
           ),
-          const SizedBox(width: 8),
-          for (int i = 0; i < fields.length; i++) ...[
-            if (i != 0) const SizedBox(width: 8),
-            fields[i],
-          ],
-          const SizedBox(width: 8),
+          for (int i = 0; i < fields.length; i++) ...[fields[i]],
+          if (showRPE) RPECompactColumn(rpe: set.rpe),
           if (isConcrete) ...[
             if (set.done)
               Icon(GTIcons.checkbox_on, color: colorScheme.tertiary)
             else
               Icon(GTIcons.checkbox_off, color: colorScheme.onSurfaceVariant),
-            const SizedBox(width: 8),
           ],
           if (draggable) DragHandle(index: index!),
         ],

@@ -635,6 +635,7 @@ class _WorkoutExerciseSetEditorState extends State<WorkoutExerciseSetEditor> {
             color: value,
             padding: const EdgeInsets.fromLTRB(8, 4, 8, 4),
             child: Row(
+              spacing: 8,
               children: [
                 PopupMenuButton(
                   icon: buildSetType(
@@ -717,16 +718,14 @@ class _WorkoutExerciseSetEditorState extends State<WorkoutExerciseSetEditor> {
                     ),
                   ],
                 ),
-                const SizedBox(width: 8),
                 for (int i = 0; i < fields.length; i++) ...[
-                  if (i != 0) const SizedBox(width: 8),
                   Flexible(child: fields[i]),
                 ],
-                const SizedBox(width: 8),
                 TextButton(
                   style: TextButton.styleFrom(
-                    padding: EdgeInsets.symmetric(horizontal: 2),
+                    padding: EdgeInsets.zero,
                     minimumSize: const Size(36, 36),
+                    tapTargetSize: .shrinkWrap,
                   ),
                   onPressed: () {
                     showDialog<Optional<double?>>(
@@ -742,7 +741,6 @@ class _WorkoutExerciseSetEditorState extends State<WorkoutExerciseSetEditor> {
                   },
                   child: RPECompactColumn(rpe: widget.set.rpe),
                 ),
-                const SizedBox(width: 8),
                 if (!widget.isCreating && widget.showDoneCheckbox) ...[
                   ValueBuilder<bool?>(
                     builder: (_, update) => Checkbox(
@@ -755,7 +753,6 @@ class _WorkoutExerciseSetEditorState extends State<WorkoutExerciseSetEditor> {
                       FocusManager.instance.primaryFocus?.unfocus();
                     },
                   ),
-                  const SizedBox(width: 8),
                 ],
               ],
             ),
@@ -793,7 +790,7 @@ class RPECompactColumn extends StatelessWidget {
         _textSize(
           NumberFormat.compact(locale: context.locale.languageCode).format(9.9),
           TextStyle(fontSize: 12),
-        ).width +
+        ).width.ceilToDouble() +
         4; // Add some padding
     return SizedBox(
       width: width,

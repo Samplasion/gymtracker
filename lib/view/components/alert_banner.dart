@@ -23,30 +23,30 @@ class AlertColor {
     );
   }
 
-  factory AlertColor.secondary(context) => AlertColor(
-        Theme.of(context).colorScheme.secondaryContainer,
-        Theme.of(context).colorScheme.onSecondaryContainer,
-      );
+  factory AlertColor.secondary(BuildContext context) => AlertColor(
+    Theme.of(context).colorScheme.secondaryContainer,
+    Theme.of(context).colorScheme.onSecondaryContainer,
+  );
 
-  factory AlertColor.tertiary(context) => AlertColor(
-        Theme.of(context).colorScheme.tertiaryContainer,
-        Theme.of(context).colorScheme.onTertiaryContainer,
-      );
+  factory AlertColor.tertiary(BuildContext context) => AlertColor(
+    Theme.of(context).colorScheme.tertiaryContainer,
+    Theme.of(context).colorScheme.onTertiaryContainer,
+  );
 
-  factory AlertColor.quaternary(context) => AlertColor(
-        Theme.of(context).colorScheme.quaternaryContainer,
-        Theme.of(context).colorScheme.onQuaternaryContainer,
-      );
+  factory AlertColor.quaternary(BuildContext context) => AlertColor(
+    Theme.of(context).colorScheme.quaternaryContainer,
+    Theme.of(context).colorScheme.onQuaternaryContainer,
+  );
 
-  factory AlertColor.quinary(context) => AlertColor(
-        Theme.of(context).colorScheme.quinaryContainer,
-        Theme.of(context).colorScheme.onQuinaryContainer,
-      );
+  factory AlertColor.quinary(BuildContext context) => AlertColor(
+    Theme.of(context).colorScheme.quinaryContainer,
+    Theme.of(context).colorScheme.onQuinaryContainer,
+  );
 
-  factory AlertColor.error(context) => AlertColor(
-        Theme.of(context).colorScheme.errorContainer,
-        Theme.of(context).colorScheme.onErrorContainer,
-      );
+  factory AlertColor.error(BuildContext context) => AlertColor(
+    Theme.of(context).colorScheme.errorContainer,
+    Theme.of(context).colorScheme.onErrorContainer,
+  );
 }
 
 class AlertBanner extends StatelessWidget {
@@ -57,37 +57,40 @@ class AlertBanner extends StatelessWidget {
     dynamic color,
     this.selectable = false,
     this.textBuilder,
-  })  : assert((text == null) != (textBuilder == null),
-            "Either text or textBuilder must be null, but not both"),
-        assert(
-          color == null ||
-              (color is AlertColor ||
-                  color is MaterialColor ||
-                  color is GTMaterialColor),
-          "color must be either a MaterialColor, an AlertColor, or a GTMaterialColor. You provided: ${color.runtimeType}",
-        ),
-        _color = color;
+    this.icon,
+  }) : assert(
+         (text == null) != (textBuilder == null),
+         "Either text or textBuilder must be null, but not both",
+       ),
+       assert(
+         color == null ||
+             (color is AlertColor ||
+                 color is MaterialColor ||
+                 color is GTMaterialColor),
+         "color must be either a MaterialColor, an AlertColor, or a GTMaterialColor. You provided: ${color.runtimeType}",
+       ),
+       _color = color;
 
   final String title;
   final Widget? text;
   final Widget? Function(BuildContext context)? textBuilder;
   final dynamic _color;
   final bool selectable;
+  final Widget? icon;
 
   @override
   Widget build(BuildContext context) {
     final scheme = context.colorScheme;
     final AlertColor color = _color == null
-        ? AlertColor(
-            scheme.primaryContainer,
-            scheme.onPrimaryContainer,
-          )
+        ? AlertColor(scheme.primaryContainer, scheme.onPrimaryContainer)
         : _color is GTMaterialColor
-            ? AlertColor(
-                _color.getBackground(context), _color.getForeground(context))
-            : _color is MaterialColor
-                ? AlertColor.fromMaterialColor(context, _color)
-                : _color;
+        ? AlertColor(
+            _color.getBackground(context),
+            _color.getForeground(context),
+          )
+        : _color is MaterialColor
+        ? AlertColor.fromMaterialColor(context, _color)
+        : _color;
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: Container(
@@ -101,6 +104,9 @@ class AlertBanner extends StatelessWidget {
             builder: (context) {
               final txt = text ?? textBuilder!(context);
               double textOpacity = 0.86;
+              final bodyStyle = context.theme.textTheme.bodySmall?.copyWith(
+                color: color.foreground.withAlpha((textOpacity * 255).round()),
+              );
               return Row(
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: txt == null
@@ -109,23 +115,23 @@ class AlertBanner extends StatelessWidget {
                 children: [
                   Padding(
                     padding: const EdgeInsets.only(
-                        right: 16, left: 8, top: 8, bottom: 8),
-                    child: Icon(
-                      GTIcons.info_outline,
-                      color: color.foreground,
+                      right: 16,
+                      left: 8,
+                      top: 8,
+                      bottom: 8,
+                    ),
+                    child: IconTheme(
+                      data: IconThemeData(color: color.foreground),
+                      child: icon ?? Icon(GTIcons.info_outline),
                     ),
                   ),
                   Expanded(
                     child: Theme(
                       data: ThemeData(
                         textTheme: Theme.of(context).textTheme.copyWith(
-                              bodyMedium: Theme.of(context)
-                                  .textTheme
-                                  .bodyMedium!
-                                  .copyWith(
-                                    color: color.foreground,
-                                  ),
-                            ),
+                          bodyMedium: Theme.of(context).textTheme.bodyMedium!
+                              .copyWith(color: color.foreground),
+                        ),
                       ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -143,28 +149,25 @@ class AlertBanner extends StatelessWidget {
                                   ? SelectableText.rich(
                                       TextSpan(
                                         children: [txt.text],
-                                        style: TextStyle(
-                                          color: color.foreground.withAlpha(
-                                              (textOpacity * 255).round()),
-                                        ),
+                                        style: bodyStyle,
                                       ),
                                     )
                                   : RichText(
                                       text: TextSpan(
                                         children: [txt.text],
-                                        style: TextStyle(
-                                          color: color.foreground.withAlpha(
-                                              (textOpacity * 255).round()),
-                                        ),
+                                        style: bodyStyle,
                                       ),
                                     )
                             else
-                              txt,
+                              DefaultTextStyle.merge(
+                                style: bodyStyle,
+                                child: txt,
+                              ),
                           ],
                         ],
                       ),
                     ),
-                  )
+                  ),
                 ],
               );
             },

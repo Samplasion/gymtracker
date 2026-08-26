@@ -86,6 +86,15 @@ extension DateUtils on DateTime {
     return DateTime(year, month, day, 0, 0, 0, 0, 0);
   }
 
+  DateTime getStartOfWeek(BuildContext context) {
+    final firstDayOfWeek = GTLocalizations.firstDayOfWeekFor(context);
+    DateTime thisFirstDOW = startOfDay;
+    while (thisFirstDOW.weekday != firstDayOfWeek) {
+      thisFirstDOW = thisFirstDOW.subtract(const Duration(days: 1));
+    }
+    return thisFirstDOW;
+  }
+
   bool isAfterOrAtSameMomentAs(DateTime other) {
     return isAfter(other) || isAtSameMomentAs(other);
   }

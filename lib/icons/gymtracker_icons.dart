@@ -196,6 +196,7 @@ class GTIcons {
   static const IconData exit = Icons.exit_to_app_rounded;
   static const IconData explanation = Icons.note_alt_outlined;
   static const IconData export = Icons.file_upload_rounded;
+  static const IconData equipment = Icons.fitness_center_rounded;
   static const IconData favorite = Icons.star_rounded;
   static const IconData filter_list = Icons.filter_list_rounded;
   static const IconData folder_closed = Icons.folder_rounded;
@@ -223,6 +224,7 @@ class GTIcons {
   static const IconData lt_chevron = Icons.chevron_right_rounded;
   static const IconData migration = Icons.keyboard_double_arrow_right_rounded;
   static const IconData muscle = _muscle;
+  static const IconData muscle_groups = Icons.person_search_rounded;
   static const IconData nextDay = Icons.arrow_forward;
   static const IconData no_routine = Icons.circle_outlined;
   static const IconData notes = Icons.note_alt_outlined;
@@ -263,6 +265,7 @@ class GTIcons {
   static const IconData tools = Icons.build_rounded;
   static const IconData units = Icons.numbers_rounded;
   static const IconData volume = Icons.line_weight_rounded;
+  static const IconData warning = Icons.warning_rounded;
   static const IconData weight_calculator = Icons.calculate_rounded;
   static const IconData weight_down = Icons.trending_down_rounded;
   static const IconData weight_flat = Icons.trending_flat_rounded;

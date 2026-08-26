@@ -1299,7 +1299,17 @@
         "label": "Sets"
       },
       "muscleCategory": "Muscle groups",
-      "gymEquipment": "Equipment"
+      "gymEquipment": "Equipment",
+      "atAGlance": "At a glance",
+      "mainThree": {
+        "label": "The Main Three",
+        "description": "View the evolution of your 1RM for the \"Main Three\" over the selected time frame. The chart uses the highest 1RM of each week to display the overall trend of loads in the three fundamental exercises of powerlifting.",
+        "warning": {
+          "title": "A note on the chart",
+          "text": "To ensure your progress is calculated and displayed correctly in the chart, use the standard exercises from the app library rather than creating custom variations. Specifically: @exercises."
+        },
+        "bottomTitle": "W@week"
+      }
     },
     "workoutDistribution": {
       "label": "Workout distribution"

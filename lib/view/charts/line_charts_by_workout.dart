@@ -43,10 +43,10 @@ class LineChartWithCategories<T> extends StatefulWidget {
     required this.currentValueBuilder,
     required this.leftTitleBuilder,
     this.minYAxisInterval = 100,
-  })  : assert(categories.isNotEmpty),
-        assert(categories.length == data.length),
-        assert(categories.keys.every((key) => data.keys.contains(key))),
-        assert(minYAxisInterval > 0);
+  }) : assert(categories.isNotEmpty),
+       assert(categories.length == data.length),
+       assert(categories.keys.every((key) => data.keys.contains(key))),
+       assert(minYAxisInterval > 0);
 
   @override
   State<LineChartWithCategories<T>> createState() =>
@@ -67,9 +67,7 @@ class _LineChartWithCategoriesState<T>
             .leftTitleBuilder(e.key, point.value)
             // Worst case scenario for numbers
             .replaceAll(RegExp(r"[0-9]"), "m")
-            .computeSize(
-              style: context.textTheme.labelSmall!,
-            )
+            .computeSize(style: context.textTheme.labelSmall!)
             .width;
       }).toList();
       return categorySizes.max;
@@ -83,13 +81,13 @@ class _LineChartWithCategoriesState<T>
         [
           ...entry.value.map((e) => e.value),
           if (widget.predictedData[entry.key] != null)
-            ...widget.predictedData[entry.key]!.map((e) => e.value)
+            ...widget.predictedData[entry.key]!.map((e) => e.value),
         ].min,
         [
           ...entry.value.map((e) => e.value),
           if (widget.predictedData[entry.key] != null)
-            ...widget.predictedData[entry.key]!.map((e) => e.value)
-        ].max
+            ...widget.predictedData[entry.key]!.map((e) => e.value),
+        ].max,
       )),
   };
 
@@ -112,20 +110,19 @@ class _LineChartWithCategoriesState<T>
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         widget.currentValueBuilder(
-            selectedCategory,
-            hoveredIndex,
-            hoveredIndex >= children.length
-                ? widget.predictedData[selectedCategory]!
-                    .elementAt(hoveredIndex - children.length)
-                : children[hoveredIndex],
-            hoveredIndex >= children.length),
+          selectedCategory,
+          hoveredIndex,
+          hoveredIndex >= children.length
+              ? widget.predictedData[selectedCategory]!.elementAt(
+                  hoveredIndex - children.length,
+                )
+              : children[hoveredIndex],
+          hoveredIndex >= children.length,
+        ),
         ConstrainedBox(
           constraints: BoxConstraints.loose(const Size.fromHeight(300)),
           child: Padding(
-            padding: const EdgeInsets.only(
-              top: 16,
-              right: 16,
-            ),
+            padding: const EdgeInsets.only(top: 16, right: 16),
             child: LineChart(
               LineChartData(
                 minY: yMin,
@@ -186,10 +183,12 @@ class _LineChartWithCategoriesState<T>
                   touchTooltipData: LineTouchTooltipData(
                     getTooltipColor: (_) => Colors.transparent,
                     getTooltipItems: (items) => <LineTooltipItem?>[
-                      ...items.map((_) => const LineTooltipItem(
-                            "hhh",
-                            TextStyle(color: Colors.transparent),
-                          ))
+                      ...items.map(
+                        (_) => const LineTooltipItem(
+                          "hhh",
+                          TextStyle(color: Colors.transparent),
+                        ),
+                      ),
                     ],
                   ),
                   touchSpotThreshold: 10000,
@@ -212,9 +211,11 @@ class _LineChartWithCategoriesState<T>
                           (children.length - 1).toDouble(),
                           children.last.value,
                         ),
-                        for (int i = 0;
-                            i < widget.predictedData[selectedCategory]!.length;
-                            i++)
+                        for (
+                          int i = 0;
+                          i < widget.predictedData[selectedCategory]!.length;
+                          i++
+                        )
                           FlSpot(
                             (children.length + i).toDouble(),
                             widget.predictedData[selectedCategory]![i].value,
@@ -228,18 +229,16 @@ class _LineChartWithCategoriesState<T>
                       isStrokeCapRound: true,
                       belowBarData: BarAreaData(
                         show: true,
-                        color: colorScheme.quaternary
-                            .withAlpha((0.3 * 255).round()),
+                        color: colorScheme.quaternary.withAlpha(
+                          (0.3 * 255).round(),
+                        ),
                       ),
                     ),
                   LineChartBarData(
                     dotData: const FlDotData(show: false),
                     spots: [
                       for (int i = 0; i < children.length; i++)
-                        FlSpot(
-                          i.toDouble(),
-                          children[i].value,
-                        ),
+                        FlSpot(i.toDouble(), children[i].value),
                     ],
                     isCurved: true,
                     preventCurveOverShooting: true,
@@ -268,19 +267,23 @@ class _LineChartWithCategoriesState<T>
                 for (final entry in widget.categories.entries)
                   ChoiceChip(
                     tooltip: entry.value.info,
-                    label: Text.rich(TextSpan(children: [
-                      TextSpan(text: entry.value.title),
-                      if (entry.value.info != null) ...[
-                        const TextSpan(text: "   "),
-                        WidgetSpan(
-                          child: Icon(
-                            GTIcons.info,
-                            size: 16,
-                            color: colorScheme.onSurface,
-                          ),
-                        ),
-                      ]
-                    ])),
+                    label: Text.rich(
+                      TextSpan(
+                        children: [
+                          TextSpan(text: entry.value.title),
+                          if (entry.value.info != null) ...[
+                            const TextSpan(text: "   "),
+                            WidgetSpan(
+                              child: Icon(
+                                GTIcons.info,
+                                size: 16,
+                                color: colorScheme.onSurface,
+                              ),
+                            ),
+                          ],
+                        ],
+                      ),
+                    ),
                     avatar: CircleAvatar(
                       child: this.selectedCategory == entry.key
                           ? const SizedBox.shrink()
@@ -315,8 +318,9 @@ class _LineChartWithCategoriesState<T>
     return (double value, TitleMeta meta) {
       if (value % 1 != 0) return const SizedBox.shrink();
 
-      DateTime? cur =
-          value >= children.length ? null : children[value.toInt()].date;
+      DateTime? cur = value >= children.length
+          ? null
+          : children[value.toInt()].date;
       if (cur == null) return const SizedBox.shrink();
 
       String text = DateFormat.Md(context.locale.languageCode).format(cur);
@@ -330,10 +334,7 @@ class _LineChartWithCategoriesState<T>
 
       return SideTitleWidget(
         meta: meta,
-        child: Text(
-          text,
-          style: Theme.of(context).textTheme.labelSmall,
-        ),
+        child: Text(text, style: Theme.of(context).textTheme.labelSmall),
       );
     };
   }
@@ -343,15 +344,14 @@ class _LineChartWithCategoriesState<T>
       return SideTitleWidget(
         meta: meta,
         child: Text.rich(
-          TextSpan(children: [
-            TextSpan(
-              text: widget.leftTitleBuilder(
-                selectedCategory,
-                value,
+          TextSpan(
+            children: [
+              TextSpan(
+                text: widget.leftTitleBuilder(selectedCategory, value),
+                style: context.textTheme.labelSmall!,
               ),
-              style: context.textTheme.labelSmall!,
-            ),
-          ]),
+            ],
+          ),
           textAlign: TextAlign.end,
         ),
       );
@@ -360,10 +360,7 @@ class _LineChartWithCategoriesState<T>
 }
 
 class RoutineHistoryChart extends StatefulWidget {
-  const RoutineHistoryChart({
-    required this.routine,
-    super.key,
-  });
+  const RoutineHistoryChart({required this.routine, super.key});
 
   final Workout routine;
 
@@ -375,14 +372,12 @@ class RoutineHistoryChart extends StatefulWidget {
     final ongoingWorkout = Get.isRegistered<WorkoutController>()
         ? Get.find<WorkoutController>().synthesizeTemporaryWorkout()
         : null;
-    final added =
-        ongoingWorkout != null && ongoingWorkout.isChildOf(workout) ? 1 : 0;
+    final added = ongoingWorkout != null && ongoingWorkout.isChildOf(workout)
+        ? 1
+        : 0;
     return !workout.isConcrete &&
         controller
-                    .getChildren(
-                      workout,
-                      allowSynthesized: true,
-                    )
+                    .getChildren(workout, allowSynthesized: true)
                     .where((wo) => wo.doneSets.isNotEmpty)
                     .length +
                 added >=
@@ -390,12 +385,7 @@ class RoutineHistoryChart extends StatefulWidget {
   }
 }
 
-enum _RoutineHistoryChartType {
-  volume,
-  reps,
-  duration,
-  exertion,
-}
+enum _RoutineHistoryChartType { volume, reps, duration, exertion }
 
 class _RoutineHistoryChartState
     extends ControlledState<RoutineHistoryChart, RoutinesController> {
@@ -437,10 +427,7 @@ class _RoutineHistoryChartState
   }
 
   List<Workout> get children => controller
-      .getChildren(
-        widget.routine,
-        allowSynthesized: true,
-      )
+      .getChildren(widget.routine, allowSynthesized: true)
       .where((wo) => wo.doneSets.isNotEmpty)
       .toList();
 
@@ -462,26 +449,28 @@ class _RoutineHistoryChartState
     };
 
     for (final wo in children) {
-      values[_RoutineHistoryChartType.volume]!.add(LineChartPoint(
-        value: Weights.convert(
-          value: wo.liftedWeight,
-          from: wo.weightUnit,
-          to: settingsController.weightUnit.value,
+      values[_RoutineHistoryChartType.volume]!.add(
+        LineChartPoint(
+          value: Weights.convert(
+            value: wo.liftedWeight,
+            from: wo.weightUnit,
+            to: settingsController.weightUnit.value,
+          ),
+          date: wo.startingDate!,
         ),
-        date: wo.startingDate!,
-      ));
-      values[_RoutineHistoryChartType.reps]!.add(LineChartPoint(
-        value: wo.reps.toDouble(),
-        date: wo.startingDate!,
-      ));
-      values[_RoutineHistoryChartType.duration]!.add(LineChartPoint(
-        value: wo.duration!.inSeconds.toDouble(),
-        date: wo.startingDate!,
-      ));
-      values[_RoutineHistoryChartType.exertion]!.add(LineChartPoint(
-        value: wo.exertion.toDouble(),
-        date: wo.startingDate!,
-      ));
+      );
+      values[_RoutineHistoryChartType.reps]!.add(
+        LineChartPoint(value: wo.reps.toDouble(), date: wo.startingDate!),
+      );
+      values[_RoutineHistoryChartType.duration]!.add(
+        LineChartPoint(
+          value: wo.duration!.inSeconds.toDouble(),
+          date: wo.startingDate!,
+        ),
+      );
+      values[_RoutineHistoryChartType.exertion]!.add(
+        LineChartPoint(value: wo.exertion.toDouble(), date: wo.startingDate!),
+      );
     }
 
     return values;
@@ -526,31 +515,29 @@ class _RoutineHistoryChartState
   }
 
   Map<_RoutineHistoryChartType, LineChartCategory> get categories => {
-        _RoutineHistoryChartType.volume: LineChartCategory(
-          title: "exercise.chart.views.volume".t,
-          icon: const Icon(GTIcons.volume, size: 16),
-        ),
-        _RoutineHistoryChartType.reps: LineChartCategory(
-          title: "exercise.chart.views.reps".t,
-          icon: const Icon(GTIcons.reps, size: 16),
-        ),
-        _RoutineHistoryChartType.duration: LineChartCategory(
-          title: "exercise.chart.views.duration".t,
-          icon: const Icon(GTIcons.duration, size: 16),
-        ),
-        _RoutineHistoryChartType.exertion: LineChartCategory(
-          title: "exercise.chart.views.exertion".t,
-          icon: const Icon(GTIcons.exertion, size: 16),
-          info: "exercise.chart.views.exertionInfo".t,
-        ),
-      };
+    _RoutineHistoryChartType.volume: LineChartCategory(
+      title: "exercise.chart.views.volume".t,
+      icon: const Icon(GTIcons.volume, size: 16),
+    ),
+    _RoutineHistoryChartType.reps: LineChartCategory(
+      title: "exercise.chart.views.reps".t,
+      icon: const Icon(GTIcons.reps, size: 16),
+    ),
+    _RoutineHistoryChartType.duration: LineChartCategory(
+      title: "exercise.chart.views.duration".t,
+      icon: const Icon(GTIcons.duration, size: 16),
+    ),
+    _RoutineHistoryChartType.exertion: LineChartCategory(
+      title: "exercise.chart.views.exertion".t,
+      icon: const Icon(GTIcons.exertion, size: 16),
+      info: "exercise.chart.views.exertionInfo".t,
+    ),
+  };
 
   @override
   Widget build(BuildContext context) {
     final deltaStartingTime = children.first.startingDate!
-        .difference(
-          children.last.startingDate!,
-        )
+        .difference(children.last.startingDate!)
         .abs();
     if (deltaStartingTime >= _kDeltaTimeForTimeChart) {
       return _buildTimeChart(context);
@@ -561,56 +548,61 @@ class _RoutineHistoryChartState
           .toMap(),
       data: {
         for (final entry in values.entries)
-          if (availableTypes.contains(entry.key)) entry.key: entry.value
+          if (availableTypes.contains(entry.key)) entry.key: entry.value,
       },
       predictedData: {
         for (final type in availableTypes)
           if (_currentSynthOngoing != null)
-            type: [_getSynthesizedPointFor(type)!]
+            type: [_getSynthesizedPointFor(type)!],
       },
       currentValueBuilder: (type, index, point, isPredicted) {
-        final hoveredPoint =
-            index >= children.length ? _currentSynthOngoing! : children[index];
+        final hoveredPoint = index >= children.length
+            ? _currentSynthOngoing!
+            : children[index];
 
         final style = Theme.of(context).textTheme.bodyLarge!.copyWith(
-              fontWeight: FontWeight.bold,
-              color:
-                  isPredicted ? Theme.of(context).colorScheme.quaternary : null,
-            );
+          fontWeight: FontWeight.bold,
+          color: isPredicted ? Theme.of(context).colorScheme.quaternary : null,
+        );
         return TimerView.buildTimeString(
           context,
           Duration(seconds: point.value.toInt()),
           builder: (time) {
             return Text.rich(
-              TextSpan(children: [
-                TextSpan(
-                  children: [
-                    TextSpan(text: buildType(type, time, point.value))
-                  ],
-                  style: style,
-                ),
-                const TextSpan(text: " "),
-                TextSpan(
-                  text: DateFormat.yMd(context.locale.languageCode)
-                      .format(hoveredPoint.startingDate!),
-                  style: TextStyle(
-                    color: Theme.of(context).colorScheme.primary,
-                    decoration: TextDecoration.underline,
+              TextSpan(
+                children: [
+                  TextSpan(
+                    children: [
+                      TextSpan(text: buildType(type, time, point.value)),
+                    ],
+                    style: style,
                   ),
-                  recognizer: dateRecognizer
-                    ..onTap = () {
-                      if (index >= children.length) {
-                        Go.toNamed(getPreferredWorkoutRouteName());
-                      } else {
-                        Go.to(
-                          () => ExercisesView(
-                              workout: Get.find<HistoryController>()
-                                  .getByID(children[index].id)!),
-                        );
-                      }
-                    },
-                ),
-              ]),
+                  const TextSpan(text: " "),
+                  TextSpan(
+                    text: DateFormat.yMd(
+                      context.locale.languageCode,
+                    ).format(hoveredPoint.startingDate!),
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.primary,
+                      decoration: TextDecoration.underline,
+                    ),
+                    recognizer: dateRecognizer
+                      ..onTap = () {
+                        if (index >= children.length) {
+                          Go.toNamed(getPreferredWorkoutRouteName());
+                        } else {
+                          Go.to(
+                            () => ExercisesView(
+                              workout: Get.find<HistoryController>().getByID(
+                                children[index].id,
+                              )!,
+                            ),
+                          );
+                        }
+                      },
+                  ),
+                ],
+              ),
             );
           },
           style: style,
@@ -635,15 +627,12 @@ class _RoutineHistoryChartState
           .toMap(),
       data: {
         for (final entry in values.entries)
-          if (availableTypes.contains(entry.key)) entry.key: entry.value
+          if (availableTypes.contains(entry.key)) entry.key: entry.value,
       },
       predictions: {
         for (final type in availableTypes)
           if (_currentSynthOngoing != null && availableTypes.contains(type))
-            type: [
-              values[type]!.last,
-              _getSynthesizedPointFor(type)!,
-            ]
+            type: [values[type]!.last, _getSynthesizedPointFor(type)!],
       },
       currentValueBuilder: (type, index, point, isPredicted) {
         index = startingDateIndices[index] ?? children.length + 2;
@@ -652,42 +641,46 @@ class _RoutineHistoryChartState
         }
 
         final style = Theme.of(context).textTheme.bodyLarge!.copyWith(
-              fontWeight: FontWeight.bold,
-              color:
-                  isPredicted ? Theme.of(context).colorScheme.quaternary : null,
-            );
+          fontWeight: FontWeight.bold,
+          color: isPredicted ? Theme.of(context).colorScheme.quaternary : null,
+        );
         return TimerView.buildTimeString(
           context,
           Duration(seconds: point.value.toInt()),
           builder: (time) {
             return Text.rich(
-              TextSpan(children: [
-                TextSpan(
-                  text: buildType(type, time, point.value),
-                  style: style,
-                ),
-                const TextSpan(text: " "),
-                TextSpan(
-                  text: DateFormat.yMd(context.locale.languageCode)
-                      .format(point.date),
-                  style: TextStyle(
-                    color: Theme.of(context).colorScheme.primary,
-                    decoration: TextDecoration.underline,
+              TextSpan(
+                children: [
+                  TextSpan(
+                    text: buildType(type, time, point.value),
+                    style: style,
                   ),
-                  recognizer: dateRecognizer
-                    ..onTap = () {
-                      if (index >= children.length) {
-                        Go.toNamed(getPreferredWorkoutRouteName());
-                      } else {
-                        Go.to(
-                          () => ExercisesView(
-                              workout: Get.find<HistoryController>()
-                                  .getByID(children[index].id)!),
-                        );
-                      }
-                    },
-                ),
-              ]),
+                  const TextSpan(text: " "),
+                  TextSpan(
+                    text: DateFormat.yMd(
+                      context.locale.languageCode,
+                    ).format(point.date),
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.primary,
+                      decoration: TextDecoration.underline,
+                    ),
+                    recognizer: dateRecognizer
+                      ..onTap = () {
+                        if (index >= children.length) {
+                          Go.toNamed(getPreferredWorkoutRouteName());
+                        } else {
+                          Go.to(
+                            () => ExercisesView(
+                              workout: Get.find<HistoryController>().getByID(
+                                children[index].id,
+                              )!,
+                            ),
+                          );
+                        }
+                      },
+                  ),
+                ],
+              ),
             );
           },
           style: style,
@@ -709,7 +702,8 @@ class _RoutineHistoryChartState
 ({
   Set<_ExerciseHistoryChartType> types,
   Map<_ExerciseHistoryChartType, List<LineChartPoint>> values,
-}) _calculateTypes(List<ExerciseHistoryChartChild> children) {
+})
+_calculateTypes(List<ExerciseHistoryChartChild> children) {
   final types = <_ExerciseHistoryChartType>{};
   final values = <_ExerciseHistoryChartType, List<LineChartPoint>>{
     _ExerciseHistoryChartType.volume: [],
@@ -722,36 +716,41 @@ class _RoutineHistoryChartState
     if (ex.doneSets.isEmpty) continue;
 
     if (ex.liftedWeight != null) {
-      values[_ExerciseHistoryChartType.volume]!.add(LineChartPoint(
-        value: Weights.convert(
-          value: ex.liftedWeight!,
-          from: wo.weightUnit,
-          to: settingsController.weightUnit.value,
+      values[_ExerciseHistoryChartType.volume]!.add(
+        LineChartPoint(
+          value: Weights.convert(
+            value: ex.liftedWeight!,
+            from: wo.weightUnit,
+            to: settingsController.weightUnit.value,
+          ),
+          date: wo.startingDate!,
         ),
-        date: wo.startingDate!,
-      ));
+      );
     }
     if (ex.reps != null) {
-      values[_ExerciseHistoryChartType.reps]!.add(LineChartPoint(
-        value: ex.reps!.toDouble(),
-        date: wo.startingDate!,
-      ));
+      values[_ExerciseHistoryChartType.reps]!.add(
+        LineChartPoint(value: ex.reps!.toDouble(), date: wo.startingDate!),
+      );
     }
     if (ex.time != null) {
-      values[_ExerciseHistoryChartType.time]!.add(LineChartPoint(
-        value: ex.time!.inSeconds.toDouble(),
-        date: wo.startingDate!,
-      ));
+      values[_ExerciseHistoryChartType.time]!.add(
+        LineChartPoint(
+          value: ex.time!.inSeconds.toDouble(),
+          date: wo.startingDate!,
+        ),
+      );
     }
     if (ex.distanceRun != null) {
-      values[_ExerciseHistoryChartType.distance]!.add(LineChartPoint(
-        value: Distance.convert(
-          value: ex.distanceRun!,
-          from: wo.distanceUnit,
-          to: settingsController.distanceUnit.value,
+      values[_ExerciseHistoryChartType.distance]!.add(
+        LineChartPoint(
+          value: Distance.convert(
+            value: ex.distanceRun!,
+            from: wo.distanceUnit,
+            to: settingsController.distanceUnit.value,
+          ),
+          date: wo.startingDate!,
         ),
-        date: wo.startingDate!,
-      ));
+      );
     }
   }
 
@@ -764,8 +763,8 @@ class _RoutineHistoryChartState
     types: types,
     values: {
       for (final entry in values.entries)
-        if (types.contains(entry.key)) entry.key: entry.value
-    }
+        if (types.contains(entry.key)) entry.key: entry.value,
+    },
   );
 }
 
@@ -793,12 +792,7 @@ class ExerciseHistoryChart extends StatefulWidget {
   }
 }
 
-enum _ExerciseHistoryChartType {
-  volume,
-  reps,
-  time,
-  distance,
-}
+enum _ExerciseHistoryChartType { volume, reps, time, distance }
 
 class _ExerciseHistoryChartState
     extends ControlledState<ExerciseHistoryChart, RoutinesController> {
@@ -808,9 +802,7 @@ class _ExerciseHistoryChartState
   late final Map<_ExerciseHistoryChartType, List<LineChartPoint>> values;
   late final Set<_ExerciseHistoryChartType> availableTypes;
   late final List<ExerciseHistoryChartChild> children = widget.children
-      .where(
-        (e) => e.$2.doneSets.isNotEmpty,
-      )
+      .where((e) => e.$2.doneSets.isNotEmpty)
       .toList();
 
   @override
@@ -819,8 +811,10 @@ class _ExerciseHistoryChartState
 
     widget.ongoing?.$2.logger.i("");
 
-    final (types: availableTypes, values: values) = _calculateTypes(
-        [...children, if (widget.ongoing != null) widget.ongoing!]);
+    final (types: availableTypes, values: values) = _calculateTypes([
+      ...children,
+      if (widget.ongoing != null) widget.ongoing!,
+    ]);
     this.values = values;
     this.availableTypes = availableTypes;
   }
@@ -834,8 +828,9 @@ class _ExerciseHistoryChartState
   String buildType(_ExerciseHistoryChartType type, TextSpan time, double y) =>
       switch (type) {
         _ExerciseHistoryChartType.volume => y.userFacingWeight,
-        _ExerciseHistoryChartType.reps =>
-          "exerciseList.fields.reps".plural(y.toInt()),
+        _ExerciseHistoryChartType.reps => "exerciseList.fields.reps".plural(
+          y.toInt(),
+        ),
         _ExerciseHistoryChartType.time => time.text!,
         _ExerciseHistoryChartType.distance => y.userFacingDistance,
       };
@@ -879,10 +874,9 @@ class _ExerciseHistoryChartState
     };
     Widget currentValueBuilder(type, index, point, isPredicted) {
       final style = Theme.of(context).textTheme.bodyLarge!.copyWith(
-            fontWeight: FontWeight.bold,
-            color:
-                isPredicted ? Theme.of(context).colorScheme.quaternary : null,
-          );
+        fontWeight: FontWeight.bold,
+        color: isPredicted ? Theme.of(context).colorScheme.quaternary : null,
+      );
       final date = isPredicted
           ? widget.ongoing!.$1.startingDate!
           : children[index].$1.startingDate!;
@@ -891,39 +885,42 @@ class _ExerciseHistoryChartState
         Duration(seconds: point.value.toInt()),
         builder: (time) {
           return Text.rich(
-            TextSpan(children: [
-              TextSpan(
-                children: [
-                  TextSpan(
-                    text: buildType(type, time, point.value),
-                  )
-                ],
-                style: style,
-              ),
-              const TextSpan(text: " "),
-              TextSpan(
-                text: DateFormat.yMd(context.locale.languageCode).format(date),
-                style: TextStyle(
-                  color: Theme.of(context).colorScheme.primary,
-                  decoration: TextDecoration.underline,
+            TextSpan(
+              children: [
+                TextSpan(
+                  children: [
+                    TextSpan(text: buildType(type, time, point.value)),
+                  ],
+                  style: style,
                 ),
-                recognizer: dateRecognizer
-                  ..onTap = () {
-                    if (isPredicted) {
-                      Go.toNamed(getPreferredWorkoutRouteName());
-                    } else {
-                      Go.to(
-                        () => ExercisesView(
-                          workout: Get.find<HistoryController>()
-                              .getByID(children[index].$1.id)!,
-                          highlightExercise: (ex) =>
-                              ex.id == children[index].$2.id,
-                        ),
-                      );
-                    }
-                  },
-              ),
-            ]),
+                const TextSpan(text: " "),
+                TextSpan(
+                  text: DateFormat.yMd(
+                    context.locale.languageCode,
+                  ).format(date),
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.primary,
+                    decoration: TextDecoration.underline,
+                  ),
+                  recognizer: dateRecognizer
+                    ..onTap = () {
+                      if (isPredicted) {
+                        Go.toNamed(getPreferredWorkoutRouteName());
+                      } else {
+                        Go.to(
+                          () => ExercisesView(
+                            workout: Get.find<HistoryController>().getByID(
+                              children[index].$1.id,
+                            )!,
+                            highlightExercise: (ex) =>
+                                ex.id == children[index].$2.id,
+                          ),
+                        );
+                      }
+                    },
+                ),
+              ],
+            ),
           );
         },
         style: style,
@@ -946,9 +943,7 @@ class _ExerciseHistoryChartState
     }
 
     final deltaStartingTime = children.first.$1.startingDate!
-        .difference(
-          children.last.$1.startingDate!,
-        )
+        .difference(children.last.$1.startingDate!)
         .abs();
     if (deltaStartingTime >= _kDeltaTimeForTimeChart) {
       return LineChartTimeSeries(
@@ -956,18 +951,15 @@ class _ExerciseHistoryChartState
         data: data,
         predictions: {
           for (final MapEntry(:key, :value) in predictedData.entries)
-            key: [
-              if (value.isNotEmpty) data[key]!.last,
-              ...value,
-            ],
+            key: [if (value.isNotEmpty) data[key]!.last, ...value],
         },
         currentValueBuilder: (type, index, point, isPredicted) =>
             currentValueBuilder(
-          type,
-          startingDateIndices[index] ?? children.length + 2,
-          point,
-          isPredicted,
-        ),
+              type,
+              startingDateIndices[index] ?? children.length + 2,
+              point,
+              isPredicted,
+            ),
         leftTitleBuilder: leftTitleBuilder,
       );
     }

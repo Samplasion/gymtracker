@@ -210,3 +210,19 @@ String generateWorkoutTitle(Set<GTMuscleCategory> selectedGroups) {
         }),
   }).trim();
 }
+
+DateTime maxDate(DateTime a, DateTime b) {
+  return a.isAfter(b) ? a : b;
+}
+
+int getWeekNumber(DateTime date) {
+  DateTime thursdayOfCurrentWeek = date.add(Duration(days: (4 - date.weekday)));
+  DateTime firstThursdayOfYear = DateTime(thursdayOfCurrentWeek.year, 1, 4);
+  DateTime firstWeekThursday = firstThursdayOfYear.add(
+    Duration(days: (4 - firstThursdayOfYear.weekday)),
+  );
+
+  int weekNumber =
+      ((thursdayOfCurrentWeek.difference(firstWeekThursday).inDays) ~/ 7) + 1;
+  return weekNumber;
+}

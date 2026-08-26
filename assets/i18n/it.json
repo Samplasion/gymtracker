@@ -1299,7 +1299,17 @@
         "label": "Serie"
       },
       "muscleCategory": "Gruppi muscolari",
-      "gymEquipment": "Attrezzatura"
+      "gymEquipment": "Attrezzatura",
+      "atAGlance": "Colpo d'occhio",
+      "mainThree": {
+        "label": "I big 3",
+        "description": "Visualizza l'evoluzione dei tuoi massimali (1RM) per i \"Big 3\" nell'intervallo di tempo selezionato. Il grafico utilizza il massimale più alto di ogni settimana per visualizzare l'andamento complessivo dei carichi nei tre esercizi fondamentali del powerlifting.",
+        "warning": {
+          "title": "Nota sul grafico",
+          "text": "Affinché i progressi vengano calcolati e visualizzati correttamente nel grafico, utilizza gli esercizi standard della libreria dell'app anziché creare varianti personalizzate. Nello specifico: @exercises."
+        },
+        "bottomTitle": "S@week"
+      }
     },
     "workoutDistribution": {
       "label": "Distribuzione allenamenti"

@@ -115,7 +115,8 @@ class GTLocalizations extends Translations with ChangeNotifier {
   /// Returns the first day of the week for the given [context].
   ///
   /// The returned value is converted to a format compatible with [DateTime.weekday].
-  /// That is, the returned value is in the range 1 to 7, inclusive.
+  /// That is, the returned value is in the range 1 to 7, inclusive, where
+  /// 1 represents Monday and 7 represents Sunday.
   static int firstDayOfWeekFor(BuildContext context) {
     final loc = MaterialLocalizations.of(context).firstDayOfWeekIndex;
     return loc == 0 ? 7 : loc;

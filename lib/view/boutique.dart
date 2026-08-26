@@ -14,6 +14,7 @@ import 'package:gymtracker/utils/utils.dart';
 import 'package:gymtracker/view/components/badges.dart';
 import 'package:gymtracker/view/components/content_unavailable.dart';
 import 'package:gymtracker/view/components/controlled.dart';
+import 'package:gymtracker/view/components/loading_indicator.dart';
 import 'package:gymtracker/view/components/master_detail.dart';
 import 'package:gymtracker/view/components/pro_builder.dart';
 import 'package:gymtracker/view/components/routines.dart';
@@ -291,7 +292,7 @@ class _BoutiqueCategoryViewState
           ),
           body: () {
             if (!snapshot.hasData) {
-              return const Center(child: CircularProgressIndicator());
+              return const Center(child: GBLoadingIndicator());
             }
 
             if (snapshot.data!.isError) {

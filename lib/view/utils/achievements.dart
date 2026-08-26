@@ -9,6 +9,7 @@ import 'package:gymtracker/icons/gymtracker_icons.dart';
 import 'package:gymtracker/model/achievements.dart';
 import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/utils/extensions.dart';
+import 'package:gymtracker/view/components/loading_indicator.dart';
 
 class AchievementListTile extends StatelessWidget {
   final Achievement achievement;
@@ -57,8 +58,8 @@ class _AchievementIconState extends State<AchievementIcon> {
     _icon = rootBundle
         .loadString("assets/svg/trophies/${widget.achievement.iconKey}.svg")
         .catchError((e) {
-      return rootBundle.loadString(GTAssets.svg.trophies.generic);
-    });
+          return rootBundle.loadString(GTAssets.svg.trophies.generic);
+        });
   }
 
   @override
@@ -69,7 +70,7 @@ class _AchievementIconState extends State<AchievementIcon> {
         if (!snapshot.hasData) {
           return SizedBox.square(
             dimension: widget.size,
-            child: const CircularProgressIndicator(),
+            child: const GBLoadingIndicator(),
           );
         }
         var svgPicture = SvgPicture.string(
@@ -77,7 +78,8 @@ class _AchievementIconState extends State<AchievementIcon> {
           width: widget.size,
           height: widget.size,
           theme: SvgTheme(
-            currentColor: (widget.color ??
+            currentColor:
+                (widget.color ??
                 context.harmonizeColor(widget.achievement.color)),
           ),
         );
@@ -134,37 +136,43 @@ class AchievementSnackBar extends SnackBar {
     bool inverted = true,
     super.key,
   }) : super(
-          behavior: SnackBarBehavior.floating,
-          duration: const Duration(seconds: 15),
-          content: Row(
-            children: [
-              AchievementIcon(achievement: achievement, size: 32),
-              const SizedBox(width: 16),
-              Builder(builder: (context) {
-                return Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        achievement.getLevel(completion)!.localizedName,
-                        style: context.theme.textTheme.bodyLarge!.copyWith(
-                          color: inverted ? context.theme.colorScheme.onInverseSurface : null,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      Text(
-                        achievement.getLevel(completion)!.localizedDescription,
-                        style: context.theme.textTheme.bodySmall!.copyWith(
-                          color: inverted ? context.theme.colorScheme.onInverseSurface : null,
-                        ),
-                      ),
-                    ],
-                  ),
-                );
-              }),
-            ],
-          ),
-        );
+         behavior: SnackBarBehavior.floating,
+         duration: const Duration(seconds: 15),
+         content: Row(
+           children: [
+             AchievementIcon(achievement: achievement, size: 32),
+             const SizedBox(width: 16),
+             Builder(
+               builder: (context) {
+                 return Expanded(
+                   child: Column(
+                     crossAxisAlignment: CrossAxisAlignment.start,
+                     children: [
+                       Text(
+                         achievement.getLevel(completion)!.localizedName,
+                         style: context.theme.textTheme.bodyLarge!.copyWith(
+                           color: inverted
+                               ? context.theme.colorScheme.onInverseSurface
+                               : null,
+                           fontWeight: FontWeight.bold,
+                         ),
+                       ),
+                       Text(
+                         achievement.getLevel(completion)!.localizedDescription,
+                         style: context.theme.textTheme.bodySmall!.copyWith(
+                           color: inverted
+                               ? context.theme.colorScheme.onInverseSurface
+                               : null,
+                         ),
+                       ),
+                     ],
+                   ),
+                 );
+               },
+             ),
+           ],
+         ),
+       );
 }
 
 class AchievementBanner extends MaterialBanner {
@@ -176,21 +184,23 @@ class AchievementBanner extends MaterialBanner {
     required this.completion,
     super.key,
   }) : super(
-          content: AchievementListTile(
-            achievement: achievement,
-            completion: completion,
-          ),
-          actions: [
-            Builder(builder: (context) {
-              return TextButton(
-                onPressed: () {
-                  ScaffoldMessenger.of(context).hideCurrentMaterialBanner();
-                },
-                child: Text(MaterialLocalizations.of(context).okButtonLabel),
-              );
-            }),
-          ],
-        );
+         content: AchievementListTile(
+           achievement: achievement,
+           completion: completion,
+         ),
+         actions: [
+           Builder(
+             builder: (context) {
+               return TextButton(
+                 onPressed: () {
+                   ScaffoldMessenger.of(context).hideCurrentMaterialBanner();
+                 },
+                 child: Text(MaterialLocalizations.of(context).okButtonLabel),
+               );
+             },
+           ),
+         ],
+       );
 }
 
 extension AchievementLevelLocalized on AchievementLevel {

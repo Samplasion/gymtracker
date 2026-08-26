@@ -1,13 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:gymtracker/provider/online.dart';
-import 'package:gymtracker/data/configuration.dart';
 import 'package:gymtracker/icons/gymtracker_icons.dart';
+import 'package:gymtracker/provider/online.dart';
 import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/service/online.dart';
 import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/view/login.dart';
-import 'package:gymtracker/view/me.dart';
 import 'package:gymtracker/view/user_profile.dart';
 import 'package:gymtracker/view/utils/social.dart';
 

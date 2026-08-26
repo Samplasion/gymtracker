@@ -18,6 +18,7 @@ import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/utils/sets.dart';
 import 'package:gymtracker/utils/theme.dart';
 import 'package:gymtracker/utils/utils.dart';
+import 'package:gymtracker/view/components/loading_indicator.dart';
 import 'package:gymtracker/view/components/maybe_rich_text.dart';
 import 'package:gymtracker/view/components/parent_viewer.dart';
 import 'package:gymtracker/view/components/rich_text_dialog.dart';
@@ -42,7 +43,7 @@ class WorkoutSimpleView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (!Get.isRegistered<WorkoutController>()) {
-      return const Center(child: CircularProgressIndicator());
+      return const Center(child: GBLoadingIndicator());
     }
 
     final controller = Get.find<WorkoutController>();
@@ -292,7 +293,7 @@ class _CurrentSetView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (!Get.isRegistered<WorkoutController>()) {
-      return const Center(child: CircularProgressIndicator());
+      return const Center(child: GBLoadingIndicator());
     }
 
     final controller = Get.find<WorkoutController>();

@@ -9,6 +9,7 @@ import 'package:gymtracker/provider/friend.dart';
 import 'package:gymtracker/provider/online.dart';
 import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/utils/go.dart';
+import 'package:gymtracker/view/components/loading_indicator.dart';
 import 'package:gymtracker/view/utils/crop_image.dart';
 import 'package:gymtracker/view/utils/social.dart';
 
@@ -185,7 +186,7 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
       ),
       body: SafeArea(
         child: profileAsync.when(
-          loading: () => const Center(child: CircularProgressIndicator()),
+          loading: () => const Center(child: GBLoadingIndicator()),
           error: (err, stack) => Center(child: Text("Error: $err")),
           data: (profile) {
             return Stack(
@@ -305,7 +306,7 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
                   Positioned.fill(
                     child: Container(
                       color: Colors.black.withValues(alpha: 0.3),
-                      child: const Center(child: CircularProgressIndicator()),
+                      child: const Center(child: GBLoadingIndicator()),
                     ),
                   ),
               ],

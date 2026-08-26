@@ -33,7 +33,7 @@ final class OnlineProvider
   Online create() => Online();
 }
 
-String _$onlineHash() => r'a3222173eb0e6debc266aca163b3da9835331dfd';
+String _$onlineHash() => r'6b96127f931838b8184d0a250a1168617932063c';
 
 abstract class _$Online extends $AsyncNotifier<OnlineAccount?> {
   FutureOr<OnlineAccount?> build();

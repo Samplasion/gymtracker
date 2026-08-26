@@ -36,19 +36,11 @@ class UserAccountIcon extends ConsumerWidget {
         final url = snapshot.data!;
         return Image.network(
           url,
+          gaplessPlayback: true,
           frameBuilder: (context, child, frame, wasSynchronouslyLoaded) {
-            if (wasSynchronouslyLoaded) {
-              return CircleAvatar(
-                backgroundImage: NetworkImage(url),
-                radius: radius,
-              );
-            }
-            if (frame == null) {
-              return emptyChild;
-            }
             return CircleAvatar(
-              backgroundImage: NetworkImage(url),
               radius: radius,
+              child: ClipOval(clipBehavior: .antiAlias, child: child),
             );
           },
           errorBuilder: (context, error, stackTrace) {

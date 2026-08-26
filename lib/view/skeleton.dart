@@ -23,6 +23,7 @@ import 'package:gymtracker/view/components/pro_builder.dart';
 import 'package:gymtracker/view/debug.dart';
 import 'package:gymtracker/view/feed.dart';
 import 'package:gymtracker/view/legal.dart';
+import 'package:gymtracker/view/loading.dart';
 import 'package:gymtracker/view/logs.dart';
 import 'package:gymtracker/view/me.dart';
 import 'package:gymtracker/view/routines.dart';
@@ -656,7 +657,6 @@ class OngoingWorkoutBar extends StatelessWidget {
             Breakpoints.computeBreakpoint(constraints.maxWidth) <=
             Breakpoints.xs;
         final safeArea = MediaQuery.of(context).padding;
-        final gradientColor = Theme.of(context).colorScheme.surfaceContainer;
         final controller = Get.isRegistered<WorkoutController>()
             ? Get.find<WorkoutController>()
             : null;
@@ -858,39 +858,7 @@ class __LoaderState extends State<GymTrackerAppLoader> {
 
   @override
   Widget build(BuildContext context) {
-    final showMDView = SkeletonView.isTwoPane(context);
-    return Skeletonizer(
-      child: Scaffold(
-        body: Row(
-          children: [
-            if (showMDView) ...[
-              _DrawerContainer(
-                child: NavigationDrawer(
-                  // backgroundColor: Colors.transparent,
-                  indicatorColor: Colors.transparent,
-                  children: [
-                    const SafeArea(
-                      bottom: false,
-                      minimum: EdgeInsets.only(top: 16),
-                      child: SizedBox(),
-                    ),
-                    const _GTDrawerHeader(),
-                    const SizedBox(height: 16),
-                    for (var i = 0; i < 6; i++)
-                      NavigationDrawerDestination(
-                        icon: const Icon(GTIcons.app_icon),
-                        label: Text(BoneMock.words(i % 3 + 1)),
-                        backgroundColor: Colors.transparent,
-                      ),
-                  ],
-                ),
-              ),
-            ],
-            const Expanded(child: FeedView.skeleton()),
-          ],
-        ),
-      ),
-    );
+    return LoadingPage();
   }
 }
 

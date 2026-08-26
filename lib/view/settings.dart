@@ -21,6 +21,7 @@ import 'package:gymtracker/struct/nutrition.dart';
 import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/view/components/controlled.dart';
+import 'package:gymtracker/view/components/loading_indicator.dart';
 import 'package:gymtracker/view/components/master_detail.dart';
 import 'package:gymtracker/view/onboarding.dart';
 import 'package:gymtracker/view/settings/color.dart';

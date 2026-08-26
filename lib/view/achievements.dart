@@ -10,6 +10,7 @@ import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/utils/constants.dart';
 import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/view/components/controlled.dart';
+import 'package:gymtracker/view/components/loading_indicator.dart';
 import 'package:gymtracker/view/skeleton.dart';
 import 'package:gymtracker/view/utils/achievements.dart';
 import 'package:gymtracker/view/utils/sliver_utils.dart';
@@ -257,7 +258,7 @@ class AchievementHistoryScreen
             builder: (context, snapshot) {
               if (!snapshot.hasData) {
                 return const SliverFillRemaining(
-                  child: Center(child: CircularProgressIndicator()),
+                  child: Center(child: GBLoadingIndicator()),
                 );
               }
               return SliverList.builder(

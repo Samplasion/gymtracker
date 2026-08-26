@@ -17,6 +17,7 @@ import 'package:gymtracker/utils/constants.dart';
 import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/utils/skeletons.dart';
 import 'package:gymtracker/view/components/content_unavailable.dart';
+import 'package:gymtracker/view/components/loading_indicator.dart';
 import 'package:gymtracker/view/components/routines.dart';
 import 'package:gymtracker/view/exercises.dart';
 import 'package:gymtracker/view/friend_requests.dart';
@@ -137,7 +138,7 @@ class _FeedViewState extends ConsumerState<FeedView> {
                   icon: SizedBox(
                     width: 24.0,
                     height: 24.0,
-                    child: CircularProgressIndicator(),
+                    child: GBLoadingIndicator(),
                   ),
                 ),
               ),
@@ -303,7 +304,7 @@ class _FeedViewState extends ConsumerState<FeedView> {
                               );
                             },
                             loading: () => SliverFillRemaining(
-                              child: Center(child: CircularProgressIndicator()),
+                              child: Center(child: GBLoadingIndicator()),
                             ),
                             error: (error, stackTrace) => SliverFillRemaining(
                               child: Center(child: Text("Error loading feed")),
@@ -372,7 +373,7 @@ class ProfileSearchDelegate extends SearchDelegate<Friend?> {
       future: ref.read(friendProvider.notifier).searchUsers(query),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator());
+          return const Center(child: GBLoadingIndicator());
         }
         if (snapshot.hasError) {
           return Center(child: Text("Error: ${snapshot.error}"));

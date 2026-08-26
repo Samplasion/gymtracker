@@ -171,7 +171,7 @@ class _BackupListViewState
             }
 
             if (!snapshot.hasData) {
-              return _s(const Center(child: CircularProgressIndicator()));
+              return _s(const Center(child: GBLoadingIndicator()));
             }
 
             final backups = snapshot.data!;

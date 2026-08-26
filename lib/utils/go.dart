@@ -6,6 +6,7 @@ import 'package:get/get.dart';
 import 'package:gymtracker/icons/gymtracker_icons.dart';
 import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/service/logger.dart';
+import 'package:gymtracker/view/components/loading_indicator.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 
 class Go {
@@ -646,7 +647,7 @@ class Go {
                     if (snapshot.connectionState ==
                         ConnectionState.waiting) ...[
                       const SizedBox(height: 16),
-                      const CircularProgressIndicator(),
+                      const GBLoadingIndicator(),
                     ],
                   ],
                 ),

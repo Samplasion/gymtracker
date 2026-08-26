@@ -6,6 +6,7 @@ import 'package:gymtracker/gen/assets.gen.dart';
 import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/utils/constants.dart';
 import 'package:gymtracker/utils/extensions.dart';
+import 'package:gymtracker/view/components/loading_indicator.dart';
 import 'package:markdown_widget/markdown_widget.dart';
 
 enum LegalType { tos, privacy }
@@ -83,7 +84,7 @@ class _LegalViewerPageState extends State<_LegalViewerPage> {
               ),
             );
           }
-          return const Center(child: CircularProgressIndicator());
+          return const Center(child: GBLoadingIndicator());
         },
       ),
     );

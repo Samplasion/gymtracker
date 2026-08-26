@@ -6,6 +6,7 @@ import 'package:gymtracker/provider/friend.dart';
 import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/view/components/content_unavailable.dart';
+import 'package:gymtracker/view/components/loading_indicator.dart';
 import 'package:gymtracker/view/user_profile.dart';
 import 'package:gymtracker/view/utils/social.dart';
 
@@ -17,9 +18,7 @@ class FriendRequestsPage extends ConsumerWidget {
     final friendStateAsync = ref.watch(friendProvider);
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text("friendRequests.title".t),
-      ),
+      appBar: AppBar(title: Text("friendRequests.title".t)),
       body: friendStateAsync.when(
         data: (friendState) {
           final requests = friendState.pendingReceived;
@@ -46,7 +45,7 @@ class FriendRequestsPage extends ConsumerWidget {
             ),
           );
         },
-        loading: () => const Center(child: CircularProgressIndicator()),
+        loading: () => const Center(child: GBLoadingIndicator()),
         error: (error, _) => Center(child: Text("Error: $error")),
       ),
     );

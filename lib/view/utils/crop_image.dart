@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:gymtracker/icons/gymtracker_icons.dart';
 import 'package:gymtracker/service/localizations.dart';
+import 'package:gymtracker/view/components/loading_indicator.dart';
 
 class CropImagePage extends StatefulWidget {
   final Uint8List imageBytes;
@@ -51,7 +52,8 @@ class _CropImagePageState extends State<CropImagePage> {
   }
 
   void _reset() {
-    if (_renderedWidth == null || _renderedHeight == null || _cropRect == null) return;
+    if (_renderedWidth == null || _renderedHeight == null || _cropRect == null)
+      return;
 
     final double minScaleX = _cropRect!.width / _renderedWidth!;
     final double minScaleY = _cropRect!.height / _renderedHeight!;
@@ -71,10 +73,19 @@ class _CropImagePageState extends State<CropImagePage> {
 
   bool _isClamping = false;
   void _onTransformChanged() {
-    if (_isClamping || _renderedWidth == null || _renderedHeight == null || _cropRect == null) return;
+    if (_isClamping ||
+        _renderedWidth == null ||
+        _renderedHeight == null ||
+        _cropRect == null)
+      return;
 
     final matrix = _transformationController.value;
-    final clamped = _clampTransform(matrix, _renderedWidth!, _renderedHeight!, _cropRect!);
+    final clamped = _clampTransform(
+      matrix,
+      _renderedWidth!,
+      _renderedHeight!,
+      _cropRect!,
+    );
 
     if (matrix != clamped) {
       _isClamping = true;
@@ -83,7 +94,12 @@ class _CropImagePageState extends State<CropImagePage> {
     }
   }
 
-  Matrix4 _clampTransform(Matrix4 matrix, double renderedWidth, double renderedHeight, Rect cropRect) {
+  Matrix4 _clampTransform(
+    Matrix4 matrix,
+    double renderedWidth,
+    double renderedHeight,
+    Rect cropRect,
+  ) {
     final double scale = matrix.entry(0, 0);
 
     final double minScaleX = cropRect.width / renderedWidth;
@@ -193,7 +209,7 @@ class _CropImagePageState extends State<CropImagePage> {
           ],
         ),
         body: _decodedImage == null
-            ? const Center(child: CircularProgressIndicator())
+            ? const Center(child: GBLoadingIndicator())
             : LayoutBuilder(
                 builder: (context, constraints) {
                   final double screenWidth = constraints.maxWidth;
@@ -255,8 +271,9 @@ class _CropImagePageState extends State<CropImagePage> {
                             transformationController: _transformationController,
                             minScale: minScale,
                             maxScale: 10.0,
-                            boundaryMargin:
-                                const EdgeInsets.all(double.infinity),
+                            boundaryMargin: const EdgeInsets.all(
+                              double.infinity,
+                            ),
                             child: Align(
                               alignment: Alignment.topLeft,
                               child: SizedBox(
@@ -278,60 +295,68 @@ class _CropImagePageState extends State<CropImagePage> {
                           ),
                         ),
                       ),
-                Positioned(
-                  bottom: 32,
-                  left: 0,
-                  right: 0,
-                  child: Center(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          "userProfile.edit.cropInstructions".t,
-                          style: const TextStyle(
-                            color: Colors.white70,
-                            fontSize: 14,
+                      Positioned(
+                        bottom: 32,
+                        left: 0,
+                        right: 0,
+                        child: Center(
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                "userProfile.edit.cropInstructions".t,
+                                style: const TextStyle(
+                                  color: Colors.white70,
+                                  fontSize: 14,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                              const SizedBox(height: 24),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceEvenly,
+                                children: [
+                                  OutlinedButton(
+                                    style: OutlinedButton.styleFrom(
+                                      foregroundColor: Colors.white,
+                                      side: const BorderSide(
+                                        color: Colors.white30,
+                                      ),
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 24,
+                                        vertical: 12,
+                                      ),
+                                    ),
+                                    onPressed: () =>
+                                        Navigator.of(context).pop(),
+                                    child: Text(
+                                      "userProfile.crop.buttons.cancel".t,
+                                    ),
+                                  ),
+                                  FilledButton(
+                                    style: FilledButton.styleFrom(
+                                      backgroundColor: Colors.white,
+                                      foregroundColor: Colors.black,
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 32,
+                                        vertical: 12,
+                                      ),
+                                    ),
+                                    onPressed: () => _cropImage(cropRect),
+                                    child: Text(
+                                      "userProfile.crop.buttons.confirm".t,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
                           ),
-                          textAlign: TextAlign.center,
                         ),
-                        const SizedBox(height: 24),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: [
-                            OutlinedButton(
-                              style: OutlinedButton.styleFrom(
-                                foregroundColor: Colors.white,
-                                side: const BorderSide(color: Colors.white30),
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 24,
-                                  vertical: 12,
-                                ),
-                              ),
-                              onPressed: () => Navigator.of(context).pop(),
-                              child: Text("userProfile.crop.buttons.cancel".t),
-                            ),
-                            FilledButton(
-                              style: FilledButton.styleFrom(
-                                backgroundColor: Colors.white,
-                                foregroundColor: Colors.black,
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 32,
-                                  vertical: 12,
-                                ),
-                              ),
-                              onPressed: () => _cropImage(cropRect),
-                              child: Text("userProfile.crop.buttons.confirm".t),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            );
-          },
-        ),
+                      ),
+                    ],
+                  );
+                },
+              ),
       ),
     );
   }

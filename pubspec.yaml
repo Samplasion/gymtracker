@@ -89,6 +89,7 @@ dependencies:
   soft_edge_blur: ^0.1.3
   syncable: ^1.0.3
   online_offline: ^1.0.1
+  lottie: ^3.5.1
   
 dev_dependencies:
   sentry_dart_plugin: ^3.4.0
@@ -121,6 +122,8 @@ flutter_gen:
       - assets/color/colors.xml
     outputs:
         class_name: GTColors
+  integrations:
+    lottie: true
 
 flutter:
   fonts:
@@ -130,6 +133,7 @@ flutter:
 
   uses-material-design: true
   assets:
+    - assets/anim/
     - assets/audio/
     - assets/i18n/
     - assets/svg/

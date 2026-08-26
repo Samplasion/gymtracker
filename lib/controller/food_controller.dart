@@ -26,6 +26,7 @@ import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/utils/utils.dart' as utils show stringifyDouble;
 import 'package:gymtracker/utils/utils.dart';
+import 'package:gymtracker/view/components/loading_indicator.dart';
 import 'package:gymtracker/view/food.dart';
 import 'package:gymtracker/view/utils/date_picker.dart';
 import 'package:intl/intl.dart';
@@ -435,7 +436,7 @@ class FoodController extends GetxController with ServiceableController {
       barrierDismissible: false,
       builder: (context) => const material.PopScope(
         canPop: false,
-        child: material.Center(child: material.CircularProgressIndicator()),
+        child: material.Center(child: GBLoadingIndicator()),
       ),
     );
 

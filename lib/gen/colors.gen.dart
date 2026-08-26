@@ -1,4 +1,3 @@
-// dart format width=80
 /// GENERATED CODE - DO NOT MODIFY BY HAND
 /// *****************************************************
 ///  FlutterGen
@@ -6,12 +5,14 @@
 
 // coverage:ignore-file
 // ignore_for_file: type=lint
-// ignore_for_file: deprecated_member_use,directives_ordering,implicit_dynamic_list_literal,unnecessary_import
+// ignore_for_file: directives_ordering,unnecessary_import,implicit_dynamic_list_literal,deprecated_member_use
 
 import 'package:flutter/painting.dart';
 import 'package:flutter/material.dart';
 
-abstract final class GTColors {
+class GTColors {
+  GTColors._();
+
   /// MaterialColor:
   ///   50: #FFF3E0FF
   ///   100: #FFE2B3FF
@@ -34,6 +35,30 @@ abstract final class GTColors {
     700: Color(0xFF8B00FF),
     800: Color(0xFF8100FF),
     900: Color(0xFF6F00FF),
+  });
+
+  /// MaterialColor:
+  ///   50: #FFE2E9F4
+  ///   100: #FFB6C8E3
+  ///   200: #FF86A3D0
+  ///   300: #FF567EBD
+  ///   400: #FF3163AF
+  ///   500: #FF0D47A1
+  ///   600: #FF0B4099
+  ///   700: #FF09378F
+  ///   800: #FF072F85
+  ///   900: #FF032074
+  static const MaterialColor appIcon = MaterialColor(0xFF0D47A1, <int, Color>{
+    50: Color(0xFFE2E9F4),
+    100: Color(0xFFB6C8E3),
+    200: Color(0xFF86A3D0),
+    300: Color(0xFF567EBD),
+    400: Color(0xFF3163AF),
+    500: Color(0xFF0D47A1),
+    600: Color(0xFF0B4099),
+    700: Color(0xFF09378F),
+    800: Color(0xFF072F85),
+    900: Color(0xFF032074),
   });
 
   /// MaterialColor:

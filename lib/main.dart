@@ -58,6 +58,7 @@ class MyHttpOverrides extends HttpOverrides {
 
 // TODO: Move ProviderContainer back inside the widget tree once Getx is fully migrated.
 late final ProviderContainer globalContainer;
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 void main() async {
   if (kDebugMode) {
@@ -168,6 +169,8 @@ FutureOr<void> _sentryInit(SentryFlutterOptions options) {
     }
     return log;
   };
+
+  options.navigatorKey = navigatorKey;
 }
 
 const applicationKey = Key("GymTracker");
@@ -310,7 +313,11 @@ class _MainAppState extends State<MainApp> with LoggerConfigurationMixin {
                           logger.t(text);
                         }
                       },
-                      navigatorObservers: [LoggerNavigationObserver()],
+                      navigatorObservers: [
+                        LoggerNavigationObserver(),
+                        SentryNavigatorObserver(),
+                      ],
+                      navigatorKey: navigatorKey,
                     );
                   },
                 );

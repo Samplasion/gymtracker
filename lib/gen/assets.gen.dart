@@ -1,3 +1,5 @@
+// dart format width=80
+
 /// GENERATED CODE - DO NOT MODIFY BY HAND
 /// *****************************************************
 ///  FlutterGen
@@ -5,7 +7,7 @@
 
 // coverage:ignore-file
 // ignore_for_file: type=lint
-// ignore_for_file: directives_ordering,unnecessary_import,implicit_dynamic_list_literal,deprecated_member_use
+// ignore_for_file: deprecated_member_use,directives_ordering,implicit_dynamic_list_literal,unnecessary_import
 
 import 'package:flutter/widgets.dart';
 import 'package:lottie/lottie.dart' as _lottie;
@@ -1135,9 +1137,7 @@ class $AssetsExercisesTricepsTricepsRopePushdownGen {
   List<String> get values => [en, it];
 }
 
-class GTAssets {
-  const GTAssets._();
-
+abstract final class GTAssets {
   static const $AssetsAnimGen anim = $AssetsAnimGen();
   static const $AssetsAudioGen audio = $AssetsAudioGen();
   static const $AssetsExercisesGen exercises = $AssetsExercisesGen();

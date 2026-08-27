@@ -4,17 +4,14 @@ import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/scheduler.dart';
-import 'package:flutter/widgets.dart';
 import 'package:gymtracker/controller/coordinator.dart';
-import 'package:gymtracker/main.dart';
 import 'package:gymtracker/model/subscription.dart';
 import 'package:gymtracker/service/env.dart';
-import 'package:gymtracker/provider/events.dart';
 import 'package:gymtracker/service/logger.dart';
-import 'package:purchases_flutter/purchases_flutter.dart' hide LogLevel;
 import 'package:purchases_flutter/purchases_flutter.dart'
     as revenuecat
     show LogLevel;
+import 'package:purchases_flutter/purchases_flutter.dart' hide LogLevel;
 import 'package:purchases_ui_flutter/purchases_ui_flutter.dart';
 import 'package:rxdart/rxdart.dart';
 
@@ -60,7 +57,9 @@ class PurchasesService {
       return;
     }
 
-    await Purchases.setLogLevel(revenuecat.LogLevel.verbose);
+    await Purchases.setLogLevel(
+      kDebugMode ? revenuecat.LogLevel.verbose : revenuecat.LogLevel.warn,
+    );
 
     PurchasesConfiguration configuration;
     if (Platform.isAndroid) {

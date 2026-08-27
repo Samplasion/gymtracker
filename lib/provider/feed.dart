@@ -131,10 +131,14 @@ class Feed extends _$Feed {
 
   Future<void> fetchMore() async {
     if (!_hasMore || _isLoadingMore) return;
-    final isConnected = ref.read(networkConnectivityProvider).value ?? false;
-    if (!isConnected) return;
-
     _isLoadingMore = true;
+    final isConnected = (await ref.read(networkConnectivityProvider.future));
+    if (!isConnected) {
+      _isLoadingMore = false;
+      _hasMore = false;
+      return;
+    }
+
     state = state;
     try {
       final updatedItems = await _fetchPage(isConnected);

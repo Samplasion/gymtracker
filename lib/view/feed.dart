@@ -300,90 +300,109 @@ class _FeedViewState extends ConsumerState<FeedView> {
                         ),
                       ),
                     ),
+                    const SliverToBoxAdapter(child: SizedBox(height: 8)),
+                    const SliverBottomSafeArea(),
                   ] else ...[
-                    SliverToBoxAdapter(
-                      child: Stack(
-                        children: [
-                          Positioned.fill(
-                            child: DecoratedBox(
-                              decoration: BoxDecoration(
-                                gradient: LinearGradient(
-                                  colors: [
-                                    Theme.of(context).scaffoldBackgroundColor,
-                                    Theme.of(
-                                      context,
-                                    ).colorScheme.secondaryContainer,
-                                  ],
-                                  stops: const [0.2, 1],
-                                  begin: Alignment.topCenter,
-                                  end: Alignment.bottomCenter,
-                                ),
-                              ),
-                              child: SizedBox.expand(),
-                            ),
+                    SliverFillRemaining(
+                      hasScrollBody: false,
+                      child: Align(
+                        alignment: Alignment.bottomCenter,
+                        child: Padding(
+                          padding: EdgeInsets.only(
+                            bottom:
+                                MediaQuery.of(context).padding.bottom -
+                                MediaQuery.of(context).viewPadding.bottom,
                           ),
-                          Positioned.fill(
-                            child: IconGrid(
-                              bigScale: 2,
-                              child: CircleAvatar(
-                                backgroundColor: Theme.of(
-                                  context,
-                                ).colorScheme.outlineVariant,
-                                foregroundColor: Theme.of(
-                                  context,
-                                ).colorScheme.onSurfaceVariant,
-                                child: const Icon(GTIcons.app_icon),
-                              ),
-                            ),
-                          ),
-                          Positioned.fill(
-                            child: DecoratedBox(
-                              decoration: BoxDecoration(
-                                gradient: LinearGradient(
-                                  colors: [
-                                    Theme.of(context).scaffoldBackgroundColor,
-                                    Theme.of(context)
-                                        .colorScheme
-                                        .secondaryContainer
-                                        .withAlpha(128),
-                                    Theme.of(context)
-                                        .colorScheme
-                                        .secondaryContainer
-                                        .withAlpha(0),
-                                  ],
-                                  stops: const [0, 0.7, 1],
-                                  begin: Alignment.topCenter,
-                                  end: Alignment.bottomCenter,
-                                ),
-                              ),
-                              child: SizedBox.expand(),
-                            ),
-                          ),
-                          SizedBox(
+                          child: SizedBox(
                             height: 150,
-                            child: Padding(
-                              padding: const EdgeInsets.all(16.0),
-                              child: Center(
-                                child: Text(
-                                  "feed.noMoreData".t,
-                                  style: Theme.of(context).textTheme.bodySmall
-                                      ?.copyWith(
-                                        color: Theme.of(
-                                          context,
-                                        ).colorScheme.onSecondaryContainer,
+                            child: Stack(
+                              children: [
+                                Positioned.fill(
+                                  child: DecoratedBox(
+                                    decoration: BoxDecoration(
+                                      gradient: LinearGradient(
+                                        colors: [
+                                          Theme.of(
+                                            context,
+                                          ).scaffoldBackgroundColor,
+                                          Theme.of(context)
+                                              .colorScheme
+                                              .secondaryContainer
+                                              .withAlpha(192),
+                                        ],
+                                        stops: const [0.2, 1],
+                                        begin: Alignment.topCenter,
+                                        end: Alignment.bottomCenter,
                                       ),
+                                    ),
+                                    child: SizedBox.expand(),
+                                  ),
                                 ),
-                              ),
+                                Positioned.fill(
+                                  child: IconGrid(
+                                    bigScale: 2,
+                                    child: CircleAvatar(
+                                      backgroundColor: Theme.of(
+                                        context,
+                                      ).colorScheme.outlineVariant,
+                                      foregroundColor: Theme.of(
+                                        context,
+                                      ).colorScheme.onSurfaceVariant,
+                                      child: const Icon(GTIcons.app_icon),
+                                    ),
+                                  ),
+                                ),
+                                Positioned.fill(
+                                  child: DecoratedBox(
+                                    decoration: BoxDecoration(
+                                      gradient: LinearGradient(
+                                        colors: [
+                                          Theme.of(
+                                            context,
+                                          ).scaffoldBackgroundColor,
+                                          Theme.of(context)
+                                              .colorScheme
+                                              .secondaryContainer
+                                              .withAlpha(128),
+                                          Theme.of(context)
+                                              .colorScheme
+                                              .secondaryContainer
+                                              .withAlpha(192),
+                                        ],
+                                        stops: const [0, 0.7, 1],
+                                        begin: Alignment.topCenter,
+                                        end: Alignment.bottomCenter,
+                                      ),
+                                    ),
+                                    child: SizedBox.expand(),
+                                  ),
+                                ),
+                                SizedBox(
+                                  height: 150,
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(16.0),
+                                    child: Center(
+                                      child: Text(
+                                        "feed.noMoreData".t,
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .bodySmall
+                                            ?.copyWith(
+                                              color: Theme.of(context)
+                                                  .colorScheme
+                                                  .onSecondaryContainer,
+                                            ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
-                        ],
+                        ),
                       ),
                     ),
                   ],
-                  if (feedNotifier.hasMore) ...[
-                    const SliverToBoxAdapter(child: SizedBox(height: 8)),
-                  ],
-                  const SliverBottomSafeArea(),
                 ],
               ),
             );

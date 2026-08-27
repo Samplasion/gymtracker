@@ -1344,6 +1344,10 @@
       "threeMonths": "3 mesi",
       "sixMonths": "6 mesi",
       "oneYear": "1 anno"
+    },
+    "noData": {
+      "title": "Questo grafico non presenta dati",
+      "subtitle": "Avvia qualche allenamento per vedere questi dati."
     }
   },
   "androidRequestExactAlarmsPermission": {

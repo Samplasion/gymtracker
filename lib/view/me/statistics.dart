@@ -297,7 +297,7 @@ class _MeStatisticsPageState
 }
 
 class _BigThreeStatsTab extends StatelessWidget {
-  const _BigThreeStatsTab({super.key});
+  const _BigThreeStatsTab();
 
   @override
   Widget build(BuildContext context) {
@@ -350,7 +350,7 @@ class _StatsMainLiftsChart extends ConsumerWidget {
   /// Each point on the chart represents the heaviest set of that lift for that
   /// week. If there are no sets for a lift on a given week, that lift will not
   /// have a point for that week.
-  const _StatsMainLiftsChart({super.key});
+  const _StatsMainLiftsChart();
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {

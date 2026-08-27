@@ -100,6 +100,9 @@ class LineChartTimeSeries<T> extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (data.isEmpty || data.entries.every((entry) => entry.value.isEmpty)) {
+      return _EmptyChartTimeSeries();
+    }
     if (concurrent) {
       return _LineChartTimeSeriesConcurrent<T>(
         categories: categories,
@@ -1381,6 +1384,120 @@ class __LineChartTimeSeriesConcurrentState<T>
               ),
             ),
         ],
+      ],
+    );
+  }
+}
+
+class _EmptyChartTimeSeries extends StatelessWidget {
+  const _EmptyChartTimeSeries();
+
+  @override
+  Widget build(BuildContext context) {
+    // THis is a nice curve I found on Desmos
+    f(double x) =>
+        pow(x, 6) - 8 * pow(x, 3) - 3 * pow(x, 2) + 6 * x + pow(x, 7) + 7;
+    g(double x) => f(x / 2 - 2) / 3;
+
+    final colorScheme = Theme.of(context).colorScheme;
+    return Stack(
+      alignment: .center,
+      children: [
+        ConstrainedBox(
+          constraints: BoxConstraints.loose(const Size.fromHeight(300)),
+          child: LineChart(
+            LineChartData(
+              clipData: const FlClipData.all(),
+              gridData: FlGridData(
+                show: true,
+                drawVerticalLine: true,
+                verticalInterval: const Duration(days: 1).inMinutes.toDouble(),
+                checkToShowVerticalLine: (value) {
+                  final date = DateTime.fromMillisecondsSinceEpoch(
+                    value.toInt() * 60000,
+                  );
+                  return date.day == 1;
+                },
+                getDrawingHorizontalLine: (value) {
+                  return FlLine(
+                    color: colorScheme.outlineVariant,
+                    strokeWidth: 1,
+                  );
+                },
+                getDrawingVerticalLine: (value) {
+                  return FlLine(
+                    color: colorScheme.outlineVariant,
+                    strokeWidth: 1,
+                  );
+                },
+              ),
+              titlesData: FlTitlesData(show: false),
+              borderData: FlBorderData(
+                border: Border.all(color: colorScheme.outline),
+              ),
+              showingTooltipIndicators: [],
+              lineTouchData: LineTouchData(
+                touchSpotThreshold: 10000,
+                enabled: false,
+              ),
+              lineBarsData: [
+                LineChartBarData(
+                  dotData: const FlDotData(show: false),
+                  isCurved: true,
+                  preventCurveOverShooting: false,
+                  spots: [
+                    for (double i = 0; i < 7.75; i += 0.25) FlSpot(i, g(i)),
+                  ],
+                  curveSmoothness: 0.4,
+                  barWidth: 3,
+                  isStrokeCapRound: true,
+                  color: colorScheme.primary,
+                  belowBarData: BarAreaData(
+                    show: true,
+                    spotsLine: BarAreaSpotsLine(
+                      show: false,
+                      flLineStyle: FlLine(strokeWidth: 1),
+                    ),
+                    color: colorScheme.primary.withAlpha((0.3 * 255).round()),
+                  ),
+                ),
+              ],
+            ),
+            duration: .zero,
+            curve: Curves.linearToEaseOut,
+          ),
+        ),
+
+        Positioned.fill(
+          child: Container(
+            color: colorScheme.surface.withAlpha((0.5 * 255).round()),
+          ),
+        ),
+
+        Card.outlined(
+          margin: .symmetric(horizontal: 16),
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              mainAxisAlignment: .center,
+              crossAxisAlignment: .center,
+              children: [
+                Text(
+                  "timeSeriesChart.noData.title".t,
+                  style: context.textTheme.bodyLarge?.copyWith(
+                    color: colorScheme.onSurfaceVariant,
+                  ),
+                ),
+                Text(
+                  "timeSeriesChart.noData.subtitle".t,
+                  style: context.textTheme.bodyMedium?.copyWith(
+                    color: colorScheme.onSurfaceVariant,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
       ],
     );
   }

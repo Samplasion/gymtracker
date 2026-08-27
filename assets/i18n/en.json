@@ -1350,6 +1350,10 @@
       "threeMonths": "3 months",
       "sixMonths": "6 months",
       "oneYear": "1 year"
+    },
+    "noData": {
+      "title": "This chart contains no data",
+      "subtitle": "Start some workouts to see this data"
     }
   },
   "androidRequestExactAlarmsPermission": {

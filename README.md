@@ -45,6 +45,14 @@ Finally, run the following command to generate a new step for the SQL migrator:
 dart run drift_dev schema steps drift_schemas/ lib/db/schema_versions.dart
 ```
 
+### Running code generation
+
+To correctly generate code for the project, run the following command:
+
+```bash
+dart run build_runner build && dart run pigeon --input lib/native_channels.dart
+```
+
 ### Running tests
 
 You can run the tests with the following command:

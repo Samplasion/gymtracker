@@ -105,6 +105,12 @@ class ErrorController extends GetxController {
         "Connection terminated during handshake",
       ].any((string) => error.message.contains(string));
     }
+    // Sometimes Flutter + riverpod is just quirky like that
+    if (error.toString().contains(
+      "setState() or markNeedsBuild() called during build",
+    )) {
+      return true;
+    }
     return false;
   }
 }

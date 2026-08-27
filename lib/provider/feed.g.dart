@@ -152,7 +152,7 @@ final class FeedProvider extends $AsyncNotifierProvider<Feed, List<FeedItem>> {
   Feed create() => Feed();
 }
 
-String _$feedHash() => r'f46c23432a554a51c916acb9c1622497d739ec1b';
+String _$feedHash() => r'dbdede26cd399d6a868b33cda0a7d0dd2766cc51';
 
 abstract class _$Feed extends $AsyncNotifier<List<FeedItem>> {
   FutureOr<List<FeedItem>> build();

@@ -16,7 +16,7 @@ class PermissionsSettingsPane extends ControlledWidget<SettingsController> {
             SliverList(
               delegate: SliverChildListDelegate([
                 Get.find<NotificationController>().settingsTile,
-                Get.find<FoodController>().settingsTile,
+                const FoodPermissionsSettingsTile(),
                 Get.find<HealthController>().settingsTile,
               ]),
             ),
@@ -25,6 +25,46 @@ class PermissionsSettingsPane extends ControlledWidget<SettingsController> {
           ],
         ),
       ),
+    );
+  }
+}
+
+class FoodPermissionsSettingsTile extends ConsumerWidget {
+  const FoodPermissionsSettingsTile({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final show = ref.watch(showFoodPermissionsSettingsTileProvider);
+    if (!show) return const SizedBox.shrink();
+
+    final perms = ref.watch(foodPermissionsProvider).asData?.value ??
+        (camera: false, gallery: false);
+
+    return Column(
+      children: [
+        if (!perms.camera)
+          ListTile(
+            leading: const Icon(GTIcons.camera),
+            title: Text("food.addCustomFood.permission.camera".t),
+            subtitle: Text("settings.permissions.tapToRequest".t),
+            onTap: () {
+              ref
+                  .read(foodPermissionsProvider.notifier)
+                  .requestPermission(Permission.camera);
+            },
+          ),
+        if (!perms.gallery)
+          ListTile(
+            leading: const Icon(GTIcons.gallery),
+            title: Text("food.addCustomFood.permission.gallery".t),
+            subtitle: Text("settings.permissions.tapToRequest".t),
+            onTap: () {
+              ref
+                  .read(foodPermissionsProvider.notifier)
+                  .requestPermission(Permission.photos);
+            },
+          ),
+      ],
     );
   }
 }

@@ -1,24 +1,37 @@
 part of 'food.dart';
 
-class ChangeGoalScreen extends StatefulWidget {
+class ChangeGoalScreen extends ConsumerStatefulWidget {
   const ChangeGoalScreen({super.key});
 
   @override
-  State<ChangeGoalScreen> createState() => _ChangeGoalScreenState();
+  ConsumerState<ChangeGoalScreen> createState() => _ChangeGoalScreenState();
 }
 
-class _ChangeGoalScreenState
-    extends ControlledState<ChangeGoalScreen, FoodController> {
+class _ChangeGoalScreenState extends ConsumerState<ChangeGoalScreen> {
   final _formKey = GlobalKey<FormState>();
-  late final _oldGoal = controller.getGoal();
-  late final _dailyCaloriesController = TextEditingController(
-      text: controller.stringifyDouble(_oldGoal.dailyCalories));
-  late final _fatPercentageController = TextEditingController(
-      text: controller.stringifyDouble(_oldGoal.fatPercentage));
-  late final _carbsPercentageController = TextEditingController(
-      text: controller.stringifyDouble(_oldGoal.carbsPercentage));
-  late final _proteinPercentageController = TextEditingController(
-      text: controller.stringifyDouble(_oldGoal.proteinPercentage));
+  late final TextEditingController _dailyCaloriesController;
+  late final TextEditingController _fatPercentageController;
+  late final TextEditingController _carbsPercentageController;
+  late final TextEditingController _proteinPercentageController;
+
+  @override
+  void initState() {
+    super.initState();
+    final oldGoal = ref.read(nutritionGoalForSelectedDateProvider);
+    final decimalSep = NumberFormat.decimalPattern(Get.locale?.languageCode).symbols.DECIMAL_SEP;
+    _dailyCaloriesController = TextEditingController(
+      text: stringifyDouble(oldGoal.dailyCalories, decimalSeparator: decimalSep),
+    );
+    _fatPercentageController = TextEditingController(
+      text: stringifyDouble(oldGoal.fatPercentage, decimalSeparator: decimalSep),
+    );
+    _carbsPercentageController = TextEditingController(
+      text: stringifyDouble(oldGoal.carbsPercentage, decimalSeparator: decimalSep),
+    );
+    _proteinPercentageController = TextEditingController(
+      text: stringifyDouble(oldGoal.proteinPercentage, decimalSeparator: decimalSep),
+    );
+  }
 
   @override
   void dispose() {
@@ -29,16 +42,12 @@ class _ChangeGoalScreenState
     super.dispose();
   }
 
-  // The controller updates the date when the user presses the arrows in the
-  // home page. Since we're in a different screen, we can memoize it.
-  late final effectRange = controller.getDateRange();
   Widget _buildEffectText() {
-    final fx = effectRange;
+    final fx = ref.watch(nutritionGoalDateRangeProvider);
     if (fx == null) {
       return const SizedBox();
     }
     String s;
-    // (fx.from can't be null)
     String fmt(DateTime d) => DateFormat.yMd().format(d);
     if (fx.to == null) {
       s = "food.nutritionGoal.effect.from".tParams({
@@ -63,7 +72,7 @@ class _ChangeGoalScreenState
           icon: const Icon(GTIcons.history),
           tooltip: "food.nutritionGoals.history.title".t,
           onPressed: () {
-            controller.showGoalHistory();
+            showGoalHistory(context);
           },
         ),
       ]),
@@ -203,14 +212,13 @@ class _ChangeGoalScreenState
         proteinPercentage: proteinPercentage,
       );
 
-      controller.saveNewGoal(newGoal);
+      ref.read(nutritionGoalProvider.notifier).saveNewGoal(newGoal);
 
       Get.back();
     }
   }
 
   Widget _buildSumText(double f, double c, double p) {
-    // High epsilon, I know
     if (doubleEquality(100, f + c + p, epsilon: 1.5)) return const SizedBox();
 
     final terms = [f, c, p]
@@ -234,77 +242,75 @@ class _ChangeGoalScreenState
   }
 }
 
-class GoalHistoryView extends ControlledWidget<FoodController> {
+class GoalHistoryView extends ConsumerWidget {
   const GoalHistoryView({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final goalsSeq = ref.watch(nutritionGoalsStreamProvider).asData?.value ??
+        DateSequence<NutritionGoal>.fromList([]);
+    final keys = goalsSeq.keys.toList();
+
     return Scaffold(
-      body: StreamBuilder(
-        stream: controller.goals$,
-        initialData: DateSequence<NutritionGoal>.fromList([]),
-        builder: (BuildContext context,
-            AsyncSnapshot<DateSequence<NutritionGoal>> snapshot) {
-          final keys = snapshot.data?.keys.toList() ?? [];
-          return CustomScrollView(
-            slivers: [
-              SliverAppBar(
-                title: Text("food.nutritionGoals.history.title".t),
-                pinned: true,
+      body: CustomScrollView(
+        slivers: [
+          SliverAppBar(
+            title: Text("food.nutritionGoals.history.title".t),
+            pinned: true,
+          ),
+          if (keys.isEmpty)
+            SliverFillRemaining(
+              child: Center(
+                child: Text("food.nutritionGoals.history.empty".t),
               ),
-              // This should never occur, but just in case
-              if (keys.isEmpty)
-                SliverFillRemaining(
-                  child: Center(
-                    child: Text("food.nutritionGoals.history.empty".t),
-                  ),
-                )
-              else
-                SliverList(
-                  delegate: SliverChildBuilderDelegate(
-                    (context, index) {
-                      final goal = snapshot.data![keys[index]];
-                      return ListTile(
-                        title: Text(
-                            "food.nutritionGoals.history.calories".tParams({
-                          "calories": NutritionUnit.KCAL
-                              .formatAmount(goal.dailyCalories),
-                        })),
-                        subtitle: Text.rich(TextSpan(children: [
-                          TextSpan(
-                              text:
-                                  "${controller.formatDate(keys[index])} \u2013 ${"food.nutritionGoals.history.tapToView".t}"),
-                          const TextSpan(text: "\n"),
-                          TextSpan(
-                            text: "food.nutritionGoals.history.macros".tParams({
-                              "fat": NumberFormat.decimalPercentPattern(
-                                      locale: Get.locale?.languageCode,
-                                      decimalDigits: 2)
-                                  .format(goal.fatPercentage / 100),
-                              "carbs": NumberFormat.decimalPercentPattern(
-                                      locale: Get.locale?.languageCode,
-                                      decimalDigits: 2)
-                                  .format(goal.carbsPercentage / 100),
-                              "protein": NumberFormat.decimalPercentPattern(
-                                      locale: Get.locale?.languageCode,
-                                      decimalDigits: 2)
-                                  .format(goal.proteinPercentage / 100),
-                            }),
-                          ),
-                        ])),
-                        trailing: const Icon(GTIcons.lt_chevron),
-                        onTap: () {
-                          controller.setDate(keys[index]);
-                          Go.popUntil((route) => route.isFirst);
-                        },
-                      );
+            )
+          else
+            SliverList(
+              delegate: SliverChildBuilderDelegate(
+                (context, index) {
+                  final key = keys[index];
+                  final goal = goalsSeq[key];
+                  final formattedDate =
+                      DateFormat.yMEd(Get.locale?.languageCode).format(key);
+                  return ListTile(
+                    title: Text(
+                        "food.nutritionGoals.history.calories".tParams({
+                      "calories": NutritionUnit.KCAL
+                          .formatAmount(goal.dailyCalories),
+                    })),
+                    subtitle: Text.rich(TextSpan(children: [
+                      TextSpan(
+                          text:
+                              "$formattedDate \u2013 ${"food.nutritionGoals.history.tapToView".t}"),
+                      const TextSpan(text: "\n"),
+                      TextSpan(
+                        text: "food.nutritionGoals.history.macros".tParams({
+                          "fat": NumberFormat.decimalPercentPattern(
+                                  locale: Get.locale?.languageCode,
+                                  decimalDigits: 2)
+                              .format(goal.fatPercentage / 100),
+                          "carbs": NumberFormat.decimalPercentPattern(
+                                  locale: Get.locale?.languageCode,
+                                  decimalDigits: 2)
+                              .format(goal.carbsPercentage / 100),
+                          "protein": NumberFormat.decimalPercentPattern(
+                                  locale: Get.locale?.languageCode,
+                                  decimalDigits: 2)
+                              .format(goal.proteinPercentage / 100),
+                        }),
+                      ),
+                    ])),
+                    trailing: const Icon(GTIcons.lt_chevron),
+                    onTap: () {
+                      ref.read(foodSelectedDateProvider.notifier).setDate(key);
+                      Go.popUntil((route) => route.isFirst);
                     },
-                    childCount: snapshot.data!.length,
-                  ),
-                ),
-            ],
-          );
-        },
+                  );
+                },
+                childCount: keys.length,
+              ),
+            ),
+        ],
       ),
     );
   }

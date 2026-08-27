@@ -106,16 +106,10 @@ class ServingSize {
   final String? name;
   final double amount;
 
-  const ServingSize({
-    this.name,
-    required this.amount,
-  });
+  const ServingSize({this.name, required this.amount});
 
   factory ServingSize.fromJson(Map<String, dynamic> json) {
-    return ServingSize(
-      name: json['name'],
-      amount: json['amount'],
-    );
+    return ServingSize(name: json['name'], amount: json['amount']);
   }
 
   @override
@@ -132,10 +126,7 @@ class ServingSize {
   int get hashCode => name.hashCode ^ amount.hashCode;
 
   Map<String, dynamic> toJson() {
-    return {
-      'name': name,
-      'amount': amount,
-    };
+    return {'name': name, 'amount': amount};
   }
 }
 
@@ -156,15 +147,18 @@ class VagueFood {
     this.isDownloaded = false,
     this.barcode,
     this.unit = NutritionUnit.G,
-  }) : assert(unit == NutritionUnit.G || unit == NutritionUnit.MILLI_L,
-            'Invalid unit $unit (only G and MILLI_L are allowed)');
+  }) : assert(
+         unit == NutritionUnit.G || unit == NutritionUnit.MILLI_L,
+         'Invalid unit $unit (only G and MILLI_L are allowed)',
+       );
 
   factory VagueFood.fromJson(Map<String, dynamic> json) {
     return VagueFood(
       name: json['name'],
       brand: json['brand'],
-      nutritionalValuesPer100g:
-          NutritionValues.fromJson(json['nutritionalValuesPer100g']),
+      nutritionalValuesPer100g: NutritionValues.fromJson(
+        json['nutritionalValuesPer100g'],
+      ),
       servingSizes: (json['servingSizes'] as List)
           .map((e) => ServingSize.fromJson(e))
           .toList(),
@@ -223,6 +217,9 @@ class VagueFood {
 typedef TaggedFood = DateTagged<Food>;
 
 @CopyWith()
+/// A food item with a specific amount and unit, as well as an optional ID and category.
+///
+/// A [Food] object is a [VagueFood] that has been saved.
 class Food extends VagueFood {
   final String? id;
   final double amount;
@@ -248,8 +245,9 @@ class Food extends VagueFood {
       id: json['id'],
       name: json['name'],
       brand: json['brand'],
-      nutritionalValuesPer100g:
-          NutritionValues.fromJson(json['nutritionalValuesPer100g']),
+      nutritionalValuesPer100g: NutritionValues.fromJson(
+        json['nutritionalValuesPer100g'],
+      ),
       servingSizes: (json['servingSizes'] as List)
           .map((e) => ServingSize.fromJson(e))
           .toList(),
@@ -311,13 +309,13 @@ class Food extends VagueFood {
       category.hashCode;
 
   int get hashCodeForSearch => Object.hash(
-        name,
-        brand,
-        nutritionalValuesPer100g,
-        Object.hashAll(servingSizes),
-        barcode,
-        unit,
-      );
+    name,
+    brand,
+    nutritionalValuesPer100g,
+    Object.hashAll(servingSizes),
+    barcode,
+    unit,
+  );
 
   bool equalsForSearch(Food other) =>
       other.name == name &&

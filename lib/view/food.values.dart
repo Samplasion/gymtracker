@@ -1,6 +1,6 @@
 part of 'food.dart';
 
-class AddFoodView extends StatefulWidget {
+class AddFoodView extends ConsumerStatefulWidget {
   final VagueFood food;
   final bool isEditing;
   final bool inheritAmount;
@@ -24,10 +24,10 @@ class AddFoodView extends StatefulWidget {
        );
 
   @override
-  State<AddFoodView> createState() => _AddFoodViewState();
+  ConsumerState<AddFoodView> createState() => _AddFoodViewState();
 }
 
-class _AddFoodViewState extends ControlledState<AddFoodView, FoodController> {
+class _AddFoodViewState extends ConsumerState<AddFoodView> {
   bool get shouldInheritAmount => widget.inheritAmount || widget.isEditing;
 
   final formKey = GlobalKey<FormState>();
@@ -40,11 +40,21 @@ class _AddFoodViewState extends ControlledState<AddFoodView, FoodController> {
       : widget.food.servingSizes.firstWhereOrNull(
           (element) => element.amount == amount,
         );
-  late var amountController = TextEditingController(
-    text: controller.stringifyDouble(
-      shouldInheritAmount ? (widget.food as Food).amount : amount,
-    ),
-  );
+  late final TextEditingController amountController;
+
+  @override
+  void initState() {
+    super.initState();
+    final decSep = NumberFormat.decimalPattern(
+      Get.locale?.languageCode,
+    ).symbols.DECIMAL_SEP;
+    amountController = TextEditingController(
+      text: stringifyDouble(
+        shouldInheritAmount ? (widget.food as Food).amount : amount,
+        decimalSeparator: decSep,
+      ),
+    );
+  }
 
   @override
   dispose() {
@@ -59,6 +69,8 @@ class _AddFoodViewState extends ControlledState<AddFoodView, FoodController> {
     final colorScheme = Theme.of(context).colorScheme;
     final gradientColor = colorScheme.surfaceContainerHigh;
 
+    final selectedDate = ref.watch(foodSelectedDateProvider);
+
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -71,26 +83,34 @@ class _AddFoodViewState extends ControlledState<AddFoodView, FoodController> {
         ),
         actions: [
           if (widget.food is Food)
-            StreamBuilder(
-              stream: controller.favorites$,
-              builder: (BuildContext context, _) {
-                final icon = controller.isFavorite(widget.food as Food)
+            Builder(
+              builder: (BuildContext context) {
+                final favorites =
+                    ref.watch(favoriteFoodsStreamProvider).asData?.value ?? [];
+                final isFavorite = favorites.any(
+                  (f) => f.id == (widget.food as Food).id,
+                );
+                final icon = isFavorite
                     ? GTIcons.remove_from_faves
                     : GTIcons.add_to_faves;
                 return AnimatedRotation(
-                  turns: controller.isFavorite(widget.food as Food) ? 0 : 2 / 5,
+                  turns: isFavorite ? 0 : 2 / 5,
                   duration: const Duration(milliseconds: 1200),
                   curve: Curves.elasticOut,
                   child: IconButton(
                     icon: Icon(icon),
-                    tooltip: controller.isFavorite(widget.food as Food)
+                    tooltip: isFavorite
                         ? "food.removeFavorite".t
                         : "food.addFavorite".t,
                     onPressed: () {
-                      if (controller.isFavorite(widget.food as Food)) {
-                        controller.removeFavorite(widget.food as Food);
+                      if (isFavorite) {
+                        ref
+                            .read(foodProvider.notifier)
+                            .removeFavorite(widget.food as Food);
                       } else {
-                        controller.addFavorite(widget.food as Food);
+                        ref
+                            .read(foodProvider.notifier)
+                            .addFavorite(widget.food as Food);
                       }
                     },
                   ),
@@ -212,8 +232,7 @@ class _AddFoodViewState extends ControlledState<AddFoodView, FoodController> {
         color: gradientColor,
         center: true,
         buttons: [
-          if (widget.isEditing &&
-              controller.day$.value != DateTime.now().startOfDay)
+          if (widget.isEditing && selectedDate != DateTime.now().startOfDay)
             FilledButton.tonal(
               onPressed: () {
                 if (!formKey.currentState!.validate()) {
@@ -222,7 +241,7 @@ class _AddFoodViewState extends ControlledState<AddFoodView, FoodController> {
 
                 final newFood = (widget.food as Food).copyWith(amount: amount);
 
-                controller.copyToToday(newFood);
+                ref.read(foodProvider.notifier).copyToToday(newFood);
               },
               child: Text('food.edit.copyToToday'.t),
             ),
@@ -267,20 +286,20 @@ class _AddFoodViewState extends ControlledState<AddFoodView, FoodController> {
   }
 }
 
-class OpenFoodFactsTableAttribution extends ControlledWidget<FoodController> {
+class OpenFoodFactsTableAttribution extends StatelessWidget {
   const OpenFoodFactsTableAttribution({super.key, required this.food});
 
   final VagueFood food;
 
   @override
   Widget build(BuildContext context) {
-    final canOpen = controller.canOpenOffPage(food);
+    final canOpen = food.url != null;
     return MouseRegion(
       cursor: canOpen ? SystemMouseCursors.click : SystemMouseCursors.basic,
       child: GestureDetector(
         onTap: canOpen
             ? () {
-                controller.openOffPage(food);
+                launchUrl(Uri.parse(food.url!));
               }
             : null,
         child: Text(
@@ -369,7 +388,9 @@ class NutritionTable extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final controller = Get.find<FoodController>();
+    final decSep = NumberFormat.decimalPattern(
+      Get.locale?.languageCode,
+    ).symbols.DECIMAL_SEP;
     final nutritionalValues = per100g * (amount / 100);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -377,10 +398,7 @@ class NutritionTable extends StatelessWidget {
         if (_showHeader) ...[
           Text(
             "food.add.nutritionalValuesPerAmountWithUnit".tParams({
-              "amount": stringifyDouble(
-                amount,
-                decimalSeparator: controller.decimalSeparator,
-              ),
+              "amount": stringifyDouble(amount, decimalSeparator: decSep),
               "unit": unit.t,
             }),
             style: Theme.of(context).textTheme.headlineSmall,
@@ -654,13 +672,12 @@ class NutritionRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final controller = Get.find<FoodController>();
-    var stringifiedValue = stringifyDouble(
-      value,
-      decimalSeparator: controller.decimalSeparator,
-    );
+    final decSep = NumberFormat.decimalPattern(
+      Get.locale?.languageCode,
+    ).symbols.DECIMAL_SEP;
+    var stringifiedValue = stringifyDouble(value, decimalSeparator: decSep);
     if (value < 0.01 && value != 0) {
-      stringifiedValue = "<0${controller.decimalSeparator}01";
+      stringifiedValue = "<0${decSep}01";
     }
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -686,19 +703,23 @@ class NutritionRow extends StatelessWidget {
   }
 }
 
-class CustomAddFoodView extends StatefulWidget {
+class CustomAddFoodView extends ConsumerStatefulWidget {
   final String? barcode;
+  final NutritionCategory? category;
 
-  const CustomAddFoodView({super.key}) : barcode = null;
+  const CustomAddFoodView({super.key, required this.category}) : barcode = null;
 
-  const CustomAddFoodView.withBarcode({super.key, required this.barcode});
+  const CustomAddFoodView.withBarcode({
+    super.key,
+    required this.barcode,
+    required this.category,
+  });
 
   @override
-  State<CustomAddFoodView> createState() => _CustomAddFoodViewState();
+  ConsumerState<CustomAddFoodView> createState() => _CustomAddFoodViewState();
 }
 
-class _CustomAddFoodViewState
-    extends ControlledState<CustomAddFoodView, FoodController> {
+class _CustomAddFoodViewState extends ConsumerState<CustomAddFoodView> {
   GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
   bool expanded = false;
@@ -882,8 +903,6 @@ class _CustomAddFoodViewState
                             style: ButtonStyle(
                               padding: WidgetStateProperty.all(
                                 EdgeInsets.symmetric(
-                                  // Reduce padding on mobile to compensate for the
-                                  // larger target size
                                   vertical:
                                       Theme.of(context).materialTapTargetSize ==
                                           MaterialTapTargetSize.padded
@@ -1027,13 +1046,20 @@ class _CustomAddFoodViewState
                 }),
                 barcode: widget.barcode,
                 pieces: pieces,
+                category: widget.category?.name,
               );
 
               if (widget.barcode != null) {
-                controller.addCustomBarcodeFood(widget.barcode!, food);
+                ref
+                    .read(foodProvider.notifier)
+                    .addCustomBarcodeFood(
+                      widget.barcode!,
+                      food,
+                      widget.category,
+                    );
               }
 
-              Get.back(result: food);
+              Navigator.of(context).pop(food);
             },
             child: Text('food.add.add'.t),
           ),
@@ -1043,18 +1069,20 @@ class _CustomAddFoodViewState
   }
 }
 
-class SearchResultsView extends ControlledWidget<FoodController> {
+class SearchResultsView extends ConsumerWidget {
   final Future<List<VagueFood>> foods;
   final bool showAddCustom;
+  final NutritionCategory? category;
 
   const SearchResultsView({
     super.key,
     required this.foods,
     this.showAddCustom = true,
+    required this.category,
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
       appBar: AppBar(title: Text("food.search.title".t)),
       body: FutureBuilder<List<VagueFood>>(
@@ -1074,9 +1102,6 @@ class SearchResultsView extends ControlledWidget<FoodController> {
                         ? "food.search.error.serverError".t
                         : "food.search.error.generic".t,
                     error: snapshot.error,
-                    // retryCallback: () {
-                    //   controller.searchFoodByName(controller.searchQuery$.value);
-                    // },
                   ),
                 ),
               ],
@@ -1101,7 +1126,7 @@ class SearchResultsView extends ControlledWidget<FoodController> {
                         title: Text(food.name),
                         subtitle: food.brand == null ? null : Text(food.brand!),
                         onTap: () {
-                          Get.back(result: food);
+                          Navigator.of(context).pop(food);
                         },
                       ),
                     );
@@ -1125,19 +1150,28 @@ class SearchResultsView extends ControlledWidget<FoodController> {
         },
       ),
       floatingActionButton: showAddCustom
-          ? _AddCustomFoodFAB(closeView: () => Get.back())
+          ? _AddCustomFoodFAB(
+              closeView: () => Navigator.of(context).pop(),
+              category: category,
+              onFoodAdded: (food) {
+                Navigator.of(context).pop(food);
+              },
+            )
           : null,
     );
   }
 }
 
-class FoodBarcodeReaderView extends ControlledWidget<FoodController> {
+class FoodBarcodeReaderView extends ConsumerWidget {
   final void Function(Food) onFoodReceived;
 
   const FoodBarcodeReaderView({super.key, required this.onFoodReceived});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final perms =
+        ref.watch(foodPermissionsProvider).asData?.value ??
+        (camera: false, gallery: false);
     return Scaffold(
       appBar: AppBar(
         title: Text("food.barcodeReader.title".t),
@@ -1146,8 +1180,6 @@ class FoodBarcodeReaderView extends ControlledWidget<FoodController> {
             IconButton(
               icon: const Icon(GTIcons.debug),
               onPressed: () async {
-                // String imgUrl =
-                //     "https://upload.wikimedia.org/wikipedia/commons/c/cb/Ean13.jpg";
                 String imgUrl =
                     "https://barcode.orcascan.com/?type=ean13&data=8000965154468&fontsize=Fit&format=png";
                 Code resultFromUrl = await zx.readBarcodeImageUrl(
@@ -1158,7 +1190,7 @@ class FoodBarcodeReaderView extends ControlledWidget<FoodController> {
                     tryHarder: true,
                   ),
                 );
-                handleCode(resultFromUrl);
+                handleCode(context, ref, resultFromUrl);
               },
             ),
         ],
@@ -1176,16 +1208,24 @@ class FoodBarcodeReaderView extends ControlledWidget<FoodController> {
           borderWidth: 4,
           cutOutSize: 0.85,
         ),
-        showGallery: controller.permission$.value.gallery,
+        showGallery: perms.gallery,
         onScan: (result) async {
-          handleCode(result);
+          handleCode(context, ref, result);
         },
+        tryHarder: true,
+        tryInverted: true,
+        tryDownscale: true,
+        maxNumberOfSymbols: 15,
       ),
-      // Type by hand
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
-          await Go.off(
-            () => ManualBarcodeInsertionScreen(handleCode: handleCode),
+          await Go.to(
+            () => ManualBarcodeInsertionScreen(
+              handleCode: (code) {
+                handleCode(context, ref, code);
+                Navigator.of(context).pop();
+              },
+            ),
           );
         },
         child: const Icon(GTIcons.keyboard),
@@ -1193,7 +1233,11 @@ class FoodBarcodeReaderView extends ControlledWidget<FoodController> {
     );
   }
 
-  void handleCode(Code code) {
+  Future<void> handleCode(
+    BuildContext context,
+    WidgetRef ref,
+    Code code,
+  ) async {
     logger.d((code.isValid, code.text));
 
     if (!code.isValid || code.text == null) {
@@ -1201,10 +1245,12 @@ class FoodBarcodeReaderView extends ControlledWidget<FoodController> {
       return;
     }
 
-    controller.searchFoodByBarcode(code.text!).then((food) {
-      if (food != null) {
-        onFoodReceived(food);
+    return searchFoodByBarcode(context, ref, code.text!).then((food) {
+      if (food == null) {
+        logger.w("No food found for barcode ${code.text}");
+        return;
       }
+      onFoodReceived(food);
     });
   }
 }
@@ -1272,15 +1318,17 @@ class _ManualBarcodeInsertionScreenState
   }
 }
 
-class AddCombinedFoodView extends StatefulWidget {
-  const AddCombinedFoodView({super.key});
+class AddCombinedFoodView extends ConsumerStatefulWidget {
+  const AddCombinedFoodView({super.key, required this.category});
+
+  final NutritionCategory? category;
 
   @override
-  State<AddCombinedFoodView> createState() => _AddCombinedFoodViewState();
+  ConsumerState<AddCombinedFoodView> createState() =>
+      _AddCombinedFoodViewState();
 }
 
-class _AddCombinedFoodViewState
-    extends ControlledState<AddCombinedFoodView, FoodController> {
+class _AddCombinedFoodViewState extends ConsumerState<AddCombinedFoodView> {
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
   final TextEditingController nameController = TextEditingController();
   final TextEditingController brandController = TextEditingController();
@@ -1356,8 +1404,6 @@ class _AddCombinedFoodViewState
                           style: ButtonStyle(
                             padding: WidgetStateProperty.all(
                               EdgeInsets.symmetric(
-                                // Reduce padding on mobile to compensate for the
-                                // larger target size
                                 vertical:
                                     Theme.of(context).materialTapTargetSize ==
                                         MaterialTapTargetSize.padded
@@ -1401,13 +1447,13 @@ class _AddCombinedFoodViewState
                     });
                   },
                   onTap: () {
-                    controller
-                        .showEditFoodViewForCombination(constituents[i])
-                        .then((value) {
-                          setState(() {
-                            constituents[i] = value;
-                          });
+                    showAddFoodView(context, constituents[i]).then((value) {
+                      if (value != null) {
+                        setState(() {
+                          constituents[i] = value;
                         });
+                      }
+                    });
                   },
                 ),
                 itemCount: constituents.length,
@@ -1490,8 +1536,8 @@ class _AddCombinedFoodViewState
 
   Widget _getSearchBar() {
     return SearchAnchorPlus(
-      // searchController: searchController,
       suggestionsBuilder: _getSearchSuggestionBuilder(
+        ref: ref,
         closeView: () => Get.back(),
         onFoodTap: (dtfood) {
           final food = dtfood.value;
@@ -1506,7 +1552,7 @@ class _AddCombinedFoodViewState
           icon: const Icon(GTIcons.scan_barcode),
           tooltip: "food.barcodeReader.title".t,
           onPressed: () {
-            controller.showScanBarcodeView().then((value) {
+            showScanBarcodeView(context, ref).then((value) {
               if (value != null) {
                 setState(() {
                   constituents.add(value);
@@ -1517,7 +1563,7 @@ class _AddCombinedFoodViewState
         ),
       ],
       onSubmitted: (query) {
-        controller.showSearchResultsViewForCombination(query).then((value) {
+        showSearchResultsViewForCombination(context, ref, query).then((value) {
           if (value != null) {
             setState(() {
               constituents.add(value);
@@ -1528,7 +1574,17 @@ class _AddCombinedFoodViewState
       textCapitalization: TextCapitalization.sentences,
       textInputAction: TextInputAction.search,
       keyboardType: TextInputType.text,
-      viewFloatingActionButton: _AddCustomFoodFAB(closeView: () => Get.back()),
+      viewFloatingActionButton: _AddCustomFoodFAB(
+        closeView: () => Get.back(),
+        category: widget.category,
+        onFoodAdded: (food) {
+          if (food != null) {
+            setState(() {
+              constituents.add(food);
+            });
+          }
+        },
+      ),
     );
   }
 }
@@ -1536,12 +1592,12 @@ class _AddCombinedFoodViewState
 extension on NutritionUnit {
   String get t => "food.nutrimentUnits.${toCamelCase()}".t;
 
-  // String formatAmount(double amount) =>
-  //     "${stringifyDouble(amount, decimalSeparator: Get.find<FoodController>().decimalSeparator)} $t";
-
   String formatAmount(double amount, {int pieces = 1, bool showUnit = true}) {
     final pcs = pieces == 1 ? "" : "$pieces × ";
     final unit = showUnit ? " $t" : "";
-    return "$pcs${stringifyDouble(amount, decimalSeparator: Get.find<FoodController>().decimalSeparator)}$unit";
+    final decSep = NumberFormat.decimalPattern(
+      Get.locale?.languageCode,
+    ).symbols.DECIMAL_SEP;
+    return "$pcs${stringifyDouble(amount, decimalSeparator: decSep)}$unit";
   }
 }

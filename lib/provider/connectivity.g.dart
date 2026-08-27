@@ -34,7 +34,7 @@ final class NetworkConnectivityNotifierProvider
 }
 
 String _$networkConnectivityNotifierHash() =>
-    r'c63ad199505e3dab5077fd4bd949bfe066c6ea6b';
+    r'31eb1ec7a342b7d150002dafcad81cf99067095d';
 
 abstract class _$NetworkConnectivityNotifier extends $StreamNotifier<bool> {
   Stream<bool> build();

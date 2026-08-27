@@ -1,16 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:gymtracker/icons/gymtracker_icons.dart';
 import 'package:gymtracker/service/localizations.dart';
+import 'package:gymtracker/service/logger.dart';
 import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/view/logs.dart';
 
 class ErrorViewComponent extends StatelessWidget {
-  const ErrorViewComponent({
+  ErrorViewComponent({
     super.key,
     this.title,
     required this.error,
     this.retryCallback,
-  });
+  }) {
+    globalLogger.e("ErrorViewComponent: $error");
+  }
 
   final String? title;
   final Object? error;

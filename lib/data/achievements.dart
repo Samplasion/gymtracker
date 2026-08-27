@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:gymtracker/controller/exercises_controller.dart';
-import 'package:gymtracker/controller/food_controller.dart';
+
 import 'package:gymtracker/controller/history_controller.dart';
 import 'package:gymtracker/controller/me_controller.dart';
 import 'package:gymtracker/controller/routines_controller.dart';
@@ -15,6 +15,7 @@ import 'package:gymtracker/model/achievements.dart';
 import 'package:gymtracker/model/exercise.dart';
 import 'package:gymtracker/model/set.dart';
 import 'package:gymtracker/model/workout.dart';
+import 'package:gymtracker/service/database.dart';
 import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/service/logger.dart';
 import 'package:gymtracker/utils/extensions.dart';
@@ -52,7 +53,7 @@ final Map<String, Achievement> achievements = {
         descriptionKey: "achievements.firstSteps.description.3",
         trigger: AchievementTrigger.food,
         checkCompletion: (progress) =>
-            Get.find<FoodController>().foods$.value.isNotEmpty,
+            Get.find<DatabaseService>().foods$.value.isNotEmpty,
       ),
     ],
   ),
@@ -1040,19 +1041,23 @@ double _calculate1RM(Exercise exercise, Weights unit) {
 List<DateTime> _foodWatcher() {
   final today = DateTime.now().startOfDay;
 
-  final foodController = Get.find<FoodController>();
-  if (foodController.foods$.value.isEmpty) return [];
+  final foods = Get.find<DatabaseService>().foods$.value;
+  if (foods.isEmpty) return [];
+
+  final sortedFoods = foods.toList()..sort((a, b) => a.date.compareTo(b.date));
+  final firstDay = sortedFoods.first.date;
 
   // Return the longest continuous streak of days of all time
   final streaks = <List<DateTime>>[];
   var currentStreak = <DateTime>[];
-  final difference = foodController.firstDay!.startOfDay
+  final difference = firstDay.startOfDay
       .difference(today)
       .abs()
       .inDays;
   for (var i = 0; i < difference; i++) {
     final day = today.subtract(Duration(days: i));
-    if (foodController.getFoodsForDay(day).isNotEmpty) {
+    final dayFoods = foods.where((element) => element.date.isSameDay(day)).toList();
+    if (dayFoods.isNotEmpty) {
       currentStreak.add(day);
     } else {
       if (currentStreak.isNotEmpty) {

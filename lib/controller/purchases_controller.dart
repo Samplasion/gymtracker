@@ -91,7 +91,20 @@ class PurchasesController extends ChangeNotifier {
     logger.d("Logging in with RevCat. ");
     if (user == null) {
       logger.d("Logging out from RevCat");
-      await purchasesService.logout();
+      try {
+        await purchasesService.logout();
+      } on PlatformException catch (e, s) {
+        if (e.message?.contains("the current user is anonymous") == true) {
+          logger.d("No user logged in, ignoring error");
+        } else {
+          logger.e(
+            "Error logging out from RevCat: $e",
+            error: e,
+            stackTrace: s,
+          );
+          rethrow;
+        }
+      }
       _subscriptionInfo$.add(SubscriptionInfo.empty);
     } else {
       try {

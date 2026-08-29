@@ -310,10 +310,16 @@ class Online extends _$Online {
     required String email,
     required String password,
   }) async {
-    return _service.checkEmailVerificationAndLogIn(
+    final success = await _service.checkEmailVerificationAndLogIn(
       email: email,
       password: password,
     );
+    if (success) {
+      globalContainer
+          .read(eventBusProvider)
+          .emit(GBUserDidLoginEvent(await onlineService.getAccount()));
+    }
+    return success;
   }
 
   Future<void> _runOneTimeAsyncBoot() async {

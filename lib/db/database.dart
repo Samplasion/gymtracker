@@ -1193,19 +1193,32 @@ class GTDatabaseImpl extends _$GTDatabaseImpl
   Future writeAllHistoryWorkouts(List<model.Workout> historyWorkouts) {
     final now = DateTime.now().toUtc();
     return transaction(() async {
+      final oldWorkouts = await (select(this.historyWorkouts)
+            ..where(
+              (tbl) => tbl.deleted.equals(false) & _userIdPredicate(tbl.userId),
+            ))
+          .get();
+      final toDeleteIds = oldWorkouts
+          .where((r) => !historyWorkouts.any((newW) => newW.id == r.id))
+          .map((r) => r.id)
+          .toList();
       await batch((batch) {
-        batch.update(
-          this.historyWorkouts,
-          HistoryWorkoutsCompanion(
-            deleted: const Value(true),
-            updatedAt: Value(now),
-          ),
-        );
+        if (toDeleteIds.isNotEmpty) {
+          batch.update(
+            this.historyWorkouts,
+            HistoryWorkoutsCompanion(
+              deleted: const Value(true),
+              updatedAt: Value(now),
+            ),
+            where: (tbl) => tbl.id.isIn(toDeleteIds) & tbl.deleted.equals(false),
+          );
+        }
         batch.insertAll(
           this.historyWorkouts,
           historyWorkouts.toSortedHistoryWorkoutInsertables(
             userId: currentUserId,
           ),
+          mode: .insertOrReplace,
         );
       });
       await overwriteAllHistoryWorkoutExercises(
@@ -1214,29 +1227,46 @@ class GTDatabaseImpl extends _$GTDatabaseImpl
     });
   }
 
-  @override
+@override
   Future<void> overwriteAllHistoryWorkoutExercises(
     List<model.WorkoutExercisable> historyWorkoutExercises,
   ) async {
     final now = DateTime.now().toUtc();
     final historyExerciseInsertables = historyWorkoutExercises
         .fold(<String, List<model.WorkoutExercisable>>{}, (m, r) {
-          return m..putIfAbsent(r.workoutID!, () => []).add(r);
-        })
+      return m..putIfAbsent(r.workoutID!, () => []).add(r);
+    })
         .values
-        .expand((list) => list.toSortedInsertables(userId: currentUserId));
-    await (update(
-      this.historyWorkoutExercises,
-    )..where((_) => const Constant(true))).write(
-      HistoryWorkoutExercisesCompanion(
-        deleted: const Value(true),
-        updatedAt: Value(now),
-      ),
-    );
-    await batch(
-      (b) =>
-          b.insertAll(this.historyWorkoutExercises, historyExerciseInsertables),
-    );
+        .expand(
+          (list) => list.toSortedInsertables(userId: currentUserId),
+        );
+    await transaction(() async {
+      final oldExs =
+          await (select(this.historyWorkoutExercises)..where(
+                (tbl) =>
+                    tbl.deleted.equals(false) & _userIdPredicate(tbl.userId),
+              ))
+              .get();
+      final toDeleteIds = oldExs
+          .where((r) => !historyWorkoutExercises.any((newR) => newR.id == r.id))
+          .map((r) => r.id)
+          .toList();
+      await (update(
+        this.historyWorkoutExercises,
+      )..where((tbl) => tbl.id.isIn(toDeleteIds))).write(
+        HistoryWorkoutExercisesCompanion(
+          deleted: const Value(true),
+          updatedAt: Value(now),
+        ),
+      );
+      await batch(
+        (b) => b.insertAll(
+          this.historyWorkoutExercises,
+          historyExerciseInsertables,
+          mode: .insertOrReplace,
+        ),
+      );
+    });
   }
 
   @override

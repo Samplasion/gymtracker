@@ -970,7 +970,6 @@
         "cableBicepsCurl": "Bicep curl (cable)",
         "dumbbellBicepsCurl": "Bicep curl (dumbbell)",
         "bicepsCurlMachine": "Bicep curl (machine)",
-        "chinUps": "Chin Ups",
         "hammerCurlDumbbell": "Hammer curls (dumbbells)",
         "concentrationCurl": "Concentration curls",
         "scottCurl": "Scott curl",
@@ -1074,7 +1073,8 @@
         "latPulldownsWideGrip": "Lat pulldowns (wide grip)",
         "latPulldownsNarrowGrip": "Lat pulldowns (narrow grip)",
         "tBarRowWideProneGrip": "T-Bar machine row (wide prone grip)",
-        "dumbbellRow": "Dumbbell row"
+        "dumbbellRow": "Dumbbell row",
+        "chinUps": "Chin Ups"
       },
       "exercise": {
         "dualLowRowMachine": "Dual low row machine",

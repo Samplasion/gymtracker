@@ -540,28 +540,6 @@ final Map<GTExerciseMuscleCategory, ExerciseCategory> exerciseStandardLibrary =
             equipment: GTGymEquipment.machine,
           ),
           Exercise.standard(
-            id: "library.biceps.exercises.chinUps",
-            name: "library.biceps.exercises.chinUps".t,
-            parameters: GTSetParameters.freeBodyReps,
-            primaryMuscleGroup: GTMuscleGroup.lats,
-            secondaryMuscleGroups: {
-              GTMuscleGroup.biceps,
-              GTMuscleGroup.forearms,
-            },
-            equipment: GTGymEquipment.none,
-            muscleHighlight: {
-              GTMuscleHighlight.lats: GTMuscleHighlightIntensity.primary,
-              for (final h in GTMuscleHighlight.groupToHighlight(
-                GTMuscleGroup.biceps,
-              ))
-                h: GTMuscleHighlightIntensity.secondary,
-              for (final h in GTMuscleHighlight.groupToHighlight(
-                GTMuscleGroup.triceps,
-              ))
-                h: GTMuscleHighlightIntensity.tertiary,
-            },
-          ),
-          Exercise.standard(
             id: "library.biceps.exercises.hammerCurlDumbbell",
             name: "library.biceps.exercises.hammerCurlDumbbell".t,
             parameters: GTSetParameters.repsWeight,
@@ -1498,6 +1476,28 @@ final Map<GTExerciseMuscleCategory, ExerciseCategory> exerciseStandardLibrary =
                   GTMuscleHighlightIntensity.secondary,
               GTMuscleHighlight.lowerTrapezius:
                   GTMuscleHighlightIntensity.tertiary,
+            },
+          ),
+          Exercise.standard(
+            id: "library.biceps.exercises.chinUps",
+            name: "library.back.exercises.chinUps".t,
+            parameters: GTSetParameters.freeBodyReps,
+            primaryMuscleGroup: GTMuscleGroup.lats,
+            secondaryMuscleGroups: {
+              GTMuscleGroup.biceps,
+              GTMuscleGroup.forearms,
+            },
+            equipment: GTGymEquipment.none,
+            muscleHighlight: {
+              GTMuscleHighlight.lats: GTMuscleHighlightIntensity.primary,
+              for (final h in GTMuscleHighlight.groupToHighlight(
+                GTMuscleGroup.biceps,
+              ))
+                h: GTMuscleHighlightIntensity.secondary,
+              for (final h in GTMuscleHighlight.groupToHighlight(
+                GTMuscleGroup.triceps,
+              ))
+                h: GTMuscleHighlightIntensity.tertiary,
             },
           ),
         ],

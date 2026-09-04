@@ -62,19 +62,19 @@ class $GTStandardLibraryCardioExercises {
   String get zumba => 'library.cardio.exercises.zumba';
 
   List<String> get values => [
-        aerobics,
-        bicycleCrunchesCardio,
-        biking,
-        crunchesTimed,
-        ergometer,
-        ergometerHorizontal,
-        jumpRope,
-        pilates,
-        rowingMachine,
-        running,
-        treadmill,
-        zumba
-      ];
+    aerobics,
+    bicycleCrunchesCardio,
+    biking,
+    crunchesTimed,
+    ergometer,
+    ergometerHorizontal,
+    jumpRope,
+    pilates,
+    rowingMachine,
+    running,
+    treadmill,
+    zumba,
+  ];
 }
 
 class $GTStandardLibraryChestExercises {
@@ -91,6 +91,9 @@ class $GTStandardLibraryChestExercises {
   /// Bench press (barbell, incline)
   String get barbellBenchPressIncline =>
       'library.chest.exercises.barbellBenchPressIncline';
+
+  /// Bench flys
+  String get benchFlys => 'library.chest.exercises.benchFlys';
 
   /// Butterfly Machine
   String get butterflyMachine => 'library.chest.exercises.butterflyMachine';
@@ -173,33 +176,34 @@ class $GTStandardLibraryChestExercises {
   String get verticalChestPress => 'library.chest.exercises.verticalChestPress';
 
   List<String> get values => [
-        barbellBenchPressDecline,
-        barbellBenchPressFlat,
-        barbellBenchPressIncline,
-        butterflyMachine,
-        cableBenchPressDecline,
-        cableBenchPressFlat,
-        cableBenchPressIncline,
-        cableChestPress,
-        cableFlyCrossovers,
-        declinePushUps,
-        dumbbellBenchPressDecline,
-        dumbbellBenchPressFlat,
-        dumbbellBenchPressIncline,
-        dumbbellHexPress,
-        inclineBenchFlys,
-        inclinePushUps,
-        lowCableFly,
-        pushUps,
-        pushUpsWeighted,
-        seatedCableChestFlys,
-        smithMachineBenchPressDecline,
-        smithMachineBenchPressFlat,
-        smithMachineBenchPressIncline,
-        smithMachineHexPress,
-        tBarPress,
-        verticalChestPress
-      ];
+    barbellBenchPressDecline,
+    barbellBenchPressFlat,
+    barbellBenchPressIncline,
+    benchFlys,
+    butterflyMachine,
+    cableBenchPressDecline,
+    cableBenchPressFlat,
+    cableBenchPressIncline,
+    cableChestPress,
+    cableFlyCrossovers,
+    declinePushUps,
+    dumbbellBenchPressDecline,
+    dumbbellBenchPressFlat,
+    dumbbellBenchPressIncline,
+    dumbbellHexPress,
+    inclineBenchFlys,
+    inclinePushUps,
+    lowCableFly,
+    pushUps,
+    pushUpsWeighted,
+    seatedCableChestFlys,
+    smithMachineBenchPressDecline,
+    smithMachineBenchPressFlat,
+    smithMachineBenchPressIncline,
+    smithMachineHexPress,
+    tBarPress,
+    verticalChestPress,
+  ];
 }
 
 class $GTStandardLibraryBicepsExercises {
@@ -242,18 +246,18 @@ class $GTStandardLibraryBicepsExercises {
   String get spiderCurls => 'library.biceps.exercises.spiderCurls';
 
   List<String> get values => [
-        barbellBicepsCurl,
-        bicepsCurlMachine,
-        cableBicepsCurl,
-        chinUps,
-        concentrationCurl,
-        dualCableHighCurl,
-        dumbbellBicepsCurl,
-        hammerCurlDumbbell,
-        scottCurl,
-        singleArmCableHammerCurls,
-        spiderCurls
-      ];
+    barbellBicepsCurl,
+    bicepsCurlMachine,
+    cableBicepsCurl,
+    chinUps,
+    concentrationCurl,
+    dualCableHighCurl,
+    dumbbellBicepsCurl,
+    hammerCurlDumbbell,
+    scottCurl,
+    singleArmCableHammerCurls,
+    spiderCurls,
+  ];
 }
 
 class $GTStandardLibraryAbsExercises {
@@ -321,26 +325,26 @@ class $GTStandardLibraryAbsExercises {
   String get toeTouches => 'library.abs.exercises.toeTouches';
 
   List<String> get values => [
-        bicycleCrunches,
-        crunches,
-        crunchMachine,
-        deadBugHold,
-        deadBugHoldCardio,
-        extendedReverseCrunchWithLegExtension,
-        fullBodyCrunch,
-        heelsUpCrunch,
-        heelTouches,
-        hollowBodyHold,
-        hollowBodyHoldBentKnees,
-        kneeRaise,
-        lateralHyperextensions,
-        legRaise,
-        legRaiseParallelBars,
-        obliqueCrunches,
-        plank,
-        russianTwist,
-        toeTouches
-      ];
+    bicycleCrunches,
+    crunches,
+    crunchMachine,
+    deadBugHold,
+    deadBugHoldCardio,
+    extendedReverseCrunchWithLegExtension,
+    fullBodyCrunch,
+    heelsUpCrunch,
+    heelTouches,
+    hollowBodyHold,
+    hollowBodyHoldBentKnees,
+    kneeRaise,
+    lateralHyperextensions,
+    legRaise,
+    legRaiseParallelBars,
+    obliqueCrunches,
+    plank,
+    russianTwist,
+    toeTouches,
+  ];
 }
 
 class $GTStandardLibraryObliquesExercises {
@@ -369,8 +373,11 @@ class $GTStandardLibraryCalvesExercises {
   /// Calf raise (standing)
   String get calfRaiseStanding => 'library.calves.exercises.calfRaiseStanding';
 
-  List<String> get values =>
-      [calfPressLegPressMachine, calfRaiseSeated, calfRaiseStanding];
+  List<String> get values => [
+    calfPressLegPressMachine,
+    calfRaiseSeated,
+    calfRaiseStanding,
+  ];
 }
 
 class $GTStandardLibraryQuadricepsExercises {
@@ -410,17 +417,17 @@ class $GTStandardLibraryQuadricepsExercises {
   String get squatsBarbell => 'library.quadriceps.exercises.squatsBarbell';
 
   List<String> get values => [
-        bodyweightSquats,
-        bulgarianSplitSquats,
-        frontSquats,
-        hackSquats,
-        legExtension,
-        legPress,
-        legPress45deg,
-        lunges,
-        smithMachineLunges,
-        squatsBarbell
-      ];
+    bodyweightSquats,
+    bulgarianSplitSquats,
+    frontSquats,
+    hackSquats,
+    legExtension,
+    legPress,
+    legPress45deg,
+    lunges,
+    smithMachineLunges,
+    squatsBarbell,
+  ];
 }
 
 class $GTStandardLibraryHamstringsExercises {
@@ -440,8 +447,12 @@ class $GTStandardLibraryHamstringsExercises {
   String get romanianDeadliftDumbbell =>
       'library.hamstrings.exercises.romanianDeadliftDumbbell';
 
-  List<String> get values =>
-      [legCurlProne, legCurlSeated, romanianDeadlift, romanianDeadliftDumbbell];
+  List<String> get values => [
+    legCurlProne,
+    legCurlSeated,
+    romanianDeadlift,
+    romanianDeadliftDumbbell,
+  ];
 }
 
 class $GTStandardLibraryShouldersExercises {
@@ -479,7 +490,11 @@ class $GTStandardLibraryShouldersExercises {
   String get latRaisesInclinedBench =>
       'library.shoulders.exercises.latRaisesInclinedBench';
 
-  /// Multipower military press
+  /// Barbell military press
+  String get militaryPressBarbell =>
+      'library.shoulders.exercises.militaryPressBarbell';
+
+  /// Smith machine military press
   String get militaryPressSmithMachine =>
       'library.shoulders.exercises.militaryPressSmithMachine';
 
@@ -507,24 +522,25 @@ class $GTStandardLibraryShouldersExercises {
   String get uprightRow => 'library.shoulders.exercises.uprightRow';
 
   List<String> get values => [
-        arnoldPress,
-        bentOverLateralRaises,
-        deltoidMachine,
-        frontDumbbellRaise,
-        handstandPushUps,
-        latRaisesCable,
-        latRaisesDualCable,
-        latRaisesDumbbells,
-        latRaisesInclinedBench,
-        militaryPressSmithMachine,
-        pikePushUps,
-        reverseButterfly,
-        reverseFlysInclinedBench,
-        shoulderPress,
-        shoulderPressMachine,
-        shrugsBarbell,
-        uprightRow
-      ];
+    arnoldPress,
+    bentOverLateralRaises,
+    deltoidMachine,
+    frontDumbbellRaise,
+    handstandPushUps,
+    latRaisesCable,
+    latRaisesDualCable,
+    latRaisesDumbbells,
+    latRaisesInclinedBench,
+    militaryPressBarbell,
+    militaryPressSmithMachine,
+    pikePushUps,
+    reverseButterfly,
+    reverseFlysInclinedBench,
+    shoulderPress,
+    shoulderPressMachine,
+    shrugsBarbell,
+    uprightRow,
+  ];
 }
 
 class $GTStandardLibraryBackExercises {
@@ -587,23 +603,23 @@ class $GTStandardLibraryBackExercises {
       'library.back.exercises.weightedHyperExtensions';
 
   List<String> get values => [
-        barbellRow,
-        cableSeatedRowTriangleBar,
-        deadlift,
-        dumbbellRow,
-        hyperExtensions,
-        latPulldowns,
-        latPulldownsNarrowGrip,
-        latPulldownsWideGrip,
-        pullUps,
-        rowMachine,
-        straightArmCablePushdown,
-        tBarRow,
-        tBarRowWideProneGrip,
-        triangleBarLatPulldowns,
-        underhandGripLatPulldowns,
-        weightedHyperExtensions
-      ];
+    barbellRow,
+    cableSeatedRowTriangleBar,
+    deadlift,
+    dumbbellRow,
+    hyperExtensions,
+    latPulldowns,
+    latPulldownsNarrowGrip,
+    latPulldownsWideGrip,
+    pullUps,
+    rowMachine,
+    straightArmCablePushdown,
+    tBarRow,
+    tBarRowWideProneGrip,
+    triangleBarLatPulldowns,
+    underhandGripLatPulldowns,
+    weightedHyperExtensions,
+  ];
 }
 
 class $GTStandardLibraryTricepsExercises {
@@ -640,16 +656,16 @@ class $GTStandardLibraryTricepsExercises {
       'library.triceps.exercises.tricepsRopePushdown';
 
   List<String> get values => [
-        benchDips,
-        diamondPushUps,
-        dips,
-        overheadRopeTricepExtension,
-        overheadTricepExtension,
-        skullCrushers,
-        tricepKickbacks,
-        tricepsMachine,
-        tricepsRopePushdown
-      ];
+    benchDips,
+    diamondPushUps,
+    dips,
+    overheadRopeTricepExtension,
+    overheadTricepExtension,
+    skullCrushers,
+    tricepKickbacks,
+    tricepsMachine,
+    tricepsRopePushdown,
+  ];
 }
 
 class $GTStandardLibraryHipsExercises {
@@ -674,13 +690,13 @@ class $GTStandardLibraryHipsExercises {
   String get hipThrustBarbell => 'library.hips.exercises.hipThrustBarbell';
 
   List<String> get values => [
-        clamshells,
-        gluteBridge,
-        hipAbduction,
-        hipAdduction,
-        hipThrust,
-        hipThrustBarbell
-      ];
+    clamshells,
+    gluteBridge,
+    hipAbduction,
+    hipAdduction,
+    hipThrust,
+    hipThrustBarbell,
+  ];
 }
 
 class $GTStandardLibraryForearmsExercises {
@@ -723,17 +739,17 @@ class $GTStandardLibraryForearmsExercises {
   String get wristRoller => 'library.forearms.exercises.wristRoller';
 
   List<String> get values => [
-        cableSingleArmReverseCurl,
-        farmerWalk,
-        platePinch,
-        reverseCurls,
-        reverseCurlsDumbbell,
-        reverseWristCurlsBarbell,
-        reverseWristCurlsDumbbell,
-        wristCurlsBarbell,
-        wristCurlsDumbbell,
-        wristRoller
-      ];
+    cableSingleArmReverseCurl,
+    farmerWalk,
+    platePinch,
+    reverseCurls,
+    reverseCurlsDumbbell,
+    reverseWristCurlsBarbell,
+    reverseWristCurlsDumbbell,
+    wristCurlsBarbell,
+    wristCurlsDumbbell,
+    wristRoller,
+  ];
 }
 
 class $GTStandardLibraryOtherExercises {

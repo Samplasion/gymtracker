@@ -970,7 +970,6 @@
         "cableBicepsCurl": "Bicep curl (cavi)",
         "dumbbellBicepsCurl": "Bicep curl (manubri)",
         "bicepsCurlMachine": "Bicep curl (macchina)",
-        "chinUps": "Chin up",
         "hammerCurlDumbbell": "Hammer curl (manubri)",
         "concentrationCurl": "Curl concentrati",
         "scottCurl": "Scott curl",
@@ -1074,7 +1073,8 @@
         "latPulldownsNarrowGrip": "Lat machine (presa stretta)",
         "latPulldownsWideGrip": "Lat machine (presa larga)",
         "tBarRowWideProneGrip": "Rematore T-Bar machine (presa larga prona)",
-        "dumbbellRow": "Rematore con manubrio"
+        "dumbbellRow": "Rematore con manubrio",
+        "chinUps": "Chin up"
       },
       "exercise": {
         "dualLowRowMachine": "Dual low row machine",

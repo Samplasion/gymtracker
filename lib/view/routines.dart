@@ -112,14 +112,6 @@ class _RoutinesViewState extends ConsumerState<RoutinesView> with _RoutineList {
 
   @override
   Widget build(BuildContext context) {
-    ref.listen(routinesByFolderProvider, (_, _) {
-      print("BEFORE: ${_scrollController.position.minScrollExtent}");
-      Future.delayed(
-        const Duration(milliseconds: 350),
-        () => print("AFTER: ${_scrollController.position.minScrollExtent}"),
-      );
-    });
-
     final isLoading = widget._skeleton;
     final showSuggestedRoutines =
         Get.find<SettingsController>().showSuggestedRoutines.value;
@@ -211,43 +203,6 @@ class _RoutinesViewState extends ConsumerState<RoutinesView> with _RoutineList {
               },
             ),
           ),
-          if (showSuggestedRoutines && suggested.isNotEmpty) ...[
-            const SliverToBoxAdapter(child: Divider()),
-            SliverList(
-              delegate: SliverChildBuilderDelegate((context, index) {
-                final (routine: workout, occurrences: frequency) =
-                    suggested[index];
-                return Material(
-                  type: MaterialType.transparency,
-                  key: ValueKey(workout.id),
-                  child: ListTile(
-                    leading: WorkoutIcon(workout: workout),
-                    title: Text.rich(
-                      TextSpan(
-                        children: [
-                          TextSpan(text: workout.name),
-                          const TextSpan(text: " "),
-                          WidgetSpan(
-                            child: Skeleton.ignore(
-                              child: GTBadge(content: frequency.toString()),
-                            ),
-                            alignment: PlaceholderAlignment.middle,
-                          ),
-                        ],
-                      ),
-                    ),
-                    subtitle: Text(
-                      "general.exercises".plural(workout.displayExerciseCount),
-                    ),
-                    onTap: () {
-                      onTapWorkout(workout);
-                    },
-                  ),
-                );
-              }, childCount: suggested.length),
-            ),
-            const SliverToBoxAdapter(child: Divider()),
-          ],
 
           ...folders.maybeMap(
             data: (folders) {

@@ -14,6 +14,7 @@ import 'package:gymtracker/data/weights.dart';
 import 'package:gymtracker/icons/gymtracker_icons.dart';
 import 'package:gymtracker/model/preferences.dart';
 import 'package:gymtracker/provider/online.dart';
+import 'package:gymtracker/provider/sync_status.dart';
 import 'package:gymtracker/service/color.dart';
 import 'package:gymtracker/service/database.dart';
 import 'package:gymtracker/service/localizations.dart';

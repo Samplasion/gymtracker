@@ -85,6 +85,7 @@ class AdvancedSettingsView extends ConsumerWidget {
                     await controller.showBackups();
                   },
                 ),
+                const SyncStatusListTile(),
                 if (account != null) ...[
                   Divider(),
                   ListTile(
@@ -257,6 +258,114 @@ class _BackupListViewState
           },
         ),
       ),
+    );
+  }
+}
+
+class SyncStatusListTile extends ConsumerStatefulWidget {
+  const SyncStatusListTile({super.key});
+
+  @override
+  ConsumerState<SyncStatusListTile> createState() => _SyncStatusListTileState();
+}
+
+class _SyncStatusListTileState extends ConsumerState<SyncStatusListTile>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _animController;
+
+  @override
+  void initState() {
+    super.initState();
+    _animController = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 2),
+    );
+  }
+
+  @override
+  void dispose() {
+    _animController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final syncStatus = ref.watch(syncStatusProvider);
+    final account = ref.watch(onlineProvider).value;
+
+    if (syncStatus.isSyncing) {
+      if (!_animController.isAnimating) {
+        _animController.repeat();
+      }
+    } else {
+      if (_animController.isAnimating) {
+        _animController.stop();
+        _animController.reset();
+      }
+    }
+
+    final Widget leading;
+    if (syncStatus.isSyncing) {
+      leading = RotationTransition(
+        turns: _animController,
+        child: const Icon(GTIcons.sync),
+      );
+    } else if (syncStatus.hasError) {
+      leading = Icon(
+        GTIcons.sync_problem,
+        color: context.colorScheme.error,
+      );
+    } else {
+      leading = const Icon(GTIcons.sync);
+    }
+
+    final String subtitleText;
+    if (syncStatus.isSyncing) {
+      subtitleText = "settings.advanced.options.sync.status.syncing".t;
+    } else {
+      final statusPrefix = syncStatus.hasError
+          ? "settings.advanced.options.sync.status.failed".t
+          : "settings.advanced.options.sync.status.notSyncing".t;
+      if (account == null) {
+        subtitleText =
+            "$statusPrefix • ${"settings.advanced.options.sync.notLoggedIn".t}";
+      } else if (syncStatus.lastSync != null) {
+        final formattedDate = DateFormat.yMd(
+          context.locale.languageCode,
+        ).add_Hms().format(syncStatus.lastSync!);
+        subtitleText =
+            "$statusPrefix • ${"settings.advanced.options.sync.lastSync".tParams({"date": formattedDate})}";
+      } else {
+        subtitleText =
+            "$statusPrefix • ${"settings.advanced.options.sync.never".t}";
+      }
+    }
+
+    final canSync = !syncStatus.isSyncing && account != null;
+
+    return ListTile(
+      title: Text("settings.advanced.options.sync.title".t),
+      subtitle: Text(subtitleText),
+      leading: leading,
+      onTap: canSync
+          ? () {
+              final lastSync = syncStatus.lastSync;
+              if (lastSync != null &&
+                  DateTime.now().difference(lastSync) < const Duration(minutes: 1)) {
+                ScaffoldMessenger.of(context)
+                  ..hideCurrentSnackBar()
+                  ..showSnackBar(
+                    SnackBar(
+                      content: Text("settings.advanced.options.sync.rateLimited".t),
+                      duration: const Duration(seconds: 2),
+                      behavior: SnackBarBehavior.floating,
+                    ),
+                  );
+                return;
+              }
+              ref.read(syncStatusProvider.notifier).sync();
+            }
+          : null,
     );
   }
 }

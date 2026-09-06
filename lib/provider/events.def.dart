@@ -25,3 +25,26 @@ class GBUserDidUpdateSubscriptionEvent extends GBEvent {
     required this.subscription,
   });
 }
+
+class GBSyncStartedEvent extends GBEvent {
+  const GBSyncStartedEvent();
+}
+
+class GBSyncFinishedEvent extends GBEvent {
+  final DateTime? lastSync;
+
+  const GBSyncFinishedEvent({this.lastSync});
+}
+
+class GBSyncErrorEvent extends GBEvent {
+  final Object error;
+  final StackTrace? stackTrace;
+
+  const GBSyncErrorEvent(this.error, [this.stackTrace]);
+}
+
+class GBSyncTimestampUpdatedEvent extends GBEvent {
+  final DateTime timestamp;
+
+  const GBSyncTimestampUpdatedEvent(this.timestamp);
+}

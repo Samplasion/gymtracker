@@ -261,6 +261,8 @@ class GTIcons {
   static const IconData streak_rest = Icons.nightlight_round;
   static const IconData streak_weeks = _fire;
   static const IconData superset = Icons.layers_rounded;
+  static const IconData sync = Icons.sync_rounded;
+  static const IconData sync_problem = Icons.sync_problem_rounded;
   static const IconData time = Icons.timer_rounded;
   static const IconData tools = Icons.build_rounded;
   static const IconData units = Icons.numbers_rounded;
@@ -379,6 +381,8 @@ class GTIcons {
     'streak_rest': streak_rest,
     'streak_weeks': streak_weeks,
     'superset': superset,
+    'sync': sync,
+    'sync_problem': sync_problem,
     'time': time,
     'tools': tools,
     'units': units,

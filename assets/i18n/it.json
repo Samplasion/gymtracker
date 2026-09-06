@@ -515,6 +515,19 @@
           },
           "deleting": "Eliminazione",
           "create": "Crea backup"
+        },
+        "sync": {
+          "title": "Stato sincronizzazione",
+          "status": {
+            "syncing": "Sincronizzazione in corso...",
+            "notSyncing": "Sincronizzazione terminata",
+            "failed": "Sincronizzazione non riuscita"
+          },
+          "lastSync": "Ultima sincronizzazione: @date",
+          "never": "Mai sincronizzato",
+          "notLoggedIn": "Non hai effettuato l'accesso",
+          "syncNow": "Sincronizza ora",
+          "rateLimited": "Attendi un minuto prima di sincronizzare di nuovo"
         }
       },
       "deleteAccount": {

@@ -16,6 +16,7 @@ import 'package:gymtracker/model/subscription.dart';
 import 'package:gymtracker/model/workout.dart';
 import 'package:gymtracker/model/exercise.dart';
 import 'package:gymtracker/service/database.dart';
+import 'package:gymtracker/service/test.dart';
 import 'package:mocktail/mocktail.dart';
 
 class MockInternalFinalCallback<T> extends Mock
@@ -206,9 +207,12 @@ class MockServices {
     when(
       () => purchasesController.subscriptionInfo,
     ).thenReturn(SubscriptionInfo.empty);
+
+    TestService().isTest = true;
   }
 
   static void tearDown() {
+    TestService().isTest = false;
     Get.reset();
   }
 }

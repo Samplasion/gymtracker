@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:drift/drift.dart' show Value;
+import 'package:flutter/foundation.dart';
 import 'package:get/get.dart' hide Value;
 import 'package:gymtracker/db/database.dart';
 import 'package:gymtracker/db/model/tables/exercise.dart';
@@ -29,8 +30,9 @@ part 'online.g.dart';
 
 class _SharedPrefsStorage extends SyncTimestampStorage {
   final SharedPreferences _prefs;
+  final EventBus? _eventBus;
 
-  _SharedPrefsStorage(this._prefs);
+  _SharedPrefsStorage(this._prefs, [this._eventBus]);
 
   @override
   DateTime? getSyncTimestamp(String key) {
@@ -40,8 +42,110 @@ class _SharedPrefsStorage extends SyncTimestampStorage {
   }
 
   @override
-  Future<void> setSyncTimestamp(String key, DateTime timestamp) {
-    return _prefs.setInt(key, timestamp.millisecondsSinceEpoch);
+  Future<void> setSyncTimestamp(String key, DateTime timestamp) async {
+    await _prefs.setInt(key, timestamp.millisecondsSinceEpoch);
+    _eventBus?.emit(GBSyncTimestampUpdatedEvent(timestamp));
+  }
+}
+
+class GBSyncManager extends SyncManager<GTDatabase> {
+  final EventBus eventBus;
+  final Duration drainCheckInterval;
+  bool _isSyncingTables = false;
+
+  GBSyncManager({
+    required super.localDatabase,
+    required super.supabaseClient,
+    required this.eventBus,
+    super.syncInterval,
+    this.drainCheckInterval = const Duration(milliseconds: 100),
+    super.syncTimestampStorage,
+    super.otherDevicesConsideredInactiveAfter,
+    super.maxRows,
+  });
+
+  bool get isSyncingTables => _isSyncingTables;
+
+  bool get isSyncingAny =>
+      _isSyncingTables || isSyncingFromBackend || isSyncingToBackend;
+
+  Future<void> waitForAllTables({
+    Duration timeout = const Duration(seconds: 30),
+  }) async {
+    final stopwatch = Stopwatch()..start();
+    while (isSyncingFromBackend || isSyncingToBackend) {
+      if (stopwatch.elapsed >= timeout) {
+        logger.w("Sync queue drain timed out after $timeout");
+        break;
+      }
+      await Future.delayed(drainCheckInterval);
+    }
+  }
+
+  @override
+  Future<void> syncTables() async {
+    if (_isSyncingTables) return;
+    _isSyncingTables = true;
+    eventBus.emit(const GBSyncStartedEvent());
+    var success = false;
+    try {
+      await super.syncTables();
+      await waitForAllTables();
+      success = true;
+    } catch (e, s) {
+      eventBus.emit(GBSyncErrorEvent(e, s));
+      rethrow;
+    } finally {
+      _isSyncingTables = false;
+      final now = success ? DateTime.now() : null;
+      eventBus.emit(GBSyncFinishedEvent(lastSync: now));
+    }
+  }
+
+  @override
+  void enableSync() {
+    if (syncingEnabled) return;
+    final startSyncs = nFullSyncs;
+    super.enableSync();
+    if (userId.isNotEmpty) {
+      trackAutomaticSync(startSyncs);
+    }
+  }
+
+  @override
+  void setUserId(String value) {
+    if (userId == value) return;
+    final hadUser = userId.isNotEmpty;
+    final startSyncs = nFullSyncs;
+    super.setUserId(value);
+    if (hadUser && syncingEnabled && value.isNotEmpty) {
+      trackAutomaticSync(startSyncs);
+    }
+  }
+
+  @visibleForTesting
+  void trackAutomaticSync(int startSyncs) {
+    if (_isSyncingTables) return;
+    _isSyncingTables = true;
+    eventBus.emit(const GBSyncStartedEvent());
+    () async {
+      var success = false;
+      try {
+        final stopwatch = Stopwatch()..start();
+        while (nFullSyncs == startSyncs &&
+            stopwatch.elapsed < const Duration(seconds: 30)) {
+          await Future.delayed(drainCheckInterval);
+        }
+        await waitForAllTables();
+        success = nFullSyncs > startSyncs;
+      } catch (e, s) {
+        eventBus.emit(GBSyncErrorEvent(e, s));
+      } finally {
+        _isSyncingTables = false;
+        final now = success ? DateTime.now() : null;
+        eventBus.emit(GBSyncFinishedEvent(lastSync: now));
+      }
+    }();
   }
 }
 
@@ -55,9 +159,9 @@ class Online extends _$Online {
   late final DatabaseService _databaseService;
   late final OnlineService _service;
   late SharedPreferences _prefs;
-  late final SyncManager _syncManager;
+  late final GBSyncManager _syncManager;
 
-  SyncManager get syncManager => _syncManager;
+  GBSyncManager get syncManager => _syncManager;
   OnlineService get onlineService => _service;
 
   OnlineAccount? get accountSync => state.value;
@@ -65,6 +169,19 @@ class Online extends _$Online {
   final Map<String, CachedData<Uri?>> _avatarCache = {};
 
   bool _isInit = false;
+  bool get isInit => _isInit;
+
+  Future<void> sync() async {
+    if (_syncManager.isSyncingAny) {
+      logger.w("Sync is already in progress, skipping sync.");
+      return;
+    }
+    if (_syncManager.syncingEnabled) {
+      await _syncManager.syncTables();
+    } else {
+      logger.w("Syncing is disabled, skipping sync.");
+    }
+  }
 
   Online() {
     _databaseService = Get.find<DatabaseService>();
@@ -75,8 +192,7 @@ class Online extends _$Online {
     }
   }
 
-  bool get isSyncing =>
-      syncManager.isSyncingFromBackend || syncManager.isSyncingToBackend;
+  bool get isSyncing => _syncManager.isSyncingAny;
 
   @override
   FutureOr<OnlineAccount?> build() async {
@@ -329,11 +445,16 @@ class Online extends _$Online {
 
   Future<void> _runOneTimeAsyncBoot() async {
     _prefs = await SharedPreferences.getInstance();
-    _syncManager = SyncManager(
+    _syncManager = GBSyncManager(
       localDatabase: _databaseService.db,
       supabaseClient: Supabase.instance.client,
-      syncTimestampStorage: _SharedPrefsStorage(_prefs),
-      syncInterval: const Duration(minutes: 5),
+      eventBus: ref.read(eventBusProvider),
+      syncTimestampStorage: _SharedPrefsStorage(
+        _prefs,
+        ref.read(eventBusProvider),
+      ),
+      syncInterval: const Duration(seconds: 2),
+      drainCheckInterval: const Duration(milliseconds: 100),
     );
     _isInit = true;
 

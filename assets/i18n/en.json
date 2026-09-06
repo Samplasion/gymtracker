@@ -515,6 +515,19 @@
             "confirm": "This action cannot be undone."
           },
           "deleting": "Deleting"
+        },
+        "sync": {
+          "title": "Sync status",
+          "status": {
+            "syncing": "Syncing...",
+            "notSyncing": "Not syncing",
+            "failed": "Sync failed"
+          },
+          "lastSync": "Last sync: @date",
+          "never": "Never synced",
+          "notLoggedIn": "Not logged in",
+          "syncNow": "Sync now",
+          "rateLimited": "Please wait a minute before syncing again"
         }
       },
       "deleteAccount": {

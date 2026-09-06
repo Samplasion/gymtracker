@@ -4,7 +4,6 @@ import 'package:gymtracker/controller/achievements_controller.dart';
 import 'package:gymtracker/controller/coordinator.dart';
 import 'package:gymtracker/controller/countdown_controller.dart';
 import 'package:gymtracker/controller/exercises_controller.dart';
-import 'package:gymtracker/controller/food_controller.dart';
 import 'package:gymtracker/controller/history_controller.dart';
 import 'package:gymtracker/controller/me_controller.dart';
 import 'package:gymtracker/controller/routines_controller.dart';
@@ -93,12 +92,6 @@ class MockMeController extends Mock implements MeController {
   final onDelete = MockInternalFinalCallback<void>();
 }
 
-class MockFoodController extends Mock implements FoodController {
-  @override
-  final onStart = MockInternalFinalCallback<void>();
-  @override
-  final onDelete = MockInternalFinalCallback<void>();
-}
 
 class MockAchievementsController extends Mock
     implements AchievementsController {
@@ -108,12 +101,7 @@ class MockAchievementsController extends Mock
   final onDelete = MockInternalFinalCallback<void>();
 }
 
-class MockPurchasesController extends Mock implements PurchasesController {
-  @override
-  final onStart = MockInternalFinalCallback<void>();
-  @override
-  final onDelete = MockInternalFinalCallback<void>();
-}
+class MockPurchasesController extends Mock implements PurchasesController {}
 
 // Global setup helper
 class MockServices {
@@ -126,7 +114,6 @@ class MockServices {
   static late MockCountdownController countdownController;
   static late MockExercisesController exercisesController;
   static late MockMeController meController;
-  static late MockFoodController foodController;
   static late MockAchievementsController achievementsController;
   static late MockPurchasesController purchasesController;
 
@@ -142,7 +129,6 @@ class MockServices {
     countdownController = MockCountdownController();
     exercisesController = MockExercisesController();
     meController = MockMeController();
-    foodController = MockFoodController();
     achievementsController = MockAchievementsController();
     purchasesController = MockPurchasesController();
 
@@ -155,7 +141,6 @@ class MockServices {
     Get.put<CountdownController>(countdownController);
     Get.put<ExercisesController>(exercisesController);
     Get.put<MeController>(meController);
-    Get.put<FoodController>(foodController);
     Get.put<AchievementsController>(achievementsController);
     Get.put<PurchasesController>(purchasesController);
 
@@ -167,8 +152,9 @@ class MockServices {
     // SettingsController weight/distance
     when(() => settingsController.weightUnit).thenReturn(Weights.kg.obs);
     when(() => settingsController.distanceUnit).thenReturn(Distance.km.obs);
-    when(() => settingsController.locale)
-        .thenReturn(Rx<Locale?>(const Locale('en', 'US')));
+    when(
+      () => settingsController.locale,
+    ).thenReturn(Rx<Locale?>(const Locale('en', 'US')));
     when(() => settingsController.tintExercises).thenReturn(false.obs);
     when(() => settingsController.usesDynamicColor).thenReturn(false.obs);
     when(() => settingsController.themeMode).thenReturn(ThemeMode.system.obs);
@@ -178,14 +164,18 @@ class MockServices {
     // RoutinesController hasOngoingWorkout
     when(() => routinesController.hasOngoingWorkout).thenReturn(false.obs);
     when(() => routinesController.workouts).thenReturn(<Workout>[].obs);
-    when(() => routinesController.isWorkoutContinuable(any())).thenReturn(false);
+    when(
+      () => routinesController.isWorkoutContinuable(any()),
+    ).thenReturn(false);
 
     // HistoryController history & userVisibleWorkouts
     when(() => historyController.history).thenReturn(<Workout>[].obs);
     when(() => historyController.userVisibleWorkouts).thenReturn(<Workout>[]);
-    when(() => historyController.calculateMuscleCategoryDistributionFor(
-          workouts: any(named: 'workouts'),
-        )).thenReturn(<GTMuscleCategory, double>{});
+    when(
+      () => historyController.calculateMuscleCategoryDistributionFor(
+        workouts: any(named: 'workouts'),
+      ),
+    ).thenReturn(<GTMuscleCategory, double>{});
 
     // DatabaseService empty lists/maps or no-ops
     when(() => databaseService.deleteOngoing()).thenAnswer((_) async {});
@@ -194,24 +184,28 @@ class MockServices {
     // StopwatchController globalStopwatch
     final gs = GlobalStopwatch(onTick: (duration) {});
     when(() => stopwatchController.globalStopwatch).thenReturn(gs);
-    when(() => stopwatchController.updateBinding(any(), any()))
-        .thenAnswer((_) {});
+    when(
+      () => stopwatchController.updateBinding(any(), any()),
+    ).thenAnswer((_) {});
     when(() => stopwatchController.removeStopwatches(any())).thenAnswer((_) {});
 
     // CountdownController
     when(() => countdownController.removeCountdown()).thenAnswer((_) {});
-    when(() => countdownController.startingTime)
-        .thenReturn(Rx<DateTime?>(null));
+    when(
+      () => countdownController.startingTime,
+    ).thenReturn(Rx<DateTime?>(null));
     when(() => countdownController.targetTime).thenReturn(Rx<DateTime?>(null));
 
     // Coordinator methods
     when(() => coordinator.onServiceChange()).thenAnswer((_) {});
 
     // PurchasesController
-    when(() => purchasesController.subscriptionInfoStream)
-        .thenAnswer((_) => Stream.value(SubscriptionInfo.empty));
-    when(() => purchasesController.subscriptionInfo)
-        .thenReturn(SubscriptionInfo.empty);
+    when(
+      () => purchasesController.subscriptionInfoStream,
+    ).thenAnswer((_) => Stream.value(SubscriptionInfo.empty));
+    when(
+      () => purchasesController.subscriptionInfo,
+    ).thenReturn(SubscriptionInfo.empty);
   }
 
   static void tearDown() {

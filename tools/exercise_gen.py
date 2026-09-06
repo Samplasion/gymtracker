@@ -12,20 +12,34 @@ with open(f'{cwd}/assets/i18n/en.json', 'r') as f:
 
 def generate_exercises():
   categories = {}
+  names = {}
   with open(f'{cwd}/lib/data/exercises.dart', 'r') as f:
     text = f.read()
     lines = text.split('\n')
     regex = re.compile(r'id: \"library\.(\w+)\.exercises\.(\w+)\"')
+    name_regex = re.compile(r'name: \"library\.(\w+)\.exercises\.(\w+)\"')
     for line in lines:
       match = regex.search(line)
       if match:
         if not categories.get(match.group(1)):
           categories[match.group(1)] = set()
         categories[match.group(1)].add(match.group(2))
-  return categories
+      match = name_regex.search(line)
+      if match:
+        if not names.get(match.group(1)):
+          names[match.group(1)] = set()
+        names[match.group(1)].add(match.group(2))
+  return (categories, names)
+
+def loc_name_category_from_id(id, names):
+  for category in names:
+    if id in names[category]:
+      return category
+  print(id, names)
+  return None
 
 def main():
-  categories = generate_exercises()
+  categories, names = generate_exercises()
 
   classNames = []
   classes = []
@@ -40,7 +54,10 @@ def main():
 
     sort = sorted(categories[category], key=lambda x: x.lower())
     for exercise in sort:
-      localizedName = localizedNames['library'][category]['exercises'][exercise]
+      try:
+        localizedName = localizedNames['library'][category]['exercises'][exercise]
+      except KeyError:
+        localizedName = localizedNames['library'][loc_name_category_from_id(exercise, names)]['exercises'][exercise]
       klass += f"""
       /// {localizedName}
       String get {exercise} => 'library.{category}.exercises.{exercise}';

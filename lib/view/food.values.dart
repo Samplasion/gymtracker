@@ -1162,13 +1162,84 @@ class SearchResultsView extends ConsumerWidget {
   }
 }
 
-class FoodBarcodeReaderView extends ConsumerWidget {
+class FoodBarcodeReaderView extends ConsumerStatefulWidget {
   final void Function(Food) onFoodReceived;
 
   const FoodBarcodeReaderView({super.key, required this.onFoodReceived});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<FoodBarcodeReaderView> createState() =>
+      _FoodBarcodeReaderViewState();
+}
+
+class _FoodBarcodeReaderViewState extends ConsumerState<FoodBarcodeReaderView>
+    with WidgetsBindingObserver {
+  final controller = MobileScannerController(
+    detectionSpeed: DetectionSpeed.noDuplicates,
+    facing: .back,
+    autoStart: false,
+    formats: [.ean8, .ean13, .upcA, .upcE],
+  );
+
+  StreamSubscription<Object?>? _subscription;
+
+  @override
+  void initState() {
+    super.initState();
+    // Start listening to lifecycle changes.
+    WidgetsBinding.instance.addObserver(this);
+
+    // Start listening to the barcode events.
+    _subscription = controller.barcodes.listen(_rawHandleBarcode);
+
+    // Finally, start the scanner itself.
+    unawaited(controller.start());
+  }
+
+  @override
+  Future<void> dispose() async {
+    // Stop listening to lifecycle changes.
+    WidgetsBinding.instance.removeObserver(this);
+    // Stop listening to the barcode events.
+    unawaited(_subscription?.cancel());
+    _subscription = null;
+    // Dispose the widget itself.
+    super.dispose();
+    // Finally, dispose of the controller.
+    await controller.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    // If the controller is not ready, do not try to start or stop it.
+    // Permission dialogs can trigger lifecycle changes before the controller is ready.
+    print(controller.value.hasCameraPermission);
+    if (!controller.value.hasCameraPermission) {
+      return;
+    }
+
+    switch (state) {
+      case AppLifecycleState.detached:
+      case AppLifecycleState.hidden:
+      case AppLifecycleState.paused:
+        return;
+      case AppLifecycleState.resumed:
+        // Restart the scanner when the app is resumed.
+        // Don't forget to resume listening to the barcode events.
+        _subscription = controller.barcodes.listen(_rawHandleBarcode);
+
+        unawaited(controller.start());
+      case AppLifecycleState.inactive:
+        // Stop the scanner when the app is paused.
+        // Also stop the barcode events subscription.
+        unawaited(_subscription?.cancel());
+        _subscription = null;
+        unawaited(controller.stop());
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final perms =
         ref.watch(foodPermissionsProvider).asData?.value ??
         (camera: false, gallery: false);
@@ -1180,42 +1251,28 @@ class FoodBarcodeReaderView extends ConsumerWidget {
             IconButton(
               icon: const Icon(GTIcons.debug),
               onPressed: () async {
-                String imgUrl =
-                    "https://barcode.orcascan.com/?type=ean13&data=8000965154468&fontsize=Fit&format=png";
-                Code resultFromUrl = await zx.readBarcodeImageUrl(
-                  imgUrl,
-                  DecodeParams(
-                    imageFormat: ImageFormat.rgb,
-                    format: Format.linearCodes,
-                    tryHarder: true,
-                  ),
-                );
-                handleCode(context, ref, resultFromUrl);
+                handleCode(context, ref, "8000965154468");
               },
             ),
         ],
       ),
-      body: ReaderWidget(
-        showToggleCamera: false,
-        actionButtonsBackgroundColor: Theme.of(
-          context,
-        ).colorScheme.surfaceContainerHigh.withAlpha((0.5 * 255).round()),
-        codeFormat: Format.linearCodes,
-        scannerOverlay: ScannerOverlayBorder(
-          borderColor: context.theme.colorScheme.primary,
-          borderRadius: 8,
-          borderLength: 32,
-          borderWidth: 4,
-          cutOutSize: 0.85,
-        ),
-        showGallery: perms.gallery,
-        onScan: (result) async {
-          handleCode(context, ref, result);
+      body: MobileScanner(
+        controller: controller,
+        onDetectError: (Object error, StackTrace stackTrace) {
+          Go.snack("$error");
         },
-        tryHarder: true,
-        tryInverted: true,
-        tryDownscale: true,
-        maxNumberOfSymbols: 15,
+        placeholderBuilder: (context) {
+          return Center(child: GBLoadingIndicator());
+        },
+        overlayBuilder: (context, _) {
+          final windowSize = MediaQuery.of(context).size;
+          final smallestSide = math.min(windowSize.width, windowSize.height);
+          final size = Size(smallestSide * 0.8, smallestSide * 0.4);
+          return ClipPath(
+            clipper: InvertedClipper(windowSize: size),
+            child: Container(color: Colors.black54),
+          );
+        },
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
@@ -1233,30 +1290,58 @@ class FoodBarcodeReaderView extends ConsumerWidget {
     );
   }
 
+  void _rawHandleBarcode(BarcodeCapture result) async {
+    handleCode(context, ref, result.barcodes.first.rawValue);
+  }
+
   Future<void> handleCode(
     BuildContext context,
     WidgetRef ref,
-    Code code,
+    String? code,
   ) async {
-    logger.d((code.isValid, code.text));
-
-    if (!code.isValid || code.text == null) {
-      code.logger.w("Invalid code");
+    if (code == null) {
+      logger.w("Invalid code");
       return;
     }
 
-    return searchFoodByBarcode(context, ref, code.text!).then((food) {
+    return searchFoodByBarcode(context, ref, code).then((food) {
       if (food == null) {
-        logger.w("No food found for barcode ${code.text}");
+        logger.w("No food found for barcode $code");
         return;
       }
-      onFoodReceived(food);
+      widget.onFoodReceived(food);
     });
   }
 }
 
+class InvertedClipper extends CustomClipper<Path> {
+  final Size windowSize;
+
+  InvertedClipper({required this.windowSize});
+
+  @override
+  Path getClip(Size size) {
+    return Path()
+      ..addRect(Rect.fromLTWH(0, 0, size.width, size.height))
+      ..addRRect(
+        RRect.fromRectAndRadius(
+          Rect.fromCenter(
+            center: Offset(size.width / 2, size.height / 2),
+            width: windowSize.width,
+            height: windowSize.height,
+          ),
+          const Radius.circular(16),
+        ),
+      )
+      ..fillType = PathFillType.evenOdd;
+  }
+
+  @override
+  bool shouldReclip(CustomClipper<Path> oldClipper) => true;
+}
+
 class ManualBarcodeInsertionScreen extends StatefulWidget {
-  final void Function(Code) handleCode;
+  final void Function(String?) handleCode;
 
   const ManualBarcodeInsertionScreen({super.key, required this.handleCode});
 
@@ -1273,7 +1358,7 @@ class _ManualBarcodeInsertionScreenState
   void ok() {
     if (!formKey.currentState!.validate()) return;
 
-    final code = Code(isValid: true, text: controller.text);
+    final code = controller.text;
     Get.back();
     SchedulerBinding.instance.addPostFrameCallback((_) {
       widget.handleCode(code);

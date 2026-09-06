@@ -38,7 +38,6 @@ dependencies:
   package_info_plus: ^10.2.1
   path: ^1.9.0
   path_provider: ^2.1.2
-  # protocol_handler: ^0.2.0
   app_links: ^7.2.1
   qr_flutter: ^4.1.0
   quill_delta: ^3.0.0-nullsafety.2
@@ -61,7 +60,6 @@ dependencies:
   dio: ^5.4.3+1
   fuzzywuzzy: ^1.1.6
   collection: ^1.18.0
-  flutter_zxing: ^2.2.1
   url_launcher: ^6.3.0
   sliver_tools: ^0.2.12
   csv: ^8.0.0
@@ -90,6 +88,7 @@ dependencies:
   syncable: ^1.0.3
   online_offline: ^1.0.1
   lottie: ^3.5.1
+  mobile_scanner: ^7.4.0
   
 dev_dependencies:
   sentry_dart_plugin: ^3.4.0

@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math' as math;
 import 'dart:ui';
 
 import 'package:dio/dio.dart';
@@ -8,7 +9,6 @@ import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
-import 'package:flutter_zxing/flutter_zxing.dart';
 import 'package:gauge_indicator/gauge_indicator.dart';
 import 'package:get/get.dart';
 import 'package:gymtracker/icons/gymtracker_icons.dart';
@@ -22,7 +22,6 @@ import 'package:gymtracker/utils/constants.dart';
 import 'package:gymtracker/utils/extensions.dart' hide ContextThemingUtils;
 import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/utils/skeletons.dart';
-import 'package:collection/collection.dart';
 import 'package:gymtracker/utils/utils.dart';
 import 'package:gymtracker/view/components/alert_banner.dart';
 import 'package:gymtracker/view/components/error_view.dart';
@@ -41,6 +40,7 @@ import 'package:gymtracker/view/utils/search_anchor_plus.dart';
 import 'package:gymtracker/view/utils/sliver_utils.dart';
 import 'package:gymtracker/view/utils/speed_dial.dart';
 import 'package:intl/intl.dart';
+import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:relative_time/relative_time.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 import 'package:sliver_tools/sliver_tools.dart';
@@ -1074,7 +1074,6 @@ class FoodNutritionEatenCaloriesGauge extends StatelessWidget {
         duration: const Duration(seconds: 2),
         value: value / goal,
         builder: (context, value) {
-          print((value, value.clamp((2 / 100).clamp(0, 0.75), 1)));
           return RadialGauge(
             radius: 100,
             // Clamp the value to the goal, but make sure it's at least at 2% of the

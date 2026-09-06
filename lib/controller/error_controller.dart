@@ -5,6 +5,7 @@ import 'package:gymtracker/service/logger.dart';
 import 'package:gymtracker/service/test.dart';
 import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/view/error.dart';
+import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class ErrorController extends GetxController {
@@ -28,6 +29,19 @@ class ErrorController extends GetxController {
   }
 
   void sendDetails(FlutterErrorDetails details) {
+    Sentry.captureException(
+      details.exception,
+      stackTrace: details.stack,
+      withScope: (scope) {
+        if (details.context != null) {
+          scope.setExtra('context', details.context.toString());
+        }
+        if (details.library != null) {
+          scope.setExtra('library', details.library!);
+        }
+      },
+    );
+
     if (Go.getTopmostRouteName() == ErrorView.routeName) {
       logger.i("We are already in ErrorView. Here's the error:");
       logger.w("", error: details.exception, stackTrace: details.stack);
@@ -37,8 +51,11 @@ class ErrorController extends GetxController {
     // Ignore errors that are not from the app
     if (details.stack != null &&
         !details.stack!.toString().contains('package:gymtracker')) {
-      logger.w("We got a framework error:");
-      logger.e("", error: details.exception, stackTrace: details.stack);
+      logger.w(
+        "We got a framework error:",
+        error: details.exception,
+        stackTrace: details.stack,
+      );
       return;
     }
 
@@ -51,6 +68,10 @@ class ErrorController extends GetxController {
   }
 
   void sendError(Object error, StackTrace stack) {
+    Sentry.captureException(
+      error,
+      stackTrace: stack,
+    );
     if (Go.getTopmostRouteName() == ErrorView.routeName) {
       logger.w(
         "We are already in ErrorView. Here's the error:",

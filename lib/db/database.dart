@@ -582,6 +582,13 @@ class GTDatabaseImpl extends _$GTDatabaseImpl
       TableUpdate.onTable(historyWorkoutExercises),
       TableUpdate.onTable(customExercises),
       TableUpdate.onTable(achievements),
+      TableUpdate.onTable(foods),
+      TableUpdate.onTable(customBarcodeFoods),
+      TableUpdate.onTable(favoriteFoods),
+      TableUpdate.onTable(nutritionCategories),
+      TableUpdate.onTable(nutritionGoals),
+      TableUpdate.onTable(weightMeasurements),
+      TableUpdate.onTable(bodyMeasurements),
     });
   }
 

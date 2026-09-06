@@ -4,7 +4,7 @@ import 'package:get/get.dart';
 import 'package:gymtracker/controller/coordinator.dart';
 import 'package:gymtracker/model/achievements.dart';
 import 'package:gymtracker/provider/food.dart';
-import 'package:gymtracker/service/database.dart';
+import 'package:gymtracker/repository/foods.dart';
 import 'package:gymtracker/struct/date_sequence.dart';
 import 'package:gymtracker/struct/nutrition.dart';
 import 'package:gymtracker/utils/extensions.dart';
@@ -17,30 +17,27 @@ class MockInternalFinalCallback<T> extends Mock
   T call() => null as dynamic;
 }
 
-class MockDatabaseService extends Mock implements DatabaseService {
-  @override
+class MockFoodsRepository extends Mock implements FoodsRepository {
   final foods$ = BehaviorSubject<List<DateTagged<Food>>>.seeded([]);
-  @override
   final favoriteFoods$ = BehaviorSubject<List<Food>>.seeded([]);
-  @override
   final customBarcodeFoods$ = BehaviorSubject<Map<String, Food>>.seeded({});
-  @override
   final nutritionGoals$ = BehaviorSubject<List<TaggedNutritionGoal>>.seeded([]);
-  @override
   final nutritionCategories$ =
       BehaviorSubject<DateSequence<Map<String, NutritionCategory>>>.seeded(
     DateSequence.empty(),
   );
 
-  @override
-  final onStart = MockInternalFinalCallback<void>();
-  @override
-  final onDelete = MockInternalFinalCallback<void>();
-
-  @override
-  void addListener(void Function() listener) {}
-  @override
-  void removeListener(void Function() listener) {}
+  MockFoodsRepository() {
+    when(() => watchFoods()).thenAnswer((_) => foods$.stream);
+    when(() => watchFavoriteFoods()).thenAnswer((_) => favoriteFoods$.stream);
+    when(() => watchCustomBarcodeFoods()).thenAnswer(
+      (_) => customBarcodeFoods$.stream,
+    );
+    when(() => watchNutritionGoals()).thenAnswer((_) => nutritionGoals$.stream);
+    when(() => watchNutritionCategories()).thenAnswer(
+      (_) => nutritionCategories$.stream,
+    );
+  }
 }
 
 class MockCoordinator extends Mock implements Coordinator {
@@ -51,7 +48,7 @@ class MockCoordinator extends Mock implements Coordinator {
 }
 
 void main() {
-  late MockDatabaseService mockDb;
+  late MockFoodsRepository mockFoodsRepo;
   late MockCoordinator mockCoordinator;
   late ProviderContainer container;
 
@@ -102,27 +99,31 @@ void main() {
     Get.reset();
     Get.testMode = true;
 
-    mockDb = MockDatabaseService();
+    mockFoodsRepo = MockFoodsRepository();
     mockCoordinator = MockCoordinator();
 
-    Get.put<DatabaseService>(mockDb);
     Get.put<Coordinator>(mockCoordinator);
 
-    when(() => mockDb.addFood(any())).thenAnswer((_) {});
-    when(() => mockDb.removeFood(any())).thenAnswer((_) {});
-    when(() => mockDb.updateFood(any())).thenAnswer((_) {});
-    when(() => mockDb.addFavoriteFood(any())).thenAnswer((_) {});
-    when(() => mockDb.removeFavoriteFood(any())).thenAnswer((_) {});
-    when(() => mockDb.addCustomBarcodeFood(any(), any())).thenAnswer((_) {});
-    when(() => mockDb.addNutritionGoal(any())).thenAnswer((_) {});
-    when(() => mockDb.setNutritionCategoriesForDay(any(), any()))
-        .thenAnswer((_) {});
+    when(() => mockFoodsRepo.addFood(any())).thenAnswer((_) async {});
+    when(() => mockFoodsRepo.removeFood(any())).thenAnswer((_) async {});
+    when(() => mockFoodsRepo.updateFood(any())).thenAnswer((_) async {});
+    when(() => mockFoodsRepo.addFavoriteFood(any())).thenAnswer((_) async {});
+    when(() => mockFoodsRepo.removeFavoriteFood(any())).thenAnswer((_) async {});
+    when(() => mockFoodsRepo.addCustomBarcodeFood(any(), any()))
+        .thenAnswer((_) async {});
+    when(() => mockFoodsRepo.addNutritionGoal(any())).thenAnswer((_) async {});
+    when(() => mockFoodsRepo.setNutritionCategoriesForDay(any(), any()))
+        .thenAnswer((_) async {});
 
     when(() => mockCoordinator.maybeUnlockAchievements(any()))
         .thenReturn(<Achievement, List<AchievementCompletion>>{});
     when(() => mockCoordinator.scheduleBackup()).thenAnswer((_) {});
 
-    container = ProviderContainer();
+    container = ProviderContainer(
+      overrides: [
+        foodsRepositoryProvider.overrideWithValue(mockFoodsRepo),
+      ],
+    );
     container.listen(foodLogsStreamProvider, (prev, next) {});
     container.listen(nutritionGoalsStreamProvider, (prev, next) {});
     container.listen(nutritionCategoriesStreamProvider, (prev, next) {});
@@ -196,7 +197,7 @@ void main() {
     final foodB = createSampleFood(id: "f2", name: "Banana");
 
     test("foodsForDate and taggedFoodsForDate filter by date", () async {
-      mockDb.foods$.add([
+      mockFoodsRepo.foods$.add([
         DateTagged(date: d1, value: foodA),
         DateTagged(date: d2, value: foodB),
       ]);
@@ -215,7 +216,7 @@ void main() {
     });
 
     test("foodsForSelectedDate and taggedFoodsForSelectedDate follow foodSelectedDateProvider", () async {
-      mockDb.foods$.add([
+      mockFoodsRepo.foods$.add([
         DateTagged(date: d1, value: foodA),
         DateTagged(date: d2, value: foodB),
       ]);
@@ -231,8 +232,8 @@ void main() {
     });
 
     test("favoriteFoodsStream and customBarcodeFoodsStream pipe from database", () async {
-      mockDb.favoriteFoods$.add([foodA]);
-      mockDb.customBarcodeFoods$.add({"123456": foodB});
+      mockFoodsRepo.favoriteFoods$.add([foodA]);
+      mockFoodsRepo.customBarcodeFoods$.add({"123456": foodB});
       await pumpEventQueue();
 
       final favs = container.read(favoriteFoodsStreamProvider).asData?.value;
@@ -247,7 +248,7 @@ void main() {
       final f2 = createSampleFood(id: "2", name: "Oatmeal", brand: "Quaker");
       final f3 = createSampleFood(id: "3", name: "Banana");
 
-      mockDb.foods$.add([
+      mockFoodsRepo.foods$.add([
         DateTagged(date: d1, value: f1),
         DateTagged(date: d2, value: f2),
         DateTagged(date: d2, value: f3),
@@ -275,7 +276,7 @@ void main() {
 
       container.read(foodProvider.notifier).addFood(today, food, category: cat);
 
-      final captured = verify(() => mockDb.addFood(captureAny())).captured.single
+      final captured = verify(() => mockFoodsRepo.addFood(captureAny())).captured.single
           as DateTagged<Food>;
       expect(captured.date, today);
       expect(captured.value.name, "Chicken Breast");
@@ -290,7 +291,7 @@ void main() {
     test("removeFood calls dbService.removeFood, achievements and backup", () {
       container.read(foodProvider.notifier).removeFood(today, food);
 
-      final captured = verify(() => mockDb.removeFood(captureAny())).captured.single
+      final captured = verify(() => mockFoodsRepo.removeFood(captureAny())).captured.single
           as DateTagged<Food>;
       expect(captured.date, today);
       expect(captured.value, food);
@@ -300,26 +301,28 @@ void main() {
       verify(() => mockCoordinator.scheduleBackup()).called(1);
     });
 
-    test("updateFood updates food when it exists on the date", () {
-      mockDb.foods$.add([DateTagged(date: today, value: food)]);
+    test("updateFood updates food when it exists on the date", () async {
+      mockFoodsRepo.foods$.add([DateTagged(date: today, value: food)]);
+      await pumpEventQueue();
 
       final updated = food.copyWith(amount: 250);
       container.read(foodProvider.notifier).updateFood(today, updated);
 
-      final captured = verify(() => mockDb.updateFood(captureAny())).captured.single
+      final captured = verify(() => mockFoodsRepo.updateFood(captureAny())).captured.single
           as DateTagged<Food>;
       expect(captured.date, today);
       expect(captured.value.amount, 250);
       verify(() => mockCoordinator.scheduleBackup()).called(1);
     });
 
-    test("updateFood does nothing if food does not exist on the date", () {
-      mockDb.foods$.add([]);
+    test("updateFood does nothing if food does not exist on the date", () async {
+      mockFoodsRepo.foods$.add([]);
+      await pumpEventQueue();
 
       final updated = food.copyWith(amount: 250);
       container.read(foodProvider.notifier).updateFood(today, updated);
 
-      verifyNever(() => mockDb.updateFood(any()));
+      verifyNever(() => mockFoodsRepo.updateFood(any()));
     });
 
     test("copyToToday adds food to today and sets selected date to today", () {
@@ -329,16 +332,16 @@ void main() {
       container.read(foodProvider.notifier).copyToToday(food);
 
       expect(container.read(foodSelectedDateProvider), today);
-      verify(() => mockDb.addFood(any())).called(1);
+      verify(() => mockFoodsRepo.addFood(any())).called(1);
     });
 
     test("addFavorite and removeFavorite delegate to dbService", () {
       container.read(foodProvider.notifier).addFavorite(food);
-      verify(() => mockDb.addFavoriteFood(food)).called(1);
+      verify(() => mockFoodsRepo.addFavoriteFood(food)).called(1);
       verify(() => mockCoordinator.scheduleBackup()).called(1);
 
       container.read(foodProvider.notifier).removeFavorite(food);
-      verify(() => mockDb.removeFavoriteFood(food)).called(1);
+      verify(() => mockFoodsRepo.removeFavoriteFood(food)).called(1);
     });
 
     test("addCustomBarcodeFood delegates to dbService with category", () {
@@ -352,7 +355,7 @@ void main() {
           .read(foodProvider.notifier)
           .addCustomBarcodeFood("11223344", food, cat);
 
-      verify(() => mockDb.addCustomBarcodeFood(
+      verify(() => mockFoodsRepo.addCustomBarcodeFood(
             "11223344",
             any(that: predicate<Food>((f) => f.category == "Snack")),
           )).called(1);
@@ -376,7 +379,7 @@ void main() {
     );
 
     test("nutritionGoalsStream returns default goal if stream is empty", () async {
-      mockDb.nutritionGoals$.add([]);
+      mockFoodsRepo.nutritionGoals$.add([]);
       await pumpEventQueue();
 
       final seq = container.read(nutritionGoalsStreamProvider).asData?.value;
@@ -385,7 +388,7 @@ void main() {
     });
 
     test("nutritionGoalForDate and nutritionGoalForSelectedDate fetch correct goals", () async {
-      mockDb.nutritionGoals$.add([
+      mockFoodsRepo.nutritionGoals$.add([
         TaggedNutritionGoal(date: d1, value: goal1),
         TaggedNutritionGoal(date: d2, value: goal2),
       ]);
@@ -402,7 +405,7 @@ void main() {
     });
 
     test("nutritionGoalDateRange calculates range for selected date", () async {
-      mockDb.nutritionGoals$.add([
+      mockFoodsRepo.nutritionGoals$.add([
         TaggedNutritionGoal(date: d1, value: goal1),
         TaggedNutritionGoal(date: d2, value: goal2),
       ]);
@@ -420,7 +423,7 @@ void main() {
       container.read(nutritionGoalProvider.notifier).saveNewGoal(goal1);
 
       final captured =
-          verify(() => mockDb.addNutritionGoal(captureAny())).captured.single
+          verify(() => mockFoodsRepo.addNutritionGoal(captureAny())).captured.single
               as TaggedNutritionGoal;
       expect(captured.date, d1);
       expect(captured.value, goal1);
@@ -445,7 +448,7 @@ void main() {
       final seq = DateSequence.fromDatesAndValues({
         date: {"Breakfast": catBreakfast, "Lunch": catLunch},
       });
-      mockDb.nutritionCategories$.add(seq);
+      mockFoodsRepo.nutritionCategories$.add(seq);
       await pumpEventQueue();
 
       final cats = container.read(categoriesForDateProvider(date));
@@ -460,13 +463,13 @@ void main() {
       final seq = DateSequence.fromDatesAndValues({
         date: {"Breakfast": catBreakfast},
       });
-      mockDb.nutritionCategories$.add(seq);
+      mockFoodsRepo.nutritionCategories$.add(seq);
 
       final food1 = createSampleFood(id: "1", name: "Egg", category: "Breakfast");
       final food2 = createSampleFood(id: "2", name: "Candy", category: null);
       final food3 = createSampleFood(id: "3", name: "Dinner Item", category: "Dinner");
 
-      mockDb.foods$.add([
+      mockFoodsRepo.foods$.add([
         DateTagged(date: date, value: food1),
         DateTagged(date: date, value: food2),
         DateTagged(date: date, value: food3),
@@ -487,7 +490,7 @@ void main() {
       final seq = DateSequence.fromDatesAndValues({
         date: {"Breakfast": catBreakfast},
       });
-      mockDb.nutritionCategories$.add(seq);
+      mockFoodsRepo.nutritionCategories$.add(seq);
       await pumpEventQueue();
 
       container.read(foodSelectedDateProvider.notifier).setDate(date);
@@ -500,7 +503,7 @@ void main() {
       final seq = DateSequence.fromDatesAndValues({
         date: {"Breakfast": catBreakfast},
       });
-      mockDb.nutritionCategories$.add(seq);
+      mockFoodsRepo.nutritionCategories$.add(seq);
       await pumpEventQueue();
 
       container.read(foodSelectedDateProvider.notifier).setDate(date);
@@ -518,7 +521,7 @@ void main() {
           .read(nutritionCategoryProvider.notifier)
           .addCategory(catLunch);
 
-      verify(() => mockDb.setNutritionCategoriesForDay(
+      verify(() => mockFoodsRepo.setNutritionCategoriesForDay(
             date,
             any(that: predicate<Map<String, NutritionCategory>>(
               (m) => m.containsKey("Breakfast") && m.containsKey("Lunch"),
@@ -531,7 +534,7 @@ void main() {
       final seq = DateSequence.fromDatesAndValues({
         date: {"Breakfast": catBreakfast, "Lunch": catLunch},
       });
-      mockDb.nutritionCategories$.add(seq);
+      mockFoodsRepo.nutritionCategories$.add(seq);
       await pumpEventQueue();
 
       container.read(foodSelectedDateProvider.notifier).setDate(date);
@@ -539,7 +542,7 @@ void main() {
           .read(nutritionCategoryProvider.notifier)
           .removeCategory(catBreakfast);
 
-      verify(() => mockDb.setNutritionCategoriesForDay(
+      verify(() => mockFoodsRepo.setNutritionCategoriesForDay(
             date,
             any(that: predicate<Map<String, NutritionCategory>>(
               (m) => !m.containsKey("Breakfast") && m.containsKey("Lunch"),
@@ -552,7 +555,7 @@ void main() {
       final seq = DateSequence.fromDatesAndValues({
         date: {"Breakfast": catBreakfast},
       });
-      mockDb.nutritionCategories$.add(seq);
+      mockFoodsRepo.nutritionCategories$.add(seq);
       await pumpEventQueue();
 
       final updatedBreakfast = const NutritionCategory(
@@ -566,7 +569,7 @@ void main() {
           .read(nutritionCategoryProvider.notifier)
           .updateCategory("Breakfast", updatedBreakfast);
 
-      verify(() => mockDb.setNutritionCategoriesForDay(
+      verify(() => mockFoodsRepo.setNutritionCategoriesForDay(
             date,
             any(that: predicate<Map<String, NutritionCategory>>(
               (m) =>

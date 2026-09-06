@@ -46,6 +46,11 @@ class _SharedPrefsStorage extends SyncTimestampStorage {
 }
 
 @Riverpod(keepAlive: true)
+String? currentUserId(Ref ref) {
+  return ref.watch(onlineProvider).value?.id;
+}
+
+@Riverpod(keepAlive: true)
 class Online extends _$Online {
   late final DatabaseService _databaseService;
   late final OnlineService _service;
@@ -467,7 +472,9 @@ class Online extends _$Online {
   Future<OnlineAccount?> _getAccountAndDoStuff({
     OnlineAccount? accountFromEvents,
   }) async {
-    state = const AsyncValue.loading();
+    if (!state.hasValue) {
+      state = const AsyncValue.loading();
+    }
     final account = accountFromEvents ?? await _service.getAccount();
     state = AsyncValue.data(account);
     if (account != null) {
@@ -475,8 +482,13 @@ class Online extends _$Online {
       if (ref.read(networkConnectivityProvider).value ?? false) {
         _syncManager.enableSync();
       }
-      _databaseService.setCurrentUserId(account.id);
-      await _fillMissingUserIdAndTouchStaleTimestamps(account.id);
+      if (_databaseService.db.currentUserId != account.id) {
+        _databaseService.setCurrentUserId(account.id);
+        await _fillMissingUserIdAndTouchStaleTimestamps(account.id);
+      }
+    } else if (_databaseService.db.currentUserId != null) {
+      _syncManager.disableSync();
+      _databaseService.setCurrentUserId(null);
     }
     return account;
   }

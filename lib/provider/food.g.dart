@@ -220,7 +220,7 @@ final class FoodLogsStreamProvider
   }
 }
 
-String _$foodLogsStreamHash() => r'a9be6f36f390b5358ddd219e07e8eeff1e68dcfb';
+String _$foodLogsStreamHash() => r'6f4a8b050a020b76ce15c7d6cf38048458f25e33';
 
 @ProviderFor(foodsForDate)
 final foodsForDateProvider = FoodsForDateFamily._();
@@ -511,7 +511,7 @@ final class FavoriteFoodsStreamProvider
 }
 
 String _$favoriteFoodsStreamHash() =>
-    r'627e3dd637abd412f2a65c2e9b1137077b3d033f';
+    r'b458c79cd3930b9e57080a574afb06e92794293f';
 
 @ProviderFor(customBarcodeFoodsStream)
 final customBarcodeFoodsStreamProvider = CustomBarcodeFoodsStreamProvider._();
@@ -553,7 +553,7 @@ final class CustomBarcodeFoodsStreamProvider
 }
 
 String _$customBarcodeFoodsStreamHash() =>
-    r'e3dbd84a90d8b225d80d0fd318e550b9d52c18da';
+    r'5314f7c172877fe5b59b8063f2d846962013fe04';
 
 @ProviderFor(foodSuggestions)
 final foodSuggestionsProvider = FoodSuggestionsFamily._();
@@ -669,7 +669,7 @@ final class FoodNotifierProvider extends $NotifierProvider<FoodNotifier, void> {
   }
 }
 
-String _$foodNotifierHash() => r'423fe45f962168cb373a42579130b5a6dfa121ed';
+String _$foodNotifierHash() => r'50a97b91e893350f8a0ca819271be9cd9dffb78e';
 
 abstract class _$FoodNotifier extends $Notifier<void> {
   void build();
@@ -729,7 +729,7 @@ final class NutritionGoalsStreamProvider
 }
 
 String _$nutritionGoalsStreamHash() =>
-    r'0f4a95a2b2f8b961ba1fd8bf57b4197c05946a97';
+    r'd7bc1ab72fe64ddfdd40617d54eade39f7111d73';
 
 @ProviderFor(nutritionGoalForDate)
 final nutritionGoalForDateProvider = NutritionGoalForDateFamily._();
@@ -927,7 +927,7 @@ final class NutritionGoalNotifierProvider
 }
 
 String _$nutritionGoalNotifierHash() =>
-    r'436b8201fd56b23c0822caf28e8fb92faa92ca62';
+    r'561d21951c908e43fe44c03ee0c6a2b67ffc611a';
 
 abstract class _$NutritionGoalNotifier extends $Notifier<void> {
   void build();
@@ -986,7 +986,7 @@ final class NutritionCategoriesStreamProvider
 }
 
 String _$nutritionCategoriesStreamHash() =>
-    r'a416796a0f65e66e03edce599bc3593bc332cd44';
+    r'5764482af5a4238632084a3279f92632c2e2ef3f';
 
 @ProviderFor(categoriesForDate)
 final categoriesForDateProvider = CategoriesForDateFamily._();
@@ -1406,7 +1406,7 @@ final class NutritionCategoryNotifierProvider
 }
 
 String _$nutritionCategoryNotifierHash() =>
-    r'654e12d92480008e4c3defd7e74a2146dfdd15c3';
+    r'3a7b874b365af41a2e665ffaf3e6e901c4a31bb2';
 
 abstract class _$NutritionCategoryNotifier extends $Notifier<void> {
   void build();

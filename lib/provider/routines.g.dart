@@ -46,7 +46,7 @@ final class RoutinesStreamProvider
   }
 }
 
-String _$routinesStreamHash() => r'3e9ce9f3c96a962288bb5eff0e8698f13633263f';
+String _$routinesStreamHash() => r'2b967a50f368ca228729265262bd844bf9ec10df';
 
 @ProviderFor(foldersStream)
 final foldersStreamProvider = FoldersStreamProvider._();

@@ -784,6 +784,7 @@ class DatabaseService extends GetxService
   }
 
   void setCurrentUserId(String? id) {
+    if (_db.currentUserId == id) return;
     _db.setCurrentUserId(id);
 
     eraseAllSubjects();

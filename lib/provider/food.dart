@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:collection/collection.dart';
-import 'package:dio/dio.dart';
 import 'package:flutter/widgets.dart';
 import 'package:fuzzywuzzy/fuzzywuzzy.dart';
 import 'package:get/get.dart';
@@ -10,7 +9,7 @@ import 'package:gymtracker/controller/coordinator.dart';
 import 'package:gymtracker/controller/settings_controller.dart';
 import 'package:gymtracker/model/achievements.dart';
 import 'package:gymtracker/model/native.dart';
-import 'package:gymtracker/service/database.dart';
+import 'package:gymtracker/repository/foods.dart';
 import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/service/logger.dart';
 import 'package:gymtracker/service/native.dart';
@@ -19,8 +18,6 @@ import 'package:gymtracker/struct/date_sequence.dart';
 import 'package:gymtracker/struct/nutrition.dart';
 import 'package:gymtracker/struct/optional.dart';
 import 'package:gymtracker/utils/extensions.dart';
-import 'package:gymtracker/utils/utils.dart' as utils show stringifyDouble;
-import 'package:gymtracker/utils/utils.dart';
 import 'package:intl/intl.dart';
 import 'package:openfoodfacts/openfoodfacts.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -96,8 +93,7 @@ bool foodCanUpdateCategories(Ref ref) {
 
 @riverpod
 Stream<List<DateTagged<Food>>> foodLogsStream(Ref ref) {
-  final dbService = Get.find<DatabaseService>();
-  return dbService.foods$;
+  return ref.watch(foodsRepositoryProvider).watchFoods();
 }
 
 @riverpod
@@ -126,14 +122,12 @@ List<DateTagged<Food>> taggedFoodsForSelectedDate(Ref ref) {
 
 @riverpod
 Stream<List<Food>> favoriteFoodsStream(Ref ref) {
-  final dbService = Get.find<DatabaseService>();
-  return dbService.favoriteFoods$;
+  return ref.watch(foodsRepositoryProvider).watchFavoriteFoods();
 }
 
 @riverpod
 Stream<Map<String, Food>> customBarcodeFoodsStream(Ref ref) {
-  final dbService = Get.find<DatabaseService>();
-  return dbService.customBarcodeFoods$;
+  return ref.watch(foodsRepositoryProvider).watchCustomBarcodeFoods();
 }
 
 @riverpod
@@ -154,8 +148,7 @@ class FoodNotifier extends _$FoodNotifier {
   void build() {}
 
   void addFood(DateTime dateTime, Food food, {NutritionCategory? category}) {
-    final dbService = Get.find<DatabaseService>();
-    dbService.addFood(
+    ref.read(foodsRepositoryProvider).addFood(
       DateTagged(
         date: dateTime.startOfDay,
         value: food.copyWith(
@@ -170,20 +163,20 @@ class FoodNotifier extends _$FoodNotifier {
   }
 
   void removeFood(DateTime dateTime, Food food) {
-    final dbService = Get.find<DatabaseService>();
-    dbService.removeFood(DateTagged(date: dateTime.startOfDay, value: food));
+    ref.read(foodsRepositoryProvider).removeFood(
+      DateTagged(date: dateTime.startOfDay, value: food),
+    );
     Get.find<Coordinator>().maybeUnlockAchievements(AchievementTrigger.food);
     Get.find<Coordinator>().scheduleBackup();
   }
 
   void updateFood(DateTime dateTime, Food updatedFood) {
-    final dbService = Get.find<DatabaseService>();
-    final dayFoods = dbService.foods$.value.where(
-      (element) => element.date == dateTime,
-    );
-    if (!dayFoods.any((element) => element.value.id == updatedFood.id)) return;
+    final dayFoods = ref.read(foodsForDateProvider(dateTime));
+    if (!dayFoods.any((element) => element.id == updatedFood.id)) return;
 
-    dbService.updateFood(DateTagged(date: dateTime, value: updatedFood));
+    ref.read(foodsRepositoryProvider).updateFood(
+      DateTagged(date: dateTime, value: updatedFood),
+    );
     Get.find<Coordinator>().scheduleBackup();
   }
 
@@ -197,14 +190,12 @@ class FoodNotifier extends _$FoodNotifier {
   }
 
   void addFavorite(Food food) {
-    final dbService = Get.find<DatabaseService>();
-    dbService.addFavoriteFood(food);
+    ref.read(foodsRepositoryProvider).addFavoriteFood(food);
     Get.find<Coordinator>().scheduleBackup();
   }
 
   void removeFavorite(Food food) {
-    final dbService = Get.find<DatabaseService>();
-    dbService.removeFavoriteFood(food);
+    ref.read(foodsRepositoryProvider).removeFavoriteFood(food);
     Get.find<Coordinator>().scheduleBackup();
   }
 
@@ -213,8 +204,7 @@ class FoodNotifier extends _$FoodNotifier {
     Food food,
     NutritionCategory? category,
   ) {
-    final dbService = Get.find<DatabaseService>();
-    dbService.addCustomBarcodeFood(
+    ref.read(foodsRepositoryProvider).addCustomBarcodeFood(
       barcode,
       food.copyWith(category: category?.name),
     );
@@ -226,10 +216,9 @@ class FoodNotifier extends _$FoodNotifier {
 // -----------------------------------------------------------------------------
 
 @riverpod
-Stream<DateSequence<NutritionGoal>> nutritionGoalsStream(Ref ref) async* {
-  final dbService = Get.find<DatabaseService>();
-  await for (final goals in dbService.nutritionGoals$) {
-    yield DateSequence.fromList(
+Stream<DateSequence<NutritionGoal>> nutritionGoalsStream(Ref ref) {
+  return ref.watch(foodsRepositoryProvider).watchNutritionGoals().map((goals) {
+    return DateSequence.fromList(
       goals +
           [
             if (goals.isEmpty)
@@ -239,7 +228,7 @@ Stream<DateSequence<NutritionGoal>> nutritionGoalsStream(Ref ref) async* {
               ),
           ],
     );
-  }
+  });
 }
 
 @riverpod
@@ -277,8 +266,7 @@ class NutritionGoalNotifier extends _$NutritionGoalNotifier {
 
   void saveNewGoal(NutritionGoal newGoal) {
     final selectedDate = ref.read(foodSelectedDateProvider);
-    final dbService = Get.find<DatabaseService>();
-    dbService.addNutritionGoal(
+    ref.read(foodsRepositoryProvider).addNutritionGoal(
       TaggedNutritionGoal(date: selectedDate.startOfDay, value: newGoal),
     );
     Get.find<Coordinator>().scheduleBackup();
@@ -293,8 +281,7 @@ class NutritionGoalNotifier extends _$NutritionGoalNotifier {
 Stream<DateSequence<Map<String, NutritionCategory>>> nutritionCategoriesStream(
   Ref ref,
 ) {
-  final dbService = Get.find<DatabaseService>();
-  return dbService.nutritionCategories$;
+  return ref.watch(foodsRepositoryProvider).watchNutritionCategories();
 }
 
 @riverpod
@@ -361,11 +348,13 @@ class NutritionCategoryNotifier extends _$NutritionCategoryNotifier {
         categoriesSeq[date.startOfDay].containsKey(category.name)) {
       throw StateError("Category already exists");
     }
-    final dbService = Get.find<DatabaseService>();
-    dbService.setNutritionCategoriesForDay(date.startOfDay, {
-      ...(categoriesSeq.isEmpty ? {} : categoriesSeq[date.startOfDay]),
-      category.name: category,
-    });
+    ref.read(foodsRepositoryProvider).setNutritionCategoriesForDay(
+      date.startOfDay,
+      {
+        ...(categoriesSeq.isEmpty ? {} : categoriesSeq[date.startOfDay]),
+        category.name: category,
+      },
+    );
     Get.find<Coordinator>().scheduleBackup();
   }
 
@@ -377,11 +366,13 @@ class NutritionCategoryNotifier extends _$NutritionCategoryNotifier {
     final currentMap = categoriesSeq.isEmpty
         ? <String, NutritionCategory>{}
         : categoriesSeq[date.startOfDay];
-    final dbService = Get.find<DatabaseService>();
-    dbService.setNutritionCategoriesForDay(date.startOfDay, {
-      for (final entry in currentMap.entries)
-        if (entry.key != category.name) entry.key: entry.value,
-    });
+    ref.read(foodsRepositoryProvider).setNutritionCategoriesForDay(
+      date.startOfDay,
+      {
+        for (final entry in currentMap.entries)
+          if (entry.key != category.name) entry.key: entry.value,
+      },
+    );
     Get.find<Coordinator>().scheduleBackup();
   }
 
@@ -393,14 +384,16 @@ class NutritionCategoryNotifier extends _$NutritionCategoryNotifier {
     final currentMap = categoriesSeq.isEmpty
         ? <String, NutritionCategory>{}
         : categoriesSeq[date.startOfDay];
-    final dbService = Get.find<DatabaseService>();
-    dbService.setNutritionCategoriesForDay(date.startOfDay, {
-      for (final entry in currentMap.entries)
-        if (entry.key != oldName)
-          entry.key: entry.value
-        else
-          category.name: category,
-    });
+    ref.read(foodsRepositoryProvider).setNutritionCategoriesForDay(
+      date.startOfDay,
+      {
+        for (final entry in currentMap.entries)
+          if (entry.key != oldName)
+            entry.key: entry.value
+          else
+            category.name: category,
+      },
+    );
     Get.find<Coordinator>().scheduleBackup();
   }
 }

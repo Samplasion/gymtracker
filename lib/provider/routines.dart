@@ -1,15 +1,12 @@
-import 'package:get/get.dart';
 import 'package:gymtracker/model/workout.dart';
 import 'package:gymtracker/repository/routines.dart';
-import 'package:gymtracker/service/database.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'routines.g.dart';
 
 @riverpod
 Stream<List<Workout>> routinesStream(Ref ref) {
-  // TODO: return ref.watch(routinesRepositoryProvider).watchRoutines();
-  return Get.find<DatabaseService>().routines$;
+  return ref.watch(routinesRepositoryProvider).watchRoutines();
 }
 
 @riverpod

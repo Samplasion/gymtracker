@@ -5,15 +5,14 @@ import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/service/logger.dart';
 import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/utils/utils.dart';
-import 'package:logger/logger.dart';
+import 'package:logging/logging.dart';
 import 'package:rxdart/rxdart.dart';
-import 'package:sentry_flutter/sentry_flutter.dart';
 
 class Log {
   final dynamic message;
   final DateTime timestamp;
   final Level level;
-  final Object? object;
+  final String loggerName;
   final Object? error;
   final StackTrace? stackTrace;
 
@@ -23,58 +22,64 @@ class Log {
     required this.message,
     required this.timestamp,
     required this.level,
-    required this.object,
+    required this.loggerName,
     this.error,
     this.stackTrace,
   });
+
+  Object? get object => loggerName;
 }
 
 extension LevelExt on Level {
   String get displayName {
-    return switch (this) {
-      Level.all => 'All',
-      Level.trace => 'Trace',
-      Level.debug => 'Debug',
-      Level.info => 'Info',
-      Level.warning => 'Warning',
-      Level.error => 'Error',
-      Level.fatal => 'Fatal',
-      Level.off => 'Off',
-      _ => "DON'T USE THIS LEVEL",
-    };
+    if (this == Level.ALL) return 'All';
+    if (this == Level.FINEST || this == Level.FINER) return 'Trace';
+    if (this == Level.FINE || this == Level.CONFIG) return 'Debug';
+    if (this == Level.INFO) return 'Info';
+    if (this == Level.WARNING) return 'Warning';
+    if (this == Level.SEVERE) return 'Error';
+    if (this == Level.SHOUT) return 'Fatal';
+    if (this == Level.OFF) return 'Off';
+    return name;
   }
 
   String get shortName {
-    return switch (this) {
-      Level.trace => 'TRC',
-      Level.debug => 'DBG',
-      Level.info => 'NFO',
-      Level.warning => 'WRN',
-      Level.error => 'ERR',
-      Level.fatal => 'FTL',
-      _ => "XXX",
-    };
+    if (this == Level.FINEST || this == Level.FINER) return 'TRC';
+    if (this == Level.FINE || this == Level.CONFIG) return 'DBG';
+    if (this == Level.INFO) return 'NFO';
+    if (this == Level.WARNING) return 'WRN';
+    if (this == Level.SEVERE) return 'ERR';
+    if (this == Level.SHOUT) return 'FTL';
+    return 'XXX';
   }
 
   Color get color {
-    return switch (this) {
-      Level.trace => Colors.grey,
-      Level.debug => Colors.cyan,
-      Level.info => Colors.blue,
-      Level.warning => Colors.orange,
-      Level.error => Colors.red,
-      Level.fatal => Colors.redAccent,
-      _ => Colors.black,
-    };
+    if (this == Level.FINEST || this == Level.FINER) return Colors.grey;
+    if (this == Level.FINE || this == Level.CONFIG) return Colors.cyan;
+    if (this == Level.INFO) return Colors.blue;
+    if (this == Level.WARNING) return Colors.orange;
+    if (this == Level.SEVERE) return Colors.red;
+    if (this == Level.SHOUT) return Colors.redAccent;
+    return Colors.black;
+  }
+
+  String get translationKey {
+    if (this == Level.FINEST || this == Level.FINER) return 'trace';
+    if (this == Level.FINE || this == Level.CONFIG) return 'debug';
+    if (this == Level.INFO) return 'info';
+    if (this == Level.WARNING) return 'warning';
+    if (this == Level.SEVERE) return 'error';
+    if (this == Level.SHOUT) return 'fatal';
+    return name.toLowerCase();
   }
 }
 
 const availableLevels = [
-  if (kDebugMode) ...[Level.trace, Level.debug],
-  Level.info,
-  Level.warning,
-  Level.error,
-  Level.fatal,
+  if (kDebugMode) ...[Level.FINEST, Level.FINE],
+  Level.INFO,
+  Level.WARNING,
+  Level.SEVERE,
+  Level.SHOUT,
 ];
 
 class LoggerController extends GetxController {
@@ -88,40 +93,40 @@ class LoggerController extends GetxController {
 
   final List<Log> logs = [];
 
-  Level level = kDebugMode ? Level.debug : Level.info;
+  Level level = kDebugMode ? Level.FINE : Level.INFO;
 
   List<Log> get filteredLogs {
     return logs.where((log) => log.level.value >= level.value).toList();
   }
 
-  addLog(Log log) {
+  void addLogFromRecord(LogRecord record) {
+    addLog(
+      Log(
+        message: record.message,
+        timestamp: record.time,
+        level: record.level,
+        loggerName: record.loggerName,
+        error: record.error,
+        stackTrace: record.stackTrace,
+      ),
+    );
+  }
+
+  void addLog(Log log) {
     logs.add(log);
     if (logs.length > keptLogs) {
       logs.removeRange(0, logs.length - keptLogs);
     }
     _onLogsUpdatedSubject.add(null);
-
-    final function = switch (log.level) {
-      Level.trace || Level.verbose => Sentry.logger.trace,
-      Level.debug => Sentry.logger.debug,
-      Level.info => Sentry.logger.info,
-      Level.warning => Sentry.logger.warn,
-      Level.error => Sentry.logger.error,
-      Level.fatal || Level.wtf => Sentry.logger.fatal,
-      Level.all => Sentry.logger.info,
-      Level.off || Level.nothing => Sentry.logger.info,
-    };
-
-    function(_stringifyLog(log));
     update();
   }
 
-  showLevelRadioModal() {
+  void showLevelRadioModal() {
     Go.showRadioModal(
       selectedValue: level,
       values: {
         for (final lvl in availableLevels)
-          lvl: "settings.advanced.options.logs.levels.${lvl.name}".t,
+          lvl: "settings.advanced.options.logs.levels.${lvl.translationKey}".t,
       },
       title: Text("settings.advanced.options.logs.level".t),
       onChange: (newLevel) {
@@ -133,7 +138,7 @@ class LoggerController extends GetxController {
     );
   }
 
-  clearLogs() {
+  void clearLogs() {
     logs.clear();
     _onLogsUpdatedSubject.add(null);
     update();
@@ -141,6 +146,8 @@ class LoggerController extends GetxController {
 
   void shareLogs() {
     final logs = filteredLogs;
+    if (logs.isEmpty) return;
+
     final maxLevelLength = logs
         .map((log) => log.level.displayName.length)
         .reduce((value, element) => value > element ? value : element);
@@ -149,12 +156,13 @@ class LoggerController extends GetxController {
           final timestamp = log.timestamp.toIso8601String();
           final level = log.level.displayName.toUpperCase();
           final message = log.message;
-          final object = log.object;
+          final loggerName = log.loggerName;
           final error = log.error;
           final stackTrace = log.stackTrace;
           final errorString = "${error ?? ""}\n\n${stackTrace ?? ""}".trim();
-          final firstLine = "${" " * (maxLevelLength - level.length)}[$level] ";
-          return "$firstLine$timestamp $object\n${" " * firstLine.length}$message\n\n$errorString"
+          final firstLine =
+              "${" " * (maxLevelLength - level.length)}[$level] ";
+          return "$firstLine$timestamp $loggerName\n${" " * firstLine.length}$message\n\n$errorString"
               .trimRight();
         })
         .join('\n\n${"=" * (maxLevelLength + 2)}\n\n');
@@ -177,12 +185,12 @@ class LoggerController extends GetxController {
     final timestamp = log.timestamp.toIso8601String();
     final level = log.level.displayName.toUpperCase();
     final message = log.message;
-    final object = log.object;
+    final loggerName = log.loggerName;
     final error = log.error;
     final stackTrace = log.stackTrace;
     final errorString = "${error ?? ""}\n\n${stackTrace ?? ""}".trim();
     final firstLine = "[$level] ";
-    return "$firstLine$timestamp $object\n${" " * firstLine.length}$message\n\n$errorString"
+    return "$firstLine$timestamp $loggerName\n${" " * firstLine.length}$message\n\n$errorString"
         .trimRight();
   }
 }

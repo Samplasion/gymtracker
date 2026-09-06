@@ -11,7 +11,7 @@ import 'package:gymtracker/utils/constants.dart';
 import 'package:gymtracker/utils/utils.dart';
 import 'package:gymtracker/view/components/controlled.dart';
 import 'package:intl/intl.dart';
-import 'package:logger/logger.dart';
+import 'package:logging/logging.dart';
 
 class LogView extends StatefulWidget {
   const LogView({super.key});
@@ -169,13 +169,12 @@ class _LogViewState extends ControlledState<LogView, LoggerController> {
 
     var (back, fore) = _getLevelColors(context, log.level);
 
-    var obj = log.object.toString();
+    var obj = log.loggerName;
     if (obj.split("\n").length > 1) {
       obj = _indentedLines(obj, indent).trimLeft();
     }
 
-    final firstLine =
-        '$prefix[${log.level.shortName}] [${log.object.runtimeType}] $obj';
+    final firstLine = '$prefix[${log.level.shortName}] [$obj]';
     final textStyle = monospace.copyWith(
       color: fore,
       fontSize: _fontSize,
@@ -222,7 +221,7 @@ class _LogViewState extends ControlledState<LogView, LoggerController> {
     var back = useM3 ? getContainerColor(context, level.color) : Colors.black;
     var fore = useM3 ? getOnContainerColor(context, level.color) : level.color;
 
-    if (level == Level.fatal) {
+    if (level == Level.SHOUT) {
       back = Colors.red;
       fore = Colors.white;
     }

@@ -1220,16 +1220,8 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "6.1.0"
-  logger:
-    dependency: "direct main"
-    description:
-      name: logger
-      sha256: "25aee487596a6257655a1e091ec2ae66bc30e7af663592cc3a27e6591e05035c"
-      url: "https://pub.dev"
-    source: hosted
-    version: "2.7.0"
   logging:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: logging
       sha256: c8245ada5f1717ed44271ed1c26b8ce85ca3228fd2ffdb75468ab01979309d61
@@ -1881,6 +1873,14 @@ packages:
     description:
       name: sentry_flutter
       sha256: ec89cc6ba939ca19155ea83900d9740a36544f50b3b6baf265518e3348fb0f50
+      url: "https://pub.dev"
+    source: hosted
+    version: "9.27.0"
+  sentry_logging:
+    dependency: "direct main"
+    description:
+      name: sentry_logging
+      sha256: "20aefd46daa6313fa84fb5ade7e891fff7f8fd9f80716e1a8b0fc63c632697a2"
       url: "https://pub.dev"
     source: hosted
     version: "9.27.0"

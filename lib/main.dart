@@ -42,10 +42,11 @@ import 'package:gymtracker/view/skeleton.dart';
 import 'package:gymtracker/view/utils/workout_simple.dart';
 import 'package:gymtracker/view/workout.dart';
 import 'package:relative_time/relative_time.dart';
+import 'package:sentry_flutter/sentry_flutter.dart';
+import 'package:sentry_logging/sentry_logging.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
-import 'package:sentry_flutter/sentry_flutter.dart';
 
 class MyHttpOverrides extends HttpOverrides {
   @override
@@ -160,6 +161,13 @@ FutureOr<void> _sentryInit(SentryFlutterOptions options) {
 
     return shouldMask;
   });
+
+  options.addIntegration(
+    LoggingIntegration(
+      minBreadcrumbLevel: Level.INFO,
+      minEventLevel: Level.SEVERE,
+    ),
+  );
 
   options.enableLogs = true;
   options.beforeSendLog = (log) {

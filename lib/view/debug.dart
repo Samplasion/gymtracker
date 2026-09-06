@@ -39,7 +39,7 @@ import 'package:gymtracker/view/skeleton.dart';
 import 'package:gymtracker/view/utils/import_routine.dart';
 import 'package:gymtracker/view/utils/sliver_utils.dart';
 import 'package:gymtracker/view/utils/timer.dart';
-import 'package:logger/logger.dart' as logger_lib;
+import 'package:logging/logging.dart' as logging;
 import 'package:purchases_ui_flutter/purchases_ui_flutter.dart';
 
 class DebugView extends ConsumerStatefulWidget {
@@ -158,17 +158,17 @@ class _DebugViewState extends ConsumerState<DebugView> {
                   Go.to(() => const WorkoutTitleGeneratorAlert());
                 },
               ),
-              ValueBuilder<logger_lib.Level?>(
-                initialValue: logger_lib.Logger.level,
-                builder: (val, onChange) => RadioModalTile<logger_lib.Level?>(
+              ValueBuilder<logging.Level?>(
+                initialValue: logging.Logger.root.level,
+                builder: (val, onChange) => RadioModalTile<logging.Level?>(
                   title: const Text("Logger level"),
                   onChange: onChange,
                   values: {
-                    for (final lvl in logger_lib.Level.values) lvl: lvl.name,
+                    for (final lvl in logging.Level.LEVELS) lvl: lvl.name,
                   },
                   selectedValue: val,
                 ),
-                onUpdate: (v) => logger_lib.Logger.level = v!,
+                onUpdate: (v) => logging.Logger.root.level = v!,
               ),
               ListTile(
                 title: const Text("Recompute streaks"),

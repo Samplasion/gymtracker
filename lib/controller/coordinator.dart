@@ -1,3 +1,4 @@
+import 'package:easy_debounce/easy_debounce.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get/get.dart' hide Rx;
 import 'package:gymtracker/controller/achievements_controller.dart';
@@ -98,6 +99,7 @@ class Coordinator extends GetxController
 
   @override
   void onClose() async {
+    EasyDebounce.cancel('scheduleBackup');
     await showPermissionTilesStream.drain(true);
     showPermissionTilesStream.close();
 
@@ -243,9 +245,11 @@ class Coordinator extends GetxController
   }
 
   void scheduleBackup() {
-    Future.delayed(const Duration(seconds: 5), () async {
-      get<DatabaseService>().createBackup();
-    });
+    EasyDebounce.debounce(
+      'scheduleBackup',
+      const Duration(minutes: 1),
+      () => get<DatabaseService>().createBackup(),
+    );
   }
 
   void schedulePeriodicBackup() {

@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_quill/flutter_quill.dart';
@@ -9,7 +8,6 @@ import 'package:get/get.dart';
 import 'package:gymtracker/controller/history_controller.dart';
 import 'package:gymtracker/controller/purchases_controller.dart';
 import 'package:gymtracker/controller/routines_controller.dart';
-import 'package:gymtracker/controller/settings_controller.dart';
 import 'package:gymtracker/data/configuration.dart';
 import 'package:gymtracker/icons/gymtracker_icons.dart';
 import 'package:gymtracker/model/workout.dart';
@@ -36,7 +34,6 @@ import 'package:gymtracker/view/exercises.dart';
 import 'package:gymtracker/view/library.dart';
 import 'package:gymtracker/view/routine_creator.dart';
 import 'package:gymtracker/view/skeleton.dart';
-import 'package:gymtracker/view/utils/animated_selectable.dart';
 import 'package:gymtracker/view/utils/crossfade.dart';
 import 'package:gymtracker/view/utils/drag_handle.dart';
 import 'package:gymtracker/view/utils/input_decoration.dart';
@@ -113,9 +110,6 @@ class _RoutinesViewState extends ConsumerState<RoutinesView> with _RoutineList {
   @override
   Widget build(BuildContext context) {
     final isLoading = widget._skeleton;
-    final showSuggestedRoutines =
-        Get.find<SettingsController>().showSuggestedRoutines.value;
-
     final rootRoutines = ref.watch(routinesStreamProvider);
     final routinesByFolder = ref.watch(routinesByFolderProvider);
     final folders = ref.watch(foldersStreamProvider);
@@ -130,12 +124,6 @@ class _RoutinesViewState extends ConsumerState<RoutinesView> with _RoutineList {
         ),
       ),
     );
-
-    final suggested = isLoading
-        ? fakeSuggested
-        : showSuggestedRoutines
-        ? controller.suggestions
-        : <RoutineSuggestion>[];
 
     return Scaffold(
       body: CustomScrollView(
@@ -895,6 +883,8 @@ class _RoutinesFolderViewState extends ConsumerState<_RoutinesFolderView>
                       repo.reorderFolder(folder, oldIndex, newIndex);
                     },
                   ),
+                  SliverBottomSafeArea(),
+                  SliverToBoxAdapter(child: SizedBox(height: 16)),
                 ];
               },
               loading: () {

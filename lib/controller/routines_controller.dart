@@ -32,10 +32,9 @@ import 'package:gymtracker/view/utils/history_workout.dart';
 import 'package:gymtracker/view/utils/import_routine.dart';
 import 'package:gymtracker/view/utils/workout_navigation.dart';
 import 'package:qr_flutter/qr_flutter.dart';
-import 'package:rxdart/rxdart.dart';
 import 'package:screenshot/screenshot.dart';
 
-typedef RoutineSuggestion = ({Workout routine, int occurrences});
+typedef RoutineSuggestion = ({Workout routine, double score});
 
 class RoutinesController extends GetxController
     with ServiceableController, ProtocolListener {

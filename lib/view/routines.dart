@@ -76,9 +76,9 @@ class _RoutinesViewState extends ConsumerState<RoutinesView> with _RoutineList {
   int selectedIndex = 0;
   final ScrollController _scrollController = _NonJumpableScrollController();
 
-  List<({int occurrences, Workout routine})> get fakeSuggested => List.generate(
+  List<RoutineSuggestion> get fakeSuggested => List.generate(
     2,
-    (i) => (occurrences: 1, routine: skeletonWorkout(_kFakeRoutineSeed + i)),
+    (i) => (score: 1.0, routine: skeletonWorkout(_kFakeRoutineSeed + i)),
   );
   List<Workout> get fakeRoutines =>
       List.generate(30, (i) => skeletonWorkout(_kFakeRoutineSeed + i));

@@ -203,7 +203,7 @@ class _FeedViewState extends ConsumerState<FeedView> {
                                 ) {
                                   final (
                                     routine: workout,
-                                    occurrences: frequency,
+                                    score: _,
                                   ) = suggested[index];
                                   return Material(
                                     type: MaterialType.transparency,

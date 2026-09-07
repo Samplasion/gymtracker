@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:easy_debounce/easy_debounce.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get/get.dart' hide Rx;
@@ -48,7 +50,9 @@ enum ScheduledEvent {
   userDidUpdateSubscription,
 }
 
-class EventScheduler {}
+const double kRoutineSuggestionHalfLifeDays = 28.0;
+const double kRoutineSuggestionMatchingDayWeight = 1.0;
+const double kRoutineSuggestionOtherDayWeight = 0.2;
 
 class Coordinator extends GetxController
     with LoggerConfigurationMixin, ServiceableController {
@@ -202,24 +206,44 @@ class Coordinator extends GetxController
     return get<HistoryController>().getRoutineHistory(routine);
   }
 
-  computeSuggestions() {
-    final today = DateTime.now().weekday;
-    final candidates = <Workout, int>{};
+  computeSuggestions({
+    DateTime? now,
+    double halfLifeDays = kRoutineSuggestionHalfLifeDays,
+  }) {
+    final referenceDate = now ?? DateTime.now();
+    final today = referenceDate.weekday;
+    final candidates = <Workout, double>{};
     final controller = get<HistoryController>();
     final history = controller.history;
     for (final routine in get<RoutinesController>().workouts) {
       final occurrences = history.where((wo) => wo.parentID == routine.id);
-      candidates[routine] = occurrences
-          .where((wo) => wo.startingDate?.weekday == today)
-          .length;
+      double score = 0.0;
+
+      for (final wo in occurrences) {
+        final startingDate = wo.startingDate;
+        if (startingDate == null) continue;
+
+        final secondsAgo = referenceDate.difference(startingDate).inSeconds;
+        final daysAgo = max(0.0, secondsAgo / 86400.0);
+
+        final decay = pow(2.0, -daysAgo / halfLifeDays).toDouble();
+        final dayWeight = (startingDate.weekday == today)
+            ? kRoutineSuggestionMatchingDayWeight
+            : kRoutineSuggestionOtherDayWeight;
+
+        score += dayWeight * decay;
+      }
+
+      if (score > 0) {
+        candidates[routine] = score;
+      }
     }
-    candidates.removeWhere((k, v) => v == 0);
 
     final listCandidates = [...candidates.entries];
-    listCandidates.sort((a, b) => b.value - a.value);
+    listCandidates.sort((a, b) => b.value.compareTo(a.value));
     suggestions([
       ...listCandidates
-          .map((a) => (routine: a.key, occurrences: a.value))
+          .map((a) => (routine: a.key, score: a.value))
           .take(5),
     ]);
     logger.d(

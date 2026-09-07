@@ -358,8 +358,13 @@ class _DraggingListItem extends StatelessWidget {
 
 class EditFolderModal extends StatefulWidget {
   final GTRoutineFolder folder;
+  final ScrollController? controller;
 
-  const EditFolderModal({super.key, required this.folder});
+  const EditFolderModal({
+    super.key,
+    required this.folder,
+    required this.controller,
+  });
 
   @override
   State<EditFolderModal> createState() => _EditFolderModalState();
@@ -408,34 +413,37 @@ class _EditFolderModalState
           ),
         ],
       ),
-      body: Form(
-        key: _formKey,
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            spacing: 16,
-            children: [
-              TextFormField(
-                decoration: GymTrackerInputDecoration(
-                  labelText: "routines.folderName".t,
+      body: SingleChildScrollView(
+        controller: widget.controller,
+        child: Form(
+          key: _formKey,
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              spacing: 16,
+              children: [
+                TextFormField(
+                  decoration: GymTrackerInputDecoration(
+                    labelText: "routines.folderName".t,
+                  ),
+                  controller: _controller,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return "routines.folderNameEmpty".t;
+                    }
+                    return null;
+                  },
                 ),
-                controller: _controller,
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return "routines.folderNameEmpty".t;
-                  }
-                  return null;
-                },
-              ),
-              GTRichTextEditor(
-                controller: _notesController,
-                decoration: InputDecoration(
-                  labelText: "routines.folderNotes".t,
-                  alignLabelWithHint: true,
+                GTRichTextEditor(
+                  controller: _notesController,
+                  decoration: InputDecoration(
+                    labelText: "routines.folderNotes".t,
+                    alignLabelWithHint: true,
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
@@ -457,6 +465,7 @@ mixin _RoutineList<T extends ConsumerStatefulWidget> on ConsumerState<T> {
     bool foldersInNewPage = false,
   }) {
     final controller = Get.find<RoutinesController>();
+    final repo = ref.watch(routinesRepositoryProvider);
     final folderList = folders.keys.toList()
       ..sort((a, b) {
         return a.name.compareTo(b.name);
@@ -512,8 +521,16 @@ mixin _RoutineList<T extends ConsumerStatefulWidget> on ConsumerState<T> {
                     elevation,
                   ),
                   child: GestureDetector(
-                    onLongPress: () {
-                      controller.editFolderScreen(folder);
+                    onLongPress: () async {
+                      final newFolder = await Go.showBottomModalScreen(
+                        (context, controller) => EditFolderModal(
+                          folder: folder,
+                          controller: controller,
+                        ),
+                      );
+                      if (newFolder != null) {
+                        repo.updateFolder(newFolder);
+                      }
                     },
                     child: ExpansionTile(
                       expansionAnimationStyle: AnimationStyle(
@@ -706,6 +723,8 @@ class _RoutinesFolderView extends ConsumerStatefulWidget {
 
 class _RoutinesFolderViewState extends ConsumerState<_RoutinesFolderView>
     with _RoutineList<_RoutinesFolderView> {
+  final ScrollController _scrollController = _NonJumpableScrollController();
+
   @override
   void onTapWorkout(Workout workout) {
     Navigator.of(context).pop();
@@ -743,7 +762,10 @@ class _RoutinesFolderViewState extends ConsumerState<_RoutinesFolderView>
                     ? null
                     : () async {
                         final newFolder = await Go.showBottomModalScreen(
-                          (context, _) => EditFolderModal(folder: folder),
+                          (context, _) => EditFolderModal(
+                            folder: folder,
+                            controller: _scrollController,
+                          ),
                         );
                         if (newFolder != null) {
                           repo.updateFolder(newFolder);

@@ -537,16 +537,6 @@ class RoutinesController extends GetxController
     folders({for (final folder in fld) folder: res[folder.id] ?? []});
   }
 
-  Future<void> editFolderScreen(GTRoutineFolder folder) async {
-    final newFolder = await Go.showBottomModalScreen(
-      (context, _) => EditFolderModal(folder: folder),
-    );
-    if (newFolder != null) {
-      service.updateFolder(newFolder);
-      coordinator.scheduleBackup();
-    }
-  }
-
   Future<void> deleteFolder(GTRoutineFolder folder) async {
     final shouldDelete = await Go.confirm(
       "routines.actions.deleteFolder.title".t,

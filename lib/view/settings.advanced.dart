@@ -13,13 +13,13 @@ class AdvancedSettingsView extends ConsumerWidget {
         child: CustomScrollView(
           slivers: [
             SliverAppBar.large(
-              title: Text("settings.advanced.title".t),
+              title: Text(context.t.settings.advanced.title),
               leading: MDVConfiguration.backButtonOf(context),
             ),
             SliverList(
               delegate: SliverChildListDelegate([
                 ListTile(
-                  title: Text("settings.options.import.label".t),
+                  title: Text(context.t.settings.options.import.label),
                   leading: const Icon(GTIcons.import),
                   trailing: const Icon(GTIcons.lt_chevron),
                   onTap: () async {
@@ -29,7 +29,7 @@ class AdvancedSettingsView extends ConsumerWidget {
                 Builder(
                   builder: (context) {
                     return ListTile(
-                      title: Text("settings.options.export.label".t),
+                      title: Text(context.t.settings.options.export.label),
                       leading: const Icon(GTIcons.export),
                       trailing: const Icon(GTIcons.lt_chevron),
                       onTap: () async {
@@ -42,8 +42,10 @@ class AdvancedSettingsView extends ConsumerWidget {
                   Builder(
                     builder: (context) {
                       return ListTile(
-                        title: Text("settings.options.exportSQL.label".t),
-                        subtitle: Text("settings.options.exportSQL.text".t),
+                        title: Text(context.t.settings.options.exportSQL.label),
+                        subtitle: Text(
+                          context.t.settings.options.exportSQL.text,
+                        ),
                         leading: const Icon(GTIcons.export),
                         trailing: const Icon(GTIcons.lt_chevron),
                         onTap: () async {
@@ -54,7 +56,7 @@ class AdvancedSettingsView extends ConsumerWidget {
                   ),
                 const Divider(),
                 ListTile(
-                  title: Text("settings.advanced.options.logs.title".t),
+                  title: Text(context.t.settings.advanced.options.logs.title),
                   leading: const Icon(GTIcons.logs),
                   trailing: const Icon(GTIcons.lt_chevron),
                   onTap: () async {
@@ -62,7 +64,9 @@ class AdvancedSettingsView extends ConsumerWidget {
                   },
                 ),
                 ListTile(
-                  title: Text("settings.advanced.options.migrations.title".t),
+                  title: Text(
+                    context.t.settings.advanced.options.migrations.title,
+                  ),
                   leading: const Icon(GTIcons.migration),
                   trailing: const Icon(GTIcons.lt_chevron),
                   onTap: () async {
@@ -74,7 +78,8 @@ class AdvancedSettingsView extends ConsumerWidget {
                     TextSpan(
                       children: [
                         TextSpan(
-                          text: "settings.advanced.options.backups.title".t,
+                          text:
+                              context.t.settings.advanced.options.backups.title,
                         ),
                       ],
                     ),
@@ -89,32 +94,55 @@ class AdvancedSettingsView extends ConsumerWidget {
                 if (account != null) ...[
                   Divider(),
                   ListTile(
-                    title: Text("settings.advanced.deleteAccount.title".t),
+                    title: Text(
+                      context.t.settings.advanced.deleteAccount.title,
+                    ),
                     subtitle: Text("@${account.name}"),
                     leading: const Icon(GTIcons.delete_forever),
                     trailing: const Icon(GTIcons.lt_chevron),
                     onTap: () async {
                       final exit = await Go.confirm(
-                        "settings.advanced.deleteAccount.warning.title".t,
-                        "settings.advanced.deleteAccount.warning.content".t,
+                        context.t.settings.advanced.deleteAccount.warning.title,
+                        context
+                            .t
+                            .settings
+                            .advanced
+                            .deleteAccount
+                            .warning
+                            .content,
                       );
                       if (!exit) return;
                       final controller = TextEditingController();
                       final username = await Go.textPrompt(
-                        "settings.advanced.deleteAccount.confirmation.title".t,
-                        "settings.advanced.deleteAccount.confirmation.content"
-                            .tParams({"username": account.name}),
+                        context
+                            .t
+                            .settings
+                            .advanced
+                            .deleteAccount
+                            .confirmation
+                            .title,
+                        context.t.settings.advanced.deleteAccount.confirmation
+                            .content(username: account.name),
                         controller: controller,
-                        hintText:
-                            "settings.advanced.deleteAccount.confirmation.hint"
-                                .t,
-                        transformText: (text) => text,
+                        hintText: context
+                            .t
+                            .settings
+                            .advanced
+                            .deleteAccount
+                            .confirmation
+                            .hint,
                         validator: (text) {
                           if (text != null &&
                               text.trim().isNotEmpty &&
                               text != account.name) {
-                            return "settings.advanced.deleteAccount.confirmation.error.mismatch"
-                                .t;
+                            return context
+                                .t
+                                .settings
+                                .advanced
+                                .deleteAccount
+                                .confirmation
+                                .error
+                                .mismatch;
                           }
                           return null;
                         },
@@ -123,7 +151,8 @@ class AdvancedSettingsView extends ConsumerWidget {
                       await Go.futureDialog(
                         future: () =>
                             ref.read(onlineProvider.notifier).deleteAccount(),
-                        title: "settings.advanced.deleteAccount.deleting".t,
+                        title:
+                            context.t.settings.advanced.deleteAccount.deleting,
                       );
                       if (context.mounted) {
                         SchedulerBinding.instance.addPostFrameCallback((_) {
@@ -180,7 +209,9 @@ class _BackupListViewState
             return CustomScrollView(
               slivers: [
                 SliverAppBar.large(
-                  title: Text("settings.advanced.options.backups.title".t),
+                  title: Text(
+                    context.t.settings.advanced.options.backups.title,
+                  ),
                   leading: MDVConfiguration.backButtonOf(context),
                 ),
                 SliverList(
@@ -199,9 +230,22 @@ class _BackupListViewState
                         icon: const Icon(GTIcons.delete),
                         onPressed: () async {
                           final delete = await Go.confirm(
-                            "settings.advanced.options.backups.delete.title".t,
-                            "settings.advanced.options.backups.delete.confirm"
-                                .t,
+                            context
+                                .t
+                                .settings
+                                .advanced
+                                .options
+                                .backups
+                                .delete
+                                .title,
+                            context
+                                .t
+                                .settings
+                                .advanced
+                                .options
+                                .backups
+                                .delete
+                                .confirm,
                           );
 
                           if (delete) {
@@ -217,8 +261,22 @@ class _BackupListViewState
                       ),
                       onTap: () async {
                         final restore = await Go.confirm(
-                          "settings.advanced.options.backups.restore.title".t,
-                          "settings.advanced.options.backups.restore.confirm".t,
+                          context
+                              .t
+                              .settings
+                              .advanced
+                              .options
+                              .backups
+                              .restore
+                              .title,
+                          context
+                              .t
+                              .settings
+                              .advanced
+                              .options
+                              .backups
+                              .restore
+                              .confirm,
                         );
 
                         if (restore) {
@@ -238,7 +296,9 @@ class _BackupListViewState
                 SliverList(
                   delegate: SliverChildListDelegate([
                     ListTile(
-                      title: Text("settings.advanced.options.backups.create".t),
+                      title: Text(
+                        context.t.settings.advanced.options.backups.create,
+                      ),
                       leading: const Icon(GTIcons.backup),
                       onTap: () async {
                         await Go.futureDialog(
@@ -311,52 +371,52 @@ class _SyncStatusListTileState extends ConsumerState<SyncStatusListTile>
         child: const Icon(GTIcons.sync),
       );
     } else if (syncStatus.hasError) {
-      leading = Icon(
-        GTIcons.sync_problem,
-        color: context.colorScheme.error,
-      );
+      leading = Icon(GTIcons.sync_problem, color: context.colorScheme.error);
     } else {
       leading = const Icon(GTIcons.sync);
     }
 
     final String subtitleText;
     if (syncStatus.isSyncing) {
-      subtitleText = "settings.advanced.options.sync.status.syncing".t;
+      subtitleText = context.t.settings.advanced.options.sync.status.syncing;
     } else {
       final statusPrefix = syncStatus.hasError
-          ? "settings.advanced.options.sync.status.failed".t
-          : "settings.advanced.options.sync.status.notSyncing".t;
+          ? context.t.settings.advanced.options.sync.status.failed
+          : context.t.settings.advanced.options.sync.status.notSyncing;
       if (account == null) {
         subtitleText =
-            "$statusPrefix • ${"settings.advanced.options.sync.notLoggedIn".t}";
+            "$statusPrefix • ${context.t.settings.advanced.options.sync.notLoggedIn}";
       } else if (syncStatus.lastSync != null) {
         final formattedDate = DateFormat.yMd(
           context.locale.languageCode,
         ).add_Hms().format(syncStatus.lastSync!);
         subtitleText =
-            "$statusPrefix • ${"settings.advanced.options.sync.lastSync".tParams({"date": formattedDate})}";
+            "$statusPrefix • ${context.t.settings.advanced.options.sync.lastSync(date: formattedDate)}";
       } else {
         subtitleText =
-            "$statusPrefix • ${"settings.advanced.options.sync.never".t}";
+            "$statusPrefix • ${context.t.settings.advanced.options.sync.never}";
       }
     }
 
     final canSync = !syncStatus.isSyncing && account != null;
 
     return ListTile(
-      title: Text("settings.advanced.options.sync.title".t),
+      title: Text(context.t.settings.advanced.options.sync.title),
       subtitle: Text(subtitleText),
       leading: leading,
       onTap: canSync
           ? () {
               final lastSync = syncStatus.lastSync;
               if (lastSync != null &&
-                  DateTime.now().difference(lastSync) < const Duration(minutes: 1)) {
+                  DateTime.now().difference(lastSync) <
+                      const Duration(minutes: 1)) {
                 ScaffoldMessenger.of(context)
                   ..hideCurrentSnackBar()
                   ..showSnackBar(
                     SnackBar(
-                      content: Text("settings.advanced.options.sync.rateLimited".t),
+                      content: Text(
+                        context.t.settings.advanced.options.sync.rateLimited,
+                      ),
                       duration: const Duration(seconds: 2),
                       behavior: SnackBarBehavior.floating,
                     ),

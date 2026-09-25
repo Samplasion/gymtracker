@@ -10,12 +10,12 @@ import 'package:gymtracker/controller/routines_controller.dart';
 import 'package:gymtracker/controller/stopwatch_controller.dart';
 import 'package:gymtracker/controller/workout_controller.dart';
 import 'package:gymtracker/gen/colors.gen.dart';
+import 'package:gymtracker/i18n/strings.g.dart';
 import 'package:gymtracker/icons/gymtracker_icons.dart';
 import 'package:gymtracker/model/exercisable.dart';
 import 'package:gymtracker/model/exercise.dart';
 import 'package:gymtracker/model/superset.dart';
 import 'package:gymtracker/model/workout.dart';
-import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/service/logger.dart';
 import 'package:gymtracker/utils/constants.dart';
 import 'package:gymtracker/utils/extensions.dart';
@@ -112,13 +112,13 @@ class _WorkoutViewState extends State<WorkoutView> {
               startingTime: DateTime.now(),
             );
           }
-          return Text("ongoingWorkout.title".t);
+          return Text(context.t.ongoingWorkout.title);
         }),
         actions: [
           PopupMenuButton(
             itemBuilder: (context) =>
                 buildToolboxMenuEntries(context, _controller),
-            tooltip: "ongoingWorkout.toolbox.title".t,
+            tooltip: context.t.ongoingWorkout.toolbox.title,
             icon: const Icon(GTIcons.tools),
           ),
           PopupMenuButton(
@@ -237,14 +237,14 @@ class _WorkoutViewState extends State<WorkoutView> {
           child: SplitButton(
             segments: [
               SplitButtonSegment(
-                title: 'ongoingWorkout.exercises.add'.t,
+                title: context.t.ongoingWorkout.exercises.add,
                 type: SplitButtonSegmentType.filled,
                 onTap: () async {
                   _controller?.pickExercises();
                 },
               ),
               SplitButtonSegment(
-                title: "ongoingWorkout.exercises.addSuperset".t,
+                title: context.t.ongoingWorkout.exercises.addSuperset,
                 onTap: () {
                   _controller?.addSuperset();
                   _controller?.exercises.refresh();
@@ -272,7 +272,7 @@ class _WorkoutViewState extends State<WorkoutView> {
                 onPressed: () {
                   _controller?.generateWorkout();
                 },
-                label: Text("ongoingWorkout.exercises.generate".t),
+                label: Text(context.t.ongoingWorkout.exercises.generate),
                 icon: const Icon(GTIcons.generate),
               ),
             ),
@@ -318,7 +318,7 @@ class WorkoutInfoBar extends StatelessWidget {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    "ongoingWorkout.info.time".t,
+                                    context.t.ongoingWorkout.info.time,
                                     style: Theme.of(
                                       context,
                                     ).textTheme.labelMedium,
@@ -338,7 +338,7 @@ class WorkoutInfoBar extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              "ongoingWorkout.info.reps".t,
+                              context.t.ongoingWorkout.info.reps,
                               style: Theme.of(context).textTheme.labelMedium,
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
@@ -365,7 +365,7 @@ class WorkoutInfoBar extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              "ongoingWorkout.info.volume".t,
+                              context.t.ongoingWorkout.info.volume,
                               style: Theme.of(context).textTheme.labelMedium,
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
@@ -398,7 +398,7 @@ class WorkoutInfoBar extends StatelessWidget {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                "ongoingWorkout.info.heartRate".t,
+                                context.t.ongoingWorkout.info.heartRate,
                                 style: Theme.of(context).textTheme.labelMedium,
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
@@ -437,7 +437,7 @@ class WorkoutInfoBar extends StatelessWidget {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                "ongoingWorkout.info.activeEnergy".t,
+                                context.t.ongoingWorkout.info.activeEnergy,
                                 style: Theme.of(context).textTheme.labelMedium,
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
@@ -586,7 +586,7 @@ class WorkoutTimerView extends StatelessWidget {
                       const SizedBox(width: 8),
                       IconButton(
                         icon: Text(
-                          "timer.subtract15s".t,
+                          context.t.timer.subtract15s,
                           style: TextStyle(
                             color: Theme.of(context).colorScheme.error,
                           ),
@@ -596,7 +596,7 @@ class WorkoutTimerView extends StatelessWidget {
                       ),
                       IconButton(
                         icon: Text(
-                          "timer.add15s".t,
+                          context.t.timer.add15s,
                           style: TextStyle(
                             color: Theme.of(context).colorScheme.tertiary,
                           ),
@@ -609,7 +609,7 @@ class WorkoutTimerView extends StatelessWidget {
                           icon: const Icon(GTIcons.skip),
                           clipBehavior: Clip.hardEdge,
                           label: Text(
-                            "timer.skip".t,
+                            context.t.timer.skip,
                             overflow: TextOverflow.clip,
                             maxLines: 1,
                           ),
@@ -694,7 +694,7 @@ class _WorkoutFinishPageState extends State<WorkoutFinishPage> {
         appBar: PreferredSize(
           preferredSize: const Size(0, kToolbarHeight + 1),
           child: AppBar(
-            title: Text("ongoingWorkout.finish.title".t),
+            title: Text(context.t.ongoingWorkout.finish.title),
             leading: const CloseButton(),
             bottom: const PreferredSize(
               preferredSize: Size(0, 1),
@@ -719,20 +719,37 @@ class _WorkoutFinishPageState extends State<WorkoutFinishPage> {
                             TextFormField(
                               controller: titleController,
                               decoration: _decoration(
-                                "ongoingWorkout.finish.fields.name.label".t,
+                                context
+                                    .t
+                                    .ongoingWorkout
+                                    .finish
+                                    .fields
+                                    .name
+                                    .label,
                               ),
                               validator: (string) {
                                 if (string == null || string.isEmpty) {
-                                  return "ongoingWorkout.finish.fields.name.errors.empty"
-                                      .t;
+                                  return context
+                                      .t
+                                      .ongoingWorkout
+                                      .finish
+                                      .fields
+                                      .name
+                                      .errors
+                                      .empty;
                                 }
                                 return null;
                               },
                             ),
                           DateField(
                             decoration: _decoration(
-                              "ongoingWorkout.finish.fields.startingTime.label"
-                                  .t,
+                              context
+                                  .t
+                                  .ongoingWorkout
+                                  .finish
+                                  .fields
+                                  .startingTime
+                                  .label,
                             ),
                             date: controller.time.value,
                             onSelect: (date) =>
@@ -746,7 +763,13 @@ class _WorkoutFinishPageState extends State<WorkoutFinishPage> {
                             RoutineFormPicker(
                               key: ValueKey(controller.parentID.value),
                               decoration: _decoration(
-                                "ongoingWorkout.finish.fields.parent.label".t,
+                                context
+                                    .t
+                                    .ongoingWorkout
+                                    .finish
+                                    .fields
+                                    .parent
+                                    .label,
                               ),
                               onChanged: (routine) {
                                 setState(() {
@@ -762,12 +785,24 @@ class _WorkoutFinishPageState extends State<WorkoutFinishPage> {
                           TimeInputField(
                             controller: timeController,
                             decoration: _decoration(
-                              "ongoingWorkout.finish.fields.duration.label".t,
+                              context
+                                  .t
+                                  .ongoingWorkout
+                                  .finish
+                                  .fields
+                                  .duration
+                                  .label,
                             ),
                             validator: (duration) {
                               if (duration == null || duration.inSeconds == 0) {
-                                return "ongoingWorkout.finish.fields.duration.errors.empty"
-                                    .t;
+                                return context
+                                    .t
+                                    .ongoingWorkout
+                                    .finish
+                                    .fields
+                                    .duration
+                                    .errors
+                                    .empty;
                               }
                               return null;
                             },
@@ -775,9 +810,13 @@ class _WorkoutFinishPageState extends State<WorkoutFinishPage> {
                           GTRichTextEditor(
                             controller: infoboxController,
                             decoration: GymTrackerInputDecoration(
-                              labelText:
-                                  "ongoingWorkout.finish.fields.infobox.label"
-                                      .t,
+                              labelText: context
+                                  .t
+                                  .ongoingWorkout
+                                  .finish
+                                  .fields
+                                  .infobox
+                                  .label,
                               alignLabelWithHint: true,
                             ),
                             onTapOutside: () {
@@ -845,7 +884,7 @@ class _WorkoutExerciseReorderDialogState
         appBar: PreferredSize(
           preferredSize: const Size(0, kToolbarHeight + 1),
           child: AppBar(
-            title: Text("ongoingWorkout.exercises.reorder".t),
+            title: Text(context.t.ongoingWorkout.exercises.reorder),
             leading: const CloseButton(),
             bottom: const PreferredSize(
               preferredSize: Size(0, 1),

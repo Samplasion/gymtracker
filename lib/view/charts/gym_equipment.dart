@@ -1,6 +1,7 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:gymtracker/controller/history_controller.dart';
+import 'package:gymtracker/i18n/strings.g.dart';
 import 'package:gymtracker/model/exercise.dart';
 import 'package:gymtracker/model/workout.dart';
 import 'package:gymtracker/utils/extensions.dart';
@@ -35,14 +36,17 @@ class _GymEquipmentRadialChartState
                 RadarEntry(value: entries[i].value),
             ],
             borderColor: context.colorScheme.primary,
-            fillColor:
-                context.colorScheme.primary.withAlpha((0.3 * 255).round()),
+            fillColor: context.colorScheme.primary.withAlpha(
+              (0.3 * 255).round(),
+            ),
             entryRadius: 0,
           ),
         ],
         radarShape: RadarShape.polygon,
-        radarBorderData:
-            BorderSide(color: context.colorScheme.outlineVariant, width: 1.5),
+        radarBorderData: BorderSide(
+          color: context.colorScheme.outlineVariant,
+          width: 1.5,
+        ),
         tickBorderData: BorderSide(color: context.colorScheme.outlineVariant),
         gridBorderData: BorderSide(color: context.colorScheme.outlineVariant),
         radarTouchData: RadarTouchData(enabled: false),
@@ -51,14 +55,14 @@ class _GymEquipmentRadialChartState
         getTitle: (i, angle) {
           if (angle > 90 && angle < 270) angle -= 180;
           return RadarChartTitle(
-            text: entries[i].key.localizedNameShort,
+            text: entries[i].key.getLocalizedNameShort(context.t),
             angle: angle,
             positionPercentageOffset: 0.1,
           );
         },
       ),
-      swapAnimationDuration: const Duration(seconds: 1),
-      swapAnimationCurve: Curves.easeInOut,
+      duration: const Duration(seconds: 1),
+      curve: Curves.easeInOut,
     );
   }
 }

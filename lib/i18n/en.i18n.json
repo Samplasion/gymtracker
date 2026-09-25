@@ -1,7 +1,7 @@
 {
   "appName": "Gym Bro",
   "appInfo": {
-    "version": "Version @version (build @build)",
+    "version": "Version $version (build $build)",
     "shortDescription": "Workout Buddy",
     "terms": "Terms of service",
     "privacy": "Privacy policy"
@@ -102,46 +102,48 @@
             "title": "What is RPE?",
             "text": "Rate of Perceived Exertion (RPE) is a subjective measure of how hard an exercise feels to you. It's a scale from 1 to 10, where 1 is very light effort and 10 is maximum effort. You can measure it by estimating how many more reps you could perform before reaching failure. For example, if you could perform 3 more reps before failure, the RPE would be 7."
           },
-          "level1": {
-            "title": "RPE 1",
-            "text": "Very light effort."
-          },
-          "level2": {
-            "title": "RPE 2",
-            "text": "Light effort."
-          },
-          "level3": {
-            "title": "RPE 3",
-            "text": "Moderately light effort."
-          },
-          "level4": {
-            "title": "RPE 4",
-            "text": "Moderate effort."
-          },
-          "level5": {
-            "title": "RPE 5",
-            "text": "Moderate effort."
-          },
-          "level6": {
-            "title": "RPE 6",
-            "text": "Moderate to hard effort."
-          },
-          "level7": {
-            "title": "RPE 7",
-            "text": "Hard effort."
-          },
-          "level8": {
-            "title": "RPE 8",
-            "text": "Hard effort. You can perform at most 2 more reps."
-          },
-          "level9": {
-            "title": "RPE 9",
-            "text": "Very hard effort. You can perform at most 1 more rep."
-          },
-          "level10": {
-            "title": "RPE 10",
-            "text": "Maximum effort. You cannot perform any more reps."
-          }
+          "levels": [
+            {
+              "title": "RPE 1",
+              "text": "Very light effort."
+            },
+            {
+              "title": "RPE 2",
+              "text": "Light effort."
+            },
+            {
+              "title": "RPE 3",
+              "text": "Moderately light effort."
+            },
+            {
+              "title": "RPE 4",
+              "text": "Moderate effort."
+            },
+            {
+              "title": "RPE 5",
+              "text": "Moderate effort."
+            },
+            {
+              "title": "RPE 6",
+              "text": "Moderate to hard effort."
+            },
+            {
+              "title": "RPE 7",
+              "text": "Hard effort."
+            },
+            {
+              "title": "RPE 8",
+              "text": "Hard effort. You can perform at most 2 more reps."
+            },
+            {
+              "title": "RPE 9",
+              "text": "Very hard effort. You can perform at most 1 more rep."
+            },
+            {
+              "title": "RPE 10",
+              "text": "Maximum effort. You cannot perform any more reps."
+            }
+          ]
         },
         "reorderSets": {
           "title": "Reorder sets",
@@ -205,9 +207,13 @@
       "history": "History",
       "explanation": "Explanation",
       "explanationDisclaimer": "Note: this explanation is provided for reference only. Always consult a fitness professional.",
-      "primaryMuscleGroup": "Muscle group: @muscleGroup",
-      "secondaryMuscleGroups": "Secondary muscle groups: @muscleGroups",
-      "equipment": "Equipment: @equipment"
+      "primaryMuscleGroup": "Muscle group: $muscleGroup",
+      "secondaryMuscleGroups": "Secondary muscle groups: $muscleGroups",
+      "equipment": "Equipment: $equipment",
+      "explanationNone": {
+        "title": "No explanation available",
+        "description": "This exercise does not have an explanation available yet. Please check back later."
+      }
     },
     "continuation": {
       "label": "Continuation",
@@ -324,11 +330,11 @@
         "add": "Add superset",
         "subtitle": {
           "zero": "Superset without exercises",
-          "one": "Superset with %s exercise",
-          "two": "Superset with %s exercises",
-          "few": "Superset with %s exercises",
-          "many": "Superset with %s exercises",
-          "other": "Superset with %s exercises"
+          "one": "Superset with $n exercise",
+          "two": "Superset with $n exercises",
+          "few": "Superset with $n exercises",
+          "many": "Superset with $n exercises",
+          "other": "Superset with $n exercises"
         },
         "addExercise": "Add exercises",
         "remove": {
@@ -358,26 +364,26 @@
     "empty": "No history",
     "andMore": {
       "one": "…and one more exercise",
-      "two": "…and %s more exercises",
-      "few": "…and %s more exercises",
-      "many": "…and %s more exercises",
-      "other": "…and %s more exercises"
+      "two": "…and $n more exercises",
+      "few": "…and $n more exercises",
+      "many": "…and $n more exercises",
+      "other": "…and $n more exercises"
     },
     "actions": {
       "deleteMultiple": {
         "title": {
           "one": "Delete exercise",
-          "two": "Delete %s exercises",
-          "few": "Delete %s exercises",
-          "many": "Delete %s exercises",
-          "other": "Delete %s exercises"
+          "two": "Delete $n exercises",
+          "few": "Delete $n exercises",
+          "many": "Delete $n exercises",
+          "other": "Delete $n exercises"
         },
         "text": {
           "one": "Are you sure you want to delete this exercise from your history? This action cannot be undone.",
-          "two": "Are you sure you want to delete these %s exercises from your history? This action cannot be undone.",
-          "few": "Are you sure you want to delete these %s exercises from your history? This action cannot be undone.",
-          "many": "Are you sure you want to delete these %s exercises from your history? This action cannot be undone.",
-          "other": "Are you sure you want to delete these %s exercises from your history? This action cannot be undone."
+          "two": "Are you sure you want to delete these $n exercises from your history? This action cannot be undone.",
+          "few": "Are you sure you want to delete these $n exercises from your history? This action cannot be undone.",
+          "many": "Are you sure you want to delete these $n exercises from your history? This action cannot be undone.",
+          "other": "Are you sure you want to delete these $n exercises from your history? This action cannot be undone."
         },
         "actions": {
           "no": "Cancel",
@@ -479,7 +485,7 @@
     },
     "colorPicker": {
       "heading": {
-        "label": "Select a color [@color]"
+        "label": "Select a color [$color]"
       }
     },
     "advanced": {
@@ -523,7 +529,7 @@
             "notSyncing": "Not syncing",
             "failed": "Sync failed"
           },
-          "lastSync": "Last sync: @date",
+          "lastSync": "Last sync: $date",
           "never": "Never synced",
           "notLoggedIn": "Not logged in",
           "syncNow": "Sync now",
@@ -538,7 +544,7 @@
         },
         "confirmation": {
           "title": "Confirm deletion",
-          "content": "Type your username (@username) to proceed.",
+          "content": "Type your username ($username) to proceed.",
           "hint": "Username",
           "error": {
             "mismatch": "Type your username."
@@ -586,7 +592,7 @@
       "remove": "Remove exercise",
       "addToSuperset": "Add to superset…",
       "startCardioTimer": "Start interval timer",
-      "rpeBadge": "RPE @rpe",
+      "rpeBadge": "RPE $rpe",
       "setRPE": "Set RPE",
       "generate": "Generate"
     },
@@ -677,26 +683,26 @@
         "added": {
           "zero": "No exercises added",
           "one": "1 exercise added",
-          "two": "%s exercises added",
-          "few": "%s exercises added",
-          "many": "%s exercises added",
-          "other": "%s exercises added"
+          "two": "$n exercises added",
+          "few": "$n exercises added",
+          "many": "$n exercises added",
+          "other": "$n exercises added"
         },
         "removed": {
           "zero": "No exercises removed",
           "one": "1 exercise removed",
-          "two": "%s exercises removed",
-          "few": "%s exercises removed",
-          "many": "%s exercises removed",
-          "other": "%s exercises removed"
+          "two": "$n exercises removed",
+          "few": "$n exercises removed",
+          "many": "$n exercises removed",
+          "other": "$n exercises removed"
         },
         "changed": {
           "zero": "No exercises changed",
           "one": "1 exercise changed",
-          "two": "%s exercises changed",
-          "few": "%s exercises changed",
-          "many": "%s exercises changed",
-          "other": "%s exercises changed"
+          "two": "$n exercises changed",
+          "few": "$n exercises changed",
+          "many": "$n exercises changed",
+          "other": "$n exercises changed"
         }
       }
     },
@@ -724,18 +730,18 @@
   "exerciseList": {
     "restTime": "Rest time: ",
     "fields": {
-      "weight": "@weight @unit",
-      "time": "@time",
+      "weight": "$weight $unit",
+      "time": "$time",
       "reps": {
         "zero": "0 reps",
-        "one": "%s rep",
-        "two": "%s reps",
-        "few": "%s reps",
-        "many": "%s reps",
-        "other": "%s reps"
+        "one": "$n rep",
+        "two": "$n reps",
+        "few": "$n reps",
+        "many": "$n reps",
+        "other": "$n reps"
       },
-      "distance": "@distance @unit",
-      "rpe": "RPE @rpe"
+      "distance": "$distance $unit",
+      "rpe": "RPE $rpe"
     },
     "stats": {
       "time": "Duration",
@@ -763,36 +769,36 @@
     },
     "exercises": {
       "zero": "No exercises",
-      "one": "%s exercise",
-      "two": "%s exercises",
-      "few": "%s exercises",
-      "many": "%s exercises",
-      "other": "%s exercises"
+      "one": "$n exercise",
+      "two": "$n exercises",
+      "few": "$n exercises",
+      "many": "$n exercises",
+      "other": "$n exercises"
     },
-    "totalTime": "Total time: @time",
+    "totalTime": "Total time: $time",
     "selected": {
       "zero": "Nothing selected",
       "one": "1 selected",
-      "two": "%s selected",
-      "few": "%s selected",
-      "many": "%s selected",
-      "other": "%s selected"
+      "two": "$n selected",
+      "few": "$n selected",
+      "many": "$n selected",
+      "other": "$n selected"
     },
     "workouts": {
       "zero": "No workouts",
-      "one": "%s workout",
-      "two": "%s workouts",
-      "few": "%s workouts",
-      "many": "%s workouts",
-      "other": "%s workouts"
+      "one": "$n workout",
+      "two": "$n workouts",
+      "few": "$n workouts",
+      "many": "$n workouts",
+      "other": "$n workouts"
     },
     "routines": {
       "zero": "No routines",
-      "one": "%s routine",
-      "two": "%s routines",
-      "few": "%s routines",
-      "many": "%s routines",
-      "other": "%s routines"
+      "one": "$n routine",
+      "two": "$n routines",
+      "few": "$n routines",
+      "many": "$n routines",
+      "other": "$n routines"
     },
     "optional": "(optional)",
     "unnamed": "Unnamed"
@@ -831,16 +837,16 @@
     "shoulders": "Shoulders"
   },
   "titleGenerator": {
-    "template": "@muscles Workout",
-    "title": [
-      "",
-      "@0",
-      "@0 and @1",
-      "@0, @1, and @2",
-      "@0, @1, @2, and @3",
-      "@0, @1, @2, @3, and @4",
-      "@0, @1, @2, @3, @4, and @5"
-    ]
+    "template": "$muscles Workout",
+    "title": {
+      "zero": "",
+      "one": "$p0",
+      "two": "$p0 and $p1",
+      "three": "$p0, $p1, and $p2",
+      "four": "$p0, $p1, $p2, and $p3",
+      "five": "$p0, $p1, $p2, $p3, and $p4",
+      "six": "$p0, $p1, $p2, $p3, $p4, and $p5"
+    }
   },
   "actions": {
     "create": "Create",
@@ -857,36 +863,36 @@
   },
   "time": {
     "hours": {
-      "zero": "@minutes:@seconds",
-      "one": "@hours hour, @minutes:@seconds",
-      "two": "@hours hours, @minutes:@seconds",
-      "few": "@hours hours, @minutes:@seconds",
-      "many": "@hours hours, @minutes:@seconds",
-      "other": "@hours hours, @minutes:@seconds"
+      "zero": "$minutes:$seconds",
+      "one": "$hours hour, $minutes:$seconds",
+      "two": "$hours hours, $minutes:$seconds",
+      "few": "$hours hours, $minutes:$seconds",
+      "many": "$hours hours, $minutes:$seconds",
+      "other": "$hours hours, $minutes:$seconds"
     },
     "justHours": {
-      "zero": "%s",
-      "one": "%s hour",
-      "two": "%s hours",
-      "few": "%s hours",
-      "many": "%s hours",
-      "other": "%s hours"
+      "zero": "$n",
+      "one": "$n hour",
+      "two": "$n hours",
+      "few": "$n hours",
+      "many": "$n hours",
+      "other": "$n hours"
     },
     "days": {
       "zero": "0 days",
       "one": "1 day",
       "two": "2 days",
-      "few": "%s days",
-      "many": "%s days",
-      "other": "%s days"
+      "few": "$n days",
+      "many": "$n days",
+      "other": "$n days"
     },
     "weeks": {
       "zero": "0 weeks",
       "one": "1 week",
       "two": "2 weeks",
-      "few": "%s weeks",
-      "many": "%s weeks",
-      "other": "%s weeks"
+      "few": "$n weeks",
+      "many": "$n weeks",
+      "other": "$n weeks"
     }
   },
   "locales": {
@@ -1161,14 +1167,14 @@
   },
   "superset": {
     "zero": "Superset without exercises",
-    "one": "Superset with %s exercise",
-    "two": "Superset with %s exercises",
-    "few": "Superset with %s exercises",
-    "many": "Superset with %s exercises",
-    "other": "Superset with %s exercises"
+    "one": "Superset with $n exercise",
+    "two": "Superset with $n exercises",
+    "few": "Superset with $n exercises",
+    "many": "Superset with $n exercises",
+    "other": "Superset with $n exercises"
   },
   "historyEditor": {
-    "title": "Edit: @name",
+    "title": "Edit: $name",
     "exercises": {
       "addSuperset": "+ Add superset",
       "add": "+ Add exercise",
@@ -1249,7 +1255,7 @@
       },
       "measured": {
         "never": "Last measured: never",
-        "date": "Last measured: @date"
+        "date": "Last measured: $date"
       },
       "addMeasurement": "Add measurement"
     },
@@ -1319,9 +1325,9 @@
         "description": "View the evolution of your 1RM for the \"Main Three\" over the selected time frame. The chart uses the highest 1RM of each week to display the overall trend of loads in the three fundamental exercises of powerlifting.",
         "warning": {
           "title": "A note on the chart",
-          "text": "To ensure your progress is calculated and displayed correctly in the chart, use the standard exercises from the app library rather than creating custom variations. Specifically: @exercises."
+          "text": "To ensure your progress is calculated and displayed correctly in the chart, use the standard exercises from the app library rather than creating custom variations. Specifically: $exercises."
         },
-        "bottomTitle": "W@week"
+        "bottomTitle": "W$week"
       }
     },
     "workoutDistribution": {
@@ -1336,7 +1342,7 @@
       "errors": {
         "logout": {
           "title": "An error occurred while logging out",
-          "subtitle": "Couldn't log out: @error"
+          "subtitle": "Couldn't log out: $error"
         }
       }
     },
@@ -1389,7 +1395,7 @@
       "title": "Set up interval timer",
       "active": "Active time",
       "rest": "Rest time",
-      "section": "Section #@section",
+      "section": "Section #$section",
       "start": "Start interval timer",
       "addSection": "+ New section",
       "errors": {
@@ -1461,7 +1467,7 @@
       "description": "Remove the Weight parameter from an exercise with \"Reps and Weight\" in which you've only ever used the Reps field."
     },
     "genericMultiplyWeight": {
-      "title": "Multiply exercise weight by @multiplier",
+      "title": "Multiply exercise weight by $multiplier",
       "fields": {
         "exercise": {
           "title": "Multiply the weight of this exercise...",
@@ -1516,7 +1522,7 @@
     },
     "searchBar": {
       "hint": "Search history or OpenFoodFacts…",
-      "noResults": "No results were found for \"@query\".",
+      "noResults": "No results were found for \"$query\".",
       "noHistory": "No search history"
     },
     "nutriments": {
@@ -1610,7 +1616,7 @@
       "unknown": "Unknown"
     },
     "add": {
-      "nutritionalValuesPerAmountG": "Nutrition facts (per @amount g / @amount ml)",
+      "nutritionalValuesPerAmountG": "Nutrition facts (per $amount g / $amount ml)",
       "servingSize": "Serving size",
       "custom": "Custom amount",
       "amount": "Amount",
@@ -1619,7 +1625,7 @@
       "amountInvalid": "The amount must be a valid number",
       "add": "+ Add to tracker",
       "unnamedServingSize": "Unknown serving",
-      "nutritionalValuesPerAmountWithUnit": "Nutrition facts (per @amount @unit)",
+      "nutritionalValuesPerAmountWithUnit": "Nutrition facts (per $amount $unit)",
       "customFood": {
         "showMore": "Show all fields",
         "title": "Add custom food",
@@ -1650,7 +1656,7 @@
       "title": "Scan barcode",
       "scanResult": {
         "noProductFound": {
-          "text": "No product found with barcode @barcode.",
+          "text": "No product found with barcode $barcode.",
           "title": "No product found",
           "createNew": "Create new"
         },
@@ -1676,8 +1682,8 @@
     },
     "nutritionGoal": {
       "effect": {
-        "from": "This change will take effect from @from onward.",
-        "range": "This change will take effect from @from to @to."
+        "from": "This change will take effect from $from onward.",
+        "range": "This change will take effect from $from to $to."
       }
     },
     "nutritionGoals": {
@@ -1709,8 +1715,8 @@
         "title": "Goal history",
         "empty": "There are no goals.",
         "tapToView": "Tap to view day",
-        "calories": "Daily calories: @calories",
-        "macros": "@carbs carbs – @protein protein – @fat fat"
+        "calories": "Daily calories: $calories",
+        "macros": "$carbs carbs – $protein protein – $fat fat"
       }
     },
     "combine": {
@@ -1904,7 +1910,7 @@
       "zu": "Zulu",
       "xx": "Unknown language",
       "world": "World, as pseudo language",
-      "-": "Undefined language"
+      "und": "Undefined language"
     },
     "countries": {
       "ad": "Andorra",
@@ -2159,7 +2165,7 @@
       "world": "World"
     },
     "categoryList": {
-      "dailyPercentage": "@percentage% of daily total – @calories",
+      "dailyPercentage": "$percentage% of daily total – $calories",
       "empty": "You haven't set up any categories",
       "unmodifiable": {
         "title": "Unable to edit",
@@ -2186,8 +2192,8 @@
       "save": "Save",
       "icon": "Icon",
       "effect": {
-        "from": "Any change will take effect from @from onward.",
-        "range": "Any change will take effect from @from to @to.",
+        "from": "Any change will take effect from $from onward.",
+        "range": "Any change will take effect from $from to $to.",
         "title": "Category effect range"
       },
       "nonFulfillingSum": {
@@ -2255,30 +2261,30 @@
   "achievements": {
     "title": "Achievements",
     "locked": "Locked",
-    "unlockedOn": "Unlocked on: @date",
+    "unlockedOn": "Unlocked on: $date",
     "history": "History",
     "firstSteps": {
       "title": "First steps",
       "description": {
-        "1": "Complete your first workout",
-        "2": "Log your first weight",
-        "3": "Log your first meal"
+        "k1": "Complete your first workout",
+        "k2": "Log your first weight",
+        "k3": "Log your first meal"
       }
     },
     "foodWatcher": {
       "title": "Food blogger",
       "description": {
-        "1": "Log your meals two days in a row",
-        "2": "Log your meals a week in a row",
-        "3": "Log your meals a month in a row"
+        "k1": "Log your meals two days in a row",
+        "k2": "Log your meals a week in a row",
+        "k3": "Log your meals a month in a row"
       }
     },
     "marathoner": {
       "title": "Marathoner",
       "description": {
-        "1": "Run or bike a 5km",
-        "2": "Run or bike a half marathon",
-        "3": "Run or bike a full marathon"
+        "k1": "Run or bike a 5km",
+        "k2": "Run or bike a half marathon",
+        "k3": "Run or bike a full marathon"
       }
     },
     "earlyBird": {
@@ -2292,58 +2298,58 @@
     "realGymBro": {
       "title": "Real Gym Bro",
       "description": {
-        "1": "Log a total of 100 hours worth of workouts",
-        "2": "Log a total of 500 hours worth of workouts",
-        "3": "Log a total of 1000 hours worth of workouts"
+        "k1": "Log a total of 100 hours worth of workouts",
+        "k2": "Log a total of 500 hours worth of workouts",
+        "k3": "Log a total of 1000 hours worth of workouts"
       }
     },
     "workoutFreak": {
       "title": "Workout Freak",
       "description": {
-        "1": "Log a workout every day of the month",
-        "2": "Log a workout every day of the year"
+        "k1": "Log a workout every day of the month",
+        "k2": "Log a workout every day of the year"
       }
     },
     "trailblazer": {
       "title": "Trailblazer",
       "description": {
-        "1": {
+        "k1": {
           "km": "Run or bike a total of 100 km",
-          "mi": "Run or bike a total of 100 km (@mi)"
+          "mi": "Run or bike a total of 100 km ($p0)"
         },
-        "2": {
+        "k2": {
           "km": "Run or bike a total of 500 km",
-          "mi": "Run or bike a total of 500 km (@mi)"
+          "mi": "Run or bike a total of 500 km ($p0)"
         },
-        "3": {
+        "k3": {
           "km": "Run or bike a total of 1000 km",
-          "mi": "Run or bike a total of 1000 km (@mi)"
+          "mi": "Run or bike a total of 1000 km ($p0)"
         }
       }
     },
     "cycleChampion": {
       "title": "Cycle Champion",
       "description": {
-        "1": {
+        "k1": {
           "km": "Cycle a total of 100km",
-          "mi": "Cycle a total of 100km (@mi)"
+          "mi": "Cycle a total of 100km ($p0)"
         },
-        "2": {
+        "k2": {
           "km": "Cycle a total of 500km",
-          "mi": "Cycle a total of 500km (@mi)"
+          "mi": "Cycle a total of 500km ($p0)"
         },
-        "3": {
+        "k3": {
           "km": "Cycle a total of 1000km",
-          "mi": "Cycle a total of 1000km (@mi)"
+          "mi": "Cycle a total of 1000km ($p0)"
         }
       }
     },
     "professionalWeightlifter": {
       "title": "Professional Weightlifter",
       "description": {
-        "1": "Lift your body weight in a single rep",
-        "2": "Lift 1.5x your body weight in a single rep",
-        "3": "Lift 3x your body weight in a single rep"
+        "k1": "Lift your body weight in a single rep",
+        "k2": "Lift 1.5x your body weight in a single rep",
+        "k3": "Lift 3x your body weight in a single rep"
       }
     },
     "programPlanner": {
@@ -2357,9 +2363,9 @@
     "routineMaster": {
       "title": "Routine Master",
       "description": {
-        "1": "Follow a routine for 3 consecutive months",
-        "2": "Follow a routine for 6 consecutive months",
-        "3": "Follow a routine for 12 consecutive months"
+        "k1": "Follow a routine for 3 consecutive months",
+        "k2": "Follow a routine for 6 consecutive months",
+        "k3": "Follow a routine for 12 consecutive months"
       }
     },
     "intensityInnovator": {
@@ -2389,13 +2395,13 @@
     "sparta": {
       "title": "This Is Sparta",
       "description": {
-        "1": {
-          "kg": "Lift 300 lbs (@kg) in one rep",
+        "k1": {
+          "kg": "Lift 300 lbs ($p0) in one rep",
           "lb": "Lift 300 lbs in one rep"
         },
-        "2": {
+        "k2": {
           "kg": "Lift 300 kg in one rep",
-          "lb": "Lift 300 kg (@lb) in one rep"
+          "lb": "Lift 300 kg ($p0) in one rep"
         }
       }
     },
@@ -2651,7 +2657,7 @@
     "accept": "Accept",
     "decline": "Decline",
     "unfriendConfirmation": {
-      "title": "Unfriend @name?",
+      "title": "Unfriend $name?",
       "subtitle": "They will no longer appear in your feed, and you won't appear in theirs.",
       "confirm": "Unfriend",
       "cancel": "Cancel"

@@ -3,8 +3,8 @@ import 'dart:typed_data';
 import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:gymtracker/i18n/strings.g.dart';
 import 'package:gymtracker/icons/gymtracker_icons.dart';
-import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/view/components/loading_indicator.dart';
 
 class CropImagePage extends StatefulWidget {
@@ -175,9 +175,9 @@ class _CropImagePageState extends State<CropImagePage> {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text("userProfile.edit.error".t)));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(context.t.userProfile.edit.error)),
+        );
       }
     }
   }
@@ -200,7 +200,7 @@ class _CropImagePageState extends State<CropImagePage> {
             icon: const Icon(GTIcons.close),
             onPressed: () => Navigator.of(context).pop(),
           ),
-          title: Text("userProfile.edit.cropTitle".t),
+          title: Text(context.t.userProfile.edit.cropTitle),
           actions: [
             IconButton(
               icon: const Icon(Icons.refresh_rounded),
@@ -304,7 +304,7 @@ class _CropImagePageState extends State<CropImagePage> {
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               Text(
-                                "userProfile.edit.cropInstructions".t,
+                                context.t.userProfile.edit.cropInstructions,
                                 style: const TextStyle(
                                   color: Colors.white70,
                                   fontSize: 14,
@@ -330,7 +330,7 @@ class _CropImagePageState extends State<CropImagePage> {
                                     onPressed: () =>
                                         Navigator.of(context).pop(),
                                     child: Text(
-                                      "userProfile.crop.buttons.cancel".t,
+                                      context.t.userProfile.crop.buttons.cancel,
                                     ),
                                   ),
                                   FilledButton(
@@ -344,7 +344,12 @@ class _CropImagePageState extends State<CropImagePage> {
                                     ),
                                     onPressed: () => _cropImage(cropRect),
                                     child: Text(
-                                      "userProfile.crop.buttons.confirm".t,
+                                      context
+                                          .t
+                                          .userProfile
+                                          .crop
+                                          .buttons
+                                          .confirm,
                                     ),
                                   ),
                                 ],

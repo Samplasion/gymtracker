@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart' hide ContextExtensionss;
+import 'package:gymtracker/i18n/strings.g.dart';
 import 'package:gymtracker/icons/gymtracker_icons.dart';
 import 'package:gymtracker/model/achievements.dart';
 import 'package:gymtracker/model/exercise.dart';
 import 'package:gymtracker/model/workout.dart';
-import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/utils/constants.dart';
 import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/view/charts/bar_charts.dart';
@@ -41,7 +41,8 @@ class _WorkoutDoneSheetState extends State<WorkoutDoneSheet> {
   initState() {
     super.initState();
     muscleChartHighlights = getIntensities(
-        workout.flattenedExercises.whereType<Exercise>().toList());
+      workout.flattenedExercises.whereType<Exercise>().toList(),
+    );
   }
 
   @override
@@ -49,7 +50,8 @@ class _WorkoutDoneSheetState extends State<WorkoutDoneSheet> {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.workout != widget.workout) {
       muscleChartHighlights = getIntensities(
-          workout.flattenedExercises.whereType<Exercise>().toList());
+        workout.flattenedExercises.whereType<Exercise>().toList(),
+      );
     }
   }
 
@@ -70,21 +72,20 @@ class _WorkoutDoneSheetState extends State<WorkoutDoneSheet> {
               ),
             ],
             flexibleSpace: FlexibleSpaceBar(
-              title: Text('ongoingWorkout.goodJob.title'.t),
+              title: Text(context.t.ongoingWorkout.goodJob.title),
               centerTitle: true,
               expandedTitleScale:
                   context.theme.textTheme.displaySmall!.fontSize! /
-                      context.theme.textTheme.titleLarge!.fontSize!,
+                  context.theme.textTheme.titleLarge!.fontSize!,
             ),
           ),
           if (widget.achievements.isNotEmpty) ...[
             SliverPadding(
-              padding: const EdgeInsets.all(16) +
+              padding:
+                  const EdgeInsets.all(16) +
                   MediaQuery.paddingOf(context).onlyHorizontal,
               sliver: SliverToBoxAdapter(
-                child: SectionTitle(
-                  'ongoingWorkout.goodJob.achievements'.t,
-                ),
+                child: SectionTitle(context.t.achievements.title),
               ),
             ),
             SliverList.builder(
@@ -100,12 +101,13 @@ class _WorkoutDoneSheetState extends State<WorkoutDoneSheet> {
             ),
           ],
           SliverPadding(
-            padding: const EdgeInsets.all(16) +
+            padding:
+                const EdgeInsets.all(16) +
                 MediaQuery.paddingOf(context).onlyHorizontal,
             sliver: SliverList.list(
               children: [
                 Text(
-                  'ongoingWorkout.goodJob.body'.t,
+                  context.t.ongoingWorkout.goodJob.body,
                   style: context.theme.textTheme.bodyLarge,
                 ),
                 if (WeightDistributionBarChart.shouldShow(workout)) ...[
@@ -145,24 +147,28 @@ class _WorkoutDoneSheetState extends State<WorkoutDoneSheet> {
                         workout.duration!,
                         builder: (time) => Text("${time.text}"),
                       ),
-                      subtitle: Text("me.stats.duration.label".t),
+                      subtitle: Text(context.t.me.stats.duration.label),
                     ),
                     if (workout.liftedWeight > 0)
                       SpeedDialButton(
                         icon: const Icon(GTIcons.volume),
-                        text: Text(workout.liftedWeight.userFacingWeight),
-                        subtitle: Text("me.stats.volume.label".t),
+                        text: Text(
+                          workout.liftedWeight.getUserFacingWeight(context.t),
+                        ),
+                        subtitle: Text(context.t.me.stats.volume.label),
                       ),
                     if (workout.distanceRun > 0)
                       SpeedDialButton(
                         icon: const Icon(GTIcons.distance),
-                        text: Text(workout.distanceRun.userFacingDistance),
-                        subtitle: Text("me.stats.distance.label".t),
+                        text: Text(
+                          workout.distanceRun.getUserFacingDistance(context.t),
+                        ),
+                        subtitle: Text(context.t.me.stats.distance.label),
                       ),
                     SpeedDialButton(
                       icon: const Icon(GTIcons.sets),
                       text: Text(workout.doneSets.length.toString()),
-                      subtitle: Text("me.stats.sets.label".t),
+                      subtitle: Text(context.t.me.stats.sets.label),
                     ),
                   ],
                 ),

@@ -1,8 +1,8 @@
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_quill/flutter_quill.dart';
+import 'package:gymtracker/i18n/strings.g.dart';
 import 'package:gymtracker/model/model.dart' show GTMuscleCategory;
-import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/utils/extensions.dart';
 import 'package:share_plus/share_plus.dart';
 
@@ -136,7 +136,7 @@ DateTime max(DateTime a, DateTime b) {
 }
 
 void shareText(String text) {
-  Share.share(text);
+  SharePlus.instance.share(ShareParams(text: text));
 }
 
 // https://stackoverflow.com/a/52104488
@@ -201,14 +201,53 @@ bool throws<T>(
   }
 }
 
-String generateWorkoutTitle(Set<GTMuscleCategory> selectedGroups) {
-  return "titleGenerator.template".tParams({
-    "muscles": "titleGenerator.title"
-        .tByIndexWithParams(selectedGroups.length, {
-          for (int i = 0; i < selectedGroups.length; i++)
-            "$i": "muscleCategories.${selectedGroups.elementAt(i).name}".t,
-        }),
-  }).trim();
+String generateWorkoutTitle(
+  Translations t,
+  Set<GTMuscleCategory> selectedGroups,
+) {
+  final count = selectedGroups.length;
+  final translated = [
+    for (final group in selectedGroups)
+      t.muscleCategories[group.name] ?? "UNKNOWN",
+  ];
+  String title = switch (count) {
+    0 => t.titleGenerator.title.zero,
+    1 => t.titleGenerator.title.one(p0: translated.first),
+    2 => t.titleGenerator.title.two(
+      p0: translated.elementAt(0),
+      p1: translated.elementAt(1),
+    ),
+    3 => t.titleGenerator.title.three(
+      p0: translated.elementAt(0),
+      p1: translated.elementAt(1),
+      p2: translated.elementAt(2),
+    ),
+    4 => t.titleGenerator.title.four(
+      p0: translated.elementAt(0),
+      p1: translated.elementAt(1),
+      p2: translated.elementAt(2),
+      p3: translated.elementAt(3),
+    ),
+    5 => t.titleGenerator.title.five(
+      p0: translated.elementAt(0),
+      p1: translated.elementAt(1),
+      p2: translated.elementAt(2),
+      p3: translated.elementAt(3),
+      p4: translated.elementAt(4),
+    ),
+    6 => t.titleGenerator.title.six(
+      p0: translated.elementAt(0),
+      p1: translated.elementAt(1),
+      p2: translated.elementAt(2),
+      p3: translated.elementAt(3),
+      p4: translated.elementAt(4),
+      p5: translated.elementAt(5),
+    ),
+    _ => throw ArgumentError(
+      "Cannot generate title for more than 6 muscle groups",
+    ),
+  };
+  return t.titleGenerator.template(muscles: title).trim();
 }
 
 DateTime maxDate(DateTime a, DateTime b) {
@@ -225,4 +264,17 @@ int getWeekNumber(DateTime date) {
   int weekNumber =
       ((thursdayOfCurrentWeek.difference(firstWeekThursday).inDays) ~/ 7) + 1;
   return weekNumber;
+}
+
+/// Returns the first day of the week for the given [context].
+///
+/// The returned value is converted to a format compatible with [DateTime.weekday].
+/// That is, the returned value is in the range 1 to 7, inclusive, where
+/// 1 represents Monday and 7 represents Sunday.
+int firstDayOfWeekFor(Locale locale) {
+  if (locale.languageCode == AppLocale.en.languageCode) {
+    return DateTime.sunday;
+  } else {
+    return DateTime.monday;
+  }
 }

@@ -5,21 +5,14 @@ class LineChartCategory {
   final Widget icon;
   final String? info;
 
-  LineChartCategory({
-    required this.title,
-    required this.icon,
-    this.info,
-  });
+  LineChartCategory({required this.title, required this.icon, this.info});
 }
 
 class LineChartPoint {
   final DateTime date;
   final double value;
 
-  LineChartPoint({
-    required this.date,
-    required this.value,
-  });
+  LineChartPoint({required this.date, required this.value});
 
   @override
   String toString() {

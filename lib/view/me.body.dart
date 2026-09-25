@@ -25,10 +25,13 @@ class WeightCard extends StatelessWidget {
                 return Positioned.fill(
                   child: WeightChart(
                     weights: controller.weightMeasurements
-                        .map((element) => Weights.convert(
+                        .map(
+                          (element) => Weights.convert(
                             value: element.weight,
                             from: element.weightUnit,
-                            to: settingsController.weightUnit.value))
+                            to: settingsController.weightUnit.value,
+                          ),
+                        )
                         .toList(),
                   ),
                 );
@@ -48,58 +51,55 @@ class WeightCard extends StatelessWidget {
               ),
               Padding(
                 padding: const EdgeInsets.all(16),
-                child: Obx(
-                  () {
-                    final latestMeasurement =
-                        controller.latestWeightMeasurement;
+                child: Obx(() {
+                  final latestMeasurement = controller.latestWeightMeasurement;
 
-                    return Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Text(
-                          latestMeasurement == null
-                              ? "me.weight.none".t
-                              : latestMeasurement
-                                  .convertedWeight.userFacingWeight,
-                          textAlign: TextAlign.center,
-                          style: Theme.of(context).textTheme.displaySmall,
-                        ),
-                        Text(
-                          latestMeasurement == null
-                              ? "me.weight.measured.never".t
-                              : "me.weight.measured.date".tParams({
-                                  "date": DateFormat.yMMMMd(
-                                          context.locale.languageCode)
-                                      .format(latestMeasurement.time),
-                                }),
-                          textAlign: TextAlign.center,
-                          style: Theme.of(context).textTheme.bodySmall,
-                        ),
-                        const SizedBox(height: 16),
-                        TextButton(
-                          onPressed: () async {
-                            var measurement = await Go.showBottomModalScreen<
-                                (
-                                  WeightMeasurement,
-                                  List<BodyMeasurement>
-                                )>((context, controller) {
-                              return WeightMeasurementAddSheet(
-                                  controller: controller);
-                            });
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Text(
+                        latestMeasurement == null
+                            ? context.t.me.weight.none
+                            : latestMeasurement.convertedWeight
+                                  .getUserFacingWeight(context.t),
+                        textAlign: TextAlign.center,
+                        style: Theme.of(context).textTheme.displaySmall,
+                      ),
+                      Text(
+                        latestMeasurement == null
+                            ? context.t.me.weight.measured.never
+                            : context.t.me.weight.measured.date(
+                                date: DateFormat.yMMMMd(
+                                  context.locale.languageCode,
+                                ).format(latestMeasurement.time),
+                              ),
+                        textAlign: TextAlign.center,
+                        style: Theme.of(context).textTheme.bodySmall,
+                      ),
+                      const SizedBox(height: 16),
+                      TextButton(
+                        onPressed: () async {
+                          var measurement =
+                              await Go.showBottomModalScreen<
+                                (WeightMeasurement, List<BodyMeasurement>)
+                              >((context, controller) {
+                                return WeightMeasurementAddSheet(
+                                  controller: controller,
+                                );
+                              });
 
-                            if (measurement != null) {
-                              controller.addWeightMeasurement(measurement.$1);
-                              for (final body in measurement.$2) {
-                                controller.addBodyMeasurement(body);
-                              }
+                          if (measurement != null) {
+                            controller.addWeightMeasurement(measurement.$1);
+                            for (final body in measurement.$2) {
+                              controller.addBodyMeasurement(body);
                             }
-                          },
-                          child: Text("me.weight.addMeasurement".t),
-                        ),
-                      ],
-                    );
-                  },
-                ),
+                          }
+                        },
+                        child: Text(context.t.me.weight.addMeasurement),
+                      ),
+                    ],
+                  );
+                }),
               ),
             ],
           ),
@@ -143,7 +143,8 @@ class _WeightMeasurementDataPageState extends State<WeightMeasurementDataPage> {
                       foregroundColor:
                           context.colorScheme.onQuaternaryContainer,
                       child: Icon(() {
-                        final diff = predictedWeight.weight -
+                        final diff =
+                            predictedWeight.weight -
                             controller.latestWeightMeasurement!.weight;
                         final normalized = (diff * 100).truncate();
                         if (normalized > 10) {
@@ -155,13 +156,15 @@ class _WeightMeasurementDataPageState extends State<WeightMeasurementDataPage> {
                         }
                       }()),
                     ),
-                    title: Text("me.allData.predictedWeight.label".t),
+                    title: Text(context.t.me.allData.predictedWeight.label),
                     subtitle: Text(
-                      "${predictedWeight.weight.userFacingWeight} (${DateFormat.yMd(context.locale.languageCode).format(predictedWeight.time)})",
+                      "${predictedWeight.weight.getUserFacingWeight(context.t)} (${DateFormat.yMd(context.locale.languageCode).format(predictedWeight.time)})",
                     ),
                     onTap: () {
-                      Go.dialog("me.allData.predictedWeight.dialog.title",
-                          "me.allData.predictedWeight.dialog.text");
+                      Go.dialog(
+                        "me.allData.predictedWeight.dialog.title",
+                        "me.allData.predictedWeight.dialog.text",
+                      );
                     },
                     trailing: const Icon(GTIcons.info),
                   ),
@@ -194,18 +197,17 @@ class _WeightMeasurementDataPageState extends State<WeightMeasurementDataPage> {
     final scheme = Theme.of(context).colorScheme;
     return Scaffold(
       appBar: AppBar(
-        title: Text("me.allData.label".t),
+        title: Text(context.t.me.allData.label),
         actions: [
           IconButton(
             icon: const Icon(GTIcons.add_measurement),
             onPressed: () async {
-              var measurement = await Go.showBottomModalScreen<
-                  (
-                    WeightMeasurement,
-                    List<BodyMeasurement>
-                  )>((context, controller) {
-                return WeightMeasurementAddSheet(controller: controller);
-              });
+              var measurement =
+                  await Go.showBottomModalScreen<
+                    (WeightMeasurement, List<BodyMeasurement>)
+                  >((context, controller) {
+                    return WeightMeasurementAddSheet(controller: controller);
+                  });
 
               if (measurement != null) {
                 controller.addWeightMeasurement(measurement.$1);
@@ -238,7 +240,7 @@ class _WeightMeasurementDataPageState extends State<WeightMeasurementDataPage> {
               if (weightMeasurements.isEmpty) {
                 return Center(
                   child: Text(
-                    "me.allData.none".t,
+                    context.t.me.allData.none,
                     style: Theme.of(context).textTheme.titleLarge,
                   ),
                 );
@@ -252,9 +254,11 @@ class _WeightMeasurementDataPageState extends State<WeightMeasurementDataPage> {
                   SliverToBoxAdapter(child: chart),
                   SliverList.builder(
                     itemBuilder: (context, index) {
-                      final GenericMeasurement measurement = (selected == null
-                          ? weightMeasurements[index]
-                          : bodyMeasurements[selected]![index]) as GenericMeasurement;
+                      final GenericMeasurement measurement =
+                          (selected == null
+                                  ? weightMeasurements[index]
+                                  : bodyMeasurements[selected]![index])
+                              as GenericMeasurement;
                       return Slidable(
                         key: ValueKey(measurement.id),
                         endActionPane: ActionPane(
@@ -266,22 +270,26 @@ class _WeightMeasurementDataPageState extends State<WeightMeasurementDataPage> {
                               onPressed: (_) {
                                 if (selected == null) {
                                   controller.removeWeightMeasurement(
-                                      measurement as WeightMeasurement);
+                                    measurement as WeightMeasurement,
+                                  );
                                 } else {
                                   controller.removeBodyMeasurement(
-                                      measurement as BodyMeasurement);
+                                    measurement as BodyMeasurement,
+                                  );
                                 }
                                 Go.snack(
-                                  "me.allData.removed.text".t,
+                                  context.t.me.allData.removed.text,
                                   action: SnackBarAction(
-                                    label: "actions.undo".t,
+                                    label: context.t.actions.undo,
                                     onPressed: () {
                                       if (selected == null) {
                                         controller.addWeightMeasurement(
-                                            measurement as WeightMeasurement);
+                                          measurement as WeightMeasurement,
+                                        );
                                       } else {
                                         controller.addBodyMeasurement(
-                                            measurement as BodyMeasurement);
+                                          measurement as BodyMeasurement,
+                                        );
                                       }
                                     },
                                   ),
@@ -291,38 +299,47 @@ class _WeightMeasurementDataPageState extends State<WeightMeasurementDataPage> {
                               backgroundColor: scheme.error,
                               foregroundColor: scheme.onError,
                               icon: GTIcons.delete_forever,
-                              label: 'actions.remove'.t,
+                              label: context.t.actions.remove,
                             ),
                           ],
                         ),
                         child: selected == null
                             ? ListTile(
-                                title: Text((measurement as WeightMeasurement)
-                                    .convertedWeight
-                                    .userFacingWeight),
+                                title: Text(
+                                  (measurement as WeightMeasurement)
+                                      .convertedWeight
+                                      .getUserFacingWeight(context.t),
+                                ),
                                 subtitle: Text(
-                                    DateFormat.MMMd(context.locale.languageCode)
-                                        .add_Hm()
-                                        .format(measurement.time)),
+                                  DateFormat.MMMd(
+                                    context.locale.languageCode,
+                                  ).add_Hm().format(measurement.time),
+                                ),
                                 trailing: const Icon(GTIcons.lt_chevron),
                                 onTap: () {
-                                  Go.to(() => WeightMeasurementDataDetailsPage(
-                                        measurementID: measurement.id,
-                                      ));
+                                  Go.to(
+                                    () => WeightMeasurementDataDetailsPage(
+                                      measurementID: measurement.id,
+                                    ),
+                                  );
                                 },
                               )
                             : ListTile(
                                 title: Text(
-                                    "${stringifyDouble(measurement.value, decimalSeparator: NumberFormat(context.locale.languageCode).symbols.DECIMAL_SEP)} ${selected!.unit}"),
+                                  "${stringifyDouble(measurement.value, decimalSeparator: NumberFormat(context.locale.languageCode).symbols.DECIMAL_SEP)} ${selected!.unit}",
+                                ),
                                 subtitle: Text(
-                                    DateFormat.MMMd(context.locale.languageCode)
-                                        .add_Hm()
-                                        .format(measurement.time)),
+                                  DateFormat.MMMd(
+                                    context.locale.languageCode,
+                                  ).add_Hm().format(measurement.time),
+                                ),
                                 trailing: const Icon(GTIcons.lt_chevron),
                                 onTap: () {
-                                  Go.to(() => BodyMeasurementDataDetailsPage(
-                                        measurementID: measurement.id,
-                                      ));
+                                  Go.to(
+                                    () => BodyMeasurementDataDetailsPage(
+                                      measurementID: measurement.id,
+                                    ),
+                                  );
                                 },
                               ),
                       );
@@ -353,41 +370,40 @@ class WeightMeasurementDataDetailsPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     return Scaffold(
-      appBar: AppBar(
-        title: Text("me.weight.label".t),
-      ),
+      appBar: AppBar(title: Text(context.t.me.weight.label)),
       body: Obx(() {
         final measurement = controller.getWeightMeasurementByID(measurementID);
         if (measurement == null) return const SizedBox.shrink();
         return ListView(
           children: [
             ListTile(
-              title: Text("me.addWeight.weight.label".t),
-              subtitle: Text(measurement.convertedWeight.userFacingWeight),
+              title: Text(context.t.me.addWeight.weight.label),
+              subtitle: Text(
+                measurement.convertedWeight.getUserFacingWeight(context.t),
+              ),
             ),
             ListTile(
-              title: Text("me.addWeight.time.label".t),
+              title: Text(context.t.me.addWeight.time.label),
               subtitle: Text(
-                DateFormat.yMMMMEEEEd(context.locale.languageCode)
-                    .add_Hms()
-                    .format(measurement.time),
+                DateFormat.yMMMMEEEEd(
+                  context.locale.languageCode,
+                ).add_Hms().format(measurement.time),
               ),
             ),
             ListTile(
               leading: const Icon(GTIcons.edit),
-              title: Text("actions.edit".t),
+              title: Text(context.t.actions.edit),
               trailing: const Icon(GTIcons.lt_chevron),
               onTap: () async {
-                var newMeasurement = await Go.showBottomModalScreen<
-                    (
-                      WeightMeasurement,
-                      List<BodyMeasurement>?
-                    )>((context, controller) {
-                  return WeightMeasurementAddSheet(
-                    controller: controller,
-                    baseWeight: measurement,
-                  );
-                });
+                var newMeasurement =
+                    await Go.showBottomModalScreen<
+                      (WeightMeasurement, List<BodyMeasurement>?)
+                    >((context, controller) {
+                      return WeightMeasurementAddSheet(
+                        controller: controller,
+                        baseWeight: measurement,
+                      );
+                    });
 
                 if (newMeasurement != null) {
                   controller.addWeightMeasurement(newMeasurement.$1);
@@ -398,7 +414,7 @@ class WeightMeasurementDataDetailsPage extends StatelessWidget {
               iconColor: scheme.error,
               leading: const Icon(GTIcons.delete_forever),
               title: Text(
-                "actions.remove".t,
+                context.t.actions.remove,
                 style: TextStyle(color: scheme.error),
               ),
               trailing: const Icon(GTIcons.lt_chevron),
@@ -407,9 +423,9 @@ class WeightMeasurementDataDetailsPage extends StatelessWidget {
 
                 SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
                   Go.snack(
-                    "me.allData.removed.text".t,
+                    context.t.me.allData.removed.text,
                     action: SnackBarAction(
-                      label: "actions.undo".t,
+                      label: context.t.actions.undo,
                       onPressed: () {
                         controller.addWeightMeasurement(measurement);
                       },
@@ -440,80 +456,78 @@ class BodyMeasurementDataDetailsPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     return Scaffold(
-      appBar: AppBar(
-        title: Text("me.bodyMeasurements".t),
-      ),
+      appBar: AppBar(title: Text(context.t.me.bodyMeasurements)),
       body: StreamBuilder(
-          stream: controller.bodyMeasurements.stream,
-          builder: (context, _) {
-            final measurement =
-                controller.getBodyMeasurementByID(measurementID);
-            if (measurement == null) return const SizedBox.shrink();
-            final part = measurement.type;
-            return ListView(
-              children: [
-                ListTile(
-                  title: Text("bodyMeasurement.${part.name}.label".t),
-                  subtitle: Text(
-                      "${stringifyDouble(measurement.value, decimalSeparator: NumberFormat(context.locale.languageCode).symbols.DECIMAL_SEP)} ${part.unit}"),
+        stream: controller.bodyMeasurements.stream,
+        builder: (context, _) {
+          final measurement = controller.getBodyMeasurementByID(measurementID);
+          if (measurement == null) return const SizedBox.shrink();
+          final part = measurement.type;
+          return ListView(
+            children: [
+              ListTile(
+                title: Text(context.t.bodyMeasurement[part.name].label),
+                subtitle: Text(
+                  "${stringifyDouble(measurement.value, decimalSeparator: NumberFormat(context.locale.languageCode).symbols.DECIMAL_SEP)} ${part.unit}",
                 ),
-                ListTile(
-                  title: Text("me.addWeight.time.label".t),
-                  subtitle: Text(
-                    DateFormat.yMMMMEEEEd(context.locale.languageCode)
-                        .add_Hms()
-                        .format(measurement.time),
-                  ),
+              ),
+              ListTile(
+                title: Text(context.t.me.addWeight.time.label),
+                subtitle: Text(
+                  DateFormat.yMMMMEEEEd(
+                    context.locale.languageCode,
+                  ).add_Hms().format(measurement.time),
                 ),
-                ListTile(
-                  leading: const Icon(GTIcons.edit),
-                  title: Text("actions.edit".t),
-                  trailing: const Icon(GTIcons.lt_chevron),
-                  onTap: () async {
-                    var newMeasurement = await Go.showBottomModalScreen<
-                        (
-                          WeightMeasurement?,
-                          List<BodyMeasurement>
-                        )>((context, controller) {
-                      return WeightMeasurementAddSheet(
-                        controller: controller,
-                        baseBody: measurement,
-                      );
-                    });
+              ),
+              ListTile(
+                leading: const Icon(GTIcons.edit),
+                title: Text(context.t.actions.edit),
+                trailing: const Icon(GTIcons.lt_chevron),
+                onTap: () async {
+                  var newMeasurement =
+                      await Go.showBottomModalScreen<
+                        (WeightMeasurement?, List<BodyMeasurement>)
+                      >((context, controller) {
+                        return WeightMeasurementAddSheet(
+                          controller: controller,
+                          baseBody: measurement,
+                        );
+                      });
 
-                    if (newMeasurement != null) {
-                      controller.addBodyMeasurement(newMeasurement.$2.single);
-                    }
-                  },
+                  if (newMeasurement != null) {
+                    controller.addBodyMeasurement(newMeasurement.$2.single);
+                  }
+                },
+              ),
+              ListTile(
+                iconColor: scheme.error,
+                leading: const Icon(GTIcons.delete_forever),
+                title: Text(
+                  context.t.actions.remove,
+                  style: TextStyle(color: scheme.error),
                 ),
-                ListTile(
-                  iconColor: scheme.error,
-                  leading: const Icon(GTIcons.delete_forever),
-                  title: Text(
-                    "actions.remove".t,
-                    style: TextStyle(color: scheme.error),
-                  ),
-                  trailing: const Icon(GTIcons.lt_chevron),
-                  onTap: () {
-                    Get.back();
+                trailing: const Icon(GTIcons.lt_chevron),
+                onTap: () {
+                  Get.back();
 
-                    SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
-                      Go.snack(
-                        "me.allData.removed.text".t,
-                        action: SnackBarAction(
-                          label: "actions.undo".t,
-                          onPressed: () {
-                            controller.addBodyMeasurement(measurement);
-                          },
-                        ),
-                      );
-                      controller.removeBodyMeasurement(measurement);
-                    });
-                  },
-                ),
-              ],
-            );
-          }),
+                  SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
+                    Go.snack(
+                      context.t.me.allData.removed.text,
+                      action: SnackBarAction(
+                        label: context.t.actions.undo,
+                        onPressed: () {
+                          controller.addBodyMeasurement(measurement);
+                        },
+                      ),
+                    );
+                    controller.removeBodyMeasurement(measurement);
+                  });
+                },
+              ),
+            ],
+          );
+        },
+      ),
     );
   }
 }
@@ -529,10 +543,11 @@ class WeightMeasurementAddSheet extends StatefulWidget {
     this.baseBody,
     super.key,
   }) : assert(
-            baseWeight == null && baseBody == null ||
-                baseWeight != null && baseBody == null ||
-                baseBody != null && baseWeight == null,
-            "Only one base allowed");
+         baseWeight == null && baseBody == null ||
+             baseWeight != null && baseBody == null ||
+             baseBody != null && baseWeight == null,
+         "Only one base allowed",
+       );
 
   @override
   State<WeightMeasurementAddSheet> createState() =>
@@ -553,9 +568,9 @@ class _WeightMeasurementAddSheet
 
   late final Map<BodyMeasurementPart, TextEditingController> _bodyControllers =
       {
-    for (final part in BodyMeasurementPart.values)
-      part: TextEditingController(text: ""),
-  };
+        for (final part in BodyMeasurementPart.values)
+          part: TextEditingController(text: ""),
+      };
 
   @override
   void initState() {
@@ -566,15 +581,17 @@ class _WeightMeasurementAddSheet
       weightUnit = widget.baseWeight!.weightUnit;
     } else if (widget.baseBody != null) {
       time = widget.baseBody!.time;
-      _bodyControllers[widget.baseBody!.type]!.text =
-          stringifyDouble(widget.baseBody!.value);
+      _bodyControllers[widget.baseBody!.type]!.text = stringifyDouble(
+        widget.baseBody!.value,
+      );
     } else {
       SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
         setState(() {
           weightController.text = stringifyDouble(
             controller.latestWeightMeasurement?.weight ?? 0,
-            decimalSeparator:
-                NumberFormat(context.locale.languageCode).symbols.DECIMAL_SEP,
+            decimalSeparator: NumberFormat(
+              context.locale.languageCode,
+            ).symbols.DECIMAL_SEP,
           );
         });
       });
@@ -598,7 +615,7 @@ class _WeightMeasurementAddSheet
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("me.bodyMeasurements".t),
+        title: Text(context.t.me.bodyMeasurements),
         actions: [
           IconButton(onPressed: submit, icon: const Icon(GTIcons.done)),
         ],
@@ -609,7 +626,7 @@ class _WeightMeasurementAddSheet
           padding: const EdgeInsets.all(16),
           children: [
             DateField(
-              decoration: _decoration("me.addWeight.time.label".t),
+              decoration: _decoration(context.t.me.addWeight.time.label),
               date: time,
               onSelect: (date) => setState(() => time = date),
               firstDate: DateTime.fromMillisecondsSinceEpoch(0),
@@ -630,18 +647,22 @@ class _WeightMeasurementAddSheet
                   FilteringTextInputFormatter.allow(RegExp("[0123456789.,]")),
                 ],
                 decoration: GymTrackerInputDecoration(
-                  labelText: "me.addWeight.weight.label".t,
-                  suffix: Text("units.${weightUnit.name}".t),
+                  labelText: context.t.me.addWeight.weight.label,
+                  suffix: Text(context.t.units[weightUnit.name] ?? "UNKNOWN"),
                 ),
               ),
               const SizedBox(height: 16),
               DropdownButtonFormField<Weights>(
-                decoration: _decoration("me.addWeight.weightUnit.label".t),
+                decoration: _decoration(
+                  context.t.me.addWeight.weightUnit.label,
+                ),
                 items: [
                   for (final weightUnit in Weights.values)
                     DropdownMenuItem(
                       value: weightUnit,
-                      child: Text("weightUnits.${weightUnit.name}".t),
+                      child: Text(
+                        context.t.weightUnits[weightUnit.name] ?? "UNKNOWN",
+                      ),
                     ),
                 ],
                 onChanged: (v) => setState(() => weightUnit = v!),
@@ -661,7 +682,7 @@ class _WeightMeasurementAddSheet
                     FilteringTextInputFormatter.allow(RegExp("[0123456789.,]")),
                   ],
                   decoration: GymTrackerInputDecoration(
-                    labelText: "bodyMeasurement.${part.name}.label".t,
+                    labelText: context.t.bodyMeasurement[part.name].label,
                     suffix: Text(part.unit),
                   ),
                 ),
@@ -682,7 +703,7 @@ class _WeightMeasurementAddSheet
     if (mode == _Mode.add || widget.baseWeight != null) {
       weight = weightController.text.tryParseDouble();
       if (weight == null) {
-        Go.snack("me.addWeight.errors.invalidWeight".t);
+        Go.snack(context.t.me.addWeight.errors.invalidWeight);
         return;
       }
     }
@@ -702,7 +723,7 @@ class _WeightMeasurementAddSheet
                 type: part,
                 value: _bodyControllers[part]!.text.parseDouble(),
               ),
-        ]
+        ],
       ));
     } else {
       Navigator.of(context).pop((
@@ -720,10 +741,10 @@ class _WeightMeasurementAddSheet
               id: widget.baseBody!.id,
               time: time,
               type: widget.baseBody!.type,
-              value:
-                  _bodyControllers[widget.baseBody!.type]!.text.parseDouble(),
+              value: _bodyControllers[widget.baseBody!.type]!.text
+                  .parseDouble(),
             ),
-        ]
+        ],
       ));
     }
   }

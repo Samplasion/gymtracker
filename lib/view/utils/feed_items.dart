@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:gymtracker/i18n/strings.g.dart';
 import 'package:gymtracker/provider/online.dart';
 import 'package:gymtracker/service/feed.dart';
-import 'package:gymtracker/service/localizations.dart';
+import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/view/exercises.dart';
 import 'package:gymtracker/view/utils/achievements.dart';
@@ -42,11 +43,15 @@ class FeedItemWorkoutCard extends ConsumerWidget {
               children: [
                 Expanded(
                   child: switch (item.authorship) {
-                    FeedAuthorshipOwn() => Text("feed.workout.title.you".t),
+                    FeedAuthorshipOwn() => Text(
+                      context.t.feed.workout.title.you,
+                    ),
                     FeedAuthorshipFriend(:final String userID) => UserNameText(
                       id: userID,
                     ),
-                    FeedAuthorship() => Text("feed.workout.title.unknown".t),
+                    FeedAuthorship() => Text(
+                      context.t.feed.workout.title.unknown,
+                    ),
                   },
                 ),
                 if (item.workout.endingDate != null)
@@ -60,8 +65,10 @@ class FeedItemWorkoutCard extends ConsumerWidget {
               ],
             ),
             subtitle: switch (item.authorship) {
-              FeedAuthorshipOwn() => Text("feed.workout.subtitle.you".t),
-              FeedAuthorshipFriend() => Text("feed.workout.subtitle.friend".t),
+              FeedAuthorshipOwn() => Text(context.t.feed.workout.subtitle.you),
+              FeedAuthorshipFriend() => Text(
+                context.t.feed.workout.subtitle.friend,
+              ),
             },
           ),
           HistoryWorkout.naked(
@@ -120,11 +127,15 @@ class FeedItemAchievementCard extends StatelessWidget {
               children: [
                 Expanded(
                   child: switch (item.authorship) {
-                    FeedAuthorshipOwn() => Text("feed.achievement.title.you".t),
+                    FeedAuthorshipOwn() => Text(
+                      context.t.feed.achievement.title.you,
+                    ),
                     FeedAuthorshipFriend(:final String userID) => UserNameText(
                       id: userID,
                     ),
-                    FeedAuthorship() => Text("feed.workout.title.unknown".t),
+                    FeedAuthorship() => Text(
+                      context.t.feed.workout.title.unknown,
+                    ),
                   },
                 ),
                 Text(
@@ -137,9 +148,11 @@ class FeedItemAchievementCard extends StatelessWidget {
               ],
             ),
             subtitle: switch (item.authorship) {
-              FeedAuthorshipOwn() => Text("feed.achievement.subtitle.you".t),
+              FeedAuthorshipOwn() => Text(
+                context.t.feed.achievement.subtitle.you,
+              ),
               FeedAuthorshipFriend() => Text(
-                "feed.achievement.subtitle.friend".t,
+                context.t.feed.achievement.subtitle.friend,
               ),
             },
           ),

@@ -1,10 +1,10 @@
 import 'dart:collection';
 
 import 'package:flutter/material.dart';
+import 'package:gymtracker/i18n/strings.g.dart';
 import 'package:gymtracker/icons/gymtracker_icons.dart';
 import 'package:gymtracker/model/exercisable.dart';
 import 'package:gymtracker/model/exercise.dart';
-import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/view/components/alert_banner.dart';
 import 'package:gymtracker/view/utils/crossfade.dart';
@@ -18,8 +18,8 @@ class ExercisesToSupersetDialog extends StatefulWidget {
     required this.exercises,
     required this.startingIndex,
     super.key,
-  })  : assert(startingIndex >= 0),
-        assert(startingIndex < exercises.length);
+  }) : assert(startingIndex >= 0),
+       assert(startingIndex < exercises.length);
 
   @override
   State<ExercisesToSupersetDialog> createState() =>
@@ -35,8 +35,9 @@ enum _ETSStatus {
 
 class _ExercisesToSupersetDialogState extends State<ExercisesToSupersetDialog> {
   late final selected = SplayTreeSet<int>.from({widget.startingIndex});
-  List<Exercise> get exercises =>
-      [for (final i in selected) widget.exercises[i] as Exercise];
+  List<Exercise> get exercises => [
+    for (final i in selected) widget.exercises[i] as Exercise,
+  ];
 
   _ETSStatus get status {
     if (selected.length < 2) {
@@ -49,14 +50,14 @@ class _ExercisesToSupersetDialogState extends State<ExercisesToSupersetDialog> {
   Widget get statusWidget {
     return switch (status) {
       _ETSStatus.tooFewExercises => AlertBanner(
-          color: AlertColor.error(context),
-          title: "ongoingWorkout.exercisesToSuperset.errorBannerTitle".t,
-          text: RichText(
-            text: TextSpan(
-              text: "ongoingWorkout.exercisesToSuperset.errors.tooFew".t,
-            ),
+        color: AlertColor.error(context),
+        title: context.t.ongoingWorkout.exercisesToSuperset.errorBannerTitle,
+        text: RichText(
+          text: TextSpan(
+            text: context.t.ongoingWorkout.exercisesToSuperset.errors.tooFew,
           ),
         ),
+      ),
       _ => const SizedBox(),
     };
   }
@@ -66,7 +67,7 @@ class _ExercisesToSupersetDialogState extends State<ExercisesToSupersetDialog> {
     return Dialog.fullscreen(
       child: Scaffold(
         appBar: AppBar(
-          title: Text("ongoingWorkout.exercisesToSuperset.title".t),
+          title: Text(context.t.ongoingWorkout.exercisesToSuperset.title),
           actions: [
             IconButton(
               icon: const Icon(GTIcons.done),
@@ -94,7 +95,12 @@ class _ExercisesToSupersetDialogState extends State<ExercisesToSupersetDialog> {
                 onTap: () {
                   if (widget.exercises[i] is! Exercise) {
                     Go.snack(
-                      "ongoingWorkout.exercisesToSuperset.errors.notExercise".t,
+                      context
+                          .t
+                          .ongoingWorkout
+                          .exercisesToSuperset
+                          .errors
+                          .notExercise,
                       assertive: true,
                     );
                     return;
@@ -106,8 +112,12 @@ class _ExercisesToSupersetDialogState extends State<ExercisesToSupersetDialog> {
                         selected.remove(i);
                       } else {
                         Go.snack(
-                          "ongoingWorkout.exercisesToSuperset.errors.removingMiddle"
-                              .t,
+                          context
+                              .t
+                              .ongoingWorkout
+                              .exercisesToSuperset
+                              .errors
+                              .removingMiddle,
                           assertive: true,
                         );
                       }
@@ -118,8 +128,12 @@ class _ExercisesToSupersetDialogState extends State<ExercisesToSupersetDialog> {
                         selected.add(i);
                       } else {
                         Go.snack(
-                          "ongoingWorkout.exercisesToSuperset.errors.addingNonContiguous"
-                              .t,
+                          context
+                              .t
+                              .ongoingWorkout
+                              .exercisesToSuperset
+                              .errors
+                              .addingNonContiguous,
                           assertive: true,
                         );
                       }

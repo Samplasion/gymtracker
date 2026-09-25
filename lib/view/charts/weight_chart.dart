@@ -1,7 +1,7 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:gymtracker/i18n/strings.g.dart';
 import 'package:gymtracker/model/measurements.dart';
-import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/utils/constants.dart';
 import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/utils/theme.dart';
@@ -243,17 +243,17 @@ class _WeightChartTimeSeriesState extends State<WeightChartTimeSeries> {
           },
           categories: {
             null: LineChartCategory(
-              title: "me.addWeight.weight.label".t,
+              title: context.t.me.addWeight.weight.label,
               icon: Text(
-                "me.addWeight.weight.label".t.characters.first,
+                context.t.me.addWeight.weight.label.characters.first,
                 style: const TextStyle(fontSize: 10),
               ),
             ),
             for (final part in BodyMeasurementPart.values)
               part: LineChartCategory(
-                title: "bodyMeasurement.${part.name}.label".t,
+                title: context.t.bodyMeasurement[part.name].label,
                 icon: Text(
-                  "bodyMeasurement.${part.name}.label".t.characters.first
+                  context.t.bodyMeasurement[part.name].label.characters.first
                       .toUpperCase(),
                   style: const TextStyle(fontSize: 10),
                 ),
@@ -266,7 +266,7 @@ class _WeightChartTimeSeriesState extends State<WeightChartTimeSeries> {
                   children: [
                     TextSpan(
                       text: type == null
-                          ? point.value.userFacingWeight
+                          ? point.value.getUserFacingWeight(context.t)
                           : "${stringifyDouble(point.value, decimalSeparator: NumberFormat(context.locale.languageCode).symbols.DECIMAL_SEP)} ${type.unit}",
                     ),
                   ],
@@ -290,7 +290,7 @@ class _WeightChartTimeSeriesState extends State<WeightChartTimeSeries> {
             ),
           ),
           leftTitleBuilder: (type, value) => type == null
-              ? value.userFacingWeight
+              ? value.getUserFacingWeight(context.t)
               : "${stringifyDouble(value, decimalSeparator: NumberFormat(context.locale.languageCode).symbols.DECIMAL_SEP)} ${type.unit}",
           onCategoryChanged: widget.onSelectCategory,
         );

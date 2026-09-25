@@ -5,9 +5,10 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart' hide ContextExtensionss;
 import 'package:gymtracker/controller/boutique_controller.dart';
 import 'package:gymtracker/controller/purchases_controller.dart';
+import 'package:gymtracker/i18n/strings.g.dart';
 import 'package:gymtracker/icons/gymtracker_icons.dart';
 import 'package:gymtracker/model/boutique.dart';
-import 'package:gymtracker/service/localizations.dart';
+import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/utils/skeletons.dart';
 import 'package:gymtracker/utils/utils.dart';
@@ -54,7 +55,7 @@ class _BoutiqueViewState
     return Scaffold(
       body: NestedScrollView(
         headerSliverBuilder: (context, innerBoxIsScrolled) => [
-          SliverAppBar.large(title: Text("boutique.title".t)),
+          SliverAppBar.large(title: Text(context.t.boutique.title)),
         ],
         body: RefreshIndicator(
           onRefresh: _refresh,
@@ -70,7 +71,7 @@ class _BoutiqueViewState
                         child: Padding(
                           padding: const EdgeInsets.all(16),
                           child: Text(
-                            "boutique.errors.unknown".t,
+                            context.t.boutique.errors['unknown'] ?? "UNKNOWN",
                             textAlign: TextAlign.center,
                           ),
                         ),
@@ -95,8 +96,12 @@ class _BoutiqueViewState
                             child: Padding(
                               padding: const EdgeInsets.all(16),
                               child: Text(
-                                "boutique.errors.${snapshot.data!.error?.name ?? "unknown"}"
-                                    .t,
+                                context.t.boutique.errors[snapshot
+                                            .data!
+                                            .error
+                                            ?.name ??
+                                        "unknown"] ??
+                                    "Unknown error",
                                 textAlign: TextAlign.center,
                               ),
                             ),
@@ -150,8 +155,8 @@ class _BoutiqueViewState
     return SliverFillRemaining(
       child: ContentUnavailableView(
         icon: const Icon(GTIcons.boutique),
-        title: Text("boutique.marketingUpdating.title".t),
-        description: Text("boutique.marketingUpdating.description".t),
+        title: Text(context.t.boutique.marketingUpdating.title),
+        description: Text(context.t.boutique.marketingUpdating.description),
       ),
     );
   }
@@ -300,8 +305,9 @@ class _BoutiqueCategoryViewState
                 child: Padding(
                   padding: const EdgeInsets.all(16),
                   child: Text(
-                    "boutique.errors.${snapshot.data!.error?.name ?? "unknown"}"
-                        .t,
+                    context.t.boutique.errors[snapshot.data!.error?.name ??
+                            "unknown"] ??
+                        "UNKNOWN",
                     textAlign: TextAlign.center,
                   ),
                 ),
@@ -341,7 +347,9 @@ class _BoutiqueCategoryViewState
                   children: [
                     TextSpan(text: "${package.description}\n"),
                     TextSpan(
-                      text: "general.routines".plural(package.routines.length),
+                      text: context.t.general.routines(
+                        n: package.routines.length,
+                      ),
                       style: Theme.of(context).textTheme.labelSmall,
                     ),
                   ],
@@ -403,7 +411,7 @@ class BoutiquePackageView extends StatelessWidget {
                     child: Text.rich(
                       TextSpan(
                         children: [
-                          TextSpan(text: "boutique.package.install".t),
+                          TextSpan(text: context.t.boutique.package.install),
                           if (!isPro) ...[
                             TextSpan(text: " " * 2),
                             WidgetSpan(child: ProBadge(), alignment: .middle),

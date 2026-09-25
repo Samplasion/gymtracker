@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:gymtracker/gen/colors.gen.dart';
+import 'package:gymtracker/i18n/strings.g.dart';
 import 'package:gymtracker/model/exercise.dart';
-import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/utils/utils.dart';
 import 'package:gymtracker/view/components/equipment_icon.dart';
 import 'package:gymtracker/view/components/themed_subtree.dart';
@@ -23,16 +23,20 @@ class _WorkoutGeneratorSetupScreenState
   @override
   Widget build(BuildContext context) {
     final allMuscleGroups = GTMuscleGroup.values.toList();
-    allMuscleGroups.sort((a, b) => a.localizedName.compareTo(b.localizedName));
+    allMuscleGroups.sort(
+      (a, b) => a
+          .getLocalizedName(context.t)
+          .compareTo(b.getLocalizedName(context.t)),
+    );
     return ThemedSubtree(
       color: getThemedColor(context, GTColors.ai),
       child: AlertDialog(
-        title: Text("workoutGenerator.title".t),
+        title: Text(context.t.workoutGenerator.title),
         content: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text("workoutGenerator.muscleGroups".t),
+              Text(context.t.workoutGenerator.muscleGroups),
               const SizedBox(height: 8),
               Wrap(
                 spacing: 8,
@@ -40,7 +44,7 @@ class _WorkoutGeneratorSetupScreenState
                 children: [
                   for (final group in allMuscleGroups)
                     ChoiceChip.elevated(
-                      label: Text(group.localizedName),
+                      label: Text(group.getLocalizedName(context.t)),
                       selected: muscleGroups.contains(group),
                       onSelected: (_) {
                         setState(() {
@@ -55,7 +59,7 @@ class _WorkoutGeneratorSetupScreenState
                 ],
               ),
               const SizedBox(height: 16),
-              Text("workoutGenerator.equipment".t),
+              Text(context.t.workoutGenerator.equipment),
               const SizedBox(height: 8),
               Wrap(
                 spacing: 8,
@@ -63,7 +67,7 @@ class _WorkoutGeneratorSetupScreenState
                 children: [
                   for (final eq in GTGymEquipment.values)
                     ChoiceChip.elevated(
-                      label: Text(eq.localizedName),
+                      label: Text(eq.getLocalizedName(context.t)),
                       selected: equipment.contains(eq),
                       avatar: EquipmentIcon(equipment: eq),
                       onSelected: (_) {
@@ -84,7 +88,7 @@ class _WorkoutGeneratorSetupScreenState
         actions: [
           FilledButton(
             onPressed: _getOnPressed(),
-            child: Text("workoutGenerator.actions.generate".t),
+            child: Text(context.t.workoutGenerator.actions.generate),
           ),
         ],
       ),

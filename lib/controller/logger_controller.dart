@@ -1,7 +1,8 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:gymtracker/service/localizations.dart';
+import 'package:gymtracker/main.dart';
+import 'package:gymtracker/provider/locale.dart';
 import 'package:gymtracker/service/logger.dart';
 import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/utils/utils.dart';
@@ -122,13 +123,16 @@ class LoggerController extends GetxController {
   }
 
   void showLevelRadioModal() {
+    final t = globalContainer.read(translationsProvider);
     Go.showRadioModal(
       selectedValue: level,
       values: {
         for (final lvl in availableLevels)
-          lvl: "settings.advanced.options.logs.levels.${lvl.translationKey}".t,
+          lvl:
+              t.settings.advanced.options.logs.levels[lvl.translationKey] ??
+              "UNKNOWN",
       },
-      title: Text("settings.advanced.options.logs.level".t),
+      title: Text(t.settings.advanced.options.logs.level),
       onChange: (newLevel) {
         if (newLevel == null) return;
         level = newLevel;
@@ -160,8 +164,7 @@ class LoggerController extends GetxController {
           final error = log.error;
           final stackTrace = log.stackTrace;
           final errorString = "${error ?? ""}\n\n${stackTrace ?? ""}".trim();
-          final firstLine =
-              "${" " * (maxLevelLength - level.length)}[$level] ";
+          final firstLine = "${" " * (maxLevelLength - level.length)}[$level] ";
           return "$firstLine$timestamp $loggerName\n${" " * firstLine.length}$message\n\n$errorString"
               .trimRight();
         })

@@ -1,9 +1,10 @@
 import 'package:fuzzywuzzy/fuzzywuzzy.dart';
-import 'package:get/get.dart';
+import 'package:get/get.dart' hide Translations;
 import 'package:gymtracker/controller/coordinator.dart';
 import 'package:gymtracker/controller/serviceable_controller.dart';
 import 'package:gymtracker/controller/workout_controller.dart';
 import 'package:gymtracker/data/exercises.dart';
+import 'package:gymtracker/i18n/strings.g.dart';
 import 'package:gymtracker/model/exercise.dart';
 import 'package:gymtracker/model/set.dart';
 import 'package:gymtracker/model/workout.dart';
@@ -89,7 +90,9 @@ class ExercisesController extends GetxController with ServiceableController {
   }
 
   Future<Exercise?> editExercise(
-      Exercise exercise, List<(Exercise, int, Workout)> history) async {
+    Exercise exercise,
+    List<(Exercise, int, Workout)> history,
+  ) async {
     if (Get.isRegistered<WorkoutController>() &&
         Get.find<WorkoutController>().hasExercise(exercise)) {
       final shouldOverwrite = await Go.confirm(
@@ -101,11 +104,12 @@ class ExercisesController extends GetxController with ServiceableController {
       }
     }
     final ex = await Go.showBottomModalScreen<Exercise>(
-        (context, controller) => ExerciseCreator(
-              base: exercise,
-              scrollController: controller,
-              shouldChangeParameters: history.isEmpty,
-            ));
+      (context, controller) => ExerciseCreator(
+        base: exercise,
+        scrollController: controller,
+        shouldChangeParameters: history.isEmpty,
+      ),
+    );
     final isInUse = Get.find<Coordinator>().hasExercise(exercise);
     logger.d(("IS IN USE", isInUse));
     if (ex != null) {
@@ -118,29 +122,34 @@ class ExercisesController extends GetxController with ServiceableController {
     return ex;
   }
 
-  getExerciseByID(String id) {
+  Exercise? getExerciseByID(String id) {
     return exercises.firstWhereOrNull((element) => element.id == id);
   }
 
   void removeWeightFromExercise(Exercise exercise) {
-    final newExercise =
-        exercise.copyWith(parameters: GTSetParameters.freeBodyReps);
+    final newExercise = exercise.copyWith(
+      parameters: GTSetParameters.freeBodyReps,
+    );
     saveEdit(newExercise);
   }
 
   void applyWeightMultiplier(Exercise exercise, double multiplier) {
-    final newExercise =
-        exercise.copyWith(sets: exercise.sets.map((e) => e.copyWith(weight: e.weight! * multiplier)).toList());
+    final newExercise = exercise.copyWith(
+      sets: exercise.sets
+          .map((e) => e.copyWith(weight: e.weight! * multiplier))
+          .toList(),
+    );
     saveEdit(newExercise);
   }
 
-  List<Exercise> search(String text) {
+  List<Exercise> search(String text, {required Translations t}) {
     final allExercises = exercises$.value + exerciseStandardLibraryAsList;
     final results = extractTop<Exercise>(
       query: text,
       choices: allExercises.toList(),
       limit: 20,
-      getter: (exercise) => "${exercise.displayName} ${exercise.id} ${exercise.primaryMuscleGroup.localizedName}",
+      getter: (exercise) =>
+          "${exercise.getDisplayName(t)} ${exercise.id} ${exercise.primaryMuscleGroup.getLocalizedName(t)}",
     ).map((e) => e.choice).toList();
     return results;
   }

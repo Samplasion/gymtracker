@@ -4,10 +4,10 @@ import 'dart:typed_data';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:gymtracker/i18n/strings.g.dart';
 import 'package:gymtracker/icons/gymtracker_icons.dart';
 import 'package:gymtracker/provider/friend.dart';
 import 'package:gymtracker/provider/online.dart';
-import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/view/components/loading_indicator.dart';
 import 'package:gymtracker/view/utils/crop_image.dart';
@@ -66,9 +66,9 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text("userProfile.edit.error".t)));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(context.t.userProfile.edit.error)),
+        );
       }
     }
   }
@@ -83,7 +83,7 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
             children: [
               ListTile(
                 leading: const Icon(GTIcons.gallery),
-                title: Text("userProfile.edit.changePicture".t),
+                title: Text(context.t.userProfile.edit.changePicture),
                 onTap: () {
                   Navigator.of(ctx).pop();
                   _pickImage();
@@ -92,7 +92,7 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
               ListTile(
                 leading: const Icon(GTIcons.delete, color: Colors.red),
                 title: Text(
-                  "userProfile.edit.removePicture".t,
+                  context.t.userProfile.edit.removePicture,
                   style: const TextStyle(color: Colors.red),
                 ),
                 onTap: () {
@@ -137,12 +137,12 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
       ref.invalidate(friendProvider);
 
       if (mounted) {
-        Go.snack("userProfile.edit.success".t);
+        Go.snack(context.t.userProfile.edit.success);
         Navigator.of(context).pop();
       }
     } catch (e) {
       if (mounted) {
-        Go.snack("userProfile.edit.error".t);
+        Go.snack(context.t.userProfile.edit.error);
       }
     } finally {
       if (mounted) {
@@ -165,12 +165,12 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text("userProfile.edit.title".t),
+        title: Text(context.t.userProfile.edit.title),
         actions: [
           if (!_saving)
             IconButton(
               icon: const Icon(GTIcons.done),
-              tooltip: "userProfile.edit.done".t,
+              tooltip: context.t.userProfile.edit.done,
               onPressed: _save,
             )
           else
@@ -258,14 +258,14 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
                         const SizedBox(height: 8),
                         TextButton(
                           onPressed: _showImageOptions,
-                          child: Text("userProfile.edit.changePicture".t),
+                          child: Text(context.t.userProfile.edit.changePicture),
                         ),
                         const SizedBox(height: 24),
                         TextFormField(
                           controller: _nameController,
                           decoration: InputDecoration(
-                            labelText: "userProfile.edit.fullName".t,
-                            hintText: "userProfile.edit.fullNameHint".t,
+                            labelText: context.t.userProfile.edit.fullName,
+                            hintText: context.t.userProfile.edit.fullNameHint,
                             prefixIcon: const Icon(GTIcons.profile),
                             suffixIcon: _nameController.text.isNotEmpty
                                 ? IconButton(
@@ -289,7 +289,7 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
                           child: FilledButton.icon(
                             onPressed: _saving ? null : _save,
                             icon: const Icon(GTIcons.done),
-                            label: Text("userProfile.edit.done".t),
+                            label: Text(context.t.userProfile.edit.done),
                             style: FilledButton.styleFrom(
                               padding: const EdgeInsets.symmetric(vertical: 16),
                               shape: RoundedRectangleBorder(

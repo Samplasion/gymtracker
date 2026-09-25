@@ -6,10 +6,10 @@ import 'package:gymtracker/controller/stopwatch_controller.dart';
 import 'package:gymtracker/controller/workout_controller.dart';
 import 'package:gymtracker/data/distance.dart';
 import 'package:gymtracker/data/weights.dart';
+import 'package:gymtracker/i18n/strings.g.dart';
 import 'package:gymtracker/icons/gymtracker_icons.dart';
 import 'package:gymtracker/model/exercise.dart';
 import 'package:gymtracker/model/set.dart';
-import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/struct/editor_callback.dart';
 import 'package:gymtracker/struct/optional.dart';
 import 'package:gymtracker/utils/go.dart';
@@ -29,15 +29,15 @@ List<PopupMenuEntry<dynamic>> buildWorkoutControlMenuEntries(
   return <PopupMenuEntry<dynamic>>[
     PopupMenuItem(
       onTap: controller.changeWeightUnitDialog,
-      child: Text("ongoingWorkout.actions.changeWeightUnit".t),
+      child: Text(context.t.ongoingWorkout.actions.changeWeightUnit),
     ),
     PopupMenuItem(
       onTap: controller.changeDistanceUnitDialog,
-      child: Text("ongoingWorkout.actions.changeDistanceUnit".t),
+      child: Text(context.t.ongoingWorkout.actions.changeDistanceUnit),
     ),
     const PopupMenuDivider(),
     PopupMenuItem(
-      child: Text("ongoingWorkout.actions.finish".t),
+      child: Text(context.t.ongoingWorkout.actions.finish),
       onTap: () {
         SchedulerBinding.instance.addPostFrameCallback((_) {
           controller.finishWorkoutWithDialog(context);
@@ -46,7 +46,7 @@ List<PopupMenuEntry<dynamic>> buildWorkoutControlMenuEntries(
     ),
     PopupMenuItem(
       child: Text(
-        "ongoingWorkout.actions.cancel".t,
+        context.t.ongoingWorkout.actions.cancel,
         style: TextStyle(color: Theme.of(context).colorScheme.error),
       ),
       onTap: () {
@@ -89,7 +89,7 @@ List<PopupMenuEntry<dynamic>> buildToolboxMenuEntries(
       enabled: controller != null,
       child: ListTile(
         leading: const Icon(GTIcons.stopwatch),
-        title: Text("ongoingWorkout.stopwatch.label".t),
+        title: Text(context.t.ongoingWorkout.stopwatch.label),
         mouseCursor: SystemMouseCursors.click,
         enabled: controller != null,
       ),
@@ -101,7 +101,7 @@ List<PopupMenuEntry<dynamic>> buildToolboxMenuEntries(
           showDialog(
             context: context,
             builder: (context) => AlertDialog(
-              title: Text("ongoingWorkout.stopwatch.label".t),
+              title: Text(context.t.ongoingWorkout.stopwatch.label),
               content: TimerView(
                 startingTime: DateTime.now(),
                 builder: (context, _) {
@@ -123,7 +123,9 @@ List<PopupMenuEntry<dynamic>> buildToolboxMenuEntries(
                               TextButton.icon(
                                 key: const Key("start"),
                                 icon: const Icon(GTIcons.resume),
-                                label: Text("ongoingWorkout.stopwatch.start".t),
+                                label: Text(
+                                  context.t.ongoingWorkout.stopwatch.start,
+                                ),
                                 onPressed: () {
                                   getStopwatch().start();
                                 },
@@ -132,7 +134,9 @@ List<PopupMenuEntry<dynamic>> buildToolboxMenuEntries(
                               TextButton.icon(
                                 key: const Key("pause"),
                                 icon: const Icon(GTIcons.pause),
-                                label: Text("ongoingWorkout.stopwatch.pause".t),
+                                label: Text(
+                                  context.t.ongoingWorkout.stopwatch.pause,
+                                ),
                                 onPressed: () {
                                   getStopwatch().pause();
                                 },
@@ -142,7 +146,9 @@ List<PopupMenuEntry<dynamic>> buildToolboxMenuEntries(
                               TextButton.icon(
                                 key: const Key("reset"),
                                 icon: const Icon(GTIcons.reset),
-                                label: Text("ongoingWorkout.stopwatch.reset".t),
+                                label: Text(
+                                  context.t.ongoingWorkout.stopwatch.reset,
+                                ),
                                 onPressed: () {
                                   getStopwatch().reset();
                                 },
@@ -162,7 +168,7 @@ List<PopupMenuEntry<dynamic>> buildToolboxMenuEntries(
     PopupMenuItem(
       child: ListTile(
         leading: const Icon(GTIcons.weight_calculator),
-        title: Text("ongoingWorkout.weightCalculator".t),
+        title: Text(context.t.ongoingWorkout.weightCalculator),
         mouseCursor: SystemMouseCursors.click,
         enabled: controller != null,
       ),
@@ -178,7 +184,7 @@ List<PopupMenuEntry<dynamic>> buildToolboxMenuEntries(
     PopupMenuItem(
       child: ListTile(
         leading: const Icon(GTIcons.cardio_timer),
-        title: Text("cardioTimer.name".t),
+        title: Text(context.t.cardioTimer.name),
         mouseCursor: SystemMouseCursors.click,
         enabled: controller != null,
       ),
@@ -207,7 +213,7 @@ List<PopupMenuEntry<dynamic>> buildSetKindMenuEntries({
             set: set,
             allSets: exercise.sets,
           ),
-          title: Text('set.kindLong.${kind.name}'.t),
+          title: Text(context.t.set.kindLong[kind.name] ?? "UNKNOWN"),
         ),
       ),
     const PopupMenuDivider(),
@@ -217,7 +223,7 @@ List<PopupMenuEntry<dynamic>> buildSetKindMenuEntries({
           context: context,
           builder: (context) {
             return AlertDialog(
-              title: Text('set.kinds.help.title'.t),
+              title: Text(context.t.set.kinds.help["title"]!),
               scrollable: true,
               content: Column(
                 children: [
@@ -230,8 +236,12 @@ List<PopupMenuEntry<dynamic>> buildSetKindMenuEntries({
                         allSets: exercise.sets,
                         fontSize: 16,
                       ),
-                      title: Text('set.kindLong.${kind.name}'.t),
-                      subtitle: Text('set.kinds.help.${kind.name}'.t),
+                      title: Text(
+                        context.t.set.kindLong[kind.name] ?? "UNKNOWN",
+                      ),
+                      subtitle: Text(
+                        context.t.set.kinds.help[kind.name] ?? "UNKNOWN",
+                      ),
                     ),
                 ],
               ),
@@ -255,7 +265,7 @@ List<PopupMenuEntry<dynamic>> buildSetKindMenuEntries({
             fontWeight: FontWeight.bold,
           ),
         ),
-        title: Text('set.kinds.help.title'.t),
+        title: Text(context.t.set.kinds.help["title"]!),
       ),
     ),
   ];
@@ -280,7 +290,7 @@ List<PopupMenuEntry<dynamic>> buildExerciseControlMenuEntries({
         },
         child: ListTile(
           leading: const Icon(GTIcons.reorder),
-          title: Text('ongoingWorkout.exercises.reorder'.t),
+          title: Text(context.t.ongoingWorkout.exercises.reorder),
           mouseCursor: SystemMouseCursors.click,
         ),
       ),
@@ -294,7 +304,7 @@ List<PopupMenuEntry<dynamic>> buildExerciseControlMenuEntries({
       },
       child: ListTile(
         leading: const Icon(GTIcons.replace),
-        title: Text('ongoingWorkout.exercises.replace'.t),
+        title: Text(context.t.ongoingWorkout.exercises.replace),
         mouseCursor: SystemMouseCursors.click,
       ),
     ),
@@ -305,7 +315,7 @@ List<PopupMenuEntry<dynamic>> buildExerciseControlMenuEntries({
         },
         child: ListTile(
           leading: const Icon(GTIcons.add_to_superset),
-          title: Text('ongoingWorkout.exercises.addToSuperset'.t),
+          title: Text(context.t.ongoingWorkout.exercises.addToSuperset),
           mouseCursor: SystemMouseCursors.click,
         ),
       ),
@@ -337,7 +347,7 @@ List<PopupMenuEntry<dynamic>> buildExerciseControlMenuEntries({
               },
         child: ListTile(
           leading: const Icon(GTIcons.reorder),
-          title: Text('ongoingWorkout.exercises.reorderSets'.t),
+          title: Text(context.t.ongoingWorkout.exercises.reorderSets),
           enabled: exercise.sets.isNotEmpty,
           mouseCursor: SystemMouseCursors.click,
         ),
@@ -354,7 +364,7 @@ List<PopupMenuEntry<dynamic>> buildExerciseControlMenuEntries({
           },
           child: ListTile(
             leading: const Icon(GTIcons.cardio_timer),
-            title: Text('ongoingWorkout.exercises.startCardioTimer'.t),
+            title: Text(context.t.ongoingWorkout.exercises.startCardioTimer),
             mouseCursor: SystemMouseCursors.click,
           ),
         ),
@@ -371,7 +381,7 @@ List<PopupMenuEntry<dynamic>> buildExerciseControlMenuEntries({
         textColor: Theme.of(context).colorScheme.error,
         iconColor: Theme.of(context).colorScheme.error,
         leading: const Icon(GTIcons.delete),
-        title: Text('ongoingWorkout.exercises.remove'.t),
+        title: Text(context.t.ongoingWorkout.exercises.remove),
         mouseCursor: SystemMouseCursors.click,
       ),
     ),
@@ -409,7 +419,7 @@ class _WorkoutReorderSetsDialogState extends State<WorkoutReorderSetsDialog> {
     return Dialog.fullscreen(
       child: Scaffold(
         appBar: AppBar(
-          title: Text('exercise.editor.fields.reorderSets.title'.t),
+          title: Text(context.t.exercise.editor.fields.reorderSets.title),
           leading: IconButton(
             icon: const Icon(GTIcons.close),
             onPressed: () {
@@ -431,8 +441,8 @@ class _WorkoutReorderSetsDialogState extends State<WorkoutReorderSetsDialog> {
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
                 child: AlertBanner(
-                  title: 'exercise.editor.fields.reorderSets.title'.t,
-                  text: Text('exercise.editor.fields.reorderSets.text'.t),
+                  title: context.t.exercise.editor.fields.reorderSets.title,
+                  text: Text(context.t.exercise.editor.fields.reorderSets.text),
                   color: AlertColor.secondary(context),
                 ),
               ),
@@ -484,20 +494,38 @@ class _SetRpeDialogState extends State<_SetRpeDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: Text('exercise.editor.fields.rpe.label'.t),
+      title: Text(context.t.exercise.editor.fields.rpe.label),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           ListTile(
             leading: const Icon(GTIcons.help),
-            title: Text('exercise.editor.fields.rpe.description.title'.t),
-            subtitle: Text('exercise.editor.fields.rpe.description.text'.t),
+            title: Text(context.t.exercise.editor.fields.rpe.description.title),
+            subtitle: Text(
+              context.t.exercise.editor.fields.rpe.description.text,
+            ),
           ),
           ListTile(
             leading: const Icon(GTIcons.rpe),
-            title: Text('exercise.editor.fields.rpe.level$currentRPE.title'.t),
+            title: Text(
+              context
+                  .t
+                  .exercise
+                  .editor
+                  .fields
+                  .rpe
+                  .levels[currentRPE.floor()]
+                  .title,
+            ),
             subtitle: Text(
-              'exercise.editor.fields.rpe.level$currentRPE.text'.t,
+              context
+                  .t
+                  .exercise
+                  .editor
+                  .fields
+                  .rpe
+                  .levels[currentRPE.floor()]
+                  .text,
             ),
           ),
           Slider(
@@ -531,7 +559,7 @@ class _SetRpeDialogState extends State<_SetRpeDialog> {
           onPressed: () {
             Navigator.pop<Optional<double?>>(context, const None());
           },
-          child: Text('exercise.editor.fields.rpe.removeRPE'.t),
+          child: Text(context.t.exercise.editor.fields.rpe.removeRPE),
         ),
         TextButton(
           onPressed: () {

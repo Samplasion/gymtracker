@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_quill/flutter_quill.dart';
 import 'package:get/get.dart';
 import 'package:gymtracker/data/rich_text.dart';
+import 'package:gymtracker/i18n/strings.g.dart';
 import 'package:gymtracker/icons/gymtracker_icons.dart';
-import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/view/utils/input_decoration.dart';
 
 class GTRichTextEditor extends StatefulWidget {
@@ -49,7 +49,7 @@ class _GTRichTextEditorState extends State<GTRichTextEditor> {
     final shouldShowToolbar = _focusNode.hasPrimaryFocus;
     return InputDecorator(
       decoration: GymTrackerInputDecoration(
-        labelText: "ongoingWorkout.finish.fields.infobox.label".t,
+        labelText: context.t.ongoingWorkout.finish.fields.infobox.label,
         alignLabelWithHint: true,
       ),
       child: Column(
@@ -102,7 +102,7 @@ class _GTRichTextEditorState extends State<GTRichTextEditor> {
                   QuillToolbarCustomButtonOptions(
                     // TODO: Figure out how to make this appear on when the text is highlighted
                     icon: const Icon(GTIcons.highlight),
-                    tooltip: "richText.highlight".t,
+                    tooltip: context.t.richText.highlight,
                     onPressed: () {
                       // If the selection is already highlighted, remove the highlight
                       final attr = widget.controller.getSelectionStyle();

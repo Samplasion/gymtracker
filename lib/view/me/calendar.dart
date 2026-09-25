@@ -4,13 +4,14 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:gymtracker/controller/history_controller.dart';
 import 'package:gymtracker/controller/me_controller.dart';
+import 'package:gymtracker/i18n/strings.g.dart';
 import 'package:gymtracker/icons/gymtracker_icons.dart';
 import 'package:gymtracker/model/workout.dart';
-import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/service/logger.dart';
 import 'package:gymtracker/utils/constants.dart';
 import 'package:gymtracker/utils/extensions.dart' hide ContextThemingUtils;
 import 'package:gymtracker/utils/go.dart';
+import 'package:gymtracker/utils/utils.dart' hide max;
 import 'package:gymtracker/view/components/controlled.dart';
 import 'package:gymtracker/view/exercises.dart';
 import 'package:gymtracker/view/utils/history_workout.dart';
@@ -43,7 +44,7 @@ class _MeCalendarPageState
     onDayTapped: (day) {
       Go.to(() => MeCalendarDayPage(day: day.startOfDay));
     },
-    weekdayStart: GTLocalizations.firstDayOfWeekFor(context),
+    weekdayStart: firstDayOfWeekFor(context.locale),
   );
   late Worker worker;
 
@@ -51,15 +52,12 @@ class _MeCalendarPageState
   void initState() {
     super.initState();
     historyController.queueStreaksRecomputation();
-    worker = ever(
-      historyController.history,
-      (callback) {
-        logger.i("History updated");
-        if (mounted) {
-          setState(() {});
-        }
-      },
-    );
+    worker = ever(historyController.history, (callback) {
+      logger.i("History updated");
+      if (mounted) {
+        setState(() {});
+      }
+    });
   }
 
   @override
@@ -71,51 +69,48 @@ class _MeCalendarPageState
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text("me.calendar.label".t),
-      ),
+      appBar: AppBar(title: Text(context.t.me.calendar.label)),
       body: Column(
         children: [
           Padding(
             padding: const EdgeInsets.all(16),
-            child: Obx(
-              () {
-                final streaks = historyController.streaks();
-                return SpeedDial(
-                  crossAxisCountBuilder: (breakpoint) => switch (breakpoint) {
-                    Breakpoints.xxs => 1,
-                    _ => 2,
-                  },
-                  buttonHeight: (breakpoint) =>
-                      switch (breakpoint) {
-                        Breakpoints.xxs => 0.75,
-                        _ => 1,
-                      } *
-                      kSpeedDialButtonHeight,
-                  buttons: [
-                    SpeedDialButton(
-                      icon: Icon(
-                        GTIcons.streak_weeks,
-                        color: streaks.weekStreak == 0
-                            ? context.theme.colorScheme.outline
-                            : context.harmonizeColor(Colors.orange),
-                      ),
-                      text: Text("time.weeks".plural(streaks.weekStreak)),
-                      subtitle: Text("me.calendar.streak".t),
-                      dense: true,
+            child: Obx(() {
+              final streaks = historyController.streaks();
+              return SpeedDial(
+                crossAxisCountBuilder: (breakpoint) => switch (breakpoint) {
+                  Breakpoints.xxs => 1,
+                  _ => 2,
+                },
+                buttonHeight: (breakpoint) =>
+                    switch (breakpoint) {
+                      Breakpoints.xxs => 0.75,
+                      _ => 1,
+                    } *
+                    kSpeedDialButtonHeight,
+                buttons: [
+                  SpeedDialButton(
+                    icon: Icon(
+                      GTIcons.streak_weeks,
+                      color: streaks.weekStreak == 0
+                          ? context.theme.colorScheme.outline
+                          : context.harmonizeColor(Colors.orange),
                     ),
-                    SpeedDialButton(
-                      icon: Icon(GTIcons.streak_rest,
-                          color: context
-                              .harmonizeColor(Colors.deepPurple.shade300)),
-                      text: Text("time.days".plural(streaks.restDays)),
-                      subtitle: Text("me.calendar.rest".t),
-                      dense: true,
+                    text: Text(context.t.time.weeks(n: streaks.weekStreak)),
+                    subtitle: Text(context.t.me.calendar.streak),
+                    dense: true,
+                  ),
+                  SpeedDialButton(
+                    icon: Icon(
+                      GTIcons.streak_rest,
+                      color: context.harmonizeColor(Colors.deepPurple.shade300),
                     ),
-                  ],
-                );
-              },
-            ),
+                    text: Text(context.t.time.days(n: streaks.restDays)),
+                    subtitle: Text(context.t.me.calendar.rest),
+                    dense: true,
+                  ),
+                ],
+              );
+            }),
           ),
           const Divider(height: 1),
           Expanded(
@@ -123,12 +118,13 @@ class _MeCalendarPageState
               locale: Get.locale!.languageCode,
               calendarController: calendarController,
               layout: Layout.DEFAULT,
-              padding: EdgeInsets.symmetric(
+              padding:
+                  EdgeInsets.symmetric(
                     horizontal: max(
-                        0,
-                        (context.width -
-                                Breakpoints.xs.screenWidth.toDouble()) /
-                            2),
+                      0,
+                      (context.width - Breakpoints.xs.screenWidth.toDouble()) /
+                          2,
+                    ),
                   ) +
                   const EdgeInsets.all(16) +
                   MediaQuery.of(context).padding.copyWith(top: 0),
@@ -158,13 +154,13 @@ class _MeCalendarPageState
 
     if (values.day.startOfDay.isBefore(values.minDate.startOfDay) ||
         values.day.startOfDay.isAfter(values.maxDate.startOfDay)) {
-      bgColor =
-          Theme.of(context).colorScheme.surface.withAlpha((.4 * 255).round());
+      bgColor = Theme.of(
+        context,
+      ).colorScheme.surface.withAlpha((.4 * 255).round());
       txtStyle = (Theme.of(context).textTheme.bodyLarge)!.copyWith(
-        color: Theme.of(context)
-            .colorScheme
-            .onSurface
-            .withAlpha((.5 * 255).round()),
+        color: Theme.of(
+          context,
+        ).colorScheme.onSurface.withAlpha((.5 * 255).round()),
       );
     }
 
@@ -174,11 +170,7 @@ class _MeCalendarPageState
         color: bgColor,
         borderRadius: BorderRadius.circular(kDayBorderRadius),
       ),
-      child: Text(
-        values.text,
-        textAlign: TextAlign.center,
-        style: txtStyle,
-      ),
+      child: Text(values.text, textAlign: TextAlign.center, style: txtStyle),
     );
   }
 }
@@ -205,9 +197,7 @@ class MeCalendarDayPage extends StatelessWidget {
   }
 
   Widget _buildEmpty(BuildContext context) {
-    return Center(
-      child: Text("me.calendar.empty".t),
-    );
+    return Center(child: Text(context.t.me.calendar.empty));
   }
 
   Widget _buildValues(BuildContext context, List<Workout> workouts) {

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:gymtracker/i18n/strings.g.dart';
 import 'package:gymtracker/icons/gymtracker_icons.dart';
-import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/service/native.dart';
 import 'package:health/health.dart';
 import 'package:rxdart/rxdart.dart';
@@ -32,15 +32,15 @@ class HealthController extends GetxController {
   Widget get settingsTile {
     return StreamBuilder(
       stream: hasPermissionStream,
-      builder: (_, snap) {
+      builder: (context, snap) {
         final hasPermission = snap.data ?? false;
         if (hasPermission) {
           return const SizedBox.shrink();
         } else {
           return ListTile(
             leading: const Icon(GTIcons.notification_dialog),
-            title: Text("settings.options.health.label".t),
-            subtitle: Text("settings.permissions.tapToRequest".t),
+            title: Text(context.t.settings.options.health.label),
+            subtitle: Text(context.t.settings.permissions.tapToRequest),
             onTap: () {
               requestPermission();
             },
@@ -50,7 +50,7 @@ class HealthController extends GetxController {
     );
   }
 
-  requestPermission() async {
+  void requestPermission() async {
     if (await _health.hasPermissions(typesToRead) == true) return;
     _health.requestAuthorization(typesToRead).then((value) {
       hasPermissionStream.add(value);

@@ -9,15 +9,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_quill/flutter_quill.dart';
 import 'package:flutter_quill/quill_delta.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:get/get.dart' hide ContextExtensionss;
+import 'package:get/get.dart' hide ContextExtensionss, Translations;
 import 'package:gymtracker/controller/settings_controller.dart';
 import 'package:gymtracker/data/distance.dart';
 import 'package:gymtracker/data/weights.dart';
+import 'package:gymtracker/i18n/strings.g.dart';
 import 'package:gymtracker/model/exercisable.dart';
 import 'package:gymtracker/model/exercise.dart';
 import 'package:gymtracker/model/set.dart';
 import 'package:gymtracker/model/workout.dart';
-import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/service/logger.dart';
 import 'package:gymtracker/struct/editor_callback.dart';
 import 'package:gymtracker/utils/utils.dart';
@@ -87,7 +87,7 @@ extension DateUtils on DateTime {
   }
 
   DateTime getStartOfWeek(BuildContext context) {
-    final firstDayOfWeek = GTLocalizations.firstDayOfWeekFor(context);
+    final firstDayOfWeek = firstDayOfWeekFor(context.locale);
     DateTime thisFirstDOW = startOfDay;
     while (thisFirstDOW.weekday != firstDayOfWeek) {
       thisFirstDOW = thisFirstDOW.subtract(const Duration(days: 1));
@@ -267,8 +267,8 @@ extension BuildContextUtils on BuildContext {
 }
 
 extension NumGenericUtils<T extends num> on T {
-  String get localized =>
-      NumberFormat("###,###.##", Get.locale!.languageCode).format(this);
+  String localizedWith(Translations t) =>
+      NumberFormat("###,###.##", t.$meta.locale.languageCode).format(this);
 }
 
 extension NumUtils on num {
@@ -415,19 +415,23 @@ extension WorkoutUtils on Workout {
 }
 
 extension ValueUtils on double {
-  String get userFacingWeight {
-    return "exerciseList.fields.weight".tParams({
-      "weight": localized,
-      "unit": "units.${settingsController.weightUnit.value.name}".t,
-    });
+  String getUserFacingWeight(Translations t) {
+    return t.exerciseList.fields.weight(
+      weight: localizedWith(t),
+      unit: t.units[settingsController.weightUnit.value.name] ?? "UNKNOWN",
+    );
   }
 
-  String get userFacingDistance {
-    return "exerciseList.fields.distance".tParams({
-      "distance": localized,
-      "unit": "units.${settingsController.distanceUnit.value.name}".t,
-    });
+  String getUserFacingDistance(Translations t) {
+    return t.exerciseList.fields.distance(
+      distance: localizedWith(t),
+      unit: t.units[settingsController.distanceUnit.value.name] ?? "UNKNOWN",
+    );
   }
+}
+
+extension ContextLocaleUtils on BuildContext {
+  Locale get locale => t.$meta.locale.flutterLocale;
 }
 
 extension ContextThemingUtils on BuildContext {
@@ -500,7 +504,7 @@ extension HarmonizedMaterialColor on MaterialColor {
   }
 }
 
-String _toPrettyString(x, String indent) =>
+String _toPrettyString(Object? x, String indent) =>
     JsonEncoder.withIndent(indent).convert(x);
 
 extension PrettyJsonExtensionMap on Map<String, dynamic> {
@@ -601,6 +605,7 @@ extension ScopeFunctions<T> on T {
 
 extension GTSetUtils on GTSet {
   String getHumanReadableDescription({
+    required Translations t,
     required Weights weightUnit,
     required Distance distanceUnit,
   }) {
@@ -610,9 +615,8 @@ extension GTSetUtils on GTSet {
       value: weight,
       from: weightUnit,
       to: settingsController.weightUnit.value,
-    ).userFacingWeight;
-    String _buildReps(int? reps) =>
-        "exerciseList.fields.reps".plural(reps ?? 0);
+    ).getUserFacingWeight(t);
+    String _buildReps(int? reps) => t.exerciseList.fields.reps(n: reps ?? 0);
     String _buildTime(Duration time) => context == null
         ? time.toString()
         : TimerView.buildTimeString(
@@ -624,7 +628,7 @@ extension GTSetUtils on GTSet {
       value: distance ?? 0,
       from: distanceUnit,
       to: settingsController.distanceUnit.value,
-    ).userFacingDistance;
+    ).getUserFacingDistance(t);
 
     switch (parameters) {
       case GTSetParameters.repsWeight:

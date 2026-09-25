@@ -6,6 +6,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:get/get.dart' hide ContextExtensionss;
 import 'package:gymtracker/controller/exercises_controller.dart';
 import 'package:gymtracker/controller/history_controller.dart';
@@ -15,18 +16,21 @@ import 'package:gymtracker/controller/workout_controller.dart';
 import 'package:gymtracker/data/configuration.dart';
 import 'package:gymtracker/data/exercises.dart';
 import 'package:gymtracker/data/weights.dart';
+import 'package:gymtracker/i18n/strings.g.dart';
 import 'package:gymtracker/icons/gymtracker_icons.dart';
 import 'package:gymtracker/model/exercisable.dart';
 import 'package:gymtracker/model/exercise.dart';
 import 'package:gymtracker/model/set.dart';
 import 'package:gymtracker/model/workout.dart';
-import 'package:gymtracker/service/localizations.dart';
+import 'package:gymtracker/provider/locale.dart';
 import 'package:gymtracker/service/logger.dart';
 import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/utils/utils.dart';
 import 'package:gymtracker/view/charts/line_charts_by_workout.dart';
 import 'package:gymtracker/view/components/badges.dart';
+import 'package:gymtracker/view/components/content_unavailable.dart';
+import 'package:gymtracker/view/components/controlled.dart';
 import 'package:gymtracker/view/components/master_detail.dart';
 import 'package:gymtracker/view/components/muscles.dart';
 import 'package:gymtracker/view/components/pro_builder.dart';
@@ -40,17 +44,24 @@ import 'package:gymtracker/view/utils/sliver_utils.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
-class LibraryView extends GetView<ExercisesController> {
+class LibraryView extends StatefulWidget {
   const LibraryView({super.key});
 
+  @override
+  State<LibraryView> createState() => _LibraryViewState();
+}
+
+class _LibraryViewState
+    extends ControlledState<LibraryView, ExercisesController> {
   Map<GTExerciseMuscleCategory, ExerciseCategory> get exercises {
     return {
       GTExerciseMuscleCategory.custom: ExerciseCategory(
         exercises: Get.find<ExercisesController>().exercises.toList(),
-        iconGetter: () => const Icon(GTIcons.custom_exercises),
+        iconGetter: (t) => const Icon(GTIcons.custom_exercises),
         color: Colors.amber,
       ),
-      for (final key in sortedCategories) key: exerciseStandardLibrary[key]!,
+      for (final key in getSortedCategories(context.t))
+        key: exerciseStandardLibrary[key]!,
     };
   }
 
@@ -60,18 +71,8 @@ class LibraryView extends GetView<ExercisesController> {
       body: CustomScrollView(
         slivers: [
           SliverAppBar.large(
-            title: Text("library.title".t),
-            actions: [
-              if (kDebugMode) ...[
-                IconButton(
-                  icon: const Icon(GTIcons.explanation),
-                  onPressed: () {
-                    Go.to(() => const DebugExercisesWithoutExplanationList());
-                  },
-                ),
-              ],
-              _search(context),
-            ],
+            title: Text(context.t.library.title),
+            actions: [_search(context)],
           ),
           SliverList(
             delegate: SliverChildListDelegate([
@@ -86,11 +87,13 @@ class LibraryView extends GetView<ExercisesController> {
                       context,
                       category.value.color,
                     ),
-                    child: category.value.icon,
+                    child: category.value.iconGetter(context.t),
                   ),
-                  title: Text(category.key.localizedName),
+                  title: Text(category.key.getLocalizedName(context.t)),
                   subtitle: Text(
-                    "general.exercises".plural(category.value.exercises.length),
+                    context.t.general.exercises(
+                      n: category.value.exercises.length,
+                    ),
                   ),
                   onTap: () {
                     final exStream =
@@ -103,7 +106,7 @@ class LibraryView extends GetView<ExercisesController> {
                         builder: (context, snapshot) {
                           final exercises = snapshot.data ?? [];
                           return LibraryExercisesView(
-                            name: category.key.localizedName,
+                            name: category.key.getLocalizedName(context.t),
                             category: category.value,
                             getExercises: () {
                               return exercises;
@@ -140,7 +143,7 @@ class LibraryView extends GetView<ExercisesController> {
         );
       },
       suggestionsBuilder: (context, sController) {
-        final results = controller.search(sController.text);
+        final results = controller.search(sController.text, t: context.t);
         return results.map(
           (ex) => ExerciseListTile(
             exercise: ex,
@@ -186,7 +189,11 @@ class LibraryExercisesView extends GetView<ExercisesController> {
         final exercises = getExercises();
 
         final sorted = exercises.toList()
-          ..sort((a, b) => a.displayName.compareTo(b.displayName));
+          ..sort(
+            (a, b) => a
+                .getDisplayName(context.t)
+                .compareTo(b.getDisplayName(context.t)),
+          );
 
         return StreamBuilder(
           stream: controller.exercises$,
@@ -205,7 +212,9 @@ class LibraryExercisesView extends GetView<ExercisesController> {
                         Text.rich(
                           TextSpan(
                             children: [
-                              TextSpan(text: "library.newCustomExercise".t),
+                              TextSpan(
+                                text: context.t.library.newCustomExercise,
+                              ),
                               if (shouldDisable) ...[
                                 const TextSpan(text: " "),
                                 WidgetSpan(
@@ -257,9 +266,6 @@ class LibraryExercisesView extends GetView<ExercisesController> {
                             exercise: sorted[index],
                             selected: false,
                             isConcrete: false,
-                            trailing: kDebugMode && sorted[index].hasExplanation
-                                ? const Icon(GTIcons.explanation)
-                                : null,
                           ).getAsMasterItem(
                             context,
                             detailsBuilder: (context) {
@@ -284,24 +290,24 @@ class LibraryExercisesView extends GetView<ExercisesController> {
   }
 }
 
-class ExerciseInfoView extends StatefulWidget {
+class ExerciseInfoView extends ConsumerStatefulWidget {
   const ExerciseInfoView({required this.exercise, this.refresh, super.key});
 
   final Exercise exercise;
   final void Function()? refresh;
 
   @override
-  State<ExerciseInfoView> createState() => _ExerciseInfoViewState();
+  ConsumerState<ExerciseInfoView> createState() => _ExerciseInfoViewState();
 }
 
-class _ExerciseInfoViewState extends State<ExerciseInfoView>
+class _ExerciseInfoViewState extends ConsumerState<ExerciseInfoView>
     with SingleTickerProviderStateMixin {
   final historyStream = BehaviorSubject<List<(Exercise, int, Workout)>>.seeded(
     [],
   );
   late final StreamSubscription historySub;
   late final tabController = TabController(
-    length: getTabs(widget.exercise, [], [], []).length,
+    length: getTabs(widget.exercise, [], [], [], "").length,
     vsync: this,
   );
 
@@ -313,9 +319,6 @@ class _ExerciseInfoViewState extends State<ExerciseInfoView>
     historySub = controller.history.listen((_) {
       historyStream.add(getHistory());
     });
-    if (!widget.exercise.hasExplanation) {
-      logger.i("Exercise ${widget.exercise.id} has no explanation");
-    }
   }
 
   @override
@@ -333,6 +336,7 @@ class _ExerciseInfoViewState extends State<ExerciseInfoView>
     List<(Workout, Exercise)> chartHistory,
     List<(Exercise, int, Workout)> history,
     List<ListTileTheme> infoTiles,
+    String? explanation,
   ) => [
     SafeArea(
       bottom: false,
@@ -342,8 +346,8 @@ class _ExerciseInfoViewState extends State<ExerciseInfoView>
       bottom: false,
       child: _historyBody(exercise, chartHistory, history),
     ),
-    if (exercise.standard && exercise.explanation != null)
-      SafeArea(bottom: false, child: _explanationBody(exercise)),
+    if (exercise.standard)
+      SafeArea(bottom: false, child: _explanationBody(exercise, explanation)),
   ];
 
   late final category = exerciseStandardLibrary[widget.exercise.category];
@@ -351,6 +355,7 @@ class _ExerciseInfoViewState extends State<ExerciseInfoView>
   @override
   Widget build(BuildContext context) {
     final exercise = widget.exercise;
+    final expl = ref.watch(exerciseExplanationProvider(exercise.id));
 
     return ThemedSubtree(
       color: category?.color ?? Theme.of(context).colorScheme.primary,
@@ -368,7 +373,13 @@ class _ExerciseInfoViewState extends State<ExerciseInfoView>
               (a, b) => a.$1.startingDate!.compareTo(b.$1.startingDate!),
             );
 
-            final tabs = getTabs(exercise, chartHistory, history, infoTiles);
+            final tabs = getTabs(
+              exercise,
+              chartHistory,
+              history,
+              infoTiles,
+              expl,
+            );
 
             return Scaffold(
               appBar: AppBar(
@@ -382,7 +393,7 @@ class _ExerciseInfoViewState extends State<ExerciseInfoView>
                         ),
                         const TextSpan(text: " "),
                       ],
-                      TextSpan(text: exercise.displayName),
+                      TextSpan(text: exercise.getDisplayName(context.t)),
                     ],
                   ),
                 ),
@@ -409,7 +420,7 @@ class _ExerciseInfoViewState extends State<ExerciseInfoView>
                         final dart =
                             """      Exercise.standard(
         id: "library.$category.exercises.$name",
-        name: "library.$category.exercises.$name".t,
+        name: context.t.library.$category.exercises.$name,
         parameters: GTSetParameters.${exercise.parameters.name},
         primaryMuscleGroup: GTMuscleGroup.${exercise.primaryMuscleGroup.name},
         secondaryMuscleGroups: {${exercise.secondaryMuscleGroups.map((e) => "GTMuscleGroup.${e.name}").join(", ")}},
@@ -424,7 +435,7 @@ class _ExerciseInfoViewState extends State<ExerciseInfoView>
                       key: const Key("menu"),
                       itemBuilder: (_) => [
                         PopupMenuItem(
-                          child: Text("actions.edit".t),
+                          child: Text(context.t.actions.edit),
                           onTap: () async {
                             final newExercise =
                                 await Get.find<ExercisesController>()
@@ -442,7 +453,7 @@ class _ExerciseInfoViewState extends State<ExerciseInfoView>
                         if (history.isEmpty)
                           PopupMenuItem(
                             child: Text(
-                              "actions.remove".t,
+                              context.t.actions.remove,
                               style: TextStyle(
                                 color: Theme.of(context).colorScheme.error,
                               ),
@@ -472,15 +483,15 @@ class _ExerciseInfoViewState extends State<ExerciseInfoView>
                   tabs: [
                     Tab(
                       icon: const Icon(GTIcons.home),
-                      text: "exercise.info.home".t,
+                      text: context.t.exercise.info.home,
                     ),
                     Tab(
                       icon: const Icon(GTIcons.history),
-                      text: "exercise.info.history".t,
+                      text: context.t.exercise.info.history,
                     ),
                     Tab(
                       icon: const Icon(GTIcons.explanation),
-                      text: "exercise.info.explanation".t,
+                      text: context.t.exercise.info.explanation,
                     ),
                   ].take(tabs.length).toList(),
                   isScrollable: true,
@@ -542,7 +553,7 @@ class _ExerciseInfoViewState extends State<ExerciseInfoView>
               ).copyWith(top: exercise.isCustom ? 0 : 16),
               sliver: SliverToBoxAdapter(
                 child: Text(
-                  exercise.displayName,
+                  exercise.getDisplayName(context.t),
                   style: Theme.of(context).textTheme.displayMedium,
                 ),
               ),
@@ -569,29 +580,32 @@ class _ExerciseInfoViewState extends State<ExerciseInfoView>
                       if (exercise.primaryMuscleGroup !=
                           GTMuscleGroup.none) ...[
                         TextSpan(
-                          text: "exercise.info.primaryMuscleGroup".tParams({
-                            "muscleGroup":
-                                "muscleGroups.${exercise.primaryMuscleGroup.name}"
-                                    .t,
-                          }),
+                          text: context.t.exercise.info.primaryMuscleGroup(
+                            muscleGroup:
+                                context.t.muscleGroups[exercise
+                                    .primaryMuscleGroup
+                                    .name] ??
+                                "UNKNOWN",
+                          ),
                         ),
                         if (exercise.secondaryMuscleGroups.isNotEmpty) ...[
                           const TextSpan(text: "\n"),
                           TextSpan(
-                            text: "exercise.info.secondaryMuscleGroups"
-                                .tParams({
-                                  "muscleGroups": exercise.secondaryMuscleGroups
-                                      .map((e) => "muscleGroups.${e.name}".t)
-                                      .join(", "),
-                                }),
+                            text: context.t.exercise.info.secondaryMuscleGroups(
+                              muscleGroups: exercise.secondaryMuscleGroups
+                                  .map((e) => context.t.muscleGroups[e.name])
+                                  .join(", "),
+                            ),
                           ),
                         ],
                       ],
                       const TextSpan(text: "\n"),
                       TextSpan(
-                        text: "exercise.info.equipment".tParams({
-                          "equipment": exercise.gymEquipment.localizedName,
-                        }),
+                        text: context.t.exercise.info.equipment(
+                          equipment: exercise.gymEquipment.getLocalizedName(
+                            context.t,
+                          ),
+                        ),
                       ),
                       if (kDebugMode) ...[
                         const TextSpan(text: "\n"),
@@ -613,7 +627,7 @@ class _ExerciseInfoViewState extends State<ExerciseInfoView>
               SliverToBoxAdapter(
                 child: Padding(
                   padding: const EdgeInsets.all(16),
-                  child: Text("exercise.info.noHistory".t),
+                  child: Text(context.t.exercise.info.noHistory),
                 ),
               ),
             ],
@@ -704,7 +718,7 @@ class _ExerciseInfoViewState extends State<ExerciseInfoView>
                           ),
                         );
                       },
-                      child: Text("exercise.info.viewWorkout".t),
+                      child: Text(context.t.exercise.info.viewWorkout),
                     ),
                   ],
                 ),
@@ -716,7 +730,7 @@ class _ExerciseInfoViewState extends State<ExerciseInfoView>
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.all(16),
-              child: Text("exercise.info.noHistory".t),
+              child: Text(context.t.exercise.info.noHistory),
             ),
           ),
         ],
@@ -731,60 +745,75 @@ class _ExerciseInfoViewState extends State<ExerciseInfoView>
     );
   }
 
-  Widget _explanationBody(Exercise exercise) {
+  Widget _explanationBody(Exercise exercise, String? explanation) {
     return ThemedSubtree.builder(
       color: category?.color ?? Theme.of(context).colorScheme.primary,
       enabled: Get.find<SettingsController>().tintExercises.value,
       builder: (context) {
         return CustomScrollView(
           slivers: [
-            SliverPadding(
-              padding: const EdgeInsets.all(16),
-              sliver: SliverToBoxAdapter(
-                child: MarkdownBody(
-                  data: exercise.explanation!,
-                  styleSheet: MarkdownStyleSheet.fromTheme(Theme.of(context))
-                      .copyWith(
-                        a: TextStyle(
-                          color: Theme.of(context).colorScheme.primary,
+            if (explanation == null) ...[
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: ContentUnavailableView(
+                    icon: const Icon(GTIcons.explanation),
+                    title: Text(context.t.exercise.info.explanationNone.title),
+                    description: Text(
+                      context.t.exercise.info.explanationNone.description,
+                    ),
+                  ),
+                ),
+              ),
+            ] else ...[
+              SliverPadding(
+                padding: const EdgeInsets.all(16),
+                sliver: SliverToBoxAdapter(
+                  child: MarkdownBody(
+                    data: explanation,
+                    styleSheet: MarkdownStyleSheet.fromTheme(Theme.of(context))
+                        .copyWith(
+                          a: TextStyle(
+                            color: Theme.of(context).colorScheme.primary,
+                          ),
                         ),
-                      ),
-                  onTapLink: (text, href, title) {
-                    if (href == null) return;
-                    final uri = Uri.tryParse(href);
-                    if (uri == null) return;
-                    if (uri.scheme == "exercise" && uri.host == "library") {
-                      final id = uri.pathSegments.first;
-                      logger.d(id);
-                      final exercise = getStandardExerciseByID(id);
-                      if (exercise != null) {
-                        final config = MDVConfiguration.of(context);
-                        if (config == null) {
-                          Go.to(() => ExerciseInfoView(exercise: exercise));
+                    onTapLink: (text, href, title) {
+                      if (href == null) return;
+                      final uri = Uri.tryParse(href);
+                      if (uri == null) return;
+                      if (uri.scheme == "exercise" && uri.host == "library") {
+                        final id = uri.pathSegments.first;
+                        logger.d(id);
+                        final exercise = getStandardExerciseByID(id);
+                        if (exercise != null) {
+                          final config = MDVConfiguration.of(context);
+                          if (config == null) {
+                            Go.to(() => ExerciseInfoView(exercise: exercise));
+                          } else {
+                            config.push(
+                              context,
+                              ExerciseInfoView(exercise: exercise),
+                              id: exercise.key,
+                            );
+                          }
                         } else {
-                          config.push(
-                            context,
-                            ExerciseInfoView(exercise: exercise),
-                            id: exercise.key,
-                          );
+                          logger.e("Exercise not found: $id");
                         }
-                      } else {
-                        logger.e("Exercise not found: $id");
                       }
-                    }
-                  },
+                    },
+                  ),
                 ),
               ),
-            ),
-            SliverPadding(
-              padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-              sliver: SliverToBoxAdapter(
-                child: Text(
-                  "exercise.info.explanationDisclaimer".t,
-                  style: context.theme.textTheme.labelSmall,
+              SliverPadding(
+                padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                sliver: SliverToBoxAdapter(
+                  child: Text(
+                    context.t.exercise.info.explanationDisclaimer,
+                    style: context.theme.textTheme.labelSmall,
+                  ),
                 ),
               ),
-            ),
+            ],
             SliverPadding(
               padding: MediaQuery.of(
                 context,
@@ -834,8 +863,8 @@ class _ExerciseInfoViewState extends State<ExerciseInfoView>
             if (bestScore < 0) return nullTile;
 
             return ExerciseInfoTile(
-              "exercise.info.heaviestWeight.label".t,
-              bestScore.userFacingWeight,
+              context.t.exercise.info.heaviestWeight.label,
+              bestScore.getUserFacingWeight(context.t),
               onTap: () {
                 Go.to(
                   () => ExercisesView(
@@ -879,8 +908,8 @@ class _ExerciseInfoViewState extends State<ExerciseInfoView>
             if (bestScore < 0) return nullTile;
 
             return ExerciseInfoTile(
-              "exercise.info.best1rm.label".t,
-              bestScore.userFacingWeight,
+              context.t.exercise.info.best1rm.label,
+              bestScore.getUserFacingWeight(context.t),
               onTap: () {
                 Go.to(
                   () => ExercisesView(
@@ -922,8 +951,8 @@ class _ExerciseInfoViewState extends State<ExerciseInfoView>
             if (bestReps == 0) return nullTile;
 
             return ExerciseInfoTile(
-              "exercise.info.bestSetVolume.label".t,
-              "${bestWeight.userFacingWeight} × $bestReps",
+              context.t.exercise.info.bestSetVolume.label,
+              "${bestWeight.getUserFacingWeight(context.t)} × $bestReps",
               onTap: () {
                 Go.to(
                   () => ExercisesView(
@@ -968,8 +997,8 @@ class _ExerciseInfoViewState extends State<ExerciseInfoView>
             if (bestScore < 0) return nullTile;
 
             return ExerciseInfoTile(
-              "exercise.info.bestSessionVolume.label".t,
-              bestScore.userFacingWeight,
+              context.t.exercise.info.bestSessionVolume.label,
+              bestScore.getUserFacingWeight(context.t),
               onTap: () {
                 Go.to(
                   () => ExercisesView(
@@ -996,7 +1025,7 @@ class _ExerciseInfoViewState extends State<ExerciseInfoView>
       Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16),
         child: Text(
-          "exercise.info.usefulData".t,
+          context.t.exercise.info.usefulData,
           style: Theme.of(context).textTheme.labelLarge!.copyWith(
             color: Theme.of(context).colorScheme.primary,
           ),
@@ -1019,39 +1048,6 @@ class ExerciseInfoTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListTile(title: Text(title), subtitle: Text(subtitle), onTap: onTap);
-  }
-}
-
-class DebugExercisesWithoutExplanationList extends StatelessWidget {
-  const DebugExercisesWithoutExplanationList({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    final filtered = exerciseStandardLibraryAsList
-        .where((e) => !e.hasExplanation)
-        .toList();
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("${"exercise.info.explanation".t} [${filtered.length}]"),
-      ),
-      body: ListView.builder(
-        itemCount: filtered.length,
-        itemBuilder: (context, index) {
-          final category = filtered[index].id.split(".")[1];
-          return ExerciseListTile(
-            exercise: filtered[index],
-            trailing: Text(category),
-            selected: false,
-            isConcrete: false,
-            onTap: () {
-              final name = filtered[index].id.split(".").last;
-
-              Clipboard.setData(ClipboardData(text: name));
-            },
-          );
-        },
-      ),
-    );
   }
 }
 

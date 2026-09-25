@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gymtracker/data/achievements.dart' as achievements_data;
+import 'package:gymtracker/i18n/strings.g.dart';
 import 'package:gymtracker/icons/gymtracker_icons.dart';
 import 'package:gymtracker/model/friend.dart';
 import 'package:gymtracker/model/workout.dart';
@@ -10,7 +11,6 @@ import 'package:gymtracker/provider/connectivity.dart';
 import 'package:gymtracker/provider/friend.dart';
 import 'package:gymtracker/provider/online.dart';
 import 'package:gymtracker/service/feed.dart';
-import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/service/online.dart';
 import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/view/components/badges.dart';
@@ -40,7 +40,7 @@ class UserProfilePage extends ConsumerWidget {
       return _buildErrorBody(
         context,
         ref,
-        error: "userProfile.errors.noInternet".t,
+        error: context.t.userProfile.errors.noInternet,
       );
     }
 
@@ -117,12 +117,12 @@ class UserProfilePage extends ConsumerWidget {
       body: NestedScrollView(
         headerSliverBuilder: (context, innerBoxIsScrolled) => [
           SliverAppBar(
-            title: Text(friend.fullName ?? "userProfile.title".t),
+            title: Text(friend.fullName ?? context.t.userProfile.title),
             pinned: true,
             actions: [
               if (isSelf)
                 IconButton(
-                  tooltip: "userProfile.edit.tooltip".t,
+                  tooltip: context.t.userProfile.edit.tooltip,
                   icon: const Icon(GTIcons.edit_profile),
                   onPressed: () {
                     Go.to(() => EditProfilePage(userID: friend.id));
@@ -155,7 +155,7 @@ class UserProfilePage extends ConsumerWidget {
                                 if (isSelf) ...[
                                   const TextSpan(text: "  "),
                                   WidgetSpan(
-                                    child: GTBadge(content: "you".t),
+                                    child: GTBadge(content: context.t.you),
                                     alignment: .middle,
                                   ),
                                 ],
@@ -184,15 +184,15 @@ class UserProfilePage extends ConsumerWidget {
                             stats: [
                               Stats(
                                 value: "${friendData.friendCount}",
-                                label: "userProfile.stats.friends".t,
+                                label: context.t.userProfile.stats.friends,
                               ),
                               Stats(
                                 value: "${friendData.workouts.length}",
-                                label: "userProfile.stats.workouts".t,
+                                label: context.t.userProfile.stats.workouts,
                               ),
                               Stats(
                                 value: "${friendData.achievements.length}",
-                                label: "userProfile.stats.achievements".t,
+                                label: context.t.userProfile.stats.achievements,
                               ),
                             ],
                           ),
@@ -206,9 +206,11 @@ class UserProfilePage extends ConsumerWidget {
                       child: Center(
                         child: ContentUnavailableView(
                           icon: const Icon(GTIcons.profile),
-                          title: Text("userProfile.feed.unavailable.title".t),
+                          title: Text(
+                            context.t.userProfile.feed.unavailable.title,
+                          ),
                           description: Text(
-                            "userProfile.feed.unavailable.description".t,
+                            context.t.userProfile.feed.unavailable.description,
                           ),
                         ),
                       ),
@@ -229,7 +231,7 @@ class UserProfilePage extends ConsumerWidget {
 
   Widget _buildErrorBody(BuildContext context, WidgetRef ref, {Object? error}) {
     return Scaffold(
-      appBar: AppBar(title: Text("userProfile.title".t)),
+      appBar: AppBar(title: Text(context.t.userProfile.title)),
       body: Center(
         child: ErrorViewComponent(
           error: error,
@@ -311,20 +313,24 @@ class _FriendActionButtons extends ConsumerWidget {
             builder: (ctx) => AlertDialog(
               icon: const Icon(GTIcons.profile),
               title: Text(
-                "userProfile.unfriendConfirmation.title".tParams({
-                  "name": friend.fullName ?? friend.username,
-                }),
+                context.t.userProfile.unfriendConfirmation.title(
+                  name: friend.fullName ?? friend.username,
+                ),
               ),
-              content: Text("userProfile.unfriendConfirmation.subtitle".t),
+              content: Text(
+                context.t.userProfile.unfriendConfirmation.subtitle,
+              ),
               actions: [
                 TextButton(
                   onPressed: () => Navigator.of(ctx).pop(false),
-                  child: Text("userProfile.unfriendConfirmation.cancel".t),
+                  child: Text(
+                    context.t.userProfile.unfriendConfirmation.cancel,
+                  ),
                 ),
                 TextButton(
                   onPressed: () => Navigator.of(ctx).pop(true),
                   child: Text(
-                    "userProfile.unfriendConfirmation.confirm".t,
+                    context.t.userProfile.unfriendConfirmation.confirm,
                     style: TextStyle(color: Theme.of(ctx).colorScheme.error),
                   ),
                 ),
@@ -336,14 +342,14 @@ class _FriendActionButtons extends ConsumerWidget {
           }
         },
         icon: const Icon(GTIcons.profile),
-        label: Text("userProfile.unfriend".t),
+        label: Text(context.t.userProfile.unfriend),
       );
     }
 
     if (isPendingSent) {
       return FilledButton.tonal(
         onPressed: null,
-        child: Text("userProfile.requestSent".t),
+        child: Text(context.t.userProfile.requestSent),
       );
     }
 
@@ -354,14 +360,14 @@ class _FriendActionButtons extends ConsumerWidget {
             onPressed: () async {
               await notifier.acceptFriendRequest(friend.id);
             },
-            child: Text("userProfile.accept".t),
+            child: Text(context.t.userProfile.accept),
           ),
           const SizedBox(width: 8),
           OutlinedButton(
             onPressed: () async {
               await notifier.declineFriendRequest(friend.id);
             },
-            child: Text("userProfile.reject".t),
+            child: Text(context.t.userProfile.reject),
           ),
         ],
       );
@@ -372,7 +378,7 @@ class _FriendActionButtons extends ConsumerWidget {
         await notifier.sendFriendRequest(friend.id);
       },
       icon: const Icon(GTIcons.profile),
-      label: Text("userProfile.addFriend".t),
+      label: Text(context.t.userProfile.addFriend),
     );
   }
 }
@@ -445,8 +451,8 @@ class _UserFeedSliver extends ConsumerWidget {
             child: Center(
               child: ContentUnavailableView(
                 icon: const Icon(Icons.feed_outlined),
-                title: Text("feed.empty.title".t),
-                description: Text("feed.empty.text".t),
+                title: Text(context.t.feed.empty.title),
+                description: Text(context.t.feed.empty.text),
               ),
             ),
           );

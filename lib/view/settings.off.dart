@@ -10,7 +10,7 @@ class OpenFoodFactsSettingsPane extends ControlledWidget<SettingsController> {
         child: CustomScrollView(
           slivers: [
             SliverAppBar.large(
-              title: Text("settings.panes.off".t),
+              title: Text(context.t.settings.panes.off),
               leading: MDVConfiguration.backButtonOf(context),
             ),
             SliverList(
@@ -20,16 +20,22 @@ class OpenFoodFactsSettingsPane extends ControlledWidget<SettingsController> {
                     initialValue: controller.nutritionLanguage.value,
                     builder: (value, onChange) =>
                         RadioModalTile<NutritionLanguage?>(
-                      title: Text("settings.options.nutritionLanguage".t),
-                      onChange: onChange,
-                      values: {
-                        for (final lang in NutritionLanguage.sortedValues)
-                          lang: lang.t,
-                      },
-                      selectedValue: value,
-                    ),
+                          title: Text(
+                            context.t.settings.options.nutritionLanguage,
+                          ),
+                          onChange: onChange,
+                          values: {
+                            for (final lang
+                                in NutritionLanguage.getSortedValues(
+                                  t: context.t,
+                                ))
+                              lang: lang.t(t: context.t),
+                          },
+                          selectedValue: value,
+                        ),
                     onUpdate: (v) => controller.setNutritionLanguage(
-                        v ?? Prefs.defaultValue.nutritionLanguage),
+                      v ?? Prefs.defaultValue.nutritionLanguage,
+                    ),
                   ),
                 ),
                 Obx(
@@ -37,16 +43,22 @@ class OpenFoodFactsSettingsPane extends ControlledWidget<SettingsController> {
                     initialValue: controller.nutritionCountry.value,
                     builder: (value, onChange) =>
                         RadioModalTile<NutritionCountry?>(
-                      title: Text("settings.options.nutritionCountry".t),
-                      onChange: onChange,
-                      values: {
-                        for (final country in NutritionCountry.sortedValues)
-                          country: country.t,
-                      },
-                      selectedValue: value,
-                    ),
+                          title: Text(
+                            context.t.settings.options.nutritionCountry,
+                          ),
+                          onChange: onChange,
+                          values: {
+                            for (final country
+                                in NutritionCountry.getSortedValues(
+                                  t: context.t,
+                                ))
+                              country: country.t(t: context.t),
+                          },
+                          selectedValue: value,
+                        ),
                     onUpdate: (v) => controller.setNutritionCountry(
-                        v ?? Prefs.defaultValue.nutritionCountry),
+                      v ?? Prefs.defaultValue.nutritionCountry,
+                    ),
                   ),
                 ),
               ]),

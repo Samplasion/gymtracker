@@ -10,10 +10,10 @@ import 'package:gymtracker/controller/history_controller.dart';
 import 'package:gymtracker/controller/me_controller.dart';
 import 'package:gymtracker/controller/settings_controller.dart';
 import 'package:gymtracker/data/weights.dart';
+import 'package:gymtracker/i18n/strings.g.dart';
 import 'package:gymtracker/icons/gymtracker_icons.dart';
 import 'package:gymtracker/model/measurements.dart';
 import 'package:gymtracker/provider/online.dart';
-import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/utils/constants.dart';
 import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/utils/go.dart';
@@ -49,7 +49,7 @@ class MeView extends GetView<MeController> {
       body: CustomScrollView(
         slivers: [
           SliverAppBar.large(
-            title: Text("me.title".t),
+            title: Text(context.t.me.title),
             leading: const SkeletonDrawerButton(),
           ),
           const SliverPadding(
@@ -76,7 +76,7 @@ class MeView extends GetView<MeController> {
                         SpeedDialButton(
                           icon: const Icon(GTIcons.calendar),
                           text: Text(
-                            "me.calendar.label".t,
+                            context.t.me.calendar.label,
                             style: Theme.of(context).textTheme.bodySmall,
                           ),
                           onTap: () {
@@ -86,7 +86,7 @@ class MeView extends GetView<MeController> {
                         SpeedDialButton(
                           icon: const Icon(GTIcons.stats),
                           text: Text(
-                            "me.stats.label".t,
+                            context.t.me.stats.label,
                             style: Theme.of(context).textTheme.bodySmall,
                           ),
                           onTap: () {
@@ -96,7 +96,7 @@ class MeView extends GetView<MeController> {
                         SpeedDialButton(
                           icon: const Icon(GTIcons.food),
                           text: Text(
-                            "food.title".t,
+                            context.t.food.title,
                             style: Theme.of(context).textTheme.bodySmall,
                           ),
                           onTap: () {
@@ -106,7 +106,7 @@ class MeView extends GetView<MeController> {
                         SpeedDialButton(
                           icon: const Icon(GTIcons.achievements),
                           text: Text(
-                            "achievements.title".t,
+                            context.t.achievements.title,
                             style: Theme.of(context).textTheme.bodySmall,
                           ),
                           onTap: () {
@@ -148,7 +148,7 @@ class MeView extends GetView<MeController> {
                         mainAxisSize: MainAxisSize.min,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          SectionTitle("me.workoutDistribution.label".t),
+                          SectionTitle(context.t.me.workoutDistribution.label),
                           const SizedBox(height: 16),
                           Card(
                             clipBehavior: Clip.hardEdge,
@@ -159,12 +159,12 @@ class MeView extends GetView<MeController> {
                                 children: [
                                   DensityCalendarChart(
                                     tooltipBuilder: (now, daysBeforeNow, value) {
-                                      return "${DateFormat.yMEd(Get.locale?.languageCode).format(now.subtract(Duration(days: daysBeforeNow)))}: ${"general.workouts".plural(value)}";
+                                      return "${DateFormat.yMEd(Get.locale?.languageCode).format(now.subtract(Duration(days: daysBeforeNow)))}: ${context.t.general.workouts(n: value)}";
                                     },
                                     values: values,
                                   ),
                                   ListTile(
-                                    title: Text("history.title".t),
+                                    title: Text(context.t.history.title),
                                     onTap: () {
                                       Go.to(() => const HistoryView());
                                     },
@@ -185,7 +185,7 @@ class MeView extends GetView<MeController> {
                   child: SafeArea(
                     top: false,
                     bottom: false,
-                    child: SectionTitle("me.bodyMeasurements".t),
+                    child: SectionTitle(context.t.me.bodyMeasurements),
                   ),
                 ),
                 const Padding(
@@ -194,7 +194,7 @@ class MeView extends GetView<MeController> {
                 ),
                 Obx(
                   () => ListTile(
-                    title: Text("me.weight.allData.label".t),
+                    title: Text(context.t.me.weight.allData.label),
                     trailing: const Icon(GTIcons.lt_chevron),
                     enabled: controller.weightMeasurements.isNotEmpty,
                     onTap: () {

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:get/get.dart';
 import 'package:gymtracker/controller/routines_controller.dart';
+import 'package:gymtracker/i18n/strings.g.dart';
 import 'package:gymtracker/icons/gymtracker_icons.dart';
 import 'package:gymtracker/model/friend.dart';
 import 'package:gymtracker/model/workout.dart';
@@ -11,7 +12,6 @@ import 'package:gymtracker/provider/connectivity.dart';
 import 'package:gymtracker/provider/feed.dart';
 import 'package:gymtracker/provider/friend.dart';
 import 'package:gymtracker/provider/online.dart';
-import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/utils/constants.dart';
 import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/utils/skeletons.dart';
@@ -72,7 +72,10 @@ class _FeedViewState extends ConsumerState<FeedView> {
                 onPressed: () {
                   showSearch(
                     context: context,
-                    delegate: ProfileSearchDelegate(ref: ref),
+                    delegate: ProfileSearchDelegate(
+                      ref: ref,
+                      searchFieldLabel: context.t.profileSearch.searchHint,
+                    ),
                   );
                 },
                 child: const Icon(GTIcons.search),
@@ -81,7 +84,7 @@ class _FeedViewState extends ConsumerState<FeedView> {
       body: NestedScrollView(
         headerSliverBuilder: (context, innerBoxIsScrolled) => [
           SliverAppBar.large(
-            title: Text("feed.title".t),
+            title: Text(context.t.feed.title),
             leading: SkeletonDrawerButton(),
             actions: [
               IconButton(
@@ -125,7 +128,7 @@ class _FeedViewState extends ConsumerState<FeedView> {
                   onPressed: () {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
-                        content: Text('feed.userButton.loading'.t),
+                        content: Text(context.t.feed.userButton.loading),
                         showCloseIcon: true,
                       ),
                     );
@@ -160,7 +163,7 @@ class _FeedViewState extends ConsumerState<FeedView> {
                             SkeletonView.of(context)?.goToRoutines();
                           },
                           icon: const Icon(GTIcons.workout),
-                          label: Text("feed.startWorkout".t),
+                          label: Text(context.t.feed.startWorkout),
                         ),
                       ),
                     ),
@@ -189,7 +192,7 @@ class _FeedViewState extends ConsumerState<FeedView> {
                                     vertical: 16,
                                   ).copyWith(bottom: 8),
                                   child: Text(
-                                    "routines.quickWorkout.title".t,
+                                    context.t.routines.quickWorkout.title,
                                     style: Theme.of(
                                       context,
                                     ).textTheme.titleMedium,
@@ -201,10 +204,8 @@ class _FeedViewState extends ConsumerState<FeedView> {
                                   context,
                                   index,
                                 ) {
-                                  final (
-                                    routine: workout,
-                                    score: _,
-                                  ) = suggested[index];
+                                  final (routine: workout, score: _) =
+                                      suggested[index];
                                   return Material(
                                     type: MaterialType.transparency,
                                     key: ValueKey(workout.id),
@@ -212,8 +213,8 @@ class _FeedViewState extends ConsumerState<FeedView> {
                                       leading: WorkoutIcon(workout: workout),
                                       title: Text(workout.name),
                                       subtitle: Text(
-                                        "general.exercises".plural(
-                                          workout.displayExerciseCount,
+                                        context.t.general.exercises(
+                                          n: workout.displayExerciseCount,
                                         ),
                                       ),
                                       onTap: () {
@@ -241,8 +242,8 @@ class _FeedViewState extends ConsumerState<FeedView> {
                           child: Center(
                             child: ContentUnavailableView(
                               icon: const Icon(Icons.feed_outlined),
-                              title: Text("feed.empty.title".t),
-                              description: Text("feed.empty.text".t),
+                              title: Text(context.t.feed.empty.title),
+                              description: Text(context.t.feed.empty.text),
                             ),
                           ),
                         );
@@ -296,7 +297,7 @@ class _FeedViewState extends ConsumerState<FeedView> {
                                   // progress, without hiding the data.
                                   setState(() {});
                                 },
-                          child: Text("feed.loadMore".t),
+                          child: Text(context.t.feed.loadMore),
                         ),
                       ),
                     ),
@@ -383,7 +384,7 @@ class _FeedViewState extends ConsumerState<FeedView> {
                                     padding: const EdgeInsets.all(16.0),
                                     child: Center(
                                       child: Text(
-                                        "feed.noMoreData".t,
+                                        context.t.feed.noMoreData,
                                         style: Theme.of(context)
                                             .textTheme
                                             .bodySmall
@@ -416,10 +417,7 @@ class _FeedViewState extends ConsumerState<FeedView> {
 class ProfileSearchDelegate extends SearchDelegate<Friend?> {
   final WidgetRef ref;
 
-  ProfileSearchDelegate({required this.ref});
-
-  @override
-  String? get searchFieldLabel => "profileSearch.searchHint".t;
+  ProfileSearchDelegate({required this.ref, required super.searchFieldLabel});
 
   @override
   List<Widget>? buildActions(BuildContext context) {
@@ -473,8 +471,8 @@ class ProfileSearchDelegate extends SearchDelegate<Friend?> {
           return Center(
             child: ContentUnavailableView(
               icon: const Icon(GTIcons.search),
-              title: Text("profileSearch.noResults.title".t),
-              description: Text("profileSearch.noResults.text".t),
+              title: Text(context.t.profileSearch.noResults.title),
+              description: Text(context.t.profileSearch.noResults.text),
             ),
           );
         }
@@ -520,7 +518,7 @@ class _NoSyncCard extends ConsumerWidget {
               const SizedBox(width: 8),
               Expanded(
                 child: Text(
-                  "feed.noSync.text".t,
+                  context.t.feed.noSync.text,
                   style: Theme.of(
                     context,
                   ).textTheme.bodyMedium?.copyWith(color: Colors.redAccent),

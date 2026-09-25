@@ -18,18 +18,32 @@ class _ChangeGoalScreenState extends ConsumerState<ChangeGoalScreen> {
   void initState() {
     super.initState();
     final oldGoal = ref.read(nutritionGoalForSelectedDateProvider);
-    final decimalSep = NumberFormat.decimalPattern(Get.locale?.languageCode).symbols.DECIMAL_SEP;
+    final decimalSep = NumberFormat.decimalPattern(
+      Get.locale?.languageCode,
+    ).symbols.DECIMAL_SEP;
     _dailyCaloriesController = TextEditingController(
-      text: stringifyDouble(oldGoal.dailyCalories, decimalSeparator: decimalSep),
+      text: stringifyDouble(
+        oldGoal.dailyCalories,
+        decimalSeparator: decimalSep,
+      ),
     );
     _fatPercentageController = TextEditingController(
-      text: stringifyDouble(oldGoal.fatPercentage, decimalSeparator: decimalSep),
+      text: stringifyDouble(
+        oldGoal.fatPercentage,
+        decimalSeparator: decimalSep,
+      ),
     );
     _carbsPercentageController = TextEditingController(
-      text: stringifyDouble(oldGoal.carbsPercentage, decimalSeparator: decimalSep),
+      text: stringifyDouble(
+        oldGoal.carbsPercentage,
+        decimalSeparator: decimalSep,
+      ),
     );
     _proteinPercentageController = TextEditingController(
-      text: stringifyDouble(oldGoal.proteinPercentage, decimalSeparator: decimalSep),
+      text: stringifyDouble(
+        oldGoal.proteinPercentage,
+        decimalSeparator: decimalSep,
+      ),
     );
   }
 
@@ -50,14 +64,12 @@ class _ChangeGoalScreenState extends ConsumerState<ChangeGoalScreen> {
     String s;
     String fmt(DateTime d) => DateFormat.yMd().format(d);
     if (fx.to == null) {
-      s = "food.nutritionGoal.effect.from".tParams({
-        "from": fmt(fx.from!),
-      });
+      s = context.t.food.nutritionGoal.effect.from(from: fmt(fx.from!));
     } else {
-      s = "food.nutritionGoal.effect.range".tParams({
-        "from": fmt(fx.from!),
-        "to": fmt(fx.to!),
-      });
+      s = context.t.food.nutritionGoal.effect.range(
+        from: fmt(fx.from!),
+        to: fmt(fx.to!),
+      );
     }
 
     return Text(s, style: context.theme.textTheme.labelLarge);
@@ -66,23 +78,23 @@ class _ChangeGoalScreenState extends ConsumerState<ChangeGoalScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar:
-          AppBar(title: Text('food.nutritionGoals.change.title'.t), actions: [
-        IconButton(
-          icon: const Icon(GTIcons.history),
-          tooltip: "food.nutritionGoals.history.title".t,
-          onPressed: () {
-            showGoalHistory(context);
-          },
-        ),
-      ]),
+      appBar: AppBar(
+        title: Text(context.t.food.nutritionGoals.change.title),
+        actions: [
+          IconButton(
+            icon: const Icon(GTIcons.history),
+            tooltip: context.t.food.nutritionGoals.history.title,
+            onPressed: () {
+              showGoalHistory(context);
+            },
+          ),
+        ],
+      ),
       body: SingleChildScrollView(
         child: Padding(
-          padding: const EdgeInsets.all(16.0) +
-              MediaQuery.of(context).padding.copyWith(
-                    top: 0,
-                    bottom: 0,
-                  ),
+          padding:
+              const EdgeInsets.all(16.0) +
+              MediaQuery.of(context).padding.copyWith(top: 0, bottom: 0),
           child: Form(
             key: _formKey,
             onChanged: () {
@@ -95,13 +107,27 @@ class _ChangeGoalScreenState extends ConsumerState<ChangeGoalScreen> {
                   controller: _dailyCaloriesController,
                   keyboardType: TextInputType.number,
                   decoration: InputDecoration(
-                      labelText: 'food.nutritionGoals.change.calories.label'.t),
+                    labelText:
+                        context.t.food.nutritionGoals.change.calories.label,
+                  ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return "food.nutritionGoals.change.calories.empty".t;
+                      return context
+                          .t
+                          .food
+                          .nutritionGoals
+                          .change
+                          .calories
+                          .empty;
                     }
                     if (value.tryParseDouble() == null) {
-                      return "food.nutritionGoals.change.calories.invalid".t;
+                      return context
+                          .t
+                          .food
+                          .nutritionGoals
+                          .change
+                          .calories
+                          .invalid;
                     }
                     return null;
                   },
@@ -111,20 +137,42 @@ class _ChangeGoalScreenState extends ConsumerState<ChangeGoalScreen> {
                   controller: _fatPercentageController,
                   keyboardType: TextInputType.number,
                   decoration: InputDecoration(
-                      labelText:
-                          'food.nutritionGoals.change.fatPercentage.label'.t),
+                    labelText: context
+                        .t
+                        .food
+                        .nutritionGoals
+                        .change
+                        .fatPercentage
+                        .label,
+                  ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return "food.nutritionGoals.change.fatPercentage.empty".t;
+                      return context
+                          .t
+                          .food
+                          .nutritionGoals
+                          .change
+                          .fatPercentage
+                          .empty;
                     }
                     if (value.tryParseDouble() == null) {
-                      return "food.nutritionGoals.change.fatPercentage.invalid"
-                          .t;
+                      return context
+                          .t
+                          .food
+                          .nutritionGoals
+                          .change
+                          .fatPercentage
+                          .invalid;
                     }
                     final double parsedValue = value.parseDouble();
                     if (parsedValue < 0 || parsedValue > 100) {
-                      return "food.nutritionGoals.change.fatPercentage.invalid"
-                          .t;
+                      return context
+                          .t
+                          .food
+                          .nutritionGoals
+                          .change
+                          .fatPercentage
+                          .invalid;
                     }
                     return null;
                   },
@@ -134,21 +182,42 @@ class _ChangeGoalScreenState extends ConsumerState<ChangeGoalScreen> {
                   controller: _carbsPercentageController,
                   keyboardType: TextInputType.number,
                   decoration: InputDecoration(
-                      labelText:
-                          'food.nutritionGoals.change.carbsPercentage.label'.t),
+                    labelText: context
+                        .t
+                        .food
+                        .nutritionGoals
+                        .change
+                        .carbsPercentage
+                        .label,
+                  ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return "food.nutritionGoals.change.carbsPercentage.empty"
-                          .t;
+                      return context
+                          .t
+                          .food
+                          .nutritionGoals
+                          .change
+                          .carbsPercentage
+                          .empty;
                     }
                     if (value.tryParseDouble() == null) {
-                      return "food.nutritionGoals.change.carbsPercentage.invalid"
-                          .t;
+                      return context
+                          .t
+                          .food
+                          .nutritionGoals
+                          .change
+                          .carbsPercentage
+                          .invalid;
                     }
                     final double parsedValue = value.parseDouble();
                     if (parsedValue < 0 || parsedValue > 100) {
-                      return "food.nutritionGoals.change.carbsPercentage.invalid"
-                          .t;
+                      return context
+                          .t
+                          .food
+                          .nutritionGoals
+                          .change
+                          .carbsPercentage
+                          .invalid;
                     }
                     return null;
                   },
@@ -158,22 +227,42 @@ class _ChangeGoalScreenState extends ConsumerState<ChangeGoalScreen> {
                   controller: _proteinPercentageController,
                   keyboardType: TextInputType.number,
                   decoration: InputDecoration(
-                      labelText:
-                          'food.nutritionGoals.change.proteinPercentage.label'
-                              .t),
+                    labelText: context
+                        .t
+                        .food
+                        .nutritionGoals
+                        .change
+                        .proteinPercentage
+                        .label,
+                  ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return "food.nutritionGoals.change.proteinPercentage.empty"
-                          .t;
+                      return context
+                          .t
+                          .food
+                          .nutritionGoals
+                          .change
+                          .proteinPercentage
+                          .empty;
                     }
                     if (value.tryParseDouble() == null) {
-                      return "food.nutritionGoals.change.proteinPercentage.invalid"
-                          .t;
+                      return context
+                          .t
+                          .food
+                          .nutritionGoals
+                          .change
+                          .proteinPercentage
+                          .invalid;
                     }
                     final double parsedValue = value.parseDouble();
                     if (parsedValue < 0 || parsedValue > 100) {
-                      return "food.nutritionGoals.change.proteinPercentage.invalid"
-                          .t;
+                      return context
+                          .t
+                          .food
+                          .nutritionGoals
+                          .change
+                          .proteinPercentage
+                          .invalid;
                     }
                     return null;
                   },
@@ -193,7 +282,7 @@ class _ChangeGoalScreenState extends ConsumerState<ChangeGoalScreen> {
       floatingActionButton: FloatingActionButton.extended(
         onPressed: _submitForm,
         icon: const Icon(GTIcons.save),
-        label: Text('food.nutritionGoals.change.save'.t),
+        label: Text(context.t.food.nutritionGoals.change.save),
       ),
     );
   }
@@ -222,14 +311,18 @@ class _ChangeGoalScreenState extends ConsumerState<ChangeGoalScreen> {
     if (doubleEquality(100, f + c + p, epsilon: 1.5)) return const SizedBox();
 
     final terms = [f, c, p]
-        .map((e) => NumberFormat.decimalPercentPattern(
-                locale: Get.locale?.languageCode, decimalDigits: 2)
-            .format(e / 100))
+        .map(
+          (e) => NumberFormat.decimalPercentPattern(
+            locale: Get.locale?.languageCode,
+            decimalDigits: 2,
+          ).format(e / 100),
+        )
         .toList()
         .join(" + ");
     final res = NumberFormat.decimalPercentPattern(
-            locale: Get.locale?.languageCode, decimalDigits: 2)
-        .format((f + c + p) / 100);
+      locale: Get.locale?.languageCode,
+      decimalDigits: 2,
+    ).format((f + c + p) / 100);
     return Padding(
       padding: const EdgeInsets.only(top: 8),
       child: Text(
@@ -247,7 +340,8 @@ class GoalHistoryView extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final goalsSeq = ref.watch(nutritionGoalsStreamProvider).asData?.value ??
+    final goalsSeq =
+        ref.watch(nutritionGoalsStreamProvider).asData?.value ??
         DateSequence<NutritionGoal>.fromList([]);
     final keys = goalsSeq.keys.toList();
 
@@ -255,60 +349,66 @@ class GoalHistoryView extends ConsumerWidget {
       body: CustomScrollView(
         slivers: [
           SliverAppBar(
-            title: Text("food.nutritionGoals.history.title".t),
+            title: Text(context.t.food.nutritionGoals.history.title),
             pinned: true,
           ),
           if (keys.isEmpty)
             SliverFillRemaining(
               child: Center(
-                child: Text("food.nutritionGoals.history.empty".t),
+                child: Text(context.t.food.nutritionGoals.history.empty),
               ),
             )
           else
             SliverList(
-              delegate: SliverChildBuilderDelegate(
-                (context, index) {
-                  final key = keys[index];
-                  final goal = goalsSeq[key];
-                  final formattedDate =
-                      DateFormat.yMEd(Get.locale?.languageCode).format(key);
-                  return ListTile(
-                    title: Text(
-                        "food.nutritionGoals.history.calories".tParams({
-                      "calories": NutritionUnit.KCAL
-                          .formatAmount(goal.dailyCalories),
-                    })),
-                    subtitle: Text.rich(TextSpan(children: [
-                      TextSpan(
-                          text:
-                              "$formattedDate \u2013 ${"food.nutritionGoals.history.tapToView".t}"),
-                      const TextSpan(text: "\n"),
-                      TextSpan(
-                        text: "food.nutritionGoals.history.macros".tParams({
-                          "fat": NumberFormat.decimalPercentPattern(
-                                  locale: Get.locale?.languageCode,
-                                  decimalDigits: 2)
-                              .format(goal.fatPercentage / 100),
-                          "carbs": NumberFormat.decimalPercentPattern(
-                                  locale: Get.locale?.languageCode,
-                                  decimalDigits: 2)
-                              .format(goal.carbsPercentage / 100),
-                          "protein": NumberFormat.decimalPercentPattern(
-                                  locale: Get.locale?.languageCode,
-                                  decimalDigits: 2)
-                              .format(goal.proteinPercentage / 100),
-                        }),
+              delegate: SliverChildBuilderDelegate((context, index) {
+                final key = keys[index];
+                final goal = goalsSeq[key];
+                final formattedDate = DateFormat.yMEd(
+                  Get.locale?.languageCode,
+                ).format(key);
+                return ListTile(
+                  title: Text(
+                    context.t.food.nutritionGoals.history.calories(
+                      calories: NutritionUnit.KCAL.formatAmount(
+                        goal.dailyCalories,
+                        context: context,
                       ),
-                    ])),
-                    trailing: const Icon(GTIcons.lt_chevron),
-                    onTap: () {
-                      ref.read(foodSelectedDateProvider.notifier).setDate(key);
-                      Go.popUntil((route) => route.isFirst);
-                    },
-                  );
-                },
-                childCount: keys.length,
-              ),
+                    ),
+                  ),
+                  subtitle: Text.rich(
+                    TextSpan(
+                      children: [
+                        TextSpan(
+                          text:
+                              "$formattedDate \u2013 ${context.t.food.nutritionGoals.history.tapToView}",
+                        ),
+                        const TextSpan(text: "\n"),
+                        TextSpan(
+                          text: context.t.food.nutritionGoals.history.macros(
+                            fat: NumberFormat.decimalPercentPattern(
+                              locale: Get.locale?.languageCode,
+                              decimalDigits: 2,
+                            ).format(goal.fatPercentage / 100),
+                            carbs: NumberFormat.decimalPercentPattern(
+                              locale: Get.locale?.languageCode,
+                              decimalDigits: 2,
+                            ).format(goal.carbsPercentage / 100),
+                            protein: NumberFormat.decimalPercentPattern(
+                              locale: Get.locale?.languageCode,
+                              decimalDigits: 2,
+                            ).format(goal.proteinPercentage / 100),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  trailing: const Icon(GTIcons.lt_chevron),
+                  onTap: () {
+                    ref.read(foodSelectedDateProvider.notifier).setDate(key);
+                    Go.popUntil((route) => route.isFirst);
+                  },
+                );
+              }, childCount: keys.length),
             ),
         ],
       ),

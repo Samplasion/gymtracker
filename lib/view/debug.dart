@@ -6,22 +6,19 @@ import 'package:flat/flat.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:get/get.dart';
-import 'package:gymtracker/controller/coordinator.dart';
 import 'package:gymtracker/controller/debug_controller.dart';
 import 'package:gymtracker/controller/history_controller.dart';
 import 'package:gymtracker/controller/me_controller.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:gymtracker/provider/online.dart';
 import 'package:gymtracker/controller/routines_controller.dart';
 import 'package:gymtracker/controller/stopwatch_controller.dart';
-import 'package:gymtracker/controller/workout_controller.dart';
-import 'package:gymtracker/data/configuration.dart';
 import 'package:gymtracker/data/weights.dart';
+import 'package:gymtracker/i18n/strings.g.dart';
 import 'package:gymtracker/model/exercise.dart';
 import 'package:gymtracker/model/measurements.dart';
+import 'package:gymtracker/provider/online.dart';
 import 'package:gymtracker/service/database.dart';
-import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/service/logger.dart';
 import 'package:gymtracker/service/native.dart';
 import 'package:gymtracker/service/widgets.dart';
@@ -35,7 +32,6 @@ import 'package:gymtracker/view/components/muscles.dart';
 import 'package:gymtracker/view/onboarding.dart';
 import 'package:gymtracker/view/paywall.dart';
 import 'package:gymtracker/view/settings/radio.dart';
-import 'package:gymtracker/view/skeleton.dart';
 import 'package:gymtracker/view/utils/import_routine.dart';
 import 'package:gymtracker/view/utils/sliver_utils.dart';
 import 'package:gymtracker/view/utils/timer.dart';
@@ -110,23 +106,6 @@ class _DebugViewState extends ConsumerState<DebugView> {
                     () => DriftDbViewer(
                       Get.find<DatabaseService>().db as GeneratedDatabase,
                     ),
-                  );
-                },
-              ),
-              FutureBuilder(
-                future: _loadTranslationsFuture,
-                builder: (context, snapshot) {
-                  return ListTile(
-                    enabled: snapshot.connectionState == ConnectionState.done,
-                    title: const Text("Reload translation keys"),
-                    onTap: () async {
-                      controller.missingKeys.clear();
-                      _loadTranslationsFuture = Get.find<GTLocalizations>()
-                          .init(false);
-                      _loadTranslationsFuture.then((_) {
-                        Go.snack("Reloaded");
-                      });
-                    },
                   );
                 },
               ),
@@ -387,7 +366,7 @@ class _WorkoutTitleGeneratorAlertState
     extends State<WorkoutTitleGeneratorAlert> {
   final Set<GTMuscleCategory> _selectedCategories = {};
 
-  String _generate() => generateWorkoutTitle(_selectedCategories);
+  String _generate() => generateWorkoutTitle(context.t, _selectedCategories);
 
   @override
   Widget build(BuildContext context) {

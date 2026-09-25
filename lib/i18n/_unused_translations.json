@@ -1,0 +1,428 @@
+{
+  "@@info": [
+    "Here are translations that exist in secondary locales but not in <en>.",
+    "[--full enabled] Furthermore, translations not used in 'lib/' according to the 't.<path>' pattern are written into <en>."
+  ],
+  "en": {
+    "exercise": {
+      "editor": {
+        "setless": {
+          "title": "You cannot change the parameters of this exercise",
+          "text": "Disable the \"No sets\" option to enable this field."
+        },
+        "overwriteInWorkout": {
+          "title": "This exercise appears in your ongoing workout",
+          "body": "You can modify it, but if you change the parameters you'll have to fill them in again. Do you want to continue?"
+        }
+      },
+      "info": {
+        "title": "Exercise info"
+      },
+      "continuation": {
+        "combine": {
+          "confirm": {
+            "title": "Combine workouts",
+            "body": "Are you sure you want to combine these workouts? This action cannot be undone, and the old workouts will be deleted."
+          }
+        }
+      },
+      "delete": {
+        "title": "Delete exercise",
+        "body": "Are you sure you want to delete this exercise? This action cannot be undone."
+      }
+    },
+    "workouts": {
+      "untitled": "Untitled workout",
+      "title": "Workouts",
+      "actions": {
+        "rename": {
+          "label": "Rename workout",
+          "errors": {
+            "empty": "The name must not be empty."
+          }
+        },
+        "changeParent": {
+          "label": "Change base routine",
+          "options": {
+            "none": "No routine"
+          }
+        }
+      }
+    },
+    "history": {
+      "search": "Search workouts"
+    },
+    "settings": {
+      "options": {
+        "import": {
+          "types": {
+            "gt": "Gym Bro (JSON)"
+          }
+        }
+      },
+      "advanced": {
+        "options": {
+          "backups": {
+            "restoring": "Restoring",
+            "creating": "Backing up",
+            "deleting": "Deleting"
+          },
+          "sync": {
+            "syncNow": "Sync now"
+          }
+        }
+      }
+    },
+    "ongoingWorkout": {
+      "exercises": {
+        "rpeBadge": "RPE $rpe",
+        "setRPE": "Set RPE"
+      },
+      "finish": {
+        "fields": {
+          "parent": {
+            "options": {
+              "none": "No routine"
+            }
+          }
+        }
+      },
+      "simple": {
+        "setControls": "Set controls",
+        "setKind": "Set type",
+        "markAsUndone": "Mark set as not done"
+      },
+      "exercisesToSuperset": {
+        "errors": {
+          "differingSets": "The selected exercises must have the same number of sets."
+        }
+      }
+    },
+    "exerciseList": {
+      "fields": {
+        "rpe": "RPE $rpe"
+      }
+    },
+    "library": {
+      "cardio": {
+        "name": "Cardio"
+      },
+      "custom": {
+        "name": "Custom exercises"
+      }
+    },
+    "historyEditor": {
+      "finish": {
+        "fields": {
+          "parent": {
+            "options": {
+              "none": "No routine"
+            }
+          }
+        }
+      }
+    },
+    "importRoutine": {
+      "title": "Import routine"
+    },
+    "me": {
+      "allData": {
+        "predictedWeight": {
+          "dialog": {
+            "title": "Predicted weight",
+            "text": "The predicted weight is provided for informative purposes only and should not be taken seriously."
+          }
+        }
+      },
+      "profile": {
+        "title": "Profile",
+        "logout": "Log out",
+        "errors": {
+          "logout": {
+            "title": "An error occurred while logging out",
+            "subtitle": "Couldn't log out: $error"
+          }
+        }
+      },
+      "sync": {
+        "label": "Unsynced changes",
+        "subtitle": "Tap to sync your changes with the cloud."
+      }
+    },
+    "cardioTimer": {
+      "setUp": {
+        "start": "Start interval timer"
+      }
+    },
+    "food": {
+      "add": {
+        "nutritionalValuesPerAmountG": "Nutrition facts (per $amount g / $amount ml)"
+      },
+      "barcodeReader": {
+        "scanResult": {
+          "noProductFound": {
+            "text": "No product found with barcode $barcode.",
+            "title": "No product found",
+            "createNew": "Create new"
+          },
+          "error": {
+            "title": "An error occurred",
+            "text": "Unable to search for barcode."
+          }
+        },
+        "enterCode": "Enter barcode by hand",
+        "codeField": {
+          "label": "Barcode",
+          "empty": "This field must not be empty"
+        }
+      },
+      "addCustomFood": {
+        "permission": {
+          "title": "You need to grant the following permissions",
+          "recheck": "Check again",
+          "openAppSettings": "Open permission settings"
+        }
+      },
+      "permission": {
+        "denied": "We weren't able to get this permission. Would you like to open the permission settings?",
+        "openSettings": "Open app settings",
+        "error": "An error has occurred."
+      }
+    },
+    "equipment": {
+      "none": {
+        "long": "Bodyweight",
+        "short": "Bodywt."
+      },
+      "barbell": {
+        "long": "Barbell",
+        "short": "Barb."
+      },
+      "dumbbell": {
+        "long": "Dumbbells",
+        "short": "Dumbb."
+      },
+      "cable": {
+        "long": "Cables",
+        "short": "Cables"
+      },
+      "machine": {
+        "long": "Machine",
+        "short": "Machine"
+      },
+      "kettlebell": {
+        "long": "Kettlebell",
+        "short": "Kettleb."
+      },
+      "plates": {
+        "long": "Plates",
+        "short": "Plates"
+      },
+      "resistanceBand": {
+        "long": "Resistance band",
+        "short": "Res. band"
+      },
+      "suspensionBands": {
+        "long": "Suspension bands",
+        "short": "Susp. bands"
+      },
+      "landmine": {
+        "long": "Landmine platform",
+        "short": "Landmine"
+      },
+      "other": {
+        "long": "Other",
+        "short": "Other"
+      }
+    },
+    "achievements": {
+      "firstSteps": {
+        "title": "First steps",
+        "description": {
+          "k1": "Complete your first workout",
+          "k2": "Log your first weight",
+          "k3": "Log your first meal"
+        }
+      },
+      "foodWatcher": {
+        "title": "Food blogger",
+        "description": {
+          "k1": "Log your meals two days in a row",
+          "k2": "Log your meals a week in a row",
+          "k3": "Log your meals a month in a row"
+        }
+      },
+      "marathoner": {
+        "title": "Marathoner",
+        "description": {
+          "k1": "Run or bike a 5km",
+          "k2": "Run or bike a half marathon",
+          "k3": "Run or bike a full marathon"
+        }
+      },
+      "earlyBird": {
+        "title": "Early Bird",
+        "description": "Start a workout before 8am"
+      },
+      "nightOwl": {
+        "title": "Night Owl",
+        "description": "Start a workout after 8pm"
+      },
+      "realGymBro": {
+        "title": "Real Gym Bro",
+        "description": {
+          "k1": "Log a total of 100 hours worth of workouts",
+          "k2": "Log a total of 500 hours worth of workouts",
+          "k3": "Log a total of 1000 hours worth of workouts"
+        }
+      },
+      "workoutFreak": {
+        "title": "Workout Freak",
+        "description": {
+          "k1": "Log a workout every day of the month",
+          "k2": "Log a workout every day of the year"
+        }
+      },
+      "trailblazer": {
+        "title": "Trailblazer",
+        "description": {
+          "k1": {
+            "km": "Run or bike a total of 100 km",
+            "mi": "Run or bike a total of 100 km ($p0)"
+          },
+          "k2": {
+            "km": "Run or bike a total of 500 km",
+            "mi": "Run or bike a total of 500 km ($p0)"
+          },
+          "k3": {
+            "km": "Run or bike a total of 1000 km",
+            "mi": "Run or bike a total of 1000 km ($p0)"
+          }
+        }
+      },
+      "cycleChampion": {
+        "title": "Cycle Champion",
+        "description": {
+          "k1": {
+            "km": "Cycle a total of 100km",
+            "mi": "Cycle a total of 100km ($p0)"
+          },
+          "k2": {
+            "km": "Cycle a total of 500km",
+            "mi": "Cycle a total of 500km ($p0)"
+          },
+          "k3": {
+            "km": "Cycle a total of 1000km",
+            "mi": "Cycle a total of 1000km ($p0)"
+          }
+        }
+      },
+      "professionalWeightlifter": {
+        "title": "Professional Weightlifter",
+        "description": {
+          "k1": "Lift your body weight in a single rep",
+          "k2": "Lift 1.5x your body weight in a single rep",
+          "k3": "Lift 3x your body weight in a single rep"
+        }
+      },
+      "programPlanner": {
+        "title": "Program Planner",
+        "description": "Create three routines"
+      },
+      "perfectPlanner": {
+        "title": "Perfect Planner",
+        "description": "Create a routine folder"
+      },
+      "routineMaster": {
+        "title": "Routine Master",
+        "description": {
+          "k1": "Follow a routine for 3 consecutive months",
+          "k2": "Follow a routine for 6 consecutive months",
+          "k3": "Follow a routine for 12 consecutive months"
+        }
+      },
+      "intensityInnovator": {
+        "title": "Intensity Innovator",
+        "description": "Update a routine by increasing your weight/reps"
+      },
+      "completionist": {
+        "title": "Completionist",
+        "description": "Try all library exercises at least once"
+      },
+      "notDrunk": {
+        "title": "I'm not drunk, I swear!",
+        "description": "Work out on a Sunday morning breaking a personal best in lifted weight or distance"
+      },
+      "steamedHams": {
+        "description": "Set a new one-rep max personal record in a faster-than-usual workout",
+        "title": "Steamed Hams"
+      },
+      "swimsuitSeason": {
+        "title": "Swimsuit Season",
+        "description": "Do a total of 24 hours of cardio exercises from March to June of a year"
+      },
+      "pbBreaker": {
+        "title": "Personal Best Breaker",
+        "description": "Set a new one-rep max personal record in one exercise"
+      },
+      "sparta": {
+        "title": "This Is Sparta",
+        "description": {
+          "k1": {
+            "kg": "Lift 300 lbs ($p0) in one rep",
+            "lb": "Lift 300 lbs in one rep"
+          },
+          "k2": {
+            "kg": "Lift 300 kg in one rep",
+            "lb": "Lift 300 kg ($p0) in one rep"
+          }
+        }
+      },
+      "midnightRain": {
+        "description": "Start a workout before midnight and end it after midnight",
+        "title": "Midnight Rain"
+      },
+      "equipmentSpecialist": {
+        "description": "Create and follow a routine that exclusively uses specific equipment",
+        "title": "Equipment Specialist"
+      },
+      "bodyweightBeast": {
+        "title": "Bodyweight Beast",
+        "description": "Create a bodyweight-only routine and follow it for a month"
+      }
+    },
+    "workoutGenerator": {
+      "empty": {
+        "title": "Empty workout",
+        "text": "Change your filters and try again"
+      }
+    },
+    "sync": {
+      "conflict": {
+        "title": "Conflicting data found",
+        "message": "Press OK to download the data in the cloud and overwrite the local data. Press Cancel to erase the data in the cloud and upload the local data."
+      },
+      "overwrite": {
+        "title": "Older data found",
+        "message": "Do you wish to overwrite the data in the cloud with your local data?"
+      },
+      "inProgress": "Synchronizing"
+    },
+    "userProfile": {
+      "decline": "Decline",
+      "edit": {
+        "profilePicture": "Profile Picture",
+        "uploading": "Uploading...",
+        "saving": "Saving..."
+      },
+      "error": {
+        "title": "Error",
+        "retry": "Retry"
+      }
+    },
+    "profileSearch": {
+      "title": "Search Profiles"
+    }
+  },
+  "it": {}
+}

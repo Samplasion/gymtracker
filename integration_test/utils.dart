@@ -1,15 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:gymtracker/i18n/strings.g.dart';
 import 'package:gymtracker/main.dart';
 import 'package:gymtracker/service/database.dart';
-import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/view/skeleton.dart';
 
 const key = Key("app");
 
 Future<void> awaitApp(
   WidgetTester tester,
-  GTLocalizations l,
   DatabaseService databaseService,
 ) async {
   // Set screen size to a desktop-like resolution to ensure Navigation Drawer/Sidebar is visible.
@@ -20,10 +19,8 @@ Future<void> awaitApp(
 
   // Load app widget.
   await tester.pumpWidget(
-    MainApp(
-      localizations: l,
-      databaseService: databaseService,
-      key: key,
+    TranslationProvider(
+      child: MainApp(databaseService: databaseService, key: key),
     ),
     duration: const Duration(seconds: 5),
   );
@@ -37,14 +34,14 @@ Future<void> awaitApp(
   }
 
   // Verify that the app has started.
-  if (!tester.any(find.text('library.title'.t))) {
+  if (!tester.any(find.text(t.library.title))) {
     final drawerButton = find.byIcon(Icons.menu);
     if (tester.any(drawerButton)) {
       await tester.tap(drawerButton, warnIfMissed: false);
       await tester.pumpAndSettle();
     }
   }
-  expect(find.text('library.title'.t), findsAny);
+  expect(find.text(t.library.title), findsAny);
 }
 
 Finder findMainListView(WidgetTester tester) {

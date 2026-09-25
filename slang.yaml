@@ -1,0 +1,25 @@
+maps:
+  - muscleCategories
+  - timeSeriesChart.interval
+  - bodyMeasurement
+  - nags
+  - me.stats.timeFrame
+  - barbells
+  - boutique.errors
+  - food.countries
+  - food.languages
+  - food.nutriments
+  - food.nutrimentUnits
+  - muscleGroups
+  - units
+  - locales
+  - weightUnits
+  - distanceUnits
+  - set.kindLong
+  - set.kinds.help
+  - settings.options.themeMode.values
+  - settings.advanced.options.logs.levels
+  - exercise.editor.fields.parameters.values
+translation_class_visibility: public
+input_directory: lib/i18n
+lazy: false

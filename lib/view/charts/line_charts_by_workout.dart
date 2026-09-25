@@ -8,10 +8,10 @@ import 'package:gymtracker/controller/settings_controller.dart';
 import 'package:gymtracker/controller/workout_controller.dart';
 import 'package:gymtracker/data/distance.dart';
 import 'package:gymtracker/data/weights.dart';
+import 'package:gymtracker/i18n/strings.g.dart';
 import 'package:gymtracker/icons/gymtracker_icons.dart';
 import 'package:gymtracker/model/exercise.dart';
 import 'package:gymtracker/model/workout.dart';
-import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/service/logger.dart';
 import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/utils/go.dart';
@@ -504,33 +504,33 @@ class _RoutineHistoryChartState
     if (y < 0) return "";
     switch (type) {
       case _RoutineHistoryChartType.volume:
-        return y.userFacingWeight;
+        return y.getUserFacingWeight(context.t);
       case _RoutineHistoryChartType.reps:
-        return "exerciseList.fields.reps".plural(y.toInt());
+        return context.t.exerciseList.fields.reps(n: y.toInt());
       case _RoutineHistoryChartType.duration:
         return time.text!;
       case _RoutineHistoryChartType.exertion:
-        return "${Weights.kg.format(y)}/min";
+        return "${Weights.kg.format(context.t, y)}/min";
     }
   }
 
   Map<_RoutineHistoryChartType, LineChartCategory> get categories => {
     _RoutineHistoryChartType.volume: LineChartCategory(
-      title: "exercise.chart.views.volume".t,
+      title: context.t.exercise.chart.views.volume,
       icon: const Icon(GTIcons.volume, size: 16),
     ),
     _RoutineHistoryChartType.reps: LineChartCategory(
-      title: "exercise.chart.views.reps".t,
+      title: context.t.exercise.chart.views.reps,
       icon: const Icon(GTIcons.reps, size: 16),
     ),
     _RoutineHistoryChartType.duration: LineChartCategory(
-      title: "exercise.chart.views.duration".t,
+      title: context.t.exercise.chart.views.duration,
       icon: const Icon(GTIcons.duration, size: 16),
     ),
     _RoutineHistoryChartType.exertion: LineChartCategory(
-      title: "exercise.chart.views.exertion".t,
+      title: context.t.exercise.chart.views.exertion,
       icon: const Icon(GTIcons.exertion, size: 16),
-      info: "exercise.chart.views.exertionInfo".t,
+      info: context.t.exercise.chart.views.exertionInfo,
     ),
   };
 
@@ -827,12 +827,14 @@ class _ExerciseHistoryChartState
 
   String buildType(_ExerciseHistoryChartType type, TextSpan time, double y) =>
       switch (type) {
-        _ExerciseHistoryChartType.volume => y.userFacingWeight,
-        _ExerciseHistoryChartType.reps => "exerciseList.fields.reps".plural(
-          y.toInt(),
+        _ExerciseHistoryChartType.volume => y.getUserFacingWeight(context.t),
+        _ExerciseHistoryChartType.reps => context.t.exerciseList.fields.reps(
+          n: y.toInt(),
         ),
         _ExerciseHistoryChartType.time => time.text!,
-        _ExerciseHistoryChartType.distance => y.userFacingDistance,
+        _ExerciseHistoryChartType.distance => y.getUserFacingDistance(
+          context.t,
+        ),
       };
 
   late final Map<int, int> startingDateIndices = {
@@ -848,19 +850,19 @@ class _ExerciseHistoryChartState
 
     final categories = {
       _ExerciseHistoryChartType.volume: LineChartCategory(
-        title: "exercise.chart.views.volume".t,
+        title: context.t.exercise.chart.views.volume,
         icon: const Icon(GTIcons.volume, size: 16),
       ),
       _ExerciseHistoryChartType.reps: LineChartCategory(
-        title: "exercise.chart.views.reps".t,
+        title: context.t.exercise.chart.views.reps,
         icon: const Icon(GTIcons.reps, size: 16),
       ),
       _ExerciseHistoryChartType.time: LineChartCategory(
-        title: "exercise.chart.views.time".t,
+        title: context.t.exercise.chart.views.time,
         icon: const Icon(GTIcons.time, size: 16),
       ),
       _ExerciseHistoryChartType.distance: LineChartCategory(
-        title: "exercise.chart.views.distance".t,
+        title: context.t.exercise.chart.views.distance,
         icon: const Icon(GTIcons.distance, size: 16),
       ),
     }.entries.where((element) => availableTypes.contains(element.key)).toMap();

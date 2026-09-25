@@ -10,7 +10,6 @@ import 'package:gymtracker/controller/settings_controller.dart';
 import 'package:gymtracker/model/achievements.dart';
 import 'package:gymtracker/model/native.dart';
 import 'package:gymtracker/repository/foods.dart';
-import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/service/logger.dart';
 import 'package:gymtracker/service/native.dart';
 import 'package:gymtracker/service/version.dart';
@@ -148,24 +147,26 @@ class FoodNotifier extends _$FoodNotifier {
   void build() {}
 
   void addFood(DateTime dateTime, Food food, {NutritionCategory? category}) {
-    ref.read(foodsRepositoryProvider).addFood(
-      DateTagged(
-        date: dateTime.startOfDay,
-        value: food.copyWith(
-          id: DateTime.now().millisecondsSinceEpoch.toString(),
-          category: category?.name,
-        ),
-      ),
-    );
+    ref
+        .read(foodsRepositoryProvider)
+        .addFood(
+          DateTagged(
+            date: dateTime.startOfDay,
+            value: food.copyWith(
+              id: DateTime.now().millisecondsSinceEpoch.toString(),
+              category: category?.name,
+            ),
+          ),
+        );
     // TODO: Move this stuff to the Event system so that we don't have to call the Coordinator directly
     Get.find<Coordinator>().maybeUnlockAchievements(AchievementTrigger.food);
     Get.find<Coordinator>().scheduleBackup();
   }
 
   void removeFood(DateTime dateTime, Food food) {
-    ref.read(foodsRepositoryProvider).removeFood(
-      DateTagged(date: dateTime.startOfDay, value: food),
-    );
+    ref
+        .read(foodsRepositoryProvider)
+        .removeFood(DateTagged(date: dateTime.startOfDay, value: food));
     Get.find<Coordinator>().maybeUnlockAchievements(AchievementTrigger.food);
     Get.find<Coordinator>().scheduleBackup();
   }
@@ -174,9 +175,9 @@ class FoodNotifier extends _$FoodNotifier {
     final dayFoods = ref.read(foodsForDateProvider(dateTime));
     if (!dayFoods.any((element) => element.id == updatedFood.id)) return;
 
-    ref.read(foodsRepositoryProvider).updateFood(
-      DateTagged(date: dateTime, value: updatedFood),
-    );
+    ref
+        .read(foodsRepositoryProvider)
+        .updateFood(DateTagged(date: dateTime, value: updatedFood));
     Get.find<Coordinator>().scheduleBackup();
   }
 
@@ -204,10 +205,9 @@ class FoodNotifier extends _$FoodNotifier {
     Food food,
     NutritionCategory? category,
   ) {
-    ref.read(foodsRepositoryProvider).addCustomBarcodeFood(
-      barcode,
-      food.copyWith(category: category?.name),
-    );
+    ref
+        .read(foodsRepositoryProvider)
+        .addCustomBarcodeFood(barcode, food.copyWith(category: category?.name));
   }
 }
 
@@ -266,9 +266,11 @@ class NutritionGoalNotifier extends _$NutritionGoalNotifier {
 
   void saveNewGoal(NutritionGoal newGoal) {
     final selectedDate = ref.read(foodSelectedDateProvider);
-    ref.read(foodsRepositoryProvider).addNutritionGoal(
-      TaggedNutritionGoal(date: selectedDate.startOfDay, value: newGoal),
-    );
+    ref
+        .read(foodsRepositoryProvider)
+        .addNutritionGoal(
+          TaggedNutritionGoal(date: selectedDate.startOfDay, value: newGoal),
+        );
     Get.find<Coordinator>().scheduleBackup();
   }
 }
@@ -348,13 +350,12 @@ class NutritionCategoryNotifier extends _$NutritionCategoryNotifier {
         categoriesSeq[date.startOfDay].containsKey(category.name)) {
       throw StateError("Category already exists");
     }
-    ref.read(foodsRepositoryProvider).setNutritionCategoriesForDay(
-      date.startOfDay,
-      {
-        ...(categoriesSeq.isEmpty ? {} : categoriesSeq[date.startOfDay]),
-        category.name: category,
-      },
-    );
+    ref
+        .read(foodsRepositoryProvider)
+        .setNutritionCategoriesForDay(date.startOfDay, {
+          ...(categoriesSeq.isEmpty ? {} : categoriesSeq[date.startOfDay]),
+          category.name: category,
+        });
     Get.find<Coordinator>().scheduleBackup();
   }
 
@@ -366,13 +367,12 @@ class NutritionCategoryNotifier extends _$NutritionCategoryNotifier {
     final currentMap = categoriesSeq.isEmpty
         ? <String, NutritionCategory>{}
         : categoriesSeq[date.startOfDay];
-    ref.read(foodsRepositoryProvider).setNutritionCategoriesForDay(
-      date.startOfDay,
-      {
-        for (final entry in currentMap.entries)
-          if (entry.key != category.name) entry.key: entry.value,
-      },
-    );
+    ref
+        .read(foodsRepositoryProvider)
+        .setNutritionCategoriesForDay(date.startOfDay, {
+          for (final entry in currentMap.entries)
+            if (entry.key != category.name) entry.key: entry.value,
+        });
     Get.find<Coordinator>().scheduleBackup();
   }
 
@@ -384,16 +384,15 @@ class NutritionCategoryNotifier extends _$NutritionCategoryNotifier {
     final currentMap = categoriesSeq.isEmpty
         ? <String, NutritionCategory>{}
         : categoriesSeq[date.startOfDay];
-    ref.read(foodsRepositoryProvider).setNutritionCategoriesForDay(
-      date.startOfDay,
-      {
-        for (final entry in currentMap.entries)
-          if (entry.key != oldName)
-            entry.key: entry.value
-          else
-            category.name: category,
-      },
-    );
+    ref
+        .read(foodsRepositoryProvider)
+        .setNutritionCategoriesForDay(date.startOfDay, {
+          for (final entry in currentMap.entries)
+            if (entry.key != oldName)
+              entry.key: entry.value
+            else
+              category.name: category,
+        });
     Get.find<Coordinator>().scheduleBackup();
   }
 }
@@ -601,7 +600,7 @@ Future<VagueFood?> searchOpenFoodFactsByBarcode(Ref ref, String barcode) async {
 @Riverpod(keepAlive: true)
 void foodNativeSync(Ref ref) {
   OpenFoodAPIConfiguration.userAgent = UserAgent(
-    name: "appName".t,
+    name: "Gym Bro/${VersionService().packageInfo.version}",
     version: VersionService().packageInfo.version,
     system: "${Platform.operatingSystem} ${Platform.operatingSystemVersion}",
   );

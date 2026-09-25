@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:gymtracker/controller/routines_controller.dart';
+import 'package:gymtracker/i18n/strings.g.dart';
 import 'package:gymtracker/icons/gymtracker_icons.dart';
 import 'package:gymtracker/model/workout.dart';
-import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/service/logger.dart';
 import 'package:gymtracker/view/components/controlled.dart';
 import 'package:gymtracker/view/routines.dart';
@@ -79,9 +79,7 @@ class _RoutineFormPickerState
     if (widget.routine == null) {
       return ListTile(
         focusNode: _node,
-        title: Text(
-          "routineFormPicker.fields.routine.options.none".t,
-        ),
+        title: Text(context.t.routineFormPicker.fields.routine.options.none),
         trailing: const Icon(GTIcons.lt_chevron),
         contentPadding: EdgeInsets.zero,
         visualDensity: VisualDensity.standard,

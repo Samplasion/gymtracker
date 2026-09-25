@@ -2,7 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:gymtracker/controller/error_controller.dart';
-import 'package:gymtracker/service/localizations.dart';
+import 'package:gymtracker/i18n/strings.g.dart';
 import 'package:gymtracker/utils/extensions.dart';
 
 class ErrorView extends GetWidget<ErrorController> {
@@ -18,7 +18,7 @@ class ErrorView extends GetWidget<ErrorController> {
       canPop: false,
       child: Scaffold(
         appBar: AppBar(
-          title: Text("errorView.shortTitle".t),
+          title: Text(context.t.errorView.shortTitle),
           automaticallyImplyLeading: false,
         ),
         body: SingleChildScrollView(
@@ -27,16 +27,16 @@ class ErrorView extends GetWidget<ErrorController> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                "errorView.title".t,
+                context.t.errorView.title,
                 style: Get.textTheme.displayLarge,
               ),
               const SizedBox(height: 8),
               Text(
-                "errorView.subtitle".t,
+                context.t.errorView.subtitle,
                 style: Get.textTheme.headlineMedium,
               ),
               const SizedBox(height: 16),
-              Text("errorView.body".t),
+              Text(context.t.errorView.body),
               if (kDebugMode) ...[
                 const SizedBox(height: 16),
                 FilledButton(
@@ -54,10 +54,7 @@ class ErrorView extends GetWidget<ErrorController> {
                 ),
               ],
               const SizedBox(height: 16),
-              Text(
-                "errorView.stack".t,
-                style: Get.textTheme.bodyMedium,
-              ),
+              Text(context.t.errorView.stack, style: Get.textTheme.bodyMedium),
               const SizedBox(height: 16),
               if (args.details != null) ...[
                 Text(
@@ -97,7 +94,7 @@ class ErrorView extends GetWidget<ErrorController> {
                 )
               else
                 Text(
-                  "errorView.noStack".t,
+                  context.t.errorView.noStack,
                   style: Get.textTheme.bodyMedium,
                 ),
             ],
@@ -114,10 +111,10 @@ class ErrorViewArguments {
   final StackTrace? stack;
 
   ErrorViewArguments({this.details, this.error, this.stack})
-      : assert(() {
-          if (details == null && error == null) {
-            throw ArgumentError("Either details or error must be provided");
-          }
-          return true;
-        }());
+    : assert(() {
+        if (details == null && error == null) {
+          throw ArgumentError("Either details or error must be provided");
+        }
+        return true;
+      }());
 }

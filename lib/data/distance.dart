@@ -1,4 +1,4 @@
-import 'package:gymtracker/service/localizations.dart';
+import 'package:gymtracker/i18n/strings.g.dart';
 import 'package:gymtracker/utils/extensions.dart';
 
 enum Distance {
@@ -21,8 +21,8 @@ enum Distance {
     return -1;
   }
 
-  String format(double value) => "exerciseList.fields.distance".tParams({
-        "distance": value.localized,
-        "unit": "units.$name".t,
-      });
+  String format(Translations t, double value) => t.exerciseList.fields.distance(
+    distance: value.localizedWith(t),
+    unit: t.units[name] ?? "UNKNOWN",
+  );
 }

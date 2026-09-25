@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:gymtracker/i18n/strings.g.dart';
 import 'package:gymtracker/model/workout.dart';
-import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/view/components/infobox.dart';
 import 'package:gymtracker/view/exercises.dart';
@@ -44,10 +44,12 @@ class RoutineListTile extends StatelessWidget {
       leading: WorkoutIcon(workout: routine),
       trailing: trailing,
       title: Text(
-        name.isEmpty ? "general.unnamed".t : name,
+        name.isEmpty ? context.t.general.unnamed : name,
         style: TextStyle(fontStyle: name.isEmpty ? FontStyle.italic : null),
       ),
-      subtitle: Text("general.exercises".plural(routine.displayExerciseCount)),
+      subtitle: Text(
+        context.t.general.exercises(n: routine.displayExerciseCount),
+      ),
       onTap: onTap,
     );
   }

@@ -15,7 +15,7 @@ class _AddCustomFoodFAB extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return FloatingActionButton.extended(
-      label: Text("food.addCustom.title".t),
+      label: Text(context.t.food.addCustom.title),
       icon: const Icon(GTIcons.add_food),
       onPressed: () {
         closeView();
@@ -42,7 +42,11 @@ class _SearchFoodWithMacros extends ConsumerWidget {
 
     final subtitlePieces = [
       if (food.brand != null) food.brand,
-      food.unit.formatAmount(food.amount, pieces: food.pieces),
+      food.unit.formatAmount(
+        food.amount,
+        pieces: food.pieces,
+        context: context,
+      ),
     ];
 
     final favorites =
@@ -89,21 +93,24 @@ class _SearchFoodWithMacros extends ConsumerWidget {
               child: StatsRow(
                 stats: [
                   Stats(
-                    label: "food.nutriments.carbs".t,
+                    label: context.t.food.nutriments['carbs']!,
                     value: kNutritionValueToUnit["carbs"]!.formatAmount(
                       food.nutritionalValues.carbs,
+                      context: context,
                     ),
                   ),
                   Stats(
-                    label: "food.nutriments.protein".t,
+                    label: context.t.food.nutriments['protein']!,
                     value: kNutritionValueToUnit["protein"]!.formatAmount(
                       food.nutritionalValues.protein,
+                      context: context,
                     ),
                   ),
                   Stats(
-                    label: "food.nutriments.fat".t,
+                    label: context.t.food.nutriments['fat']!,
                     value: kNutritionValueToUnit["fat"]!.formatAmount(
                       food.nutritionalValues.fat,
+                      context: context,
                     ),
                   ),
                 ],

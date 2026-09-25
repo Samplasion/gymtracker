@@ -12,12 +12,12 @@ import 'package:gymtracker/controller/settings_controller.dart';
 import 'package:gymtracker/data/configuration.dart';
 import 'package:gymtracker/data/distance.dart';
 import 'package:gymtracker/data/weights.dart';
+import 'package:gymtracker/i18n/strings.g.dart';
 import 'package:gymtracker/icons/gymtracker_icons.dart';
 import 'package:gymtracker/model/exercisable.dart';
 import 'package:gymtracker/model/exercise.dart';
 import 'package:gymtracker/model/superset.dart';
 import 'package:gymtracker/model/workout.dart';
-import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/service/logger.dart';
 import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/utils/go.dart';
@@ -155,7 +155,12 @@ class _ExercisesViewState extends State<ExercisesView> {
                         TextSpan(
                           children: [
                             TextSpan(
-                              text: "workouts.actions.saveAsRoutine.button".t,
+                              text: context
+                                  .t
+                                  .workouts
+                                  .actions
+                                  .saveAsRoutine
+                                  .button,
                             ),
                             if (shouldDisallowSaving) ...[
                               const TextSpan(text: " "),
@@ -171,7 +176,7 @@ class _ExercisesViewState extends State<ExercisesView> {
                     if (widget.isOwned) ...[
                       PopupMenuItem(
                         key: const Key("edit-workout"),
-                        child: Text("workouts.actions.edit.label".t),
+                        child: Text(context.t.workouts.actions.edit.label),
                         onTap: () {
                           SchedulerBinding.instance.addPostFrameCallback((
                             timeStamp,
@@ -184,7 +189,7 @@ class _ExercisesViewState extends State<ExercisesView> {
                         PopupMenuItem(
                           key: const Key("edit-workout-cont"),
                           child: Text(
-                            "workouts.actions.editContinuation.label".t,
+                            context.t.workouts.actions.editContinuation.label,
                           ),
                           onTap: () {
                             SchedulerBinding.instance.addPostFrameCallback((
@@ -203,7 +208,7 @@ class _ExercisesViewState extends State<ExercisesView> {
                           color: Theme.of(context).colorScheme.error,
                         ),
                         child: Text(
-                          "workouts.actions.delete.title".t,
+                          context.t.workouts.actions.delete.title,
                           style: TextStyle(
                             color: Theme.of(context).colorScheme.error,
                           ),
@@ -218,7 +223,12 @@ class _ExercisesViewState extends State<ExercisesView> {
                                       .addPostFrameCallback((timeStamp) {
                                         Get.back();
                                         Go.snack(
-                                          "workouts.actions.delete.done".t,
+                                          context
+                                              .t
+                                              .workouts
+                                              .actions
+                                              .delete
+                                              .done,
                                         );
                                       });
                                 },
@@ -228,13 +238,13 @@ class _ExercisesViewState extends State<ExercisesView> {
                     ],
                   ] else ...[
                     PopupMenuItem(
-                      child: Text("workouts.actions.share.button".t),
+                      child: Text(context.t.workouts.actions.share.button),
                       onTap: () {
                         controller.shareRoutine(workout);
                       },
                     ),
                     PopupMenuItem(
-                      child: Text("routines.actions.viewHistory".t),
+                      child: Text(context.t.routines.actions.viewHistory),
                       onTap: () {
                         Get.find<RoutinesController>().viewHistory(
                           routine: workout,
@@ -242,7 +252,7 @@ class _ExercisesViewState extends State<ExercisesView> {
                       },
                     ),
                     PopupMenuItem(
-                      child: Text("routines.actions.edit".t),
+                      child: Text(context.t.routines.actions.edit),
                       onTap: () {
                         SchedulerBinding.instance.addPostFrameCallback((
                           timeStamp,
@@ -269,7 +279,7 @@ class _ExercisesViewState extends State<ExercisesView> {
                         color: Theme.of(context).colorScheme.error,
                       ),
                       child: Text(
-                        "routines.actions.delete.title".t,
+                        context.t.routines.actions.delete.title,
                         style: TextStyle(
                           color: Theme.of(context).colorScheme.error,
                         ),
@@ -283,7 +293,7 @@ class _ExercisesViewState extends State<ExercisesView> {
                               timeStamp,
                             ) {
                               Get.back();
-                              Go.snack("routines.actions.delete.done".t);
+                              Go.snack(context.t.routines.actions.delete.done);
                             });
                           },
                         );
@@ -345,9 +355,9 @@ class _ExercisesViewState extends State<ExercisesView> {
                                   TextSpan(
                                     text: () {
                                       if (workout.isConcrete) {
-                                        return "workouts.actions.start".t;
+                                        return context.t.workouts.actions.start;
                                       } else {
-                                        return "routines.actions.start".t;
+                                        return context.t.routines.actions.start;
                                       }
                                     }(),
                                   ),
@@ -372,7 +382,7 @@ class _ExercisesViewState extends State<ExercisesView> {
                                   controller.continueWorkout(context, workout);
                                 }
                               : null,
-                          child: Text("workouts.actions.continue".t),
+                          child: Text(context.t.workouts.actions.kContinue),
                         ),
                       ],
                     ],
@@ -453,8 +463,8 @@ class _ExercisesViewState extends State<ExercisesView> {
                   leading: const CircleAvatar(
                     child: Icon(GTIcons.continuation),
                   ),
-                  title: Text("exercise.continuation.label".t),
-                  subtitle: Text("exercise.continuation.description".t),
+                  title: Text(context.t.exercise.continuation.label),
+                  subtitle: Text(context.t.exercise.continuation.description),
                   onTap: () {
                     Get.find<HistoryController>().combineWorkoutsFlow(workout);
                   },
@@ -546,7 +556,7 @@ class WorkoutStatsRow extends StatelessWidget {
             workout.duration!,
             builder: (time) => time.text!,
           ),
-          label: "exerciseList.stats.time".t,
+          label: context.t.exerciseList.stats.time,
         ),
         if (workout.liftedWeight > 0)
           Stats(
@@ -554,8 +564,8 @@ class WorkoutStatsRow extends StatelessWidget {
               value: workout.liftedWeight,
               from: workout.weightUnit,
               to: settingsController.weightUnit.value,
-            ).userFacingWeight,
-            label: "exerciseList.stats.volume".t,
+            ).getUserFacingWeight(context.t),
+            label: context.t.exerciseList.stats.volume,
           ),
         if (workout.distanceRun > 0)
           Stats(
@@ -563,12 +573,12 @@ class WorkoutStatsRow extends StatelessWidget {
               value: workout.distanceRun,
               from: workout.distanceUnit,
               to: settingsController.distanceUnit.value,
-            ).userFacingDistance,
-            label: "exerciseList.stats.distance".t,
+            ).getUserFacingDistance(context.t),
+            label: context.t.exerciseList.stats.distance,
           ),
         Stats(
           value: workout.doneSets.length.toString(),
-          label: "exerciseList.stats.sets".t,
+          label: context.t.exerciseList.stats.sets,
         ),
       ],
     );
@@ -629,7 +639,9 @@ class ExerciseDataView extends StatelessWidget {
                         Text.rich(
                           TextSpan(
                             children: [
-                              TextSpan(text: exercise.displayName),
+                              TextSpan(
+                                text: exercise.getDisplayName(context.t),
+                              ),
                               if (exercise.isCustom) ...[
                                 const TextSpan(text: " "),
                                 const WidgetSpan(
@@ -649,7 +661,9 @@ class ExerciseDataView extends StatelessWidget {
                             builder: (time) => Text.rich(
                               TextSpan(
                                 children: [
-                                  TextSpan(text: "exerciseList.restTime".t),
+                                  TextSpan(
+                                    text: context.t.exerciseList.restTime,
+                                  ),
                                   time,
                                 ],
                                 style: Theme.of(context).textTheme.labelMedium!
@@ -729,8 +743,8 @@ class ExerciseDataView extends StatelessWidget {
                         TextSpan(
                           children: [
                             TextSpan(
-                              text: "superset".plural(
-                                superset.exercises.length,
+                              text: context.t.superset(
+                                n: superset.exercises.length,
                               ),
                             ),
                           ],
@@ -743,7 +757,7 @@ class ExerciseDataView extends StatelessWidget {
                         builder: (time) => Text.rich(
                           TextSpan(
                             children: [
-                              TextSpan(text: "exerciseList.restTime".t),
+                              TextSpan(text: context.t.exerciseList.restTime),
                               time,
                             ],
                             style: Theme.of(context).textTheme.labelMedium!
@@ -793,20 +807,20 @@ class OverwriteDialog extends StatelessWidget {
   Widget build(BuildContext context) {
     return AlertDialog(
       icon: const Icon(GTIcons.info),
-      title: Text("ongoingWorkout.overwrite.title".t),
-      content: Text("ongoingWorkout.overwrite.text".t),
+      title: Text(context.t.ongoingWorkout.overwrite.title),
+      content: Text(context.t.ongoingWorkout.overwrite.text),
       actions: [
         TextButton(
           onPressed: () {
             Get.back(result: false);
           },
-          child: Text("ongoingWorkout.overwrite.actions.no".t),
+          child: Text(context.t.ongoingWorkout.overwrite.actions.no),
         ),
         FilledButton.tonal(
           onPressed: () {
             Get.back(result: true);
           },
-          child: Text("ongoingWorkout.overwrite.actions.yes".t),
+          child: Text(context.t.ongoingWorkout.overwrite.actions.yes),
         ),
       ],
     );

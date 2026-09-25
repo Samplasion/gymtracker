@@ -2,7 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:gymtracker/service/localizations.dart';
+import 'package:gymtracker/i18n/strings.g.dart';
 import 'package:gymtracker/utils/constants.dart';
 import 'package:gymtracker/utils/extensions.dart';
 import 'package:scrollable_clean_calendar/controllers/clean_calendar_controller.dart';
@@ -49,34 +49,39 @@ class _DatePickerPlusState extends State<DatePickerPlus> {
         actions: [
           IconButton(
             icon: const Icon(Icons.today),
-            tooltip: "food.datePicker.today".t,
+            tooltip: context.t.food.datePicker.today,
             onPressed: () => Get.back(result: DateTime.now()),
           ),
         ],
       ),
-      body: LayoutBuilder(builder: (context, constraints) {
-        final width = constraints.maxWidth;
-        return ScrollableCleanCalendar(
-          locale: Get.locale!.languageCode,
-          calendarController: calendarController,
-          layout: Layout.DEFAULT,
-          padding: EdgeInsets.symmetric(
-                horizontal:
-                    max(0, (width - Breakpoints.xs.screenWidth.toDouble()) / 2),
-              ) +
-              const EdgeInsets.all(16) +
-              MediaQuery.of(context).padding.copyWith(top: 0),
-          dayBuilder: (context, values) {
-            final date = values.day.startOfDay;
+      body: LayoutBuilder(
+        builder: (context, constraints) {
+          final width = constraints.maxWidth;
+          return ScrollableCleanCalendar(
+            locale: Get.locale!.languageCode,
+            calendarController: calendarController,
+            layout: Layout.DEFAULT,
+            padding:
+                EdgeInsets.symmetric(
+                  horizontal: max(
+                    0,
+                    (width - Breakpoints.xs.screenWidth.toDouble()) / 2,
+                  ),
+                ) +
+                const EdgeInsets.all(16) +
+                MediaQuery.of(context).padding.copyWith(top: 0),
+            dayBuilder: (context, values) {
+              final date = values.day.startOfDay;
 
-            return Badge(
-              isLabelVisible: widget.markDate(date),
-              offset: const Offset(2, 2),
-              child: _pattern(context, values),
-            );
-          },
-        );
-      }),
+              return Badge(
+                isLabelVisible: widget.markDate(date),
+                offset: const Offset(2, 2),
+                child: _pattern(context, values),
+              );
+            },
+          );
+        },
+      ),
     );
   }
 
@@ -88,15 +93,13 @@ class _DatePickerPlusState extends State<DatePickerPlus> {
 
     if (values.day.startOfDay.isBefore(values.minDate.startOfDay) ||
         values.day.startOfDay.isAfter(values.maxDate.startOfDay)) {
-      bgColor = Theme.of(context)
-          .colorScheme
-          .surfaceContainerLow
-          .withAlpha((.4 * 255).round());
+      bgColor = Theme.of(
+        context,
+      ).colorScheme.surfaceContainerLow.withAlpha((.4 * 255).round());
       txtStyle = (Theme.of(context).textTheme.bodyLarge)!.copyWith(
-        color: Theme.of(context)
-            .colorScheme
-            .onSurface
-            .withAlpha((.5 * 255).round()),
+        color: Theme.of(
+          context,
+        ).colorScheme.onSurface.withAlpha((.5 * 255).round()),
       );
     }
 
@@ -120,11 +123,7 @@ class _DatePickerPlusState extends State<DatePickerPlus> {
         color: bgColor,
         borderRadius: BorderRadius.circular(8),
       ),
-      child: Text(
-        values.text,
-        textAlign: TextAlign.center,
-        style: txtStyle,
-      ),
+      child: Text(values.text, textAlign: TextAlign.center, style: txtStyle),
     );
   }
 }

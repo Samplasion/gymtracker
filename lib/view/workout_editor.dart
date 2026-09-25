@@ -7,13 +7,13 @@ import 'package:gymtracker/controller/routines_controller.dart';
 import 'package:gymtracker/controller/workout_controller.dart';
 import 'package:gymtracker/data/distance.dart';
 import 'package:gymtracker/data/weights.dart';
+import 'package:gymtracker/i18n/strings.g.dart';
 import 'package:gymtracker/icons/gymtracker_icons.dart';
 import 'package:gymtracker/model/exercisable.dart';
 import 'package:gymtracker/model/exercise.dart';
 import 'package:gymtracker/model/set.dart';
 import 'package:gymtracker/model/superset.dart';
 import 'package:gymtracker/model/workout.dart';
-import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/service/logger.dart';
 import 'package:gymtracker/struct/editor_callback.dart';
 import 'package:gymtracker/utils/extensions.dart';
@@ -79,8 +79,8 @@ class _WorkoutEditorState extends State<WorkoutEditor> {
         } else {
           SchedulerBinding.instance.addPostFrameCallback((_) async {
             final confirm = await Go.confirm(
-              "historyEditor.actions.discardChanges".t,
-              "historyEditor.actions.discardChangesContent".t,
+              context.t.historyEditor.actions.discardChanges,
+              context.t.historyEditor.actions.discardChangesContent,
             );
 
             if (confirm) {
@@ -94,10 +94,10 @@ class _WorkoutEditorState extends State<WorkoutEditor> {
       child: Scaffold(
         appBar: AppBar(
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(0)),
-          title: Text("historyEditor.title".tParams({"name": workout.name})),
+          title: Text(context.t.historyEditor.title(name: workout.name)),
           actions: [
             IconButton(
-              tooltip: "ongoingWorkout.weightCalculator".t,
+              tooltip: context.t.ongoingWorkout.weightCalculator,
               icon: const Icon(GTIcons.weight_calculator),
               onPressed: () {
                 showDialog(
@@ -111,7 +111,7 @@ class _WorkoutEditorState extends State<WorkoutEditor> {
               key: const Key("main-menu"),
               itemBuilder: (context) => <PopupMenuEntry<dynamic>>[
                 PopupMenuItem(
-                  child: Text("historyEditor.actions.changeWeightUnit".t),
+                  child: Text(context.t.historyEditor.actions.changeWeightUnit),
                   onTap: () {
                     setState(() {
                       changeWeightUnitDialog();
@@ -119,7 +119,9 @@ class _WorkoutEditorState extends State<WorkoutEditor> {
                   },
                 ),
                 PopupMenuItem(
-                  child: Text("ongoingWorkout.actions.changeDistanceUnit".t),
+                  child: Text(
+                    context.t.ongoingWorkout.actions.changeDistanceUnit,
+                  ),
                   onTap: () {
                     setState(() {
                       changeDistanceUnitDialog();
@@ -128,7 +130,7 @@ class _WorkoutEditorState extends State<WorkoutEditor> {
                 ),
                 const PopupMenuDivider(),
                 PopupMenuItem(
-                  child: Text("historyEditor.actions.finish".t),
+                  child: Text(context.t.historyEditor.actions.finish),
                   onTap: () {
                     SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
                       historyController.finishEditingWorkoutWithDialog(
@@ -183,7 +185,7 @@ class _WorkoutEditorState extends State<WorkoutEditor> {
               child: SplitButton(
                 segments: [
                   SplitButtonSegment(
-                    title: 'historyEditor.exercises.add'.t,
+                    title: context.t.historyEditor.exercises.add,
                     type: SplitButtonSegmentType.filled,
                     onTap: () async {
                       final exs = await Go.to<List<Exercise>>(
@@ -205,7 +207,7 @@ class _WorkoutEditorState extends State<WorkoutEditor> {
                     },
                   ),
                   SplitButtonSegment(
-                    title: "historyEditor.exercises.addSuperset".t,
+                    title: context.t.historyEditor.exercises.addSuperset,
                     onTap: () {
                       setState(() {
                         workout.exercises.add(Superset.empty());
@@ -224,9 +226,10 @@ class _WorkoutEditorState extends State<WorkoutEditor> {
   void changeWeightUnitDialog() {
     Go.showRadioModal(
       selectedValue: workout.weightUnit,
-      title: Text("ongoingWorkout.actions.changeWeightUnit".t),
+      title: Text(context.t.ongoingWorkout.actions.changeWeightUnit),
       values: {
-        for (final val in Weights.values) val: "weightUnits.${val.name}".t,
+        for (final val in Weights.values)
+          val: context.t.weightUnits[val.name] ?? "UNKNOWN",
       },
       onChange: (value) {
         logger.w("Changing weight unit to $value");
@@ -239,10 +242,10 @@ class _WorkoutEditorState extends State<WorkoutEditor> {
   void changeDistanceUnitDialog() {
     Go.showRadioModal(
       selectedValue: workout.distanceUnit,
-      title: Text("ongoingWorkout.actions.changeDistanceUnit".t),
+      title: Text(context.t.ongoingWorkout.actions.changeDistanceUnit),
       values: {
         for (final distance in Distance.values)
-          distance: "distanceUnits.${distance.name}".t,
+          distance: context.t.distanceUnits[distance.name] ?? "UNKNOWN",
       },
       onChange: (value) {
         logger.i("Changing distance unit to $value");
@@ -794,7 +797,7 @@ class WorkoutInfoBar extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    "historyEditor.info.reps".t,
+                    context.t.historyEditor.info.reps,
                     style: Theme.of(context).textTheme.labelMedium,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
@@ -813,7 +816,7 @@ class WorkoutInfoBar extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    "historyEditor.info.volume".t,
+                    context.t.historyEditor.info.volume,
                     style: Theme.of(context).textTheme.labelMedium,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
@@ -891,7 +894,7 @@ class _WorkoutFinishEditingPageState extends State<WorkoutFinishEditingPage> {
         appBar: PreferredSize(
           preferredSize: const Size(0, kToolbarHeight + 1),
           child: AppBar(
-            title: Text("historyEditor.finish.title".t),
+            title: Text(context.t.historyEditor.finish.title),
             leading: const CloseButton(),
             bottom: const PreferredSize(
               preferredSize: Size(0, 1),
@@ -919,19 +922,31 @@ class _WorkoutFinishEditingPageState extends State<WorkoutFinishEditingPage> {
                           TextFormField(
                             controller: titleController,
                             decoration: _decoration(
-                              "historyEditor.finish.fields.name.label".t,
+                              context.t.historyEditor.finish.fields.name.label,
                             ),
                             validator: (string) {
                               if (string == null || string.isEmpty) {
-                                return "historyEditor.finish.fields.name.errors.empty"
-                                    .t;
+                                return context
+                                    .t
+                                    .historyEditor
+                                    .finish
+                                    .fields
+                                    .name
+                                    .errors
+                                    .empty;
                               }
                               return null;
                             },
                           ),
                         DateField(
                           decoration: _decoration(
-                            "historyEditor.finish.fields.startingTime.label".t,
+                            context
+                                .t
+                                .historyEditor
+                                .finish
+                                .fields
+                                .startingTime
+                                .label,
                           ),
                           date: startingDate,
                           onSelect: (date) =>
@@ -943,7 +958,13 @@ class _WorkoutFinishEditingPageState extends State<WorkoutFinishEditingPage> {
                           RoutineFormPicker(
                             key: ValueKey(parentWorkoutID),
                             decoration: _decoration(
-                              "historyEditor.finish.fields.parent.label".t,
+                              context
+                                  .t
+                                  .historyEditor
+                                  .finish
+                                  .fields
+                                  .parent
+                                  .label,
                             ),
                             onChanged: (routine) {
                               setState(() {
@@ -958,12 +979,24 @@ class _WorkoutFinishEditingPageState extends State<WorkoutFinishEditingPage> {
                         TimeInputField(
                           controller: timeController,
                           decoration: _decoration(
-                            "historyEditor.finish.fields.duration.label".t,
+                            context
+                                .t
+                                .historyEditor
+                                .finish
+                                .fields
+                                .duration
+                                .label,
                           ),
                           validator: (duration) {
                             if (duration == null || duration.inSeconds == 0) {
-                              return "historyEditor.finish.fields.duration.errors.empty"
-                                  .t;
+                              return context
+                                  .t
+                                  .historyEditor
+                                  .finish
+                                  .fields
+                                  .duration
+                                  .errors
+                                  .empty;
                             }
                             return null;
                           },
@@ -972,8 +1005,13 @@ class _WorkoutFinishEditingPageState extends State<WorkoutFinishEditingPage> {
                           GTRichTextEditor(
                             controller: infoboxController,
                             decoration: GymTrackerInputDecoration(
-                              labelText:
-                                  "historyEditor.finish.fields.infobox.label".t,
+                              labelText: context
+                                  .t
+                                  .historyEditor
+                                  .finish
+                                  .fields
+                                  .infobox
+                                  .label,
                               alignLabelWithHint: true,
                             ),
                             onTapOutside: () {},
@@ -1039,7 +1077,7 @@ class _WorkoutExerciseReorderDialogState
         appBar: PreferredSize(
           preferredSize: const Size(0, kToolbarHeight + 1),
           child: AppBar(
-            title: Text("historyEditor.exercises.reorder".t),
+            title: Text(context.t.historyEditor.exercises.reorder),
             leading: const CloseButton(),
             bottom: const PreferredSize(
               preferredSize: Size(0, 1),

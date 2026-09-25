@@ -3,9 +3,9 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:get/get.dart';
+import 'package:get/get.dart' hide Translations;
+import 'package:gymtracker/i18n/strings.g.dart';
 import 'package:gymtracker/icons/gymtracker_icons.dart';
-import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/service/logger.dart';
 import 'package:gymtracker/service/notifications.dart';
 import 'package:gymtracker/utils/constants.dart';
@@ -34,7 +34,7 @@ class NotificationController extends GetxController implements Listenable {
   Widget get settingsTile {
     return StreamBuilder(
       stream: status,
-      builder: (_, __) {
+      builder: (context, __) {
         final hasPermission = !showSettingsTileStream.value;
         if (showSettingsTileStream.value == false) {
           return const SizedBox.shrink();
@@ -42,8 +42,8 @@ class NotificationController extends GetxController implements Listenable {
         if (!hasPermission) {
           return ListTile(
             leading: const Icon(GTIcons.notification_dialog),
-            title: Text("settings.options.notifications.label".t),
-            subtitle: Text("settings.permissions.tapToRequest".t),
+            title: Text(context.t.settings.options.notifications.label),
+            subtitle: Text(context.t.settings.permissions.tapToRequest),
             onTap: () {
               requestPermission();
             },
@@ -52,10 +52,16 @@ class NotificationController extends GetxController implements Listenable {
         if (shouldShowAndroidExactAlarmPermissionRequest) {
           return ListTile(
             leading: const Icon(GTIcons.notification_dialog),
-            title: Text("settings.options.notifications.label".t),
+            title: Text(context.t.settings.options.notifications.label),
             subtitle: Text(
-                "settings.options.notifications.subtitle.noExactAlarmPermission"
-                    .t),
+              context
+                  .t
+                  .settings
+                  .options
+                  .notifications
+                  .subtitle
+                  .noExactAlarmPermission,
+            ),
             onTap: () {
               androidRequestExactAlarmsPermission();
             },
@@ -72,24 +78,30 @@ class NotificationController extends GetxController implements Listenable {
       // Android 14
       android: VersionRequirement(min: 34),
     );
-    bool result = await service.plugin
+    bool result =
+        await service.plugin
             .resolvePlatformSpecificImplementation<
-                AndroidFlutterLocalNotificationsPlugin>()
+              AndroidFlutterLocalNotificationsPlugin
+            >()
             ?.canScheduleExactNotifications() ??
         true;
     hasAndroidScheduleExactAlarmPermission = result;
 
     status.listen((_) {
       logger.i("NotificationController status changed");
-      showSettingsTileStream.add(!(hasPermission &&
-          (!usesAndroidExactAlarmPermission ||
-              hasAndroidScheduleExactAlarmPermission)));
+      showSettingsTileStream.add(
+        !(hasPermission &&
+            (!usesAndroidExactAlarmPermission ||
+                hasAndroidScheduleExactAlarmPermission)),
+      );
     });
     hasPermission = await _getHasPermission();
 
-    logger.i("Has permission: $hasPermission\n"
-        "(Android) Uses \"Schedule exact alarms\" permission: $usesAndroidExactAlarmPermission\n"
-        "(Android 14+) Has \"Schedule exact alarms\" permission: $hasAndroidScheduleExactAlarmPermission\n");
+    logger.i(
+      "Has permission: $hasPermission\n"
+      "(Android) Uses \"Schedule exact alarms\" permission: $usesAndroidExactAlarmPermission\n"
+      "(Android 14+) Has \"Schedule exact alarms\" permission: $hasAndroidScheduleExactAlarmPermission\n",
+    );
 
     notifyListeners();
   }
@@ -99,19 +111,22 @@ class NotificationController extends GetxController implements Listenable {
     if (Platform.isMacOS) {
       final perms = await service.plugin
           .resolvePlatformSpecificImplementation<
-              MacOSFlutterLocalNotificationsPlugin>()!
+            MacOSFlutterLocalNotificationsPlugin
+          >()!
           .checkPermissions();
       return perms!.isEnabled;
     } else if (Platform.isIOS) {
       final perms = await service.plugin
           .resolvePlatformSpecificImplementation<
-              IOSFlutterLocalNotificationsPlugin>()!
+            IOSFlutterLocalNotificationsPlugin
+          >()!
           .checkPermissions();
       return perms!.isEnabled;
     } else if (Platform.isAndroid) {
       final perms = await service.plugin
           .resolvePlatformSpecificImplementation<
-              AndroidFlutterLocalNotificationsPlugin>()!
+            AndroidFlutterLocalNotificationsPlugin
+          >()!
           .areNotificationsEnabled();
       return perms ?? true;
     } else {
@@ -119,13 +134,13 @@ class NotificationController extends GetxController implements Listenable {
     }
   }
 
-  requestPermission() async {
+  Future<void> requestPermission() async {
     if (hasPermission) return;
 
     try {
-      await Permission.notification
-          .request()
-          .then((status) => status.isGranted);
+      await Permission.notification.request().then(
+        (status) => status.isGranted,
+      );
     } on PlatformException catch (e) {
       if (e.code == "ERROR_ALREADY_REQUESTING_PERMISSIONS") {
         logger.i("Permission already being requested.", error: e);
@@ -140,11 +155,13 @@ class NotificationController extends GetxController implements Listenable {
     notifyListeners();
   }
 
-  androidRequestExactAlarmsPermission() async {
+  Future<void> androidRequestExactAlarmsPermission() async {
     if (!usesAndroidExactAlarmPermission) return;
     if (!hasPermission) {
-      logger.i("We don't have notifications permission. "
-          "Don't bother asking for exact alarms.");
+      logger.i(
+        "We don't have notifications permission. "
+        "Don't bother asking for exact alarms.",
+      );
       return;
     }
     if (hasAndroidScheduleExactAlarmPermission) {
@@ -153,15 +170,16 @@ class NotificationController extends GetxController implements Listenable {
     }
 
     final shouldAsk = await Go.confirm(
-      "androidRequestExactAlarmsPermission.title",
-      "androidRequestExactAlarmsPermission.message",
+      t.androidRequestExactAlarmsPermission.title,
+      t.androidRequestExactAlarmsPermission.message,
       icon: const Icon(GTIcons.notification_dialog),
     );
 
     if (shouldAsk) {
       final hasPermissionNow = await service.plugin
           .resolvePlatformSpecificImplementation<
-              AndroidFlutterLocalNotificationsPlugin>()
+            AndroidFlutterLocalNotificationsPlugin
+          >()
           ?.requestExactAlarmsPermission();
 
       hasAndroidScheduleExactAlarmPermission = hasPermissionNow ?? false;
@@ -170,7 +188,7 @@ class NotificationController extends GetxController implements Listenable {
     notifyListeners();
   }
 
-  void scheduleRestOverNotification(DateTime targetTime) {
+  void scheduleRestOverNotification(Translations t, DateTime targetTime) {
     if (!hasPermission) return;
     if (shouldShowAndroidExactAlarmPermissionRequest) return;
 
@@ -184,11 +202,11 @@ class NotificationController extends GetxController implements Listenable {
 
     final androidDetails = AndroidNotificationDetails(
       'org.js.samplasion.gymtracker.RestTimeoutChannel',
-      'androidNotificationChannel.name'.t,
-      channelDescription: 'androidNotificationChannel.description'.t,
+      t.androidNotificationChannel.name,
+      channelDescription: t.androidNotificationChannel.description,
       importance: Importance.max,
       priority: Priority.high,
-      ticker: 'ongoingWorkout.restOver'.t,
+      ticker: t.ongoingWorkout.restOver,
     );
     const darwinDetails = DarwinNotificationDetails(
       presentSound: true,
@@ -201,8 +219,8 @@ class NotificationController extends GetxController implements Listenable {
     );
     service.plugin.zonedSchedule(
       id: NotificationIDs.restTimer,
-      title: 'appName'.t,
-      body: 'ongoingWorkout.restOver'.t,
+      title: t.appName,
+      body: t.ongoingWorkout.restOver,
       scheduledDate: targetTimeTZ,
       notificationDetails: notificationDetails,
       androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,

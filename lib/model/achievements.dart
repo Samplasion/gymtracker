@@ -1,6 +1,7 @@
 import 'package:drift/drift.dart';
 import 'package:flutter/material.dart';
 import 'package:gymtracker/db/database.dart';
+import 'package:gymtracker/i18n/strings.g.dart';
 import 'package:gymtracker/utils/extensions.dart';
 import 'package:syncable/syncable.dart';
 import 'package:uuid/uuid.dart';
@@ -55,18 +56,18 @@ final class Achievement {
   }
 }
 
-Map<String, String> _defaultParameters() => {};
+List<String> _defaultParameters(Translations t) => [];
 
 final class AchievementLevel {
   final String achievementID;
   final int level;
   final String nameKey;
   final String descriptionKey;
-  final Map<String, String> Function() descriptionParameters;
+  final List<String> Function(Translations t) descriptionParameters;
   final AchievementTrigger trigger;
   final bool Function(double? progress) checkCompletion;
   final double Function()? progress;
-  final String Function(double value)? progressText;
+  final String Function(Translations t, double value)? progressText;
   final double Function()? progressMax;
 
   const AchievementLevel({

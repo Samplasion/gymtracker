@@ -2,6 +2,7 @@ import 'package:flex_color_picker/flex_color_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:gymtracker/gen/colors.gen.dart';
+import 'package:gymtracker/i18n/strings.g.dart';
 
 typedef OnChange<T> = void Function(T value);
 
@@ -118,8 +119,8 @@ class _ColorModalTileState extends State<ColorModalTile>
                           runSpacing: 5,
                           wheelDiameter: 155,
                           heading: Text(
-                            "settings.colorPicker.heading.label".trParams(
-                              {"color": ColorTools.nameThatColor(_value)},
+                            context.t.settings.colorPicker.heading.label(
+                              color: ColorTools.nameThatColor(_value),
                             ),
                             style: Theme.of(context).textTheme.titleSmall,
                           ),
@@ -128,12 +129,15 @@ class _ColorModalTileState extends State<ColorModalTile>
                             ctrlC: false,
                             ctrlV: false,
                           ),
-                          materialNameTextStyle:
-                              Theme.of(context).textTheme.bodySmall,
-                          colorNameTextStyle:
-                              Theme.of(context).textTheme.bodySmall,
-                          colorCodeTextStyle:
-                              Theme.of(context).textTheme.bodySmall,
+                          materialNameTextStyle: Theme.of(
+                            context,
+                          ).textTheme.bodySmall,
+                          colorNameTextStyle: Theme.of(
+                            context,
+                          ).textTheme.bodySmall,
+                          colorCodeTextStyle: Theme.of(
+                            context,
+                          ).textTheme.bodySmall,
                           enableShadesSelection: false,
                           pickersEnabled: const <ColorPickerType, bool>{
                             ColorPickerType.both: false,
@@ -154,16 +158,22 @@ class _ColorModalTileState extends State<ColorModalTile>
                             alignment: WrapAlignment.end,
                             children: [
                               TextButton(
-                                child: Text(MaterialLocalizations.of(context)
-                                    .cancelButtonLabel),
+                                child: Text(
+                                  MaterialLocalizations.of(
+                                    context,
+                                  ).cancelButtonLabel,
+                                ),
                                 onPressed: () {
                                   widget.onChange?.call(oldValue);
                                   Navigator.of(context).pop(false);
                                 },
                               ),
                               TextButton(
-                                child: Text(MaterialLocalizations.of(context)
-                                    .okButtonLabel),
+                                child: Text(
+                                  MaterialLocalizations.of(
+                                    context,
+                                  ).okButtonLabel,
+                                ),
                                 onPressed: () {
                                   if (widget.onChange != null) {
                                     widget.onChange!(widget.selectedValue);

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_quill/flutter_quill.dart';
+import 'package:gymtracker/i18n/strings.g.dart';
 import 'package:gymtracker/icons/gymtracker_icons.dart';
-import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/view/components/rich_text_editor.dart';
 import 'package:gymtracker/view/utils/input_decoration.dart';
@@ -21,7 +21,7 @@ class GTRichTextEditDialog extends StatelessWidget {
     return Dialog.fullscreen(
       child: Scaffold(
         appBar: AppBar(
-          title: Text('exercise.editor.fields.notes.label'.t),
+          title: Text(context.t.exercise.editor.fields.notes.label),
           actions: [
             IconButton(
               onPressed: () {
@@ -38,7 +38,7 @@ class GTRichTextEditDialog extends StatelessWidget {
               controller: controller,
               autofocus: true,
               decoration: GymTrackerInputDecoration(
-                labelText: "exercise.editor.fields.notes.label".t,
+                labelText: context.t.exercise.editor.fields.notes.label,
               ),
             ),
           ),

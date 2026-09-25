@@ -2,8 +2,8 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
-import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/service/logger.dart';
+import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/view/utils/input_decoration.dart';
 import 'package:intl/intl.dart';
 
@@ -86,28 +86,33 @@ class _DateFieldState extends State<DateField> {
         _isFocused = value;
       },
       actions: <Type, Action<Intent>>{
-        ActivateIntent: CallbackAction<Intent>(onInvoke: (intent) {
-          _openDialog();
-          return null;
-        }),
-        NextFocusIntent: CallbackAction<NextFocusIntent>(onInvoke: (intent) {
-          logger.d("Next focus");
-          FocusManager.instance.primaryFocus?.nextFocus();
-        }),
-        PreviousFocusIntent:
-            CallbackAction<PreviousFocusIntent>(onInvoke: (intent) {
-          logger.d("Previous focus");
-          FocusManager.instance.primaryFocus?.previousFocus();
-        }),
+        ActivateIntent: CallbackAction<Intent>(
+          onInvoke: (intent) {
+            _openDialog();
+            return null;
+          },
+        ),
+        NextFocusIntent: CallbackAction<NextFocusIntent>(
+          onInvoke: (intent) {
+            logger.d("Next focus");
+            FocusManager.instance.primaryFocus?.nextFocus();
+          },
+        ),
+        PreviousFocusIntent: CallbackAction<PreviousFocusIntent>(
+          onInvoke: (intent) {
+            logger.d("Previous focus");
+            FocusManager.instance.primaryFocus?.previousFocus();
+          },
+        ),
       },
       child: TextFormField(
         focusNode: _noTabNode,
         statesController: _widgetStatesController,
         decoration: decoration,
         controller: TextEditingController(
-          text: DateFormat.yMEd(context.locale.languageCode)
-              .add_jm()
-              .format(widget.date),
+          text: DateFormat.yMEd(
+            context.locale.languageCode,
+          ).add_jm().format(widget.date),
         ),
         readOnly: true,
         canRequestFocus: false,
@@ -130,15 +135,14 @@ class _DateFieldState extends State<DateField> {
       TimeOfDay? time = await showTimePicker(
         // ignore: use_build_context_synchronously
         context: context,
-        initialTime:
-            TimeOfDay(hour: widget.date.hour, minute: widget.date.minute),
+        initialTime: TimeOfDay(
+          hour: widget.date.hour,
+          minute: widget.date.minute,
+        ),
       );
 
       if (time != null) {
-        date = date.copyWith(
-          hour: time.hour,
-          minute: time.minute,
-        );
+        date = date.copyWith(hour: time.hour, minute: time.minute);
         widget.onSelect(date);
       }
     }

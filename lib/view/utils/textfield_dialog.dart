@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:gymtracker/service/localizations.dart';
+import 'package:gymtracker/i18n/strings.g.dart';
 import 'package:gymtracker/view/utils/input_decoration.dart';
 
 class TextFieldDialog extends StatefulWidget {
@@ -23,8 +23,9 @@ class TextFieldDialog extends StatefulWidget {
 
 class _TextFieldDialogState extends State<TextFieldDialog> {
   var formKey = GlobalKey<FormState>();
-  late TextEditingController controller =
-      TextEditingController(text: widget.initialValue);
+  late TextEditingController controller = TextEditingController(
+    text: widget.initialValue,
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -42,7 +43,7 @@ class _TextFieldDialogState extends State<TextFieldDialog> {
             onPressed: () {
               Get.back();
             },
-            child: Text("general.dialogs.actions.cancel".t),
+            child: Text(context.t.general.dialogs.actions.cancel),
           ),
           FilledButton.tonal(
             onPressed: () {
@@ -51,7 +52,7 @@ class _TextFieldDialogState extends State<TextFieldDialog> {
                 Get.back();
               }
             },
-            child: Text("general.dialogs.actions.ok".t),
+            child: Text(context.t.general.dialogs.actions.ok),
           ),
         ],
       ),

@@ -4,14 +4,14 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:gymtracker/controller/achievements_controller.dart';
 import 'package:gymtracker/data/achievements.dart';
+import 'package:gymtracker/i18n/strings.g.dart';
 import 'package:gymtracker/icons/gymtracker_icons.dart';
 import 'package:gymtracker/model/achievements.dart';
-import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/utils/constants.dart';
+import 'package:gymtracker/utils/extensions.dart' hide ContextThemingUtils;
 import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/view/components/controlled.dart';
 import 'package:gymtracker/view/components/loading_indicator.dart';
-import 'package:gymtracker/view/skeleton.dart';
 import 'package:gymtracker/view/utils/achievements.dart';
 import 'package:gymtracker/view/utils/sliver_utils.dart';
 import 'package:intl/intl.dart';
@@ -32,12 +32,12 @@ class _AchievementsViewState
       body: CustomScrollView(
         slivers: [
           SliverAppBar.large(
-            title: Text("achievements.title".t),
+            title: Text(context.t.achievements.title),
             actions: [
               IconButton(
                 icon: const Icon(GTIcons.history),
                 onPressed: () => Go.to(() => const AchievementHistoryScreen()),
-                tooltip: "achievements.history".t,
+                tooltip: context.t.achievements.history,
               ),
             ],
           ),
@@ -124,7 +124,7 @@ class AchievementGridTile extends ControlledWidget<AchievementsController> {
                 ),
                 // const Spacer(),
                 Text(
-                  level.localizedName,
+                  level.getLocalizedName(context.t),
                   textAlign: TextAlign.center,
                   style: context.theme.textTheme.bodyLarge,
                   maxLines: 2,
@@ -132,7 +132,7 @@ class AchievementGridTile extends ControlledWidget<AchievementsController> {
                 ),
                 Text(
                   achievement.shouldShowDescriptionFor(level.level)
-                      ? level.localizedDescription
+                      ? level.getLocalizedDescription(context.t)
                       : "???",
                   textAlign: TextAlign.center,
                   style: context.theme.textTheme.bodySmall,
@@ -183,13 +183,13 @@ class AchievementGetDialog extends ControlledWidget<AchievementsController> {
             ),
             const SizedBox(height: 16),
             Text(
-              level.localizedName,
+              level.getLocalizedName(context.t),
               textAlign: TextAlign.center,
               style: context.theme.textTheme.bodyLarge,
             ),
             Text(
               achievement.shouldShowDescriptionFor(level.level)
-                  ? level.localizedDescription
+                  ? level.getLocalizedDescription(context.t)
                   : "???",
               textAlign: TextAlign.center,
             ),
@@ -202,18 +202,18 @@ class AchievementGetDialog extends ControlledWidget<AchievementsController> {
                   value: level.progress!() / level.progressMax!(),
                 ),
               ),
-              Text(_getProgressText(), textAlign: TextAlign.center),
+              Text(_getProgressText(context), textAlign: TextAlign.center),
             ],
             const SizedBox(height: 16),
             if (completion != null || !level.canShowProgress) ...[
               Text(
                 completion == null
-                    ? "achievements.locked".t
-                    : "achievements.unlockedOn".tParams({
-                        "date": DateFormat.yMMMMEEEEd(
+                    ? context.t.achievements.locked
+                    : context.t.achievements.unlockedOn(
+                        date: DateFormat.yMMMMEEEEd(
                           context.locale.languageCode,
                         ).add_Hms().format(completion.completedAt),
-                      }),
+                      ),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 16),
@@ -230,13 +230,13 @@ class AchievementGetDialog extends ControlledWidget<AchievementsController> {
     );
   }
 
-  String _getProgressText() {
+  String _getProgressText(BuildContext context) {
     assert(level.canShowProgress);
     final progress = level.progress!();
     final progressMax = level.progressMax!();
 
     if (level.progressText != null) {
-      return "${level.progressText!(progress)} / ${level.progressText!(progressMax)}";
+      return "${level.progressText!(context.t, progress)} / ${level.progressText!(context.t, progressMax)}";
     } else {
       return "$progress / $progressMax";
     }
@@ -250,7 +250,7 @@ class AchievementHistoryScreen
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("achievements.history".t)),
+      appBar: AppBar(title: Text(context.t.achievements.history)),
       body: CustomScrollView(
         slivers: [
           StreamBuilder<List<AchievementCompletion>>(
@@ -278,18 +278,20 @@ class AchievementHistoryScreen
                       enabled: true,
                       size: 48,
                     ),
-                    title: Text(level.localizedName),
+                    title: Text(level.getLocalizedName(context.t)),
                     subtitle: Text.rich(
                       TextSpan(
                         children: [
-                          TextSpan(text: level.localizedDescription),
+                          TextSpan(
+                            text: level.getLocalizedDescription(context.t),
+                          ),
                           const TextSpan(text: "\n"),
                           TextSpan(
-                            text: "achievements.unlockedOn".tParams({
-                              "date": DateFormat.yMMMMEEEEd(
+                            text: context.t.achievements.unlockedOn(
+                              date: DateFormat.yMMMMEEEEd(
                                 context.locale.languageCode,
                               ).add_Hms().format(completion.completedAt),
-                            }),
+                            ),
                           ),
                         ],
                       ),

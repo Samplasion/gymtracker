@@ -10,7 +10,7 @@ class PermissionsSettingsPane extends ControlledWidget<SettingsController> {
         child: CustomScrollView(
           slivers: [
             SliverAppBar.large(
-              title: Text("settings.panes.permissions".t),
+              title: Text(context.t.settings.panes.permissions),
               leading: MDVConfiguration.backButtonOf(context),
             ),
             SliverList(
@@ -37,7 +37,8 @@ class FoodPermissionsSettingsTile extends ConsumerWidget {
     final show = ref.watch(showFoodPermissionsSettingsTileProvider);
     if (!show) return const SizedBox.shrink();
 
-    final perms = ref.watch(foodPermissionsProvider).asData?.value ??
+    final perms =
+        ref.watch(foodPermissionsProvider).asData?.value ??
         (camera: false, gallery: false);
 
     return Column(
@@ -45,8 +46,8 @@ class FoodPermissionsSettingsTile extends ConsumerWidget {
         if (!perms.camera)
           ListTile(
             leading: const Icon(GTIcons.camera),
-            title: Text("food.addCustomFood.permission.camera".t),
-            subtitle: Text("settings.permissions.tapToRequest".t),
+            title: Text(context.t.food.addCustomFood.permission.camera),
+            subtitle: Text(context.t.settings.permissions.tapToRequest),
             onTap: () {
               ref
                   .read(foodPermissionsProvider.notifier)
@@ -56,8 +57,8 @@ class FoodPermissionsSettingsTile extends ConsumerWidget {
         if (!perms.gallery)
           ListTile(
             leading: const Icon(GTIcons.gallery),
-            title: Text("food.addCustomFood.permission.gallery".t),
-            subtitle: Text("settings.permissions.tapToRequest".t),
+            title: Text(context.t.food.addCustomFood.permission.gallery),
+            subtitle: Text(context.t.settings.permissions.tapToRequest),
             onTap: () {
               ref
                   .read(foodPermissionsProvider.notifier)

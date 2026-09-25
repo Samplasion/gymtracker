@@ -4,7 +4,6 @@ import 'package:flutter/material.dart' hide Material;
 import 'package:flutter/scheduler.dart';
 import 'package:get/get.dart';
 import 'package:gymtracker/icons/gymtracker_icons.dart';
-import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/service/logger.dart';
 import 'package:gymtracker/view/components/loading_indicator.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
@@ -149,8 +148,8 @@ class Go {
       builder: (context) {
         return AlertDialog(
           icon: icon ?? const Icon(GTIcons.info),
-          title: Text(title.t),
-          content: Text(body.t, style: bodyStyle),
+          title: Text(title),
+          content: Text(body, style: bodyStyle),
           scrollable: scrollable,
           clipBehavior: Clip.hardEdge,
           actions: [
@@ -167,19 +166,14 @@ class Go {
     );
   }
 
-  static Future<bool> confirm(
-    String title,
-    String body, {
-    Widget? icon,
-    String Function(String) transformText = _defaultT,
-  }) {
+  static Future<bool> confirm(String title, String body, {Widget? icon}) {
     return showDialog<bool>(
       context: Get.context!,
       builder: (context) {
         return AlertDialog(
           icon: icon ?? const Icon(GTIcons.info),
-          title: Text(title.t),
-          content: Text(body.t),
+          title: Text(title),
+          content: Text(body),
           actions: [
             TextButton(
               onPressed: () {
@@ -208,7 +202,6 @@ class Go {
     String body, {
     Widget? icon,
     required TextEditingController controller,
-    String Function(String) transformText = _defaultT,
     String? Function(String?)? validator,
     String? hintText,
   }) {
@@ -222,11 +215,11 @@ class Go {
                 controller.text.trim().isNotEmpty;
             return AlertDialog(
               icon: icon ?? const Icon(GTIcons.info),
-              title: Text(transformText(title)),
+              title: Text(title),
               content: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text(transformText(body)),
+                  Text(body),
                   const SizedBox(height: 16),
                   TextFormField(
                     autofocus: true,
@@ -234,9 +227,7 @@ class Go {
                     controller: controller,
                     decoration: InputDecoration(
                       border: const OutlineInputBorder(),
-                      hintText: hintText == null
-                          ? null
-                          : transformText(hintText),
+                      hintText: hintText,
                       errorText: validator?.call(controller.text),
                     ),
                     onChanged: (value) {
@@ -639,11 +630,11 @@ class Go {
             future: computation,
             builder: (context, snapshot) {
               return AlertDialog(
-                title: Text(title.t),
+                title: Text(title),
                 content: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    if (body != null) Text(body.t),
+                    if (body != null) Text(body),
                     if (snapshot.connectionState ==
                         ConnectionState.waiting) ...[
                       const SizedBox(height: 16),
@@ -759,8 +750,6 @@ class Go {
     return completer.future.whenComplete(() => sub.cancel());
   }
 }
-
-String _defaultT(String s) => s.t;
 
 class _NoAnimationPageTransitionsBuilder extends PageTransitionsBuilder {
   const _NoAnimationPageTransitionsBuilder();

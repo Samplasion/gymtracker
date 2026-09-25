@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:gymtracker/controller/history_controller.dart';
+import 'package:gymtracker/i18n/strings.g.dart';
 import 'package:gymtracker/icons/gymtracker_icons.dart';
 import 'package:gymtracker/model/workout.dart';
-import 'package:gymtracker/service/localizations.dart';
+import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/view/exercises.dart';
 import 'package:gymtracker/view/utils/exercise.dart';
 import 'package:gymtracker/view/utils/workout_utils.dart';
@@ -83,8 +84,8 @@ class HistoryWorkout extends StatelessWidget {
             if (workout.exercises.length > showExercises) ...[
               ListTile(
                 title: Text(
-                  "history.andMore".plural(
-                    workout.displayExerciseCount - showExercises,
+                  context.t.history.andMore(
+                    n: workout.displayExerciseCount - showExercises,
                   ),
                 ),
               ),

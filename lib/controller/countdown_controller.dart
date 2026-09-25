@@ -3,6 +3,8 @@ import 'dart:async';
 import 'package:get/get.dart';
 import 'package:gymtracker/controller/coordinator.dart';
 import 'package:gymtracker/controller/notifications_controller.dart';
+import 'package:gymtracker/main.dart';
+import 'package:gymtracker/provider/locale.dart';
 import 'package:gymtracker/service/logger.dart';
 
 class CountdownController extends GetxController {
@@ -31,7 +33,9 @@ class CountdownController extends GetxController {
     }
   }
 
-  _onUpdate() {
+  void _onUpdate() {
+    final t = globalContainer.read(translationsProvider);
+
     timer?.cancel();
     notificationController.cancelRestOverNotification();
 
@@ -40,7 +44,7 @@ class CountdownController extends GetxController {
     if (targetTime.value != null) {
       timer = Timer(targetTime.value!.difference(DateTime.now()), _onRing);
 
-      notificationController.scheduleRestOverNotification(targetTime.value!);
+      notificationController.scheduleRestOverNotification(t, targetTime.value!);
     }
   }
 

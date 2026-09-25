@@ -3,12 +3,12 @@ import 'package:gymtracker/controller/settings_controller.dart';
 import 'package:gymtracker/data/distance.dart';
 import 'package:gymtracker/data/exercises.dart';
 import 'package:gymtracker/data/weights.dart';
+import 'package:gymtracker/i18n/strings.g.dart';
 import 'package:gymtracker/icons/gymtracker_icons.dart';
 import 'package:gymtracker/model/exercisable.dart';
 import 'package:gymtracker/model/exercise.dart';
 import 'package:gymtracker/model/set.dart';
 import 'package:gymtracker/model/superset.dart';
-import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/utils/utils.dart';
 import 'package:gymtracker/view/components/badges.dart';
@@ -136,9 +136,9 @@ class ExerciseListTile extends StatelessWidget {
                 child: Icon(GTIcons.superset),
               ),
               const TextSpan(text: " "),
-              TextSpan(text: "superset".plural(exercise.exercises.length)),
+              TextSpan(text: context.t.superset(n: exercise.exercises.length)),
             ] else if (exercise is Exercise) ...[
-              TextSpan(text: exercise.displayName),
+              TextSpan(text: exercise.getDisplayName(context.t)),
               if (exercise.isCustom) ...[
                 const TextSpan(text: " "),
                 const WidgetSpan(
@@ -160,26 +160,31 @@ class ExerciseListTile extends StatelessWidget {
     );
   }
 
-  String _buildWeight(double weight) => Weights.convert(
+  String _buildWeight(BuildContext context, double weight) => Weights.convert(
     value: weight,
     from: weightUnit!,
     to: settingsController.weightUnit.value,
-  ).userFacingWeight;
-  String _buildReps(int? reps) => "exerciseList.fields.reps".plural(reps ?? 0);
+  ).getUserFacingWeight(context.t);
+
+  String _buildReps(BuildContext context, int? reps) =>
+      context.t.exerciseList.fields.reps(n: reps ?? 0);
+
   String _buildTime(BuildContext context, Duration time) =>
       TimerView.buildTimeString(context, time, builder: (time) => time.text!);
-  String _buildDistance(double? distance) => Distance.convert(
-    value: distance ?? 0,
-    from: distanceUnit!,
-    to: settingsController.distanceUnit.value,
-  ).userFacingDistance;
+
+  String _buildDistance(BuildContext context, double? distance) =>
+      Distance.convert(
+        value: distance ?? 0,
+        from: distanceUnit!,
+        to: settingsController.distanceUnit.value,
+      ).getUserFacingDistance(context.t);
 
   Text? _buildSubtitle(BuildContext context) {
     final exercise = this.exercise;
     if (exercise is Superset) {
       if (exercise.exercises.isEmpty) return null;
       return Text(
-        exercise.exercises.map((e) => e.displayName).join(", "),
+        exercise.exercises.map((e) => e.getDisplayName(context.t)).join(", "),
         maxLines: 2,
         overflow: TextOverflow.ellipsis,
       );
@@ -191,16 +196,19 @@ class ExerciseListTile extends StatelessWidget {
       switch (exercise.parameters) {
         case GTSetParameters.repsWeight:
           formattedSets = exercise.sets.map(
-            (set) => "${_buildReps(set.reps)} ${_buildWeight(set.weight ?? 0)}",
+            (set) =>
+                "${_buildReps(context, set.reps)} ${_buildWeight(context, set.weight ?? 0)}",
           );
 
         case GTSetParameters.freeBodyReps:
-          formattedSets = exercise.sets.map((set) => _buildReps(set.reps));
+          formattedSets = exercise.sets.map(
+            (set) => _buildReps(context, set.reps),
+          );
 
         case GTSetParameters.timeWeight:
           formattedSets = exercise.sets.map(
             (set) =>
-                "${_buildReps(set.reps)} ${_buildTime(context, set.time ?? Duration.zero)}",
+                "${_buildReps(context, set.reps)} ${_buildTime(context, set.time ?? Duration.zero)}",
           );
 
         case GTSetParameters.time:
@@ -210,7 +218,7 @@ class ExerciseListTile extends StatelessWidget {
 
         case GTSetParameters.distance:
           formattedSets = exercise.sets.map(
-            (set) => _buildDistance(set.distance),
+            (set) => _buildDistance(context, set.distance),
           );
 
         case GTSetParameters.setless:
@@ -250,7 +258,7 @@ class ExerciseBadgeRow extends StatelessWidget {
 
   const ExerciseBadgeRow({required this.exercise, super.key});
 
-  static shouldShow(Exercise exercise) {
+  static bool shouldShow(Exercise exercise) {
     return [exercise.rpe != null].any((element) => element);
   }
 

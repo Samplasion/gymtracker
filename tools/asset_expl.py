@@ -6,7 +6,7 @@ import re
 
 cwd = os.getcwd()
 
-langs = [file.replace('.json', '') for file in os.listdir(f'{cwd}/assets/i18n')]
+langs = [file.replace('.json', '') for file in os.listdir(f'{cwd}/lib/i18n')]
 
 def generate_category_list():
   categories = set()

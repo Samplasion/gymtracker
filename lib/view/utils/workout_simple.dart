@@ -7,11 +7,11 @@ import 'package:gymtracker/controller/settings_controller.dart';
 import 'package:gymtracker/controller/stopwatch_controller.dart';
 import 'package:gymtracker/controller/workout_controller.dart';
 import 'package:gymtracker/data/exercises.dart';
+import 'package:gymtracker/i18n/strings.g.dart';
 import 'package:gymtracker/icons/gymtracker_icons.dart';
 import 'package:gymtracker/model/exercise.dart';
 import 'package:gymtracker/model/set.dart';
 import 'package:gymtracker/model/superset.dart';
-import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/struct/optional.dart';
 import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/utils/go.dart';
@@ -52,7 +52,7 @@ class WorkoutSimpleView extends StatelessWidget {
     final settings = Get.find<SettingsController>();
 
     return Obx(() {
-      final current = _currentSetData(controller);
+      final current = _currentSetData(controller, context);
       final isRestActive = countdownController.isActive;
       final isWorkoutComplete = _isWorkoutComplete(controller);
       final canShowAddExercise = current == null
@@ -83,7 +83,7 @@ class WorkoutSimpleView extends StatelessWidget {
                 : _CurrentSetView(
                     data: current,
                     isRestActive: isRestActive,
-                    nextUp: _nextUpData(controller, current),
+                    nextUp: _nextUpData(context, controller, current),
                     showAddExercise: canShowAddExercise,
                     showAddSet: canShowAddSet,
                     onAddExercise: () async {
@@ -181,11 +181,11 @@ class WorkoutSimpleView extends StatelessWidget {
                 startingTime: DateTime.now(),
               );
             }
-            return Text('ongoingWorkout.title'.t);
+            return Text(context.t.ongoingWorkout.title);
           }),
           actions: [
             IconButton(
-              tooltip: 'ongoingWorkout.simple.restTimer'.t,
+              tooltip: context.t.ongoingWorkout.simple.restTimer,
               onPressed: _canTriggerRestTimer(current)
                   ? () => controller.markSetAsDone(current!.index, -1, true)
                   : null,
@@ -194,7 +194,7 @@ class WorkoutSimpleView extends StatelessWidget {
             PopupMenuButton(
               itemBuilder: (context) =>
                   buildToolboxMenuEntries(context, controller),
-              tooltip: "ongoingWorkout.toolbox.title".t,
+              tooltip: context.t.ongoingWorkout.toolbox.title,
               icon: const Icon(GTIcons.tools),
             ),
             PopupMenuButton(
@@ -203,7 +203,7 @@ class WorkoutSimpleView extends StatelessWidget {
                   PopupMenuItem(
                     child: ListTile(
                       leading: const Icon(GTIcons.workout),
-                      title: Text('ongoingWorkout.simple.switchToFull'.t),
+                      title: Text(context.t.ongoingWorkout.simple.switchToFull),
                       mouseCursor: SystemMouseCursors.click,
                     ),
                     onTap: () {
@@ -230,7 +230,7 @@ class WorkoutSimpleView extends StatelessWidget {
                           },
                     child: ListTile(
                       leading: const Icon(GTIcons.sets),
-                      title: Text('set.kindLong.drop'.t),
+                      title: Text(context.t.set.kindLong["drop"]!),
                       mouseCursor: SystemMouseCursors.click,
                       enabled: current != null,
                     ),
@@ -344,7 +344,7 @@ class _CurrentSetView extends StatelessWidget {
                       ),
                       const TextSpan(text: ' '),
                       TextSpan(
-                        text: 'superset'.plural(data.supersetExerciseCount),
+                        text: context.t.superset(n: data.supersetExerciseCount),
                       ),
                     ],
                   ),
@@ -354,7 +354,7 @@ class _CurrentSetView extends StatelessWidget {
               Text.rich(
                 TextSpan(
                   children: [
-                    TextSpan(text: data.exercise.displayName),
+                    TextSpan(text: data.exercise.getDisplayName(context.t)),
                     const TextSpan(text: ' '),
                     WidgetSpan(
                       alignment: PlaceholderAlignment.middle,
@@ -450,7 +450,7 @@ class _CurrentSetView extends StatelessWidget {
                     ),
                     icon: const Icon(GTIcons.edit, size: 16),
                     label: Text(
-                      '${'exercise.fields.restTime'.t}: ${TimeInputField.encodeDuration(data.restTime)}',
+                      '${context.t.exercise.fields.restTime}: ${TimeInputField.encodeDuration(data.restTime)}',
                       style: Theme.of(context).textTheme.bodySmall,
                     ),
                   ),
@@ -458,7 +458,7 @@ class _CurrentSetView extends StatelessWidget {
               ),
               const SizedBox(height: 8),
               _NotesBox(
-                title: 'exercise.editor.fields.notes.label'.t,
+                title: context.t.exercise.editor.fields.notes.label,
                 text: data.exercise.notes,
                 onTap: () => _showNotesEditor(
                   context,
@@ -472,7 +472,7 @@ class _CurrentSetView extends StatelessWidget {
               if (data.supersetNotes != null) ...[
                 const SizedBox(height: 8),
                 _NotesBox(
-                  title: 'ongoingWorkout.simple.supersetNotes'.t,
+                  title: context.t.ongoingWorkout.simple.supersetNotes,
                   text: data.supersetNotes!,
                   onTap: () => _showNotesEditor(
                     context,
@@ -497,12 +497,12 @@ class _CurrentSetView extends StatelessWidget {
                     if (showAddExercise)
                       FilledButton.tonal(
                         onPressed: onAddExercise,
-                        child: Text('ongoingWorkout.exercises.add'.t),
+                        child: Text(context.t.ongoingWorkout.exercises.add),
                       ),
                     if (showAddSet)
                       FilledButton.tonal(
                         onPressed: onAddSet,
-                        child: Text('exercise.actions.addSet'.t),
+                        child: Text(context.t.exercise.actions.addSet),
                       ),
                   ],
                 ),
@@ -538,7 +538,7 @@ class _NextSetRestView extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Text(
-              'exercise.fields.restTime'.t,
+              context.t.exercise.fields.restTime,
               style: Theme.of(context).textTheme.displaySmall?.copyWith(
                 fontWeight: FontWeight.w700,
                 color: textColor,
@@ -547,9 +547,8 @@ class _NextSetRestView extends StatelessWidget {
             ),
             const SizedBox(height: 14),
             Text(
-              'ongoingWorkout.simple.nextUp'.tParams({
-                'exercise': data.exercise.displayName,
-              }),
+              context.t.ongoingWorkout.simple.nextUp,
+
               style: Theme.of(context).textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.w600,
                 color: textColor,
@@ -575,7 +574,9 @@ class _NextSetRestView extends StatelessWidget {
                                 const Icon(GTIcons.superset, size: 16),
                                 const SizedBox(width: 4),
                                 Text(
-                                  'superset'.plural(data.supersetExerciseCount),
+                                  context.t.superset(
+                                    n: data.supersetExerciseCount,
+                                  ),
                                   style: Theme.of(
                                     context,
                                   ).textTheme.labelMedium,
@@ -585,7 +586,7 @@ class _NextSetRestView extends StatelessWidget {
                             const SizedBox(height: 2),
                           ],
                           Text(
-                            data.exercise.displayName,
+                            data.exercise.getDisplayName(context.t),
                             style: Theme.of(context).textTheme.titleMedium
                                 ?.copyWith(fontWeight: FontWeight.w700),
                           ),
@@ -747,7 +748,7 @@ class _BottomPanel extends StatelessWidget {
                             TextButton(
                               onPressed: countdownController.subtract15Seconds,
                               child: Text(
-                                'timer.subtract15s'.t,
+                                context.t.timer.subtract15s,
                                 style: TextStyle(
                                   color: Theme.of(context).colorScheme.error,
                                 ),
@@ -757,7 +758,7 @@ class _BottomPanel extends StatelessWidget {
                             TextButton(
                               onPressed: countdownController.add15Seconds,
                               child: Text(
-                                'timer.add15s'.t,
+                                context.t.timer.add15s,
                                 style: TextStyle(
                                   color: Theme.of(context).colorScheme.tertiary,
                                 ),
@@ -767,7 +768,7 @@ class _BottomPanel extends StatelessWidget {
                             TextButton.icon(
                               onPressed: countdownController.removeCountdown,
                               icon: const Icon(GTIcons.skip),
-                              label: Text('timer.skip'.t),
+                              label: Text(context.t.timer.skip),
                             ),
                           ],
                         ),
@@ -796,7 +797,7 @@ class _BottomPanel extends StatelessWidget {
                     children: [
                       _RoundControlButton(
                         icon: GTIcons.previousDay,
-                        tooltip: 'ongoingWorkout.simple.previousSet'.t,
+                        tooltip: context.t.ongoingWorkout.simple.previousSet,
                         onPressed: (!controlsDisabled && canGoPrevious)
                             ? onPrevious
                             : null,
@@ -806,23 +807,23 @@ class _BottomPanel extends StatelessWidget {
                       ),
                       _RoundControlButton(
                         icon: GTIcons.weight_calculator,
-                        tooltip: 'ongoingWorkout.weightCalculator'.t,
+                        tooltip: context.t.ongoingWorkout.weightCalculator,
                         onPressed: controlsDisabled ? null : onCalculator,
                       ),
                       _RoundControlButton(
                         icon: GTIcons.done,
-                        tooltip: 'ongoingWorkout.simple.markAsDone'.t,
+                        tooltip: context.t.ongoingWorkout.simple.markAsDone,
                         highlighted: true,
                         onPressed: controlsDisabled ? null : onDone,
                       ),
                       _RoundControlButton(
                         icon: GTIcons.cardio_timer,
-                        tooltip: 'cardioTimer.name'.t,
+                        tooltip: context.t.cardioTimer.name,
                         onPressed: controlsDisabled ? null : onInterval,
                       ),
                       _RoundControlButton(
                         icon: GTIcons.nextDay,
-                        tooltip: 'ongoingWorkout.simple.nextSet'.t,
+                        tooltip: context.t.ongoingWorkout.simple.nextSet,
                         onPressed: (!controlsDisabled && canGoNext)
                             ? onNext
                             : null,
@@ -905,7 +906,7 @@ class _EmptyCurrentSetView extends StatelessWidget {
             FilledButton.icon(
               onPressed: onFinishWorkout,
               icon: const Icon(GTIcons.done),
-              label: Text('ongoingWorkout.actions.finish'.t),
+              label: Text(context.t.ongoingWorkout.actions.finish),
             ),
             const SizedBox(height: 12),
             Wrap(
@@ -915,7 +916,7 @@ class _EmptyCurrentSetView extends StatelessWidget {
               children: [
                 FilledButton.tonal(
                   onPressed: onAddExercise,
-                  child: Text('ongoingWorkout.exercises.add'.t),
+                  child: Text(context.t.ongoingWorkout.exercises.add),
                 ),
               ],
             ),
@@ -930,8 +931,8 @@ class _EmptyCurrentSetView extends StatelessWidget {
         children: [
           Text(
             isRestActive
-                ? 'ongoingWorkout.restOver'.t
-                : 'general.exercises'.plural(0),
+                ? context.t.ongoingWorkout.restOver
+                : context.t.general.exercises(n: 0),
             style: Theme.of(context).textTheme.titleLarge,
             textAlign: TextAlign.center,
           ),
@@ -939,7 +940,7 @@ class _EmptyCurrentSetView extends StatelessWidget {
             const SizedBox(height: 12),
             FilledButton.tonal(
               onPressed: onAddExercise,
-              child: Text('ongoingWorkout.exercises.add'.t),
+              child: Text(context.t.ongoingWorkout.exercises.add),
             ),
           ],
         ],
@@ -965,7 +966,7 @@ class _SimpleSetEditDialogState extends State<_SimpleSetEditDialog> {
     final controller = Get.find<WorkoutController>();
 
     return Scaffold(
-      appBar: AppBar(title: Text('ongoingWorkout.simple.editSet'.t)),
+      appBar: AppBar(title: Text(context.t.ongoingWorkout.simple.editSet)),
       body: SafeArea(
         child: ListView(
           padding: const EdgeInsets.fromLTRB(12, 12, 12, 24),
@@ -1076,7 +1077,10 @@ class _NextUpData {
   });
 }
 
-_CurrentSetData? _currentSetData(WorkoutController controller) {
+_CurrentSetData? _currentSetData(
+  WorkoutController controller,
+  BuildContext context,
+) {
   final cursor = controller.currentSetCursor;
   if (cursor == null) return null;
 
@@ -1095,8 +1099,7 @@ _CurrentSetData? _currentSetData(WorkoutController controller) {
       : ((controller.exercises[cursor.supersetIndex!] as Superset)
             .exercises
             .length);
-  final context = Get.context;
-  final fallbackColor = context?.theme.colorScheme.primary ?? Colors.grey;
+  final fallbackColor = context.theme.colorScheme.primary ?? Colors.grey;
   final exerciseColor = exercise.standard && exercise.category != null
       ? exerciseStandardLibrary[exercise.category]?.color ?? fallbackColor
       : fallbackColor;
@@ -1110,12 +1113,13 @@ _CurrentSetData? _currentSetData(WorkoutController controller) {
     exercise: exercise,
     set: set,
     restTime: restTime,
-    setTypeLabel: _nextUpSetShortLabel(exercise, set),
+    setTypeLabel: _nextUpSetShortLabel(exercise, set, context: context),
     supersetNotes: supersetNotes,
     isInSuperset: cursor.supersetIndex != null,
     supersetExerciseCount: supersetExerciseCount,
     exerciseColor: exerciseColor,
     parametersLabel: set.getHumanReadableDescription(
+      t: context.t,
       weightUnit: controller.weightUnit.value,
       distanceUnit: controller.distanceUnit.value,
     ),
@@ -1140,12 +1144,12 @@ Future<void> _showRestTimeEditor(
   await showDialog<void>(
     context: context,
     builder: (ctx) => AlertDialog(
-      title: Text('exercise.fields.restTime'.t),
+      title: Text(context.t.exercise.fields.restTime),
       content: TimeInputField(
         controller: textController,
         focusNode: focusNode,
         decoration: GymTrackerInputDecoration(
-          labelText: 'exercise.fields.restTime'.t,
+          labelText: context.t.exercise.fields.restTime,
         ),
         onChangedTime: (value) {
           restTime = value ?? Duration.zero;
@@ -1282,6 +1286,7 @@ bool _hasNextSet(WorkoutController controller, WorkoutSetCursor? cursor) {
 }
 
 _NextUpData? _nextUpData(
+  BuildContext context,
   WorkoutController controller,
   _CurrentSetData current,
 ) {
@@ -1299,6 +1304,7 @@ _NextUpData? _nextUpData(
         set: next.set,
         isInSuperset: next.isInSuperset,
         parametersLabel: next.set.getHumanReadableDescription(
+          t: context.t,
           weightUnit: controller.weightUnit.value,
           distanceUnit: controller.distanceUnit.value,
         ),
@@ -1314,6 +1320,7 @@ _NextUpData? _nextUpData(
         set: next.set,
         isInSuperset: next.isInSuperset,
         parametersLabel: next.set.getHumanReadableDescription(
+          t: context.t,
           weightUnit: controller.weightUnit.value,
           distanceUnit: controller.distanceUnit.value,
         ),
@@ -1324,10 +1331,14 @@ _NextUpData? _nextUpData(
   return null;
 }
 
-String _nextUpSetShortLabel(Exercise exercise, GTSet set) {
+String _nextUpSetShortLabel(
+  Exercise exercise,
+  GTSet set, {
+  required BuildContext context,
+}) {
   switch (set.kind) {
     case GTSetKind.warmUp:
-      return 'set.kindShort.warmUp'.t;
+      return context.t.set.kindShort.warmUp;
     case GTSetKind.normal:
       final normalSets = exercise.sets
           .where((element) => element.kind == GTSetKind.normal)
@@ -1336,11 +1347,11 @@ String _nextUpSetShortLabel(Exercise exercise, GTSet set) {
       final index = setIndex < 0 ? 1 : setIndex + 1;
       return index.toString();
     case GTSetKind.drop:
-      return 'set.kindShort.drop'.t;
+      return context.t.set.kindShort.drop;
     case GTSetKind.failure:
-      return 'set.kindShort.failure'.t;
+      return context.t.set.kindShort.failure;
     case GTSetKind.failureStripping:
-      return 'set.kindShort.failureStripping'.t;
+      return context.t.set.kindShort.failureStripping;
   }
 }
 
@@ -1484,7 +1495,7 @@ class _SetTypeBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return PopupMenuButton(
-      tooltip: 'set.kind'.t,
+      tooltip: context.t.set.kind,
       icon: buildSetType(context, set.kind, set: set, allSets: exercise.sets),
       itemBuilder: (context) => buildSetKindMenuEntries(
         context: context,
@@ -1551,7 +1562,7 @@ class _NotesBox extends StatelessWidget {
               const SizedBox(height: 4),
               text.asQuillDocument().isEmpty()
                   ? Text(
-                      'exercise.editor.fields.notes.tapToEdit'.t,
+                      context.t.exercise.editor.fields.notes.tapToEdit,
                       style: notesTextStyle,
                     )
                   : MaybeRichText(text: text, style: notesTextStyle),

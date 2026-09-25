@@ -57,7 +57,7 @@ class __ProfileEditPageState extends ConsumerState<_ProfileEditPage> {
       canPop: !isLoading,
       child: Scaffold(
         appBar: AppBar(
-          title: Text("me.profile.edit.title".t),
+          title: Text(context.t.me.profile.edit.title),
           leading: IconButton(
             icon: const Icon(GTIcons.close),
             onPressed: isLoading ? null : Get.back,
@@ -82,9 +82,9 @@ class __ProfileEditPageState extends ConsumerState<_ProfileEditPage> {
                 controller: _usernameController,
                 onChanged: (_) => _checkCredentials(),
                 decoration: InputDecoration(
-                  labelText: "login.fields.username.label".t,
+                  labelText: context.t.login.fields.username.label,
                   errorText: _state.usernameError
-                      ? "login.errors.username".t
+                      ? context.t.login.errors.username
                       : null,
                 ),
               ),
@@ -93,8 +93,10 @@ class __ProfileEditPageState extends ConsumerState<_ProfileEditPage> {
                 controller: _emailController,
                 onChanged: (_) => _checkCredentials(),
                 decoration: InputDecoration(
-                  labelText: "login.fields.email.label".t,
-                  errorText: _state.emailError ? "login.errors.email".t : null,
+                  labelText: context.t.login.fields.email.label,
+                  errorText: _state.emailError
+                      ? context.t.login.errors.email
+                      : null,
                 ),
               ),
             ],

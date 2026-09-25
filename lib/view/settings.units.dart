@@ -10,7 +10,7 @@ class UnitsSettingsPane extends ControlledWidget<SettingsController> {
         child: CustomScrollView(
           slivers: [
             SliverAppBar.large(
-              title: Text("settings.panes.units".t),
+              title: Text(context.t.settings.panes.units),
               leading: MDVConfiguration.backButtonOf(context),
             ),
             SliverList(
@@ -19,11 +19,12 @@ class UnitsSettingsPane extends ControlledWidget<SettingsController> {
                   () => ValueBuilder<Weights?>(
                     initialValue: controller.weightUnit.value,
                     builder: (value, onChange) => RadioModalTile<Weights?>(
-                      title: Text("settings.options.weightUnit.label".t),
+                      title: Text(context.t.settings.options.weightUnit.label),
                       onChange: onChange,
                       values: {
                         for (final weight in Weights.values)
-                          weight: "weightUnits.${weight.name}".t,
+                          weight:
+                              context.t.weightUnits[weight.name] ?? "UNKNOWN",
                       },
                       selectedValue: value,
                     ),
@@ -34,11 +35,15 @@ class UnitsSettingsPane extends ControlledWidget<SettingsController> {
                   () => ValueBuilder<Distance?>(
                     initialValue: controller.distanceUnit.value,
                     builder: (value, onChange) => RadioModalTile<Distance?>(
-                      title: Text("settings.options.distanceUnit.label".t),
+                      title: Text(
+                        context.t.settings.options.distanceUnit.label,
+                      ),
                       onChange: onChange,
                       values: {
                         for (final distance in Distance.values)
-                          distance: "distanceUnits.${distance.name}".t,
+                          distance:
+                              context.t.distanceUnits[distance.name] ??
+                              "UNKNOWN",
                       },
                       selectedValue: value,
                     ),

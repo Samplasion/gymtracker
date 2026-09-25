@@ -12,8 +12,8 @@ import 'package:gymtracker/controller/logger_controller.dart';
 import 'package:gymtracker/controller/purchases_controller.dart';
 import 'package:gymtracker/controller/routines_controller.dart';
 import 'package:gymtracker/controller/workout_controller.dart';
+import 'package:gymtracker/i18n/strings.g.dart';
 import 'package:gymtracker/icons/gymtracker_icons.dart';
-import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/service/logger.dart';
 import 'package:gymtracker/service/version.dart';
 import 'package:gymtracker/utils/constants.dart';
@@ -207,12 +207,6 @@ class _SkeletonViewState extends State<SkeletonView>
   ];
 
   @override
-  void reassemble() {
-    super.reassemble();
-    Get.find<Coordinator>().onHotReload();
-  }
-
-  @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     Get.find<RoutinesController>().didChangeAppLifecycleState(state);
   }
@@ -339,20 +333,20 @@ class _SkeletonViewState extends State<SkeletonView>
                     destinations: [
                       NavigationDestination(
                         icon: const Icon(GTIcons.home),
-                        label: "feed.title".t,
+                        label: context.t.feed.title,
                       ),
                       NavigationDestination(
                         icon: const Icon(GTIcons.profile),
-                        label: "me.title".t,
+                        label: context.t.me.title,
                       ),
                       NavigationDestination(
                         icon: const Icon(GTIcons.muscle),
-                        label: "workoutPage.title".t,
+                        label: context.t.workoutPage.title,
                       ),
                       if (!isSubscribed)
                         NavigationDestination(
                           icon: const Icon(GTIcons.pro),
-                          label: "pro.title".t,
+                          label: context.t.pro.title,
                         ),
                     ],
                   );
@@ -389,24 +383,24 @@ class _SkeletonViewState extends State<SkeletonView>
         final destinations = [
           NavigationDrawerDestination(
             icon: const Icon(GTIcons.home),
-            label: Text("feed.title".t),
+            label: Text(context.t.feed.title),
           ),
           NavigationDrawerDestination(
             icon: const Icon(GTIcons.profile),
-            label: Text("me.title".t),
+            label: Text(context.t.me.title),
           ),
           NavigationDrawerDestination(
             icon: const Icon(GTIcons.muscle),
-            label: Text("workoutPage.title".t),
+            label: Text(context.t.workoutPage.title),
           ),
           if (!isSubscribed)
             NavigationDrawerDestination(
               icon: const Icon(GTIcons.pro),
-              label: Text("pro.title".t),
+              label: Text(context.t.pro.title),
             ),
           NavigationDrawerDestination(
             icon: const Icon(GTIcons.settings),
-            label: Text("settings.title".t, textAlign: TextAlign.center),
+            label: Text(context.t.settings.title, textAlign: TextAlign.center),
           ),
           if (kDebugMode)
             const NavigationDrawerDestination(
@@ -581,9 +575,9 @@ class __GTDrawerFooterState extends State<_GTDrawerFooter> {
         TextSpan(
           children: [
             TextSpan(
-              text: "appInfo.version".tParams({
-                "version": VersionService().packageInfo.version,
-                "build":
+              text: context.t.appInfo.version(
+                version: VersionService().packageInfo.version,
+                build:
                     const String.fromEnvironment(
                       "BUILD",
                       defaultValue: "[NO_VALUE]",
@@ -591,12 +585,12 @@ class __GTDrawerFooterState extends State<_GTDrawerFooter> {
                       "[NO_VALUE]",
                       VersionService().packageInfo.buildNumber,
                     ),
-              }),
+              ),
               style: Theme.of(context).textTheme.bodySmall,
             ),
             const TextSpan(text: "\n"),
             TextSpan(
-              text: "appInfo.terms".t,
+              text: context.t.appInfo.terms,
               style: Theme.of(context).textTheme.bodySmall!.copyWith(
                 color: Theme.of(context).colorScheme.primary,
               ),
@@ -604,7 +598,7 @@ class __GTDrawerFooterState extends State<_GTDrawerFooter> {
             ),
             const TextSpan(text: " • "),
             TextSpan(
-              text: "appInfo.privacy".t,
+              text: context.t.appInfo.privacy,
               style: Theme.of(context).textTheme.bodySmall!.copyWith(
                 color: Theme.of(context).colorScheme.primary,
               ),
@@ -624,13 +618,13 @@ class _GTDrawerHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     return ListTile(
       title: Text(
-        "appName".t,
+        context.t.appName,
         style: Theme.of(
           context,
         ).textTheme.bodyLarge!.copyWith(fontWeight: FontWeight.bold),
       ),
       subtitle: Text(
-        "appInfo.shortDescription".t,
+        context.t.appInfo.shortDescription,
         style: Theme.of(
           context,
         ).textTheme.bodySmall!.copyWith(fontWeight: FontWeight.w400),
@@ -728,8 +722,12 @@ class OngoingWorkoutBar extends StatelessWidget {
                                   label: Text(
                                     isPhone
                                         ? ""
-                                        : "ongoingWorkout.actions.short.resume"
-                                              .t,
+                                        : context
+                                              .t
+                                              .ongoingWorkout
+                                              .actions
+                                              .short
+                                              .resume,
                                     overflow: TextOverflow.clip,
                                     maxLines: 1,
                                   ),
@@ -764,8 +762,12 @@ class OngoingWorkoutBar extends StatelessWidget {
                                     label: Text(
                                       isPhone
                                           ? ""
-                                          : "ongoingWorkout.actions.short.cancel"
-                                                .t,
+                                          : context
+                                                .t
+                                                .ongoingWorkout
+                                                .actions
+                                                .short
+                                                .cancel,
                                       overflow: TextOverflow.clip,
                                       maxLines: 1,
                                     ),

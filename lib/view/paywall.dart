@@ -6,8 +6,8 @@ import 'package:flutter/scheduler.dart';
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:gymtracker/controller/purchases_controller.dart';
+import 'package:gymtracker/i18n/strings.g.dart';
 import 'package:gymtracker/model/subscription.dart';
-import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/utils/extensions.dart';
 import 'package:purchases_ui_flutter/views/paywall_view.dart';
 import 'package:skeletonizer/skeletonizer.dart';
@@ -103,7 +103,7 @@ class __CustomPaywallViewState extends State<_CustomPaywallView> {
                   child: CustomScrollView(
                     slivers: [
                       CupertinoSliverNavigationBar(
-                        largeTitle: Text("paywall.title".t),
+                        largeTitle: Text("context.t.paywall.title"),
                         padding: const EdgeInsetsDirectional.only(
                           start: 0,
                           end: 16.0,
@@ -128,7 +128,7 @@ class __CustomPaywallViewState extends State<_CustomPaywallView> {
                           Padding(
                             padding: const EdgeInsets.all(16.0),
                             child: Text(
-                              "paywall.subtitle".t,
+                              "context.t.paywall.subtitle",
                               style: Theme.of(context).textTheme.bodyLarge,
                             ),
                           ),
@@ -172,20 +172,15 @@ class __CustomPaywallViewState extends State<_CustomPaywallView> {
                                       var trial = offering.trial;
                                       if (trial == null) return null;
                                       return Text(
-                                        // "paywall.trialPeriod".t.let((t) {
+                                        // context.t.paywall.trialPeriod.let((t) {
                                         trial.periodType.let((t) {
                                           return switch (t) {
                                             SubscriptionPeriod.week =>
-                                              "paywall.trialPeriod.week".plural(
-                                                trial.duration,
-                                              ),
+                                              "context.t.paywall.trialPeriod.week(n: trial.duration)",
                                             SubscriptionPeriod.month =>
-                                              "paywall.trialPeriod.month"
-                                                  .plural(trial.duration),
+                                              "context.t.paywall.trialPeriod.month(n: trial.duration)",
                                             SubscriptionPeriod.year =>
-                                              "paywall.trialPeriod.year".plural(
-                                                trial.duration,
-                                              ),
+                                              "context.t.paywall.trialPeriod.year(n: trial.duration)",
                                           };
                                         }),
                                       );
@@ -233,12 +228,10 @@ class __CustomPaywallViewState extends State<_CustomPaywallView> {
                                             builder: (context) {
                                               return AlertDialog.adaptive(
                                                 title: Text(
-                                                  "paywall.purchaseError.title"
-                                                      .t,
+                                                  "context.t.paywall.purchaseError.title",
                                                 ),
                                                 content: Text(
-                                                  "paywall.purchaseError.subtitle"
-                                                      .t,
+                                                  "context.t.paywall.purchaseError.subtitle",
                                                 ),
                                                 actions: [
                                                   CupertinoButton(
@@ -260,7 +253,9 @@ class __CustomPaywallViewState extends State<_CustomPaywallView> {
                                         }
                                       }
                                     },
-                              child: Text("paywall.actions.subscribe".t),
+                              child: Text(
+                                "context.t.paywall.actions.subscribe",
+                              ),
                             ),
                           ),
                           if (_selectedSubscription != null)
@@ -271,17 +266,11 @@ class __CustomPaywallViewState extends State<_CustomPaywallView> {
                                   return switch (_selectedSubscription!
                                       .duration) {
                                     SubscriptionPeriod.week =>
-                                      "paywall.autoRenewNotice.week".tParams({
-                                        'price': _selectedSubscription!.price,
-                                      }),
+                                      "paywall.autoRenewNotice.week.tParams({'price': _selectedSubscription!.price,})",
                                     SubscriptionPeriod.month =>
-                                      "paywall.autoRenewNotice.month".tParams({
-                                        'price': _selectedSubscription!.price,
-                                      }),
+                                      "paywall.autoRenewNotice.month.tParams({'price': _selectedSubscription!.price,})",
                                     SubscriptionPeriod.year =>
-                                      "paywall.autoRenewNotice.year".tParams({
-                                        'price': _selectedSubscription!.price,
-                                      }),
+                                      "paywall.autoRenewNotice.year.tParams({'price': _selectedSubscription!.price,})",
                                   };
                                 }),
                                 style: Theme.of(context).textTheme.bodySmall,
@@ -321,12 +310,10 @@ class __CustomPaywallViewState extends State<_CustomPaywallView> {
                                               builder: (context) {
                                                 return AlertDialog.adaptive(
                                                   title: Text(
-                                                    "paywall.restoreError.title"
-                                                        .t,
+                                                    "context.t.paywall.restoreError.title",
                                                   ),
                                                   content: Text(
-                                                    "paywall.restoreError.subtitle"
-                                                        .t,
+                                                    "context.t.paywall.restoreError.subtitle",
                                                   ),
                                                   actions: [
                                                     CupertinoButton(
@@ -348,7 +335,7 @@ class __CustomPaywallViewState extends State<_CustomPaywallView> {
                                           }
                                         },
                                   child: Text(
-                                    "paywall.actions.restorePurchase".t,
+                                    "context.t.paywall.actions.restorePurchase",
                                   ),
                                 ),
                                 CupertinoButton(
@@ -360,7 +347,7 @@ class __CustomPaywallViewState extends State<_CustomPaywallView> {
                                           // );
                                         },
                                   child: Text(
-                                    "paywall.actions.termsOfService".t,
+                                    "context.t.paywall.actions.termsOfService",
                                   ),
                                 ),
                                 CupertinoButton(
@@ -372,7 +359,7 @@ class __CustomPaywallViewState extends State<_CustomPaywallView> {
                                           // );
                                         },
                                   child: Text(
-                                    "paywall.actions.privacyPolicy".t,
+                                    "context.t.paywall.actions.privacyPolicy",
                                   ),
                                 ),
                               ],

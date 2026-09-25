@@ -3,7 +3,9 @@ import 'package:flutter/scheduler.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:get/get.dart' hide Rx, ContextExtensionss;
 import 'package:gymtracker/controller/coordinator.dart';
+import 'package:gymtracker/i18n/strings.g.dart';
 import 'package:gymtracker/provider/food.dart';
+import 'package:gymtracker/provider/locale.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:gymtracker/controller/health_controller.dart';
 import 'package:gymtracker/controller/notifications_controller.dart';
@@ -17,7 +19,6 @@ import 'package:gymtracker/provider/online.dart';
 import 'package:gymtracker/provider/sync_status.dart';
 import 'package:gymtracker/service/color.dart';
 import 'package:gymtracker/service/database.dart';
-import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/service/version.dart';
 import 'package:gymtracker/struct/nutrition.dart';
 import 'package:gymtracker/utils/extensions.dart';
@@ -44,13 +45,13 @@ class SettingsView extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final account = ref.watch(onlineProvider).value;
-    var appVersion = "appInfo.version".tParams({
-      "version": VersionService().packageInfo.version,
-      "build": const String.fromEnvironment(
+    var appVersion = context.t.appInfo.version(
+      version: VersionService().packageInfo.version,
+      build: const String.fromEnvironment(
         "BUILD",
         defaultValue: "[NO_VALUE]",
       ).replaceAll("[NO_VALUE]", VersionService().packageInfo.buildNumber),
-    });
+    );
 
     return StreamBuilder<Object>(
       stream: Get.find<Coordinator>().showPermissionTilesStream,
@@ -59,39 +60,39 @@ class SettingsView extends ConsumerWidget {
         final showPermissionsTile = snapshot.data == true;
 
         return MasterDetailView(
-          appBarTitle: Text("settings.title".t),
+          appBarTitle: Text(context.t.settings.title),
           items: [
             MasterItem(
-              Text("settings.panes.appearance".t),
+              Text(context.t.settings.panes.appearance),
               leading: const Icon(GTIcons.appearance),
               detailsBuilder: (_) => const AppearanceSettingsPane(),
             ),
             MasterItem(
-              Text("settings.panes.units".t),
+              Text(context.t.settings.panes.units),
               leading: const Icon(GTIcons.units),
               detailsBuilder: (_) => const UnitsSettingsPane(),
             ),
             MasterItem(
-              Text("settings.panes.off".t),
+              Text(context.t.settings.panes.off),
               leading: const Icon(GTIcons.food),
               detailsBuilder: (_) => const OpenFoodFactsSettingsPane(),
             ),
             if (showPermissionsTile)
               MasterItem(
-                Text("settings.panes.permissions".t),
+                Text(context.t.settings.panes.permissions),
                 leading: const Icon(GTIcons.permissions),
                 detailsBuilder: (_) => const PermissionsSettingsPane(),
               ),
             const MasterItemWidget(child: Divider()),
             MasterItem(
-              Text("settings.advanced.title".t),
-              subtitle: Text("settings.advanced.subtitle".t),
+              Text(context.t.settings.advanced.title),
+              subtitle: Text(context.t.settings.advanced.subtitle),
               leading: const Icon(GTIcons.advanced),
               trailing: const Icon(GTIcons.lt_chevron),
               detailsBuilder: (_) => const AdvancedSettingsView(),
             ),
             MasterItem(
-              Text("settings.pro.title".t),
+              Text(context.t.settings.pro.title),
               leading: GTIcons.compound.pro,
               onTap: () {
                 Get.find<PurchasesController>().presentCustomerCenter();
@@ -101,16 +102,16 @@ class SettingsView extends ConsumerWidget {
               Text(
                 MaterialLocalizations.of(
                   context,
-                ).aboutListTileTitle("appName".t),
+                ).aboutListTileTitle(context.t.appName),
               ),
               leading: const Icon(GTIcons.info),
               subtitle: Text(appVersion),
               onTap: () {
                 showAboutDialog(
                   context: context,
-                  applicationName: "appName".t,
+                  applicationName: context.t.appName,
                   applicationVersion: appVersion,
-                  children: [Text("appInfo.shortDescription".t)],
+                  children: [Text(context.t.appInfo.shortDescription)],
                   applicationIcon: const InAppIcon.proportional(),
                 );
               },
@@ -118,14 +119,14 @@ class SettingsView extends ConsumerWidget {
             if (account != null) ...[
               const MasterItemWidget(child: Divider()),
               MasterItem(
-                Text("settings.logout".t),
+                Text(context.t.settings.logout),
                 subtitle: Text("@${account.name}"),
                 leading: const Icon(GTIcons.exit),
                 trailing: const Icon(GTIcons.lt_chevron),
                 onTap: () async {
                   final exit = await Go.confirm(
-                    "settings.logoutWarning.title".t,
-                    "settings.logoutWarning.content".t,
+                    context.t.settings.logoutWarning.title,
+                    context.t.settings.logoutWarning.content,
                   );
                   if (!exit) return;
                   ref.read(onlineProvider.notifier).logout();

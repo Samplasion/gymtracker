@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:gymtracker/controller/purchases_controller.dart';
+import 'package:gymtracker/i18n/strings.g.dart';
 import 'package:gymtracker/icons/gymtracker_icons.dart';
 import 'package:gymtracker/model/subscription.dart';
-import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/utils/theme.dart';
 import 'package:gymtracker/view/components/controlled.dart';
 import 'package:gymtracker/view/components/gradient_button.dart';
@@ -61,8 +61,8 @@ class SubscriptionNag extends ControlledWidgetAny<PurchasesController> {
                 leading: GTIcons.compound.pro.withColors(
                   accessoryColor: Theme.of(context).colorScheme.primary,
                 ),
-                title: Text("nags.$stringKey.title".t),
-                subtitle: Text("nags.$stringKey.subtitle".t),
+                title: Text(context.t.nags[stringKey].title),
+                subtitle: Text(context.t.nags[stringKey].subtitle),
               ),
               Padding(
                 padding: const EdgeInsets.symmetric(
@@ -88,7 +88,7 @@ class SubscriptionNag extends ControlledWidgetAny<PurchasesController> {
                           Theme.of(context).colorScheme.tertiary,
                         ],
                       ),
-                      child: Text("nags.button".t),
+                      child: Text(context.t.nags["button"]!),
                     ),
                   ],
                 ),

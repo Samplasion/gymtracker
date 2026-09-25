@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:gymtracker/data/weights.dart';
+import 'package:gymtracker/i18n/strings.g.dart';
 import 'package:gymtracker/icons/gymtracker_icons.dart';
-import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/service/logger.dart';
 import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/utils/theme.dart';
@@ -22,8 +22,10 @@ class WeightCalculator extends StatefulWidget {
     required this.weightUnit,
     this.showInsertButton = false,
     this.onPressInsert,
-  }) : assert(showInsertButton ? onPressInsert != null : true,
-            "If showInsertButton is true, onPressInsert must be provided");
+  }) : assert(
+         showInsertButton ? onPressInsert != null : true,
+         "If showInsertButton is true, onPressInsert must be provided",
+       );
 
   @override
   State<WeightCalculator> createState() => _WeightCalculatorState();
@@ -34,9 +36,10 @@ const double kClampMax = 10020;
 class _WeightCalculatorState extends State<WeightCalculator>
     with SingleTickerProviderStateMixin {
   late final _weightController = TextEditingController(
-      text: widget.startingWeight != null
-          ? stringifyDouble(widget.startingWeight!.clamp(0, kClampMax))
-          : null);
+    text: widget.startingWeight != null
+        ? stringifyDouble(widget.startingWeight!.clamp(0, kClampMax))
+        : null,
+  );
   Bars selectedBarbell = Bars.normal;
   late final animationController = AnimationController(
     vsync: this,
@@ -73,7 +76,7 @@ class _WeightCalculatorState extends State<WeightCalculator>
               height: kToolbarHeight,
               padding: const EdgeInsets.only(left: 16),
               child: Text(
-                "ongoingWorkout.weightCalculator".t,
+                context.t.ongoingWorkout.weightCalculator,
                 style: context.textTheme.titleLarge,
               ),
             ),
@@ -93,13 +96,11 @@ class _WeightCalculatorState extends State<WeightCalculator>
                       ),
                       inputFormatters: [
                         FilteringTextInputFormatter.allow(
-                          RegExp(
-                            r'^\d+[\.,]?\d*',
-                          ),
-                        )
+                          RegExp(r'^\d+[\.,]?\d*'),
+                        ),
                       ],
                       decoration: GymTrackerInputDecoration(
-                        labelText: 'weightCalculator.weight.label'.t,
+                        labelText: context.t.weightCalculator.weight.label,
                       ),
                       onChanged: (value) {
                         setState(() {
@@ -125,7 +126,7 @@ class _WeightCalculatorState extends State<WeightCalculator>
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16),
                     child: Text(
-                      "weightCalculator.weights.label".t,
+                      context.t.weightCalculator.weights.label,
                       style: context.textTheme.bodyMedium,
                     ),
                   ),
@@ -156,7 +157,7 @@ class _WeightCalculatorState extends State<WeightCalculator>
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16),
                     child: Text(
-                      "weightCalculator.barbells.label".t,
+                      context.t.weightCalculator.barbells.label,
                       style: context.textTheme.bodyMedium,
                     ),
                   ),
@@ -168,20 +169,28 @@ class _WeightCalculatorState extends State<WeightCalculator>
                           Padding(
                             padding: const EdgeInsets.all(8),
                             child: ChoiceChip(
-                              label: Text.rich(TextSpan(children: [
-                                TextSpan(text: "barbells.${barbell.name}".t),
+                              label: Text.rich(
                                 TextSpan(
-                                  text: () {
-                                    switch (format) {
-                                      case Weights.kg:
-                                        return " (${stringifyDouble(barbell.weightKg)} kg)";
-                                      case Weights.lb:
-                                        return " (${stringifyDouble(barbell.weightLb)} lb)";
-                                    }
-                                  }(),
-                                  style: Theme.of(context).textTheme.bodySmall,
+                                  children: [
+                                    TextSpan(
+                                      text: context.t.barbells[barbell.name],
+                                    ),
+                                    TextSpan(
+                                      text: () {
+                                        switch (format) {
+                                          case Weights.kg:
+                                            return " (${stringifyDouble(barbell.weightKg)} kg)";
+                                          case Weights.lb:
+                                            return " (${stringifyDouble(barbell.weightLb)} lb)";
+                                        }
+                                      }(),
+                                      style: Theme.of(
+                                        context,
+                                      ).textTheme.bodySmall,
+                                    ),
+                                  ],
                                 ),
-                              ])),
+                              ),
                               selected: selectedBarbell == barbell,
                               onSelected: (selected) {
                                 setState(() {
@@ -231,14 +240,14 @@ class _WeightCalculatorState extends State<WeightCalculator>
                               );
                               Navigator.pop(context);
                             },
-                            label: Text("weightCalculator.insert".t),
+                            label: Text(context.t.weightCalculator.insert),
                             icon: const Icon(GTIcons.insert),
                           ),
                         TextButton.icon(
                           onPressed: () {
                             Navigator.pop(context);
                           },
-                          label: Text("general.dialogs.actions.close".t),
+                          label: Text(context.t.general.dialogs.actions.close),
                           icon: const Icon(GTIcons.close),
                         ),
                       ],
@@ -246,7 +255,7 @@ class _WeightCalculatorState extends State<WeightCalculator>
                   ),
                 ),
               ],
-            )
+            ),
           ],
         );
       }(),
@@ -331,8 +340,8 @@ class Barbell extends StatelessWidget {
             child: Text(
               stringifyDouble(barbellWeight),
               style: Theme.of(context).textTheme.bodySmall!.copyWith(
-                    color: Theme.of(context).colorScheme.onSecondary,
-                  ),
+                color: Theme.of(context).colorScheme.onSecondary,
+              ),
             ),
           ),
         ),
@@ -391,11 +400,14 @@ class BarbellWeightPlate extends StatelessWidget {
       textColor: context.colorScheme.onQuinary,
       isLabelVisible: count > 1,
       child: Container(
-        height:
-            mapRange(weight, format.weights.min, format.weights.max, 32, 64),
-        constraints: const BoxConstraints(
-          maxWidth: 40,
+        height: mapRange(
+          weight,
+          format.weights.min,
+          format.weights.max,
+          32,
+          64,
         ),
+        constraints: const BoxConstraints(maxWidth: 40),
         padding: const EdgeInsets.all(4),
         decoration: BoxDecoration(
           color: Theme.of(context).colorScheme.tertiaryContainer,
@@ -409,8 +421,8 @@ class BarbellWeightPlate extends StatelessWidget {
           child: Text(
             stringifyDouble(weight),
             style: Theme.of(context).textTheme.bodySmall!.copyWith(
-                  color: Theme.of(context).colorScheme.onTertiaryContainer,
-                ),
+              color: Theme.of(context).colorScheme.onTertiaryContainer,
+            ),
           ),
         ),
       ),
@@ -418,8 +430,11 @@ class BarbellWeightPlate extends StatelessWidget {
   }
 }
 
-List<double> calculateBarbellWeights(double weight,
-    {required List<double> weights, required double barbellWeight}) {
+List<double> calculateBarbellWeights(
+  double weight, {
+  required List<double> weights,
+  required double barbellWeight,
+}) {
   final applicableWeight = weight - barbellWeight;
   final result = <double>[];
   double perSide = applicableWeight / 2;

@@ -5,14 +5,12 @@ class AppearanceSettingsPane extends ControlledWidget<SettingsController> {
 
   @override
   Widget build(BuildContext context) {
-    final currentLocale =
-        (Get.locale ?? Get.deviceLocale ?? Get.fallbackLocale)!;
     return Scaffold(
       body: DetailsView(
         child: CustomScrollView(
           slivers: [
             SliverAppBar.large(
-              title: Text("settings.panes.appearance".t),
+              title: Text(context.t.settings.panes.appearance),
               leading: MDVConfiguration.backButtonOf(context),
             ),
             SliverList(
@@ -21,13 +19,15 @@ class AppearanceSettingsPane extends ControlledWidget<SettingsController> {
                   () => ValueBuilder<Locale?>(
                     initialValue: controller.locale.value,
                     builder: (value, onChange) => RadioModalTile(
-                      title: Text("settings.options.locale.label".t),
+                      title: Text(context.t.settings.options.locale.label),
                       onChange: onChange,
                       values: {
                         kSystemLocaleSentinel:
-                            "settings.options.locale.values.system".t,
-                        for (final locale in GTLocalizations.supportedLocales)
-                          locale: "locales.${locale.languageCode}".t,
+                            context.t.settings.options.locale.values.system,
+                        for (final locale in AppLocale.values)
+                          locale.flutterLocale:
+                              context.t.locales[locale.languageCode] ??
+                              "UNKNOWN",
                       },
                       selectedValue: value,
                     ),
@@ -38,7 +38,9 @@ class AppearanceSettingsPane extends ControlledWidget<SettingsController> {
                   ValueBuilder<bool?>(
                     initialValue: controller.usesDynamicColor.value,
                     builder: (value, onChanged) => SwitchListTile(
-                      title: Text("settings.options.useDynamicColor.label".t),
+                      title: Text(
+                        context.t.settings.options.useDynamicColor.label,
+                      ),
                       value: value ?? false,
                       onChanged: onChanged,
                     ),
@@ -57,7 +59,7 @@ class AppearanceSettingsPane extends ControlledWidget<SettingsController> {
                         () => ValueBuilder<Color?>(
                           initialValue: controller.color.value,
                           builder: (value, onChange) => ColorModalTile(
-                            title: Text("settings.options.color.label".t),
+                            title: Text(context.t.settings.options.color.label),
                             onChange: onChange,
                             selectedValue: value ?? Prefs.defaultValue.color,
                           ),
@@ -76,12 +78,14 @@ class AppearanceSettingsPane extends ControlledWidget<SettingsController> {
                   () => ValueBuilder<ThemeMode?>(
                     initialValue: controller.themeMode.value,
                     builder: (value, onChange) => RadioModalTile(
-                      title: Text("settings.options.themeMode.label".t),
+                      title: Text(context.t.settings.options.themeMode.label),
                       onChange: onChange,
                       values: {
                         for (final mode in ThemeMode.values)
-                          mode: "settings.options.themeMode.values.${mode.name}"
-                              .t,
+                          mode:
+                              context.t.settings.options.themeMode.values[mode
+                                  .name] ??
+                              "UNKNOWN",
                       },
                       selectedValue: value ?? ThemeMode.system,
                     ),
@@ -92,8 +96,10 @@ class AppearanceSettingsPane extends ControlledWidget<SettingsController> {
                 ValueBuilder<bool?>(
                   initialValue: controller.tintExercises.value,
                   builder: (value, onChanged) => SwitchListTile(
-                    title: Text("settings.options.tintExercises.label".t),
-                    subtitle: Text("settings.options.tintExercises.subtitle".t),
+                    title: Text(context.t.settings.options.tintExercises.label),
+                    subtitle: Text(
+                      context.t.settings.options.tintExercises.subtitle,
+                    ),
                     value: value ?? Prefs.defaultValue.tintExercises,
                     onChanged: onChanged,
                   ),
@@ -105,7 +111,7 @@ class AppearanceSettingsPane extends ControlledWidget<SettingsController> {
                   initialValue: controller.showSuggestedRoutines.value,
                   builder: (value, onChanged) => SwitchListTile(
                     title: Text(
-                      "settings.options.showSuggestedRoutines.label".t,
+                      context.t.settings.options.showSuggestedRoutines.label,
                     ),
                     value: value ?? false,
                     onChanged: onChanged,
@@ -117,10 +123,20 @@ class AppearanceSettingsPane extends ControlledWidget<SettingsController> {
                   initialValue: controller.defaultToSimpleWorkoutView.value,
                   builder: (value, onChanged) => SwitchListTile(
                     title: Text(
-                      "settings.options.defaultToSimpleWorkoutView.label".t,
+                      context
+                          .t
+                          .settings
+                          .options
+                          .defaultToSimpleWorkoutView
+                          .label,
                     ),
                     subtitle: Text(
-                      "settings.options.defaultToSimpleWorkoutView.subtitle".t,
+                      context
+                          .t
+                          .settings
+                          .options
+                          .defaultToSimpleWorkoutView
+                          .subtitle,
                     ),
                     value:
                         value ?? Prefs.defaultValue.defaultToSimpleWorkoutView,

@@ -11,14 +11,16 @@ import 'package:gymtracker/controller/intents_controller.dart';
 import 'package:gymtracker/controller/serviceable_controller.dart';
 import 'package:gymtracker/controller/settings_controller.dart';
 import 'package:gymtracker/controller/workout_controller.dart';
+import 'package:gymtracker/i18n/strings.g.dart';
 import 'package:gymtracker/icons/gymtracker_icons.dart';
+import 'package:gymtracker/main.dart';
 import 'package:gymtracker/model/achievements.dart';
 import 'package:gymtracker/model/exercisable.dart';
 import 'package:gymtracker/model/exercise.dart';
 import 'package:gymtracker/model/set.dart';
 import 'package:gymtracker/model/superset.dart';
 import 'package:gymtracker/model/workout.dart';
-import 'package:gymtracker/service/localizations.dart';
+import 'package:gymtracker/provider/locale.dart';
 import 'package:gymtracker/service/logger.dart';
 import 'package:gymtracker/service/native.dart';
 import 'package:gymtracker/service/protocol.dart';
@@ -309,14 +311,14 @@ class RoutinesController extends GetxController
       builder: (context) {
         return AlertDialog(
           icon: const Icon(GTIcons.info),
-          title: Text("routines.actions.delete.title".t),
-          content: Text("routines.actions.delete.text".t),
+          title: Text(context.t.routines.actions.delete.title),
+          content: Text(context.t.routines.actions.delete.text),
           actions: [
             TextButton(
               onPressed: () {
                 Get.back(closeOverlays: true);
               },
-              child: Text("routines.actions.delete.actions.no".t),
+              child: Text(context.t.routines.actions.delete.actions.no),
             ),
             FilledButton.tonal(
               onPressed: () {
@@ -327,7 +329,7 @@ class RoutinesController extends GetxController
 
                 onCanceled();
               },
-              child: Text("routines.actions.delete.actions.yes".t),
+              child: Text(context.t.routines.actions.delete.actions.yes),
             ),
           ],
         );
@@ -378,10 +380,11 @@ class RoutinesController extends GetxController
   }
 
   void onRoutineUrlReceived(Uri parsed) {
+    final t = globalContainer.read(translationsProvider);
     if (!parsed.queryParameters.containsKey("json")) {
       Go.dialog(
-        "importRoutine.errors.noJson.title".t,
-        "importRoutine.errors.noJson.body".t,
+        t.importRoutine.errors.noJson.title,
+        t.importRoutine.errors.noJson.body,
       );
       return;
     }
@@ -392,8 +395,8 @@ class RoutinesController extends GetxController
     } catch (e, s) {
       logger.e("$e", error: e, stackTrace: s);
       Go.dialog(
-        "importRoutine.errors.badJson.title".t,
-        "importRoutine.errors.badJson.body".t,
+        t.importRoutine.errors.badJson.title,
+        t.importRoutine.errors.badJson.body,
       );
       return;
     }
@@ -404,8 +407,8 @@ class RoutinesController extends GetxController
     } catch (e, s) {
       logger.e("$e", error: e, stackTrace: s);
       Go.dialog(
-        "importRoutine.errors.badWorkout.title".t,
-        "importRoutine.errors.badWorkout.body".t,
+        t.importRoutine.errors.badWorkout.title,
+        t.importRoutine.errors.badWorkout.body,
       );
       return;
     }
@@ -420,14 +423,15 @@ class RoutinesController extends GetxController
   }
 
   void onUnknownUrlReceived(Uri parsed) {
+    final t = globalContainer.read(translationsProvider);
     showDialog(
       context: Get.context!,
       builder: (context) => AlertDialog(
-        title: Text("unknownUrl.title".t),
+        title: Text(t.unknownUrl.title),
         content: RichText(
           text: TextSpan(
             children: [
-              TextSpan(text: "unknownUrl.text".t),
+              TextSpan(text: t.unknownUrl.text),
               const TextSpan(text: "\n\n"),
               TextSpan(
                 text: parsed.toString(),
@@ -480,10 +484,11 @@ class RoutinesController extends GetxController
   }
 
   void viewHistory({required Workout routine}) {
+    final t = globalContainer.read(translationsProvider);
     final history = coordinator.getRoutineHistory(routine: routine);
     Go.to(
       () => Scaffold(
-        appBar: AppBar(title: Text("routines.actions.viewHistory".t)),
+        appBar: AppBar(title: Text(t.routines.actions.viewHistory)),
         body: Scrollbar(
           child: ListView.builder(
             padding:
@@ -507,7 +512,8 @@ class RoutinesController extends GetxController
   }
 
   void createFolder() {
-    final folder = GTRoutineFolder.generate(name: "routines.newFolder".t);
+    final t = globalContainer.read(translationsProvider);
+    final folder = GTRoutineFolder.generate(name: t.routines.newFolder);
     service.addFolder(folder);
     coordinator.scheduleBackup();
   }
@@ -537,9 +543,10 @@ class RoutinesController extends GetxController
   }
 
   Future<void> deleteFolder(GTRoutineFolder folder) async {
+    final t = globalContainer.read(translationsProvider);
     final shouldDelete = await Go.confirm(
-      "routines.actions.deleteFolder.title".t,
-      "routines.actions.deleteFolder.text".t,
+      t.routines.actions.deleteFolder.title,
+      t.routines.actions.deleteFolder.text,
     );
     if (!shouldDelete) return;
     Get.back();
@@ -698,12 +705,12 @@ class _ShareRoutineAlertDialogState extends State<ShareRoutineAlertDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: Text("workouts.actions.share.alert.title".t),
+      title: Text(context.t.workouts.actions.share.alert.title),
       scrollable: true,
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text("workouts.actions.share.alert.body".t),
+          Text(context.t.workouts.actions.share.alert.body),
           const SizedBox(height: 16),
           if (showQr)
             SizedBox(
@@ -724,7 +731,7 @@ class _ShareRoutineAlertDialogState extends State<ShareRoutineAlertDialog> {
               ),
             )
           else
-            Text("workouts.actions.share.alert.noQr".t),
+            Text(context.t.workouts.actions.share.alert.noQr),
           const SizedBox(height: 16),
           Text(
             widget.uri.toString(),
@@ -741,22 +748,28 @@ class _ShareRoutineAlertDialogState extends State<ShareRoutineAlertDialog> {
           onPressed: () {
             Get.back();
           },
-          child: Text("workouts.actions.share.alert.actions.close".t),
+          child: Text(context.t.workouts.actions.share.alert.actions.close),
         ),
         TextButton(
           onPressed: () {
             Get.back();
             Clipboard.setData(ClipboardData(text: widget.uri.toString()));
-            Go.snack("workouts.actions.share.alert.actions.shared".t);
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(
+                  context.t.workouts.actions.share.alert.actions.shared,
+                ),
+              ),
+            );
           },
-          child: Text("workouts.actions.share.alert.actions.share".t),
+          child: Text(context.t.workouts.actions.share.alert.actions.share),
         ),
         if (showQr)
           FilledButton.tonal(
             onPressed: () {
               shareImage();
             },
-            child: Text("workouts.actions.share.alert.actions.shareQR".t),
+            child: Text(context.t.workouts.actions.share.alert.actions.shareQR),
           ),
       ],
     );

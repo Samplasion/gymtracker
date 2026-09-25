@@ -100,8 +100,8 @@ class _AddFoodViewState extends ConsumerState<AddFoodView> {
                   child: IconButton(
                     icon: Icon(icon),
                     tooltip: isFavorite
-                        ? "food.removeFavorite".t
-                        : "food.addFavorite".t,
+                        ? context.t.food.removeFavorite
+                        : context.t.food.addFavorite,
                     onPressed: () {
                       if (isFavorite) {
                         ref
@@ -138,7 +138,7 @@ class _AddFoodViewState extends ConsumerState<AddFoodView> {
                         DropdownButtonFormField<ServingSize?>(
                           isExpanded: true,
                           decoration: GymTrackerInputDecoration(
-                            labelText: "food.add.servingSize".t,
+                            labelText: context.t.food.add.servingSize,
                           ),
                           value: servingSize,
                           items: [
@@ -146,13 +146,13 @@ class _AddFoodViewState extends ConsumerState<AddFoodView> {
                               (servingSize) => DropdownMenuItem(
                                 value: servingSize,
                                 child: Text(
-                                  "${(servingSize.name != null && servingSize.name!.trim().isNotEmpty) ? servingSize.name! : "food.add.unnamedServingSize".t} (${widget.food.unit.formatAmount(servingSize.amount)})",
+                                  "${(servingSize.name != null && servingSize.name!.trim().isNotEmpty) ? servingSize.name! : context.t.food.add.unnamedServingSize} (${widget.food.unit.formatAmount(servingSize.amount, context: context)})",
                                 ),
                               ),
                             ),
                             DropdownMenuItem(
                               value: null,
-                              child: Text("food.add.custom".t),
+                              child: Text(context.t.food.add.custom),
                             ),
                           ],
                           onChanged: (value) {
@@ -175,13 +175,12 @@ class _AddFoodViewState extends ConsumerState<AddFoodView> {
                         _AmountFormField(
                           controller: amountController,
                           clarifyUnit: false,
-                          suffix: Text(widget.food.unit.t),
+                          suffix: Text(widget.food.unit.t(context: context)),
                           onChanged: (value) {
                             setState(() {
                               amount = value.tryParseDouble() ?? 100;
                             });
                           },
-                          restorationId: "_AddFoodViewState_amount",
                         ),
                         const SizedBox(height: 16),
                       ],
@@ -194,7 +193,7 @@ class _AddFoodViewState extends ConsumerState<AddFoodView> {
                           });
                         },
                         decoration: GymTrackerInputDecoration(
-                          labelText: "food.add.pieces".t,
+                          labelText: context.t.food.add.pieces,
                         ),
                       ),
                       const SizedBox(height: 16),
@@ -243,7 +242,7 @@ class _AddFoodViewState extends ConsumerState<AddFoodView> {
 
                 ref.read(foodProvider.notifier).copyToToday(newFood);
               },
-              child: Text('food.edit.copyToToday'.t),
+              child: Text(context.t.food.edit.copyToToday),
             ),
           FilledButton(
             onPressed: () {
@@ -277,7 +276,9 @@ class _AddFoodViewState extends ConsumerState<AddFoodView> {
               }
             },
             child: Text(
-              widget.isEditing ? 'food.edit.edit'.t : 'food.add.add'.t,
+              widget.isEditing
+                  ? context.t.food.edit.edit
+                  : context.t.food.add.add,
             ),
           ),
         ],
@@ -303,7 +304,7 @@ class OpenFoodFactsTableAttribution extends StatelessWidget {
               }
             : null,
         child: Text(
-          "food.offAttribution".t,
+          context.t.food.offAttribution,
           style: Theme.of(context).textTheme.labelSmall!.copyWith(
             color: canOpen
                 ? Theme.of(context).colorScheme.secondary
@@ -321,14 +322,12 @@ class _AmountFormField extends StatelessWidget {
     required this.onChanged,
     this.clarifyUnit = true,
     this.suffix,
-    required this.restorationId,
   });
 
   final TextEditingController controller;
   final void Function(String) onChanged;
   final bool clarifyUnit;
   final Widget? suffix;
-  final String restorationId;
 
   @override
   Widget build(BuildContext context) {
@@ -336,8 +335,8 @@ class _AmountFormField extends StatelessWidget {
       controller: controller,
       decoration: GymTrackerInputDecoration(
         labelText: clarifyUnit
-            ? "food.add.amountWithClarifiedUnit".t
-            : "food.add.amount".t,
+            ? context.t.food.add.amountWithClarifiedUnit
+            : context.t.food.add.amount,
         suffix: suffix,
       ),
       keyboardType: _kKeyboardType,
@@ -348,14 +347,14 @@ class _AmountFormField extends StatelessWidget {
       autovalidateMode: AutovalidateMode.onUserInteraction,
       validator: (value) {
         if (value == null || value.isEmpty) {
-          return "food.add.amountEmpty".t;
+          return context.t.food.add.amountEmpty;
         }
         if (value.tryParseDouble() == null) {
-          return "food.add.amountInvalid".t;
+          return context.t.food.add.amountInvalid;
         }
         final double parsedValue = value.parseDouble();
         if (parsedValue <= 0 || parsedValue.isNaN || parsedValue.isInfinite) {
-          return "food.add.amountInvalid".t;
+          return context.t.food.add.amountInvalid;
         }
         return null;
       },
@@ -397,10 +396,10 @@ class NutritionTable extends StatelessWidget {
       children: [
         if (_showHeader) ...[
           Text(
-            "food.add.nutritionalValuesPerAmountWithUnit".tParams({
-              "amount": stringifyDouble(amount, decimalSeparator: decSep),
-              "unit": unit.t,
-            }),
+            context.t.food.add.nutritionalValuesPerAmountWithUnit(
+              amount: stringifyDouble(amount, decimalSeparator: decSep),
+              unit: unit.t(context: context),
+            ),
             style: Theme.of(context).textTheme.headlineSmall,
           ),
           verticalSpace,
@@ -684,7 +683,7 @@ class NutritionRow extends StatelessWidget {
       children: [
         Expanded(
           child: Text(
-            "food.nutriments.$id".t,
+            context.t.food.nutriments[id] ?? "UNKNOWN",
             style: TextStyle(
               fontWeight: bold ? FontWeight.bold : FontWeight.normal,
             ),
@@ -692,7 +691,7 @@ class NutritionRow extends StatelessWidget {
         ),
         const SizedBox(width: 8),
         Text(
-          "$stringifiedValue ${"food.nutrimentUnits.${kNutritionValueToUnit[id]!.toCamelCase()}".t}"
+          "$stringifiedValue ${context.t.food.nutrimentUnits[kNutritionValueToUnit[id]!.toCamelCase()]}"
               .trim(),
           style: TextStyle(
             fontWeight: bold ? FontWeight.bold : FontWeight.normal,
@@ -843,7 +842,7 @@ class _CustomAddFoodViewState extends ConsumerState<CustomAddFoodView> {
     final colorScheme = Theme.of(context).colorScheme;
     final gradientColor = colorScheme.surfaceContainerHigh;
     return Scaffold(
-      appBar: AppBar(title: Text("food.add.customFood.title".t)),
+      appBar: AppBar(title: Text(context.t.food.add.customFood.title)),
       extendBody: true,
       body: SingleChildScrollView(
         child: GradientBottomBar.wrap(
@@ -862,25 +861,23 @@ class _CustomAddFoodViewState extends ConsumerState<CustomAddFoodView> {
                       TextFormField(
                         controller: nameController,
                         decoration: GymTrackerInputDecoration(
-                          labelText: "food.add.customFood.fields.name".t,
+                          labelText: context.t.food.add.customFood.fields.name,
                         ),
                         autovalidateMode: AutovalidateMode.onUserInteraction,
                         validator: (value) {
                           if ((value == null || value.trim().isEmpty)) {
-                            return "food.add.nameEmpty".t;
+                            return context.t.food.add.nameEmpty;
                           }
 
                           return null;
                         },
-                        restorationId: "_CustomAddFoodViewState_name",
                       ),
                       const SizedBox(height: 8),
                       TextFormField(
                         controller: brandController,
                         decoration: GymTrackerInputDecoration(
-                          labelText: "food.add.customFood.fields.brand".t,
+                          labelText: context.t.food.add.customFood.fields.brand,
                         ),
-                        restorationId: "_CustomAddFoodViewState_brand",
                       ),
                       const SizedBox(height: 8),
                       Row(
@@ -895,7 +892,6 @@ class _CustomAddFoodViewState extends ConsumerState<CustomAddFoodView> {
                                   amount = value.tryParseDouble() ?? 100;
                                 });
                               },
-                              restorationId: "_CustomAddFoodViewState_amount",
                             ),
                           ),
                           const SizedBox(width: 8),
@@ -914,11 +910,15 @@ class _CustomAddFoodViewState extends ConsumerState<CustomAddFoodView> {
                             showSelectedIcon: false,
                             segments: <ButtonSegment<NutritionUnit>>[
                               ButtonSegment<NutritionUnit>(
-                                label: Text("food.nutrimentUnits.g".t),
+                                label: Text(
+                                  context.t.food.nutrimentUnits['g']!,
+                                ),
                                 value: NutritionUnit.G,
                               ),
                               ButtonSegment<NutritionUnit>(
-                                label: Text("food.nutrimentUnits.milliL".t),
+                                label: Text(
+                                  context.t.food.nutrimentUnits['milliL']!,
+                                ),
                                 value: NutritionUnit.MILLI_L,
                               ),
                             ],
@@ -941,15 +941,18 @@ class _CustomAddFoodViewState extends ConsumerState<CustomAddFoodView> {
                           });
                         },
                         decoration: GymTrackerInputDecoration(
-                          labelText: "food.add.pieces".t,
+                          labelText: context.t.food.add.pieces,
                         ),
                       ),
                       const Divider(height: 32),
                       Text(
-                        "food.add.nutritionalValuesPerAmountWithUnit".tParams({
-                          "amount": "100",
-                          "unit": "food.nutrimentUnits.${unit.toCamelCase()}".t,
-                        }),
+                        context.t.food.add.nutritionalValuesPerAmountWithUnit(
+                          amount: "100",
+                          unit:
+                              context.t.food.nutrimentUnits[unit
+                                  .toCamelCase()] ??
+                              "UNKNOWN",
+                        ),
                         style: Theme.of(context).textTheme.headlineSmall,
                       ),
                       for (var id in controllers.keys) ...[
@@ -963,14 +966,18 @@ class _CustomAddFoodViewState extends ConsumerState<CustomAddFoodView> {
                                 controller: controllers[id],
                                 decoration: GymTrackerInputDecoration(
                                   labelText:
-                                      "${"food.nutriments.$id".t} (${"food.nutrimentUnits.${kNutritionValueToUnit[id]!.toCamelCase()}".t})",
+                                      "${context.t.food.nutriments[id]} (${context.t.food.nutrimentUnits[kNutritionValueToUnit[id]!.toCamelCase()] ?? "UNKNOWN"})",
                                   suffix: Text(
-                                    "food.nutrimentUnits.${kNutritionValueToUnit[id]!.toCamelCase()}"
-                                        .t,
+                                    context
+                                            .t
+                                            .food
+                                            .nutrimentUnits[kNutritionValueToUnit[id]!
+                                            .toCamelCase()] ??
+                                        "UNKNOWN",
                                   ),
                                   hintText: required.contains(id)
                                       ? null
-                                      : "general.optional".t,
+                                      : context.t.general.optional,
                                 ),
                                 keyboardType: _kKeyboardType,
                                 autovalidateMode:
@@ -978,24 +985,23 @@ class _CustomAddFoodViewState extends ConsumerState<CustomAddFoodView> {
                                 validator: (value) {
                                   if (required.contains(id)) {
                                     if ((value == null || value.isEmpty)) {
-                                      return "food.add.amountEmpty".t;
+                                      return context.t.food.add.amountEmpty;
                                     }
                                   } else {
                                     return null;
                                   }
                                   if (value.tryParseDouble() == null) {
-                                    return "food.add.amountInvalid".t;
+                                    return context.t.food.add.amountInvalid;
                                   }
                                   final double parsedValue = value
                                       .parseDouble();
                                   if (parsedValue < 0 ||
                                       parsedValue.isNaN ||
                                       parsedValue.isInfinite) {
-                                    return "food.add.amountInvalid".t;
+                                    return context.t.food.add.amountInvalid;
                                   }
                                   return null;
                                 },
-                                restorationId: "_CustomAddFoodViewState_$id",
                               ),
                             ],
                           ),
@@ -1011,7 +1017,7 @@ class _CustomAddFoodViewState extends ConsumerState<CustomAddFoodView> {
                               expanded = true;
                             });
                           },
-                          child: Text("food.add.customFood.showMore".t),
+                          child: Text(context.t.food.add.customFood.showMore),
                         ),
                       ),
                     ],
@@ -1061,7 +1067,7 @@ class _CustomAddFoodViewState extends ConsumerState<CustomAddFoodView> {
 
               Navigator.of(context).pop(food);
             },
-            child: Text('food.add.add'.t),
+            child: Text(context.t.food.add.add),
           ),
         ],
       ),
@@ -1084,7 +1090,7 @@ class SearchResultsView extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
-      appBar: AppBar(title: Text("food.search.title".t)),
+      appBar: AppBar(title: Text(context.t.food.search.title)),
       body: FutureBuilder<List<VagueFood>>(
         future: foods,
         builder: (context, snapshot) {
@@ -1099,8 +1105,8 @@ class SearchResultsView extends ConsumerWidget {
                         snapshot.error is DioException &&
                             (snapshot.error as DioException).type ==
                                 DioExceptionType.badResponse
-                        ? "food.search.error.serverError".t
-                        : "food.search.error.generic".t,
+                        ? context.t.food.search.error.serverError
+                        : context.t.food.search.error.generic,
                     error: snapshot.error,
                   ),
                 ),
@@ -1137,7 +1143,7 @@ class SearchResultsView extends ConsumerWidget {
                     children: [
                       ListTile(
                         title: Text(
-                          "food.offAttribution".t,
+                          context.t.food.offAttribution,
                           style: Theme.of(context).textTheme.labelSmall,
                         ),
                       ),
@@ -1240,12 +1246,9 @@ class _FoodBarcodeReaderViewState extends ConsumerState<FoodBarcodeReaderView>
 
   @override
   Widget build(BuildContext context) {
-    final perms =
-        ref.watch(foodPermissionsProvider).asData?.value ??
-        (camera: false, gallery: false);
     return Scaffold(
       appBar: AppBar(
-        title: Text("food.barcodeReader.title".t),
+        title: Text(context.t.food.barcodeReader.title),
         actions: [
           if (kDebugMode)
             IconButton(
@@ -1432,7 +1435,7 @@ class _AddCombinedFoodViewState extends ConsumerState<AddCombinedFoodView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("food.combine.title".t)),
+      appBar: AppBar(title: Text(context.t.food.combine.title)),
       extendBody: true,
       body: Form(
         key: formKey,
@@ -1448,25 +1451,23 @@ class _AddCombinedFoodViewState extends ConsumerState<AddCombinedFoodView> {
                     TextFormField(
                       controller: nameController,
                       decoration: GymTrackerInputDecoration(
-                        labelText: "food.add.customFood.fields.name".t,
+                        labelText: context.t.food.add.customFood.fields.name,
                       ),
                       autovalidateMode: AutovalidateMode.onUserInteraction,
                       validator: (value) {
                         if ((value == null || value.trim().isEmpty)) {
-                          return "food.add.nameEmpty".t;
+                          return context.t.food.add.nameEmpty;
                         }
 
                         return null;
                       },
-                      restorationId: "_AddCombinedFoodViewState_name",
                     ),
                     const SizedBox(height: 8),
                     TextFormField(
                       controller: brandController,
                       decoration: GymTrackerInputDecoration(
-                        labelText: "food.add.customFood.fields.brand".t,
+                        labelText: context.t.food.add.customFood.fields.brand,
                       ),
-                      restorationId: "_AddCombinedFoodViewState_brand",
                     ),
                     const SizedBox(height: 8),
                     Row(
@@ -1481,7 +1482,6 @@ class _AddCombinedFoodViewState extends ConsumerState<AddCombinedFoodView> {
                                 amount = value.tryParseDouble() ?? 100;
                               });
                             },
-                            restorationId: "_AddCombinedFoodViewState_amount",
                           ),
                         ),
                         const SizedBox(width: 8),
@@ -1500,11 +1500,13 @@ class _AddCombinedFoodViewState extends ConsumerState<AddCombinedFoodView> {
                           showSelectedIcon: false,
                           segments: <ButtonSegment<NutritionUnit>>[
                             ButtonSegment<NutritionUnit>(
-                              label: Text("food.nutrimentUnits.g".t),
+                              label: Text(context.t.food.nutrimentUnits['g']!),
                               value: NutritionUnit.G,
                             ),
                             ButtonSegment<NutritionUnit>(
-                              label: Text("food.nutrimentUnits.milliL".t),
+                              label: Text(
+                                context.t.food.nutrimentUnits['milliL']!,
+                              ),
                               value: NutritionUnit.MILLI_L,
                             ),
                           ],
@@ -1612,7 +1614,7 @@ class _AddCombinedFoodViewState extends ConsumerState<AddCombinedFoodView> {
 
                     Get.back(result: food);
                   },
-            child: Text('food.add.add'.t),
+            child: Text(context.t.food.add.add),
           ),
         ],
       ),
@@ -1631,11 +1633,11 @@ class _AddCombinedFoodViewState extends ConsumerState<AddCombinedFoodView> {
           });
         },
       ),
-      hintText: 'food.searchBar.hint'.t,
+      hintText: context.t.food.searchBar.hint,
       barTrailing: [
         IconButton(
           icon: const Icon(GTIcons.scan_barcode),
-          tooltip: "food.barcodeReader.title".t,
+          tooltip: context.t.food.barcodeReader.title,
           onPressed: () {
             showScanBarcodeView(context, ref).then((value) {
               if (value != null) {
@@ -1675,9 +1677,15 @@ class _AddCombinedFoodViewState extends ConsumerState<AddCombinedFoodView> {
 }
 
 extension on NutritionUnit {
-  String get t => "food.nutrimentUnits.${toCamelCase()}".t;
+  String t({required BuildContext context}) =>
+      context.t.food.nutrimentUnits[toCamelCase()] ?? "UNKNOWN";
 
-  String formatAmount(double amount, {int pieces = 1, bool showUnit = true}) {
+  String formatAmount(
+    double amount, {
+    int pieces = 1,
+    bool showUnit = true,
+    required BuildContext context,
+  }) {
     final pcs = pieces == 1 ? "" : "$pieces × ";
     final unit = showUnit ? " $t" : "";
     final decSep = NumberFormat.decimalPattern(

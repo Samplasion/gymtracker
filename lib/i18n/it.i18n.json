@@ -1,7 +1,7 @@
 {
   "appName": "Gym Bro",
   "appInfo": {
-    "version": "Versione @version (build @build)",
+    "version": "Versione $version (build $build)",
     "shortDescription": "Compagno di allenamenti",
     "terms": "Termini di servizio",
     "privacy": "Informativa sulla privacy"
@@ -102,46 +102,48 @@
             "title": "Cos'è l'RPE?",
             "text": "L'RPE (Rate of Perceived Exertion, tasso di sforzo percepito) è una misurazione soggettiva della difficoltà di un esercizio. Si misura da 1 a 10, dove 1 sta per \"sforzo molto basso\" e 10 sta per \"sforzo massimo\". Si può misurare in base alla stima delle ripetizioni rimanenti al termine di una serie (ad esempio, RPE 8 significa che potresti fare altre 2 ripetizioni prima di cedere)."
           },
-          "level1": {
-            "title": "RPE 1",
-            "text": "Sforzo molto basso."
-          },
-          "level2": {
-            "title": "RPE 2",
-            "text": "Sforzo basso."
-          },
-          "level3": {
-            "title": "RPE 3",
-            "text": "Sforzo basso."
-          },
-          "level4": {
-            "title": "RPE 4",
-            "text": "Sforzo moderato."
-          },
-          "level5": {
-            "title": "RPE 5",
-            "text": "Sforzo moderato."
-          },
-          "level6": {
-            "title": "RPE 6",
-            "text": "Sforzo moderatamente elevato."
-          },
-          "level7": {
-            "title": "RPE 7",
-            "text": "Sforzo elevato."
-          },
-          "level8": {
-            "title": "RPE 8",
-            "text": "Sforzo elevato. Puoi effettuare al massimo 2 ripetizioni in più."
-          },
-          "level9": {
-            "title": "RPE 9",
-            "text": "Sforzo molto elevato. Puoi effettuare al massimo un'altra ripetizione."
-          },
-          "level10": {
-            "title": "RPE 10",
-            "text": "Sforzo massimo. Non puoi effettuare altre ripetizioni."
-          }
+          "levels": [
+            {
+              "title": "RPE 1",
+              "text": "Sforzo molto basso."
+            },
+            {
+              "title": "RPE 2",
+              "text": "Sforzo basso."
+            },
+            {
+              "title": "RPE 3",
+              "text": "Sforzo basso."
+            },
+            {
+              "title": "RPE 4",
+              "text": "Sforzo moderato."
+            },
+            {
+              "title": "RPE 5",
+              "text": "Sforzo moderato."
+            },
+            {
+              "title": "RPE 6",
+              "text": "Sforzo moderatamente elevato."
+            },
+            {
+              "title": "RPE 7",
+              "text": "Sforzo elevato."
+            },
+            {
+              "title": "RPE 8",
+              "text": "Sforzo elevato. Puoi effettuare al massimo 2 ripetizioni in più."
+            },
+            {
+              "title": "RPE 9",
+              "text": "Sforzo molto elevato. Puoi effettuare al massimo un'altra ripetizione."
+            },
+            {
+              "title": "RPE 10",
+              "text": "Sforzo massimo. Non puoi effettuare altre ripetizioni."
+            }
+          ]
         },
         "reorderSets": {
           "title": "Riordina serie",
@@ -205,9 +207,13 @@
       "history": "Cronologia",
       "explanation": "Spiegazione",
       "explanationDisclaimer": "Nota che questa spiegazione è fornita a puro scopo informativo, e non sostituisce il parere di un trainer qualificato.",
-      "primaryMuscleGroup": "Gruppo muscolare: @muscleGroup",
-      "secondaryMuscleGroups": "Gruppi muscolari secondari: @muscleGroups",
-      "equipment": "Attrezzatura: @equipment"
+      "primaryMuscleGroup": "Gruppo muscolare: $muscleGroup",
+      "secondaryMuscleGroups": "Gruppi muscolari secondari: $muscleGroups",
+      "equipment": "Attrezzatura: $equipment",
+      "explanationNone": {
+        "title": "Nessuna spiegazione disponibile",
+        "description": "Non c'è ancora una spiegazione per questo esercizio. Controlla più tardi."
+      }
     },
     "continuation": {
       "label": "Continuazione",
@@ -325,10 +331,10 @@
         "subtitle": {
           "zero": "Superserie senza esercizi",
           "one": "Superserie con un esercizio",
-          "two": "Superserie con %s esercizi",
-          "few": "Superserie con %s esercizi",
-          "many": "Superserie con %s esercizi",
-          "other": "Superserie con %s esercizi"
+          "two": "Superserie con $n esercizi",
+          "few": "Superserie con $n esercizi",
+          "many": "Superserie con $n esercizi",
+          "other": "Superserie con $n esercizi"
         },
         "addExercise": "Aggiungi esercizi",
         "remove": {
@@ -358,19 +364,19 @@
     "empty": "Nessun allenamento",
     "andMore": {
       "one": "…e un altro",
-      "two": "…e altri %s",
-      "few": "…e altri %s",
-      "many": "…e altri %s",
-      "other": "…e altri %s"
+      "two": "…e altri $n",
+      "few": "…e altri $n",
+      "many": "…e altri $n",
+      "other": "…e altri $n"
     },
     "actions": {
       "deleteMultiple": {
         "title": {
           "one": "Rimuovi esercizio",
-          "two": "Rimuovi %s esercizi",
-          "few": "Rimuovi %s esercizi",
-          "many": "Rimuovi %s esercizi",
-          "other": "Rimuovi %s esercizi"
+          "two": "Rimuovi $n esercizi",
+          "few": "Rimuovi $n esercizi",
+          "many": "Rimuovi $n esercizi",
+          "other": "Rimuovi $n esercizi"
         },
         "text": {
           "one": "Sei sicuro di voler eliminare questo esercizio dalla tua cronologia? Quest'azione non può essere annullata.",
@@ -479,7 +485,7 @@
     },
     "colorPicker": {
       "heading": {
-        "label": "Seleziona un colore [@color]"
+        "label": "Seleziona un colore [$color]"
       }
     },
     "advanced": {
@@ -523,7 +529,7 @@
             "notSyncing": "Sincronizzazione terminata",
             "failed": "Sincronizzazione non riuscita"
           },
-          "lastSync": "Ultima sincronizzazione: @date",
+          "lastSync": "Ultima sincronizzazione: $date",
           "never": "Mai sincronizzato",
           "notLoggedIn": "Non hai effettuato l'accesso",
           "syncNow": "Sincronizza ora",
@@ -538,7 +544,7 @@
         },
         "confirmation": {
           "title": "Conferma eliminazione",
-          "content": "Digita il tuo username (@username) per procedere.",
+          "content": "Digita il tuo username ($username) per procedere.",
           "hint": "Username",
           "error": {
             "mismatch": "Digita il tuo username."
@@ -586,7 +592,7 @@
       "remove": "Rimuovi esercizio",
       "addToSuperset": "Aggiungi a superserie…",
       "startCardioTimer": "Avvia timer a intervalli",
-      "rpeBadge": "RPE @rpe",
+      "rpeBadge": "RPE $rpe",
       "setRPE": "Imposta RPE",
       "generate": "Genera"
     },
@@ -677,26 +683,26 @@
         "added": {
           "zero": "Nessun esercizio aggiunto",
           "one": "1 esercizio aggiunto",
-          "two": "%s esercizi aggiunti",
-          "few": "%s esercizi aggiunti",
-          "many": "%s esercizi aggiunti",
-          "other": "%s esercizi aggiunti"
+          "two": "$n esercizi aggiunti",
+          "few": "$n esercizi aggiunti",
+          "many": "$n esercizi aggiunti",
+          "other": "$n esercizi aggiunti"
         },
         "removed": {
           "zero": "Nessun esercizio rimosso",
           "one": "1 esercizio rimosso",
-          "two": "%s esercizi rimossi",
-          "few": "%s esercizi rimossi",
-          "many": "%s esercizi rimossi",
-          "other": "%s esercizi rimossi"
+          "two": "$n esercizi rimossi",
+          "few": "$n esercizi rimossi",
+          "many": "$n esercizi rimossi",
+          "other": "$n esercizi rimossi"
         },
         "changed": {
           "zero": "Nessun esercizio modificato",
           "one": "1 esercizio modificato",
-          "two": "%s esercizi modificati",
-          "few": "%s esercizi modificati",
-          "many": "%s esercizi modificati",
-          "other": "%s esercizi modificati"
+          "two": "$n esercizi modificati",
+          "few": "$n esercizi modificati",
+          "many": "$n esercizi modificati",
+          "other": "$n esercizi modificati"
         }
       }
     },
@@ -724,18 +730,18 @@
   "exerciseList": {
     "restTime": "Recupero: ",
     "fields": {
-      "weight": "@weight @unit",
-      "time": "@time",
+      "weight": "$weight $unit",
+      "time": "$time",
       "reps": {
         "zero": "0 rip.",
-        "one": "%s rip.",
-        "two": "%s rip.",
-        "few": "%s rip.",
-        "many": "%s di rip.",
-        "other": "%s rip."
+        "one": "$n rip.",
+        "two": "$n rip.",
+        "few": "$n rip.",
+        "many": "$n di rip.",
+        "other": "$n rip."
       },
-      "distance": "@distance @unit",
-      "rpe": "RPE @rpe"
+      "distance": "$distance $unit",
+      "rpe": "RPE $rpe"
     },
     "workoutMuscleCategoriesBarChart": {
       "label": "Distribuzione muscolare (per serie effettuate)"
@@ -763,36 +769,36 @@
     },
     "exercises": {
       "zero": "Nessun esercizio",
-      "one": "%s esercizio",
-      "two": "%s esercizi",
-      "few": "%s esercizi",
-      "many": "%s di esercizi",
-      "other": "%s esercizi"
+      "one": "$n esercizio",
+      "two": "$n esercizi",
+      "few": "$n esercizi",
+      "many": "$n di esercizi",
+      "other": "$n esercizi"
     },
-    "totalTime": "Tempo totale: @time",
+    "totalTime": "Tempo totale: $time",
     "selected": {
       "zero": "Nessuna selezione",
       "one": "1 elemento selezionato",
-      "two": "%s elementi selezionati",
-      "few": "%s elementi selezionati",
-      "many": "%s elementi selezionati",
-      "other": "%s elementi selezionati"
+      "two": "$n elementi selezionati",
+      "few": "$n elementi selezionati",
+      "many": "$n elementi selezionati",
+      "other": "$n elementi selezionati"
     },
     "workouts": {
       "zero": "Nessun allenamento",
-      "one": "%s allenamento",
-      "two": "%s allenamenti",
-      "few": "%s allenamenti",
-      "many": "%s allenamenti",
-      "other": "%s allenamenti"
+      "one": "$n allenamento",
+      "two": "$n allenamenti",
+      "few": "$n allenamenti",
+      "many": "$n allenamenti",
+      "other": "$n allenamenti"
     },
     "routines": {
       "zero": "Nessuna routine",
-      "one": "%s routine",
-      "two": "%s routine",
-      "few": "%s routine",
-      "many": "%s routine",
-      "other": "%s routine"
+      "one": "$n routine",
+      "two": "$n routine",
+      "few": "$n routine",
+      "many": "$n routine",
+      "other": "$n routine"
     },
     "optional": "(facoltativo)",
     "unnamed": "Unnamed"
@@ -831,16 +837,16 @@
     "shoulders": "Spalle"
   },
   "titleGenerator": {
-    "template": "Allenamento @muscles",
-    "title": [
-      "",
-      "@0",
-      "@0 e @1",
-      "@0, @1 e @2",
-      "@0, @1, @2 e @3",
-      "@0, @1, @2, @3 e @4",
-      "@0, @1, @2, @3, @4 e @5"
-    ]
+    "template": "Allenamento $muscles",
+    "title": {
+      "zero": "",
+      "one": "$p0",
+      "two": "$p0 e $p1",
+      "three": "$p0, $p1 e $p2",
+      "four": "$p0, $p1, $p2 e $p3",
+      "five": "$p0, $p1, $p2, $p3 e $p4",
+      "six": "$p0, $p1, $p2, $p3, $p4 e $p5"
+    }
   },
   "actions": {
     "create": "Crea",
@@ -857,36 +863,36 @@
   },
   "time": {
     "hours": {
-      "zero": "@minutes:@seconds",
-      "one": "@hours ora, @minutes:@seconds",
-      "two": "@hours ore, @minutes:@seconds",
-      "few": "@hours ore, @minutes:@seconds",
-      "many": "@hours di ore, @minutes:@seconds",
-      "other": "@hours ore, @minutes:@seconds"
+      "zero": "$minutes:$seconds",
+      "one": "$hours ora, $minutes:$seconds",
+      "two": "$hours ore, $minutes:$seconds",
+      "few": "$hours ore, $minutes:$seconds",
+      "many": "$hours di ore, $minutes:$seconds",
+      "other": "$hours ore, $minutes:$seconds"
     },
     "justHours": {
-      "zero": "%s",
-      "one": "%s ora",
-      "two": "%s ore",
-      "few": "%s ore",
-      "many": "%s di ore",
-      "other": "%s ore"
+      "zero": "$n",
+      "one": "$n ora",
+      "two": "$n ore",
+      "few": "$n ore",
+      "many": "$n di ore",
+      "other": "$n ore"
     },
     "days": {
       "zero": "0 giorni",
       "one": "1 giorno",
       "two": "2 giorni",
-      "few": "%s giorni",
-      "many": "%s di giorni",
-      "other": "%s giorni"
+      "few": "$n giorni",
+      "many": "$n di giorni",
+      "other": "$n giorni"
     },
     "weeks": {
       "zero": "0 settimane",
       "one": "1 settimana",
       "two": "2 settimane",
-      "few": "%s settimane",
-      "many": "%s di settimane",
-      "other": "%s settimane"
+      "few": "$n settimane",
+      "many": "$n di settimane",
+      "other": "$n settimane"
     }
   },
   "locales": {
@@ -1162,13 +1168,13 @@
   "superset": {
     "zero": "Superserie senza esercizi",
     "one": "Superserie con un esercizio",
-    "two": "Superserie con %s esercizi",
-    "few": "Superserie con %s esercizi",
-    "many": "Superserie con %s esercizi",
-    "other": "Superserie con %s esercizi"
+    "two": "Superserie con $n esercizi",
+    "few": "Superserie con $n esercizi",
+    "many": "Superserie con $n esercizi",
+    "other": "Superserie con $n esercizi"
   },
   "historyEditor": {
-    "title": "Modifica: @name",
+    "title": "Modifica: $name",
     "exercises": {
       "addSuperset": "+ Aggiungi superserie",
       "add": "+ Aggiungi esercizio",
@@ -1249,7 +1255,7 @@
       },
       "measured": {
         "never": "Ultima misurazione: mai",
-        "date": "Ultima misurazione: @date"
+        "date": "Ultima misurazione: $date"
       },
       "addMeasurement": "Aggiungi misurazione"
     },
@@ -1319,9 +1325,9 @@
         "description": "Visualizza l'evoluzione dei tuoi massimali (1RM) per i \"Big 3\" nell'intervallo di tempo selezionato. Il grafico utilizza il massimale più alto di ogni settimana per visualizzare l'andamento complessivo dei carichi nei tre esercizi fondamentali del powerlifting.",
         "warning": {
           "title": "Nota sul grafico",
-          "text": "Affinché i progressi vengano calcolati e visualizzati correttamente nel grafico, utilizza gli esercizi standard della libreria dell'app anziché creare varianti personalizzate. Nello specifico: @exercises."
+          "text": "Affinché i progressi vengano calcolati e visualizzati correttamente nel grafico, utilizza gli esercizi standard della libreria dell'app anziché creare varianti personalizzate. Nello specifico: $exercises."
         },
-        "bottomTitle": "S@week"
+        "bottomTitle": "S$week"
       }
     },
     "workoutDistribution": {
@@ -1332,6 +1338,12 @@
       "logout": "Esci",
       "edit": {
         "title": "Modifica profilo"
+      },
+      "errors": {
+        "logout": {
+          "title": "Si è verificato un errore",
+          "subtitle": "Impossibile effettuare il logout: $error"
+        }
       }
     },
     "sync": {
@@ -1383,7 +1395,7 @@
       "title": "Impostazioni timer a intervalli",
       "active": "Tempo di attività",
       "rest": "Tempo di recupero",
-      "section": "Sezione @section",
+      "section": "Sezione $section",
       "start": "Avvia timer a intervalli",
       "addSection": "+ Nuova sezione",
       "errors": {
@@ -1455,7 +1467,7 @@
       "description": "Rimuovi il parametro Peso da un esercizio con \"Peso e ripetizioni\" dove hai sempre e solo usato il campo Ripetizioni."
     },
     "genericMultiplyWeight": {
-      "title": "Moltiplica peso di un esercizio per @multiplier",
+      "title": "Moltiplica peso di un esercizio per $multiplier",
       "fields": {
         "exercise": {
           "title": "Moltiplica il peso di questo esercizio...",
@@ -1510,7 +1522,7 @@
     },
     "searchBar": {
       "hint": "Cerca cronologia o OpenFoodFacts…",
-      "noResults": "Nessun riscontro per \"@query\".",
+      "noResults": "Nessun riscontro per \"$query\".",
       "noHistory": "Cronologia vuota"
     },
     "nutriments": {
@@ -1604,7 +1616,7 @@
       "unknown": "Sconosciuto"
     },
     "add": {
-      "nutritionalValuesPerAmountG": "Valori nutrizionali (per @amount g / @amount ml)",
+      "nutritionalValuesPerAmountG": "Valori nutrizionali (per $amount g / $amount ml)",
       "servingSize": "Porzione",
       "custom": "Quantità personalizzata",
       "amount": "Quantità",
@@ -1613,7 +1625,7 @@
       "amountInvalid": "Inserisci un numero valido.",
       "add": "+ Aggiungi al diario",
       "unnamedServingSize": "Porzione sconosciuta",
-      "nutritionalValuesPerAmountWithUnit": "Valori nutrizionali (per @amount @unit)",
+      "nutritionalValuesPerAmountWithUnit": "Valori nutrizionali (per $amount $unit)",
       "customFood": {
         "showMore": "Mostra tutti i campi",
         "title": "Aggiungi cibo personalizzato",
@@ -1644,7 +1656,7 @@
       "title": "Scansiona codice a barre",
       "scanResult": {
         "noProductFound": {
-          "text": "Nessun prodotto è stato trovato con codice @barcode.",
+          "text": "Nessun prodotto è stato trovato con codice $barcode.",
           "title": "Nessun prodotto",
           "createNew": "Crea nuovo prodotto"
         },
@@ -1670,8 +1682,8 @@
     },
     "nutritionGoal": {
       "effect": {
-        "from": "La modifica verrà applicata a partire dal @from.",
-        "range": "La modifica verrà applicata dal @from al @to."
+        "from": "La modifica verrà applicata a partire dal $from.",
+        "range": "La modifica verrà applicata dal $from al $to."
       }
     },
     "nutritionGoals": {
@@ -1703,8 +1715,8 @@
         "title": "Cronologia obiettivi",
         "empty": "Non ci sono obiettivi",
         "tapToView": "Tocca per andare al giorno",
-        "calories": "Calorie giornaliere: @calories",
-        "macros": "@carbs carboidrati – @protein proteine – @fat grassi"
+        "calories": "Calorie giornaliere: $calories",
+        "macros": "$carbs carboidrati – $protein proteine – $fat grassi"
       }
     },
     "combine": {
@@ -1898,7 +1910,7 @@
       "zu": "Zulu",
       "xx": "Lingua sconosciuta",
       "world": "Mondo (pseudo-lingua)",
-      "-": "Lingua non definita"
+      "und": "Lingua non definita"
     },
     "countries": {
       "ad": "Andorra",
@@ -2153,7 +2165,7 @@
       "world": "Mondo"
     },
     "categoryList": {
-      "dailyPercentage": "@percentage% del totale giornaliero – @calories",
+      "dailyPercentage": "$percentage% del totale giornaliero – $calories",
       "empty": "Non hai ancora configurato le categorie",
       "unmodifiable": {
         "title": "Impossibile modificare",
@@ -2180,8 +2192,8 @@
       "save": "Salva",
       "icon": "Icona",
       "effect": {
-        "from": "Eventuali modifiche verranno applicate a partire dal @from.",
-        "range": "Eventuali modifiche verranno applicate dal @from al @to.",
+        "from": "Eventuali modifiche verranno applicate a partire dal $from.",
+        "range": "Eventuali modifiche verranno applicate dal $from al $to.",
         "title": "Range di applicazione"
       },
       "nonFulfillingSum": {
@@ -2249,30 +2261,30 @@
   "achievements": {
     "title": "Conquiste",
     "locked": "Bloccato",
-    "unlockedOn": "Sbloccato: @date",
+    "unlockedOn": "Sbloccato: $date",
     "history": "Cronologia",
     "firstSteps": {
       "title": "Primi passi",
       "description": {
-        "1": "Completa il tuo primo allenamento",
-        "2": "Traccia il tuo primo peso",
-        "3": "Traccia il tuo primo pasto"
+        "k1": "Completa il tuo primo allenamento",
+        "k2": "Traccia il tuo primo peso",
+        "k3": "Traccia il tuo primo pasto"
       }
     },
     "foodWatcher": {
       "title": "Food blogger",
       "description": {
-        "1": "Traccia i tuoi pasti per 2 giorni di fila",
-        "2": "Traccia i tuoi pasti per 7 giorni di fila",
-        "3": "Traccia i tuoi pasti per un intero mese di fila"
+        "k1": "Traccia i tuoi pasti per 2 giorni di fila",
+        "k2": "Traccia i tuoi pasti per 7 giorni di fila",
+        "k3": "Traccia i tuoi pasti per un intero mese di fila"
       }
     },
     "marathoner": {
       "title": "Maratoneta",
       "description": {
-        "1": "Percorri una 5km",
-        "2": "Percorri una mezza maratona",
-        "3": "Percorri un'intera maratona"
+        "k1": "Percorri una 5km",
+        "k2": "Percorri una mezza maratona",
+        "k3": "Percorri un'intera maratona"
       }
     },
     "earlyBird": {
@@ -2286,58 +2298,58 @@
     "realGymBro": {
       "title": "Vero Gym Bro",
       "description": {
-        "1": "Traccia un totale di 100 ore di allenamenti",
-        "2": "Traccia un totale di 500 ore di allenamenti",
-        "3": "Traccia un totale di 1000 ore di allenamenti"
+        "k1": "Traccia un totale di 100 ore di allenamenti",
+        "k2": "Traccia un totale di 500 ore di allenamenti",
+        "k3": "Traccia un totale di 1000 ore di allenamenti"
       }
     },
     "workoutFreak": {
       "title": "Maniaco dell'allenamento",
       "description": {
-        "1": "Traccia un allenamento al giorno per tutto un mese",
-        "2": "Traccia un allenamento al giorno per tutto un anno"
+        "k1": "Traccia un allenamento al giorno per tutto un mese",
+        "k2": "Traccia un allenamento al giorno per tutto un anno"
       }
     },
     "trailblazer": {
       "title": "Pioniere",
       "description": {
-        "1": {
+        "k1": {
           "km": "Percorri un totale di 100 km",
-          "mi": "Percorri un totale di 100 km (@mi)"
+          "mi": "Percorri un totale di 100 km ($p0)"
         },
-        "2": {
+        "k2": {
           "km": "Percorri un totale di 500 km",
-          "mi": "Percorri un totale di 500 km (@mi)"
+          "mi": "Percorri un totale di 500 km ($p0)"
         },
-        "3": {
+        "k3": {
           "km": "Percorri un totale di 1000 km",
-          "mi": "Percorri un totale di 1000 km (@mi)"
+          "mi": "Percorri un totale di 1000 km ($p0)"
         }
       }
     },
     "cycleChampion": {
       "title": "Ciclista campione",
       "description": {
-        "1": {
+        "k1": {
           "km": "Pedala per un totale di 100 km",
-          "mi": "Pedala per un totale di 100 km (@mi)"
+          "mi": "Pedala per un totale di 100 km ($p0)"
         },
-        "2": {
+        "k2": {
           "km": "Pedala per un totale di 500 km",
-          "mi": "Pedala per un totale di 500 km (@mi)"
+          "mi": "Pedala per un totale di 500 km ($p0)"
         },
-        "3": {
+        "k3": {
           "km": "Pedala per un totale di 1000 km",
-          "mi": "Pedala per un totale di 1000 km (@mi)"
+          "mi": "Pedala per un totale di 1000 km ($p0)"
         }
       }
     },
     "professionalWeightlifter": {
       "title": "Sollevatore di coriandoli",
       "description": {
-        "1": "Solleva il tuo peso corporeo in una ripetizione",
-        "2": "Solleva 1.5x volte il tuo peso corporeo in una ripetizione",
-        "3": "Solleva 3x volte il tuo peso corporeo in una ripetizione"
+        "k1": "Solleva il tuo peso corporeo in una ripetizione",
+        "k2": "Solleva 1.5x volte il tuo peso corporeo in una ripetizione",
+        "k3": "Solleva 3x volte il tuo peso corporeo in una ripetizione"
       }
     },
     "programPlanner": {
@@ -2351,9 +2363,9 @@
     "routineMaster": {
       "title": "Maestro delle routine",
       "description": {
-        "1": "Segui una routine per 3 mesi consecutivi",
-        "2": "Segui una routine per 6 mesi consecutivi",
-        "3": "Segui una routine per 12 mesi consecutivi"
+        "k1": "Segui una routine per 3 mesi consecutivi",
+        "k2": "Segui una routine per 6 mesi consecutivi",
+        "k3": "Segui una routine per 12 mesi consecutivi"
       }
     },
     "intensityInnovator": {
@@ -2383,13 +2395,13 @@
     "sparta": {
       "title": "Questa è Sparta",
       "description": {
-        "1": {
-          "kg": "Solleva 300 lb (@kg) in una ripetizione",
+        "k1": {
+          "kg": "Solleva 300 lb ($p0) in una ripetizione",
           "lb": "Solleva 300 lb in una ripetizione"
         },
-        "2": {
+        "k2": {
           "kg": "Solleva 300 kg in una ripetizione",
-          "lb": "Solleva 300 kg (@lb) in una ripetizione"
+          "lb": "Solleva 300 kg ($p0) in una ripetizione"
         }
       }
     },
@@ -2645,7 +2657,7 @@
     "accept": "Accetta",
     "decline": "Rifiuta",
     "unfriendConfirmation": {
-      "title": "Rimuovere @name dagli amici?",
+      "title": "Rimuovere $name dagli amici?",
       "subtitle": "Non apparirà più nel tuo feed, e tu non apparirai nel suo.",
       "confirm": "Rimuovi",
       "cancel": "Annulla"

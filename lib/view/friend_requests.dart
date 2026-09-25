@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:gymtracker/i18n/strings.g.dart';
 import 'package:gymtracker/icons/gymtracker_icons.dart';
 import 'package:gymtracker/model/friend.dart';
 import 'package:gymtracker/provider/friend.dart';
-import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/view/components/content_unavailable.dart';
 import 'package:gymtracker/view/components/loading_indicator.dart';
@@ -18,7 +18,7 @@ class FriendRequestsPage extends ConsumerWidget {
     final friendStateAsync = ref.watch(friendProvider);
 
     return Scaffold(
-      appBar: AppBar(title: Text("friendRequests.title".t)),
+      appBar: AppBar(title: Text(context.t.friendRequests.title)),
       body: friendStateAsync.when(
         data: (friendState) {
           final requests = friendState.pendingReceived;
@@ -26,8 +26,8 @@ class FriendRequestsPage extends ConsumerWidget {
             return Center(
               child: ContentUnavailableView(
                 icon: const Icon(GTIcons.friend_requests),
-                title: Text("friendRequests.empty.title".t),
-                description: Text("friendRequests.empty.text".t),
+                title: Text(context.t.friendRequests.empty.title),
+                description: Text(context.t.friendRequests.empty.text),
               ),
             );
           }
@@ -67,7 +67,7 @@ class _FriendRequestTile extends ConsumerWidget {
       },
       leading: UserAccountIcon(id: friend.id),
       title: UserNameText(id: friend.id),
-      subtitle: Text("friendRequests.subtitle".t),
+      subtitle: Text(context.t.friendRequests.subtitle),
       trailing: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -75,14 +75,14 @@ class _FriendRequestTile extends ConsumerWidget {
             onPressed: () async {
               await notifier.acceptFriendRequest(friend.id);
             },
-            child: Text("userProfile.accept".t),
+            child: Text(context.t.userProfile.accept),
           ),
           const SizedBox(width: 8),
           OutlinedButton(
             onPressed: () async {
               await notifier.declineFriendRequest(friend.id);
             },
-            child: Text("userProfile.reject".t),
+            child: Text(context.t.userProfile.reject),
           ),
         ],
       ),

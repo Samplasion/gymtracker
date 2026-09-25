@@ -9,15 +9,17 @@ import 'package:gymtracker/data/distance.dart';
 import 'package:gymtracker/data/exercises.dart';
 import 'package:gymtracker/data/weights.dart';
 import 'package:gymtracker/gen/exercises.gen.dart';
+import 'package:gymtracker/i18n/strings.g.dart';
 import 'package:gymtracker/icons/gymtracker_icons.dart';
 import 'package:gymtracker/model/exercise.dart';
 import 'package:gymtracker/model/workout.dart';
+import 'package:gymtracker/provider/locale.dart';
 import 'package:gymtracker/provider/stats.dart';
-import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/utils/colors.dart';
 import 'package:gymtracker/utils/constants.dart';
 import 'package:gymtracker/utils/extensions.dart';
-import 'package:gymtracker/utils/utils.dart' show getWeekNumber;
+import 'package:gymtracker/utils/utils.dart'
+    show getLastFirstDayOfWeek, getWeekNumber, firstDayOfWeekFor;
 import 'package:gymtracker/view/charts/gym_equipment.dart';
 import 'package:gymtracker/view/charts/line_charts_time_series.dart';
 import 'package:gymtracker/view/charts/muscle_category.dart';
@@ -105,7 +107,9 @@ class _MeStatisticsPageState
         for (final timeFrame in TimeFrame.values)
           DropdownMenuItem(
             value: timeFrame,
-            child: Text("me.stats.timeFrame.${timeFrame.name}".t),
+            child: Text(
+              context.t.me.stats.timeFrame[timeFrame.name] ?? "UNKNOWN",
+            ),
           ),
       ],
       onChanged: (v) {
@@ -121,27 +125,30 @@ class _MeStatisticsPageState
     );
     return Scaffold(
       appBar: AppBar(
-        title: Text("me.stats.label".t),
+        title: Text(context.t.me.stats.label),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(0)),
         bottom: TabBar(
           isScrollable: true,
           controller: _controller,
           tabs: [
-            Tab(icon: const Icon(GTIcons.stats), text: "me.stats.atAGlance".t),
+            Tab(
+              icon: const Icon(GTIcons.stats),
+              text: context.t.me.stats.atAGlance,
+            ),
             Tab(
               icon: const Icon(GTIcons.muscle_groups),
-              text: "me.stats.muscleCategory".t,
+              text: context.t.me.stats.muscleCategory,
             ),
             Tab(
               icon: const Icon(GTIcons.equipment),
-              text: "me.stats.gymEquipment".t,
+              text: context.t.me.stats.gymEquipment,
             ),
             Tab(
               icon: EquipmentIcon(
                 equipment: .barbell,
                 size: Theme.of(context).iconTheme.size ?? 24,
               ),
-              text: "me.stats.mainThree.label".t,
+              text: context.t.me.stats.mainThree.label,
             ),
           ],
         ),
@@ -176,7 +183,7 @@ class _MeStatisticsPageState
                         return SpeedDialButton(
                           icon: const Icon(GTIcons.workout),
                           text: Text("${value.toInt()}"),
-                          subtitle: Text("me.stats.workouts.label".t),
+                          subtitle: Text(context.t.me.stats.workouts.label),
                         );
                       },
                     ),
@@ -190,7 +197,7 @@ class _MeStatisticsPageState
                             Duration(milliseconds: value),
                             builder: (time) => Text("${time.text}"),
                           ),
-                          subtitle: Text("me.stats.duration.label".t),
+                          subtitle: Text(context.t.me.stats.duration.label),
                         );
                       },
                     ),
@@ -199,8 +206,8 @@ class _MeStatisticsPageState
                       builder: (context, value) {
                         return SpeedDialButton(
                           icon: const Icon(GTIcons.volume),
-                          text: Text(value.userFacingWeight),
-                          subtitle: Text("me.stats.volume.label".t),
+                          text: Text(value.getUserFacingWeight(context.t)),
+                          subtitle: Text(context.t.me.stats.volume.label),
                         );
                       },
                     ),
@@ -210,7 +217,7 @@ class _MeStatisticsPageState
                         return SpeedDialButton(
                           icon: const Icon(GTIcons.sets),
                           text: Text("$value"),
-                          subtitle: Text("me.stats.sets.label".t),
+                          subtitle: Text(context.t.me.stats.sets.label),
                         );
                       },
                     ),
@@ -219,8 +226,8 @@ class _MeStatisticsPageState
                       builder: (context, value) {
                         return SpeedDialButton(
                           icon: const Icon(GTIcons.distance),
-                          text: Text(value.userFacingDistance),
-                          subtitle: Text("me.stats.distance.label".t),
+                          text: Text(value.getUserFacingDistance(context.t)),
+                          subtitle: Text(context.t.me.stats.distance.label),
                         );
                       },
                     ),
@@ -310,15 +317,15 @@ class _BigThreeStatsTab extends StatelessWidget {
               _StatsMainLiftsChart(),
               const SizedBox(height: 16),
               AlertBanner(
-                title: "me.stats.mainThree.label".t,
-                text: Text("me.stats.mainThree.description".t),
+                title: context.t.me.stats.mainThree.label,
+                text: Text(context.t.me.stats.mainThree.description),
                 color: GTMaterialColor.primary,
               ),
               AlertBanner(
-                title: "me.stats.mainThree.warning.title".t,
+                title: context.t.me.stats.mainThree.warning.title,
                 text: Text(
-                  "me.stats.mainThree.warning.text".tParams({
-                    "exercises":
+                  context.t.me.stats.mainThree.warning.text(
+                    exercises:
                         [
                               GTStandardLibrary.chest.barbellBenchPressFlat,
                               GTStandardLibrary.quadriceps.squatsBarbell,
@@ -326,10 +333,10 @@ class _BigThreeStatsTab extends StatelessWidget {
                             ]
                             .map(
                               (id) =>
-                                  '"${getStandardExerciseByID(id)?.displayName ?? id.toString()}"',
+                                  '"${getStandardExerciseByID(id)?.getDisplayName(context.t) ?? id.toString()}"',
                             )
                             .join(", "),
-                  }),
+                  ),
                 ),
                 color: GTMaterialColor.warning,
                 icon: const Icon(GTIcons.warning),
@@ -355,7 +362,7 @@ class _StatsMainLiftsChart extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final weightResult = ref.watch(
-      majorThreeChartDataProvider(GTLocalizations.firstDayOfWeekFor(context)),
+      majorThreeChartDataProvider(firstDayOfWeekFor(context.locale)),
     );
 
     return PageTransitionSwitcher(
@@ -435,15 +442,15 @@ class _StatsMainLiftsChart extends ConsumerWidget {
           .firstWhere(
             (ex) => ex.id == GTStandardLibrary.chest.barbellBenchPressFlat,
           )
-          .displayName,
+          .getDisplayName(context.t),
       MajorLiftType.squat: exerciseStandardLibraryAsList
           .firstWhere(
             (ex) => ex.id == GTStandardLibrary.quadriceps.squatsBarbell,
           )
-          .displayName,
+          .getDisplayName(context.t),
       MajorLiftType.deadlift: exerciseStandardLibraryAsList
           .firstWhere((ex) => ex.id == GTStandardLibrary.back.deadlift)
-          .displayName,
+          .getDisplayName(context.t),
     };
 
     return LineChartTimeSeries(
@@ -473,7 +480,7 @@ class _StatsMainLiftsChart extends ConsumerWidget {
       },
       currentValueBuilder: (selectedCategory, hoveredIndex, point, isPredicted) {
         return Text(
-          "${names[selectedCategory] ?? selectedCategory}: ${point.value.userFacingWeight} (${DateFormat.yMMMd(context.locale.languageCode).format(point.date)})",
+          "${names[selectedCategory] ?? selectedCategory}: ${point.value.getUserFacingWeight(context.t)} (${DateFormat.yMMMd(context.locale.languageCode).format(point.date)})",
         );
       },
       nullCurrentValueBuilder: (selectedCategory) {
@@ -481,13 +488,13 @@ class _StatsMainLiftsChart extends ConsumerWidget {
       },
       leftTitleBuilder: (category, weight) {
         if (weight < 0) return "";
-        return weight.userFacingWeight;
+        return weight.getUserFacingWeight(context.t);
       },
       categoryColors: (context) => colors,
       bottomTitleBuilder: (date) {
-        return "me.stats.mainThree.bottomTitle".tParams({
-          "week": getWeekNumber(date).toString(),
-        });
+        return context.t.me.stats.mainThree.bottomTitle(
+          week: getWeekNumber(date).toString(),
+        );
       },
     );
   }

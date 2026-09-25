@@ -6,8 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:get/get.dart';
 import 'package:gymtracker/controller/purchases_controller.dart';
+import 'package:gymtracker/i18n/strings.g.dart';
 import 'package:gymtracker/icons/gymtracker_icons.dart';
-import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/utils/theme.dart';
@@ -512,7 +512,9 @@ class __LineChartTimeSeriesSingleState<T>
                               children: [
                                 TextSpan(
                                   text:
-                                      "timeSeriesChart.interval.${type.name}".t,
+                                      context.t.timeSeriesChart.interval[type
+                                          .name] ??
+                                      "UNKNOWN",
                                 ),
                                 if (type.isPro && shouldBlock) ...[
                                   const TextSpan(text: " "),
@@ -525,7 +527,7 @@ class __LineChartTimeSeriesSingleState<T>
                             ),
                           ),
                       },
-                      title: Text("timeSeriesChart.selectInterval".t),
+                      title: Text(context.t.timeSeriesChart.selectInterval),
                       onChange: (value) {
                         if (value == null) return;
                         if (shouldBlock && value.isPro) {
@@ -542,7 +544,10 @@ class __LineChartTimeSeriesSingleState<T>
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Text("timeSeriesChart.interval.${type.name}".t),
+                      Text(
+                        context.t.timeSeriesChart.interval[type.name] ??
+                            "UNKNOWN",
+                      ),
                       const SizedBox(width: 4),
                       const Icon(GTIcons.dropdown),
                     ],
@@ -1166,7 +1171,9 @@ class __LineChartTimeSeriesConcurrentState<T>
                               children: [
                                 TextSpan(
                                   text:
-                                      "timeSeriesChart.interval.${type.name}".t,
+                                      context.t.timeSeriesChart.interval[type
+                                          .name] ??
+                                      "UNKNOWN",
                                 ),
                                 if (type.isPro && shouldBlock) ...[
                                   const TextSpan(text: " "),
@@ -1179,7 +1186,7 @@ class __LineChartTimeSeriesConcurrentState<T>
                             ),
                           ),
                       },
-                      title: Text("timeSeriesChart.selectInterval".t),
+                      title: Text(context.t.timeSeriesChart.selectInterval),
                       onChange: (value) {
                         if (value == null) return;
                         if (shouldBlock && value.isPro) {
@@ -1196,7 +1203,10 @@ class __LineChartTimeSeriesConcurrentState<T>
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Text("timeSeriesChart.interval.${type.name}".t),
+                      Text(
+                        context.t.timeSeriesChart.interval[type.name] ??
+                            "UNKNOWN",
+                      ),
                       const SizedBox(width: 4),
                       const Icon(GTIcons.dropdown),
                     ],
@@ -1483,13 +1493,13 @@ class _EmptyChartTimeSeries extends StatelessWidget {
               crossAxisAlignment: .center,
               children: [
                 Text(
-                  "timeSeriesChart.noData.title".t,
+                  context.t.timeSeriesChart.noData.title,
                   style: context.textTheme.bodyLarge?.copyWith(
                     color: colorScheme.onSurfaceVariant,
                   ),
                 ),
                 Text(
-                  "timeSeriesChart.noData.subtitle".t,
+                  context.t.timeSeriesChart.noData.subtitle,
                   style: context.textTheme.bodyMedium?.copyWith(
                     color: colorScheme.onSurfaceVariant,
                   ),

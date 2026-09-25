@@ -9,11 +9,11 @@ import 'package:gymtracker/controller/history_controller.dart';
 import 'package:gymtracker/controller/purchases_controller.dart';
 import 'package:gymtracker/controller/routines_controller.dart';
 import 'package:gymtracker/data/configuration.dart';
+import 'package:gymtracker/i18n/strings.g.dart';
 import 'package:gymtracker/icons/gymtracker_icons.dart';
 import 'package:gymtracker/model/workout.dart';
 import 'package:gymtracker/provider/routines.dart';
 import 'package:gymtracker/repository/routines.dart';
-import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/service/logger.dart';
 import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/utils/go.dart';
@@ -131,7 +131,7 @@ class _RoutinesViewState extends ConsumerState<RoutinesView> with _RoutineList {
         slivers: [
           // Hardcode the title while loading to avoid flickering
           SliverAppBar.large(
-            title: Text(isLoading ? "Routines" : "routines.title".t),
+            title: Text(isLoading ? "Routines" : context.t.routines.title),
             leading: const SkeletonDrawerButton(),
             actions: [
               IconButton(
@@ -139,14 +139,14 @@ class _RoutinesViewState extends ConsumerState<RoutinesView> with _RoutineList {
                   Go.to(() => const BoutiqueView());
                 },
                 icon: const Icon(GTIcons.boutique),
-                tooltip: "boutique.title".t,
+                tooltip: context.t.boutique.title,
               ),
               IconButton(
                 onPressed: () {
                   Go.to(() => const LibraryView());
                 },
                 icon: const Icon(GTIcons.library),
-                tooltip: "library.title".t,
+                tooltip: context.t.library.title,
               ),
             ],
           ),
@@ -170,8 +170,8 @@ class _RoutinesViewState extends ConsumerState<RoutinesView> with _RoutineList {
                     historyController.history.length >=
                         Configuration.trialWorkoutLimit;
                 return ListTile(
-                  title: Text("routines.quickWorkout.title".t),
-                  subtitle: Text("routines.quickWorkout.subtitle".t),
+                  title: Text(context.t.routines.quickWorkout.title),
+                  subtitle: Text(context.t.routines.quickWorkout.subtitle),
                   leading: Skeleton.leaf(
                     child: CircleAvatar(
                       foregroundColor:
@@ -236,7 +236,7 @@ class _RoutinesViewState extends ConsumerState<RoutinesView> with _RoutineList {
                   title: Text.rich(
                     TextSpan(
                       children: [
-                        TextSpan(text: "routines.newRoutine".t),
+                        TextSpan(text: context.t.routines.newRoutine),
                         if (shouldDisable) ...[
                           const TextSpan(text: " "),
                           WidgetSpan(
@@ -273,7 +273,7 @@ class _RoutinesViewState extends ConsumerState<RoutinesView> with _RoutineList {
                     title: Text.rich(
                       TextSpan(
                         children: [
-                          TextSpan(text: "routines.newFolder".t),
+                          TextSpan(text: context.t.routines.newFolder),
                           if (shouldDisable) ...[
                             const TextSpan(text: " "),
                             WidgetSpan(
@@ -340,7 +340,9 @@ class _DraggingListItem extends StatelessWidget {
                       maxLines: 2,
                     ),
                     Text(
-                      "general.exercises".plural(workout.displayExerciseCount),
+                      context.t.general.exercises(
+                        n: workout.displayExerciseCount,
+                      ),
                       textAlign: TextAlign.center,
                       overflow: TextOverflow.ellipsis,
                       maxLines: 2,
@@ -384,11 +386,11 @@ class _EditFolderModalState
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("routines.editFolder".t),
+        title: Text(context.t.routines.editFolder),
         actions: [
           IconButton(
             icon: const Icon(GTIcons.delete),
-            tooltip: "actions.remove".t,
+            tooltip: context.t.actions.remove,
             onPressed: () {
               controller.deleteFolder(widget.folder);
             },
@@ -408,7 +410,7 @@ class _EditFolderModalState
                 ),
               );
             },
-            tooltip: "actions.save".t,
+            tooltip: context.t.actions.save,
             icon: const Icon(GTIcons.done),
           ),
         ],
@@ -425,12 +427,12 @@ class _EditFolderModalState
               children: [
                 TextFormField(
                   decoration: GymTrackerInputDecoration(
-                    labelText: "routines.folderName".t,
+                    labelText: context.t.routines.folderName,
                   ),
                   controller: _controller,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return "routines.folderNameEmpty".t;
+                      return context.t.routines.folderNameEmpty;
                     }
                     return null;
                   },
@@ -438,7 +440,7 @@ class _EditFolderModalState
                 GTRichTextEditor(
                   controller: _notesController,
                   decoration: InputDecoration(
-                    labelText: "routines.folderNotes".t,
+                    labelText: context.t.routines.folderNotes,
                     alignLabelWithHint: true,
                   ),
                 ),
@@ -498,7 +500,9 @@ mixin _RoutineList<T extends ConsumerStatefulWidget> on ConsumerState<T> {
                     child: Icon(icon),
                   ),
                   title: Text(folder.name),
-                  subtitle: Text("general.routines".plural(workouts.length)),
+                  subtitle: Text(
+                    context.t.general.routines(n: workouts.length),
+                  ),
                   onTap: () {
                     Go.to(
                       () => _RoutinesFolderView(
@@ -554,7 +558,7 @@ mixin _RoutineList<T extends ConsumerStatefulWidget> on ConsumerState<T> {
                       ),
                       title: Text(folder.name),
                       subtitle: Text(
-                        "general.routines".plural(workouts.length),
+                        context.t.general.routines(n: workouts.length),
                       ),
                       children: [
                         ReorderableList(
@@ -656,8 +660,8 @@ mixin _RoutineList<T extends ConsumerStatefulWidget> on ConsumerState<T> {
                   child: Padding(
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     child: ListTile(
-                      title: Text("routines.dropHere".t),
-                      subtitle: Text("routines.moveToRoot".t),
+                      title: Text(context.t.routines.dropHere),
+                      subtitle: Text(context.t.routines.moveToRoot),
                       leading: CircleAvatar(
                         backgroundColor: Theme.of(
                           context,
@@ -754,7 +758,7 @@ class _RoutinesFolderViewState extends ConsumerState<_RoutinesFolderView>
       body: CustomScrollView(
         slivers: [
           SliverAppBar.large(
-            title: Text(folder?.name ?? "routines.folder".t),
+            title: Text(folder?.name ?? context.t.routines.folder),
             actions: [
               IconButton(
                 icon: Icon(GTIcons.edit),
@@ -779,8 +783,8 @@ class _RoutinesFolderViewState extends ConsumerState<_RoutinesFolderView>
             SliverFillRemaining(
               child: ContentUnavailableView(
                 icon: Icon(GTIcons.folder_open),
-                title: Text("routines.nullFolder".t),
-                description: Text("routines.nullFolderSubtitle".t),
+                title: Text(context.t.routines.nullFolder),
+                description: Text(context.t.routines.nullFolderSubtitle),
               ),
             )
           else
@@ -794,8 +798,10 @@ class _RoutinesFolderViewState extends ConsumerState<_RoutinesFolderView>
                     SliverFillRemaining(
                       child: ContentUnavailableView(
                         icon: Icon(GTIcons.folder_open),
-                        title: Text("routines.emptyFolder".t),
-                        description: Text("routines.emptyFolderSubtitle".t),
+                        title: Text(context.t.routines.emptyFolder),
+                        description: Text(
+                          context.t.routines.emptyFolderSubtitle,
+                        ),
                       ),
                     ),
                   ];
@@ -869,7 +875,7 @@ class _RoutinesFolderViewState extends ConsumerState<_RoutinesFolderView>
                                     vertical: 16,
                                     horizontal: 16,
                                   ),
-                                  title: Text("routines.dropHere".t),
+                                  title: Text(context.t.routines.dropHere),
                                   subtitle: Text.rich(
                                     TextSpan(
                                       children: [
@@ -879,7 +885,9 @@ class _RoutinesFolderViewState extends ConsumerState<_RoutinesFolderView>
                                               PlaceholderAlignment.middle,
                                         ),
                                         const TextSpan(text: " "),
-                                        TextSpan(text: "routines.rootFolder".t),
+                                        TextSpan(
+                                          text: context.t.routines.rootFolder,
+                                        ),
                                       ],
                                     ),
                                   ),
@@ -970,7 +978,7 @@ class _RoutinePickerState extends ConsumerState<RoutinePicker>
       body: Obx(
         () => CustomScrollView(
           slivers: [
-            SliverAppBar.large(title: Text("routines.pick".t)),
+            SliverAppBar.large(title: Text(context.t.routines.pick)),
             if (widget.allowNone) ...[
               SliverToBoxAdapter(
                 child: ListTile(
@@ -979,7 +987,7 @@ class _RoutinePickerState extends ConsumerState<RoutinePicker>
                     foregroundColor: context.colorScheme.onTertiaryContainer,
                     child: const Icon(GTIcons.no_routine),
                   ),
-                  title: Text("routines.none".t),
+                  title: Text(context.t.routines.none),
                   onTap: () {
                     widget.onPick(null);
                     Get.back();
@@ -1022,7 +1030,7 @@ class TerseRoutineListTile extends StatelessWidget {
       text = routine!.folder!.name;
     } else {
       icon = const Icon(GTIcons.folder_root, size: 20);
-      text = "routineFormPicker.fields.routine.options.root".t;
+      text = context.t.routineFormPicker.fields.routine.options.root;
     }
 
     return ListTile(

@@ -6,13 +6,13 @@ import 'package:flutter_quill/flutter_quill.dart';
 import 'package:get/get.dart';
 import 'package:gymtracker/controller/routines_controller.dart';
 import 'package:gymtracker/controller/settings_controller.dart';
+import 'package:gymtracker/i18n/strings.g.dart';
 import 'package:gymtracker/icons/gymtracker_icons.dart';
 import 'package:gymtracker/model/exercisable.dart';
 import 'package:gymtracker/model/exercise.dart';
 import 'package:gymtracker/model/set.dart';
 import 'package:gymtracker/model/superset.dart';
 import 'package:gymtracker/model/workout.dart';
-import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/struct/editor_callback.dart';
 import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/utils/go.dart';
@@ -68,36 +68,39 @@ class _RoutineCreatorState extends State<RoutineCreator> {
   @override
   void initState() {
     super.initState();
-    if (widget.base != null) {
-      _titleIsTouched = true;
-      _controller.exercises(
-        widget.base!.exercises.map((e) => e.clone()).toList().wrap(),
-      );
-    } else {
-      titleController.text = generateWorkoutTitle({});
-      _titleUpdateStreamSubscription = _controller.exercises.listen((
-        exercises,
-      ) {
-        if (!_titleIsTouched) {
-          titleController.text = generateWorkoutTitle(
-            exercises
-                .map((e) => e.data)
-                .expand((e) {
-                  if (e is Exercise) {
-                    return {e.primaryMuscleGroup.category};
-                  } else if (e is Superset) {
-                    return e.exercises.expand(
-                      (ex) => {ex.primaryMuscleGroup.category},
-                    );
-                  }
-                  return <GTMuscleCategory>{};
-                })
-                .whereType<GTMuscleCategory>()
-                .toSet(),
-          );
-        }
-      });
-    }
+    SchedulerBinding.instance.addPostFrameCallback((_) {
+      if (widget.base != null) {
+        _titleIsTouched = true;
+        _controller.exercises(
+          widget.base!.exercises.map((e) => e.clone()).toList().wrap(),
+        );
+      } else {
+        titleController.text = generateWorkoutTitle(context.t, {});
+        _titleUpdateStreamSubscription = _controller.exercises.listen((
+          exercises,
+        ) {
+          if (!_titleIsTouched) {
+            titleController.text = generateWorkoutTitle(
+              context.t,
+              exercises
+                  .map((e) => e.data)
+                  .expand((e) {
+                    if (e is Exercise) {
+                      return {e.primaryMuscleGroup.category};
+                    } else if (e is Superset) {
+                      return e.exercises.expand(
+                        (ex) => {ex.primaryMuscleGroup.category},
+                      );
+                    }
+                    return <GTMuscleCategory>{};
+                  })
+                  .whereType<GTMuscleCategory>()
+                  .toSet(),
+            );
+          }
+        });
+      }
+    });
   }
 
   @override
@@ -113,9 +116,9 @@ class _RoutineCreatorState extends State<RoutineCreator> {
       appBar: AppBar(
         title: Text(() {
           if (widget.base == null) {
-            return "routines.actions.create".t;
+            return context.t.routines.actions.create;
           } else {
-            return "routines.actions.edit".t;
+            return context.t.routines.actions.edit;
           }
         }()),
         actions: [
@@ -131,12 +134,12 @@ class _RoutineCreatorState extends State<RoutineCreator> {
               TextFormField(
                 controller: titleController,
                 decoration: GymTrackerInputDecoration(
-                  labelText: "routines.editor.fields.name.label".t,
+                  labelText: context.t.routines.editor.fields.name.label,
                 ),
                 autovalidateMode: AutovalidateMode.always,
                 validator: (string) {
                   if (string == null || string.isEmpty) {
-                    return "routines.editor.fields.name.errors.empty".t;
+                    return context.t.routines.editor.fields.name.errors.empty;
                   }
                   return null;
                 },
@@ -151,13 +154,13 @@ class _RoutineCreatorState extends State<RoutineCreator> {
               GTRichTextEditor(
                 controller: infoboxController,
                 decoration: GymTrackerInputDecoration(
-                  labelText: "routines.editor.fields.infobox.label".t,
+                  labelText: context.t.routines.editor.fields.infobox.label,
                   alignLabelWithHint: true,
                 ),
                 onTapOutside: () {},
               ),
               Text(
-                "routines.editor.exercises.title".t,
+                context.t.routines.editor.exercises.title,
                 style: Theme.of(context).textTheme.titleMedium,
               ),
             ].map(
@@ -170,7 +173,7 @@ class _RoutineCreatorState extends State<RoutineCreator> {
               ),
             ),
             ListTile(
-              title: Text("routines.editor.exercises.add".t),
+              title: Text(context.t.routines.editor.exercises.add),
               leading: const CircleAvatar(child: Icon(GTIcons.add_exercise)),
               onTap: () {
                 Go.to<List<Exercise>>(
@@ -197,7 +200,7 @@ class _RoutineCreatorState extends State<RoutineCreator> {
               },
             ),
             ListTile(
-              title: Text("routines.editor.superset.add".t),
+              title: Text(context.t.routines.editor.superset.add),
               leading: const CircleAvatar(child: Icon(GTIcons.add_superset)),
               onTap: () {
                 Go.to<List<Exercise>>(
@@ -269,6 +272,7 @@ class _RoutineCreatorState extends State<RoutineCreator> {
   void _submit() {
     if (!_titleIsTouched) {
       titleController.text = generateWorkoutTitle(
+        context.t,
         _controller.exercises
             .unwrap()
             .expand((e) {

@@ -90,6 +90,8 @@ dependencies:
   online_offline: ^1.0.1
   lottie: ^3.5.1
   mobile_scanner: ^7.4.0
+  slang: ^4.19.1
+  slang_flutter: ^4.19.0
   
 dev_dependencies:
   sentry_dart_plugin: ^3.4.0
@@ -135,7 +137,6 @@ flutter:
   assets:
     - assets/anim/
     - assets/audio/
-    - assets/i18n/
     - assets/svg/
     - assets/svg/equipment/
     - assets/svg/trophies/
@@ -154,17 +155,26 @@ flutter:
     - assets/exercises/abs/hollowBodyHold/
     - assets/exercises/abs/hollowBodyHoldBentKnees/
     - assets/exercises/abs/kneeRaise/
+    - assets/exercises/abs/lateralHyperextensions/
     - assets/exercises/abs/legRaise/
+    - assets/exercises/abs/legRaiseParallelBars/
+    - assets/exercises/abs/obliqueCrunches/
     - assets/exercises/abs/plank/
     - assets/exercises/abs/russianTwist/
     - assets/exercises/abs/toeTouches/
     - assets/exercises/back/barbellRow/
     - assets/exercises/back/cableSeatedRowTriangleBar/
     - assets/exercises/back/deadlift/
+    - assets/exercises/back/dumbbellRow/
     - assets/exercises/back/hyperExtensions/
     - assets/exercises/back/latPulldowns/
+    - assets/exercises/back/latPulldownsNarrowGrip/
+    - assets/exercises/back/latPulldownsWideGrip/
     - assets/exercises/back/pullUps/
+    - assets/exercises/back/rowMachine/
     - assets/exercises/back/straightArmCablePushdown/
+    - assets/exercises/back/tBarRow/
+    - assets/exercises/back/tBarRowWideProneGrip/
     - assets/exercises/back/triangleBarLatPulldowns/
     - assets/exercises/back/underhandGripLatPulldowns/
     - assets/exercises/back/weightedHyperExtensions/
@@ -197,7 +207,11 @@ flutter:
     - assets/exercises/chest/barbellBenchPressDecline/
     - assets/exercises/chest/barbellBenchPressFlat/
     - assets/exercises/chest/barbellBenchPressIncline/
+    - assets/exercises/chest/benchFlys/
     - assets/exercises/chest/butterflyMachine/
+    - assets/exercises/chest/cableBenchPressDecline/
+    - assets/exercises/chest/cableBenchPressFlat/
+    - assets/exercises/chest/cableBenchPressIncline/
     - assets/exercises/chest/cableChestPress/
     - assets/exercises/chest/cableFlyCrossovers/
     - assets/exercises/chest/declinePushUps/
@@ -205,6 +219,8 @@ flutter:
     - assets/exercises/chest/dumbbellBenchPressFlat/
     - assets/exercises/chest/dumbbellBenchPressIncline/
     - assets/exercises/chest/dumbbellHexPress/
+    - assets/exercises/chest/inclineBenchFlys/
+    - assets/exercises/chest/inclinePushUps/
     - assets/exercises/chest/lowCableFly/
     - assets/exercises/chest/pushUps/
     - assets/exercises/chest/pushUpsWeighted/
@@ -213,10 +229,13 @@ flutter:
     - assets/exercises/chest/smithMachineBenchPressFlat/
     - assets/exercises/chest/smithMachineBenchPressIncline/
     - assets/exercises/chest/smithMachineHexPress/
+    - assets/exercises/chest/tBarPress/
     - assets/exercises/chest/verticalChestPress/
+    - assets/exercises/forearms/cableSingleArmReverseCurl/
     - assets/exercises/forearms/farmerWalk/
     - assets/exercises/forearms/platePinch/
     - assets/exercises/forearms/reverseCurls/
+    - assets/exercises/forearms/reverseCurlsDumbbell/
     - assets/exercises/forearms/reverseWristCurlsBarbell/
     - assets/exercises/forearms/reverseWristCurlsDumbbell/
     - assets/exercises/forearms/wristCurlsBarbell/
@@ -232,9 +251,13 @@ flutter:
     - assets/exercises/hips/hipAdduction/
     - assets/exercises/hips/hipThrust/
     - assets/exercises/hips/hipThrustBarbell/
+    - assets/exercises/obliques/sidewaysPlank/
+    - assets/exercises/obliques/sidewaysPlankReachThrough/
+    - assets/exercises/other/stretching/
     - assets/exercises/quadriceps/bodyweightSquats/
     - assets/exercises/quadriceps/bulgarianSplitSquats/
     - assets/exercises/quadriceps/frontSquats/
+    - assets/exercises/quadriceps/hackSquats/
     - assets/exercises/quadriceps/legExtension/
     - assets/exercises/quadriceps/legPress/
     - assets/exercises/quadriceps/legPress45deg/
@@ -243,19 +266,27 @@ flutter:
     - assets/exercises/quadriceps/squatsBarbell/
     - assets/exercises/shoulders/arnoldPress/
     - assets/exercises/shoulders/bentOverLateralRaises/
+    - assets/exercises/shoulders/deltoidMachine/
     - assets/exercises/shoulders/frontDumbbellRaise/
     - assets/exercises/shoulders/handstandPushUps/
     - assets/exercises/shoulders/latRaisesCable/
     - assets/exercises/shoulders/latRaisesDualCable/
+    - assets/exercises/shoulders/latRaisesDumbbells/
     - assets/exercises/shoulders/latRaisesInclinedBench/
+    - assets/exercises/shoulders/militaryPressBarbell/
+    - assets/exercises/shoulders/militaryPressSmithMachine/
     - assets/exercises/shoulders/pikePushUps/
+    - assets/exercises/shoulders/reverseButterfly/
     - assets/exercises/shoulders/reverseFlysInclinedBench/
+    - assets/exercises/shoulders/shoulderPress/
     - assets/exercises/shoulders/shoulderPressMachine/
+    - assets/exercises/shoulders/shrugsBarbell/
     - assets/exercises/shoulders/uprightRow/
     - assets/exercises/triceps/benchDips/
     - assets/exercises/triceps/diamondPushUps/
     - assets/exercises/triceps/dips/
     - assets/exercises/triceps/overheadRopeTricepExtension/
+    - assets/exercises/triceps/overheadTricepExtension/
     - assets/exercises/triceps/skullCrushers/
     - assets/exercises/triceps/tricepKickbacks/
     - assets/exercises/triceps/tricepsMachine/

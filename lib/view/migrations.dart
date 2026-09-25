@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:gymtracker/controller/migrations_controller.dart';
+import 'package:gymtracker/i18n/strings.g.dart';
 import 'package:gymtracker/icons/gymtracker_icons.dart';
 import 'package:gymtracker/model/exercise.dart';
 import 'package:gymtracker/model/set.dart';
-import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/struct/data_migration.dart';
 import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/utils/go.dart';
@@ -26,12 +26,12 @@ class AllMigrationsView extends ControlledWidget<MigrationsController> {
     return Scaffold(
       body: CustomScrollView(
         slivers: [
-          SliverAppBar.large(
-            title: Text("migrations.title".t),
-          ),
+          SliverAppBar.large(title: Text(context.t.migrations.title)),
           SliverList(
             delegate: SliverChildListDelegate([
-              for (final migration in controller.migrations)
+              for (final migration in controller.getMigrations(
+                context: context,
+              ))
                 ListTile(
                   title: Text(migration.title),
                   subtitle: Text(migration.description),
@@ -56,15 +56,19 @@ class CustomToLibraryMigrationSetupView extends StatefulWidget {
       _CustomToLibraryMigrationSetupViewState();
 }
 
-class _CustomToLibraryMigrationSetupViewState extends ControlledState<
-    CustomToLibraryMigrationSetupView, MigrationsController> {
+class _CustomToLibraryMigrationSetupViewState
+    extends
+        ControlledState<
+          CustomToLibraryMigrationSetupView,
+          MigrationsController
+        > {
   Exercise? from, to;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("migrations.customToLibraryExercise.title".t),
+        title: Text(context.t.migrations.customToLibraryExercise.title),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
@@ -73,7 +77,7 @@ class _CustomToLibraryMigrationSetupViewState extends ControlledState<
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Text(
-                "migrations.customToLibraryExercise.fields.from.title".t,
+                context.t.migrations.customToLibraryExercise.fields.from.title,
                 style: Theme.of(context).textTheme.titleMedium,
               ),
               const SizedBox(height: 8),
@@ -86,13 +90,18 @@ class _CustomToLibraryMigrationSetupViewState extends ControlledState<
                   return ex.parameters == to!.parameters;
                 },
                 decoration: GymTrackerInputDecoration(
-                  labelText:
-                      "migrations.customToLibraryExercise.fields.from.label".t,
+                  labelText: context
+                      .t
+                      .migrations
+                      .customToLibraryExercise
+                      .fields
+                      .from
+                      .label,
                 ),
               ),
               const SizedBox(height: 16),
               Text(
-                "migrations.customToLibraryExercise.fields.to.title".t,
+                context.t.migrations.customToLibraryExercise.fields.to.title,
                 style: Theme.of(context).textTheme.titleMedium,
               ),
               const SizedBox(height: 8),
@@ -105,14 +114,19 @@ class _CustomToLibraryMigrationSetupViewState extends ControlledState<
                   return ex.parameters == from!.parameters;
                 },
                 decoration: GymTrackerInputDecoration(
-                  labelText:
-                      "migrations.customToLibraryExercise.fields.to.label".t,
+                  labelText: context
+                      .t
+                      .migrations
+                      .customToLibraryExercise
+                      .fields
+                      .to
+                      .label,
                 ),
               ),
               const SizedBox(height: 24),
               ElevatedButton(
                 onPressed: _nextCallback(),
-                child: Text("migrations.common.actions.next".t),
+                child: Text(context.t.migrations.common.actions.next),
               ),
             ],
           ),
@@ -135,10 +149,7 @@ class CustomToLibraryMigrationPreviewView
     extends ControlledWidget<MigrationsController> {
   final CustomToLibraryExerciseMigration migration;
 
-  CustomToLibraryMigrationPreviewView({
-    super.key,
-    required this.migration,
-  });
+  CustomToLibraryMigrationPreviewView({super.key, required this.migration});
 
   late final affectedRoutines = migration.affectedRoutines;
   late final affectedWorkouts = migration.affectedHistory.reversed.toList();
@@ -146,9 +157,7 @@ class CustomToLibraryMigrationPreviewView
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text("migrations.common.preview".t),
-      ),
+      appBar: AppBar(title: Text(context.t.migrations.common.preview)),
       body: CustomScrollView(
         slivers: [
           SliverPadding(
@@ -158,7 +167,7 @@ class CustomToLibraryMigrationPreviewView
                 SafeArea(
                   bottom: false,
                   child: Text(
-                    "migrations.customToLibraryExercise.preview.from".t,
+                    context.t.migrations.customToLibraryExercise.preview.from,
                     style: Theme.of(context).textTheme.titleMedium,
                   ),
                 ),
@@ -173,7 +182,7 @@ class CustomToLibraryMigrationPreviewView
                 SafeArea(
                   bottom: false,
                   child: Text(
-                    "migrations.customToLibraryExercise.preview.to".t,
+                    context.t.migrations.customToLibraryExercise.preview.to,
                     style: Theme.of(context).textTheme.titleMedium,
                   ),
                 ),
@@ -189,8 +198,12 @@ class CustomToLibraryMigrationPreviewView
                   SafeArea(
                     bottom: false,
                     child: Text(
-                      "migrations.customToLibraryExercise.preview.affectedRoutines"
-                          .t,
+                      context
+                          .t
+                          .migrations
+                          .customToLibraryExercise
+                          .preview
+                          .affectedRoutines,
                       style: Theme.of(context).textTheme.titleMedium,
                     ),
                   ),
@@ -207,18 +220,21 @@ class CustomToLibraryMigrationPreviewView
                     cursor: SystemMouseCursors.click,
                     child: TerseRoutineListTile(
                       routine: affectedRoutines[index],
-                      contentPadding:
-                          const EdgeInsets.symmetric(horizontal: 16.0),
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 16.0,
+                      ),
                       showIcon: true,
                       onTap: () {
-                        Go.to(() => ExercisesView(
-                              workout: affectedRoutines[index],
-                              highlightExercise: (we) {
-                                if (!we.isExercise) return false;
-                                final ex = we.asExercise;
-                                return migration.from.isTheSameAs(ex);
-                              },
-                            ));
+                        Go.to(
+                          () => ExercisesView(
+                            workout: affectedRoutines[index],
+                            highlightExercise: (we) {
+                              if (!we.isExercise) return false;
+                              final ex = we.asExercise;
+                              return migration.from.isTheSameAs(ex);
+                            },
+                          ),
+                        );
                       },
                     ),
                   );
@@ -234,8 +250,12 @@ class CustomToLibraryMigrationPreviewView
                   SafeArea(
                     bottom: false,
                     child: Text(
-                      "migrations.customToLibraryExercise.preview.affectedWorkouts"
-                          .t,
+                      context
+                          .t
+                          .migrations
+                          .customToLibraryExercise
+                          .preview
+                          .affectedWorkouts,
                       style: Theme.of(context).textTheme.titleMedium,
                     ),
                   ),
@@ -248,17 +268,20 @@ class CustomToLibraryMigrationPreviewView
                 itemBuilder: (context, i) {
                   return TerseWorkoutListTile(
                     workout: affectedWorkouts[i],
-                    contentPadding:
-                        const EdgeInsets.symmetric(horizontal: 16.0),
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 16.0,
+                    ),
                     onTap: () {
-                      Go.to(() => ExercisesView(
-                            workout: affectedWorkouts[i],
-                            highlightExercise: (we) {
-                              if (!we.isExercise) return false;
-                              final ex = we.asExercise;
-                              return migration.from.isTheSameAs(ex);
-                            },
-                          ));
+                      Go.to(
+                        () => ExercisesView(
+                          workout: affectedWorkouts[i],
+                          highlightExercise: (we) {
+                            if (!we.isExercise) return false;
+                            final ex = we.asExercise;
+                            return migration.from.isTheSameAs(ex);
+                          },
+                        ),
+                      );
                     },
                   );
                 },
@@ -267,9 +290,7 @@ class CustomToLibraryMigrationPreviewView
             ),
           ],
           SliverToBoxAdapter(
-            child: SizedBox(
-              height: MediaQuery.of(context).padding.bottom,
-            ),
+            child: SizedBox(height: MediaQuery.of(context).padding.bottom),
           ),
         ],
       ),
@@ -284,10 +305,10 @@ class CustomToLibraryMigrationPreviewView
                   return null;
                 }
                 return () {
-                  controller.applyMigration(migration);
+                  controller.applyMigration(context, migration);
                 };
               }(),
-              child: Text("migrations.common.actions.apply".t),
+              child: Text(context.t.migrations.common.actions.apply),
             ),
           ),
         ),
@@ -310,9 +331,7 @@ class RemoveUnusedExercisesMigrationPreviewView
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text("migrations.common.preview".t),
-      ),
+      appBar: AppBar(title: Text(context.t.migrations.common.preview)),
       body: CustomScrollView(
         slivers: [
           if (affectedExercises.isNotEmpty) ...[
@@ -323,8 +342,12 @@ class RemoveUnusedExercisesMigrationPreviewView
                   SafeArea(
                     bottom: false,
                     child: Text(
-                      "migrations.removeUnusedExercises.preview.affectedExercises"
-                          .t,
+                      context
+                          .t
+                          .migrations
+                          .removeUnusedExercises
+                          .preview
+                          .affectedExercises,
                       style: Theme.of(context).textTheme.titleMedium,
                     ),
                   ),
@@ -341,8 +364,9 @@ class RemoveUnusedExercisesMigrationPreviewView
                       exercise: affectedExercises[index],
                       selected: false,
                       isConcrete: false,
-                      contentPadding:
-                          const EdgeInsets.symmetric(horizontal: 16.0),
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 16.0,
+                      ),
                     ),
                   );
                 },
@@ -357,7 +381,12 @@ class RemoveUnusedExercisesMigrationPreviewView
                   SafeArea(
                     bottom: false,
                     child: Text(
-                      "migrations.removeUnusedExercises.preview.noAffected".t,
+                      context
+                          .t
+                          .migrations
+                          .removeUnusedExercises
+                          .preview
+                          .noAffected,
                       style: Theme.of(context).textTheme.titleMedium,
                     ),
                   ),
@@ -366,9 +395,7 @@ class RemoveUnusedExercisesMigrationPreviewView
             ),
           ],
           SliverToBoxAdapter(
-            child: SizedBox(
-              height: MediaQuery.of(context).padding.bottom,
-            ),
+            child: SizedBox(height: MediaQuery.of(context).padding.bottom),
           ),
         ],
       ),
@@ -383,10 +410,10 @@ class RemoveUnusedExercisesMigrationPreviewView
                   return null;
                 }
                 return () {
-                  controller.applyMigration(migration);
+                  controller.applyMigration(context, migration);
                 };
               }(),
-              child: Text("migrations.common.actions.apply".t),
+              child: Text(context.t.migrations.common.actions.apply),
             ),
           ),
         ),
@@ -398,8 +425,10 @@ class RemoveUnusedExercisesMigrationPreviewView
 class RemoveWeightFromCustomExerciseMigrationSetupView extends StatefulWidget {
   final UIMigration<RemoveWeightFromCustomExerciseMigration> migration;
 
-  const RemoveWeightFromCustomExerciseMigrationSetupView(this.migration,
-      {super.key});
+  const RemoveWeightFromCustomExerciseMigrationSetupView(
+    this.migration, {
+    super.key,
+  });
 
   @override
   State<RemoveWeightFromCustomExerciseMigrationSetupView> createState() =>
@@ -407,15 +436,18 @@ class RemoveWeightFromCustomExerciseMigrationSetupView extends StatefulWidget {
 }
 
 class _RemoveWeightFromCustomExerciseMigrationSetupViewState
-    extends ControlledState<RemoveWeightFromCustomExerciseMigrationSetupView,
-        MigrationsController> {
+    extends
+        ControlledState<
+          RemoveWeightFromCustomExerciseMigrationSetupView,
+          MigrationsController
+        > {
   Exercise? ex;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("migrations.removeWeightFromCustomExercise.title".t),
+        title: Text(context.t.migrations.removeWeightFromCustomExercise.title),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
@@ -424,8 +456,13 @@ class _RemoveWeightFromCustomExerciseMigrationSetupViewState
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Text(
-                "migrations.removeWeightFromCustomExercise.fields.exercise.title"
-                    .t,
+                context
+                    .t
+                    .migrations
+                    .removeWeightFromCustomExercise
+                    .fields
+                    .exercise
+                    .title,
                 style: Theme.of(context).textTheme.titleMedium,
               ),
               const SizedBox(height: 8),
@@ -437,15 +474,19 @@ class _RemoveWeightFromCustomExerciseMigrationSetupViewState
                   return ex.parameters == GTSetParameters.repsWeight;
                 },
                 decoration: GymTrackerInputDecoration(
-                  labelText:
-                      "migrations.removeWeightFromCustomExercise.fields.exercise.label"
-                          .t,
+                  labelText: context
+                      .t
+                      .migrations
+                      .removeWeightFromCustomExercise
+                      .fields
+                      .exercise
+                      .label,
                 ),
               ),
               const SizedBox(height: 24),
               ElevatedButton(
                 onPressed: _nextCallback(),
-                child: Text("migrations.common.actions.next".t),
+                child: Text(context.t.migrations.common.actions.next),
               ),
             ],
           ),
@@ -478,9 +519,7 @@ class RemoveWeightFromCustomExerciseMigrationPreviewView
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text("migrations.common.preview".t),
-      ),
+      appBar: AppBar(title: Text(context.t.migrations.common.preview)),
       body: CustomScrollView(
         slivers: [
           if (!isCompatible)
@@ -490,12 +529,21 @@ class RemoveWeightFromCustomExerciseMigrationPreviewView
                 child: SafeArea(
                   child: AlertBanner(
                     color: Colors.amber,
-                    title:
-                        "migrations.removeWeightFromCustomExercise.preview.incompatible.title"
-                            .t,
+                    title: context
+                        .t
+                        .migrations
+                        .removeWeightFromCustomExercise
+                        .preview
+                        .incompatible
+                        .title,
                     text: Text(
-                      "migrations.removeWeightFromCustomExercise.preview.incompatible.text"
-                          .t,
+                      context
+                          .t
+                          .migrations
+                          .removeWeightFromCustomExercise
+                          .preview
+                          .incompatible
+                          .text,
                     ),
                   ),
                 ),
@@ -508,8 +556,12 @@ class RemoveWeightFromCustomExerciseMigrationPreviewView
                 SafeArea(
                   bottom: false,
                   child: Text(
-                    "migrations.removeWeightFromCustomExercise.preview.selected"
-                        .t,
+                    context
+                        .t
+                        .migrations
+                        .removeWeightFromCustomExercise
+                        .preview
+                        .selected,
                     style: Theme.of(context).textTheme.titleMedium,
                   ),
                 ),
@@ -525,8 +577,12 @@ class RemoveWeightFromCustomExerciseMigrationPreviewView
                   SafeArea(
                     bottom: false,
                     child: Text(
-                      "migrations.removeWeightFromCustomExercise.preview.affectedRoutines"
-                          .t,
+                      context
+                          .t
+                          .migrations
+                          .removeWeightFromCustomExercise
+                          .preview
+                          .affectedRoutines,
                       style: Theme.of(context).textTheme.titleMedium,
                     ),
                   ),
@@ -543,18 +599,21 @@ class RemoveWeightFromCustomExerciseMigrationPreviewView
                     cursor: SystemMouseCursors.click,
                     child: TerseRoutineListTile(
                       routine: affectedRoutines[index],
-                      contentPadding:
-                          const EdgeInsets.symmetric(horizontal: 16.0),
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 16.0,
+                      ),
                       showIcon: true,
                       onTap: () {
-                        Go.to(() => ExercisesView(
-                              workout: affectedRoutines[index],
-                              highlightExercise: (we) {
-                                if (!we.isExercise) return false;
-                                final ex = we.asExercise;
-                                return migration.exercise.isTheSameAs(ex);
-                              },
-                            ));
+                        Go.to(
+                          () => ExercisesView(
+                            workout: affectedRoutines[index],
+                            highlightExercise: (we) {
+                              if (!we.isExercise) return false;
+                              final ex = we.asExercise;
+                              return migration.exercise.isTheSameAs(ex);
+                            },
+                          ),
+                        );
                       },
                     ),
                   );
@@ -570,8 +629,12 @@ class RemoveWeightFromCustomExerciseMigrationPreviewView
                   SafeArea(
                     bottom: false,
                     child: Text(
-                      "migrations.removeWeightFromCustomExercise.preview.affectedWorkouts"
-                          .t,
+                      context
+                          .t
+                          .migrations
+                          .removeWeightFromCustomExercise
+                          .preview
+                          .affectedWorkouts,
                       style: Theme.of(context).textTheme.titleMedium,
                     ),
                   ),
@@ -584,17 +647,20 @@ class RemoveWeightFromCustomExerciseMigrationPreviewView
                 itemBuilder: (context, i) {
                   return TerseWorkoutListTile(
                     workout: affectedWorkouts[i],
-                    contentPadding:
-                        const EdgeInsets.symmetric(horizontal: 16.0),
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 16.0,
+                    ),
                     onTap: () {
-                      Go.to(() => ExercisesView(
-                            workout: affectedWorkouts[i],
-                            highlightExercise: (we) {
-                              if (!we.isExercise) return false;
-                              final ex = we.asExercise;
-                              return migration.exercise.isTheSameAs(ex);
-                            },
-                          ));
+                      Go.to(
+                        () => ExercisesView(
+                          workout: affectedWorkouts[i],
+                          highlightExercise: (we) {
+                            if (!we.isExercise) return false;
+                            final ex = we.asExercise;
+                            return migration.exercise.isTheSameAs(ex);
+                          },
+                        ),
+                      );
                     },
                   );
                 },
@@ -603,9 +669,7 @@ class RemoveWeightFromCustomExerciseMigrationPreviewView
             ),
           ],
           SliverToBoxAdapter(
-            child: SizedBox(
-              height: MediaQuery.of(context).padding.bottom,
-            ),
+            child: SizedBox(height: MediaQuery.of(context).padding.bottom),
           ),
         ],
       ),
@@ -623,10 +687,10 @@ class RemoveWeightFromCustomExerciseMigrationPreviewView
                         return null;
                       }
                       return () {
-                        controller.applyMigration(migration);
+                        controller.applyMigration(context, migration);
                       };
                     }(),
-              child: Text("migrations.common.actions.apply".t),
+              child: Text(context.t.migrations.common.actions.apply),
             ),
           ),
         ),
@@ -651,18 +715,24 @@ class GenericMultiplyWeightInExerciseMigrationSetupView extends StatefulWidget {
 }
 
 class _GenericMultiplyWeightInExerciseMigrationSetupViewState
-    extends ControlledState<GenericMultiplyWeightInExerciseMigrationSetupView,
-        MigrationsController> {
+    extends
+        ControlledState<
+          GenericMultiplyWeightInExerciseMigrationSetupView,
+          MigrationsController
+        > {
   Exercise? ex;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("migrations.genericMultiplyWeight.title".tParams({
-          "multiplier": NumberFormat.decimalPattern(context.locale.languageCode)
-              .format(widget.multiplier),
-        })),
+        title: Text(
+          context.t.migrations.genericMultiplyWeight.title(
+            multiplier: NumberFormat.decimalPattern(
+              context.locale.languageCode,
+            ).format(widget.multiplier),
+          ),
+        ),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
@@ -671,7 +741,13 @@ class _GenericMultiplyWeightInExerciseMigrationSetupViewState
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Text(
-                "migrations.genericMultiplyWeight.fields.exercise.title".t,
+                context
+                    .t
+                    .migrations
+                    .genericMultiplyWeight
+                    .fields
+                    .exercise
+                    .title,
                 style: Theme.of(context).textTheme.titleMedium,
               ),
               const SizedBox(height: 8),
@@ -683,15 +759,19 @@ class _GenericMultiplyWeightInExerciseMigrationSetupViewState
                   return ex.parameters == GTSetParameters.repsWeight;
                 },
                 decoration: GymTrackerInputDecoration(
-                  labelText:
-                      "migrations.genericMultiplyWeight.fields.exercise.label"
-                          .t,
+                  labelText: context
+                      .t
+                      .migrations
+                      .genericMultiplyWeight
+                      .fields
+                      .exercise
+                      .label,
                 ),
               ),
               const SizedBox(height: 24),
               ElevatedButton(
                 onPressed: _nextCallback(),
-                child: Text("migrations.common.actions.next".t),
+                child: Text(context.t.migrations.common.actions.next),
               ),
             ],
           ),
@@ -704,7 +784,8 @@ class _GenericMultiplyWeightInExerciseMigrationSetupViewState
     if (ex == null) return null;
     return () {
       widget.migration.preview(
-          GenericMultiplyWeightInExerciseMigration(ex!, widget.multiplier));
+        GenericMultiplyWeightInExerciseMigration(ex!, widget.multiplier),
+      );
     };
   }
 }
@@ -725,9 +806,7 @@ class GenericMultiplyWeightInExerciseMigrationPreviewView
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text("migrations.common.preview".t),
-      ),
+      appBar: AppBar(title: Text(context.t.migrations.common.preview)),
       body: CustomScrollView(
         slivers: [
           if (!isCompatible)
@@ -737,12 +816,21 @@ class GenericMultiplyWeightInExerciseMigrationPreviewView
                 child: SafeArea(
                   child: AlertBanner(
                     color: Colors.amber,
-                    title:
-                        "migrations.genericMultiplyWeight.preview.incompatible.title"
-                            .t,
+                    title: context
+                        .t
+                        .migrations
+                        .genericMultiplyWeight
+                        .preview
+                        .incompatible
+                        .title,
                     text: Text(
-                      "migrations.genericMultiplyWeight.preview.incompatible.text"
-                          .t,
+                      context
+                          .t
+                          .migrations
+                          .genericMultiplyWeight
+                          .preview
+                          .incompatible
+                          .text,
                     ),
                   ),
                 ),
@@ -755,7 +843,7 @@ class GenericMultiplyWeightInExerciseMigrationPreviewView
                 SafeArea(
                   bottom: false,
                   child: Text(
-                    "migrations.genericMultiplyWeight.preview.selected".t,
+                    context.t.migrations.genericMultiplyWeight.preview.selected,
                     style: Theme.of(context).textTheme.titleMedium,
                   ),
                 ),
@@ -771,8 +859,12 @@ class GenericMultiplyWeightInExerciseMigrationPreviewView
                   SafeArea(
                     bottom: false,
                     child: Text(
-                      "migrations.genericMultiplyWeight.preview.affectedRoutines"
-                          .t,
+                      context
+                          .t
+                          .migrations
+                          .genericMultiplyWeight
+                          .preview
+                          .affectedRoutines,
                       style: Theme.of(context).textTheme.titleMedium,
                     ),
                   ),
@@ -789,18 +881,21 @@ class GenericMultiplyWeightInExerciseMigrationPreviewView
                     cursor: SystemMouseCursors.click,
                     child: TerseRoutineListTile(
                       routine: affectedRoutines[index],
-                      contentPadding:
-                          const EdgeInsets.symmetric(horizontal: 16.0),
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 16.0,
+                      ),
                       showIcon: true,
                       onTap: () {
-                        Go.to(() => ExercisesView(
-                              workout: affectedRoutines[index],
-                              highlightExercise: (we) {
-                                if (!we.isExercise) return false;
-                                final ex = we.asExercise;
-                                return migration.exercise.isTheSameAs(ex);
-                              },
-                            ));
+                        Go.to(
+                          () => ExercisesView(
+                            workout: affectedRoutines[index],
+                            highlightExercise: (we) {
+                              if (!we.isExercise) return false;
+                              final ex = we.asExercise;
+                              return migration.exercise.isTheSameAs(ex);
+                            },
+                          ),
+                        );
                       },
                     ),
                   );
@@ -816,8 +911,12 @@ class GenericMultiplyWeightInExerciseMigrationPreviewView
                   SafeArea(
                     bottom: false,
                     child: Text(
-                      "migrations.genericMultiplyWeight.preview.affectedWorkouts"
-                          .t,
+                      context
+                          .t
+                          .migrations
+                          .genericMultiplyWeight
+                          .preview
+                          .affectedWorkouts,
                       style: Theme.of(context).textTheme.titleMedium,
                     ),
                   ),
@@ -830,17 +929,20 @@ class GenericMultiplyWeightInExerciseMigrationPreviewView
                 itemBuilder: (context, i) {
                   return TerseWorkoutListTile(
                     workout: affectedWorkouts[i],
-                    contentPadding:
-                        const EdgeInsets.symmetric(horizontal: 16.0),
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 16.0,
+                    ),
                     onTap: () {
-                      Go.to(() => ExercisesView(
-                            workout: affectedWorkouts[i],
-                            highlightExercise: (we) {
-                              if (!we.isExercise) return false;
-                              final ex = we.asExercise;
-                              return migration.exercise.isTheSameAs(ex);
-                            },
-                          ));
+                      Go.to(
+                        () => ExercisesView(
+                          workout: affectedWorkouts[i],
+                          highlightExercise: (we) {
+                            if (!we.isExercise) return false;
+                            final ex = we.asExercise;
+                            return migration.exercise.isTheSameAs(ex);
+                          },
+                        ),
+                      );
                     },
                   );
                 },
@@ -849,9 +951,7 @@ class GenericMultiplyWeightInExerciseMigrationPreviewView
             ),
           ],
           SliverToBoxAdapter(
-            child: SizedBox(
-              height: MediaQuery.of(context).padding.bottom,
-            ),
+            child: SizedBox(height: MediaQuery.of(context).padding.bottom),
           ),
         ],
       ),
@@ -869,10 +969,10 @@ class GenericMultiplyWeightInExerciseMigrationPreviewView
                         return null;
                       }
                       return () {
-                        controller.applyMigration(migration);
+                        controller.applyMigration(context, migration);
                       };
                     }(),
-              child: Text("migrations.common.actions.apply".t),
+              child: Text(context.t.migrations.common.actions.apply),
             ),
           ),
         ),

@@ -3,7 +3,7 @@ import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:gymtracker/gen/assets.gen.dart';
-import 'package:gymtracker/service/localizations.dart';
+import 'package:gymtracker/i18n/strings.g.dart';
 import 'package:gymtracker/utils/constants.dart';
 import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/view/components/loading_indicator.dart';
@@ -66,8 +66,8 @@ class _LegalViewerPageState extends State<_LegalViewerPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(switch (widget.type) {
-          LegalType.tos => "appInfo.terms".t,
-          LegalType.privacy => "appInfo.privacy".t,
+          LegalType.tos => context.t.appInfo.terms,
+          LegalType.privacy => context.t.appInfo.privacy,
         }),
       ),
       body: FutureBuilder<String>(

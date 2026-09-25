@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:gymtracker/i18n/strings.g.dart';
 import 'package:gymtracker/icons/gymtracker_icons.dart';
-import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/service/logger.dart';
 import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/view/logs.dart';
@@ -32,7 +32,7 @@ class ErrorViewComponent extends StatelessWidget {
               const SizedBox(height: 24),
 
               Text(
-                title ?? "error.title".t,
+                title ?? context.t.error.title,
                 style: Theme.of(context).textTheme.headlineMedium,
                 textAlign: TextAlign.center,
               ),
@@ -53,7 +53,7 @@ class ErrorViewComponent extends StatelessWidget {
                 FilledButton.icon(
                   onPressed: retryCallback,
                   icon: const Icon(Icons.refresh_rounded),
-                  label: Text("error.retry".t),
+                  label: Text(context.t.error.retry),
                 ),
 
               const SizedBox(height: 16),
@@ -63,7 +63,7 @@ class ErrorViewComponent extends StatelessWidget {
                   Go.to(() => const LogView());
                 },
                 icon: const Icon(GTIcons.logs),
-                label: Text("error.logs".t),
+                label: Text(context.t.error.logs),
               ),
             ],
           ),

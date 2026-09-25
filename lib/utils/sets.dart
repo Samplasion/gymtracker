@@ -1,8 +1,8 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:gymtracker/i18n/strings.g.dart';
 import 'package:gymtracker/model/set.dart';
-import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/utils/theme.dart';
 
 Widget buildSetType(
@@ -16,7 +16,7 @@ Widget buildSetType(
   switch (kind) {
     case GTSetKind.warmUp:
       return Text(
-        "set.kindShort.warmUp".t,
+        context.t.set.kindShort.warmUp,
         style: TextStyle(
           color: scheme.tertiary,
           fontWeight: FontWeight.bold,
@@ -26,13 +26,13 @@ Widget buildSetType(
     case GTSetKind.normal:
       return Text(
         max(
-                allSets
-                        .where((element) => element.kind == GTSetKind.normal)
-                        .toList()
-                        .indexOf(set) +
-                    1,
-                1)
-            .toString(),
+          allSets
+                  .where((element) => element.kind == GTSetKind.normal)
+                  .toList()
+                  .indexOf(set) +
+              1,
+          1,
+        ).toString(),
         style: TextStyle(
           color: scheme.primary,
           fontWeight: FontWeight.bold,
@@ -41,7 +41,7 @@ Widget buildSetType(
       );
     case GTSetKind.drop:
       return Text(
-        "set.kindShort.drop".t,
+        context.t.set.kindShort.drop,
         style: TextStyle(
           color: scheme.error,
           fontWeight: FontWeight.bold,
@@ -50,7 +50,7 @@ Widget buildSetType(
       );
     case GTSetKind.failure:
       return Text(
-        "set.kindShort.failure".t,
+        context.t.set.kindShort.failure,
         style: TextStyle(
           color: scheme.quinary,
           fontWeight: FontWeight.bold,
@@ -59,7 +59,7 @@ Widget buildSetType(
       );
     case GTSetKind.failureStripping:
       return Text(
-        "set.kindShort.failureStripping".t,
+        context.t.set.kindShort.failureStripping,
         style: TextStyle(
           color: scheme.quaternary,
           fontWeight: FontWeight.bold,

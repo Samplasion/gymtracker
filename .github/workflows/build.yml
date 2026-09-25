@@ -40,7 +40,7 @@ jobs:
         run: |
           echo $DOTENV > .env
           set -a; source .env; set +a
-          dart run build_runner clean && dart run build_runner build --delete-conflicting-outputs
+          dart run build_runner clean && dart run build_runner build && dart run pigeon --input lib/native_channels.dart && dart run slang
       - name: Install Rust
         uses: actions-rust-lang/setup-rust-toolchain@v1
       # - name: Install iOS platform

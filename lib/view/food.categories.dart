@@ -29,7 +29,10 @@ class FoodCategoryList extends ConsumerWidget {
     return Scaffold(
       body: CustomScrollView(
         slivers: [
-          SliverAppBar(title: Text("food.categoryList.title".t), pinned: true),
+          SliverAppBar(
+            title: Text(context.t.food.categoryList.title),
+            pinned: true,
+          ),
           if (!canUpdate)
             const _UnmodifiableCategoriesAlert()
           else
@@ -37,7 +40,7 @@ class FoodCategoryList extends ConsumerWidget {
           if (foodCategories.isEmpty) ...[
             SliverFillRemaining(
               hasScrollBody: false,
-              child: Center(child: Text("food.categoryList.empty".t)),
+              child: Center(child: Text(context.t.food.categoryList.empty)),
             ),
           ] else ...[
             const _NonFulfillingSumBanner(),
@@ -60,7 +63,7 @@ class FoodCategoryList extends ConsumerWidget {
                         backgroundColor: context.theme.colorScheme.error,
                         foregroundColor: context.theme.colorScheme.onError,
                         icon: GTIcons.delete_forever,
-                        label: 'actions.remove'.t,
+                        label: context.t.actions.remove,
                       ),
                     ],
                   ),
@@ -81,7 +84,7 @@ class FoodCategoryList extends ConsumerWidget {
               }
             : null,
         icon: GTIcons.compound.add_food_category,
-        label: Text("food.categoryList.add".t),
+        label: Text(context.t.food.categoryList.add),
         disabledElevation: 0,
         backgroundColor: getFabBackgroundColor(context, canUpdate),
         foregroundColor: getFabForegroundColor(context, canUpdate),
@@ -105,12 +108,13 @@ class FoodCategoryListTile extends ConsumerWidget {
       leading: Icon(category.icon.iconData),
       title: Text(category.name),
       subtitle: Text(
-        "food.categoryList.dailyPercentage".tParams({
-          "percentage": category.dailyPercentage.toString(),
-          "calories": NutritionUnit.KCAL.formatAmount(
+        context.t.food.categoryList.dailyPercentage(
+          percentage: category.dailyPercentage.toString(),
+          calories: NutritionUnit.KCAL.formatAmount(
             goal.dailyCalories * category.dailyPercentage / 100,
+            context: context,
           ),
-        }),
+        ),
       ),
       trailing: canUpdate ? const Icon(GTIcons.lt_chevron) : null,
       onTap: canUpdate
@@ -134,8 +138,8 @@ class _UnmodifiableCategoriesAlert extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
           child: AlertBanner(
-            title: "food.categoryList.unmodifiable.title".t,
-            text: Text("food.categoryList.unmodifiable.text".t),
+            title: context.t.food.categoryList.unmodifiable.title,
+            text: Text(context.t.food.categoryList.unmodifiable.text),
             color: GTMaterialColor.warning,
           ),
         ),
@@ -152,12 +156,12 @@ class _DateRangeBanner extends ConsumerWidget {
     String s;
     String fmt(DateTime d) => DateFormat.yMd().format(d);
     if (fx.to == null) {
-      s = "food.categoryEditor.effect.from".tParams({"from": fmt(fx.from!)});
+      s = context.t.food.categoryEditor.effect.from(from: fmt(fx.from!));
     } else {
-      s = "food.categoryEditor.effect.range".tParams({
-        "from": fmt(fx.from!),
-        "to": fmt(fx.to!),
-      });
+      s = context.t.food.categoryEditor.effect.range(
+        from: fmt(fx.from!),
+        to: fmt(fx.to!),
+      );
     }
 
     return Text(s);
@@ -177,7 +181,7 @@ class _DateRangeBanner extends ConsumerWidget {
         child: Padding(
           padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
           child: AlertBanner(
-            title: "food.categoryEditor.effect.title".t,
+            title: context.t.food.categoryEditor.effect.title,
             text: _buildEffectText(context, ref),
           ),
         ),
@@ -207,7 +211,7 @@ class _NonFulfillingSumBanner extends ConsumerWidget {
           padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
           child: AlertBanner(
             color: GTMaterialColor.warning,
-            title: "food.categoryEditor.nonFulfillingSum.title".t,
+            title: context.t.food.categoryEditor.nonFulfillingSum.title,
             text: Text(
               "${categories.values.map((e) => NumberFormat.percentPattern(context.locale.languageCode).format(e.dailyPercentage / 100)).join(" + ")} = ${NumberFormat.percentPattern(context.locale.languageCode).format(sum / 100)}",
             ),
@@ -253,8 +257,8 @@ class _FoodCategoryEditorViewState
       appBar: AppBar(
         title: Text(
           widget.oldCategory == null
-              ? "food.categoryEditor.title.add".t
-              : "food.categoryEditor.title.edit".t,
+              ? context.t.food.categoryEditor.title.add
+              : context.t.food.categoryEditor.title.edit,
         ),
       ),
       extendBody: true,
@@ -268,17 +272,31 @@ class _FoodCategoryEditorViewState
               TextFormField(
                 controller: _nameController,
                 decoration: GymTrackerInputDecoration(
-                  labelText: "food.categoryEditor.name".t,
+                  labelText: context.t.food.categoryEditor.name,
                 ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return "food.categoryEditor.fields.name.errors.empty".t;
+                    return context
+                        .t
+                        .food
+                        .categoryEditor
+                        .fields
+                        .name
+                        .errors
+                        .empty;
                   }
                   final isUnique = ref.read(
                     isUniqueCategoryNameProvider(value),
                   );
                   if (!isEditing && !isUnique) {
-                    return "food.categoryEditor.fields.name.errors.unique".t;
+                    return context
+                        .t
+                        .food
+                        .categoryEditor
+                        .fields
+                        .name
+                        .errors
+                        .unique;
                   }
                   return null;
                 },
@@ -292,10 +310,10 @@ class _FoodCategoryEditorViewState
                 min: 1,
                 max: 100,
                 decoration: GymTrackerInputDecoration(
-                  labelText: "food.categoryEditor.dailyPercentage".t,
+                  labelText: context.t.food.categoryEditor.dailyPercentage,
                 ),
                 labelBuilder: (value) =>
-                    "${NumberFormat.percentPattern(context.locale.languageCode).format(value / 100)} (${NutritionUnit.KCAL.formatAmount(goal.dailyCalories * value / 100)})",
+                    "${NumberFormat.percentPattern(context.locale.languageCode).format(value / 100)} (${NutritionUnit.KCAL.formatAmount(goal.dailyCalories * value / 100, context: context)})",
               ),
               const SizedBox(height: 16),
               InkWell(
@@ -311,17 +329,17 @@ class _FoodCategoryEditorViewState
                       onIconChanged: (icon) => setState(() {
                         _icon = icon;
                       }),
-                      title: Text("food.categoryEditor.icon".t),
+                      title: Text(context.t.food.categoryEditor.icon),
                     ),
                   );
                 },
                 child: InputDecorator(
                   decoration: GymTrackerInputDecoration(
                     contentPadding: const EdgeInsets.fromLTRB(12.0, 0, 12.0, 0),
-                    labelText: "food.categoryEditor.icon".t,
+                    labelText: context.t.food.categoryEditor.icon,
                   ),
                   child: ListTile(
-                    title: Text("food.categoryEditor.icon".t),
+                    title: Text(context.t.food.categoryEditor.icon),
                     leading: Icon(_icon.iconData),
                     contentPadding: EdgeInsets.zero,
                     visualDensity: VisualDensity.standard,
@@ -348,7 +366,7 @@ class _FoodCategoryEditorViewState
               );
               Navigator.of(context).pop(category);
             },
-            child: Text("food.categoryEditor.save".t),
+            child: Text(context.t.food.categoryEditor.save),
           ),
         ],
       ),
@@ -379,10 +397,10 @@ class FoodCategoryFoodsView extends ConsumerWidget {
           if (foods.isEmpty) ...[
             SliverFillRemaining(
               hasScrollBody: false,
-              child: Center(child: Text("food.categoryFoods.empty".t)),
+              child: Center(child: Text(context.t.food.categoryFoods.empty)),
             ),
           ] else ...[
-            SliverToBoxAdapter(child: _buildStatsRow(foods)),
+            SliverToBoxAdapter(child: _buildStatsRow(foods, context: context)),
             SliverList(
               delegate: SliverChildBuilderDelegate((context, index) {
                 final food = foods[index];
@@ -433,7 +451,7 @@ class FoodCategoryFoodsView extends ConsumerWidget {
     );
   }
 
-  Widget _buildStatsRow(List<Food> foods) {
+  Widget _buildStatsRow(List<Food> foods, {required BuildContext context}) {
     final totals = foods.fold<(double, double, double, double)>(
       (0, 0, 0, 0),
       (previousValue, element) => (
@@ -449,20 +467,29 @@ class FoodCategoryFoodsView extends ConsumerWidget {
       child: StatsRow(
         stats: [
           Stats(
-            value: NutritionUnit.KCAL.formatAmount(totals.$1),
-            label: "food.nutriments.calories".t,
+            value: NutritionUnit.KCAL.formatAmount(totals.$1, context: context),
+            label: context.t.food.nutriments['calories']!,
           ),
           Stats(
-            value: kNutritionValueToUnit["protein"]!.formatAmount(totals.$2),
-            label: "food.nutriments.protein".t,
+            value: kNutritionValueToUnit["protein"]!.formatAmount(
+              totals.$2,
+              context: context,
+            ),
+            label: context.t.food.nutriments['protein']!,
           ),
           Stats(
-            value: kNutritionValueToUnit["carbs"]!.formatAmount(totals.$3),
-            label: "food.nutriments.carbs".t,
+            value: kNutritionValueToUnit["carbs"]!.formatAmount(
+              totals.$3,
+              context: context,
+            ),
+            label: context.t.food.nutriments['carbs']!,
           ),
           Stats(
-            value: kNutritionValueToUnit["fat"]!.formatAmount(totals.$4),
-            label: "food.nutriments.fat".t,
+            value: kNutritionValueToUnit["fat"]!.formatAmount(
+              totals.$4,
+              context: context,
+            ),
+            label: context.t.food.nutriments['fat']!,
           ),
         ],
       ),
@@ -485,11 +512,11 @@ class FoodCategoryFoodsView extends ConsumerWidget {
           });
         },
       ),
-      hintText: 'food.searchBar.hint'.t,
+      hintText: context.t.food.searchBar.hint,
       barTrailing: [
         IconButton(
           icon: const Icon(GTIcons.combine),
-          tooltip: "food.combine.title".t,
+          tooltip: context.t.food.combine.title,
           onPressed: () {
             showCombineFoodsView(context, ref, category: category).then((food) {
               if (food != null) {
@@ -503,7 +530,7 @@ class FoodCategoryFoodsView extends ConsumerWidget {
         ),
         IconButton(
           icon: const Icon(GTIcons.scan_barcode),
-          tooltip: "food.barcodeReader.title".t,
+          tooltip: context.t.food.barcodeReader.title,
           onPressed: () {
             showScanBarcodeView(context, ref).then((food) {
               if (food != null) {

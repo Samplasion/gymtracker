@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:gymtracker/controller/exercises_controller.dart';
 import 'package:gymtracker/data/exercises.dart';
+import 'package:gymtracker/i18n/strings.g.dart';
 import 'package:gymtracker/icons/gymtracker_icons.dart';
 import 'package:gymtracker/model/exercise.dart';
-import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/service/logger.dart';
 import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/utils/go.dart';
@@ -75,11 +75,11 @@ class _ExercisePickerState extends State<ExercisePicker> {
       if (widget.filter.hasCustom)
         GTExerciseMuscleCategory.custom: ExerciseCategory(
           exercises: controller.exercises.where(_filter).toList(),
-          iconGetter: () => const Icon(GTIcons.custom_exercises),
+          iconGetter: (t) => const Icon(GTIcons.custom_exercises),
           color: context.harmonizeColor(Colors.yellow),
         ),
       if (widget.filter.hasLibrary)
-        for (final key in sortedCategories)
+        for (final key in getSortedCategories(context.t))
           if (exerciseStandardLibrary[key]!
               .filtered(_filter)
               .exercises
@@ -94,7 +94,7 @@ class _ExercisePickerState extends State<ExercisePicker> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("exercise.picker.title".t),
+        title: Text(context.t.exercise.picker.title),
         actions: [
           IconButton(
             icon: Badge(
@@ -136,8 +136,8 @@ class _ExercisePickerState extends State<ExercisePicker> {
                   foregroundColor: context.colorScheme.onTertiaryContainer,
                   child: const Icon(GTIcons.no_routine),
                 ),
-                title: Text("exercises.none.title".t),
-                subtitle: Text("exercises.none.subtitle".t),
+                title: Text(context.t.exercises.none.title),
+                subtitle: Text(context.t.exercises.none.subtitle),
                 onTap: () {
                   Get.back(result: <Exercise>[]);
                 },
@@ -158,19 +158,21 @@ class _ExercisePickerState extends State<ExercisePicker> {
                       context,
                       category.value.color,
                     ),
-                    child: category.value.icon,
+                    child: category.value.iconGetter(context.t),
                   ),
                 ),
-                title: Text(category.key.localizedName),
+                title: Text(category.key.getLocalizedName(context.t)),
                 subtitle: Text(
-                  "general.exercises".plural(category.value.exercises.length),
+                  context.t.general.exercises(
+                    n: category.value.exercises.length,
+                  ),
                 ),
                 onTap: () {
                   Go.to(
                     () => StatefulBuilder(
                       builder: (context, setState) {
                         return LibraryPickerExercisesView(
-                          name: category.key.localizedName,
+                          name: category.key.getLocalizedName(context.t),
                           category: category.value,
                           singleSelection: widget.singlePick,
                           selectedExercises: selectedExercises,
@@ -226,7 +228,7 @@ class _ExercisePickerState extends State<ExercisePicker> {
                 child: Padding(
                   padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
                   child: Text(
-                    "exercise.picker.filter.equipment".t,
+                    context.t.exercise.picker.filter.equipment,
                     style: context.textTheme.labelMedium,
                   ),
                 ),
@@ -252,7 +254,9 @@ class _ExercisePickerState extends State<ExercisePicker> {
                                   child: EquipmentIcon(equipment: equipment),
                                 ),
                               ),
-                              label: Text(equipment.localizedName),
+                              label: Text(
+                                equipment.getLocalizedName(context.t),
+                              ),
                               selected: equipmentFilter.contains(equipment),
                               onSelected: (selected) {
                                 setState(() {
@@ -281,7 +285,7 @@ class _ExercisePickerState extends State<ExercisePicker> {
 
   void _submit() {
     if (widget.singlePick && selectedExercises.isEmpty) {
-      Go.snack("exercise.picker.errors.empty".t);
+      Go.snack(context.t.exercise.picker.errors.empty);
       return;
     }
     ScaffoldMessenger.of(context).clearSnackBars();
@@ -326,7 +330,7 @@ class _ExercisePickerState extends State<ExercisePicker> {
         );
       },
       suggestionsBuilder: (context, sController) {
-        final results = controller.search(sController.text);
+        final results = controller.search(sController.text, t: context.t);
         return [
           StatefulBuilder(
             builder: (context, ss) {
@@ -374,7 +378,7 @@ class _CreateExerciseFab extends StatelessWidget {
               ExerciseCreator(base: null, scrollController: scrollController),
         );
       },
-      label: Text("actions.create".t),
+      label: Text(context.t.actions.create),
       icon: const Icon(GTIcons.create_exercise),
     );
   }
@@ -408,7 +412,10 @@ class _LibraryPickerExercisesViewState
   @override
   Widget build(BuildContext context) {
     final sorted = [...widget.category.exercises]
-      ..sort((a, b) => a.displayName.compareTo(b.displayName));
+      ..sort(
+        (a, b) =>
+            a.getDisplayName(context.t).compareTo(b.getDisplayName(context.t)),
+      );
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.name),

@@ -3,10 +3,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:get/get.dart';
 import 'package:gymtracker/controller/coordinator.dart';
 import 'package:gymtracker/controller/notifications_controller.dart';
+import 'package:gymtracker/i18n/strings.g.dart';
 import 'package:gymtracker/icons/gymtracker_icons.dart';
 import 'package:gymtracker/provider/food.dart';
 import 'package:gymtracker/provider/online.dart';
-import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/view/login.dart';
 import 'package:gymtracker/view/utils/in_app_icon.dart';
@@ -26,14 +26,15 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   @override
   Widget build(BuildContext context) {
     final notificationController = Get.find<NotificationController>();
-    final foodPerms = ref.watch(foodPermissionsProvider).asData?.value ??
+    final foodPerms =
+        ref.watch(foodPermissionsProvider).asData?.value ??
         (camera: false, gallery: false);
 
     nextButton(bool enabled) => ElevatedButton(
       onPressed: () {
         _introKey.currentState?.next();
       },
-      child: Text('onboarding.buttons.next'.t),
+      child: Text(context.t.onboarding.buttons.next),
     );
     permIcon(IconData defaultValue, bool granted) =>
         Icon(granted ? Icons.check_rounded : defaultValue, size: 24);
@@ -45,9 +46,9 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
           key: _introKey,
           pages: [
             PageViewModel(
-              title: 'onboarding.welcome.title'.t,
+              title: context.t.onboarding.welcome.title,
               image: const InAppIcon.proportional(size: 96),
-              body: 'onboarding.welcome.text'.t,
+              body: context.t.onboarding.welcome.text,
               footer: Padding(
                 padding: const EdgeInsets.all(16),
                 child: OverflowBar(
@@ -60,9 +61,9 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
               ),
             ),
             PageViewModel(
-              title: 'onboarding.notifications.title'.t,
+              title: context.t.onboarding.notifications.title,
               image: const Icon(GTIcons.notification_dialog, size: 64),
-              body: 'onboarding.notifications.text'.t,
+              body: context.t.onboarding.notifications.text,
               footer: Padding(
                 padding: const EdgeInsets.all(16),
                 child: OverflowBar(
@@ -77,7 +78,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                         notificationController.hasPermission,
                       ),
                       label: Text(
-                        'onboarding.notifications.notifications'.t,
+                        context.t.onboarding.notifications.notifications,
                       ),
                       onPressed: notificationController.hasPermission
                           ? null
@@ -86,8 +87,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                               notificationController.requestPermission();
                             },
                     ),
-                    if (notificationController
-                        .usesAndroidExactAlarmPermission)
+                    if (notificationController.usesAndroidExactAlarmPermission)
                       ElevatedButton.icon(
                         icon: permIcon(
                           Icons.notifications_active,
@@ -95,7 +95,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                               .hasAndroidScheduleExactAlarmPermission,
                         ),
                         label: Text(
-                          'onboarding.notifications.exactAlarm'.t,
+                          context.t.onboarding.notifications.exactAlarm,
                         ),
                         onPressed:
                             !notificationController
@@ -113,9 +113,9 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
               ),
             ),
             PageViewModel(
-              title: 'onboarding.camera.title'.t,
+              title: context.t.onboarding.camera.title,
               image: const Icon(GTIcons.camera, size: 64),
-              body: 'onboarding.camera.text'.t,
+              body: context.t.onboarding.camera.text,
               footer: Padding(
                 padding: const EdgeInsets.all(16),
                 child: OverflowBar(
@@ -126,29 +126,25 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                   children: [
                     ElevatedButton.icon(
                       icon: permIcon(Icons.camera_alt, foodPerms.camera),
-                      label: Text('onboarding.camera.camera'.t),
+                      label: Text(context.t.onboarding.camera.camera),
                       onPressed: foodPerms.camera
                           ? null
                           : () {
                               // Request permission
                               ref
-                                  .read(
-                                    foodPermissionsProvider.notifier,
-                                  )
+                                  .read(foodPermissionsProvider.notifier)
                                   .requestPermission(Permission.camera);
                             },
                     ),
                     ElevatedButton.icon(
                       icon: permIcon(Icons.photo, foodPerms.gallery),
-                      label: Text('onboarding.camera.gallery'.t),
+                      label: Text(context.t.onboarding.camera.gallery),
                       onPressed: foodPerms.gallery
                           ? null
                           : () {
                               // Request permission
                               ref
-                                  .read(
-                                    foodPermissionsProvider.notifier,
-                                  )
+                                  .read(foodPermissionsProvider.notifier)
                                   .requestPermission(Permission.photos);
                             },
                     ),
@@ -157,74 +153,74 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                 ),
               ),
             ),
-                PageViewModel(
-                  title: 'onboarding.login.title'.t,
-                  image: const Icon(GTIcons.account, size: 64),
-                  body: 'onboarding.login.text'.t,
-                  footer: Padding(
-                    padding: const EdgeInsets.all(16).copyWith(bottom: 0),
-                    child: Column(
-                      children: [
-                        OverflowBar(
-                          alignment: MainAxisAlignment.center,
-                          overflowAlignment: OverflowBarAlignment.center,
-                          spacing: 8,
-                          overflowSpacing: 8,
-                          children: [
-                            ElevatedButton.icon(
-                              icon: permIcon(
-                                GTIcons.account,
-                                onlineAccount != null,
-                              ),
-                              label: Text('login.title'.t),
-                              onPressed: onlineAccount != null
-                                  ? null
-                                  : () {
-                                      Go.to(() => AuthScreen());
-                                    },
-                            ),
-                          ],
-                        ),
-                        TextButton(
-                          onPressed: () {
-                            _introKey.currentState?.next();
-                          },
-                          child: Text('onboarding.buttons.next'.t),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                PageViewModel(
-                  title: 'onboarding.done.title'.t,
-                  image: const Icon(GTIcons.checkbox_on, size: 64),
-                  body: 'onboarding.done.text'.t,
-                  footer: Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: OverflowBar(
+            PageViewModel(
+              title: context.t.onboarding.login.title,
+              image: const Icon(GTIcons.account, size: 64),
+              body: context.t.onboarding.login.text,
+              footer: Padding(
+                padding: const EdgeInsets.all(16).copyWith(bottom: 0),
+                child: Column(
+                  children: [
+                    OverflowBar(
                       alignment: MainAxisAlignment.center,
                       overflowAlignment: OverflowBarAlignment.center,
                       spacing: 8,
                       overflowSpacing: 8,
                       children: [
-                        ElevatedButton(
-                          onPressed: () {
-                            // Done
-                            Get.find<Coordinator>().onFinishedOnboarding();
-                          },
-                          child: Text('onboarding.buttons.done'.t),
+                        ElevatedButton.icon(
+                          icon: permIcon(
+                            GTIcons.account,
+                            onlineAccount != null,
+                          ),
+                          label: Text(context.t.login.title),
+                          onPressed: onlineAccount != null
+                              ? null
+                              : () {
+                                  Go.to(() => AuthScreen());
+                                },
                         ),
                       ],
                     ),
-                  ),
+                    TextButton(
+                      onPressed: () {
+                        _introKey.currentState?.next();
+                      },
+                      child: Text(context.t.onboarding.buttons.next),
+                    ),
+                  ],
                 ),
-              ],
-              freeze: false,
-              showNextButton: false,
-              showDoneButton: false,
-              isProgressTap: false,
-            );
-          },
+              ),
+            ),
+            PageViewModel(
+              title: context.t.onboarding.done.title,
+              image: const Icon(GTIcons.checkbox_on, size: 64),
+              body: context.t.onboarding.done.text,
+              footer: Padding(
+                padding: const EdgeInsets.all(16),
+                child: OverflowBar(
+                  alignment: MainAxisAlignment.center,
+                  overflowAlignment: OverflowBarAlignment.center,
+                  spacing: 8,
+                  overflowSpacing: 8,
+                  children: [
+                    ElevatedButton(
+                      onPressed: () {
+                        // Done
+                        Get.find<Coordinator>().onFinishedOnboarding();
+                      },
+                      child: Text(context.t.onboarding.buttons.done),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+          freeze: false,
+          showNextButton: false,
+          showDoneButton: false,
+          isProgressTap: false,
         );
+      },
+    );
   }
 }

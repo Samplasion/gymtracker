@@ -560,9 +560,7 @@ enum NutritionLanguage {
   /// Undefined language
   UNDEFINED(stringValue: '-');
 
-  const NutritionLanguage({
-    required this.stringValue,
-  });
+  const NutritionLanguage({required this.stringValue});
 
   /// ISO 639-1
   final String stringValue;
@@ -573,13 +571,15 @@ enum NutritionLanguage {
             language.stringValue == stringValue,
       );
 
-  static List<NutritionLanguage> get sortedValues =>
-      NutritionLanguage.values.toList()..sort((a, b) => a.t.compareTo(b.t));
+  static List<NutritionLanguage> getSortedValues({required Translations t}) =>
+      NutritionLanguage.values.toList()
+        ..sort((a, b) => a.t(t: t).compareTo(b.t(t: t)));
 
   OpenFoodFactsLanguage get offApiLanguage =>
       OpenFoodFactsLanguage.fromOffTag(stringValue)!;
 
-  String get t => 'food.languages.${stringValue.toLowerCase()}'.t;
+  String t({required Translations t}) =>
+      t.food.languages[stringValue.toLowerCase()] ?? "UNKNOWN";
 }
 
 enum NutritionCountry {
@@ -1334,9 +1334,7 @@ enum NutritionCountry {
   /// World
   WORLD(stringValue: 'world');
 
-  const NutritionCountry({
-    required this.stringValue,
-  });
+  const NutritionCountry({required this.stringValue});
 
   /// Lowercase ISO 639-1, except for [UNITED_KINGDOM].
   final String stringValue;
@@ -1346,11 +1344,13 @@ enum NutritionCountry {
         (final NutritionCountry country) => country.stringValue == stringValue,
       );
 
-  static List<NutritionCountry> get sortedValues =>
-      NutritionCountry.values.toList()..sort((a, b) => a.t.compareTo(b.t));
+  static List<NutritionCountry> getSortedValues({required Translations t}) =>
+      NutritionCountry.values.toList()
+        ..sort((a, b) => a.t(t: t).compareTo(b.t(t: t)));
 
   OpenFoodFactsCountry? get offApiCountry =>
       OpenFoodFactsCountry.fromOffTag(stringValue);
 
-  String get t => 'food.countries.${stringValue.toLowerCase()}'.t;
+  String t({required Translations t}) =>
+      t.food.countries[stringValue.toLowerCase()] ?? "UNKNOWN";
 }

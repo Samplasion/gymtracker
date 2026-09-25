@@ -3,10 +3,10 @@ import 'package:get/get.dart' show Get, GetNavigation;
 import 'package:gymtracker/data/distance.dart';
 import 'package:gymtracker/data/exercises.dart';
 import 'package:gymtracker/data/weights.dart';
+import 'package:gymtracker/i18n/strings.g.dart';
 import 'package:gymtracker/model/exercisable.dart';
 import 'package:gymtracker/model/set.dart';
 import 'package:gymtracker/model/workout.dart';
-import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/service/logger.dart';
 import 'package:gymtracker/struct/optional.dart';
 import 'package:gymtracker/utils/utils.dart';
@@ -15,7 +15,7 @@ import 'package:uuid/uuid.dart';
 
 part 'exercise.g.dart';
 
-bool _defaultSetFilter(set) => true;
+bool _defaultSetFilter(dynamic set) => true;
 
 enum GTMuscleCategory {
   arms,
@@ -25,7 +25,8 @@ enum GTMuscleCategory {
   legs,
   shoulders;
 
-  String get localizedName => "muscleCategories.$name".t;
+  String getLocalizedName(Translations t) =>
+      t.muscleCategories[name] ?? "UNKNOWN";
 }
 
 enum GTExerciseMuscleCategory {
@@ -45,7 +46,8 @@ enum GTExerciseMuscleCategory {
   custom,
   other;
 
-  String get localizedName => "library.$name.name".t;
+  String getLocalizedName(Translations t) =>
+      t['library.$name.name'] ?? "UNKNOWN";
 }
 
 enum GTMuscleGroup {
@@ -80,7 +82,8 @@ enum GTMuscleGroup {
 
   final GTMuscleCategory? category;
 
-  String get localizedName => "muscleGroups.$name".t;
+  String getLocalizedName(Translations t) =>
+      t['muscleGroups.$name'] ?? "UNKNOWN";
 }
 
 enum GTMuscleHighlightIntensity {
@@ -90,7 +93,7 @@ enum GTMuscleHighlightIntensity {
   primary(1);
 
   const GTMuscleHighlightIntensity(this.value)
-      : assert(value >= 0 && value <= 1);
+    : assert(value >= 0 && value <= 1);
 
   final double value;
 }
@@ -133,71 +136,73 @@ enum GTMuscleHighlight {
   trapsMiddle;
 
   String get svgName => name.replaceAllMapped(
-      RegExp("[A-Z]"), (match) => "-${match[0]!.toLowerCase()}");
+    RegExp("[A-Z]"),
+    (match) => "-${match[0]!.toLowerCase()}",
+  );
 
   static Set<GTMuscleHighlight> groupToHighlight(GTMuscleGroup group) =>
       switch (group) {
         GTMuscleGroup.abductors => {GTMuscleHighlight.outerQuadricep},
         GTMuscleGroup.abs => {
-            GTMuscleHighlight.lowerAbdominals,
-            GTMuscleHighlight.upperAbdominals,
-          },
+          GTMuscleHighlight.lowerAbdominals,
+          GTMuscleHighlight.upperAbdominals,
+        },
         GTMuscleGroup.adductors => {GTMuscleHighlight.innerThigh},
         GTMuscleGroup.biceps => {
-            GTMuscleHighlight.longHeadBicep,
-            GTMuscleHighlight.shortHeadBicep,
-          },
+          GTMuscleHighlight.longHeadBicep,
+          GTMuscleHighlight.shortHeadBicep,
+        },
         GTMuscleGroup.calves => {
-            GTMuscleHighlight.gastrocnemius,
-            GTMuscleHighlight.soleus,
-          },
+          GTMuscleHighlight.gastrocnemius,
+          GTMuscleHighlight.soleus,
+        },
         GTMuscleGroup.chest => {
-            GTMuscleHighlight.midLowerPectoralis,
-            GTMuscleHighlight.upperPectoralis,
-          },
+          GTMuscleHighlight.midLowerPectoralis,
+          GTMuscleHighlight.upperPectoralis,
+        },
         GTMuscleGroup.glutes => {
-            GTMuscleHighlight.gluteusMaximus,
-            GTMuscleHighlight.gluteusMedius,
-          },
+          GTMuscleHighlight.gluteusMaximus,
+          GTMuscleHighlight.gluteusMedius,
+        },
         GTMuscleGroup.hamstrings => {
-            GTMuscleHighlight.lateralHamstrings,
-            GTMuscleHighlight.medialHamstrings,
-          },
+          GTMuscleHighlight.lateralHamstrings,
+          GTMuscleHighlight.medialHamstrings,
+        },
         GTMuscleGroup.lats => {GTMuscleHighlight.lats},
         GTMuscleGroup.lowerBack => {GTMuscleHighlight.lowerback},
         GTMuscleGroup.none => {},
         GTMuscleGroup.other => {},
         GTMuscleGroup.quadriceps => {
-            GTMuscleHighlight.outerQuadricep,
-            GTMuscleHighlight.rectusFemoris,
-            GTMuscleHighlight.innerQuadricep,
-          },
+          GTMuscleHighlight.outerQuadricep,
+          GTMuscleHighlight.rectusFemoris,
+          GTMuscleHighlight.innerQuadricep,
+        },
         GTMuscleGroup.shoulders => {
-            GTMuscleHighlight.anteriorDeltoid,
-            GTMuscleHighlight.lateralDeltoid,
-            GTMuscleHighlight.posteriorDeltoid,
-          },
+          GTMuscleHighlight.anteriorDeltoid,
+          GTMuscleHighlight.lateralDeltoid,
+          GTMuscleHighlight.posteriorDeltoid,
+        },
         GTMuscleGroup.traps => {
-            GTMuscleHighlight.upperTrapezius,
-            GTMuscleHighlight.trapsMiddle,
-            GTMuscleHighlight.lowerTrapezius,
-          },
+          GTMuscleHighlight.upperTrapezius,
+          GTMuscleHighlight.trapsMiddle,
+          GTMuscleHighlight.lowerTrapezius,
+        },
         GTMuscleGroup.triceps => {
-            GTMuscleHighlight.lateralHeadTriceps,
-            GTMuscleHighlight.longHeadTriceps,
-            GTMuscleHighlight.medialHeadTriceps,
-          },
+          GTMuscleHighlight.lateralHeadTriceps,
+          GTMuscleHighlight.longHeadTriceps,
+          GTMuscleHighlight.medialHeadTriceps,
+        },
         GTMuscleGroup.upperBack => {
-            GTMuscleHighlight.upperTrapezius,
-            GTMuscleHighlight.trapsMiddle,
-            GTMuscleHighlight.lowerTrapezius,
-            GTMuscleHighlight.lats,
-          },
+          GTMuscleHighlight.upperTrapezius,
+          GTMuscleHighlight.trapsMiddle,
+          GTMuscleHighlight.lowerTrapezius,
+          GTMuscleHighlight.lats,
+        },
         GTMuscleGroup.thighs => {GTMuscleHighlight.outerQuadricep},
         GTMuscleGroup.forearms => {
-            GTMuscleHighlight.wristExtensors,
-            GTMuscleHighlight.wristFlexors,
-          },
+          GTMuscleHighlight.wristExtensors,
+          GTMuscleHighlight.wristFlexors,
+        },
         GTMuscleGroup.obliques => {GTMuscleHighlight.obliques},
         GTMuscleGroup.hands => {GTMuscleHighlight.hands},
         GTMuscleGroup.tibialis => {GTMuscleHighlight.tibialis},
@@ -217,8 +222,10 @@ enum GTGymEquipment {
   landmine,
   other;
 
-  String get localizedName => "equipment.$name.long".t;
-  String get localizedNameShort => "equipment.$name.short".t;
+  String getLocalizedName(Translations t) =>
+      t['equipment.$name.long'] ?? "UNKNOWN";
+  String getLocalizedNameShort(Translations t) =>
+      t['equipment.$name.short'] ?? "UNKNOWN";
 }
 
 @JsonSerializable(constructor: "raw")
@@ -293,17 +300,19 @@ class Exercise extends WorkoutExercisable {
   }
 
   List<GTSet> get doneSets => [
-        for (final set in sets)
-          if (set.done) set
-      ];
+    for (final set in sets)
+      if (set.done) set,
+  ];
   double? get liftedWeight {
     if (parameters != GTSetParameters.repsWeight &&
-        parameters != GTSetParameters.timeWeight) return null;
+        parameters != GTSetParameters.timeWeight) {
+      return null;
+    }
 
     return doneSets.fold(
-        0.0,
-        (value, element) =>
-            value! + (element.weight ?? 0) * (element.reps ?? 1));
+      0.0,
+      (value, element) => value! + (element.weight ?? 0) * (element.reps ?? 1),
+    );
   }
 
   double? get distanceRun {
@@ -313,14 +322,20 @@ class Exercise extends WorkoutExercisable {
 
   Duration? get time {
     if (parameters != GTSetParameters.time &&
-        parameters != GTSetParameters.timeWeight) return null;
+        parameters != GTSetParameters.timeWeight) {
+      return null;
+    }
     return doneSets.fold(
-        Duration.zero, (value, element) => value! + (element.time!));
+      Duration.zero,
+      (value, element) => value! + (element.time!),
+    );
   }
 
   int? get reps {
     if (parameters != GTSetParameters.repsWeight &&
-        parameters != GTSetParameters.freeBodyReps) return null;
+        parameters != GTSetParameters.freeBodyReps) {
+      return null;
+    }
     return doneSets.fold(0, (value, element) => value! + (element.reps ?? 0));
   }
 
@@ -358,15 +373,19 @@ class Exercise extends WorkoutExercisable {
     this.skeleton = false,
     required this.equipment,
     Map<GTMuscleHighlight, GTMuscleHighlightIntensity>? muscleHighlight,
-  })  : id = id ?? const Uuid().v4(),
-        _category = category,
-        muscleHighlight = muscleHighlight ??
-            _defaultMuscleHighlight(primaryMuscleGroup, secondaryMuscleGroups),
-        assert(sets.isEmpty || parameters == sets[0].parameters,
-            "The parameters must not change between the Exercise and its Sets"),
-        assert(
-            sets.isEmpty || sets.map((e) => e.parameters).toSet().length == 1,
-            "The sets must have the same parameters.");
+  }) : id = id ?? const Uuid().v4(),
+       _category = category,
+       muscleHighlight =
+           muscleHighlight ??
+           _defaultMuscleHighlight(primaryMuscleGroup, secondaryMuscleGroups),
+       assert(
+         sets.isEmpty || parameters == sets[0].parameters,
+         "The parameters must not change between the Exercise and its Sets",
+       ),
+       assert(
+         sets.isEmpty || sets.map((e) => e.parameters).toSet().length == 1,
+         "The sets must have the same parameters.",
+       );
 
   factory Exercise.custom({
     String? id,
@@ -381,24 +400,23 @@ class Exercise extends WorkoutExercisable {
     required String? supersetID,
     required String? workoutID,
     required GTGymEquipment equipment,
-  }) =>
-      Exercise.raw(
-        id: id,
-        name: name,
-        parameters: parameters,
-        sets: sets,
-        primaryMuscleGroup: primaryMuscleGroup,
-        secondaryMuscleGroups: secondaryMuscleGroups,
-        restTime: restTime,
-        parentID: parentID,
-        notes: notes,
-        standard: false,
-        supersetID: supersetID,
-        workoutID: workoutID,
-        supersedesID: null,
-        category: GTExerciseMuscleCategory.custom,
-        equipment: equipment,
-      );
+  }) => Exercise.raw(
+    id: id,
+    name: name,
+    parameters: parameters,
+    sets: sets,
+    primaryMuscleGroup: primaryMuscleGroup,
+    secondaryMuscleGroups: secondaryMuscleGroups,
+    restTime: restTime,
+    parentID: parentID,
+    notes: notes,
+    standard: false,
+    supersetID: supersetID,
+    workoutID: workoutID,
+    supersedesID: null,
+    category: GTExerciseMuscleCategory.custom,
+    equipment: equipment,
+  );
 
   factory Exercise.standard({
     required String id,
@@ -432,10 +450,10 @@ class Exercise extends WorkoutExercisable {
 
   @override
   Map<String, dynamic> toJson() => <String, dynamic>{
-        ..._$ExerciseToJson(this),
-        'sets': [for (final set in sets) set.toJson()],
-        'type': 'exercise',
-      };
+    ..._$ExerciseToJson(this),
+    'sets': [for (final set in sets) set.toJson()],
+    'type': 'exercise',
+  };
 
   @override
   Exercise clone() => Exercise.fromJson(toJson());
@@ -491,7 +509,8 @@ class Exercise extends WorkoutExercisable {
   Exercise makeChild() {
     final child = _withRegeneratedID().copyWith(parentID: id);
     logger.t(
-        "Making child of [id: $id, pid: $parentID] with ID [id: ${child.id}, pid: ${child.parentID}]");
+      "Making child of [id: $id, pid: $parentID] with ID [id: ${child.id}, pid: ${child.parentID}]",
+    );
     return child;
   }
 
@@ -575,19 +594,21 @@ class Exercise extends WorkoutExercisable {
         a.rpe == b.rpe &&
         [
           for (var i = 0; i < a.sets.length; i++)
-            GTSet.deepEquality(a.sets[i], b.sets[i])
+            GTSet.deepEquality(a.sets[i], b.sets[i]),
         ].every((element) => element);
   }
 }
 
 Map<GTMuscleHighlight, GTMuscleHighlightIntensity> _defaultMuscleHighlight(
-    GTMuscleGroup primaryMuscleGroup,
-    Set<GTMuscleGroup> secondaryMuscleGroups) {
+  GTMuscleGroup primaryMuscleGroup,
+  Set<GTMuscleGroup> secondaryMuscleGroups,
+) {
   final primary = GTMuscleHighlight.groupToHighlight(primaryMuscleGroup);
   final res = {
     for (final group in secondaryMuscleGroups)
-      for (final highlight
-          in GTMuscleHighlight.groupToHighlight(group).difference(primary))
+      for (final highlight in GTMuscleHighlight.groupToHighlight(
+        group,
+      ).difference(primary))
         highlight: GTMuscleHighlightIntensity.secondary,
     for (final highlight in primary)
       highlight: GTMuscleHighlightIntensity.primary,
@@ -596,19 +617,20 @@ Map<GTMuscleHighlight, GTMuscleHighlightIntensity> _defaultMuscleHighlight(
 }
 
 extension Display on Exercise {
-  String get displayName {
+  String getDisplayName(Translations t) {
     if (Get.context == null) return name;
     if (skeleton) return name;
     if (isCustom) return name;
 
     final candidate = isAbstract
-        ? name
+        ? id
         : (getStandardExerciseByID(parentID!)?.name ?? parentID!);
 
-    if (candidate.existsAsTranslationKey) return candidate.t;
-    if (!isOrphan && parentID!.existsAsTranslationKey) return parentID!.t;
+    if (t[candidate] != null) return t[candidate];
+    if (!isOrphan && t[parentID!] != null) return t[parentID!];
     name.logger.e(
-        "No translation found for exercise $candidate which ${isAbstract ? "is" : "is not"} abstract");
+      "No translation found for exercise $candidate which ${isAbstract ? "is" : "is not"} abstract",
+    );
     return name;
   }
 }

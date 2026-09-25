@@ -5,9 +5,9 @@ import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:gymtracker/data/achievements.dart';
 import 'package:gymtracker/gen/assets.gen.dart';
+import 'package:gymtracker/i18n/strings.g.dart';
 import 'package:gymtracker/icons/gymtracker_icons.dart';
 import 'package:gymtracker/model/achievements.dart';
-import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/view/components/loading_indicator.dart';
 
@@ -25,8 +25,12 @@ class AchievementListTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return ListTile(
       leading: AchievementIcon(achievement: achievement),
-      title: Text(achievement.getLevel(completion)!.localizedName),
-      subtitle: Text(achievement.getLevel(completion)!.localizedDescription),
+      title: Text(
+        achievement.getLevel(completion)!.getLocalizedName(context.t),
+      ),
+      subtitle: Text(
+        achievement.getLevel(completion)!.getLocalizedDescription(context.t),
+      ),
     );
   }
 }
@@ -149,7 +153,9 @@ class AchievementSnackBar extends SnackBar {
                      crossAxisAlignment: CrossAxisAlignment.start,
                      children: [
                        Text(
-                         achievement.getLevel(completion)!.localizedName,
+                         achievement
+                             .getLevel(completion)!
+                             .getLocalizedName(context.t),
                          style: context.theme.textTheme.bodyLarge!.copyWith(
                            color: inverted
                                ? context.theme.colorScheme.onInverseSurface
@@ -158,7 +164,9 @@ class AchievementSnackBar extends SnackBar {
                          ),
                        ),
                        Text(
-                         achievement.getLevel(completion)!.localizedDescription,
+                         achievement
+                             .getLevel(completion)!
+                             .getLocalizedDescription(context.t),
                          style: context.theme.textTheme.bodySmall!.copyWith(
                            color: inverted
                                ? context.theme.colorScheme.onInverseSurface
@@ -204,11 +212,21 @@ class AchievementBanner extends MaterialBanner {
 }
 
 extension AchievementLevelLocalized on AchievementLevel {
-  String get localizedName {
-    if (achievements[achievementID]!.levels.length == 1) return nameKey.t;
-    return "${nameKey.t} ${level.toRomanNumeral()}";
+  String getLocalizedName(Translations t) {
+    return "${t[nameKey] ?? 'UNKNOWN'} ${level.toRomanNumeral()}";
   }
 
-  String get localizedDescription =>
-      descriptionKey.tParams(descriptionParameters());
+  // TODO: LANG
+  String getLocalizedDescription(Translations t) {
+    final f = t[descriptionKey];
+    if (f is String) {
+      return f;
+    } else if (f is String Function({required Object p0})) {
+      return f(p0: descriptionParameters(t)[0]);
+    } else {
+      throw ArgumentError(
+        "The description for this achievement level is not a valid string or function",
+      );
+    }
+  }
 }

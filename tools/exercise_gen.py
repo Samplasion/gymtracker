@@ -7,7 +7,7 @@ import re
 
 cwd = os.getcwd()
 
-with open(f'{cwd}/assets/i18n/en.json', 'r') as f:
+with open(f'{cwd}/lib/i18n/en.i18n.json', 'r') as f:
   localizedNames = json.load(f)
 
 def generate_exercises():

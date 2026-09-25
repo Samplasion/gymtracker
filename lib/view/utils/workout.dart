@@ -7,10 +7,10 @@ import 'package:get/get.dart' hide ContextExtensionss;
 import 'package:gymtracker/controller/workout_controller.dart';
 import 'package:gymtracker/data/distance.dart';
 import 'package:gymtracker/data/weights.dart';
+import 'package:gymtracker/i18n/strings.g.dart';
 import 'package:gymtracker/icons/gymtracker_icons.dart';
 import 'package:gymtracker/model/exercise.dart';
 import 'package:gymtracker/model/set.dart';
-import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/service/logger.dart';
 import 'package:gymtracker/struct/editor_callback.dart';
 import 'package:gymtracker/struct/optional.dart';
@@ -97,7 +97,9 @@ class _WorkoutExerciseEditorState extends State<WorkoutExerciseEditor> {
                       child: Text.rich(
                         TextSpan(
                           children: [
-                            TextSpan(text: widget.exercise.displayName),
+                            TextSpan(
+                              text: widget.exercise.getDisplayName(context.t),
+                            ),
                             if (widget.exercise.isCustom) ...[
                               const TextSpan(text: " "),
                               const WidgetSpan(
@@ -122,7 +124,9 @@ class _WorkoutExerciseEditorState extends State<WorkoutExerciseEditor> {
                             },
                             child: ListTile(
                               leading: const Icon(GTIcons.reorder),
-                              title: Text('ongoingWorkout.exercises.reorder'.t),
+                              title: Text(
+                                context.t.ongoingWorkout.exercises.reorder,
+                              ),
                             ),
                           ),
                         ],
@@ -132,7 +136,9 @@ class _WorkoutExerciseEditorState extends State<WorkoutExerciseEditor> {
                           },
                           child: ListTile(
                             leading: const Icon(GTIcons.replace),
-                            title: Text('ongoingWorkout.exercises.replace'.t),
+                            title: Text(
+                              context.t.ongoingWorkout.exercises.replace,
+                            ),
                           ),
                         ),
                         if (widget.index.supersetIndex == null)
@@ -145,7 +151,11 @@ class _WorkoutExerciseEditorState extends State<WorkoutExerciseEditor> {
                             child: ListTile(
                               leading: const Icon(GTIcons.add_to_superset),
                               title: Text(
-                                'ongoingWorkout.exercises.addToSuperset'.t,
+                                context
+                                    .t
+                                    .ongoingWorkout
+                                    .exercises
+                                    .addToSuperset,
                               ),
                             ),
                           ),
@@ -178,7 +188,7 @@ class _WorkoutExerciseEditorState extends State<WorkoutExerciseEditor> {
                             child: ListTile(
                               leading: const Icon(GTIcons.reorder),
                               title: Text(
-                                'ongoingWorkout.exercises.reorderSets'.t,
+                                context.t.ongoingWorkout.exercises.reorderSets,
                               ),
                               enabled: widget.exercise.sets.isNotEmpty,
                             ),
@@ -198,7 +208,11 @@ class _WorkoutExerciseEditorState extends State<WorkoutExerciseEditor> {
                               child: ListTile(
                                 leading: const Icon(GTIcons.cardio_timer),
                                 title: Text(
-                                  'ongoingWorkout.exercises.startCardioTimer'.t,
+                                  context
+                                      .t
+                                      .ongoingWorkout
+                                      .exercises
+                                      .startCardioTimer,
                                 ),
                               ),
                             ),
@@ -213,7 +227,9 @@ class _WorkoutExerciseEditorState extends State<WorkoutExerciseEditor> {
                             textColor: Theme.of(context).colorScheme.error,
                             iconColor: Theme.of(context).colorScheme.error,
                             leading: const Icon(GTIcons.delete),
-                            title: Text('ongoingWorkout.exercises.remove'.t),
+                            title: Text(
+                              context.t.ongoingWorkout.exercises.remove,
+                            ),
                           ),
                         ),
                       ],
@@ -231,7 +247,7 @@ class _WorkoutExerciseEditorState extends State<WorkoutExerciseEditor> {
                 leading: const Icon(GTIcons.notes),
                 title: widget.exercise.notes.asQuillDocument().isEmpty()
                     ? Text(
-                        "exercise.editor.fields.notes.tapToEdit".t,
+                        context.t.exercise.editor.fields.notes.tapToEdit,
                         style: notesTextStyle,
                       )
                     : MaybeRichText(
@@ -266,7 +282,7 @@ class _WorkoutExerciseEditorState extends State<WorkoutExerciseEditor> {
                         child: TimeInputField(
                           controller: timeController,
                           decoration: GymTrackerInputDecoration(
-                            labelText: "exercise.fields.restTime".t,
+                            labelText: context.t.exercise.fields.restTime,
                           ),
                           onChangedTime: (value) =>
                               widget.callbacks.onExerciseChangeRestTime(
@@ -285,7 +301,7 @@ class _WorkoutExerciseEditorState extends State<WorkoutExerciseEditor> {
                             true,
                           ),
                           icon: const Icon(GTIcons.time),
-                          tooltip: "exercise.fields.startRestTime".t,
+                          tooltip: context.t.exercise.fields.restTime,
                         ),
                       ],
                     ],
@@ -317,7 +333,7 @@ class _WorkoutExerciseEditorState extends State<WorkoutExerciseEditor> {
                 const SizedBox(height: 8),
                 FilledButton.tonal(
                   onPressed: () => widget.callbacks.onSetCreate(widget.index),
-                  child: Text('exercise.actions.addSet'.t),
+                  child: Text(context.t.exercise.actions.addSet),
                 ),
               ],
               // if (kDebugMode) ...[
@@ -493,8 +509,8 @@ class _WorkoutExerciseSetEditorState extends State<WorkoutExerciseSetEditor> {
       FilteringTextInputFormatter.allow(RegExp("[0123456789.,]")),
     ],
     decoration: GymTrackerInputDecoration(
-      labelText: "exercise.fields.weight".t,
-      suffix: Text("units.${widget.weightUnit.name}".t),
+      labelText: context.t.exercise.fields.weight,
+      suffix: Text(context.t.units[widget.weightUnit.name] ?? "UNKNOWN"),
       suffixIconConstraints: const BoxConstraints(minHeight: 24),
       suffixIcon: _weightFocusNode.hasFocus
           ? IconButton(
@@ -529,7 +545,9 @@ class _WorkoutExerciseSetEditorState extends State<WorkoutExerciseSetEditor> {
     }(),
     setID: widget.set.id,
     controller: timeController,
-    decoration: GymTrackerInputDecoration(labelText: "exercise.fields.time".t),
+    decoration: GymTrackerInputDecoration(
+      labelText: context.t.exercise.fields.time,
+    ),
     onChanged: (value) {
       final newSet = widget.set.copyWith(
         time: value.isEmpty ? null : TimeInputField.parseDuration(value),
@@ -545,7 +563,9 @@ class _WorkoutExerciseSetEditorState extends State<WorkoutExerciseSetEditor> {
       signed: true,
     ),
     inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-    decoration: GymTrackerInputDecoration(labelText: "exercise.fields.reps".t),
+    decoration: GymTrackerInputDecoration(
+      labelText: context.t.exercise.fields.reps,
+    ),
     onChanged: (value) {
       final newSet = widget.set.copyWith(
         reps: value.isEmpty ? null : int.tryParse(value),
@@ -564,8 +584,8 @@ class _WorkoutExerciseSetEditorState extends State<WorkoutExerciseSetEditor> {
       FilteringTextInputFormatter.allow(RegExp("[0123456789.,]")),
     ],
     decoration: GymTrackerInputDecoration(
-      labelText: "exercise.fields.distance".t,
-      suffix: Text("units.${widget.distanceUnit.name}".t),
+      labelText: context.t.exercise.fields.distance,
+      suffix: Text(context.t.units[widget.distanceUnit.name] ?? "UNKNOWN"),
     ),
     onChanged: (value) {
       final newSet = widget.set.copyWith(
@@ -617,7 +637,7 @@ class _WorkoutExerciseSetEditorState extends State<WorkoutExerciseSetEditor> {
             backgroundColor: scheme.error,
             foregroundColor: scheme.onError,
             icon: GTIcons.delete_forever,
-            label: 'actions.remove'.t,
+            label: context.t.actions.remove,
           ),
         ],
       ),
@@ -644,7 +664,7 @@ class _WorkoutExerciseSetEditorState extends State<WorkoutExerciseSetEditor> {
                     set: widget.set,
                     allSets: widget.exercise.sets,
                   ),
-                  tooltip: "set.kind".t,
+                  tooltip: context.t.set.kind,
                   itemBuilder: (context) => <PopupMenuEntry<GTSetKind>>[
                     for (final kind in GTSetKind.values)
                       PopupMenuItem(
@@ -657,7 +677,9 @@ class _WorkoutExerciseSetEditorState extends State<WorkoutExerciseSetEditor> {
                             set: widget.set,
                             allSets: widget.exercise.sets,
                           ),
-                          title: Text('set.kindLong.${kind.name}'.t),
+                          title: Text(
+                            context.t.set.kindLong[kind.name] ?? "UNKNOWN",
+                          ),
                         ),
                       ),
                     const PopupMenuDivider(),
@@ -667,7 +689,7 @@ class _WorkoutExerciseSetEditorState extends State<WorkoutExerciseSetEditor> {
                           context: context,
                           builder: (context) {
                             return AlertDialog(
-                              title: Text('set.kinds.help.title'.t),
+                              title: Text(context.t.set.kinds.help['title']!),
                               scrollable: true,
                               content: Column(
                                 children: [
@@ -681,10 +703,12 @@ class _WorkoutExerciseSetEditorState extends State<WorkoutExerciseSetEditor> {
                                         fontSize: 16,
                                       ),
                                       title: Text(
-                                        'set.kindLong.${kind.name}'.t,
+                                        context.t.set.kindLong[kind.name] ??
+                                            "UNKNOWN",
                                       ),
                                       subtitle: Text(
-                                        'set.kinds.help.${kind.name}'.t,
+                                        context.t.set.kinds.help[kind.name] ??
+                                            "UNKNOWN",
                                       ),
                                     ),
                                 ],
@@ -713,7 +737,7 @@ class _WorkoutExerciseSetEditorState extends State<WorkoutExerciseSetEditor> {
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                        title: Text('set.kinds.help.title'.t),
+                        title: Text(context.t.set.kinds.help['title']!),
                       ),
                     ),
                   ],
@@ -842,7 +866,7 @@ class _WorkoutSetRPEDialogState extends State<WorkoutSetRPEDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: Text('exercise.editor.fields.rpe.label'.t),
+      title: Text(context.t.exercise.editor.fields.rpe.label),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -853,18 +877,16 @@ class _WorkoutSetRPEDialogState extends State<WorkoutSetRPEDialog> {
                   ListTile(
                     leading: const Icon(GTIcons.help),
                     subtitle: Text(
-                      'exercise.editor.fields.rpe.description.text'.t,
+                      context.t.exercise.editor.fields.rpe.description.text,
                     ),
                   ),
                   ListTile(
                     leading: const Icon(GTIcons.rpe),
                     title: Text(
-                      'exercise.editor.fields.rpe.level${currentRPE.toInt()}.title'
-                          .t,
+                      'exercise.editor.fields.rpe.level${currentRPE.toInt()}.title',
                     ),
                     subtitle: Text(
-                      'exercise.editor.fields.rpe.level${currentRPE.toInt()}.text'
-                          .t,
+                      'exercise.editor.fields.rpe.level${currentRPE.toInt()}.text',
                     ),
                   ),
                 ],
@@ -908,7 +930,7 @@ class _WorkoutSetRPEDialogState extends State<WorkoutSetRPEDialog> {
           onPressed: () {
             Navigator.pop<Optional<double?>>(context, const None());
           },
-          child: Text("exercise.editor.fields.rpe.removeRPE".t),
+          child: Text(context.t.exercise.editor.fields.rpe.removeRPE),
         ),
         TextButton(
           onPressed: () {
@@ -949,7 +971,7 @@ class __WorkoutReorderSetsDialogState extends State<_WorkoutReorderSetsDialog> {
     return Dialog.fullscreen(
       child: Scaffold(
         appBar: AppBar(
-          title: Text('exercise.editor.fields.reorderSets.title'.t),
+          title: Text(context.t.exercise.editor.fields.reorderSets.title),
           leading: IconButton(
             icon: const Icon(GTIcons.close),
             onPressed: () {
@@ -971,8 +993,8 @@ class __WorkoutReorderSetsDialogState extends State<_WorkoutReorderSetsDialog> {
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
                 child: AlertBanner(
-                  title: 'exercise.editor.fields.reorderSets.title'.t,
-                  text: Text('exercise.editor.fields.reorderSets.text'.t),
+                  title: context.t.exercise.editor.fields.reorderSets.title,
+                  text: Text(context.t.exercise.editor.fields.reorderSets.text),
                   color: AlertColor.secondary(context),
                 ),
               ),

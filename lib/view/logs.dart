@@ -5,8 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:get/get.dart' hide ContextExtensionss;
 import 'package:gymtracker/controller/logger_controller.dart';
+import 'package:gymtracker/i18n/strings.g.dart';
 import 'package:gymtracker/icons/gymtracker_icons.dart';
-import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/utils/constants.dart';
 import 'package:gymtracker/utils/utils.dart';
 import 'package:gymtracker/view/components/controlled.dart';
@@ -88,7 +88,7 @@ class _LogViewState extends ControlledState<LogView, LoggerController> {
         );
         return Scaffold(
           appBar: AppBar(
-            title: Text("settings.advanced.options.logs.title".t),
+            title: Text(context.t.settings.advanced.options.logs.title),
             actions: [
               Badge(
                 label: Text("${controller.filteredLogs.length}"),
@@ -164,7 +164,8 @@ class _LogViewState extends ControlledState<LogView, LoggerController> {
         spans.add(const TextSpan(text: '\n\n'));
       }
       spans.add(
-          TextSpan(text: _indentedLines(log.stackTrace.toString(), indent)));
+        TextSpan(text: _indentedLines(log.stackTrace.toString(), indent)),
+      );
     }
 
     var (back, fore) = _getLevelColors(context, log.level);
@@ -175,10 +176,7 @@ class _LogViewState extends ControlledState<LogView, LoggerController> {
     }
 
     final firstLine = '$prefix[${log.level.shortName}] [$obj]';
-    final textStyle = monospace.copyWith(
-      color: fore,
-      fontSize: _fontSize,
-    );
+    final textStyle = monospace.copyWith(color: fore, fontSize: _fontSize);
 
     return Container(
       color: back,
@@ -190,24 +188,17 @@ class _LogViewState extends ControlledState<LogView, LoggerController> {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Flexible(
-                child: Text(
-                  firstLine,
-                  style: textStyle,
-                ),
-              ),
+              Flexible(child: Text(firstLine, style: textStyle)),
               Text(
                 " ${DateFormat.Md(Get.locale!.languageCode).format(log.timestamp)} "
                 "${DateFormat.Hms().format(log.timestamp)} ",
                 style: textStyle.copyWith(
-                    color: fore.withAlpha((0.7 * 255).round())),
+                  color: fore.withAlpha((0.7 * 255).round()),
+                ),
               ),
             ],
           ),
-          Text.rich(
-            TextSpan(children: spans),
-            style: textStyle,
-          ),
+          Text.rich(TextSpan(children: spans), style: textStyle),
         ],
       ),
     );

@@ -17,14 +17,16 @@ import 'package:gymtracker/data/distance.dart';
 import 'package:gymtracker/data/exercises.dart';
 import 'package:gymtracker/data/weights.dart';
 import 'package:gymtracker/gen/colors.gen.dart';
+import 'package:gymtracker/i18n/strings.g.dart';
 import 'package:gymtracker/icons/gymtracker_icons.dart';
+import 'package:gymtracker/main.dart';
 import 'package:gymtracker/model/exercisable.dart';
 import 'package:gymtracker/model/exercise.dart';
 import 'package:gymtracker/model/native.dart';
 import 'package:gymtracker/model/set.dart';
 import 'package:gymtracker/model/superset.dart';
 import 'package:gymtracker/model/workout.dart';
-import 'package:gymtracker/service/localizations.dart';
+import 'package:gymtracker/provider/locale.dart';
 import 'package:gymtracker/service/logger.dart';
 import 'package:gymtracker/service/native.dart';
 import 'package:gymtracker/struct/editor_callback.dart';
@@ -37,9 +39,9 @@ import 'package:gymtracker/utils/utils.dart';
 import 'package:gymtracker/view/components/rich_text_dialog.dart';
 import 'package:gymtracker/view/exercise_picker.dart';
 import 'package:gymtracker/view/utils/exercises_to_superset.dart';
-import 'package:gymtracker/view/utils/workout_navigation.dart';
 import 'package:gymtracker/view/utils/workout_done.dart';
 import 'package:gymtracker/view/utils/workout_generator.dart';
+import 'package:gymtracker/view/utils/workout_navigation.dart';
 import 'package:gymtracker/view/workout.dart';
 
 typedef WorkoutExerciseIndex = ExerciseIndex;
@@ -88,7 +90,7 @@ class WorkoutController extends GetxController with ServiceableController {
     });
   }
 
-  _initFirstSync() {
+  void _initFirstSync() {
     SchedulerBinding.instance.addPostFrameCallback((_) {
       // Wait for the context to be available
       if (Get.context == null) {
@@ -686,14 +688,14 @@ class WorkoutController extends GetxController with ServiceableController {
       builder: (context) {
         return AlertDialog(
           icon: const Icon(GTIcons.info),
-          title: Text("ongoingWorkout.cancel.title".t),
-          content: Text("ongoingWorkout.cancel.text".t),
+          title: Text(context.t.ongoingWorkout.cancel.title),
+          content: Text(context.t.ongoingWorkout.cancel.text),
           actions: [
             TextButton(
               onPressed: () {
                 Get.back();
               },
-              child: Text("ongoingWorkout.cancel.actions.no".t),
+              child: Text(context.t.ongoingWorkout.cancel.actions.no),
             ),
             FilledButton.tonal(
               onPressed: () async {
@@ -702,7 +704,7 @@ class WorkoutController extends GetxController with ServiceableController {
 
                 onCanceled();
               },
-              child: Text("ongoingWorkout.cancel.actions.yes".t),
+              child: Text(context.t.ongoingWorkout.cancel.actions.yes),
             ),
           ],
         );
@@ -719,6 +721,8 @@ class WorkoutController extends GetxController with ServiceableController {
   }
 
   void generateNameIfEmpty() {
+    final t = globalContainer.read(translationsProvider);
+
     if (name.value.trim().isEmpty) {
       final groups = <GTMuscleCategory>{};
 
@@ -736,7 +740,7 @@ class WorkoutController extends GetxController with ServiceableController {
         );
       }
 
-      name(generateWorkoutTitle(groups));
+      name(generateWorkoutTitle(t, groups));
     }
   }
 
@@ -784,6 +788,7 @@ class WorkoutController extends GetxController with ServiceableController {
 
   Future<void> askToUpdateRoutine(Workout workout) async {
     // if (workout.isContinuation) return;
+    final t = globalContainer.read(translationsProvider);
     if (workout.isContinuation) {
       final orig = workout.originalWorkoutForContinuation!;
       workout = SynthesizedWorkout([
@@ -803,26 +808,25 @@ class WorkoutController extends GetxController with ServiceableController {
       );
       if (!difference.isEmpty) {
         final confirm = await Go.confirm(
-          "ongoingWorkout.updateRoutine.differenceTitle".t,
+          t.ongoingWorkout.updateRoutine.differenceTitle,
           () {
             String text =
-                "${"ongoingWorkout.updateRoutine.differenceText".t}\n\n";
+                "${t.ongoingWorkout.updateRoutine.differenceText}\n\n";
             if (difference.addedExercises > 0) {
               text +=
-                  "- ${"ongoingWorkout.updateRoutine.differences.added".plural(difference.addedExercises)}\n";
+                  "- ${t.ongoingWorkout.updateRoutine.differences.added(n: difference.addedExercises)}\n";
             }
             if (difference.removedExercises > 0) {
               text +=
-                  "- ${"ongoingWorkout.updateRoutine.differences.removed".plural(difference.removedExercises)}\n";
+                  "- ${t.ongoingWorkout.updateRoutine.differences.removed(n: difference.removedExercises)}\n";
             }
             if (difference.changedExercises > 0) {
               text +=
-                  "- ${"ongoingWorkout.updateRoutine.differences.changed".plural(difference.changedExercises)}\n";
+                  "- ${t.ongoingWorkout.updateRoutine.differences.changed(n: difference.changedExercises)}\n";
             }
 
             return text.trim();
           }(),
-          transformText: (s) => s,
         );
         if (confirm) {
           routinesController.updateRoutineFromWorkout(
@@ -960,9 +964,10 @@ class WorkoutController extends GetxController with ServiceableController {
   void changeWeightUnitDialog() {
     Go.showRadioModal(
       selectedValue: weightUnit.value,
-      title: Text("ongoingWorkout.actions.changeWeightUnit".t),
+      title: Text(t.ongoingWorkout.actions.changeWeightUnit),
       values: {
-        for (final val in Weights.values) val: "weightUnits.${val.name}".t,
+        for (final val in Weights.values)
+          val: t.weightUnits[val.name] ?? "UNKNOWN",
       },
       onChange: (value) {
         logger.w("Changing weight unit to $value");
@@ -975,10 +980,10 @@ class WorkoutController extends GetxController with ServiceableController {
   void changeDistanceUnitDialog() {
     Go.showRadioModal(
       selectedValue: distanceUnit.value,
-      title: Text("ongoingWorkout.actions.changeDistanceUnit".t),
+      title: Text(t.ongoingWorkout.actions.changeDistanceUnit),
       values: {
         for (final distance in Distance.values)
-          distance: "distanceUnits.${distance.name}".t,
+          distance: t.distanceUnits[distance.name] ?? "UNKNOWN",
       },
       onChange: (value) {
         logger.i("Changing distance unit to $value");
@@ -1104,13 +1109,13 @@ class WorkoutController extends GetxController with ServiceableController {
     Go.snack(
       ListTile(
         leading: const Icon(GTIcons.generate),
-        title: Text("workoutGenerator.success.title".t),
+        title: Text(t.workoutGenerator.success.title),
         textColor: onContainerColor,
         iconColor: onContainerColor,
       ),
       backgroundColor: containerColor,
       action: SnackBarAction(
-        label: "workoutGenerator.success.undo".t,
+        label: t.workoutGenerator.success.undo,
         backgroundColor: themedColor,
         textColor: onThemedColor,
         onPressed: () {
@@ -1657,7 +1662,8 @@ and:
     );
   }
 
-  refreshWatchData() {
+  void refreshWatchData() {
+    final t = globalContainer.read(translationsProvider);
     final ctdctrl = Get.find<CountdownController>();
     final startingTime = ctdctrl.startingTime.value;
     final endingTime = ctdctrl.targetTime.value;
@@ -1681,7 +1687,7 @@ and:
       final exercise = supersetIndex == null
           ? (exercises[exerciseIndex] as Exercise)
           : (exercises[supersetIndex] as Superset).exercises[exerciseIndex];
-      final name = exercise.displayName;
+      final name = exercise.getDisplayName(t);
       final color =
           theme ??
           (exercise.standard && exercise.category != null
@@ -1697,6 +1703,7 @@ and:
         exerciseName: name,
         exerciseColor: color,
         exerciseParameters: set.getHumanReadableDescription(
+          t: t,
           weightUnit: weightUnit.value,
           distanceUnit: distanceUnit.value,
         ),
@@ -1735,7 +1742,7 @@ and:
   String _setTypeLabelForWatch(GTSet set, List<GTSet> allSets) {
     switch (set.kind) {
       case GTSetKind.warmUp:
-        return "set.kindShort.warmUp".t;
+        return t.set.kindShort.warmUp;
       case GTSetKind.normal:
         final normalSets = allSets.where(
           (element) => element.kind == GTSetKind.normal,
@@ -1745,11 +1752,11 @@ and:
         );
         return (normalSetIndex >= 0 ? normalSetIndex + 1 : 1).toString();
       case GTSetKind.drop:
-        return "set.kindShort.drop".t;
+        return t.set.kindShort.drop;
       case GTSetKind.failure:
-        return "set.kindShort.failure".t;
+        return t.set.kindShort.failure;
       case GTSetKind.failureStripping:
-        return "set.kindShort.failureStripping".t;
+        return t.set.kindShort.failureStripping;
     }
   }
 

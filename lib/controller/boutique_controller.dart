@@ -3,8 +3,9 @@ import 'dart:convert';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:gymtracker/controller/serviceable_controller.dart';
+import 'package:gymtracker/main.dart';
 import 'package:gymtracker/model/model.dart';
-import 'package:gymtracker/service/localizations.dart';
+import 'package:gymtracker/provider/locale.dart';
 import 'package:gymtracker/service/logger.dart';
 import 'package:gymtracker/service/test.dart';
 import 'package:gymtracker/service/version.dart';
@@ -70,9 +71,10 @@ class BoutiqueController extends GetxController with ServiceableController {
   }
 
   void install(BoutiquePackage package) {
+    final t = globalContainer.read(translationsProvider);
     coordinator.installRoutines(package.routines);
     Go.popUntil((route) => route.isFirst);
-    Go.snack("boutique.package.installed".t);
+    Go.snack(t.boutique.package.installed);
   }
 
   void routineConverter(String categoryID) async {
@@ -237,16 +239,16 @@ typedef BoutiqueApiResponse<T> = Future<BoutiqueResponse<T, BoutiqueError>>;
 
 enum BoutiqueError { unknown, version }
 
-sealed class BoutiqueResponse<Ok, Error> {
+sealed class BoutiqueResponse<Ok, Err> {
   const BoutiqueResponse();
 
   factory BoutiqueResponse.success(Ok data) => _BoutiqueResponseSuccess(data);
-  factory BoutiqueResponse.error(Error error) => _BoutiqueResponseError(error);
+  factory BoutiqueResponse.error(Err error) => _BoutiqueResponseError(error);
 
   Ok? get success => this is _BoutiqueResponseSuccess
       ? (this as _BoutiqueResponseSuccess).data
       : null;
-  Error? get error => this is _BoutiqueResponseError
+  Err? get error => this is _BoutiqueResponseError
       ? (this as _BoutiqueResponseError).error
       : null;
 

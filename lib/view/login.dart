@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:gymtracker/i18n/strings.g.dart';
 import 'package:gymtracker/provider/online.dart';
 import 'package:gymtracker/controller/serviceable_controller.dart';
-import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/service/logger.dart';
 import 'package:gymtracker/utils/go.dart';
 import 'package:rxdart/rxdart.dart';
@@ -38,7 +38,11 @@ class _LoginController extends GetxController
     );
   }
 
-  Future<void> signIn(String email, String password) async {
+  Future<void> signIn(
+    String email,
+    String password, {
+    required BuildContext context,
+  }) async {
     if (status.isLoading) return;
     if (_credentials$.value.emailError) return;
     if (password.isEmpty) return;
@@ -51,7 +55,7 @@ class _LoginController extends GetxController
       String message = e.toString();
       if (e is AuthException && e is! AuthApiException) {
         if (e.message.contains("Socket")) {
-          message = "login.errors.noInternet".t;
+          message = context.t.login.errors.noInternet;
           change(null, status: RxStatus.error(message));
         } else {
           message = e.message;
@@ -63,7 +67,12 @@ class _LoginController extends GetxController
     }
   }
 
-  Future<bool> signUp(String email, String password, String username) async {
+  Future<bool> signUp(
+    String email,
+    String password,
+    String username, {
+    required BuildContext context,
+  }) async {
     if (status.isLoading) return false;
     if (_credentials$.value.hasError) return false;
     if (password.isEmpty) return false;
@@ -78,9 +87,9 @@ class _LoginController extends GetxController
           String message = e.toString();
           if (e is AuthException) {
             if (e.message.contains("Socket")) {
-              message = "login.errors.noInternet".t;
+              message = context.t.login.errors.noInternet;
             } else if (e.message == "login.errors.usernameTaken") {
-              message = "login.errors.usernameTaken".t;
+              message = context.t.login.errors.usernameTaken;
             } else {
               message = e.message;
             }
@@ -137,12 +146,12 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
 
     return Scaffold(
       appBar: AppBar(
-        title: Text("login.title".t),
+        title: Text(context.t.login.title),
         bottom: TabBar(
           controller: tabController,
           tabs: [
-            Tab(text: 'login.tabs.signIn'.t),
-            Tab(text: 'login.tabs.signUp'.t),
+            Tab(text: context.t.login.tabs.signIn),
+            Tab(text: context.t.login.tabs.signUp),
           ],
         ),
       ),
@@ -170,14 +179,14 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
         if (loginController.status.isError)
           Text(
             loginController.status.errorMessage?.toString() ??
-                'login.errors.generic'.t,
+                context.t.login.errors.generic,
           ),
         const SizedBox(height: 16),
         TextField(
           controller: emailController,
           decoration: InputDecoration(
-            labelText: 'login.fields.email.label'.t,
-            hintText: 'login.fields.email.hint'.t,
+            labelText: context.t.login.fields.email.label,
+            hintText: context.t.login.fields.email.hint,
           ),
           enabled: fieldsEnabled,
         ),
@@ -185,8 +194,8 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
         TextField(
           controller: passwordController,
           decoration: InputDecoration(
-            labelText: 'login.fields.password.label'.t,
-            hintText: 'login.fields.password.hint'.t,
+            labelText: context.t.login.fields.password.label,
+            hintText: context.t.login.fields.password.hint,
             suffixIcon: IconButton(
               icon: Icon(
                 _showPassword ? Icons.visibility : Icons.visibility_off,
@@ -200,7 +209,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
         const SizedBox(height: 16),
         ElevatedButton.icon(
           onPressed: fieldsEnabled ? _submitSignIn : null,
-          label: Text('login.buttons.signIn'.t),
+          label: Text(context.t.login.buttons.signIn),
           icon: () {
             if (loginController.status.isLoading) {
               return SizedBox(
@@ -228,7 +237,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
         if (loginController.status.isError)
           Text(
             loginController.status.errorMessage?.toString() ??
-                'login.errors.generic'.t,
+                context.t.login.errors.generic,
           ),
         const SizedBox(height: 16),
         StreamBuilder<CredentialsState>(
@@ -238,12 +247,12 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
               controller: usernameController,
               onChanged: (_) => _checkCredentials(),
               decoration: InputDecoration(
-                labelText: 'login.fields.username.label'.t,
-                hintText: 'login.fields.username.hint'.t,
+                labelText: context.t.login.fields.username.label,
+                hintText: context.t.login.fields.username.hint,
                 errorText: snapshot.data?.when(
                   invalid: (_, __, usernameError) {
                     if (!usernameError) return null;
-                    return 'login.errors.username'.t;
+                    return context.t.login.errors.username;
                   },
                   orElse: () => null,
                 ),
@@ -260,12 +269,12 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
               controller: emailController,
               onChanged: (_) => _checkCredentials(),
               decoration: InputDecoration(
-                labelText: 'login.fields.email.label'.t,
-                hintText: 'login.fields.email.hint'.t,
+                labelText: context.t.login.fields.email.label,
+                hintText: context.t.login.fields.email.hint,
                 errorText: snapshot.data?.when(
                   invalid: (emailError, _, __) {
                     if (!emailError) return null;
-                    return 'login.errors.email'.t;
+                    return context.t.login.errors.email;
                   },
                   orElse: () => null,
                 ),
@@ -282,8 +291,8 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
               controller: passwordController,
               onChanged: (_) => _checkCredentials(),
               decoration: InputDecoration(
-                labelText: 'login.fields.password.label'.t,
-                hintText: 'login.fields.password.hint'.t,
+                labelText: context.t.login.fields.password.label,
+                hintText: context.t.login.fields.password.hint,
                 error: snapshot.data?.when(
                   invalid: (_, passwordErrors, __) {
                     if (passwordErrors.isEmpty) return null;
@@ -297,11 +306,11 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
                         children: [
                           TextSpan(
                             text:
-                                '${'login.errors.password.invalid.header'.t}\n',
+                                '${context.t.login.errors.password.invalid.header}\n',
                           ),
                           TextSpan(
                             text:
-                                '${'login.errors.password.invalid.length'.t}\n',
+                                '${context.t.login.errors.password.invalid.length}\n',
                             style: TextStyle(
                               color:
                                   (passwordErrors.contains(
@@ -313,7 +322,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
                           ),
                           TextSpan(
                             text:
-                                '${'login.errors.password.invalid.uppercase'.t}\n',
+                                '${context.t.login.errors.password.invalid.uppercase}\n',
                             style: TextStyle(
                               color:
                                   (passwordErrors.contains(
@@ -325,7 +334,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
                           ),
                           TextSpan(
                             text:
-                                '${'login.errors.password.invalid.lowercase'.t}\n',
+                                '${context.t.login.errors.password.invalid.lowercase}\n',
                             style: TextStyle(
                               color:
                                   (passwordErrors.contains(
@@ -337,7 +346,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
                           ),
                           TextSpan(
                             text:
-                                '${'login.errors.password.invalid.number'.t}\n',
+                                '${context.t.login.errors.password.invalid.number}\n',
                             style: TextStyle(
                               color:
                                   (passwordErrors.contains(
@@ -349,7 +358,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
                           ),
                           TextSpan(
                             text:
-                                '${'login.errors.password.invalid.specialCharacter'.t}\n',
+                                '${context.t.login.errors.password.invalid.specialCharacter}\n',
                             style: TextStyle(
                               color:
                                   (passwordErrors.contains(
@@ -388,7 +397,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
               onPressed: fieldsEnabled && (snapshot.data?.isEmpty ?? true)
                   ? _submitSignUp
                   : null,
-              label: Text('login.buttons.signUp'.t),
+              label: Text(context.t.login.buttons.signUp),
               icon: loginController.status.isLoading
                   ? SizedBox(
                       height: IconTheme.of(context).size,
@@ -410,6 +419,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
       await Get.find<_LoginController>().signIn(
         emailController.text,
         passwordController.text,
+        context: context,
       );
     } on AuthApiException catch (e) {
       if (e.code == "email_not_confirmed") {
@@ -433,6 +443,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
       emailController.text,
       passwordController.text,
       usernameController.text,
+      context: context,
     );
     if (isOk) {
       Go.off(
@@ -496,13 +507,13 @@ class _AuthVerifyEmailStringState
                 ),
                 const SizedBox(height: 24),
                 Text(
-                  "login.verifyEmail.title".t,
+                  context.t.login.verifyEmail.title,
                   style: Theme.of(context).textTheme.headlineMedium,
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 16),
                 Text(
-                  "login.verifyEmail.description".t,
+                  context.t.login.verifyEmail.description,
                   style: Theme.of(context).textTheme.bodyLarge,
                   textAlign: TextAlign.center,
                 ),
@@ -512,7 +523,7 @@ class _AuthVerifyEmailStringState
                       ? null
                       : () => _checkEmailVerification(loginController),
                   icon: const Icon(Icons.check),
-                  label: Text("login.verifyEmail.done".t),
+                  label: Text(context.t.login.verifyEmail.done),
                 ),
               ],
             ),
@@ -525,14 +536,18 @@ class _AuthVerifyEmailStringState
   Future<void> _checkEmailVerification(_LoginController loginController) async {
     setState(() => loading = true);
     try {
-      final notConfirmedString = "login.verifyEmail.notVerified".t;
+      final notConfirmedString = context.t.login.verifyEmail.notVerified;
       final isVerified = await loginController.checkEmailVerificationAndLogIn(
         email: widget.email,
         password: widget.password,
       );
       if (isVerified) {
         setState(() => emailVerified = true);
-        await loginController.signIn(widget.email, widget.password);
+        await loginController.signIn(
+          widget.email,
+          widget.password,
+          context: context,
+        );
         Get.back();
       } else {
         if (!context.mounted) return;

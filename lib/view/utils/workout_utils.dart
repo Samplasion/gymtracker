@@ -1,8 +1,8 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:gymtracker/i18n/strings.g.dart';
 import 'package:gymtracker/icons/gymtracker_icons.dart';
 import 'package:gymtracker/model/workout.dart';
-import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/view/utils/timer.dart';
 import 'package:intl/intl.dart';
@@ -23,8 +23,9 @@ class WorkoutHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    final fg =
-        isSelected ? colorScheme.onSurface : colorScheme.onPrimaryContainer;
+    final fg = isSelected
+        ? colorScheme.onSurface
+        : colorScheme.onPrimaryContainer;
     final bg = isSelected ? colorScheme.surface : colorScheme.primaryContainer;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -39,13 +40,16 @@ class WorkoutHeader extends StatelessWidget {
                 child: isSelected
                     ? const Icon(GTIcons.done)
                     : Text(
-                        workout.name.characters.safeFirst?.toUpperCase() ?? ""),
+                        workout.name.characters.safeFirst?.toUpperCase() ?? "",
+                      ),
               ),
             ),
             const SizedBox(width: 16),
             Expanded(
               child: _HistoryWorkoutHeaderInner(
-                  workout: workout, continuation: continuation),
+                workout: workout,
+                continuation: continuation,
+              ),
             ),
           ],
         ),
@@ -75,9 +79,7 @@ class _HistoryWorkoutHeaderInner extends StatelessWidget {
               if (workout.isContinuation && kDebugMode)
                 TextSpan(
                   text: " [CONTINUATION]",
-                  style: TextStyle(
-                    color: Theme.of(context).colorScheme.error,
-                  ),
+                  style: TextStyle(color: Theme.of(context).colorScheme.error),
                 ),
             ],
           ),
@@ -87,9 +89,7 @@ class _HistoryWorkoutHeaderInner extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text("general.exercises".plural(
-              workout.displayExerciseCount,
-            )),
+            Text(context.t.general.exercises(n: workout.displayExerciseCount)),
             if (workout.isConcrete)
               Flexible(
                 child: TimerView.buildTimeString(
@@ -110,8 +110,9 @@ class _HistoryWorkoutHeaderInner extends StatelessWidget {
                           TextSpan(
                             text: DateFormat.yMd(context.locale.languageCode)
                                 .add_Hm()
-                                .format(continuation!.startingDate ??
-                                    DateTime.now()),
+                                .format(
+                                  continuation!.startingDate ?? DateTime.now(),
+                                ),
                           ),
                           const TextSpan(text: " - "),
                           TimerView.buildTimeString(
@@ -125,12 +126,12 @@ class _HistoryWorkoutHeaderInner extends StatelessWidget {
                             (continuation!.duration ?? Duration.zero) +
                                 (workout.duration ?? Duration.zero),
                             builder: (time) => TextSpan(
-                              text: "general.totalTime".tParams({
-                                "time": time.text!,
-                              }),
+                              text: context.t.general.totalTime(
+                                time: time.text!,
+                              ),
                             ),
-                          )
-                        ]
+                          ),
+                        ],
                       ],
                     ),
                     textAlign: TextAlign.end,

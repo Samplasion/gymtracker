@@ -4,6 +4,7 @@ import 'package:flutter/scheduler.dart';
 import 'package:get/get.dart';
 import 'package:gymtracker/controller/coordinator.dart';
 import 'package:gymtracker/controller/serviceable_controller.dart';
+import 'package:gymtracker/i18n/strings.g.dart';
 import 'package:gymtracker/icons/gymtracker_icons.dart';
 import 'package:gymtracker/model/achievements.dart';
 import 'package:gymtracker/model/exercisable.dart';
@@ -11,13 +12,13 @@ import 'package:gymtracker/model/exercise.dart';
 import 'package:gymtracker/model/set.dart';
 import 'package:gymtracker/model/superset.dart';
 import 'package:gymtracker/model/workout.dart';
-import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/service/logger.dart';
 import 'package:gymtracker/service/native.dart';
 import 'package:gymtracker/service/widgets.dart';
 import 'package:gymtracker/struct/streaks.dart';
 import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/utils/go.dart';
+import 'package:gymtracker/utils/utils.dart';
 import 'package:gymtracker/view/exercises.dart';
 import 'package:gymtracker/view/workout_editor.dart';
 
@@ -34,7 +35,6 @@ class HistoryController extends GetxController with ServiceableController {
 
   Rx<Streaks> streaks = Streaks.zero.obs;
 
-  bool _init = false;
   @override
   onInit() {
     super.onInit();
@@ -52,8 +52,6 @@ class HistoryController extends GetxController with ServiceableController {
         computeStreaks();
       });
       coordinator.computeSuggestions();
-
-      _init = true;
     });
   }
 
@@ -86,7 +84,7 @@ class HistoryController extends GetxController with ServiceableController {
       streaks(
         Streaks.fromMappedDays(
           workoutsByDay,
-          firstDayOfWeek: GTLocalizations.firstDayOfWeekFor(Get.context!),
+          firstDayOfWeek: firstDayOfWeekFor(Get.context!.locale),
           today: DateTime.now(),
         ),
       );
@@ -216,14 +214,14 @@ class HistoryController extends GetxController with ServiceableController {
       builder: (context) {
         return AlertDialog(
           icon: const Icon(GTIcons.info),
-          title: Text("workouts.actions.delete.title".t),
-          content: Text("workouts.actions.delete.text".t),
+          title: Text(context.t.workouts.actions.delete.title),
+          content: Text(context.t.workouts.actions.delete.text),
           actions: [
             TextButton(
               onPressed: () {
                 Get.back(closeOverlays: true);
               },
-              child: Text("workouts.actions.delete.actions.no".t),
+              child: Text(context.t.workouts.actions.delete.actions.no),
             ),
             FilledButton.tonal(
               onPressed: () {
@@ -234,7 +232,7 @@ class HistoryController extends GetxController with ServiceableController {
 
                 onCanceled();
               },
-              child: Text("workouts.actions.delete.actions.yes".t),
+              child: Text(context.t.workouts.actions.delete.actions.yes),
             ),
           ],
         );
@@ -253,17 +251,19 @@ class HistoryController extends GetxController with ServiceableController {
         return AlertDialog(
           icon: const Icon(GTIcons.info),
           title: Text(
-            "history.actions.deleteMultiple.title".plural(workoutIDs.length),
+            context.t.history.actions.deleteMultiple.title(
+              n: workoutIDs.length,
+            ),
           ),
           content: Text(
-            "history.actions.deleteMultiple.text".plural(workoutIDs.length),
+            context.t.history.actions.deleteMultiple.text(n: workoutIDs.length),
           ),
           actions: [
             TextButton(
               onPressed: () {
                 Get.back(closeOverlays: true);
               },
-              child: Text("history.actions.deleteMultiple.actions.no".t),
+              child: Text(context.t.history.actions.deleteMultiple.actions.no),
             ),
             FilledButton.tonal(
               onPressed: () {
@@ -280,7 +280,7 @@ class HistoryController extends GetxController with ServiceableController {
 
                 onDeleted();
               },
-              child: Text("history.actions.deleteMultiple.actions.yes".t),
+              child: Text(context.t.history.actions.deleteMultiple.actions.yes),
             ),
           ],
         );

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:gymtracker/i18n/strings.g.dart';
 import 'package:gymtracker/icons/gymtracker_icons.dart';
 import 'package:gymtracker/model/exercise.dart';
-import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/view/exercise_picker.dart';
 import 'package:gymtracker/view/utils/exercise.dart';
@@ -31,28 +31,28 @@ class ExerciseFormPicker extends StatelessWidget {
         decoration: decoration.copyWith(
           contentPadding: const EdgeInsets.fromLTRB(12.0, 0, 12.0, 0),
         ),
-        child: _buildBody(),
+        child: _buildBody(context: context),
       ),
     );
   }
 
   _callback() async {
-    final exs = await Go.to<List<Exercise>>(() => ExercisePicker(
-          singlePick: true,
-          allowNone: true,
-          filter: filter,
-          individualFilter: individualFilter,
-        ));
+    final exs = await Go.to<List<Exercise>>(
+      () => ExercisePicker(
+        singlePick: true,
+        allowNone: true,
+        filter: filter,
+        individualFilter: individualFilter,
+      ),
+    );
     if (exs == null) return;
     onChanged(exs.firstOrNull);
   }
 
-  Widget _buildBody() {
+  Widget _buildBody({required BuildContext context}) {
     if (exercise == null) {
       return ListTile(
-        title: Text(
-          "exerciseFormPicker.fields.exercise.options.none".t,
-        ),
+        title: Text(context.t.exerciseFormPicker.fields.exercise.options.none),
         trailing: const Icon(GTIcons.lt_chevron),
         contentPadding: EdgeInsets.zero,
         visualDensity: VisualDensity.standard,

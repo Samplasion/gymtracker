@@ -1,8 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-
-import 'package:gymtracker/service/localizations.dart';
+import 'package:gymtracker/i18n/strings.g.dart';
 
 typedef TimerStringBuilder<T> = T Function(TextSpan time);
 
@@ -30,11 +29,12 @@ class TimerView extends StatefulWidget {
     final minutes = (time.inMinutes % 60).toString().padLeft(2, '0');
     final seconds = (time.inSeconds % 60).toString().padLeft(2, '0');
 
-    String built = "time.hours".plural(hours, args: {
-      "hours": "$hours",
-      "minutes": minutes,
-      "seconds": seconds,
-    });
+    String built = context.t.time.hours(
+      n: hours,
+      hours: hours,
+      minutes: minutes,
+      seconds: seconds,
+    );
 
     final text = TextSpan(
       text: built,
@@ -44,26 +44,21 @@ class TimerView extends StatefulWidget {
     return builder(text);
   }
 
-  static Widget _defaultTimerStringBuilder(TextSpan time) => RichText(
-        text: time,
-      );
+  static Widget _defaultTimerStringBuilder(TextSpan time) =>
+      RichText(text: time);
 }
 
 class _TimerViewState extends State<TimerView> {
-  Stream stream = Stream.periodic(
-    const Duration(milliseconds: 200),
-  );
+  Stream stream = Stream.periodic(const Duration(milliseconds: 200));
   late StreamSubscription subscription;
 
   @override
   void initState() {
     super.initState();
-    subscription = stream.listen(
-      (_) {
-        if (!mounted) subscription.cancel();
-        setState(() {});
-      },
-    );
+    subscription = stream.listen((_) {
+      if (!mounted) subscription.cancel();
+      setState(() {});
+    });
   }
 
   @override

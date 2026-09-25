@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:gymtracker/i18n/strings.g.dart';
 import 'package:gymtracker/icons/gymtracker_icons.dart';
-import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/view/components/maybe_rich_text.dart';
 
 class Infobox extends StatelessWidget {
@@ -24,17 +24,19 @@ class Infobox extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 Text.rich(
-                  TextSpan(children: [
-                    WidgetSpan(
-                      child: Icon(
-                        GTIcons.notes,
-                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  TextSpan(
+                    children: [
+                      WidgetSpan(
+                        child: Icon(
+                          GTIcons.notes,
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
+                        ),
+                        alignment: PlaceholderAlignment.middle,
                       ),
-                      alignment: PlaceholderAlignment.middle,
-                    ),
-                    const TextSpan(text: "  "),
-                    TextSpan(text: "infobox.label".t),
-                  ]),
+                      const TextSpan(text: "  "),
+                      TextSpan(text: context.t.infobox.label),
+                    ],
+                  ),
                   style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,

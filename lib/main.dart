@@ -18,12 +18,12 @@ import 'package:gymtracker/controller/coordinator.dart';
 import 'package:gymtracker/controller/debug_controller.dart';
 import 'package:gymtracker/controller/logger_controller.dart';
 import 'package:gymtracker/controller/settings_controller.dart';
+import 'package:gymtracker/i18n/strings.g.dart';
 import 'package:gymtracker/licenses.dart';
-import 'package:gymtracker/model/preferences.dart';
+import 'package:gymtracker/provider/locale.dart';
 import 'package:gymtracker/service/color.dart';
 import 'package:gymtracker/service/database.dart';
 import 'package:gymtracker/service/env.dart';
-import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/service/logger.dart';
 import 'package:gymtracker/service/version.dart';
 import 'package:gymtracker/struct/navigation_observer.dart';
@@ -73,6 +73,7 @@ void main() async {
   initLicenses();
 
   WidgetsFlutterBinding.ensureInitialized();
+  LocaleSettings.useDeviceLocale();
   SentryWidgetsFlutterBinding.ensureInitialized();
 
   HttpOverrides.global = MyHttpOverrides();
@@ -96,12 +97,16 @@ void main() async {
 
   final _databaseService = DatabaseService();
 
-  final l = GTLocalizations();
-  await l.init();
+  // TODO: Move this to some "loading" provider eventually
+  await globalContainer.read(translationsProvider.notifier).loadExercises();
 
   final _compl = Completer();
   _databaseService.ensureInitialized(onDone: () => _compl.complete());
   await _compl.future;
+  final savedLocale = _databaseService.prefs$.value.locale;
+  if (savedLocale != null) {
+    LocaleSettings.setLocaleRaw(savedLocale.languageCode);
+  }
 
   await ColorService().init();
   await VersionService().init();
@@ -116,7 +121,9 @@ void main() async {
       SentryWidget(
         child: UncontrolledProviderScope(
           container: globalContainer,
-          child: MainApp(localizations: l, databaseService: _databaseService),
+          child: TranslationProvider(
+            child: MainApp(databaseService: _databaseService),
+          ),
         ),
       ),
     ),
@@ -184,14 +191,9 @@ FutureOr<void> _sentryInit(SentryFlutterOptions options) {
 const applicationKey = Key("GymTracker");
 
 class MainApp extends StatefulWidget {
-  final GTLocalizations localizations;
   final DatabaseService databaseService;
 
-  const MainApp({
-    required this.localizations,
-    required this.databaseService,
-    super.key,
-  });
+  const MainApp({required this.databaseService, super.key});
 
   @override
   State<MainApp> createState() => _MainAppState();
@@ -203,7 +205,6 @@ class _MainAppState extends State<MainApp> with LoggerConfigurationMixin {
     super.initState();
     Get.put(widget.databaseService);
     Get.put(Coordinator()..init());
-    Get.put(widget.localizations);
   }
 
   @override
@@ -213,7 +214,6 @@ class _MainAppState extends State<MainApp> with LoggerConfigurationMixin {
   Widget build(BuildContext context) {
     final debugController = Get.find<DebugController>();
     final settings = Get.find<SettingsController>();
-    final localizations = widget.localizations;
 
     final application = DynamicColorBuilder(
       key: applicationKey,
@@ -238,96 +238,85 @@ class _MainAppState extends State<MainApp> with LoggerConfigurationMixin {
                     ? platformSeedColor ?? settings.color()
                     : settings.color();
 
-                return AnimatedBuilder(
-                  animation: localizations,
-                  builder: (context, _) {
-                    final systemLocale =
-                        WidgetsBinding.instance.platformDispatcher.locale;
-                    return GetMaterialApp(
-                      useInheritedMediaQuery: true,
-                      title: () {
-                        if (kDebugMode) {
-                          return "${"appName".t} (Debug)";
-                        } else {
-                          return "appName".t;
-                        }
-                      }(),
-                      translations: localizations,
-                      locale:
-                          settings.locale.value ??
-                          Prefs.defaultValue.locale ??
-                          systemLocale,
-                      supportedLocales: GTLocalizations.supportedLocales,
-                      fallbackLocale: const Locale('en'),
-                      localizationsDelegates: const [
-                        RelativeTimeLocalizations.delegate,
-                        GlobalMaterialLocalizations.delegate,
-                        GlobalWidgetsLocalizations.delegate,
-                        GlobalCupertinoLocalizations.delegate,
-                        FlutterQuillLocalizations.delegate,
-                      ],
-                      themeMode: settings.themeMode(),
-                      theme: getGymTrackerThemeFor(
-                        context,
-                        seedColor,
-                        Brightness.light,
+                return GetMaterialApp(
+                  useInheritedMediaQuery: true,
+                  title: () {
+                    if (kDebugMode) {
+                      return "${context.t.appName} (Debug)";
+                    } else {
+                      return context.t.appName;
+                    }
+                  }(),
+                  locale: TranslationProvider.of(context).flutterLocale,
+                  supportedLocales: AppLocaleUtils.supportedLocales,
+                  fallbackLocale: const Locale('en'),
+                  localizationsDelegates: const [
+                    RelativeTimeLocalizations.delegate,
+                    GlobalMaterialLocalizations.delegate,
+                    GlobalWidgetsLocalizations.delegate,
+                    GlobalCupertinoLocalizations.delegate,
+                    FlutterQuillLocalizations.delegate,
+                  ],
+                  themeMode: settings.themeMode(),
+                  theme: getGymTrackerThemeFor(
+                    context,
+                    seedColor,
+                    Brightness.light,
+                  ),
+                  darkTheme: getGymTrackerThemeFor(
+                    context,
+                    seedColor,
+                    Brightness.dark,
+                  ),
+                  home: const GymTrackerAppLoader(),
+                  onGenerateRoute: (settings) {
+                    return switch (settings.name) {
+                      WorkoutView.routeName => Go.materialRoute(
+                        () => const WorkoutView(),
+                        settings: settings,
                       ),
-                      darkTheme: getGymTrackerThemeFor(
-                        context,
-                        seedColor,
-                        Brightness.dark,
+                      WorkoutSimpleView.routeName => Go.materialRoute(
+                        () => const WorkoutSimpleView(),
+                        settings: settings,
                       ),
-                      home: const GymTrackerAppLoader(),
-                      onGenerateRoute: (settings) {
-                        return switch (settings.name) {
-                          WorkoutView.routeName => Go.materialRoute(
-                            () => const WorkoutView(),
-                            settings: settings,
-                          ),
-                          WorkoutSimpleView.routeName => Go.materialRoute(
-                            () => const WorkoutSimpleView(),
-                            settings: settings,
-                          ),
-                          ErrorView.routeName => Go.materialRoute(
-                            () => const ErrorView(),
-                            settings: settings,
-                          ),
-                          PaywallScreen.routeName => Go.materialRoute(
-                            () => const PaywallScreen(),
-                            settings: settings,
-                          ),
-                          null || String() => throw Exception(
-                            "Invalid route: ${settings.name}",
-                          ),
-                        };
-                      },
-                      debugShowCheckedModeBanner: false,
-                      builder: (context, child) =>
-                          AnnotatedRegion<SystemUiOverlayStyle>(
-                            value: SystemUiOverlayStyle(
-                              systemNavigationBarColor: Theme.of(
-                                context,
-                              ).colorScheme.surface,
-                              systemNavigationBarIconBrightness:
-                                  Theme.of(context).colorScheme.surface
-                                      .estimateForegroundBrightness(),
-                            ),
-                            child: child ?? Container(),
-                          ),
-                      logWriterCallback: (text, {bool? isError}) {
-                        if (isError == true) {
-                          logger.e(text);
-                        } else {
-                          logger.t(text);
-                        }
-                      },
-                      navigatorObservers: [
-                        LoggerNavigationObserver(),
-                        SentryNavigatorObserver(),
-                      ],
-                      navigatorKey: navigatorKey,
-                    );
+                      ErrorView.routeName => Go.materialRoute(
+                        () => const ErrorView(),
+                        settings: settings,
+                      ),
+                      PaywallScreen.routeName => Go.materialRoute(
+                        () => const PaywallScreen(),
+                        settings: settings,
+                      ),
+                      null || String() => throw Exception(
+                        "Invalid route: ${settings.name}",
+                      ),
+                    };
                   },
+                  debugShowCheckedModeBanner: false,
+                  builder: (context, child) =>
+                      AnnotatedRegion<SystemUiOverlayStyle>(
+                        value: SystemUiOverlayStyle(
+                          systemNavigationBarColor: Theme.of(
+                            context,
+                          ).colorScheme.surface,
+                          systemNavigationBarIconBrightness: Theme.of(
+                            context,
+                          ).colorScheme.surface.estimateForegroundBrightness(),
+                        ),
+                        child: child ?? Container(),
+                      ),
+                  logWriterCallback: (text, {bool? isError}) {
+                    if (isError == true) {
+                      logger.e(text);
+                    } else {
+                      logger.t(text);
+                    }
+                  },
+                  navigatorObservers: [
+                    LoggerNavigationObserver(),
+                    SentryNavigatorObserver(),
+                  ],
+                  navigatorKey: navigatorKey,
                 );
               }(),
             );
@@ -336,18 +325,15 @@ class _MainAppState extends State<MainApp> with LoggerConfigurationMixin {
       },
     );
 
-    return RootRestorationScope(
-      restorationId: "org.js.samplasion.GymTracker-restoration-flt",
-      child: Obx(() {
-        if (debugController.showSimulator.isTrue) {
-          return DeviceSim(
-            builder: (context) => application,
-            devices: const [iphone13Mini, iphone15, ipad129Gen5],
-          );
-        }
+    return Obx(() {
+      if (debugController.showSimulator.isTrue) {
+        return DeviceSim(
+          builder: (context) => application,
+          devices: const [iphone13Mini, iphone15, ipad129Gen5],
+        );
+      }
 
-        return application;
-      }),
-    );
+      return application;
+    });
   }
 }

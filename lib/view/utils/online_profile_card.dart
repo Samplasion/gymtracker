@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:gymtracker/i18n/strings.g.dart';
 import 'package:gymtracker/icons/gymtracker_icons.dart';
 import 'package:gymtracker/provider/online.dart';
-import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/service/online.dart';
 import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/view/login.dart';
@@ -19,7 +19,7 @@ class OnlineProfileCard extends ConsumerWidget {
     return accountAsync.when(
       data: (account) {
         if (account == null) {
-          return _buildLoggedOut();
+          return _buildLoggedOut(context: context);
         }
         return _buildLoggedIn(account);
       },
@@ -28,14 +28,14 @@ class OnlineProfileCard extends ConsumerWidget {
     );
   }
 
-  Widget _buildLoggedOut() {
+  Widget _buildLoggedOut({required BuildContext context}) {
     return Card.outlined(
       margin: EdgeInsets.zero,
       clipBehavior: Clip.hardEdge,
       child: ListTile(
         leading: const CircleAvatar(child: Icon(GTIcons.account)),
-        title: Text("login.upsell.title".t),
-        subtitle: Text("login.upsell.subtitle".t),
+        title: Text(context.t.login.upsell.title),
+        subtitle: Text(context.t.login.upsell.subtitle),
         onTap: () {
           Go.to(() => const AuthScreen());
         },

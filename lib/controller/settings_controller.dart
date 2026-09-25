@@ -11,10 +11,10 @@ import 'package:gymtracker/controller/serviceable_controller.dart';
 import 'package:gymtracker/data/converters.dart';
 import 'package:gymtracker/data/distance.dart';
 import 'package:gymtracker/data/weights.dart';
+import 'package:gymtracker/i18n/strings.g.dart';
 import 'package:gymtracker/main.dart';
 import 'package:gymtracker/model/preferences.dart';
 import 'package:gymtracker/provider/locale.dart';
-import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/service/logger.dart';
 import 'package:gymtracker/struct/nutrition.dart';
 import 'package:gymtracker/utils/constants.dart';
@@ -57,7 +57,15 @@ class SettingsController extends GetxController with ServiceableController {
     if (locale == kSystemLocaleSentinel) {
       locale = null;
     }
+    if (locale == null) {
+      LocaleSettings.useDeviceLocaleSync();
+    } else {
+      LocaleSettings.setLocaleRaw(locale.languageCode);
+    }
     Get.updateLocale(locale ?? globalContainer.read(platformLocaleProvider));
+    globalContainer
+        .read(translationsProvider.notifier)
+        .setLocale(locale ?? globalContainer.read(platformLocaleProvider));
     service.writeSettings(service.prefs$.value.copyWith(locale: locale));
   }
 
@@ -106,7 +114,7 @@ class SettingsController extends GetxController with ServiceableController {
       if (locale == kSystemLocaleSentinel || locale == null) {
         locale = globalContainer.read(platformLocaleProvider);
       }
-      Get.updateLocale(locale!);
+      globalContainer.read(translationsProvider.notifier).setLocale(locale!);
 
       usesDynamicColor(prefs.usesDynamicColor);
       color(prefs.color);
@@ -155,20 +163,20 @@ class SettingsController extends GetxController with ServiceableController {
           Uint8List.fromList(utf8.encode(json.encode(service.toJson()))),
           mimeType: "application/json",
           name:
-              "${"settings.options.export.filename".t}_${DateTime.now().toIso8601String()}.json",
+              "${context.t.settings.options.export.filename}_${DateTime.now().toIso8601String()}.json",
         ),
       ], sharePositionOrigin: box!.localToGlobal(Offset.zero) & box.size);
     } catch (e, s) {
       logger.e(null, error: e, stackTrace: s);
 
       Go.dialog(
-        "settings.options.export.failed.title".t,
+        context.t.settings.options.export.failed.title,
         "$e\n$s".trim(),
         actions: [
           TextButton(
             onPressed: () {
               Clipboard.setData(ClipboardData(text: "$e\n$s".trim()));
-              Go.snack("settings.options.export.failed.copy".t);
+              Go.snack(context.t.settings.options.export.failed.copy);
             },
             child: Text(
               // ignore: use_build_context_synchronously
@@ -183,8 +191,8 @@ class SettingsController extends GetxController with ServiceableController {
 
   Future importSettings(BuildContext context) async {
     final choice = await Go.pick(
-      title: "settings.options.import.label".t,
-      values: {"hevy": "settings.options.import.types.hevy".t},
+      title: context.t.settings.options.import.label,
+      values: {"hevy": context.t.settings.options.import.types.hevy},
     );
 
     if (choice == null) return;
@@ -211,7 +219,7 @@ class SettingsController extends GetxController with ServiceableController {
           break;
       }
 
-      Go.snack("settings.options.import.success".t);
+      Go.snack(context.t.settings.options.import.success);
     } catch (e, s) {
       logger.e("", error: e, stackTrace: s);
 
@@ -221,13 +229,13 @@ class SettingsController extends GetxController with ServiceableController {
       }
 
       Go.dialog(
-        "settings.options.import.failed.title".t,
+        context.t.settings.options.import.failed.title,
         errorString,
         actions: [
           TextButton(
             onPressed: () {
               Clipboard.setData(ClipboardData(text: errorString));
-              Go.snack("settings.options.import.failed.copy".t);
+              Go.snack(context.t.settings.options.import.failed.copy);
             },
             child: Text(
               // ignore: use_build_context_synchronously
@@ -292,20 +300,20 @@ class SettingsController extends GetxController with ServiceableController {
           (await service.exportRaw()).path,
           mimeType: "application/octet-stream",
           name:
-              "${"settings.options.export.filename".t}_${DateTime.now().toIso8601String()}.db",
+              "${context.t.settings.options.export.filename}_${DateTime.now().toIso8601String()}.db",
         ),
       ], sharePositionOrigin: box!.localToGlobal(Offset.zero) & box.size);
     } catch (e, s) {
       logger.e(null, error: e, stackTrace: s);
 
       Go.dialog(
-        "settings.options.export.failed.title".t,
+        context.t.settings.options.export.failed.title,
         "$e\n$s".trim(),
         actions: [
           TextButton(
             onPressed: () {
               Clipboard.setData(ClipboardData(text: "$e\n$s".trim()));
-              Go.snack("settings.options.export.failed.copy".t);
+              Go.snack(context.t.settings.options.export.failed.copy);
             },
             child: Text(
               // ignore: use_build_context_synchronously

@@ -3,7 +3,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:get/utils.dart';
 import 'package:gymtracker/gen/colors.gen.dart';
-import 'package:gymtracker/service/localizations.dart';
+import 'package:gymtracker/i18n/strings.g.dart';
 import 'package:gymtracker/view/components/loading_indicator.dart';
 
 class LoadingPage extends StatelessWidget {
@@ -37,7 +37,7 @@ class LoadingPage extends StatelessWidget {
               ),
             ),
             Text(
-              "appName".t,
+              context.t.appName,
               style: Theme.of(context).textTheme.headlineLarge,
               textAlign: .center,
             ),

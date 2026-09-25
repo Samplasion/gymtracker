@@ -77,19 +77,6 @@ class $AssetsExercisesGen {
   $AssetsExercisesTricepsGen get triceps => const $AssetsExercisesTricepsGen();
 }
 
-class $AssetsI18nGen {
-  const $AssetsI18nGen();
-
-  /// File path: assets/i18n/en.json
-  String get en => 'assets/i18n/en.json';
-
-  /// File path: assets/i18n/it.json
-  String get it => 'assets/i18n/it.json';
-
-  /// List of all assets
-  List<String> get values => [en, it];
-}
-
 class $AssetsLegalGen {
   const $AssetsLegalGen();
 
@@ -1141,7 +1128,6 @@ abstract final class GTAssets {
   static const $AssetsAnimGen anim = $AssetsAnimGen();
   static const $AssetsAudioGen audio = $AssetsAudioGen();
   static const $AssetsExercisesGen exercises = $AssetsExercisesGen();
-  static const $AssetsI18nGen i18n = $AssetsI18nGen();
   static const $AssetsLegalGen legal = $AssetsLegalGen();
   static const $AssetsSvgGen svg = $AssetsSvgGen();
 }

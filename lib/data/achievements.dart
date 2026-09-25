@@ -16,7 +16,6 @@ import 'package:gymtracker/model/exercise.dart';
 import 'package:gymtracker/model/set.dart';
 import 'package:gymtracker/model/workout.dart';
 import 'package:gymtracker/service/database.dart';
-import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/service/logger.dart';
 import 'package:gymtracker/utils/extensions.dart';
 import 'package:scrollable_clean_calendar/utils/extensions.dart';
@@ -32,7 +31,7 @@ final Map<String, Achievement> achievements = {
         achievementID: "firstSteps",
         level: 1,
         nameKey: "achievements.firstSteps.title",
-        descriptionKey: "achievements.firstSteps.description.1",
+        descriptionKey: "achievements.firstSteps.description.k1",
         trigger: AchievementTrigger.workout,
         checkCompletion: (progress) =>
             Get.find<HistoryController>().history.isNotEmpty,
@@ -41,7 +40,7 @@ final Map<String, Achievement> achievements = {
         achievementID: "firstSteps",
         level: 2,
         nameKey: "achievements.firstSteps.title",
-        descriptionKey: "achievements.firstSteps.description.2",
+        descriptionKey: "achievements.firstSteps.description.k2",
         trigger: AchievementTrigger.weight,
         checkCompletion: (progress) =>
             Get.find<MeController>().weightMeasurements.isNotEmpty,
@@ -50,7 +49,7 @@ final Map<String, Achievement> achievements = {
         achievementID: "firstSteps",
         level: 3,
         nameKey: "achievements.firstSteps.title",
-        descriptionKey: "achievements.firstSteps.description.3",
+        descriptionKey: "achievements.firstSteps.description.k3",
         trigger: AchievementTrigger.food,
         checkCompletion: (progress) =>
             Get.find<DatabaseService>().foods$.value.isNotEmpty,
@@ -70,14 +69,14 @@ final Map<String, Achievement> achievements = {
         achievementID: "foodWatcher",
         level: 1,
         nameKey: "achievements.foodWatcher.title",
-        descriptionKey: "achievements.foodWatcher.description.1",
+        descriptionKey: "achievements.foodWatcher.description.k1",
         trigger: AchievementTrigger.food,
         progress: () {
           final periodFoods = _foodWatcher();
           return periodFoods.length.toDouble();
         },
         progressMax: () => 2,
-        progressText: (value) => "time.days".plural(value.toInt()),
+        progressText: (t, value) => t.time.days(n: value.toInt()),
         checkCompletion: (progress) {
           const days = 2;
           return progress! >= days;
@@ -87,14 +86,14 @@ final Map<String, Achievement> achievements = {
         achievementID: "foodWatcher",
         level: 2,
         nameKey: "achievements.foodWatcher.title",
-        descriptionKey: "achievements.foodWatcher.description.2",
+        descriptionKey: "achievements.foodWatcher.description.k2",
         trigger: AchievementTrigger.food,
         progress: () {
           final periodFoods = _foodWatcher();
           return periodFoods.length.toDouble();
         },
         progressMax: () => 7,
-        progressText: (value) => "time.days".plural(value.toInt()),
+        progressText: (t, value) => t.time.days(n: value.toInt()),
         checkCompletion: (progress) {
           const days = 7;
           return progress! >= days;
@@ -104,14 +103,14 @@ final Map<String, Achievement> achievements = {
         achievementID: "foodWatcher",
         level: 3,
         nameKey: "achievements.foodWatcher.title",
-        descriptionKey: "achievements.foodWatcher.description.3",
+        descriptionKey: "achievements.foodWatcher.description.k3",
         trigger: AchievementTrigger.food,
         progress: () {
           final periodFoods = _foodWatcher();
           return periodFoods.length.toDouble();
         },
         progressMax: () => 30,
-        progressText: (value) => "time.days".plural(value.toInt()),
+        progressText: (t, value) => t.time.days(n: value.toInt()),
         checkCompletion: (progress) {
           const days = 30;
           return progress! >= days;
@@ -132,7 +131,7 @@ final Map<String, Achievement> achievements = {
         achievementID: "marathoner",
         level: 1,
         nameKey: "achievements.marathoner.title",
-        descriptionKey: "achievements.marathoner.description.1",
+        descriptionKey: "achievements.marathoner.description.k1",
         trigger: AchievementTrigger.workout,
         checkCompletion: (progress) {
           final history = Get.find<HistoryController>().history;
@@ -150,7 +149,7 @@ final Map<String, Achievement> achievements = {
         achievementID: "marathoner",
         level: 2,
         nameKey: "achievements.marathoner.title",
-        descriptionKey: "achievements.marathoner.description.2",
+        descriptionKey: "achievements.marathoner.description.k2",
         trigger: AchievementTrigger.workout,
         checkCompletion: (progress) {
           final history = Get.find<HistoryController>().history;
@@ -168,7 +167,7 @@ final Map<String, Achievement> achievements = {
         achievementID: "marathoner",
         level: 3,
         nameKey: "achievements.marathoner.title",
-        descriptionKey: "achievements.marathoner.description.3",
+        descriptionKey: "achievements.marathoner.description.k3",
         trigger: AchievementTrigger.workout,
         checkCompletion: (progress) {
           final history = Get.find<HistoryController>().history;
@@ -235,7 +234,7 @@ final Map<String, Achievement> achievements = {
         achievementID: "realGymBro",
         level: 1,
         nameKey: "achievements.realGymBro.title",
-        descriptionKey: "achievements.realGymBro.description.1",
+        descriptionKey: "achievements.realGymBro.description.k1",
         trigger: AchievementTrigger.workout,
         progress: () {
           final workouts = Get.find<HistoryController>().history;
@@ -247,14 +246,14 @@ final Map<String, Achievement> achievements = {
               60;
         },
         progressMax: () => 100,
-        progressText: (value) => "time.justHours".plural(value.toInt()),
+        progressText: (t, value) => t.time.justHours(n: value.toInt()),
         checkCompletion: (progress) => progress! >= 100,
       ),
       AchievementLevel(
         achievementID: "realGymBro",
         level: 2,
         nameKey: "achievements.realGymBro.title",
-        descriptionKey: "achievements.realGymBro.description.2",
+        descriptionKey: "achievements.realGymBro.description.k2",
         trigger: AchievementTrigger.workout,
         progress: () {
           final workouts = Get.find<HistoryController>().history;
@@ -266,14 +265,14 @@ final Map<String, Achievement> achievements = {
               60;
         },
         progressMax: () => 500,
-        progressText: (value) => "time.justHours".plural(value.toInt()),
+        progressText: (t, value) => t.time.justHours(n: value.toInt()),
         checkCompletion: (progress) => progress! >= 500,
       ),
       AchievementLevel(
         achievementID: "realGymBro",
         level: 3,
         nameKey: "achievements.realGymBro.title",
-        descriptionKey: "achievements.realGymBro.description.3",
+        descriptionKey: "achievements.realGymBro.description.k3",
         trigger: AchievementTrigger.workout,
         progress: () {
           final workouts = Get.find<HistoryController>().history;
@@ -285,7 +284,7 @@ final Map<String, Achievement> achievements = {
               60;
         },
         progressMax: () => 1000,
-        progressText: (value) => "time.justHours".plural(value.toInt()),
+        progressText: (t, value) => t.time.justHours(n: value.toInt()),
         checkCompletion: (progress) => progress! >= 1000,
       ),
     ],
@@ -302,7 +301,7 @@ final Map<String, Achievement> achievements = {
         achievementID: "workoutFreak",
         level: 1,
         nameKey: "achievements.workoutFreak.title",
-        descriptionKey: "achievements.workoutFreak.description.1",
+        descriptionKey: "achievements.workoutFreak.description.k1",
         trigger: AchievementTrigger.workout,
         progress: () {
           return _workoutFreak(_WorkoutFreakPeriod.month).length.toDouble();
@@ -311,7 +310,7 @@ final Map<String, Achievement> achievements = {
           final today = DateTime.now();
           return DateTime(today.year, today.month + 1, 0).day.toDouble();
         },
-        progressText: (value) => "time.days".plural(value.toInt()),
+        progressText: (t, value) => t.time.days(n: value.toInt()),
         checkCompletion: (progress) {
           final today = DateTime.now().startOfDay;
           final daysInMonth = DateTime(today.year, today.month + 1, 0).day;
@@ -322,7 +321,7 @@ final Map<String, Achievement> achievements = {
         achievementID: "workoutFreak",
         level: 2,
         nameKey: "achievements.workoutFreak.title",
-        descriptionKey: "achievements.workoutFreak.description.2",
+        descriptionKey: "achievements.workoutFreak.description.k2",
         trigger: AchievementTrigger.workout,
         progress: () {
           return _workoutFreak(_WorkoutFreakPeriod.year).length.toDouble();
@@ -331,7 +330,7 @@ final Map<String, Achievement> achievements = {
           final today = DateTime.now();
           return today.isLeapYear ? 366 : 365;
         },
-        progressText: (value) => "time.days".plural(value.toInt()),
+        progressText: (t, value) => t.time.days(n: value.toInt()),
         checkCompletion: (progress) {
           final today = DateTime.now().startOfDay;
           final daysInYear = today.isLeapYear ? 366 : 365;
@@ -355,20 +354,21 @@ final Map<String, Achievement> achievements = {
         level: 1,
         nameKey: "achievements.trailblazer.title",
         descriptionKey:
-            "achievements.trailblazer.description.1.${settingsController.distanceUnit.value.name}",
-        descriptionParameters: () => {
-          "mi": Distance.mi.format(
+            "achievements.trailblazer.description.k1.${settingsController.distanceUnit.value.name}",
+        descriptionParameters: (t) => [
+          Distance.mi.format(
+            t,
             Distance.convert(value: 100, from: Distance.km, to: Distance.mi),
           ),
-        },
+        ],
         trigger: AchievementTrigger.workout,
         progress: _trailblazer,
         progressMax: () => 100,
-        progressText: (value) => Distance.convert(
+        progressText: (t, value) => Distance.convert(
           value: value,
           from: Distance.km,
           to: settingsController.distanceUnit.value,
-        ).userFacingDistance,
+        ).getUserFacingDistance(t),
         checkCompletion: (progress) => progress! >= 100,
       ),
       AchievementLevel(
@@ -376,20 +376,21 @@ final Map<String, Achievement> achievements = {
         level: 2,
         nameKey: "achievements.trailblazer.title",
         descriptionKey:
-            "achievements.trailblazer.description.2.${settingsController.distanceUnit.value.name}",
-        descriptionParameters: () => {
-          "mi": Distance.mi.format(
+            "achievements.trailblazer.description.k2.${settingsController.distanceUnit.value.name}",
+        descriptionParameters: (t) => [
+          Distance.mi.format(
+            t,
             Distance.convert(value: 500, from: Distance.km, to: Distance.mi),
           ),
-        },
+        ],
         trigger: AchievementTrigger.workout,
         progress: _trailblazer,
         progressMax: () => 500,
-        progressText: (value) => Distance.convert(
+        progressText: (t, value) => Distance.convert(
           value: value,
           from: Distance.km,
           to: settingsController.distanceUnit.value,
-        ).userFacingDistance,
+        ).getUserFacingDistance(t),
         checkCompletion: (progress) => progress! >= 500,
       ),
       AchievementLevel(
@@ -397,20 +398,21 @@ final Map<String, Achievement> achievements = {
         level: 3,
         nameKey: "achievements.trailblazer.title",
         descriptionKey:
-            "achievements.trailblazer.description.3.${settingsController.distanceUnit.value.name}",
-        descriptionParameters: () => {
-          "mi": Distance.mi.format(
+            "achievements.trailblazer.description.k3.${settingsController.distanceUnit.value.name}",
+        descriptionParameters: (t) => [
+          Distance.mi.format(
+            t,
             Distance.convert(value: 1000, from: Distance.km, to: Distance.mi),
           ),
-        },
+        ],
         trigger: AchievementTrigger.workout,
         progress: _trailblazer,
         progressMax: () => 1000,
-        progressText: (value) => Distance.convert(
+        progressText: (t, value) => Distance.convert(
           value: value,
           from: Distance.km,
           to: settingsController.distanceUnit.value,
-        ).userFacingDistance,
+        ).getUserFacingDistance(t),
         checkCompletion: (progress) => progress! >= 1000,
       ),
     ],
@@ -430,20 +432,21 @@ final Map<String, Achievement> achievements = {
         level: 1,
         nameKey: "achievements.cycleChampion.title",
         descriptionKey:
-            "achievements.cycleChampion.description.1.${settingsController.distanceUnit.value.name}",
-        descriptionParameters: () => {
-          "mi": Distance.mi.format(
+            "achievements.cycleChampion.description.k1.${settingsController.distanceUnit.value.name}",
+        descriptionParameters: (t) => [
+          Distance.mi.format(
+            t,
             Distance.convert(value: 100, from: Distance.km, to: Distance.mi),
           ),
-        },
+        ],
         trigger: AchievementTrigger.workout,
         progress: _cycleChampion,
         progressMax: () => 100,
-        progressText: (value) => Distance.convert(
+        progressText: (t, value) => Distance.convert(
           value: value,
           from: Distance.km,
           to: settingsController.distanceUnit.value,
-        ).userFacingDistance,
+        ).getUserFacingDistance(t),
         checkCompletion: (progress) => progress! >= 100,
       ),
       AchievementLevel(
@@ -451,20 +454,21 @@ final Map<String, Achievement> achievements = {
         level: 2,
         nameKey: "achievements.cycleChampion.title",
         descriptionKey:
-            "achievements.cycleChampion.description.2.${settingsController.distanceUnit.value.name}",
-        descriptionParameters: () => {
-          "mi": Distance.mi.format(
+            "achievements.cycleChampion.description.k2.${settingsController.distanceUnit.value.name}",
+        descriptionParameters: (t) => [
+          Distance.mi.format(
+            t,
             Distance.convert(value: 500, from: Distance.km, to: Distance.mi),
           ),
-        },
+        ],
         trigger: AchievementTrigger.workout,
         progress: _cycleChampion,
         progressMax: () => 500,
-        progressText: (value) => Distance.convert(
+        progressText: (t, value) => Distance.convert(
           value: value,
           from: Distance.km,
           to: settingsController.distanceUnit.value,
-        ).userFacingDistance,
+        ).getUserFacingDistance(t),
         checkCompletion: (progress) => progress! >= 500,
       ),
       AchievementLevel(
@@ -472,20 +476,21 @@ final Map<String, Achievement> achievements = {
         level: 3,
         nameKey: "achievements.cycleChampion.title",
         descriptionKey:
-            "achievements.cycleChampion.description.3.${settingsController.distanceUnit.value.name}",
-        descriptionParameters: () => {
-          "mi": Distance.mi.format(
+            "achievements.cycleChampion.description.k3.${settingsController.distanceUnit.value.name}",
+        descriptionParameters: (t) => [
+          Distance.mi.format(
+            t,
             Distance.convert(value: 1000, from: Distance.km, to: Distance.mi),
           ),
-        },
+        ],
         trigger: AchievementTrigger.workout,
         progress: _cycleChampion,
         progressMax: () => 1000,
-        progressText: (value) => Distance.convert(
+        progressText: (t, value) => Distance.convert(
           value: value,
           from: Distance.km,
           to: settingsController.distanceUnit.value,
-        ).userFacingDistance,
+        ).getUserFacingDistance(t),
         checkCompletion: (progress) => progress! >= 1000,
       ),
     ],
@@ -504,7 +509,7 @@ final Map<String, Achievement> achievements = {
         achievementID: "professionalWeightlifter",
         level: 1,
         nameKey: "achievements.professionalWeightlifter.title",
-        descriptionKey: "achievements.professionalWeightlifter.description.1",
+        descriptionKey: "achievements.professionalWeightlifter.description.k1",
         trigger: AchievementTrigger.workout,
         checkCompletion: (progress) {
           return _professionalWeightlifter(1);
@@ -514,7 +519,7 @@ final Map<String, Achievement> achievements = {
         achievementID: "professionalWeightlifter",
         level: 2,
         nameKey: "achievements.professionalWeightlifter.title",
-        descriptionKey: "achievements.professionalWeightlifter.description.2",
+        descriptionKey: "achievements.professionalWeightlifter.description.k2",
         trigger: AchievementTrigger.workout,
         checkCompletion: (progress) {
           return _professionalWeightlifter(1.5);
@@ -524,7 +529,7 @@ final Map<String, Achievement> achievements = {
         achievementID: "professionalWeightlifter",
         level: 3,
         nameKey: "achievements.professionalWeightlifter.title",
-        descriptionKey: "achievements.professionalWeightlifter.description.3",
+        descriptionKey: "achievements.professionalWeightlifter.description.k3",
         trigger: AchievementTrigger.workout,
         checkCompletion: (progress) {
           return _professionalWeightlifter(3);
@@ -548,7 +553,7 @@ final Map<String, Achievement> achievements = {
         progress: () =>
             Get.find<RoutinesController>().workouts.length.toDouble(),
         progressMax: () => 3,
-        progressText: (value) => value.toInt().toString(),
+        progressText: (t, value) => value.toInt().toString(),
         checkCompletion: (progress) {
           return progress! >= 3;
         },
@@ -588,33 +593,33 @@ final Map<String, Achievement> achievements = {
         achievementID: "routineMaster",
         level: 1,
         nameKey: "achievements.routineMaster.title",
-        descriptionKey: "achievements.routineMaster.description.1",
+        descriptionKey: "achievements.routineMaster.description.k1",
         trigger: AchievementTrigger.workout,
         progress: () => _routineMaster().length.toDouble(),
         progressMax: () => 3,
-        progressText: (v) => v.toInt().toString(),
+        progressText: (t, v) => v.toInt().toString(),
         checkCompletion: (progress) => progress! >= 3,
       ),
       AchievementLevel(
         achievementID: "routineMaster",
         level: 2,
         nameKey: "achievements.routineMaster.title",
-        descriptionKey: "achievements.routineMaster.description.2",
+        descriptionKey: "achievements.routineMaster.description.k2",
         trigger: AchievementTrigger.workout,
         progress: () => _routineMaster().length.toDouble(),
         progressMax: () => 6,
-        progressText: (v) => v.toInt().toString(),
+        progressText: (t, v) => v.toInt().toString(),
         checkCompletion: (progress) => progress! >= 6,
       ),
       AchievementLevel(
         achievementID: "routineMaster",
         level: 3,
         nameKey: "achievements.routineMaster.title",
-        descriptionKey: "achievements.routineMaster.description.3",
+        descriptionKey: "achievements.routineMaster.description.k3",
         trigger: AchievementTrigger.workout,
         progress: () => _routineMaster().length.toDouble(),
         progressMax: () => 12,
-        progressText: (v) => v.toInt().toString(),
+        progressText: (t, v) => v.toInt().toString(),
         checkCompletion: (progress) => progress! >= 12,
       ),
     ],
@@ -715,7 +720,7 @@ final Map<String, Achievement> achievements = {
           return exercises.length.toDouble();
         },
         progressMax: () => exerciseStandardLibraryAsList.length.toDouble(),
-        progressText: (v) => v.toInt().toString(),
+        progressText: (t, v) => v.toInt().toString(),
         checkCompletion: (progress) {
           return progress! >= exerciseStandardLibraryAsList.length;
         },
@@ -831,7 +836,7 @@ final Map<String, Achievement> achievements = {
           return _swimsuitSeason(subset).inMinutes / 60;
         },
         progressMax: () => 24,
-        progressText: (value) => "time.justHours".plural(value),
+        progressText: (t, value) => t.time.justHours(n: value),
         checkCompletion: (_) {
           const trigger = Duration(hours: 24);
 
@@ -870,12 +875,13 @@ final Map<String, Achievement> achievements = {
         level: 1,
         nameKey: "achievements.sparta.title",
         descriptionKey:
-            "achievements.sparta.description.1.${settingsController.weightUnit.value.name}",
-        descriptionParameters: () => {
-          "kg": Weights.kg.format(
+            "achievements.sparta.description.k1.${settingsController.weightUnit.value.name}",
+        descriptionParameters: (t) => [
+          Weights.kg.format(
+            t,
             Weights.convert(value: 300, from: Weights.lb, to: Weights.kg),
           ),
-        },
+        ],
         trigger: AchievementTrigger.workout,
         checkCompletion: (_) => _sparta(Weights.lb),
       ),
@@ -884,12 +890,13 @@ final Map<String, Achievement> achievements = {
         level: 2,
         nameKey: "achievements.sparta.title",
         descriptionKey:
-            "achievements.sparta.description.2.${settingsController.weightUnit.value.name}",
-        descriptionParameters: () => {
-          "lb": Weights.lb.format(
+            "achievements.sparta.description.k2.${settingsController.weightUnit.value.name}",
+        descriptionParameters: (t) => [
+          Weights.lb.format(
+            t,
             Weights.convert(value: 300, from: Weights.kg, to: Weights.lb),
           ),
-        },
+        ],
         trigger: AchievementTrigger.workout,
         checkCompletion: (_) => _sparta(Weights.kg),
       ),
@@ -1050,13 +1057,12 @@ List<DateTime> _foodWatcher() {
   // Return the longest continuous streak of days of all time
   final streaks = <List<DateTime>>[];
   var currentStreak = <DateTime>[];
-  final difference = firstDay.startOfDay
-      .difference(today)
-      .abs()
-      .inDays;
+  final difference = firstDay.startOfDay.difference(today).abs().inDays;
   for (var i = 0; i < difference; i++) {
     final day = today.subtract(Duration(days: i));
-    final dayFoods = foods.where((element) => element.date.isSameDay(day)).toList();
+    final dayFoods = foods
+        .where((element) => element.date.isSameDay(day))
+        .toList();
     if (dayFoods.isNotEmpty) {
       currentStreak.add(day);
     } else {
@@ -1152,8 +1158,9 @@ bool _professionalWeightlifter(double coefficient) {
                     from: weight.weightUnit,
                     to: Weights.kg,
                   ) *
-                  coefficient)
+                  coefficient) {
         return true;
+      }
     }
   }
 

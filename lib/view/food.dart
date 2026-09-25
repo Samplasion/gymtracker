@@ -11,9 +11,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:gauge_indicator/gauge_indicator.dart';
 import 'package:get/get.dart';
+import 'package:gymtracker/i18n/strings.g.dart';
 import 'package:gymtracker/icons/gymtracker_icons.dart';
 import 'package:gymtracker/provider/food.dart';
-import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/service/logger.dart';
 import 'package:gymtracker/struct/date_sequence.dart';
 import 'package:gymtracker/struct/nutrition.dart';
@@ -324,7 +324,7 @@ class _FoodViewState extends ConsumerState<FoodView> {
 
           var goals = [
             FoodNutritionalSingleGoalSDButton(
-              text: "food.home.carbs".t,
+              text: context.t.food.home.carbs,
               value: foods.fold<double>(
                 0,
                 (previousValue, element) =>
@@ -334,7 +334,7 @@ class _FoodViewState extends ConsumerState<FoodView> {
               key: macroTile1Key,
             ),
             FoodNutritionalSingleGoalSDButton(
-              text: "food.home.protein".t,
+              text: context.t.food.home.protein,
               value: foods.fold<double>(
                 0,
                 (previousValue, element) =>
@@ -344,7 +344,7 @@ class _FoodViewState extends ConsumerState<FoodView> {
               key: macroTile2Key,
             ),
             FoodNutritionalSingleGoalSDButton(
-              text: "food.home.fat".t,
+              text: context.t.food.home.fat,
               value: foods.fold<double>(
                 0,
                 (previousValue, element) =>
@@ -553,7 +553,7 @@ class _FoodViewState extends ConsumerState<FoodView> {
         (previousValue, element) =>
             previousValue + element.nutritionalValues.calories,
       ),
-      text: "food.home.eaten".t,
+      text: context.t.food.home.eaten,
       key: eatenKey,
     );
     final gauge = FoodNutritionEatenCaloriesGauge(
@@ -567,7 +567,7 @@ class _FoodViewState extends ConsumerState<FoodView> {
     );
     final goal = FoodNutritionGaugeInfoSideView(
       value: nutritionGoal.dailyCalories,
-      text: "food.home.goal".t,
+      text: context.t.food.home.goal,
       key: goalKey,
     );
 
@@ -582,7 +582,7 @@ class _FoodViewState extends ConsumerState<FoodView> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Text("food.home.calories".t),
+            Text(context.t.food.home.calories),
             const SizedBox(height: 16),
             if (showSpacers) const Spacer(),
             // ResponsiveBuilder(
@@ -642,11 +642,11 @@ class _FoodViewState extends ConsumerState<FoodView> {
           });
         },
       ),
-      hintText: 'food.searchBar.hint'.t,
+      hintText: context.t.food.searchBar.hint,
       barTrailing: [
         IconButton(
           icon: const Icon(GTIcons.combine),
-          tooltip: "food.combine.title".t,
+          tooltip: context.t.food.combine.title,
           onPressed: () {
             showCombineFoodsView(context, ref).then((food) {
               if (food != null) {
@@ -658,7 +658,7 @@ class _FoodViewState extends ConsumerState<FoodView> {
         ),
         IconButton(
           icon: const Icon(GTIcons.scan_barcode),
-          tooltip: "food.barcodeReader.title".t,
+          tooltip: context.t.food.barcodeReader.title,
           onPressed: () {
             showScanBarcodeView(context, ref).then((food) {
               if (food != null) {
@@ -814,7 +814,7 @@ class FoodListTile extends ConsumerWidget {
             backgroundColor: context.theme.colorScheme.error,
             foregroundColor: context.theme.colorScheme.onError,
             icon: GTIcons.delete_forever,
-            label: 'actions.remove'.t,
+            label: context.t.actions.remove,
           ),
         ],
       ),
@@ -838,10 +838,10 @@ class FoodListTile extends ConsumerWidget {
           ),
         ),
         subtitle: Text(
-          "${food.brand != null ? "${food.brand}, " : ""}${food.unit.formatAmount(food.amount, pieces: food.pieces)}",
+          "${food.brand != null ? "${food.brand}, " : ""}${food.unit.formatAmount(food.amount, pieces: food.pieces, context: context)}",
         ),
         trailing: Text(
-          "${food.nutritionalValues.calories.round()} ${"food.nutrimentUnits.kcal".t}",
+          "${food.nutritionalValues.calories.round()} ${context.t.food.nutrimentUnits['kcal']}",
           style: context.theme.textTheme.bodyMedium,
         ),
         onTap: onTap,
@@ -869,7 +869,7 @@ class _HomeFoodCategoryListTile extends ConsumerWidget {
     final progress = categoryMax == 0 ? 0.0 : categoryCalories / categoryMax;
 
     final subtitleParts = [
-      "${NutritionUnit.KCAL.formatAmount(categoryCalories, showUnit: false)} / ${NutritionUnit.KCAL.formatAmount(categoryMax)}",
+      "${NutritionUnit.KCAL.formatAmount(categoryCalories, showUnit: false, context: context)} / ${NutritionUnit.KCAL.formatAmount(categoryMax, context: context)}",
       if (categoryFoods.isNotEmpty) categoryFoods.map((e) => e.name).join(", "),
     ];
 
@@ -957,7 +957,7 @@ SearchSuggestionBuilder _getSearchSuggestionBuilder({
         ];
       }
 
-      return [ListTile(title: Text("food.searchBar.noHistory".t))];
+      return [ListTile(title: Text(context.t.food.searchBar.noHistory))];
     }
 
     final res = ref.watch(foodSuggestionsProvider(searchController.text));
@@ -965,9 +965,7 @@ SearchSuggestionBuilder _getSearchSuggestionBuilder({
       return [
         ListTile(
           title: Text(
-            "food.searchBar.noResults".tParams({
-              "query": searchController.text,
-            }),
+            context.t.food.searchBar.noResults(query: searchController.text),
           ),
         ),
       ];
@@ -1000,14 +998,14 @@ class _FoodDayAppBar extends ConsumerWidget {
       actions: [
         IconButton(
           icon: const Icon(GTIcons.food_categories),
-          tooltip: "food.categoryList.title".t,
+          tooltip: context.t.food.categoryList.title,
           onPressed: () {
             Go.to(() => const FoodCategoryList());
           },
         ),
         IconButton(
           icon: const Icon(GTIcons.nutrition_goal),
-          tooltip: "food.nutritionGoals.change.title".t,
+          tooltip: context.t.food.nutritionGoals.change.title,
           onPressed: () {
             showNutritionGoalView(context);
           },
@@ -1119,11 +1117,11 @@ class FoodNutritionEatenCaloriesGauge extends StatelessWidget {
                 children: [
                   Crossfade(
                     firstChild: Text(
-                      "food.home.remainingCal".t,
+                      context.t.food.home.remainingCal,
                       style: Theme.of(context).textTheme.bodySmall,
                     ),
                     secondChild: Text(
-                      "food.home.overCal".t,
+                      context.t.food.home.overCal,
                       style: Theme.of(context).textTheme.bodySmall,
                     ),
                     showSecond: this.value > goal,

@@ -1,9 +1,9 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:gymtracker/controller/history_controller.dart';
+import 'package:gymtracker/i18n/strings.g.dart';
 import 'package:gymtracker/model/exercise.dart';
 import 'package:gymtracker/model/workout.dart';
-import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/view/components/controlled.dart';
 
@@ -35,14 +35,17 @@ class _MuscleCategoryGraphState
                 RadarEntry(value: entries[i].value),
             ],
             borderColor: context.colorScheme.primary,
-            fillColor:
-                context.colorScheme.primary.withAlpha((0.3 * 255).round()),
+            fillColor: context.colorScheme.primary.withAlpha(
+              (0.3 * 255).round(),
+            ),
             entryRadius: 0,
           ),
         ],
         radarShape: RadarShape.polygon,
-        radarBorderData:
-            BorderSide(color: context.colorScheme.outlineVariant, width: 1.5),
+        radarBorderData: BorderSide(
+          color: context.colorScheme.outlineVariant,
+          width: 1.5,
+        ),
         tickBorderData: BorderSide(color: context.colorScheme.outlineVariant),
         gridBorderData: BorderSide(color: context.colorScheme.outlineVariant),
         radarTouchData: RadarTouchData(enabled: false),
@@ -51,7 +54,7 @@ class _MuscleCategoryGraphState
         getTitle: (i, angle) {
           if (angle > 90 && angle < 270) angle -= 180;
           return RadarChartTitle(
-            text: "muscleCategories.${entries[i].key.name}".t,
+            text: context.t.muscleCategories[entries[i].key.name] ?? "UNKNOWN",
             angle: angle,
             positionPercentageOffset: 0.1,
           );

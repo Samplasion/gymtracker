@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:gymtracker/i18n/strings.g.dart';
 import 'package:gymtracker/icons/gymtracker_icons.dart';
-import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/utils/colors.dart';
 import 'package:gymtracker/utils/theme.dart';
 
@@ -73,14 +73,19 @@ class BetaBadge extends StatelessWidget {
   }
 }
 
-class CustomExerciseBadge extends StatelessWidget {
+class CustomExerciseBadge extends StatefulWidget {
   final bool short;
 
   const CustomExerciseBadge({this.short = false, super.key});
 
+  @override
+  State<CustomExerciseBadge> createState() => _CustomExerciseBadgeState();
+}
+
+class _CustomExerciseBadgeState extends State<CustomExerciseBadge> {
   String get text {
-    final str = "exercise.custom".t.toUpperCase();
-    if (short) return str[0];
+    final str = context.t.exercise.custom.toUpperCase();
+    if (widget.short) return str[0];
     return str;
   }
 

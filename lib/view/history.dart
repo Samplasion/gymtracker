@@ -3,10 +3,11 @@ import 'package:flutter_sticky_header/flutter_sticky_header.dart';
 import 'package:get/get.dart';
 import 'package:gymtracker/controller/history_controller.dart';
 import 'package:gymtracker/data/configuration.dart';
+import 'package:gymtracker/i18n/strings.g.dart';
 import 'package:gymtracker/icons/gymtracker_icons.dart';
 import 'package:gymtracker/model/workout.dart';
-import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/service/logger.dart';
+import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/utils/skeletons.dart';
 import 'package:gymtracker/utils/theme.dart';
@@ -123,7 +124,7 @@ class _HistoryViewState extends State<HistoryView> {
                             color: Theme.of(context).colorScheme.onSurface,
                           ),
                           const SizedBox(height: 16),
-                          Text("history.empty".t),
+                          Text(context.t.history.empty),
                         ],
                       ),
                     ),
@@ -181,7 +182,7 @@ class _HistoryViewState extends State<HistoryView> {
                   padding: const EdgeInsets.only(top: 16),
                   sliver: SliverToBoxAdapter(
                     child: ListTile(
-                      title: Text("history.showAll".t),
+                      title: Text(context.t.history.showAll),
                       trailing: const ListTileActionIcon(),
                       onTap: () {
                         Go.to(() => const MeCalendarPage());
@@ -228,7 +229,7 @@ class _HistoryViewState extends State<HistoryView> {
     Widget widget;
     if (selectedEntries.isEmpty) {
       widget = SliverAppBar.large(
-        title: Text("history.title".t),
+        title: Text(context.t.history.title),
         actions: [
           SearchAnchor(
             builder: (context, sController) => IconButton(
@@ -278,7 +279,7 @@ class _HistoryViewState extends State<HistoryView> {
         backgroundColor: Theme.of(context).colorScheme.inverseSurface,
         foregroundColor: Theme.of(context).colorScheme.onInverseSurface,
         surfaceTintColor: Colors.transparent,
-        title: Text("general.selected".plural(selectedEntries.length)),
+        title: Text(context.t.general.selected(n: selectedEntries.length)),
         leading: IconButton(
           icon: const Icon(GTIcons.close),
           onPressed: () {
@@ -289,8 +290,8 @@ class _HistoryViewState extends State<HistoryView> {
         ),
         actions: [
           IconButton(
-            tooltip: "history.actions.deleteMultiple.title".plural(
-              selectedEntries.length,
+            tooltip: context.t.history.actions.deleteMultiple.title(
+              n: selectedEntries.length,
             ),
             icon: const Icon(GTIcons.delete),
             onPressed: () {
@@ -300,8 +301,8 @@ class _HistoryViewState extends State<HistoryView> {
                 workoutIDs: selectedEntries,
                 onDeleted: () {
                   Go.snack(
-                    "history.actions.deleteMultiple.done".plural(
-                      selectedEntries.length,
+                    context.t.history.actions.deleteMultiple.done(
+                      n: selectedEntries.length,
                     ),
                   );
                   selectedEntries.clear();

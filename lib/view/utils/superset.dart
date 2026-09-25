@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:gymtracker/data/distance.dart';
 import 'package:gymtracker/data/weights.dart';
+import 'package:gymtracker/i18n/strings.g.dart';
 import 'package:gymtracker/icons/gymtracker_icons.dart';
 import 'package:gymtracker/model/superset.dart';
-import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/struct/editor_callback.dart';
 import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/view/utils/drag_handle.dart';
@@ -38,34 +38,37 @@ class _SupersetEditorState extends State<SupersetEditor> {
   late final timeController = TextEditingController(
     text: TimeInputField.encodeDuration(widget.superset.restTime),
   );
-  late final notesController =
-      TextEditingController(text: widget.superset.notes);
+  late final notesController = TextEditingController(
+    text: widget.superset.notes,
+  );
 
   @override
   Widget build(BuildContext context) {
-    final topLevelEntryIndex =
-        (exerciseIndex: widget.index, supersetIndex: null);
+    final topLevelEntryIndex = (
+      exerciseIndex: widget.index,
+      supersetIndex: null,
+    );
     var notesTextStyle = Theme.of(context).textTheme.bodyMedium!.copyWith(
-          fontSize: widget.superset.notes.isEmpty ? 15 : null,
-          color: widget.superset.notes.isEmpty
-              ? Theme.of(context)
-                  .colorScheme
-                  .onSurface
-                  .withAlpha((0.75 * 255).round())
-              : null,
-        );
+      fontSize: widget.superset.notes.isEmpty ? 15 : null,
+      color: widget.superset.notes.isEmpty
+          ? Theme.of(
+              context,
+            ).colorScheme.onSurface.withAlpha((0.75 * 255).round())
+          : null,
+    );
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: Column(
         children: [
           ListTile(
-            title: Text("routines.editor.superset.title".t),
-            subtitle: Text("routines.editor.superset.subtitle"
-                .plural(widget.superset.exercises.length)),
+            title: Text(context.t.routines.editor.superset.title),
+            subtitle: Text(
+              context.t.routines.editor.superset.subtitle(
+                n: widget.superset.exercises.length,
+              ),
+            ),
             leading: widget.isCreating
-                ? DragHandle(
-                    index: widget.index,
-                  )
+                ? DragHandle(index: widget.index)
                 : ExerciseIcon(exercise: widget.superset),
             trailing: PopupMenuButton(
               itemBuilder: (context) => <PopupMenuEntry<dynamic>>[
@@ -75,7 +78,7 @@ class _SupersetEditorState extends State<SupersetEditor> {
                         widget.callbacks.onExerciseReorder(widget.index),
                     child: ListTile(
                       leading: const Icon(GTIcons.reorder),
-                      title: Text('ongoingWorkout.exercises.reorder'.t),
+                      title: Text(context.t.ongoingWorkout.exercises.reorder),
                     ),
                   ),
                 ],
@@ -85,16 +88,17 @@ class _SupersetEditorState extends State<SupersetEditor> {
                       widget.callbacks.onExerciseReplace(topLevelEntryIndex),
                   child: ListTile(
                     leading: const Icon(GTIcons.replace),
-                    title:
-                        Text('ongoingWorkout.superset.replaceWithExercise'.t),
+                    title: Text(
+                      context.t.ongoingWorkout.superset.replaceWithExercise,
+                    ),
                   ),
                 ),
                 const PopupMenuDivider(),
                 PopupMenuItem(
                   onTap: () async {
                     final delete = await Go.confirm(
-                      "routines.editor.superset.remove.title",
-                      "routines.editor.superset.remove.body",
+                      context.t.routines.editor.superset.remove.title,
+                      context.t.routines.editor.superset.remove.body,
                     );
                     if (delete) {
                       // We're considering this superset as a top-level exercise entry
@@ -105,7 +109,7 @@ class _SupersetEditorState extends State<SupersetEditor> {
                     textColor: Theme.of(context).colorScheme.error,
                     iconColor: Theme.of(context).colorScheme.error,
                     leading: const Icon(GTIcons.delete),
-                    title: Text('ongoingWorkout.superset.remove'.t),
+                    title: Text(context.t.ongoingWorkout.superset.remove),
                   ),
                 ),
               ],
@@ -115,7 +119,7 @@ class _SupersetEditorState extends State<SupersetEditor> {
             leading: const Icon(GTIcons.notes),
             title: Text(
               widget.superset.notes.isEmpty
-                  ? "exercise.editor.fields.notes.tapToEdit".t
+                  ? context.t.exercise.editor.fields.notes.tapToEdit
                   : widget.superset.notes,
               style: notesTextStyle,
             ),
@@ -126,30 +130,34 @@ class _SupersetEditorState extends State<SupersetEditor> {
                 builder: (context) {
                   return AlertDialog(
                     contentPadding: const EdgeInsets.all(24),
-                    title: Text('exercise.editor.fields.notes.label'.t),
+                    title: Text(context.t.exercise.editor.fields.notes.label),
                     content: TextField(
                       controller: notesController,
                       autofocus: true,
                       minLines: 4,
                       maxLines: null,
                       decoration: GymTrackerInputDecoration(
-                        labelText: "exercise.editor.fields.notes.label".t,
+                        labelText: context.t.exercise.editor.fields.notes.label,
                       ),
                     ),
                     actions: [
                       TextButton(
                         onPressed: () => Navigator.pop(context),
-                        child: Text(MaterialLocalizations.of(context)
-                            .cancelButtonLabel),
+                        child: Text(
+                          MaterialLocalizations.of(context).cancelButtonLabel,
+                        ),
                       ),
                       TextButton(
                         onPressed: () {
                           widget.callbacks.onExerciseNotesChange(
-                              topLevelEntryIndex, notesController.text.trim());
+                            topLevelEntryIndex,
+                            notesController.text.trim(),
+                          );
                           Navigator.pop(context);
                         },
                         child: Text(
-                            MaterialLocalizations.of(context).okButtonLabel),
+                          MaterialLocalizations.of(context).okButtonLabel,
+                        ),
                       ),
                     ],
                   );
@@ -162,11 +170,13 @@ class _SupersetEditorState extends State<SupersetEditor> {
             child: TimeInputField(
               controller: timeController,
               decoration: GymTrackerInputDecoration(
-                labelText: "exercise.fields.restTime".t,
+                labelText: context.t.exercise.fields.restTime,
               ),
               onChangedTime: (value) {
                 widget.callbacks.onExerciseChangeRestTime(
-                    topLevelEntryIndex, value ?? Duration.zero);
+                  topLevelEntryIndex,
+                  value ?? Duration.zero,
+                );
               },
             ),
           ),
@@ -177,18 +187,19 @@ class _SupersetEditorState extends State<SupersetEditor> {
             physics: const NeverScrollableScrollPhysics(),
             onReorder: (oldIndex, newIndex) {
               widget.callbacks.onSupersetExercisesReorderPair(
-                  widget.index, oldIndex, newIndex);
+                widget.index,
+                oldIndex,
+                newIndex,
+              );
             },
             children: [
               for (int j = 0; j < widget.superset.exercises.length; j++) ...[
                 WorkoutExerciseEditor(
                   key: ValueKey(
-                      "superset-${widget.superset.exercises[j].name}${widget.superset.id}"),
-                  exercise: widget.superset.exercises[j],
-                  index: (
-                    exerciseIndex: j,
-                    supersetIndex: widget.index,
+                    "superset-${widget.superset.exercises[j].name}${widget.superset.id}",
                   ),
+                  exercise: widget.superset.exercises[j],
+                  index: (exerciseIndex: j, supersetIndex: widget.index),
                   createDivider: true,
                   isCreating: widget.isCreating,
                   isInSuperset: true,
@@ -200,7 +211,7 @@ class _SupersetEditorState extends State<SupersetEditor> {
             ],
           ),
           ListTile(
-            title: Text("routines.editor.superset.addExercise".t),
+            title: Text(context.t.routines.editor.superset.addExercise),
             leading: const Icon(GTIcons.add_exercise),
             onTap: () {
               widget.callbacks.onSupersetAddExercise(widget.index);

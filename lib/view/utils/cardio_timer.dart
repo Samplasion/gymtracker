@@ -6,9 +6,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:get/get.dart';
 import 'package:gymtracker/gen/assets.gen.dart';
+import 'package:gymtracker/i18n/strings.g.dart';
 import 'package:gymtracker/icons/gymtracker_icons.dart';
 import 'package:gymtracker/model/exercise.dart';
-import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/view/components/tweened_builder.dart';
@@ -20,10 +20,7 @@ class CardioSection {
   final Duration active;
   final Duration rest;
 
-  const CardioSection({
-    required this.active,
-    required this.rest,
-  });
+  const CardioSection({required this.active, required this.rest});
 
   @override
   String toString() {
@@ -63,35 +60,36 @@ class _CardioTimerSetupScreenState extends State<CardioTimerSetupScreen> {
         rest: TextEditingController(
           text: TimeInputField.encodeDuration(const Duration(seconds: 30)),
         ),
-      )
+      ),
     ),
   ];
 
   _addSection() {
     setState(() {
-      sections.add(
-        (
-          section: const CardioSection(
-            active: Duration(minutes: 1),
-            rest: Duration(seconds: 30),
+      sections.add((
+        section: const CardioSection(
+          active: Duration(minutes: 1),
+          rest: Duration(seconds: 30),
+        ),
+        controllers: (
+          active: TextEditingController(
+            text: TimeInputField.encodeDuration(const Duration(minutes: 1)),
           ),
-          controllers: (
-            active: TextEditingController(
-              text: TimeInputField.encodeDuration(const Duration(minutes: 1)),
-            ),
-            rest: TextEditingController(
-              text: TimeInputField.encodeDuration(const Duration(seconds: 30)),
-            ),
+          rest: TextEditingController(
+            text: TimeInputField.encodeDuration(const Duration(seconds: 30)),
           ),
         ),
-      );
+      ));
     });
   }
 
   _submit() {
     if (!_formKey.currentState!.validate() ||
         sections.any((section) => !_isValid(section.section))) {
-      return Go.snack("cardioTimer.setUp.errors.generic".t, assertive: true);
+      return Go.snack(
+        context.t.cardioTimer.setUp.errors.generic,
+        assertive: true,
+      );
     }
     final cardioSections = sections.map((section) => section.section).toList();
     Go.off(() => CardioTimerScreen(sections: cardioSections));
@@ -104,9 +102,7 @@ class _CardioTimerSetupScreenState extends State<CardioTimerSetupScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text("cardioTimer.setUp.title".t),
-      ),
+      appBar: AppBar(title: Text(context.t.cardioTimer.setUp.title)),
       body: Form(
         key: _formKey,
         child: ListView(
@@ -114,13 +110,13 @@ class _CardioTimerSetupScreenState extends State<CardioTimerSetupScreen> {
           children: [
             for (var i = 0; i < sections.length; i++) ...[
               ListTile(
-                title: Text("cardioTimer.setUp.section".tParams({
-                  "section": "${i + 1}",
-                })),
+                title: Text(
+                  context.t.cardioTimer.setUp.section(section: "${i + 1}"),
+                ),
                 trailing: (i > 0)
                     ? IconButton(
                         icon: const Icon(GTIcons.delete),
-                        tooltip: "actions.remove".t,
+                        tooltip: context.t.actions.remove,
                         onPressed: () {
                           setState(() {
                             sections.removeAt(i);
@@ -132,7 +128,9 @@ class _CardioTimerSetupScreenState extends State<CardioTimerSetupScreen> {
                   final section = sections[i].section;
                   return Crossfade(
                     firstChild: const SizedBox.shrink(),
-                    secondChild: Text("cardioTimer.setUp.errors.bothZeros".t),
+                    secondChild: Text(
+                      context.t.cardioTimer.setUp.errors.bothZeros,
+                    ),
                     showSecond: !_isValid(section),
                   );
                 }(),
@@ -153,12 +151,12 @@ class _CardioTimerSetupScreenState extends State<CardioTimerSetupScreen> {
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: TimeInputField(
                   decoration: GymTrackerInputDecoration(
-                    labelText: "cardioTimer.setUp.active".t,
+                    labelText: context.t.cardioTimer.setUp.active,
                   ),
                   controller: sections[i].controllers.active,
                   validator: (duration) {
                     if (duration == null) {
-                      return "cardioTimer.setUp.errors.duration".t;
+                      return context.t.cardioTimer.setUp.errors.duration;
                     }
                     return null;
                   },
@@ -181,12 +179,12 @@ class _CardioTimerSetupScreenState extends State<CardioTimerSetupScreen> {
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: TimeInputField(
                   decoration: GymTrackerInputDecoration(
-                    labelText: "cardioTimer.setUp.rest".t,
+                    labelText: context.t.cardioTimer.setUp.rest,
                   ),
                   controller: sections[i].controllers.rest,
                   validator: (duration) {
                     if (duration == null) {
-                      return "cardioTimer.setUp.errors.duration".t;
+                      return context.t.cardioTimer.setUp.errors.duration;
                     }
                     return null;
                   },
@@ -212,7 +210,7 @@ class _CardioTimerSetupScreenState extends State<CardioTimerSetupScreen> {
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: OutlinedButton(
                 onPressed: _addSection,
-                child: Text("cardioTimer.setUp.addSection".t),
+                child: Text(context.t.cardioTimer.setUp.addSection),
               ),
             ),
           ],
@@ -229,10 +227,7 @@ class _CardioTimerSetupScreenState extends State<CardioTimerSetupScreen> {
 class CardioTimerScreen extends StatefulWidget {
   final List<CardioSection> sections;
 
-  const CardioTimerScreen({
-    required this.sections,
-    super.key,
-  });
+  const CardioTimerScreen({required this.sections, super.key});
 
   factory CardioTimerScreen.fromExercise(Exercise exercise) {
     assert(exercise.sets.isNotEmpty, "Exercise has no sets");
@@ -334,8 +329,8 @@ class _CardioTimerScreenState extends State<CardioTimerScreen> {
       onPopInvokedWithResult: (didPop, dynamic res) async {
         if (!didPop) {
           final shouldPop = await Go.confirm(
-            "cardioTimer.confirmExit.title".t,
-            "cardioTimer.confirmExit.message".t,
+            context.t.cardioTimer.confirmExit.title,
+            context.t.cardioTimer.confirmExit.message,
           );
           if (shouldPop) {
             Get.back(result: res);
@@ -349,7 +344,7 @@ class _CardioTimerScreenState extends State<CardioTimerScreen> {
         builder: (context, backgroundColor) {
           return Scaffold(
             appBar: AppBar(
-              title: Text("cardioTimer.name".t),
+              title: Text(context.t.cardioTimer.name),
               backgroundColor: backgroundColor,
               foregroundColor: textColor,
               surfaceTintColor: Colors.transparent,
@@ -372,7 +367,8 @@ class _CardioTimerScreenState extends State<CardioTimerScreen> {
                             fit: BoxFit.fitWidth,
                             child: Text(
                               TimeInputField.encodeDuration(
-                                  Duration(seconds: _time)),
+                                Duration(seconds: _time),
+                              ),
                               style: TextStyle(
                                 fontSize: fontSize,
                                 color: textColor,
@@ -390,11 +386,14 @@ class _CardioTimerScreenState extends State<CardioTimerScreen> {
                       curve: Curves.linear,
                       duration: const Duration(seconds: 1),
                       builder: (context, value) => LinearProgressIndicator(
-                        minHeight:
-                            max(4, MediaQuery.of(context).viewPadding.bottom),
+                        minHeight: max(
+                          4,
+                          MediaQuery.of(context).viewPadding.bottom,
+                        ),
                         value: value,
-                        backgroundColor:
-                            textColor.withAlpha((0.5 * 255).round()),
+                        backgroundColor: textColor.withAlpha(
+                          (0.5 * 255).round(),
+                        ),
                         color: textColor,
                       ),
                     ),

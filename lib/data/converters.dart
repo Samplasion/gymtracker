@@ -1,12 +1,12 @@
 import 'package:gymtracker/data/distance.dart';
 import 'package:gymtracker/data/weights.dart';
+import 'package:gymtracker/i18n/strings.g.dart';
 import 'package:gymtracker/model/exercisable.dart';
 import 'package:gymtracker/model/exercise.dart';
 import 'package:gymtracker/model/measurements.dart';
 import 'package:gymtracker/model/set.dart';
 import 'package:gymtracker/model/superset.dart';
 import 'package:gymtracker/model/workout.dart';
-import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/utils/extensions.dart';
 
 extension _String on String {
@@ -71,7 +71,7 @@ ConvertedHevyWorkoutData convertHevyWorkoutData(List<List> rowsAsListOfValues) {
           exercises: [],
           parentID: null,
           infobox:
-              "${description ?? ""}\n\n${"settings.options.import.utils.hevy.notes".t}"
+              "${description ?? ""}\n\n${t.settings.options.import.utils.hevy.notes}"
                   .trim(),
           startingDate: _parseHevyDateTime(startTime),
           duration: _parseHevyDateTime(
@@ -102,8 +102,7 @@ ConvertedHevyWorkoutData convertHevyWorkoutData(List<List> rowsAsListOfValues) {
         Exercise.custom(
           id: exerciseDbKey,
           parentID: parentExerciseDbKey,
-          name:
-              "$exerciseTitle ${"settings.options.import.utils.hevy.titles".t}",
+          name: "$exerciseTitle ${t.settings.options.import.utils.hevy.titles}",
           parameters: _guessParams(
             weight: weightKg,
             reps: reps,

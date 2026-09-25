@@ -27,9 +27,9 @@ import 'package:gymtracker/model/achievements.dart';
 import 'package:gymtracker/model/exercise.dart';
 import 'package:gymtracker/model/workout.dart';
 import 'package:gymtracker/provider/food.dart';
+import 'package:gymtracker/provider/locale.dart';
 import 'package:gymtracker/provider/online.dart';
 import 'package:gymtracker/service/database.dart';
-import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/service/logger.dart';
 import 'package:gymtracker/service/notifications.dart';
 import 'package:gymtracker/service/protocol.dart';
@@ -199,14 +199,15 @@ class Coordinator extends GetxController
     if (workout.parentID == null) {
       get<HistoryController>().setParentID(workout, newParentID: newID);
     }
-    Go.snack("workouts.actions.saveAsRoutine.done".t);
+    final t = globalContainer.read(translationsProvider);
+    Go.snack(t.workouts.actions.saveAsRoutine.done);
   }
 
   List<Workout> getRoutineHistory({required Workout routine}) {
     return get<HistoryController>().getRoutineHistory(routine);
   }
 
-  computeSuggestions({
+  void computeSuggestions({
     DateTime? now,
     double halfLifeDays = kRoutineSuggestionHalfLifeDays,
   }) {
@@ -242,16 +243,14 @@ class Coordinator extends GetxController
     final listCandidates = [...candidates.entries];
     listCandidates.sort((a, b) => b.value.compareTo(a.value));
     suggestions([
-      ...listCandidates
-          .map((a) => (routine: a.key, score: a.value))
-          .take(5),
+      ...listCandidates.map((a) => (routine: a.key, score: a.value)).take(5),
     ]);
     logger.d(
       "Recomputed suggested routines with ${suggestions().length} values",
     );
   }
 
-  computeStreaks() {
+  void computeStreaks() {
     if (Get.isRegistered<HistoryController>()) {
       get<HistoryController>().computeStreaks();
     }
@@ -261,11 +260,6 @@ class Coordinator extends GetxController
     if (Get.isRegistered<WorkoutController>()) {
       get<WorkoutController>().onNotificationTapped(value);
     }
-  }
-
-  void onHotReload() {
-    logger.t("[#reassemble()] called");
-    get<GTLocalizations>().init(false);
   }
 
   void scheduleBackup() {

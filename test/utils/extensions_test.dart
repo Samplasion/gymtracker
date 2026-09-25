@@ -3,12 +3,13 @@ import 'dart:io';
 import 'dart:ui';
 
 import 'package:flutter/material.dart' show Colors;
+import 'package:flutter_test/flutter_test.dart';
 import 'package:get/get.dart';
 import 'package:gymtracker/data/distance.dart';
 import 'package:gymtracker/data/weights.dart';
+import 'package:gymtracker/i18n/strings.g.dart';
 import 'package:gymtracker/model/model.dart';
 import 'package:gymtracker/utils/extensions.dart';
-import 'package:test/test.dart';
 
 import '../helpers.dart';
 import '../test_helpers/mock_services.dart';
@@ -23,6 +24,8 @@ Nam ultricies sed tortor eu consequat. Nullam consectetur, neque sed venenatis c
 final encodedLipsum = base64.encode(gzip.encode(utf8.encode(lipsum)));
 
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
+
   setUp(() async {
     MockServices.setup();
     await initTestLocalizations();
@@ -36,13 +39,19 @@ void main() {
     test("compressed", () {
       const testCompressed = "H4sIAAAAAAAAAwtJLS4BADLRTXgEAAAA";
       expect(
-          [testCompressed, testCompressed.replaceRange(12, 13, "E")]
-              .contains("Test".compressed),
-          true);
+        [
+          testCompressed,
+          testCompressed.replaceRange(12, 13, "E"),
+        ].contains("Test".compressed),
+        true,
+      );
       expect(
-          [encodedLipsum, encodedLipsum.replaceRange(12, 13, "E")]
-              .contains(lipsum.compressed),
-          true);
+        [
+          encodedLipsum,
+          encodedLipsum.replaceRange(12, 13, "E"),
+        ].contains(lipsum.compressed),
+        true,
+      );
     });
     test("uncompressed", () {
       expect("H4sIAAAAAAAAEwtJLS4BADLRTXgEAAAA".uncompressed, "Test");
@@ -53,23 +62,23 @@ void main() {
   group('NumGenericUtils extension', () {
     group("localized", () {
       test("en-US", () {
-        Get.updateLocale(const Locale("en", "US"));
-        expect(1.234.localized, "1.23");
-        expect(1.239.localized, "1.24");
-        expect(12.localized, "12");
-        expect(1234.localized, "1,234");
-        expect(1234.567.localized, "1,234.57");
-        expect(123456789.012.localized, "123,456,789.01");
+        final t = AppLocale.en.buildSync();
+        expect(1.234.localizedWith(t), "1.23");
+        expect(1.239.localizedWith(t), "1.24");
+        expect(12.localizedWith(t), "12");
+        expect(1234.localizedWith(t), "1,234");
+        expect(1234.567.localizedWith(t), "1,234.57");
+        expect(123456789.012.localizedWith(t), "123,456,789.01");
       });
 
       test("it-IT", () {
-        Get.updateLocale(const Locale("it", "IT"));
-        expect(1.234.localized, "1,23");
-        expect(1.239.localized, "1,24");
-        expect(12.localized, "12");
-        expect(1234.localized, "1.234");
-        expect(1234.567.localized, "1.234,57");
-        expect(123456789.012.localized, "123.456.789,01");
+        final t = AppLocale.it.buildSync();
+        expect(1.234.localizedWith(t), "1,23");
+        expect(1.239.localizedWith(t), "1,24");
+        expect(12.localizedWith(t), "12");
+        expect(1234.localizedWith(t), "1.234");
+        expect(1234.567.localizedWith(t), "1.234,57");
+        expect(123456789.012.localizedWith(t), "123.456.789,01");
       });
 
       // To update if we support new languages
@@ -173,11 +182,11 @@ void main() {
     test('combinedWith', () {
       final m1 = {
         'a': [1, 2],
-        'b': [3]
+        'b': [3],
       };
       final m2 = {
         'b': [4],
-        'c': [5]
+        'c': [5],
       };
       final res = m1.combinedWith(m2);
       expect(res, {
@@ -206,10 +215,10 @@ void main() {
         name: 'Test',
         exercises: [
           exerciseHelper('1', 'E1'),
-          supersetHelper('ss', exercises: [
-            exerciseHelper('2', 'E2'),
-            exerciseHelper('3', 'E3'),
-          ]),
+          supersetHelper(
+            'ss',
+            exercises: [exerciseHelper('2', 'E2'), exerciseHelper('3', 'E3')],
+          ),
         ],
       );
       final flat = w.flattenedExercises;
@@ -223,17 +232,23 @@ void main() {
     test('exerciseAt', () {
       final exercises = [
         exerciseHelper('1', 'E1'),
-        supersetHelper('ss', exercises: [
-          exerciseHelper('2', 'E2'),
-          exerciseHelper('3', 'E3'),
-        ]),
+        supersetHelper(
+          'ss',
+          exercises: [exerciseHelper('2', 'E2'), exerciseHelper('3', 'E3')],
+        ),
       ];
-      expect(exercises.exerciseAt((exerciseIndex: 0, supersetIndex: null))?.id,
-          '1');
       expect(
-          exercises.exerciseAt((exerciseIndex: 0, supersetIndex: 1))?.id, '2');
+        exercises.exerciseAt((exerciseIndex: 0, supersetIndex: null))?.id,
+        '1',
+      );
       expect(
-          exercises.exerciseAt((exerciseIndex: 1, supersetIndex: 1))?.id, '3');
+        exercises.exerciseAt((exerciseIndex: 0, supersetIndex: 1))?.id,
+        '2',
+      );
+      expect(
+        exercises.exerciseAt((exerciseIndex: 1, supersetIndex: 1))?.id,
+        '3',
+      );
     });
   });
 
@@ -247,6 +262,7 @@ void main() {
         kind: GTSetKind.normal,
       );
       final desc = set.getHumanReadableDescription(
+        t: AppLocale.en.buildSync(),
         weightUnit: Weights.kg,
         distanceUnit: Distance.km,
       );

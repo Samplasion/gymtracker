@@ -1,3 +1,4 @@
+import 'package:gymtracker/i18n/strings.g.dart';
 import 'package:gymtracker/model/model.dart';
 import 'package:gymtracker/utils/utils.dart';
 import 'package:test/test.dart';
@@ -39,10 +40,12 @@ void main() {
     });
   });
   test('generateWorkoutTitle works correctly', () {
-    final title1 = generateWorkoutTitle({GTMuscleCategory.chest});
+    final title1 = generateWorkoutTitle(AppLocale.en.buildSync(), {
+      GTMuscleCategory.chest,
+    });
     expect(title1.contains('Chest'), true);
 
-    final title2 = generateWorkoutTitle({
+    final title2 = generateWorkoutTitle(AppLocale.en.buildSync(), {
       GTMuscleCategory.chest,
       GTMuscleCategory.shoulders,
     });

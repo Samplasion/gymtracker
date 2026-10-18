@@ -10,7 +10,7 @@ import GymBroWidgetsExtension
 import flutter_app_intents
 
 @main
-@objc class AppDelegate: FlutterAppDelegate {
+@objc class AppDelegate: FlutterAppDelegate, FlutterImplicitEngineDelegate {
     var session: WCSession?
     var flutterNativeApi: GymBroNativeFlutterAPI?
     var applicationContext: TypedApplicationContext = TypedApplicationContext(isRunning: false, hasExercise: false, percentageDone: 0)
@@ -38,25 +38,6 @@ import flutter_app_intents
             UNUserNotificationCenter.current().delegate = self as UNUserNotificationCenterDelegate
         }
         
-        GeneratedPluginRegistrant.register(with: self)
-        
-        // Init communication channel with Flutter
-        let controller = window?.rootViewController as! FlutterViewController
-        let api: GymBroNativeHostAPI = self
-        
-        GymBroNativeHostAPISetup.setUp(binaryMessenger: controller.binaryMessenger, api: api)
-        flutterNativeApi = GymBroNativeFlutterAPI(binaryMessenger: controller.binaryMessenger)
-        logger = FlutterLogger(binaryMessenger: controller.binaryMessenger)
-        
-        if WCSession.isSupported() {
-            session = WCSession.default
-            session?.delegate = self
-            
-            self.setSession(session!)
-            
-            session?.activate()
-        }
-        
         if #available(iOS 26, *) {
             requestHealthPermission()
             workout.retrieveRemoteSession()
@@ -65,6 +46,22 @@ import flutter_app_intents
         }
         
         return super.application(application, didFinishLaunchingWithOptions: launchOptions)
+    }
+
+    func didInitializeImplicitFlutterEngine(_ engineBridge: FlutterImplicitEngineBridge) {
+        GeneratedPluginRegistrant.register(with: engineBridge.pluginRegistry)
+
+        let binaryMessenger = engineBridge.applicationRegistrar.messenger()
+        GymBroNativeHostAPISetup.setUp(binaryMessenger: binaryMessenger, api: self)
+        flutterNativeApi = GymBroNativeFlutterAPI(binaryMessenger: binaryMessenger)
+        logger = FlutterLogger(binaryMessenger: binaryMessenger)
+
+        if WCSession.isSupported() {
+            let watchSession = WCSession.default
+            watchSession.delegate = self
+            setSession(watchSession)
+            watchSession.activate()
+        }
     }
     
     // MARK: live activity functions

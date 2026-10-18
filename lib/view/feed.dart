@@ -28,7 +28,6 @@ import 'package:gymtracker/view/utils/crossfade.dart';
 import 'package:gymtracker/view/utils/feed_items.dart';
 import 'package:gymtracker/view/utils/sliver_utils.dart';
 import 'package:gymtracker/view/utils/social.dart';
-import 'package:skeletonizer/skeletonizer.dart';
 import 'package:sliver_tools/sliver_tools.dart';
 
 class FeedView extends ConsumerStatefulWidget {

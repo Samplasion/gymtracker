@@ -472,9 +472,6 @@ class GTDatabaseImpl extends _$GTDatabaseImpl
             await m.alterTable(TableMigration(schema.nutritionCategories));
           },
           from15To16: (m, schema) async {
-            logger.f(
-              "Current achievements: ${(await m.database.select(schema.achievementsV2).get()).length}",
-            );
             await m.database.customStatement("""
                 WITH RankedRecords AS (
                     SELECT 
@@ -492,9 +489,6 @@ class GTDatabaseImpl extends _$GTDatabaseImpl
                     WHERE rn > 1
                 );
               """);
-            logger.f(
-              "After deleting: ${(await m.database.select(schema.achievementsV2).get()).length}",
-            );
             await m.alterTable(TableMigration(schema.achievementsV2));
             await m.alterTable(TableMigration(schema.customExercises));
             await m.alterTable(TableMigration(schema.foods));
@@ -1093,11 +1087,6 @@ class GTDatabaseImpl extends _$GTDatabaseImpl
   }
 
   Future<void> insertHistoryWorkout(model.Workout workout) async {
-    logger.e(workout);
-    logger.e(workout.toHistoryWorkoutInsertable(userId: currentUserId));
-    logger.e(
-      workout.flattenedExercises.toSortedInsertables(userId: currentUserId),
-    );
     return batch((batch) {
       batch.insert(
         historyWorkouts,
@@ -1200,11 +1189,12 @@ class GTDatabaseImpl extends _$GTDatabaseImpl
   Future writeAllHistoryWorkouts(List<model.Workout> historyWorkouts) {
     final now = DateTime.now().toUtc();
     return transaction(() async {
-      final oldWorkouts = await (select(this.historyWorkouts)
-            ..where(
-              (tbl) => tbl.deleted.equals(false) & _userIdPredicate(tbl.userId),
-            ))
-          .get();
+      final oldWorkouts =
+          await (select(this.historyWorkouts)..where(
+                (tbl) =>
+                    tbl.deleted.equals(false) & _userIdPredicate(tbl.userId),
+              ))
+              .get();
       final toDeleteIds = oldWorkouts
           .where((r) => !historyWorkouts.any((newW) => newW.id == r.id))
           .map((r) => r.id)
@@ -1217,7 +1207,8 @@ class GTDatabaseImpl extends _$GTDatabaseImpl
               deleted: const Value(true),
               updatedAt: Value(now),
             ),
-            where: (tbl) => tbl.id.isIn(toDeleteIds) & tbl.deleted.equals(false),
+            where: (tbl) =>
+                tbl.id.isIn(toDeleteIds) & tbl.deleted.equals(false),
           );
         }
         batch.insertAll(
@@ -1234,19 +1225,17 @@ class GTDatabaseImpl extends _$GTDatabaseImpl
     });
   }
 
-@override
+  @override
   Future<void> overwriteAllHistoryWorkoutExercises(
     List<model.WorkoutExercisable> historyWorkoutExercises,
   ) async {
     final now = DateTime.now().toUtc();
     final historyExerciseInsertables = historyWorkoutExercises
         .fold(<String, List<model.WorkoutExercisable>>{}, (m, r) {
-      return m..putIfAbsent(r.workoutID!, () => []).add(r);
-    })
+          return m..putIfAbsent(r.workoutID!, () => []).add(r);
+        })
         .values
-        .expand(
-          (list) => list.toSortedInsertables(userId: currentUserId),
-        );
+        .expand((list) => list.toSortedInsertables(userId: currentUserId));
     await transaction(() async {
       final oldExs =
           await (select(this.historyWorkoutExercises)..where(

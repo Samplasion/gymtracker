@@ -215,7 +215,7 @@ class SettingsController extends GetxController with ServiceableController {
       switch (choice) {
         case "hevy":
           // ignore: use_build_context_synchronously
-          await _importHevy(context, content);
+          await importHevy(content);
           break;
       }
 
@@ -253,20 +253,24 @@ class SettingsController extends GetxController with ServiceableController {
     await service.fromJson(map);
   }
 
-  Future _importHevy(BuildContext context, String content) async {
+  Future<void> importHevy(String content) async {
     List<List<dynamic>> data = const CsvDecoder().convert(content);
     final header = data.removeAt(0);
 
     if (header.contains("fat_percent")) {
       final measurementData = convertHevyMeasurementData(data);
 
-      await service.addWeightMeasurements(measurementData.weightMeasurements);
-      await service.addBodyMeasurements(measurementData.bodyMeasurements);
+      await service.transaction(() async {
+        await service.addWeightMeasurements(measurementData.weightMeasurements);
+        await service.addBodyMeasurements(measurementData.bodyMeasurements);
+      });
     } else {
       final workoutData = convertHevyWorkoutData(data);
 
-      await service.addExercises(workoutData.customExercises);
-      await service.addHistoryWorkouts(workoutData.workouts);
+      await service.transaction(() async {
+        await service.addExercises(workoutData.customExercises);
+        await service.addHistoryWorkouts(workoutData.workouts);
+      });
     }
   }
 

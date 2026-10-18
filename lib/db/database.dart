@@ -1248,6 +1248,11 @@ class GTDatabaseImpl extends _$GTDatabaseImpl
     final userId = currentUserId;
     final now = DateTime.now().toUtc();
     return transaction(() async {
+      if (userId == null) {
+        await (delete(
+          this.historyWorkouts,
+        )..where((tbl) => tbl.userId.isNull())).go();
+      }
       final oldWorkouts =
           await (select(this.historyWorkouts)..where(
                 (tbl) =>
@@ -1385,9 +1390,12 @@ class GTDatabaseImpl extends _$GTDatabaseImpl
         ),
         where: (tbl) => _ownedBy(tbl.userId, userId),
       );
+      if (userId == null) {
+        batch.deleteWhere(customExercises, (tbl) => tbl.userId.isNull());
+      }
       batch.insertAll(customExercises, [
         for (final ex in exercises) ex.toInsertable(userId: userId),
-      ]);
+      ], mode: InsertMode.insertOrReplace);
     });
   }
 
@@ -1496,6 +1504,9 @@ class GTDatabaseImpl extends _$GTDatabaseImpl
         ),
       );
       await batch((batch) {
+        if (userId == null) {
+          batch.deleteWhere(weightMeasurements, (tbl) => tbl.userId.isNull());
+        }
         for (final measurement in measurements) {
           batch.insert(
             weightMeasurements,
@@ -1504,6 +1515,7 @@ class GTDatabaseImpl extends _$GTDatabaseImpl
               updatedAt: Value(now),
               deleted: const Value(false),
             ),
+            mode: InsertMode.insertOrReplace,
           );
         }
       });
@@ -2054,6 +2066,9 @@ class GTDatabaseImpl extends _$GTDatabaseImpl
         ),
       );
       await batch((batch) {
+        if (userId == null) {
+          batch.deleteWhere(bodyMeasurements, (tbl) => tbl.userId.isNull());
+        }
         for (final measurement in measurements) {
           batch.insert(
             bodyMeasurements,
@@ -2062,6 +2077,7 @@ class GTDatabaseImpl extends _$GTDatabaseImpl
               updatedAt: Value(now),
               deleted: const Value(false),
             ),
+            mode: InsertMode.insertOrReplace,
           );
         }
       });

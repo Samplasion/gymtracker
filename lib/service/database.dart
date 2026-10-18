@@ -27,6 +27,11 @@ const _kPeriodicBackupInterval = Duration(days: 1);
 
 class DatabaseService extends GetxService
     with ChangeNotifier, LoggerConfigurationMixin {
+  DatabaseService();
+
+  @visibleForTesting
+  DatabaseService.withDatabase(GTDatabase database) : _db = database;
+
   @override
   int get loggerMethodCount => 0;
 
@@ -344,7 +349,10 @@ class DatabaseService extends GetxService
   Future<void> addExercises(List<Exercise> customExercises) async {
     if (customExercises.isEmpty) return;
 
-    final allExercises = exercises + customExercises;
+    final allExercises = {
+      for (final e in await _db.getAllCustomExercises().first) e.id: e,
+      for (final e in customExercises) e.id: e,
+    }.values.toList();
     return writeExercises(allExercises);
   }
 
@@ -416,7 +424,10 @@ class DatabaseService extends GetxService
   Future<void> addHistoryWorkouts(List<Workout> workouts) async {
     if (workouts.isEmpty) return;
 
-    final allWorkouts = workoutHistory + workouts;
+    final allWorkouts = {
+      for (final w in await _db.getAllHistoryWorkoutsFuture()) w.id: w,
+      for (final w in workouts) w.id: w,
+    }.values.toList();
     return writeAllHistory(allWorkouts);
   }
 
@@ -445,7 +456,10 @@ class DatabaseService extends GetxService
   ) async {
     if (measurements.isEmpty) return;
 
-    final allMeasurements = weightMeasurements$.value + measurements;
+    final allMeasurements = {
+      for (final m in await _db.watchWeightMeasurements().first) m.id: m,
+      for (final m in measurements) m.id: m,
+    }.values.toList();
     return _writeWeightMeasurements(allMeasurements);
   }
 
@@ -561,7 +575,10 @@ class DatabaseService extends GetxService
   Future<void> addBodyMeasurements(List<BodyMeasurement> measurements) async {
     if (measurements.isEmpty) return;
 
-    final allMeasurements = bodyMeasurements$.value + measurements;
+    final allMeasurements = {
+      for (final m in await _db.watchBodyMeasurements().first) m.id: m,
+      for (final m in measurements) m.id: m,
+    }.values.toList();
     return _writeBodyMeasurements(allMeasurements);
   }
 
@@ -631,7 +648,7 @@ class DatabaseService extends GetxService
         rethrow;
       }
 
-      overrideDatabase(snapshot);
+      await overrideDatabase(snapshot);
     }
 
     try {
@@ -659,8 +676,15 @@ class DatabaseService extends GetxService
 
   bool get hasOngoing => ongoing$.valueOrNull != null;
 
-  void transaction<T>(Future<T> Function() action) async {
-    await _db.transaction(action);
+  Future<T> transaction<T>(Future<T> Function() action) {
+    final userId = _db.currentUserId;
+    return _db.transaction(() async {
+      final result = await action();
+      if (_db.currentUserId != userId) {
+        throw StateError('The account changed during the transaction');
+      }
+      return result;
+    });
   }
 
   Future<void> applyExerciseModificationToHistory(Exercise exercise) {

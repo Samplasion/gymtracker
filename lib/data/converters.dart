@@ -227,8 +227,6 @@ ConvertedHevyWorkoutData convertHevyWorkoutData(List<List> rowsAsListOfValues) {
 ConvertedHevyMeasurementData convertHevyMeasurementData(
   List<List> rowsAsListOfValues,
 ) {
-  final now = DateTime.now().millisecondsSinceEpoch;
-
   // "date","weight_kg","fat_percent","neck_cm","shoulder_cm","chest_cm","left_bicep_cm","right_bicep_cm","left_forearm_cm","right_forearm_cm","abdomen_cm","waist_cm","hips_cm","left_thigh_cm","right_thigh_cm","left_calf_cm","right_calf_cm"
   final weightMeasurements = <WeightMeasurement>[];
   final bodyMeasurements = <BodyMeasurement>[];
@@ -257,7 +255,7 @@ ConvertedHevyMeasurementData convertHevyMeasurementData(
     if (weightKg != null) {
       weightMeasurements.add(
         WeightMeasurement(
-          id: "hevy_wt_${date.millisecondsSinceEpoch}_$now",
+          id: "hevy_wt_${date.millisecondsSinceEpoch}",
           time: date,
           weight: weightKg,
           weightUnit: Weights.kg,
@@ -272,7 +270,7 @@ ConvertedHevyMeasurementData convertHevyMeasurementData(
 
       bodyMeasurements.add(
         BodyMeasurement(
-          id: "hevy_bm_${date.millisecondsSinceEpoch}_$now",
+          id: "hevy_bm_${date.millisecondsSinceEpoch}_${types[i].name}",
           time: date,
           value: value,
           type: types[i],

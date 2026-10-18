@@ -2180,12 +2180,15 @@ class GTDatabaseImpl extends _$GTDatabaseImpl
   @override
   Future<void> touchStaleTimestamps(String userId) async {
     final now = DateTime.now().toUtc();
-    final epoch = DateTime.utc(0);
+    final epochs = [
+      DateTime.fromMillisecondsSinceEpoch(0, isUtc: true),
+      DateTime.utc(0),
+    ];
     await transaction(() async {
       await (update(routineFolders)..where(
             (r) =>
                 (r.userId.isNull() | r.userId.equals(userId)) &
-                (r.updatedAt.isNull() | r.updatedAt.equals(epoch)),
+                (r.updatedAt.isNull() | r.updatedAt.isIn(epochs)),
           ))
           .write(
             RoutineFoldersCompanion(
@@ -2197,7 +2200,7 @@ class GTDatabaseImpl extends _$GTDatabaseImpl
       await (update(routines)..where(
             (r) =>
                 (r.userId.isNull() | r.userId.equals(userId)) &
-                (r.updatedAt.isNull() | r.updatedAt.equals(epoch)),
+                (r.updatedAt.isNull() | r.updatedAt.isIn(epochs)),
           ))
           .write(
             RoutinesCompanion(userId: Value(userId), updatedAt: Value(now)),
@@ -2206,7 +2209,7 @@ class GTDatabaseImpl extends _$GTDatabaseImpl
       await (update(historyWorkouts)..where(
             (r) =>
                 (r.userId.isNull() | r.userId.equals(userId)) &
-                (r.updatedAt.isNull() | r.updatedAt.equals(epoch)),
+                (r.updatedAt.isNull() | r.updatedAt.isIn(epochs)),
           ))
           .write(
             HistoryWorkoutsCompanion(
@@ -2218,7 +2221,7 @@ class GTDatabaseImpl extends _$GTDatabaseImpl
       await (update(customExercises)..where(
             (r) =>
                 (r.userId.isNull() | r.userId.equals(userId)) &
-                (r.updatedAt.isNull() | r.updatedAt.equals(epoch)),
+                (r.updatedAt.isNull() | r.updatedAt.isIn(epochs)),
           ))
           .write(
             CustomExercisesCompanion(
@@ -2230,7 +2233,7 @@ class GTDatabaseImpl extends _$GTDatabaseImpl
       await (update(routineExercises)..where(
             (r) =>
                 (r.userId.isNull() | r.userId.equals(userId)) &
-                (r.updatedAt.isNull() | r.updatedAt.equals(epoch)),
+                (r.updatedAt.isNull() | r.updatedAt.isIn(epochs)),
           ))
           .write(
             RoutineExercisesCompanion(
@@ -2242,7 +2245,7 @@ class GTDatabaseImpl extends _$GTDatabaseImpl
       await (update(historyWorkoutExercises)..where(
             (r) =>
                 (r.userId.isNull() | r.userId.equals(userId)) &
-                (r.updatedAt.isNull() | r.updatedAt.equals(epoch)),
+                (r.updatedAt.isNull() | r.updatedAt.isIn(epochs)),
           ))
           .write(
             HistoryWorkoutExercisesCompanion(
@@ -2254,7 +2257,7 @@ class GTDatabaseImpl extends _$GTDatabaseImpl
       await (update(achievements)..where(
             (r) =>
                 (r.userId.isNull() | r.userId.equals(userId)) &
-                (r.updatedAt.isNull() | r.updatedAt.equals(epoch)),
+                (r.updatedAt.isNull() | r.updatedAt.isIn(epochs)),
           ))
           .write(
             AchievementsCompanion(userId: Value(userId), updatedAt: Value(now)),
@@ -2263,14 +2266,14 @@ class GTDatabaseImpl extends _$GTDatabaseImpl
       await (update(foods)..where(
             (r) =>
                 (r.userId.isNull() | r.userId.equals(userId)) &
-                (r.updatedAt.isNull() | r.updatedAt.equals(epoch)),
+                (r.updatedAt.isNull() | r.updatedAt.isIn(epochs)),
           ))
           .write(FoodsCompanion(userId: Value(userId), updatedAt: Value(now)));
 
       await (update(customBarcodeFoods)..where(
             (r) =>
                 (r.userId.isNull() | r.userId.equals(userId)) &
-                (r.updatedAt.isNull() | r.updatedAt.equals(epoch)),
+                (r.updatedAt.isNull() | r.updatedAt.isIn(epochs)),
           ))
           .write(
             CustomBarcodeFoodsCompanion(
@@ -2282,7 +2285,7 @@ class GTDatabaseImpl extends _$GTDatabaseImpl
       await (update(favoriteFoods)..where(
             (r) =>
                 (r.userId.isNull() | r.userId.equals(userId)) &
-                (r.updatedAt.isNull() | r.updatedAt.equals(epoch)),
+                (r.updatedAt.isNull() | r.updatedAt.isIn(epochs)),
           ))
           .write(
             FavoriteFoodsCompanion(
@@ -2294,7 +2297,7 @@ class GTDatabaseImpl extends _$GTDatabaseImpl
       await (update(weightMeasurements)..where(
             (r) =>
                 (r.userId.isNull() | r.userId.equals(userId)) &
-                (r.updatedAt.isNull() | r.updatedAt.equals(epoch)),
+                (r.updatedAt.isNull() | r.updatedAt.isIn(epochs)),
           ))
           .write(
             WeightMeasurementsCompanion(
@@ -2306,7 +2309,7 @@ class GTDatabaseImpl extends _$GTDatabaseImpl
       await (update(bodyMeasurements)..where(
             (r) =>
                 (r.userId.isNull() | r.userId.equals(userId)) &
-                (r.updatedAt.isNull() | r.updatedAt.equals(epoch)),
+                (r.updatedAt.isNull() | r.updatedAt.isIn(epochs)),
           ))
           .write(
             BodyMeasurementsCompanion(
@@ -2318,7 +2321,7 @@ class GTDatabaseImpl extends _$GTDatabaseImpl
       await (update(nutritionCategories)..where(
             (r) =>
                 (r.userId.isNull() | r.userId.equals(userId)) &
-                (r.updatedAt.isNull() | r.updatedAt.equals(epoch)),
+                (r.updatedAt.isNull() | r.updatedAt.isIn(epochs)),
           ))
           .write(
             NutritionCategoriesCompanion(
@@ -2330,7 +2333,7 @@ class GTDatabaseImpl extends _$GTDatabaseImpl
       await (update(nutritionGoals)..where(
             (r) =>
                 (r.userId.isNull() | r.userId.equals(userId)) &
-                (r.updatedAt.isNull() | r.updatedAt.equals(epoch)),
+                (r.updatedAt.isNull() | r.updatedAt.isIn(epochs)),
           ))
           .write(
             NutritionGoalsCompanion(

@@ -111,6 +111,54 @@ void main() {
   });
   tearDown(() => db.close());
 
+  for (final epoch in [
+    DateTime.fromMillisecondsSinceEpoch(0, isUtc: true),
+    DateTime.utc(0),
+  ]) {
+    test(
+      'repairs legacy timestamps ($epoch) without touching other accounts',
+      () async {
+        // Anonymous rows with the same IDs are handled by adoption, not repair.
+        await db.clearUserData(null);
+        final tables = db.allTables.where(
+          (table) => table.columnsByName.containsKey('user_id'),
+        );
+        for (final table in tables) {
+          await db.customUpdate(
+            'UPDATE "${table.actualTableName}" SET updated_at = ?',
+            variables: [Variable(epoch)],
+            updates: {table},
+          );
+        }
+        final others = await otherUsers();
+        final before = DateTime.now().toUtc().subtract(
+          const Duration(seconds: 1),
+        );
+        await db.touchStaleTimestamps('A');
+        expect(await otherUsers(), others);
+        for (final table in tables) {
+          final rows = await db
+              .customSelect(
+                'SELECT updated_at FROM "${table.actualTableName}" WHERE user_id = ?',
+                variables: [Variable('A')],
+              )
+              .get();
+          for (final row in rows) {
+            expect(row.read<DateTime>('updated_at').isAfter(before), isTrue);
+          }
+        }
+        final repaired = (await db.select(db.foods).get())
+            .map((row) => row.toJson())
+            .toList();
+        await db.touchStaleTimestamps('A');
+        expect(
+          (await db.select(db.foods).get()).map((row) => row.toJson()).toList(),
+          repaired,
+        );
+      },
+    );
+  }
+
   test('bulk mutations preserve all other users and guest rows', () async {
     final before = await otherUsers();
     for (final operation in <Future<void> Function()>[

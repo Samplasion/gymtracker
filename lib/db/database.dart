@@ -1644,25 +1644,34 @@ class GTDatabaseImpl extends _$GTDatabaseImpl
   Future<void> setFoods(List<model.TaggedFood> foods) {
     final userId = currentUserId;
     return transaction(() async {
+      final existing = await (select(
+        this.foods,
+      )..where((tbl) => _ownedBy(tbl.userId, userId))).get();
+      final existingById = {for (final row in existing) row.id: row};
       final now = DateTime.now().toUtc();
       await (update(
         this.foods,
       )..where((tbl) => _ownedBy(tbl.userId, userId))).write(
         FoodsCompanion(deleted: const Value(true), updatedAt: Value(now)),
       );
-      await batch((batch) {
-        for (final food in foods) {
-          final insertable = food.toInsertable(
-            generateInsertionDate: false,
-            userId: userId,
-            updatedAt: now,
-          );
-          batch.insert(
+      for (final food in foods) {
+        final insertable = food.toInsertable(
+          generateInsertionDate: false,
+          userId: userId,
+          updatedAt: now,
+        );
+        final old = existingById[insertable.id.value];
+        if (old == null) {
+          await into(
             this.foods,
-            insertable.copyWith(dateAdded: insertable.referenceDate),
-          );
+          ).insert(insertable.copyWith(dateAdded: insertable.referenceDate));
+        } else {
+          await (update(this.foods)..where(
+                (tbl) => tbl.id.equals(old.id) & _ownedBy(tbl.userId, userId),
+              ))
+              .write(insertable.copyWith(dateAdded: Value(old.dateAdded)));
         }
-      });
+      }
     });
   }
 

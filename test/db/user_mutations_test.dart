@@ -159,6 +159,46 @@ void main() {
     );
   }
 
+  for (final user in [null, 'A', 'B']) {
+    test(
+      'replacing food logs for $user updates existing IDs and keeps tombstones',
+      () async {
+        db.setCurrentUserId(user);
+        final others = await otherUsers();
+        final original = (await db.select(db.foods).get()).firstWhere(
+          (row) => row.userId == user,
+        );
+        await db.insertFoods(
+          DateTagged(date: day, value: food.copyWith.id('removed')),
+        );
+        await db.insertFavoriteFood('removed');
+        final replacement = [
+          DateTagged(date: day, value: food.copyWith.name('Updated')),
+          DateTagged(date: day, value: food.copyWith.id('new')),
+        ];
+        await db.setFoods(replacement);
+        await db.setFoods(replacement);
+        final rows = (await db.select(db.foods).get())
+            .where((row) => row.userId == user)
+            .toList();
+        expect(rows, hasLength(3));
+        expect(rows.singleWhere((row) => row.id == 'removed').deleted, isTrue);
+        final updated = rows.singleWhere((row) => row.id == 'food');
+        expect(updated.deleted, isFalse);
+        expect(updated.jsonData, contains('Updated'));
+        expect(updated.dateAdded, original.dateAdded);
+        expect(rows.singleWhere((row) => row.id == 'new').deleted, isFalse);
+        expect(
+          (await db.select(db.favoriteFoods).get())
+              .where((row) => row.userId == user)
+              .map((row) => row.id),
+          containsAll(['food', 'removed']),
+        );
+        expect(await otherUsers(), others);
+      },
+    );
+  }
+
   test('bulk mutations preserve all other users and guest rows', () async {
     final before = await otherUsers();
     for (final operation in <Future<void> Function()>[

@@ -111,7 +111,6 @@
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "7EC6628A2EFDB99D000CD218"
             BuildableName = "GymBroWatchWidgetsExtension.appex"
-            BlueprintName = "GymBroWatchWidgetsExtension"
             ReferencedContainer = "container:Runner.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>

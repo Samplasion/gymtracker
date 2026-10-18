@@ -63,6 +63,8 @@ class SyncManager<T extends SyncableDatabase> {
   final Map<Type, int> _nSyncedToBackend = {};
   final Map<Type, int> _nSyncedFromBackend = {};
   int _nFullSyncs = 0;
+  int _consecutiveFailures = 0;
+  DateTime? _retryNotBefore;
 
   bool get syncingEnabled => _enabled;
   String get userId => _userId;
@@ -185,6 +187,8 @@ class SyncManager<T extends SyncableDatabase> {
       _knownItems[type]!.clear();
     }
     _reconcileRequested = false;
+    _consecutiveFailures = 0;
+    _retryNotBefore = null;
   }
 
   /// Registers a syncable table with the sync manager.
@@ -316,6 +320,9 @@ class SyncManager<T extends SyncableDatabase> {
 
   void _backgroundSync({bool reconcile = false}) {
     if (!_canRun) return;
+    final retryNotBefore = _retryNotBefore;
+    if (retryNotBefore != null && DateTime.now().isBefore(retryNotBefore))
+      return;
     unawaited(_requestSync(reconcile: reconcile).catchError((Object _) {}));
   }
 
@@ -355,10 +362,22 @@ class SyncManager<T extends SyncableDatabase> {
                 isSyncingFromBackend ||
                 isSyncingToBackend));
         success = _current(generation, owner);
+        if (success) {
+          _consecutiveFailures = 0;
+          _retryNotBefore = null;
+        }
       } catch (e, s) {
         failure = e;
         failureStack = s;
         onSyncError(e, s);
+        if (_current(generation, owner)) {
+          _reconcileRequested = true;
+          _consecutiveFailures++;
+          final exponent =
+              _consecutiveFailures > 7 ? 6 : _consecutiveFailures - 1;
+          final seconds = 1 << exponent;
+          _retryNotBefore = DateTime.now().add(Duration(seconds: seconds));
+        }
       } finally {
         _pulling = false;
         _pushing = false;
@@ -405,8 +424,14 @@ class SyncManager<T extends SyncableDatabase> {
         if (batch.length < _maxRows) break;
         offset += batch.length;
       }
-      final localById = {for (final row in local) row.id: row};
+      final localById = <String, Syncable>{};
       for (final row in local) {
+        final previous = localById[row.id];
+        if (previous == null || row.updatedAt.isAfter(previous.updatedAt)) {
+          localById[row.id] = row;
+        }
+      }
+      for (final row in localById.values) {
         final date = remote[row.id];
         if (date == null || row.updatedAt.isAfter(date)) {
           final queued = _outQueues[type]![row.id];
@@ -506,18 +531,21 @@ class SyncManager<T extends SyncableDatabase> {
     await _localDb.transaction(() async {
       for (final row in latest.values) {
         if (!_current(generation, owner)) throw const _SyncInterrupted();
-        final existing = await (_localDb.select(table)
+        final existingRows = await (_localDb.select(table)
               ..where((r) => r.userId.equals(owner) & r.id.equals(row.id)))
-            .getSingleOrNull();
+            .get();
         if (!_current(generation, owner)) throw const _SyncInterrupted();
-        if (existing == null) {
+        if (existingRows.isEmpty) {
           await _localDb.into(table).insert(row.toCompanion());
-        } else if (row.updatedAt.isAfter(existing.updatedAt) ||
-            (row.updatedAt.isAtSameMomentAs(existing.updatedAt) &&
-                !_same(row, existing))) {
-          await (_localDb.update(table)
-                ..where((r) => r.userId.equals(owner) & r.id.equals(row.id)))
-              .write(row.toCompanion());
+        } else {
+          final newest = existingRows.map((existing) => existing.updatedAt).max;
+          if (row.updatedAt.isAfter(newest) ||
+              (row.updatedAt.isAtSameMomentAs(newest) &&
+                  existingRows.any((existing) => !_same(row, existing)))) {
+            await (_localDb.update(table)
+                  ..where((r) => r.userId.equals(owner) & r.id.equals(row.id)))
+                .write(row.toCompanion());
+          }
         }
       }
       if (!_current(generation, owner)) throw const _SyncInterrupted();

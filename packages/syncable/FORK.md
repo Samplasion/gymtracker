@@ -32,6 +32,10 @@ The upstream LICENSE is retained. This package is private and resolved by path.
 - Full reconciliation compares all paginated metadata. Persistent timestamps
   remain informational; they cannot exclude unsent legacy rows. Realtime is an
   optimization, not the only recovery path.
+- Local rows sharing an account and ID are read as a group. The newest local
+  revision participates in reconciliation; an incoming server revision updates
+  all matching rows only when it is at least as recent. Failed background work
+  retries with delays from 1 to 64 seconds to avoid a rapid error loop.
 
 ## Compatibility and boundaries
 

@@ -9,13 +9,16 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:syncable/syncable.dart';
 
 class TestSyncManager extends SyncManager<GTDatabase> {
-  TestSyncManager(GTDatabase db, SupabaseClient client)
-    : super(
-        localDatabase: db,
-        supabaseClient: client,
-        syncInterval: const Duration(hours: 1),
-        maxRows: 2,
-      );
+  TestSyncManager(
+    GTDatabase db,
+    SupabaseClient client, {
+    Duration syncInterval = const Duration(hours: 1),
+  }) : super(
+         localDatabase: db,
+         supabaseClient: client,
+         syncInterval: syncInterval,
+         maxRows: 2,
+       );
   final errors = <Object>[];
   final finishes = <bool>[];
   @override

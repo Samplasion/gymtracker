@@ -400,7 +400,7 @@ class Online extends _$Online {
       if (!password.contains(RegExp(r'[0-9]'))) {
         passwordErrors.add(PasswordValidationErrors.number);
       }
-      if (!password.contains(RegExp(r'[!@#$%^&*(),.?":{}|<>]'))) {
+      if (!password.contains(RegExp(r'[!@#$%^&*(),.?":{}|<>_\-]'))) {
         passwordErrors.add(PasswordValidationErrors.specialCharacter);
       }
     }

@@ -1,4 +1,25 @@
 {
+  "progression": {
+    "title": "Guided progression",
+    "configure": "Set progression",
+    "remove": "Remove progression",
+    "lastTime": "Last time",
+    "noHistory": "Complete a session to see your last performance",
+    "goal": "Today's goal",
+    "double": "Double progression",
+    "cyclic": "Cyclic linear progression",
+    "minReps": "Minimum reps",
+    "maxReps": "Maximum reps",
+    "repsPerStep": "Reps per step",
+    "startingWeight": "Starting weight",
+    "weightPerStep": "Weight increase per step",
+    "weightPerCycle": "Starting weight increase per cycle",
+    "preview": "Next goals",
+    "save": "Save",
+    "invalid": "Check the values and the number of working sets",
+    "step": "Cycle $cycle, step $step",
+    "advance": "Advance manually"
+  },
   "appName": "Gym Bro",
   "appInfo": {
     "version": "Version $version (build $build)",

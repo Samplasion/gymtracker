@@ -20,6 +20,7 @@ import 'package:gymtracker/utils/sets.dart';
 import 'package:gymtracker/utils/utils.dart';
 import 'package:gymtracker/view/components/alert_banner.dart';
 import 'package:gymtracker/view/components/badges.dart';
+import 'package:gymtracker/view/components/exercise_progression.dart';
 import 'package:gymtracker/view/components/exercise_set_view.dart';
 import 'package:gymtracker/view/components/maybe_rich_text.dart';
 import 'package:gymtracker/view/components/parent_viewer.dart';
@@ -241,6 +242,14 @@ class _WorkoutExerciseEditorState extends State<WorkoutExerciseEditor> {
                 const SizedBox(height: 8),
                 ExerciseBadgeRow(exercise: widget.exercise),
               ],
+              ExerciseProgressionPanel(
+                exercise: widget.exercise,
+                weightUnit: widget.weightUnit,
+                distanceUnit: widget.distanceUnit,
+                index: widget.index,
+                callbacks: widget.callbacks,
+                isCreating: widget.isCreating,
+              ),
               const SizedBox(height: 8),
               ListTile(
                 titleAlignment: ListTileTitleAlignment.titleHeight,

@@ -38,6 +38,7 @@ class TranslationsIt with BaseTranslations<AppLocale, Translations> implements T
 	TranslationsIt $copyWith({TranslationMetadata<AppLocale, Translations>? meta}) => TranslationsIt(meta: meta ?? this.$meta);
 
 	// Translations
+	@override late final Translations$progression$it progression = Translations$progression$it._(_root);
 	@override String get appName => 'Gym Bro';
 	@override late final Translations$appInfo$it appInfo = Translations$appInfo$it._(_root);
 	@override late final Translations$set$it set = Translations$set$it._(_root);
@@ -176,6 +177,34 @@ class TranslationsIt with BaseTranslations<AppLocale, Translations> implements T
 	@override String get you => 'Tu';
 	@override late final Translations$error$it error = Translations$error$it._(_root);
 	@override late final Translations$legacyWorkoutRecovery$it legacyWorkoutRecovery = Translations$legacyWorkoutRecovery$it._(_root);
+}
+
+// Path: progression
+class Translations$progression$it implements Translations$progression$en {
+	Translations$progression$it._(this._root);
+
+	final TranslationsIt _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Progressione guidata';
+	@override String get configure => 'Imposta progressione';
+	@override String get remove => 'Rimuovi progressione';
+	@override String get lastTime => 'Ultima volta';
+	@override String get noHistory => 'Completa una sessione per vedere l\'ultima prestazione';
+	@override String get goal => 'Obiettivo di oggi';
+	@override String get double => 'Doppia progressione';
+	@override String get cyclic => 'Progressione lineare ciclica';
+	@override String get minReps => 'Ripetizioni minime';
+	@override String get maxReps => 'Ripetizioni massime';
+	@override String get repsPerStep => 'Ripetizioni per passo';
+	@override String get startingWeight => 'Peso iniziale';
+	@override String get weightPerStep => 'Aumento del peso per passo';
+	@override String get weightPerCycle => 'Aumento del peso iniziale per ciclo';
+	@override String get preview => 'Prossimi obiettivi';
+	@override String get save => 'Salva';
+	@override String get invalid => 'Controlla i valori e il numero di serie normali';
+	@override String step({required Object cycle, required Object step}) => 'Ciclo ${cycle}, passo ${step}';
+	@override String get advance => 'Avanza manualmente';
 }
 
 // Path: appInfo
@@ -6526,6 +6555,25 @@ class Translations$food$categoryEditor$fields$name$errors$it implements Translat
 extension on TranslationsIt {
 	dynamic _flatMapFunction(String path) {
 		return switch (path) {
+			'progression.title' => 'Progressione guidata',
+			'progression.configure' => 'Imposta progressione',
+			'progression.remove' => 'Rimuovi progressione',
+			'progression.lastTime' => 'Ultima volta',
+			'progression.noHistory' => 'Completa una sessione per vedere l\'ultima prestazione',
+			'progression.goal' => 'Obiettivo di oggi',
+			'progression.double' => 'Doppia progressione',
+			'progression.cyclic' => 'Progressione lineare ciclica',
+			'progression.minReps' => 'Ripetizioni minime',
+			'progression.maxReps' => 'Ripetizioni massime',
+			'progression.repsPerStep' => 'Ripetizioni per passo',
+			'progression.startingWeight' => 'Peso iniziale',
+			'progression.weightPerStep' => 'Aumento del peso per passo',
+			'progression.weightPerCycle' => 'Aumento del peso iniziale per ciclo',
+			'progression.preview' => 'Prossimi obiettivi',
+			'progression.save' => 'Salva',
+			'progression.invalid' => 'Controlla i valori e il numero di serie normali',
+			'progression.step' => ({required Object cycle, required Object step}) => 'Ciclo ${cycle}, passo ${step}',
+			'progression.advance' => 'Avanza manualmente',
 			'appName' => 'Gym Bro',
 			'appInfo.version' => ({required Object version, required Object build}) => 'Versione ${version} (build ${build})',
 			'appInfo.shortDescription' => 'Compagno di allenamenti',
@@ -7019,6 +7067,8 @@ extension on TranslationsIt {
 			'library.biceps.exercises.scottCurl' => 'Scott curl',
 			'library.biceps.exercises.dualCableHighCurl' => 'Curl ai cavi alti',
 			'library.abs.name' => 'Addominali',
+			_ => null,
+		} ?? switch (path) {
 			'library.abs.exercises.crunches' => 'Crunch',
 			'library.abs.exercises.kneeRaise' => 'Sollevamento delle ginocchia',
 			'library.abs.exercises.legRaise' => 'Sollevamento delle gambe',
@@ -7038,8 +7088,6 @@ extension on TranslationsIt {
 			'library.abs.exercises.obliqueCrunches' => 'Crunch obliqui',
 			'library.abs.exercises.legRaiseParallelBars' => 'Sollevamento delle gambe alle parallele',
 			'library.abs.exercises.lateralHyperextensions' => 'Iperestensioni laterali',
-			_ => null,
-		} ?? switch (path) {
 			'library.calves.name' => 'Polpacci',
 			'library.calves.exercises.calfRaiseStanding' => 'Calf raise (in piedi)',
 			'library.calves.exercises.calfRaiseSeated' => 'Calf raise (seduti)',
@@ -7533,6 +7581,8 @@ extension on TranslationsIt {
 			'food.languages.kr' => 'Kanuri',
 			'food.languages.ks' => 'Kashmiri',
 			'food.languages.ku' => 'Curdo',
+			_ => null,
+		} ?? switch (path) {
 			'food.languages.kv' => 'Komi',
 			'food.languages.kw' => 'Cornico',
 			'food.languages.ky' => 'Kirghiso',
@@ -7552,8 +7602,6 @@ extension on TranslationsIt {
 			'food.languages.ml' => 'Malese',
 			'food.languages.mn' => 'Mongolo',
 			'food.languages.mo' => 'Moldavo',
-			_ => null,
-		} ?? switch (path) {
 			'food.languages.mr' => 'Marathi',
 			'food.languages.ms' => 'Malese',
 			'food.languages.mt' => 'Maltese',
@@ -8047,6 +8095,8 @@ extension on TranslationsIt {
 			'login.verifyEmail.title' => 'Ti abbiamo inviato un\'email di verifica',
 			'login.verifyEmail.done' => 'Ho verificato la mia email',
 			'login.verifyEmail.description' => 'Controlla la tua casella di posta elettronica per confermare la tua email. Dopodiché tocca il pulsante sottostante per accedere.',
+			_ => null,
+		} ?? switch (path) {
 			'login.verifyEmail.notVerified' => 'Verifica il tuo indirizzo email e riprova.',
 			'sync.conflict.title' => 'Trovati dati contrastanti',
 			'sync.conflict.message' => 'Premei OK per scaricare i dati nel cloud e sovrascrivere i dati locali. Premi Annulla per cancellare i dati nel cloud e caricare i dati locali.',
@@ -8066,8 +8116,6 @@ extension on TranslationsIt {
 			'bodyMeasurement.hips.label' => 'Anche',
 			'bodyMeasurement.leftThigh.label' => 'Coscia sinistra',
 			'bodyMeasurement.rightThigh.label' => 'Coscia destra',
-			_ => null,
-		} ?? switch (path) {
 			'bodyMeasurement.leftCalf.label' => 'Polpaccio sinistro',
 			'bodyMeasurement.rightCalf.label' => 'Polpaccio destro',
 			'onboarding.buttons.next' => 'Avanti',

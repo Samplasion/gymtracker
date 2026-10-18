@@ -41,6 +41,7 @@ class Translations with BaseTranslations<AppLocale, Translations> {
 	Translations $copyWith({TranslationMetadata<AppLocale, Translations>? meta}) => Translations(meta: meta ?? this.$meta);
 
 	// Translations
+	late final Translations$progression$en progression = Translations$progression$en._(_root);
 
 	/// en: 'Gym Bro'
 	String get appName => 'Gym Bro';
@@ -188,6 +189,72 @@ class Translations with BaseTranslations<AppLocale, Translations> {
 
 	late final Translations$error$en error = Translations$error$en._(_root);
 	late final Translations$legacyWorkoutRecovery$en legacyWorkoutRecovery = Translations$legacyWorkoutRecovery$en._(_root);
+}
+
+// Path: progression
+class Translations$progression$en {
+	Translations$progression$en._(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Guided progression'
+	String get title => 'Guided progression';
+
+	/// en: 'Set progression'
+	String get configure => 'Set progression';
+
+	/// en: 'Remove progression'
+	String get remove => 'Remove progression';
+
+	/// en: 'Last time'
+	String get lastTime => 'Last time';
+
+	/// en: 'Complete a session to see your last performance'
+	String get noHistory => 'Complete a session to see your last performance';
+
+	/// en: 'Today's goal'
+	String get goal => 'Today\'s goal';
+
+	/// en: 'Double progression'
+	String get double => 'Double progression';
+
+	/// en: 'Cyclic linear progression'
+	String get cyclic => 'Cyclic linear progression';
+
+	/// en: 'Minimum reps'
+	String get minReps => 'Minimum reps';
+
+	/// en: 'Maximum reps'
+	String get maxReps => 'Maximum reps';
+
+	/// en: 'Reps per step'
+	String get repsPerStep => 'Reps per step';
+
+	/// en: 'Starting weight'
+	String get startingWeight => 'Starting weight';
+
+	/// en: 'Weight increase per step'
+	String get weightPerStep => 'Weight increase per step';
+
+	/// en: 'Starting weight increase per cycle'
+	String get weightPerCycle => 'Starting weight increase per cycle';
+
+	/// en: 'Next goals'
+	String get preview => 'Next goals';
+
+	/// en: 'Save'
+	String get save => 'Save';
+
+	/// en: 'Check the values and the number of working sets'
+	String get invalid => 'Check the values and the number of working sets';
+
+	/// en: 'Cycle $cycle, step $step'
+	String step({required Object cycle, required Object step}) => 'Cycle ${cycle}, step ${step}';
+
+	/// en: 'Advance manually'
+	String get advance => 'Advance manually';
 }
 
 // Path: appInfo
@@ -8716,6 +8783,25 @@ class Translations$food$categoryEditor$fields$name$errors$en {
 extension on Translations {
 	dynamic _flatMapFunction(String path) {
 		return switch (path) {
+			'progression.title' => 'Guided progression',
+			'progression.configure' => 'Set progression',
+			'progression.remove' => 'Remove progression',
+			'progression.lastTime' => 'Last time',
+			'progression.noHistory' => 'Complete a session to see your last performance',
+			'progression.goal' => 'Today\'s goal',
+			'progression.double' => 'Double progression',
+			'progression.cyclic' => 'Cyclic linear progression',
+			'progression.minReps' => 'Minimum reps',
+			'progression.maxReps' => 'Maximum reps',
+			'progression.repsPerStep' => 'Reps per step',
+			'progression.startingWeight' => 'Starting weight',
+			'progression.weightPerStep' => 'Weight increase per step',
+			'progression.weightPerCycle' => 'Starting weight increase per cycle',
+			'progression.preview' => 'Next goals',
+			'progression.save' => 'Save',
+			'progression.invalid' => 'Check the values and the number of working sets',
+			'progression.step' => ({required Object cycle, required Object step}) => 'Cycle ${cycle}, step ${step}',
+			'progression.advance' => 'Advance manually',
 			'appName' => 'Gym Bro',
 			'appInfo.version' => ({required Object version, required Object build}) => 'Version ${version} (build ${build})',
 			'appInfo.shortDescription' => 'Workout Buddy',
@@ -9209,6 +9295,8 @@ extension on Translations {
 			'library.biceps.exercises.scottCurl' => 'Scott curl',
 			'library.biceps.exercises.dualCableHighCurl' => 'Dual-cable high curls',
 			'library.abs.name' => 'Abs',
+			_ => null,
+		} ?? switch (path) {
 			'library.abs.exercises.crunches' => 'Crunches',
 			'library.abs.exercises.kneeRaise' => 'Knee raise',
 			'library.abs.exercises.legRaise' => 'Leg raise',
@@ -9228,8 +9316,6 @@ extension on Translations {
 			'library.abs.exercises.obliqueCrunches' => 'Oblique crunches',
 			'library.abs.exercises.legRaiseParallelBars' => 'Leg raise (parallel bars)',
 			'library.abs.exercises.lateralHyperextensions' => 'Lateral hyperextensions',
-			_ => null,
-		} ?? switch (path) {
 			'library.calves.name' => 'Calves',
 			'library.calves.exercises.calfRaiseStanding' => 'Calf raise (standing)',
 			'library.calves.exercises.calfRaiseSeated' => 'Calf raise (seated)',
@@ -9723,6 +9809,8 @@ extension on Translations {
 			'food.languages.kr' => 'Kanuri',
 			'food.languages.ks' => 'Kashmiri',
 			'food.languages.ku' => 'Kurdish',
+			_ => null,
+		} ?? switch (path) {
 			'food.languages.kv' => 'Komi',
 			'food.languages.kw' => 'Cornish',
 			'food.languages.ky' => 'Kyrgyz',
@@ -9742,8 +9830,6 @@ extension on Translations {
 			'food.languages.ml' => 'Malayalam',
 			'food.languages.mn' => 'Mongolian',
 			'food.languages.mo' => 'Moldovan',
-			_ => null,
-		} ?? switch (path) {
 			'food.languages.mr' => 'Marathi',
 			'food.languages.ms' => 'Malay',
 			'food.languages.mt' => 'Maltese',
@@ -10237,6 +10323,8 @@ extension on Translations {
 			'login.verifyEmail.title' => 'We\'ve sent you a verification email',
 			'login.verifyEmail.description' => 'Check your inbox to confirm your email. Once you\'re done, come back and tap the button to sign in.',
 			'login.verifyEmail.done' => 'I\'ve verified my email',
+			_ => null,
+		} ?? switch (path) {
 			'login.verifyEmail.notVerified' => 'Verify your email address and try again.',
 			'sync.conflict.title' => 'Conflicting data found',
 			'sync.conflict.message' => 'Press OK to download the data in the cloud and overwrite the local data. Press Cancel to erase the data in the cloud and upload the local data.',
@@ -10256,8 +10344,6 @@ extension on Translations {
 			'bodyMeasurement.hips.label' => 'Hips',
 			'bodyMeasurement.leftThigh.label' => 'Left thigh',
 			'bodyMeasurement.rightThigh.label' => 'Right thigh',
-			_ => null,
-		} ?? switch (path) {
 			'bodyMeasurement.leftCalf.label' => 'Left calf',
 			'bodyMeasurement.rightCalf.label' => 'Right calf',
 			'onboarding.buttons.next' => 'Next',

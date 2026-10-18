@@ -17,6 +17,7 @@ import 'package:gymtracker/main.dart';
 import 'package:gymtracker/model/achievements.dart';
 import 'package:gymtracker/model/exercisable.dart';
 import 'package:gymtracker/model/exercise.dart';
+import 'package:gymtracker/model/progression.dart';
 import 'package:gymtracker/model/set.dart';
 import 'package:gymtracker/model/superset.dart';
 import 'package:gymtracker/model/workout.dart';
@@ -363,6 +364,110 @@ class RoutinesController extends GetxController
         .copyWith
         .folder(oldRoutine.folder);
     service.setRoutine(newRoutine);
+    coordinator.scheduleBackup();
+  }
+
+  /// Advances only goals belonging to the saved routine and completed workout.
+  Future<void> advanceProgressionsFromWorkout(Workout workout) async {
+    final routineID = workout.parentID;
+    if (routineID == null) return;
+    final routine = getRoutine(routineID);
+    if (routine == null) return;
+
+    final performed = <Exercise>[
+      for (final entry in workout.exercises)
+        if (entry is Exercise)
+          entry
+        else if (entry is Superset)
+          ...entry.exercises,
+    ];
+    final plannedExercises = <Exercise>[
+      for (final entry in routine.exercises)
+        if (entry is Exercise)
+          entry
+        else if (entry is Superset)
+          ...entry.exercises,
+    ];
+    var advancedAny = false;
+    Exercise advance(Exercise planned) {
+      final current = planned.progression;
+      if (current == null) return planned;
+      var actual = performed
+          .where(
+            (ex) => ex.supersedesID == planned.id && ex.progression != null,
+          )
+          .firstOrNull;
+      // Updating a routine from a workout regenerates exercise IDs. In that
+      // case a library exercise can still be matched if it occurs only once.
+      if (actual == null &&
+          planned.parentID != null &&
+          plannedExercises
+                  .where((ex) => ex.parentID == planned.parentID)
+                  .length ==
+              1) {
+        final candidates = performed
+            .where(
+              (ex) => ex.parentID == planned.parentID && ex.progression != null,
+            )
+            .toList();
+        if (candidates.length == 1) actual = candidates.single;
+      }
+      if (actual == null || !actual.progression!.reached(actual)) {
+        return planned;
+      }
+      // An edited goal must not be overwritten by a workout started earlier.
+      if (!actual.progression!.sameAs(current)) {
+        return planned;
+      }
+      final next = current.advance(
+        current.setCount,
+        hasWeight: planned.parameters.hasWeight,
+      );
+      if (next.sameAs(current)) return planned;
+      advancedAny = true;
+      return planned.copyWith(progression: next);
+    }
+
+    final updated = routine.copyWith(
+      exercises: [
+        for (final entry in routine.exercises)
+          entry.map(
+            exercise: advance,
+            superset: (superset) => superset.copyWith(
+              exercises: [for (final ex in superset.exercises) advance(ex)],
+            ),
+          ),
+      ],
+    );
+    if (!advancedAny) return;
+    await service.setRoutine(updated);
+    coordinator.scheduleBackup();
+  }
+
+  Future<void> setProgressionForOngoingExercise({
+    required String? routineID,
+    required Exercise exercise,
+    required ExerciseProgression? progression,
+  }) async {
+    if (routineID == null || exercise.supersedesID == null) return;
+    final routine = getRoutine(routineID);
+    if (routine == null) return;
+    Exercise update(Exercise planned) => planned.id == exercise.supersedesID
+        ? planned.copyWith(progression: progression)
+        : planned;
+    await service.setRoutine(
+      routine.copyWith(
+        exercises: [
+          for (final entry in routine.exercises)
+            entry.map(
+              exercise: update,
+              superset: (superset) => superset.copyWith(
+                exercises: [for (final ex in superset.exercises) update(ex)],
+              ),
+            ),
+        ],
+      ),
+    );
     coordinator.scheduleBackup();
   }
 

@@ -260,6 +260,24 @@ class _WorkoutEditorState extends State<WorkoutEditor> {
   });
 
   EditorCallbacks get callbacks => EditorCallbacks.editor(
+    onExerciseProgressionChange: (index, progression) {
+      final exercises = workout.exercises.toList();
+      if (index.supersetIndex == null) {
+        final ex = exercises[index.exerciseIndex] as Exercise;
+        exercises[index.exerciseIndex] = ex.copyWith(progression: progression);
+      } else {
+        final superset = exercises[index.supersetIndex!] as Superset;
+        exercises[index.supersetIndex!] = superset.copyWith(
+          exercises: [
+            for (var i = 0; i < superset.exercises.length; i++)
+              i == index.exerciseIndex
+                  ? superset.exercises[i].copyWith(progression: progression)
+                  : superset.exercises[i],
+          ],
+        );
+      }
+      _setExercises(exercises);
+    },
     onExerciseReorder: (supersetIndex) async {
       final target = supersetIndex == null
           ? workout.exercises

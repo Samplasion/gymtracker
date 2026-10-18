@@ -1,3 +1,4 @@
+import 'package:gymtracker/model/progression.dart';
 import 'package:gymtracker/model/set.dart';
 
 typedef ExerciseIndex = ({int exerciseIndex, int? supersetIndex});
@@ -13,6 +14,8 @@ class EditorCallbacks {
   onExerciseChangeRestTime;
   final void Function(ExerciseIndex exerciseIndex, String notes)
   onExerciseNotesChange;
+  final void Function(ExerciseIndex index, ExerciseProgression? progression)?
+  onExerciseProgressionChange;
   final void Function(ExerciseIndex index, List<int> newIndices)
   onExerciseSetReorder;
   final void Function(ExerciseIndex exerciseIndex) onSetCreate;
@@ -35,6 +38,7 @@ class EditorCallbacks {
     required this.onExerciseRemove,
     required this.onExerciseChangeRestTime,
     required this.onExerciseNotesChange,
+    this.onExerciseProgressionChange,
     required this.onExerciseSetReorder,
     required this.onSetCreate,
     required this.onSetRemove,
@@ -60,6 +64,7 @@ class EditorCallbacks {
     required this.onExerciseRemove,
     required this.onExerciseChangeRestTime,
     required this.onExerciseNotesChange,
+    this.onExerciseProgressionChange,
     required this.onSetChangeRPE,
     required this.onExerciseSetReorder,
     required this.onSetCreate,

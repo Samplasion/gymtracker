@@ -53,6 +53,7 @@ typedef WorkoutSetCursor = ({
 });
 
 class WorkoutController extends GetxController with ServiceableController {
+  Future<void> _progressionWrite = Future.value();
   final String? ownerId;
   bool preserveOngoingOnClose = false;
   RxString name;
@@ -166,6 +167,35 @@ class WorkoutController extends GetxController with ServiceableController {
   }
 
   EditorCallbacks get callbacks => EditorCallbacks.editor(
+    onExerciseProgressionChange: (index, progression) {
+      final oldExercise = index.supersetIndex == null
+          ? exercises[index.exerciseIndex] as Exercise
+          : (exercises[index.supersetIndex!] as Superset).exercises[index
+                .exerciseIndex];
+      if (index.supersetIndex == null) {
+        final ex = exercises[index.exerciseIndex] as Exercise;
+        exercises[index.exerciseIndex] = ex.copyWith(progression: progression);
+      } else {
+        final superset = exercises[index.supersetIndex!] as Superset;
+        exercises[index.supersetIndex!] = superset.copyWith(
+          exercises: [
+            for (var i = 0; i < superset.exercises.length; i++)
+              i == index.exerciseIndex
+                  ? superset.exercises[i].copyWith(progression: progression)
+                  : superset.exercises[i],
+          ],
+        );
+      }
+      exercises.refresh();
+      save();
+      _progressionWrite = _progressionWrite.then(
+        (_) => Get.find<RoutinesController>().setProgressionForOngoingExercise(
+          routineID: parentID.value,
+          exercise: oldExercise,
+          progression: progression,
+        ),
+      );
+    },
     onExerciseReorder: (supersetIndex) async {
       final target = supersetIndex == null
           ? exercises
@@ -761,6 +791,7 @@ class WorkoutController extends GetxController with ServiceableController {
       throw StateError('Cannot submit a workout belonging to another account');
     }
     final historyController = Get.find<HistoryController>();
+    await _progressionWrite;
 
     removeCountdown();
     removeRelevantStopwatches();
@@ -788,6 +819,9 @@ class WorkoutController extends GetxController with ServiceableController {
       Get.back();
       Get.delete<WorkoutController>();
       await askToUpdateRoutine(workout);
+      await Get.find<RoutinesController>().advanceProgressionsFromWorkout(
+        workout,
+      );
 
       if (workout.doneSets.isNotEmpty) {
         await Go.showBottomModalScreen(

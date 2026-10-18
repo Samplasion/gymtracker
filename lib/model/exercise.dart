@@ -5,6 +5,7 @@ import 'package:gymtracker/data/exercises.dart';
 import 'package:gymtracker/data/weights.dart';
 import 'package:gymtracker/i18n/strings.g.dart';
 import 'package:gymtracker/model/exercisable.dart';
+import 'package:gymtracker/model/progression.dart';
 import 'package:gymtracker/model/set.dart';
 import 'package:gymtracker/model/workout.dart';
 import 'package:gymtracker/service/logger.dart';
@@ -269,6 +270,8 @@ class Exercise extends WorkoutExercisable {
   /// It is a number between 1 and 10.
   final int? rpe;
 
+  final ExerciseProgression? progression;
+
   // Not actually deprecated, but the name is reserved for copyWith
   @Deprecated("Use [gymEquipment] instead")
   @JsonKey(name: "equipment", defaultValue: GTGymEquipment.none)
@@ -369,6 +372,7 @@ class Exercise extends WorkoutExercisable {
     required this.workoutID,
     required this.supersedesID,
     this.rpe,
+    this.progression,
     GTExerciseMuscleCategory? category,
     this.skeleton = false,
     required this.equipment,
@@ -451,6 +455,7 @@ class Exercise extends WorkoutExercisable {
   @override
   Map<String, dynamic> toJson() => <String, dynamic>{
     ..._$ExerciseToJson(this),
+    'progression': progression?.toJson(),
     'sets': [for (final set in sets) set.toJson()],
     'type': 'exercise',
   };
@@ -551,6 +556,7 @@ class Exercise extends WorkoutExercisable {
     required Distance toDistanceUnit,
   }) {
     return copyWith(
+      progression: progression?.changeUnits(fromWeightUnit, toWeightUnit),
       sets: [
         for (final set in sets)
           set.copyWith(
@@ -592,6 +598,9 @@ class Exercise extends WorkoutExercisable {
         a.standard == b.standard &&
         a.skeleton == b.skeleton &&
         a.rpe == b.rpe &&
+        (a.progression == null
+            ? b.progression == null
+            : b.progression != null && a.progression!.sameAs(b.progression!)) &&
         [
           for (var i = 0; i < a.sets.length; i++)
             GTSet.deepEquality(a.sets[i], b.sets[i]),

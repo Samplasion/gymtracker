@@ -321,6 +321,26 @@ class _RoutineCreatorController extends GetxController {
   final exercises = <_DateWrapped<WorkoutExercisable>>[].obs;
 
   EditorCallbacks get callbacks => EditorCallbacks.creation(
+    onExerciseProgressionChange: (index, progression) {
+      if (index.supersetIndex == null) {
+        final ex = exercises[index.exerciseIndex].data as Exercise;
+        exercises[index.exerciseIndex].data = ex.copyWith(
+          progression: progression,
+        );
+      } else {
+        final wrapper = exercises[index.supersetIndex!];
+        final superset = wrapper.data as Superset;
+        wrapper.data = superset.copyWith(
+          exercises: [
+            for (var i = 0; i < superset.exercises.length; i++)
+              i == index.exerciseIndex
+                  ? superset.exercises[i].copyWith(progression: progression)
+                  : superset.exercises[i],
+          ],
+        );
+      }
+      exercises.refresh();
+    },
     onExerciseReplace: (index) {
       final (exerciseIndex: i, supersetIndex: supersetIndex) = index;
       SchedulerBinding.instance.addPostFrameCallback((timeStamp) async {

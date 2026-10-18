@@ -70,14 +70,19 @@ abstract class OnlineService with ChangeNotifier {
 }
 
 class OnlineServiceImpl with ChangeNotifier implements OnlineService {
-  final _client = Supabase.instance.client.auth;
-  final _db = Supabase.instance.client;
+  final GoTrueClient _client;
+  final SupabaseClient _db;
 
   OnlineAccount? _account;
   @override
   OnlineAccount? get account => _account;
 
-  OnlineServiceImpl() {
+  @visibleForTesting
+  set account(OnlineAccount? value) => _account = value;
+
+  OnlineServiceImpl([SupabaseClient? client])
+    : _db = client ?? Supabase.instance.client,
+      _client = (client ?? Supabase.instance.client).auth {
     _client.onAuthStateChange.listen((event) {
       logger.d("Auth state changed: $event");
       if (event.session == null) {
@@ -119,13 +124,21 @@ class OnlineServiceImpl with ChangeNotifier implements OnlineService {
           .limit(1);
       _setAccount(_mapAccount(user, row.first));
       return _account;
-    } on ClientException catch (e, s) {
-      if (e is SocketException) {
-        logger.e("Unable to connect", error: e, stackTrace: s);
-        // Ignore and use cached data.
-        return _account;
-      }
-      rethrow;
+    } on ClientException catch (e) {
+      logger.w("[OnlineService] Offline during getAccount(): $e");
+      if (_account != null) return _account;
+      // Synthesize fallback account from offline cached session
+      _setAccount(
+        OnlineAccount(
+          id: user.id,
+          email: user.email ?? '',
+          name:
+              (user.userMetadata?['username'] as String?) ??
+              user.email ??
+              'Offline User',
+        ),
+      );
+      return _account;
     }
   }
 

@@ -62,7 +62,7 @@ class _LoginController extends GetxController
           change(null, status: RxStatus.error(message));
         }
       } else {
-        rethrow;
+        RxStatus.error(message);
       }
     }
   }

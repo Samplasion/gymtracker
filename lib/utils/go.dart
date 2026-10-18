@@ -618,6 +618,11 @@ class Go {
         Navigator.of(context).pop();
         completer.complete();
       }),
+      onError: (error, stackTrace) =>
+          SchedulerBinding.instance.addPostFrameCallback((_) {
+            Navigator.of(context).pop();
+            completer.completeError(error, stackTrace);
+          }),
     );
 
     showDialog(

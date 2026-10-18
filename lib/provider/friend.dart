@@ -58,10 +58,17 @@ class FriendNotifier extends _$FriendNotifier {
     final currentUserId = currentUser.id;
 
     // Fetch relations
-    final List<dynamic> relations = await client
-        .from('friends')
-        .select()
-        .or('sender_id.eq.$currentUserId,receiver_id.eq.$currentUserId');
+    late final List<dynamic> relations;
+
+    try {
+      relations = await client
+          .from('friends')
+          .select()
+          .or('sender_id.eq.$currentUserId,receiver_id.eq.$currentUserId');
+    } catch (e) {
+      // If the request fails (e.g., offline), return an empty state instead of throwing
+      return FriendState(friends: [], pendingReceived: [], pendingSent: []);
+    }
 
     final friendIds = <String>{};
     final pendingReceivedIds = <String>{};

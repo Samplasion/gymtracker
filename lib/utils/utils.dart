@@ -1,10 +1,15 @@
+import 'dart:async';
+import 'dart:io';
+
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_quill/flutter_quill.dart';
 import 'package:gymtracker/i18n/strings.g.dart';
 import 'package:gymtracker/model/model.dart' show GTMuscleCategory;
 import 'package:gymtracker/utils/extensions.dart';
+import 'package:http/http.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 bool doubleIsActuallyInt(double double, [double epsilon = 0.001]) {
   return doubleEquality(double, double.floorToDouble(), epsilon: epsilon);
@@ -277,4 +282,13 @@ int firstDayOfWeekFor(Locale locale) {
   } else {
     return DateTime.monday;
   }
+}
+
+bool isNetworkError(Object error) {
+  return error is ClientException ||
+      error is SocketException ||
+      error is TimeoutException ||
+      error is HttpException ||
+      (error is PostgrestException &&
+          error.message.contains('Failed host lookup'));
 }

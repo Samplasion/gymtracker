@@ -19,6 +19,7 @@ import 'package:gymtracker/service/logger.dart';
 import 'package:gymtracker/service/online.dart';
 import 'package:gymtracker/service/test.dart';
 import 'package:gymtracker/struct/cache.dart';
+import 'package:gymtracker/utils/utils.dart' show isNetworkError;
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -94,7 +95,10 @@ class GBSyncManager extends SyncManager<GTDatabase> {
       success = true;
     } catch (e, s) {
       eventBus.emit(GBSyncErrorEvent(e, s));
-      rethrow;
+      if (!isNetworkError(e)) {
+        rethrow;
+      }
+      logger.i("[SyncManager] Sync deferred: device is offline ($e)");
     } finally {
       _isSyncingTables = false;
       final now = success ? DateTime.now() : null;
@@ -106,7 +110,24 @@ class GBSyncManager extends SyncManager<GTDatabase> {
   void enableSync() {
     if (syncingEnabled) return;
     final startSyncs = nFullSyncs;
-    super.enableSync();
+    // Run in a guarded zone to handle unawaited background futures from package:syncable
+    runZonedGuarded(
+      () {
+        super.enableSync();
+      },
+      (error, stack) {
+        if (isNetworkError(error)) {
+          logger.w(
+            "[SyncManager] Suppressed offline network error in enableSync: $error",
+          );
+          eventBus.emit(GBSyncErrorEvent(error, stack));
+        } else {
+          // Forward genuine programming bugs to the root zone
+          Zone.current.parent?.handleUncaughtError(error, stack);
+        }
+      },
+    );
+
     if (userId.isNotEmpty) {
       trackAutomaticSync(startSyncs);
     }
@@ -117,7 +138,23 @@ class GBSyncManager extends SyncManager<GTDatabase> {
     if (userId == value) return;
     final hadUser = userId.isNotEmpty;
     final startSyncs = nFullSyncs;
-    super.setUserId(value);
+
+    runZonedGuarded(
+      () {
+        super.setUserId(value);
+      },
+      (error, stack) {
+        if (isNetworkError(error)) {
+          logger.w(
+            "[SyncManager] Suppressed offline network error in setUserId: $error",
+          );
+          eventBus.emit(GBSyncErrorEvent(error, stack));
+        } else {
+          Zone.current.parent?.handleUncaughtError(error, stack);
+        }
+      },
+    );
+
     if (hadUser && syncingEnabled && value.isNotEmpty) {
       trackAutomaticSync(startSyncs);
     }

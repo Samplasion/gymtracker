@@ -98,6 +98,37 @@ void main() {
     );
 
     test(
+      'last sync is cleared on logout and belongs to the active account',
+      () async {
+        final online = _FakeOnline(
+          OnlineAccount(id: testUserId, email: 'a@example.com', name: 'A'),
+        );
+        final container = ProviderContainer(
+          overrides: [onlineProvider.overrideWith(() => online)],
+        );
+        addTearDown(container.dispose);
+        container.read(syncStatusProvider);
+        await pumpEventQueue();
+        expect(container.read(syncStatusProvider).lastSync, initialDate);
+
+        online.switchAccount(null);
+        await pumpEventQueue();
+        expect(container.read(syncStatusProvider).lastSync, isNull);
+        online.switchAccount(
+          OnlineAccount(id: 'B', email: 'b@example.com', name: 'B'),
+        );
+        await pumpEventQueue();
+        expect(container.read(syncStatusProvider).lastSync, isNull);
+
+        online.switchAccount(
+          OnlineAccount(id: testUserId, email: 'a@example.com', name: 'A'),
+        );
+        await pumpEventQueue();
+        expect(container.read(syncStatusProvider).lastSync, initialDate);
+      },
+    );
+
+    test(
       'updates state on GBSyncStartedEvent and GBSyncFinishedEvent',
       () async {
         final container = ProviderContainer(
@@ -364,6 +395,10 @@ class _FakeOnline extends Online {
   @override
   FutureOr<OnlineAccount?> build() {
     return _account;
+  }
+
+  void switchAccount(OnlineAccount? account) {
+    state = AsyncValue.data(account);
   }
 
   @override

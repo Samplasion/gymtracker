@@ -47,6 +47,8 @@ class SyncStatusNotifier extends _$SyncStatusNotifier {
   SharedPreferences? _prefs;
   Timer? _pollingTimer;
   DateTime? _lastSync;
+  String? _statusUserId;
+  int _loadGeneration = 0;
 
   static const String _lastSyncKeyPrefix = 'gymtracker_last_sync_';
 
@@ -54,6 +56,11 @@ class SyncStatusNotifier extends _$SyncStatusNotifier {
   SyncStatus build() {
     final eventBus = ref.watch(eventBusProvider);
     final account = ref.watch(onlineProvider).value;
+    if (_statusUserId != account?.id) {
+      _statusUserId = account?.id;
+      _lastSync = null;
+    }
+    final generation = ++_loadGeneration;
 
     final startSub = eventBus.on<GBSyncStartedEvent>().listen((_) {
       state = state.copyWith(state: SyncState.syncing);
@@ -86,6 +93,7 @@ class SyncStatusNotifier extends _$SyncStatusNotifier {
     });
 
     ref.onDispose(() {
+      _loadGeneration++;
       startSub.cancel();
       finishSub.cancel();
       errorSub.cancel();
@@ -93,7 +101,7 @@ class SyncStatusNotifier extends _$SyncStatusNotifier {
     });
 
     if (account?.id != null) {
-      _loadPrefsAndInitialState(account!.id);
+      _loadPrefsAndInitialState(account!.id, generation);
     }
 
     final isSyncing = _checkIsSyncing();
@@ -103,7 +111,7 @@ class SyncStatusNotifier extends _$SyncStatusNotifier {
 
     return SyncStatus(
       state: isSyncing ? SyncState.syncing : SyncState.notSyncing,
-      lastSync: stateOrNull?.lastSync ?? _lastSync,
+      lastSync: _lastSync,
     );
   }
 
@@ -135,8 +143,9 @@ class SyncStatusNotifier extends _$SyncStatusNotifier {
     _pollingTimer = null;
   }
 
-  Future<void> _loadPrefsAndInitialState(String userId) async {
+  Future<void> _loadPrefsAndInitialState(String userId, int generation) async {
     _prefs ??= await SharedPreferences.getInstance();
+    if (generation != _loadGeneration || _lastSync != null) return;
     final timestampMs = _prefs?.getInt('$_lastSyncKeyPrefix$userId');
     if (timestampMs != null) {
       final loadedDate = DateTime.fromMillisecondsSinceEpoch(timestampMs);
@@ -146,8 +155,8 @@ class SyncStatusNotifier extends _$SyncStatusNotifier {
   }
 
   Future<void> _saveLastSync(DateTime timestamp) async {
-    _prefs ??= await SharedPreferences.getInstance();
     final userId = ref.read(currentUserIdProvider);
+    _prefs ??= await SharedPreferences.getInstance();
     if (userId != null) {
       await _prefs?.setInt(
         '$_lastSyncKeyPrefix$userId',

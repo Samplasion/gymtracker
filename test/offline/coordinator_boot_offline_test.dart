@@ -4,6 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get/get.dart';
 import 'package:gymtracker/controller/coordinator.dart';
+import 'package:gymtracker/controller/health_controller.dart';
+import 'package:gymtracker/provider/food.dart';
 import 'package:gymtracker/controller/notifications_controller.dart';
 import 'package:gymtracker/controller/settings_controller.dart';
 import 'package:gymtracker/main.dart';
@@ -38,6 +40,18 @@ class _FailingOfflineOnlineNotifier extends Online {
   }
 }
 
+class _SlowOnline extends Online {
+  @override
+  FutureOr<OnlineAccount?> build() => Completer<OnlineAccount?>().future;
+}
+
+class _BootCoordinator extends Coordinator {
+  @override
+  void loadColdbootDeeplink() {}
+  @override
+  void schedulePeriodicBackup() {}
+}
+
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
@@ -66,52 +80,57 @@ void main() {
 
     Get.put<NotificationController>(mockNotificationController);
     Get.put<PurchasesService>(mockPurchasesService);
+    Get.put(HealthController());
 
     // Override onlineProvider in globalContainer with an instance that fails on network
     globalContainer = ProviderContainer(
+      retry: (_, __) => null,
       overrides: [
         onlineProvider.overrideWith(() => _FailingOfflineOnlineNotifier()),
+        showFoodPermissionsSettingsTileProvider.overrideWith((_) => false),
       ],
     );
 
-    coordinator = Coordinator();
+    coordinator = _BootCoordinator();
   });
 
-  tearDown(() {
+  tearDown(() async {
+    globalContainer.dispose();
+    await MockServices.database.close();
     Get.reset();
   });
 
   group('Coordinator Offline Boot Tests', () {
-    testWidgets(
-      'awaitInitialized() should complete without throwing when offline so cold boot does not hang',
-      (tester) async {
-        await tester.pumpWidget(
-          GetMaterialApp(home: const Scaffold(body: Text('Loaded'))),
+    testWidgets('remote error does not block local initialization', (
+      tester,
+    ) async {
+      await tester.pumpWidget(GetMaterialApp(home: const Scaffold()));
+      await tester.runAsync(() async {
+        await expectLater(
+          coordinator.awaitInitialized().timeout(const Duration(seconds: 3)),
+          completes,
         );
+      });
+    });
 
-        // Expected behavior for offline resilience:
-        Object? bootError;
-        bool bootCompleted = false;
-        coordinator.awaitInitialized().then(
-          (_) {
-            bootCompleted = true;
-          },
-          onError: (e) {
-            bootError = e;
-          },
+    testWidgets('online timeout still completes local initialization', (
+      tester,
+    ) async {
+      globalContainer.dispose();
+      globalContainer = ProviderContainer(
+        retry: (_, __) => null,
+        overrides: [
+          onlineProvider.overrideWith(_SlowOnline.new),
+          showFoodPermissionsSettingsTileProvider.overrideWith((_) => false),
+        ],
+      );
+      await tester.pumpWidget(GetMaterialApp(home: const Scaffold()));
+      await tester.runAsync(() async {
+        await expectLater(
+          coordinator.awaitInitialized().timeout(const Duration(seconds: 12)),
+          completes,
         );
-
-        // Advance timers so Go.awaitInitialization() ticks and settles
-        await tester.pump(const Duration(milliseconds: 2000));
-        await tester.pump(const Duration(milliseconds: 2000));
-
-        expect(
-          bootCompleted,
-          isTrue,
-          reason:
-              'Coordinator.awaitInitialized() hangs on onlineProvider offline failure, preventing bootProcedure() from ever executing',
-        );
-      },
-    );
+      });
+    });
   });
 }

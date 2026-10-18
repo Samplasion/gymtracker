@@ -186,6 +186,8 @@ class MockServices {
       ),
     ).thenReturn(<GTMuscleCategory, double>{});
 
+    when(() => databaseService.db).thenReturn(database);
+
     // DatabaseService empty lists/maps or no-ops
     when(() => databaseService.deleteOngoing()).thenAnswer((_) async {});
     when(() => databaseService.writeToOngoing(any())).thenAnswer((_) async {});

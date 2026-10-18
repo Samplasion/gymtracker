@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math';
 
 import 'package:easy_debounce/easy_debounce.dart';
@@ -60,7 +61,8 @@ class Coordinator extends GetxController
   int get loggerMethodCount => 0;
 
   RxList<RoutineSuggestion> suggestions = <RoutineSuggestion>[].obs;
-  late BehaviorSubject<bool> showPermissionTilesStream;
+  final showPermissionTilesStream = BehaviorSubject<bool>.seeded(true);
+  StreamSubscription<bool>? _permissionSubscription;
 
   @override
   void onServiceChange() {}
@@ -73,14 +75,13 @@ class Coordinator extends GetxController
       "prefs onboardingComplete=${service.prefs$.valueOrNull?.onboardingComplete}, "
       "currentUserId=${service.db.currentUserId}",
     );
-    showPermissionTilesStream = BehaviorSubject<bool>.seeded(true);
 
     await Future.wait([
       Go.awaitInitialization(),
       get<SettingsController>().awaitInitialized(),
       get<NotificationController>().initialize(),
-      globalContainer.read(onlineProvider.future),
-      get<PurchasesService>().init(),
+      _awaitRemoteInitialization(globalContainer.read(onlineProvider.future)),
+      _awaitRemoteInitialization(get<PurchasesService>().init()),
     ]);
     logger.i(
       "[Coordinator.awaitInitialized] Completed Future.wait. "
@@ -95,7 +96,8 @@ class Coordinator extends GetxController
           globalContainer.read(showFoodPermissionsSettingsTileProvider) ||
           !get<HealthController>().hasPermissionStream.value,
     );
-    Rx.combineLatest(
+    await _permissionSubscription?.cancel();
+    _permissionSubscription = Rx.combineLatest<bool, bool>(
       [
         get<NotificationController>().showSettingsTileStream,
         get<HealthController>().hasPermissionStream.map((e) => !e),
@@ -105,17 +107,29 @@ class Coordinator extends GetxController
         return e.any((element) => element) ||
             globalContainer.read(showFoodPermissionsSettingsTileProvider);
       },
-    ).pipe(showPermissionTilesStream);
+    ).listen(showPermissionTilesStream.add);
 
     schedulePeriodicBackup();
     loadColdbootDeeplink();
   }
 
+  Future<void> _awaitRemoteInitialization(Future<dynamic> work) async {
+    try {
+      await work.timeout(const Duration(seconds: 10));
+    } catch (error, stack) {
+      logger.w(
+        'Remote initialization deferred; local data remains available',
+        error: error,
+        stackTrace: stack,
+      );
+    }
+  }
+
   @override
   void onClose() async {
     EasyDebounce.cancel('scheduleBackup');
-    await showPermissionTilesStream.drain(true);
-    showPermissionTilesStream.close();
+    await _permissionSubscription?.cancel();
+    await showPermissionTilesStream.close();
 
     Get.delete<DebugController>();
     Get.delete<NotificationsService>();

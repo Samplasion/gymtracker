@@ -24,6 +24,7 @@ import 'package:gymtracker/view/debug.dart';
 import 'package:gymtracker/view/feed.dart';
 import 'package:gymtracker/view/legal.dart';
 import 'package:gymtracker/view/loading.dart';
+import 'package:gymtracker/view/components/error_view.dart';
 import 'package:gymtracker/view/logs.dart';
 import 'package:gymtracker/view/me.dart';
 import 'package:gymtracker/view/routines.dart';
@@ -848,27 +849,55 @@ class GymTrackerAppLoader extends StatefulWidget {
 }
 
 class __LoaderState extends State<GymTrackerAppLoader> {
+  Object? _error;
+
   @override
   void initState() {
     super.initState();
+    _initialize();
+  }
+
+  void _initialize() {
+    setState(() => _error = null);
     globalLogger.i(
       "[GymTrackerAppLoader] initState: waiting for Coordinator.awaitInitialized",
     );
-    Get.find<Coordinator>().awaitInitialized().then((_) {
-      globalLogger.i(
-        "[GymTrackerAppLoader] Coordinator.awaitInitialized completed; scheduling bootProcedure via addPostFrameCallback",
-      );
-      SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
+    Get.find<Coordinator>().awaitInitialized().then(
+      (_) {
         globalLogger.i(
-          "[GymTrackerAppLoader] Executing Coordinator.bootProcedure now",
+          "[GymTrackerAppLoader] Coordinator.awaitInitialized completed; scheduling bootProcedure via addPostFrameCallback",
         );
-        Get.find<Coordinator>().bootProcedure();
-      });
-    });
+        SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
+          globalLogger.i(
+            "[GymTrackerAppLoader] Executing Coordinator.bootProcedure now",
+          );
+          if (mounted) Get.find<Coordinator>().bootProcedure();
+        });
+      },
+      onError: (Object error, StackTrace stack) {
+        globalLogger.e(
+          'Local initialization failed',
+          error: error,
+          stackTrace: stack,
+        );
+        if (mounted) setState(() => _error = error);
+      },
+    );
   }
 
   @override
   Widget build(BuildContext context) {
+    if (_error != null) {
+      return Scaffold(
+        body: Center(
+          child: ErrorViewComponent(
+            title: context.t.error.title,
+            error: null,
+            retryCallback: _initialize,
+          ),
+        ),
+      );
+    }
     return LoadingPage();
   }
 }

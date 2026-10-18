@@ -1,4 +1,4 @@
-import 'dart:io' show SocketException;
+import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 import 'package:gymtracker/data/achievements.dart';
@@ -10,7 +10,7 @@ import 'package:gymtracker/model/history.dart';
 import 'package:gymtracker/model/workout.dart';
 import 'package:gymtracker/service/feed.dart';
 import 'package:gymtracker/service/logger.dart';
-import 'package:http/http.dart' show ClientException;
+import 'package:gymtracker/utils/utils.dart' show isNetworkError;
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 export 'package:supabase_flutter/supabase_flutter.dart' show AuthException;
@@ -117,16 +117,17 @@ class OnlineServiceImpl with ChangeNotifier implements OnlineService {
     }
 
     try {
-      final row = await _db
-          .from("profiles")
-          .select()
-          .eq('id', user.id)
-          .limit(1);
+      Future<List<Map<String, dynamic>>> fetchProfile() async {
+        return await _db.from("profiles").select().eq('id', user.id).limit(1);
+      }
+
+      final row = await fetchProfile().timeout(const Duration(seconds: 8));
       _setAccount(_mapAccount(user, row.first));
       return _account;
-    } on ClientException catch (e) {
+    } catch (e) {
+      if (!isNetworkError(e)) rethrow;
       logger.w("[OnlineService] Offline during getAccount(): $e");
-      if (_account != null) return _account;
+      if (_account?.id == user.id) return _account;
       // Synthesize fallback account from offline cached session
       _setAccount(
         OnlineAccount(

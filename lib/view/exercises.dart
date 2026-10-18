@@ -692,7 +692,7 @@ class ExerciseDataView extends StatelessWidget {
               const SizedBox(height: 8),
               ExerciseBadgeRow(exercise: exercise),
             ],
-            if (exercise.notes.isNotEmpty)
+            if (!exercise.notes.asQuillDocument().isEmpty())
               Padding(
                 padding: const EdgeInsets.symmetric(
                   horizontal: 16,

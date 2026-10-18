@@ -48,15 +48,6 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 
-class MyHttpOverrides extends HttpOverrides {
-  @override
-  HttpClient createHttpClient(SecurityContext? context) {
-    return super.createHttpClient(context)
-      ..badCertificateCallback =
-          (X509Certificate cert, String host, int port) => true;
-  }
-}
-
 // TODO: Move ProviderContainer back inside the widget tree once Getx is fully migrated.
 late ProviderContainer globalContainer;
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
@@ -75,8 +66,6 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   LocaleSettings.useDeviceLocale();
   SentryWidgetsFlutterBinding.ensureInitialized();
-
-  HttpOverrides.global = MyHttpOverrides();
 
   await Supabase.initialize(
     url: Env.supabaseInstance,

@@ -1219,7 +1219,6 @@ class _FoodBarcodeReaderViewState extends ConsumerState<FoodBarcodeReaderView>
   void didChangeAppLifecycleState(AppLifecycleState state) {
     // If the controller is not ready, do not try to start or stop it.
     // Permission dialogs can trigger lifecycle changes before the controller is ready.
-    print(controller.value.hasCameraPermission);
     if (!controller.value.hasCameraPermission) {
       return;
     }
@@ -1294,7 +1293,11 @@ class _FoodBarcodeReaderViewState extends ConsumerState<FoodBarcodeReaderView>
   }
 
   void _rawHandleBarcode(BarcodeCapture result) async {
-    handleCode(context, ref, result.barcodes.first.rawValue);
+    EasyDebounce.debounce(
+      "barcode",
+      const Duration(milliseconds: 2500),
+      () => handleCode(context, ref, result.barcodes.first.rawValue),
+    );
   }
 
   Future<void> handleCode(

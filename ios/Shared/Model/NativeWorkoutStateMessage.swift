@@ -70,14 +70,14 @@ struct NativeWorkoutStateMessage: Codable {
         exerciseColor = try container.decode(Int64.self, forKey: .exerciseColor)
         exerciseParameters = try container.decode(String.self, forKey: .exerciseParameters)
         setTypeLabel = try container.decodeIfPresent(String.self, forKey: .setTypeLabel) ?? ""
-        let startMillis = try container.decode(Int.self, forKey: .startingTime)
+        let startMillis = try container.decode(Int64.self, forKey: .startingTime)
         startingTime = Date(milliseconds: startMillis)
-        if let restStartMillis = try container.decodeIfPresent(Int.self, forKey: .restTimeStart) {
+        if let restStartMillis = try container.decodeIfPresent(Int64.self, forKey: .restTimeStart) {
             restTimeStart = Date(milliseconds: restStartMillis)
         } else {
             restTimeStart = nil
         }
-        if let restEndMillis = try container.decodeIfPresent(Int.self, forKey: .restTimeEnd) {
+        if let restEndMillis = try container.decodeIfPresent(Int64.self, forKey: .restTimeEnd) {
             restTimeEnd = Date(milliseconds: restEndMillis)
         } else {
             restTimeEnd = nil
@@ -159,11 +159,11 @@ extension Color {
 }
 
 extension Date {
-    init(milliseconds: Int) {
+    init(milliseconds: Int64) {
         self = Date(timeIntervalSince1970: TimeInterval(milliseconds) / 1000)
     }
 
-    var millisecondsSinceEpoch: Int {
-        Int(self.timeIntervalSince1970 * 1000)
+    var millisecondsSinceEpoch: Int64 {
+        Int64(self.timeIntervalSince1970 * 1000)
     }
 }

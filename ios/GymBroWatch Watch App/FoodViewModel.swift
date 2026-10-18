@@ -66,7 +66,7 @@ class FoodViewModel: NSObject, ObservableObject {
         var newCategories: [NativeFoodCategory] = foodParameters.categories
         var newTotalNutritionSplit: NativeFoodNutritionSplit = foodParameters.totalNutritionSplit
         
-        guard let lastUpdatedTimestamp = defaults.value(forKey: "_\(key)") as? Int else {
+        guard let lastUpdatedTimestamp = defaults.value(forKey: "_\(key)") as? Int64 else {
             return
         }
         

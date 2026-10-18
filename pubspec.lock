@@ -2180,11 +2180,10 @@ packages:
   syncable:
     dependency: "direct main"
     description:
-      name: syncable
-      sha256: f7764d31f3422445625e75981a8431fd650b8c651522a566569f19d61a39fad7
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.0.3"
+      path: "packages/syncable"
+      relative: true
+    source: path
+    version: "1.0.3+gymtracker.1"
   synchronized:
     dependency: transitive
     description:

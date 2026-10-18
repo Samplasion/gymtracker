@@ -68,6 +68,11 @@ class Coordinator extends GetxController
   T get<T>() => Get.find<T>();
 
   Future awaitInitialized() async {
+    logger.i(
+      "[Coordinator.awaitInitialized] Started. "
+      "prefs onboardingComplete=${service.prefs$.valueOrNull?.onboardingComplete}, "
+      "currentUserId=${service.db.currentUserId}",
+    );
     showPermissionTilesStream = BehaviorSubject<bool>.seeded(true);
 
     await Future.wait([
@@ -77,6 +82,11 @@ class Coordinator extends GetxController
       globalContainer.read(onlineProvider.future),
       get<PurchasesService>().init(),
     ]);
+    logger.i(
+      "[Coordinator.awaitInitialized] Completed Future.wait. "
+      "prefs onboardingComplete=${service.prefs$.valueOrNull?.onboardingComplete}, "
+      "currentUserId=${service.db.currentUserId}",
+    );
     get<AchievementsController>().init();
     IntentsController.initialize();
 
@@ -290,14 +300,35 @@ class Coordinator extends GetxController
 
   void bootProcedure() {
     final isTest = TestService().isTest;
+    final prefsValue = service.prefs$.valueOrNull;
+    final onboardingComplete = prefsValue?.onboardingComplete;
+    logger.i(
+      "[Coordinator.bootProcedure] Evaluating onboarding state: "
+      "isTest=$isTest, "
+      "hasValue=${service.prefs$.hasValue}, "
+      "onboardingComplete=$onboardingComplete, "
+      "currentUserId=${service.db.currentUserId}",
+    );
     if (!isTest && !service.prefs$.value.onboardingComplete) {
+      logger.i(
+        "[Coordinator.bootProcedure] Result: Routing -> OnboardingScreen "
+        "(onboardingComplete is false)",
+      );
       Go.offWithoutAnimation(() => const OnboardingScreen());
     } else {
+      logger.i(
+        "[Coordinator.bootProcedure] Result: Routing -> SkeletonView "
+        "(onboardingComplete=$onboardingComplete, isTest=$isTest)",
+      );
       Go.offWithoutAnimation(() => const SkeletonView());
     }
   }
 
   void onFinishedOnboarding() {
+    logger.i(
+      "[Coordinator.onFinishedOnboarding] Marking onboardingComplete=true "
+      "for currentUserId=${service.db.currentUserId}",
+    );
     service.writeSettings(service.prefs$.value.copyWithOnboardingComplete());
     Go.offWithoutAnimation(() => const SkeletonView());
   }

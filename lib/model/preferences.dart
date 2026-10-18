@@ -153,6 +153,7 @@ class Prefs implements Insertable<Preference> {
     bool? defaultToSimpleWorkoutView,
     NutritionLanguage? nutritionLanguage,
     NutritionCountry? nutritionCountry,
+    bool? onboardingComplete,
     bool? anonymizedLogging,
   }) {
     return Prefs(
@@ -169,7 +170,7 @@ class Prefs implements Insertable<Preference> {
           defaultToSimpleWorkoutView ?? this.defaultToSimpleWorkoutView,
       nutritionLanguage: nutritionLanguage ?? this.nutritionLanguage,
       nutritionCountry: nutritionCountry ?? this.nutritionCountry,
-      onboardingComplete: onboardingComplete,
+      onboardingComplete: onboardingComplete ?? this.onboardingComplete,
       anonymizedLogging: anonymizedLogging ?? this.anonymizedLogging,
     );
   }

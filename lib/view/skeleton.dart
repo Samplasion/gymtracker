@@ -851,8 +851,17 @@ class __LoaderState extends State<GymTrackerAppLoader> {
   @override
   void initState() {
     super.initState();
+    globalLogger.i(
+      "[GymTrackerAppLoader] initState: waiting for Coordinator.awaitInitialized",
+    );
     Get.find<Coordinator>().awaitInitialized().then((_) {
+      globalLogger.i(
+        "[GymTrackerAppLoader] Coordinator.awaitInitialized completed; scheduling bootProcedure via addPostFrameCallback",
+      );
       SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
+        globalLogger.i(
+          "[GymTrackerAppLoader] Executing Coordinator.bootProcedure now",
+        );
         Get.find<Coordinator>().bootProcedure();
       });
     });

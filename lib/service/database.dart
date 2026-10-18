@@ -62,10 +62,18 @@ class DatabaseService extends GetxService
   BehaviorSubject<List<DatabaseBackup>> get _backups$ => BehaviorSubject();
 
   void eraseAllSubjects() {
+    logger.i(
+      "[DatabaseService.eraseAllSubjects] Erasing all subjects; "
+      "prefs\$ reset to Prefs.defaultValue (onboardingComplete=${Prefs.defaultValue.onboardingComplete})",
+    );
     exercises$.add([]);
     routines$.add([]);
     history$.add([]);
-    prefs$.add(Prefs.defaultValue);
+    prefs$.add(
+      Prefs.defaultValue.copyWith(
+        onboardingComplete: prefs$.value.onboardingComplete,
+      ),
+    );
     ongoing$.add(null);
     weightMeasurements$.add([]);
     folders$.add([]);
@@ -84,6 +92,11 @@ class DatabaseService extends GetxService
   }
 
   void writeSettings(Prefs prefs) {
+    logger.i(
+      "[DatabaseService.writeSettings] Writing settings to DB: "
+      "onboardingComplete=${prefs.onboardingComplete}, "
+      "currentUserId=${_db.currentUserId}",
+    );
     _db.setPreferences(prefs);
     notifyListeners();
   }
@@ -173,6 +186,11 @@ class DatabaseService extends GetxService
       check();
     });
     _db.watchPreferences().listen((prefs) {
+      logger.i(
+        "[DatabaseService.watchPreferences] Emitted preferences from DB: "
+        "onboardingComplete=${prefs.onboardingComplete}, "
+        "currentUserId=${_db.currentUserId}",
+      );
       prefs$.add(prefs);
       notifyListeners();
       onDatabaseUpdated("preferences")();
@@ -783,12 +801,25 @@ class DatabaseService extends GetxService
     });
   }
 
-  void setCurrentUserId(String? id) {
-    if (_db.currentUserId == id) return;
+  Future<void> setCurrentUserId(String? id) async {
+    logger.i(
+      "[DatabaseService.setCurrentUserId] Requested userId change: "
+      "current='${_db.currentUserId}', new='$id'",
+    );
+    if (_db.currentUserId == id) {
+      logger.i(
+        "[DatabaseService.setCurrentUserId] userId unchanged, skipping reload",
+      );
+      return;
+    }
     _db.setCurrentUserId(id);
 
+    logger.i(
+      "[DatabaseService.setCurrentUserId] userId changed to '$id'. "
+      "Triggering eraseAllSubjects() and _innerEnsureInitialized()",
+    );
     eraseAllSubjects();
-    _innerEnsureInitialized(overrideInitializationCheck: true);
+    await _innerEnsureInitialized(overrideInitializationCheck: true);
   }
 }
 

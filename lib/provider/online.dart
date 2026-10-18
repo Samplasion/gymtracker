@@ -445,10 +445,10 @@ class Online extends _$Online {
     await _databaseService.db.touchStaleTimestamps(userId);
   }
 
-  void _onUserWillLogout(GBUserWillLogoutEvent event) async {
+  Future<void> _onUserWillLogout(GBUserWillLogoutEvent event) async {
     state = const AsyncValue.data(null);
     _syncManager.disableSync();
-    _databaseService.setCurrentUserId(null);
+    await _databaseService.setCurrentUserId(null);
   }
 
   Future<void> deleteAccount() async {
@@ -633,22 +633,26 @@ class Online extends _$Online {
     if (!state.hasValue) {
       state = const AsyncValue.loading();
     }
-    final account = accountFromEvents ?? await _service.getAccount();
-    state = AsyncValue.data(account);
-    if (account != null) {
-      _syncManager.setUserId(account.id);
-      if (ref.read(networkConnectivityProvider).value ?? false) {
-        _syncManager.enableSync();
+    final future = () async {
+      final account = accountFromEvents ?? await _service.getAccount();
+      state = AsyncValue.data(account);
+      if (account != null) {
+        _syncManager.setUserId(account.id);
+        if (ref.read(networkConnectivityProvider).value ?? false) {
+          _syncManager.enableSync();
+        }
+        if (_databaseService.db.currentUserId != account.id) {
+          await _databaseService.setCurrentUserId(account.id);
+          await _fillMissingUserIdAndTouchStaleTimestamps(account.id);
+        }
+      } else if (_databaseService.db.currentUserId != null) {
+        _syncManager.disableSync();
+        await _databaseService.setCurrentUserId(null);
       }
-      if (_databaseService.db.currentUserId != account.id) {
-        _databaseService.setCurrentUserId(account.id);
-        await _fillMissingUserIdAndTouchStaleTimestamps(account.id);
-      }
-    } else if (_databaseService.db.currentUserId != null) {
-      _syncManager.disableSync();
-      _databaseService.setCurrentUserId(null);
-    }
-    return account;
+      return account;
+    }();
+    state = await AsyncValue.guard(() => future);
+    return future;
   }
 }
 

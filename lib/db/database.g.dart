@@ -1886,6 +1886,18 @@ class $HistoryWorkoutExercisesTable extends HistoryWorkoutExercises
     requiredDuringInsert: false,
   );
   @override
+  late final GeneratedColumnWithTypeConverter<ExerciseProgression?, String>
+  progression =
+      GeneratedColumn<String>(
+        'progression',
+        aliasedName,
+        true,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+      ).withConverter<ExerciseProgression?>(
+        $HistoryWorkoutExercisesTable.$converterprogressionn,
+      );
+  @override
   late final GeneratedColumnWithTypeConverter<GTGymEquipment?, String>
   equipment =
       GeneratedColumn<String>(
@@ -1954,6 +1966,7 @@ class $HistoryWorkoutExercisesTable extends HistoryWorkoutExercises
     sortOrder,
     supersedesId,
     rpe,
+    progression,
     equipment,
     updatedAt,
     deleted,
@@ -2187,6 +2200,12 @@ class $HistoryWorkoutExercisesTable extends HistoryWorkoutExercises
         DriftSqlType.int,
         data['${effectivePrefix}rpe'],
       ),
+      progression: $HistoryWorkoutExercisesTable.$converterprogressionn.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.string,
+          data['${effectivePrefix}progression'],
+        ),
+      ),
       equipment: $HistoryWorkoutExercisesTable.$converterequipmentn.fromSql(
         attachedDatabase.typeMapping.read(
           DriftSqlType.string,
@@ -2237,6 +2256,10 @@ class $HistoryWorkoutExercisesTable extends HistoryWorkoutExercises
   $convertersecondaryMuscleGroupsn = NullAwareTypeConverter.wrap(
     $convertersecondaryMuscleGroups,
   );
+  static TypeConverter<ExerciseProgression, String> $converterprogression =
+      const ExerciseProgressionConverter();
+  static TypeConverter<ExerciseProgression?, String?> $converterprogressionn =
+      NullAwareTypeConverter.wrap($converterprogression);
   static JsonTypeConverter2<GTGymEquipment, String, String>
   $converterequipment = const EnumNameConverter<GTGymEquipment>(
     GTGymEquipment.values,
@@ -2265,6 +2288,7 @@ class HistoryWorkoutExercisesCompanion
   final Value<int> sortOrder;
   final Value<String?> supersedesId;
   final Value<int?> rpe;
+  final Value<ExerciseProgression?> progression;
   final Value<GTGymEquipment?> equipment;
   final Value<DateTime> updatedAt;
   final Value<bool> deleted;
@@ -2289,6 +2313,7 @@ class HistoryWorkoutExercisesCompanion
     this.sortOrder = const Value.absent(),
     this.supersedesId = const Value.absent(),
     this.rpe = const Value.absent(),
+    this.progression = const Value.absent(),
     this.equipment = const Value.absent(),
     this.updatedAt = const Value.absent(),
     this.deleted = const Value.absent(),
@@ -2314,6 +2339,7 @@ class HistoryWorkoutExercisesCompanion
     required int sortOrder,
     this.supersedesId = const Value.absent(),
     this.rpe = const Value.absent(),
+    this.progression = const Value.absent(),
     this.equipment = const Value.absent(),
     this.updatedAt = const Value.absent(),
     this.deleted = const Value.absent(),
@@ -2344,6 +2370,7 @@ class HistoryWorkoutExercisesCompanion
     Expression<int>? sortOrder,
     Expression<String>? supersedesId,
     Expression<int>? rpe,
+    Expression<String>? progression,
     Expression<String>? equipment,
     Expression<DateTime>? updatedAt,
     Expression<bool>? deleted,
@@ -2371,6 +2398,7 @@ class HistoryWorkoutExercisesCompanion
       if (sortOrder != null) 'sort_order': sortOrder,
       if (supersedesId != null) 'supersedes_id': supersedesId,
       if (rpe != null) 'rpe': rpe,
+      if (progression != null) 'progression': progression,
       if (equipment != null) 'equipment': equipment,
       if (updatedAt != null) 'updated_at': updatedAt,
       if (deleted != null) 'deleted': deleted,
@@ -2398,6 +2426,7 @@ class HistoryWorkoutExercisesCompanion
     Value<int>? sortOrder,
     Value<String?>? supersedesId,
     Value<int?>? rpe,
+    Value<ExerciseProgression?>? progression,
     Value<GTGymEquipment?>? equipment,
     Value<DateTime>? updatedAt,
     Value<bool>? deleted,
@@ -2424,6 +2453,7 @@ class HistoryWorkoutExercisesCompanion
       sortOrder: sortOrder ?? this.sortOrder,
       supersedesId: supersedesId ?? this.supersedesId,
       rpe: rpe ?? this.rpe,
+      progression: progression ?? this.progression,
       equipment: equipment ?? this.equipment,
       updatedAt: updatedAt ?? this.updatedAt,
       deleted: deleted ?? this.deleted,
@@ -2503,6 +2533,13 @@ class HistoryWorkoutExercisesCompanion
     if (rpe.present) {
       map['rpe'] = Variable<int>(rpe.value);
     }
+    if (progression.present) {
+      map['progression'] = Variable<String>(
+        $HistoryWorkoutExercisesTable.$converterprogressionn.toSql(
+          progression.value,
+        ),
+      );
+    }
     if (equipment.present) {
       map['equipment'] = Variable<String>(
         $HistoryWorkoutExercisesTable.$converterequipmentn.toSql(
@@ -2546,6 +2583,7 @@ class HistoryWorkoutExercisesCompanion
           ..write('sortOrder: $sortOrder, ')
           ..write('supersedesId: $supersedesId, ')
           ..write('rpe: $rpe, ')
+          ..write('progression: $progression, ')
           ..write('equipment: $equipment, ')
           ..write('updatedAt: $updatedAt, ')
           ..write('deleted: $deleted, ')
@@ -2777,6 +2815,18 @@ class $RoutineExercisesTable extends RoutineExercises
     requiredDuringInsert: false,
   );
   @override
+  late final GeneratedColumnWithTypeConverter<ExerciseProgression?, String>
+  progression =
+      GeneratedColumn<String>(
+        'progression',
+        aliasedName,
+        true,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+      ).withConverter<ExerciseProgression?>(
+        $RoutineExercisesTable.$converterprogressionn,
+      );
+  @override
   late final GeneratedColumnWithTypeConverter<GTGymEquipment?, String>
   equipment = GeneratedColumn<String>(
     'equipment',
@@ -2842,6 +2892,7 @@ class $RoutineExercisesTable extends RoutineExercises
     sortOrder,
     supersedesId,
     rpe,
+    progression,
     equipment,
     updatedAt,
     deleted,
@@ -3074,6 +3125,12 @@ class $RoutineExercisesTable extends RoutineExercises
         DriftSqlType.int,
         data['${effectivePrefix}rpe'],
       ),
+      progression: $RoutineExercisesTable.$converterprogressionn.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.string,
+          data['${effectivePrefix}progression'],
+        ),
+      ),
       equipment: $RoutineExercisesTable.$converterequipmentn.fromSql(
         attachedDatabase.typeMapping.read(
           DriftSqlType.string,
@@ -3124,6 +3181,10 @@ class $RoutineExercisesTable extends RoutineExercises
   $convertersecondaryMuscleGroupsn = NullAwareTypeConverter.wrap(
     $convertersecondaryMuscleGroups,
   );
+  static TypeConverter<ExerciseProgression, String> $converterprogression =
+      const ExerciseProgressionConverter();
+  static TypeConverter<ExerciseProgression?, String?> $converterprogressionn =
+      NullAwareTypeConverter.wrap($converterprogression);
   static JsonTypeConverter2<GTGymEquipment, String, String>
   $converterequipment = const EnumNameConverter<GTGymEquipment>(
     GTGymEquipment.values,
@@ -3151,6 +3212,7 @@ class RoutineExercisesCompanion extends UpdateCompanion<RoutineExercise> {
   final Value<int> sortOrder;
   final Value<String?> supersedesId;
   final Value<int?> rpe;
+  final Value<ExerciseProgression?> progression;
   final Value<GTGymEquipment?> equipment;
   final Value<DateTime> updatedAt;
   final Value<bool> deleted;
@@ -3175,6 +3237,7 @@ class RoutineExercisesCompanion extends UpdateCompanion<RoutineExercise> {
     this.sortOrder = const Value.absent(),
     this.supersedesId = const Value.absent(),
     this.rpe = const Value.absent(),
+    this.progression = const Value.absent(),
     this.equipment = const Value.absent(),
     this.updatedAt = const Value.absent(),
     this.deleted = const Value.absent(),
@@ -3200,6 +3263,7 @@ class RoutineExercisesCompanion extends UpdateCompanion<RoutineExercise> {
     required int sortOrder,
     this.supersedesId = const Value.absent(),
     this.rpe = const Value.absent(),
+    this.progression = const Value.absent(),
     this.equipment = const Value.absent(),
     this.updatedAt = const Value.absent(),
     this.deleted = const Value.absent(),
@@ -3230,6 +3294,7 @@ class RoutineExercisesCompanion extends UpdateCompanion<RoutineExercise> {
     Expression<int>? sortOrder,
     Expression<String>? supersedesId,
     Expression<int>? rpe,
+    Expression<String>? progression,
     Expression<String>? equipment,
     Expression<DateTime>? updatedAt,
     Expression<bool>? deleted,
@@ -3257,6 +3322,7 @@ class RoutineExercisesCompanion extends UpdateCompanion<RoutineExercise> {
       if (sortOrder != null) 'sort_order': sortOrder,
       if (supersedesId != null) 'supersedes_id': supersedesId,
       if (rpe != null) 'rpe': rpe,
+      if (progression != null) 'progression': progression,
       if (equipment != null) 'equipment': equipment,
       if (updatedAt != null) 'updated_at': updatedAt,
       if (deleted != null) 'deleted': deleted,
@@ -3284,6 +3350,7 @@ class RoutineExercisesCompanion extends UpdateCompanion<RoutineExercise> {
     Value<int>? sortOrder,
     Value<String?>? supersedesId,
     Value<int?>? rpe,
+    Value<ExerciseProgression?>? progression,
     Value<GTGymEquipment?>? equipment,
     Value<DateTime>? updatedAt,
     Value<bool>? deleted,
@@ -3310,6 +3377,7 @@ class RoutineExercisesCompanion extends UpdateCompanion<RoutineExercise> {
       sortOrder: sortOrder ?? this.sortOrder,
       supersedesId: supersedesId ?? this.supersedesId,
       rpe: rpe ?? this.rpe,
+      progression: progression ?? this.progression,
       equipment: equipment ?? this.equipment,
       updatedAt: updatedAt ?? this.updatedAt,
       deleted: deleted ?? this.deleted,
@@ -3387,6 +3455,11 @@ class RoutineExercisesCompanion extends UpdateCompanion<RoutineExercise> {
     if (rpe.present) {
       map['rpe'] = Variable<int>(rpe.value);
     }
+    if (progression.present) {
+      map['progression'] = Variable<String>(
+        $RoutineExercisesTable.$converterprogressionn.toSql(progression.value),
+      );
+    }
     if (equipment.present) {
       map['equipment'] = Variable<String>(
         $RoutineExercisesTable.$converterequipmentn.toSql(equipment.value),
@@ -3428,6 +3501,7 @@ class RoutineExercisesCompanion extends UpdateCompanion<RoutineExercise> {
           ..write('sortOrder: $sortOrder, ')
           ..write('supersedesId: $supersedesId, ')
           ..write('rpe: $rpe, ')
+          ..write('progression: $progression, ')
           ..write('equipment: $equipment, ')
           ..write('updatedAt: $updatedAt, ')
           ..write('deleted: $deleted, ')
@@ -8626,6 +8700,7 @@ typedef $$HistoryWorkoutExercisesTableCreateCompanionBuilder =
       required int sortOrder,
       Value<String?> supersedesId,
       Value<int?> rpe,
+      Value<ExerciseProgression?> progression,
       Value<GTGymEquipment?> equipment,
       Value<DateTime> updatedAt,
       Value<bool> deleted,
@@ -8652,6 +8727,7 @@ typedef $$HistoryWorkoutExercisesTableUpdateCompanionBuilder =
       Value<int> sortOrder,
       Value<String?> supersedesId,
       Value<int?> rpe,
+      Value<ExerciseProgression?> progression,
       Value<GTGymEquipment?> equipment,
       Value<DateTime> updatedAt,
       Value<bool> deleted,
@@ -8835,6 +8911,16 @@ class $$HistoryWorkoutExercisesTableFilterComposer
   ColumnFilters<int> get rpe => $composableBuilder(
     column: $table.rpe,
     builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnWithTypeConverterFilters<
+    ExerciseProgression?,
+    ExerciseProgression,
+    String
+  >
+  get progression => $composableBuilder(
+    column: $table.progression,
+    builder: (column) => ColumnWithTypeConverterFilters(column),
   );
 
   ColumnWithTypeConverterFilters<GTGymEquipment?, GTGymEquipment, String>
@@ -9032,6 +9118,11 @@ class $$HistoryWorkoutExercisesTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get progression => $composableBuilder(
+    column: $table.progression,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<String> get equipment => $composableBuilder(
     column: $table.equipment,
     builder: (column) => ColumnOrderings(column),
@@ -9213,6 +9304,12 @@ class $$HistoryWorkoutExercisesTableAnnotationComposer
   GeneratedColumn<int> get rpe =>
       $composableBuilder(column: $table.rpe, builder: (column) => column);
 
+  GeneratedColumnWithTypeConverter<ExerciseProgression?, String>
+  get progression => $composableBuilder(
+    column: $table.progression,
+    builder: (column) => column,
+  );
+
   GeneratedColumnWithTypeConverter<GTGymEquipment?, String> get equipment =>
       $composableBuilder(column: $table.equipment, builder: (column) => column);
 
@@ -9383,6 +9480,7 @@ class $$HistoryWorkoutExercisesTableTableManager
                 Value<int> sortOrder = const Value.absent(),
                 Value<String?> supersedesId = const Value.absent(),
                 Value<int?> rpe = const Value.absent(),
+                Value<ExerciseProgression?> progression = const Value.absent(),
                 Value<GTGymEquipment?> equipment = const Value.absent(),
                 Value<DateTime> updatedAt = const Value.absent(),
                 Value<bool> deleted = const Value.absent(),
@@ -9407,6 +9505,7 @@ class $$HistoryWorkoutExercisesTableTableManager
                 sortOrder: sortOrder,
                 supersedesId: supersedesId,
                 rpe: rpe,
+                progression: progression,
                 equipment: equipment,
                 updatedAt: updatedAt,
                 deleted: deleted,
@@ -9434,6 +9533,7 @@ class $$HistoryWorkoutExercisesTableTableManager
                 required int sortOrder,
                 Value<String?> supersedesId = const Value.absent(),
                 Value<int?> rpe = const Value.absent(),
+                Value<ExerciseProgression?> progression = const Value.absent(),
                 Value<GTGymEquipment?> equipment = const Value.absent(),
                 Value<DateTime> updatedAt = const Value.absent(),
                 Value<bool> deleted = const Value.absent(),
@@ -9458,6 +9558,7 @@ class $$HistoryWorkoutExercisesTableTableManager
                 sortOrder: sortOrder,
                 supersedesId: supersedesId,
                 rpe: rpe,
+                progression: progression,
                 equipment: equipment,
                 updatedAt: updatedAt,
                 deleted: deleted,
@@ -9609,6 +9710,7 @@ typedef $$RoutineExercisesTableCreateCompanionBuilder =
       required int sortOrder,
       Value<String?> supersedesId,
       Value<int?> rpe,
+      Value<ExerciseProgression?> progression,
       Value<GTGymEquipment?> equipment,
       Value<DateTime> updatedAt,
       Value<bool> deleted,
@@ -9635,6 +9737,7 @@ typedef $$RoutineExercisesTableUpdateCompanionBuilder =
       Value<int> sortOrder,
       Value<String?> supersedesId,
       Value<int?> rpe,
+      Value<ExerciseProgression?> progression,
       Value<GTGymEquipment?> equipment,
       Value<DateTime> updatedAt,
       Value<bool> deleted,
@@ -9813,6 +9916,16 @@ class $$RoutineExercisesTableFilterComposer
   ColumnFilters<int> get rpe => $composableBuilder(
     column: $table.rpe,
     builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnWithTypeConverterFilters<
+    ExerciseProgression?,
+    ExerciseProgression,
+    String
+  >
+  get progression => $composableBuilder(
+    column: $table.progression,
+    builder: (column) => ColumnWithTypeConverterFilters(column),
   );
 
   ColumnWithTypeConverterFilters<GTGymEquipment?, GTGymEquipment, String>
@@ -10008,6 +10121,11 @@ class $$RoutineExercisesTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get progression => $composableBuilder(
+    column: $table.progression,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<String> get equipment => $composableBuilder(
     column: $table.equipment,
     builder: (column) => ColumnOrderings(column),
@@ -10187,6 +10305,12 @@ class $$RoutineExercisesTableAnnotationComposer
   GeneratedColumn<int> get rpe =>
       $composableBuilder(column: $table.rpe, builder: (column) => column);
 
+  GeneratedColumnWithTypeConverter<ExerciseProgression?, String>
+  get progression => $composableBuilder(
+    column: $table.progression,
+    builder: (column) => column,
+  );
+
   GeneratedColumnWithTypeConverter<GTGymEquipment?, String> get equipment =>
       $composableBuilder(column: $table.equipment, builder: (column) => column);
 
@@ -10346,6 +10470,7 @@ class $$RoutineExercisesTableTableManager
                 Value<int> sortOrder = const Value.absent(),
                 Value<String?> supersedesId = const Value.absent(),
                 Value<int?> rpe = const Value.absent(),
+                Value<ExerciseProgression?> progression = const Value.absent(),
                 Value<GTGymEquipment?> equipment = const Value.absent(),
                 Value<DateTime> updatedAt = const Value.absent(),
                 Value<bool> deleted = const Value.absent(),
@@ -10370,6 +10495,7 @@ class $$RoutineExercisesTableTableManager
                 sortOrder: sortOrder,
                 supersedesId: supersedesId,
                 rpe: rpe,
+                progression: progression,
                 equipment: equipment,
                 updatedAt: updatedAt,
                 deleted: deleted,
@@ -10397,6 +10523,7 @@ class $$RoutineExercisesTableTableManager
                 required int sortOrder,
                 Value<String?> supersedesId = const Value.absent(),
                 Value<int?> rpe = const Value.absent(),
+                Value<ExerciseProgression?> progression = const Value.absent(),
                 Value<GTGymEquipment?> equipment = const Value.absent(),
                 Value<DateTime> updatedAt = const Value.absent(),
                 Value<bool> deleted = const Value.absent(),
@@ -10421,6 +10548,7 @@ class $$RoutineExercisesTableTableManager
                 sortOrder: sortOrder,
                 supersedesId: supersedesId,
                 rpe: rpe,
+                progression: progression,
                 equipment: equipment,
                 updatedAt: updatedAt,
                 deleted: deleted,

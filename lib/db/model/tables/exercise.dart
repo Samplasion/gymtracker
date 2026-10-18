@@ -1,8 +1,11 @@
+import 'dart:convert';
+
 import 'package:drift/drift.dart';
 import 'package:gymtracker/db/database.dart';
 import 'package:gymtracker/db/model/tables/set.dart' show GTSetListConverter;
 import 'package:gymtracker/model/exercise.dart'
     show GTGymEquipment, GTMuscleGroup;
+import 'package:gymtracker/model/progression.dart';
 import 'package:gymtracker/model/set.dart';
 import 'package:syncable/syncable.dart';
 import 'package:uuid/uuid.dart';
@@ -164,6 +167,8 @@ abstract class LinkedExerciseBase extends Table implements SyncableTable {
   IntColumn get sortOrder => integer()();
   TextColumn get supersedesId;
   IntColumn get rpe => integer().nullable()();
+  TextColumn get progression =>
+      text().nullable().map(const ExerciseProgressionConverter())();
   TextColumn get equipment => textEnum<GTGymEquipment>()
       .nullable()
       .clientDefault(() => GTGymEquipment.none.name)();
@@ -196,6 +201,7 @@ class ConcreteExercise {
   final int sortOrder;
   final String? supersedesId;
   final int? rpe;
+  final ExerciseProgression? progression;
   final GTGymEquipment equipment;
   final DateTime updatedAt;
   final bool deleted;
@@ -220,6 +226,7 @@ class ConcreteExercise {
     required this.sortOrder,
     required this.supersedesId,
     required this.rpe,
+    this.progression,
     required GTGymEquipment? equipment,
     DateTime? updatedAt,
     bool? deleted,
@@ -261,6 +268,7 @@ class RoutineExercise extends ConcreteExercise implements Syncable {
     required super.sortOrder,
     required super.supersedesId,
     required super.rpe,
+    super.progression,
     required super.equipment,
     super.updatedAt,
     super.deleted,
@@ -327,6 +335,7 @@ class RoutineExercise extends ConcreteExercise implements Syncable {
       supersedesId:
           json['supersedes_id'] as String? ?? json['supersedesId'] as String?,
       rpe: json['rpe'] as int?,
+      progression: parseExerciseProgression(json['progression']),
       equipment: json['equipment'] != null
           ? GTGymEquipment.values.byName(json['equipment'] as String)
           : GTGymEquipment.none,
@@ -362,6 +371,7 @@ class RoutineExercise extends ConcreteExercise implements Syncable {
     'sort_order': sortOrder,
     'supersedes_id': supersedesId,
     'rpe': rpe,
+    'progression': progression?.toJson(),
     'equipment': equipment.name,
     'updated_at': updatedAt.toUtc().toIso8601String(),
     'deleted': deleted,
@@ -389,6 +399,7 @@ class RoutineExercise extends ConcreteExercise implements Syncable {
       sortOrder: sortOrder,
       supersedesId: Value(supersedesId),
       rpe: Value(rpe),
+      progression: Value(progression),
       equipment: Value(equipment),
       updatedAt: Value(updatedAt),
       deleted: Value(deleted),
@@ -417,6 +428,7 @@ class HistoryWorkoutExercise extends ConcreteExercise implements Syncable {
     required super.sortOrder,
     required super.supersedesId,
     required super.rpe,
+    super.progression,
     required super.equipment,
     super.updatedAt,
     super.deleted,
@@ -483,6 +495,7 @@ class HistoryWorkoutExercise extends ConcreteExercise implements Syncable {
       supersedesId:
           json['supersedes_id'] as String? ?? json['supersedesId'] as String?,
       rpe: json['rpe'] as int?,
+      progression: parseExerciseProgression(json['progression']),
       equipment: json['equipment'] != null
           ? GTGymEquipment.values.byName(json['equipment'] as String)
           : GTGymEquipment.none,
@@ -518,6 +531,7 @@ class HistoryWorkoutExercise extends ConcreteExercise implements Syncable {
     'sort_order': sortOrder,
     'supersedes_id': supersedesId,
     'rpe': rpe,
+    'progression': progression?.toJson(),
     'equipment': equipment.name,
     'updated_at': updatedAt.toUtc().toIso8601String(),
     'deleted': deleted,
@@ -545,6 +559,7 @@ class HistoryWorkoutExercise extends ConcreteExercise implements Syncable {
       sortOrder: sortOrder,
       supersedesId: Value(supersedesId),
       rpe: Value(rpe),
+      progression: Value(progression),
       equipment: Value(equipment),
       updatedAt: Value(updatedAt),
       deleted: Value(deleted),
@@ -573,4 +588,23 @@ class MuscleGroupSetConverter
   String toSql(Set<GTMuscleGroup> value) {
     return value.map((e) => e.name).join(',');
   }
+}
+
+ExerciseProgression? parseExerciseProgression(Object? value) {
+  if (value == null) return null;
+  final json = value is String ? jsonDecode(value) : value;
+  return ExerciseProgression.fromJson((json as Map).cast<String, dynamic>());
+}
+
+class ExerciseProgressionConverter
+    extends TypeConverter<ExerciseProgression, String> {
+  const ExerciseProgressionConverter();
+
+  @override
+  ExerciseProgression fromSql(String fromDb) => ExerciseProgression.fromJson(
+    (jsonDecode(fromDb) as Map).cast<String, dynamic>(),
+  );
+
+  @override
+  String toSql(ExerciseProgression value) => jsonEncode(value.toJson());
 }

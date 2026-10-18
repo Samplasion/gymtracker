@@ -30,6 +30,7 @@ import 'package:gymtracker/model/exercise.dart' show GTGymEquipment;
 import 'package:gymtracker/model/history.dart';
 import 'package:gymtracker/model/measurements.dart';
 import 'package:gymtracker/model/preferences.dart';
+import 'package:gymtracker/model/progression.dart';
 import 'package:gymtracker/model/routines.dart';
 import 'package:gymtracker/model/set.dart';
 import 'package:gymtracker/model/superset.dart' as model;
@@ -56,7 +57,7 @@ part 'database.g.dart';
 // Used in the generated code
 const _uuid = Uuid();
 
-const DATABASE_VERSION = 18;
+const DATABASE_VERSION = 19;
 
 abstract class GTDatabase extends GeneratedDatabase with SyncableDatabase {
   GTDatabase(super.e);
@@ -515,6 +516,16 @@ class GTDatabaseImpl extends _$GTDatabaseImpl
                 schema.ongoingData,
                 newColumns: [schema.ongoingData.owner],
               ),
+            );
+          },
+          from18To19: (m, schema) async {
+            await m.addColumn(
+              schema.routineExercises,
+              schema.routineExercises.progression,
+            );
+            await m.addColumn(
+              schema.historyWorkoutExercises,
+              schema.historyWorkoutExercises.progression,
             );
           },
           from16To17: (m, schema) async {
@@ -2520,6 +2531,9 @@ extension WorkoutExercisableDatabaseUtils on model.WorkoutExercisable {
       rpe: this is model.Exercise
           ? Value(asExercise.rpe)
           : const Value.absent(),
+      progression: this is model.Exercise
+          ? Value(asExercise.progression)
+          : const Value.absent(),
       equipment: this is model.Exercise
           ? Value(asExercise.gymEquipment)
           : const Value(GTGymEquipment.none),
@@ -2565,6 +2579,9 @@ extension WorkoutExercisableDatabaseUtils on model.WorkoutExercisable {
       supersedesId: Value.absentIfNull(supersedesID),
       rpe: this is model.Exercise
           ? Value(asExercise.rpe)
+          : const Value.absent(),
+      progression: this is model.Exercise
+          ? Value(asExercise.progression)
           : const Value.absent(),
       equipment: this is model.Exercise
           ? Value(asExercise.gymEquipment)

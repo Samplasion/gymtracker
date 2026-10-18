@@ -18,6 +18,7 @@ import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/utils/sets.dart';
 import 'package:gymtracker/utils/theme.dart';
 import 'package:gymtracker/utils/utils.dart';
+import 'package:gymtracker/view/components/exercise_progression.dart';
 import 'package:gymtracker/view/components/loading_indicator.dart';
 import 'package:gymtracker/view/components/maybe_rich_text.dart';
 import 'package:gymtracker/view/components/parent_viewer.dart';
@@ -457,6 +458,8 @@ class _CurrentSetView extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 8),
+              _SimpleProgressionCard(data: data),
+              const SizedBox(height: 8),
               _NotesBox(
                 title: context.t.exercise.editor.fields.notes.label,
                 text: data.exercise.notes,
@@ -617,8 +620,32 @@ class _NextSetRestView extends StatelessWidget {
                 ),
               ),
             ),
+            const SizedBox(height: 8),
+            _SimpleProgressionCard(data: data),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class _SimpleProgressionCard extends StatelessWidget {
+  const _SimpleProgressionCard({required this.data});
+
+  final _CurrentSetData data;
+
+  @override
+  Widget build(BuildContext context) {
+    final controller = Get.find<WorkoutController>();
+    return SizedBox(
+      width: double.infinity,
+      child: ExerciseProgressionPanel(
+        exercise: data.exercise,
+        weightUnit: controller.weightUnit.value,
+        distanceUnit: controller.distanceUnit.value,
+        index: data.index,
+        callbacks: controller.callbacks,
+        isCreating: false,
       ),
     );
   }

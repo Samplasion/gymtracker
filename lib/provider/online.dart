@@ -463,11 +463,12 @@ class Online extends _$Online {
       // A failed remote deletion must never erase the local copy.
       await _service.deleteAccount();
       manager.setUserId('');
-      await _databaseService.db.clearUserData(account.id);
       globalContainer
           .read(eventBusProvider)
           .emit(GBUserWillLogoutEvent(account));
       await _databaseService.setCurrentUserId(null);
+      // Account-switch hooks may persist its active workout. Purge afterwards.
+      await _databaseService.db.clearUserData(account.id);
       state = const AsyncValue.data(null);
       globalContainer.read(eventBusProvider).emit(GBUserDidLogoutEvent());
     } catch (_) {

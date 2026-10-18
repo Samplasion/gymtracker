@@ -2725,5 +2725,12 @@
     "title": "Si è verificato un errore",
     "retry": "Riprova",
     "logs": "Apri log"
+  },
+  "legacyWorkoutRecovery": {
+    "title": "Allenamento precedente da recuperare",
+    "action": "Recupera in questo account",
+    "confirm": "Recuperare questo allenamento in ${account}? Diventerà l’allenamento in corso di questo account.",
+    "guest": "Ospite",
+    "failed": "Impossibile recuperare l’allenamento. Verifica che questo account non abbia un allenamento in corso, poi riprova."
   }
 }

@@ -28,6 +28,7 @@ import 'package:gymtracker/model/superset.dart';
 import 'package:gymtracker/model/workout.dart';
 import 'package:gymtracker/provider/locale.dart';
 import 'package:gymtracker/service/logger.dart';
+import 'package:gymtracker/service/database.dart';
 import 'package:gymtracker/service/native.dart';
 import 'package:gymtracker/struct/editor_callback.dart';
 import 'package:gymtracker/struct/optional.dart';
@@ -52,6 +53,8 @@ typedef WorkoutSetCursor = ({
 });
 
 class WorkoutController extends GetxController with ServiceableController {
+  final String? ownerId;
+  bool preserveOngoingOnClose = false;
   RxString name;
   Rx<DateTime> time;
   Rx<String?> parentID;
@@ -65,7 +68,8 @@ class WorkoutController extends GetxController with ServiceableController {
   RxList<WorkoutExercisable> exercises = <WorkoutExercisable>[].obs;
 
   WorkoutController(String name, String? parentID, String? infobox)
-    : name = name.obs,
+    : ownerId = Get.find<DatabaseService>().db.currentUserId,
+      name = name.obs,
       time = DateTime.now().obs,
       parentID = Rx<String?>(parentID),
       infobox = Rx<String?>(infobox),
@@ -92,6 +96,7 @@ class WorkoutController extends GetxController with ServiceableController {
 
   void _initFirstSync() {
     SchedulerBinding.instance.addPostFrameCallback((_) {
+      if (isClosed || ownerId != service.db.currentUserId) return;
       // Wait for the context to be available
       if (Get.context == null) {
         _initFirstSync();
@@ -624,6 +629,7 @@ class WorkoutController extends GetxController with ServiceableController {
   void onInit() {
     super.onInit();
     SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
+      if (isClosed || ownerId != service.db.currentUserId) return;
       Get.find<RoutinesController>().hasOngoingWorkout(true);
       NativeService.instance().setIsWorkoutRunning(true);
       save();
@@ -637,17 +643,23 @@ class WorkoutController extends GetxController with ServiceableController {
     super.onClose();
     removeCountdown();
     removeRelevantStopwatches();
+    if (!preserveOngoingOnClose) {
+      unawaited(service.db.deleteOngoingForUser(ownerId));
+    }
     SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
+      if (Get.isRegistered<WorkoutController>()) return;
       Get.find<RoutinesController>().hasOngoingWorkout(false);
       NativeService.instance().setIsWorkoutRunning(false);
-      service.deleteOngoing();
     });
   }
 
   /// Writes the ongoing workout to the database so that we can restore it on app restart.
-  void save() {
+  void save() => unawaited(persist());
+
+  Future<void> persist({bool force = false}) async {
+    if (isClosed || ownerId != service.db.currentUserId) return;
     // TODO: Figure out if this is still necessary
-    if (Get.find<RoutinesController>().hasOngoingWorkout.isFalse) {
+    if (!force && Get.find<RoutinesController>().hasOngoingWorkout.isFalse) {
       logger.d(
         "Not saving ongoing workout because there is no ongoing workout",
       );
@@ -655,7 +667,7 @@ class WorkoutController extends GetxController with ServiceableController {
     }
     final stopwatchController = Get.find<StopwatchController>();
 
-    service.writeToOngoing({
+    await service.writeToOngoing({
       "name": name.value,
       "exercises": exercises.map((ex) => ex.toJson()).toList(),
       "parentID": parentID.value,
@@ -745,6 +757,9 @@ class WorkoutController extends GetxController with ServiceableController {
   }
 
   Future<void> submit(String name, Duration duration) async {
+    if (isClosed || ownerId != service.db.currentUserId) {
+      throw StateError('Cannot submit a workout belonging to another account');
+    }
     final historyController = Get.find<HistoryController>();
 
     removeCountdown();
@@ -1663,6 +1678,7 @@ and:
   }
 
   void refreshWatchData() {
+    if (isClosed || ownerId != service.db.currentUserId) return;
     final t = globalContainer.read(translationsProvider);
     final ctdctrl = Get.find<CountdownController>();
     final startingTime = ctdctrl.startingTime.value;

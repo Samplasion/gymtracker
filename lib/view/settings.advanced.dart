@@ -90,6 +90,7 @@ class AdvancedSettingsView extends ConsumerWidget {
                     await controller.showBackups();
                   },
                 ),
+                const LegacyWorkoutRecoveryTile(),
                 const SyncStatusListTile(),
                 if (account != null) ...[
                   Divider(),

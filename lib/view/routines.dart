@@ -24,6 +24,7 @@ import 'package:gymtracker/view/boutique.dart';
 import 'package:gymtracker/view/components/badges.dart';
 import 'package:gymtracker/view/components/content_unavailable.dart';
 import 'package:gymtracker/view/components/controlled.dart';
+import 'package:gymtracker/view/components/legacy_workout_recovery.dart';
 import 'package:gymtracker/view/components/error_view.dart';
 import 'package:gymtracker/view/components/infobox.dart';
 import 'package:gymtracker/view/components/pro_builder.dart';
@@ -150,6 +151,8 @@ class _RoutinesViewState extends ConsumerState<RoutinesView> with _RoutineList {
               ),
             ],
           ),
+          if (!isLoading)
+            const SliverToBoxAdapter(child: LegacyWorkoutRecoveryTile()),
           SliverToBoxAdapter(
             child: SubscriptionNag(
               stringKey: "routines",

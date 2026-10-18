@@ -3673,8 +3673,18 @@ class $OngoingDataTable extends OngoingData
     type: DriftSqlType.string,
     requiredDuringInsert: true,
   );
+  static const VerificationMeta _ownerMeta = const VerificationMeta('owner');
   @override
-  List<GeneratedColumn> get $columns => [data];
+  late final GeneratedColumn<String> owner = GeneratedColumn<String>(
+    'owner',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('legacy'),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [data, owner];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -3695,11 +3705,17 @@ class $OngoingDataTable extends OngoingData
     } else if (isInserting) {
       context.missing(_dataMeta);
     }
+    if (data.containsKey('owner')) {
+      context.handle(
+        _ownerMeta,
+        owner.isAcceptableOrUnknown(data['owner']!, _ownerMeta),
+      );
+    }
     return context;
   }
 
   @override
-  Set<GeneratedColumn> get $primaryKey => const {};
+  Set<GeneratedColumn> get $primaryKey => {owner};
   @override
   OngoingDatum map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
@@ -3707,6 +3723,10 @@ class $OngoingDataTable extends OngoingData
       data: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}data'],
+      )!,
+      owner: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}owner'],
       )!,
     );
   }
@@ -3719,16 +3739,18 @@ class $OngoingDataTable extends OngoingData
 
 class OngoingDatum extends DataClass implements Insertable<OngoingDatum> {
   final String data;
-  const OngoingDatum({required this.data});
+  final String owner;
+  const OngoingDatum({required this.data, required this.owner});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
     map['data'] = Variable<String>(data);
+    map['owner'] = Variable<String>(owner);
     return map;
   }
 
   OngoingDataCompanion toCompanion(bool nullToAbsent) {
-    return OngoingDataCompanion(data: Value(data));
+    return OngoingDataCompanion(data: Value(data), owner: Value(owner));
   }
 
   factory OngoingDatum.fromJson(
@@ -3736,60 +3758,82 @@ class OngoingDatum extends DataClass implements Insertable<OngoingDatum> {
     ValueSerializer? serializer,
   }) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
-    return OngoingDatum(data: serializer.fromJson<String>(json['data']));
+    return OngoingDatum(
+      data: serializer.fromJson<String>(json['data']),
+      owner: serializer.fromJson<String>(json['owner']),
+    );
   }
   @override
   Map<String, dynamic> toJson({ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
-    return <String, dynamic>{'data': serializer.toJson<String>(data)};
+    return <String, dynamic>{
+      'data': serializer.toJson<String>(data),
+      'owner': serializer.toJson<String>(owner),
+    };
   }
 
-  OngoingDatum copyWith({String? data}) =>
-      OngoingDatum(data: data ?? this.data);
+  OngoingDatum copyWith({String? data, String? owner}) =>
+      OngoingDatum(data: data ?? this.data, owner: owner ?? this.owner);
   OngoingDatum copyWithCompanion(OngoingDataCompanion data) {
-    return OngoingDatum(data: data.data.present ? data.data.value : this.data);
+    return OngoingDatum(
+      data: data.data.present ? data.data.value : this.data,
+      owner: data.owner.present ? data.owner.value : this.owner,
+    );
   }
 
   @override
   String toString() {
     return (StringBuffer('OngoingDatum(')
-          ..write('data: $data')
+          ..write('data: $data, ')
+          ..write('owner: $owner')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => data.hashCode;
+  int get hashCode => Object.hash(data, owner);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      (other is OngoingDatum && other.data == this.data);
+      (other is OngoingDatum &&
+          other.data == this.data &&
+          other.owner == this.owner);
 }
 
 class OngoingDataCompanion extends UpdateCompanion<OngoingDatum> {
   final Value<String> data;
+  final Value<String> owner;
   final Value<int> rowid;
   const OngoingDataCompanion({
     this.data = const Value.absent(),
+    this.owner = const Value.absent(),
     this.rowid = const Value.absent(),
   });
   OngoingDataCompanion.insert({
     required String data,
+    this.owner = const Value.absent(),
     this.rowid = const Value.absent(),
   }) : data = Value(data);
   static Insertable<OngoingDatum> custom({
     Expression<String>? data,
+    Expression<String>? owner,
     Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
       if (data != null) 'data': data,
+      if (owner != null) 'owner': owner,
       if (rowid != null) 'rowid': rowid,
     });
   }
 
-  OngoingDataCompanion copyWith({Value<String>? data, Value<int>? rowid}) {
+  OngoingDataCompanion copyWith({
+    Value<String>? data,
+    Value<String>? owner,
+    Value<int>? rowid,
+  }) {
     return OngoingDataCompanion(
       data: data ?? this.data,
+      owner: owner ?? this.owner,
       rowid: rowid ?? this.rowid,
     );
   }
@@ -3799,6 +3843,9 @@ class OngoingDataCompanion extends UpdateCompanion<OngoingDatum> {
     final map = <String, Expression>{};
     if (data.present) {
       map['data'] = Variable<String>(data.value);
+    }
+    if (owner.present) {
+      map['owner'] = Variable<String>(owner.value);
     }
     if (rowid.present) {
       map['rowid'] = Variable<int>(rowid.value);
@@ -3810,6 +3857,7 @@ class OngoingDataCompanion extends UpdateCompanion<OngoingDatum> {
   String toString() {
     return (StringBuffer('OngoingDataCompanion(')
           ..write('data: $data, ')
+          ..write('owner: $owner, ')
           ..write('rowid: $rowid')
           ..write(')'))
         .toString();
@@ -10650,9 +10698,17 @@ typedef $$PreferencesTableProcessedTableManager =
       PrefetchHooks Function()
     >;
 typedef $$OngoingDataTableCreateCompanionBuilder =
-    OngoingDataCompanion Function({required String data, Value<int> rowid});
+    OngoingDataCompanion Function({
+      required String data,
+      Value<String> owner,
+      Value<int> rowid,
+    });
 typedef $$OngoingDataTableUpdateCompanionBuilder =
-    OngoingDataCompanion Function({Value<String> data, Value<int> rowid});
+    OngoingDataCompanion Function({
+      Value<String> data,
+      Value<String> owner,
+      Value<int> rowid,
+    });
 
 class $$OngoingDataTableFilterComposer
     extends Composer<_$GTDatabaseImpl, $OngoingDataTable> {
@@ -10665,6 +10721,11 @@ class $$OngoingDataTableFilterComposer
   });
   ColumnFilters<String> get data => $composableBuilder(
     column: $table.data,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get owner => $composableBuilder(
+    column: $table.owner,
     builder: (column) => ColumnFilters(column),
   );
 }
@@ -10682,6 +10743,11 @@ class $$OngoingDataTableOrderingComposer
     column: $table.data,
     builder: (column) => ColumnOrderings(column),
   );
+
+  ColumnOrderings<String> get owner => $composableBuilder(
+    column: $table.owner,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$OngoingDataTableAnnotationComposer
@@ -10695,6 +10761,9 @@ class $$OngoingDataTableAnnotationComposer
   });
   GeneratedColumn<String> get data =>
       $composableBuilder(column: $table.data, builder: (column) => column);
+
+  GeneratedColumn<String> get owner =>
+      $composableBuilder(column: $table.owner, builder: (column) => column);
 }
 
 class $$OngoingDataTableTableManager
@@ -10729,13 +10798,20 @@ class $$OngoingDataTableTableManager
           updateCompanionCallback:
               ({
                 Value<String> data = const Value.absent(),
+                Value<String> owner = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
-              }) => OngoingDataCompanion(data: data, rowid: rowid),
+              }) =>
+                  OngoingDataCompanion(data: data, owner: owner, rowid: rowid),
           createCompanionCallback:
               ({
                 required String data,
+                Value<String> owner = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
-              }) => OngoingDataCompanion.insert(data: data, rowid: rowid),
+              }) => OngoingDataCompanion.insert(
+                data: data,
+                owner: owner,
+                rowid: rowid,
+              ),
           withReferenceMapper: (p0) => p0
               .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
               .toList(),

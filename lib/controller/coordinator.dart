@@ -63,6 +63,7 @@ class Coordinator extends GetxController
   RxList<RoutineSuggestion> suggestions = <RoutineSuggestion>[].obs;
   final showPermissionTilesStream = BehaviorSubject<bool>.seeded(true);
   StreamSubscription<bool>? _permissionSubscription;
+  Future<void>? _ongoingRestore;
 
   @override
   void onServiceChange() {}
@@ -80,6 +81,7 @@ class Coordinator extends GetxController
       Go.awaitInitialization(),
       get<SettingsController>().awaitInitialized(),
       get<NotificationController>().initialize(),
+      if (_ongoingRestore != null) _ongoingRestore!,
       _awaitRemoteInitialization(globalContainer.read(onlineProvider.future)),
       _awaitRemoteInitialization(get<PurchasesService>().init()),
     ]);
@@ -127,6 +129,8 @@ class Coordinator extends GetxController
 
   @override
   void onClose() async {
+    service.beforeUserChange = null;
+    service.afterUserChange = null;
     EasyDebounce.cancel('scheduleBackup');
     await _permissionSubscription?.cancel();
     await showPermissionTilesStream.close();
@@ -166,6 +170,9 @@ class Coordinator extends GetxController
     Get.put(ErrorController(), permanent: true);
     Get.put(MigrationsController());
 
+    service.beforeUserChange = suspendOngoingWorkout;
+    service.afterUserChange = restoreOngoingWorkout;
+
     // Add any providers that need to live for the app's lifespan here (and mark them as keepAlive)
     globalContainer.read(foodNativeSyncProvider);
 
@@ -178,9 +185,28 @@ class Coordinator extends GetxController
       PurchasesController(get<PurchasesService>(), this, online.onlineService),
     );
 
-    if (service.hasOngoing) {
-      Get.put(WorkoutController.fromSavedData(service.getOngoingData()!));
+    _ongoingRestore = restoreOngoingWorkout();
+  }
+
+  Future<void> suspendOngoingWorkout() async {
+    if (!Get.isRegistered<WorkoutController>()) return;
+    final workout = get<WorkoutController>();
+    await workout.persist(force: true);
+    workout.preserveOngoingOnClose = true;
+    Get.delete<WorkoutController>();
+    get<StopwatchController>().globalStopwatch.reset();
+  }
+
+  Future<void> restoreOngoingWorkout() async {
+    final userId = service.db.currentUserId;
+    final data = await service.db.watchOngoing().first;
+    if (userId != service.db.currentUserId ||
+        data == null ||
+        Get.isRegistered<WorkoutController>()) {
+      return;
     }
+    get<StopwatchController>().globalStopwatch.reset();
+    Get.put(WorkoutController.fromSavedData(data));
   }
 
   /// If the app was launched by a deeplink while it was closed, this method

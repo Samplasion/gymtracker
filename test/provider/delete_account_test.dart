@@ -93,7 +93,9 @@ void main() {
       final deletion = online.deleteAccount();
       expect(
         (await MockServices.database
-                .select((MockServices.database as GTDatabaseImpl).routineFolders)
+                .select(
+                  (MockServices.database as GTDatabaseImpl).routineFolders,
+                )
                 .get())
             .length,
         2,
@@ -108,4 +110,16 @@ void main() {
       verifyNever(() => manager.enableSync());
     },
   );
+  test('cleanup also removes a workout persisted by logout hooks', () async {
+    when(() => service.deleteAccount()).thenAnswer((_) async {});
+    when(() => MockServices.databaseService.setCurrentUserId(null)).thenAnswer((
+      _,
+    ) async {
+      await MockServices.database.setOngoing({'name': 'Last save from A'});
+      MockServices.database.setCurrentUserId(null);
+    });
+    await online.deleteAccount();
+    MockServices.database.setCurrentUserId('A');
+    expect(await MockServices.database.watchOngoing().first, isNull);
+  });
 }

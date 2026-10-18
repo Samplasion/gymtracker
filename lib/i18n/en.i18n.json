@@ -2725,5 +2725,12 @@
     "title": "An unknown error occurred",
     "retry": "Try again",
     "logs": "Open logs"
+  },
+  "legacyWorkoutRecovery": {
+    "title": "Previous workout to recover",
+    "action": "Recover in this account",
+    "confirm": "Recover this workout in ${account}? It will become the ongoing workout for this account.",
+    "guest": "Guest",
+    "failed": "The workout could not be recovered. Check that this account has no ongoing workout, then try again."
   }
 }

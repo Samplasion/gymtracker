@@ -187,6 +187,7 @@ class Translations with BaseTranslations<AppLocale, Translations> {
 	String get you => 'You';
 
 	late final Translations$error$en error = Translations$error$en._(_root);
+	late final Translations$legacyWorkoutRecovery$en legacyWorkoutRecovery = Translations$legacyWorkoutRecovery$en._(_root);
 }
 
 // Path: appInfo
@@ -1994,6 +1995,30 @@ class Translations$error$en {
 
 	/// en: 'Open logs'
 	String get logs => 'Open logs';
+}
+
+// Path: legacyWorkoutRecovery
+class Translations$legacyWorkoutRecovery$en {
+	Translations$legacyWorkoutRecovery$en._(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Previous workout to recover'
+	String get title => 'Previous workout to recover';
+
+	/// en: 'Recover in this account'
+	String get action => 'Recover in this account';
+
+	/// en: 'Recover this workout in ${account}? It will become the ongoing workout for this account.'
+	String confirm({required Object account}) => 'Recover this workout in ${account}? It will become the ongoing workout for this account.';
+
+	/// en: 'Guest'
+	String get guest => 'Guest';
+
+	/// en: 'The workout could not be recovered. Check that this account has no ongoing workout, then try again.'
+	String get failed => 'The workout could not be recovered. Check that this account has no ongoing workout, then try again.';
 }
 
 // Path: set.kindShort
@@ -10324,6 +10349,11 @@ extension on Translations {
 			'error.title' => 'An unknown error occurred',
 			'error.retry' => 'Try again',
 			'error.logs' => 'Open logs',
+			'legacyWorkoutRecovery.title' => 'Previous workout to recover',
+			'legacyWorkoutRecovery.action' => 'Recover in this account',
+			'legacyWorkoutRecovery.confirm' => ({required Object account}) => 'Recover this workout in ${account}? It will become the ongoing workout for this account.',
+			'legacyWorkoutRecovery.guest' => 'Guest',
+			'legacyWorkoutRecovery.failed' => 'The workout could not be recovered. Check that this account has no ongoing workout, then try again.',
 			_ => null,
 		};
 	}

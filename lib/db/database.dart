@@ -56,7 +56,7 @@ part 'database.g.dart';
 // Used in the generated code
 const _uuid = Uuid();
 
-const DATABASE_VERSION = 17;
+const DATABASE_VERSION = 18;
 
 abstract class GTDatabase extends GeneratedDatabase with SyncableDatabase {
   GTDatabase(super.e);
@@ -110,6 +110,9 @@ abstract class GTDatabase extends GeneratedDatabase with SyncableDatabase {
   Stream<Map<String, dynamic>?> watchOngoing();
   Future<void> setOngoing(Map<String, dynamic> ongoing);
   Future deleteOngoing();
+  Future<void> deleteOngoingForUser(String? userId);
+  Stream<Map<String, dynamic>?> watchLegacyOngoing();
+  Future<void> recoverLegacyOngoing();
 
   Stream<List<WeightMeasurement>> watchWeightMeasurements();
   Future<void> insertWeightMeasurement(WeightMeasurement measurement);
@@ -503,6 +506,14 @@ class GTDatabaseImpl extends _$GTDatabaseImpl
             await m.alterTable(TableMigration(schema.routineFolders));
             await m.alterTable(TableMigration(schema.routines));
             await m.alterTable(TableMigration(schema.routineExercises));
+          },
+          from17To18: (m, schema) async {
+            await m.alterTable(
+              TableMigration(
+                schema.ongoingData,
+                newColumns: [schema.ongoingData.owner],
+              ),
+            );
           },
           from16To17: (m, schema) async {
             await m.addColumn(
@@ -1414,27 +1425,79 @@ class GTDatabaseImpl extends _$GTDatabaseImpl
     });
   }
 
+  String _ongoingOwner(String? userId) =>
+      userId == null ? 'guest' : 'user:$userId';
+
   @override
   Stream<Map<String, dynamic>?> watchOngoing() {
-    return select(ongoingData).watch().map((l) {
-      if (l.isEmpty) return null;
-      return jsonDecode(l[0].data);
+    return _watchForCurrentUser(() {
+      final owner = _ongoingOwner(currentUserId);
+      return (select(
+        ongoingData,
+      )..where((row) => row.owner.equals(owner))).watchSingleOrNull().map(
+        (row) =>
+            row == null ? null : jsonDecode(row.data) as Map<String, dynamic>,
+      );
     });
   }
 
   @override
   Future<void> setOngoing(Map<String, dynamic> ongoing) {
-    return transaction(() async {
-      await deleteOngoing();
-      await into(
-        ongoingData,
-      ).insert(OngoingDataCompanion(data: Value(jsonEncode(ongoing))));
-    });
+    final owner = _ongoingOwner(currentUserId);
+    return into(ongoingData).insert(
+      OngoingDataCompanion(
+        data: Value(jsonEncode(ongoing)),
+        owner: Value(owner),
+      ),
+      mode: InsertMode.insertOrReplace,
+    );
   }
 
   @override
-  Future deleteOngoing() {
-    return delete(ongoingData).go();
+  Future<void> deleteOngoing() => deleteOngoingForUser(currentUserId);
+
+  @override
+  Future<void> deleteOngoingForUser(String? userId) {
+    return (delete(
+      ongoingData,
+    )..where((row) => row.owner.equals(_ongoingOwner(userId)))).go();
+  }
+
+  @override
+  Stream<Map<String, dynamic>?> watchLegacyOngoing() {
+    return (select(
+      ongoingData,
+    )..where((row) => row.owner.equals('legacy'))).watchSingleOrNull().map(
+      (row) =>
+          row == null ? null : jsonDecode(row.data) as Map<String, dynamic>,
+    );
+  }
+
+  @override
+  Future<void> recoverLegacyOngoing() {
+    final owner = _ongoingOwner(currentUserId);
+    return transaction(() async {
+      final legacy = await (select(
+        ongoingData,
+      )..where((row) => row.owner.equals('legacy'))).getSingle();
+      final active = await (select(
+        ongoingData,
+      )..where((row) => row.owner.equals(owner))).getSingleOrNull();
+      if (active != null) throw StateError('An ongoing workout already exists');
+      final data = jsonDecode(legacy.data) as Map<String, dynamic>;
+      if (data['name'] is! String ||
+          data['exercises'] is! List ||
+          data['time'] is! int) {
+        throw const FormatException('Invalid saved workout');
+      }
+      for (final exercise in data['exercises'] as List) {
+        model.WorkoutExercisable.fromJson(exercise);
+      }
+      if (owner != _ongoingOwner(currentUserId))
+        throw StateError('The account changed');
+      await (update(ongoingData)..where((row) => row.owner.equals('legacy')))
+          .write(OngoingDataCompanion(owner: Value(owner)));
+    });
   }
 
   @override
@@ -2087,6 +2150,7 @@ class GTDatabaseImpl extends _$GTDatabaseImpl
   @override
   Future<void> clearUserData(String? userId) {
     return transaction(() async {
+      await deleteOngoingForUser(userId);
       for (final table in allTables) {
         final dsl = table.asDslTable;
         if (dsl is SyncableTable) {

@@ -38,6 +38,10 @@ class DatabaseService extends GetxService
   late GTDatabase _db;
   GTDatabase get db => _db;
 
+  Future<void> Function()? beforeUserChange;
+  Future<void> Function()? afterUserChange;
+  Future<void> _userTransition = Future.value();
+
   final exercises$ = BehaviorSubject<List<Exercise>>.seeded([]);
   final routines$ = BehaviorSubject<List<Workout>>.seeded([]);
   final history$ = BehaviorSubject<List<Workout>>.seeded([]);
@@ -659,9 +663,9 @@ class DatabaseService extends GetxService
     }
   }
 
-  void writeToOngoing(Map<String, dynamic> data) {
+  Future<void> writeToOngoing(Map<String, dynamic> data) {
     logger.t("Writing ongoing workout data");
-    _db.setOngoing(data);
+    return _db.setOngoing(data);
   }
 
   Map<String, dynamic>? getOngoingData() {
@@ -856,7 +860,13 @@ class DatabaseService extends GetxService
     });
   }
 
-  Future<void> setCurrentUserId(String? id) async {
+  Future<void> setCurrentUserId(String? id) {
+    final change = _userTransition.then((_) => _changeUser(id));
+    _userTransition = change.catchError((Object _) {});
+    return change;
+  }
+
+  Future<void> _changeUser(String? id) async {
     logger.i(
       "[DatabaseService.setCurrentUserId] Requested userId change: "
       "current='${_db.currentUserId}', new='$id'",
@@ -867,9 +877,12 @@ class DatabaseService extends GetxService
       );
       return;
     }
+    await beforeUserChange?.call();
     // Clear user data before the new queries can emit. Preferences are device-wide.
     eraseAllSubjects(includeDeviceState: false);
+    ongoing$.add(null);
     _db.setCurrentUserId(id);
+    await afterUserChange?.call();
   }
 }
 

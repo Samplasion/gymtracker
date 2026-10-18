@@ -175,6 +175,7 @@ class TranslationsIt with BaseTranslations<AppLocale, Translations> implements T
 	@override late final Translations$profileSearch$it profileSearch = Translations$profileSearch$it._(_root);
 	@override String get you => 'Tu';
 	@override late final Translations$error$it error = Translations$error$it._(_root);
+	@override late final Translations$legacyWorkoutRecovery$it legacyWorkoutRecovery = Translations$legacyWorkoutRecovery$it._(_root);
 }
 
 // Path: appInfo
@@ -1676,6 +1677,20 @@ class Translations$error$it implements Translations$error$en {
 	@override String get title => 'Si è verificato un errore';
 	@override String get retry => 'Riprova';
 	@override String get logs => 'Apri log';
+}
+
+// Path: legacyWorkoutRecovery
+class Translations$legacyWorkoutRecovery$it implements Translations$legacyWorkoutRecovery$en {
+	Translations$legacyWorkoutRecovery$it._(this._root);
+
+	final TranslationsIt _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Allenamento precedente da recuperare';
+	@override String get action => 'Recupera in questo account';
+	@override String confirm({required Object account}) => 'Recuperare questo allenamento in ${account}? Diventerà l’allenamento in corso di questo account.';
+	@override String get guest => 'Ospite';
+	@override String get failed => 'Impossibile recuperare l’allenamento. Verifica che questo account non abbia un allenamento in corso, poi riprova.';
 }
 
 // Path: set.kindShort
@@ -8144,6 +8159,11 @@ extension on TranslationsIt {
 			'error.title' => 'Si è verificato un errore',
 			'error.retry' => 'Riprova',
 			'error.logs' => 'Apri log',
+			'legacyWorkoutRecovery.title' => 'Allenamento precedente da recuperare',
+			'legacyWorkoutRecovery.action' => 'Recupera in questo account',
+			'legacyWorkoutRecovery.confirm' => ({required Object account}) => 'Recuperare questo allenamento in ${account}? Diventerà l’allenamento in corso di questo account.',
+			'legacyWorkoutRecovery.guest' => 'Ospite',
+			'legacyWorkoutRecovery.failed' => 'Impossibile recuperare l’allenamento. Verifica che questo account non abbia un allenamento in corso, poi riprova.',
 			_ => null,
 		};
 	}

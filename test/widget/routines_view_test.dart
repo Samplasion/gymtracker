@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:gymtracker/controller/routines_controller.dart';
 import 'package:gymtracker/model/model.dart';
@@ -14,32 +15,38 @@ void main() {
     await initTestLocalizations();
 
     // Stub routinesController methods and getters
-    when(() => MockServices.routinesController.suggestions)
-        .thenReturn(<RoutineSuggestion>[].obs);
-    when(() => MockServices.routinesController.folders)
-        .thenReturn(<GTRoutineFolder, List<Workout>>{}.obs);
-    when(() => MockServices.routinesController.rootRoutines)
-        .thenReturn(<Workout>[].obs);
-    when(() => MockServices.routinesController.workouts)
-        .thenReturn(<Workout>[
-          Workout(
-            id: 'workout_1',
-            name: 'Test Routine',
-            exercises: [],
-            duration: const Duration(hours: 1),
-            startingDate: DateTime.now(),
-          ),
-        ].obs);
-    when(() => MockServices.routinesController.onServiceChange())
-        .thenAnswer((_) {});
+    when(
+      () => MockServices.routinesController.suggestions,
+    ).thenReturn(<RoutineSuggestion>[].obs);
+    when(
+      () => MockServices.routinesController.folders,
+    ).thenReturn(<GTRoutineFolder, List<Workout>>{}.obs);
+    when(
+      () => MockServices.routinesController.rootRoutines,
+    ).thenReturn(<Workout>[].obs);
+    when(() => MockServices.routinesController.workouts).thenReturn(
+      <Workout>[
+        Workout(
+          id: 'workout_1',
+          name: 'Test Routine',
+          exercises: [],
+          duration: const Duration(hours: 1),
+          startingDate: DateTime.now(),
+        ),
+      ].obs,
+    );
+    when(
+      () => MockServices.routinesController.onServiceChange(),
+    ).thenAnswer((_) {});
   });
 
   tearDown(() {
     MockServices.tearDown();
   });
 
-  testWidgets('RoutinesView renders successfully with create options',
-      (WidgetTester tester) async {
+  testWidgets('RoutinesView renders successfully with create options', (
+    WidgetTester tester,
+  ) async {
     await tester.pumpWidget(
       const WidgetTestApp(wrapWithProviderScope: true, child: RoutinesView()),
     );
@@ -48,5 +55,7 @@ void main() {
     // Verify view has "New routine" and "New folder" options
     expect(find.textContaining('New routine'), findsOneWidget);
     expect(find.textContaining('New folder'), findsOneWidget);
+    await tester.pumpWidget(const SizedBox.shrink());
+    await tester.pumpAndSettle();
   });
 }

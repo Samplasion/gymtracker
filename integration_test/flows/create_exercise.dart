@@ -1,31 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:gymtracker/i18n/strings.g.dart';
 import 'package:gymtracker/icons/gymtracker_icons.dart';
-import 'package:gymtracker/main.dart';
 import 'package:gymtracker/model/exercise.dart';
 import 'package:gymtracker/model/set.dart';
 import 'package:gymtracker/service/database.dart';
-import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/view/components/badges.dart';
 
 import '../../test/expectations.dart';
+import '../utils.dart';
 
 Future<void> testCreateExerciseFlow(
   WidgetTester tester,
-  GTLocalizations l,
   DatabaseService databaseService,
 ) async {
   // Load app widget.
-  await tester.pumpWidget(
-    MainApp(localizations: l, databaseService: databaseService),
-    duration: const Duration(seconds: 5),
-  );
-
-  // Wait for the app to finish loading
-  await tester.pumpAndSettle(const Duration(seconds: 5));
+  await awaitApp(tester, databaseService);
 
   // Verify that the app has started.
-  expect(find.text('library.title'.t), findsAny);
+  expect(find.text(t.library.title), findsAny);
 
   await tester.tap(
     find.descendant(
@@ -36,17 +29,17 @@ Future<void> testCreateExerciseFlow(
   await tester.tap(find.widgetWithIcon(ListTile, GTIcons.custom_exercises));
   await tester.pumpAndSettle();
   await tester
-      .tap(find.widgetWithText(ListTile, 'library.newCustomExercise'.t));
+      .tap(find.widgetWithText(ListTile, t.library.newCustomExercise));
   await tester.pumpAndSettle();
 
   final titleBtn =
-      find.widgetWithText(TextField, "exercise.editor.fields.title.label".t);
+      find.widgetWithText(TextField, t.exercise.editor.fields.title.label);
   final parametersBtn = find.widgetWithText(
       DropdownButtonFormField<GTSetParameters>,
-      "exercise.editor.fields.parameters.label".t);
+      t.exercise.editor.fields.parameters.label);
   final primaryMuscleGroupBtn = find.widgetWithText(
       DropdownButtonFormField<GTMuscleGroup>,
-      "exercise.editor.fields.primaryMuscleGroup.label".t);
+      t.exercise.editor.fields.primaryMuscleGroup.label);
   final setFields = [
     titleBtn,
     parametersBtn,
@@ -60,14 +53,14 @@ Future<void> testCreateExerciseFlow(
   await tester.tap(setFields[1]);
   await tester.pumpAndSettle();
   await tester.tap(find.widgetWithText(DropdownMenuItem<GTSetParameters>,
-      "exercise.editor.fields.parameters.values.time".t));
+      t.exercise.editor.fields.parameters.values['time']!));
   await tester.pumpAndSettle();
   await tester.tap(setFields[2]);
   await tester.pumpAndSettle();
   await tester.tap(find.widgetWithText(
-      DropdownMenuItem<GTMuscleGroup>, "muscleGroups.chest".t));
+      DropdownMenuItem<GTMuscleGroup>, t.muscleGroups['chest']!));
   await tester.pumpAndSettle();
-  await tester.tap(find.widgetWithText(ChoiceChip, "muscleGroups.triceps".t));
+  await tester.tap(find.widgetWithText(ChoiceChip, t.muscleGroups['triceps']!));
   await tester.pumpAndSettle();
 
   await tester.tap(find.byKey(const Key('done')));

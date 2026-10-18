@@ -58,7 +58,7 @@ void main() {
 
     // 1. By default, with no matching local custom exercise, starting should be disabled.
     await tester.pumpWidget(WidgetTestApp(
-      child: ExercisesView(workout: workout),
+      child: ExercisesView(workout: workout, isOwned: false),
     ));
     await tester.pumpAndSettle();
 
@@ -74,7 +74,7 @@ void main() {
         .thenReturn(<Exercise>[customEx].obs);
 
     await tester.pumpWidget(WidgetTestApp(
-      child: ExercisesView(workout: workout),
+      child: ExercisesView(workout: workout, isOwned: false),
     ));
     await tester.pumpAndSettle();
 

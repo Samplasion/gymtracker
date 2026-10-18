@@ -20,6 +20,16 @@ void main() {
         .thenReturn(<GTRoutineFolder, List<Workout>>{}.obs);
     when(() => MockServices.routinesController.rootRoutines)
         .thenReturn(<Workout>[].obs);
+    when(() => MockServices.routinesController.workouts)
+        .thenReturn(<Workout>[
+          Workout(
+            id: 'workout_1',
+            name: 'Test Routine',
+            exercises: [],
+            duration: const Duration(hours: 1),
+            startingDate: DateTime.now(),
+          ),
+        ].obs);
     when(() => MockServices.routinesController.onServiceChange())
         .thenAnswer((_) {});
   });
@@ -30,7 +40,9 @@ void main() {
 
   testWidgets('RoutinesView renders successfully with create options',
       (WidgetTester tester) async {
-    await tester.pumpWidget(const WidgetTestApp(child: RoutinesView()));
+    await tester.pumpWidget(
+      const WidgetTestApp(wrapWithProviderScope: true, child: RoutinesView()),
+    );
     await tester.pump();
 
     // Verify view has "New routine" and "New folder" options

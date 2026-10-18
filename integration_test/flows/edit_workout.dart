@@ -4,12 +4,10 @@ import 'package:flutter_quill_test/flutter_quill_test.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:gymtracker/data/exercises.dart';
 import 'package:gymtracker/icons/gymtracker_icons.dart';
-import 'package:gymtracker/main.dart';
 import 'package:gymtracker/model/exercise.dart';
 import 'package:gymtracker/model/set.dart';
 import 'package:gymtracker/model/workout.dart';
 import 'package:gymtracker/service/database.dart';
-import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/struct/optional.dart';
 import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/view/exercises.dart';
@@ -58,22 +56,15 @@ Workout get baseRoutine {
 
 Future<void> testEditWorkoutFlow(
   WidgetTester tester,
-  GTLocalizations l,
   DatabaseService databaseService,
 ) async {
-  // Load app widget.
-  await tester.pumpWidget(
-    MainApp(localizations: l, databaseService: databaseService),
-    duration: const Duration(seconds: 5),
-  );
-
   // Manually add the routine
   // We can do it this way since we verified the "Create routine" flow
   // is working in another test
   databaseService.setRoutine(baseRoutine);
 
-  // Wait for the app to finish loading
-  await tester.pumpAndSettle(const Duration(seconds: 5));
+  // Load app widget.
+  await awaitApp(tester, databaseService);
 
   // Verify that the app has started.
   expect(find.text('New routine'), findsOneWidget);

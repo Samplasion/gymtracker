@@ -3,20 +3,19 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:get/get.dart';
 import 'package:gymtracker/controller/achievements_controller.dart';
 import 'package:gymtracker/data/achievements.dart';
+import 'package:gymtracker/i18n/strings.g.dart';
 import 'package:gymtracker/icons/gymtracker_icons.dart';
 import 'package:gymtracker/model/achievements.dart';
 import 'package:gymtracker/service/database.dart';
-import 'package:gymtracker/service/localizations.dart';
 
 import '../utils.dart';
 
 Future<void> testAchievementsFlow(
   WidgetTester tester,
-  GTLocalizations l,
   DatabaseService databaseService,
 ) async {
   // Load app widget.
-  await awaitApp(tester, l, databaseService);
+  await awaitApp(tester, databaseService);
 
   final achievementsController = Get.find<AchievementsController>();
   final firstSteps = achievements["firstSteps"]!;
@@ -45,5 +44,5 @@ Future<void> testAchievementsFlow(
 
   // 4. Verify achievement is now unlocked in controller and visible
   expect(achievementsController.isUnlocked(firstSteps, firstLevel), true);
-  expect(find.textContaining("achievements.firstSteps.title".t), findsAtLeast(1));
+  expect(find.textContaining(t.achievements.firstSteps.title), findsAtLeast(1));
 }

@@ -1,11 +1,12 @@
 import 'package:drift/native.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:get/get.dart';
+import 'package:gymtracker/i18n/strings.g.dart';
+import 'package:gymtracker/main.dart';
 import 'package:gymtracker/service/color.dart';
 import 'package:gymtracker/service/database.dart';
-import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/service/test.dart';
 import 'package:gymtracker/service/version.dart';
 import 'package:integration_test/integration_test.dart';
@@ -30,11 +31,12 @@ void main() async {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
   TestService().isTest = true;
   late DatabaseService databaseService = DatabaseService();
-  final l = GTLocalizations();
   await databaseService.ensureInitializedForTests(NativeDatabase.memory(), null);
 
   setUp(() async {
     IntegrationTestWidgetsFlutterBinding.instance.reset();
+    globalContainer = ProviderContainer();
+    LocaleSettings.setLocale(AppLocale.en);
     await ColorService().init();
     await VersionService().init();
 
@@ -42,8 +44,6 @@ void main() async {
         await FlutterTimezone.getLocalTimezone();
     tz.initializeTimeZones();
     tz.setLocalLocation(tz.getLocation(currentTimeZone.identifier));
-
-    await l.initTests(const [Locale("en")]);
   });
 
   tearDown(() async {
@@ -60,59 +60,59 @@ void main() async {
   group('end-to-end test', () {
     testWidgets(
       'create routine',
-      (tester) => testCreateRoutineFlow(tester, l, databaseService),
+      (tester) => testCreateRoutineFlow(tester, databaseService),
     );
     testWidgets(
       'create workout from routine and save it back',
-      (tester) => testWorkoutFromRoutineFlow(tester, l, databaseService),
+      (tester) => testWorkoutFromRoutineFlow(tester, databaseService),
     );
     testWidgets(
       'edit workout',
-      (tester) => testEditWorkoutFlow(tester, l, databaseService),
+      (tester) => testEditWorkoutFlow(tester, databaseService),
     );
     group("edit exercise", () {
       testWidgets(
         'edit an exercise that was saved in a routine and/or in history',
         (tester) =>
-            testEditExerciseInRoutineAndHistoryFlow(tester, l, databaseService),
+            testEditExerciseInRoutineAndHistoryFlow(tester, databaseService),
       );
       testWidgets(
         'edit exercise while workout is ongoing',
         (tester) => testEditExerciseWhileWorkoutIsOngoingFlow(
-            tester, l, databaseService),
+            tester, databaseService),
       );
     });
     testWidgets(
       'create exercise',
-      (tester) => testCreateExerciseFlow(tester, l, databaseService),
+      (tester) => testCreateExerciseFlow(tester, databaseService),
     );
     testWidgets(
       'create routine from history workout',
-      (tester) => testRoutineFromWorkout(tester, l, databaseService),
+      (tester) => testRoutineFromWorkout(tester, databaseService),
     );
     testWidgets(
       'combine workouts',
-      (tester) => testCombineWorkoutsFlow(tester, l, databaseService),
+      (tester) => testCombineWorkoutsFlow(tester, databaseService),
     );
     testWidgets(
       'edit workout combination',
-      (tester) => testEditWorkoutCombinationFlow(tester, l, databaseService),
+      (tester) => testEditWorkoutCombinationFlow(tester, databaseService),
     );
     testWidgets(
       'test default units',
-      (tester) => testDefaultUnitsFlow(tester, l, databaseService),
+      (tester) => testDefaultUnitsFlow(tester, databaseService),
     );
     testWidgets(
       'delete routine',
-      (tester) => testDeleteRoutineFlow(tester, l, databaseService),
+      (tester) => testDeleteRoutineFlow(tester, databaseService),
     );
     testWidgets(
       'log weight',
-      (tester) => testLogWeightFlow(tester, l, databaseService),
+      (tester) => testLogWeightFlow(tester, databaseService),
     );
     testWidgets(
       'achievements check',
-      (tester) => testAchievementsFlow(tester, l, databaseService),
+      (tester) => testAchievementsFlow(tester, databaseService),
     );
   });
 }

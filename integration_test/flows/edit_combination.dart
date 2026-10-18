@@ -3,13 +3,13 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:get/get.dart';
 import 'package:gymtracker/controller/history_controller.dart';
 import 'package:gymtracker/controller/workout_controller.dart';
+import 'package:gymtracker/i18n/strings.g.dart';
 import 'package:gymtracker/icons/gymtracker_icons.dart';
 import 'package:gymtracker/model/exercise.dart';
 import 'package:gymtracker/model/set.dart';
 import 'package:gymtracker/model/superset.dart';
 import 'package:gymtracker/model/workout.dart';
 import 'package:gymtracker/service/database.dart';
-import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/view/exercises.dart';
 import 'package:gymtracker/view/utils/history_workout.dart';
@@ -74,10 +74,9 @@ final historyWorkoutBase = Workout(
 
 Future<void> testEditWorkoutCombinationFlow(
   WidgetTester tester,
-  GTLocalizations l,
   DatabaseService databaseService,
 ) async {
-  await awaitApp(tester, l, databaseService);
+  await awaitApp(tester, databaseService);
   // await databaseService.setRoutine(routine);
   await databaseService.setHistoryWorkout(historyWorkoutBase);
   expect(historyWorkoutBase.isContinuable, true);
@@ -94,9 +93,9 @@ Future<void> testEditWorkoutCombinationFlow(
   await tester.tap(find.byType(HistoryWorkout));
   await tester.pumpAndSettle();
 
-  expect(find.text("workouts.actions.continue".t), findsOneWidget);
+  expect(find.text(t.workouts.actions.kContinue), findsOneWidget);
 
-  await tester.tap(find.text("workouts.actions.continue".t));
+  await tester.tap(find.text(t.workouts.actions.kContinue));
   await tester.pumpAndSettle(const Duration(seconds: 2));
 
   WorkoutController controller = Get.find<WorkoutController>();

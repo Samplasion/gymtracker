@@ -58,7 +58,7 @@ class MyHttpOverrides extends HttpOverrides {
 }
 
 // TODO: Move ProviderContainer back inside the widget tree once Getx is fully migrated.
-late final ProviderContainer globalContainer;
+late ProviderContainer globalContainer;
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 void main() async {

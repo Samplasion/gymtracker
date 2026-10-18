@@ -5,32 +5,26 @@ import 'package:gymtracker/controller/settings_controller.dart';
 import 'package:gymtracker/controller/workout_controller.dart';
 import 'package:gymtracker/data/distance.dart';
 import 'package:gymtracker/data/weights.dart';
+import 'package:gymtracker/i18n/strings.g.dart';
 import 'package:gymtracker/icons/gymtracker_icons.dart';
-import 'package:gymtracker/main.dart';
 import 'package:gymtracker/service/database.dart';
-import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/view/workout.dart';
+
+import '../utils.dart';
 
 WorkoutController get workoutController => Get.find<WorkoutController>();
 
 Future<void> testDefaultUnitsFlow(
   WidgetTester tester,
-  GTLocalizations l,
   DatabaseService databaseService,
 ) async {
   // Load app widget.
-  await tester.pumpWidget(
-    MainApp(localizations: l, databaseService: databaseService),
-    duration: const Duration(seconds: 5),
-  );
-
-  // Wait for the app to finish loading
-  await tester.pumpAndSettle(const Duration(seconds: 5));
+  await awaitApp(tester, databaseService);
 
   // Verify that the app has started.
-  expect(find.text('routines.quickWorkout.title'.t), findsOneWidget);
+  expect(find.text(t.routines.quickWorkout.title), findsOneWidget);
 
-  await tester.tap(find.text("routines.quickWorkout.title".t));
+  await tester.tap(find.text(t.routines.quickWorkout.title));
   await tester.pumpAndSettle();
 
   // Verify that we're now at the workout page
@@ -43,12 +37,12 @@ Future<void> testDefaultUnitsFlow(
   // Discard the workout
   await tester.tap(find.byKey(const Key("main-menu")));
   await tester.pumpAndSettle();
-  await tester.tap(find.text("ongoingWorkout.actions.cancel".t));
+  await tester.tap(find.text(t.ongoingWorkout.actions.cancel));
   await tester.pumpAndSettle();
 
   expect(find.byType(AlertDialog), findsOneWidget);
 
-  await tester.tap(find.text("ongoingWorkout.cancel.actions.yes".t));
+  await tester.tap(find.text(t.ongoingWorkout.cancel.actions.yes));
   await tester.pumpAndSettle();
 
   // Go to the settings and change the units
@@ -59,18 +53,18 @@ Future<void> testDefaultUnitsFlow(
   );
   await tester.pumpAndSettle();
 
-  await tester.tap(find.text("settings.panes.units".t));
+  await tester.tap(find.text(t.settings.panes.units));
   await tester.pumpAndSettle();
-  await tester.tap(find.text("settings.options.weightUnit.label".t));
+  await tester.tap(find.text(t.settings.options.weightUnit.label));
   await tester.pumpAndSettle();
-  await tester.tap(find.text("weightUnits.lb".t));
+  await tester.tap(find.text(t.weightUnits['lb']!));
   await tester.pumpAndSettle();
   await tester.tap(find.text("OK"));
   await tester.pumpAndSettle();
 
-  await tester.tap(find.text("settings.options.distanceUnit.label".t));
+  await tester.tap(find.text(t.settings.options.distanceUnit.label));
   await tester.pumpAndSettle();
-  await tester.tap(find.text("distanceUnits.mi".t));
+  await tester.tap(find.text(t.distanceUnits['mi']!));
   await tester.pumpAndSettle();
   await tester.tap(find.text("OK"));
   await tester.pumpAndSettle();
@@ -90,7 +84,7 @@ Future<void> testDefaultUnitsFlow(
   await tester.pumpAndSettle();
 
   // Start another workout and check that the units have changed
-  await tester.tap(find.text("routines.quickWorkout.title".t));
+  await tester.tap(find.text(t.routines.quickWorkout.title));
   await tester.pumpAndSettle();
 
   // Verify that we're now at the workout page
@@ -103,11 +97,11 @@ Future<void> testDefaultUnitsFlow(
   // Cleanup
   await tester.tap(find.byKey(const Key("main-menu")));
   await tester.pumpAndSettle();
-  await tester.tap(find.text("ongoingWorkout.actions.cancel".t));
+  await tester.tap(find.text(t.ongoingWorkout.actions.cancel));
   await tester.pumpAndSettle();
 
   expect(find.byType(AlertDialog), findsOneWidget);
 
-  await tester.tap(find.text("ongoingWorkout.cancel.actions.yes".t));
+  await tester.tap(find.text(t.ongoingWorkout.cancel.actions.yes));
   await tester.pumpAndSettle();
 }

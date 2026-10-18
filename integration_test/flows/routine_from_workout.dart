@@ -2,54 +2,48 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get/get.dart';
 import 'package:gymtracker/controller/routines_controller.dart';
+import 'package:gymtracker/i18n/strings.g.dart';
 import 'package:gymtracker/icons/gymtracker_icons.dart';
-import 'package:gymtracker/main.dart';
 import 'package:gymtracker/service/database.dart';
-import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/view/utils/history_workout.dart';
 import 'package:gymtracker/view/workout.dart';
+
+import '../utils.dart';
 
 const workoutName = "Workout";
 
 Future<void> testRoutineFromWorkout(
   WidgetTester tester,
-  GTLocalizations l,
   DatabaseService databaseService,
 ) async {
   // Load app widget.
-  await tester.pumpWidget(
-    MainApp(localizations: l, databaseService: databaseService),
-    duration: const Duration(seconds: 5),
-  );
-  // Wait for the app to finish loading
-  await tester.pumpAndSettle(const Duration(seconds: 5));
+  await awaitApp(tester, databaseService);
 
-  await createWorkout(tester, l, databaseService);
-  await createRoutineFromWorkout(tester, l, databaseService);
-  await checkRoutine(tester, l, databaseService);
+  await createWorkout(tester, databaseService);
+  await createRoutineFromWorkout(tester, databaseService);
+  await checkRoutine(tester, databaseService);
 }
 
 Future<void> createWorkout(
   WidgetTester tester,
-  GTLocalizations l,
   DatabaseService databaseService,
 ) async {
   // Verify that the app has started.
-  expect(find.text('routines.quickWorkout.title'.t), findsOneWidget);
+  expect(find.text(t.routines.quickWorkout.title), findsOneWidget);
 
   await tester
-      .tap(find.widgetWithText(ListTile, 'routines.quickWorkout.title'.t));
+      .tap(find.widgetWithText(ListTile, t.routines.quickWorkout.title));
   await tester.pumpAndSettle();
 
   expect(find.byType(WorkoutView), findsOneWidget);
 
   await tester
-      .tap(find.widgetWithText(FilledButton, 'ongoingWorkout.exercises.add'.t));
+      .tap(find.widgetWithText(FilledButton, t.ongoingWorkout.exercises.add));
   await tester.pumpAndSettle();
-  await tester.tap(find.widgetWithText(ListTile, 'library.abs.name'.t));
+  await tester.tap(find.widgetWithText(ListTile, t.library.abs.name));
   await tester.pumpAndSettle();
   await tester
-      .tap(find.widgetWithText(ListTile, 'library.abs.exercises.crunches'.t));
+      .tap(find.widgetWithText(ListTile, t.library.abs.exercises.crunches));
   await tester.pumpAndSettle();
   await tester.tap(find.byKey(const Key('pick')));
   await tester.pumpAndSettle();
@@ -58,7 +52,7 @@ Future<void> createWorkout(
   // Add two more sets
   final addSetButton = find.widgetWithText(
     FilledButton,
-    "exercise.actions.addSet".t,
+    t.exercise.actions.addSet,
   );
 
   await tester.tap(addSetButton);
@@ -84,7 +78,7 @@ Future<void> createWorkout(
   await tester.enterText(
     find.widgetWithText(
       TextField,
-      "ongoingWorkout.finish.fields.name.label".t,
+      t.ongoingWorkout.finish.fields.name.label,
     ),
     workoutName,
   );
@@ -103,7 +97,6 @@ Future<void> createWorkout(
 
 Future<void> createRoutineFromWorkout(
   WidgetTester tester,
-  GTLocalizations l,
   DatabaseService databaseService,
 ) async {
   await tester.tap(
@@ -120,7 +113,7 @@ Future<void> createRoutineFromWorkout(
   await tester.tap(find.byKey(const Key("save-as-routine")));
   await tester.pumpAndSettle();
 
-  expect(find.widgetWithText(SnackBar, "workouts.actions.saveAsRoutine.done".t),
+  expect(find.widgetWithText(SnackBar, t.workouts.actions.saveAsRoutine.done),
       findsOneWidget);
   await tester.tap(find.byType(BackButton));
   await tester.pumpAndSettle();
@@ -137,7 +130,6 @@ Future<void> createRoutineFromWorkout(
 
 Future<void> checkRoutine(
   WidgetTester tester,
-  GTLocalizations l,
   DatabaseService databaseService,
 ) async {
   final routine = Get.find<RoutinesController>().workouts.single;

@@ -2,13 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get/get.dart';
 import 'package:gymtracker/controller/exercises_controller.dart';
+import 'package:gymtracker/i18n/strings.g.dart';
 import 'package:gymtracker/icons/gymtracker_icons.dart';
-import 'package:gymtracker/main.dart';
 import 'package:gymtracker/model/exercise.dart';
 import 'package:gymtracker/model/set.dart';
 import 'package:gymtracker/model/workout.dart';
 import 'package:gymtracker/service/database.dart';
-import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/service/logger.dart';
 import 'package:gymtracker/struct/optional.dart';
 
@@ -31,17 +30,10 @@ final Exercise baseExercise = Exercise.custom(
 
 Future<void> testEditExerciseInRoutineAndHistoryFlow(
   WidgetTester tester,
-  GTLocalizations l,
   DatabaseService databaseService,
 ) async {
   // Load app widget.
-  await tester.pumpWidget(
-    MainApp(localizations: l, databaseService: databaseService),
-    duration: const Duration(seconds: 5),
-  );
-
-  // Wait for the app to finish loading
-  await tester.pumpAndSettle(const Duration(seconds: 5));
+  await awaitApp(tester, databaseService);
 
   print("Starting database state: ${databaseService.toJson()}");
 
@@ -139,7 +131,7 @@ Future<void> testEditExerciseInRoutineAndHistoryFlow(
   // Trigger a frame.
   await tester.pumpAndSettle();
 
-  expect(find.text('library.title'.t), findsAny);
+  expect(find.text(t.library.title), findsAny);
 
   await tester.tap(
     find.descendant(
@@ -156,14 +148,14 @@ Future<void> testEditExerciseInRoutineAndHistoryFlow(
   await tester.pumpAndSettle();
   await tester.tap(find.byKey(const Key('menu')));
   await tester.pumpAndSettle();
-  await tester.tap(find.widgetWithText(PopupMenuItem, "actions.edit".t));
+  await tester.tap(find.widgetWithText(PopupMenuItem, t.actions.edit));
   await tester.pumpAndSettle();
 
   final titleBtn =
-      find.widgetWithText(TextField, "exercise.editor.fields.title.label".t);
+      find.widgetWithText(TextField, t.exercise.editor.fields.title.label);
   final primaryMuscleGroupBtn = find.widgetWithText(
       DropdownButtonFormField<GTMuscleGroup>,
-      "exercise.editor.fields.primaryMuscleGroup.label".t);
+      t.exercise.editor.fields.primaryMuscleGroup.label);
   final setFields = [
     titleBtn,
     primaryMuscleGroupBtn,
@@ -178,12 +170,12 @@ Future<void> testEditExerciseInRoutineAndHistoryFlow(
   await tester.pumpAndSettle();
   await tester.tap(
     find.widgetWithText(
-        DropdownMenuItem<GTMuscleGroup>, "muscleGroups.chest".t),
+        DropdownMenuItem<GTMuscleGroup>, t.muscleGroups['chest']!),
     warnIfMissed: false,
   );
   await tester.pumpAndSettle();
-  await tester.tap(find.widgetWithText(ChoiceChip, "muscleGroups.glutes".t));
-  await tester.tap(find.widgetWithText(ChoiceChip, "muscleGroups.triceps".t));
+  await tester.tap(find.widgetWithText(ChoiceChip, t.muscleGroups['glutes']!));
+  await tester.tap(find.widgetWithText(ChoiceChip, t.muscleGroups['triceps']!));
   await tester.pumpAndSettle();
 
   // Save changes (pushes to DB)

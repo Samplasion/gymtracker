@@ -1,4 +1,6 @@
+import 'package:drift/native.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:get/get.dart';
 import 'package:gymtracker/controller/achievements_controller.dart';
 import 'package:gymtracker/controller/coordinator.dart';
@@ -6,15 +8,17 @@ import 'package:gymtracker/controller/countdown_controller.dart';
 import 'package:gymtracker/controller/exercises_controller.dart';
 import 'package:gymtracker/controller/history_controller.dart';
 import 'package:gymtracker/controller/me_controller.dart';
+import 'package:gymtracker/controller/purchases_controller.dart';
 import 'package:gymtracker/controller/routines_controller.dart';
 import 'package:gymtracker/controller/settings_controller.dart';
 import 'package:gymtracker/controller/stopwatch_controller.dart';
 import 'package:gymtracker/data/distance.dart';
 import 'package:gymtracker/data/weights.dart';
-import 'package:gymtracker/controller/purchases_controller.dart';
+import 'package:gymtracker/db/database.dart';
+import 'package:gymtracker/main.dart';
+import 'package:gymtracker/model/exercise.dart';
 import 'package:gymtracker/model/subscription.dart';
 import 'package:gymtracker/model/workout.dart';
-import 'package:gymtracker/model/exercise.dart';
 import 'package:gymtracker/service/database.dart';
 import 'package:gymtracker/service/test.dart';
 import 'package:mocktail/mocktail.dart';
@@ -107,6 +111,7 @@ class MockPurchasesController extends Mock implements PurchasesController {}
 // Global setup helper
 class MockServices {
   static late MockDatabaseService databaseService;
+  static late GTDatabase database;
   static late MockCoordinator coordinator;
   static late MockSettingsController settingsController;
   static late MockRoutinesController routinesController;
@@ -121,7 +126,10 @@ class MockServices {
   static void setup() {
     Get.reset();
     Get.testMode = true;
+    globalContainer = ProviderContainer();
+    database = GTDatabaseImpl.withQueryExecutor(NativeDatabase.memory());
     databaseService = MockDatabaseService();
+    when(() => databaseService.db).thenReturn(database);
     coordinator = MockCoordinator();
     settingsController = MockSettingsController();
     routinesController = MockRoutinesController();
@@ -214,5 +222,6 @@ class MockServices {
   static void tearDown() {
     TestService().isTest = false;
     Get.reset();
+    database.close();
   }
 }

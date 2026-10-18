@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:gymtracker/icons/gymtracker_icons.dart';
 import 'package:gymtracker/service/database.dart';
-import 'package:gymtracker/service/localizations.dart';
 import 'package:gymtracker/view/exercises.dart';
 import 'package:gymtracker/view/utils/history_workout.dart';
 import 'package:gymtracker/view/utils/workout_done.dart';
@@ -12,11 +11,10 @@ import 'create_routine.dart';
 
 Future<void> testWorkoutFromRoutineFlow(
   WidgetTester tester,
-  GTLocalizations l,
   DatabaseService databaseService,
 ) async {
   // Create our routine
-  await testCreateRoutineFlow(tester, l, databaseService);
+  await testCreateRoutineFlow(tester, databaseService);
 
   await tester.tap(find.widgetWithText(ListTile, "Test Routine"));
   await tester.pumpAndSettle();

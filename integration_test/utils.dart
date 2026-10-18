@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:gymtracker/i18n/strings.g.dart';
 import 'package:gymtracker/main.dart';
@@ -19,8 +20,11 @@ Future<void> awaitApp(
 
   // Load app widget.
   await tester.pumpWidget(
-    TranslationProvider(
-      child: MainApp(databaseService: databaseService, key: key),
+    UncontrolledProviderScope(
+      container: globalContainer,
+      child: TranslationProvider(
+        child: MainApp(databaseService: databaseService, key: key),
+      ),
     ),
     duration: const Duration(seconds: 5),
   );

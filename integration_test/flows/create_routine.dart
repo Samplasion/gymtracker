@@ -3,17 +3,15 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:gymtracker/icons/gymtracker_icons.dart';
 import 'package:gymtracker/model/exercise.dart';
 import 'package:gymtracker/service/database.dart';
-import 'package:gymtracker/service/localizations.dart';
 
 import '../utils.dart';
 
 Future<void> testCreateRoutineFlow(
   WidgetTester tester,
-  GTLocalizations l,
   DatabaseService databaseService,
 ) async {
   // Load app widget.
-  await awaitApp(tester, l, databaseService);
+  await awaitApp(tester, databaseService);
 
   // Verify that the app has started.
   expect(find.text('New routine'), findsOneWidget);

@@ -2,19 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get/get.dart';
 import 'package:gymtracker/controller/me_controller.dart';
+import 'package:gymtracker/i18n/strings.g.dart';
 import 'package:gymtracker/icons/gymtracker_icons.dart';
 import 'package:gymtracker/service/database.dart';
-import 'package:gymtracker/service/localizations.dart';
 
 import '../utils.dart';
 
 Future<void> testLogWeightFlow(
   WidgetTester tester,
-  GTLocalizations l,
   DatabaseService databaseService,
 ) async {
   // Load app widget.
-  await awaitApp(tester, l, databaseService);
+  await awaitApp(tester, databaseService);
 
   // 1. Navigate to the Me tab
   await tester.tap(
@@ -25,14 +24,14 @@ Future<void> testLogWeightFlow(
   await tester.pumpAndSettle();
 
   // 2. Verify we are on the Me page
-  expect(find.text("me.title".t), findsAtLeast(1));
+  expect(find.text(t.me.title), findsAtLeast(1));
 
   // 3. Tap the "Add measurement" button
-  await tester.tap(find.widgetWithText(TextButton, "me.weight.addMeasurement".t));
+  await tester.tap(find.widgetWithText(TextButton, t.me.weight.addMeasurement));
   await tester.pumpAndSettle();
 
   // 4. Fill in the weight field (e.g. 75.5 kg)
-  final weightField = find.widgetWithText(TextField, "me.addWeight.weight.label".t);
+  final weightField = find.widgetWithText(TextField, t.me.addWeight.weight.label);
   expect(weightField, findsOneWidget);
   await tester.enterText(weightField, "75.5");
   await tester.pumpAndSettle();

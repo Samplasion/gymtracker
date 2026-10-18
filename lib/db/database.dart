@@ -163,6 +163,7 @@ abstract class GTDatabase extends GeneratedDatabase with SyncableDatabase {
 
   Future<void> touchStaleTimestamps(String userId);
 
+  Future<void> clearUserData(String? userId);
   Future clearTheWholeThingIAmAbsolutelySureISwear();
   Future<File> get path;
   Future<void> close();
@@ -600,6 +601,10 @@ class GTDatabaseImpl extends _$GTDatabaseImpl
     return col.isNull();
   }
 
+  Expression<bool> _ownedBy(GeneratedColumn<String> col, String? userId) {
+    return userId == null ? col.isNull() : col.equals(userId);
+  }
+
   @override
   Stream<List<model.Workout>> getAllRoutines() {
     return _watchForCurrentUser(() {
@@ -692,10 +697,11 @@ class GTDatabaseImpl extends _$GTDatabaseImpl
 
   @override
   Future<void> insertRoutine(model.Workout routine) async {
+    final userId = currentUserId;
     final newSortOrder =
         (await (select(routines)..where(
                   (tbl) =>
-                      tbl.deleted.equals(false) & _userIdPredicate(tbl.userId),
+                      tbl.deleted.equals(false) & _ownedBy(tbl.userId, userId),
                 ))
                 .get())
             .length;
@@ -703,13 +709,13 @@ class GTDatabaseImpl extends _$GTDatabaseImpl
       batch.insert(
         routines,
         routine
-            .toRoutineInsertable(userId: currentUserId)
+            .toRoutineInsertable(userId: userId)
             .copyWith(sortOrder: Value(newSortOrder)),
       );
       batch.insertAll(
         routineExercises,
         routine.flattenedExercises.toSortedRoutineExerciseInsertables(
-          userId: currentUserId,
+          userId: userId,
         ),
       );
     });
@@ -717,6 +723,7 @@ class GTDatabaseImpl extends _$GTDatabaseImpl
 
   @override
   Future<void> deleteRoutine(String id) async {
+    final userId = currentUserId;
     final now = DateTime.now().toUtc();
     final remainingIDs =
         (await (select(routines)
@@ -724,7 +731,7 @@ class GTDatabaseImpl extends _$GTDatabaseImpl
                 (tbl) =>
                     tbl.id.isNotValue(id) &
                     tbl.deleted.equals(false) &
-                    _userIdPredicate(tbl.userId),
+                    _ownedBy(tbl.userId, userId),
               )
               ..orderBy([(r) => OrderingTerm(expression: r.sortOrder)]))
             .get());
@@ -735,7 +742,7 @@ class GTDatabaseImpl extends _$GTDatabaseImpl
       batch.update(
         routines,
         RoutinesCompanion(deleted: const Value(true), updatedAt: Value(now)),
-        where: (tbl) => tbl.id.equals(id),
+        where: (tbl) => (tbl.id.equals(id) & _ownedBy(tbl.userId, userId)),
       );
       batch.update(
         routineExercises,
@@ -743,7 +750,8 @@ class GTDatabaseImpl extends _$GTDatabaseImpl
           deleted: const Value(true),
           updatedAt: Value(now),
         ),
-        where: (tbl) => tbl.routineId.equals(id),
+        where: (tbl) =>
+            (tbl.routineId.equals(id) & _ownedBy(tbl.userId, userId)),
       );
       for (final entry in idToSortOrder.entries) {
         batch.update(
@@ -752,7 +760,8 @@ class GTDatabaseImpl extends _$GTDatabaseImpl
             sortOrder: Value(entry.value),
             updatedAt: Value(now),
           ),
-          where: (tbl) => tbl.id.equals(entry.key),
+          where: (tbl) =>
+              (tbl.id.equals(entry.key) & _ownedBy(tbl.userId, userId)),
         );
       }
     });
@@ -760,6 +769,7 @@ class GTDatabaseImpl extends _$GTDatabaseImpl
 
   @override
   Future<void> updateRoutine(model.Workout routine) async {
+    final userId = currentUserId;
     final now = DateTime.now().toUtc();
     if (routine.id.isEmpty) {
       throw ArgumentError("Routine ID cannot be empty");
@@ -767,15 +777,20 @@ class GTDatabaseImpl extends _$GTDatabaseImpl
     final sortOrder =
         (await (select(routines)..where(
                   (tbl) =>
-                      tbl.id.equals(routine.id) & tbl.deleted.equals(false),
+                      (tbl.id.equals(routine.id) &
+                          _ownedBy(tbl.userId, userId)) &
+                      tbl.deleted.equals(false),
                 ))
                 .getSingle())
             .sortOrder;
     return transaction(() async {
       final oldExercises =
-          (await (select(
-                routineExercises,
-              )..where((tbl) => tbl.routineId.equals(routine.id))).get())
+          (await (select(routineExercises)..where(
+                    (tbl) =>
+                        (tbl.routineId.equals(routine.id) &
+                        _ownedBy(tbl.userId, userId)),
+                  ))
+                  .get())
               .map((e) => e.id)
               .toSet();
 
@@ -791,11 +806,14 @@ class GTDatabaseImpl extends _$GTDatabaseImpl
           .toList();
 
       await batch((batch) {
-        batch.deleteWhere(routines, (tbl) => tbl.id.equals(routine.id));
+        batch.deleteWhere(
+          routines,
+          (tbl) => (tbl.id.equals(routine.id) & _ownedBy(tbl.userId, userId)),
+        );
         batch.insert(
           routines,
           routine
-              .toRoutineInsertable(userId: currentUserId)
+              .toRoutineInsertable(userId: userId)
               .copyWith(
                 sortOrder: Value(sortOrder),
                 updatedAt: Value(now),
@@ -811,21 +829,25 @@ class GTDatabaseImpl extends _$GTDatabaseImpl
               updatedAt: Value(now),
             ),
             where: (tbl) =>
-                tbl.id.isIn(removedExerciseIds) & tbl.deleted.equals(false),
+                (tbl.id.isIn(removedExerciseIds) &
+                    _ownedBy(tbl.userId, userId)) &
+                tbl.deleted.equals(false),
           );
         }
 
         if (remainingExerciseIds.isNotEmpty) {
           batch.deleteWhere(
             routineExercises,
-            (tbl) => tbl.id.isIn(remainingExerciseIds),
+            (tbl) =>
+                (tbl.id.isIn(remainingExerciseIds) &
+                _ownedBy(tbl.userId, userId)),
           );
         }
 
         batch.insertAll(
           routineExercises,
           routine.flattenedExercises.toSortedRoutineExerciseInsertables(
-            userId: currentUserId,
+            userId: userId,
           ),
         );
       });
@@ -834,12 +856,13 @@ class GTDatabaseImpl extends _$GTDatabaseImpl
 
   @override
   Future writeAllRoutines(List<model.Workout> routines) {
+    final userId = currentUserId;
     final now = DateTime.now().toUtc();
     return transaction(() async {
       final oldRoutines =
           await (select(this.routines)..where(
                 (tbl) =>
-                    tbl.deleted.equals(false) & _userIdPredicate(tbl.userId),
+                    tbl.deleted.equals(false) & _ownedBy(tbl.userId, userId),
               ))
               .get();
       // Split the routines into two categories: to delete, and to upsert.
@@ -854,11 +877,13 @@ class GTDatabaseImpl extends _$GTDatabaseImpl
         batch.update(
           this.routines,
           RoutinesCompanion(deleted: const Value(true), updatedAt: Value(now)),
-          where: (tbl) => tbl.id.isIn(toDeleteIds) & tbl.deleted.equals(false),
+          where: (tbl) =>
+              (tbl.id.isIn(toDeleteIds) & _ownedBy(tbl.userId, userId)) &
+              tbl.deleted.equals(false),
         );
         batch.insertAll(
           this.routines,
-          routines.toSortedRoutineInsertables(userId: currentUserId),
+          routines.toSortedRoutineInsertables(userId: userId),
           mode: .insertOrReplace,
         );
       });
@@ -870,6 +895,7 @@ class GTDatabaseImpl extends _$GTDatabaseImpl
   Future<void> overwriteAllRoutineExercises(
     List<model.WorkoutExercisable> routineExercises,
   ) async {
+    final userId = currentUserId;
     final now = DateTime.now().toUtc();
     final routineExerciseInsertables = routineExercises
         .fold(<String, List<model.WorkoutExercisable>>{}, (m, r) {
@@ -877,28 +903,28 @@ class GTDatabaseImpl extends _$GTDatabaseImpl
         })
         .values
         .expand(
-          (list) =>
-              list.toSortedRoutineExerciseInsertables(userId: currentUserId),
+          (list) => list.toSortedRoutineExerciseInsertables(userId: userId),
         );
     await transaction(() async {
       final oldExs =
           await (select(this.routineExercises)..where(
                 (tbl) =>
-                    tbl.deleted.equals(false) & _userIdPredicate(tbl.userId),
+                    tbl.deleted.equals(false) & _ownedBy(tbl.userId, userId),
               ))
               .get();
       final toDeleteIds = oldExs
           .where((r) => !routineExercises.any((newR) => newR.id == r.id))
           .map((r) => r.id)
           .toList();
-      await (update(
-        this.routineExercises,
-      )..where((tbl) => tbl.id.isIn(toDeleteIds))).write(
-        RoutineExercisesCompanion(
-          deleted: const Value(true),
-          updatedAt: Value(now),
-        ),
-      );
+      await (update(this.routineExercises)..where(
+            (tbl) => (tbl.id.isIn(toDeleteIds) & _ownedBy(tbl.userId, userId)),
+          ))
+          .write(
+            RoutineExercisesCompanion(
+              deleted: const Value(true),
+              updatedAt: Value(now),
+            ),
+          );
       await batch(
         (b) => b.insertAll(
           this.routineExercises,
@@ -922,20 +948,20 @@ class GTDatabaseImpl extends _$GTDatabaseImpl
 
   @override
   Future<void> insertRoutineFolder(model.GTRoutineFolder folder) async {
-    await into(
-      routineFolders,
-    ).insert(folder.toInsertable(userId: currentUserId));
-    await _recomputeFolderSortOrders();
+    final userId = currentUserId;
+    await into(routineFolders).insert(folder.toInsertable(userId: userId));
+    await _recomputeFolderSortOrders(userId);
   }
 
   @override
   Future<void> deleteRoutineFolder(String id) async {
+    final userId = currentUserId;
     final now = DateTime.now().toUtc();
     final allRoutines =
         await (select(routines)
               ..where(
                 (tbl) =>
-                    tbl.deleted.equals(false) & _userIdPredicate(tbl.userId),
+                    tbl.deleted.equals(false) & _ownedBy(tbl.userId, userId),
               )
               ..orderBy([(r) => OrderingTerm(expression: r.sortOrder)]))
             .get();
@@ -950,7 +976,7 @@ class GTDatabaseImpl extends _$GTDatabaseImpl
           deleted: const Value(true),
           updatedAt: Value(now),
         ),
-        where: (tbl) => tbl.id.equals(id) & _userIdPredicate(tbl.userId),
+        where: (tbl) => tbl.id.equals(id) & _ownedBy(tbl.userId, userId),
       );
       int counter = allRoutines.length;
       for (final routine in routinesValues) {
@@ -962,24 +988,25 @@ class GTDatabaseImpl extends _$GTDatabaseImpl
             updatedAt: Value(now),
           ),
           where: (tbl) =>
-              tbl.id.equals(routine.id) & _userIdPredicate(tbl.userId),
+              tbl.id.equals(routine.id) & _ownedBy(tbl.userId, userId),
         );
       }
     });
 
-    await _recomputeFolderSortOrders();
+    await _recomputeFolderSortOrders(userId);
   }
 
   @override
   Future<void> updateRoutineFolder(model.GTRoutineFolder folder) async {
+    final userId = currentUserId;
     await transaction(() async {
       await (delete(routineFolders)..where(
-            (tbl) => tbl.id.equals(folder.id) & _userIdPredicate(tbl.userId),
+            (tbl) => tbl.id.equals(folder.id) & _ownedBy(tbl.userId, userId),
           ))
           .go();
       await into(routineFolders).insert(
         folder
-            .toInsertable(userId: currentUserId)
+            .toInsertable(userId: userId)
             .copyWith(
               updatedAt: Value(DateTime.now().toUtc()),
               deleted: const Value(false),
@@ -990,6 +1017,7 @@ class GTDatabaseImpl extends _$GTDatabaseImpl
 
   @override
   Future writeAllRoutineFolders(List<model.GTRoutineFolder> folders) {
+    final userId = currentUserId;
     final now = DateTime.now().toUtc();
     return batch((batch) {
       batch.update(
@@ -998,19 +1026,19 @@ class GTDatabaseImpl extends _$GTDatabaseImpl
           deleted: const Value(true),
           updatedAt: Value(now),
         ),
-        where: (_) => const Constant(true),
+        where: (tbl) => _ownedBy(tbl.userId, userId),
       );
       batch.insertAll(
         routineFolders,
-        folders.map((f) => f.toInsertable(userId: currentUserId)),
+        folders.map((f) => f.toInsertable(userId: userId)),
       );
     });
   }
 
-  Future<void> _recomputeFolderSortOrders() async {
+  Future<void> _recomputeFolderSortOrders(String? userId) async {
     // Recompute sort orders
     final query = select(routineFolders)
-      ..where((tbl) => tbl.deleted.equals(false) & _userIdPredicate(tbl.userId))
+      ..where((tbl) => tbl.deleted.equals(false) & _ownedBy(tbl.userId, userId))
       ..orderBy([(r) => OrderingTerm.asc(r.sortOrder)]);
     final folders = await query.get();
     final idToSortOrder = {
@@ -1024,7 +1052,8 @@ class GTDatabaseImpl extends _$GTDatabaseImpl
             sortOrder: Value(entry.value),
             updatedAt: Value(DateTime.now().toUtc()),
           ),
-          where: (tbl) => tbl.id.equals(entry.key),
+          where: (tbl) =>
+              tbl.id.equals(entry.key) & _ownedBy(tbl.userId, userId),
         );
       }
     });
@@ -1100,39 +1129,45 @@ class GTDatabaseImpl extends _$GTDatabaseImpl
   }
 
   Future<void> insertHistoryWorkout(model.Workout workout) async {
+    final userId = currentUserId;
     return batch((batch) {
       batch.insert(
         historyWorkouts,
-        workout.toHistoryWorkoutInsertable(userId: currentUserId),
+        workout.toHistoryWorkoutInsertable(userId: userId),
       );
       batch.insertAll(
         historyWorkoutExercises,
-        workout.flattenedExercises.toSortedInsertables(userId: currentUserId),
+        workout.flattenedExercises.toSortedInsertables(userId: userId),
       );
     });
   }
 
   @override
   Future<void> deleteHistoryWorkout(String id) async {
+    final userId = currentUserId;
     final now = DateTime.now().toUtc();
-    await (update(historyWorkouts)..where((tbl) => tbl.id.equals(id))).write(
-      HistoryWorkoutsCompanion(
-        deleted: const Value(true),
-        updatedAt: Value(now),
-      ),
-    );
-    await (update(
-      historyWorkoutExercises,
-    )..where((tbl) => tbl.routineId.equals(id))).write(
-      HistoryWorkoutExercisesCompanion(
-        deleted: const Value(true),
-        updatedAt: Value(now),
-      ),
-    );
+    await (update(historyWorkouts)
+          ..where((tbl) => (tbl.id.equals(id) & _ownedBy(tbl.userId, userId))))
+        .write(
+          HistoryWorkoutsCompanion(
+            deleted: const Value(true),
+            updatedAt: Value(now),
+          ),
+        );
+    await (update(historyWorkoutExercises)..where(
+          (tbl) => (tbl.routineId.equals(id) & _ownedBy(tbl.userId, userId)),
+        ))
+        .write(
+          HistoryWorkoutExercisesCompanion(
+            deleted: const Value(true),
+            updatedAt: Value(now),
+          ),
+        );
   }
 
   @override
   Future<void> updateHistoryWorkout(model.Workout workout) async {
+    final userId = currentUserId;
     final now = DateTime.now().toUtc();
     if (workout.id.isEmpty) {
       throw ArgumentError("Routine ID cannot be empty");
@@ -1145,9 +1180,12 @@ class GTDatabaseImpl extends _$GTDatabaseImpl
     }
     return transaction(() async {
       final oldExercises =
-          (await (select(
-                historyWorkoutExercises,
-              )..where((tbl) => tbl.routineId.equals(workout.id))).get())
+          (await (select(historyWorkoutExercises)..where(
+                    (tbl) =>
+                        (tbl.routineId.equals(workout.id) &
+                        _ownedBy(tbl.userId, userId)),
+                  ))
+                  .get())
               .map((e) => e.id)
               .toSet();
 
@@ -1163,11 +1201,14 @@ class GTDatabaseImpl extends _$GTDatabaseImpl
           .toList();
 
       await batch((batch) {
-        batch.deleteWhere(historyWorkouts, (tbl) => tbl.id.equals(workout.id));
+        batch.deleteWhere(
+          historyWorkouts,
+          (tbl) => (tbl.id.equals(workout.id) & _ownedBy(tbl.userId, userId)),
+        );
         batch.insert(
           historyWorkouts,
           workout
-              .toHistoryWorkoutInsertable(userId: currentUserId)
+              .toHistoryWorkoutInsertable(userId: userId)
               .copyWith(updatedAt: Value(now), deleted: const Value(false)),
         );
 
@@ -1179,20 +1220,24 @@ class GTDatabaseImpl extends _$GTDatabaseImpl
               updatedAt: Value(now),
             ),
             where: (tbl) =>
-                tbl.id.isIn(removedExerciseIds) & tbl.deleted.equals(false),
+                (tbl.id.isIn(removedExerciseIds) &
+                    _ownedBy(tbl.userId, userId)) &
+                tbl.deleted.equals(false),
           );
         }
 
         if (remainingExerciseIds.isNotEmpty) {
           batch.deleteWhere(
             historyWorkoutExercises,
-            (tbl) => tbl.id.isIn(remainingExerciseIds),
+            (tbl) =>
+                (tbl.id.isIn(remainingExerciseIds) &
+                _ownedBy(tbl.userId, userId)),
           );
         }
 
         batch.insertAll(
           historyWorkoutExercises,
-          workout.flattenedExercises.toSortedInsertables(userId: currentUserId),
+          workout.flattenedExercises.toSortedInsertables(userId: userId),
         );
       });
     });
@@ -1200,12 +1245,13 @@ class GTDatabaseImpl extends _$GTDatabaseImpl
 
   @override
   Future writeAllHistoryWorkouts(List<model.Workout> historyWorkouts) {
+    final userId = currentUserId;
     final now = DateTime.now().toUtc();
     return transaction(() async {
       final oldWorkouts =
           await (select(this.historyWorkouts)..where(
                 (tbl) =>
-                    tbl.deleted.equals(false) & _userIdPredicate(tbl.userId),
+                    tbl.deleted.equals(false) & _ownedBy(tbl.userId, userId),
               ))
               .get();
       final toDeleteIds = oldWorkouts
@@ -1221,14 +1267,13 @@ class GTDatabaseImpl extends _$GTDatabaseImpl
               updatedAt: Value(now),
             ),
             where: (tbl) =>
-                tbl.id.isIn(toDeleteIds) & tbl.deleted.equals(false),
+                (tbl.id.isIn(toDeleteIds) & _ownedBy(tbl.userId, userId)) &
+                tbl.deleted.equals(false),
           );
         }
         batch.insertAll(
           this.historyWorkouts,
-          historyWorkouts.toSortedHistoryWorkoutInsertables(
-            userId: currentUserId,
-          ),
+          historyWorkouts.toSortedHistoryWorkoutInsertables(userId: userId),
           mode: .insertOrReplace,
         );
       });
@@ -1242,32 +1287,34 @@ class GTDatabaseImpl extends _$GTDatabaseImpl
   Future<void> overwriteAllHistoryWorkoutExercises(
     List<model.WorkoutExercisable> historyWorkoutExercises,
   ) async {
+    final userId = currentUserId;
     final now = DateTime.now().toUtc();
     final historyExerciseInsertables = historyWorkoutExercises
         .fold(<String, List<model.WorkoutExercisable>>{}, (m, r) {
           return m..putIfAbsent(r.workoutID!, () => []).add(r);
         })
         .values
-        .expand((list) => list.toSortedInsertables(userId: currentUserId));
+        .expand((list) => list.toSortedInsertables(userId: userId));
     await transaction(() async {
       final oldExs =
           await (select(this.historyWorkoutExercises)..where(
                 (tbl) =>
-                    tbl.deleted.equals(false) & _userIdPredicate(tbl.userId),
+                    tbl.deleted.equals(false) & _ownedBy(tbl.userId, userId),
               ))
               .get();
       final toDeleteIds = oldExs
           .where((r) => !historyWorkoutExercises.any((newR) => newR.id == r.id))
           .map((r) => r.id)
           .toList();
-      await (update(
-        this.historyWorkoutExercises,
-      )..where((tbl) => tbl.id.isIn(toDeleteIds))).write(
-        HistoryWorkoutExercisesCompanion(
-          deleted: const Value(true),
-          updatedAt: Value(now),
-        ),
-      );
+      await (update(this.historyWorkoutExercises)..where(
+            (tbl) => (tbl.id.isIn(toDeleteIds) & _ownedBy(tbl.userId, userId)),
+          ))
+          .write(
+            HistoryWorkoutExercisesCompanion(
+              deleted: const Value(true),
+              updatedAt: Value(now),
+            ),
+          );
       await batch(
         (b) => b.insertAll(
           this.historyWorkoutExercises,
@@ -1294,27 +1341,30 @@ class GTDatabaseImpl extends _$GTDatabaseImpl
 
   @override
   Future<void> insertCustomExercise(model.Exercise exercise) async {
-    await into(
-      customExercises,
-    ).insert(exercise.toInsertable(userId: currentUserId));
+    final userId = currentUserId;
+    await into(customExercises).insert(exercise.toInsertable(userId: userId));
   }
 
   @override
   Future<void> deleteCustomExercise(String id) async {
+    final userId = currentUserId;
     final now = DateTime.now().toUtc();
-    await (update(customExercises)..where((tbl) => tbl.id.equals(id))).write(
-      CustomExercisesCompanion(
-        deleted: const Value(true),
-        updatedAt: Value(now),
-      ),
-    );
+    await (update(customExercises)
+          ..where((tbl) => (tbl.id.equals(id) & _ownedBy(tbl.userId, userId))))
+        .write(
+          CustomExercisesCompanion(
+            deleted: const Value(true),
+            updatedAt: Value(now),
+          ),
+        );
   }
 
   @override
   Future<void> updateCustomExercise(model.Exercise exercise) async {
+    final userId = currentUserId;
     await (update(customExercises).replace(
       exercise
-          .toInsertable(userId: currentUserId)
+          .toInsertable(userId: userId)
           .copyWith(
             updatedAt: Value(DateTime.now().toUtc()),
             deleted: const Value(false),
@@ -1324,6 +1374,7 @@ class GTDatabaseImpl extends _$GTDatabaseImpl
 
   @override
   Future<void> writeAllCustomExercises(exercises) async {
+    final userId = currentUserId;
     final now = DateTime.now().toUtc();
     return batch((batch) {
       batch.update(
@@ -1332,10 +1383,10 @@ class GTDatabaseImpl extends _$GTDatabaseImpl
           deleted: const Value(true),
           updatedAt: Value(now),
         ),
-        where: (_) => const Constant(true),
+        where: (tbl) => _ownedBy(tbl.userId, userId),
       );
       batch.insertAll(customExercises, [
-        for (final ex in exercises) ex.toInsertable(userId: currentUserId),
+        for (final ex in exercises) ex.toInsertable(userId: userId),
       ]);
     });
   }
@@ -1392,9 +1443,10 @@ class GTDatabaseImpl extends _$GTDatabaseImpl
 
   @override
   Future<void> insertWeightMeasurement(WeightMeasurement measurement) {
+    final userId = currentUserId;
     return into(weightMeasurements).insert(
       measurement.toCompanion().copyWith(
-        userId: Value(currentUserId),
+        userId: Value(userId),
         updatedAt: Value(DateTime.now().toUtc()),
         deleted: const Value(false),
       ),
@@ -1403,35 +1455,41 @@ class GTDatabaseImpl extends _$GTDatabaseImpl
 
   @override
   Future<void> deleteWeightMeasurement(String id) {
-    return (update(
-      weightMeasurements,
-    )..where((tbl) => tbl.id.equals(id))).write(
-      WeightMeasurementsCompanion(
-        deleted: const Value(true),
-        updatedAt: Value(DateTime.now().toUtc()),
-      ),
-    );
+    final userId = currentUserId;
+    return (update(weightMeasurements)
+          ..where((tbl) => (tbl.id.equals(id) & _ownedBy(tbl.userId, userId))))
+        .write(
+          WeightMeasurementsCompanion(
+            deleted: const Value(true),
+            updatedAt: Value(DateTime.now().toUtc()),
+          ),
+        );
   }
 
   @override
   Future<void> updateWeightMeasurement(WeightMeasurement measurement) {
-    return (update(
-      weightMeasurements,
-    )..where((tbl) => tbl.id.equals(measurement.id))).write(
-      measurement.toCompanion().copyWith(
-        updatedAt: Value(DateTime.now().toUtc()),
-        deleted: const Value(false),
-      ),
-    );
+    final userId = currentUserId;
+    return (update(weightMeasurements)..where(
+          (tbl) =>
+              (tbl.id.equals(measurement.id) & _ownedBy(tbl.userId, userId)),
+        ))
+        .write(
+          measurement.toCompanion().copyWith(
+            userId: Value(userId),
+            updatedAt: Value(DateTime.now().toUtc()),
+            deleted: const Value(false),
+          ),
+        );
   }
 
   @override
   Future<void> setWeightMeasurements(List<WeightMeasurement> measurements) {
+    final userId = currentUserId;
     return transaction(() async {
       final now = DateTime.now().toUtc();
       await (update(
         weightMeasurements,
-      )..where((_) => const Constant(true))).write(
+      )..where((tbl) => _ownedBy(tbl.userId, userId))).write(
         WeightMeasurementsCompanion(
           deleted: const Value(true),
           updatedAt: Value(now),
@@ -1442,7 +1500,7 @@ class GTDatabaseImpl extends _$GTDatabaseImpl
           batch.insert(
             weightMeasurements,
             measurement.toCompanion().copyWith(
-              userId: Value(currentUserId),
+              userId: Value(userId),
               updatedAt: Value(now),
               deleted: const Value(false),
             ),
@@ -1468,29 +1526,38 @@ class GTDatabaseImpl extends _$GTDatabaseImpl
 
   @override
   Future<void> insertFoods(model.TaggedFood food) {
-    return into(foods).insert(
-      food.toInsertable(generateInsertionDate: true, userId: currentUserId),
-    );
+    final userId = currentUserId;
+    return into(
+      foods,
+    ).insert(food.toInsertable(generateInsertionDate: true, userId: userId));
   }
 
   @override
   Future<void> deleteFoods(String id) {
-    return (update(foods)..where((tbl) => tbl.id.equals(id))).write(
-      FoodsCompanion(
-        deleted: const Value(true),
-        updatedAt: Value(DateTime.now().toUtc()),
-      ),
-    );
+    final userId = currentUserId;
+    return (update(foods)
+          ..where((tbl) => (tbl.id.equals(id) & _ownedBy(tbl.userId, userId))))
+        .write(
+          FoodsCompanion(
+            deleted: const Value(true),
+            updatedAt: Value(DateTime.now().toUtc()),
+          ),
+        );
   }
 
   @override
   Future<void> updateFoods(model.TaggedFood food) async {
-    final oldFood = await (select(
-      foods,
-    )..where((tbl) => tbl.id.equals(food.value.id!))).getSingle();
+    final userId = currentUserId;
+    final oldFood =
+        await (select(foods)..where(
+              (tbl) =>
+                  (tbl.id.equals(food.value.id!) &
+                  _ownedBy(tbl.userId, userId)),
+            ))
+            .getSingle();
     await update(foods).replace(
       food
-          .toInsertable(generateInsertionDate: false, userId: currentUserId)
+          .toInsertable(generateInsertionDate: false, userId: userId)
           .copyWith(
             dateAdded: Value(oldFood.dateAdded),
             updatedAt: Value(DateTime.now().toUtc()),
@@ -1500,16 +1567,19 @@ class GTDatabaseImpl extends _$GTDatabaseImpl
 
   @override
   Future<void> setFoods(List<model.TaggedFood> foods) {
+    final userId = currentUserId;
     return transaction(() async {
       final now = DateTime.now().toUtc();
-      await (update(this.foods)..where((_) => const Constant(true))).write(
+      await (update(
+        this.foods,
+      )..where((tbl) => _ownedBy(tbl.userId, userId))).write(
         FoodsCompanion(deleted: const Value(true), updatedAt: Value(now)),
       );
       await batch((batch) {
         for (final food in foods) {
           final insertable = food.toInsertable(
             generateInsertionDate: false,
-            userId: currentUserId,
+            userId: userId,
             updatedAt: now,
           );
           batch.insert(
@@ -1537,29 +1607,35 @@ class GTDatabaseImpl extends _$GTDatabaseImpl
 
   @override
   Future<void> deleteNutritionGoal(DateTime date) {
+    final userId = currentUserId;
     final utcDate = DateTime.utc(date.year, date.month, date.day);
-    return (update(
-      nutritionGoals,
-    )..where((tbl) => tbl.id.equals(utcDate.toIso8601String()))).write(
-      NutritionGoalsCompanion(
-        deleted: const Value(true),
-        updatedAt: Value(DateTime.now().toUtc()),
-      ),
-    );
+    return (update(nutritionGoals)..where(
+          (tbl) =>
+              (tbl.id.equals(utcDate.toIso8601String()) &
+              _ownedBy(tbl.userId, userId)),
+        ))
+        .write(
+          NutritionGoalsCompanion(
+            deleted: const Value(true),
+            updatedAt: Value(DateTime.now().toUtc()),
+          ),
+        );
   }
 
   @override
   Future<void> updateNutritionGoal(model.TaggedNutritionGoal goal) async {
-    await update(
-      nutritionGoals,
-    ).replace(goal.toInsertable(userId: currentUserId));
+    final userId = currentUserId;
+    await update(nutritionGoals).replace(goal.toInsertable(userId: userId));
   }
 
   @override
   Future<void> setNutritionGoals(List<model.TaggedNutritionGoal> goals) {
+    final userId = currentUserId;
     return transaction(() async {
       final now = DateTime.now().toUtc();
-      await (update(nutritionGoals)..where((_) => const Constant(true))).write(
+      await (update(
+        nutritionGoals,
+      )..where((tbl) => _ownedBy(tbl.userId, userId))).write(
         NutritionGoalsCompanion(
           deleted: const Value(true),
           updatedAt: Value(now),
@@ -1569,7 +1645,7 @@ class GTDatabaseImpl extends _$GTDatabaseImpl
         for (final goal in goals) {
           batch.insert(
             nutritionGoals,
-            goal.toInsertable(userId: currentUserId, updatedAt: now),
+            goal.toInsertable(userId: userId, updatedAt: now),
             mode: .insertOrReplace,
           );
         }
@@ -1595,11 +1671,12 @@ class GTDatabaseImpl extends _$GTDatabaseImpl
 
   @override
   Future<void> insertCustomBarcodeFood(String barcode, model.Food food) {
+    final userId = currentUserId;
     return into(customBarcodeFoods).insert(
       CustomBarcodeFoodsCompanion(
         id: Value(barcode),
         jsonData: Value(jsonEncode(food.toJson())),
-        userId: Value(currentUserId),
+        userId: Value(userId),
         updatedAt: Value(DateTime.now().toUtc()),
         deleted: const Value(false),
       ),
@@ -1608,23 +1685,26 @@ class GTDatabaseImpl extends _$GTDatabaseImpl
 
   @override
   Future<void> deleteCustomBarcodeFood(String barcode) {
-    return (update(
-      customBarcodeFoods,
-    )..where((tbl) => tbl.id.equals(barcode))).write(
-      CustomBarcodeFoodsCompanion(
-        deleted: const Value(true),
-        updatedAt: Value(DateTime.now().toUtc()),
-      ),
-    );
+    final userId = currentUserId;
+    return (update(customBarcodeFoods)..where(
+          (tbl) => (tbl.id.equals(barcode) & _ownedBy(tbl.userId, userId)),
+        ))
+        .write(
+          CustomBarcodeFoodsCompanion(
+            deleted: const Value(true),
+            updatedAt: Value(DateTime.now().toUtc()),
+          ),
+        );
   }
 
   @override
   Future<void> setCustomBarcodeFoods(Map<String, model.Food> foods) {
+    final userId = currentUserId;
     return transaction(() async {
       final now = DateTime.now().toUtc();
       await (update(
         customBarcodeFoods,
-      )..where((_) => const Constant(true))).write(
+      )..where((tbl) => _ownedBy(tbl.userId, userId))).write(
         CustomBarcodeFoodsCompanion(
           deleted: const Value(true),
           updatedAt: Value(now),
@@ -1637,7 +1717,7 @@ class GTDatabaseImpl extends _$GTDatabaseImpl
             CustomBarcodeFoodsCompanion(
               id: Value(entry.key),
               jsonData: Value(jsonEncode(entry.value.toJson())),
-              userId: Value(currentUserId),
+              userId: Value(userId),
               updatedAt: Value(now),
               deleted: const Value(false),
             ),
@@ -1676,10 +1756,11 @@ class GTDatabaseImpl extends _$GTDatabaseImpl
 
   @override
   Future<void> insertFavoriteFood(String id) {
+    final userId = currentUserId;
     return into(favoriteFoods).insert(
       FavoriteFoodsCompanion(
         id: Value(id),
-        userId: Value(currentUserId),
+        userId: Value(userId),
         updatedAt: Value(DateTime.now().toUtc()),
         deleted: const Value(false),
       ),
@@ -1688,19 +1769,25 @@ class GTDatabaseImpl extends _$GTDatabaseImpl
 
   @override
   Future<void> deleteFavoriteFood(String id) {
-    return (update(favoriteFoods)..where((tbl) => tbl.id.equals(id))).write(
-      FavoriteFoodsCompanion(
-        deleted: const Value(true),
-        updatedAt: Value(DateTime.now().toUtc()),
-      ),
-    );
+    final userId = currentUserId;
+    return (update(favoriteFoods)
+          ..where((tbl) => (tbl.id.equals(id) & _ownedBy(tbl.userId, userId))))
+        .write(
+          FavoriteFoodsCompanion(
+            deleted: const Value(true),
+            updatedAt: Value(DateTime.now().toUtc()),
+          ),
+        );
   }
 
   @override
   Future<void> setFavoriteFoods(List<String> ids) {
+    final userId = currentUserId;
     return transaction(() async {
       final now = DateTime.now().toUtc();
-      await (update(favoriteFoods)..where((_) => const Constant(true))).write(
+      await (update(
+        favoriteFoods,
+      )..where((tbl) => _ownedBy(tbl.userId, userId))).write(
         FavoriteFoodsCompanion(
           deleted: const Value(true),
           updatedAt: Value(now),
@@ -1712,7 +1799,7 @@ class GTDatabaseImpl extends _$GTDatabaseImpl
             favoriteFoods,
             FavoriteFoodsCompanion(
               id: Value(id),
-              userId: Value(currentUserId),
+              userId: Value(userId),
               updatedAt: Value(now),
               deleted: const Value(false),
             ),
@@ -1745,10 +1832,11 @@ class GTDatabaseImpl extends _$GTDatabaseImpl
 
   @override
   Future<void> deleteNutritionCategories(DateTime date) {
+    final userId = currentUserId;
     final utcDate = DateTime.utc(date.year, date.month, date.day);
     return (update(nutritionCategories)..where(
           (tbl) =>
-              tbl.referenceDate.equals(utcDate) & _userIdPredicate(tbl.userId),
+              tbl.referenceDate.equals(utcDate) & _ownedBy(tbl.userId, userId),
         ))
         .write(
           NutritionCategoriesCompanion(
@@ -1762,11 +1850,12 @@ class GTDatabaseImpl extends _$GTDatabaseImpl
   Future<void> setNutritionCategories(
     Map<DateTime, Map<String, model.NutritionCategory>> categories,
   ) {
+    final userId = currentUserId;
     return transaction(() async {
       final now = DateTime.now().toUtc();
       await (update(
         nutritionCategories,
-      )..where((_) => const Constant(true))).write(
+      )..where((tbl) => _ownedBy(tbl.userId, userId))).write(
         NutritionCategoriesCompanion(
           deleted: const Value(true),
           updatedAt: Value(now),
@@ -1787,7 +1876,7 @@ class GTDatabaseImpl extends _$GTDatabaseImpl
               jsonData: Value(
                 jsonEncode(entry.value.values.map((e) => e.toJson()).toList()),
               ),
-              userId: Value(currentUserId),
+              userId: Value(userId),
               updatedAt: Value(now),
               deleted: const Value(false),
             ),
@@ -1810,6 +1899,7 @@ class GTDatabaseImpl extends _$GTDatabaseImpl
 
   @override
   Future<void> insertAchievementCompletion(AchievementCompletion completion) {
+    final userId = currentUserId;
     return into(achievements).insert(
       AchievementsCompanion(
         achievementID: Value(completion.achievementID),
@@ -1817,7 +1907,7 @@ class GTDatabaseImpl extends _$GTDatabaseImpl
         completedAt: Value(completion.completedAt),
         updatedAt: Value(DateTime.now().toUtc()),
         deleted: const Value(false),
-        userId: Value(completion.userId ?? currentUserId),
+        userId: Value(userId),
       ),
       mode: InsertMode.insertOrIgnore,
     );
@@ -1827,6 +1917,7 @@ class GTDatabaseImpl extends _$GTDatabaseImpl
   Future<void> insertAchievementCompletions(
     List<AchievementCompletion> completions,
   ) {
+    final userId = currentUserId;
     final now = DateTime.now().toUtc();
     return batch((batch) async {
       batch.insertAll(
@@ -1839,7 +1930,7 @@ class GTDatabaseImpl extends _$GTDatabaseImpl
                 completedAt: completion.completedAt,
                 updatedAt: Value(now),
                 deleted: const Value(false),
-                userId: Value(completion.userId ?? currentUserId),
+                userId: Value(userId),
               ),
             )
             .toList(),
@@ -1850,10 +1941,11 @@ class GTDatabaseImpl extends _$GTDatabaseImpl
 
   @override
   Future<void> deleteAchievementCompletion(String achievementID, int level) {
+    final userId = currentUserId;
     final now = DateTime.now().toUtc();
     return (update(achievements)..where((tbl) {
           return tbl.achievementID.equals(achievementID) &
-              tbl.level.equals(level);
+              (tbl.level.equals(level) & _ownedBy(tbl.userId, userId));
         }))
         .write(
           AchievementsCompanion(
@@ -1867,9 +1959,12 @@ class GTDatabaseImpl extends _$GTDatabaseImpl
   Future<void> setAchievementCompletions(
     List<AchievementCompletion> completions,
   ) {
+    final userId = currentUserId;
     final now = DateTime.now().toUtc();
     return transaction(() async {
-      await (update(achievements)..where((_) => const Constant(true))).write(
+      await (update(
+        achievements,
+      )..where((tbl) => _ownedBy(tbl.userId, userId))).write(
         AchievementsCompanion(
           deleted: const Value(true),
           updatedAt: Value(now),
@@ -1886,7 +1981,7 @@ class GTDatabaseImpl extends _$GTDatabaseImpl
                   completedAt: completion.completedAt,
                   updatedAt: Value(now),
                   deleted: const Value(false),
-                  userId: Value(completion.userId ?? currentUserId),
+                  userId: Value(userId),
                 ),
               )
               .toList(),
@@ -1910,9 +2005,10 @@ class GTDatabaseImpl extends _$GTDatabaseImpl
 
   @override
   Future<void> insertBodyMeasurement(BodyMeasurement measurement) {
+    final userId = currentUserId;
     return into(bodyMeasurements).insert(
       measurement.toCompanion().copyWith(
-        userId: Value(currentUserId),
+        userId: Value(userId),
         updatedAt: Value(DateTime.now().toUtc()),
         deleted: const Value(false),
       ),
@@ -1921,18 +2017,23 @@ class GTDatabaseImpl extends _$GTDatabaseImpl
 
   @override
   Future<void> deleteBodyMeasurement(String id) {
-    return (update(bodyMeasurements)..where((tbl) => tbl.id.equals(id))).write(
-      BodyMeasurementsCompanion(
-        deleted: const Value(true),
-        updatedAt: Value(DateTime.now().toUtc()),
-      ),
-    );
+    final userId = currentUserId;
+    return (update(bodyMeasurements)
+          ..where((tbl) => (tbl.id.equals(id) & _ownedBy(tbl.userId, userId))))
+        .write(
+          BodyMeasurementsCompanion(
+            deleted: const Value(true),
+            updatedAt: Value(DateTime.now().toUtc()),
+          ),
+        );
   }
 
   @override
   Future<void> updateBodyMeasurement(BodyMeasurement measurement) {
+    final userId = currentUserId;
     return (update(bodyMeasurements).replace(
       measurement.toCompanion().copyWith(
+        userId: Value(userId),
         updatedAt: Value(DateTime.now().toUtc()),
         deleted: const Value(false),
       ),
@@ -1941,11 +2042,12 @@ class GTDatabaseImpl extends _$GTDatabaseImpl
 
   @override
   Future<void> setBodyMeasurements(List<BodyMeasurement> measurements) {
+    final userId = currentUserId;
     return transaction(() async {
       final now = DateTime.now().toUtc();
       await (update(
         bodyMeasurements,
-      )..where((_) => const Constant(true))).write(
+      )..where((tbl) => _ownedBy(tbl.userId, userId))).write(
         BodyMeasurementsCompanion(
           deleted: const Value(true),
           updatedAt: Value(now),
@@ -1956,13 +2058,28 @@ class GTDatabaseImpl extends _$GTDatabaseImpl
           batch.insert(
             bodyMeasurements,
             measurement.toCompanion().copyWith(
-              userId: Value(currentUserId),
+              userId: Value(userId),
               updatedAt: Value(now),
               deleted: const Value(false),
             ),
           );
         }
       });
+    });
+  }
+
+  @override
+  Future<void> clearUserData(String? userId) {
+    return transaction(() async {
+      for (final table in allTables) {
+        final dsl = table.asDslTable;
+        if (dsl is SyncableTable) {
+          await (delete(table)..where(
+                (_) => _ownedBy(dsl.userId as GeneratedColumn<String>, userId),
+              ))
+              .go();
+        }
+      }
     });
   }
 

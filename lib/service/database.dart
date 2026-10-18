@@ -798,8 +798,9 @@ class DatabaseService extends GetxService
   }
 
   Future<void> overrideDatabase(DatabaseSnapshot snapshot) async {
+    final userId = _db.currentUserId;
     await _db.transaction(() async {
-      await _db.clearTheWholeThingIAmAbsolutelySureISwear();
+      await _db.clearUserData(userId);
 
       logger.i("Created import transaction");
       // Keep this above other calls to prevent double computation of

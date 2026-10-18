@@ -242,14 +242,6 @@ class _WorkoutExerciseEditorState extends State<WorkoutExerciseEditor> {
                 const SizedBox(height: 8),
                 ExerciseBadgeRow(exercise: widget.exercise),
               ],
-              ExerciseProgressionPanel(
-                exercise: widget.exercise,
-                weightUnit: widget.weightUnit,
-                distanceUnit: widget.distanceUnit,
-                index: widget.index,
-                callbacks: widget.callbacks,
-                isCreating: widget.isCreating,
-              ),
               const SizedBox(height: 8),
               ListTile(
                 titleAlignment: ListTileTitleAlignment.titleHeight,
@@ -282,6 +274,18 @@ class _WorkoutExerciseEditorState extends State<WorkoutExerciseEditor> {
                   );
                 },
               ),
+              if (!widget.exercise.parameters.isSetless)
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 8, 16, 18),
+                  child: ExerciseProgressionPanel(
+                    exercise: widget.exercise,
+                    weightUnit: widget.weightUnit,
+                    distanceUnit: widget.distanceUnit,
+                    index: widget.index,
+                    callbacks: widget.callbacks,
+                    isCreating: widget.isCreating,
+                  ),
+                ),
               if (!widget.isInSuperset)
                 Padding(
                   padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),

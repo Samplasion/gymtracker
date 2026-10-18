@@ -77,82 +77,81 @@ class ExerciseProgressionPanel extends StatelessWidget {
         )
         .join(' / ');
     final targets = progression?.repsFor(progression.setCount).join(' / ');
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-      child: Card.outlined(
-        child: Padding(
-          padding: const EdgeInsets.all(12),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              if (!isCreating)
-                Text(
-                  previous == null
-                      ? t.noHistory
-                      : '${t.lastTime} · ${DateFormat.yMd().format(previous.$3.startingDate!)}: ${setsText(previous.$1, previous.$3.weightUnit, previous.$3.distanceUnit)}',
-                ),
-              if (progression != null) ...[
-                const SizedBox(height: 6),
-                Text(
-                  '${t.goal}: ${exercise.parameters.hasWeight ? '${weightUnit.stringify(progression.targetWeight)} × ' : ''}$targets',
-                  style: Theme.of(context).textTheme.titleSmall,
-                ),
-                if (progression.mode == ProgressionMode.cyclicLinear)
-                  Text(
-                    t.step(
-                      cycle: progression.cycle + 1,
-                      step: progression.step + 1,
+    var children = [
+      if (!isCreating)
+        Text(
+          previous == null
+              ? t.noHistory
+              : '${t.lastTime}: ${DateFormat.yMd().format(previous.$3.startingDate!)}\n${setsText(previous.$1, previous.$3.weightUnit, previous.$3.distanceUnit)}',
+        ),
+      if (progression != null) ...[
+        const SizedBox(height: 6),
+        Text(
+          '${t.goal}: ${exercise.parameters.hasWeight ? '${weightUnit.stringify(progression.targetWeight)} × ' : ''}$targets',
+          style: Theme.of(context).textTheme.titleSmall,
+        ),
+        if (progression.mode == ProgressionMode.cyclicLinear)
+          Text(
+            t.step(cycle: progression.cycle + 1, step: progression.step + 1),
+          ),
+      ],
+      if (exercise.parameters.hasReps && canConfigure)
+        Wrap(
+          spacing: 8,
+          children: [
+            TextButton(
+              onPressed: () async {
+                final result = await showDialog<ExerciseProgression>(
+                  context: context,
+                  builder: (_) => _ProgressionDialog(
+                    exercise: exercise,
+                    current: progression,
+                    unit: weightUnit,
+                  ),
+                );
+                if (result != null) {
+                  callbacks.onExerciseProgressionChange!(index, result);
+                }
+              },
+              child: Text(t.configure),
+            ),
+            if (progression != null) ...[
+              if (!progression
+                  .advance(
+                    progression.setCount,
+                    hasWeight: exercise.parameters.hasWeight,
+                  )
+                  .sameAs(progression))
+                TextButton(
+                  onPressed: () => callbacks.onExerciseProgressionChange!(
+                    index,
+                    progression.advance(
+                      progression.setCount,
+                      hasWeight: exercise.parameters.hasWeight,
                     ),
                   ),
-              ],
-              if (exercise.parameters.hasReps && canConfigure)
-                Wrap(
-                  spacing: 8,
-                  children: [
-                    TextButton(
-                      onPressed: () async {
-                        final result = await showDialog<ExerciseProgression>(
-                          context: context,
-                          builder: (_) => _ProgressionDialog(
-                            exercise: exercise,
-                            current: progression,
-                            unit: weightUnit,
-                          ),
-                        );
-                        if (result != null) {
-                          callbacks.onExerciseProgressionChange!(index, result);
-                        }
-                      },
-                      child: Text(t.configure),
-                    ),
-                    if (progression != null) ...[
-                      if (!progression
-                          .advance(
-                            progression.setCount,
-                            hasWeight: exercise.parameters.hasWeight,
-                          )
-                          .sameAs(progression))
-                        TextButton(
-                          onPressed: () =>
-                              callbacks.onExerciseProgressionChange!(
-                                index,
-                                progression.advance(
-                                  progression.setCount,
-                                  hasWeight: exercise.parameters.hasWeight,
-                                ),
-                              ),
-                          child: Text(t.advance),
-                        ),
-                      TextButton(
-                        onPressed: () =>
-                            callbacks.onExerciseProgressionChange!(index, null),
-                        child: Text(t.remove),
-                      ),
-                    ],
-                  ],
+                  child: Text(t.advance),
                 ),
+              TextButton(
+                onPressed: () =>
+                    callbacks.onExerciseProgressionChange!(index, null),
+                child: Text(t.remove),
+              ),
             ],
-          ),
+          ],
+        ),
+    ];
+    if (children.isEmpty) return const SizedBox.shrink();
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        border: Border.all(color: Theme.of(context).colorScheme.primary),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: children,
         ),
       ),
     );
@@ -298,6 +297,7 @@ class _ProgressionDialogState extends State<_ProgressionDialog> {
         child: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,
+            spacing: 16,
             children: [
               DropdownButtonFormField<ProgressionMode>(
                 initialValue: mode,
@@ -329,12 +329,18 @@ class _ProgressionDialogState extends State<_ProgressionDialog> {
               ],
               if (current == null) Text(t.invalid),
               if (current != null && mode == ProgressionMode.cyclicLinear) ...[
-                const SizedBox(height: 12),
-                Text(t.preview),
-                for (var i = 0; i < current.stepsPerCycle; i++)
-                  Text(
-                    '${widget.unit.stringify(current.startingWeight + i * current.weightPerStep)} × ${current.maxReps - i * current.repsPerStep}',
+                Text.rich(
+                  TextSpan(
+                    text: t.preview,
+                    children: [
+                      for (var i = 0; i < current.stepsPerCycle; i++)
+                        TextSpan(
+                          text:
+                              '\n${widget.unit.stringify(current.startingWeight + i * current.weightPerStep)} × ${current.maxReps - i * current.repsPerStep}',
+                        ),
+                    ],
                   ),
+                ),
               ],
             ],
           ),

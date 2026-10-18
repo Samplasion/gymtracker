@@ -346,7 +346,7 @@ class RoutinesController extends GetxController
     return service.routines.firstWhereOrNull((r) => r.id == s);
   }
 
-  void updateRoutineFromWorkout(String s, Workout workout) {
+  Future<void> updateRoutineFromWorkout(String s, Workout workout) async {
     final oldRoutine = getRoutine(s);
     if (oldRoutine == null) return;
     final newRoutine = workout
@@ -363,7 +363,41 @@ class RoutinesController extends GetxController
         // is still a concrete workout.
         .copyWith
         .folder(oldRoutine.folder);
-    service.setRoutine(newRoutine);
+    final previousById = <String, Exercise>{
+      for (final entry in oldRoutine.exercises)
+        if (entry is Exercise)
+          entry.id: entry
+        else if (entry is Superset)
+          for (final exercise in entry.exercises) exercise.id: exercise,
+    };
+    Exercise reconcile(Exercise converted, Exercise performed) {
+      final previous = previousById[performed.supersedesID];
+      final progression = performed.progression;
+      if (previous == null || progression == null) return converted;
+      return converted.copyWith(
+        progression: progression.forRoutineSets(previous.sets, performed.sets),
+      );
+    }
+
+    final updated = newRoutine.copyWith(
+      exercises: [
+        for (var i = 0; i < newRoutine.exercises.length; i++)
+          newRoutine.exercises[i].map(
+            exercise: (converted) =>
+                reconcile(converted, workout.exercises[i] as Exercise),
+            superset: (converted) {
+              final performed = workout.exercises[i] as Superset;
+              return converted.copyWith(
+                exercises: [
+                  for (var j = 0; j < converted.exercises.length; j++)
+                    reconcile(converted.exercises[j], performed.exercises[j]),
+                ],
+              );
+            },
+          ),
+      ],
+    );
+    await service.setRoutine(updated);
     coordinator.scheduleBackup();
   }
 

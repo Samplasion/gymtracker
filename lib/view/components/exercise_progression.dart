@@ -36,15 +36,19 @@ class ExerciseProgressionPanel extends StatelessWidget {
         (isCreating && !exercise.parameters.hasReps)) {
       return const SizedBox.shrink();
     }
-    final progression = exercise.progression;
-    final routineID = !isCreating && Get.isRegistered<WorkoutController>()
+    final hasActiveWorkout =
+        Get.isRegistered<WorkoutController>() && !isCreating;
+    final routineID = isCreating
+        ? exercise.workoutID
+        : hasActiveWorkout
         ? Get.find<WorkoutController>().parentID.value
         : null;
+    final progression = hasActiveWorkout && routineID == null
+        ? null
+        : exercise.progression;
     final canConfigure =
         callbacks.onExerciseProgressionChange != null &&
-        (!Get.isRegistered<WorkoutController>() ||
-            isCreating ||
-            routineID != null);
+        (!hasActiveWorkout || isCreating || routineID != null);
     final history = Get.find<HistoryController>()
         .getHistoryOf(exercise.getParent() ?? exercise)
         .where((entry) => routineID == null || entry.$3.parentID == routineID)

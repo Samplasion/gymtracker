@@ -118,6 +118,68 @@ void main() {
     expect(goal.advance(3, hasWeight: false).sameAs(goal), isTrue);
   });
 
+  test('editing routine sets preserves targets for remaining sets', () {
+    const goal = ExerciseProgression(
+      mode: ProgressionMode.doubleProgression,
+      minReps: 8,
+      maxReps: 12,
+      repsPerStep: 1,
+      setCount: 3,
+      startingWeight: 40,
+      weightPerStep: 2.5,
+      weightPerCycle: 0,
+      targetReps: [10, 9, 8],
+    );
+    final sets = performed([10, 9, 8], 40).sets;
+    final shortened = goal.forRoutineSets(sets, [sets[0], sets[2]])!;
+    expect(shortened.setCount, 2);
+    expect(shortened.repsFor(2), [10, 8]);
+    expect(shortened.reached(performed([10, 8], 40)), isTrue);
+
+    final extended = shortened.forRoutineSets(
+      [sets[0], sets[2]],
+      [
+        sets[2],
+        sets[0],
+        GTSet.empty(
+          kind: GTSetKind.normal,
+          parameters: GTSetParameters.repsWeight,
+        ),
+      ],
+    )!;
+    expect(extended.repsFor(3), [8, 10, 8]);
+    expect(goal.forRoutineSets(sets, []), isNull);
+  });
+
+  test('warm-up changes leave cyclic goal unchanged', () {
+    const goal = ExerciseProgression(
+      mode: ProgressionMode.cyclicLinear,
+      minReps: 8,
+      maxReps: 12,
+      repsPerStep: 2,
+      setCount: 3,
+      startingWeight: 40,
+      weightPerStep: 5,
+      weightPerCycle: 5,
+      cycle: 1,
+      step: 1,
+    );
+    final sets = performed([10, 10, 10], 45).sets;
+    final withWarmup = [
+      GTSet.empty(
+        kind: GTSetKind.warmUp,
+        parameters: GTSetParameters.repsWeight,
+      ),
+      ...sets,
+    ];
+    expect(goal.forRoutineSets(sets, withWarmup)!.sameAs(goal), isTrue);
+    final shortened = goal.forRoutineSets(sets, [sets[0], sets[2]])!;
+    expect(shortened.setCount, 2);
+    expect(shortened.cycle, 1);
+    expect(shortened.step, 1);
+    expect(shortened.reached(performed([10, 10], 50)), isTrue);
+  });
+
   test(
     'old exercises load without progression and configured ones round-trip',
     () {

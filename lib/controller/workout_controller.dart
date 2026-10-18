@@ -878,7 +878,7 @@ class WorkoutController extends GetxController with ServiceableController {
           }(),
         );
         if (confirm) {
-          routinesController.updateRoutineFromWorkout(
+          await routinesController.updateRoutineFromWorkout(
             workout.parentID!,
             workout,
           );

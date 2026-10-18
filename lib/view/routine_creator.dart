@@ -320,6 +320,12 @@ class _RoutineCreatorState extends State<RoutineCreator> {
 class _RoutineCreatorController extends GetxController {
   final exercises = <_DateWrapped<WorkoutExercisable>>[].obs;
 
+  Exercise _withRoutineSets(Exercise exercise, List<GTSet> sets) =>
+      exercise.copyWith(
+        sets: sets,
+        progression: exercise.progression?.forRoutineSets(exercise.sets, sets),
+      );
+
   EditorCallbacks get callbacks => EditorCallbacks.creation(
     onExerciseProgressionChange: (index, progression) {
       if (index.supersetIndex == null) {
@@ -416,19 +422,17 @@ class _RoutineCreatorController extends GetxController {
       if (supersetIndex == null) {
         final ex = exercises[i].data as Exercise;
         final newSets = [for (final newIndex in newIndices) ex.sets[newIndex]];
-        exercises[i].data = ex.copyWith(sets: newSets);
+        exercises[i].data = _withRoutineSets(ex, newSets);
       } else {
         final superset = exercises[supersetIndex].data as Superset;
         exercises[supersetIndex].data = superset.copyWith(
           exercises: [
             for (int j = 0; j < superset.exercises.length; j++)
               if (j == i)
-                superset.exercises[j].copyWith(
-                  sets: [
-                    for (final newIndex in newIndices)
-                      superset.exercises[j].sets[newIndex],
-                  ],
-                )
+                _withRoutineSets(superset.exercises[j], [
+                  for (final newIndex in newIndices)
+                    superset.exercises[j].sets[newIndex],
+                ])
               else
                 superset.exercises[j],
           ],
@@ -440,14 +444,17 @@ class _RoutineCreatorController extends GetxController {
       final (exerciseIndex: i, supersetIndex: supersetIndex) = index;
       if (supersetIndex == null) {
         final ex = exercises[i].data as Exercise;
-        ex.sets.add(
+        exercises[i].data = _withRoutineSets(ex, [
+          ...ex.sets,
           GTSet.empty(kind: GTSetKind.normal, parameters: ex.parameters),
-        );
+        ]);
       } else {
         final ex = (exercises[supersetIndex].data as Superset).exercises[i];
-        ex.sets.add(
-          GTSet.empty(kind: GTSetKind.normal, parameters: ex.parameters),
-        );
+        (exercises[supersetIndex].data as Superset).exercises[i] =
+            _withRoutineSets(ex, [
+              ...ex.sets,
+              GTSet.empty(kind: GTSetKind.normal, parameters: ex.parameters),
+            ]);
       }
       _controller.exercises.refresh();
     },
@@ -455,20 +462,17 @@ class _RoutineCreatorController extends GetxController {
       final (exerciseIndex: i, supersetIndex: supersetIndex) = exerciseIndex;
       if (supersetIndex == null) {
         final ex = exercises[i].data as Exercise;
-        exercises[i].data = ex.copyWith(
-          sets: [
-            for (int j = 0; j < ex.sets.length; j++)
-              if (j != index) ex.sets[j],
-          ],
-        );
+        exercises[i].data = _withRoutineSets(ex, [
+          for (int j = 0; j < ex.sets.length; j++)
+            if (j != index) ex.sets[j],
+        ]);
       } else {
         final ex = (exercises[supersetIndex].data as Superset).exercises[i];
-        (exercises[supersetIndex].data as Superset).exercises[i] = ex.copyWith(
-          sets: [
-            for (int j = 0; j < ex.sets.length; j++)
-              if (j != index) ex.sets[j],
-          ],
-        );
+        (exercises[supersetIndex].data as Superset).exercises[i] =
+            _withRoutineSets(ex, [
+              for (int j = 0; j < ex.sets.length; j++)
+                if (j != index) ex.sets[j],
+            ]);
       }
 
       _controller.exercises.refresh();
@@ -477,26 +481,17 @@ class _RoutineCreatorController extends GetxController {
       final (exerciseIndex: i, supersetIndex: supersetIndex) = index;
       if (supersetIndex == null) {
         final ex = exercises[i].data as Exercise;
-        exercises[i].data = ex.copyWith(
-          sets: [
-            for (int j = 0; j < ex.sets.length; j++)
-              if (j == setIndex)
-                ex.sets[j].copyWith(kind: kind)
-              else
-                ex.sets[j],
-          ],
-        );
+        exercises[i].data = _withRoutineSets(ex, [
+          for (int j = 0; j < ex.sets.length; j++)
+            if (j == setIndex) ex.sets[j].copyWith(kind: kind) else ex.sets[j],
+        ]);
       } else {
         final ex = (exercises[supersetIndex].data as Superset).exercises[i];
-        (exercises[supersetIndex].data as Superset).exercises[i] = ex.copyWith(
-          sets: [
-            for (int j = 0; j < ex.sets.length; j++)
-              if (j == setIndex)
-                ex.sets[j].copyWith(kind: kind)
-              else
-                ex.sets[j],
-          ],
-        );
+        (exercises[supersetIndex].data as Superset)
+            .exercises[i] = _withRoutineSets(ex, [
+          for (int j = 0; j < ex.sets.length; j++)
+            if (j == setIndex) ex.sets[j].copyWith(kind: kind) else ex.sets[j],
+        ]);
       }
       _controller.exercises.refresh();
     },

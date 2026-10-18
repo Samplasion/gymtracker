@@ -63,6 +63,31 @@ class ExerciseProgression {
       ? targetReps
       : List.filled(count, minReps);
 
+  /// Keep each remaining working set's target when a routine is edited.
+  /// New working sets start at the bottom of the configured rep range.
+  ExerciseProgression? forRoutineSets(
+    List<GTSet> previousSets,
+    List<GTSet> nextSets,
+  ) {
+    final previous = previousSets
+        .where((set) => set.kind == GTSetKind.normal)
+        .toList();
+    final next = nextSets.where((set) => set.kind == GTSetKind.normal).toList();
+    if (next.isEmpty) return null;
+
+    final previousTargets = repsFor(setCount);
+    final targetsById = <String, int>{
+      for (var i = 0; i < previous.length && i < previousTargets.length; i++)
+        previous[i].id: previousTargets[i],
+    };
+    return copyWith(
+      setCount: next.length,
+      targetReps: mode == ProgressionMode.doubleProgression
+          ? [for (final set in next) targetsById[set.id] ?? minReps]
+          : targetReps,
+    );
+  }
+
   bool get isValid =>
       minReps > 0 &&
       setCount > 0 &&
@@ -121,13 +146,14 @@ class ExerciseProgression {
   ExerciseProgression copyWith({
     int? cycle,
     int? step,
+    int? setCount,
     List<int>? targetReps,
   }) => ExerciseProgression(
     mode: mode,
     minReps: minReps,
     maxReps: maxReps,
     repsPerStep: repsPerStep,
-    setCount: setCount,
+    setCount: setCount ?? this.setCount,
     startingWeight: startingWeight,
     weightPerStep: weightPerStep,
     weightPerCycle: weightPerCycle,

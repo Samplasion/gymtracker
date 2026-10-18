@@ -220,9 +220,11 @@ class Online extends _$Online {
     }
   }
 
-  Online() {
+  Online({OnlineService? service}) {
     _databaseService = Get.find<DatabaseService>();
-    if (TestService().isTest) {
+    if (service != null) {
+      _service = service;
+    } else if (TestService().isTest) {
       _service = TestOnlineServiceImpl();
     } else {
       _service = OnlineServiceImpl();
@@ -452,16 +454,28 @@ class Online extends _$Online {
   }
 
   Future<void> deleteAccount() async {
-    globalContainer
-        .read(eventBusProvider)
-        .emit(GBUserWillLogoutEvent(_service.account));
-    await Get.find<DatabaseService>().db
-        .clearTheWholeThingIAmAbsolutelySureISwear();
-    return _service.deleteAccount().then((_) {
+    final account = _service.account;
+    if (account == null) throw StateError('No account to delete');
+    final manager = syncManager;
+    final wasEnabled = manager.syncingEnabled;
+    manager.disableSync();
+    try {
+      // A failed remote deletion must never erase the local copy.
+      await _service.deleteAccount();
+      manager.setUserId('');
+      await _databaseService.db.clearUserData(account.id);
+      globalContainer
+          .read(eventBusProvider)
+          .emit(GBUserWillLogoutEvent(account));
+      await _databaseService.setCurrentUserId(null);
+      state = const AsyncValue.data(null);
       globalContainer.read(eventBusProvider).emit(GBUserDidLogoutEvent());
-      // Trigger a rebuild so everyone knows the user is no more more :(
-      ref.invalidateSelf();
-    });
+    } catch (_) {
+      if (wasEnabled && _service.account?.id == account.id) {
+        manager.enableSync();
+      }
+      rethrow;
+    }
   }
 
   Future<bool> checkEmailVerificationAndLogIn({

@@ -117,11 +117,11 @@ class _RoutinesViewState extends ConsumerState<RoutinesView> with _RoutineList {
     final loadingView = SliverSkeletonizer(
       enabled: true,
       child: MultiSliver(
-        children: routineList(
-          fakeFolders,
-          fakeRoutines,
-          foldersInNewPage: true,
-        ),
+        children: [
+          ...routineList(fakeFolders, fakeRoutines, foldersInNewPage: true),
+          // Avoids a pesky "No element" Heisenbug
+          SliverToBoxAdapter(child: SizedBox.shrink()),
+        ],
       ),
     );
 

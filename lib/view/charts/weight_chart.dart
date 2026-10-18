@@ -253,7 +253,11 @@ class _WeightChartTimeSeriesState extends State<WeightChartTimeSeries> {
               part: LineChartCategory(
                 title: context.t.bodyMeasurement[part.name].label,
                 icon: Text(
-                  context.t.bodyMeasurement[part.name].label.characters.first
+                  ((context.t.bodyMeasurement[part.name] as dynamic)?.label
+                              as String? ??
+                          "U")
+                      .characters
+                      .first
                       .toUpperCase(),
                   style: const TextStyle(fontSize: 10),
                 ),

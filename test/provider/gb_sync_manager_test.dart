@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:gymtracker/db/database.dart';
 import 'package:gymtracker/provider/events.dart';
@@ -8,6 +10,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../test_helpers/mock_services.dart';
 
 class MockGTDatabase extends Mock implements GTDatabase {}
+
 class MockSupabaseClient extends Mock implements SupabaseClient {}
 
 void main() {
@@ -58,54 +61,98 @@ void main() {
       expect(manager.isSyncingAny, isFalse);
     });
 
-    test('syncTables emits GBSyncStartedEvent and GBSyncFinishedEvent with timestamp', () async {
-      final manager = GBSyncManager(
-        localDatabase: mockDb,
-        supabaseClient: mockSupabase,
-        eventBus: eventBus,
-        drainCheckInterval: const Duration(milliseconds: 10),
+    for (final incoming in [false, true]) {
+      test(
+        'queue drain timeout is reported as an error (incoming: $incoming)',
+        () async {
+          final manager = _BlockedGBSyncManager(
+            localDatabase: mockDb,
+            supabaseClient: mockSupabase,
+            eventBus: eventBus,
+            incoming: incoming,
+          );
+          final events = <GBEvent>[];
+          final errorSub = eventBus.on<GBSyncErrorEvent>().listen(events.add);
+          final finishSub = eventBus.on<GBSyncFinishedEvent>().listen(
+            events.add,
+          );
+          addTearDown(errorSub.cancel);
+          addTearDown(finishSub.cancel);
+
+          await expectLater(
+            manager.waitForAllTables(),
+            throwsA(isA<TimeoutException>()),
+          );
+          await manager.syncTables();
+          await pumpEventQueue();
+
+          expect(
+            events.whereType<GBSyncErrorEvent>().single.error,
+            isA<TimeoutException>(),
+          );
+          expect(
+            events.whereType<GBSyncFinishedEvent>().single.lastSync,
+            isNull,
+          );
+          expect(manager.isSyncingTables, isFalse);
+        },
       );
+    }
 
-      final events = <GBEvent>[];
-      eventBus.on<GBSyncStartedEvent>().listen(events.add);
-      eventBus.on<GBSyncFinishedEvent>().listen(events.add);
+    test(
+      'syncTables emits GBSyncStartedEvent and GBSyncFinishedEvent with timestamp',
+      () async {
+        final manager = GBSyncManager(
+          localDatabase: mockDb,
+          supabaseClient: mockSupabase,
+          eventBus: eventBus,
+          drainCheckInterval: const Duration(milliseconds: 10),
+        );
 
-      await manager.syncTables();
-      await pumpEventQueue();
+        final events = <GBEvent>[];
+        eventBus.on<GBSyncStartedEvent>().listen(events.add);
+        eventBus.on<GBSyncFinishedEvent>().listen(events.add);
 
-      expect(events.length, equals(2));
-      expect(events[0], isA<GBSyncStartedEvent>());
-      expect(events[1], isA<GBSyncFinishedEvent>());
-      final finished = events[1] as GBSyncFinishedEvent;
-      expect(finished.lastSync, isNotNull);
-      expect(
-        finished.lastSync!.isBefore(
-          DateTime.now().add(const Duration(seconds: 1)),
-        ),
-        isTrue,
-      );
-    });
+        await manager.syncTables();
+        await pumpEventQueue();
 
-    test('syncTables does not start duplicate sync if already running', () async {
-      final manager = GBSyncManager(
-        localDatabase: mockDb,
-        supabaseClient: mockSupabase,
-        eventBus: eventBus,
-        drainCheckInterval: const Duration(milliseconds: 10),
-      );
+        expect(events.length, equals(2));
+        expect(events[0], isA<GBSyncStartedEvent>());
+        expect(events[1], isA<GBSyncFinishedEvent>());
+        final finished = events[1] as GBSyncFinishedEvent;
+        expect(finished.lastSync, isNotNull);
+        expect(
+          finished.lastSync!.isBefore(
+            DateTime.now().add(const Duration(seconds: 1)),
+          ),
+          isTrue,
+        );
+      },
+    );
 
-      final events = <GBEvent>[];
-      eventBus.on<GBSyncStartedEvent>().listen(events.add);
-      eventBus.on<GBSyncFinishedEvent>().listen(events.add);
+    test(
+      'syncTables does not start duplicate sync if already running',
+      () async {
+        final manager = GBSyncManager(
+          localDatabase: mockDb,
+          supabaseClient: mockSupabase,
+          eventBus: eventBus,
+          drainCheckInterval: const Duration(milliseconds: 10),
+        );
 
-      // Run concurrent sync calls
-      await Future.wait([manager.syncTables(), manager.syncTables()]);
-      await pumpEventQueue();
+        final events = <GBEvent>[];
+        eventBus.on<GBSyncStartedEvent>().listen(events.add);
+        eventBus.on<GBSyncFinishedEvent>().listen(events.add);
 
-      // Only one sync lifecycle should run
-      expect(events.whereType<GBSyncStartedEvent>().length, equals(1));
-      expect(events.whereType<GBSyncFinishedEvent>().length, equals(1));
-    });
+        // Run concurrent sync calls
+        await Future.wait([manager.syncTables(), manager.syncTables()]);
+        await pumpEventQueue();
+
+        // Only one sync lifecycle should run
+        expect(events.whereType<GBSyncStartedEvent>().length, equals(1));
+        expect(events.whereType<GBSyncFinishedEvent>().length, equals(1));
+      },
+    );
 
     test('automatic sync tracking emits start and finish events', () async {
       final manager = _TestGBSyncManager(
@@ -127,34 +174,42 @@ void main() {
 
       expect(events.any((e) => e is GBSyncStartedEvent), isTrue);
       expect(events.any((e) => e is GBSyncFinishedEvent), isTrue);
-      final finishEvent = events.firstWhere((e) => e is GBSyncFinishedEvent) as GBSyncFinishedEvent;
+      final finishEvent =
+          events.firstWhere((e) => e is GBSyncFinishedEvent)
+              as GBSyncFinishedEvent;
       expect(finishEvent.lastSync, isNotNull);
     });
 
-    test('syncTables emits GBSyncErrorEvent and GBSyncFinishedEvent with null lastSync on failure', () async {
-      final manager = _FailingGBSyncManager(
-        localDatabase: mockDb,
-        supabaseClient: mockSupabase,
-        eventBus: eventBus,
-      );
+    test(
+      'syncTables emits GBSyncErrorEvent and GBSyncFinishedEvent with null lastSync on failure',
+      () async {
+        final manager = _FailingGBSyncManager(
+          localDatabase: mockDb,
+          supabaseClient: mockSupabase,
+          eventBus: eventBus,
+        );
 
-      final events = <GBEvent>[];
-      eventBus.on<GBSyncStartedEvent>().listen(events.add);
-      eventBus.on<GBSyncErrorEvent>().listen(events.add);
-      eventBus.on<GBSyncFinishedEvent>().listen(events.add);
+        final events = <GBEvent>[];
+        eventBus.on<GBSyncStartedEvent>().listen(events.add);
+        eventBus.on<GBSyncErrorEvent>().listen(events.add);
+        eventBus.on<GBSyncFinishedEvent>().listen(events.add);
 
-      expect(() => manager.syncTables(), throwsException);
-      await pumpEventQueue();
+        expect(() => manager.syncTables(), throwsException);
+        await pumpEventQueue();
 
-      expect(events.length, equals(3));
-      expect(events[0], isA<GBSyncStartedEvent>());
-      expect(events[1], isA<GBSyncErrorEvent>());
-      expect(events[2], isA<GBSyncFinishedEvent>());
-      final errorEvent = events[1] as GBSyncErrorEvent;
-      expect(errorEvent.error.toString(), contains('Simulated network failure'));
-      final finished = events[2] as GBSyncFinishedEvent;
-      expect(finished.lastSync, isNull);
-    });
+        expect(events.length, equals(3));
+        expect(events[0], isA<GBSyncStartedEvent>());
+        expect(events[1], isA<GBSyncErrorEvent>());
+        expect(events[2], isA<GBSyncFinishedEvent>());
+        final errorEvent = events[1] as GBSyncErrorEvent;
+        expect(
+          errorEvent.error.toString(),
+          contains('Simulated network failure'),
+        );
+        final finished = events[2] as GBSyncFinishedEvent;
+        expect(finished.lastSync, isNull);
+      },
+    );
   });
 }
 
@@ -166,7 +221,9 @@ class _FailingGBSyncManager extends GBSyncManager {
   });
 
   @override
-  Future<void> waitForAllTables({Duration timeout = const Duration(seconds: 30)}) {
+  Future<void> waitForAllTables({
+    Duration timeout = const Duration(seconds: 30),
+  }) {
     throw Exception('Simulated network failure');
   }
 }
@@ -220,4 +277,25 @@ class _TestGBSyncManager extends GBSyncManager {
     trackAutomaticSync(startSyncs);
     _fakeFullSyncs++;
   }
+}
+
+class _BlockedGBSyncManager extends GBSyncManager {
+  _BlockedGBSyncManager({
+    required super.localDatabase,
+    required super.supabaseClient,
+    required super.eventBus,
+    required this.incoming,
+  });
+
+  final bool incoming;
+
+  @override
+  bool get isSyncingFromBackend => incoming;
+
+  @override
+  bool get isSyncingToBackend => !incoming;
+
+  @override
+  Future<void> waitForAllTables({Duration timeout = Duration.zero}) =>
+      super.waitForAllTables(timeout: timeout);
 }

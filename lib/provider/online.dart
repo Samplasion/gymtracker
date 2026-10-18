@@ -76,8 +76,7 @@ class GBSyncManager extends SyncManager<GTDatabase> {
     final stopwatch = Stopwatch()..start();
     while (isSyncingFromBackend || isSyncingToBackend) {
       if (stopwatch.elapsed >= timeout) {
-        logger.w("Sync queue drain timed out after $timeout");
-        break;
+        throw TimeoutException("Sync queue drain timed out", timeout);
       }
       await Future.delayed(drainCheckInterval);
     }

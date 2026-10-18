@@ -84,20 +84,11 @@ class SyncStatusNotifier extends _$SyncStatusNotifier {
       state = state.copyWith(state: SyncState.error);
       _stopPolling();
     });
-    final timestampSub = eventBus.on<GBSyncTimestampUpdatedEvent>().listen((
-      event,
-    ) {
-      final local = event.timestamp.toLocal();
-      _lastSync = local;
-      _saveLastSync(local);
-      state = state.copyWith(lastSync: local);
-    });
 
     ref.onDispose(() {
       startSub.cancel();
       finishSub.cancel();
       errorSub.cancel();
-      timestampSub.cancel();
       _stopPolling();
     });
 

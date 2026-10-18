@@ -143,7 +143,7 @@ void main() {
     );
 
     test(
-      'updates lastSync and persists to SharedPreferences on GBSyncTimestampUpdatedEvent',
+      'partial table checkpoints do not update the last successful sync',
       () async {
         final container = ProviderContainer(
           overrides: [
@@ -170,12 +170,12 @@ void main() {
         await Future<void>.delayed(const Duration(milliseconds: 50));
 
         final status = container.read(syncStatusProvider);
-        expect(status.lastSync, equals(newTimestamp.toLocal()));
+        expect(status.lastSync, equals(initialDate));
 
         final prefs = await SharedPreferences.getInstance();
         expect(
           prefs.getInt('gymtracker_last_sync_$testUserId'),
-          equals(newTimestamp.toLocal().millisecondsSinceEpoch),
+          equals(initialDate.millisecondsSinceEpoch),
         );
       },
     );
@@ -236,56 +236,73 @@ void main() {
         bus.emit(GBSyncFinishedEvent(lastSync: initialSyncDate));
         await Future<void>.delayed(const Duration(milliseconds: 50));
 
-        expect(container.read(syncStatusProvider).lastSync, equals(initialSyncDate));
+        expect(
+          container.read(syncStatusProvider).lastSync,
+          equals(initialSyncDate),
+        );
 
         // Now emit a failed sync finished event (lastSync == null)
         bus.emit(const GBSyncStartedEvent());
         await Future<void>.delayed(const Duration(milliseconds: 50));
-        expect(container.read(syncStatusProvider).state, equals(SyncState.syncing));
+        expect(
+          container.read(syncStatusProvider).state,
+          equals(SyncState.syncing),
+        );
 
         bus.emit(const GBSyncFinishedEvent(lastSync: null));
         await Future<void>.delayed(const Duration(milliseconds: 50));
 
         // State returns to notSyncing, but lastSync is NOT overwritten
-        expect(container.read(syncStatusProvider).state, equals(SyncState.notSyncing));
-        expect(container.read(syncStatusProvider).lastSync, equals(initialSyncDate));
+        expect(
+          container.read(syncStatusProvider).state,
+          equals(SyncState.notSyncing),
+        );
+        expect(
+          container.read(syncStatusProvider).lastSync,
+          equals(initialSyncDate),
+        );
       },
     );
 
-    test('sync() ignores requests if less than 1 minute has passed since lastSync', () async {
-      final container = ProviderContainer(
-        overrides: [
-          currentUserIdProvider.overrideWith((ref) => testUserId),
-          onlineProvider.overrideWith(
-            () => _FakeOnline(
-              OnlineAccount(
-                id: testUserId,
-                email: 'test@example.com',
-                name: 'tester',
+    test(
+      'sync() ignores requests if less than 1 minute has passed since lastSync',
+      () async {
+        final container = ProviderContainer(
+          overrides: [
+            currentUserIdProvider.overrideWith((ref) => testUserId),
+            onlineProvider.overrideWith(
+              () => _FakeOnline(
+                OnlineAccount(
+                  id: testUserId,
+                  email: 'test@example.com',
+                  name: 'tester',
+                ),
               ),
             ),
-          ),
-        ],
-      );
-      addTearDown(container.dispose);
+          ],
+        );
+        addTearDown(container.dispose);
 
-      container.read(syncStatusProvider);
-      await Future<void>.delayed(const Duration(milliseconds: 50));
+        container.read(syncStatusProvider);
+        await Future<void>.delayed(const Duration(milliseconds: 50));
 
-      // First sync succeeds
-      final first = await container.read(syncStatusProvider.notifier).sync();
-      await pumpEventQueue();
-      expect(first, isTrue);
+        // First sync succeeds
+        final first = await container.read(syncStatusProvider.notifier).sync();
+        await pumpEventQueue();
+        expect(first, isTrue);
 
-      // Immediate second sync is rate-limited
-      final second = await container.read(syncStatusProvider.notifier).sync();
-      expect(second, isFalse);
+        // Immediate second sync is rate-limited
+        final second = await container.read(syncStatusProvider.notifier).sync();
+        expect(second, isFalse);
 
-      // Forced sync bypasses the rate limit
-      final forced = await container.read(syncStatusProvider.notifier).sync(force: true);
-      await pumpEventQueue();
-      expect(forced, isTrue);
-    });
+        // Forced sync bypasses the rate limit
+        final forced = await container
+            .read(syncStatusProvider.notifier)
+            .sync(force: true);
+        await pumpEventQueue();
+        expect(forced, isTrue);
+      },
+    );
 
     test('updates state to SyncState.error on GBSyncErrorEvent', () async {
       final container = ProviderContainer(
@@ -310,7 +327,10 @@ void main() {
       final bus = container.read(eventBusProvider);
       bus.emit(const GBSyncStartedEvent());
       await Future<void>.delayed(const Duration(milliseconds: 50));
-      expect(container.read(syncStatusProvider).state, equals(SyncState.syncing));
+      expect(
+        container.read(syncStatusProvider).state,
+        equals(SyncState.syncing),
+      );
 
       bus.emit(GBSyncErrorEvent(Exception('Connection reset')));
       await Future<void>.delayed(const Duration(milliseconds: 50));
@@ -328,7 +348,10 @@ void main() {
       // New sync starts: error state is cleared
       bus.emit(const GBSyncStartedEvent());
       await Future<void>.delayed(const Duration(milliseconds: 50));
-      expect(container.read(syncStatusProvider).state, equals(SyncState.syncing));
+      expect(
+        container.read(syncStatusProvider).state,
+        equals(SyncState.syncing),
+      );
       expect(container.read(syncStatusProvider).hasError, isFalse);
     });
   });

@@ -25,8 +25,10 @@ The upstream LICENSE is retained. This package is private and resolved by path.
   beyond their lifetime.
 - Queues are acknowledged after successful writes. An upload is read back because
   the existing server trigger may silently reject older updates. A reply for an
-  older local version never acknowledges a newer queued edit. Equal timestamps
-  with differing outgoing content surface an error instead of reporting success.
+  older local version never acknowledges a newer queued edit. The later
+  `updated_at` wins; equal timestamps with different contents choose the server
+  row, including after an upload readback. Full reconciliation also fetches rows
+  with equal timestamps to resolve conflicts left by earlier app versions.
 - Full reconciliation compares all paginated metadata. Persistent timestamps
   remain informational; they cannot exclude unsent legacy rows. Realtime is an
   optimization, not the only recovery path.
@@ -43,6 +45,9 @@ This is the first reliability increment. It does not introduce a persistent
 operation outbox, server revisions, conflict history, or recovery of already
 lost records. Reconciliation still uses client timestamps; older offline edits
 can lose to a newer server value under the existing conflict policy. Server
-metadata pagination is not a transactionally consistent snapshot; a later full
-reconciliation recovers rows moved during pagination. Deployment against the
+records and local sync models currently have no `created_at` field, so creation
+time cannot break an `updated_at` tie. SQLite stores these timestamps at second
+precision; two distinct edits within one second can tie and use the server rule.
+Server metadata pagination is not a transactionally consistent snapshot; a
+later full reconciliation recovers rows moved during pagination. Deployment against the
 actual backend and testing on physical devices remain required.

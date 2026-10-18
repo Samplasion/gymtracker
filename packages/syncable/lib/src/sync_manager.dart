@@ -417,7 +417,7 @@ class SyncManager<T extends SyncableDatabase> {
       final toPull = remote.entries
           .where((entry) =>
               localById[entry.key] == null ||
-              entry.value.isAfter(localById[entry.key]!.updatedAt))
+              !entry.value.isBefore(localById[entry.key]!.updatedAt))
           .map((e) => e.key)
           .toList();
       for (final ids in toPull.slices(100)) {
@@ -472,14 +472,11 @@ class SyncManager<T extends SyncableDatabase> {
             throw StateError(
                 'Upload was not confirmed for ${_backendTables[type]}/${row.id}');
           }
-          if (server.updatedAt.isAtSameMomentAs(row.updatedAt) &&
-              !_same(server, row)) {
-            throw StateError(
-                'Conflicting data at the same revision for ${_backendTables[type]}/${row.id}');
-          }
           if (identical(queue[row.id], row)) queue.remove(row.id);
           _knownItems[type]![row.id] = server;
-          if (server.updatedAt.isAfter(row.updatedAt))
+          // Equal timestamps are possible with SQLite's second precision.
+          // The server is the deterministic winner when contents differ.
+          if (server.updatedAt.isAfter(row.updatedAt) || !_same(server, row))
             _inQueues[type]!.add(server);
         }
         _nSyncedToBackend[type] = nSyncedToBackend(type) + batch.length;
@@ -501,7 +498,8 @@ class SyncManager<T extends SyncableDatabase> {
     for (final row in snapshot) {
       if (row.userId != owner) throw StateError('Unexpected sync owner');
       final old = latest[row.id];
-      if (old == null || row.updatedAt.isAfter(old.updatedAt))
+      // When two server events share a timestamp, the latest observed value wins.
+      if (old == null || !row.updatedAt.isBefore(old.updatedAt))
         latest[row.id] = row;
     }
     final table = _localTables[type]!;
@@ -514,7 +512,9 @@ class SyncManager<T extends SyncableDatabase> {
         if (!_current(generation, owner)) throw const _SyncInterrupted();
         if (existing == null) {
           await _localDb.into(table).insert(row.toCompanion());
-        } else if (row.updatedAt.isAfter(existing.updatedAt)) {
+        } else if (row.updatedAt.isAfter(existing.updatedAt) ||
+            (row.updatedAt.isAtSameMomentAs(existing.updatedAt) &&
+                !_same(row, existing))) {
           await (_localDb.update(table)
                 ..where((r) => r.userId.equals(owner) & r.id.equals(row.id)))
               .write(row.toCompanion());

@@ -560,30 +560,33 @@ class GTDatabaseImpl extends _$GTDatabaseImpl
   int get schemaVersion => DATABASE_VERSION;
 
   String? _currentUserId;
+  final _userIdChanges = BehaviorSubject<String?>.seeded(null);
 
   @override
   String? get currentUserId => _currentUserId;
 
   @override
   void setCurrentUserId(String? id) {
+    if (_currentUserId == id) return;
     _currentUserId = id;
-    // Force all syncable-table streams to re-evaluate their queries.
-    notifyUpdates({
-      TableUpdate.onTable(routines),
-      TableUpdate.onTable(routineExercises),
-      TableUpdate.onTable(routineFolders),
-      TableUpdate.onTable(historyWorkouts),
-      TableUpdate.onTable(historyWorkoutExercises),
-      TableUpdate.onTable(customExercises),
-      TableUpdate.onTable(achievements),
-      TableUpdate.onTable(foods),
-      TableUpdate.onTable(customBarcodeFoods),
-      TableUpdate.onTable(favoriteFoods),
-      TableUpdate.onTable(nutritionCategories),
-      TableUpdate.onTable(nutritionGoals),
-      TableUpdate.onTable(weightMeasurements),
-      TableUpdate.onTable(bodyMeasurements),
-    });
+    _userIdChanges.add(id);
+  }
+
+  Stream<T> _watchForCurrentUser<T>(Stream<T> Function() query) {
+    // A separate input per subscriber also propagates pause/resume to switchMap.
+    Stream<String?> identities() async* {
+      yield* _userIdChanges;
+    }
+
+    return identities().distinct().switchMap(
+      (userId) => query().where((_) => userId == _currentUserId),
+    );
+  }
+
+  @override
+  Future<void> close() async {
+    await _userIdChanges.close();
+    await super.close();
   }
 
   /// Returns a filter expression for a `userId` column:
@@ -599,49 +602,53 @@ class GTDatabaseImpl extends _$GTDatabaseImpl
 
   @override
   Stream<List<model.Workout>> getAllRoutines() {
-    logger.i("Getting all routines");
+    return _watchForCurrentUser(() {
+      logger.i("Getting all routines");
 
-    final query = select(routines)
-      ..where((tbl) => tbl.deleted.equals(false) & _userIdPredicate(tbl.userId))
-      ..orderBy([(r) => OrderingTerm(expression: r.sortOrder)]);
-    final routineStream = query.watch();
-
-    return routineStream.switchMap((routines) {
-      final idToRoutine = {for (var routine in routines) routine.id: routine};
-      final ids = idToRoutine.keys;
-
-      final folderQuery = select(routineFolders)
+      final query = select(routines)
         ..where(
           (tbl) => tbl.deleted.equals(false) & _userIdPredicate(tbl.userId),
-        );
-      final folderStream = folderQuery.watch();
+        )
+        ..orderBy([(r) => OrderingTerm(expression: r.sortOrder)]);
+      final routineStream = query.watch();
 
-      return folderStream.switchMap((dbFolders) {
-        final idToFolder = {for (var folder in dbFolders) folder.id: folder};
+      return routineStream.switchMap((routines) {
+        final idToRoutine = {for (var routine in routines) routine.id: routine};
+        final ids = idToRoutine.keys;
 
-        final exQuery = select(routineExercises)
+        final folderQuery = select(routineFolders)
           ..where(
-            (tbl) =>
-                tbl.routineId.isIn(ids) &
-                tbl.deleted.equals(false) &
-                _userIdPredicate(tbl.userId),
+            (tbl) => tbl.deleted.equals(false) & _userIdPredicate(tbl.userId),
           );
+        final folderStream = folderQuery.watch();
 
-        return exQuery.watch().map((rows) {
-          final idToExs = <String, List<ConcreteExercise>>{};
+        return folderStream.switchMap((dbFolders) {
+          final idToFolder = {for (var folder in dbFolders) folder.id: folder};
 
-          for (final row in rows) {
-            idToExs.putIfAbsent(row.routineId, () => []).add(row);
-          }
+          final exQuery = select(routineExercises)
+            ..where(
+              (tbl) =>
+                  tbl.routineId.isIn(ids) &
+                  tbl.deleted.equals(false) &
+                  _userIdPredicate(tbl.userId),
+            );
 
-          return [
-            for (var id in ids)
-              workoutFromDatabase(
-                idToRoutine[id]!,
-                idToExs[id] ?? [],
-                dbFolder: idToFolder[idToRoutine[id]!.folderId],
-              ),
-          ];
+          return exQuery.watch().map((rows) {
+            final idToExs = <String, List<ConcreteExercise>>{};
+
+            for (final row in rows) {
+              idToExs.putIfAbsent(row.routineId, () => []).add(row);
+            }
+
+            return [
+              for (var id in ids)
+                workoutFromDatabase(
+                  idToRoutine[id]!,
+                  idToExs[id] ?? [],
+                  dbFolder: idToFolder[idToRoutine[id]!.folderId],
+                ),
+            ];
+          });
         });
       });
     });
@@ -904,11 +911,13 @@ class GTDatabaseImpl extends _$GTDatabaseImpl
 
   @override
   Stream<List<model.GTRoutineFolder>> watchRoutineFolders() {
-    return (select(routineFolders)..where(
-          (tbl) => tbl.deleted.equals(false) & _userIdPredicate(tbl.userId),
-        ))
-        .watch()
-        .map((l) => [for (final row in l) folderFromDatabase(row)]);
+    return _watchForCurrentUser(() {
+      return (select(routineFolders)..where(
+            (tbl) => tbl.deleted.equals(false) & _userIdPredicate(tbl.userId),
+          ))
+          .watch()
+          .map((l) => [for (final row in l) folderFromDatabase(row)]);
+    });
   }
 
   @override
@@ -1023,38 +1032,42 @@ class GTDatabaseImpl extends _$GTDatabaseImpl
 
   @override
   Stream<List<model.Workout>> getAllHistoryWorkouts() {
-    logger.i("Getting all history workouts");
+    return _watchForCurrentUser(() {
+      logger.i("Getting all history workouts");
 
-    final query = select(historyWorkouts)
-      ..where((tbl) => tbl.deleted.equals(false) & _userIdPredicate(tbl.userId))
-      ..orderBy([
-        (r) =>
-            OrderingTerm(expression: r.startingDate, mode: OrderingMode.desc),
-      ]);
-    final historyStream = query.watch();
-
-    return historyStream.switchMap((history) {
-      final idToWorkout = {for (var workout in history) workout.id: workout};
-      final ids = idToWorkout.keys;
-
-      final entryQuery = select(historyWorkoutExercises)
+      final query = select(historyWorkouts)
         ..where(
-          (tbl) =>
-              tbl.routineId.isIn(ids) &
-              tbl.deleted.equals(false) &
-              _userIdPredicate(tbl.userId),
-        );
+          (tbl) => tbl.deleted.equals(false) & _userIdPredicate(tbl.userId),
+        )
+        ..orderBy([
+          (r) =>
+              OrderingTerm(expression: r.startingDate, mode: OrderingMode.desc),
+        ]);
+      final historyStream = query.watch();
 
-      return entryQuery.watch().map((rows) {
-        final idToItems = <String, List<ConcreteExercise>>{};
+      return historyStream.switchMap((history) {
+        final idToWorkout = {for (var workout in history) workout.id: workout};
+        final ids = idToWorkout.keys;
 
-        for (final row in rows) {
-          idToItems.putIfAbsent(row.routineId, () => []).add(row);
-        }
-        return [
-          for (var id in ids)
-            historyWorkoutFromDatabase(idToWorkout[id]!, idToItems[id] ?? []),
-        ];
+        final entryQuery = select(historyWorkoutExercises)
+          ..where(
+            (tbl) =>
+                tbl.routineId.isIn(ids) &
+                tbl.deleted.equals(false) &
+                _userIdPredicate(tbl.userId),
+          );
+
+        return entryQuery.watch().map((rows) {
+          final idToItems = <String, List<ConcreteExercise>>{};
+
+          for (final row in rows) {
+            idToItems.putIfAbsent(row.routineId, () => []).add(row);
+          }
+          return [
+            for (var id in ids)
+              historyWorkoutFromDatabase(idToWorkout[id]!, idToItems[id] ?? []),
+          ];
+        });
       });
     });
   }
@@ -1267,14 +1280,16 @@ class GTDatabaseImpl extends _$GTDatabaseImpl
 
   @override
   Stream<List<model.Exercise>> getAllCustomExercises() {
-    logger.i("Getting all custom exercises");
-    return (select(customExercises)..where(
-          (tbl) => tbl.deleted.equals(false) & _userIdPredicate(tbl.userId),
-        ))
-        .watch()
-        .map((rows) {
-          return [for (final row in rows) exerciseFromData(row)];
-        });
+    return _watchForCurrentUser(() {
+      logger.i("Getting all custom exercises");
+      return (select(customExercises)..where(
+            (tbl) => tbl.deleted.equals(false) & _userIdPredicate(tbl.userId),
+          ))
+          .watch()
+          .map((rows) {
+            return [for (final row in rows) exerciseFromData(row)];
+          });
+    });
   }
 
   @override
@@ -1365,10 +1380,14 @@ class GTDatabaseImpl extends _$GTDatabaseImpl
 
   @override
   Stream<List<WeightMeasurement>> watchWeightMeasurements() {
-    final query = select(weightMeasurements)
-      ..where((tbl) => tbl.deleted.equals(false) & _userIdPredicate(tbl.userId))
-      ..orderBy([(tbl) => OrderingTerm.asc(tbl.time)]);
-    return query.watch();
+    return _watchForCurrentUser(() {
+      final query = select(weightMeasurements)
+        ..where(
+          (tbl) => tbl.deleted.equals(false) & _userIdPredicate(tbl.userId),
+        )
+        ..orderBy([(tbl) => OrderingTerm.asc(tbl.time)]);
+      return query.watch();
+    });
   }
 
   @override
@@ -1435,11 +1454,15 @@ class GTDatabaseImpl extends _$GTDatabaseImpl
 
   @override
   Stream<List<model.TaggedFood>> watchFoods() {
-    final query = select(foods)
-      ..where((tbl) => tbl.deleted.equals(false) & _userIdPredicate(tbl.userId))
-      ..orderBy([(tbl) => OrderingTerm.asc(tbl.dateAdded)]);
-    return query.watch().map((foods) {
-      return foods.map((food) => foodFromDatabase(food)).toList();
+    return _watchForCurrentUser(() {
+      final query = select(foods)
+        ..where(
+          (tbl) => tbl.deleted.equals(false) & _userIdPredicate(tbl.userId),
+        )
+        ..orderBy([(tbl) => OrderingTerm.asc(tbl.dateAdded)]);
+      return query.watch().map((foods) {
+        return foods.map((food) => foodFromDatabase(food)).toList();
+      });
     });
   }
 
@@ -1500,11 +1523,15 @@ class GTDatabaseImpl extends _$GTDatabaseImpl
 
   @override
   Stream<List<model.TaggedNutritionGoal>> watchNutritionGoals() {
-    final query = select(nutritionGoals)
-      ..where((tbl) => tbl.deleted.equals(false) & _userIdPredicate(tbl.userId))
-      ..orderBy([(tbl) => OrderingTerm.asc(tbl.referenceDate)]);
-    return query.watch().map((goals) {
-      return goals.map((goal) => goalFromDatabase(goal)).toList();
+    return _watchForCurrentUser(() {
+      final query = select(nutritionGoals)
+        ..where(
+          (tbl) => tbl.deleted.equals(false) & _userIdPredicate(tbl.userId),
+        )
+        ..orderBy([(tbl) => OrderingTerm.asc(tbl.referenceDate)]);
+      return query.watch().map((goals) {
+        return goals.map((goal) => goalFromDatabase(goal)).toList();
+      });
     });
   }
 
@@ -1552,16 +1579,18 @@ class GTDatabaseImpl extends _$GTDatabaseImpl
 
   @override
   Stream<Map<String, model.Food>> watchCustomBarcodeFoods() {
-    return (select(customBarcodeFoods)..where(
-          (tbl) => tbl.deleted.equals(false) & _userIdPredicate(tbl.userId),
-        ))
-        .watch()
-        .map((foods) {
-          return {
-            for (final food in foods)
-              food.id: model.Food.fromJson(jsonDecode(food.jsonData)),
-          };
-        });
+    return _watchForCurrentUser(() {
+      return (select(customBarcodeFoods)..where(
+            (tbl) => tbl.deleted.equals(false) & _userIdPredicate(tbl.userId),
+          ))
+          .watch()
+          .map((foods) {
+            return {
+              for (final food in foods)
+                food.id: model.Food.fromJson(jsonDecode(food.jsonData)),
+            };
+          });
+    });
   }
 
   @override
@@ -1620,27 +1649,29 @@ class GTDatabaseImpl extends _$GTDatabaseImpl
 
   @override
   Stream<List<model.Food>> watchFavoriteFoods() {
-    return (select(favoriteFoods)..where(
-          (tbl) => tbl.deleted.equals(false) & _userIdPredicate(tbl.userId),
-        ))
-        .watch()
-        .switchMap((foodIDs) {
-          final ids = foodIDs.map((e) => e.id).toList();
-          return (select(foods)..where(
-                (tbl) =>
-                    tbl.deleted.equals(false) & _userIdPredicate(tbl.userId),
-              ))
-              .watch()
-              .map(
-                (foods) => foods
-                    .where((f) => ids.contains(f.id))
-                    .map(
-                      (dbfood) =>
-                          model.Food.fromJson(jsonDecode(dbfood.jsonData)),
-                    )
-                    .toList(),
-              );
-        });
+    return _watchForCurrentUser(() {
+      return (select(favoriteFoods)..where(
+            (tbl) => tbl.deleted.equals(false) & _userIdPredicate(tbl.userId),
+          ))
+          .watch()
+          .switchMap((foodIDs) {
+            final ids = foodIDs.map((e) => e.id).toList();
+            return (select(foods)..where(
+                  (tbl) =>
+                      tbl.deleted.equals(false) & _userIdPredicate(tbl.userId),
+                ))
+                .watch()
+                .map(
+                  (foods) => foods
+                      .where((f) => ids.contains(f.id))
+                      .map(
+                        (dbfood) =>
+                            model.Food.fromJson(jsonDecode(dbfood.jsonData)),
+                      )
+                      .toList(),
+                );
+          });
+    });
   }
 
   @override
@@ -1694,20 +1725,22 @@ class GTDatabaseImpl extends _$GTDatabaseImpl
   @override
   Stream<Map<DateTime, Map<String, model.NutritionCategory>>>
   watchNutritionCategories() {
-    return (select(nutritionCategories)..where(
-          (tbl) => tbl.deleted.equals(false) & _userIdPredicate(tbl.userId),
-        ))
-        .watch()
-        .map((categories) {
-          return {
-            for (final category in categories)
-              databaseDateToLocalDay(category.referenceDate): Map.fromEntries(
-                (jsonDecode(category.jsonData) as List)
-                    .map((e) => model.NutritionCategory.fromJson(e))
-                    .map((c) => MapEntry(c.name, c)),
-              ),
-          };
-        });
+    return _watchForCurrentUser(() {
+      return (select(nutritionCategories)..where(
+            (tbl) => tbl.deleted.equals(false) & _userIdPredicate(tbl.userId),
+          ))
+          .watch()
+          .map((categories) {
+            return {
+              for (final category in categories)
+                databaseDateToLocalDay(category.referenceDate): Map.fromEntries(
+                  (jsonDecode(category.jsonData) as List)
+                      .map((e) => model.NutritionCategory.fromJson(e))
+                      .map((c) => MapEntry(c.name, c)),
+                ),
+            };
+          });
+    });
   }
 
   @override
@@ -1767,10 +1800,12 @@ class GTDatabaseImpl extends _$GTDatabaseImpl
 
   @override
   Stream<List<AchievementCompletion>> watchAchievementCompletions() {
-    return (select(achievements)..where(
-          (tbl) => tbl.deleted.equals(false) & _userIdPredicate(tbl.userId),
-        ))
-        .watch();
+    return _watchForCurrentUser(() {
+      return (select(achievements)..where(
+            (tbl) => tbl.deleted.equals(false) & _userIdPredicate(tbl.userId),
+          ))
+          .watch();
+    });
   }
 
   @override
@@ -1863,10 +1898,14 @@ class GTDatabaseImpl extends _$GTDatabaseImpl
 
   @override
   Stream<List<BodyMeasurement>> watchBodyMeasurements() {
-    final query = select(bodyMeasurements)
-      ..where((tbl) => tbl.deleted.equals(false) & _userIdPredicate(tbl.userId))
-      ..orderBy([(tbl) => OrderingTerm.asc(tbl.time)]);
-    return query.watch();
+    return _watchForCurrentUser(() {
+      final query = select(bodyMeasurements)
+        ..where(
+          (tbl) => tbl.deleted.equals(false) & _userIdPredicate(tbl.userId),
+        )
+        ..orderBy([(tbl) => OrderingTerm.asc(tbl.time)]);
+      return query.watch();
+    });
   }
 
   @override

@@ -58,10 +58,31 @@ class DatabaseService extends GetxService
   final completions$ = BehaviorSubject<List<AchievementCompletion>>.seeded([]);
   final bodyMeasurements$ = BehaviorSubject<List<BodyMeasurement>>.seeded([]);
 
+  final _databaseSubscriptions = <StreamSubscription<dynamic>>[];
+
+  void _listenTo<T>(
+    Stream<T> stream,
+    void Function(T) onData, {
+    Function? onError,
+  }) {
+    _databaseSubscriptions.add(stream.listen(onData, onError: onError));
+  }
+
+  Future<void> _cancelDatabaseSubscriptions() async {
+    await Future.wait(_databaseSubscriptions.map((s) => s.cancel()));
+    _databaseSubscriptions.clear();
+  }
+
+  @override
+  void onClose() {
+    unawaited(_cancelDatabaseSubscriptions());
+    super.onClose();
+  }
+
   final backups = _DatabaseBackups();
   BehaviorSubject<List<DatabaseBackup>> get _backups$ => BehaviorSubject();
 
-  void eraseAllSubjects() {
+  void eraseAllSubjects({bool includeDeviceState = true}) {
     logger.i(
       "[DatabaseService.eraseAllSubjects] Erasing all subjects; "
       "prefs\$ reset to Prefs.defaultValue (onboardingComplete=${Prefs.defaultValue.onboardingComplete})",
@@ -69,12 +90,14 @@ class DatabaseService extends GetxService
     exercises$.add([]);
     routines$.add([]);
     history$.add([]);
-    prefs$.add(
-      Prefs.defaultValue.copyWith(
-        onboardingComplete: prefs$.value.onboardingComplete,
-      ),
-    );
-    ongoing$.add(null);
+    if (includeDeviceState) {
+      prefs$.add(
+        Prefs.defaultValue.copyWith(
+          onboardingComplete: prefs$.value.onboardingComplete,
+        ),
+      );
+      ongoing$.add(null);
+    }
     weightMeasurements$.add([]);
     folders$.add([]);
     foods$.add([]);
@@ -125,6 +148,7 @@ class DatabaseService extends GetxService
     Function()? onDone,
     bool overrideInitializationCheck = false,
   }) async {
+    await _cancelDatabaseSubscriptions();
     await backups.init();
 
     final initialized = [
@@ -156,13 +180,14 @@ class DatabaseService extends GetxService
       _backups$.add(b);
     });
 
-    db.watchAchievementCompletions().listen((event) {
+    _listenTo(db.watchAchievementCompletions(), (event) {
       completions$.add(event);
       onDatabaseUpdated("nutrition categories")();
       initialized[0] = true;
       check();
     });
-    _db.getAllCustomExercises().listen(
+    _listenTo(
+      _db.getAllCustomExercises(),
       (event) {
         exercises$.add(event);
         onDatabaseUpdated("exercises")();
@@ -173,19 +198,19 @@ class DatabaseService extends GetxService
         logger.e("Error loading exercises", error: e, stackTrace: s);
       },
     );
-    _db.getAllRoutines().listen((event) {
+    _listenTo(_db.getAllRoutines(), (event) {
       routines$.add(event);
       onDatabaseUpdated("routines")();
       initialized[2] = true;
       check();
     });
-    _db.getAllHistoryWorkouts().listen((event) {
+    _listenTo(_db.getAllHistoryWorkouts(), (event) {
       history$.add(event);
       onDatabaseUpdated("history")();
       initialized[3] = true;
       check();
     });
-    _db.watchPreferences().listen((prefs) {
+    _listenTo(_db.watchPreferences(), (prefs) {
       logger.i(
         "[DatabaseService.watchPreferences] Emitted preferences from DB: "
         "onboardingComplete=${prefs.onboardingComplete}, "
@@ -198,66 +223,71 @@ class DatabaseService extends GetxService
       check();
       prefs.logger.i("Changed.");
     });
-    _db.watchOngoing().listen((event) {
+    _listenTo(_db.watchOngoing(), (event) {
       ongoing$.add(event);
       onDatabaseUpdated("ongoing")();
       initialized[5] = true;
+      check();
     });
-    _db.watchWeightMeasurements().listen((event) {
+    _listenTo(_db.watchWeightMeasurements(), (event) {
       weightMeasurements$.add(event);
       onDatabaseUpdated("weight measurements")();
       initialized[6] = true;
       check();
     });
-    _db.watchRoutineFolders().listen((event) {
+    _listenTo(_db.watchRoutineFolders(), (event) {
       folders$.add(event);
       onDatabaseUpdated("folders")();
       initialized[7] = true;
       check();
     });
-    _db.watchFoods().listen((event) {
+    _listenTo(_db.watchFoods(), (event) {
       foods$.add(event);
       onDatabaseUpdated("foods")();
       initialized[8] = true;
       check();
     });
-    _db
-        .watchNutritionGoals()
-        .map((event) => DateSequence.normalized(event).values.toList())
-        .listen((event) {
-          nutritionGoals$.add(event);
-          onDatabaseUpdated("nutrition goals")();
-          initialized[9] = true;
-          check();
-        });
-    _db.watchCustomBarcodeFoods().listen((event) {
+    _listenTo(
+      _db.watchNutritionGoals().map(
+        (event) => DateSequence.normalized(event).values.toList(),
+      ),
+      (event) {
+        nutritionGoals$.add(event);
+        onDatabaseUpdated("nutrition goals")();
+        initialized[9] = true;
+        check();
+      },
+    );
+    _listenTo(_db.watchCustomBarcodeFoods(), (event) {
       customBarcodeFoods$.add(event);
       onDatabaseUpdated("custom barcode foods")();
       initialized[10] = true;
       check();
     });
-    _db.watchFavoriteFoods().listen((event) {
+    _listenTo(_db.watchFavoriteFoods(), (event) {
       favoriteFoods$.add(event);
       onDatabaseUpdated("favorite foods")();
       initialized[11] = true;
       check();
     });
-    _db
-        .watchNutritionCategories()
-        .map((event) => DateSequence.fromDatesAndValues(event).normalize())
-        .listen((event) {
-          nutritionCategories$.add(event);
-          onDatabaseUpdated("nutrition categories")();
-          initialized[12] = true;
-          check();
-        });
-    _db.watchBodyMeasurements().listen((event) {
+    _listenTo(
+      _db.watchNutritionCategories().map(
+        (event) => DateSequence.fromDatesAndValues(event).normalize(),
+      ),
+      (event) {
+        nutritionCategories$.add(event);
+        onDatabaseUpdated("nutrition categories")();
+        initialized[12] = true;
+        check();
+      },
+    );
+    _listenTo(_db.watchBodyMeasurements(), (event) {
       bodyMeasurements$.add(event);
       onDatabaseUpdated("body measurements")();
       initialized[13] = true;
       check();
     });
-    backups.watch().listen((event) {
+    _listenTo(backups.watch(), (event) {
       _backups$.add(event);
       logger.i("Backups updated: ${event.length}");
     });
@@ -812,14 +842,9 @@ class DatabaseService extends GetxService
       );
       return;
     }
+    // Clear user data before the new queries can emit. Preferences are device-wide.
+    eraseAllSubjects(includeDeviceState: false);
     _db.setCurrentUserId(id);
-
-    logger.i(
-      "[DatabaseService.setCurrentUserId] userId changed to '$id'. "
-      "Triggering eraseAllSubjects() and _innerEnsureInitialized()",
-    );
-    eraseAllSubjects();
-    await _innerEnsureInitialized(overrideInitializationCheck: true);
   }
 }
 

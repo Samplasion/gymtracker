@@ -197,6 +197,8 @@ class GTDatabaseImpl extends _$GTDatabaseImpl
     implements GTDatabase {
   GTDatabaseImpl.prod() : super(_openConnection());
 
+  GTDatabaseImpl.openBackup(File file) : super(NativeDatabase(file));
+
   @visibleForTesting
   GTDatabaseImpl.withQueryExecutor(super.e);
 

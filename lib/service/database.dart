@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:drift/drift.dart';
 import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
+import 'package:gymtracker/db/backup_restore.dart';
 import 'package:gymtracker/db/database.dart';
 import 'package:gymtracker/db/imports/types.dart';
 import 'package:gymtracker/model/achievements.dart';
@@ -16,8 +17,8 @@ import 'package:gymtracker/model/workout.dart';
 import 'package:gymtracker/service/logger.dart';
 import 'package:gymtracker/service/online.dart';
 import 'package:gymtracker/struct/date_sequence.dart';
-import 'package:gymtracker/struct/nutrition.dart' hide NutritionGoal;
 import 'package:gymtracker/struct/nutrition.dart' as gtn;
+import 'package:gymtracker/struct/nutrition.dart' hide NutritionGoal;
 import 'package:gymtracker/utils/extensions.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:rxdart/rxdart.dart';
@@ -41,6 +42,7 @@ class DatabaseService extends GetxService
   Future<void> Function()? beforeUserChange;
   Future<void> Function()? afterUserChange;
   Future<void> _userTransition = Future.value();
+  Future<void> Function(Future<void> Function() action)? runWithSyncPaused;
 
   final exercises$ = BehaviorSubject<List<Exercise>>.seeded([]);
   final routines$ = BehaviorSubject<List<Workout>>.seeded([]);
@@ -779,30 +781,28 @@ class DatabaseService extends GetxService
   }
 
   Future<void> restoreBackup(DatabaseBackup backup) async {
-    Completer c = Completer();
-    final p = (await _db.path);
-    await _db.close();
-    await backup.file.copy(p.absolute.path);
-    await ensureInitialized(
-      onDone: () {
-        if (!c.isCompleted) {
-          c.complete();
+    final barrier = runWithSyncPaused;
+    if (barrier == null) throw StateError('Synchronization is not initialized');
+    final owner = _db.currentUserId;
+    final prepared = await PreparedDatabaseRestore.load(backup.file, owner);
+    await barrier(() {
+      final restore = _userTransition.then((_) async {
+        if (_db.currentUserId != owner) {
+          throw StateError('Account changed before restore');
         }
-      },
-      overrideInitializationCheck: true,
-    );
-
-    Future.delayed(const Duration(seconds: 60), () {
-      try {
-        if (!c.isCompleted) {
-          c.completeError("Initialization took too long");
+        await beforeUserChange?.call();
+        try {
+          // A failed safety backup must abort the replacement.
+          final saved = await backups.store(_db);
+          if (saved == null) throw StateError('Unable to create safety backup');
+          await prepared.apply(_db);
+        } finally {
+          await afterUserChange?.call();
         }
-      } catch (_) {
-        // Do nothing.
-      }
+      });
+      _userTransition = restore.catchError((Object _) {});
+      return restore;
     });
-
-    return c.future;
   }
 
   Future<void> deleteBackup(DatabaseBackup backup) {
@@ -950,7 +950,8 @@ class _DatabaseBackups {
     try {
       final now = DateTime.now();
       final path = "${_backupDir.path}/${now.millisecondsSinceEpoch}.db";
-      await (await _db.path).copy(path);
+      // VACUUM INTO includes committed WAL pages and creates a consistent snapshot.
+      await _db.customStatement('VACUUM INTO ?', [path]);
 
       // Delete old backups
       final backups = list();
@@ -973,6 +974,7 @@ class _DatabaseBackups {
   }
 
   List<DatabaseBackup> list() {
+    if (!_backupDir.existsSync()) return [];
     return _backupDir
         .listSync()
         .whereType<File>()

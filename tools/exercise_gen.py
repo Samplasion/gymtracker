@@ -16,8 +16,8 @@ def generate_exercises():
   with open(f'{cwd}/lib/data/exercises.dart', 'r') as f:
     text = f.read()
     lines = text.split('\n')
-    regex = re.compile(r'id: \"library\.(\w+)\.exercises\.(\w+)\"')
-    name_regex = re.compile(r'name: \"library\.(\w+)\.exercises\.(\w+)\"')
+    regex = re.compile(r'id:\s*\"library\.(\w+)\.exercises\.(\w+)\"')
+    name_regex = re.compile(r'name:\s*(?:\"library|t\.library)\.(\w+)\.exercises\.(\w+)\"?')
     for line in lines:
       match = regex.search(line)
       if match:

@@ -128,6 +128,39 @@ void main() {
       },
     );
 
+    test('late sync events from the previous account are ignored', () async {
+      final online = _FakeOnline(
+        OnlineAccount(id: testUserId, email: 'a@example.com', name: 'A'),
+      );
+      final container = ProviderContainer(
+        overrides: [onlineProvider.overrideWith(() => online)],
+      );
+      addTearDown(container.dispose);
+      container.read(syncStatusProvider);
+      await pumpEventQueue();
+      online.switchAccount(
+        OnlineAccount(id: 'B', email: 'b@example.com', name: 'B'),
+      );
+      await pumpEventQueue();
+
+      final bus = container.read(eventBusProvider);
+      bus.emit(const GBSyncStartedEvent(userId: testUserId));
+      bus.emit(GBSyncFinishedEvent(
+        lastSync: DateTime.utc(2026, 10, 18),
+        userId: testUserId,
+      ));
+      bus.emit(GBSyncErrorEvent(
+        StateError('old session'),
+        StackTrace.current,
+        testUserId,
+      ));
+      await pumpEventQueue();
+
+      final status = container.read(syncStatusProvider);
+      expect(status.state, SyncState.notSyncing);
+      expect(status.lastSync, isNull);
+    });
+
     test(
       'updates state on GBSyncStartedEvent and GBSyncFinishedEvent',
       () async {
@@ -402,9 +435,10 @@ class _FakeOnline extends Online {
   }
 
   @override
-  Future<void> sync() async {
+  Future<bool> sync() async {
     final eventBus = ref.read(eventBusProvider);
     eventBus.emit(const GBSyncStartedEvent());
     eventBus.emit(GBSyncFinishedEvent(lastSync: DateTime.now()));
+    return true;
   }
 }

@@ -62,11 +62,13 @@ class SyncStatusNotifier extends _$SyncStatusNotifier {
     }
     final generation = ++_loadGeneration;
 
-    final startSub = eventBus.on<GBSyncStartedEvent>().listen((_) {
+    final startSub = eventBus.on<GBSyncStartedEvent>().listen((event) {
+      if (event.userId != null && event.userId != _statusUserId) return;
       state = state.copyWith(state: SyncState.syncing);
       _startPollingIfNeeded();
     });
     final finishSub = eventBus.on<GBSyncFinishedEvent>().listen((event) {
+      if (event.userId != null && event.userId != _statusUserId) return;
       if (event.lastSync != null) {
         _lastSync = event.lastSync;
         _saveLastSync(event.lastSync!);
@@ -82,6 +84,7 @@ class SyncStatusNotifier extends _$SyncStatusNotifier {
       _stopPolling();
     });
     final errorSub = eventBus.on<GBSyncErrorEvent>().listen((event) {
+      if (event.userId != null && event.userId != _statusUserId) return;
       logger.e(
         "Sync failed: ${event.error}",
         error: event.error,
@@ -175,8 +178,7 @@ class SyncStatusNotifier extends _$SyncStatusNotifier {
     }
     final online = ref.read(onlineProvider.notifier);
     try {
-      await online.sync();
-      return true;
+      return await online.sync();
     } catch (e, s) {
       logger.e("Sync failed: $e", error: e, stackTrace: s);
       return false;

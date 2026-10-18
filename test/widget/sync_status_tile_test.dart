@@ -243,7 +243,8 @@ class _FakeOnlineForWidgetTest extends Online {
   }
 
   @override
-  Future<void> sync() async {
+  Future<bool> sync() async {
     syncCalls++;
+    return true;
   }
 }

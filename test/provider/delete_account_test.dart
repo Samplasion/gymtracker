@@ -36,6 +36,7 @@ void main() {
     manager = _Manager();
     when(() => service.account).thenReturn(account);
     when(() => manager.syncingEnabled).thenReturn(true);
+    when(() => manager.suspend()).thenAnswer((_) async {});
     when(
       () => MockServices.databaseService.db,
     ).thenReturn(MockServices.database);
@@ -78,7 +79,7 @@ void main() {
       expect(rows.map((r) => r.userId), containsAll(['A', 'B']));
       expect(globalContainer.read(onlineProvider).value?.id, 'A');
       verifyInOrder([
-        () => manager.disableSync(),
+        () => manager.suspend(),
         () => service.deleteAccount(),
         () => manager.enableSync(),
       ]);

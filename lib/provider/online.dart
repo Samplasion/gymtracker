@@ -52,7 +52,8 @@ class _SharedPrefsStorage extends SyncTimestampStorage {
 class GBSyncManager extends SyncManager<GTDatabase> {
   final EventBus eventBus;
   final Duration drainCheckInterval;
-  bool _isSyncingTables = false;
+  int successfulSyncs = 0;
+  String? _cycleUserId;
 
   GBSyncManager({
     required super.localDatabase,
@@ -65,123 +66,54 @@ class GBSyncManager extends SyncManager<GTDatabase> {
     super.maxRows,
   });
 
-  bool get isSyncingTables => _isSyncingTables;
-
+  bool get isSyncingTables => isSyncing;
   bool get isSyncingAny =>
-      _isSyncingTables || isSyncingFromBackend || isSyncingToBackend;
+      isSyncing || isSyncingFromBackend || isSyncingToBackend;
 
   Future<void> waitForAllTables({
     Duration timeout = const Duration(seconds: 30),
   }) async {
     final stopwatch = Stopwatch()..start();
-    while (isSyncingFromBackend || isSyncingToBackend) {
+    while (isSyncingAny) {
       if (stopwatch.elapsed >= timeout) {
-        throw TimeoutException("Sync queue drain timed out", timeout);
+        throw TimeoutException('Sync queue drain timed out', timeout);
       }
-      await Future.delayed(drainCheckInterval);
+      await Future<void>.delayed(drainCheckInterval);
     }
+  }
+
+  @override
+  void onSyncStarted() {
+    _cycleUserId = userId;
+    eventBus.emit(GBSyncStartedEvent(userId: _cycleUserId));
+  }
+
+  @override
+  void onSyncError(Object error, StackTrace stack) {
+    super.onSyncError(error, stack);
+    eventBus.emit(GBSyncErrorEvent(error, stack, _cycleUserId ?? userId));
+  }
+
+  @override
+  void onSyncFinished({required bool success}) {
+    if (success) successfulSyncs++;
+    eventBus.emit(
+      GBSyncFinishedEvent(
+        lastSync: success ? DateTime.now() : null,
+        userId: _cycleUserId,
+      ),
+    );
+    _cycleUserId = null;
   }
 
   @override
   Future<void> syncTables() async {
-    if (_isSyncingTables) return;
-    _isSyncingTables = true;
-    eventBus.emit(const GBSyncStartedEvent());
-    var success = false;
     try {
       await super.syncTables();
-      await waitForAllTables();
-      success = true;
-    } catch (e, s) {
-      eventBus.emit(GBSyncErrorEvent(e, s));
-      if (!isNetworkError(e)) {
-        rethrow;
-      }
-      logger.i("[SyncManager] Sync deferred: device is offline ($e)");
-    } finally {
-      _isSyncingTables = false;
-      final now = success ? DateTime.now() : null;
-      eventBus.emit(GBSyncFinishedEvent(lastSync: now));
+    } catch (e) {
+      if (!isNetworkError(e)) rethrow;
+      logger.i('Sync deferred: $e');
     }
-  }
-
-  @override
-  void enableSync() {
-    if (syncingEnabled) return;
-    final startSyncs = nFullSyncs;
-    // Run in a guarded zone to handle unawaited background futures from package:syncable
-    runZonedGuarded(
-      () {
-        super.enableSync();
-      },
-      (error, stack) {
-        if (isNetworkError(error)) {
-          logger.w(
-            "[SyncManager] Suppressed offline network error in enableSync: $error",
-          );
-          eventBus.emit(GBSyncErrorEvent(error, stack));
-        } else {
-          // Forward genuine programming bugs to the root zone
-          Zone.current.parent?.handleUncaughtError(error, stack);
-        }
-      },
-    );
-
-    if (userId.isNotEmpty) {
-      trackAutomaticSync(startSyncs);
-    }
-  }
-
-  @override
-  void setUserId(String value) {
-    if (userId == value) return;
-    final hadUser = userId.isNotEmpty;
-    final startSyncs = nFullSyncs;
-
-    runZonedGuarded(
-      () {
-        super.setUserId(value);
-      },
-      (error, stack) {
-        if (isNetworkError(error)) {
-          logger.w(
-            "[SyncManager] Suppressed offline network error in setUserId: $error",
-          );
-          eventBus.emit(GBSyncErrorEvent(error, stack));
-        } else {
-          Zone.current.parent?.handleUncaughtError(error, stack);
-        }
-      },
-    );
-
-    if (hadUser && syncingEnabled && value.isNotEmpty) {
-      trackAutomaticSync(startSyncs);
-    }
-  }
-
-  @visibleForTesting
-  void trackAutomaticSync(int startSyncs) {
-    if (_isSyncingTables) return;
-    _isSyncingTables = true;
-    eventBus.emit(const GBSyncStartedEvent());
-    () async {
-      var success = false;
-      try {
-        final stopwatch = Stopwatch()..start();
-        while (nFullSyncs == startSyncs &&
-            stopwatch.elapsed < const Duration(seconds: 30)) {
-          await Future.delayed(drainCheckInterval);
-        }
-        await waitForAllTables();
-        success = nFullSyncs > startSyncs;
-      } catch (e, s) {
-        eventBus.emit(GBSyncErrorEvent(e, s));
-      } finally {
-        _isSyncingTables = false;
-        final now = success ? DateTime.now() : null;
-        eventBus.emit(GBSyncFinishedEvent(lastSync: now));
-      }
-    }();
   }
 }
 
@@ -204,19 +136,46 @@ class Online extends _$Online {
 
   final Map<String, CachedData<Uri?>> _avatarCache = {};
 
+  Future<void> _transition = Future.value();
+
+  Future<T> _serialize<T>(Future<T> Function() action) {
+    final result = _transition.then((_) => action());
+    _transition = result.then<void>(
+      (_) {},
+      onError: (Object _, StackTrace _) {},
+    );
+    return result;
+  }
+
+  void _resumeSync() {
+    if ((ref.read(networkConnectivityProvider).value ?? false) &&
+        _service.account?.id == _databaseService.db.currentUserId &&
+        _service.account != null) {
+      syncManager.enableSync();
+    }
+  }
+
+  Future<T> _changeAuthentication<T>(Future<T> Function() action) =>
+      _serialize(() async {
+        await syncManager.suspend();
+        try {
+          final result = await action();
+          await _applyAccount(await _service.getAccount());
+          return result;
+        } catch (_) {
+          _resumeSync();
+          rethrow;
+        }
+      });
+
   bool _isInit = false;
   bool get isInit => _isInit;
 
-  Future<void> sync() async {
-    if (_syncManager.isSyncingAny) {
-      logger.w("Sync is already in progress, skipping sync.");
-      return;
-    }
-    if (_syncManager.syncingEnabled) {
-      await _syncManager.syncTables();
-    } else {
-      logger.w("Syncing is disabled, skipping sync.");
-    }
+  Future<bool> sync() async {
+    if (!syncManager.syncingEnabled) return false;
+    final previous = syncManager.successfulSyncs;
+    await syncManager.syncTables();
+    return syncManager.successfulSyncs > previous;
   }
 
   Online({OnlineService? service}) {
@@ -238,60 +197,35 @@ class Online extends _$Online {
       await _runOneTimeAsyncBoot();
     }
 
-    final eventBus = ref.watch(eventBusProvider);
     ref.listen<AsyncValue<bool>>(networkConnectivityProvider, (previous, next) {
-      final isOnline = next.value ?? false;
-      _onNetworkStatusChanged(isOnline);
+      _onNetworkStatusChanged(next.value ?? false);
     });
-
-    final userDidLoginSub = eventBus.on<GBUserDidLoginEvent>().listen(
-      _onUserDidLogin,
-    );
-    final userWillLogoutSub = eventBus.on<GBUserWillLogoutEvent>().listen(
-      _onUserWillLogout,
-    );
-
-    ref.onDispose(userDidLoginSub.cancel);
-    ref.onDispose(userWillLogoutSub.cancel);
+    ref.onDispose(() {
+      _syncManager.dispose();
+      _databaseService.runWithSyncPaused = null;
+    });
 
     return _getAccountAndDoStuff();
   }
 
-  Future<void> login({required String email, required String password}) async {
-    try {
-      globalContainer.read(eventBusProvider).emit(GBUserWillLoginEvent());
-      await _service.login(email: email, password: password);
-      globalContainer
-          .read(eventBusProvider)
-          .emit(GBUserDidLoginEvent(await onlineService.getAccount()));
-    } on AuthApiException {
-      rethrow;
-    } catch (e, s) {
-      logger.e("An error occurred while logging in", error: e, stackTrace: s);
-      rethrow;
-    }
-  }
+  Future<void> login({required String email, required String password}) =>
+      _changeAuthentication(() async {
+        ref.read(eventBusProvider).emit(GBUserWillLoginEvent());
+        await _service.login(email: email, password: password);
+      });
 
   Future<void> register({
     required String email,
     required String password,
     required String username,
-  }) async {
-    try {
-      globalContainer.read(eventBusProvider).emit(GBUserWillLoginEvent());
-      await _service.register(
-        email: email,
-        password: password,
-        username: username,
-      );
-      globalContainer
-          .read(eventBusProvider)
-          .emit(GBUserDidLoginEvent(await onlineService.getAccount()));
-    } catch (e, s) {
-      logger.e("An error occurred while signing up", error: e, stackTrace: s);
-      rethrow;
-    }
-  }
+  }) => _changeAuthentication(() async {
+    ref.read(eventBusProvider).emit(GBUserWillLoginEvent());
+    await _service.register(
+      email: email,
+      password: password,
+      username: username,
+    );
+  });
 
   Future<void> updateAccount({
     required String email,
@@ -366,18 +300,10 @@ class Online extends _$Online {
     } catch (_) {}
   }
 
-  Future<void> logout() async {
-    try {
-      globalContainer
-          .read(eventBusProvider)
-          .emit(GBUserWillLogoutEvent(onlineService.account));
-      await _service.logout();
-      globalContainer.read(eventBusProvider).emit(GBUserDidLogoutEvent());
-    } catch (e, s) {
-      logger.e("An error occurred while logging out", error: e, stackTrace: s);
-      rethrow;
-    }
-  }
+  Future<void> logout() => _changeAuthentication(() async {
+    ref.read(eventBusProvider).emit(GBUserWillLogoutEvent(_service.account));
+    await _service.logout();
+  });
 
   CredentialsState checkCredentials({
     required String email,
@@ -437,27 +363,17 @@ class Online extends _$Online {
     });
   }
 
-  void _onUserDidLogin(GBUserDidLoginEvent event) async {
-    _getAccountAndDoStuff(accountFromEvents: event.account);
-  }
-
   Future<void> _fillMissingUserIdAndTouchStaleTimestamps(String userId) async {
     await _syncManager.fillMissingUserIdForLocalTables();
     await _databaseService.db.touchStaleTimestamps(userId);
   }
 
-  Future<void> _onUserWillLogout(GBUserWillLogoutEvent event) async {
-    state = const AsyncValue.data(null);
-    _syncManager.disableSync();
-    await _databaseService.setCurrentUserId(null);
-  }
-
-  Future<void> deleteAccount() async {
+  Future<void> deleteAccount() => _serialize(() async {
     final account = _service.account;
     if (account == null) throw StateError('No account to delete');
     final manager = syncManager;
     final wasEnabled = manager.syncingEnabled;
-    manager.disableSync();
+    await manager.suspend();
     try {
       // A failed remote deletion must never erase the local copy.
       await _service.deleteAccount();
@@ -476,23 +392,17 @@ class Online extends _$Online {
       }
       rethrow;
     }
-  }
+  });
 
   Future<bool> checkEmailVerificationAndLogIn({
     required String email,
     required String password,
-  }) async {
-    final success = await _service.checkEmailVerificationAndLogIn(
+  }) => _changeAuthentication(
+    () => _service.checkEmailVerificationAndLogIn(
       email: email,
       password: password,
-    );
-    if (success) {
-      globalContainer
-          .read(eventBusProvider)
-          .emit(GBUserDidLoginEvent(await onlineService.getAccount()));
-    }
-    return success;
-  }
+    ),
+  );
 
   Future<void> _runOneTimeAsyncBoot() async {
     _prefs = await SharedPreferences.getInstance();
@@ -611,62 +521,64 @@ class Online extends _$Online {
       companionConstructor: NutritionGoalsCompanion.new,
     );
 
-    try {
-      final account = await _service.getAccount();
-      // Emit login event at app start
-      if (account != null) {
-        globalContainer
-            .read(eventBusProvider)
-            .emit(GBUserDidLoginEvent(account));
+    _databaseService.runWithSyncPaused = (action) => _serialize(() async {
+      final wasEnabled = _syncManager.syncingEnabled;
+      var drained = false;
+      try {
+        await _syncManager.runPaused(
+          () async {
+            drained = true;
+            await action();
+          },
+          discardPendingOnSuccess: true,
+          resume: false,
+        );
+      } finally {
+        if (drained && wasEnabled) _resumeSync();
       }
-    } catch (e) {
-      logger.e("Got an error while first fetching account", error: e);
-      // Ignore this error
-    }
+    });
   }
 
-  // Handle network changes without re-running build()
   void _onNetworkStatusChanged(bool isOnline) {
-    logger.d("We are now ${isOnline ? "ONLINE" : "OFFLINE"}.");
+    if (!isOnline) _syncManager.disableSync();
     if (isOnline) {
-      // Avoid double-enabling sync if already enabled.
-      if (!_syncManager.syncingEnabled) {
-        _syncManager.enableSync();
-      }
-      _getAccountAndDoStuff();
-    } else {
-      if (_syncManager.syncingEnabled) {
-        _syncManager.disableSync();
-      }
+      unawaited(
+        _getAccountAndDoStuff().catchError((Object e, StackTrace s) {
+          logger.e('Unable to resume sync', error: e, stackTrace: s);
+          return null;
+        }),
+      );
     }
   }
 
-  Future<OnlineAccount?> _getAccountAndDoStuff({
-    OnlineAccount? accountFromEvents,
-  }) async {
-    if (!state.hasValue) {
-      state = const AsyncValue.loading();
-    }
-    final future = () async {
-      final account = accountFromEvents ?? await _service.getAccount();
-      state = AsyncValue.data(account);
+  Future<OnlineAccount?> _getAccountAndDoStuff() => _serialize(() async {
+    final account = await _service.getAccount();
+    await _applyAccount(account);
+    return account;
+  });
+
+  Future<void> _applyAccount(OnlineAccount? account) async {
+    final previous = _databaseService.db.currentUserId;
+    final changed =
+        previous != account?.id || _syncManager.userId != (account?.id ?? '');
+    if (changed) {
+      await _syncManager.suspend();
+      _syncManager.setUserId(account?.id ?? '');
+      await _databaseService.setCurrentUserId(account?.id);
       if (account != null) {
-        _syncManager.setUserId(account.id);
-        if (ref.read(networkConnectivityProvider).value ?? false) {
-          _syncManager.enableSync();
-        }
-        if (_databaseService.db.currentUserId != account.id) {
-          await _databaseService.setCurrentUserId(account.id);
-          await _fillMissingUserIdAndTouchStaleTimestamps(account.id);
-        }
-      } else if (_databaseService.db.currentUserId != null) {
-        _syncManager.disableSync();
-        await _databaseService.setCurrentUserId(null);
+        await _fillMissingUserIdAndTouchStaleTimestamps(account.id);
       }
-      return account;
-    }();
-    state = await AsyncValue.guard(() => future);
-    return future;
+    }
+    state = AsyncValue.data(account);
+    _resumeSync();
+    if (changed) {
+      final bus = ref.read(eventBusProvider);
+      if (account != null) {
+        bus.emit(GBUserDidLoginEvent(account));
+      } else {
+        bus.emit(GBUserDidLogoutEvent());
+      }
+    }
   }
 }
 

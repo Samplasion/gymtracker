@@ -23,6 +23,7 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:relative_time/relative_time.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:scrollable_clean_calendar/utils/extensions.dart';
+import 'package:uuid/uuid.dart';
 
 part 'food.g.dart';
 
@@ -153,7 +154,7 @@ class FoodNotifier extends _$FoodNotifier {
           DateTagged(
             date: dateTime.startOfDay,
             value: food.copyWith(
-              id: DateTime.now().millisecondsSinceEpoch.toString(),
+              id: const Uuid().v4(),
               category: category?.name,
             ),
           ),
@@ -183,10 +184,7 @@ class FoodNotifier extends _$FoodNotifier {
 
   void copyToToday(Food food) {
     final today = DateTime.now().startOfDay;
-    final foodCopy = food.copyWith(
-      id: DateTime.now().millisecondsSinceEpoch.toString(),
-    );
-    addFood(today, foodCopy);
+    addFood(today, food);
     ref.read(foodSelectedDateProvider.notifier).setDate(today);
   }
 

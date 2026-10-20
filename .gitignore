@@ -63,3 +63,5 @@ env.g.dart
 ios/.derived-data-log-*
 
 sentry.properties
+BUGS.md
+OFFLINE.md

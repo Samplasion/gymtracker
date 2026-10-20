@@ -81,7 +81,7 @@ class Coordinator extends GetxController
       Go.awaitInitialization(),
       get<SettingsController>().awaitInitialized(),
       get<NotificationController>().initialize(),
-      if (_ongoingRestore != null) _ongoingRestore!,
+      ?_ongoingRestore,
       _awaitRemoteInitialization(globalContainer.read(onlineProvider.future)),
       _awaitRemoteInitialization(get<PurchasesService>().init()),
     ]);

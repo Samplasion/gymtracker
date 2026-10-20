@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gymtracker/view/components/visible_data_refresh.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gymtracker/i18n/strings.g.dart';
 import 'package:gymtracker/icons/gymtracker_icons.dart';
@@ -17,36 +18,39 @@ class FriendRequestsPage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final friendStateAsync = ref.watch(friendProvider);
 
-    return Scaffold(
-      appBar: AppBar(title: Text(context.t.friendRequests.title)),
-      body: friendStateAsync.when(
-        data: (friendState) {
-          final requests = friendState.pendingReceived;
-          if (requests.isEmpty) {
-            return Center(
-              child: ContentUnavailableView(
-                icon: const Icon(GTIcons.friend_requests),
-                title: Text(context.t.friendRequests.empty.title),
-                description: Text(context.t.friendRequests.empty.text),
+    return VisibleDataRefresh(
+      refresh: () => ref.read(friendProvider.notifier).refresh(),
+      child: Scaffold(
+        appBar: AppBar(title: Text(context.t.friendRequests.title)),
+        body: friendStateAsync.when(
+          data: (friendState) {
+            final requests = friendState.pendingReceived;
+            if (requests.isEmpty) {
+              return Center(
+                child: ContentUnavailableView(
+                  icon: const Icon(GTIcons.friend_requests),
+                  title: Text(context.t.friendRequests.empty.title),
+                  description: Text(context.t.friendRequests.empty.text),
+                ),
+              );
+            }
+
+            return RefreshIndicator(
+              onRefresh: () async {
+                await ref.read(friendProvider.notifier).refresh(force: true);
+              },
+              child: ListView.builder(
+                itemCount: requests.length,
+                itemBuilder: (context, index) {
+                  final friend = requests[index];
+                  return _FriendRequestTile(friend: friend);
+                },
               ),
             );
-          }
-
-          return RefreshIndicator(
-            onRefresh: () async {
-              ref.invalidate(friendProvider);
-            },
-            child: ListView.builder(
-              itemCount: requests.length,
-              itemBuilder: (context, index) {
-                final friend = requests[index];
-                return _FriendRequestTile(friend: friend);
-              },
-            ),
-          );
-        },
-        loading: () => const Center(child: GBLoadingIndicator()),
-        error: (error, _) => Center(child: Text("Error: $error")),
+          },
+          loading: () => const Center(child: GBLoadingIndicator()),
+          error: (error, _) => Center(child: Text("Error: $error")),
+        ),
       ),
     );
   }

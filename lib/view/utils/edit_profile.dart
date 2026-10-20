@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:file_picker/file_picker.dart';
@@ -123,7 +122,8 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
       final finalName = newName.isEmpty ? null : newName;
 
       // Update full name
-      await onlineNotifier.updateProfile(fullName: finalName);
+      if (finalName != onlineNotifier.accountSync?.fullName)
+        await onlineNotifier.updateProfile(fullName: finalName);
 
       // Update avatar
       if (_removeAvatarPending) {
@@ -133,8 +133,7 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
       }
 
       // Invalidate the relevant providers
-      ref.invalidate(friendPublicDataProvider(widget.userID));
-      ref.invalidate(friendProvider);
+      ref.read(friendProvider.notifier).invalidateProfile(widget.userID);
 
       if (mounted) {
         Go.snack(context.t.userProfile.edit.success);

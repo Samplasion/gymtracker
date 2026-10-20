@@ -1,152 +1,229 @@
+import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:get/get.dart';
 import 'package:gymtracker/controller/achievements_controller.dart';
 import 'package:gymtracker/controller/history_controller.dart';
-import 'package:gymtracker/provider/connectivity.dart';
-import 'package:gymtracker/provider/online.dart';
 import 'package:gymtracker/model/achievements.dart';
+import 'package:gymtracker/data/achievements.dart';
+import 'package:gymtracker/model/friend.dart';
 import 'package:gymtracker/model/workout.dart';
+import 'package:gymtracker/provider/connectivity.dart';
+import 'package:gymtracker/provider/friend.dart';
+import 'package:gymtracker/provider/online.dart';
 import 'package:gymtracker/service/database.dart';
 import 'package:gymtracker/service/feed.dart';
-import 'package:gymtracker/service/logger.dart';
-import 'package:gymtracker/service/online.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-
 part 'feed.g.dart';
 
 @riverpod
-Stream<List<Workout>> feedHistoryStream(Ref ref) {
-  return Get.find<HistoryController>().history.stream;
-}
-
+Stream<List<Workout>> feedHistoryStream(Ref ref) =>
+    Get.find<HistoryController>().history.stream;
 @riverpod
-Stream<List<AchievementCompletion>> feedAchievementsStream(Ref ref) {
-  return Get.find<AchievementsController>().completionStream;
-}
+Stream<List<AchievementCompletion>> feedAchievementsStream(Ref ref) =>
+    Get.find<AchievementsController>().completionStream;
 
-@riverpod
-Stream<OnlineAccount?> feedUserStream(Ref ref) async* {
-  yield ref.watch(onlineProvider).value;
-}
-
-@riverpod
+@Riverpod(keepAlive: true)
 class Feed extends _$Feed {
-  DateTime _currentEndDate = DateTime.now();
-  final List<FeedItem> _items = [];
-  bool _hasMore = true;
-  bool _isLoadingMore = false;
+  DateTime _end = DateTime.now(), _start = DateTime.now();
+  DateTime? _previous, _fetchedAt;
+  List<FeedItem> _remote = [];
+  Future<void>? _work;
+  int _generation = 0;
+  bool _more = true;
+  bool _visible = false;
+  void setVisible(bool visible) {
+    if (_visible == visible) return;
+    _visible = visible;
+    if (visible)
+      scheduleMicrotask(() {
+        if (ref.mounted && _visible) unawaited(refreshIfStale());
+      });
+  }
 
-  bool get hasMore => _hasMore;
-  bool get isLoadingMore => _isLoadingMore;
+  bool get hasMore => _more;
+  bool get isLoadingMore => _work != null;
 
   @override
-  FutureOr<List<FeedItem>> build() async {
-    // Listen to local & auth streams so that changes trigger feed invalidation
-    ref.watch(feedHistoryStreamProvider);
-    ref.watch(feedAchievementsStreamProvider);
-    ref.watch(feedUserStreamProvider);
-    final isConnected = ref.read(networkConnectivityProvider).value ?? false;
-
-    _currentEndDate = DateTime.now();
-    _items.clear();
-    _hasMore = true;
-    _isLoadingMore = false;
-
-    return _fetchPage(isConnected);
-  }
-
-  Future<List<FeedItem>> _fetchPage(bool isConnected) async {
-    final databaseService = Get.find<DatabaseService>();
-    final onlineService = ref.read(onlineProvider.notifier).onlineService;
-
-    final startDate = _currentEndDate.subtract(const Duration(days: 30));
-
-    // Fetch local user's own items
-    final feedService = FeedService(databaseService, onlineService);
-    final localResult = await feedService.getFeedItems(
-      sources: {FeedSource.ownHistory, FeedSource.ownAchievements},
-      startDate: startDate,
-      endDate: _currentEndDate,
-    );
-
-    // Fetch remote friends' items, catching errors to avoid crashing the feed on connection failure
-    var remoteResult = (feed: <FeedItem>[], hasMore: false);
-    if (isConnected) {
-      try {
-        remoteResult = await onlineService.getFriendsFeed(
-          sources: {FeedSource.friendsHistory, FeedSource.friendsAchievements},
-          startDate: startDate,
-          endDate: _currentEndDate,
-        );
-      } catch (e) {
-        // Log the exception but do not abort: only local items will be returned for this range
-        logger.e("Failed to fetch friends' feed items: $e", error: e);
-      }
-    }
-
-    final combinedFeed = [...localResult.feed, ...remoteResult.feed];
-
-    _currentEndDate = startDate;
-    _hasMore = localResult.hasMore || remoteResult.hasMore || !isConnected;
-
-    final existingIds = _items.map(_getItemId).toSet();
-    for (final item in combinedFeed) {
-      if (!existingIds.contains(_getItemId(item))) {
-        _items.add(item);
-      }
-    }
-
-    _items.sort((a, b) {
-      DateTime? aDate;
-      DateTime? bDate;
-
-      if (a is FeedItemWorkout) {
-        aDate = a.workout.endingDate ?? a.workout.startingDate;
-      } else if (a is FeedItemAchievement) {
-        aDate = a.completion.completedAt;
-      }
-
-      if (b is FeedItemWorkout) {
-        bDate = b.workout.endingDate ?? b.workout.startingDate;
-      } else if (b is FeedItemAchievement) {
-        bDate = b.completion.completedAt;
-      }
-
-      return (bDate ?? DateTime.fromMillisecondsSinceEpoch(0)).compareTo(
-        aDate ?? DateTime.fromMillisecondsSinceEpoch(0),
-      );
+  Future<List<FeedItem>> build() async {
+    ref.watch(currentUserIdProvider);
+    final generation = ++_generation;
+    _end = DateTime.now();
+    _start = _end.subtract(const Duration(days: 30));
+    _remote = [];
+    _more = true;
+    _fetchedAt = null;
+    _work = null;
+    ref.listen(feedHistoryStreamProvider, (_, __) => _recompose());
+    ref.listen(feedAchievementsStreamProvider, (_, __) => _recompose());
+    ref.listen(networkConnectivityProvider, (previous, next) {
+      if (_visible && previous?.value != true && next.value == true)
+        unawaited(refreshIfStale());
     });
-
-    return _items;
-  }
-
-  String _getItemId(FeedItem item) {
-    if (item is FeedItemWorkout) {
-      return item.workout.id;
-    } else if (item is FeedItemAchievement) {
-      return item.completion.id;
-    }
-    return '';
-  }
-
-  Future<void> fetchMore() async {
-    if (!_hasMore || _isLoadingMore) return;
-    _isLoadingMore = true;
-    final isConnected = (await ref.read(networkConnectivityProvider.future));
-    if (!isConnected) {
-      _isLoadingMore = false;
-      _hasMore = false;
-      return;
-    }
-
-    state = state;
+    ref.onDispose(() => _generation++);
     try {
-      final updatedItems = await _fetchPage(isConnected);
-      state = AsyncValue.data(List.from(updatedItems));
-    } catch (e, st) {
-      state = AsyncValue.error(e, st);
-    } finally {
-      _isLoadingMore = false;
+      await _serialized(() => _load(_start, _end, generation, replace: true));
+    } catch (_) {
+      await _publish();
     }
+    return _compose();
+  }
+
+  List<FeedItem> _compose() {
+    // getFeedItems performs only synchronous local reads before returning.
+    final db = Get.find<DatabaseService>();
+    final own = ref.read(currentUserIdProvider);
+    final items = <FeedItem>[..._remote];
+    for (final w in db.history$.value) {
+      final d = w.endingDate ?? w.startingDate;
+      if (d != null && !d.isBefore(_start) && d.isBefore(_end))
+        items.add(
+          FeedItemWorkout(
+            workout: w,
+            authorship: FeedAuthorshipOwn(userID: own),
+          ),
+        );
+    }
+    for (final c in db.completions$.value) {
+      final d = c.completedAt;
+      if (!d.isBefore(_start) && d.isBefore(_end)) {
+        final a = achievements[c.achievementID];
+        if (a != null)
+          items.add(
+            FeedItemAchievement(
+              achievement: a,
+              completion: c,
+              authorship: FeedAuthorshipOwn(userID: own),
+            ),
+          );
+      }
+    }
+    return _merged(items);
+  }
+
+  DateTime _date(FeedItem item) => switch (item) {
+    FeedItemWorkout(:final workout) =>
+      workout.endingDate ?? workout.startingDate ?? DateTime(1970),
+    FeedItemAchievement(:final completion) => completion.completedAt,
+  };
+  String _id(FeedItem i) =>
+      '${i.runtimeType}/${i.authorship.userID}/${switch (i) {
+        FeedItemWorkout(:final workout) => workout.id,
+        FeedItemAchievement(:final completion) => completion.id,
+      }}';
+  List<FeedItem> _merged(List<FeedItem> items) {
+    final map = {for (final i in items) _id(i): i};
+    return List.unmodifiable(
+      map.values.toList()..sort((a, b) => _date(b).compareTo(_date(a))),
+    );
+  }
+
+  void _recompose() {
+    if (ref.mounted && state.hasValue) unawaited(_publish());
+  }
+
+  Future<void> _publish() async {
+    final generation = _generation;
+    final service = FeedService(
+      Get.find<DatabaseService>(),
+      ref.read(onlineProvider.notifier).onlineService,
+    );
+    final local = await service.getFeedItems(
+      sources: {FeedSource.ownHistory, FeedSource.ownAchievements},
+      startDate: _start,
+      endDate: _end,
+    );
+    if (generation != _generation || !ref.mounted) return;
+    _previous = _latest(
+      service.previousAt,
+      ref.read(onlineProvider.notifier).onlineService.nextFriendsFeedDate,
+    );
+    _more = _previous != null;
+    if (ref.mounted)
+      state = AsyncValue.data(_merged([...local.feed, ..._remote]));
+  }
+
+  DateTime? _latest(DateTime? a, DateTime? b) => a == null
+      ? b
+      : b == null
+      ? a
+      : a.isAfter(b)
+      ? a
+      : b;
+
+  Future<void> _load(
+    DateTime start,
+    DateTime end,
+    int generation, {
+    required bool replace,
+  }) async {
+    final connected = await ref.read(networkConnectivityProvider.future);
+    if (generation != _generation || !ref.mounted) return;
+    if (connected && ref.read(currentUserIdProvider) != null) {
+      final online = ref.read(onlineProvider.notifier).onlineService;
+      final result = await online.getFriendsFeed(
+        sources: {FeedSource.friendsHistory, FeedSource.friendsAchievements},
+        startDate: start,
+        endDate: end,
+      );
+      if (generation != _generation || !ref.mounted) return;
+      for (final p in online.feedProfiles) {
+        ref.read(friendProvider.notifier).seedIdentity(Friend.fromJson(p));
+      }
+      _remote = replace ? result.feed : _merged([..._remote, ...result.feed]);
+      _fetchedAt = DateTime.now();
+    }
+    await _publish();
+  }
+
+  Future<void> refreshIfStale() async {
+    if (_fetchedAt != null &&
+        DateTime.now().difference(_fetchedAt!) < const Duration(minutes: 5))
+      return;
+    try {
+      await refresh();
+    } catch (_) {
+      /* Existing feed remains visible. */
+    }
+  }
+
+  Future<void> refresh() => _serialized(() async {
+    _end = DateTime.now();
+    await _load(_start, _end, _generation, replace: true);
+  });
+  Future<void> fetchMore() => _serialized(() async {
+    if (!_more || _previous == null) return;
+    final end = _previous!.add(const Duration(microseconds: 1));
+    final start = end.subtract(const Duration(days: 30));
+    final previousStart = _start;
+    _start = start;
+    try {
+      await _load(start, end, _generation, replace: false);
+    } catch (_) {
+      _start = previousStart;
+      rethrow;
+    }
+    await _publish();
+  });
+  Future<void> _serialized(Future<void> Function() body) {
+    if (_work != null) return _work!;
+    final generation = _generation;
+    final future = Future<void>.sync(body).whenComplete(() {
+      if (generation == _generation) {
+        _work = null;
+        if (ref.mounted && state.hasValue)
+          state = AsyncValue.data(List.unmodifiable(state.value!));
+      }
+    });
+    _work = future;
+    return future;
+  }
+
+  void relationsChanged(Set<String> accepted) {
+    _remote = _remote
+        .where((i) => accepted.contains(i.authorship.userID))
+        .toList();
+    _fetchedAt = null;
+    _recompose();
+    if (_visible) unawaited(refreshIfStale());
   }
 }

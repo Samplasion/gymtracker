@@ -1,4 +1,5 @@
 import 'dart:math';
+import 'package:gymtracker/view/components/visible_data_refresh.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -9,6 +10,7 @@ import 'package:gymtracker/model/friend.dart';
 import 'package:gymtracker/model/workout.dart';
 import 'package:gymtracker/provider/connectivity.dart';
 import 'package:gymtracker/provider/friend.dart';
+import 'package:gymtracker/provider/feed.dart';
 import 'package:gymtracker/provider/online.dart';
 import 'package:gymtracker/service/feed.dart';
 import 'package:gymtracker/service/online.dart';
@@ -34,9 +36,19 @@ class UserProfilePage extends ConsumerWidget {
     final friendState = ref.watch(friendProvider);
     final friendObject = ref.watch(friendPublicDataProvider(userID));
     final online = ref.watch(onlineProvider);
+    if (online.value?.id == userID) {
+      ref.listen(feedHistoryStreamProvider, (_, __) {
+        ref.read(friendProvider.notifier).invalidateContents(userID);
+      });
+      ref.listen(feedAchievementsStreamProvider, (_, __) {
+        ref.read(friendProvider.notifier).invalidateContents(userID);
+      });
+    }
     final connectivityStatus = ref.watch(networkConnectivityProvider).value;
 
-    if (connectivityStatus != true) {
+    if (connectivityStatus != true &&
+        online.value?.id != userID &&
+        !friendObject.hasValue) {
       return _buildErrorBody(
         context,
         ref,
@@ -56,13 +68,30 @@ class UserProfilePage extends ConsumerWidget {
       pendingReceived: [],
     );
 
-    return Scaffold(
-      body: online.when(
-        data: (onlineAccount) {
-          return friendState.when(
-            data: (state) => friendObject.when(
-              data: (friend) =>
-                  _buildBody(context, ref, friend, onlineAccount, state),
+    return VisibleDataRefresh(
+      refresh: () async {
+        await ref.read(friendProvider.notifier).refresh();
+        await ref.read(friendProvider.notifier).getFriendPublicData(userID);
+        if (context.mounted) ref.invalidate(friendPublicDataProvider(userID));
+      },
+      child: Scaffold(
+        body: online.when(
+          data: (onlineAccount) {
+            return friendState.when(
+              data: (state) => friendObject.when(
+                data: (friend) =>
+                    _buildBody(context, ref, friend, onlineAccount, state),
+                loading: () => _buildBody(
+                  context,
+                  ref,
+                  fakeFriendData,
+                  onlineAccount,
+                  fakeFriendState,
+                  isLoading: true,
+                ),
+                error: (error, _) =>
+                    _buildErrorBody(context, ref, error: error),
+              ),
               loading: () => _buildBody(
                 context,
                 ref,
@@ -72,27 +101,18 @@ class UserProfilePage extends ConsumerWidget {
                 isLoading: true,
               ),
               error: (error, _) => _buildErrorBody(context, ref, error: error),
-            ),
-            loading: () => _buildBody(
-              context,
-              ref,
-              fakeFriendData,
-              onlineAccount,
-              fakeFriendState,
-              isLoading: true,
-            ),
-            error: (error, _) => _buildErrorBody(context, ref, error: error),
-          );
-        },
-        loading: () => _buildBody(
-          context,
-          ref,
-          fakeFriendData,
-          null,
-          fakeFriendState,
-          isLoading: true,
+            );
+          },
+          loading: () => _buildBody(
+            context,
+            ref,
+            fakeFriendData,
+            null,
+            fakeFriendState,
+            isLoading: true,
+          ),
+          error: (error, _) => _buildErrorBody(context, ref, error: error),
         ),
-        error: (error, _) => _buildErrorBody(context, ref, error: error),
       ),
     );
   }
@@ -136,7 +156,10 @@ class UserProfilePage extends ConsumerWidget {
           child: Builder(
             builder: (context) => RefreshIndicator(
               onRefresh: () async {
-                ref.invalidate(friendProvider);
+                await ref.read(friendProvider.notifier).refresh(force: true);
+                await ref
+                    .read(friendProvider.notifier)
+                    .getFriendPublicData(friend.id, force: true);
                 ref.invalidate(friendPublicDataProvider(friend.id));
               },
               child: CustomScrollView(
@@ -235,8 +258,8 @@ class UserProfilePage extends ConsumerWidget {
       body: Center(
         child: ErrorViewComponent(
           error: error,
-          retryCallback: () {
-            ref.invalidate(friendProvider);
+          retryCallback: () async {
+            await ref.read(friendProvider.notifier).refresh(force: true);
             ref.invalidate(friendPublicDataProvider(userID));
           },
         ),

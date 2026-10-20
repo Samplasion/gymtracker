@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:gymtracker/struct/request_cache.dart';
 
 import 'package:flutter/foundation.dart';
 import 'package:gymtracker/data/achievements.dart';
@@ -20,17 +21,21 @@ class OnlineAccount {
   final String name;
   final String? email;
   final String? fullName;
+  final String? updatedAt;
 
   OnlineAccount({
     required this.id,
     required this.name,
     this.email,
     this.fullName,
+    this.updatedAt,
   });
 }
 
 abstract class OnlineService with ChangeNotifier {
   OnlineAccount? get account;
+  DateTime? get nextFriendsFeedDate => null;
+  List<Map<String, dynamic>> get feedProfiles => const [];
 
   Future<OnlineAccount?> getAccount();
   Future<void> login({required String email, required String password});
@@ -73,6 +78,13 @@ class OnlineServiceImpl with ChangeNotifier implements OnlineService {
   final GoTrueClient _client;
   final SupabaseClient _db;
 
+  @override
+  DateTime? nextFriendsFeedDate;
+  @override
+  List<Map<String, dynamic>> feedProfiles = [];
+  final _accounts = RequestCache<String, OnlineAccount?>(
+    const Duration(minutes: 30),
+  );
   OnlineAccount? _account;
   @override
   OnlineAccount? get account => _account;
@@ -84,15 +96,17 @@ class OnlineServiceImpl with ChangeNotifier implements OnlineService {
     : _db = client ?? Supabase.instance.client,
       _client = (client ?? Supabase.instance.client).auth {
     _client.onAuthStateChange.listen((event) {
-      logger.d("Auth state changed: $event");
+      logger.d("Auth state changed: ${event.event.name}");
       if (event.session == null) {
         _setAccount(null);
       }
     });
   }
 
-  void _setAccount(OnlineAccount? account) {
+  void _setAccount(OnlineAccount? account, {bool cache = true}) {
+    if (_account?.id != account?.id) _accounts.clear();
     _account = account;
+    if (cache && account != null) _accounts.put(account.id, account);
     notifyListeners();
   }
 
@@ -105,6 +119,7 @@ class OnlineServiceImpl with ChangeNotifier implements OnlineService {
       name: data["username"] ?? user.email,
       email: user.email,
       fullName: data["full_name"],
+      updatedAt: data["updated_at"] as String?,
     );
   }
 
@@ -121,8 +136,12 @@ class OnlineServiceImpl with ChangeNotifier implements OnlineService {
         return await _db.from("profiles").select().eq('id', user.id).limit(1);
       }
 
-      final row = await fetchProfile().timeout(const Duration(seconds: 8));
-      _setAccount(_mapAccount(user, row.first));
+      final account = await _accounts.get(user.id, () async {
+        final row = await fetchProfile().timeout(const Duration(seconds: 8));
+        return _mapAccount(user, row.single);
+      });
+      if (_client.currentUser?.id != user.id) return null;
+      _setAccount(account);
       return _account;
     } catch (e) {
       if (!isNetworkError(e)) rethrow;
@@ -138,6 +157,7 @@ class OnlineServiceImpl with ChangeNotifier implements OnlineService {
               user.email ??
               'Offline User',
         ),
+        cache: false,
       );
       return _account;
     }
@@ -185,6 +205,10 @@ class OnlineServiceImpl with ChangeNotifier implements OnlineService {
       throw const AuthException("No user found");
     }
 
+    if (response.session == null) {
+      _setAccount(null);
+      return;
+    }
     final row = await _db
         .from("profiles")
         .select()
@@ -235,7 +259,10 @@ class OnlineServiceImpl with ChangeNotifier implements OnlineService {
           "full_name": fullName,
           "updated_at": DateTime.now().toUtc().toIso8601String(),
         })
-        .eq("id", user.id);
+        .eq("id", user.id)
+        .select()
+        .single()
+        .then((row) => _setAccount(_mapAccount(user, row)));
   }
 
   @override
@@ -255,6 +282,17 @@ class OnlineServiceImpl with ChangeNotifier implements OnlineService {
             contentType: 'image/png',
           ),
         );
+    await _touchProfile(user);
+  }
+
+  Future<void> _touchProfile(User user) async {
+    final row = await _db
+        .from('profiles')
+        .update({'updated_at': DateTime.now().toUtc().toIso8601String()})
+        .eq('id', user.id)
+        .select()
+        .single();
+    _setAccount(_mapAccount(user, row));
   }
 
   @override
@@ -265,6 +303,7 @@ class OnlineServiceImpl with ChangeNotifier implements OnlineService {
     }
 
     await _db.storage.from("profile_pictures").remove([user.id]);
+    await _touchProfile(user);
   }
 
   @override
@@ -322,25 +361,7 @@ class OnlineServiceImpl with ChangeNotifier implements OnlineService {
 
   @override
   Future<Uri?> getAvatarUrl(String id) async {
-    // Avatar is stored in the public storage in the profile_pictures bucket
-    // as <user-id>
-    try {
-      final response = await _db.storage
-          .from("profile_pictures")
-          .createSignedUrl(
-            id,
-            60 * 60, // 1 hour
-            // transform: const TransformOptions(
-            //   resize: ResizeMode.cover,
-            //   width: 256,
-            //   height: 256,
-            // ),
-          );
-      return Uri.parse(response);
-    } catch (e) {
-      logger.e(e);
-      return null;
-    }
+    return Uri.parse(_db.storage.from('profile_pictures').getPublicUrl(id));
   }
 
   @override
@@ -349,150 +370,65 @@ class OnlineServiceImpl with ChangeNotifier implements OnlineService {
     required DateTime startDate,
     required DateTime endDate,
   }) async {
-    final user = _client.currentUser;
-    if (user == null) {
+    if (_client.currentUser == null)
       return (feed: <FeedItem>[], hasMore: false);
+    final res = Map<String, dynamic>.from(
+      await _db.rpc(
+            'get_friends_feed',
+            params: {
+              'start_at': startDate.toUtc().toIso8601String(),
+              'end_at': endDate.toUtc().toIso8601String(),
+            },
+          )
+          as Map,
+    );
+    nextFriendsFeedDate = DateTime.tryParse(
+      res['previous_at'] as String? ?? '',
+    );
+    feedProfiles = (res['profiles'] as List)
+        .map((p) => Map<String, dynamic>.from(p as Map))
+        .toList();
+    final grouped = <String, List<ConcreteExercise>>{};
+    for (final row in res['exercises'] as List) {
+      final e = HistoryWorkoutExercise.fromJson(
+        Map<String, dynamic>.from(row as Map),
+      );
+      grouped.putIfAbsent('${e.userId}/${e.routineId}', () => []).add(e);
     }
-
-    final feedItems = <FeedItem>[];
-    bool hasMore = false;
-
-    final friendsRes = await _db
-        .from("friends")
-        .select("sender_id,receiver_id")
-        .or("sender_id.eq.${user.id},receiver_id.eq.${user.id}")
-        .eq("status", "accepted");
-    final friendIDs = <String>{
-      for (final row in friendsRes as List)
-        if (row["sender_id"] != user.id) row["sender_id"] as String,
-      for (final row in friendsRes as List)
-        if (row["receiver_id"] != user.id) row["receiver_id"] as String,
-    };
-
+    final items = <FeedItem>[];
     if (sources.contains(FeedSource.friendsHistory)) {
-      try {
-        final workoutsResponse = await _db
-            .from("history_workouts")
-            .select()
-            .inFilter("user_id", friendIDs.toList())
-            .eq("deleted", false)
-            .gte("starting_date", startDate.toUtc().toIso8601String())
-            .lte("starting_date", endDate.toUtc().toIso8601String());
-
-        final List<String> workoutIds = (workoutsResponse as List)
-            .map((w) => w["id"] as String)
-            .toList();
-
-        final exercisesResponse = workoutIds.isEmpty
-            ? []
-            : await _db
-                  .from("history_workout_exercises")
-                  .select()
-                  .inFilter("user_id", friendIDs.toList())
-                  .eq("deleted", false)
-                  .inFilter("routine_id", workoutIds);
-
-        final exercisesByWorkout = <String, List<ConcreteExercise>>{};
-        for (final row in exercisesResponse as List) {
-          final exercise = HistoryWorkoutExercise.fromJson(
-            row as Map<String, dynamic>,
-          );
-          exercisesByWorkout
-              .putIfAbsent(exercise.routineId, () => <ConcreteExercise>[])
-              .add(exercise);
-        }
-
-        for (final row in workoutsResponse) {
-          final historyWorkout = HistoryWorkout.fromJson(
-            row as Map<String, dynamic>,
-          );
-          final exercises =
-              exercisesByWorkout[historyWorkout.id] ?? <ConcreteExercise>[];
-          final workout = historyWorkoutFromDatabase(
-            historyWorkout,
-            exercises,
-          ).copyWith.parentID(null);
-          final userId = historyWorkout.userId;
-          if (userId == null) {
-            logger.w("History workout ${historyWorkout.id} has no user_id");
-            continue;
-          }
-          feedItems.add(
-            FeedItemWorkout(
-              workout: workout,
-              authorship: FeedAuthorshipFriend(userID: userId),
+      for (final row in res['workouts'] as List) {
+        final w = HistoryWorkout.fromJson(
+          Map<String, dynamic>.from(row as Map),
+        );
+        items.add(
+          FeedItemWorkout(
+            workout: historyWorkoutFromDatabase(
+              w,
+              grouped['${w.userId}/${w.id}'] ?? [],
+            ).copyWith.parentID(null),
+            authorship: FeedAuthorshipFriend(userID: w.userId!),
+          ),
+        );
+      }
+    }
+    if (sources.contains(FeedSource.friendsAchievements)) {
+      for (final row in res['achievements'] as List) {
+        final c = AchievementCompletion.fromJson(
+          Map<String, dynamic>.from(row as Map),
+        );
+        final achievement = achievements[c.achievementID];
+        if (achievement != null)
+          items.add(
+            FeedItemAchievement(
+              achievement: achievement,
+              completion: c,
+              authorship: FeedAuthorshipFriend(userID: c.userId!),
             ),
           );
-        }
-
-        final countResponse = await _db
-            .from("history_workouts")
-            .select("id")
-            .inFilter("user_id", friendIDs.toList())
-            .eq("deleted", false)
-            .lt("starting_date", startDate.toUtc().toIso8601String())
-            .limit(1);
-        hasMore = hasMore || countResponse.isNotEmpty;
-      } catch (e, s) {
-        logger.e(
-          "Error fetching friends history from Supabase",
-          error: e,
-          stackTrace: s,
-        );
       }
     }
-
-    if (sources.contains(FeedSource.friendsAchievements)) {
-      try {
-        final completionsResponse = await _db
-            .from("achievements_v2")
-            .select()
-            .inFilter("user_id", friendIDs.toList())
-            .eq("deleted", false)
-            .gte("completed_at", startDate.toUtc().toIso8601String())
-            .lte("completed_at", endDate.toUtc().toIso8601String());
-
-        for (final row in completionsResponse as List) {
-          final completion = AchievementCompletion.fromJson(
-            row as Map<String, dynamic>,
-          );
-          final achievement = achievements[completion.achievementID];
-          if (achievement != null) {
-            final userId = completion.userId;
-            if (userId == null) {
-              logger.w(
-                "Achievement completion ${completion.id} has no user_id",
-              );
-              continue;
-            }
-            feedItems.add(
-              FeedItemAchievement(
-                achievement: achievement,
-                completion: completion,
-                authorship: FeedAuthorshipFriend(userID: userId),
-              ),
-            );
-          }
-        }
-
-        final countResponse = await _db
-            .from("achievements_v2")
-            .select("id")
-            .inFilter("user_id", friendIDs.toList())
-            .eq("deleted", false)
-            .lt("completed_at", startDate.toUtc().toIso8601String())
-            .limit(1);
-        hasMore = hasMore || countResponse.isNotEmpty;
-      } catch (e, s) {
-        logger.e(
-          "Error fetching friends achievements from Supabase",
-          error: e,
-          stackTrace: s,
-        );
-      }
-    }
-
-    return (feed: feedItems, hasMore: hasMore);
+    return (feed: items, hasMore: nextFriendsFeedDate != null);
   }
 
   @override

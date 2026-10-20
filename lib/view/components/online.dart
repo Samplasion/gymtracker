@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:gymtracker/provider/online.dart';
 import 'package:gymtracker/icons/gymtracker_icons.dart';
 import 'package:gymtracker/service/online.dart';
 import 'package:gymtracker/view/components/icon_grid.dart';
@@ -14,28 +13,7 @@ class UserAvatar extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return FutureBuilder(
-      future: ref.read(onlineProvider.notifier).getAvatarUrl(id),
-      builder: (context, snapshot) {
-        return CircleAvatar(
-          radius: radius,
-          backgroundImage: snapshot.hasData && snapshot.data != null
-              ? NetworkImage(snapshot.data!.toString())
-              : null,
-          child: snapshot.hasData && snapshot.data != null
-              ? null
-              : LayoutBuilder(
-                  builder: (context, constraints) {
-                    final size = constraints.maxWidth / 2;
-                    return Icon(
-                      GTIcons.account,
-                      size: size,
-                    );
-                  },
-                ),
-        );
-      },
-    );
+    return UserAccountIcon(id: id, radius: radius);
   }
 }
 

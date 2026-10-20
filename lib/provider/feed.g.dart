@@ -46,7 +46,7 @@ final class FeedHistoryStreamProvider
   }
 }
 
-String _$feedHistoryStreamHash() => r'054c36e52921af57f0cee90d2fed4fdea1831a55';
+String _$feedHistoryStreamHash() => r'df9a9d9c7e1ec38f2e7716709c2fc00360505c8e';
 
 @ProviderFor(feedAchievementsStream)
 final feedAchievementsStreamProvider = FeedAchievementsStreamProvider._();
@@ -88,46 +88,7 @@ final class FeedAchievementsStreamProvider
 }
 
 String _$feedAchievementsStreamHash() =>
-    r'a20aa0cb3faaeb47a7a65e75ccdb69635353f4b1';
-
-@ProviderFor(feedUserStream)
-final feedUserStreamProvider = FeedUserStreamProvider._();
-
-final class FeedUserStreamProvider
-    extends
-        $FunctionalProvider<
-          AsyncValue<OnlineAccount?>,
-          OnlineAccount?,
-          Stream<OnlineAccount?>
-        >
-    with $FutureModifier<OnlineAccount?>, $StreamProvider<OnlineAccount?> {
-  FeedUserStreamProvider._()
-    : super(
-        from: null,
-        argument: null,
-        retry: null,
-        name: r'feedUserStreamProvider',
-        isAutoDispose: true,
-        dependencies: null,
-        $allTransitiveDependencies: null,
-      );
-
-  @override
-  String debugGetCreateSourceHash() => _$feedUserStreamHash();
-
-  @$internal
-  @override
-  $StreamProviderElement<OnlineAccount?> $createElement(
-    $ProviderPointer pointer,
-  ) => $StreamProviderElement(pointer);
-
-  @override
-  Stream<OnlineAccount?> create(Ref ref) {
-    return feedUserStream(ref);
-  }
-}
-
-String _$feedUserStreamHash() => r'0b46bdf08c83b49dd1bb6ee71878c1910e73a5c0';
+    r'e4b3b6e481e054cc5ba9fcb21a254eb453e77ec3';
 
 @ProviderFor(Feed)
 final feedProvider = FeedProvider._();
@@ -139,7 +100,7 @@ final class FeedProvider extends $AsyncNotifierProvider<Feed, List<FeedItem>> {
         argument: null,
         retry: null,
         name: r'feedProvider',
-        isAutoDispose: true,
+        isAutoDispose: false,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
@@ -152,7 +113,7 @@ final class FeedProvider extends $AsyncNotifierProvider<Feed, List<FeedItem>> {
   Feed create() => Feed();
 }
 
-String _$feedHash() => r'dbdede26cd399d6a868b33cda0a7d0dd2766cc51';
+String _$feedHash() => r'22c79bbe11c532cce4273e4a970655bba7c5a8e1';
 
 abstract class _$Feed extends $AsyncNotifier<List<FeedItem>> {
   FutureOr<List<FeedItem>> build();

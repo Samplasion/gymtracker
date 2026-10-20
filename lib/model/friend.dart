@@ -8,12 +8,14 @@ class Friend {
   final String username;
   final String? email;
   final String? fullName;
+  final String? updatedAt;
 
   Friend({
     required this.id,
     required this.username,
     this.email,
     this.fullName,
+    this.updatedAt,
   });
 
   factory Friend.fromJson(Map<String, dynamic> json) {
@@ -22,15 +24,17 @@ class Friend {
       username: json['username'] as String,
       email: json['email'] as String?,
       fullName: json['full_name'] as String?,
+      updatedAt: json['updated_at'] as String?,
     );
   }
 
   Map<String, dynamic> toJson() => {
-        'id': id,
-        'username': username,
-        'email': email,
-        'full_name': fullName,
-      };
+    'id': id,
+    'username': username,
+    'email': email,
+    'full_name': fullName,
+    if (updatedAt != null) 'updated_at': updatedAt,
+  };
 }
 
 class FriendRelation {

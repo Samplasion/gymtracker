@@ -54,6 +54,7 @@ class FeedService {
 
   FeedService(this._databaseService, this._onlineService);
 
+  DateTime? previousAt;
   Future<({List<FeedItem> feed, bool hasMore})> getFeedItems({
     required Set<FeedSource> sources,
     required DateTime startDate,
@@ -65,15 +66,12 @@ class FeedService {
     for (final source in sources) {
       switch (source) {
         case FeedSource.ownHistory:
-          final workouts = _databaseService.history$.value
-              .where(
-                (workout) =>
-                    (workout.endingDate ?? workout.startingDate)?.isAfter(
-                      startDate,
-                    ) ??
-                    false,
-              )
-              .toList();
+          final workouts = _databaseService.history$.value.where((w) {
+            final date = w.endingDate ?? w.startingDate;
+            return date != null &&
+                !date.isBefore(startDate) &&
+                date.isBefore(endDate);
+          }).toList();
           feedItems.addAll(
             workouts.map(
               (workout) => FeedItemWorkout(
@@ -84,13 +82,22 @@ class FeedService {
               ),
             ),
           );
-          hasMore =
-              hasMore ||
-              _databaseService.history$.value.length > workouts.length;
+          for (final w in _databaseService.history$.value) {
+            final d = w.endingDate ?? w.startingDate;
+            if (d != null &&
+                d.isBefore(startDate) &&
+                (previousAt == null || d.isAfter(previousAt!)))
+              previousAt = d;
+          }
+          hasMore = previousAt != null;
           break;
         case FeedSource.ownAchievements:
           final fetchedAchievements = _databaseService.completions$.value
-              .where((completion) => completion.completedAt.isAfter(startDate))
+              .where(
+                (c) =>
+                    !c.completedAt.isBefore(startDate) &&
+                    c.completedAt.isBefore(endDate),
+              )
               .map(
                 (completion) =>
                     (achievements[completion.achievementID], completion),
@@ -108,10 +115,13 @@ class FeedService {
               ),
             ),
           );
-          hasMore =
-              hasMore ||
-              _databaseService.completions$.value.length >
-                  fetchedAchievements.length;
+          for (final c in _databaseService.completions$.value) {
+            final d = c.completedAt;
+            if (d.isBefore(startDate) &&
+                (previousAt == null || d.isAfter(previousAt!)))
+              previousAt = d;
+          }
+          hasMore = previousAt != null;
           break;
         case FeedSource.friendsHistory:
         case FeedSource.friendsAchievements:

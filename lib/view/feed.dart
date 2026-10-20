@@ -1,4 +1,5 @@
 import 'dart:math';
+import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -39,7 +40,38 @@ class FeedView extends ConsumerStatefulWidget {
 
 const _kFakeRoutineSeed = 2001;
 
-class _FeedViewState extends ConsumerState<FeedView> {
+class _FeedViewState extends ConsumerState<FeedView>
+    with WidgetsBindingObserver {
+  Timer? _refreshTimer;
+  bool _foreground = true;
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    _refreshTimer = Timer.periodic(const Duration(minutes: 5), (_) {
+      if (_foreground && ModalRoute.of(context)?.isCurrent != false)
+        unawaited(ref.read(feedProvider.notifier).refreshIfStale());
+    });
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) unawaited(ref.read(feedProvider.notifier).refreshIfStale());
+    });
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    _foreground = state == AppLifecycleState.resumed;
+    if (_foreground && ModalRoute.of(context)?.isCurrent != false)
+      unawaited(ref.read(feedProvider.notifier).refreshIfStale());
+  }
+
+  @override
+  void dispose() {
+    _refreshTimer?.cancel();
+    ref.read(feedProvider.notifier).setVisible(false);
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
   List<Workout> get fakeWorkouts =>
       List.generate(5, (i) => skeletonWorkout(_kFakeRoutineSeed + i));
 
@@ -47,6 +79,7 @@ class _FeedViewState extends ConsumerState<FeedView> {
   Widget build(BuildContext context) {
     final feed = ref.watch(feedProvider);
     final feedNotifier = ref.watch(feedProvider.notifier);
+    feedNotifier.setVisible(ModalRoute.of(context)?.isCurrent ?? true);
     final routinesController = Get.find<RoutinesController>();
     final List<RoutineSuggestion> suggested = routinesController.suggestions
         .take(3)
@@ -81,6 +114,7 @@ class _FeedViewState extends ConsumerState<FeedView> {
               ),
             ),
       body: NestedScrollView(
+        key: const PageStorageKey('feed-scroll'),
         headerSliverBuilder: (context, innerBoxIsScrolled) => [
           SliverAppBar.large(
             title: Text(context.t.feed.title),
@@ -146,8 +180,7 @@ class _FeedViewState extends ConsumerState<FeedView> {
           builder: (context) {
             return RefreshIndicator(
               onRefresh: () async {
-                ref.invalidate(feedProvider);
-                return ref.read(feedProvider.future);
+                return ref.read(feedProvider.notifier).refresh();
               },
               child: CustomScrollView(
                 slivers: [
@@ -456,41 +489,39 @@ class ProfileSearchDelegate extends SearchDelegate<Friend?> {
       return const SizedBox.shrink();
     }
 
-    return FutureBuilder<List<Friend>>(
-      future: ref.read(friendProvider.notifier).searchUsers(query),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: GBLoadingIndicator());
-        }
-        if (snapshot.hasError) {
-          return Center(child: Text("Error: ${snapshot.error}"));
-        }
-        final results = snapshot.data ?? [];
-        if (results.isEmpty) {
-          return Center(
-            child: ContentUnavailableView(
-              icon: const Icon(GTIcons.search),
-              title: Text(context.t.profileSearch.noResults.title),
-              description: Text(context.t.profileSearch.noResults.text),
-            ),
-          );
-        }
-        return ListView.builder(
-          itemCount: results.length,
-          itemBuilder: (context, index) {
-            final friend = results[index];
-            return ListTile(
-              leading: UserAccountIcon(id: friend.id),
-              title: Text(friend.fullName ?? friend.username),
-              subtitle: Text("@${friend.username}"),
-              onTap: () {
-                close(context, friend);
-                Go.to(() => UserProfilePage(userID: friend.id));
-              },
-            );
-          },
-        );
-      },
+    return Consumer(
+      builder: (context, ref, _) => ref
+          .watch(userSearchProvider(query.trim().toLowerCase()))
+          .when(
+            loading: () => const Center(child: GBLoadingIndicator()),
+            error: (error, _) => Center(child: Text('Error: $error')),
+            data: (results) {
+              if (results.isEmpty) {
+                return Center(
+                  child: ContentUnavailableView(
+                    icon: const Icon(GTIcons.search),
+                    title: Text(context.t.profileSearch.noResults.title),
+                    description: Text(context.t.profileSearch.noResults.text),
+                  ),
+                );
+              }
+              return ListView.builder(
+                itemCount: results.length,
+                itemBuilder: (context, index) {
+                  final friend = results[index];
+                  return ListTile(
+                    leading: UserAccountIcon(id: friend.id),
+                    title: Text(friend.fullName ?? friend.username),
+                    subtitle: Text("@${friend.username}"),
+                    onTap: () {
+                      close(context, friend);
+                      Go.to(() => UserProfilePage(userID: friend.id));
+                    },
+                  );
+                },
+              );
+            },
+          ),
     );
   }
 }

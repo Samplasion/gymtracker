@@ -6,7 +6,11 @@ import 'package:gymtracker/model/achievements.dart';
 import 'package:gymtracker/model/friend.dart';
 import 'package:gymtracker/model/history.dart';
 import 'package:gymtracker/model/workout.dart';
-import 'package:gymtracker/struct/cache.dart';
+import 'package:gymtracker/struct/request_cache.dart';
+import 'package:gymtracker/provider/online.dart';
+import 'package:gymtracker/provider/feed.dart';
+import 'package:gymtracker/service/database.dart';
+import 'package:get/get.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -38,17 +42,136 @@ class FriendState {
 
 @Riverpod(keepAlive: true)
 class FriendNotifier extends _$FriendNotifier {
-  final Map<String, CachedData<String?>> _avatarCache = {};
-  final Map<String, CachedData<FriendPublicData>> _friendPublicDataCache = {};
+  final _identities = RequestCache<String, Friend>(const Duration(minutes: 30));
+  final _profiles = RequestCache<String, FriendPublicData>(
+    const Duration(minutes: 5),
+  );
+  final _search = RequestCache<String, List<Friend>>(
+    const Duration(minutes: 1),
+  );
+  final _relations = RequestCache<String, FriendState>(
+    const Duration(minutes: 5),
+  );
+  final _identityWaiters = <String, Completer<Friend>>{};
+  int _generation = 0;
+  bool _scheduled = false;
+  bool _identityNotifyScheduled = false;
 
   @override
   FutureOr<FriendState> build() async {
-    _avatarCache.clear();
-    _friendPublicDataCache.clear();
-    return _fetchFriendState();
+    ref.watch(currentUserIdProvider);
+    _generation++;
+    _identities.clear();
+    _profiles.clear();
+    _search.clear();
+    _relations.clear();
+    ref.onDispose(() {
+      _generation++;
+    });
+    final account = ref.read(onlineProvider).value;
+    if (account != null)
+      seedIdentity(
+        Friend(
+          id: account.id,
+          username: account.name,
+          fullName: account.fullName,
+          updatedAt: account.updatedAt,
+        ),
+      );
+    // No authenticated session is a valid empty state; network errors are not.
+    if (Supabase.instance.client.auth.currentUser == null)
+      return FriendState(friends: [], pendingReceived: [], pendingSent: []);
+    try {
+      return await _fetchFriendState();
+    } catch (_) {
+      return _relations.peek('state') ??
+          FriendState(friends: [], pendingReceived: [], pendingSent: []);
+    }
   }
 
-  Future<FriendState> _fetchFriendState() async {
+  void seedIdentity(Friend friend) {
+    final previous = _identities.peek(friend.id);
+    _identities.put(friend.id, friend);
+    if (previous?.username == friend.username &&
+        previous?.fullName == friend.fullName &&
+        previous?.updatedAt == friend.updatedAt)
+      return;
+    if (!_identityNotifyScheduled) {
+      _identityNotifyScheduled = true;
+      scheduleMicrotask(() {
+        _identityNotifyScheduled = false;
+        if (ref.mounted) ref.read(identityEpochProvider.notifier).bump();
+      });
+    }
+  }
+
+  Future<Friend> getIdentity(String id) => _identities.get(id, () {
+    final completer = Completer<Friend>();
+    _identityWaiters[id] = completer;
+    if (!_scheduled) {
+      _scheduled = true;
+      scheduleMicrotask(_flushIdentities);
+    }
+    return completer.future;
+  });
+  Future<void> _flushIdentities() async {
+    _scheduled = false;
+    final waiters = Map<String, Completer<Friend>>.from(_identityWaiters);
+    _identityWaiters.clear();
+    final generation = _generation;
+    try {
+      final rows = await Supabase.instance.client
+          .from('profiles')
+          .select('id,username,full_name,updated_at')
+          .inFilter('id', waiters.keys.toList());
+      if (generation != _generation) throw StateError('Account changed');
+      final found = {
+        for (final row in rows) row['id'] as String: Friend.fromJson(row),
+      };
+      for (final e in waiters.entries) {
+        final friend = found[e.key];
+        if (friend == null) {
+          e.value.completeError(StateError('Profile not found'));
+        } else {
+          e.value.complete(friend);
+        }
+      }
+    } catch (e, st) {
+      for (final w in waiters.values) {
+        if (!w.isCompleted) w.completeError(e, st);
+      }
+    }
+  }
+
+  Future<void> refresh({bool force = false}) async {
+    final generation = _generation;
+    final previous =
+        state.value?.friends.map((f) => f.id).toSet() ?? <String>{};
+    final result = await _relations.get(
+      'state',
+      _loadFriendState,
+      force: force,
+    );
+    if (generation == _generation && ref.mounted) {
+      state = AsyncValue.data(result);
+      final accepted = result.friends.map((f) => f.id).toSet();
+      for (final changed in {
+        ...previous.difference(accepted),
+        ...accepted.difference(previous),
+      }) {
+        invalidateContents(changed);
+      }
+      if (previous.length != accepted.length ||
+          !previous.containsAll(accepted)) {
+        if (ref.exists(feedProvider))
+          ref.read(feedProvider.notifier).relationsChanged(accepted);
+      }
+    }
+  }
+
+  Future<FriendState> _fetchFriendState() =>
+      _relations.get('state', _loadFriendState);
+  Future<FriendState> _loadFriendState() async {
     final client = Supabase.instance.client;
     final currentUser = client.auth.currentUser;
     if (currentUser == null) {
@@ -60,15 +183,10 @@ class FriendNotifier extends _$FriendNotifier {
     // Fetch relations
     late final List<dynamic> relations;
 
-    try {
-      relations = await client
-          .from('friends')
-          .select()
-          .or('sender_id.eq.$currentUserId,receiver_id.eq.$currentUserId');
-    } catch (e) {
-      // If the request fails (e.g., offline), return an empty state instead of throwing
-      return FriendState(friends: [], pendingReceived: [], pendingSent: []);
-    }
+    relations = await client
+        .from('friends')
+        .select()
+        .or('sender_id.eq.$currentUserId,receiver_id.eq.$currentUserId');
 
     final friendIds = <String>{};
     final pendingReceivedIds = <String>{};
@@ -106,6 +224,10 @@ class FriendNotifier extends _$FriendNotifier {
         p['id'] as String: Friend.fromJson(p as Map<String, dynamic>),
     };
 
+    for (final friend in profilesMap.values) {
+      seedIdentity(friend);
+    }
+
     final List<Friend> friends = [];
     final List<Friend> pendingReceived = [];
     final List<Friend> pendingSent = [];
@@ -135,95 +257,70 @@ class FriendNotifier extends _$FriendNotifier {
     );
   }
 
-  Future<void> sendFriendRequest(String receiverId) async {
-    state = const AsyncValue.loading();
-    state = await AsyncValue.guard(() async {
-      final client = Supabase.instance.client;
-      final currentUserId = client.auth.currentUser?.id;
-      if (currentUserId == null) throw Exception("User not logged in");
-
-      if (currentUserId == receiverId) {
-        throw Exception("Cannot send friend request to yourself");
-      }
-
-      // Check if a friend request already exists
-      final existingRequest = await client
-          .from('friends')
-          .select()
-          .or('sender_id.eq.$currentUserId,receiver_id.eq.$currentUserId')
-          .or('sender_id.eq.$receiverId,receiver_id.eq.$receiverId');
-
-      if (existingRequest.isNotEmpty) {
-        throw Exception("Friend request already sent");
-      }
-
+  Future<void> _mutate(String id, String action) async {
+    await refresh();
+    final old = state.value!;
+    final generation = _generation;
+    final client = Supabase.instance.client;
+    final owner = client.auth.currentUser?.id;
+    if (owner == null || owner == id)
+      throw StateError('Invalid friend request');
+    final identity = await getIdentity(id);
+    if (action == 'send') {
+      if ([
+        ...old.friends,
+        ...old.pendingReceived,
+        ...old.pendingSent,
+      ].any((f) => f.id == id))
+        throw StateError('Friend request already exists');
       await client.from('friends').insert({
-        'sender_id': currentUserId,
-        'receiver_id': receiverId,
+        'sender_id': owner,
+        'receiver_id': id,
         'status': 'pending',
-      });
-      return _fetchFriendState();
-    });
-  }
-
-  Future<void> acceptFriendRequest(String senderId) async {
-    state = const AsyncValue.loading();
-    state = await AsyncValue.guard(() async {
-      final client = Supabase.instance.client;
-      final currentUserId = client.auth.currentUser?.id;
-      if (currentUserId == null) throw Exception("User not logged in");
-
-      await client
+      }).select();
+    } else if (action == 'accept') {
+      final rows = await client
           .from('friends')
           .update({'status': 'accepted'})
-          .eq('sender_id', senderId)
-          .eq('receiver_id', currentUserId);
-      return _fetchFriendState();
-    });
-  }
-
-  Future<void> declineFriendRequest(String senderId) async {
-    state = const AsyncValue.loading();
-    state = await AsyncValue.guard(() async {
-      final client = Supabase.instance.client;
-      final currentUserId = client.auth.currentUser?.id;
-      if (currentUserId == null) throw Exception("User not logged in");
-
+          .eq('sender_id', id)
+          .eq('receiver_id', owner)
+          .select();
+      if (rows.isEmpty) throw StateError('Friend request no longer exists');
+    } else {
       await client
           .from('friends')
           .delete()
-          .eq('sender_id', senderId)
-          .eq('receiver_id', currentUserId);
-      return _fetchFriendState();
-    });
+          .or(
+            'and(sender_id.eq.$owner,receiver_id.eq.$id),and(sender_id.eq.$id,receiver_id.eq.$owner)',
+          )
+          .select();
+    }
+    if (generation != _generation || !ref.mounted) return;
+    final result = FriendState(
+      friends: [
+        ...old.friends.where((f) => f.id != id),
+        if (action == 'accept') identity,
+      ],
+      pendingReceived: old.pendingReceived.where((f) => f.id != id).toList(),
+      pendingSent: [
+        ...old.pendingSent.where((f) => f.id != id),
+        if (action == 'send') identity,
+      ],
+    );
+    _relations.put('state', result);
+    state = AsyncValue.data(result);
+    _profiles.invalidate(id);
+    ref.invalidate(friendPublicDataProvider(id));
+    if ((action == 'accept' || action == 'remove') && ref.exists(feedProvider))
+      ref
+          .read(feedProvider.notifier)
+          .relationsChanged(result.friends.map((f) => f.id).toSet());
   }
 
-  Future<void> unfriend(String friendId) async {
-    state = const AsyncValue.loading();
-    state = await AsyncValue.guard(() async {
-      final client = Supabase.instance.client;
-      final currentUserId = client.auth.currentUser?.id;
-      if (currentUserId == null) throw Exception("User not logged in");
-
-      await client
-          .from('friends')
-          .delete()
-          .eq('sender_id', currentUserId)
-          .eq('receiver_id', friendId);
-
-      await client
-          .from('friends')
-          .delete()
-          .eq('sender_id', friendId)
-          .eq('receiver_id', currentUserId);
-
-      // Invalidate caches for the unfriended user.
-      _avatarCache.remove(friendId);
-      _friendPublicDataCache.remove(friendId);
-
-      return _fetchFriendState();
-    });
-  }
+  Future<void> sendFriendRequest(String id) => _mutate(id, 'send');
+  Future<void> acceptFriendRequest(String id) => _mutate(id, 'accept');
+  Future<void> declineFriendRequest(String id) => _mutate(id, 'decline');
+  Future<void> unfriend(String id) => _mutate(id, 'remove');
 
   Future<Friend?> searchUserByUsername(String username) async {
     try {
@@ -240,137 +337,144 @@ class FriendNotifier extends _$FriendNotifier {
     }
   }
 
-  Future<List<Friend>> searchUsers(String query) async {
-    final trimmed = query.trim();
-    if (trimmed.isEmpty) return [];
-    final client = Supabase.instance.client;
-    try {
-      final response = await client
-          .rpc('search_users_weighted', params: {'search_query': trimmed})
-          .limit(15);
-      return (response as List)
-          .map((json) => Friend.fromJson(json as Map<String, dynamic>))
-          .toList();
-    } catch (_) {
+  Future<List<Friend>> searchUsers(String query) {
+    final key = query.trim().toLowerCase();
+    if (key.isEmpty) return Future.value([]);
+    return _search.get(key, () async {
+      final client = Supabase.instance.client;
+      List<dynamic> rows;
       try {
-        final response = await client
+        rows =
+            await client
+                    .rpc('search_users_weighted', params: {'search_query': key})
+                    .limit(15)
+                as List;
+      } on PostgrestException catch (e) {
+        if (e.code != 'PGRST202' && e.code != '42883') rethrow;
+        rows = await client
             .from('profiles')
-            .select()
-            .ilike('username', '%$trimmed%')
+            .select('id,username,full_name,updated_at')
+            .ilike('username', '%$key%')
             .limit(15);
-        return (response as List)
-            .map((json) => Friend.fromJson(json as Map<String, dynamic>))
-            .toList();
-      } catch (_) {
-        return [];
       }
-    }
+      final friends = rows
+          .map((r) => Friend.fromJson(Map<String, dynamic>.from(r as Map)))
+          .toList();
+      for (final f in friends) {
+        seedIdentity(f);
+      }
+      return friends;
+    });
   }
 
-  Future<FriendPublicData> getFriendPublicData(String friendId) async {
-    // Return a fresh cached entry if available.
-    final cached = _friendPublicDataCache[friendId];
-    if (cached != null && !cached.isExpired) {
-      return cached.data;
-    }
-
-    final client = Supabase.instance.client;
-
-    // 1. Fetch profile of the friend from the profiles table
-    final profileRes = await client
-        .from('profiles')
-        .select()
-        .eq('id', friendId)
-        .single();
-    final friend = Friend.fromJson(profileRes);
-
-    // 2. Fetch public achievement completions (non-deleted)
-    final achievementsRes = await client
-        .from('achievements_v2')
-        .select()
-        .eq('user_id', friendId)
-        .eq('deleted', false)
-        .order('completed_at', ascending: false)
-        .limit(100);
-    final achievements = achievementsRes
-        .map((json) => AchievementCompletion.fromJson(json))
-        .toList();
-
-    // 3. Fetch public workouts with their exercises
-    final workoutsRes = await client
-        .from('history_workouts')
-        .select()
-        .eq('user_id', friendId)
-        .eq('deleted', false)
-        .isFilter('completes', null)
-        .order('starting_date', ascending: false)
-        .limit(25);
-    final historyWorkouts = workoutsRes
-        .map((json) => HistoryWorkout.fromJson(json))
-        .toList();
-
-    final workoutIds = historyWorkouts.map((w) => w.id).toList();
-    final exercisesResponse = workoutIds.isEmpty
-        ? <dynamic>[]
-        : await client
-              .from('history_workout_exercises')
-              .select()
-              .inFilter('routine_id', workoutIds)
-              .eq('deleted', false);
-
-    final exercisesByWorkout = <String, List<ConcreteExercise>>{};
-    for (final row in exercisesResponse) {
-      final exercise = HistoryWorkoutExercise.fromJson(
-        row as Map<String, dynamic>,
+  Future<FriendPublicData> getFriendPublicData(
+    String id, {
+    bool force = false,
+  }) => _profiles.get(id, () async {
+    final friend = await getIdentity(id);
+    final self = id == ref.read(currentUserIdProvider);
+    if (!self) await refresh();
+    final relations =
+        state.value ??
+        FriendState(friends: [], pendingReceived: [], pendingSent: []);
+    if (self) {
+      final db = Get.find<DatabaseService>();
+      return FriendPublicData(
+        friend: friend,
+        achievements:
+            (db.completions$.value.toList()
+                  ..sort((a, b) => b.completedAt.compareTo(a.completedAt)))
+                .take(100)
+                .toList(),
+        workouts:
+            (db.history$.value.toList()..sort(
+                  (a, b) => (b.startingDate ?? DateTime(1970)).compareTo(
+                    a.startingDate ?? DateTime(1970),
+                  ),
+                ))
+                .take(25)
+                .toList(),
+        friendCount: relations.friends.length,
       );
-      exercisesByWorkout
-          .putIfAbsent(exercise.routineId, () => <ConcreteExercise>[])
-          .add(exercise);
     }
-
-    final workouts = <Workout>[
-      for (final hw in historyWorkouts)
-        historyWorkoutFromDatabase(
-          hw,
-          exercisesByWorkout[hw.id] ?? <ConcreteExercise>[],
-        ).copyWith.parentID(null),
-    ];
-
-    final friendRelationsRes = await client
-        .from('friends')
-        .select()
-        .or('sender_id.eq.$friendId,receiver_id.eq.$friendId')
-        .eq('status', 'accepted');
-    final friendCount = (friendRelationsRes as List).length;
-
-    final result = FriendPublicData(
-      friend: friend,
-      achievements: achievements,
-      workouts: workouts,
-      friendCount: friendCount,
+    if (!relations.friends.any((f) => f.id == id))
+      return FriendPublicData(
+        friend: friend,
+        achievements: [],
+        workouts: [],
+        friendCount: 0,
+      );
+    final result = Map<String, dynamic>.from(
+      await Supabase.instance.client.rpc(
+            'get_public_profile_v2',
+            params: {'profile_id': id},
+          )
+          as Map,
     );
-
-    _friendPublicDataCache[friendId] = CachedData(DateTime.now(), result);
-    return result;
-  }
-
-  Future<String?> getAvatar(String userID) async {
-    // Return a fresh cached entry if available.
-    final cached = _avatarCache[userID];
-    if (cached != null && !cached.isExpired) {
-      return cached.data;
+    final exercises = <String, List<ConcreteExercise>>{};
+    for (final row in result['exercises'] as List) {
+      final ex = HistoryWorkoutExercise.fromJson(
+        Map<String, dynamic>.from(row as Map),
+      );
+      exercises.putIfAbsent(ex.routineId, () => []).add(ex);
     }
+    return FriendPublicData(
+      friend: friend,
+      achievements: (result['achievements'] as List)
+          .map(
+            (r) => AchievementCompletion.fromJson(
+              Map<String, dynamic>.from(r as Map),
+            ),
+          )
+          .toList(),
+      workouts: (result['workouts'] as List).map((r) {
+        final w = HistoryWorkout.fromJson(Map<String, dynamic>.from(r as Map));
+        return historyWorkoutFromDatabase(
+          w,
+          exercises[w.id] ?? [],
+        ).copyWith.parentID(null);
+      }).toList(),
+      friendCount: (result['friend_count'] as num).toInt(),
+    );
+  }, force: force || id == ref.read(currentUserIdProvider));
 
-    final client = Supabase.instance.client;
-    final link = client.storage.from('profile_pictures').getPublicUrl(userID);
-    final cacheBusterLink = "$link?t=${DateTime.now().millisecondsSinceEpoch}";
-    _avatarCache[userID] = CachedData(DateTime.now(), cacheBusterLink);
-    return cacheBusterLink;
+  Future<String?> getAvatar(String id) async {
+    final identity = await getIdentity(id);
+    final url = Supabase.instance.client.storage
+        .from('profile_pictures')
+        .getPublicUrl(id);
+    return identity.updatedAt == null
+        ? url
+        : '$url?v=${Uri.encodeComponent(identity.updatedAt!)}';
   }
 
-  void invalidateAvatarCache(String userID) {
-    _avatarCache.remove(userID);
-    _friendPublicDataCache.remove(userID);
+  void invalidateAvatarCache(String id) {
+    final account = ref.read(onlineProvider).value;
+    if (account?.id == id) {
+      seedIdentity(
+        Friend(
+          id: id,
+          username: account!.name,
+          fullName: account.fullName,
+          updatedAt: account.updatedAt,
+        ),
+      );
+    } else {
+      _identities.invalidate(id);
+    }
+    ref.invalidate(userIdentityProvider(id));
+    ref.invalidate(userAvatarProvider(id));
+  }
+
+  void invalidateContents(String id) {
+    _profiles.invalidate(id);
+    ref.invalidate(friendPublicDataProvider(id));
+  }
+
+  void invalidateProfile(String id) {
+    _profiles.invalidate(id);
+    invalidateAvatarCache(id);
+    ref.invalidate(friendPublicDataProvider(id));
   }
 }
 
@@ -384,6 +488,40 @@ Future<FriendPublicData> friendPublicData(Ref ref, String friendId) async {
       friendCount: 0,
     );
   }
+  final current = ref.watch(currentUserIdProvider);
+  if (current == friendId) ref.watch(friendProvider);
   final friendNotifier = ref.watch(friendProvider.notifier);
   return friendNotifier.getFriendPublicData(friendId);
+}
+
+@riverpod
+Future<Friend> userIdentity(Ref ref, String id) {
+  final expiry = Timer(const Duration(minutes: 30), () => ref.invalidateSelf());
+  ref.onDispose(expiry.cancel);
+  ref.watch(currentUserIdProvider);
+  ref.watch(identityEpochProvider);
+  return ref.watch(friendProvider.notifier).getIdentity(id);
+}
+
+@riverpod
+Future<String?> userAvatar(Ref ref, String id) {
+  ref.watch(userIdentityProvider(id));
+  return ref.watch(friendProvider.notifier).getAvatar(id);
+}
+
+@riverpod
+Future<List<Friend>> userSearch(Ref ref, String query) async {
+  ref.watch(currentUserIdProvider);
+  var cancelled = false;
+  ref.onDispose(() => cancelled = true);
+  await Future<void>.delayed(const Duration(milliseconds: 300));
+  if (cancelled) return [];
+  return ref.read(friendProvider.notifier).searchUsers(query);
+}
+
+@Riverpod(keepAlive: true)
+class IdentityEpoch extends _$IdentityEpoch {
+  @override
+  int build() => 0;
+  void bump() => state++;
 }

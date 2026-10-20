@@ -1660,6 +1660,7 @@ class Translations$userProfile$it implements Translations$userProfile$en {
 	@override String get addFriend => 'Aggiungi amico';
 	@override String get unfriend => 'Rimuovi amico';
 	@override String get requestSent => 'Richiesta inviata';
+	@override late final Translations$userProfile$cancelRequestConfirmation$it cancelRequestConfirmation = Translations$userProfile$cancelRequestConfirmation$it._(_root);
 	@override String get accept => 'Accetta';
 	@override String get decline => 'Rifiuta';
 	@override late final Translations$userProfile$unfriendConfirmation$it unfriendConfirmation = Translations$userProfile$unfriendConfirmation$it._(_root);
@@ -3667,6 +3668,19 @@ class Translations$feed$noSync$it implements Translations$feed$noSync$en {
 
 	// Translations
 	@override String get text => 'La sincronizzazione è in pausa: non sei connesso a Internet. Potrebbero volerci alcuni minuti. Non preoccuparti, i dati verranno mantenuti in locale e trasferiti in un secondo momento.';
+}
+
+// Path: userProfile.cancelRequestConfirmation
+class Translations$userProfile$cancelRequestConfirmation$it implements Translations$userProfile$cancelRequestConfirmation$en {
+	Translations$userProfile$cancelRequestConfirmation$it._(this._root);
+
+	final TranslationsIt _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Annullare richiesta?';
+	@override String get keep => 'Mantieni richiesta';
+	@override String get confirm => 'Annulla richiesta';
+	@override String get error => 'Impossibile annullare la richiesta di amicizia. Riprova.';
 }
 
 // Path: userProfile.unfriendConfirmation
@@ -8164,6 +8178,10 @@ extension on TranslationsIt {
 			'userProfile.addFriend' => 'Aggiungi amico',
 			'userProfile.unfriend' => 'Rimuovi amico',
 			'userProfile.requestSent' => 'Richiesta inviata',
+			'userProfile.cancelRequestConfirmation.title' => 'Annullare richiesta?',
+			'userProfile.cancelRequestConfirmation.keep' => 'Mantieni richiesta',
+			'userProfile.cancelRequestConfirmation.confirm' => 'Annulla richiesta',
+			'userProfile.cancelRequestConfirmation.error' => 'Impossibile annullare la richiesta di amicizia. Riprova.',
 			'userProfile.accept' => 'Accetta',
 			'userProfile.decline' => 'Rifiuta',
 			'userProfile.unfriendConfirmation.title' => ({required Object name}) => 'Rimuovere ${name} dagli amici?',

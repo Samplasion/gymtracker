@@ -2675,6 +2675,12 @@
     "addFriend": "Add Friend",
     "unfriend": "Unfriend",
     "requestSent": "Friend Request Sent",
+    "cancelRequestConfirmation": {
+      "title": "Cancel friend request?",
+      "keep": "Keep request",
+      "confirm": "Cancel request",
+      "error": "Could not cancel the friend request. Please try again."
+    },
     "accept": "Accept",
     "decline": "Decline",
     "unfriendConfirmation": {

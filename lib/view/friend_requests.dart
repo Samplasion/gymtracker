@@ -22,34 +22,46 @@ class FriendRequestsPage extends ConsumerWidget {
       refresh: () => ref.read(friendProvider.notifier).refresh(),
       child: Scaffold(
         appBar: AppBar(title: Text(context.t.friendRequests.title)),
-        body: friendStateAsync.when(
-          data: (friendState) {
-            final requests = friendState.pendingReceived;
-            if (requests.isEmpty) {
-              return Center(
-                child: ContentUnavailableView(
-                  icon: const Icon(GTIcons.friend_requests),
-                  title: Text(context.t.friendRequests.empty.title),
-                  description: Text(context.t.friendRequests.empty.text),
-                ),
-              );
-            }
+        body: RefreshIndicator(
+          onRefresh: () async {
+            await ref.read(friendProvider.notifier).refresh(force: true);
+          },
+          child: friendStateAsync.when(
+            data: (friendState) {
+              final requests = friendState.pendingReceived;
+              if (requests.isEmpty) {
+                return Center(
+                  child: SingleChildScrollView(
+                    primary: true,
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    child: Column(
+                      mainAxisAlignment: .center,
+                      mainAxisSize: MainAxisSize.max,
+                      children: [
+                        ContentUnavailableView(
+                          icon: const Icon(GTIcons.friend_requests),
+                          title: Text(context.t.friendRequests.empty.title),
+                          description: Text(
+                            context.t.friendRequests.empty.text,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              }
 
-            return RefreshIndicator(
-              onRefresh: () async {
-                await ref.read(friendProvider.notifier).refresh(force: true);
-              },
-              child: ListView.builder(
+              return ListView.builder(
                 itemCount: requests.length,
                 itemBuilder: (context, index) {
                   final friend = requests[index];
                   return _FriendRequestTile(friend: friend);
                 },
-              ),
-            );
-          },
-          loading: () => const Center(child: GBLoadingIndicator()),
-          error: (error, _) => Center(child: Text("Error: $error")),
+              );
+            },
+            loading: () => const Center(child: GBLoadingIndicator()),
+            error: (error, _) => Center(child: Text("Error: $error")),
+          ),
         ),
       ),
     );

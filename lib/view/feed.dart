@@ -43,31 +43,37 @@ const _kFakeRoutineSeed = 2001;
 class _FeedViewState extends ConsumerState<FeedView>
     with WidgetsBindingObserver {
   Timer? _refreshTimer;
+  late Feed _feedNotifier;
   bool _foreground = true;
   @override
   void initState() {
     super.initState();
+    _feedNotifier = ref.read(feedProvider.notifier);
     WidgetsBinding.instance.addObserver(this);
     _refreshTimer = Timer.periodic(const Duration(minutes: 5), (_) {
-      if (_foreground && ModalRoute.of(context)?.isCurrent != false)
-        unawaited(ref.read(feedProvider.notifier).refreshIfStale());
+      if (mounted &&
+          _foreground &&
+          ModalRoute.of(context)?.isCurrent != false) {
+        unawaited(_feedNotifier.refreshIfStale());
+      }
     });
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) unawaited(ref.read(feedProvider.notifier).refreshIfStale());
+      if (mounted) unawaited(_feedNotifier.refreshIfStale());
     });
   }
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     _foreground = state == AppLifecycleState.resumed;
-    if (_foreground && ModalRoute.of(context)?.isCurrent != false)
-      unawaited(ref.read(feedProvider.notifier).refreshIfStale());
+    if (mounted && _foreground && ModalRoute.of(context)?.isCurrent != false) {
+      unawaited(_feedNotifier.refreshIfStale());
+    }
   }
 
   @override
   void dispose() {
     _refreshTimer?.cancel();
-    ref.read(feedProvider.notifier).setVisible(false);
+    _feedNotifier.setVisible(false);
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }
@@ -79,12 +85,20 @@ class _FeedViewState extends ConsumerState<FeedView>
   Widget build(BuildContext context) {
     final feed = ref.watch(feedProvider);
     final feedNotifier = ref.watch(feedProvider.notifier);
+    _feedNotifier = feedNotifier;
     feedNotifier.setVisible(ModalRoute.of(context)?.isCurrent ?? true);
     final routinesController = Get.find<RoutinesController>();
     final List<RoutineSuggestion> suggested = routinesController.suggestions
         .take(3)
         .toList();
     final account = ref.watch(onlineProvider);
+    final pendingRequestCount = account.value == null
+        ? 0
+        : ref.watch(
+            friendProvider.select(
+              (state) => state.value?.pendingReceived.length ?? 0,
+            ),
+          );
 
     return Scaffold(
       floatingActionButtonLocation: .endDocked,
@@ -113,333 +127,325 @@ class _FeedViewState extends ConsumerState<FeedView>
                 child: const Icon(GTIcons.search),
               ),
             ),
-      body: NestedScrollView(
-        key: const PageStorageKey('feed-scroll'),
-        headerSliverBuilder: (context, innerBoxIsScrolled) => [
-          SliverAppBar.large(
-            title: Text(context.t.feed.title),
-            leading: SkeletonDrawerButton(),
-            actions: [
-              IconButton(
-                icon: const Icon(GTIcons.friend_requests),
-                onPressed: account.value == null
-                    ? null
-                    : () {
-                        Go.to(() => const FriendRequestsPage());
-                      },
-              ),
-              account.when(
-                data: (account) => IconButton(
-                  icon: UserAccountIcon(id: account?.id),
-                  onPressed: () {
-                    if (account?.id != null) {
-                      Go.to(() => UserProfilePage(userID: account!.id));
-                    } else {
-                      Go.to(() => const AuthScreen());
-                    }
-                  },
+      body: RefreshIndicator(
+        onRefresh: () async {
+          await Future.wait([
+            ref.read(feedProvider.notifier).refresh(),
+            if (account.value != null)
+              ref.read(friendProvider.notifier).refresh(force: true),
+          ]);
+        },
+        child: CustomScrollView(
+          key: const PageStorageKey('feed-scroll'),
+          physics: const AlwaysScrollableScrollPhysics(),
+          slivers: [
+            SliverAppBar.large(
+              title: Text(context.t.feed.title),
+              leading: SkeletonDrawerButton(),
+              actions: [
+                IconButton(
+                  tooltip: context.t.friendRequests.title,
+                  icon: Badge.count(
+                    count: pendingRequestCount,
+                    isLabelVisible: pendingRequestCount > 0,
+                    child: const Icon(GTIcons.friend_requests),
+                  ),
+                  onPressed: account.value == null
+                      ? null
+                      : () {
+                          Go.to(() => const FriendRequestsPage());
+                        },
                 ),
-                error: (error, stackTrace) => IconButton(
-                  icon: const Icon(Icons.error, color: Colors.redAccent),
-                  onPressed: () {
-                    showDialog(
-                      context: context,
-                      builder: (context) => AlertDialog(
-                        title: Text("Error"),
-                        content: Text(error.toString()),
-                        actions: [
-                          TextButton(
-                            onPressed: () => Navigator.of(context).pop(),
-                            child: Text("OK"),
+                account.when(
+                  data: (account) => IconButton(
+                    icon: UserAccountIcon(id: account?.id),
+                    onPressed: () {
+                      if (account?.id != null) {
+                        Go.to(() => UserProfilePage(userID: account!.id));
+                      } else {
+                        Go.to(() => const AuthScreen());
+                      }
+                    },
+                  ),
+                  error: (error, stackTrace) => IconButton(
+                    icon: const Icon(Icons.error, color: Colors.redAccent),
+                    onPressed: () {
+                      showDialog(
+                        context: context,
+                        builder: (context) => AlertDialog(
+                          title: Text("Error"),
+                          content: Text(error.toString()),
+                          actions: [
+                            TextButton(
+                              onPressed: () => Navigator.of(context).pop(),
+                              child: Text("OK"),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  ),
+                  loading: () => IconButton(
+                    onPressed: () {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(context.t.feed.userButton.loading),
+                          showCloseIcon: true,
+                        ),
+                      );
+                    },
+                    icon: SizedBox(
+                      width: 24.0,
+                      height: 24.0,
+                      child: GBLoadingIndicator(),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            SliverToBoxAdapter(
+              child: SafeArea(
+                top: false,
+                bottom: false,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                  child: FilledButton.icon(
+                    onPressed: () {
+                      SkeletonView.of(context)?.goToRoutines();
+                    },
+                    icon: const Icon(GTIcons.workout),
+                    label: Text(context.t.feed.startWorkout),
+                  ),
+                ),
+              ),
+            ),
+            if (suggested.isNotEmpty) ...[
+              SliverToBoxAdapter(child: SizedBox(height: 4)),
+              SliverPadding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 8,
+                ),
+                sliver: SliverStack(
+                  children: [
+                    SliverPositioned.fill(
+                      child: Card.outlined(
+                        clipBehavior: Clip.none,
+                        margin: EdgeInsets.zero,
+                      ),
+                    ),
+                    MultiSliver(
+                      children: [
+                        SliverToBoxAdapter(
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 16,
+                            ).copyWith(bottom: 8),
+                            child: Text(
+                              context.t.routines.quickWorkout.title,
+                              style: Theme.of(context).textTheme.titleMedium,
+                            ),
+                          ),
+                        ),
+                        SliverList(
+                          delegate: SliverChildBuilderDelegate((
+                            context,
+                            index,
+                          ) {
+                            final (routine: workout, score: _) =
+                                suggested[index];
+                            return Material(
+                              type: MaterialType.transparency,
+                              key: ValueKey(workout.id),
+                              child: ListTile(
+                                leading: WorkoutIcon(workout: workout),
+                                title: Text(workout.name),
+                                subtitle: Text(
+                                  context.t.general.exercises(
+                                    n: workout.displayExerciseCount,
+                                  ),
+                                ),
+                                onTap: () {
+                                  Go.to(() => ExercisesView(workout: workout));
+                                },
+                              ),
+                            );
+                          }, childCount: suggested.length),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ],
+            SliverToBoxAdapter(child: _NoSyncCard()),
+            feed.when(
+              data: (feedItems) {
+                if (feedItems.isEmpty) {
+                  return SliverFillRemaining(
+                    fillOverscroll: true,
+                    hasScrollBody: false,
+                    child: Center(
+                      child: ContentUnavailableView(
+                        icon: const Icon(Icons.feed_outlined),
+                        title: Text(context.t.feed.empty.title),
+                        description: Text(context.t.feed.empty.text),
+                      ),
+                    ),
+                  );
+                }
+                return SliverList(
+                  delegate: SliverChildBuilderDelegate((context, index) {
+                    final item = feedItems[index];
+                    return SafeArea(
+                      top: false,
+                      bottom: false,
+                      child: FeedItemCard(
+                        item: item,
+                        onUserPressed: (id) {
+                          if (id != null) {
+                            Go.to(() => UserProfilePage(userID: id));
+                          }
+                        },
+                      ),
+                    );
+                  }, childCount: feedItems.length),
+                );
+              },
+              loading: () => SliverFillRemaining(
+                child: Center(child: GBLoadingIndicator()),
+              ),
+              error: (error, stackTrace) => SliverFillRemaining(
+                child: Center(child: Text("Error loading feed")),
+              ),
+            ),
+            if (feedNotifier.isLoadingMore) ...[
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 16.0),
+                  child: Center(child: GBLoadingIndicator()),
+                ),
+              ),
+            ],
+            if (feedNotifier.hasMore) ...[
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: FilledButton(
+                    onPressed: feedNotifier.isLoadingMore
+                        ? null
+                        : () {
+                            feedNotifier.fetchMore();
+                            // Due to how we've implemented the load more
+                            // mechanism, we need to call setState here to
+                            // trigger a rebuild in order to show the
+                            // loading indicator while the fetch is in
+                            // progress, without hiding the data.
+                            setState(() {});
+                          },
+                    child: Text(context.t.feed.loadMore),
+                  ),
+                ),
+              ),
+              const SliverToBoxAdapter(child: SizedBox(height: 8)),
+              const SliverBottomSafeArea(),
+            ] else ...[
+              SliverFillRemaining(
+                hasScrollBody: false,
+                child: Align(
+                  alignment: Alignment.bottomCenter,
+                  child: Padding(
+                    padding: EdgeInsets.only(
+                      bottom:
+                          MediaQuery.of(context).padding.bottom -
+                          MediaQuery.of(context).viewPadding.bottom,
+                    ),
+                    child: SizedBox(
+                      height: 150,
+                      child: Stack(
+                        children: [
+                          Positioned.fill(
+                            child: DecoratedBox(
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  colors: [
+                                    Theme.of(context).scaffoldBackgroundColor,
+                                    Theme.of(context)
+                                        .colorScheme
+                                        .secondaryContainer
+                                        .withAlpha(192),
+                                  ],
+                                  stops: const [0.2, 1],
+                                  begin: Alignment.topCenter,
+                                  end: Alignment.bottomCenter,
+                                ),
+                              ),
+                              child: SizedBox.expand(),
+                            ),
+                          ),
+                          Positioned.fill(
+                            child: IconGrid(
+                              bigScale: 2,
+                              child: CircleAvatar(
+                                backgroundColor: Theme.of(
+                                  context,
+                                ).colorScheme.outlineVariant,
+                                foregroundColor: Theme.of(
+                                  context,
+                                ).colorScheme.onSurfaceVariant,
+                                child: const Icon(GTIcons.app_icon),
+                              ),
+                            ),
+                          ),
+                          Positioned.fill(
+                            child: DecoratedBox(
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  colors: [
+                                    Theme.of(context).scaffoldBackgroundColor,
+                                    Theme.of(context)
+                                        .colorScheme
+                                        .secondaryContainer
+                                        .withAlpha(128),
+                                    Theme.of(context)
+                                        .colorScheme
+                                        .secondaryContainer
+                                        .withAlpha(192),
+                                  ],
+                                  stops: const [0, 0.7, 1],
+                                  begin: Alignment.topCenter,
+                                  end: Alignment.bottomCenter,
+                                ),
+                              ),
+                              child: SizedBox.expand(),
+                            ),
+                          ),
+                          SizedBox(
+                            height: 150,
+                            child: Padding(
+                              padding: const EdgeInsets.all(16.0),
+                              child: Center(
+                                child: Text(
+                                  context.t.feed.noMoreData,
+                                  style: Theme.of(context).textTheme.bodySmall
+                                      ?.copyWith(
+                                        color: Theme.of(
+                                          context,
+                                        ).colorScheme.onSecondaryContainer,
+                                      ),
+                                ),
+                              ),
+                            ),
                           ),
                         ],
                       ),
-                    );
-                  },
-                ),
-                loading: () => IconButton(
-                  onPressed: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text(context.t.feed.userButton.loading),
-                        showCloseIcon: true,
-                      ),
-                    );
-                  },
-                  icon: SizedBox(
-                    width: 24.0,
-                    height: 24.0,
-                    child: GBLoadingIndicator(),
+                    ),
                   ),
                 ),
               ),
             ],
-          ),
-        ],
-        body: Builder(
-          builder: (context) {
-            return RefreshIndicator(
-              onRefresh: () async {
-                return ref.read(feedProvider.notifier).refresh();
-              },
-              child: CustomScrollView(
-                slivers: [
-                  SliverToBoxAdapter(
-                    child: SafeArea(
-                      top: false,
-                      bottom: false,
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                        child: FilledButton.icon(
-                          onPressed: () {
-                            SkeletonView.of(context)?.goToRoutines();
-                          },
-                          icon: const Icon(GTIcons.workout),
-                          label: Text(context.t.feed.startWorkout),
-                        ),
-                      ),
-                    ),
-                  ),
-                  if (suggested.isNotEmpty) ...[
-                    SliverToBoxAdapter(child: SizedBox(height: 4)),
-                    SliverPadding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 8,
-                      ),
-                      sliver: SliverStack(
-                        children: [
-                          SliverPositioned.fill(
-                            child: Card.outlined(
-                              clipBehavior: Clip.none,
-                              margin: EdgeInsets.zero,
-                            ),
-                          ),
-                          MultiSliver(
-                            children: [
-                              SliverToBoxAdapter(
-                                child: Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 16,
-                                    vertical: 16,
-                                  ).copyWith(bottom: 8),
-                                  child: Text(
-                                    context.t.routines.quickWorkout.title,
-                                    style: Theme.of(
-                                      context,
-                                    ).textTheme.titleMedium,
-                                  ),
-                                ),
-                              ),
-                              SliverList(
-                                delegate: SliverChildBuilderDelegate((
-                                  context,
-                                  index,
-                                ) {
-                                  final (routine: workout, score: _) =
-                                      suggested[index];
-                                  return Material(
-                                    type: MaterialType.transparency,
-                                    key: ValueKey(workout.id),
-                                    child: ListTile(
-                                      leading: WorkoutIcon(workout: workout),
-                                      title: Text(workout.name),
-                                      subtitle: Text(
-                                        context.t.general.exercises(
-                                          n: workout.displayExerciseCount,
-                                        ),
-                                      ),
-                                      onTap: () {
-                                        Go.to(
-                                          () => ExercisesView(workout: workout),
-                                        );
-                                      },
-                                    ),
-                                  );
-                                }, childCount: suggested.length),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                  SliverToBoxAdapter(child: _NoSyncCard()),
-                  feed.when(
-                    data: (feedItems) {
-                      if (feedItems.isEmpty) {
-                        return SliverFillRemaining(
-                          fillOverscroll: true,
-                          hasScrollBody: false,
-                          child: Center(
-                            child: ContentUnavailableView(
-                              icon: const Icon(Icons.feed_outlined),
-                              title: Text(context.t.feed.empty.title),
-                              description: Text(context.t.feed.empty.text),
-                            ),
-                          ),
-                        );
-                      }
-                      return SliverList(
-                        delegate: SliverChildBuilderDelegate((context, index) {
-                          final item = feedItems[index];
-                          return SafeArea(
-                            top: false,
-                            bottom: false,
-                            child: FeedItemCard(
-                              item: item,
-                              onUserPressed: (id) {
-                                if (id != null) {
-                                  Go.to(() => UserProfilePage(userID: id));
-                                }
-                              },
-                            ),
-                          );
-                        }, childCount: feedItems.length),
-                      );
-                    },
-                    loading: () => SliverFillRemaining(
-                      child: Center(child: GBLoadingIndicator()),
-                    ),
-                    error: (error, stackTrace) => SliverFillRemaining(
-                      child: Center(child: Text("Error loading feed")),
-                    ),
-                  ),
-                  if (feedNotifier.isLoadingMore) ...[
-                    SliverToBoxAdapter(
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 16.0),
-                        child: Center(child: GBLoadingIndicator()),
-                      ),
-                    ),
-                  ],
-                  if (feedNotifier.hasMore) ...[
-                    SliverToBoxAdapter(
-                      child: Padding(
-                        padding: const EdgeInsets.all(16),
-                        child: FilledButton(
-                          onPressed: feedNotifier.isLoadingMore
-                              ? null
-                              : () {
-                                  feedNotifier.fetchMore();
-                                  // Due to how we've implemented the load more
-                                  // mechanism, we need to call setState here to
-                                  // trigger a rebuild in order to show the
-                                  // loading indicator while the fetch is in
-                                  // progress, without hiding the data.
-                                  setState(() {});
-                                },
-                          child: Text(context.t.feed.loadMore),
-                        ),
-                      ),
-                    ),
-                    const SliverToBoxAdapter(child: SizedBox(height: 8)),
-                    const SliverBottomSafeArea(),
-                  ] else ...[
-                    SliverFillRemaining(
-                      hasScrollBody: false,
-                      child: Align(
-                        alignment: Alignment.bottomCenter,
-                        child: Padding(
-                          padding: EdgeInsets.only(
-                            bottom:
-                                MediaQuery.of(context).padding.bottom -
-                                MediaQuery.of(context).viewPadding.bottom,
-                          ),
-                          child: SizedBox(
-                            height: 150,
-                            child: Stack(
-                              children: [
-                                Positioned.fill(
-                                  child: DecoratedBox(
-                                    decoration: BoxDecoration(
-                                      gradient: LinearGradient(
-                                        colors: [
-                                          Theme.of(
-                                            context,
-                                          ).scaffoldBackgroundColor,
-                                          Theme.of(context)
-                                              .colorScheme
-                                              .secondaryContainer
-                                              .withAlpha(192),
-                                        ],
-                                        stops: const [0.2, 1],
-                                        begin: Alignment.topCenter,
-                                        end: Alignment.bottomCenter,
-                                      ),
-                                    ),
-                                    child: SizedBox.expand(),
-                                  ),
-                                ),
-                                Positioned.fill(
-                                  child: IconGrid(
-                                    bigScale: 2,
-                                    child: CircleAvatar(
-                                      backgroundColor: Theme.of(
-                                        context,
-                                      ).colorScheme.outlineVariant,
-                                      foregroundColor: Theme.of(
-                                        context,
-                                      ).colorScheme.onSurfaceVariant,
-                                      child: const Icon(GTIcons.app_icon),
-                                    ),
-                                  ),
-                                ),
-                                Positioned.fill(
-                                  child: DecoratedBox(
-                                    decoration: BoxDecoration(
-                                      gradient: LinearGradient(
-                                        colors: [
-                                          Theme.of(
-                                            context,
-                                          ).scaffoldBackgroundColor,
-                                          Theme.of(context)
-                                              .colorScheme
-                                              .secondaryContainer
-                                              .withAlpha(128),
-                                          Theme.of(context)
-                                              .colorScheme
-                                              .secondaryContainer
-                                              .withAlpha(192),
-                                        ],
-                                        stops: const [0, 0.7, 1],
-                                        begin: Alignment.topCenter,
-                                        end: Alignment.bottomCenter,
-                                      ),
-                                    ),
-                                    child: SizedBox.expand(),
-                                  ),
-                                ),
-                                SizedBox(
-                                  height: 150,
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(16.0),
-                                    child: Center(
-                                      child: Text(
-                                        context.t.feed.noMoreData,
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .bodySmall
-                                            ?.copyWith(
-                                              color: Theme.of(context)
-                                                  .colorScheme
-                                                  .onSecondaryContainer,
-                                            ),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ],
-              ),
-            );
-          },
+          ],
         ),
       ),
     );

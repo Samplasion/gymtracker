@@ -2675,6 +2675,12 @@
     "addFriend": "Aggiungi amico",
     "unfriend": "Rimuovi amico",
     "requestSent": "Richiesta inviata",
+    "cancelRequestConfirmation": {
+      "title": "Annullare richiesta?",
+      "keep": "Mantieni richiesta",
+      "confirm": "Annulla richiesta",
+      "error": "Impossibile annullare la richiesta di amicizia. Riprova."
+    },
     "accept": "Accetta",
     "decline": "Rifiuta",
     "unfriendConfirmation": {

@@ -91,6 +91,7 @@ class IconGrid extends StatelessWidget {
           angle: 25 * 180 / pi,
           child: () {
             final grid = GridView.extent(
+              primary: false,
               physics: const NeverScrollableScrollPhysics(),
               maxCrossAxisExtent: maxCrossAxisExtent,
               children: [

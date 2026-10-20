@@ -1993,6 +1993,8 @@ class Translations$userProfile$en {
 	/// en: 'Friend Request Sent'
 	String get requestSent => 'Friend Request Sent';
 
+	late final Translations$userProfile$cancelRequestConfirmation$en cancelRequestConfirmation = Translations$userProfile$cancelRequestConfirmation$en._(_root);
+
 	/// en: 'Accept'
 	String get accept => 'Accept';
 
@@ -4760,6 +4762,27 @@ class Translations$feed$noSync$en {
 
 	/// en: 'Syncing is paused: you are not connected to the Internet. It may take a few minutes. Don't worry, the data will be kept locally and transferred later.'
 	String get text => 'Syncing is paused: you are not connected to the Internet. It may take a few minutes. Don\'t worry, the data will be kept locally and transferred later.';
+}
+
+// Path: userProfile.cancelRequestConfirmation
+class Translations$userProfile$cancelRequestConfirmation$en {
+	Translations$userProfile$cancelRequestConfirmation$en._(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Cancel friend request?'
+	String get title => 'Cancel friend request?';
+
+	/// en: 'Keep request'
+	String get keep => 'Keep request';
+
+	/// en: 'Cancel request'
+	String get confirm => 'Cancel request';
+
+	/// en: 'Could not cancel the friend request. Please try again.'
+	String get error => 'Could not cancel the friend request. Please try again.';
 }
 
 // Path: userProfile.unfriendConfirmation
@@ -10392,6 +10415,10 @@ extension on Translations {
 			'userProfile.addFriend' => 'Add Friend',
 			'userProfile.unfriend' => 'Unfriend',
 			'userProfile.requestSent' => 'Friend Request Sent',
+			'userProfile.cancelRequestConfirmation.title' => 'Cancel friend request?',
+			'userProfile.cancelRequestConfirmation.keep' => 'Keep request',
+			'userProfile.cancelRequestConfirmation.confirm' => 'Cancel request',
+			'userProfile.cancelRequestConfirmation.error' => 'Could not cancel the friend request. Please try again.',
 			'userProfile.accept' => 'Accept',
 			'userProfile.decline' => 'Decline',
 			'userProfile.unfriendConfirmation.title' => ({required Object name}) => 'Unfriend ${name}?',

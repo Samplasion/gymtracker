@@ -157,9 +157,11 @@ class UserProfilePage extends ConsumerWidget {
             builder: (context) => RefreshIndicator(
               onRefresh: () async {
                 await ref.read(friendProvider.notifier).refresh(force: true);
+                if (!context.mounted) return;
                 await ref
                     .read(friendProvider.notifier)
                     .getFriendPublicData(friend.id, force: true);
+                if (!context.mounted) return;
                 ref.invalidate(friendPublicDataProvider(friend.id));
               },
               child: CustomScrollView(
@@ -260,6 +262,7 @@ class UserProfilePage extends ConsumerWidget {
           error: error,
           retryCallback: () async {
             await ref.read(friendProvider.notifier).refresh(force: true);
+            if (!context.mounted) return;
             ref.invalidate(friendPublicDataProvider(userID));
           },
         ),
@@ -311,7 +314,7 @@ class _UserProfileHeader extends StatelessWidget {
   }
 }
 
-class _FriendActionButtons extends ConsumerWidget {
+class _FriendActionButtons extends ConsumerStatefulWidget {
   final Friend friend;
   final bool isFriend;
   final bool isPendingSent;
@@ -325,10 +328,19 @@ class _FriendActionButtons extends ConsumerWidget {
   });
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<_FriendActionButtons> createState() =>
+      _FriendActionButtonsState();
+}
+
+class _FriendActionButtonsState extends ConsumerState<_FriendActionButtons> {
+  bool _cancellingRequest = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final friend = widget.friend;
     final notifier = ref.read(friendProvider.notifier);
 
-    if (isFriend) {
+    if (widget.isFriend) {
       return OutlinedButton.icon(
         onPressed: () async {
           final confirmed = await showDialog<bool>(
@@ -369,14 +381,68 @@ class _FriendActionButtons extends ConsumerWidget {
       );
     }
 
-    if (isPendingSent) {
+    if (widget.isPendingSent) {
       return FilledButton.tonal(
-        onPressed: null,
+        onPressed: _cancellingRequest
+            ? null
+            : () async {
+                setState(() => _cancellingRequest = true);
+                try {
+                  final confirmed = await showDialog<bool>(
+                    context: context,
+                    builder: (ctx) => AlertDialog(
+                      title: Text(
+                        context.t.userProfile.cancelRequestConfirmation.title,
+                      ),
+                      actions: [
+                        TextButton(
+                          onPressed: () => Navigator.of(ctx).pop(false),
+                          child: Text(
+                            context
+                                .t
+                                .userProfile
+                                .cancelRequestConfirmation
+                                .keep,
+                          ),
+                        ),
+                        TextButton(
+                          onPressed: () => Navigator.of(ctx).pop(true),
+                          child: Text(
+                            context
+                                .t
+                                .userProfile
+                                .cancelRequestConfirmation
+                                .confirm,
+                            style: TextStyle(
+                              color: Theme.of(ctx).colorScheme.error,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                  if (confirmed == true && mounted) {
+                    await notifier.cancelFriendRequest(friend.id);
+                  }
+                } catch (_) {
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(
+                          context.t.userProfile.cancelRequestConfirmation.error,
+                        ),
+                      ),
+                    );
+                  }
+                } finally {
+                  if (mounted) setState(() => _cancellingRequest = false);
+                }
+              },
         child: Text(context.t.userProfile.requestSent),
       );
     }
 
-    if (isPendingReceived) {
+    if (widget.isPendingReceived) {
       return Row(
         children: [
           FilledButton(

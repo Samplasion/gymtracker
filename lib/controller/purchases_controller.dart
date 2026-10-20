@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:gymtracker/controller/coordinator.dart';
@@ -22,6 +20,11 @@ class PurchasesController extends ChangeNotifier {
   final Coordinator eventScheduler;
   final OnlineService onlineService;
 
+  int _authEpoch = 0;
+  bool _switchingAuth = false;
+  String? _boundUser;
+  Future<void> _authWork = Future.value();
+
   final _subscriptionInfo$ = BehaviorSubject.seeded(SubscriptionInfo.empty);
   late final Stream<SubscriptionInfo> subscriptionInfoStream =
       _subscriptionInfo$.stream;
@@ -32,28 +35,21 @@ class PurchasesController extends ChangeNotifier {
     this.eventScheduler,
     this.onlineService,
   ) {
-    purchasesService.entitlementStream.listen((entitlement) async {
-      globalContainer
-          .read(eventBusProvider)
-          .emit(
-            GBUserDidUpdateSubscriptionEvent(
-              user: onlineService.account,
-              subscription: null,
-            ),
-          );
-    });
     final eventBus = globalContainer.read(eventBusProvider);
     eventBus.on<GBUserDidLoginEvent>().listen(
       (event) => _authChangeRoutine(event.account),
     );
-    eventBus.on<GBUserWillLogoutEvent>().listen(
-      (event) => _authChangeRoutine(event.account),
+    eventBus.on<GBUserDidLogoutEvent>().listen(
+      (event) => _authChangeRoutine(null),
     );
     eventBus.on<GBUserDidUpdateSubscriptionEvent>().listen((event) async {
+      if (event.user?.id != onlineService.account?.id) return;
+      final epoch = _authEpoch;
       while (!purchasesService.isInitialized()) {
         await Future.delayed(const Duration(milliseconds: 100));
       }
       purchasesService.getCustomerInfo().then((entitlement) {
+        if (epoch != _authEpoch || _switchingAuth) return;
         final subscriptionInfo = _mapEntitlementToSubscriptionInfo(entitlement);
         _subscriptionInfo$.add(subscriptionInfo);
         notifyListeners();
@@ -61,19 +57,32 @@ class PurchasesController extends ChangeNotifier {
     });
     _subscriptionInfo$.add(SubscriptionInfo.empty);
     purchasesService.entitlementStream.listen((entitlement) async {
-      // final user = authService.user.valueOrNull;
-      // if (user == null) {
-      //   _subscriptionInfo$.add(SubscriptionInfo.empty);
-      //   notifyListeners();
-      //   return;
-      // }
+      if (_switchingAuth || _boundUser != onlineService.account?.id) return;
       final subscriptionInfo = _mapEntitlementToSubscriptionInfo(entitlement);
       _subscriptionInfo$.add(subscriptionInfo);
       notifyListeners();
     });
   }
 
-  Future<void> _authChangeRoutine(OnlineAccount? account) async {
+  Future<void> _authChangeRoutine(OnlineAccount? account) {
+    final epoch = ++_authEpoch;
+    final work = _authWork.then((_) async {
+      if (epoch != _authEpoch) return;
+      _switchingAuth = true;
+      try {
+        await _runAuthentication(account, epoch);
+      } finally {
+        if (epoch == _authEpoch) {
+          _boundUser = account?.id;
+          _switchingAuth = false;
+        }
+      }
+    });
+    _authWork = work.catchError((Object _) {});
+    return work;
+  }
+
+  Future<void> _runAuthentication(OnlineAccount? account, int epoch) async {
     if (purchasesService.isPurchasingEnabled.isEmpty) {
       logger.d("Purchases are disabled");
       _subscriptionInfo$.add(
@@ -105,26 +114,14 @@ class PurchasesController extends ChangeNotifier {
           rethrow;
         }
       }
+      if (epoch != _authEpoch) return;
       _subscriptionInfo$.add(SubscriptionInfo.empty);
     } else {
       try {
         logger.d("Logging in to Purchases");
         await purchasesService.login(user.id);
-        // if (user.isForcedPro) {
-        //   logger.d(
-        //     "User is forced pro, setting subscription info to forced pro",
-        //   );
-        //   _subscriptionInfo$.add(
-        //     const SubscriptionInfo(
-        //       isPro: false,
-        //       isTrial: false,
-        //       isForcedPro: true,
-        //       isAboutToExpire: false,
-        //     ),
-        //   );
-        //   return;
-        // }
         final entitlement = await purchasesService.getCustomerInfo();
+        if (epoch != _authEpoch) return;
         final subscriptionInfo = _mapEntitlementToSubscriptionInfo(entitlement);
         _subscriptionInfo$.add(subscriptionInfo);
       } catch (e, s) {

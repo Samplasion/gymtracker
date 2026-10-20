@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io';
+import 'package:gymtracker/struct/request_cache.dart';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
@@ -124,7 +125,8 @@ class PurchasesService {
       _RestPurchases.instance
           .getCustomerInfo()
           .then((info) {
-            _customerInfo$.add(info);
+            if (_RestPurchases.instance.userID == userId)
+              _customerInfo$.add(info);
           })
           .catchError((error) {
             logger.e("Error getting customer info: $error", error: error);
@@ -242,26 +244,23 @@ class _RestPurchases {
     ),
   );
   String? userID;
+  final _cache = RequestCache<String, CustomerInfo?>(
+    const Duration(minutes: 5),
+  );
   StreamController<CustomerInfo?>? _customerInfoStreamController;
 
   Future<void> init() async {}
 
   Future<void> login(String userId) async {
+    if (userID != userId) _cache.clear();
     userID = userId;
     _customerInfoStreamController ??=
         StreamController<CustomerInfo?>.broadcast();
     _customerInfoStreamController?.add(null);
-    getCustomerInfo()
-        .then((customerInfo) {
-          _customerInfoStreamController?.add(customerInfo);
-        })
-        .catchError((error) {
-          logger.e("Error getting customer info: $error");
-          _customerInfoStreamController?.add(null);
-        });
   }
 
   Future<void> logout() async {
+    _cache.clear();
     userID = null;
     _customerInfoStreamController?.add(null);
   }
@@ -273,52 +272,63 @@ class _RestPurchases {
       );
       return null;
     }
-    final res = await dio.get("subscribers/$userID");
-    if (res.statusCode != 200) {
-      throw Exception("Error getting customer info: ${res.statusCode}");
-    }
-    final data =
-        (res.data as Map<String, dynamic>)['subscriber']
-            as Map<String, dynamic>;
+    final owner = userID!;
+    final cached = _cache.peek(owner);
+    if (cached != null &&
+        cached.entitlements.active.values.any(
+          (e) =>
+              e.expirationDate != null &&
+              DateTime.parse(e.expirationDate!).isBefore(DateTime.now()),
+        ))
+      _cache.invalidate(owner);
+    return _cache.get(owner, () async {
+      final res = await dio.get('subscribers/$owner');
+      if (res.statusCode != 200) {
+        throw Exception("Error getting customer info: ${res.statusCode}");
+      }
+      final data =
+          (res.data as Map<String, dynamic>)['subscriber']
+              as Map<String, dynamic>;
 
-    final entitlements = data['entitlements'] as Map<String, dynamic>;
-    final entitlementInfos = entitlements.entries.map((e) {
-      final entitlement = e.value as Map<String, dynamic>;
-      return EntitlementInfo(
-        e.key,
-        entitlement['expires_date'] != null
-            ? DateTime.parse(
-                entitlement['expires_date'],
-              ).isAfter(DateTime.now().toUtc())
-            : false,
-        false,
+      final entitlements = data['entitlements'] as Map<String, dynamic>;
+      final entitlementInfos = entitlements.entries.map((e) {
+        final entitlement = e.value as Map<String, dynamic>;
+        return EntitlementInfo(
+          e.key,
+          entitlement['expires_date'] != null
+              ? DateTime.parse(
+                  entitlement['expires_date'],
+                ).isAfter(DateTime.now().toUtc())
+              : false,
+          false,
+          DateTime.now().toIso8601String(),
+          DateTime.now().toIso8601String(),
+          entitlement['product_identifier'],
+          false,
+        );
+      }).toList();
+
+      return CustomerInfo(
+        EntitlementInfos(
+          {for (var e in entitlementInfos) e.identifier: e},
+          {
+            for (var e
+                in entitlementInfos
+                    .where((e) => e.isActive)
+                    .toList(growable: false))
+              e.identifier: e,
+          },
+          verification: VerificationResult.notRequested,
+        ),
+        {},
+        [],
+        [],
+        [],
+        data['first_seen'],
+        owner,
+        {},
         DateTime.now().toIso8601String(),
-        DateTime.now().toIso8601String(),
-        entitlement['product_identifier'],
-        false,
       );
-    }).toList();
-
-    return CustomerInfo(
-      EntitlementInfos(
-        {for (var e in entitlementInfos) e.identifier: e},
-        {
-          for (var e
-              in entitlementInfos
-                  .where((e) => e.isActive)
-                  .toList(growable: false))
-            e.identifier: e,
-        },
-        verification: VerificationResult.notRequested,
-      ),
-      {},
-      [],
-      [],
-      [],
-      data['first_seen'],
-      userID!,
-      {},
-      DateTime.now().toIso8601String(),
-    );
+    });
   }
 }

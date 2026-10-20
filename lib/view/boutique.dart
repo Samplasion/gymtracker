@@ -39,13 +39,22 @@ class _BoutiqueViewState
   @override
   void initState() {
     super.initState();
-    _refresh();
+    _refresh(force: false);
   }
 
-  Future _refresh() async {
+  Future _refresh({bool force = true}) async {
+    if (force) controller.invalidateCache();
     setState(() {
       _settings = controller.getSettings();
-      _categories = controller.getCategories();
+      _categories = _settings!.then(
+        (settings) => settings.enabled
+            ? controller.getCategories()
+            : Future.value(
+                BoutiqueResponse<List<BoutiqueCategory>, BoutiqueError>.success(
+                  [],
+                ),
+              ),
+      );
     });
     return _categories;
   }
@@ -264,10 +273,11 @@ class _BoutiqueCategoryViewState
   @override
   void initState() {
     super.initState();
-    _refresh();
+    _refresh(force: false);
   }
 
-  Future _refresh() async {
+  Future _refresh({bool force = true}) async {
+    if (force) controller.invalidateCache();
     setState(() {
       _packages = controller.getPackages(
         widget.category.id,

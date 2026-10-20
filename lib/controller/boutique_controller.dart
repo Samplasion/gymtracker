@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:gymtracker/struct/request_cache.dart';
 
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
@@ -17,6 +18,20 @@ import 'package:uuid/uuid.dart';
 
 class BoutiqueController extends GetxController with ServiceableController {
   late final _BoutiqueRepository _repository;
+  final _settings = RequestCache<String, BoutiqueSettings>(
+    const Duration(minutes: 30),
+  );
+  final _categories = RequestCache<String, List<BoutiqueCategory>>(
+    const Duration(minutes: 30),
+  );
+  final _packages = RequestCache<String, List<BoutiquePackage>>(
+    const Duration(minutes: 30),
+  );
+  void invalidateCache() {
+    _settings.clear();
+    _categories.clear();
+    _packages.clear();
+  }
 
   BoutiqueController() {
     if (TestService().isTest) {
@@ -27,11 +42,12 @@ class BoutiqueController extends GetxController with ServiceableController {
   }
 
   Future<BoutiqueSettings> getSettings() async {
-    return _repository.getSettings();
+    return _settings.get('settings', _repository.getSettings);
   }
 
   Future<void> _checkVersion() async {
-    final settings = await _repository.getSettings();
+    final settings = await getSettings();
+    if (!settings.enabled) throw BoutiqueError.unknown;
     final range = VersionConstraint.parse(settings.compatibility);
     if (!range.allows(Version.parse(VersionService().packageInfo.version))) {
       throw BoutiqueError.version;
@@ -41,7 +57,10 @@ class BoutiqueController extends GetxController with ServiceableController {
   BoutiqueApiResponse<List<BoutiqueCategory>> getCategories() async {
     try {
       await _checkVersion();
-      final response = await _repository.getCategories();
+      final response = await _categories.get(
+        'categories',
+        _repository.getCategories,
+      );
       return BoutiqueResponse.success(response);
     } catch (e, s) {
       logger.e("ERROR", error: e, stackTrace: s);
@@ -57,9 +76,9 @@ class BoutiqueController extends GetxController with ServiceableController {
   }) async {
     try {
       await _checkVersion();
-      final response = await _repository.getPackages(
-        categoryId,
-        language: language,
+      final response = await _packages.get(
+        '$categoryId/$language',
+        () => _repository.getPackages(categoryId, language: language),
       );
       return BoutiqueResponse.success(response);
     } catch (e, s) {

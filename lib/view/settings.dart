@@ -130,7 +130,7 @@ class SettingsView extends ConsumerWidget {
                     context.t.settings.logoutWarning.title,
                     context.t.settings.logoutWarning.content,
                   );
-                  if (!exit) return;
+                  if (!exit || !context.mounted) return;
                   ref.read(onlineProvider.notifier).logout();
                   if (context.mounted) {
                     Go.replaceStack(() => const OnboardingScreen());

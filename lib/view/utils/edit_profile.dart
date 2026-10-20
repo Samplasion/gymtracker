@@ -133,6 +133,7 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
       }
 
       // Invalidate the relevant providers
+      if (!mounted) return;
       ref.read(friendProvider.notifier).invalidateProfile(widget.userID);
 
       if (mounted) {

@@ -303,7 +303,7 @@ class _ChangeGoalScreenState extends ConsumerState<ChangeGoalScreen> {
 
       await ref.read(nutritionGoalProvider.notifier).saveNewGoal(newGoal);
 
-      Get.back();
+      if (mounted) Get.back();
     }
   }
 

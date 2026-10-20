@@ -113,7 +113,7 @@ class AdvancedSettingsView extends ConsumerWidget {
                             .warning
                             .content,
                       );
-                      if (!exit) return;
+                      if (!exit || !context.mounted) return;
                       final controller = TextEditingController();
                       final username = await Go.textPrompt(
                         context
@@ -149,10 +149,10 @@ class AdvancedSettingsView extends ConsumerWidget {
                           return null;
                         },
                       );
-                      if (account.name != username) return;
+                      if (account.name != username || !context.mounted) return;
+                      final online = ref.read(onlineProvider.notifier);
                       await Go.futureDialog(
-                        future: () =>
-                            ref.read(onlineProvider.notifier).deleteAccount(),
+                        future: online.deleteAccount,
                         title:
                             context.t.settings.advanced.deleteAccount.deleting,
                       );

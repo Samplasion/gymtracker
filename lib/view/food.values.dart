@@ -1203,16 +1203,16 @@ class _FoodBarcodeReaderViewState extends ConsumerState<FoodBarcodeReaderView>
   }
 
   @override
-  Future<void> dispose() async {
+  void dispose() {
     // Stop listening to lifecycle changes.
     WidgetsBinding.instance.removeObserver(this);
     // Stop listening to the barcode events.
     unawaited(_subscription?.cancel());
     _subscription = null;
+    EasyDebounce.cancel('barcode');
+    unawaited(controller.dispose());
     // Dispose the widget itself.
     super.dispose();
-    // Finally, dispose of the controller.
-    await controller.dispose();
   }
 
   @override
@@ -1281,6 +1281,7 @@ class _FoodBarcodeReaderViewState extends ConsumerState<FoodBarcodeReaderView>
           await Go.to(
             () => ManualBarcodeInsertionScreen(
               handleCode: (code) {
+                if (!mounted) return;
                 handleCode(context, ref, code);
                 Navigator.of(context).pop();
               },
@@ -1293,11 +1294,12 @@ class _FoodBarcodeReaderViewState extends ConsumerState<FoodBarcodeReaderView>
   }
 
   void _rawHandleBarcode(BarcodeCapture result) async {
-    EasyDebounce.debounce(
-      "barcode",
-      const Duration(milliseconds: 2500),
-      () => handleCode(context, ref, result.barcodes.first.rawValue),
-    );
+    if (!mounted || result.barcodes.isEmpty) return;
+    EasyDebounce.debounce("barcode", const Duration(milliseconds: 2500), () {
+      if (mounted) {
+        unawaited(handleCode(context, ref, result.barcodes.first.rawValue));
+      }
+    });
   }
 
   bool _handlingCode = false;
@@ -1307,6 +1309,7 @@ class _FoodBarcodeReaderViewState extends ConsumerState<FoodBarcodeReaderView>
     WidgetRef ref,
     String? code,
   ) async {
+    if (!mounted) return;
     if (code == null) {
       logger.w("Invalid code");
       return;
@@ -1316,6 +1319,7 @@ class _FoodBarcodeReaderViewState extends ConsumerState<FoodBarcodeReaderView>
     _handlingCode = true;
     return searchFoodByBarcode(context, ref, code)
         .then((food) async {
+          if (!mounted) return;
           if (food == null) {
             logger.w("No food found for barcode $code");
             return;

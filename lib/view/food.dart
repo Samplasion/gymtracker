@@ -84,7 +84,7 @@ Future<void> showEditFoodView(
     inheritAmount: true,
     isEditing: true,
   );
-  if (edited != null) {
+  if (edited != null && context.mounted) {
     final selectedDate = ref.read(foodSelectedDateProvider);
     await ref.read(foodProvider.notifier).updateFood(selectedDate, edited);
   }
@@ -224,7 +224,7 @@ Future<void> showDatePicker(BuildContext context, WidgetRef ref) async {
       markDate: (date) => datesWithLogs.contains(date.startOfDay),
     ),
   );
-  if (date != null) {
+  if (date != null && context.mounted) {
     ref.read(foodSelectedDateProvider.notifier).setDate(date);
   }
 }
@@ -637,7 +637,7 @@ class _FoodViewState extends ConsumerState<FoodView> {
         closeView: () => Get.back(),
         onFoodTap: (dtfood) {
           showAddFoodView(context, dtfood.value).then((food) async {
-            if (food != null) {
+            if (food != null && context.mounted) {
               final selectedDate = ref.read(foodSelectedDateProvider);
               await ref.read(foodProvider.notifier).addFood(selectedDate, food);
             }
@@ -651,7 +651,7 @@ class _FoodViewState extends ConsumerState<FoodView> {
           tooltip: context.t.food.combine.title,
           onPressed: () async {
             showCombineFoodsView(context, ref).then((food) async {
-              if (food != null) {
+              if (food != null && context.mounted) {
                 final selectedDate = ref.read(foodSelectedDateProvider);
                 await ref
                     .read(foodProvider.notifier)
@@ -665,7 +665,7 @@ class _FoodViewState extends ConsumerState<FoodView> {
           tooltip: context.t.food.barcodeReader.title,
           onPressed: () async {
             showScanBarcodeView(context, ref).then((food) async {
-              if (food != null) {
+              if (food != null && context.mounted) {
                 final selectedDate = ref.read(foodSelectedDateProvider);
                 await ref
                     .read(foodProvider.notifier)
@@ -680,7 +680,7 @@ class _FoodViewState extends ConsumerState<FoodView> {
           if (food == null) return;
           if (context.mounted) {
             Go.to(() => AddFoodView(food: food)).then((added) async {
-              if (added != null) {
+              if (added != null && context.mounted) {
                 final selectedDate = ref.read(foodSelectedDateProvider);
                 await ref
                     .read(foodProvider.notifier)
@@ -696,7 +696,7 @@ class _FoodViewState extends ConsumerState<FoodView> {
       viewFloatingActionButton: _AddCustomFoodFAB(
         closeView: () => Get.back(),
         onFoodAdded: (food) async {
-          if (food != null) {
+          if (food != null && context.mounted) {
             final selectedDate = ref.read(foodSelectedDateProvider);
             await ref.read(foodProvider.notifier).addFood(selectedDate, food);
           }

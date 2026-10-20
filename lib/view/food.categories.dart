@@ -505,7 +505,7 @@ class FoodCategoryFoodsView extends ConsumerWidget {
         closeView: () => Get.back(),
         onFoodTap: (dtfood) {
           showAddFoodView(context, dtfood.value).then((food) async {
-            if (food != null) {
+            if (food != null && context.mounted) {
               final selectedDate = ref.read(foodSelectedDateProvider);
               await ref
                   .read(foodProvider.notifier)
@@ -523,7 +523,7 @@ class FoodCategoryFoodsView extends ConsumerWidget {
             showCombineFoodsView(context, ref, category: category).then((
               food,
             ) async {
-              if (food != null) {
+              if (food != null && context.mounted) {
                 final selectedDate = ref.read(foodSelectedDateProvider);
                 await ref
                     .read(foodProvider.notifier)
@@ -537,7 +537,7 @@ class FoodCategoryFoodsView extends ConsumerWidget {
           tooltip: context.t.food.barcodeReader.title,
           onPressed: () async {
             showScanBarcodeView(context, ref).then((food) async {
-              if (food != null) {
+              if (food != null && context.mounted) {
                 final selectedDate = ref.read(foodSelectedDateProvider);
                 await ref
                     .read(foodProvider.notifier)
@@ -562,7 +562,7 @@ class FoodCategoryFoodsView extends ConsumerWidget {
         closeView: () => Navigator.of(context).pop(),
         category: category,
         onFoodAdded: (food) async {
-          if (food != null) {
+          if (food != null && context.mounted) {
             final selectedDate = ref.read(foodSelectedDateProvider);
             await ref
                 .read(foodProvider.notifier)

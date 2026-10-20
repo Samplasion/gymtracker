@@ -1,0 +1,2 @@
+id,name,owner,created_at,updated_at,public,avif_autodetection,file_size_limit,allowed_mime_types,owner_id,type,versioning_status,lifecycle_configuration,lifecycle_configuration_generation
+profile_pictures,profile_pictures,null,2026-08-05 20:25:14.295025+00,2026-08-05 20:25:14.295025+00,true,false,5242880,"[""image/*""]",null,STANDARD,DISABLED,null,null

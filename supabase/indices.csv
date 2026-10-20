@@ -1,0 +1,24 @@
+tablename,indexname,indexdef
+achievements_v2,achievements_pkey,"CREATE UNIQUE INDEX achievements_pkey ON public.achievements_v2 USING btree (id, user_id)"
+body_measurements,body_measurements_pkey,"CREATE UNIQUE INDEX body_measurements_pkey ON public.body_measurements USING btree (id, user_id)"
+boutique_categories,boutique_categories_order_key,"CREATE UNIQUE INDEX boutique_categories_order_key ON public.boutique_categories USING btree (""order"")"
+boutique_categories,boutique_categories_pkey,CREATE UNIQUE INDEX boutique_categories_pkey ON public.boutique_categories USING btree (id)
+boutique_packages,boutique_packages_pkey,CREATE UNIQUE INDEX boutique_packages_pkey ON public.boutique_packages USING btree (id)
+boutique_routine_exercises,boutique_routine_exercises_pkey,CREATE UNIQUE INDEX boutique_routine_exercises_pkey ON public.boutique_routine_exercises USING btree (id)
+boutique_routines,boutique_routines_pkey,CREATE UNIQUE INDEX boutique_routines_pkey ON public.boutique_routines USING btree (id)
+boutique_settings,boutique_settings_pkey,CREATE UNIQUE INDEX boutique_settings_pkey ON public.boutique_settings USING btree (id)
+custom_barcode_foods,custom_barcode_foods_pkey,"CREATE UNIQUE INDEX custom_barcode_foods_pkey ON public.custom_barcode_foods USING btree (id, user_id)"
+custom_exercises,custom_exercises_pkey,"CREATE UNIQUE INDEX custom_exercises_pkey ON public.custom_exercises USING btree (id, user_id)"
+favorite_foods,favorite_foods_pkey,"CREATE UNIQUE INDEX favorite_foods_pkey ON public.favorite_foods USING btree (id, user_id)"
+foods,foods_pkey,"CREATE UNIQUE INDEX foods_pkey ON public.foods USING btree (id, user_id)"
+friends,friends_pkey,"CREATE UNIQUE INDEX friends_pkey ON public.friends USING btree (sender_id, receiver_id)"
+history_workout_exercises,history_workout_exercises_pkey,"CREATE UNIQUE INDEX history_workout_exercises_pkey ON public.history_workout_exercises USING btree (id, user_id)"
+history_workouts,history_workouts_pkey,"CREATE UNIQUE INDEX history_workouts_pkey ON public.history_workouts USING btree (id, user_id)"
+nutrition_categories,nutrition_categories_pkey,"CREATE UNIQUE INDEX nutrition_categories_pkey ON public.nutrition_categories USING btree (user_id, id)"
+nutrition_goals,nutrition_goals_pkey,"CREATE UNIQUE INDEX nutrition_goals_pkey ON public.nutrition_goals USING btree (id, user_id)"
+profiles,profiles_pkey,CREATE UNIQUE INDEX profiles_pkey ON public.profiles USING btree (id)
+profiles,profiles_username_key,CREATE UNIQUE INDEX profiles_username_key ON public.profiles USING btree (username)
+routine_exercises,routine_exercises_pkey,"CREATE UNIQUE INDEX routine_exercises_pkey ON public.routine_exercises USING btree (id, user_id)"
+routine_folders,routine_folders_pkey,"CREATE UNIQUE INDEX routine_folders_pkey ON public.routine_folders USING btree (id, user_id)"
+routines,routines_pkey,"CREATE UNIQUE INDEX routines_pkey ON public.routines USING btree (id, user_id)"
+weight_measurements,weight_measurements_pkey,"CREATE UNIQUE INDEX weight_measurements_pkey ON public.weight_measurements USING btree (id, user_id)"

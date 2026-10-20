@@ -1,0 +1,6 @@
+column_name,data_type,is_generated,generation_expression
+id,uuid,NEVER,null
+email,text,NEVER,null
+full_name,text,NEVER,null
+updated_at,timestamp with time zone,NEVER,null
+username,text,NEVER,null

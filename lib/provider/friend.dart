@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:gymtracker/db/model/tables/exercise.dart';
 import 'package:gymtracker/db/utils.dart';
@@ -8,7 +9,6 @@ import 'package:gymtracker/model/history.dart';
 import 'package:gymtracker/model/workout.dart';
 import 'package:gymtracker/struct/request_cache.dart';
 import 'package:gymtracker/provider/online.dart';
-import 'package:gymtracker/provider/feed.dart';
 import 'package:gymtracker/service/database.dart';
 import 'package:get/get.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -69,6 +69,16 @@ class FriendNotifier extends _$FriendNotifier {
       _generation++;
     });
     final account = ref.read(onlineProvider).value;
+    ref.listen(onlineProvider, (previous, next) {
+      final before = previous?.value;
+      final after = next.value;
+      if (before == null || after == null || before.id != after.id) return;
+      if (before.name != after.name ||
+          before.fullName != after.fullName ||
+          before.updatedAt != after.updatedAt) {
+        invalidateProfile(after.id);
+      }
+    });
     if (account != null)
       seedIdentity(
         Friend(
@@ -163,8 +173,7 @@ class FriendNotifier extends _$FriendNotifier {
       }
       if (previous.length != accepted.length ||
           !previous.containsAll(accepted)) {
-        if (ref.exists(feedProvider))
-          ref.read(feedProvider.notifier).relationsChanged(accepted);
+        ref.read(friendshipChangesProvider.notifier).publish(accepted);
       }
     }
   }
@@ -286,6 +295,14 @@ class FriendNotifier extends _$FriendNotifier {
           .eq('receiver_id', owner)
           .select();
       if (rows.isEmpty) throw StateError('Friend request no longer exists');
+    } else if (action == 'cancel') {
+      await client
+          .from('friends')
+          .delete()
+          .eq('sender_id', owner)
+          .eq('receiver_id', id)
+          .eq('status', 'pending')
+          .select();
     } else {
       await client
           .from('friends')
@@ -298,10 +315,12 @@ class FriendNotifier extends _$FriendNotifier {
     if (generation != _generation || !ref.mounted) return;
     final result = FriendState(
       friends: [
-        ...old.friends.where((f) => f.id != id),
+        ...old.friends.where((f) => action == 'cancel' || f.id != id),
         if (action == 'accept') identity,
       ],
-      pendingReceived: old.pendingReceived.where((f) => f.id != id).toList(),
+      pendingReceived: old.pendingReceived
+          .where((f) => action == 'cancel' || f.id != id)
+          .toList(),
       pendingSent: [
         ...old.pendingSent.where((f) => f.id != id),
         if (action == 'send') identity,
@@ -309,15 +328,16 @@ class FriendNotifier extends _$FriendNotifier {
     );
     _relations.put('state', result);
     state = AsyncValue.data(result);
-    _profiles.invalidate(id);
-    ref.invalidate(friendPublicDataProvider(id));
-    if ((action == 'accept' || action == 'remove') && ref.exists(feedProvider))
+    invalidateContents(id);
+    if (action == 'accept' || action == 'remove') {
       ref
-          .read(feedProvider.notifier)
-          .relationsChanged(result.friends.map((f) => f.id).toSet());
+          .read(friendshipChangesProvider.notifier)
+          .publish(result.friends.map((friend) => friend.id).toSet());
+    }
   }
 
   Future<void> sendFriendRequest(String id) => _mutate(id, 'send');
+  Future<void> cancelFriendRequest(String id) => _mutate(id, 'cancel');
   Future<void> acceptFriendRequest(String id) => _mutate(id, 'accept');
   Future<void> declineFriendRequest(String id) => _mutate(id, 'decline');
   Future<void> unfriend(String id) => _mutate(id, 'remove');
@@ -462,19 +482,17 @@ class FriendNotifier extends _$FriendNotifier {
     } else {
       _identities.invalidate(id);
     }
-    ref.invalidate(userIdentityProvider(id));
-    ref.invalidate(userAvatarProvider(id));
+    ref.read(userCacheRevisionProvider(id).notifier).identityChanged();
   }
 
   void invalidateContents(String id) {
     _profiles.invalidate(id);
-    ref.invalidate(friendPublicDataProvider(id));
+    ref.read(userCacheRevisionProvider(id).notifier).contentsChanged();
   }
 
   void invalidateProfile(String id) {
-    _profiles.invalidate(id);
     invalidateAvatarCache(id);
-    ref.invalidate(friendPublicDataProvider(id));
+    invalidateContents(id);
   }
 }
 
@@ -489,6 +507,9 @@ Future<FriendPublicData> friendPublicData(Ref ref, String friendId) async {
     );
   }
   final current = ref.watch(currentUserIdProvider);
+  ref.watch(
+    userCacheRevisionProvider(friendId).select((value) => value.contents),
+  );
   if (current == friendId) ref.watch(friendProvider);
   final friendNotifier = ref.watch(friendProvider.notifier);
   return friendNotifier.getFriendPublicData(friendId);
@@ -500,6 +521,7 @@ Future<Friend> userIdentity(Ref ref, String id) {
   ref.onDispose(expiry.cancel);
   ref.watch(currentUserIdProvider);
   ref.watch(identityEpochProvider);
+  ref.watch(userCacheRevisionProvider(id).select((value) => value.identity));
   return ref.watch(friendProvider.notifier).getIdentity(id);
 }
 
@@ -524,4 +546,30 @@ class IdentityEpoch extends _$IdentityEpoch {
   @override
   int build() => 0;
   void bump() => state++;
+}
+
+/// Independent signals keep cache writers from depending on their consumers.
+/// Each signal lives only while the corresponding user is observed.
+@riverpod
+class UserCacheRevision extends _$UserCacheRevision {
+  @override
+  ({int identity, int contents}) build(String id) => (identity: 0, contents: 0);
+
+  void identityChanged() =>
+      state = (identity: state.identity + 1, contents: state.contents);
+
+  void contentsChanged() =>
+      state = (identity: state.identity, contents: state.contents + 1);
+}
+
+/// Feed observers receive mutations without starting a separate relation read.
+@Riverpod(keepAlive: true)
+class FriendshipChanges extends _$FriendshipChanges {
+  @override
+  Set<String>? build() {
+    ref.watch(currentUserIdProvider);
+    return null;
+  }
+
+  void publish(Set<String> accepted) => state = Set.unmodifiable(accepted);
 }

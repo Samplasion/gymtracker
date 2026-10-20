@@ -33,7 +33,7 @@ final class FriendNotifierProvider
   FriendNotifier create() => FriendNotifier();
 }
 
-String _$friendNotifierHash() => r'd3c44b61e328bc24925ab836ad4579ad972efc5d';
+String _$friendNotifierHash() => r'cf591866fe54254054f3840cd9a8d751ec6f78e6';
 
 abstract class _$FriendNotifier extends $AsyncNotifier<FriendState> {
   FutureOr<FriendState> build();
@@ -108,7 +108,7 @@ final class FriendPublicDataProvider
   }
 }
 
-String _$friendPublicDataHash() => r'9db5522846ad962e272808809392cb7b59f96b56';
+String _$friendPublicDataHash() => r'1bcfd16e5ba0e09f2f87b69392e20520280e4ef0';
 
 final class FriendPublicDataFamily extends $Family
     with $FunctionalFamilyOverride<FutureOr<FriendPublicData>, String> {
@@ -177,7 +177,7 @@ final class UserIdentityProvider
   }
 }
 
-String _$userIdentityHash() => r'0a5aab956b9f4425f321c778236294dc1df32b59';
+String _$userIdentityHash() => r'aa10e14b91495b97240d22f2cc1873c6d341ef26';
 
 final class UserIdentityFamily extends $Family
     with $FunctionalFamilyOverride<FutureOr<Friend>, String> {
@@ -386,6 +386,189 @@ abstract class _$IdentityEpoch extends $Notifier<int> {
             as $ClassProviderElement<
               AnyNotifier<int, int>,
               int,
+              Object?,
+              Object?
+            >;
+    return element.handleCreate(ref, build);
+  }
+}
+
+/// Independent signals keep cache writers from depending on their consumers.
+/// Each signal lives only while the corresponding user is observed.
+
+@ProviderFor(UserCacheRevision)
+final userCacheRevisionProvider = UserCacheRevisionFamily._();
+
+/// Independent signals keep cache writers from depending on their consumers.
+/// Each signal lives only while the corresponding user is observed.
+final class UserCacheRevisionProvider
+    extends
+        $NotifierProvider<UserCacheRevision, ({int contents, int identity})> {
+  /// Independent signals keep cache writers from depending on their consumers.
+  /// Each signal lives only while the corresponding user is observed.
+  UserCacheRevisionProvider._({
+    required UserCacheRevisionFamily super.from,
+    required String super.argument,
+  }) : super(
+         retry: null,
+         name: r'userCacheRevisionProvider',
+         isAutoDispose: true,
+         dependencies: null,
+         $allTransitiveDependencies: null,
+       );
+
+  @override
+  String debugGetCreateSourceHash() => _$userCacheRevisionHash();
+
+  @override
+  String toString() {
+    return r'userCacheRevisionProvider'
+        ''
+        '($argument)';
+  }
+
+  @$internal
+  @override
+  UserCacheRevision create() => UserCacheRevision();
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(({int contents, int identity}) value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<({int contents, int identity})>(
+        value,
+      ),
+    );
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is UserCacheRevisionProvider && other.argument == argument;
+  }
+
+  @override
+  int get hashCode {
+    return argument.hashCode;
+  }
+}
+
+String _$userCacheRevisionHash() => r'ea37714031cd774a728a54b7960b7615cdfb649e';
+
+/// Independent signals keep cache writers from depending on their consumers.
+/// Each signal lives only while the corresponding user is observed.
+
+final class UserCacheRevisionFamily extends $Family
+    with
+        $ClassFamilyOverride<
+          UserCacheRevision,
+          ({int contents, int identity}),
+          ({int contents, int identity}),
+          ({int contents, int identity}),
+          String
+        > {
+  UserCacheRevisionFamily._()
+    : super(
+        retry: null,
+        name: r'userCacheRevisionProvider',
+        dependencies: null,
+        $allTransitiveDependencies: null,
+        isAutoDispose: true,
+      );
+
+  /// Independent signals keep cache writers from depending on their consumers.
+  /// Each signal lives only while the corresponding user is observed.
+
+  UserCacheRevisionProvider call(String id) =>
+      UserCacheRevisionProvider._(argument: id, from: this);
+
+  @override
+  String toString() => r'userCacheRevisionProvider';
+}
+
+/// Independent signals keep cache writers from depending on their consumers.
+/// Each signal lives only while the corresponding user is observed.
+
+abstract class _$UserCacheRevision
+    extends $Notifier<({int contents, int identity})> {
+  late final _$args = ref.$arg as String;
+  String get id => _$args;
+
+  ({int contents, int identity}) build(String id);
+  @$mustCallSuper
+  @override
+  WhenComplete runBuild() {
+    final ref =
+        this.ref
+            as $Ref<
+              ({int contents, int identity}),
+              ({int contents, int identity})
+            >;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<
+                ({int contents, int identity}),
+                ({int contents, int identity})
+              >,
+              ({int contents, int identity}),
+              Object?,
+              Object?
+            >;
+    return element.handleCreate(ref, () => build(_$args));
+  }
+}
+
+/// Feed observers receive mutations without starting a separate relation read.
+
+@ProviderFor(FriendshipChanges)
+final friendshipChangesProvider = FriendshipChangesProvider._();
+
+/// Feed observers receive mutations without starting a separate relation read.
+final class FriendshipChangesProvider
+    extends $NotifierProvider<FriendshipChanges, Set<String>?> {
+  /// Feed observers receive mutations without starting a separate relation read.
+  FriendshipChangesProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'friendshipChangesProvider',
+        isAutoDispose: false,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$friendshipChangesHash();
+
+  @$internal
+  @override
+  FriendshipChanges create() => FriendshipChanges();
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(Set<String>? value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<Set<String>?>(value),
+    );
+  }
+}
+
+String _$friendshipChangesHash() => r'18bc0decde342f99c092f808db382bb70a071b3f';
+
+/// Feed observers receive mutations without starting a separate relation read.
+
+abstract class _$FriendshipChanges extends $Notifier<Set<String>?> {
+  Set<String>? build();
+  @$mustCallSuper
+  @override
+  WhenComplete runBuild() {
+    final ref = this.ref as $Ref<Set<String>?, Set<String>?>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<Set<String>?, Set<String>?>,
+              Set<String>?,
               Object?,
               Object?
             >;

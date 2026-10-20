@@ -55,6 +55,9 @@ class Feed extends _$Feed {
     _work = null;
     ref.listen(feedHistoryStreamProvider, (_, __) => _recompose());
     ref.listen(feedAchievementsStreamProvider, (_, __) => _recompose());
+    ref.listen(friendshipChangesProvider, (_, accepted) {
+      if (accepted != null) relationsChanged(accepted);
+    });
     ref.listen(networkConnectivityProvider, (previous, next) {
       if (_visible && previous?.value != true && next.value == true)
         unawaited(refreshIfStale());
@@ -65,6 +68,7 @@ class Feed extends _$Feed {
     } catch (_) {
       await _publish();
     }
+    if (!ref.mounted || generation != _generation) return [];
     return _compose();
   }
 
@@ -122,6 +126,7 @@ class Feed extends _$Feed {
   }
 
   Future<void> _publish() async {
+    if (!ref.mounted) return;
     final generation = _generation;
     final service = FeedService(
       Get.find<DatabaseService>(),
@@ -156,6 +161,7 @@ class Feed extends _$Feed {
     int generation, {
     required bool replace,
   }) async {
+    if (!ref.mounted || generation != _generation) return;
     final connected = await ref.read(networkConnectivityProvider.future);
     if (generation != _generation || !ref.mounted) return;
     if (connected && ref.read(currentUserIdProvider) != null) {

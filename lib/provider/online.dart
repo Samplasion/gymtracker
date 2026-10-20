@@ -14,7 +14,6 @@ import 'package:gymtracker/model/measurements.dart';
 import 'package:gymtracker/model/routines.dart';
 import 'package:gymtracker/provider/connectivity.dart';
 import 'package:gymtracker/provider/events.dart';
-import 'package:gymtracker/provider/friend.dart';
 import 'package:gymtracker/service/database.dart';
 import 'package:gymtracker/service/logger.dart';
 import 'package:gymtracker/service/online.dart';
@@ -264,8 +263,6 @@ class Online extends _$Online {
       // Fetch the updated account to refresh state
       final updated = _service.account;
       state = AsyncValue.data(updated);
-      if (updated != null)
-        ref.read(friendProvider.notifier).invalidateProfile(updated.id);
     } catch (e, s) {
       logger.e(
         "An error occurred while updating account",
@@ -294,10 +291,6 @@ class Online extends _$Online {
     try {
       await _service.uploadAvatar(bytes);
       state = AsyncValue.data(_service.account);
-      final user = _service.account;
-      if (user != null) {
-        invalidateAvatarCache(user.id);
-      }
     } catch (e, s) {
       logger.e(
         "An error occurred while uploading avatar",
@@ -312,10 +305,6 @@ class Online extends _$Online {
     try {
       await _service.removeAvatar();
       state = AsyncValue.data(_service.account);
-      final user = _service.account;
-      if (user != null) {
-        invalidateAvatarCache(user.id);
-      }
     } catch (e, s) {
       logger.e(
         "An error occurred while removing avatar",
@@ -324,12 +313,6 @@ class Online extends _$Online {
       );
       rethrow;
     }
-  }
-
-  void invalidateAvatarCache(String userID) {
-    try {
-      ref.read(friendProvider.notifier).invalidateAvatarCache(userID);
-    } catch (_) {}
   }
 
   Future<void> logout() => _changeAuthentication(() async {
@@ -377,8 +360,14 @@ class Online extends _$Online {
   }
 
   Future<Uri?> getAvatarUrl(String id) async {
-    final url = await ref.read(friendProvider.notifier).getAvatar(id);
-    return url == null ? null : Uri.parse(url);
+    final url = await _service.getAvatarUrl(id);
+    final account = _service.account;
+    if (url == null || account?.id != id || account?.updatedAt == null) {
+      return url;
+    }
+    return url.replace(
+      queryParameters: {...url.queryParameters, 'v': account!.updatedAt!},
+    );
   }
 
   Future<void> deleteAccount() => _serialize(() async {

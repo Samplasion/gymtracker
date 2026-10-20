@@ -144,6 +144,7 @@ INSERT INTO boutique_routine_exercises (
   sort_order,
   supersedes_id,
   rpe,
+  progression,
   equipment
 ) values (
   '${_generateUUID()}',
@@ -163,6 +164,7 @@ INSERT INTO boutique_routine_exercises (
   $sortOrder,
   NULL,
   NULL,
+  ${exercise.progression == null ? 'NULL' : "'${jsonEncode(exercise.progression!.toJson())}'"},
   '${exercise.gymEquipment.name}'
 );\n\n""";
     }
@@ -196,6 +198,7 @@ INSERT INTO boutique_routine_exercises (
   sort_order,
   supersedes_id,
   rpe,
+  progression,
   equipment
 ) values (
   '$supersetID',
@@ -213,6 +216,7 @@ INSERT INTO boutique_routine_exercises (
   0,
   NULL,
   $i,
+  NULL,
   NULL,
   NULL,
   NULL
@@ -329,41 +333,6 @@ class _BoutiqueRepositoryImpl implements _BoutiqueRepository {
         .from('boutique_packages')
         .select("*, boutique_routines(*, boutique_routine_exercises(*))")
         .eq('category_id', categoryId);
-    return response
-        .map((e) {
-          return {
-            ...e,
-            'name': e['name'][language] ?? e['name']['en'] ?? "",
-            'description':
-                e['description'][language] ?? e['description']['en'] ?? "",
-            'routines': [
-              for (final json in e['boutique_routines'])
-                {
-                  ...json,
-                  'name': json['name'][language] ?? json['name']['en'] ?? "",
-                  'infobox':
-                      json['infobox'][language] ?? json['infobox']['en'] ?? "",
-                  'exercises': [
-                    for (final json in json['boutique_routine_exercises'])
-                      {
-                        ...json,
-                        'type': json['is_superset'] == 1
-                            ? 'superset'
-                            : 'exercise',
-                        'name':
-                            json['name'][language] ?? json['name']['en'] ?? "",
-                        'notes':
-                            json['notes']?[language] ??
-                            json['notes']?['en'] ??
-                            "",
-                        'sets': jsonDecode(json['sets']),
-                      }.cast<String, dynamic>(),
-                  ],
-                },
-            ],
-          };
-        })
-        .map((e) => BoutiquePackage.fromJson(e, language))
-        .toList();
+    return response.map((e) => BoutiquePackage.fromJson(e, language)).toList();
   }
 }

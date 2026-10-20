@@ -6,6 +6,33 @@ import 'package:gymtracker/db/utils.dart';
 import 'package:gymtracker/model/model.dart';
 import 'package:gymtracker/utils/extensions.dart';
 
+String _localizedBoutiqueText(Object? value, String language) {
+  if (value == null) return '';
+  Object? decoded = value;
+  if (value is String) {
+    try {
+      decoded = jsonDecode(value);
+    } on FormatException {
+      return value;
+    }
+  }
+  if (decoded is Map) {
+    return (decoded[language] ?? decoded['en'] ?? '').toString();
+  }
+  return decoded is String ? decoded : value.toString();
+}
+
+List<dynamic> _boutiqueList(Object? value) {
+  if (value is List) return value;
+  if (value is String) {
+    final decoded = jsonDecode(value);
+    if (decoded is List) return decoded;
+  }
+  return [];
+}
+
+bool _boutiqueFlag(Object? value) => value == true || value == 1;
+
 class BoutiqueSettings {
   final String compatibility;
   final bool enabled;
@@ -81,49 +108,72 @@ class BoutiquePackage {
   factory BoutiquePackage.fromJson(Map<String, dynamic> json, String language) {
     return BoutiquePackage(
       id: json['id'],
-      name: json['name'],
-      description: json['description'],
-      routines: (json['routines'] as List).map((e) {
+      name: _localizedBoutiqueText(json['name'], language),
+      description: _localizedBoutiqueText(json['description'], language),
+      routines: ((json['routines'] ?? json['boutique_routines']) as List).map((
+        e,
+      ) {
+        final routine = (e as Map).cast<String, dynamic>();
         final exercises = databaseExercisesToExercises(
-          (e['exercises'] as List)
-              .map(
-                (e) => ConcreteExercise(
-                  id: e['id'],
-                  routineId: e['routine_id'],
-                  name: "${e['name']}",
-                  parameters: GTSetParameters.values.byName(e['parameters']),
-                  sets: (e['sets'] as List)
-                      .map((e) => GTSet.fromJson(e))
+          ((routine['exercises'] ?? routine['boutique_routine_exercises'])
+                  as List)
+              .map((rawExercise) {
+                final exercise = (rawExercise as Map).cast<String, dynamic>();
+                final isSuperset = _boutiqueFlag(exercise['is_superset']);
+                return ConcreteExercise(
+                  id: exercise['id'],
+                  routineId: exercise['routine_id'],
+                  name: _localizedBoutiqueText(exercise['name'], language),
+                  parameters: isSuperset
+                      ? null
+                      : GTSetParameters.values.byName(exercise['parameters']),
+                  sets: _boutiqueList(exercise['sets'])
+                      .map(
+                        (set) => GTSet.fromJson(
+                          (set as Map).cast<String, dynamic>(),
+                        ),
+                      )
                       .toList(),
-                  primaryMuscleGroup: e['is_superset'] == 1
+                  primaryMuscleGroup: isSuperset
                       ? null
-                      : GTMuscleGroup.values.byName(e['primary_muscle_group']),
+                      : GTMuscleGroup.values.byName(
+                          exercise['primary_muscle_group'],
+                        ),
                   secondaryMuscleGroups: {
-                    if (e['secondary_muscle_groups'] != null)
-                      for (final e in jsonDecode(e['secondary_muscle_groups']))
-                        GTMuscleGroup.values.byName(e),
+                    for (final group in _boutiqueList(
+                      exercise['secondary_muscle_groups'],
+                    ))
+                      GTMuscleGroup.values.byName(group as String),
                   },
-                  restTime: e['rest_time'],
-                  isCustom: false,
-                  libraryExerciseId: e['library_exercise_id'],
-                  customExerciseId: null,
-                  notes: e['notes'],
-                  isSuperset: e['is_superset'] == 1,
-                  isInSuperset: e['is_in_superset'] == 1,
-                  supersetId: e['superset_id'],
-                  sortOrder: e['sort_order'],
-                  supersedesId: null,
-                  rpe: null,
-                  equipment: e['is_superset'] == 1
+                  restTime: exercise['rest_time'],
+                  isCustom: _boutiqueFlag(exercise['is_custom']),
+                  libraryExerciseId: exercise['library_exercise_id'],
+                  customExerciseId: exercise['custom_exercise_id'],
+                  notes: _localizedBoutiqueText(exercise['notes'], language),
+                  isSuperset: isSuperset,
+                  isInSuperset: _boutiqueFlag(exercise['is_in_superset']),
+                  supersetId: exercise['superset_id'],
+                  sortOrder: exercise['sort_order'],
+                  supersedesId: exercise['supersedes_id'],
+                  rpe: exercise['rpe'],
+                  progression: parseExerciseProgression(
+                    exercise['progression'],
+                  ),
+                  equipment: isSuperset
                       ? null
-                      : GTGymEquipment.values.byName(e['equipment']),
-                ),
-              )
+                      : GTGymEquipment.values.byName(exercise['equipment']),
+                );
+              })
               .toList(),
         );
-        return Workout.fromJson(
-          {...e, 'exercises': []}.cast<String, dynamic>(),
-        ).copyWith(exercises: exercises);
+        return Workout.fromJson({
+          ...routine,
+          'name': _localizedBoutiqueText(routine['name'], language),
+          'infobox': _localizedBoutiqueText(routine['infobox'], language),
+          'weightUnit': routine['weightUnit'] ?? routine['weight_unit'],
+          'distanceUnit': routine['distanceUnit'] ?? routine['distance_unit'],
+          'exercises': [],
+        }).copyWith(exercises: exercises);
       }).toList(),
     );
   }

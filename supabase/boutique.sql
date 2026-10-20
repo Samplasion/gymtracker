@@ -46,6 +46,7 @@ create table if not exists public.boutique_routine_exercises (
   sort_order integer not null,
   supersedes_id text,
   rpe integer,
+  progression text,
   equipment text not null default 'none',
   primary key (id)
 );

@@ -6,15 +6,15 @@ class FoodCategoryList extends ConsumerWidget {
   Color? getFabBackgroundColor(BuildContext context, bool canUpdate) =>
       canUpdate
       ? null
-      : Theme.of(
-          context,
-        ).buttonTheme.getDisabledFillColor(MaterialButton(onPressed: () {}));
+      : Theme.of(context).buttonTheme.getDisabledFillColor(
+          MaterialButton(onPressed: () async {}),
+        );
   Color? getFabForegroundColor(BuildContext context, bool canUpdate) =>
       canUpdate
       ? null
-      : Theme.of(
-          context,
-        ).buttonTheme.getDisabledTextColor(MaterialButton(onPressed: () {}));
+      : Theme.of(context).buttonTheme.getDisabledTextColor(
+          MaterialButton(onPressed: () async {}),
+        );
   MouseCursor? getFabMouseCursor(BuildContext context, bool canUpdate) =>
       canUpdate ? SystemMouseCursors.click : SystemMouseCursors.basic;
 
@@ -55,8 +55,8 @@ class FoodCategoryList extends ConsumerWidget {
                     motion: const BehindMotion(),
                     children: [
                       SlidableAction(
-                        onPressed: (_) {
-                          ref
+                        onPressed: (_) async {
+                          await ref
                               .read(nutritionCategoryProvider.notifier)
                               .removeCategory(category);
                         },
@@ -79,7 +79,9 @@ class FoodCategoryList extends ConsumerWidget {
             ? () async {
                 final cat = await showAddCategoryView(context, ref);
                 if (cat != null) {
-                  ref.read(nutritionCategoryProvider.notifier).addCategory(cat);
+                  await ref
+                      .read(nutritionCategoryProvider.notifier)
+                      .addCategory(cat);
                 }
               }
             : null,
@@ -356,7 +358,7 @@ class _FoodCategoryEditorViewState
         center: true,
         buttons: [
           FilledButton(
-            onPressed: () {
+            onPressed: () async {
               if (!_formKey.currentState!.validate()) return;
 
               final category = NutritionCategory(
@@ -409,8 +411,8 @@ class FoodCategoryFoodsView extends ConsumerWidget {
                   onTap: () {
                     showEditFoodView(context, ref, food);
                   },
-                  onDelete: () {
-                    ref
+                  onDelete: () async {
+                    await ref
                         .read(foodProvider.notifier)
                         .removeFood(selectedDate, food);
                   },
@@ -502,10 +504,10 @@ class FoodCategoryFoodsView extends ConsumerWidget {
         ref: ref,
         closeView: () => Get.back(),
         onFoodTap: (dtfood) {
-          showAddFoodView(context, dtfood.value).then((food) {
+          showAddFoodView(context, dtfood.value).then((food) async {
             if (food != null) {
               final selectedDate = ref.read(foodSelectedDateProvider);
-              ref
+              await ref
                   .read(foodProvider.notifier)
                   .addFood(selectedDate, food, category: category);
             }
@@ -517,11 +519,13 @@ class FoodCategoryFoodsView extends ConsumerWidget {
         IconButton(
           icon: const Icon(GTIcons.combine),
           tooltip: context.t.food.combine.title,
-          onPressed: () {
-            showCombineFoodsView(context, ref, category: category).then((food) {
+          onPressed: () async {
+            showCombineFoodsView(context, ref, category: category).then((
+              food,
+            ) async {
               if (food != null) {
                 final selectedDate = ref.read(foodSelectedDateProvider);
-                ref
+                await ref
                     .read(foodProvider.notifier)
                     .addFood(selectedDate, food, category: category);
               }
@@ -531,11 +535,11 @@ class FoodCategoryFoodsView extends ConsumerWidget {
         IconButton(
           icon: const Icon(GTIcons.scan_barcode),
           tooltip: context.t.food.barcodeReader.title,
-          onPressed: () {
-            showScanBarcodeView(context, ref).then((food) {
+          onPressed: () async {
+            showScanBarcodeView(context, ref).then((food) async {
               if (food != null) {
                 final selectedDate = ref.read(foodSelectedDateProvider);
-                ref
+                await ref
                     .read(foodProvider.notifier)
                     .addFood(selectedDate, food, category: category);
               }
@@ -557,10 +561,10 @@ class FoodCategoryFoodsView extends ConsumerWidget {
       viewFloatingActionButton: _AddCustomFoodFAB(
         closeView: () => Navigator.of(context).pop(),
         category: category,
-        onFoodAdded: (food) {
+        onFoodAdded: (food) async {
           if (food != null) {
             final selectedDate = ref.read(foodSelectedDateProvider);
-            ref
+            await ref
                 .read(foodProvider.notifier)
                 .addFood(selectedDate, food, category: category);
           }

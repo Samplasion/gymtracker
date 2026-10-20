@@ -84,7 +84,7 @@ class _ChangeGoalScreenState extends ConsumerState<ChangeGoalScreen> {
           IconButton(
             icon: const Icon(GTIcons.history),
             tooltip: context.t.food.nutritionGoals.history.title,
-            onPressed: () {
+            onPressed: () async {
               showGoalHistory(context);
             },
           ),
@@ -287,7 +287,7 @@ class _ChangeGoalScreenState extends ConsumerState<ChangeGoalScreen> {
     );
   }
 
-  void _submitForm() {
+  Future<void> _submitForm() async {
     if (_formKey.currentState?.validate() ?? false) {
       final dailyCalories = _dailyCaloriesController.text.parseDouble();
       final fatPercentage = _fatPercentageController.text.parseDouble();
@@ -301,7 +301,7 @@ class _ChangeGoalScreenState extends ConsumerState<ChangeGoalScreen> {
         proteinPercentage: proteinPercentage,
       );
 
-      ref.read(nutritionGoalProvider.notifier).saveNewGoal(newGoal);
+      await ref.read(nutritionGoalProvider.notifier).saveNewGoal(newGoal);
 
       Get.back();
     }

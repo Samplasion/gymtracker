@@ -3,6 +3,7 @@ import 'dart:typed_data';
 
 import 'package:drift/drift.dart' show Value;
 import 'package:flutter/foundation.dart';
+import 'package:gymtracker/view/utils/sync_recovery.dart';
 import 'package:get/get.dart' hide Value;
 import 'package:gymtracker/db/database.dart';
 import 'package:gymtracker/db/model/tables/exercise.dart';
@@ -18,7 +19,6 @@ import 'package:gymtracker/service/database.dart';
 import 'package:gymtracker/service/logger.dart';
 import 'package:gymtracker/service/online.dart';
 import 'package:gymtracker/service/test.dart';
-import 'package:gymtracker/struct/cache.dart';
 import 'package:gymtracker/utils/utils.dart' show isNetworkError;
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -59,6 +59,7 @@ class GBSyncManager extends SyncManager<GTDatabase> {
     required super.localDatabase,
     required super.supabaseClient,
     required this.eventBus,
+    super.useProtocolV2,
     super.syncInterval,
     this.drainCheckInterval = const Duration(milliseconds: 100),
     super.syncTimestampStorage,
@@ -85,13 +86,20 @@ class GBSyncManager extends SyncManager<GTDatabase> {
   @override
   void onSyncStarted() {
     _cycleUserId = userId;
-    eventBus.emit(GBSyncStartedEvent(userId: _cycleUserId));
+    eventBus.emit(
+      GBSyncStartedEvent(userId: _cycleUserId, cycleId: activeCycleId),
+    );
   }
 
   @override
   void onSyncError(Object error, StackTrace stack) {
-    super.onSyncError(error, stack);
-    eventBus.emit(GBSyncErrorEvent(error, stack, _cycleUserId ?? userId));
+    final safe = useProtocolV2
+        ? StateError(
+            'Synchronization failed (${error is PostgrestException ? error.code : error.runtimeType})',
+          )
+        : error;
+    super.onSyncError(safe, stack);
+    eventBus.emit(GBSyncErrorEvent(safe, stack, _cycleUserId ?? userId));
   }
 
   @override
@@ -101,6 +109,8 @@ class GBSyncManager extends SyncManager<GTDatabase> {
       GBSyncFinishedEvent(
         lastSync: success ? DateTime.now() : null,
         userId: _cycleUserId,
+        cycleId: activeCycleId,
+        result: lastResult,
       ),
     );
     _cycleUserId = null;
@@ -111,7 +121,7 @@ class GBSyncManager extends SyncManager<GTDatabase> {
     try {
       await super.syncTables();
     } catch (e) {
-      if (!isNetworkError(e)) rethrow;
+      if (useProtocolV2 || !isNetworkError(e)) rethrow;
       logger.i('Sync deferred: $e');
     }
   }
@@ -133,8 +143,6 @@ class Online extends _$Online {
   OnlineService get onlineService => _service;
 
   OnlineAccount? get accountSync => state.value;
-
-  final Map<String, CachedData<Uri?>> _avatarCache = {};
 
   Future<void> _transition = Future.value();
 
@@ -160,7 +168,7 @@ class Online extends _$Online {
         await syncManager.suspend();
         try {
           final result = await action();
-          await _applyAccount(await _service.getAccount());
+          await _applyAccount(_service.account);
           return result;
         } catch (_) {
           _resumeSync();
@@ -171,7 +179,27 @@ class Online extends _$Online {
   bool _isInit = false;
   bool get isInit => _isInit;
 
+  Future<SyncResult> synchronize() async {
+    final owner = state.value?.id ?? '';
+    if (!syncManager.syncingEnabled)
+      return SyncResult(SyncOutcome.disabled, userId: owner, cycleId: '');
+    try {
+      await syncManager.retryPending();
+    } catch (e) {
+      return SyncResult(
+        isNetworkError(e) ? SyncOutcome.offline : SyncOutcome.partial,
+        userId: owner,
+        cycleId: syncManager.lastResult?.cycleId ?? '',
+        pending: syncManager.lastResult?.pending ?? 0,
+        error: e,
+      );
+    }
+    return syncManager.lastResult ??
+        SyncResult(SyncOutcome.cancelled, userId: owner, cycleId: '');
+  }
+
   Future<bool> sync() async {
+    if (syncManager.useProtocolV2) return (await synchronize()).completed;
     if (!syncManager.syncingEnabled) return false;
     final previous = syncManager.successfulSyncs;
     await syncManager.syncTables();
@@ -234,8 +262,10 @@ class Online extends _$Online {
     try {
       await _service.updateAccount(email: email, username: username);
       // Fetch the updated account to refresh state
-      final updated = await _service.getAccount();
+      final updated = _service.account;
       state = AsyncValue.data(updated);
+      if (updated != null)
+        ref.read(friendProvider.notifier).invalidateProfile(updated.id);
     } catch (e, s) {
       logger.e(
         "An error occurred while updating account",
@@ -249,6 +279,7 @@ class Online extends _$Online {
   Future<void> updateProfile({String? fullName}) async {
     try {
       await _service.updateProfile(fullName: fullName);
+      state = AsyncValue.data(_service.account);
     } catch (e, s) {
       logger.e(
         "An error occurred while updating profile",
@@ -262,6 +293,7 @@ class Online extends _$Online {
   Future<void> uploadAvatar(Uint8List bytes) async {
     try {
       await _service.uploadAvatar(bytes);
+      state = AsyncValue.data(_service.account);
       final user = _service.account;
       if (user != null) {
         invalidateAvatarCache(user.id);
@@ -279,6 +311,7 @@ class Online extends _$Online {
   Future<void> removeAvatar() async {
     try {
       await _service.removeAvatar();
+      state = AsyncValue.data(_service.account);
       final user = _service.account;
       if (user != null) {
         invalidateAvatarCache(user.id);
@@ -294,7 +327,6 @@ class Online extends _$Online {
   }
 
   void invalidateAvatarCache(String userID) {
-    _avatarCache.remove(userID);
     try {
       ref.read(friendProvider.notifier).invalidateAvatarCache(userID);
     } catch (_) {}
@@ -345,27 +377,8 @@ class Online extends _$Online {
   }
 
   Future<Uri?> getAvatarUrl(String id) async {
-    if (_avatarCache.containsKey(id)) {
-      final cached = _avatarCache[id]!;
-      if (DateTime.now().difference(cached.downloaded) <
-          const Duration(hours: 1)) {
-        return cached.data;
-      }
-    }
-    final time = DateTime.now();
-    return _service.getAvatarUrl(id).then((uri) {
-      if (uri == null) {
-        _avatarCache.remove(id);
-      } else {
-        _avatarCache[id] = CachedData(time, uri);
-      }
-      return uri;
-    });
-  }
-
-  Future<void> _fillMissingUserIdAndTouchStaleTimestamps(String userId) async {
-    await _syncManager.fillMissingUserIdForLocalTables();
-    await _databaseService.db.touchStaleTimestamps(userId);
+    final url = await ref.read(friendProvider.notifier).getAvatar(id);
+    return url == null ? null : Uri.parse(url);
   }
 
   Future<void> deleteAccount() => _serialize(() async {
@@ -414,6 +427,7 @@ class Online extends _$Online {
         _prefs,
         ref.read(eventBusProvider),
       ),
+      useProtocolV2: true,
       syncInterval: const Duration(seconds: 2),
       drainCheckInterval: const Duration(milliseconds: 100),
     );
@@ -566,7 +580,14 @@ class Online extends _$Online {
       _syncManager.setUserId(account?.id ?? '');
       await _databaseService.setCurrentUserId(account?.id);
       if (account != null) {
-        await _fillMissingUserIdAndTouchStaleTimestamps(account.id);
+        final context = navigatorKey.currentContext;
+        final key = 'guest_import_offered_${account.id}';
+        if (context != null &&
+            context.mounted &&
+            !(_prefs.getBool(key) ?? false)) {
+          await offerGuestImport(context, _databaseService, account.id);
+          await _prefs.setBool(key, true);
+        }
       }
     }
     state = AsyncValue.data(account);

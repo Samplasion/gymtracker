@@ -102,13 +102,13 @@ class _AddFoodViewState extends ConsumerState<AddFoodView> {
                     tooltip: isFavorite
                         ? context.t.food.removeFavorite
                         : context.t.food.addFavorite,
-                    onPressed: () {
+                    onPressed: () async {
                       if (isFavorite) {
-                        ref
+                        await ref
                             .read(foodProvider.notifier)
                             .removeFavorite(widget.food as Food);
                       } else {
-                        ref
+                        await ref
                             .read(foodProvider.notifier)
                             .addFavorite(widget.food as Food);
                       }
@@ -233,19 +233,19 @@ class _AddFoodViewState extends ConsumerState<AddFoodView> {
         buttons: [
           if (widget.isEditing && selectedDate != DateTime.now().startOfDay)
             FilledButton.tonal(
-              onPressed: () {
+              onPressed: () async {
                 if (!formKey.currentState!.validate()) {
                   return;
                 }
 
                 final newFood = (widget.food as Food).copyWith(amount: amount);
 
-                ref.read(foodProvider.notifier).copyToToday(newFood);
+                await ref.read(foodProvider.notifier).copyToToday(newFood);
               },
               child: Text(context.t.food.edit.copyToToday),
             ),
           FilledButton(
-            onPressed: () {
+            onPressed: () async {
               if (!formKey.currentState!.validate()) {
                 return;
               }
@@ -1012,7 +1012,7 @@ class _CustomAddFoodViewState extends ConsumerState<CustomAddFoodView> {
                         showSecond: !expanded,
                         firstChild: const SizedBox(),
                         secondChild: TextButton(
-                          onPressed: () {
+                          onPressed: () async {
                             setState(() {
                               expanded = true;
                             });
@@ -1033,7 +1033,7 @@ class _CustomAddFoodViewState extends ConsumerState<CustomAddFoodView> {
         center: true,
         buttons: [
           FilledButton(
-            onPressed: () {
+            onPressed: () async {
               if (!formKey.currentState!.validate()) {
                 return;
               }
@@ -1056,7 +1056,7 @@ class _CustomAddFoodViewState extends ConsumerState<CustomAddFoodView> {
               );
 
               if (widget.barcode != null) {
-                ref
+                await ref
                     .read(foodProvider.notifier)
                     .addCustomBarcodeFood(
                       widget.barcode!,
@@ -1159,7 +1159,7 @@ class SearchResultsView extends ConsumerWidget {
           ? _AddCustomFoodFAB(
               closeView: () => Navigator.of(context).pop(),
               category: category,
-              onFoodAdded: (food) {
+              onFoodAdded: (food) async {
                 Navigator.of(context).pop(food);
               },
             )
@@ -1300,6 +1300,8 @@ class _FoodBarcodeReaderViewState extends ConsumerState<FoodBarcodeReaderView>
     );
   }
 
+  bool _handlingCode = false;
+
   Future<void> handleCode(
     BuildContext context,
     WidgetRef ref,
@@ -1310,13 +1312,17 @@ class _FoodBarcodeReaderViewState extends ConsumerState<FoodBarcodeReaderView>
       return;
     }
 
-    return searchFoodByBarcode(context, ref, code).then((food) {
-      if (food == null) {
-        logger.w("No food found for barcode $code");
-        return;
-      }
-      widget.onFoodReceived(food);
-    });
+    if (_handlingCode) return;
+    _handlingCode = true;
+    return searchFoodByBarcode(context, ref, code)
+        .then((food) async {
+          if (food == null) {
+            logger.w("No food found for barcode $code");
+            return;
+          }
+          widget.onFoodReceived(food);
+        })
+        .whenComplete(() => _handlingCode = false);
   }
 }
 
@@ -1537,7 +1543,9 @@ class _AddCombinedFoodViewState extends ConsumerState<AddCombinedFoodView> {
                     });
                   },
                   onTap: () {
-                    showAddFoodView(context, constituents[i]).then((value) {
+                    showAddFoodView(context, constituents[i]).then((
+                      value,
+                    ) async {
                       if (value != null) {
                         setState(() {
                           constituents[i] = value;
@@ -1641,8 +1649,8 @@ class _AddCombinedFoodViewState extends ConsumerState<AddCombinedFoodView> {
         IconButton(
           icon: const Icon(GTIcons.scan_barcode),
           tooltip: context.t.food.barcodeReader.title,
-          onPressed: () {
-            showScanBarcodeView(context, ref).then((value) {
+          onPressed: () async {
+            showScanBarcodeView(context, ref).then((value) async {
               if (value != null) {
                 setState(() {
                   constituents.add(value);
@@ -1653,7 +1661,9 @@ class _AddCombinedFoodViewState extends ConsumerState<AddCombinedFoodView> {
         ),
       ],
       onSubmitted: (query) {
-        showSearchResultsViewForCombination(context, ref, query).then((value) {
+        showSearchResultsViewForCombination(context, ref, query).then((
+          value,
+        ) async {
           if (value != null) {
             setState(() {
               constituents.add(value);
@@ -1667,7 +1677,7 @@ class _AddCombinedFoodViewState extends ConsumerState<AddCombinedFoodView> {
       viewFloatingActionButton: _AddCustomFoodFAB(
         closeView: () => Get.back(),
         category: widget.category,
-        onFoodAdded: (food) {
+        onFoodAdded: (food) async {
           if (food != null) {
             setState(() {
               constituents.add(food);

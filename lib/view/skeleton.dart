@@ -16,6 +16,8 @@ import 'package:gymtracker/i18n/strings.g.dart';
 import 'package:gymtracker/icons/gymtracker_icons.dart';
 import 'package:gymtracker/service/logger.dart';
 import 'package:gymtracker/service/version.dart';
+import 'package:gymtracker/main.dart' show globalContainer;
+import 'package:gymtracker/provider/online.dart';
 import 'package:gymtracker/utils/constants.dart';
 import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/utils/go.dart';
@@ -210,6 +212,9 @@ class _SkeletonViewState extends State<SkeletonView>
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     Get.find<RoutinesController>().didChangeAppLifecycleState(state);
+    final online = globalContainer.read(onlineProvider.notifier);
+    if (online.isInit)
+      online.syncManager.setForeground(state == AppLifecycleState.resumed);
   }
 
   @override

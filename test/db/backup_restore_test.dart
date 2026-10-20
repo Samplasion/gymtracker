@@ -104,7 +104,10 @@ void main() {
         final backup = await snapshot();
         manager.enableSync();
         await started.future;
-        final restoring = service.restoreBackup(backup);
+        final restoring = service.restoreBackup(
+          backup,
+          mode: RestoreMode.replace,
+        );
         await pumpEventQueue();
         expect(backend.requestsInFlight, 1);
         release.complete();
@@ -147,7 +150,7 @@ void main() {
         paused = true;
         await action();
       };
-      await service.restoreBackup(await snapshot());
+      await service.restoreBackup(await snapshot(), mode: RestoreMode.replace);
       await pumpEventQueue();
       expect(paused, isTrue);
       expect(identical(service.db, db), isTrue);
@@ -187,7 +190,7 @@ void main() {
       expect(await db.watchFoods().first, hasLength(1));
       service.runWithSyncPaused = null;
       await expectLater(
-        service.restoreBackup(await snapshot()),
+        service.restoreBackup(await snapshot(), mode: RestoreMode.replace),
         throwsStateError,
       );
       expect(await db.watchFoods().first, hasLength(1));
@@ -211,7 +214,7 @@ void main() {
         resumed = true;
       };
       await expectLater(
-        service.restoreBackup(await snapshot()),
+        service.restoreBackup(await snapshot(), mode: RestoreMode.replace),
         throwsA(anything),
       );
       expect(
@@ -229,7 +232,7 @@ void main() {
       DateTagged(date: day, value: food.copyWith.name('B meal')),
     );
     await expectLater(
-      service.restoreBackup(await snapshot()),
+      service.restoreBackup(await snapshot(), mode: RestoreMode.replace),
       throwsStateError,
     );
     expect((await db.watchFoods().first).single.value.name, 'B meal');
@@ -242,7 +245,7 @@ void main() {
     service.runWithSyncPaused = (_) =>
         Future.error(TimeoutException('Still uploading'));
     await expectLater(
-      service.restoreBackup(await snapshot()),
+      service.restoreBackup(await snapshot(), mode: RestoreMode.replace),
       throwsA(isA<TimeoutException>()),
     );
     expect((await db.watchFoods().first).single.value.name, 'Keep me');

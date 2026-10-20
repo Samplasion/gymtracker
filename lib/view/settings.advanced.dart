@@ -54,6 +54,7 @@ class AdvancedSettingsView extends ConsumerWidget {
                       );
                     },
                   ),
+                const SyncRecoveryActions(),
                 const Divider(),
                 ListTile(
                   title: Text(context.t.settings.advanced.options.logs.title),
@@ -261,29 +262,19 @@ class _BackupListViewState
                         },
                       ),
                       onTap: () async {
-                        final restore = await Go.confirm(
-                          context
-                              .t
-                              .settings
-                              .advanced
-                              .options
-                              .backups
-                              .restore
-                              .title,
-                          context
-                              .t
-                              .settings
-                              .advanced
-                              .options
-                              .backups
-                              .restore
-                              .confirm,
+                        final mode = await previewBackupRestore(
+                          context,
+                          controller,
+                          backup,
                         );
 
-                        if (restore) {
+                        if (mode != null) {
                           await Go.futureDialog(
                             future: () async {
-                              await controller.restoreBackup(backup);
+                              await controller.restoreBackup(
+                                backup,
+                                mode: mode,
+                              );
                             },
                             title:
                                 "settings.advanced.options.backups.restoring",

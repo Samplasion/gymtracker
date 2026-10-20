@@ -669,7 +669,7 @@ final class FoodNotifierProvider extends $NotifierProvider<FoodNotifier, void> {
   }
 }
 
-String _$foodNotifierHash() => r'826c041216771b8b4fad248281e73edfaa4a8060';
+String _$foodNotifierHash() => r'3edff4216a9a4d93648ea40fabe7e56ed0ff3e48';
 
 abstract class _$FoodNotifier extends $Notifier<void> {
   void build();
@@ -927,7 +927,7 @@ final class NutritionGoalNotifierProvider
 }
 
 String _$nutritionGoalNotifierHash() =>
-    r'561d21951c908e43fe44c03ee0c6a2b67ffc611a';
+    r'c8e47278ee2d3a1e330a7396e5060f8f1d57c58e';
 
 abstract class _$NutritionGoalNotifier extends $Notifier<void> {
   void build();
@@ -1406,7 +1406,7 @@ final class NutritionCategoryNotifierProvider
 }
 
 String _$nutritionCategoryNotifierHash() =>
-    r'3a7b874b365af41a2e665ffaf3e6e901c4a31bb2';
+    r'6e254030968a73b5ad9a2087a2b0243a351e2474';
 
 abstract class _$NutritionCategoryNotifier extends $Notifier<void> {
   void build();
@@ -1571,7 +1571,7 @@ final class SearchOpenFoodFactsProvider
 }
 
 String _$searchOpenFoodFactsHash() =>
-    r'ad3dd398cff9b9a5526856d7490d40c94619cce8';
+    r'fb31f249aac50ed210eb80d736f171cec568be8f';
 
 final class SearchOpenFoodFactsFamily extends $Family
     with $FunctionalFamilyOverride<FutureOr<List<VagueFood>>, String> {
@@ -1648,7 +1648,7 @@ final class SearchOpenFoodFactsByBarcodeProvider
 }
 
 String _$searchOpenFoodFactsByBarcodeHash() =>
-    r'792e4030ed0d138dd669ad65767c46cf3b39431c';
+    r'6ca2d434eb7a889186a127656692db24904684a2';
 
 final class SearchOpenFoodFactsByBarcodeFamily extends $Family
     with $FunctionalFamilyOverride<FutureOr<VagueFood?>, String> {

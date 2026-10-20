@@ -137,7 +137,10 @@ void main() {
             .any((column) => column['name'] == 'progression'),
         isTrue,
       );
-      expect(raw.select('PRAGMA user_version').single['user_version'], 19);
+      expect(
+        raw.select('PRAGMA user_version').single['user_version'],
+        DATABASE_VERSION,
+      );
     } finally {
       await db.close();
     }

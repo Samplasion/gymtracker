@@ -1,9 +1,12 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:crypto/crypto.dart';
 
 import 'package:drift/drift.dart';
 import 'package:gymtracker/db/database.dart';
 import 'package:syncable/syncable.dart';
+
+enum RestoreMode { merge, replace }
 
 /// Validates/migrates a disposable copy. Never opens the original for writing.
 class PreparedDatabaseRestore {
@@ -21,6 +24,14 @@ class PreparedDatabaseRestore {
 
   static Future<PreparedDatabaseRestore> load(File file, String? owner) async {
     if (!await file.exists()) throw StateError('Backup does not exist');
+    final manifest = File('${file.path}.json');
+    if (await manifest.exists()) {
+      final metadata =
+          jsonDecode(await manifest.readAsString()) as Map<String, dynamic>;
+      final digest = (await sha256.bind(file.openRead()).first).toString();
+      if (metadata['sha256'] != digest)
+        throw StateError('Backup checksum mismatch');
+    }
     final temp = await Directory.systemTemp.createTemp('gymtracker-restore-');
     GTDatabaseImpl? source;
     try {
@@ -93,7 +104,11 @@ class PreparedDatabaseRestore {
 
   /// Replace the current owner's snapshot without changing database identity.
   /// Missing local records become tombstones so known deletions reach the cloud.
-  Future<void> apply(GTDatabase db) => db.transaction(() async {
+  int get count => rows.values.fold(0, (n, r) => n + r.length);
+  Future<void> apply(
+    GTDatabase db, {
+    RestoreMode mode = RestoreMode.replace,
+  }) => db.transaction(() async {
     if (db.currentUserId != owner) {
       throw StateError('Account changed before restore');
     }
@@ -117,10 +132,27 @@ class PreparedDatabaseRestore {
     for (final table in db.allTables) {
       if (table.asDslTable is! SyncableTable) continue;
       final name = table.actualTableName;
-      await db.customStatement(
-        'UPDATE "$name" SET deleted = 1, updated_at = ? WHERE user_id IS ?',
-        [revision, owner],
-      );
+      if (mode == RestoreMode.replace) {
+        final retained = rows[name]!
+            .map((r) => r[(table.asDslTable as SyncableTable).id.name])
+            .toSet();
+        final current = await db
+            .customSelect(
+              'SELECT * FROM "$name" WHERE user_id IS ?',
+              variables: [Variable(owner)],
+            )
+            .get();
+        for (final row in current) {
+          final idColumn = (table.asDslTable as SyncableTable).id.name;
+          if (!retained.contains(row.data[idColumn]) &&
+              row.data['deleted'] != 1) {
+            await db.customStatement(
+              'UPDATE "$name" SET deleted=1,updated_at=? WHERE user_id IS ? AND "$idColumn" IS ?',
+              [revision, owner, row.data[idColumn]],
+            );
+          }
+        }
+      }
       for (final original in rows[name]!) {
         if (original['user_id'] != owner) {
           throw StateError('Unexpected backup owner');
@@ -130,13 +162,31 @@ class PreparedDatabaseRestore {
         final idColumn = (table.asDslTable as SyncableTable).id.name;
         final present = await db
             .customSelect(
-              'SELECT 1 FROM "$name" WHERE "$idColumn" IS ? AND user_id IS ? LIMIT 1',
+              'SELECT * FROM "$name" WHERE "$idColumn" IS ? AND user_id IS ? LIMIT 1',
               variables: [Variable(row[idColumn]), Variable(owner)],
             )
             .get();
         if (present.isEmpty) {
           await _insert(db, name, row);
         } else {
+          if (mode == RestoreMode.merge) {
+            final existing = Map<String, Object?>.from(present.single.data)
+              ..remove('updated_at');
+            final restored = Map<String, Object?>.from(row)
+              ..remove('updated_at');
+            if (jsonEncode(existing) != jsonEncode(restored)) {
+              await db.customStatement(
+                'INSERT INTO sync_quarantine(owner,entity,payload,reason) VALUES(?,?,?,?)',
+                [
+                  owner,
+                  name,
+                  jsonEncode(original),
+                  'Backup merge collision; current value preserved',
+                ],
+              );
+            }
+            continue;
+          }
           final columns = row.keys.toList();
           await db.customStatement(
             'UPDATE "$name" SET ${columns.map((c) => '"$c" = ?').join(', ')} WHERE "$idColumn" IS ? AND user_id IS ?',
@@ -147,13 +197,15 @@ class PreparedDatabaseRestore {
       db.notifyUpdates({TableUpdate.onTable(table)});
     }
     final ongoingOwner = owner == null ? 'guest' : 'user:$owner';
-    await db.customStatement('DELETE FROM ongoing_data WHERE owner = ?', [
-      ongoingOwner,
-    ]);
-    for (final row in ongoing) {
+    if (mode == RestoreMode.replace)
+      await db.customStatement('DELETE FROM ongoing_data WHERE owner = ?', [
+        ongoingOwner,
+      ]);
+    for (final row
+        in mode == RestoreMode.replace ? ongoing : <Map<String, Object?>>[]) {
       await _insert(db, 'ongoing_data', row);
     }
-    if (preferences.isNotEmpty) {
+    if (mode == RestoreMode.replace && preferences.isNotEmpty) {
       await db.customStatement('DELETE FROM preferences');
       for (final row in preferences) {
         await _insert(db, 'preferences', row);

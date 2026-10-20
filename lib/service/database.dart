@@ -1,5 +1,10 @@
 import 'dart:async';
+import 'dart:convert';
+import 'package:syncable/syncable.dart';
 import 'dart:io';
+import 'package:crypto/crypto.dart';
+import 'package:sqlite3/sqlite3.dart' as sqlite;
+import 'package:gymtracker/db/sync_diagnostics.dart';
 
 import 'package:drift/drift.dart';
 import 'package:flutter/foundation.dart';
@@ -125,13 +130,13 @@ class DatabaseService extends GetxService
     bodyMeasurements$.add([]);
   }
 
-  void writeSettings(Prefs prefs) {
+  Future<void> writeSettings(Prefs prefs) async {
     logger.i(
       "[DatabaseService.writeSettings] Writing settings to DB: "
       "onboardingComplete=${prefs.onboardingComplete}, "
       "currentUserId=${_db.currentUserId}",
     );
-    _db.setPreferences(prefs);
+    await _db.setPreferences(prefs);
     notifyListeners();
   }
 
@@ -362,8 +367,8 @@ class DatabaseService extends GetxService
     return writeExercises(allExercises);
   }
 
-  void removeExercise(Exercise exercise) {
-    _db.deleteCustomExercise(exercise.id);
+  Future<void> removeExercise(Exercise exercise) async {
+    await _db.deleteCustomExercise(exercise.id);
   }
 
   List<Workout> get routines {
@@ -395,15 +400,15 @@ class DatabaseService extends GetxService
       );
       logger.d("Do we have it already? ${oldFolder != null} ($oldFolder)");
       if (oldFolder == null) {
-        addFolder(routine.folder!);
+        await addFolder(routine.folder!);
       } else {
-        updateFolder(routine.folder!);
+        await updateFolder(routine.folder!);
       }
     }
   }
 
-  void removeRoutine(Workout routine) {
-    _db.deleteRoutine(routine.id);
+  Future<void> removeRoutine(Workout routine) async {
+    await _db.deleteRoutine(routine.id);
   }
 
   bool hasRoutine(String id) {
@@ -437,8 +442,8 @@ class DatabaseService extends GetxService
     return writeAllHistory(allWorkouts);
   }
 
-  void removeHistoryWorkout(Workout workout) {
-    removeHistoryWorkoutById(workout.id);
+  Future<void> removeHistoryWorkout(Workout workout) async {
+    await removeHistoryWorkoutById(workout.id);
   }
 
   Future removeHistoryWorkoutById(String id) async {
@@ -475,93 +480,57 @@ class DatabaseService extends GetxService
     );
   }
 
-  void setWeightMeasurement(WeightMeasurement measurement) {
+  Future<void> setWeightMeasurement(WeightMeasurement measurement) async {
     if (getWeightMeasurement(measurement.id) == null) {
-      _db.insertWeightMeasurement(measurement);
+      await _db.insertWeightMeasurement(measurement);
     } else {
-      _db.updateWeightMeasurement(measurement);
+      await _db.updateWeightMeasurement(measurement);
     }
   }
 
-  void removeWeightMeasurement(WeightMeasurement measurement) {
-    _db.deleteWeightMeasurement(measurement.id);
+  Future<void> removeWeightMeasurement(WeightMeasurement measurement) async {
+    await _db.deleteWeightMeasurement(measurement.id);
   }
 
-  void addFolder(GTRoutineFolder folder) {
-    _db.insertRoutineFolder(folder);
+  Future<void> addFolder(GTRoutineFolder folder) async {
+    await _db.insertRoutineFolder(folder);
   }
 
-  void removeFolder(GTRoutineFolder folder) {
-    _db.deleteRoutineFolder(folder.id);
+  Future<void> removeFolder(GTRoutineFolder folder) async {
+    await _db.deleteRoutineFolder(folder.id);
   }
 
-  void updateFolder(GTRoutineFolder folder) {
-    _db.updateRoutineFolder(folder);
+  Future<void> updateFolder(GTRoutineFolder folder) async {
+    await _db.updateRoutineFolder(folder);
   }
 
-  void addFood(TaggedFood food) {
-    _db.insertFoods(food);
+  Future<void> addFood(TaggedFood food) => _db.insertFoods(food);
+  Future<void> removeFood(TaggedFood food) => _db.deleteFoods(food.value.id!);
+  Future<void> updateFood(TaggedFood food) => _db.updateFoods(food);
+  Future<void> addNutritionGoal(TaggedNutritionGoal goal) =>
+      _db.updateNutritionGoal(goal);
+  Future<void> removeNutritionGoal(TaggedNutritionGoal goal) =>
+      _db.deleteNutritionGoal(goal.date.startOfDay);
+  Future<void> updateNutritionGoal(TaggedNutritionGoal goal) =>
+      _db.updateNutritionGoal(goal);
+  Future<void> addCustomBarcodeFood(String barcode, Food food) =>
+      _db.insertCustomBarcodeFood(barcode, food);
+  Future<void> removeCustomBarcodeFood(String barcode) =>
+      _db.deleteCustomBarcodeFood(barcode);
+  Future<void> addFavoriteFood(Food food) async {
+    if (food.id == null) throw StateError('Food must have an ID');
+    await _db.insertFavoriteFood(food.id!);
   }
 
-  void removeFood(TaggedFood food) {
-    _db.deleteFoods(food.value.id!);
+  Future<void> removeFavoriteFood(Food food) async {
+    if (food.id == null) throw StateError('Food must have an ID');
+    await _db.deleteFavoriteFood(food.id!);
   }
 
-  void updateFood(TaggedFood food) {
-    _db.updateFoods(food);
-  }
-
-  void addNutritionGoal(TaggedNutritionGoal goal) {
-    final newGoals = nutritionGoals$.value;
-    newGoals.add(goal);
-
-    _db.setNutritionGoals(DateSequence.normalized(newGoals).values.toList());
-  }
-
-  void removeNutritionGoal(TaggedNutritionGoal goal) {
-    _db.deleteNutritionGoal(goal.date.startOfDay);
-  }
-
-  void updateNutritionGoal(TaggedNutritionGoal goal) {
-    _db.updateNutritionGoal(goal);
-  }
-
-  void addCustomBarcodeFood(String barcode, Food food) {
-    _db.insertCustomBarcodeFood(barcode, food);
-  }
-
-  void removeCustomBarcodeFood(String barcode) {
-    _db.deleteCustomBarcodeFood(barcode);
-  }
-
-  void addFavoriteFood(Food food) {
-    if (food.id == null) {
-      throw Exception("Food must have an ID to be favorited");
-    }
-
-    _db.insertFavoriteFood(food.id!);
-  }
-
-  void removeFavoriteFood(Food food) {
-    if (food.id == null) {
-      throw Exception("Food must have an ID to be unfavorited");
-    }
-
-    _db.deleteFavoriteFood(food.id!);
-  }
-
-  void setNutritionCategoriesForDay(
+  Future<void> setNutritionCategoriesForDay(
     DateTime date,
-    Map<String, NutritionCategory> map,
-  ) async {
-    final values = nutritionCategories$.value.toMap();
-    _db.setNutritionCategories(
-      DateSequence.fromDatesAndValues({
-        ...values,
-        date.startOfDay: map,
-      }).normalize().toMap(),
-    );
-  }
+    Map<String, NutritionCategory> categories,
+  ) => _db.setNutritionCategoriesForDay(date, categories);
 
   Future<void> insertAchievementCompletion(AchievementCompletion completion) =>
       db.insertAchievementCompletion(completion);
@@ -594,16 +563,16 @@ class DatabaseService extends GetxService
     );
   }
 
-  void setBodyMeasurement(BodyMeasurement measurement) {
+  Future<void> setBodyMeasurement(BodyMeasurement measurement) async {
     if (getBodyMeasurement(measurement.id) == null) {
-      _db.insertBodyMeasurement(measurement);
+      await _db.insertBodyMeasurement(measurement);
     } else {
-      _db.updateBodyMeasurement(measurement);
+      await _db.updateBodyMeasurement(measurement);
     }
   }
 
-  void removeBodyMeasurement(BodyMeasurement measurement) {
-    _db.deleteBodyMeasurement(measurement.id);
+  Future<void> removeBodyMeasurement(BodyMeasurement measurement) async {
+    await _db.deleteBodyMeasurement(measurement.id);
   }
 
   DatabaseSnapshot get currentSnapshot => DatabaseSnapshot(
@@ -780,7 +749,10 @@ class DatabaseService extends GetxService
     return backups.watch();
   }
 
-  Future<void> restoreBackup(DatabaseBackup backup) async {
+  Future<void> restoreBackup(
+    DatabaseBackup backup, {
+    RestoreMode mode = RestoreMode.merge,
+  }) async {
     final barrier = runWithSyncPaused;
     if (barrier == null) throw StateError('Synchronization is not initialized');
     final owner = _db.currentUserId;
@@ -795,7 +767,7 @@ class DatabaseService extends GetxService
           // A failed safety backup must abort the replacement.
           final saved = await backups.store(_db);
           if (saved == null) throw StateError('Unable to create safety backup');
-          await prepared.apply(_db);
+          await prepared.apply(_db, mode: mode);
         } finally {
           await afterUserChange?.call();
         }
@@ -826,10 +798,23 @@ class DatabaseService extends GetxService
   }
 
   Future<void> overrideDatabase(DatabaseSnapshot snapshot) async {
+    final barrier = runWithSyncPaused;
+    if (barrier == null) throw StateError('Synchronization is not initialized');
+    await barrier(() => _overrideDatabase(snapshot));
+  }
+
+  Future<void> _overrideDatabase(DatabaseSnapshot snapshot) async {
     final userId = _db.currentUserId;
     await _db.transaction(() async {
-      await _db.clearUserData(userId);
-
+      for (final table in _db.allTables.where(
+        (t) => t.asDslTable is SyncableTable,
+      )) {
+        await _db.customStatement(
+          'UPDATE "${table.actualTableName}" SET deleted=1,updated_at=? WHERE user_id IS ? AND deleted=0',
+          [DateTime.now().millisecondsSinceEpoch ~/ 1000, userId],
+        );
+        _db.notifyUpdates({TableUpdate.onTable(table)});
+      }
       logger.i("Created import transaction");
       // Keep this above other calls to prevent double computation of
       // achievements
@@ -931,6 +916,8 @@ class DatabaseBackup {
 }
 
 class _DatabaseBackups {
+  // Keep incident evidence until an explicit investigation outcome is recorded.
+  bool preserveForInvestigation = true;
   late Directory _backupDir;
   final BehaviorSubject<List<DatabaseBackup>> _backups$ = BehaviorSubject();
 
@@ -953,13 +940,56 @@ class _DatabaseBackups {
       // VACUUM INTO includes committed WAL pages and creates a consistent snapshot.
       await _db.customStatement('VACUUM INTO ?', [path]);
 
+      final saved = File(path);
+      final check = sqlite.sqlite3.open(path, mode: sqlite.OpenMode.readOnly);
+      try {
+        if (check.select('PRAGMA integrity_check').single.values.single != 'ok')
+          throw StateError('Backup integrity check failed');
+      } finally {
+        check.close();
+      }
+      final counts = SyncDiagnostics.fileCounts(saved, _db);
+      var active = 0;
+      for (final groups in counts.values) {
+        for (final group in groups as List) {
+          if (group['user_id'] == _db.currentUserId && group['deleted'] == 0)
+            active += (group['count'] as int);
+        }
+      }
+      await File('$path.json').writeAsString(
+        jsonEncode({
+          'schema': _db.schemaVersion,
+          'owner': _db.currentUserId,
+          'created_at': now.toUtc().toIso8601String(),
+          'sha256': (await sha256.bind(saved.openRead()).first).toString(),
+          'active_records': active,
+          'counts': counts,
+        }),
+      );
+      // Protect the newest verified non-empty snapshot of each account.
+      final protected = <String>{};
+      final owners = <String>{};
+      for (final backup in list()) {
+        final manifest = File('${backup.file.path}.json');
+        if (!await manifest.exists()) {
+          protected.add(backup.file.path);
+          continue;
+        }
+        final metadata = jsonDecode(await manifest.readAsString()) as Map;
+        final owner = metadata['owner']?.toString() ?? 'guest';
+        if ((metadata['active_records'] as int? ?? 0) > 0 && owners.add(owner))
+          protected.add(backup.file.path);
+      }
       // Delete old backups
       final backups = list();
-      if (backups.length > _kMaxBackups) {
+      if (!preserveForInvestigation && backups.length > _kMaxBackups) {
         final toDelete = (backups..sort((a, b) => a.date.compareTo(b.date)))
             .sublist(0, backups.length - _kMaxBackups);
         for (final backup in toDelete) {
+          if (protected.contains(backup.file.path)) continue;
           await backup.file.delete();
+          final manifest = File('${backup.file.path}.json');
+          if (await manifest.exists()) await manifest.delete();
         }
       }
       _backups$.add(list());
@@ -998,6 +1028,8 @@ class _DatabaseBackups {
 
   Future<void> delete(DatabaseBackup backup) async {
     await backup.file.delete();
+    final manifest = File('${backup.file.path}.json');
+    if (await manifest.exists()) await manifest.delete();
     _backups$.add(list());
   }
 }

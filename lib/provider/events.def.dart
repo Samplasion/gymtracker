@@ -28,14 +28,22 @@ class GBUserDidUpdateSubscriptionEvent extends GBEvent {
 
 class GBSyncStartedEvent extends GBEvent {
   final String? userId;
-  const GBSyncStartedEvent({this.userId});
+  final String? cycleId;
+  const GBSyncStartedEvent({this.userId, this.cycleId});
 }
 
 class GBSyncFinishedEvent extends GBEvent {
   final DateTime? lastSync;
 
   final String? userId;
-  const GBSyncFinishedEvent({this.lastSync, this.userId});
+  final String? cycleId;
+  final SyncResult? result;
+  const GBSyncFinishedEvent({
+    this.lastSync,
+    this.userId,
+    this.cycleId,
+    this.result,
+  });
 }
 
 class GBSyncErrorEvent extends GBEvent {

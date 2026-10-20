@@ -78,11 +78,7 @@ class FoodsRepository {
   }
 
   Future<void> addNutritionGoal(TaggedNutritionGoal goal) async {
-    final currentGoals = await _db.watchNutritionGoals().first;
-    final newGoals = [...currentGoals, goal];
-    return _db.setNutritionGoals(
-      DateSequence.normalized(newGoals).values.toList(),
-    );
+    await _db.updateNutritionGoal(goal);
   }
 
   Future<void> removeNutritionGoal(TaggedNutritionGoal goal) {
@@ -100,23 +96,28 @@ class FoodsRepository {
   // Nutrition categories
   Stream<DateSequence<Map<String, NutritionCategory>>>
   watchNutritionCategories() {
-    return _db
-        .watchNutritionCategories()
-        .map((event) => DateSequence.fromDatesAndValues(event).normalize());
+    return _db.watchNutritionCategories().map(
+      (event) => DateSequence.fromDatesAndValues(event).normalize(),
+    );
   }
+
+  Future<void> addNutritionCategory(
+    DateTime date,
+    NutritionCategory category,
+  ) => _db.mutateNutritionCategory(date, category: category);
+  Future<void> removeNutritionCategory(DateTime date, String name) =>
+      _db.mutateNutritionCategory(date, oldName: name);
+  Future<void> updateNutritionCategory(
+    DateTime date,
+    String oldName,
+    NutritionCategory category,
+  ) => _db.mutateNutritionCategory(date, oldName: oldName, category: category);
 
   Future<void> setNutritionCategoriesForDay(
     DateTime date,
     Map<String, NutritionCategory> map,
   ) async {
-    final current = await watchNutritionCategories().first;
-    final values = current.toMap();
-    return _db.setNutritionCategories(
-      DateSequence.fromDatesAndValues({
-        ...values,
-        date.startOfDay: map,
-      }).normalize().toMap(),
-    );
+    await _db.setNutritionCategoriesForDay(date, map);
   }
 
   Future<void> setNutritionCategories(

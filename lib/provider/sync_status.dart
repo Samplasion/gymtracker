@@ -1,3 +1,5 @@
+import 'package:drift/drift.dart' show Variable;
+import 'package:gymtracker/provider/db.dart';
 import 'dart:async';
 
 import 'package:gymtracker/provider/events.dart';
@@ -62,14 +64,21 @@ class SyncStatusNotifier extends _$SyncStatusNotifier {
     }
     final generation = ++_loadGeneration;
 
+    String? activeCycle;
     final startSub = eventBus.on<GBSyncStartedEvent>().listen((event) {
       if (event.userId != null && event.userId != _statusUserId) return;
+      activeCycle = event.cycleId;
       state = state.copyWith(state: SyncState.syncing);
       _startPollingIfNeeded();
     });
     final finishSub = eventBus.on<GBSyncFinishedEvent>().listen((event) {
+      if (event.cycleId != null &&
+          activeCycle != null &&
+          event.cycleId != activeCycle)
+        return;
       if (event.userId != null && event.userId != _statusUserId) return;
-      if (event.lastSync != null) {
+      if (event.lastSync != null &&
+          (event.result == null || event.result!.completed)) {
         _lastSync = event.lastSync;
         _saveLastSync(event.lastSync!);
         state = state.copyWith(
@@ -184,4 +193,41 @@ class SyncStatusNotifier extends _$SyncStatusNotifier {
       return false;
     }
   }
+}
+
+@riverpod
+Stream<({int pending, int conflicts, int errors})> deliveryStatus(Ref ref) {
+  final owner = ref.watch(currentUserIdProvider);
+  if (owner == null) return Stream.value((pending: 0, conflicts: 0, errors: 0));
+  final db = ref.watch(appDatabaseProvider);
+  return db
+      .customSelect(
+        "SELECT (SELECT count(*) FROM sync_outbox WHERE owner=?) AS pending,(SELECT count(*) FROM sync_conflicts WHERE owner=? AND resolved=0) AS conflicts,(SELECT count(*) FROM sync_outbox WHERE owner=? AND error IS NOT NULL) AS errors",
+        variables: [Variable(owner), Variable(owner), Variable(owner)],
+        readsFrom: db.allTables.toSet(),
+      )
+      .watch()
+      .map((r) {
+        final row = r.single;
+        return (
+          pending: row.read<int>('pending'),
+          conflicts: row.read<int>('conflicts'),
+          errors: row.read<int>('errors'),
+        );
+      });
+}
+
+@riverpod
+Stream<int> deletionAlert(Ref ref) {
+  final owner = ref.watch(currentUserIdProvider);
+  if (owner == null) return Stream.value(0);
+  final db = ref.watch(appDatabaseProvider);
+  return db
+      .customSelect(
+        "SELECT count(*) AS count FROM sync_quarantine WHERE owner=? AND reason='Deleted locally on '||date('now')",
+        variables: [Variable(owner)],
+        readsFrom: db.allTables.toSet(),
+      )
+      .watch()
+      .map((rows) => rows.single.read<int>('count'));
 }

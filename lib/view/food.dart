@@ -86,7 +86,7 @@ Future<void> showEditFoodView(
   );
   if (edited != null) {
     final selectedDate = ref.read(foodSelectedDateProvider);
-    ref.read(foodProvider.notifier).updateFood(selectedDate, edited);
+    await ref.read(foodProvider.notifier).updateFood(selectedDate, edited);
   }
 }
 
@@ -521,19 +521,19 @@ class _FoodViewState extends ConsumerState<FoodView> {
         buttons: [
           IconButton(
             icon: const Icon(GTIcons.previousDay),
-            onPressed: () {
+            onPressed: () async {
               ref.read(foodSelectedDateProvider.notifier).previousDay();
             },
           ),
           IconButton(
             icon: const Icon(GTIcons.showDatePicker),
-            onPressed: () {
+            onPressed: () async {
               showDatePicker(context, ref);
             },
           ),
           IconButton(
             icon: const Icon(GTIcons.nextDay),
-            onPressed: () {
+            onPressed: () async {
               ref.read(foodSelectedDateProvider.notifier).nextDay();
             },
           ),
@@ -636,10 +636,10 @@ class _FoodViewState extends ConsumerState<FoodView> {
         ref: ref,
         closeView: () => Get.back(),
         onFoodTap: (dtfood) {
-          showAddFoodView(context, dtfood.value).then((food) {
+          showAddFoodView(context, dtfood.value).then((food) async {
             if (food != null) {
               final selectedDate = ref.read(foodSelectedDateProvider);
-              ref.read(foodProvider.notifier).addFood(selectedDate, food);
+              await ref.read(foodProvider.notifier).addFood(selectedDate, food);
             }
           });
         },
@@ -649,11 +649,13 @@ class _FoodViewState extends ConsumerState<FoodView> {
         IconButton(
           icon: const Icon(GTIcons.combine),
           tooltip: context.t.food.combine.title,
-          onPressed: () {
-            showCombineFoodsView(context, ref).then((food) {
+          onPressed: () async {
+            showCombineFoodsView(context, ref).then((food) async {
               if (food != null) {
                 final selectedDate = ref.read(foodSelectedDateProvider);
-                ref.read(foodProvider.notifier).addFood(selectedDate, food);
+                await ref
+                    .read(foodProvider.notifier)
+                    .addFood(selectedDate, food);
               }
             });
           },
@@ -661,24 +663,28 @@ class _FoodViewState extends ConsumerState<FoodView> {
         IconButton(
           icon: const Icon(GTIcons.scan_barcode),
           tooltip: context.t.food.barcodeReader.title,
-          onPressed: () {
-            showScanBarcodeView(context, ref).then((food) {
+          onPressed: () async {
+            showScanBarcodeView(context, ref).then((food) async {
               if (food != null) {
                 final selectedDate = ref.read(foodSelectedDateProvider);
-                ref.read(foodProvider.notifier).addFood(selectedDate, food);
+                await ref
+                    .read(foodProvider.notifier)
+                    .addFood(selectedDate, food);
               }
             });
           },
         ),
       ],
       onSubmitted: (query) {
-        showSearchResultsView(context, ref, query).then((food) {
+        showSearchResultsView(context, ref, query).then((food) async {
           if (food == null) return;
           if (context.mounted) {
-            Go.to(() => AddFoodView(food: food)).then((added) {
+            Go.to(() => AddFoodView(food: food)).then((added) async {
               if (added != null) {
                 final selectedDate = ref.read(foodSelectedDateProvider);
-                ref.read(foodProvider.notifier).addFood(selectedDate, added);
+                await ref
+                    .read(foodProvider.notifier)
+                    .addFood(selectedDate, added);
               }
             });
           }
@@ -689,10 +695,10 @@ class _FoodViewState extends ConsumerState<FoodView> {
       keyboardType: TextInputType.text,
       viewFloatingActionButton: _AddCustomFoodFAB(
         closeView: () => Get.back(),
-        onFoodAdded: (food) {
+        onFoodAdded: (food) async {
           if (food != null) {
             final selectedDate = ref.read(foodSelectedDateProvider);
-            ref.read(foodProvider.notifier).addFood(selectedDate, food);
+            await ref.read(foodProvider.notifier).addFood(selectedDate, food);
           }
         },
       ),
@@ -740,8 +746,10 @@ class _HomeUnassignedFoodsList extends ConsumerWidget {
           onTap: () {
             showEditFoodView(context, ref, food);
           },
-          onDelete: () {
-            ref.read(foodProvider.notifier).removeFood(selectedDate, food);
+          onDelete: () async {
+            await ref
+                .read(foodProvider.notifier)
+                .removeFood(selectedDate, food);
           },
         );
       },
@@ -946,7 +954,7 @@ SearchSuggestionBuilder _getSearchSuggestionBuilder({
                 quarterTurns: -1,
                 child: IconButton(
                   icon: const Icon(Icons.arrow_outward_rounded),
-                  onPressed: () {
+                  onPressed: () async {
                     searchController.text = term;
                     searchController.selection = TextSelection.collapsed(
                       offset: searchController.text.length,
@@ -1001,14 +1009,14 @@ class _FoodDayAppBar extends ConsumerWidget {
         IconButton(
           icon: const Icon(GTIcons.food_categories),
           tooltip: context.t.food.categoryList.title,
-          onPressed: () {
+          onPressed: () async {
             Go.to(() => const FoodCategoryList());
           },
         ),
         IconButton(
           icon: const Icon(GTIcons.nutrition_goal),
           tooltip: context.t.food.nutritionGoals.change.title,
-          onPressed: () {
+          onPressed: () async {
             showNutritionGoalView(context);
           },
         ),

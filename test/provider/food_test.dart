@@ -92,6 +92,13 @@ void main() {
       ),
     );
     registerFallbackValue(createSampleFood());
+    registerFallbackValue(
+      const NutritionCategory(
+        name: 'Test',
+        dailyPercentage: 100,
+        icon: NutritionCategoryIcon.coffee,
+      ),
+    );
     registerFallbackValue(AchievementTrigger.food);
   });
 
@@ -104,6 +111,15 @@ void main() {
 
     Get.put<Coordinator>(mockCoordinator);
 
+    when(
+      () => mockFoodsRepo.addNutritionCategory(any(), any()),
+    ).thenAnswer((_) async {});
+    when(
+      () => mockFoodsRepo.removeNutritionCategory(any(), any()),
+    ).thenAnswer((_) async {});
+    when(
+      () => mockFoodsRepo.updateNutritionCategory(any(), any(), any()),
+    ).thenAnswer((_) async {});
     when(() => mockFoodsRepo.addFood(any())).thenAnswer((_) async {});
     when(() => mockFoodsRepo.removeFood(any())).thenAnswer((_) async {});
     when(() => mockFoodsRepo.updateFood(any())).thenAnswer((_) async {});
@@ -140,18 +156,18 @@ void main() {
   });
 
   group("FoodSelectedDateNotifier", () {
-    test("initial state is today at start of day", () {
+    test("initial state is today at start of day", () async {
       final selectedDate = container.read(foodSelectedDateProvider);
       expect(selectedDate, DateTime.now().startOfDay);
     });
 
-    test("setDate updates state to start of given day", () {
+    test("setDate updates state to start of given day", () async {
       final target = DateTime(2026, 5, 15, 14, 30);
       container.read(foodSelectedDateProvider.notifier).setDate(target);
       expect(container.read(foodSelectedDateProvider), DateTime(2026, 5, 15));
     });
 
-    test("previousDay and nextDay shift by 1 day", () {
+    test("previousDay and nextDay shift by 1 day", () async {
       final target = DateTime(2026, 5, 15);
       container.read(foodSelectedDateProvider.notifier).setDate(target);
 
@@ -162,7 +178,7 @@ void main() {
       expect(container.read(foodSelectedDateProvider), DateTime(2026, 5, 15));
     });
 
-    test("canGoToPreviousDay and canGoToNextDay boundary checks", () {
+    test("canGoToPreviousDay and canGoToNextDay boundary checks", () async {
       final notifier = container.read(foodSelectedDateProvider.notifier);
 
       notifier.setDate(DateTime(2026, 1, 1));
@@ -178,7 +194,7 @@ void main() {
   });
 
   group("foodCanUpdateCategoriesProvider", () {
-    test("returns true for today and future dates, false for past", () {
+    test("returns true for today and future dates, false for past", () async {
       final today = DateTime.now().startOfDay;
       container.read(foodSelectedDateProvider.notifier).setDate(today);
       expect(container.read(foodCanUpdateCategoriesProvider), isTrue);
@@ -291,14 +307,14 @@ void main() {
 
     test(
       "addFood calls dbService.addFood, maybeUnlockAchievements and scheduleBackup",
-      () {
+      () async {
         final cat = const NutritionCategory(
           name: "Lunch",
           dailyPercentage: 40,
           icon: NutritionCategoryIcon.fork_and_spoon,
         );
 
-        container
+        await container
             .read(foodProvider.notifier)
             .addFood(today, food, category: cat);
 
@@ -318,42 +334,49 @@ void main() {
       },
     );
 
-    test("rapid additions and copies use independent food identities", () {
-      final notifier = container.read(foodProvider.notifier);
-      for (var i = 0; i < 100; i++) {
-        notifier.addFood(today, food);
-        notifier.copyToToday(food);
-      }
-      final saved = verify(
-        () => mockFoodsRepo.addFood(captureAny()),
-      ).captured.cast<DateTagged<Food>>();
-      expect(saved, hasLength(200));
-      expect(saved.map((row) => row.value.id).toSet(), hasLength(200));
-      expect(saved.every((row) => row.value.id != food.id), isTrue);
-      expect(food.id, 'food_test');
-    });
+    test(
+      "rapid additions and copies use independent food identities",
+      () async {
+        final notifier = container.read(foodProvider.notifier);
+        for (var i = 0; i < 100; i++) {
+          notifier.addFood(today, food);
+          notifier.copyToToday(food);
+        }
+        final saved = verify(
+          () => mockFoodsRepo.addFood(captureAny()),
+        ).captured.cast<DateTagged<Food>>();
+        expect(saved, hasLength(200));
+        expect(saved.map((row) => row.value.id).toSet(), hasLength(200));
+        expect(saved.every((row) => row.value.id != food.id), isTrue);
+        expect(food.id, 'food_test');
+      },
+    );
 
-    test("removeFood calls dbService.removeFood, achievements and backup", () {
-      container.read(foodProvider.notifier).removeFood(today, food);
+    test(
+      "removeFood calls dbService.removeFood, achievements and backup",
+      () async {
+        await container.read(foodProvider.notifier).removeFood(today, food);
 
-      final captured =
-          verify(() => mockFoodsRepo.removeFood(captureAny())).captured.single
-              as DateTagged<Food>;
-      expect(captured.date, today);
-      expect(captured.value, food);
+        final captured =
+            verify(() => mockFoodsRepo.removeFood(captureAny())).captured.single
+                as DateTagged<Food>;
+        expect(captured.date, today);
+        expect(captured.value, food);
 
-      verify(
-        () => mockCoordinator.maybeUnlockAchievements(AchievementTrigger.food),
-      ).called(1);
-      verify(() => mockCoordinator.scheduleBackup()).called(1);
-    });
+        verify(
+          () =>
+              mockCoordinator.maybeUnlockAchievements(AchievementTrigger.food),
+        ).called(1);
+        verify(() => mockCoordinator.scheduleBackup()).called(1);
+      },
+    );
 
     test("updateFood updates food when it exists on the date", () async {
       mockFoodsRepo.foods$.add([DateTagged(date: today, value: food)]);
       await pumpEventQueue();
 
       final updated = food.copyWith(amount: 250);
-      container.read(foodProvider.notifier).updateFood(today, updated);
+      await container.read(foodProvider.notifier).updateFood(today, updated);
 
       final captured =
           verify(() => mockFoodsRepo.updateFood(captureAny())).captured.single
@@ -370,39 +393,42 @@ void main() {
         await pumpEventQueue();
 
         final updated = food.copyWith(amount: 250);
-        container.read(foodProvider.notifier).updateFood(today, updated);
+        await container.read(foodProvider.notifier).updateFood(today, updated);
 
         verifyNever(() => mockFoodsRepo.updateFood(any()));
       },
     );
 
-    test("copyToToday adds food to today and sets selected date to today", () {
-      final pastDate = DateTime(2026, 1, 1).startOfDay;
-      container.read(foodSelectedDateProvider.notifier).setDate(pastDate);
+    test(
+      "copyToToday adds food to today and sets selected date to today",
+      () async {
+        final pastDate = DateTime(2026, 1, 1).startOfDay;
+        container.read(foodSelectedDateProvider.notifier).setDate(pastDate);
 
-      container.read(foodProvider.notifier).copyToToday(food);
+        await container.read(foodProvider.notifier).copyToToday(food);
 
-      expect(container.read(foodSelectedDateProvider), today);
-      verify(() => mockFoodsRepo.addFood(any())).called(1);
-    });
+        expect(container.read(foodSelectedDateProvider), today);
+        verify(() => mockFoodsRepo.addFood(any())).called(1);
+      },
+    );
 
-    test("addFavorite and removeFavorite delegate to dbService", () {
-      container.read(foodProvider.notifier).addFavorite(food);
+    test("addFavorite and removeFavorite delegate to dbService", () async {
+      await container.read(foodProvider.notifier).addFavorite(food);
       verify(() => mockFoodsRepo.addFavoriteFood(food)).called(1);
       verify(() => mockCoordinator.scheduleBackup()).called(1);
 
-      container.read(foodProvider.notifier).removeFavorite(food);
+      await container.read(foodProvider.notifier).removeFavorite(food);
       verify(() => mockFoodsRepo.removeFavoriteFood(food)).called(1);
     });
 
-    test("addCustomBarcodeFood delegates to dbService with category", () {
+    test("addCustomBarcodeFood delegates to dbService with category", () async {
       final cat = const NutritionCategory(
         name: "Snack",
         dailyPercentage: 10,
         icon: NutritionCategoryIcon.cake,
       );
 
-      container
+      await container
           .read(foodProvider.notifier)
           .addCustomBarcodeFood("11223344", food, cat);
 
@@ -481,9 +507,9 @@ void main() {
 
     test(
       "saveNewGoal adds goal to db for selected date and schedules backup",
-      () {
+      () async {
         container.read(foodSelectedDateProvider.notifier).setDate(d1);
-        container.read(nutritionGoalProvider.notifier).saveNewGoal(goal1);
+        await container.read(nutritionGoalProvider.notifier).saveNewGoal(goal1);
 
         final captured =
             verify(
@@ -602,19 +628,12 @@ void main() {
         );
 
         // Successfully adds unique category
-        container
+        await container
             .read(nutritionCategoryProvider.notifier)
             .addCategory(catLunch);
 
         verify(
-          () => mockFoodsRepo.setNutritionCategoriesForDay(
-            date,
-            any(
-              that: predicate<Map<String, NutritionCategory>>(
-                (m) => m.containsKey("Breakfast") && m.containsKey("Lunch"),
-              ),
-            ),
-          ),
+          () => mockFoodsRepo.addNutritionCategory(date, catLunch),
         ).called(1);
         verify(() => mockCoordinator.scheduleBackup()).called(1);
       },
@@ -628,19 +647,12 @@ void main() {
       await pumpEventQueue();
 
       container.read(foodSelectedDateProvider.notifier).setDate(date);
-      container
+      await container
           .read(nutritionCategoryProvider.notifier)
           .removeCategory(catBreakfast);
 
       verify(
-        () => mockFoodsRepo.setNutritionCategoriesForDay(
-          date,
-          any(
-            that: predicate<Map<String, NutritionCategory>>(
-              (m) => !m.containsKey("Breakfast") && m.containsKey("Lunch"),
-            ),
-          ),
-        ),
+        () => mockFoodsRepo.removeNutritionCategory(date, "Breakfast"),
       ).called(1);
       verify(() => mockCoordinator.scheduleBackup()).called(1);
     });
@@ -659,20 +671,15 @@ void main() {
       );
 
       container.read(foodSelectedDateProvider.notifier).setDate(date);
-      container
+      await container
           .read(nutritionCategoryProvider.notifier)
           .updateCategory("Breakfast", updatedBreakfast);
 
       verify(
-        () => mockFoodsRepo.setNutritionCategoriesForDay(
+        () => mockFoodsRepo.updateNutritionCategory(
           date,
-          any(
-            that: predicate<Map<String, NutritionCategory>>(
-              (m) =>
-                  !m.containsKey("Breakfast") &&
-                  m["Morning Meal"] == updatedBreakfast,
-            ),
-          ),
+          "Breakfast",
+          updatedBreakfast,
         ),
       ).called(1);
       verify(() => mockCoordinator.scheduleBackup()).called(1);

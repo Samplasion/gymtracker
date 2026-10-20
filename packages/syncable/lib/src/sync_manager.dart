@@ -1,4 +1,8 @@
 import 'dart:async';
+import 'dart:convert';
+import 'dart:io' show SocketException;
+import 'dart:math';
+import 'sync_v2_store.dart';
 import 'package:collection/collection.dart';
 import 'package:drift/drift.dart';
 import 'package:logging/logging.dart';
@@ -13,6 +17,7 @@ import 'package:syncable/src/syncable_table.dart';
 class SyncManager<T extends SyncableDatabase> {
   SyncManager({
     required T localDatabase,
+    this.useProtocolV2 = false,
     required SupabaseClient supabaseClient,
     Duration syncInterval = const Duration(seconds: 1),
     int maxRows = 1000,
@@ -28,6 +33,18 @@ class SyncManager<T extends SyncableDatabase> {
           syncInterval.inMilliseconds > 0,
           'Sync interval must be positive',
         );
+
+  final bool useProtocolV2;
+  SyncResult? lastResult;
+  String? activeCycleId;
+  DateTime? _lastPull;
+  bool _foreground = true;
+  bool _v2Stopped = false;
+  void setForeground(bool value) {
+    if (_foreground == value) return;
+    _foreground = value;
+    if (value && _canRun) _backgroundSync(reconcile: true);
+  }
 
   final _logger = Logger('syncable');
 
@@ -189,6 +206,8 @@ class SyncManager<T extends SyncableDatabase> {
     _reconcileRequested = false;
     _consecutiveFailures = 0;
     _retryNotBefore = null;
+    _v2Stopped = false;
+    _lastPull = null;
   }
 
   /// Registers a syncable table with the sync manager.
@@ -270,7 +289,7 @@ class SyncManager<T extends SyncableDatabase> {
     if (!_canRun) return;
     final owner = userId;
     final generation = _generation;
-    for (final type in _syncables) {
+    for (final type in useProtocolV2 ? <Type>[] : _syncables) {
       _localSubscriptions[type] = _localDb.subscribe(
         table: _localTables[type]!,
         filter: (row) => row.userId.equals(owner),
@@ -294,7 +313,20 @@ class SyncManager<T extends SyncableDatabase> {
       return;
     final channel = _supabaseClient.channel('backend_changes_$generation');
     _backendSubscription = channel;
-    for (final type in _syncables) {
+    if (useProtocolV2) {
+      channel.onPostgresChanges(
+          schema: publicSchema,
+          table: 'sync_changes_v2',
+          event: PostgresChangeEvent.insert,
+          filter: PostgresChangeFilter(
+              type: PostgresChangeFilterType.eq,
+              column: userIdKey,
+              value: owner),
+          callback: (_) {
+            if (_current(generation, owner)) _backgroundSync(reconcile: true);
+          });
+    }
+    for (final type in useProtocolV2 ? <Type>[] : _syncables) {
       channel.onPostgresChanges(
         schema: publicSchema,
         table: _backendTables[type],
@@ -319,7 +351,7 @@ class SyncManager<T extends SyncableDatabase> {
   }
 
   void _backgroundSync({bool reconcile = false}) {
-    if (!_canRun) return;
+    if (!_canRun || !_foreground || _v2Stopped) return;
     final retryNotBefore = _retryNotBefore;
     if (retryNotBefore != null && DateTime.now().isBefore(retryNotBefore))
       return;
@@ -330,6 +362,7 @@ class SyncManager<T extends SyncableDatabase> {
 
   Future<void> _requestSync({required bool reconcile}) {
     if (!_canRun) return Future.value();
+    if (useProtocolV2) return _requestV2(reconcile);
     _reconcileRequested |= reconcile;
     if (_activeWork case final work?) return work;
     if (!_reconcileRequested && !isSyncingFromBackend && !isSyncingToBackend)
@@ -558,6 +591,402 @@ class SyncManager<T extends SyncableDatabase> {
     }
     queue.removeAll(snapshot);
     _nSyncedFromBackend[type] = nSyncedFromBackend(type) + latest.length;
+  }
+
+  Future<void> _requestV2(bool pull) {
+    _reconcileRequested |= pull;
+    if (_activeWork case final active?) return active;
+    final owner = userId;
+    final generation = _generation;
+    final completion = Completer<void>();
+    _activeWork = completion.future;
+    () async {
+      var started = false;
+      final cycle = '${DateTime.now().microsecondsSinceEpoch}-$generation';
+      try {
+        await _subscriptionCleanup;
+        final pending = await SyncV2Store.pending(_localDb, owner);
+        final needsPull = _reconcileRequested ||
+            _lastPull == null ||
+            DateTime.now().difference(_lastPull!) >= const Duration(minutes: 5);
+        if (!needsPull && pending == 0) return;
+        started = true;
+        activeCycleId = cycle;
+        onSyncStarted();
+        await SyncV2Store.seed(_localDb, owner);
+        if (!_current(generation, owner)) return;
+        final cursors = await _localDb.customSelect(
+            'SELECT * FROM sync_cursors WHERE owner=?',
+            variables: [Variable(owner)]).get();
+        final lastReconcile = cursors.isEmpty
+            ? null
+            : cursors.first.data['reconciled_at'] as int?;
+        final full = lastReconcile == null ||
+            DateTime.now().millisecondsSinceEpoch ~/ 1000 - lastReconcile >=
+                86400;
+        if (needsPull || full) {
+          _reconcileRequested = false;
+          await _pullV2(owner, generation, full: full);
+          _lastPull = DateTime.now();
+        }
+        await _pushV2(owner, generation);
+        if (!_current(generation, owner)) {
+          lastResult =
+              SyncResult(SyncOutcome.cancelled, userId: owner, cycleId: cycle);
+          return;
+        }
+        final remaining = await SyncV2Store.pending(_localDb, owner);
+        lastResult = SyncResult(
+            remaining == 0 ? SyncOutcome.completed : SyncOutcome.partial,
+            userId: owner,
+            cycleId: cycle,
+            pending: remaining);
+        _consecutiveFailures = 0;
+        _retryNotBefore = null;
+      } catch (e, st) {
+        _reconcileRequested = true;
+        _consecutiveFailures++;
+        final seconds = min(64, 1 << min(_consecutiveFailures - 1, 6));
+        _retryNotBefore = DateTime.now().add(
+            Duration(milliseconds: seconds * 1000 + Random().nextInt(500)));
+        lastResult = SyncResult(
+            e is TimeoutException
+                ? SyncOutcome.timeout
+                : e is SocketException
+                    ? SyncOutcome.offline
+                    : SyncOutcome.partial,
+            userId: owner,
+            cycleId: cycle,
+            error: e);
+        if ((e is PostgrestException &&
+                e.code != '503' &&
+                e.code != '504' &&
+                e.code != '57014') ||
+            e is FormatException) {
+          _v2Stopped = true;
+          await _localDb.customStatement(
+              'UPDATE sync_outbox SET error=? WHERE owner=? AND blocked=0',
+              [e is PostgrestException ? e.code : 'invalid_payload', owner]);
+        }
+        onSyncError(e, st);
+        completion.completeError(e, st);
+      } finally {
+        _activeWork = null;
+        if (started)
+          onSyncFinished(
+              success: lastResult?.userId == owner &&
+                  lastResult?.cycleId == cycle &&
+                  lastResult!.completed);
+        if (!completion.isCompleted) completion.complete();
+      }
+    }();
+    return completion.future;
+  }
+
+  Type _typeFor(String entity) =>
+      _backendTables.entries.singleWhere((e) => e.value == entity).key;
+
+  Future<void> _applyV2(
+      String owner, String entity, Map<String, dynamic> payload) async {
+    if (payload['user_id'] != owner) throw StateError('Unexpected sync owner');
+    final type = _typeFor(entity);
+    final table = _localTables[type]!;
+    final row = _fromJsons[type]!(payload);
+    final existing = await (_localDb.select(table)
+          ..where((r) => r.userId.equals(owner) & r.id.equals(row.id)))
+        .get();
+    if (existing.isEmpty) {
+      await _localDb.into(table).insert(row.toCompanion());
+    } else {
+      await (_localDb.update(table)
+            ..where((r) => r.userId.equals(owner) & r.id.equals(row.id)))
+          .write(row.toCompanion());
+    }
+  }
+
+  Future<void> _pullV2(String owner, int generation,
+      {required bool full}) async {
+    final saved = await _localDb.customSelect(
+        'SELECT * FROM sync_cursors WHERE owner=?',
+        variables: [Variable(owner)]).get();
+    var cursor = saved.isEmpty
+        ? 0
+        : saved.first.read<int>(full ? 'reconcile_cursor' : 'cursor');
+    int? horizon = full && saved.isNotEmpty
+        ? saved.first.data['reconcile_horizon'] as int?
+        : null;
+    do {
+      final response = Map<String, dynamic>.from(await _supabaseClient.rpc(
+              full ? 'sync_reconcile_v2' : 'sync_pull_v2',
+              params: {'cursor': cursor, 'horizon': horizon, 'page_limit': 500})
+          as Map);
+      if (!_current(generation, owner)) return;
+      horizon = (response['horizon'] as num).toInt();
+      final next = (response['cursor'] as num).toInt();
+      await SyncV2Store.receiving(_localDb, () async {
+        for (final raw in response['changes'] as List) {
+          if (!_current(generation, owner)) throw const _SyncInterrupted();
+          final change = Map<String, dynamic>.from(raw as Map);
+          final entity = change['entity'] as String;
+          final payload = Map<String, dynamic>.from(change['payload'] as Map);
+          if (payload['user_id'] != owner)
+            throw StateError('Unexpected sync owner');
+          final id = payload['id'].toString();
+          final revision = (change['revision'] as num).toInt();
+          final ops = await _localDb.customSelect(
+              'SELECT * FROM sync_outbox WHERE owner=? AND entity=? AND record_id=? ORDER BY sequence',
+              variables: [
+                Variable(owner),
+                Variable(entity),
+                Variable(id)
+              ]).get();
+          // Legacy bootstrap can prove equal data delivered, but never infer a
+          // deletion or overwrite a different unsent value from an old checkpoint.
+          if (ops.isNotEmpty) {
+            final type = _typeFor(entity);
+            final local = (await _localTables[type]!.map(
+                    jsonDecode(ops.last.read<String>('payload'))
+                        as Map<String, dynamic>))
+                .toJson();
+            final l = Map<String, dynamic>.from(local)..remove('updated_at');
+            final r = Map<String, dynamic>.from(payload)
+              ..remove('updated_at')
+              ..remove('revision');
+            if (const DeepCollectionEquality().equals(l, r) &&
+                ops.every((o) => o.read<int>('base_revision') == 0)) {
+              await _localDb.customStatement(
+                  'DELETE FROM sync_outbox WHERE owner=? AND entity=? AND record_id=? AND sequence<=?',
+                  [owner, entity, id, ops.last.read<int>('sequence')]);
+              await _applyV2(owner, entity, payload);
+              await _localDb.customStatement(
+                  'UPDATE sync_conflicts SET resolved=1 WHERE owner=? AND entity=? AND record_id=?',
+                  [owner, entity, id]);
+            }
+          } else {
+            await _applyV2(owner, entity, payload);
+          }
+          await SyncV2Store.remember(
+              _localDb, owner, entity, id, revision, payload);
+          await _localDb.customStatement(
+              'UPDATE sync_conflicts SET server_payload=?,server_revision=? WHERE owner=? AND entity=? AND record_id=? AND resolved=0 AND server_revision<=?',
+              [jsonEncode(payload), revision, owner, entity, id, revision]);
+        }
+        if (!_current(generation, owner)) throw const _SyncInterrupted();
+        if (full && response['has_more'] == true) {
+          await _localDb.customStatement(
+              'INSERT INTO sync_cursors(owner,reconcile_cursor,reconcile_horizon) VALUES(?,?,?) ON CONFLICT(owner) DO UPDATE SET reconcile_cursor=excluded.reconcile_cursor,reconcile_horizon=excluded.reconcile_horizon',
+              [owner, next, horizon]);
+        }
+        if (!full || response['has_more'] != true) {
+          await _localDb.customStatement(
+              'INSERT INTO sync_cursors(owner,cursor,bootstrapped,reconciled_at) VALUES(?,?,1,?) ON CONFLICT(owner) DO UPDATE SET cursor=excluded.cursor,bootstrapped=1,reconciled_at=COALESCE(excluded.reconciled_at,sync_cursors.reconciled_at),reconcile_cursor=0,reconcile_horizon=NULL',
+              [
+                owner,
+                full ? horizon : next,
+                full ? DateTime.now().millisecondsSinceEpoch ~/ 1000 : null
+              ]);
+        }
+      });
+      if (response['has_more'] != true) break;
+      if (next <= cursor) throw StateError('Sync cursor did not advance');
+      cursor = next;
+    } while (_current(generation, owner));
+  }
+
+  Future<void> _pushV2(String owner, int generation) async {
+    while (_current(generation, owner)) {
+      final ops = await _localDb.customSelect(
+          "SELECT o.* FROM sync_outbox o WHERE owner=? AND blocked=0 AND error IS NULL AND NOT EXISTS(SELECT 1 FROM sync_outbox p WHERE p.owner=o.owner AND p.entity=o.entity AND p.record_id=o.record_id AND p.sequence<o.sequence) ORDER BY sequence LIMIT 100",
+          variables: [Variable(owner)]).get();
+      if (ops.isEmpty) return;
+      final batch = <Map<String, dynamic>>[];
+      for (final op in ops) {
+        final entity = op.read<String>('entity');
+        final payload = (await _localTables[_typeFor(entity)]!.map(
+                jsonDecode(op.read<String>('payload')) as Map<String, dynamic>))
+            .toJson();
+        batch.add({
+          'operation_id': op.read<String>('operation_id'),
+          'entity': entity,
+          'record_id': op.read<String>('record_id'),
+          'base_revision': op.read<int>('base_revision'),
+          'payload': payload
+        });
+        await _localDb.customStatement(
+            'UPDATE sync_outbox SET attempts=attempts+1 WHERE sequence=?',
+            [op.read<int>('sequence')]);
+      }
+      final receipts = await _supabaseClient
+          .rpc('sync_push_v2', params: {'operations': batch}) as List;
+      if (!_current(generation, owner)) return;
+      if (receipts.length != ops.length)
+        throw StateError('Missing sync receipts');
+      await SyncV2Store.receiving(_localDb, () async {
+        for (final raw in receipts) {
+          final receipt = Map<String, dynamic>.from(raw as Map);
+          final op = ops.singleWhere(
+              (o) => o.read<String>('operation_id') == receipt['operation_id']);
+          final entity = op.read<String>('entity');
+          final id = op.read<String>('record_id');
+          final payload = Map<String, dynamic>.from(receipt['payload'] as Map);
+          final revision = (receipt['revision'] as num).toInt();
+          if (receipt['status'] == 'conflict') {
+            await _localDb.customStatement(
+                'INSERT OR REPLACE INTO sync_conflicts(operation_id,owner,entity,record_id,local_payload,server_payload,server_revision,resolved) VALUES(?,?,?,?,?,?,?,0)',
+                [
+                  op.read<String>('operation_id'),
+                  owner,
+                  entity,
+                  id,
+                  jsonEncode(batch.singleWhere((b) =>
+                      b['operation_id'] == receipt['operation_id'])['payload']),
+                  jsonEncode(payload),
+                  revision
+                ]);
+            await _localDb.customStatement(
+                'UPDATE sync_outbox SET blocked=1 WHERE owner=? AND entity=? AND record_id=?',
+                [owner, entity, id]);
+          } else if (receipt['status'] == 'applied') {
+            await SyncV2Store.remember(
+                _localDb, owner, entity, id, revision, payload);
+            await _localDb.customStatement(
+                'DELETE FROM sync_outbox WHERE sequence=? AND owner=?',
+                [op.read<int>('sequence'), owner]);
+            await _localDb.customStatement(
+                'UPDATE sync_outbox SET base_revision=? WHERE owner=? AND entity=? AND record_id=?',
+                [revision, owner, entity, id]);
+            final remaining = await _localDb.customSelect(
+                'SELECT 1 FROM sync_outbox WHERE owner=? AND entity=? AND record_id=? LIMIT 1',
+                variables: [
+                  Variable(owner),
+                  Variable(entity),
+                  Variable(id)
+                ]).get();
+            if (remaining.isEmpty) await _applyV2(owner, entity, payload);
+          } else if (receipt['status'] == 'error') {
+            await _localDb.customStatement(
+                'UPDATE sync_outbox SET error=? WHERE sequence=? AND owner=?', [
+              receipt['code']?.toString() ?? 'invalid_payload',
+              op.read<int>('sequence'),
+              owner
+            ]);
+          } else {
+            throw StateError('Unexpected sync receipt');
+          }
+        }
+        if (!_current(generation, owner)) throw const _SyncInterrupted();
+      });
+    }
+  }
+
+  Future<void> retryPending() async {
+    await _localDb.customStatement(
+        'UPDATE sync_outbox SET error=NULL WHERE owner=? AND blocked=0',
+        [userId]);
+    _retryNotBefore = null;
+    _v2Stopped = false;
+    await syncTables();
+  }
+
+  Future<void> resolveConflict(String operationId,
+      {required bool useLocal}) async {
+    final owner = userId;
+    await runPaused(() async {
+      await SyncV2Store.receiving(_localDb, () async {
+        final c = await _localDb.customSelect(
+            'SELECT * FROM sync_conflicts WHERE operation_id=? AND owner=? AND resolved=0',
+            variables: [Variable(operationId), Variable(owner)]).getSingle();
+        final entity = c.read<String>('entity');
+        final id = c.read<String>('record_id');
+        final pending = await _localDb.customSelect(
+            'SELECT * FROM sync_outbox WHERE owner=? AND entity=? AND record_id=? ORDER BY sequence DESC LIMIT 1',
+            variables: [Variable(owner), Variable(entity), Variable(id)]).get();
+        final metadata = await _localDb.customSelect(
+            'SELECT * FROM sync_metadata WHERE owner=? AND entity=? AND record_id=?',
+            variables: [Variable(owner), Variable(entity), Variable(id)]).get();
+        final newest = metadata.isNotEmpty &&
+            metadata.single.read<int>('revision') >=
+                c.read<int>('server_revision');
+        final server = Map<String, dynamic>.from(jsonDecode(newest
+            ? metadata.single.read<String>('payload')
+            : c.read<String>('server_payload')) as Map);
+        final revision = newest
+            ? metadata.single.read<int>('revision')
+            : c.read<int>('server_revision');
+        if (pending.isNotEmpty) {
+          final latest = (await _localTables[_typeFor(entity)]!.map(
+                  jsonDecode(pending.first.read<String>('payload'))
+                      as Map<String, dynamic>))
+              .toJson();
+          await _localDb.customStatement(
+              'UPDATE sync_conflicts SET local_payload=? WHERE operation_id=? AND owner=?',
+              [jsonEncode(latest), operationId, owner]);
+        }
+        await _localDb.customStatement(
+            'DELETE FROM sync_outbox WHERE owner=? AND entity=? AND record_id=?',
+            [owner, entity, id]);
+        await SyncV2Store.remember(
+            _localDb, owner, entity, id, revision, server);
+        if (useLocal && pending.isNotEmpty) {
+          await _localDb.customStatement(
+              'INSERT INTO sync_outbox(operation_id,owner,entity,record_id,base_revision,payload) VALUES(lower(hex(randomblob(16))),?,?,?,?,?)',
+              [
+                owner,
+                entity,
+                id,
+                revision,
+                pending.first.read<String>('payload')
+              ]);
+          final local = (await _localTables[_typeFor(entity)]!.map(
+                  jsonDecode(pending.first.read<String>('payload'))
+                      as Map<String, dynamic>))
+              .toJson();
+          await _applyV2(owner, entity, local);
+        } else if (server.isNotEmpty) {
+          await _applyV2(owner, entity, server);
+        }
+        await _localDb.customStatement(
+            'UPDATE sync_conflicts SET resolved=1 WHERE owner=? AND entity=? AND record_id=?',
+            [owner, entity, id]);
+      });
+    });
+  }
+
+  Future<void> restoreConflictVersion(String operationId,
+      {required bool useLocal}) async {
+    final owner = userId;
+    await runPaused(() async {
+      await _localDb.transaction(() async {
+        final saved = await _localDb.customSelect(
+            'SELECT * FROM sync_conflicts WHERE operation_id=? AND owner=?',
+            variables: [Variable(operationId), Variable(owner)]).getSingle();
+        final entity = saved.read<String>('entity');
+        final id = saved.read<String>('record_id');
+        final table = _localTables[_typeFor(entity)]!;
+        final column = table.asDslTable.id.name;
+        final payload = Map<String, dynamic>.from(jsonDecode(saved.read<String>(
+            useLocal ? 'local_payload' : 'server_payload')) as Map);
+        if (payload['user_id'] != owner)
+          throw StateError('Unexpected recovery owner');
+        final current = await _localDb.customSelect(
+            'SELECT * FROM "${table.actualTableName}" WHERE user_id=? AND "$column"=?',
+            variables: [Variable(owner), Variable(id)]).get();
+        for (final row in current) {
+          await _localDb.customStatement(
+              'INSERT INTO sync_quarantine(owner,entity,payload,reason) VALUES(?,?,?,?)',
+              [
+                owner,
+                entity,
+                jsonEncode(row.data),
+                'Value before restoring a conflict version'
+              ]);
+        }
+        await _applyV2(owner, entity, {
+          ...payload,
+          'updated_at': DateTime.now().toUtc().toIso8601String()
+        });
+      });
+    });
   }
 
   Future<void> _setTimestamp(

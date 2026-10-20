@@ -5,6 +5,14 @@ from pub.dev. Original archive SHA-256:
 `f7764d31f3422445625e75981a8431fd650b8c651522a566569f19d61a39fad7`.
 The upstream LICENSE is retained. This package is private and resolved by path.
 
+## Durable protocol v2
+
+The application explicitly enables `useProtocolV2`. Missing RPCs stop synchronization safely; there is no automatic legacy fallback. `SyncV2Store` installs transactional SQLite capture triggers; local writes persist immutable operation snapshots alongside business data. Remote applications suppress those triggers. Pure timestamp updates do not generate deliveries.
+
+The v2 worker uses authenticated push/pull/reconciliation RPCs with server revisions, idempotent receipts and persistent cursors (including partially downloaded reconciliation snapshots). Failed operations remain durable. Conflicts block only their record, preserve alternatives and can be resolved explicitly against the newest confirmed revision. Validation failures remain visible and retriable; editing a failed record preserves its rejected snapshot before creating a replacement operation. Tombstones and receipts are not automatically expired.
+
+Legacy timestamp behavior described below is retained for compatibility tests, not for rollback after v2 activation. The database lifecycle, account barriers and generation checks remain shared by both protocols. See the application-level `SYNC_V2.md` for rollout, diagnostic exports and incident limitations.
+
 ## Lifecycle contract
 
 - One worker handles reconciliation, incoming writes and outgoing uploads.

@@ -21,6 +21,7 @@ import 'package:gymtracker/db/model/tables/ongoing.dart';
 import 'package:gymtracker/db/model/tables/preferences.dart';
 import 'package:gymtracker/db/model/tables/routines.dart';
 import 'package:gymtracker/db/model/tables/set.dart';
+import 'package:gymtracker/db/model/tables/sync.dart';
 import 'package:gymtracker/db/schema_versions.dart';
 import 'package:gymtracker/db/utils.dart';
 import 'package:gymtracker/model/achievements.dart';
@@ -57,7 +58,7 @@ part 'database.g.dart';
 // Used in the generated code
 const _uuid = Uuid();
 
-const DATABASE_VERSION = 19;
+const DATABASE_VERSION = 20;
 
 abstract class GTDatabase extends GeneratedDatabase with SyncableDatabase {
   GTDatabase(super.e);
@@ -131,6 +132,10 @@ abstract class GTDatabase extends GeneratedDatabase with SyncableDatabase {
   Future<void> deleteNutritionGoal(DateTime date);
   Future<void> updateNutritionGoal(model.TaggedNutritionGoal goal);
   Future<void> setNutritionGoals(List<model.TaggedNutritionGoal> goals);
+  Future<void> setNutritionCategoriesForDay(
+    DateTime date,
+    Map<String, model.NutritionCategory> categories,
+  );
 
   Stream<Map<String, model.Food>> watchCustomBarcodeFoods();
   Future<void> insertCustomBarcodeFood(String barcode, model.Food food);
@@ -144,6 +149,11 @@ abstract class GTDatabase extends GeneratedDatabase with SyncableDatabase {
 
   Stream<Map<DateTime, Map<String, model.NutritionCategory>>>
   watchNutritionCategories();
+  Future<void> mutateNutritionCategory(
+    DateTime date, {
+    model.NutritionCategory? category,
+    String? oldName,
+  });
   Future<void> deleteNutritionCategories(DateTime date);
   Future<void> setNutritionCategories(
     Map<DateTime, Map<String, model.NutritionCategory>> categories,
@@ -191,6 +201,12 @@ abstract class GTDatabase extends GeneratedDatabase with SyncableDatabase {
     FavoriteFoods,
     NutritionCategories,
     Achievements,
+    SyncOutbox,
+    SyncMetadata,
+    SyncCursors,
+    SyncConflicts,
+    SyncContext,
+    SyncQuarantine,
   ],
 )
 class GTDatabaseImpl extends _$GTDatabaseImpl
@@ -216,6 +232,7 @@ class GTDatabaseImpl extends _$GTDatabaseImpl
       );
     },
     onUpgrade: (m, from, to) async {
+      if (from > to) throw StateError('Database is newer than this app');
       // Run migration steps without foreign keys and re-enable them later
       // (https://drift.simonbinder.eu/docs/advanced-features/migrations/#tips)
       // await customStatement('PRAGMA foreign_keys = OFF');
@@ -528,6 +545,14 @@ class GTDatabaseImpl extends _$GTDatabaseImpl
               schema.historyWorkoutExercises.progression,
             );
           },
+          from19To20: (m, schema) async {
+            await m.createTable(schema.syncOutbox);
+            await m.createTable(schema.syncMetadata);
+            await m.createTable(schema.syncCursors);
+            await m.createTable(schema.syncConflicts);
+            await m.createTable(schema.syncContext);
+            await m.createTable(schema.syncQuarantine);
+          },
           from16To17: (m, schema) async {
             await m.addColumn(
               schema.routineFolders,
@@ -548,6 +573,7 @@ class GTDatabaseImpl extends _$GTDatabaseImpl
       // await customStatement('PRAGMA foreign_keys = ON;');
     },
     beforeOpen: (details) async {
+      await SyncV2Store.install(this);
       final nutritionGoalCount = await (select(nutritionGoals)).get();
       if (nutritionGoalCount.isEmpty) {
         await into(nutritionGoals).insert(
@@ -615,12 +641,12 @@ class GTDatabaseImpl extends _$GTDatabaseImpl
   }
 
   /// Returns a filter expression for a `userId` column:
-  /// - logged in  -> `userId IS NULL OR userId = currentUserId`
+  /// - logged in  -> `userId = currentUserId`
   /// - logged out -> `userId IS NULL`
   Expression<bool> _userIdPredicate(GeneratedColumn<String> col) {
     final uid = _currentUserId;
     if (uid != null) {
-      return col.isNull() | col.equals(uid);
+      return col.equals(uid);
     }
     return col.isNull();
   }
@@ -1662,11 +1688,19 @@ class GTDatabaseImpl extends _$GTDatabaseImpl
       )..where((tbl) => _ownedBy(tbl.userId, userId))).get();
       final existingById = {for (final row in existing) row.id: row};
       final now = DateTime.now().toUtc();
-      await (update(
-        this.foods,
-      )..where((tbl) => _ownedBy(tbl.userId, userId))).write(
-        FoodsCompanion(deleted: const Value(true), updatedAt: Value(now)),
-      );
+      final retained = foods
+          .map((f) => f.value.id)
+          .whereType<String>()
+          .toList();
+      await (update(this.foods)..where(
+            (tbl) =>
+                _ownedBy(tbl.userId, userId) &
+                tbl.id.isNotIn(retained) &
+                tbl.deleted.equals(false),
+          ))
+          .write(
+            FoodsCompanion(deleted: const Value(true), updatedAt: Value(now)),
+          );
       for (final food in foods) {
         final insertable = food.toInsertable(
           generateInsertionDate: false,
@@ -1720,24 +1754,51 @@ class GTDatabaseImpl extends _$GTDatabaseImpl
   }
 
   @override
-  Future<void> updateNutritionGoal(model.TaggedNutritionGoal goal) async {
-    final userId = currentUserId;
-    await update(nutritionGoals).replace(goal.toInsertable(userId: userId));
-  }
+  Future<void> updateNutritionGoal(model.TaggedNutritionGoal goal) =>
+      transaction(() async {
+        final user = currentUserId;
+        final value = goal.toInsertable(userId: user);
+        final existing =
+            await (select(nutritionGoals)..where(
+                  (t) => _ownedBy(t.userId, user) & t.id.equals(value.id.value),
+                ))
+                .get();
+        if (existing.isEmpty) {
+          await into(nutritionGoals).insert(value);
+        } else {
+          await (update(nutritionGoals)..where(
+                (t) => _ownedBy(t.userId, user) & t.id.equals(value.id.value),
+              ))
+              .write(value);
+        }
+      });
 
   @override
   Future<void> setNutritionGoals(List<model.TaggedNutritionGoal> goals) {
     final userId = currentUserId;
     return transaction(() async {
       final now = DateTime.now().toUtc();
-      await (update(
-        nutritionGoals,
-      )..where((tbl) => _ownedBy(tbl.userId, userId))).write(
-        NutritionGoalsCompanion(
-          deleted: const Value(true),
-          updatedAt: Value(now),
-        ),
-      );
+      final retained = goals
+          .map(
+            (g) => DateTime.utc(
+              g.date.year,
+              g.date.month,
+              g.date.day,
+            ).toIso8601String(),
+          )
+          .toList();
+      await (update(nutritionGoals)..where(
+            (tbl) =>
+                _ownedBy(tbl.userId, userId) &
+                tbl.id.isNotIn(retained) &
+                tbl.deleted.equals(false),
+          ))
+          .write(
+            NutritionGoalsCompanion(
+              deleted: const Value(true),
+              updatedAt: Value(now),
+            ),
+          );
       await batch((batch) {
         for (final goal in goals) {
           batch.insert(
@@ -1944,20 +2005,100 @@ class GTDatabaseImpl extends _$GTDatabaseImpl
   }
 
   @override
+  Future<void> setNutritionCategoriesForDay(
+    DateTime date,
+    Map<String, model.NutritionCategory> categories,
+  ) => transaction(() async {
+    final day = DateTime.utc(date.year, date.month, date.day);
+    final owner = currentUserId;
+    final value = NutritionCategoriesCompanion(
+      id: Value(day.toIso8601String()),
+      referenceDate: Value(day),
+      jsonData: Value(
+        jsonEncode(categories.values.map((c) => c.toJson()).toList()),
+      ),
+      userId: Value(owner),
+      updatedAt: Value(DateTime.now().toUtc()),
+      deleted: const Value(false),
+    );
+    final existing =
+        await (select(nutritionCategories)..where(
+              (t) =>
+                  _ownedBy(t.userId, owner) &
+                  t.id.equals(day.toIso8601String()),
+            ))
+            .get();
+    if (existing.isEmpty) {
+      await into(nutritionCategories).insert(value);
+    } else {
+      await (update(nutritionCategories)..where(
+            (t) =>
+                _ownedBy(t.userId, owner) & t.id.equals(day.toIso8601String()),
+          ))
+          .write(value);
+    }
+  });
+
+  @override
+  Future<void> mutateNutritionCategory(
+    DateTime date, {
+    model.NutritionCategory? category,
+    String? oldName,
+  }) => transaction(() async {
+    final day = DateTime.utc(date.year, date.month, date.day);
+    final previous =
+        await (select(nutritionCategories)
+              ..where(
+                (t) =>
+                    _ownedBy(t.userId, currentUserId) &
+                    t.deleted.equals(false) &
+                    t.referenceDate.isSmallerOrEqualValue(day),
+              )
+              ..orderBy([(t) => OrderingTerm.desc(t.referenceDate)])
+              ..limit(1))
+            .getSingleOrNull();
+    final map = <String, model.NutritionCategory>{};
+    if (previous != null) {
+      for (final raw in jsonDecode(previous.jsonData) as List) {
+        final c = model.NutritionCategory.fromJson(raw);
+        map[c.name] = c;
+      }
+    }
+    if (oldName != null) {
+      if (!map.containsKey(oldName))
+        throw StateError('Category no longer exists');
+      map.remove(oldName);
+    }
+    if (category != null) {
+      if (map.containsKey(category.name))
+        throw StateError('Category already exists');
+      map[category.name] = category;
+    }
+    await setNutritionCategoriesForDay(day, map);
+  });
+
+  @override
   Future<void> setNutritionCategories(
     Map<DateTime, Map<String, model.NutritionCategory>> categories,
   ) {
     final userId = currentUserId;
     return transaction(() async {
       final now = DateTime.now().toUtc();
-      await (update(
-        nutritionCategories,
-      )..where((tbl) => _ownedBy(tbl.userId, userId))).write(
-        NutritionCategoriesCompanion(
-          deleted: const Value(true),
-          updatedAt: Value(now),
-        ),
-      );
+      final retained = categories.keys
+          .map((d) => DateTime.utc(d.year, d.month, d.day).toIso8601String())
+          .toList();
+      await (update(nutritionCategories)..where(
+            (tbl) =>
+                _ownedBy(tbl.userId, userId) &
+                tbl.id.isNotIn(retained) &
+                tbl.deleted.equals(false),
+          ))
+          .write(
+            NutritionCategoriesCompanion(
+              deleted: const Value(true),
+              updatedAt: Value(now),
+            ),
+          );
       await batch((batch) {
         for (final entry in categories.entries) {
           final utcDate = DateTime.utc(
@@ -2173,6 +2314,15 @@ class GTDatabaseImpl extends _$GTDatabaseImpl
   Future<void> clearUserData(String? userId) {
     return transaction(() async {
       await deleteOngoingForUser(userId);
+      for (final name in [
+        'sync_outbox',
+        'sync_metadata',
+        'sync_cursors',
+        'sync_conflicts',
+        'sync_quarantine',
+      ]) {
+        await customStatement('DELETE FROM "$name" WHERE owner IS ?', [userId]);
+      }
       for (final table in allTables) {
         final dsl = table.asDslTable;
         if (dsl is SyncableTable) {
@@ -2187,9 +2337,11 @@ class GTDatabaseImpl extends _$GTDatabaseImpl
 
   @override
   Future clearTheWholeThingIAmAbsolutelySureISwear() async {
-    for (var table in allTables) {
-      await table.deleteAll();
-    }
+    await SyncV2Store.receiving(this, () async {
+      for (var table in allTables) {
+        if (table.actualTableName != 'sync_context') await table.deleteAll();
+      }
+    });
   }
 
   @override

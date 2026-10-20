@@ -59,8 +59,6 @@
 	<string>We access your heart rate and burned calories to save workouts in your Health history.</string>
 	<key>NSHealthUpdateUsageDescription</key>
 	<string>We access your heart rate and burned calories to save workouts in your Health history.</string>
-	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>We access your location to provide you with In-App Purchase data.</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>We use the camera to enable you to scan barcodes for product identification.</string>
 	<key>NSPhotoLibraryUsageDescription</key>

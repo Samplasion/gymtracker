@@ -187,14 +187,7 @@ class _WorkoutViewState extends State<WorkoutView> {
   }
 
   Widget _buildListView() {
-    return ListView(
-      padding:
-          const EdgeInsets.symmetric(vertical: 8) +
-          EdgeInsets.only(
-            bottom:
-                MediaQuery.of(context).viewInsets.bottom +
-                MediaQuery.of(context).padding.bottom,
-          ),
+    return WorkoutListView(
       children: [
         if (_controller != null &&
             Workout.shouldShowAsInfobox(
@@ -278,6 +271,27 @@ class _WorkoutViewState extends State<WorkoutView> {
             ),
           ),
       ],
+    );
+  }
+}
+
+/// Keeps keyboard metrics out of the workout and exercise build contexts.
+class WorkoutListView extends StatelessWidget {
+  const WorkoutListView({super.key, required this.children});
+
+  final List<Widget> children;
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView(
+      padding:
+          const EdgeInsets.symmetric(vertical: 8) +
+          EdgeInsets.only(
+            bottom:
+                MediaQuery.viewInsetsOf(context).bottom +
+                MediaQuery.paddingOf(context).bottom,
+          ),
+      children: children,
     );
   }
 }

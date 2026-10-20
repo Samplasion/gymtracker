@@ -11,7 +11,6 @@ import 'package:gymtracker/i18n/strings.g.dart';
 import 'package:gymtracker/icons/gymtracker_icons.dart';
 import 'package:gymtracker/model/exercise.dart';
 import 'package:gymtracker/model/set.dart';
-import 'package:gymtracker/service/logger.dart';
 import 'package:gymtracker/struct/editor_callback.dart';
 import 'package:gymtracker/struct/optional.dart';
 import 'package:gymtracker/utils/extensions.dart';
@@ -436,6 +435,7 @@ class _WorkoutExerciseSetEditorState extends State<WorkoutExerciseSetEditor> {
   final _distanceFocusNode = FocusNode();
 
   StreamSubscription? subscription;
+  late GTSet _lastSyncedSet = widget.set;
 
   @override
   void initState() {
@@ -446,68 +446,68 @@ class _WorkoutExerciseSetEditorState extends State<WorkoutExerciseSetEditor> {
     if (!Get.isRegistered<WorkoutController>()) return;
     // Update data if a different actor edits it (such as a paired Apple Watch)
     subscription = Get.find<WorkoutController>().exercises.listen((exs) {
-      logger.i(
-        "[${widget.index} -> ${widget.setIndex}] Refreshing because of exercise update",
-      );
-      // if (Get.isRegistered<WorkoutController>()) {
-      //   logger.w(
-      //       "Called subscription listener, but WorkoutController has been discarded. Check for leaks.");
-      //   subscription?.cancel();
-      //   return;
-      // }
       final newExercise = exs.exerciseAt(widget.index);
       if (newExercise == null) return;
       if (newExercise.sets.length <= widget.setIndex) return;
       final newSet = newExercise.sets[widget.setIndex];
-      if (!_weightFocusNode.hasFocus && newSet.weight != null) {
-        weightController.text = stringifyDouble(newSet.weight ?? 0);
-      }
-      if (!_timeFocusNode.hasFocus && newSet.time != null) {
-        timeController.text = TimeInputField.encodeDuration(newSet.time!);
-      }
-      if (!_repsFocusNode.hasFocus && newSet.reps != null) {
-        repsController.text = newSet.reps.toString();
-      }
-      if (!_distanceFocusNode.hasFocus && newSet.distance != null) {
-        distanceController.text = stringifyDouble(newSet.distance ?? 0);
-      }
-      if (!mounted) {
-        logger.w(
-          "[${widget.index} -> ${widget.setIndex}] Called subscription listener, but state is not mounted. Check for leaks.",
-        );
-        return;
-      }
-      setState(() {});
+      if (!mounted || identical(newSet, _lastSyncedSet)) return;
+      _syncControllers(newSet);
     });
   }
 
   @override
   void dispose() {
-    logger.i(
-      "[${widget.index} -> ${widget.setIndex}] Canceling subscription: $subscription",
-    );
     subscription?.cancel();
+    weightController.dispose();
+    timeController.dispose();
+    repsController.dispose();
+    distanceController.dispose();
     _weightFocusNode.dispose();
+    _timeFocusNode.dispose();
+    _repsFocusNode.dispose();
+    _distanceFocusNode.dispose();
     super.dispose();
   }
 
   @override
   void didUpdateWidget(WorkoutExerciseSetEditor oldWidget) {
     super.didUpdateWidget(oldWidget);
-    // If the set has changed, update the controllers
-    if (oldWidget.set != widget.set) {
-      if (!_weightFocusNode.hasFocus && widget.set.weight != null) {
-        weightController.text = stringifyDouble(widget.set.weight ?? 0);
+    if (!identical(_lastSyncedSet, widget.set)) {
+      _syncControllers(widget.set);
+    }
+  }
+
+  void _syncControllers(GTSet set) {
+    _lastSyncedSet = set;
+    void update(
+      TextEditingController controller,
+      FocusNode focus,
+      String text,
+    ) {
+      if (!focus.hasFocus && controller.text != text) {
+        controller.text = text;
       }
-      if (!_timeFocusNode.hasFocus && widget.set.time != null) {
-        timeController.text = TimeInputField.encodeDuration(widget.set.time!);
-      }
-      if (!_repsFocusNode.hasFocus && widget.set.reps != null) {
-        repsController.text = widget.set.reps.toString();
-      }
-      if (!_distanceFocusNode.hasFocus && widget.set.distance != null) {
-        distanceController.text = stringifyDouble(widget.set.distance ?? 0);
-      }
+    }
+
+    if (set.weight != null) {
+      update(weightController, _weightFocusNode, stringifyDouble(set.weight!));
+    }
+    if (set.time != null) {
+      update(
+        timeController,
+        _timeFocusNode,
+        TimeInputField.encodeDuration(set.time!),
+      );
+    }
+    if (set.reps != null) {
+      update(repsController, _repsFocusNode, set.reps.toString());
+    }
+    if (set.distance != null) {
+      update(
+        distanceController,
+        _distanceFocusNode,
+        stringifyDouble(set.distance!),
+      );
     }
   }
 

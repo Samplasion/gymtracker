@@ -219,9 +219,9 @@ class _MainAppState extends State<MainApp> with LoggerConfigurationMixin {
                     }[switch (settings.themeMode()) {
                       ThemeMode.light => Brightness.light,
                       ThemeMode.dark => Brightness.dark,
-                      ThemeMode.system => MediaQuery.of(
+                      ThemeMode.system => MediaQuery.platformBrightnessOf(
                         context,
-                      ).platformBrightness,
+                      ),
                     }]);
                 final seedColor = settings.usesDynamicColor()
                     ? platformSeedColor ?? settings.color()

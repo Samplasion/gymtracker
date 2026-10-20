@@ -27,8 +27,8 @@ import 'package:gymtracker/model/set.dart';
 import 'package:gymtracker/model/superset.dart';
 import 'package:gymtracker/model/workout.dart';
 import 'package:gymtracker/provider/locale.dart';
-import 'package:gymtracker/service/logger.dart';
 import 'package:gymtracker/service/database.dart';
+import 'package:gymtracker/service/logger.dart';
 import 'package:gymtracker/service/native.dart';
 import 'package:gymtracker/struct/editor_callback.dart';
 import 'package:gymtracker/struct/optional.dart';
@@ -54,6 +54,8 @@ typedef WorkoutSetCursor = ({
 
 class WorkoutController extends GetxController with ServiceableController {
   Future<void> _progressionWrite = Future.value();
+  Timer? _pendingInputSave;
+  AppLifecycleListener? _inputSaveLifecycle;
   final String? ownerId;
   bool preserveOngoingOnClose = false;
   RxString name;
@@ -575,8 +577,12 @@ class WorkoutController extends GetxController with ServiceableController {
         );
       }
 
-      exercises.refresh();
-      save();
+      // RxList's indexed assignment has already notified listeners.
+      _pendingInputSave?.cancel();
+      _pendingInputSave = Timer(const Duration(milliseconds: 250), () {
+        _pendingInputSave = null;
+        save();
+      });
     },
     onExerciseNotesChange: (index, notes) {
       final (exerciseIndex: exerciseIndex, supersetIndex: supersetIndex) =
@@ -658,6 +664,13 @@ class WorkoutController extends GetxController with ServiceableController {
   @override
   void onInit() {
     super.onInit();
+    _inputSaveLifecycle = AppLifecycleListener(
+      onStateChange: (state) {
+        if (state != AppLifecycleState.resumed && _pendingInputSave != null) {
+          save();
+        }
+      },
+    );
     SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
       if (isClosed || ownerId != service.db.currentUserId) return;
       Get.find<RoutinesController>().hasOngoingWorkout(true);
@@ -670,6 +683,8 @@ class WorkoutController extends GetxController with ServiceableController {
 
   @override
   void onClose() {
+    _pendingInputSave?.cancel();
+    _inputSaveLifecycle?.dispose();
     super.onClose();
     removeCountdown();
     removeRelevantStopwatches();
@@ -687,6 +702,8 @@ class WorkoutController extends GetxController with ServiceableController {
   void save() => unawaited(persist());
 
   Future<void> persist({bool force = false}) async {
+    _pendingInputSave?.cancel();
+    _pendingInputSave = null;
     if (isClosed || ownerId != service.db.currentUserId) return;
     // TODO: Figure out if this is still necessary
     if (!force && Get.find<RoutinesController>().hasOngoingWorkout.isFalse) {

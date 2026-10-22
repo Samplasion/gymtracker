@@ -166,6 +166,15 @@ class PurchasesController {
     return purchasesService.canPresentNativePaywall();
   }
 
+  Future<void> presentNativePaywall() async {
+    final epoch = _authEpoch;
+    final userID = onlineService.account?.id;
+    await _authWork;
+    if (!_isCurrent(epoch, userID) || !_isBoundTo(userID)) return;
+    await purchasesService.presentPaywall();
+    if (_isCurrent(epoch, userID)) _refreshSubscription();
+  }
+
   Future<SubscriptionInfo> getSubscriptionInfo() => _readSubscription();
 
   SubscriptionInfo _mapEntitlementToSubscriptionInfo(
@@ -299,8 +308,13 @@ class PurchasesController {
     await _subscriptionInfo$.close();
   }
 
-  Future<void> presentCustomerCenter() {
-    return purchasesService.presentCustomerCenter();
+  Future<void> presentCustomerCenter() async {
+    final epoch = _authEpoch;
+    final userID = onlineService.account?.id;
+    await _authWork;
+    if (!_isCurrent(epoch, userID) || !_isBoundTo(userID)) return;
+    await purchasesService.presentCustomerCenter();
+    if (_isCurrent(epoch, userID)) _refreshSubscription();
   }
 }
 

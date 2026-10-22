@@ -598,6 +598,40 @@ void main() {
       await paywall;
       verify(() => service.presentPaywall()).called(1);
     });
+    test(
+      'customer center waits for login and ignores completion after account switch',
+      () async {
+        final login = Completer<void>();
+        final center = Completer<void>();
+        when(() => service.login('A')).thenAnswer((_) => login.future);
+        when(
+          () => service.presentCustomerCenter(),
+        ).thenAnswer((_) => center.future);
+        final bus = MockServices.container.read(eventBusProvider);
+        final a = OnlineAccount(id: 'A', name: 'A');
+        when(() => online.account).thenReturn(a);
+        bus.emit(GBUserDidLoginEvent(a));
+        await _flush();
+        final presentation = c.presentCustomerCenter();
+        await _flush();
+        verifyNever(() => service.presentCustomerCenter());
+        login.complete();
+        await _flush();
+        verify(() => service.presentCustomerCenter()).called(1);
+        final b = OnlineAccount(id: 'B', name: 'B');
+        when(() => online.account).thenReturn(b);
+        when(() => service.getCustomerInfo()).thenAnswer((_) async => null);
+        bus.emit(GBUserDidLoginEvent(b));
+        await _flush();
+        clearInteractions(service);
+        center.complete();
+        await presentation;
+        await _flush();
+        verifyNever(() => service.getCustomerInfo());
+        expect(c.subscriptionInfo.userID, 'B');
+        expect(c.subscriptionInfo.isPro, isFalse);
+      },
+    );
     test('maps entitlement active trial and expiration flags', () async {
       final info = await c.getSubscriptionInfo();
       expect(info.isPro, isTrue);

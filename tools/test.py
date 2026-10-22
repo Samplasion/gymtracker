@@ -9,10 +9,15 @@ import sys
 import json
 import os
 import re
+import subprocess
 
 GROUP_COUNT = 3
 
 cwd = os.getcwd()
+flutter_executable = os.path.join(cwd, '.fvm', 'flutter_sdk', 'bin', 'flutter.bat' if os.name == 'nt' else 'flutter')
+if not os.path.isfile(flutter_executable):
+  flutter_executable = 'flutter'
+
 
 with open(f'{cwd}/integration_test/app_test.dart', 'r') as f:
   text = f.read()
@@ -29,7 +34,7 @@ def run_group(group):
   print(f'Running {len(group)} tests')
   for test in group:
     print(f'Running {test}')
-    os.system(f'flutter test integration_test -d macos --plain-name="{test}"')
+    subprocess.run([flutter_executable, 'test', 'integration_test/app_test.dart', '-d', 'macos', f'--plain-name={test}'], check=True)
 
 def main():
   group = 0

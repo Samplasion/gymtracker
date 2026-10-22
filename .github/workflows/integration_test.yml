@@ -19,7 +19,7 @@ jobs:
 
       - uses: subosito/flutter-action@v2
         with:
-          flutter-version: "3.27.1"
+          flutter-version: "3.44.8"
           channel: "stable"
           cache: true
 
@@ -37,5 +37,8 @@ jobs:
       # without timing out
       - name: Build
         run: flutter build macos
+
+      - name: Native router rendering
+        run: flutter test integration_test/router_smoke_test.dart -d macos
 
       - run: tools/test.py ${{matrix.flag}}

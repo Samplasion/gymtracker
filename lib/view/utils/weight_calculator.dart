@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:get/get.dart';
 import 'package:gymtracker/data/weights.dart';
 import 'package:gymtracker/i18n/strings.g.dart';
 import 'package:gymtracker/icons/gymtracker_icons.dart';
@@ -77,7 +76,7 @@ class _WeightCalculatorState extends State<WeightCalculator>
               padding: const EdgeInsets.only(left: 16),
               child: Text(
                 context.t.ongoingWorkout.weightCalculator,
-                style: context.textTheme.titleLarge,
+                style: Theme.of(context).textTheme.titleLarge,
               ),
             ),
             const Divider(height: 1),
@@ -127,7 +126,7 @@ class _WeightCalculatorState extends State<WeightCalculator>
                     padding: const EdgeInsets.symmetric(horizontal: 16),
                     child: Text(
                       context.t.weightCalculator.weights.label,
-                      style: context.textTheme.bodyMedium,
+                      style: Theme.of(context).textTheme.bodyMedium,
                     ),
                   ),
                   Padding(
@@ -158,7 +157,7 @@ class _WeightCalculatorState extends State<WeightCalculator>
                     padding: const EdgeInsets.symmetric(horizontal: 16),
                     child: Text(
                       context.t.weightCalculator.barbells.label,
-                      style: context.textTheme.bodyMedium,
+                      style: Theme.of(context).textTheme.bodyMedium,
                     ),
                   ),
                   Padding(

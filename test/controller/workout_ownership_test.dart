@@ -1,6 +1,4 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:get/get.dart';
-import 'package:gymtracker/controller/workout_controller.dart';
 import 'package:gymtracker/service/database.dart';
 import 'package:mocktail/mocktail.dart';
 
@@ -14,7 +12,7 @@ void main() {
     'stale controller cannot save or submit after account changes',
     () async {
       MockServices.database.setCurrentUserId('A');
-      final controller = WorkoutController('A workout', null, null);
+      final controller = MockServices.createWorkout('A workout', null, null);
       MockServices.database.setCurrentUserId('B');
       expect(controller.refreshWatchData, returnsNormally);
       await controller.persist(force: true);
@@ -41,7 +39,10 @@ void main() {
       await service.setCurrentUserId('B');
       expect(order, ['A', 'B']);
       expect(service.db.currentUserId, 'B');
-      expect(Get.find<DatabaseService>(), same(MockServices.databaseService));
+      expect(
+        MockServices.container.read(databaseServiceProvider),
+        same(MockServices.databaseService),
+      );
     },
   );
 }

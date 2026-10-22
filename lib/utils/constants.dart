@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+import 'package:gymtracker/utils/go.dart';
 
 enum Breakpoints {
   /// Class xx-small (width: 320)
@@ -26,7 +26,7 @@ enum Breakpoints {
   final int screenWidth;
 
   static Breakpoints get currentBreakpoint =>
-      computeBreakpoint(Get.context!.width);
+      computeBreakpoint(MediaQuery.sizeOf(Go.context!).width);
 
   static Breakpoints computeBreakpoint(double width) {
     final w = width;

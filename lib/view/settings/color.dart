@@ -1,6 +1,5 @@
 import 'package:flex_color_picker/flex_color_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:gymtracker/gen/colors.gen.dart';
 import 'package:gymtracker/i18n/strings.g.dart';
 

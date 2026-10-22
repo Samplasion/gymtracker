@@ -1,9 +1,7 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_quill/flutter_quill.dart';
-import 'package:get/get.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gymtracker/controller/routines_controller.dart';
 import 'package:gymtracker/controller/settings_controller.dart';
 import 'package:gymtracker/i18n/strings.g.dart';
@@ -13,6 +11,7 @@ import 'package:gymtracker/model/exercise.dart';
 import 'package:gymtracker/model/set.dart';
 import 'package:gymtracker/model/superset.dart';
 import 'package:gymtracker/model/workout.dart';
+import 'package:gymtracker/provider/settings.dart';
 import 'package:gymtracker/struct/editor_callback.dart';
 import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/utils/go.dart';
@@ -35,24 +34,41 @@ extension _Wrap<T> on List<T> {
   List<_DateWrapped<T>> wrap() => [for (final data in this) _DateWrapped(data)];
 }
 
-extension _Unwrap<T> on RxList<_DateWrapped<T>> {
+extension _Unwrap<T> on List<_DateWrapped<T>> {
   List<T> unwrap() => [for (final box in this) box.data];
 }
 
-// ignore: library_private_types_in_public_api
-_RoutineCreatorController get _controller =>
-    Get.put(_RoutineCreatorController());
-
-class RoutineCreator extends StatefulWidget {
+class RoutineCreator extends ConsumerStatefulWidget {
   final Workout? base;
 
   const RoutineCreator({this.base, super.key});
 
   @override
-  State<RoutineCreator> createState() => _RoutineCreatorState();
+  ConsumerState<RoutineCreator> createState() => _RoutineCreatorState();
 }
 
-class _RoutineCreatorState extends State<RoutineCreator> {
+class _RoutineCreatorState extends ConsumerState<RoutineCreator> {
+  late final _RoutineCreatorController _controller = _RoutineCreatorController(
+    () {
+      if (!mounted) return;
+      if (!_titleIsTouched && widget.base == null) {
+        titleController.text = generateWorkoutTitle(
+          context.t,
+          _controller.exercises
+              .expand(
+                (e) => e.data.map(
+                  exercise: (ex) => [ex.primaryMuscleGroup.category],
+                  superset: (ss) =>
+                      ss.exercises.map((ex) => ex.primaryMuscleGroup.category),
+                ),
+              )
+              .whereType<GTMuscleCategory>()
+              .toSet(),
+        );
+      }
+      setState(() {});
+    },
+  );
   final formKey = GlobalKey<FormState>();
   late final titleController = TextEditingController(text: widget.base?.name);
   late final infoboxController = QuillController(
@@ -61,9 +77,8 @@ class _RoutineCreatorState extends State<RoutineCreator> {
   );
   bool _titleIsTouched = false;
 
-  RoutinesController get workoutsController => Get.find<RoutinesController>();
-
-  StreamSubscription? _titleUpdateStreamSubscription;
+  RoutinesController get workoutsController =>
+      ref.read(routinesControllerProvider);
 
   @override
   void initState() {
@@ -71,47 +86,24 @@ class _RoutineCreatorState extends State<RoutineCreator> {
     SchedulerBinding.instance.addPostFrameCallback((_) {
       if (widget.base != null) {
         _titleIsTouched = true;
-        _controller.exercises(
-          widget.base!.exercises.map((e) => e.clone()).toList().wrap(),
-        );
+        _controller.exercises = widget.base!.exercises
+            .map((e) => e.clone())
+            .toList()
+            .wrap();
       } else {
         titleController.text = generateWorkoutTitle(context.t, {});
-        _titleUpdateStreamSubscription = _controller.exercises.listen((
-          exercises,
-        ) {
-          if (!_titleIsTouched) {
-            titleController.text = generateWorkoutTitle(
-              context.t,
-              exercises
-                  .map((e) => e.data)
-                  .expand((e) {
-                    if (e is Exercise) {
-                      return {e.primaryMuscleGroup.category};
-                    } else if (e is Superset) {
-                      return e.exercises.expand(
-                        (ex) => {ex.primaryMuscleGroup.category},
-                      );
-                    }
-                    return <GTMuscleCategory>{};
-                  })
-                  .whereType<GTMuscleCategory>()
-                  .toSet(),
-            );
-          }
-        });
       }
     });
   }
 
   @override
   void dispose() {
-    _titleUpdateStreamSubscription?.cancel();
-    Get.delete<_RoutineCreatorController>();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    ref.watch(appPreferencesProvider);
     return Scaffold(
       appBar: AppBar(
         title: Text(() {
@@ -222,8 +214,8 @@ class _RoutineCreatorState extends State<RoutineCreator> {
                 });
               },
             ),
-            Obx(
-              () => ReorderableListView(
+            Builder(
+              builder: (context) => ReorderableListView(
                 buildDefaultDragHandles: false,
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
@@ -234,7 +226,7 @@ class _RoutineCreatorState extends State<RoutineCreator> {
                 ],
                 onReorder: (oldIndex, newIndex) {
                   reorder(_controller.exercises, oldIndex, newIndex);
-                  _controller.exercises.refresh();
+                  _controller.changed();
                 },
               ),
             ),
@@ -251,8 +243,8 @@ class _RoutineCreatorState extends State<RoutineCreator> {
         exercise: ex,
         index: (exerciseIndex: i, supersetIndex: null),
         isCreating: true,
-        weightUnit: Get.find<SettingsController>().weightUnit.value,
-        distanceUnit: Get.find<SettingsController>().distanceUnit.value,
+        weightUnit: ref.read(settingsControllerInstanceProvider).weightUnit,
+        distanceUnit: ref.read(settingsControllerInstanceProvider).distanceUnit,
         callbacks: _controller.callbacks,
       );
     },
@@ -262,8 +254,8 @@ class _RoutineCreatorState extends State<RoutineCreator> {
         superset: ss,
         index: i,
         isCreating: true,
-        weightUnit: Get.find<SettingsController>().weightUnit.value,
-        distanceUnit: Get.find<SettingsController>().distanceUnit.value,
+        weightUnit: ref.read(settingsControllerInstanceProvider).weightUnit,
+        distanceUnit: ref.read(settingsControllerInstanceProvider).distanceUnit,
         callbacks: _controller.callbacks,
       );
     },
@@ -300,8 +292,9 @@ class _RoutineCreatorState extends State<RoutineCreator> {
               ? null
               : infoboxController.toEncoded(),
         );
+        Go.back();
       } else {
-        Get.back(
+        Go.back(
           result: workoutsController.generate(
             name: titleController.text,
             exercises: _controller.exercises.unwrap(),
@@ -317,8 +310,10 @@ class _RoutineCreatorState extends State<RoutineCreator> {
   }
 }
 
-class _RoutineCreatorController extends GetxController {
-  final exercises = <_DateWrapped<WorkoutExercisable>>[].obs;
+class _RoutineCreatorController {
+  _RoutineCreatorController(this.changed);
+  final VoidCallback changed;
+  List<_DateWrapped<WorkoutExercisable>> exercises = [];
 
   Exercise _withRoutineSets(Exercise exercise, List<GTSet> sets) =>
       exercise.copyWith(
@@ -345,7 +340,7 @@ class _RoutineCreatorController extends GetxController {
           ],
         );
       }
-      exercises.refresh();
+      changed();
     },
     onExerciseReplace: (index) {
       final (exerciseIndex: i, supersetIndex: supersetIndex) = index;
@@ -379,7 +374,7 @@ class _RoutineCreatorController extends GetxController {
                 ],
               );
         }
-        _controller.exercises.refresh();
+        changed();
       });
     },
     onExerciseRemove: (index) {
@@ -399,7 +394,7 @@ class _RoutineCreatorController extends GetxController {
           ],
         );
       }
-      _controller.exercises.refresh();
+      changed();
     },
     onExerciseChangeRestTime: (index, value) {
       final (exerciseIndex: i, supersetIndex: supersetIndex) = index;
@@ -415,7 +410,7 @@ class _RoutineCreatorController extends GetxController {
         // We don't support rest time for individual exercises in a superset
         throw UnimplementedError();
       }
-      _controller.exercises.refresh();
+      changed();
     },
     onExerciseSetReorder: (index, newIndices) {
       final (exerciseIndex: i, supersetIndex: supersetIndex) = index;
@@ -438,7 +433,7 @@ class _RoutineCreatorController extends GetxController {
           ],
         );
       }
-      _controller.exercises.refresh();
+      changed();
     },
     onSetCreate: (index) {
       final (exerciseIndex: i, supersetIndex: supersetIndex) = index;
@@ -456,7 +451,7 @@ class _RoutineCreatorController extends GetxController {
               GTSet.empty(kind: GTSetKind.normal, parameters: ex.parameters),
             ]);
       }
-      _controller.exercises.refresh();
+      changed();
     },
     onSetRemove: (exerciseIndex, index) {
       final (exerciseIndex: i, supersetIndex: supersetIndex) = exerciseIndex;
@@ -475,7 +470,7 @@ class _RoutineCreatorController extends GetxController {
             ]);
       }
 
-      _controller.exercises.refresh();
+      changed();
     },
     onSetSelectKind: (index, setIndex, kind) {
       final (exerciseIndex: i, supersetIndex: supersetIndex) = index;
@@ -493,7 +488,7 @@ class _RoutineCreatorController extends GetxController {
             if (j == setIndex) ex.sets[j].copyWith(kind: kind) else ex.sets[j],
         ]);
       }
-      _controller.exercises.refresh();
+      changed();
     },
     onSetChangeRPE: (exerciseIndex, setIndex, newRPE) {
       final (exerciseIndex: i, supersetIndex: supersetIndex) = exerciseIndex;
@@ -520,7 +515,7 @@ class _RoutineCreatorController extends GetxController {
           ],
         );
       }
-      _controller.exercises.refresh();
+      changed();
     },
     onSetValueChange: (index, setIndex, newSet) {
       final (exerciseIndex: i, supersetIndex: supersetIndex) = index;
@@ -541,7 +536,7 @@ class _RoutineCreatorController extends GetxController {
           ],
         );
       }
-      _controller.exercises.refresh();
+      changed();
     },
     onExerciseNotesChange: (index, notes) {
       final (exerciseIndex: exerciseIndex, supersetIndex: supersetIndex) =
@@ -568,7 +563,7 @@ class _RoutineCreatorController extends GetxController {
         );
       }
 
-      exercises.refresh();
+      changed();
     },
     onSupersetAddExercise: (supersetIndex) {
       SchedulerBinding.instance.addPostFrameCallback((timeStamp) async {
@@ -590,22 +585,22 @@ class _RoutineCreatorController extends GetxController {
                 newExercise,
               ],
             );
-        _controller.exercises.refresh();
+        changed();
       });
     },
     onSupersetExercisesReorderPair: (supersetIndex, oldExIndex, newExIndex) {
       final superset = exercises[supersetIndex].data as Superset;
       final supersetExercises = superset.exercises.toList();
       reorder(supersetExercises, oldExIndex, newExIndex);
-      _controller.exercises[supersetIndex].data = superset.copyWith(
+      exercises[supersetIndex].data = superset.copyWith(
         exercises: supersetExercises,
       );
-      _controller.exercises.refresh();
+      changed();
     },
     onGroupExercisesIntoSuperset: (startingIndex) async {
       final indices = await Go.toDialog(
         () => ExercisesToSupersetDialog(
-          exercises: [for (final ex in _controller.exercises) ex.data],
+          exercises: [for (final ex in exercises) ex.data],
           startingIndex: startingIndex,
         ),
       );
@@ -626,8 +621,8 @@ class _RoutineCreatorController extends GetxController {
         for (int i = indices.last + 1; i < exercises.length; i++) exercises[i],
       ];
 
-      _controller.exercises(newExercises);
-      _controller.exercises.refresh();
+      exercises = newExercises;
+      changed();
     },
   );
 }

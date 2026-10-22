@@ -3,24 +3,26 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
-import 'package:get/get.dart' hide ContextExtensionss;
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gymtracker/controller/logger_controller.dart';
 import 'package:gymtracker/i18n/strings.g.dart';
 import 'package:gymtracker/icons/gymtracker_icons.dart';
 import 'package:gymtracker/utils/constants.dart';
 import 'package:gymtracker/utils/utils.dart';
-import 'package:gymtracker/view/components/controlled.dart';
+import 'package:gymtracker/view/actions/logger.dart';
 import 'package:intl/intl.dart';
 import 'package:logging/logging.dart';
 
-class LogView extends StatefulWidget {
+class LogView extends ConsumerStatefulWidget {
   const LogView({super.key});
 
   @override
-  State<LogView> createState() => _LogViewState();
+  ConsumerState<LogView> createState() => _LogViewState();
 }
 
-class _LogViewState extends ControlledState<LogView, LoggerController> {
+class _LogViewState extends ConsumerState<LogView> {
+  LoggerController get controller => ref.read(loggerControllerInstanceProvider);
+
   Logger get logger =>
       throw Exception("Are you trying to cause an infinite loop?");
 
@@ -78,9 +80,9 @@ class _LogViewState extends ControlledState<LogView, LoggerController> {
 
   @override
   Widget build(BuildContext context) {
-    return GetBuilder(
-      init: controller,
-      builder: (_) {
+    ref.watch(logSnapshotProvider);
+    return Builder(
+      builder: (context) {
         final levelColors = _getLevelColors(
           context,
           controller.level,
@@ -96,7 +98,7 @@ class _LogViewState extends ControlledState<LogView, LoggerController> {
                 textColor: levelColors.$2,
                 child: IconButton(
                   icon: const Icon(GTIcons.filter_list),
-                  onPressed: controller.showLevelRadioModal,
+                  onPressed: () => controller.showLevelRadioModal(context.t),
                 ),
               ),
               IconButton(
@@ -190,7 +192,7 @@ class _LogViewState extends ControlledState<LogView, LoggerController> {
             children: [
               Flexible(child: Text(firstLine, style: textStyle)),
               Text(
-                " ${DateFormat.Md(Get.locale!.languageCode).format(log.timestamp)} "
+                " ${DateFormat.Md(Localizations.localeOf(context).languageCode).format(log.timestamp)} "
                 "${DateFormat.Hms().format(log.timestamp)} ",
                 style: textStyle.copyWith(
                   color: fore.withAlpha((0.7 * 255).round()),

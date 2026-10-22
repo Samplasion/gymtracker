@@ -1,16 +1,14 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
-import 'dart:math';
 import 'dart:math' as math;
+import 'dart:math';
 
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_quill/flutter_quill.dart';
 import 'package:flutter_quill/quill_delta.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:get/get.dart' hide ContextExtensionss, Translations;
-import 'package:gymtracker/controller/settings_controller.dart';
 import 'package:gymtracker/data/distance.dart';
 import 'package:gymtracker/data/weights.dart';
 import 'package:gymtracker/i18n/strings.g.dart';
@@ -21,7 +19,6 @@ import 'package:gymtracker/model/workout.dart';
 import 'package:gymtracker/service/logger.dart';
 import 'package:gymtracker/struct/editor_callback.dart';
 import 'package:gymtracker/utils/utils.dart';
-import 'package:gymtracker/view/utils/timer.dart';
 import 'package:intl/intl.dart' hide TextDirection;
 
 extension StringUtils on String {
@@ -33,12 +30,9 @@ extension StringUtils on String {
     return double.tryParse(replaceAll(",", "."));
   }
 
-  Size computeSize({TextStyle? style}) {
+  Size computeSize({required TextStyle? style}) {
     final TextPainter textPainter = TextPainter(
-      text: TextSpan(
-        text: this,
-        style: style ?? Get.context!.theme.textTheme.bodyMedium,
-      ),
+      text: TextSpan(text: this, style: style),
       maxLines: 1,
       textDirection: TextDirection.ltr,
     )..layout(minWidth: 0, maxWidth: double.infinity);
@@ -415,17 +409,17 @@ extension WorkoutUtils on Workout {
 }
 
 extension ValueUtils on double {
-  String getUserFacingWeight(Translations t) {
+  String getUserFacingWeight(Translations t, Weights unit) {
     return t.exerciseList.fields.weight(
       weight: localizedWith(t),
-      unit: t.units[settingsController.weightUnit.value.name] ?? "UNKNOWN",
+      unit: t.units[unit.name] ?? "UNKNOWN",
     );
   }
 
-  String getUserFacingDistance(Translations t) {
+  String getUserFacingDistance(Translations t, Distance unit) {
     return t.exerciseList.fields.distance(
       distance: localizedWith(t),
-      unit: t.units[settingsController.distanceUnit.value.name] ?? "UNKNOWN",
+      unit: t.units[unit.name] ?? "UNKNOWN",
     );
   }
 }
@@ -608,27 +602,27 @@ extension GTSetUtils on GTSet {
     required Translations t,
     required Weights weightUnit,
     required Distance distanceUnit,
+    required Weights targetWeightUnit,
+    required Distance targetDistanceUnit,
+    BuildContext? context,
   }) {
-    final context = Get.context;
-
     String _buildWeight(double weight) => Weights.convert(
       value: weight,
       from: weightUnit,
-      to: settingsController.weightUnit.value,
-    ).getUserFacingWeight(t);
+      to: targetWeightUnit,
+    ).getUserFacingWeight(t, targetWeightUnit);
     String _buildReps(int? reps) => t.exerciseList.fields.reps(n: reps ?? 0);
-    String _buildTime(Duration time) => context == null
-        ? time.toString()
-        : TimerView.buildTimeString(
-            context,
-            time,
-            builder: (time) => time.text!,
-          );
+    String _buildTime(Duration time) => t.time.hours(
+      n: time.inHours,
+      hours: time.inHours,
+      minutes: (time.inMinutes % 60).toString().padLeft(2, '0'),
+      seconds: (time.inSeconds % 60).toString().padLeft(2, '0'),
+    );
     String _buildDistance(double? distance) => Distance.convert(
       value: distance ?? 0,
       from: distanceUnit,
-      to: settingsController.distanceUnit.value,
-    ).getUserFacingDistance(t);
+      to: targetDistanceUnit,
+    ).getUserFacingDistance(t, targetDistanceUnit);
 
     switch (parameters) {
       case GTSetParameters.repsWeight:

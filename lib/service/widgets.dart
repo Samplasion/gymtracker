@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gymtracker/service/logger.dart';
 import 'package:home_widget/home_widget.dart';
 
@@ -8,7 +8,7 @@ const String appGroupId = 'group.samplasion.gymtracker';
 const iOSWidgetName = [
   'GymBroWidgets',
   'GymBroWidgetsRest',
-  'GymBroWidgetsTotal'
+  'GymBroWidgetsTotal',
 ];
 const String androidWidgetName = 'org.js.samplasion.gymtracker.StreakWidget';
 
@@ -83,3 +83,7 @@ class _WidgetsServiceUnsupported extends WidgetsService {
   @override
   updateWorkouts(int total) async {}
 }
+
+final widgetsServiceProvider = Provider<WidgetsService>(
+  (ref) => WidgetsService.instance(),
+);

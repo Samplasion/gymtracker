@@ -1,10 +1,12 @@
 part of 'settings.dart';
 
-class AppearanceSettingsPane extends ControlledWidget<SettingsController> {
+class AppearanceSettingsPane extends ConsumerWidget {
   const AppearanceSettingsPane({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final controller = ref.watch(settingsControllerInstanceProvider);
+    ref.watch(appPreferencesProvider);
     return Scaffold(
       body: DetailsView(
         child: CustomScrollView(
@@ -15,9 +17,9 @@ class AppearanceSettingsPane extends ControlledWidget<SettingsController> {
             ),
             SliverList(
               delegate: SliverChildListDelegate([
-                Obx(
-                  () => ValueBuilder<Locale?>(
-                    initialValue: controller.locale.value,
+                Builder(
+                  builder: (context) => PreferenceControl<Locale?>(
+                    initialValue: controller.locale,
                     builder: (value, onChange) => RadioModalTile(
                       title: Text(context.t.settings.options.locale.label),
                       onChange: onChange,
@@ -34,9 +36,9 @@ class AppearanceSettingsPane extends ControlledWidget<SettingsController> {
                     onUpdate: (v) => controller.setLocale(v),
                   ),
                 ),
-                if (ColorService().supportsDynamicColor)
-                  ValueBuilder<bool?>(
-                    initialValue: controller.usesDynamicColor.value,
+                if (ref.watch(colorServiceProvider).supportsDynamicColor)
+                  PreferenceControl<bool?>(
+                    initialValue: controller.usesDynamicColor,
                     builder: (value, onChanged) => SwitchListTile(
                       title: Text(
                         context.t.settings.options.useDynamicColor.label,
@@ -50,14 +52,16 @@ class AppearanceSettingsPane extends ControlledWidget<SettingsController> {
                   animation: controller.service,
                   builder: (context, _) {
                     final state =
-                        (!ColorService().supportsDynamicColor ||
-                            !controller.usesDynamicColor.value)
+                        (!ref
+                                .watch(colorServiceProvider)
+                                .supportsDynamicColor ||
+                            !controller.usesDynamicColor)
                         ? CrossFadeState.showFirst
                         : CrossFadeState.showSecond;
                     return AnimatedCrossFade(
-                      firstChild: Obx(
-                        () => ValueBuilder<Color?>(
-                          initialValue: controller.color.value,
+                      firstChild: Builder(
+                        builder: (context) => PreferenceControl<Color?>(
+                          initialValue: controller.color,
                           builder: (value, onChange) => ColorModalTile(
                             title: Text(context.t.settings.options.color.label),
                             onChange: onChange,
@@ -74,9 +78,9 @@ class AppearanceSettingsPane extends ControlledWidget<SettingsController> {
                     );
                   },
                 ),
-                Obx(
-                  () => ValueBuilder<ThemeMode?>(
-                    initialValue: controller.themeMode.value,
+                Builder(
+                  builder: (context) => PreferenceControl<ThemeMode?>(
+                    initialValue: controller.themeMode,
                     builder: (value, onChange) => RadioModalTile(
                       title: Text(context.t.settings.options.themeMode.label),
                       onChange: onChange,
@@ -93,8 +97,8 @@ class AppearanceSettingsPane extends ControlledWidget<SettingsController> {
                         controller.setThemeMode(v ?? ThemeMode.system),
                   ),
                 ),
-                ValueBuilder<bool?>(
-                  initialValue: controller.tintExercises.value,
+                PreferenceControl<bool?>(
+                  initialValue: controller.tintExercises,
                   builder: (value, onChanged) => SwitchListTile(
                     title: Text(context.t.settings.options.tintExercises.label),
                     subtitle: Text(
@@ -107,8 +111,8 @@ class AppearanceSettingsPane extends ControlledWidget<SettingsController> {
                     v ?? Prefs.defaultValue.tintExercises,
                   ),
                 ),
-                ValueBuilder<bool?>(
-                  initialValue: controller.showSuggestedRoutines.value,
+                PreferenceControl<bool?>(
+                  initialValue: controller.showSuggestedRoutines,
                   builder: (value, onChanged) => SwitchListTile(
                     title: Text(
                       context.t.settings.options.showSuggestedRoutines.label,
@@ -119,8 +123,8 @@ class AppearanceSettingsPane extends ControlledWidget<SettingsController> {
                   onUpdate: (v) =>
                       controller.setShowSuggestedRoutines(v ?? false),
                 ),
-                ValueBuilder<bool?>(
-                  initialValue: controller.defaultToSimpleWorkoutView.value,
+                PreferenceControl<bool?>(
+                  initialValue: controller.defaultToSimpleWorkoutView,
                   builder: (value, onChanged) => SwitchListTile(
                     title: Text(
                       context
@@ -146,7 +150,7 @@ class AppearanceSettingsPane extends ControlledWidget<SettingsController> {
                     v ?? Prefs.defaultValue.defaultToSimpleWorkoutView,
                   ),
                 ),
-                Get.find<NotificationController>().settingsTile,
+                const NotificationPermissionTile(),
               ]),
             ),
             const SliverToBoxAdapter(child: SizedBox(height: 8)),

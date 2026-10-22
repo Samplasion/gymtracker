@@ -4,7 +4,6 @@ import 'dart:math';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
-import 'package:get/get.dart';
 import 'package:gymtracker/gen/assets.gen.dart';
 import 'package:gymtracker/i18n/strings.g.dart';
 import 'package:gymtracker/icons/gymtracker_icons.dart';
@@ -333,7 +332,7 @@ class _CardioTimerScreenState extends State<CardioTimerScreen> {
             context.t.cardioTimer.confirmExit.message,
           );
           if (shouldPop) {
-            Get.back(result: res);
+            Go.back(result: res);
           }
         }
       },

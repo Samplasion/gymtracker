@@ -2,7 +2,6 @@ import 'dart:math';
 
 import 'package:copy_with_extension/copy_with_extension.dart';
 import 'package:flutter/foundation.dart';
-import 'package:gymtracker/controller/exercises_controller.dart';
 import 'package:gymtracker/data/distance.dart';
 import 'package:gymtracker/data/weights.dart';
 import 'package:gymtracker/model/exercisable.dart';
@@ -411,17 +410,10 @@ class Workout {
   }
 
   bool hasExercise(Exercise exercise) {
-    if (exercise.parentID == null) {
-      return exercises.where((e) => e.isExercise).any((e) {
-        return e.asExercise.parentID == exercise.id;
-      });
-    } else {
-      final parent = exercise.getParent();
-      if (parent == null) {
-        return false;
-      }
-      return hasExercise(parent);
-    }
+    final templateId = exercise.parentID ?? exercise.id;
+    return exercises
+        .where((entry) => entry.isExercise)
+        .any((entry) => entry.asExercise.parentID == templateId);
   }
 
   bool isChildOf(Workout workout) {

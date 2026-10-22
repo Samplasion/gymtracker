@@ -1,17 +1,17 @@
 import 'dart:convert';
 import 'dart:io';
-import 'package:syncable/syncable.dart';
-import 'package:share_plus/share_plus.dart';
-import 'package:gymtracker/db/backup_restore.dart';
-import 'package:gymtracker/provider/sync_status.dart';
-import 'package:gymtracker/provider/connectivity.dart';
+
 import 'package:drift/drift.dart' show Variable;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:get/get.dart';
+import 'package:gymtracker/db/backup_restore.dart';
 import 'package:gymtracker/db/sync_diagnostics.dart';
+import 'package:gymtracker/provider/connectivity.dart';
 import 'package:gymtracker/provider/online.dart';
+import 'package:gymtracker/provider/sync_status.dart';
 import 'package:gymtracker/service/database.dart';
+import 'package:share_plus/share_plus.dart';
+import 'package:syncable/syncable.dart';
 
 bool _it(BuildContext c) => Localizations.localeOf(c).languageCode == 'it';
 Future<bool> offerGuestImport(
@@ -62,7 +62,7 @@ class _ConflictsState extends ConsumerState<SyncConflictsPage> {
   Future<List<Map<String, dynamic>>> _load() async {
     final owner = ref.read(currentUserIdProvider);
     if (owner == null) return [];
-    final db = Get.find<DatabaseService>().db;
+    final db = ref.read(databaseServiceProvider).db;
     final rows = await db
         .customSelect(
           'SELECT c.*,(SELECT payload FROM sync_outbox o WHERE c.resolved=0 AND o.owner=c.owner AND o.entity=c.entity AND o.record_id=c.record_id ORDER BY sequence DESC LIMIT 1) AS pending_payload FROM sync_conflicts c WHERE owner=? AND resolved=?',
@@ -297,7 +297,9 @@ class _PreservedState extends ConsumerState<PreservedDataPage> {
   late Future<List<Map<String, dynamic>>> _rows = _load();
   Future<List<Map<String, dynamic>>> _load() async {
     final owner = ref.read(currentUserIdProvider);
-    return (await Get.find<DatabaseService>().db
+    return (await ref
+            .read(databaseServiceProvider)
+            .db
             .customSelect(
               'SELECT * FROM sync_quarantine WHERE owner IS ? ORDER BY id DESC',
               variables: [Variable(owner)],
@@ -365,7 +367,7 @@ class _PreservedState extends ConsumerState<PreservedDataPage> {
                       final online = ref.read(onlineProvider.notifier);
                       await online.syncManager.runPaused(
                         () => SyncDiagnostics.recover(
-                          Get.find<DatabaseService>().db,
+                          ref.read(databaseServiceProvider).db,
                           row['id'] as int,
                         ),
                       );
@@ -468,7 +470,7 @@ class SyncRecoveryActions extends ConsumerWidget {
                     .runPaused(
                       () => offerGuestImport(
                         context,
-                        Get.find<DatabaseService>(),
+                        ref.read(databaseServiceProvider),
                         owner,
                       ).then((_) {}),
                     );
@@ -501,7 +503,7 @@ class SyncRecoveryActions extends ConsumerWidget {
                 'gymtracker-diagnostic-',
               );
               final file = await SyncDiagnostics.export(
-                Get.find<DatabaseService>().db,
+                ref.read(databaseServiceProvider).db,
                 directory,
               );
               if (context.mounted)

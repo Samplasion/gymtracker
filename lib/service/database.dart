@@ -1,17 +1,16 @@
 import 'dart:async';
 import 'dart:convert';
-import 'package:syncable/syncable.dart';
 import 'dart:io';
-import 'package:crypto/crypto.dart';
-import 'package:sqlite3/sqlite3.dart' as sqlite;
-import 'package:gymtracker/db/sync_diagnostics.dart';
 
+import 'package:crypto/crypto.dart';
 import 'package:drift/drift.dart';
 import 'package:flutter/foundation.dart';
-import 'package:get/get.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gymtracker/db/backup_restore.dart';
 import 'package:gymtracker/db/database.dart';
+import 'package:gymtracker/db/exports/v20.dart';
 import 'package:gymtracker/db/imports/types.dart';
+import 'package:gymtracker/db/sync_diagnostics.dart';
 import 'package:gymtracker/model/achievements.dart';
 import 'package:gymtracker/model/exercisable.dart';
 import 'package:gymtracker/model/exercise.dart';
@@ -27,13 +26,20 @@ import 'package:gymtracker/struct/nutrition.dart' hide NutritionGoal;
 import 'package:gymtracker/utils/extensions.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:rxdart/rxdart.dart';
+import 'package:sqlite3/sqlite3.dart' as sqlite;
+import 'package:syncable/syncable.dart';
 
 const _kMaxBackups = 50;
 const _kPeriodicBackupInterval = Duration(days: 1);
 
-class DatabaseService extends GetxService
-    with ChangeNotifier, LoggerConfigurationMixin {
-  DatabaseService();
+final databaseServiceProvider = Provider<DatabaseService>((ref) {
+  final service = DatabaseService();
+  ref.onDispose(service.dispose);
+  return service;
+});
+
+class DatabaseService extends ChangeNotifier with LoggerConfigurationMixin {
+  DatabaseService() : _db = GTDatabaseImpl.prod();
 
   @visibleForTesting
   DatabaseService.withDatabase(GTDatabase database) : _db = database;
@@ -74,6 +80,7 @@ class DatabaseService extends GetxService
   final completions$ = BehaviorSubject<List<AchievementCompletion>>.seeded([]);
   final bodyMeasurements$ = BehaviorSubject<List<BodyMeasurement>>.seeded([]);
 
+  bool _disposed = false;
   final _databaseSubscriptions = <StreamSubscription<dynamic>>[];
 
   void _listenTo<T>(
@@ -81,7 +88,11 @@ class DatabaseService extends GetxService
     void Function(T) onData, {
     Function? onError,
   }) {
-    _databaseSubscriptions.add(stream.listen(onData, onError: onError));
+    _databaseSubscriptions.add(
+      stream.listen((value) {
+        if (!_disposed) onData(value);
+      }, onError: onError),
+    );
   }
 
   Future<void> _cancelDatabaseSubscriptions() async {
@@ -90,13 +101,36 @@ class DatabaseService extends GetxService
   }
 
   @override
-  void onClose() {
+  void dispose() {
+    if (_disposed) return;
+    _disposed = true;
     unawaited(_cancelDatabaseSubscriptions());
-    super.onClose();
+    unawaited(backups.dispose());
+    for (final subject in <Subject<dynamic>>[
+      exercises$,
+      routines$,
+      history$,
+      prefs$,
+      ongoing$,
+      weightMeasurements$,
+      folders$,
+      foods$,
+      nutritionGoals$,
+      customBarcodeFoods$,
+      favoriteFoods$,
+      nutritionCategories$,
+      completions$,
+      bodyMeasurements$,
+      _backups$,
+    ]) {
+      unawaited(subject.close());
+    }
+    unawaited(_db.close());
+    super.dispose();
   }
 
   final backups = _DatabaseBackups();
-  BehaviorSubject<List<DatabaseBackup>> get _backups$ => BehaviorSubject();
+  final _backups$ = BehaviorSubject<List<DatabaseBackup>>();
 
   void eraseAllSubjects({bool includeDeviceState = true}) {
     logger.i(
@@ -140,19 +174,10 @@ class DatabaseService extends GetxService
     notifyListeners();
   }
 
-  @override
-  onInit() async {
-    super.onInit();
-
-    onDatabaseUpdated("main")();
-  }
-
   Future<void> ensureInitialized({
     Function()? onDone,
     bool overrideInitializationCheck = false,
   }) async {
-    _db = GTDatabaseImpl.prod();
-
     return _innerEnsureInitialized(
       onDone: onDone,
       overrideInitializationCheck: overrideInitializationCheck,
@@ -160,12 +185,14 @@ class DatabaseService extends GetxService
   }
 
   bool _isInit = false;
+  bool get isInitialized => _isInit;
   Future<void> _innerEnsureInitialized({
     Function()? onDone,
     bool overrideInitializationCheck = false,
   }) async {
     await _cancelDatabaseSubscriptions();
     await backups.init();
+    if (_disposed) return;
 
     final initialized = [
       "achievements",
@@ -192,6 +219,7 @@ class DatabaseService extends GetxService
     }
 
     Future.microtask(() {
+      if (_disposed) return;
       final b = backups.list();
       _backups$.add(b);
     });
@@ -335,6 +363,7 @@ class DatabaseService extends GetxService
 
   @override
   notifyListeners() {
+    if (_disposed) return;
     super.notifyListeners();
     logger.i("Notified listeners");
   }
@@ -596,6 +625,10 @@ class DatabaseService extends GetxService
     achievements: completions$.value,
     bodyMeasurements: bodyMeasurements$.value,
   );
+
+  /// Version 20 is export-only; legacy import converters remain separate.
+  Future<Map<String, dynamic>> exportJson() =>
+      const VersionedJsonExportV20().export(_db);
 
   Map<String, dynamic> toJson() {
     final converter = getConverter(DATABASE_VERSION);
@@ -916,21 +949,34 @@ class DatabaseBackup {
 }
 
 class _DatabaseBackups {
+  bool _disposed = false;
+  StreamSubscription<FileSystemEvent>? _directorySubscription;
   // Keep incident evidence until an explicit investigation outcome is recorded.
   bool preserveForInvestigation = true;
   late Directory _backupDir;
   final BehaviorSubject<List<DatabaseBackup>> _backups$ = BehaviorSubject();
 
   Future<void> init() async {
+    await _directorySubscription?.cancel();
     final root = await getApplicationDocumentsDirectory();
+    if (_disposed) return;
     _backupDir = Directory("${root.path}/backups");
     await _backupDir.create();
+    if (_disposed) return;
     _backups$.add(list());
     if (!(Platform.isIOS || Platform.isAndroid)) {
-      _backupDir.watch().listen((event) {
-        _backups$.add(list());
+      _directorySubscription = _backupDir.watch().listen((event) {
+        if (!_disposed) _backups$.add(list());
       });
     }
+  }
+
+  Future<void> dispose() async {
+    if (_disposed) return;
+    _disposed = true;
+    await _directorySubscription?.cancel();
+    _directorySubscription = null;
+    await _backups$.close();
   }
 
   Future<DatabaseBackup?> store(GTDatabase _db) async {
@@ -992,7 +1038,7 @@ class _DatabaseBackups {
           if (await manifest.exists()) await manifest.delete();
         }
       }
-      _backups$.add(list());
+      if (!_disposed) _backups$.add(list());
 
       final file = File(path);
       final size = await file.length();

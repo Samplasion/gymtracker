@@ -15,6 +15,7 @@ import 'package:gymtracker/view/utils/history_workout.dart';
 import 'package:gymtracker/view/utils/workout_done.dart';
 import 'package:gymtracker/view/workout.dart';
 import 'package:gymtracker/view/workout_editor.dart';
+
 import '../utils.dart';
 
 Workout get baseRoutine {
@@ -87,8 +88,14 @@ Future<void> testEditWorkoutFlow(
   expect(setFields, findsNWidgets(3));
 
   for (final field in setFields.evaluate()) {
-    await tester.enterText(find.byWidget(field.widget), "10");
+    await enterTextAndDismissKeyboard(
+      tester,
+      find.byWidget(field.widget),
+      "10",
+    );
   }
+
+  await dismissKeyboard(tester);
 
   final checkboxes = find.byType(Checkbox);
   expect(checkboxes, findsNWidgets(3));
@@ -100,12 +107,24 @@ Future<void> testEditWorkoutFlow(
   // Avoiding pumpAndSettle here because the animation in WorkoutTimerView
   // causes the tester to wait for the entire duration of the timer
   await tester.pump(const Duration(seconds: 2));
+  // The first frame rebuilds the Riverpod consumer and starts the 300ms
+  // crossfade from a zero-height bottom bar. Finish that transition without
+  // waiting for the countdown's continuously animated progress indicator.
+  await tester.pump(const Duration(milliseconds: 350));
 
   expect(find.byType(WorkoutTimerView), findsOneWidget);
+  final skipRest = find
+      .descendant(
+        of: find.byType(WorkoutTimerView),
+        matching: find.byIcon(GTIcons.skip),
+      )
+      .hitTestable();
+  expect(skipRest, findsOneWidget);
 
-  // Avoid the above issue for the next pumpAndSettle calls
-  await tester.tap(find.widgetWithIcon(IconButton, GTIcons.skip));
+  // Stop the rest timer before the next pumpAndSettle calls.
+  await tester.tap(skipRest);
   await tester.pumpAndSettle();
+  expect(skipRest, findsNothing);
 
   await tester.tap(find.byKey(const Key('main-menu')));
   await tester.pumpAndSettle();
@@ -114,8 +133,9 @@ Future<void> testEditWorkoutFlow(
 
   expect(find.byType(WorkoutFinishPage), findsOneWidget);
 
+  await dismissKeyboard(tester);
   await tester.tap(find.widgetWithIcon(IconButton, GTIcons.done));
-  await tester.pumpAndSettle();
+  await waitForWidget(tester, find.byType(WorkoutFinishPage), present: false);
 
   expect(find.byType(WorkoutFinishPage), findsNothing);
   expect(find.byType(WorkoutView), findsNothing);
@@ -128,11 +148,7 @@ Future<void> testEditWorkoutFlow(
   await tester.tap(find.byIcon(GTIcons.done));
   await tester.pumpAndSettle();
 
-  await tester.tap(
-    find.descendant(
-        of: find.byType(NavigationDrawer),
-        matching: find.byIcon(GTIcons.history)),
-  );
+  await openHistory(tester);
   await tester.pumpAndSettle();
 
   await tester.tap(find.byType(HistoryWorkout));
@@ -193,7 +209,11 @@ Future<void> testEditWorkoutFlow(
 
   await tester.drag(findMainListView(tester), const Offset(0.0, -600.0));
   await tester.pumpAndSettle();
-  await tester.enterText(find.widgetWithText(TextField, "Time"), "100");
+  await enterTextAndDismissKeyboard(
+    tester,
+    find.widgetWithText(TextField, "Time"),
+    "100",
+  );
   await tester.pumpAndSettle();
 
   await tester.tap(find.byKey(const Key('main-menu')));
@@ -203,13 +223,15 @@ Future<void> testEditWorkoutFlow(
 
   expect(find.byType(WorkoutFinishEditingPage), findsOneWidget);
 
-  await tester.quillEnterText(
-    find.byType(QuillEditor),
-    "Edited notes\n",
-  );
+  await tester.quillEnterText(find.byType(QuillEditor), "Edited notes\n");
+  await dismissKeyboard(tester);
   await tester.pumpAndSettle();
   await tester.tap(find.byKey(const Key("submit")));
-  await tester.pumpAndSettle(const Duration(seconds: 1));
+  await waitForWidget(
+    tester,
+    find.byType(WorkoutFinishEditingPage),
+    present: false,
+  );
 
   expect(find.byType(WorkoutFinishEditingPage), findsNothing);
   expect(find.byType(WorkoutEditor), findsNothing);
@@ -220,20 +242,30 @@ Future<void> testEditWorkoutFlow(
   expect(editedWorkout.exercises.length, 2);
   expect(editedWorkout.exercises[0].id, originalWorkout.exercises[0].id);
   expect(editedWorkout.exercises[0].sets.length, 5);
-  expect(editedWorkout.exercises[0].sets[0].id,
-      originalWorkout.exercises[0].sets[0].id);
-  expect(editedWorkout.exercises[0].sets[1].id,
-      originalWorkout.exercises[0].sets[1].id);
-  expect(editedWorkout.exercises[0].sets[2].id,
-      originalWorkout.exercises[0].sets[2].id);
+  expect(
+    editedWorkout.exercises[0].sets[0].id,
+    originalWorkout.exercises[0].sets[0].id,
+  );
+  expect(
+    editedWorkout.exercises[0].sets[1].id,
+    originalWorkout.exercises[0].sets[1].id,
+  );
+  expect(
+    editedWorkout.exercises[0].sets[2].id,
+    originalWorkout.exercises[0].sets[2].id,
+  );
   expect(editedWorkout.exercises[0].sets[3].kind, GTSetKind.failureStripping);
   expect(editedWorkout.exercises[0].sets[4].kind, GTSetKind.drop);
   expect((editedWorkout.exercises[1] as Exercise).name, "Zumba");
   expect((editedWorkout.exercises[1] as Exercise).standard, true);
   expect(editedWorkout.exercises[1].sets.length, 1);
   expect(
-      editedWorkout.exercises[1].sets.single.parameters, GTSetParameters.time);
+    editedWorkout.exercises[1].sets.single.parameters,
+    GTSetParameters.time,
+  );
   expect(
-      editedWorkout.exercises[1].sets.single.time, const Duration(minutes: 1));
+    editedWorkout.exercises[1].sets.single.time,
+    const Duration(minutes: 1),
+  );
   expect(editedWorkout.infobox, "Edited notes\n".asQuillDocument().toEncoded());
 }

@@ -1,7 +1,7 @@
 import 'dart:async';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:get/get.dart';
 import 'package:gymtracker/model/achievements.dart';
 import 'package:gymtracker/model/workout.dart';
 import 'package:gymtracker/provider/connectivity.dart';
@@ -11,6 +11,7 @@ import 'package:gymtracker/service/feed.dart';
 import 'package:gymtracker/service/online.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:rxdart/rxdart.dart';
+
 import '../test_helpers/mock_services.dart';
 
 class _Service extends TestOnlineServiceImpl {
@@ -64,6 +65,7 @@ void main() {
     final service = _Service()..response = response;
     final container = ProviderContainer(
       overrides: [
+        ...MockServices.defaultOverrides,
         onlineProvider.overrideWith(() => _Online(service)),
         currentUserIdProvider.overrideWithValue('owner'),
         networkConnectivityProvider.overrideWith(_Connectivity.new),
@@ -96,6 +98,7 @@ void main() {
     final service = _Service();
     final c = ProviderContainer(
       overrides: [
+        ...MockServices.defaultOverrides,
         onlineProvider.overrideWith(() => _Online(service)),
         currentUserIdProvider.overrideWithValue('owner'),
         networkConnectivityProvider.overrideWith(_Connectivity.new),
@@ -117,7 +120,9 @@ void main() {
       startingDate: DateTime.now().subtract(const Duration(minutes: 1)),
     );
     history.add([workout]);
-    MockServices.historyController.history.assignAll([workout]);
+    MockServices.historyController.history
+      ..clear()
+      ..addAll([workout]);
     await pumpEventQueue();
     await c.pump();
     expect(service.calls, 1);

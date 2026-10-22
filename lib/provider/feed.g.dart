@@ -46,7 +46,7 @@ final class FeedHistoryStreamProvider
   }
 }
 
-String _$feedHistoryStreamHash() => r'df9a9d9c7e1ec38f2e7716709c2fc00360505c8e';
+String _$feedHistoryStreamHash() => r'9878b381a0329582597dac2a826d667166e9ff76';
 
 @ProviderFor(feedAchievementsStream)
 final feedAchievementsStreamProvider = FeedAchievementsStreamProvider._();
@@ -88,7 +88,7 @@ final class FeedAchievementsStreamProvider
 }
 
 String _$feedAchievementsStreamHash() =>
-    r'e4b3b6e481e054cc5ba9fcb21a254eb453e77ec3';
+    r'96322f32145d1a05c39600b2abacab7f531771ce';
 
 @ProviderFor(Feed)
 final feedProvider = FeedProvider._();
@@ -113,7 +113,7 @@ final class FeedProvider extends $AsyncNotifierProvider<Feed, List<FeedItem>> {
   Feed create() => Feed();
 }
 
-String _$feedHash() => r'95735c81ca5847d12cbcd4c99e1fd11953269b7f';
+String _$feedHash() => r'95d4a4f3115a03277c5aab3136aad59dcd97531f';
 
 abstract class _$Feed extends $AsyncNotifier<List<FeedItem>> {
   FutureOr<List<FeedItem>> build();

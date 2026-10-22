@@ -1,5 +1,5 @@
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart' hide Translations;
 import 'package:gymtracker/i18n/strings.g.dart';
 import 'package:gymtracker/icons/gymtracker_icons.dart';
 import 'package:gymtracker/model/exercise.dart';

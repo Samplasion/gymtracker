@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:get/get.dart';
 import 'package:gymtracker/controller/routines_controller.dart';
 import 'package:gymtracker/model/friend.dart';
 import 'package:gymtracker/provider/connectivity.dart';
@@ -90,7 +89,7 @@ void main() {
     await initTestLocalizations();
     when(
       () => MockServices.routinesController.suggestions,
-    ).thenReturn(<RoutineSuggestion>[].obs);
+    ).thenReturn(<RoutineSuggestion>[]);
   });
   tearDown(MockServices.tearDown);
 

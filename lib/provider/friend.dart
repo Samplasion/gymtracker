@@ -1,16 +1,15 @@
 import 'dart:async';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gymtracker/db/model/tables/exercise.dart';
 import 'package:gymtracker/db/utils.dart';
 import 'package:gymtracker/model/achievements.dart';
 import 'package:gymtracker/model/friend.dart';
 import 'package:gymtracker/model/history.dart';
 import 'package:gymtracker/model/workout.dart';
-import 'package:gymtracker/struct/request_cache.dart';
 import 'package:gymtracker/provider/online.dart';
 import 'package:gymtracker/service/database.dart';
-import 'package:get/get.dart';
+import 'package:gymtracker/struct/request_cache.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -398,7 +397,7 @@ class FriendNotifier extends _$FriendNotifier {
         state.value ??
         FriendState(friends: [], pendingReceived: [], pendingSent: []);
     if (self) {
-      final db = Get.find<DatabaseService>();
+      final db = ref.read(databaseServiceProvider);
       return FriendPublicData(
         friend: friend,
         achievements:

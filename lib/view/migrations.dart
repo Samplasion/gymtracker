@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:gymtracker/controller/exercises_controller.dart';
+import 'package:gymtracker/controller/history_controller.dart';
 import 'package:gymtracker/controller/migrations_controller.dart';
+import 'package:gymtracker/controller/routines_controller.dart';
 import 'package:gymtracker/i18n/strings.g.dart';
 import 'package:gymtracker/icons/gymtracker_icons.dart';
 import 'package:gymtracker/model/exercise.dart';
@@ -7,8 +11,8 @@ import 'package:gymtracker/model/set.dart';
 import 'package:gymtracker/struct/data_migration.dart';
 import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/utils/go.dart';
+import 'package:gymtracker/view/actions/migrations.dart';
 import 'package:gymtracker/view/components/alert_banner.dart';
-import 'package:gymtracker/view/components/controlled.dart';
 import 'package:gymtracker/view/exercise_picker.dart';
 import 'package:gymtracker/view/exercises.dart';
 import 'package:gymtracker/view/routines.dart';
@@ -18,11 +22,12 @@ import 'package:gymtracker/view/utils/history_workout.dart';
 import 'package:gymtracker/view/utils/input_decoration.dart';
 import 'package:intl/intl.dart';
 
-class AllMigrationsView extends ControlledWidget<MigrationsController> {
+class AllMigrationsView extends ConsumerWidget {
   const AllMigrationsView({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final controller = ref.read(migrationsControllerProvider);
     return Scaffold(
       body: CustomScrollView(
         slivers: [
@@ -46,22 +51,18 @@ class AllMigrationsView extends ControlledWidget<MigrationsController> {
   }
 }
 
-class CustomToLibraryMigrationSetupView extends StatefulWidget {
+class CustomToLibraryMigrationSetupView extends ConsumerStatefulWidget {
   final UIMigration<CustomToLibraryExerciseMigration> migration;
 
   const CustomToLibraryMigrationSetupView(this.migration, {super.key});
 
   @override
-  State<CustomToLibraryMigrationSetupView> createState() =>
+  ConsumerState<CustomToLibraryMigrationSetupView> createState() =>
       _CustomToLibraryMigrationSetupViewState();
 }
 
 class _CustomToLibraryMigrationSetupViewState
-    extends
-        ControlledState<
-          CustomToLibraryMigrationSetupView,
-          MigrationsController
-        > {
+    extends ConsumerState<CustomToLibraryMigrationSetupView> {
   Exercise? from, to;
 
   @override
@@ -140,13 +141,19 @@ class _CustomToLibraryMigrationSetupViewState
     if (from!.parameters != to!.parameters) return null;
     return () {
       // Go.to(() => CustomToLibraryMigrationPreviewView(from: from!, to: to!));
-      widget.migration.preview(CustomToLibraryExerciseMigration(from!, to!));
+      widget.migration.preview(
+        CustomToLibraryExerciseMigration(
+          from!,
+          to!,
+          routinesController: ref.read(routinesControllerProvider),
+          historyController: ref.read(historyControllerProvider),
+        ),
+      );
     };
   }
 }
 
-class CustomToLibraryMigrationPreviewView
-    extends ControlledWidget<MigrationsController> {
+class CustomToLibraryMigrationPreviewView extends ConsumerWidget {
   final CustomToLibraryExerciseMigration migration;
 
   CustomToLibraryMigrationPreviewView({super.key, required this.migration});
@@ -155,7 +162,8 @@ class CustomToLibraryMigrationPreviewView
   late final affectedWorkouts = migration.affectedHistory.reversed.toList();
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final controller = ref.read(migrationsControllerProvider);
     return Scaffold(
       appBar: AppBar(title: Text(context.t.migrations.common.preview)),
       body: CustomScrollView(
@@ -317,8 +325,7 @@ class CustomToLibraryMigrationPreviewView
   }
 }
 
-class RemoveUnusedExercisesMigrationPreviewView
-    extends ControlledWidget<MigrationsController> {
+class RemoveUnusedExercisesMigrationPreviewView extends ConsumerWidget {
   final RemoveUnusedExercisesMigration migration;
 
   RemoveUnusedExercisesMigrationPreviewView({
@@ -329,7 +336,8 @@ class RemoveUnusedExercisesMigrationPreviewView
   late final affectedExercises = migration.affectedExercises;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final controller = ref.read(migrationsControllerProvider);
     return Scaffold(
       appBar: AppBar(title: Text(context.t.migrations.common.preview)),
       body: CustomScrollView(
@@ -422,7 +430,8 @@ class RemoveUnusedExercisesMigrationPreviewView
   }
 }
 
-class RemoveWeightFromCustomExerciseMigrationSetupView extends StatefulWidget {
+class RemoveWeightFromCustomExerciseMigrationSetupView
+    extends ConsumerStatefulWidget {
   final UIMigration<RemoveWeightFromCustomExerciseMigration> migration;
 
   const RemoveWeightFromCustomExerciseMigrationSetupView(
@@ -431,16 +440,12 @@ class RemoveWeightFromCustomExerciseMigrationSetupView extends StatefulWidget {
   });
 
   @override
-  State<RemoveWeightFromCustomExerciseMigrationSetupView> createState() =>
-      _RemoveWeightFromCustomExerciseMigrationSetupViewState();
+  ConsumerState<RemoveWeightFromCustomExerciseMigrationSetupView>
+  createState() => _RemoveWeightFromCustomExerciseMigrationSetupViewState();
 }
 
 class _RemoveWeightFromCustomExerciseMigrationSetupViewState
-    extends
-        ControlledState<
-          RemoveWeightFromCustomExerciseMigrationSetupView,
-          MigrationsController
-        > {
+    extends ConsumerState<RemoveWeightFromCustomExerciseMigrationSetupView> {
   Exercise? ex;
 
   @override
@@ -498,13 +503,20 @@ class _RemoveWeightFromCustomExerciseMigrationSetupViewState
   void Function()? _nextCallback() {
     if (ex == null) return null;
     return () {
-      widget.migration.preview(RemoveWeightFromCustomExerciseMigration(ex!));
+      widget.migration.preview(
+        RemoveWeightFromCustomExerciseMigration(
+          ex!,
+          exercisesController: ref.read(exercisesControllerProvider),
+          routinesController: ref.read(routinesControllerProvider),
+          historyController: ref.read(historyControllerProvider),
+        ),
+      );
     };
   }
 }
 
 class RemoveWeightFromCustomExerciseMigrationPreviewView
-    extends ControlledWidget<MigrationsController> {
+    extends ConsumerWidget {
   final RemoveWeightFromCustomExerciseMigration migration;
 
   RemoveWeightFromCustomExerciseMigrationPreviewView({
@@ -517,7 +529,8 @@ class RemoveWeightFromCustomExerciseMigrationPreviewView
   late final isCompatible = migration.isCompatible;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final controller = ref.read(migrationsControllerProvider);
     return Scaffold(
       appBar: AppBar(title: Text(context.t.migrations.common.preview)),
       body: CustomScrollView(
@@ -699,7 +712,8 @@ class RemoveWeightFromCustomExerciseMigrationPreviewView
   }
 }
 
-class GenericMultiplyWeightInExerciseMigrationSetupView extends StatefulWidget {
+class GenericMultiplyWeightInExerciseMigrationSetupView
+    extends ConsumerStatefulWidget {
   final UIMigration<GenericMultiplyWeightInExerciseMigration> migration;
   final double multiplier;
 
@@ -710,16 +724,12 @@ class GenericMultiplyWeightInExerciseMigrationSetupView extends StatefulWidget {
   });
 
   @override
-  State<GenericMultiplyWeightInExerciseMigrationSetupView> createState() =>
-      _GenericMultiplyWeightInExerciseMigrationSetupViewState();
+  ConsumerState<GenericMultiplyWeightInExerciseMigrationSetupView>
+  createState() => _GenericMultiplyWeightInExerciseMigrationSetupViewState();
 }
 
 class _GenericMultiplyWeightInExerciseMigrationSetupViewState
-    extends
-        ControlledState<
-          GenericMultiplyWeightInExerciseMigrationSetupView,
-          MigrationsController
-        > {
+    extends ConsumerState<GenericMultiplyWeightInExerciseMigrationSetupView> {
   Exercise? ex;
 
   @override
@@ -784,14 +794,20 @@ class _GenericMultiplyWeightInExerciseMigrationSetupViewState
     if (ex == null) return null;
     return () {
       widget.migration.preview(
-        GenericMultiplyWeightInExerciseMigration(ex!, widget.multiplier),
+        GenericMultiplyWeightInExerciseMigration(
+          ex!,
+          widget.multiplier,
+          exercisesController: ref.read(exercisesControllerProvider),
+          routinesController: ref.read(routinesControllerProvider),
+          historyController: ref.read(historyControllerProvider),
+        ),
       );
     };
   }
 }
 
 class GenericMultiplyWeightInExerciseMigrationPreviewView
-    extends ControlledWidget<MigrationsController> {
+    extends ConsumerWidget {
   final GenericMultiplyWeightInExerciseMigration migration;
 
   GenericMultiplyWeightInExerciseMigrationPreviewView({
@@ -804,7 +820,8 @@ class GenericMultiplyWeightInExerciseMigrationPreviewView
   late final isCompatible = migration.isCompatible;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final controller = ref.read(migrationsControllerProvider);
     return Scaffold(
       appBar: AppBar(title: Text(context.t.migrations.common.preview)),
       body: CustomScrollView(

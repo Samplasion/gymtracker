@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:get/get.dart';
 import 'package:gymtracker/controller/exercises_controller.dart';
 import 'package:gymtracker/controller/workout_controller.dart';
 import 'package:gymtracker/i18n/strings.g.dart';
@@ -37,29 +36,43 @@ Future<void> testEditExerciseWhileWorkoutIsOngoingFlow(
   // Load app widget.
   await awaitApp(tester, databaseService);
 
-  print("Starting database state: ${databaseService.toJson()}");
+  print(
+    "Starting database state: ${databaseService.currentSnapshot.customExercises.map((e) => e.id).toList()}",
+  );
 
   // Manually add the exercise
   // We can do it this way since we verified the "Create exercise" flow
   // is working in another test
   await databaseService.writeExercises([]);
-  Get.find<ExercisesController>().addExercise(baseExercise);
+  integrationContainer
+      .read(exercisesControllerProvider)
+      .addExercise(baseExercise);
+  await awaitCustomExercise(tester, baseExercise.id);
 
   await tester.pumpAndSettle();
 
-  print("Edited database state: ${databaseService.toJson()}");
-  expect(Get.find<ExercisesController>().exercises.isNotEmpty, true);
+  print(
+    "Edited database state: ${databaseService.currentSnapshot.customExercises.map((e) => e.id).toList()}",
+  );
+  expect(
+    integrationContainer.read(exercisesControllerProvider).exercises.isNotEmpty,
+    true,
+  );
   expectAbstractExercise(
-      Get.find<ExercisesController>().exercises.single, baseExercise);
+    integrationContainer.read(exercisesControllerProvider).exercises.single,
+    baseExercise,
+  );
 
-  await tester
-      .tap(find.widgetWithText(ListTile, t.routines.quickWorkout.title));
+  await tester.tap(
+    find.widgetWithText(ListTile, t.routines.quickWorkout.title),
+  );
   await tester.pumpAndSettle();
 
   expect(find.byType(WorkoutView), findsOneWidget);
 
-  await tester
-      .tap(find.widgetWithText(FilledButton, t.ongoingWorkout.exercises.add));
+  await tester.tap(
+    find.widgetWithText(FilledButton, t.ongoingWorkout.exercises.add),
+  );
   await tester.pumpAndSettle(wait);
   await tester.tap(find.byIcon(GTIcons.custom_exercises));
   await tester.pumpAndSettle(wait);
@@ -69,12 +82,18 @@ Future<void> testEditExerciseWhileWorkoutIsOngoingFlow(
   await tester.tap(find.byKey(const Key('pick')));
   await tester.pumpAndSettle(wait);
 
-  final ongoingWorkout = Get.find<WorkoutController>();
+  final ongoingWorkout = integrationContainer.read(
+    workoutControllerProvider.notifier,
+  );
   print(ongoingWorkout.exercises.single.toJson());
   expect(
-      (ongoingWorkout.exercises.single as Exercise).parentID, baseExercise.id);
+    (ongoingWorkout.exercises.single as Exercise).parentID,
+    baseExercise.id,
+  );
 
-  await tester.tap(find.byType(CircleAvatar)); // faccio parte del codice di questo progetto adesso, voglio i nomi nei titoli finali 
+  await tester.tap(
+    find.byType(CircleAvatar),
+  ); // faccio parte del codice di questo progetto adesso, voglio i nomi nei titoli finali
   await tester.pumpAndSettle(wait);
   await tester.tap(find.byKey(const Key('menu')));
   await tester.pumpAndSettle(wait);
@@ -83,29 +102,35 @@ Future<void> testEditExerciseWhileWorkoutIsOngoingFlow(
   await tester.tap(find.widgetWithText(TextButton, "OK"));
   await tester.pumpAndSettle(wait);
 
-  final titleBtn =
-      find.widgetWithText(TextField, t.exercise.editor.fields.title.label);
+  final titleBtn = find.widgetWithText(
+    TextField,
+    t.exercise.editor.fields.title.label,
+  );
   final parametersBtn = find.widgetWithText(
-      DropdownButtonFormField<GTSetParameters>,
-      t.exercise.editor.fields.parameters.label);
+    DropdownButtonFormField<GTSetParameters>,
+    t.exercise.editor.fields.parameters.label,
+  );
   final primaryMuscleGroupBtn = find.widgetWithText(
-      DropdownButtonFormField<GTMuscleGroup>,
-      t.exercise.editor.fields.primaryMuscleGroup.label);
-  final setFields = [
-    titleBtn,
-    parametersBtn,
-    primaryMuscleGroupBtn,
-  ];
+    DropdownButtonFormField<GTMuscleGroup>,
+    t.exercise.editor.fields.primaryMuscleGroup.label,
+  );
+  final setFields = [titleBtn, parametersBtn, primaryMuscleGroupBtn];
 
   for (final finder in setFields) {
     expect(finder, findsOneWidget);
   }
-  await tester.enterText(setFields[0], "SecondEditedExercise");
+  await enterTextAndDismissKeyboard(
+    tester,
+    setFields[0],
+    "SecondEditedExercise",
+  );
   await tester.tap(setFields[1]);
   await tester.pumpAndSettle(wait);
   await tester.tap(
-    find.widgetWithText(DropdownMenuItem<GTSetParameters>,
-        t.exercise.editor.fields.parameters.values['time']!),
+    find.widgetWithText(
+      DropdownMenuItem<GTSetParameters>,
+      t.exercise.editor.fields.parameters.values['time']!,
+    ),
     warnIfMissed: false,
   );
   await tester.pumpAndSettle(wait);
@@ -113,7 +138,9 @@ Future<void> testEditExerciseWhileWorkoutIsOngoingFlow(
   await tester.pumpAndSettle(wait);
   await tester.tap(
     find.widgetWithText(
-        DropdownMenuItem<GTMuscleGroup>, t.muscleGroups['chest']!),
+      DropdownMenuItem<GTMuscleGroup>,
+      t.muscleGroups['chest']!,
+    ),
     warnIfMissed: false,
   );
   await tester.pumpAndSettle();
@@ -133,11 +160,9 @@ Future<void> testEditExerciseWhileWorkoutIsOngoingFlow(
   await tester.tap(find.text("Finish workout"));
   await tester.pumpAndSettle();
 
-  await tester.enterText(
-    find.widgetWithText(
-      TextField,
-      t.ongoingWorkout.finish.fields.name.label,
-    ),
+  await enterTextAndDismissKeyboard(
+    tester,
+    find.widgetWithText(TextField, t.ongoingWorkout.finish.fields.name.label),
     "Workout",
   );
 

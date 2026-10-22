@@ -1,7 +1,10 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:gymtracker/controller/settings_controller.dart';
 import 'package:gymtracker/i18n/strings.g.dart';
 import 'package:gymtracker/model/measurements.dart';
+import 'package:gymtracker/provider/settings.dart';
 import 'package:gymtracker/utils/constants.dart';
 import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/utils/theme.dart';
@@ -10,14 +13,15 @@ import 'package:gymtracker/view/charts/line_charts_time_series.dart';
 import 'package:gymtracker/view/components/responsive_builder.dart';
 import 'package:intl/intl.dart';
 
-class WeightChart extends StatelessWidget {
+class WeightChart extends ConsumerWidget {
   final List<double> weights;
   final double? predictedWeight;
 
   const WeightChart({required this.weights, this.predictedWeight, super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    ref.watch(appPreferencesProvider);
     final colorScheme = Theme.of(context).colorScheme;
 
     return ResponsiveBuilder(
@@ -154,7 +158,7 @@ class WeightChart extends StatelessWidget {
   }
 }
 
-class WeightChartTimeSeries extends StatefulWidget {
+class WeightChartTimeSeries extends ConsumerStatefulWidget {
   final List<WeightMeasurement> weights;
   final PredictedWeightMeasurement? predictedWeight;
   final List<BodyMeasurement> bodyMeasurements;
@@ -169,10 +173,11 @@ class WeightChartTimeSeries extends StatefulWidget {
   });
 
   @override
-  State<WeightChartTimeSeries> createState() => _WeightChartTimeSeriesState();
+  ConsumerState<WeightChartTimeSeries> createState() =>
+      _WeightChartTimeSeriesState();
 }
 
-class _WeightChartTimeSeriesState extends State<WeightChartTimeSeries> {
+class _WeightChartTimeSeriesState extends ConsumerState<WeightChartTimeSeries> {
   late Map<BodyMeasurementPart, List<BodyMeasurement>> measurementsByPart;
 
   @override
@@ -202,6 +207,7 @@ class _WeightChartTimeSeriesState extends State<WeightChartTimeSeries> {
 
   @override
   Widget build(BuildContext context) {
+    ref.watch(appPreferencesProvider);
     return ResponsiveBuilder(
       builder: (context, breakpoint) {
         final relevantWeights = widget.weights;
@@ -211,7 +217,9 @@ class _WeightChartTimeSeriesState extends State<WeightChartTimeSeries> {
             null: [
               for (int i = 0; i < relevantWeights.length; i++)
                 LineChartPoint(
-                  value: relevantWeights[i].convertedWeight,
+                  value: relevantWeights[i].convertedWeightTo(
+                    ref.read(settingsControllerProvider).weightUnit,
+                  ),
                   date: relevantWeights[i].time,
                 ),
             ],
@@ -232,7 +240,9 @@ class _WeightChartTimeSeriesState extends State<WeightChartTimeSeries> {
             if (widget.predictedWeight != null)
               null: [
                 LineChartPoint(
-                  value: relevantWeights.last.convertedWeight,
+                  value: relevantWeights.last.convertedWeightTo(
+                    ref.read(settingsControllerProvider).weightUnit,
+                  ),
                   date: relevantWeights.last.time,
                 ),
                 LineChartPoint(
@@ -270,7 +280,10 @@ class _WeightChartTimeSeriesState extends State<WeightChartTimeSeries> {
                   children: [
                     TextSpan(
                       text: type == null
-                          ? point.value.getUserFacingWeight(context.t)
+                          ? point.value.getUserFacingWeight(
+                              context.t,
+                              ref.read(settingsControllerProvider).weightUnit,
+                            )
                           : "${stringifyDouble(point.value, decimalSeparator: NumberFormat(context.locale.languageCode).symbols.DECIMAL_SEP)} ${type.unit}",
                     ),
                   ],
@@ -294,7 +307,10 @@ class _WeightChartTimeSeriesState extends State<WeightChartTimeSeries> {
             ),
           ),
           leftTitleBuilder: (type, value) => type == null
-              ? value.getUserFacingWeight(context.t)
+              ? value.getUserFacingWeight(
+                  context.t,
+                  ref.read(settingsControllerProvider).weightUnit,
+                )
               : "${stringifyDouble(value, decimalSeparator: NumberFormat(context.locale.languageCode).symbols.DECIMAL_SEP)} ${type.unit}",
           onCategoryChanged: widget.onSelectCategory,
         );

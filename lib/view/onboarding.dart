@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:get/get.dart';
-import 'package:gymtracker/controller/coordinator.dart';
+import 'package:go_router/go_router.dart';
 import 'package:gymtracker/controller/notifications_controller.dart';
 import 'package:gymtracker/i18n/strings.g.dart';
 import 'package:gymtracker/icons/gymtracker_icons.dart';
 import 'package:gymtracker/provider/food.dart';
 import 'package:gymtracker/provider/online.dart';
+import 'package:gymtracker/service/database.dart';
 import 'package:gymtracker/utils/go.dart';
+import 'package:gymtracker/view/actions/notifications.dart';
 import 'package:gymtracker/view/login.dart';
 import 'package:gymtracker/view/utils/in_app_icon.dart';
 import 'package:introduction_screen/introduction_screen.dart';
@@ -25,7 +26,8 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final notificationController = Get.find<NotificationController>();
+    final notificationController = ref.read(notificationControllerProvider);
+    ref.watch(notificationPermissionsProvider);
     final foodPerms =
         ref.watch(foodPermissionsProvider).asData?.value ??
         (camera: false, gallery: false);
@@ -38,9 +40,8 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
     );
     permIcon(IconData defaultValue, bool granted) =>
         Icon(granted ? Icons.check_rounded : defaultValue, size: 24);
-    return StreamBuilder<void>(
-      stream: notificationController.status,
-      builder: (context, snapshot) {
+    return Builder(
+      builder: (context) {
         final onlineAccount = ref.watch(onlineProvider).value;
         return IntroductionScreen(
           key: _introKey,
@@ -204,9 +205,13 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                   overflowSpacing: 8,
                   children: [
                     ElevatedButton(
-                      onPressed: () {
+                      onPressed: () async {
                         // Done
-                        Get.find<Coordinator>().onFinishedOnboarding();
+                        final service = ref.read(databaseServiceProvider);
+                        await service.writeSettings(
+                          service.prefs$.value.copyWithOnboardingComplete(),
+                        );
+                        if (context.mounted) context.go('/feed');
                       },
                       child: Text(context.t.onboarding.buttons.done),
                     ),

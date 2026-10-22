@@ -7,7 +7,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:get/get.dart';
 import 'package:gymtracker/controller/debug_controller.dart';
 import 'package:gymtracker/controller/history_controller.dart';
 import 'package:gymtracker/controller/me_controller.dart';
@@ -33,6 +32,7 @@ import 'package:gymtracker/view/onboarding.dart';
 import 'package:gymtracker/view/paywall.dart';
 import 'package:gymtracker/view/settings/radio.dart';
 import 'package:gymtracker/view/utils/import_routine.dart';
+import 'package:gymtracker/view/utils/preference_control.dart';
 import 'package:gymtracker/view/utils/sliver_utils.dart';
 import 'package:gymtracker/view/utils/timer.dart';
 import 'package:logging/logging.dart' as logging;
@@ -50,7 +50,8 @@ class _DebugViewState extends ConsumerState<DebugView> {
 
   @override
   Widget build(BuildContext context) {
-    final controller = Get.find<DebugController>();
+    final controller = ref.read(debugControllerProvider.notifier);
+    final debug = ref.watch(debugControllerProvider);
 
     return Scaffold(
       body: CustomScrollView(
@@ -58,30 +59,32 @@ class _DebugViewState extends ConsumerState<DebugView> {
           const SliverAppBar.large(title: Text("Debug")),
           SliverList(
             delegate: SliverChildListDelegate([
-              Obx(() {
-                final missingKeys = generateJsonForMissingKeys([
-                  ...controller.missingKeys,
-                ]);
-                return ListTile(
-                  title: const Text("Missing translations"),
-                  subtitle: Text(missingKeys, style: monospace),
-                  onTap: () {
-                    logger.d("\n$missingKeys\n");
-                    Clipboard.setData(ClipboardData(text: missingKeys));
-                    Go.snack(
-                      "The missing keys have been copied to the clipboard",
-                    );
-                  },
-                );
-              }),
+              Builder(
+                builder: (context) {
+                  final missingKeys = generateJsonForMissingKeys([
+                    ...debug.missingKeys,
+                  ]);
+                  return ListTile(
+                    title: const Text("Missing translations"),
+                    subtitle: Text(missingKeys, style: monospace),
+                    onTap: () {
+                      logger.d("\n$missingKeys\n");
+                      Clipboard.setData(ClipboardData(text: missingKeys));
+                      Go.snack(
+                        "The missing keys have been copied to the clipboard",
+                      );
+                    },
+                  );
+                },
+              ),
               ListTile(
                 title: const Text("Fix history std. exercise labels"),
                 subtitle: const Text(
                   "Fixes the labels of the standard exercises in the history",
                 ),
                 onTap: () {
-                  final hc = Get.find<HistoryController>();
-                  final db = Get.find<DatabaseService>();
+                  final hc = ref.read(historyControllerProvider);
+                  final db = ref.read(databaseServiceProvider);
                   for (final workout in db.workoutHistory) {
                     db.setHistoryWorkout(hc.fixWorkout(workout));
                   }
@@ -94,7 +97,10 @@ class _DebugViewState extends ConsumerState<DebugView> {
                 onTap: () {
                   Go.showBottomModalScreen(
                     (context, _) => ImportRoutineModal(
-                      workout: Get.find<RoutinesController>().workouts.first,
+                      workout: ref
+                          .read(routinesControllerProvider)
+                          .workouts
+                          .first,
                     ),
                   );
                 },
@@ -104,13 +110,13 @@ class _DebugViewState extends ConsumerState<DebugView> {
                 onTap: () {
                   Go.to(
                     () => DriftDbViewer(
-                      Get.find<DatabaseService>().db as GeneratedDatabase,
+                      ref.read(databaseServiceProvider).db as GeneratedDatabase,
                     ),
                   );
                 },
               ),
-              ValueBuilder<bool?>(
-                initialValue: controller.showSimulator.value,
+              PreferenceControl<bool?>(
+                initialValue: debug.showSimulator,
                 builder: (value, onChanged) => SwitchListTile(
                   title: const Text("Show device simulator"),
                   value: value ?? false,
@@ -137,7 +143,7 @@ class _DebugViewState extends ConsumerState<DebugView> {
                   Go.to(() => const WorkoutTitleGeneratorAlert());
                 },
               ),
-              ValueBuilder<logging.Level?>(
+              PreferenceControl<logging.Level?>(
                 initialValue: logging.Logger.root.level,
                 builder: (val, onChange) => RadioModalTile<logging.Level?>(
                   title: const Text("Logger level"),
@@ -152,10 +158,10 @@ class _DebugViewState extends ConsumerState<DebugView> {
               ListTile(
                 title: const Text("Recompute streaks"),
                 subtitle: Text(
-                  "Current value: ${Get.find<HistoryController>().streaks.value}",
+                  "Current value: ${ref.read(historyControllerProvider).streaks}",
                 ),
                 onTap: () {
-                  Get.find<HistoryController>().computeStreaks();
+                  ref.read(historyControllerProvider).computeStreaks();
                 },
               ),
               ListTile(
@@ -176,73 +182,52 @@ class _DebugViewState extends ConsumerState<DebugView> {
                   Go.toDialog(() => const _DebugAddRandomWeightAlert());
                 },
               ),
-              // ListTile(
-              //   title: const Text("Simulate succesful login sequence"),
-              //   onTap: () async {
-              //     Get.find<Coordinator>().onSuccessfulLogin();
-              //   },
-              // ),
-              // ListTile(
-              //   title: const Text("Simulate sync upload"),
-              //   onTap: () async {
-              //     Get.find<OnlineController>().also((c) {
-              //       c.onStandardSyncUpload(
-              //           currentSnapshot: c.service.currentSnapshot);
-              //     });
-              //   },
-              // ),
-              // ListTile(
-              //   title: const Text("Simulate sync download"),
-              //   onTap: () async {
-              //     Get.find<OnlineController>().also((c) {
-              //       c.onStandardSyncDownload(
-              //           currentSnapshot: c.service.currentSnapshot);
-              //     });
-              //   },
-              // ),
-              ListTile(
-                title: const Text("Simulate sync"),
-                onTap: () async {
-                  // Get.find<OnlineController>().also((c) {
-                  //   c.sync(currentSnapshot: c.service.currentSnapshot);
-                  // });
-                },
-              ),
+              ListTile(title: const Text("Simulate sync"), onTap: () async {}),
               ListTile(
                 title: const Text("Update home widgets"),
                 onTap: () async {
                   WidgetsService.instance().updateWeeklyStreak(
-                    Get.find<HistoryController>().streaks.value.weekStreak,
+                    ref.read(historyControllerProvider).streaks.weekStreak,
                   );
                   WidgetsService.instance().updateRestStreak(
-                    Get.find<HistoryController>().streaks.value.restDays,
+                    ref.read(historyControllerProvider).streaks.restDays,
                   );
                   WidgetsService.instance().updateWorkouts(
-                    Get.find<HistoryController>().history.length,
+                    ref.read(historyControllerProvider).history.length,
                   );
-                  NativeService.instance().updateHomeWidgetParameters(
-                    weekStreak:
-                        Get.find<HistoryController>().streaks.value.weekStreak,
-                    lastWorkoutDay: Get.find<HistoryController>()
-                        .userVisibleWorkouts
-                        .let((self) {
-                          if (self.isEmpty) return DateTime.now().startOfDay;
-                          return ([
-                            self.first.startingDate!,
-                            self.last.startingDate!,
-                          ]..sort()).last.startOfDay;
-                        }),
-                    workouts: Get.find<HistoryController>().userVisibleLength,
-                    workoutDensityChartData: [
-                      for (int i = 0; i < 7 * 18; i++)
-                        Get.find<HistoryController>()
-                                .workoutsByDay[DateTime.now()
-                                    .subtract(Duration(days: i))
-                                    .startOfDay]
-                                ?.length ??
-                            0,
-                    ],
-                  );
+                  ref
+                      .read(nativeServiceProvider)
+                      .updateHomeWidgetParameters(
+                        weekStreak: ref
+                            .read(historyControllerProvider)
+                            .streaks
+                            .weekStreak,
+                        lastWorkoutDay: ref
+                            .read(historyControllerProvider)
+                            .userVisibleWorkouts
+                            .let((self) {
+                              if (self.isEmpty) {
+                                return DateTime.now().startOfDay;
+                              }
+                              return ([
+                                self.first.startingDate!,
+                                self.last.startingDate!,
+                              ]..sort()).last.startOfDay;
+                            }),
+                        workouts: ref
+                            .read(historyControllerProvider)
+                            .userVisibleLength,
+                        workoutDensityChartData: [
+                          for (int i = 0; i < 7 * 18; i++)
+                            ref
+                                    .read(historyControllerProvider)
+                                    .workoutsByDay[DateTime.now()
+                                        .subtract(Duration(days: i))
+                                        .startOfDay]
+                                    ?.length ??
+                                0,
+                        ],
+                      );
                 },
               ),
               ListTile(
@@ -301,23 +286,28 @@ class _DebugViewState extends ConsumerState<DebugView> {
                   ),
                 ),
               ),
-              Obx(() {
-                return Column(
-                  children: [
-                    for (final entry
-                        in Get.find<StopwatchController>().stopwatches.entries)
-                      TimerView(
-                        builder: (ctx, _) => ListTile(
-                          title: Text(entry.key),
-                          subtitle: Text(
-                            "Running: ${!entry.value.isStopped()}, Current time: ${entry.value.currentTime}",
+              Builder(
+                builder: (context) {
+                  return Column(
+                    children: [
+                      for (final entry
+                          in ref
+                              .read(stopwatchControllerProvider.notifier)
+                              .stopwatches
+                              .entries)
+                        TimerView(
+                          builder: (ctx, _) => ListTile(
+                            title: Text(entry.key),
+                            subtitle: Text(
+                              "Running: ${!entry.value.isStopped}, Current time: ${entry.value.currentTime}",
+                            ),
                           ),
+                          startingTime: DateTime.now(),
                         ),
-                        startingTime: DateTime.now(),
-                      ),
-                  ],
-                );
-              }),
+                    ],
+                  );
+                },
+              ),
               StatefulBuilder(
                 builder: (context, setState) {
                   return Slider(
@@ -786,23 +776,23 @@ class _DebugMaterialBannerTestState extends State<_DebugMaterialBannerTest> {
   }
 }
 
-class _DebugAddRandomWeightAlert extends StatefulWidget {
+class _DebugAddRandomWeightAlert extends ConsumerStatefulWidget {
   const _DebugAddRandomWeightAlert();
 
   @override
-  State<_DebugAddRandomWeightAlert> createState() =>
+  ConsumerState<_DebugAddRandomWeightAlert> createState() =>
       __DebugAddRandomWeightAlertState();
 }
 
 class __DebugAddRandomWeightAlertState
-    extends State<_DebugAddRandomWeightAlert> {
+    extends ConsumerState<_DebugAddRandomWeightAlert> {
   double startingWeight = 80;
   int numberOfWeights = 5;
   int displacement = 0;
 
   @override
   Widget build(BuildContext context) {
-    final meController = Get.find<MeController>();
+    final meController = ref.read(meControllerProvider);
 
     return AlertDialog(
       title: const Text("Add random weight"),

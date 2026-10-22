@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:gymtracker/controller/exercises_controller.dart';
 import 'package:gymtracker/controller/history_controller.dart';
 import 'package:gymtracker/controller/settings_controller.dart';
 import 'package:gymtracker/data/distance.dart';
@@ -13,18 +14,18 @@ import 'package:gymtracker/i18n/strings.g.dart';
 import 'package:gymtracker/icons/gymtracker_icons.dart';
 import 'package:gymtracker/model/exercise.dart';
 import 'package:gymtracker/model/workout.dart';
-import 'package:gymtracker/provider/locale.dart';
+import 'package:gymtracker/provider/settings.dart';
 import 'package:gymtracker/provider/stats.dart';
+import 'package:gymtracker/provider/training_data.dart';
 import 'package:gymtracker/utils/colors.dart';
 import 'package:gymtracker/utils/constants.dart';
 import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/utils/utils.dart'
-    show getLastFirstDayOfWeek, getWeekNumber, firstDayOfWeekFor;
+    show getWeekNumber, firstDayOfWeekFor;
 import 'package:gymtracker/view/charts/gym_equipment.dart';
 import 'package:gymtracker/view/charts/line_charts_time_series.dart';
 import 'package:gymtracker/view/charts/muscle_category.dart';
 import 'package:gymtracker/view/components/alert_banner.dart';
-import 'package:gymtracker/view/components/controlled.dart';
 import 'package:gymtracker/view/components/equipment_icon.dart';
 import 'package:gymtracker/view/components/error_view.dart';
 import 'package:gymtracker/view/components/loading_indicator.dart';
@@ -49,16 +50,16 @@ enum TimeFrame {
   final Duration? duration;
 }
 
-class MeStatisticsPage extends StatefulWidget {
+class MeStatisticsPage extends ConsumerStatefulWidget {
   const MeStatisticsPage({super.key});
 
   @override
-  State<MeStatisticsPage> createState() => _MeStatisticsPageState();
+  ConsumerState<MeStatisticsPage> createState() => _MeStatisticsPageState();
 }
 
-class _MeStatisticsPageState
-    extends ControlledState<MeStatisticsPage, HistoryController>
+class _MeStatisticsPageState extends ConsumerState<MeStatisticsPage>
     with SingleTickerProviderStateMixin {
+  HistoryController get controller => ref.read(historyControllerProvider);
   late final _controller = TabController(length: 4, vsync: this);
 
   TimeFrame timeFrame = TimeFrame.thirtyDays;
@@ -84,13 +85,13 @@ class _MeStatisticsPageState
       volume += Weights.convert(
         value: workout.liftedWeight,
         from: workout.weightUnit,
-        to: settingsController.weightUnit.value,
+        to: ref.read(settingsControllerInstanceProvider).weightUnit,
       );
       sets += workout.doneSets.length;
       distance += Distance.convert(
         value: workout.distanceRun,
         from: workout.distanceUnit,
-        to: settingsController.distanceUnit.value,
+        to: ref.read(settingsControllerInstanceProvider).distanceUnit,
       );
     }
 
@@ -99,6 +100,8 @@ class _MeStatisticsPageState
 
   @override
   Widget build(BuildContext context) {
+    ref.watch(appPreferencesProvider);
+    ref.watch(historyWorkoutsProvider);
     final speedDialData = this.speedDialData;
 
     final dropdown = DropdownButtonFormField(
@@ -206,7 +209,12 @@ class _MeStatisticsPageState
                       builder: (context, value) {
                         return SpeedDialButton(
                           icon: const Icon(GTIcons.volume),
-                          text: Text(value.getUserFacingWeight(context.t)),
+                          text: Text(
+                            value.getUserFacingWeight(
+                              context.t,
+                              ref.read(settingsControllerProvider).weightUnit,
+                            ),
+                          ),
                           subtitle: Text(context.t.me.stats.volume.label),
                         );
                       },
@@ -226,7 +234,12 @@ class _MeStatisticsPageState
                       builder: (context, value) {
                         return SpeedDialButton(
                           icon: const Icon(GTIcons.distance),
-                          text: Text(value.getUserFacingDistance(context.t)),
+                          text: Text(
+                            value.getUserFacingDistance(
+                              context.t,
+                              ref.read(settingsControllerProvider).distanceUnit,
+                            ),
+                          ),
                           subtitle: Text(context.t.me.stats.distance.label),
                         );
                       },
@@ -245,6 +258,9 @@ class _MeStatisticsPageState
                               )
                               .expand((e) => e)
                               .toList(),
+                          customExercises: ref
+                              .read(exercisesControllerProvider)
+                              .exercises,
                         ),
                         curve: Curves.easeOutSine,
                       ),
@@ -303,11 +319,13 @@ class _MeStatisticsPageState
   }
 }
 
-class _BigThreeStatsTab extends StatelessWidget {
+class _BigThreeStatsTab extends ConsumerWidget {
   const _BigThreeStatsTab();
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    ref.watch(appPreferencesProvider);
+    ref.watch(historyWorkoutsProvider);
     return LayoutBuilder(
       builder: (context, constr) {
         return SingleChildScrollView(
@@ -361,6 +379,7 @@ class _StatsMainLiftsChart extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    ref.watch(appPreferencesProvider);
     final weightResult = ref.watch(
       majorThreeChartDataProvider(firstDayOfWeekFor(context.locale)),
     );
@@ -394,7 +413,7 @@ class _StatsMainLiftsChart extends ConsumerWidget {
         );
       },
       child: weightResult.when(
-        data: (weights) => _dataBuilder(context, weights),
+        data: (weights) => _dataBuilder(context, weights, ref),
         loading: () => const Center(child: GBLoadingIndicator()),
         error: (error, stackTrace) => ErrorViewComponent(
           error: error,
@@ -407,6 +426,7 @@ class _StatsMainLiftsChart extends ConsumerWidget {
   Widget _dataBuilder(
     BuildContext context,
     Map<MajorLiftType, Map<DateTime, double>> weights,
+    WidgetRef ref,
   ) {
     final Map<MajorLiftType, List<LineChartPoint>> data = {};
 
@@ -480,7 +500,7 @@ class _StatsMainLiftsChart extends ConsumerWidget {
       },
       currentValueBuilder: (selectedCategory, hoveredIndex, point, isPredicted) {
         return Text(
-          "${names[selectedCategory] ?? selectedCategory}: ${point.value.getUserFacingWeight(context.t)} (${DateFormat.yMMMd(context.locale.languageCode).format(point.date)})",
+          "${names[selectedCategory] ?? selectedCategory}: ${point.value.getUserFacingWeight(context.t, ref.read(settingsControllerProvider).weightUnit)} (${DateFormat.yMMMd(context.locale.languageCode).format(point.date)})",
         );
       },
       nullCurrentValueBuilder: (selectedCategory) {
@@ -488,7 +508,10 @@ class _StatsMainLiftsChart extends ConsumerWidget {
       },
       leftTitleBuilder: (category, weight) {
         if (weight < 0) return "";
-        return weight.getUserFacingWeight(context.t);
+        return weight.getUserFacingWeight(
+          context.t,
+          ref.read(settingsControllerProvider).weightUnit,
+        );
       },
       categoryColors: (context) => colors,
       bottomTitleBuilder: (date) {

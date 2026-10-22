@@ -1,10 +1,11 @@
 part of 'settings.dart';
 
-class PermissionsSettingsPane extends ControlledWidget<SettingsController> {
+class PermissionsSettingsPane extends ConsumerWidget {
   const PermissionsSettingsPane({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    ref.watch(appPreferencesProvider);
     return Scaffold(
       body: DetailsView(
         child: CustomScrollView(
@@ -15,9 +16,9 @@ class PermissionsSettingsPane extends ControlledWidget<SettingsController> {
             ),
             SliverList(
               delegate: SliverChildListDelegate([
-                Get.find<NotificationController>().settingsTile,
+                const NotificationPermissionTile(),
                 const FoodPermissionsSettingsTile(),
-                Get.find<HealthController>().settingsTile,
+                const HealthPermissionTile(),
               ]),
             ),
             const SliverToBoxAdapter(child: SizedBox(height: 8)),

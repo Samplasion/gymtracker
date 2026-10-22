@@ -1,59 +1,48 @@
-import 'dart:convert';
-import 'dart:io';
-
 import 'package:csv/csv.dart';
-import 'package:file_picker/file_picker.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:get/get.dart';
-import 'package:gymtracker/controller/serviceable_controller.dart';
 import 'package:gymtracker/data/converters.dart';
 import 'package:gymtracker/data/distance.dart';
 import 'package:gymtracker/data/weights.dart';
 import 'package:gymtracker/i18n/strings.g.dart';
-import 'package:gymtracker/main.dart';
 import 'package:gymtracker/model/preferences.dart';
 import 'package:gymtracker/provider/locale.dart';
-import 'package:gymtracker/service/logger.dart';
+import 'package:gymtracker/provider/settings.dart';
+import 'package:gymtracker/service/database.dart';
 import 'package:gymtracker/struct/nutrition.dart';
-import 'package:gymtracker/utils/constants.dart';
 import 'package:gymtracker/utils/extensions.dart';
-import 'package:gymtracker/utils/go.dart';
-import 'package:gymtracker/view/logs.dart';
-import 'package:gymtracker/view/migrations.dart';
-import 'package:gymtracker/view/settings.dart';
-import 'package:share_plus/share_plus.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
+
+part 'settings_controller.g.dart';
 
 Color defaultColor = Color(Colors.blue.hexValue);
 
-SettingsController get settingsController => Get.find<SettingsController>();
+class SettingsController {
+  SettingsController({required Ref ref}) : _ref = ref;
+  final Ref _ref;
+  DatabaseService get service => _ref.read(databaseServiceProvider);
+  Prefs get _preferences =>
+      _ref.read(appPreferencesProvider).value ?? service.prefs$.value;
+  bool get hasInitialized => _ref.read(appPreferencesProvider).hasValue;
+  bool get usesDynamicColor => _preferences.usesDynamicColor;
+  Color get color => _preferences.color;
+  Locale get locale => _preferences.locale ?? kSystemLocaleSentinel;
+  Weights get weightUnit => _preferences.weightUnit;
+  Distance get distanceUnit => _preferences.distanceUnit;
+  bool get showSuggestedRoutines => _preferences.showSuggestedRoutines;
+  ThemeMode get themeMode => _preferences.themeMode;
+  bool get tintExercises => _preferences.tintExercises;
+  bool get defaultToSimpleWorkoutView =>
+      _preferences.defaultToSimpleWorkoutView;
+  NutritionLanguage get nutritionLanguage => _preferences.nutritionLanguage;
+  NutritionCountry get nutritionCountry => _preferences.nutritionCountry;
 
-class SettingsController extends GetxController with ServiceableController {
-  RxBool hasInitialized = false.obs;
-  RxBool usesDynamicColor = Prefs.defaultValue.usesDynamicColor.obs;
-  Rx<Color> color = Prefs.defaultValue.color.obs;
-  Rx<Locale?> locale = Prefs.defaultValue.locale.obs;
-  Rx<Weights> weightUnit = Prefs.defaultValue.weightUnit.obs;
-  Rx<Distance> distanceUnit = Prefs.defaultValue.distanceUnit.obs;
-  RxBool showSuggestedRoutines = Prefs.defaultValue.showSuggestedRoutines.obs;
-  Rx<ThemeMode> themeMode = Prefs.defaultValue.themeMode.obs;
-  RxBool tintExercises = Prefs.defaultValue.tintExercises.obs;
-  RxBool defaultToSimpleWorkoutView =
-      Prefs.defaultValue.defaultToSimpleWorkoutView.obs;
-  Rx<NutritionLanguage> nutritionLanguage =
-      Prefs.defaultValue.nutritionLanguage.obs;
-  Rx<NutritionCountry> nutritionCountry =
-      Prefs.defaultValue.nutritionCountry.obs;
+  Future<void> setUsesDynamicColor(bool usesDC) =>
+      service.writeSettings(_preferences.copyWith(usesDynamicColor: usesDC));
 
-  void setUsesDynamicColor(bool usesDC) => service.writeSettings(
-    service.prefs$.value.copyWith(usesDynamicColor: usesDC),
-  );
+  Future<void> setColor(Color color) =>
+      service.writeSettings(_preferences.copyWith(color: color));
 
-  void setColor(Color color) =>
-      service.writeSettings(service.prefs$.value.copyWith(color: color));
-
-  void setLocale(Locale? locale) {
+  Future<void> setLocale(Locale? locale) {
     if (locale == kSystemLocaleSentinel) {
       locale = null;
     }
@@ -62,196 +51,38 @@ class SettingsController extends GetxController with ServiceableController {
     } else {
       LocaleSettings.setLocaleRaw(locale.languageCode);
     }
-    Get.updateLocale(locale ?? globalContainer.read(platformLocaleProvider));
-    globalContainer
+    _ref
         .read(translationsProvider.notifier)
-        .setLocale(locale ?? globalContainer.read(platformLocaleProvider));
-    service.writeSettings(service.prefs$.value.copyWith(locale: locale));
+        .setLocale(locale ?? _ref.read(platformLocaleProvider));
+    return service.writeSettings(_preferences.copyWith(locale: locale));
   }
 
-  void setWeightUnit(Weights weightUnit) => service.writeSettings(
-    service.prefs$.value.copyWith(weightUnit: weightUnit),
+  Future<void> setWeightUnit(Weights weightUnit) =>
+      service.writeSettings(_preferences.copyWith(weightUnit: weightUnit));
+
+  Future<void> setDistanceUnit(Distance distanceUnit) =>
+      service.writeSettings(_preferences.copyWith(distanceUnit: distanceUnit));
+
+  Future<void> setShowSuggestedRoutines(bool show) =>
+      service.writeSettings(_preferences.copyWith(showSuggestedRoutines: show));
+
+  Future<void> setThemeMode(ThemeMode themeMode) =>
+      service.writeSettings(_preferences.copyWith(themeMode: themeMode));
+
+  Future<void> setTintExercises(bool tintExercises) => service.writeSettings(
+    _preferences.copyWith(tintExercises: tintExercises),
   );
 
-  void setDistanceUnit(Distance distanceUnit) => service.writeSettings(
-    service.prefs$.value.copyWith(distanceUnit: distanceUnit),
-  );
+  Future<void> setDefaultToSimpleWorkoutView(bool value) => service
+      .writeSettings(_preferences.copyWith(defaultToSimpleWorkoutView: value));
 
-  void setShowSuggestedRoutines(bool show) => service.writeSettings(
-    service.prefs$.value.copyWith(showSuggestedRoutines: show),
-  );
-
-  void setThemeMode(ThemeMode themeMode) => service.writeSettings(
-    service.prefs$.value.copyWith(themeMode: themeMode),
-  );
-
-  void setTintExercises(bool tintExercises) => service.writeSettings(
-    service.prefs$.value.copyWith(tintExercises: tintExercises),
-  );
-
-  void setDefaultToSimpleWorkoutView(bool value) => service.writeSettings(
-    service.prefs$.value.copyWith(defaultToSimpleWorkoutView: value),
-  );
-
-  void setNutritionLanguage(NutritionLanguage nutritionLanguage) =>
+  Future<void> setNutritionLanguage(NutritionLanguage nutritionLanguage) =>
       service.writeSettings(
-        service.prefs$.value.copyWith(nutritionLanguage: nutritionLanguage),
+        _preferences.copyWith(nutritionLanguage: nutritionLanguage),
       );
 
-  void setNutritionCountry(NutritionCountry nutritionCountry) =>
-      service.writeSettings(
-        service.prefs$.value.copyWith(nutritionCountry: nutritionCountry),
-      );
-
-  @override
-  void onInit() {
-    super.onInit();
-
-    service.prefs$.listen((prefs) {
-      hasInitialized(true);
-
-      var locale = prefs.locale ?? globalContainer.read(platformLocaleProvider);
-      if (locale == kSystemLocaleSentinel || locale == null) {
-        locale = globalContainer.read(platformLocaleProvider);
-      }
-      globalContainer.read(translationsProvider.notifier).setLocale(locale!);
-
-      usesDynamicColor(prefs.usesDynamicColor);
-      color(prefs.color);
-      this.locale(locale);
-      weightUnit(prefs.weightUnit);
-      distanceUnit(prefs.distanceUnit);
-      showSuggestedRoutines(prefs.showSuggestedRoutines);
-      themeMode(prefs.themeMode);
-      tintExercises(prefs.tintExercises);
-      defaultToSimpleWorkoutView(prefs.defaultToSimpleWorkoutView);
-      nutritionLanguage(prefs.nutritionLanguage);
-      nutritionCountry(prefs.nutritionCountry);
-
-      notifyChildrens();
-    });
-  }
-
-  @override
-  void onServiceChange() {
-    final prefs = service.prefs$.value;
-    var locale = prefs.locale ?? globalContainer.read(platformLocaleProvider);
-    if (locale == kSystemLocaleSentinel || locale == null) {
-      locale = globalContainer.read(platformLocaleProvider);
-    }
-
-    usesDynamicColor(prefs.usesDynamicColor);
-    color(prefs.color);
-    this.locale(locale);
-    weightUnit(prefs.weightUnit);
-    distanceUnit(prefs.distanceUnit);
-    showSuggestedRoutines(prefs.showSuggestedRoutines);
-    themeMode(prefs.themeMode);
-    tintExercises(prefs.tintExercises);
-    defaultToSimpleWorkoutView(prefs.defaultToSimpleWorkoutView);
-    nutritionLanguage(prefs.nutritionLanguage);
-    nutritionCountry(prefs.nutritionCountry);
-
-    notifyChildrens();
-  }
-
-  Future exportSettings(BuildContext context) async {
-    try {
-      final box = context.findRenderObject() as RenderBox?;
-      await Share.shareXFiles([
-        XFile.fromData(
-          Uint8List.fromList(utf8.encode(json.encode(service.toJson()))),
-          mimeType: "application/json",
-          name:
-              "${context.t.settings.options.export.filename}_${DateTime.now().toIso8601String()}.json",
-        ),
-      ], sharePositionOrigin: box!.localToGlobal(Offset.zero) & box.size);
-    } catch (e, s) {
-      logger.e(null, error: e, stackTrace: s);
-
-      Go.dialog(
-        context.t.settings.options.export.failed.title,
-        "$e\n$s".trim(),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Clipboard.setData(ClipboardData(text: "$e\n$s".trim()));
-              Go.snack(context.t.settings.options.export.failed.copy);
-            },
-            child: Text(
-              // ignore: use_build_context_synchronously
-              MaterialLocalizations.of(context).copyButtonLabel,
-            ),
-          ),
-        ],
-        bodyStyle: monospace,
-      );
-    }
-  }
-
-  Future importSettings(BuildContext context) async {
-    final choice = await Go.pick(
-      title: context.t.settings.options.import.label,
-      values: {"hevy": context.t.settings.options.import.types.hevy},
-    );
-
-    if (choice == null) return;
-
-    PlatformFile? result = await FilePicker.pickFile();
-    Uint8List? bytes = await result?.readAsBytes();
-    String content;
-
-    if (kIsWeb && bytes != null) {
-      content = String.fromCharCodes(bytes.toList());
-    } else if (!kIsWeb && result != null) {
-      content = await result.xFile.readAsString();
-    } else {
-      // User canceled the picker
-      logger.i("Picker canceled");
-      return;
-    }
-
-    try {
-      switch (choice) {
-        case "hevy":
-          // ignore: use_build_context_synchronously
-          await importHevy(content);
-          break;
-      }
-
-      Go.snack(context.t.settings.options.import.success);
-    } catch (e, s) {
-      logger.e("", error: e, stackTrace: s);
-
-      String errorString = e.toString();
-      if (e is Error) {
-        errorString = "$errorString\n${e.stackTrace}";
-      }
-
-      Go.dialog(
-        context.t.settings.options.import.failed.title,
-        errorString,
-        actions: [
-          TextButton(
-            onPressed: () {
-              Clipboard.setData(ClipboardData(text: errorString));
-              Go.snack(context.t.settings.options.import.failed.copy);
-            },
-            child: Text(
-              // ignore: use_build_context_synchronously
-              MaterialLocalizations.of(context).copyButtonLabel,
-            ),
-          ),
-        ],
-      );
-    }
-  }
-
-  Future _importGTJson(BuildContext context, String content) async {
-    Map<String, dynamic> map = json.decode(content);
-
-    await service.fromJson(map);
-  }
+  Future<void> setNutritionCountry(NutritionCountry nutritionCountry) => service
+      .writeSettings(_preferences.copyWith(nutritionCountry: nutritionCountry));
 
   Future<void> importHevy(String content) async {
     List<List<dynamic>> data = const CsvDecoder().convert(content);
@@ -280,57 +111,29 @@ class SettingsController extends GetxController with ServiceableController {
   /// Otherwise, it is guaranteed to return in 5 seconds if the database
   /// doesn't fire the event for some reason.
   Future<void> awaitInitialized() async {
-    if (hasInitialized()) return;
+    if (hasInitialized) return;
     await Future.any([
       service.db.watchPreferences().first,
       Future.delayed(const Duration(seconds: 5)),
     ]);
   }
 
-  showLogs() {
-    Go.to(() => const LogView());
-  }
-
-  showMigrations() {
-    Go.to(() => const AllMigrationsView());
-  }
-
   bool get canExportRaw => service.canExportRaw;
-  exportRawDatabase(BuildContext context) async {
-    try {
-      final box = context.findRenderObject() as RenderBox?;
-      await Share.shareXFiles([
-        XFile(
-          (await service.exportRaw()).path,
-          mimeType: "application/octet-stream",
-          name:
-              "${context.t.settings.options.export.filename}_${DateTime.now().toIso8601String()}.db",
-        ),
-      ], sharePositionOrigin: box!.localToGlobal(Offset.zero) & box.size);
-    } catch (e, s) {
-      logger.e(null, error: e, stackTrace: s);
-
-      Go.dialog(
-        context.t.settings.options.export.failed.title,
-        "$e\n$s".trim(),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Clipboard.setData(ClipboardData(text: "$e\n$s".trim()));
-              Go.snack(context.t.settings.options.export.failed.copy);
-            },
-            child: Text(
-              // ignore: use_build_context_synchronously
-              MaterialLocalizations.of(context).copyButtonLabel,
-            ),
-          ),
-        ],
-        bodyStyle: monospace,
-      );
-    }
-  }
-
-  showBackups() {
-    Go.to(() => const BackupListView());
-  }
 }
+
+@Riverpod(keepAlive: true)
+SettingsController settingsControllerInstance(Ref ref) {
+  ref.watch(appPreferencesProvider);
+  ref.listen(appPreferencesProvider, (_, next) {
+    final prefs = next.value;
+    if (prefs == null) return;
+    final locale = prefs.locale == kSystemLocaleSentinel ? null : prefs.locale;
+    ref
+        .read(translationsProvider.notifier)
+        .setLocale(locale ?? ref.read(platformLocaleProvider));
+  });
+  final controller = SettingsController(ref: ref);
+  return controller;
+}
+
+final settingsControllerProvider = settingsControllerInstanceProvider;

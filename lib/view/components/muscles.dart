@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:gymtracker/controller/exercises_controller.dart';
 import 'package:gymtracker/data/exercises.dart';
@@ -13,7 +14,7 @@ import 'package:rainbow_color/rainbow_color.dart';
 import 'package:xml/xml.dart';
 import 'package:xml/xpath.dart';
 
-class MusclesView extends StatefulWidget {
+class MusclesView extends ConsumerStatefulWidget {
   final Map<GTMuscleHighlight, double> muscles;
   final Curve curve;
 
@@ -24,10 +25,10 @@ class MusclesView extends StatefulWidget {
   });
 
   @override
-  State<MusclesView> createState() => _MusclesViewState();
+  ConsumerState<MusclesView> createState() => _MusclesViewState();
 }
 
-class _MusclesViewState extends State<MusclesView> {
+class _MusclesViewState extends ConsumerState<MusclesView> {
   late Future<(String, String)> _svgFuture = Future.value((
     "#ffffff",
     "#ffffff",
@@ -208,7 +209,10 @@ class _MusclesViewState extends State<MusclesView> {
   }
 }
 
-Map<GTMuscleHighlight, double> getIntensities(List<Exercise> exercises) {
+Map<GTMuscleHighlight, double> getIntensities(
+  List<Exercise> exercises, {
+  Iterable<Exercise> customExercises = const [],
+}) {
   final intensities = <GTMuscleHighlight, double>{
     for (final muscle in GTMuscleHighlight.values) muscle: 0,
   };
@@ -221,7 +225,7 @@ Map<GTMuscleHighlight, double> getIntensities(List<Exercise> exercises) {
         highlight = standard.muscleHighlight;
       }
     } else {
-      final parent = exercise.getParent();
+      final parent = exercise.getParent(customExercises);
       highlight = parent?.muscleHighlight ?? highlight;
     }
 

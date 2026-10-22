@@ -1,6 +1,5 @@
 import 'package:copy_with_extension/copy_with_extension.dart';
 import 'package:drift/drift.dart';
-import 'package:gymtracker/controller/settings_controller.dart';
 import 'package:gymtracker/data/weights.dart';
 import 'package:gymtracker/db/database.dart';
 import 'package:json_annotation/json_annotation.dart';
@@ -45,11 +44,8 @@ class WeightMeasurement extends PredictedWeightMeasurement
   @override
   double get value => weight;
 
-  double get convertedWeight => Weights.convert(
-    value: weight,
-    from: weightUnit,
-    to: settingsController.weightUnit.value,
-  );
+  double convertedWeightTo(Weights targetUnit) =>
+      Weights.convert(value: weight, from: weightUnit, to: targetUnit);
 
   @override
   final DateTime updatedAt;

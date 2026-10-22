@@ -7,7 +7,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:get/get.dart' hide ContextExtensionss;
 import 'package:gymtracker/controller/exercises_controller.dart';
 import 'package:gymtracker/controller/history_controller.dart';
 import 'package:gymtracker/controller/purchases_controller.dart';
@@ -23,14 +22,17 @@ import 'package:gymtracker/model/exercise.dart';
 import 'package:gymtracker/model/set.dart';
 import 'package:gymtracker/model/workout.dart';
 import 'package:gymtracker/provider/locale.dart';
+import 'package:gymtracker/provider/settings.dart';
+import 'package:gymtracker/provider/training_data.dart';
 import 'package:gymtracker/service/logger.dart';
 import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/utils/utils.dart';
+import 'package:gymtracker/view/actions/exercises.dart';
+import 'package:gymtracker/view/actions/purchases.dart';
 import 'package:gymtracker/view/charts/line_charts_by_workout.dart';
 import 'package:gymtracker/view/components/badges.dart';
 import 'package:gymtracker/view/components/content_unavailable.dart';
-import 'package:gymtracker/view/components/controlled.dart';
 import 'package:gymtracker/view/components/master_detail.dart';
 import 'package:gymtracker/view/components/muscles.dart';
 import 'package:gymtracker/view/components/pro_builder.dart';
@@ -44,19 +46,19 @@ import 'package:gymtracker/view/utils/sliver_utils.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
-class LibraryView extends StatefulWidget {
+class LibraryView extends ConsumerStatefulWidget {
   const LibraryView({super.key});
 
   @override
-  State<LibraryView> createState() => _LibraryViewState();
+  ConsumerState<LibraryView> createState() => _LibraryViewState();
 }
 
-class _LibraryViewState
-    extends ControlledState<LibraryView, ExercisesController> {
+class _LibraryViewState extends ConsumerState<LibraryView> {
+  ExercisesController get controller => ref.read(exercisesControllerProvider);
   Map<GTExerciseMuscleCategory, ExerciseCategory> get exercises {
     return {
       GTExerciseMuscleCategory.custom: ExerciseCategory(
-        exercises: Get.find<ExercisesController>().exercises.toList(),
+        exercises: ref.read(exercisesControllerProvider).exercises.toList(),
         iconGetter: (t) => const Icon(GTIcons.custom_exercises),
         color: Colors.amber,
       ),
@@ -67,6 +69,9 @@ class _LibraryViewState
 
   @override
   Widget build(BuildContext context) {
+    ref.watch(appPreferencesProvider);
+    ref.watch(historyWorkoutsProvider);
+    ref.watch(customExercisesProvider);
     return Scaffold(
       body: CustomScrollView(
         slivers: [
@@ -98,7 +103,7 @@ class _LibraryViewState
                   onTap: () {
                     final exStream =
                         category.key == GTExerciseMuscleCategory.custom
-                        ? Get.find<ExercisesController>().exercises$
+                        ? ref.read(exercisesControllerProvider).exercises$
                         : Stream.value(category.value.exercises);
                     Go.to(
                       () => StreamBuilder<List<Exercise>>(
@@ -143,7 +148,9 @@ class _LibraryViewState
         );
       },
       suggestionsBuilder: (context, sController) {
-        final results = controller.search(sController.text, t: context.t);
+        final results = ref
+            .read(exercisesControllerProvider)
+            .search(sController.text, t: context.t);
         return results.map(
           (ex) => ExerciseListTile(
             exercise: ex,
@@ -160,7 +167,7 @@ class _LibraryViewState
   }
 }
 
-class LibraryExercisesView extends GetView<ExercisesController> {
+class LibraryExercisesView extends ConsumerWidget {
   const LibraryExercisesView({
     required this.name,
     required this.category,
@@ -175,15 +182,20 @@ class LibraryExercisesView extends GetView<ExercisesController> {
   final bool isCustom;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    ref.watch(appPreferencesProvider);
+    ref.watch(historyWorkoutsProvider);
+    ref.watch(customExercisesProvider);
     return ThemedSubtree(
       color: category.color,
-      enabled: Get.find<SettingsController>().tintExercises.value,
-      child: isCustom ? _buildInnerView(context) : _buildInnerView(context),
+      enabled: ref.read(settingsControllerInstanceProvider).tintExercises,
+      child: isCustom
+          ? _buildInnerView(context, ref)
+          : _buildInnerView(context, ref),
     );
   }
 
-  Widget _buildInnerView(BuildContext context) {
+  Widget _buildInnerView(BuildContext context, WidgetRef ref) {
     return StatefulBuilder(
       builder: (context, refresh) {
         final exercises = getExercises();
@@ -196,13 +208,13 @@ class LibraryExercisesView extends GetView<ExercisesController> {
           );
 
         return StreamBuilder(
-          stream: controller.exercises$,
+          stream: ref.read(exercisesControllerProvider).exercises$,
           builder: (context, asyncSnapshot) {
             return ProBuilder(
               builder: (context, info) {
                 final shouldDisable =
                     (info == null || !info.hasProFeatures) &&
-                    controller.exercises.length >=
+                    ref.read(exercisesControllerProvider).exercises.length >=
                         Configuration.trialCustomExerciseLimit;
                 return MasterDetailView(
                   appBarTitle: Text(name),
@@ -230,15 +242,17 @@ class LibraryExercisesView extends GetView<ExercisesController> {
                         ),
                         onTap: () {
                           if (shouldDisable) {
-                            Get.find<PurchasesController>().presentPaywall();
+                            ref
+                                .read(purchasesControllerProvider)
+                                .presentPaywall();
                             return;
                           }
                           Go.showBottomModalScreen(
                             (context, controller) => ThemedSubtree(
                               color: category.color,
-                              enabled: Get.find<SettingsController>()
-                                  .tintExercises
-                                  .value,
+                              enabled: ref
+                                  .read(settingsControllerInstanceProvider)
+                                  .tintExercises,
                               child: ExerciseCreator(
                                 base: null,
                                 scrollController: controller,
@@ -255,7 +269,10 @@ class LibraryExercisesView extends GetView<ExercisesController> {
                         subscriptionInfo: info,
                         shouldHide: (subscriptionInfo) {
                           return subscriptionInfo.hasProFeatures ||
-                              controller.exercises.length <
+                              ref
+                                      .read(exercisesControllerProvider)
+                                      .exercises
+                                      .length <
                                   Configuration.trialCustomExerciseAlertLimit;
                         },
                       ),
@@ -268,6 +285,7 @@ class LibraryExercisesView extends GetView<ExercisesController> {
                             isConcrete: false,
                           ).getAsMasterItem(
                             context,
+                            ref,
                             detailsBuilder: (context) {
                               return ExerciseInfoView(
                                 key: ValueKey(sorted[index].id),
@@ -305,7 +323,7 @@ class _ExerciseInfoViewState extends ConsumerState<ExerciseInfoView>
   final historyStream = BehaviorSubject<List<(Exercise, int, Workout)>>.seeded(
     [],
   );
-  late final StreamSubscription historySub;
+  late final ProviderSubscription historySub;
   late final tabController = TabController(
     length: getTabs(widget.exercise, [], [], [], "").length,
     vsync: this,
@@ -314,9 +332,8 @@ class _ExerciseInfoViewState extends ConsumerState<ExerciseInfoView>
   @override
   void initState() {
     super.initState();
-    final HistoryController controller = Get.find();
     historyStream.add(getHistory());
-    historySub = controller.history.listen((_) {
+    historySub = ref.listenManual(historyWorkoutsProvider, (_, next) {
       historyStream.add(getHistory());
     });
   }
@@ -324,12 +341,12 @@ class _ExerciseInfoViewState extends ConsumerState<ExerciseInfoView>
   @override
   void dispose() {
     historyStream.close();
-    historySub.cancel();
+    historySub.close();
     super.dispose();
   }
 
   List<(Exercise, int, Workout)> getHistory() =>
-      Get.find<HistoryController>().getHistoryOf(widget.exercise);
+      ref.read(historyControllerProvider).getHistoryOf(widget.exercise);
 
   List<Widget> getTabs(
     Exercise exercise,
@@ -354,12 +371,15 @@ class _ExerciseInfoViewState extends ConsumerState<ExerciseInfoView>
 
   @override
   Widget build(BuildContext context) {
+    ref.watch(appPreferencesProvider);
+    ref.watch(historyWorkoutsProvider);
+    ref.watch(customExercisesProvider);
     final exercise = widget.exercise;
     final expl = ref.watch(exerciseExplanationProvider(exercise.id));
 
     return ThemedSubtree(
       color: category?.color ?? Theme.of(context).colorScheme.primary,
-      enabled: Get.find<SettingsController>().tintExercises.value,
+      enabled: ref.read(settingsControllerInstanceProvider).tintExercises,
       child: DetailsView(
         child: StreamBuilder<List<(Exercise, int, Workout)>>(
           stream: historyStream,
@@ -437,9 +457,9 @@ class _ExerciseInfoViewState extends ConsumerState<ExerciseInfoView>
                         PopupMenuItem(
                           child: Text(context.t.actions.edit),
                           onTap: () async {
-                            final newExercise =
-                                await Get.find<ExercisesController>()
-                                    .editExercise(exercise, history);
+                            final newExercise = await ref
+                                .read(exercisesControllerProvider)
+                                .editExercise(exercise, history);
                             if (context.mounted && newExercise != null) {
                               widget.refresh?.call();
                               MDVConfiguration.of(context)?.push(
@@ -464,11 +484,11 @@ class _ExerciseInfoViewState extends ConsumerState<ExerciseInfoView>
                                 "exercise.delete.body",
                               );
                               if (delete) {
-                                Get.find<ExercisesController>().deleteExercise(
-                                  exercise,
-                                );
+                                ref
+                                    .read(exercisesControllerProvider)
+                                    .deleteExercise(exercise);
                                 widget.refresh?.call();
-                                Get.back();
+                                Go.back();
                               }
                             },
                           ),
@@ -514,8 +534,10 @@ class _ExerciseInfoViewState extends ConsumerState<ExerciseInfoView>
     List<(Exercise, int, Workout)> history,
     List<ListTileTheme> infoTiles,
   ) {
-    final ongoingWorkout = Get.isRegistered<WorkoutController>()
-        ? Get.find<WorkoutController>().synthesizeTemporaryWorkout()
+    final ongoingWorkout = ref.read(workoutControllerProvider) != null
+        ? ref
+              .read(workoutControllerProvider.notifier)
+              .synthesizeTemporaryWorkout()
         : null;
     final ongoingWorkoutData = ongoingWorkout != null
         ? (
@@ -536,7 +558,7 @@ class _ExerciseInfoViewState extends ConsumerState<ExerciseInfoView>
         : null;
     return ThemedSubtree.builder(
       color: category?.color ?? Theme.of(context).colorScheme.primary,
-      enabled: Get.find<SettingsController>().tintExercises.value,
+      enabled: ref.read(settingsControllerInstanceProvider).tintExercises,
       builder: (context) {
         return CustomScrollView(
           slivers: [
@@ -748,7 +770,7 @@ class _ExerciseInfoViewState extends ConsumerState<ExerciseInfoView>
   Widget _explanationBody(Exercise exercise, String? explanation) {
     return ThemedSubtree.builder(
       color: category?.color ?? Theme.of(context).colorScheme.primary,
-      enabled: Get.find<SettingsController>().tintExercises.value,
+      enabled: ref.read(settingsControllerInstanceProvider).tintExercises,
       builder: (context) {
         return CustomScrollView(
           slivers: [
@@ -852,7 +874,7 @@ class _ExerciseInfoViewState extends ConsumerState<ExerciseInfoView>
                     .max
                     .toDouble(),
                 from: workout.weightUnit,
-                to: settingsController.weightUnit.value,
+                to: ref.read(settingsControllerInstanceProvider).weightUnit,
               );
               if (value > bestScore) {
                 best = hist;
@@ -864,7 +886,10 @@ class _ExerciseInfoViewState extends ConsumerState<ExerciseInfoView>
 
             return ExerciseInfoTile(
               context.t.exercise.info.heaviestWeight.label,
-              bestScore.getUserFacingWeight(context.t),
+              bestScore.getUserFacingWeight(
+                context.t,
+                ref.read(settingsControllerProvider).weightUnit,
+              ),
               onTap: () {
                 Go.to(
                   () => ExercisesView(
@@ -897,7 +922,7 @@ class _ExerciseInfoViewState extends ConsumerState<ExerciseInfoView>
               final value = Weights.convert(
                 value: val,
                 from: workout.weightUnit,
-                to: settingsController.weightUnit.value,
+                to: ref.read(settingsControllerInstanceProvider).weightUnit,
               );
               if (value > bestScore) {
                 best = hist;
@@ -909,7 +934,10 @@ class _ExerciseInfoViewState extends ConsumerState<ExerciseInfoView>
 
             return ExerciseInfoTile(
               context.t.exercise.info.best1rm.label,
-              bestScore.getUserFacingWeight(context.t),
+              bestScore.getUserFacingWeight(
+                context.t,
+                ref.read(settingsControllerProvider).weightUnit,
+              ),
               onTap: () {
                 Go.to(
                   () => ExercisesView(
@@ -937,7 +965,7 @@ class _ExerciseInfoViewState extends ConsumerState<ExerciseInfoView>
                 final value = Weights.convert(
                   value: set.weight!,
                   from: workout.weightUnit,
-                  to: settingsController.weightUnit.value,
+                  to: ref.read(settingsControllerInstanceProvider).weightUnit,
                 );
                 if ((value * set.reps!) > bestScore) {
                   best = hist;
@@ -952,7 +980,7 @@ class _ExerciseInfoViewState extends ConsumerState<ExerciseInfoView>
 
             return ExerciseInfoTile(
               context.t.exercise.info.bestSetVolume.label,
-              "${bestWeight.getUserFacingWeight(context.t)} × $bestReps",
+              "${bestWeight.getUserFacingWeight(context.t, ref.read(settingsControllerProvider).weightUnit)} × $bestReps",
               onTap: () {
                 Go.to(
                   () => ExercisesView(
@@ -986,7 +1014,7 @@ class _ExerciseInfoViewState extends ConsumerState<ExerciseInfoView>
                     .sum
                     .toDouble(),
                 from: workout.weightUnit,
-                to: settingsController.weightUnit.value,
+                to: ref.read(settingsControllerInstanceProvider).weightUnit,
               );
               if (value > bestScore) {
                 best = hist;
@@ -998,7 +1026,10 @@ class _ExerciseInfoViewState extends ConsumerState<ExerciseInfoView>
 
             return ExerciseInfoTile(
               context.t.exercise.info.bestSessionVolume.label,
-              bestScore.getUserFacingWeight(context.t),
+              bestScore.getUserFacingWeight(
+                context.t,
+                ref.read(settingsControllerProvider).weightUnit,
+              ),
               onTap: () {
                 Go.to(
                   () => ExercisesView(
@@ -1039,24 +1070,28 @@ class _ExerciseInfoViewState extends ConsumerState<ExerciseInfoView>
   }
 }
 
-class ExerciseInfoTile extends StatelessWidget {
+class ExerciseInfoTile extends ConsumerWidget {
   final String title, subtitle;
   final VoidCallback? onTap;
 
   const ExerciseInfoTile(this.title, this.subtitle, {this.onTap, super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    ref.watch(appPreferencesProvider);
+    ref.watch(historyWorkoutsProvider);
+    ref.watch(customExercisesProvider);
     return ListTile(title: Text(title), subtitle: Text(subtitle), onTap: onTap);
   }
 }
 
 extension _MDView on ExerciseListTile {
   MasterItem getAsMasterItem(
-    BuildContext context, {
+    BuildContext context,
+    WidgetRef ref, {
     required Widget Function(BuildContext)? detailsBuilder,
   }) {
-    final ListTile tile = build(context) as ListTile;
+    final ListTile tile = build(context, ref) as ListTile;
     return MasterItem(
       tile.title!,
       leading: tile.leading,

@@ -1,6 +1,4 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:get/get.dart';
-import 'package:gymtracker/controller/workout_controller.dart';
 import 'package:gymtracker/model/model.dart';
 import 'package:mocktail/mocktail.dart';
 
@@ -23,7 +21,11 @@ void main() {
     test(
       'computed properties (progress, reps, liftedWeight) work correctly',
       () {
-        final controller = WorkoutController("Test Workout", null, null);
+        final controller = MockServices.createWorkout(
+          "Test Workout",
+          null,
+          null,
+        );
         controller.exercises.addAll([
           exerciseHelper(
             "ex1",
@@ -56,7 +58,7 @@ void main() {
     );
 
     test('hasExercise & applyExerciseModification work correctly', () {
-      final controller = WorkoutController("Test Workout", null, null);
+      final controller = MockServices.createWorkout("Test Workout", null, null);
       final template = exerciseHelper("ex1", "Bench Press");
       final concrete = template.copyWith(id: "concrete1", parentID: "ex1");
       controller.exercises.add(concrete);
@@ -71,18 +73,18 @@ void main() {
     });
 
     test('generateNameIfEmpty works correctly', () {
-      final controller = WorkoutController("", null, null);
+      final controller = MockServices.createWorkout("", null, null);
       controller.exercises.add(exerciseHelper("ex1", "Bench Press"));
       controller.generateNameIfEmpty();
 
-      expect(controller.name.value.isNotEmpty, true);
-      expect(controller.name.value.contains('Chest'), true);
+      expect(controller.name.isNotEmpty, true);
+      expect(controller.name.contains('Chest'), true);
     });
 
     test(
       'serialization & deserialization (save/fromSavedData) work correctly',
       () {
-        final controller = WorkoutController(
+        final controller = MockServices.createWorkout(
           "Saved Workout",
           "parent123",
           "Some info",
@@ -92,7 +94,7 @@ void main() {
         // Stub routinesController to return true for hasOngoingWorkout
         when(
           () => MockServices.routinesController.hasOngoingWorkout,
-        ).thenReturn(true.obs);
+        ).thenReturn(true);
 
         controller.save();
 
@@ -113,17 +115,17 @@ void main() {
           'exercises': controller.exercises.map((e) => e.toJson()).toList(),
         };
 
-        final restored = WorkoutController.fromSavedData(data);
-        expect(restored.name.value, 'Saved Workout');
-        expect(restored.parentID.value, 'parent123');
-        expect(restored.infobox.value, 'Some info');
+        final restored = MockServices.restoreWorkout(data);
+        expect(restored.name, 'Saved Workout');
+        expect(restored.parentID, 'parent123');
+        expect(restored.infobox, 'Some info');
         expect(restored.exercises.length, 1);
         expect(restored.exercises[0].id, 'ex1');
       },
     );
 
     test('cursor navigation works correctly', () {
-      final controller = WorkoutController("Cursor Test", null, null);
+      final controller = MockServices.createWorkout("Cursor Test", null, null);
       controller.exercises.addAll([
         exerciseHelper(
           "ex1",

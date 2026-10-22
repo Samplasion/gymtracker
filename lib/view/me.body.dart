@@ -1,12 +1,14 @@
 part of 'me.dart';
 
-class WeightCard extends StatelessWidget {
+class WeightCard extends ConsumerWidget {
   const WeightCard({super.key});
 
-  MeController get controller => Get.find<MeController>();
-
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final controller = ref.read(meControllerProvider);
+    ref.watch(weightMeasurementsProvider);
+    ref.watch(bodyMeasurementsProvider);
+    ref.watch(measurementWeightUnitProvider);
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 16),
       child: SafeArea(
@@ -18,24 +20,28 @@ class WeightCard extends StatelessWidget {
           child: Stack(
             alignment: Alignment.center,
             children: [
-              Obx(() {
-                if (controller.weightMeasurements.length < 2) {
-                  return const SizedBox.shrink();
-                }
-                return Positioned.fill(
-                  child: WeightChart(
-                    weights: controller.weightMeasurements
-                        .map(
-                          (element) => Weights.convert(
-                            value: element.weight,
-                            from: element.weightUnit,
-                            to: settingsController.weightUnit.value,
-                          ),
-                        )
-                        .toList(),
-                  ),
-                );
-              }),
+              Builder(
+                builder: (context) {
+                  if (controller.weightMeasurements.length < 2) {
+                    return const SizedBox.shrink();
+                  }
+                  return Positioned.fill(
+                    child: WeightChart(
+                      weights: controller.weightMeasurements
+                          .map(
+                            (element) => Weights.convert(
+                              value: element.weight,
+                              from: element.weightUnit,
+                              to: ref
+                                  .watch(settingsControllerProvider)
+                                  .weightUnit,
+                            ),
+                          )
+                          .toList(),
+                    ),
+                  );
+                },
+              ),
               Positioned.fill(
                 child: DecoratedBox(
                   decoration: BoxDecoration(
@@ -51,55 +57,68 @@ class WeightCard extends StatelessWidget {
               ),
               Padding(
                 padding: const EdgeInsets.all(16),
-                child: Obx(() {
-                  final latestMeasurement = controller.latestWeightMeasurement;
+                child: Builder(
+                  builder: (context) {
+                    final latestMeasurement =
+                        controller.latestWeightMeasurement;
 
-                  return Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Text(
-                        latestMeasurement == null
-                            ? context.t.me.weight.none
-                            : latestMeasurement.convertedWeight
-                                  .getUserFacingWeight(context.t),
-                        textAlign: TextAlign.center,
-                        style: Theme.of(context).textTheme.displaySmall,
-                      ),
-                      Text(
-                        latestMeasurement == null
-                            ? context.t.me.weight.measured.never
-                            : context.t.me.weight.measured.date(
-                                date: DateFormat.yMMMMd(
-                                  context.locale.languageCode,
-                                ).format(latestMeasurement.time),
-                              ),
-                        textAlign: TextAlign.center,
-                        style: Theme.of(context).textTheme.bodySmall,
-                      ),
-                      const SizedBox(height: 16),
-                      TextButton(
-                        onPressed: () async {
-                          var measurement =
-                              await Go.showBottomModalScreen<
-                                (WeightMeasurement, List<BodyMeasurement>)
-                              >((context, controller) {
-                                return WeightMeasurementAddSheet(
-                                  controller: controller,
-                                );
-                              });
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Text(
+                          latestMeasurement == null
+                              ? context.t.me.weight.none
+                              : latestMeasurement
+                                    .convertedWeightTo(
+                                      ref
+                                          .watch(settingsControllerProvider)
+                                          .weightUnit,
+                                    )
+                                    .getUserFacingWeight(
+                                      context.t,
+                                      ref
+                                          .watch(settingsControllerProvider)
+                                          .weightUnit,
+                                    ),
+                          textAlign: TextAlign.center,
+                          style: Theme.of(context).textTheme.displaySmall,
+                        ),
+                        Text(
+                          latestMeasurement == null
+                              ? context.t.me.weight.measured.never
+                              : context.t.me.weight.measured.date(
+                                  date: DateFormat.yMMMMd(
+                                    context.locale.languageCode,
+                                  ).format(latestMeasurement.time),
+                                ),
+                          textAlign: TextAlign.center,
+                          style: Theme.of(context).textTheme.bodySmall,
+                        ),
+                        const SizedBox(height: 16),
+                        TextButton(
+                          onPressed: () async {
+                            var measurement =
+                                await Go.showBottomModalScreen<
+                                  (WeightMeasurement, List<BodyMeasurement>)
+                                >((context, controller) {
+                                  return WeightMeasurementAddSheet(
+                                    controller: controller,
+                                  );
+                                });
 
-                          if (measurement != null) {
-                            controller.addWeightMeasurement(measurement.$1);
-                            for (final body in measurement.$2) {
-                              controller.addBodyMeasurement(body);
+                            if (measurement != null) {
+                              controller.addWeightMeasurement(measurement.$1);
+                              for (final body in measurement.$2) {
+                                controller.addBodyMeasurement(body);
+                              }
                             }
-                          }
-                        },
-                        child: Text(context.t.me.weight.addMeasurement),
-                      ),
-                    ],
-                  );
-                }),
+                          },
+                          child: Text(context.t.me.weight.addMeasurement),
+                        ),
+                      ],
+                    );
+                  },
+                ),
               ),
             ],
           ),
@@ -109,20 +128,21 @@ class WeightCard extends StatelessWidget {
   }
 }
 
-class WeightMeasurementDataPage extends StatefulWidget {
+class WeightMeasurementDataPage extends ConsumerStatefulWidget {
   const WeightMeasurementDataPage({super.key});
 
   @override
-  State<WeightMeasurementDataPage> createState() =>
+  ConsumerState<WeightMeasurementDataPage> createState() =>
       _WeightMeasurementDataPageState();
 }
 
-class _WeightMeasurementDataPageState extends State<WeightMeasurementDataPage> {
-  MeController get controller => Get.find<MeController>();
+class _WeightMeasurementDataPageState
+    extends ConsumerState<WeightMeasurementDataPage> {
+  MeController get controller => ref.read(meControllerProvider);
   BodyMeasurementPart? selected;
 
   Widget get chart {
-    final predictedWeight = controller.predictedWeight.valueOrNull;
+    final predictedWeight = ref.watch(predictedWeightProvider);
     return Crossfade(
       firstChild: const SizedBox.shrink(),
       secondChild: Padding(
@@ -158,7 +178,7 @@ class _WeightMeasurementDataPageState extends State<WeightMeasurementDataPage> {
                     ),
                     title: Text(context.t.me.allData.predictedWeight.label),
                     subtitle: Text(
-                      "${predictedWeight.weight.getUserFacingWeight(context.t)} (${DateFormat.yMd(context.locale.languageCode).format(predictedWeight.time)})",
+                      "${predictedWeight.weight.getUserFacingWeight(context.t, ref.watch(settingsControllerProvider).weightUnit)} (${DateFormat.yMd(context.locale.languageCode).format(predictedWeight.time)})",
                     ),
                     onTap: () {
                       Go.dialog(
@@ -194,6 +214,9 @@ class _WeightMeasurementDataPageState extends State<WeightMeasurementDataPage> {
 
   @override
   Widget build(BuildContext context) {
+    ref.watch(weightMeasurementsProvider);
+    ref.watch(bodyMeasurementsProvider);
+    ref.watch(measurementWeightUnitProvider);
     final scheme = Theme.of(context).colorScheme;
     return Scaffold(
       appBar: AppBar(
@@ -220,7 +243,7 @@ class _WeightMeasurementDataPageState extends State<WeightMeasurementDataPage> {
         ],
       ),
       body: StreamBuilder(
-        stream: controller.bodyMeasurements.stream,
+        stream: controller.bodyMeasurementsStream,
         initialData: controller.bodyMeasurements,
         builder: (context, snapshot) {
           final allBodyMeasurements = snapshot.data!.reversed;
@@ -232,7 +255,7 @@ class _WeightMeasurementDataPageState extends State<WeightMeasurementDataPage> {
           };
 
           return StreamBuilder(
-            stream: controller.weightMeasurements.stream,
+            stream: controller.weightMeasurementsStream,
             initialData: controller.weightMeasurements,
             builder: (context, snapshot) {
               final weightMeasurements = [...snapshot.data!.reversed];
@@ -307,8 +330,17 @@ class _WeightMeasurementDataPageState extends State<WeightMeasurementDataPage> {
                             ? ListTile(
                                 title: Text(
                                   (measurement as WeightMeasurement)
-                                      .convertedWeight
-                                      .getUserFacingWeight(context.t),
+                                      .convertedWeightTo(
+                                        ref
+                                            .watch(settingsControllerProvider)
+                                            .weightUnit,
+                                      )
+                                      .getUserFacingWeight(
+                                        context.t,
+                                        ref
+                                            .watch(settingsControllerProvider)
+                                            .weightUnit,
+                                      ),
                                 ),
                                 subtitle: Text(
                                   DateFormat.MMMd(
@@ -356,7 +388,7 @@ class _WeightMeasurementDataPageState extends State<WeightMeasurementDataPage> {
   }
 }
 
-class WeightMeasurementDataDetailsPage extends StatelessWidget {
+class WeightMeasurementDataDetailsPage extends ConsumerWidget {
   final String measurementID;
 
   const WeightMeasurementDataDetailsPage({
@@ -364,85 +396,98 @@ class WeightMeasurementDataDetailsPage extends StatelessWidget {
     super.key,
   });
 
-  MeController get controller => Get.find<MeController>();
-
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final controller = ref.read(meControllerProvider);
+    ref.watch(weightMeasurementsProvider);
+    ref.watch(bodyMeasurementsProvider);
+    ref.watch(measurementWeightUnitProvider);
     final scheme = Theme.of(context).colorScheme;
     return Scaffold(
       appBar: AppBar(title: Text(context.t.me.weight.label)),
-      body: Obx(() {
-        final measurement = controller.getWeightMeasurementByID(measurementID);
-        if (measurement == null) return const SizedBox.shrink();
-        return ListView(
-          children: [
-            ListTile(
-              title: Text(context.t.me.addWeight.weight.label),
-              subtitle: Text(
-                measurement.convertedWeight.getUserFacingWeight(context.t),
+      body: Builder(
+        builder: (context) {
+          final measurement = controller.getWeightMeasurementByID(
+            measurementID,
+          );
+          if (measurement == null) return const SizedBox.shrink();
+          return ListView(
+            children: [
+              ListTile(
+                title: Text(context.t.me.addWeight.weight.label),
+                subtitle: Text(
+                  measurement
+                      .convertedWeightTo(
+                        ref.watch(settingsControllerProvider).weightUnit,
+                      )
+                      .getUserFacingWeight(
+                        context.t,
+                        ref.watch(settingsControllerProvider).weightUnit,
+                      ),
+                ),
               ),
-            ),
-            ListTile(
-              title: Text(context.t.me.addWeight.time.label),
-              subtitle: Text(
-                DateFormat.yMMMMEEEEd(
-                  context.locale.languageCode,
-                ).add_Hms().format(measurement.time),
+              ListTile(
+                title: Text(context.t.me.addWeight.time.label),
+                subtitle: Text(
+                  DateFormat.yMMMMEEEEd(
+                    context.locale.languageCode,
+                  ).add_Hms().format(measurement.time),
+                ),
               ),
-            ),
-            ListTile(
-              leading: const Icon(GTIcons.edit),
-              title: Text(context.t.actions.edit),
-              trailing: const Icon(GTIcons.lt_chevron),
-              onTap: () async {
-                var newMeasurement =
-                    await Go.showBottomModalScreen<
-                      (WeightMeasurement, List<BodyMeasurement>?)
-                    >((context, controller) {
-                      return WeightMeasurementAddSheet(
-                        controller: controller,
-                        baseWeight: measurement,
-                      );
-                    });
+              ListTile(
+                leading: const Icon(GTIcons.edit),
+                title: Text(context.t.actions.edit),
+                trailing: const Icon(GTIcons.lt_chevron),
+                onTap: () async {
+                  var newMeasurement =
+                      await Go.showBottomModalScreen<
+                        (WeightMeasurement, List<BodyMeasurement>?)
+                      >((context, controller) {
+                        return WeightMeasurementAddSheet(
+                          controller: controller,
+                          baseWeight: measurement,
+                        );
+                      });
 
-                if (newMeasurement != null) {
-                  controller.addWeightMeasurement(newMeasurement.$1);
-                }
-              },
-            ),
-            ListTile(
-              iconColor: scheme.error,
-              leading: const Icon(GTIcons.delete_forever),
-              title: Text(
-                context.t.actions.remove,
-                style: TextStyle(color: scheme.error),
+                  if (newMeasurement != null) {
+                    controller.addWeightMeasurement(newMeasurement.$1);
+                  }
+                },
               ),
-              trailing: const Icon(GTIcons.lt_chevron),
-              onTap: () {
-                Get.back();
+              ListTile(
+                iconColor: scheme.error,
+                leading: const Icon(GTIcons.delete_forever),
+                title: Text(
+                  context.t.actions.remove,
+                  style: TextStyle(color: scheme.error),
+                ),
+                trailing: const Icon(GTIcons.lt_chevron),
+                onTap: () {
+                  Navigator.of(context).pop();
 
-                SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
-                  Go.snack(
-                    context.t.me.allData.removed.text,
-                    action: SnackBarAction(
-                      label: context.t.actions.undo,
-                      onPressed: () {
-                        controller.addWeightMeasurement(measurement);
-                      },
-                    ),
-                  );
-                  controller.removeWeightMeasurement(measurement);
-                });
-              },
-            ),
-          ],
-        );
-      }),
+                  SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
+                    Go.snack(
+                      context.t.me.allData.removed.text,
+                      action: SnackBarAction(
+                        label: context.t.actions.undo,
+                        onPressed: () {
+                          controller.addWeightMeasurement(measurement);
+                        },
+                      ),
+                    );
+                    controller.removeWeightMeasurement(measurement);
+                  });
+                },
+              ),
+            ],
+          );
+        },
+      ),
     );
   }
 }
 
-class BodyMeasurementDataDetailsPage extends StatelessWidget {
+class BodyMeasurementDataDetailsPage extends ConsumerWidget {
   final String measurementID;
 
   const BodyMeasurementDataDetailsPage({
@@ -450,15 +495,17 @@ class BodyMeasurementDataDetailsPage extends StatelessWidget {
     super.key,
   });
 
-  MeController get controller => Get.find<MeController>();
-
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final controller = ref.read(meControllerProvider);
+    ref.watch(weightMeasurementsProvider);
+    ref.watch(bodyMeasurementsProvider);
+    ref.watch(measurementWeightUnitProvider);
     final scheme = Theme.of(context).colorScheme;
     return Scaffold(
       appBar: AppBar(title: Text(context.t.me.bodyMeasurements)),
       body: StreamBuilder(
-        stream: controller.bodyMeasurements.stream,
+        stream: controller.bodyMeasurementsStream,
         builder: (context, _) {
           final measurement = controller.getBodyMeasurementByID(measurementID);
           if (measurement == null) return const SizedBox.shrink();
@@ -508,7 +555,7 @@ class BodyMeasurementDataDetailsPage extends StatelessWidget {
                 ),
                 trailing: const Icon(GTIcons.lt_chevron),
                 onTap: () {
-                  Get.back();
+                  Navigator.of(context).pop();
 
                   SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
                     Go.snack(
@@ -532,7 +579,7 @@ class BodyMeasurementDataDetailsPage extends StatelessWidget {
   }
 }
 
-class WeightMeasurementAddSheet extends StatefulWidget {
+class WeightMeasurementAddSheet extends ConsumerStatefulWidget {
   final WeightMeasurement? baseWeight;
   final BodyMeasurement? baseBody;
   final ScrollController? controller;
@@ -550,17 +597,18 @@ class WeightMeasurementAddSheet extends StatefulWidget {
        );
 
   @override
-  State<WeightMeasurementAddSheet> createState() =>
+  ConsumerState<WeightMeasurementAddSheet> createState() =>
       _WeightMeasurementAddSheet();
 }
 
 enum _Mode { add, edit }
 
 class _WeightMeasurementAddSheet
-    extends ControlledState<WeightMeasurementAddSheet, MeController> {
+    extends ConsumerState<WeightMeasurementAddSheet> {
+  MeController get controller => ref.read(meControllerProvider);
   DateTime time = DateTime.now();
   late final weightController = TextEditingController(text: "0");
-  Weights weightUnit = settingsController.weightUnit();
+  late Weights weightUnit = ref.read(settingsControllerProvider).weightUnit;
   final FocusNode _weightFocusNode = FocusNode();
   late final _Mode mode = widget.baseWeight == null && widget.baseBody == null
       ? _Mode.add

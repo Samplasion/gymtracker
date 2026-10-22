@@ -5,7 +5,6 @@ import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
-import 'package:get/get.dart';
 import 'package:gymtracker/controller/history_controller.dart';
 import 'package:gymtracker/controller/me_controller.dart';
 import 'package:gymtracker/controller/settings_controller.dart';
@@ -13,7 +12,9 @@ import 'package:gymtracker/data/weights.dart';
 import 'package:gymtracker/i18n/strings.g.dart';
 import 'package:gymtracker/icons/gymtracker_icons.dart';
 import 'package:gymtracker/model/measurements.dart';
+import 'package:gymtracker/provider/measurements.dart';
 import 'package:gymtracker/provider/online.dart';
+import 'package:gymtracker/provider/training_data.dart';
 import 'package:gymtracker/utils/constants.dart';
 import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/utils/go.dart';
@@ -22,7 +23,6 @@ import 'package:gymtracker/utils/utils.dart';
 import 'package:gymtracker/view/achievements.dart';
 import 'package:gymtracker/view/charts/density_calendar_chart.dart';
 import 'package:gymtracker/view/charts/weight_chart.dart';
-import 'package:gymtracker/view/components/controlled.dart';
 import 'package:gymtracker/view/food.dart';
 import 'package:gymtracker/view/history.dart';
 import 'package:gymtracker/view/me/calendar.dart';
@@ -40,11 +40,14 @@ import 'package:intl/intl.dart';
 part 'me.body.dart';
 part 'me.profile.dart';
 
-class MeView extends GetView<MeController> {
+class MeView extends ConsumerWidget {
   const MeView({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    ref.watch(historyWorkoutsProvider);
+    final hasMeasurements =
+        ref.watch(weightMeasurementsProvider).value?.isNotEmpty ?? false;
     return Scaffold(
       body: CustomScrollView(
         slivers: [
@@ -118,67 +121,76 @@ class MeView extends GetView<MeController> {
                   ),
                 ),
                 const SizedBox(height: 24),
-                Obx(() {
-                  final historyController = Get.find<HistoryController>();
-                  if (historyController.history.isEmpty) {
-                    return const SizedBox.shrink();
-                  }
-                  final firstDay =
-                      historyController.history.first.startingDate!;
-                  final now = DateTime.now();
-                  final allDays = math.max(1, now.difference(firstDay).inDays);
-                  final values = [
-                    for (int i = 0; i < allDays; i++)
-                      historyController
-                              .workoutsByDay[now
-                                  .subtract(Duration(days: i))
-                                  .startOfDay]
-                              ?.length ??
-                          0,
-                  ];
-                  if (values.isEmpty) {
-                    return const SizedBox.shrink();
-                  }
-                  return Padding(
-                    padding: const EdgeInsets.all(16).copyWith(top: 0),
-                    child: SafeArea(
-                      top: false,
-                      bottom: false,
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          SectionTitle(context.t.me.workoutDistribution.label),
-                          const SizedBox(height: 16),
-                          Card(
-                            clipBehavior: Clip.hardEdge,
-                            margin: EdgeInsets.zero,
-                            child: Padding(
-                              padding: const EdgeInsets.all(16),
-                              child: Column(
-                                children: [
-                                  DensityCalendarChart(
-                                    tooltipBuilder: (now, daysBeforeNow, value) {
-                                      return "${DateFormat.yMEd(Get.locale?.languageCode).format(now.subtract(Duration(days: daysBeforeNow)))}: ${context.t.general.workouts(n: value)}";
-                                    },
-                                    values: values,
-                                  ),
-                                  ListTile(
-                                    title: Text(context.t.history.title),
-                                    onTap: () {
-                                      Go.to(() => const HistoryView());
-                                    },
-                                    trailing: const Icon(GTIcons.lt_chevron),
-                                  ),
-                                ],
+                Builder(
+                  builder: (context) {
+                    final historyController = ref.watch(
+                      historyControllerProvider,
+                    );
+                    if (historyController.history.isEmpty) {
+                      return const SizedBox.shrink();
+                    }
+                    final firstDay =
+                        historyController.history.first.startingDate!;
+                    final now = DateTime.now();
+                    final allDays = math.max(
+                      1,
+                      now.difference(firstDay).inDays,
+                    );
+                    final values = [
+                      for (int i = 0; i < allDays; i++)
+                        historyController
+                                .workoutsByDay[now
+                                    .subtract(Duration(days: i))
+                                    .startOfDay]
+                                ?.length ??
+                            0,
+                    ];
+                    if (values.isEmpty) {
+                      return const SizedBox.shrink();
+                    }
+                    return Padding(
+                      padding: const EdgeInsets.all(16).copyWith(top: 0),
+                      child: SafeArea(
+                        top: false,
+                        bottom: false,
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            SectionTitle(
+                              context.t.me.workoutDistribution.label,
+                            ),
+                            const SizedBox(height: 16),
+                            Card(
+                              clipBehavior: Clip.hardEdge,
+                              margin: EdgeInsets.zero,
+                              child: Padding(
+                                padding: const EdgeInsets.all(16),
+                                child: Column(
+                                  children: [
+                                    DensityCalendarChart(
+                                      tooltipBuilder: (now, daysBeforeNow, value) {
+                                        return "${DateFormat.yMEd(Localizations.localeOf(context).languageCode).format(now.subtract(Duration(days: daysBeforeNow)))}: ${context.t.general.workouts(n: value)}";
+                                      },
+                                      values: values,
+                                    ),
+                                    ListTile(
+                                      title: Text(context.t.history.title),
+                                      onTap: () {
+                                        Go.to(() => const HistoryView());
+                                      },
+                                      trailing: const Icon(GTIcons.lt_chevron),
+                                    ),
+                                  ],
+                                ),
                               ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
-                    ),
-                  );
-                }),
+                    );
+                  },
+                ),
                 const SizedBox(height: 8),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -192,11 +204,11 @@ class MeView extends GetView<MeController> {
                   padding: EdgeInsets.symmetric(horizontal: 16),
                   child: WeightCard(),
                 ),
-                Obx(
-                  () => ListTile(
+                Builder(
+                  builder: (context) => ListTile(
                     title: Text(context.t.me.weight.allData.label),
                     trailing: const Icon(GTIcons.lt_chevron),
-                    enabled: controller.weightMeasurements.isNotEmpty,
+                    enabled: hasMeasurements,
                     onTap: () {
                       Go.to(() => const WeightMeasurementDataPage());
                     },

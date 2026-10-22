@@ -1,32 +1,30 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gymtracker/controller/achievements_controller.dart';
-import 'package:gymtracker/data/achievements.dart';
 import 'package:gymtracker/i18n/strings.g.dart';
 import 'package:gymtracker/icons/gymtracker_icons.dart';
 import 'package:gymtracker/model/achievements.dart';
 import 'package:gymtracker/utils/constants.dart';
-import 'package:gymtracker/utils/extensions.dart' hide ContextThemingUtils;
+import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/utils/go.dart';
-import 'package:gymtracker/view/components/controlled.dart';
 import 'package:gymtracker/view/components/loading_indicator.dart';
 import 'package:gymtracker/view/utils/achievements.dart';
 import 'package:gymtracker/view/utils/sliver_utils.dart';
 import 'package:intl/intl.dart';
 
-class AchievementsView extends StatefulWidget {
+class AchievementsView extends ConsumerStatefulWidget {
   const AchievementsView({super.key});
 
   @override
-  State<AchievementsView> createState() => _AchievementsViewState();
+  ConsumerState<AchievementsView> createState() => _AchievementsViewState();
 }
 
-class _AchievementsViewState
-    extends ControlledState<AchievementsView, AchievementsController> {
+class _AchievementsViewState extends ConsumerState<AchievementsView> {
   @override
   Widget build(BuildContext context) {
+    final achievements = ref.watch(achievementCatalogProvider);
     final achievementKeys = achievements.keys.toList();
     return Scaffold(
       body: CustomScrollView(
@@ -77,7 +75,7 @@ class _AchievementsViewState
   }
 }
 
-class AchievementGridTile extends ControlledWidget<AchievementsController> {
+class AchievementGridTile extends ConsumerWidget {
   final Achievement achievement;
   final AchievementLevel level;
   final void Function(Achievement, AchievementLevel) onTap;
@@ -89,10 +87,11 @@ class AchievementGridTile extends ControlledWidget<AchievementsController> {
     super.key,
   });
 
-  bool get enabled => controller.isUnlocked(achievement, level);
-
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    ref.watch(achievementCompletionsProvider);
+    final controller = ref.watch(achievementsControllerProvider);
+    final enabled = controller.isUnlocked(achievement, level);
     return LayoutBuilder(
       builder: (context, cardSize) {
         var child = InkWell(
@@ -131,7 +130,7 @@ class AchievementGridTile extends ControlledWidget<AchievementsController> {
                   overflow: TextOverflow.ellipsis,
                 ),
                 Text(
-                  achievement.shouldShowDescriptionFor(level.level)
+                  achievement.shouldShowDescriptionFor(level.level, controller)
                       ? level.getLocalizedDescription(context.t)
                       : "???",
                   textAlign: TextAlign.center,
@@ -156,7 +155,7 @@ class AchievementGridTile extends ControlledWidget<AchievementsController> {
   }
 }
 
-class AchievementGetDialog extends ControlledWidget<AchievementsController> {
+class AchievementGetDialog extends ConsumerWidget {
   final Achievement achievement;
   final AchievementLevel level;
 
@@ -167,7 +166,9 @@ class AchievementGetDialog extends ControlledWidget<AchievementsController> {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    ref.watch(achievementCompletionsProvider);
+    final controller = ref.watch(achievementsControllerProvider);
     final completion = controller.getCompletion(achievement, level);
     return AlertDialog(
       content: Padding(
@@ -179,7 +180,7 @@ class AchievementGetDialog extends ControlledWidget<AchievementsController> {
             AchievementIcon(
               achievement: achievement,
               enabled: completion != null,
-              size: min(context.width, 96),
+              size: min(MediaQuery.sizeOf(context).width, 96),
             ),
             const SizedBox(height: 16),
             Text(
@@ -188,14 +189,17 @@ class AchievementGetDialog extends ControlledWidget<AchievementsController> {
               style: context.theme.textTheme.bodyLarge,
             ),
             Text(
-              achievement.shouldShowDescriptionFor(level.level)
+              achievement.shouldShowDescriptionFor(level.level, controller)
                   ? level.getLocalizedDescription(context.t)
                   : "???",
               textAlign: TextAlign.center,
             ),
             if (completion == null &&
                 level.canShowProgress &&
-                achievement.shouldShowDescriptionFor(level.level)) ...[
+                achievement.shouldShowDescriptionFor(
+                  level.level,
+                  controller,
+                )) ...[
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 16),
                 child: LinearProgressIndicator(
@@ -224,7 +228,7 @@ class AchievementGetDialog extends ControlledWidget<AchievementsController> {
       actions: [
         TextButton(
           child: Text(MaterialLocalizations.of(context).okButtonLabel),
-          onPressed: () => Get.back(),
+          onPressed: () => Navigator.of(context).pop(),
         ),
       ],
     );
@@ -243,12 +247,12 @@ class AchievementGetDialog extends ControlledWidget<AchievementsController> {
   }
 }
 
-class AchievementHistoryScreen
-    extends ControlledWidget<AchievementsController> {
+class AchievementHistoryScreen extends ConsumerWidget {
   const AchievementHistoryScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final controller = ref.watch(achievementsControllerProvider);
     return Scaffold(
       appBar: AppBar(title: Text(context.t.achievements.history)),
       body: CustomScrollView(

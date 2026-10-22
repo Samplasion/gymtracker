@@ -1,10 +1,12 @@
 import 'dart:async';
 
-import 'package:get/get.dart';
-import 'package:gymtracker/controller/serviceable_controller.dart';
-import 'package:gymtracker/service/logger.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:gymtracker/controller/countdown_controller.dart';
 import 'package:gymtracker/struct/stopwatch_extended.dart';
-import 'package:gymtracker/view/utils/time.dart';
+import 'package:gymtracker/utils/time.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
+
+part 'stopwatch_controller.g.dart';
 
 const _globalStopwatchID = "global";
 
@@ -12,114 +14,177 @@ abstract class GTStopwatch {
   DateTime get startingTime;
   String get currentTime;
   Function get onTick;
-  RxBool get isStopped;
+  bool get isStopped;
 
-  dispose();
+  void dispose();
 }
 
 class GlobalStopwatch extends GTStopwatch {
   late StopwatchEx stopwatch;
+  void Function()? onChanged;
+  final DateTime Function() now;
 
   Duration get currentDuration => stopwatch.elapsed;
-  late Timer timer;
   @override
-  String get currentTime => TimeInputField.encodeDuration(stopwatch.elapsed);
+  String get currentTime => encodeTimerDuration(stopwatch.elapsed);
   @override
-  DateTime get startingTime => DateTime.now().subtract(currentDuration);
+  DateTime get startingTime => now().subtract(currentDuration);
   @override
   final void Function(Duration duration) onTick;
 
   @override
-  RxBool isStopped = true.obs;
+  bool isStopped = true;
 
   GlobalStopwatch({
     required this.onTick,
-  }) {
-    stopwatch = StopwatchEx();
+    DateTime Function()? now,
+    StopwatchEx Function(int elapsedMilliseconds)? createStopwatch,
+  }) : now = now ?? DateTime.now {
+    stopwatch = (createStopwatch ?? StopwatchEx.fromMilliseconds)(0);
     stopwatch.stop();
     stopwatch.reset();
   }
 
   @override
   void dispose() {
-    onTick(DateTime.now().difference(startingTime));
-    timer.cancel();
+    onTick(now().difference(startingTime));
     stopwatch.stop();
     stopwatch.reset();
   }
 
   void pause() {
-    isStopped.value = true;
+    isStopped = true;
     stopwatch.stop();
+    onChanged?.call();
   }
 
   void start() {
-    isStopped.value = false;
+    isStopped = false;
     stopwatch.start();
+    onChanged?.call();
   }
 
   void reset() {
-    // Intentionally trigger a rebuild by setting isStopped to false and then true
-    isStopped.value = false;
-    isStopped.value = true;
+    isStopped = true;
     stopwatch.stop();
     stopwatch.reset();
     onTick(Duration.zero);
+    onChanged?.call();
   }
 }
 
-typedef TickBinding = void Function(
-    Timer timer, Duration duration, String encoded);
+typedef TickBinding =
+    void Function(Timer timer, Duration duration, String encoded);
 
 class TimeFieldStopwatch extends GTStopwatch {
   @override
   TickBinding onTick;
+  void Function()? onChanged;
   final String Function() getCurrentTime;
   final String setID;
 
   @override
-  final DateTime startingTime = DateTime.now();
+  final DateTime startingTime;
   late Timer timer;
   @override
   late String currentTime;
   @override
-  RxBool get isStopped => RxBool(timer.isActive);
+  bool get isStopped => !timer.isActive;
 
   TimeFieldStopwatch({
     required this.onTick,
     required this.setID,
     required this.getCurrentTime,
-  }) {
+    WorkoutClock clock = const WorkoutClock(),
+  }) : startingTime = clock.now() {
     currentTime = getCurrentTime();
-    timer = Timer.periodic(const Duration(seconds: 1), (_) {
-      final parsed = TimeInputField.parseDuration(currentTime);
-      final encoded = TimeInputField.encodeDuration(Duration(
-        seconds: parsed.inSeconds + 1,
-      ));
+    timer = clock.periodic(const Duration(seconds: 1), (_) {
+      final parsed = parseTimerDuration(currentTime);
+      final encoded = encodeTimerDuration(
+        Duration(seconds: parsed.inSeconds + 1),
+      );
       currentTime = encoded;
       onTick(timer, parsed, encoded);
+      onChanged?.call();
     });
   }
 
   @override
   void dispose() {
-    onTick(timer, TimeInputField.parseDuration(currentTime), currentTime);
+    onTick(timer, parseTimerDuration(currentTime), currentTime);
     timer.cancel();
   }
 }
 
-class StopwatchController extends GetxController with ServiceableController {
-  final RxMap<String, GTStopwatch> stopwatches = <String, GTStopwatch>{
-    _globalStopwatchID: GlobalStopwatch(onTick: (duration) {})..reset(),
-  }.obs;
+class StopwatchState {
+  const StopwatchState(
+    this.running,
+    this.elapsed, {
+    this.fieldTimes = const {},
+  });
+  final Map<String, bool> running;
+  final Duration elapsed;
+  final Map<String, String> fieldTimes;
+}
+
+final workoutStopwatchFactoryProvider =
+    Provider<StopwatchEx Function(int elapsedMilliseconds)>(
+      (ref) => StopwatchEx.fromMilliseconds,
+    );
+
+@Riverpod(keepAlive: true)
+class StopwatchController extends _$StopwatchController {
+  final Map<String, GTStopwatch> stopwatches = {};
+  Timer? _globalTicker;
 
   @override
-  void onServiceChange() {
-    logger.i("Service changed");
+  StopwatchState build() {
+    stopwatches[_globalStopwatchID] = GlobalStopwatch(
+      onTick: (_) {},
+      now: ref.read(workoutClockProvider).now,
+      createStopwatch: ref.read(workoutStopwatchFactoryProvider),
+    );
+    globalStopwatch.onChanged = _publish;
+    ref.onDispose(() {
+      _globalTicker?.cancel();
+      for (final stopwatch in stopwatches.values) {
+        if (stopwatch is TimeFieldStopwatch) {
+          stopwatch.timer.cancel();
+        } else if (stopwatch is GlobalStopwatch) {
+          stopwatch.stopwatch.stop();
+        }
+      }
+      stopwatches.clear();
+    });
+    return const StopwatchState({_globalStopwatchID: false}, Duration.zero);
+  }
+
+  void _publish() {
+    if (!ref.mounted) return;
+    if (globalStopwatch.isStopped) {
+      _globalTicker?.cancel();
+      _globalTicker = null;
+    } else {
+      _globalTicker ??= ref
+          .read(workoutClockProvider)
+          .periodic(const Duration(milliseconds: 200), (_) => _publish());
+    }
+    state = StopwatchState(
+      Map.unmodifiable({for (final id in stopwatches.keys) id: isRunning(id)}),
+      globalStopwatch.currentDuration,
+      fieldTimes: Map.unmodifiable({
+        for (final entry in stopwatches.entries)
+          if (entry.value is TimeFieldStopwatch)
+            entry.key: entry.value.currentTime,
+      }),
+    );
   }
 
   void addStopwatch(TimeFieldStopwatch stopwatch) {
+    stopwatches[stopwatch.setID]?.dispose();
     stopwatches[stopwatch.setID] = stopwatch;
+    stopwatch.onChanged = _publish;
+    _publish();
   }
 
   void removeStopwatch(String setID) {
@@ -128,6 +193,7 @@ class StopwatchController extends GetxController with ServiceableController {
     }
     stopwatches[setID]?.dispose();
     stopwatches.remove(setID);
+    _publish();
   }
 
   void removeStopwatches(Iterable<String> setIDs) {
@@ -140,7 +206,7 @@ class StopwatchController extends GetxController with ServiceableController {
     final stopwatch = stopwatches[setID];
     if (stopwatch == null) return false;
     if (stopwatch is GlobalStopwatch) {
-      return !stopwatch.isStopped.value;
+      return !stopwatch.isStopped;
     } else if (stopwatch is TimeFieldStopwatch) {
       return stopwatch.timer.isActive;
     }

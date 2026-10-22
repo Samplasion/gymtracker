@@ -1,90 +1,101 @@
 import 'dart:async';
 
-import 'package:get/get.dart';
-import 'package:gymtracker/controller/coordinator.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gymtracker/controller/notifications_controller.dart';
-import 'package:gymtracker/main.dart';
 import 'package:gymtracker/provider/locale.dart';
 import 'package:gymtracker/service/logger.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-class CountdownController extends GetxController {
-  Rx<DateTime?> targetTime = Rx(null);
-  Rx<DateTime?> startingTime = Rx(null);
+part 'countdown_controller.g.dart';
+
+/// Injectable time source shared by workout timers and deterministic tests.
+class WorkoutClock {
+  const WorkoutClock();
+  DateTime now() => DateTime.now();
+  Timer once(Duration duration, void Function() callback) =>
+      Timer(duration, callback);
+  Timer periodic(Duration duration, void Function(Timer) callback) =>
+      Timer.periodic(duration, callback);
+}
+
+final workoutClockProvider = Provider<WorkoutClock>(
+  (ref) => const WorkoutClock(),
+);
+
+class CountdownState {
+  const CountdownState({this.targetTime, this.startingTime});
+  final DateTime? targetTime;
+  final DateTime? startingTime;
+}
+
+@Riverpod(keepAlive: true)
+class CountdownController extends _$CountdownController {
   Timer? timer;
-
-  final NotificationController notificationController = Get.find();
-
-  bool get isActive => targetTime.value != null && timer != null;
+  WorkoutClock get clock => ref.read(workoutClockProvider);
+  DateTime? get targetTime => state.targetTime;
+  DateTime? get startingTime => state.startingTime;
+  bool get isActive => targetTime != null && timer != null;
   Duration get remaining =>
-      targetTime.value
-          ?.add(const Duration(seconds: 1))
-          .difference(DateTime.now()) ??
+      targetTime?.add(const Duration(seconds: 1)).difference(clock.now()) ??
       Duration.zero;
   double get progress {
-    try {
-      final end = targetTime.value!.millisecondsSinceEpoch;
-      final start = startingTime.value!.millisecondsSinceEpoch;
-      final now = DateTime.now();
+    if (targetTime == null || startingTime == null) return 0;
+    return (targetTime!.millisecondsSinceEpoch -
+            clock.now().millisecondsSinceEpoch) /
+        (targetTime!.millisecondsSinceEpoch -
+            startingTime!.millisecondsSinceEpoch);
+  }
 
-      final diff = end - start;
-      return (end - now.millisecondsSinceEpoch) / diff;
-    } catch (_) {
-      return 0;
-    }
+  @override
+  CountdownState build() {
+    ref.onDispose(() {
+      timer?.cancel();
+      timer = null;
+    });
+    return const CountdownState();
   }
 
   void _onUpdate() {
-    final t = globalContainer.read(translationsProvider);
-
     timer?.cancel();
-    notificationController.cancelRestOverNotification();
-
-    Get.find<Coordinator>().syncNative();
-
-    if (targetTime.value != null) {
-      timer = Timer(targetTime.value!.difference(DateTime.now()), _onRing);
-
-      notificationController.scheduleRestOverNotification(t, targetTime.value!);
+    timer = null;
+    final notifications = ref.read(notificationControllerProvider);
+    notifications.cancelRestOverNotification();
+    final target = targetTime;
+    if (target != null) {
+      timer = clock.once(target.difference(clock.now()), _onRing);
+      notifications.scheduleRestOverNotification(
+        ref.read(translationsProvider),
+        target,
+      );
     }
   }
 
-  _onRing() async {
-    // Clean up
+  void _onRing() {
     timer?.cancel();
     timer = null;
-    targetTime.value = null;
-    startingTime.value = null;
-
-    Get.find<Coordinator>().syncNative();
-
+    state = const CountdownState();
     logger.i('Rest timer finished');
   }
 
-  setCountdown(Duration delta) {
-    notificationController.cancelRestOverNotification();
-    final now = DateTime.now();
-    startingTime(now);
-    targetTime(now.add(delta));
+  void setCountdown(Duration delta) {
+    final now = clock.now();
+    state = CountdownState(startingTime: now, targetTime: now.add(delta));
     _onUpdate();
   }
 
   void removeCountdown() {
-    targetTime.value = null;
-    startingTime.value = null;
+    state = const CountdownState();
     _onUpdate();
   }
 
-  void add15Seconds() {
-    if (targetTime.value != null) {
-      targetTime(targetTime()!.add(const Duration(seconds: 15)));
-      _onUpdate();
-    }
-  }
-
-  void subtract15Seconds() {
-    if (targetTime.value != null) {
-      targetTime(targetTime()!.subtract(const Duration(seconds: 15)));
-      _onUpdate();
-    }
+  void add15Seconds() => _adjust(const Duration(seconds: 15));
+  void subtract15Seconds() => _adjust(const Duration(seconds: -15));
+  void _adjust(Duration delta) {
+    if (targetTime == null) return;
+    state = CountdownState(
+      startingTime: startingTime,
+      targetTime: targetTime!.add(delta),
+    );
+    _onUpdate();
   }
 }

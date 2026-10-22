@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:get/get.dart';
-import 'package:gymtracker/controller/workout_controller.dart';
 import 'package:gymtracker/data/distance.dart';
 import 'package:gymtracker/data/weights.dart';
-import 'package:gymtracker/main.dart' show globalContainer;
 import 'package:gymtracker/model/model.dart';
 import 'package:gymtracker/view/utils/workout.dart';
 import 'package:gymtracker/view/workout.dart' show WorkoutListView;
@@ -57,15 +54,15 @@ void main() {
     (tester) async {
       MockServices.setup();
       await initTestLocalizations();
-      final workout = WorkoutController('Workout', null, null);
+      final workout = MockServices.createWorkout('Workout', null, null);
       workout.exercises.addAll([
         exerciseHelper('ex1', 'Bench Press'),
         exerciseHelper('ex2', 'Squat'),
       ]);
-      Get.put<WorkoutController>(workout, permanent: true);
       final exercise = workout.exercises.first.asExercise;
       await tester.pumpWidget(
         WidgetTestApp(
+          wrapWithProviderScope: true,
           child: WorkoutExerciseSetEditor(
             exercise: exercise,
             set: exercise.sets.first,
@@ -92,6 +89,7 @@ void main() {
       weight.addListener(() => updates++);
       final other = workout.exercises[1].asExercise;
       workout.exercises[1] = other.copyWith(notes: 'Changed remotely');
+      workout.publishExercises();
       await tester.pump();
       expect(updates, 0);
       expect(weight.selection.baseOffset, 0);
@@ -99,11 +97,11 @@ void main() {
       workout.exercises[0] = exercise.copyWith(
         sets: [exercise.sets.first.copyWith(weight: 42)],
       );
+      workout.publishExercises();
       await tester.pump();
       expect(weight.text, '42');
       expect(updates, 1);
       await tester.pumpWidget(const SizedBox());
-      globalContainer.dispose();
       MockServices.tearDown();
     },
   );

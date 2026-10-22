@@ -77,6 +77,8 @@ abstract class OnlineService with ChangeNotifier {
 class OnlineServiceImpl with ChangeNotifier implements OnlineService {
   final GoTrueClient _client;
   final SupabaseClient _db;
+  late final StreamSubscription<AuthState> _authSubscription;
+  bool _disposed = false;
 
   @override
   DateTime? nextFriendsFeedDate;
@@ -92,10 +94,22 @@ class OnlineServiceImpl with ChangeNotifier implements OnlineService {
   @visibleForTesting
   set account(OnlineAccount? value) => _account = value;
 
+  final Map<String, Achievement> Function() _achievementCatalog;
+
   OnlineServiceImpl([SupabaseClient? client])
-    : _db = client ?? Supabase.instance.client,
-      _client = (client ?? Supabase.instance.client).auth {
-    _client.onAuthStateChange.listen((event) {
+    : this.withAchievementCatalog(
+        achievementCatalog: () => achievements,
+        client: client,
+      );
+
+  OnlineServiceImpl.withAchievementCatalog({
+    required Map<String, Achievement> Function() achievementCatalog,
+    SupabaseClient? client,
+  }) : _achievementCatalog = achievementCatalog,
+       _db = client ?? Supabase.instance.client,
+       _client = (client ?? Supabase.instance.client).auth {
+    _authSubscription = _client.onAuthStateChange.listen((event) {
+      if (_disposed) return;
       logger.d("Auth state changed: ${event.event.name}");
       if (event.session == null) {
         _setAccount(null);
@@ -103,7 +117,16 @@ class OnlineServiceImpl with ChangeNotifier implements OnlineService {
     });
   }
 
+  @override
+  void dispose() {
+    if (_disposed) return;
+    _disposed = true;
+    unawaited(_authSubscription.cancel());
+    super.dispose();
+  }
+
   void _setAccount(OnlineAccount? account, {bool cache = true}) {
+    if (_disposed) return;
     if (_account?.id != account?.id) _accounts.clear();
     _account = account;
     if (cache && account != null) _accounts.put(account.id, account);
@@ -417,7 +440,7 @@ class OnlineServiceImpl with ChangeNotifier implements OnlineService {
         final c = AchievementCompletion.fromJson(
           Map<String, dynamic>.from(row as Map),
         );
-        final achievement = achievements[c.achievementID];
+        final achievement = _achievementCatalog()[c.achievementID];
         if (achievement != null)
           items.add(
             FeedItemAchievement(

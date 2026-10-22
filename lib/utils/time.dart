@@ -8,8 +8,10 @@ String stringifyTime(int seconds) {
 }
 
 int parseTime(String time) {
-  assert(RegExp(r'^\d{2,}:\d{2}$').hasMatch(time),
-      'The string must be in the format "[mm+]:[ss]"');
+  assert(
+    RegExp(r'^\d{2,}:\d{2}$').hasMatch(time),
+    'The string must be in the format "[mm+]:[ss]"',
+  );
   final mins = int.parse(time.split(":").first);
   final secs = int.parse(time.split(":").last);
   return mins * 100 + secs;
@@ -19,4 +21,22 @@ Duration timeToDuration(int seconds) {
   final mins = (seconds ~/ 100);
   final secs = (seconds % 100);
   return Duration(minutes: mins, seconds: secs);
+}
+
+/// Parse the timer editor's compact digits or minute/second representation.
+Duration parseTimerDuration(String value) {
+  final padded = value.padLeft(4, '0');
+  final parts =
+      '${padded.substring(0, padded.length - 2)}:${padded.substring(padded.length - 2)}'
+          .split(':');
+  return Duration(
+    minutes: int.parse(parts.first),
+    seconds: int.parse(parts.last),
+  );
+}
+
+String encodeTimerDuration(Duration duration) {
+  final minutes = duration.inMinutes.toString().padLeft(2, '0');
+  final seconds = (duration.inSeconds % 60).toString().padLeft(2, '0');
+  return '$minutes:$seconds';
 }

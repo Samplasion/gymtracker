@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:get/get.dart';
 import 'package:gymtracker/model/model.dart';
 import 'package:gymtracker/view/exercise_picker.dart';
 import 'package:mocktail/mocktail.dart';
@@ -14,19 +13,24 @@ void main() {
     await initTestLocalizations();
 
     // Stub exercisesController
-    when(() => MockServices.exercisesController.exercises)
-        .thenReturn(<Exercise>[].obs);
+    when(
+      () => MockServices.exercisesController.exercises,
+    ).thenReturn(<Exercise>[]);
   });
 
   tearDown(() {
     MockServices.tearDown();
   });
 
-  testWidgets('ExercisePicker renders successfully with search bar',
-      (WidgetTester tester) async {
-    await tester.pumpWidget(const WidgetTestApp(
-      child: ExercisePicker(singlePick: true),
-    ));
+  testWidgets('ExercisePicker renders successfully with search bar', (
+    WidgetTester tester,
+  ) async {
+    await tester.pumpWidget(
+      const WidgetTestApp(
+        wrapWithProviderScope: true,
+        child: ExercisePicker(singlePick: true),
+      ),
+    );
     await tester.pump();
 
     // Should render the title "Select exercises"

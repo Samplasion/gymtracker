@@ -1,9 +1,7 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
-import 'package:get/get.dart' hide ContextExtensionss;
 import 'package:gymtracker/controller/workout_controller.dart';
 import 'package:gymtracker/data/distance.dart';
 import 'package:gymtracker/data/weights.dart';
@@ -266,7 +264,7 @@ class _WorkoutExerciseEditorState extends State<WorkoutExerciseEditor> {
                             widget.index,
                             text,
                           );
-                          Get.back();
+                          Go.back();
                         },
                       );
                     },
@@ -374,7 +372,7 @@ class _WorkoutExerciseEditorState extends State<WorkoutExerciseEditor> {
   }
 }
 
-class WorkoutExerciseSetEditor extends StatefulWidget {
+class WorkoutExerciseSetEditor extends ConsumerStatefulWidget {
   final Exercise exercise;
   final GTSet set;
   final WorkoutExerciseIndex index;
@@ -409,11 +407,12 @@ class WorkoutExerciseSetEditor extends StatefulWidget {
   });
 
   @override
-  State<WorkoutExerciseSetEditor> createState() =>
+  ConsumerState<WorkoutExerciseSetEditor> createState() =>
       _WorkoutExerciseSetEditorState();
 }
 
-class _WorkoutExerciseSetEditorState extends State<WorkoutExerciseSetEditor> {
+class _WorkoutExerciseSetEditorState
+    extends ConsumerState<WorkoutExerciseSetEditor> {
   late var weightController = TextEditingController(
     text: stringifyDouble(widget.set.weight ?? 0),
   );
@@ -434,7 +433,7 @@ class _WorkoutExerciseSetEditorState extends State<WorkoutExerciseSetEditor> {
   final _repsFocusNode = FocusNode();
   final _distanceFocusNode = FocusNode();
 
-  StreamSubscription? subscription;
+  ProviderSubscription<WorkoutState?>? subscription;
   late GTSet _lastSyncedSet = widget.set;
 
   @override
@@ -443,9 +442,13 @@ class _WorkoutExerciseSetEditorState extends State<WorkoutExerciseSetEditor> {
     _weightFocusNode.addListener(() {
       setState(() {});
     });
-    if (!Get.isRegistered<WorkoutController>()) return;
     // Update data if a different actor edits it (such as a paired Apple Watch)
-    subscription = Get.find<WorkoutController>().exercises.listen((exs) {
+    subscription = ref.listenManual(workoutControllerProvider, (
+      previous,
+      next,
+    ) {
+      if (next == null) return;
+      final exs = next.workout.exercises;
       final newExercise = exs.exerciseAt(widget.index);
       if (newExercise == null) return;
       if (newExercise.sets.length <= widget.setIndex) return;
@@ -457,7 +460,7 @@ class _WorkoutExerciseSetEditorState extends State<WorkoutExerciseSetEditor> {
 
   @override
   void dispose() {
-    subscription?.cancel();
+    subscription?.close();
     weightController.dispose();
     timeController.dispose();
     repsController.dispose();
@@ -779,13 +782,10 @@ class _WorkoutExerciseSetEditorState extends State<WorkoutExerciseSetEditor> {
                   child: RPECompactColumn(rpe: widget.set.rpe),
                 ),
                 if (!widget.isCreating && widget.showDoneCheckbox) ...[
-                  ValueBuilder<bool?>(
-                    builder: (_, update) => Checkbox(
-                      value: widget.set.done,
-                      onChanged: update,
-                      activeColor: Theme.of(context).colorScheme.tertiary,
-                    ),
-                    onUpdate: (isDone) {
+                  Checkbox(
+                    value: widget.set.done,
+                    activeColor: Theme.of(context).colorScheme.tertiary,
+                    onChanged: (isDone) {
                       widget.onSetSetDone(isDone ?? widget.set.done);
                       FocusManager.instance.primaryFocus?.unfocus();
                     },

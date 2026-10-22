@@ -1,4 +1,3 @@
-import 'package:get/get.dart';
 import 'package:gymtracker/controller/exercises_controller.dart';
 import 'package:gymtracker/controller/history_controller.dart';
 import 'package:gymtracker/controller/routines_controller.dart';
@@ -19,22 +18,27 @@ class CustomToLibraryExerciseMigration extends DataMigration {
   final Exercise from;
   final Exercise to;
 
-  CustomToLibraryExerciseMigration(this.from, this.to);
+  CustomToLibraryExerciseMigration(
+    this.from,
+    this.to, {
+    required this.routinesController,
+    required this.historyController,
+  });
 
-  RoutinesController get routinesController => Get.find<RoutinesController>();
-  HistoryController get historyController => Get.find<HistoryController>();
+  final RoutinesController routinesController;
+  final HistoryController historyController;
 
   @override
   List<Workout> get affectedRoutines => [
-        for (final workout in routinesController.workouts)
-          if (workout.hasExercise(from)) workout
-      ];
+    for (final workout in routinesController.workouts)
+      if (workout.hasExercise(from)) workout,
+  ];
 
   @override
   List<Workout> get affectedHistory => [
-        for (final workout in historyController.history)
-          if (workout.hasExercise(from)) workout
-      ];
+    for (final workout in historyController.history)
+      if (workout.hasExercise(from)) workout,
+  ];
 
   @override
   void apply() {
@@ -44,12 +48,15 @@ class CustomToLibraryExerciseMigration extends DataMigration {
 }
 
 class RemoveUnusedExercisesMigration extends DataMigration {
-  RemoveUnusedExercisesMigration();
+  RemoveUnusedExercisesMigration({
+    required this.exercisesController,
+    required this.routinesController,
+    required this.historyController,
+  });
 
-  ExercisesController get exercisesController =>
-      Get.find<ExercisesController>();
-  RoutinesController get routinesController => Get.find<RoutinesController>();
-  HistoryController get historyController => Get.find<HistoryController>();
+  final ExercisesController exercisesController;
+  final RoutinesController routinesController;
+  final HistoryController historyController;
 
   @override
   List<Exercise> get affectedExercises {
@@ -78,35 +85,41 @@ class RemoveUnusedExercisesMigration extends DataMigration {
 class RemoveWeightFromCustomExerciseMigration extends DataMigration {
   final Exercise exercise;
 
-  RemoveWeightFromCustomExerciseMigration(this.exercise);
+  RemoveWeightFromCustomExerciseMigration(
+    this.exercise, {
+    required this.exercisesController,
+    required this.routinesController,
+    required this.historyController,
+  });
 
-  ExercisesController get exercisesController =>
-      Get.find<ExercisesController>();
-  RoutinesController get routinesController => Get.find<RoutinesController>();
-  HistoryController get historyController => Get.find<HistoryController>();
+  final ExercisesController exercisesController;
+  final RoutinesController routinesController;
+  final HistoryController historyController;
 
   bool get isCompatible =>
       exercise.isCustom &&
       exercise.parameters == GTSetParameters.repsWeight &&
-      affectedHistory.every((workout) => workout.flattenedExercises
-          .whereType<Exercise>()
-          .where((ex) => exercise.isTheSameAs(ex))
-          .every(
-            (ex) =>
-                ex.sets.every((set) => set.weight == null || set.weight == 0),
-          ));
+      affectedHistory.every(
+        (workout) => workout.flattenedExercises
+            .whereType<Exercise>()
+            .where((ex) => exercise.isTheSameAs(ex))
+            .every(
+              (ex) =>
+                  ex.sets.every((set) => set.weight == null || set.weight == 0),
+            ),
+      );
 
   @override
   List<Workout> get affectedRoutines => [
-        for (final workout in routinesController.workouts)
-          if (workout.hasExercise(exercise)) workout
-      ];
+    for (final workout in routinesController.workouts)
+      if (workout.hasExercise(exercise)) workout,
+  ];
 
   @override
   List<Workout> get affectedHistory => [
-        for (final workout in historyController.history)
-          if (workout.hasExercise(exercise)) workout
-      ];
+    for (final workout in historyController.history)
+      if (workout.hasExercise(exercise)) workout,
+  ];
 
   @override
   void apply() {
@@ -116,49 +129,49 @@ class RemoveWeightFromCustomExerciseMigration extends DataMigration {
   }
 }
 
-
 class GenericMultiplyWeightInExerciseMigration extends DataMigration {
   final Exercise exercise;
   final double multiplier;
 
-  GenericMultiplyWeightInExerciseMigration(this.exercise, this.multiplier);
+  GenericMultiplyWeightInExerciseMigration(
+    this.exercise,
+    this.multiplier, {
+    required this.exercisesController,
+    required this.routinesController,
+    required this.historyController,
+  });
 
-  ExercisesController get exercisesController =>
-      Get.find<ExercisesController>();
-  RoutinesController get routinesController => Get.find<RoutinesController>();
-  HistoryController get historyController => Get.find<HistoryController>();
+  final ExercisesController exercisesController;
+  final RoutinesController routinesController;
+  final HistoryController historyController;
 
   bool get isCompatible =>
       exercise.parameters == GTSetParameters.repsWeight &&
-      affectedHistory.every((workout) => workout.flattenedExercises
-          .whereType<Exercise>()
-          .where((ex) => exercise.isTheSameAs(ex))
-          .every(
-            (ex) =>
-                ex.sets.every((set) => set.weight != null),
-          ));
+      affectedHistory.every(
+        (workout) => workout.flattenedExercises
+            .whereType<Exercise>()
+            .where((ex) => exercise.isTheSameAs(ex))
+            .every((ex) => ex.sets.every((set) => set.weight != null)),
+      );
 
   @override
   List<Workout> get affectedRoutines => [
-        for (final workout in routinesController.workouts)
-          if (workout.hasExercise(exercise)) workout
-      ];
+    for (final workout in routinesController.workouts)
+      if (workout.hasExercise(exercise)) workout,
+  ];
 
   @override
   List<Workout> get affectedHistory => [
-        for (final workout in historyController.history)
-          if (workout.hasExercise(exercise)) workout
-      ];
+    for (final workout in historyController.history)
+      if (workout.hasExercise(exercise)) workout,
+  ];
 
   @override
   void apply() {
     if (exercise.isCustom) {
-      exercisesController.
-      applyWeightMultiplier(exercise, multiplier);
+      exercisesController.applyWeightMultiplier(exercise, multiplier);
     }
-    routinesController.
-      applyWeightMultiplier(exercise, multiplier);
-    historyController.
-      applyWeightMultiplier(exercise, multiplier);
+    routinesController.applyWeightMultiplier(exercise, multiplier);
+    historyController.applyWeightMultiplier(exercise, multiplier);
   }
 }

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:gymtracker/i18n/strings.g.dart';
+import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/view/utils/input_decoration.dart';
 
 class TextFieldDialog extends StatefulWidget {
@@ -41,7 +41,7 @@ class _TextFieldDialogState extends State<TextFieldDialog> {
         actions: [
           TextButton(
             onPressed: () {
-              Get.back();
+              Go.back();
             },
             child: Text(context.t.general.dialogs.actions.cancel),
           ),
@@ -49,7 +49,7 @@ class _TextFieldDialogState extends State<TextFieldDialog> {
             onPressed: () {
               if (formKey.currentState!.validate()) {
                 widget.onDone.call(controller.text);
-                Get.back();
+                Go.back();
               }
             },
             child: Text(context.t.general.dialogs.actions.ok),

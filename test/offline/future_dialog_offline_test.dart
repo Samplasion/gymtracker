@@ -1,8 +1,5 @@
-import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:get/get.dart';
 import 'package:gymtracker/utils/go.dart';
 import 'package:http/http.dart';
 
@@ -13,10 +10,6 @@ void main() {
 
   setUp(() async {
     await initTestLocalizations();
-  });
-
-  tearDown(() {
-    Get.reset();
   });
 
   testWidgets(

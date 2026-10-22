@@ -1,23 +1,16 @@
-import 'dart:convert';
-import 'package:gymtracker/struct/request_cache.dart';
-
-import 'package:flutter/services.dart';
-import 'package:get/get.dart';
-import 'package:gymtracker/controller/serviceable_controller.dart';
-import 'package:gymtracker/main.dart';
 import 'package:gymtracker/model/model.dart';
-import 'package:gymtracker/provider/locale.dart';
+import 'package:gymtracker/repository/boutique.dart';
 import 'package:gymtracker/service/logger.dart';
-import 'package:gymtracker/service/test.dart';
 import 'package:gymtracker/service/version.dart';
-import 'package:gymtracker/utils/go.dart';
-import 'package:gymtracker/view/utils/boutique_debug_converter.dart';
+import 'package:gymtracker/struct/request_cache.dart';
 import 'package:pub_semver/pub_semver.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:uuid/uuid.dart';
 
-class BoutiqueController extends GetxController with ServiceableController {
-  late final _BoutiqueRepository _repository;
+export 'package:gymtracker/repository/boutique.dart' show BoutiqueRepository;
+
+class BoutiqueController {
+  final BoutiqueRepository _repository;
+  final void Function(List<Workout>) _installRoutines;
+  final String Function() _version;
   final _settings = RequestCache<String, BoutiqueSettings>(
     const Duration(minutes: 30),
   );
@@ -33,13 +26,13 @@ class BoutiqueController extends GetxController with ServiceableController {
     _packages.clear();
   }
 
-  BoutiqueController() {
-    if (TestService().isTest) {
-      _repository = _TestBoutiqueRepositoryImpl();
-    } else {
-      _repository = _BoutiqueRepositoryImpl();
-    }
-  }
+  BoutiqueController({
+    BoutiqueRepository? repository,
+    String Function()? version,
+    required void Function(List<Workout>) installRoutines,
+  }) : _repository = repository ?? createBoutiqueRepository(),
+       _version = version ?? (() => VersionService().packageInfo.version),
+       _installRoutines = installRoutines;
 
   Future<BoutiqueSettings> getSettings() async {
     return _settings.get('settings', _repository.getSettings);
@@ -49,7 +42,7 @@ class BoutiqueController extends GetxController with ServiceableController {
     final settings = await getSettings();
     if (!settings.enabled) throw BoutiqueError.unknown;
     final range = VersionConstraint.parse(settings.compatibility);
-    if (!range.allows(Version.parse(VersionService().packageInfo.version))) {
+    if (!range.allows(Version.parse(_version()))) {
       throw BoutiqueError.version;
     }
   }
@@ -90,172 +83,8 @@ class BoutiqueController extends GetxController with ServiceableController {
   }
 
   void install(BoutiquePackage package) {
-    final t = globalContainer.read(translationsProvider);
-    coordinator.installRoutines(package.routines);
-    Go.popUntil((route) => route.isFirst);
-    Go.snack(t.boutique.package.installed);
+    _installRoutines(package.routines);
   }
-
-  void routineConverter(String categoryID) async {
-    final packages = (await getPackages(categoryID, language: 'en')).success!;
-    Go.to(
-      () => BoutiqueDebugConverter(
-        packages: packages,
-        onPicked: (routine, package) {
-          final packageID = package.id;
-          final sql = _boutiqueSql(routine, packageID);
-          Clipboard.setData(ClipboardData(text: sql));
-        },
-      ),
-    );
-  }
-
-  String _boutiqueSql(Workout routine, String packageID) {
-    String _generateUUID() {
-      return const Uuid().v4();
-    }
-
-    final routineID = _generateUUID();
-
-    String result = '';
-    result +=
-        """
-INSERT INTO
-  boutique_routines (
-    id,
-    name,
-    infobox,
-    weight_unit,
-    distance_unit,
-    sort_order,
-    package_id
-  )
-values
-  (
-    '$routineID',
-    '{"en":"${routine.name}"}',
-    '{"en":${routine.infobox == null ? '""' : jsonEncode(routine.infobox)}}',
-    '${routine.weightUnit.name}',
-    '${routine.distanceUnit.name}',
-    0,
-    '$packageID'
-  );
-  """;
-
-    void _handleExercise(Exercise exercise, Superset? superset, int sortOrder) {
-      result +=
-          """
-INSERT INTO boutique_routine_exercises (
-  id,
-  routine_id,
-  name,
-  parameters,
-  sets,
-  primary_muscle_group,
-  secondary_muscle_groups,
-  rest_time,
-  is_custom,
-  library_exercise_id,
-  notes,
-  is_superset,
-  is_in_superset,
-  superset_id,
-  sort_order,
-  supersedes_id,
-  rpe,
-  progression,
-  equipment
-) values (
-  '${_generateUUID()}',
-  '$routineID',
-  '{"en":"${exercise.name}"}',
-  '${exercise.parameters.name}',
-  '${jsonEncode(exercise.sets.map((s) => s.copyWith(id: _generateUUID(), weight: 0)).toList())}',
-  '${exercise.primaryMuscleGroup.name}',
-  '${jsonEncode(exercise.secondaryMuscleGroups.map((e) => e.name).toList())}',
-  ${exercise.restTime.inSeconds},
-  0,
-  '${exercise.parentID!}',
-  '${exercise.notes.isEmpty ? "{}" : exercise.notes}',
-  0,
-  ${superset == null ? 0 : 1},
-  ${superset == null ? 'NULL' : "'${superset.id}'"},
-  $sortOrder,
-  NULL,
-  NULL,
-  ${exercise.progression == null ? 'NULL' : "'${jsonEncode(exercise.progression!.toJson())}'"},
-  '${exercise.gymEquipment.name}'
-);\n\n""";
-    }
-
-    final flattened = routine.exercises;
-
-    for (int i = 0; i < flattened.length; i++) {
-      final exercise = flattened[i];
-      if (exercise is Exercise) {
-        _handleExercise(exercise, null, i);
-      } else {
-        final superset = exercise as Superset;
-        final supersetID = _generateUUID();
-        result +=
-            """
-INSERT INTO boutique_routine_exercises (
-  id,
-  routine_id,
-  name,
-  parameters,
-  sets,
-  primary_muscle_group,
-  secondary_muscle_groups,
-  rest_time,
-  is_custom,
-  library_exercise_id,
-  notes,
-  is_superset,
-  is_in_superset,
-  superset_id,
-  sort_order,
-  supersedes_id,
-  rpe,
-  progression,
-  equipment
-) values (
-  '$supersetID',
-  '$routineID',
-  '{}',
-  'repsWeight',
-  '[]',
-  '',
-  '[]',
-  ${superset.restTime.inSeconds},
-  0,
-  NULL,
-  '${superset.notes.isEmpty ? "{}" : superset.notes}',
-  1,
-  0,
-  NULL,
-  $i,
-  NULL,
-  NULL,
-  NULL,
-  NULL
-);\n\n""";
-
-        for (int j = 0; j < superset.exercises.length; j++) {
-          _handleExercise(
-            superset.exercises[j],
-            superset.copyWith.id(supersetID),
-            j,
-          );
-        }
-      }
-    }
-
-    return result;
-  }
-
-  @override
-  void onServiceChange() {}
 }
 
 typedef BoutiqueApiResponse<T> = Future<BoutiqueResponse<T, BoutiqueError>>;
@@ -290,68 +119,4 @@ class _BoutiqueResponseError<T> extends BoutiqueResponse<Never, T> {
   final T error;
 
   _BoutiqueResponseError(this.error);
-}
-
-abstract class _BoutiqueRepository {
-  Future<BoutiqueSettings> getSettings();
-  Future<List<BoutiqueCategory>> getCategories();
-  Future<List<BoutiquePackage>> getPackages(
-    String categoryId, {
-    required String language,
-  });
-}
-
-class _TestBoutiqueRepositoryImpl implements _BoutiqueRepository {
-  @override
-  Future<List<BoutiqueCategory>> getCategories() async {
-    return [];
-  }
-
-  @override
-  Future<List<BoutiquePackage>> getPackages(
-    String categoryId, {
-    required String language,
-  }) async {
-    return [];
-  }
-
-  @override
-  Future<BoutiqueSettings> getSettings() async {
-    return BoutiqueSettings(compatibility: "0.0.0", enabled: false);
-  }
-}
-
-class _BoutiqueRepositoryImpl implements _BoutiqueRepository {
-  final _db = Supabase.instance.client;
-
-  @override
-  Future<BoutiqueSettings> getSettings() async {
-    final response = await _db
-        .from('boutique_settings')
-        .select()
-        .limit(1)
-        .single();
-    return BoutiqueSettings.fromJson(response);
-  }
-
-  @override
-  Future<List<BoutiqueCategory>> getCategories() async {
-    final response = await _db
-        .from('boutique_categories')
-        .select()
-        .order('order', ascending: true);
-    return response.map((e) => BoutiqueCategory.fromJson(e)).toList();
-  }
-
-  @override
-  Future<List<BoutiquePackage>> getPackages(
-    String categoryId, {
-    required String language,
-  }) async {
-    final response = await _db
-        .from('boutique_packages')
-        .select("*, boutique_routines(*, boutique_routine_exercises(*))")
-        .eq('category_id', categoryId);
-    return response.map((e) => BoutiquePackage.fromJson(e, language)).toList();
-  }
 }

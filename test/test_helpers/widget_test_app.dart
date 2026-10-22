@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:get/get.dart';
 import 'package:gymtracker/i18n/strings.g.dart';
-import 'package:gymtracker/main.dart';
+import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/utils/theme.dart';
 import 'package:intl/date_symbol_data_local.dart';
+
+import 'mock_services.dart';
 
 Future<void> initTestLocalizations() async {
   await initializeDateFormatting('en_US', null);
@@ -25,7 +26,8 @@ class WidgetTestApp extends StatelessWidget {
   Widget build(BuildContext context) {
     final baseTheme = ThemeData(useMaterial3: true);
     final app = TranslationProvider(
-      child: GetMaterialApp(
+      child: MaterialApp(
+        navigatorKey: Go.navigatorKey,
         locale: const Locale('en'),
         theme: baseTheme.copyWith(
           extensions: [MoreColors.fromColorScheme(baseTheme.colorScheme)],
@@ -34,12 +36,20 @@ class WidgetTestApp extends StatelessWidget {
       ),
     );
 
+    var hasParentScope = false;
+    try {
+      ProviderScope.containerOf(context, listen: false);
+      hasParentScope = true;
+    } on StateError {
+      // Legacy widget fixtures need a root scope as their widgets migrate.
+    }
     if (wrapWithProviderScope) {
       return UncontrolledProviderScope(
-        container: globalContainer,
+        container: MockServices.container,
         child: app,
       );
     }
+    if (!hasParentScope) return ProviderScope(child: app);
     return app;
   }
 }

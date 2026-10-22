@@ -1,12 +1,9 @@
-import 'package:easy_debounce/easy_debounce.dart';
 import 'package:fake_async/fake_async.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:get/get.dart';
-import 'package:gymtracker/controller/coordinator.dart';
-import 'package:gymtracker/controller/history_controller.dart';
 import 'package:gymtracker/controller/routines_controller.dart';
 import 'package:gymtracker/model/workout.dart';
-import 'package:gymtracker/service/database.dart';
+import 'package:gymtracker/provider/bootstrap.dart';
+import 'package:gymtracker/provider/training_data.dart';
 import 'package:mocktail/mocktail.dart';
 
 import '../test_helpers/mock_services.dart';
@@ -15,43 +12,38 @@ void main() {
   late MockDatabaseService mockDatabaseService;
   late MockHistoryController mockHistoryController;
   late MockRoutinesController mockRoutinesController;
-  late Coordinator coordinator;
+  late BackupScheduler backupScheduler;
+  var suggestions = <RoutineSuggestion>[];
 
   setUp(() {
-    Get.reset();
-    Get.testMode = true;
     mockDatabaseService = MockDatabaseService();
     mockHistoryController = MockHistoryController();
     mockRoutinesController = MockRoutinesController();
 
     when(() => mockDatabaseService.createBackup()).thenAnswer((_) async {});
-    when(() => mockHistoryController.history).thenReturn(RxList<Workout>([]));
-    when(() => mockRoutinesController.workouts).thenReturn(RxList<Workout>([]));
+    when(() => mockHistoryController.history).thenReturn(<Workout>[]);
+    when(() => mockRoutinesController.workouts).thenReturn(<Workout>[]);
 
-    Get.put<DatabaseService>(mockDatabaseService);
-    Get.put<HistoryController>(mockHistoryController);
-    Get.put<RoutinesController>(mockRoutinesController);
-
-    coordinator = Coordinator();
+    backupScheduler = BackupScheduler(mockDatabaseService);
+    suggestions = [];
   });
 
   tearDown(() {
-    EasyDebounce.cancel('scheduleBackup');
-    Get.reset();
+    backupScheduler.dispose();
   });
 
   group('Coordinator - scheduleBackup debounce', () {
     test('debounces multiple calls within one minute to a single backup', () {
       fakeAsync((async) {
-        coordinator.scheduleBackup();
+        backupScheduler.schedule();
         async.elapse(const Duration(seconds: 20));
         verifyNever(() => mockDatabaseService.createBackup());
 
-        coordinator.scheduleBackup();
+        backupScheduler.schedule();
         async.elapse(const Duration(seconds: 20));
         verifyNever(() => mockDatabaseService.createBackup());
 
-        coordinator.scheduleBackup();
+        backupScheduler.schedule();
         async.elapse(const Duration(seconds: 59));
         verifyNever(() => mockDatabaseService.createBackup());
 
@@ -62,11 +54,11 @@ void main() {
 
     test('creates at most one backup in a one-minute span', () {
       fakeAsync((async) {
-        coordinator.scheduleBackup();
+        backupScheduler.schedule();
         async.elapse(const Duration(minutes: 1));
         verify(() => mockDatabaseService.createBackup()).called(1);
 
-        coordinator.scheduleBackup();
+        backupScheduler.schedule();
         async.elapse(const Duration(minutes: 1));
         verify(() => mockDatabaseService.createBackup()).called(1);
       });
@@ -74,8 +66,8 @@ void main() {
 
     test('cancels scheduled backup with EasyDebounce.cancel', () {
       fakeAsync((async) {
-        coordinator.scheduleBackup();
-        EasyDebounce.cancel('scheduleBackup');
+        backupScheduler.schedule();
+        backupScheduler.dispose();
         async.elapse(const Duration(minutes: 2));
         verifyNever(() => mockDatabaseService.createBackup());
       });
@@ -103,16 +95,20 @@ void main() {
 
         when(
           () => mockRoutinesController.workouts,
-        ).thenReturn(RxList<Workout>([routine]));
+        ).thenReturn(List<Workout>.of([routine]));
         when(
           () => mockHistoryController.history,
-        ).thenReturn(RxList<Workout>([workout]));
+        ).thenReturn(List<Workout>.of([workout]));
 
-        coordinator.computeSuggestions(now: referenceDate);
+        suggestions = computeRoutineSuggestions(
+          mockRoutinesController.workouts,
+          mockHistoryController.history,
+          now: referenceDate,
+        );
 
-        expect(coordinator.suggestions.length, 1);
-        expect(coordinator.suggestions.first.routine.id, 'routine-1');
-        expect(coordinator.suggestions.first.score, closeTo(1.0, 1e-5));
+        expect(suggestions.length, 1);
+        expect(suggestions.first.routine.id, 'routine-1');
+        expect(suggestions.first.score, closeTo(1.0, 1e-5));
       },
     );
 
@@ -134,15 +130,19 @@ void main() {
 
         when(
           () => mockRoutinesController.workouts,
-        ).thenReturn(RxList<Workout>([routine]));
+        ).thenReturn(List<Workout>.of([routine]));
         when(
           () => mockHistoryController.history,
-        ).thenReturn(RxList<Workout>([workout]));
+        ).thenReturn(List<Workout>.of([workout]));
 
-        coordinator.computeSuggestions(now: referenceDate);
+        suggestions = computeRoutineSuggestions(
+          mockRoutinesController.workouts,
+          mockHistoryController.history,
+          now: referenceDate,
+        );
 
-        expect(coordinator.suggestions.length, 1);
-        expect(coordinator.suggestions.first.score, closeTo(0.5, 1e-5));
+        expect(suggestions.length, 1);
+        expect(suggestions.first.score, closeTo(0.5, 1e-5));
       },
     );
 
@@ -164,15 +164,19 @@ void main() {
 
         when(
           () => mockRoutinesController.workouts,
-        ).thenReturn(RxList<Workout>([routine]));
+        ).thenReturn(List<Workout>.of([routine]));
         when(
           () => mockHistoryController.history,
-        ).thenReturn(RxList<Workout>([workout]));
+        ).thenReturn(List<Workout>.of([workout]));
 
-        coordinator.computeSuggestions(now: referenceDate);
+        suggestions = computeRoutineSuggestions(
+          mockRoutinesController.workouts,
+          mockHistoryController.history,
+          now: referenceDate,
+        );
 
-        expect(coordinator.suggestions.length, 1);
-        expect(coordinator.suggestions.first.score, closeTo(0.25, 1e-5));
+        expect(suggestions.length, 1);
+        expect(suggestions.first.score, closeTo(0.25, 1e-5));
       },
     );
 
@@ -194,15 +198,19 @@ void main() {
 
         when(
           () => mockRoutinesController.workouts,
-        ).thenReturn(RxList<Workout>([routine]));
+        ).thenReturn(List<Workout>.of([routine]));
         when(
           () => mockHistoryController.history,
-        ).thenReturn(RxList<Workout>([workout]));
+        ).thenReturn(List<Workout>.of([workout]));
 
-        coordinator.computeSuggestions(now: referenceDate);
+        suggestions = computeRoutineSuggestions(
+          mockRoutinesController.workouts,
+          mockHistoryController.history,
+          now: referenceDate,
+        );
 
-        expect(coordinator.suggestions.length, 1);
-        expect(coordinator.suggestions.first.score, closeTo(0.125, 1e-5));
+        expect(suggestions.length, 1);
+        expect(suggestions.first.score, closeTo(0.125, 1e-5));
       },
     );
 
@@ -220,16 +228,20 @@ void main() {
 
         when(
           () => mockRoutinesController.workouts,
-        ).thenReturn(RxList<Workout>([routine]));
+        ).thenReturn(List<Workout>.of([routine]));
         when(
           () => mockHistoryController.history,
-        ).thenReturn(RxList<Workout>([workout]));
+        ).thenReturn(List<Workout>.of([workout]));
 
-        coordinator.computeSuggestions(now: referenceDate);
+        suggestions = computeRoutineSuggestions(
+          mockRoutinesController.workouts,
+          mockHistoryController.history,
+          now: referenceDate,
+        );
 
-        expect(coordinator.suggestions.length, 1);
+        expect(suggestions.length, 1);
         // 2^(-14/28) = 2^(-0.5) = 1/sqrt(2) ≈ 0.70710678
-        expect(coordinator.suggestions.first.score, closeTo(0.707106, 1e-4));
+        expect(suggestions.first.score, closeTo(0.707106, 1e-4));
       },
     );
 
@@ -249,16 +261,21 @@ void main() {
 
       when(
         () => mockRoutinesController.workouts,
-      ).thenReturn(RxList<Workout>([routine]));
+      ).thenReturn(List<Workout>.of([routine]));
       when(
         () => mockHistoryController.history,
-      ).thenReturn(RxList<Workout>([workout]));
+      ).thenReturn(List<Workout>.of([workout]));
 
       // With halfLifeDays = 14, 14 days ago is exactly 1 half-life => 0.5
-      coordinator.computeSuggestions(now: referenceDate, halfLifeDays: 14.0);
+      suggestions = computeRoutineSuggestions(
+        mockRoutinesController.workouts,
+        mockHistoryController.history,
+        now: referenceDate,
+        halfLifeDays: 14.0,
+      );
 
-      expect(coordinator.suggestions.length, 1);
-      expect(coordinator.suggestions.first.score, closeTo(0.5, 1e-5));
+      expect(suggestions.length, 1);
+      expect(suggestions.first.score, closeTo(0.5, 1e-5));
     });
 
     test(
@@ -296,23 +313,27 @@ void main() {
 
         when(
           () => mockRoutinesController.workouts,
-        ).thenReturn(RxList<Workout>([routineMatch, routineOther]));
+        ).thenReturn(List<Workout>.of([routineMatch, routineOther]));
         when(
           () => mockHistoryController.history,
-        ).thenReturn(RxList<Workout>([workoutMatch, workoutOther]));
+        ).thenReturn(List<Workout>.of([workoutMatch, workoutOther]));
 
-        coordinator.computeSuggestions(now: referenceDate);
+        suggestions = computeRoutineSuggestions(
+          mockRoutinesController.workouts,
+          mockHistoryController.history,
+          now: referenceDate,
+        );
 
-        expect(coordinator.suggestions.length, 2);
+        expect(suggestions.length, 2);
 
         // Routine on matching weekday has weight 1.0 * 2^(-7/28) ≈ 0.840896
-        final matchSuggestion = coordinator.suggestions.firstWhere(
+        final matchSuggestion = suggestions.firstWhere(
           (s) => s.routine.id == 'routine-match',
         );
         expect(matchSuggestion.score, closeTo(1.0 * 0.840896, 1e-4));
 
         // Routine on other weekday has weight 0.2 * 2^(-8/28) ≈ 0.2 * 0.820335 = 0.164067
-        final otherSuggestion = coordinator.suggestions.firstWhere(
+        final otherSuggestion = suggestions.firstWhere(
           (s) => s.routine.id == 'routine-other',
         );
         expect(otherSuggestion.score, closeTo(0.2 * 0.820335, 1e-4));
@@ -350,16 +371,20 @@ void main() {
 
         when(
           () => mockRoutinesController.workouts,
-        ).thenReturn(RxList<Workout>([routine]));
+        ).thenReturn(List<Workout>.of([routine]));
         when(
           () => mockHistoryController.history,
-        ).thenReturn(RxList<Workout>(workouts));
+        ).thenReturn(List<Workout>.of(workouts));
 
-        coordinator.computeSuggestions(now: referenceDate);
+        suggestions = computeRoutineSuggestions(
+          mockRoutinesController.workouts,
+          mockHistoryController.history,
+          now: referenceDate,
+        );
 
-        expect(coordinator.suggestions.length, 1);
+        expect(suggestions.length, 1);
         // Total score = 1.0 + 0.5 + 0.25 = 1.75
-        expect(coordinator.suggestions.first.score, closeTo(1.75, 1e-5));
+        expect(suggestions.first.score, closeTo(1.75, 1e-5));
       },
     );
 
@@ -429,22 +454,26 @@ void main() {
 
       when(
         () => mockRoutinesController.workouts,
-      ).thenReturn(RxList<Workout>([oldRoutine, activeRoutine]));
+      ).thenReturn(List<Workout>.of([oldRoutine, activeRoutine]));
       when(
         () => mockHistoryController.history,
-      ).thenReturn(RxList<Workout>([...oldWorkouts, ...activeWorkouts]));
+      ).thenReturn(List<Workout>.of([...oldWorkouts, ...activeWorkouts]));
 
-      coordinator.computeSuggestions(now: referenceDate);
+      suggestions = computeRoutineSuggestions(
+        mockRoutinesController.workouts,
+        mockHistoryController.history,
+        now: referenceDate,
+      );
 
-      expect(coordinator.suggestions.length, 2);
+      expect(suggestions.length, 2);
 
       // Active routine must be ranked #1
-      expect(coordinator.suggestions[0].routine.id, 'routine-active');
-      expect(coordinator.suggestions[1].routine.id, 'routine-old');
+      expect(suggestions[0].routine.id, 'routine-active');
+      expect(suggestions[1].routine.id, 'routine-old');
 
       // Active routine score (~2.64) is substantially higher than old routine (~0.85)
-      expect(coordinator.suggestions[0].score, greaterThan(2.5));
-      expect(coordinator.suggestions[1].score, lessThan(1.0));
+      expect(suggestions[0].score, greaterThan(2.5));
+      expect(suggestions[1].score, lessThan(1.0));
     });
 
     test(
@@ -486,15 +515,19 @@ void main() {
 
         when(
           () => mockRoutinesController.workouts,
-        ).thenReturn(RxList<Workout>([ancientRoutine, freshRoutine]));
+        ).thenReturn(List<Workout>.of([ancientRoutine, freshRoutine]));
         when(
           () => mockHistoryController.history,
-        ).thenReturn(RxList<Workout>([...ancientWorkouts, ...freshWorkouts]));
+        ).thenReturn(List<Workout>.of([...ancientWorkouts, ...freshWorkouts]));
 
-        coordinator.computeSuggestions(now: referenceDate);
+        suggestions = computeRoutineSuggestions(
+          mockRoutinesController.workouts,
+          mockHistoryController.history,
+          now: referenceDate,
+        );
 
-        expect(coordinator.suggestions.first.routine.id, 'routine-fresh');
-        expect(coordinator.suggestions.first.score, greaterThan(0.1));
+        expect(suggestions.first.routine.id, 'routine-fresh');
+        expect(suggestions.first.score, greaterThan(0.1));
       },
     );
   });
@@ -503,13 +536,15 @@ void main() {
     final referenceDate = DateTime(2026, 9, 7, 12, 0);
 
     test('returns empty suggestions when history or routines are empty', () {
-      when(
-        () => mockRoutinesController.workouts,
-      ).thenReturn(RxList<Workout>([]));
-      when(() => mockHistoryController.history).thenReturn(RxList<Workout>([]));
+      when(() => mockRoutinesController.workouts).thenReturn(<Workout>[]);
+      when(() => mockHistoryController.history).thenReturn(<Workout>[]);
 
-      coordinator.computeSuggestions(now: referenceDate);
-      expect(coordinator.suggestions, isEmpty);
+      suggestions = computeRoutineSuggestions(
+        mockRoutinesController.workouts,
+        mockHistoryController.history,
+        now: referenceDate,
+      );
+      expect(suggestions, isEmpty);
     });
 
     test('ignores routines with no matching history', () {
@@ -528,13 +563,17 @@ void main() {
 
       when(
         () => mockRoutinesController.workouts,
-      ).thenReturn(RxList<Workout>([routine]));
+      ).thenReturn(List<Workout>.of([routine]));
       when(
         () => mockHistoryController.history,
-      ).thenReturn(RxList<Workout>([otherWorkout]));
+      ).thenReturn(List<Workout>.of([otherWorkout]));
 
-      coordinator.computeSuggestions(now: referenceDate);
-      expect(coordinator.suggestions, isEmpty);
+      suggestions = computeRoutineSuggestions(
+        mockRoutinesController.workouts,
+        mockHistoryController.history,
+        now: referenceDate,
+      );
+      expect(suggestions, isEmpty);
     });
 
     test('safely handles workouts with null startingDate', () {
@@ -560,17 +599,21 @@ void main() {
 
       when(
         () => mockRoutinesController.workouts,
-      ).thenReturn(RxList<Workout>([routine]));
+      ).thenReturn(List<Workout>.of([routine]));
       when(
         () => mockHistoryController.history,
-      ).thenReturn(RxList<Workout>([workoutNullDate, workoutValidDate]));
+      ).thenReturn(List<Workout>.of([workoutNullDate, workoutValidDate]));
 
       expect(
-        () => coordinator.computeSuggestions(now: referenceDate),
+        () => suggestions = computeRoutineSuggestions(
+          mockRoutinesController.workouts,
+          mockHistoryController.history,
+          now: referenceDate,
+        ),
         returnsNormally,
       );
-      expect(coordinator.suggestions.length, 1);
-      expect(coordinator.suggestions.first.score, closeTo(1.0, 1e-5));
+      expect(suggestions.length, 1);
+      expect(suggestions.first.score, closeTo(1.0, 1e-5));
     });
 
     test(
@@ -592,17 +635,21 @@ void main() {
 
         when(
           () => mockRoutinesController.workouts,
-        ).thenReturn(RxList<Workout>([routine]));
+        ).thenReturn(List<Workout>.of([routine]));
         when(
           () => mockHistoryController.history,
-        ).thenReturn(RxList<Workout>([futureWorkout]));
+        ).thenReturn(List<Workout>.of([futureWorkout]));
 
-        coordinator.computeSuggestions(now: referenceDate);
+        suggestions = computeRoutineSuggestions(
+          mockRoutinesController.workouts,
+          mockHistoryController.history,
+          now: referenceDate,
+        );
 
-        expect(coordinator.suggestions.length, 1);
+        expect(suggestions.length, 1);
         // Clamped to daysAgo = 0 => decay = 1.0
-        expect(coordinator.suggestions.first.score, greaterThan(0.0));
-        expect(coordinator.suggestions.first.score, lessThanOrEqualTo(1.0));
+        expect(suggestions.first.score, greaterThan(0.0));
+        expect(suggestions.first.score, lessThanOrEqualTo(1.0));
       },
     );
 
@@ -642,26 +689,24 @@ void main() {
 
       when(
         () => mockRoutinesController.workouts,
-      ).thenReturn(RxList<Workout>(routines));
+      ).thenReturn(List<Workout>.of(routines));
       when(
         () => mockHistoryController.history,
-      ).thenReturn(RxList<Workout>(workouts));
+      ).thenReturn(List<Workout>.of(workouts));
 
-      coordinator.computeSuggestions(now: referenceDate);
-
-      expect(coordinator.suggestions.length, 3);
-      expect(coordinator.suggestions[0].routine.id, 'r-high');
-      expect(coordinator.suggestions[1].routine.id, 'r-mid');
-      expect(coordinator.suggestions[2].routine.id, 'r-low');
-
-      expect(
-        coordinator.suggestions[0].score,
-        greaterThan(coordinator.suggestions[1].score),
+      suggestions = computeRoutineSuggestions(
+        mockRoutinesController.workouts,
+        mockHistoryController.history,
+        now: referenceDate,
       );
-      expect(
-        coordinator.suggestions[1].score,
-        greaterThan(coordinator.suggestions[2].score),
-      );
+
+      expect(suggestions.length, 3);
+      expect(suggestions[0].routine.id, 'r-high');
+      expect(suggestions[1].routine.id, 'r-mid');
+      expect(suggestions[2].routine.id, 'r-low');
+
+      expect(suggestions[0].score, greaterThan(suggestions[1].score));
+      expect(suggestions[1].score, greaterThan(suggestions[2].score));
     });
 
     test('limits suggestions to top 5 even when more candidates exist', () {
@@ -683,19 +728,23 @@ void main() {
 
       when(
         () => mockRoutinesController.workouts,
-      ).thenReturn(RxList<Workout>(routines));
+      ).thenReturn(List<Workout>.of(routines));
       when(
         () => mockHistoryController.history,
-      ).thenReturn(RxList<Workout>(workouts));
+      ).thenReturn(List<Workout>.of(workouts));
 
-      coordinator.computeSuggestions(now: referenceDate);
+      suggestions = computeRoutineSuggestions(
+        mockRoutinesController.workouts,
+        mockHistoryController.history,
+        now: referenceDate,
+      );
 
-      expect(coordinator.suggestions.length, 5);
+      expect(suggestions.length, 5);
       // Verify top 5 are in descending order
-      for (int i = 0; i < coordinator.suggestions.length - 1; i++) {
+      for (int i = 0; i < suggestions.length - 1; i++) {
         expect(
-          coordinator.suggestions[i].score,
-          greaterThanOrEqualTo(coordinator.suggestions[i + 1].score),
+          suggestions[i].score,
+          greaterThanOrEqualTo(suggestions[i + 1].score),
         );
       }
     });
@@ -716,14 +765,18 @@ void main() {
 
       when(
         () => mockRoutinesController.workouts,
-      ).thenReturn(RxList<Workout>([routine]));
+      ).thenReturn(List<Workout>.of([routine]));
       when(
         () => mockHistoryController.history,
-      ).thenReturn(RxList<Workout>([workout]));
+      ).thenReturn(List<Workout>.of([workout]));
 
-      coordinator.computeSuggestions(now: referenceDate);
+      suggestions = computeRoutineSuggestions(
+        mockRoutinesController.workouts,
+        mockHistoryController.history,
+        now: referenceDate,
+      );
 
-      final suggestion = coordinator.suggestions.first;
+      final suggestion = suggestions.first;
       expect(suggestion.score, isA<double>());
     });
   });

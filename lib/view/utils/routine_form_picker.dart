@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gymtracker/controller/routines_controller.dart';
 import 'package:gymtracker/i18n/strings.g.dart';
 import 'package:gymtracker/icons/gymtracker_icons.dart';
 import 'package:gymtracker/model/workout.dart';
 import 'package:gymtracker/service/logger.dart';
-import 'package:gymtracker/view/components/controlled.dart';
+import 'package:gymtracker/view/actions/routines.dart';
 import 'package:gymtracker/view/routines.dart';
 import 'package:gymtracker/view/utils/input_decoration.dart';
 
-class RoutineFormPicker extends StatefulWidget {
+class RoutineFormPicker extends ConsumerStatefulWidget {
   final Workout? routine;
   final ValueChanged<Workout?> onChanged;
   final InputDecoration decoration;
@@ -23,11 +24,10 @@ class RoutineFormPicker extends StatefulWidget {
   });
 
   @override
-  State<RoutineFormPicker> createState() => _RoutineFormPickerState();
+  ConsumerState<RoutineFormPicker> createState() => _RoutineFormPickerState();
 }
 
-class _RoutineFormPickerState
-    extends ControlledState<RoutineFormPicker, RoutinesController> {
+class _RoutineFormPickerState extends ConsumerState<RoutineFormPicker> {
   final _node = FocusNode();
 
   @override
@@ -67,12 +67,14 @@ class _RoutineFormPickerState
   }
 
   _callback() {
-    controller.pickRoutine(
-      onPick: (routine) {
-        widget.onChanged(routine);
-      },
-      allowNone: true,
-    );
+    ref
+        .read(routinesControllerProvider)
+        .pickRoutine(
+          onPick: (routine) {
+            widget.onChanged(routine);
+          },
+          allowNone: true,
+        );
   }
 
   Widget _buildBody() {

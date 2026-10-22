@@ -1,7 +1,6 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
-import 'package:get/utils.dart';
 import 'package:gymtracker/gen/colors.gen.dart';
 import 'package:gymtracker/i18n/strings.g.dart';
 import 'package:gymtracker/view/components/loading_indicator.dart';
@@ -13,7 +12,7 @@ class LoadingPage extends StatelessWidget {
   Widget build(BuildContext context) {
     const size = 192.0;
     const padding = 32.0;
-    final boxSize = min(size, context.width - 2 * padding);
+    final boxSize = min(size, MediaQuery.sizeOf(context).width - 2 * padding);
     return Scaffold(
       body: Center(
         child: Column(

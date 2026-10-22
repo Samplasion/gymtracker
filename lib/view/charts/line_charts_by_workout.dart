@@ -1,7 +1,7 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gymtracker/controller/history_controller.dart';
 import 'package:gymtracker/controller/routines_controller.dart';
 import 'package:gymtracker/controller/settings_controller.dart';
@@ -12,12 +12,13 @@ import 'package:gymtracker/i18n/strings.g.dart';
 import 'package:gymtracker/icons/gymtracker_icons.dart';
 import 'package:gymtracker/model/exercise.dart';
 import 'package:gymtracker/model/workout.dart';
+import 'package:gymtracker/provider/settings.dart';
+import 'package:gymtracker/provider/training_data.dart';
 import 'package:gymtracker/service/logger.dart';
 import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/utils/theme.dart';
 import 'package:gymtracker/view/charts/line_charts_time_series.dart';
-import 'package:gymtracker/view/components/controlled.dart';
 import 'package:gymtracker/view/exercises.dart';
 import 'package:gymtracker/view/utils/timer.dart';
 import 'package:gymtracker/view/utils/workout_navigation.dart';
@@ -27,7 +28,7 @@ export 'package:gymtracker/view/charts/base_types.dart';
 
 const _kDeltaTimeForTimeChart = Duration(days: 90);
 
-class LineChartWithCategories<T> extends StatefulWidget {
+class LineChartWithCategories<T> extends ConsumerStatefulWidget {
   final Map<T, LineChartCategory> categories;
   final Map<T, List<LineChartPoint>> data;
   final Map<T, List<LineChartPoint>> predictedData;
@@ -49,12 +50,12 @@ class LineChartWithCategories<T> extends StatefulWidget {
        assert(minYAxisInterval > 0);
 
   @override
-  State<LineChartWithCategories<T>> createState() =>
-      _LineChartWithCategoriesState<T>();
+  ConsumerState<LineChartWithCategories<T>> createState() =>
+      _LineChartWithCategoriesConsumerState<T>();
 }
 
-class _LineChartWithCategoriesState<T>
-    extends State<LineChartWithCategories<T>> {
+class _LineChartWithCategoriesConsumerState<T>
+    extends ConsumerState<LineChartWithCategories<T>> {
   late T selectedCategory = widget.categories.keys.first;
   late int hoveredIndex = widget.data[selectedCategory]!.length - 1;
 
@@ -67,7 +68,7 @@ class _LineChartWithCategoriesState<T>
             .leftTitleBuilder(e.key, point.value)
             // Worst case scenario for numbers
             .replaceAll(RegExp(r"[0-9]"), "m")
-            .computeSize(style: context.textTheme.labelSmall!)
+            .computeSize(style: Theme.of(context).textTheme.labelSmall!)
             .width;
       }).toList();
       return categorySizes.max;
@@ -103,6 +104,9 @@ class _LineChartWithCategoriesState<T>
 
   @override
   Widget build(BuildContext context) {
+    ref.watch(appPreferencesProvider);
+    ref.watch(historyWorkoutsProvider);
+    ref.watch(customExercisesProvider);
     final colorScheme = Theme.of(context).colorScheme;
     final (yMin, yMax) = _categoryYAxisRanges[selectedCategory]!;
     return Column(
@@ -163,7 +167,11 @@ class _LineChartWithCategoriesState<T>
                     sideTitles: SideTitles(
                       showTitles: true,
                       reservedSize:
-                          [context.width / 5, leftReservedSize].min + 8,
+                          [
+                            MediaQuery.sizeOf(context).width / 5,
+                            leftReservedSize,
+                          ].min +
+                          8,
                       getTitlesWidget: leftTitleWidgets(context),
                     ),
                   ),
@@ -348,7 +356,7 @@ class _LineChartWithCategoriesState<T>
             children: [
               TextSpan(
                 text: widget.leftTitleBuilder(selectedCategory, value),
-                style: context.textTheme.labelSmall!,
+                style: Theme.of(context).textTheme.labelSmall!,
               ),
             ],
           ),
@@ -359,18 +367,21 @@ class _LineChartWithCategoriesState<T>
   }
 }
 
-class RoutineHistoryChart extends StatefulWidget {
+class RoutineHistoryChart extends ConsumerStatefulWidget {
   const RoutineHistoryChart({required this.routine, super.key});
 
   final Workout routine;
 
   @override
-  State<RoutineHistoryChart> createState() => _RoutineHistoryChartState();
+  ConsumerState<RoutineHistoryChart> createState() =>
+      _RoutineHistoryChartState();
 
-  static shouldShow(Workout workout) {
-    final controller = Get.find<RoutinesController>();
-    final ongoingWorkout = Get.isRegistered<WorkoutController>()
-        ? Get.find<WorkoutController>().synthesizeTemporaryWorkout()
+  static bool shouldShow(Workout workout, WidgetRef ref) {
+    final controller = ref.read(routinesControllerProvider);
+    final ongoingWorkout = ref.read(workoutControllerProvider) != null
+        ? ref
+              .read(workoutControllerProvider.notifier)
+              .synthesizeTemporaryWorkout()
         : null;
     final added = ongoingWorkout != null && ongoingWorkout.isChildOf(workout)
         ? 1
@@ -387,11 +398,13 @@ class RoutineHistoryChart extends StatefulWidget {
 
 enum _RoutineHistoryChartType { volume, reps, duration, exertion }
 
-class _RoutineHistoryChartState
-    extends ControlledState<RoutineHistoryChart, RoutinesController> {
+class _RoutineHistoryChartState extends ConsumerState<RoutineHistoryChart> {
+  RoutinesController get controller => ref.read(routinesControllerProvider);
   Workout? get _currentSynthOngoing {
-    if (!Get.isRegistered<WorkoutController>()) return null;
-    final wo = Get.find<WorkoutController>().synthesizeTemporaryWorkout();
+    if (ref.read(workoutControllerProvider) == null) return null;
+    final wo = ref
+        .read(workoutControllerProvider.notifier)
+        .synthesizeTemporaryWorkout();
     return wo.isChildOf(widget.routine) ? wo : null;
   }
 
@@ -404,7 +417,7 @@ class _RoutineHistoryChartState
           value: Weights.convert(
             value: wo.liftedWeight,
             from: wo.weightUnit,
-            to: settingsController.weightUnit.value,
+            to: ref.read(settingsControllerInstanceProvider).weightUnit,
           ),
           date: wo.startingDate!,
         );
@@ -454,7 +467,7 @@ class _RoutineHistoryChartState
           value: Weights.convert(
             value: wo.liftedWeight,
             from: wo.weightUnit,
-            to: settingsController.weightUnit.value,
+            to: ref.read(settingsControllerInstanceProvider).weightUnit,
           ),
           date: wo.startingDate!,
         ),
@@ -504,7 +517,10 @@ class _RoutineHistoryChartState
     if (y < 0) return "";
     switch (type) {
       case _RoutineHistoryChartType.volume:
-        return y.getUserFacingWeight(context.t);
+        return y.getUserFacingWeight(
+          context.t,
+          ref.read(settingsControllerProvider).weightUnit,
+        );
       case _RoutineHistoryChartType.reps:
         return context.t.exerciseList.fields.reps(n: y.toInt());
       case _RoutineHistoryChartType.duration:
@@ -536,6 +552,9 @@ class _RoutineHistoryChartState
 
   @override
   Widget build(BuildContext context) {
+    ref.watch(appPreferencesProvider);
+    ref.watch(historyWorkoutsProvider);
+    ref.watch(customExercisesProvider);
     final deltaStartingTime = children.first.startingDate!
         .difference(children.last.startingDate!)
         .abs();
@@ -589,13 +608,19 @@ class _RoutineHistoryChartState
                     recognizer: dateRecognizer
                       ..onTap = () {
                         if (index >= children.length) {
-                          Go.toNamed(getPreferredWorkoutRouteName());
+                          Go.toNamed(
+                            getPreferredWorkoutRouteName(
+                              simple: ref
+                                  .read(settingsControllerInstanceProvider)
+                                  .defaultToSimpleWorkoutView,
+                            ),
+                          );
                         } else {
                           Go.to(
                             () => ExercisesView(
-                              workout: Get.find<HistoryController>().getByID(
-                                children[index].id,
-                              )!,
+                              workout: ref
+                                  .read(historyControllerProvider)
+                                  .getByID(children[index].id)!,
                             ),
                           );
                         }
@@ -667,13 +692,19 @@ class _RoutineHistoryChartState
                     recognizer: dateRecognizer
                       ..onTap = () {
                         if (index >= children.length) {
-                          Go.toNamed(getPreferredWorkoutRouteName());
+                          Go.toNamed(
+                            getPreferredWorkoutRouteName(
+                              simple: ref
+                                  .read(settingsControllerInstanceProvider)
+                                  .defaultToSimpleWorkoutView,
+                            ),
+                          );
                         } else {
                           Go.to(
                             () => ExercisesView(
-                              workout: Get.find<HistoryController>().getByID(
-                                children[index].id,
-                              )!,
+                              workout: ref
+                                  .read(historyControllerProvider)
+                                  .getByID(children[index].id)!,
                             ),
                           );
                         }
@@ -703,7 +734,11 @@ class _RoutineHistoryChartState
   Set<_ExerciseHistoryChartType> types,
   Map<_ExerciseHistoryChartType, List<LineChartPoint>> values,
 })
-_calculateTypes(List<ExerciseHistoryChartChild> children) {
+_calculateTypes(
+  List<ExerciseHistoryChartChild> children, {
+  Weights weightUnit = Weights.kg,
+  Distance distanceUnit = Distance.km,
+}) {
   final types = <_ExerciseHistoryChartType>{};
   final values = <_ExerciseHistoryChartType, List<LineChartPoint>>{
     _ExerciseHistoryChartType.volume: [],
@@ -721,7 +756,7 @@ _calculateTypes(List<ExerciseHistoryChartChild> children) {
           value: Weights.convert(
             value: ex.liftedWeight!,
             from: wo.weightUnit,
-            to: settingsController.weightUnit.value,
+            to: weightUnit,
           ),
           date: wo.startingDate!,
         ),
@@ -746,7 +781,7 @@ _calculateTypes(List<ExerciseHistoryChartChild> children) {
           value: Distance.convert(
             value: ex.distanceRun!,
             from: wo.distanceUnit,
-            to: settingsController.distanceUnit.value,
+            to: distanceUnit,
           ),
           date: wo.startingDate!,
         ),
@@ -770,7 +805,7 @@ _calculateTypes(List<ExerciseHistoryChartChild> children) {
 
 typedef ExerciseHistoryChartChild = (Workout, Exercise);
 
-class ExerciseHistoryChart extends StatefulWidget {
+class ExerciseHistoryChart extends ConsumerStatefulWidget {
   const ExerciseHistoryChart({
     required this.children,
     required this.ongoing,
@@ -782,10 +817,14 @@ class ExerciseHistoryChart extends StatefulWidget {
   final ExerciseHistoryChartChild? ongoing;
 
   @override
-  State<ExerciseHistoryChart> createState() => _ExerciseHistoryChartState();
+  ConsumerState<ExerciseHistoryChart> createState() =>
+      _ExerciseHistoryChartState();
 
   // ignore: library_private_types_in_public_api
-  static shouldShow(List<ExerciseHistoryChartChild> exercises, bool ongoing) {
+  static bool shouldShow(
+    List<ExerciseHistoryChartChild> exercises,
+    bool ongoing,
+  ) {
     return exercises.where((e) => e.$2.doneSets.isNotEmpty).length >=
             (ongoing ? 1 : 2) &&
         _calculateTypes(exercises).types.isNotEmpty;
@@ -794,8 +833,8 @@ class ExerciseHistoryChart extends StatefulWidget {
 
 enum _ExerciseHistoryChartType { volume, reps, time, distance }
 
-class _ExerciseHistoryChartState
-    extends ControlledState<ExerciseHistoryChart, RoutinesController> {
+class _ExerciseHistoryChartState extends ConsumerState<ExerciseHistoryChart> {
+  RoutinesController get controller => ref.read(routinesControllerProvider);
   late final dateRecognizer = TapGestureRecognizer();
 
   late _ExerciseHistoryChartType type = availableTypes.first;
@@ -811,10 +850,11 @@ class _ExerciseHistoryChartState
 
     widget.ongoing?.$2.logger.i("");
 
-    final (types: availableTypes, values: values) = _calculateTypes([
-      ...children,
-      if (widget.ongoing != null) widget.ongoing!,
-    ]);
+    final (types: availableTypes, values: values) = _calculateTypes(
+      [...children, if (widget.ongoing != null) widget.ongoing!],
+      weightUnit: ref.read(settingsControllerInstanceProvider).weightUnit,
+      distanceUnit: ref.read(settingsControllerInstanceProvider).distanceUnit,
+    );
     this.values = values;
     this.availableTypes = availableTypes;
   }
@@ -827,13 +867,17 @@ class _ExerciseHistoryChartState
 
   String buildType(_ExerciseHistoryChartType type, TextSpan time, double y) =>
       switch (type) {
-        _ExerciseHistoryChartType.volume => y.getUserFacingWeight(context.t),
+        _ExerciseHistoryChartType.volume => y.getUserFacingWeight(
+          context.t,
+          ref.read(settingsControllerProvider).weightUnit,
+        ),
         _ExerciseHistoryChartType.reps => context.t.exerciseList.fields.reps(
           n: y.toInt(),
         ),
         _ExerciseHistoryChartType.time => time.text!,
         _ExerciseHistoryChartType.distance => y.getUserFacingDistance(
           context.t,
+          ref.read(settingsControllerProvider).distanceUnit,
         ),
       };
 
@@ -846,6 +890,9 @@ class _ExerciseHistoryChartState
 
   @override
   Widget build(BuildContext context) {
+    ref.watch(appPreferencesProvider);
+    ref.watch(historyWorkoutsProvider);
+    ref.watch(customExercisesProvider);
     final partition = children.length;
 
     final categories = {
@@ -907,13 +954,19 @@ class _ExerciseHistoryChartState
                   recognizer: dateRecognizer
                     ..onTap = () {
                       if (isPredicted) {
-                        Go.toNamed(getPreferredWorkoutRouteName());
+                        Go.toNamed(
+                          getPreferredWorkoutRouteName(
+                            simple: ref
+                                .read(settingsControllerInstanceProvider)
+                                .defaultToSimpleWorkoutView,
+                          ),
+                        );
                       } else {
                         Go.to(
                           () => ExercisesView(
-                            workout: Get.find<HistoryController>().getByID(
-                              children[index].$1.id,
-                            )!,
+                            workout: ref
+                                .read(historyControllerProvider)
+                                .getByID(children[index].$1.id)!,
                             highlightExercise: (ex) =>
                                 ex.id == children[index].$2.id,
                           ),
@@ -932,7 +985,7 @@ class _ExerciseHistoryChartState
     String leftTitleBuilder(type, point) {
       if (point.isNegative) return "";
 
-      final style = context.textTheme.labelSmall!;
+      final style = Theme.of(context).textTheme.labelSmall!;
 
       return TimerView.buildTimeString(
         context,

@@ -81,11 +81,7 @@ Future<void> testCombineWorkoutsFlow(
   await tester.pumpAndSettle();
 
   // Go to the history page
-  await tester.tap(
-    find.descendant(
-        of: find.byType(NavigationDrawerDestination),
-        matching: find.byIcon(GTIcons.history)),
-  );
+  await openHistory(tester);
   await tester.pumpAndSettle();
 
   // Verify that the workout is in the history
@@ -111,7 +107,8 @@ Future<void> testCombineWorkoutsFlow(
     find.descendant(
       of: find.byType(WorkoutExerciseSetEditor),
       matching: find.byWidgetPredicate(
-          (widget) => widget is Checkbox && widget.value == true),
+        (widget) => widget is Checkbox && widget.value == true,
+      ),
     ),
     findsOneWidget,
   );
@@ -119,17 +116,21 @@ Future<void> testCombineWorkoutsFlow(
     find.descendant(
       of: find.byType(WorkoutExerciseSetEditor),
       matching: find.byWidgetPredicate(
-          (widget) => widget is Checkbox && widget.value == false),
+        (widget) => widget is Checkbox && widget.value == false,
+      ),
     ),
     findsOneWidget,
   );
 
   // Mark the first set as done
-  await tester.tap(find.descendant(
-    of: find.byType(WorkoutExerciseSetEditor),
-    matching: find.byWidgetPredicate(
-        (widget) => widget is Checkbox && widget.value == false),
-  ));
+  await tester.tap(
+    find.descendant(
+      of: find.byType(WorkoutExerciseSetEditor),
+      matching: find.byWidgetPredicate(
+        (widget) => widget is Checkbox && widget.value == false,
+      ),
+    ),
+  );
   await tester.pumpAndSettle();
 
   // Finish the workout

@@ -1,10 +1,12 @@
 part of 'settings.dart';
 
-class UnitsSettingsPane extends ControlledWidget<SettingsController> {
+class UnitsSettingsPane extends ConsumerWidget {
   const UnitsSettingsPane({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final controller = ref.watch(settingsControllerInstanceProvider);
+    ref.watch(appPreferencesProvider);
     return Scaffold(
       body: DetailsView(
         child: CustomScrollView(
@@ -15,9 +17,9 @@ class UnitsSettingsPane extends ControlledWidget<SettingsController> {
             ),
             SliverList(
               delegate: SliverChildListDelegate([
-                Obx(
-                  () => ValueBuilder<Weights?>(
-                    initialValue: controller.weightUnit.value,
+                Builder(
+                  builder: (context) => PreferenceControl<Weights?>(
+                    initialValue: controller.weightUnit,
                     builder: (value, onChange) => RadioModalTile<Weights?>(
                       title: Text(context.t.settings.options.weightUnit.label),
                       onChange: onChange,
@@ -31,9 +33,9 @@ class UnitsSettingsPane extends ControlledWidget<SettingsController> {
                     onUpdate: (v) => controller.setWeightUnit(v ?? Weights.kg),
                   ),
                 ),
-                Obx(
-                  () => ValueBuilder<Distance?>(
-                    initialValue: controller.distanceUnit.value,
+                Builder(
+                  builder: (context) => PreferenceControl<Distance?>(
+                    initialValue: controller.distanceUnit,
                     builder: (value, onChange) => RadioModalTile<Distance?>(
                       title: Text(
                         context.t.settings.options.distanceUnit.label,

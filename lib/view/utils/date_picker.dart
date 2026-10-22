@@ -1,10 +1,10 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:gymtracker/i18n/strings.g.dart';
 import 'package:gymtracker/utils/constants.dart';
 import 'package:gymtracker/utils/extensions.dart';
+import 'package:gymtracker/utils/go.dart';
 import 'package:scrollable_clean_calendar/controllers/clean_calendar_controller.dart';
 import 'package:scrollable_clean_calendar/models/day_values_model.dart';
 import 'package:scrollable_clean_calendar/scrollable_clean_calendar.dart';
@@ -37,7 +37,7 @@ class _DatePickerPlusState extends State<DatePickerPlus> {
     maxDate: widget.lastDate,
     rangeMode: false,
     onDayTapped: (date) {
-      Get.back(result: date);
+      Go.back(result: date);
     },
   );
 
@@ -50,7 +50,7 @@ class _DatePickerPlusState extends State<DatePickerPlus> {
           IconButton(
             icon: const Icon(Icons.today),
             tooltip: context.t.food.datePicker.today,
-            onPressed: () => Get.back(result: DateTime.now()),
+            onPressed: () => Go.back(result: DateTime.now()),
           ),
         ],
       ),
@@ -58,7 +58,7 @@ class _DatePickerPlusState extends State<DatePickerPlus> {
         builder: (context, constraints) {
           final width = constraints.maxWidth;
           return ScrollableCleanCalendar(
-            locale: Get.locale!.languageCode,
+            locale: Localizations.localeOf(context).languageCode,
             calendarController: calendarController,
             layout: Layout.DEFAULT,
             padding:

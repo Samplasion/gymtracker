@@ -1,17 +1,20 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gymtracker/controller/history_controller.dart';
+import 'package:gymtracker/controller/settings_controller.dart';
 import 'package:gymtracker/i18n/strings.g.dart';
 import 'package:gymtracker/model/exercise.dart';
 import 'package:gymtracker/model/workout.dart';
+import 'package:gymtracker/provider/settings.dart';
+import 'package:gymtracker/provider/training_data.dart';
 import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/utils/theme.dart';
 
 const kBarHeight = 24.0;
 const kBarPadding = 24.0;
 
-class GTRawBarChart<T> extends StatelessWidget {
+class GTRawBarChart<T> extends ConsumerWidget {
   final String title;
   final Map<T, double> data;
   final String Function(T, double) labelBuilder;
@@ -36,7 +39,10 @@ class GTRawBarChart<T> extends StatelessWidget {
   }();
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    ref.watch(appPreferencesProvider);
+    ref.watch(historyWorkoutsProvider);
+    ref.watch(customExercisesProvider);
     final max = data.values.sum;
 
     String _getLabel(T cat) {
@@ -47,13 +53,25 @@ class GTRawBarChart<T> extends StatelessWidget {
     final textReservedSize = nonEmptyData.isEmpty
         ? 0.0
         : nonEmptyData
-              .map((e) => _getLabel(e.key).computeSize().width + 16)
+              .map(
+                (e) =>
+                    _getLabel(e.key)
+                        .computeSize(
+                          style: Theme.of(context).textTheme.bodyMedium,
+                        )
+                        .width +
+                    16,
+              )
               .max;
 
     double rightSideReservedSize = 16;
     if (rightSideLabelBuilder != null) {
       final rightLabelLengths = nonEmptyData.map(
-        (e) => rightSideLabelBuilder!(e.key).computeSize().width + 16,
+        (e) =>
+            rightSideLabelBuilder!(
+              e.key,
+            ).computeSize(style: Theme.of(context).textTheme.bodyMedium).width +
+            16,
       );
       if (rightLabelLengths.isNotEmpty) {
         rightSideReservedSize = rightLabelLengths.max;
@@ -66,9 +84,9 @@ class GTRawBarChart<T> extends StatelessWidget {
       children: [
         Text(
           title,
-          style: context.textTheme.bodyLarge!.copyWith(
-            fontWeight: FontWeight.bold,
-          ),
+          style: Theme.of(
+            context,
+          ).textTheme.bodyLarge!.copyWith(fontWeight: FontWeight.bold),
         ),
         ConstrainedBox(
           constraints: BoxConstraints.loose(
@@ -149,22 +167,26 @@ class GTRawBarChart<T> extends StatelessWidget {
   }
 }
 
-class WorkoutMuscleCategoriesBarChart extends GetWidget<HistoryController> {
+class WorkoutMuscleCategoriesBarChart extends ConsumerWidget {
   final Workout workout;
 
   const WorkoutMuscleCategoriesBarChart({required this.workout, super.key});
 
-  static bool shouldShow(Workout workout) => Get.find<HistoryController>()
+  static bool shouldShow(Workout workout, WidgetRef ref) => ref
+      .read(historyControllerProvider)
       .calculateMuscleCategoryDistributionFor(workouts: [workout])
       .entries
       .where((e) => e.value > 0)
       .isNotEmpty;
 
   @override
-  Widget build(BuildContext context) {
-    final data = controller.calculateMuscleCategoryDistributionFor(
-      workouts: [workout],
-    );
+  Widget build(BuildContext context, WidgetRef ref) {
+    ref.watch(appPreferencesProvider);
+    ref.watch(historyWorkoutsProvider);
+    ref.watch(customExercisesProvider);
+    final data = ref
+        .read(historyControllerProvider)
+        .calculateMuscleCategoryDistributionFor(workouts: [workout]);
 
     return GTRawBarChart(
       title: context.t.exerciseList.workoutMuscleCategoriesBarChart.label,
@@ -176,7 +198,7 @@ class WorkoutMuscleCategoriesBarChart extends GetWidget<HistoryController> {
   }
 }
 
-class WeightDistributionBarChart extends StatelessWidget {
+class WeightDistributionBarChart extends ConsumerWidget {
   final Workout workout;
 
   const WeightDistributionBarChart({required this.workout, super.key});
@@ -195,7 +217,10 @@ class WeightDistributionBarChart extends StatelessWidget {
       );
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    ref.watch(appPreferencesProvider);
+    ref.watch(historyWorkoutsProvider);
+    ref.watch(customExercisesProvider);
     final mappedWeights = <GTMuscleCategory, double>{};
 
     void processExercise(Exercise ex) {
@@ -229,7 +254,10 @@ class WeightDistributionBarChart extends StatelessWidget {
       data: percentages,
       color: context.colorScheme.quinary,
       rightSideLabelBuilder: (category) {
-        return mappedWeights[category]!.getUserFacingWeight(context.t);
+        return mappedWeights[category]!.getUserFacingWeight(
+          context.t,
+          ref.read(settingsControllerProvider).weightUnit,
+        );
       },
       labelBuilder: (cat, percentage) =>
           "${context.t.muscleCategories[cat.name]} (${percentage.round()}%)",
@@ -237,7 +265,7 @@ class WeightDistributionBarChart extends StatelessWidget {
   }
 }
 
-class EquipmentDistributionBarChart extends StatelessWidget {
+class EquipmentDistributionBarChart extends ConsumerWidget {
   final Workout workout;
 
   const EquipmentDistributionBarChart({required this.workout, super.key});
@@ -247,7 +275,10 @@ class EquipmentDistributionBarChart extends StatelessWidget {
       .any((ex) => ex.doneSets.isNotEmpty || !workout.isConcrete);
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    ref.watch(appPreferencesProvider);
+    ref.watch(historyWorkoutsProvider);
+    ref.watch(customExercisesProvider);
     final setsPerEquipment = <GTGymEquipment, int>{};
 
     final exs = workout.flattenedExercises.whereType<Exercise>();

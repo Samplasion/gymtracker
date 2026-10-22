@@ -1,10 +1,8 @@
 import 'dart:async';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:get/get.dart';
-import 'package:gymtracker/controller/achievements_controller.dart';
-import 'package:gymtracker/controller/history_controller.dart';
+import 'package:gymtracker/provider/achievement_metadata.dart';
 import 'package:gymtracker/model/achievements.dart';
-import 'package:gymtracker/data/achievements.dart';
 import 'package:gymtracker/model/friend.dart';
 import 'package:gymtracker/model/workout.dart';
 import 'package:gymtracker/provider/connectivity.dart';
@@ -17,10 +15,10 @@ part 'feed.g.dart';
 
 @riverpod
 Stream<List<Workout>> feedHistoryStream(Ref ref) =>
-    Get.find<HistoryController>().history.stream;
+    ref.watch(databaseServiceProvider).history$.stream;
 @riverpod
 Stream<List<AchievementCompletion>> feedAchievementsStream(Ref ref) =>
-    Get.find<AchievementsController>().completionStream;
+    ref.watch(databaseServiceProvider).completions$.stream;
 
 @Riverpod(keepAlive: true)
 class Feed extends _$Feed {
@@ -55,6 +53,7 @@ class Feed extends _$Feed {
     _work = null;
     ref.listen(feedHistoryStreamProvider, (_, __) => _recompose());
     ref.listen(feedAchievementsStreamProvider, (_, __) => _recompose());
+    ref.listen(achievementMetadataProvider, (_, _) => _recompose());
     ref.listen(friendshipChangesProvider, (_, accepted) {
       if (accepted != null) relationsChanged(accepted);
     });
@@ -74,7 +73,7 @@ class Feed extends _$Feed {
 
   List<FeedItem> _compose() {
     // getFeedItems performs only synchronous local reads before returning.
-    final db = Get.find<DatabaseService>();
+    final db = ref.read(databaseServiceProvider);
     final own = ref.read(currentUserIdProvider);
     final items = <FeedItem>[..._remote];
     for (final w in db.history$.value) {
@@ -90,7 +89,7 @@ class Feed extends _$Feed {
     for (final c in db.completions$.value) {
       final d = c.completedAt;
       if (!d.isBefore(_start) && d.isBefore(_end)) {
-        final a = achievements[c.achievementID];
+        final a = ref.read(achievementMetadataProvider)[c.achievementID];
         if (a != null)
           items.add(
             FeedItemAchievement(
@@ -115,7 +114,18 @@ class Feed extends _$Feed {
         FeedItemAchievement(:final completion) => completion.id,
       }}';
   List<FeedItem> _merged(List<FeedItem> items) {
-    final map = {for (final i in items) _id(i): i};
+    final catalog = ref.read(achievementMetadataProvider);
+    final map = {
+      for (final item in items)
+        _id(item): item is FeedItemAchievement
+            ? FeedItemAchievement(
+                achievement:
+                    catalog[item.completion.achievementID] ?? item.achievement,
+                completion: item.completion,
+                authorship: item.authorship,
+              )
+            : item,
+    };
     return List.unmodifiable(
       map.values.toList()..sort((a, b) => _date(b).compareTo(_date(a))),
     );
@@ -129,8 +139,9 @@ class Feed extends _$Feed {
     if (!ref.mounted) return;
     final generation = _generation;
     final service = FeedService(
-      Get.find<DatabaseService>(),
+      ref.read(databaseServiceProvider),
       ref.read(onlineProvider.notifier).onlineService,
+      achievementCatalog: ref.read(achievementMetadataProvider),
     );
     final local = await service.getFeedItems(
       sources: {FeedSource.ownHistory, FeedSource.ownAchievements},

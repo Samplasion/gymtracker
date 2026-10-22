@@ -70,6 +70,33 @@ void main() {
     MockServices.tearDown();
   });
 
+  test(
+    'disposing the service removes its auth listener and ignores later events',
+    () async {
+      final authEvents = StreamController<AuthState>.broadcast(sync: true);
+      when(
+        () => mockAuth.onAuthStateChange,
+      ).thenAnswer((_) => authEvents.stream);
+      final service = OnlineServiceImpl(mockSupabase);
+      service.account = OnlineAccount(id: 'first', name: 'First');
+      var changes = 0;
+      service.addListener(() => changes++);
+      expect(authEvents.hasListener, isTrue);
+      authEvents.add(AuthState(AuthChangeEvent.signedOut, null));
+      expect(service.account, isNull);
+      expect(changes, 1);
+      service.account = OnlineAccount(id: 'retained', name: 'Retained');
+      service.dispose();
+      service.dispose();
+      await Future<void>.delayed(Duration.zero);
+      expect(authEvents.hasListener, isFalse);
+      authEvents.add(AuthState(AuthChangeEvent.signedOut, null));
+      expect(service.account?.id, 'retained');
+      expect(changes, 1);
+      await authEvents.close();
+    },
+  );
+
   group('OnlineServiceImpl Offline Behavior Tests', () {
     test(
       'getAccount() should catch ClientException and return cached _account when offline',

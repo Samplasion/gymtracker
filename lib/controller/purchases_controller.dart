@@ -1,28 +1,32 @@
-import 'package:flutter/foundation.dart';
+import 'dart:async';
+
 import 'package:flutter/services.dart';
-import 'package:gymtracker/controller/coordinator.dart';
-import 'package:gymtracker/main.dart';
 import 'package:gymtracker/model/subscription.dart';
 import 'package:gymtracker/provider/events.dart';
+import 'package:gymtracker/provider/online.dart';
 import 'package:gymtracker/service/logger.dart';
 import 'package:gymtracker/service/online.dart';
 import 'package:gymtracker/service/purchases.dart';
-import 'package:gymtracker/utils/go.dart';
-import 'package:gymtracker/view/paywall.dart';
 import 'package:purchases_flutter/models/entitlement_info_wrapper.dart';
 import 'package:purchases_flutter/models/package_wrapper.dart';
 import 'package:purchases_flutter/models/period_unit.dart' show PeriodUnit;
-
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:rxdart/subjects.dart';
 
-class PurchasesController extends ChangeNotifier {
+part 'purchases_controller.g.dart';
+
+class PurchasesController {
   final PurchasesService purchasesService;
-  final Coordinator eventScheduler;
   final OnlineService onlineService;
 
+  final _subscriptions = <StreamSubscription<dynamic>>[];
+  late final EventBus _events;
+  bool _disposed = false;
   int _authEpoch = 0;
   bool _switchingAuth = false;
+  bool _authReady = true;
   String? _boundUser;
+  int _refreshEpoch = 0;
   Future<void> _authWork = Future.value();
 
   final _subscriptionInfo$ = BehaviorSubject.seeded(SubscriptionInfo.empty);
@@ -32,133 +36,148 @@ class PurchasesController extends ChangeNotifier {
 
   PurchasesController(
     this.purchasesService,
-    this.eventScheduler,
-    this.onlineService,
-  ) {
-    final eventBus = globalContainer.read(eventBusProvider);
-    eventBus.on<GBUserDidLoginEvent>().listen(
-      (event) => _authChangeRoutine(event.account),
+    this.onlineService, {
+    required EventBus events,
+  }) {
+    final eventBus = _events = events;
+    _subscriptions.add(
+      eventBus.on<GBUserDidLoginEvent>().listen(
+        (event) => _authChangeRoutine(event.account),
+      ),
     );
-    eventBus.on<GBUserDidLogoutEvent>().listen(
-      (event) => _authChangeRoutine(null),
+    _subscriptions.add(
+      eventBus.on<GBUserDidLogoutEvent>().listen(
+        (event) => _authChangeRoutine(null),
+      ),
     );
-    eventBus.on<GBUserDidUpdateSubscriptionEvent>().listen((event) async {
-      if (event.user?.id != onlineService.account?.id) return;
-      final epoch = _authEpoch;
-      while (!purchasesService.isInitialized()) {
-        await Future.delayed(const Duration(milliseconds: 100));
-      }
-      purchasesService.getCustomerInfo().then((entitlement) {
-        if (epoch != _authEpoch || _switchingAuth) return;
-        final subscriptionInfo = _mapEntitlementToSubscriptionInfo(entitlement);
-        _subscriptionInfo$.add(subscriptionInfo);
-        notifyListeners();
-      });
-    });
-    _subscriptionInfo$.add(SubscriptionInfo.empty);
-    purchasesService.entitlementStream.listen((entitlement) async {
-      if (_switchingAuth || _boundUser != onlineService.account?.id) return;
-      final subscriptionInfo = _mapEntitlementToSubscriptionInfo(entitlement);
-      _subscriptionInfo$.add(subscriptionInfo);
-      notifyListeners();
-    });
+    _subscriptions.add(
+      eventBus.on<GBUserDidUpdateSubscriptionEvent>().listen((event) {
+        if (event.user?.id == onlineService.account?.id) _refreshSubscription();
+      }),
+    );
+    _subscriptions.add(
+      purchasesService.entitlementStream.listen((entitlement) {
+        if (!_isBoundTo(onlineService.account?.id)) return;
+        // A newer stream update takes precedence over an older pending read.
+        _refreshEpoch++;
+        _subscriptionInfo$.add(
+          _mapEntitlementToSubscriptionInfo(entitlement, userID: _boundUser),
+        );
+      }),
+    );
+    final account = onlineService.account;
+    if (account != null) unawaited(_authChangeRoutine(account));
   }
+
+  bool _isCurrent(int epoch, String? userID) =>
+      !_disposed && epoch == _authEpoch && onlineService.account?.id == userID;
+
+  bool _isBoundTo(String? userID) =>
+      !_disposed && !_switchingAuth && _authReady && _boundUser == userID;
 
   Future<void> _authChangeRoutine(OnlineAccount? account) {
+    if (_disposed) return Future.value();
     final epoch = ++_authEpoch;
-    final work = _authWork.then((_) async {
-      if (epoch != _authEpoch) return;
-      _switchingAuth = true;
+    final userID = account?.id;
+    // Invalidate immediately, including while an earlier SDK login is pending.
+    _switchingAuth = true;
+    _authReady = false;
+    _boundUser = null;
+    _refreshEpoch++;
+    _subscriptionInfo$.add(
+      _mapEntitlementToSubscriptionInfo(null, userID: userID),
+    );
+    _authWork = _authWork.then((_) async {
+      if (!_isCurrent(epoch, userID)) return;
       try {
-        await _runAuthentication(account, epoch);
-      } finally {
-        if (epoch == _authEpoch) {
-          _boundUser = account?.id;
+        if (!purchasesService.isInitialized()) await purchasesService.init();
+        if (!_isCurrent(epoch, userID)) return;
+        if (!purchasesService.isPurchasingEnabled.contains(
+          PurchasesCheckType.read,
+        )) {
           _switchingAuth = false;
+          return;
         }
+        if (userID == null) {
+          try {
+            await purchasesService.logout();
+          } on PlatformException catch (e) {
+            if (e.message?.contains('the current user is anonymous') != true) {
+              rethrow;
+            }
+          }
+        } else {
+          await purchasesService.login(userID);
+        }
+        if (!_isCurrent(epoch, userID)) return;
+        _boundUser = userID;
+        _authReady = true;
+        _switchingAuth = false;
+        // Do not hold the authentication queue behind a network read.
+        if (userID != null) _refreshSubscription();
+      } catch (e, s) {
+        if (_isCurrent(epoch, userID)) _switchingAuth = false;
+        logger.e(
+          'Error binding Purchases account: $e',
+          error: e,
+          stackTrace: s,
+        );
       }
     });
-    _authWork = work.catchError((Object _) {});
-    return work;
+    return _authWork;
   }
 
-  Future<void> _runAuthentication(OnlineAccount? account, int epoch) async {
-    if (purchasesService.isPurchasingEnabled.isEmpty) {
-      logger.d("Purchases are disabled");
-      _subscriptionInfo$.add(
-        const SubscriptionInfo(
-          isPro: false,
-          isTrial: false,
-          isForcedPro: false,
-          isAboutToExpire: false,
-        ),
-      );
-      return;
-    }
+  void _refreshSubscription() {
+    unawaited(
+      _readSubscription(publish: true).catchError((Object e, StackTrace s) {
+        logger.e('Error refreshing subscription: $e', error: e, stackTrace: s);
+        return SubscriptionInfo.empty;
+      }),
+    );
+  }
 
-    final user = account;
-    logger.d("Logging in with RevCat. ");
-    if (user == null) {
-      logger.d("Logging out from RevCat");
-      try {
-        await purchasesService.logout();
-      } on PlatformException catch (e, s) {
-        if (e.message?.contains("the current user is anonymous") == true) {
-          logger.d("No user logged in, ignoring error");
-        } else {
-          logger.e(
-            "Error logging out from RevCat: $e",
-            error: e,
-            stackTrace: s,
-          );
-          rethrow;
-        }
-      }
-      if (epoch != _authEpoch) return;
-      _subscriptionInfo$.add(SubscriptionInfo.empty);
-    } else {
-      try {
-        logger.d("Logging in to Purchases");
-        await purchasesService.login(user.id);
-        final entitlement = await purchasesService.getCustomerInfo();
-        if (epoch != _authEpoch) return;
-        final subscriptionInfo = _mapEntitlementToSubscriptionInfo(entitlement);
-        _subscriptionInfo$.add(subscriptionInfo);
-      } catch (e, s) {
-        // Handle error
-        logger.e("Error logging in to Purchases: $e", error: e, stackTrace: s);
-      }
+  Future<SubscriptionInfo> _readSubscription({bool publish = false}) async {
+    final epoch = _authEpoch;
+    final userID = onlineService.account?.id;
+    await _authWork;
+    if (!_isCurrent(epoch, userID) || !_isBoundTo(userID)) {
+      return SubscriptionInfo.empty;
     }
-    notifyListeners();
+    if (!purchasesService.isInitialized()) await purchasesService.init();
+    if (!_isCurrent(epoch, userID) ||
+        !_isBoundTo(userID) ||
+        !purchasesService.isPurchasingEnabled.contains(
+          PurchasesCheckType.read,
+        )) {
+      return SubscriptionInfo.empty;
+    }
+    final refresh = ++_refreshEpoch;
+    final entitlement = await purchasesService.getCustomerInfo();
+    if (!_isCurrent(epoch, userID) || !_isBoundTo(userID)) {
+      return SubscriptionInfo.empty;
+    }
+    if (refresh != _refreshEpoch) return subscriptionInfo;
+    final info = _mapEntitlementToSubscriptionInfo(entitlement, userID: userID);
+    if (publish) _subscriptionInfo$.add(info);
+    return info;
   }
 
   bool canPresentNativePaywall() {
     return purchasesService.canPresentNativePaywall();
   }
 
-  Future<void> presentPaywall() {
-    if (!canPresentNativePaywall()) {
-      return Go.to(() => PaywallScreen());
-    }
-    return purchasesService.presentPaywall();
-  }
-
-  Future<SubscriptionInfo> getSubscriptionInfo() async {
-    final entitlement = await purchasesService.getCustomerInfo();
-    return _mapEntitlementToSubscriptionInfo(entitlement);
-  }
+  Future<SubscriptionInfo> getSubscriptionInfo() => _readSubscription();
 
   SubscriptionInfo _mapEntitlementToSubscriptionInfo(
-    EntitlementInfo? entitlement,
-    // User user,
-  ) {
-    return SubscriptionInfo(
-      isPro: entitlement != null && entitlement.isActive,
-      isTrial: entitlement?.periodType == PeriodType.trial,
-      isForcedPro: false,
-      isAboutToExpire: entitlement?.unsubscribeDetectedAt != null,
-    );
-  }
+    EntitlementInfo? entitlement, {
+    required String? userID,
+  }) => SubscriptionInfo(
+    userID: userID,
+    isPro: entitlement != null && entitlement.isActive,
+    isTrial: entitlement?.periodType == PeriodType.trial,
+    isForcedPro: false,
+    isAboutToExpire: entitlement?.unsubscribeDetectedAt != null,
+  );
 
   Future<String?> getSubscriptionManagementURL() =>
       purchasesService.getSubscriptionManagementURL();
@@ -229,47 +248,73 @@ class PurchasesController extends ChangeNotifier {
   Future<SubscriptionPurchaseStatus> purchaseSubscription(
     Subscription selectedSubscription,
   ) async {
-    return purchasesService
-        .purchaseSubscription(selectedSubscription)
-        .then((_) {
-          globalContainer
-              .read(eventBusProvider)
-              .emit(
-                GBUserDidUpdateSubscriptionEvent(
-                  user: onlineService.account,
-                  subscription: selectedSubscription,
-                ),
-              );
-          return SubscriptionPurchaseStatus.success;
-        })
-        .onError((error, stackTrace) {
-          if (error is PlatformException &&
-              error.message?.contains('cancelled') == true) {
-            return SubscriptionPurchaseStatus.cancelled;
-          }
-          logger.e(
-            "Error purchasing subscription: $error",
-            error: error,
-            stackTrace: stackTrace,
-          );
-          return SubscriptionPurchaseStatus.error;
-        });
+    final epoch = _authEpoch;
+    final account = onlineService.account;
+    await _authWork;
+    if (!_isCurrent(epoch, account?.id) || !_isBoundTo(account?.id)) {
+      return SubscriptionPurchaseStatus.error;
+    }
+    try {
+      await purchasesService.purchaseSubscription(selectedSubscription);
+      if (_isCurrent(epoch, account?.id)) {
+        _events.emit(
+          GBUserDidUpdateSubscriptionEvent(
+            user: account,
+            subscription: selectedSubscription,
+          ),
+        );
+      }
+      return SubscriptionPurchaseStatus.success;
+    } catch (e, s) {
+      if (e is PlatformException && e.message?.contains('cancelled') == true) {
+        return SubscriptionPurchaseStatus.cancelled;
+      }
+      logger.e('Error purchasing subscription: $e', error: e, stackTrace: s);
+      return SubscriptionPurchaseStatus.error;
+    }
   }
 
-  Future restorePurchases() async {
+  Future<void> restorePurchases() async {
+    final epoch = _authEpoch;
+    final userID = onlineService.account?.id;
+    await _authWork;
+    if (!_isCurrent(epoch, userID) || !_isBoundTo(userID)) return;
     try {
       await purchasesService.restorePurchases();
-      final entitlement = await purchasesService.getCustomerInfo();
-      final subscriptionInfo = _mapEntitlementToSubscriptionInfo(entitlement);
-      _subscriptionInfo$.add(subscriptionInfo);
-      notifyListeners();
+      if (_isCurrent(epoch, userID)) await _readSubscription(publish: true);
     } catch (e, s) {
-      logger.e("Error restoring purchases: $e", error: e, stackTrace: s);
+      logger.e('Error restoring purchases: $e', error: e, stackTrace: s);
       rethrow;
     }
+  }
+
+  Future<void> dispose() async {
+    if (_disposed) return;
+    _disposed = true;
+    _authEpoch++;
+    await Future.wait(
+      _subscriptions.map((subscription) => subscription.cancel()),
+    );
+    _subscriptions.clear();
+    await _subscriptionInfo$.close();
   }
 
   Future<void> presentCustomerCenter() {
     return purchasesService.presentCustomerCenter();
   }
 }
+
+@Riverpod(keepAlive: true)
+PurchasesController purchasesController(Ref ref) {
+  final controller = PurchasesController(
+    ref.watch(purchasesServiceProvider),
+    ref.watch(onlineProvider.notifier).onlineService,
+    events: ref.watch(eventBusProvider),
+  );
+  ref.onDispose(controller.dispose);
+  return controller;
+}
+
+@riverpod
+Stream<SubscriptionInfo> subscriptionInfo(Ref ref) =>
+    ref.watch(purchasesControllerProvider).subscriptionInfoStream;

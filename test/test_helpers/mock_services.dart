@@ -1,110 +1,52 @@
 import 'package:drift/native.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:get/get.dart';
+import 'package:flutter_riverpod/misc.dart' show Override;
 import 'package:gymtracker/controller/achievements_controller.dart';
-import 'package:gymtracker/controller/coordinator.dart';
 import 'package:gymtracker/controller/countdown_controller.dart';
 import 'package:gymtracker/controller/exercises_controller.dart';
 import 'package:gymtracker/controller/history_controller.dart';
 import 'package:gymtracker/controller/me_controller.dart';
+import 'package:gymtracker/controller/notifications_controller.dart';
 import 'package:gymtracker/controller/purchases_controller.dart';
 import 'package:gymtracker/controller/routines_controller.dart';
 import 'package:gymtracker/controller/settings_controller.dart';
 import 'package:gymtracker/controller/stopwatch_controller.dart';
+import 'package:gymtracker/controller/workout_controller.dart';
 import 'package:gymtracker/data/distance.dart';
 import 'package:gymtracker/data/weights.dart';
 import 'package:gymtracker/db/database.dart';
-import 'package:gymtracker/main.dart';
+import 'package:gymtracker/model/achievements.dart';
 import 'package:gymtracker/model/exercise.dart';
+import 'package:gymtracker/model/preferences.dart';
 import 'package:gymtracker/model/subscription.dart';
 import 'package:gymtracker/model/workout.dart';
+import 'package:gymtracker/provider/bootstrap.dart';
+import 'package:gymtracker/provider/db.dart';
+import 'package:gymtracker/provider/settings.dart';
 import 'package:gymtracker/service/database.dart';
 import 'package:gymtracker/service/test.dart';
 import 'package:mocktail/mocktail.dart';
 
-class MockInternalFinalCallback<T> extends Mock
-    implements InternalFinalCallback<T> {
-  @override
-  T call() => null as dynamic;
-}
+class MockDatabaseService extends Mock implements DatabaseService {}
 
-class MockDatabaseService extends Mock implements DatabaseService {
-  @override
-  final onStart = MockInternalFinalCallback<void>();
-  @override
-  final onDelete = MockInternalFinalCallback<void>();
+class MockSettingsController extends Mock implements SettingsController {}
 
-  @override
-  void addListener(void Function() listener) {}
-  @override
-  void removeListener(void Function() listener) {}
-}
+class MockRoutinesController extends Mock implements RoutinesController {}
 
-class MockCoordinator extends Mock implements Coordinator {
-  @override
-  final onStart = MockInternalFinalCallback<void>();
-  @override
-  final onDelete = MockInternalFinalCallback<void>();
-}
+class MockHistoryController extends Mock implements HistoryController {}
 
-class MockSettingsController extends Mock implements SettingsController {
-  @override
-  final onStart = MockInternalFinalCallback<void>();
-  @override
-  final onDelete = MockInternalFinalCallback<void>();
-}
+class MockExercisesController extends Mock implements ExercisesController {}
 
-class MockRoutinesController extends Mock implements RoutinesController {
-  @override
-  final onStart = MockInternalFinalCallback<void>();
-  @override
-  final onDelete = MockInternalFinalCallback<void>();
-}
+class MockBackupScheduler extends Mock implements BackupScheduler {}
 
-class MockHistoryController extends Mock implements HistoryController {
-  @override
-  final onStart = MockInternalFinalCallback<void>();
-  @override
-  final onDelete = MockInternalFinalCallback<void>();
-}
+class MockNotificationController extends Mock
+    implements NotificationController {}
 
-class MockStopwatchController extends Mock implements StopwatchController {
-  @override
-  final onStart = MockInternalFinalCallback<void>();
-  @override
-  final onDelete = MockInternalFinalCallback<void>();
-}
-
-class MockCountdownController extends Mock implements CountdownController {
-  @override
-  final onStart = MockInternalFinalCallback<void>();
-  @override
-  final onDelete = MockInternalFinalCallback<void>();
-}
-
-class MockExercisesController extends Mock implements ExercisesController {
-  @override
-  final onStart = MockInternalFinalCallback<void>();
-  @override
-  final onDelete = MockInternalFinalCallback<void>();
-}
-
-class MockMeController extends Mock implements MeController {
-  @override
-  final onStart = MockInternalFinalCallback<void>();
-  @override
-  final onDelete = MockInternalFinalCallback<void>();
-}
-
+class MockMeController extends Mock implements MeController {}
 
 class MockAchievementsController extends Mock
-    implements AchievementsController {
-  @override
-  final onStart = MockInternalFinalCallback<void>();
-  @override
-  final onDelete = MockInternalFinalCallback<void>();
-}
+    implements AchievementsController {}
 
 class MockPurchasesController extends Mock implements PurchasesController {}
 
@@ -112,73 +54,60 @@ class MockPurchasesController extends Mock implements PurchasesController {}
 class MockServices {
   static late MockDatabaseService databaseService;
   static late GTDatabase database;
-  static late MockCoordinator coordinator;
+  static late ProviderContainer container;
+  static late MockBackupScheduler backupScheduler;
+  static late MockNotificationController notifications;
   static late MockSettingsController settingsController;
   static late MockRoutinesController routinesController;
   static late MockHistoryController historyController;
-  static late MockStopwatchController stopwatchController;
-  static late MockCountdownController countdownController;
+  static late StopwatchController stopwatchController;
+  static late CountdownController countdownController;
   static late MockExercisesController exercisesController;
   static late MockMeController meController;
   static late MockAchievementsController achievementsController;
   static late MockPurchasesController purchasesController;
 
   static void setup() {
-    Get.reset();
-    Get.testMode = true;
-    globalContainer = ProviderContainer();
+    WidgetsFlutterBinding.ensureInitialized();
     database = GTDatabaseImpl.withQueryExecutor(NativeDatabase.memory());
     databaseService = MockDatabaseService();
     when(() => databaseService.db).thenReturn(database);
-    coordinator = MockCoordinator();
+    backupScheduler = MockBackupScheduler();
+    notifications = MockNotificationController();
     settingsController = MockSettingsController();
     routinesController = MockRoutinesController();
     historyController = MockHistoryController();
-    stopwatchController = MockStopwatchController();
-    countdownController = MockCountdownController();
     exercisesController = MockExercisesController();
     meController = MockMeController();
     achievementsController = MockAchievementsController();
     purchasesController = MockPurchasesController();
-
-    Get.put<DatabaseService>(databaseService);
-    Get.put<Coordinator>(coordinator);
-    Get.put<SettingsController>(settingsController);
-    Get.put<RoutinesController>(routinesController);
-    Get.put<HistoryController>(historyController);
-    Get.put<StopwatchController>(stopwatchController);
-    Get.put<CountdownController>(countdownController);
-    Get.put<ExercisesController>(exercisesController);
-    Get.put<MeController>(meController);
-    Get.put<AchievementsController>(achievementsController);
-    Get.put<PurchasesController>(purchasesController);
+    when(() => purchasesController.dispose()).thenAnswer((_) async {});
 
     // Default stubbing for critical common stuff
+    registerFallbackValue(AchievementTrigger.workout);
     registerFallbackValue(const Duration(seconds: 0));
     registerFallbackValue(Workout(name: '', exercises: []));
     registerFallbackValue(<Workout>[]);
 
     // SettingsController weight/distance
-    when(() => settingsController.weightUnit).thenReturn(Weights.kg.obs);
-    when(() => settingsController.distanceUnit).thenReturn(Distance.km.obs);
-    when(
-      () => settingsController.locale,
-    ).thenReturn(Rx<Locale?>(const Locale('en', 'US')));
-    when(() => settingsController.tintExercises).thenReturn(false.obs);
-    when(() => settingsController.usesDynamicColor).thenReturn(false.obs);
-    when(() => settingsController.themeMode).thenReturn(ThemeMode.system.obs);
-    when(() => settingsController.color).thenReturn(Rx<Color>(Colors.blue));
-    when(() => settingsController.showSuggestedRoutines).thenReturn(true.obs);
+    when(() => settingsController.weightUnit).thenReturn(Weights.kg);
+    when(() => settingsController.distanceUnit).thenReturn(Distance.km);
+    when(() => settingsController.locale).thenReturn(const Locale('en', 'US'));
+    when(() => settingsController.tintExercises).thenReturn(false);
+    when(() => settingsController.usesDynamicColor).thenReturn(false);
+    when(() => settingsController.themeMode).thenReturn(ThemeMode.system);
+    when(() => settingsController.color).thenReturn(Colors.blue);
+    when(() => settingsController.showSuggestedRoutines).thenReturn(true);
 
     // RoutinesController hasOngoingWorkout
-    when(() => routinesController.hasOngoingWorkout).thenReturn(false.obs);
-    when(() => routinesController.workouts).thenReturn(<Workout>[].obs);
+    when(() => routinesController.hasOngoingWorkout).thenReturn(false);
+    when(() => routinesController.workouts).thenReturn(<Workout>[]);
     when(
       () => routinesController.isWorkoutContinuable(any()),
     ).thenReturn(false);
 
     // HistoryController history & userVisibleWorkouts
-    when(() => historyController.history).thenReturn(<Workout>[].obs);
+    when(() => historyController.history).thenReturn(<Workout>[]);
     when(() => historyController.userVisibleWorkouts).thenReturn(<Workout>[]);
     when(
       () => historyController.calculateMuscleCategoryDistributionFor(
@@ -192,23 +121,11 @@ class MockServices {
     when(() => databaseService.deleteOngoing()).thenAnswer((_) async {});
     when(() => databaseService.writeToOngoing(any())).thenAnswer((_) async {});
 
-    // StopwatchController globalStopwatch
-    final gs = GlobalStopwatch(onTick: (duration) {});
-    when(() => stopwatchController.globalStopwatch).thenReturn(gs);
+    when(() => backupScheduler.schedule()).thenAnswer((_) {});
     when(
-      () => stopwatchController.updateBinding(any(), any()),
-    ).thenAnswer((_) {});
-    when(() => stopwatchController.removeStopwatches(any())).thenAnswer((_) {});
-
-    // CountdownController
-    when(() => countdownController.removeCountdown()).thenAnswer((_) {});
-    when(
-      () => countdownController.startingTime,
-    ).thenReturn(Rx<DateTime?>(null));
-    when(() => countdownController.targetTime).thenReturn(Rx<DateTime?>(null));
-
-    // Coordinator methods
-    when(() => coordinator.onServiceChange()).thenAnswer((_) {});
+      () => achievementsController.maybeUnlockAchievements(any()),
+    ).thenReturn({});
+    when(() => notifications.cancelRestOverNotification()).thenAnswer((_) {});
 
     // PurchasesController
     when(
@@ -218,12 +135,44 @@ class MockServices {
       () => purchasesController.subscriptionInfo,
     ).thenReturn(SubscriptionInfo.empty);
 
+    container = ProviderContainer(overrides: defaultOverrides);
+    stopwatchController = container.read(stopwatchControllerProvider.notifier);
+    countdownController = container.read(countdownControllerProvider.notifier);
     TestService().isTest = true;
   }
 
+  static List<Override> get defaultOverrides => [
+    databaseServiceProvider.overrideWithValue(databaseService),
+    appDatabaseProvider.overrideWithValue(database),
+    settingsControllerProvider.overrideWithValue(settingsController),
+    appPreferencesProvider.overrideWith(
+      (ref) => Stream.value(Prefs.defaultValue),
+    ),
+    routinesControllerProvider.overrideWithValue(routinesController),
+    historyControllerProvider.overrideWithValue(historyController),
+    exercisesControllerProvider.overrideWithValue(exercisesController),
+    purchasesControllerProvider.overrideWithValue(purchasesController),
+    achievementsControllerProvider.overrideWithValue(achievementsController),
+    achievementTriggerProvider.overrideWithValue((trigger) {
+      achievementsController.maybeUnlockAchievements(trigger);
+    }),
+    backupSchedulerProvider.overrideWithValue(backupScheduler),
+    notificationControllerProvider.overrideWithValue(notifications),
+  ];
+
+  static WorkoutController createWorkout(
+    String name,
+    String? parentID,
+    String? infobox,
+  ) =>
+      container.read(workoutControllerProvider.notifier)
+        ..start(name, parentID, infobox, saveInitial: false);
+  static WorkoutController restoreWorkout(Map<String, dynamic> data) =>
+      container.read(workoutControllerProvider.notifier)..restore(data);
+
   static void tearDown() {
     TestService().isTest = false;
-    Get.reset();
+    container.dispose();
     database.close();
   }
 }

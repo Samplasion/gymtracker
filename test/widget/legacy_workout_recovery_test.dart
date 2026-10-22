@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:gymtracker/db/database.dart';
-import 'package:gymtracker/main.dart';
 import 'package:gymtracker/provider/online.dart';
 import 'package:gymtracker/service/online.dart';
 import 'package:gymtracker/view/components/legacy_workout_recovery.dart';
@@ -35,12 +34,14 @@ void main() {
     await db
         .into(db.ongoingData)
         .insert(OngoingDataCompanion(data: Value(jsonEncode(legacy))));
-    globalContainer = ProviderContainer(
-      overrides: [onlineProvider.overrideWith(_Online.new)],
+    MockServices.container = ProviderContainer(
+      overrides: [
+        ...MockServices.defaultOverrides,
+        onlineProvider.overrideWith(_Online.new),
+      ],
     );
   });
   tearDown(() {
-    globalContainer.dispose();
     MockServices.tearDown();
   });
 

@@ -1,20 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_sticky_header/flutter_sticky_header.dart';
-import 'package:get/get.dart';
 import 'package:gymtracker/controller/history_controller.dart';
 import 'package:gymtracker/data/configuration.dart';
 import 'package:gymtracker/i18n/strings.g.dart';
 import 'package:gymtracker/icons/gymtracker_icons.dart';
 import 'package:gymtracker/model/workout.dart';
+import 'package:gymtracker/provider/training_data.dart';
 import 'package:gymtracker/service/logger.dart';
 import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/utils/skeletons.dart';
 import 'package:gymtracker/utils/theme.dart';
+import 'package:gymtracker/view/actions/history.dart';
 import 'package:gymtracker/view/components/subscription_nag.dart';
 import 'package:gymtracker/view/exercises.dart';
 import 'package:gymtracker/view/me/calendar.dart';
-import 'package:gymtracker/view/skeleton.dart';
 import 'package:gymtracker/view/utils/action_icon.dart';
 import 'package:gymtracker/view/utils/history_workout.dart';
 import 'package:gymtracker/view/utils/sliver_utils.dart';
@@ -39,16 +40,16 @@ Map<MonthYear, List<Workout>> _getHistoryByMonthThread(List<Workout> raw) {
   return map;
 }
 
-class HistoryView extends StatefulWidget {
+class HistoryView extends ConsumerStatefulWidget {
   const HistoryView({super.key});
 
   @override
-  State<HistoryView> createState() => _HistoryViewState();
+  ConsumerState<HistoryView> createState() => _HistoryViewState();
 }
 
-class _HistoryViewState extends State<HistoryView> {
+class _HistoryViewState extends ConsumerState<HistoryView> {
   late Future<Map<MonthYear, List<Workout>>> historyByMonth = Future.value({});
-  late Worker worker;
+  late ProviderSubscription worker;
 
   final searchController = SearchController();
 
@@ -56,7 +57,7 @@ class _HistoryViewState extends State<HistoryView> {
 
   Map<MonthYear, List<Workout>> getSearchResults(String query) {
     if (query.isEmpty) return {};
-    final controller = Get.find<HistoryController>();
+    final controller = ref.read(historyControllerProvider);
     final matching = controller.userVisibleWorkouts.where((workout) {
       return workout.name.toLowerCase().contains(query.toLowerCase());
     }).toList();
@@ -67,14 +68,13 @@ class _HistoryViewState extends State<HistoryView> {
   void initState() {
     super.initState();
     _recompute();
-    final controller = Get.find<HistoryController>();
-    worker = ever(controller.history, (callback) {
+    worker = ref.listenManual(historyWorkoutsProvider, (_, next) {
       _recompute();
     });
   }
 
   void _recompute() {
-    final controller = Get.find<HistoryController>();
+    final controller = ref.read(historyControllerProvider);
     try {
       historyByMonth = Future.value(
         _getHistoryByMonthThread(controller.userVisibleWorkouts),
@@ -90,7 +90,7 @@ class _HistoryViewState extends State<HistoryView> {
   @override
   void dispose() {
     searchController.dispose();
-    worker.dispose();
+    worker.close();
     super.dispose();
   }
 
@@ -176,7 +176,10 @@ class _HistoryViewState extends State<HistoryView> {
                   ),
                 ),
               ],
-              if (Get.find<HistoryController>().userVisibleWorkouts.length >
+              if (ref
+                      .read(historyControllerProvider)
+                      .userVisibleWorkouts
+                      .length >
                   kHistoryWorkoutsAbridgedCount)
                 SliverPadding(
                   padding: const EdgeInsets.only(top: 16),
@@ -295,7 +298,7 @@ class _HistoryViewState extends State<HistoryView> {
             ),
             icon: const Icon(GTIcons.delete),
             onPressed: () {
-              final controller = Get.find<HistoryController>();
+              final controller = ref.read(historyControllerProvider);
               controller.deleteWorkoutsWithDialog(
                 context,
                 workoutIDs: selectedEntries,

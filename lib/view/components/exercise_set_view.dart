@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gymtracker/controller/settings_controller.dart';
 import 'package:gymtracker/data/distance.dart';
 import 'package:gymtracker/data/weights.dart';
@@ -11,7 +12,7 @@ import 'package:gymtracker/utils/sets.dart';
 import 'package:gymtracker/view/utils/drag_handle.dart';
 import 'package:gymtracker/view/utils/workout.dart';
 
-class ExerciseSetView extends StatefulWidget {
+class ExerciseSetView extends ConsumerStatefulWidget {
   final GTSet set;
   final Exercise exercise;
   final bool isConcrete;
@@ -39,10 +40,12 @@ class ExerciseSetView extends StatefulWidget {
        );
 
   @override
-  State<ExerciseSetView> createState() => _ExerciseSetViewState();
+  ConsumerState<ExerciseSetView> createState() => _ExerciseSetViewState();
 }
 
-class _ExerciseSetViewState extends State<ExerciseSetView> {
+class _ExerciseSetViewState extends ConsumerState<ExerciseSetView> {
+  SettingsController get settingsController =>
+      ref.watch(settingsControllerProvider);
   List<Widget> get fields => [
     if ([
       GTSetParameters.repsWeight,
@@ -53,8 +56,8 @@ class _ExerciseSetViewState extends State<ExerciseSetView> {
           Weights.convert(
             value: widget.set.weight!,
             from: widget.weightUnit,
-            to: settingsController.weightUnit.value,
-          ).getUserFacingWeight(context.t),
+            to: settingsController.weightUnit,
+          ).getUserFacingWeight(context.t, settingsController.weightUnit),
         ),
       ),
     if ([
@@ -84,8 +87,8 @@ class _ExerciseSetViewState extends State<ExerciseSetView> {
           Distance.convert(
             value: widget.set.distance!,
             from: widget.distanceUnit,
-            to: settingsController.distanceUnit.value,
-          ).getUserFacingDistance(context.t),
+            to: settingsController.distanceUnit,
+          ).getUserFacingDistance(context.t, settingsController.distanceUnit),
         ),
       ),
   ];

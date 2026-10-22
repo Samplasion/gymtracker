@@ -1,28 +1,20 @@
-// ignore_for_file: use_build_context_synchronously
-
 import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:get/get.dart' hide ContextExtensionss;
-import 'package:gymtracker/controller/coordinator.dart';
 import 'package:gymtracker/controller/countdown_controller.dart';
 import 'package:gymtracker/controller/history_controller.dart';
 import 'package:gymtracker/controller/routines_controller.dart';
-import 'package:gymtracker/controller/serviceable_controller.dart';
 import 'package:gymtracker/controller/settings_controller.dart';
 import 'package:gymtracker/controller/stopwatch_controller.dart';
 import 'package:gymtracker/data/distance.dart';
 import 'package:gymtracker/data/exercises.dart';
 import 'package:gymtracker/data/weights.dart';
-import 'package:gymtracker/gen/colors.gen.dart';
 import 'package:gymtracker/i18n/strings.g.dart';
-import 'package:gymtracker/icons/gymtracker_icons.dart';
-import 'package:gymtracker/main.dart';
 import 'package:gymtracker/model/exercisable.dart';
 import 'package:gymtracker/model/exercise.dart';
 import 'package:gymtracker/model/native.dart';
+import 'package:gymtracker/model/progression.dart';
 import 'package:gymtracker/model/set.dart';
 import 'package:gymtracker/model/superset.dart';
 import 'package:gymtracker/model/workout.dart';
@@ -32,18 +24,13 @@ import 'package:gymtracker/service/logger.dart';
 import 'package:gymtracker/service/native.dart';
 import 'package:gymtracker/struct/editor_callback.dart';
 import 'package:gymtracker/struct/optional.dart';
-import 'package:gymtracker/struct/stopwatch_extended.dart';
-import 'package:gymtracker/utils/constants.dart';
 import 'package:gymtracker/utils/extensions.dart';
-import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/utils/utils.dart';
-import 'package:gymtracker/view/components/rich_text_dialog.dart';
-import 'package:gymtracker/view/exercise_picker.dart';
-import 'package:gymtracker/view/utils/exercises_to_superset.dart';
-import 'package:gymtracker/view/utils/workout_done.dart';
-import 'package:gymtracker/view/utils/workout_generator.dart';
-import 'package:gymtracker/view/utils/workout_navigation.dart';
-import 'package:gymtracker/view/workout.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
+
+// ignore_for_file: use_build_context_synchronously
+
+part 'workout_controller.g.dart';
 
 typedef WorkoutExerciseIndex = ExerciseIndex;
 typedef WorkoutSetCursor = ({
@@ -52,97 +39,114 @@ typedef WorkoutSetCursor = ({
   int setIndex,
 });
 
-class WorkoutController extends GetxController with ServiceableController {
+class WorkoutState {
+  WorkoutState({
+    required this.workout,
+    required this.ownerId,
+    this.cursor,
+    this.previousCursor,
+  });
+  final Workout workout;
+  final String? ownerId;
+  final WorkoutSetCursor? cursor;
+  final WorkoutSetCursor? previousCursor;
+}
+
+@Riverpod(keepAlive: true)
+class WorkoutController extends _$WorkoutController {
   Future<void> _progressionWrite = Future.value();
   Timer? _pendingInputSave;
   AppLifecycleListener? _inputSaveLifecycle;
-  final String? ownerId;
-  bool preserveOngoingOnClose = false;
-  RxString name;
-  Rx<DateTime> time;
-  Rx<String?> parentID;
-  Rx<String?> infobox;
-  RxBool isContinuation = false.obs;
-  Rx<String?> continuesID = Rx(null);
-  final Rx<WorkoutSetCursor?> _setCursor = Rx<WorkoutSetCursor?>(null);
-  final Rx<WorkoutSetCursor?> _previousSetCursor = Rx<WorkoutSetCursor?>(null);
-  late Rx<Weights> weightUnit;
-  late Rx<Distance> distanceUnit;
-  RxList<WorkoutExercisable> exercises = <WorkoutExercisable>[].obs;
+  String? ownerId;
+  int _sessionGeneration = 0;
+  int get sessionGeneration => _sessionGeneration;
+  bool isSessionActive(int generation) =>
+      ref.mounted &&
+      state != null &&
+      generation == _sessionGeneration &&
+      ownerId == service.db.currentUserId;
+  bool get isClosed => !ref.mounted || state == null;
+  bool get isActive => !isClosed;
+  DatabaseService get service => ref.read(databaseServiceProvider);
+  List<WorkoutExercisable> exercises = [];
+  late String name;
+  late DateTime time;
+  late String? parentID;
+  late String? infobox;
+  late bool isContinuation;
+  late String? continuesID;
+  late Weights weightUnit;
+  late Distance distanceUnit;
+  late WorkoutSetCursor? _setCursor;
+  late WorkoutSetCursor? _previousSetCursor;
 
-  WorkoutController(String name, String? parentID, String? infobox)
-    : ownerId = Get.find<DatabaseService>().db.currentUserId,
-      name = name.obs,
-      time = DateTime.now().obs,
-      parentID = Rx<String?>(parentID),
-      infobox = Rx<String?>(infobox),
-      weightUnit = (Get.find<SettingsController>().weightUnit()).obs,
-      distanceUnit = (Get.find<SettingsController>().distanceUnit()).obs {
-    final sc = Get.find<SettingsController>();
-    logger.i("""
-      Currently defined units:
-        - Weight: \t${sc.weightUnit().name} \t(cfr. ${weightUnit.value.name})
-        - Distance: \t${sc.distanceUnit().name} \t(cfr. ${distanceUnit.value.name})
-    """);
-    logger.w(
-      "Created with name $name, parentID $parentID, and infobox $infobox",
-      error: Error(),
-      stackTrace: StackTrace.current,
-    );
-
-    exercises.listen((_) {
-      _syncSetCursorWithWorkout();
-      logger.i("Syncing exercises to native channels");
-      _initFirstSync();
+  @override
+  WorkoutState? build() {
+    ref.listen(translationsProvider, (_, _) {});
+    ref.onDispose(() {
+      _pendingInputSave?.cancel();
+      _inputSaveLifecycle?.dispose();
     });
+    return null;
   }
 
-  void _initFirstSync() {
-    SchedulerBinding.instance.addPostFrameCallback((_) {
-      if (isClosed || ownerId != service.db.currentUserId) return;
-      // Wait for the context to be available
-      if (Get.context == null) {
-        _initFirstSync();
-        return;
-      }
-      refreshWatchData();
-    });
+  void start(
+    String name,
+    String? parentID,
+    String? infobox, {
+    bool saveInitial = true,
+  }) {
+    _sessionGeneration++;
+    _pendingInputSave?.cancel();
+    _pendingInputSave = null;
+    ownerId = service.db.currentUserId;
+    this.name = name;
+    this.parentID = parentID;
+    this.infobox = infobox;
+    time = ref.read(workoutClockProvider).now();
+    isContinuation = false;
+    continuesID = null;
+    _setCursor = null;
+    _previousSetCursor = null;
+    final settings = ref.read(settingsControllerProvider);
+    weightUnit = settings.weightUnit;
+    distanceUnit = settings.distanceUnit;
+    exercises = [];
+    publishExercises();
+    _inputSaveLifecycle?.dispose();
+    _inputSaveLifecycle = AppLifecycleListener(
+      onStateChange: (lifecycle) {
+        if (lifecycle != AppLifecycleState.resumed &&
+            _pendingInputSave != null) {
+          save();
+        }
+      },
+    );
+    ref.read(nativeServiceProvider).setIsWorkoutRunning(true);
+    if (saveInitial) save();
   }
 
-  factory WorkoutController.fromSavedData(Map<String, dynamic> data) {
-    final cont = WorkoutController(
-      data['name'],
-      data['parentID'],
-      data['infobox'],
+  void restore(Map<String, dynamic> data) {
+    start(data['name'], data['parentID'], data['infobox'], saveInitial: false);
+    exercises = (data['exercises'] as List)
+        .map((el) => WorkoutExercisable.fromJson(el))
+        .toList();
+    time = DateTime.fromMillisecondsSinceEpoch(
+      data['time'] ??
+          ref.read(workoutClockProvider).now().millisecondsSinceEpoch,
     );
-
-    cont.exercises(
-      (data['exercises'] as List)
-          .map((el) => WorkoutExercisable.fromJson(el))
-          .toList(),
+    continuesID = data['continuesID'];
+    isContinuation = data['isContinuation'] ?? false;
+    weightUnit = Weights.values.firstWhere(
+      (v) => v.name == data['weightUnit'],
+      orElse: () => Weights.kg,
     );
-    cont.time(
-      DateTime.fromMillisecondsSinceEpoch(
-        data['time'] ?? DateTime.now().millisecondsSinceEpoch,
-      ),
+    distanceUnit = Distance.values.firstWhere(
+      (v) => v.name == data['distanceUnit'],
+      orElse: () => Distance.km,
     );
-    cont.continuesID(data['continuesID']);
-    cont.isContinuation(data['isContinuation'] ?? false);
-    cont.weightUnit(
-      Weights.values.firstWhere(
-        (element) => element.name == data['weightUnit'],
-        orElse: () => Weights.kg,
-      ),
-    );
-    cont.distanceUnit(
-      Distance.values.firstWhere(
-        (element) => element.name == data['distanceUnit'],
-        orElse: () => Distance.km,
-      ),
-    );
-
     if (data.containsKey("globalStopwatch")) {
-      final controller = Get.find<StopwatchController>();
+      final controller = ref.read(stopwatchControllerProvider.notifier);
 
       // Separating the two cases this way avoids a couple of nasty bugs:
       //
@@ -153,497 +157,539 @@ class WorkoutController extends GetxController with ServiceableController {
       //   running.
       // TODO: Test these cases.
       if (data['globalStopwatchPaused'] == false) {
-        controller.globalStopwatch.stopwatch = StopwatchEx.fromMilliseconds(
-          DateTime.now().millisecondsSinceEpoch -
-              (data['globalStopwatch'] as int),
-        );
+        controller.globalStopwatch.stopwatch =
+            ref.read(workoutStopwatchFactoryProvider)(
+              ref.read(workoutClockProvider).now().millisecondsSinceEpoch -
+                  (data['globalStopwatch'] as int),
+            );
         controller.globalStopwatch.start();
       } else {
-        controller.globalStopwatch.stopwatch = StopwatchEx.fromMilliseconds(
-          data['globalStopwatchNominalDuration'] as int,
-        );
+        controller.globalStopwatch.stopwatch = ref.read(
+          workoutStopwatchFactoryProvider,
+        )(data['globalStopwatchNominalDuration'] as int);
+        controller.globalStopwatch.pause();
       }
     }
 
-    return cont;
+    publishExercises();
   }
 
-  EditorCallbacks get callbacks => EditorCallbacks.editor(
-    onExerciseProgressionChange: (index, progression) {
-      final oldExercise = index.supersetIndex == null
-          ? exercises[index.exerciseIndex] as Exercise
-          : (exercises[index.supersetIndex!] as Superset).exercises[index
-                .exerciseIndex];
-      if (index.supersetIndex == null) {
-        final ex = exercises[index.exerciseIndex] as Exercise;
-        exercises[index.exerciseIndex] = ex.copyWith(progression: progression);
-      } else {
-        final superset = exercises[index.supersetIndex!] as Superset;
-        exercises[index.supersetIndex!] = superset.copyWith(
-          exercises: [
-            for (var i = 0; i < superset.exercises.length; i++)
-              i == index.exerciseIndex
-                  ? superset.exercises[i].copyWith(progression: progression)
-                  : superset.exercises[i],
-          ],
-        );
-      }
-      exercises.refresh();
-      save();
-      _progressionWrite = _progressionWrite.then(
-        (_) => Get.find<RoutinesController>().setProgressionForOngoingExercise(
-          routineID: parentID.value,
-          exercise: oldExercise,
-          progression: progression,
+  /// Publish a detached snapshot; editing buffers are never exposed as provider state.
+  void publishExercises() {
+    if (!ref.mounted) return;
+    _syncSetCursorWithWorkout();
+    state = WorkoutState(
+      workout: synthesizeSnapshot(),
+      ownerId: ownerId,
+      cursor: _setCursor,
+      previousCursor: _previousSetCursor,
+    );
+    final generation = sessionGeneration;
+    SchedulerBinding.instance.addPostFrameCallback((_) {
+      if (isSessionActive(generation)) refreshWatchData();
+    });
+  }
+
+  Workout synthesizeSnapshot() => Workout(
+    name: name,
+    exercises: List.unmodifiable(
+      exercises.map(
+        (e) => e.map(
+          exercise: _snapshotExercise,
+          superset: (ss) => ss.copyWith(
+            exercises: List.unmodifiable(ss.exercises.map(_snapshotExercise)),
+          ),
         ),
+      ),
+    ),
+    duration: ref.read(workoutClockProvider).now().difference(time),
+    startingDate: time,
+    parentID: parentID,
+    infobox: infobox,
+    weightUnit: weightUnit,
+    distanceUnit: distanceUnit,
+    completes: continuesID,
+  );
+
+  Exercise _snapshotExercise(Exercise exercise) => Exercise.raw(
+    id: exercise.id,
+    name: exercise.name,
+    parameters: exercise.parameters,
+    sets: List.unmodifiable(exercise.sets),
+    primaryMuscleGroup: exercise.primaryMuscleGroup,
+    secondaryMuscleGroups: Set.unmodifiable(exercise.secondaryMuscleGroups),
+    restTime: exercise.restTime,
+    parentID: exercise.parentID,
+    notes: exercise.notes,
+    standard: exercise.standard,
+    supersetID: exercise.supersetID,
+    workoutID: exercise.workoutID,
+    supersedesID: exercise.supersedesID,
+    rpe: exercise.rpe,
+    progression: exercise.progression?.copyWith(
+      targetReps: List.unmodifiable(exercise.progression!.targetReps),
+    ),
+    category: exercise.category,
+    skeleton: exercise.skeleton,
+    equipment: exercise.gymEquipment,
+    muscleHighlight: Map.unmodifiable(exercise.muscleHighlight),
+  );
+
+  Future<void> suspend() async {
+    if (isClosed) return;
+    final generation = sessionGeneration;
+    await _progressionWrite;
+    if (!isSessionActive(generation)) return;
+    await persist(force: true);
+    if (isSessionActive(generation)) _clear();
+  }
+
+  Future<void> cancel() async {
+    if (isClosed) return;
+    final owner = ownerId;
+    _clear();
+    await service.db.deleteOngoingForUser(owner);
+  }
+
+  void _clear() {
+    _sessionGeneration++;
+    _pendingInputSave?.cancel();
+    _inputSaveLifecycle?.dispose();
+    _inputSaveLifecycle = null;
+    removeCountdown();
+    removeRelevantStopwatches();
+    state = null;
+    ref.read(nativeServiceProvider).setIsWorkoutRunning(false);
+  }
+
+  void setName(String value) {
+    name = value;
+    publishExercises();
+  }
+
+  void setTime(DateTime value) {
+    time = value;
+    publishExercises();
+  }
+
+  void setParentID(String? value) {
+    parentID = value;
+    publishExercises();
+  }
+
+  void setInfobox(String? value) {
+    infobox = value;
+    publishExercises();
+  }
+
+  void setIsContinuation(bool value) {
+    isContinuation = value;
+    publishExercises();
+  }
+
+  void setContinuesID(String? value) {
+    continuesID = value;
+    publishExercises();
+  }
+
+  void setWeightUnit(Weights value) {
+    weightUnit = value;
+    publishExercises();
+  }
+
+  void setDistanceUnit(Distance value) {
+    distanceUnit = value;
+    publishExercises();
+  }
+
+  void setCursor(WorkoutSetCursor? value) {
+    _setCursor = value;
+    publishExercises();
+  }
+
+  void setPreviousCursor(WorkoutSetCursor? value) {
+    _previousSetCursor = value;
+    publishExercises();
+  }
+
+  void setExercises(List<WorkoutExercisable> value) {
+    exercises = value;
+    publishExercises();
+  }
+
+  void onExerciseProgressionChange(
+    ExerciseIndex index,
+    ExerciseProgression? progression,
+  ) {
+    final oldExercise = index.supersetIndex == null
+        ? exercises[index.exerciseIndex] as Exercise
+        : (exercises[index.supersetIndex!] as Superset).exercises[index
+              .exerciseIndex];
+    if (index.supersetIndex == null) {
+      final ex = exercises[index.exerciseIndex] as Exercise;
+      exercises[index.exerciseIndex] = ex.copyWith(progression: progression);
+    } else {
+      final superset = exercises[index.supersetIndex!] as Superset;
+      exercises[index.supersetIndex!] = superset.copyWith(
+        exercises: [
+          for (var i = 0; i < superset.exercises.length; i++)
+            i == index.exerciseIndex
+                ? superset.exercises[i].copyWith(progression: progression)
+                : superset.exercises[i],
+        ],
       );
-    },
-    onExerciseReorder: (supersetIndex) async {
-      final target = supersetIndex == null
-          ? exercises
-          : (exercises[supersetIndex] as Superset).exercises
-                as List<WorkoutExercisable>;
-      SchedulerBinding.instance.addPostFrameCallback((timeStamp) async {
-        final newIndices = await showDialog<List<int>>(
-          builder: (context) => WorkoutExerciseReorderDialog(exercises: target),
-          context: Get.context!,
-        );
-        if (newIndices == null || newIndices.length != target.length) {
-          return;
-        }
-
-        if (supersetIndex == null) {
-          exercises([
-            for (int i = 0; i < newIndices.length; i++) target[newIndices[i]],
-          ]);
-        } else {
-          exercises[supersetIndex] = (exercises[supersetIndex] as Superset)
-              .copyWith(
-                exercises: [
-                  for (int i = 0; i < newIndices.length; i++)
-                    target[newIndices[i]] as Exercise,
-                ],
-              );
-        }
-      });
-      exercises.refresh();
-      save();
-    },
-    onExerciseReplace: (ExerciseIndex index) {
-      final (exerciseIndex: i, supersetIndex: supersetIndex) = index;
-      SchedulerBinding.instance.addPostFrameCallback((timeStamp) async {
-        final old = supersetIndex == null
-            ? exercises[i]
-            : (exercises[supersetIndex] as Superset).exercises[i];
-        final ex = await Go.to<List<Exercise>>(
-          () => const ExercisePicker(singlePick: true),
-        );
-        if (ex == null || ex.isEmpty) return;
-        final newExercise =
-            (old is Exercise
-                    ? Exercise.replaced(from: old, to: ex.first.makeChild())
-                    : ex.first.makeChild().copyWith(
-                        sets: [
-                          if (!ex.first.parameters.isSetless)
-                            GTSet.empty(
-                              kind: GTSetKind.normal,
-                              parameters: ex.first.parameters,
-                            ),
-                        ],
-                      ))
-                .copyWith
-                .supersedesID(old.supersedesID);
-        if (supersetIndex == null) {
-          exercises[i] = newExercise;
-        } else {
-          exercises[supersetIndex] = (exercises[supersetIndex] as Superset)
-              .copyWith(
-                exercises: [
-                  for (
-                    int j = 0;
-                    j < (exercises[supersetIndex] as Superset).exercises.length;
-                    j++
-                  )
-                    if (j == i)
-                      newExercise
-                    else
-                      (exercises[supersetIndex] as Superset).exercises[j],
-                ],
-              );
-        }
-        exercises.refresh();
-        save();
-      });
-    },
-    onExerciseRemove: (index) {
-      final previousCursor = _setCursor.value;
-      _previousSetCursor.value = previousCursor;
-      final (exerciseIndex: exerciseIndex, supersetIndex: supersetIndex) =
-          index;
-      if (supersetIndex == null) {
-        exercises.removeAt(exerciseIndex);
-      } else {
-        final superset = exercises[supersetIndex] as Superset;
-        exercises[supersetIndex] = superset.copyWith(
-          exercises: [
-            for (int j = 0; j < superset.exercises.length; j++)
-              if (j != exerciseIndex) superset.exercises[j],
-          ],
-        );
-      }
-
-      _setCursor.value = _healCursorAfterExerciseDeletion(
-        previousCursor,
-        index,
+    }
+    publishExercises();
+    save();
+    final generation = sessionGeneration;
+    final routineID = parentID;
+    final routines = ref.read(routinesControllerProvider);
+    _progressionWrite = _progressionWrite.then((_) async {
+      if (!isSessionActive(generation)) return;
+      await routines.setProgressionForOngoingExercise(
+        routineID: routineID,
+        exercise: oldExercise,
+        progression: progression,
       );
-      exercises.refresh();
-      save();
-    },
-    onExerciseChangeRestTime: (index, value) {
-      final (exerciseIndex: exerciseIndex, supersetIndex: supersetIndex) =
-          index;
+    });
+  }
 
-      if (supersetIndex == null) {
-        final ex = exercises[exerciseIndex];
-        // Type safety
-        exercises[exerciseIndex] = ex is Exercise
-            ? ex.copyWith(restTime: value)
-            : ex is Superset
-            ? ex.copyWith(restTime: value)
-            : throw AssertionError("Unreachable yet");
-      } else {
-        // We don't support changing rest time for individual exercises in a superset
-        throw UnimplementedError();
-      }
+  void onExerciseRemove(ExerciseIndex index) {
+    final previousCursor = _setCursor;
+    _previousSetCursor = previousCursor;
+    final (exerciseIndex: exerciseIndex, supersetIndex: supersetIndex) = index;
+    if (supersetIndex == null) {
+      exercises.removeAt(exerciseIndex);
+    } else {
+      final superset = exercises[supersetIndex] as Superset;
+      exercises[supersetIndex] = superset.copyWith(
+        exercises: [
+          for (int j = 0; j < superset.exercises.length; j++)
+            if (j != exerciseIndex) superset.exercises[j],
+        ],
+      );
+    }
 
-      exercises.refresh();
-      save();
-    },
-    onSetChangeRPE: (index, setIndex, value) {
-      final (exerciseIndex: exerciseIndex, supersetIndex: supersetIndex) =
-          index;
+    _setCursor = _healCursorAfterExerciseDeletion(previousCursor, index);
+    publishExercises();
+    save();
+  }
 
-      if (supersetIndex == null) {
-        final ex = exercises[exerciseIndex];
-        // Type safety
-        exercises[exerciseIndex] = ex is Exercise
-            ? ex.copyWith(
+  void onExerciseChangeRestTime(ExerciseIndex index, Duration value) {
+    final (exerciseIndex: exerciseIndex, supersetIndex: supersetIndex) = index;
+
+    if (supersetIndex == null) {
+      final ex = exercises[exerciseIndex];
+      // Type safety
+      exercises[exerciseIndex] = ex is Exercise
+          ? ex.copyWith(restTime: value)
+          : ex is Superset
+          ? ex.copyWith(restTime: value)
+          : throw AssertionError("Unreachable yet");
+    } else {
+      // We don't support changing rest time for individual exercises in a superset
+      throw UnimplementedError();
+    }
+
+    publishExercises();
+    save();
+  }
+
+  void onSetChangeRPE(ExerciseIndex index, int setIndex, double? value) {
+    final (exerciseIndex: exerciseIndex, supersetIndex: supersetIndex) = index;
+
+    if (supersetIndex == null) {
+      final ex = exercises[exerciseIndex];
+      // Type safety
+      exercises[exerciseIndex] = ex is Exercise
+          ? ex.copyWith(
+              sets: [
+                for (int j = 0; j < ex.sets.length; j++)
+                  if (j == setIndex)
+                    ex.sets[j].copyWith(rpe: value)
+                  else
+                    ex.sets[j],
+              ],
+            )
+          : ex is Superset
+          ? ex.copyWith(
+              exercises: [
+                for (final e in ex.exercises)
+                  e.copyWith(
+                    sets: [
+                      for (int j = 0; j < e.sets.length; j++)
+                        if (j == setIndex)
+                          e.sets[j].copyWith(rpe: value)
+                        else
+                          e.sets[j],
+                    ],
+                  ),
+              ],
+            )
+          : throw AssertionError("Unreachable yet");
+    } else {
+      final superset = exercises[supersetIndex] as Superset;
+      exercises[supersetIndex] = superset.copyWith(
+        exercises: [
+          for (int j = 0; j < superset.exercises.length; j++)
+            if (j == exerciseIndex)
+              superset.exercises[j].copyWith(
                 sets: [
-                  for (int j = 0; j < ex.sets.length; j++)
-                    if (j == setIndex)
-                      ex.sets[j].copyWith(rpe: value)
+                  for (int k = 0; k < superset.exercises[j].sets.length; k++)
+                    if (k == setIndex)
+                      superset.exercises[j].sets[k].copyWith(rpe: value)
                     else
-                      ex.sets[j],
+                      superset.exercises[j].sets[k],
                 ],
               )
-            : ex is Superset
-            ? ex.copyWith(
-                exercises: [
-                  for (final e in ex.exercises)
-                    e.copyWith(
+            else
+              superset.exercises[j],
+        ],
+      );
+    }
+
+    publishExercises();
+    save();
+  }
+
+  void onExerciseSetReorder(ExerciseIndex index, List<int> newIndices) {
+    final (exerciseIndex: exerciseIndex, supersetIndex: supersetIndex) = index;
+
+    if (supersetIndex == null) {
+      final ex = exercises[exerciseIndex];
+      // Type safety
+      exercises[exerciseIndex] = ex is Exercise
+          ? ex.copyWith(
+              sets: [
+                for (int i = 0; i < newIndices.length; i++)
+                  ex.sets[newIndices[i]],
+              ],
+            )
+          : ex is Superset
+          ? ex.copyWith(
+              exercises: [
+                for (final e in ex.exercises)
+                  e.copyWith(
+                    sets: [
+                      for (int i = 0; i < newIndices.length; i++)
+                        e.sets[newIndices[i]],
+                    ],
+                  ),
+              ],
+            )
+          : throw AssertionError("Unreachable yet");
+    } else {
+      final superset = exercises[supersetIndex] as Superset;
+      exercises[supersetIndex] = superset.copyWith(
+        exercises: [
+          for (final e in superset.exercises)
+            e.copyWith(
+              sets: [
+                for (int i = 0; i < newIndices.length; i++)
+                  e.sets[newIndices[i]],
+              ],
+            ),
+        ],
+      );
+    }
+
+    publishExercises();
+    save();
+  }
+
+  void onSetCreate(ExerciseIndex index) {
+    final (exerciseIndex: i, supersetIndex: supersetIndex) = index;
+    final set = GTSet.empty(
+      kind: GTSetKind.normal,
+      parameters: supersetIndex == null
+          ? (exercises[i] as Exercise).parameters
+          : (exercises[supersetIndex] as Superset).exercises[i].parameters,
+    );
+
+    if (supersetIndex == null) {
+      exercises[i].sets.add(set);
+    } else {
+      final superset = exercises[supersetIndex] as Superset;
+      exercises[supersetIndex] = superset.copyWith(
+        exercises: [
+          for (int j = 0; j < superset.exercises.length; j++)
+            if (j == i)
+              superset.exercises[j].copyWith(
+                sets: [...superset.exercises[j].sets, set],
+              )
+            else
+              superset.exercises[j],
+        ],
+      );
+    }
+
+    publishExercises();
+    save();
+  }
+
+  void onSetRemove(ExerciseIndex index, int setIndex) {
+    final previousCursor = _setCursor;
+    _previousSetCursor = previousCursor;
+    final (exerciseIndex: i, supersetIndex: supersetIndex) = index;
+
+    if (supersetIndex == null) {
+      exercises[i].sets.removeAt(setIndex);
+    } else {
+      final superset = exercises[supersetIndex] as Superset;
+      exercises[supersetIndex] = superset.copyWith(
+        exercises: [
+          for (int j = 0; j < superset.exercises.length; j++)
+            if (j == i)
+              superset.exercises[j].copyWith(
+                sets: [
+                  for (int k = 0; k < superset.exercises[j].sets.length; k++)
+                    if (k != setIndex) superset.exercises[j].sets[k],
+                ],
+              )
+            else
+              superset.exercises[j],
+        ],
+      );
+    }
+
+    _setCursor = _healCursorAfterSetDeletion(previousCursor, index, setIndex);
+
+    publishExercises();
+    save();
+  }
+
+  void onSetSelectKind(ExerciseIndex index, int setIndex, GTSetKind kind) {
+    final (exerciseIndex: i, supersetIndex: supersetIndex) = index;
+
+    final exercise = supersetIndex == null
+        ? (exercises[i] as Exercise)
+        : (exercises[supersetIndex] as Superset).exercises[i];
+    final set = exercise.sets[setIndex];
+
+    final newSet = set.copyWith(kind: kind);
+
+    if (supersetIndex == null) {
+      final ex = exercises[i] as Exercise;
+      exercises[i] = ex.copyWith(
+        sets: [
+          for (int j = 0; j < ex.sets.length; j++)
+            if (j == setIndex) newSet else ex.sets[j],
+        ],
+      );
+    } else {
+      final superset = exercises[supersetIndex] as Superset;
+      exercises[supersetIndex] = superset.copyWith(
+        exercises: [
+          for (int j = 0; j < superset.exercises.length; j++)
+            if (j == i)
+              superset.exercises[j].copyWith(
+                sets: [
+                  for (int k = 0; k < superset.exercises[j].sets.length; k++)
+                    if (k == setIndex)
+                      newSet
+                    else
+                      superset.exercises[j].sets[k],
+                ],
+              )
+            else
+              superset.exercises[j],
+        ],
+      );
+    }
+
+    publishExercises();
+    save();
+  }
+
+  void onSetSetDone(ExerciseIndex index, int setIndex, bool done) {
+    markSetAsDone(index, setIndex, done);
+  }
+
+  void onSetValueChange(ExerciseIndex index, int setIndex, GTSet set) {
+    final (exerciseIndex: exerciseIndex, supersetIndex: supersetIndex) = index;
+
+    if (supersetIndex == null) {
+      final ex = exercises[exerciseIndex];
+      // Type safety
+      exercises[exerciseIndex] = ex is Exercise
+          ? ex.copyWith(
+              sets: [
+                for (int j = 0; j < ex.sets.length; j++)
+                  if (j == setIndex) set else ex.sets[j],
+              ],
+            )
+          : ex is Superset
+          ? ex.copyWith(
+              exercises: [
+                for (int j = 0; j < ex.exercises.length; j++)
+                  if (j == setIndex)
+                    ex.exercises[j].copyWith(
                       sets: [
-                        for (int j = 0; j < e.sets.length; j++)
-                          if (j == setIndex)
-                            e.sets[j].copyWith(rpe: value)
-                          else
-                            e.sets[j],
+                        for (int k = 0; k < ex.exercises[j].sets.length; k++)
+                          if (k == setIndex) set else ex.exercises[j].sets[k],
                       ],
-                    ),
-                ],
-              )
-            : throw AssertionError("Unreachable yet");
-      } else {
-        final superset = exercises[supersetIndex] as Superset;
-        exercises[supersetIndex] = superset.copyWith(
-          exercises: [
-            for (int j = 0; j < superset.exercises.length; j++)
-              if (j == exerciseIndex)
-                superset.exercises[j].copyWith(
-                  sets: [
-                    for (int k = 0; k < superset.exercises[j].sets.length; k++)
-                      if (k == setIndex)
-                        superset.exercises[j].sets[k].copyWith(rpe: value)
-                      else
-                        superset.exercises[j].sets[k],
-                  ],
-                )
-              else
-                superset.exercises[j],
-          ],
-        );
-      }
-
-      exercises.refresh();
-      save();
-    },
-    onExerciseSetReorder: (index, newIndices) {
-      final (exerciseIndex: exerciseIndex, supersetIndex: supersetIndex) =
-          index;
-
-      if (supersetIndex == null) {
-        final ex = exercises[exerciseIndex];
-        // Type safety
-        exercises[exerciseIndex] = ex is Exercise
-            ? ex.copyWith(
+                    )
+                  else
+                    ex.exercises[j],
+              ],
+            )
+          : throw AssertionError("Unreachable yet");
+    } else {
+      final superset = exercises[supersetIndex] as Superset;
+      exercises[supersetIndex] = superset.copyWith(
+        exercises: [
+          for (int j = 0; j < superset.exercises.length; j++)
+            if (j == exerciseIndex)
+              superset.exercises[j].copyWith(
                 sets: [
-                  for (int i = 0; i < newIndices.length; i++)
-                    ex.sets[newIndices[i]],
+                  for (int k = 0; k < superset.exercises[j].sets.length; k++)
+                    if (k == setIndex) set else superset.exercises[j].sets[k],
                 ],
               )
-            : ex is Superset
-            ? ex.copyWith(
-                exercises: [
-                  for (final e in ex.exercises)
-                    e.copyWith(
-                      sets: [
-                        for (int i = 0; i < newIndices.length; i++)
-                          e.sets[newIndices[i]],
-                      ],
-                    ),
-                ],
-              )
-            : throw AssertionError("Unreachable yet");
-      } else {
-        final superset = exercises[supersetIndex] as Superset;
-        exercises[supersetIndex] = superset.copyWith(
-          exercises: [
-            for (final e in superset.exercises)
-              e.copyWith(
-                sets: [
-                  for (int i = 0; i < newIndices.length; i++)
-                    e.sets[newIndices[i]],
-                ],
-              ),
-          ],
-        );
-      }
-
-      exercises.refresh();
-      save();
-    },
-    onSetCreate: (index) {
-      final (exerciseIndex: i, supersetIndex: supersetIndex) = index;
-      final set = GTSet.empty(
-        kind: GTSetKind.normal,
-        parameters: supersetIndex == null
-            ? (exercises[i] as Exercise).parameters
-            : (exercises[supersetIndex] as Superset).exercises[i].parameters,
+            else
+              superset.exercises[j],
+        ],
       );
+    }
 
-      if (supersetIndex == null) {
-        exercises[i].sets.add(set);
-      } else {
-        final superset = exercises[supersetIndex] as Superset;
-        exercises[supersetIndex] = superset.copyWith(
-          exercises: [
-            for (int j = 0; j < superset.exercises.length; j++)
-              if (j == i)
-                superset.exercises[j].copyWith(
-                  sets: [...superset.exercises[j].sets, set],
-                )
-              else
-                superset.exercises[j],
-          ],
-        );
-      }
-
-      exercises.refresh();
-      save();
-    },
-    onSetRemove: (index, setIndex) {
-      final previousCursor = _setCursor.value;
-      _previousSetCursor.value = previousCursor;
-      final (exerciseIndex: i, supersetIndex: supersetIndex) = index;
-
-      if (supersetIndex == null) {
-        exercises[i].sets.removeAt(setIndex);
-      } else {
-        final superset = exercises[supersetIndex] as Superset;
-        exercises[supersetIndex] = superset.copyWith(
-          exercises: [
-            for (int j = 0; j < superset.exercises.length; j++)
-              if (j == i)
-                superset.exercises[j].copyWith(
-                  sets: [
-                    for (int k = 0; k < superset.exercises[j].sets.length; k++)
-                      if (k != setIndex) superset.exercises[j].sets[k],
-                  ],
-                )
-              else
-                superset.exercises[j],
-          ],
-        );
-      }
-
-      _setCursor.value = _healCursorAfterSetDeletion(
-        previousCursor,
-        index,
-        setIndex,
-      );
-
-      exercises.refresh();
-      save();
-    },
-    onSetSelectKind: (index, setIndex, kind) {
-      final (exerciseIndex: i, supersetIndex: supersetIndex) = index;
-
-      final exercise = supersetIndex == null
-          ? (exercises[i] as Exercise)
-          : (exercises[supersetIndex] as Superset).exercises[i];
-      final set = exercise.sets[setIndex];
-
-      final newSet = set.copyWith(kind: kind);
-
-      if (supersetIndex == null) {
-        final ex = exercises[i] as Exercise;
-        exercises[i] = ex.copyWith(
-          sets: [
-            for (int j = 0; j < ex.sets.length; j++)
-              if (j == setIndex) newSet else ex.sets[j],
-          ],
-        );
-      } else {
-        final superset = exercises[supersetIndex] as Superset;
-        exercises[supersetIndex] = superset.copyWith(
-          exercises: [
-            for (int j = 0; j < superset.exercises.length; j++)
-              if (j == i)
-                superset.exercises[j].copyWith(
-                  sets: [
-                    for (int k = 0; k < superset.exercises[j].sets.length; k++)
-                      if (k == setIndex)
-                        newSet
-                      else
-                        superset.exercises[j].sets[k],
-                  ],
-                )
-              else
-                superset.exercises[j],
-          ],
-        );
-      }
-
-      exercises.refresh();
-      save();
-    },
-    onSetSetDone: (index, setIndex, done) {
-      markSetAsDone(index, setIndex, done);
-    },
-    onSetValueChange: (index, setIndex, set) {
-      final (exerciseIndex: exerciseIndex, supersetIndex: supersetIndex) =
-          index;
-
-      if (supersetIndex == null) {
-        final ex = exercises[exerciseIndex];
-        // Type safety
-        exercises[exerciseIndex] = ex is Exercise
-            ? ex.copyWith(
-                sets: [
-                  for (int j = 0; j < ex.sets.length; j++)
-                    if (j == setIndex) set else ex.sets[j],
-                ],
-              )
-            : ex is Superset
-            ? ex.copyWith(
-                exercises: [
-                  for (int j = 0; j < ex.exercises.length; j++)
-                    if (j == setIndex)
-                      ex.exercises[j].copyWith(
-                        sets: [
-                          for (int k = 0; k < ex.exercises[j].sets.length; k++)
-                            if (k == setIndex) set else ex.exercises[j].sets[k],
-                        ],
-                      )
-                    else
-                      ex.exercises[j],
-                ],
-              )
-            : throw AssertionError("Unreachable yet");
-      } else {
-        final superset = exercises[supersetIndex] as Superset;
-        exercises[supersetIndex] = superset.copyWith(
-          exercises: [
-            for (int j = 0; j < superset.exercises.length; j++)
-              if (j == exerciseIndex)
-                superset.exercises[j].copyWith(
-                  sets: [
-                    for (int k = 0; k < superset.exercises[j].sets.length; k++)
-                      if (k == setIndex) set else superset.exercises[j].sets[k],
-                  ],
-                )
-              else
-                superset.exercises[j],
-          ],
-        );
-      }
-
-      // RxList's indexed assignment has already notified listeners.
-      _pendingInputSave?.cancel();
-      _pendingInputSave = Timer(const Duration(milliseconds: 250), () {
+    publishExercises();
+    _pendingInputSave?.cancel();
+    _pendingInputSave = ref.read(workoutClockProvider).once(
+      const Duration(milliseconds: 250),
+      () {
         _pendingInputSave = null;
         save();
-      });
-    },
-    onExerciseNotesChange: (index, notes) {
-      final (exerciseIndex: exerciseIndex, supersetIndex: supersetIndex) =
-          index;
+      },
+    );
+  }
 
-      if (supersetIndex == null) {
-        final ex = exercises[exerciseIndex];
-        // Type safety
-        exercises[exerciseIndex] = ex is Exercise
-            ? ex.copyWith(notes: notes)
-            : ex is Superset
-            ? ex.copyWith(notes: notes)
-            : throw AssertionError("Unreachable yet");
-      } else {
-        final superset = exercises[supersetIndex] as Superset;
-        exercises[supersetIndex] = superset.copyWith(
-          exercises: [
-            for (int j = 0; j < superset.exercises.length; j++)
-              if (j == exerciseIndex)
-                superset.exercises[j].copyWith(notes: notes)
-              else
-                superset.exercises[j],
-          ],
-        );
-      }
+  void onExerciseNotesChange(ExerciseIndex index, String notes) {
+    final (exerciseIndex: exerciseIndex, supersetIndex: supersetIndex) = index;
 
-      exercises.refresh();
-      save();
-    },
-    onSupersetAddExercise: (supersetIndex) {
-      SchedulerBinding.instance.addPostFrameCallback((timeStamp) async {
-        pickExercisesForSuperset(supersetIndex);
-      });
-    },
-    onGroupExercisesIntoSuperset: (startingIndex) async {
-      final indices = await Go.toDialog(
-        () => ExercisesToSupersetDialog(
-          exercises: exercises,
-          startingIndex: startingIndex,
-        ),
+    if (supersetIndex == null) {
+      final ex = exercises[exerciseIndex];
+      // Type safety
+      exercises[exerciseIndex] = ex is Exercise
+          ? ex.copyWith(notes: notes)
+          : ex is Superset
+          ? ex.copyWith(notes: notes)
+          : throw AssertionError("Unreachable yet");
+    } else {
+      final superset = exercises[supersetIndex] as Superset;
+      exercises[supersetIndex] = superset.copyWith(
+        exercises: [
+          for (int j = 0; j < superset.exercises.length; j++)
+            if (j == exerciseIndex)
+              superset.exercises[j].copyWith(notes: notes)
+            else
+              superset.exercises[j],
+        ],
       );
+    }
 
-      if (indices == null || indices.length < 2) return;
-
-      final newSuperset = Superset(
-        restTime: Duration.zero,
-        workoutID: null,
-        exercises: [for (final index in indices) exercises[index] as Exercise],
-      );
-
-      final newExercises = [
-        for (int i = 0; i < indices.first; i++) exercises[i],
-        newSuperset,
-        for (int i = indices.last + 1; i < exercises.length; i++) exercises[i],
-      ];
-
-      exercises(newExercises);
-      exercises.refresh();
-      save();
-    },
-  );
+    publishExercises();
+    save();
+  }
 
   List<GTSet> get allSets => [for (final ex in exercises) ...ex.sets];
   List<GTSet> get doneSets => [
@@ -661,43 +707,6 @@ class WorkoutController extends GetxController with ServiceableController {
     (value, element) => value + (element.weight ?? 0) * (element.reps ?? 1),
   );
 
-  @override
-  void onInit() {
-    super.onInit();
-    _inputSaveLifecycle = AppLifecycleListener(
-      onStateChange: (state) {
-        if (state != AppLifecycleState.resumed && _pendingInputSave != null) {
-          save();
-        }
-      },
-    );
-    SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
-      if (isClosed || ownerId != service.db.currentUserId) return;
-      Get.find<RoutinesController>().hasOngoingWorkout(true);
-      NativeService.instance().setIsWorkoutRunning(true);
-      save();
-
-      refreshWatchData();
-    });
-  }
-
-  @override
-  void onClose() {
-    _pendingInputSave?.cancel();
-    _inputSaveLifecycle?.dispose();
-    super.onClose();
-    removeCountdown();
-    removeRelevantStopwatches();
-    if (!preserveOngoingOnClose) {
-      unawaited(service.db.deleteOngoingForUser(ownerId));
-    }
-    SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
-      if (Get.isRegistered<WorkoutController>()) return;
-      Get.find<RoutinesController>().hasOngoingWorkout(false);
-      NativeService.instance().setIsWorkoutRunning(false);
-    });
-  }
-
   /// Writes the ongoing workout to the database so that we can restore it on app restart.
   void save() => unawaited(persist());
 
@@ -705,84 +714,35 @@ class WorkoutController extends GetxController with ServiceableController {
     _pendingInputSave?.cancel();
     _pendingInputSave = null;
     if (isClosed || ownerId != service.db.currentUserId) return;
-    // TODO: Figure out if this is still necessary
-    if (!force && Get.find<RoutinesController>().hasOngoingWorkout.isFalse) {
-      logger.d(
-        "Not saving ongoing workout because there is no ongoing workout",
-      );
-      return;
-    }
-    final stopwatchController = Get.find<StopwatchController>();
+    final stopwatchController = ref.read(stopwatchControllerProvider.notifier);
 
     await service.writeToOngoing({
-      "name": name.value,
+      "name": name,
       "exercises": exercises.map((ex) => ex.toJson()).toList(),
-      "parentID": parentID.value,
-      "time": time.value.millisecondsSinceEpoch,
-      "infobox": infobox.value,
-      "isContinuation": isContinuation.value,
-      "continuesID": continuesID.value,
-      "weightUnit": weightUnit.value.name,
-      "distanceUnit": distanceUnit.value.name,
+      "parentID": parentID,
+      "time": time.millisecondsSinceEpoch,
+      "infobox": infobox,
+      "isContinuation": isContinuation,
+      "continuesID": continuesID,
+      "weightUnit": weightUnit.name,
+      "distanceUnit": distanceUnit.name,
       if (stopwatchController.globalStopwatch.currentDuration.inSeconds >
           0) ...{
         "globalStopwatch": stopwatchController
             .globalStopwatch
             .startingTime
             .millisecondsSinceEpoch,
-        "globalStopwatchPaused": stopwatchController.globalStopwatch
-            .isStopped(),
+        "globalStopwatchPaused": stopwatchController.globalStopwatch.isStopped,
         "globalStopwatchNominalDuration":
             stopwatchController.globalStopwatch.currentDuration.inMilliseconds,
       },
     });
   }
 
-  void cancelWorkoutWithDialog(
-    BuildContext context, {
-    required void Function() onCanceled,
-  }) {
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          icon: const Icon(GTIcons.info),
-          title: Text(context.t.ongoingWorkout.cancel.title),
-          content: Text(context.t.ongoingWorkout.cancel.text),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Get.back();
-              },
-              child: Text(context.t.ongoingWorkout.cancel.actions.no),
-            ),
-            FilledButton.tonal(
-              onPressed: () async {
-                Get.back();
-                Get.delete<WorkoutController>();
-
-                onCanceled();
-              },
-              child: Text(context.t.ongoingWorkout.cancel.actions.yes),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  void finishWorkoutWithDialog(BuildContext context) {
-    generateNameIfEmpty();
-
-    SchedulerBinding.instance.addPostFrameCallback((_) {
-      Go.showBottomModalScreen((context, _) => const WorkoutFinishPage());
-    });
-  }
-
   void generateNameIfEmpty() {
-    final t = globalContainer.read(translationsProvider);
+    final t = ref.read(translationsProvider);
 
-    if (name.value.trim().isEmpty) {
+    if (name.trim().isEmpty) {
       final groups = <GTMuscleCategory>{};
 
       for (final ex in exercises) {
@@ -799,16 +759,20 @@ class WorkoutController extends GetxController with ServiceableController {
         );
       }
 
-      name(generateWorkoutTitle(t, groups));
+      setName(generateWorkoutTitle(t, groups));
     }
   }
 
-  Future<void> submit(String name, Duration duration) async {
+  Future<Workout> submit(String name, Duration duration) async {
     if (isClosed || ownerId != service.db.currentUserId) {
       throw StateError('Cannot submit a workout belonging to another account');
     }
-    final historyController = Get.find<HistoryController>();
+    final generation = sessionGeneration;
+    final historyController = ref.read(historyControllerProvider);
     await _progressionWrite;
+    if (!isSessionActive(generation)) {
+      throw StateError("Workout session changed during submission");
+    }
 
     removeCountdown();
     removeRelevantStopwatches();
@@ -817,100 +781,30 @@ class WorkoutController extends GetxController with ServiceableController {
       name: name,
       exercises: exercises,
       duration: duration,
-      startingDate: time.value,
-      parentID: parentID.value,
-      infobox: infobox.value,
-      completes: continuesID.value,
-      weightUnit: weightUnit.value,
-      distanceUnit: distanceUnit.value,
+      startingDate: time,
+      parentID: parentID,
+      infobox: infobox,
+      completes: continuesID,
+      weightUnit: weightUnit,
+      distanceUnit: distanceUnit,
     );
 
-    if (isContinuation.isTrue) {
+    if (isContinuation) {
       historyController.bindContinuation(continuation: workout);
     }
 
     workout.logger.i("Submitting workout");
     await historyController.addNewWorkout(workout);
-    Get.back();
-    SchedulerBinding.instance.addPostFrameCallback((timeStamp) async {
-      Get.back();
-      Get.delete<WorkoutController>();
-      await askToUpdateRoutine(workout);
-      await Get.find<RoutinesController>().advanceProgressionsFromWorkout(
-        workout,
-      );
-
-      if (workout.doneSets.isNotEmpty) {
-        await Go.showBottomModalScreen(
-          (context, controller) =>
-              WorkoutDoneSheet(workout: workout, controller: controller),
-        );
-      }
-
-      // Always keep at the very end
-      Get.find<Coordinator>().scheduleBackup();
-    });
-  }
-
-  Future<void> askToUpdateRoutine(Workout workout) async {
-    // if (workout.isContinuation) return;
-    final t = globalContainer.read(translationsProvider);
-    if (workout.isContinuation) {
-      final orig = workout.originalWorkoutForContinuation!;
-      workout = SynthesizedWorkout([
-        orig.copyWith(completedBy: workout.id),
-        workout.copyWith(completes: orig.id),
-      ]);
-    }
-
-    final routinesController = Get.find<RoutinesController>();
-
-    if (workout.parentID != null &&
-        routinesController.hasRoutine(workout.parentID!)) {
-      final routine = routinesController.getRoutine(workout.parentID!);
-      final difference = WorkoutDifference.fromWorkouts(
-        oldWorkout: routine!,
-        newWorkout: workout,
-      );
-      if (!difference.isEmpty) {
-        final confirm = await Go.confirm(
-          t.ongoingWorkout.updateRoutine.differenceTitle,
-          () {
-            String text =
-                "${t.ongoingWorkout.updateRoutine.differenceText}\n\n";
-            if (difference.addedExercises > 0) {
-              text +=
-                  "- ${t.ongoingWorkout.updateRoutine.differences.added(n: difference.addedExercises)}\n";
-            }
-            if (difference.removedExercises > 0) {
-              text +=
-                  "- ${t.ongoingWorkout.updateRoutine.differences.removed(n: difference.removedExercises)}\n";
-            }
-            if (difference.changedExercises > 0) {
-              text +=
-                  "- ${t.ongoingWorkout.updateRoutine.differences.changed(n: difference.changedExercises)}\n";
-            }
-
-            return text.trim();
-          }(),
-        );
-        if (confirm) {
-          await routinesController.updateRoutineFromWorkout(
-            workout.parentID!,
-            workout,
-          );
-        }
-      }
-    }
+    return workout;
   }
 
   void removeCountdown() {
-    Get.find<CountdownController>().removeCountdown();
+    ref.read(countdownControllerProvider.notifier).removeCountdown();
   }
 
   void removeRelevantStopwatches() {
     final ids = allSets.map((e) => e.id);
-    final controller = Get.find<StopwatchController>();
+    final controller = ref.read(stopwatchControllerProvider.notifier);
 
     for (final id in ids) {
       controller.updateBinding(id, (timer, duration, encoded) {
@@ -918,9 +812,7 @@ class WorkoutController extends GetxController with ServiceableController {
       });
     }
 
-    SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
-      controller.removeStopwatches(ids);
-    });
+    controller.removeStopwatches(ids);
 
     // Stop the global stopwatch
     controller.globalStopwatch.reset();
@@ -968,95 +860,7 @@ class WorkoutController extends GetxController with ServiceableController {
       );
     }
 
-    exercises(res);
-  }
-
-  Future<void> pickExercises() async {
-    final exs = await Go.to<List<Exercise>>(
-      () => const ExercisePicker(singlePick: false),
-    );
-    if (exs == null || exs.isEmpty) return;
-    exercises.addAll(
-      exs
-          .map(
-            (ex) => ex.makeChild().copyWith.sets([
-              if (!ex.parameters.isSetless)
-                GTSet.empty(kind: GTSetKind.normal, parameters: ex.parameters),
-            ]),
-          )
-          .toList(),
-    );
-    exercises.refresh();
-    save();
-  }
-
-  Future<void> pickExercisesForSuperset(int i) async {
-    final exs = await Go.to<List<Exercise>>(
-      () => const ExercisePicker(singlePick: false),
-    );
-    if (exs == null || exs.isEmpty) return;
-
-    final superset = exercises[i] as Superset;
-    exercises[i] = superset.copyWith(
-      exercises: [
-        ...superset.exercises,
-        ...exs.map(
-          (ex) => ex.makeChild().copyWith.sets([
-            if (!ex.parameters.isSetless)
-              GTSet.empty(kind: GTSetKind.normal, parameters: ex.parameters),
-          ]),
-        ),
-      ],
-    );
-
-    exercises.refresh();
-    save();
-  }
-
-  void showEditNotesDialog() {
-    final controller = quillControllerFromText(infobox.value);
-    Go.toDialog(
-      () => GTRichTextEditDialog(
-        controller: controller,
-        onNotesChange: (text) {
-          infobox(text);
-          save();
-          Get.back();
-        },
-      ),
-    );
-  }
-
-  void changeWeightUnitDialog() {
-    Go.showRadioModal(
-      selectedValue: weightUnit.value,
-      title: Text(t.ongoingWorkout.actions.changeWeightUnit),
-      values: {
-        for (final val in Weights.values)
-          val: t.weightUnits[val.name] ?? "UNKNOWN",
-      },
-      onChange: (value) {
-        logger.w("Changing weight unit to $value");
-        if (value != null) weightUnit(value);
-        save();
-      },
-    );
-  }
-
-  void changeDistanceUnitDialog() {
-    Go.showRadioModal(
-      selectedValue: distanceUnit.value,
-      title: Text(t.ongoingWorkout.actions.changeDistanceUnit),
-      values: {
-        for (final distance in Distance.values)
-          distance: t.distanceUnits[distance.name] ?? "UNKNOWN",
-      },
-      onChange: (value) {
-        logger.i("Changing distance unit to $value");
-        if (value != null) distanceUnit(value);
-        save();
-      },
-    );
+    setExercises(res);
   }
 
   void applyExistingWorkout(
@@ -1068,8 +872,8 @@ class WorkoutController extends GetxController with ServiceableController {
     required bool shouldKeepRPEs,
   }) {
     this
-      ..name(workout.name)
-      ..exercises([
+      ..setName(workout.name)
+      ..setExercises([
         for (final ex in workout.exercises)
           if (exerciseFilter(ex))
             if (ex is Exercise)
@@ -1093,106 +897,35 @@ class WorkoutController extends GetxController with ServiceableController {
                     .toList(),
               ),
       ])
-      ..time(DateTime.now())
-      ..parentID(parentID)
-      ..infobox(workout.infobox)
-      ..isContinuation(continuation)
-      ..continuesID(continuation ? workout.id : null)
-      ..weightUnit(workout.weightUnit)
-      ..distanceUnit(workout.distanceUnit)
+      ..setTime(ref.read(workoutClockProvider).now())
+      ..setParentID(parentID)
+      ..setInfobox(workout.infobox)
+      ..setIsContinuation(continuation)
+      ..setContinuesID(continuation ? workout.id : null)
+      ..setWeightUnit(workout.weightUnit)
+      ..setDistanceUnit(workout.distanceUnit)
       ..save();
-  }
-
-  @override
-  void onServiceChange() {}
-
-  void onNotificationTapped(NotificationResponse value) {
-    logger.t((value.id, NotificationIDs.restTimer));
-    if (value.id == NotificationIDs.restTimer) {
-      logger.t((Go.getTopmostRouteName(), WorkoutView.routeName));
-      if (!isWorkoutRouteName(Go.getTopmostRouteName())) {
-        Go.toNamed(getPreferredWorkoutRouteName());
-      }
-    }
   }
 
   /// Helper method used in debug mode to show "Good job" dialog while workout
   /// is running
   Workout synthesizeTemporaryWorkout() {
     return Workout(
-      name: name.value,
+      name: name,
       exercises: exercises,
-      duration: DateTime.now().difference(time.value),
-      startingDate: time.value,
-      parentID: parentID.value,
-      infobox: infobox.value,
-      weightUnit: weightUnit.value,
-      distanceUnit: distanceUnit.value,
+      duration: ref.read(workoutClockProvider).now().difference(time),
+      startingDate: time,
+      parentID: parentID,
+      infobox: infobox,
+      weightUnit: weightUnit,
+      distanceUnit: distanceUnit,
       completedBy: null,
-      completes: continuesID.value,
+      completes: continuesID,
       folder: null,
     );
   }
 
-  void generateWorkout() async {
-    if (this.exercises.isNotEmpty) {
-      return;
-    }
-
-    final _res = await Go.toDialog<(Set<GTMuscleGroup>, Set<GTGymEquipment>)>(
-      () => const WorkoutGeneratorSetupScreen(),
-    );
-    if (_res == null) return;
-
-    final (muscleGroups, equipment) = _res;
-    final exercises = _workoutGenerator(
-      muscleGroups: muscleGroups,
-      equipment: equipment,
-    );
-
-    if (exercises.isEmpty) {
-      Go.dialog("workoutGenerator.empty.title", "workoutGenerator.empty.text");
-      return;
-    }
-
-    this.exercises.addAll(exercises);
-    this.exercises.refresh();
-
-    final context = Get.context;
-    final onThemedColor = context == null
-            ? null
-            : getOnThemedColor(context, GTColors.ai),
-        themedColor = context == null
-            ? null
-            : getThemedColor(context, GTColors.ai),
-        containerColor = context == null
-            ? null
-            : getContainerColor(context, GTColors.ai),
-        onContainerColor = context == null
-            ? null
-            : getOnContainerColor(context, GTColors.ai);
-
-    Go.snack(
-      ListTile(
-        leading: const Icon(GTIcons.generate),
-        title: Text(t.workoutGenerator.success.title),
-        textColor: onContainerColor,
-        iconColor: onContainerColor,
-      ),
-      backgroundColor: containerColor,
-      action: SnackBarAction(
-        label: t.workoutGenerator.success.undo,
-        backgroundColor: themedColor,
-        textColor: onThemedColor,
-        onPressed: () {
-          this.exercises([]);
-        },
-      ),
-      duration: const Duration(milliseconds: 2250) * exercises.length,
-    );
-  }
-
-  List<WorkoutExercisable> _workoutGenerator({
+  List<WorkoutExercisable> generateWorkoutExercises({
     required Set<GTMuscleGroup> muscleGroups,
     required Set<GTGymEquipment> equipment,
   }) {
@@ -1253,11 +986,11 @@ class WorkoutController extends GetxController with ServiceableController {
 
   WorkoutSetCursor? get currentSetCursor {
     _syncSetCursorWithWorkout();
-    return _setCursor.value;
+    return _setCursor;
   }
 
   WorkoutSetCursor? get previousSetCursor {
-    final cursor = _previousSetCursor.value;
+    final cursor = _previousSetCursor;
     if (cursor == null) return null;
     if (!_isCursorValid(cursor)) return null;
     return cursor;
@@ -1287,8 +1020,8 @@ class WorkoutController extends GetxController with ServiceableController {
     for (int i = position + 1; i < ordered.length; i++) {
       final candidate = ordered[i];
       if (!_setForCursor(candidate).done) {
-        _previousSetCursor.value = cursor;
-        _setCursor.value = candidate;
+        _previousSetCursor = cursor;
+        _setCursor = candidate;
         refreshWatchData();
         return true;
       }
@@ -1312,8 +1045,8 @@ class WorkoutController extends GetxController with ServiceableController {
     for (int i = position - 1; i >= 0; i--) {
       final candidate = ordered[i];
       if (!_setForCursor(candidate).done) {
-        _previousSetCursor.value = cursor;
-        _setCursor.value = candidate;
+        _previousSetCursor = cursor;
+        _setCursor = candidate;
         refreshWatchData();
         return true;
       }
@@ -1326,8 +1059,8 @@ class WorkoutController extends GetxController with ServiceableController {
     final cursor = _firstUndoneCursor();
     if (cursor == null) return false;
 
-    _previousSetCursor.value = _setCursor.value;
-    _setCursor.value = cursor;
+    _previousSetCursor = _setCursor;
+    _setCursor = cursor;
     refreshWatchData();
     return true;
   }
@@ -1337,8 +1070,8 @@ class WorkoutController extends GetxController with ServiceableController {
     for (int i = ordered.length - 1; i >= 0; i--) {
       final candidate = ordered[i];
       if (!_setForCursor(candidate).done) {
-        _previousSetCursor.value = _setCursor.value;
-        _setCursor.value = candidate;
+        _previousSetCursor = _setCursor;
+        _setCursor = candidate;
         refreshWatchData();
         return true;
       }
@@ -1352,8 +1085,8 @@ class WorkoutController extends GetxController with ServiceableController {
       return false;
     }
 
-    _previousSetCursor.value = _setCursor.value;
-    _setCursor.value = cursor;
+    _previousSetCursor = _setCursor;
+    _setCursor = cursor;
     refreshWatchData();
     return true;
   }
@@ -1409,13 +1142,13 @@ class WorkoutController extends GetxController with ServiceableController {
   }
 
   void _syncSetCursorWithWorkout() {
-    final current = _setCursor.value;
+    final current = _setCursor;
     final ordered = _orderedSetCursors;
     final hasUndone = ordered.any((cursor) => !_setForCursor(cursor).done);
 
     if (ordered.isEmpty || !hasUndone) {
-      _previousSetCursor.value = _setCursor.value;
-      _setCursor.value = null;
+      _previousSetCursor = _setCursor;
+      _setCursor = null;
       return;
     }
 
@@ -1423,10 +1156,8 @@ class WorkoutController extends GetxController with ServiceableController {
       return;
     }
 
-    _previousSetCursor.value = _setCursor.value;
-    _setCursor.value = ordered.firstWhere(
-      (cursor) => !_setForCursor(cursor).done,
-    );
+    _previousSetCursor = _setCursor;
+    _setCursor = ordered.firstWhere((cursor) => !_setForCursor(cursor).done);
   }
 
   bool _isCursorSelectable(WorkoutSetCursor cursor) {
@@ -1615,9 +1346,11 @@ class WorkoutController extends GetxController with ServiceableController {
       final superset = supersetIndex == null
           ? null
           : (exercises[supersetIndex] as Superset);
-      Get.find<CountdownController>().setCountdown(
-        supersetIndex == null ? exercise.restTime : superset!.restTime,
-      );
+      ref
+          .read(countdownControllerProvider.notifier)
+          .setCountdown(
+            supersetIndex == null ? exercise.restTime : superset!.restTime,
+          );
 
       return;
     }
@@ -1680,9 +1413,11 @@ class WorkoutController extends GetxController with ServiceableController {
       // and:
       //  - The next set is not a stripping set
       if (shouldStart) {
-        Get.find<CountdownController>().setCountdown(
-          supersetIndex == null ? exercise.restTime : superset!.restTime,
-        );
+        ref
+            .read(countdownControllerProvider.notifier)
+            .setCountdown(
+              supersetIndex == null ? exercise.restTime : superset!.restTime,
+            );
       } else {
         logger.i(
           """
@@ -1704,12 +1439,12 @@ and:
     if (done &&
         currentCursor != null &&
         _isSameSetCursor(currentCursor, targetCursor)) {
-      _previousSetCursor.value = currentCursor;
-      _setCursor.value =
+      _previousSetCursor = currentCursor;
+      _setCursor =
           _firstUndoneCursorAfter(currentCursor) ?? _firstUndoneCursor();
     }
 
-    exercises.refresh();
+    publishExercises();
     refreshWatchData();
     save();
   }
@@ -1728,23 +1463,35 @@ and:
     );
   }
 
-  void refreshWatchData() {
+  Color? nativePrimaryColor;
+
+  void refreshWatchData({Color? primaryColor}) {
+    nativePrimaryColor = primaryColor ?? nativePrimaryColor;
     if (isClosed || ownerId != service.db.currentUserId) return;
-    final t = globalContainer.read(translationsProvider);
-    final ctdctrl = Get.find<CountdownController>();
-    final startingTime = ctdctrl.startingTime.value;
-    final endingTime = ctdctrl.targetTime.value;
+    if (state?.cursor != _setCursor ||
+        state?.previousCursor != _previousSetCursor) {
+      state = WorkoutState(
+        workout: synthesizeSnapshot(),
+        ownerId: ownerId,
+        cursor: _setCursor,
+        previousCursor: _previousSetCursor,
+      );
+    }
+    final t = ref.read(translationsProvider);
+    final ctdctrl = ref.read(countdownControllerProvider.notifier);
+    final startingTime = ctdctrl.startingTime;
+    final endingTime = ctdctrl.targetTime;
 
     final cursor = currentSetCursor;
     NativeWorkoutStateMessage message;
 
-    final settingsController = Get.find<SettingsController>();
+    final settingsController = ref.read(settingsControllerProvider);
     // This is going to be null if the user has enabled tinting,
     // so that we can use the null-aware operator to fall back to the exercise
     // color
-    final theme = settingsController.tintExercises.value
+    final theme = settingsController.tintExercises
         ? null
-        : settingsController.color.value;
+        : settingsController.color;
 
     if (cursor != null) {
       final (exerciseIndex: exerciseIndex, supersetIndex: supersetIndex) = (
@@ -1759,9 +1506,9 @@ and:
           theme ??
           (exercise.standard && exercise.category != null
               ? exerciseStandardLibrary[exercise.category]?.color ??
-                    Get.context?.theme.colorScheme.primary ??
+                    nativePrimaryColor ??
                     Colors.red
-              : Get.context?.theme.colorScheme.primary ?? Colors.red);
+              : nativePrimaryColor ?? Colors.red);
       final set = exercise.sets[cursor.setIndex];
       final setTypeLabel = _setTypeLabelForWatch(set, exercise.sets);
 
@@ -1771,11 +1518,13 @@ and:
         exerciseColor: color,
         exerciseParameters: set.getHumanReadableDescription(
           t: t,
-          weightUnit: weightUnit.value,
-          distanceUnit: distanceUnit.value,
+          weightUnit: weightUnit,
+          distanceUnit: distanceUnit,
+          targetWeightUnit: settingsController.weightUnit,
+          targetDistanceUnit: settingsController.distanceUnit,
         ),
         setTypeLabel: setTypeLabel,
-        startingTime: time.value,
+        startingTime: time,
         restTimeStart: startingTime,
         restTimeEnd: endingTime,
         percentageDone: progress,
@@ -1788,7 +1537,7 @@ and:
         exerciseColor: Colors.transparent,
         exerciseParameters: "",
         setTypeLabel: "",
-        startingTime: time.value,
+        startingTime: time,
         restTimeStart: startingTime,
         restTimeEnd: endingTime,
         percentageDone: progress,
@@ -1799,7 +1548,7 @@ and:
     // TODO: Figure out why this was needed
     // SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
     // });
-    NativeService.instance().setExerciseParameters(message);
+    ref.read(nativeServiceProvider).setExerciseParameters(message);
   }
 
   void addSuperset() {
@@ -1865,7 +1614,7 @@ and:
       );
     }
 
-    exercises.refresh();
+    publishExercises();
     refreshWatchData();
     save();
   }

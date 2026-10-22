@@ -1,13 +1,11 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-import 'package:gymtracker/main.dart';
-import 'package:gymtracker/provider/locale.dart';
 import 'package:gymtracker/service/logger.dart';
-import 'package:gymtracker/utils/go.dart';
-import 'package:gymtracker/utils/utils.dart';
 import 'package:logging/logging.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:rxdart/rxdart.dart';
+
+part 'logger_controller.g.dart';
 
 class Log {
   final dynamic message;
@@ -83,7 +81,20 @@ const availableLevels = [
   Level.SHOUT,
 ];
 
-class LoggerController extends GetxController {
+typedef LogSnapshot = ({List<Log> logs, Level level});
+
+class LoggerController {
+  LoggerController();
+  bool _disposed = false;
+  LogSnapshot get snapshot =>
+      (logs: List.unmodifiable(filteredLogs), level: level);
+  Stream<LogSnapshot> get snapshots =>
+      onLogsUpdated.map((_) => snapshot).startWith(snapshot);
+  Future<void> dispose() async {
+    _disposed = true;
+    await _onLogsUpdatedSubject.close();
+  }
+
   // Whether to show the logger pane in the bottom nav bar
   static const shouldShowPane =
       kDebugMode || bool.hasEnvironment('SHOW_LOGGER_PANE');
@@ -94,7 +105,13 @@ class LoggerController extends GetxController {
 
   final List<Log> logs = [];
 
-  Level level = kDebugMode ? Level.FINE : Level.INFO;
+  Level _level = kDebugMode ? Level.FINE : Level.INFO;
+  Level get level => _level;
+  set level(Level value) {
+    if (_disposed) return;
+    _level = value;
+    _onLogsUpdatedSubject.add(null);
+  }
 
   List<Log> get filteredLogs {
     return logs.where((log) => log.level.value >= level.value).toList();
@@ -114,64 +131,17 @@ class LoggerController extends GetxController {
   }
 
   void addLog(Log log) {
+    if (_disposed) return;
     logs.add(log);
     if (logs.length > keptLogs) {
       logs.removeRange(0, logs.length - keptLogs);
     }
     _onLogsUpdatedSubject.add(null);
-    update();
-  }
-
-  void showLevelRadioModal() {
-    final t = globalContainer.read(translationsProvider);
-    Go.showRadioModal(
-      selectedValue: level,
-      values: {
-        for (final lvl in availableLevels)
-          lvl:
-              t.settings.advanced.options.logs.levels[lvl.translationKey] ??
-              "UNKNOWN",
-      },
-      title: Text(t.settings.advanced.options.logs.level),
-      onChange: (newLevel) {
-        if (newLevel == null) return;
-        level = newLevel;
-        _onLogsUpdatedSubject.add(null);
-        update();
-      },
-    );
   }
 
   void clearLogs() {
     logs.clear();
     _onLogsUpdatedSubject.add(null);
-    update();
-  }
-
-  void shareLogs() {
-    final logs = filteredLogs;
-    if (logs.isEmpty) return;
-
-    final maxLevelLength = logs
-        .map((log) => log.level.displayName.length)
-        .reduce((value, element) => value > element ? value : element);
-    final logsString = logs
-        .map((log) {
-          final timestamp = log.timestamp.toIso8601String();
-          final level = log.level.displayName.toUpperCase();
-          final message = log.message;
-          final loggerName = log.loggerName;
-          final error = log.error;
-          final stackTrace = log.stackTrace;
-          final errorString = "${error ?? ""}\n\n${stackTrace ?? ""}".trim();
-          final firstLine = "${" " * (maxLevelLength - level.length)}[$level] ";
-          return "$firstLine$timestamp $loggerName\n${" " * firstLine.length}$message\n\n$errorString"
-              .trimRight();
-        })
-        .join('\n\n${"=" * (maxLevelLength + 2)}\n\n');
-
-    if (logsString.isEmpty) return;
-    shareText(logsString);
   }
 
   void dumpAllLevels() {
@@ -197,3 +167,16 @@ class LoggerController extends GetxController {
         .trimRight();
   }
 }
+
+@Riverpod(keepAlive: true)
+LoggerController loggerControllerInstance(Ref ref) {
+  final controller = LoggerController();
+  final subscription = Logger.root.onRecord.listen(controller.addLogFromRecord);
+  ref.onDispose(subscription.cancel);
+  ref.onDispose(controller.dispose);
+  return controller;
+}
+
+@riverpod
+Stream<LogSnapshot> logSnapshot(Ref ref) =>
+    ref.watch(loggerControllerInstanceProvider).snapshots;

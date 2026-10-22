@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:get/get.dart';
 import 'package:gymtracker/controller/settings_controller.dart';
 import 'package:gymtracker/controller/workout_controller.dart';
 import 'package:gymtracker/data/distance.dart';
@@ -12,7 +11,8 @@ import 'package:gymtracker/view/workout.dart';
 
 import '../utils.dart';
 
-WorkoutController get workoutController => Get.find<WorkoutController>();
+WorkoutController get workoutController =>
+    integrationContainer.read(workoutControllerProvider.notifier);
 
 Future<void> testDefaultUnitsFlow(
   WidgetTester tester,
@@ -31,8 +31,8 @@ Future<void> testDefaultUnitsFlow(
   expect(find.byType(WorkoutView), findsOneWidget);
 
   // Check that the default units are set to kilograms and kilometers
-  expect(workoutController.weightUnit.value, Weights.kg);
-  expect(workoutController.distanceUnit.value, Distance.km);
+  expect(workoutController.weightUnit, Weights.kg);
+  expect(workoutController.distanceUnit, Distance.km);
 
   // Discard the workout
   await tester.tap(find.byKey(const Key("main-menu")));
@@ -48,8 +48,9 @@ Future<void> testDefaultUnitsFlow(
   // Go to the settings and change the units
   await tester.tap(
     find.descendant(
-        of: find.byType(NavigationDrawerDestination),
-        matching: find.byIcon(GTIcons.settings)),
+      of: find.byType(NavigationDrawerDestination),
+      matching: find.byIcon(GTIcons.settings),
+    ),
   );
   await tester.pumpAndSettle();
 
@@ -69,19 +70,18 @@ Future<void> testDefaultUnitsFlow(
   await tester.tap(find.text("OK"));
   await tester.pumpAndSettle();
 
-  final settingsController = Get.find<SettingsController>();
+  final settingsController = integrationContainer.read(
+    settingsControllerProvider,
+  );
 
   // Check that the units have changed
-  expect(settingsController.weightUnit.value, Weights.lb);
-  expect(settingsController.distanceUnit.value, Distance.mi);
+  expect(settingsController.weightUnit, Weights.lb);
+  expect(settingsController.distanceUnit, Distance.mi);
 
-  // Go back
-  await tester.tap(
-    find.descendant(
-        of: find.byType(NavigationDrawerDestination),
-        matching: find.byIcon(GTIcons.routines)),
-  );
+  // Return from settings before selecting the main section.
+  await tester.tap(find.byType(BackButton).hitTestable().first);
   await tester.pumpAndSettle();
+  await openMainSection(tester, GTIcons.muscle);
 
   // Start another workout and check that the units have changed
   await tester.tap(find.text(t.routines.quickWorkout.title));
@@ -91,8 +91,8 @@ Future<void> testDefaultUnitsFlow(
   expect(find.byType(WorkoutView), findsOneWidget);
 
   // Check that the default units are set to kilograms and kilometers
-  expect(workoutController.weightUnit.value, Weights.lb);
-  expect(workoutController.distanceUnit.value, Distance.mi);
+  expect(workoutController.weightUnit, Weights.lb);
+  expect(workoutController.distanceUnit, Distance.mi);
 
   // Cleanup
   await tester.tap(find.byKey(const Key("main-menu")));

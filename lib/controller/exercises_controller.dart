@@ -1,35 +1,55 @@
+import 'package:collection/collection.dart';
 import 'package:fuzzywuzzy/fuzzywuzzy.dart';
-import 'package:get/get.dart' hide Translations;
-import 'package:gymtracker/controller/coordinator.dart';
-import 'package:gymtracker/controller/serviceable_controller.dart';
+import 'package:gymtracker/controller/history_controller.dart';
+import 'package:gymtracker/controller/routines_controller.dart';
 import 'package:gymtracker/controller/workout_controller.dart';
 import 'package:gymtracker/data/exercises.dart';
 import 'package:gymtracker/i18n/strings.g.dart';
 import 'package:gymtracker/model/exercise.dart';
 import 'package:gymtracker/model/set.dart';
-import 'package:gymtracker/model/workout.dart';
-import 'package:gymtracker/service/logger.dart';
-import 'package:gymtracker/utils/go.dart';
-import 'package:gymtracker/view/exercise_creator.dart';
-import 'package:rxdart/rxdart.dart';
+import 'package:gymtracker/provider/training_data.dart';
+import 'package:gymtracker/service/database.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-class ExercisesController extends GetxController with ServiceableController {
-  RxList<Exercise> exercises = <Exercise>[].obs;
-  BehaviorSubject<List<Exercise>> exercises$ =
-      BehaviorSubject<List<Exercise>>.seeded([]);
+part 'exercises_controller.g.dart';
 
-  @override
-  onInit() {
-    super.onInit();
-    service.exercises$.listen((event) {
-      logger.i("Updated with ${event.length} exercises");
-      exercises(event);
-      exercises$.add(event);
-    });
+@Riverpod(keepAlive: true)
+ExercisesController exercisesController(Ref ref) {
+  ref.listen(customExercisesProvider, (_, _) {});
+  return ExercisesController(ref);
+}
+
+class ExercisesController {
+  ExercisesController(this.ref);
+  final Ref ref;
+  DatabaseService get service => ref.read(databaseServiceProvider);
+  List<Exercise> get exercises =>
+      ref.read(customExercisesProvider).value ?? const [];
+  Stream<List<Exercise>> get exercises$ => service.exercises$;
+  bool hasExerciseInUse(Exercise exercise) =>
+      ref.read(routinesControllerProvider).hasExercise(exercise) ||
+      ref.read(historyControllerProvider).hasExercise(exercise) ||
+      (ref.read(workoutControllerProvider) != null &&
+          ref.read(workoutControllerProvider.notifier).hasExercise(exercise));
+  Future<void> applyExerciseModification(Exercise exercise) async {
+    final owner = service.db.currentUserId;
+    final routines = ref.read(routinesControllerProvider);
+    final history = ref.read(historyControllerProvider);
+    if (history.hasExercise(exercise)) {
+      await history.applyExerciseModification(exercise);
+    }
+    if (!ref.mounted || service.db.currentUserId != owner) return;
+    if (routines.hasExercise(exercise)) {
+      await routines.applyExerciseModification(exercise);
+    }
+    if (!ref.mounted || service.db.currentUserId != owner) return;
+    if (ref.read(workoutControllerProvider) != null &&
+        ref.read(workoutControllerProvider.notifier).hasExercise(exercise)) {
+      ref
+          .read(workoutControllerProvider.notifier)
+          .applyExerciseModification(exercise);
+    }
   }
-
-  @override
-  void onServiceChange() {}
 
   bool isNameValid(String name) =>
       !exercises.any((element) => element.name == name);
@@ -73,8 +93,6 @@ class ExercisesController extends GetxController with ServiceableController {
     );
 
     addExercise(exercise);
-
-    Get.back();
   }
 
   void addExercise(Exercise exercise) {
@@ -89,39 +107,6 @@ class ExercisesController extends GetxController with ServiceableController {
     return service.setExercise(exercise);
   }
 
-  Future<Exercise?> editExercise(
-    Exercise exercise,
-    List<(Exercise, int, Workout)> history,
-  ) async {
-    if (Get.isRegistered<WorkoutController>() &&
-        Get.find<WorkoutController>().hasExercise(exercise)) {
-      final shouldOverwrite = await Go.confirm(
-        "exercise.editor.overwriteInWorkout.title",
-        "exercise.editor.overwriteInWorkout.body",
-      );
-      if (!shouldOverwrite) {
-        return null;
-      }
-    }
-    final ex = await Go.showBottomModalScreen<Exercise>(
-      (context, controller) => ExerciseCreator(
-        base: exercise,
-        scrollController: controller,
-        shouldChangeParameters: history.isEmpty,
-      ),
-    );
-    final isInUse = Get.find<Coordinator>().hasExercise(exercise);
-    logger.d(("IS IN USE", isInUse));
-    if (ex != null) {
-      assert(ex.id == exercise.id);
-      await Get.find<ExercisesController>().saveEdit(ex);
-      if (isInUse) {
-        await Get.find<Coordinator>().applyExerciseModification(ex);
-      }
-    }
-    return ex;
-  }
-
   Exercise? getExerciseByID(String id) {
     return exercises.firstWhereOrNull((element) => element.id == id);
   }
@@ -129,6 +114,10 @@ class ExercisesController extends GetxController with ServiceableController {
   void removeWeightFromExercise(Exercise exercise) {
     final newExercise = exercise.copyWith(
       parameters: GTSetParameters.freeBodyReps,
+      sets: [
+        for (final set in exercise.sets)
+          set.copyWith(parameters: GTSetParameters.freeBodyReps),
+      ],
     );
     saveEdit(newExercise);
   }
@@ -143,7 +132,7 @@ class ExercisesController extends GetxController with ServiceableController {
   }
 
   List<Exercise> search(String text, {required Translations t}) {
-    final allExercises = exercises$.value + exerciseStandardLibraryAsList;
+    final allExercises = exercises + exerciseStandardLibraryAsList;
     final results = extractTop<Exercise>(
       query: text,
       choices: allExercises.toList(),
@@ -156,15 +145,11 @@ class ExercisesController extends GetxController with ServiceableController {
 }
 
 extension ExerciseParent on Exercise {
-  ExercisesController get _controller => Get.find<ExercisesController>();
-
-  Exercise? getParent() {
+  Exercise? getParent([Iterable<Exercise> customExercises = const []]) {
     if (parentID == null) return null;
-
-    if (standard) {
-      return getStandardExerciseByID(parentID!);
-    }
-
-    return _controller.getExerciseByID(parentID!);
+    if (standard) return getStandardExerciseByID(parentID!);
+    return customExercises
+        .where((exercise) => exercise.id == parentID)
+        .firstOrNull;
   }
 }

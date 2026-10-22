@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gymtracker/controller/exercises_controller.dart';
 import 'package:gymtracker/controller/history_controller.dart';
 import 'package:gymtracker/controller/workout_controller.dart';
@@ -12,7 +12,7 @@ import 'package:gymtracker/model/set.dart';
 import 'package:gymtracker/struct/editor_callback.dart';
 import 'package:intl/intl.dart';
 
-class ExerciseProgressionPanel extends StatelessWidget {
+class ExerciseProgressionPanel extends ConsumerWidget {
   const ExerciseProgressionPanel({
     required this.exercise,
     required this.weightUnit,
@@ -31,17 +31,17 @@ class ExerciseProgressionPanel extends StatelessWidget {
   final bool isCreating;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     if (exercise.parameters.isSetless ||
         (isCreating && !exercise.parameters.hasReps)) {
       return const SizedBox.shrink();
     }
     final hasActiveWorkout =
-        Get.isRegistered<WorkoutController>() && !isCreating;
+        (ref.watch(workoutControllerProvider) != null) && !isCreating;
     final routineID = isCreating
         ? exercise.workoutID
         : hasActiveWorkout
-        ? Get.find<WorkoutController>().parentID.value
+        ? ref.read(workoutControllerProvider.notifier).parentID
         : null;
     final progression = hasActiveWorkout && routineID == null
         ? null
@@ -49,8 +49,17 @@ class ExerciseProgressionPanel extends StatelessWidget {
     final canConfigure =
         callbacks.onExerciseProgressionChange != null &&
         (!hasActiveWorkout || isCreating || routineID != null);
-    final history = Get.find<HistoryController>()
-        .getHistoryOf(exercise.getParent() ?? exercise)
+    final history = ProviderScope.containerOf(context, listen: false)
+        .read(historyControllerProvider)
+        .getHistoryOf(
+          exercise.getParent(
+                ProviderScope.containerOf(
+                  context,
+                  listen: false,
+                ).read(exercisesControllerProvider).exercises,
+              ) ??
+              exercise,
+        )
         .where((entry) => routineID == null || entry.$3.parentID == routineID)
         .toList();
     final previous = history
@@ -201,8 +210,17 @@ class _ProgressionDialogState extends State<_ProgressionDialog> {
         .firstOrNull
         ?.weight;
     if (planned != null) return planned;
-    final previous = Get.find<HistoryController>()
-        .getHistoryOf(widget.exercise.getParent() ?? widget.exercise)
+    final previous = ProviderScope.containerOf(context, listen: false)
+        .read(historyControllerProvider)
+        .getHistoryOf(
+          widget.exercise.getParent(
+                ProviderScope.containerOf(
+                  context,
+                  listen: false,
+                ).read(exercisesControllerProvider).exercises,
+              ) ??
+              widget.exercise,
+        )
         .where(
           (entry) => entry.$1.doneSets.any(
             (set) => set.kind == GTSetKind.normal && (set.weight ?? 0) > 0,

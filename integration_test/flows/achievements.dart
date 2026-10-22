@@ -1,10 +1,7 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:get/get.dart';
 import 'package:gymtracker/controller/achievements_controller.dart';
 import 'package:gymtracker/data/achievements.dart';
 import 'package:gymtracker/i18n/strings.g.dart';
-import 'package:gymtracker/icons/gymtracker_icons.dart';
 import 'package:gymtracker/model/achievements.dart';
 import 'package:gymtracker/service/database.dart';
 
@@ -17,16 +14,14 @@ Future<void> testAchievementsFlow(
   // Load app widget.
   await awaitApp(tester, databaseService);
 
-  final achievementsController = Get.find<AchievementsController>();
+  final achievementsController = integrationContainer.read(
+    achievementsControllerProvider,
+  );
   final firstSteps = achievements["firstSteps"]!;
   final firstLevel = firstSteps.levels[0]; // Level 1: Workout completion
 
   // 1. Navigate to Achievements tab
-  await tester.tap(
-    find.descendant(
-        of: find.byType(NavigationDrawerDestination),
-        matching: find.byIcon(GTIcons.achievements)),
-  );
+  await openAchievements(tester);
   await tester.pumpAndSettle();
 
   // 2. Verify achievement is initially locked

@@ -119,7 +119,7 @@ final class FoodRelativeDayTextProvider
 }
 
 String _$foodRelativeDayTextHash() =>
-    r'28e8262d32c0bf2c9d1c1d01c5a4ccf2e92d7907';
+    r'164981280348f0935ae489b71524cb960decc4de';
 
 final class FoodRelativeDayTextFamily extends $Family
     with $FunctionalFamilyOverride<String, BuildContext> {
@@ -669,7 +669,7 @@ final class FoodNotifierProvider extends $NotifierProvider<FoodNotifier, void> {
   }
 }
 
-String _$foodNotifierHash() => r'3edff4216a9a4d93648ea40fabe7e56ed0ff3e48';
+String _$foodNotifierHash() => r'c5d25403fd69e637a71d5a8a0e7ce4c21e27c381';
 
 abstract class _$FoodNotifier extends $Notifier<void> {
   void build();
@@ -927,7 +927,7 @@ final class NutritionGoalNotifierProvider
 }
 
 String _$nutritionGoalNotifierHash() =>
-    r'c8e47278ee2d3a1e330a7396e5060f8f1d57c58e';
+    r'46e794eec767d95e0eac99a5e33499adf36b5fb5';
 
 abstract class _$NutritionGoalNotifier extends $Notifier<void> {
   void build();
@@ -1406,7 +1406,7 @@ final class NutritionCategoryNotifierProvider
 }
 
 String _$nutritionCategoryNotifierHash() =>
-    r'6e254030968a73b5ad9a2087a2b0243a351e2474';
+    r'6217ed2faf398bad34dfd5413f327e15b7d8b12e';
 
 abstract class _$NutritionCategoryNotifier extends $Notifier<void> {
   void build();
@@ -1571,7 +1571,7 @@ final class SearchOpenFoodFactsProvider
 }
 
 String _$searchOpenFoodFactsHash() =>
-    r'fb31f249aac50ed210eb80d736f171cec568be8f';
+    r'6560176ee90129833c11cebeccd3ceefe259ba70';
 
 final class SearchOpenFoodFactsFamily extends $Family
     with $FunctionalFamilyOverride<FutureOr<List<VagueFood>>, String> {
@@ -1648,7 +1648,7 @@ final class SearchOpenFoodFactsByBarcodeProvider
 }
 
 String _$searchOpenFoodFactsByBarcodeHash() =>
-    r'6ca2d434eb7a889186a127656692db24904684a2';
+    r'908d745a9b05783c746d592c7618243fa009a2c7';
 
 final class SearchOpenFoodFactsByBarcodeFamily extends $Family
     with $FunctionalFamilyOverride<FutureOr<VagueFood?>, String> {
@@ -1706,4 +1706,4 @@ final class FoodNativeSyncProvider extends $FunctionalProvider<void, void, void>
   }
 }
 
-String _$foodNativeSyncHash() => r'16bbc1db03d0b815094f22c39de262266e6de371';
+String _$foodNativeSyncHash() => r'5213fd850d8e8ff0e33a4cb127bf74b2b304bed0';

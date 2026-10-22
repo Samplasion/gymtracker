@@ -7,18 +7,9 @@ class ShareService {
   factory ShareService() => _instance;
   ShareService._internal();
 
-  void shareImage(
-    Uint8List data, {
-    String name = "image.png",
-  }) {
-    Share.shareXFiles(
-      [
-        XFile.fromData(
-          data,
-          name: name,
-          mimeType: "image/png",
-        ),
-      ],
-    );
+  void shareImage(Uint8List data, {String name = "image.png"}) {
+    Share.shareXFiles([
+      XFile.fromData(data, name: name, mimeType: "image/png"),
+    ]);
   }
 }

@@ -1,45 +1,64 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/scheduler.dart';
-import 'package:get/get.dart';
+import 'package:gymtracker/service/error_reporter.dart';
 import 'package:gymtracker/service/logger.dart';
 import 'package:gymtracker/service/test.dart';
 import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/view/error.dart';
-import 'package:sentry_flutter/sentry_flutter.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-class ErrorController extends GetxController {
+part 'error_controller.g.dart';
+
+class ErrorController {
+  ErrorController({ErrorReporter? reporter})
+    : _reporter = reporter ?? ErrorReporter();
+  final ErrorReporter _reporter;
+  FlutterExceptionHandler? _previousFlutter;
+  bool Function(Object, StackTrace)? _previousPlatform;
+  FlutterExceptionHandler? _flutterHandler;
+  bool Function(Object, StackTrace)? _platformHandler;
+  bool _disposed = false;
+  bool _installed = false;
   int get loggerErrorMethodCount => 24;
 
-  @override
-  void onInit() {
-    super.onInit();
-
-    if (TestService().isTest) return;
-
-    FlutterError.onError = (details) {
+  void initialize({bool? enabled}) {
+    if (_installed || _disposed || !(enabled ?? !TestService().isTest)) return;
+    _installed = true;
+    _previousFlutter = FlutterError.onError;
+    _previousPlatform = PlatformDispatcher.instance.onError;
+    _flutterHandler = (details) {
       FlutterError.presentError(details);
       sendDetails(details);
       // if (kReleaseMode) exit(1);
     };
-    PlatformDispatcher.instance.onError = (error, stack) {
+    _platformHandler = (error, stack) {
       sendError(error, stack);
       return true;
     };
+    FlutterError.onError = _flutterHandler;
+    PlatformDispatcher.instance.onError = _platformHandler;
+  }
+
+  void dispose() {
+    _disposed = true;
+    if (!_installed) return;
+    if (identical(FlutterError.onError, _flutterHandler)) {
+      FlutterError.onError = _previousFlutter;
+    }
+    if (identical(PlatformDispatcher.instance.onError, _platformHandler)) {
+      PlatformDispatcher.instance.onError = _previousPlatform;
+    }
+    _installed = false;
   }
 
   void sendDetails(FlutterErrorDetails details) {
-    Sentry.captureException(
+    if (_disposed) return;
+    _reporter.report(
       details.exception,
-      stackTrace: details.stack,
-      withScope: (scope) {
-        if (details.context != null) {
-          scope.setExtra('context', details.context.toString());
-        }
-        if (details.library != null) {
-          scope.setExtra('library', details.library!);
-        }
-      },
+      details.stack,
+      context: details.context?.toString(),
+      library: details.library,
     );
 
     if (Go.getTopmostRouteName() == ErrorView.routeName) {
@@ -60,6 +79,7 @@ class ErrorController extends GetxController {
     }
 
     SchedulerBinding.instance.addPostFrameCallback((_) {
+      if (_disposed) return;
       Go.toNamed(
         ErrorView.routeName,
         arguments: _generateRouteArguments(details: details),
@@ -68,10 +88,8 @@ class ErrorController extends GetxController {
   }
 
   void sendError(Object error, StackTrace stack) {
-    Sentry.captureException(
-      error,
-      stackTrace: stack,
-    );
+    if (_disposed) return;
+    _reporter.report(error, stack);
     if (Go.getTopmostRouteName() == ErrorView.routeName) {
       logger.w(
         "We are already in ErrorView. Here's the error:",
@@ -87,6 +105,7 @@ class ErrorController extends GetxController {
     }
 
     SchedulerBinding.instance.addPostFrameCallback((_) {
+      if (_disposed) return;
       Go.toNamed(
         ErrorView.routeName,
         arguments: _generateRouteArguments(error: error, stack: stack),
@@ -134,4 +153,14 @@ class ErrorController extends GetxController {
     }
     return false;
   }
+}
+
+@Riverpod(keepAlive: true)
+ErrorController errorController(Ref ref) {
+  final controller = ErrorController(
+    reporter: ref.watch(errorReporterProvider),
+  );
+  controller.initialize();
+  ref.onDispose(controller.dispose);
+  return controller;
 }

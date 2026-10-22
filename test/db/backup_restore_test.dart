@@ -9,10 +9,11 @@ import 'package:gymtracker/repository/foods.dart';
 import 'package:gymtracker/service/database.dart';
 import 'package:gymtracker/struct/date_sequence.dart';
 import 'package:gymtracker/struct/nutrition.dart';
-// ignore: depend_on_referenced_packages
 import 'package:path_provider_platform_interface/path_provider_platform_interface.dart';
 
 import '../sync/support.dart';
+
+// ignore: depend_on_referenced_packages
 
 class _Paths extends PathProviderPlatform {
   _Paths(this.path);
@@ -68,6 +69,7 @@ void main() {
     await service.backups.init();
   });
   tearDown(() async {
+    await service.backups.dispose();
     await source.close();
     await db.close();
     PathProviderPlatform.instance = originalPaths;

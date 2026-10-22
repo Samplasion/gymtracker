@@ -1,22 +1,19 @@
 import 'package:flutter/material.dart';
-import 'package:gymtracker/view/utils/sync_recovery.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:get/get.dart' hide Rx, ContextExtensionss;
-import 'package:gymtracker/controller/coordinator.dart';
-import 'package:gymtracker/i18n/strings.g.dart';
-import 'package:gymtracker/provider/food.dart';
-import 'package:gymtracker/provider/locale.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:gymtracker/controller/health_controller.dart';
 import 'package:gymtracker/controller/notifications_controller.dart';
 import 'package:gymtracker/controller/purchases_controller.dart';
 import 'package:gymtracker/controller/settings_controller.dart';
 import 'package:gymtracker/data/distance.dart';
 import 'package:gymtracker/data/weights.dart';
+import 'package:gymtracker/i18n/strings.g.dart';
 import 'package:gymtracker/icons/gymtracker_icons.dart';
 import 'package:gymtracker/model/preferences.dart';
+import 'package:gymtracker/provider/food.dart';
+import 'package:gymtracker/provider/locale.dart';
 import 'package:gymtracker/provider/online.dart';
+import 'package:gymtracker/provider/settings.dart';
 import 'package:gymtracker/provider/sync_status.dart';
 import 'package:gymtracker/service/color.dart';
 import 'package:gymtracker/service/database.dart';
@@ -24,16 +21,21 @@ import 'package:gymtracker/service/version.dart';
 import 'package:gymtracker/struct/nutrition.dart';
 import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/utils/go.dart';
-import 'package:gymtracker/view/components/controlled.dart';
+import 'package:gymtracker/view/actions/settings.dart';
+import 'package:gymtracker/view/components/health_permission.dart';
 import 'package:gymtracker/view/components/legacy_workout_recovery.dart';
 import 'package:gymtracker/view/components/loading_indicator.dart';
 import 'package:gymtracker/view/components/master_detail.dart';
+import 'package:gymtracker/view/components/notification_permission.dart';
 import 'package:gymtracker/view/onboarding.dart';
 import 'package:gymtracker/view/settings/color.dart';
 import 'package:gymtracker/view/settings/radio.dart';
 import 'package:gymtracker/view/utils/in_app_icon.dart';
+import 'package:gymtracker/view/utils/preference_control.dart';
 import 'package:gymtracker/view/utils/sliver_utils.dart';
+import 'package:gymtracker/view/utils/sync_recovery.dart';
 import 'package:intl/intl.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 part 'settings.advanced.dart';
 part 'settings.appearance.dart';
@@ -48,18 +50,22 @@ class SettingsView extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final account = ref.watch(onlineProvider).value;
     var appVersion = context.t.appInfo.version(
-      version: VersionService().packageInfo.version,
-      build: const String.fromEnvironment(
-        "BUILD",
-        defaultValue: "[NO_VALUE]",
-      ).replaceAll("[NO_VALUE]", VersionService().packageInfo.buildNumber),
+      version: ref.watch(versionServiceProvider).packageInfo.version,
+      build: const String.fromEnvironment("BUILD", defaultValue: "[NO_VALUE]")
+          .replaceAll(
+            "[NO_VALUE]",
+            ref.watch(versionServiceProvider).packageInfo.buildNumber,
+          ),
     );
 
     return StreamBuilder<Object>(
-      stream: Get.find<Coordinator>().showPermissionTilesStream,
+      stream: ref.watch(notificationControllerProvider).showSettingsTileStream,
       initialData: true,
       builder: (context, snapshot) {
-        final showPermissionsTile = snapshot.data == true;
+        final showPermissionsTile =
+            snapshot.data == true ||
+            ref.watch(showFoodPermissionsSettingsTileProvider) ||
+            !(ref.watch(healthPermissionProvider).value ?? true);
 
         return MasterDetailView(
           appBarTitle: Text(context.t.settings.title),
@@ -97,7 +103,7 @@ class SettingsView extends ConsumerWidget {
               Text(context.t.settings.pro.title),
               leading: GTIcons.compound.pro,
               onTap: () {
-                Get.find<PurchasesController>().presentCustomerCenter();
+                ref.read(purchasesControllerProvider).presentCustomerCenter();
               },
             ),
             MasterItem(

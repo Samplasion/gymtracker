@@ -1,3 +1,4 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gymtracker/utils/version_resolver.dart';
 
 class ColorService {
@@ -14,3 +15,5 @@ class ColorService {
     );
   }
 }
+
+final colorServiceProvider = Provider<ColorService>((ref) => ColorService());

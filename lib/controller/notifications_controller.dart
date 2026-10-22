@@ -1,22 +1,31 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:get/get.dart' hide Translations;
 import 'package:gymtracker/i18n/strings.g.dart';
-import 'package:gymtracker/icons/gymtracker_icons.dart';
 import 'package:gymtracker/service/logger.dart';
 import 'package:gymtracker/service/notifications.dart';
 import 'package:gymtracker/utils/constants.dart';
-import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/utils/version_resolver.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:timezone/timezone.dart';
 
-class NotificationController extends GetxController implements Listenable {
-  final NotificationsService service = Get.find();
+part 'notifications_controller.g.dart';
+
+class NotificationController extends ChangeNotifier {
+  NotificationController({
+    required this.service,
+    Future<bool> Function()? queryPermission,
+    Future<bool> Function()? usesExactAlarms,
+  }) : _queryPermission = queryPermission,
+       _usesExactAlarms = usesExactAlarms;
+  final NotificationsService service;
+  final Future<bool> Function()? _queryPermission;
+  final Future<bool> Function()? _usesExactAlarms;
 
   Stream<void> get status => _statusSubject.stream;
   final _statusSubject = BehaviorSubject<void>();
@@ -31,53 +40,18 @@ class NotificationController extends GetxController implements Listenable {
       !hasAndroidScheduleExactAlarmPermission;
 
   final showSettingsTileStream = BehaviorSubject<bool>.seeded(true);
-  Widget get settingsTile {
-    return StreamBuilder(
-      stream: status,
-      builder: (context, __) {
-        final hasPermission = !showSettingsTileStream.value;
-        if (showSettingsTileStream.value == false) {
-          return const SizedBox.shrink();
-        }
-        if (!hasPermission) {
-          return ListTile(
-            leading: const Icon(GTIcons.notification_dialog),
-            title: Text(context.t.settings.options.notifications.label),
-            subtitle: Text(context.t.settings.permissions.tapToRequest),
-            onTap: () {
-              requestPermission();
-            },
-          );
-        }
-        if (shouldShowAndroidExactAlarmPermissionRequest) {
-          return ListTile(
-            leading: const Icon(GTIcons.notification_dialog),
-            title: Text(context.t.settings.options.notifications.label),
-            subtitle: Text(
-              context
-                  .t
-                  .settings
-                  .options
-                  .notifications
-                  .subtitle
-                  .noExactAlarmPermission,
-            ),
-            onTap: () {
-              androidRequestExactAlarmsPermission();
-            },
-          );
-        }
 
-        return const SizedBox.shrink();
-      },
-    );
-  }
+  StreamSubscription<void>? _statusSubscription;
+  bool _disposed = false;
 
   Future<void> initialize() async {
-    usesAndroidExactAlarmPermission = await versionMatches(
-      // Android 14
-      android: VersionRequirement(min: 34),
-    );
+    if (_disposed) return;
+    usesAndroidExactAlarmPermission =
+        await (_usesExactAlarms?.call() ??
+            versionMatches(
+              // Android 14
+              android: VersionRequirement(min: 34),
+            ));
     bool result =
         await service.plugin
             .resolvePlatformSpecificImplementation<
@@ -87,7 +61,7 @@ class NotificationController extends GetxController implements Listenable {
         true;
     hasAndroidScheduleExactAlarmPermission = result;
 
-    status.listen((_) {
+    _statusSubscription ??= status.listen((_) {
       logger.i("NotificationController status changed");
       showSettingsTileStream.add(
         !(hasPermission &&
@@ -107,6 +81,7 @@ class NotificationController extends GetxController implements Listenable {
   }
 
   Future<bool> _getHasPermission() async {
+    if (_queryPermission case final query?) return query();
     // The permission_handler plugin doesn't support macOS
     if (Platform.isMacOS) {
       final perms = await service.plugin
@@ -155,36 +130,14 @@ class NotificationController extends GetxController implements Listenable {
     notifyListeners();
   }
 
-  Future<void> androidRequestExactAlarmsPermission() async {
-    if (!usesAndroidExactAlarmPermission) return;
-    if (!hasPermission) {
-      logger.i(
-        "We don't have notifications permission. "
-        "Don't bother asking for exact alarms.",
-      );
-      return;
-    }
-    if (hasAndroidScheduleExactAlarmPermission) {
-      logger.i("We already have the exact alarms permission.");
-      return;
-    }
-
-    final shouldAsk = await Go.confirm(
-      t.androidRequestExactAlarmsPermission.title,
-      t.androidRequestExactAlarmsPermission.message,
-      icon: const Icon(GTIcons.notification_dialog),
-    );
-
-    if (shouldAsk) {
-      final hasPermissionNow = await service.plugin
-          .resolvePlatformSpecificImplementation<
-            AndroidFlutterLocalNotificationsPlugin
-          >()
-          ?.requestExactAlarmsPermission();
-
-      hasAndroidScheduleExactAlarmPermission = hasPermissionNow ?? false;
-    }
-
+  Future<void> requestExactAlarmsPermission() async {
+    final granted = await service.plugin
+        .resolvePlatformSpecificImplementation<
+          AndroidFlutterLocalNotificationsPlugin
+        >()
+        ?.requestExactAlarmsPermission();
+    if (_disposed) return;
+    hasAndroidScheduleExactAlarmPermission = granted ?? false;
     notifyListeners();
   }
 
@@ -231,7 +184,49 @@ class NotificationController extends GetxController implements Listenable {
     service.plugin.cancel(id: NotificationIDs.restTimer);
   }
 
+  @override
   void notifyListeners() {
+    if (_disposed) return;
     _statusSubject.add(null);
+    super.notifyListeners();
   }
+
+  @override
+  void dispose() {
+    _disposed = true;
+    unawaited(_statusSubscription?.cancel());
+    unawaited(_statusSubject.close());
+    unawaited(showSettingsTileStream.close());
+    super.dispose();
+  }
+}
+
+typedef NotificationPermissions = ({
+  bool hasPermission,
+  bool usesExactAlarm,
+  bool hasExactAlarmPermission,
+  bool showSettingsTile,
+});
+
+@Riverpod(keepAlive: true)
+NotificationController notificationController(Ref ref) {
+  final controller = NotificationController(
+    service: ref.watch(notificationsServiceProvider),
+  );
+  ref.onDispose(controller.dispose);
+  return controller;
+}
+
+@riverpod
+Stream<NotificationPermissions> notificationPermissions(Ref ref) {
+  final controller = ref.watch(notificationControllerProvider);
+  return controller.showSettingsTileStream.map(
+    (show) => (
+      hasPermission: controller.hasPermission,
+      usesExactAlarm: controller.usesAndroidExactAlarmPermission,
+      hasExactAlarmPermission:
+          controller.hasAndroidScheduleExactAlarmPermission,
+      showSettingsTile: show,
+    ),
+  );
 }

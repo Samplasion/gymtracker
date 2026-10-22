@@ -1,12 +1,11 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:online_offline/online_offline.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:rxdart/rxdart.dart';
 
 part 'connectivity.g.dart';
 
-@riverpod
-class NetworkConnectivityNotifier extends StreamNotifier<bool> {
+@Riverpod(keepAlive: true)
+class NetworkConnectivityNotifier extends _$NetworkConnectivityNotifier {
   @override
   Stream<bool> build() {
     final connectionService = ConnectionService(

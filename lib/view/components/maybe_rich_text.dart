@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_quill/flutter_quill.dart';
-import 'package:get/get.dart';
 import 'package:gymtracker/data/rich_text.dart';
 import 'package:gymtracker/utils/extensions.dart';
 
@@ -13,7 +12,7 @@ class MaybeRichText extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final parsed = text.tryParseJson();
-    final textStyle = style ?? context.textTheme.bodyMedium!;
+    final textStyle = style ?? Theme.of(context).textTheme.bodyMedium!;
     if (parsed == null) return Text(text, style: textStyle);
 
     return DefaultTextStyle(

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:gymtracker/gen/colors.gen.dart';
 import 'package:gymtracker/i18n/strings.g.dart';
 import 'package:gymtracker/model/exercise.dart';
+import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/utils/utils.dart';
 import 'package:gymtracker/view/components/equipment_icon.dart';
 import 'package:gymtracker/view/components/themed_subtree.dart';
@@ -101,7 +101,7 @@ class _WorkoutGeneratorSetupScreenState
     }
 
     return () {
-      Get.back(result: (muscleGroups, equipment));
+      Go.back(result: (muscleGroups, equipment));
     };
   }
 }

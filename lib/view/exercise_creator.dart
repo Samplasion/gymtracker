@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gymtracker/controller/exercises_controller.dart';
 import 'package:gymtracker/i18n/strings.g.dart';
 import 'package:gymtracker/icons/gymtracker_icons.dart';
 import 'package:gymtracker/model/exercise.dart';
 import 'package:gymtracker/model/set.dart';
+import 'package:gymtracker/provider/training_data.dart';
 import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/view/components/equipment_icon.dart';
 import 'package:gymtracker/view/utils/input_decoration.dart';
 
-class ExerciseCreator extends StatefulWidget {
+class ExerciseCreator extends ConsumerStatefulWidget {
   final Exercise? base;
   final ScrollController? scrollController;
   final bool shouldChangeParameters;
@@ -22,10 +23,10 @@ class ExerciseCreator extends StatefulWidget {
   });
 
   @override
-  State<ExerciseCreator> createState() => _ExerciseCreatorState();
+  ConsumerState<ExerciseCreator> createState() => _ExerciseCreatorState();
 }
 
-class _ExerciseCreatorState extends State<ExerciseCreator> {
+class _ExerciseCreatorState extends ConsumerState<ExerciseCreator> {
   final formKey = GlobalKey<FormState>();
   late final titleController = TextEditingController(text: widget.base?.name);
 
@@ -39,10 +40,12 @@ class _ExerciseCreatorState extends State<ExerciseCreator> {
       widget.base?.gymEquipment ?? GTGymEquipment.none;
   late bool isSetless = widget.base?.parameters.isSetless ?? false;
 
-  ExercisesController get controller => Get.put(ExercisesController());
+  ExercisesController get controller => ref.read(exercisesControllerProvider);
 
   @override
   Widget build(BuildContext context) {
+    ref.watch(historyWorkoutsProvider);
+    ref.watch(customExercisesProvider);
     final muscleGroups = GTMuscleGroup.values.toList();
     muscleGroups.sort(
       (a, b) =>
@@ -371,8 +374,9 @@ class _ExerciseCreatorState extends State<ExerciseCreator> {
           otherMuscleGroups: otherGroups,
           restTime: Duration.zero,
         );
+        Go.back();
       } else {
-        Get.back(
+        Go.back(
           result: Exercise.replaced(
             from: widget.base!,
             to: Exercise.custom(

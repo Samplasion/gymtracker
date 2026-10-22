@@ -2,9 +2,13 @@ import 'package:drift/native.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_timezone/flutter_timezone.dart';
-import 'package:get/get.dart';
+import 'package:gymtracker/db/database.dart';
 import 'package:gymtracker/i18n/strings.g.dart';
-import 'package:gymtracker/main.dart';
+import 'package:gymtracker/provider/bootstrap.dart';
+import 'package:gymtracker/provider/connectivity.dart';
+import 'package:gymtracker/provider/db.dart';
+import 'package:gymtracker/provider/locale.dart';
+import 'package:gymtracker/provider/routines.dart';
 import 'package:gymtracker/service/color.dart';
 import 'package:gymtracker/service/database.dart';
 import 'package:gymtracker/service/test.dart';
@@ -26,16 +30,39 @@ import 'flows/edit_workout.dart';
 import 'flows/log_weight.dart';
 import 'flows/routine_from_workout.dart';
 import 'flows/workout_from_routine.dart';
+import 'utils.dart';
+
+class _IntegrationConnectivity extends NetworkConnectivityNotifier {
+  @override
+  Stream<bool> build() => Stream.value(true);
+}
 
 void main() async {
-  IntegrationTestWidgetsFlutterBinding.ensureInitialized();
+  IntegrationTestWidgetsFlutterBinding.ensureInitialized().framePolicy =
+      LiveTestWidgetsFlutterBindingFramePolicy.onlyPumps;
   TestService().isTest = true;
-  late DatabaseService databaseService = DatabaseService();
-  await databaseService.ensureInitializedForTests(NativeDatabase.memory(), null);
+  late DatabaseService databaseService;
 
   setUp(() async {
     IntegrationTestWidgetsFlutterBinding.instance.reset();
-    globalContainer = ProviderContainer();
+    databaseService = DatabaseService.withDatabase(
+      GTDatabaseImpl.withQueryExecutor(NativeDatabase.memory()),
+    );
+    await databaseService.ensureInitialized();
+    integrationContainer = ProviderContainer(
+      overrides: [
+        databaseServiceProvider.overrideWithValue(databaseService),
+        appDatabaseProvider.overrideWithValue(databaseService.db),
+        platformLocaleProvider.overrideWithValue(AppLocale.en.flutterLocale),
+        networkConnectivityProvider.overrideWith(_IntegrationConnectivity.new),
+      ],
+    );
+    integrationContainer.listen(routinesStreamProvider, (_, _) {});
+    integrationContainer.listen(foldersStreamProvider, (_, _) {});
+    await Future.wait([
+      integrationContainer.read(routinesStreamProvider.future),
+      integrationContainer.read(foldersStreamProvider.future),
+    ]);
     LocaleSettings.setLocale(AppLocale.en);
     await ColorService().init();
     await VersionService().init();
@@ -47,13 +74,11 @@ void main() async {
   });
 
   tearDown(() async {
-    print("Waiting for asynchronous code to finish");
-    // Is there a better way to wait for all asynchronous code to finish?
-    await Future.delayed(const Duration(seconds: 10));
-
-    print("\n${"=" * 10}\nTearing down the database");
-    await databaseService.teardown();
-    Get.reset();
+    await integrationContainer.read(accountWorkoutLifecycleProvider).suspend();
+    integrationContainer.dispose();
+    databaseService.dispose();
+    await Future<void>.delayed(Duration.zero);
+    await databaseService.db.close();
   });
 
   // TODO: Use localized strings ("".t) in the tests
@@ -78,8 +103,8 @@ void main() async {
       );
       testWidgets(
         'edit exercise while workout is ongoing',
-        (tester) => testEditExerciseWhileWorkoutIsOngoingFlow(
-            tester, databaseService),
+        (tester) =>
+            testEditExerciseWhileWorkoutIsOngoingFlow(tester, databaseService),
       );
     });
     testWidgets(

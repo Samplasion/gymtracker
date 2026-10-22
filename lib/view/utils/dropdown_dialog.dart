@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:gymtracker/i18n/strings.g.dart';
+import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/view/utils/input_decoration.dart';
 
 class DropdownDialog<T> extends StatefulWidget {
@@ -39,13 +39,13 @@ class _DropdownDialogState<T> extends State<DropdownDialog<T>> {
       actions: [
         TextButton(
           onPressed: () {
-            Get.back();
+            Go.back();
           },
           child: Text(context.t.general.dialogs.actions.cancel),
         ),
         FilledButton.tonal(
           onPressed: () {
-            Get.back();
+            Go.back();
             widget.onSelect?.call(item);
           },
           child: Text(context.t.general.dialogs.actions.ok),

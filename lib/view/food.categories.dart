@@ -502,7 +502,7 @@ class FoodCategoryFoodsView extends ConsumerWidget {
     return SearchAnchorPlus(
       suggestionsBuilder: _getSearchSuggestionBuilder(
         ref: ref,
-        closeView: () => Get.back(),
+        closeView: () => Go.back(),
         onFoodTap: (dtfood) {
           showAddFoodView(context, dtfood.value).then((food) async {
             if (food != null && context.mounted) {

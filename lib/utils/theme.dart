@@ -3,9 +3,9 @@ import 'package:dynamic_color/dynamic_color.dart';
 import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:gymtracker/utils/constants.dart';
 import 'package:gymtracker/utils/extensions.dart';
+import 'package:gymtracker/utils/go.dart';
 
 const kDarkBackgroundBase = Color(0xFF000000);
 const kDarkBackgroundLight1 = Color(0xFF111111);
@@ -282,20 +282,20 @@ class MoreColors extends ThemeExtension<MoreColors> {
 
 extension MoreColorsOnColorScheme on ColorScheme {
   Color get quaternary =>
-      Theme.of(Get.context!).extension<MoreColors>()!.quaternary;
+      Theme.of(Go.context!).extension<MoreColors>()!.quaternary;
   Color get onQuaternary =>
-      Theme.of(Get.context!).extension<MoreColors>()!.onQuaternary;
+      Theme.of(Go.context!).extension<MoreColors>()!.onQuaternary;
   Color get quaternaryContainer =>
-      Theme.of(Get.context!).extension<MoreColors>()!.quaternaryContainer;
+      Theme.of(Go.context!).extension<MoreColors>()!.quaternaryContainer;
   Color get onQuaternaryContainer =>
-      Theme.of(Get.context!).extension<MoreColors>()!.onQuaternaryContainer;
-  Color get quinary => Theme.of(Get.context!).extension<MoreColors>()!.quinary;
+      Theme.of(Go.context!).extension<MoreColors>()!.onQuaternaryContainer;
+  Color get quinary => Theme.of(Go.context!).extension<MoreColors>()!.quinary;
   Color get onQuinary =>
-      Theme.of(Get.context!).extension<MoreColors>()!.onQuinary;
+      Theme.of(Go.context!).extension<MoreColors>()!.onQuinary;
   Color get quinaryContainer =>
-      Theme.of(Get.context!).extension<MoreColors>()!.quinaryContainer;
+      Theme.of(Go.context!).extension<MoreColors>()!.quinaryContainer;
   Color get onQuinaryContainer =>
-      Theme.of(Get.context!).extension<MoreColors>()!.onQuinaryContainer;
+      Theme.of(Go.context!).extension<MoreColors>()!.onQuinaryContainer;
 }
 
 class _SharedAxisTransitionBuilder extends PageTransitionsBuilder {

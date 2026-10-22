@@ -1,9 +1,8 @@
-import 'dart:math';
 import 'dart:async';
+import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:get/get.dart';
 import 'package:gymtracker/controller/routines_controller.dart';
 import 'package:gymtracker/i18n/strings.g.dart';
 import 'package:gymtracker/icons/gymtracker_icons.dart';
@@ -87,7 +86,7 @@ class _FeedViewState extends ConsumerState<FeedView>
     final feedNotifier = ref.watch(feedProvider.notifier);
     _feedNotifier = feedNotifier;
     feedNotifier.setVisible(ModalRoute.of(context)?.isCurrent ?? true);
-    final routinesController = Get.find<RoutinesController>();
+    final routinesController = ref.watch(routinesControllerProvider);
     final List<RoutineSuggestion> suggested = routinesController.suggestions
         .take(3)
         .toList();

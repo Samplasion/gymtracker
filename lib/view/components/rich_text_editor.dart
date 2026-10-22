@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_quill/flutter_quill.dart';
-import 'package:get/get.dart';
 import 'package:gymtracker/data/rich_text.dart';
 import 'package:gymtracker/i18n/strings.g.dart';
 import 'package:gymtracker/icons/gymtracker_icons.dart';
@@ -60,14 +59,14 @@ class _GTRichTextEditorState extends State<GTRichTextEditor> {
             controller: widget.controller,
             config: QuillEditorConfig(
               minHeight:
-                  context.textTheme.bodyMedium!.height! *
-                  context.textTheme.bodyMedium!.fontSize! *
+                  Theme.of(context).textTheme.bodyMedium!.height! *
+                  Theme.of(context).textTheme.bodyMedium!.fontSize! *
                   3,
               scrollable: true,
               expands: false,
               onTapOutsideEnabled: true,
               autoFocus: widget.autofocus,
-              keyboardAppearance: context.theme.brightness,
+              keyboardAppearance: Theme.of(context).brightness,
               onTapOutside: (_, __) {
                 widget.onTapOutside?.call();
               },

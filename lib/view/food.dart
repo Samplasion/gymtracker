@@ -11,7 +11,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:gauge_indicator/gauge_indicator.dart';
-import 'package:get/get.dart';
 import 'package:gymtracker/i18n/strings.g.dart';
 import 'package:gymtracker/icons/gymtracker_icons.dart';
 import 'package:gymtracker/provider/food.dart';
@@ -20,7 +19,7 @@ import 'package:gymtracker/struct/date_sequence.dart';
 import 'package:gymtracker/struct/nutrition.dart';
 import 'package:gymtracker/utils/colors.dart';
 import 'package:gymtracker/utils/constants.dart';
-import 'package:gymtracker/utils/extensions.dart' hide ContextThemingUtils;
+import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/utils/skeletons.dart';
 import 'package:gymtracker/utils/utils.dart';
@@ -43,7 +42,6 @@ import 'package:gymtracker/view/utils/speed_dial.dart';
 import 'package:intl/intl.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:relative_time/relative_time.dart';
-import 'package:rxdart/rxdart.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 import 'package:sliver_tools/sliver_tools.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -145,7 +143,7 @@ Future<Food?> searchFoodByBarcode(
     final res = await ref.read(
       searchOpenFoodFactsByBarcodeProvider(barcode).future,
     );
-    if (context.mounted) Get.back();
+    if (context.mounted) Go.back();
 
     if (res != null) {
       if (context.mounted) {
@@ -634,7 +632,7 @@ class _FoodViewState extends ConsumerState<FoodView> {
       searchController: searchController,
       suggestionsBuilder: _getSearchSuggestionBuilder(
         ref: ref,
-        closeView: () => Get.back(),
+        closeView: () => Go.back(),
         onFoodTap: (dtfood) {
           showAddFoodView(context, dtfood.value).then((food) async {
             if (food != null && context.mounted) {
@@ -694,7 +692,7 @@ class _FoodViewState extends ConsumerState<FoodView> {
       textInputAction: TextInputAction.search,
       keyboardType: TextInputType.text,
       viewFloatingActionButton: _AddCustomFoodFAB(
-        closeView: () => Get.back(),
+        closeView: () => Go.back(),
         onFoodAdded: (food) async {
           if (food != null && context.mounted) {
             final selectedDate = ref.read(foodSelectedDateProvider);
@@ -919,7 +917,7 @@ class _HomeFoodCategoryListTile extends ConsumerWidget {
       trailing: Text(
         NumberFormat.decimalPercentPattern(
           decimalDigits: 0,
-          locale: Get.locale?.languageCode,
+          locale: Localizations.localeOf(context).languageCode,
         ).format(progress),
         style: context.theme.textTheme.bodyMedium,
       ),
@@ -1180,7 +1178,7 @@ class FoodNutritionalSingleGoalSDButton extends StatelessWidget {
     return Tooltip(
       message: NumberFormat.decimalPercentPattern(
         decimalDigits: 0,
-        locale: Get.locale?.languageCode,
+        locale: Localizations.localeOf(context).languageCode,
       ).format(value / goal),
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 8),
@@ -1194,7 +1192,7 @@ class FoodNutritionalSingleGoalSDButton extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             Text(
-              "${value.round()} / ${goal.round()} ${NutritionUnit.G.t}",
+              "${value.round()} / ${goal.round()} ${NutritionUnit.G.t(context: context)}",
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 12),

@@ -2,19 +2,21 @@ import 'dart:math' as math;
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart' hide ContextExtensionss;
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gymtracker/controller/boutique_controller.dart';
 import 'package:gymtracker/controller/purchases_controller.dart';
 import 'package:gymtracker/i18n/strings.g.dart';
 import 'package:gymtracker/icons/gymtracker_icons.dart';
 import 'package:gymtracker/model/boutique.dart';
+import 'package:gymtracker/provider/boutique.dart';
 import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/utils/skeletons.dart';
 import 'package:gymtracker/utils/utils.dart';
+import 'package:gymtracker/view/actions/boutique.dart';
+import 'package:gymtracker/view/actions/purchases.dart';
 import 'package:gymtracker/view/components/badges.dart';
 import 'package:gymtracker/view/components/content_unavailable.dart';
-import 'package:gymtracker/view/components/controlled.dart';
 import 'package:gymtracker/view/components/loading_indicator.dart';
 import 'package:gymtracker/view/components/master_detail.dart';
 import 'package:gymtracker/view/components/pro_builder.dart';
@@ -24,39 +26,21 @@ import 'package:skeletonizer/skeletonizer.dart';
 
 const defaultIcon = GTIcons.boutique;
 
-class BoutiqueView extends StatefulWidget {
+class BoutiqueView extends ConsumerStatefulWidget {
   const BoutiqueView({super.key});
 
   @override
-  State<BoutiqueView> createState() => _BoutiqueViewState();
+  ConsumerState<BoutiqueView> createState() => _BoutiqueViewState();
 }
 
-class _BoutiqueViewState
-    extends ControlledState<BoutiqueView, BoutiqueController> {
-  BoutiqueApiResponse<List<BoutiqueCategory>>? _categories;
-  Future<BoutiqueSettings>? _settings;
-
-  @override
-  void initState() {
-    super.initState();
-    _refresh(force: false);
-  }
-
-  Future _refresh({bool force = true}) async {
-    if (force) controller.invalidateCache();
-    setState(() {
-      _settings = controller.getSettings();
-      _categories = _settings!.then(
-        (settings) => settings.enabled
-            ? controller.getCategories()
-            : Future.value(
-                BoutiqueResponse<List<BoutiqueCategory>, BoutiqueError>.success(
-                  [],
-                ),
-              ),
-      );
-    });
-    return _categories;
+class _BoutiqueViewState extends ConsumerState<BoutiqueView> {
+  Future<void> _refresh({bool force = true}) async {
+    if (force) {
+      ref.read(boutiqueControllerProvider).invalidateCache();
+      ref.invalidate(boutiqueSettingsProvider);
+      ref.invalidate(boutiqueCategoriesProvider);
+    }
+    await ref.read(boutiqueCategoriesProvider.future);
   }
 
   @override
@@ -71,7 +55,7 @@ class _BoutiqueViewState
           child: CustomScrollView(
             slivers: [
               FutureBuilder<BoutiqueSettings>(
-                future: _settings,
+                future: ref.watch(boutiqueSettingsProvider.future),
                 initialData: BoutiqueSettings.defaultSettings,
                 builder: (context, snapshot) {
                   if (snapshot.error != null || snapshot.data == null) {
@@ -96,7 +80,7 @@ class _BoutiqueViewState
                   return FutureBuilder<
                     BoutiqueResponse<List<BoutiqueCategory>, BoutiqueError>
                   >(
-                    future: _categories,
+                    future: ref.watch(boutiqueCategoriesProvider.future),
                     builder: (context, snapshot) {
                       if (snapshot.error != null ||
                           snapshot.data?.isError == true) {
@@ -257,34 +241,27 @@ class BoutiqueCategoryCard extends StatelessWidget {
   }
 }
 
-class BoutiqueCategoryView extends StatefulWidget {
+class BoutiqueCategoryView extends ConsumerStatefulWidget {
   final BoutiqueCategory category;
 
   const BoutiqueCategoryView({required this.category, super.key});
 
   @override
-  State<BoutiqueCategoryView> createState() => _BoutiqueCategoryViewState();
+  ConsumerState<BoutiqueCategoryView> createState() =>
+      _BoutiqueCategoryViewState();
 }
 
-class _BoutiqueCategoryViewState
-    extends ControlledState<BoutiqueCategoryView, BoutiqueController> {
-  BoutiqueApiResponse<List<BoutiquePackage>>? _packages;
-
-  @override
-  void initState() {
-    super.initState();
-    _refresh(force: false);
-  }
-
-  Future _refresh({bool force = true}) async {
-    if (force) controller.invalidateCache();
-    setState(() {
-      _packages = controller.getPackages(
-        widget.category.id,
-        language: Get.context!.locale.languageCode,
-      );
-    });
-    return _packages;
+class _BoutiqueCategoryViewState extends ConsumerState<BoutiqueCategoryView> {
+  Future<void> _refresh({bool force = true}) async {
+    final provider = boutiquePackagesProvider(
+      widget.category.id,
+      language: context.locale.languageCode,
+    );
+    if (force) {
+      ref.read(boutiqueControllerProvider).invalidateCache();
+      ref.invalidate(provider);
+    }
+    await ref.read(provider.future);
   }
 
   @override
@@ -292,7 +269,12 @@ class _BoutiqueCategoryViewState
     return FutureBuilder<
       BoutiqueResponse<List<BoutiquePackage>, BoutiqueError>
     >(
-      future: _packages,
+      future: ref.watch(
+        boutiquePackagesProvider(
+          widget.category.id,
+          language: context.locale.languageCode,
+        ).future,
+      ),
       builder: (context, snapshot) {
         if (snapshot.hasData && snapshot.data!.success != null) {
           return _buildLoaded(context, snapshot.data!.success!);
@@ -344,7 +326,9 @@ class _BoutiqueCategoryViewState
           if (kDebugMode)
             IconButton(
               icon: const Icon(Icons.code),
-              onPressed: () => controller.routineConverter(widget.category.id),
+              onPressed: () => ref
+                  .read(boutiqueControllerProvider)
+                  .routineConverter(widget.category.id),
             ),
         ],
         items: [
@@ -374,13 +358,13 @@ class _BoutiqueCategoryViewState
   }
 }
 
-class BoutiquePackageView extends StatelessWidget {
+class BoutiquePackageView extends ConsumerWidget {
   final BoutiquePackage package;
 
   const BoutiquePackageView({required this.package, super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     bool isEmpty = package.routines.isEmpty;
     return Scaffold(
       appBar: AppBar(
@@ -413,10 +397,16 @@ class BoutiquePackageView extends StatelessWidget {
                         ? null
                         : () {
                             if (!isPro) {
-                              Get.find<PurchasesController>().presentPaywall();
+                              ref
+                                  .read(purchasesControllerProvider)
+                                  .presentPaywall();
                               return;
                             }
-                            Get.find<BoutiqueController>().install(package);
+                            ref
+                                .read(boutiqueControllerProvider)
+                                .install(package);
+                            Go.popUntil((route) => route.isFirst);
+                            Go.snack(context.t.boutique.package.installed);
                           },
                     child: Text.rich(
                       TextSpan(

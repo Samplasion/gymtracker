@@ -4,7 +4,6 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart' show Colors;
 import 'package:flutter_test/flutter_test.dart';
-import 'package:get/get.dart';
 import 'package:gymtracker/data/distance.dart';
 import 'package:gymtracker/data/weights.dart';
 import 'package:gymtracker/i18n/strings.g.dart';
@@ -262,6 +261,8 @@ void main() {
         kind: GTSetKind.normal,
       );
       final desc = set.getHumanReadableDescription(
+        targetWeightUnit: Weights.kg,
+        targetDistanceUnit: Distance.km,
         t: AppLocale.en.buildSync(),
         weightUnit: Weights.kg,
         distanceUnit: Distance.km,

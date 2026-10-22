@@ -2,22 +2,28 @@ import 'dart:async';
 
 import 'package:flutter/material.dart' hide Material;
 import 'package:flutter/scheduler.dart';
-import 'package:get/get.dart';
+import 'package:go_router/go_router.dart';
 import 'package:gymtracker/icons/gymtracker_icons.dart';
 import 'package:gymtracker/service/logger.dart';
 import 'package:gymtracker/view/components/loading_indicator.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 
 class Go {
-  static Navigator get navigator => Get.find<Navigator>();
+  static final navigatorKey = GlobalKey<NavigatorState>();
+  static BuildContext? get context => navigatorKey.currentContext;
+  static NavigatorState get navigator => navigatorKey.currentState!;
+  static void back<T>({T? result, bool closeOverlays = false}) =>
+      navigator.pop(result);
 
   /// Returns the name of the topmost route in the navigator stack.
   ///
   /// This is a workaround for the fact that [Navigator] does not have a method
   /// to get the topmost route name. Please use this method with caution.
   static String? getTopmostRouteName() {
+    final context = Go.context;
+    if (context == null) return null;
     String? top;
-    Navigator.popUntil(Get.context!, (route) {
+    Navigator.popUntil(context, (route) {
       top = route.settings.name;
       return true;
     });
@@ -42,30 +48,30 @@ class Go {
   }
 
   static Future<T?> to<T>(Widget Function() page) async {
-    return Navigator.of(Get.context!).push<T>(materialRoute(page));
+    return Navigator.of(Go.context!).push<T>(materialRoute(page));
   }
 
   static Future<T?> toNamed<T>(String route, {Object? arguments}) async {
-    return Navigator.of(Get.context!).pushNamed<T>(route, arguments: arguments);
+    return GoRouter.of(Go.context!).push<T>(route, extra: arguments);
   }
 
   static Future<T?> toDialog<T>(Widget Function() page) async {
-    return showDialog(context: Get.context!, builder: (_) => page());
+    return showDialog(context: Go.context!, builder: (_) => page());
   }
 
   static Future<T?> off<T>(Widget Function() page) async {
-    Navigator.of(Get.context!).pop();
+    Navigator.of(Go.context!).pop();
     return to<T>(page);
   }
 
   static Future<T?> offWithoutAnimation<T>(Widget Function() page) async {
     Navigator.of(
-      Get.context!,
+      Go.context!,
     ).pushReplacement(materialRoute(page, animation: false));
   }
 
   static Future<T?> replaceStack<T>(Widget Function() page) async {
-    Navigator.of(Get.context!).popUntil((route) => route.isFirst);
+    Navigator.of(Go.context!).popUntil((route) => route.isFirst);
     return off<T>(page);
   }
 
@@ -90,7 +96,7 @@ class Go {
   }
 
   static Future customSnack(SnackBar snackBar, {bool assertive = false}) async {
-    var messenger = ScaffoldMessenger.of(Get.context!);
+    var messenger = ScaffoldMessenger.of(Go.context!);
     if (assertive) messenger.clearSnackBars();
     messenger.showSnackBar(snackBar);
   }
@@ -110,12 +116,10 @@ class Go {
             [
               TextButton(
                 onPressed: () {
-                  ScaffoldMessenger.of(
-                    Get.context!,
-                  ).hideCurrentMaterialBanner();
+                  ScaffoldMessenger.of(Go.context!).hideCurrentMaterialBanner();
                 },
                 child: Text(
-                  MaterialLocalizations.of(Get.context!).okButtonLabel,
+                  MaterialLocalizations.of(Go.context!).okButtonLabel,
                 ),
               ),
             ],
@@ -130,7 +134,7 @@ class Go {
     MaterialBanner banner, {
     bool assertive = false,
   }) async {
-    var messenger = ScaffoldMessenger.of(Get.context!);
+    var messenger = ScaffoldMessenger.of(Go.context!);
     if (assertive) messenger.hideCurrentMaterialBanner();
     messenger.showMaterialBanner(banner);
   }
@@ -144,7 +148,7 @@ class Go {
     TextStyle? bodyStyle,
   }) {
     showDialog(
-      context: Get.context!,
+      context: Go.context!,
       builder: (context) {
         return AlertDialog(
           icon: icon ?? const Icon(GTIcons.info),
@@ -156,7 +160,7 @@ class Go {
             ...actions,
             TextButton(
               onPressed: () {
-                Get.back();
+                Go.back();
               },
               child: Text(MaterialLocalizations.of(context).okButtonLabel),
             ),
@@ -168,7 +172,7 @@ class Go {
 
   static Future<bool> confirm(String title, String body, {Widget? icon}) {
     return showDialog<bool>(
-      context: Get.context!,
+      context: Go.context!,
       builder: (context) {
         return AlertDialog(
           icon: icon ?? const Icon(GTIcons.info),
@@ -178,7 +182,7 @@ class Go {
             TextButton(
               onPressed: () {
                 SchedulerBinding.instance.addPostFrameCallback((_) {
-                  Get.back(result: false);
+                  Go.back(result: false);
                 });
               },
               child: Text(MaterialLocalizations.of(context).cancelButtonLabel),
@@ -186,7 +190,7 @@ class Go {
             TextButton(
               onPressed: () {
                 SchedulerBinding.instance.addPostFrameCallback((_) {
-                  Get.back(result: true);
+                  Go.back(result: true);
                 });
               },
               child: Text(MaterialLocalizations.of(context).okButtonLabel),
@@ -206,7 +210,7 @@ class Go {
     String? hintText,
   }) {
     return showDialog<String>(
-      context: Get.context!,
+      context: Go.context!,
       builder: (context) {
         return StatefulBuilder(
           builder: (context, setState) {
@@ -240,7 +244,7 @@ class Go {
                 TextButton(
                   onPressed: () {
                     SchedulerBinding.instance.addPostFrameCallback((_) {
-                      Get.back(result: null);
+                      Go.back(result: null);
                     });
                   },
                   child: Text(
@@ -251,7 +255,7 @@ class Go {
                   onPressed: isValid
                       ? () {
                           SchedulerBinding.instance.addPostFrameCallback((_) {
-                            Get.back(result: controller.text);
+                            Go.back(result: controller.text);
                           });
                         }
                       : null,
@@ -269,7 +273,7 @@ class Go {
     Widget Function(BuildContext) builder,
   ) async {
     return await showModalBottomSheet<T>(
-      context: Get.context!,
+      context: Go.context!,
       builder: builder,
     );
   }
@@ -278,7 +282,7 @@ class Go {
     Widget Function(BuildContext, ScrollController?) page, {
     bool enableDrag = true,
   }) async {
-    final context = Get.context!;
+    final context = Go.context!;
     return showCupertinoModalBottomSheet(
       context: context,
       builder: (context) => page(context, ModalScrollController.of(context)),
@@ -434,9 +438,9 @@ class Go {
     }
 
     final revert = fullScreen
-        ? await showDialog<bool>(context: Get.context!, builder: builder)
+        ? await showDialog<bool>(context: Go.context!, builder: builder)
         : await showModalBottomSheet<bool>(
-            context: Get.context!,
+            context: Go.context!,
             builder: builder,
           );
 
@@ -592,9 +596,9 @@ class Go {
     }
 
     final revert = fullScreen
-        ? await showDialog<bool>(context: Get.context!, builder: builder)
+        ? await showDialog<bool>(context: Go.context!, builder: builder)
         : await showModalBottomSheet<bool>(
-            context: Get.context!,
+            context: Go.context!,
             builder: builder,
           );
 
@@ -609,7 +613,7 @@ class Go {
     required String title,
     String? body,
   }) async {
-    final context = Get.context!;
+    final context = Go.context!;
     final computation = future();
     final completer = Completer<void>();
 
@@ -669,7 +673,7 @@ class Go {
   }
 
   static void popUntil(bool Function(Route route) predicate) {
-    Navigator.of(Get.context!).popUntil(predicate);
+    Navigator.of(Go.context!).popUntil(predicate);
   }
 
   static Future<T?> pick<T>({
@@ -738,7 +742,7 @@ class Go {
     }
 
     return await showModalBottomSheet<T>(
-      context: Get.context!,
+      context: Go.context!,
       builder: builder,
     );
   }
@@ -748,7 +752,7 @@ class Go {
     final sub = Stream.periodic(const Duration(milliseconds: 100)).listen((
       event,
     ) {
-      if (Get.context != null) {
+      if (Go.context != null) {
         completer.complete();
       }
     });

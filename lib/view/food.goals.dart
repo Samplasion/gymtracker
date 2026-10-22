@@ -19,7 +19,7 @@ class _ChangeGoalScreenState extends ConsumerState<ChangeGoalScreen> {
     super.initState();
     final oldGoal = ref.read(nutritionGoalForSelectedDateProvider);
     final decimalSep = NumberFormat.decimalPattern(
-      Get.locale?.languageCode,
+      Localizations.localeOf(context).languageCode,
     ).symbols.DECIMAL_SEP;
     _dailyCaloriesController = TextEditingController(
       text: stringifyDouble(
@@ -303,7 +303,7 @@ class _ChangeGoalScreenState extends ConsumerState<ChangeGoalScreen> {
 
       await ref.read(nutritionGoalProvider.notifier).saveNewGoal(newGoal);
 
-      if (mounted) Get.back();
+      if (mounted) Go.back();
     }
   }
 
@@ -313,14 +313,14 @@ class _ChangeGoalScreenState extends ConsumerState<ChangeGoalScreen> {
     final terms = [f, c, p]
         .map(
           (e) => NumberFormat.decimalPercentPattern(
-            locale: Get.locale?.languageCode,
+            locale: Localizations.localeOf(context).languageCode,
             decimalDigits: 2,
           ).format(e / 100),
         )
         .toList()
         .join(" + ");
     final res = NumberFormat.decimalPercentPattern(
-      locale: Get.locale?.languageCode,
+      locale: Localizations.localeOf(context).languageCode,
       decimalDigits: 2,
     ).format((f + c + p) / 100);
     return Padding(
@@ -364,7 +364,7 @@ class GoalHistoryView extends ConsumerWidget {
                 final key = keys[index];
                 final goal = goalsSeq[key];
                 final formattedDate = DateFormat.yMEd(
-                  Get.locale?.languageCode,
+                  Localizations.localeOf(context).languageCode,
                 ).format(key);
                 return ListTile(
                   title: Text(
@@ -386,15 +386,21 @@ class GoalHistoryView extends ConsumerWidget {
                         TextSpan(
                           text: context.t.food.nutritionGoals.history.macros(
                             fat: NumberFormat.decimalPercentPattern(
-                              locale: Get.locale?.languageCode,
+                              locale: Localizations.localeOf(
+                                context,
+                              ).languageCode,
                               decimalDigits: 2,
                             ).format(goal.fatPercentage / 100),
                             carbs: NumberFormat.decimalPercentPattern(
-                              locale: Get.locale?.languageCode,
+                              locale: Localizations.localeOf(
+                                context,
+                              ).languageCode,
                               decimalDigits: 2,
                             ).format(goal.carbsPercentage / 100),
                             protein: NumberFormat.decimalPercentPattern(
-                              locale: Get.locale?.languageCode,
+                              locale: Localizations.localeOf(
+                                context,
+                              ).languageCode,
                               decimalDigits: 2,
                             ).format(goal.proteinPercentage / 100),
                           ),

@@ -6,7 +6,7 @@ class AdvancedSettingsView extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final account = ref.watch(onlineProvider).value;
-    final controller = Get.find<SettingsController>();
+    final controller = ref.read(settingsControllerProvider);
 
     return Scaffold(
       body: DetailsView(
@@ -175,15 +175,15 @@ class AdvancedSettingsView extends ConsumerWidget {
   }
 }
 
-class BackupListView extends StatefulWidget {
+class BackupListView extends ConsumerStatefulWidget {
   const BackupListView({super.key});
 
   @override
-  State<BackupListView> createState() => _BackupListViewState();
+  ConsumerState<BackupListView> createState() => _BackupListViewState();
 }
 
-class _BackupListViewState
-    extends ControlledState<BackupListView, DatabaseService> {
+class _BackupListViewState extends ConsumerState<BackupListView> {
+  DatabaseService get controller => ref.read(databaseServiceProvider);
   late Stream<List<DatabaseBackup>> backupsStream = controller.listBackups();
 
   @override

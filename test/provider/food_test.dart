@@ -1,8 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:get/get.dart';
-import 'package:gymtracker/controller/coordinator.dart';
+import 'package:gymtracker/controller/achievements_controller.dart';
 import 'package:gymtracker/model/achievements.dart';
+import 'package:gymtracker/provider/bootstrap.dart';
 import 'package:gymtracker/provider/food.dart';
 import 'package:gymtracker/repository/foods.dart';
 import 'package:gymtracker/struct/date_sequence.dart';
@@ -10,12 +10,6 @@ import 'package:gymtracker/struct/nutrition.dart';
 import 'package:gymtracker/utils/extensions.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:rxdart/rxdart.dart';
-
-class MockInternalFinalCallback<T> extends Mock
-    implements InternalFinalCallback<T> {
-  @override
-  T call() => null as dynamic;
-}
 
 class MockFoodsRepository extends Mock implements FoodsRepository {
   final foods$ = BehaviorSubject<List<DateTagged<Food>>>.seeded([]);
@@ -40,16 +34,15 @@ class MockFoodsRepository extends Mock implements FoodsRepository {
   }
 }
 
-class MockCoordinator extends Mock implements Coordinator {
-  @override
-  final onStart = MockInternalFinalCallback<void>();
-  @override
-  final onDelete = MockInternalFinalCallback<void>();
-}
+class MockAchievementsController extends Mock
+    implements AchievementsController {}
+
+class MockBackupScheduler extends Mock implements BackupScheduler {}
 
 void main() {
   late MockFoodsRepository mockFoodsRepo;
-  late MockCoordinator mockCoordinator;
+  late MockAchievementsController mockAchievements;
+  late MockBackupScheduler mockBackup;
   late ProviderContainer container;
 
   const sampleNutritionValues = NutritionValues(
@@ -103,13 +96,9 @@ void main() {
   });
 
   setUp(() {
-    Get.reset();
-    Get.testMode = true;
-
     mockFoodsRepo = MockFoodsRepository();
-    mockCoordinator = MockCoordinator();
-
-    Get.put<Coordinator>(mockCoordinator);
+    mockAchievements = MockAchievementsController();
+    mockBackup = MockBackupScheduler();
 
     when(
       () => mockFoodsRepo.addNutritionCategory(any(), any()),
@@ -136,12 +125,18 @@ void main() {
     ).thenAnswer((_) async {});
 
     when(
-      () => mockCoordinator.maybeUnlockAchievements(any()),
+      () => mockAchievements.maybeUnlockAchievements(any()),
     ).thenReturn(<Achievement, List<AchievementCompletion>>{});
-    when(() => mockCoordinator.scheduleBackup()).thenAnswer((_) {});
+    when(() => mockBackup.schedule()).thenAnswer((_) {});
 
     container = ProviderContainer(
-      overrides: [foodsRepositoryProvider.overrideWithValue(mockFoodsRepo)],
+      overrides: [
+        foodsRepositoryProvider.overrideWithValue(mockFoodsRepo),
+        backupSchedulerProvider.overrideWithValue(mockBackup),
+        achievementTriggerProvider.overrideWithValue((trigger) {
+          mockAchievements.maybeUnlockAchievements(trigger);
+        }),
+      ],
     );
     container.listen(foodLogsStreamProvider, (prev, next) {});
     container.listen(nutritionGoalsStreamProvider, (prev, next) {});
@@ -152,7 +147,6 @@ void main() {
 
   tearDown(() {
     container.dispose();
-    Get.reset();
   });
 
   group("FoodSelectedDateNotifier", () {
@@ -328,9 +322,9 @@ void main() {
 
         verify(
           () =>
-              mockCoordinator.maybeUnlockAchievements(AchievementTrigger.food),
+              mockAchievements.maybeUnlockAchievements(AchievementTrigger.food),
         ).called(1);
-        verify(() => mockCoordinator.scheduleBackup()).called(1);
+        verify(() => mockBackup.schedule()).called(1);
       },
     );
 
@@ -365,9 +359,9 @@ void main() {
 
         verify(
           () =>
-              mockCoordinator.maybeUnlockAchievements(AchievementTrigger.food),
+              mockAchievements.maybeUnlockAchievements(AchievementTrigger.food),
         ).called(1);
-        verify(() => mockCoordinator.scheduleBackup()).called(1);
+        verify(() => mockBackup.schedule()).called(1);
       },
     );
 
@@ -383,7 +377,7 @@ void main() {
               as DateTagged<Food>;
       expect(captured.date, today);
       expect(captured.value.amount, 250);
-      verify(() => mockCoordinator.scheduleBackup()).called(1);
+      verify(() => mockBackup.schedule()).called(1);
     });
 
     test(
@@ -415,7 +409,7 @@ void main() {
     test("addFavorite and removeFavorite delegate to dbService", () async {
       await container.read(foodProvider.notifier).addFavorite(food);
       verify(() => mockFoodsRepo.addFavoriteFood(food)).called(1);
-      verify(() => mockCoordinator.scheduleBackup()).called(1);
+      verify(() => mockBackup.schedule()).called(1);
 
       await container.read(foodProvider.notifier).removeFavorite(food);
       verify(() => mockFoodsRepo.removeFavoriteFood(food)).called(1);
@@ -518,7 +512,7 @@ void main() {
                 as TaggedNutritionGoal;
         expect(captured.date, d1);
         expect(captured.value, goal1);
-        verify(() => mockCoordinator.scheduleBackup()).called(1);
+        verify(() => mockBackup.schedule()).called(1);
       },
     );
   });
@@ -635,7 +629,7 @@ void main() {
         verify(
           () => mockFoodsRepo.addNutritionCategory(date, catLunch),
         ).called(1);
-        verify(() => mockCoordinator.scheduleBackup()).called(1);
+        verify(() => mockBackup.schedule()).called(1);
       },
     );
 
@@ -654,7 +648,7 @@ void main() {
       verify(
         () => mockFoodsRepo.removeNutritionCategory(date, "Breakfast"),
       ).called(1);
-      verify(() => mockCoordinator.scheduleBackup()).called(1);
+      verify(() => mockBackup.schedule()).called(1);
     });
 
     test("updateCategory replaces old category with new values", () async {
@@ -682,7 +676,7 @@ void main() {
           updatedBreakfast,
         ),
       ).called(1);
-      verify(() => mockCoordinator.scheduleBackup()).called(1);
+      verify(() => mockBackup.schedule()).called(1);
     });
   });
 

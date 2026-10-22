@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:get/get.dart';
 import 'package:gymtracker/model/model.dart';
 import 'package:gymtracker/view/exercises.dart';
 import 'package:mocktail/mocktail.dart';
@@ -17,23 +16,25 @@ void main() {
     registerFallbackValue(Workout(name: '', exercises: []));
 
     // Stub hasContinuation
-    when(() => MockServices.historyController.hasContinuation(
-          incompleteWorkout: any(named: 'incompleteWorkout'),
-        )).thenReturn(false);
+    when(
+      () => MockServices.historyController.hasContinuation(
+        incompleteWorkout: any(named: 'incompleteWorkout'),
+      ),
+    ).thenReturn(false);
 
     // Stub ExercisesController exercises
-    when(() => MockServices.exercisesController.exercises)
-        .thenReturn(<Exercise>[].obs);
-    when(() => MockServices.exercisesController.onServiceChange())
-        .thenAnswer((_) {});
+    when(
+      () => MockServices.exercisesController.exercises,
+    ).thenReturn(<Exercise>[]);
   });
 
   tearDown(() {
     MockServices.tearDown();
   });
 
-  testWidgets('ExercisesView canStart disabling logic',
-      (WidgetTester tester) async {
+  testWidgets('ExercisesView canStart disabling logic', (
+    WidgetTester tester,
+  ) async {
     final customEx = Exercise.custom(
       id: 'custom_1',
       name: 'Custom Pushup',
@@ -57,9 +58,12 @@ void main() {
     );
 
     // 1. By default, with no matching local custom exercise, starting should be disabled.
-    await tester.pumpWidget(WidgetTestApp(
-      child: ExercisesView(workout: workout, isOwned: false),
-    ));
+    await tester.pumpWidget(
+      WidgetTestApp(
+        wrapWithProviderScope: true,
+        child: ExercisesView(workout: workout, isOwned: false),
+      ),
+    );
     await tester.pumpAndSettle();
 
     // Find the filled button (which contains text 'Redo this workout' or starting routines/workouts)
@@ -67,24 +71,34 @@ void main() {
     expect(redoButtonFinder, findsOneWidget);
 
     FilledButton redoButton = tester.widget<FilledButton>(redoButtonFinder);
-    expect(redoButton.onPressed, isNull); // Disabled because customEx is unmatched!
+    expect(
+      redoButton.onPressed,
+      isNull,
+    ); // Disabled because customEx is unmatched!
 
     // 2. Now matching the custom exercise locally
-    when(() => MockServices.exercisesController.exercises)
-        .thenReturn(<Exercise>[customEx].obs);
+    when(
+      () => MockServices.exercisesController.exercises,
+    ).thenReturn(<Exercise>[customEx]);
 
-    await tester.pumpWidget(WidgetTestApp(
-      child: ExercisesView(workout: workout, isOwned: false),
-    ));
+    await tester.pumpWidget(
+      WidgetTestApp(
+        wrapWithProviderScope: true,
+        child: ExercisesView(workout: workout, isOwned: false),
+      ),
+    );
     await tester.pumpAndSettle();
 
     redoButton = tester.widget<FilledButton>(find.byType(FilledButton));
     expect(redoButton.onPressed, isNotNull); // Enabled now!
 
     // 3. Setting canStart = false explicitly should disable it even if exercises match
-    await tester.pumpWidget(WidgetTestApp(
-      child: ExercisesView(workout: workout, canStart: false),
-    ));
+    await tester.pumpWidget(
+      WidgetTestApp(
+        wrapWithProviderScope: true,
+        child: ExercisesView(workout: workout, canStart: false),
+      ),
+    );
     await tester.pumpAndSettle();
 
     redoButton = tester.widget<FilledButton>(find.byType(FilledButton));

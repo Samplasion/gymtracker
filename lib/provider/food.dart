@@ -1,15 +1,14 @@
-import 'package:gymtracker/struct/request_cache.dart';
 import 'dart:async';
 import 'dart:io';
 
 import 'package:collection/collection.dart';
 import 'package:flutter/widgets.dart';
 import 'package:fuzzywuzzy/fuzzywuzzy.dart';
-import 'package:get/get.dart';
-import 'package:gymtracker/controller/coordinator.dart';
+import 'package:gymtracker/controller/achievements_controller.dart';
 import 'package:gymtracker/controller/settings_controller.dart';
 import 'package:gymtracker/model/achievements.dart';
 import 'package:gymtracker/model/native.dart';
+import 'package:gymtracker/provider/bootstrap.dart';
 import 'package:gymtracker/repository/foods.dart';
 import 'package:gymtracker/service/logger.dart';
 import 'package:gymtracker/service/native.dart';
@@ -17,6 +16,7 @@ import 'package:gymtracker/service/version.dart';
 import 'package:gymtracker/struct/date_sequence.dart';
 import 'package:gymtracker/struct/nutrition.dart';
 import 'package:gymtracker/struct/optional.dart';
+import 'package:gymtracker/struct/request_cache.dart';
 import 'package:gymtracker/utils/extensions.dart';
 import 'package:intl/intl.dart';
 import 'package:openfoodfacts/openfoodfacts.dart';
@@ -66,7 +66,9 @@ String foodRelativeDayText(Ref ref, BuildContext context) {
 
   String string;
   if (diff.abs() >= 2) {
-    string = DateFormat.yMEd(Get.locale?.languageCode).format(date);
+    string = DateFormat.yMEd(
+      Localizations.localeOf(context).languageCode,
+    ).format(date);
   } else {
     var trt = date.relativeTime(context, timeUnits: [TimeUnit.day]);
     var todayRt = today.relativeTime(context, timeUnits: [TimeUnit.day]);
@@ -165,16 +167,16 @@ class FoodNotifier extends _$FoodNotifier {
           ),
         );
     // TODO: Move this stuff to the Event system so that we don't have to call the Coordinator directly
-    Get.find<Coordinator>().maybeUnlockAchievements(AchievementTrigger.food);
-    Get.find<Coordinator>().scheduleBackup();
+    ref.read(achievementTriggerProvider)(AchievementTrigger.food);
+    ref.read(backupSchedulerProvider).schedule();
   }
 
   Future<void> removeFood(DateTime dateTime, Food food) async {
     await ref
         .read(foodsRepositoryProvider)
         .removeFood(DateTagged(date: dateTime.startOfDay, value: food));
-    Get.find<Coordinator>().maybeUnlockAchievements(AchievementTrigger.food);
-    Get.find<Coordinator>().scheduleBackup();
+    ref.read(achievementTriggerProvider)(AchievementTrigger.food);
+    ref.read(backupSchedulerProvider).schedule();
   }
 
   Future<void> updateFood(DateTime dateTime, Food updatedFood) async {
@@ -184,7 +186,7 @@ class FoodNotifier extends _$FoodNotifier {
     await ref
         .read(foodsRepositoryProvider)
         .updateFood(DateTagged(date: dateTime, value: updatedFood));
-    Get.find<Coordinator>().scheduleBackup();
+    ref.read(backupSchedulerProvider).schedule();
   }
 
   Future<void> copyToToday(Food food) async {
@@ -195,12 +197,12 @@ class FoodNotifier extends _$FoodNotifier {
 
   Future<void> addFavorite(Food food) async {
     await ref.read(foodsRepositoryProvider).addFavoriteFood(food);
-    Get.find<Coordinator>().scheduleBackup();
+    ref.read(backupSchedulerProvider).schedule();
   }
 
   Future<void> removeFavorite(Food food) async {
     await ref.read(foodsRepositoryProvider).removeFavoriteFood(food);
-    Get.find<Coordinator>().scheduleBackup();
+    ref.read(backupSchedulerProvider).schedule();
   }
 
   Future<void> addCustomBarcodeFood(
@@ -274,7 +276,7 @@ class NutritionGoalNotifier extends _$NutritionGoalNotifier {
         .addNutritionGoal(
           TaggedNutritionGoal(date: selectedDate.startOfDay, value: newGoal),
         );
-    Get.find<Coordinator>().scheduleBackup();
+    ref.read(backupSchedulerProvider).schedule();
   }
 }
 
@@ -356,7 +358,7 @@ class NutritionCategoryNotifier extends _$NutritionCategoryNotifier {
     await ref
         .read(foodsRepositoryProvider)
         .addNutritionCategory(date.startOfDay, category);
-    Get.find<Coordinator>().scheduleBackup();
+    ref.read(backupSchedulerProvider).schedule();
   }
 
   Future<void> removeCategory(NutritionCategory category) async {
@@ -364,7 +366,7 @@ class NutritionCategoryNotifier extends _$NutritionCategoryNotifier {
     await ref
         .read(foodsRepositoryProvider)
         .removeNutritionCategory(date.startOfDay, category.name);
-    Get.find<Coordinator>().scheduleBackup();
+    ref.read(backupSchedulerProvider).schedule();
   }
 
   Future<void> updateCategory(
@@ -375,7 +377,7 @@ class NutritionCategoryNotifier extends _$NutritionCategoryNotifier {
     await ref
         .read(foodsRepositoryProvider)
         .updateNutritionCategory(date.startOfDay, oldName, category);
-    Get.find<Coordinator>().scheduleBackup();
+    ref.read(backupSchedulerProvider).schedule();
   }
 }
 
@@ -453,12 +455,22 @@ final _offBarcode = RequestCache<String, VagueFood?>(const Duration(hours: 24));
 Future<List<VagueFood>> searchOpenFoodFacts(Ref ref, String query) async {
   if (query.trim().isEmpty) return [];
   globalLogger.d("Initiating OFF search for $query");
+  final settingsController = ref.watch(settingsControllerProvider);
   final key =
-      '${query.trim().toLowerCase()}/${settingsController.nutritionLanguage.value}/${settingsController.nutritionCountry.value}';
+      '${query.trim().toLowerCase()}/${settingsController.nutritionLanguage}/${settingsController.nutritionCountry}';
   return _offSearch.get(key, () async {
-    final result = await searchOFF(query.trim());
+    final result = await searchOFF(
+      query.trim(),
+      language: settingsController.nutritionLanguage.offApiLanguage,
+      country: settingsController.nutritionCountry.offApiCountry,
+    );
     final foods = (result.products ?? [])
-        .map((p) => _offFoodToGTFood(p))
+        .map(
+          (p) => _offFoodToGTFood(
+            p,
+            language: settingsController.nutritionLanguage.offApiLanguage,
+          ),
+        )
         .toList();
     globalLogger.d("Found ${foods.length} foods for $query");
     return foods;
@@ -468,12 +480,9 @@ Future<List<VagueFood>> searchOpenFoodFacts(Ref ref, String query) async {
 /// Helper function to search OFF using API v1
 Future<SearchResult> searchOFF(
   String query, {
-  OpenFoodFactsLanguage? language,
-  OpenFoodFactsCountry? country,
+  required OpenFoodFactsLanguage language,
+  required OpenFoodFactsCountry? country,
 }) async {
-  language ??= settingsController.nutritionLanguage.value.offApiLanguage;
-  country ??= settingsController.nutritionCountry.value.offApiCountry;
-
   final uri = Uri.https("search.openfoodfacts.org", "/search", {
     "q": "$query lang:\"${language.code}\"",
     "langs": language.code,
@@ -513,12 +522,13 @@ Future<SearchResult> searchOFF(
   return result;
 }
 
-VagueFood _offFoodToGTFood(Product product, {String? barcode}) {
+VagueFood _offFoodToGTFood(
+  Product product, {
+  String? barcode,
+  required OpenFoodFactsLanguage language,
+}) {
   final nameBrand = product
-      .getProductNameBrand(
-        settingsController.nutritionLanguage.value.offApiLanguage,
-        kNameBrandSeparator,
-      )
+      .getProductNameBrand(language, kNameBrandSeparator)
       .split(kNameBrandSeparator);
   final name = nameBrand.first;
   final brand = nameBrand.length > 1 && nameBrand.last.trim().isNotEmpty
@@ -541,10 +551,7 @@ VagueFood _offFoodToGTFood(Product product, {String? barcode}) {
         ServingSize(
           amount: product.packagingQuantity!,
           name:
-              product.packagingTextInLanguages?[settingsController
-                  .nutritionLanguage
-                  .value
-                  .offApiLanguage] ??
+              product.packagingTextInLanguages?[language] ??
               (product.packagingTextInLanguages?.values.toList() as List?)
                   ?.getAt(0),
         ),
@@ -566,15 +573,16 @@ VagueFood _offFoodToGTFood(Product product, {String? barcode}) {
 @riverpod
 Future<VagueFood?> searchOpenFoodFactsByBarcode(Ref ref, String barcode) async {
   globalLogger.d("Searching OpenFoodFacts for barcode: $barcode");
+  final settingsController = ref.watch(settingsControllerProvider);
   final key =
-      '$barcode/${settingsController.nutritionLanguage.value}/${settingsController.nutritionCountry.value}';
+      '$barcode/${settingsController.nutritionLanguage}/${settingsController.nutritionCountry}';
   return _offBarcode.get(key, () async {
     final product = await OpenFoodAPIClient.getProductV3(
       ProductQueryConfiguration(
         barcode,
         version: .v3,
-        language: settingsController.nutritionLanguage.value.offApiLanguage,
-        country: settingsController.nutritionCountry.value.offApiCountry,
+        language: settingsController.nutritionLanguage.offApiLanguage,
+        country: settingsController.nutritionCountry.offApiCountry,
       ),
     );
 
@@ -582,7 +590,11 @@ Future<VagueFood?> searchOpenFoodFactsByBarcode(Ref ref, String barcode) async {
       globalLogger.d("No product found for barcode: $barcode");
       return null;
     }
-    final food = _offFoodToGTFood(product.product!, barcode: barcode);
+    final food = _offFoodToGTFood(
+      product.product!,
+      barcode: barcode,
+      language: settingsController.nutritionLanguage.offApiLanguage,
+    );
     globalLogger.d("Found product for barcode: $barcode -> ${food.name}");
     return food;
   });
@@ -595,23 +607,28 @@ Future<VagueFood?> searchOpenFoodFactsByBarcode(Ref ref, String barcode) async {
 @Riverpod(keepAlive: true)
 void foodNativeSync(Ref ref) {
   OpenFoodAPIConfiguration.userAgent = UserAgent(
-    name: "Gym Bro/${VersionService().packageInfo.version}",
-    version: VersionService().packageInfo.version,
+    name: "Gym Bro/${ref.watch(versionServiceProvider).packageInfo.version}",
+    version: ref.watch(versionServiceProvider).packageInfo.version,
     system: "${Platform.operatingSystem} ${Platform.operatingSystemVersion}",
   );
 
   final today = DateTime.now().startOfDay;
+  // Observe the derived values: raw-stream callbacks can run before their
+  // dependents have invalidated and would send the previous totals.
+  ref.watch(foodsForDateProvider(today));
+  ref.watch(nutritionGoalForDateProvider(today));
+  ref.watch(categoriesForDateProvider(today));
 
-  ref.listen(foodLogsStreamProvider, (_, __) {
-    _updateNativeData(ref, today);
+  final now = DateTime.now();
+  final midnight = Timer(
+    DateTime(now.year, now.month, now.day + 1).difference(now),
+    ref.invalidateSelf,
+  );
+  final lifecycle = AppLifecycleListener(onResume: ref.invalidateSelf);
+  ref.onDispose(() {
+    midnight.cancel();
+    lifecycle.dispose();
   });
-  ref.listen(nutritionGoalsStreamProvider, (_, __) {
-    _updateNativeData(ref, today);
-  });
-  ref.listen(nutritionCategoriesStreamProvider, (_, __) {
-    _updateNativeData(ref, today);
-  });
-
   _updateNativeData(ref, today);
 }
 
@@ -635,50 +652,52 @@ void _updateNativeData(Ref ref, DateTime now) {
     (previousValue, element) => previousValue + element.nutritionalValues.fat,
   );
 
-  NativeService.instance().setFoodParameters(
-    NativeFoodStateMessage(
-      calorieGoal: goal.dailyCalories,
-      calorieIntake: foods.fold<double>(
-        0,
-        (previousValue, element) =>
-            previousValue + element.nutritionalValues.calories,
-      ),
-      categories: categories.values.map((c) {
-        final foodsForCategory = foods
-            .where((food) => food.category == c.name)
-            .toList();
-
-        double proteinSum = 0, carbsSum = 0, fatsSum = 0;
-
-        for (final food in foodsForCategory) {
-          proteinSum += food.nutritionalValues.protein;
-          carbsSum += food.nutritionalValues.carbs;
-          fatsSum += food.nutritionalValues.fat;
-        }
-
-        return NativeFoodCategory(
-          name: c.name,
-          emoji: c.icon.emoji,
-          nutritionSplit: NativeFoodNutritionSplit(
-            protein: proteinSum,
-            proteinGoal: goal.dailyProtein / c.dailyPercentage.toDouble(),
-            carbs: carbsSum,
-            carbsGoal: goal.dailyCarbs / c.dailyPercentage.toDouble(),
-            fats: fatsSum,
-            fatsGoal: goal.dailyFat / c.dailyPercentage.toDouble(),
+  ref
+      .read(nativeServiceProvider)
+      .setFoodParameters(
+        NativeFoodStateMessage(
+          calorieGoal: goal.dailyCalories,
+          calorieIntake: foods.fold<double>(
+            0,
+            (previousValue, element) =>
+                previousValue + element.nutritionalValues.calories,
           ),
-        );
-      }).toList(),
-      totalNutritionSplit: NativeFoodNutritionSplit(
-        protein: foodProteinIntake,
-        proteinGoal: goal.dailyProtein,
-        carbs: foodCarbsIntake,
-        carbsGoal: goal.dailyCarbs,
-        fats: foodFatsIntake,
-        fatsGoal: goal.dailyFat,
-      ),
-    ),
-  );
+          categories: categories.values.map((c) {
+            final foodsForCategory = foods
+                .where((food) => food.category == c.name)
+                .toList();
+
+            double proteinSum = 0, carbsSum = 0, fatsSum = 0;
+
+            for (final food in foodsForCategory) {
+              proteinSum += food.nutritionalValues.protein;
+              carbsSum += food.nutritionalValues.carbs;
+              fatsSum += food.nutritionalValues.fat;
+            }
+
+            return NativeFoodCategory(
+              name: c.name,
+              emoji: c.icon.emoji,
+              nutritionSplit: NativeFoodNutritionSplit(
+                protein: proteinSum,
+                proteinGoal: goal.dailyProtein * c.dailyPercentage / 100,
+                carbs: carbsSum,
+                carbsGoal: goal.dailyCarbs * c.dailyPercentage / 100,
+                fats: fatsSum,
+                fatsGoal: goal.dailyFat * c.dailyPercentage / 100,
+              ),
+            );
+          }).toList(),
+          totalNutritionSplit: NativeFoodNutritionSplit(
+            protein: foodProteinIntake,
+            proteinGoal: goal.dailyProtein,
+            carbs: foodCarbsIntake,
+            carbsGoal: goal.dailyCarbs,
+            fats: foodFatsIntake,
+            fatsGoal: goal.dailyFat,
+          ),
+        ),
+      );
 }
 
 class _FoodEquality implements Equality<DateTagged<Food>> {

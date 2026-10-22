@@ -15,9 +15,12 @@ void main() {
     MockServices.tearDown();
   });
 
-  testWidgets('RoutineCreator renders successfully in create mode',
-      (WidgetTester tester) async {
-    await tester.pumpWidget(const WidgetTestApp(child: RoutineCreator()));
+  testWidgets('RoutineCreator renders successfully in create mode', (
+    WidgetTester tester,
+  ) async {
+    await tester.pumpWidget(
+      const WidgetTestApp(wrapWithProviderScope: true, child: RoutineCreator()),
+    );
     await tester.pump();
 
     // Verify title "Create new routine" is rendered

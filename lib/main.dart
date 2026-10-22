@@ -9,38 +9,39 @@ import 'package:dynamic_color/dynamic_color.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart' hide Localizations;
 import 'package:flutter/services.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_quill/flutter_quill.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_timezone/flutter_timezone.dart';
-import 'package:get/get.dart';
-import 'package:gymtracker/controller/coordinator.dart';
+import 'package:gymtracker/controller/achievements_controller.dart';
 import 'package:gymtracker/controller/debug_controller.dart';
 import 'package:gymtracker/controller/logger_controller.dart';
+import 'package:gymtracker/controller/me_controller.dart';
 import 'package:gymtracker/controller/settings_controller.dart';
+import 'package:gymtracker/controller/workout_controller.dart';
 import 'package:gymtracker/i18n/strings.g.dart';
 import 'package:gymtracker/licenses.dart';
-import 'package:gymtracker/provider/locale.dart';
+import 'package:gymtracker/model/achievements.dart';
+import 'package:gymtracker/provider/bootstrap.dart';
+import 'package:gymtracker/provider/router.dart';
+import 'package:gymtracker/provider/settings.dart';
 import 'package:gymtracker/service/color.dart';
-import 'package:gymtracker/service/database.dart';
 import 'package:gymtracker/service/env.dart';
 import 'package:gymtracker/service/logger.dart';
+import 'package:gymtracker/service/notifications.dart';
 import 'package:gymtracker/service/version.dart';
-import 'package:gymtracker/struct/navigation_observer.dart';
 import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/utils/theme.dart';
+import 'package:gymtracker/view/actions/workout.dart';
 import 'package:gymtracker/view/charts/density_calendar_chart.dart'
     show DensityCalendarChart;
 import 'package:gymtracker/view/charts/line_charts_time_series.dart';
 import 'package:gymtracker/view/charts/weight_chart.dart';
 import 'package:gymtracker/view/debug/iphone15.dart';
-import 'package:gymtracker/view/error.dart';
 import 'package:gymtracker/view/me.dart';
-import 'package:gymtracker/view/paywall.dart';
-import 'package:gymtracker/view/skeleton.dart';
-import 'package:gymtracker/view/utils/workout_simple.dart';
-import 'package:gymtracker/view/workout.dart';
+import 'package:gymtracker/view/utils/achievements.dart';
 import 'package:relative_time/relative_time.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:sentry_logging/sentry_logging.dart';
@@ -48,9 +49,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 
-// TODO: Move ProviderContainer back inside the widget tree once Getx is fully migrated.
-late ProviderContainer globalContainer;
-final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+final GlobalKey<NavigatorState> navigatorKey = Go.navigatorKey;
 
 void main() async {
   if (kDebugMode) {
@@ -58,8 +57,6 @@ void main() async {
       "Health check: ${Platform.operatingSystem} ${Platform.operatingSystemVersion}",
     );
   }
-
-  globalContainer = ProviderContainer();
 
   initLicenses();
 
@@ -81,21 +78,7 @@ void main() async {
     ).build(),
   );
 
-  Get.put(LoggerController());
   initLogger();
-
-  final _databaseService = DatabaseService();
-
-  // TODO: Move this to some "loading" provider eventually
-  await globalContainer.read(translationsProvider.notifier).loadExercises();
-
-  final _compl = Completer();
-  _databaseService.ensureInitialized(onDone: () => _compl.complete());
-  await _compl.future;
-  final savedLocale = _databaseService.prefs$.value.locale;
-  if (savedLocale != null) {
-    LocaleSettings.setLocaleRaw(savedLocale.languageCode);
-  }
 
   await ColorService().init();
   await VersionService().init();
@@ -108,12 +91,7 @@ void main() async {
     _sentryInit,
     appRunner: () => runApp(
       SentryWidget(
-        child: UncontrolledProviderScope(
-          container: globalContainer,
-          child: TranslationProvider(
-            child: MainApp(databaseService: _databaseService),
-          ),
-        ),
+        child: ProviderScope(child: TranslationProvider(child: MainApp())),
       ),
     ),
   );
@@ -179,21 +157,65 @@ FutureOr<void> _sentryInit(SentryFlutterOptions options) {
 
 const applicationKey = Key("GymTracker");
 
-class MainApp extends StatefulWidget {
-  final DatabaseService databaseService;
-
-  const MainApp({required this.databaseService, super.key});
+class MainApp extends ConsumerStatefulWidget {
+  const MainApp({super.key});
 
   @override
-  State<MainApp> createState() => _MainAppState();
+  ConsumerState<MainApp> createState() => _MainAppState();
 }
 
-class _MainAppState extends State<MainApp> with LoggerConfigurationMixin {
+class _MainAppState extends ConsumerState<MainApp>
+    with LoggerConfigurationMixin {
+  StreamSubscription<Map<Achievement, List<AchievementCompletion>>>?
+  _achievementSubscription;
+
+  StreamSubscription<NotificationResponse>? _notificationSubscription;
+
   @override
   void initState() {
     super.initState();
-    Get.put(widget.databaseService);
-    Get.put(Coordinator()..init());
+    _notificationSubscription = ref
+        .read(notificationEventsProvider)
+        .stream
+        .listen((response) async {
+          await ref.read(appStartupProvider.future);
+          if (!mounted || ref.read(workoutControllerProvider) == null) return;
+          ref
+              .read(workoutControllerProvider.notifier)
+              .onNotificationTapped(
+                response,
+                simple: ref
+                    .read(settingsControllerProvider)
+                    .defaultToSimpleWorkoutView,
+              );
+        });
+    ref.listenManual(appStartupProvider, (_, next) {
+      if (!next.hasValue) return;
+      _achievementSubscription?.cancel();
+      _achievementSubscription = ref
+          .read(achievementsControllerProvider)
+          .unlocked
+          .listen((unlocked) {
+            if (!mounted) return;
+            for (final entry in unlocked.entries) {
+              for (final completion in entry.value) {
+                Go.customSnack(
+                  AchievementSnackBar(
+                    achievement: entry.key,
+                    completion: completion,
+                  ),
+                );
+              }
+            }
+          });
+    });
+  }
+
+  @override
+  void dispose() {
+    _achievementSubscription?.cancel();
+    _notificationSubscription?.cancel();
+    super.dispose();
   }
 
   @override
@@ -201,8 +223,14 @@ class _MainAppState extends State<MainApp> with LoggerConfigurationMixin {
 
   @override
   Widget build(BuildContext context) {
-    final debugController = Get.find<DebugController>();
-    final settings = Get.find<SettingsController>();
+    final router = ref.watch(appRouterProvider);
+    ref.watch(loggerControllerInstanceProvider);
+    ref.watch(meControllerProvider);
+    final showSimulator = ref.watch(
+      debugControllerProvider.select((s) => s.showSimulator),
+    );
+    final settings = ref.watch(settingsControllerInstanceProvider);
+    ref.watch(appPreferencesProvider);
 
     final application = DynamicColorBuilder(
       key: applicationKey,
@@ -216,19 +244,19 @@ class _MainAppState extends State<MainApp> with LoggerConfigurationMixin {
                     ({
                       Brightness.light: light?.primary,
                       Brightness.dark: dark?.primary,
-                    }[switch (settings.themeMode()) {
+                    }[switch (settings.themeMode) {
                       ThemeMode.light => Brightness.light,
                       ThemeMode.dark => Brightness.dark,
                       ThemeMode.system => MediaQuery.platformBrightnessOf(
                         context,
                       ),
                     }]);
-                final seedColor = settings.usesDynamicColor()
-                    ? platformSeedColor ?? settings.color()
-                    : settings.color();
+                final seedColor = settings.usesDynamicColor
+                    ? platformSeedColor ?? settings.color
+                    : settings.color;
 
-                return GetMaterialApp(
-                  useInheritedMediaQuery: true,
+                return MaterialApp.router(
+                  routerConfig: router,
                   title: () {
                     if (kDebugMode) {
                       return "${context.t.appName} (Debug)";
@@ -238,7 +266,6 @@ class _MainAppState extends State<MainApp> with LoggerConfigurationMixin {
                   }(),
                   locale: TranslationProvider.of(context).flutterLocale,
                   supportedLocales: AppLocaleUtils.supportedLocales,
-                  fallbackLocale: const Locale('en'),
                   localizationsDelegates: const [
                     RelativeTimeLocalizations.delegate,
                     GlobalMaterialLocalizations.delegate,
@@ -246,7 +273,7 @@ class _MainAppState extends State<MainApp> with LoggerConfigurationMixin {
                     GlobalCupertinoLocalizations.delegate,
                     FlutterQuillLocalizations.delegate,
                   ],
-                  themeMode: settings.themeMode(),
+                  themeMode: settings.themeMode,
                   theme: getGymTrackerThemeFor(
                     context,
                     seedColor,
@@ -257,30 +284,6 @@ class _MainAppState extends State<MainApp> with LoggerConfigurationMixin {
                     seedColor,
                     Brightness.dark,
                   ),
-                  home: const GymTrackerAppLoader(),
-                  onGenerateRoute: (settings) {
-                    return switch (settings.name) {
-                      WorkoutView.routeName => Go.materialRoute(
-                        () => const WorkoutView(),
-                        settings: settings,
-                      ),
-                      WorkoutSimpleView.routeName => Go.materialRoute(
-                        () => const WorkoutSimpleView(),
-                        settings: settings,
-                      ),
-                      ErrorView.routeName => Go.materialRoute(
-                        () => const ErrorView(),
-                        settings: settings,
-                      ),
-                      PaywallScreen.routeName => Go.materialRoute(
-                        () => const PaywallScreen(),
-                        settings: settings,
-                      ),
-                      null || String() => throw Exception(
-                        "Invalid route: ${settings.name}",
-                      ),
-                    };
-                  },
                   debugShowCheckedModeBanner: false,
                   builder: (context, child) =>
                       AnnotatedRegion<SystemUiOverlayStyle>(
@@ -294,18 +297,6 @@ class _MainAppState extends State<MainApp> with LoggerConfigurationMixin {
                         ),
                         child: child ?? Container(),
                       ),
-                  logWriterCallback: (text, {bool? isError}) {
-                    if (isError == true) {
-                      logger.e(text);
-                    } else {
-                      logger.t(text);
-                    }
-                  },
-                  navigatorObservers: [
-                    LoggerNavigationObserver(),
-                    SentryNavigatorObserver(),
-                  ],
-                  navigatorKey: navigatorKey,
                 );
               }(),
             );
@@ -314,15 +305,13 @@ class _MainAppState extends State<MainApp> with LoggerConfigurationMixin {
       },
     );
 
-    return Obx(() {
-      if (debugController.showSimulator.isTrue) {
-        return DeviceSim(
-          builder: (context) => application,
-          devices: const [iphone13Mini, iphone15, ipad129Gen5],
-        );
-      }
+    if (showSimulator) {
+      return DeviceSim(
+        builder: (context) => application,
+        devices: const [iphone13Mini, iphone15, ipad129Gen5],
+      );
+    }
 
-      return application;
-    });
+    return application;
   }
 }

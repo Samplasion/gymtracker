@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
-import 'package:get/get.dart';
 import 'package:gymtracker/gen/assets.gen.dart';
 import 'package:gymtracker/i18n/strings.g.dart';
 import 'package:gymtracker/utils/constants.dart';
@@ -44,7 +43,9 @@ class _LegalViewerPageState extends State<_LegalViewerPage> {
 
   Future<void> _loadTos() async {
     setState(() {
-      _mdFuture = rootBundle.loadString(switch (Get.locale!.languageCode) {
+      _mdFuture = rootBundle.loadString(switch (Localizations.localeOf(
+        context,
+      ).languageCode) {
         'en' => GTAssets.legal.en.let(
           (t) => switch (widget.type) {
             LegalType.tos => t.tos,
@@ -108,7 +109,7 @@ class _LegalViewerPageState extends State<_LegalViewerPage> {
   }
 
   Widget buildOk(BuildContext context, String data) {
-    if (context.width < Breakpoints.m.screenWidth) {
+    if (MediaQuery.sizeOf(context).width < Breakpoints.m.screenWidth) {
       return buildMarkdown(context, data);
     }
     return Row(

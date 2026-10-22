@@ -1,141 +1,121 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
-import 'package:get/get.dart';
-import 'package:gymtracker/controller/coordinator.dart';
-import 'package:gymtracker/controller/serviceable_controller.dart';
-import 'package:gymtracker/i18n/strings.g.dart';
-import 'package:gymtracker/icons/gymtracker_icons.dart';
+import 'package:gymtracker/controller/achievements_controller.dart';
 import 'package:gymtracker/model/achievements.dart';
 import 'package:gymtracker/model/exercisable.dart';
 import 'package:gymtracker/model/exercise.dart';
 import 'package:gymtracker/model/set.dart';
 import 'package:gymtracker/model/superset.dart';
 import 'package:gymtracker/model/workout.dart';
+import 'package:gymtracker/provider/bootstrap.dart';
+import 'package:gymtracker/provider/locale.dart';
+import 'package:gymtracker/provider/settings.dart';
+import 'package:gymtracker/provider/training_data.dart';
+import 'package:gymtracker/service/database.dart';
 import 'package:gymtracker/service/logger.dart';
 import 'package:gymtracker/service/native.dart';
 import 'package:gymtracker/service/widgets.dart';
 import 'package:gymtracker/struct/streaks.dart';
 import 'package:gymtracker/utils/extensions.dart';
-import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/utils/utils.dart';
-import 'package:gymtracker/view/exercises.dart';
-import 'package:gymtracker/view/workout_editor.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-class HistoryController extends GetxController with ServiceableController {
-  /// History, sorted from oldest to newest
-  RxList<Workout> history = <Workout>[].obs;
+part 'history_controller.g.dart';
 
-  int get userVisibleLength => userVisibleWorkouts.length;
-
-  List<Workout> get userVisibleWorkouts => history
-      .where((workout) => !workout.isContinuation || kDebugMode)
-      .toList();
-  Map<DateTime, List<Workout>> workoutsByDay = {};
-
-  Rx<Streaks> streaks = Streaks.zero.obs;
-
-  @override
-  onInit() {
-    super.onInit();
-    service.history$.listen((event) {
-      logger.i("Updated with ${event.length} workouts");
-      event.sort(
-        (a, b) => (a.startingDate ?? DateTime.fromMillisecondsSinceEpoch(0))
-            .compareTo(
-              b.startingDate ?? DateTime.fromMillisecondsSinceEpoch(0),
-            ),
-      );
-      history(event);
-      _computeWorkoutsByDay();
-      SchedulerBinding.instance.addPostFrameCallback((_) {
-        computeStreaks();
-      });
-      coordinator.computeSuggestions();
+@Riverpod(keepAlive: true)
+HistoryController historyController(Ref ref) {
+  final controller = HistoryController(ref);
+  void update() {
+    SchedulerBinding.instance.addPostFrameCallback((_) {
+      if (ref.mounted) controller.computeStreaks();
     });
   }
 
-  @override
-  void onServiceChange() {}
+  ref.listen(historyWorkoutsProvider, (_, next) {
+    if (next.hasValue) update();
+  });
+  ref.listen(appPreferencesProvider, (_, next) {
+    if (next.hasValue) update();
+  });
+  return controller;
+}
 
-  void _computeWorkoutsByDay() {
-    final _counts = <DateTime, List<Workout>>{};
+class HistoryController {
+  HistoryController(this.ref);
+  final Ref ref;
+  DatabaseService get service => ref.read(databaseServiceProvider);
+  List<Workout> get history =>
+      ref.read(historyWorkoutsProvider).value ?? const [];
+  int get userVisibleLength => userVisibleWorkouts.length;
+  List<Workout> get userVisibleWorkouts =>
+      history.where((w) => !w.isContinuation || kDebugMode).toList();
+  Map<DateTime, List<Workout>> get workoutsByDay {
+    final result = <DateTime, List<Workout>>{};
     for (final workout in userVisibleWorkouts) {
-      final date = workout.startingDate!.startOfDay;
-      _counts.putIfAbsent(date, () => []);
-      _counts[date]!.add(workout);
+      if (workout.startingDate != null) {
+        (result[workout.startingDate!.startOfDay] ??= []).add(workout);
+      }
     }
-    workoutsByDay = _counts;
+    return result;
   }
 
-  void queueStreaksRecomputation() {
-    if (streaks.value == Streaks.zero) {
-      computeStreaks();
-    }
-  }
-
+  Streaks get streaks => Streaks.fromMappedDays(
+    workoutsByDay,
+    firstDayOfWeek: firstDayOfWeekFor(
+      ref.read(appPreferencesProvider).value?.locale == kSystemLocaleSentinel
+          ? ref.read(platformLocaleProvider)
+          : ref.read(appPreferencesProvider).value?.locale ??
+                ref.read(platformLocaleProvider),
+    ),
+    today: ref.read(trainingClockProvider)(),
+  );
+  void queueStreaksRecomputation() => computeStreaks();
   void computeStreaks() {
     try {
-      if (Get.context == null) {
-        logger.w("[computeStreaks] Context is null, ignoring.");
-        return;
-      }
-
-      streaks(
-        Streaks.fromMappedDays(
-          workoutsByDay,
-          firstDayOfWeek: firstDayOfWeekFor(Get.context!.locale),
-          today: DateTime.now(),
-        ),
-      );
-
-      logger.i("Recomputed streaks: $streaks");
-
-      WidgetsService.instance().updateWeeklyStreak(streaks.value.weekStreak);
-      WidgetsService.instance().updateRestStreak(streaks.value.restDays);
-      WidgetsService.instance().updateWorkouts(userVisibleWorkouts.length);
-      const daysBack = 7 * 18; // 18 weeks
-      final now = DateTime.now();
-      var workoutDensityChartData = [
-        for (int i = 0; i < daysBack; i++)
+      final current = streaks;
+      ref.read(widgetsServiceProvider).updateWeeklyStreak(current.weekStreak);
+      ref.read(widgetsServiceProvider).updateRestStreak(current.restDays);
+      ref.read(widgetsServiceProvider).updateWorkouts(userVisibleLength);
+      final now = ref.read(trainingClockProvider)();
+      final density = [
+        for (var i = 0; i < 7 * 18; i++)
           workoutsByDay[now.subtract(Duration(days: i)).startOfDay]?.length ??
               0,
       ];
-      // The dynamic calculation of rest day slots is done downstream
-      int steps = workoutDensityChartData.length;
-      while (workoutDensityChartData[0] == 0 && steps > 0) {
-        workoutDensityChartData.add(workoutDensityChartData.removeAt(0));
-        steps--;
+      var remaining = density.length;
+      while (density.first == 0 && remaining-- > 0) {
+        density.add(density.removeAt(0));
       }
-      NativeService.instance().updateHomeWidgetParameters(
-        weekStreak: streaks.value.weekStreak,
-        lastWorkoutDay: userVisibleWorkouts.let((self) {
-          if (self.isEmpty) return DateTime.now().startOfDay;
-          return ([
-            self.first.startingDate!,
-            self.last.startingDate!,
-          ]..sort()).last.startOfDay;
-        }),
-        workouts: userVisibleWorkouts.length,
-        workoutDensityChartData: workoutDensityChartData,
-      );
-
-      logger.i(
-        "Updated widget with streak: (${streaks.value.weekStreak}, ${streaks.value.restDays}, ${history.length})",
-      );
-    } catch (e, s) {
-      logger.e("Error computing streaks", error: e, stackTrace: s);
+      ref
+          .read(nativeServiceProvider)
+          .updateHomeWidgetParameters(
+            weekStreak: current.weekStreak,
+            lastWorkoutDay: userVisibleWorkouts.isEmpty
+                ? now.startOfDay
+                : userVisibleWorkouts.last.startingDate!.startOfDay,
+            workouts: userVisibleLength,
+            workoutDensityChartData: density,
+          );
+    } catch (error, stack) {
+      logger.e('Error computing streaks', error: error, stackTrace: stack);
     }
   }
+
+  void scheduleBackup() => ref.read(backupSchedulerProvider).schedule();
+  void unlockAchievements() => ref
+      .read(achievementsControllerProvider)
+      .maybeUnlockAchievements(AchievementTrigger.workout);
 
   Future<void> deleteWorkout(Workout workout) async {
     await service.removeHistoryWorkoutById(workout.id);
     if (workout.completedBy != null) {
       await service.removeHistoryWorkoutById(workout.completedBy!);
     }
-    coordinator.scheduleBackup();
+    scheduleBackup();
 
-    Get.find<Coordinator>().maybeUnlockAchievements(AchievementTrigger.workout);
+    unlockAchievements();
   }
 
   void setParentID(Workout workout, {String? newParentID}) {
@@ -204,90 +184,6 @@ class HistoryController extends GetxController with ServiceableController {
     return workout.copyWith(exercises: exercises);
   }
 
-  void deleteWorkoutWithDialog(
-    BuildContext context, {
-    required Workout workout,
-    required void Function() onCanceled,
-  }) {
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          icon: const Icon(GTIcons.info),
-          title: Text(context.t.workouts.actions.delete.title),
-          content: Text(context.t.workouts.actions.delete.text),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Get.back(closeOverlays: true);
-              },
-              child: Text(context.t.workouts.actions.delete.actions.no),
-            ),
-            FilledButton.tonal(
-              onPressed: () {
-                deleteWorkout(workout);
-                SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
-                  Get.back(closeOverlays: true);
-                });
-
-                onCanceled();
-              },
-              child: Text(context.t.workouts.actions.delete.actions.yes),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  void deleteWorkoutsWithDialog(
-    BuildContext context, {
-    required Set<String> workoutIDs,
-    required void Function() onDeleted,
-  }) {
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          icon: const Icon(GTIcons.info),
-          title: Text(
-            context.t.history.actions.deleteMultiple.title(
-              n: workoutIDs.length,
-            ),
-          ),
-          content: Text(
-            context.t.history.actions.deleteMultiple.text(n: workoutIDs.length),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Get.back(closeOverlays: true);
-              },
-              child: Text(context.t.history.actions.deleteMultiple.actions.no),
-            ),
-            FilledButton.tonal(
-              onPressed: () {
-                final deletedWorkouts = service.workoutHistory
-                    .where((element) => workoutIDs.contains(element.id))
-                    .toList();
-                for (final workout in deletedWorkouts) {
-                  deleteWorkout(workout);
-                }
-
-                SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
-                  Get.back(closeOverlays: true);
-                });
-
-                onDeleted();
-              },
-              child: Text(context.t.history.actions.deleteMultiple.actions.yes),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
   void unbindAllFromParent(String id) {
     for (final workout in service.workoutHistory) {
       if (workout.parentID == id) {
@@ -326,27 +222,18 @@ class HistoryController extends GetxController with ServiceableController {
     );
   }
 
-  void finishEditingWorkoutWithDialog(BuildContext context, Workout workout) {
-    SchedulerBinding.instance.addPostFrameCallback((_) {
-      Go.showBottomModalScreen(
-        (context, _) => WorkoutFinishEditingPage(workout: workout),
-      );
-    });
-  }
-
   Future<void> submitEditedWorkout(Workout workout) async {
+    final owner = service.db.currentUserId;
     await service.setHistoryWorkout(workout);
-    if (workout.hasContinuation) {
+    if (!ref.mounted || service.db.currentUserId != owner) return;
+    if (hasContinuation(incompleteWorkout: workout)) {
       await service.setHistoryWorkout(
-        workout.continuation!.copyWith(parentID: workout.parentID),
+        getContinuation(
+          incompleteWorkout: workout,
+        )!.copyWith(parentID: workout.parentID),
       );
     }
-    Get.find<Coordinator>().maybeUnlockAchievements(AchievementTrigger.workout);
-    Get.back();
-    SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
-      Get.back();
-      Get.back();
-    });
+    if (ref.mounted && service.db.currentUserId == owner) unlockAchievements();
   }
 
   /// Adds a new workout to the history, avoiding collisions
@@ -454,59 +341,6 @@ class HistoryController extends GetxController with ServiceableController {
           .compareTo(a.startingDate ?? DateTime.fromMillisecondsSinceEpoch(0)),
     );
     return history;
-  }
-
-  Future<void> combineWorkoutsFlow(Workout workout) async {
-    if (!workout.hasContinuation) {
-      throw ArgumentError.value(
-        workout,
-        'workout',
-        "Workout must have a continuation.",
-      );
-    }
-
-    // Rationale: The old algorithm used a filter on the base workout to filter
-    // done exercises so that they don't show up twice. To the new algorithm
-    // that's counter-productive so we don't do that.
-    // That is counter-productive because the new algorithm uses the
-    // [supersedesID] field on exercises to know what exercise goes where,
-    // so filtering exercises means that the combined workout has some
-    // exercises missing.
-    final w1 = linearExercisesUseNewAlgorithm(workout, workout.continuation!)
-        ? workout
-        : workout.withFilters(
-            exerciseFilter: (e) => e.sets.any((element) => element.done),
-            setFilter: (e, s) => s.done,
-          );
-    // Rationale: the continuation's infobox is pre-populated with the base
-    // workout's notes. Since the continuation algorithm appends the second
-    // workout's notes to the first, we want to avoid showing them twice
-    // if the user hasn't touched them.
-    final w2 = workout.continuation!.copyWith.infobox(
-      workout.continuation!.infobox == w1.infobox
-          ? null
-          : workout.continuation!.infobox,
-    );
-
-    final shouldCombine = await Go.confirm(
-      "exercise.continuation.combine.confirm.title",
-      "exercise.continuation.combine.confirm.body",
-      icon: const Icon(GTIcons.combine),
-    );
-
-    logger.t("Should combine: $shouldCombine");
-
-    if (!shouldCombine) {
-      return;
-    }
-
-    final combined = Workout.combine(w1, w2);
-
-    logger.d(combined.toJson().toPrettyString());
-
-    replaceWorkoutsWithCombined(workouts: [w1, w2], combined: combined);
-
-    Go.off(() => ExercisesView(workout: combined));
   }
 
   void replaceWorkoutsWithCombined({
@@ -669,14 +503,14 @@ class HistoryController extends GetxController with ServiceableController {
 }
 
 extension WorkoutHistory on Workout {
-  bool get hasContinuation =>
-      Get.find<HistoryController>().hasContinuation(incompleteWorkout: this);
-  Workout? get continuation =>
-      Get.find<HistoryController>().getContinuation(incompleteWorkout: this);
-  Workout? get originalWorkoutForContinuation => Get.find<HistoryController>()
-      .getOriginalForContinuation(continuationWorkout: this);
-
+  bool hasContinuationIn(Iterable<Workout> history) =>
+      continuationIn(history) != null;
+  Workout? continuationIn(Iterable<Workout> history) =>
+      isComplete ? null : history.where((w) => w.completes == id).firstOrNull;
+  Workout? originalWorkoutForContinuationIn(Iterable<Workout> history) =>
+      history.where((w) => w.id == completes).firstOrNull;
   SynthesizedWorkout synthesizeContinuations({
+    required Iterable<Workout> history,
     bool previous = true,
     bool next = true,
   }) {
@@ -684,10 +518,15 @@ extension WorkoutHistory on Workout {
         ? (this as SynthesizedWorkout).components.first
         : this;
     return SynthesizedWorkout([
-      if (previous && self.isContinuation) self.originalWorkoutForContinuation!,
+      if (previous &&
+          self.isContinuation &&
+          self.originalWorkoutForContinuationIn(history) != null)
+        self.originalWorkoutForContinuationIn(history)!,
       self,
-      if (next && self.completedBy != null && self.continuation != null)
-        self.continuation!,
+      if (next &&
+          self.completedBy != null &&
+          self.continuationIn(history) != null)
+        self.continuationIn(history)!,
     ]);
   }
 }

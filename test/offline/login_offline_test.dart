@@ -1,10 +1,9 @@
 import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:get/get.dart';
 import 'package:gymtracker/i18n/strings.g.dart';
-import 'package:gymtracker/main.dart';
 import 'package:gymtracker/provider/online.dart';
 import 'package:gymtracker/service/online.dart';
 import 'package:gymtracker/view/login.dart';
@@ -39,13 +38,16 @@ void main() {
     MockServices.setup();
     await initTestLocalizations();
 
-    globalContainer = ProviderContainer(
-      overrides: [onlineProvider.overrideWith(() => _FailingOnlineNotifier())],
+    MockServices.container = ProviderContainer(
+      overrides: [
+        ...MockServices.defaultOverrides,
+        onlineProvider.overrideWith(() => _FailingOnlineNotifier()),
+      ],
     );
   });
 
   tearDown(() {
-    Get.reset();
+    MockServices.tearDown();
   });
 
   testWidgets(

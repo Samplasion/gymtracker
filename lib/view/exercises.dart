@@ -1,8 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
-import 'package:get/get.dart';
-import 'package:gymtracker/controller/coordinator.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gymtracker/controller/exercises_controller.dart';
 import 'package:gymtracker/controller/history_controller.dart' as history;
 import 'package:gymtracker/controller/history_controller.dart';
@@ -18,9 +17,14 @@ import 'package:gymtracker/model/exercisable.dart';
 import 'package:gymtracker/model/exercise.dart';
 import 'package:gymtracker/model/superset.dart';
 import 'package:gymtracker/model/workout.dart';
+import 'package:gymtracker/provider/settings.dart';
+import 'package:gymtracker/provider/training_data.dart';
 import 'package:gymtracker/service/logger.dart';
 import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/utils/go.dart';
+import 'package:gymtracker/view/actions/history.dart';
+import 'package:gymtracker/view/actions/purchases.dart';
+import 'package:gymtracker/view/actions/routines.dart';
 import 'package:gymtracker/view/charts/bar_charts.dart';
 import 'package:gymtracker/view/charts/line_charts_by_workout.dart';
 import 'package:gymtracker/view/components/badges.dart';
@@ -36,7 +40,7 @@ import 'package:gymtracker/view/utils/timer.dart';
 import 'package:gymtracker/view/utils/workout_utils.dart';
 import 'package:gymtracker/view/workout_editor.dart';
 
-class ExercisesView extends StatefulWidget {
+class ExercisesView extends ConsumerStatefulWidget {
   final Workout workout;
   final bool Function(WorkoutExercisable) highlightExercise;
   final bool canStart;
@@ -55,19 +59,27 @@ class ExercisesView extends StatefulWidget {
   }
 
   @override
-  State<ExercisesView> createState() => _ExercisesViewState();
+  ConsumerState<ExercisesView> createState() => _ExercisesViewState();
 }
 
-class _ExercisesViewState extends State<ExercisesView> {
+class _ExercisesViewState extends ConsumerState<ExercisesView> {
   late Workout workout = widget.workout;
 
-  RoutinesController get controller => Get.find<RoutinesController>();
+  void _saveWorkoutAsRoutine(Workout workout) {
+    final id = ref.read(routinesControllerProvider).importWorkout(workout);
+    if (workout.parentID == null) {
+      ref.read(historyControllerProvider).setParentID(workout, newParentID: id);
+    }
+    Go.snack(context.t.workouts.actions.saveAsRoutine.done);
+  }
+
+  RoutinesController get controller => ref.read(routinesControllerProvider);
 
   bool get _canStart {
     if (!widget.canStart) return false;
     if (widget.isOwned) return true;
 
-    final exercisesController = Get.find<ExercisesController>();
+    final exercisesController = ref.read(exercisesControllerProvider);
     final localExercises = exercisesController.exercises;
 
     for (final ex in workout.exercises) {
@@ -89,8 +101,11 @@ class _ExercisesViewState extends State<ExercisesView> {
 
   @override
   Widget build(BuildContext context) {
+    ref.watch(appPreferencesProvider);
+    ref.watch(historyWorkoutsProvider);
+    ref.watch(customExercisesProvider);
     final charts = [
-      if (RoutineHistoryChart.shouldShow(workout))
+      if (RoutineHistoryChart.shouldShow(workout, ref))
         Padding(
           padding: const EdgeInsets.all(16),
           child: RoutineHistoryChart(routine: workout),
@@ -100,7 +115,10 @@ class _ExercisesViewState extends State<ExercisesView> {
           padding: const EdgeInsets.all(16),
           child: WeightDistributionBarChart(workout: _getSynthesizedWorkout()),
         ),
-      if (WorkoutMuscleCategoriesBarChart.shouldShow(_getSynthesizedWorkout()))
+      if (WorkoutMuscleCategoriesBarChart.shouldShow(
+        _getSynthesizedWorkout(),
+        ref,
+      ))
         Padding(
           padding: const EdgeInsets.all(16),
           child: WorkoutMuscleCategoriesBarChart(
@@ -122,7 +140,7 @@ class _ExercisesViewState extends State<ExercisesView> {
         actions: [
           ProBuilder(
             builder: (context, subscriptionInfo) {
-              final routinesController = Get.find<RoutinesController>();
+              final routinesController = ref.read(routinesControllerProvider);
               final shouldDisallowSaving =
                   (subscriptionInfo == null ||
                       !subscriptionInfo.hasProFeatures) &&
@@ -141,14 +159,13 @@ class _ExercisesViewState extends State<ExercisesView> {
                                 SchedulerBinding.instance.addPostFrameCallback((
                                   timeStamp,
                                 ) {
-                                  Get.find<PurchasesController>()
+                                  ref
+                                      .read(purchasesControllerProvider)
                                       .presentPaywall();
                                 });
                                 return;
                               }
-                              Get.find<Coordinator>().saveWorkoutAsRoutine(
-                                workout,
-                              );
+                              _saveWorkoutAsRoutine(workout);
                             }
                           : null,
                       child: Text.rich(
@@ -185,7 +202,9 @@ class _ExercisesViewState extends State<ExercisesView> {
                           });
                         },
                       ),
-                      if (workout.hasContinuation)
+                      if (workout.hasContinuationIn(
+                        ref.read(historyControllerProvider).history,
+                      ))
                         PopupMenuItem(
                           key: const Key("edit-workout-cont"),
                           child: Text(
@@ -197,7 +216,9 @@ class _ExercisesViewState extends State<ExercisesView> {
                             ) {
                               Go.to(
                                 () => WorkoutEditor(
-                                  baseWorkout: workout.continuation!,
+                                  baseWorkout: workout.continuationIn(
+                                    ref.read(historyControllerProvider).history,
+                                  )!,
                                 ),
                               );
                             });
@@ -214,14 +235,15 @@ class _ExercisesViewState extends State<ExercisesView> {
                           ),
                         ),
                         onTap: () {
-                          Get.find<history.HistoryController>()
+                          ref
+                              .read(historyControllerProvider)
                               .deleteWorkoutWithDialog(
                                 context,
                                 workout: workout,
                                 onCanceled: () {
                                   SchedulerBinding.instance
                                       .addPostFrameCallback((timeStamp) {
-                                        Get.back();
+                                        Go.back();
                                         Go.snack(
                                           context
                                               .t
@@ -246,9 +268,9 @@ class _ExercisesViewState extends State<ExercisesView> {
                     PopupMenuItem(
                       child: Text(context.t.routines.actions.viewHistory),
                       onTap: () {
-                        Get.find<RoutinesController>().viewHistory(
-                          routine: workout,
-                        );
+                        ref
+                            .read(routinesControllerProvider)
+                            .viewHistory(routine: workout);
                       },
                     ),
                     PopupMenuItem(
@@ -264,9 +286,9 @@ class _ExercisesViewState extends State<ExercisesView> {
                           logger.d("newRoutine: $newRoutine");
 
                           if (newRoutine != null) {
-                            Get.find<RoutinesController>().editRoutine(
-                              newRoutine,
-                            );
+                            ref
+                                .read(routinesControllerProvider)
+                                .editRoutine(newRoutine);
                             setState(() {
                               workout = newRoutine;
                             });
@@ -285,18 +307,22 @@ class _ExercisesViewState extends State<ExercisesView> {
                         ),
                       ),
                       onTap: () {
-                        Get.find<RoutinesController>().deleteRoutineWithDialog(
-                          context,
-                          workout: workout,
-                          onCanceled: () {
-                            SchedulerBinding.instance.addPostFrameCallback((
-                              timeStamp,
-                            ) {
-                              Get.back();
-                              Go.snack(context.t.routines.actions.delete.done);
-                            });
-                          },
-                        );
+                        ref
+                            .read(routinesControllerProvider)
+                            .deleteRoutineWithDialog(
+                              context,
+                              workout: workout,
+                              onCanceled: () {
+                                SchedulerBinding.instance.addPostFrameCallback((
+                                  timeStamp,
+                                ) {
+                                  Go.back();
+                                  Go.snack(
+                                    context.t.routines.actions.delete.done,
+                                  );
+                                });
+                              },
+                            );
                       },
                     ),
                   ],
@@ -320,7 +346,9 @@ class _ExercisesViewState extends State<ExercisesView> {
                     children: [
                       WorkoutHeader(
                         workout: workout,
-                        continuation: workout.continuation,
+                        continuation: workout.continuationIn(
+                          ref.read(historyControllerProvider).history,
+                        ),
                       ),
                       if (workout.isConcrete) ...[
                         const Divider(height: 32),
@@ -329,8 +357,9 @@ class _ExercisesViewState extends State<ExercisesView> {
                       const Divider(height: 32),
                       ProBuilder(
                         builder: (context, subscriptionInfo) {
-                          final historyController =
-                              Get.find<HistoryController>();
+                          final historyController = ref.read(
+                            historyControllerProvider,
+                          );
                           final shouldDisallowRunning =
                               (subscriptionInfo == null ||
                                   !subscriptionInfo.hasProFeatures) &&
@@ -341,7 +370,8 @@ class _ExercisesViewState extends State<ExercisesView> {
                             onPressed: isEnabled
                                 ? () {
                                     if (shouldDisallowRunning) {
-                                      Get.find<PurchasesController>()
+                                      ref
+                                          .read(purchasesControllerProvider)
                                           .presentPaywall();
                                       return;
                                     }
@@ -449,14 +479,19 @@ class _ExercisesViewState extends State<ExercisesView> {
                   onTap: () {
                     Go.to(
                       () => ExercisesView(
-                        workout: workout.originalWorkoutForContinuation!,
+                        workout: workout.originalWorkoutForContinuationIn(
+                          ref.read(historyControllerProvider).history,
+                        )!,
                       ),
                     );
                   },
                 ),
               ),
             ],
-            if (workout.isConcrete && workout.hasContinuation) ...[
+            if (workout.isConcrete &&
+                workout.hasContinuationIn(
+                  ref.read(historyControllerProvider).history,
+                )) ...[
               const SliverToBoxAdapter(child: Divider()),
               SliverToBoxAdapter(
                 child: ListTile(
@@ -466,43 +501,72 @@ class _ExercisesViewState extends State<ExercisesView> {
                   title: Text(context.t.exercise.continuation.label),
                   subtitle: Text(context.t.exercise.continuation.description),
                   onTap: () {
-                    Get.find<HistoryController>().combineWorkoutsFlow(workout);
+                    ref
+                        .read(historyControllerProvider)
+                        .combineWorkoutsFlow(workout);
                   },
                 ),
               ),
               SliverList(
-                delegate: SliverChildBuilderDelegate((context, index) {
-                  final exercise = workout.continuation!.exercises[index];
-                  return Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 8),
-                    child: ExerciseDataView(
-                      exercise: exercise,
-                      workout: workout.continuation!,
-                      index: index,
-                      isInSuperset: false,
-                      highlight: widget.highlightExercise(exercise),
-                      weightUnit: workout.continuation!.weightUnit,
-                      distanceUnit: workout.continuation!.distanceUnit,
-                    ),
-                  );
-                }, childCount: workout.continuation!.exercises.length),
+                delegate: SliverChildBuilderDelegate(
+                  (context, index) {
+                    final exercise = workout
+                        .continuationIn(
+                          ref.read(historyControllerProvider).history,
+                        )!
+                        .exercises[index];
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 8),
+                      child: ExerciseDataView(
+                        exercise: exercise,
+                        workout: workout.continuationIn(
+                          ref.read(historyControllerProvider).history,
+                        )!,
+                        index: index,
+                        isInSuperset: false,
+                        highlight: widget.highlightExercise(exercise),
+                        weightUnit: workout
+                            .continuationIn(
+                              ref.read(historyControllerProvider).history,
+                            )!
+                            .weightUnit,
+                        distanceUnit: workout
+                            .continuationIn(
+                              ref.read(historyControllerProvider).history,
+                            )!
+                            .distanceUnit,
+                      ),
+                    );
+                  },
+                  childCount: workout
+                      .continuationIn(
+                        ref.read(historyControllerProvider).history,
+                      )!
+                      .exercises
+                      .length,
+                ),
               ),
               if (kDebugMode) ...[
                 SliverToBoxAdapter(
                   child: Text(
-                    "cont id: ${workout.continuation!.id}",
+                    "cont id: ${workout.continuationIn(ref.read(historyControllerProvider).history)!.id}",
                     textAlign: TextAlign.center,
                   ),
                 ),
                 SliverToBoxAdapter(
                   child: Text(
-                    "cont parent: ${workout.continuation!.parentID}",
+                    "cont parent: ${workout.continuationIn(ref.read(historyControllerProvider).history)!.parentID}",
                     textAlign: TextAlign.center,
                   ),
                 ),
                 SliverToBoxAdapter(
                   child: Text(
-                    workout.continuation!.toJson().toPrettyString(),
+                    workout
+                        .continuationIn(
+                          ref.read(historyControllerProvider).history,
+                        )!
+                        .toJson()
+                        .toPrettyString(),
                     style: const TextStyle(
                       fontFamily: "monospace",
                       fontFamilyFallback: <String>["Menlo", "Courier"],
@@ -526,28 +590,34 @@ class _ExercisesViewState extends State<ExercisesView> {
   SynthesizedWorkout _getSynthesizedWorkout() {
     return SynthesizedWorkout([
       workout,
-      if (workout.isConcrete && workout.hasContinuation) workout.continuation!,
+      if (workout.isConcrete &&
+          workout.hasContinuationIn(
+            ref.read(historyControllerProvider).history,
+          ))
+        workout.continuationIn(ref.read(historyControllerProvider).history)!,
     ]);
   }
 
   void rename(String? value) {
-    final newWorkout = Get.find<history.HistoryController>().rename(
-      workout,
-      newName: value,
-    );
+    final newWorkout = ref
+        .read(historyControllerProvider)
+        .rename(workout, newName: value);
     SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
       setState(() => workout = newWorkout);
     });
   }
 }
 
-class WorkoutStatsRow extends StatelessWidget {
+class WorkoutStatsRow extends ConsumerWidget {
   const WorkoutStatsRow({super.key, required this.workout});
 
   final Workout workout;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    ref.watch(appPreferencesProvider);
+    ref.watch(historyWorkoutsProvider);
+    ref.watch(customExercisesProvider);
     return StatsRow(
       stats: [
         Stats(
@@ -560,20 +630,28 @@ class WorkoutStatsRow extends StatelessWidget {
         ),
         if (workout.liftedWeight > 0)
           Stats(
-            value: Weights.convert(
-              value: workout.liftedWeight,
-              from: workout.weightUnit,
-              to: settingsController.weightUnit.value,
-            ).getUserFacingWeight(context.t),
+            value:
+                Weights.convert(
+                  value: workout.liftedWeight,
+                  from: workout.weightUnit,
+                  to: ref.read(settingsControllerInstanceProvider).weightUnit,
+                ).getUserFacingWeight(
+                  context.t,
+                  ref.read(settingsControllerProvider).weightUnit,
+                ),
             label: context.t.exerciseList.stats.volume,
           ),
         if (workout.distanceRun > 0)
           Stats(
-            value: Distance.convert(
-              value: workout.distanceRun,
-              from: workout.distanceUnit,
-              to: settingsController.distanceUnit.value,
-            ).getUserFacingDistance(context.t),
+            value:
+                Distance.convert(
+                  value: workout.distanceRun,
+                  from: workout.distanceUnit,
+                  to: ref.read(settingsControllerInstanceProvider).distanceUnit,
+                ).getUserFacingDistance(
+                  context.t,
+                  ref.read(settingsControllerProvider).distanceUnit,
+                ),
             label: context.t.exerciseList.stats.distance,
           ),
         Stats(
@@ -585,7 +663,7 @@ class WorkoutStatsRow extends StatelessWidget {
   }
 }
 
-class ExerciseDataView extends StatelessWidget {
+class ExerciseDataView extends ConsumerWidget {
   const ExerciseDataView({
     super.key,
     required this.exercise,
@@ -606,7 +684,10 @@ class ExerciseDataView extends StatelessWidget {
   final Distance distanceUnit;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    ref.watch(appPreferencesProvider);
+    ref.watch(historyWorkoutsProvider);
+    ref.watch(customExercisesProvider);
     if (this.exercise is Superset) return _buildSuperset(context);
 
     assert(this.exercise is! Superset);
@@ -800,11 +881,14 @@ class ExerciseDataView extends StatelessWidget {
   }
 }
 
-class OverwriteDialog extends StatelessWidget {
+class OverwriteDialog extends ConsumerWidget {
   const OverwriteDialog({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    ref.watch(appPreferencesProvider);
+    ref.watch(historyWorkoutsProvider);
+    ref.watch(customExercisesProvider);
     return AlertDialog(
       icon: const Icon(GTIcons.info),
       title: Text(context.t.ongoingWorkout.overwrite.title),
@@ -812,13 +896,13 @@ class OverwriteDialog extends StatelessWidget {
       actions: [
         TextButton(
           onPressed: () {
-            Get.back(result: false);
+            Go.back(result: false);
           },
           child: Text(context.t.ongoingWorkout.overwrite.actions.no),
         ),
         FilledButton.tonal(
           onPressed: () {
-            Get.back(result: true);
+            Go.back(result: true);
           },
           child: Text(context.t.ongoingWorkout.overwrite.actions.yes),
         ),

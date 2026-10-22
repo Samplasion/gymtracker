@@ -7,6 +7,7 @@ import 'package:gymtracker/view/utils/history_workout.dart';
 import 'package:gymtracker/view/utils/workout_done.dart';
 import 'package:gymtracker/view/workout.dart';
 
+import '../utils.dart';
 import 'create_routine.dart';
 
 Future<void> testWorkoutFromRoutineFlow(
@@ -35,7 +36,11 @@ Future<void> testWorkoutFromRoutineFlow(
   expect(setFields, findsNWidgets(3));
 
   for (final field in setFields.evaluate()) {
-    await tester.enterText(find.byWidget(field.widget), "10");
+    await enterTextAndDismissKeyboard(
+      tester,
+      find.byWidget(field.widget),
+      "10",
+    );
   }
 
   final checkboxes = find.byType(Checkbox);
@@ -48,12 +53,24 @@ Future<void> testWorkoutFromRoutineFlow(
   // Avoiding pumpAndSettle here because the animation in WorkoutTimerView
   // causes the tester to wait for the entire duration of the timer
   await tester.pump(const Duration(seconds: 2));
+  // The first frame rebuilds the Riverpod consumer and starts the 300ms
+  // crossfade from a zero-height bottom bar. Finish that transition without
+  // waiting for the countdown's continuously animated progress indicator.
+  await tester.pump(const Duration(milliseconds: 350));
 
   expect(find.byType(WorkoutTimerView), findsOneWidget);
+  final skipRest = find
+      .descendant(
+        of: find.byType(WorkoutTimerView),
+        matching: find.byIcon(GTIcons.skip),
+      )
+      .hitTestable();
+  expect(skipRest, findsOneWidget);
 
-  // Avoid the above issue for the next pumpAndSettle calls
-  await tester.tap(find.widgetWithIcon(IconButton, GTIcons.skip));
+  // Stop the rest timer before the next pumpAndSettle calls.
+  await tester.tap(skipRest);
   await tester.pumpAndSettle();
+  expect(skipRest, findsNothing);
 
   await tester.tap(find.byKey(const Key('main-menu')));
   await tester.pumpAndSettle();
@@ -85,11 +102,7 @@ Future<void> testWorkoutFromRoutineFlow(
   await tester.pumpAndSettle();
 
   // Check the history view
-  await tester.tap(
-    find.descendant(
-        of: find.byType(NavigationDrawer),
-        matching: find.byIcon(GTIcons.history)),
-  );
+  await openHistory(tester);
   await tester.pumpAndSettle(const Duration(seconds: 2));
 
   expect(find.byType(HistoryWorkout), findsOneWidget);

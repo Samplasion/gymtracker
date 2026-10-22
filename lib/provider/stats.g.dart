@@ -46,7 +46,7 @@ final class WorkoutsStreamProvider
   }
 }
 
-String _$workoutsStreamHash() => r'd47f6c531a077e446f19b74e9e07d5784dd3625c';
+String _$workoutsStreamHash() => r'a263c0f5551ef8ec8f28fdecd04600e8805e6a04';
 
 @ProviderFor(exerciseDataStream)
 final exerciseDataStreamProvider = ExerciseDataStreamFamily._();

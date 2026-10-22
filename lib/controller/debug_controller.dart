@@ -1,16 +1,28 @@
 import 'package:flutter/scheduler.dart';
-import 'package:get/get.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-class DebugController extends GetxController {
-  RxSet<String> missingKeys = RxSet();
-  RxBool showSimulator = false.obs;
+part 'debug_controller.g.dart';
 
-  addMissingKey(String key) {
-    SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
-      missingKeys.add(key);
+typedef DebugState = ({Set<String> missingKeys, bool showSimulator});
+
+@Riverpod(keepAlive: true)
+class DebugController extends _$DebugController {
+  @override
+  DebugState build() => (missingKeys: const {}, showSimulator: false);
+
+  void addMissingKey(String key) {
+    SchedulerBinding.instance.addPostFrameCallback((_) {
+      if (!ref.mounted) return;
+      state = (
+        missingKeys: Set.unmodifiable({...state.missingKeys, key}),
+        showSimulator: state.showSimulator,
+      );
     });
   }
 
-  toggleSimulator() => showSimulator.toggle();
-  setShowSimulator(bool v) => showSimulator(v);
+  void toggleSimulator() => setShowSimulator(!state.showSimulator);
+
+  void setShowSimulator(bool value) {
+    state = (missingKeys: state.missingKeys, showSimulator: value);
+  }
 }

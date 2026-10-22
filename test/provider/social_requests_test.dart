@@ -1,12 +1,12 @@
 import 'dart:convert';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:gymtracker/model/achievements.dart';
+import 'package:gymtracker/model/workout.dart';
+import 'package:gymtracker/provider/connectivity.dart';
+import 'package:gymtracker/provider/feed.dart';
 import 'package:gymtracker/provider/friend.dart';
 import 'package:gymtracker/provider/online.dart';
-import 'package:gymtracker/provider/feed.dart';
-import 'package:gymtracker/provider/connectivity.dart';
-import 'package:gymtracker/model/workout.dart';
-import 'package:gymtracker/model/achievements.dart';
 import 'package:gymtracker/service/online.dart';
 import 'package:http/http.dart';
 import 'package:http/testing.dart';
@@ -142,6 +142,7 @@ void main() {
       ).thenAnswer((_) => completions.stream);
       final c = ProviderContainer(
         overrides: [
+          ...MockServices.defaultOverrides,
           onlineProvider.overrideWith(_Online.new),
           currentUserIdProvider.overrideWithValue('owner'),
           networkConnectivityProvider.overrideWith(_Connectivity.new),
@@ -170,6 +171,7 @@ void main() {
         }
         final c = ProviderContainer(
           overrides: [
+            ...MockServices.defaultOverrides,
             onlineProvider.overrideWith(_Online.new),
             currentUserIdProvider.overrideWithValue('owner'),
           ],
@@ -222,6 +224,7 @@ void main() {
     () async {
       final c = ProviderContainer(
         overrides: [
+          ...MockServices.defaultOverrides,
           onlineProvider.overrideWith(_Online.new),
           currentUserIdProvider.overrideWithValue('owner'),
         ],
@@ -244,6 +247,7 @@ void main() {
     () async {
       final c = ProviderContainer(
         overrides: [
+          ...MockServices.defaultOverrides,
           onlineProvider.overrideWith(_Online.new),
           currentUserIdProvider.overrideWithValue('owner'),
         ],
@@ -267,6 +271,7 @@ void main() {
   test('names share a batch and never fetch public content', () async {
     final c = ProviderContainer(
       overrides: [
+        ...MockServices.defaultOverrides,
         onlineProvider.overrideWith(_Online.new),
         currentUserIdProvider.overrideWithValue('owner'),
       ],

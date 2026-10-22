@@ -1,5 +1,4 @@
 import 'package:copy_with_extension/copy_with_extension.dart';
-import 'package:get/get.dart' show Get, GetNavigation;
 import 'package:gymtracker/data/distance.dart';
 import 'package:gymtracker/data/exercises.dart';
 import 'package:gymtracker/data/weights.dart';
@@ -627,7 +626,6 @@ Map<GTMuscleHighlight, GTMuscleHighlightIntensity> _defaultMuscleHighlight(
 
 extension Display on Exercise {
   String getDisplayName(Translations t) {
-    if (Get.context == null) return name;
     if (skeleton) return name;
     if (isCustom) return name;
 

@@ -1,10 +1,11 @@
 import 'package:csv/csv.dart';
 import 'package:drift/native.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:get/get.dart';
 import 'package:gymtracker/controller/settings_controller.dart';
 import 'package:gymtracker/db/database.dart';
 import 'package:gymtracker/model/measurements.dart';
+import 'package:gymtracker/provider/db.dart';
 import 'package:gymtracker/service/database.dart';
 
 import '../helpers.dart';
@@ -21,6 +22,17 @@ class _FailingBodyImport extends DatabaseService {
 void main() {
   late GTDatabaseImpl db;
   late SettingsController controller;
+  late ProviderContainer container;
+  void useService(DatabaseService service) {
+    container = ProviderContainer(
+      overrides: [
+        databaseServiceProvider.overrideWithValue(service),
+        appDatabaseProvider.overrideWithValue(db),
+      ],
+    );
+    controller = container.read(settingsControllerProvider);
+  }
+
   final day = DateTime(2026, 10, 18, 9);
   final measurementCsv = const CsvEncoder().convert([
     [
@@ -71,10 +83,9 @@ void main() {
 
   setUp(() {
     db = GTDatabaseImpl.withQueryExecutor(NativeDatabase.memory());
-    controller = SettingsController();
   });
   tearDown(() async {
-    Get.reset();
+    container.dispose();
     await db.close();
   });
 
@@ -83,7 +94,7 @@ void main() {
       'repeated measurement and workout import preserves existing data for $user',
       () async {
         db.setCurrentUserId(user);
-        Get.put<DatabaseService>(DatabaseService.withDatabase(db));
+        useService(DatabaseService.withDatabase(db));
         await db.insertWeightMeasurement(
           WeightMeasurement(
             id: 'existing',
@@ -118,7 +129,7 @@ void main() {
     'failure in the second import phase rolls back the first phase',
     () async {
       db.setCurrentUserId('A');
-      Get.put<DatabaseService>(_FailingBodyImport(db));
+      useService(_FailingBodyImport(db));
       await expectLater(
         controller.importHevy(measurementCsv),
         throwsStateError,

@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_quill/flutter_quill.dart';
-import 'package:get/get.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gymtracker/controller/history_controller.dart';
 import 'package:gymtracker/controller/routines_controller.dart';
-import 'package:gymtracker/controller/workout_controller.dart';
 import 'package:gymtracker/data/distance.dart';
 import 'package:gymtracker/data/weights.dart';
 import 'package:gymtracker/i18n/strings.g.dart';
@@ -14,11 +13,13 @@ import 'package:gymtracker/model/exercise.dart';
 import 'package:gymtracker/model/set.dart';
 import 'package:gymtracker/model/superset.dart';
 import 'package:gymtracker/model/workout.dart';
+import 'package:gymtracker/provider/settings.dart';
 import 'package:gymtracker/service/logger.dart';
 import 'package:gymtracker/struct/editor_callback.dart';
 import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/utils/utils.dart';
+import 'package:gymtracker/view/actions/history.dart';
 import 'package:gymtracker/view/components/infobox.dart';
 import 'package:gymtracker/view/components/rich_text_editor.dart';
 import 'package:gymtracker/view/components/split_button.dart';
@@ -33,16 +34,16 @@ import 'package:gymtracker/view/utils/time.dart';
 import 'package:gymtracker/view/utils/weight_calculator.dart';
 import 'package:gymtracker/view/utils/workout.dart';
 
-class WorkoutEditor extends StatefulWidget {
+class WorkoutEditor extends ConsumerStatefulWidget {
   final Workout baseWorkout;
 
   const WorkoutEditor({required this.baseWorkout, super.key});
 
   @override
-  State<WorkoutEditor> createState() => _WorkoutEditorState();
+  ConsumerState<WorkoutEditor> createState() => _WorkoutEditorState();
 }
 
-class _WorkoutEditorState extends State<WorkoutEditor> {
+class _WorkoutEditorState extends ConsumerState<WorkoutEditor> {
   late Workout workout = widget.baseWorkout.clone();
 
   @override
@@ -50,16 +51,7 @@ class _WorkoutEditorState extends State<WorkoutEditor> {
     if (mounted) super.setState(fn);
   }
 
-  @override
-  void dispose() {
-    super.dispose();
-
-    try {
-      Get.find<WorkoutController>().save();
-    } catch (_) {}
-  }
-
-  late final historyController = Get.find<HistoryController>();
+  late final historyController = ref.read(historyControllerProvider);
 
   bool shouldPop() {
     return Workout.deepEquality(workout, widget.baseWorkout);
@@ -67,6 +59,7 @@ class _WorkoutEditorState extends State<WorkoutEditor> {
 
   @override
   Widget build(BuildContext context) {
+    ref.watch(appPreferencesProvider);
     final nav = Navigator.of(context);
     return PopScope(
       canPop: false,
@@ -286,7 +279,7 @@ class _WorkoutEditorState extends State<WorkoutEditor> {
       SchedulerBinding.instance.addPostFrameCallback((timeStamp) async {
         final newIndices = await showDialog<List<int>>(
           builder: (context) => WorkoutExerciseReorderDialog(exercises: target),
-          context: Get.context!,
+          context: Go.context!,
         );
         if (newIndices == null || newIndices.length != target.length) {
           return;
@@ -789,7 +782,7 @@ class _WorkoutEditorState extends State<WorkoutEditor> {
   );
 }
 
-class WorkoutInfoBar extends StatelessWidget {
+class WorkoutInfoBar extends ConsumerWidget {
   final int reps;
   final double liftedWeight;
   final double progress;
@@ -802,7 +795,8 @@ class WorkoutInfoBar extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    ref.watch(appPreferencesProvider);
     return Column(
       children: [
         Padding(
@@ -866,17 +860,18 @@ class WorkoutInfoBar extends StatelessWidget {
   }
 }
 
-class WorkoutFinishEditingPage extends StatefulWidget {
+class WorkoutFinishEditingPage extends ConsumerStatefulWidget {
   final Workout workout;
 
   const WorkoutFinishEditingPage({super.key, required this.workout});
 
   @override
-  State<WorkoutFinishEditingPage> createState() =>
+  ConsumerState<WorkoutFinishEditingPage> createState() =>
       _WorkoutFinishEditingPageState();
 }
 
-class _WorkoutFinishEditingPageState extends State<WorkoutFinishEditingPage> {
+class _WorkoutFinishEditingPageState
+    extends ConsumerState<WorkoutFinishEditingPage> {
   late Duration workoutDuration;
   final formKey = GlobalKey<FormState>();
 
@@ -897,7 +892,7 @@ class _WorkoutFinishEditingPageState extends State<WorkoutFinishEditingPage> {
     // Parent workout data
     String? pwInitialItem = widget.workout.parentID;
     if (pwInitialItem == null ||
-        !Get.find<RoutinesController>().hasRoutine(pwInitialItem)) {
+        !ref.read(routinesControllerProvider).hasRoutine(pwInitialItem)) {
       pwInitialItem = null;
     }
 
@@ -906,6 +901,7 @@ class _WorkoutFinishEditingPageState extends State<WorkoutFinishEditingPage> {
 
   @override
   Widget build(BuildContext context) {
+    ref.watch(appPreferencesProvider);
     final padding = MediaQuery.of(context).viewPadding;
     return Dialog.fullscreen(
       child: Scaffold(
@@ -989,7 +985,9 @@ class _WorkoutFinishEditingPageState extends State<WorkoutFinishEditingPage> {
                                 parentWorkoutID = routine?.id;
                               });
                             },
-                            routine: Get.find<RoutinesController>().workouts
+                            routine: ref
+                                .read(routinesControllerProvider)
+                                .workouts
                                 .firstWhereOrNull(
                                   (element) => element.id == parentWorkoutID,
                                 ),
@@ -1056,12 +1054,12 @@ class _WorkoutFinishEditingPageState extends State<WorkoutFinishEditingPage> {
     return GymTrackerInputDecoration(labelText: label);
   }
 
-  void _submit() {
+  Future<void> _submit() async {
     final isValid = formKey.currentState!.validate();
 
     if (isValid) {
-      final controller = Get.find<HistoryController>();
-      controller.submitEditedWorkout(
+      final controller = ref.read(historyControllerProvider);
+      await controller.submitEditedWorkout(
         widget.workout.copyWith(
           name: titleController.text,
           parentID: parentWorkoutID,
@@ -1070,26 +1068,33 @@ class _WorkoutFinishEditingPageState extends State<WorkoutFinishEditingPage> {
           infobox: infoboxController.toEncoded(),
         ),
       );
+      if (!mounted) return;
+      Go.back();
+      SchedulerBinding.instance.addPostFrameCallback((_) {
+        Go.back();
+        Go.back();
+      });
     }
   }
 }
 
-class WorkoutExerciseReorderDialog extends StatefulWidget {
+class WorkoutExerciseReorderDialog extends ConsumerStatefulWidget {
   final List<WorkoutExercisable> exercises;
 
   const WorkoutExerciseReorderDialog({required this.exercises, super.key});
 
   @override
-  State<WorkoutExerciseReorderDialog> createState() =>
+  ConsumerState<WorkoutExerciseReorderDialog> createState() =>
       _WorkoutExerciseReorderDialogState();
 }
 
 class _WorkoutExerciseReorderDialogState
-    extends State<WorkoutExerciseReorderDialog> {
+    extends ConsumerState<WorkoutExerciseReorderDialog> {
   late List<int> indices = List.generate(widget.exercises.length, (i) => i);
 
   @override
   Widget build(BuildContext context) {
+    ref.watch(appPreferencesProvider);
     return Dialog.fullscreen(
       child: Scaffold(
         appBar: PreferredSize(
@@ -1129,6 +1134,6 @@ class _WorkoutExerciseReorderDialogState
   }
 
   void _submit() {
-    Get.back(result: indices);
+    Go.back(result: indices);
   }
 }

@@ -1,7 +1,7 @@
+import 'dart:async';
 import 'dart:io';
 
-import 'package:get/get.dart';
-import 'package:gymtracker/controller/workout_controller.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gymtracker/model/native.dart';
 import 'package:gymtracker/service/logger.dart';
 import 'package:gymtracker/service/native.g.dart';
@@ -19,6 +19,23 @@ abstract class NativeService {
   }
 
   NativeService._();
+  void Function()? onMarkSetDone;
+  bool Function()? onCursorNext;
+  bool Function()? onCursorPrevious;
+  void Function()? onRequestTrainingData;
+  void Function(double?, double?, int?, double?)? onUpdateSetParameters;
+
+  void attach() {}
+
+  void clearCallbacks() {
+    onMarkSetDone = null;
+    onCursorNext = null;
+    onCursorPrevious = null;
+    onRequestTrainingData = null;
+    onUpdateSetParameters = null;
+  }
+
+  void dispose() => clearCallbacks();
 
   Stream<double?> get energyStream;
   Stream<double?> get heartRateStream;
@@ -92,7 +109,11 @@ class _UnsupportedNativeService extends NativeService
 
   @override
   void updateSetParameters(
-      double? weight, double? timeSeconds, int? reps, double? distance) {
+    double? weight,
+    double? timeSeconds,
+    int? reps,
+    double? distance,
+  ) {
     // no-op
   }
 
@@ -112,11 +133,34 @@ class _NativeServiceImpl extends NativeService
     implements GymBroNativeFlutterAPI, GymBroNativeLoggerChannel {
   final _watch = GymBroNativeHostAPI();
 
-  static final _NativeServiceImpl _instance = _NativeServiceImpl._internal();
-  factory _NativeServiceImpl() => _instance;
-  _NativeServiceImpl._internal() : super._() {
+  _NativeServiceImpl() : super._();
+  bool _disposed = false;
+  bool _attached = false;
+
+  @override
+  void attach() {
+    if (_disposed || _attached) return;
+    _attached = true;
     GymBroNativeFlutterAPI.setUp(this);
     GymBroNativeLoggerChannel.setUp(this);
+  }
+
+  @override
+  void clearCallbacks() {
+    super.clearCallbacks();
+    if (!_attached) return;
+    _attached = false;
+    GymBroNativeFlutterAPI.setUp(null);
+    GymBroNativeLoggerChannel.setUp(null);
+  }
+
+  @override
+  void dispose() {
+    if (_disposed) return;
+    _disposed = true;
+    clearCallbacks();
+    unawaited(_energy$.close());
+    unawaited(_heartRate$.close());
   }
 
   final _energy$ = BehaviorSubject<double?>();
@@ -129,24 +173,28 @@ class _NativeServiceImpl extends NativeService
 
   @override
   void markThisSetAsDone() {
+    if (_disposed) return;
     logger.i("Received markThisSetAsDone from native.");
-    Get.find<WorkoutController>().autoMarkNextSetDone();
+    onMarkSetDone?.call();
   }
 
   @override
   bool moveWorkoutCursorNext() {
+    if (_disposed) return false;
     logger.i("Received moveWorkoutCursorNext from native.");
-    return Get.find<WorkoutController>().moveSetCursorToNext();
+    return onCursorNext?.call() ?? false;
   }
 
   @override
   bool moveWorkoutCursorPrevious() {
+    if (_disposed) return false;
     logger.i("Received moveWorkoutCursorPrevious from native.");
-    return Get.find<WorkoutController>().moveSetCursorToPrevious();
+    return onCursorPrevious?.call() ?? false;
   }
 
   @override
   void setIsWorkoutRunning(bool isWorkoutRunning) {
+    if (_disposed) return;
     logger.i("Setting isWorkoutRunning on native side: $isWorkoutRunning");
     if (isWorkoutRunning) {
       _watch.startWorkout();
@@ -159,20 +207,22 @@ class _NativeServiceImpl extends NativeService
 
   @override
   void setExerciseParameters(NativeWorkoutStateMessage parameters) {
+    if (_disposed) return;
     logger.i(
-        """Setting exercise parameters on native side: ${parameters.toJson()}""");
+      """Setting exercise parameters on native side: ${parameters.toJson()}""",
+    );
     _watch.setExerciseParameters(parameters.toJson());
   }
 
   @override
   void requestTrainingData() {
+    if (_disposed) return;
     logger.i("Received requestTrainingData from native.");
-    if (!Get.isRegistered<WorkoutController>()) {
-      // Cancel workout
+    if (onRequestTrainingData == null) {
       _watch.stopWorkout();
       return;
     }
-    Get.find<WorkoutController>().refreshWatchData();
+    onRequestTrainingData?.call();
   }
 
   @override
@@ -192,12 +242,10 @@ class _NativeServiceImpl extends NativeService
     required int workouts,
     required List<int> workoutDensityChartData,
   }) {
-    logger.i("""Sending complication data to native side: ${(
-      weekStreak: weekStreak,
-      restDays: lastWorkoutDay,
-      workouts: workouts,
-      workoutDensityChartData: workoutDensityChartData,
-    )}""");
+    if (_disposed) return Future<void>.value();
+    logger.i(
+      """Sending complication data to native side: ${(weekStreak: weekStreak, restDays: lastWorkoutDay, workouts: workouts, workoutDensityChartData: workoutDensityChartData)}""",
+    );
     return _watch.updateHomeWidgetParameters({
       streakKey: weekStreak,
       restKey: lastWorkoutDay.millisecondsSinceEpoch,
@@ -207,8 +255,10 @@ class _NativeServiceImpl extends NativeService
 
   @override
   void handleWorkoutMetrics(double? energy, double? heartRate) {
+    if (_disposed) return;
     logger.i(
-        "Native side sent the following metrics: $energy kcal, $heartRate bpm");
+      "Native side sent the following metrics: $energy kcal, $heartRate bpm",
+    );
     if (energy != null) _energy$.add(energy);
     if (heartRate != null) _heartRate$.add(heartRate);
     if (energy == null && heartRate == null) {
@@ -220,22 +270,37 @@ class _NativeServiceImpl extends NativeService
 
   @override
   void updateSetParameters(
-      double? weight, double? timeSeconds, int? reps, double? distance) {
-    Get.find<WorkoutController>()
-        .updateSetParameters(weight, timeSeconds, reps, distance);
+    double? weight,
+    double? timeSeconds,
+    int? reps,
+    double? distance,
+  ) {
+    if (_disposed) return;
+    onUpdateSetParameters?.call(weight, timeSeconds, reps, distance);
   }
 
   @override
   void setFoodParameters(NativeFoodStateMessage parameters) {
+    if (_disposed) return;
     logger.i(
-        """Setting food parameters on native side: ${parameters.toJson()}""");
+      """Setting food parameters on native side: ${parameters.toJson()}""",
+    );
     _watch.updateFoodParameters(parameters.toJson());
   }
 
   @override
   void updateShadowRoutines(Map<String, String> routines) {
+    if (_disposed) return;
     logger.i(
-        """Updating shadow routines on native side: ${routines.toString()}""");
+      """Updating shadow routines on native side: ${routines.toString()}""",
+    );
     _watch.updateShadowRoutines(routines);
   }
 }
+
+final nativeServiceProvider = Provider<NativeService>((ref) {
+  final service = NativeService.instance();
+  service.attach();
+  ref.onDispose(service.dispose);
+  return service;
+});

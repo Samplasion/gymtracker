@@ -4,15 +4,17 @@ import 'package:collection/collection.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
-import 'package:get/get.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gymtracker/controller/purchases_controller.dart';
 import 'package:gymtracker/i18n/strings.g.dart';
 import 'package:gymtracker/icons/gymtracker_icons.dart';
+import 'package:gymtracker/provider/training_data.dart';
 import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/utils/theme.dart';
-import 'package:gymtracker/utils/utils.dart' show doubleEquality;
 import 'package:gymtracker/utils/utils.dart' as utils show maxDate;
+import 'package:gymtracker/utils/utils.dart' show doubleEquality;
+import 'package:gymtracker/view/actions/purchases.dart';
 import 'package:gymtracker/view/charts/base_types.dart';
 import 'package:gymtracker/view/components/badges.dart';
 import 'package:gymtracker/view/components/pro_builder.dart';
@@ -36,7 +38,7 @@ enum _LineChartTimeSeriesType {
   final bool isPro;
 }
 
-class LineChartTimeSeries<T> extends StatelessWidget {
+class LineChartTimeSeries<T> extends ConsumerWidget {
   final Map<T, LineChartCategory> categories;
   final Map<T, List<LineChartPoint>> data;
   final Map<T, List<LineChartPoint>>? predictions;
@@ -99,7 +101,8 @@ class LineChartTimeSeries<T> extends StatelessWidget {
        assert(categories.keys.every((key) => data.keys.contains(key)));
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    ref.watch(historyWorkoutsProvider);
     if (data.isEmpty || data.entries.every((entry) => entry.value.isEmpty)) {
       return _EmptyChartTimeSeries();
     }
@@ -135,7 +138,7 @@ class LineChartTimeSeries<T> extends StatelessWidget {
   }
 }
 
-class _LineChartTimeSeriesSingle<T> extends StatefulWidget {
+class _LineChartTimeSeriesSingle<T> extends ConsumerStatefulWidget {
   final Map<T, LineChartCategory> categories;
   final Map<T, List<LineChartPoint>> data;
   final Map<T, List<LineChartPoint>>? predictions;
@@ -170,12 +173,12 @@ class _LineChartTimeSeriesSingle<T> extends StatefulWidget {
   });
 
   @override
-  State<_LineChartTimeSeriesSingle<T>> createState() =>
-      __LineChartTimeSeriesSingleState<T>();
+  ConsumerState<_LineChartTimeSeriesSingle<T>> createState() =>
+      __LineChartTimeSeriesSingleConsumerState<T>();
 }
 
-class __LineChartTimeSeriesSingleState<T>
-    extends State<_LineChartTimeSeriesSingle<T>> {
+class __LineChartTimeSeriesSingleConsumerState<T>
+    extends ConsumerState<_LineChartTimeSeriesSingle<T>> {
   late T selectedCategory;
   late int hoveredIndex;
   var type = _LineChartTimeSeriesType.threeMonths;
@@ -334,7 +337,7 @@ class __LineChartTimeSeriesSingleState<T>
   }
 
   void _recalculateLeftReservedSize() {
-    final style = context.textTheme.labelSmall!;
+    final style = Theme.of(context).textTheme.labelSmall!;
     final sizes = widget.data.entries.map((e) {
       final categorySizes =
           e.value.map((point) {
@@ -455,7 +458,7 @@ class __LineChartTimeSeriesSingleState<T>
           children: [
             TextSpan(
               text: widget.leftTitleBuilder(selectedCategory, value),
-              style: context.textTheme.labelSmall!,
+              style: Theme.of(context).textTheme.labelSmall!,
             ),
           ],
         ),
@@ -466,6 +469,7 @@ class __LineChartTimeSeriesSingleState<T>
 
   @override
   Widget build(BuildContext context) {
+    ref.watch(historyWorkoutsProvider);
     final colorScheme = Theme.of(context).colorScheme;
     final predictionColor = colorScheme.quaternary;
     final currentPoint = dataIndices[selectedCategory]?[hoveredIndex];
@@ -533,7 +537,9 @@ class __LineChartTimeSeriesSingleState<T>
                         if (shouldBlock && value.isPro) {
                           Navigator.of(context).pop();
                           SchedulerBinding.instance.addPostFrameCallback((_) {
-                            Get.find<PurchasesController>().presentPaywall();
+                            ref
+                                .read(purchasesControllerProvider)
+                                .presentPaywall();
                           });
                           return;
                         }
@@ -626,7 +632,7 @@ class __LineChartTimeSeriesSingleState<T>
                             showTitles: true,
                             reservedSize:
                                 [
-                                  context.width / 5,
+                                  MediaQuery.sizeOf(context).width / 5,
                                   _leftReservedSize ?? 0,
                                 ].min +
                                 8,
@@ -812,7 +818,7 @@ class __LineChartTimeSeriesSingleState<T>
   }
 }
 
-class _LineChartTimeSeriesConcurrent<T> extends StatefulWidget {
+class _LineChartTimeSeriesConcurrent<T> extends ConsumerStatefulWidget {
   final Map<T, LineChartCategory> categories;
   final Map<T, List<LineChartPoint>> data;
   final Map<T, List<LineChartPoint>>? predictions;
@@ -847,12 +853,12 @@ class _LineChartTimeSeriesConcurrent<T> extends StatefulWidget {
   });
 
   @override
-  State<_LineChartTimeSeriesConcurrent<T>> createState() =>
-      __LineChartTimeSeriesConcurrentState<T>();
+  ConsumerState<_LineChartTimeSeriesConcurrent<T>> createState() =>
+      __LineChartTimeSeriesConcurrentConsumerState<T>();
 }
 
-class __LineChartTimeSeriesConcurrentState<T>
-    extends State<_LineChartTimeSeriesConcurrent<T>> {
+class __LineChartTimeSeriesConcurrentConsumerState<T>
+    extends ConsumerState<_LineChartTimeSeriesConcurrent<T>> {
   late Map<T, int> hoveredIndex;
   var type = _LineChartTimeSeriesType.threeMonths;
 
@@ -997,7 +1003,7 @@ class __LineChartTimeSeriesConcurrentState<T>
   }
 
   void _recalculateLeftReservedSize() {
-    final style = context.textTheme.labelSmall!;
+    final style = Theme.of(context).textTheme.labelSmall!;
     final sizes = widget.data.entries.map((e) {
       final categorySizes =
           e.value.map((point) {
@@ -1117,7 +1123,7 @@ class __LineChartTimeSeriesConcurrentState<T>
           children: [
             TextSpan(
               text: widget.leftTitleBuilder(firstCategory, value),
-              style: context.textTheme.labelSmall!,
+              style: Theme.of(context).textTheme.labelSmall!,
             ),
           ],
         ),
@@ -1128,6 +1134,7 @@ class __LineChartTimeSeriesConcurrentState<T>
 
   @override
   Widget build(BuildContext context) {
+    ref.watch(historyWorkoutsProvider);
     final colorScheme = Theme.of(context).colorScheme;
 
     return Column(
@@ -1192,7 +1199,9 @@ class __LineChartTimeSeriesConcurrentState<T>
                         if (shouldBlock && value.isPro) {
                           Navigator.of(context).pop();
                           SchedulerBinding.instance.addPostFrameCallback((_) {
-                            Get.find<PurchasesController>().presentPaywall();
+                            ref
+                                .read(purchasesControllerProvider)
+                                .presentPaywall();
                           });
                           return;
                         }
@@ -1285,7 +1294,7 @@ class __LineChartTimeSeriesConcurrentState<T>
                             showTitles: true,
                             reservedSize:
                                 [
-                                  context.width / 5,
+                                  MediaQuery.sizeOf(context).width / 5,
                                   _leftReservedSize ?? 0,
                                 ].min +
                                 8,
@@ -1399,11 +1408,12 @@ class __LineChartTimeSeriesConcurrentState<T>
   }
 }
 
-class _EmptyChartTimeSeries extends StatelessWidget {
+class _EmptyChartTimeSeries extends ConsumerWidget {
   const _EmptyChartTimeSeries();
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    ref.watch(historyWorkoutsProvider);
     // THis is a nice curve I found on Desmos
     f(double x) =>
         pow(x, 6) - 8 * pow(x, 3) - 3 * pow(x, 2) + 6 * x + pow(x, 7) + 7;
@@ -1494,13 +1504,13 @@ class _EmptyChartTimeSeries extends StatelessWidget {
               children: [
                 Text(
                   context.t.timeSeriesChart.noData.title,
-                  style: context.textTheme.bodyLarge?.copyWith(
+                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                     color: colorScheme.onSurfaceVariant,
                   ),
                 ),
                 Text(
                   context.t.timeSeriesChart.noData.subtitle,
-                  style: context.textTheme.bodyMedium?.copyWith(
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     color: colorScheme.onSurfaceVariant,
                   ),
                 ),

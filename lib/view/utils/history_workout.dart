@@ -1,16 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gymtracker/controller/history_controller.dart';
 import 'package:gymtracker/i18n/strings.g.dart';
 import 'package:gymtracker/icons/gymtracker_icons.dart';
 import 'package:gymtracker/model/workout.dart';
+import 'package:gymtracker/provider/training_data.dart';
 import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/view/exercises.dart';
 import 'package:gymtracker/view/utils/exercise.dart';
 import 'package:gymtracker/view/utils/workout_utils.dart';
 import 'package:intl/intl.dart';
 
-class HistoryWorkout extends StatelessWidget {
+class HistoryWorkout extends ConsumerWidget {
   final Workout workout;
   final int showExercises;
   final bool isSelected;
@@ -20,13 +21,7 @@ class HistoryWorkout extends StatelessWidget {
   final Widget Function(BuildContext context, Workout workout)? headerBuilder;
   final bool _naked;
 
-  HistoryController get controller => Get.find<HistoryController>();
-
-  late final Workout? _continuation = controller.getContinuation(
-    incompleteWorkout: workout,
-  );
-
-  HistoryWorkout({
+  const HistoryWorkout({
     required this.workout,
     this.showExercises = 5,
     this.isSelected = false,
@@ -37,7 +32,7 @@ class HistoryWorkout extends StatelessWidget {
     super.key,
   }) : _naked = false;
 
-  HistoryWorkout.naked({
+  const HistoryWorkout.naked({
     required this.workout,
     this.showExercises = 5,
     this.isSelected = false,
@@ -49,7 +44,9 @@ class HistoryWorkout extends StatelessWidget {
   }) : _naked = true;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    ref.watch(historyWorkoutsProvider);
+    ref.watch(customExercisesProvider);
     var child = Material(
       type: MaterialType.transparency,
       child: InkWell(
@@ -66,7 +63,9 @@ class HistoryWorkout extends StatelessWidget {
                   WorkoutHeader(
                     isSelected: isSelected,
                     workout: workout,
-                    continuation: _continuation,
+                    continuation: ref
+                        .read(historyControllerProvider)
+                        .getContinuation(incompleteWorkout: workout),
                   ),
             ),
             if (withStats) ...[
@@ -109,7 +108,7 @@ class HistoryWorkout extends StatelessWidget {
   }
 }
 
-class TerseWorkoutListTile extends StatelessWidget {
+class TerseWorkoutListTile extends ConsumerWidget {
   final Workout workout;
   final VoidCallback? onTap;
   final EdgeInsetsGeometry? contentPadding;
@@ -122,7 +121,9 @@ class TerseWorkoutListTile extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    ref.watch(historyWorkoutsProvider);
+    ref.watch(customExercisesProvider);
     return ListTile(
       leading: CircleAvatar(
         backgroundColor: Theme.of(context).colorScheme.primaryContainer,

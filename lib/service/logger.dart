@@ -2,14 +2,9 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
-import 'package:get/get.dart';
-import 'package:gymtracker/controller/logger_controller.dart';
 import 'package:logging/logging.dart';
 
 export 'package:logging/logging.dart';
-
-LoggerController? get loggerController =>
-    Get.isRegistered<LoggerController>() ? Get.find<LoggerController>() : null;
 
 class AnsiColor {
   final String _code;
@@ -52,11 +47,13 @@ void _logToConsole(LogRecord record) {
   final prefix = _formatLevelPrefix(record.level).padLeft(7);
   final coloredPrefix = color(prefix);
   final timeStr = record.time.toIso8601String();
-  final loggerName =
-      record.loggerName.isNotEmpty ? ' [${record.loggerName}]' : '';
+  final loggerName = record.loggerName.isNotEmpty
+      ? ' [${record.loggerName}]'
+      : '';
 
-  final buffer =
-      StringBuffer('$coloredPrefix [$timeStr]$loggerName ${record.message}');
+  final buffer = StringBuffer(
+    '$coloredPrefix [$timeStr]$loggerName ${record.message}',
+  );
   if (record.error != null) {
     buffer.write('\n$coloredPrefix Error: ${record.error}');
   }
@@ -72,7 +69,6 @@ void initLogger() {
   _logSubscription?.cancel();
   _logSubscription = Logger.root.onRecord.listen((record) {
     _logToConsole(record);
-    loggerController?.addLogFromRecord(record);
   });
 }
 

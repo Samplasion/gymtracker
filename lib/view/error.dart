@@ -1,19 +1,21 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gymtracker/controller/error_controller.dart';
 import 'package:gymtracker/i18n/strings.g.dart';
 import 'package:gymtracker/utils/extensions.dart';
 
-class ErrorView extends GetWidget<ErrorController> {
+class ErrorView extends ConsumerWidget {
   static const routeName = "/error";
 
   const ErrorView({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    ErrorViewArguments args =
-        ModalRoute.of(context)!.settings.arguments as ErrorViewArguments;
+  Widget build(BuildContext context, WidgetRef ref) {
+    final controller = ref.read(errorControllerProvider);
+    final args = ErrorViewArguments.fromRouteArguments(
+      ModalRoute.of(context)?.settings.arguments,
+    );
     return PopScope(
       canPop: false,
       child: Scaffold(
@@ -28,12 +30,12 @@ class ErrorView extends GetWidget<ErrorController> {
             children: [
               Text(
                 context.t.errorView.title,
-                style: Get.textTheme.displayLarge,
+                style: Theme.of(context).textTheme.displayLarge,
               ),
               const SizedBox(height: 8),
               Text(
                 context.t.errorView.subtitle,
-                style: Get.textTheme.headlineMedium,
+                style: Theme.of(context).textTheme.headlineMedium,
               ),
               const SizedBox(height: 16),
               Text(context.t.errorView.body),
@@ -41,7 +43,7 @@ class ErrorView extends GetWidget<ErrorController> {
                 const SizedBox(height: 16),
                 FilledButton(
                   onPressed: () {
-                    Get.back();
+                    Navigator.of(context).pop();
                   },
                   child: const Text("Back"),
                 ),
@@ -54,7 +56,10 @@ class ErrorView extends GetWidget<ErrorController> {
                 ),
               ],
               const SizedBox(height: 16),
-              Text(context.t.errorView.stack, style: Get.textTheme.bodyMedium),
+              Text(
+                context.t.errorView.stack,
+                style: Theme.of(context).textTheme.bodyMedium,
+              ),
               const SizedBox(height: 16),
               if (args.details != null) ...[
                 Text(
@@ -95,7 +100,7 @@ class ErrorView extends GetWidget<ErrorController> {
               else
                 Text(
                   context.t.errorView.noStack,
-                  style: Get.textTheme.bodyMedium,
+                  style: Theme.of(context).textTheme.bodyMedium,
                 ),
             ],
           ),
@@ -117,4 +122,14 @@ class ErrorViewArguments {
         }
         return true;
       }());
+
+  factory ErrorViewArguments.fromRouteArguments(Object? arguments) {
+    if (arguments is ErrorViewArguments) return arguments;
+
+    // Route state can be restored in a serialized form, where custom argument
+    // objects may arrive as a map instead of their original Dart type.
+    return ErrorViewArguments(
+      error: arguments ?? StateError("No error details were provided."),
+    );
+  }
 }

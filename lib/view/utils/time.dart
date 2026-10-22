@@ -1,15 +1,18 @@
+import 'dart:async';
 import 'dart:io';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:gymtracker/controller/countdown_controller.dart';
 import 'package:gymtracker/controller/stopwatch_controller.dart';
-import 'package:gymtracker/view/components/controlled.dart';
+import 'package:gymtracker/utils/time.dart';
 import 'package:gymtracker/view/utils/animated_selectable.dart';
 import 'package:gymtracker/view/utils/input_decoration.dart';
 
-class TimeInputField extends StatefulWidget {
+class TimeInputField extends ConsumerStatefulWidget {
   final TextEditingController controller;
   final InputDecoration? decoration;
   final void Function(String)? onChanged;
@@ -29,62 +32,60 @@ class TimeInputField extends StatefulWidget {
     this.setID,
     this.focusNode,
     super.key,
-  }) : assert(timerInteractive ? (setID != null) : true,
-            "If timerInteractive is true, setID must be provided");
+  }) : assert(
+         timerInteractive ? (setID != null) : true,
+         "If timerInteractive is true, setID must be provided",
+       );
 
   @override
-  State<TimeInputField> createState() => _TimeInputFieldState();
+  ConsumerState<TimeInputField> createState() => _TimeInputFieldState();
 
-  static Duration parseDuration(String value) {
-    final parts = _toTimeString(value).split(":");
-    final minutes = int.parse(parts.first);
-    final seconds = int.parse(parts.last);
-    return Duration(minutes: minutes, seconds: seconds);
-  }
-
-  static String encodeDuration(Duration duration) {
-    final minutes = (duration.inMinutes).toString().padLeft(2, "0");
-    final seconds = (duration.inSeconds % 60).toString().padLeft(2, "0");
-    return "$minutes:$seconds";
-  }
+  static Duration parseDuration(String value) => parseTimerDuration(value);
+  static String encodeDuration(Duration duration) =>
+      encodeTimerDuration(duration);
 }
 
-class _TimeInputFieldState
-    extends ControlledState<TimeInputField, StopwatchController> {
+class _TimeInputFieldState extends ConsumerState<TimeInputField> {
+  StopwatchController get controller =>
+      ref.read(stopwatchControllerProvider.notifier);
   late String numericalValue = _toTimeString(widget.controller.text);
   late final node = widget.focusNode ?? FocusNode();
 
   @override
   void initState() {
     super.initState();
-    widget.controller.text =
-        _normalize(widget.controller.text.replaceAll(":", ""));
+    widget.controller.text = _normalize(
+      widget.controller.text.replaceAll(":", ""),
+    );
     if (widget.timerInteractive && controller.isRunning(widget.setID!)) {
       controller.updateBinding(widget.setID!, _onTick);
     }
   }
 
-  _startTimer() {
-    controller.addStopwatch(TimeFieldStopwatch(
-      onTick: _onTick,
-      getCurrentTime: () => widget.controller.text,
-      setID: widget.setID!,
-    ));
+  void _startTimer() {
+    controller.addStopwatch(
+      TimeFieldStopwatch(
+        onTick: _onTick,
+        getCurrentTime: () => widget.controller.text,
+        setID: widget.setID!,
+        clock: ref.read(workoutClockProvider),
+      ),
+    );
   }
 
-  void _onTick(timer, duration, encoded) {
+  void _onTick(Timer timer, Duration duration, String encoded) {
     widget.onChanged?.call(encoded);
     if (mounted) setState(() => widget.controller.text = encoded);
   }
 
-  _endTimer() {
+  void _endTimer() {
     controller.removeStopwatch(widget.setID!);
   }
 
   bool get _isActive =>
       widget.timerInteractive && controller.isRunning(widget.setID!);
 
-  _toggleTimer() {
+  void _toggleTimer() {
     if (_isActive) {
       _endTimer();
     } else {
@@ -106,51 +107,44 @@ class _TimeInputFieldState
     }
   }
 
-  @override
-  void dispose() {
-    super.dispose();
-  }
-
   TextSelection? _oldSelection;
 
   @override
   Widget build(BuildContext context) {
+    ref.watch(stopwatchControllerProvider);
     return TextFormField(
       controller: widget.controller,
       focusNode: node,
       keyboardType: Platform.isIOS
-          ? const TextInputType.numberWithOptions(
-              decimal: true,
-              signed: true,
-            )
+          ? const TextInputType.numberWithOptions(decimal: true, signed: true)
           : const TextInputType.numberWithOptions(decimal: false),
-      decoration:
-          (widget.decoration ?? const GymTrackerInputDecoration()).copyWith(
-        suffixIconConstraints: const BoxConstraints(
-          minHeight: 24,
-          minWidth: 24,
-        ),
-        isDense: true,
-        suffixIcon: () {
-          if (!widget.timerInteractive) return null;
-          var isActive = _isActive;
-          return SelectableAnimatedBuilder(
-            isSelected: isActive,
-            builder: (context, animation) => IconButton(
-              visualDensity: VisualDensity.compact,
-              icon: AnimatedIcon(
-                progress: animation,
-                icon: AnimatedIcons.play_pause,
-              ),
-              onPressed: () {
-                setState(() {
-                  _toggleTimer();
-                });
-              },
+      decoration: (widget.decoration ?? const GymTrackerInputDecoration())
+          .copyWith(
+            suffixIconConstraints: const BoxConstraints(
+              minHeight: 24,
+              minWidth: 24,
             ),
-          );
-        }(),
-      ),
+            isDense: true,
+            suffixIcon: () {
+              if (!widget.timerInteractive) return null;
+              var isActive = _isActive;
+              return SelectableAnimatedBuilder(
+                isSelected: isActive,
+                builder: (context, animation) => IconButton(
+                  visualDensity: VisualDensity.compact,
+                  icon: AnimatedIcon(
+                    progress: animation,
+                    icon: AnimatedIcons.play_pause,
+                  ),
+                  onPressed: () {
+                    setState(() {
+                      _toggleTimer();
+                    });
+                  },
+                ),
+              );
+            }(),
+          ),
       inputFormatters: <TextInputFormatter>[TimeTextInputFormatter()],
       onChanged: (value) {
         if (_oldSelection != null) {
@@ -161,8 +155,9 @@ class _TimeInputFieldState
         value = value.replaceAll(":", "");
         setState(() => numericalValue = int.parse(value).toString());
         widget.onChanged?.call(value);
-        widget.onChangedTime
-            ?.call(TimeInputField.parseDuration(widget.controller.text));
+        widget.onChangedTime?.call(
+          TimeInputField.parseDuration(widget.controller.text),
+        );
         setState(() {
           _oldSelection = widget.controller.selection;
         });
@@ -210,21 +205,25 @@ class TimeTextInputFormatter extends TextInputFormatter {
     if (_exp.hasMatch(newValue.text)) {
       TextSelection newSelection = newValue.selection;
 
-      String value =
-          int.parse(newValue.text.replaceAll(":", "").padLeft(1, "0"))
-              .toString();
+      String value = int.parse(
+        newValue.text.replaceAll(":", "").padLeft(1, "0"),
+      ).toString();
       final colonPosition = max(2, oldValue.text.length - 2);
       final colonOffset = newSelection.baseOffset >= colonPosition ? 1 : 0;
       if (oldValue.text.length < newValue.text.length) {
         // When typing
         newSelection = newSelection.copyWith(
-          baseOffset: min(max(4, value.length),
-                      newSelection.baseOffset + max(0, 4 - value.length))
-                  .toInt() +
+          baseOffset:
+              min(
+                max(4, value.length),
+                newSelection.baseOffset + max(0, 4 - value.length),
+              ).toInt() +
               colonOffset,
-          extentOffset: min(max(4, value.length),
-                      newSelection.extentOffset + max(0, 4 - value.length))
-                  .toInt() +
+          extentOffset:
+              min(
+                max(4, value.length),
+                newSelection.extentOffset + max(0, 4 - value.length),
+              ).toInt() +
               colonOffset,
         );
       } else if (value.length < 5) {

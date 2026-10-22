@@ -1,29 +1,33 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gymtracker/controller/history_controller.dart';
 import 'package:gymtracker/i18n/strings.g.dart';
 import 'package:gymtracker/model/exercise.dart';
 import 'package:gymtracker/model/workout.dart';
+import 'package:gymtracker/provider/training_data.dart';
 import 'package:gymtracker/utils/extensions.dart';
-import 'package:gymtracker/view/components/controlled.dart';
 
-class MuscleCategoryGraph extends StatefulWidget {
+class MuscleCategoryGraph extends ConsumerStatefulWidget {
   final List<Workout> workouts;
 
   const MuscleCategoryGraph({required this.workouts, super.key});
 
   @override
-  State<MuscleCategoryGraph> createState() => _MuscleCategoryGraphState();
+  ConsumerState<MuscleCategoryGraph> createState() =>
+      _MuscleCategoryGraphState();
 }
 
-class _MuscleCategoryGraphState
-    extends ControlledState<MuscleCategoryGraph, HistoryController> {
+class _MuscleCategoryGraphState extends ConsumerState<MuscleCategoryGraph> {
+  HistoryController get controller => ref.read(historyControllerProvider);
   Map<GTMuscleCategory, double> get data => controller
       .calculateMuscleCategoryDistributionFor(workouts: widget.workouts);
   double get maxValue => data.values.max;
 
   @override
   Widget build(BuildContext context) {
+    ref.watch(historyWorkoutsProvider);
+    ref.watch(customExercisesProvider);
     final entries = data.entries.toList();
 
     return RadarChart(

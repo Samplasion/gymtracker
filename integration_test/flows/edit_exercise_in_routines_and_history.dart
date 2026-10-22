@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:get/get.dart';
 import 'package:gymtracker/controller/exercises_controller.dart';
 import 'package:gymtracker/i18n/strings.g.dart';
 import 'package:gymtracker/icons/gymtracker_icons.dart';
@@ -35,20 +34,32 @@ Future<void> testEditExerciseInRoutineAndHistoryFlow(
   // Load app widget.
   await awaitApp(tester, databaseService);
 
-  print("Starting database state: ${databaseService.toJson()}");
+  print(
+    "Starting database state: ${databaseService.currentSnapshot.customExercises.map((e) => e.id).toList()}",
+  );
 
   // Manually add the exercise
   // We can do it this way since we verified the "Create exercise" flow
   // is working in another test
   await databaseService.writeExercises([]);
-  Get.find<ExercisesController>().addExercise(baseExercise);
+  integrationContainer
+      .read(exercisesControllerProvider)
+      .addExercise(baseExercise);
+  await awaitCustomExercise(tester, baseExercise.id);
 
   await tester.pumpAndSettle();
 
-  print("Edited database state: ${databaseService.toJson()}");
-  expect(Get.find<ExercisesController>().exercises.isNotEmpty, true);
+  print(
+    "Edited database state: ${databaseService.currentSnapshot.customExercises.map((e) => e.id).toList()}",
+  );
+  expect(
+    integrationContainer.read(exercisesControllerProvider).exercises.isNotEmpty,
+    true,
+  );
   expectAbstractExercise(
-      Get.find<ExercisesController>().exercises.single, baseExercise);
+    integrationContainer.read(exercisesControllerProvider).exercises.single,
+    baseExercise,
+  );
 
   // Add a fake workout
   // We can do it this way since we verified the "Create workout" flow
@@ -63,9 +74,10 @@ Future<void> testEditExerciseInRoutineAndHistoryFlow(
   expect(workout.isConcrete, true);
   // Simulate picking the exercise
   workout.exercises.add(
-    baseExercise
-        .makeChild()
-        .instantiate(workout: workout.toRoutine(), rpe: const None()),
+    baseExercise.makeChild().instantiate(
+      workout: workout.toRoutine(),
+      rpe: const None(),
+    ),
   );
   globalLogger.d(workout.exercises.single);
   expect(baseExercise.isAbstract, true);
@@ -89,7 +101,8 @@ Future<void> testEditExerciseInRoutineAndHistoryFlow(
   expect(find.text('Create new routine'), findsOneWidget);
 
   final nameField = find.widgetWithText(TextFormField, "Routine name");
-  await tester.enterText(nameField, "Test Routine");
+  await enterTextAndDismissKeyboard(tester, nameField, "Test Routine");
+  await dismissKeyboard(tester);
 
   // Scroll down
   await tester.drag(findMainListView(tester), const Offset(0.0, -600.0));
@@ -99,6 +112,17 @@ Future<void> testEditExerciseInRoutineAndHistoryFlow(
 
   // Add an exercise
   final addExerciseButton = find.widgetWithText(ListTile, "Add exercises");
+  await tester.scrollUntilVisible(
+    addExerciseButton.hitTestable(),
+    200,
+    scrollable: find
+        .descendant(
+          of: findMainListView(tester),
+          matching: find.byType(Scrollable),
+        )
+        .first,
+  );
+  await tester.pumpAndSettle();
   await tester.tap(addExerciseButton);
 
   // Trigger a frame.
@@ -131,13 +155,9 @@ Future<void> testEditExerciseInRoutineAndHistoryFlow(
   // Trigger a frame.
   await tester.pumpAndSettle();
 
-  expect(find.text(t.library.title), findsAny);
+  expect(find.text(t.routines.title), findsAny);
 
-  await tester.tap(
-    find.descendant(
-        of: find.byType(NavigationDrawer),
-        matching: find.byIcon(GTIcons.library)),
-  );
+  await openMainSection(tester, GTIcons.library);
   await tester.pumpAndSettle();
   await tester.tap(find.widgetWithIcon(ListTile, GTIcons.custom_exercises));
   await tester.pumpAndSettle();
@@ -151,26 +171,28 @@ Future<void> testEditExerciseInRoutineAndHistoryFlow(
   await tester.tap(find.widgetWithText(PopupMenuItem, t.actions.edit));
   await tester.pumpAndSettle();
 
-  final titleBtn =
-      find.widgetWithText(TextField, t.exercise.editor.fields.title.label);
+  final titleBtn = find.widgetWithText(
+    TextField,
+    t.exercise.editor.fields.title.label,
+  );
   final primaryMuscleGroupBtn = find.widgetWithText(
-      DropdownButtonFormField<GTMuscleGroup>,
-      t.exercise.editor.fields.primaryMuscleGroup.label);
-  final setFields = [
-    titleBtn,
-    primaryMuscleGroupBtn,
-  ];
+    DropdownButtonFormField<GTMuscleGroup>,
+    t.exercise.editor.fields.primaryMuscleGroup.label,
+  );
+  final setFields = [titleBtn, primaryMuscleGroupBtn];
 
   for (final finder in setFields) {
     expect(finder, findsOneWidget);
   }
-  await tester.enterText(setFields[0], "EditedExercise");
+  await enterTextAndDismissKeyboard(tester, setFields[0], "EditedExercise");
   await tester.pumpAndSettle();
   await tester.tap(setFields[1]);
   await tester.pumpAndSettle();
   await tester.tap(
     find.widgetWithText(
-        DropdownMenuItem<GTMuscleGroup>, t.muscleGroups['chest']!),
+      DropdownMenuItem<GTMuscleGroup>,
+      t.muscleGroups['chest']!,
+    ),
     warnIfMissed: false,
   );
   await tester.pumpAndSettle();
@@ -204,11 +226,14 @@ Future<void> testEditExerciseInRoutineAndHistoryFlow(
     ),
   );
 
-  print(databaseService.toJson());
+  print(
+    databaseService.currentSnapshot.customExercises.map((e) => e.id).toList(),
+  );
 
   // Check the history data as well
-  final historyWorkout = databaseService.workoutHistory
-      .firstWhere((workout) => workout.id == "ourFakeWorkout");
+  final historyWorkout = databaseService.workoutHistory.firstWhere(
+    (workout) => workout.id == "ourFakeWorkout",
+  );
   ex = historyWorkout.exercises.single as Exercise;
   expectExercise(
     ex,

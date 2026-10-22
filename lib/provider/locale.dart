@@ -43,7 +43,7 @@ final translations = {
   for (final locale in AppLocale.values) locale: locale.buildSync(),
 };
 
-@riverpod
+@Riverpod(keepAlive: true)
 class TranslationsNotifier extends _$TranslationsNotifier {
   /// Maps each language to its corresponding exercise explanations, by exercise ID.
   final Map<String, Map<String, String>> exerciseExplanations = {};

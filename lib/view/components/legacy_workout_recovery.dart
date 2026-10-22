@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:get/get.dart';
 import 'package:gymtracker/i18n/strings.g.dart';
 import 'package:gymtracker/provider/online.dart';
 import 'package:gymtracker/service/database.dart';
@@ -15,7 +14,7 @@ class LegacyWorkoutRecoveryTile extends ConsumerStatefulWidget {
 }
 
 class _RecoveryState extends ConsumerState<LegacyWorkoutRecoveryTile> {
-  late final service = Get.find<DatabaseService>();
+  late final service = ref.read(databaseServiceProvider);
   late final stream = service.db.watchLegacyOngoing();
   bool busy = false;
 

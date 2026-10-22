@@ -46,7 +46,7 @@ class _AddFoodViewState extends ConsumerState<AddFoodView> {
   void initState() {
     super.initState();
     final decSep = NumberFormat.decimalPattern(
-      Get.locale?.languageCode,
+      Localizations.localeOf(context).languageCode,
     ).symbols.DECIMAL_SEP;
     amountController = TextEditingController(
       text: stringifyDouble(
@@ -257,7 +257,7 @@ class _AddFoodViewState extends ConsumerState<AddFoodView> {
                   pieces: pieces,
                 );
 
-                Get.back(result: updatedFood);
+                Go.back(result: updatedFood);
               } else {
                 final food = Food(
                   name: widget.food.name,
@@ -272,7 +272,7 @@ class _AddFoodViewState extends ConsumerState<AddFoodView> {
                   pieces: pieces,
                 );
 
-                Get.back(result: food);
+                Go.back(result: food);
               }
             },
             child: Text(
@@ -388,7 +388,7 @@ class NutritionTable extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final decSep = NumberFormat.decimalPattern(
-      Get.locale?.languageCode,
+      Localizations.localeOf(context).languageCode,
     ).symbols.DECIMAL_SEP;
     final nutritionalValues = per100g * (amount / 100);
     return Column(
@@ -672,7 +672,7 @@ class NutritionRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final decSep = NumberFormat.decimalPattern(
-      Get.locale?.languageCode,
+      Localizations.localeOf(context).languageCode,
     ).symbols.DECIMAL_SEP;
     var stringifiedValue = stringifyDouble(value, decimalSeparator: decSep);
     if (value < 0.01 && value != 0) {
@@ -1375,7 +1375,7 @@ class _ManualBarcodeInsertionScreenState
     if (!formKey.currentState!.validate()) return;
 
     final code = controller.text;
-    Get.back();
+    Go.back();
     SchedulerBinding.instance.addPostFrameCallback((_) {
       widget.handleCode(code);
     });
@@ -1384,7 +1384,7 @@ class _ManualBarcodeInsertionScreenState
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("food.barcodeReader.enterCode".tr)),
+      appBar: AppBar(title: Text(context.t.food.barcodeReader.enterCode)),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Form(
@@ -1397,12 +1397,12 @@ class _ManualBarcodeInsertionScreenState
                 autofocus: true,
                 keyboardType: TextInputType.number,
                 decoration: InputDecoration(
-                  labelText: "food.barcodeReader.codeField.label".tr,
+                  labelText: context.t.food.barcodeReader.codeField.label,
                 ),
                 onFieldSubmitted: (_) => ok(),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return "food.barcodeReader.codeField.empty".tr;
+                    return context.t.food.barcodeReader.codeField.empty;
                   }
                   return null;
                 },
@@ -1627,7 +1627,7 @@ class _AddCombinedFoodViewState extends ConsumerState<AddCombinedFoodView> {
                       ),
                     );
 
-                    Get.back(result: food);
+                    Go.back(result: food);
                   },
             child: Text(context.t.food.add.add),
           ),
@@ -1640,7 +1640,7 @@ class _AddCombinedFoodViewState extends ConsumerState<AddCombinedFoodView> {
     return SearchAnchorPlus(
       suggestionsBuilder: _getSearchSuggestionBuilder(
         ref: ref,
-        closeView: () => Get.back(),
+        closeView: () => Go.back(),
         onFoodTap: (dtfood) {
           final food = dtfood.value;
           setState(() {
@@ -1679,7 +1679,7 @@ class _AddCombinedFoodViewState extends ConsumerState<AddCombinedFoodView> {
       textInputAction: TextInputAction.search,
       keyboardType: TextInputType.text,
       viewFloatingActionButton: _AddCustomFoodFAB(
-        closeView: () => Get.back(),
+        closeView: () => Go.back(),
         category: widget.category,
         onFoodAdded: (food) async {
           if (food != null) {
@@ -1704,9 +1704,9 @@ extension on NutritionUnit {
     required BuildContext context,
   }) {
     final pcs = pieces == 1 ? "" : "$pieces × ";
-    final unit = showUnit ? " $t" : "";
+    final unit = showUnit ? " ${t(context: context)}" : "";
     final decSep = NumberFormat.decimalPattern(
-      Get.locale?.languageCode,
+      Localizations.localeOf(context).languageCode,
     ).symbols.DECIMAL_SEP;
     return "$pcs${stringifyDouble(amount, decimalSeparator: decSep)}$unit";
   }

@@ -1,18 +1,17 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gymtracker/controller/history_controller.dart';
-import 'package:gymtracker/controller/me_controller.dart';
 import 'package:gymtracker/i18n/strings.g.dart';
 import 'package:gymtracker/icons/gymtracker_icons.dart';
 import 'package:gymtracker/model/workout.dart';
+import 'package:gymtracker/provider/training_data.dart';
 import 'package:gymtracker/service/logger.dart';
 import 'package:gymtracker/utils/constants.dart';
 import 'package:gymtracker/utils/extensions.dart' hide ContextThemingUtils;
 import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/utils/utils.dart' hide max;
-import 'package:gymtracker/view/components/controlled.dart';
 import 'package:gymtracker/view/exercises.dart';
 import 'package:gymtracker/view/utils/history_workout.dart';
 import 'package:gymtracker/view/utils/speed_dial.dart';
@@ -24,16 +23,16 @@ import 'package:scrollable_clean_calendar/utils/enums.dart';
 
 const double kDayBorderRadius = 6;
 
-class MeCalendarPage extends StatefulWidget {
+class MeCalendarPage extends ConsumerStatefulWidget {
   const MeCalendarPage({super.key});
 
   @override
-  State<MeCalendarPage> createState() => _MeCalendarPageState();
+  ConsumerState<MeCalendarPage> createState() => _MeCalendarPageState();
 }
 
-class _MeCalendarPageState
-    extends ControlledState<MeCalendarPage, MeController> {
-  HistoryController get historyController => Get.find<HistoryController>();
+class _MeCalendarPageState extends ConsumerState<MeCalendarPage> {
+  HistoryController get historyController =>
+      ref.read(historyControllerProvider);
   late final calendarController = CleanCalendarController(
     minDate: historyController.userVisibleWorkouts.isEmpty
         ? DateTime.now()
@@ -46,13 +45,13 @@ class _MeCalendarPageState
     },
     weekdayStart: firstDayOfWeekFor(context.locale),
   );
-  late Worker worker;
+  late ProviderSubscription worker;
 
   @override
   void initState() {
     super.initState();
     historyController.queueStreaksRecomputation();
-    worker = ever(historyController.history, (callback) {
+    worker = ref.listenManual(historyWorkoutsProvider, (_, next) {
       logger.i("History updated");
       if (mounted) {
         setState(() {});
@@ -62,67 +61,73 @@ class _MeCalendarPageState
 
   @override
   void dispose() {
-    worker.dispose();
+    worker.close();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    ref.watch(historyWorkoutsProvider);
     return Scaffold(
       appBar: AppBar(title: Text(context.t.me.calendar.label)),
       body: Column(
         children: [
           Padding(
             padding: const EdgeInsets.all(16),
-            child: Obx(() {
-              final streaks = historyController.streaks();
-              return SpeedDial(
-                crossAxisCountBuilder: (breakpoint) => switch (breakpoint) {
-                  Breakpoints.xxs => 1,
-                  _ => 2,
-                },
-                buttonHeight: (breakpoint) =>
-                    switch (breakpoint) {
-                      Breakpoints.xxs => 0.75,
-                      _ => 1,
-                    } *
-                    kSpeedDialButtonHeight,
-                buttons: [
-                  SpeedDialButton(
-                    icon: Icon(
-                      GTIcons.streak_weeks,
-                      color: streaks.weekStreak == 0
-                          ? context.theme.colorScheme.outline
-                          : context.harmonizeColor(Colors.orange),
+            child: Builder(
+              builder: (context) {
+                final streaks = historyController.streaks;
+                return SpeedDial(
+                  crossAxisCountBuilder: (breakpoint) => switch (breakpoint) {
+                    Breakpoints.xxs => 1,
+                    _ => 2,
+                  },
+                  buttonHeight: (breakpoint) =>
+                      switch (breakpoint) {
+                        Breakpoints.xxs => 0.75,
+                        _ => 1,
+                      } *
+                      kSpeedDialButtonHeight,
+                  buttons: [
+                    SpeedDialButton(
+                      icon: Icon(
+                        GTIcons.streak_weeks,
+                        color: streaks.weekStreak == 0
+                            ? Theme.of(context).colorScheme.outline
+                            : context.harmonizeColor(Colors.orange),
+                      ),
+                      text: Text(context.t.time.weeks(n: streaks.weekStreak)),
+                      subtitle: Text(context.t.me.calendar.streak),
+                      dense: true,
                     ),
-                    text: Text(context.t.time.weeks(n: streaks.weekStreak)),
-                    subtitle: Text(context.t.me.calendar.streak),
-                    dense: true,
-                  ),
-                  SpeedDialButton(
-                    icon: Icon(
-                      GTIcons.streak_rest,
-                      color: context.harmonizeColor(Colors.deepPurple.shade300),
+                    SpeedDialButton(
+                      icon: Icon(
+                        GTIcons.streak_rest,
+                        color: context.harmonizeColor(
+                          Colors.deepPurple.shade300,
+                        ),
+                      ),
+                      text: Text(context.t.time.days(n: streaks.restDays)),
+                      subtitle: Text(context.t.me.calendar.rest),
+                      dense: true,
                     ),
-                    text: Text(context.t.time.days(n: streaks.restDays)),
-                    subtitle: Text(context.t.me.calendar.rest),
-                    dense: true,
-                  ),
-                ],
-              );
-            }),
+                  ],
+                );
+              },
+            ),
           ),
           const Divider(height: 1),
           Expanded(
             child: ScrollableCleanCalendar(
-              locale: Get.locale!.languageCode,
+              locale: Localizations.localeOf(context).languageCode,
               calendarController: calendarController,
               layout: Layout.DEFAULT,
               padding:
                   EdgeInsets.symmetric(
                     horizontal: max(
                       0,
-                      (context.width - Breakpoints.xs.screenWidth.toDouble()) /
+                      (MediaQuery.sizeOf(context).width -
+                              Breakpoints.xs.screenWidth.toDouble()) /
                           2,
                     ),
                   ) +
@@ -175,20 +180,24 @@ class _MeCalendarPageState
   }
 }
 
-class MeCalendarDayPage extends StatelessWidget {
+class MeCalendarDayPage extends ConsumerWidget {
   final DateTime day;
 
   const MeCalendarDayPage({required this.day, super.key});
 
-  HistoryController get historyController => Get.find<HistoryController>();
-
   @override
-  Widget build(BuildContext context) {
-    final workouts = historyController.workoutsByDay[day] ?? [];
+  Widget build(BuildContext context, WidgetRef ref) {
+    ref.watch(historyWorkoutsProvider);
+    final workouts =
+        ref.read(historyControllerProvider).workoutsByDay[day] ?? [];
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(DateFormat.yMMMMd(Get.locale!.languageCode).format(day)),
+        title: Text(
+          DateFormat.yMMMMd(
+            Localizations.localeOf(context).languageCode,
+          ).format(day),
+        ),
       ),
       body: workouts.isEmpty
           ? _buildEmpty(context)

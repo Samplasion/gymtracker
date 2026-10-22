@@ -1,6 +1,5 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:gymtracker/icons/gymtracker_icons.dart';
 import 'package:gymtracker/service/logger.dart';
 import 'package:gymtracker/utils/go.dart';
@@ -78,9 +77,7 @@ class _IntStepperFormFieldState extends State<IntStepperFormField> {
   Widget _buildBody() {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 12),
-      child: Text(
-        widget.labelBuilder(widget.value),
-      ),
+      child: Text(widget.labelBuilder(widget.value)),
     );
   }
 }
@@ -145,8 +142,9 @@ class _IntStepperFormFieldSheetContentState
             itemBuilder: (context, index) =>
                 Center(child: Text(widget.labelBuilder(index + listOffset))),
             selectionOverlay: CupertinoPickerDefaultSelectionOverlay(
-              background:
-                  Theme.of(context).colorScheme.secondary.withAlpha(128),
+              background: Theme.of(
+                context,
+              ).colorScheme.secondary.withAlpha(128),
             ),
           ),
         ),
@@ -157,7 +155,7 @@ class _IntStepperFormFieldSheetContentState
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 TextButton(
-                  onPressed: () => Get.back(),
+                  onPressed: () => Go.back(),
                   child: Text(MaterialLocalizations.of(context).okButtonLabel),
                 ),
               ],

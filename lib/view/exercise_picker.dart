@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gymtracker/controller/exercises_controller.dart';
 import 'package:gymtracker/data/exercises.dart';
 import 'package:gymtracker/i18n/strings.g.dart';
 import 'package:gymtracker/icons/gymtracker_icons.dart';
 import 'package:gymtracker/model/exercise.dart';
+import 'package:gymtracker/provider/training_data.dart';
 import 'package:gymtracker/service/logger.dart';
 import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/utils/go.dart';
@@ -28,7 +29,7 @@ enum ExercisePickerFilter {
 
 typedef ExerciseFilter = bool Function(Exercise);
 
-class ExercisePicker extends StatefulWidget {
+class ExercisePicker extends ConsumerStatefulWidget {
   final bool singlePick;
   final bool allowNone;
   final ExercisePickerFilter filter;
@@ -46,11 +47,11 @@ class ExercisePicker extends StatefulWidget {
        );
 
   @override
-  State<ExercisePicker> createState() => _ExercisePickerState();
+  ConsumerState<ExercisePicker> createState() => _ExercisePickerState();
 }
 
-class _ExercisePickerState extends State<ExercisePicker> {
-  ExercisesController get controller => Get.put(ExercisesController());
+class _ExercisePickerState extends ConsumerState<ExercisePicker> {
+  ExercisesController get controller => ref.read(exercisesControllerProvider);
 
   Map<String, Exercise> selectedExercises = {};
 
@@ -92,6 +93,8 @@ class _ExercisePickerState extends State<ExercisePicker> {
 
   @override
   Widget build(BuildContext context) {
+    ref.watch(historyWorkoutsProvider);
+    ref.watch(customExercisesProvider);
     return Scaffold(
       appBar: AppBar(
         title: Text(context.t.exercise.picker.title),
@@ -117,7 +120,7 @@ class _ExercisePickerState extends State<ExercisePicker> {
         ],
       ),
       body: widget.filter.hasCustom
-          ? Obx(() => _innerScrollView(context))
+          ? Builder(builder: (context) => _innerScrollView(context))
           : _innerScrollView(context),
       floatingActionButton: const _CreateExerciseFab(),
     );
@@ -139,7 +142,7 @@ class _ExercisePickerState extends State<ExercisePicker> {
                 title: Text(context.t.exercises.none.title),
                 subtitle: Text(context.t.exercises.none.subtitle),
                 onTap: () {
-                  Get.back(result: <Exercise>[]);
+                  Go.back(result: <Exercise>[]);
                 },
               ),
               const Divider(),
@@ -195,7 +198,7 @@ class _ExercisePickerState extends State<ExercisePicker> {
                             });
                           },
                           onSubmit: () {
-                            Get.back();
+                            Go.back();
                             _submit();
                           },
                         );
@@ -229,7 +232,7 @@ class _ExercisePickerState extends State<ExercisePicker> {
                   padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
                   child: Text(
                     context.t.exercise.picker.filter.equipment,
-                    style: context.textTheme.labelMedium,
+                    style: Theme.of(context).textTheme.labelMedium,
                   ),
                 ),
               ),
@@ -292,7 +295,7 @@ class _ExercisePickerState extends State<ExercisePicker> {
     final List<Exercise> exercises = selectedExercises.entries
         .map((e) => e.value)
         .toList();
-    Get.back(result: exercises, closeOverlays: true);
+    Go.back(result: exercises, closeOverlays: true);
   }
 
   Map<GTExerciseMuscleCategory, ({bool isLabelVisible, Widget? label})>
@@ -366,11 +369,13 @@ class _ExercisePickerState extends State<ExercisePicker> {
   }
 }
 
-class _CreateExerciseFab extends StatelessWidget {
+class _CreateExerciseFab extends ConsumerWidget {
   const _CreateExerciseFab();
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    ref.watch(historyWorkoutsProvider);
+    ref.watch(customExercisesProvider);
     return FloatingActionButton.extended(
       onPressed: () {
         Go.showBottomModalScreen(
@@ -384,7 +389,7 @@ class _CreateExerciseFab extends StatelessWidget {
   }
 }
 
-class LibraryPickerExercisesView extends StatefulWidget {
+class LibraryPickerExercisesView extends ConsumerStatefulWidget {
   const LibraryPickerExercisesView({
     required this.name,
     required this.category,
@@ -403,14 +408,16 @@ class LibraryPickerExercisesView extends StatefulWidget {
   final Map<String, Exercise> selectedExercises;
 
   @override
-  State<LibraryPickerExercisesView> createState() =>
+  ConsumerState<LibraryPickerExercisesView> createState() =>
       _LibraryPickerExercisesViewState();
 }
 
 class _LibraryPickerExercisesViewState
-    extends State<LibraryPickerExercisesView> {
+    extends ConsumerState<LibraryPickerExercisesView> {
   @override
   Widget build(BuildContext context) {
+    ref.watch(historyWorkoutsProvider);
+    ref.watch(customExercisesProvider);
     final sorted = [...widget.category.exercises]
       ..sort(
         (a, b) =>

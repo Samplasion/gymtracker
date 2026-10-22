@@ -1,30 +1,34 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gymtracker/controller/history_controller.dart';
 import 'package:gymtracker/i18n/strings.g.dart';
 import 'package:gymtracker/model/exercise.dart';
 import 'package:gymtracker/model/workout.dart';
+import 'package:gymtracker/provider/training_data.dart';
 import 'package:gymtracker/utils/extensions.dart';
-import 'package:gymtracker/view/components/controlled.dart';
 
-class GymEquipmentRadialChart extends StatefulWidget {
+class GymEquipmentRadialChart extends ConsumerStatefulWidget {
   final List<Workout> workouts;
 
   const GymEquipmentRadialChart({required this.workouts, super.key});
 
   @override
-  State<GymEquipmentRadialChart> createState() =>
+  ConsumerState<GymEquipmentRadialChart> createState() =>
       _GymEquipmentRadialChartState();
 }
 
 class _GymEquipmentRadialChartState
-    extends ControlledState<GymEquipmentRadialChart, HistoryController> {
+    extends ConsumerState<GymEquipmentRadialChart> {
+  HistoryController get controller => ref.read(historyControllerProvider);
   Map<GTGymEquipment, double> get data => controller
       .calculateGymEquipmentDistributionFor(workouts: widget.workouts);
   double get maxValue => data.values.max;
 
   @override
   Widget build(BuildContext context) {
+    ref.watch(historyWorkoutsProvider);
+    ref.watch(customExercisesProvider);
     final entries = data.entries.toList();
 
     return RadarChart(

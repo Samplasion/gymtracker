@@ -27,10 +27,22 @@ Future<void> testCreateRoutineFlow(
   expect(find.text('Create new routine'), findsOneWidget);
 
   final nameField = find.widgetWithText(TextFormField, "Routine name");
-  await tester.enterText(nameField, "Test Routine");
+  await enterTextAndDismissKeyboard(tester, nameField, "Test Routine");
+  await dismissKeyboard(tester);
 
   // Add an exercise
   final addExerciseButton = find.widgetWithText(ListTile, "Add exercises");
+  await tester.scrollUntilVisible(
+    addExerciseButton.hitTestable(),
+    200,
+    scrollable: find
+        .descendant(
+          of: findMainListView(tester),
+          matching: find.byType(Scrollable),
+        )
+        .first,
+  );
+  await tester.pumpAndSettle();
   await tester.tap(addExerciseButton);
 
   // Trigger a frame.
@@ -59,6 +71,8 @@ Future<void> testCreateRoutineFlow(
 
   final addExercise = find.byKey(const Key("pick"));
   await tester.tap(addExercise);
+  await waitForWidget(tester, addExercise, present: false);
+  await dismissKeyboard(tester);
 
   // Trigger a frame.
   await tester.pumpAndSettle();
@@ -70,8 +84,11 @@ Future<void> testCreateRoutineFlow(
   await tester.pumpAndSettle();
 
   // Add two more sets
-  final addSetButton =
-      find.widgetWithText(FilledButton, "+ Add Set", skipOffstage: false);
+  final addSetButton = find.widgetWithText(
+    FilledButton,
+    "+ Add Set",
+    skipOffstage: false,
+  );
 
   await tester.tap(addSetButton);
   await tester.pumpAndSettle();
@@ -89,7 +106,8 @@ Future<void> testCreateRoutineFlow(
 
   // Fill in the rest timer field
   final restTimerField = find.widgetWithText(TextField, "Rest time");
-  await tester.enterText(restTimerField, "100");
+  await enterTextAndDismissKeyboard(tester, restTimerField, "100");
+  await dismissKeyboard(tester);
   await tester.pumpAndSettle();
   expect(find.text('01:00'), findsOneWidget);
 
@@ -103,11 +121,16 @@ Future<void> testCreateRoutineFlow(
   await tester.pumpAndSettle();
 
   // Fill in the sets
-  final repsFields =
-      find.widgetWithText(TextField, "Reps", skipOffstage: false).evaluate();
+  final repsFields = find
+      .widgetWithText(TextField, "Reps", skipOffstage: false)
+      .evaluate();
   int currentReps = 5;
   for (final repsField in repsFields) {
-    await tester.enterText(find.byWidget(repsField.widget), "$currentReps");
+    await enterTextAndDismissKeyboard(
+      tester,
+      find.byWidget(repsField.widget),
+      "$currentReps",
+    );
     currentReps += 5;
   }
 
@@ -116,6 +139,8 @@ Future<void> testCreateRoutineFlow(
 
   // Trigger a frame.
   await tester.pumpAndSettle();
+
+  await dismissKeyboard(tester);
 
   // Save the routine
   final saveButton = find.widgetWithIcon(IconButton, GTIcons.done);

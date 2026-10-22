@@ -3,22 +3,22 @@ import 'dart:typed_data';
 
 import 'package:drift/drift.dart' show Value;
 import 'package:flutter/foundation.dart';
-import 'package:gymtracker/view/utils/sync_recovery.dart';
-import 'package:get/get.dart' hide Value;
 import 'package:gymtracker/db/database.dart';
 import 'package:gymtracker/db/model/tables/exercise.dart';
-import 'package:gymtracker/main.dart';
 import 'package:gymtracker/model/achievements.dart';
 import 'package:gymtracker/model/history.dart';
 import 'package:gymtracker/model/measurements.dart';
 import 'package:gymtracker/model/routines.dart';
+import 'package:gymtracker/provider/achievement_metadata.dart';
 import 'package:gymtracker/provider/connectivity.dart';
 import 'package:gymtracker/provider/events.dart';
 import 'package:gymtracker/service/database.dart';
 import 'package:gymtracker/service/logger.dart';
 import 'package:gymtracker/service/online.dart';
 import 'package:gymtracker/service/test.dart';
+import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/utils/utils.dart' show isNetworkError;
+import 'package:gymtracker/view/utils/sync_recovery.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -133,8 +133,9 @@ String? currentUserId(Ref ref) {
 
 @Riverpod(keepAlive: true)
 class Online extends _$Online {
-  late final DatabaseService _databaseService;
+  DatabaseService get _databaseService => ref.read(databaseServiceProvider);
   late final OnlineService _service;
+  final bool _ownsService;
   late SharedPreferences _prefs;
   late final GBSyncManager _syncManager;
 
@@ -155,6 +156,7 @@ class Online extends _$Online {
   }
 
   void _resumeSync() {
+    if (!ref.mounted || !_isInit) return;
     if ((ref.read(networkConnectivityProvider).value ?? false) &&
         _service.account?.id == _databaseService.db.currentUserId &&
         _service.account != null) {
@@ -205,14 +207,17 @@ class Online extends _$Online {
     return syncManager.successfulSyncs > previous;
   }
 
-  Online({OnlineService? service}) {
-    _databaseService = Get.find<DatabaseService>();
+  Online({OnlineService? service}) : _ownsService = service == null {
     if (service != null) {
       _service = service;
     } else if (TestService().isTest) {
       _service = TestOnlineServiceImpl();
     } else {
-      _service = OnlineServiceImpl();
+      _service = OnlineServiceImpl.withAchievementCatalog(
+        achievementCatalog: () => ref.mounted
+            ? ref.read(achievementMetadataProvider)
+            : const <String, Achievement>{},
+      );
     }
   }
 
@@ -220,18 +225,20 @@ class Online extends _$Online {
 
   @override
   FutureOr<OnlineAccount?> build() async {
+    final databaseService = _databaseService;
+    ref.onDispose(() {
+      if (_isInit) _syncManager.dispose();
+      databaseService.runWithSyncPaused = null;
+      if (_ownsService) _service.dispose();
+    });
     if (!_isInit) {
       await _runOneTimeAsyncBoot();
     }
+    if (!ref.mounted) return null;
 
     ref.listen<AsyncValue<bool>>(networkConnectivityProvider, (previous, next) {
       _onNetworkStatusChanged(next.value ?? false);
     });
-    ref.onDispose(() {
-      _syncManager.dispose();
-      _databaseService.runWithSyncPaused = null;
-    });
-
     return _getAccountAndDoStuff();
   }
 
@@ -380,14 +387,12 @@ class Online extends _$Online {
       // A failed remote deletion must never erase the local copy.
       await _service.deleteAccount();
       manager.setUserId('');
-      globalContainer
-          .read(eventBusProvider)
-          .emit(GBUserWillLogoutEvent(account));
+      ref.read(eventBusProvider).emit(GBUserWillLogoutEvent(account));
       await _databaseService.setCurrentUserId(null);
       // Account-switch hooks may persist its active workout. Purge afterwards.
       await _databaseService.db.clearUserData(account.id);
       state = const AsyncValue.data(null);
-      globalContainer.read(eventBusProvider).emit(GBUserDidLogoutEvent());
+      ref.read(eventBusProvider).emit(GBUserDidLogoutEvent());
     } catch (_) {
       if (wasEnabled && _service.account?.id == account.id) {
         manager.enableSync();
@@ -408,6 +413,7 @@ class Online extends _$Online {
 
   Future<void> _runOneTimeAsyncBoot() async {
     _prefs = await SharedPreferences.getInstance();
+    if (!ref.mounted) return;
     _syncManager = GBSyncManager(
       localDatabase: _databaseService.db,
       supabaseClient: Supabase.instance.client,
@@ -556,29 +562,35 @@ class Online extends _$Online {
 
   Future<OnlineAccount?> _getAccountAndDoStuff() => _serialize(() async {
     final account = await _service.getAccount();
+    if (!ref.mounted) return null;
     await _applyAccount(account);
     return account;
   });
 
   Future<void> _applyAccount(OnlineAccount? account) async {
-    final previous = _databaseService.db.currentUserId;
+    if (!ref.mounted) return;
+    final databaseService = _databaseService;
+    final previous = databaseService.db.currentUserId;
     final changed =
         previous != account?.id || _syncManager.userId != (account?.id ?? '');
     if (changed) {
       await _syncManager.suspend();
+      if (!ref.mounted) return;
       _syncManager.setUserId(account?.id ?? '');
-      await _databaseService.setCurrentUserId(account?.id);
+      await databaseService.setCurrentUserId(account?.id);
+      if (!ref.mounted) return;
       if (account != null) {
-        final context = navigatorKey.currentContext;
+        final context = Go.context;
         final key = 'guest_import_offered_${account.id}';
         if (context != null &&
             context.mounted &&
             !(_prefs.getBool(key) ?? false)) {
-          await offerGuestImport(context, _databaseService, account.id);
+          await offerGuestImport(context, databaseService, account.id);
           await _prefs.setBool(key, true);
         }
       }
     }
+    if (!ref.mounted) return;
     state = AsyncValue.data(account);
     _resumeSync();
     if (changed) {

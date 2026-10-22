@@ -1,25 +1,26 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gymtracker/controller/purchases_controller.dart';
 import 'package:gymtracker/controller/routines_controller.dart';
 import 'package:gymtracker/i18n/strings.g.dart';
 import 'package:gymtracker/model/workout.dart';
 import 'package:gymtracker/utils/go.dart';
+import 'package:gymtracker/view/actions/purchases.dart';
 import 'package:gymtracker/view/components/badges.dart';
 import 'package:gymtracker/view/components/gradient_bottom_bar.dart';
 import 'package:gymtracker/view/components/pro_builder.dart';
 import 'package:gymtracker/view/components/routines.dart';
 
-class ImportRoutineModal extends StatefulWidget {
+class ImportRoutineModal extends ConsumerStatefulWidget {
   final Workout workout;
 
   const ImportRoutineModal({required this.workout, super.key});
 
   @override
-  State<ImportRoutineModal> createState() => _ImportRoutineModalState();
+  ConsumerState<ImportRoutineModal> createState() => _ImportRoutineModalState();
 }
 
-class _ImportRoutineModalState extends State<ImportRoutineModal>
+class _ImportRoutineModalState extends ConsumerState<ImportRoutineModal>
     with SingleTickerProviderStateMixin {
   late AnimationController controller = BottomSheet.createAnimationController(
     this,
@@ -45,7 +46,7 @@ class _ImportRoutineModalState extends State<ImportRoutineModal>
         center: true,
         buttons: [
           FilledButton.tonal(
-            onPressed: () => Get.back(),
+            onPressed: () => Go.back(),
             child: Text(MaterialLocalizations.of(context).cancelButtonLabel),
           ),
           ProBuilder(
@@ -55,11 +56,11 @@ class _ImportRoutineModalState extends State<ImportRoutineModal>
               return FilledButton(
                 onPressed: () {
                   if (shouldDisable) {
-                    Get.find<PurchasesController>().presentPaywall();
+                    ref.read(purchasesControllerProvider).presentPaywall();
                     return;
                   }
-                  Get.back();
-                  Get.find<RoutinesController>().importWorkout(workout);
+                  Go.back();
+                  ref.read(routinesControllerProvider).importWorkout(workout);
                   Go.snack(context.t.importRoutine.import.done);
                 },
                 child: Text.rich(

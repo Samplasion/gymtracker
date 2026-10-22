@@ -1,5 +1,5 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:get/get.dart';
 import 'package:gymtracker/controller/logger_controller.dart';
 import 'package:gymtracker/service/logger.dart';
 import 'package:logging/logging.dart';
@@ -11,16 +11,14 @@ void main() {
 
   group('Logger Service & Controller Tests', () {
     late LoggerController controller;
+    late ProviderContainer container;
+
+    tearDown(() => container.dispose());
 
     setUp(() {
-      Get.reset();
-      controller = LoggerController();
-      Get.put(controller);
+      container = ProviderContainer();
+      controller = container.read(loggerControllerInstanceProvider);
       initLogger();
-    });
-
-    tearDown(() {
-      Get.reset();
     });
 
     test('globalLogger is named Gym Bro', () {
@@ -87,25 +85,28 @@ void main() {
       expect(controller.filteredLogs.first.message, equals('error msg'));
     });
 
-    test('LoggerController ring buffer trims old logs when exceeding capacity', () {
-      controller.clearLogs();
-      const maxLogs = LoggerController.keptLogs;
+    test(
+      'LoggerController ring buffer trims old logs when exceeding capacity',
+      () {
+        controller.clearLogs();
+        const maxLogs = LoggerController.keptLogs;
 
-      for (int i = 0; i < maxLogs + 10; i++) {
-        controller.addLog(
-          Log(
-            message: 'Msg $i',
-            timestamp: DateTime.now(),
-            level: Level.INFO,
-            loggerName: 'RingBuffer',
-          ),
-        );
-      }
+        for (int i = 0; i < maxLogs + 10; i++) {
+          controller.addLog(
+            Log(
+              message: 'Msg $i',
+              timestamp: DateTime.now(),
+              level: Level.INFO,
+              loggerName: 'RingBuffer',
+            ),
+          );
+        }
 
-      expect(controller.logs.length, equals(maxLogs));
-      expect(controller.logs.first.message, equals('Msg 10'));
-      expect(controller.logs.last.message, equals('Msg ${maxLogs + 9}'));
-    });
+        expect(controller.logs.length, equals(maxLogs));
+        expect(controller.logs.first.message, equals('Msg 10'));
+        expect(controller.logs.last.message, equals('Msg ${maxLogs + 9}'));
+      },
+    );
 
     test('LevelExt provides correct display names and short names', () {
       expect(Level.FINEST.displayName, equals('Trace'));

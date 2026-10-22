@@ -30,6 +30,47 @@ void main() {
           protein: 100,
         ),
       );
+  test('a fresh install has no guest data to import', () async {
+    db.setCurrentUserId('A');
+    final preview = await GuestImportPreview.load(db, 'A');
+    expect(preview.count, 0);
+    expect(preview.collisions, 0);
+    expect(await db.watchNutritionGoals().first, isEmpty);
+    expect(await db.watchNutritionCategories().first, isEmpty);
+  });
+
+  test('reopening an empty database does not create guest data', () async {
+    final temp = await Directory.systemTemp.createTemp('empty-guest-test-');
+    addTearDown(() => temp.delete(recursive: true));
+    final file = File('${temp.path}/empty.db');
+    final first = GTDatabaseImpl.withQueryExecutor(NativeDatabase(file));
+    await first.customSelect('SELECT 1').get();
+    await first.close();
+
+    final reopened = GTDatabaseImpl.withQueryExecutor(NativeDatabase(file));
+    addTearDown(reopened.close);
+    reopened.setCurrentUserId('A');
+    expect((await GuestImportPreview.load(reopened, 'A')).count, 0);
+  });
+
+  test('explicitly saved defaults remain importable guest data', () async {
+    final day = DateTime(2026, 10, 20);
+    await db.updateNutritionGoal(
+      TaggedNutritionGoal(date: day, value: NutritionGoal.defaultGoal),
+    );
+    await db.setNutritionCategoriesForDay(day, {});
+    db.setCurrentUserId('A');
+    final preview = await GuestImportPreview.load(db, 'A');
+    expect(preview.count, 2);
+    await preview.apply(db, 'A');
+    expect(
+      (await db.watchNutritionGoals().first).single.value,
+      NutritionGoal.defaultGoal,
+    );
+    expect((await db.watchNutritionCategories().first).keys, contains(day));
+    expect((await GuestImportPreview.load(db, 'A')).count, 0);
+  });
+
   test(
     'category edits read the latest day atomically and preserve other days',
     () async {

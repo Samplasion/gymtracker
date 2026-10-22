@@ -1,43 +1,32 @@
 import 'dart:async';
-import 'package:flutter/material.dart';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:get/get.dart';
-import 'package:gymtracker/controller/coordinator.dart';
 import 'package:gymtracker/controller/health_controller.dart';
+import 'package:gymtracker/provider/bootstrap.dart';
 import 'package:gymtracker/provider/food.dart';
-import 'package:gymtracker/controller/notifications_controller.dart';
-import 'package:gymtracker/controller/settings_controller.dart';
-import 'package:gymtracker/main.dart';
-import 'package:gymtracker/model/preferences.dart';
 import 'package:gymtracker/provider/online.dart';
-import 'package:gymtracker/service/database.dart';
-import 'package:gymtracker/service/logger.dart';
+import 'package:gymtracker/service/native.dart';
 import 'package:gymtracker/service/online.dart';
+import 'package:gymtracker/service/protocol.dart';
 import 'package:gymtracker/service/purchases.dart';
-import 'package:gymtracker/utils/go.dart';
 import 'package:http/http.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:rxdart/rxdart.dart';
 
 import '../test_helpers/mock_services.dart';
 
-class MockNotificationController extends Mock
-    implements NotificationController {
-  @override
-  final onStart = MockInternalFinalCallback<void>();
-  @override
-  final onDelete = MockInternalFinalCallback<void>();
-}
+class _Health extends Mock implements HealthController {}
 
-class MockPurchasesService extends Mock implements PurchasesService {}
+class _Native extends Mock implements NativeService {}
+
+class _Protocol extends Mock implements ProtocolService {}
+
+class _Purchases extends Mock implements PurchasesService {}
 
 class _FailingOfflineOnlineNotifier extends Online {
   @override
-  FutureOr<OnlineAccount?> build() async {
-    // Simulates onlineProvider failing due to no internet during app boot
-    throw ClientException('Failed to connect to Supabase: No internet');
-  }
+  FutureOr<OnlineAccount?> build() async =>
+      throw ClientException('Failed to connect to Supabase: No internet');
 }
 
 class _SlowOnline extends Online {
@@ -45,92 +34,79 @@ class _SlowOnline extends Online {
   FutureOr<OnlineAccount?> build() => Completer<OnlineAccount?>().future;
 }
 
-class _BootCoordinator extends Coordinator {
-  @override
-  void loadColdbootDeeplink() {}
-  @override
-  void schedulePeriodicBackup() {}
-}
-
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
-
-  late Coordinator coordinator;
-  late MockNotificationController mockNotificationController;
-  late MockPurchasesService mockPurchasesService;
+  late _Health health;
+  late _Protocol protocol;
+  late _Purchases purchases;
 
   setUp(() {
     MockServices.setup();
-    mockNotificationController = MockNotificationController();
-    mockPurchasesService = MockPurchasesService();
-
+    health = _Health();
+    protocol = _Protocol();
+    purchases = _Purchases();
+    when(() => MockServices.databaseService.isInitialized).thenReturn(true);
     when(
-      () => MockServices.databaseService.prefs$,
-    ).thenAnswer((_) => BehaviorSubject<Prefs>.seeded(Prefs.defaultValue));
-    when(
-      () => MockServices.settingsController.awaitInitialized(),
+      () => MockServices.notifications.initialize(),
     ).thenAnswer((_) async {});
-    when(
-      () => mockNotificationController.initialize(),
-    ).thenAnswer((_) async {});
-    when(
-      () => mockNotificationController.showSettingsTileStream,
-    ).thenAnswer((_) => BehaviorSubject<bool>.seeded(false));
-    when(() => mockPurchasesService.init()).thenAnswer((_) async {});
-
-    Get.put<NotificationController>(mockNotificationController);
-    Get.put<PurchasesService>(mockPurchasesService);
-    Get.put(HealthController());
-
-    // Override onlineProvider in globalContainer with an instance that fails on network
-    globalContainer = ProviderContainer(
+    when(() => health.init()).thenAnswer((_) async {});
+    when(() => protocol.initialize()).thenAnswer((_) async {});
+    when(() => purchases.init()).thenAnswer((_) async {});
+    MockServices.container.dispose();
+    MockServices.container = ProviderContainer(
       retry: (_, __) => null,
       overrides: [
-        onlineProvider.overrideWith(() => _FailingOfflineOnlineNotifier()),
-        showFoodPermissionsSettingsTileProvider.overrideWith((_) => false),
+        ...MockServices.defaultOverrides,
+        onlineProvider.overrideWith(_FailingOfflineOnlineNotifier.new),
+        healthControllerProvider.overrideWithValue(health),
+        nativeServiceProvider.overrideWithValue(_Native()),
+        protocolServiceProvider.overrideWithValue(protocol),
+        purchasesServiceProvider.overrideWithValue(purchases),
+        foodNativeSyncProvider.overrideWith((ref) {}),
       ],
     );
-
-    coordinator = _BootCoordinator();
   });
+  tearDown(MockServices.tearDown);
 
-  tearDown(() async {
-    globalContainer.dispose();
-    await MockServices.database.close();
-    Get.reset();
-  });
-
-  group('Coordinator Offline Boot Tests', () {
+  group('Application offline boot', () {
     testWidgets('remote error does not block local initialization', (
       tester,
     ) async {
-      await tester.pumpWidget(GetMaterialApp(home: const Scaffold()));
       await tester.runAsync(() async {
         await expectLater(
-          coordinator.awaitInitialized().timeout(const Duration(seconds: 3)),
+          MockServices.container
+              .read(appStartupProvider.future)
+              .timeout(const Duration(seconds: 3)),
           completes,
         );
       });
+      verify(() => MockServices.notifications.initialize()).called(1);
+      verify(() => health.init()).called(1);
+      verify(() => protocol.initialize()).called(1);
     });
 
     testWidgets('online timeout still completes local initialization', (
       tester,
     ) async {
-      globalContainer.dispose();
-      globalContainer = ProviderContainer(
-        retry: (_, __) => null,
-        overrides: [
-          onlineProvider.overrideWith(_SlowOnline.new),
-          showFoodPermissionsSettingsTileProvider.overrideWith((_) => false),
-        ],
-      );
-      await tester.pumpWidget(GetMaterialApp(home: const Scaffold()));
+      MockServices.container.updateOverrides([
+        ...MockServices.defaultOverrides,
+        onlineProvider.overrideWith(_SlowOnline.new),
+        healthControllerProvider.overrideWithValue(health),
+        nativeServiceProvider.overrideWithValue(_Native()),
+        protocolServiceProvider.overrideWithValue(protocol),
+        purchasesServiceProvider.overrideWithValue(purchases),
+        foodNativeSyncProvider.overrideWith((ref) {}),
+      ]);
       await tester.runAsync(() async {
         await expectLater(
-          coordinator.awaitInitialized().timeout(const Duration(seconds: 12)),
+          MockServices.container
+              .read(appStartupProvider.future)
+              .timeout(const Duration(seconds: 12)),
           completes,
         );
       });
+      verify(() => MockServices.notifications.initialize()).called(1);
+      verify(() => protocol.initialize()).called(1);
     });
   });
 }

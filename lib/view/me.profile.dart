@@ -44,10 +44,12 @@ class __ProfileEditPageState extends ConsumerState<_ProfileEditPage> {
             email: _emailController.text,
           );
     } finally {
-      setState(() {
-        isLoading = false;
-      });
-      Get.back();
+      if (mounted) {
+        setState(() {
+          isLoading = false;
+        });
+        Navigator.of(context).pop();
+      }
     }
   }
 
@@ -60,7 +62,7 @@ class __ProfileEditPageState extends ConsumerState<_ProfileEditPage> {
           title: Text(context.t.me.profile.edit.title),
           leading: IconButton(
             icon: const Icon(GTIcons.close),
-            onPressed: isLoading ? null : Get.back,
+            onPressed: isLoading ? null : () => Navigator.of(context).pop(),
           ),
           actions: [
             IconButton(

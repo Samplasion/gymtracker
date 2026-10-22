@@ -20,7 +20,7 @@ final class NetworkConnectivityNotifierProvider
         argument: null,
         retry: null,
         name: r'networkConnectivityProvider',
-        isAutoDispose: true,
+        isAutoDispose: false,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
@@ -34,7 +34,7 @@ final class NetworkConnectivityNotifierProvider
 }
 
 String _$networkConnectivityNotifierHash() =>
-    r'31eb1ec7a342b7d150002dafcad81cf99067095d';
+    r'62b3458cbbb34c9343467b24e965fe56c01d77b5';
 
 abstract class _$NetworkConnectivityNotifier extends $StreamNotifier<bool> {
   Stream<bool> build();

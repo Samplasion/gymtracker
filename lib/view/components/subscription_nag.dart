@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gymtracker/controller/purchases_controller.dart';
 import 'package:gymtracker/i18n/strings.g.dart';
 import 'package:gymtracker/icons/gymtracker_icons.dart';
 import 'package:gymtracker/model/subscription.dart';
 import 'package:gymtracker/utils/theme.dart';
-import 'package:gymtracker/view/components/controlled.dart';
+import 'package:gymtracker/view/actions/purchases.dart';
 import 'package:gymtracker/view/components/gradient_button.dart';
 import 'package:gymtracker/view/components/pro_builder.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
-class SubscriptionNag extends ControlledWidgetAny<PurchasesController> {
+class SubscriptionNag extends ConsumerWidget {
   const SubscriptionNag({
     super.key,
     required this.shouldHide,
@@ -31,19 +32,25 @@ class SubscriptionNag extends ControlledWidgetAny<PurchasesController> {
   final bool _builder;
 
   @override
-  Widget build(BuildContext context) {
-    if (!_builder) return _cardBuilder(context, subscriptionInfo);
+  Widget build(BuildContext context, WidgetRef ref) {
+    Widget card(BuildContext context, SubscriptionInfo? info) => _cardBuilder(
+      context,
+      info,
+      () => ref.read(purchasesControllerProvider).presentPaywall(),
+    );
+    if (!_builder) return card(context, subscriptionInfo);
 
     return SafeArea(
       top: false,
       bottom: false,
-      child: ProBuilder(builder: _cardBuilder),
+      child: ProBuilder(builder: card),
     );
   }
 
   Widget _cardBuilder(
     BuildContext context,
     SubscriptionInfo? subscriptionInfo,
+    VoidCallback onUpgrade,
   ) {
     if (subscriptionInfo != null && shouldHide(subscriptionInfo)) {
       return const SizedBox.shrink();
@@ -74,7 +81,7 @@ class SubscriptionNag extends ControlledWidgetAny<PurchasesController> {
                   children: [
                     GradientButton(
                       onPressed: () {
-                        controller.presentPaywall();
+                        onUpgrade();
                       },
                       gradient: LinearGradient(
                         colors: [

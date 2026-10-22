@@ -3,7 +3,7 @@ import 'package:gymtracker/view/components/visible_data_refresh.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:gymtracker/data/achievements.dart' as achievements_data;
+import 'package:gymtracker/provider/achievement_metadata.dart';
 import 'package:gymtracker/i18n/strings.g.dart';
 import 'package:gymtracker/icons/gymtracker_icons.dart';
 import 'package:gymtracker/model/friend.dart';
@@ -480,6 +480,7 @@ class _UserFeedSliver extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final dataAsync = ref.watch(friendPublicDataProvider(friendId));
+    final achievementCatalog = ref.watch(achievementMetadataProvider);
 
     return dataAsync.when(
       loading: () => SliverSkeletonizer(
@@ -506,11 +507,9 @@ class _UserFeedSliver extends ConsumerWidget {
           for (final w in data.workouts)
             FeedItemWorkout(workout: w, authorship: authorship),
           for (final completion in data.achievements)
-            if (achievements_data.achievements[completion.achievementID] !=
-                null)
+            if (achievementCatalog[completion.achievementID] != null)
               FeedItemAchievement(
-                achievement:
-                    achievements_data.achievements[completion.achievementID]!,
+                achievement: achievementCatalog[completion.achievementID]!,
                 completion: completion,
                 authorship: authorship,
               ),

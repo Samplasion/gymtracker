@@ -1,5 +1,4 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:get/get.dart';
 import 'package:gymtracker/model/model.dart';
 import 'package:gymtracker/view/history.dart';
 import 'package:mocktail/mocktail.dart';
@@ -13,19 +12,22 @@ void main() {
     await initTestLocalizations();
 
     // Stub historyController methods and getters
-    when(() => MockServices.historyController.history)
-        .thenReturn(<Workout>[].obs);
-    when(() => MockServices.historyController.userVisibleWorkouts)
-        .thenReturn(<Workout>[]);
+    when(() => MockServices.historyController.history).thenReturn(<Workout>[]);
+    when(
+      () => MockServices.historyController.userVisibleWorkouts,
+    ).thenReturn(<Workout>[]);
   });
 
   tearDown(() {
     MockServices.tearDown();
   });
 
-  testWidgets('HistoryView renders successfully when history is empty',
-      (WidgetTester tester) async {
-    await tester.pumpWidget(const WidgetTestApp(child: HistoryView()));
+  testWidgets('HistoryView renders successfully when history is empty', (
+    WidgetTester tester,
+  ) async {
+    await tester.pumpWidget(
+      const WidgetTestApp(wrapWithProviderScope: true, child: HistoryView()),
+    );
     await tester.pump();
 
     // Should render empty history message

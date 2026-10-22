@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart' hide ContextExtensionss;
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:gymtracker/controller/exercises_controller.dart';
+import 'package:gymtracker/controller/settings_controller.dart';
 import 'package:gymtracker/i18n/strings.g.dart';
 import 'package:gymtracker/icons/gymtracker_icons.dart';
 import 'package:gymtracker/model/achievements.dart';
@@ -7,6 +9,7 @@ import 'package:gymtracker/model/exercise.dart';
 import 'package:gymtracker/model/workout.dart';
 import 'package:gymtracker/utils/constants.dart';
 import 'package:gymtracker/utils/extensions.dart';
+import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/view/charts/bar_charts.dart';
 import 'package:gymtracker/view/components/muscles.dart';
 import 'package:gymtracker/view/utils/achievements.dart';
@@ -15,7 +18,7 @@ import 'package:gymtracker/view/utils/sliver_utils.dart';
 import 'package:gymtracker/view/utils/speed_dial.dart';
 import 'package:gymtracker/view/utils/timer.dart';
 
-class WorkoutDoneSheet extends StatefulWidget {
+class WorkoutDoneSheet extends ConsumerStatefulWidget {
   final Workout workout;
   final ScrollController? controller;
   final Map<Achievement, AchievementCompletion> achievements;
@@ -28,10 +31,12 @@ class WorkoutDoneSheet extends StatefulWidget {
   });
 
   @override
-  State<WorkoutDoneSheet> createState() => _WorkoutDoneSheetState();
+  ConsumerState<WorkoutDoneSheet> createState() => _WorkoutDoneSheetState();
 }
 
-class _WorkoutDoneSheetState extends State<WorkoutDoneSheet> {
+class _WorkoutDoneSheetState extends ConsumerState<WorkoutDoneSheet> {
+  SettingsController get settingsController =>
+      ref.watch(settingsControllerProvider);
   Workout get workout => widget.workout;
   ScrollController? get controller => widget.controller;
 
@@ -42,6 +47,7 @@ class _WorkoutDoneSheetState extends State<WorkoutDoneSheet> {
     super.initState();
     muscleChartHighlights = getIntensities(
       workout.flattenedExercises.whereType<Exercise>().toList(),
+      customExercises: ref.read(exercisesControllerProvider).exercises,
     );
   }
 
@@ -67,7 +73,7 @@ class _WorkoutDoneSheetState extends State<WorkoutDoneSheet> {
               IconButton(
                 icon: const Icon(GTIcons.done),
                 onPressed: () {
-                  Get.back();
+                  Go.back();
                 },
               ),
             ],
@@ -75,8 +81,8 @@ class _WorkoutDoneSheetState extends State<WorkoutDoneSheet> {
               title: Text(context.t.ongoingWorkout.goodJob.title),
               centerTitle: true,
               expandedTitleScale:
-                  context.theme.textTheme.displaySmall!.fontSize! /
-                  context.theme.textTheme.titleLarge!.fontSize!,
+                  Theme.of(context).textTheme.displaySmall!.fontSize! /
+                  Theme.of(context).textTheme.titleLarge!.fontSize!,
             ),
           ),
           if (widget.achievements.isNotEmpty) ...[
@@ -108,13 +114,16 @@ class _WorkoutDoneSheetState extends State<WorkoutDoneSheet> {
               children: [
                 Text(
                   context.t.ongoingWorkout.goodJob.body,
-                  style: context.theme.textTheme.bodyLarge,
+                  style: Theme.of(context).textTheme.bodyLarge,
                 ),
                 if (WeightDistributionBarChart.shouldShow(workout)) ...[
                   const SizedBox(height: 16),
                   WeightDistributionBarChart(workout: workout),
                 ],
-                if (WorkoutMuscleCategoriesBarChart.shouldShow(workout)) ...[
+                if (WorkoutMuscleCategoriesBarChart.shouldShow(
+                  workout,
+                  ref,
+                )) ...[
                   const SizedBox(height: 16),
                   WorkoutMuscleCategoriesBarChart(workout: workout),
                 ],
@@ -153,7 +162,10 @@ class _WorkoutDoneSheetState extends State<WorkoutDoneSheet> {
                       SpeedDialButton(
                         icon: const Icon(GTIcons.volume),
                         text: Text(
-                          workout.liftedWeight.getUserFacingWeight(context.t),
+                          workout.liftedWeight.getUserFacingWeight(
+                            context.t,
+                            settingsController.weightUnit,
+                          ),
                         ),
                         subtitle: Text(context.t.me.stats.volume.label),
                       ),
@@ -161,7 +173,10 @@ class _WorkoutDoneSheetState extends State<WorkoutDoneSheet> {
                       SpeedDialButton(
                         icon: const Icon(GTIcons.distance),
                         text: Text(
-                          workout.distanceRun.getUserFacingDistance(context.t),
+                          workout.distanceRun.getUserFacingDistance(
+                            context.t,
+                            settingsController.distanceUnit,
+                          ),
                         ),
                         subtitle: Text(context.t.me.stats.distance.label),
                       ),

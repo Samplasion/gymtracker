@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:gymtracker/main.dart';
 import 'package:gymtracker/db/database.dart';
 import 'package:gymtracker/model/workout.dart';
 import 'package:gymtracker/provider/online.dart';
@@ -43,12 +42,13 @@ void main() {
     when(
       () => MockServices.databaseService.setCurrentUserId(null),
     ).thenAnswer((_) async {});
-    globalContainer = ProviderContainer(
+    MockServices.container = ProviderContainer(
       overrides: [
+        ...MockServices.defaultOverrides,
         onlineProvider.overrideWith(() => online = _Online(service, manager)),
       ],
     );
-    await globalContainer.read(onlineProvider.future);
+    await MockServices.container.read(onlineProvider.future);
     MockServices.database.setCurrentUserId('A');
     await MockServices.database.insertRoutineFolder(
       const GTRoutineFolder(id: 'A', name: 'A', sortOrder: 0, notes: ''),
@@ -61,7 +61,6 @@ void main() {
   });
 
   tearDown(() {
-    globalContainer.dispose();
     MockServices.tearDown();
   });
 
@@ -77,7 +76,7 @@ void main() {
           .select((MockServices.database as GTDatabaseImpl).routineFolders)
           .get();
       expect(rows.map((r) => r.userId), containsAll(['A', 'B']));
-      expect(globalContainer.read(onlineProvider).value?.id, 'A');
+      expect(MockServices.container.read(onlineProvider).value?.id, 'A');
       verifyInOrder([
         () => manager.suspend(),
         () => service.deleteAccount(),
@@ -107,7 +106,7 @@ void main() {
           .select((MockServices.database as GTDatabaseImpl).routineFolders)
           .get();
       expect(rows.map((r) => r.userId), ['B']);
-      expect(globalContainer.read(onlineProvider).value, isNull);
+      expect(MockServices.container.read(onlineProvider).value, isNull);
       verifyNever(() => manager.enableSync());
     },
   );

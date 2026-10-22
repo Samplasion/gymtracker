@@ -1,32 +1,45 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gymtracker/i18n/strings.g.dart';
 import 'package:gymtracker/provider/online.dart';
-import 'package:gymtracker/controller/serviceable_controller.dart';
 import 'package:gymtracker/service/logger.dart';
 import 'package:gymtracker/utils/go.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-class _LoginController extends GetxController
-    with ServiceableController, StateMixin {
-  final Online _controller;
+enum _LoginPhase { empty, loading, success, error }
 
-  _LoginController(this._controller);
+class _LoginStatus {
+  const _LoginStatus(this.phase, [this.errorMessage]);
+  final _LoginPhase phase;
+  final String? errorMessage;
+  bool get isLoading => phase == _LoginPhase.loading;
+  bool get isError => phase == _LoginPhase.error;
+  bool get isSuccess => phase == _LoginPhase.success;
+  bool get isEmpty => phase == _LoginPhase.empty;
+}
 
+final _loginControllerProvider =
+    NotifierProvider.autoDispose<_LoginController, _LoginStatus>(
+      _LoginController.new,
+    );
+
+class _LoginController extends Notifier<_LoginStatus> {
+  Online get _controller => ref.read(onlineProvider.notifier);
+  _LoginStatus get status => state;
   @override
-  onInit() {
-    super.onInit();
-    change(null, status: RxStatus.empty());
+  _LoginStatus build() {
+    ref.onDispose(_credentials$.close);
+    return const _LoginStatus(_LoginPhase.empty);
+  }
+
+  void change(Object? _, {required _LoginStatus status}) {
+    if (ref.mounted) state = status;
   }
 
   final _credentials$ = BehaviorSubject<CredentialsState>.seeded(
     CredentialsState.empty(),
   );
-
-  @override
-  void onServiceChange() {}
 
   void checkCredentials(String email, String password, String username) {
     _credentials$.add(
@@ -43,26 +56,27 @@ class _LoginController extends GetxController
     String password, {
     required BuildContext context,
   }) async {
+    final errorLabels = context.t.login.errors;
     if (status.isLoading) return;
     if (_credentials$.value.emailError) return;
     if (password.isEmpty) return;
-    change(null, status: RxStatus.loading());
+    change(null, status: const _LoginStatus(_LoginPhase.loading));
     try {
       await _controller.login(email: email, password: password);
-      change(null, status: RxStatus.success());
+      change(null, status: const _LoginStatus(_LoginPhase.success));
       // TODO: Custom error type
     } catch (e) {
       String message = e.toString();
       if (e is AuthException && e is! AuthApiException) {
         if (e.message.contains("Socket")) {
-          message = context.t.login.errors.noInternet;
-          change(null, status: RxStatus.error(message));
+          message = errorLabels.noInternet;
+          change(null, status: _LoginStatus(_LoginPhase.error, message));
         } else {
           message = e.message;
-          change(null, status: RxStatus.error(message));
+          change(null, status: _LoginStatus(_LoginPhase.error, message));
         }
       } else {
-        RxStatus.error(message);
+        _LoginStatus(_LoginPhase.error, message);
       }
     }
   }
@@ -73,28 +87,29 @@ class _LoginController extends GetxController
     String username, {
     required BuildContext context,
   }) async {
+    final errorLabels = context.t.login.errors;
     if (status.isLoading) return false;
     if (_credentials$.value.hasError) return false;
     if (password.isEmpty) return false;
-    change(null, status: RxStatus.loading());
+    change(null, status: const _LoginStatus(_LoginPhase.loading));
     return _controller
         .register(email: email, password: password, username: username)
         .then((_) {
-          change(null, status: RxStatus.success());
+          change(null, status: const _LoginStatus(_LoginPhase.success));
           return true;
         })
         .catchError((e) {
           String message = e.toString();
           if (e is AuthException) {
             if (e.message.contains("Socket")) {
-              message = context.t.login.errors.noInternet;
+              message = errorLabels.noInternet;
             } else if (e.message == "login.errors.usernameTaken") {
-              message = context.t.login.errors.usernameTaken;
+              message = errorLabels.usernameTaken;
             } else {
               message = e.message;
             }
           }
-          change(null, status: RxStatus.error(message));
+          change(null, status: _LoginStatus(_LoginPhase.error, message));
           return false;
         });
   }
@@ -133,10 +148,19 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
   }
 
   @override
-  Widget build(BuildContext context) => GetBuilder<_LoginController>(
-    init: _LoginController(ref.read(onlineProvider.notifier)),
-    builder: (controller) => _buildPage(context, controller),
-  );
+  void dispose() {
+    tabController.dispose();
+    emailController.dispose();
+    usernameController.dispose();
+    passwordController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    ref.watch(_loginControllerProvider);
+    return _buildPage(context, ref.read(_loginControllerProvider.notifier));
+  }
 
   Widget _buildPage(BuildContext context, _LoginController loginController) {
     final fieldsEnabled =
@@ -416,12 +440,15 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
     _checkCredentials();
 
     try {
-      await Get.find<_LoginController>().signIn(
-        emailController.text,
-        passwordController.text,
-        context: context,
-      );
+      await ref
+          .read(_loginControllerProvider.notifier)
+          .signIn(
+            emailController.text,
+            passwordController.text,
+            context: context,
+          );
     } on AuthApiException catch (e) {
+      if (!mounted) return;
       if (e.code == "email_not_confirmed") {
         Go.off(
           () => _AuthVerifyEmailString(
@@ -433,19 +460,21 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
       logger.e("AuthApiException: ${e.code} - ${e.message}");
       return;
     }
-    Get.back();
+    if (mounted) Navigator.of(context).pop();
   }
 
   void _submitSignUp() async {
     _checkCredentials();
 
-    final isOk = await Get.find<_LoginController>().signUp(
-      emailController.text,
-      passwordController.text,
-      usernameController.text,
-      context: context,
-    );
-    if (isOk) {
+    final isOk = await ref
+        .read(_loginControllerProvider.notifier)
+        .signUp(
+          emailController.text,
+          passwordController.text,
+          usernameController.text,
+          context: context,
+        );
+    if (isOk && mounted) {
       Go.off(
         () => _AuthVerifyEmailString(
           email: emailController.text,
@@ -456,11 +485,13 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
   }
 
   void _checkCredentials() {
-    Get.find<_LoginController>().checkCredentials(
-      emailController.text,
-      passwordController.text,
-      usernameController.text,
-    );
+    ref
+        .read(_loginControllerProvider.notifier)
+        .checkCredentials(
+          emailController.text,
+          passwordController.text,
+          usernameController.text,
+        );
   }
 }
 
@@ -485,10 +516,10 @@ class _AuthVerifyEmailStringState
   bool emailVerified = false;
 
   @override
-  Widget build(BuildContext context) => GetBuilder<_LoginController>(
-    init: _LoginController(ref.read(onlineProvider.notifier)),
-    builder: (controller) => _buildPage(context, controller),
-  );
+  Widget build(BuildContext context) {
+    ref.watch(_loginControllerProvider);
+    return _buildPage(context, ref.read(_loginControllerProvider.notifier));
+  }
 
   Widget _buildPage(BuildContext context, _LoginController loginController) {
     return PopScope(
@@ -541,6 +572,7 @@ class _AuthVerifyEmailStringState
         email: widget.email,
         password: widget.password,
       );
+      if (!mounted) return;
       if (isVerified) {
         setState(() => emailVerified = true);
         await loginController.signIn(
@@ -548,7 +580,7 @@ class _AuthVerifyEmailStringState
           widget.password,
           context: context,
         );
-        Get.back();
+        if (mounted) Navigator.of(context).pop();
       } else {
         if (!context.mounted) return;
         ScaffoldMessenger.of(
@@ -557,7 +589,7 @@ class _AuthVerifyEmailStringState
         ).showSnackBar(SnackBar(content: Text(notConfirmedString)));
       }
     } finally {
-      setState(() => loading = false);
+      if (mounted) setState(() => loading = false);
     }
   }
 }

@@ -1,7 +1,8 @@
 import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
-import 'package:get/get.dart' hide ContextExtensionss;
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:gymtracker/controller/countdown_controller.dart';
 import 'package:gymtracker/controller/settings_controller.dart';
 import 'package:gymtracker/controller/stopwatch_controller.dart';
@@ -18,6 +19,7 @@ import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/utils/sets.dart';
 import 'package:gymtracker/utils/theme.dart';
 import 'package:gymtracker/utils/utils.dart';
+import 'package:gymtracker/view/actions/workout.dart';
 import 'package:gymtracker/view/components/exercise_progression.dart';
 import 'package:gymtracker/view/components/loading_indicator.dart';
 import 'package:gymtracker/view/components/maybe_rich_text.dart';
@@ -43,230 +45,254 @@ class WorkoutSimpleView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (!Get.isRegistered<WorkoutController>()) {
+    if (!(_workoutController(context) != null)) {
       return const Center(child: GBLoadingIndicator());
     }
 
-    final controller = Get.find<WorkoutController>();
-    final countdownController = Get.find<CountdownController>();
-    final stopwatchController = Get.find<StopwatchController>();
-    final settings = Get.find<SettingsController>();
+    final controller = ProviderScope.containerOf(
+      context,
+      listen: false,
+    ).read(workoutControllerProvider.notifier);
+    final countdownController = ProviderScope.containerOf(
+      context,
+      listen: false,
+    ).read(countdownControllerProvider.notifier);
+    final stopwatchController = ProviderScope.containerOf(
+      context,
+      listen: false,
+    ).read(stopwatchControllerProvider.notifier);
+    return Consumer(
+      builder: (context, ref, _) {
+        final settings = ref.watch(settingsControllerProvider);
+        ref.watch(workoutControllerProvider);
+        ref.watch(countdownControllerProvider);
+        ref.watch(stopwatchControllerProvider);
+        final current = _currentSetData(controller, context);
+        final isRestActive = countdownController.isActive;
+        final isWorkoutComplete = _isWorkoutComplete(controller);
+        final canShowAddExercise = current == null
+            ? !isWorkoutComplete
+            : _isLastSetInWorkout(controller, current.cursor);
+        final canShowAddSet =
+            current != null &&
+            _isLastSetInExercise(current.cursor, current.exercise);
+        final accentColor = settings.tintExercises && current != null
+            ? current.exerciseColor
+            : settings.color;
 
-    return Obx(() {
-      final current = _currentSetData(controller, context);
-      final isRestActive = countdownController.isActive;
-      final isWorkoutComplete = _isWorkoutComplete(controller);
-      final canShowAddExercise = current == null
-          ? !isWorkoutComplete
-          : _isLastSetInWorkout(controller, current.cursor);
-      final canShowAddSet =
-          current != null &&
-          _isLastSetInExercise(current.cursor, current.exercise);
-      final accentColor = settings.tintExercises.value && current != null
-          ? current.exerciseColor
-          : settings.color.value;
+        final body = Column(
+          children: [
+            Expanded(
+              child: current == null
+                  ? _EmptyCurrentSetView(
+                      isRestActive: isRestActive,
+                      isWorkoutComplete: isWorkoutComplete,
+                      onFinishWorkout: () {
+                        controller.finishWorkoutWithDialog(context);
+                      },
+                      onAddExercise: () async {
+                        await _addExerciseAndAdvanceCursor(controller, current);
+                      },
+                      showAddExercise: canShowAddExercise,
+                    )
+                  : _CurrentSetView(
+                      data: current,
+                      isRestActive: isRestActive,
+                      nextUp: _nextUpData(context, controller, current),
+                      showAddExercise: canShowAddExercise,
+                      showAddSet: canShowAddSet,
+                      onAddExercise: () async {
+                        await _addExerciseAndAdvanceCursor(controller, current);
+                      },
+                      onAddSet: () {
+                        controller.callbacks.onSetCreate(current.index);
+                        controller.selectSetCursorByIndex(
+                          current.index,
+                          current.cursor.setIndex + 1,
+                        );
+                      },
+                      onEditSet: () {
+                        Go.to<void>(() => _SimpleSetEditDialog(data: current));
+                      },
+                    ),
+            ),
+            _BottomPanel(
+              current: current,
+              isRestActive: isRestActive,
+              accentColor: accentColor,
+              canGoPrevious: current == null
+                  ? false
+                  : _hasPreviousSet(controller, current.cursor),
+              canGoNext: current == null
+                  ? false
+                  : _hasNextSet(controller, current.cursor),
+              onGoToFirstSet: () {
+                if (current != null) {
+                  controller.moveSetCursorToFirstUndone();
+                }
+              },
+              onPrevious: controller.moveSetCursorToPrevious,
+              onCalculator: () {
+                showDialog(
+                  context: context,
+                  builder: (context) =>
+                      WeightCalculator(weightUnit: controller.weightUnit),
+                );
+              },
+              onDone: controller.autoMarkNextSetDone,
+              onInterval: () => Go.to(() => const CardioTimerSetupScreen()),
+              onNext: controller.moveSetCursorToNext,
+              onGoToLastSet: () {
+                if (current != null) {
+                  controller.moveSetCursorToLastUndone();
+                }
+              },
+              workoutStart: controller.time,
+            ),
+          ],
+        );
 
-      final body = Column(
-        children: [
-          Expanded(
-            child: current == null
-                ? _EmptyCurrentSetView(
-                    isRestActive: isRestActive,
-                    isWorkoutComplete: isWorkoutComplete,
-                    onFinishWorkout: () {
-                      controller.finishWorkoutWithDialog(context);
-                    },
-                    onAddExercise: () async {
-                      await _addExerciseAndAdvanceCursor(controller, current);
-                    },
-                    showAddExercise: canShowAddExercise,
-                  )
-                : _CurrentSetView(
-                    data: current,
-                    isRestActive: isRestActive,
-                    nextUp: _nextUpData(context, controller, current),
-                    showAddExercise: canShowAddExercise,
-                    showAddSet: canShowAddSet,
-                    onAddExercise: () async {
-                      await _addExerciseAndAdvanceCursor(controller, current);
-                    },
-                    onAddSet: () {
-                      controller.callbacks.onSetCreate(current.index);
-                      controller.selectSetCursorByIndex(
-                        current.index,
-                        current.cursor.setIndex + 1,
-                      );
-                    },
-                    onEditSet: () {
-                      Go.to<void>(() => _SimpleSetEditDialog(data: current));
-                    },
-                  ),
-          ),
-          _BottomPanel(
-            current: current,
-            isRestActive: isRestActive,
-            accentColor: accentColor,
-            canGoPrevious: current == null
-                ? false
-                : _hasPreviousSet(controller, current.cursor),
-            canGoNext: current == null
-                ? false
-                : _hasNextSet(controller, current.cursor),
-            onGoToFirstSet: () {
-              if (current != null) {
-                controller.moveSetCursorToFirstUndone();
-              }
-            },
-            onPrevious: controller.moveSetCursorToPrevious,
-            onCalculator: () {
-              showDialog(
-                context: context,
-                builder: (context) =>
-                    WeightCalculator(weightUnit: controller.weightUnit.value),
-              );
-            },
-            onDone: controller.autoMarkNextSetDone,
-            onInterval: () => Go.to(() => const CardioTimerSetupScreen()),
-            onNext: controller.moveSetCursorToNext,
-            onGoToLastSet: () {
-              if (current != null) {
-                controller.moveSetCursorToLastUndone();
-              }
-            },
-            workoutStart: controller.time.value,
-          ),
-        ],
-      );
-
-      Widget page = Scaffold(
-        appBar: AppBar(
-          leading: const BackButton(),
-          title: Obx(() {
-            if (stopwatchController.globalStopwatch.isStopped.isFalse ||
-                stopwatchController.globalStopwatch.currentDuration.inSeconds >
-                    0) {
-              return TimerView(
-                builder: (ctx, _) {
-                  return Text.rich(
-                    TimerView.buildTimeString(
-                      context,
-                      stopwatchController.globalStopwatch.currentDuration,
-                      style: TextStyle(
-                        color: Theme.of(context).colorScheme.secondary,
-                      ),
-                      builder: (time) => TextSpan(
-                        children: [
-                          TextSpan(
+        Widget page = Scaffold(
+          appBar: AppBar(
+            leading: const BackButton(),
+            title: Consumer(
+              builder: (context, ref, _) {
+                ref.watch(workoutControllerProvider);
+                ref.watch(countdownControllerProvider);
+                ref.watch(stopwatchControllerProvider);
+                if (!stopwatchController.globalStopwatch.isStopped ||
+                    stopwatchController
+                            .globalStopwatch
+                            .currentDuration
+                            .inSeconds >
+                        0) {
+                  return TimerView(
+                    builder: (ctx, _) {
+                      return Text.rich(
+                        TimerView.buildTimeString(
+                          context,
+                          stopwatchController.globalStopwatch.currentDuration,
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.secondary,
+                          ),
+                          builder: (time) => TextSpan(
                             children: [
-                              WidgetSpan(
-                                child: Icon(
-                                  GTIcons.stopwatch,
+                              TextSpan(
+                                children: [
+                                  WidgetSpan(
+                                    child: Icon(
+                                      GTIcons.stopwatch,
+                                      color: Theme.of(
+                                        context,
+                                      ).colorScheme.secondary,
+                                    ),
+                                    alignment: PlaceholderAlignment.middle,
+                                  ),
+                                  const TextSpan(text: ' '),
+                                  time,
+                                ],
+                                style: TextStyle(
                                   color: Theme.of(
                                     context,
                                   ).colorScheme.secondary,
                                 ),
-                                alignment: PlaceholderAlignment.middle,
                               ),
-                              const TextSpan(text: ' '),
-                              time,
                             ],
-                            style: TextStyle(
-                              color: Theme.of(context).colorScheme.secondary,
-                            ),
                           ),
-                        ],
+                        ),
+                      );
+                    },
+                    startingTime: DateTime.now(),
+                  );
+                }
+                return Text(context.t.ongoingWorkout.title);
+              },
+            ),
+            actions: [
+              IconButton(
+                tooltip: context.t.ongoingWorkout.simple.restTimer,
+                onPressed: _canTriggerRestTimer(context, current)
+                    ? () => controller.markSetAsDone(current!.index, -1, true)
+                    : null,
+                icon: const Icon(GTIcons.rest_timer),
+              ),
+              PopupMenuButton(
+                itemBuilder: (context) =>
+                    buildToolboxMenuEntries(context, controller),
+                tooltip: context.t.ongoingWorkout.toolbox.title,
+                icon: const Icon(GTIcons.tools),
+              ),
+              PopupMenuButton(
+                itemBuilder: (context) {
+                  final items = <PopupMenuEntry<dynamic>>[
+                    PopupMenuItem(
+                      child: ListTile(
+                        leading: const Icon(GTIcons.workout),
+                        title: Text(
+                          context.t.ongoingWorkout.simple.switchToFull,
+                        ),
+                        mouseCursor: SystemMouseCursors.click,
+                      ),
+                      onTap: () {
+                        SchedulerBinding.instance.addPostFrameCallback((_) {
+                          if (!context.mounted) return;
+                          context.pushReplacement(WorkoutView.routeName);
+                        });
+                      },
+                    ),
+                    const PopupMenuDivider(),
+                    ...buildWorkoutControlMenuEntries(context, controller),
+                    const PopupMenuDivider(),
+                    PopupMenuItem(
+                      enabled: current != null,
+                      onTap: current == null
+                          ? null
+                          : () {
+                              _insertSetAfterCurrent(
+                                controller,
+                                current,
+                                GTSetKind.drop,
+                              );
+                            },
+                      child: ListTile(
+                        leading: const Icon(GTIcons.sets),
+                        title: Text(context.t.set.kindLong["drop"]!),
+                        mouseCursor: SystemMouseCursors.click,
+                        enabled: current != null,
                       ),
                     ),
-                  );
-                },
-                startingTime: DateTime.now(),
-              );
-            }
-            return Text(context.t.ongoingWorkout.title);
-          }),
-          actions: [
-            IconButton(
-              tooltip: context.t.ongoingWorkout.simple.restTimer,
-              onPressed: _canTriggerRestTimer(current)
-                  ? () => controller.markSetAsDone(current!.index, -1, true)
-                  : null,
-              icon: const Icon(GTIcons.rest_timer),
-            ),
-            PopupMenuButton(
-              itemBuilder: (context) =>
-                  buildToolboxMenuEntries(context, controller),
-              tooltip: context.t.ongoingWorkout.toolbox.title,
-              icon: const Icon(GTIcons.tools),
-            ),
-            PopupMenuButton(
-              itemBuilder: (context) {
-                final items = <PopupMenuEntry<dynamic>>[
-                  PopupMenuItem(
-                    child: ListTile(
-                      leading: const Icon(GTIcons.workout),
-                      title: Text(context.t.ongoingWorkout.simple.switchToFull),
-                      mouseCursor: SystemMouseCursors.click,
-                    ),
-                    onTap: () {
-                      SchedulerBinding.instance.addPostFrameCallback((_) {
-                        Navigator.of(
-                          context,
-                        ).popAndPushNamed(WorkoutView.routeName);
-                      });
-                    },
-                  ),
-                  const PopupMenuDivider(),
-                  ...buildWorkoutControlMenuEntries(context, controller),
-                  const PopupMenuDivider(),
-                  PopupMenuItem(
-                    enabled: current != null,
-                    onTap: current == null
-                        ? null
-                        : () {
-                            _insertSetAfterCurrent(
-                              controller,
-                              current,
-                              GTSetKind.drop,
-                            );
-                          },
-                    child: ListTile(
-                      leading: const Icon(GTIcons.sets),
-                      title: Text(context.t.set.kindLong["drop"]!),
-                      mouseCursor: SystemMouseCursors.click,
-                      enabled: current != null,
-                    ),
-                  ),
-                ];
+                  ];
 
-                return items;
-              },
-            ),
-          ],
-          bottom: PreferredSize(
-            preferredSize: const Size.fromHeight(4),
-            child: TweenAnimationBuilder<double>(
-              duration: const Duration(milliseconds: 220),
-              tween: Tween<double>(begin: 0, end: controller.progress),
-              builder: (context, value, _) {
-                return LinearProgressIndicator(value: value);
-              },
+                  return items;
+                },
+              ),
+            ],
+            bottom: PreferredSize(
+              preferredSize: const Size.fromHeight(4),
+              child: TweenAnimationBuilder<double>(
+                duration: const Duration(milliseconds: 220),
+                tween: Tween<double>(begin: 0, end: controller.progress),
+                builder: (context, value, _) {
+                  return LinearProgressIndicator(value: value);
+                },
+              ),
             ),
           ),
-        ),
-        body: SafeArea(bottom: false, child: body),
-      );
-
-      if (settings.tintExercises.value) {
-        return ThemedSubtree(
-          key: const ValueKey<String>('tinted-exercise'),
-          color:
-              current?.exerciseColor ?? Theme.of(context).colorScheme.primary,
-          child: page,
+          body: SafeArea(bottom: false, child: body),
         );
-      }
 
-      return page;
-    });
+        if (settings.tintExercises) {
+          return ThemedSubtree(
+            key: const ValueKey<String>('tinted-exercise'),
+            color:
+                current?.exerciseColor ?? Theme.of(context).colorScheme.primary,
+            child: page,
+          );
+        }
+
+        return page;
+      },
+    );
   }
 }
 
@@ -293,11 +319,14 @@ class _CurrentSetView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (!Get.isRegistered<WorkoutController>()) {
+    if (!(_workoutController(context) != null)) {
       return const Center(child: GBLoadingIndicator());
     }
 
-    final controller = Get.find<WorkoutController>();
+    final controller = ProviderScope.containerOf(
+      context,
+      listen: false,
+    ).read(workoutControllerProvider.notifier);
 
     if (isRestActive) {
       return _NextSetRestView(data: data);
@@ -367,8 +396,8 @@ class _CurrentSetView extends StatelessWidget {
                               exercise: data.exercise,
                               isCreating: false,
                               callbacks: controller.callbacks,
-                              weightUnit: controller.weightUnit.value,
-                              distanceUnit: controller.distanceUnit.value,
+                              weightUnit: controller.weightUnit,
+                              distanceUnit: controller.distanceUnit,
                             ),
                       ),
                     ),
@@ -467,7 +496,9 @@ class _CurrentSetView extends StatelessWidget {
                   context,
                   initialText: data.exercise.notes,
                   onSave: (text) {
-                    Get.find<WorkoutController>().callbacks
+                    ProviderScope.containerOf(context, listen: false)
+                        .read(workoutControllerProvider.notifier)
+                        .callbacks
                         .onExerciseNotesChange(data.index, text);
                   },
                 ),
@@ -481,7 +512,9 @@ class _CurrentSetView extends StatelessWidget {
                     context,
                     initialText: data.supersetNotes!,
                     onSave: (text) {
-                      Get.find<WorkoutController>().callbacks
+                      ProviderScope.containerOf(context, listen: false)
+                          .read(workoutControllerProvider.notifier)
+                          .callbacks
                           .onExerciseNotesChange((
                             exerciseIndex: data.cursor.supersetIndex!,
                             supersetIndex: null,
@@ -636,13 +669,16 @@ class _SimpleProgressionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final controller = Get.find<WorkoutController>();
+    final controller = ProviderScope.containerOf(
+      context,
+      listen: false,
+    ).read(workoutControllerProvider.notifier);
     return SizedBox(
       width: double.infinity,
       child: ExerciseProgressionPanel(
         exercise: data.exercise,
-        weightUnit: controller.weightUnit.value,
-        distanceUnit: controller.distanceUnit.value,
+        weightUnit: controller.weightUnit,
+        distanceUnit: controller.distanceUnit,
         index: data.index,
         callbacks: controller.callbacks,
         isCreating: false,
@@ -685,7 +721,10 @@ class _BottomPanel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controlsDisabled = current == null;
-    final countdownController = Get.find<CountdownController>();
+    final countdownController = ProviderScope.containerOf(
+      context,
+      listen: false,
+    ).read(countdownControllerProvider.notifier);
 
     return SafeArea(
       top: false,
@@ -696,114 +735,127 @@ class _BottomPanel extends StatelessWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Obx(() {
-                final showRestControls =
-                    countdownController.targetTime.value != null;
-                return Crossfade(
-                  showSecond: showRestControls,
-                  firstChild: const SizedBox.shrink(
-                    key: ValueKey<String>('rest-controls-hidden'),
-                  ),
-                  secondChild: Padding(
-                    key: const ValueKey<String>('rest-controls-visible'),
-                    padding: const EdgeInsets.only(top: 8),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(
-                              GTIcons.cardio_timer,
-                              size: 18,
-                              color: accentColor,
-                            ),
-                            const SizedBox(width: 6),
-                            TimerView(
-                              startingTime:
-                                  countdownController.startingTime.value ??
-                                  DateTime.now(),
-                              builder: (context, _) {
-                                return TimerView.buildTimeString(
-                                  context,
-                                  countdownController.remaining,
-                                  style: Theme.of(context).textTheme.titleSmall
-                                      ?.copyWith(
-                                        fontWeight: FontWeight.w700,
-                                        color: accentColor,
-                                      ),
-                                );
-                              },
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 6),
-                        TimerView(
-                          startingTime: () {
-                            try {
-                              return Get.find<WorkoutController>().time.value;
-                            } catch (_) {
-                              return DateTime.now();
-                            }
-                          }(),
-                          builder: (context, _) {
-                            return TweenAnimationBuilder<double>(
-                              tween: Tween<double>(
-                                begin: 1,
-                                end: countdownController.progress,
-                              ),
-                              duration: const Duration(milliseconds: 220),
-                              builder: (context, value, _) {
-                                return LinearProgressIndicator(
-                                  value: value,
-                                  minHeight: 3,
-                                  valueColor: AlwaysStoppedAnimation<Color>(
-                                    accentColor,
-                                  ),
-                                  backgroundColor: accentColor.withValues(
-                                    alpha: 0.18,
-                                  ),
-                                );
-                              },
-                            );
-                          },
-                        ),
-                        const SizedBox(height: 6),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            TextButton(
-                              onPressed: countdownController.subtract15Seconds,
-                              child: Text(
-                                context.t.timer.subtract15s,
-                                style: TextStyle(
-                                  color: Theme.of(context).colorScheme.error,
-                                ),
-                              ),
-                            ),
-                            const SizedBox(width: 4),
-                            TextButton(
-                              onPressed: countdownController.add15Seconds,
-                              child: Text(
-                                context.t.timer.add15s,
-                                style: TextStyle(
-                                  color: Theme.of(context).colorScheme.tertiary,
-                                ),
-                              ),
-                            ),
-                            const SizedBox(width: 4),
-                            TextButton.icon(
-                              onPressed: countdownController.removeCountdown,
-                              icon: const Icon(GTIcons.skip),
-                              label: Text(context.t.timer.skip),
-                            ),
-                          ],
-                        ),
-                      ],
+              Consumer(
+                builder: (context, ref, _) {
+                  ref.watch(workoutControllerProvider);
+                  ref.watch(countdownControllerProvider);
+                  ref.watch(stopwatchControllerProvider);
+                  final showRestControls =
+                      countdownController.targetTime != null;
+                  return Crossfade(
+                    showSecond: showRestControls,
+                    firstChild: const SizedBox.shrink(
+                      key: ValueKey<String>('rest-controls-hidden'),
                     ),
-                  ),
-                );
-              }),
+                    secondChild: Padding(
+                      key: const ValueKey<String>('rest-controls-visible'),
+                      padding: const EdgeInsets.only(top: 8),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                GTIcons.cardio_timer,
+                                size: 18,
+                                color: accentColor,
+                              ),
+                              const SizedBox(width: 6),
+                              TimerView(
+                                startingTime:
+                                    countdownController.startingTime ??
+                                    DateTime.now(),
+                                builder: (context, _) {
+                                  return TimerView.buildTimeString(
+                                    context,
+                                    countdownController.remaining,
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .titleSmall
+                                        ?.copyWith(
+                                          fontWeight: FontWeight.w700,
+                                          color: accentColor,
+                                        ),
+                                  );
+                                },
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 6),
+                          TimerView(
+                            startingTime: () {
+                              try {
+                                return ProviderScope.containerOf(
+                                  context,
+                                  listen: false,
+                                ).read(workoutControllerProvider.notifier).time;
+                              } catch (_) {
+                                return DateTime.now();
+                              }
+                            }(),
+                            builder: (context, _) {
+                              return TweenAnimationBuilder<double>(
+                                tween: Tween<double>(
+                                  begin: 1,
+                                  end: countdownController.progress,
+                                ),
+                                duration: const Duration(milliseconds: 220),
+                                builder: (context, value, _) {
+                                  return LinearProgressIndicator(
+                                    value: value,
+                                    minHeight: 3,
+                                    valueColor: AlwaysStoppedAnimation<Color>(
+                                      accentColor,
+                                    ),
+                                    backgroundColor: accentColor.withValues(
+                                      alpha: 0.18,
+                                    ),
+                                  );
+                                },
+                              );
+                            },
+                          ),
+                          const SizedBox(height: 6),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              TextButton(
+                                onPressed:
+                                    countdownController.subtract15Seconds,
+                                child: Text(
+                                  context.t.timer.subtract15s,
+                                  style: TextStyle(
+                                    color: Theme.of(context).colorScheme.error,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 4),
+                              TextButton(
+                                onPressed: countdownController.add15Seconds,
+                                child: Text(
+                                  context.t.timer.add15s,
+                                  style: TextStyle(
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.tertiary,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 4),
+                              TextButton.icon(
+                                onPressed: countdownController.removeCountdown,
+                                icon: const Icon(GTIcons.skip),
+                                label: Text(context.t.timer.skip),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                },
+              ),
               Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
@@ -990,7 +1042,10 @@ class _SimpleSetEditDialogState extends State<_SimpleSetEditDialog> {
 
   @override
   Widget build(BuildContext context) {
-    final controller = Get.find<WorkoutController>();
+    final controller = ProviderScope.containerOf(
+      context,
+      listen: false,
+    ).read(workoutControllerProvider.notifier);
 
     return Scaffold(
       appBar: AppBar(title: Text(context.t.ongoingWorkout.simple.editSet)),
@@ -1038,8 +1093,8 @@ class _SimpleSetEditDialogState extends State<_SimpleSetEditDialog> {
                   );
                 });
               },
-              weightUnit: controller.weightUnit.value,
-              distanceUnit: controller.distanceUnit.value,
+              weightUnit: controller.weightUnit,
+              distanceUnit: controller.distanceUnit,
             ),
           ],
         ),
@@ -1126,7 +1181,7 @@ _CurrentSetData? _currentSetData(
       : ((controller.exercises[cursor.supersetIndex!] as Superset)
             .exercises
             .length);
-  final fallbackColor = context.theme.colorScheme.primary ?? Colors.grey;
+  final fallbackColor = context.theme.colorScheme.primary;
   final exerciseColor = exercise.standard && exercise.category != null
       ? exerciseStandardLibrary[exercise.category]?.color ?? fallbackColor
       : fallbackColor;
@@ -1147,8 +1202,17 @@ _CurrentSetData? _currentSetData(
     exerciseColor: exerciseColor,
     parametersLabel: set.getHumanReadableDescription(
       t: context.t,
-      weightUnit: controller.weightUnit.value,
-      distanceUnit: controller.distanceUnit.value,
+      weightUnit: controller.weightUnit,
+      distanceUnit: controller.distanceUnit,
+      targetWeightUnit: ProviderScope.containerOf(
+        context,
+        listen: false,
+      ).read(settingsControllerProvider).weightUnit,
+      targetDistanceUnit: ProviderScope.containerOf(
+        context,
+        listen: false,
+      ).read(settingsControllerProvider).distanceUnit,
+      context: context,
     ),
   );
 }
@@ -1157,7 +1221,11 @@ Future<void> _showRestTimeEditor(
   BuildContext context,
   _CurrentSetData data,
 ) async {
-  final controller = Get.find<WorkoutController>();
+  final controller = ProviderScope.containerOf(
+    context,
+    listen: false,
+  ).read(workoutControllerProvider.notifier);
+  final generation = controller.sessionGeneration;
   final textController = TextEditingController(
     text: TimeInputField.encodeDuration(data.restTime),
   );
@@ -1195,7 +1263,9 @@ Future<void> _showRestTimeEditor(
                     exerciseIndex: data.cursor.supersetIndex!,
                     supersetIndex: null,
                   );
-            controller.callbacks.onExerciseChangeRestTime(index, restTime);
+            if (controller.isSessionActive(generation)) {
+              controller.onExerciseChangeRestTime(index, restTime);
+            }
             Navigator.of(ctx).pop();
           },
           child: Text(MaterialLocalizations.of(ctx).okButtonLabel),
@@ -1332,8 +1402,17 @@ _NextUpData? _nextUpData(
         isInSuperset: next.isInSuperset,
         parametersLabel: next.set.getHumanReadableDescription(
           t: context.t,
-          weightUnit: controller.weightUnit.value,
-          distanceUnit: controller.distanceUnit.value,
+          weightUnit: controller.weightUnit,
+          distanceUnit: controller.distanceUnit,
+          targetWeightUnit: ProviderScope.containerOf(
+            context,
+            listen: false,
+          ).read(settingsControllerProvider).weightUnit,
+          targetDistanceUnit: ProviderScope.containerOf(
+            context,
+            listen: false,
+          ).read(settingsControllerProvider).distanceUnit,
+          context: context,
         ),
       );
     }
@@ -1348,8 +1427,17 @@ _NextUpData? _nextUpData(
         isInSuperset: next.isInSuperset,
         parametersLabel: next.set.getHumanReadableDescription(
           t: context.t,
-          weightUnit: controller.weightUnit.value,
-          distanceUnit: controller.distanceUnit.value,
+          weightUnit: controller.weightUnit,
+          distanceUnit: controller.distanceUnit,
+          targetWeightUnit: ProviderScope.containerOf(
+            context,
+            listen: false,
+          ).read(settingsControllerProvider).weightUnit,
+          targetDistanceUnit: ProviderScope.containerOf(
+            context,
+            listen: false,
+          ).read(settingsControllerProvider).distanceUnit,
+          context: context,
         ),
       );
     }
@@ -1399,11 +1487,14 @@ Color _setTypeColor(BuildContext context, GTSetKind kind) {
   }
 }
 
-bool _canTriggerRestTimer(_CurrentSetData? current) {
+bool _canTriggerRestTimer(BuildContext context, _CurrentSetData? current) {
   if (current == null) return false;
-  if (!Get.isRegistered<WorkoutController>()) return false;
+  if (!(_workoutController(context) != null)) return false;
 
-  final controller = Get.find<WorkoutController>();
+  final controller = ProviderScope.containerOf(
+    context,
+    listen: false,
+  ).read(workoutControllerProvider.notifier);
   if (current.cursor.supersetIndex == null) {
     return current.exercise.restTime.inSeconds > 0;
   }
@@ -1475,7 +1566,7 @@ void _insertSetAfterCurrent(
     );
   }
 
-  controller.exercises.refresh();
+  controller.publishExercises();
   controller.save();
   controller.selectSetCursorByIndex(current.index, insertionIndex);
 }
@@ -1484,8 +1575,10 @@ Future<void> _addExerciseAndAdvanceCursor(
   WorkoutController controller,
   _CurrentSetData? current,
 ) async {
+  final generation = controller.sessionGeneration;
   final previousLength = controller.exercises.length;
   await controller.pickExercises();
+  if (!controller.isSessionActive(generation)) return;
 
   if (controller.exercises.length <= previousLength) {
     return;
@@ -1529,11 +1622,10 @@ class _SetTypeBadge extends StatelessWidget {
         exercise: exercise,
         set: set,
         onSetSelectKind: (kind) {
-          Get.find<WorkoutController>().callbacks.onSetSelectKind(
-            index,
-            setIndex,
-            kind,
-          );
+          ProviderScope.containerOf(context, listen: false)
+              .read(workoutControllerProvider.notifier)
+              .callbacks
+              .onSetSelectKind(index, setIndex, kind);
         },
       ),
     );
@@ -1653,4 +1745,11 @@ bool _isSetIndexAfter(WorkoutSetCursor a, WorkoutSetCursor? b) {
     // a is in a superset, b is in the root
     return a.supersetIndex! > b.exerciseIndex;
   }
+}
+
+WorkoutController? _workoutController(BuildContext context) {
+  final container = ProviderScope.containerOf(context, listen: false);
+  return container.read(workoutControllerProvider) == null
+      ? null
+      : container.read(workoutControllerProvider.notifier);
 }

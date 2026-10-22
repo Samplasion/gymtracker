@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:gymtracker/model/model.dart';
+import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/view/utils/input_decoration.dart';
 import 'package:gymtracker/view/utils/routine_form_picker.dart';
 
@@ -25,9 +25,7 @@ class _BoutiqueDebugConverterState extends State<BoutiqueDebugConverter> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Boutique Debug Converter'),
-      ),
+      appBar: AppBar(title: const Text('Boutique Debug Converter')),
       body: ListView(
         children: [
           DropdownButton<BoutiquePackage>(
@@ -38,10 +36,7 @@ class _BoutiqueDebugConverterState extends State<BoutiqueDebugConverter> {
               });
             },
             items: widget.packages
-                .map((e) => DropdownMenuItem(
-                      value: e,
-                      child: Text(e.name),
-                    ))
+                .map((e) => DropdownMenuItem(value: e, child: Text(e.name)))
                 .toList(),
           ),
           RoutineFormPicker(
@@ -57,7 +52,7 @@ class _BoutiqueDebugConverterState extends State<BoutiqueDebugConverter> {
             onPressed: () {
               if (routine != null && package != null) {
                 widget.onPicked(routine!, package!);
-                Get.back();
+                Go.back();
               }
             },
             child: const Text('Convert'),

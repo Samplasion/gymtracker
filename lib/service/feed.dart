@@ -52,7 +52,12 @@ class FeedService {
   final DatabaseService _databaseService;
   final OnlineService _onlineService;
 
-  FeedService(this._databaseService, this._onlineService);
+  FeedService(
+    this._databaseService,
+    this._onlineService, {
+    Map<String, Achievement>? achievementCatalog,
+  }) : _achievementCatalog = achievementCatalog ?? achievements;
+  final Map<String, Achievement> _achievementCatalog;
 
   DateTime? previousAt;
   Future<({List<FeedItem> feed, bool hasMore})> getFeedItems({
@@ -100,7 +105,7 @@ class FeedService {
               )
               .map(
                 (completion) =>
-                    (achievements[completion.achievementID], completion),
+                    (_achievementCatalog[completion.achievementID], completion),
               )
               .where((tuple) => tuple.$1 != null)
               .toList();

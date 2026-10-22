@@ -20,7 +20,7 @@ final class TranslationsNotifierProvider
         argument: null,
         retry: null,
         name: r'translationsProvider',
-        isAutoDispose: true,
+        isAutoDispose: false,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
@@ -42,7 +42,7 @@ final class TranslationsNotifierProvider
 }
 
 String _$translationsNotifierHash() =>
-    r'fcf28b09d6da693c07ef1c5f321a44e49cd41160';
+    r'497f02191631106e0f4d17778b2221f52e48ddcc';
 
 abstract class _$TranslationsNotifier extends $Notifier<Translations> {
   Translations build();

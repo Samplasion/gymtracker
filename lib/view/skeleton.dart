@@ -6,27 +6,32 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart' hide Localizations;
 import 'package:flutter/scheduler.dart';
-import 'package:get/get.dart';
-import 'package:gymtracker/controller/coordinator.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:gymtracker/controller/logger_controller.dart';
 import 'package:gymtracker/controller/purchases_controller.dart';
 import 'package:gymtracker/controller/routines_controller.dart';
+import 'package:gymtracker/controller/settings_controller.dart';
 import 'package:gymtracker/controller/workout_controller.dart';
 import 'package:gymtracker/i18n/strings.g.dart';
 import 'package:gymtracker/icons/gymtracker_icons.dart';
-import 'package:gymtracker/service/logger.dart';
-import 'package:gymtracker/service/version.dart';
-import 'package:gymtracker/main.dart' show globalContainer;
+import 'package:gymtracker/provider/bootstrap.dart';
 import 'package:gymtracker/provider/online.dart';
+import 'package:gymtracker/service/logger.dart';
+import 'package:gymtracker/service/protocol.dart';
+import 'package:gymtracker/service/test.dart';
+import 'package:gymtracker/service/version.dart';
 import 'package:gymtracker/utils/constants.dart';
 import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/utils/go.dart';
+import 'package:gymtracker/view/actions/purchases.dart';
+import 'package:gymtracker/view/actions/workout.dart';
+import 'package:gymtracker/view/components/error_view.dart';
 import 'package:gymtracker/view/components/pro_builder.dart';
 import 'package:gymtracker/view/debug.dart';
 import 'package:gymtracker/view/feed.dart';
 import 'package:gymtracker/view/legal.dart';
 import 'package:gymtracker/view/loading.dart';
-import 'package:gymtracker/view/components/error_view.dart';
 import 'package:gymtracker/view/logs.dart';
 import 'package:gymtracker/view/me.dart';
 import 'package:gymtracker/view/routines.dart';
@@ -134,11 +139,13 @@ class _SkeletonDrawerButtonState extends State<SkeletonDrawerButton>
   }
 }
 
-class SkeletonView extends StatefulWidget {
-  const SkeletonView({super.key});
+class SkeletonView extends ConsumerStatefulWidget {
+  const SkeletonView({this.child, this.sectionIndex = 0, super.key});
+  final Widget? child;
+  final int sectionIndex;
 
   @override
-  State<SkeletonView> createState() => _SkeletonViewState();
+  ConsumerState<SkeletonView> createState() => _SkeletonViewState();
 
   static SkeletonViewState? of(BuildContext context) {
     return context.findAncestorStateOfType<_SkeletonViewState>();
@@ -149,7 +156,8 @@ class SkeletonView extends StatefulWidget {
   }
 
   static bool isTwoPane(BuildContext context) {
-    return Breakpoints.computeBreakpoint(context.width) >= Breakpoints.l;
+    return Breakpoints.computeBreakpoint(MediaQuery.sizeOf(context).width) >=
+        Breakpoints.l;
   }
 }
 
@@ -157,7 +165,7 @@ abstract class SkeletonViewState {
   void goToRoutines();
 }
 
-class _SkeletonViewState extends State<SkeletonView>
+class _SkeletonViewState extends ConsumerState<SkeletonView>
     with WidgetsBindingObserver
     implements SkeletonViewState {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey();
@@ -181,16 +189,12 @@ class _SkeletonViewState extends State<SkeletonView>
 
   @override
   void goToRoutines() {
-    setState(() => _selectedIndex = 2);
+    context.go('/routines');
   }
 
   @override
   void initState() {
     super.initState();
-
-    // SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
-    //   Get.find<NotificationController>().androidRequestExactAlarmsPermission();
-    // });
 
     WidgetsBinding.instance.addObserver(this);
   }
@@ -201,7 +205,7 @@ class _SkeletonViewState extends State<SkeletonView>
     super.dispose();
   }
 
-  int _selectedIndex = 0;
+  int get _selectedIndex => widget.sectionIndex;
 
   List<Widget> get pages => [
     const FeedView(),
@@ -211,8 +215,8 @@ class _SkeletonViewState extends State<SkeletonView>
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    Get.find<RoutinesController>().didChangeAppLifecycleState(state);
-    final online = globalContainer.read(onlineProvider.notifier);
+    ref.read(routinesControllerProvider).didChangeAppLifecycleState(state);
+    final online = ref.read(onlineProvider.notifier);
     if (online.isInit)
       online.syncManager.setForeground(state == AppLifecycleState.resumed);
   }
@@ -229,14 +233,14 @@ class _SkeletonViewState extends State<SkeletonView>
       body: Row(
         children: [
           Crossfade(
-            firstChild: SizedBox(height: context.height),
+            firstChild: SizedBox(height: MediaQuery.sizeOf(context).height),
             secondChild: _drawer(true),
             showSecond: showMDView,
             alignment: Alignment.centerLeft,
             layoutBuilder:
                 (topChild, topChildKey, bottomChild, bottomChildKey) {
                   return SizedBox(
-                    height: context.height,
+                    height: MediaQuery.sizeOf(context).height,
                     child: Stack(
                       clipBehavior: Clip.none,
                       alignment: AlignmentDirectional.centerStart,
@@ -269,17 +273,16 @@ class _SkeletonViewState extends State<SkeletonView>
                     );
                   },
               child: KeyedSubtree(
-                key: ValueKey<int>(_selectedIndex),
-                child: Obx(
-                  () => MediaQuery(
+                key: ValueKey<Object>(
+                  widget.child == null ? _selectedIndex : 'shell-navigator',
+                ),
+                child: Builder(
+                  builder: (context) => MediaQuery(
                     data: MediaQuery.of(context).copyWith(
                       padding: safeArea.copyWith(
                         bottom:
                             safeArea.bottom +
-                            ((Get.find<RoutinesController>()
-                                        .hasOngoingWorkout
-                                        .isTrue ||
-                                    Get.isRegistered<WorkoutController>())
+                            ((ref.watch(workoutControllerProvider) != null)
                                 ? (OngoingWorkoutBar.defaultHeight + 32)
                                 : 0) +
                             (showMDView ? 0 : _kNavBarHeight),
@@ -290,7 +293,7 @@ class _SkeletonViewState extends State<SkeletonView>
                       //   context,
                       // ).viewInsets.copyWith(bottom: 0),
                     ),
-                    child: pages[_selectedIndex],
+                    child: widget.child ?? pages[_selectedIndex],
                   ),
                 ),
               ),
@@ -304,30 +307,35 @@ class _SkeletonViewState extends State<SkeletonView>
         return Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Obx(() {
-              var hasWorkout =
-                  Get.find<RoutinesController>().hasOngoingWorkout() ||
-                  Get.isRegistered<WorkoutController>();
-              return MediaQuery(
-                data: MediaQuery.of(context).copyWith(
-                  padding: safeArea.copyWith(
-                    left: safeArea.left + leftNavigationSize,
-                    bottom: 0,
+            Builder(
+              builder: (context) {
+                var hasWorkout = ref.watch(workoutControllerProvider) != null;
+                return MediaQuery(
+                  data: MediaQuery.of(context).copyWith(
+                    padding: safeArea.copyWith(
+                      left: safeArea.left + leftNavigationSize,
+                      bottom: 0,
+                    ),
                   ),
-                ),
-                child: Crossfade(
-                  firstChild: const SizedBox(),
-                  secondChild: OngoingWorkoutBar(
-                    open: () => SchedulerBinding.instance.addPostFrameCallback((
-                      timeStamp,
-                    ) {
-                      Go.toNamed(getPreferredWorkoutRouteName());
-                    }),
+                  child: Crossfade(
+                    firstChild: const SizedBox(),
+                    secondChild: OngoingWorkoutBar(
+                      open: () => SchedulerBinding.instance
+                          .addPostFrameCallback((timeStamp) {
+                            Go.toNamed(
+                              getPreferredWorkoutRouteName(
+                                simple: ref
+                                    .read(settingsControllerProvider)
+                                    .defaultToSimpleWorkoutView,
+                              ),
+                            );
+                          }),
+                    ),
+                    showSecond: hasWorkout,
                   ),
-                  showSecond: hasWorkout,
-                ),
-              );
-            }),
+                );
+              },
+            ),
             Crossfade(
               firstChild: ProBuilder(
                 builder: (context, subscriptionInfo) {
@@ -369,10 +377,10 @@ class _SkeletonViewState extends State<SkeletonView>
 
   void _onBottomDestinationTap(int i) {
     if (i == 3) {
-      Get.find<PurchasesController>().presentPaywall();
+      ref.read(purchasesControllerProvider).presentPaywall();
       return;
     }
-    setState(() => _selectedIndex = i);
+    context.go(const ['/feed', '/profile', '/routines'][i]);
   }
 
   Widget _drawer(bool expanded) {
@@ -452,10 +460,12 @@ class _SkeletonViewState extends State<SkeletonView>
               ),
             ),
             child: ConstrainedBox(
-              constraints: BoxConstraints.tightFor(height: context.height),
+              constraints: BoxConstraints.tightFor(
+                height: MediaQuery.sizeOf(context).height,
+              ),
               child: Crossfade(
                 firstChild: SizedBox(
-                  height: context.height,
+                  height: MediaQuery.sizeOf(context).height,
                   child: NavigationDrawer(
                     selectedIndex: expanded ? _selectedIndex : null,
                     onDestinationSelected: (i) {
@@ -494,7 +504,7 @@ class _SkeletonViewState extends State<SkeletonView>
                 ),
                 secondChild: SizedBox(
                   width: _kRailSize + safeArea.left,
-                  height: context.height,
+                  height: MediaQuery.sizeOf(context).height,
                   child: ScrollableNavigationRail(
                     leading: const SkeletonDrawerButton(isInRail: true),
                     backgroundColor: Colors.transparent,
@@ -516,7 +526,7 @@ class _SkeletonViewState extends State<SkeletonView>
                 layoutBuilder:
                     (topChild, topChildKey, bottomChild, bottomChildKey) {
                       return SizedBox(
-                        height: context.height,
+                        height: MediaQuery.sizeOf(context).height,
                         child: Stack(
                           clipBehavior: Clip.none,
                           // alignment: AlignmentDirectional.centerStart,
@@ -543,14 +553,14 @@ class _SkeletonViewState extends State<SkeletonView>
   }
 }
 
-class _GTDrawerFooter extends StatefulWidget {
+class _GTDrawerFooter extends ConsumerStatefulWidget {
   const _GTDrawerFooter();
 
   @override
-  State<_GTDrawerFooter> createState() => __GTDrawerFooterState();
+  ConsumerState<_GTDrawerFooter> createState() => __GTDrawerFooterState();
 }
 
-class __GTDrawerFooterState extends State<_GTDrawerFooter> {
+class __GTDrawerFooterState extends ConsumerState<_GTDrawerFooter> {
   final _termsGestureDetector = TapGestureRecognizer();
   final _privacyGestureDetector = TapGestureRecognizer();
 
@@ -582,14 +592,14 @@ class __GTDrawerFooterState extends State<_GTDrawerFooter> {
           children: [
             TextSpan(
               text: context.t.appInfo.version(
-                version: VersionService().packageInfo.version,
+                version: ref.watch(versionServiceProvider).packageInfo.version,
                 build:
                     const String.fromEnvironment(
                       "BUILD",
                       defaultValue: "[NO_VALUE]",
                     ).replaceAll(
                       "[NO_VALUE]",
-                      VersionService().packageInfo.buildNumber,
+                      ref.watch(versionServiceProvider).packageInfo.buildNumber,
                     ),
               ),
               style: Theme.of(context).textTheme.bodySmall,
@@ -640,25 +650,24 @@ class _GTDrawerHeader extends StatelessWidget {
   }
 }
 
-class OngoingWorkoutBar extends StatelessWidget {
+class OngoingWorkoutBar extends ConsumerWidget {
   final VoidCallback open;
 
   const OngoingWorkoutBar({required this.open, super.key});
 
-  RoutinesController get controller => Get.find<RoutinesController>();
-
   static const defaultHeight = 64.0;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
         final isPhone =
             Breakpoints.computeBreakpoint(constraints.maxWidth) <=
             Breakpoints.xs;
         final safeArea = MediaQuery.of(context).padding;
-        final controller = Get.isRegistered<WorkoutController>()
-            ? Get.find<WorkoutController>()
+        ref.watch(workoutControllerProvider);
+        final controller = ref.read(workoutControllerProvider) != null
+            ? ref.read(workoutControllerProvider.notifier)
             : null;
         return Container(
           alignment: Alignment.topCenter,
@@ -699,98 +708,108 @@ class OngoingWorkoutBar extends StatelessWidget {
                           color: context.colorScheme.surfaceContainerHighest,
                         ),
                       ),
-                      child: Container(
-                        constraints: const BoxConstraints(minHeight: 64),
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 8,
-                        ),
-                        child: Center(
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Expanded(
-                                child: controller == null
-                                    ? SizedBox.shrink()
-                                    : Obx(
-                                        () => TimerView(
-                                          startingTime: controller.time.value,
-                                          builder: (_, time) => time,
+                      child: InkWell(
+                        onTap: open,
+                        child: Container(
+                          constraints: const BoxConstraints(minHeight: 64),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 8,
+                          ),
+                          child: Center(
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Expanded(
+                                  child: controller == null
+                                      ? SizedBox.shrink()
+                                      : Builder(
+                                          builder: (context) => TimerView(
+                                            startingTime: controller.time,
+                                            builder: (_, time) => time,
+                                          ),
                                         ),
-                                      ),
-                              ),
-                              const SizedBox(width: 8),
-                              Crossfade(
-                                firstChild: TextButton.icon(
-                                  onPressed: resumeWorkout,
-                                  icon: const Icon(GTIcons.resume),
-                                  clipBehavior: Clip.hardEdge,
-                                  label: Text(
-                                    isPhone
-                                        ? ""
-                                        : context
+                                ),
+                                const SizedBox(width: 8),
+                                Flexible(
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    mainAxisAlignment: MainAxisAlignment.end,
+                                    children: [
+                                      if (isPhone)
+                                        IconButton(
+                                          onPressed: resumeWorkout,
+                                          icon: const Icon(GTIcons.resume),
+                                          tooltip: context
                                               .t
                                               .ongoingWorkout
                                               .actions
                                               .short
                                               .resume,
-                                    overflow: TextOverflow.clip,
-                                    maxLines: 1,
+                                        )
+                                      else
+                                        Flexible(
+                                          child: TextButton.icon(
+                                            onPressed: resumeWorkout,
+                                            icon: const Icon(GTIcons.resume),
+                                            label: Text(
+                                              context
+                                                  .t
+                                                  .ongoingWorkout
+                                                  .actions
+                                                  .short
+                                                  .resume,
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                          ),
+                                        ),
+                                      const SizedBox(width: 8),
+                                      if (isPhone)
+                                        IconButton(
+                                          onPressed: () =>
+                                              cancelWorkout(context, ref),
+                                          style: TextButton.styleFrom(
+                                            foregroundColor:
+                                                context.colorScheme.error,
+                                          ),
+                                          icon: const Icon(GTIcons.close),
+                                          tooltip: context
+                                              .t
+                                              .ongoingWorkout
+                                              .actions
+                                              .short
+                                              .cancel,
+                                        )
+                                      else
+                                        Flexible(
+                                          child: TextButton.icon(
+                                            style: TextButton.styleFrom(
+                                              foregroundColor:
+                                                  context.colorScheme.error,
+                                            ),
+                                            onPressed: () =>
+                                                cancelWorkout(context, ref),
+                                            icon: Icon(
+                                              GTIcons.close,
+                                              color: context.colorScheme.error,
+                                            ),
+                                            label: Text(
+                                              context
+                                                  .t
+                                                  .ongoingWorkout
+                                                  .actions
+                                                  .short
+                                                  .cancel,
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                          ),
+                                        ),
+                                    ],
                                   ),
                                 ),
-                                secondChild: IconButton(
-                                  onPressed: resumeWorkout,
-                                  icon: Icon(
-                                    GTIcons.resume,
-                                    color: Theme.of(
-                                      context,
-                                    ).colorScheme.primary,
-                                  ),
-                                ),
-                                showSecond: isPhone,
-                              ),
-                              const SizedBox(width: 8),
-                              ClipRect(
-                                clipBehavior: Clip.hardEdge,
-                                child: Crossfade(
-                                  firstChild: TextButton.icon(
-                                    style: TextButton.styleFrom(
-                                      foregroundColor: Theme.of(
-                                        context,
-                                      ).colorScheme.error,
-                                      iconColor: Theme.of(
-                                        context,
-                                      ).colorScheme.error,
-                                    ),
-                                    onPressed: () => cancelWorkout(context),
-                                    icon: const Icon(GTIcons.close),
-                                    clipBehavior: Clip.hardEdge,
-                                    label: Text(
-                                      isPhone
-                                          ? ""
-                                          : context
-                                                .t
-                                                .ongoingWorkout
-                                                .actions
-                                                .short
-                                                .cancel,
-                                      overflow: TextOverflow.clip,
-                                      maxLines: 1,
-                                    ),
-                                  ),
-                                  secondChild: IconButton(
-                                    style: IconButton.styleFrom(
-                                      foregroundColor: Theme.of(
-                                        context,
-                                      ).colorScheme.error,
-                                    ),
-                                    onPressed: () => cancelWorkout(context),
-                                    icon: const Icon(GTIcons.close),
-                                  ),
-                                  showSecond: isPhone,
-                                ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
                         ),
                       ),
@@ -809,11 +828,10 @@ class OngoingWorkoutBar extends StatelessWidget {
     open();
   }
 
-  void cancelWorkout(BuildContext context) {
-    Get.find<WorkoutController>().cancelWorkoutWithDialog(
-      context,
-      onCanceled: () {},
-    );
+  void cancelWorkout(BuildContext context, WidgetRef ref) {
+    ref
+        .read(workoutControllerProvider.notifier)
+        .cancelWorkoutWithDialog(context, onCanceled: () {});
   }
 }
 
@@ -846,14 +864,14 @@ class _DrawerContainer extends StatelessWidget {
 ///
 /// Used to force the root widget to be an
 /// animated route, so that exit animations work.
-class GymTrackerAppLoader extends StatefulWidget {
+class GymTrackerAppLoader extends ConsumerStatefulWidget {
   const GymTrackerAppLoader({super.key});
 
   @override
-  State<GymTrackerAppLoader> createState() => __LoaderState();
+  ConsumerState<GymTrackerAppLoader> createState() => __LoaderState();
 }
 
-class __LoaderState extends State<GymTrackerAppLoader> {
+class __LoaderState extends ConsumerState<GymTrackerAppLoader> {
   Object? _error;
 
   @override
@@ -864,30 +882,33 @@ class __LoaderState extends State<GymTrackerAppLoader> {
 
   void _initialize() {
     setState(() => _error = null);
-    globalLogger.i(
-      "[GymTrackerAppLoader] initState: waiting for Coordinator.awaitInitialized",
-    );
-    Get.find<Coordinator>().awaitInitialized().then(
-      (_) {
-        globalLogger.i(
-          "[GymTrackerAppLoader] Coordinator.awaitInitialized completed; scheduling bootProcedure via addPostFrameCallback",
+    ref
+        .read(appStartupProvider.future)
+        .then(
+          (_) {
+            SchedulerBinding.instance.addPostFrameCallback((_) {
+              if (!mounted) return;
+              final onboarding = ref
+                  .read(settingsControllerProvider)
+                  .service
+                  .prefs$
+                  .value
+                  .onboardingComplete;
+              context.go(
+                TestService().isTest || onboarding ? '/feed' : '/onboarding',
+              );
+              ref.read(protocolServiceProvider).markReady();
+            });
+          },
+          onError: (Object error, StackTrace stack) {
+            globalLogger.e(
+              'Local initialization failed',
+              error: error,
+              stackTrace: stack,
+            );
+            if (mounted) setState(() => _error = error);
+          },
         );
-        SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
-          globalLogger.i(
-            "[GymTrackerAppLoader] Executing Coordinator.bootProcedure now",
-          );
-          if (mounted) Get.find<Coordinator>().bootProcedure();
-        });
-      },
-      onError: (Object error, StackTrace stack) {
-        globalLogger.e(
-          'Local initialization failed',
-          error: error,
-          stackTrace: stack,
-        );
-        if (mounted) setState(() => _error = error);
-      },
-    );
   }
 
   @override

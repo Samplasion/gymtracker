@@ -1,27 +1,27 @@
-import "dart:math" as math;
 import 'dart:math';
+import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:gymtracker/utils/extensions.dart' hide ContextThemingUtils;
 import 'package:gymtracker/utils/utils.dart' hide max;
 import 'package:intl/intl.dart';
 
 class DensityCalendarChart extends StatelessWidget {
   final List<int> values;
-  final String Function(DateTime start, int daysInThePast, int value)
-      tooltipBuilder;
+  final String Function(DateTime start, int daysInThePast, int value)?
+  tooltipBuilder;
 
-  DensityCalendarChart({
-    super.key,
-    required this.values,
-    this.tooltipBuilder = _defaultTooltipBuilder,
-  })  : assert(values.isNotEmpty),
-        assert(values.every((value) => value >= 0));
+  DensityCalendarChart({super.key, required this.values, this.tooltipBuilder})
+    : assert(values.isNotEmpty),
+      assert(values.every((value) => value >= 0));
 
   static String _defaultTooltipBuilder(
-      DateTime start, int daysInThePast, int value) {
-    return "${DateFormat.yMEd(Get.locale?.languageCode).format(start.subtract(Duration(days: daysInThePast)))}: $value";
+    BuildContext context,
+    DateTime start,
+    int daysInThePast,
+    int value,
+  ) {
+    return "${DateFormat.yMEd(Localizations.localeOf(context).languageCode).format(start.subtract(Duration(days: daysInThePast)))}: $value";
   }
 
   final maxSquareSize = 24.0;
@@ -31,7 +31,7 @@ class DensityCalendarChart extends StatelessWidget {
   late final start = DateTime.now();
 
   TextStyle _labelStyle(BuildContext context) =>
-      context.theme.textTheme.labelSmall!;
+      Theme.of(context).textTheme.labelSmall!;
 
   @override
   Widget build(BuildContext context) {
@@ -69,7 +69,7 @@ class DensityCalendarChart extends StatelessWidget {
                         if (i == crossCount - 1 ||
                             _getMonthNumberFor(index: 7 * i) !=
                                 _getMonthNumberFor(index: 7 * (i + 1)))
-                          _textRaw(context, _getMonthFor(index: 7 * i))
+                          _textRaw(context, _getMonthFor(context, index: 7 * i))
                         else
                           _textRaw(context, ""),
                         for (int j = 0; j < 7; j++)
@@ -83,35 +83,37 @@ class DensityCalendarChart extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text(
-                  runningMin.toString(),
-                  style: _labelStyle(context),
-                ),
+                Text(runningMin.toString(), style: _labelStyle(context)),
                 const SizedBox(width: 16),
-                for (int i = 0;
-                    i <
-                        math.min((runningMax - runningMin + 1),
-                            math.min(8, crossCount - 2));
-                    i++)
+                for (
+                  int i = 0;
+                  i <
+                      math.min(
+                        (runningMax - runningMin + 1),
+                        math.min(8, crossCount - 2),
+                      );
+                  i++
+                )
                   _rawSquare(
                     context,
-                    context.theme.colorScheme.tertiary.withAlpha((mapRange(
-                              i.toDouble(),
-                              0,
-                              math.min((runningMax - runningMin + 1).toDouble(),
-                                      math.min(8, crossCount - 2)) -
-                                  1,
-                              minOpacity,
-                              maxOpacity,
-                            ).clamp(0, 1) *
-                            255)
-                        .round()),
+                    Theme.of(context).colorScheme.tertiary.withAlpha(
+                      (mapRange(
+                                i.toDouble(),
+                                0,
+                                math.min(
+                                      (runningMax - runningMin + 1).toDouble(),
+                                      math.min(8, crossCount - 2),
+                                    ) -
+                                    1,
+                                minOpacity,
+                                maxOpacity,
+                              ).clamp(0, 1) *
+                              255)
+                          .round(),
+                    ),
                   ),
                 const SizedBox(width: 16),
-                Text(
-                  runningMax.toString(),
-                  style: _labelStyle(context),
-                ),
+                Text(runningMax.toString(), style: _labelStyle(context)),
               ],
             ),
           ],
@@ -122,16 +124,23 @@ class DensityCalendarChart extends StatelessWidget {
 
   Widget _square(BuildContext context, int index, int max) {
     final val = index >= values.length ? 0 : values[index];
-    var opacity =
-        mapRange(val.toDouble(), 0, max.toDouble(), minOpacity, maxOpacity)
-            .clamp(0, 1)
-            .toDouble();
+    var opacity = mapRange(
+      val.toDouble(),
+      0,
+      max.toDouble(),
+      minOpacity,
+      maxOpacity,
+    ).clamp(0, 1).toDouble();
     if (val == max && val == 0) opacity = minOpacity;
     return Tooltip(
-      message: tooltipBuilder(start, index, val),
+      message:
+          tooltipBuilder?.call(start, index, val) ??
+          _defaultTooltipBuilder(context, start, index, val),
       child: _rawSquare(
         context,
-        context.theme.colorScheme.tertiary.withAlpha((opacity * 255).round()),
+        Theme.of(
+          context,
+        ).colorScheme.tertiary.withAlpha((opacity * 255).round()),
       ),
     );
   }
@@ -148,7 +157,7 @@ class DensityCalendarChart extends StatelessWidget {
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(6),
         border: Border.all(
-          color: context.theme.dividerColor.withAlpha((0.35 * 255).round()),
+          color: Theme.of(context).dividerColor.withAlpha((0.35 * 255).round()),
           width: 0.8,
         ),
         color: color,
@@ -159,12 +168,13 @@ class DensityCalendarChart extends StatelessWidget {
 
   Widget _day(BuildContext context, int index) {
     return _textRaw(
-        context,
-        DateFormat.E(Get.locale?.languageCode)
-            .format(start.subtract(Duration(days: index)))
-            .characters
-            .first
-            .toUpperCase());
+      context,
+      DateFormat.E(Localizations.localeOf(context).languageCode)
+          .format(start.subtract(Duration(days: index)))
+          .characters
+          .first
+          .toUpperCase(),
+    );
   }
 
   Widget _textRaw(BuildContext context, String text) {
@@ -176,17 +186,12 @@ class DensityCalendarChart extends StatelessWidget {
         minHeight: maxSquareSize,
         maxHeight: maxSquareSize,
       ),
-      child: Center(
-        child: Text(
-          text,
-          style: _labelStyle(context),
-        ),
-      ),
+      child: Center(child: Text(text, style: _labelStyle(context))),
     );
   }
 
-  String _getMonthFor({required int index}) {
-    return DateFormat.MMM(Get.locale?.languageCode)
+  String _getMonthFor(BuildContext context, {required int index}) {
+    return DateFormat.MMM(Localizations.localeOf(context).languageCode)
         .format(start.subtract(Duration(days: index)))
         .characters
         .first

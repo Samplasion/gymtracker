@@ -1,6 +1,5 @@
-import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter/widgets.dart';
-import 'package:get/get.dart';
+import 'package:flutter_test/flutter_test.dart';
 import 'package:gymtracker/controller/routines_controller.dart';
 import 'package:gymtracker/model/model.dart';
 import 'package:gymtracker/view/routines.dart';
@@ -17,27 +16,22 @@ void main() {
     // Stub routinesController methods and getters
     when(
       () => MockServices.routinesController.suggestions,
-    ).thenReturn(<RoutineSuggestion>[].obs);
+    ).thenReturn(<RoutineSuggestion>[]);
     when(
       () => MockServices.routinesController.folders,
-    ).thenReturn(<GTRoutineFolder, List<Workout>>{}.obs);
+    ).thenReturn(<GTRoutineFolder, List<Workout>>{});
     when(
       () => MockServices.routinesController.rootRoutines,
-    ).thenReturn(<Workout>[].obs);
-    when(() => MockServices.routinesController.workouts).thenReturn(
-      <Workout>[
-        Workout(
-          id: 'workout_1',
-          name: 'Test Routine',
-          exercises: [],
-          duration: const Duration(hours: 1),
-          startingDate: DateTime.now(),
-        ),
-      ].obs,
-    );
-    when(
-      () => MockServices.routinesController.onServiceChange(),
-    ).thenAnswer((_) {});
+    ).thenReturn(<Workout>[]);
+    when(() => MockServices.routinesController.workouts).thenReturn(<Workout>[
+      Workout(
+        id: 'workout_1',
+        name: 'Test Routine',
+        exercises: [],
+        duration: const Duration(hours: 1),
+        startingDate: DateTime.now(),
+      ),
+    ]);
   });
 
   tearDown(() {

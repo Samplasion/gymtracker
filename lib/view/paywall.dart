@@ -4,9 +4,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/widgets.dart';
-import 'package:get/get.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gymtracker/controller/purchases_controller.dart';
-import 'package:gymtracker/i18n/strings.g.dart';
 import 'package:gymtracker/model/subscription.dart';
 import 'package:gymtracker/utils/extensions.dart';
 import 'package:purchases_ui_flutter/views/paywall_view.dart';
@@ -41,15 +40,16 @@ class PaywallScreen extends StatelessWidget {
   }
 }
 
-class _CustomPaywallView extends StatefulWidget {
+class _CustomPaywallView extends ConsumerStatefulWidget {
   const _CustomPaywallView();
 
   @override
-  State<_CustomPaywallView> createState() => __CustomPaywallViewState();
+  ConsumerState<_CustomPaywallView> createState() => __CustomPaywallViewState();
 }
 
-class __CustomPaywallViewState extends State<_CustomPaywallView> {
-  final _purchasesService = Get.find<PurchasesController>();
+class __CustomPaywallViewState extends ConsumerState<_CustomPaywallView> {
+  PurchasesController get _purchasesService =>
+      ref.read(purchasesControllerProvider);
   late Future<Offering?> _future = Future.value(null);
   Subscription? _selectedSubscription;
   bool _purchasing = false;

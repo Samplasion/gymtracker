@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:get/get.dart';
 import 'package:gymtracker/controller/routines_controller.dart';
 import 'package:gymtracker/i18n/strings.g.dart';
 import 'package:gymtracker/icons/gymtracker_icons.dart';
@@ -22,7 +21,8 @@ Future<void> testDeleteRoutineFlow(
   await tester.pumpAndSettle();
 
   // Enter name
-  await tester.enterText(
+  await enterTextAndDismissKeyboard(
+    tester,
     find.widgetWithText(TextFormField, "Routine name"),
     "Routine to Delete",
   );
@@ -67,5 +67,8 @@ Future<void> testDeleteRoutineFlow(
   // 4. Verify routine is deleted and we are back to main routines screen
   expect(find.text('Routine to Delete'), findsNothing);
   expect(databaseService.routines.length, 0);
-  expect(Get.find<RoutinesController>().workouts.length, 0);
+  expect(
+    integrationContainer.read(routinesControllerProvider).workouts.length,
+    0,
+  );
 }

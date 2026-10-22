@@ -37,9 +37,6 @@ import 'package:gymtracker/model/set.dart';
 import 'package:gymtracker/model/superset.dart' as model;
 import 'package:gymtracker/model/workout.dart' as model;
 import 'package:gymtracker/service/logger.dart';
-import 'package:gymtracker/struct/nutrition.dart'
-    as model_nutrition
-    show NutritionGoal;
 import 'package:gymtracker/struct/nutrition.dart' as model hide NutritionGoal;
 import 'package:gymtracker/utils/extensions.dart';
 import 'package:path/path.dart' as p;
@@ -224,12 +221,6 @@ class GTDatabaseImpl extends _$GTDatabaseImpl
     onCreate: (m) async {
       await m.createAll();
       await into(preferences).insert(Prefs.defaultValue);
-      await into(nutritionGoals).insert(
-        model.TaggedNutritionGoal(
-          date: DateTime.now(),
-          value: model_nutrition.NutritionGoal.defaultGoal,
-        ).toInsertable(),
-      );
     },
     onUpgrade: (m, from, to) async {
       if (from > to) throw StateError('Database is newer than this app');
@@ -574,32 +565,8 @@ class GTDatabaseImpl extends _$GTDatabaseImpl
     },
     beforeOpen: (details) async {
       await SyncV2Store.install(this);
-      final nutritionGoalCount = await (select(nutritionGoals)).get();
-      if (nutritionGoalCount.isEmpty) {
-        await into(nutritionGoals).insert(
-          model.TaggedNutritionGoal(
-            date: DateTime.now(),
-            value: model_nutrition.NutritionGoal.defaultGoal,
-          ).toInsertable(),
-        );
-      }
-
-      final nutritionCategoriesCount = await (select(
-        nutritionCategories,
-      )).get();
-      if (nutritionCategoriesCount.isEmpty) {
-        final utcNow = DateTime.now().toUtc();
-        final utcDate = DateTime.utc(utcNow.year, utcNow.month, utcNow.day);
-        await into(nutritionCategories).insert(
-          NutritionCategoriesCompanion(
-            id: Value(utcDate.toIso8601String()),
-            referenceDate: Value(utcDate),
-            jsonData: const Value('[]'),
-            updatedAt: Value(utcNow),
-            deleted: const Value(false),
-          ),
-        );
-      }
+      // Nutrition defaults are supplied by the providers until the user saves
+      // them. Persisting defaults here would look like guest data at login.
 
       if (kDebugMode) {
         await validateDatabaseSchema();
@@ -1417,14 +1384,17 @@ class GTDatabaseImpl extends _$GTDatabaseImpl
   @override
   Future<void> updateCustomExercise(model.Exercise exercise) async {
     final userId = currentUserId;
-    await (update(customExercises).replace(
-      exercise
-          .toInsertable(userId: userId)
-          .copyWith(
-            updatedAt: Value(DateTime.now().toUtc()),
-            deleted: const Value(false),
-          ),
-    ));
+    await (update(customExercises)..where(
+          (tbl) => tbl.id.equals(exercise.id) & _ownedBy(tbl.userId, userId),
+        ))
+        .write(
+          exercise
+              .toInsertable(userId: userId)
+              .copyWith(
+                updatedAt: Value(DateTime.now().toUtc()),
+                deleted: const Value(false),
+              ),
+        );
   }
 
   @override
@@ -2269,13 +2239,17 @@ class GTDatabaseImpl extends _$GTDatabaseImpl
   @override
   Future<void> updateBodyMeasurement(BodyMeasurement measurement) {
     final userId = currentUserId;
-    return (update(bodyMeasurements).replace(
-      measurement.toCompanion().copyWith(
-        userId: Value(userId),
-        updatedAt: Value(DateTime.now().toUtc()),
-        deleted: const Value(false),
-      ),
-    ));
+    return (update(bodyMeasurements)..where(
+          (table) =>
+              table.id.equals(measurement.id) & _ownedBy(table.userId, userId),
+        ))
+        .write(
+          measurement.toCompanion().copyWith(
+            userId: Value(userId),
+            updatedAt: Value(DateTime.now().toUtc()),
+            deleted: const Value(false),
+          ),
+        );
   }
 
   @override

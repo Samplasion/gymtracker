@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gymtracker/controller/settings_controller.dart';
 import 'package:gymtracker/data/distance.dart';
 import 'package:gymtracker/data/exercises.dart';
@@ -63,7 +64,7 @@ class ExerciseIcon extends StatelessWidget {
   }
 }
 
-class ExerciseListTile extends StatelessWidget {
+class ExerciseListTile extends ConsumerWidget {
   final WorkoutExercisable exercise;
   final bool selected;
   final bool isConcrete;
@@ -97,7 +98,7 @@ class ExerciseListTile extends StatelessWidget {
        );
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final exercise = this.exercise;
 
     final unselectedIcon = ExerciseIcon(exercise: exercise);
@@ -151,7 +152,7 @@ class ExerciseListTile extends StatelessWidget {
           ],
         ),
       ),
-      subtitle: _buildSubtitle(context),
+      subtitle: _buildSubtitle(context, ref),
       onTap: onTap,
       trailing: trailing,
       visualDensity: visualDensity,
@@ -160,11 +161,15 @@ class ExerciseListTile extends StatelessWidget {
     );
   }
 
-  String _buildWeight(BuildContext context, double weight) => Weights.convert(
-    value: weight,
-    from: weightUnit!,
-    to: settingsController.weightUnit.value,
-  ).getUserFacingWeight(context.t);
+  String _buildWeight(BuildContext context, WidgetRef ref, double weight) =>
+      Weights.convert(
+        value: weight,
+        from: weightUnit!,
+        to: ref.watch(settingsControllerProvider).weightUnit,
+      ).getUserFacingWeight(
+        context.t,
+        ref.watch(settingsControllerProvider).weightUnit,
+      );
 
   String _buildReps(BuildContext context, int? reps) =>
       context.t.exerciseList.fields.reps(n: reps ?? 0);
@@ -172,14 +177,21 @@ class ExerciseListTile extends StatelessWidget {
   String _buildTime(BuildContext context, Duration time) =>
       TimerView.buildTimeString(context, time, builder: (time) => time.text!);
 
-  String _buildDistance(BuildContext context, double? distance) =>
+  String _buildDistance(
+    BuildContext context,
+    WidgetRef ref,
+    double? distance,
+  ) =>
       Distance.convert(
         value: distance ?? 0,
         from: distanceUnit!,
-        to: settingsController.distanceUnit.value,
-      ).getUserFacingDistance(context.t);
+        to: ref.watch(settingsControllerProvider).distanceUnit,
+      ).getUserFacingDistance(
+        context.t,
+        ref.watch(settingsControllerProvider).distanceUnit,
+      );
 
-  Text? _buildSubtitle(BuildContext context) {
+  Text? _buildSubtitle(BuildContext context, WidgetRef ref) {
     final exercise = this.exercise;
     if (exercise is Superset) {
       if (exercise.exercises.isEmpty) return null;
@@ -197,7 +209,7 @@ class ExerciseListTile extends StatelessWidget {
         case GTSetParameters.repsWeight:
           formattedSets = exercise.sets.map(
             (set) =>
-                "${_buildReps(context, set.reps)} ${_buildWeight(context, set.weight ?? 0)}",
+                "${_buildReps(context, set.reps)} ${_buildWeight(context, ref, set.weight ?? 0)}",
           );
 
         case GTSetParameters.freeBodyReps:
@@ -218,7 +230,7 @@ class ExerciseListTile extends StatelessWidget {
 
         case GTSetParameters.distance:
           formattedSets = exercise.sets.map(
-            (set) => _buildDistance(context, set.distance),
+            (set) => _buildDistance(context, ref, set.distance),
           );
 
         case GTSetParameters.setless:

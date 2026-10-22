@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_quill/flutter_quill.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:get/get.dart';
 import 'package:gymtracker/controller/history_controller.dart';
 import 'package:gymtracker/controller/purchases_controller.dart';
 import 'package:gymtracker/controller/routines_controller.dart';
@@ -20,13 +19,14 @@ import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/utils/skeletons.dart';
 import 'package:gymtracker/utils/theme.dart';
 import 'package:gymtracker/utils/utils.dart';
+import 'package:gymtracker/view/actions/purchases.dart';
+import 'package:gymtracker/view/actions/routines.dart';
 import 'package:gymtracker/view/boutique.dart';
 import 'package:gymtracker/view/components/badges.dart';
 import 'package:gymtracker/view/components/content_unavailable.dart';
-import 'package:gymtracker/view/components/controlled.dart';
-import 'package:gymtracker/view/components/legacy_workout_recovery.dart';
 import 'package:gymtracker/view/components/error_view.dart';
 import 'package:gymtracker/view/components/infobox.dart';
+import 'package:gymtracker/view/components/legacy_workout_recovery.dart';
 import 'package:gymtracker/view/components/pro_builder.dart';
 import 'package:gymtracker/view/components/rich_text_editor.dart';
 import 'package:gymtracker/view/components/routines.dart';
@@ -73,7 +73,7 @@ class _NonJumpableScrollController extends ScrollController {
 }
 
 class _RoutinesViewState extends ConsumerState<RoutinesView> with _RoutineList {
-  RoutinesController get controller => Get.find<RoutinesController>();
+  RoutinesController get controller => ref.read(routinesControllerProvider);
   int selectedIndex = 0;
   final ScrollController _scrollController = _NonJumpableScrollController();
 
@@ -94,7 +94,6 @@ class _RoutinesViewState extends ConsumerState<RoutinesView> with _RoutineList {
   @override
   void initState() {
     super.initState();
-    controller.onServiceChange();
   }
 
   @override
@@ -166,7 +165,7 @@ class _RoutinesViewState extends ConsumerState<RoutinesView> with _RoutineList {
           SliverToBoxAdapter(
             child: ProBuilder(
               builder: (context, subscriptionInfo) {
-                final historyController = Get.find<HistoryController>();
+                final historyController = ref.read(historyControllerProvider);
                 final shouldDisable =
                     (subscriptionInfo == null ||
                         !subscriptionInfo.hasProFeatures) &&
@@ -185,7 +184,7 @@ class _RoutinesViewState extends ConsumerState<RoutinesView> with _RoutineList {
                   ),
                   onTap: () {
                     if (shouldDisable) {
-                      Get.find<PurchasesController>().presentPaywall();
+                      ref.read(purchasesControllerProvider).presentPaywall();
                       return;
                     }
                     controller.startRoutine(context);
@@ -255,7 +254,9 @@ class _RoutinesViewState extends ConsumerState<RoutinesView> with _RoutineList {
                   ),
                   onTap: shouldDisable
                       ? () {
-                          Get.find<PurchasesController>().presentPaywall();
+                          ref
+                              .read(purchasesControllerProvider)
+                              .presentPaywall();
                         }
                       : () {
                           Go.to(() => const RoutineCreator());
@@ -292,7 +293,7 @@ class _RoutinesViewState extends ConsumerState<RoutinesView> with _RoutineList {
                     ),
                     onTap: () {
                       if (shouldDisable) {
-                        Get.find<PurchasesController>().presentPaywall();
+                        ref.read(purchasesControllerProvider).presentPaywall();
                         return;
                       }
                       controller.createFolder();
@@ -309,14 +310,14 @@ class _RoutinesViewState extends ConsumerState<RoutinesView> with _RoutineList {
   }
 }
 
-class _DraggingListItem extends StatelessWidget {
+class _DraggingListItem extends ConsumerWidget {
   const _DraggingListItem({required this.dragKey, required this.workout});
 
   final GlobalKey dragKey;
   final Workout workout;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return FractionalTranslation(
       translation: const Offset(-0.5, -0.5),
       child: ClipRRect(
@@ -361,7 +362,7 @@ class _DraggingListItem extends StatelessWidget {
   }
 }
 
-class EditFolderModal extends StatefulWidget {
+class EditFolderModal extends ConsumerStatefulWidget {
   final GTRoutineFolder folder;
   final ScrollController? controller;
 
@@ -372,11 +373,11 @@ class EditFolderModal extends StatefulWidget {
   });
 
   @override
-  State<EditFolderModal> createState() => _EditFolderModalState();
+  ConsumerState<EditFolderModal> createState() => _EditFolderModalState();
 }
 
-class _EditFolderModalState
-    extends ControlledState<EditFolderModal, RoutinesController> {
+class _EditFolderModalState extends ConsumerState<EditFolderModal> {
+  RoutinesController get controller => ref.read(routinesControllerProvider);
   final GlobalKey<FormState> _formKey = GlobalKey();
   late final TextEditingController _controller = TextEditingController(
     text: widget.folder.name,
@@ -387,6 +388,7 @@ class _EditFolderModalState
 
   @override
   Widget build(BuildContext context) {
+    ref.watch(routinesStreamProvider);
     return Scaffold(
       appBar: AppBar(
         title: Text(context.t.routines.editFolder),
@@ -469,7 +471,7 @@ mixin _RoutineList<T extends ConsumerStatefulWidget> on ConsumerState<T> {
     List<Workout> rootRoutines, {
     bool foldersInNewPage = false,
   }) {
-    final controller = Get.find<RoutinesController>();
+    final controller = ref.read(routinesControllerProvider);
     final repo = ref.watch(routinesRepositoryProvider);
     final folderList = folders.keys.toList()
       ..sort((a, b) {
@@ -966,20 +968,21 @@ class RoutinePicker extends ConsumerStatefulWidget {
 
 class _RoutinePickerState extends ConsumerState<RoutinePicker>
     with _RoutineList {
-  RoutinesController get controller => Get.find<RoutinesController>();
+  RoutinesController get controller => ref.read(routinesControllerProvider);
 
   @override
   void onTapWorkout(Workout workout) {
     logger.i("Picked workout: ${workout.name}");
     widget.onPick(workout);
-    Get.back();
+    Go.back();
   }
 
   @override
   Widget build(BuildContext context) {
+    ref.watch(routinesStreamProvider);
     return Scaffold(
-      body: Obx(
-        () => CustomScrollView(
+      body: Builder(
+        builder: (context) => CustomScrollView(
           slivers: [
             SliverAppBar.large(title: Text(context.t.routines.pick)),
             if (widget.allowNone) ...[
@@ -993,7 +996,7 @@ class _RoutinePickerState extends ConsumerState<RoutinePicker>
                   title: Text(context.t.routines.none),
                   onTap: () {
                     widget.onPick(null);
-                    Get.back();
+                    Go.back();
                   },
                 ),
               ),
@@ -1009,7 +1012,7 @@ class _RoutinePickerState extends ConsumerState<RoutinePicker>
   }
 }
 
-class TerseRoutineListTile extends StatelessWidget {
+class TerseRoutineListTile extends ConsumerWidget {
   final Workout? routine;
   final VoidCallback? onTap;
   final EdgeInsetsGeometry? contentPadding;
@@ -1024,7 +1027,7 @@ class TerseRoutineListTile extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     Icon icon;
     String text;
 

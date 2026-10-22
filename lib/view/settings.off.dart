@@ -1,10 +1,12 @@
 part of 'settings.dart';
 
-class OpenFoodFactsSettingsPane extends ControlledWidget<SettingsController> {
+class OpenFoodFactsSettingsPane extends ConsumerWidget {
   const OpenFoodFactsSettingsPane({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final controller = ref.watch(settingsControllerInstanceProvider);
+    ref.watch(appPreferencesProvider);
     return Scaffold(
       body: DetailsView(
         child: CustomScrollView(
@@ -15,9 +17,9 @@ class OpenFoodFactsSettingsPane extends ControlledWidget<SettingsController> {
             ),
             SliverList(
               delegate: SliverChildListDelegate([
-                Obx(
-                  () => ValueBuilder<NutritionLanguage?>(
-                    initialValue: controller.nutritionLanguage.value,
+                Builder(
+                  builder: (context) => PreferenceControl<NutritionLanguage?>(
+                    initialValue: controller.nutritionLanguage,
                     builder: (value, onChange) =>
                         RadioModalTile<NutritionLanguage?>(
                           title: Text(
@@ -38,9 +40,9 @@ class OpenFoodFactsSettingsPane extends ControlledWidget<SettingsController> {
                     ),
                   ),
                 ),
-                Obx(
-                  () => ValueBuilder<NutritionCountry?>(
-                    initialValue: controller.nutritionCountry.value,
+                Builder(
+                  builder: (context) => PreferenceControl<NutritionCountry?>(
+                    initialValue: controller.nutritionCountry,
                     builder: (value, onChange) =>
                         RadioModalTile<NutritionCountry?>(
                           title: Text(

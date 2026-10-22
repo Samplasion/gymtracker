@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:get/get.dart';
 import 'package:gymtracker/controller/workout_controller.dart';
-import 'package:gymtracker/main.dart' show globalContainer;
 import 'package:gymtracker/model/model.dart';
 import 'package:mocktail/mocktail.dart';
 
@@ -17,8 +15,8 @@ void main() {
     MockServices.setup();
     when(
       () => MockServices.routinesController.hasOngoingWorkout,
-    ).thenReturn(true.obs);
-    controller = WorkoutController('Workout', null, null);
+    ).thenReturn(true);
+    controller = MockServices.createWorkout('Workout', null, null);
     controller.exercises.add(exerciseHelper('ex1', 'Bench Press'));
   });
 
@@ -30,7 +28,6 @@ void main() {
   ) async {
     tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.resumed);
     await tester.pumpWidget(const WidgetTestApp(child: SizedBox()));
-    Get.put(controller);
     await tester.pump();
     await tester.pump();
     clearInteractions(MockServices.databaseService);
@@ -38,15 +35,14 @@ void main() {
       await body();
     } finally {
       tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.resumed);
-      Get.delete<WorkoutController>();
+      await tester.runAsync(controller.suspend);
       await tester.pump();
       await tester.pumpWidget(const SizedBox());
-      globalContainer.dispose();
     }
   }
 
   void typeWeight(double weight) {
-    controller.callbacks.onSetValueChange(
+    controller.onSetValueChange(
       (exerciseIndex: 0, supersetIndex: null),
       0,
       controller.exercises.first.asExercise.sets.first.copyWith(weight: weight),
@@ -57,7 +53,10 @@ void main() {
     'typing notifies once and batches saves with the latest value',
     (tester) async => runInputTest(tester, () async {
       var notifications = 0;
-      final subscription = controller.exercises.listen((_) => notifications++);
+      final subscription = MockServices.container.listen(
+        workoutControllerProvider,
+        (_, _) => notifications++,
+      );
       typeWeight(4);
       await tester.pump(const Duration(milliseconds: 100));
       typeWeight(42);
@@ -73,7 +72,7 @@ void main() {
               as Map<String, dynamic>;
       final exercises = saved['exercises'] as List;
       expect(exercises.single['sets'][0]['weight'], 42);
-      await subscription.cancel();
+      subscription.close();
     }),
   );
 

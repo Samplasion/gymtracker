@@ -1,7 +1,8 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
-import 'package:get/get.dart' hide ContextExtensionss;
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:gymtracker/controller/countdown_controller.dart';
 import 'package:gymtracker/controller/stopwatch_controller.dart';
 import 'package:gymtracker/controller/workout_controller.dart';
 import 'package:gymtracker/data/distance.dart';
@@ -15,6 +16,7 @@ import 'package:gymtracker/struct/optional.dart';
 import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/utils/sets.dart';
 import 'package:gymtracker/utils/utils.dart';
+import 'package:gymtracker/view/actions/workout.dart';
 import 'package:gymtracker/view/components/alert_banner.dart';
 import 'package:gymtracker/view/components/exercise_set_view.dart';
 import 'package:gymtracker/view/utils/cardio_timer.dart';
@@ -55,8 +57,8 @@ List<PopupMenuEntry<dynamic>> buildWorkoutControlMenuEntries(
             context,
             onCanceled: () {
               SchedulerBinding.instance.addPostFrameCallback((_) {
-                Get.back(closeOverlays: true);
-                Get.delete<WorkoutController>();
+                Go.back();
+                controller.cancel();
               });
             },
           );
@@ -95,7 +97,10 @@ List<PopupMenuEntry<dynamic>> buildToolboxMenuEntries(
       ),
       onTap: () {
         if (controller == null) return;
-        final stopwatchController = Get.find<StopwatchController>();
+        final stopwatchController = ProviderScope.containerOf(
+          context,
+          listen: false,
+        ).read(stopwatchControllerProvider.notifier);
         GlobalStopwatch getStopwatch() => stopwatchController.globalStopwatch;
         SchedulerBinding.instance.addPostFrameCallback((_) {
           showDialog(
@@ -105,58 +110,63 @@ List<PopupMenuEntry<dynamic>> buildToolboxMenuEntries(
               content: TimerView(
                 startingTime: DateTime.now(),
                 builder: (context, _) {
-                  return Obx(
-                    () => Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        TimerView.buildTimeString(
-                          context,
-                          getStopwatch().currentDuration,
-                          style: Theme.of(context).textTheme.displaySmall,
-                        ),
-                        const SizedBox(height: 16),
-                        OverflowBar(
-                          alignment: MainAxisAlignment.end,
-                          overflowAlignment: OverflowBarAlignment.end,
-                          children: [
-                            if (getStopwatch().isStopped())
-                              TextButton.icon(
-                                key: const Key("start"),
-                                icon: const Icon(GTIcons.resume),
-                                label: Text(
-                                  context.t.ongoingWorkout.stopwatch.start,
+                  return Consumer(
+                    builder: (context, ref, _) {
+                      ref.watch(workoutControllerProvider);
+                      ref.watch(countdownControllerProvider);
+                      ref.watch(stopwatchControllerProvider);
+                      return Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          TimerView.buildTimeString(
+                            context,
+                            getStopwatch().currentDuration,
+                            style: Theme.of(context).textTheme.displaySmall,
+                          ),
+                          const SizedBox(height: 16),
+                          OverflowBar(
+                            alignment: MainAxisAlignment.end,
+                            overflowAlignment: OverflowBarAlignment.end,
+                            children: [
+                              if (getStopwatch().isStopped)
+                                TextButton.icon(
+                                  key: const Key("start"),
+                                  icon: const Icon(GTIcons.resume),
+                                  label: Text(
+                                    context.t.ongoingWorkout.stopwatch.start,
+                                  ),
+                                  onPressed: () {
+                                    getStopwatch().start();
+                                  },
+                                )
+                              else
+                                TextButton.icon(
+                                  key: const Key("pause"),
+                                  icon: const Icon(GTIcons.pause),
+                                  label: Text(
+                                    context.t.ongoingWorkout.stopwatch.pause,
+                                  ),
+                                  onPressed: () {
+                                    getStopwatch().pause();
+                                  },
                                 ),
-                                onPressed: () {
-                                  getStopwatch().start();
-                                },
-                              )
-                            else
-                              TextButton.icon(
-                                key: const Key("pause"),
-                                icon: const Icon(GTIcons.pause),
-                                label: Text(
-                                  context.t.ongoingWorkout.stopwatch.pause,
+                              if (getStopwatch().isStopped &&
+                                  getStopwatch().currentDuration.inSeconds > 0)
+                                TextButton.icon(
+                                  key: const Key("reset"),
+                                  icon: const Icon(GTIcons.reset),
+                                  label: Text(
+                                    context.t.ongoingWorkout.stopwatch.reset,
+                                  ),
+                                  onPressed: () {
+                                    getStopwatch().reset();
+                                  },
                                 ),
-                                onPressed: () {
-                                  getStopwatch().pause();
-                                },
-                              ),
-                            if (getStopwatch().isStopped() &&
-                                getStopwatch().currentDuration.inSeconds > 0)
-                              TextButton.icon(
-                                key: const Key("reset"),
-                                icon: const Icon(GTIcons.reset),
-                                label: Text(
-                                  context.t.ongoingWorkout.stopwatch.reset,
-                                ),
-                                onPressed: () {
-                                  getStopwatch().reset();
-                                },
-                              ),
-                          ],
-                        ),
-                      ],
-                    ),
+                            ],
+                          ),
+                        ],
+                      );
+                    },
                   );
                 },
               ),
@@ -174,7 +184,7 @@ List<PopupMenuEntry<dynamic>> buildToolboxMenuEntries(
       ),
       onTap: () {
         if (controller == null) return;
-        final weightUnit = controller.weightUnit.value;
+        final weightUnit = controller.weightUnit;
         showDialog(
           context: context,
           builder: (context) => WeightCalculator(weightUnit: weightUnit),

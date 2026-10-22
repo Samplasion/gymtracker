@@ -64,310 +64,291 @@ class _WorkoutExerciseEditorState extends State<WorkoutExerciseEditor> {
 
   @override
   Widget build(BuildContext context) {
-    return Scrollable(
-      viewportBuilder: (BuildContext context, _) {
-        var notesTextStyle = Theme.of(context).textTheme.bodyMedium!.copyWith(
-          fontSize: widget.exercise.notes.isEmpty ? 15 : null,
-          color: widget.exercise.notes.isEmpty
-              ? Theme.of(
-                  context,
-                ).colorScheme.onSurface.withAlpha((0.75 * 255).round())
-              : null,
-        );
-        return Padding(
-          padding: const EdgeInsets.symmetric(vertical: 8),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: Row(
-                  children: [
-                    if (widget.isCreating) ...[
-                      DragHandle(index: widget.index.exerciseIndex),
-                    ] else
-                      ExerciseParentViewGesture(
-                        exercise: widget.exercise,
-                        child: ExerciseIcon(exercise: widget.exercise),
-                      ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: Text.rich(
+    var notesTextStyle = Theme.of(context).textTheme.bodyMedium!.copyWith(
+      fontSize: widget.exercise.notes.isEmpty ? 15 : null,
+      color: widget.exercise.notes.isEmpty
+          ? Theme.of(
+              context,
+            ).colorScheme.onSurface.withAlpha((0.75 * 255).round())
+          : null,
+    );
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Row(
+              children: [
+                if (widget.isCreating) ...[
+                  DragHandle(index: widget.index.exerciseIndex),
+                ] else
+                  ExerciseParentViewGesture(
+                    exercise: widget.exercise,
+                    child: ExerciseIcon(exercise: widget.exercise),
+                  ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Text.rich(
+                    TextSpan(
+                      children: [
                         TextSpan(
-                          children: [
-                            TextSpan(
-                              text: widget.exercise.getDisplayName(context.t),
-                            ),
-                            if (widget.exercise.isCustom) ...[
-                              const TextSpan(text: " "),
-                              const WidgetSpan(
-                                baseline: TextBaseline.ideographic,
-                                alignment: PlaceholderAlignment.middle,
-                                child: CustomExerciseBadge(),
-                              ),
-                            ],
-                          ],
+                          text: widget.exercise.getDisplayName(context.t),
                         ),
-                        style: Theme.of(context).textTheme.titleMedium,
-                      ),
-                    ),
-                    PopupMenuButton(
-                      itemBuilder: (context) => <PopupMenuEntry<dynamic>>[
-                        if (!widget.isCreating) ...[
-                          PopupMenuItem(
-                            onTap: () {
-                              widget.callbacks.onExerciseReorder(
-                                widget.index.supersetIndex,
-                              );
-                            },
-                            child: ListTile(
-                              leading: const Icon(GTIcons.reorder),
-                              title: Text(
-                                context.t.ongoingWorkout.exercises.reorder,
-                              ),
-                            ),
+                        if (widget.exercise.isCustom) ...[
+                          const TextSpan(text: " "),
+                          const WidgetSpan(
+                            baseline: TextBaseline.ideographic,
+                            alignment: PlaceholderAlignment.middle,
+                            child: CustomExerciseBadge(),
                           ),
                         ],
-                        PopupMenuItem(
-                          onTap: () {
-                            widget.callbacks.onExerciseReplace(widget.index);
-                          },
-                          child: ListTile(
-                            leading: const Icon(GTIcons.replace),
-                            title: Text(
-                              context.t.ongoingWorkout.exercises.replace,
-                            ),
-                          ),
-                        ),
-                        if (widget.index.supersetIndex == null)
-                          PopupMenuItem(
-                            onTap: () {
-                              widget.callbacks.onGroupExercisesIntoSuperset(
-                                widget.index.exerciseIndex,
-                              );
-                            },
-                            child: ListTile(
-                              leading: const Icon(GTIcons.add_to_superset),
-                              title: Text(
-                                context
-                                    .t
-                                    .ongoingWorkout
-                                    .exercises
-                                    .addToSuperset,
-                              ),
-                            ),
-                          ),
-                        if (!widget.exercise.parameters.isSetless ||
-                            !widget.isCreating)
-                          const PopupMenuDivider(),
-                        if (!widget.exercise.parameters.isSetless)
-                          PopupMenuItem(
-                            enabled: widget.exercise.sets.isNotEmpty,
-                            onTap: widget.exercise.sets.isEmpty
-                                ? null
-                                : () async {
-                                    final newIndices =
-                                        await Go.toDialog<List<int>>(
-                                          () => _WorkoutReorderSetsDialog(
-                                            exercise: widget.exercise,
-                                            sets: widget.exercise.sets,
-                                            weightUnit: widget.weightUnit,
-                                            distanceUnit: widget.distanceUnit,
-                                            isConcrete: !widget.isCreating,
-                                          ),
-                                        );
-                                    if (newIndices != null) {
-                                      widget.callbacks.onExerciseSetReorder(
-                                        widget.index,
-                                        newIndices,
-                                      );
-                                    }
-                                  },
-                            child: ListTile(
-                              leading: const Icon(GTIcons.reorder),
-                              title: Text(
-                                context.t.ongoingWorkout.exercises.reorderSets,
-                              ),
-                              enabled: widget.exercise.sets.isNotEmpty,
-                            ),
-                          ),
-                        if (!widget.isCreating) ...[
-                          if (CardioTimerScreen.supportsTimer(
-                            widget.exercise,
-                          )) ...[
-                            PopupMenuItem(
-                              onTap: () {
-                                Go.to(
-                                  () => CardioTimerScreen.fromExercise(
-                                    widget.exercise,
-                                  ),
-                                );
-                              },
-                              child: ListTile(
-                                leading: const Icon(GTIcons.cardio_timer),
-                                title: Text(
-                                  context
-                                      .t
-                                      .ongoingWorkout
-                                      .exercises
-                                      .startCardioTimer,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ],
-                        const PopupMenuDivider(),
-                        PopupMenuItem(
-                          onTap: () {
-                            widget.callbacks.onExerciseRemove(widget.index);
-                          },
-                          child: ListTile(
-                            textColor: Theme.of(context).colorScheme.error,
-                            iconColor: Theme.of(context).colorScheme.error,
-                            leading: const Icon(GTIcons.delete),
-                            title: Text(
-                              context.t.ongoingWorkout.exercises.remove,
-                            ),
-                          ),
-                        ),
                       ],
                     ),
-                  ],
-                ),
-              ),
-              if (ExerciseBadgeRow.shouldShow(widget.exercise)) ...[
-                const SizedBox(height: 8),
-                ExerciseBadgeRow(exercise: widget.exercise),
-              ],
-              const SizedBox(height: 8),
-              ListTile(
-                titleAlignment: ListTileTitleAlignment.titleHeight,
-                leading: const Icon(GTIcons.notes),
-                title: widget.exercise.notes.asQuillDocument().isEmpty()
-                    ? Text(
-                        context.t.exercise.editor.fields.notes.tapToEdit,
-                        style: notesTextStyle,
-                      )
-                    : MaybeRichText(
-                        text: widget.exercise.notes,
-                        style: notesTextStyle,
-                      ),
-                trailing: const Icon(GTIcons.edit),
-                onTap: () {
-                  showDialog(
-                    context: context,
-                    builder: (context) {
-                      return GTRichTextEditDialog(
-                        controller: notesController,
-                        onNotesChange: (text) {
-                          widget.callbacks.onExerciseNotesChange(
-                            widget.index,
-                            text,
-                          );
-                          Go.back();
-                        },
-                      );
-                    },
-                  );
-                },
-              ),
-              if (!widget.exercise.parameters.isSetless)
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 8, 16, 18),
-                  child: ExerciseProgressionPanel(
-                    exercise: widget.exercise,
-                    weightUnit: widget.weightUnit,
-                    distanceUnit: widget.distanceUnit,
-                    index: widget.index,
-                    callbacks: widget.callbacks,
-                    isCreating: widget.isCreating,
+                    style: Theme.of(context).textTheme.titleMedium,
                   ),
                 ),
-              if (!widget.isInSuperset)
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: TimeInputField(
-                          controller: timeController,
-                          decoration: GymTrackerInputDecoration(
-                            labelText: context.t.exercise.fields.restTime,
+                PopupMenuButton(
+                  itemBuilder: (context) => <PopupMenuEntry<dynamic>>[
+                    if (!widget.isCreating) ...[
+                      PopupMenuItem(
+                        onTap: () {
+                          widget.callbacks.onExerciseReorder(
+                            widget.index.supersetIndex,
+                          );
+                        },
+                        child: ListTile(
+                          leading: const Icon(GTIcons.reorder),
+                          title: Text(
+                            context.t.ongoingWorkout.exercises.reorder,
                           ),
-                          onChangedTime: (value) =>
-                              widget.callbacks.onExerciseChangeRestTime(
-                                widget.index,
-                                value ?? Duration.zero,
-                              ),
                         ),
                       ),
-                      if (widget.exercise.parameters.isSetless &&
-                          !widget.isCreating) ...[
-                        const SizedBox(width: 8),
-                        IconButton(
-                          onPressed: () => widget.callbacks.onSetSetDone(
-                            widget.index,
-                            -1,
-                            true,
+                    ],
+                    PopupMenuItem(
+                      onTap: () {
+                        widget.callbacks.onExerciseReplace(widget.index);
+                      },
+                      child: ListTile(
+                        leading: const Icon(GTIcons.replace),
+                        title: Text(context.t.ongoingWorkout.exercises.replace),
+                      ),
+                    ),
+                    if (widget.index.supersetIndex == null)
+                      PopupMenuItem(
+                        onTap: () {
+                          widget.callbacks.onGroupExercisesIntoSuperset(
+                            widget.index.exerciseIndex,
+                          );
+                        },
+                        child: ListTile(
+                          leading: const Icon(GTIcons.add_to_superset),
+                          title: Text(
+                            context.t.ongoingWorkout.exercises.addToSuperset,
                           ),
-                          icon: const Icon(GTIcons.time),
-                          tooltip: context.t.exercise.fields.restTime,
+                        ),
+                      ),
+                    if (!widget.exercise.parameters.isSetless ||
+                        !widget.isCreating)
+                      const PopupMenuDivider(),
+                    if (!widget.exercise.parameters.isSetless)
+                      PopupMenuItem(
+                        enabled: widget.exercise.sets.isNotEmpty,
+                        onTap: widget.exercise.sets.isEmpty
+                            ? null
+                            : () async {
+                                final newIndices = await Go.toDialog<List<int>>(
+                                  () => _WorkoutReorderSetsDialog(
+                                    exercise: widget.exercise,
+                                    sets: widget.exercise.sets,
+                                    weightUnit: widget.weightUnit,
+                                    distanceUnit: widget.distanceUnit,
+                                    isConcrete: !widget.isCreating,
+                                  ),
+                                );
+                                if (newIndices != null) {
+                                  widget.callbacks.onExerciseSetReorder(
+                                    widget.index,
+                                    newIndices,
+                                  );
+                                }
+                              },
+                        child: ListTile(
+                          leading: const Icon(GTIcons.reorder),
+                          title: Text(
+                            context.t.ongoingWorkout.exercises.reorderSets,
+                          ),
+                          enabled: widget.exercise.sets.isNotEmpty,
+                        ),
+                      ),
+                    if (!widget.isCreating) ...[
+                      if (CardioTimerScreen.supportsTimer(widget.exercise)) ...[
+                        PopupMenuItem(
+                          onTap: () {
+                            Go.to(
+                              () => CardioTimerScreen.fromExercise(
+                                widget.exercise,
+                              ),
+                            );
+                          },
+                          child: ListTile(
+                            leading: const Icon(GTIcons.cardio_timer),
+                            title: Text(
+                              context
+                                  .t
+                                  .ongoingWorkout
+                                  .exercises
+                                  .startCardioTimer,
+                            ),
+                          ),
                         ),
                       ],
                     ],
-                  ),
-                ),
-              if (!widget.exercise.parameters.isSetless) ...[
-                for (int i = 0; i < widget.exercise.sets.length; i++)
-                  WorkoutExerciseSetEditor(
-                    key: ValueKey((widget.index, i)),
-                    set: widget.exercise.sets[i],
-                    index: widget.index,
-                    setIndex: i,
-                    exercise: widget.exercise,
-                    onDelete: () =>
-                        widget.callbacks.onSetRemove(widget.index, i),
-                    alt: i % 2 == 0,
-                    isCreating: widget.isCreating,
-                    onSetSelectKind: (val) =>
-                        widget.callbacks.onSetSelectKind(widget.index, i, val),
-                    onSetSetDone: (val) =>
-                        widget.callbacks.onSetSetDone(widget.index, i, val),
-                    onSetChangeRPE: (val) =>
-                        widget.callbacks.onSetChangeRPE(widget.index, i, val),
-                    onSetValueChange: (set) =>
-                        widget.callbacks.onSetValueChange(widget.index, i, set),
-                    weightUnit: widget.weightUnit,
-                    distanceUnit: widget.distanceUnit,
-                  ),
-                const SizedBox(height: 8),
-                FilledButton.tonal(
-                  onPressed: () => widget.callbacks.onSetCreate(widget.index),
-                  child: Text(context.t.exercise.actions.addSet),
+                    const PopupMenuDivider(),
+                    PopupMenuItem(
+                      onTap: () {
+                        widget.callbacks.onExerciseRemove(widget.index);
+                      },
+                      child: ListTile(
+                        textColor: Theme.of(context).colorScheme.error,
+                        iconColor: Theme.of(context).colorScheme.error,
+                        leading: const Icon(GTIcons.delete),
+                        title: Text(context.t.ongoingWorkout.exercises.remove),
+                      ),
+                    ),
+                  ],
                 ),
               ],
-              // if (kDebugMode) ...[
-              //   Text(
-              //     "id: ${widget.exercise.id}",
-              //     textAlign: TextAlign.center,
-              //   ),
-              //   Text(
-              //     "parent: ${widget.exercise.parentID}",
-              //     textAlign: TextAlign.center,
-              //   ),
-              //   Text(
-              //     "supersede: ${widget.exercise.supersedesID}",
-              //     textAlign: TextAlign.center,
-              //   ),
-              // ],
-              if (widget.createDivider) ...[
-                const SizedBox(height: 8),
-                const Divider(),
-              ],
-            ],
+            ),
           ),
-        );
-      },
+          if (ExerciseBadgeRow.shouldShow(widget.exercise)) ...[
+            const SizedBox(height: 8),
+            ExerciseBadgeRow(exercise: widget.exercise),
+          ],
+          const SizedBox(height: 8),
+          ListTile(
+            titleAlignment: ListTileTitleAlignment.titleHeight,
+            leading: const Icon(GTIcons.notes),
+            title: widget.exercise.notes.asQuillDocument().isEmpty()
+                ? Text(
+                    context.t.exercise.editor.fields.notes.tapToEdit,
+                    style: notesTextStyle,
+                  )
+                : MaybeRichText(
+                    text: widget.exercise.notes,
+                    style: notesTextStyle,
+                  ),
+            trailing: const Icon(GTIcons.edit),
+            onTap: () {
+              showDialog(
+                context: context,
+                builder: (context) {
+                  return GTRichTextEditDialog(
+                    controller: notesController,
+                    onNotesChange: (text) {
+                      widget.callbacks.onExerciseNotesChange(
+                        widget.index,
+                        text,
+                      );
+                      Go.back();
+                    },
+                  );
+                },
+              );
+            },
+          ),
+          if (!widget.exercise.parameters.isSetless)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 8, 16, 18),
+              child: ExerciseProgressionPanel(
+                exercise: widget.exercise,
+                weightUnit: widget.weightUnit,
+                distanceUnit: widget.distanceUnit,
+                index: widget.index,
+                callbacks: widget.callbacks,
+                isCreating: widget.isCreating,
+              ),
+            ),
+          if (!widget.isInSuperset)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: TimeInputField(
+                      controller: timeController,
+                      decoration: GymTrackerInputDecoration(
+                        labelText: context.t.exercise.fields.restTime,
+                      ),
+                      onChangedTime: (value) =>
+                          widget.callbacks.onExerciseChangeRestTime(
+                            widget.index,
+                            value ?? Duration.zero,
+                          ),
+                    ),
+                  ),
+                  if (widget.exercise.parameters.isSetless &&
+                      !widget.isCreating) ...[
+                    const SizedBox(width: 8),
+                    IconButton(
+                      onPressed: () =>
+                          widget.callbacks.onSetSetDone(widget.index, -1, true),
+                      icon: const Icon(GTIcons.time),
+                      tooltip: context.t.exercise.fields.restTime,
+                    ),
+                  ],
+                ],
+              ),
+            ),
+          if (!widget.exercise.parameters.isSetless) ...[
+            for (int i = 0; i < widget.exercise.sets.length; i++)
+              WorkoutExerciseSetEditor(
+                key: ValueKey((widget.index, i)),
+                set: widget.exercise.sets[i],
+                index: widget.index,
+                setIndex: i,
+                exercise: widget.exercise,
+                onDelete: () => widget.callbacks.onSetRemove(widget.index, i),
+                alt: i % 2 == 0,
+                isCreating: widget.isCreating,
+                onSetSelectKind: (val) =>
+                    widget.callbacks.onSetSelectKind(widget.index, i, val),
+                onSetSetDone: (val) =>
+                    widget.callbacks.onSetSetDone(widget.index, i, val),
+                onSetChangeRPE: (val) =>
+                    widget.callbacks.onSetChangeRPE(widget.index, i, val),
+                onSetValueChange: (set) =>
+                    widget.callbacks.onSetValueChange(widget.index, i, set),
+                weightUnit: widget.weightUnit,
+                distanceUnit: widget.distanceUnit,
+              ),
+            const SizedBox(height: 8),
+            FilledButton.tonal(
+              onPressed: () => widget.callbacks.onSetCreate(widget.index),
+              child: Text(context.t.exercise.actions.addSet),
+            ),
+          ],
+          // if (kDebugMode) ...[
+          //   Text(
+          //     "id: ${widget.exercise.id}",
+          //     textAlign: TextAlign.center,
+          //   ),
+          //   Text(
+          //     "parent: ${widget.exercise.parentID}",
+          //     textAlign: TextAlign.center,
+          //   ),
+          //   Text(
+          //     "supersede: ${widget.exercise.supersedesID}",
+          //     textAlign: TextAlign.center,
+          //   ),
+          // ],
+          if (widget.createDivider) ...[
+            const SizedBox(height: 8),
+            const Divider(),
+          ],
+        ],
+      ),
     );
   }
 }

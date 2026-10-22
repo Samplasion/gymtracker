@@ -1,25 +1,27 @@
 import 'package:pigeon/pigeon.dart';
 
-@ConfigurePigeon(PigeonOptions(
-  dartOut: 'lib/service/native.g.dart',
-  dartOptions: DartOptions(),
-  swiftOut: 'ios/Runner/FlutterCommunicator.g.swift',
-  swiftOptions: SwiftOptions(),
-  kotlinOut:
-      'android/app/src/main/java/org/js/samplasion/gymtracker/FlutterCommunicator.kt',
-  kotlinOptions: KotlinOptions(
-    package: "org.js.samplasion.gymtracker",
+@ConfigurePigeon(
+  PigeonOptions(
+    dartOut: 'lib/service/native.g.dart',
+    dartOptions: DartOptions(),
+    swiftOut: 'ios/Runner/FlutterCommunicator.g.swift',
+    swiftOptions: SwiftOptions(),
+    kotlinOut:
+        'android/app/src/main/java/org/js/samplasion/gymtracker/FlutterCommunicator.kt',
+    kotlinOptions: KotlinOptions(package: "org.js.samplasion.gymtracker"),
+    dartPackageName: 'gymtracker',
   ),
-  dartPackageName: 'gymtracker',
-))
+)
 @HostApi()
 // This API is called by the Flutter app to communicate with the native OS
 abstract class GymBroNativeHostAPI {
-  void startWorkout();
-  void stopWorkout();
+  void startWorkout(String workoutId, int startMilliseconds);
+  void stopWorkout(String workoutId, bool save);
   void setExerciseParameters(Map<String?, Object?> parameters);
   void updateHomeWidgetParameters(
-      Map<String, int> parameters, List<int> workoutDensityChartData);
+    Map<String, int> parameters,
+    List<int> workoutDensityChartData,
+  );
   void requestHealthPermission();
 
   // Food
@@ -47,7 +49,11 @@ abstract class GymBroNativeFlutterAPI {
 
   // Update set parameters from native interfaces
   void updateSetParameters(
-      double? weight, double? timeSeconds, int? reps, double? distance);
+    double? weight,
+    double? timeSeconds,
+    int? reps,
+    double? distance,
+  );
 }
 
 @FlutterApi()

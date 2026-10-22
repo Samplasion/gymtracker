@@ -40,7 +40,12 @@ abstract class NativeService {
   Stream<double?> get energyStream;
   Stream<double?> get heartRateStream;
 
-  void setIsWorkoutRunning(bool isWorkoutRunning);
+  void setIsWorkoutRunning(
+    bool isWorkoutRunning, {
+    required String workoutId,
+    required DateTime start,
+    bool save = true,
+  });
   void setExerciseParameters(NativeWorkoutStateMessage parameters);
   Future<void> updateHomeWidgetParameters({
     required int weekStreak,
@@ -88,7 +93,12 @@ class _UnsupportedNativeService extends NativeService
   }
 
   @override
-  void setIsWorkoutRunning(bool isWorkoutRunning) {
+  void setIsWorkoutRunning(
+    bool isWorkoutRunning, {
+    required String workoutId,
+    required DateTime start,
+    bool save = true,
+  }) {
     // no-op
   }
 
@@ -132,6 +142,7 @@ class _UnsupportedNativeService extends NativeService
 class _NativeServiceImpl extends NativeService
     implements GymBroNativeFlutterAPI, GymBroNativeLoggerChannel {
   final _watch = GymBroNativeHostAPI();
+  String? _workoutId;
 
   _NativeServiceImpl() : super._();
   bool _disposed = false;
@@ -193,15 +204,35 @@ class _NativeServiceImpl extends NativeService
   }
 
   @override
-  void setIsWorkoutRunning(bool isWorkoutRunning) {
+  void setIsWorkoutRunning(
+    bool isWorkoutRunning, {
+    required String workoutId,
+    required DateTime start,
+    bool save = true,
+  }) {
     if (_disposed) return;
     logger.i("Setting isWorkoutRunning on native side: $isWorkoutRunning");
+    if (isWorkoutRunning && _workoutId != workoutId) {
+      _energy$.add(null);
+      _heartRate$.add(null);
+    }
+    _workoutId = workoutId;
     if (isWorkoutRunning) {
-      _watch.startWorkout();
+      unawaited(
+        _watch.startWorkout(workoutId, start.millisecondsSinceEpoch).catchError(
+          (Object error) {
+            logger.e('Native workout start failed', error: error);
+          },
+        ),
+      );
     } else {
       _energy$.add(null);
       _heartRate$.add(null);
-      _watch.stopWorkout();
+      unawaited(
+        _watch.stopWorkout(workoutId, save).catchError((Object error) {
+          logger.e('Native workout stop failed', error: error);
+        }),
+      );
     }
   }
 
@@ -211,7 +242,10 @@ class _NativeServiceImpl extends NativeService
     logger.i(
       """Setting exercise parameters on native side: ${parameters.toJson()}""",
     );
-    _watch.setExerciseParameters(parameters.toJson());
+    _watch.setExerciseParameters({
+      ...parameters.toJson(),
+      'workoutId': _workoutId,
+    });
   }
 
   @override
@@ -219,7 +253,7 @@ class _NativeServiceImpl extends NativeService
     if (_disposed) return;
     logger.i("Received requestTrainingData from native.");
     if (onRequestTrainingData == null) {
-      _watch.stopWorkout();
+      // Flutter may still be bootstrapping; absence of a callback is not a stop.
       return;
     }
     onRequestTrainingData?.call();

@@ -13,12 +13,15 @@ import flutter_app_intents
 @objc class AppDelegate: FlutterAppDelegate, FlutterImplicitEngineDelegate {
     var session: WCSession?
     private var latestFoodParameters: [String: Any]?
+    private var legacySensorGeneration: String?
+    private let legacyWorkoutQueue = WorkoutOperationQueue()
+    private var watchSnapshot = WatchSnapshot(dictionary: UserDefaults.standard.dictionary(forKey: "watch.snapshot.v2") ?? [:])
     var flutterNativeApi: GymBroNativeFlutterAPI?
     var applicationContext: TypedApplicationContext = TypedApplicationContext(isRunning: false, hasExercise: false, percentageDone: 0)
     var logger: FlutterLogger?;
     
     private var _workout: Any? = nil
-    @available(iOS 26.0, *)
+    @available(iOS 17.0, *)
     fileprivate var workout: WorkoutManager {
         if _workout == nil {
             _workout = WorkoutManager.shared
@@ -39,11 +42,22 @@ import flutter_app_intents
             UNUserNotificationCenter.current().delegate = self as UNUserNotificationCenterDelegate
         }
         
-        if #available(iOS 26, *) {
+        if #available(iOS 17, *) {
             requestHealthPermission()
             workout.retrieveRemoteSession()
             
             workout.listener = self
+            workout.watchAvailable = { [weak self] in self?.session?.isReachable == true }
+            workout.remoteCommand = { [weak self] command in
+                guard let session = self?.session, session.isReachable else { throw WorkoutOperationError.unavailable }
+                return try await withCheckedThrowingContinuation { continuation in
+                    var command = command
+                    command["revision"] = self?.watchSnapshot.revision ?? 0
+                    session.sendMessage(command, replyHandler: { continuation.resume(returning: $0) }, errorHandler: { continuation.resume(throwing: $0) })
+                }
+            }
+            workout.onError = { [weak self] id, message in self?.showWorkoutError(id: id, message: message) }
+            for id in workout.discardedWorkoutIDs { workout.retryDiscard(id: id) }
         }
         
         return super.application(application, didFinishLaunchingWithOptions: launchOptions)
@@ -184,15 +198,10 @@ extension AppDelegate: WCSessionDelegate {
         }
 
         logger!.log("Activated session with activationState: \(activationState)")
-        // Request fresh data from the app
-        do {
-            if let parameters = latestFoodParameters {
-                try updateFoodParameters(parameters: parameters)
-            } else if session.applicationContext["kind"] as? String != "food" {
-                try session.updateApplicationContext(applicationContext.toDictionary())
-            }
-        } catch {
-            logger!.error("Error updating application context: \(error)")
+        Task { @MainActor in
+            self.publishWatchSnapshot()
+            if #available(iOS 17, *) { if session.isReachable { self.workout.watchBecameReachable() } }
+            else { self.synchronizeLegacyWorkout() }
         }
     }
     
@@ -206,19 +215,17 @@ extension AppDelegate: WCSessionDelegate {
     }
 
     func sessionWatchStateDidChange(_ session: WCSession) {
-        guard let parameters = latestFoodParameters else { return }
-        do {
-            try updateFoodParameters(parameters: parameters)
-        } catch {
-            logger?.error("Error updating food context after Watch state change: \(error)")
-        }
+        Task { @MainActor in self.publishWatchSnapshot() }
     }
-    
+
     func session(_ session: WCSession, didReceiveMessage message: [String : Any]) {
         Task {
             guard let method = message["method"] as? String else { return }
             
             if method == "requestTrainingData" {
+                self.publishWatchSnapshot()
+                if #available(iOS 17, *) { self.workout.watchBecameReachable() }
+                else { self.synchronizeLegacyWorkout() }
                 self.flutterNativeApi?.requestTrainingData(completion: { result in
                     switch result {
                     case .success(_): break
@@ -233,17 +240,19 @@ extension AppDelegate: WCSessionDelegate {
                     self.logger!.error("Unknown log message from watch")
                 }
             } else if method == "workoutMetrics" {
-                // TODO: Use standard workout mirroring methods
-                self.flutterNativeApi?.handleWorkoutMetrics(energy: message["energy"] as? Double, heartRate: message["heartRate"] as? Double, completion: { result in
-                    switch result {
-                    case .success(): break
-                    case .failure(let error):
-                        self.logger!.error("Error handling workout metrics: \(error)")
-                    }
-                })
+                if #available(iOS 17, *) {
+                    guard message["workoutId"] as? String == self.workout.desiredRequest?.id,
+                          message["generation"] as? String == self.workout.generation else { return }
+                    if let data = try? JSONSerialization.data(withJSONObject: message) { try? self.workout.handleReceivedData(data) }
+                } else {
+                    guard message["workoutId"] as? String == self.watchSnapshot.workout["id"] as? String,
+                          self.watchSnapshot.workout["active"] as? Bool == true,
+                          message["generation"] as? String == self.legacySensorGeneration else { return }
+                    self.flutterNativeApi?.handleWorkoutMetrics(energy: message["energy"] as? Double, heartRate: message["heartRate"] as? Double, completion: { _ in })
+                }
             } else {
                 logger!.error("Received unknown message from watch: \(method)")
-                fatalError("Received unknown message from watch: \(method)")
+                return
             }
         }
     }
@@ -251,8 +260,12 @@ extension AppDelegate: WCSessionDelegate {
     func session(_ session: WCSession, didReceiveMessage message: [String : Any], replyHandler: @escaping ([String : Any]) -> Void) {
         Task {
             logger?.log("\(#function): Received \(message)")
-            guard let method = message["method"] as? String else { return }
-            
+            guard let method = message["method"] as? String else { replyHandler(["success": false]); return }
+            guard message["workoutId"] as? String == self.watchSnapshot.workout["id"] as? String,
+                  self.watchSnapshot.workout["active"] as? Bool == true,
+                  message["setId"] as? String == self.applicationContext.set?.id,
+                  self.flutterNativeApi != nil else { replyHandler(["success": false]); return }
+
             if method == "markThisSetAsDone" {
                 self.flutterNativeApi?.markThisSetAsDone(completion: { result in
                     switch result {
@@ -291,13 +304,17 @@ extension AppDelegate: WCSessionDelegate {
                 })
             } else {
                 logger!.error("Received unknown message from watch: \(method)")
-                fatalError("Received unknown message from watch: \(method)")
+                return
             }
         }
     }
     
     func sessionReachabilityDidChange(_ session: WCSession) {
-        logger!.log("Session \(session.hashValue) reachability did change: \(session.activationState)")
+        Task { @MainActor in
+            self.publishWatchSnapshot()
+            if #available(iOS 17, *) { if session.isReachable { self.workout.watchBecameReachable() } }
+            else { self.synchronizeLegacyWorkout() }
+        }
     }
 }
 
@@ -314,37 +331,43 @@ extension AppDelegate: GymBroNativeHostAPI {
         self.updateLiveActivity()
     }
     
-    func startWorkout() throws {
-        self.logger!.log("Received startWorkout() from Flutter side")
-        if #available(iOS 26, *) {
-            Task {
-                try await workout.startWatchWorkout(workoutType: .traditionalStrengthTraining)
-                Task { @MainActor in
-                    self.logger!.log("Started workout on Apple Watch")
-                }
-            }
-        }
-        return try setIsWorkoutRunning(isWorkoutRunning: true)
-    }
-    
-    func stopWorkout() throws {
-        if #available(iOS 26, *) {
-            Task {
-                workout.session?.stopActivity(with: .now)
-            }
-        }
-        return try setIsWorkoutRunning(isWorkoutRunning: false)
-    }
-    
-    func setIsWorkoutRunning(isWorkoutRunning: Bool) throws {
-        applicationContext.isRunning = isWorkoutRunning
-        sendMessage(["method": "setIsWorkoutRunning", "value": isWorkoutRunning], replyHandler: nil, errorHandler: nil)
-        
+    func startWorkout(workoutId: String, startMilliseconds: Int64) throws {
+        applicationContext.isRunning = true
+        applicationContext.startingTime = Date(milliseconds: startMilliseconds)
+        let old = watchSnapshot.workout
+        var state: [String: Any] = ["id": workoutId, "active": true, "save": true, "start": startMilliseconds]
+        if old["id"] as? String == workoutId { state["parameters"] = old["parameters"] }
+        watchSnapshot.update(workout: state)
+        publishWatchSnapshot()
         didUpdateApplicationContext(applicationContext)
+        if #available(iOS 17, *) { workout.startPhoneWorkout(id: workoutId, start: applicationContext.startingTime) }
+        else { launchLegacyWatch(); synchronizeLegacyWorkout() }
     }
-    
+
+    func stopWorkout(workoutId: String, save: Bool) throws {
+        if watchSnapshot.workout["id"] as? String == workoutId {
+            var state = watchSnapshot.workout
+            state["active"] = false
+            state["save"] = save
+            watchSnapshot.update(workout: state)
+            applicationContext.isRunning = false
+            publishWatchSnapshot()
+            didUpdateApplicationContext(applicationContext)
+        }
+        if #available(iOS 17, *) { workout.stopPhoneWorkout(id: workoutId, save: save) }
+        else {
+            var pending = UserDefaults.standard.dictionary(forKey: "workout.remoteFinishes.v2") as? [String: Bool] ?? [:]
+            pending[workoutId] = save
+            UserDefaults.standard.set(pending, forKey: "workout.remoteFinishes.v2")
+            synchronizeLegacyWorkout()
+        }
+    }
+
     func setExerciseParameters(parameters: [String?: Any?]) throws {
-        let decoded = NativeWorkoutStateMessage.decodeWorkoutState(from: parameters)!
+        guard let id = parameters["workoutId"] as? String,
+              id == watchSnapshot.workout["id"] as? String,
+              watchSnapshot.workout["active"] as? Bool == true,
+              let decoded = NativeWorkoutStateMessage.decodeWorkoutState(from: parameters) else { return }
         
         applicationContext.hasExercise = decoded.hasExercise
         applicationContext.exerciseName = decoded.exerciseName
@@ -355,24 +378,11 @@ extension AppDelegate: GymBroNativeHostAPI {
         applicationContext.restTimeEnd = decoded.restTimeEnd
         applicationContext.percentageDone = decoded.percentageDone
         applicationContext.set = decoded.set
-//        var msg = [
-//            "method": "setExerciseParameters",
-//            "value": true,
-//            "hasExercise": decoded.hasExercise,
-//            "exerciseName": decoded.exerciseName,
-//            "exerciseColor": decoded.exerciseColor.hexString,
-//            "exerciseParameters": decoded.exerciseParameters,
-//            "restTimeEnd": Int(decoded.restTimeEnd?.timeIntervalSinceReferenceDate ?? 0),
-//            "startingTime": Int(decoded.startingTime.timeIntervalSinceReferenceDate),
-//            "message": try decoded.toJSONString() as Any,
-//        ]
-//        if let set = try decoded.set?.toJSON() {
-//            msg["set"] = set
-//        }
-//        session?.sendMessage(msg, replyHandler: nil, errorHandler: { [self] err in logger?.error("\(#file) \(#function): \(err.localizedDescription)\n\(msg)")})
-        let msg = (try? decoded.toJSON()) ?? [:]
-        sendMessage(["method": "setExerciseParameters", "data": msg], replyHandler: nil, errorHandler: { [self] err in logger?.error("\(#file) \(#function): \(err.localizedDescription)\n\(msg)")})
-        
+        var state = watchSnapshot.workout
+        state["parameters"] = try decoded.toJSON()
+        watchSnapshot.update(workout: state)
+        publishWatchSnapshot()
+
         didUpdateApplicationContext(applicationContext)
     }
 
@@ -439,7 +449,7 @@ extension AppDelegate: GymBroNativeHostAPI {
     }
     
     func requestHealthPermission() {
-        guard #available(iOS 26.0, *) else {
+        guard #available(iOS 17.0, *) else {
             return
         }
         
@@ -454,7 +464,7 @@ extension AppDelegate: GymBroNativeHostAPI {
                     // Typically, authorization requests only fail if you haven't set the
                     // usage and share descriptions in your app's Info.plist, or if
                     // Health data isn't available on the current device.
-                    fatalError("*** An unexpected error occurred while requesting authorization: \(error.localizedDescription) ***")
+                    self.logger?.error("HealthKit authorization failed: \(error.localizedDescription)")
                 }
             }
         }
@@ -462,7 +472,7 @@ extension AppDelegate: GymBroNativeHostAPI {
 }
 
 // MARK: - Health Data
-@available(iOS 26.0, *)
+@available(iOS 17.0, *)
 extension AppDelegate {
     func handleHealthUpdate() {
         logger?.log("Updating data: \(workout.activeEnergy) kcal, \(workout.heartRate) bpm")
@@ -474,36 +484,112 @@ extension AppDelegate {
     }
 }
 
-@available(iOS 26.0, *)
+@available(iOS 17.0, *)
 extension AppDelegate: WorkoutMetricsListener {
     func handleHeartRateUpdate(_ heartRate: Double) {
+        guard heartRate > 0 else { return }
         logger?.log("Updating data: \(heartRate) bpm")
-        self.flutterNativeApi?.handleWorkoutMetrics(energy: nil, heartRate: heartRate == 0 ? nil : heartRate, completion: {_ in})
+        self.flutterNativeApi?.handleWorkoutMetrics(energy: nil, heartRate: heartRate, completion: {_ in})
     }
     func handleActiveEnergyUpdate(_ activeEnergy: Double) {
         logger?.log("Updating data: \(activeEnergy) kcal")
-        self.flutterNativeApi?.handleWorkoutMetrics(energy: activeEnergy == 0 ? nil : activeEnergy, heartRate: nil, completion: {_ in})
+        self.flutterNativeApi?.handleWorkoutMetrics(energy: activeEnergy, heartRate: nil, completion: {_ in})
     }
 }
 
 // MARK: - Food data
 extension AppDelegate {
     func updateFoodParameters(parameters: [String? : Any?]) throws {
-        if let parameters = parameters as? [String: Any] {
-            latestFoodParameters = parameters
-            let msg = [
-                "kind": "food",
-                "parameters": parameters
-            ] as [String : Any];
-            if let session,
-               session.activationState == .activated,
-               session.isPaired,
-               session.isWatchAppInstalled {
-                // Nutrition is a replaceable snapshot, not a queue of events.
-                // Keep only the newest state while the Watch is unavailable.
-                try session.updateApplicationContext(msg)
+        guard let parameters = parameters as? [String: Any] else { return }
+        latestFoodParameters = parameters
+        watchSnapshot.update(food: parameters)
+        publishWatchSnapshot()
+    }
+
+    private func launchLegacyWatch() {
+        guard session?.isPaired == true, session?.isWatchAppInstalled == true else { return }
+        let configuration = HKWorkoutConfiguration()
+        configuration.activityType = .traditionalStrengthTraining
+        configuration.locationType = .indoor
+        Task { @MainActor in
+            do {
+                try await workoutDeadline(10) { try await HKHealthStore().startWatchApp(toHandle: configuration) }
+                self.synchronizeLegacyWorkout()
+            } catch { self.logger?.error("Watch launch: \(error)") }
+        }
+    }
+
+    private func synchronizeLegacyWorkout() {
+        guard session?.isReachable == true,
+              let id = watchSnapshot.workout["id"] as? String else { return }
+        let state = watchSnapshot.workout
+        let revision = watchSnapshot.revision
+        legacyWorkoutQueue.enqueue {
+            guard self.watchSnapshot.workout["id"] as? String == id else { return }
+            do {
+                let pending = UserDefaults.standard.dictionary(forKey: "workout.remoteFinishes.v2") as? [String: Bool] ?? [:]
+                for (oldID, save) in pending {
+                    let result = try await self.legacySensorCommand(["action": "stop", "workoutId": oldID, "save": save])
+                    guard result["success"] as? Bool == true else { throw WorkoutOperationError.unavailable }
+                    var remaining = UserDefaults.standard.dictionary(forKey: "workout.remoteFinishes.v2") as? [String: Bool] ?? [:]
+                    if remaining[oldID] == save { remaining.removeValue(forKey: oldID) }
+                    UserDefaults.standard.set(remaining, forKey: "workout.remoteFinishes.v2")
+                }
+                guard self.watchSnapshot.workout["id"] as? String == id,
+                      self.watchSnapshot.workout["active"] as? Bool == state["active"] as? Bool else { return }
+                if state["active"] as? Bool == true {
+                    let token = UUID().uuidString
+                    let prepared = try await self.legacySensorCommand(["action": "prepare", "workoutId": id,
+                        "generation": token, "start": ((state["start"] as? NSNumber)?.doubleValue ?? 0) / 1000,
+                        "revision": revision, "deadline": Date().addingTimeInterval(10).timeIntervalSince1970])
+                    guard prepared["success"] as? Bool == true,
+                          self.watchSnapshot.workout["id"] as? String == id,
+                          self.watchSnapshot.workout["active"] as? Bool == true else { return }
+                    self.legacySensorGeneration = prepared["generation"] as? String ?? token
+                    _ = try await self.legacySensorCommand(["action": "commit", "workoutId": id,
+                        "generation": prepared["generation"] as? String ?? token, "revision": revision,
+                        "deadline": Date().addingTimeInterval(10).timeIntervalSince1970])
+                } else {
+                    _ = try await self.legacySensorCommand(["action": "stop", "workoutId": id, "save": state["save"] as? Bool ?? false])
+                }
+            } catch { self.logger?.error("Watch workout: \(error)") }
+        }
+    }
+
+    private func legacySensorCommand(_ command: [String: Any]) async throws -> [String: Any] {
+        try await workoutDeadline(10) {
+            guard let session = self.session, session.isReachable else { throw WorkoutOperationError.unavailable }
+            return try await withCheckedThrowingContinuation { continuation in
+                var message = command
+                message["method"] = "workoutSensor"
+                session.sendMessage(message, replyHandler: { continuation.resume(returning: $0) }, errorHandler: { continuation.resume(throwing: $0) })
             }
         }
+    }
+
+    private func publishWatchSnapshot() {
+        let snapshot = watchSnapshot.dictionary
+        UserDefaults.standard.set(snapshot, forKey: "watch.snapshot.v2")
+        guard let session, session.activationState == .activated, session.isPaired, session.isWatchAppInstalled else { return }
+        do { try session.updateApplicationContext(snapshot) }
+        catch { logger?.error("Unable to publish Watch snapshot: \(error)") }
+        if session.isReachable { session.sendMessage(["method": "snapshot", "data": snapshot], replyHandler: nil, errorHandler: { _ in }) }
+    }
+
+    private func showWorkoutError(id: String, message: String) {
+        guard UIApplication.shared.applicationState == .active,
+              let scene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+              var presenter = scene.windows.first(where: { $0.isKeyWindow })?.rootViewController else { return }
+        while let presented = presenter.presentedViewController { presenter = presented }
+        guard !(presenter is UIAlertController) else { return }
+        let alert = UIAlertController(title: "Workout recording", message: message, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "Close", style: .cancel))
+        if #available(iOS 17, *), workout.discardedWorkoutIDs.contains(id) {
+            alert.addAction(UIAlertAction(title: "Retry", style: .default) { _ in
+                self.workout.stopPhoneWorkout(id: id, save: false)
+            })
+        }
+        presenter.present(alert, animated: true)
     }
 }
 

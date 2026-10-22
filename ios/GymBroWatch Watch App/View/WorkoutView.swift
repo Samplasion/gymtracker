@@ -1,293 +1,128 @@
-//
-//  MetricsView.swift
-//  GymBroWatch Watch App
-//
-//  Created by Francesco Arieti on 26/12/25.
-//
-
 import SwiftUI
 import HealthKit
 import WatchKit
 
 struct WorkoutView: View {
-  @EnvironmentObject var workoutManager: WorkoutManager
-  @EnvironmentObject var workoutViewModel: WorkoutViewModel
-  @Environment(\.isLuminanceReduced) var isLuminanceReduced
-  @State private var selection: Tab = .workout
-  @State private var isSheetActive = false
-  @State private var editingSetID: String? = nil
-  
-  private enum Tab {
-    case workout, music
-  }
-  
-  @State var presentEditSheet = false
-  
-  @ViewBuilder
-  var body: some View {
-    NavigationView {
-      if #available(watchOS 10.0, *) {
+    @EnvironmentObject var workoutManager: WorkoutManager
+    @EnvironmentObject var workoutViewModel: WorkoutViewModel
+    @Environment(\.isLuminanceReduced) private var isLuminanceReduced
+    @Environment(\.scenePhase) private var scenePhase
+    @State private var selection: Tab = .workout
+    @State private var mediaIdentity = UUID()
+    @State private var presentEditSheet = false
+    @State private var editingSetID: String?
+    private enum Tab { case workout, music }
+
+    var body: some View {
         TabView(selection: $selection) {
-          innerBody.tag(Tab.workout)
-          nowPlaying.tag(Tab.music)
+            NavigationStack { metrics }.tag(Tab.workout)
+            // The system media controller is a page root, outside NavigationStack.
+            NowPlayingView().id(mediaIdentity).tag(Tab.music)
         }
         .tabViewStyle(.page)
-        .onChange(of: isLuminanceReduced) {
-          selection = .workout
+        .onChange(of: selection) { tab in if tab == .music { mediaIdentity = UUID() } }
+        .onChange(of: scenePhase) { phase in if phase == .active { mediaIdentity = UUID() } }
+        .onChange(of: isLuminanceReduced) { reduced in if reduced { selection = .workout } }
+        .onChange(of: workoutViewModel.workoutID) { _ in presentEditSheet = false; selection = .workout }
+        .onChange(of: workoutViewModel.set?.id) { id in
+            if presentEditSheet && editingSetID != id { presentEditSheet = false }
         }
-      } else {
-        TabView(selection: $selection) {
-          innerBody.tag(Tab.workout)
-          nowPlaying.tag(Tab.music)
+        .sheet(isPresented: $presentEditSheet, onDismiss: { editingSetID = nil }) {
+            SetEditSheet(model: workoutViewModel)
         }
-        .tabViewStyle(.page)
-      }
     }
-    .sheet(isPresented: $presentEditSheet, onDismiss: {
-      editingSetID = nil
-    }, content: {
-      if #available(watchOS 9, *) {
-        SetEditSheet(model: workoutViewModel)
-//              .tint(workoutViewModel.exerciseColor.asARGBColor())
-      } else {
-        EmptyView()
-      }
-    })
-  }
-  
-  @ViewBuilder
-  var nowPlaying: some View {
-    ZStack {
-      Rectangle()
-        .foregroundColor(.black)
-        .ignoresSafeArea(.all, edges: .all)
-      NowPlayingView()
-    }
-  }
-  
-  @ViewBuilder
-  var innerBody: some View {
-    switch workoutViewModel.state {
-      case .running, .paused:
-        TimelineView(MetricsTimelineSchedule()) { context in
-          ZStack(alignment: .topLeading) {
+
+    @ViewBuilder private var metrics: some View {
+        if workoutViewModel.state == .running || workoutViewModel.state == .paused {
             VStack(alignment: .leading) {
-              // Timer view
-              ElapsedTimeView(elapsedTime: elapsedTime(with: context.date), showSubseconds: context.cadence == .live)
-                .foregroundStyle(.tint)
-                .if(workoutViewModel.exerciseColor != 0 && workoutViewModel.hasNextSet) {
-                  $0.tint(workoutViewModel.exerciseColor.asARGBColor())
+                TimelineView(MetricsTimelineSchedule()) { context in
+                    ElapsedTimeView(elapsedTime: context.date.timeIntervalSince(workoutViewModel.workoutStart ?? context.date), showSubseconds: context.cadence == .live)
                 }
                 .font(.system(size: 24, weight: .semibold, design: .rounded))
-                .brightness(0.15)
-              
-              Spacer()
-              
-              // Exercise view
-              if workoutViewModel.hasNextSet {
-                Text(workoutViewModel.exerciseName)
-                  .font(.system(size: 18, weight: .semibold, design: .rounded))
-                  .multilineTextAlignment(.center)
-                if #available(watchOS 9, *) {
-                  Button(action: {
-                    editingSetID = workoutViewModel.set?.id
-                    presentEditSheet = true
-                  }, label: {
-                    (
-                      SetTypeIndicatorView.richTextPrefix(
-                        set: workoutViewModel.set,
-                        label: workoutViewModel.setTypeLabel,
-                        primary: workoutViewModel.exerciseColor.asARGBColor()
-                      )
-                      + Text(workoutViewModel.exerciseParameters)
-                      + Text(" ")
-                      + Text(Image(systemName: "chevron.right"))
-                    )
-                    .font(.system(size: 14, weight: .regular, design: .rounded))
-                    .multilineTextAlignment(.center)
-                  })
-                  .buttonStyle(.plain)
-                  .disabled(!workoutViewModel.state.isRunning || workoutViewModel.isLoading)
-                } else {
-                  (
-                    SetTypeIndicatorView.richTextPrefix(
-                      set: workoutViewModel.set,
-                      label: workoutViewModel.setTypeLabel,
-                      primary: workoutViewModel.exerciseColor.asARGBColor()
-                    )
-                    + Text(workoutViewModel.exerciseParameters)
-                  )
-                  .font(.system(size: 14, weight: .regular, design: .rounded))
-                  .multilineTextAlignment(.center)
-                }
-              }
-              
-              // BPM view
-              HStack {
-                Image(systemName: "heart.fill").foregroundStyle(.red).frame(width: 30)
-                Text(workoutManager.heartRate.formatted(.number.precision(.fractionLength(0))) + " bpm")
-              }
-              HStack {
-                Image(systemName: "flame.fill").foregroundStyle(.orange).frame(width: 30)
-                Text(workoutManager.activeEnergy.formatted(.number.precision(.fractionLength(1))) + " kcal")
-              }
-              
-              Spacer()
-              
-              // Control(s)
-              HStack {
+                .foregroundStyle(.tint)
                 Spacer()
-                Button(action: {
-                  if !workoutViewModel.isLoading {
-                    workoutViewModel.moveWorkoutCursorPrevious()
-                  }
-                }, label: {
-                  Image(systemName: "chevron.left")
-                    .imageScale(.small)
-                    .font(.headline)
-                    .tint(workoutViewModel.exerciseColor.asARGBColor())
-                    .brightness(0.10)
-                })
-                .modifier(MaybeGlassButtonStyle(size: .navigation))
-                .clipShape(Circle())
-                .disabled(!workoutViewModel.state.isRunning || workoutViewModel.isLoading || !workoutViewModel.hasNextSet)
-                Spacer()
-                Button(action: {
-                  if !workoutViewModel.isLoading {
-                    workoutViewModel.markThisSetAsDone()
-                  }
-                }, label: {
-                  ZStack {
-                    Image(systemName: "checkmark.circle")
-                      .imageScale(.medium)
-                      .foregroundStyle(.tint)
-                      .font(.title2)
-                      .tint(workoutViewModel.exerciseColor.asARGBColor())
-                      .brightness(0.15)
-                      .opacity(workoutViewModel.isLoading ? 0.0 : 1.0)
-                    
-                    if (workoutViewModel.isLoading) {
-                      ProgressView()
-                        .progressViewStyle(CircularProgressViewStyle())
-                        .imageScale(.medium)
-                        .foregroundStyle(.tint)
-                        .font(.title2)
-                        .tint(workoutViewModel.exerciseColor.asARGBColor())
-                        .brightness(0.15)
-                        .aspectRatio(1, contentMode: .fit)
+                if workoutViewModel.hasNextSet {
+                    Text(workoutViewModel.exerciseName)
+                        .font(.system(size: 18, weight: .semibold, design: .rounded))
+                        .multilineTextAlignment(.center)
+                    Button {
+                        guard !workoutViewModel.isLoading else { return }
+                        editingSetID = workoutViewModel.set?.id
+                        presentEditSheet = true
+                    } label: {
+                        (SetTypeIndicatorView.richTextPrefix(set: workoutViewModel.set, label: workoutViewModel.setTypeLabel, primary: workoutViewModel.exerciseColor.asARGBColor())
+                         + Text(workoutViewModel.exerciseParameters) + Text(" ") + Text(Image(systemName: "pencil")))
+                        .font(.system(size: 14)).multilineTextAlignment(.center)
                     }
-                  }
-                })
-                .clipShape(Circle())
-                .modifier(MaybeGlassButtonStyle(size: .done))
-                .modifier(HandGestureShortcutIfAvailable())
-                .disabled(!workoutViewModel.state.isRunning || workoutViewModel.isLoading || !workoutViewModel.hasNextSet)
-                Spacer()
-                Button(action: {
-                  if !workoutViewModel.isLoading {
-                    workoutViewModel.moveWorkoutCursorNext()
-                  }
-                }, label: {
-                  Image(systemName: "chevron.right")
-                    .imageScale(.small)
-                    .font(.headline)
-                    .tint(workoutViewModel.exerciseColor.asARGBColor())
-                    .brightness(0.10)
-                })
-                .modifier(MaybeGlassButtonStyle(size: .navigation))
-                .clipShape(Circle())
-                .disabled(!workoutViewModel.state.isRunning || workoutViewModel.isLoading || !workoutViewModel.hasNextSet)
-                Spacer()
-              }
-              .padding(EdgeInsets(top: 8, leading: 0, bottom: 8, trailing: 0))
-              
-              // Rest time view
-              Label {
-                ElapsedTimeView(elapsedTime: restTime(with: context.date), showSubseconds: false)
-              } icon: {
-                if restTime(with: context.date) >= 0 {
-                  Image(systemName: "timer").frame(width: 30)
+                    .buttonStyle(.plain)
+                    .disabled(!workoutViewModel.state.isRunning)
                 }
-              }
-              .font(.system(.body, design: .default))
-              
-              Spacer()
+                HStack {
+                    Image(systemName: "heart.fill").foregroundStyle(.red).frame(width: 30)
+                    Text(workoutManager.heartRate > 0 ? "\(workoutManager.heartRate.formatted(.number.precision(.fractionLength(0)))) bpm" : "— bpm")
+                }
+                HStack {
+                    Image(systemName: "flame.fill").foregroundStyle(.orange).frame(width: 30)
+                    Text("\(workoutManager.activeEnergy.formatted(.number.precision(.fractionLength(1)))) kcal")
+                }
+                Spacer()
+                HStack {
+                    Button { workoutViewModel.moveWorkoutCursorPrevious() } label: { Image(systemName: "chevron.left") }
+                    Spacer()
+                    Button { workoutViewModel.markThisSetAsDone() } label: {
+                        Image(systemName: "checkmark.circle")
+                            .font(.title2)
+                            .opacity(workoutViewModel.isLoading ? 0 : 1)
+                            .overlay {
+                                ProgressView().opacity(workoutViewModel.isLoading ? 1 : 0)
+                                    .allowsHitTesting(false)
+                            }
+                    }
+                    .modifier(HandGestureShortcutIfAvailable())
+                    Spacer()
+                    Button { workoutViewModel.moveWorkoutCursorNext() } label: { Image(systemName: "chevron.right") }
+                }
+                .buttonStyle(.bordered)
+                // Keep the gesture target enabled while a request is in flight.
+                // The model rejects repeated actions without changing its identity.
+                .disabled(!workoutViewModel.state.isRunning || !workoutViewModel.hasNextSet)
+                .padding(.vertical, 8)
+                TimelineView(.periodic(from: .now, by: 1)) { context in
+                    if let end = workoutViewModel.restTimeEnd, end >= context.date {
+                        Label {
+                            ElapsedTimeView(elapsedTime: end.timeIntervalSince(context.date).rounded(), showSubseconds: false)
+                        } icon: { Image(systemName: "timer").frame(width: 30) }
+                    }
+                }
+                .font(.body)
+                Spacer()
             }
             .font(.system(.headline, design: .rounded).monospacedDigit().lowercaseSmallCaps())
             .frame(maxWidth: .infinity, alignment: .leading)
-            .ignoresSafeArea(edges: .bottom)
+            .tint(workoutViewModel.exerciseColor == 0 ? .accentColor : workoutViewModel.exerciseColor.asARGBColor())
             .scenePadding()
-            .padding([.top], 30)
-            .onChange(of: workoutViewModel.set.map { s in s.id }, perform: { _ in
-              print("WorkoutView: set changed, dismissing edit sheet if open")
-              guard presentEditSheet else { return }
-              guard let editingSetID, editingSetID != workoutViewModel.set?.id else { return }
-              presentEditSheet = false
-            })
-          }
+            .padding(.top, 30)
+            .ignoresSafeArea(edges: .bottom)
+        } else {
+            Text("Start a workout from your iPhone.")
+                .multilineTextAlignment(.center)
+                .font(.system(.headline).weight(.regular))
+                .navigationTitle("Workout")
+                .navigationBarTitleDisplayMode(.inline)
         }
-      case .notStarted, .cancelled, .ended:
-        Text("Start a workout from your iPhone.")
-          .multilineTextAlignment(.center)
-          .font(.system(.headline, design: .default).weight(.regular))
-          .lineLimit(5)
-          .navigationTitle(Text("Workout"))
-          .navigationBarTitleDisplayMode(.inline)
     }
-  }
-  
-  func elapsedTime(with contextDate: Date) -> TimeInterval {
-    return contextDate.timeIntervalSince(workoutViewModel.workoutStart ?? .now) // workoutManager.builder?.elapsedTime(at: contextDate) ?? 0
-  }
-  
-  func restTime(with contextDate: Date) -> TimeInterval {
-    if (workoutViewModel.restTimeEnd == nil) {
-      return -1
-    }
-    return workoutViewModel.restTimeEnd!.timeIntervalSince(contextDate).rounded(.toNearestOrAwayFromZero);
-  }
 }
 
 struct MetricsTimelineSchedule: TimelineSchedule {
-  func entries(from startDate: Date, mode: TimelineScheduleMode) -> AnyIterator<Date> {
-    let newMode = (mode == .lowFrequency ? 1.0 : 1.0 / 30.0)
-    var baseSchedule = PeriodicTimelineSchedule(from: Date(), by: newMode).entries(from: Date(), mode: mode)
-    
-    return AnyIterator<Date> {
-      return baseSchedule.next()
+    func entries(from startDate: Date, mode: TimelineScheduleMode) -> AnyIterator<Date> {
+        var entries = PeriodicTimelineSchedule(from: startDate, by: mode == .lowFrequency ? 1 : 1.0 / 30).entries(from: startDate, mode: mode)
+        return AnyIterator { entries.next() }
     }
-  }
 }
 
 private struct HandGestureShortcutIfAvailable: ViewModifier {
-  func body(content: Content) -> some View {
-    if #available(watchOS 11, *) {
-      content.handGestureShortcut(.primaryAction)
-    } else {
-      content
+    func body(content: Content) -> some View {
+        if #available(watchOS 11, *) { content.handGestureShortcut(.primaryAction) }
+        else { content }
     }
-  }
-}
-
-private struct MaybeGlassButtonStyle: ViewModifier {
-  enum Size {
-    case done, navigation;
-    
-    func toInset() -> CGFloat {
-      switch self {
-          case .done: return 8
-          case .navigation: return 12
-      }
-    }
-  }
-  
-  var size: Size
-  
-  func body(content: Content) -> some View {
-    if #available(watchOS 26, *) {
-      content.buttonStyle(.plain).padding(.all, size.toInset()).glassEffect()
-    } else {
-      content.buttonStyle(.plain)
-    }
-  }
 }

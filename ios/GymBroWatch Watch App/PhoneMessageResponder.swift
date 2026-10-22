@@ -1,129 +1,78 @@
-//
-//  PhoneMessageResponder.swift
-//  Runner
-//
-//  Created by Francesco Arieti on 06/01/26.
-//
-
 import Foundation
 import WatchConnectivity
 
-class PhoneMessageResponder: NSObject {
+@MainActor
+final class PhoneMessageResponder: NSObject {
     static let shared = PhoneMessageResponder()
-    
-    var workoutDelegate: WorkoutMessageDelegate?
-    var foodDelegate: FoodMessageDelegate?
+    var workoutDelegate: WorkoutMessageDelegate? {
+        didSet {
+            if let cached = UserDefaults.standard.dictionary(forKey: "watch.receivedSnapshot.v2") {
+                workoutDelegate?.apply(workoutSnapshot: cached["workout"] as? [String: Any] ?? [:])
+            }
+        }
+    }
+    var foodDelegate: FoodMessageDelegate? {
+        didSet {
+            if let cached = UserDefaults.standard.dictionary(forKey: "watch.receivedSnapshot.v2"),
+               let food = cached["food"] as? [String: Any],
+               let decoded = NativeFoodStateMessage.decodeFoodState(from: food) { foodDelegate?.set(foodParameters: decoded) }
+        }
+    }
     var session: WCSession?
-    
-    func session(_ session: WCSession, didReceiveMessage message: [String : Any]) {
-        // If we don't include @MainActor here, Swift gets all fussy about concurrence and whatnot
+    private var cursor = WatchSnapshotCursor(revision: (UserDefaults.standard.dictionary(forKey: "watch.receivedSnapshot.v2")?["revision"] as? NSNumber)?.int64Value ?? -1)
+
+    nonisolated func session(_ session: WCSession, didReceiveMessage message: [String: Any]) {
         Task { @MainActor in
-            log("Received message: \(message)")
-            
-            guard let method = message["method"] as? String else { return }
-            
-            if method == "setIsWorkoutRunning" {
-                workoutDelegate?.set(isWorkoutRunning: message["value"] as! Bool, shouldSave: message["shouldSave"] as? Bool ?? true)
-            } else if method == "setExerciseParameters" {
-                if let data = message["data"] as? [String: Any],
-                   let decoded = NativeWorkoutStateMessage.decodeWorkoutState(from: data) {
-                    workoutDelegate?.set(exerciseParameters: decoded)
-                } else {
-                    log("Unable to decode exercise parameters from phone message: \(message)")
-                }
-            } else if method == "updateHomeWidgetParameters" {
-                guard message["value"] as? [String: Int64] != nil,
-                      message["workoutDensityChartData"] as? [Int64] != nil else {
-                    log("Invalid message format: \(message)\nReason: missing or malformed payload")
-                    return
-                }
-                workoutDelegate?.update(widgetParameters: message["value"] as! [String: Int64], workoutDensityChartData: message["workoutDensityChartData"] as! [Int64])
-            } else {
-                log("Received unknown message from phone: \(method)")
+            if message["method"] as? String == "snapshot", let snapshot = message["data"] as? [String: Any] {
+                self.apply(snapshot)
+            } else if message["method"] as? String == "updateHomeWidgetParameters",
+                      let parameters = message["value"] as? [String: Int64], let chart = message["workoutDensityChartData"] as? [Int64] {
+                self.workoutDelegate?.update(widgetParameters: parameters, workoutDensityChartData: chart)
             }
         }
     }
-    
-    func session(_ session: WCSession, didReceiveUserInfo userInfo: [String: Any]) {
-        log("Received user info: \(userInfo)")
+
+    nonisolated func receiveCommand(_ message: [String: Any], reply: @escaping ([String: Any]) -> Void) {
         Task { @MainActor in
-            switch (userInfo["kind"] as? String) {
-            case "food":
-                if let paramsMap = userInfo["parameters"] as? [String: Any],
-                   let params = NativeFoodStateMessage.decodeFoodState(from: paramsMap) {
-                    foodDelegate?.set(foodParameters: params)
+            guard message["method"] as? String == "workoutSensor" else { reply(["success": false]); return }
+            WorkoutManager.shared.enqueue {
+                do { reply(try await WorkoutManager.shared.handleSensorCommand(message)) }
+                catch {
+                    let id = message["workoutId"] as? String ?? ""
+                    if WorkoutManager.shared.request?.id == id { WorkoutManager.shared.summary = .init(id: id, result: .failed(error.localizedDescription)) }
+                    reply(["success": false, "error": error.localizedDescription])
                 }
-            default:
-                log("Unknown user info kind: \(userInfo)")
-                break
             }
         }
     }
-    
-    func session(_ session: WCSession, didReceiveApplicationContext applicationContext: [String : Any]) {
-        log("Received application context: \(applicationContext)")
-        Task { @MainActor in
-            switch (applicationContext["kind"] as? String) {
-            case "food":
-                if let paramsMap = applicationContext["parameters"] as? [String: Any],
-                   let params = NativeFoodStateMessage.decodeFoodState(from: paramsMap) {
-                    foodDelegate?.set(foodParameters: params)
+
+    private func apply(_ snapshot: [String: Any]) {
+        guard cursor.accept(snapshot) else { return }
+        UserDefaults.standard.set(snapshot, forKey: "watch.receivedSnapshot.v2")
+        if let workout = snapshot["workout"] as? [String: Any] {
+            workoutDelegate?.apply(workoutSnapshot: workout)
+            if workout["active"] as? Bool == false, let id = workout["id"] as? String {
+                // Deferred delivery also closes a workout when direct messages failed.
+                WorkoutManager.shared.enqueue {
+                    _ = try? await WorkoutManager.shared.handleSensorCommand(["action": "stop", "workoutId": id, "save": workout["save"] as? Bool ?? false])
                 }
-            default:
-                log("Unknown application context kind: \(applicationContext)")
-                break
             }
         }
+        if let food = snapshot["food"] as? [String: Any], let decoded = NativeFoodStateMessage.decodeFoodState(from: food) { foodDelegate?.set(foodParameters: decoded) }
     }
-    
-    func log(_ message: String) {
-        NSLog(message)
-      sendMessage(["method": "log", "message": message], replyHandler: nil, errorHandler: nil);
-    }
-  
-  func sendMessage(_ message: [String: Any],
-                   replyHandler: (([String: Any]) -> Void)?,
-                   errorHandler: ((Error) -> Void)?) {
-    guard let communicationReadySession = session else {
-      // watchOS: A session is always valid, so it will never come here.
-      print("Cannot send direct message: No reachable session")
-      let error = NSError.init(domain: "WCErrorDomain",
-                               code: 7007,
-                               userInfo: nil)
-      errorHandler?(error)
-      return
-    }
-    
-    /* The following trySendingMessageToWatch sometimews fails with
-     Error Domain=WCErrorDomain Code=7007 "WatchConnectivity session on paired device is not reachable."
-     In this case, the transfer is retried a number of times.
-     */
-    let maxNrRetries = 5
-    var availableRetries = maxNrRetries
-    
-    func trySendingMessageToWatch(_ message: [String: Any]) {
-      communicationReadySession.sendMessage(message,
-                                            replyHandler: replyHandler,
-                                            errorHandler: { error in
-        print("sending message to watch failed: error: \(error)")
-        let nsError = error as NSError
-        if nsError.domain == "WCErrorDomain" && nsError.code == 7007 && availableRetries > 0 {
-          availableRetries = availableRetries - 1
-          let randomDelay = Double.random(in: 0.3...1.0)
-          DispatchQueue.main.asyncAfter(deadline: .now() + randomDelay, execute: {
-            trySendingMessageToWatch(message)
-          })
-        } else {
-          errorHandler?(error)
+
+    nonisolated func session(_ session: WCSession, didReceiveApplicationContext context: [String: Any]) {
+        Task { @MainActor in
+            if context["version"] as? Int == 2 { self.apply(context) }
+            else if self.cursor.revision < 0, context["kind"] as? String == "food",
+                    let parameters = context["parameters"] as? [String: Any],
+                    let decoded = NativeFoodStateMessage.decodeFoodState(from: parameters) { self.foodDelegate?.set(foodParameters: decoded) }
         }
-      })
-    } // trySendingMessageToWatch
-    
-    trySendingMessageToWatch(message)
-  }
-    
-    @MainActor
-    func sessionReachabilityDidChange(_ session: WCSession) {
-        workoutDelegate?.sessionReachabilityDidChange(session)
+    }
+    nonisolated func session(_ session: WCSession, didReceiveUserInfo info: [String: Any]) {
+        self.session(session, didReceiveApplicationContext: info)
+    }
+    nonisolated func sessionReachabilityDidChange(_ session: WCSession) {
+        Task { @MainActor in self.workoutDelegate?.sessionReachabilityDidChange(session) }
     }
 }

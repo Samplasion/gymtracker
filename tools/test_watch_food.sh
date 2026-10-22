@@ -3,7 +3,7 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 task_dir=$(mktemp -d)
 trap 'rm -rf "$task_dir"' EXIT
-xcrun swiftc -o "$task_dir/watch_food_test" \
+xcrun swiftc -module-cache-path "$task_dir/modules" -o "$task_dir/watch_food_test" \
   ios/Shared/Model/NativeFoodNutritionSplit.swift \
   ios/Shared/Model/NativeFoodCategory.swift \
   ios/Shared/Model/NativeFoodStateMessage.swift \

@@ -27,6 +27,7 @@ import 'package:gymtracker/struct/optional.dart';
 import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/utils/utils.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:uuid/uuid.dart';
 
 // ignore_for_file: use_build_context_synchronously
 
@@ -69,6 +70,7 @@ class WorkoutController extends _$WorkoutController {
   bool get isActive => !isClosed;
   DatabaseService get service => ref.read(databaseServiceProvider);
   List<WorkoutExercisable> exercises = [];
+  late String nativeWorkoutId;
   late String name;
   late DateTime time;
   late String? parentID;
@@ -95,6 +97,8 @@ class WorkoutController extends _$WorkoutController {
     String? parentID,
     String? infobox, {
     bool saveInitial = true,
+    String? restoredNativeId,
+    DateTime? restoredStart,
   }) {
     _sessionGeneration++;
     _pendingInputSave?.cancel();
@@ -103,7 +107,8 @@ class WorkoutController extends _$WorkoutController {
     this.name = name;
     this.parentID = parentID;
     this.infobox = infobox;
-    time = ref.read(workoutClockProvider).now();
+    nativeWorkoutId = restoredNativeId ?? const Uuid().v4();
+    time = restoredStart ?? ref.read(workoutClockProvider).now();
     isContinuation = false;
     continuesID = null;
     _setCursor = null;
@@ -122,12 +127,30 @@ class WorkoutController extends _$WorkoutController {
         }
       },
     );
-    ref.read(nativeServiceProvider).setIsWorkoutRunning(true);
+    ref
+        .read(nativeServiceProvider)
+        .setIsWorkoutRunning(true, workoutId: nativeWorkoutId, start: time);
     if (saveInitial) save();
   }
 
   void restore(Map<String, dynamic> data) {
-    start(data['name'], data['parentID'], data['infobox'], saveInitial: false);
+    start(
+      data['name'],
+      data['parentID'],
+      data['infobox'],
+      saveInitial: false,
+      restoredNativeId:
+          data['nativeWorkoutId'] as String? ??
+          (data['time'] == null
+              ? null
+              : const Uuid().v5(
+                  Namespace.url.value,
+                  'gymtracker:ongoing:${service.db.currentUserId ?? 'guest'}:${data['time']}',
+                )),
+      restoredStart: data['time'] == null
+          ? null
+          : DateTime.fromMillisecondsSinceEpoch(data['time'] as int),
+    );
     exercises = (data['exercises'] as List)
         .map((el) => WorkoutExercisable.fromJson(el))
         .toList();
@@ -240,18 +263,20 @@ class WorkoutController extends _$WorkoutController {
     final generation = sessionGeneration;
     await _progressionWrite;
     if (!isSessionActive(generation)) return;
-    await persist(force: true);
+    // A suspended native recording is discarded. Recovery starts a new recording
+    // group so late callbacks/tombstones from the old account cannot affect it.
+    await persist(force: true, recoveryNativeId: const Uuid().v4());
     if (isSessionActive(generation)) _clear();
   }
 
-  Future<void> cancel() async {
+  Future<void> cancel({bool saveHealthWorkout = false}) async {
     if (isClosed) return;
     final owner = ownerId;
-    _clear();
+    _clear(saveHealthWorkout: saveHealthWorkout);
     await service.db.deleteOngoingForUser(owner);
   }
 
-  void _clear() {
+  void _clear({bool saveHealthWorkout = false}) {
     _sessionGeneration++;
     _pendingInputSave?.cancel();
     _inputSaveLifecycle?.dispose();
@@ -259,7 +284,14 @@ class WorkoutController extends _$WorkoutController {
     removeCountdown();
     removeRelevantStopwatches();
     state = null;
-    ref.read(nativeServiceProvider).setIsWorkoutRunning(false);
+    ref
+        .read(nativeServiceProvider)
+        .setIsWorkoutRunning(
+          false,
+          workoutId: nativeWorkoutId,
+          start: time,
+          save: saveHealthWorkout,
+        );
   }
 
   void setName(String value) {
@@ -710,13 +742,14 @@ class WorkoutController extends _$WorkoutController {
   /// Writes the ongoing workout to the database so that we can restore it on app restart.
   void save() => unawaited(persist());
 
-  Future<void> persist({bool force = false}) async {
+  Future<void> persist({bool force = false, String? recoveryNativeId}) async {
     _pendingInputSave?.cancel();
     _pendingInputSave = null;
     if (isClosed || ownerId != service.db.currentUserId) return;
     final stopwatchController = ref.read(stopwatchControllerProvider.notifier);
 
     await service.writeToOngoing({
+      "nativeWorkoutId": recoveryNativeId ?? nativeWorkoutId,
       "name": name,
       "exercises": exercises.map((ex) => ex.toJson()).toList(),
       "parentID": parentID,

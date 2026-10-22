@@ -80,14 +80,14 @@ class GymBroNativeHostAPI {
 
   final String pigeonVar_messageChannelSuffix;
 
-  Future<void> startWorkout() async {
+  Future<void> startWorkout(String workoutId, int startMilliseconds) async {
     final pigeonVar_channelName = 'dev.flutter.pigeon.gymtracker.GymBroNativeHostAPI.startWorkout$pigeonVar_messageChannelSuffix';
     final pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
       binaryMessenger: pigeonVar_binaryMessenger,
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(null);
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[workoutId, startMilliseconds]);
     final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
 
     _extractReplyValueOrThrow(
@@ -98,14 +98,14 @@ class GymBroNativeHostAPI {
     ;
   }
 
-  Future<void> stopWorkout() async {
+  Future<void> stopWorkout(String workoutId, bool save) async {
     final pigeonVar_channelName = 'dev.flutter.pigeon.gymtracker.GymBroNativeHostAPI.stopWorkout$pigeonVar_messageChannelSuffix';
     final pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
       binaryMessenger: pigeonVar_binaryMessenger,
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(null);
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[workoutId, save]);
     final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
 
     _extractReplyValueOrThrow(

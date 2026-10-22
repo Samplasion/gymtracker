@@ -1,106 +1,65 @@
-//
-//  SummaryView.swift
-//  Runner
-//
-//  Created by Francesco Arieti on 27/12/25.
-//
-
-import Foundation
 import HealthKit
-import HealthKitUI
 import SwiftUI
 
 struct SummaryView: View {
+    let workoutID: String
     @EnvironmentObject var workoutManager: WorkoutManager
-    @EnvironmentObject var workoutViewModel: WorkoutViewModel
-    @Environment(\.dismiss) var dismiss
-    @State private var activitySummary: HKActivitySummary?
+    @Environment(\.dismiss) private var dismiss
+    @State private var longWait = false
 
     var body: some View {
-        if let workout = workoutManager.workout {
-            ScrollView {
-                summaryListView(workout: workout)
-                    .scenePadding()
-            }
-            .navigationTitle("Summary")
-            .navigationBarTitleDisplayMode(.inline)
-            .task {
-                if activitySummary == nil, let workout = workoutManager.workout {
-                    await loadActivitySummary(for: workout, healthStore: workoutManager.healthStore)
+        ScrollView {
+            VStack(alignment: .leading) {
+                switch result {
+                case .saved(let workout):
+                    SummaryMetricView(title: "Total Time", value: duration(workout.duration))
+                        .foregroundStyle(.yellow)
+                    SummaryMetricView(title: "Total Energy", value: "\((workout.totalEnergyBurned?.doubleValue(for: .kilocalorie()) ?? 0).formatted(.number.precision(.fractionLength(1)))) kcal")
+                        .foregroundStyle(.pink)
+                    SummaryMetricView(title: "Avg. Heart Rate", value: "\(Int(workout.statistics(for: HKQuantityType(.heartRate))?.averageQuantity()?.doubleValue(for: .count().unitDivided(by: .minute())) ?? 0)) bpm")
+                        .foregroundStyle(.red)
+                    Text("Activity Rings")
+                    ActivityRingsView(healthStore: workoutManager.healthStore).frame(width: 50, height: 50)
+                case .saving:
+                    ProgressView("Saving Workout")
+                    if longWait { Text("Saving is taking longer than expected. You can close this screen.").font(.footnote) }
+                case .failed(let message):
+                    Text("Unable to save workout").font(.headline)
+                    Text(message).font(.footnote)
+                    if workoutManager.discardedWorkoutIDs.contains(workoutID) {
+                        Button("Retry") { workoutManager.retryDiscard(id: workoutID) }
+                    }
+                case .discarded:
+                    Text("Workout discarded")
                 }
+                Button("Done") { dismiss() }
             }
-        } else {
-            ProgressView("Saving Workout")
-//                .navigationBarHidden(true)
+            .scenePadding()
+        }
+        .navigationTitle("Summary")
+        .task {
+            do { try await Task.sleep(nanoseconds: 30_000_000_000) }
+            catch { return }
+            longWait = true
         }
     }
-    
-    @ViewBuilder
-    private func summaryListView(workout: HKWorkout) -> some View {
-        VStack(alignment: .leading) {
-            SummaryMetricView(title: LocalizedStringKey("Total Time"), value: stringFromTimeInterval(workoutViewModel.workoutStart!.timeIntervalSince(workout.endDate)))
-                .foregroundStyle(.yellow)
-            
-            SummaryMetricView(title: LocalizedStringKey("Total Energy"), value: "\((workout.totalEnergyBurned ?? HKQuantity(unit: .kilocalorie(), doubleValue: 0)).doubleValue(for: .kilocalorie()).formatted(.number.precision(.fractionLength(1)))) kcal")
-                .foregroundStyle(.pink)
-            
-            if #available(watchOS 9.0, *) {
-                SummaryMetricView(title: LocalizedStringKey("Avg. Heart Rate"), value: "\(Int(workout.statistics(for: HKQuantityType(.heartRate))?.averageQuantity()?.doubleValue(for: HKUnit.count().unitDivided(by: .minute())).rounded() ?? 0)) bpm")
-                    .foregroundStyle(.red)
-            }
-            
-            Group {
-                Text("Activity Rings")
-                ActivityRingsView(healthStore: workoutManager.healthStore)
-                    .frame(width: 50, height: 50)
-                Button {
-                    dismiss()
-                } label: {
-                    Text("Done")
-                }
-            }
-        }
-    }
-    
-    private func stringFromTimeInterval(_ timeInterval: TimeInterval) -> String {
-        let endingDate = Date()
-        let startingDate = endingDate.addingTimeInterval(-timeInterval)
-        let calendar = Calendar.current
 
-        var componentsNow = calendar.dateComponents([.hour, .minute, .second], from: startingDate, to: endingDate)
-        if let hour = componentsNow.hour, let minute = componentsNow.minute, let seconds = componentsNow.second {
-            return "\(pad(Int(hour.magnitude))):\(pad(Int(minute.magnitude))):\(pad(Int(seconds.magnitude)))"
-        } else {
-            return "00:00:00"
-        }
+    private var result: WorkoutSummary.Result {
+        guard let summary = workoutManager.summary, summary.id == workoutID else { return .saving }
+        return summary.result
     }
-    private func pad(_ v: Int) -> String { return (v < 10) ? "0\(v)" : "\(v)" }
-    
-    private func loadActivitySummary(for workout: HKWorkout, healthStore: HKHealthStore) async {
-        let calendar = Calendar.current
-        let date = calendar.dateComponents([.year, .month, .day, .calendar], from: workout.startDate)
-        let predicate = HKQuery.predicate(forActivitySummariesBetweenStart: date, end: date)
-        let query = HKActivitySummaryQuery(predicate: predicate) { _, summaries, _ in
-            if let summary = summaries?.first {
-                DispatchQueue.main.async {
-                    self.activitySummary = summary
-                }
-            }
-        }
-        healthStore.execute(query)
+    private func duration(_ interval: TimeInterval) -> String {
+        let seconds = max(0, Int(interval))
+        return String(format: "%02d:%02d:%02d", seconds / 3600, (seconds / 60) % 60, seconds % 60)
     }
 }
 
 struct SummaryMetricView: View {
     var title: LocalizedStringKey
     var value: String
-
     var body: some View {
         Text(title)
-            .foregroundStyle(.foreground)
-        Text(value)
-            .font(.system(.title2, design: .rounded).lowercaseSmallCaps())
+        Text(value).font(.system(.title2, design: .rounded).lowercaseSmallCaps())
         Divider()
     }
 }
-

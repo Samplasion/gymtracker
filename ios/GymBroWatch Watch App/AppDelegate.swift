@@ -21,7 +21,9 @@ class GBAppDelegate: NSObject, WKApplicationDelegate {
         super.init()
         
         WorkoutManager.shared.listener = self
+        WorkoutManager.shared.onAuthorizationChanged = { [weak self] in self?.workoutViewModel.requestFreshData() }
         PhoneMessageResponder.shared.workoutDelegate = workoutViewModel
+        PhoneMessageResponder.shared.session = session
         PhoneMessageResponder.shared.foodDelegate = foodViewModel
         
         session?.delegate = self
@@ -32,35 +34,19 @@ class GBAppDelegate: NSObject, WKApplicationDelegate {
         
     }
     
-    // Attempt dangling workout recovery
+    // HealthKit launch only wakes the UI; the phone handshake owns sensor creation.
     func handle(_ workoutConfiguration: HKWorkoutConfiguration) {
-        log("Handling active workout recovery... (handle(_:)")
-        if #available(watchOS 10.0, *) {
-            Task {
-                do {
-                    WorkoutManager.shared.resetWorkout()
-                    try await WorkoutManager.shared.startWorkout(workoutConfiguration: workoutConfiguration)
-                    log("Successfully started workout")
-                } catch {
-                    log("Failed started workout")
-                }
-            }
-        } else {
-            log("watchOS 10.0 not available")
-        }
+        Task { @MainActor in workoutViewModel.requestFreshData() }
     }
-    
+
     func handleActiveWorkoutRecovery() {
-        log("Handling active workout recovery... (handleActiveWorkoutRecovery())")
-        if #available(watchOS 10.0, *) {
-            Task {
-                let session = try await WorkoutManager.shared.healthStore.recoverActiveWorkoutSession()
-                guard let session = session else {
-                    log("Session object is null")
-                    return
+        WorkoutManager.shared.enqueue {
+            do {
+                if let recovered = try await WorkoutManager.shared.healthStore.recoverActiveWorkoutSession() {
+                    try await WorkoutManager.shared.recoverWorkout(with: recovered)
                 }
-                try await WorkoutManager.shared.recoverWorkout(with: session)
-            }
+                self.workoutViewModel.requestFreshData()
+            } catch { self.log("Workout recovery failed: \(error)") }
         }
     }
 }
@@ -75,6 +61,10 @@ extension GBAppDelegate: WCSessionDelegate {
         session?.sendMessage(["method": "log", "message": message], replyHandler: nil);
     }
     
+    func session(_ session: WCSession, didReceiveMessage message: [String : Any], replyHandler: @escaping ([String: Any]) -> Void) {
+        PhoneMessageResponder.shared.receiveCommand(message, reply: replyHandler)
+    }
+
     func session(_ session: WCSession, didReceiveMessage message: [String : Any]) {
         PhoneMessageResponder.shared.session(session, didReceiveMessage: message)
     }
@@ -93,11 +83,20 @@ extension GBAppDelegate: WCSessionDelegate {
 }
 
 extension GBAppDelegate: WorkoutMetricsListener {
+    private func sendMetrics() {
+        Task { @MainActor in
+            let manager = WorkoutManager.shared
+            guard let id = manager.request?.id, session?.isReachable == true else { return }
+            session?.sendMessage(["method": "workoutMetrics", "workoutId": id, "generation": manager.generation,
+                "energy": manager.activeEnergy, "heartRate": manager.heartRate], replyHandler: nil)
+        }
+    }
+
     func handleActiveEnergyUpdate(_ activeEnergy: Double) {
-        session?.sendMessage(["method": "workoutMetrics", "energy": activeEnergy], replyHandler: nil);
+        sendMetrics()
     }
     
     func handleHeartRateUpdate(_ heartRate: Double) {
-        session?.sendMessage(["method": "workoutMetrics", "heartRate": heartRate], replyHandler: nil);
+        sendMetrics()
     }
 }

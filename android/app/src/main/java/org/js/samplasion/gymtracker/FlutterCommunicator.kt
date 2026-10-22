@@ -61,8 +61,8 @@ private open class FlutterCommunicatorPigeonCodec : StandardMessageCodec() {
 
 /** Generated interface from Pigeon that represents a handler of messages from Flutter. */
 interface GymBroNativeHostAPI {
-  fun startWorkout()
-  fun stopWorkout()
+  fun startWorkout(workoutId: String, startMilliseconds: Long)
+  fun stopWorkout(workoutId: String, save: Boolean)
   fun setExerciseParameters(parameters: Map<String?, Any?>)
   fun updateHomeWidgetParameters(parameters: Map<String, Long>, workoutDensityChartData: List<Long>)
   fun requestHealthPermission()
@@ -81,9 +81,12 @@ interface GymBroNativeHostAPI {
       run {
         val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.gymtracker.GymBroNativeHostAPI.startWorkout$separatedMessageChannelSuffix", codec)
         if (api != null) {
-          channel.setMessageHandler { _, reply ->
+          channel.setMessageHandler { message, reply ->
+            val args = message as List<Any?>
+            val workoutIdArg = args[0] as String
+            val startMillisecondsArg = args[1] as Long
             val wrapped: List<Any?> = try {
-              api.startWorkout()
+              api.startWorkout(workoutIdArg, startMillisecondsArg)
               listOf(null)
             } catch (exception: Throwable) {
               FlutterCommunicatorPigeonUtils.wrapError(exception)
@@ -97,9 +100,12 @@ interface GymBroNativeHostAPI {
       run {
         val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.gymtracker.GymBroNativeHostAPI.stopWorkout$separatedMessageChannelSuffix", codec)
         if (api != null) {
-          channel.setMessageHandler { _, reply ->
+          channel.setMessageHandler { message, reply ->
+            val args = message as List<Any?>
+            val workoutIdArg = args[0] as String
+            val saveArg = args[1] as Boolean
             val wrapped: List<Any?> = try {
-              api.stopWorkout()
+              api.stopWorkout(workoutIdArg, saveArg)
               listOf(null)
             } catch (exception: Throwable) {
               FlutterCommunicatorPigeonUtils.wrapError(exception)

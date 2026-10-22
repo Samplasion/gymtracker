@@ -92,11 +92,11 @@ class MainActivity: FlutterFragmentActivity() {
             .setOnlyAlertOnce(true)
             .setCategory(NotificationCompat.CATEGORY_WORKOUT)
 
-        override fun startWorkout() {
+        override fun startWorkout(workoutId: String, startMilliseconds: Long) {
             createOrUpdateOngoingLiveNotification()
         }
 
-        override fun stopWorkout() {
+        override fun stopWorkout(workoutId: String, save: Boolean) {
             removeOngoingLiveNotification()
         }
 

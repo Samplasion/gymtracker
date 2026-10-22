@@ -465,7 +465,7 @@ extension WorkoutPresentation on WorkoutController {
     SchedulerBinding.instance.addPostFrameCallback((timeStamp) async {
       if (!isSessionActive(generation)) return;
       Go.back();
-      await cancel();
+      await cancel(saveHealthWorkout: true);
       final completionGeneration = sessionGeneration;
       await askToUpdateRoutine(
         workout,

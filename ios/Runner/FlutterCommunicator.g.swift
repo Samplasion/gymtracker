@@ -101,8 +101,8 @@ class FlutterCommunicatorPigeonCodec: FlutterStandardMessageCodec, @unchecked Se
 
 /// Generated protocol from Pigeon that represents a handler of messages from Flutter.
 protocol GymBroNativeHostAPI {
-  func startWorkout() throws
-  func stopWorkout() throws
+  func startWorkout(workoutId: String, startMilliseconds: Int64) throws
+  func stopWorkout(workoutId: String, save: Bool) throws
   func setExerciseParameters(parameters: [String?: Any?]) throws
   func updateHomeWidgetParameters(parameters: [String: Int64], workoutDensityChartData: [Int64]) throws
   func requestHealthPermission() throws
@@ -118,9 +118,12 @@ class GymBroNativeHostAPISetup {
     let channelSuffix = messageChannelSuffix.count > 0 ? ".\(messageChannelSuffix)" : ""
     let startWorkoutChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.gymtracker.GymBroNativeHostAPI.startWorkout\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
     if let api = api {
-      startWorkoutChannel.setMessageHandler { _, reply in
+      startWorkoutChannel.setMessageHandler { message, reply in
+        let args = message as! [Any?]
+        let workoutIdArg = args[0] as! String
+        let startMillisecondsArg = args[1] as! Int64
         do {
-          try api.startWorkout()
+          try api.startWorkout(workoutId: workoutIdArg, startMilliseconds: startMillisecondsArg)
           reply(wrapResult(nil))
         } catch {
           reply(wrapError(error))
@@ -131,9 +134,12 @@ class GymBroNativeHostAPISetup {
     }
     let stopWorkoutChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.gymtracker.GymBroNativeHostAPI.stopWorkout\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
     if let api = api {
-      stopWorkoutChannel.setMessageHandler { _, reply in
+      stopWorkoutChannel.setMessageHandler { message, reply in
+        let args = message as! [Any?]
+        let workoutIdArg = args[0] as! String
+        let saveArg = args[1] as! Bool
         do {
-          try api.stopWorkout()
+          try api.stopWorkout(workoutId: workoutIdArg, save: saveArg)
           reply(wrapResult(nil))
         } catch {
           reply(wrapError(error))

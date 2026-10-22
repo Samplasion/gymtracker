@@ -6,18 +6,21 @@
 //
 
 import Foundation
+import Combine
 
 fileprivate let key: String = "foodParameters"
 
 @MainActor
 class FoodViewModel: NSObject, ObservableObject {
+    private let defaults: UserDefaults?
     @Published var lastUpdated = Date.now
     @Published var calorieGoal: Double = 2000
     @Published var calorieIntake: Double = 0
     @Published var categories: [NativeFoodCategory] = []
     @Published var totalNutritionSplit: NativeFoodNutritionSplit = .init(protein: 0, proteinGoal: 1, carbs: 0, carbsGoal: 1, fats: 0, fatsGoal: 1)
     
-    override init() {
+    init(defaults: UserDefaults? = UserDefaults(suiteName: "group.samplasion.gymtracker")) {
+        self.defaults = defaults
         super.init()
         restoreSavedData()
     }
@@ -32,7 +35,7 @@ class FoodViewModel: NSObject, ObservableObject {
     }
     
     func save() {
-        guard let defaults = UserDefaults(suiteName: "group.samplasion.gymtracker") else {
+        guard let defaults else {
             return
         }
         
@@ -48,11 +51,11 @@ class FoodViewModel: NSObject, ObservableObject {
         }
         
         defaults.set(jsonString, forKey: key)
-        defaults.set(lastUpdated.millisecondsSinceEpoch, forKey: "_\(key)")
+        defaults.set(Int64(lastUpdated.timeIntervalSince1970 * 1000), forKey: "_\(key)")
     }
     
     func restoreSavedData() {
-        guard let defaults = UserDefaults(suiteName: "group.samplasion.gymtracker") else {
+        guard let defaults else {
             return
         }
         
@@ -81,25 +84,20 @@ class FoodViewModel: NSObject, ObservableObject {
             }
         }
         
-        DispatchQueue.main.async {
-            self.calorieGoal = newCalorieGoal
-            self.calorieIntake = newCalorieIntake
-            self.categories = newCategories
-            self.totalNutritionSplit = newTotalNutritionSplit
-            
-            self.update()
-        }
+        calorieGoal = newCalorieGoal
+        calorieIntake = newCalorieIntake
+        categories = newCategories
+        totalNutritionSplit = newTotalNutritionSplit
+        update()
     }
 }
 
 extension FoodViewModel: FoodMessageDelegate {
     func set(foodParameters: NativeFoodStateMessage) {
-//        DispatchQueue.main.async {
-//            self.calorieGoal = foodParameters.calorieGoal
-//            self.calorieIntake = foodParameters.calorieIntake
-//            self.categories = foodParameters.categories
-//            self.totalNutritionSplit = foodParameters.totalNutritionSplit
-//            self.update()
-//        }
+        calorieGoal = foodParameters.calorieGoal
+        calorieIntake = foodParameters.calorieIntake
+        categories = foodParameters.categories
+        totalNutritionSplit = foodParameters.totalNutritionSplit
+        update()
     }
 }

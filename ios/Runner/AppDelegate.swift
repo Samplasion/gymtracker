@@ -12,6 +12,7 @@ import flutter_app_intents
 @main
 @objc class AppDelegate: FlutterAppDelegate, FlutterImplicitEngineDelegate {
     var session: WCSession?
+    private var latestFoodParameters: [String: Any]?
     var flutterNativeApi: GymBroNativeFlutterAPI?
     var applicationContext: TypedApplicationContext = TypedApplicationContext(isRunning: false, hasExercise: false, percentageDone: 0)
     var logger: FlutterLogger?;
@@ -185,7 +186,11 @@ extension AppDelegate: WCSessionDelegate {
         logger!.log("Activated session with activationState: \(activationState)")
         // Request fresh data from the app
         do {
-            try session.updateApplicationContext(applicationContext.toDictionary())
+            if let parameters = latestFoodParameters {
+                try updateFoodParameters(parameters: parameters)
+            } else if session.applicationContext["kind"] as? String != "food" {
+                try session.updateApplicationContext(applicationContext.toDictionary())
+            }
         } catch {
             logger!.error("Error updating application context: \(error)")
         }
@@ -197,6 +202,16 @@ extension AppDelegate: WCSessionDelegate {
     
     func sessionDidDeactivate(_ session: WCSession) {
         logger!.log("Watch session deactivated")
+        session.activate()
+    }
+
+    func sessionWatchStateDidChange(_ session: WCSession) {
+        guard let parameters = latestFoodParameters else { return }
+        do {
+            try updateFoodParameters(parameters: parameters)
+        } catch {
+            logger?.error("Error updating food context after Watch state change: \(error)")
+        }
     }
     
     func session(_ session: WCSession, didReceiveMessage message: [String : Any]) {
@@ -475,13 +490,18 @@ extension AppDelegate: WorkoutMetricsListener {
 extension AppDelegate {
     func updateFoodParameters(parameters: [String? : Any?]) throws {
         if let parameters = parameters as? [String: Any] {
+            latestFoodParameters = parameters
             let msg = [
                 "kind": "food",
                 "parameters": parameters
             ] as [String : Any];
-            if session?.activationState == .activated {
-                session?.transferUserInfo(msg)
-                try? session?.updateApplicationContext(msg)
+            if let session,
+               session.activationState == .activated,
+               session.isPaired,
+               session.isWatchAppInstalled {
+                // Nutrition is a replaceable snapshot, not a queue of events.
+                // Keep only the newest state while the Watch is unavailable.
+                try session.updateApplicationContext(msg)
             }
         }
     }

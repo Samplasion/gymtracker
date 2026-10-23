@@ -1,0 +1,8 @@
+{
+  "imports": { "jose": "npm:jose@6.1.3" },
+  "compilerOptions": { "strict": true },
+  "tasks": {
+    "check": "deno check index.ts",
+    "test": "deno test --allow-env *_test.ts"
+  }
+}

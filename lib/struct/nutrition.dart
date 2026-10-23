@@ -109,7 +109,10 @@ class ServingSize {
   const ServingSize({this.name, required this.amount});
 
   factory ServingSize.fromJson(Map<String, dynamic> json) {
-    return ServingSize(name: json['name'], amount: json['amount']);
+    return ServingSize(
+      name: json['name'],
+      amount: (json['amount'] as num).toDouble(),
+    );
   }
 
   @override
@@ -251,7 +254,7 @@ class Food extends VagueFood {
       servingSizes: (json['servingSizes'] as List)
           .map((e) => ServingSize.fromJson(e))
           .toList(),
-      amount: json['amount'],
+      amount: (json['amount'] as num).toDouble(),
       isDownloaded: json['isDownloaded'] ?? false,
       barcode: json['barcode'],
       unit: deserializeUnit(json['unit'] ?? 'g'),

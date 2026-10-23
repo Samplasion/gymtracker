@@ -18,22 +18,249 @@ export const setSchema = z.strictObject({
   distance: nonnegative.max(100000).optional(),
   rpe: z.number().min(1).max(10).optional(),
 });
+export const progressionSchema = z.strictObject({
+  mode: z.enum(["doubleProgression", "cyclicLinear"]),
+  minReps: z.number().int().positive().max(100000),
+  maxReps: z.number().int().positive().max(100000),
+  repsPerStep: z.number().int().positive().max(100000),
+  startingWeight: nonnegative.max(100000),
+  weightPerStep: z.number().positive().max(100000),
+  weightPerCycle: nonnegative.max(100000),
+  cycle: nonnegative.int().max(100000).default(0),
+  step: nonnegative.int().max(100000).default(0),
+  targetReps: z.array(z.number().int().positive().max(100000)).max(100)
+    .optional(),
+});
+export const simpleExerciseSchema = z.strictObject({
+  type: z.literal("exercise").optional(),
+  exerciseRef,
+  notes: text,
+  restSeconds: nonnegative.int().max(86400).default(0),
+  rpe: z.number().int().min(1).max(10).optional(),
+  progression: progressionSchema.optional(),
+  sets: z.array(setSchema).max(100),
+}).superRefine((entry, ctx) => {
+  const p = entry.progression;
+  if (!p) return;
+  const issue = (path: string, message: string) =>
+    ctx.addIssue({ code: "custom", path: ["progression", path], message });
+  const normal = entry.sets.filter((s) => s.kind === "normal").length;
+  if (normal === 0) {
+    issue("setCount", "Progression requires normal working sets");
+  }
+  if (p.maxReps < p.minReps) issue("maxReps", "Must be at least minReps");
+  if (
+    p.mode === "cyclicLinear" && (p.maxReps - p.minReps) % p.repsPerStep !== 0
+  ) issue("repsPerStep", "Must divide the rep range");
+  if (p.step >= Math.floor((p.maxReps - p.minReps) / p.repsPerStep) + 1) {
+    issue("step", "Step outside cycle");
+  }
+  if (
+    p.targetReps &&
+    (p.targetReps.length !== normal ||
+      p.targetReps.some((n) => n < p.minReps || n > p.maxReps))
+  ) {
+    issue(
+      "targetReps",
+      "One in-range target per normal working set is required",
+    );
+  }
+});
+export const entrySchema = z.union([
+  simpleExerciseSchema,
+  z.strictObject({
+    type: z.literal("superset"),
+    notes: text,
+    restSeconds: nonnegative.int().max(86400).default(0),
+    exercises: z.array(simpleExerciseSchema).min(2).max(100),
+  }),
+]);
+export const routineSchema = z.strictObject({
+  name,
+  notes: text,
+  weightUnit: z.enum(["kg", "lb"]).default("kg"),
+  distanceUnit: z.enum(["km", "mi"]).default("km"),
+  exercises: z.array(entrySchema).min(1).max(100),
+});
 export const programSchema = z.strictObject({
   name,
   notes: text,
-  routines: z.array(z.strictObject({
-    name,
-    notes: text,
-    weightUnit: z.enum(["kg", "lb"]).default("kg"),
-    distanceUnit: z.enum(["km", "mi"]).default("km"),
-    exercises: z.array(z.strictObject({
-      exerciseRef,
-      notes: text,
-      restSeconds: nonnegative.int().max(86400).default(0),
-      sets: z.array(setSchema).max(100),
-    })).min(1).max(100),
-  })).min(1).max(31),
+  routines: z.array(routineSchema).min(1).max(31),
 });
+export const dateSchema = z.iso.date().refine(
+  (d) => d >= "2000-01-01" && d <= "2099-12-31",
+  "Date outside supported range",
+);
+export const idsSchema = z.array(z.string().min(1).max(300)).min(1).max(20);
+export const cursorPage = {
+  cursor: z.string().max(2000).optional(),
+  limit: z.number().int().min(1).max(100).default(20),
+};
+export const dateRange = { from: dateSchema, to: dateSchema };
+export const foodRef = z.strictObject({
+  source: z.enum(["openfoodfacts", "favorite", "customBarcode"]),
+  id: z.string().min(1).max(300),
+});
+export const nutrientNames = [
+  "calories",
+  "fat",
+  "saturatedFat",
+  "carbs",
+  "sugar",
+  "protein",
+  "salt",
+  "sodium",
+  "fiber",
+  "addedSugars",
+  "caffeine",
+  "calcium",
+  "iron",
+  "vitaminC",
+  "magnesium",
+  "phosphorus",
+  "potassium",
+  "zinc",
+  "copper",
+  "selenium",
+  "vitaminA",
+  "vitaminE",
+  "vitaminD",
+  "vitaminB1",
+  "vitaminB2",
+  "vitaminPP",
+  "vitaminB6",
+  "vitaminB12",
+  "vitaminB9",
+  "vitaminK",
+  "cholesterol",
+  "butyricAcid",
+  "caproicAcid",
+  "caprylicAcid",
+  "capricAcid",
+  "lauricAcid",
+  "myristicAcid",
+  "palmiticAcid",
+  "stearicAcid",
+  "oleicAcid",
+  "linoleicAcid",
+  "docosahexaenoicAcid",
+  "eicosapentaenoicAcid",
+  "erucicAcid",
+  "monounsaturatedFat",
+  "polyunsaturatedFat",
+  "alcohol",
+  "pantothenicAcid",
+  "biotin",
+  "chloride",
+  "chromium",
+  "fluoride",
+  "iodine",
+  "manganese",
+  "molybdenum",
+  "omega3",
+  "omega6",
+  "omega9",
+  "betaCarotene",
+  "bicarbonate",
+  "sugarAlcohol",
+  "alphaLinolenicAcid",
+  "arachidicAcid",
+  "arachidonicAcid",
+  "behenicAcid",
+  "ceroticAcid",
+  "dihomoGammaLinolenicAcid",
+  "elaidicAcid",
+  "gammaLinolenicAcid",
+  "gondoicAcid",
+  "lignocericAcid",
+  "meadAcid",
+  "melissicAcid",
+  "montanicAcid",
+  "nervonicAcid",
+  "transFat",
+] as const;
+export const nutrientUnits: Record<string, string> = Object.fromEntries(
+  nutrientNames.map((k) => [k, "g"]),
+);
+Object.assign(nutrientUnits, { calories: "kcal", alcohol: "%" });
+for (
+  const k of [
+    "calcium",
+    "iron",
+    "vitaminC",
+    "magnesium",
+    "phosphorus",
+    "potassium",
+    "zinc",
+    "copper",
+    "vitaminE",
+    "vitaminB1",
+    "vitaminB2",
+    "vitaminPP",
+    "vitaminB6",
+    "cholesterol",
+    "pantothenicAcid",
+    "chloride",
+    "fluoride",
+    "manganese",
+    "omega3",
+    "omega6",
+    "omega9",
+    "bicarbonate",
+  ]
+) nutrientUnits[k] = "mg";
+for (
+  const k of [
+    "selenium",
+    "vitaminA",
+    "vitaminD",
+    "vitaminB12",
+    "vitaminB9",
+    "vitaminK",
+    "biotin",
+    "chromium",
+    "iodine",
+    "molybdenum",
+  ]
+) nutrientUnits[k] = "µg";
+export const nutrientsSchema = z.strictObject(
+  Object.fromEntries(
+    nutrientNames.map((
+      key,
+      i,
+    ) => [
+      key,
+      (i < 6
+        ? nonnegative.max(1e9)
+        : nonnegative.max(1e9).nullable().optional()).describe(
+          `${nutrientUnits[key]} per 100g or 100ml`,
+        ),
+    ]),
+  ),
+);
+export const foodDefinition = z.strictObject({
+  name,
+  brand: z.string().max(200).optional(),
+  unit: z.enum(["g", "ml"]),
+  nutritionalValuesPer100g: nutrientsSchema,
+  servingSizes: z.array(
+    z.strictObject({
+      name: z.string().max(200).optional(),
+      amount: z.number().positive().max(1e6),
+    }),
+  ).max(100).default([]),
+});
+export const foodLogSchema = z.strictObject({
+  date: dateSchema,
+  category: z.string().min(1).max(200).optional(),
+  amount: z.number().positive().max(1e6),
+  pieces: z.number().int().positive().max(10000).default(1),
+  foodRef: foodRef.optional(),
+  food: foodDefinition.optional(),
+}).refine(
+  (v) => !!v.foodRef !== !!v.food,
+  "Supply foodRef or food, exclusively",
+);
 export const pagination = {
   offset: nonnegative.int().max(1000000).default(0),
   limit: z.number().int().min(1).max(100).default(20),

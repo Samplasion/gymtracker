@@ -1,3 +1,5 @@
+import { registerExtensions } from "./extensions.ts";
+import { routineView } from "./views.ts";
 import { createMcpHandler, McpServer } from "@modelcontextprotocol/server";
 import { z } from "zod";
 import { challenge, type Config, protectedResource } from "./auth.ts";
@@ -17,44 +19,96 @@ import {
 
 type Rpc = (name: string, args?: Record<string, unknown>) => Promise<unknown>;
 export function database(config: Config, token: string): Rpc {
-  return async (name, args = {}) => {
-    const response = await fetch(`${config.supabaseUrl}/rest/v1/rpc/${name}`, {
-      method: "POST",
-      headers: {
-        apikey: config.publicKey,
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
+  const service = async (action: string, args: Record<string, unknown>) => {
+    const response = await fetch(
+      `${config.supabaseUrl}/functions/v1/mcp-services`,
+      {
+        method: "POST",
+        headers: {
+          apikey: config.publicKey,
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ action, ...args }),
+        signal: AbortSignal.timeout(20000),
       },
-      body: JSON.stringify(args),
-      signal: AbortSignal.timeout(15000),
-    });
+    );
+    const body = await response.json().catch(() => ({}));
+    if (!response.ok) {
+      throw new ToolError(
+        body.error ?? "external_service_unavailable",
+        "Gym Bro service unavailable",
+      );
+    }
+    return body;
+  };
+  return async (name, args = {}) => {
+    if (name.startsWith("@")) return service(name.slice(1), args);
+    const perform = () =>
+      fetch(`${config.supabaseUrl}/rest/v1/rpc/${name}`, {
+        method: "POST",
+        headers: {
+          apikey: config.publicKey,
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(args),
+        signal: AbortSignal.timeout(15000),
+      });
+    let response = await perform();
+    if (!response.ok) {
+      const error = await response.clone().json().catch(() => ({}));
+      if (error.code === "P1002") {
+        await service("billing", {});
+        response = await perform();
+      }
+    }
+
     if (!response.ok) {
       const body = await response.json().catch(() => ({}));
-      const code = body.code === "42501" || response.status === 401
-        ? "authentication_required"
-        : body.code === "P0002"
-        ? "reference_unavailable"
-        : body.code === "23505"
-        ? "idempotency_conflict"
-        : ["22023", "22P02", "23502", "23514"].includes(body.code)
-        ? "invalid_input"
-        : "server_error";
+      const custom: Record<string, string> = {
+        P1001: "consent_required",
+        P1002: "billing_unavailable",
+        P1003: "pro_required",
+        P1004: "plan_limit_exceeded",
+      };
+      const code = custom[body.code] ??
+        (body.code === "42501" || response.status === 401
+          ? "authentication_required"
+          : body.code === "P0002"
+          ? "reference_unavailable"
+          : body.code === "23505"
+          ? "idempotency_conflict"
+          : ["22023", "22P02", "23502", "23514"].includes(body.code)
+          ? "invalid_input"
+          : "server_error");
       throw new ToolError(
         code,
         code === "server_error"
           ? "Gym Bro temporarily unavailable"
+          : code === "consent_required"
+          ? `Approve expanded access at ${config.siteOrigin}/oauth/capabilities`
           : code.replaceAll("_", " "),
       );
     }
     return await response.json();
   };
 }
-const content = (value: Record<string, unknown>) => ({
-  structuredContent: value,
-  content: [{ type: "text" as const, text: JSON.stringify(value) }],
-});
+const content = (value: Record<string, unknown>) => {
+  const serialized = JSON.stringify(value);
+  if (new TextEncoder().encode(serialized).length > 1048576) {
+    throw new ToolError(
+      "result_too_large",
+      "Narrow the date interval, ID batch or page size",
+    );
+  }
+  return ({
+    structuredContent: value,
+    content: [{ type: "text" as const, text: serialized }],
+  });
+};
 export function mcpServer(config: Config, rpc: Rpc) {
-  const server = new McpServer({ name: "gym-bro", version: "0.1.0" });
+  const server = new McpServer({ name: "gym-bro", version: "0.2.0" });
   const securitySchemes = [{ type: "oauth2", scopes: ["openid"] }];
   const read = {
     readOnlyHint: true,
@@ -69,6 +123,9 @@ export function mcpServer(config: Config, rpc: Rpc) {
       } catch (error) {
         const known = error instanceof ToolError;
         const code = known ? error.code : "server_error";
+        console.warn(
+          JSON.stringify({ service: "mcp", event: "tool_error", code }),
+        );
         return {
           ...content({
             error: {
@@ -152,57 +209,12 @@ export function mcpServer(config: Config, rpc: Rpc) {
       const routine = await rpc("mcp_get_routine", {
         routine_id: args.id,
       }) as Record<string, unknown>;
-      const raw = routine.exercises as Record<string, unknown>[];
-      return {
-        id: routine.id,
-        name: routine.name,
-        notes: routine.infobox,
-        weightUnit: routine.weight_unit,
-        distanceUnit: routine.distance_unit,
-        folderId: routine.folder_id,
-        exercises: raw.map((e) => {
-          const standard = standardExercises.find((d) =>
-            d.id === e.library_exercise_id
-          );
-          return {
-            id: e.id,
-            name: standard
-              ? displayExercise(standard, args.language).name
-              : e.name,
-            exerciseRef: e.is_superset ? null : {
-              source: e.is_custom ? "custom" : "standard",
-              id: e.is_custom ? e.custom_exercise_id : e.library_exercise_id,
-            },
-            parameters: e.parameters,
-            primaryMuscleGroup: e.primary_muscle_group,
-            secondaryMuscleGroups: e.secondary_muscle_groups ?? [],
-            equipment: e.equipment,
-            restSeconds: e.rest_time ?? 0,
-            notes: e.notes ?? "",
-            isSuperset: e.is_superset,
-            supersetId: e.superset_id,
-            supersedesId: e.supersedes_id,
-            rpe: e.rpe,
-            progression: e.progression,
-            sets: ((e.sets ?? []) as Record<string, unknown>[]).map((s) => ({
-              id: s.id,
-              kind: s.kind,
-              parameters: s.parameters,
-              reps: s.reps,
-              weight: s.weight,
-              timeSeconds: Number(s.time ?? 0) / 1000000,
-              distance: s.distance,
-              rpe: s.rpe,
-              done: s.done,
-            })),
-          };
-        }),
-      };
+      return routineView(routine, args.language);
     })());
   server.registerTool("create_program", {
     title: "Save a complete training program",
     description:
-      "After the user requests saving the proposed program, create one new folder and all its daily routines atomically. Resolve exercises first. Reuse the same UUID idempotencyKey and identical program on retries. Omitted weight means zero, not a prescribed load. Creation supports simple exercises, not supersets or progressions; setless exercises have an empty sets array.",
+      "After the user requests saving the proposed program, save the daily routines atomically; Pro creates a folder, Free saves them in the home within its four-routine limit. Resolve exercises first. Reuse the same UUID idempotencyKey and identical program on retries. Omitted weight means zero, not a prescribed load. Creation supports supersets and valid double/cyclic-linear progression; setless exercises have an empty sets array.",
     inputSchema: z.strictObject({
       idempotencyKey: z.uuid(),
       program: programSchema,
@@ -216,6 +228,7 @@ export function mcpServer(config: Config, rpc: Rpc) {
         idempotency_key: args.idempotencyKey,
       }) as Record<string, unknown>;
     })());
+  registerExtensions(server, rpc, config, { read, securitySchemes, wrap });
   return server;
 }
 export function createHandler(

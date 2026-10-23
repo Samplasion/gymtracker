@@ -30,4 +30,15 @@ docker exec -i "$container" psql -h 127.0.0.1 -U supabase_admin -d postgres -v O
 docker exec -i "$container" psql -h 127.0.0.1 -U supabase_admin -d postgres -v ON_ERROR_STOP=1 < test/backend/friend_request_notifications.sql
 
 docker exec -i "$container" psql -h 127.0.0.1 -U supabase_admin -d postgres -v ON_ERROR_STOP=1 < test/backend/mcp.sql
+expanded_log=$(mktemp)
+docker exec -i "$container" psql -h 127.0.0.1 -U supabase_admin -d postgres -v ON_ERROR_STOP=1 < test/backend/mcp_capabilities.sql | tee "$expanded_log"
+if [ -n "${MCP_EXPANDED_COMPATIBILITY_FIXTURE:-}" ]; then
+ python3 - "$expanded_log" "$MCP_EXPANDED_COMPATIBILITY_FIXTURE" <<'PYFIXTURE'
+import json, sys
+from pathlib import Path
+line = next(line for line in Path(sys.argv[1]).read_text().splitlines() if line.startswith('MCP_EXPANDED_FIXTURE:'))
+Path(sys.argv[2]).write_text(json.dumps(json.loads(line.split(':', 1)[1]), indent=2) + '\n')
+PYFIXTURE
+fi
+rm -f "$expanded_log"
 bash tools/test_mcp_concurrency.sh "$container"

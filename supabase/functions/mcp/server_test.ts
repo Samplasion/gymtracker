@@ -43,6 +43,9 @@ const handler = createHandler(config, (token) => {
   return Promise.resolve();
 }, () => (name, args = {}) => {
   called.push({ name, args });
+  if (name === "mcp_execute" && args.operation === "search_foods") {
+    return Promise.resolve({ items: [], nextCursor: null });
+  }
   if (name === "mcp_custom_exercises") return Promise.resolve([custom]);
   if (name === "mcp_create_program") {
     return Promise.resolve({ folderId: "folder", routines: [{ id: "day1" }] });
@@ -103,7 +106,7 @@ Deno.test("public discovery and authenticated transport do not expose tools anon
     403,
   );
 });
-Deno.test("real MCP SDK initializes and exposes exactly five annotated OAuth tools", async () => {
+Deno.test("real MCP SDK initializes and exposes compatible and expanded annotated OAuth tools", async () => {
   const initialized = await rpc("initialize", {
     protocolVersion: "2025-03-26",
     capabilities: {},
@@ -111,16 +114,25 @@ Deno.test("real MCP SDK initializes and exposes exactly five annotated OAuth too
   });
   equal(initialized.result.serverInfo.name, "gym-bro");
   const list = await rpc("tools/list");
-  equal(list.result.tools.map((t: { name: string }) => t.name).sort(), [
-    "create_program",
-    "get_exercises",
-    "get_routine",
-    "list_routines",
-    "search_exercises",
-  ]);
+  equal(list.result.tools.length, 22);
+  for (
+    const name of [
+      "create_program",
+      "get_exercises",
+      "get_routine",
+      "list_routines",
+      "search_exercises",
+      "log_foods",
+      "get_account_limits",
+      "create_routines",
+    ]
+  ) assert(list.result.tools.some((t: { name: string }) => t.name === name));
   for (const tool of list.result.tools) {
     equal(tool._meta.securitySchemes, [{ type: "oauth2", scopes: ["openid"] }]);
-    equal(tool.annotations.readOnlyHint, tool.name !== "create_program");
+    equal(
+      tool.annotations.readOnlyHint,
+      !tool.name.startsWith("create_") && tool.name !== "log_foods",
+    );
   }
 });
 Deno.test("search combines bilingual catalog with private exercises, filters and pages deterministically", () => {
@@ -185,7 +197,9 @@ Deno.test("program defaults normalize retries and never allow caller identity or
   };
   const normalized = programSchema.parse(program);
   equal(normalized.routines[0].weightUnit, "kg");
-  equal(normalized.routines[0].exercises[0].sets[0].weight, undefined);
+  const entry = normalized.routines[0].exercises[0];
+  assert("sets" in entry);
+  equal(entry.sets[0].weight, undefined);
   assert(
     !programSchema.safeParse({ ...program, userId: "other-user" }).success,
   );
@@ -266,4 +280,33 @@ Deno.test("chunked oversized requests are rejected before MCP parsing", async ()
     }),
   );
   equal(response.status, 413);
+});
+
+Deno.test("food search defaults to both local sources and never calls external search", async () => {
+  const before = called.length;
+  const result = await rpc("tools/call", {
+    name: "search_foods",
+    arguments: { query: "Pollo" },
+  });
+  equal(result.result.structuredContent.items, []);
+  equal(called.slice(before), [{
+    name: "mcp_execute",
+    args: {
+      operation: "search_foods",
+      request: {
+        query: "Pollo",
+        source: "all",
+        language: "it",
+        country: "it",
+        limit: 20,
+      },
+    },
+  }]);
+  const count = called.length;
+  const invalid = await rpc("tools/call", {
+    name: "search_foods",
+    arguments: { query: "Pollo", source: "openfoodfacts" },
+  });
+  assert(invalid.result?.isError || invalid.error);
+  equal(called.length, count);
 });

@@ -1,139 +1,253 @@
 # Gym Bro MCP / ChatGPT
 
-This integration exposes five authenticated tools: `search_exercises`,
-`get_exercises`, `list_routines`, `get_routine`, and `create_program`.
-ChatGPT composes a proposal; it calls `create_program` only after the user asks
-it to save. There is no model call, OpenAI API key, public directory listing,
-or embedded ChatGPT UI in this server.
+Private, authenticated Streamable HTTP integration. The server now publishes
+22 tools; it does not call a model or need an OpenAI API key. Existing endpoint,
+OAuth client and the original five tool names are preserved.
 
-## Components and permissions
+## Capabilities
 
-- `supabase/functions/mcp`: official MCP TypeScript SDK 2.0.0, stateless
-  Streamable HTTP, structured and text results, schemas, tool annotations.
-- `supabase/migrations/20261023100000_mcp.sql`: RPCs, internal catalog/config,
-  idempotency receipts and OAuth hook. No existing data is rewritten and the
-  optional sync-v2 activation function is not called.
-- `supabase/migrations/20261023101000_mcp_catalog.sql`: catalog generated from
-  the actual Flutter exercise models and Italian/English translations.
-- `gym-bro-landing`: existing Next.js login plus `/oauth/consent`, localized
-  consent, safe internal login redirects and account grant revocation.
-- The checked-in copies of `delete-user-complete` and `gdpr-data-export` were
-  retrieved read-only from the linked project. Their new guard rejects delegated
-  OAuth JWTs before any account-management/admin operation. The scheduled push
-  worker uses a separate secret and does not accept user OAuth credentials.
+| Area | Tools |
+| --- | --- |
+| Exercise catalog | `search_exercises`, `get_exercises`, `create_custom_exercises` |
+| Routines and folders | `list_routines`, `get_routine`, `get_routines`, `create_routines`, `create_program`, `list_routine_folders`, `create_routine_folders` |
+| Saved training | `list_workouts`, `get_workouts`, `get_exercise_history`, `get_training_stats` |
+| Account | `get_account_limits` |
+| Nutrition | `search_foods`, `get_foods`, `list_food_entries`, `get_food_entries`, `log_foods`, `get_nutrition_summary`, `get_nutrition_settings` |
 
-MCP tokens use `gymbro_mcp_user`, **not** `authenticated`. The role has no table
-privileges or membership in `authenticated`; only the four MCP RPCs are granted.
-Each RPC also checks the signed subject, role, registered client and audience.
-Existing public function grants to PUBLIC are converted to explicit grants for
-existing anon/authenticated/service callers, preserving their current access.
-Future migrations must not grant private tables or unrelated RPCs to PUBLIC or
-to `gymbro_mcp_user`; the backend test audits those permissions.
+No update/delete operations, workout-history writes, live workout controls,
+nutrition-goal/category edits, favorites/barcode-catalog edits, or social access.
+Writes are called only after the user requests saving. Arrays containing one
+item implement single-item operations; bulk writes are atomic.
 
-The server verifies asymmetric ES256/RS256 JWTs against Supabase JWKS, issuer,
-canonical resource audience, expiry/not-before and the configured OAuth client.
-The database repeats the identity checks, so callers cannot bypass them through
-PostgREST. No service-role key is used by the MCP function. Ordinary app/site
-sessions keep their existing claims and privileges.
+Inputs are strict Zod schemas in `supabase/functions/mcp/schemas.ts` and the
+registered tool definitions. Results have matching structured/text representations.
+New lists return `items` and `nextCursor`; the original list/search tools retain
+`nextOffset`. Cursors bind to the original filters and page size for OFF search.
+Database lists have deterministic ordering; cursors are not historical snapshots.
+Date intervals are inclusive and bounded to 367 days per request. Training
+aggregation is bounded to 1,000 logical workouts and nutrition summaries to
+10,000 consumptions; larger inputs are rejected explicitly. Detail batches
+are limited to 20 IDs, food logs to 100 entries, routine creations to 31,
+custom exercises to 100 and folders to 31. Request/result size is bounded to 1MiB;
+narrow the interval or batch when a result is too large.
 
-Supabase's `openid` scope is for identity; it is not a database permission scope.
-The dedicated database role is the authorization boundary. Unknown OAuth clients
-also receive that isolated role and fail the MCP client allowlist.
+`unavailable` never distinguishes missing, deleted or other-user references.
+All writes use a UUID `idempotencyKey`: reuse it with identical normalized input
+on retry. A different operation/payload conflicts. Prior `create_program` receipts
+remain valid; new program receipts also remain in the original receipt table.
+Receipts for the other operations are kept separately, with cross-table conflict
+checks. Successful retries do not consume quota or need fresh billing.
 
-## Tool contract
+## Complete routines and logical workout history
 
-References are `{ "source": "standard" | "custom", "id": "..." }`.
-Search matches Italian and English names, optionally category, equipment and all
-specified primary/secondary muscles. Both searches and routine lists return
-`items` and nullable `nextOffset`. Search also returns `catalogVersion`.
-Custom exercise names are returned unchanged. Deleted and other-user data are
-never returned. Missing exercise references are listed in `unavailable`.
-
-Example write (one folder, any number of daily routines between 1 and 31):
+`create_program` and `create_routines` use the same routine schema. The legacy
+simple exercise shape still works. A superset entry is:
 
 ```json
-{
-  "idempotencyKey": "d1e1f23d-1d18-48b5-a20b-5d7038b8ac09",
-  "program": {
-    "name": "Programma tre giorni",
-    "routines": [{
-      "name": "Giorno 1",
-      "weightUnit": "kg",
-      "distanceUnit": "km",
-      "exercises": [{
-        "exerciseRef": {
-          "source": "standard",
-          "id": "library.chest.exercises.barbellBenchPressFlat"
-        },
-        "restSeconds": 120,
-        "sets": [{ "kind": "normal", "reps": 8 }]
-      }]
-    }]
-  }
-}
+{"type":"superset","restSeconds":120,"notes":"Alternate the exercises","exercises":[
+  {"exerciseRef":{"source":"standard","id":"library.chest.exercises.barbellBenchPressFlat"},"sets":[{"reps":8}]},
+  {"exerciseRef":{"source":"standard","id":"library.abs.exercises.bicycleCrunches"},"sets":[{"reps":12}]}
+]}
 ```
 
-Optional notes default to empty strings; unit defaults are kg/km, kind defaults
-to normal and rest defaults to zero. A weight omitted for a weighted exercise is
-zero (unspecified load), not a guessed prescription. Durations use `timeSeconds`
-in the MCP interface and microseconds in stored GTSet JSON. Distances follow the
-routine unit. The database enforces parameter compatibility and generates IDs,
-set parameter names and exercise metadata itself. Setless exercises require `[]`.
-Creation is limited to simple exercises, up to 100 exercises per routine and 100
-sets per exercise; no creation of supersets/progressions/custom definitions.
-Existing supersets/progressions are preserved when reading routines.
+Supersets are one level deep, with ordered children and independent notes/rests.
+All five set kinds and all six parameter types are supported, including setless
+exercises (`sets: []`), exercise/set RPE and kg/lb/km/mi units. Missing weight is
+zero, never an inferred recommendation. Set times are seconds at the MCP boundary
+and microseconds in stored GTSet JSON; rests and workout duration are seconds.
+IDs, muscle groups, equipment and set parameters are server-generated/resolved.
 
-A canonical tool retry uses the same UUID and identical normalized program.
-Receipts are durable and scoped to the user. Reusing a key with a different
-payload gives `idempotency_conflict`; invalid input gives `invalid_input`;
-unavailable references give `reference_unavailable`. Authentication failures
-return a challenge; unexpected backend errors are sanitized as `server_error`.
-No user-supplied owner, UUID, exercise type or metadata is accepted in creation.
+Exercise `progression` supports `doubleProgression` and `cyclicLinear` with
+`minReps`, `maxReps`, `repsPerStep`, `startingWeight`, `weightPerStep`,
+`weightPerCycle`, optional `cycle`, `step`, `targetReps`. Working-set count is
+computed from normal sets. Defaults start at cycle/step zero. Validation follows
+Flutter; cyclic progression requires a weighted rep exercise. Progression state
+continues advancing through the existing app lifecycle, not through MCP writes.
 
-The creation RPC locks the sync account row, creates the entire hierarchy and
-receipt in one transaction, sets the existing sync-v2 transaction context and
-lets the existing revision/change-log triggers run. Any validation error rolls
-back everything. Routine ordering follows the payload, and the new folder is
-appended. Realtime/pull delivers it to clients without changing Flutter sync.
+`get_routine` retains its flat `exercises` and adds hierarchical `entries`.
+Notes retain their stored representation; `notesText` exposes readable Quill text.
+Original and continuation workouts are composed with the same modern/legacy
+supersedence rules as Flutter. Logical IDs use the original session, with
+`componentIds`, raw-session details and missing-component warnings. Active
+durations exclude gaps between sessions. Filters/pagination operate on logical
+workouts; totals count each logical workout and performed set once.
 
-## Local verification
+## Food diary and sources
+
+`search_foods` searches only the account's local favorites and personal barcode
+food definitions. The default source is `all`; `favorite` and `customBarcode`
+restrict the search. No Open Food Facts search is performed. References are
+`{source,id}` and always identify the actual local source. These definitions are
+read-only. This is not a complete local food catalog; missing foods require
+explicit manual nutritional values until that database is available.
+
+`get_foods` still supports explicit Open Food Facts barcode references; it does
+not search that catalog. External product definitions are cached privately.
+
+Migration `20261023120000_mcp_local_foods.sql` also reads existing JSONB strings
+from Flutter and native JSON documents from MCP for categories and foods, without
+rewriting existing records. Deploy this migration and the `mcp`/`mcp-services`
+functions together, then refresh the ChatGPT connection's tool metadata.
+
+`log_foods` accepts `{idempotencyKey,entries:[{date,amount,pieces,category?,foodRef? ,food?}]}`.
+Provide exactly one of `foodRef` or a manual `food` definition. Manual definitions
+contain `name`, optional `brand`, `unit` (`g`/`ml`), `servingSizes` and
+`nutritionalValuesPer100g`. Calories, fat, saturated fat, carbs, sugar and protein
+are mandatory. Other fields use Flutter's nutrient units (exposed as
+`nutrientUnits`); unknown optional values stay unknown. Incomplete catalog foods
+must be completed explicitly as a manual definition before logging.
+
+Consumed totals are `valuesPer100 * amount * pieces / 100`. No implicit
+mass/volume conversion is performed. Category names must exist for the requested
+day; omitted means unassigned. Each consumption stores a snapshot. Definitions
+never change existing logs. Dates are `YYYY-MM-DD`, stored at UTC midnight as
+calendar dates, following the existing database convention.
+
+Settings follow Flutter DateSequence: latest effective settings, earliest fallback
+before the first record, app defaults if there are no goals. Defaults are marked
+and never written implicitly. Summaries include empty days, meal totals,
+remaining macros and missing optional nutrient indicators.
+
+Open Food Facts requests use an app User-Agent, attribution, shared cache and
+a shared conservative budget of 15 product lookups per minute.
+Product cache is 24 hours. The search service action is disabled, including for
+stale clients. Timeouts/provider limits
+produce explicit errors. No user identity or diary content is sent to OFF.
+
+## Troubleshooting billing refresh
+
+If nutrition tools report `invalid_input: Gym Bro service unavailable` after
+billing was refreshed, redeploy the current `mcp-services` function. PostgREST
+returns HTTP 204 for `mcp_store_billing` (a void RPC); the adapter must accept that
+empty successful response without trying to parse JSON. Older adapters saved the
+billing state but then reported a parse error, often on the first request after
+the five-minute cache expired. This fix needs no migration or OAuth reset.
+
+## Billing, isolation and consent
+
+| Capability | Free | Pro |
+| --- | --- | --- |
+| Active routines, all sources | 4 total | No commercial cap |
+| Active personal exercises | 10 total | No commercial cap |
+| Create folders | Denied | Allowed |
+| `create_program` destination | Home | New folder |
+| Nutrition diary/settings/summary dates | Today ±7 days, inclusive | Any supported date |
+| Basic training reads, food catalog lookup | Allowed | Allowed |
+
+Technical batch limits still apply to Pro. Free programs return `folderId:null`,
+`placement:"root"` and a warning that folder name/notes were not saved; routine
+names/notes are unchanged. No records are deleted on downgrade. Explicit folder
+selection by a Free caller is rejected. Tombstones do not count toward quotas.
+
+The database repeats every ownership, permission, consent and quota check.
+MCP tokens use isolated role `gymbro_mcp_user` with no direct table privileges.
+All new functions use closed `search_path` and explicit grants. Writes acquire
+the same account lock as sync v2 and run with its transaction context/triggers.
+Quota checks consider the entire bulk. Concurrent requests cannot both consume
+the final Free slot. The app's existing offline/sync commercial behavior is not
+changed by this implementation.
+
+The MCP transport has no service key. It invokes the separate `mcp-services`
+adapter using the verified user bearer. The adapter verifies issuer, audience,
+client, signature and role again. Its service key can only be used by code paths
+that refresh a verified account's RevenueCat state, cache public products or
+process authenticated RevenueCat events. The user cannot choose another billing
+account. Catalog operations repeat database consent checks before external calls.
+
+RevenueCat App User ID is the Supabase UUID already used by Flutter. The adapter
+uses the same entitlement ID as the app. State is checked on first use and after
+5 minutes, with webhook-driven refresh in between. Expiration is evaluated even
+inside the cache lifetime; cancellation of renewal does not revoke access early.
+Lifetime access, trial, grace periods and transfers are supported. Sandbox
+purchases never grant production Pro. Webhooks use the dedicated Authorization
+secret, deduplicate successful events and refetch authoritative subscriber data
+instead of replaying stale event state. Configure this secret as a high-entropy
+value in RevenueCat; never reuse a user JWT or service key.
+
+Fresh cached state can be used during an outage. Without a fresh verified state,
+writes and plan-restricted nutrition reads return `billing_unavailable`; unrelated
+reads still work. No client-supplied plan or entitlement is accepted. The cache
+means entitlement changes may take up to 5 minutes to propagate if a webhook is
+missed. `get_account_limits` is informational, not an authorization token.
+
+Expanded operations require version-2 application consent. Legacy simple
+`create_program` and the four original reads keep their earlier consent behavior,
+but writes enforce billing. Advanced creation requires expanded consent.
+The ordinary authenticated website calls `mcp_manage_consent`; MCP tokens cannot
+approve themselves. Users approve at `/oauth/capabilities` (localized internally),
+including workout history and food read/log access, and can change their IANA
+time zone there. The server derives today's diary date in that stored zone.
+Requests cannot supply their own "today". Existing OAuth grants route through
+this page if expanded consent is missing, without replacing client/connection.
+Revocation in account management also removes application consent.
+
+Error codes include `authentication_required`, `consent_required`, `invalid_input`,
+`reference_unavailable`, `idempotency_conflict`, `plan_limit_exceeded`,
+`pro_required`, `billing_unavailable`, `external_rate_limited`,
+`external_service_unavailable`, `result_too_large`, `server_error`.
+Unexpected provider/database messages are sanitized. Do not log bodies, queries,
+food/training content, tokens or credentials.
+
+## Verification
 
 ```sh
-# Set FLUTTER if your shell's Flutter wrapper points to a missing SDK.
-FLUTTER=/path/to/flutter/bin/flutter bash tools/export_mcp_catalog.sh --dart-define=CHECK_CATALOG=true
-flutter test --no-pub test/model/mcp_compatibility_test.dart
-cd supabase/functions/mcp
-deno task check
-deno task test
-cd ../../..
-deno test supabase/functions/_shared/first_party_test.ts
+(cd supabase/functions/mcp && deno task check && deno task test)
+(cd supabase/functions/mcp-services && deno task check && deno task test)
 bash tools/test_sync_v2_backend.sh
+flutter test --no-pub test/model/mcp_compatibility_test.dart test/model/mcp_expanded_compatibility_test.dart test/model/progression_test.dart test/model/workout_test.dart
 ```
 
-The SQL suite uses a disposable Docker Postgres container, with no published
-ports, not the linked project. It tests existing sync/social behavior as well as
-atomicity, rollback, permissions, units, pagination, post-activation writes,
-change-log delivery and simultaneous retries from two connections.
-`MCP_COMPATIBILITY_FIXTURE=test/fixtures/mcp_program.json` regenerates the Flutter
-compatibility fixture from an actually persisted SQL program during that suite.
-It is a synthetic test account, never production data.
+The backend suite uses disposable Docker Postgres, never the linked project.
+It tests sync/social regressions, post-gate writes, permissions, atomicity,
+concurrent retries and competing Free quota writes. To regenerate synthetic
+Flutter fixtures from persisted SQL, set `MCP_COMPATIBILITY_FIXTURE` or
+`MCP_EXPANDED_COMPATIBILITY_FIXTURE` to their respective fixture paths when
+running the suite. In `gym-bro-landing`, run `npm run test:oauth`, `npm run lint`,
+`npm run build`; use an isolated local MongoDB for the build, not the live CMS.
 
-In `gym-bro-landing`, run `yarn test:oauth`, `yarn lint`, `yarn build`.
-The build needs the site's MongoDB service; use an isolated test database when
-checking the build. It must not run migrations against the live CMS database.
+Catalog generation still uses the Flutter runtime via `tools/export_mcp_catalog.sh`.
+Use `--dart-define=CHECK_CATALOG=true` for verification. Never rewrite deployed
+catalog migrations; generate a new migration path for catalog changes.
 
-Regenerate the initial catalog with `bash tools/export_mcp_catalog.sh`. After a
-catalog migration has been deployed, **do not rewrite that applied migration**:
-pass `--dart-define=CATALOG_MIGRATION=supabase/migrations/<new_timestamp>_mcp_catalog.sql`
-to generate a new migration and pass the same flag to the check command. Deploy
-the registry migration and matching Edge JSON together.
+## Deploying this expansion into a test project
 
-## Staged deployment
+Prepare the same test project's existing OAuth/client/settings first. Set these
+server secrets in the **test project**, without committing their values:
+
+- `MCP_RESOURCE_URL`, `MCP_SITE_ORIGIN`, `MCP_OAUTH_CLIENT_ID` (existing configuration).
+- `REVENUECAT_SECRET_API_KEY`: RevenueCat server API key with subscriber read access.
+- `REVENUECAT_ACCESS_ENTITLEMENT_ID`: identical to Flutter configuration.
+- `REVENUECAT_ENVIRONMENT`: `SANDBOX` for sandbox testing, `PRODUCTION` for release.
+  Set `gymbro_mcp.settings.billing_environment` to the same value in the test
+  project; its migration default is `PRODUCTION`. Mismatched cache environments
+  fail closed in the database.
+- `REVENUECAT_WEBHOOK_AUTHORIZATION`: independent random secret, including any
+  desired `Bearer ` prefix exactly as configured in RevenueCat.
+
+`SUPABASE_SERVICE_ROLE_KEY` is provided to the isolated adapter by the Edge runtime;
+it must never be added to the website or used for MCP user database operations.
+
+Apply only the new incremental migration, deploy `mcp-services`, then the updated
+site and `mcp` function. Coordinate this rollout: the migrated write RPC requires
+billing, so old transports cannot create until the updated adapter/transport are
+available. Configure the RevenueCat webhook URL to the test project's
+`/functions/v1/mcp-services`, with the dedicated Authorization header and matching
+environment. Test purchases, restore, cancellation, expiration and account
+transfer; test a Free account separately. Refresh the private ChatGPT connection's
+metadata, approve expanded access, and verify app pull/reconnection.
+
+Do not run `activate_sync_v2()`, replay the remote baseline, replace the OAuth
+client or migrate the live project as a substitute for staging. Rollout requires
+real RevenueCat credentials, webhook configuration and a test project.
+
+## Initial OAuth setup (new installations only)
+
+Existing connections keep their client and settings. Use the expansion rollout
+above; the following steps are for a new installation or a future test project.
 
 1. Verify the migration history and real schema. The repository baseline is a
    snapshot of an existing database: do not replay it on production. Deploy the
-   required existing incremental sync-v2 migrations if absent, then the two MCP
-   migrations. Do not call `activate_sync_v2()` as part of this feature.
+   required existing incremental sync-v2 migrations if absent, then the original MCP migrations and `20261023110000_mcp_capabilities.sql`. Do not call `activate_sync_v2()` as part of this feature.
 2. Deploy the protected account-management functions **before enabling OAuth**:
    `supabase functions deploy delete-user-complete` and
    `supabase functions deploy gdpr-data-export`. Their middleware verifies JWTs

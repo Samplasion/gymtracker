@@ -1,0 +1,25 @@
+name: MCP integration
+on:
+  push:
+    paths: ['supabase/**', 'tools/*mcp*', 'tools/test_sync_v2_backend.sh', 'test/backend/**', 'lib/data/exercises.dart', 'lib/model/exercise.dart', 'lib/model/set.dart', 'lib/i18n/**', 'test/model/mcp_compatibility_test.dart', 'test/fixtures/mcp_program.json', '.github/workflows/mcp.yml']
+  pull_request:
+    paths: ['supabase/**', 'tools/*mcp*', 'tools/test_sync_v2_backend.sh', 'test/backend/**', 'lib/data/exercises.dart', 'lib/model/exercise.dart', 'lib/model/set.dart', 'lib/i18n/**', 'test/model/mcp_compatibility_test.dart', 'test/fixtures/mcp_program.json', '.github/workflows/mcp.yml']
+  workflow_dispatch:
+jobs:
+  mcp:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+      - name: Check MCP server
+        working-directory: supabase/functions/mcp
+        run: deno task check && deno task test
+      - name: Check account-management guards
+        run: |
+          deno check --config supabase/functions/delete-user-complete/deno.json supabase/functions/delete-user-complete/index.ts
+          deno check --config supabase/functions/gdpr-data-export/deno.json supabase/functions/gdpr-data-export/index.ts
+          deno test supabase/functions/_shared/first_party_test.ts
+      - name: Backend integration and concurrent retries
+        run: bash tools/test_sync_v2_backend.sh

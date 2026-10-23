@@ -371,7 +371,7 @@ enabled = false
 # OAuth server configuration
 [auth.oauth_server]
 # Enable OAuth server functionality
-enabled = false
+enabled = true
 # Path for OAuth consent flow UI
 authorization_url_path = "/oauth/consent"
 # Allow dynamic client registration
@@ -421,4 +421,20 @@ enabled = true
 
 # Scheduled worker authenticates with a dedicated secret, never a user JWT.
 [functions.push-delivery]
+verify_jwt = false
+
+# MCP serves unauthenticated discovery and verifies OAuth JWTs in the handler.
+[functions.mcp]
+verify_jwt = false
+
+# Local OAuth tokens use the isolated database role; ordinary sessions are unchanged.
+[auth.hook.custom_access_token]
+enabled = true
+uri = "pg-functions://postgres/public/gymbro_mcp_access_token_hook"
+
+# JWTs are verified by @supabase/server. Handler rejects delegated OAuth callers.
+[functions.delete-user-complete]
+verify_jwt = false
+
+[functions.gdpr-data-export]
 verify_jwt = false

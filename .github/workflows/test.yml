@@ -31,3 +31,5 @@ jobs:
           dart run build_runner clean && dart run build_runner build && dart run pigeon --input lib/native_channels.dart && dart run slang
       - name: Run Flutter tests
         run: flutter test
+      - name: Verify MCP catalog matches Flutter
+        run: bash tools/export_mcp_catalog.sh --dart-define=CHECK_CATALOG=true

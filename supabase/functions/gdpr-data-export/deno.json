@@ -1,0 +1,7 @@
+{
+  "imports": {
+    "@supabase/server": "npm:@supabase/server@1.9.2",
+    "edge-runtime": "jsr:@supabase/functions-js@2.118.0/edge-runtime.d.ts",
+    "jszip": "npm:jszip@3.10.1"
+  }
+}

@@ -24,7 +24,7 @@ DO $$ DECLARE f record; r text; BEGIN
 END $$;
 ALTER DEFAULT PRIVILEGES IN SCHEMA public REVOKE EXECUTE ON FUNCTIONS FROM PUBLIC;
 
-CREATE TABLE gymbro_mcp.settings(singleton boolean PRIMARY KEY DEFAULT true CHECK(singleton), client_id text NOT NULL, resource text NOT NULL CHECK(resource LIKE 'https://%'));
+CREATE TABLE gymbro_mcp.settings(singleton boolean PRIMARY KEY DEFAULT true CHECK(singleton), client_id text NOT NULL, resource text NOT NULL CHECK(resource LIKE 'https://%' OR resource ~ '^http://(localhost|127[.]0[.]0[.]1|\[::1\])(:[0-9]+)?(/|$)'));
 CREATE TABLE gymbro_mcp.catalog(singleton boolean PRIMARY KEY DEFAULT true CHECK(singleton), version text NOT NULL, exercises jsonb NOT NULL);
 CREATE TABLE gymbro_mcp.receipts(user_id uuid NOT NULL REFERENCES auth.users ON DELETE CASCADE, idempotency_key uuid NOT NULL, request jsonb NOT NULL, result jsonb NOT NULL, PRIMARY KEY(user_id,idempotency_key));
 REVOKE ALL ON ALL TABLES IN SCHEMA gymbro_mcp FROM PUBLIC, anon, authenticated, gymbro_mcp_user;
@@ -64,14 +64,14 @@ CREATE FUNCTION public.mcp_custom_exercises() RETURNS jsonb LANGUAGE plpgsql STA
 DECLARE owner uuid:=gymbro_mcp.owner(); result jsonb;
 BEGIN
  SELECT COALESCE(jsonb_agg(jsonb_build_object('source','custom','id',id,'name',name,'category','custom','parameters',parameters,
- 'primaryMuscleGroup',primary_muscle_group,'secondaryMuscleGroups',secondary_muscle_groups,'equipment',COALESCE(equipment,'none')) ORDER BY id),'[]')
+ 'primaryMuscleGroup',primary_muscle_group,'secondaryMuscleGroups',COALESCE(secondary_muscle_groups,'{}'::text[]),'equipment',COALESCE(equipment,'none')) ORDER BY id),'[]')
  INTO result FROM public.custom_exercises WHERE user_id=owner AND NOT deleted;
  RETURN result;
 END $$;
 CREATE FUNCTION public.mcp_list_routines(page_offset integer DEFAULT 0, page_limit integer DEFAULT 20) RETURNS jsonb LANGUAGE plpgsql STABLE SECURITY DEFINER SET search_path='' AS $$
 DECLARE owner uuid:=gymbro_mcp.owner(); result jsonb;
 BEGIN
- IF page_offset<0 OR page_limit NOT BETWEEN 1 AND 100 THEN RAISE EXCEPTION 'Invalid pagination' USING ERRCODE='22023'; END IF;
+ IF page_offset IS NULL OR page_limit IS NULL OR page_offset NOT BETWEEN 0 AND 1000000 OR page_limit NOT BETWEEN 1 AND 100 THEN RAISE EXCEPTION 'Invalid pagination' USING ERRCODE='22023'; END IF;
  SELECT COALESCE(jsonb_agg(to_jsonb(t)),'[]') INTO result FROM (
  SELECT r.id,r.name,r.weight_unit AS "weightUnit",r.distance_unit AS "distanceUnit",r.folder_id AS "folderId",f.name AS "folderName"
  FROM public.routines r LEFT JOIN public.routine_folders f ON f.id=r.folder_id AND f.user_id=owner AND NOT f.deleted
@@ -140,7 +140,7 @@ BEGIN
   routine_name:=gymbro_mcp.text_value(routine->'name',200,true);
   info:=gymbro_mcp.text_value(routine->'notes',10000);
   weight_unit:=COALESCE(routine->>'weightUnit','kg'); distance_unit:=COALESCE(routine->>'distanceUnit','km');
-  IF weight_unit NOT IN ('kg','lb') OR distance_unit NOT IN ('km','mi') OR jsonb_typeof(routine->'exercises') IS DISTINCT FROM 'array' OR jsonb_array_length(routine->'exercises') NOT BETWEEN 1 AND 100 THEN RAISE EXCEPTION 'Invalid routine' USING ERRCODE='22023'; END IF;
+  IF (routine ? 'weightUnit' AND jsonb_typeof(routine->'weightUnit')<>'string') OR (routine ? 'distanceUnit' AND jsonb_typeof(routine->'distanceUnit')<>'string') OR weight_unit NOT IN ('kg','lb') OR distance_unit NOT IN ('km','mi') OR jsonb_typeof(routine->'exercises') IS DISTINCT FROM 'array' OR jsonb_array_length(routine->'exercises') NOT BETWEEN 1 AND 100 THEN RAISE EXCEPTION 'Invalid routine' USING ERRCODE='22023'; END IF;
   routine_id:=gen_random_uuid()::text;
   INSERT INTO public.routines(id,user_id,name,infobox,weight_unit,distance_unit,folder_id,sort_order)
   VALUES(routine_id,owner,routine_name,info,weight_unit,distance_unit,folder_id,routine_order);
@@ -154,11 +154,12 @@ BEGIN
    IF reference->>'source'='standard' THEN
     SELECT value INTO definition FROM jsonb_array_elements(catalog) WHERE value->>'id'=reference->>'id';
    ELSIF reference->>'source'='custom' THEN
-    SELECT jsonb_build_object('names',jsonb_build_object('it',name),'parameters',c.parameters,'primaryMuscleGroup',primary_muscle_group,'secondaryMuscleGroups',secondary_muscle_groups,'equipment',COALESCE(equipment,'none'))
+    SELECT jsonb_build_object('names',jsonb_build_object('it',name),'parameters',c.parameters,'primaryMuscleGroup',primary_muscle_group,'secondaryMuscleGroups',COALESCE(secondary_muscle_groups,'{}'::text[]),'equipment',COALESCE(equipment,'none'))
     INTO definition FROM public.custom_exercises c WHERE c.user_id=owner AND c.id=reference->>'id' AND NOT c.deleted FOR SHARE;
    END IF;
    IF definition IS NULL THEN RAISE EXCEPTION 'Exercise unavailable' USING ERRCODE='P0002'; END IF;
    parameters:=definition->>'parameters';
+   IF parameters IS NULL OR parameters NOT IN ('repsWeight','timeWeight','freeBodyReps','time','distance','setless') THEN RAISE EXCEPTION 'Exercise definition unavailable' USING ERRCODE='P0002'; END IF;
    rest:=COALESCE(gymbro_mcp.number_value(exercise->'restSeconds',86400,true),0);
    exercise_notes:=gymbro_mcp.text_value(exercise->'notes',10000);
    IF jsonb_typeof(exercise->'sets') IS DISTINCT FROM 'array' OR jsonb_array_length(exercise->'sets')>100 OR (parameters<>'setless' AND jsonb_array_length(exercise->'sets')=0) OR (parameters='setless' AND jsonb_array_length(exercise->'sets')<>0) THEN RAISE EXCEPTION 'Invalid sets' USING ERRCODE='22023'; END IF;
@@ -166,7 +167,7 @@ BEGIN
    FOR item IN SELECT value FROM jsonb_array_elements(exercise->'sets') LOOP
     PERFORM gymbro_mcp.object_keys(item,ARRAY['kind','reps','weight','timeSeconds','distance','rpe']);
     kind:=COALESCE(item->>'kind','normal');
-    IF kind NOT IN ('warmUp','normal','drop','failure','failureStripping') THEN RAISE EXCEPTION 'Invalid set kind' USING ERRCODE='22023'; END IF;
+    IF (item ? 'kind' AND jsonb_typeof(item->'kind')<>'string') OR kind NOT IN ('warmUp','normal','drop','failure','failureStripping') THEN RAISE EXCEPTION 'Invalid set kind' USING ERRCODE='22023'; END IF;
     repetitions:=gymbro_mcp.number_value(item->'reps',100000,true);
     weight:=gymbro_mcp.number_value(item->'weight',100000);
     duration:=gymbro_mcp.number_value(item->'timeSeconds',604800);

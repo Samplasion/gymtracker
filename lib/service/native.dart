@@ -18,6 +18,8 @@ abstract class NativeService {
     }
   }
 
+  factory NativeService.withHost(GymBroNativeHostAPI host) = _NativeServiceImpl;
+
   NativeService._();
   void Function()? onMarkSetDone;
   bool Function()? onCursorNext;
@@ -141,10 +143,12 @@ class _UnsupportedNativeService extends NativeService
 // ignore: camel_case_types
 class _NativeServiceImpl extends NativeService
     implements GymBroNativeFlutterAPI, GymBroNativeLoggerChannel {
-  final _watch = GymBroNativeHostAPI();
+  final GymBroNativeHostAPI _watch;
   String? _workoutId;
 
-  _NativeServiceImpl() : super._();
+  _NativeServiceImpl([GymBroNativeHostAPI? host])
+    : _watch = host ?? GymBroNativeHostAPI(),
+      super._();
   bool _disposed = false;
   bool _attached = false;
 
@@ -294,7 +298,9 @@ class _NativeServiceImpl extends NativeService
       "Native side sent the following metrics: $energy kcal, $heartRate bpm",
     );
     if (energy != null) _energy$.add(energy);
-    if (heartRate != null) _heartRate$.add(heartRate);
+    // Zero explicitly invalidates only the current heart-rate reading.
+    // Null still means that this particular metric was not updated.
+    if (heartRate != null) _heartRate$.add(heartRate > 0 ? heartRate : null);
     if (energy == null && heartRate == null) {
       // If both are null, reset
       _energy$.add(null);

@@ -28,6 +28,7 @@ def main():
     revisions = []
     cache = None
     acknowledgements = None
+    last_observation = None
     with log_path.open('w') as log:
         process = subprocess.Popen([
             str(root / '.fvm/flutter_sdk/bin/flutter'), 'test', '--no-pub',
@@ -53,6 +54,13 @@ def main():
                     except (plistlib.InvalidFileException, OSError):
                         continue
                     workout = snapshot.get('workout', {})
+                    observation = (snapshot.get('revision'), workout.get('id'), workout.get('active'),
+                                   workout.get('parameters', {}).get('exerciseName'))
+                    if observation != last_observation:
+                        last_observation = observation
+                        print(f'Observed Watch snapshot: revision={observation[0]}, '
+                              f'this_run={str(workout.get("id", "")).startswith(token)}, '
+                              f'active={observation[2]}, parameters_present={bool(workout.get("parameters"))}', flush=True)
                     if (workout.get('id') in (f'{token}-A', f'{token}-B')
                             and (not workout.get('active') or workout.get('parameters', {}).get('exerciseName') == f'Workout {workout["id"][-1]}')):
                         food = snapshot['food']

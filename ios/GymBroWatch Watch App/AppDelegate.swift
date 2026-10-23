@@ -20,7 +20,10 @@ class GBAppDelegate: NSObject, WKApplicationDelegate {
     override init() {
         super.init()
         
-        WorkoutManager.shared.listener = self
+        WorkoutManager.shared.onMetricsPacket = { [weak self] packet in self?.sendMetrics(packet) }
+        WorkoutManager.shared.onSensorSessionEnded = { [weak self] in
+            if self?.workoutViewModel.isWorkoutRunning == true { self?.workoutViewModel.requestFreshData() }
+        }
         WorkoutManager.shared.onAuthorizationChanged = { [weak self] in self?.workoutViewModel.requestFreshData() }
         PhoneMessageResponder.shared.workoutDelegate = workoutViewModel
         PhoneMessageResponder.shared.session = session
@@ -54,6 +57,10 @@ class GBAppDelegate: NSObject, WKApplicationDelegate {
 extension GBAppDelegate: WCSessionDelegate {
     func session(_ session: WCSession, activationDidCompleteWith activationState: WCSessionActivationState, error: (any Error)?) {
         log("GBAppDelegate: WCsession activationDidCompleteWith activationState: \(activationState)")
+        Task { @MainActor in
+            if let packet = WorkoutManager.shared.metricsPacket() { self.sendMetrics(packet) }
+            self.workoutViewModel.requestFreshData()
+        }
     }
     
     func log(_ message: String) {
@@ -71,6 +78,9 @@ extension GBAppDelegate: WCSessionDelegate {
     
     func sessionReachabilityDidChange(_ session: WCSession) {
         PhoneMessageResponder.shared.sessionReachabilityDidChange(session)
+        Task { @MainActor in
+            if session.isReachable, let packet = WorkoutManager.shared.metricsPacket() { self.sendMetrics(packet) }
+        }
     }
     
     func session(_ session: WCSession, didReceiveUserInfo userInfo: [String : Any] = [:]) {
@@ -82,21 +92,15 @@ extension GBAppDelegate: WCSessionDelegate {
     }
 }
 
-extension GBAppDelegate: WorkoutMetricsListener {
-    private func sendMetrics() {
-        Task { @MainActor in
-            let manager = WorkoutManager.shared
-            guard let id = manager.request?.id, session?.isReachable == true else { return }
-            session?.sendMessage(["method": "workoutMetrics", "workoutId": id, "generation": manager.generation,
-                "energy": manager.activeEnergy, "heartRate": manager.heartRate], replyHandler: nil)
+extension GBAppDelegate {
+    private func sendMetrics(_ packet: WorkoutMetricsPacket) {
+        guard let session, session.activationState == .activated else { return }
+        let envelope: [String: Any] = ["kind": "workoutMetrics", "metrics": packet.dictionary]
+        // Replaceable, complete history: offline collection never creates a queue
+        // of incremental values that could be counted twice after reconnecting.
+        try? session.updateApplicationContext(envelope)
+        if session.isReachable {
+            session.sendMessage(["method": "workoutMetrics", "metrics": packet.dictionary], replyHandler: nil, errorHandler: { _ in })
         }
-    }
-
-    func handleActiveEnergyUpdate(_ activeEnergy: Double) {
-        sendMetrics()
-    }
-    
-    func handleHeartRateUpdate(_ heartRate: Double) {
-        sendMetrics()
     }
 }

@@ -21,6 +21,7 @@ extension WorkoutManager {
                 summary = .init(id: id, result: .failed("There is no Watch recording for this workout. Your workout is available in the iPhone app."))
             }
             if !save { try await deleteSavedSegments(id: id) }
+            if request?.id == id { stopMonitoringMetrics() }
             return ["success": true]
         }
         guard let token = command["generation"] as? String else { throw WorkoutOperationError.stale }
@@ -36,10 +37,12 @@ extension WorkoutManager {
             if session == nil, let recovered = try? await healthStore.recoverActiveWorkoutSession() {
                 try await recoverWorkout(with: recovered)
             }
+            if request?.id == id, let metrics = command["metrics"] as? [String: Any],
+               let data = try? JSONSerialization.data(withJSONObject: metrics) { try handleReceivedData(data) }
             if let session, request?.id == id, session.state == .running || session.state == .paused {
-                return ["success": true, "generation": generation, "running": true]
+                return sensorReply(running: true)
             }
-            if request?.id == id && generation == token && session != nil { return ["success": true, "generation": token] }
+            if request?.id == id && generation == token && session != nil { return sensorReply(running: false) }
             if session != nil { try await finishSegment(save: true) }
             guard Date().timeIntervalSince1970 <= deadline else { throw WorkoutOperationError.stale }
             let request = WorkoutRequest(id: id, start: Date(timeIntervalSince1970: command["start"] as? Double ?? Date().timeIntervalSince1970))
@@ -47,8 +50,12 @@ extension WorkoutManager {
             configuration.activityType = .traditionalStrengthTraining
             configuration.locationType = .indoor
             let primary = try HKWorkoutSession(healthStore: healthStore, configuration: configuration)
+            selectWorkout(request)
+            if let metrics = command["metrics"] as? [String: Any], let data = try? JSONSerialization.data(withJSONObject: metrics) {
+                try handleReceivedData(data)
+            }
             attachPrimary(primary, request: request, generation: token)
-            try await builder?.addMetadata([HKMetadataKeyExternalUUID: id])
+            try await builder?.addMetadata([HKMetadataKeyExternalUUID: id, "gymbro.segmentId": token])
             persistWatchIdentity()
             primary.prepare()
             if #available(watchOS 10, *) {
@@ -61,19 +68,27 @@ extension WorkoutManager {
                 guard self.session === primary, primary.state == .prepared || primary.state == .notStarted else { return }
                 try? await self.finishSegment(save: false)
             }
-            return ["success": true, "generation": token]
+            return sensorReply(running: false)
         }
         guard action == "commit", request?.id == id, generation == token else { throw WorkoutOperationError.stale }
-        energyOffset = command["offset"] as? Double ?? 0
+        if let metrics = command["metrics"] as? [String: Any], let data = try? JSONSerialization.data(withJSONObject: metrics) {
+            try handleReceivedData(data)
+        }
         persistWatchIdentity()
         try await commitPrimary(at: Date())
         return ["success": true]
     }
 
+    private func sensorReply(running: Bool) -> [String: Any] {
+        var reply: [String: Any] = ["success": true, "generation": generation, "running": running]
+        if let packet = metricsPacket() { reply["metrics"] = packet.dictionary }
+        return reply
+    }
+
     private func persistWatchIdentity() {
         UserDefaults.standard.set(try? JSONEncoder().encode(request), forKey: "workout.watchRequest.v2")
         UserDefaults.standard.set(generation, forKey: "workout.watchGeneration.v2")
-        UserDefaults.standard.set(energyOffset, forKey: "workout.watchOffset.v2")
+
     }
 
     func recoverWorkout(with recovered: HKWorkoutSession) async throws {
@@ -84,8 +99,13 @@ extension WorkoutManager {
             recovered.end()
             return
         }
-        energyOffset = UserDefaults.standard.double(forKey: "workout.watchOffset.v2")
-        attachPrimary(recovered, request: request, generation: UserDefaults.standard.string(forKey: "workout.watchGeneration.v2") ?? UUID().uuidString)
+        var ledger = metricsStore.ledger(for: request.id)
+        ledger.seedLegacyOffset(UserDefaults.standard.double(forKey: "workout.watchOffset.v2"))
+        metricsStore.save(ledger)
+        let token = recovered.associatedWorkoutBuilder().metadata["gymbro.segmentId"] as? String
+            ?? UserDefaults.standard.string(forKey: "workout.watchGeneration.v2") ?? UUID().uuidString
+        attachPrimary(recovered, request: request, generation: token)
+        recordSegment(generation: token, state: recovered.state == .paused ? .paused : .running, activate: true)
         phase = .active
         sessionState = recovered.state
         if #available(watchOS 10, *) { try? await recovered.startMirroringToCompanionDevice() }

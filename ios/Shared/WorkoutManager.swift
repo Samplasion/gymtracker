@@ -30,7 +30,20 @@ final class WorkoutManager: NSObject, ObservableObject {
     var listener: WorkoutMetricsListener?
     var request: WorkoutRequest?
     var generation = UUID().uuidString
-    var energyOffset: Double = 0
+    let metricsStore = WorkoutMetricsStore.shared
+    var metricsDevice: String {
+        #if os(watchOS)
+        return "watch"
+        #else
+        return "phone"
+        #endif
+    }
+    var onMetricsPacket: ((WorkoutMetricsPacket) -> Void)?
+    var onSensorSessionEnded: (() -> Void)?
+    private var metricsMonitor: Task<Void, Never>?
+    private var heartRateInvalidatedAt = Date()
+    var watchReconciliationQueued = false
+    var nextWatchProbe = Date.distantPast
     var remoteSession: HKWorkoutSession?
     var remoteCommand: (([String: Any]) async throws -> [String: Any])?
     var watchAvailable: (() -> Bool)?
@@ -60,6 +73,10 @@ final class WorkoutManager: NSObject, ObservableObject {
             for await event in events.stream {
                 guard self.session === event.session else { continue }
                 self.sessionState = event.state
+                if self.builder != nil {
+                    self.recordSegment(generation: self.generation, state: self.metricsState(event.state), stateDate: event.date)
+                }
+                if event.state == .paused || event.state == .stopped || event.state == .ended { self.invalidateHeartRate() }
                 if let error = event.error {
                     self.phase = .failed(error)
                     self.summary = .init(id: self.request?.id ?? self.generation, result: .failed(error))
@@ -70,6 +87,7 @@ final class WorkoutManager: NSObject, ObservableObject {
                     self.enqueue {
                         guard self.session === event.session else { return }
                         try? await self.finishSegment(save: true)
+                        self.onSensorSessionEnded?()
                     }
                 }
             }
@@ -93,7 +111,7 @@ final class WorkoutManager: NSObject, ObservableObject {
     @available(iOS 26, *)
     func attachPrimary(_ newSession: HKWorkoutSession, request: WorkoutRequest, generation: String) {
         terminalGenerations.removeAll()
-        self.request = request
+        selectWorkout(request)
         self.generation = generation
         session = newSession
         let liveBuilder = newSession.associatedWorkoutBuilder()
@@ -102,8 +120,8 @@ final class WorkoutManager: NSObject, ObservableObject {
         liveBuilder.delegate = self
         liveBuilder.dataSource = HKLiveWorkoutDataSource(healthStore: healthStore, workoutConfiguration: newSession.workoutConfiguration)
         workout = nil
-        heartRate = 0
-        activeEnergy = energyOffset
+        invalidateHeartRate()
+        recordSegment(generation: generation, state: metricsState(newSession.state), activate: true)
         summary = nil
     }
 
@@ -116,6 +134,7 @@ final class WorkoutManager: NSObject, ObservableObject {
             try Task.checkCancellation()
             guard self.session === session else { throw WorkoutOperationError.stale }
             phase = .active
+            recordSegment(generation: generation, state: .running, activate: true)
         } catch {
             builder.discardWorkout()
             session.end()
@@ -135,6 +154,8 @@ final class WorkoutManager: NSObject, ObservableObject {
         let id = request?.id ?? generation
         let endDate = Date()
         let finishingGeneration = generation
+        if builder != nil { recordSegment(generation: finishingGeneration, state: .ended) }
+        invalidateHeartRate()
         let task = Task { @MainActor in
             if self.request?.id == id && self.generation == finishingGeneration { self.summary = .init(id: id, result: save ? .saving : .discarded) }
             if session.state == .running || session.state == .paused { session.stopActivity(with: endDate) }
@@ -151,6 +172,8 @@ final class WorkoutManager: NSObject, ObservableObject {
                     try await builder.endCollection(at: endDate)
                     if let result = try await builder.finishWorkout() {
                         self.remember(result, workoutID: id)
+                        self.recordSegment(workoutID: id, generation: finishingGeneration,
+                            energy: result.totalEnergyBurned?.doubleValue(for: .kilocalorie()), state: .ended)
                         if self.discardedWorkoutIDs.contains(id) {
                             try await self.deleteSavedSegments(id: id)
                         } else if self.request?.id == id && self.generation == finishingGeneration {
@@ -215,14 +238,88 @@ final class WorkoutManager: NSObject, ObservableObject {
         }
     }
 
-    func updateForStatistics(_ statistics: HKStatistics) {
+    func selectWorkout(_ next: WorkoutRequest) {
+        let changed = request?.id != next.id
+        request = next
+        if changed {
+            var ledger = metricsStore.ledger(for: next.id)
+            ledger.seedLegacyOffset(UserDefaults.standard.double(forKey: "workout.offset.\(next.id)"))
+            metricsStore.save(ledger)
+            heartRateInvalidatedAt = Date()
+        }
+        refreshPublishedMetrics(emitPacket: false)
+        if metricsMonitor == nil {
+            metricsMonitor = Task { @MainActor in
+                while !Task.isCancelled {
+                    do { try await Task.sleep(nanoseconds: 5_000_000_000) } catch { return }
+                    self.refreshPublishedMetrics(emitPacket: false)
+                    #if os(iOS)
+                    if self.desiredRequest != nil, self.watchAvailable?() == true,
+                       self.device != "watch" || self.sessionState == .ended || self.sessionState == .stopped
+                        || self.metricsStore.ledger(for: self.request?.id ?? "").activeGenerations["watch"] == nil {
+                        self.watchBecameReachable()
+                    }
+                    #endif
+                }
+            }
+        }
+    }
+
+    func stopMonitoringMetrics() {
+        metricsMonitor?.cancel()
+        metricsMonitor = nil
+        invalidateHeartRate()
+    }
+
+    func invalidateHeartRate() {
+        heartRateInvalidatedAt = Date()
+        heartRate = 0
+        listener?.handleHeartRateUpdate(0)
+    }
+
+    func metricsPacket() -> WorkoutMetricsPacket? {
+        guard let id = request?.id else { return nil }
+        return metricsStore.ledger(for: id).packet(device: metricsDevice)
+    }
+
+    func refreshPublishedMetrics(emitPacket: Bool = true) {
+        guard let id = request?.id else { return }
+        let ledger = metricsStore.ledger(for: id)
+        activeEnergy = ledger.totalEnergy
+        heartRate = ledger.liveHeartRate(at: Date(), after: heartRateInvalidatedAt) ?? 0
+        listener?.handleActiveEnergyUpdate(activeEnergy)
+        listener?.handleHeartRateUpdate(heartRate)
+        if emitPacket { onMetricsPacket?(ledger.packet(device: metricsDevice)) }
+    }
+
+    func recordSegment(workoutID: String? = nil, generation: String, energy: Double? = nil,
+                       state: WorkoutSegmentMetrics.State? = nil, heartRate: Double? = nil,
+                       heartRateDate: Date? = nil, activate: Bool = false, stateDate: Date = Date()) {
+        guard let id = workoutID ?? request?.id else { return }
+        var ledger = metricsStore.ledger(for: id)
+        ledger.record(device: metricsDevice, generation: generation, energy: energy, state: state,
+                      heartRate: heartRate, heartRateDate: heartRateDate, activate: activate, stateDate: stateDate)
+        metricsStore.save(ledger)
+        if request?.id == id { refreshPublishedMetrics() }
+    }
+
+    private func metricsState(_ state: HKWorkoutSessionState) -> WorkoutSegmentMetrics.State {
+        switch state {
+        case .running: return .running
+        case .paused: return .paused
+        case .stopped, .ended: return .ended
+        default: return .prepared
+        }
+    }
+
+    func updateForStatistics(_ statistics: HKStatistics, generation: String) {
         switch statistics.quantityType {
         case HKQuantityType(.heartRate):
-            heartRate = statistics.mostRecentQuantity()?.doubleValue(for: .count().unitDivided(by: .minute())) ?? 0
-            listener?.handleHeartRateUpdate(heartRate)
+            recordSegment(generation: generation,
+                heartRate: statistics.mostRecentQuantity()?.doubleValue(for: .count().unitDivided(by: .minute())),
+                heartRateDate: statistics.mostRecentQuantityDateInterval()?.end)
         case HKQuantityType(.activeEnergyBurned):
-            activeEnergy = energyOffset + (statistics.sumQuantity()?.doubleValue(for: .kilocalorie()) ?? 0)
-            listener?.handleActiveEnergyUpdate(activeEnergy)
+            recordSegment(generation: generation, energy: statistics.sumQuantity()?.doubleValue(for: .kilocalorie()))
         default: break
         }
     }
@@ -235,12 +332,26 @@ final class WorkoutManager: NSObject, ObservableObject {
     }
 
     func handleReceivedData(_ data: Data) throws {
-        guard let packet = try JSONSerialization.jsonObject(with: data) as? [String: Any],
-              packet["workoutId"] as? String == request?.id,
-              packet["generation"] as? String == generation else { return }
-        if let energy = packet["energy"] as? Double { activeEnergy = energy; listener?.handleActiveEnergyUpdate(energy) }
-        if let rate = packet["heartRate"] as? Double { heartRate = rate; listener?.handleHeartRateUpdate(rate) }
+        let raw = try JSONSerialization.jsonObject(with: data) as? [String: Any] ?? [:]
+        guard let packet = WorkoutMetricsPacket.decode(raw["metrics"] as? [String: Any] ?? raw),
+              packet.workoutID == request?.id, packet.device != metricsDevice else { return }
+        if metricsStore.merge(packet) {
+            refreshPublishedMetrics()
+            #if os(iOS)
+            if packet.device == "watch", device == "watch" {
+                let ledger = metricsStore.ledger(for: packet.workoutID)
+                switch ledger.activeGenerations["watch"].flatMap({ ledger.segments[$0]?.state }) {
+                case .running?: sessionState = .running
+                case .paused?: sessionState = .paused
+                case .prepared?: sessionState = .prepared
+                default: sessionState = .ended
+                }
+                if packet.activeGeneration == nil { onSensorSessionEnded?() }
+            }
+            #endif
+        }
     }
+
 }
 
 @available(iOS 17, watchOS 9, *)
@@ -254,6 +365,7 @@ extension WorkoutManager: HKWorkoutSessionDelegate {
     nonisolated func workoutSession(_ workoutSession: HKWorkoutSession, didDisconnectFromRemoteDeviceWithError error: Error?) {
         Task { @MainActor in
             guard self.session === workoutSession else { return }
+            if self.builder == nil { self.invalidateHeartRate() }
             if let error { Logger.shared.error("Workout disconnected: \(error)") }
         }
     }
@@ -269,13 +381,15 @@ extension WorkoutManager: HKWorkoutSessionDelegate {
 extension WorkoutManager: HKLiveWorkoutBuilderDelegate {
     nonisolated func workoutBuilder(_ workoutBuilder: HKLiveWorkoutBuilder, didCollectDataOf collectedTypes: Set<HKSampleType>) {
         Task { @MainActor in
-            guard self.builder === workoutBuilder else { return }
+            let id = workoutBuilder.metadata[HKMetadataKeyExternalUUID] as? String
+            guard id == self.request?.id,
+                  let token = workoutBuilder.metadata["gymbro.segmentId"] as? String ?? (self.builder === workoutBuilder ? self.generation : nil) else { return }
             for type in collectedTypes {
-                if let quantity = type as? HKQuantityType, let statistics = workoutBuilder.statistics(for: quantity) { self.updateForStatistics(statistics) }
+                if let quantity = type as? HKQuantityType, let statistics = workoutBuilder.statistics(for: quantity) {
+                    self.updateForStatistics(statistics, generation: token)
+                }
             }
-            guard let id = self.request?.id else { return }
-            let packet: [String: Any] = ["workoutId": id, "generation": self.generation, "energy": self.activeEnergy, "heartRate": self.heartRate]
-            if let data = try? JSONSerialization.data(withJSONObject: packet) { await self.sendData(data) }
+            if let packet = self.metricsPacket(), let data = try? JSONEncoder().encode(packet) { await self.sendData(data) }
         }
     }
     nonisolated func workoutBuilderDidCollectEvent(_ workoutBuilder: HKLiveWorkoutBuilder) {}

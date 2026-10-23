@@ -4,6 +4,7 @@ import Foundation
 struct WatchWorkoutLifecycleTests {
     @MainActor
     static func main() async throws {
+        try testMetricsAggregation()
         var snapshot = WatchSnapshot()
         snapshot.update(workout: ["id": "A", "active": true])
         let beforeFood = snapshot.dictionary
@@ -73,4 +74,84 @@ struct WatchWorkoutLifecycleTests {
         precondition(handoff == ["abort"])
         print("Workout lifecycle: snapshot coexistence/revisions, persisted command fences, ordered operations, deadline races and device handoff passed")
     }
+    @MainActor
+    static func testMetricsAggregation() throws {
+        let now = Date(timeIntervalSince1970: 1000)
+        var watch = WorkoutMetricsLedger(workoutID: "training")
+        watch.record(device: "watch", generation: "A", energy: 80, state: .running, heartRate: 120, heartRateDate: now, activate: true)
+        var phone = WorkoutMetricsLedger(workoutID: "training")
+        let first = watch.packet(device: "watch")
+        precondition(WorkoutMetricsPacket.decode(first.dictionary) == first)
+        precondition(phone.merge(first) && phone.totalEnergy == 80)
+        precondition(!phone.merge(first) && phone.totalEnergy == 80)
+        precondition(phone.liveHeartRate(at: now.addingTimeInterval(29)) == 120)
+        precondition(phone.liveHeartRate(at: now.addingTimeInterval(31)) == nil)
+        precondition(phone.liveHeartRate(at: now, after: now) == nil)
+        watch.record(device: "watch", generation: "A", state: .ended)
+        precondition(phone.merge(watch.packet(device: "watch")))
+        precondition(phone.totalEnergy == 80 && phone.liveHeartRate(at: now) == nil)
+        watch.record(device: "watch", generation: "B", energy: 0, state: .running, activate: true)
+        watch.record(device: "watch", generation: "B", energy: 15, heartRate: 130, heartRateDate: now.addingTimeInterval(10))
+        precondition(phone.merge(watch.packet(device: "watch")))
+        precondition(phone.totalEnergy == 95 && phone.liveHeartRate(at: now.addingTimeInterval(12)) == 130)
+        let beforeLateFinalization = watch.packet(device: "watch")
+        // A delayed final builder result refines A, without making it active again.
+        watch.record(device: "watch", generation: "A", energy: 82, state: .ended,
+                     heartRate: 200, heartRateDate: now.addingTimeInterval(11))
+        precondition(phone.merge(watch.packet(device: "watch")))
+        precondition(phone.totalEnergy == 97 && phone.liveHeartRate(at: now.addingTimeInterval(12)) == 130)
+        precondition(!phone.merge(beforeLateFinalization))
+        precondition(!phone.merge(first) && phone.totalEnergy == 97)
+        watch.record(device: "watch", generation: "B", energy: 0)
+        phone.merge(watch.packet(device: "watch"))
+        precondition(phone.totalEnergy == 97)
+        watch.record(device: "watch", generation: "B", state: .paused, stateDate: now.addingTimeInterval(15))
+        phone.merge(watch.packet(device: "watch"))
+        precondition(phone.liveHeartRate(at: now.addingTimeInterval(12)) == nil)
+        watch.record(device: "watch", generation: "B", state: .running, activate: true)
+        phone.merge(watch.packet(device: "watch"))
+        precondition(phone.liveHeartRate(at: now.addingTimeInterval(16)) == nil)
+        watch.record(device: "watch", generation: "B", state: .running,
+                     heartRate: 135, heartRateDate: now.addingTimeInterval(20), activate: true)
+        phone.merge(watch.packet(device: "watch"))
+        precondition(phone.liveHeartRate(at: now.addingTimeInterval(21)) == 135)
+        // Local fallback and Watch contributions are raw values: no nested offsets.
+        phone.record(device: "phone", generation: "P", energy: 30, state: .ended)
+        watch.merge(phone.packet(device: "phone"))
+        precondition(watch.totalEnergy == 127 && phone.totalEnergy == 127)
+        precondition(!watch.merge(phone.packet(device: "phone")))
+        phone.record(device: "phone", generation: "P2", energy: 5, state: .running, activate: true)
+        watch.merge(phone.packet(device: "phone"))
+        precondition(watch.totalEnergy == 132)
+        phone.merge(watch.packet(device: "watch"))
+        precondition(phone.totalEnergy == 132)
+        // Recovering a builder keeps its segment identity and cumulative counter.
+        watch.record(device: "watch", generation: "B", energy: 16)
+        phone.merge(watch.packet(device: "watch"))
+        precondition(phone.totalEnergy == 133)
+        let restored = try JSONDecoder().decode(WorkoutMetricsLedger.self, from: JSONEncoder().encode(phone))
+        precondition(restored == phone)
+        var other = WorkoutMetricsLedger(workoutID: "next-training")
+        precondition(!other.merge(watch.packet(device: "watch")) && other.totalEnergy == 0)
+        let suite = "GymBro.MetricsTests.\(UUID().uuidString)"
+        let defaults = UserDefaults(suiteName: suite)!
+        defer { defaults.removePersistentDomain(forName: suite) }
+        WorkoutMetricsStore(defaults: defaults).save(phone)
+        let reopened = WorkoutMetricsStore(defaults: defaults)
+        precondition(reopened.ledger(for: "training").totalEnergy == 133)
+        precondition(!reopened.merge(watch.packet(device: "watch")))
+        precondition(reopened.ledger(for: "next-training").totalEnergy == 0)
+        // Migrating the old prefix on both devices must count it only once.
+        var legacyPhone = WorkoutMetricsLedger(workoutID: "legacy")
+        var legacyWatch = WorkoutMetricsLedger(workoutID: "legacy")
+        legacyPhone.seedLegacyOffset(20)
+        legacyWatch.seedLegacyOffset(10)
+        legacyWatch.record(device: "watch", generation: "W", energy: 10, state: .running, activate: true)
+        legacyPhone.merge(legacyWatch.packet(device: "watch"))
+        precondition(legacyPhone.totalEnergy == 30)
+        legacyWatch.merge(legacyPhone.packet(device: "phone"))
+        precondition(legacyWatch.totalEnergy == 30)
+        print("Workout aggregation: session restarts, duplicates, late packets/results, raw device totals, HR expiry/pauses, recovery, persistence and workout isolation passed")
+    }
+
 }

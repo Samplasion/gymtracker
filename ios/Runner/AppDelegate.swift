@@ -14,6 +14,11 @@ import flutter_app_intents
     var session: WCSession?
     private var latestFoodParameters: [String: Any]?
     private var legacySensorGeneration: String?
+    private let metricsStore = WorkoutMetricsStore.shared
+    private var legacyMetricsMonitor: Task<Void, Never>?
+    private var legacyHeartRateInvalidatedAt = Date()
+    private var legacyReconciliationQueued = false
+    private var legacyLastProbe = Date.distantPast
     private let legacyWorkoutQueue = WorkoutOperationQueue()
     private var watchSnapshot = WatchSnapshot(dictionary: UserDefaults.standard.dictionary(forKey: "watch.snapshot.v2") ?? [:])
     var flutterNativeApi: GymBroNativeFlutterAPI?
@@ -47,6 +52,7 @@ import flutter_app_intents
             workout.retrieveRemoteSession()
             
             workout.listener = self
+            workout.onMetricsPacket = { [weak self] packet in self?.publishPhoneMetrics(packet) }
             workout.watchAvailable = { [weak self] in self?.session?.isReachable == true }
             workout.remoteCommand = { [weak self] command in
                 guard let session = self?.session, session.isReachable else { throw WorkoutOperationError.unavailable }
@@ -205,6 +211,14 @@ extension AppDelegate: WCSessionDelegate {
         }
     }
     
+    func session(_ session: WCSession, didReceiveApplicationContext context: [String: Any]) {
+        Task { @MainActor in
+            if context["kind"] as? String == "workoutMetrics", let metrics = context["metrics"] as? [String: Any] {
+                self.receiveWorkoutMetrics(metrics)
+            }
+        }
+    }
+
     func sessionDidBecomeInactive(_ session: WCSession) {
         logger!.log("Watch session became inactive")
     }
@@ -240,16 +254,7 @@ extension AppDelegate: WCSessionDelegate {
                     self.logger!.error("Unknown log message from watch")
                 }
             } else if method == "workoutMetrics" {
-                if #available(iOS 17, *) {
-                    guard message["workoutId"] as? String == self.workout.desiredRequest?.id,
-                          message["generation"] as? String == self.workout.generation else { return }
-                    if let data = try? JSONSerialization.data(withJSONObject: message) { try? self.workout.handleReceivedData(data) }
-                } else {
-                    guard message["workoutId"] as? String == self.watchSnapshot.workout["id"] as? String,
-                          self.watchSnapshot.workout["active"] as? Bool == true,
-                          message["generation"] as? String == self.legacySensorGeneration else { return }
-                    self.flutterNativeApi?.handleWorkoutMetrics(energy: message["energy"] as? Double, heartRate: message["heartRate"] as? Double, completion: { _ in })
-                }
+                self.receiveWorkoutMetrics(message["metrics"] as? [String: Any] ?? [:])
             } else {
                 logger!.error("Received unknown message from watch: \(method)")
                 return
@@ -311,6 +316,11 @@ extension AppDelegate: WCSessionDelegate {
     
     func sessionReachabilityDidChange(_ session: WCSession) {
         Task { @MainActor in
+            if !session.isReachable {
+                if #available(iOS 17, *) {
+                    if self.workout.device == "watch" { self.workout.invalidateHeartRate() }
+                } else { self.legacyHeartRateInvalidatedAt = Date(); self.publishLegacyMetrics() }
+            }
             self.publishWatchSnapshot()
             if #available(iOS 17, *) { if session.isReachable { self.workout.watchBecameReachable() } }
             else { self.synchronizeLegacyWorkout() }
@@ -336,19 +346,23 @@ extension AppDelegate: GymBroNativeHostAPI {
         applicationContext.startingTime = Date(milliseconds: startMilliseconds)
         let old = watchSnapshot.workout
         var state: [String: Any] = ["id": workoutId, "active": true, "save": true, "start": startMilliseconds]
+        state["metrics"] = metricsStore.ledger(for: workoutId).packet(device: "phone").dictionary
         if old["id"] as? String == workoutId { state["parameters"] = old["parameters"] }
         watchSnapshot.update(workout: state)
         publishWatchSnapshot()
         didUpdateApplicationContext(applicationContext)
         if #available(iOS 17, *) { workout.startPhoneWorkout(id: workoutId, start: applicationContext.startingTime) }
-        else { launchLegacyWatch(); synchronizeLegacyWorkout() }
+        else { startLegacyMetricsMonitor(); publishLegacyMetrics(); launchLegacyWatch(); synchronizeLegacyWorkout() }
     }
 
     func stopWorkout(workoutId: String, save: Bool) throws {
+        legacyMetricsMonitor?.cancel()
+        legacyMetricsMonitor = nil
         if watchSnapshot.workout["id"] as? String == workoutId {
             var state = watchSnapshot.workout
             state["active"] = false
             state["save"] = save
+            state["end"] = Date().millisecondsSinceEpoch
             watchSnapshot.update(workout: state)
             applicationContext.isRunning = false
             publishWatchSnapshot()
@@ -487,11 +501,14 @@ extension AppDelegate {
 @available(iOS 17.0, *)
 extension AppDelegate: WorkoutMetricsListener {
     func handleHeartRateUpdate(_ heartRate: Double) {
-        guard heartRate > 0 else { return }
+        guard watchSnapshot.workout["active"] as? Bool == true,
+              workout.request?.id == watchSnapshot.workout["id"] as? String else { return }
         logger?.log("Updating data: \(heartRate) bpm")
         self.flutterNativeApi?.handleWorkoutMetrics(energy: nil, heartRate: heartRate, completion: {_ in})
     }
     func handleActiveEnergyUpdate(_ activeEnergy: Double) {
+        guard watchSnapshot.workout["active"] as? Bool == true,
+              workout.request?.id == watchSnapshot.workout["id"] as? String else { return }
         logger?.log("Updating data: \(activeEnergy) kcal")
         self.flutterNativeApi?.handleWorkoutMetrics(energy: activeEnergy, heartRate: nil, completion: {_ in})
     }
@@ -504,6 +521,50 @@ extension AppDelegate {
         latestFoodParameters = parameters
         watchSnapshot.update(food: parameters)
         publishWatchSnapshot()
+    }
+
+    private func receiveWorkoutMetrics(_ dictionary: [String: Any]) {
+        guard let packet = WorkoutMetricsPacket.decode(dictionary), packet.device == "watch",
+              watchSnapshot.workout["active"] as? Bool == true,
+              packet.workoutID == watchSnapshot.workout["id"] as? String else { return }
+        if #available(iOS 17, *) {
+            if let data = try? JSONSerialization.data(withJSONObject: dictionary) { try? workout.handleReceivedData(data) }
+        } else if metricsStore.merge(packet) {
+            publishLegacyMetrics()
+        }
+    }
+
+    private func publishPhoneMetrics(_ packet: WorkoutMetricsPacket) {
+        guard watchSnapshot.workout["id"] as? String == packet.workoutID else { return }
+        let old = watchSnapshot.workout["metrics"] as? [String: Any] ?? [:]
+        guard !(old as NSDictionary).isEqual(to: packet.dictionary) else { return }
+        var state = watchSnapshot.workout
+        state["metrics"] = packet.dictionary
+        watchSnapshot.update(workout: state)
+        publishWatchSnapshot()
+    }
+
+    private func publishLegacyMetrics() {
+        guard watchSnapshot.workout["active"] as? Bool == true,
+              let id = watchSnapshot.workout["id"] as? String else { return }
+        let ledger = metricsStore.ledger(for: id)
+        flutterNativeApi?.handleWorkoutMetrics(energy: ledger.totalEnergy,
+            heartRate: ledger.liveHeartRate(at: Date(), after: legacyHeartRateInvalidatedAt) ?? 0, completion: { _ in })
+        publishPhoneMetrics(ledger.packet(device: "phone"))
+    }
+
+    private func startLegacyMetricsMonitor() {
+        legacyMetricsMonitor?.cancel()
+        legacyHeartRateInvalidatedAt = Date()
+        legacyMetricsMonitor = Task { @MainActor in
+            while !Task.isCancelled {
+                do { try await Task.sleep(nanoseconds: 5_000_000_000) } catch { return }
+                self.publishLegacyMetrics()
+                if let id = self.watchSnapshot.workout["id"] as? String,
+                   self.metricsStore.ledger(for: id).activeGenerations["watch"] == nil,
+                   Date().timeIntervalSince(self.legacyLastProbe) >= 15 { self.synchronizeLegacyWorkout() }
+            }
+        }
     }
 
     private func launchLegacyWatch() {
@@ -520,11 +581,14 @@ extension AppDelegate {
     }
 
     private func synchronizeLegacyWorkout() {
-        guard session?.isReachable == true,
+        guard session?.isReachable == true, !legacyReconciliationQueued,
               let id = watchSnapshot.workout["id"] as? String else { return }
+        legacyReconciliationQueued = true
+        legacyLastProbe = Date()
         let state = watchSnapshot.workout
         let revision = watchSnapshot.revision
         legacyWorkoutQueue.enqueue {
+            defer { self.legacyReconciliationQueued = false }
             guard self.watchSnapshot.workout["id"] as? String == id else { return }
             do {
                 let pending = UserDefaults.standard.dictionary(forKey: "workout.remoteFinishes.v2") as? [String: Bool] ?? [:]
@@ -541,10 +605,12 @@ extension AppDelegate {
                     let token = UUID().uuidString
                     let prepared = try await self.legacySensorCommand(["action": "prepare", "workoutId": id,
                         "generation": token, "start": ((state["start"] as? NSNumber)?.doubleValue ?? 0) / 1000,
-                        "revision": revision, "deadline": Date().addingTimeInterval(10).timeIntervalSince1970])
+                        "revision": revision, "metrics": self.metricsStore.ledger(for: id).packet(device: "phone").dictionary,
+                        "deadline": Date().addingTimeInterval(10).timeIntervalSince1970])
                     guard prepared["success"] as? Bool == true,
                           self.watchSnapshot.workout["id"] as? String == id,
                           self.watchSnapshot.workout["active"] as? Bool == true else { return }
+                    if let metrics = prepared["metrics"] as? [String: Any] { self.receiveWorkoutMetrics(metrics) }
                     self.legacySensorGeneration = prepared["generation"] as? String ?? token
                     _ = try await self.legacySensorCommand(["action": "commit", "workoutId": id,
                         "generation": prepared["generation"] as? String ?? token, "revision": revision,

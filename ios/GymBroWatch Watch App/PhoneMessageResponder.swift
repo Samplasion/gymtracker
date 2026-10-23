@@ -7,7 +7,11 @@ final class PhoneMessageResponder: NSObject {
     var workoutDelegate: WorkoutMessageDelegate? {
         didSet {
             if let cached = UserDefaults.standard.dictionary(forKey: "watch.receivedSnapshot.v2") {
-                workoutDelegate?.apply(workoutSnapshot: cached["workout"] as? [String: Any] ?? [:])
+                let workout = cached["workout"] as? [String: Any] ?? [:]
+                workoutDelegate?.apply(workoutSnapshot: workout)
+                if let id = workout["id"] as? String, let start = (workout["start"] as? NSNumber)?.int64Value {
+                    WorkoutManager.shared.selectWorkout(.init(id: id, start: Date(milliseconds: start)))
+                }
             }
         }
     }
@@ -51,6 +55,12 @@ final class PhoneMessageResponder: NSObject {
         UserDefaults.standard.set(snapshot, forKey: "watch.receivedSnapshot.v2")
         if let workout = snapshot["workout"] as? [String: Any] {
             workoutDelegate?.apply(workoutSnapshot: workout)
+            if let id = workout["id"] as? String, let start = (workout["start"] as? NSNumber)?.int64Value {
+                WorkoutManager.shared.selectWorkout(.init(id: id, start: Date(milliseconds: start)))
+                if let metrics = workout["metrics"] as? [String: Any], let data = try? JSONSerialization.data(withJSONObject: metrics) {
+                    try? WorkoutManager.shared.handleReceivedData(data)
+                }
+            }
             if workout["active"] as? Bool == false, let id = workout["id"] as? String {
                 // Deferred delivery also closes a workout when direct messages failed.
                 WorkoutManager.shared.enqueue {

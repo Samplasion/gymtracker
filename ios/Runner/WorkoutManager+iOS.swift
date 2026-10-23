@@ -5,6 +5,11 @@ import HealthKit
 @available(iOS 17, *)
 extension WorkoutManager {
     func retrieveRemoteSession() {
+        onSensorSessionEnded = { [weak self] in
+            guard self?.desiredRequest != nil else { return }
+            self?.watchBecameReachable()
+        }
+
         healthStore.workoutSessionMirroringStartHandler = { mirrored in
             Task { @MainActor in
                 // A mirror is never a local primary and must never create a builder.
@@ -18,18 +23,22 @@ extension WorkoutManager {
 
     func startPhoneWorkout(id: String, start: Date) {
         let next = WorkoutRequest(id: id, start: start)
-        guard desiredRequest != next else { return }
+        guard desiredRequest != next else {
+            // Flutter can reconnect to the same native session after rebuilding
+            // its providers. Republish the persisted totals without restarting it.
+            selectWorkout(next)
+            refreshPublishedMetrics()
+            return
+        }
         desiredRequest = next
         persistDesiredRequest()
         enqueue {
             guard self.desiredRequest == next else { return }
             if self.request?.id != id {
-                self.energyOffset = UserDefaults.standard.double(forKey: "workout.offset.\(id)")
-                self.activeEnergy = 0
-                self.heartRate = 0
+                self.invalidateHeartRate()
                 self.summary = nil
             }
-            self.request = next
+            self.selectWorkout(next)
             self.phase = .starting
             // Recover first; restoring Flutter must not create a second native session.
             if #available(iOS 26, *), self.session == nil,
@@ -37,7 +46,9 @@ extension WorkoutManager {
                 if recovered.type == .primary && (recovered.state == .running || recovered.state == .paused) {
                     let metadata = recovered.associatedWorkoutBuilder().metadata
                     if metadata[HKMetadataKeyExternalUUID] as? String == id {
-                        self.attachPrimary(recovered, request: next, generation: UUID().uuidString)
+                        self.attachPrimary(recovered, request: next, generation:
+                            metadata["gymbro.segmentId"] as? String ?? UserDefaults.standard.string(forKey: "workout.localGeneration.\(id)") ?? UUID().uuidString)
+                        self.recordSegment(generation: self.generation, state: recovered.state == .paused ? .paused : .running, activate: true)
                         self.device = "phone"
                         self.phase = .active
                     } else { recovered.end() }
@@ -58,7 +69,7 @@ extension WorkoutManager {
     }
 
     func stopPhoneWorkout(id: String, save: Bool) {
-        if desiredRequest?.id == id { desiredRequest = nil; persistDesiredRequest() }
+        if desiredRequest?.id == id { desiredRequest = nil; persistDesiredRequest(); stopMonitoringMetrics() }
         if !save { markDiscarded(id) }
         pendingRemoteFinish[id] = save
         UserDefaults.standard.set(pendingRemoteFinish, forKey: "workout.remoteFinishes.v2")
@@ -90,18 +101,21 @@ extension WorkoutManager {
     }
 
     func watchBecameReachable() {
-        guard !watchAttemptInProgress else { return }
+        guard !watchAttemptInProgress, !watchReconciliationQueued, Date() >= nextWatchProbe else { return }
+        watchReconciliationQueued = true
         enqueue {
+            defer { self.watchReconciliationQueued = false }
             let stored = UserDefaults.standard.dictionary(forKey: "workout.remoteFinishes.v2") as? [String: Bool] ?? [:]
             self.pendingRemoteFinish.merge(stored) { current, _ in current }
             for (id, save) in self.pendingRemoteFinish {
                 try? await self.finishRemote(id: id, save: save)
             }
             guard let request = self.desiredRequest,
-                  self.request == request, self.device != "watch" else { return }
+                  self.request == request, self.watchAvailable?() == true else { return }
             do { try await self.connectWatch(request) }
             catch {
-                if self.session == nil && self.desiredRequest == request { await self.startLocal(request) }
+                self.nextWatchProbe = Date().addingTimeInterval(15)
+                if self.session == nil && self.device != "watch" && self.desiredRequest == request { await self.startLocal(request) }
             }
         }
     }
@@ -112,6 +126,7 @@ extension WorkoutManager {
 
     private func connectWatch(_ request: WorkoutRequest) async throws {
         guard let remoteCommand else { throw WorkoutOperationError.unavailable }
+        nextWatchProbe = Date().addingTimeInterval(15)
         watchAttemptInProgress = true
         defer { watchAttemptInProgress = false }
         self.phase = device == "phone" ? .switchingDevice : .starting
@@ -136,12 +151,16 @@ extension WorkoutManager {
                 try await self.finishRemote(id: id, save: save)
             }
         }
-        let command: [String: Any] = ["method": "workoutSensor", "action": "prepare", "workoutId": request.id,
+        var command: [String: Any] = ["method": "workoutSensor", "action": "prepare", "workoutId": request.id,
             "generation": token, "start": request.start.timeIntervalSince1970,
             "deadline": preparationDeadline.timeIntervalSince1970]
+        command["metrics"] = metricsPacket()?.dictionary
         let prepared = try await workoutDeadline(max(0.001, preparationDeadline.timeIntervalSinceNow)) { try await remoteCommand(command) }
         guard prepared["success"] as? Bool == true else { throw WorkoutOperationError.unavailable }
         token = prepared["generation"] as? String ?? token
+        if let metrics = prepared["metrics"] as? [String: Any], let data = try? JSONSerialization.data(withJSONObject: metrics) {
+            try handleReceivedData(data)
+        }
         guard desiredRequest == request else {
             _ = try? await workoutDeadline(10) { try await remoteCommand(["method": "workoutSensor", "action": "abort", "workoutId": request.id, "generation": token]) }
             throw WorkoutOperationError.stale
@@ -150,12 +169,6 @@ extension WorkoutManager {
             isCurrent: { self.desiredRequest == request },
             finishLocal: {
                 if self.device == "phone" {
-                    // Keep the old offset while the builder delivers its final
-                    // statistics, then carry the cumulative value to the Watch.
-                    defer {
-                        self.energyOffset = self.activeEnergy
-                        UserDefaults.standard.set(self.energyOffset, forKey: "workout.offset.\(request.id)")
-                    }
                     try await self.finishSegment(save: true)
                 }
             },
@@ -164,7 +177,7 @@ extension WorkoutManager {
                 var commit = command
                 commit["action"] = "commit"
                 commit["generation"] = token
-                commit["offset"] = self.energyOffset
+                commit["metrics"] = self.metricsPacket()?.dictionary
                 commit["deadline"] = Date().addingTimeInterval(10).timeIntervalSince1970
                 let result = try await workoutDeadline(10) { try await remoteCommand(commit) }
                 guard result["success"] as? Bool == true else { throw WorkoutOperationError.unavailable }
@@ -200,7 +213,8 @@ extension WorkoutManager {
         configuration.locationType = .indoor
         let local = try HKWorkoutSession(healthStore: healthStore, configuration: configuration)
         attachPrimary(local, request: request, generation: UUID().uuidString)
-        try await builder?.addMetadata([HKMetadataKeyExternalUUID: request.id])
+        UserDefaults.standard.set(generation, forKey: "workout.localGeneration.\(request.id)")
+        try await builder?.addMetadata([HKMetadataKeyExternalUUID: request.id, "gymbro.segmentId": generation])
         guard desiredRequest == request, !Task.isCancelled else {
             local.end()
             builder?.discardWorkout()

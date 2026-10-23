@@ -4,6 +4,7 @@ import SwiftUI
 struct SummaryView: View {
     let workoutID: String
     @EnvironmentObject var workoutManager: WorkoutManager
+    @EnvironmentObject var workoutViewModel: WorkoutViewModel
     @Environment(\.dismiss) private var dismiss
     @State private var longWait = false
 
@@ -12,9 +13,9 @@ struct SummaryView: View {
             VStack(alignment: .leading) {
                 switch result {
                 case .saved(let workout):
-                    SummaryMetricView(title: "Total Time", value: duration(workout.duration))
+                    SummaryMetricView(title: "Total Time", value: duration(elapsedTime(for: workout)))
                         .foregroundStyle(.yellow)
-                    SummaryMetricView(title: "Total Energy", value: "\((workout.totalEnergyBurned?.doubleValue(for: .kilocalorie()) ?? 0).formatted(.number.precision(.fractionLength(1)))) kcal")
+                    SummaryMetricView(title: "Total Energy", value: "\(workoutManager.metricsStore.ledger(for: workoutID).totalEnergy.formatted(.number.precision(.fractionLength(1)))) kcal")
                         .foregroundStyle(.pink)
                     SummaryMetricView(title: "Avg. Heart Rate", value: "\(Int(workout.statistics(for: HKQuantityType(.heartRate))?.averageQuantity()?.doubleValue(for: .count().unitDivided(by: .minute())) ?? 0)) bpm")
                         .foregroundStyle(.red)
@@ -47,6 +48,12 @@ struct SummaryView: View {
     private var result: WorkoutSummary.Result {
         guard let summary = workoutManager.summary, summary.id == workoutID else { return .saving }
         return summary.result
+    }
+    private func elapsedTime(for workout: HKWorkout) -> TimeInterval {
+        guard workoutViewModel.workoutID == workoutID else { return workout.duration }
+        let start = workoutViewModel.workoutStart ?? workout.startDate
+        let end = workoutViewModel.workoutEnd ?? workout.endDate
+        return max(0, end.timeIntervalSince(start))
     }
     private func duration(_ interval: TimeInterval) -> String {
         let seconds = max(0, Int(interval))

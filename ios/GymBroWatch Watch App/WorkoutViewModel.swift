@@ -18,6 +18,7 @@ final class WorkoutViewModel: NSObject, ObservableObject {
     @Published var exerciseParameters = ""
     @Published var setTypeLabel = ""
     @Published var workoutStart: Date?
+    @Published var workoutEnd: Date?
     @Published var isLoading = false
     @Published var state: WorkoutState = .notStarted
     @Published var set: GTSet?
@@ -108,6 +109,7 @@ extension WorkoutViewModel: WorkoutMessageDelegate {
             exerciseParameters = ""
             workoutID = id
         }
+        workoutEnd = active ? nil : (workoutSnapshot["end"] as? NSNumber).map { Date(milliseconds: $0.int64Value) }
         if let start = (workoutSnapshot["start"] as? NSNumber)?.int64Value { workoutStart = Date(milliseconds: start) }
         if let parameters = workoutSnapshot["parameters"] as? [String: Any],
            let decoded = NativeWorkoutStateMessage.decodeWorkoutState(from: parameters) { self.set(exerciseParameters: decoded) }

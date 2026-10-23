@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:gymtracker/controller/error_controller.dart';
 import 'package:gymtracker/i18n/strings.g.dart';
 import 'package:gymtracker/utils/extensions.dart';
@@ -14,8 +15,9 @@ class ErrorView extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final controller = ref.read(errorControllerProvider);
     final args = ErrorViewArguments.fromRouteArguments(
-      ModalRoute.of(context)?.settings.arguments,
+      GoRouterState.of(context).extra,
     );
+    final stack = args.details?.stack ?? args.stack;
     return PopScope(
       canPop: false,
       child: Scaffold(
@@ -61,36 +63,17 @@ class ErrorView extends ConsumerWidget {
                 style: Theme.of(context).textTheme.bodyMedium,
               ),
               const SizedBox(height: 16),
-              if (args.details != null) ...[
-                Text(
-                  args.details!.exceptionAsString(),
-                  style: TextStyle(
-                    color: context.colorScheme.onSurfaceVariant,
-                    fontFamily: "monospace",
-                    fontFamilyFallback: const ["Menlo", "Courier"],
-                  ),
+              Text(
+                args.details?.exceptionAsString() ?? args.error.toString(),
+                style: TextStyle(
+                  color: context.colorScheme.onSurfaceVariant,
+                  fontFamily: "monospace",
+                  fontFamilyFallback: const ["Menlo", "Courier"],
                 ),
-                const SizedBox(height: 16),
+              ),
+              if (stack != null)
                 Text(
-                  args.details!.stack.toString(),
-                  style: TextStyle(
-                    color: context.colorScheme.onSurfaceVariant,
-                    fontFamily: "monospace",
-                    fontFamilyFallback: const ["Menlo", "Courier"],
-                  ),
-                ),
-              ] else
-                Text(
-                  args.error.toString(),
-                  style: TextStyle(
-                    color: context.colorScheme.onSurfaceVariant,
-                    fontFamily: "monospace",
-                    fontFamilyFallback: const ["Menlo", "Courier"],
-                  ),
-                ),
-              if (args.stack != null)
-                Text(
-                  "\n${args.stack!.toString()}",
+                  "\n$stack",
                   style: TextStyle(
                     color: context.colorScheme.onSurfaceVariant,
                     fontFamily: "monospace",

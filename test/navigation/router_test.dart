@@ -24,6 +24,7 @@ import 'package:gymtracker/service/test.dart';
 import 'package:gymtracker/service/version.dart';
 import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/utils/theme.dart';
+import 'package:gymtracker/view/error.dart';
 import 'package:gymtracker/view/feed.dart';
 import 'package:gymtracker/view/loading.dart';
 import 'package:gymtracker/view/me.dart';
@@ -137,6 +138,55 @@ void main() {
       );
     },
   );
+
+  for (final frameworkError in [false, true]) {
+    testWidgets(
+      'error route preserves ${frameworkError ? 'Flutter' : 'async'} error and stack',
+      (tester) async {
+        await mount(tester, '/workout');
+        final error = StateError('Original error for navigation test');
+        final stack = StackTrace.fromString('original_error_stack');
+        final args = frameworkError
+            ? ErrorViewArguments(
+                details: FlutterErrorDetails(exception: error, stack: stack),
+              )
+            : ErrorViewArguments(error: error, stack: stack);
+
+        unawaited(Go.toNamed<void>(ErrorView.routeName, arguments: args));
+        await tester.pumpAndSettle();
+
+        expect(find.byType(ErrorView), findsOneWidget);
+        expect(
+          find.textContaining('Original error for navigation test'),
+          findsOneWidget,
+        );
+        expect(find.textContaining('original_error_stack'), findsOneWidget);
+        final context = tester.element(find.byType(ErrorView));
+        expect(find.text(context.t.errorView.noStack), findsNothing);
+        expect(find.text('{}'), findsNothing);
+        expect(tester.takeException(), isNull);
+        await tester.pumpWidget(const SizedBox());
+        await tester.pumpAndSettle();
+      },
+    );
+  }
+
+  testWidgets('error route without details shows an explicit fallback', (
+    tester,
+  ) async {
+    await mount(tester, '/error');
+    await tester.pumpAndSettle();
+    expect(
+      find.textContaining('No error details were provided.'),
+      findsOneWidget,
+    );
+    final context = tester.element(find.byType(ErrorView));
+    expect(find.text(context.t.errorView.noStack), findsOneWidget);
+    expect(find.text('{}'), findsNothing);
+    expect(tester.takeException(), isNull);
+    await tester.pumpWidget(const SizedBox());
+    await tester.pumpAndSettle();
+  });
 
   Future<Completer<void>> configureBoot({
     required bool completedOnboarding,

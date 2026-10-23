@@ -14,21 +14,52 @@ final socialClientProvider = Provider<SupabaseClient>(
 );
 final sourceSocialProvider = FutureProvider.autoDispose
     .family<Map<String, dynamic>?, SocialSource>((ref, source) async {
-      ref.watch(sourcePublicationPendingProvider(source));
-      final expiry = Timer(const Duration(minutes: 1), ref.invalidateSelf);
-      ref.onDispose(expiry.cancel);
       if (ref.watch(currentUserIdProvider) == null) return null;
-      final result = await ref
-          .watch(socialClientProvider)
-          .rpc(
-            'get_source_social',
-            params: {
-              'owner': source.owner,
-              'source': source.source,
-              'source_kind': source.kind,
-            },
-          );
-      return result == null ? null : Map<String, dynamic>.from(result as Map);
+      ref.watch(
+        sourcePublicationPendingProvider(
+          source,
+        ).select((pending) => pending.value ?? false),
+      );
+      // Scrolling a card away must not discard its counts or in-flight request.
+      // Refresh visible cards, but release cached offscreen cards after a while.
+      final cache = ref.keepAlive();
+      Timer? eviction;
+      Timer? refresh;
+      void scheduleRefresh() {
+        refresh?.cancel();
+        refresh = Timer(const Duration(minutes: 1), ref.invalidateSelf);
+      }
+
+      scheduleRefresh();
+      ref.onCancel(() {
+        refresh?.cancel();
+        eviction?.cancel();
+        eviction = Timer(const Duration(minutes: 5), cache.close);
+      });
+      ref.onResume(() {
+        eviction?.cancel();
+        scheduleRefresh();
+      });
+      ref.onDispose(() {
+        refresh?.cancel();
+        eviction?.cancel();
+      });
+      try {
+        final result = await ref
+            .watch(socialClientProvider)
+            .rpc(
+              'get_source_social',
+              params: {
+                'owner': source.owner,
+                'source': source.source,
+                'source_kind': source.kind,
+              },
+            );
+        return result == null ? null : Map<String, dynamic>.from(result as Map);
+      } catch (_) {
+        cache.close();
+        rethrow;
+      }
     });
 final postContentProvider = FutureProvider.autoDispose
     .family<Map<String, dynamic>, String>((ref, id) async {

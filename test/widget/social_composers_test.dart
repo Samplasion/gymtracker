@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:gymtracker/model/workout.dart';
+import 'package:gymtracker/provider/online.dart';
+import 'package:gymtracker/provider/social.dart';
 import 'package:gymtracker/view/social.dart';
 import 'package:mocktail/mocktail.dart';
 
@@ -14,6 +16,54 @@ void main() {
     await initTestLocalizations();
   });
   tearDown(MockServices.tearDown);
+
+  for (final canOpenComments in [true, false]) {
+    testWidgets('comment navigation enabled: $canOpenComments', (tester) async {
+      const source = (owner: 'friend', source: 'workout', kind: 'workout');
+      final container = ProviderContainer(
+        overrides: [
+          ...MockServices.defaultOverrides,
+          currentUserIdProvider.overrideWithValue('viewer'),
+          sourceSocialProvider(source).overrideWith(
+            (ref) async => {
+              'post': {'id': 'post', 'active': true},
+              'likes': 4,
+              'comments': 7,
+            },
+          ),
+        ],
+      );
+      addTearDown(container.dispose);
+      await tester.pumpWidget(
+        UncontrolledProviderScope(
+          container: container,
+          child: WidgetTestApp(
+            child: PostActions(
+              source: source,
+              canOpenComments: canOpenComments,
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      final button = tester.widget<TextButton>(
+        find.ancestor(
+          of: find.byIcon(Icons.comment_outlined),
+          matching: find.byType(TextButton),
+        ),
+      );
+      expect(button.onPressed, canOpenComments ? isNotNull : isNull);
+      expect(find.text('7'), findsOneWidget);
+      // Disabling comments must leave likes usable.
+      expect(
+        tester
+            .widget<TextButton>(find.widgetWithText(TextButton, '4'))
+            .onPressed,
+        isNotNull,
+      );
+      await tester.pumpWidget(const SizedBox.shrink());
+    });
+  }
 
   testWidgets('visibility is edited in a dialog opened from the popup menu', (
     tester,

@@ -243,9 +243,15 @@ class WorkoutVisibilityMenu extends ConsumerWidget {
 }
 
 class PostActions extends ConsumerStatefulWidget {
-  const PostActions({super.key, required this.source, this.workout});
+  const PostActions({
+    super.key,
+    required this.source,
+    this.workout,
+    this.canOpenComments = true,
+  });
   final SocialSource source;
   final Workout? workout;
+  final bool canOpenComments;
   @override
   ConsumerState<PostActions> createState() => _PostActionsState();
 }
@@ -319,8 +325,11 @@ class _PostActionsState extends ConsumerState<PostActions> {
                 label: Text('${data?["likes"] ?? 0}'),
               ),
               TextButton.icon(
-                onPressed: () =>
-                    Go.to(() => SocialPostPage(postId: post!['id'] as String)),
+                onPressed: widget.canOpenComments
+                    ? () => Go.to(
+                        () => SocialPostPage(postId: post!['id'] as String),
+                      )
+                    : null,
                 icon: const Icon(Icons.comment_outlined),
                 label: Text('${data?["comments"] ?? 0}'),
               ),
@@ -459,7 +468,8 @@ class _SocialPostPageState extends ConsumerState<SocialPostPage> {
             },
             child: ListView(
               children: [
-                if (feedItem != null) FeedItemCard(item: feedItem),
+                if (feedItem != null)
+                  FeedItemCard(item: feedItem, canOpenComments: false),
                 ListTile(
                   title: Text(context.t.social.comments),
                   trailing: IconButton(

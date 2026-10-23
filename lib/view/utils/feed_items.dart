@@ -16,12 +16,14 @@ import 'package:relative_time/relative_time.dart';
 /// user profile screens.
 class FeedItemWorkoutCard extends ConsumerWidget {
   final FeedItemWorkout item;
+  final bool canOpenComments;
   final void Function(String? userID)? onUserPressed;
 
   const FeedItemWorkoutCard({
     super.key,
     required this.item,
     this.onUserPressed,
+    this.canOpenComments = true,
   });
 
   @override
@@ -101,6 +103,7 @@ class FeedItemWorkoutCard extends ConsumerWidget {
           ),
           if (item.authorship.userID != null)
             PostActions(
+              canOpenComments: canOpenComments,
               source: (
                 owner: item.authorship.userID!,
                 source: item.workout.id,
@@ -118,12 +121,14 @@ class FeedItemWorkoutCard extends ConsumerWidget {
 /// user profile screens.
 class FeedItemAchievementCard extends StatelessWidget {
   final FeedItemAchievement item;
+  final bool canOpenComments;
   final void Function(String? userID)? onUserPressed;
 
   const FeedItemAchievementCard({
     super.key,
     required this.item,
     this.onUserPressed,
+    this.canOpenComments = true,
   });
 
   @override
@@ -189,6 +194,7 @@ class FeedItemAchievementCard extends StatelessWidget {
           ),
           if (item.authorship.userID != null)
             PostActions(
+              canOpenComments: canOpenComments,
               source: (
                 owner: item.authorship.userID!,
                 source: item.completion.id,
@@ -205,17 +211,31 @@ class FeedItemAchievementCard extends StatelessWidget {
 /// [FeedItemAchievementCard] based on the runtime type of [item].
 class FeedItemCard extends StatelessWidget {
   final FeedItem item;
+  final bool canOpenComments;
   final void Function(String? userID)? onUserPressed;
 
-  const FeedItemCard({super.key, required this.item, this.onUserPressed});
+  const FeedItemCard({
+    super.key,
+    required this.item,
+    this.onUserPressed,
+    this.canOpenComments = true,
+  });
 
   @override
   Widget build(BuildContext context) {
     final i = item;
     if (i is FeedItemWorkout) {
-      return FeedItemWorkoutCard(item: i, onUserPressed: onUserPressed);
+      return FeedItemWorkoutCard(
+        item: i,
+        onUserPressed: onUserPressed,
+        canOpenComments: canOpenComments,
+      );
     } else if (i is FeedItemAchievement) {
-      return FeedItemAchievementCard(item: i, onUserPressed: onUserPressed);
+      return FeedItemAchievementCard(
+        item: i,
+        onUserPressed: onUserPressed,
+        canOpenComments: canOpenComments,
+      );
     }
     return const SizedBox.shrink();
   }

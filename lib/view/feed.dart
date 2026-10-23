@@ -20,7 +20,8 @@ import 'package:gymtracker/view/components/icon_grid.dart';
 import 'package:gymtracker/view/components/loading_indicator.dart';
 import 'package:gymtracker/view/components/routines.dart';
 import 'package:gymtracker/view/exercises.dart';
-import 'package:gymtracker/view/friend_requests.dart';
+import 'package:gymtracker/view/social_notifications.dart';
+import 'package:gymtracker/provider/social.dart';
 import 'package:gymtracker/view/login.dart';
 import 'package:gymtracker/view/skeleton.dart';
 import 'package:gymtracker/view/user_profile.dart';
@@ -66,6 +67,8 @@ class _FeedViewState extends ConsumerState<FeedView>
     _foreground = state == AppLifecycleState.resumed;
     if (mounted && _foreground && ModalRoute.of(context)?.isCurrent != false) {
       unawaited(_feedNotifier.refreshIfStale());
+      ref.invalidate(socialNotificationsProvider);
+      ref.invalidate(sourceSocialProvider);
     }
   }
 
@@ -93,11 +96,8 @@ class _FeedViewState extends ConsumerState<FeedView>
     final account = ref.watch(onlineProvider);
     final pendingRequestCount = account.value == null
         ? 0
-        : ref.watch(
-            friendProvider.select(
-              (state) => state.value?.pendingReceived.length ?? 0,
-            ),
-          );
+        : (ref.watch(notificationSummaryProvider).value?['unread'] as int? ??
+              0);
 
     return Scaffold(
       floatingActionButtonLocation: .endDocked,
@@ -128,6 +128,8 @@ class _FeedViewState extends ConsumerState<FeedView>
             ),
       body: RefreshIndicator(
         onRefresh: () async {
+          ref.invalidate(sourceSocialProvider);
+          ref.invalidate(socialNotificationsProvider);
           await Future.wait([
             ref.read(feedProvider.notifier).refresh(),
             if (account.value != null)
@@ -143,16 +145,16 @@ class _FeedViewState extends ConsumerState<FeedView>
               leading: SkeletonDrawerButton(),
               actions: [
                 IconButton(
-                  tooltip: context.t.friendRequests.title,
+                  tooltip: context.t.social.notifications,
                   icon: Badge.count(
                     count: pendingRequestCount,
                     isLabelVisible: pendingRequestCount > 0,
-                    child: const Icon(GTIcons.friend_requests),
+                    child: const Icon(GTIcons.notifications),
                   ),
                   onPressed: account.value == null
                       ? null
                       : () {
-                          Go.to(() => const FriendRequestsPage());
+                          Go.to(() => const SocialNotificationsPage());
                         },
                 ),
                 account.when(

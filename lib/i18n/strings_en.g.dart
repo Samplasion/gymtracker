@@ -189,6 +189,8 @@ class Translations with BaseTranslations<AppLocale, Translations> {
 
 	late final Translations$error$en error = Translations$error$en._(_root);
 	late final Translations$legacyWorkoutRecovery$en legacyWorkoutRecovery = Translations$legacyWorkoutRecovery$en._(_root);
+	late final Translations$friendsList$en friendsList = Translations$friendsList$en._(_root);
+	late final Translations$social$en social = Translations$social$en._(_root);
 }
 
 // Path: progression
@@ -2088,6 +2090,186 @@ class Translations$legacyWorkoutRecovery$en {
 
 	/// en: 'The workout could not be recovered. Check that this account has no ongoing workout, then try again.'
 	String get failed => 'The workout could not be recovered. Check that this account has no ongoing workout, then try again.';
+}
+
+// Path: friendsList
+class Translations$friendsList$en {
+	Translations$friendsList$en._(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Load more'
+	String get loadMore => 'Load more';
+
+	/// en: 'Friends'
+	String get title => 'Friends';
+
+	/// en: 'No friends yet'
+	String get empty => 'No friends yet';
+
+	/// en: 'Accepted friendships will appear here.'
+	String get emptyDescription => 'Accepted friendships will appear here.';
+
+	/// en: '$name’s achievements'
+	String historyTitle({required Object name}) => '${name}’s achievements';
+
+	/// en: 'No achievements yet'
+	String get historyEmpty => 'No achievements yet';
+
+	/// en: 'This friend’s unlocked achievements will appear here.'
+	String get historyEmptyDescription => 'This friend’s unlocked achievements will appear here.';
+
+	/// en: 'Unknown achievement'
+	String get unknownAchievement => 'Unknown achievement';
+
+	/// en: 'History is only available for your friends.'
+	String get accessDenied => 'History is only available for your friends.';
+}
+
+// Path: social
+class Translations$social$en {
+	Translations$social$en._(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Notifications'
+	String get notifications => 'Notifications';
+
+	/// en: 'Post'
+	String get post => 'Post';
+
+	/// en: 'Comments'
+	String get comments => 'Comments';
+
+	/// en: 'Comment'
+	String get comment => 'Comment';
+
+	/// en: 'Like'
+	String get like => 'Like';
+
+	/// en: 'Unlike'
+	String get unlike => 'Unlike';
+
+	/// en: 'Send'
+	String get send => 'Send';
+
+	/// en: 'Edit'
+	String get edit => 'Edit';
+
+	/// en: 'Delete'
+	String get delete => 'Delete';
+
+	/// en: 'Load more'
+	String get more => 'Load more';
+
+	/// en: 'Only me'
+	String get private => 'Only me';
+
+	/// en: 'Friends'
+	String get friends => 'Friends';
+
+	/// en: 'Visibility'
+	String get visibility => 'Visibility';
+
+	/// en: 'Change waiting to sync'
+	String get pending => 'Change waiting to sync';
+
+	/// en: 'Waiting to publish'
+	String get unpublished => 'Waiting to publish';
+
+	/// en: 'Content unavailable'
+	String get unavailable => 'Content unavailable';
+
+	/// en: 'Something went wrong. Please try again.'
+	String get error => 'Something went wrong. Please try again.';
+
+	/// en: 'There is nothing to show.'
+	String get empty => 'There is nothing to show.';
+
+	/// en: 'Block user'
+	String get block => 'Block user';
+
+	/// en: 'Unblock'
+	String get unblock => 'Unblock';
+
+	/// en: 'Blocked users'
+	String get blockedUsers => 'Blocked users';
+
+	/// en: 'Report user'
+	String get report => 'Report user';
+
+	/// en: 'My reports'
+	String get reports => 'My reports';
+
+	/// en: 'Reason (required)'
+	String get reason => 'Reason (required)';
+
+	/// en: 'Report submitted'
+	String get reportSent => 'Report submitted';
+
+	/// en: 'Block this user? Your friendship and requests will be removed.'
+	String get blockConfirm => 'Block this user? Your friendship and requests will be removed.';
+
+	/// en: 'Cancel'
+	String get cancel => 'Cancel';
+
+	/// en: 'Confirm'
+	String get confirm => 'Confirm';
+
+	/// en: 'Received'
+	String get received => 'Received';
+
+	/// en: 'Under review'
+	String get reviewing => 'Under review';
+
+	/// en: 'Resolved'
+	String get resolved => 'Resolved';
+
+	/// en: 'Dismissed'
+	String get dismissed => 'Dismissed';
+
+	/// en: 'Sent you a friend request'
+	String get friendRequest => 'Sent you a friend request';
+
+	/// en: 'Accepted your friend request'
+	String get friendAccepted => 'Accepted your friend request';
+
+	/// en: 'Liked your post'
+	String get likedPost => 'Liked your post';
+
+	/// en: 'Commented on your post'
+	String get commentedPost => 'Commented on your post';
+
+	/// en: 'Unlocked an achievement'
+	String get achievementUnlocked => 'Unlocked an achievement';
+
+	/// en: 'Your report status changed'
+	String get reportUpdated => 'Your report status changed';
+
+	/// en: 'Accept'
+	String get accept => 'Accept';
+
+	/// en: 'Decline'
+	String get reject => 'Decline';
+
+	/// en: 'Sign in to continue'
+	String get signIn => 'Sign in to continue';
+
+	/// en: 'Save'
+	String get save => 'Save';
+
+	/// en: 'Push notifications'
+	String get push => 'Push notifications';
+
+	/// en: 'Requests, interactions, achievements and reports'
+	String get pushDescription => 'Requests, interactions, achievements and reports';
+
+	/// en: 'Push notifications are not configured on this device'
+	String get pushDisabled => 'Push notifications are not configured on this device';
 }
 
 // Path: set.kindShort
@@ -10467,6 +10649,60 @@ extension on Translations {
 			'legacyWorkoutRecovery.confirm' => ({required Object account}) => 'Recover this workout in ${account}? It will become the ongoing workout for this account.',
 			'legacyWorkoutRecovery.guest' => 'Guest',
 			'legacyWorkoutRecovery.failed' => 'The workout could not be recovered. Check that this account has no ongoing workout, then try again.',
+			'friendsList.loadMore' => 'Load more',
+			'friendsList.title' => 'Friends',
+			'friendsList.empty' => 'No friends yet',
+			'friendsList.emptyDescription' => 'Accepted friendships will appear here.',
+			'friendsList.historyTitle' => ({required Object name}) => '${name}’s achievements',
+			'friendsList.historyEmpty' => 'No achievements yet',
+			'friendsList.historyEmptyDescription' => 'This friend’s unlocked achievements will appear here.',
+			'friendsList.unknownAchievement' => 'Unknown achievement',
+			'friendsList.accessDenied' => 'History is only available for your friends.',
+			'social.notifications' => 'Notifications',
+			'social.post' => 'Post',
+			'social.comments' => 'Comments',
+			'social.comment' => 'Comment',
+			'social.like' => 'Like',
+			'social.unlike' => 'Unlike',
+			'social.send' => 'Send',
+			'social.edit' => 'Edit',
+			'social.delete' => 'Delete',
+			'social.more' => 'Load more',
+			'social.private' => 'Only me',
+			'social.friends' => 'Friends',
+			'social.visibility' => 'Visibility',
+			'social.pending' => 'Change waiting to sync',
+			'social.unpublished' => 'Waiting to publish',
+			'social.unavailable' => 'Content unavailable',
+			'social.error' => 'Something went wrong. Please try again.',
+			'social.empty' => 'There is nothing to show.',
+			'social.block' => 'Block user',
+			'social.unblock' => 'Unblock',
+			'social.blockedUsers' => 'Blocked users',
+			'social.report' => 'Report user',
+			'social.reports' => 'My reports',
+			'social.reason' => 'Reason (required)',
+			'social.reportSent' => 'Report submitted',
+			'social.blockConfirm' => 'Block this user? Your friendship and requests will be removed.',
+			'social.cancel' => 'Cancel',
+			'social.confirm' => 'Confirm',
+			'social.received' => 'Received',
+			'social.reviewing' => 'Under review',
+			'social.resolved' => 'Resolved',
+			'social.dismissed' => 'Dismissed',
+			'social.friendRequest' => 'Sent you a friend request',
+			'social.friendAccepted' => 'Accepted your friend request',
+			'social.likedPost' => 'Liked your post',
+			'social.commentedPost' => 'Commented on your post',
+			'social.achievementUnlocked' => 'Unlocked an achievement',
+			'social.reportUpdated' => 'Your report status changed',
+			'social.accept' => 'Accept',
+			'social.reject' => 'Decline',
+			'social.signIn' => 'Sign in to continue',
+			'social.save' => 'Save',
+			'social.push' => 'Push notifications',
+			'social.pushDescription' => 'Requests, interactions, achievements and reports',
+			'social.pushDisabled' => 'Push notifications are not configured on this device',
 			_ => null,
 		};
 	}

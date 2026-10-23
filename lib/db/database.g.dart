@@ -1182,6 +1182,29 @@ class $HistoryWorkoutsTable extends HistoryWorkouts
     ),
     defaultValue: const Constant(false),
   );
+  static const VerificationMeta _visibilityMeta = const VerificationMeta(
+    'visibility',
+  );
+  @override
+  late final GeneratedColumn<String> visibility = GeneratedColumn<String>(
+    'visibility',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('friends'),
+  );
+  static const VerificationMeta _publicationManifestMeta =
+      const VerificationMeta('publicationManifest');
+  @override
+  late final GeneratedColumn<String> publicationManifest =
+      GeneratedColumn<String>(
+        'publication_manifest',
+        aliasedName,
+        true,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+      );
   static const VerificationMeta _nameMeta = const VerificationMeta('name');
   @override
   late final GeneratedColumn<String> name = GeneratedColumn<String>(
@@ -1290,6 +1313,8 @@ class $HistoryWorkoutsTable extends HistoryWorkouts
     userId,
     updatedAt,
     deleted,
+    visibility,
+    publicationManifest,
     name,
     infobox,
     duration,
@@ -1331,6 +1356,21 @@ class $HistoryWorkoutsTable extends HistoryWorkouts
       context.handle(
         _deletedMeta,
         deleted.isAcceptableOrUnknown(data['deleted']!, _deletedMeta),
+      );
+    }
+    if (data.containsKey('visibility')) {
+      context.handle(
+        _visibilityMeta,
+        visibility.isAcceptableOrUnknown(data['visibility']!, _visibilityMeta),
+      );
+    }
+    if (data.containsKey('publication_manifest')) {
+      context.handle(
+        _publicationManifestMeta,
+        publicationManifest.isAcceptableOrUnknown(
+          data['publication_manifest']!,
+          _publicationManifestMeta,
+        ),
       );
     }
     if (data.containsKey('name')) {
@@ -1408,6 +1448,14 @@ class $HistoryWorkoutsTable extends HistoryWorkouts
         DriftSqlType.string,
         data['${effectivePrefix}name'],
       )!,
+      visibility: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}visibility'],
+      )!,
+      publicationManifest: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}publication_manifest'],
+      ),
       infobox: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}infobox'],
@@ -1475,6 +1523,8 @@ class HistoryWorkoutsCompanion extends UpdateCompanion<HistoryWorkout> {
   final Value<String?> userId;
   final Value<DateTime> updatedAt;
   final Value<bool> deleted;
+  final Value<String> visibility;
+  final Value<String?> publicationManifest;
   final Value<String> name;
   final Value<String?> infobox;
   final Value<int> duration;
@@ -1490,6 +1540,8 @@ class HistoryWorkoutsCompanion extends UpdateCompanion<HistoryWorkout> {
     this.userId = const Value.absent(),
     this.updatedAt = const Value.absent(),
     this.deleted = const Value.absent(),
+    this.visibility = const Value.absent(),
+    this.publicationManifest = const Value.absent(),
     this.name = const Value.absent(),
     this.infobox = const Value.absent(),
     this.duration = const Value.absent(),
@@ -1506,6 +1558,8 @@ class HistoryWorkoutsCompanion extends UpdateCompanion<HistoryWorkout> {
     this.userId = const Value.absent(),
     this.updatedAt = const Value.absent(),
     this.deleted = const Value.absent(),
+    this.visibility = const Value.absent(),
+    this.publicationManifest = const Value.absent(),
     required String name,
     this.infobox = const Value.absent(),
     required int duration,
@@ -1526,6 +1580,8 @@ class HistoryWorkoutsCompanion extends UpdateCompanion<HistoryWorkout> {
     Expression<String>? userId,
     Expression<DateTime>? updatedAt,
     Expression<bool>? deleted,
+    Expression<String>? visibility,
+    Expression<String>? publicationManifest,
     Expression<String>? name,
     Expression<String>? infobox,
     Expression<int>? duration,
@@ -1542,6 +1598,9 @@ class HistoryWorkoutsCompanion extends UpdateCompanion<HistoryWorkout> {
       if (userId != null) 'user_id': userId,
       if (updatedAt != null) 'updated_at': updatedAt,
       if (deleted != null) 'deleted': deleted,
+      if (visibility != null) 'visibility': visibility,
+      if (publicationManifest != null)
+        'publication_manifest': publicationManifest,
       if (name != null) 'name': name,
       if (infobox != null) 'infobox': infobox,
       if (duration != null) 'duration': duration,
@@ -1560,6 +1619,8 @@ class HistoryWorkoutsCompanion extends UpdateCompanion<HistoryWorkout> {
     Value<String?>? userId,
     Value<DateTime>? updatedAt,
     Value<bool>? deleted,
+    Value<String>? visibility,
+    Value<String?>? publicationManifest,
     Value<String>? name,
     Value<String?>? infobox,
     Value<int>? duration,
@@ -1576,6 +1637,8 @@ class HistoryWorkoutsCompanion extends UpdateCompanion<HistoryWorkout> {
       userId: userId ?? this.userId,
       updatedAt: updatedAt ?? this.updatedAt,
       deleted: deleted ?? this.deleted,
+      visibility: visibility ?? this.visibility,
+      publicationManifest: publicationManifest ?? this.publicationManifest,
       name: name ?? this.name,
       infobox: infobox ?? this.infobox,
       duration: duration ?? this.duration,
@@ -1603,6 +1666,12 @@ class HistoryWorkoutsCompanion extends UpdateCompanion<HistoryWorkout> {
     }
     if (deleted.present) {
       map['deleted'] = Variable<bool>(deleted.value);
+    }
+    if (visibility.present) {
+      map['visibility'] = Variable<String>(visibility.value);
+    }
+    if (publicationManifest.present) {
+      map['publication_manifest'] = Variable<String>(publicationManifest.value);
     }
     if (name.present) {
       map['name'] = Variable<String>(name.value);
@@ -1648,6 +1717,8 @@ class HistoryWorkoutsCompanion extends UpdateCompanion<HistoryWorkout> {
           ..write('userId: $userId, ')
           ..write('updatedAt: $updatedAt, ')
           ..write('deleted: $deleted, ')
+          ..write('visibility: $visibility, ')
+          ..write('publicationManifest: $publicationManifest, ')
           ..write('name: $name, ')
           ..write('infobox: $infobox, ')
           ..write('duration: $duration, ')
@@ -1946,6 +2017,17 @@ class $HistoryWorkoutExercisesTable extends HistoryWorkoutExercises
     type: DriftSqlType.string,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _publicationVersionMeta =
+      const VerificationMeta('publicationVersion');
+  @override
+  late final GeneratedColumn<String> publicationVersion =
+      GeneratedColumn<String>(
+        'publication_version',
+        aliasedName,
+        true,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+      );
   @override
   List<GeneratedColumn> get $columns => [
     id,
@@ -1971,6 +2053,7 @@ class $HistoryWorkoutExercisesTable extends HistoryWorkoutExercises
     updatedAt,
     deleted,
     userId,
+    publicationVersion,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -2107,6 +2190,15 @@ class $HistoryWorkoutExercisesTable extends HistoryWorkoutExercises
         userId.isAcceptableOrUnknown(data['user_id']!, _userIdMeta),
       );
     }
+    if (data.containsKey('publication_version')) {
+      context.handle(
+        _publicationVersionMeta,
+        publicationVersion.isAcceptableOrUnknown(
+          data['publication_version']!,
+          _publicationVersionMeta,
+        ),
+      );
+    }
     return context;
   }
 
@@ -2116,6 +2208,10 @@ class $HistoryWorkoutExercisesTable extends HistoryWorkoutExercises
   HistoryWorkoutExercise map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return HistoryWorkoutExercise(
+      publicationVersion: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}publication_version'],
+      ),
       id: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}id'],
@@ -2293,6 +2389,7 @@ class HistoryWorkoutExercisesCompanion
   final Value<DateTime> updatedAt;
   final Value<bool> deleted;
   final Value<String?> userId;
+  final Value<String?> publicationVersion;
   final Value<int> rowid;
   const HistoryWorkoutExercisesCompanion({
     this.id = const Value.absent(),
@@ -2318,6 +2415,7 @@ class HistoryWorkoutExercisesCompanion
     this.updatedAt = const Value.absent(),
     this.deleted = const Value.absent(),
     this.userId = const Value.absent(),
+    this.publicationVersion = const Value.absent(),
     this.rowid = const Value.absent(),
   });
   HistoryWorkoutExercisesCompanion.insert({
@@ -2344,6 +2442,7 @@ class HistoryWorkoutExercisesCompanion
     this.updatedAt = const Value.absent(),
     this.deleted = const Value.absent(),
     this.userId = const Value.absent(),
+    this.publicationVersion = const Value.absent(),
     this.rowid = const Value.absent(),
   }) : routineId = Value(routineId),
        name = Value(name),
@@ -2375,6 +2474,7 @@ class HistoryWorkoutExercisesCompanion
     Expression<DateTime>? updatedAt,
     Expression<bool>? deleted,
     Expression<String>? userId,
+    Expression<String>? publicationVersion,
     Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
@@ -2403,6 +2503,7 @@ class HistoryWorkoutExercisesCompanion
       if (updatedAt != null) 'updated_at': updatedAt,
       if (deleted != null) 'deleted': deleted,
       if (userId != null) 'user_id': userId,
+      if (publicationVersion != null) 'publication_version': publicationVersion,
       if (rowid != null) 'rowid': rowid,
     });
   }
@@ -2431,6 +2532,7 @@ class HistoryWorkoutExercisesCompanion
     Value<DateTime>? updatedAt,
     Value<bool>? deleted,
     Value<String?>? userId,
+    Value<String?>? publicationVersion,
     Value<int>? rowid,
   }) {
     return HistoryWorkoutExercisesCompanion(
@@ -2458,6 +2560,7 @@ class HistoryWorkoutExercisesCompanion
       updatedAt: updatedAt ?? this.updatedAt,
       deleted: deleted ?? this.deleted,
       userId: userId ?? this.userId,
+      publicationVersion: publicationVersion ?? this.publicationVersion,
       rowid: rowid ?? this.rowid,
     );
   }
@@ -2556,6 +2659,9 @@ class HistoryWorkoutExercisesCompanion
     if (userId.present) {
       map['user_id'] = Variable<String>(userId.value);
     }
+    if (publicationVersion.present) {
+      map['publication_version'] = Variable<String>(publicationVersion.value);
+    }
     if (rowid.present) {
       map['rowid'] = Variable<int>(rowid.value);
     }
@@ -2588,6 +2694,7 @@ class HistoryWorkoutExercisesCompanion
           ..write('updatedAt: $updatedAt, ')
           ..write('deleted: $deleted, ')
           ..write('userId: $userId, ')
+          ..write('publicationVersion: $publicationVersion, ')
           ..write('rowid: $rowid')
           ..write(')'))
         .toString();
@@ -10386,6 +10493,8 @@ typedef $$HistoryWorkoutsTableCreateCompanionBuilder =
       Value<String?> userId,
       Value<DateTime> updatedAt,
       Value<bool> deleted,
+      Value<String> visibility,
+      Value<String?> publicationManifest,
       required String name,
       Value<String?> infobox,
       required int duration,
@@ -10403,6 +10512,8 @@ typedef $$HistoryWorkoutsTableUpdateCompanionBuilder =
       Value<String?> userId,
       Value<DateTime> updatedAt,
       Value<bool> deleted,
+      Value<String> visibility,
+      Value<String?> publicationManifest,
       Value<String> name,
       Value<String?> infobox,
       Value<int> duration,
@@ -10534,6 +10645,16 @@ class $$HistoryWorkoutsTableFilterComposer
 
   ColumnFilters<bool> get deleted => $composableBuilder(
     column: $table.deleted,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get visibility => $composableBuilder(
+    column: $table.visibility,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get publicationManifest => $composableBuilder(
+    column: $table.publicationManifest,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -10694,6 +10815,16 @@ class $$HistoryWorkoutsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get visibility => $composableBuilder(
+    column: $table.visibility,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get publicationManifest => $composableBuilder(
+    column: $table.publicationManifest,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<String> get name => $composableBuilder(
     column: $table.name,
     builder: (column) => ColumnOrderings(column),
@@ -10814,6 +10945,16 @@ class $$HistoryWorkoutsTableAnnotationComposer
 
   GeneratedColumn<bool> get deleted =>
       $composableBuilder(column: $table.deleted, builder: (column) => column);
+
+  GeneratedColumn<String> get visibility => $composableBuilder(
+    column: $table.visibility,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get publicationManifest => $composableBuilder(
+    column: $table.publicationManifest,
+    builder: (column) => column,
+  );
 
   GeneratedColumn<String> get name =>
       $composableBuilder(column: $table.name, builder: (column) => column);
@@ -10977,6 +11118,8 @@ class $$HistoryWorkoutsTableTableManager
                 Value<String?> userId = const Value.absent(),
                 Value<DateTime> updatedAt = const Value.absent(),
                 Value<bool> deleted = const Value.absent(),
+                Value<String> visibility = const Value.absent(),
+                Value<String?> publicationManifest = const Value.absent(),
                 Value<String> name = const Value.absent(),
                 Value<String?> infobox = const Value.absent(),
                 Value<int> duration = const Value.absent(),
@@ -10992,6 +11135,8 @@ class $$HistoryWorkoutsTableTableManager
                 userId: userId,
                 updatedAt: updatedAt,
                 deleted: deleted,
+                visibility: visibility,
+                publicationManifest: publicationManifest,
                 name: name,
                 infobox: infobox,
                 duration: duration,
@@ -11009,6 +11154,8 @@ class $$HistoryWorkoutsTableTableManager
                 Value<String?> userId = const Value.absent(),
                 Value<DateTime> updatedAt = const Value.absent(),
                 Value<bool> deleted = const Value.absent(),
+                Value<String> visibility = const Value.absent(),
+                Value<String?> publicationManifest = const Value.absent(),
                 required String name,
                 Value<String?> infobox = const Value.absent(),
                 required int duration,
@@ -11024,6 +11171,8 @@ class $$HistoryWorkoutsTableTableManager
                 userId: userId,
                 updatedAt: updatedAt,
                 deleted: deleted,
+                visibility: visibility,
+                publicationManifest: publicationManifest,
                 name: name,
                 infobox: infobox,
                 duration: duration,
@@ -11194,6 +11343,7 @@ typedef $$HistoryWorkoutExercisesTableCreateCompanionBuilder =
       Value<DateTime> updatedAt,
       Value<bool> deleted,
       Value<String?> userId,
+      Value<String?> publicationVersion,
       Value<int> rowid,
     });
 typedef $$HistoryWorkoutExercisesTableUpdateCompanionBuilder =
@@ -11221,6 +11371,7 @@ typedef $$HistoryWorkoutExercisesTableUpdateCompanionBuilder =
       Value<DateTime> updatedAt,
       Value<bool> deleted,
       Value<String?> userId,
+      Value<String?> publicationVersion,
       Value<int> rowid,
     });
 
@@ -11433,6 +11584,11 @@ class $$HistoryWorkoutExercisesTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
+  ColumnFilters<String> get publicationVersion => $composableBuilder(
+    column: $table.publicationVersion,
+    builder: (column) => ColumnFilters(column),
+  );
+
   $$HistoryWorkoutsTableFilterComposer get routineId {
     final $$HistoryWorkoutsTableFilterComposer composer = $composerBuilder(
       composer: this,
@@ -11632,6 +11788,11 @@ class $$HistoryWorkoutExercisesTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get publicationVersion => $composableBuilder(
+    column: $table.publicationVersion,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   $$HistoryWorkoutsTableOrderingComposer get routineId {
     final $$HistoryWorkoutsTableOrderingComposer composer = $composerBuilder(
       composer: this,
@@ -11811,6 +11972,11 @@ class $$HistoryWorkoutExercisesTableAnnotationComposer
   GeneratedColumn<String> get userId =>
       $composableBuilder(column: $table.userId, builder: (column) => column);
 
+  GeneratedColumn<String> get publicationVersion => $composableBuilder(
+    column: $table.publicationVersion,
+    builder: (column) => column,
+  );
+
   $$HistoryWorkoutsTableAnnotationComposer get routineId {
     final $$HistoryWorkoutsTableAnnotationComposer composer = $composerBuilder(
       composer: this,
@@ -11974,6 +12140,7 @@ class $$HistoryWorkoutExercisesTableTableManager
                 Value<DateTime> updatedAt = const Value.absent(),
                 Value<bool> deleted = const Value.absent(),
                 Value<String?> userId = const Value.absent(),
+                Value<String?> publicationVersion = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => HistoryWorkoutExercisesCompanion(
                 id: id,
@@ -11999,6 +12166,7 @@ class $$HistoryWorkoutExercisesTableTableManager
                 updatedAt: updatedAt,
                 deleted: deleted,
                 userId: userId,
+                publicationVersion: publicationVersion,
                 rowid: rowid,
               ),
           createCompanionCallback:
@@ -12027,6 +12195,7 @@ class $$HistoryWorkoutExercisesTableTableManager
                 Value<DateTime> updatedAt = const Value.absent(),
                 Value<bool> deleted = const Value.absent(),
                 Value<String?> userId = const Value.absent(),
+                Value<String?> publicationVersion = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => HistoryWorkoutExercisesCompanion.insert(
                 id: id,
@@ -12052,6 +12221,7 @@ class $$HistoryWorkoutExercisesTableTableManager
                 updatedAt: updatedAt,
                 deleted: deleted,
                 userId: userId,
+                publicationVersion: publicationVersion,
                 rowid: rowid,
               ),
           withReferenceMapper: (p0) => p0

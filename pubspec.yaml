@@ -94,6 +94,8 @@ dependencies:
   mobile_scanner: ^7.4.0
   slang: ^4.19.1
   slang_flutter: ^4.19.0
+  firebase_core: ^5.0.0
+  firebase_messaging: ^17.0.0
   
 dev_dependencies:
   sentry_dart_plugin: ^3.4.0

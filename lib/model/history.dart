@@ -10,6 +10,8 @@ const _uuid = Uuid();
 final class HistoryWorkout implements Syncable {
   @override
   final String id;
+  final String visibility;
+  final String? publicationManifest;
   final String name;
   final String? infobox;
   final int duration;
@@ -29,6 +31,8 @@ final class HistoryWorkout implements Syncable {
   HistoryWorkout({
     required this.id,
     required this.name,
+    this.visibility = 'friends',
+    this.publicationManifest,
     this.infobox,
     required this.duration,
     required this.startingDate,
@@ -40,13 +44,15 @@ final class HistoryWorkout implements Syncable {
     DateTime? updatedAt,
     bool? deleted,
     this.userId,
-  })  : updatedAt = updatedAt ?? DateTime.now().toUtc(),
-        deleted = deleted ?? false;
+  }) : updatedAt = updatedAt ?? DateTime.now().toUtc(),
+       deleted = deleted ?? false;
 
   factory HistoryWorkout.fromJson(Map<String, dynamic> json) {
     return HistoryWorkout(
       id: json['id'] as String? ?? _uuid.v4(),
       name: json['name'] as String,
+      visibility: json['visibility'] as String? ?? 'friends',
+      publicationManifest: json['publication_manifest'] as String?,
       infobox: json['infobox'] as String?,
       duration: json['duration'] as int,
       startingDate: DateTime.parse(
@@ -65,8 +71,8 @@ final class HistoryWorkout implements Syncable {
       updatedAt: json['updated_at'] != null
           ? DateTime.parse(json['updated_at'] as String)
           : json['updatedAt'] != null
-              ? DateTime.parse(json['updatedAt'] as String)
-              : null,
+          ? DateTime.parse(json['updatedAt'] as String)
+          : null,
       deleted: json['deleted'] as bool? ?? false,
       userId: json['user_id'] as String? ?? json['userId'] as String?,
     );
@@ -74,26 +80,30 @@ final class HistoryWorkout implements Syncable {
 
   @override
   Map<String, dynamic> toJson() => {
-        'id': id,
-        'name': name,
-        'infobox': infobox,
-        'duration': duration,
-        'starting_date': startingDate.toUtc().toIso8601String(),
-        'parent_id': parentId,
-        'completed_by': completedBy,
-        'completes': completes,
-        'weight_unit': weightUnit.name,
-        'distance_unit': distanceUnit.name,
-        'updated_at': updatedAt.toUtc().toIso8601String(),
-        'deleted': deleted,
-        'user_id': userId,
-      };
+    'id': id,
+    'name': name,
+    'visibility': visibility,
+    'publication_manifest': publicationManifest,
+    'infobox': infobox,
+    'duration': duration,
+    'starting_date': startingDate.toUtc().toIso8601String(),
+    'parent_id': parentId,
+    'completed_by': completedBy,
+    'completes': completes,
+    'weight_unit': weightUnit.name,
+    'distance_unit': distanceUnit.name,
+    'updated_at': updatedAt.toUtc().toIso8601String(),
+    'deleted': deleted,
+    'user_id': userId,
+  };
 
   @override
   UpdateCompanion<Syncable> toCompanion() {
     return HistoryWorkoutsCompanion.insert(
       id: Value(id),
       name: name,
+      visibility: Value(visibility),
+      publicationManifest: Value(publicationManifest),
       infobox: Value(infobox),
       duration: duration,
       startingDate: startingDate,

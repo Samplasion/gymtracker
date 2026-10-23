@@ -8,7 +8,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gymtracker/db/backup_restore.dart';
 import 'package:gymtracker/db/database.dart';
-import 'package:gymtracker/db/exports/v20.dart';
+import 'package:gymtracker/db/exports/v21.dart';
 import 'package:gymtracker/db/imports/types.dart';
 import 'package:gymtracker/db/sync_diagnostics.dart';
 import 'package:gymtracker/model/achievements.dart';
@@ -452,6 +452,8 @@ class DatabaseService extends ChangeNotifier with LoggerConfigurationMixin {
     return _db.writeAllHistoryWorkouts(history);
   }
 
+  void Function()? onSocialDataSaved;
+
   Future setHistoryWorkout(Workout workout) async {
     logger.i("Setting history workout");
     if (workoutHistory.any((element) => element.id == workout.id)) {
@@ -459,6 +461,7 @@ class DatabaseService extends ChangeNotifier with LoggerConfigurationMixin {
     } else {
       await _db.insertHistoryWorkout(fixWorkout(workout));
     }
+    onSocialDataSaved?.call();
   }
 
   Future<void> addHistoryWorkouts(List<Workout> workouts) async {
@@ -565,7 +568,11 @@ class DatabaseService extends ChangeNotifier with LoggerConfigurationMixin {
       db.insertAchievementCompletion(completion);
   Future<void> insertAchievementCompletions(
     List<AchievementCompletion> completions,
-  ) => db.insertAchievementCompletions(completions);
+  ) async {
+    await db.insertAchievementCompletions(completions);
+    onSocialDataSaved?.call();
+  }
+
   Future<void> deleteAchievementCompletion(String achievementID, int level) =>
       db.deleteAchievementCompletion(achievementID, level);
   Future<void> setAchievementCompletions(
@@ -628,7 +635,7 @@ class DatabaseService extends ChangeNotifier with LoggerConfigurationMixin {
 
   /// Version 20 is export-only; legacy import converters remain separate.
   Future<Map<String, dynamic>> exportJson() =>
-      const VersionedJsonExportV20().export(_db);
+      const VersionedJsonExportV21().export(_db);
 
   Map<String, dynamic> toJson() {
     final converter = getConverter(DATABASE_VERSION);

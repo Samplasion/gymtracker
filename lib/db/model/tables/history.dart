@@ -16,6 +16,8 @@ class HistoryWorkouts extends Table implements SyncableTable {
 
   @override
   TextColumn get id => text().clientDefault(() => _uuid.v4())();
+  TextColumn get visibility => text().withDefault(const Constant('friends'))();
+  TextColumn get publicationManifest => text().nullable()();
   TextColumn get name => text()();
   TextColumn get infobox => text().nullable()();
   IntColumn get duration => integer()();
@@ -44,6 +46,7 @@ class HistoryWorkouts extends Table implements SyncableTable {
 
 @UseRowClass(HistoryWorkoutExercise)
 class HistoryWorkoutExercises extends LinkedExerciseBase {
+  TextColumn get publicationVersion => text().nullable()();
   @override
   TextColumn get routineId => text().references(HistoryWorkouts, #id)();
 

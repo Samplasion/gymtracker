@@ -55,7 +55,7 @@ part 'database.g.dart';
 // Used in the generated code
 const _uuid = Uuid();
 
-const DATABASE_VERSION = 20;
+const DATABASE_VERSION = 21;
 
 abstract class GTDatabase extends GeneratedDatabase with SyncableDatabase {
   GTDatabase(super.e);
@@ -534,6 +534,20 @@ class GTDatabaseImpl extends _$GTDatabaseImpl
             await m.addColumn(
               schema.historyWorkoutExercises,
               schema.historyWorkoutExercises.progression,
+            );
+          },
+          from20To21: (m, schema) async {
+            await m.addColumn(
+              schema.historyWorkouts,
+              schema.historyWorkouts.visibility,
+            );
+            await m.addColumn(
+              schema.historyWorkouts,
+              schema.historyWorkouts.publicationManifest,
+            );
+            await m.addColumn(
+              schema.historyWorkoutExercises,
+              schema.historyWorkoutExercises.publicationVersion,
             );
           },
           from19To20: (m, schema) async {
@@ -1147,14 +1161,21 @@ class GTDatabaseImpl extends _$GTDatabaseImpl
 
   Future<void> insertHistoryWorkout(model.Workout workout) async {
     final userId = currentUserId;
+    final version = _uuid.v4();
     return batch((batch) {
       batch.insert(
         historyWorkouts,
-        workout.toHistoryWorkoutInsertable(userId: userId),
+        workout.toHistoryWorkoutInsertable(
+          userId: userId,
+          publicationVersion: version,
+        ),
       );
       batch.insertAll(
         historyWorkoutExercises,
-        workout.flattenedExercises.toSortedInsertables(userId: userId),
+        workout.flattenedExercises.toSortedInsertables(
+          userId: userId,
+          publicationVersion: version,
+        ),
       );
     });
   }
@@ -1186,6 +1207,7 @@ class GTDatabaseImpl extends _$GTDatabaseImpl
   Future<void> updateHistoryWorkout(model.Workout workout) async {
     final userId = currentUserId;
     final now = DateTime.now().toUtc();
+    final version = _uuid.v4();
     if (workout.id.isEmpty) {
       throw ArgumentError("Routine ID cannot be empty");
     }
@@ -1225,7 +1247,10 @@ class GTDatabaseImpl extends _$GTDatabaseImpl
         batch.insert(
           historyWorkouts,
           workout
-              .toHistoryWorkoutInsertable(userId: userId)
+              .toHistoryWorkoutInsertable(
+                userId: userId,
+                publicationVersion: version,
+              )
               .copyWith(updatedAt: Value(now), deleted: const Value(false)),
         );
 
@@ -1254,7 +1279,10 @@ class GTDatabaseImpl extends _$GTDatabaseImpl
 
         batch.insertAll(
           historyWorkoutExercises,
-          workout.flattenedExercises.toSortedInsertables(userId: userId),
+          workout.flattenedExercises.toSortedInsertables(
+            userId: userId,
+            publicationVersion: version,
+          ),
         );
       });
     });
@@ -1263,6 +1291,9 @@ class GTDatabaseImpl extends _$GTDatabaseImpl
   @override
   Future writeAllHistoryWorkouts(List<model.Workout> historyWorkouts) {
     final userId = currentUserId;
+    final publicationVersions = {
+      for (final workout in historyWorkouts) workout.id: _uuid.v4(),
+    };
     final now = DateTime.now().toUtc();
     return transaction(() async {
       if (userId == null) {
@@ -1295,28 +1326,46 @@ class GTDatabaseImpl extends _$GTDatabaseImpl
         }
         batch.insertAll(
           this.historyWorkouts,
-          historyWorkouts.toSortedHistoryWorkoutInsertables(userId: userId),
+          historyWorkouts.toSortedHistoryWorkoutInsertables(
+            userId: userId,
+            publicationVersions: publicationVersions,
+          ),
           mode: .insertOrReplace,
         );
       });
       await overwriteAllHistoryWorkoutExercises(
         historyWorkouts.flattenedExercises,
+        publicationVersions: publicationVersions,
       );
     });
   }
 
   @override
   Future<void> overwriteAllHistoryWorkoutExercises(
-    List<model.WorkoutExercisable> historyWorkoutExercises,
-  ) async {
+    List<model.WorkoutExercisable> historyWorkoutExercises, {
+    Map<String, String>? publicationVersions,
+  }) async {
     final userId = currentUserId;
     final now = DateTime.now().toUtc();
+    publicationVersions ??= {
+      for (final w in await (select(
+        historyWorkouts,
+      )..where((t) => _ownedBy(t.userId, userId))).get())
+        if (w.publicationManifest != null)
+          w.id:
+              (jsonDecode(w.publicationManifest!) as Map)['version'] as String,
+    };
     final historyExerciseInsertables = historyWorkoutExercises
         .fold(<String, List<model.WorkoutExercisable>>{}, (m, r) {
           return m..putIfAbsent(r.workoutID!, () => []).add(r);
         })
         .values
-        .expand((list) => list.toSortedInsertables(userId: userId));
+        .expand(
+          (list) => list.toSortedInsertables(
+            userId: userId,
+            publicationVersion: publicationVersions?[list.first.workoutID],
+          ),
+        );
     await transaction(() async {
       final oldExs =
           await (select(this.historyWorkoutExercises)..where(
@@ -2556,10 +2605,14 @@ extension WorkoutListDatabaseUtils on List<model.Workout> {
 
   List<HistoryWorkoutsCompanion> toSortedHistoryWorkoutInsertables({
     String? userId,
+    Map<String, String>? publicationVersions,
   }) {
     return [
       for (int i = 0; i < length; i++)
-        this[i].toHistoryWorkoutInsertable(userId: userId),
+        this[i].toHistoryWorkoutInsertable(
+          userId: userId,
+          publicationVersion: publicationVersions?[this[i].id],
+        ),
     ];
   }
 }
@@ -2579,13 +2632,25 @@ extension WorkoutDatabaseUtils on model.Workout {
     );
   }
 
-  HistoryWorkoutsCompanion toHistoryWorkoutInsertable({String? userId}) {
+  HistoryWorkoutsCompanion toHistoryWorkoutInsertable({
+    String? userId,
+    String? publicationVersion,
+  }) {
     return HistoryWorkoutsCompanion(
       id: Value(id),
       name: Value(name),
       infobox: Value(infobox ?? ""),
       weightUnit: Value(weightUnit),
       distanceUnit: Value(distanceUnit),
+      visibility: Value(visibility),
+      publicationManifest: Value(
+        publicationVersion == null
+            ? null
+            : jsonEncode({
+                'version': publicationVersion,
+                'ids': flattenedExercises.map((e) => e.id).toList(),
+              }),
+      ),
       startingDate: Value(startingDate!),
       duration: Value(duration!.inSeconds),
       parentId: Value(parentID),
@@ -2600,10 +2665,18 @@ extension WorkoutDatabaseUtils on model.Workout {
 
 extension WorkoutExercisableListDatabaseUtils
     on List<model.WorkoutExercisable> {
-  List<HistoryWorkoutExercisesCompanion> toSortedInsertables({String? userId}) {
+  List<HistoryWorkoutExercisesCompanion> toSortedInsertables({
+    String? userId,
+    String? publicationVersion,
+  }) {
     return [
       for (int i = 0; i < length; i++)
-        this[i].toInsertable(userId: userId).copyWith(sortOrder: Value(i)),
+        this[i]
+            .toInsertable(userId: userId)
+            .copyWith(
+              sortOrder: Value(i),
+              publicationVersion: Value(publicationVersion),
+            ),
     ];
   }
 

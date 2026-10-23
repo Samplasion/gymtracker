@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:gymtracker/service/push.dart';
 import 'dart:typed_data';
 
 import 'package:drift/drift.dart' show Value;
@@ -323,6 +324,7 @@ class Online extends _$Online {
   }
 
   Future<void> logout() => _changeAuthentication(() async {
+    await ref.read(pushServiceProvider).logout();
     ref.read(eventBusProvider).emit(GBUserWillLogoutEvent(_service.account));
     await _service.logout();
   });

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:gymtracker/view/social.dart';
+import 'package:gymtracker/service/push.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gymtracker/controller/health_controller.dart';

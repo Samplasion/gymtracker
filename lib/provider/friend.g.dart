@@ -33,7 +33,7 @@ final class FriendNotifierProvider
   FriendNotifier create() => FriendNotifier();
 }
 
-String _$friendNotifierHash() => r'ad51f78c0af54bb86abf15acbe75c1c70ee74eed';
+String _$friendNotifierHash() => r'f0979f546a43a536dfbf52f38c059ec3ca9bc652';
 
 abstract class _$FriendNotifier extends $AsyncNotifier<FriendState> {
   FutureOr<FriendState> build();
@@ -246,7 +246,7 @@ final class UserAvatarProvider
   }
 }
 
-String _$userAvatarHash() => r'5d09afef04b6ab7f79a49b209552dfdb9000fe55';
+String _$userAvatarHash() => r'c42cab64125fb1968fc0b277b82f5c8b3f269dd2';
 
 final class UserAvatarFamily extends $Family
     with $FunctionalFamilyOverride<FutureOr<String?>, String> {

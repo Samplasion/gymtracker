@@ -17,11 +17,13 @@ import 'package:gymtracker/controller/workout_controller.dart';
 import 'package:gymtracker/provider/food.dart';
 import 'package:gymtracker/provider/locale.dart';
 import 'package:gymtracker/provider/online.dart';
+import 'package:gymtracker/provider/social.dart';
 import 'package:gymtracker/service/database.dart';
 import 'package:gymtracker/service/logger.dart';
 import 'package:gymtracker/service/native.dart';
 import 'package:gymtracker/service/protocol.dart';
 import 'package:gymtracker/service/purchases.dart';
+import 'package:gymtracker/service/push.dart';
 import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/view/actions/routines.dart';
 
@@ -110,6 +112,31 @@ final appStartupProvider = FutureProvider<void>((ref) async {
     await ready.future;
   }
   ref.read(settingsControllerProvider);
+  ref.read(pushServiceProvider);
+  ref.watch(socialAccessListenerProvider);
+  Timer? socialSync;
+  database.onSocialDataSaved = () {
+    socialSync?.cancel();
+    socialSync = Timer(const Duration(milliseconds: 100), () {
+      if (ref.mounted && ref.read(currentUserIdProvider) != null) {
+        unawaited(
+          ref.read(onlineProvider.notifier).syncManager.syncTables().catchError(
+            (Object error, StackTrace stack) {
+              globalLogger.w(
+                'Social publication deferred',
+                error: error,
+                stackTrace: stack,
+              );
+            },
+          ),
+        );
+      }
+    });
+  };
+  ref.onDispose(() {
+    socialSync?.cancel();
+    database.onSocialDataSaved = null;
+  });
   ref.read(errorControllerProvider);
   ref.listen(foodNativeSyncProvider, (_, _) {});
   ref.read(routinesControllerProvider);

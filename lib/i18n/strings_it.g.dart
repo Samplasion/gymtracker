@@ -177,6 +177,8 @@ class TranslationsIt with BaseTranslations<AppLocale, Translations> implements T
 	@override String get you => 'Tu';
 	@override late final Translations$error$it error = Translations$error$it._(_root);
 	@override late final Translations$legacyWorkoutRecovery$it legacyWorkoutRecovery = Translations$legacyWorkoutRecovery$it._(_root);
+	@override late final Translations$friendsList$it friendsList = Translations$friendsList$it._(_root);
+	@override late final Translations$social$it social = Translations$social$it._(_root);
 }
 
 // Path: progression
@@ -1721,6 +1723,78 @@ class Translations$legacyWorkoutRecovery$it implements Translations$legacyWorkou
 	@override String confirm({required Object account}) => 'Recuperare questo allenamento in ${account}? Diventerà l’allenamento in corso di questo account.';
 	@override String get guest => 'Ospite';
 	@override String get failed => 'Impossibile recuperare l’allenamento. Verifica che questo account non abbia un allenamento in corso, poi riprova.';
+}
+
+// Path: friendsList
+class Translations$friendsList$it implements Translations$friendsList$en {
+	Translations$friendsList$it._(this._root);
+
+	final TranslationsIt _root; // ignore: unused_field
+
+	// Translations
+	@override String get loadMore => 'Carica altri';
+	@override String get title => 'Amici';
+	@override String get empty => 'Non hai ancora amici';
+	@override String get emptyDescription => 'Le amicizie accettate appariranno qui.';
+	@override String historyTitle({required Object name}) => 'Traguardi di ${name}';
+	@override String get historyEmpty => 'Nessun traguardo ottenuto';
+	@override String get historyEmptyDescription => 'I traguardi ottenuti da questo amico appariranno qui.';
+	@override String get unknownAchievement => 'Traguardo sconosciuto';
+	@override String get accessDenied => 'La cronologia è disponibile solo per i tuoi amici.';
+}
+
+// Path: social
+class Translations$social$it implements Translations$social$en {
+	Translations$social$it._(this._root);
+
+	final TranslationsIt _root; // ignore: unused_field
+
+	// Translations
+	@override String get notifications => 'Notifiche';
+	@override String get post => 'Post';
+	@override String get comments => 'Commenti';
+	@override String get comment => 'Commenta';
+	@override String get like => 'Mi piace';
+	@override String get unlike => 'Non mi piace più';
+	@override String get send => 'Invia';
+	@override String get edit => 'Modifica';
+	@override String get delete => 'Elimina';
+	@override String get more => 'Carica altri';
+	@override String get private => 'Solo io';
+	@override String get friends => 'Amici';
+	@override String get visibility => 'Visibilità';
+	@override String get pending => 'Modifica in attesa di sincronizzazione';
+	@override String get unpublished => 'In attesa di pubblicazione';
+	@override String get unavailable => 'Contenuto non disponibile';
+	@override String get error => 'Operazione non riuscita. Riprova.';
+	@override String get empty => 'Non ci sono elementi da mostrare.';
+	@override String get block => 'Blocca utente';
+	@override String get unblock => 'Sblocca';
+	@override String get blockedUsers => 'Utenti bloccati';
+	@override String get report => 'Segnala utente';
+	@override String get reports => 'Le mie segnalazioni';
+	@override String get reason => 'Motivazione (obbligatoria)';
+	@override String get reportSent => 'Segnalazione inviata';
+	@override String get blockConfirm => 'Bloccare questo utente? L’amicizia e le richieste verranno eliminate.';
+	@override String get cancel => 'Annulla';
+	@override String get confirm => 'Conferma';
+	@override String get received => 'Ricevuta';
+	@override String get reviewing => 'In esame';
+	@override String get resolved => 'Risolta';
+	@override String get dismissed => 'Archiviata';
+	@override String get friendRequest => 'Ti ha inviato una richiesta di amicizia';
+	@override String get friendAccepted => 'Ha accettato la tua richiesta di amicizia';
+	@override String get likedPost => 'Ha messo Mi piace al tuo post';
+	@override String get commentedPost => 'Ha commentato il tuo post';
+	@override String get achievementUnlocked => 'Ha sbloccato un achievement';
+	@override String get reportUpdated => 'Lo stato della tua segnalazione è cambiato';
+	@override String get accept => 'Accetta';
+	@override String get reject => 'Rifiuta';
+	@override String get signIn => 'Accedi per continuare';
+	@override String get save => 'Salva';
+	@override String get push => 'Notifiche push';
+	@override String get pushDescription => 'Richieste, interazioni, achievement e segnalazioni';
+	@override String get pushDisabled => 'Push non configurate su questo dispositivo';
 }
 
 // Path: set.kindShort
@@ -8230,6 +8304,60 @@ extension on TranslationsIt {
 			'legacyWorkoutRecovery.confirm' => ({required Object account}) => 'Recuperare questo allenamento in ${account}? Diventerà l’allenamento in corso di questo account.',
 			'legacyWorkoutRecovery.guest' => 'Ospite',
 			'legacyWorkoutRecovery.failed' => 'Impossibile recuperare l’allenamento. Verifica che questo account non abbia un allenamento in corso, poi riprova.',
+			'friendsList.loadMore' => 'Carica altri',
+			'friendsList.title' => 'Amici',
+			'friendsList.empty' => 'Non hai ancora amici',
+			'friendsList.emptyDescription' => 'Le amicizie accettate appariranno qui.',
+			'friendsList.historyTitle' => ({required Object name}) => 'Traguardi di ${name}',
+			'friendsList.historyEmpty' => 'Nessun traguardo ottenuto',
+			'friendsList.historyEmptyDescription' => 'I traguardi ottenuti da questo amico appariranno qui.',
+			'friendsList.unknownAchievement' => 'Traguardo sconosciuto',
+			'friendsList.accessDenied' => 'La cronologia è disponibile solo per i tuoi amici.',
+			'social.notifications' => 'Notifiche',
+			'social.post' => 'Post',
+			'social.comments' => 'Commenti',
+			'social.comment' => 'Commenta',
+			'social.like' => 'Mi piace',
+			'social.unlike' => 'Non mi piace più',
+			'social.send' => 'Invia',
+			'social.edit' => 'Modifica',
+			'social.delete' => 'Elimina',
+			'social.more' => 'Carica altri',
+			'social.private' => 'Solo io',
+			'social.friends' => 'Amici',
+			'social.visibility' => 'Visibilità',
+			'social.pending' => 'Modifica in attesa di sincronizzazione',
+			'social.unpublished' => 'In attesa di pubblicazione',
+			'social.unavailable' => 'Contenuto non disponibile',
+			'social.error' => 'Operazione non riuscita. Riprova.',
+			'social.empty' => 'Non ci sono elementi da mostrare.',
+			'social.block' => 'Blocca utente',
+			'social.unblock' => 'Sblocca',
+			'social.blockedUsers' => 'Utenti bloccati',
+			'social.report' => 'Segnala utente',
+			'social.reports' => 'Le mie segnalazioni',
+			'social.reason' => 'Motivazione (obbligatoria)',
+			'social.reportSent' => 'Segnalazione inviata',
+			'social.blockConfirm' => 'Bloccare questo utente? L’amicizia e le richieste verranno eliminate.',
+			'social.cancel' => 'Annulla',
+			'social.confirm' => 'Conferma',
+			'social.received' => 'Ricevuta',
+			'social.reviewing' => 'In esame',
+			'social.resolved' => 'Risolta',
+			'social.dismissed' => 'Archiviata',
+			'social.friendRequest' => 'Ti ha inviato una richiesta di amicizia',
+			'social.friendAccepted' => 'Ha accettato la tua richiesta di amicizia',
+			'social.likedPost' => 'Ha messo Mi piace al tuo post',
+			'social.commentedPost' => 'Ha commentato il tuo post',
+			'social.achievementUnlocked' => 'Ha sbloccato un achievement',
+			'social.reportUpdated' => 'Lo stato della tua segnalazione è cambiato',
+			'social.accept' => 'Accetta',
+			'social.reject' => 'Rifiuta',
+			'social.signIn' => 'Accedi per continuare',
+			'social.save' => 'Salva',
+			'social.push' => 'Notifiche push',
+			'social.pushDescription' => 'Richieste, interazioni, achievement e segnalazioni',
+			'social.pushDisabled' => 'Push non configurate su questo dispositivo',
 			_ => null,
 		};
 	}

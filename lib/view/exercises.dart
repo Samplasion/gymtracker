@@ -17,6 +17,7 @@ import 'package:gymtracker/model/exercisable.dart';
 import 'package:gymtracker/model/exercise.dart';
 import 'package:gymtracker/model/superset.dart';
 import 'package:gymtracker/model/workout.dart';
+import 'package:gymtracker/provider/online.dart';
 import 'package:gymtracker/provider/settings.dart';
 import 'package:gymtracker/provider/training_data.dart';
 import 'package:gymtracker/service/logger.dart';
@@ -35,7 +36,10 @@ import 'package:gymtracker/view/components/parent_viewer.dart';
 import 'package:gymtracker/view/components/pro_builder.dart';
 import 'package:gymtracker/view/components/stats.dart';
 import 'package:gymtracker/view/routine_creator.dart';
+import 'package:gymtracker/view/social.dart';
+import 'package:gymtracker/view/user_profile.dart';
 import 'package:gymtracker/view/utils/exercise.dart';
+import 'package:gymtracker/view/utils/social.dart';
 import 'package:gymtracker/view/utils/timer.dart';
 import 'package:gymtracker/view/utils/workout_utils.dart';
 import 'package:gymtracker/view/workout_editor.dart';
@@ -46,11 +50,15 @@ class ExercisesView extends ConsumerStatefulWidget {
   final bool canStart;
   final bool isOwned;
 
+  /// Author of a remote workout; local workouts leave this unset.
+  final String? authorId;
+
   const ExercisesView({
     required this.workout,
     this.highlightExercise = _highlightExercise,
     this.canStart = true,
     this.isOwned = true,
+    this.authorId,
     super.key,
   });
 
@@ -102,6 +110,13 @@ class _ExercisesViewState extends ConsumerState<ExercisesView> {
   @override
   Widget build(BuildContext context) {
     ref.watch(appPreferencesProvider);
+    final currentUserId = ref.watch(currentUserIdProvider);
+    final authorId = widget.authorId;
+    final showAuthor =
+        currentUserId != null &&
+        !widget.isOwned &&
+        authorId != null &&
+        authorId != currentUserId;
     ref.watch(historyWorkoutsProvider);
     ref.watch(customExercisesProvider);
     final charts = [
@@ -191,6 +206,18 @@ class _ExercisesViewState extends ConsumerState<ExercisesView> {
                       ),
                     ),
                     if (widget.isOwned) ...[
+                      if (currentUserId != null)
+                        PopupMenuItem(
+                          key: const Key('workout-visibility'),
+                          child: Text(context.t.social.visibility),
+                          onTap: () {
+                            SchedulerBinding.instance.addPostFrameCallback((_) {
+                              if (context.mounted) {
+                                changeWorkoutVisibility(context, ref, workout);
+                              }
+                            });
+                          },
+                        ),
                       PopupMenuItem(
                         key: const Key("edit-workout"),
                         child: Text(context.t.workouts.actions.edit.label),
@@ -336,6 +363,19 @@ class _ExercisesViewState extends ConsumerState<ExercisesView> {
         bottom: false,
         child: CustomScrollView(
           slivers: [
+            if (showAuthor)
+              SliverToBoxAdapter(
+                child: Card(
+                  key: const Key('workout-author-card'),
+                  margin: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+                  child: ListTile(
+                    leading: UserAccountIcon(id: authorId),
+                    title: UserNameText(id: authorId),
+                    trailing: const Icon(GTIcons.lt_chevron),
+                    onTap: () => Go.to(() => UserProfilePage(userID: authorId)),
+                  ),
+                ),
+              ),
             SliverToBoxAdapter(
               child: Card(
                 margin: const EdgeInsets.fromLTRB(16, 16, 16, 8),

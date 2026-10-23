@@ -6,6 +6,7 @@ import 'package:gymtracker/service/feed.dart';
 import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/view/exercises.dart';
+import 'package:gymtracker/view/social.dart';
 import 'package:gymtracker/view/utils/achievements.dart';
 import 'package:gymtracker/view/utils/history_workout.dart';
 import 'package:gymtracker/view/utils/social.dart';
@@ -32,6 +33,12 @@ class FeedItemWorkoutCard extends ConsumerWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           ListTile(
+            trailing:
+                account != null &&
+                    (item.authorship is FeedAuthorshipOwn ||
+                        item.authorship.userID == account.id)
+                ? WorkoutVisibilityMenu(workout: item.workout)
+                : null,
             leading: GestureDetector(
               onTap: onUserPressed != null
                   ? () => onUserPressed!(item.authorship.userID)
@@ -84,6 +91,7 @@ class FeedItemWorkoutCard extends ConsumerWidget {
               Go.to(
                 () => ExercisesView(
                   workout: item.workout,
+                  authorId: item.authorship.userID,
                   isOwned:
                       item.authorship is FeedAuthorshipOwn ||
                       item.authorship.userID == account?.id,
@@ -91,6 +99,15 @@ class FeedItemWorkoutCard extends ConsumerWidget {
               );
             },
           ),
+          if (item.authorship.userID != null)
+            PostActions(
+              source: (
+                owner: item.authorship.userID!,
+                source: item.workout.id,
+                kind: 'workout',
+              ),
+              workout: item.workout,
+            ),
         ],
       ),
     );
@@ -170,6 +187,14 @@ class FeedItemAchievementCard extends StatelessWidget {
               ).content,
             ),
           ),
+          if (item.authorship.userID != null)
+            PostActions(
+              source: (
+                owner: item.authorship.userID!,
+                source: item.completion.id,
+                kind: 'achievement',
+              ),
+            ),
         ],
       ),
     );

@@ -48,6 +48,7 @@ model.Workout historyWorkoutFromDatabase(
     id: routine.id,
     name: routine.name,
     exercises: entries,
+    visibility: routine.visibility,
     duration: Duration(seconds: routine.duration),
     startingDate: routine.startingDate,
     parentID: routine.parentId,

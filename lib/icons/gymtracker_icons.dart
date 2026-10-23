@@ -231,6 +231,7 @@ class GTIcons {
   static const IconData notes_add = Icons.note_add_rounded;
   static const IconData notification_dialog =
       Icons.notification_important_rounded;
+  static const IconData notifications = Icons.notifications_rounded;
   static const IconData nutrition_goal = Icons.outlined_flag_rounded;
   static const IconData pause = Icons.pause_rounded;
   static const IconData permissions = Icons.security_rounded;

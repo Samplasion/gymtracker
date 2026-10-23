@@ -41,7 +41,7 @@ final class WorkoutControllerProvider
   }
 }
 
-String _$workoutControllerHash() => r'ea0ff93cba3b674fb8c7361de23c43b4df91ed39';
+String _$workoutControllerHash() => r'4aace7e70b57156b36824fa76e3483f9a4b18145';
 
 abstract class _$WorkoutController extends $Notifier<WorkoutState?> {
   WorkoutState? build();

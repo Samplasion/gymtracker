@@ -91,6 +91,7 @@ class GTRoutineFolder {
 /// not concrete and represents a routine.
 class Workout {
   final String id;
+  final String visibility;
   final String name;
   final List<WorkoutExercisable> exercises;
   final Duration? duration;
@@ -192,6 +193,7 @@ class Workout {
       max(1, duration!.inMinutes));
 
   Workout({
+    this.visibility = 'friends',
     String? id,
     required this.name,
     required this.exercises,
@@ -253,6 +255,10 @@ class Workout {
     );
 
     final result = Workout(
+      visibility:
+          workout1.visibility == 'private' || workout2.visibility == 'private'
+          ? 'private'
+          : 'friends',
       name: workout1.name,
       exercises: exercises,
       duration:
@@ -299,6 +305,7 @@ class Workout {
   Workout toRoutine({String? routineID}) {
     final newRoutineID = routineID ?? const Uuid().v4();
     return copyWith(
+      visibility: 'friends',
       duration: null,
       startingDate: null,
       id: newRoutineID,
@@ -452,6 +459,9 @@ class SynthesizedWorkoutMethodException implements Exception {
 }
 
 class SynthesizedWorkout implements Workout {
+  @override
+  String get visibility =>
+      components.any((w) => w.visibility == 'private') ? 'private' : 'friends';
   final List<Workout> components;
 
   SynthesizedWorkout(this.components)

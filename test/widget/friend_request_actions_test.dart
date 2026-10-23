@@ -7,6 +7,7 @@ import 'package:gymtracker/provider/connectivity.dart';
 import 'package:gymtracker/provider/feed.dart';
 import 'package:gymtracker/provider/friend.dart';
 import 'package:gymtracker/provider/online.dart';
+import 'package:gymtracker/provider/social.dart';
 import 'package:gymtracker/service/feed.dart';
 import 'package:gymtracker/service/online.dart';
 import 'package:gymtracker/view/feed.dart';
@@ -110,6 +111,12 @@ void main() {
         userAvatarProvider('friend').overrideWith((ref) async => null),
         userAvatarProvider('owner').overrideWith((ref) async => null),
         feedProvider.overrideWith(_Feed.new),
+        notificationSummaryProvider.overrideWith(
+          (ref) async => {
+            'unread':
+                ref.watch(friendProvider).value?.pendingReceived.length ?? 0,
+          },
+        ),
       ],
     );
     addTearDown(container.dispose);
@@ -165,7 +172,7 @@ void main() {
     await tester.pumpWidget(const SizedBox.shrink());
   });
 
-  testWidgets('feed badge counts incoming requests and hides when empty', (
+  testWidgets('feed badge counts unread notifications and hides when empty', (
     tester,
   ) async {
     final friends = _Friends();
@@ -174,12 +181,12 @@ void main() {
     expect(badge().isLabelVisible, isFalse);
 
     friends.receiveRequests(2);
-    await tester.pump();
+    await tester.pumpAndSettle();
     expect(badge().isLabelVisible, isTrue);
     expect((badge().label! as Text).data, '2');
 
     friends.receiveRequests(0);
-    await tester.pump();
+    await tester.pumpAndSettle();
     expect(badge().isLabelVisible, isFalse);
     await tester.pumpWidget(const SizedBox.shrink());
   });

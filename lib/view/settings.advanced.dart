@@ -54,6 +54,35 @@ class AdvancedSettingsView extends ConsumerWidget {
                       );
                     },
                   ),
+                if (account != null) ...[
+                  ListTile(
+                    leading: const Icon(Icons.flag_outlined),
+                    title: Text(context.t.social.reports),
+                    onTap: () =>
+                        Go.to(() => const SocialSettingsPage(reports: true)),
+                  ),
+                  ListTile(
+                    leading: const Icon(Icons.block),
+                    title: Text(context.t.social.blockedUsers),
+                    onTap: () => Go.to(() => const SocialSettingsPage()),
+                  ),
+                  ListTile(
+                    leading: const Icon(Icons.notifications_outlined),
+                    title: Text(context.t.social.push),
+                    subtitle: Text(context.t.social.pushDescription),
+                    onTap: () => socialAction(context, () async {
+                      final enabled = await ref
+                          .read(pushServiceProvider)
+                          .enable();
+                      if (!enabled && context.mounted)
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(context.t.social.pushDisabled),
+                          ),
+                        );
+                    }),
+                  ),
+                ],
                 const SyncRecoveryActions(),
                 const Divider(),
                 ListTile(

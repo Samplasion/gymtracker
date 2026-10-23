@@ -1,0 +1,36 @@
+{
+  "en": {
+    "events": {
+      "friend_request": "Sent you a friend request",
+      "friend_accepted": "Accepted your friend request",
+      "like": "Liked your post",
+      "comment": "Commented on your post",
+      "achievement": "Unlocked an achievement",
+      "report_status": "Your report status changed"
+    },
+    "statuses": {
+      "received": "Received",
+      "reviewing": "Under review",
+      "resolved": "Resolved",
+      "dismissed": "Dismissed"
+    },
+    "fallback": "Notifications"
+  },
+  "it": {
+    "events": {
+      "friend_request": "Ti ha inviato una richiesta di amicizia",
+      "friend_accepted": "Ha accettato la tua richiesta di amicizia",
+      "like": "Ha messo Mi piace al tuo post",
+      "comment": "Ha commentato il tuo post",
+      "achievement": "Ha sbloccato un achievement",
+      "report_status": "Lo stato della tua segnalazione è cambiato"
+    },
+    "statuses": {
+      "received": "Ricevuta",
+      "reviewing": "In esame",
+      "resolved": "Risolta",
+      "dismissed": "Archiviata"
+    },
+    "fallback": "Notifiche"
+  }
+}

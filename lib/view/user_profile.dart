@@ -1,16 +1,16 @@
 import 'dart:math';
-import 'package:gymtracker/view/components/visible_data_refresh.dart';
 
 import 'package:flutter/material.dart';
+import 'package:gymtracker/view/social.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:gymtracker/provider/achievement_metadata.dart';
 import 'package:gymtracker/i18n/strings.g.dart';
 import 'package:gymtracker/icons/gymtracker_icons.dart';
 import 'package:gymtracker/model/friend.dart';
 import 'package:gymtracker/model/workout.dart';
+import 'package:gymtracker/provider/achievement_metadata.dart';
 import 'package:gymtracker/provider/connectivity.dart';
-import 'package:gymtracker/provider/friend.dart';
 import 'package:gymtracker/provider/feed.dart';
+import 'package:gymtracker/provider/friend.dart';
 import 'package:gymtracker/provider/online.dart';
 import 'package:gymtracker/service/feed.dart';
 import 'package:gymtracker/service/online.dart';
@@ -20,6 +20,9 @@ import 'package:gymtracker/view/components/content_unavailable.dart';
 import 'package:gymtracker/view/components/error_view.dart';
 import 'package:gymtracker/view/components/icon_grid.dart';
 import 'package:gymtracker/view/components/stats.dart';
+import 'package:gymtracker/view/components/visible_data_refresh.dart';
+import 'package:gymtracker/view/friend_achievement_history.dart';
+import 'package:gymtracker/view/friends.dart';
 import 'package:gymtracker/view/utils/edit_profile.dart';
 import 'package:gymtracker/view/utils/feed_items.dart';
 import 'package:gymtracker/view/utils/sliver_utils.dart';
@@ -37,10 +40,10 @@ class UserProfilePage extends ConsumerWidget {
     final friendObject = ref.watch(friendPublicDataProvider(userID));
     final online = ref.watch(onlineProvider);
     if (online.value?.id == userID) {
-      ref.listen(feedHistoryStreamProvider, (_, __) {
+      ref.listen(feedHistoryStreamProvider, (_, _) {
         ref.read(friendProvider.notifier).invalidateContents(userID);
       });
-      ref.listen(feedAchievementsStreamProvider, (_, __) {
+      ref.listen(feedAchievementsStreamProvider, (_, _) {
         ref.read(friendProvider.notifier).invalidateContents(userID);
       });
     }
@@ -140,6 +143,26 @@ class UserProfilePage extends ConsumerWidget {
             title: Text(friend.fullName ?? context.t.userProfile.title),
             pinned: true,
             actions: [
+              if (!isSelf && !isLoading && account != null)
+                PopupMenuButton<String>(
+                  itemBuilder: (_) => [
+                    PopupMenuItem(
+                      value: 'block',
+                      child: Text(context.t.social.block),
+                    ),
+                    PopupMenuItem(
+                      value: 'report',
+                      child: Text(context.t.social.report),
+                    ),
+                  ],
+                  onSelected: (action) {
+                    if (action == 'block') {
+                      blockUser(context, ref, userID);
+                    } else {
+                      reportUser(context, ref, userID);
+                    }
+                  },
+                ),
               if (isSelf)
                 IconButton(
                   tooltip: context.t.userProfile.edit.tooltip,
@@ -210,6 +233,9 @@ class UserProfilePage extends ConsumerWidget {
                               Stats(
                                 value: "${friendData.friendCount}",
                                 label: context.t.userProfile.stats.friends,
+                                onTap: isSelf && !isLoading
+                                    ? () => Go.to(() => const FriendsPage())
+                                    : null,
                               ),
                               Stats(
                                 value: "${friendData.workouts.length}",
@@ -218,6 +244,13 @@ class UserProfilePage extends ConsumerWidget {
                               Stats(
                                 value: "${friendData.achievements.length}",
                                 label: context.t.userProfile.stats.achievements,
+                                onTap: isFriend && !isSelf && !isLoading
+                                    ? () => Go.to(
+                                        () => FriendAchievementHistoryPage(
+                                          friend: friend,
+                                        ),
+                                      )
+                                    : null,
                               ),
                             ],
                           ),

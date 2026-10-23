@@ -12,13 +12,10 @@ class StatsRow extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: stats
-            .map((s) => Expanded(
-                  child: s,
-                ))
+            .map((s) => Expanded(child: s))
             .separated(
-              separatorBuilder: (_) => VerticalDivider(
-                color: context.colorScheme.outlineVariant,
-              ),
+              separatorBuilder: (_) =>
+                  VerticalDivider(color: context.colorScheme.outlineVariant),
             ),
       ),
     );
@@ -28,12 +25,18 @@ class StatsRow extends StatelessWidget {
 class Stats extends StatelessWidget {
   final String value;
   final String label;
+  final VoidCallback? onTap;
 
-  const Stats({required this.value, required this.label, super.key});
+  const Stats({
+    required this.value,
+    required this.label,
+    this.onTap,
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return Center(
+    final content = Center(
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.center,
@@ -52,6 +55,11 @@ class Stats extends StatelessWidget {
           ),
         ],
       ),
+    );
+    if (onTap == null) return content;
+    return Semantics(
+      button: true,
+      child: InkWell(onTap: onTap, child: content),
     );
   }
 }

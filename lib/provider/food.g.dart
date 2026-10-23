@@ -1706,4 +1706,4 @@ final class FoodNativeSyncProvider extends $FunctionalProvider<void, void, void>
   }
 }
 
-String _$foodNativeSyncHash() => r'5213fd850d8e8ff0e33a4cb127bf74b2b304bed0';
+String _$foodNativeSyncHash() => r'563023a18693406e23b5e81f9320b172f41252bf';

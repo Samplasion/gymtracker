@@ -7,6 +7,8 @@ part of 'workout.dart';
 // **************************************************************************
 
 abstract class _$WorkoutCWProxy {
+  Workout visibility(String visibility);
+
   Workout id(String? id);
 
   Workout name(String name);
@@ -39,6 +41,7 @@ abstract class _$WorkoutCWProxy {
   /// Workout(...).copyWith(id: 12, name: "My name")
   /// ```
   Workout call({
+    String visibility,
     String? id,
     String name,
     List<WorkoutExercisable> exercises,
@@ -60,6 +63,9 @@ class _$WorkoutCWProxyImpl implements _$WorkoutCWProxy {
   const _$WorkoutCWProxyImpl(this._value);
 
   final Workout _value;
+
+  @override
+  Workout visibility(String visibility) => call(visibility: visibility);
 
   @override
   Workout id(String? id) => call(id: id);
@@ -109,6 +115,7 @@ class _$WorkoutCWProxyImpl implements _$WorkoutCWProxy {
   /// Workout(...).copyWith(id: 12, name: "My name")
   /// ```
   Workout call({
+    Object? visibility = const $CopyWithPlaceholder(),
     Object? id = const $CopyWithPlaceholder(),
     Object? name = const $CopyWithPlaceholder(),
     Object? exercises = const $CopyWithPlaceholder(),
@@ -123,6 +130,11 @@ class _$WorkoutCWProxyImpl implements _$WorkoutCWProxy {
     Object? folder = const $CopyWithPlaceholder(),
   }) {
     return Workout(
+      visibility:
+          visibility == const $CopyWithPlaceholder() || visibility == null
+          ? _value.visibility
+          // ignore: cast_nullable_to_non_nullable
+          : visibility as String,
       id: id == const $CopyWithPlaceholder()
           ? _value.id
           // ignore: cast_nullable_to_non_nullable
@@ -189,6 +201,7 @@ extension $WorkoutCopyWith on Workout {
 // **************************************************************************
 
 Workout _$WorkoutFromJson(Map<String, dynamic> json) => Workout(
+  visibility: json['visibility'] as String? ?? 'friends',
   id: json['id'] as String?,
   name: json['name'] as String,
   exercises: (json['exercises'] as List<dynamic>)
@@ -216,6 +229,7 @@ Workout _$WorkoutFromJson(Map<String, dynamic> json) => Workout(
 
 Map<String, dynamic> _$WorkoutToJson(Workout instance) => <String, dynamic>{
   'id': instance.id,
+  'visibility': instance.visibility,
   'name': instance.name,
   'exercises': instance.exercises,
   'duration': instance.duration?.inMicroseconds,

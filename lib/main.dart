@@ -178,6 +178,7 @@ class _MainAppState extends ConsumerState<MainApp>
         .read(notificationEventsProvider)
         .stream
         .listen((response) async {
+          if (response.payload?.startsWith('social:') == true) return;
           await ref.read(appStartupProvider.future);
           if (!mounted || ref.read(workoutControllerProvider) == null) return;
           ref

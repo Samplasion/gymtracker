@@ -35,6 +35,7 @@ const converters = {
   10: VersionedJsonImportV10(),
   11: VersionedJsonImportV11(),
   12: VersionedJsonImportV12(),
+  21: VersionedJsonImportV12(),
 };
 
 VersionedJsonImportBase getConverter(int version) {
@@ -119,4 +120,3 @@ class DatabaseSnapshot {
 bool deepEquals(DatabaseSnapshot a, DatabaseSnapshot b) {
   return mapEquals(a.toJson(), b.toJson());
 }
-

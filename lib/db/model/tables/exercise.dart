@@ -409,7 +409,9 @@ class RoutineExercise extends ConcreteExercise implements Syncable {
 }
 
 class HistoryWorkoutExercise extends ConcreteExercise implements Syncable {
+  final String? publicationVersion;
   HistoryWorkoutExercise({
+    this.publicationVersion,
     required super.id,
     required super.routineId,
     required super.name,
@@ -453,6 +455,7 @@ class HistoryWorkoutExercise extends ConcreteExercise implements Syncable {
     }
 
     return HistoryWorkoutExercise(
+      publicationVersion: json['publication_version'] as String?,
       id: json['id'] as String? ?? _uuid.v4(),
       routineId: json['routine_id'] as String? ?? json['routineId'] as String,
       name: json['name'] as String,
@@ -511,6 +514,7 @@ class HistoryWorkoutExercise extends ConcreteExercise implements Syncable {
 
   @override
   Map<String, dynamic> toJson() => {
+    'publication_version': publicationVersion,
     'id': id,
     'routine_id': routineId,
     'name': name,
@@ -541,6 +545,7 @@ class HistoryWorkoutExercise extends ConcreteExercise implements Syncable {
   @override
   UpdateCompanion<Syncable> toCompanion() {
     return HistoryWorkoutExercisesCompanion.insert(
+      publicationVersion: Value(publicationVersion),
       id: Value(id),
       routineId: routineId,
       name: name,

@@ -9,6 +9,7 @@ import 'package:gymtracker/model/achievements.dart';
 import 'package:gymtracker/utils/constants.dart';
 import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/utils/go.dart';
+import 'package:gymtracker/view/components/achievement_history_tile.dart';
 import 'package:gymtracker/view/components/loading_indicator.dart';
 import 'package:gymtracker/view/utils/achievements.dart';
 import 'package:gymtracker/view/utils/sliver_utils.dart';
@@ -269,38 +270,7 @@ class AchievementHistoryScreen extends ConsumerWidget {
                 itemCount: snapshot.data!.length,
                 itemBuilder: (context, index) {
                   final completion = snapshot.data![index];
-                  final achievement = controller.getAchievement(
-                    completion.achievementID,
-                  );
-                  final level = controller.getLevel(
-                    achievement,
-                    completion.level,
-                  )!;
-                  return ListTile(
-                    leading: AchievementIcon(
-                      achievement: achievement,
-                      enabled: true,
-                      size: 48,
-                    ),
-                    title: Text(level.getLocalizedName(context.t)),
-                    subtitle: Text.rich(
-                      TextSpan(
-                        children: [
-                          TextSpan(
-                            text: level.getLocalizedDescription(context.t),
-                          ),
-                          const TextSpan(text: "\n"),
-                          TextSpan(
-                            text: context.t.achievements.unlockedOn(
-                              date: DateFormat.yMMMMEEEEd(
-                                context.locale.languageCode,
-                              ).add_Hms().format(completion.completedAt),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  );
+                  return AchievementHistoryTile(completion: completion);
                 },
               );
             },

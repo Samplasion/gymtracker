@@ -459,12 +459,19 @@ class FriendNotifier extends _$FriendNotifier {
 
   Future<String?> getAvatar(String id) async {
     final identity = await getIdentity(id);
-    final url = Supabase.instance.client.storage
+    final url = await Supabase.instance.client.storage
         .from('profile_pictures')
-        .getPublicUrl(id);
+        .createSignedUrl(id, 60);
     return identity.updatedAt == null
         ? url
-        : '$url?v=${Uri.encodeComponent(identity.updatedAt!)}';
+        : Uri.parse(url)
+              .replace(
+                queryParameters: {
+                  ...Uri.parse(url).queryParameters,
+                  'v': identity.updatedAt!,
+                },
+              )
+              .toString();
   }
 
   void invalidateAvatarCache(String id) {
@@ -526,6 +533,8 @@ Future<Friend> userIdentity(Ref ref, String id) {
 
 @riverpod
 Future<String?> userAvatar(Ref ref, String id) {
+  final expiry = Timer(const Duration(seconds: 45), ref.invalidateSelf);
+  ref.onDispose(expiry.cancel);
   ref.watch(userIdentityProvider(id));
   return ref.watch(friendProvider.notifier).getAvatar(id);
 }

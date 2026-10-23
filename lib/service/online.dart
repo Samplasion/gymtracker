@@ -384,7 +384,9 @@ class OnlineServiceImpl with ChangeNotifier implements OnlineService {
 
   @override
   Future<Uri?> getAvatarUrl(String id) async {
-    return Uri.parse(_db.storage.from('profile_pictures').getPublicUrl(id));
+    return Uri.parse(
+      await _db.storage.from('profile_pictures').createSignedUrl(id, 60),
+    );
   }
 
   @override

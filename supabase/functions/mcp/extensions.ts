@@ -4,6 +4,7 @@ import * as s from "./schemas.ts";
 import {
   exerciseHistory,
   foodView,
+  hydrationSummary,
   nutritionSummary,
   routineView,
   trainingStats,
@@ -49,6 +50,58 @@ export function registerExtensions(
       })());
   };
   const uuid = { idempotencyKey: z.uuid() };
+  add(
+    "list_water_entries",
+    "List drinking-water records for inclusive dates in the account time zone, newest first. Free: today ±7 days. Food water is included only in hydration summaries.",
+    { ...s.dateRange, ...s.cursorPage },
+  );
+  add(
+    "get_water_entries",
+    "Read 1–20 drinking-water records by ID. Deleted, missing and other-account IDs are unavailable. Free date restrictions also apply to ID reads.",
+    { ids: s.idsSchema },
+  );
+  add(
+    "log_water",
+    "After the user requests saving, record 1–100 drinking-water entries atomically. milliliters is the TOTAL volume: two 250ml glasses are 500ml; convert liters exactly and ask when glass/bottle volume is unknown. Do not also record water for the same beverage already logged as food: its water nutrient is counted separately. No future entries, updates or deletions. Free: today ±7 days. Reuse idempotencyKey on retries; never deduplicate historical records by similarity.",
+    { ...uuid, entries: z.array(s.waterLogSchema).min(1).max(100) },
+    true,
+  );
+  add(
+    "get_hydration_summary",
+    "Daily drinking water, known water from food snapshots and combined known totals, completeness and effective optional goal. Unknown food water is never estimated. Includes empty days. Free: today ±7 days.",
+    s.dateRange,
+    false,
+    (r) => hydrationSummary(r),
+  );
+
+  add(
+    "list_measurements",
+    "Read actual weight and body measurements, newest first. Optional inclusive local calendar dates. Available on Free and Pro; no predictions.",
+    {
+      kind: z.enum(["weight", "body"]).optional(),
+      types: z.array(s.bodyMeasurementType).min(1).max(15).optional(),
+      from: s.measurementDate.optional(),
+      to: s.measurementDate.optional(),
+      ...s.cursorPage,
+    },
+  );
+  add(
+    "get_measurements",
+    "Read actual measurements by kind and ID. Unknown, deleted and other-account references are unavailable.",
+    {
+      references: z.array(s.measurementRef).min(1).max(20),
+    },
+  );
+  add(
+    "create_measurements",
+    "After the user requests saving, create 1–100 actual weight/body measurements atomically. Reuse idempotencyKey on retries. Preserve units; body measurements use cm or percent. No updates or deletions; multiple records per day are allowed. Available on Free and Pro.",
+    {
+      ...uuid,
+      entries: z.array(s.measurementSchema).min(1).max(100),
+    },
+    true,
+  );
+
   const nm = z.string().trim().min(1).max(200),
     notes = z.string().max(10000).default("");
   add(
@@ -60,6 +113,7 @@ export function registerExtensions(
         name: nm,
         parameters: z.enum([
           "repsWeight",
+          "repsNegWeight",
           "timeWeight",
           "freeBodyReps",
           "time",
@@ -169,10 +223,12 @@ export function registerExtensions(
   server.registerTool("search_foods", {
     title: "Search foods",
     description:
-      "Search only local Gym Bro favorites and personal barcode definitions. By default search both sources; no external food search is performed. Use returned references when logging. Missing nutrients require explicit completion, never assume zero.",
+      "Search the shared Gym Bro food catalog, local favorites and personal barcode definitions. By default search all three sources; no external service is contacted. Use returned references when logging. missingNutrients lists only missing REQUIRED nutrients: calories, fat, saturatedFat, carbs, sugar and protein. An empty list means these six are present, not that all nutrients are known. Optional nutrients may be null (unknown, never zero) and do not prevent logging. Complete missing required nutrients explicitly before logging.",
     inputSchema: z.strictObject({
       query: z.string().trim().min(1).max(200),
-      source: z.enum(["all", "favorite", "customBarcode"]).default("all"),
+      source: z.enum(["all", "catalog", "favorite", "customBarcode"]).default(
+        "all",
+      ),
       language: s.language,
       country: z.string().regex(/^[a-z]{2}$/).default("it"),
       ...s.cursorPage,
@@ -190,7 +246,7 @@ export function registerExtensions(
   server.registerTool("get_foods", {
     title: "Get food definitions",
     description:
-      "Resolve up to 20 food references. For Open Food Facts the ID is the barcode. Returns missing nutrients explicitly.",
+      "Resolve up to 20 food references. Catalog references use the product ID. Legacy Open Food Facts barcode references resolve only from the published Gym Bro catalog. missingNutrients lists only missing REQUIRED nutrients: calories, fat, saturatedFat, carbs, sugar and protein. An empty list means these six are present, not that all nutrients are known. Optional nutrients may be null (unknown, never zero) and do not prevent logging. Complete missing required nutrients explicitly before logging.",
     inputSchema: z.strictObject({
       references: z.array(s.foodRef).min(1).max(20),
     }),
@@ -222,7 +278,7 @@ export function registerExtensions(
   server.registerTool("log_foods", {
     title: "Log food consumption",
     description:
-      "After the user requests saving, log 1–100 consumptions atomically. Supply a resolved foodRef OR explicit manual food values per 100g/100ml, amount and pieces. Do not invent missing nutrient values or convert mass to volume. Free: today ±7 days. Reuse idempotencyKey on retries.",
+      "After the user requests saving, log 1–100 consumptions atomically. Supply a resolved foodRef OR explicit manual food values per 100g/100ml, amount and pieces. For X units of Y (slices, spoons, glasses, packs), amount is grams/ml for ONE unit and pieces is X; e.g. three slices weighing 30g TOTAL: amount=10, pieces=3; three slices weighing 30g EACH: amount=30, pieces=3. If only a total for equal units is given divide by X. Use a matching servingSize or user-supplied unit size; ask when unknown. Nutrients stay per 100g/100ml; never multiply twice. Only calories, fat, saturatedFat, carbs, sugar and protein are required; missingNutrients reports missing values among these six. Optional nutrients may remain null (unknown), do not prevent logging and do not require completion. Do not invent missing nutrient values, replace unknown values with zero or convert mass to volume. Free: today ±7 days. Reuse idempotencyKey on retries.",
     inputSchema: z.strictObject({
       ...uuid,
       entries: z.array(s.foodLogSchema).min(1).max(100),

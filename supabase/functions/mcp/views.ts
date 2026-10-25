@@ -3,6 +3,7 @@ import {
   nutrientNames,
   nutrientUnits,
   standardExercises,
+  ToolError,
 } from "./schemas.ts";
 type Row = Record<string, any>;
 const parse = (v: unknown) => typeof v === "string" ? JSON.parse(v) : v;
@@ -254,7 +255,54 @@ export function foodView(f: Row) {
       : {}),
   };
 }
+export function hydrationSummary(raw: Row) {
+  return {
+    items: raw.settings.map((setting: Row) => {
+      const foods = raw.entries.filter((e: Row) => e.date === setting.date);
+      const drinking = (raw.waterEntries ?? []).filter((e: Row) =>
+        e.date === setting.date
+      );
+      const drinkingWaterMl = drinking.reduce(
+        (sum: number, entry: Row) => sum + entry.milliliters,
+        0,
+      );
+      const hasWater = (entry: Row) =>
+        typeof entry.food.nutritionalValuesPer100g?.water === "number";
+      const knownFoodWaterMl = foods.filter(hasWater).reduce(
+        (sum: number, entry: Row) =>
+          sum +
+          entry.food.nutritionalValuesPer100g.water * entry.food.amount *
+            (entry.food.pieces ?? 1) / 100,
+        0,
+      );
+      if (
+        ![drinkingWaterMl, knownFoodWaterMl, drinkingWaterMl + knownFoodWaterMl]
+          .every(Number.isFinite)
+      ) {
+        throw new ToolError(
+          "invalid_input",
+          "Hydration totals exceed numeric range",
+        );
+      }
+      const waterGoalMl = setting.goal.dailyWater ?? null;
+      return {
+        date: setting.date,
+        drinkingWaterMl,
+        knownFoodWaterMl,
+        knownTotalWaterMl: drinkingWaterMl + knownFoodWaterMl,
+        foodWaterComplete: foods.every(hasWater),
+        waterGoalMl,
+        waterGoalEffectiveFrom: waterGoalMl === null
+          ? null
+          : setting.goalEffectiveFrom ?? null,
+      };
+    }),
+  };
+}
 export function nutritionSummary(raw: Row) {
+  const hydration = new Map(
+    hydrationSummary(raw).items.map((day: Row) => [day.date, day]),
+  );
   return {
     nutrientUnits,
     items: raw.settings.map((setting: Row) => {
@@ -280,6 +328,7 @@ export function nutritionSummary(raw: Row) {
       const totals = total(entries);
       return {
         ...setting,
+        hydration: hydration.get(setting.date),
         totals,
         incompleteNutrients: nutrientNames.filter((k) => totals[k] === null),
         remaining: {

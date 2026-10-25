@@ -35,10 +35,6 @@ function harness(consented = true) {
     calls.push(`billing:${id}`);
     return Promise.resolve({ refreshed: true });
   };
-  services.search = () => {
-    calls.push("search");
-    throw new Error("External search must not be called");
-  };
   services.product = () => {
     calls.push("product");
     return Promise.resolve({ name: "food" });
@@ -55,7 +51,7 @@ function harness(consented = true) {
       Promise.resolve(
         consented
           ? Response.json({ allowed: true })
-          : Response.json({ code: "P1001" }, { status: 403 }),
+          : Response.json({ code: "42501" }, { status: 403 }),
       ),
   );
   const request = (body: unknown, token = "Bearer valid") =>
@@ -78,11 +74,11 @@ Deno.test("billing refresh cannot select another account supplied in the body", 
   equal((await h.request({ action: "billing", userId: "victim" })).status, 200);
   equal(h.calls, ["billing:00000000-0000-0000-0000-000000000081"]);
 });
-Deno.test("catalog service repeats consent checks before retrieving external products", async () => {
+Deno.test("catalog service repeats OAuth session checks before retrieving catalog products", async () => {
   const h = harness(false);
   const result = await h.request({ action: "food_get", barcode: "12345678" });
   equal(result.status, 503);
-  equal(await result.json(), { error: "consent_required" });
+  equal(await result.json(), { error: "authentication_required" });
   equal(h.calls, []);
 });
 Deno.test("webhook retries are idempotent and transfers refresh both affected accounts", async () => {
@@ -168,4 +164,11 @@ Deno.test("billing refresh succeeds end to end when the storage RPC returns HTTP
   equal(response.status, 200);
   equal(await response.json(), { refreshed: true });
   equal(calls.length, 2);
+});
+
+Deno.test("revoked OAuth sessions cannot invoke the privileged billing refresh", async () => {
+  const h = harness(false);
+  const response = await h.request({ action: "billing" });
+  equal(await response.json(), { error: "authentication_required" });
+  equal(h.calls, []);
 });

@@ -98,7 +98,7 @@ export const cursorPage = {
 };
 export const dateRange = { from: dateSchema, to: dateSchema };
 export const foodRef = z.strictObject({
-  source: z.enum(["openfoodfacts", "favorite", "customBarcode"]),
+  source: z.enum(["catalog", "openfoodfacts", "favorite", "customBarcode"]),
   id: z.string().min(1).max(300),
 });
 export const nutrientNames = [
@@ -178,11 +178,12 @@ export const nutrientNames = [
   "montanicAcid",
   "nervonicAcid",
   "transFat",
+  "water",
 ] as const;
 export const nutrientUnits: Record<string, string> = Object.fromEntries(
   nutrientNames.map((k) => [k, "g"]),
 );
-Object.assign(nutrientUnits, { calories: "kcal", alcohol: "%" });
+Object.assign(nutrientUnits, { calories: "kcal", alcohol: "%", water: "ml" });
 for (
   const k of [
     "calcium",
@@ -250,11 +251,76 @@ export const foodDefinition = z.strictObject({
     }),
   ).max(100).default([]),
 });
+export const bodyMeasurementType = z.enum([
+  "waist",
+  "bodyFat",
+  "neck",
+  "shoulder",
+  "chest",
+  "leftBicep",
+  "rightBicep",
+  "leftForearm",
+  "rightForearm",
+  "abdomen",
+  "hips",
+  "leftThigh",
+  "rightThigh",
+  "leftCalf",
+  "rightCalf",
+]);
+export const measurementRef = z.strictObject({
+  kind: z.enum(["weight", "body"]),
+  id: z.string().min(1).max(300),
+});
+export const measurementDate = z.iso.date().refine(
+  (value) => !value.startsWith("0000-"),
+  "Year must be at least 1",
+);
+const measurementTime = z.union([
+  z.iso.datetime({ offset: true }),
+  measurementDate,
+])
+  .optional().describe(
+    "Instant with UTC/offset, or YYYY-MM-DD at midnight in the account time zone. Omit for server time.",
+  );
+const measurementValue = z.number().min(0).max(3.4028234e38);
+export const measurementSchema = z.discriminatedUnion("kind", [
+  z.strictObject({
+    kind: z.literal("weight"),
+    value: measurementValue,
+    unit: z.enum(["kg", "lb"]).default("kg"),
+    time: measurementTime,
+  }),
+  z.strictObject({
+    kind: z.literal("body"),
+    type: bodyMeasurementType,
+    value: measurementValue,
+    time: measurementTime,
+  }),
+]).superRefine((entry, ctx) => {
+  if (entry.kind === "body" && entry.type === "bodyFat" && entry.value > 100) {
+    ctx.addIssue({
+      code: "custom",
+      path: ["value"],
+      message: "Body fat must be between 0 and 100 percent",
+    });
+  }
+});
+export const waterLogSchema = z.strictObject({
+  milliliters: z.number().positive().max(Number.MAX_VALUE).describe(
+    "Total drinking water volume in ml. Two 250ml glasses are 500ml; ask if the unit size is unknown.",
+  ),
+  time: measurementTime,
+});
 export const foodLogSchema = z.strictObject({
   date: dateSchema,
   category: z.string().min(1).max(200).optional(),
-  amount: z.number().positive().max(1e6),
-  pieces: z.number().int().positive().max(10000).default(1),
+  amount: z.number().positive().max(1e6).describe(
+    "Grams/ml for ONE piece or serving, not the total across pieces. Three slices weighing 30g TOTAL: amount=10, pieces=3. Three slices weighing 30g EACH: amount=30, pieces=3.",
+  ),
+  pieces: z.number().int().positive().max(10000).default(1).describe(
+    "Number of equal units consumed. For X slices, spoons, glasses or packs use X; resolve the grams/ml per unit from user input or a matching servingSize, otherwise ask.",
+  ),
   foodRef: foodRef.optional(),
   food: foodDefinition.optional(),
 }).refine(

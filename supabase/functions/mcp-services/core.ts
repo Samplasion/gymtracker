@@ -80,6 +80,45 @@ export class Services {
           : null;
         active = expiration === null || Date.parse(expiration) > Date.now();
       }
+      // RevenueCat's merged entitlement can point to a sandbox lifetime purchase
+      // even while a separate production promotional grant is active. Evaluate
+      // those grants independently, using their own expiration (not ent's null).
+      // Match the full entitlement + documented v1 duration, never a loose prefix
+      // that could accidentally recognize a different entitlement.
+      for (
+        const duration of [
+          "daily",
+          "three_day",
+          "weekly",
+          "two_week",
+          "monthly",
+          "two_month",
+          "three_month",
+          "six_month",
+          "yearly",
+          "lifetime",
+        ]
+      ) {
+        const grant = body.subscriber.subscriptions?.[
+          `rc_promo_${this.config.entitlement}_${duration}`
+        ];
+        if (
+          !grant || grant.store !== "promotional" ||
+          grant.is_sandbox !== false || grant.refunded_at != null ||
+          typeof grant.expires_date !== "string"
+        ) continue;
+        const until = Date.parse(grant.expires_date);
+        if (!Number.isFinite(until)) {
+          throw new ServiceError("billing_unavailable");
+        }
+        if (until <= Date.now()) continue;
+        if (
+          !active || (expiration !== null && until > Date.parse(expiration))
+        ) {
+          expiration = new Date(until).toISOString();
+        }
+        active = true;
+      }
     }
     await this.admin("mcp_store_billing", {
       account_id: userId,
@@ -92,121 +131,22 @@ export class Services {
   }
   async product(barcode: string) {
     if (!/^\d{4,32}$/.test(barcode)) throw new ServiceError("invalid_input");
-    const key = `product:${barcode}`;
-    const cached = await this.admin("mcp_cache_food", { cache_key: key });
-    if (cached) return cached;
-    await this.admin("mcp_external_budget", { budget_kind: "product" });
-    const url =
-      `https://world.openfoodfacts.org/api/v3/product/${barcode}.json`;
-    const body = await this.off(url);
-    if (!body.product) return null;
-    const food = mapProduct(body.product);
-    await this.admin("mcp_cache_food", { cache_key: key, definition: food });
-    return food;
-  }
-  async search(
-    args: {
-      query: string;
-      language: string;
-      country: string;
-      limit: number;
-      cursor?: string;
-    },
-  ) {
-    let page = 1;
-    const query = args.query.trim();
-    const filter = JSON.stringify([
-      query,
-      args.language,
-      args.country,
-      args.limit,
-    ]);
-    if (args.cursor) {
-      try {
-        const c = JSON.parse(
-          new TextDecoder().decode(
-            Uint8Array.from(atob(args.cursor), (c) => c.charCodeAt(0)),
-          ),
-        );
-        if (
-          c.filter !== filter || !Number.isInteger(c.page) || c.page < 1 ||
-          c.page > 1000
-        ) throw new Error();
-        page = c.page;
-      } catch {
-        throw new ServiceError("invalid_input");
-      }
-    }
-    const key = `search:${filter}:${page}`;
-    const cached = await this.admin("mcp_cache_food", { cache_key: key });
-    if (cached) return cached;
-    await this.admin("mcp_external_budget", { budget_kind: "search" });
-    // Matches the keyword-search behavior used by the Flutter OFF client.
-    const url = new URL("https://world.openfoodfacts.org/cgi/search.pl");
-    url.search = new URLSearchParams({
-      search_terms: query,
-      search_simple: "1",
-      action: "process",
-      json: "1",
-      page: String(page),
-      page_size: String(args.limit),
-      lc: args.language,
-      cc: args.country,
-    }).toString();
-    const body = await this.off(url.href);
-    if (!Array.isArray(body.products)) {
-      throw new ServiceError("external_service_unavailable");
-    }
-    const items = [];
-    for (const p of body.products) {
-      if (!/^\d{4,32}$/.test(String(p.code))) continue;
-      const food = mapProduct(p, args.language);
-      items.push({
-        reference: { source: "openfoodfacts", id: String(p.code) },
-        food,
-      });
-      await this.admin("mcp_cache_food", {
-        cache_key: `product:${p.code}`,
-        definition: food,
-      });
-    }
-    const result = {
-      items,
-      nextCursor: page * args.limit < Number(body.count)
-        ? btoa(
-          String.fromCharCode(
-            ...new TextEncoder().encode(
-              JSON.stringify({ filter, page: page + 1 }),
-            ),
-          ),
-        )
-        : null,
-      attribution: {
-        name: "Open Food Facts",
-        url: "https://world.openfoodfacts.org",
-        license: "ODbL",
-      },
-    };
-    await this.admin("mcp_cache_food", { cache_key: key, definition: result });
-    return result;
-  }
-  async off(url: string) {
+    const url = new URL(`${this.config.supabaseUrl}/rest/v1/food_catalog`);
+    url.searchParams.set("select", "food");
+    url.searchParams.set("barcode", `eq.${barcode}`);
+    url.searchParams.set("status", "eq.published");
+    url.searchParams.set("limit", "1");
     const response = await this.http(url, {
       headers: {
-        "User-Agent": this.config.userAgent,
-        Accept: "application/json",
+        apikey: this.config.serviceKey,
+        Authorization: `Bearer ${this.config.serviceKey}`,
       },
-      signal: AbortSignal.timeout(12000),
+      signal: AbortSignal.timeout(15000),
     });
-    if (response.status === 404) return {};
-    if (!response.ok) {
-      throw new ServiceError(
-        response.status === 429
-          ? "external_rate_limited"
-          : "external_service_unavailable",
-      );
-    }
-    return await response.json();
+    if (!response.ok) throw new ServiceError("external_service_unavailable");
+    const rows = await response.json();
+    const food = rows[0]?.food ?? null;
+    return food;
   }
 }
 export function mapProduct(p: Record<string, any>, language = "it") {

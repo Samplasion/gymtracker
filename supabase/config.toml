@@ -442,3 +442,7 @@ verify_jwt = false
 # Validates MCP JWTs or the dedicated RevenueCat webhook Authorization secret.
 [functions.mcp-services]
 verify_jwt = false
+
+# Handler verifies JWT and fetches current administrator privileges per request.
+[functions.admin-api]
+verify_jwt = false

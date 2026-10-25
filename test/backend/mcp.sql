@@ -3,20 +3,21 @@ BEGIN;
 INSERT INTO auth.users(id,email,raw_user_meta_data) VALUES
  ('00000000-0000-0000-0000-000000000031','mcp-a@unit.test','{"username":"mcpalpha"}'),
  ('00000000-0000-0000-0000-000000000032','mcp-b@unit.test','{"username":"mcpbeta"}');
-INSERT INTO gymbro_mcp.settings(singleton,client_id,resource) VALUES(true,'test-client','https://gym-bro.test/mcp');
+INSERT INTO gymbro_mcp.settings(singleton,client_id,resource) VALUES(true,'00000000-0000-0000-0000-000000000090','https://gym-bro.test/mcp');
 INSERT INTO public.custom_exercises(id,user_id,name,parameters,primary_muscle_group,secondary_muscle_groups,equipment) VALUES
  ('custom-a','00000000-0000-0000-0000-000000000031','Custom timer','time','abs','{}','none'),
  ('custom-b','00000000-0000-0000-0000-000000000032','Private exercise','freeBodyReps','chest','{}','none');
 DO $$ DECLARE claims jsonb; BEGIN
- claims:=public.gymbro_mcp_access_token_hook('{"claims":{"role":"authenticated","aud":"authenticated","client_id":"test-client"}}')->'claims';
+ claims:=public.gymbro_mcp_access_token_hook('{"claims":{"role":"authenticated","aud":"authenticated","client_id":"00000000-0000-0000-0000-000000000090"}}')->'claims';
  IF claims->>'role'<>'gymbro_mcp_user' OR NOT (claims->'aud' ? 'https://gym-bro.test/mcp') THEN RAISE EXCEPTION 'OAuth claims missing'; END IF;
  IF public.gymbro_mcp_access_token_hook('{"claims":{"role":"authenticated","aud":"authenticated"}}')->'claims'<>'{"role":"authenticated","aud":"authenticated"}' THEN RAISE EXCEPTION 'Ordinary claims changed'; END IF;
  IF public.gymbro_mcp_access_token_hook('{"claims":{"role":"authenticated","client_id":"unknown"}}')->'claims'->>'role'<>'gymbro_mcp_user' THEN RAISE EXCEPTION 'Unknown client was not isolated'; END IF;
 END $$;
 INSERT INTO gymbro_mcp.billing SELECT id,true,NULL,now(),'PRODUCTION' FROM auth.users ON CONFLICT(user_id) DO NOTHING;
-INSERT INTO gymbro_mcp.consents SELECT id,'test-client',2,'Europe/Rome',now() FROM auth.users ON CONFLICT(user_id) DO NOTHING;
+SELECT public.test_mcp_oauth(id) FROM auth.users;
+INSERT INTO gymbro_mcp.preferences SELECT id,'Europe/Rome' FROM auth.users ON CONFLICT DO NOTHING;
 SET LOCAL ROLE gymbro_mcp_user;
-SELECT set_config('request.jwt.claims','{"sub":"00000000-0000-0000-0000-000000000031","role":"gymbro_mcp_user","client_id":"test-client","aud":["authenticated","https://gym-bro.test/mcp"]}',true);
+SELECT set_config('request.jwt.claims','{"sub":"00000000-0000-0000-0000-000000000031","session_id":"00000000-0000-0000-0000-000000000031","role":"gymbro_mcp_user","client_id":"00000000-0000-0000-0000-000000000090","aud":["authenticated","https://gym-bro.test/mcp"]}',true);
 DO $$ DECLARE request jsonb; first_result jsonb; repeated jsonb; routine jsonb; changed jsonb; definitions jsonb; BEGIN
  definitions:=public.mcp_custom_exercises();
  IF jsonb_array_length(definitions)<>1 OR definitions->0->>'id'<>'custom-a' THEN RAISE EXCEPTION 'Custom catalog isolation failed'; END IF;
@@ -60,12 +61,12 @@ DO $$ DECLARE request jsonb; first_result jsonb; repeated jsonb; routine jsonb; 
  BEGIN PERFORM 1 FROM public.routines; RAISE EXCEPTION 'Direct table access' USING ERRCODE='XX000'; EXCEPTION WHEN insufficient_privilege THEN NULL; END;
  BEGIN PERFORM public.gymbro_mcp_access_token_hook('{}'); RAISE EXCEPTION 'Auth hook exposed' USING ERRCODE='XX000'; EXCEPTION WHEN insufficient_privilege THEN NULL; END;
 END $$;
-SELECT set_config('request.jwt.claims','{"sub":"00000000-0000-0000-0000-000000000032","role":"gymbro_mcp_user","client_id":"test-client","aud":["authenticated","https://gym-bro.test/mcp"]}',true);
+SELECT set_config('request.jwt.claims','{"sub":"00000000-0000-0000-0000-000000000032","session_id":"00000000-0000-0000-0000-000000000032","role":"gymbro_mcp_user","client_id":"00000000-0000-0000-0000-000000000090","aud":["authenticated","https://gym-bro.test/mcp"]}',true);
 DO $$ BEGIN
  IF public.mcp_list_routines()<>'[]' THEN RAISE EXCEPTION 'Cross-user routines'; END IF;
  BEGIN PERFORM public.mcp_get_routine(current_setting('gymbro.test.result')::jsonb->'routines'->0->>'id'); RAISE EXCEPTION 'Cross-user routine' USING ERRCODE='XX000'; EXCEPTION WHEN no_data_found THEN NULL; END;
 END $$;
-SELECT set_config('request.jwt.claims','{"sub":"00000000-0000-0000-0000-000000000031","role":"gymbro_mcp_user","client_id":"unknown","aud":["https://gym-bro.test/mcp"]}',true);
+SELECT set_config('request.jwt.claims','{"sub":"00000000-0000-0000-0000-000000000031","session_id":"00000000-0000-0000-0000-000000000031","role":"gymbro_mcp_user","client_id":"unknown","aud":["https://gym-bro.test/mcp"]}',true);
 DO $$ BEGIN
  BEGIN PERFORM public.mcp_list_routines(); RAISE EXCEPTION 'Unknown client' USING ERRCODE='XX000'; EXCEPTION WHEN insufficient_privilege THEN NULL; END;
 END $$;
@@ -77,9 +78,10 @@ DO $$ BEGIN
 END $$;
 SELECT public.activate_sync_v2();
 INSERT INTO gymbro_mcp.billing SELECT id,true,NULL,now(),'PRODUCTION' FROM auth.users ON CONFLICT(user_id) DO NOTHING;
-INSERT INTO gymbro_mcp.consents SELECT id,'test-client',2,'Europe/Rome',now() FROM auth.users ON CONFLICT(user_id) DO NOTHING;
+SELECT public.test_mcp_oauth(id) FROM auth.users;
+INSERT INTO gymbro_mcp.preferences SELECT id,'Europe/Rome' FROM auth.users ON CONFLICT DO NOTHING;
 SET LOCAL ROLE gymbro_mcp_user;
-SELECT set_config('request.jwt.claims','{"sub":"00000000-0000-0000-0000-000000000031","role":"gymbro_mcp_user","client_id":"test-client","aud":["authenticated","https://gym-bro.test/mcp"]}',true);
+SELECT set_config('request.jwt.claims','{"sub":"00000000-0000-0000-0000-000000000031","session_id":"00000000-0000-0000-0000-000000000031","role":"gymbro_mcp_user","client_id":"00000000-0000-0000-0000-000000000090","aud":["authenticated","https://gym-bro.test/mcp"]}',true);
 DO $$ DECLARE p jsonb; BEGIN
  p:='{"name":"After activation","routines":[{"name":"After gate","exercises":[{"exerciseRef":{"source":"custom","id":"custom-a"},"sets":[{"timeSeconds":15}]}]}]}';
  PERFORM public.mcp_create_program(p,'00000000-0000-0000-0000-000000000043');
@@ -87,7 +89,7 @@ DO $$ DECLARE p jsonb; BEGIN
 END $$;
 RESET ROLE;
 SET LOCAL ROLE authenticated;
-SELECT set_config('request.jwt.claims','{"sub":"00000000-0000-0000-0000-000000000031","role":"authenticated"}',true);
+SELECT set_config('request.jwt.claims','{"sub":"00000000-0000-0000-0000-000000000031","session_id":"00000000-0000-0000-0000-000000000031","role":"authenticated"}',true);
 DO $$ DECLARE page jsonb; cursor bigint:=0; horizon bigint; total integer:=0; BEGIN
  page:=public.sync_pull_v2(0,NULL,2); horizon:=(page->>'horizon')::bigint;
  LOOP
@@ -103,12 +105,13 @@ ROLLBACK;
 -- All parameter kinds, tombstones and retries after a reference is deleted.
 BEGIN;
 INSERT INTO auth.users(id,email,raw_user_meta_data) VALUES('00000000-0000-0000-0000-000000000061','mcp-types@unit.test','{"username":"mcptypes"}');
-INSERT INTO gymbro_mcp.settings(singleton,client_id,resource) VALUES(true,'test-client','https://gym-bro.test/mcp');
+INSERT INTO gymbro_mcp.settings(singleton,client_id,resource) VALUES(true,'00000000-0000-0000-0000-000000000090','https://gym-bro.test/mcp');
 INSERT INTO public.custom_exercises(id,user_id,name,parameters,primary_muscle_group,secondary_muscle_groups,equipment) VALUES('custom-later-deleted','00000000-0000-0000-0000-000000000061','Timer','time','abs','{}','none');
 INSERT INTO gymbro_mcp.billing SELECT id,true,NULL,now(),'PRODUCTION' FROM auth.users ON CONFLICT(user_id) DO NOTHING;
-INSERT INTO gymbro_mcp.consents SELECT id,'test-client',2,'Europe/Rome',now() FROM auth.users ON CONFLICT(user_id) DO NOTHING;
+SELECT public.test_mcp_oauth(id) FROM auth.users;
+INSERT INTO gymbro_mcp.preferences SELECT id,'Europe/Rome' FROM auth.users ON CONFLICT DO NOTHING;
 SET LOCAL ROLE gymbro_mcp_user;
-SET LOCAL request.jwt.claims = '{"sub":"00000000-0000-0000-0000-000000000061","role":"gymbro_mcp_user","client_id":"test-client","aud":["https://gym-bro.test/mcp"]}';
+SET LOCAL request.jwt.claims = '{"sub":"00000000-0000-0000-0000-000000000061","session_id":"00000000-0000-0000-0000-000000000061","role":"gymbro_mcp_user","client_id":"00000000-0000-0000-0000-000000000090","aud":["https://gym-bro.test/mcp"]}';
 DO $$ DECLARE request jsonb; saved jsonb; routine jsonb; BEGIN
  request:='{"name":"All parameters","routines":[{"name":"All types","weightUnit":"lb","distanceUnit":"mi","exercises":[{"exerciseRef":{"source":"standard","id":"library.forearms.exercises.farmerWalk"},"sets":[{"timeSeconds":30,"weight":15}]},{"exerciseRef":{"source":"standard","id":"library.cardio.exercises.biking"},"sets":[{"distance":2.5}]},{"exerciseRef":{"source":"standard","id":"library.abs.exercises.bicycleCrunches"},"sets":[{"reps":12}]},{"exerciseRef":{"source":"standard","id":"library.other.exercises.stretching"},"sets":[]},{"exerciseRef":{"source":"custom","id":"custom-later-deleted"},"sets":[{"timeSeconds":30}]}]}]}';
  saved:=public.mcp_create_program(request,'00000000-0000-0000-0000-000000000062');
@@ -124,7 +127,8 @@ END $$;
 RESET ROLE;
 UPDATE public.custom_exercises SET deleted=true,updated_at=clock_timestamp() WHERE id='custom-later-deleted';
 INSERT INTO gymbro_mcp.billing SELECT id,true,NULL,now(),'PRODUCTION' FROM auth.users ON CONFLICT(user_id) DO NOTHING;
-INSERT INTO gymbro_mcp.consents SELECT id,'test-client',2,'Europe/Rome',now() FROM auth.users ON CONFLICT(user_id) DO NOTHING;
+SELECT public.test_mcp_oauth(id) FROM auth.users;
+INSERT INTO gymbro_mcp.preferences SELECT id,'Europe/Rome' FROM auth.users ON CONFLICT DO NOTHING;
 SET LOCAL ROLE gymbro_mcp_user;
 DO $$ BEGIN
  IF public.mcp_custom_exercises()<>'[]' THEN RAISE EXCEPTION 'Deleted exercise exposed'; END IF;

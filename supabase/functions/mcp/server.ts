@@ -18,9 +18,13 @@ import {
 } from "./schemas.ts";
 
 type Rpc = (name: string, args?: Record<string, unknown>) => Promise<unknown>;
-export function database(config: Config, token: string): Rpc {
+export function database(
+  config: Config,
+  token: string,
+  http: typeof fetch = fetch,
+): Rpc {
   const service = async (action: string, args: Record<string, unknown>) => {
-    const response = await fetch(
+    const response = await http(
       `${config.supabaseUrl}/functions/v1/mcp-services`,
       {
         method: "POST",
@@ -45,7 +49,7 @@ export function database(config: Config, token: string): Rpc {
   return async (name, args = {}) => {
     if (name.startsWith("@")) return service(name.slice(1), args);
     const perform = () =>
-      fetch(`${config.supabaseUrl}/rest/v1/rpc/${name}`, {
+      http(`${config.supabaseUrl}/rest/v1/rpc/${name}`, {
         method: "POST",
         headers: {
           apikey: config.publicKey,
@@ -67,7 +71,6 @@ export function database(config: Config, token: string): Rpc {
     if (!response.ok) {
       const body = await response.json().catch(() => ({}));
       const custom: Record<string, string> = {
-        P1001: "consent_required",
         P1002: "billing_unavailable",
         P1003: "pro_required",
         P1004: "plan_limit_exceeded",
@@ -79,15 +82,18 @@ export function database(config: Config, token: string): Rpc {
           ? "reference_unavailable"
           : body.code === "23505"
           ? "idempotency_conflict"
-          : ["22023", "22P02", "23502", "23514"].includes(body.code)
+          : ["22023", "22P02", "23502", "23514", "22003"].includes(body.code)
           ? "invalid_input"
           : "server_error");
       throw new ToolError(
         code,
-        code === "server_error"
+        code === "invalid_input" &&
+          /^entries\[[0-9]+\]: Invalid (measurement|water entry)$/.test(
+            body.message ?? "",
+          )
+          ? body.message
+          : code === "server_error"
           ? "Gym Bro temporarily unavailable"
-          : code === "consent_required"
-          ? `Approve expanded access at ${config.siteOrigin}/oauth/capabilities`
           : code.replaceAll("_", " "),
       );
     }
@@ -108,7 +114,7 @@ const content = (value: Record<string, unknown>) => {
   });
 };
 export function mcpServer(config: Config, rpc: Rpc) {
-  const server = new McpServer({ name: "gym-bro", version: "0.2.0" });
+  const server = new McpServer({ name: "gym-bro", version: "0.4.0" });
   const securitySchemes = [{ type: "oauth2", scopes: ["openid"] }];
   const read = {
     readOnlyHint: true,

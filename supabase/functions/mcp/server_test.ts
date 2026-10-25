@@ -1,4 +1,4 @@
-import { createHandler } from "./server.ts";
+import { createHandler, database } from "./server.ts";
 import { type Config, metadataUrl, verifyToken } from "./auth.ts";
 import {
   catalogVersion,
@@ -43,8 +43,31 @@ const handler = createHandler(config, (token) => {
   return Promise.resolve();
 }, () => (name, args = {}) => {
   called.push({ name, args });
-  if (name === "mcp_execute" && args.operation === "search_foods") {
+  if (
+    name === "mcp_execute" &&
+    [
+      "search_foods",
+      "list_measurements",
+      "get_measurements",
+      "create_measurements",
+      "list_water_entries",
+      "get_water_entries",
+      "log_water",
+    ].includes(String(args.operation))
+  ) {
     return Promise.resolve({ items: [], nextCursor: null });
+  }
+  if (
+    name === "mcp_execute" &&
+    ["get_hydration_summary", "get_nutrition_summary"].includes(
+      String(args.operation),
+    )
+  ) {
+    return Promise.resolve({
+      settings: [{ date: "2026-10-25", goal: { dailyWater: null } }],
+      entries: [],
+      waterEntries: [{ date: "2026-10-25", milliliters: 500 }],
+    });
   }
   if (name === "mcp_custom_exercises") return Promise.resolve([custom]);
   if (name === "mcp_create_program") {
@@ -114,7 +137,7 @@ Deno.test("real MCP SDK initializes and exposes compatible and expanded annotate
   });
   equal(initialized.result.serverInfo.name, "gym-bro");
   const list = await rpc("tools/list");
-  equal(list.result.tools.length, 22);
+  equal(list.result.tools.length, 29);
   for (
     const name of [
       "create_program",
@@ -131,7 +154,8 @@ Deno.test("real MCP SDK initializes and exposes compatible and expanded annotate
     equal(tool._meta.securitySchemes, [{ type: "oauth2", scopes: ["openid"] }]);
     equal(
       tool.annotations.readOnlyHint,
-      !tool.name.startsWith("create_") && tool.name !== "log_foods",
+      !tool.name.startsWith("create_") && tool.name !== "log_foods" &&
+        tool.name !== "log_water",
     );
   }
 });
@@ -282,7 +306,7 @@ Deno.test("chunked oversized requests are rejected before MCP parsing", async ()
   equal(response.status, 413);
 });
 
-Deno.test("food search defaults to both local sources and never calls external search", async () => {
+Deno.test("food search defaults to all local and shared sources without external search", async () => {
   const before = called.length;
   const result = await rpc("tools/call", {
     name: "search_foods",
@@ -302,6 +326,15 @@ Deno.test("food search defaults to both local sources and never calls external s
       },
     },
   }]);
+  const catalog = await rpc("tools/call", {
+    name: "search_foods",
+    arguments: { query: "Milk", source: "catalog" },
+  });
+  equal(catalog.result.structuredContent.items, []);
+  equal(
+    (called.at(-1)?.args.request as Record<string, unknown>).source,
+    "catalog",
+  );
   const count = called.length;
   const invalid = await rpc("tools/call", {
     name: "search_foods",
@@ -309,4 +342,139 @@ Deno.test("food search defaults to both local sources and never calls external s
   });
   assert(invalid.result?.isError || invalid.error);
   equal(called.length, count);
+});
+
+Deno.test("missing billing triggers authoritative refresh and retries account limits before returning a plan", async () => {
+  const actions: string[] = [];
+  let reads = 0;
+  const db = database(config, "valid", (input, init) => {
+    const body = JSON.parse(String(init?.body));
+    if (String(input).endsWith("/mcp-services")) {
+      equal(body, { action: "billing" });
+      actions.push("refresh");
+      return Promise.resolve(Response.json({ refreshed: true }));
+    }
+    actions.push("read");
+    reads++;
+    return Promise.resolve(
+      reads === 1
+        ? Response.json({ code: "P1002" }, { status: 400 })
+        : Response.json({ plan: "pro" }),
+    );
+  });
+  equal(
+    await db("mcp_execute", { operation: "get_account_limits", request: {} }),
+    { plan: "pro" },
+  );
+  equal(actions, ["read", "refresh", "read"]);
+});
+Deno.test("failed billing refresh never invents a Free plan", async () => {
+  const db = database(config, "valid", (input) =>
+    Promise.resolve(
+      String(input).endsWith("/mcp-services")
+        ? Response.json({ error: "billing_unavailable" }, { status: 503 })
+        : Response.json({ code: "P1002" }, { status: 400 }),
+    ));
+  let code: string | undefined;
+  try {
+    await db("mcp_execute", { operation: "get_account_limits", request: {} });
+  } catch (error) {
+    if (error instanceof ToolError) code = error.code;
+    else throw error;
+  }
+  equal(code, "billing_unavailable");
+});
+
+Deno.test("measurement tools support mixed creation and strict physiological types", async () => {
+  const key = "b303cefc-01a7-4da4-9d2c-4ca75cefbe77";
+  const result = await rpc("tools/call", {
+    name: "create_measurements",
+    arguments: {
+      idempotencyKey: key,
+      entries: [{ kind: "weight", value: 70, time: "2026-10-24" }, {
+        kind: "body",
+        type: "bodyFat",
+        value: 15.5,
+      }],
+    },
+  });
+  equal(result.result.structuredContent.items, []);
+  const saved = called.findLast((c) =>
+    c.args.operation === "create_measurements"
+  )!;
+  equal(saved.args.idempotency_key, key);
+  equal((saved.args.request as any).entries[0].unit, "kg");
+  for (
+    const entry of [
+      { kind: "body", type: "bodyFat", value: 101 },
+      { kind: "body", type: "chest", unit: "inch", value: 30 },
+      { kind: "weight", value: -1 },
+      { kind: "weight", value: 60, time: "2026-10-24T12:00:00" },
+    ]
+  ) {
+    const count = called.length;
+    const invalid = await rpc("tools/call", {
+      name: "create_measurements",
+      arguments: { idempotencyKey: key, entries: [entry] },
+    });
+    assert(invalid.result?.isError || invalid.error);
+    equal(called.length, count);
+  }
+});
+
+Deno.test("water tools preserve fractional volume, optional time and strict bulk schemas", async () => {
+  const key = "b303cefc-01a7-4da4-9d2c-4ca75cefbe88";
+  const logged = await rpc("tools/call", {
+    name: "log_water",
+    arguments: { idempotencyKey: key, entries: [{ milliliters: 500.25 }] },
+  });
+  equal(logged.result.structuredContent.items, []);
+  const saved = called.findLast((c) => c.args.operation === "log_water")!;
+  equal(saved.args.request, { entries: [{ milliliters: 500.25 }] });
+  equal(saved.args.idempotency_key, key);
+  for (
+    const entry of [
+      { milliliters: 0 },
+      { milliliters: -1 },
+      { milliliters: 100, unit: "l" },
+      { milliliters: 200, pieces: 2 },
+      { milliliters: 200, time: "2026-10-25T12:00:00" },
+    ]
+  ) {
+    const count = called.length;
+    const invalid = await rpc("tools/call", {
+      name: "log_water",
+      arguments: { idempotencyKey: key, entries: [entry] },
+    });
+    assert(invalid.result?.isError || invalid.error);
+    equal(called.length, count);
+  }
+  for (
+    const [name, args] of [["list_water_entries", {
+      from: "2026-10-24",
+      to: "2026-10-25",
+    }], ["get_water_entries", { ids: ["record"] }]] as const
+  ) {
+    const r = await rpc("tools/call", { name, arguments: args });
+    equal(r.result.structuredContent.items, []);
+  }
+});
+
+Deno.test("hydration summary tool returns text equivalent to structured content and nutrition hydration", async () => {
+  const args = { from: "2026-10-25", to: "2026-10-25" };
+  const water = (await rpc("tools/call", {
+    name: "get_hydration_summary",
+    arguments: args,
+  })).result;
+  equal(JSON.parse(water.content[0].text), water.structuredContent);
+  const food = (await rpc("tools/call", {
+    name: "get_nutrition_summary",
+    arguments: args,
+  })).result;
+  equal(
+    water.structuredContent.items[0],
+    food.structuredContent.items[0].hydration,
+  );
+  equal(water.structuredContent.items[0].knownTotalWaterMl, 500);
+  equal(food.structuredContent.items[0].totals.water, 0);
 });

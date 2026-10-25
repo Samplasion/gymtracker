@@ -1,6 +1,19 @@
 {
-  "version": "b578b19e974c5515a2ea795b6a34291de1f5ed7de735109d3dcdbb433fb374be",
+  "version": "3fe7c858e1f2ead35aaa6999208b83254023adaed8e8b3e934db1b400e82017b",
   "exercises": [
+    {
+      "source": "standard",
+      "id": "library.abs.exercises.abWheelRollout",
+      "names": {
+        "en": "Ab wheel rollout",
+        "it": "Ab wheel rollout"
+      },
+      "category": "abs",
+      "parameters": "freeBodyReps",
+      "primaryMuscleGroup": "abs",
+      "secondaryMuscleGroups": [],
+      "equipment": "other"
+    },
     {
       "source": "standard",
       "id": "library.abs.exercises.bicycleCrunches",
@@ -13,6 +26,19 @@
       "primaryMuscleGroup": "abs",
       "secondaryMuscleGroups": [],
       "equipment": "none"
+    },
+    {
+      "source": "standard",
+      "id": "library.abs.exercises.cableCrunch",
+      "names": {
+        "en": "Cable crunch",
+        "it": "Crunch al cavo"
+      },
+      "category": "abs",
+      "parameters": "repsWeight",
+      "primaryMuscleGroup": "abs",
+      "secondaryMuscleGroups": [],
+      "equipment": "cable"
     },
     {
       "source": "standard",
@@ -44,8 +70,8 @@
       "source": "standard",
       "id": "library.abs.exercises.deadBugHold",
       "names": {
-        "en": "Dead bug hold",
-        "it": "Dead bug hold"
+        "en": "Dead bugs",
+        "it": "Dead bugs"
       },
       "category": "abs",
       "parameters": "freeBodyReps",
@@ -57,8 +83,21 @@
       "source": "standard",
       "id": "library.abs.exercises.deadBugHoldCardio",
       "names": {
-        "en": "Dead bug hold (timed)",
-        "it": "Dead bug hold (a tempo)"
+        "en": "Dead bugs (timed)",
+        "it": "Dead bugs (a tempo)"
+      },
+      "category": "abs",
+      "parameters": "time",
+      "primaryMuscleGroup": "abs",
+      "secondaryMuscleGroups": [],
+      "equipment": "none"
+    },
+    {
+      "source": "standard",
+      "id": "library.abs.exercises.deadBugHoldStatic",
+      "names": {
+        "en": "Dead bug hold (static)",
+        "it": "Dead bug hold (statico)"
       },
       "category": "abs",
       "parameters": "time",
@@ -70,8 +109,8 @@
       "source": "standard",
       "id": "library.abs.exercises.extendedReverseCrunchWithLegExtension",
       "names": {
-        "en": "Extended reverse crunch with leg extension",
-        "it": "Crunch inverso con leg extension"
+        "en": "Reverse crunch with leg extension",
+        "it": "Crunch inverso con distensione delle gambe"
       },
       "category": "abs",
       "parameters": "freeBodyReps",
@@ -83,14 +122,27 @@
       "source": "standard",
       "id": "library.abs.exercises.fullBodyCrunch",
       "names": {
-        "en": "Full-body crunches",
-        "it": "Full-body crunch"
+        "en": "Double crunch",
+        "it": "Crunch doppio"
       },
       "category": "abs",
       "parameters": "freeBodyReps",
       "primaryMuscleGroup": "abs",
       "secondaryMuscleGroups": [],
       "equipment": "none"
+    },
+    {
+      "source": "standard",
+      "id": "library.abs.exercises.hangingKneeRaise",
+      "names": {
+        "en": "Hanging knee raise",
+        "it": "Sollevamento delle ginocchia alla sbarra"
+      },
+      "category": "abs",
+      "parameters": "freeBodyReps",
+      "primaryMuscleGroup": "abs",
+      "secondaryMuscleGroups": [],
+      "equipment": "other"
     },
     {
       "source": "standard",
@@ -120,6 +172,21 @@
     },
     {
       "source": "standard",
+      "id": "library.abs.exercises.highCableWoodchopper",
+      "names": {
+        "en": "High-to-low cable woodchop",
+        "it": "Woodchopper al cavo dall’alto"
+      },
+      "category": "abs",
+      "parameters": "repsWeight",
+      "primaryMuscleGroup": "obliques",
+      "secondaryMuscleGroups": [
+        "abs"
+      ],
+      "equipment": "cable"
+    },
+    {
+      "source": "standard",
       "id": "library.abs.exercises.hollowBodyHold",
       "names": {
         "en": "Hollow body hold",
@@ -135,8 +202,8 @@
       "source": "standard",
       "id": "library.abs.exercises.hollowBodyHoldBentKnees",
       "names": {
-        "en": "Bent hollow hold",
-        "it": "Bent hollow hold"
+        "en": "Bent-knee hollow body hold",
+        "it": "Hollow body hold a ginocchia piegate"
       },
       "category": "abs",
       "parameters": "time",
@@ -148,8 +215,8 @@
       "source": "standard",
       "id": "library.abs.exercises.kneeRaise",
       "names": {
-        "en": "Knee raise",
-        "it": "Sollevamento delle ginocchia"
+        "en": "Lying knee raise",
+        "it": "Sollevamento delle ginocchia da sdraiati"
       },
       "category": "abs",
       "parameters": "freeBodyReps",
@@ -174,8 +241,8 @@
       "source": "standard",
       "id": "library.abs.exercises.legRaise",
       "names": {
-        "en": "Leg raise",
-        "it": "Sollevamento delle gambe"
+        "en": "Lying leg raise",
+        "it": "Sollevamento delle gambe da sdraiati"
       },
       "category": "abs",
       "parameters": "freeBodyReps",
@@ -198,6 +265,21 @@
     },
     {
       "source": "standard",
+      "id": "library.abs.exercises.mountainClimber",
+      "names": {
+        "en": "Mountain climber",
+        "it": "Mountain climber"
+      },
+      "category": "abs",
+      "parameters": "time",
+      "primaryMuscleGroup": "abs",
+      "secondaryMuscleGroups": [
+        "shoulders"
+      ],
+      "equipment": "none"
+    },
+    {
+      "source": "standard",
       "id": "library.abs.exercises.obliqueCrunches",
       "names": {
         "en": "Oblique crunches",
@@ -208,6 +290,21 @@
       "primaryMuscleGroup": "obliques",
       "secondaryMuscleGroups": [],
       "equipment": "none"
+    },
+    {
+      "source": "standard",
+      "id": "library.abs.exercises.pallofPress",
+      "names": {
+        "en": "Cable Pallof press",
+        "it": "Pallof press al cavo"
+      },
+      "category": "abs",
+      "parameters": "repsWeight",
+      "primaryMuscleGroup": "obliques",
+      "secondaryMuscleGroups": [
+        "abs"
+      ],
+      "equipment": "cable"
     },
     {
       "source": "standard",
@@ -231,6 +328,19 @@
         "traps",
         "triceps"
       ],
+      "equipment": "none"
+    },
+    {
+      "source": "standard",
+      "id": "library.abs.exercises.reverseCrunch",
+      "names": {
+        "en": "Reverse crunch",
+        "it": "Crunch inverso"
+      },
+      "category": "abs",
+      "parameters": "freeBodyReps",
+      "primaryMuscleGroup": "abs",
+      "secondaryMuscleGroups": [],
       "equipment": "none"
     },
     {
@@ -300,7 +410,7 @@
       "id": "library.back.exercises.barbellRow",
       "names": {
         "en": "Barbell row",
-        "it": "Rematore col bilanciere"
+        "it": "Rematore con bilanciere"
       },
       "category": "back",
       "parameters": "repsWeight",
@@ -329,6 +439,22 @@
     },
     {
       "source": "standard",
+      "id": "library.back.exercises.chestSupportedDumbbellRow",
+      "names": {
+        "en": "Chest-supported dumbbell row",
+        "it": "Rematore con petto appoggiato su panca (manubri)"
+      },
+      "category": "back",
+      "parameters": "repsWeight",
+      "primaryMuscleGroup": "upperBack",
+      "secondaryMuscleGroups": [
+        "biceps",
+        "lats"
+      ],
+      "equipment": "dumbbell"
+    },
+    {
+      "source": "standard",
       "id": "library.back.exercises.deadlift",
       "names": {
         "en": "Deadlift",
@@ -344,6 +470,21 @@
         "quadriceps"
       ],
       "equipment": "barbell"
+    },
+    {
+      "source": "standard",
+      "id": "library.back.exercises.dumbbellPullover",
+      "names": {
+        "en": "Dumbbell pullover",
+        "it": "Pullover con manubrio"
+      },
+      "category": "back",
+      "parameters": "repsWeight",
+      "primaryMuscleGroup": "lats",
+      "secondaryMuscleGroups": [
+        "chest"
+      ],
+      "equipment": "dumbbell"
     },
     {
       "source": "standard",
@@ -427,10 +568,26 @@
     },
     {
       "source": "standard",
+      "id": "library.back.exercises.machineAssistedPullUps",
+      "names": {
+        "en": "Machine-assisted pull-ups",
+        "it": "Trazioni assistite alla macchina"
+      },
+      "category": "back",
+      "parameters": "repsNegWeight",
+      "primaryMuscleGroup": "lats",
+      "secondaryMuscleGroups": [
+        "biceps",
+        "upperBack"
+      ],
+      "equipment": "machine"
+    },
+    {
+      "source": "standard",
       "id": "library.back.exercises.pullUps",
       "names": {
         "en": "Pull-ups",
-        "it": "Pull-up"
+        "it": "Trazioni alla sbarra (presa prona)"
       },
       "category": "back",
       "parameters": "freeBodyReps",
@@ -442,10 +599,26 @@
     },
     {
       "source": "standard",
+      "id": "library.back.exercises.ringRow",
+      "names": {
+        "en": "Ring row",
+        "it": "Rematore agli anelli"
+      },
+      "category": "back",
+      "parameters": "freeBodyReps",
+      "primaryMuscleGroup": "upperBack",
+      "secondaryMuscleGroups": [
+        "biceps",
+        "lats"
+      ],
+      "equipment": "suspensionBands"
+    },
+    {
+      "source": "standard",
       "id": "library.back.exercises.rowMachine",
       "names": {
         "en": "Seated row machine",
-        "it": "Vogatore (macchinario)"
+        "it": "Rematore alla macchina da seduto"
       },
       "category": "back",
       "parameters": "repsWeight",
@@ -455,6 +628,22 @@
         "traps"
       ],
       "equipment": "machine"
+    },
+    {
+      "source": "standard",
+      "id": "library.back.exercises.singleArmCableRow",
+      "names": {
+        "en": "Single-arm cable row",
+        "it": "Rematore a un braccio al cavo"
+      },
+      "category": "back",
+      "parameters": "repsWeight",
+      "primaryMuscleGroup": "lats",
+      "secondaryMuscleGroups": [
+        "biceps",
+        "upperBack"
+      ],
+      "equipment": "cable"
     },
     {
       "source": "standard",
@@ -491,8 +680,8 @@
       "source": "standard",
       "id": "library.back.exercises.tBarRowWideProneGrip",
       "names": {
-        "en": "T-Bar machine row (wide prone grip)",
-        "it": "Rematore T-Bar machine (presa larga prona)"
+        "en": "T-bar machine row (wide overhand grip)",
+        "it": "Rematore alla T-bar machine (presa larga prona)"
       },
       "category": "back",
       "parameters": "repsWeight",
@@ -555,7 +744,7 @@
       "source": "standard",
       "id": "library.biceps.exercises.barbellBicepsCurl",
       "names": {
-        "en": "Bicep curl (barbell)",
+        "en": "Biceps curl (barbell)",
         "it": "Bicep curl (bilanciere)"
       },
       "category": "biceps",
@@ -566,9 +755,22 @@
     },
     {
       "source": "standard",
+      "id": "library.biceps.exercises.behindBodyCableCurl",
+      "names": {
+        "en": "Behind-the-body cable curl",
+        "it": "Curl al cavo con braccio dietro al busto"
+      },
+      "category": "biceps",
+      "parameters": "repsWeight",
+      "primaryMuscleGroup": "biceps",
+      "secondaryMuscleGroups": [],
+      "equipment": "cable"
+    },
+    {
+      "source": "standard",
       "id": "library.biceps.exercises.bicepsCurlMachine",
       "names": {
-        "en": "Bicep curl (machine)",
+        "en": "Biceps curl (machine)",
         "it": "Bicep curl (macchina)"
       },
       "category": "biceps",
@@ -581,7 +783,7 @@
       "source": "standard",
       "id": "library.biceps.exercises.cableBicepsCurl",
       "names": {
-        "en": "Bicep curl (cable)",
+        "en": "Biceps curl (cable)",
         "it": "Bicep curl (cavi)"
       },
       "category": "biceps",
@@ -594,8 +796,8 @@
       "source": "standard",
       "id": "library.biceps.exercises.chinUps",
       "names": {
-        "en": "Chin Ups",
-        "it": "Chin Ups"
+        "en": "Chin-ups",
+        "it": "Chin-ups"
       },
       "category": "back",
       "parameters": "freeBodyReps",
@@ -636,7 +838,7 @@
       "source": "standard",
       "id": "library.biceps.exercises.dumbbellBicepsCurl",
       "names": {
-        "en": "Bicep curl (dumbbell)",
+        "en": "Biceps curl (dumbbell)",
         "it": "Bicep curl (manubri)"
       },
       "category": "biceps",
@@ -660,10 +862,38 @@
     },
     {
       "source": "standard",
+      "id": "library.biceps.exercises.inclineDumbbellCurl",
+      "names": {
+        "en": "Incline dumbbell curl",
+        "it": "Curl su panca inclinata (manubri)"
+      },
+      "category": "biceps",
+      "parameters": "repsWeight",
+      "primaryMuscleGroup": "biceps",
+      "secondaryMuscleGroups": [],
+      "equipment": "dumbbell"
+    },
+    {
+      "source": "standard",
+      "id": "library.biceps.exercises.ropeHammerCurl",
+      "names": {
+        "en": "Cable rope hammer curl",
+        "it": "Hammer curl con corda al cavo"
+      },
+      "category": "biceps",
+      "parameters": "repsWeight",
+      "primaryMuscleGroup": "biceps",
+      "secondaryMuscleGroups": [
+        "forearms"
+      ],
+      "equipment": "cable"
+    },
+    {
+      "source": "standard",
       "id": "library.biceps.exercises.scottCurl",
       "names": {
-        "en": "Scott curl",
-        "it": "Scott curl"
+        "en": "Preacher curl",
+        "it": "Curl alla panca Scott"
       },
       "category": "biceps",
       "parameters": "repsWeight",
@@ -701,8 +931,8 @@
       "source": "standard",
       "id": "library.calves.exercises.calfPressLegPressMachine",
       "names": {
-        "en": "Calf press (on Leg Press machine)",
-        "it": "Pressa dei polpacci (sulla Leg Press machine)"
+        "en": "Calf press on leg press machine",
+        "it": "Calf press alla leg press"
       },
       "category": "calves",
       "parameters": "repsWeight",
@@ -729,6 +959,19 @@
       "names": {
         "en": "Calf raise (standing)",
         "it": "Calf raise (in piedi)"
+      },
+      "category": "calves",
+      "parameters": "repsWeight",
+      "primaryMuscleGroup": "calves",
+      "secondaryMuscleGroups": [],
+      "equipment": "machine"
+    },
+    {
+      "source": "standard",
+      "id": "library.calves.exercises.smithMachineCalfRaise",
+      "names": {
+        "en": "Smith machine calf raise",
+        "it": "Calf raise al Multipower"
       },
       "category": "calves",
       "parameters": "repsWeight",
@@ -792,8 +1035,8 @@
       "source": "standard",
       "id": "library.cardio.exercises.ergometer",
       "names": {
-        "en": "Ergometer",
-        "it": "Ergometro"
+        "en": "Upright exercise bike",
+        "it": "Cyclette verticale"
       },
       "category": "cardio",
       "parameters": "distance",
@@ -805,8 +1048,8 @@
       "source": "standard",
       "id": "library.cardio.exercises.ergometerHorizontal",
       "names": {
-        "en": "Ergometer (horizontal)",
-        "it": "Ergometro (orizzontale)"
+        "en": "Recumbent exercise bike",
+        "it": "Cyclette orizzontale"
       },
       "category": "cardio",
       "parameters": "distance",
@@ -818,7 +1061,7 @@
       "source": "standard",
       "id": "library.cardio.exercises.jumpRope",
       "names": {
-        "en": "Jump Rope",
+        "en": "Jump rope",
         "it": "Salto con la corda"
       },
       "category": "cardio",
@@ -897,7 +1140,7 @@
       "id": "library.chest.exercises.barbellBenchPressDecline",
       "names": {
         "en": "Bench press (barbell, decline)",
-        "it": "Panca inclinata (bilanciere, all'indietro)"
+        "it": "Panca declinata (bilanciere)"
       },
       "category": "chest",
       "parameters": "repsWeight",
@@ -927,7 +1170,7 @@
       "id": "library.chest.exercises.barbellBenchPressIncline",
       "names": {
         "en": "Bench press (barbell, incline)",
-        "it": "Panca inclinata (bilanciere, in avanti)"
+        "it": "Panca inclinata (bilanciere)"
       },
       "category": "chest",
       "parameters": "repsWeight",
@@ -941,7 +1184,7 @@
       "source": "standard",
       "id": "library.chest.exercises.benchFlys",
       "names": {
-        "en": "Bench flys",
+        "en": "Bench flyes",
         "it": "Croci su panca piana"
       },
       "category": "chest",
@@ -956,8 +1199,8 @@
       "source": "standard",
       "id": "library.chest.exercises.butterflyMachine",
       "names": {
-        "en": "Butterfly Machine",
-        "it": "Butterfly machine"
+        "en": "Pec deck fly",
+        "it": "Croci alla macchina (pec deck)"
       },
       "category": "chest",
       "parameters": "repsWeight",
@@ -970,7 +1213,7 @@
       "id": "library.chest.exercises.cableBenchPressDecline",
       "names": {
         "en": "Bench press (cables, decline)",
-        "it": "Panca inclinata (cavi, all'indietro)"
+        "it": "Panca declinata (cavi)"
       },
       "category": "chest",
       "parameters": "repsWeight",
@@ -1000,7 +1243,7 @@
       "id": "library.chest.exercises.cableBenchPressIncline",
       "names": {
         "en": "Bench press (cables, incline)",
-        "it": "Panca inclinata (cavi, in avanti)"
+        "it": "Panca inclinata (cavi)"
       },
       "category": "chest",
       "parameters": "repsWeight",
@@ -1030,7 +1273,7 @@
       "source": "standard",
       "id": "library.chest.exercises.cableFlyCrossovers",
       "names": {
-        "en": "Cable fly cross-overs",
+        "en": "High cable fly",
         "it": "Croci ai cavi alti"
       },
       "category": "chest",
@@ -1059,7 +1302,7 @@
       "id": "library.chest.exercises.dumbbellBenchPressDecline",
       "names": {
         "en": "Bench press (dumbbell, decline)",
-        "it": "Panca inclinata (manubri, all'indietro)"
+        "it": "Panca declinata (manubri)"
       },
       "category": "chest",
       "parameters": "repsWeight",
@@ -1089,7 +1332,7 @@
       "id": "library.chest.exercises.dumbbellBenchPressIncline",
       "names": {
         "en": "Bench press (dumbbell, incline)",
-        "it": "Panca inclinata (manubri, in avanti)"
+        "it": "Panca inclinata (manubri)"
       },
       "category": "chest",
       "parameters": "repsWeight",
@@ -1104,8 +1347,8 @@
       "source": "standard",
       "id": "library.chest.exercises.dumbbellHexPress",
       "names": {
-        "en": "Dumbbell Hex Press",
-        "it": "Hex Press (manubri)"
+        "en": "Dumbbell hex press",
+        "it": "Hex press (manubri)"
       },
       "category": "chest",
       "parameters": "repsWeight",
@@ -1117,7 +1360,7 @@
       "source": "standard",
       "id": "library.chest.exercises.inclineBenchFlys",
       "names": {
-        "en": "Incline bench flys",
+        "en": "Incline bench flyes",
         "it": "Croci su panca inclinata"
       },
       "category": "chest",
@@ -1125,6 +1368,22 @@
       "primaryMuscleGroup": "chest",
       "secondaryMuscleGroups": [],
       "equipment": "dumbbell"
+    },
+    {
+      "source": "standard",
+      "id": "library.chest.exercises.inclineMachineChestPress",
+      "names": {
+        "en": "Incline machine chest press",
+        "it": "Chest press inclinata alla macchina"
+      },
+      "category": "chest",
+      "parameters": "repsWeight",
+      "primaryMuscleGroup": "chest",
+      "secondaryMuscleGroups": [
+        "shoulders",
+        "triceps"
+      ],
+      "equipment": "machine"
     },
     {
       "source": "standard",
@@ -1154,6 +1413,19 @@
       "secondaryMuscleGroups": [
         "shoulders"
       ],
+      "equipment": "cable"
+    },
+    {
+      "source": "standard",
+      "id": "library.chest.exercises.midHeightCableFly",
+      "names": {
+        "en": "Chest-height cable fly",
+        "it": "Croci ai cavi all’altezza del petto"
+      },
+      "category": "chest",
+      "parameters": "repsWeight",
+      "primaryMuscleGroup": "chest",
+      "secondaryMuscleGroups": [],
       "equipment": "cable"
     },
     {
@@ -1192,7 +1464,7 @@
       "source": "standard",
       "id": "library.chest.exercises.seatedCableChestFlys",
       "names": {
-        "en": "Seated cable chest flys",
+        "en": "Seated cable chest flyes",
         "it": "Croci ai cavi da seduto"
       },
       "category": "chest",
@@ -1206,7 +1478,7 @@
       "id": "library.chest.exercises.smithMachineBenchPressDecline",
       "names": {
         "en": "Bench press (Smith machine, decline)",
-        "it": "Panca inclinata (Multipower, all'indietro)"
+        "it": "Panca declinata (Multipower)"
       },
       "category": "chest",
       "parameters": "repsWeight",
@@ -1236,7 +1508,7 @@
       "id": "library.chest.exercises.smithMachineBenchPressIncline",
       "names": {
         "en": "Bench press (Smith machine, incline)",
-        "it": "Panca inclinata (Multipower, in avanti)"
+        "it": "Panca inclinata (Multipower)"
       },
       "category": "chest",
       "parameters": "repsWeight",
@@ -1250,8 +1522,8 @@
       "source": "standard",
       "id": "library.chest.exercises.smithMachineHexPress",
       "names": {
-        "en": "Smith Machine Hex Press",
-        "it": "Hex Press al Multipower"
+        "en": "Smith machine hex press",
+        "it": "Hex press al Multipower"
       },
       "category": "chest",
       "parameters": "repsWeight",
@@ -1263,8 +1535,8 @@
       "source": "standard",
       "id": "library.chest.exercises.tBarPress",
       "names": {
-        "en": "T-Bar press",
-        "it": "Pressa con bilanciere a T"
+        "en": "Landmine press",
+        "it": "Landmine press"
       },
       "category": "chest",
       "parameters": "repsWeight",
@@ -1291,10 +1563,10 @@
     },
     {
       "source": "standard",
-      "id": "library.forearms.exercises.cableSingleArmReverseCurl",
+      "id": "library.forearms.exercises.dumbbellSingleArmReverseCurl",
       "names": {
-        "en": "Cable single-arm reverse curls",
-        "it": "Reverse curl a braccio singolo al cavo"
+        "en": "Single-arm dumbbell reverse curl",
+        "it": "Reverse curl a un braccio (manubrio)"
       },
       "category": "forearms",
       "parameters": "repsWeight",
@@ -1308,8 +1580,8 @@
       "source": "standard",
       "id": "library.forearms.exercises.farmerWalk",
       "names": {
-        "en": "Farmer's Walk",
-        "it": "Farmer Walk"
+        "en": "Farmer’s walk",
+        "it": "Farmer walk"
       },
       "category": "forearms",
       "parameters": "timeWeight",
@@ -1368,7 +1640,7 @@
       "id": "library.forearms.exercises.reverseWristCurlsBarbell",
       "names": {
         "en": "Reverse wrist curls (barbell)",
-        "it": "Curl dei polsi rovesciato (bilanciere)"
+        "it": "Estensioni dei polsi (bilanciere)"
       },
       "category": "forearms",
       "parameters": "repsWeight",
@@ -1381,13 +1653,28 @@
       "id": "library.forearms.exercises.reverseWristCurlsDumbbell",
       "names": {
         "en": "Reverse wrist curls (dumbbell)",
-        "it": "Curl dei polsi rovesciato (manubri)"
+        "it": "Estensioni dei polsi (manubri)"
       },
       "category": "forearms",
       "parameters": "repsWeight",
       "primaryMuscleGroup": "forearms",
       "secondaryMuscleGroups": [],
       "equipment": "dumbbell"
+    },
+    {
+      "source": "standard",
+      "id": "library.forearms.exercises.singleArmCableReverseCurl",
+      "names": {
+        "en": "Single-arm cable reverse curl",
+        "it": "Reverse curl a un braccio al cavo"
+      },
+      "category": "forearms",
+      "parameters": "repsWeight",
+      "primaryMuscleGroup": "biceps",
+      "secondaryMuscleGroups": [
+        "forearms"
+      ],
+      "equipment": "cable"
     },
     {
       "source": "standard",
@@ -1430,6 +1717,128 @@
     },
     {
       "source": "standard",
+      "id": "library.glutes.exercises.bandHipAbduction",
+      "names": {
+        "en": "Resistance band hip abduction",
+        "it": "Abduzioni dell’anca con elastico"
+      },
+      "category": "glutes",
+      "parameters": "freeBodyReps",
+      "primaryMuscleGroup": "glutes",
+      "secondaryMuscleGroups": [],
+      "equipment": "resistanceBand"
+    },
+    {
+      "source": "standard",
+      "id": "library.glutes.exercises.cableGluteKickback",
+      "names": {
+        "en": "Cable glute kickback",
+        "it": "Slanci posteriori al cavo"
+      },
+      "category": "glutes",
+      "parameters": "repsWeight",
+      "primaryMuscleGroup": "glutes",
+      "secondaryMuscleGroups": [],
+      "equipment": "cable"
+    },
+    {
+      "source": "standard",
+      "id": "library.glutes.exercises.cableHipAbduction",
+      "names": {
+        "en": "Cable hip abduction",
+        "it": "Abduzioni dell’anca al cavo"
+      },
+      "category": "glutes",
+      "parameters": "repsWeight",
+      "primaryMuscleGroup": "glutes",
+      "secondaryMuscleGroups": [],
+      "equipment": "cable"
+    },
+    {
+      "source": "standard",
+      "id": "library.glutes.exercises.kettlebellSwing",
+      "names": {
+        "en": "Kettlebell swing",
+        "it": "Kettlebell swing"
+      },
+      "category": "glutes",
+      "parameters": "repsWeight",
+      "primaryMuscleGroup": "glutes",
+      "secondaryMuscleGroups": [
+        "hamstrings",
+        "lowerBack"
+      ],
+      "equipment": "kettlebell"
+    },
+    {
+      "source": "standard",
+      "id": "library.glutes.exercises.lateralBandWalk",
+      "names": {
+        "en": "Lateral band walk",
+        "it": "Camminata laterale con elastico"
+      },
+      "category": "glutes",
+      "parameters": "freeBodyReps",
+      "primaryMuscleGroup": "glutes",
+      "secondaryMuscleGroups": [],
+      "equipment": "resistanceBand"
+    },
+    {
+      "source": "standard",
+      "id": "library.glutes.exercises.machineGluteKickback",
+      "names": {
+        "en": "Machine glute kickback",
+        "it": "Slanci posteriori alla macchina"
+      },
+      "category": "glutes",
+      "parameters": "repsWeight",
+      "primaryMuscleGroup": "glutes",
+      "secondaryMuscleGroups": [],
+      "equipment": "machine"
+    },
+    {
+      "source": "standard",
+      "id": "library.glutes.exercises.quadrupedGluteKickback",
+      "names": {
+        "en": "Quadruped glute kickback",
+        "it": "Slanci posteriori in quadrupedia"
+      },
+      "category": "glutes",
+      "parameters": "freeBodyReps",
+      "primaryMuscleGroup": "glutes",
+      "secondaryMuscleGroups": [],
+      "equipment": "none"
+    },
+    {
+      "source": "standard",
+      "id": "library.glutes.exercises.singleLegGluteBridge",
+      "names": {
+        "en": "Single-leg glute bridge",
+        "it": "Ponte per i glutei a una gamba"
+      },
+      "category": "glutes",
+      "parameters": "freeBodyReps",
+      "primaryMuscleGroup": "glutes",
+      "secondaryMuscleGroups": [
+        "hamstrings"
+      ],
+      "equipment": "none"
+    },
+    {
+      "source": "standard",
+      "id": "library.glutes.exercises.smithMachineHipThrust",
+      "names": {
+        "en": "Smith machine hip thrust",
+        "it": "Hip thrust al Multipower"
+      },
+      "category": "glutes",
+      "parameters": "repsWeight",
+      "primaryMuscleGroup": "glutes",
+      "secondaryMuscleGroups": [],
+      "equipment": "machine"
+    },
+    {
+      "source": "standard",
       "id": "library.hamstrings.exercises.legCurlProne",
       "names": {
         "en": "Leg curl (prone)",
@@ -1456,10 +1865,36 @@
     },
     {
       "source": "standard",
+      "id": "library.hamstrings.exercises.legCurlStanding",
+      "names": {
+        "en": "Standing machine leg curl",
+        "it": "Leg curl in piedi alla macchina"
+      },
+      "category": "hamstrings",
+      "parameters": "repsWeight",
+      "primaryMuscleGroup": "hamstrings",
+      "secondaryMuscleGroups": [],
+      "equipment": "machine"
+    },
+    {
+      "source": "standard",
+      "id": "library.hamstrings.exercises.nordicCurl",
+      "names": {
+        "en": "Nordic curl",
+        "it": "Nordic curl"
+      },
+      "category": "hamstrings",
+      "parameters": "freeBodyReps",
+      "primaryMuscleGroup": "hamstrings",
+      "secondaryMuscleGroups": [],
+      "equipment": "none"
+    },
+    {
+      "source": "standard",
       "id": "library.hamstrings.exercises.romanianDeadlift",
       "names": {
-        "en": "Romanian deadlift",
-        "it": "Stacchi rumeni"
+        "en": "Romanian deadlift (barbell)",
+        "it": "Stacchi rumeni (bilanciere)"
       },
       "category": "hamstrings",
       "parameters": "repsWeight",
@@ -1475,7 +1910,23 @@
       "id": "library.hamstrings.exercises.romanianDeadliftDumbbell",
       "names": {
         "en": "Romanian deadlift (dumbbells)",
-        "it": "Stacchi romeni (manubri)"
+        "it": "Stacchi rumeni (manubri)"
+      },
+      "category": "hamstrings",
+      "parameters": "repsWeight",
+      "primaryMuscleGroup": "hamstrings",
+      "secondaryMuscleGroups": [
+        "glutes",
+        "lowerBack"
+      ],
+      "equipment": "dumbbell"
+    },
+    {
+      "source": "standard",
+      "id": "library.hamstrings.exercises.singleLegDumbbellRomanianDeadlift",
+      "names": {
+        "en": "Single-leg dumbbell Romanian deadlift",
+        "it": "Stacco rumeno a una gamba (manubrio)"
       },
       "category": "hamstrings",
       "parameters": "repsWeight",
@@ -1516,8 +1967,8 @@
       "source": "standard",
       "id": "library.hips.exercises.hipAbduction",
       "names": {
-        "en": "Hip abduction",
-        "it": "Hip abduction"
+        "en": "Machine hip abduction",
+        "it": "Machine hip abduction"
       },
       "category": "glutes",
       "parameters": "repsWeight",
@@ -1529,8 +1980,8 @@
       "source": "standard",
       "id": "library.hips.exercises.hipAdduction",
       "names": {
-        "en": "Hip adduction",
-        "it": "Hip adduction"
+        "en": "Machine hip adduction",
+        "it": "Adduzioni dell’anca alla macchina"
       },
       "category": "hips",
       "parameters": "repsWeight",
@@ -1542,8 +1993,8 @@
       "source": "standard",
       "id": "library.hips.exercises.hipThrust",
       "names": {
-        "en": "Hip thrust",
-        "it": "Hip thrust"
+        "en": "Machine hip thrust",
+        "it": "Machine hip thrust"
       },
       "category": "glutes",
       "parameters": "repsWeight",
@@ -1568,7 +2019,7 @@
       "source": "standard",
       "id": "library.obliques.exercises.sidewaysPlank",
       "names": {
-        "en": "Sideways plank",
+        "en": "Side plank",
         "it": "Plank laterale"
       },
       "category": "abs",
@@ -1607,8 +2058,8 @@
       "source": "standard",
       "id": "library.quadriceps.exercises.bodyweightSquats",
       "names": {
-        "en": "Squats",
-        "it": "Squat"
+        "en": "Bodyweight squat",
+        "it": "Squat a corpo libero"
       },
       "category": "quadriceps",
       "parameters": "freeBodyReps",
@@ -1651,6 +2102,22 @@
     },
     {
       "source": "standard",
+      "id": "library.quadriceps.exercises.gobletSquats",
+      "names": {
+        "en": "Goblet squat (dumbbell)",
+        "it": "Goblet squat (manubrio)"
+      },
+      "category": "quadriceps",
+      "parameters": "repsWeight",
+      "primaryMuscleGroup": "quadriceps",
+      "secondaryMuscleGroups": [
+        "abs",
+        "glutes"
+      ],
+      "equipment": "dumbbell"
+    },
+    {
+      "source": "standard",
       "id": "library.quadriceps.exercises.hackSquats",
       "names": {
         "en": "Hack squats",
@@ -1663,6 +2130,22 @@
         "glutes"
       ],
       "equipment": "machine"
+    },
+    {
+      "source": "standard",
+      "id": "library.quadriceps.exercises.lateralDumbbellLunges",
+      "names": {
+        "en": "Lateral dumbbell lunges",
+        "it": "Affondi laterali (manubrio)"
+      },
+      "category": "quadriceps",
+      "parameters": "repsWeight",
+      "primaryMuscleGroup": "quadriceps",
+      "secondaryMuscleGroups": [
+        "adductors",
+        "glutes"
+      ],
+      "equipment": "dumbbell"
     },
     {
       "source": "standard",
@@ -1711,8 +2194,8 @@
       "source": "standard",
       "id": "library.quadriceps.exercises.lunges",
       "names": {
-        "en": "Lunges",
-        "it": "Affondi"
+        "en": "Dumbbell lunges",
+        "it": "Affondi con manubri"
       },
       "category": "quadriceps",
       "parameters": "repsWeight",
@@ -1724,10 +2207,55 @@
     },
     {
       "source": "standard",
+      "id": "library.quadriceps.exercises.reverseDumbbellLunges",
+      "names": {
+        "en": "Reverse dumbbell lunges",
+        "it": "Affondi indietro (manubri)"
+      },
+      "category": "quadriceps",
+      "parameters": "repsWeight",
+      "primaryMuscleGroup": "quadriceps",
+      "secondaryMuscleGroups": [
+        "glutes"
+      ],
+      "equipment": "dumbbell"
+    },
+    {
+      "source": "standard",
+      "id": "library.quadriceps.exercises.singleLegLegPress",
+      "names": {
+        "en": "Single-leg leg press",
+        "it": "Leg press a una gamba"
+      },
+      "category": "quadriceps",
+      "parameters": "repsWeight",
+      "primaryMuscleGroup": "quadriceps",
+      "secondaryMuscleGroups": [
+        "glutes"
+      ],
+      "equipment": "machine"
+    },
+    {
+      "source": "standard",
       "id": "library.quadriceps.exercises.smithMachineLunges",
       "names": {
         "en": "Smith machine lunges",
         "it": "Affondi al Multipower"
+      },
+      "category": "quadriceps",
+      "parameters": "repsWeight",
+      "primaryMuscleGroup": "quadriceps",
+      "secondaryMuscleGroups": [
+        "glutes"
+      ],
+      "equipment": "machine"
+    },
+    {
+      "source": "standard",
+      "id": "library.quadriceps.exercises.smithMachineSquats",
+      "names": {
+        "en": "Smith machine squat",
+        "it": "Squat al Multipower"
       },
       "category": "quadriceps",
       "parameters": "repsWeight",
@@ -1754,6 +2282,52 @@
     },
     {
       "source": "standard",
+      "id": "library.quadriceps.exercises.stepUps",
+      "names": {
+        "en": "Step-ups (dumbbells)",
+        "it": "Step-up (manubri)"
+      },
+      "category": "quadriceps",
+      "parameters": "repsWeight",
+      "primaryMuscleGroup": "quadriceps",
+      "secondaryMuscleGroups": [
+        "glutes"
+      ],
+      "equipment": "dumbbell"
+    },
+    {
+      "source": "standard",
+      "id": "library.quadriceps.exercises.sumoDumbbellSquat",
+      "names": {
+        "en": "Dumbbell sumo squat",
+        "it": "Squat sumo (manubrio)"
+      },
+      "category": "quadriceps",
+      "parameters": "repsWeight",
+      "primaryMuscleGroup": "quadriceps",
+      "secondaryMuscleGroups": [
+        "adductors",
+        "glutes"
+      ],
+      "equipment": "dumbbell"
+    },
+    {
+      "source": "standard",
+      "id": "library.quadriceps.exercises.walkingDumbbellLunges",
+      "names": {
+        "en": "Walking dumbbell lunges",
+        "it": "Affondi camminati (manubri)"
+      },
+      "category": "quadriceps",
+      "parameters": "repsWeight",
+      "primaryMuscleGroup": "quadriceps",
+      "secondaryMuscleGroups": [
+        "glutes"
+      ],
+      "equipment": "dumbbell"
+    },
+    {
+      "source": "standard",
       "id": "library.shoulders.exercises.arnoldPress",
       "names": {
         "en": "Arnold press",
@@ -1771,8 +2345,8 @@
       "source": "standard",
       "id": "library.shoulders.exercises.bentOverLateralRaises",
       "names": {
-        "en": "Bent-Over Lateral Raises",
-        "it": "Alzate laterali al cavo basso con busto a 90°"
+        "en": "Bent-over cable reverse fly",
+        "it": "Croci inverse al cavo basso con busto flesso"
       },
       "category": "shoulders",
       "parameters": "repsWeight",
@@ -1782,6 +2356,19 @@
         "traps",
         "upperBack"
       ],
+      "equipment": "cable"
+    },
+    {
+      "source": "standard",
+      "id": "library.shoulders.exercises.cableFrontRaise",
+      "names": {
+        "en": "Cable front raise",
+        "it": "Alzate frontali al cavo"
+      },
+      "category": "shoulders",
+      "parameters": "repsWeight",
+      "primaryMuscleGroup": "shoulders",
+      "secondaryMuscleGroups": [],
       "equipment": "cable"
     },
     {
@@ -1799,10 +2386,38 @@
     },
     {
       "source": "standard",
+      "id": "library.shoulders.exercises.dumbbellShrugs",
+      "names": {
+        "en": "Dumbbell shrugs",
+        "it": "Scrollate con manubri"
+      },
+      "category": "shoulders",
+      "parameters": "repsWeight",
+      "primaryMuscleGroup": "traps",
+      "secondaryMuscleGroups": [],
+      "equipment": "dumbbell"
+    },
+    {
+      "source": "standard",
+      "id": "library.shoulders.exercises.facePull",
+      "names": {
+        "en": "Cable face pull",
+        "it": "Face pull al cavo"
+      },
+      "category": "shoulders",
+      "parameters": "repsWeight",
+      "primaryMuscleGroup": "shoulders",
+      "secondaryMuscleGroups": [
+        "traps"
+      ],
+      "equipment": "cable"
+    },
+    {
+      "source": "standard",
       "id": "library.shoulders.exercises.frontDumbbellRaise",
       "names": {
         "en": "Front dumbbell raise",
-        "it": "Sollevamento frontale dei manubri"
+        "it": "Alzate frontali con manubri"
       },
       "category": "shoulders",
       "parameters": "repsWeight",
@@ -1895,7 +2510,7 @@
       "id": "library.shoulders.exercises.militaryPressSmithMachine",
       "names": {
         "en": "Smith machine military press",
-        "it": "Lento avanti al multipower"
+        "it": "Lento avanti al Multipower"
       },
       "category": "shoulders",
       "parameters": "repsWeight",
@@ -1923,8 +2538,8 @@
       "source": "standard",
       "id": "library.shoulders.exercises.reverseButterfly",
       "names": {
-        "en": "Reverse butterfly machine",
-        "it": "Reverse butterfly machine"
+        "en": "Reverse pec deck fly",
+        "it": "Croci inverse alla macchina"
       },
       "category": "shoulders",
       "parameters": "repsWeight",
@@ -1938,7 +2553,7 @@
       "source": "standard",
       "id": "library.shoulders.exercises.reverseFlysInclinedBench",
       "names": {
-        "en": "Reverse flys (inclined bench)",
+        "en": "Reverse flyes (inclined bench)",
         "it": "Croci inverse (panca inclinata)"
       },
       "category": "shoulders",
@@ -1953,8 +2568,8 @@
       "source": "standard",
       "id": "library.shoulders.exercises.shoulderPress",
       "names": {
-        "en": "Shoulder press",
-        "it": "Shoulder press"
+        "en": "Dumbbell shoulder press",
+        "it": "Shoulder press con manubri"
       },
       "category": "shoulders",
       "parameters": "repsWeight",
@@ -1992,10 +2607,26 @@
     },
     {
       "source": "standard",
+      "id": "library.shoulders.exercises.standingCableReverseFly",
+      "names": {
+        "en": "Standing cable reverse fly",
+        "it": "Croci inverse ai cavi in piedi"
+      },
+      "category": "shoulders",
+      "parameters": "repsWeight",
+      "primaryMuscleGroup": "shoulders",
+      "secondaryMuscleGroups": [
+        "traps",
+        "upperBack"
+      ],
+      "equipment": "cable"
+    },
+    {
+      "source": "standard",
       "id": "library.shoulders.exercises.uprightRow",
       "names": {
         "en": "Upright row",
-        "it": "Vogatore verticale"
+        "it": "Tirate al mento"
       },
       "category": "shoulders",
       "parameters": "repsWeight",
@@ -2004,6 +2635,19 @@
         "upperBack"
       ],
       "equipment": "barbell"
+    },
+    {
+      "source": "standard",
+      "id": "library.triceps.exercises.barTricepsPushdown",
+      "names": {
+        "en": "Bar triceps pushdown",
+        "it": "Pushdown dei tricipiti con barra"
+      },
+      "category": "triceps",
+      "parameters": "repsWeight",
+      "primaryMuscleGroup": "triceps",
+      "secondaryMuscleGroups": [],
+      "equipment": "cable"
     },
     {
       "source": "standard",
@@ -2051,10 +2695,26 @@
     },
     {
       "source": "standard",
+      "id": "library.triceps.exercises.machineAssistedDips",
+      "names": {
+        "en": "Machine-assisted dips",
+        "it": "Dip assistiti alla macchina"
+      },
+      "category": "triceps",
+      "parameters": "repsNegWeight",
+      "primaryMuscleGroup": "triceps",
+      "secondaryMuscleGroups": [
+        "chest",
+        "shoulders"
+      ],
+      "equipment": "machine"
+    },
+    {
+      "source": "standard",
       "id": "library.triceps.exercises.overheadRopeTricepExtension",
       "names": {
-        "en": "Overhead rope tricep extension",
-        "it": "Estensione dei tricipiti sopra la testa"
+        "en": "Overhead rope triceps extension",
+        "it": "Estensioni dei tricipiti sopra la testa con corda al cavo"
       },
       "category": "triceps",
       "parameters": "repsWeight",
@@ -2066,8 +2726,8 @@
       "source": "standard",
       "id": "library.triceps.exercises.overheadTricepExtension",
       "names": {
-        "en": "Overhead triceps extension",
-        "it": "Estensione verticale dei tricipiti con manubri"
+        "en": "Dumbbell overhead triceps extension",
+        "it": "Estensioni dei tricipiti sopra la testa con manubri"
       },
       "category": "triceps",
       "parameters": "repsWeight",
@@ -2077,10 +2737,23 @@
     },
     {
       "source": "standard",
+      "id": "library.triceps.exercises.singleArmTricepsPushdown",
+      "names": {
+        "en": "Single-arm triceps pushdown",
+        "it": "Pushdown dei tricipiti a un braccio"
+      },
+      "category": "triceps",
+      "parameters": "repsWeight",
+      "primaryMuscleGroup": "triceps",
+      "secondaryMuscleGroups": [],
+      "equipment": "cable"
+    },
+    {
+      "source": "standard",
       "id": "library.triceps.exercises.skullCrushers",
       "names": {
-        "en": "Skull Crushers",
-        "it": "Skull Crushers"
+        "en": "Skull crushers",
+        "it": "French press su panca (skull crusher)"
       },
       "category": "triceps",
       "parameters": "repsWeight",
@@ -2092,7 +2765,7 @@
       "source": "standard",
       "id": "library.triceps.exercises.tricepKickbacks",
       "names": {
-        "en": "Tricep kickbacks",
+        "en": "Triceps kickbacks",
         "it": "Kickback per i tricipiti"
       },
       "category": "triceps",
@@ -2105,7 +2778,7 @@
       "source": "standard",
       "id": "library.triceps.exercises.tricepsMachine",
       "names": {
-        "en": "Triceps Machine",
+        "en": "Triceps machine",
         "it": "Triceps machine"
       },
       "category": "triceps",

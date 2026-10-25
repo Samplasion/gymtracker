@@ -1,11 +1,17 @@
 import {
   foodView,
+  hydrationSummary,
   nutritionSummary,
   routineView,
   trainingStats,
   workoutView,
 } from "./views.ts";
-import { foodDefinition, foodLogSchema, programSchema } from "./schemas.ts";
+import {
+  foodDefinition,
+  foodLogSchema,
+  programSchema,
+  ToolError,
+} from "./schemas.ts";
 function equal(a: unknown, b: unknown) {
   if (JSON.stringify(a) !== JSON.stringify(b)) {
     throw new Error(`${JSON.stringify(a)} != ${JSON.stringify(b)}`);
@@ -245,4 +251,138 @@ Deno.test("training stats do not double count completed sets copied into a moder
   equal(result.completedSets, 2);
   equal(result.volume, 240);
   equal(result.workouts, 1);
+});
+
+Deno.test("counted foods use one-unit amount and multiply pieces exactly once", () => {
+  const settings = [{
+    date: "2026-10-24",
+    goal: {
+      dailyCalories: 2000,
+      dailyFat: 60,
+      dailyCarbs: 250,
+      dailyProtein: 100,
+    },
+  }];
+  for (
+    const [amount, pieces, calories] of [[10, 3, 75], [30, 3, 225], [
+      200,
+      2,
+      1000,
+    ], [15, 4, 150]]
+  ) {
+    const r = nutritionSummary({
+      settings,
+      entries: [{
+        date: "2026-10-24",
+        food: {
+          amount,
+          pieces,
+          nutritionalValuesPer100g: {
+            calories: 250,
+            fat: 0,
+            saturatedFat: 0,
+            carbs: 50,
+            sugar: 0,
+            protein: 5,
+          },
+        },
+      }],
+    });
+    equal(r.items[0].totals.calories, calories);
+  }
+});
+
+Deno.test("hydration shares daily totals with nutrition without changing food-only water", () => {
+  const raw = {
+    settings: [
+      {
+        date: "2026-10-24",
+        goal: { dailyWater: 2000 },
+        goalEffectiveFrom: "2026-10-01",
+      },
+      {
+        date: "2026-10-25",
+        goal: { dailyWater: null },
+        goalEffectiveFrom: "2026-10-25",
+      },
+      { date: "2026-10-26", goal: {} },
+    ],
+    entries: [
+      {
+        date: "2026-10-24",
+        food: {
+          amount: 10,
+          pieces: 3,
+          nutritionalValuesPer100g: { water: 90 },
+        },
+      },
+      {
+        date: "2026-10-25",
+        food: { amount: 100, nutritionalValuesPer100g: { water: 0 } },
+      },
+      {
+        date: "2026-10-25",
+        food: { amount: 200, nutritionalValuesPer100g: {} },
+      },
+    ],
+    waterEntries: [{ date: "2026-10-24", milliliters: 500.25 }, {
+      date: "2026-10-24",
+      milliliters: 125.5,
+    }],
+  };
+  const water = hydrationSummary(raw).items;
+  equal(water[0], {
+    date: "2026-10-24",
+    drinkingWaterMl: 625.75,
+    knownFoodWaterMl: 27,
+    knownTotalWaterMl: 652.75,
+    foodWaterComplete: true,
+    waterGoalMl: 2000,
+    waterGoalEffectiveFrom: "2026-10-01",
+  });
+  equal(water[1].knownFoodWaterMl, 0);
+  equal(water[1].foodWaterComplete, false);
+  equal(water[1].waterGoalMl, null);
+  equal(water[2].knownTotalWaterMl, 0);
+  equal(water[2].foodWaterComplete, true);
+  equal(water[2].waterGoalMl, null);
+  const nutrition = nutritionSummary(raw).items;
+  equal(nutrition.map((d: any) => d.hydration), water);
+  equal(nutrition[0].totals.water, 27);
+  equal(nutrition[1].totals.water, null);
+  equal(nutrition[1].incompleteNutrients.includes("water"), true);
+});
+
+Deno.test("hydration totals reject numeric overflow instead of serializing Infinity as null", () => {
+  let failed = false;
+  try {
+    hydrationSummary({
+      settings: [{ date: "2026-10-25", goal: {} }],
+      entries: [],
+      waterEntries: [{ date: "2026-10-25", milliliters: Number.MAX_VALUE }, {
+        date: "2026-10-25",
+        milliliters: Number.MAX_VALUE,
+      }],
+    });
+  } catch (error) {
+    failed = error instanceof ToolError && error.code === "invalid_input";
+  }
+  equal(failed, true);
+});
+
+Deno.test("shared hydration fixture matches the Flutter diary calculation", async () => {
+  const fixture = JSON.parse(
+    await Deno.readTextFile(
+      new URL("../../../test/fixtures/mcp_hydration.json", import.meta.url),
+    ),
+  );
+  const raw = {
+    settings: [{ date: fixture.api.date, goal: {} }],
+    entries: [{ date: fixture.api.date, food: fixture.food }],
+    waterEntries: [fixture.api],
+  };
+  equal(
+    hydrationSummary(raw).items[0].knownTotalWaterMl,
+    fixture.knownTotalWaterMl,
+  );
 });

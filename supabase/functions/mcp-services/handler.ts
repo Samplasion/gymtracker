@@ -99,6 +99,9 @@ export function createServiceHandler(
             signal: AbortSignal.timeout(10000),
           },
         );
+        if (status.status === 401 || status.status === 403) {
+          throw new ServiceError("authentication_required");
+        }
         if (status.ok) {
           const cached = await status.json();
           if (
@@ -109,7 +112,7 @@ export function createServiceHandler(
         }
         return Response.json(await services.billing(identity!.sub!));
       }
-      // Repeat database consent checks before any external catalog access.
+      // Verify access before resolving catalog products.
       const check = await http(
         `${config.supabaseUrl}/rest/v1/rpc/mcp_execute`,
         {
@@ -123,11 +126,8 @@ export function createServiceHandler(
         },
       );
       if (!check.ok) {
-        const error = await check.json();
         throw new ServiceError(
-          error.code === "P1001"
-            ? "consent_required"
-            : "authentication_required",
+          "authentication_required",
         );
       }
       if (body.action === "food_get") {

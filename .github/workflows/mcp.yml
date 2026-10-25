@@ -1,9 +1,9 @@
 name: MCP integration
 on:
   push:
-    paths: ['supabase/**', 'tools/*mcp*', 'tools/test_sync_v2_backend.sh', 'test/backend/**', 'lib/data/exercises.dart', 'lib/model/exercise.dart', 'lib/model/set.dart', 'lib/i18n/**', 'lib/struct/nutrition*', 'lib/model/progression.dart', 'lib/model/workout.dart', 'lib/data/configuration.dart', 'test/model/mcp*', 'test/fixtures/mcp*', '.github/workflows/mcp.yml']
+    paths: ['supabase/**', 'tools/*mcp*', 'tools/test_sync_v2_backend.sh', 'test/backend/**', 'lib/data/exercises.dart', 'lib/model/exercise.dart', 'lib/model/set.dart', 'lib/i18n/**', 'lib/struct/nutrition*', 'lib/db/model/tables/water_logs.dart', 'lib/repository/hydration.dart', 'lib/struct/nutrition.values.dart', 'lib/model/measurements.dart', 'lib/model/progression.dart', 'lib/model/workout.dart', 'lib/data/configuration.dart', 'test/model/mcp*', 'test/fixtures/mcp*', '.github/workflows/mcp.yml']
   pull_request:
-    paths: ['supabase/**', 'tools/*mcp*', 'tools/test_sync_v2_backend.sh', 'test/backend/**', 'lib/data/exercises.dart', 'lib/model/exercise.dart', 'lib/model/set.dart', 'lib/i18n/**', 'lib/struct/nutrition*', 'lib/model/progression.dart', 'lib/model/workout.dart', 'lib/data/configuration.dart', 'test/model/mcp*', 'test/fixtures/mcp*', '.github/workflows/mcp.yml']
+    paths: ['supabase/**', 'tools/*mcp*', 'tools/test_sync_v2_backend.sh', 'test/backend/**', 'lib/data/exercises.dart', 'lib/model/exercise.dart', 'lib/model/set.dart', 'lib/i18n/**', 'lib/struct/nutrition*', 'lib/db/model/tables/water_logs.dart', 'lib/repository/hydration.dart', 'lib/struct/nutrition.values.dart', 'lib/model/measurements.dart', 'lib/model/progression.dart', 'lib/model/workout.dart', 'lib/data/configuration.dart', 'test/model/mcp*', 'test/fixtures/mcp*', '.github/workflows/mcp.yml']
   workflow_dispatch:
 jobs:
   mcp:

@@ -3,24 +3,25 @@ BEGIN;
 INSERT INTO auth.users(id,email,raw_user_meta_data) VALUES
  ('00000000-0000-0000-0000-000000000081','mcp-free@unit.test','{"username":"mcpfree"}'),
  ('00000000-0000-0000-0000-000000000082','mcp-other@unit.test','{"username":"mcpother"}');
-INSERT INTO gymbro_mcp.settings(singleton,client_id,resource) VALUES(true,'test-client','https://gym-bro.test/mcp');
+INSERT INTO gymbro_mcp.settings(singleton,client_id,resource) VALUES(true,'00000000-0000-0000-0000-000000000090','https://gym-bro.test/mcp');
 INSERT INTO gymbro_mcp.billing VALUES('00000000-0000-0000-0000-000000000081',false,NULL,now(),'PRODUCTION');
 SET LOCAL ROLE gymbro_mcp_user;
-SET LOCAL request.jwt.claims = '{"sub":"00000000-0000-0000-0000-000000000081","role":"gymbro_mcp_user","client_id":"test-client","aud":["https://gym-bro.test/mcp"]}';
+SET LOCAL request.jwt.claims = '{"sub":"00000000-0000-0000-0000-000000000081","session_id":"00000000-0000-0000-0000-000000000081","role":"gymbro_mcp_user","client_id":"00000000-0000-0000-0000-000000000090","aud":["https://gym-bro.test/mcp"]}';
 DO $$ BEGIN
- BEGIN PERFORM public.mcp_execute('get_account_limits'); RAISE EXCEPTION 'Missing consent accepted' USING ERRCODE='XX000'; EXCEPTION WHEN SQLSTATE 'P1001' THEN NULL; END;
- BEGIN PERFORM public.mcp_manage_consent(true,'Europe/Rome'); RAISE EXCEPTION 'MCP self-consent accepted' USING ERRCODE='XX000'; EXCEPTION WHEN insufficient_privilege THEN NULL; END;
+ BEGIN PERFORM public.mcp_execute('get_account_limits'); RAISE EXCEPTION 'Missing OAuth grant accepted' USING ERRCODE='XX000'; EXCEPTION WHEN insufficient_privilege THEN NULL; END;
+ BEGIN PERFORM public.mcp_preferences('Europe/Rome'); RAISE EXCEPTION 'MCP preferences write accepted' USING ERRCODE='XX000'; EXCEPTION WHEN insufficient_privilege THEN NULL; END;
  BEGIN PERFORM public.mcp_store_billing('00000000-0000-0000-0000-000000000081',true,NULL,'PRODUCTION',now()); RAISE EXCEPTION 'MCP self-upgrade accepted' USING ERRCODE='XX000'; EXCEPTION WHEN insufficient_privilege THEN NULL; END;
 END $$;
 RESET ROLE;
+SELECT public.test_mcp_oauth(id) FROM auth.users;
 SET LOCAL ROLE authenticated;
-SET LOCAL request.jwt.claims = '{"sub":"00000000-0000-0000-0000-000000000081","role":"authenticated"}';
-SELECT public.mcp_manage_consent(true,'Europe/Rome');
+SET LOCAL request.jwt.claims = '{"sub":"00000000-0000-0000-0000-000000000081","session_id":"00000000-0000-0000-0000-000000000081","role":"authenticated"}';
+SELECT public.mcp_preferences('Europe/Rome');
 RESET ROLE;
 -- Array storage and date-effective fallback match the app's DateSequence.
 INSERT INTO public.nutrition_categories(id,user_id,reference_date,json_data) VALUES('categories','00000000-0000-0000-0000-000000000081',now() AT TIME ZONE 'UTC','[{"name":"Lunch","dailyPercentage":40,"icon":"fork_and_spoon"}]');
 SET LOCAL ROLE gymbro_mcp_user;
-SET LOCAL request.jwt.claims = '{"sub":"00000000-0000-0000-0000-000000000081","role":"gymbro_mcp_user","client_id":"test-client","aud":["https://gym-bro.test/mcp"]}';
+SET LOCAL request.jwt.claims = '{"sub":"00000000-0000-0000-0000-000000000081","session_id":"00000000-0000-0000-0000-000000000081","role":"gymbro_mcp_user","client_id":"00000000-0000-0000-0000-000000000090","aud":["https://gym-bro.test/mcp"]}';
 DO $$ DECLARE result jsonb; routine jsonb; request jsonb; again jsonb; food jsonb; day text:=(now() AT TIME ZONE 'Europe/Rome')::date::text; i int; BEGIN
  result:=public.mcp_execute('get_account_limits');
  IF result->>'plan'<>'free' OR result->>'routineLimit'<>'4' THEN RAISE EXCEPTION 'Wrong free limits'; END IF;

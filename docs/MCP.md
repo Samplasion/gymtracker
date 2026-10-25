@@ -1,7 +1,7 @@
 # Gym Bro MCP / ChatGPT
 
 Private, authenticated Streamable HTTP integration. The server now publishes
-22 tools; it does not call a model or need an OpenAI API key. Existing endpoint,
+29 tools; it does not call a model or need an OpenAI API key. Existing endpoint,
 OAuth client and the original five tool names are preserved.
 
 ## Capabilities
@@ -11,6 +11,8 @@ OAuth client and the original five tool names are preserved.
 | Exercise catalog | `search_exercises`, `get_exercises`, `create_custom_exercises` |
 | Routines and folders | `list_routines`, `get_routine`, `get_routines`, `create_routines`, `create_program`, `list_routine_folders`, `create_routine_folders` |
 | Saved training | `list_workouts`, `get_workouts`, `get_exercise_history`, `get_training_stats` |
+| Hydration | `list_water_entries`, `get_water_entries`, `log_water`, `get_hydration_summary` |
+| Measurements | `list_measurements`, `get_measurements`, `create_measurements` |
 | Account | `get_account_limits` |
 | Nutrition | `search_foods`, `get_foods`, `list_food_entries`, `get_food_entries`, `log_foods`, `get_nutrition_summary`, `get_nutrition_settings` |
 
@@ -22,9 +24,9 @@ item implement single-item operations; bulk writes are atomic.
 Inputs are strict Zod schemas in `supabase/functions/mcp/schemas.ts` and the
 registered tool definitions. Results have matching structured/text representations.
 New lists return `items` and `nextCursor`; the original list/search tools retain
-`nextOffset`. Cursors bind to the original filters and page size for OFF search.
+`nextOffset`. Cursors bind to their original filters.
 Database lists have deterministic ordering; cursors are not historical snapshots.
-Date intervals are inclusive and bounded to 367 days per request. Training
+Date intervals are inclusive; training and nutrition intervals are bounded to 367 days per request. Training
 aggregation is bounded to 1,000 logical workouts and nutrition summaries to
 10,000 consumptions; larger inputs are rejected explicitly. Detail batches
 are limited to 20 IDs, food logs to 100 entries, routine creations to 31,
@@ -37,6 +39,23 @@ on retry. A different operation/payload conflicts. Prior `create_program` receip
 remain valid; new program receipts also remain in the original receipt table.
 Receipts for the other operations are kept separately, with cross-table conflict
 checks. Successful retries do not consume quota or need fresh billing.
+
+## Actual weight and body measurements
+
+`list_measurements` accepts optional `kind` (`weight`/`body`), `types` (body types),
+inclusive local dates `from`/`to`, `cursor`, and `limit` (default 20, max 100).
+Results are ordered by instant, kind and ID descending; keyset cursors bind to
+filters and account time zone. No commercial date restriction or Pro requirement.
+
+`get_measurements` accepts 1–20 `{kind,id}` references, returning `items` and
+`unavailable`. `create_measurements` accepts `idempotencyKey` and 1–100 `entries`:
+weight `{kind:"weight",value,unit?:"kg"|"lb",time?}`; body
+`{kind:"body",type,value,time?}`. Types match Flutter BodyMeasurementPart; body
+units are cm or % for bodyFat. Values are finite/nonnegative; bodyFat ≤100.
+Time is an RFC3339 timestamp with offset or local YYYY-MM-DD at midnight;
+omitted time uses the server instant. Retry receipts precede resolving default
+times. IDs are server-generated and writes atomic with active sync-v2 triggers.
+Multiple records per day are retained. No updates, deletes or forecasts.
 
 ## Complete routines and logical workout history
 
@@ -74,20 +93,23 @@ workouts; totals count each logical workout and performed set once.
 
 ## Food diary and sources
 
-`search_foods` searches only the account's local favorites and personal barcode
-food definitions. The default source is `all`; `favorite` and `customBarcode`
-restrict the search. No Open Food Facts search is performed. References are
-`{source,id}` and always identify the actual local source. These definitions are
-read-only. This is not a complete local food catalog; missing foods require
-explicit manual nutritional values until that database is available.
+`search_foods` searches the shared Gym Bro food catalog plus the account's local
+favorites and personal barcode definitions. The default source is `all`;
+`catalog`, `favorite` and `customBarcode` restrict the search. Shared results use
+`{source:"catalog",id:"product-uuid"}` and include only published entries. No
+Open Food Facts API is contacted. Legacy `openfoodfacts` barcode references resolve
+only against published Gym Bro catalog entries.
 
-`get_foods` still supports explicit Open Food Facts barcode references; it does
-not search that catalog. External product definitions are cached privately.
+`get_foods` resolves these references to full definitions. `log_foods` copies all
+product fields into the diary; later corrections or moderation cannot alter
+existing entries. MCP has no publication, reporting or administration tools.
+The shared catalog starts empty and receives only explicit manual submissions
+from the app, independently of personal synchronization or account deletion.
 
-Migration `20261023120000_mcp_local_foods.sql` also reads existing JSONB strings
-from Flutter and native JSON documents from MCP for categories and foods, without
-rewriting existing records. Deploy this migration and the `mcp`/`mcp-services`
-functions together, then refresh the ChatGPT connection's tool metadata.
+Migration `20261024140000_food_catalog.sql` extends the preceding MCP migrations
+without changing existing diary JSON. Review migration and `mcp`/`mcp-services`
+functions together; deploy only with separate authorization, then refresh the
+ChatGPT connection's tool metadata.
 
 `log_foods` accepts `{idempotencyKey,entries:[{date,amount,pieces,category?,foodRef? ,food?}]}`.
 Provide exactly one of `foodRef` or a manual `food` definition. Manual definitions
@@ -96,6 +118,14 @@ contain `name`, optional `brand`, `unit` (`g`/`ml`), `servingSizes` and
 are mandatory. Other fields use Flutter's nutrient units (exposed as
 `nutrientUnits`); unknown optional values stay unknown. Incomplete catalog foods
 must be completed explicitly as a manual definition before logging.
+
+For "X units of Y", `amount` is grams/ml for ONE unit and `pieces` is X.
+Three slices weighing **30 g total** use `amount:10,pieces:3`; three slices
+weighing **30 g each** use `amount:30,pieces:3`. Use user-supplied quantities or
+a matching serving size; ask when unknown. Divide total quantities for equal
+units by their count. Do not invent spoon/glass sizes. Nutrient definitions remain
+per 100g/100ml; never multiply quantities twice. Preserve known named serving
+sizes in manual snapshots when applicable.
 
 Consumed totals are `valuesPer100 * amount * pieces / 100`. No implicit
 mass/volume conversion is performed. Category names must exist for the requested
@@ -123,6 +153,68 @@ empty successful response without trying to parse JSON. Older adapters saved the
 billing state but then reported a parse error, often on the first request after
 the five-minute cache expired. This fix needs no migration or OAuth reset.
 
+A merged RevenueCat entitlement can select a sandbox lifetime product while an
+independent production support grant is active. The adapter also checks exact
+`rc_promo_<configured entitlement>_<v1 duration>` subscriptions with
+`store: promotional`, `is_sandbox: false`, no refund and a future expiration.
+It uses the grant's expiration, never the sandbox entitlement's unbounded access.
+Other entitlements, sandbox-only purchases and expired grants do not unlock Pro.
+Redeploy `mcp-services` for this fix; existing billing caches refresh after five
+minutes or an authenticated webhook. No database migration is needed.
+
+## Drinking water and hydration
+
+`log_water` accepts `{idempotencyKey,entries:[{milliliters,time?}]}` (1–100).
+Milliliters are the total volume, finite and positive; two 250ml glasses are one
+500ml record. Convert liters exactly and ask when glass/bottle volume is unknown.
+Time is RFC3339 with offset or YYYY-MM-DD at account-zone midnight; omitted time
+uses the server instant. Diary dates use the same supported 2000–2099 range as
+other nutrition tools. Actual future instants are rejected for all plans.
+Do not also log drinking water for a beverage already recorded as food with its
+water nutrient. The tool never changes/deletes records or deduplicates by similarity.
+
+`list_water_entries` accepts inclusive `from`/`to`, `cursor`, `limit` (20/100).
+Records sort by actual time and ID descending. `get_water_entries` accepts 1–20
+IDs with `items`/`unavailable`. Actual JSON time and account IANA zone determine
+local dates and Free restrictions, not stale/imported `reference_date` metadata.
+Free allows today ±7 days, including ID access; Pro has no commercial date window.
+A mixed invalid/out-of-window bulk fails wholly. Completed retries retain their
+original IDs even after the billing cache expires; identity must remain valid.
+
+`get_hydration_summary` and the new daily `hydration` object in
+`get_nutrition_summary` use one calculation: `drinkingWaterMl`, `knownFoodWaterMl`,
+`knownTotalWaterMl`, `foodWaterComplete`, `waterGoalMl`, `waterGoalEffectiveFrom`.
+Food water uses the saved snapshot × amount × pieces / 100; missing water remains
+unknown, with the known subtotal and completeness reported separately. Empty
+days are included. Water goals follow existing DateSequence settings, are null
+when unset and are never inferred. `totals.water` remains food-only. Summary
+ranges are capped at 367 days, with at most 10,000 water records; overflow is an
+explicit error, never silent truncation. Numeric overflow is rejected too.
+
+Rows use the existing `water_logs` JSON-text model, with actual `date_added`,
+local calendar day at UTC midnight in `reference_date`, and active sync-v2
+triggers. The app may export them to Health after pull according to the existing
+device permission/preferences; MCP never enables Health or writes to it directly.
+No new OAuth scope, consent page or client is needed; only informational copy is
+updated in Italian/English.
+
+### Deploying the water tools
+
+Apply `20261025190000_mcp_hydration.sql` after the existing
+`20261025180000_hydration.sql` and earlier catalog/OAuth migrations. This preserves
+the catalog search wrapper and all earlier tools. It also makes the shared date
+validator evaluate verified billing explicitly, avoiding SQL AND short-circuiting
+inside the Free date window. Deploy the updated `mcp` function, the site's copy
+change, and refresh ChatGPT metadata (29 tools). The adapter `mcp-services` needs
+no change for this water integration. No new secrets or sync-v2 activation.
+Use `supabase db push --linked --dry-run` to review pending migrations first;
+this task does not deploy production automatically.
+
+Tests include `test/backend/mcp_hydration.sql`, concurrent water retries, Deno
+contracts/summaries, and the shared `mcp_hydration.json` Flutter compatibility
+fixture. Run `flutter test --no-pub test/model/mcp_hydration_compatibility_test.dart
+test/hydration` plus the normal Deno/backend suites.
+
 ## Billing, isolation and consent
 
 | Capability | Free | Pro |
@@ -139,7 +231,7 @@ Technical batch limits still apply to Pro. Free programs return `folderId:null`,
 names/notes are unchanged. No records are deleted on downgrade. Explicit folder
 selection by a Free caller is rejected. Tombstones do not count toward quotas.
 
-The database repeats every ownership, permission, consent and quota check.
+The database repeats every ownership, OAuth grant/session and quota check.
 MCP tokens use isolated role `gymbro_mcp_user` with no direct table privileges.
 All new functions use closed `search_path` and explicit grants. Writes acquire
 the same account lock as sync v2 and run with its transaction context/triggers.
@@ -152,7 +244,7 @@ adapter using the verified user bearer. The adapter verifies issuer, audience,
 client, signature and role again. Its service key can only be used by code paths
 that refresh a verified account's RevenueCat state, cache public products or
 process authenticated RevenueCat events. The user cannot choose another billing
-account. Catalog operations repeat database consent checks before external calls.
+account. Catalog operations repeat database OAuth grant/session checks before external calls.
 
 RevenueCat App User ID is the Supabase UUID already used by Flutter. The adapter
 uses the same entitlement ID as the app. State is checked on first use and after
@@ -170,18 +262,27 @@ reads still work. No client-supplied plan or entitlement is accepted. The cache
 means entitlement changes may take up to 5 minutes to propagate if a webhook is
 missed. `get_account_limits` is informational, not an authorization token.
 
-Expanded operations require version-2 application consent. Legacy simple
-`create_program` and the four original reads keep their earlier consent behavior,
-but writes enforce billing. Advanced creation requires expanded consent.
-The ordinary authenticated website calls `mcp_manage_consent`; MCP tokens cannot
-approve themselves. Users approve at `/oauth/capabilities` (localized internally),
-including workout history and food read/log access, and can change their IANA
-time zone there. The server derives today's diary date in that stored zone.
-Requests cannot supply their own "today". Existing OAuth grants route through
-this page if expanded consent is missing, without replacing client/connection.
-Revocation in account management also removes application consent.
+OAuth is the only authorization. The private owner check verifies the configured
+client/audience, user, live `auth.sessions` row from JWT `session_id`, matching
+OAuth client and an unrevoked `auth.oauth_consents` grant. Revoked/deleted sessions
+fail immediately, including direct RPCs and legacy tools. No capability versions,
+application-consent records or grandfathering paths remain.
 
-Error codes include `authentication_required`, `consent_required`, `invalid_input`,
+Ordinary website sessions manage only `mcp_preferences(time_zone)`; MCP tokens
+cannot change preferences. The OAuth approval form saves the selected zone and
+approves the standard grant in one flow. Already-approved grants return to the
+checked callback without an additional prompt. The old capabilities URL is only
+a compatibility redirect. Authorized apps/revocation and time zone settings
+remain under Advanced in the account page. No OAuth client or scopes change.
+
+Time zones use a searchable, selection-only IANA dropdown with city/offset labels.
+Stored values retain DST behavior. Missing preferences default to UTC at the
+server; a new approval form detects the browser zone. Invalid values fall back
+to UTC/GMT+0 in the site and RPC. The response includes `isDefault` so the site
+distinguishes missing settings from an explicit UTC selection. Diary "today"
+always uses the server-side preference.
+
+Error codes include `authentication_required`, `invalid_input`,
 `reference_unavailable`, `idempotency_conflict`, `plan_limit_exceeded`,
 `pro_required`, `billing_unavailable`, `external_rate_limited`,
 `external_service_unavailable`, `result_too_large`, `server_error`.
@@ -194,7 +295,7 @@ food/training content, tokens or credentials.
 (cd supabase/functions/mcp && deno task check && deno task test)
 (cd supabase/functions/mcp-services && deno task check && deno task test)
 bash tools/test_sync_v2_backend.sh
-flutter test --no-pub test/model/mcp_compatibility_test.dart test/model/mcp_expanded_compatibility_test.dart test/model/progression_test.dart test/model/workout_test.dart
+flutter test --no-pub test/model/mcp_compatibility_test.dart test/model/mcp_expanded_compatibility_test.dart test/model/mcp_measurements_compatibility_test.dart test/model/progression_test.dart test/model/workout_test.dart
 ```
 
 The backend suite uses disposable Docker Postgres, never the linked project.
@@ -206,8 +307,29 @@ running the suite. In `gym-bro-landing`, run `npm run test:oauth`, `npm run lint
 `npm run build`; use an isolated local MongoDB for the build, not the live CMS.
 
 Catalog generation still uses the Flutter runtime via `tools/export_mcp_catalog.sh`.
-Use `--dart-define=CHECK_CATALOG=true` for verification. Never rewrite deployed
-catalog migrations; generate a new migration path for catalog changes.
+Exports automatically create `supabase/migrations/YYYYMMDDHHMMSS_mcp_catalog.sql`
+using the current UTC timestamp. Existing migrations are never overwritten with
+different content. `--dart-define=CATALOG_MIGRATION=path` can select an explicit
+new path when needed.
+Use `--dart-define=CHECK_CATALOG=true` for read-only verification of the JSON and
+the most recent generated catalog migration. An explicit `CATALOG_MIGRATION`
+checks that file instead. Never rewrite deployed catalog migrations.
+
+## Deploying measurements and OAuth-only authorization
+
+Apply `20261024130000_mcp_measurements_oauth.sql` after the earlier MCP migrations.
+It migrates time zones into private preferences, replaces permission checks with
+live OAuth session/grant checks and removes the separate consent objects.
+Deploy the site, `mcp-services` and `mcp` in one maintenance window: the old site
+references the removed RPC. Keep the existing OAuth client, resource URL, hook,
+RevenueCat settings and connections. Refresh ChatGPT metadata (29 tools). No
+sync-v2 activation or baseline replay is needed. This task does not deploy
+production automatically.
+
+The disposable harness supplies Auth OAuth schema fixtures matching the current
+hosted project; production uses the existing Auth-managed tables without
+modifying them. Run the backend suite and web checks before deployment, then
+verify revocation and app pull end to end.
 
 ## Deploying this expansion into a test project
 
@@ -234,7 +356,7 @@ available. Configure the RevenueCat webhook URL to the test project's
 `/functions/v1/mcp-services`, with the dedicated Authorization header and matching
 environment. Test purchases, restore, cancellation, expiration and account
 transfer; test a Free account separately. Refresh the private ChatGPT connection's
-metadata, approve expanded access, and verify app pull/reconnection.
+metadata, verify the single OAuth approval and app pull/reconnection.
 
 Do not run `activate_sync_v2()`, replay the remote baseline, replace the OAuth
 client or migrate the live project as a substitute for staging. Rollout requires

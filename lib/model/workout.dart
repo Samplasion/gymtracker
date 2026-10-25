@@ -165,10 +165,8 @@ class Workout {
       : allSets.where((set) => set.done).length / allSets.length;
   int get reps =>
       doneSets.fold(0, (value, element) => value + (element.reps ?? 0));
-  double get liftedWeight => doneSets.fold(
-    0.0,
-    (value, element) => value + (element.weight ?? 0) * (element.reps ?? 1),
-  );
+  double get liftedWeight =>
+      doneSets.fold(0.0, (value, element) => value + element.liftedWeight);
   double get distanceRun =>
       doneSets.fold(0.0, (value, element) => value + (element.distance ?? 0));
 

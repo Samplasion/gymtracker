@@ -261,7 +261,10 @@ class RoutinesController {
     var advancedAny = false;
     Exercise advance(Exercise planned) {
       final current = planned.progression;
-      if (current == null) return planned;
+      if (current == null ||
+          planned.parameters == GTSetParameters.repsNegWeight) {
+        return planned;
+      }
       var actual = performed
           .where(
             (ex) => ex.supersedesID == planned.id && ex.progression != null,

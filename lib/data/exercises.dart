@@ -52,7 +52,6 @@ final Map<GTExerciseMuscleCategory, ExerciseCategory> exerciseStandardLibrary =
             primaryMuscleGroup: GTMuscleGroup.none,
             equipment: GTGymEquipment.other,
           ),
-          // aka the weird cyclette
           Exercise.standard(
             id: "library.cardio.exercises.ergometer",
             name: t.library.cardio.exercises.ergometer,
@@ -115,6 +114,24 @@ final Map<GTExerciseMuscleCategory, ExerciseCategory> exerciseStandardLibrary =
       ),
       GTExerciseMuscleCategory.chest: ExerciseCategory(
         exercises: [
+          Exercise.standard(
+            id: "library.chest.exercises.midHeightCableFly",
+            name: t.library.chest.exercises.midHeightCableFly,
+            parameters: GTSetParameters.repsWeight,
+            primaryMuscleGroup: GTMuscleGroup.chest,
+            equipment: GTGymEquipment.cable,
+          ),
+          Exercise.standard(
+            id: "library.chest.exercises.inclineMachineChestPress",
+            name: t.library.chest.exercises.inclineMachineChestPress,
+            parameters: GTSetParameters.repsWeight,
+            primaryMuscleGroup: GTMuscleGroup.chest,
+            secondaryMuscleGroups: {
+              GTMuscleGroup.triceps,
+              GTMuscleGroup.shoulders,
+            },
+            equipment: GTGymEquipment.machine,
+          ),
           Exercise.standard(
             id: "library.chest.exercises.barbellBenchPressFlat",
             name: t.library.chest.exercises.barbellBenchPressFlat,
@@ -496,6 +513,28 @@ final Map<GTExerciseMuscleCategory, ExerciseCategory> exerciseStandardLibrary =
       GTExerciseMuscleCategory.biceps: ExerciseCategory(
         exercises: [
           Exercise.standard(
+            id: "library.biceps.exercises.ropeHammerCurl",
+            name: t.library.biceps.exercises.ropeHammerCurl,
+            parameters: GTSetParameters.repsWeight,
+            primaryMuscleGroup: GTMuscleGroup.biceps,
+            secondaryMuscleGroups: {GTMuscleGroup.forearms},
+            equipment: GTGymEquipment.cable,
+          ),
+          Exercise.standard(
+            id: "library.biceps.exercises.behindBodyCableCurl",
+            name: t.library.biceps.exercises.behindBodyCableCurl,
+            parameters: GTSetParameters.repsWeight,
+            primaryMuscleGroup: GTMuscleGroup.biceps,
+            equipment: GTGymEquipment.cable,
+          ),
+          Exercise.standard(
+            id: "library.biceps.exercises.inclineDumbbellCurl",
+            name: t.library.biceps.exercises.inclineDumbbellCurl,
+            parameters: GTSetParameters.repsWeight,
+            primaryMuscleGroup: GTMuscleGroup.biceps,
+            equipment: GTGymEquipment.dumbbell,
+          ),
+          Exercise.standard(
             id: "library.biceps.exercises.barbellBicepsCurl",
             name: t.library.biceps.exercises.barbellBicepsCurl,
             parameters: GTSetParameters.repsWeight,
@@ -572,6 +611,65 @@ final Map<GTExerciseMuscleCategory, ExerciseCategory> exerciseStandardLibrary =
       ),
       GTExerciseMuscleCategory.abs: ExerciseCategory(
         exercises: [
+          Exercise.standard(
+            id: "library.abs.exercises.deadBugHoldStatic",
+            name: t.library.abs.exercises.deadBugHoldStatic,
+            parameters: GTSetParameters.time,
+            primaryMuscleGroup: GTMuscleGroup.abs,
+            equipment: GTGymEquipment.none,
+          ),
+          Exercise.standard(
+            id: "library.abs.exercises.reverseCrunch",
+            name: t.library.abs.exercises.reverseCrunch,
+            parameters: GTSetParameters.freeBodyReps,
+            primaryMuscleGroup: GTMuscleGroup.abs,
+            equipment: GTGymEquipment.none,
+          ),
+          Exercise.standard(
+            id: "library.abs.exercises.highCableWoodchopper",
+            name: t.library.abs.exercises.highCableWoodchopper,
+            parameters: GTSetParameters.repsWeight,
+            primaryMuscleGroup: GTMuscleGroup.obliques,
+            secondaryMuscleGroups: {GTMuscleGroup.abs},
+            equipment: GTGymEquipment.cable,
+          ),
+          Exercise.standard(
+            id: "library.abs.exercises.mountainClimber",
+            name: t.library.abs.exercises.mountainClimber,
+            parameters: GTSetParameters.time,
+            primaryMuscleGroup: GTMuscleGroup.abs,
+            secondaryMuscleGroups: {GTMuscleGroup.shoulders},
+            equipment: GTGymEquipment.none,
+          ),
+          Exercise.standard(
+            id: "library.abs.exercises.hangingKneeRaise",
+            name: t.library.abs.exercises.hangingKneeRaise,
+            parameters: GTSetParameters.freeBodyReps,
+            primaryMuscleGroup: GTMuscleGroup.abs,
+            equipment: GTGymEquipment.other,
+          ),
+          Exercise.standard(
+            id: "library.abs.exercises.abWheelRollout",
+            name: t.library.abs.exercises.abWheelRollout,
+            parameters: GTSetParameters.freeBodyReps,
+            primaryMuscleGroup: GTMuscleGroup.abs,
+            equipment: GTGymEquipment.other,
+          ),
+          Exercise.standard(
+            id: "library.abs.exercises.cableCrunch",
+            name: t.library.abs.exercises.cableCrunch,
+            parameters: GTSetParameters.repsWeight,
+            primaryMuscleGroup: GTMuscleGroup.abs,
+            equipment: GTGymEquipment.cable,
+          ),
+          Exercise.standard(
+            id: "library.abs.exercises.pallofPress",
+            name: t.library.abs.exercises.pallofPress,
+            parameters: GTSetParameters.repsWeight,
+            primaryMuscleGroup: GTMuscleGroup.obliques,
+            secondaryMuscleGroups: {GTMuscleGroup.abs},
+            equipment: GTGymEquipment.cable,
+          ),
           Exercise.standard(
             id: "library.abs.exercises.crunches",
             name: t.library.abs.exercises.crunches,
@@ -824,6 +922,13 @@ final Map<GTExerciseMuscleCategory, ExerciseCategory> exerciseStandardLibrary =
       GTExerciseMuscleCategory.calves: ExerciseCategory(
         exercises: [
           Exercise.standard(
+            id: "library.calves.exercises.smithMachineCalfRaise",
+            name: t.library.calves.exercises.smithMachineCalfRaise,
+            parameters: GTSetParameters.repsWeight,
+            primaryMuscleGroup: GTMuscleGroup.calves,
+            equipment: GTGymEquipment.machine,
+          ),
+          Exercise.standard(
             id: "library.calves.exercises.calfRaiseStanding",
             name: t.library.calves.exercises.calfRaiseStanding,
             parameters: GTSetParameters.repsWeight,
@@ -851,6 +956,76 @@ final Map<GTExerciseMuscleCategory, ExerciseCategory> exerciseStandardLibrary =
       ),
       GTExerciseMuscleCategory.quadriceps: ExerciseCategory(
         exercises: [
+          Exercise.standard(
+            id: "library.quadriceps.exercises.singleLegLegPress",
+            name: t.library.quadriceps.exercises.singleLegLegPress,
+            parameters: GTSetParameters.repsWeight,
+            primaryMuscleGroup: GTMuscleGroup.quadriceps,
+            secondaryMuscleGroups: {GTMuscleGroup.glutes},
+            equipment: GTGymEquipment.machine,
+          ),
+          Exercise.standard(
+            id: "library.quadriceps.exercises.sumoDumbbellSquat",
+            name: t.library.quadriceps.exercises.sumoDumbbellSquat,
+            parameters: GTSetParameters.repsWeight,
+            primaryMuscleGroup: GTMuscleGroup.quadriceps,
+            secondaryMuscleGroups: {
+              GTMuscleGroup.glutes,
+              GTMuscleGroup.adductors,
+            },
+            equipment: GTGymEquipment.dumbbell,
+          ),
+          Exercise.standard(
+            id: "library.quadriceps.exercises.lateralDumbbellLunges",
+            name: t.library.quadriceps.exercises.lateralDumbbellLunges,
+            parameters: GTSetParameters.repsWeight,
+            primaryMuscleGroup: GTMuscleGroup.quadriceps,
+            secondaryMuscleGroups: {
+              GTMuscleGroup.glutes,
+              GTMuscleGroup.adductors,
+            },
+            equipment: GTGymEquipment.dumbbell,
+          ),
+          Exercise.standard(
+            id: "library.quadriceps.exercises.walkingDumbbellLunges",
+            name: t.library.quadriceps.exercises.walkingDumbbellLunges,
+            parameters: GTSetParameters.repsWeight,
+            primaryMuscleGroup: GTMuscleGroup.quadriceps,
+            secondaryMuscleGroups: {GTMuscleGroup.glutes},
+            equipment: GTGymEquipment.dumbbell,
+          ),
+          Exercise.standard(
+            id: "library.quadriceps.exercises.reverseDumbbellLunges",
+            name: t.library.quadriceps.exercises.reverseDumbbellLunges,
+            parameters: GTSetParameters.repsWeight,
+            primaryMuscleGroup: GTMuscleGroup.quadriceps,
+            secondaryMuscleGroups: {GTMuscleGroup.glutes},
+            equipment: GTGymEquipment.dumbbell,
+          ),
+          Exercise.standard(
+            id: "library.quadriceps.exercises.smithMachineSquats",
+            name: t.library.quadriceps.exercises.smithMachineSquats,
+            parameters: GTSetParameters.repsWeight,
+            primaryMuscleGroup: GTMuscleGroup.quadriceps,
+            secondaryMuscleGroups: {GTMuscleGroup.glutes},
+            equipment: GTGymEquipment.machine,
+          ),
+          Exercise.standard(
+            id: "library.quadriceps.exercises.gobletSquats",
+            name: t.library.quadriceps.exercises.gobletSquats,
+            parameters: GTSetParameters.repsWeight,
+            primaryMuscleGroup: GTMuscleGroup.quadriceps,
+            secondaryMuscleGroups: {GTMuscleGroup.glutes, GTMuscleGroup.abs},
+            equipment: GTGymEquipment.dumbbell,
+          ),
+          Exercise.standard(
+            id: "library.quadriceps.exercises.stepUps",
+            name: t.library.quadriceps.exercises.stepUps,
+            parameters: GTSetParameters.repsWeight,
+            primaryMuscleGroup: GTMuscleGroup.quadriceps,
+            secondaryMuscleGroups: {GTMuscleGroup.glutes},
+            equipment: GTGymEquipment.dumbbell,
+          ),
           Exercise.standard(
             id: "library.quadriceps.exercises.bodyweightSquats",
             name: t.library.quadriceps.exercises.bodyweightSquats,
@@ -961,6 +1136,35 @@ final Map<GTExerciseMuscleCategory, ExerciseCategory> exerciseStandardLibrary =
       GTExerciseMuscleCategory.hamstrings: ExerciseCategory(
         exercises: [
           Exercise.standard(
+            id: "library.hamstrings.exercises.singleLegDumbbellRomanianDeadlift",
+            name: t
+                .library
+                .hamstrings
+                .exercises
+                .singleLegDumbbellRomanianDeadlift,
+            parameters: GTSetParameters.repsWeight,
+            primaryMuscleGroup: GTMuscleGroup.hamstrings,
+            secondaryMuscleGroups: {
+              GTMuscleGroup.glutes,
+              GTMuscleGroup.lowerBack,
+            },
+            equipment: GTGymEquipment.dumbbell,
+          ),
+          Exercise.standard(
+            id: "library.hamstrings.exercises.nordicCurl",
+            name: t.library.hamstrings.exercises.nordicCurl,
+            parameters: GTSetParameters.freeBodyReps,
+            primaryMuscleGroup: GTMuscleGroup.hamstrings,
+            equipment: GTGymEquipment.none,
+          ),
+          Exercise.standard(
+            id: "library.hamstrings.exercises.legCurlStanding",
+            name: t.library.hamstrings.exercises.legCurlStanding,
+            parameters: GTSetParameters.repsWeight,
+            primaryMuscleGroup: GTMuscleGroup.hamstrings,
+            equipment: GTGymEquipment.machine,
+          ),
+          Exercise.standard(
             id: "library.hamstrings.exercises.legCurlProne",
             name: t.library.hamstrings.exercises.legCurlProne,
             parameters: GTSetParameters.repsWeight,
@@ -1003,6 +1207,39 @@ final Map<GTExerciseMuscleCategory, ExerciseCategory> exerciseStandardLibrary =
       ),
       GTExerciseMuscleCategory.shoulders: ExerciseCategory(
         exercises: [
+          Exercise.standard(
+            id: "library.shoulders.exercises.dumbbellShrugs",
+            name: t.library.shoulders.exercises.dumbbellShrugs,
+            parameters: GTSetParameters.repsWeight,
+            primaryMuscleGroup: GTMuscleGroup.traps,
+            equipment: GTGymEquipment.dumbbell,
+          ),
+          Exercise.standard(
+            id: "library.shoulders.exercises.cableFrontRaise",
+            name: t.library.shoulders.exercises.cableFrontRaise,
+            parameters: GTSetParameters.repsWeight,
+            primaryMuscleGroup: GTMuscleGroup.shoulders,
+            equipment: GTGymEquipment.cable,
+          ),
+          Exercise.standard(
+            id: "library.shoulders.exercises.standingCableReverseFly",
+            name: t.library.shoulders.exercises.standingCableReverseFly,
+            parameters: GTSetParameters.repsWeight,
+            primaryMuscleGroup: GTMuscleGroup.shoulders,
+            secondaryMuscleGroups: {
+              GTMuscleGroup.upperBack,
+              GTMuscleGroup.traps,
+            },
+            equipment: GTGymEquipment.cable,
+          ),
+          Exercise.standard(
+            id: "library.shoulders.exercises.facePull",
+            name: t.library.shoulders.exercises.facePull,
+            parameters: GTSetParameters.repsWeight,
+            primaryMuscleGroup: GTMuscleGroup.shoulders,
+            secondaryMuscleGroups: {GTMuscleGroup.traps},
+            equipment: GTGymEquipment.cable,
+          ),
           Exercise.standard(
             id: "library.shoulders.exercises.shoulderPressMachine",
             name: t.library.shoulders.exercises.shoulderPressMachine,
@@ -1195,6 +1432,52 @@ final Map<GTExerciseMuscleCategory, ExerciseCategory> exerciseStandardLibrary =
       ),
       GTExerciseMuscleCategory.back: ExerciseCategory(
         exercises: [
+          Exercise.standard(
+            id: "library.back.exercises.dumbbellPullover",
+            name: t.library.back.exercises.dumbbellPullover,
+            parameters: GTSetParameters.repsWeight,
+            primaryMuscleGroup: GTMuscleGroup.lats,
+            secondaryMuscleGroups: {GTMuscleGroup.chest},
+            equipment: GTGymEquipment.dumbbell,
+          ),
+          Exercise.standard(
+            id: "library.back.exercises.ringRow",
+            name: t.library.back.exercises.ringRow,
+            parameters: GTSetParameters.freeBodyReps,
+            primaryMuscleGroup: GTMuscleGroup.upperBack,
+            secondaryMuscleGroups: {GTMuscleGroup.lats, GTMuscleGroup.biceps},
+            equipment: GTGymEquipment.suspensionBands,
+          ),
+          Exercise.standard(
+            id: "library.back.exercises.singleArmCableRow",
+            name: t.library.back.exercises.singleArmCableRow,
+            parameters: GTSetParameters.repsWeight,
+            primaryMuscleGroup: GTMuscleGroup.lats,
+            secondaryMuscleGroups: {
+              GTMuscleGroup.upperBack,
+              GTMuscleGroup.biceps,
+            },
+            equipment: GTGymEquipment.cable,
+          ),
+          Exercise.standard(
+            id: "library.back.exercises.chestSupportedDumbbellRow",
+            name: t.library.back.exercises.chestSupportedDumbbellRow,
+            parameters: GTSetParameters.repsWeight,
+            primaryMuscleGroup: GTMuscleGroup.upperBack,
+            secondaryMuscleGroups: {GTMuscleGroup.lats, GTMuscleGroup.biceps},
+            equipment: GTGymEquipment.dumbbell,
+          ),
+          Exercise.standard(
+            id: "library.back.exercises.machineAssistedPullUps",
+            name: t.library.back.exercises.machineAssistedPullUps,
+            parameters: GTSetParameters.repsNegWeight,
+            primaryMuscleGroup: GTMuscleGroup.lats,
+            secondaryMuscleGroups: {
+              GTMuscleGroup.biceps,
+              GTMuscleGroup.upperBack,
+            },
+            equipment: GTGymEquipment.machine,
+          ),
           Exercise.standard(
             id: "library.back.exercises.hyperExtensions",
             name: t.library.back.exercises.hyperExtensions,
@@ -1505,6 +1788,31 @@ final Map<GTExerciseMuscleCategory, ExerciseCategory> exerciseStandardLibrary =
       GTExerciseMuscleCategory.triceps: ExerciseCategory(
         exercises: [
           Exercise.standard(
+            id: "library.triceps.exercises.singleArmTricepsPushdown",
+            name: t.library.triceps.exercises.singleArmTricepsPushdown,
+            parameters: GTSetParameters.repsWeight,
+            primaryMuscleGroup: GTMuscleGroup.triceps,
+            equipment: GTGymEquipment.cable,
+          ),
+          Exercise.standard(
+            id: "library.triceps.exercises.barTricepsPushdown",
+            name: t.library.triceps.exercises.barTricepsPushdown,
+            parameters: GTSetParameters.repsWeight,
+            primaryMuscleGroup: GTMuscleGroup.triceps,
+            equipment: GTGymEquipment.cable,
+          ),
+          Exercise.standard(
+            id: "library.triceps.exercises.machineAssistedDips",
+            name: t.library.triceps.exercises.machineAssistedDips,
+            parameters: GTSetParameters.repsNegWeight,
+            primaryMuscleGroup: GTMuscleGroup.triceps,
+            secondaryMuscleGroups: {
+              GTMuscleGroup.chest,
+              GTMuscleGroup.shoulders,
+            },
+            equipment: GTGymEquipment.machine,
+          ),
+          Exercise.standard(
             id: "library.triceps.exercises.dips",
             name: t.library.triceps.exercises.dips,
             parameters: GTSetParameters.repsWeight,
@@ -1613,6 +1921,14 @@ final Map<GTExerciseMuscleCategory, ExerciseCategory> exerciseStandardLibrary =
       GTExerciseMuscleCategory.forearms: ExerciseCategory(
         exercises: [
           Exercise.standard(
+            id: "library.forearms.exercises.singleArmCableReverseCurl",
+            name: t.library.forearms.exercises.singleArmCableReverseCurl,
+            parameters: GTSetParameters.repsWeight,
+            primaryMuscleGroup: GTMuscleGroup.biceps,
+            secondaryMuscleGroups: {GTMuscleGroup.forearms},
+            equipment: GTGymEquipment.cable,
+          ),
+          Exercise.standard(
             id: "library.forearms.exercises.wristCurlsBarbell",
             name: t.library.forearms.exercises.wristCurlsBarbell,
             parameters: GTSetParameters.repsWeight,
@@ -1683,8 +1999,8 @@ final Map<GTExerciseMuscleCategory, ExerciseCategory> exerciseStandardLibrary =
             equipment: GTGymEquipment.dumbbell,
           ),
           Exercise.standard(
-            id: "library.forearms.exercises.cableSingleArmReverseCurl",
-            name: t.library.forearms.exercises.cableSingleArmReverseCurl,
+            id: "library.forearms.exercises.dumbbellSingleArmReverseCurl",
+            name: t.library.forearms.exercises.dumbbellSingleArmReverseCurl,
             parameters: GTSetParameters.repsWeight,
             primaryMuscleGroup: GTMuscleGroup.biceps,
             secondaryMuscleGroups: {GTMuscleGroup.forearms},
@@ -1700,6 +2016,74 @@ final Map<GTExerciseMuscleCategory, ExerciseCategory> exerciseStandardLibrary =
         iconGetter: (t) =>
             Text(t.library.glutes.name.characters.first.toUpperCase()),
         exercises: [
+          Exercise.standard(
+            id: "library.glutes.exercises.quadrupedGluteKickback",
+            name: t.library.glutes.exercises.quadrupedGluteKickback,
+            parameters: GTSetParameters.freeBodyReps,
+            primaryMuscleGroup: GTMuscleGroup.glutes,
+            equipment: GTGymEquipment.none,
+          ),
+          Exercise.standard(
+            id: "library.glutes.exercises.lateralBandWalk",
+            name: t.library.glutes.exercises.lateralBandWalk,
+            parameters: GTSetParameters.freeBodyReps,
+            primaryMuscleGroup: GTMuscleGroup.glutes,
+            equipment: GTGymEquipment.resistanceBand,
+          ),
+          Exercise.standard(
+            id: "library.glutes.exercises.bandHipAbduction",
+            name: t.library.glutes.exercises.bandHipAbduction,
+            parameters: GTSetParameters.freeBodyReps,
+            primaryMuscleGroup: GTMuscleGroup.glutes,
+            equipment: GTGymEquipment.resistanceBand,
+          ),
+          Exercise.standard(
+            id: "library.glutes.exercises.smithMachineHipThrust",
+            name: t.library.glutes.exercises.smithMachineHipThrust,
+            parameters: GTSetParameters.repsWeight,
+            primaryMuscleGroup: GTMuscleGroup.glutes,
+            equipment: GTGymEquipment.machine,
+          ),
+          Exercise.standard(
+            id: "library.glutes.exercises.singleLegGluteBridge",
+            name: t.library.glutes.exercises.singleLegGluteBridge,
+            parameters: GTSetParameters.freeBodyReps,
+            primaryMuscleGroup: GTMuscleGroup.glutes,
+            secondaryMuscleGroups: {GTMuscleGroup.hamstrings},
+            equipment: GTGymEquipment.none,
+          ),
+          Exercise.standard(
+            id: "library.glutes.exercises.kettlebellSwing",
+            name: t.library.glutes.exercises.kettlebellSwing,
+            parameters: GTSetParameters.repsWeight,
+            primaryMuscleGroup: GTMuscleGroup.glutes,
+            secondaryMuscleGroups: {
+              GTMuscleGroup.hamstrings,
+              GTMuscleGroup.lowerBack,
+            },
+            equipment: GTGymEquipment.kettlebell,
+          ),
+          Exercise.standard(
+            id: "library.glutes.exercises.cableHipAbduction",
+            name: t.library.glutes.exercises.cableHipAbduction,
+            parameters: GTSetParameters.repsWeight,
+            primaryMuscleGroup: GTMuscleGroup.glutes,
+            equipment: GTGymEquipment.cable,
+          ),
+          Exercise.standard(
+            id: "library.glutes.exercises.machineGluteKickback",
+            name: t.library.glutes.exercises.machineGluteKickback,
+            parameters: GTSetParameters.repsWeight,
+            primaryMuscleGroup: GTMuscleGroup.glutes,
+            equipment: GTGymEquipment.machine,
+          ),
+          Exercise.standard(
+            id: "library.glutes.exercises.cableGluteKickback",
+            name: t.library.glutes.exercises.cableGluteKickback,
+            parameters: GTSetParameters.repsWeight,
+            primaryMuscleGroup: GTMuscleGroup.glutes,
+            equipment: GTGymEquipment.cable,
+          ),
           Exercise.standard(
             id: "library.hips.exercises.gluteBridge",
             name: t.library.glutes.exercises.gluteBridge,

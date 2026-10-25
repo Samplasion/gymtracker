@@ -28,6 +28,7 @@ struct GTSet: Codable, Equatable {
     
     enum Parameters: String, Codable {
         case repsWeight
+        case repsNegWeight
         case timeWeight
         case freeBodyReps
         case time
@@ -44,11 +45,11 @@ struct GTSet: Codable, Equatable {
         }
 
         var hasReps: Bool {
-            self == .repsWeight || self == .freeBodyReps
+            self == .repsWeight || self == .repsNegWeight || self == .freeBodyReps
         }
 
         var hasWeight: Bool {
-            self == .repsWeight || self == .timeWeight
+            self == .repsWeight || self == .repsNegWeight || self == .timeWeight
         }
 
         var hasTime: Bool {

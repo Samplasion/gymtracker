@@ -303,6 +303,7 @@ Map<String, dynamic> _$ExerciseToJson(Exercise instance) => <String, dynamic>{
 
 const _$GTSetParametersEnumMap = {
   GTSetParameters.repsWeight: 'repsWeight',
+  GTSetParameters.repsNegWeight: 'repsNegWeight',
   GTSetParameters.timeWeight: 'timeWeight',
   GTSetParameters.freeBodyReps: 'freeBodyReps',
   GTSetParameters.time: 'time',

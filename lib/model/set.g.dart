@@ -187,6 +187,7 @@ const _$GTSetKindEnumMap = {
 
 const _$GTSetParametersEnumMap = {
   GTSetParameters.repsWeight: 'repsWeight',
+  GTSetParameters.repsNegWeight: 'repsNegWeight',
   GTSetParameters.timeWeight: 'timeWeight',
   GTSetParameters.freeBodyReps: 'freeBodyReps',
   GTSetParameters.time: 'time',

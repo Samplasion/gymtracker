@@ -154,6 +154,7 @@ model.TaggedNutritionGoal goalFromDatabase(DBNutritionGoal goal) {
     value: model.NutritionGoal(
       dailyCalories: goal.calories,
       dailyProtein: goal.protein,
+      dailyWater: goal.water,
       dailyCarbs: goal.carbs,
       dailyFat: goal.fat,
     ),

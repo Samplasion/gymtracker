@@ -780,7 +780,8 @@ class AchievementRules {
                 .where(
                   (exercise) =>
                       exercise.parameters.hasDistance ||
-                      exercise.parameters.hasWeight,
+                      (exercise.parameters.hasWeight &&
+                          exercise.parameters != GTSetParameters.repsNegWeight),
                 );
             if (exercises.isEmpty) return false;
             for (final exercise in exercises) {
@@ -1172,7 +1173,8 @@ class AchievementRules {
 
     for (final ex in exercises) {
       for (final set in ex.doneSets) {
-        if (set.weight != null &&
+        if (set.parameters != GTSetParameters.repsNegWeight &&
+            set.weight != null &&
             Weights.convert(
                   value: set.weight!,
                   from: latestWorkout.weightUnit,
@@ -1395,7 +1397,8 @@ class AchievementRules {
 
     for (final ex in exercises) {
       for (final set in ex.doneSets) {
-        if (set.weight != null &&
+        if (set.parameters != GTSetParameters.repsNegWeight &&
+            set.weight != null &&
             Weights.convert(
                   value: set.weight!,
                   from: latestWorkout.weightUnit,

@@ -93,6 +93,7 @@
         "parameters": {
           "label": "Parameters",
           "values": {
+            "repsNegWeight": "Negative weight & reps",
             "repsWeight": "Weight & reps",
             "timeWeight": "Weight & time",
             "time": "Time",
@@ -957,13 +958,13 @@
       "exercises": {
         "aerobics": "Aerobics",
         "biking": "Biking",
-        "ergometer": "Ergometer",
-        "ergometerHorizontal": "Ergometer (horizontal)",
+        "ergometer": "Upright exercise bike",
+        "ergometerHorizontal": "Recumbent exercise bike",
         "pilates": "Pilates",
         "running": "Running",
         "treadmill": "Treadmill",
         "zumba": "Zumba",
-        "jumpRope": "Jump Rope",
+        "jumpRope": "Jump rope",
         "rowingMachine": "Rowing machine",
         "bicycleCrunchesCardio": "Bicycle crunches (timed)",
         "crunchesTimed": "Crunches (timed)"
@@ -972,6 +973,8 @@
     "chest": {
       "name": "Chest",
       "exercises": {
+        "inclineMachineChestPress": "Incline machine chest press",
+        "midHeightCableFly": "Chest-height cable fly",
         "barbellBenchPressFlat": "Bench press (barbell)",
         "barbellBenchPressIncline": "Bench press (barbell, incline)",
         "barbellBenchPressDecline": "Bench press (barbell, decline)",
@@ -984,57 +987,68 @@
         "cableBenchPressFlat": "Bench press (cables)",
         "cableBenchPressIncline": "Bench press (cables, incline)",
         "cableBenchPressDecline": "Bench press (cables, decline)",
-        "butterflyMachine": "Butterfly Machine",
-        "dumbbellHexPress": "Dumbbell Hex Press",
-        "smithMachineHexPress": "Smith Machine Hex Press",
-        "seatedCableChestFlys": "Seated cable chest flys",
+        "butterflyMachine": "Pec deck fly",
+        "dumbbellHexPress": "Dumbbell hex press",
+        "smithMachineHexPress": "Smith machine hex press",
+        "seatedCableChestFlys": "Seated cable chest flyes",
         "verticalChestPress": "Vertical chest press",
-        "cableFlyCrossovers": "Cable fly cross-overs",
+        "cableFlyCrossovers": "High cable fly",
         "pushUps": "Push-ups",
         "pushUpsWeighted": "Push-ups (weighted)",
         "cableChestPress": "Cable chest press",
         "declinePushUps": "Decline push-ups",
         "lowCableFly": "Low cable fly",
         "inclinePushUps": "Incline push-ups",
-        "tBarPress": "T-Bar press",
-        "inclineBenchFlys": "Incline bench flys",
-        "benchFlys": "Bench flys"
+        "tBarPress": "Landmine press",
+        "inclineBenchFlys": "Incline bench flyes",
+        "benchFlys": "Bench flyes"
       }
     },
     "biceps": {
       "name": "Biceps",
       "exercises": {
-        "barbellBicepsCurl": "Bicep curl (barbell)",
+        "behindBodyCableCurl": "Behind-the-body cable curl",
+        "ropeHammerCurl": "Cable rope hammer curl",
+        "inclineDumbbellCurl": "Incline dumbbell curl",
+        "barbellBicepsCurl": "Biceps curl (barbell)",
         "spiderCurls": "Spider curls",
         "singleArmCableHammerCurls": "Hammer curls (cable, single arm)",
-        "cableBicepsCurl": "Bicep curl (cable)",
-        "dumbbellBicepsCurl": "Bicep curl (dumbbell)",
-        "bicepsCurlMachine": "Bicep curl (machine)",
+        "cableBicepsCurl": "Biceps curl (cable)",
+        "dumbbellBicepsCurl": "Biceps curl (dumbbell)",
+        "bicepsCurlMachine": "Biceps curl (machine)",
         "hammerCurlDumbbell": "Hammer curls (dumbbells)",
         "concentrationCurl": "Concentration curls",
-        "scottCurl": "Scott curl",
+        "scottCurl": "Preacher curl",
         "dualCableHighCurl": "Dual-cable high curls"
       }
     },
     "abs": {
       "name": "Abs",
       "exercises": {
+        "abWheelRollout": "Ab wheel rollout",
+        "hangingKneeRaise": "Hanging knee raise",
+        "mountainClimber": "Mountain climber",
+        "highCableWoodchopper": "High-to-low cable woodchop",
+        "reverseCrunch": "Reverse crunch",
+        "cableCrunch": "Cable crunch",
+        "pallofPress": "Cable Pallof press",
         "crunches": "Crunches",
-        "kneeRaise": "Knee raise",
-        "legRaise": "Leg raise",
+        "kneeRaise": "Lying knee raise",
+        "legRaise": "Lying leg raise",
         "crunchMachine": "Crunch (machine)",
         "heelsUpCrunch": "Heels-up crunches",
-        "fullBodyCrunch": "Full-body crunches",
+        "fullBodyCrunch": "Double crunch",
         "plank": "Plank",
         "hollowBodyHold": "Hollow body hold",
         "bicycleCrunches": "Bicycle crunches",
-        "extendedReverseCrunchWithLegExtension": "Extended reverse crunch with leg extension",
+        "extendedReverseCrunchWithLegExtension": "Reverse crunch with leg extension",
         "toeTouches": "Toe touches",
         "russianTwist": "Russian twist",
         "heelTouches": "Heel touches",
-        "deadBugHoldCardio": "Dead bug hold (timed)",
-        "deadBugHold": "Dead bug hold",
-        "hollowBodyHoldBentKnees": "Bent hollow hold",
+        "deadBugHoldCardio": "Dead bugs (timed)",
+        "deadBugHoldStatic": "Dead bug hold (static)",
+        "deadBugHold": "Dead bugs",
+        "hollowBodyHoldBentKnees": "Bent-knee hollow body hold",
         "obliqueCrunches": "Oblique crunches",
         "legRaiseParallelBars": "Leg raise (parallel bars)",
         "lateralHyperextensions": "Lateral hyperextensions"
@@ -1043,61 +1057,82 @@
     "calves": {
       "name": "Calves",
       "exercises": {
+        "smithMachineCalfRaise": "Smith machine calf raise",
         "calfRaiseStanding": "Calf raise (standing)",
         "calfRaiseSeated": "Calf raise (seated)",
-        "calfPressLegPressMachine": "Calf press (on Leg Press machine)"
+        "calfPressLegPressMachine": "Calf press on leg press machine"
       }
     },
     "quadriceps": {
       "name": "Quadriceps",
       "exercises": {
+        "reverseDumbbellLunges": "Reverse dumbbell lunges",
+        "walkingDumbbellLunges": "Walking dumbbell lunges",
+        "lateralDumbbellLunges": "Lateral dumbbell lunges",
+        "sumoDumbbellSquat": "Dumbbell sumo squat",
+        "singleLegLegPress": "Single-leg leg press",
+        "smithMachineSquats": "Smith machine squat",
+        "stepUps": "Step-ups (dumbbells)",
+        "gobletSquats": "Goblet squat (dumbbell)",
         "squatsBarbell": "Squats (barbell)",
         "legPress": "Leg press",
         "legExtension": "Leg extension",
         "smithMachineLunges": "Smith machine lunges",
-        "lunges": "Lunges",
+        "lunges": "Dumbbell lunges",
         "legPress45deg": "Leg press (45°)",
         "frontSquats": "Front squats",
         "bulgarianSplitSquats": "Bulgarian split squats",
-        "bodyweightSquats": "Squats",
+        "bodyweightSquats": "Bodyweight squat",
         "hackSquats": "Hack squats"
       }
     },
     "hamstrings": {
       "name": "Hamstrings",
       "exercises": {
+        "singleLegDumbbellRomanianDeadlift": "Single-leg dumbbell Romanian deadlift",
+        "legCurlStanding": "Standing machine leg curl",
+        "nordicCurl": "Nordic curl",
         "legCurlProne": "Leg curl (prone)",
         "legCurlSeated": "Leg curl (seated)",
-        "romanianDeadlift": "Romanian deadlift",
+        "romanianDeadlift": "Romanian deadlift (barbell)",
         "romanianDeadliftDumbbell": "Romanian deadlift (dumbbells)"
       }
     },
     "shoulders": {
       "name": "Shoulders",
       "exercises": {
+        "standingCableReverseFly": "Standing cable reverse fly",
+        "cableFrontRaise": "Cable front raise",
+        "dumbbellShrugs": "Dumbbell shrugs",
+        "facePull": "Cable face pull",
         "shoulderPressMachine": "Shoulder press (machine)",
         "latRaisesInclinedBench": "Lateral raises (inclined bench)",
         "latRaisesCable": "Lateral raises (cable)",
         "latRaisesDualCable": "Lateral raises (cable, both arms)",
-        "reverseFlysInclinedBench": "Reverse flys (inclined bench)",
+        "reverseFlysInclinedBench": "Reverse flyes (inclined bench)",
         "arnoldPress": "Arnold press",
         "frontDumbbellRaise": "Front dumbbell raise",
         "uprightRow": "Upright row",
         "pikePushUps": "Pike push-ups",
         "handstandPushUps": "Handstand push-ups",
-        "bentOverLateralRaises": "Bent-Over Lateral Raises",
-        "shoulderPress": "Shoulder press",
+        "bentOverLateralRaises": "Bent-over cable reverse fly",
+        "shoulderPress": "Dumbbell shoulder press",
         "latRaisesDumbbells": "Lateral raises (dumbbells)",
         "deltoidMachine": "Deltoid machine",
         "shrugsBarbell": "Front shrugs (barbell)",
         "militaryPressSmithMachine": "Smith machine military press",
-        "reverseButterfly": "Reverse butterfly machine",
+        "reverseButterfly": "Reverse pec deck fly",
         "militaryPressBarbell": "Barbell military press"
       }
     },
     "back": {
       "name": "Back",
       "exercises": {
+        "chestSupportedDumbbellRow": "Chest-supported dumbbell row",
+        "singleArmCableRow": "Single-arm cable row",
+        "ringRow": "Ring row",
+        "dumbbellPullover": "Dumbbell pullover",
+        "machineAssistedPullUps": "Machine-assisted pull-ups",
         "hyperExtensions": "Hyperextensions",
         "weightedHyperExtensions": "Hyperextensions (weighted)",
         "barbellRow": "Barbell row",
@@ -1112,9 +1147,9 @@
         "rowMachine": "Seated row machine",
         "latPulldownsWideGrip": "Lat pulldowns (wide grip)",
         "latPulldownsNarrowGrip": "Lat pulldowns (narrow grip)",
-        "tBarRowWideProneGrip": "T-Bar machine row (wide prone grip)",
+        "tBarRowWideProneGrip": "T-bar machine row (wide overhand grip)",
         "dumbbellRow": "Dumbbell row",
-        "chinUps": "Chin Ups"
+        "chinUps": "Chin-ups"
       },
       "exercise": {
         "dualLowRowMachine": "Dual low row machine",
@@ -1124,15 +1159,18 @@
     "triceps": {
       "name": "Triceps",
       "exercises": {
+        "barTricepsPushdown": "Bar triceps pushdown",
+        "singleArmTricepsPushdown": "Single-arm triceps pushdown",
+        "machineAssistedDips": "Machine-assisted dips",
         "dips": "Dips",
-        "overheadRopeTricepExtension": "Overhead rope tricep extension",
+        "overheadRopeTricepExtension": "Overhead rope triceps extension",
         "tricepsRopePushdown": "Triceps rope pushdown",
-        "tricepKickbacks": "Tricep kickbacks",
-        "skullCrushers": "Skull Crushers",
+        "tricepKickbacks": "Triceps kickbacks",
+        "skullCrushers": "Skull crushers",
         "benchDips": "Dips (bench)",
         "diamondPushUps": "Diamond push-ups",
-        "tricepsMachine": "Triceps Machine",
-        "overheadTricepExtension": "Overhead triceps extension"
+        "tricepsMachine": "Triceps machine",
+        "overheadTricepExtension": "Dumbbell overhead triceps extension"
       }
     },
     "newCustomExercise": "New exercise",
@@ -1141,7 +1179,7 @@
     },
     "hips": {
       "exercises": {
-        "hipAdduction": "Hip adduction"
+        "hipAdduction": "Machine hip adduction"
       },
       "name": "Hips"
     },
@@ -1153,16 +1191,17 @@
         "wristCurlsDumbbell": "Wrist curls (dumbbell)",
         "reverseWristCurlsDumbbell": "Reverse wrist curls (dumbbell)",
         "wristRoller": "Wrist roller",
-        "farmerWalk": "Farmer's Walk",
+        "farmerWalk": "Farmer’s walk",
         "platePinch": "Plate pinch",
         "reverseCurls": "Reverse curls (barbell)",
         "reverseCurlsDumbbell": "Reverse curls (dumbbell)",
-        "cableSingleArmReverseCurl": "Cable single-arm reverse curls"
+        "dumbbellSingleArmReverseCurl": "Single-arm dumbbell reverse curl",
+        "singleArmCableReverseCurl": "Single-arm cable reverse curl"
       }
     },
     "obliques": {
       "exercises": {
-        "sidewaysPlank": "Sideways plank",
+        "sidewaysPlank": "Side plank",
         "sidewaysPlankReachThrough": "Side plank reach through"
       }
     },
@@ -1174,9 +1213,18 @@
     },
     "glutes": {
       "exercises": {
+        "singleLegGluteBridge": "Single-leg glute bridge",
+        "smithMachineHipThrust": "Smith machine hip thrust",
+        "bandHipAbduction": "Resistance band hip abduction",
+        "lateralBandWalk": "Lateral band walk",
+        "quadrupedGluteKickback": "Quadruped glute kickback",
+        "kettlebellSwing": "Kettlebell swing",
+        "cableGluteKickback": "Cable glute kickback",
+        "machineGluteKickback": "Machine glute kickback",
+        "cableHipAbduction": "Cable hip abduction",
         "gluteBridge": "Glute bridge",
-        "hipThrust": "Hip thrust",
-        "hipAbduction": "Hip abduction",
+        "hipThrust": "Machine hip thrust",
+        "hipAbduction": "Machine hip abduction",
         "clamshells": "Clamshells",
         "hipThrustBarbell": "Hip thrust (barbell)"
       },
@@ -1542,7 +1590,7 @@
       "overCal": "Over"
     },
     "searchBar": {
-      "hint": "Search history or OpenFoodFacts…",
+      "hint": "Search history or food catalog…",
       "noResults": "No results were found for \"$query\".",
       "noHistory": "No search history"
     },
@@ -1623,7 +1671,8 @@
       "melissicAcid": "Melissic Acid",
       "montanicAcid": "Montanic Acid",
       "nervonicAcid": "Nervonic Acid",
-      "transFat": "Trans Fats"
+      "transFat": "Trans Fats",
+      "water": "Water"
     },
     "nutrimentUnits": {
       "kcal": "kcal",
@@ -1669,8 +1718,8 @@
     "search": {
       "title": "Search results",
       "error": {
-        "serverError": "The OpenFoodFacts server has not provided a response. Please try again later.",
-        "generic": "An error has occurred while communicating with the OpenFoodFacts server. Please try again."
+        "serverError": "Could not reach the food catalog. Please try again later.",
+        "generic": "Could not reach the food catalog. Please try again later."
       }
     },
     "barcodeReader": {
@@ -2231,6 +2280,43 @@
     },
     "datePicker": {
       "today": "Today"
+    },
+    "catalog": {
+      "submitAlso": "Also submit to the catalog",
+      "publicNotice": "Your contribution becomes public and remains available even after your account is deleted.",
+      "loginToSubmit": "Sign in to submit foods to the catalog. Saving to your diary remains available.",
+      "queueFailed": "Food is ready for your diary, but the catalog submission could not be queued.",
+      "submissions": "Catalog submissions",
+      "noSubmissions": "You have not requested any catalog submissions yet.",
+      "loadFailed": "Could not load submissions.",
+      "retry": "Retry submission",
+      "cancel": "Cancel",
+      "report": "Report food",
+      "loginToReport": "Sign in to report a food.",
+      "details": "Details (optional)",
+      "detailsRequired": "Please explain your report.",
+      "sendReport": "Send report",
+      "reportSent": "Report sent.",
+      "reportFailed": "Could not send the report. Please try again later.",
+      "reasons(map)": {
+        "spam": "Spam",
+        "inappropriate": "Content inappropriate for Gym Bro",
+        "nutrition": "Incorrect nutritional values",
+        "product": "Incorrect product information or barcode",
+        "duplicate": "Duplicate food",
+        "other": "Other"
+      },
+      "statuses(map)": {
+        "pending": "Waiting to submit; retries automatically",
+        "sending": "Submitting",
+        "failed": "Submission failed: check the data and retry",
+        "published": "Published in the catalog",
+        "duplicate": "Already in the catalog",
+        "correction": "Correction submitted for review",
+        "unavailable": "Entry unavailable for publication",
+        "cancelled": "Submission cancelled",
+        "cancelled_unknown": "Retries cancelled; an earlier submission may already have been received"
+      }
     }
   },
   "equipment": {
@@ -2817,5 +2903,43 @@
     "push": "Push notifications",
     "pushDescription": "Requests, interactions, achievements and reports",
     "pushDisabled": "Push notifications are not configured on this device"
-}
+  },
+  "hydration": {
+    "title": "Water",
+    "drinking": "Water drunk",
+    "food": "From foods",
+    "add": "Add water",
+    "custom": "Custom amount",
+    "amount": "Amount (ml)",
+    "time": "Time",
+    "goal": "Daily goal (ml)",
+    "setGoal": "Set goal",
+    "noGoal": "No goal set",
+    "optionalGoal": "Leave blank to remove the goal",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "invalid": "Enter a valid positive amount",
+    "future": "Choose a time in the past",
+    "connect": "Connect to Health",
+    "disconnect": "Disable Health export",
+    "disabled": "Health export disabled",
+    "synced": "Water synced with Health",
+    "pending": "Health export pending: check permissions and retry",
+    "unavailable": "Health service unavailable",
+    "syncing": "Syncing with Health…",
+    "empty": "No drinking water recorded",
+    "error": "Unable to save. Try again.",
+    "natural": "Still water",
+    "sparkling": "Sparkling water",
+    "cucumber": "Cucumber with peel, raw",
+    "tomato": "Tomato, red, raw",
+    "watermelon": "Watermelon, raw",
+    "apple": "Apple with skin, raw",
+    "source": "Source: USDA SR Legacy",
+    "waterPer100": "Water (ml per 100 g/ml)",
+    "history": "Water history",
+    "permissionDenied": "Water is saved in your diary. To also add it to Health, allow access in Settings → Permissions."
+  }
 }

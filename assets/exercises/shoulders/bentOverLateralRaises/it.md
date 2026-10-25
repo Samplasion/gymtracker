@@ -1,4 +1,4 @@
-Le Alzate laterali al cavo basso con busto a 90° sono un esercizio di isolamento che coinvolge i deltoidi posteriori (retro delle spalle), con un coinvolgimento secondario di romboidi e trapezio. Questo esercizio aiuta a migliorare la stabilità delle spalle e a sviluppare i deltoidi posteriori, contribuendo ad uno sviluppo equilibrato delle spalle.
+Le croci inverse al cavo basso con busto flesso sono un esercizio di isolamento che coinvolge i deltoidi posteriori (retro delle spalle), con un coinvolgimento secondario di romboidi e trapezio. Questo esercizio aiuta a migliorare la stabilità delle spalle e a sviluppare i deltoidi posteriori, contribuendo ad uno sviluppo equilibrato delle spalle.
 
 ### Esecuzione
 1. **Posizione:**

@@ -191,6 +191,7 @@ class Translations with BaseTranslations<AppLocale, Translations> {
 	late final Translations$legacyWorkoutRecovery$en legacyWorkoutRecovery = Translations$legacyWorkoutRecovery$en._(_root);
 	late final Translations$friendsList$en friendsList = Translations$friendsList$en._(_root);
 	late final Translations$social$en social = Translations$social$en._(_root);
+	late final Translations$hydration$en hydration = Translations$hydration$en._(_root);
 }
 
 // Path: progression
@@ -1050,6 +1051,7 @@ class Translations$food$en {
 		'montanicAcid': 'Montanic Acid',
 		'nervonicAcid': 'Nervonic Acid',
 		'transFat': 'Trans Fats',
+		'water': 'Water',
 	};
 	Map<String, String> get nutrimentUnits => {
 		'kcal': 'kcal',
@@ -1527,6 +1529,7 @@ class Translations$food$en {
 	late final Translations$food$categoryFoods$en categoryFoods = Translations$food$categoryFoods$en._(_root);
 	late final Translations$food$permission$en permission = Translations$food$permission$en._(_root);
 	late final Translations$food$datePicker$en datePicker = Translations$food$datePicker$en._(_root);
+	late final Translations$food$catalog$en catalog = Translations$food$catalog$en._(_root);
 }
 
 // Path: equipment
@@ -2270,6 +2273,123 @@ class Translations$social$en {
 
 	/// en: 'Push notifications are not configured on this device'
 	String get pushDisabled => 'Push notifications are not configured on this device';
+}
+
+// Path: hydration
+class Translations$hydration$en {
+	Translations$hydration$en._(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Water'
+	String get title => 'Water';
+
+	/// en: 'Water drunk'
+	String get drinking => 'Water drunk';
+
+	/// en: 'From foods'
+	String get food => 'From foods';
+
+	/// en: 'Add water'
+	String get add => 'Add water';
+
+	/// en: 'Custom amount'
+	String get custom => 'Custom amount';
+
+	/// en: 'Amount (ml)'
+	String get amount => 'Amount (ml)';
+
+	/// en: 'Time'
+	String get time => 'Time';
+
+	/// en: 'Daily goal (ml)'
+	String get goal => 'Daily goal (ml)';
+
+	/// en: 'Set goal'
+	String get setGoal => 'Set goal';
+
+	/// en: 'No goal set'
+	String get noGoal => 'No goal set';
+
+	/// en: 'Leave blank to remove the goal'
+	String get optionalGoal => 'Leave blank to remove the goal';
+
+	/// en: 'Save'
+	String get save => 'Save';
+
+	/// en: 'Cancel'
+	String get cancel => 'Cancel';
+
+	/// en: 'Delete'
+	String get delete => 'Delete';
+
+	/// en: 'Edit'
+	String get edit => 'Edit';
+
+	/// en: 'Enter a valid positive amount'
+	String get invalid => 'Enter a valid positive amount';
+
+	/// en: 'Choose a time in the past'
+	String get future => 'Choose a time in the past';
+
+	/// en: 'Connect to Health'
+	String get connect => 'Connect to Health';
+
+	/// en: 'Disable Health export'
+	String get disconnect => 'Disable Health export';
+
+	/// en: 'Health export disabled'
+	String get disabled => 'Health export disabled';
+
+	/// en: 'Water synced with Health'
+	String get synced => 'Water synced with Health';
+
+	/// en: 'Health export pending: check permissions and retry'
+	String get pending => 'Health export pending: check permissions and retry';
+
+	/// en: 'Health service unavailable'
+	String get unavailable => 'Health service unavailable';
+
+	/// en: 'Syncing with Health…'
+	String get syncing => 'Syncing with Health…';
+
+	/// en: 'No drinking water recorded'
+	String get empty => 'No drinking water recorded';
+
+	/// en: 'Unable to save. Try again.'
+	String get error => 'Unable to save. Try again.';
+
+	/// en: 'Still water'
+	String get natural => 'Still water';
+
+	/// en: 'Sparkling water'
+	String get sparkling => 'Sparkling water';
+
+	/// en: 'Cucumber with peel, raw'
+	String get cucumber => 'Cucumber with peel, raw';
+
+	/// en: 'Tomato, red, raw'
+	String get tomato => 'Tomato, red, raw';
+
+	/// en: 'Watermelon, raw'
+	String get watermelon => 'Watermelon, raw';
+
+	/// en: 'Apple with skin, raw'
+	String get apple => 'Apple with skin, raw';
+
+	/// en: 'Source: USDA SR Legacy'
+	String get source => 'Source: USDA SR Legacy';
+
+	/// en: 'Water (ml per 100 g/ml)'
+	String get waterPer100 => 'Water (ml per 100 g/ml)';
+
+	/// en: 'Water history'
+	String get history => 'Water history';
+
+	/// en: 'Water is saved in your diary. To also add it to Health, allow access in Settings → Permissions.'
+	String get permissionDenied => 'Water is saved in your diary. To also add it to Health, allow access in Settings → Permissions.';
 }
 
 // Path: set.kindShort
@@ -3825,8 +3945,8 @@ class Translations$food$searchBar$en {
 
 	// Translations
 
-	/// en: 'Search history or OpenFoodFacts…'
-	String get hint => 'Search history or OpenFoodFacts…';
+	/// en: 'Search history or food catalog…'
+	String get hint => 'Search history or food catalog…';
 
 	/// en: 'No results were found for "$query".'
 	String noResults({required Object query}) => 'No results were found for "${query}".';
@@ -4075,6 +4195,83 @@ class Translations$food$datePicker$en {
 
 	/// en: 'Today'
 	String get today => 'Today';
+}
+
+// Path: food.catalog
+class Translations$food$catalog$en {
+	Translations$food$catalog$en._(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Also submit to the catalog'
+	String get submitAlso => 'Also submit to the catalog';
+
+	/// en: 'Your contribution becomes public and remains available even after your account is deleted.'
+	String get publicNotice => 'Your contribution becomes public and remains available even after your account is deleted.';
+
+	/// en: 'Sign in to submit foods to the catalog. Saving to your diary remains available.'
+	String get loginToSubmit => 'Sign in to submit foods to the catalog. Saving to your diary remains available.';
+
+	/// en: 'Food is ready for your diary, but the catalog submission could not be queued.'
+	String get queueFailed => 'Food is ready for your diary, but the catalog submission could not be queued.';
+
+	/// en: 'Catalog submissions'
+	String get submissions => 'Catalog submissions';
+
+	/// en: 'You have not requested any catalog submissions yet.'
+	String get noSubmissions => 'You have not requested any catalog submissions yet.';
+
+	/// en: 'Could not load submissions.'
+	String get loadFailed => 'Could not load submissions.';
+
+	/// en: 'Retry submission'
+	String get retry => 'Retry submission';
+
+	/// en: 'Cancel'
+	String get cancel => 'Cancel';
+
+	/// en: 'Report food'
+	String get report => 'Report food';
+
+	/// en: 'Sign in to report a food.'
+	String get loginToReport => 'Sign in to report a food.';
+
+	/// en: 'Details (optional)'
+	String get details => 'Details (optional)';
+
+	/// en: 'Please explain your report.'
+	String get detailsRequired => 'Please explain your report.';
+
+	/// en: 'Send report'
+	String get sendReport => 'Send report';
+
+	/// en: 'Report sent.'
+	String get reportSent => 'Report sent.';
+
+	/// en: 'Could not send the report. Please try again later.'
+	String get reportFailed => 'Could not send the report. Please try again later.';
+
+	Map<String, String> get reasons => {
+		'spam': 'Spam',
+		'inappropriate': 'Content inappropriate for Gym Bro',
+		'nutrition': 'Incorrect nutritional values',
+		'product': 'Incorrect product information or barcode',
+		'duplicate': 'Duplicate food',
+		'other': 'Other',
+	};
+	Map<String, String> get statuses => {
+		'pending': 'Waiting to submit; retries automatically',
+		'sending': 'Submitting',
+		'failed': 'Submission failed: check the data and retry',
+		'published': 'Published in the catalog',
+		'duplicate': 'Already in the catalog',
+		'correction': 'Correction submitted for review',
+		'unavailable': 'Entry unavailable for publication',
+		'cancelled': 'Submission cancelled',
+		'cancelled_unknown': 'Retries cancelled; an earlier submission may already have been received',
+	};
 }
 
 // Path: equipment.none
@@ -5987,11 +6184,11 @@ class Translations$library$cardio$exercises$en {
 	/// en: 'Biking'
 	String get biking => 'Biking';
 
-	/// en: 'Ergometer'
-	String get ergometer => 'Ergometer';
+	/// en: 'Upright exercise bike'
+	String get ergometer => 'Upright exercise bike';
 
-	/// en: 'Ergometer (horizontal)'
-	String get ergometerHorizontal => 'Ergometer (horizontal)';
+	/// en: 'Recumbent exercise bike'
+	String get ergometerHorizontal => 'Recumbent exercise bike';
 
 	/// en: 'Pilates'
 	String get pilates => 'Pilates';
@@ -6005,8 +6202,8 @@ class Translations$library$cardio$exercises$en {
 	/// en: 'Zumba'
 	String get zumba => 'Zumba';
 
-	/// en: 'Jump Rope'
-	String get jumpRope => 'Jump Rope';
+	/// en: 'Jump rope'
+	String get jumpRope => 'Jump rope';
 
 	/// en: 'Rowing machine'
 	String get rowingMachine => 'Rowing machine';
@@ -6025,6 +6222,12 @@ class Translations$library$chest$exercises$en {
 	final Translations _root; // ignore: unused_field
 
 	// Translations
+
+	/// en: 'Incline machine chest press'
+	String get inclineMachineChestPress => 'Incline machine chest press';
+
+	/// en: 'Chest-height cable fly'
+	String get midHeightCableFly => 'Chest-height cable fly';
 
 	/// en: 'Bench press (barbell)'
 	String get barbellBenchPressFlat => 'Bench press (barbell)';
@@ -6062,23 +6265,23 @@ class Translations$library$chest$exercises$en {
 	/// en: 'Bench press (cables, decline)'
 	String get cableBenchPressDecline => 'Bench press (cables, decline)';
 
-	/// en: 'Butterfly Machine'
-	String get butterflyMachine => 'Butterfly Machine';
+	/// en: 'Pec deck fly'
+	String get butterflyMachine => 'Pec deck fly';
 
-	/// en: 'Dumbbell Hex Press'
-	String get dumbbellHexPress => 'Dumbbell Hex Press';
+	/// en: 'Dumbbell hex press'
+	String get dumbbellHexPress => 'Dumbbell hex press';
 
-	/// en: 'Smith Machine Hex Press'
-	String get smithMachineHexPress => 'Smith Machine Hex Press';
+	/// en: 'Smith machine hex press'
+	String get smithMachineHexPress => 'Smith machine hex press';
 
-	/// en: 'Seated cable chest flys'
-	String get seatedCableChestFlys => 'Seated cable chest flys';
+	/// en: 'Seated cable chest flyes'
+	String get seatedCableChestFlys => 'Seated cable chest flyes';
 
 	/// en: 'Vertical chest press'
 	String get verticalChestPress => 'Vertical chest press';
 
-	/// en: 'Cable fly cross-overs'
-	String get cableFlyCrossovers => 'Cable fly cross-overs';
+	/// en: 'High cable fly'
+	String get cableFlyCrossovers => 'High cable fly';
 
 	/// en: 'Push-ups'
 	String get pushUps => 'Push-ups';
@@ -6098,14 +6301,14 @@ class Translations$library$chest$exercises$en {
 	/// en: 'Incline push-ups'
 	String get inclinePushUps => 'Incline push-ups';
 
-	/// en: 'T-Bar press'
-	String get tBarPress => 'T-Bar press';
+	/// en: 'Landmine press'
+	String get tBarPress => 'Landmine press';
 
-	/// en: 'Incline bench flys'
-	String get inclineBenchFlys => 'Incline bench flys';
+	/// en: 'Incline bench flyes'
+	String get inclineBenchFlys => 'Incline bench flyes';
 
-	/// en: 'Bench flys'
-	String get benchFlys => 'Bench flys';
+	/// en: 'Bench flyes'
+	String get benchFlys => 'Bench flyes';
 }
 
 // Path: library.biceps.exercises
@@ -6116,8 +6319,17 @@ class Translations$library$biceps$exercises$en {
 
 	// Translations
 
-	/// en: 'Bicep curl (barbell)'
-	String get barbellBicepsCurl => 'Bicep curl (barbell)';
+	/// en: 'Behind-the-body cable curl'
+	String get behindBodyCableCurl => 'Behind-the-body cable curl';
+
+	/// en: 'Cable rope hammer curl'
+	String get ropeHammerCurl => 'Cable rope hammer curl';
+
+	/// en: 'Incline dumbbell curl'
+	String get inclineDumbbellCurl => 'Incline dumbbell curl';
+
+	/// en: 'Biceps curl (barbell)'
+	String get barbellBicepsCurl => 'Biceps curl (barbell)';
 
 	/// en: 'Spider curls'
 	String get spiderCurls => 'Spider curls';
@@ -6125,14 +6337,14 @@ class Translations$library$biceps$exercises$en {
 	/// en: 'Hammer curls (cable, single arm)'
 	String get singleArmCableHammerCurls => 'Hammer curls (cable, single arm)';
 
-	/// en: 'Bicep curl (cable)'
-	String get cableBicepsCurl => 'Bicep curl (cable)';
+	/// en: 'Biceps curl (cable)'
+	String get cableBicepsCurl => 'Biceps curl (cable)';
 
-	/// en: 'Bicep curl (dumbbell)'
-	String get dumbbellBicepsCurl => 'Bicep curl (dumbbell)';
+	/// en: 'Biceps curl (dumbbell)'
+	String get dumbbellBicepsCurl => 'Biceps curl (dumbbell)';
 
-	/// en: 'Bicep curl (machine)'
-	String get bicepsCurlMachine => 'Bicep curl (machine)';
+	/// en: 'Biceps curl (machine)'
+	String get bicepsCurlMachine => 'Biceps curl (machine)';
 
 	/// en: 'Hammer curls (dumbbells)'
 	String get hammerCurlDumbbell => 'Hammer curls (dumbbells)';
@@ -6140,8 +6352,8 @@ class Translations$library$biceps$exercises$en {
 	/// en: 'Concentration curls'
 	String get concentrationCurl => 'Concentration curls';
 
-	/// en: 'Scott curl'
-	String get scottCurl => 'Scott curl';
+	/// en: 'Preacher curl'
+	String get scottCurl => 'Preacher curl';
 
 	/// en: 'Dual-cable high curls'
 	String get dualCableHighCurl => 'Dual-cable high curls';
@@ -6155,14 +6367,35 @@ class Translations$library$abs$exercises$en {
 
 	// Translations
 
+	/// en: 'Ab wheel rollout'
+	String get abWheelRollout => 'Ab wheel rollout';
+
+	/// en: 'Hanging knee raise'
+	String get hangingKneeRaise => 'Hanging knee raise';
+
+	/// en: 'Mountain climber'
+	String get mountainClimber => 'Mountain climber';
+
+	/// en: 'High-to-low cable woodchop'
+	String get highCableWoodchopper => 'High-to-low cable woodchop';
+
+	/// en: 'Reverse crunch'
+	String get reverseCrunch => 'Reverse crunch';
+
+	/// en: 'Cable crunch'
+	String get cableCrunch => 'Cable crunch';
+
+	/// en: 'Cable Pallof press'
+	String get pallofPress => 'Cable Pallof press';
+
 	/// en: 'Crunches'
 	String get crunches => 'Crunches';
 
-	/// en: 'Knee raise'
-	String get kneeRaise => 'Knee raise';
+	/// en: 'Lying knee raise'
+	String get kneeRaise => 'Lying knee raise';
 
-	/// en: 'Leg raise'
-	String get legRaise => 'Leg raise';
+	/// en: 'Lying leg raise'
+	String get legRaise => 'Lying leg raise';
 
 	/// en: 'Crunch (machine)'
 	String get crunchMachine => 'Crunch (machine)';
@@ -6170,8 +6403,8 @@ class Translations$library$abs$exercises$en {
 	/// en: 'Heels-up crunches'
 	String get heelsUpCrunch => 'Heels-up crunches';
 
-	/// en: 'Full-body crunches'
-	String get fullBodyCrunch => 'Full-body crunches';
+	/// en: 'Double crunch'
+	String get fullBodyCrunch => 'Double crunch';
 
 	/// en: 'Plank'
 	String get plank => 'Plank';
@@ -6182,8 +6415,8 @@ class Translations$library$abs$exercises$en {
 	/// en: 'Bicycle crunches'
 	String get bicycleCrunches => 'Bicycle crunches';
 
-	/// en: 'Extended reverse crunch with leg extension'
-	String get extendedReverseCrunchWithLegExtension => 'Extended reverse crunch with leg extension';
+	/// en: 'Reverse crunch with leg extension'
+	String get extendedReverseCrunchWithLegExtension => 'Reverse crunch with leg extension';
 
 	/// en: 'Toe touches'
 	String get toeTouches => 'Toe touches';
@@ -6194,14 +6427,17 @@ class Translations$library$abs$exercises$en {
 	/// en: 'Heel touches'
 	String get heelTouches => 'Heel touches';
 
-	/// en: 'Dead bug hold (timed)'
-	String get deadBugHoldCardio => 'Dead bug hold (timed)';
+	/// en: 'Dead bugs (timed)'
+	String get deadBugHoldCardio => 'Dead bugs (timed)';
 
-	/// en: 'Dead bug hold'
-	String get deadBugHold => 'Dead bug hold';
+	/// en: 'Dead bug hold (static)'
+	String get deadBugHoldStatic => 'Dead bug hold (static)';
 
-	/// en: 'Bent hollow hold'
-	String get hollowBodyHoldBentKnees => 'Bent hollow hold';
+	/// en: 'Dead bugs'
+	String get deadBugHold => 'Dead bugs';
+
+	/// en: 'Bent-knee hollow body hold'
+	String get hollowBodyHoldBentKnees => 'Bent-knee hollow body hold';
 
 	/// en: 'Oblique crunches'
 	String get obliqueCrunches => 'Oblique crunches';
@@ -6221,14 +6457,17 @@ class Translations$library$calves$exercises$en {
 
 	// Translations
 
+	/// en: 'Smith machine calf raise'
+	String get smithMachineCalfRaise => 'Smith machine calf raise';
+
 	/// en: 'Calf raise (standing)'
 	String get calfRaiseStanding => 'Calf raise (standing)';
 
 	/// en: 'Calf raise (seated)'
 	String get calfRaiseSeated => 'Calf raise (seated)';
 
-	/// en: 'Calf press (on Leg Press machine)'
-	String get calfPressLegPressMachine => 'Calf press (on Leg Press machine)';
+	/// en: 'Calf press on leg press machine'
+	String get calfPressLegPressMachine => 'Calf press on leg press machine';
 }
 
 // Path: library.quadriceps.exercises
@@ -6238,6 +6477,30 @@ class Translations$library$quadriceps$exercises$en {
 	final Translations _root; // ignore: unused_field
 
 	// Translations
+
+	/// en: 'Reverse dumbbell lunges'
+	String get reverseDumbbellLunges => 'Reverse dumbbell lunges';
+
+	/// en: 'Walking dumbbell lunges'
+	String get walkingDumbbellLunges => 'Walking dumbbell lunges';
+
+	/// en: 'Lateral dumbbell lunges'
+	String get lateralDumbbellLunges => 'Lateral dumbbell lunges';
+
+	/// en: 'Dumbbell sumo squat'
+	String get sumoDumbbellSquat => 'Dumbbell sumo squat';
+
+	/// en: 'Single-leg leg press'
+	String get singleLegLegPress => 'Single-leg leg press';
+
+	/// en: 'Smith machine squat'
+	String get smithMachineSquats => 'Smith machine squat';
+
+	/// en: 'Step-ups (dumbbells)'
+	String get stepUps => 'Step-ups (dumbbells)';
+
+	/// en: 'Goblet squat (dumbbell)'
+	String get gobletSquats => 'Goblet squat (dumbbell)';
 
 	/// en: 'Squats (barbell)'
 	String get squatsBarbell => 'Squats (barbell)';
@@ -6251,8 +6514,8 @@ class Translations$library$quadriceps$exercises$en {
 	/// en: 'Smith machine lunges'
 	String get smithMachineLunges => 'Smith machine lunges';
 
-	/// en: 'Lunges'
-	String get lunges => 'Lunges';
+	/// en: 'Dumbbell lunges'
+	String get lunges => 'Dumbbell lunges';
 
 	/// en: 'Leg press (45°)'
 	String get legPress45deg => 'Leg press (45°)';
@@ -6263,8 +6526,8 @@ class Translations$library$quadriceps$exercises$en {
 	/// en: 'Bulgarian split squats'
 	String get bulgarianSplitSquats => 'Bulgarian split squats';
 
-	/// en: 'Squats'
-	String get bodyweightSquats => 'Squats';
+	/// en: 'Bodyweight squat'
+	String get bodyweightSquats => 'Bodyweight squat';
 
 	/// en: 'Hack squats'
 	String get hackSquats => 'Hack squats';
@@ -6278,14 +6541,23 @@ class Translations$library$hamstrings$exercises$en {
 
 	// Translations
 
+	/// en: 'Single-leg dumbbell Romanian deadlift'
+	String get singleLegDumbbellRomanianDeadlift => 'Single-leg dumbbell Romanian deadlift';
+
+	/// en: 'Standing machine leg curl'
+	String get legCurlStanding => 'Standing machine leg curl';
+
+	/// en: 'Nordic curl'
+	String get nordicCurl => 'Nordic curl';
+
 	/// en: 'Leg curl (prone)'
 	String get legCurlProne => 'Leg curl (prone)';
 
 	/// en: 'Leg curl (seated)'
 	String get legCurlSeated => 'Leg curl (seated)';
 
-	/// en: 'Romanian deadlift'
-	String get romanianDeadlift => 'Romanian deadlift';
+	/// en: 'Romanian deadlift (barbell)'
+	String get romanianDeadlift => 'Romanian deadlift (barbell)';
 
 	/// en: 'Romanian deadlift (dumbbells)'
 	String get romanianDeadliftDumbbell => 'Romanian deadlift (dumbbells)';
@@ -6299,6 +6571,18 @@ class Translations$library$shoulders$exercises$en {
 
 	// Translations
 
+	/// en: 'Standing cable reverse fly'
+	String get standingCableReverseFly => 'Standing cable reverse fly';
+
+	/// en: 'Cable front raise'
+	String get cableFrontRaise => 'Cable front raise';
+
+	/// en: 'Dumbbell shrugs'
+	String get dumbbellShrugs => 'Dumbbell shrugs';
+
+	/// en: 'Cable face pull'
+	String get facePull => 'Cable face pull';
+
 	/// en: 'Shoulder press (machine)'
 	String get shoulderPressMachine => 'Shoulder press (machine)';
 
@@ -6311,8 +6595,8 @@ class Translations$library$shoulders$exercises$en {
 	/// en: 'Lateral raises (cable, both arms)'
 	String get latRaisesDualCable => 'Lateral raises (cable, both arms)';
 
-	/// en: 'Reverse flys (inclined bench)'
-	String get reverseFlysInclinedBench => 'Reverse flys (inclined bench)';
+	/// en: 'Reverse flyes (inclined bench)'
+	String get reverseFlysInclinedBench => 'Reverse flyes (inclined bench)';
 
 	/// en: 'Arnold press'
 	String get arnoldPress => 'Arnold press';
@@ -6329,11 +6613,11 @@ class Translations$library$shoulders$exercises$en {
 	/// en: 'Handstand push-ups'
 	String get handstandPushUps => 'Handstand push-ups';
 
-	/// en: 'Bent-Over Lateral Raises'
-	String get bentOverLateralRaises => 'Bent-Over Lateral Raises';
+	/// en: 'Bent-over cable reverse fly'
+	String get bentOverLateralRaises => 'Bent-over cable reverse fly';
 
-	/// en: 'Shoulder press'
-	String get shoulderPress => 'Shoulder press';
+	/// en: 'Dumbbell shoulder press'
+	String get shoulderPress => 'Dumbbell shoulder press';
 
 	/// en: 'Lateral raises (dumbbells)'
 	String get latRaisesDumbbells => 'Lateral raises (dumbbells)';
@@ -6347,8 +6631,8 @@ class Translations$library$shoulders$exercises$en {
 	/// en: 'Smith machine military press'
 	String get militaryPressSmithMachine => 'Smith machine military press';
 
-	/// en: 'Reverse butterfly machine'
-	String get reverseButterfly => 'Reverse butterfly machine';
+	/// en: 'Reverse pec deck fly'
+	String get reverseButterfly => 'Reverse pec deck fly';
 
 	/// en: 'Barbell military press'
 	String get militaryPressBarbell => 'Barbell military press';
@@ -6361,6 +6645,21 @@ class Translations$library$back$exercises$en {
 	final Translations _root; // ignore: unused_field
 
 	// Translations
+
+	/// en: 'Chest-supported dumbbell row'
+	String get chestSupportedDumbbellRow => 'Chest-supported dumbbell row';
+
+	/// en: 'Single-arm cable row'
+	String get singleArmCableRow => 'Single-arm cable row';
+
+	/// en: 'Ring row'
+	String get ringRow => 'Ring row';
+
+	/// en: 'Dumbbell pullover'
+	String get dumbbellPullover => 'Dumbbell pullover';
+
+	/// en: 'Machine-assisted pull-ups'
+	String get machineAssistedPullUps => 'Machine-assisted pull-ups';
 
 	/// en: 'Hyperextensions'
 	String get hyperExtensions => 'Hyperextensions';
@@ -6404,14 +6703,14 @@ class Translations$library$back$exercises$en {
 	/// en: 'Lat pulldowns (narrow grip)'
 	String get latPulldownsNarrowGrip => 'Lat pulldowns (narrow grip)';
 
-	/// en: 'T-Bar machine row (wide prone grip)'
-	String get tBarRowWideProneGrip => 'T-Bar machine row (wide prone grip)';
+	/// en: 'T-bar machine row (wide overhand grip)'
+	String get tBarRowWideProneGrip => 'T-bar machine row (wide overhand grip)';
 
 	/// en: 'Dumbbell row'
 	String get dumbbellRow => 'Dumbbell row';
 
-	/// en: 'Chin Ups'
-	String get chinUps => 'Chin Ups';
+	/// en: 'Chin-ups'
+	String get chinUps => 'Chin-ups';
 }
 
 // Path: library.back.exercise
@@ -6437,20 +6736,29 @@ class Translations$library$triceps$exercises$en {
 
 	// Translations
 
+	/// en: 'Bar triceps pushdown'
+	String get barTricepsPushdown => 'Bar triceps pushdown';
+
+	/// en: 'Single-arm triceps pushdown'
+	String get singleArmTricepsPushdown => 'Single-arm triceps pushdown';
+
+	/// en: 'Machine-assisted dips'
+	String get machineAssistedDips => 'Machine-assisted dips';
+
 	/// en: 'Dips'
 	String get dips => 'Dips';
 
-	/// en: 'Overhead rope tricep extension'
-	String get overheadRopeTricepExtension => 'Overhead rope tricep extension';
+	/// en: 'Overhead rope triceps extension'
+	String get overheadRopeTricepExtension => 'Overhead rope triceps extension';
 
 	/// en: 'Triceps rope pushdown'
 	String get tricepsRopePushdown => 'Triceps rope pushdown';
 
-	/// en: 'Tricep kickbacks'
-	String get tricepKickbacks => 'Tricep kickbacks';
+	/// en: 'Triceps kickbacks'
+	String get tricepKickbacks => 'Triceps kickbacks';
 
-	/// en: 'Skull Crushers'
-	String get skullCrushers => 'Skull Crushers';
+	/// en: 'Skull crushers'
+	String get skullCrushers => 'Skull crushers';
 
 	/// en: 'Dips (bench)'
 	String get benchDips => 'Dips (bench)';
@@ -6458,11 +6766,11 @@ class Translations$library$triceps$exercises$en {
 	/// en: 'Diamond push-ups'
 	String get diamondPushUps => 'Diamond push-ups';
 
-	/// en: 'Triceps Machine'
-	String get tricepsMachine => 'Triceps Machine';
+	/// en: 'Triceps machine'
+	String get tricepsMachine => 'Triceps machine';
 
-	/// en: 'Overhead triceps extension'
-	String get overheadTricepExtension => 'Overhead triceps extension';
+	/// en: 'Dumbbell overhead triceps extension'
+	String get overheadTricepExtension => 'Dumbbell overhead triceps extension';
 }
 
 // Path: library.hips.exercises
@@ -6473,8 +6781,8 @@ class Translations$library$hips$exercises$en {
 
 	// Translations
 
-	/// en: 'Hip adduction'
-	String get hipAdduction => 'Hip adduction';
+	/// en: 'Machine hip adduction'
+	String get hipAdduction => 'Machine hip adduction';
 }
 
 // Path: library.forearms.exercises
@@ -6500,8 +6808,8 @@ class Translations$library$forearms$exercises$en {
 	/// en: 'Wrist roller'
 	String get wristRoller => 'Wrist roller';
 
-	/// en: 'Farmer's Walk'
-	String get farmerWalk => 'Farmer\'s Walk';
+	/// en: 'Farmer’s walk'
+	String get farmerWalk => 'Farmer’s walk';
 
 	/// en: 'Plate pinch'
 	String get platePinch => 'Plate pinch';
@@ -6512,8 +6820,11 @@ class Translations$library$forearms$exercises$en {
 	/// en: 'Reverse curls (dumbbell)'
 	String get reverseCurlsDumbbell => 'Reverse curls (dumbbell)';
 
-	/// en: 'Cable single-arm reverse curls'
-	String get cableSingleArmReverseCurl => 'Cable single-arm reverse curls';
+	/// en: 'Single-arm dumbbell reverse curl'
+	String get dumbbellSingleArmReverseCurl => 'Single-arm dumbbell reverse curl';
+
+	/// en: 'Single-arm cable reverse curl'
+	String get singleArmCableReverseCurl => 'Single-arm cable reverse curl';
 }
 
 // Path: library.obliques.exercises
@@ -6524,8 +6835,8 @@ class Translations$library$obliques$exercises$en {
 
 	// Translations
 
-	/// en: 'Sideways plank'
-	String get sidewaysPlank => 'Sideways plank';
+	/// en: 'Side plank'
+	String get sidewaysPlank => 'Side plank';
 
 	/// en: 'Side plank reach through'
 	String get sidewaysPlankReachThrough => 'Side plank reach through';
@@ -6551,14 +6862,41 @@ class Translations$library$glutes$exercises$en {
 
 	// Translations
 
+	/// en: 'Single-leg glute bridge'
+	String get singleLegGluteBridge => 'Single-leg glute bridge';
+
+	/// en: 'Smith machine hip thrust'
+	String get smithMachineHipThrust => 'Smith machine hip thrust';
+
+	/// en: 'Resistance band hip abduction'
+	String get bandHipAbduction => 'Resistance band hip abduction';
+
+	/// en: 'Lateral band walk'
+	String get lateralBandWalk => 'Lateral band walk';
+
+	/// en: 'Quadruped glute kickback'
+	String get quadrupedGluteKickback => 'Quadruped glute kickback';
+
+	/// en: 'Kettlebell swing'
+	String get kettlebellSwing => 'Kettlebell swing';
+
+	/// en: 'Cable glute kickback'
+	String get cableGluteKickback => 'Cable glute kickback';
+
+	/// en: 'Machine glute kickback'
+	String get machineGluteKickback => 'Machine glute kickback';
+
+	/// en: 'Cable hip abduction'
+	String get cableHipAbduction => 'Cable hip abduction';
+
 	/// en: 'Glute bridge'
 	String get gluteBridge => 'Glute bridge';
 
-	/// en: 'Hip thrust'
-	String get hipThrust => 'Hip thrust';
+	/// en: 'Machine hip thrust'
+	String get hipThrust => 'Machine hip thrust';
 
-	/// en: 'Hip abduction'
-	String get hipAbduction => 'Hip abduction';
+	/// en: 'Machine hip abduction'
+	String get hipAbduction => 'Machine hip abduction';
 
 	/// en: 'Clamshells'
 	String get clamshells => 'Clamshells';
@@ -7012,11 +7350,11 @@ class Translations$food$search$error$en {
 
 	// Translations
 
-	/// en: 'The OpenFoodFacts server has not provided a response. Please try again later.'
-	String get serverError => 'The OpenFoodFacts server has not provided a response. Please try again later.';
+	/// en: 'Could not reach the food catalog. Please try again later.'
+	String get serverError => 'Could not reach the food catalog. Please try again later.';
 
-	/// en: 'An error has occurred while communicating with the OpenFoodFacts server. Please try again.'
-	String get generic => 'An error has occurred while communicating with the OpenFoodFacts server. Please try again.';
+	/// en: 'Could not reach the food catalog. Please try again later.'
+	String get generic => 'Could not reach the food catalog. Please try again later.';
 }
 
 // Path: food.barcodeReader.scanResult
@@ -7524,6 +7862,7 @@ class Translations$exercise$editor$fields$parameters$en {
 	String get label => 'Parameters';
 
 	Map<String, String> get values => {
+		'repsNegWeight': 'Negative weight & reps',
 		'repsWeight': 'Weight & reps',
 		'timeWeight': 'Weight & time',
 		'time': 'Time',
@@ -9047,6 +9386,7 @@ extension on Translations {
 			'exercise.editor.fields.title.errors.empty' => 'The name must not be empty.',
 			'exercise.editor.fields.title.errors.invalid' => 'An exercise with this name already exists.',
 			'exercise.editor.fields.parameters.label' => 'Parameters',
+			'exercise.editor.fields.parameters.values.repsNegWeight' => 'Negative weight & reps',
 			'exercise.editor.fields.parameters.values.repsWeight' => 'Weight & reps',
 			'exercise.editor.fields.parameters.values.timeWeight' => 'Weight & time',
 			'exercise.editor.fields.parameters.values.time' => 'Time',
@@ -9450,17 +9790,19 @@ extension on Translations {
 			'library.cardio.name' => 'Cardio',
 			'library.cardio.exercises.aerobics' => 'Aerobics',
 			'library.cardio.exercises.biking' => 'Biking',
-			'library.cardio.exercises.ergometer' => 'Ergometer',
-			'library.cardio.exercises.ergometerHorizontal' => 'Ergometer (horizontal)',
+			'library.cardio.exercises.ergometer' => 'Upright exercise bike',
+			'library.cardio.exercises.ergometerHorizontal' => 'Recumbent exercise bike',
 			'library.cardio.exercises.pilates' => 'Pilates',
 			'library.cardio.exercises.running' => 'Running',
 			'library.cardio.exercises.treadmill' => 'Treadmill',
 			'library.cardio.exercises.zumba' => 'Zumba',
-			'library.cardio.exercises.jumpRope' => 'Jump Rope',
+			'library.cardio.exercises.jumpRope' => 'Jump rope',
 			'library.cardio.exercises.rowingMachine' => 'Rowing machine',
 			'library.cardio.exercises.bicycleCrunchesCardio' => 'Bicycle crunches (timed)',
 			'library.cardio.exercises.crunchesTimed' => 'Crunches (timed)',
 			'library.chest.name' => 'Chest',
+			'library.chest.exercises.inclineMachineChestPress' => 'Incline machine chest press',
+			'library.chest.exercises.midHeightCableFly' => 'Chest-height cable fly',
 			'library.chest.exercises.barbellBenchPressFlat' => 'Bench press (barbell)',
 			'library.chest.exercises.barbellBenchPressIncline' => 'Bench press (barbell, incline)',
 			'library.chest.exercises.barbellBenchPressDecline' => 'Bench press (barbell, decline)',
@@ -9473,94 +9815,126 @@ extension on Translations {
 			'library.chest.exercises.cableBenchPressFlat' => 'Bench press (cables)',
 			'library.chest.exercises.cableBenchPressIncline' => 'Bench press (cables, incline)',
 			'library.chest.exercises.cableBenchPressDecline' => 'Bench press (cables, decline)',
-			'library.chest.exercises.butterflyMachine' => 'Butterfly Machine',
-			'library.chest.exercises.dumbbellHexPress' => 'Dumbbell Hex Press',
-			'library.chest.exercises.smithMachineHexPress' => 'Smith Machine Hex Press',
-			'library.chest.exercises.seatedCableChestFlys' => 'Seated cable chest flys',
+			'library.chest.exercises.butterflyMachine' => 'Pec deck fly',
+			'library.chest.exercises.dumbbellHexPress' => 'Dumbbell hex press',
+			'library.chest.exercises.smithMachineHexPress' => 'Smith machine hex press',
+			'library.chest.exercises.seatedCableChestFlys' => 'Seated cable chest flyes',
 			'library.chest.exercises.verticalChestPress' => 'Vertical chest press',
-			'library.chest.exercises.cableFlyCrossovers' => 'Cable fly cross-overs',
+			'library.chest.exercises.cableFlyCrossovers' => 'High cable fly',
 			'library.chest.exercises.pushUps' => 'Push-ups',
 			'library.chest.exercises.pushUpsWeighted' => 'Push-ups (weighted)',
 			'library.chest.exercises.cableChestPress' => 'Cable chest press',
 			'library.chest.exercises.declinePushUps' => 'Decline push-ups',
 			'library.chest.exercises.lowCableFly' => 'Low cable fly',
 			'library.chest.exercises.inclinePushUps' => 'Incline push-ups',
-			'library.chest.exercises.tBarPress' => 'T-Bar press',
-			'library.chest.exercises.inclineBenchFlys' => 'Incline bench flys',
-			'library.chest.exercises.benchFlys' => 'Bench flys',
+			'library.chest.exercises.tBarPress' => 'Landmine press',
+			'library.chest.exercises.inclineBenchFlys' => 'Incline bench flyes',
+			'library.chest.exercises.benchFlys' => 'Bench flyes',
 			'library.biceps.name' => 'Biceps',
-			'library.biceps.exercises.barbellBicepsCurl' => 'Bicep curl (barbell)',
+			'library.biceps.exercises.behindBodyCableCurl' => 'Behind-the-body cable curl',
+			'library.biceps.exercises.ropeHammerCurl' => 'Cable rope hammer curl',
+			'library.biceps.exercises.inclineDumbbellCurl' => 'Incline dumbbell curl',
+			'library.biceps.exercises.barbellBicepsCurl' => 'Biceps curl (barbell)',
 			'library.biceps.exercises.spiderCurls' => 'Spider curls',
 			'library.biceps.exercises.singleArmCableHammerCurls' => 'Hammer curls (cable, single arm)',
-			'library.biceps.exercises.cableBicepsCurl' => 'Bicep curl (cable)',
-			'library.biceps.exercises.dumbbellBicepsCurl' => 'Bicep curl (dumbbell)',
-			'library.biceps.exercises.bicepsCurlMachine' => 'Bicep curl (machine)',
-			'library.biceps.exercises.hammerCurlDumbbell' => 'Hammer curls (dumbbells)',
-			'library.biceps.exercises.concentrationCurl' => 'Concentration curls',
-			'library.biceps.exercises.scottCurl' => 'Scott curl',
-			'library.biceps.exercises.dualCableHighCurl' => 'Dual-cable high curls',
-			'library.abs.name' => 'Abs',
+			'library.biceps.exercises.cableBicepsCurl' => 'Biceps curl (cable)',
+			'library.biceps.exercises.dumbbellBicepsCurl' => 'Biceps curl (dumbbell)',
 			_ => null,
 		} ?? switch (path) {
+			'library.biceps.exercises.bicepsCurlMachine' => 'Biceps curl (machine)',
+			'library.biceps.exercises.hammerCurlDumbbell' => 'Hammer curls (dumbbells)',
+			'library.biceps.exercises.concentrationCurl' => 'Concentration curls',
+			'library.biceps.exercises.scottCurl' => 'Preacher curl',
+			'library.biceps.exercises.dualCableHighCurl' => 'Dual-cable high curls',
+			'library.abs.name' => 'Abs',
+			'library.abs.exercises.abWheelRollout' => 'Ab wheel rollout',
+			'library.abs.exercises.hangingKneeRaise' => 'Hanging knee raise',
+			'library.abs.exercises.mountainClimber' => 'Mountain climber',
+			'library.abs.exercises.highCableWoodchopper' => 'High-to-low cable woodchop',
+			'library.abs.exercises.reverseCrunch' => 'Reverse crunch',
+			'library.abs.exercises.cableCrunch' => 'Cable crunch',
+			'library.abs.exercises.pallofPress' => 'Cable Pallof press',
 			'library.abs.exercises.crunches' => 'Crunches',
-			'library.abs.exercises.kneeRaise' => 'Knee raise',
-			'library.abs.exercises.legRaise' => 'Leg raise',
+			'library.abs.exercises.kneeRaise' => 'Lying knee raise',
+			'library.abs.exercises.legRaise' => 'Lying leg raise',
 			'library.abs.exercises.crunchMachine' => 'Crunch (machine)',
 			'library.abs.exercises.heelsUpCrunch' => 'Heels-up crunches',
-			'library.abs.exercises.fullBodyCrunch' => 'Full-body crunches',
+			'library.abs.exercises.fullBodyCrunch' => 'Double crunch',
 			'library.abs.exercises.plank' => 'Plank',
 			'library.abs.exercises.hollowBodyHold' => 'Hollow body hold',
 			'library.abs.exercises.bicycleCrunches' => 'Bicycle crunches',
-			'library.abs.exercises.extendedReverseCrunchWithLegExtension' => 'Extended reverse crunch with leg extension',
+			'library.abs.exercises.extendedReverseCrunchWithLegExtension' => 'Reverse crunch with leg extension',
 			'library.abs.exercises.toeTouches' => 'Toe touches',
 			'library.abs.exercises.russianTwist' => 'Russian twist',
 			'library.abs.exercises.heelTouches' => 'Heel touches',
-			'library.abs.exercises.deadBugHoldCardio' => 'Dead bug hold (timed)',
-			'library.abs.exercises.deadBugHold' => 'Dead bug hold',
-			'library.abs.exercises.hollowBodyHoldBentKnees' => 'Bent hollow hold',
+			'library.abs.exercises.deadBugHoldCardio' => 'Dead bugs (timed)',
+			'library.abs.exercises.deadBugHoldStatic' => 'Dead bug hold (static)',
+			'library.abs.exercises.deadBugHold' => 'Dead bugs',
+			'library.abs.exercises.hollowBodyHoldBentKnees' => 'Bent-knee hollow body hold',
 			'library.abs.exercises.obliqueCrunches' => 'Oblique crunches',
 			'library.abs.exercises.legRaiseParallelBars' => 'Leg raise (parallel bars)',
 			'library.abs.exercises.lateralHyperextensions' => 'Lateral hyperextensions',
 			'library.calves.name' => 'Calves',
+			'library.calves.exercises.smithMachineCalfRaise' => 'Smith machine calf raise',
 			'library.calves.exercises.calfRaiseStanding' => 'Calf raise (standing)',
 			'library.calves.exercises.calfRaiseSeated' => 'Calf raise (seated)',
-			'library.calves.exercises.calfPressLegPressMachine' => 'Calf press (on Leg Press machine)',
+			'library.calves.exercises.calfPressLegPressMachine' => 'Calf press on leg press machine',
 			'library.quadriceps.name' => 'Quadriceps',
+			'library.quadriceps.exercises.reverseDumbbellLunges' => 'Reverse dumbbell lunges',
+			'library.quadriceps.exercises.walkingDumbbellLunges' => 'Walking dumbbell lunges',
+			'library.quadriceps.exercises.lateralDumbbellLunges' => 'Lateral dumbbell lunges',
+			'library.quadriceps.exercises.sumoDumbbellSquat' => 'Dumbbell sumo squat',
+			'library.quadriceps.exercises.singleLegLegPress' => 'Single-leg leg press',
+			'library.quadriceps.exercises.smithMachineSquats' => 'Smith machine squat',
+			'library.quadriceps.exercises.stepUps' => 'Step-ups (dumbbells)',
+			'library.quadriceps.exercises.gobletSquats' => 'Goblet squat (dumbbell)',
 			'library.quadriceps.exercises.squatsBarbell' => 'Squats (barbell)',
 			'library.quadriceps.exercises.legPress' => 'Leg press',
 			'library.quadriceps.exercises.legExtension' => 'Leg extension',
 			'library.quadriceps.exercises.smithMachineLunges' => 'Smith machine lunges',
-			'library.quadriceps.exercises.lunges' => 'Lunges',
+			'library.quadriceps.exercises.lunges' => 'Dumbbell lunges',
 			'library.quadriceps.exercises.legPress45deg' => 'Leg press (45°)',
 			'library.quadriceps.exercises.frontSquats' => 'Front squats',
 			'library.quadriceps.exercises.bulgarianSplitSquats' => 'Bulgarian split squats',
-			'library.quadriceps.exercises.bodyweightSquats' => 'Squats',
+			'library.quadriceps.exercises.bodyweightSquats' => 'Bodyweight squat',
 			'library.quadriceps.exercises.hackSquats' => 'Hack squats',
 			'library.hamstrings.name' => 'Hamstrings',
+			'library.hamstrings.exercises.singleLegDumbbellRomanianDeadlift' => 'Single-leg dumbbell Romanian deadlift',
+			'library.hamstrings.exercises.legCurlStanding' => 'Standing machine leg curl',
+			'library.hamstrings.exercises.nordicCurl' => 'Nordic curl',
 			'library.hamstrings.exercises.legCurlProne' => 'Leg curl (prone)',
 			'library.hamstrings.exercises.legCurlSeated' => 'Leg curl (seated)',
-			'library.hamstrings.exercises.romanianDeadlift' => 'Romanian deadlift',
+			'library.hamstrings.exercises.romanianDeadlift' => 'Romanian deadlift (barbell)',
 			'library.hamstrings.exercises.romanianDeadliftDumbbell' => 'Romanian deadlift (dumbbells)',
 			'library.shoulders.name' => 'Shoulders',
+			'library.shoulders.exercises.standingCableReverseFly' => 'Standing cable reverse fly',
+			'library.shoulders.exercises.cableFrontRaise' => 'Cable front raise',
+			'library.shoulders.exercises.dumbbellShrugs' => 'Dumbbell shrugs',
+			'library.shoulders.exercises.facePull' => 'Cable face pull',
 			'library.shoulders.exercises.shoulderPressMachine' => 'Shoulder press (machine)',
 			'library.shoulders.exercises.latRaisesInclinedBench' => 'Lateral raises (inclined bench)',
 			'library.shoulders.exercises.latRaisesCable' => 'Lateral raises (cable)',
 			'library.shoulders.exercises.latRaisesDualCable' => 'Lateral raises (cable, both arms)',
-			'library.shoulders.exercises.reverseFlysInclinedBench' => 'Reverse flys (inclined bench)',
+			'library.shoulders.exercises.reverseFlysInclinedBench' => 'Reverse flyes (inclined bench)',
 			'library.shoulders.exercises.arnoldPress' => 'Arnold press',
 			'library.shoulders.exercises.frontDumbbellRaise' => 'Front dumbbell raise',
 			'library.shoulders.exercises.uprightRow' => 'Upright row',
 			'library.shoulders.exercises.pikePushUps' => 'Pike push-ups',
 			'library.shoulders.exercises.handstandPushUps' => 'Handstand push-ups',
-			'library.shoulders.exercises.bentOverLateralRaises' => 'Bent-Over Lateral Raises',
-			'library.shoulders.exercises.shoulderPress' => 'Shoulder press',
+			'library.shoulders.exercises.bentOverLateralRaises' => 'Bent-over cable reverse fly',
+			'library.shoulders.exercises.shoulderPress' => 'Dumbbell shoulder press',
 			'library.shoulders.exercises.latRaisesDumbbells' => 'Lateral raises (dumbbells)',
 			'library.shoulders.exercises.deltoidMachine' => 'Deltoid machine',
 			'library.shoulders.exercises.shrugsBarbell' => 'Front shrugs (barbell)',
 			'library.shoulders.exercises.militaryPressSmithMachine' => 'Smith machine military press',
-			'library.shoulders.exercises.reverseButterfly' => 'Reverse butterfly machine',
+			'library.shoulders.exercises.reverseButterfly' => 'Reverse pec deck fly',
 			'library.shoulders.exercises.militaryPressBarbell' => 'Barbell military press',
 			'library.back.name' => 'Back',
+			'library.back.exercises.chestSupportedDumbbellRow' => 'Chest-supported dumbbell row',
+			'library.back.exercises.singleArmCableRow' => 'Single-arm cable row',
+			'library.back.exercises.ringRow' => 'Ring row',
+			'library.back.exercises.dumbbellPullover' => 'Dumbbell pullover',
+			'library.back.exercises.machineAssistedPullUps' => 'Machine-assisted pull-ups',
 			'library.back.exercises.hyperExtensions' => 'Hyperextensions',
 			'library.back.exercises.weightedHyperExtensions' => 'Hyperextensions (weighted)',
 			'library.back.exercises.barbellRow' => 'Barbell row',
@@ -9575,24 +9949,27 @@ extension on Translations {
 			'library.back.exercises.rowMachine' => 'Seated row machine',
 			'library.back.exercises.latPulldownsWideGrip' => 'Lat pulldowns (wide grip)',
 			'library.back.exercises.latPulldownsNarrowGrip' => 'Lat pulldowns (narrow grip)',
-			'library.back.exercises.tBarRowWideProneGrip' => 'T-Bar machine row (wide prone grip)',
+			'library.back.exercises.tBarRowWideProneGrip' => 'T-bar machine row (wide overhand grip)',
 			'library.back.exercises.dumbbellRow' => 'Dumbbell row',
-			'library.back.exercises.chinUps' => 'Chin Ups',
+			'library.back.exercises.chinUps' => 'Chin-ups',
 			'library.back.exercise.dualLowRowMachine' => 'Dual low row machine',
 			'library.back.exercise.dualHighRowMachine' => 'Dual high row machine',
 			'library.triceps.name' => 'Triceps',
+			'library.triceps.exercises.barTricepsPushdown' => 'Bar triceps pushdown',
+			'library.triceps.exercises.singleArmTricepsPushdown' => 'Single-arm triceps pushdown',
+			'library.triceps.exercises.machineAssistedDips' => 'Machine-assisted dips',
 			'library.triceps.exercises.dips' => 'Dips',
-			'library.triceps.exercises.overheadRopeTricepExtension' => 'Overhead rope tricep extension',
+			'library.triceps.exercises.overheadRopeTricepExtension' => 'Overhead rope triceps extension',
 			'library.triceps.exercises.tricepsRopePushdown' => 'Triceps rope pushdown',
-			'library.triceps.exercises.tricepKickbacks' => 'Tricep kickbacks',
-			'library.triceps.exercises.skullCrushers' => 'Skull Crushers',
+			'library.triceps.exercises.tricepKickbacks' => 'Triceps kickbacks',
+			'library.triceps.exercises.skullCrushers' => 'Skull crushers',
 			'library.triceps.exercises.benchDips' => 'Dips (bench)',
 			'library.triceps.exercises.diamondPushUps' => 'Diamond push-ups',
-			'library.triceps.exercises.tricepsMachine' => 'Triceps Machine',
-			'library.triceps.exercises.overheadTricepExtension' => 'Overhead triceps extension',
+			'library.triceps.exercises.tricepsMachine' => 'Triceps machine',
+			'library.triceps.exercises.overheadTricepExtension' => 'Dumbbell overhead triceps extension',
 			'library.newCustomExercise' => 'New exercise',
 			'library.custom.name' => 'Custom exercises',
-			'library.hips.exercises.hipAdduction' => 'Hip adduction',
+			'library.hips.exercises.hipAdduction' => 'Machine hip adduction',
 			'library.hips.name' => 'Hips',
 			'library.forearms.name' => 'Forearms',
 			'library.forearms.exercises.wristCurlsBarbell' => 'Wrist curls (barbell)',
@@ -9600,18 +9977,28 @@ extension on Translations {
 			'library.forearms.exercises.wristCurlsDumbbell' => 'Wrist curls (dumbbell)',
 			'library.forearms.exercises.reverseWristCurlsDumbbell' => 'Reverse wrist curls (dumbbell)',
 			'library.forearms.exercises.wristRoller' => 'Wrist roller',
-			'library.forearms.exercises.farmerWalk' => 'Farmer\'s Walk',
+			'library.forearms.exercises.farmerWalk' => 'Farmer’s walk',
 			'library.forearms.exercises.platePinch' => 'Plate pinch',
 			'library.forearms.exercises.reverseCurls' => 'Reverse curls (barbell)',
 			'library.forearms.exercises.reverseCurlsDumbbell' => 'Reverse curls (dumbbell)',
-			'library.forearms.exercises.cableSingleArmReverseCurl' => 'Cable single-arm reverse curls',
-			'library.obliques.exercises.sidewaysPlank' => 'Sideways plank',
+			'library.forearms.exercises.dumbbellSingleArmReverseCurl' => 'Single-arm dumbbell reverse curl',
+			'library.forearms.exercises.singleArmCableReverseCurl' => 'Single-arm cable reverse curl',
+			'library.obliques.exercises.sidewaysPlank' => 'Side plank',
 			'library.obliques.exercises.sidewaysPlankReachThrough' => 'Side plank reach through',
 			'library.other.name' => 'Other',
 			'library.other.exercises.stretching' => 'Stretching',
+			'library.glutes.exercises.singleLegGluteBridge' => 'Single-leg glute bridge',
+			'library.glutes.exercises.smithMachineHipThrust' => 'Smith machine hip thrust',
+			'library.glutes.exercises.bandHipAbduction' => 'Resistance band hip abduction',
+			'library.glutes.exercises.lateralBandWalk' => 'Lateral band walk',
+			'library.glutes.exercises.quadrupedGluteKickback' => 'Quadruped glute kickback',
+			'library.glutes.exercises.kettlebellSwing' => 'Kettlebell swing',
+			'library.glutes.exercises.cableGluteKickback' => 'Cable glute kickback',
+			'library.glutes.exercises.machineGluteKickback' => 'Machine glute kickback',
+			'library.glutes.exercises.cableHipAbduction' => 'Cable hip abduction',
 			'library.glutes.exercises.gluteBridge' => 'Glute bridge',
-			'library.glutes.exercises.hipThrust' => 'Hip thrust',
-			'library.glutes.exercises.hipAbduction' => 'Hip abduction',
+			'library.glutes.exercises.hipThrust' => 'Machine hip thrust',
+			'library.glutes.exercises.hipAbduction' => 'Machine hip abduction',
 			'library.glutes.exercises.clamshells' => 'Clamshells',
 			'library.glutes.exercises.hipThrustBarbell' => 'Hip thrust (barbell)',
 			'library.glutes.name' => 'Glutes',
@@ -9777,7 +10164,7 @@ extension on Translations {
 			'food.home.remainingCal' => 'Remaining',
 			'food.home.goal' => 'Goal',
 			'food.home.overCal' => 'Over',
-			'food.searchBar.hint' => 'Search history or OpenFoodFacts…',
+			'food.searchBar.hint' => 'Search history or food catalog…',
 			'food.searchBar.noResults' => ({required Object query}) => 'No results were found for "${query}".',
 			'food.searchBar.noHistory' => 'No search history',
 			'food.nutriments.calories' => 'Calories',
@@ -9857,6 +10244,7 @@ extension on Translations {
 			'food.nutriments.montanicAcid' => 'Montanic Acid',
 			'food.nutriments.nervonicAcid' => 'Nervonic Acid',
 			'food.nutriments.transFat' => 'Trans Fats',
+			'food.nutriments.water' => 'Water',
 			'food.nutrimentUnits.kcal' => 'kcal',
 			'food.nutrimentUnits.kj' => 'kJ',
 			'food.nutrimentUnits.g' => 'g',
@@ -9887,8 +10275,8 @@ extension on Translations {
 			'food.edit.copyToToday' => 'Copy to today',
 			'food.addCustom.title' => 'Add custom',
 			'food.search.title' => 'Search results',
-			'food.search.error.serverError' => 'The OpenFoodFacts server has not provided a response. Please try again later.',
-			'food.search.error.generic' => 'An error has occurred while communicating with the OpenFoodFacts server. Please try again.',
+			'food.search.error.serverError' => 'Could not reach the food catalog. Please try again later.',
+			'food.search.error.generic' => 'Could not reach the food catalog. Please try again later.',
 			'food.barcodeReader.title' => 'Scan barcode',
 			'food.barcodeReader.scanResult.noProductFound.text' => ({required Object barcode}) => 'No product found with barcode ${barcode}.',
 			'food.barcodeReader.scanResult.noProductFound.title' => 'No product found',
@@ -9965,6 +10353,8 @@ extension on Translations {
 			'food.languages.el' => 'Modern Greek',
 			'food.languages.en' => 'English',
 			'food.languages.eo' => 'Esperanto',
+			_ => null,
+		} ?? switch (path) {
 			'food.languages.es' => 'Spanish',
 			'food.languages.et' => 'Estonian',
 			'food.languages.eu' => 'Basque',
@@ -10014,8 +10404,6 @@ extension on Translations {
 			'food.languages.kr' => 'Kanuri',
 			'food.languages.ks' => 'Kashmiri',
 			'food.languages.ku' => 'Kurdish',
-			_ => null,
-		} ?? switch (path) {
 			'food.languages.kv' => 'Komi',
 			'food.languages.kw' => 'Cornish',
 			'food.languages.ky' => 'Kyrgyz',
@@ -10388,6 +10776,37 @@ extension on Translations {
 			'food.permission.openSettings' => 'Open app settings',
 			'food.permission.error' => 'An error has occurred.',
 			'food.datePicker.today' => 'Today',
+			'food.catalog.submitAlso' => 'Also submit to the catalog',
+			'food.catalog.publicNotice' => 'Your contribution becomes public and remains available even after your account is deleted.',
+			'food.catalog.loginToSubmit' => 'Sign in to submit foods to the catalog. Saving to your diary remains available.',
+			'food.catalog.queueFailed' => 'Food is ready for your diary, but the catalog submission could not be queued.',
+			'food.catalog.submissions' => 'Catalog submissions',
+			'food.catalog.noSubmissions' => 'You have not requested any catalog submissions yet.',
+			'food.catalog.loadFailed' => 'Could not load submissions.',
+			'food.catalog.retry' => 'Retry submission',
+			'food.catalog.cancel' => 'Cancel',
+			'food.catalog.report' => 'Report food',
+			'food.catalog.loginToReport' => 'Sign in to report a food.',
+			'food.catalog.details' => 'Details (optional)',
+			'food.catalog.detailsRequired' => 'Please explain your report.',
+			'food.catalog.sendReport' => 'Send report',
+			'food.catalog.reportSent' => 'Report sent.',
+			'food.catalog.reportFailed' => 'Could not send the report. Please try again later.',
+			'food.catalog.reasons.spam' => 'Spam',
+			'food.catalog.reasons.inappropriate' => 'Content inappropriate for Gym Bro',
+			'food.catalog.reasons.nutrition' => 'Incorrect nutritional values',
+			'food.catalog.reasons.product' => 'Incorrect product information or barcode',
+			'food.catalog.reasons.duplicate' => 'Duplicate food',
+			'food.catalog.reasons.other' => 'Other',
+			'food.catalog.statuses.pending' => 'Waiting to submit; retries automatically',
+			'food.catalog.statuses.sending' => 'Submitting',
+			'food.catalog.statuses.failed' => 'Submission failed: check the data and retry',
+			'food.catalog.statuses.published' => 'Published in the catalog',
+			'food.catalog.statuses.duplicate' => 'Already in the catalog',
+			'food.catalog.statuses.correction' => 'Correction submitted for review',
+			'food.catalog.statuses.unavailable' => 'Entry unavailable for publication',
+			'food.catalog.statuses.cancelled' => 'Submission cancelled',
+			'food.catalog.statuses.cancelled_unknown' => 'Retries cancelled; an earlier submission may already have been received',
 			'equipment.none.long' => 'Bodyweight',
 			'equipment.none.short' => 'Bodywt.',
 			'equipment.barbell.long' => 'Barbell',
@@ -10448,6 +10867,8 @@ extension on Translations {
 			'achievements.cycleChampion.description.k1.km' => 'Cycle a total of 100km',
 			'achievements.cycleChampion.description.k1.mi' => ({required Object p0}) => 'Cycle a total of 100km (${p0})',
 			'achievements.cycleChampion.description.k2.km' => 'Cycle a total of 500km',
+			_ => null,
+		} ?? switch (path) {
 			'achievements.cycleChampion.description.k2.mi' => ({required Object p0}) => 'Cycle a total of 500km (${p0})',
 			'achievements.cycleChampion.description.k3.km' => 'Cycle a total of 1000km',
 			'achievements.cycleChampion.description.k3.mi' => ({required Object p0}) => 'Cycle a total of 1000km (${p0})',
@@ -10528,8 +10949,6 @@ extension on Translations {
 			'login.verifyEmail.title' => 'We\'ve sent you a verification email',
 			'login.verifyEmail.description' => 'Check your inbox to confirm your email. Once you\'re done, come back and tap the button to sign in.',
 			'login.verifyEmail.done' => 'I\'ve verified my email',
-			_ => null,
-		} ?? switch (path) {
 			'login.verifyEmail.notVerified' => 'Verify your email address and try again.',
 			'sync.conflict.title' => 'Conflicting data found',
 			'sync.conflict.message' => 'Press OK to download the data in the cloud and overwrite the local data. Press Cancel to erase the data in the cloud and upload the local data.',
@@ -10703,6 +11122,42 @@ extension on Translations {
 			'social.push' => 'Push notifications',
 			'social.pushDescription' => 'Requests, interactions, achievements and reports',
 			'social.pushDisabled' => 'Push notifications are not configured on this device',
+			'hydration.title' => 'Water',
+			'hydration.drinking' => 'Water drunk',
+			'hydration.food' => 'From foods',
+			'hydration.add' => 'Add water',
+			'hydration.custom' => 'Custom amount',
+			'hydration.amount' => 'Amount (ml)',
+			'hydration.time' => 'Time',
+			'hydration.goal' => 'Daily goal (ml)',
+			'hydration.setGoal' => 'Set goal',
+			'hydration.noGoal' => 'No goal set',
+			'hydration.optionalGoal' => 'Leave blank to remove the goal',
+			'hydration.save' => 'Save',
+			'hydration.cancel' => 'Cancel',
+			'hydration.delete' => 'Delete',
+			'hydration.edit' => 'Edit',
+			'hydration.invalid' => 'Enter a valid positive amount',
+			'hydration.future' => 'Choose a time in the past',
+			'hydration.connect' => 'Connect to Health',
+			'hydration.disconnect' => 'Disable Health export',
+			'hydration.disabled' => 'Health export disabled',
+			'hydration.synced' => 'Water synced with Health',
+			'hydration.pending' => 'Health export pending: check permissions and retry',
+			'hydration.unavailable' => 'Health service unavailable',
+			'hydration.syncing' => 'Syncing with Health…',
+			'hydration.empty' => 'No drinking water recorded',
+			'hydration.error' => 'Unable to save. Try again.',
+			'hydration.natural' => 'Still water',
+			'hydration.sparkling' => 'Sparkling water',
+			'hydration.cucumber' => 'Cucumber with peel, raw',
+			'hydration.tomato' => 'Tomato, red, raw',
+			'hydration.watermelon' => 'Watermelon, raw',
+			'hydration.apple' => 'Apple with skin, raw',
+			'hydration.source' => 'Source: USDA SR Legacy',
+			'hydration.waterPer100' => 'Water (ml per 100 g/ml)',
+			'hydration.history' => 'Water history',
+			'hydration.permissionDenied' => 'Water is saved in your diary. To also add it to Health, allow access in Settings → Permissions.',
 			_ => null,
 		};
 	}

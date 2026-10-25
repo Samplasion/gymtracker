@@ -207,9 +207,10 @@ class ExerciseListTile extends ConsumerWidget {
 
       switch (exercise.parameters) {
         case GTSetParameters.repsWeight:
+        case GTSetParameters.repsNegWeight:
           formattedSets = exercise.sets.map(
             (set) =>
-                "${_buildReps(context, set.reps)} ${_buildWeight(context, ref, set.weight ?? 0)}",
+                "${_buildReps(context, set.reps)} ${_buildWeight(context, ref, set.effectiveWeight)}",
           );
 
         case GTSetParameters.freeBodyReps:

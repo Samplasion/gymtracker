@@ -306,14 +306,13 @@ class Exercise extends WorkoutExercisable {
       if (set.done) set,
   ];
   double? get liftedWeight {
-    if (parameters != GTSetParameters.repsWeight &&
-        parameters != GTSetParameters.timeWeight) {
+    if (!parameters.hasWeight) {
       return null;
     }
 
     return doneSets.fold(
       0.0,
-      (value, element) => value! + (element.weight ?? 0) * (element.reps ?? 1),
+      (value, element) => value! + element.liftedWeight,
     );
   }
 
@@ -334,8 +333,7 @@ class Exercise extends WorkoutExercisable {
   }
 
   int? get reps {
-    if (parameters != GTSetParameters.repsWeight &&
-        parameters != GTSetParameters.freeBodyReps) {
+    if (!parameters.hasReps) {
       return null;
     }
     return doneSets.fold(0, (value, element) => value! + (element.reps ?? 0));

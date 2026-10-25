@@ -20,6 +20,7 @@ enum GTSetKind {
 @JsonEnum()
 enum GTSetParameters {
   repsWeight,
+  repsNegWeight,
   timeWeight,
   freeBodyReps,
   time,
@@ -32,9 +33,12 @@ enum GTSetParameters {
 
   bool get hasReps =>
       this == GTSetParameters.repsWeight ||
+      this == GTSetParameters.repsNegWeight ||
       this == GTSetParameters.freeBodyReps;
   bool get hasWeight =>
-      this == GTSetParameters.repsWeight || this == GTSetParameters.timeWeight;
+      this == GTSetParameters.repsWeight ||
+      this == GTSetParameters.repsNegWeight ||
+      this == GTSetParameters.timeWeight;
   bool get hasTime =>
       this == GTSetParameters.timeWeight || this == GTSetParameters.time;
   bool get hasDistance => this == GTSetParameters.distance;
@@ -85,6 +89,7 @@ class GTSet {
   }) {
     switch (parameters) {
       case GTSetParameters.repsWeight:
+      case GTSetParameters.repsNegWeight:
         return reps != null && weight != null;
       case GTSetParameters.timeWeight:
         return time != null && weight != null;
@@ -105,6 +110,7 @@ class GTSet {
   }) {
     switch (parameters) {
       case GTSetParameters.repsWeight:
+      case GTSetParameters.repsNegWeight:
         return GTSet(kind: kind, parameters: parameters, reps: 0, weight: 0);
       case GTSetParameters.timeWeight:
         return GTSet(
@@ -127,6 +133,17 @@ class GTSet {
   factory GTSet.fromJson(Map<String, dynamic> json) => _$GTSetFromJson(json);
 
   Map<String, dynamic> toJson() => _$GTSetToJson(this);
+
+  /// Weight used for display and calculations; stored input stays unchanged.
+  double get effectiveWeight {
+    final value = weight ?? 0;
+    return parameters == GTSetParameters.repsNegWeight && value != 0
+        ? -value
+        : value;
+  }
+
+  /// Contribution to volume; completion is handled by the caller.
+  double get liftedWeight => effectiveWeight * (reps ?? 1);
 
   /// Calculates the one-rep max for this set
   ///

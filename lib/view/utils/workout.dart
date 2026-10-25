@@ -288,8 +288,7 @@ class _WorkoutExerciseEditorState extends State<WorkoutExerciseEditor> {
                           ),
                     ),
                   ),
-                  if (widget.exercise.parameters.isSetless &&
-                      !widget.isCreating) ...[
+                  if (!widget.isCreating) ...[
                     const SizedBox(width: 8),
                     IconButton(
                       onPressed: () =>
@@ -595,6 +594,7 @@ class _WorkoutExerciseSetEditorState
   List<Widget> get fields => [
     if ([
       GTSetParameters.repsWeight,
+      GTSetParameters.repsNegWeight,
       GTSetParameters.timeWeight,
     ].contains(widget.set.parameters))
       weightField,
@@ -605,6 +605,7 @@ class _WorkoutExerciseSetEditorState
       timeField,
     if ([
       GTSetParameters.repsWeight,
+      GTSetParameters.repsNegWeight,
       GTSetParameters.freeBodyReps,
     ].contains(widget.set.parameters))
       repsField,

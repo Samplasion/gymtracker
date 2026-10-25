@@ -179,6 +179,7 @@ class TranslationsIt with BaseTranslations<AppLocale, Translations> implements T
 	@override late final Translations$legacyWorkoutRecovery$it legacyWorkoutRecovery = Translations$legacyWorkoutRecovery$it._(_root);
 	@override late final Translations$friendsList$it friendsList = Translations$friendsList$it._(_root);
 	@override late final Translations$social$it social = Translations$social$it._(_root);
+	@override late final Translations$hydration$it hydration = Translations$hydration$it._(_root);
 }
 
 // Path: progression
@@ -818,6 +819,7 @@ class Translations$food$it implements Translations$food$en {
 		'montanicAcid': 'Acido montanico',
 		'nervonicAcid': 'Acido nervonico',
 		'transFat': 'Acidi grassi trans',
+		'water': 'Acqua',
 	};
 	@override Map<String, String> get nutrimentUnits => {
 		'kcal': 'kcal',
@@ -1287,6 +1289,7 @@ class Translations$food$it implements Translations$food$en {
 	@override late final Translations$food$categoryFoods$it categoryFoods = Translations$food$categoryFoods$it._(_root);
 	@override late final Translations$food$permission$it permission = Translations$food$permission$it._(_root);
 	@override late final Translations$food$datePicker$it datePicker = Translations$food$datePicker$it._(_root);
+	@override late final Translations$food$catalog$it catalog = Translations$food$catalog$it._(_root);
 }
 
 // Path: equipment
@@ -1795,6 +1798,51 @@ class Translations$social$it implements Translations$social$en {
 	@override String get push => 'Notifiche push';
 	@override String get pushDescription => 'Richieste, interazioni, achievement e segnalazioni';
 	@override String get pushDisabled => 'Push non configurate su questo dispositivo';
+}
+
+// Path: hydration
+class Translations$hydration$it implements Translations$hydration$en {
+	Translations$hydration$it._(this._root);
+
+	final TranslationsIt _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Acqua';
+	@override String get drinking => 'Acqua bevuta';
+	@override String get food => 'Dagli alimenti';
+	@override String get add => 'Aggiungi acqua';
+	@override String get custom => 'Quantità personalizzata';
+	@override String get amount => 'Quantità (ml)';
+	@override String get time => 'Orario';
+	@override String get goal => 'Obiettivo giornaliero (ml)';
+	@override String get setGoal => 'Imposta obiettivo';
+	@override String get noGoal => 'Nessun obiettivo impostato';
+	@override String get optionalGoal => 'Lascia vuoto per rimuovere l’obiettivo';
+	@override String get save => 'Salva';
+	@override String get cancel => 'Annulla';
+	@override String get delete => 'Elimina';
+	@override String get edit => 'Modifica';
+	@override String get invalid => 'Inserisci una quantità positiva valida';
+	@override String get future => 'Scegli un orario nel passato';
+	@override String get connect => 'Collega a Salute';
+	@override String get disconnect => 'Disattiva invio a Salute';
+	@override String get disabled => 'Invio a Salute disattivato';
+	@override String get synced => 'Acqua sincronizzata con Salute';
+	@override String get pending => 'Invio a Salute in attesa: controlla i permessi e riprova';
+	@override String get unavailable => 'Servizio Salute non disponibile';
+	@override String get syncing => 'Invio a Salute…';
+	@override String get empty => 'Nessuna acqua bevuta registrata';
+	@override String get error => 'Impossibile salvare. Riprova.';
+	@override String get natural => 'Acqua naturale';
+	@override String get sparkling => 'Acqua frizzante';
+	@override String get cucumber => 'Cetriolo con buccia, crudo';
+	@override String get tomato => 'Pomodoro rosso, crudo';
+	@override String get watermelon => 'Anguria, cruda';
+	@override String get apple => 'Mela con buccia, cruda';
+	@override String get source => 'Fonte: USDA SR Legacy';
+	@override String get waterPer100 => 'Acqua (ml per 100 g/ml)';
+	@override String get history => 'Cronologia acqua';
+	@override String get permissionDenied => 'L’acqua viene salvata nel diario. Per aggiungerla anche a Salute, consenti l’accesso da Impostazioni → Autorizzazioni.';
 }
 
 // Path: set.kindShort
@@ -2922,7 +2970,7 @@ class Translations$food$searchBar$it implements Translations$food$searchBar$en {
 	final TranslationsIt _root; // ignore: unused_field
 
 	// Translations
-	@override String get hint => 'Cerca cronologia o OpenFoodFacts…';
+	@override String get hint => 'Cerca cronologia o catalogo alimenti…';
 	@override String noResults({required Object query}) => 'Nessun riscontro per "${query}".';
 	@override String get noHistory => 'Cronologia vuota';
 }
@@ -3096,6 +3144,50 @@ class Translations$food$datePicker$it implements Translations$food$datePicker$en
 
 	// Translations
 	@override String get today => 'Oggi';
+}
+
+// Path: food.catalog
+class Translations$food$catalog$it implements Translations$food$catalog$en {
+	Translations$food$catalog$it._(this._root);
+
+	final TranslationsIt _root; // ignore: unused_field
+
+	// Translations
+	@override String get submitAlso => 'Invia anche al catalogo';
+	@override String get publicNotice => 'Il contributo diventa pubblico e rimane disponibile anche dopo la cancellazione del tuo account.';
+	@override String get loginToSubmit => 'Accedi per inviare alimenti al catalogo. Il salvataggio nel diario rimane disponibile.';
+	@override String get queueFailed => 'Alimento pronto per il diario, ma non è stato possibile accodare l’invio al catalogo.';
+	@override String get submissions => 'Invii al catalogo';
+	@override String get noSubmissions => 'Non hai ancora richiesto invii al catalogo.';
+	@override String get loadFailed => 'Impossibile caricare gli invii.';
+	@override String get retry => 'Riprova invio';
+	@override String get cancel => 'Annulla';
+	@override String get report => 'Segnala alimento';
+	@override String get loginToReport => 'Accedi per segnalare un alimento.';
+	@override String get details => 'Dettagli (facoltativi)';
+	@override String get detailsRequired => 'Specifica il motivo della segnalazione.';
+	@override String get sendReport => 'Invia segnalazione';
+	@override String get reportSent => 'Segnalazione inviata.';
+	@override String get reportFailed => 'Invio non riuscito. Riprova più tardi.';
+	@override Map<String, String> get reasons => {
+		'spam': 'Spam',
+		'inappropriate': 'Contenuto non opportuno per Gym Bro',
+		'nutrition': 'Valori nutrizionali sbagliati',
+		'product': 'Informazioni sul prodotto o barcode sbagliate',
+		'duplicate': 'Alimento duplicato',
+		'other': 'Altro',
+	};
+	@override Map<String, String> get statuses => {
+		'pending': 'In attesa di invio; riprova automaticamente',
+		'sending': 'Invio in corso',
+		'failed': 'Invio non riuscito: controlla i dati e riprova',
+		'published': 'Pubblicato nel catalogo',
+		'duplicate': 'Già presente nel catalogo',
+		'correction': 'Correzione inviata per revisione',
+		'unavailable': 'Voce non disponibile per la pubblicazione',
+		'cancelled': 'Invio annullato',
+		'cancelled_unknown': 'Tentativi annullati; un invio precedente potrebbe essere già stato ricevuto',
+	};
 }
 
 // Path: equipment.none
@@ -4528,8 +4620,8 @@ class Translations$library$cardio$exercises$it implements Translations$library$c
 	// Translations
 	@override String get aerobics => 'Aerobica';
 	@override String get biking => 'Bicicletta';
-	@override String get ergometer => 'Ergometro';
-	@override String get ergometerHorizontal => 'Ergometro (orizzontale)';
+	@override String get ergometer => 'Cyclette verticale';
+	@override String get ergometerHorizontal => 'Cyclette orizzontale';
 	@override String get pilates => 'Pilates';
 	@override String get running => 'Corsa';
 	@override String get treadmill => 'Tapis roulant';
@@ -4547,21 +4639,23 @@ class Translations$library$chest$exercises$it implements Translations$library$ch
 	final TranslationsIt _root; // ignore: unused_field
 
 	// Translations
+	@override String get inclineMachineChestPress => 'Chest press inclinata alla macchina';
+	@override String get midHeightCableFly => 'Croci ai cavi all’altezza del petto';
 	@override String get barbellBenchPressFlat => 'Panca piana (bilanciere)';
-	@override String get barbellBenchPressIncline => 'Panca inclinata (bilanciere, in avanti)';
-	@override String get barbellBenchPressDecline => 'Panca inclinata (bilanciere, all\'indietro)';
+	@override String get barbellBenchPressIncline => 'Panca inclinata (bilanciere)';
+	@override String get barbellBenchPressDecline => 'Panca declinata (bilanciere)';
 	@override String get dumbbellBenchPressFlat => 'Panca piana (manubri)';
-	@override String get dumbbellBenchPressIncline => 'Panca inclinata (manubri, in avanti)';
-	@override String get dumbbellBenchPressDecline => 'Panca inclinata (manubri, all\'indietro)';
+	@override String get dumbbellBenchPressIncline => 'Panca inclinata (manubri)';
+	@override String get dumbbellBenchPressDecline => 'Panca declinata (manubri)';
 	@override String get smithMachineBenchPressFlat => 'Panca piana (Multipower)';
-	@override String get smithMachineBenchPressIncline => 'Panca inclinata (Multipower, in avanti)';
-	@override String get smithMachineBenchPressDecline => 'Panca inclinata (Multipower, all\'indietro)';
+	@override String get smithMachineBenchPressIncline => 'Panca inclinata (Multipower)';
+	@override String get smithMachineBenchPressDecline => 'Panca declinata (Multipower)';
 	@override String get cableBenchPressFlat => 'Panca piana (cavi)';
-	@override String get cableBenchPressIncline => 'Panca inclinata (cavi, in avanti)';
-	@override String get cableBenchPressDecline => 'Panca inclinata (cavi, all\'indietro)';
-	@override String get butterflyMachine => 'Butterfly machine';
-	@override String get dumbbellHexPress => 'Hex Press (manubri)';
-	@override String get smithMachineHexPress => 'Hex Press al Multipower';
+	@override String get cableBenchPressIncline => 'Panca inclinata (cavi)';
+	@override String get cableBenchPressDecline => 'Panca declinata (cavi)';
+	@override String get butterflyMachine => 'Croci alla macchina (pec deck)';
+	@override String get dumbbellHexPress => 'Hex press (manubri)';
+	@override String get smithMachineHexPress => 'Hex press al Multipower';
 	@override String get seatedCableChestFlys => 'Croci ai cavi da seduto';
 	@override String get verticalChestPress => 'Chest press (verticale)';
 	@override String get cableFlyCrossovers => 'Croci ai cavi alti';
@@ -4571,7 +4665,7 @@ class Translations$library$chest$exercises$it implements Translations$library$ch
 	@override String get declinePushUps => 'Push-up declinati';
 	@override String get lowCableFly => 'Croci ai cavi bassi';
 	@override String get inclinePushUps => 'Push-up inclinati';
-	@override String get tBarPress => 'Pressa con bilanciere a T';
+	@override String get tBarPress => 'Landmine press';
 	@override String get inclineBenchFlys => 'Croci su panca inclinata';
 	@override String get benchFlys => 'Croci su panca piana';
 }
@@ -4583,6 +4677,9 @@ class Translations$library$biceps$exercises$it implements Translations$library$b
 	final TranslationsIt _root; // ignore: unused_field
 
 	// Translations
+	@override String get behindBodyCableCurl => 'Curl al cavo con braccio dietro al busto';
+	@override String get ropeHammerCurl => 'Hammer curl con corda al cavo';
+	@override String get inclineDumbbellCurl => 'Curl su panca inclinata (manubri)';
 	@override String get barbellBicepsCurl => 'Bicep curl (bilanciere)';
 	@override String get spiderCurls => 'Spider curl';
 	@override String get singleArmCableHammerCurls => 'Hammer curl ai cavi (braccio singolo)';
@@ -4591,7 +4688,7 @@ class Translations$library$biceps$exercises$it implements Translations$library$b
 	@override String get bicepsCurlMachine => 'Bicep curl (macchina)';
 	@override String get hammerCurlDumbbell => 'Hammer curl (manubri)';
 	@override String get concentrationCurl => 'Curl concentrati';
-	@override String get scottCurl => 'Scott curl';
+	@override String get scottCurl => 'Curl alla panca Scott';
 	@override String get dualCableHighCurl => 'Curl ai cavi alti';
 }
 
@@ -4602,22 +4699,30 @@ class Translations$library$abs$exercises$it implements Translations$library$abs$
 	final TranslationsIt _root; // ignore: unused_field
 
 	// Translations
+	@override String get abWheelRollout => 'Ab wheel rollout';
+	@override String get hangingKneeRaise => 'Sollevamento delle ginocchia alla sbarra';
+	@override String get mountainClimber => 'Mountain climber';
+	@override String get highCableWoodchopper => 'Woodchopper al cavo dall’alto';
+	@override String get reverseCrunch => 'Crunch inverso';
+	@override String get cableCrunch => 'Crunch al cavo';
+	@override String get pallofPress => 'Pallof press al cavo';
 	@override String get crunches => 'Crunch';
-	@override String get kneeRaise => 'Sollevamento delle ginocchia';
-	@override String get legRaise => 'Sollevamento delle gambe';
+	@override String get kneeRaise => 'Sollevamento delle ginocchia da sdraiati';
+	@override String get legRaise => 'Sollevamento delle gambe da sdraiati';
 	@override String get crunchMachine => 'Crunch machine';
 	@override String get heelsUpCrunch => 'Crunch (caviglie alzate)';
-	@override String get fullBodyCrunch => 'Full-body crunch';
+	@override String get fullBodyCrunch => 'Crunch doppio';
 	@override String get plank => 'Plank';
 	@override String get hollowBodyHold => 'Hollow body hold';
 	@override String get russianTwist => 'Russian twist';
 	@override String get bicycleCrunches => 'Bicycle crunch';
-	@override String get extendedReverseCrunchWithLegExtension => 'Crunch inverso con leg extension';
+	@override String get extendedReverseCrunchWithLegExtension => 'Crunch inverso con distensione delle gambe';
 	@override String get toeTouches => 'Toe touches';
 	@override String get heelTouches => 'Heel touches';
-	@override String get deadBugHoldCardio => 'Dead bug hold (a tempo)';
-	@override String get deadBugHold => 'Dead bug hold';
-	@override String get hollowBodyHoldBentKnees => 'Bent hollow hold';
+	@override String get deadBugHoldCardio => 'Dead bugs (a tempo)';
+	@override String get deadBugHoldStatic => 'Dead bug hold (statico)';
+	@override String get deadBugHold => 'Dead bugs';
+	@override String get hollowBodyHoldBentKnees => 'Hollow body hold a ginocchia piegate';
 	@override String get obliqueCrunches => 'Crunch obliqui';
 	@override String get legRaiseParallelBars => 'Sollevamento delle gambe alle parallele';
 	@override String get lateralHyperextensions => 'Iperestensioni laterali';
@@ -4630,9 +4735,10 @@ class Translations$library$calves$exercises$it implements Translations$library$c
 	final TranslationsIt _root; // ignore: unused_field
 
 	// Translations
+	@override String get smithMachineCalfRaise => 'Calf raise al Multipower';
 	@override String get calfRaiseStanding => 'Calf raise (in piedi)';
 	@override String get calfRaiseSeated => 'Calf raise (seduti)';
-	@override String get calfPressLegPressMachine => 'Pressa dei polpacci (sulla Leg Press machine)';
+	@override String get calfPressLegPressMachine => 'Calf press alla leg press';
 }
 
 // Path: library.quadriceps.exercises
@@ -4642,15 +4748,23 @@ class Translations$library$quadriceps$exercises$it implements Translations$libra
 	final TranslationsIt _root; // ignore: unused_field
 
 	// Translations
+	@override String get reverseDumbbellLunges => 'Affondi indietro (manubri)';
+	@override String get walkingDumbbellLunges => 'Affondi camminati (manubri)';
+	@override String get lateralDumbbellLunges => 'Affondi laterali (manubrio)';
+	@override String get sumoDumbbellSquat => 'Squat sumo (manubrio)';
+	@override String get singleLegLegPress => 'Leg press a una gamba';
+	@override String get smithMachineSquats => 'Squat al Multipower';
+	@override String get stepUps => 'Step-up (manubri)';
+	@override String get gobletSquats => 'Goblet squat (manubrio)';
 	@override String get squatsBarbell => 'Squat (bilanciere)';
 	@override String get legPress => 'Leg press';
 	@override String get legExtension => 'Leg extension';
 	@override String get smithMachineLunges => 'Affondi al Multipower';
-	@override String get lunges => 'Affondi';
+	@override String get lunges => 'Affondi con manubri';
 	@override String get legPress45deg => 'Leg press (45°)';
 	@override String get frontSquats => 'Squat frontali';
 	@override String get bulgarianSplitSquats => 'Squat bulgari';
-	@override String get bodyweightSquats => 'Squat';
+	@override String get bodyweightSquats => 'Squat a corpo libero';
 	@override String get hackSquats => 'Hack squat';
 }
 
@@ -4661,10 +4775,13 @@ class Translations$library$hamstrings$exercises$it implements Translations$libra
 	final TranslationsIt _root; // ignore: unused_field
 
 	// Translations
+	@override String get singleLegDumbbellRomanianDeadlift => 'Stacco rumeno a una gamba (manubrio)';
+	@override String get legCurlStanding => 'Leg curl in piedi alla macchina';
+	@override String get nordicCurl => 'Nordic curl';
 	@override String get legCurlProne => 'Leg curl (sdraiati)';
 	@override String get legCurlSeated => 'Leg curl (seduti)';
-	@override String get romanianDeadlift => 'Stacchi rumeni';
-	@override String get romanianDeadliftDumbbell => 'Stacchi romeni (manubri)';
+	@override String get romanianDeadlift => 'Stacchi rumeni (bilanciere)';
+	@override String get romanianDeadliftDumbbell => 'Stacchi rumeni (manubri)';
 }
 
 // Path: library.shoulders.exercises
@@ -4674,23 +4791,27 @@ class Translations$library$shoulders$exercises$it implements Translations$librar
 	final TranslationsIt _root; // ignore: unused_field
 
 	// Translations
+	@override String get standingCableReverseFly => 'Croci inverse ai cavi in piedi';
+	@override String get cableFrontRaise => 'Alzate frontali al cavo';
+	@override String get dumbbellShrugs => 'Scrollate con manubri';
+	@override String get facePull => 'Face pull al cavo';
 	@override String get shoulderPressMachine => 'Shoulder press (macchina)';
 	@override String get latRaisesInclinedBench => 'Alzate laterali (panca inclinata)';
 	@override String get latRaisesCable => 'Alzate laterali ai cavi';
 	@override String get latRaisesDualCable => 'Alzate laterali ai cavi (entrambe le braccia)';
 	@override String get reverseFlysInclinedBench => 'Croci inverse (panca inclinata)';
 	@override String get arnoldPress => 'Arnold press';
-	@override String get frontDumbbellRaise => 'Sollevamento frontale dei manubri';
-	@override String get uprightRow => 'Vogatore verticale';
+	@override String get frontDumbbellRaise => 'Alzate frontali con manubri';
+	@override String get uprightRow => 'Tirate al mento';
 	@override String get pikePushUps => 'Pike push-up';
 	@override String get handstandPushUps => 'Flessioni in verticale';
-	@override String get bentOverLateralRaises => 'Alzate laterali al cavo basso con busto a 90°';
-	@override String get shoulderPress => 'Shoulder press';
+	@override String get bentOverLateralRaises => 'Croci inverse al cavo basso con busto flesso';
+	@override String get shoulderPress => 'Shoulder press con manubri';
 	@override String get latRaisesDumbbells => 'Alzate laterali (manubri)';
 	@override String get deltoidMachine => 'Deltoid machine';
 	@override String get shrugsBarbell => 'Scrollate con bilanciere davanti';
-	@override String get militaryPressSmithMachine => 'Lento avanti al multipower';
-	@override String get reverseButterfly => 'Reverse butterfly machine';
+	@override String get militaryPressSmithMachine => 'Lento avanti al Multipower';
+	@override String get reverseButterfly => 'Croci inverse alla macchina';
 	@override String get militaryPressBarbell => 'Lento avanti con bilanciere';
 }
 
@@ -4701,23 +4822,28 @@ class Translations$library$back$exercises$it implements Translations$library$bac
 	final TranslationsIt _root; // ignore: unused_field
 
 	// Translations
+	@override String get chestSupportedDumbbellRow => 'Rematore con petto appoggiato su panca (manubri)';
+	@override String get singleArmCableRow => 'Rematore a un braccio al cavo';
+	@override String get ringRow => 'Rematore agli anelli';
+	@override String get dumbbellPullover => 'Pullover con manubrio';
+	@override String get machineAssistedPullUps => 'Trazioni assistite alla macchina';
 	@override String get hyperExtensions => 'Iperestensioni';
 	@override String get weightedHyperExtensions => 'Iperestensioni con peso';
-	@override String get barbellRow => 'Rematore col bilanciere';
+	@override String get barbellRow => 'Rematore con bilanciere';
 	@override String get triangleBarLatPulldowns => 'Lat machine (con triangolo)';
 	@override String get underhandGripLatPulldowns => 'Lat machine (presa supina)';
 	@override String get latPulldowns => 'Lat machine';
 	@override String get cableSeatedRowTriangleBar => 'Rematore al cavo (con triangolo)';
 	@override String get straightArmCablePushdown => 'Pulldown a braccia dritte';
 	@override String get deadlift => 'Stacchi';
-	@override String get pullUps => 'Pull-up';
+	@override String get pullUps => 'Trazioni alla sbarra (presa prona)';
 	@override String get tBarRow => 'Rematore con bilanciere a T';
-	@override String get rowMachine => 'Vogatore (macchinario)';
+	@override String get rowMachine => 'Rematore alla macchina da seduto';
 	@override String get latPulldownsNarrowGrip => 'Lat machine (presa stretta)';
 	@override String get latPulldownsWideGrip => 'Lat machine (presa larga)';
-	@override String get tBarRowWideProneGrip => 'Rematore T-Bar machine (presa larga prona)';
+	@override String get tBarRowWideProneGrip => 'Rematore alla T-bar machine (presa larga prona)';
 	@override String get dumbbellRow => 'Rematore con manubrio';
-	@override String get chinUps => 'Chin up';
+	@override String get chinUps => 'Trazioni alla sbarra (presa supina)';
 }
 
 // Path: library.back.exercise
@@ -4738,15 +4864,18 @@ class Translations$library$triceps$exercises$it implements Translations$library$
 	final TranslationsIt _root; // ignore: unused_field
 
 	// Translations
+	@override String get barTricepsPushdown => 'Pushdown dei tricipiti con barra';
+	@override String get singleArmTricepsPushdown => 'Pushdown dei tricipiti a un braccio';
+	@override String get machineAssistedDips => 'Dip assistiti alla macchina';
 	@override String get dips => 'Dip';
-	@override String get overheadRopeTricepExtension => 'Estensione dei tricipiti sopra la testa';
+	@override String get overheadRopeTricepExtension => 'Estensioni dei tricipiti sopra la testa con corda al cavo';
 	@override String get tricepsRopePushdown => 'Pushdown dei tricipiti con corda';
 	@override String get tricepKickbacks => 'Kickback per i tricipiti';
-	@override String get skullCrushers => 'Skull Crushers';
+	@override String get skullCrushers => 'French press su panca (skull crusher)';
 	@override String get benchDips => 'Dip alla panca';
 	@override String get diamondPushUps => 'Flessioni a diamante';
 	@override String get tricepsMachine => 'Triceps machine';
-	@override String get overheadTricepExtension => 'Estensione verticale dei tricipiti con manubri';
+	@override String get overheadTricepExtension => 'Estensioni dei tricipiti sopra la testa con manubri';
 }
 
 // Path: library.hips.exercises
@@ -4756,7 +4885,7 @@ class Translations$library$hips$exercises$it implements Translations$library$hip
 	final TranslationsIt _root; // ignore: unused_field
 
 	// Translations
-	@override String get hipAdduction => 'Hip adduction';
+	@override String get hipAdduction => 'Adduzioni dell’anca alla macchina';
 }
 
 // Path: library.forearms.exercises
@@ -4767,15 +4896,16 @@ class Translations$library$forearms$exercises$it implements Translations$library
 
 	// Translations
 	@override String get wristCurlsBarbell => 'Curl dei polsi (bilanciere)';
-	@override String get reverseWristCurlsBarbell => 'Curl dei polsi rovesciato (bilanciere)';
+	@override String get reverseWristCurlsBarbell => 'Estensioni dei polsi (bilanciere)';
 	@override String get wristCurlsDumbbell => 'Curl dei polsi (manubri)';
-	@override String get reverseWristCurlsDumbbell => 'Curl dei polsi rovesciato (manubri)';
+	@override String get reverseWristCurlsDumbbell => 'Estensioni dei polsi (manubri)';
 	@override String get wristRoller => 'Wrist roller';
-	@override String get farmerWalk => 'Farmer Walk';
+	@override String get farmerWalk => 'Farmer walk';
 	@override String get platePinch => 'Plate pinch';
 	@override String get reverseCurls => 'Reverse curl (bilanciere)';
 	@override String get reverseCurlsDumbbell => 'Reverse curl (manubri)';
-	@override String get cableSingleArmReverseCurl => 'Reverse curl a braccio singolo al cavo';
+	@override String get dumbbellSingleArmReverseCurl => 'Reverse curl a un braccio (manubrio)';
+	@override String get singleArmCableReverseCurl => 'Reverse curl a un braccio al cavo';
 }
 
 // Path: library.obliques.exercises
@@ -4806,9 +4936,18 @@ class Translations$library$glutes$exercises$it implements Translations$library$g
 	final TranslationsIt _root; // ignore: unused_field
 
 	// Translations
+	@override String get singleLegGluteBridge => 'Ponte per i glutei a una gamba';
+	@override String get smithMachineHipThrust => 'Hip thrust al Multipower';
+	@override String get bandHipAbduction => 'Abduzioni dell’anca con elastico';
+	@override String get lateralBandWalk => 'Camminata laterale con elastico';
+	@override String get quadrupedGluteKickback => 'Slanci posteriori in quadrupedia';
+	@override String get kettlebellSwing => 'Kettlebell swing';
+	@override String get cableGluteKickback => 'Slanci posteriori al cavo';
+	@override String get machineGluteKickback => 'Slanci posteriori alla macchina';
+	@override String get cableHipAbduction => 'Abduzioni dell’anca al cavo';
 	@override String get gluteBridge => 'Ponte per i glutei';
-	@override String get hipThrust => 'Hip thrust';
-	@override String get hipAbduction => 'Hip abduction';
+	@override String get hipThrust => 'Hip thrust alla macchina';
+	@override String get hipAbduction => 'Abduzioni dell’anca alla macchina';
 	@override String get clamshells => 'Clamshell per i glutei';
 	@override String get hipThrustBarbell => 'Hip thrust (bilanciere)';
 }
@@ -5168,8 +5307,8 @@ class Translations$food$search$error$it implements Translations$food$search$erro
 	final TranslationsIt _root; // ignore: unused_field
 
 	// Translations
-	@override String get serverError => 'Il server OpenFoodFacts non ha fornito una risposta. Riprova più tardi.';
-	@override String get generic => 'Si è verificato un errore durante la comunicazione con il server OpenFoodFacts. Riprova più tardi.';
+	@override String get serverError => 'Impossibile contattare il catalogo alimenti. Riprova più tardi.';
+	@override String get generic => 'Impossibile contattare il catalogo alimenti. Riprova più tardi.';
 }
 
 // Path: food.barcodeReader.scanResult
@@ -5548,6 +5687,7 @@ class Translations$exercise$editor$fields$parameters$it implements Translations$
 	// Translations
 	@override String get label => 'Parametri';
 	@override Map<String, String> get values => {
+		'repsNegWeight': 'Peso negativo e ripetizioni',
 		'repsWeight': 'Peso e ripetizioni',
 		'timeWeight': 'Peso e tempo',
 		'time': 'Tempo',
@@ -6702,6 +6842,7 @@ extension on TranslationsIt {
 			'exercise.editor.fields.title.errors.empty' => 'Il nome non dev\'essere vuoto.',
 			'exercise.editor.fields.title.errors.invalid' => 'Un esercizio con questo nome esiste già.',
 			'exercise.editor.fields.parameters.label' => 'Parametri',
+			'exercise.editor.fields.parameters.values.repsNegWeight' => 'Peso negativo e ripetizioni',
 			'exercise.editor.fields.parameters.values.repsWeight' => 'Peso e ripetizioni',
 			'exercise.editor.fields.parameters.values.timeWeight' => 'Peso e tempo',
 			'exercise.editor.fields.parameters.values.time' => 'Tempo',
@@ -7105,8 +7246,8 @@ extension on TranslationsIt {
 			'library.cardio.name' => 'Cardio',
 			'library.cardio.exercises.aerobics' => 'Aerobica',
 			'library.cardio.exercises.biking' => 'Bicicletta',
-			'library.cardio.exercises.ergometer' => 'Ergometro',
-			'library.cardio.exercises.ergometerHorizontal' => 'Ergometro (orizzontale)',
+			'library.cardio.exercises.ergometer' => 'Cyclette verticale',
+			'library.cardio.exercises.ergometerHorizontal' => 'Cyclette orizzontale',
 			'library.cardio.exercises.pilates' => 'Pilates',
 			'library.cardio.exercises.running' => 'Corsa',
 			'library.cardio.exercises.treadmill' => 'Tapis roulant',
@@ -7116,21 +7257,23 @@ extension on TranslationsIt {
 			'library.cardio.exercises.bicycleCrunchesCardio' => 'Bicycle crunch a tempo',
 			'library.cardio.exercises.crunchesTimed' => 'Crunch a tempo',
 			'library.chest.name' => 'Petto',
+			'library.chest.exercises.inclineMachineChestPress' => 'Chest press inclinata alla macchina',
+			'library.chest.exercises.midHeightCableFly' => 'Croci ai cavi all’altezza del petto',
 			'library.chest.exercises.barbellBenchPressFlat' => 'Panca piana (bilanciere)',
-			'library.chest.exercises.barbellBenchPressIncline' => 'Panca inclinata (bilanciere, in avanti)',
-			'library.chest.exercises.barbellBenchPressDecline' => 'Panca inclinata (bilanciere, all\'indietro)',
+			'library.chest.exercises.barbellBenchPressIncline' => 'Panca inclinata (bilanciere)',
+			'library.chest.exercises.barbellBenchPressDecline' => 'Panca declinata (bilanciere)',
 			'library.chest.exercises.dumbbellBenchPressFlat' => 'Panca piana (manubri)',
-			'library.chest.exercises.dumbbellBenchPressIncline' => 'Panca inclinata (manubri, in avanti)',
-			'library.chest.exercises.dumbbellBenchPressDecline' => 'Panca inclinata (manubri, all\'indietro)',
+			'library.chest.exercises.dumbbellBenchPressIncline' => 'Panca inclinata (manubri)',
+			'library.chest.exercises.dumbbellBenchPressDecline' => 'Panca declinata (manubri)',
 			'library.chest.exercises.smithMachineBenchPressFlat' => 'Panca piana (Multipower)',
-			'library.chest.exercises.smithMachineBenchPressIncline' => 'Panca inclinata (Multipower, in avanti)',
-			'library.chest.exercises.smithMachineBenchPressDecline' => 'Panca inclinata (Multipower, all\'indietro)',
+			'library.chest.exercises.smithMachineBenchPressIncline' => 'Panca inclinata (Multipower)',
+			'library.chest.exercises.smithMachineBenchPressDecline' => 'Panca declinata (Multipower)',
 			'library.chest.exercises.cableBenchPressFlat' => 'Panca piana (cavi)',
-			'library.chest.exercises.cableBenchPressIncline' => 'Panca inclinata (cavi, in avanti)',
-			'library.chest.exercises.cableBenchPressDecline' => 'Panca inclinata (cavi, all\'indietro)',
-			'library.chest.exercises.butterflyMachine' => 'Butterfly machine',
-			'library.chest.exercises.dumbbellHexPress' => 'Hex Press (manubri)',
-			'library.chest.exercises.smithMachineHexPress' => 'Hex Press al Multipower',
+			'library.chest.exercises.cableBenchPressIncline' => 'Panca inclinata (cavi)',
+			'library.chest.exercises.cableBenchPressDecline' => 'Panca declinata (cavi)',
+			'library.chest.exercises.butterflyMachine' => 'Croci alla macchina (pec deck)',
+			'library.chest.exercises.dumbbellHexPress' => 'Hex press (manubri)',
+			'library.chest.exercises.smithMachineHexPress' => 'Hex press al Multipower',
 			'library.chest.exercises.seatedCableChestFlys' => 'Croci ai cavi da seduto',
 			'library.chest.exercises.verticalChestPress' => 'Chest press (verticale)',
 			'library.chest.exercises.cableFlyCrossovers' => 'Croci ai cavi alti',
@@ -7140,134 +7283,179 @@ extension on TranslationsIt {
 			'library.chest.exercises.declinePushUps' => 'Push-up declinati',
 			'library.chest.exercises.lowCableFly' => 'Croci ai cavi bassi',
 			'library.chest.exercises.inclinePushUps' => 'Push-up inclinati',
-			'library.chest.exercises.tBarPress' => 'Pressa con bilanciere a T',
+			'library.chest.exercises.tBarPress' => 'Landmine press',
 			'library.chest.exercises.inclineBenchFlys' => 'Croci su panca inclinata',
 			'library.chest.exercises.benchFlys' => 'Croci su panca piana',
 			'library.biceps.name' => 'Bicipiti',
+			'library.biceps.exercises.behindBodyCableCurl' => 'Curl al cavo con braccio dietro al busto',
+			'library.biceps.exercises.ropeHammerCurl' => 'Hammer curl con corda al cavo',
+			'library.biceps.exercises.inclineDumbbellCurl' => 'Curl su panca inclinata (manubri)',
 			'library.biceps.exercises.barbellBicepsCurl' => 'Bicep curl (bilanciere)',
 			'library.biceps.exercises.spiderCurls' => 'Spider curl',
 			'library.biceps.exercises.singleArmCableHammerCurls' => 'Hammer curl ai cavi (braccio singolo)',
 			'library.biceps.exercises.cableBicepsCurl' => 'Bicep curl (cavi)',
 			'library.biceps.exercises.dumbbellBicepsCurl' => 'Bicep curl (manubri)',
+			_ => null,
+		} ?? switch (path) {
 			'library.biceps.exercises.bicepsCurlMachine' => 'Bicep curl (macchina)',
 			'library.biceps.exercises.hammerCurlDumbbell' => 'Hammer curl (manubri)',
 			'library.biceps.exercises.concentrationCurl' => 'Curl concentrati',
-			'library.biceps.exercises.scottCurl' => 'Scott curl',
+			'library.biceps.exercises.scottCurl' => 'Curl alla panca Scott',
 			'library.biceps.exercises.dualCableHighCurl' => 'Curl ai cavi alti',
 			'library.abs.name' => 'Addominali',
-			_ => null,
-		} ?? switch (path) {
+			'library.abs.exercises.abWheelRollout' => 'Ab wheel rollout',
+			'library.abs.exercises.hangingKneeRaise' => 'Sollevamento delle ginocchia alla sbarra',
+			'library.abs.exercises.mountainClimber' => 'Mountain climber',
+			'library.abs.exercises.highCableWoodchopper' => 'Woodchopper al cavo dall’alto',
+			'library.abs.exercises.reverseCrunch' => 'Crunch inverso',
+			'library.abs.exercises.cableCrunch' => 'Crunch al cavo',
+			'library.abs.exercises.pallofPress' => 'Pallof press al cavo',
 			'library.abs.exercises.crunches' => 'Crunch',
-			'library.abs.exercises.kneeRaise' => 'Sollevamento delle ginocchia',
-			'library.abs.exercises.legRaise' => 'Sollevamento delle gambe',
+			'library.abs.exercises.kneeRaise' => 'Sollevamento delle ginocchia da sdraiati',
+			'library.abs.exercises.legRaise' => 'Sollevamento delle gambe da sdraiati',
 			'library.abs.exercises.crunchMachine' => 'Crunch machine',
 			'library.abs.exercises.heelsUpCrunch' => 'Crunch (caviglie alzate)',
-			'library.abs.exercises.fullBodyCrunch' => 'Full-body crunch',
+			'library.abs.exercises.fullBodyCrunch' => 'Crunch doppio',
 			'library.abs.exercises.plank' => 'Plank',
 			'library.abs.exercises.hollowBodyHold' => 'Hollow body hold',
 			'library.abs.exercises.russianTwist' => 'Russian twist',
 			'library.abs.exercises.bicycleCrunches' => 'Bicycle crunch',
-			'library.abs.exercises.extendedReverseCrunchWithLegExtension' => 'Crunch inverso con leg extension',
+			'library.abs.exercises.extendedReverseCrunchWithLegExtension' => 'Crunch inverso con distensione delle gambe',
 			'library.abs.exercises.toeTouches' => 'Toe touches',
 			'library.abs.exercises.heelTouches' => 'Heel touches',
-			'library.abs.exercises.deadBugHoldCardio' => 'Dead bug hold (a tempo)',
-			'library.abs.exercises.deadBugHold' => 'Dead bug hold',
-			'library.abs.exercises.hollowBodyHoldBentKnees' => 'Bent hollow hold',
+			'library.abs.exercises.deadBugHoldCardio' => 'Dead bugs (a tempo)',
+			'library.abs.exercises.deadBugHoldStatic' => 'Dead bug hold (statico)',
+			'library.abs.exercises.deadBugHold' => 'Dead bugs',
+			'library.abs.exercises.hollowBodyHoldBentKnees' => 'Hollow body hold a ginocchia piegate',
 			'library.abs.exercises.obliqueCrunches' => 'Crunch obliqui',
 			'library.abs.exercises.legRaiseParallelBars' => 'Sollevamento delle gambe alle parallele',
 			'library.abs.exercises.lateralHyperextensions' => 'Iperestensioni laterali',
 			'library.calves.name' => 'Polpacci',
+			'library.calves.exercises.smithMachineCalfRaise' => 'Calf raise al Multipower',
 			'library.calves.exercises.calfRaiseStanding' => 'Calf raise (in piedi)',
 			'library.calves.exercises.calfRaiseSeated' => 'Calf raise (seduti)',
-			'library.calves.exercises.calfPressLegPressMachine' => 'Pressa dei polpacci (sulla Leg Press machine)',
+			'library.calves.exercises.calfPressLegPressMachine' => 'Calf press alla leg press',
 			'library.quadriceps.name' => 'Quadricipiti',
+			'library.quadriceps.exercises.reverseDumbbellLunges' => 'Affondi indietro (manubri)',
+			'library.quadriceps.exercises.walkingDumbbellLunges' => 'Affondi camminati (manubri)',
+			'library.quadriceps.exercises.lateralDumbbellLunges' => 'Affondi laterali (manubrio)',
+			'library.quadriceps.exercises.sumoDumbbellSquat' => 'Squat sumo (manubrio)',
+			'library.quadriceps.exercises.singleLegLegPress' => 'Leg press a una gamba',
+			'library.quadriceps.exercises.smithMachineSquats' => 'Squat al Multipower',
+			'library.quadriceps.exercises.stepUps' => 'Step-up (manubri)',
+			'library.quadriceps.exercises.gobletSquats' => 'Goblet squat (manubrio)',
 			'library.quadriceps.exercises.squatsBarbell' => 'Squat (bilanciere)',
 			'library.quadriceps.exercises.legPress' => 'Leg press',
 			'library.quadriceps.exercises.legExtension' => 'Leg extension',
 			'library.quadriceps.exercises.smithMachineLunges' => 'Affondi al Multipower',
-			'library.quadriceps.exercises.lunges' => 'Affondi',
+			'library.quadriceps.exercises.lunges' => 'Affondi con manubri',
 			'library.quadriceps.exercises.legPress45deg' => 'Leg press (45°)',
 			'library.quadriceps.exercises.frontSquats' => 'Squat frontali',
 			'library.quadriceps.exercises.bulgarianSplitSquats' => 'Squat bulgari',
-			'library.quadriceps.exercises.bodyweightSquats' => 'Squat',
+			'library.quadriceps.exercises.bodyweightSquats' => 'Squat a corpo libero',
 			'library.quadriceps.exercises.hackSquats' => 'Hack squat',
 			'library.hamstrings.name' => 'Posteriori della coscia',
+			'library.hamstrings.exercises.singleLegDumbbellRomanianDeadlift' => 'Stacco rumeno a una gamba (manubrio)',
+			'library.hamstrings.exercises.legCurlStanding' => 'Leg curl in piedi alla macchina',
+			'library.hamstrings.exercises.nordicCurl' => 'Nordic curl',
 			'library.hamstrings.exercises.legCurlProne' => 'Leg curl (sdraiati)',
 			'library.hamstrings.exercises.legCurlSeated' => 'Leg curl (seduti)',
-			'library.hamstrings.exercises.romanianDeadlift' => 'Stacchi rumeni',
-			'library.hamstrings.exercises.romanianDeadliftDumbbell' => 'Stacchi romeni (manubri)',
+			'library.hamstrings.exercises.romanianDeadlift' => 'Stacchi rumeni (bilanciere)',
+			'library.hamstrings.exercises.romanianDeadliftDumbbell' => 'Stacchi rumeni (manubri)',
 			'library.shoulders.name' => 'Spalle',
+			'library.shoulders.exercises.standingCableReverseFly' => 'Croci inverse ai cavi in piedi',
+			'library.shoulders.exercises.cableFrontRaise' => 'Alzate frontali al cavo',
+			'library.shoulders.exercises.dumbbellShrugs' => 'Scrollate con manubri',
+			'library.shoulders.exercises.facePull' => 'Face pull al cavo',
 			'library.shoulders.exercises.shoulderPressMachine' => 'Shoulder press (macchina)',
 			'library.shoulders.exercises.latRaisesInclinedBench' => 'Alzate laterali (panca inclinata)',
 			'library.shoulders.exercises.latRaisesCable' => 'Alzate laterali ai cavi',
 			'library.shoulders.exercises.latRaisesDualCable' => 'Alzate laterali ai cavi (entrambe le braccia)',
 			'library.shoulders.exercises.reverseFlysInclinedBench' => 'Croci inverse (panca inclinata)',
 			'library.shoulders.exercises.arnoldPress' => 'Arnold press',
-			'library.shoulders.exercises.frontDumbbellRaise' => 'Sollevamento frontale dei manubri',
-			'library.shoulders.exercises.uprightRow' => 'Vogatore verticale',
+			'library.shoulders.exercises.frontDumbbellRaise' => 'Alzate frontali con manubri',
+			'library.shoulders.exercises.uprightRow' => 'Tirate al mento',
 			'library.shoulders.exercises.pikePushUps' => 'Pike push-up',
 			'library.shoulders.exercises.handstandPushUps' => 'Flessioni in verticale',
-			'library.shoulders.exercises.bentOverLateralRaises' => 'Alzate laterali al cavo basso con busto a 90°',
-			'library.shoulders.exercises.shoulderPress' => 'Shoulder press',
+			'library.shoulders.exercises.bentOverLateralRaises' => 'Croci inverse al cavo basso con busto flesso',
+			'library.shoulders.exercises.shoulderPress' => 'Shoulder press con manubri',
 			'library.shoulders.exercises.latRaisesDumbbells' => 'Alzate laterali (manubri)',
 			'library.shoulders.exercises.deltoidMachine' => 'Deltoid machine',
 			'library.shoulders.exercises.shrugsBarbell' => 'Scrollate con bilanciere davanti',
-			'library.shoulders.exercises.militaryPressSmithMachine' => 'Lento avanti al multipower',
-			'library.shoulders.exercises.reverseButterfly' => 'Reverse butterfly machine',
+			'library.shoulders.exercises.militaryPressSmithMachine' => 'Lento avanti al Multipower',
+			'library.shoulders.exercises.reverseButterfly' => 'Croci inverse alla macchina',
 			'library.shoulders.exercises.militaryPressBarbell' => 'Lento avanti con bilanciere',
 			'library.back.name' => 'Schiena',
+			'library.back.exercises.chestSupportedDumbbellRow' => 'Rematore con petto appoggiato su panca (manubri)',
+			'library.back.exercises.singleArmCableRow' => 'Rematore a un braccio al cavo',
+			'library.back.exercises.ringRow' => 'Rematore agli anelli',
+			'library.back.exercises.dumbbellPullover' => 'Pullover con manubrio',
+			'library.back.exercises.machineAssistedPullUps' => 'Trazioni assistite alla macchina',
 			'library.back.exercises.hyperExtensions' => 'Iperestensioni',
 			'library.back.exercises.weightedHyperExtensions' => 'Iperestensioni con peso',
-			'library.back.exercises.barbellRow' => 'Rematore col bilanciere',
+			'library.back.exercises.barbellRow' => 'Rematore con bilanciere',
 			'library.back.exercises.triangleBarLatPulldowns' => 'Lat machine (con triangolo)',
 			'library.back.exercises.underhandGripLatPulldowns' => 'Lat machine (presa supina)',
 			'library.back.exercises.latPulldowns' => 'Lat machine',
 			'library.back.exercises.cableSeatedRowTriangleBar' => 'Rematore al cavo (con triangolo)',
 			'library.back.exercises.straightArmCablePushdown' => 'Pulldown a braccia dritte',
 			'library.back.exercises.deadlift' => 'Stacchi',
-			'library.back.exercises.pullUps' => 'Pull-up',
+			'library.back.exercises.pullUps' => 'Trazioni alla sbarra (presa prona)',
 			'library.back.exercises.tBarRow' => 'Rematore con bilanciere a T',
-			'library.back.exercises.rowMachine' => 'Vogatore (macchinario)',
+			'library.back.exercises.rowMachine' => 'Rematore alla macchina da seduto',
 			'library.back.exercises.latPulldownsNarrowGrip' => 'Lat machine (presa stretta)',
 			'library.back.exercises.latPulldownsWideGrip' => 'Lat machine (presa larga)',
-			'library.back.exercises.tBarRowWideProneGrip' => 'Rematore T-Bar machine (presa larga prona)',
+			'library.back.exercises.tBarRowWideProneGrip' => 'Rematore alla T-bar machine (presa larga prona)',
 			'library.back.exercises.dumbbellRow' => 'Rematore con manubrio',
-			'library.back.exercises.chinUps' => 'Chin up',
+			'library.back.exercises.chinUps' => 'Trazioni alla sbarra (presa supina)',
 			'library.back.exercise.dualLowRowMachine' => 'Dual low row machine',
 			'library.back.exercise.dualHighRowMachine' => 'Dual high row machine',
 			'library.triceps.name' => 'Tricipiti',
+			'library.triceps.exercises.barTricepsPushdown' => 'Pushdown dei tricipiti con barra',
+			'library.triceps.exercises.singleArmTricepsPushdown' => 'Pushdown dei tricipiti a un braccio',
+			'library.triceps.exercises.machineAssistedDips' => 'Dip assistiti alla macchina',
 			'library.triceps.exercises.dips' => 'Dip',
-			'library.triceps.exercises.overheadRopeTricepExtension' => 'Estensione dei tricipiti sopra la testa',
+			'library.triceps.exercises.overheadRopeTricepExtension' => 'Estensioni dei tricipiti sopra la testa con corda al cavo',
 			'library.triceps.exercises.tricepsRopePushdown' => 'Pushdown dei tricipiti con corda',
 			'library.triceps.exercises.tricepKickbacks' => 'Kickback per i tricipiti',
-			'library.triceps.exercises.skullCrushers' => 'Skull Crushers',
+			'library.triceps.exercises.skullCrushers' => 'French press su panca (skull crusher)',
 			'library.triceps.exercises.benchDips' => 'Dip alla panca',
 			'library.triceps.exercises.diamondPushUps' => 'Flessioni a diamante',
 			'library.triceps.exercises.tricepsMachine' => 'Triceps machine',
-			'library.triceps.exercises.overheadTricepExtension' => 'Estensione verticale dei tricipiti con manubri',
+			'library.triceps.exercises.overheadTricepExtension' => 'Estensioni dei tricipiti sopra la testa con manubri',
 			'library.custom.name' => 'Esercizi personalizzati',
 			'library.newCustomExercise' => 'Nuovo esercizio',
 			'library.hips.name' => 'Anche',
-			'library.hips.exercises.hipAdduction' => 'Hip adduction',
+			'library.hips.exercises.hipAdduction' => 'Adduzioni dell’anca alla macchina',
 			'library.forearms.name' => 'Avambracci',
 			'library.forearms.exercises.wristCurlsBarbell' => 'Curl dei polsi (bilanciere)',
-			'library.forearms.exercises.reverseWristCurlsBarbell' => 'Curl dei polsi rovesciato (bilanciere)',
+			'library.forearms.exercises.reverseWristCurlsBarbell' => 'Estensioni dei polsi (bilanciere)',
 			'library.forearms.exercises.wristCurlsDumbbell' => 'Curl dei polsi (manubri)',
-			'library.forearms.exercises.reverseWristCurlsDumbbell' => 'Curl dei polsi rovesciato (manubri)',
+			'library.forearms.exercises.reverseWristCurlsDumbbell' => 'Estensioni dei polsi (manubri)',
 			'library.forearms.exercises.wristRoller' => 'Wrist roller',
-			'library.forearms.exercises.farmerWalk' => 'Farmer Walk',
+			'library.forearms.exercises.farmerWalk' => 'Farmer walk',
 			'library.forearms.exercises.platePinch' => 'Plate pinch',
 			'library.forearms.exercises.reverseCurls' => 'Reverse curl (bilanciere)',
 			'library.forearms.exercises.reverseCurlsDumbbell' => 'Reverse curl (manubri)',
-			'library.forearms.exercises.cableSingleArmReverseCurl' => 'Reverse curl a braccio singolo al cavo',
+			'library.forearms.exercises.dumbbellSingleArmReverseCurl' => 'Reverse curl a un braccio (manubrio)',
+			'library.forearms.exercises.singleArmCableReverseCurl' => 'Reverse curl a un braccio al cavo',
 			'library.obliques.exercises.sidewaysPlank' => 'Plank laterale',
 			'library.obliques.exercises.sidewaysPlankReachThrough' => 'Plank laterale con rotazione',
 			'library.other.name' => 'Altro',
 			'library.other.exercises.stretching' => 'Stretching',
 			'library.glutes.name' => 'Glutei',
+			'library.glutes.exercises.singleLegGluteBridge' => 'Ponte per i glutei a una gamba',
+			'library.glutes.exercises.smithMachineHipThrust' => 'Hip thrust al Multipower',
+			'library.glutes.exercises.bandHipAbduction' => 'Abduzioni dell’anca con elastico',
+			'library.glutes.exercises.lateralBandWalk' => 'Camminata laterale con elastico',
+			'library.glutes.exercises.quadrupedGluteKickback' => 'Slanci posteriori in quadrupedia',
+			'library.glutes.exercises.kettlebellSwing' => 'Kettlebell swing',
+			'library.glutes.exercises.cableGluteKickback' => 'Slanci posteriori al cavo',
+			'library.glutes.exercises.machineGluteKickback' => 'Slanci posteriori alla macchina',
+			'library.glutes.exercises.cableHipAbduction' => 'Abduzioni dell’anca al cavo',
 			'library.glutes.exercises.gluteBridge' => 'Ponte per i glutei',
-			'library.glutes.exercises.hipThrust' => 'Hip thrust',
-			'library.glutes.exercises.hipAbduction' => 'Hip abduction',
+			'library.glutes.exercises.hipThrust' => 'Hip thrust alla macchina',
+			'library.glutes.exercises.hipAbduction' => 'Abduzioni dell’anca alla macchina',
 			'library.glutes.exercises.clamshells' => 'Clamshell per i glutei',
 			'library.glutes.exercises.hipThrustBarbell' => 'Hip thrust (bilanciere)',
 			'infobox.label' => 'Note',
@@ -7432,7 +7620,7 @@ extension on TranslationsIt {
 			'food.home.remainingCal' => 'Rimanenti',
 			'food.home.goal' => 'Obiettivo',
 			'food.home.overCal' => 'Superate',
-			'food.searchBar.hint' => 'Cerca cronologia o OpenFoodFacts…',
+			'food.searchBar.hint' => 'Cerca cronologia o catalogo alimenti…',
 			'food.searchBar.noResults' => ({required Object query}) => 'Nessun riscontro per "${query}".',
 			'food.searchBar.noHistory' => 'Cronologia vuota',
 			'food.nutriments.calories' => 'Calorie',
@@ -7512,6 +7700,7 @@ extension on TranslationsIt {
 			'food.nutriments.montanicAcid' => 'Acido montanico',
 			'food.nutriments.nervonicAcid' => 'Acido nervonico',
 			'food.nutriments.transFat' => 'Acidi grassi trans',
+			'food.nutriments.water' => 'Acqua',
 			'food.nutrimentUnits.kcal' => 'kcal',
 			'food.nutrimentUnits.kj' => 'kJ',
 			'food.nutrimentUnits.g' => 'g',
@@ -7542,8 +7731,8 @@ extension on TranslationsIt {
 			'food.edit.copyToToday' => 'Copia a oggi',
 			'food.addCustom.title' => 'Aggiungi personalizzato',
 			'food.search.title' => 'Risultati',
-			'food.search.error.serverError' => 'Il server OpenFoodFacts non ha fornito una risposta. Riprova più tardi.',
-			'food.search.error.generic' => 'Si è verificato un errore durante la comunicazione con il server OpenFoodFacts. Riprova più tardi.',
+			'food.search.error.serverError' => 'Impossibile contattare il catalogo alimenti. Riprova più tardi.',
+			'food.search.error.generic' => 'Impossibile contattare il catalogo alimenti. Riprova più tardi.',
 			'food.barcodeReader.title' => 'Scansiona codice a barre',
 			'food.barcodeReader.scanResult.noProductFound.text' => ({required Object barcode}) => 'Nessun prodotto è stato trovato con codice ${barcode}.',
 			'food.barcodeReader.scanResult.noProductFound.title' => 'Nessun prodotto',
@@ -7620,6 +7809,8 @@ extension on TranslationsIt {
 			'food.languages.el' => 'Greco',
 			'food.languages.en' => 'Inglese',
 			'food.languages.eo' => 'Esperanto',
+			_ => null,
+		} ?? switch (path) {
 			'food.languages.es' => 'Spagnolo',
 			'food.languages.et' => 'Estone',
 			'food.languages.eu' => 'Basco',
@@ -7669,8 +7860,6 @@ extension on TranslationsIt {
 			'food.languages.kr' => 'Kanuri',
 			'food.languages.ks' => 'Kashmiri',
 			'food.languages.ku' => 'Curdo',
-			_ => null,
-		} ?? switch (path) {
 			'food.languages.kv' => 'Komi',
 			'food.languages.kw' => 'Cornico',
 			'food.languages.ky' => 'Kirghiso',
@@ -8043,6 +8232,37 @@ extension on TranslationsIt {
 			'food.permission.openSettings' => 'Apri le impostazioni dell\'app',
 			'food.permission.error' => 'Si è verificato un errore.',
 			'food.datePicker.today' => 'Oggi',
+			'food.catalog.submitAlso' => 'Invia anche al catalogo',
+			'food.catalog.publicNotice' => 'Il contributo diventa pubblico e rimane disponibile anche dopo la cancellazione del tuo account.',
+			'food.catalog.loginToSubmit' => 'Accedi per inviare alimenti al catalogo. Il salvataggio nel diario rimane disponibile.',
+			'food.catalog.queueFailed' => 'Alimento pronto per il diario, ma non è stato possibile accodare l’invio al catalogo.',
+			'food.catalog.submissions' => 'Invii al catalogo',
+			'food.catalog.noSubmissions' => 'Non hai ancora richiesto invii al catalogo.',
+			'food.catalog.loadFailed' => 'Impossibile caricare gli invii.',
+			'food.catalog.retry' => 'Riprova invio',
+			'food.catalog.cancel' => 'Annulla',
+			'food.catalog.report' => 'Segnala alimento',
+			'food.catalog.loginToReport' => 'Accedi per segnalare un alimento.',
+			'food.catalog.details' => 'Dettagli (facoltativi)',
+			'food.catalog.detailsRequired' => 'Specifica il motivo della segnalazione.',
+			'food.catalog.sendReport' => 'Invia segnalazione',
+			'food.catalog.reportSent' => 'Segnalazione inviata.',
+			'food.catalog.reportFailed' => 'Invio non riuscito. Riprova più tardi.',
+			'food.catalog.reasons.spam' => 'Spam',
+			'food.catalog.reasons.inappropriate' => 'Contenuto non opportuno per Gym Bro',
+			'food.catalog.reasons.nutrition' => 'Valori nutrizionali sbagliati',
+			'food.catalog.reasons.product' => 'Informazioni sul prodotto o barcode sbagliate',
+			'food.catalog.reasons.duplicate' => 'Alimento duplicato',
+			'food.catalog.reasons.other' => 'Altro',
+			'food.catalog.statuses.pending' => 'In attesa di invio; riprova automaticamente',
+			'food.catalog.statuses.sending' => 'Invio in corso',
+			'food.catalog.statuses.failed' => 'Invio non riuscito: controlla i dati e riprova',
+			'food.catalog.statuses.published' => 'Pubblicato nel catalogo',
+			'food.catalog.statuses.duplicate' => 'Già presente nel catalogo',
+			'food.catalog.statuses.correction' => 'Correzione inviata per revisione',
+			'food.catalog.statuses.unavailable' => 'Voce non disponibile per la pubblicazione',
+			'food.catalog.statuses.cancelled' => 'Invio annullato',
+			'food.catalog.statuses.cancelled_unknown' => 'Tentativi annullati; un invio precedente potrebbe essere già stato ricevuto',
 			'equipment.none.long' => 'Corpo libero',
 			'equipment.none.short' => 'C. libero',
 			'equipment.barbell.long' => 'Bilanciere',
@@ -8103,6 +8323,8 @@ extension on TranslationsIt {
 			'achievements.cycleChampion.description.k1.km' => 'Pedala per un totale di 100 km',
 			'achievements.cycleChampion.description.k1.mi' => ({required Object p0}) => 'Pedala per un totale di 100 km (${p0})',
 			'achievements.cycleChampion.description.k2.km' => 'Pedala per un totale di 500 km',
+			_ => null,
+		} ?? switch (path) {
 			'achievements.cycleChampion.description.k2.mi' => ({required Object p0}) => 'Pedala per un totale di 500 km (${p0})',
 			'achievements.cycleChampion.description.k3.km' => 'Pedala per un totale di 1000 km',
 			'achievements.cycleChampion.description.k3.mi' => ({required Object p0}) => 'Pedala per un totale di 1000 km (${p0})',
@@ -8183,8 +8405,6 @@ extension on TranslationsIt {
 			'login.verifyEmail.title' => 'Ti abbiamo inviato un\'email di verifica',
 			'login.verifyEmail.done' => 'Ho verificato la mia email',
 			'login.verifyEmail.description' => 'Controlla la tua casella di posta elettronica per confermare la tua email. Dopodiché tocca il pulsante sottostante per accedere.',
-			_ => null,
-		} ?? switch (path) {
 			'login.verifyEmail.notVerified' => 'Verifica il tuo indirizzo email e riprova.',
 			'sync.conflict.title' => 'Trovati dati contrastanti',
 			'sync.conflict.message' => 'Premei OK per scaricare i dati nel cloud e sovrascrivere i dati locali. Premi Annulla per cancellare i dati nel cloud e caricare i dati locali.',
@@ -8358,6 +8578,42 @@ extension on TranslationsIt {
 			'social.push' => 'Notifiche push',
 			'social.pushDescription' => 'Richieste, interazioni, achievement e segnalazioni',
 			'social.pushDisabled' => 'Push non configurate su questo dispositivo',
+			'hydration.title' => 'Acqua',
+			'hydration.drinking' => 'Acqua bevuta',
+			'hydration.food' => 'Dagli alimenti',
+			'hydration.add' => 'Aggiungi acqua',
+			'hydration.custom' => 'Quantità personalizzata',
+			'hydration.amount' => 'Quantità (ml)',
+			'hydration.time' => 'Orario',
+			'hydration.goal' => 'Obiettivo giornaliero (ml)',
+			'hydration.setGoal' => 'Imposta obiettivo',
+			'hydration.noGoal' => 'Nessun obiettivo impostato',
+			'hydration.optionalGoal' => 'Lascia vuoto per rimuovere l’obiettivo',
+			'hydration.save' => 'Salva',
+			'hydration.cancel' => 'Annulla',
+			'hydration.delete' => 'Elimina',
+			'hydration.edit' => 'Modifica',
+			'hydration.invalid' => 'Inserisci una quantità positiva valida',
+			'hydration.future' => 'Scegli un orario nel passato',
+			'hydration.connect' => 'Collega a Salute',
+			'hydration.disconnect' => 'Disattiva invio a Salute',
+			'hydration.disabled' => 'Invio a Salute disattivato',
+			'hydration.synced' => 'Acqua sincronizzata con Salute',
+			'hydration.pending' => 'Invio a Salute in attesa: controlla i permessi e riprova',
+			'hydration.unavailable' => 'Servizio Salute non disponibile',
+			'hydration.syncing' => 'Invio a Salute…',
+			'hydration.empty' => 'Nessuna acqua bevuta registrata',
+			'hydration.error' => 'Impossibile salvare. Riprova.',
+			'hydration.natural' => 'Acqua naturale',
+			'hydration.sparkling' => 'Acqua frizzante',
+			'hydration.cucumber' => 'Cetriolo con buccia, crudo',
+			'hydration.tomato' => 'Pomodoro rosso, crudo',
+			'hydration.watermelon' => 'Anguria, cruda',
+			'hydration.apple' => 'Mela con buccia, cruda',
+			'hydration.source' => 'Fonte: USDA SR Legacy',
+			'hydration.waterPer100' => 'Acqua (ml per 100 g/ml)',
+			'hydration.history' => 'Cronologia acqua',
+			'hydration.permissionDenied' => 'L’acqua viene salvata nel diario. Per aggiungerla anche a Salute, consenti l’accesso da Impostazioni → Autorizzazioni.',
 			_ => null,
 		};
 	}

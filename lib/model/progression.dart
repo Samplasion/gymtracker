@@ -104,6 +104,7 @@ class ExerciseProgression {
 
   /// Only the planned working sets count. Extra sets do not change the goal.
   bool reached(Exercise exercise) {
+    if (exercise.parameters == GTSetParameters.repsNegWeight) return false;
     final working = exercise.sets
         .where((set) => set.kind == GTSetKind.normal)
         .toList();

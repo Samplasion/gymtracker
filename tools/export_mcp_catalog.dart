@@ -8,6 +8,8 @@ import 'package:gymtracker/data/exercises.dart';
 import 'package:gymtracker/i18n/strings.g.dart';
 import 'package:gymtracker/model/exercise.dart';
 
+import 'mcp_catalog_migrations.dart';
+
 void main() {
   test('export authoritative MCP catalog', () {
     final translations = {
@@ -55,17 +57,25 @@ VALUES (true, '$version', \$catalog\$${jsonEncode(exercises)}\$catalog\$::jsonb)
 ON CONFLICT (singleton) DO UPDATE
 SET version = EXCLUDED.version, exercises = EXCLUDED.exercises;
 ''';
-    const sqlPath = String.fromEnvironment(
-      'CATALOG_MIGRATION',
-      defaultValue: 'supabase/migrations/20261023101000_mcp_catalog.sql',
-    );
+    const sqlPath = String.fromEnvironment('CATALOG_MIGRATION');
     if (const bool.fromEnvironment('CHECK_CATALOG')) {
       expect(file.readAsStringSync(), json, reason: 'Regenerate MCP catalog');
-      expect(File(sqlPath).readAsStringSync(), sql);
+      final migration = sqlPath.isEmpty
+          ? latestCatalogMigration()
+          : File(sqlPath);
+      expect(
+        migration.readAsStringSync(),
+        sql,
+        reason: 'Regenerate MCP catalog migration',
+      );
     } else {
+      final migration = File(
+        sqlPath.isEmpty ? catalogMigrationPath(DateTime.now()) : sqlPath,
+      );
+      writeCatalogMigration(migration, sql);
       file.parent.createSync(recursive: true);
       file.writeAsStringSync(json);
-      File(sqlPath).writeAsStringSync(sql);
+      stdout.writeln('Catalog migration: ${migration.path}');
     }
   });
 }

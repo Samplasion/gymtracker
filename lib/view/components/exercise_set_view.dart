@@ -49,12 +49,13 @@ class _ExerciseSetViewState extends ConsumerState<ExerciseSetView> {
   List<Widget> get fields => [
     if ([
       GTSetParameters.repsWeight,
+      GTSetParameters.repsNegWeight,
       GTSetParameters.timeWeight,
     ].contains(widget.set.parameters))
       Expanded(
         child: Text(
           Weights.convert(
-            value: widget.set.weight!,
+            value: widget.set.effectiveWeight,
             from: widget.weightUnit,
             to: settingsController.weightUnit,
           ).getUserFacingWeight(context.t, settingsController.weightUnit),
@@ -74,6 +75,7 @@ class _ExerciseSetViewState extends ConsumerState<ExerciseSetView> {
       ),
     if ([
       GTSetParameters.repsWeight,
+      GTSetParameters.repsNegWeight,
       GTSetParameters.freeBodyReps,
     ].contains(widget.set.parameters))
       Expanded(

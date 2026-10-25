@@ -668,7 +668,7 @@ class WorkoutStatsRow extends ConsumerWidget {
           ),
           label: context.t.exerciseList.stats.time,
         ),
-        if (workout.liftedWeight > 0)
+        if (workout.liftedWeight != 0)
           Stats(
             value:
                 Weights.convert(

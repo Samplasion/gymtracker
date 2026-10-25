@@ -32,7 +32,8 @@ class ExerciseProgressionPanel extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    if (exercise.parameters.isSetless ||
+    if (exercise.parameters == GTSetParameters.repsNegWeight ||
+        exercise.parameters.isSetless ||
         (isCreating && !exercise.parameters.hasReps)) {
       return const SizedBox.shrink();
     }
@@ -73,11 +74,11 @@ class ExerciseProgressionPanel extends ConsumerWidget {
         .where((set) => set.done && set.kind == GTSetKind.normal)
         .map(
           (set) => switch (ex.parameters) {
-            GTSetParameters.repsWeight =>
-              '${unit.stringify(set.weight ?? 0)} × ${set.reps}',
+            GTSetParameters.repsWeight || GTSetParameters.repsNegWeight =>
+              '${unit.stringify(set.effectiveWeight)} × ${set.reps}',
             GTSetParameters.freeBodyReps => '${set.reps}',
             GTSetParameters.timeWeight =>
-              '${unit.stringify(set.weight ?? 0)} × ${set.time?.inSeconds ?? 0}s',
+              '${unit.stringify(set.effectiveWeight)} × ${set.time?.inSeconds ?? 0}s',
             GTSetParameters.time => '${set.time?.inSeconds ?? 0}s',
             GTSetParameters.distance =>
               '${set.distance ?? 0} ${distanceUnit.name}',

@@ -158,7 +158,7 @@ class _WorkoutDoneSheetState extends ConsumerState<WorkoutDoneSheet> {
                       ),
                       subtitle: Text(context.t.me.stats.duration.label),
                     ),
-                    if (workout.liftedWeight > 0)
+                    if (workout.liftedWeight != 0)
                       SpeedDialButton(
                         icon: const Icon(GTIcons.volume),
                         text: Text(

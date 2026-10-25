@@ -1,4 +1,4 @@
-The Bent-Over Cable Lateral Raise is an isolation exercise that targets the rear deltoids (back of the shoulders), with secondary engagement of the upper back muscles such as the rhomboids and trapezius. This exercise helps improve shoulder stability and develop the rear delts, contributing to balanced shoulder development.
+The bent-over cable reverse fly is an isolation exercise that targets the rear deltoids (back of the shoulders), with secondary engagement of the upper back muscles such as the rhomboids and trapezius. This exercise helps improve shoulder stability and develop the rear delts, contributing to balanced shoulder development.
 
 ### Execution
 1. **Starting Position:**

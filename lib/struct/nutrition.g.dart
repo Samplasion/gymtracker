@@ -19,7 +19,7 @@ abstract class _$FoodCWProxy {
 
   Food id(String? id);
 
-  Food isDownloaded(bool isDownloaded);
+  Food downloadedFromOFF(bool downloadedFromOFF);
 
   Food barcode(String? barcode);
 
@@ -43,7 +43,7 @@ abstract class _$FoodCWProxy {
     double amount,
     List<ServingSize> servingSizes,
     String? id,
-    bool isDownloaded,
+    bool downloadedFromOFF,
     String? barcode,
     NutritionUnit unit,
     int pieces,
@@ -79,7 +79,8 @@ class _$FoodCWProxyImpl implements _$FoodCWProxy {
   Food id(String? id) => call(id: id);
 
   @override
-  Food isDownloaded(bool isDownloaded) => call(isDownloaded: isDownloaded);
+  Food downloadedFromOFF(bool downloadedFromOFF) =>
+      call(downloadedFromOFF: downloadedFromOFF);
 
   @override
   Food barcode(String? barcode) => call(barcode: barcode);
@@ -108,7 +109,7 @@ class _$FoodCWProxyImpl implements _$FoodCWProxy {
     Object? amount = const $CopyWithPlaceholder(),
     Object? servingSizes = const $CopyWithPlaceholder(),
     Object? id = const $CopyWithPlaceholder(),
-    Object? isDownloaded = const $CopyWithPlaceholder(),
+    Object? downloadedFromOFF = const $CopyWithPlaceholder(),
     Object? barcode = const $CopyWithPlaceholder(),
     Object? unit = const $CopyWithPlaceholder(),
     Object? pieces = const $CopyWithPlaceholder(),
@@ -142,11 +143,12 @@ class _$FoodCWProxyImpl implements _$FoodCWProxy {
           ? _value.id
           // ignore: cast_nullable_to_non_nullable
           : id as String?,
-      isDownloaded:
-          isDownloaded == const $CopyWithPlaceholder() || isDownloaded == null
-          ? _value.isDownloaded
+      downloadedFromOFF:
+          downloadedFromOFF == const $CopyWithPlaceholder() ||
+              downloadedFromOFF == null
+          ? _value.downloadedFromOFF
           // ignore: cast_nullable_to_non_nullable
-          : isDownloaded as bool,
+          : downloadedFromOFF as bool,
       barcode: barcode == const $CopyWithPlaceholder()
           ? _value.barcode
           // ignore: cast_nullable_to_non_nullable

@@ -17,6 +17,7 @@ class NutritionGoals extends Table implements SyncableTable {
   RealColumn get fat => real()();
   RealColumn get carbs => real()();
   RealColumn get protein => real()();
+  RealColumn get water => real().nullable()();
   @override
   DateTimeColumn get updatedAt => dateTime().withDefault(
     Constant(DateTime.fromMicrosecondsSinceEpoch(0, isUtc: true)),
@@ -35,6 +36,7 @@ class DBNutritionGoal implements Insertable<DBNutritionGoal>, Syncable {
   final double fat;
   final double carbs;
   final double protein;
+  final double? water;
   @override
   final DateTime updatedAt;
   @override
@@ -49,6 +51,7 @@ class DBNutritionGoal implements Insertable<DBNutritionGoal>, Syncable {
     required this.fat,
     required this.carbs,
     required this.protein,
+    this.water,
     required this.updatedAt,
     required this.deleted,
     this.userId,
@@ -64,6 +67,7 @@ class DBNutritionGoal implements Insertable<DBNutritionGoal>, Syncable {
       fat: (json['fat'] as num).toDouble(),
       carbs: (json['carbs'] as num).toDouble(),
       protein: (json['protein'] as num).toDouble(),
+      water: (json['water'] as num?)?.toDouble(),
       updatedAt: DateTime.parse(
         json['updated_at'] as String? ??
             json['updatedAt'] as String? ??
@@ -81,6 +85,7 @@ class DBNutritionGoal implements Insertable<DBNutritionGoal>, Syncable {
     'fat': fat,
     'carbs': carbs,
     'protein': protein,
+    'water': water,
     'updated_at': updatedAt.toUtc().toIso8601String(),
     'deleted': deleted,
     'user_id': userId,
@@ -95,6 +100,7 @@ class DBNutritionGoal implements Insertable<DBNutritionGoal>, Syncable {
       fat: Value(fat),
       carbs: Value(carbs),
       protein: Value(protein),
+      water: Value(water),
       updatedAt: Value(updatedAt),
       deleted: Value(deleted),
       userId: userId == null && nullToAbsent
@@ -112,6 +118,7 @@ class DBNutritionGoal implements Insertable<DBNutritionGoal>, Syncable {
       fat: Value(fat),
       carbs: Value(carbs),
       protein: Value(protein),
+      water: Value(water),
       updatedAt: Value(updatedAt),
       deleted: Value(deleted),
       userId: Value(userId),

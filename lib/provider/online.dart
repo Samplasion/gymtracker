@@ -502,6 +502,12 @@ class Online extends _$Online {
       companionConstructor: BodyMeasurementsCompanion.new,
     );
 
+    _syncManager.registerSyncable<DBWaterLog>(
+      backendTable: 'water_logs',
+      fromJson: DBWaterLog.fromJson,
+      companionConstructor: WaterLogsCompanion.new,
+    );
+
     _syncManager.registerSyncable<DBFood>(
       backendTable: 'foods',
       fromJson: DBFood.fromJson,

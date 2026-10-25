@@ -10,17 +10,26 @@ class ChangeGoalScreen extends ConsumerStatefulWidget {
 class _ChangeGoalScreenState extends ConsumerState<ChangeGoalScreen> {
   final _formKey = GlobalKey<FormState>();
   late final TextEditingController _dailyCaloriesController;
+  late final TextEditingController _dailyWaterController;
+  bool _initialized = false;
   late final TextEditingController _fatPercentageController;
   late final TextEditingController _carbsPercentageController;
   late final TextEditingController _proteinPercentageController;
 
   @override
-  void initState() {
-    super.initState();
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_initialized) return;
+    _initialized = true;
     final oldGoal = ref.read(nutritionGoalForSelectedDateProvider);
     final decimalSep = NumberFormat.decimalPattern(
       Localizations.localeOf(context).languageCode,
     ).symbols.DECIMAL_SEP;
+    _dailyWaterController = TextEditingController(
+      text: oldGoal.dailyWater == null
+          ? ''
+          : stringifyDouble(oldGoal.dailyWater!, decimalSeparator: decimalSep),
+    );
     _dailyCaloriesController = TextEditingController(
       text: stringifyDouble(
         oldGoal.dailyCalories,
@@ -50,6 +59,7 @@ class _ChangeGoalScreenState extends ConsumerState<ChangeGoalScreen> {
   @override
   void dispose() {
     _dailyCaloriesController.dispose();
+    _dailyWaterController.dispose();
     _fatPercentageController.dispose();
     _carbsPercentageController.dispose();
     _proteinPercentageController.dispose();
@@ -77,6 +87,7 @@ class _ChangeGoalScreenState extends ConsumerState<ChangeGoalScreen> {
 
   @override
   Widget build(BuildContext context) {
+    ref.watch(nutritionGoalForSelectedDateProvider);
     return Scaffold(
       appBar: AppBar(
         title: Text(context.t.food.nutritionGoals.change.title),
@@ -273,6 +284,24 @@ class _ChangeGoalScreenState extends ConsumerState<ChangeGoalScreen> {
                   _proteinPercentageController.text.tryParseDouble() ?? 0,
                 ),
                 const SizedBox(height: 16),
+                TextFormField(
+                  controller: _dailyWaterController,
+                  keyboardType: const TextInputType.numberWithOptions(
+                    decimal: true,
+                  ),
+                  decoration: InputDecoration(
+                    labelText: context.t.hydration.goal,
+                    helperText: context.t.hydration.optionalGoal,
+                  ),
+                  validator: (text) {
+                    if (text == null || text.trim().isEmpty) return null;
+                    final amount = text.tryParseDouble();
+                    return amount == null || !amount.isFinite || amount <= 0
+                        ? context.t.hydration.invalid
+                        : null;
+                  },
+                ),
+                const SizedBox(height: 16),
                 _buildEffectText(),
               ],
             ),
@@ -295,6 +324,7 @@ class _ChangeGoalScreenState extends ConsumerState<ChangeGoalScreen> {
       final proteinPercentage = _proteinPercentageController.text.parseDouble();
 
       final newGoal = NutritionGoal.fromPercentages(
+        dailyWater: _dailyWaterController.text.tryParseDouble(),
         dailyCalories: dailyCalories,
         fatPercentage: fatPercentage,
         carbsPercentage: carbsPercentage,
@@ -382,6 +412,11 @@ class GoalHistoryView extends ConsumerWidget {
                           text:
                               "$formattedDate \u2013 ${context.t.food.nutritionGoals.history.tapToView}",
                         ),
+                        if (goal.dailyWater != null)
+                          TextSpan(
+                            text:
+                                '\n${context.t.hydration.title}: ${NutritionUnit.MILLI_L.formatAmount(goal.dailyWater!, context: context)}',
+                          ),
                         const TextSpan(text: "\n"),
                         TextSpan(
                           text: context.t.food.nutritionGoals.history.macros(

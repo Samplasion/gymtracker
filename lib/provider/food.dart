@@ -5,21 +5,17 @@ import 'package:collection/collection.dart';
 import 'package:flutter/widgets.dart';
 import 'package:fuzzywuzzy/fuzzywuzzy.dart';
 import 'package:gymtracker/controller/achievements_controller.dart';
-import 'package:gymtracker/controller/settings_controller.dart';
 import 'package:gymtracker/model/achievements.dart';
 import 'package:gymtracker/model/native.dart';
 import 'package:gymtracker/provider/bootstrap.dart';
 import 'package:gymtracker/repository/foods.dart';
 import 'package:gymtracker/service/logger.dart';
 import 'package:gymtracker/service/native.dart';
-import 'package:gymtracker/service/version.dart';
 import 'package:gymtracker/struct/date_sequence.dart';
 import 'package:gymtracker/struct/nutrition.dart';
 import 'package:gymtracker/struct/optional.dart';
-import 'package:gymtracker/struct/request_cache.dart';
 import 'package:gymtracker/utils/extensions.dart';
 import 'package:intl/intl.dart';
-import 'package:openfoodfacts/openfoodfacts.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:relative_time/relative_time.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -27,8 +23,6 @@ import 'package:scrollable_clean_calendar/utils/extensions.dart';
 import 'package:uuid/uuid.dart';
 
 part 'food.g.dart';
-
-const kNameBrandSeparator = "\n\n\n\n~\n\n\n\n";
 
 typedef FoodPermissions = ({bool camera, bool gallery});
 
@@ -155,6 +149,8 @@ class FoodNotifier extends _$FoodNotifier {
     Food food, {
     NutritionCategory? category,
   }) async {
+    final trigger = ref.read(achievementTriggerProvider);
+    final backup = ref.read(backupSchedulerProvider);
     await ref
         .read(foodsRepositoryProvider)
         .addFood(
@@ -167,42 +163,54 @@ class FoodNotifier extends _$FoodNotifier {
           ),
         );
     // TODO: Move this stuff to the Event system so that we don't have to call the Coordinator directly
-    ref.read(achievementTriggerProvider)(AchievementTrigger.food);
-    ref.read(backupSchedulerProvider).schedule();
+    trigger(AchievementTrigger.food);
+    backup.schedule();
   }
 
   Future<void> removeFood(DateTime dateTime, Food food) async {
+    final trigger = ref.read(achievementTriggerProvider);
+    final backup = ref.read(backupSchedulerProvider);
     await ref
         .read(foodsRepositoryProvider)
         .removeFood(DateTagged(date: dateTime.startOfDay, value: food));
-    ref.read(achievementTriggerProvider)(AchievementTrigger.food);
-    ref.read(backupSchedulerProvider).schedule();
+    trigger(AchievementTrigger.food);
+    backup.schedule();
   }
 
   Future<void> updateFood(DateTime dateTime, Food updatedFood) async {
     final dayFoods = ref.read(foodsForDateProvider(dateTime));
     if (!dayFoods.any((element) => element.id == updatedFood.id)) return;
 
+    final backup = ref.read(backupSchedulerProvider);
     await ref
         .read(foodsRepositoryProvider)
         .updateFood(DateTagged(date: dateTime, value: updatedFood));
-    ref.read(backupSchedulerProvider).schedule();
+    backup.schedule();
   }
 
   Future<void> copyToToday(Food food) async {
     final today = DateTime.now().startOfDay;
-    await addFood(today, food);
-    ref.read(foodSelectedDateProvider.notifier).setDate(today);
+    final keepAlive = ref.keepAlive();
+    try {
+      await addFood(today, food);
+      if (ref.mounted) {
+        ref.read(foodSelectedDateProvider.notifier).setDate(today);
+      }
+    } finally {
+      keepAlive.close();
+    }
   }
 
   Future<void> addFavorite(Food food) async {
+    final backup = ref.read(backupSchedulerProvider);
     await ref.read(foodsRepositoryProvider).addFavoriteFood(food);
-    ref.read(backupSchedulerProvider).schedule();
+    backup.schedule();
   }
 
   Future<void> removeFavorite(Food food) async {
+    final backup = ref.read(backupSchedulerProvider);
     await ref.read(foodsRepositoryProvider).removeFavoriteFood(food);
-    ref.read(backupSchedulerProvider).schedule();
+    backup.schedule();
   }
 
   Future<void> addCustomBarcodeFood(
@@ -271,12 +279,13 @@ class NutritionGoalNotifier extends _$NutritionGoalNotifier {
 
   Future<void> saveNewGoal(NutritionGoal newGoal) async {
     final selectedDate = ref.read(foodSelectedDateProvider);
+    final backup = ref.read(backupSchedulerProvider);
     await ref
         .read(foodsRepositoryProvider)
         .addNutritionGoal(
           TaggedNutritionGoal(date: selectedDate.startOfDay, value: newGoal),
         );
-    ref.read(backupSchedulerProvider).schedule();
+    backup.schedule();
   }
 }
 
@@ -355,18 +364,20 @@ class NutritionCategoryNotifier extends _$NutritionCategoryNotifier {
         categoriesSeq[date.startOfDay].containsKey(category.name)) {
       throw StateError("Category already exists");
     }
+    final backup = ref.read(backupSchedulerProvider);
     await ref
         .read(foodsRepositoryProvider)
         .addNutritionCategory(date.startOfDay, category);
-    ref.read(backupSchedulerProvider).schedule();
+    backup.schedule();
   }
 
   Future<void> removeCategory(NutritionCategory category) async {
     final date = ref.read(foodSelectedDateProvider);
+    final backup = ref.read(backupSchedulerProvider);
     await ref
         .read(foodsRepositoryProvider)
         .removeNutritionCategory(date.startOfDay, category.name);
-    ref.read(backupSchedulerProvider).schedule();
+    backup.schedule();
   }
 
   Future<void> updateCategory(
@@ -374,10 +385,11 @@ class NutritionCategoryNotifier extends _$NutritionCategoryNotifier {
     NutritionCategory category,
   ) async {
     final date = ref.read(foodSelectedDateProvider);
+    final backup = ref.read(backupSchedulerProvider);
     await ref
         .read(foodsRepositoryProvider)
         .updateNutritionCategory(date.startOfDay, oldName, category);
-    ref.read(backupSchedulerProvider).schedule();
+    backup.schedule();
   }
 }
 
@@ -443,175 +455,13 @@ bool showFoodPermissionsSettingsTile(Ref ref) {
 }
 
 // -----------------------------------------------------------------------------
-// OpenFoodFacts & Search
-// -----------------------------------------------------------------------------
-
-final _offSearch = RequestCache<String, List<VagueFood>>(
-  const Duration(minutes: 5),
-);
-final _offBarcode = RequestCache<String, VagueFood?>(const Duration(hours: 24));
-
-@riverpod
-Future<List<VagueFood>> searchOpenFoodFacts(Ref ref, String query) async {
-  if (query.trim().isEmpty) return [];
-  globalLogger.d("Initiating OFF search for $query");
-  final settingsController = ref.watch(settingsControllerProvider);
-  final key =
-      '${query.trim().toLowerCase()}/${settingsController.nutritionLanguage}/${settingsController.nutritionCountry}';
-  return _offSearch.get(key, () async {
-    final result = await searchOFF(
-      query.trim(),
-      language: settingsController.nutritionLanguage.offApiLanguage,
-      country: settingsController.nutritionCountry.offApiCountry,
-    );
-    final foods = (result.products ?? [])
-        .map(
-          (p) => _offFoodToGTFood(
-            p,
-            language: settingsController.nutritionLanguage.offApiLanguage,
-          ),
-        )
-        .toList();
-    globalLogger.d("Found ${foods.length} foods for $query");
-    return foods;
-  });
-}
-
-/// Helper function to search OFF using API v1
-Future<SearchResult> searchOFF(
-  String query, {
-  required OpenFoodFactsLanguage language,
-  required OpenFoodFactsCountry? country,
-}) async {
-  final uri = Uri.https("search.openfoodfacts.org", "/search", {
-    "q": "$query lang:\"${language.code}\"",
-    "langs": language.code,
-    "page_size": "50",
-    "page": "1",
-  });
-
-  globalLogger.d("Searching OpenFoodFacts with URI: $uri");
-  // final res = await Dio().getUri(uri);
-  // final data = res.data as Map<String, dynamic>;
-
-  // if (data.containsKey("hits")) {
-  //   final products = data["hits"] as List<dynamic>;
-  //   for (final product in products) {
-  //     if (product is Map<String, dynamic>) {
-  //       product.remove("packagings");
-  //     }
-  //   }
-  // }
-
-  // return SearchResult.fromJson(data);
-  ProductSearchQueryConfiguration configuration =
-      ProductSearchQueryConfiguration(
-        language: language,
-        country: country,
-        parametersList: <Parameter>[
-          SearchTerms(terms: [query]),
-        ],
-        version: .v3,
-      );
-
-  SearchResult result = await OpenFoodAPIClient.searchProducts(
-    null,
-    configuration,
-  );
-
-  return result;
-}
-
-VagueFood _offFoodToGTFood(
-  Product product, {
-  String? barcode,
-  required OpenFoodFactsLanguage language,
-}) {
-  final nameBrand = product
-      .getProductNameBrand(language, kNameBrandSeparator)
-      .split(kNameBrandSeparator);
-  final name = nameBrand.first;
-  final brand = nameBrand.length > 1 && nameBrand.last.trim().isNotEmpty
-      ? nameBrand.last
-      : null;
-
-  final liquidRegex = RegExp(r"(?:\d|\b)(ml|l|cl)\b");
-  final isLikelyToBeLiquid =
-      (product.quantity != null &&
-          product.quantity!.toLowerCase().contains(liquidRegex)) ||
-      (product.servingSize != null &&
-          product.servingSize!.toLowerCase().contains(liquidRegex));
-  final unit = isLikelyToBeLiquid ? NutritionUnit.MILLI_L : NutritionUnit.G;
-
-  return VagueFood(
-    name: name,
-    brand: brand,
-    servingSizes: [
-      if (product.packagingQuantity != null && product.packagingQuantity! > 0)
-        ServingSize(
-          amount: product.packagingQuantity!,
-          name:
-              product.packagingTextInLanguages?[language] ??
-              (product.packagingTextInLanguages?.values.toList() as List?)
-                  ?.getAt(0),
-        ),
-      if (product.servingQuantity != null)
-        ServingSize(
-          amount: product.servingQuantity!,
-          name: product.servingSize,
-        ),
-    ],
-    nutritionalValuesPer100g: NutritionValues.fromOFFNutrimentsPer100g(
-      product.nutriments ?? Nutriments.empty(),
-    ),
-    isDownloaded: true,
-    unit: unit,
-    barcode: barcode ?? product.barcode,
-  );
-}
-
-@riverpod
-Future<VagueFood?> searchOpenFoodFactsByBarcode(Ref ref, String barcode) async {
-  globalLogger.d("Searching OpenFoodFacts for barcode: $barcode");
-  final settingsController = ref.watch(settingsControllerProvider);
-  final key =
-      '$barcode/${settingsController.nutritionLanguage}/${settingsController.nutritionCountry}';
-  return _offBarcode.get(key, () async {
-    final product = await OpenFoodAPIClient.getProductV3(
-      ProductQueryConfiguration(
-        barcode,
-        version: .v3,
-        language: settingsController.nutritionLanguage.offApiLanguage,
-        country: settingsController.nutritionCountry.offApiCountry,
-      ),
-    );
-
-    if (product.product == null) {
-      globalLogger.d("No product found for barcode: $barcode");
-      return null;
-    }
-    final food = _offFoodToGTFood(
-      product.product!,
-      barcode: barcode,
-      language: settingsController.nutritionLanguage.offApiLanguage,
-    );
-    globalLogger.d("Found product for barcode: $barcode -> ${food.name}");
-    return food;
-  });
-}
-
+// Catalog search lives in provider/food_catalog.dart.
 // -----------------------------------------------------------------------------
 // Native Sync Listener (Eager & KeepAlive)
 // -----------------------------------------------------------------------------
 
 @Riverpod(keepAlive: true)
 void foodNativeSync(Ref ref) {
-  OpenFoodAPIConfiguration.userAgent = UserAgent(
-    name: "Gym Bro/${ref.watch(versionServiceProvider).packageInfo.version}",
-    version: ref.watch(versionServiceProvider).packageInfo.version,
-    system: "${Platform.operatingSystem} ${Platform.operatingSystemVersion}",
-  );
-
   final today = DateTime.now().startOfDay;
   // Observe the derived values: raw-stream callbacks can run before their
   // dependents have invalidated and would send the previous totals.

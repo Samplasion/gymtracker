@@ -4,6 +4,7 @@ import 'package:crypto/crypto.dart';
 
 import 'package:drift/drift.dart';
 import 'package:gymtracker/db/database.dart';
+import 'package:gymtracker/repository/hydration.dart';
 import 'package:syncable/syncable.dart';
 
 enum RestoreMode { merge, replace }
@@ -73,6 +74,7 @@ class PreparedDatabaseRestore {
       }
       // Exercise domain decoders before touching the live database.
       await source.watchFoods().first;
+      await HydrationRepository(source).watch(owner).first;
       await source.watchNutritionCategories().first;
       await source.watchCustomBarcodeFoods().first;
       await source.watchNutritionGoals().first;

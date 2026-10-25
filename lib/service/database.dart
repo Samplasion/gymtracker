@@ -8,7 +8,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gymtracker/db/backup_restore.dart';
 import 'package:gymtracker/db/database.dart';
-import 'package:gymtracker/db/exports/v21.dart';
+import 'package:gymtracker/db/exports/v23.dart';
 import 'package:gymtracker/db/imports/types.dart';
 import 'package:gymtracker/db/sync_diagnostics.dart';
 import 'package:gymtracker/model/achievements.dart';
@@ -635,7 +635,7 @@ class DatabaseService extends ChangeNotifier with LoggerConfigurationMixin {
 
   /// Version 20 is export-only; legacy import converters remain separate.
   Future<Map<String, dynamic>> exportJson() =>
-      const VersionedJsonExportV21().export(_db);
+      const VersionedJsonExportV23().export(_db);
 
   Map<String, dynamic> toJson() {
     final converter = getConverter(DATABASE_VERSION);

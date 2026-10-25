@@ -5,7 +5,7 @@ import 'package:gymtracker/i18n/strings.g.dart';
 import 'package:gymtracker/struct/date_sequence.dart';
 import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/utils/utils.dart';
-import 'package:openfoodfacts/openfoodfacts.dart' hide Unit;
+import 'package:intl/intl.dart';
 
 part 'nutrition.categories.dart';
 part 'nutrition.g.dart';
@@ -19,12 +19,14 @@ class NutritionGoal {
   final double dailyFat;
   final double dailyCarbs;
   final double dailyProtein;
+  final double? dailyWater;
 
   const NutritionGoal({
     required this.dailyCalories,
     required this.dailyFat,
     required this.dailyCarbs,
     required this.dailyProtein,
+    this.dailyWater,
   });
 
   factory NutritionGoal.fromJson(Map<String, dynamic> json) {
@@ -33,6 +35,7 @@ class NutritionGoal {
       dailyFat: json['dailyFat'],
       dailyCarbs: json['dailyCarbs'],
       dailyProtein: json['dailyProtein'],
+      dailyWater: (json['dailyWater'] as num?)?.toDouble(),
     );
   }
 
@@ -41,6 +44,7 @@ class NutritionGoal {
     required double fatPercentage,
     required double carbsPercentage,
     required double proteinPercentage,
+    double? dailyWater,
   }) {
     final fat = dailyCalories * fatPercentage / 100 / 9;
     final carbs = dailyCalories * carbsPercentage / 100 / 4;
@@ -50,6 +54,7 @@ class NutritionGoal {
       dailyFat: fat,
       dailyCarbs: carbs,
       dailyProtein: protein,
+      dailyWater: dailyWater,
     );
   }
 
@@ -71,6 +76,7 @@ class NutritionGoal {
       'dailyFat': dailyFat,
       'dailyCarbs': dailyCarbs,
       'dailyProtein': dailyProtein,
+      'dailyWater': dailyWater,
     };
   }
 
@@ -90,7 +96,8 @@ class NutritionGoal {
         doubleEq(other.dailyCalories, dailyCalories) &&
         doubleEq(other.dailyFat, dailyFat) &&
         doubleEq(other.dailyCarbs, dailyCarbs) &&
-        doubleEq(other.dailyProtein, dailyProtein);
+        doubleEq(other.dailyProtein, dailyProtein) &&
+        other.dailyWater == dailyWater;
   }
 
   @override
@@ -98,7 +105,8 @@ class NutritionGoal {
     return dailyCalories.hashCode ^
         dailyFat.hashCode ^
         dailyCarbs.hashCode ^
-        dailyProtein.hashCode;
+        dailyProtein.hashCode ^
+        dailyWater.hashCode;
   }
 }
 
@@ -138,7 +146,7 @@ class VagueFood {
   final String? brand;
   final NutritionValues nutritionalValuesPer100g;
   final List<ServingSize> servingSizes;
-  final bool isDownloaded;
+  final bool downloadedFromOFF;
   final String? barcode;
   final NutritionUnit unit;
 
@@ -147,7 +155,7 @@ class VagueFood {
     this.brand,
     required this.nutritionalValuesPer100g,
     this.servingSizes = const [],
-    this.isDownloaded = false,
+    this.downloadedFromOFF = false,
     this.barcode,
     this.unit = NutritionUnit.G,
   }) : assert(
@@ -165,7 +173,7 @@ class VagueFood {
       servingSizes: (json['servingSizes'] as List)
           .map((e) => ServingSize.fromJson(e))
           .toList(),
-      isDownloaded: json['isDownloaded'] ?? false,
+      downloadedFromOFF: json['isDownloaded'] ?? false,
       barcode: json['barcode'],
       unit: deserializeUnit(json['unit'] ?? 'g'),
     );
@@ -173,7 +181,7 @@ class VagueFood {
 
   @override
   String toString() {
-    return 'VagueFood(name: $name, brand: $brand, nutritionalValuesPer100g: $nutritionalValuesPer100g, servingSizes: $servingSizes, isDownloaded: $isDownloaded, barcode: $barcode, unit: $unit)';
+    return 'VagueFood(name: $name, brand: $brand, nutritionalValuesPer100g: $nutritionalValuesPer100g, servingSizes: $servingSizes, downloadedFromOFF: $downloadedFromOFF, barcode: $barcode, unit: $unit)';
   }
 
   Map<String, dynamic> toJson() {
@@ -182,7 +190,7 @@ class VagueFood {
       'brand': brand,
       'nutritionalValuesPer100g': nutritionalValuesPer100g.toJson(),
       'servingSizes': servingSizes.map((e) => e.toJson()).toList(),
-      'isDownloaded': isDownloaded,
+      'isDownloaded': downloadedFromOFF,
       'barcode': barcode,
       'unit': serializeUnit(unit),
     };
@@ -197,7 +205,7 @@ class VagueFood {
         other.brand == brand &&
         other.nutritionalValuesPer100g == nutritionalValuesPer100g &&
         listEquals(other.servingSizes, servingSizes) &&
-        other.isDownloaded == isDownloaded &&
+        other.downloadedFromOFF == downloadedFromOFF &&
         other.barcode == barcode &&
         other.unit == unit;
   }
@@ -208,11 +216,11 @@ class VagueFood {
       brand.hashCode ^
       nutritionalValuesPer100g.hashCode ^
       servingSizes.hashCode ^
-      isDownloaded.hashCode ^
+      downloadedFromOFF.hashCode ^
       barcode.hashCode ^
       unit.hashCode;
 
-  String? get url => barcode == null || !isDownloaded
+  String? get url => barcode == null || !downloadedFromOFF
       ? null
       : "https://world.openfoodfacts.org/product/$barcode/";
 }
@@ -236,7 +244,7 @@ class Food extends VagueFood {
     required this.amount,
     super.servingSizes,
     this.id,
-    super.isDownloaded,
+    super.downloadedFromOFF,
     super.barcode,
     super.unit,
     this.pieces = 1,
@@ -255,7 +263,7 @@ class Food extends VagueFood {
           .map((e) => ServingSize.fromJson(e))
           .toList(),
       amount: (json['amount'] as num).toDouble(),
-      isDownloaded: json['isDownloaded'] ?? false,
+      downloadedFromOFF: json['isDownloaded'] ?? false,
       barcode: json['barcode'],
       unit: deserializeUnit(json['unit'] ?? 'g'),
       pieces: (json['pieces'] as int?) ?? 1,
@@ -276,7 +284,7 @@ class Food extends VagueFood {
 
   @override
   String toString() {
-    return 'Food(id: $id, name: $name, brand: $brand, nutritionalValuesPer100g: $nutritionalValuesPer100g, amount: $amount, servingSizes: $servingSizes, isDownloaded: $isDownloaded, barcode: $barcode, unit: $unit, pieces: $pieces, category: $category)';
+    return 'Food(id: $id, name: $name, brand: $brand, nutritionalValuesPer100g: $nutritionalValuesPer100g, amount: $amount, servingSizes: $servingSizes, downloadedFromOFF: $downloadedFromOFF, barcode: $barcode, unit: $unit, pieces: $pieces, category: $category)';
   }
 
   @override
@@ -290,7 +298,7 @@ class Food extends VagueFood {
         other.nutritionalValuesPer100g == nutritionalValuesPer100g &&
         other.amount == amount &&
         listEquals(other.servingSizes, servingSizes) &&
-        other.isDownloaded == isDownloaded &&
+        other.downloadedFromOFF == downloadedFromOFF &&
         other.barcode == barcode &&
         other.unit == unit &&
         other.pieces == pieces &&
@@ -305,7 +313,7 @@ class Food extends VagueFood {
       nutritionalValuesPer100g.hashCode ^
       amount.hashCode ^
       servingSizes.hashCode ^
-      isDownloaded.hashCode ^
+      downloadedFromOFF.hashCode ^
       barcode.hashCode ^
       unit.hashCode ^
       pieces.hashCode ^

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:gymtracker/controller/achievements_controller.dart';
@@ -325,6 +327,112 @@ void main() {
               mockAchievements.maybeUnlockAchievements(AchievementTrigger.food),
         ).called(1);
         verify(() => mockBackup.schedule()).called(1);
+      },
+    );
+
+    for (final operation in [
+      'add',
+      'remove',
+      'update',
+      'favorite',
+      'unfavorite',
+    ]) {
+      test(
+        '$operation completes achievements and backup after auto-disposal',
+        () async {
+          final pending = Completer<void>();
+          mockFoodsRepo.foods$.add([DateTagged(date: today, value: food)]);
+          await pumpEventQueue();
+          switch (operation) {
+            case 'add':
+              when(
+                () => mockFoodsRepo.addFood(any()),
+              ).thenAnswer((_) => pending.future);
+            case 'remove':
+              when(
+                () => mockFoodsRepo.removeFood(any()),
+              ).thenAnswer((_) => pending.future);
+            case 'update':
+              when(
+                () => mockFoodsRepo.updateFood(any()),
+              ).thenAnswer((_) => pending.future);
+            case 'favorite':
+              when(
+                () => mockFoodsRepo.addFavoriteFood(any()),
+              ).thenAnswer((_) => pending.future);
+            case 'unfavorite':
+              when(
+                () => mockFoodsRepo.removeFavoriteFood(any()),
+              ).thenAnswer((_) => pending.future);
+          }
+          final notifier = container.read(foodProvider.notifier);
+          final command = switch (operation) {
+            'add' => notifier.addFood(today, food),
+            'remove' => notifier.removeFood(today, food),
+            'update' => notifier.updateFood(today, food.copyWith(amount: 250)),
+            'favorite' => notifier.addFavorite(food),
+            _ => notifier.removeFavorite(food),
+          };
+          await container.pump();
+          expect(container.exists(foodProvider), isFalse);
+          pending.complete();
+          await command;
+          verify(() => mockBackup.schedule()).called(1);
+          if (operation == 'add' || operation == 'remove') {
+            verify(
+              () => mockAchievements.maybeUnlockAchievements(
+                AchievementTrigger.food,
+              ),
+            ).called(1);
+          }
+        },
+      );
+    }
+
+    test(
+      'copy retains its command provider until the date is updated, then releases it',
+      () async {
+        final pending = Completer<void>();
+        when(
+          () => mockFoodsRepo.addFood(any()),
+        ).thenAnswer((_) => pending.future);
+        final dateSubscription = container.listen(
+          foodSelectedDateProvider,
+          (_, _) {},
+        );
+        container
+            .read(foodSelectedDateProvider.notifier)
+            .setDate(today.subtract(const Duration(days: 1)));
+        final command = container.read(foodProvider.notifier).copyToToday(food);
+        await container.pump();
+        expect(container.exists(foodProvider), isTrue);
+        pending.complete();
+        await command;
+        expect(container.read(foodSelectedDateProvider), today);
+        await container.pump();
+        expect(container.exists(foodProvider), isFalse);
+        verify(() => mockBackup.schedule()).called(1);
+        dateSubscription.close();
+      },
+    );
+
+    test(
+      'failed save after disposal does not trigger achievements or backup',
+      () async {
+        final pending = Completer<void>();
+        when(
+          () => mockFoodsRepo.addFood(any()),
+        ).thenAnswer((_) => pending.future);
+        final command = container
+            .read(foodProvider.notifier)
+            .addFood(today, food);
+        final failure = expectLater(command, throwsStateError);
+        await container.pump();
+        expect(container.exists(foodProvider), isFalse);
+        pending.completeError(StateError('Save failed'));
+        await failure;
+        verifyNever(() => mockBackup.schedule());
+        verifyNever(() => mockAchievements.maybeUnlockAchievements(any()));
       },
     );
 

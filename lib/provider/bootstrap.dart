@@ -15,6 +15,8 @@ import 'package:gymtracker/controller/routines_controller.dart';
 import 'package:gymtracker/controller/settings_controller.dart';
 import 'package:gymtracker/controller/workout_controller.dart';
 import 'package:gymtracker/provider/food.dart';
+import 'package:gymtracker/provider/food_catalog.dart';
+import 'package:gymtracker/provider/hydration.dart';
 import 'package:gymtracker/provider/locale.dart';
 import 'package:gymtracker/provider/online.dart';
 import 'package:gymtracker/provider/social.dart';
@@ -114,6 +116,8 @@ final appStartupProvider = FutureProvider<void>((ref) async {
   ref.read(settingsControllerProvider);
   ref.read(pushServiceProvider);
   ref.watch(socialAccessListenerProvider);
+  ref.watch(catalogWorkerProvider);
+  ref.watch(hydrationWorkerProvider);
   Timer? socialSync;
   database.onSocialDataSaved = () {
     socialSync?.cancel();

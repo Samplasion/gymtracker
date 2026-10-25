@@ -11,6 +11,9 @@
     <uses-permission android:name="android.permission.POST_PROMOTED_NOTIFICATIONS" />
     <uses-permission android:name="com.android.vending.BILLING" />
 
+    <uses-permission android:name="android.permission.health.WRITE_HYDRATION" />
+    <queries><package android:name="com.google.android.apps.healthdata" /></queries>
+
     <application
         android:name="${applicationName}"
         android:enableOnBackInvokedCallback="true"
@@ -49,6 +52,9 @@
                 android:resource="@style/NormalTheme" />
 
             <intent-filter>
+                <action android:name="androidx.health.ACTION_SHOW_PERMISSIONS_RATIONALE" />
+            </intent-filter>
+            <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -64,6 +70,14 @@
             </intent-filter>
         </activity>
 
+        <activity-alias android:name="ViewPermissionUsageActivity"
+            android:exported="true" android:targetActivity=".MainActivity"
+            android:permission="android.permission.START_VIEW_PERMISSION_USAGE">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW_PERMISSION_USAGE" />
+                <category android:name="android.intent.category.HEALTH_PERMISSIONS" />
+            </intent-filter>
+        </activity-alias>
         <receiver
             android:name="com.dexterous.flutterlocalnotifications.ScheduledNotificationReceiver"
             android:exported="false" />

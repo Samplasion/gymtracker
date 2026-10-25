@@ -22,28 +22,28 @@ enum NutritionUnit {
 }
 
 NutritionUnit deserializeUnit(String camelCase) => switch (camelCase) {
-      'kcal' => NutritionUnit.KCAL,
-      'kj' => NutritionUnit.KJ,
-      'g' => NutritionUnit.G,
-      'mg' => NutritionUnit.MILLI_G,
-      'µg' => NutritionUnit.MICRO_G,
-      'ml' => NutritionUnit.MILLI_L,
-      'l' => NutritionUnit.L,
-      '%' => NutritionUnit.PERCENT,
-      _ => NutritionUnit.UNKNOWN,
-    };
+  'kcal' => NutritionUnit.KCAL,
+  'kj' => NutritionUnit.KJ,
+  'g' => NutritionUnit.G,
+  'mg' => NutritionUnit.MILLI_G,
+  'µg' => NutritionUnit.MICRO_G,
+  'ml' => NutritionUnit.MILLI_L,
+  'l' => NutritionUnit.L,
+  '%' => NutritionUnit.PERCENT,
+  _ => NutritionUnit.UNKNOWN,
+};
 
 String serializeUnit(NutritionUnit unit) => switch (unit) {
-      NutritionUnit.KCAL => 'kcal',
-      NutritionUnit.KJ => 'kj',
-      NutritionUnit.G => 'g',
-      NutritionUnit.MILLI_G => 'mg',
-      NutritionUnit.MICRO_G => 'µg',
-      NutritionUnit.MILLI_L => 'ml',
-      NutritionUnit.L => 'l',
-      NutritionUnit.PERCENT => '%',
-      NutritionUnit.UNKNOWN => '',
-    };
+  NutritionUnit.KCAL => 'kcal',
+  NutritionUnit.KJ => 'kj',
+  NutritionUnit.G => 'g',
+  NutritionUnit.MILLI_G => 'mg',
+  NutritionUnit.MICRO_G => 'µg',
+  NutritionUnit.MILLI_L => 'ml',
+  NutritionUnit.L => 'l',
+  NutritionUnit.PERCENT => '%',
+  NutritionUnit.UNKNOWN => '',
+};
 
 const kNutritionValueToUnit = {
   "calories": NutritionUnit.KCAL,
@@ -52,6 +52,7 @@ const kNutritionValueToUnit = {
   "carbs": NutritionUnit.G,
   "sugar": NutritionUnit.G,
   "protein": NutritionUnit.G,
+  "water": NutritionUnit.MILLI_L,
   "salt": NutritionUnit.G,
   "sodium": NutritionUnit.G,
   "fiber": NutritionUnit.G,
@@ -135,6 +136,9 @@ class NutritionValues {
   final double protein;
 
   // Optional fields
+
+  /// Water (ml per 100 g/ml). Null means unavailable.
+  final double? water;
 
   /// Salt (unit: G)
   final double? salt;
@@ -353,6 +357,7 @@ class NutritionValues {
     required this.carbs,
     required this.sugar,
     required this.protein,
+    this.water,
     this.salt,
     this.sodium,
     this.fiber,
@@ -443,6 +448,7 @@ class NutritionValues {
       carbs: (json['carbs'] as num).toDouble(),
       sugar: (json['sugar'] as num).toDouble(),
       protein: (json['protein'] as num).toDouble(),
+      water: (json['water'] as num?)?.toDouble(),
       salt: (json['salt'] as num?)?.toDouble(),
       sodium: (json['sodium'] as num?)?.toDouble(),
       fiber: (json['fiber'] as num?)?.toDouble(),
@@ -503,8 +509,8 @@ class NutritionValues {
       arachidonicAcid: (json['arachidonicAcid'] as num?)?.toDouble(),
       behenicAcid: (json['behenicAcid'] as num?)?.toDouble(),
       ceroticAcid: (json['ceroticAcid'] as num?)?.toDouble(),
-      dihomoGammaLinolenicAcid:
-          (json['dihomoGammaLinolenicAcid'] as num?)?.toDouble(),
+      dihomoGammaLinolenicAcid: (json['dihomoGammaLinolenicAcid'] as num?)
+          ?.toDouble(),
       elaidicAcid: (json['elaidicAcid'] as num?)?.toDouble(),
       gammaLinolenicAcid: (json['gammaLinolenicAcid'] as num?)?.toDouble(),
       gondoicAcid: (json['gondoicAcid'] as num?)?.toDouble(),
@@ -517,141 +523,6 @@ class NutritionValues {
     );
   }
 
-  factory NutritionValues.fromOFFNutrimentsPer100g(Nutriments nutriments) {
-    return NutritionValues(
-      calories:
-          nutriments.getValue(Nutrient.energyKCal, PerSize.oneHundredGrams) ??
-              0,
-      fat: nutriments.getValue(Nutrient.fat, PerSize.oneHundredGrams) ?? 0,
-      saturatedFat:
-          nutriments.getValue(Nutrient.saturatedFat, PerSize.oneHundredGrams) ??
-              0,
-      carbs: nutriments.getValue(
-              Nutrient.carbohydrates, PerSize.oneHundredGrams) ??
-          0,
-      sugar: nutriments.getValue(Nutrient.sugars, PerSize.oneHundredGrams) ?? 0,
-      protein:
-          nutriments.getValue(Nutrient.proteins, PerSize.oneHundredGrams) ?? 0,
-      salt: nutriments.getValue(Nutrient.salt, PerSize.oneHundredGrams),
-      sodium: nutriments.getValue(Nutrient.sodium, PerSize.oneHundredGrams),
-      fiber: nutriments.getValue(Nutrient.fiber, PerSize.oneHundredGrams),
-      addedSugars:
-          nutriments.getValue(Nutrient.addedSugars, PerSize.oneHundredGrams),
-      caffeine: nutriments.getValue(Nutrient.caffeine, PerSize.oneHundredGrams),
-      calcium: nutriments.getValue(Nutrient.calcium, PerSize.oneHundredGrams),
-      iron: nutriments.getValue(Nutrient.iron, PerSize.oneHundredGrams),
-      vitaminC: nutriments.getValue(Nutrient.vitaminC, PerSize.oneHundredGrams),
-      magnesium:
-          nutriments.getValue(Nutrient.magnesium, PerSize.oneHundredGrams),
-      phosphorus:
-          nutriments.getValue(Nutrient.phosphorus, PerSize.oneHundredGrams),
-      potassium:
-          nutriments.getValue(Nutrient.potassium, PerSize.oneHundredGrams),
-      zinc: nutriments.getValue(Nutrient.zinc, PerSize.oneHundredGrams),
-      copper: nutriments.getValue(Nutrient.copper, PerSize.oneHundredGrams),
-      selenium: nutriments.getValue(Nutrient.selenium, PerSize.oneHundredGrams),
-      vitaminA: nutriments.getValue(Nutrient.vitaminA, PerSize.oneHundredGrams),
-      vitaminE: nutriments.getValue(Nutrient.vitaminE, PerSize.oneHundredGrams),
-      vitaminD: nutriments.getValue(Nutrient.vitaminD, PerSize.oneHundredGrams),
-      vitaminB1:
-          nutriments.getValue(Nutrient.vitaminB1, PerSize.oneHundredGrams),
-      vitaminB2:
-          nutriments.getValue(Nutrient.vitaminB2, PerSize.oneHundredGrams),
-      vitaminPP:
-          nutriments.getValue(Nutrient.vitaminPP, PerSize.oneHundredGrams),
-      vitaminB6:
-          nutriments.getValue(Nutrient.vitaminB6, PerSize.oneHundredGrams),
-      vitaminB12:
-          nutriments.getValue(Nutrient.vitaminB12, PerSize.oneHundredGrams),
-      vitaminB9:
-          nutriments.getValue(Nutrient.vitaminB9, PerSize.oneHundredGrams),
-      vitaminK: nutriments.getValue(Nutrient.vitaminK, PerSize.oneHundredGrams),
-      cholesterol:
-          nutriments.getValue(Nutrient.cholesterol, PerSize.oneHundredGrams),
-      butyricAcid:
-          nutriments.getValue(Nutrient.butyricAcid, PerSize.oneHundredGrams),
-      caproicAcid:
-          nutriments.getValue(Nutrient.caproicAcid, PerSize.oneHundredGrams),
-      caprylicAcid:
-          nutriments.getValue(Nutrient.caprylicAcid, PerSize.oneHundredGrams),
-      capricAcid:
-          nutriments.getValue(Nutrient.capricAcid, PerSize.oneHundredGrams),
-      lauricAcid:
-          nutriments.getValue(Nutrient.lauricAcid, PerSize.oneHundredGrams),
-      myristicAcid:
-          nutriments.getValue(Nutrient.myristicAcid, PerSize.oneHundredGrams),
-      palmiticAcid:
-          nutriments.getValue(Nutrient.palmiticAcid, PerSize.oneHundredGrams),
-      stearicAcid:
-          nutriments.getValue(Nutrient.stearicAcid, PerSize.oneHundredGrams),
-      oleicAcid:
-          nutriments.getValue(Nutrient.oleicAcid, PerSize.oneHundredGrams),
-      linoleicAcid:
-          nutriments.getValue(Nutrient.linoleicAcid, PerSize.oneHundredGrams),
-      docosahexaenoicAcid: nutriments.getValue(
-          Nutrient.docosahexaenoicAcid, PerSize.oneHundredGrams),
-      eicosapentaenoicAcid: nutriments.getValue(
-          Nutrient.eicosapentaenoicAcid, PerSize.oneHundredGrams),
-      erucicAcid:
-          nutriments.getValue(Nutrient.erucicAcid, PerSize.oneHundredGrams),
-      monounsaturatedFat: nutriments.getValue(
-          Nutrient.monounsaturatedFat, PerSize.oneHundredGrams),
-      polyunsaturatedFat: nutriments.getValue(
-          Nutrient.polyunsaturatedFat, PerSize.oneHundredGrams),
-      alcohol: nutriments.getValue(Nutrient.alcohol, PerSize.oneHundredGrams),
-      pantothenicAcid: nutriments.getValue(
-          Nutrient.pantothenicAcid, PerSize.oneHundredGrams),
-      biotin: nutriments.getValue(Nutrient.biotin, PerSize.oneHundredGrams),
-      chloride: nutriments.getValue(Nutrient.chloride, PerSize.oneHundredGrams),
-      chromium: nutriments.getValue(Nutrient.chromium, PerSize.oneHundredGrams),
-      fluoride: nutriments.getValue(Nutrient.fluoride, PerSize.oneHundredGrams),
-      iodine: nutriments.getValue(Nutrient.iodine, PerSize.oneHundredGrams),
-      manganese:
-          nutriments.getValue(Nutrient.manganese, PerSize.oneHundredGrams),
-      molybdenum:
-          nutriments.getValue(Nutrient.molybdenum, PerSize.oneHundredGrams),
-      omega3: nutriments.getValue(Nutrient.omega3, PerSize.oneHundredGrams),
-      omega6: nutriments.getValue(Nutrient.omega6, PerSize.oneHundredGrams),
-      omega9: nutriments.getValue(Nutrient.omega9, PerSize.oneHundredGrams),
-      betaCarotene:
-          nutriments.getValue(Nutrient.betaCarotene, PerSize.oneHundredGrams),
-      bicarbonate:
-          nutriments.getValue(Nutrient.bicarbonate, PerSize.oneHundredGrams),
-      sugarAlcohol:
-          nutriments.getValue(Nutrient.sugarAlcohol, PerSize.oneHundredGrams),
-      alphaLinolenicAcid: nutriments.getValue(
-          Nutrient.alphaLinolenicAcid, PerSize.oneHundredGrams),
-      arachidicAcid:
-          nutriments.getValue(Nutrient.arachidicAcid, PerSize.oneHundredGrams),
-      arachidonicAcid: nutriments.getValue(
-          Nutrient.arachidonicAcid, PerSize.oneHundredGrams),
-      behenicAcid:
-          nutriments.getValue(Nutrient.behenicAcid, PerSize.oneHundredGrams),
-      ceroticAcid:
-          nutriments.getValue(Nutrient.ceroticAcid, PerSize.oneHundredGrams),
-      dihomoGammaLinolenicAcid: nutriments.getValue(
-          Nutrient.dihomoGammaLinolenicAcid, PerSize.oneHundredGrams),
-      elaidicAcid:
-          nutriments.getValue(Nutrient.elaidicAcid, PerSize.oneHundredGrams),
-      gammaLinolenicAcid: nutriments.getValue(
-          Nutrient.gammaLinolenicAcid, PerSize.oneHundredGrams),
-      gondoicAcid:
-          nutriments.getValue(Nutrient.gondoicAcid, PerSize.oneHundredGrams),
-      lignocericAcid:
-          nutriments.getValue(Nutrient.lignocericAcid, PerSize.oneHundredGrams),
-      meadAcid: nutriments.getValue(Nutrient.meadAcid, PerSize.oneHundredGrams),
-      melissicAcid:
-          nutriments.getValue(Nutrient.melissicAcid, PerSize.oneHundredGrams),
-      montanicAcid:
-          nutriments.getValue(Nutrient.montanicAcid, PerSize.oneHundredGrams),
-      nervonicAcid:
-          nutriments.getValue(Nutrient.nervonicAcid, PerSize.oneHundredGrams),
-      transFat: nutriments.getValue(Nutrient.transFat, PerSize.oneHundredGrams),
-    );
-  }
-
-  /// Returns the combined nutrition values of the given [values], rescaled to
-  /// 100g.
   static NutritionValues sum(Iterable<NutritionValuesWithAmount> values) {
     var sum = NutritionValues.zero;
     var totalAmount = 0.0;
@@ -671,11 +542,15 @@ class NutritionValues {
       carbs: carbs + other.carbs,
       sugar: sugar + other.sugar,
       protein: protein + other.protein,
+      water: water == null && other.water == null
+          ? null
+          : (water ?? 0) + (other.water ?? 0),
       salt: _nullIfZero((salt ?? 0.0) + (other.salt ?? 0.0)),
       sodium: _nullIfZero((sodium ?? 0.0) + (other.sodium ?? 0.0)),
       fiber: _nullIfZero((fiber ?? 0.0) + (other.fiber ?? 0.0)),
-      addedSugars:
-          _nullIfZero((addedSugars ?? 0.0) + (other.addedSugars ?? 0.0)),
+      addedSugars: _nullIfZero(
+        (addedSugars ?? 0.0) + (other.addedSugars ?? 0.0),
+      ),
       caffeine: _nullIfZero((caffeine ?? 0.0) + (other.caffeine ?? 0.0)),
       calcium: _nullIfZero((calcium ?? 0.0) + (other.calcium ?? 0.0)),
       iron: _nullIfZero((iron ?? 0.0) + (other.iron ?? 0.0)),
@@ -696,37 +571,50 @@ class NutritionValues {
       vitaminB12: _nullIfZero((vitaminB12 ?? 0.0) + (other.vitaminB12 ?? 0.0)),
       vitaminB9: _nullIfZero((vitaminB9 ?? 0.0) + (other.vitaminB9 ?? 0.0)),
       vitaminK: _nullIfZero((vitaminK ?? 0.0) + (other.vitaminK ?? 0.0)),
-      cholesterol:
-          _nullIfZero((cholesterol ?? 0.0) + (other.cholesterol ?? 0.0)),
-      butyricAcid:
-          _nullIfZero((butyricAcid ?? 0.0) + (other.butyricAcid ?? 0.0)),
-      caproicAcid:
-          _nullIfZero((caproicAcid ?? 0.0) + (other.caproicAcid ?? 0.0)),
-      caprylicAcid:
-          _nullIfZero((caprylicAcid ?? 0.0) + (other.caprylicAcid ?? 0.0)),
+      cholesterol: _nullIfZero(
+        (cholesterol ?? 0.0) + (other.cholesterol ?? 0.0),
+      ),
+      butyricAcid: _nullIfZero(
+        (butyricAcid ?? 0.0) + (other.butyricAcid ?? 0.0),
+      ),
+      caproicAcid: _nullIfZero(
+        (caproicAcid ?? 0.0) + (other.caproicAcid ?? 0.0),
+      ),
+      caprylicAcid: _nullIfZero(
+        (caprylicAcid ?? 0.0) + (other.caprylicAcid ?? 0.0),
+      ),
       capricAcid: _nullIfZero((capricAcid ?? 0.0) + (other.capricAcid ?? 0.0)),
       lauricAcid: _nullIfZero((lauricAcid ?? 0.0) + (other.lauricAcid ?? 0.0)),
-      myristicAcid:
-          _nullIfZero((myristicAcid ?? 0.0) + (other.myristicAcid ?? 0.0)),
-      palmiticAcid:
-          _nullIfZero((palmiticAcid ?? 0.0) + (other.palmiticAcid ?? 0.0)),
-      stearicAcid:
-          _nullIfZero((stearicAcid ?? 0.0) + (other.stearicAcid ?? 0.0)),
+      myristicAcid: _nullIfZero(
+        (myristicAcid ?? 0.0) + (other.myristicAcid ?? 0.0),
+      ),
+      palmiticAcid: _nullIfZero(
+        (palmiticAcid ?? 0.0) + (other.palmiticAcid ?? 0.0),
+      ),
+      stearicAcid: _nullIfZero(
+        (stearicAcid ?? 0.0) + (other.stearicAcid ?? 0.0),
+      ),
       oleicAcid: _nullIfZero((oleicAcid ?? 0.0) + (other.oleicAcid ?? 0.0)),
-      linoleicAcid:
-          _nullIfZero((linoleicAcid ?? 0.0) + (other.linoleicAcid ?? 0.0)),
+      linoleicAcid: _nullIfZero(
+        (linoleicAcid ?? 0.0) + (other.linoleicAcid ?? 0.0),
+      ),
       docosahexaenoicAcid: _nullIfZero(
-          (docosahexaenoicAcid ?? 0.0) + (other.docosahexaenoicAcid ?? 0.0)),
+        (docosahexaenoicAcid ?? 0.0) + (other.docosahexaenoicAcid ?? 0.0),
+      ),
       eicosapentaenoicAcid: _nullIfZero(
-          (eicosapentaenoicAcid ?? 0.0) + (other.eicosapentaenoicAcid ?? 0.0)),
+        (eicosapentaenoicAcid ?? 0.0) + (other.eicosapentaenoicAcid ?? 0.0),
+      ),
       erucicAcid: _nullIfZero((erucicAcid ?? 0.0) + (other.erucicAcid ?? 0.0)),
       monounsaturatedFat: _nullIfZero(
-          (monounsaturatedFat ?? 0.0) + (other.monounsaturatedFat ?? 0.0)),
+        (monounsaturatedFat ?? 0.0) + (other.monounsaturatedFat ?? 0.0),
+      ),
       polyunsaturatedFat: _nullIfZero(
-          (polyunsaturatedFat ?? 0.0) + (other.polyunsaturatedFat ?? 0.0)),
+        (polyunsaturatedFat ?? 0.0) + (other.polyunsaturatedFat ?? 0.0),
+      ),
       alcohol: _nullIfZero((alcohol ?? 0.0) + (other.alcohol ?? 0.0)),
       pantothenicAcid: _nullIfZero(
-          (pantothenicAcid ?? 0.0) + (other.pantothenicAcid ?? 0.0)),
+        (pantothenicAcid ?? 0.0) + (other.pantothenicAcid ?? 0.0),
+      ),
       biotin: _nullIfZero((biotin ?? 0.0) + (other.biotin ?? 0.0)),
       chloride: _nullIfZero((chloride ?? 0.0) + (other.chloride ?? 0.0)),
       chromium: _nullIfZero((chromium ?? 0.0) + (other.chromium ?? 0.0)),
@@ -737,39 +625,56 @@ class NutritionValues {
       omega3: _nullIfZero((omega3 ?? 0.0) + (other.omega3 ?? 0.0)),
       omega6: _nullIfZero((omega6 ?? 0.0) + (other.omega6 ?? 0.0)),
       omega9: _nullIfZero((omega9 ?? 0.0) + (other.omega9 ?? 0.0)),
-      betaCarotene:
-          _nullIfZero((betaCarotene ?? 0.0) + (other.betaCarotene ?? 0.0)),
-      bicarbonate:
-          _nullIfZero((bicarbonate ?? 0.0) + (other.bicarbonate ?? 0.0)),
-      sugarAlcohol:
-          _nullIfZero((sugarAlcohol ?? 0.0) + (other.sugarAlcohol ?? 0.0)),
+      betaCarotene: _nullIfZero(
+        (betaCarotene ?? 0.0) + (other.betaCarotene ?? 0.0),
+      ),
+      bicarbonate: _nullIfZero(
+        (bicarbonate ?? 0.0) + (other.bicarbonate ?? 0.0),
+      ),
+      sugarAlcohol: _nullIfZero(
+        (sugarAlcohol ?? 0.0) + (other.sugarAlcohol ?? 0.0),
+      ),
       alphaLinolenicAcid: _nullIfZero(
-          (alphaLinolenicAcid ?? 0.0) + (other.alphaLinolenicAcid ?? 0.0)),
-      arachidicAcid:
-          _nullIfZero((arachidicAcid ?? 0.0) + (other.arachidicAcid ?? 0.0)),
+        (alphaLinolenicAcid ?? 0.0) + (other.alphaLinolenicAcid ?? 0.0),
+      ),
+      arachidicAcid: _nullIfZero(
+        (arachidicAcid ?? 0.0) + (other.arachidicAcid ?? 0.0),
+      ),
       arachidonicAcid: _nullIfZero(
-          (arachidonicAcid ?? 0.0) + (other.arachidonicAcid ?? 0.0)),
-      behenicAcid:
-          _nullIfZero((behenicAcid ?? 0.0) + (other.behenicAcid ?? 0.0)),
-      ceroticAcid:
-          _nullIfZero((ceroticAcid ?? 0.0) + (other.ceroticAcid ?? 0.0)),
-      dihomoGammaLinolenicAcid: _nullIfZero((dihomoGammaLinolenicAcid ?? 0.0) +
-          (other.dihomoGammaLinolenicAcid ?? 0.0)),
-      elaidicAcid:
-          _nullIfZero((elaidicAcid ?? 0.0) + (other.elaidicAcid ?? 0.0)),
+        (arachidonicAcid ?? 0.0) + (other.arachidonicAcid ?? 0.0),
+      ),
+      behenicAcid: _nullIfZero(
+        (behenicAcid ?? 0.0) + (other.behenicAcid ?? 0.0),
+      ),
+      ceroticAcid: _nullIfZero(
+        (ceroticAcid ?? 0.0) + (other.ceroticAcid ?? 0.0),
+      ),
+      dihomoGammaLinolenicAcid: _nullIfZero(
+        (dihomoGammaLinolenicAcid ?? 0.0) +
+            (other.dihomoGammaLinolenicAcid ?? 0.0),
+      ),
+      elaidicAcid: _nullIfZero(
+        (elaidicAcid ?? 0.0) + (other.elaidicAcid ?? 0.0),
+      ),
       gammaLinolenicAcid: _nullIfZero(
-          (gammaLinolenicAcid ?? 0.0) + (other.gammaLinolenicAcid ?? 0.0)),
-      gondoicAcid:
-          _nullIfZero((gondoicAcid ?? 0.0) + (other.gondoicAcid ?? 0.0)),
-      lignocericAcid:
-          _nullIfZero((lignocericAcid ?? 0.0) + (other.lignocericAcid ?? 0.0)),
+        (gammaLinolenicAcid ?? 0.0) + (other.gammaLinolenicAcid ?? 0.0),
+      ),
+      gondoicAcid: _nullIfZero(
+        (gondoicAcid ?? 0.0) + (other.gondoicAcid ?? 0.0),
+      ),
+      lignocericAcid: _nullIfZero(
+        (lignocericAcid ?? 0.0) + (other.lignocericAcid ?? 0.0),
+      ),
       meadAcid: _nullIfZero((meadAcid ?? 0.0) + (other.meadAcid ?? 0.0)),
-      melissicAcid:
-          _nullIfZero((melissicAcid ?? 0.0) + (other.melissicAcid ?? 0.0)),
-      montanicAcid:
-          _nullIfZero((montanicAcid ?? 0.0) + (other.montanicAcid ?? 0.0)),
-      nervonicAcid:
-          _nullIfZero((nervonicAcid ?? 0.0) + (other.nervonicAcid ?? 0.0)),
+      melissicAcid: _nullIfZero(
+        (melissicAcid ?? 0.0) + (other.melissicAcid ?? 0.0),
+      ),
+      montanicAcid: _nullIfZero(
+        (montanicAcid ?? 0.0) + (other.montanicAcid ?? 0.0),
+      ),
+      nervonicAcid: _nullIfZero(
+        (nervonicAcid ?? 0.0) + (other.nervonicAcid ?? 0.0),
+      ),
       transFat: _nullIfZero((transFat ?? 0.0) + (other.transFat ?? 0.0)),
     );
   }
@@ -782,6 +687,7 @@ class NutritionValues {
       carbs: carbs / value,
       sugar: sugar / value,
       protein: protein / value,
+      water: water != null ? water! / value : null,
       salt: salt != null ? salt! / value : null,
       sodium: sodium != null ? sodium! / value : null,
       fiber: fiber != null ? fiber! / value : null,
@@ -817,18 +723,23 @@ class NutritionValues {
       stearicAcid: stearicAcid != null ? stearicAcid! / value : null,
       oleicAcid: oleicAcid != null ? oleicAcid! / value : null,
       linoleicAcid: linoleicAcid != null ? linoleicAcid! / value : null,
-      docosahexaenoicAcid:
-          docosahexaenoicAcid != null ? docosahexaenoicAcid! / value : null,
-      eicosapentaenoicAcid:
-          eicosapentaenoicAcid != null ? eicosapentaenoicAcid! / value : null,
+      docosahexaenoicAcid: docosahexaenoicAcid != null
+          ? docosahexaenoicAcid! / value
+          : null,
+      eicosapentaenoicAcid: eicosapentaenoicAcid != null
+          ? eicosapentaenoicAcid! / value
+          : null,
       erucicAcid: erucicAcid != null ? erucicAcid! / value : null,
-      monounsaturatedFat:
-          monounsaturatedFat != null ? monounsaturatedFat! / value : null,
-      polyunsaturatedFat:
-          polyunsaturatedFat != null ? polyunsaturatedFat! / value : null,
+      monounsaturatedFat: monounsaturatedFat != null
+          ? monounsaturatedFat! / value
+          : null,
+      polyunsaturatedFat: polyunsaturatedFat != null
+          ? polyunsaturatedFat! / value
+          : null,
       alcohol: alcohol != null ? alcohol! / value : null,
-      pantothenicAcid:
-          pantothenicAcid != null ? pantothenicAcid! / value : null,
+      pantothenicAcid: pantothenicAcid != null
+          ? pantothenicAcid! / value
+          : null,
       biotin: biotin != null ? biotin! / value : null,
       chloride: chloride != null ? chloride! / value : null,
       chromium: chromium != null ? chromium! / value : null,
@@ -842,19 +753,22 @@ class NutritionValues {
       betaCarotene: betaCarotene != null ? betaCarotene! / value : null,
       bicarbonate: bicarbonate != null ? bicarbonate! / value : null,
       sugarAlcohol: sugarAlcohol != null ? sugarAlcohol! / value : null,
-      alphaLinolenicAcid:
-          alphaLinolenicAcid != null ? alphaLinolenicAcid! / value : null,
+      alphaLinolenicAcid: alphaLinolenicAcid != null
+          ? alphaLinolenicAcid! / value
+          : null,
       arachidicAcid: arachidicAcid != null ? arachidicAcid! / value : null,
-      arachidonicAcid:
-          arachidonicAcid != null ? arachidonicAcid! / value : null,
+      arachidonicAcid: arachidonicAcid != null
+          ? arachidonicAcid! / value
+          : null,
       behenicAcid: behenicAcid != null ? behenicAcid! / value : null,
       ceroticAcid: ceroticAcid != null ? ceroticAcid! / value : null,
       dihomoGammaLinolenicAcid: dihomoGammaLinolenicAcid != null
           ? dihomoGammaLinolenicAcid! / value
           : null,
       elaidicAcid: elaidicAcid != null ? elaidicAcid! / value : null,
-      gammaLinolenicAcid:
-          gammaLinolenicAcid != null ? gammaLinolenicAcid! / value : null,
+      gammaLinolenicAcid: gammaLinolenicAcid != null
+          ? gammaLinolenicAcid! / value
+          : null,
       gondoicAcid: gondoicAcid != null ? gondoicAcid! / value : null,
       lignocericAcid: lignocericAcid != null ? lignocericAcid! / value : null,
       meadAcid: meadAcid != null ? meadAcid! / value : null,
@@ -873,6 +787,7 @@ class NutritionValues {
       carbs: carbs * value,
       sugar: sugar * value,
       protein: protein * value,
+      water: water != null ? water! * value : null,
       salt: salt != null ? salt! * value : null,
       sodium: sodium != null ? sodium! * value : null,
       fiber: fiber != null ? fiber! * value : null,
@@ -908,18 +823,23 @@ class NutritionValues {
       stearicAcid: stearicAcid != null ? stearicAcid! * value : null,
       oleicAcid: oleicAcid != null ? oleicAcid! * value : null,
       linoleicAcid: linoleicAcid != null ? linoleicAcid! * value : null,
-      docosahexaenoicAcid:
-          docosahexaenoicAcid != null ? docosahexaenoicAcid! * value : null,
-      eicosapentaenoicAcid:
-          eicosapentaenoicAcid != null ? eicosapentaenoicAcid! * value : null,
+      docosahexaenoicAcid: docosahexaenoicAcid != null
+          ? docosahexaenoicAcid! * value
+          : null,
+      eicosapentaenoicAcid: eicosapentaenoicAcid != null
+          ? eicosapentaenoicAcid! * value
+          : null,
       erucicAcid: erucicAcid != null ? erucicAcid! * value : null,
-      monounsaturatedFat:
-          monounsaturatedFat != null ? monounsaturatedFat! * value : null,
-      polyunsaturatedFat:
-          polyunsaturatedFat != null ? polyunsaturatedFat! * value : null,
+      monounsaturatedFat: monounsaturatedFat != null
+          ? monounsaturatedFat! * value
+          : null,
+      polyunsaturatedFat: polyunsaturatedFat != null
+          ? polyunsaturatedFat! * value
+          : null,
       alcohol: alcohol != null ? alcohol! * value : null,
-      pantothenicAcid:
-          pantothenicAcid != null ? pantothenicAcid! * value : null,
+      pantothenicAcid: pantothenicAcid != null
+          ? pantothenicAcid! * value
+          : null,
       biotin: biotin != null ? biotin! * value : null,
       chloride: chloride != null ? chloride! * value : null,
       chromium: chromium != null ? chromium! * value : null,
@@ -933,19 +853,22 @@ class NutritionValues {
       betaCarotene: betaCarotene != null ? betaCarotene! * value : null,
       bicarbonate: bicarbonate != null ? bicarbonate! * value : null,
       sugarAlcohol: sugarAlcohol != null ? sugarAlcohol! * value : null,
-      alphaLinolenicAcid:
-          alphaLinolenicAcid != null ? alphaLinolenicAcid! * value : null,
+      alphaLinolenicAcid: alphaLinolenicAcid != null
+          ? alphaLinolenicAcid! * value
+          : null,
       arachidicAcid: arachidicAcid != null ? arachidicAcid! * value : null,
-      arachidonicAcid:
-          arachidonicAcid != null ? arachidonicAcid! * value : null,
+      arachidonicAcid: arachidonicAcid != null
+          ? arachidonicAcid! * value
+          : null,
       behenicAcid: behenicAcid != null ? behenicAcid! * value : null,
       ceroticAcid: ceroticAcid != null ? ceroticAcid! * value : null,
       dihomoGammaLinolenicAcid: dihomoGammaLinolenicAcid != null
           ? dihomoGammaLinolenicAcid! * value
           : null,
       elaidicAcid: elaidicAcid != null ? elaidicAcid! * value : null,
-      gammaLinolenicAcid:
-          gammaLinolenicAcid != null ? gammaLinolenicAcid! * value : null,
+      gammaLinolenicAcid: gammaLinolenicAcid != null
+          ? gammaLinolenicAcid! * value
+          : null,
       gondoicAcid: gondoicAcid != null ? gondoicAcid! * value : null,
       lignocericAcid: lignocericAcid != null ? lignocericAcid! * value : null,
       meadAcid: meadAcid != null ? meadAcid! * value : null,
@@ -1055,6 +978,7 @@ class NutritionValues {
         other.carbs == carbs &&
         other.sugar == sugar &&
         other.protein == protein &&
+        other.water == water &&
         other.salt == salt &&
         other.sodium == sodium &&
         other.fiber == fiber &&
@@ -1135,6 +1059,7 @@ class NutritionValues {
       carbs.hashCode ^
       sugar.hashCode ^
       protein.hashCode ^
+      water.hashCode ^
       salt.hashCode ^
       sodium.hashCode ^
       fiber.hashCode ^
@@ -1214,6 +1139,7 @@ class NutritionValues {
       "carbs": carbs,
       "sugar": sugar,
       "protein": protein,
+      "water": water,
       "salt": salt,
       "sodium": sodium,
       "fiber": fiber,
@@ -1287,14 +1213,30 @@ class NutritionValues {
     };
   }
 
-  NutritionValues rescaled({
-    required double from,
-    required double to,
-  }) {
+  NutritionValues rescaled({required double from, required double to}) {
     return this * (to / from);
   }
 }
 
 double? _nullIfZero(double value) {
   return value == 0.0 ? null : value;
+}
+
+extension NutritionUnitFormatting on NutritionUnit {
+  String t({required BuildContext context}) =>
+      context.t.food.nutrimentUnits[toCamelCase()] ?? "UNKNOWN";
+
+  String formatAmount(
+    double amount, {
+    int pieces = 1,
+    bool showUnit = true,
+    required BuildContext context,
+  }) {
+    final pcs = pieces == 1 ? "" : "$pieces × ";
+    final unit = showUnit ? " ${t(context: context)}" : "";
+    final decSep = NumberFormat.decimalPattern(
+      Localizations.localeOf(context).languageCode,
+    ).symbols.DECIMAL_SEP;
+    return "$pcs${stringifyDouble(amount, decimalSeparator: decSep)}$unit";
+  }
 }

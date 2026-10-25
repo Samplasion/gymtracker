@@ -41,10 +41,16 @@ class _AddFoodViewState extends ConsumerState<AddFoodView> {
           (element) => element.amount == amount,
         );
   late final TextEditingController amountController;
+  late final waterController = TextEditingController(
+    text: widget.food.nutritionalValuesPer100g.water?.toString() ?? "",
+  );
+
+  bool _amountInitialized = false;
 
   @override
-  void initState() {
-    super.initState();
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_amountInitialized) return;
     final decSep = NumberFormat.decimalPattern(
       Localizations.localeOf(context).languageCode,
     ).symbols.DECIMAL_SEP;
@@ -54,11 +60,13 @@ class _AddFoodViewState extends ConsumerState<AddFoodView> {
         decimalSeparator: decSep,
       ),
     );
+    _amountInitialized = true;
   }
 
   @override
   dispose() {
     amountController.dispose();
+    waterController.dispose();
     super.dispose();
   }
 
@@ -82,6 +90,16 @@ class _AddFoodViewState extends ConsumerState<AddFoodView> {
           ].join(", "),
         ),
         actions: [
+          if (widget.food is CatalogFood)
+            IconButton(
+              tooltip: context.t.food.catalog.report,
+              icon: const Icon(Icons.flag_outlined),
+              onPressed: () => showCatalogReport(
+                context,
+                ref,
+                (widget.food as CatalogFood).catalogId,
+              ),
+            ),
           if (widget.food is Food)
             Builder(
               builder: (BuildContext context) {
@@ -134,6 +152,23 @@ class _AddFoodViewState extends ConsumerState<AddFoodView> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
+                      TextFormField(
+                        controller: waterController,
+                        keyboardType: const TextInputType.numberWithOptions(
+                          decimal: true,
+                        ),
+                        decoration: InputDecoration(
+                          labelText: context.t.hydration.waterPer100,
+                        ),
+                        validator: (text) {
+                          if (text == null || text.trim().isEmpty) return null;
+                          final value = text.tryParseDouble();
+                          return value == null || !value.isFinite || value < 0
+                              ? context.t.food.add.amountInvalid
+                              : null;
+                        },
+                      ),
+                      const SizedBox(height: 12),
                       if (hasServingSizes) ...[
                         DropdownButtonFormField<ServingSize?>(
                           isExpanded: true,
@@ -207,7 +242,7 @@ class _AddFoodViewState extends ConsumerState<AddFoodView> {
                                 amount: amount * pieces,
                                 unit: widget.food.unit,
                               ),
-                              if (widget.food.isDownloaded) ...[
+                              if (widget.food.downloadedFromOFF) ...[
                                 const SizedBox(height: 16),
                                 OpenFoodFactsTableAttribution(
                                   food: widget.food,
@@ -263,10 +298,12 @@ class _AddFoodViewState extends ConsumerState<AddFoodView> {
                   name: widget.food.name,
                   brand: widget.food.brand,
                   amount: amount,
-                  nutritionalValuesPer100g:
-                      widget.food.nutritionalValuesPer100g,
-                  servingSizes: widget.food.servingSizes,
-                  isDownloaded: true,
+                  nutritionalValuesPer100g: NutritionValues.fromJson({
+                    ...widget.food.nutritionalValuesPer100g.toJson(),
+                    "water": waterController.text.tryParseDouble(),
+                  }),
+                  servingSizes: List.of(widget.food.servingSizes),
+                  downloadedFromOFF: widget.food.downloadedFromOFF,
                   barcode: widget.food.barcode,
                   unit: widget.food.unit,
                   pieces: pieces,
@@ -422,6 +459,8 @@ class NutritionTable extends StatelessWidget {
         NutritionRow(id: "fat", value: nutritionalValues.fat, bold: true),
         NutritionRow(id: "saturatedFat", value: nutritionalValues.saturatedFat),
         verticalSpace,
+        if (nutritionalValues.water != null)
+          NutritionRow(id: "water", value: nutritionalValues.water!),
         if (nutritionalValues.salt != null)
           NutritionRow(id: "salt", value: nutritionalValues.salt!),
         if (nutritionalValues.sodium != null)
@@ -729,6 +768,7 @@ class _CustomAddFoodViewState extends ConsumerState<CustomAddFoodView> {
     "sugar": TextEditingController(),
     "fat": TextEditingController(),
     "saturatedFat": TextEditingController(),
+    "water": TextEditingController(),
     "salt": TextEditingController(),
     "sodium": TextEditingController(),
     "fiber": TextEditingController(),
@@ -803,6 +843,8 @@ class _CustomAddFoodViewState extends ConsumerState<CustomAddFoodView> {
 
   late final nameController = TextEditingController();
   late final brandController = TextEditingController();
+  bool submitToCatalog = true;
+  bool saving = false;
   double amount = 100;
   int pieces = 1;
   late final amountController = TextEditingController(
@@ -839,6 +881,7 @@ class _CustomAddFoodViewState extends ConsumerState<CustomAddFoodView> {
 
   @override
   Widget build(BuildContext context) {
+    final catalogOwner = ref.watch(currentUserIdProvider);
     final colorScheme = Theme.of(context).colorScheme;
     final gradientColor = colorScheme.surfaceContainerHigh;
     return Scaffold(
@@ -944,6 +987,25 @@ class _CustomAddFoodViewState extends ConsumerState<CustomAddFoodView> {
                           labelText: context.t.food.add.pieces,
                         ),
                       ),
+                      const SizedBox(height: 16),
+                      CheckboxListTile(
+                        key: const ValueKey('submit-to-catalog'),
+                        contentPadding: EdgeInsets.zero,
+                        title: Text(context.t.food.catalog.submitAlso),
+                        subtitle: Text(
+                          catalogOwner == null
+                              ? context.t.food.catalog.loginToSubmit
+                              : context.t.food.catalog.publicNotice,
+                        ),
+                        value: submitToCatalog && catalogOwner != null,
+                        onChanged: catalogOwner == null || saving
+                            ? null
+                            : (value) {
+                                setState(
+                                  () => submitToCatalog = value ?? false,
+                                );
+                              },
+                      ),
                       const Divider(height: 32),
                       Text(
                         context.t.food.add.nutritionalValuesPerAmountWithUnit(
@@ -1038,6 +1100,8 @@ class _CustomAddFoodViewState extends ConsumerState<CustomAddFoodView> {
                 return;
               }
 
+              if (saving) return;
+              setState(() => saving = true);
               final food = Food(
                 name: nameController.text.trim(),
                 brand: brandController.text.trim().isEmpty
@@ -1065,6 +1129,27 @@ class _CustomAddFoodViewState extends ConsumerState<CustomAddFoodView> {
                     );
               }
 
+              if (submitToCatalog && catalogOwner != null) {
+                try {
+                  await ref
+                      .read(catalogOutboxProvider)
+                      .enqueue(catalogOwner, food);
+                } catch (error, stack) {
+                  globalLogger.w(
+                    'Could not queue explicit catalog submission',
+                    error: error,
+                    stackTrace: stack,
+                  );
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(context.t.food.catalog.queueFailed),
+                      ),
+                    );
+                  }
+                }
+              }
+              if (!context.mounted) return;
               Navigator.of(context).pop(food);
             },
             child: Text(context.t.food.add.add),
@@ -1131,24 +1216,23 @@ class SearchResultsView extends ConsumerWidget {
                       child: ListTile(
                         title: Text(food.name),
                         subtitle: food.brand == null ? null : Text(food.brand!),
+                        trailing: food is CatalogFood
+                            ? IconButton(
+                                tooltip: context.t.food.catalog.report,
+                                icon: const Icon(Icons.flag_outlined),
+                                onPressed: () => showCatalogReport(
+                                  context,
+                                  ref,
+                                  food.catalogId,
+                                ),
+                              )
+                            : null,
                         onTap: () {
                           Navigator.of(context).pop(food);
                         },
                       ),
                     );
                   },
-                ),
-                SliverSafeArea(
-                  sliver: SliverList.list(
-                    children: [
-                      ListTile(
-                        title: Text(
-                          context.t.food.offAttribution,
-                          style: Theme.of(context).textTheme.labelSmall,
-                        ),
-                      ),
-                    ],
-                  ),
                 ),
               ],
             ),
@@ -1577,7 +1661,7 @@ class _AddCombinedFoodViewState extends ConsumerState<AddCombinedFoodView> {
                                 unit: unit,
                               ),
                               if (constituents.any(
-                                (food) => food.isDownloaded,
+                                (food) => food.downloadedFromOFF,
                               )) ...[
                                 const SizedBox(height: 16),
                                 OpenFoodFactsTableAttribution(
@@ -1622,8 +1706,8 @@ class _AddCombinedFoodViewState extends ConsumerState<AddCombinedFoodView> {
                       amount: amount,
                       unit: unit,
                       nutritionalValuesPer100g: nutritionalValues,
-                      isDownloaded: constituents.any(
-                        (food) => food.isDownloaded,
+                      downloadedFromOFF: constituents.any(
+                        (food) => food.downloadedFromOFF,
                       ),
                     );
 
@@ -1690,24 +1774,5 @@ class _AddCombinedFoodViewState extends ConsumerState<AddCombinedFoodView> {
         },
       ),
     );
-  }
-}
-
-extension on NutritionUnit {
-  String t({required BuildContext context}) =>
-      context.t.food.nutrimentUnits[toCamelCase()] ?? "UNKNOWN";
-
-  String formatAmount(
-    double amount, {
-    int pieces = 1,
-    bool showUnit = true,
-    required BuildContext context,
-  }) {
-    final pcs = pieces == 1 ? "" : "$pieces × ";
-    final unit = showUnit ? " ${t(context: context)}" : "";
-    final decSep = NumberFormat.decimalPattern(
-      Localizations.localeOf(context).languageCode,
-    ).symbols.DECIMAL_SEP;
-    return "$pcs${stringifyDouble(amount, decimalSeparator: decSep)}$unit";
   }
 }

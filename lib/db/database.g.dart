@@ -5097,6 +5097,15 @@ class $NutritionGoalsTable extends NutritionGoals
     type: DriftSqlType.double,
     requiredDuringInsert: true,
   );
+  static const VerificationMeta _waterMeta = const VerificationMeta('water');
+  @override
+  late final GeneratedColumn<double> water = GeneratedColumn<double>(
+    'water',
+    aliasedName,
+    true,
+    type: DriftSqlType.double,
+    requiredDuringInsert: false,
+  );
   @override
   List<GeneratedColumn> get $columns => [
     id,
@@ -5108,6 +5117,7 @@ class $NutritionGoalsTable extends NutritionGoals
     fat,
     carbs,
     protein,
+    water,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -5185,6 +5195,12 @@ class $NutritionGoalsTable extends NutritionGoals
     } else if (isInserting) {
       context.missing(_proteinMeta);
     }
+    if (data.containsKey('water')) {
+      context.handle(
+        _waterMeta,
+        water.isAcceptableOrUnknown(data['water']!, _waterMeta),
+      );
+    }
     return context;
   }
 
@@ -5218,6 +5234,10 @@ class $NutritionGoalsTable extends NutritionGoals
         DriftSqlType.double,
         data['${effectivePrefix}protein'],
       )!,
+      water: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}water'],
+      ),
       updatedAt: attachedDatabase.typeMapping.read(
         DriftSqlType.dateTime,
         data['${effectivePrefix}updated_at'],
@@ -5249,6 +5269,7 @@ class NutritionGoalsCompanion extends UpdateCompanion<DBNutritionGoal> {
   final Value<double> fat;
   final Value<double> carbs;
   final Value<double> protein;
+  final Value<double?> water;
   final Value<int> rowid;
   const NutritionGoalsCompanion({
     this.id = const Value.absent(),
@@ -5260,6 +5281,7 @@ class NutritionGoalsCompanion extends UpdateCompanion<DBNutritionGoal> {
     this.fat = const Value.absent(),
     this.carbs = const Value.absent(),
     this.protein = const Value.absent(),
+    this.water = const Value.absent(),
     this.rowid = const Value.absent(),
   });
   NutritionGoalsCompanion.insert({
@@ -5272,6 +5294,7 @@ class NutritionGoalsCompanion extends UpdateCompanion<DBNutritionGoal> {
     required double fat,
     required double carbs,
     required double protein,
+    this.water = const Value.absent(),
     this.rowid = const Value.absent(),
   }) : referenceDate = Value(referenceDate),
        calories = Value(calories),
@@ -5288,6 +5311,7 @@ class NutritionGoalsCompanion extends UpdateCompanion<DBNutritionGoal> {
     Expression<double>? fat,
     Expression<double>? carbs,
     Expression<double>? protein,
+    Expression<double>? water,
     Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
@@ -5300,6 +5324,7 @@ class NutritionGoalsCompanion extends UpdateCompanion<DBNutritionGoal> {
       if (fat != null) 'fat': fat,
       if (carbs != null) 'carbs': carbs,
       if (protein != null) 'protein': protein,
+      if (water != null) 'water': water,
       if (rowid != null) 'rowid': rowid,
     });
   }
@@ -5314,6 +5339,7 @@ class NutritionGoalsCompanion extends UpdateCompanion<DBNutritionGoal> {
     Value<double>? fat,
     Value<double>? carbs,
     Value<double>? protein,
+    Value<double?>? water,
     Value<int>? rowid,
   }) {
     return NutritionGoalsCompanion(
@@ -5326,6 +5352,7 @@ class NutritionGoalsCompanion extends UpdateCompanion<DBNutritionGoal> {
       fat: fat ?? this.fat,
       carbs: carbs ?? this.carbs,
       protein: protein ?? this.protein,
+      water: water ?? this.water,
       rowid: rowid ?? this.rowid,
     );
   }
@@ -5360,6 +5387,9 @@ class NutritionGoalsCompanion extends UpdateCompanion<DBNutritionGoal> {
     if (protein.present) {
       map['protein'] = Variable<double>(protein.value);
     }
+    if (water.present) {
+      map['water'] = Variable<double>(water.value);
+    }
     if (rowid.present) {
       map['rowid'] = Variable<int>(rowid.value);
     }
@@ -5378,6 +5408,7 @@ class NutritionGoalsCompanion extends UpdateCompanion<DBNutritionGoal> {
           ..write('fat: $fat, ')
           ..write('carbs: $carbs, ')
           ..write('protein: $protein, ')
+          ..write('water: $water, ')
           ..write('rowid: $rowid')
           ..write(')'))
         .toString();
@@ -8927,6 +8958,1543 @@ class SyncQuarantineCompanion extends UpdateCompanion<SyncQuarantineData> {
   }
 }
 
+class $CatalogSubmissionsTable extends CatalogSubmissions
+    with TableInfo<$CatalogSubmissionsTable, CatalogSubmission> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $CatalogSubmissionsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _operationIdMeta = const VerificationMeta(
+    'operationId',
+  );
+  @override
+  late final GeneratedColumn<String> operationId = GeneratedColumn<String>(
+    'operation_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _ownerMeta = const VerificationMeta('owner');
+  @override
+  late final GeneratedColumn<String> owner = GeneratedColumn<String>(
+    'owner',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _definitionMeta = const VerificationMeta(
+    'definition',
+  );
+  @override
+  late final GeneratedColumn<String> definition = GeneratedColumn<String>(
+    'definition',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _statusMeta = const VerificationMeta('status');
+  @override
+  late final GeneratedColumn<String> status = GeneratedColumn<String>(
+    'status',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('pending'),
+  );
+  static const VerificationMeta _resultMeta = const VerificationMeta('result');
+  @override
+  late final GeneratedColumn<String> result = GeneratedColumn<String>(
+    'result',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _errorMeta = const VerificationMeta('error');
+  @override
+  late final GeneratedColumn<String> error = GeneratedColumn<String>(
+    'error',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _attemptsMeta = const VerificationMeta(
+    'attempts',
+  );
+  @override
+  late final GeneratedColumn<int> attempts = GeneratedColumn<int>(
+    'attempts',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  static const VerificationMeta _nextAttemptMeta = const VerificationMeta(
+    'nextAttempt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> nextAttempt = GeneratedColumn<DateTime>(
+    'next_attempt',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    operationId,
+    owner,
+    definition,
+    status,
+    result,
+    error,
+    attempts,
+    nextAttempt,
+    createdAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'catalog_submissions';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<CatalogSubmission> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('operation_id')) {
+      context.handle(
+        _operationIdMeta,
+        operationId.isAcceptableOrUnknown(
+          data['operation_id']!,
+          _operationIdMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_operationIdMeta);
+    }
+    if (data.containsKey('owner')) {
+      context.handle(
+        _ownerMeta,
+        owner.isAcceptableOrUnknown(data['owner']!, _ownerMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_ownerMeta);
+    }
+    if (data.containsKey('definition')) {
+      context.handle(
+        _definitionMeta,
+        definition.isAcceptableOrUnknown(data['definition']!, _definitionMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_definitionMeta);
+    }
+    if (data.containsKey('status')) {
+      context.handle(
+        _statusMeta,
+        status.isAcceptableOrUnknown(data['status']!, _statusMeta),
+      );
+    }
+    if (data.containsKey('result')) {
+      context.handle(
+        _resultMeta,
+        result.isAcceptableOrUnknown(data['result']!, _resultMeta),
+      );
+    }
+    if (data.containsKey('error')) {
+      context.handle(
+        _errorMeta,
+        error.isAcceptableOrUnknown(data['error']!, _errorMeta),
+      );
+    }
+    if (data.containsKey('attempts')) {
+      context.handle(
+        _attemptsMeta,
+        attempts.isAcceptableOrUnknown(data['attempts']!, _attemptsMeta),
+      );
+    }
+    if (data.containsKey('next_attempt')) {
+      context.handle(
+        _nextAttemptMeta,
+        nextAttempt.isAcceptableOrUnknown(
+          data['next_attempt']!,
+          _nextAttemptMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_nextAttemptMeta);
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {operationId};
+  @override
+  CatalogSubmission map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return CatalogSubmission(
+      operationId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}operation_id'],
+      )!,
+      owner: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}owner'],
+      )!,
+      definition: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}definition'],
+      )!,
+      status: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}status'],
+      )!,
+      result: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}result'],
+      ),
+      error: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}error'],
+      ),
+      attempts: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}attempts'],
+      )!,
+      nextAttempt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}next_attempt'],
+      )!,
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+    );
+  }
+
+  @override
+  $CatalogSubmissionsTable createAlias(String alias) {
+    return $CatalogSubmissionsTable(attachedDatabase, alias);
+  }
+}
+
+class CatalogSubmission extends DataClass
+    implements Insertable<CatalogSubmission> {
+  final String operationId;
+  final String owner;
+  final String definition;
+  final String status;
+  final String? result;
+  final String? error;
+  final int attempts;
+  final DateTime nextAttempt;
+  final DateTime createdAt;
+  const CatalogSubmission({
+    required this.operationId,
+    required this.owner,
+    required this.definition,
+    required this.status,
+    this.result,
+    this.error,
+    required this.attempts,
+    required this.nextAttempt,
+    required this.createdAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['operation_id'] = Variable<String>(operationId);
+    map['owner'] = Variable<String>(owner);
+    map['definition'] = Variable<String>(definition);
+    map['status'] = Variable<String>(status);
+    if (!nullToAbsent || result != null) {
+      map['result'] = Variable<String>(result);
+    }
+    if (!nullToAbsent || error != null) {
+      map['error'] = Variable<String>(error);
+    }
+    map['attempts'] = Variable<int>(attempts);
+    map['next_attempt'] = Variable<DateTime>(nextAttempt);
+    map['created_at'] = Variable<DateTime>(createdAt);
+    return map;
+  }
+
+  CatalogSubmissionsCompanion toCompanion(bool nullToAbsent) {
+    return CatalogSubmissionsCompanion(
+      operationId: Value(operationId),
+      owner: Value(owner),
+      definition: Value(definition),
+      status: Value(status),
+      result: result == null && nullToAbsent
+          ? const Value.absent()
+          : Value(result),
+      error: error == null && nullToAbsent
+          ? const Value.absent()
+          : Value(error),
+      attempts: Value(attempts),
+      nextAttempt: Value(nextAttempt),
+      createdAt: Value(createdAt),
+    );
+  }
+
+  factory CatalogSubmission.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return CatalogSubmission(
+      operationId: serializer.fromJson<String>(json['operationId']),
+      owner: serializer.fromJson<String>(json['owner']),
+      definition: serializer.fromJson<String>(json['definition']),
+      status: serializer.fromJson<String>(json['status']),
+      result: serializer.fromJson<String?>(json['result']),
+      error: serializer.fromJson<String?>(json['error']),
+      attempts: serializer.fromJson<int>(json['attempts']),
+      nextAttempt: serializer.fromJson<DateTime>(json['nextAttempt']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'operationId': serializer.toJson<String>(operationId),
+      'owner': serializer.toJson<String>(owner),
+      'definition': serializer.toJson<String>(definition),
+      'status': serializer.toJson<String>(status),
+      'result': serializer.toJson<String?>(result),
+      'error': serializer.toJson<String?>(error),
+      'attempts': serializer.toJson<int>(attempts),
+      'nextAttempt': serializer.toJson<DateTime>(nextAttempt),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+    };
+  }
+
+  CatalogSubmission copyWith({
+    String? operationId,
+    String? owner,
+    String? definition,
+    String? status,
+    Value<String?> result = const Value.absent(),
+    Value<String?> error = const Value.absent(),
+    int? attempts,
+    DateTime? nextAttempt,
+    DateTime? createdAt,
+  }) => CatalogSubmission(
+    operationId: operationId ?? this.operationId,
+    owner: owner ?? this.owner,
+    definition: definition ?? this.definition,
+    status: status ?? this.status,
+    result: result.present ? result.value : this.result,
+    error: error.present ? error.value : this.error,
+    attempts: attempts ?? this.attempts,
+    nextAttempt: nextAttempt ?? this.nextAttempt,
+    createdAt: createdAt ?? this.createdAt,
+  );
+  CatalogSubmission copyWithCompanion(CatalogSubmissionsCompanion data) {
+    return CatalogSubmission(
+      operationId: data.operationId.present
+          ? data.operationId.value
+          : this.operationId,
+      owner: data.owner.present ? data.owner.value : this.owner,
+      definition: data.definition.present
+          ? data.definition.value
+          : this.definition,
+      status: data.status.present ? data.status.value : this.status,
+      result: data.result.present ? data.result.value : this.result,
+      error: data.error.present ? data.error.value : this.error,
+      attempts: data.attempts.present ? data.attempts.value : this.attempts,
+      nextAttempt: data.nextAttempt.present
+          ? data.nextAttempt.value
+          : this.nextAttempt,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('CatalogSubmission(')
+          ..write('operationId: $operationId, ')
+          ..write('owner: $owner, ')
+          ..write('definition: $definition, ')
+          ..write('status: $status, ')
+          ..write('result: $result, ')
+          ..write('error: $error, ')
+          ..write('attempts: $attempts, ')
+          ..write('nextAttempt: $nextAttempt, ')
+          ..write('createdAt: $createdAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    operationId,
+    owner,
+    definition,
+    status,
+    result,
+    error,
+    attempts,
+    nextAttempt,
+    createdAt,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is CatalogSubmission &&
+          other.operationId == this.operationId &&
+          other.owner == this.owner &&
+          other.definition == this.definition &&
+          other.status == this.status &&
+          other.result == this.result &&
+          other.error == this.error &&
+          other.attempts == this.attempts &&
+          other.nextAttempt == this.nextAttempt &&
+          other.createdAt == this.createdAt);
+}
+
+class CatalogSubmissionsCompanion extends UpdateCompanion<CatalogSubmission> {
+  final Value<String> operationId;
+  final Value<String> owner;
+  final Value<String> definition;
+  final Value<String> status;
+  final Value<String?> result;
+  final Value<String?> error;
+  final Value<int> attempts;
+  final Value<DateTime> nextAttempt;
+  final Value<DateTime> createdAt;
+  final Value<int> rowid;
+  const CatalogSubmissionsCompanion({
+    this.operationId = const Value.absent(),
+    this.owner = const Value.absent(),
+    this.definition = const Value.absent(),
+    this.status = const Value.absent(),
+    this.result = const Value.absent(),
+    this.error = const Value.absent(),
+    this.attempts = const Value.absent(),
+    this.nextAttempt = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  CatalogSubmissionsCompanion.insert({
+    required String operationId,
+    required String owner,
+    required String definition,
+    this.status = const Value.absent(),
+    this.result = const Value.absent(),
+    this.error = const Value.absent(),
+    this.attempts = const Value.absent(),
+    required DateTime nextAttempt,
+    required DateTime createdAt,
+    this.rowid = const Value.absent(),
+  }) : operationId = Value(operationId),
+       owner = Value(owner),
+       definition = Value(definition),
+       nextAttempt = Value(nextAttempt),
+       createdAt = Value(createdAt);
+  static Insertable<CatalogSubmission> custom({
+    Expression<String>? operationId,
+    Expression<String>? owner,
+    Expression<String>? definition,
+    Expression<String>? status,
+    Expression<String>? result,
+    Expression<String>? error,
+    Expression<int>? attempts,
+    Expression<DateTime>? nextAttempt,
+    Expression<DateTime>? createdAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (operationId != null) 'operation_id': operationId,
+      if (owner != null) 'owner': owner,
+      if (definition != null) 'definition': definition,
+      if (status != null) 'status': status,
+      if (result != null) 'result': result,
+      if (error != null) 'error': error,
+      if (attempts != null) 'attempts': attempts,
+      if (nextAttempt != null) 'next_attempt': nextAttempt,
+      if (createdAt != null) 'created_at': createdAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  CatalogSubmissionsCompanion copyWith({
+    Value<String>? operationId,
+    Value<String>? owner,
+    Value<String>? definition,
+    Value<String>? status,
+    Value<String?>? result,
+    Value<String?>? error,
+    Value<int>? attempts,
+    Value<DateTime>? nextAttempt,
+    Value<DateTime>? createdAt,
+    Value<int>? rowid,
+  }) {
+    return CatalogSubmissionsCompanion(
+      operationId: operationId ?? this.operationId,
+      owner: owner ?? this.owner,
+      definition: definition ?? this.definition,
+      status: status ?? this.status,
+      result: result ?? this.result,
+      error: error ?? this.error,
+      attempts: attempts ?? this.attempts,
+      nextAttempt: nextAttempt ?? this.nextAttempt,
+      createdAt: createdAt ?? this.createdAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (operationId.present) {
+      map['operation_id'] = Variable<String>(operationId.value);
+    }
+    if (owner.present) {
+      map['owner'] = Variable<String>(owner.value);
+    }
+    if (definition.present) {
+      map['definition'] = Variable<String>(definition.value);
+    }
+    if (status.present) {
+      map['status'] = Variable<String>(status.value);
+    }
+    if (result.present) {
+      map['result'] = Variable<String>(result.value);
+    }
+    if (error.present) {
+      map['error'] = Variable<String>(error.value);
+    }
+    if (attempts.present) {
+      map['attempts'] = Variable<int>(attempts.value);
+    }
+    if (nextAttempt.present) {
+      map['next_attempt'] = Variable<DateTime>(nextAttempt.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('CatalogSubmissionsCompanion(')
+          ..write('operationId: $operationId, ')
+          ..write('owner: $owner, ')
+          ..write('definition: $definition, ')
+          ..write('status: $status, ')
+          ..write('result: $result, ')
+          ..write('error: $error, ')
+          ..write('attempts: $attempts, ')
+          ..write('nextAttempt: $nextAttempt, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $WaterLogsTable extends WaterLogs
+    with TableInfo<$WaterLogsTable, DBWaterLog> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $WaterLogsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    clientDefault: () => _uuid.v4(),
+  );
+  static const VerificationMeta _userIdMeta = const VerificationMeta('userId');
+  @override
+  late final GeneratedColumn<String> userId = GeneratedColumn<String>(
+    'user_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    defaultValue: Constant(DateTime.fromMicrosecondsSinceEpoch(0, isUtc: true)),
+  );
+  static const VerificationMeta _deletedMeta = const VerificationMeta(
+    'deleted',
+  );
+  @override
+  late final GeneratedColumn<bool> deleted = GeneratedColumn<bool>(
+    'deleted',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("deleted" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  static const VerificationMeta _dateAddedMeta = const VerificationMeta(
+    'dateAdded',
+  );
+  @override
+  late final GeneratedColumn<DateTime> dateAdded = GeneratedColumn<DateTime>(
+    'date_added',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _referenceDateMeta = const VerificationMeta(
+    'referenceDate',
+  );
+  @override
+  late final GeneratedColumn<DateTime> referenceDate =
+      GeneratedColumn<DateTime>(
+        'reference_date',
+        aliasedName,
+        false,
+        type: DriftSqlType.dateTime,
+        requiredDuringInsert: true,
+      );
+  static const VerificationMeta _jsonDataMeta = const VerificationMeta(
+    'jsonData',
+  );
+  @override
+  late final GeneratedColumn<String> jsonData = GeneratedColumn<String>(
+    'json_data',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    userId,
+    updatedAt,
+    deleted,
+    dateAdded,
+    referenceDate,
+    jsonData,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'water_logs';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<DBWaterLog> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('user_id')) {
+      context.handle(
+        _userIdMeta,
+        userId.isAcceptableOrUnknown(data['user_id']!, _userIdMeta),
+      );
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    }
+    if (data.containsKey('deleted')) {
+      context.handle(
+        _deletedMeta,
+        deleted.isAcceptableOrUnknown(data['deleted']!, _deletedMeta),
+      );
+    }
+    if (data.containsKey('date_added')) {
+      context.handle(
+        _dateAddedMeta,
+        dateAdded.isAcceptableOrUnknown(data['date_added']!, _dateAddedMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_dateAddedMeta);
+    }
+    if (data.containsKey('reference_date')) {
+      context.handle(
+        _referenceDateMeta,
+        referenceDate.isAcceptableOrUnknown(
+          data['reference_date']!,
+          _referenceDateMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_referenceDateMeta);
+    }
+    if (data.containsKey('json_data')) {
+      context.handle(
+        _jsonDataMeta,
+        jsonData.isAcceptableOrUnknown(data['json_data']!, _jsonDataMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_jsonDataMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id, userId};
+  @override
+  DBWaterLog map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return DBWaterLog(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      dateAdded: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}date_added'],
+      )!,
+      referenceDate: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}reference_date'],
+      )!,
+      jsonData: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}json_data'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}updated_at'],
+      )!,
+      deleted: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}deleted'],
+      )!,
+      userId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}user_id'],
+      ),
+    );
+  }
+
+  @override
+  $WaterLogsTable createAlias(String alias) {
+    return $WaterLogsTable(attachedDatabase, alias);
+  }
+}
+
+class WaterLogsCompanion extends UpdateCompanion<DBWaterLog> {
+  final Value<String> id;
+  final Value<String?> userId;
+  final Value<DateTime> updatedAt;
+  final Value<bool> deleted;
+  final Value<DateTime> dateAdded;
+  final Value<DateTime> referenceDate;
+  final Value<String> jsonData;
+  final Value<int> rowid;
+  const WaterLogsCompanion({
+    this.id = const Value.absent(),
+    this.userId = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.deleted = const Value.absent(),
+    this.dateAdded = const Value.absent(),
+    this.referenceDate = const Value.absent(),
+    this.jsonData = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  WaterLogsCompanion.insert({
+    this.id = const Value.absent(),
+    this.userId = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.deleted = const Value.absent(),
+    required DateTime dateAdded,
+    required DateTime referenceDate,
+    required String jsonData,
+    this.rowid = const Value.absent(),
+  }) : dateAdded = Value(dateAdded),
+       referenceDate = Value(referenceDate),
+       jsonData = Value(jsonData);
+  static Insertable<DBWaterLog> custom({
+    Expression<String>? id,
+    Expression<String>? userId,
+    Expression<DateTime>? updatedAt,
+    Expression<bool>? deleted,
+    Expression<DateTime>? dateAdded,
+    Expression<DateTime>? referenceDate,
+    Expression<String>? jsonData,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (userId != null) 'user_id': userId,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (deleted != null) 'deleted': deleted,
+      if (dateAdded != null) 'date_added': dateAdded,
+      if (referenceDate != null) 'reference_date': referenceDate,
+      if (jsonData != null) 'json_data': jsonData,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  WaterLogsCompanion copyWith({
+    Value<String>? id,
+    Value<String?>? userId,
+    Value<DateTime>? updatedAt,
+    Value<bool>? deleted,
+    Value<DateTime>? dateAdded,
+    Value<DateTime>? referenceDate,
+    Value<String>? jsonData,
+    Value<int>? rowid,
+  }) {
+    return WaterLogsCompanion(
+      id: id ?? this.id,
+      userId: userId ?? this.userId,
+      updatedAt: updatedAt ?? this.updatedAt,
+      deleted: deleted ?? this.deleted,
+      dateAdded: dateAdded ?? this.dateAdded,
+      referenceDate: referenceDate ?? this.referenceDate,
+      jsonData: jsonData ?? this.jsonData,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (userId.present) {
+      map['user_id'] = Variable<String>(userId.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    if (deleted.present) {
+      map['deleted'] = Variable<bool>(deleted.value);
+    }
+    if (dateAdded.present) {
+      map['date_added'] = Variable<DateTime>(dateAdded.value);
+    }
+    if (referenceDate.present) {
+      map['reference_date'] = Variable<DateTime>(referenceDate.value);
+    }
+    if (jsonData.present) {
+      map['json_data'] = Variable<String>(jsonData.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('WaterLogsCompanion(')
+          ..write('id: $id, ')
+          ..write('userId: $userId, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('deleted: $deleted, ')
+          ..write('dateAdded: $dateAdded, ')
+          ..write('referenceDate: $referenceDate, ')
+          ..write('jsonData: $jsonData, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $HydrationExportsTable extends HydrationExports
+    with TableInfo<$HydrationExportsTable, HydrationExport> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $HydrationExportsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _ownerMeta = const VerificationMeta('owner');
+  @override
+  late final GeneratedColumn<String> owner = GeneratedColumn<String>(
+    'owner',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _recordIdMeta = const VerificationMeta(
+    'recordId',
+  );
+  @override
+  late final GeneratedColumn<String> recordId = GeneratedColumn<String>(
+    'record_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _fingerprintMeta = const VerificationMeta(
+    'fingerprint',
+  );
+  @override
+  late final GeneratedColumn<String> fingerprint = GeneratedColumn<String>(
+    'fingerprint',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _versionMeta = const VerificationMeta(
+    'version',
+  );
+  @override
+  late final GeneratedColumn<int> version = GeneratedColumn<int>(
+    'version',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _pendingMeta = const VerificationMeta(
+    'pending',
+  );
+  @override
+  late final GeneratedColumn<bool> pending = GeneratedColumn<bool>(
+    'pending',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("pending" IN (0, 1))',
+    ),
+    defaultValue: const Constant(true),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    owner,
+    recordId,
+    fingerprint,
+    version,
+    pending,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'hydration_exports';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<HydrationExport> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('owner')) {
+      context.handle(
+        _ownerMeta,
+        owner.isAcceptableOrUnknown(data['owner']!, _ownerMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_ownerMeta);
+    }
+    if (data.containsKey('record_id')) {
+      context.handle(
+        _recordIdMeta,
+        recordId.isAcceptableOrUnknown(data['record_id']!, _recordIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_recordIdMeta);
+    }
+    if (data.containsKey('fingerprint')) {
+      context.handle(
+        _fingerprintMeta,
+        fingerprint.isAcceptableOrUnknown(
+          data['fingerprint']!,
+          _fingerprintMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_fingerprintMeta);
+    }
+    if (data.containsKey('version')) {
+      context.handle(
+        _versionMeta,
+        version.isAcceptableOrUnknown(data['version']!, _versionMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_versionMeta);
+    }
+    if (data.containsKey('pending')) {
+      context.handle(
+        _pendingMeta,
+        pending.isAcceptableOrUnknown(data['pending']!, _pendingMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {owner, recordId};
+  @override
+  HydrationExport map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return HydrationExport(
+      owner: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}owner'],
+      )!,
+      recordId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}record_id'],
+      )!,
+      fingerprint: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}fingerprint'],
+      )!,
+      version: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}version'],
+      )!,
+      pending: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}pending'],
+      )!,
+    );
+  }
+
+  @override
+  $HydrationExportsTable createAlias(String alias) {
+    return $HydrationExportsTable(attachedDatabase, alias);
+  }
+}
+
+class HydrationExport extends DataClass implements Insertable<HydrationExport> {
+  final String owner;
+  final String recordId;
+  final String fingerprint;
+  final int version;
+  final bool pending;
+  const HydrationExport({
+    required this.owner,
+    required this.recordId,
+    required this.fingerprint,
+    required this.version,
+    required this.pending,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['owner'] = Variable<String>(owner);
+    map['record_id'] = Variable<String>(recordId);
+    map['fingerprint'] = Variable<String>(fingerprint);
+    map['version'] = Variable<int>(version);
+    map['pending'] = Variable<bool>(pending);
+    return map;
+  }
+
+  HydrationExportsCompanion toCompanion(bool nullToAbsent) {
+    return HydrationExportsCompanion(
+      owner: Value(owner),
+      recordId: Value(recordId),
+      fingerprint: Value(fingerprint),
+      version: Value(version),
+      pending: Value(pending),
+    );
+  }
+
+  factory HydrationExport.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return HydrationExport(
+      owner: serializer.fromJson<String>(json['owner']),
+      recordId: serializer.fromJson<String>(json['recordId']),
+      fingerprint: serializer.fromJson<String>(json['fingerprint']),
+      version: serializer.fromJson<int>(json['version']),
+      pending: serializer.fromJson<bool>(json['pending']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'owner': serializer.toJson<String>(owner),
+      'recordId': serializer.toJson<String>(recordId),
+      'fingerprint': serializer.toJson<String>(fingerprint),
+      'version': serializer.toJson<int>(version),
+      'pending': serializer.toJson<bool>(pending),
+    };
+  }
+
+  HydrationExport copyWith({
+    String? owner,
+    String? recordId,
+    String? fingerprint,
+    int? version,
+    bool? pending,
+  }) => HydrationExport(
+    owner: owner ?? this.owner,
+    recordId: recordId ?? this.recordId,
+    fingerprint: fingerprint ?? this.fingerprint,
+    version: version ?? this.version,
+    pending: pending ?? this.pending,
+  );
+  HydrationExport copyWithCompanion(HydrationExportsCompanion data) {
+    return HydrationExport(
+      owner: data.owner.present ? data.owner.value : this.owner,
+      recordId: data.recordId.present ? data.recordId.value : this.recordId,
+      fingerprint: data.fingerprint.present
+          ? data.fingerprint.value
+          : this.fingerprint,
+      version: data.version.present ? data.version.value : this.version,
+      pending: data.pending.present ? data.pending.value : this.pending,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('HydrationExport(')
+          ..write('owner: $owner, ')
+          ..write('recordId: $recordId, ')
+          ..write('fingerprint: $fingerprint, ')
+          ..write('version: $version, ')
+          ..write('pending: $pending')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(owner, recordId, fingerprint, version, pending);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is HydrationExport &&
+          other.owner == this.owner &&
+          other.recordId == this.recordId &&
+          other.fingerprint == this.fingerprint &&
+          other.version == this.version &&
+          other.pending == this.pending);
+}
+
+class HydrationExportsCompanion extends UpdateCompanion<HydrationExport> {
+  final Value<String> owner;
+  final Value<String> recordId;
+  final Value<String> fingerprint;
+  final Value<int> version;
+  final Value<bool> pending;
+  final Value<int> rowid;
+  const HydrationExportsCompanion({
+    this.owner = const Value.absent(),
+    this.recordId = const Value.absent(),
+    this.fingerprint = const Value.absent(),
+    this.version = const Value.absent(),
+    this.pending = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  HydrationExportsCompanion.insert({
+    required String owner,
+    required String recordId,
+    required String fingerprint,
+    required int version,
+    this.pending = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : owner = Value(owner),
+       recordId = Value(recordId),
+       fingerprint = Value(fingerprint),
+       version = Value(version);
+  static Insertable<HydrationExport> custom({
+    Expression<String>? owner,
+    Expression<String>? recordId,
+    Expression<String>? fingerprint,
+    Expression<int>? version,
+    Expression<bool>? pending,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (owner != null) 'owner': owner,
+      if (recordId != null) 'record_id': recordId,
+      if (fingerprint != null) 'fingerprint': fingerprint,
+      if (version != null) 'version': version,
+      if (pending != null) 'pending': pending,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  HydrationExportsCompanion copyWith({
+    Value<String>? owner,
+    Value<String>? recordId,
+    Value<String>? fingerprint,
+    Value<int>? version,
+    Value<bool>? pending,
+    Value<int>? rowid,
+  }) {
+    return HydrationExportsCompanion(
+      owner: owner ?? this.owner,
+      recordId: recordId ?? this.recordId,
+      fingerprint: fingerprint ?? this.fingerprint,
+      version: version ?? this.version,
+      pending: pending ?? this.pending,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (owner.present) {
+      map['owner'] = Variable<String>(owner.value);
+    }
+    if (recordId.present) {
+      map['record_id'] = Variable<String>(recordId.value);
+    }
+    if (fingerprint.present) {
+      map['fingerprint'] = Variable<String>(fingerprint.value);
+    }
+    if (version.present) {
+      map['version'] = Variable<int>(version.value);
+    }
+    if (pending.present) {
+      map['pending'] = Variable<bool>(pending.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('HydrationExportsCompanion(')
+          ..write('owner: $owner, ')
+          ..write('recordId: $recordId, ')
+          ..write('fingerprint: $fingerprint, ')
+          ..write('version: $version, ')
+          ..write('pending: $pending, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $HydrationSettingsTable extends HydrationSettings
+    with TableInfo<$HydrationSettingsTable, HydrationSetting> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $HydrationSettingsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _ownerMeta = const VerificationMeta('owner');
+  @override
+  late final GeneratedColumn<String> owner = GeneratedColumn<String>(
+    'owner',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _enabledSinceMeta = const VerificationMeta(
+    'enabledSince',
+  );
+  @override
+  late final GeneratedColumn<DateTime> enabledSince = GeneratedColumn<DateTime>(
+    'enabled_since',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _enabledMeta = const VerificationMeta(
+    'enabled',
+  );
+  @override
+  late final GeneratedColumn<bool> enabled = GeneratedColumn<bool>(
+    'enabled',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("enabled" IN (0, 1))',
+    ),
+    defaultValue: const Constant(true),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [owner, enabledSince, enabled];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'hydration_settings';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<HydrationSetting> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('owner')) {
+      context.handle(
+        _ownerMeta,
+        owner.isAcceptableOrUnknown(data['owner']!, _ownerMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_ownerMeta);
+    }
+    if (data.containsKey('enabled_since')) {
+      context.handle(
+        _enabledSinceMeta,
+        enabledSince.isAcceptableOrUnknown(
+          data['enabled_since']!,
+          _enabledSinceMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_enabledSinceMeta);
+    }
+    if (data.containsKey('enabled')) {
+      context.handle(
+        _enabledMeta,
+        enabled.isAcceptableOrUnknown(data['enabled']!, _enabledMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {owner};
+  @override
+  HydrationSetting map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return HydrationSetting(
+      owner: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}owner'],
+      )!,
+      enabledSince: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}enabled_since'],
+      )!,
+      enabled: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}enabled'],
+      )!,
+    );
+  }
+
+  @override
+  $HydrationSettingsTable createAlias(String alias) {
+    return $HydrationSettingsTable(attachedDatabase, alias);
+  }
+}
+
+class HydrationSetting extends DataClass
+    implements Insertable<HydrationSetting> {
+  final String owner;
+  final DateTime enabledSince;
+  final bool enabled;
+  const HydrationSetting({
+    required this.owner,
+    required this.enabledSince,
+    required this.enabled,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['owner'] = Variable<String>(owner);
+    map['enabled_since'] = Variable<DateTime>(enabledSince);
+    map['enabled'] = Variable<bool>(enabled);
+    return map;
+  }
+
+  HydrationSettingsCompanion toCompanion(bool nullToAbsent) {
+    return HydrationSettingsCompanion(
+      owner: Value(owner),
+      enabledSince: Value(enabledSince),
+      enabled: Value(enabled),
+    );
+  }
+
+  factory HydrationSetting.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return HydrationSetting(
+      owner: serializer.fromJson<String>(json['owner']),
+      enabledSince: serializer.fromJson<DateTime>(json['enabledSince']),
+      enabled: serializer.fromJson<bool>(json['enabled']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'owner': serializer.toJson<String>(owner),
+      'enabledSince': serializer.toJson<DateTime>(enabledSince),
+      'enabled': serializer.toJson<bool>(enabled),
+    };
+  }
+
+  HydrationSetting copyWith({
+    String? owner,
+    DateTime? enabledSince,
+    bool? enabled,
+  }) => HydrationSetting(
+    owner: owner ?? this.owner,
+    enabledSince: enabledSince ?? this.enabledSince,
+    enabled: enabled ?? this.enabled,
+  );
+  HydrationSetting copyWithCompanion(HydrationSettingsCompanion data) {
+    return HydrationSetting(
+      owner: data.owner.present ? data.owner.value : this.owner,
+      enabledSince: data.enabledSince.present
+          ? data.enabledSince.value
+          : this.enabledSince,
+      enabled: data.enabled.present ? data.enabled.value : this.enabled,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('HydrationSetting(')
+          ..write('owner: $owner, ')
+          ..write('enabledSince: $enabledSince, ')
+          ..write('enabled: $enabled')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(owner, enabledSince, enabled);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is HydrationSetting &&
+          other.owner == this.owner &&
+          other.enabledSince == this.enabledSince &&
+          other.enabled == this.enabled);
+}
+
+class HydrationSettingsCompanion extends UpdateCompanion<HydrationSetting> {
+  final Value<String> owner;
+  final Value<DateTime> enabledSince;
+  final Value<bool> enabled;
+  final Value<int> rowid;
+  const HydrationSettingsCompanion({
+    this.owner = const Value.absent(),
+    this.enabledSince = const Value.absent(),
+    this.enabled = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  HydrationSettingsCompanion.insert({
+    required String owner,
+    required DateTime enabledSince,
+    this.enabled = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : owner = Value(owner),
+       enabledSince = Value(enabledSince);
+  static Insertable<HydrationSetting> custom({
+    Expression<String>? owner,
+    Expression<DateTime>? enabledSince,
+    Expression<bool>? enabled,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (owner != null) 'owner': owner,
+      if (enabledSince != null) 'enabled_since': enabledSince,
+      if (enabled != null) 'enabled': enabled,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  HydrationSettingsCompanion copyWith({
+    Value<String>? owner,
+    Value<DateTime>? enabledSince,
+    Value<bool>? enabled,
+    Value<int>? rowid,
+  }) {
+    return HydrationSettingsCompanion(
+      owner: owner ?? this.owner,
+      enabledSince: enabledSince ?? this.enabledSince,
+      enabled: enabled ?? this.enabled,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (owner.present) {
+      map['owner'] = Variable<String>(owner.value);
+    }
+    if (enabledSince.present) {
+      map['enabled_since'] = Variable<DateTime>(enabledSince.value);
+    }
+    if (enabled.present) {
+      map['enabled'] = Variable<bool>(enabled.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('HydrationSettingsCompanion(')
+          ..write('owner: $owner, ')
+          ..write('enabledSince: $enabledSince, ')
+          ..write('enabled: $enabled, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$GTDatabaseImpl extends GeneratedDatabase {
   _$GTDatabaseImpl(QueryExecutor e) : super(e);
   $GTDatabaseImplManager get managers => $GTDatabaseImplManager(this);
@@ -8964,6 +10532,14 @@ abstract class _$GTDatabaseImpl extends GeneratedDatabase {
   late final $SyncConflictsTable syncConflicts = $SyncConflictsTable(this);
   late final $SyncContextTable syncContext = $SyncContextTable(this);
   late final $SyncQuarantineTable syncQuarantine = $SyncQuarantineTable(this);
+  late final $CatalogSubmissionsTable catalogSubmissions =
+      $CatalogSubmissionsTable(this);
+  late final $WaterLogsTable waterLogs = $WaterLogsTable(this);
+  late final $HydrationExportsTable hydrationExports = $HydrationExportsTable(
+    this,
+  );
+  late final $HydrationSettingsTable hydrationSettings =
+      $HydrationSettingsTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -8991,6 +10567,10 @@ abstract class _$GTDatabaseImpl extends GeneratedDatabase {
     syncConflicts,
     syncContext,
     syncQuarantine,
+    catalogSubmissions,
+    waterLogs,
+    hydrationExports,
+    hydrationSettings,
   ];
 }
 
@@ -14483,6 +16063,7 @@ typedef $$NutritionGoalsTableCreateCompanionBuilder =
       required double fat,
       required double carbs,
       required double protein,
+      Value<double?> water,
       Value<int> rowid,
     });
 typedef $$NutritionGoalsTableUpdateCompanionBuilder =
@@ -14496,6 +16077,7 @@ typedef $$NutritionGoalsTableUpdateCompanionBuilder =
       Value<double> fat,
       Value<double> carbs,
       Value<double> protein,
+      Value<double?> water,
       Value<int> rowid,
     });
 
@@ -14550,6 +16132,11 @@ class $$NutritionGoalsTableFilterComposer
 
   ColumnFilters<double> get protein => $composableBuilder(
     column: $table.protein,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get water => $composableBuilder(
+    column: $table.water,
     builder: (column) => ColumnFilters(column),
   );
 }
@@ -14607,6 +16194,11 @@ class $$NutritionGoalsTableOrderingComposer
     column: $table.protein,
     builder: (column) => ColumnOrderings(column),
   );
+
+  ColumnOrderings<double> get water => $composableBuilder(
+    column: $table.water,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$NutritionGoalsTableAnnotationComposer
@@ -14646,6 +16238,9 @@ class $$NutritionGoalsTableAnnotationComposer
 
   GeneratedColumn<double> get protein =>
       $composableBuilder(column: $table.protein, builder: (column) => column);
+
+  GeneratedColumn<double> get water =>
+      $composableBuilder(column: $table.water, builder: (column) => column);
 }
 
 class $$NutritionGoalsTableTableManager
@@ -14694,6 +16289,7 @@ class $$NutritionGoalsTableTableManager
                 Value<double> fat = const Value.absent(),
                 Value<double> carbs = const Value.absent(),
                 Value<double> protein = const Value.absent(),
+                Value<double?> water = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => NutritionGoalsCompanion(
                 id: id,
@@ -14705,6 +16301,7 @@ class $$NutritionGoalsTableTableManager
                 fat: fat,
                 carbs: carbs,
                 protein: protein,
+                water: water,
                 rowid: rowid,
               ),
           createCompanionCallback:
@@ -14718,6 +16315,7 @@ class $$NutritionGoalsTableTableManager
                 required double fat,
                 required double carbs,
                 required double protein,
+                Value<double?> water = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => NutritionGoalsCompanion.insert(
                 id: id,
@@ -14729,6 +16327,7 @@ class $$NutritionGoalsTableTableManager
                 fat: fat,
                 carbs: carbs,
                 protein: protein,
+                water: water,
                 rowid: rowid,
               ),
           withReferenceMapper: (p0) => p0
@@ -17079,6 +18678,930 @@ typedef $$SyncQuarantineTableProcessedTableManager =
       SyncQuarantineData,
       PrefetchHooks Function()
     >;
+typedef $$CatalogSubmissionsTableCreateCompanionBuilder =
+    CatalogSubmissionsCompanion Function({
+      required String operationId,
+      required String owner,
+      required String definition,
+      Value<String> status,
+      Value<String?> result,
+      Value<String?> error,
+      Value<int> attempts,
+      required DateTime nextAttempt,
+      required DateTime createdAt,
+      Value<int> rowid,
+    });
+typedef $$CatalogSubmissionsTableUpdateCompanionBuilder =
+    CatalogSubmissionsCompanion Function({
+      Value<String> operationId,
+      Value<String> owner,
+      Value<String> definition,
+      Value<String> status,
+      Value<String?> result,
+      Value<String?> error,
+      Value<int> attempts,
+      Value<DateTime> nextAttempt,
+      Value<DateTime> createdAt,
+      Value<int> rowid,
+    });
+
+class $$CatalogSubmissionsTableFilterComposer
+    extends Composer<_$GTDatabaseImpl, $CatalogSubmissionsTable> {
+  $$CatalogSubmissionsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get operationId => $composableBuilder(
+    column: $table.operationId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get owner => $composableBuilder(
+    column: $table.owner,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get definition => $composableBuilder(
+    column: $table.definition,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get status => $composableBuilder(
+    column: $table.status,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get result => $composableBuilder(
+    column: $table.result,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get error => $composableBuilder(
+    column: $table.error,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get attempts => $composableBuilder(
+    column: $table.attempts,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get nextAttempt => $composableBuilder(
+    column: $table.nextAttempt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$CatalogSubmissionsTableOrderingComposer
+    extends Composer<_$GTDatabaseImpl, $CatalogSubmissionsTable> {
+  $$CatalogSubmissionsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get operationId => $composableBuilder(
+    column: $table.operationId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get owner => $composableBuilder(
+    column: $table.owner,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get definition => $composableBuilder(
+    column: $table.definition,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get status => $composableBuilder(
+    column: $table.status,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get result => $composableBuilder(
+    column: $table.result,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get error => $composableBuilder(
+    column: $table.error,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get attempts => $composableBuilder(
+    column: $table.attempts,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get nextAttempt => $composableBuilder(
+    column: $table.nextAttempt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$CatalogSubmissionsTableAnnotationComposer
+    extends Composer<_$GTDatabaseImpl, $CatalogSubmissionsTable> {
+  $$CatalogSubmissionsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get operationId => $composableBuilder(
+    column: $table.operationId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get owner =>
+      $composableBuilder(column: $table.owner, builder: (column) => column);
+
+  GeneratedColumn<String> get definition => $composableBuilder(
+    column: $table.definition,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get status =>
+      $composableBuilder(column: $table.status, builder: (column) => column);
+
+  GeneratedColumn<String> get result =>
+      $composableBuilder(column: $table.result, builder: (column) => column);
+
+  GeneratedColumn<String> get error =>
+      $composableBuilder(column: $table.error, builder: (column) => column);
+
+  GeneratedColumn<int> get attempts =>
+      $composableBuilder(column: $table.attempts, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get nextAttempt => $composableBuilder(
+    column: $table.nextAttempt,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+}
+
+class $$CatalogSubmissionsTableTableManager
+    extends
+        RootTableManager<
+          _$GTDatabaseImpl,
+          $CatalogSubmissionsTable,
+          CatalogSubmission,
+          $$CatalogSubmissionsTableFilterComposer,
+          $$CatalogSubmissionsTableOrderingComposer,
+          $$CatalogSubmissionsTableAnnotationComposer,
+          $$CatalogSubmissionsTableCreateCompanionBuilder,
+          $$CatalogSubmissionsTableUpdateCompanionBuilder,
+          (
+            CatalogSubmission,
+            BaseReferences<
+              _$GTDatabaseImpl,
+              $CatalogSubmissionsTable,
+              CatalogSubmission
+            >,
+          ),
+          CatalogSubmission,
+          PrefetchHooks Function()
+        > {
+  $$CatalogSubmissionsTableTableManager(
+    _$GTDatabaseImpl db,
+    $CatalogSubmissionsTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$CatalogSubmissionsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$CatalogSubmissionsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$CatalogSubmissionsTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<String> operationId = const Value.absent(),
+                Value<String> owner = const Value.absent(),
+                Value<String> definition = const Value.absent(),
+                Value<String> status = const Value.absent(),
+                Value<String?> result = const Value.absent(),
+                Value<String?> error = const Value.absent(),
+                Value<int> attempts = const Value.absent(),
+                Value<DateTime> nextAttempt = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => CatalogSubmissionsCompanion(
+                operationId: operationId,
+                owner: owner,
+                definition: definition,
+                status: status,
+                result: result,
+                error: error,
+                attempts: attempts,
+                nextAttempt: nextAttempt,
+                createdAt: createdAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String operationId,
+                required String owner,
+                required String definition,
+                Value<String> status = const Value.absent(),
+                Value<String?> result = const Value.absent(),
+                Value<String?> error = const Value.absent(),
+                Value<int> attempts = const Value.absent(),
+                required DateTime nextAttempt,
+                required DateTime createdAt,
+                Value<int> rowid = const Value.absent(),
+              }) => CatalogSubmissionsCompanion.insert(
+                operationId: operationId,
+                owner: owner,
+                definition: definition,
+                status: status,
+                result: result,
+                error: error,
+                attempts: attempts,
+                nextAttempt: nextAttempt,
+                createdAt: createdAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$CatalogSubmissionsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$GTDatabaseImpl,
+      $CatalogSubmissionsTable,
+      CatalogSubmission,
+      $$CatalogSubmissionsTableFilterComposer,
+      $$CatalogSubmissionsTableOrderingComposer,
+      $$CatalogSubmissionsTableAnnotationComposer,
+      $$CatalogSubmissionsTableCreateCompanionBuilder,
+      $$CatalogSubmissionsTableUpdateCompanionBuilder,
+      (
+        CatalogSubmission,
+        BaseReferences<
+          _$GTDatabaseImpl,
+          $CatalogSubmissionsTable,
+          CatalogSubmission
+        >,
+      ),
+      CatalogSubmission,
+      PrefetchHooks Function()
+    >;
+typedef $$WaterLogsTableCreateCompanionBuilder =
+    WaterLogsCompanion Function({
+      Value<String> id,
+      Value<String?> userId,
+      Value<DateTime> updatedAt,
+      Value<bool> deleted,
+      required DateTime dateAdded,
+      required DateTime referenceDate,
+      required String jsonData,
+      Value<int> rowid,
+    });
+typedef $$WaterLogsTableUpdateCompanionBuilder =
+    WaterLogsCompanion Function({
+      Value<String> id,
+      Value<String?> userId,
+      Value<DateTime> updatedAt,
+      Value<bool> deleted,
+      Value<DateTime> dateAdded,
+      Value<DateTime> referenceDate,
+      Value<String> jsonData,
+      Value<int> rowid,
+    });
+
+class $$WaterLogsTableFilterComposer
+    extends Composer<_$GTDatabaseImpl, $WaterLogsTable> {
+  $$WaterLogsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get userId => $composableBuilder(
+    column: $table.userId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get deleted => $composableBuilder(
+    column: $table.deleted,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get dateAdded => $composableBuilder(
+    column: $table.dateAdded,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get referenceDate => $composableBuilder(
+    column: $table.referenceDate,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get jsonData => $composableBuilder(
+    column: $table.jsonData,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$WaterLogsTableOrderingComposer
+    extends Composer<_$GTDatabaseImpl, $WaterLogsTable> {
+  $$WaterLogsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get userId => $composableBuilder(
+    column: $table.userId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get deleted => $composableBuilder(
+    column: $table.deleted,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get dateAdded => $composableBuilder(
+    column: $table.dateAdded,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get referenceDate => $composableBuilder(
+    column: $table.referenceDate,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get jsonData => $composableBuilder(
+    column: $table.jsonData,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$WaterLogsTableAnnotationComposer
+    extends Composer<_$GTDatabaseImpl, $WaterLogsTable> {
+  $$WaterLogsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get userId =>
+      $composableBuilder(column: $table.userId, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+
+  GeneratedColumn<bool> get deleted =>
+      $composableBuilder(column: $table.deleted, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get dateAdded =>
+      $composableBuilder(column: $table.dateAdded, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get referenceDate => $composableBuilder(
+    column: $table.referenceDate,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get jsonData =>
+      $composableBuilder(column: $table.jsonData, builder: (column) => column);
+}
+
+class $$WaterLogsTableTableManager
+    extends
+        RootTableManager<
+          _$GTDatabaseImpl,
+          $WaterLogsTable,
+          DBWaterLog,
+          $$WaterLogsTableFilterComposer,
+          $$WaterLogsTableOrderingComposer,
+          $$WaterLogsTableAnnotationComposer,
+          $$WaterLogsTableCreateCompanionBuilder,
+          $$WaterLogsTableUpdateCompanionBuilder,
+          (
+            DBWaterLog,
+            BaseReferences<_$GTDatabaseImpl, $WaterLogsTable, DBWaterLog>,
+          ),
+          DBWaterLog,
+          PrefetchHooks Function()
+        > {
+  $$WaterLogsTableTableManager(_$GTDatabaseImpl db, $WaterLogsTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$WaterLogsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$WaterLogsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$WaterLogsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String?> userId = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+                Value<bool> deleted = const Value.absent(),
+                Value<DateTime> dateAdded = const Value.absent(),
+                Value<DateTime> referenceDate = const Value.absent(),
+                Value<String> jsonData = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => WaterLogsCompanion(
+                id: id,
+                userId: userId,
+                updatedAt: updatedAt,
+                deleted: deleted,
+                dateAdded: dateAdded,
+                referenceDate: referenceDate,
+                jsonData: jsonData,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String?> userId = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+                Value<bool> deleted = const Value.absent(),
+                required DateTime dateAdded,
+                required DateTime referenceDate,
+                required String jsonData,
+                Value<int> rowid = const Value.absent(),
+              }) => WaterLogsCompanion.insert(
+                id: id,
+                userId: userId,
+                updatedAt: updatedAt,
+                deleted: deleted,
+                dateAdded: dateAdded,
+                referenceDate: referenceDate,
+                jsonData: jsonData,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$WaterLogsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$GTDatabaseImpl,
+      $WaterLogsTable,
+      DBWaterLog,
+      $$WaterLogsTableFilterComposer,
+      $$WaterLogsTableOrderingComposer,
+      $$WaterLogsTableAnnotationComposer,
+      $$WaterLogsTableCreateCompanionBuilder,
+      $$WaterLogsTableUpdateCompanionBuilder,
+      (
+        DBWaterLog,
+        BaseReferences<_$GTDatabaseImpl, $WaterLogsTable, DBWaterLog>,
+      ),
+      DBWaterLog,
+      PrefetchHooks Function()
+    >;
+typedef $$HydrationExportsTableCreateCompanionBuilder =
+    HydrationExportsCompanion Function({
+      required String owner,
+      required String recordId,
+      required String fingerprint,
+      required int version,
+      Value<bool> pending,
+      Value<int> rowid,
+    });
+typedef $$HydrationExportsTableUpdateCompanionBuilder =
+    HydrationExportsCompanion Function({
+      Value<String> owner,
+      Value<String> recordId,
+      Value<String> fingerprint,
+      Value<int> version,
+      Value<bool> pending,
+      Value<int> rowid,
+    });
+
+class $$HydrationExportsTableFilterComposer
+    extends Composer<_$GTDatabaseImpl, $HydrationExportsTable> {
+  $$HydrationExportsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get owner => $composableBuilder(
+    column: $table.owner,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get recordId => $composableBuilder(
+    column: $table.recordId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get fingerprint => $composableBuilder(
+    column: $table.fingerprint,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get version => $composableBuilder(
+    column: $table.version,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get pending => $composableBuilder(
+    column: $table.pending,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$HydrationExportsTableOrderingComposer
+    extends Composer<_$GTDatabaseImpl, $HydrationExportsTable> {
+  $$HydrationExportsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get owner => $composableBuilder(
+    column: $table.owner,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get recordId => $composableBuilder(
+    column: $table.recordId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get fingerprint => $composableBuilder(
+    column: $table.fingerprint,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get version => $composableBuilder(
+    column: $table.version,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get pending => $composableBuilder(
+    column: $table.pending,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$HydrationExportsTableAnnotationComposer
+    extends Composer<_$GTDatabaseImpl, $HydrationExportsTable> {
+  $$HydrationExportsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get owner =>
+      $composableBuilder(column: $table.owner, builder: (column) => column);
+
+  GeneratedColumn<String> get recordId =>
+      $composableBuilder(column: $table.recordId, builder: (column) => column);
+
+  GeneratedColumn<String> get fingerprint => $composableBuilder(
+    column: $table.fingerprint,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get version =>
+      $composableBuilder(column: $table.version, builder: (column) => column);
+
+  GeneratedColumn<bool> get pending =>
+      $composableBuilder(column: $table.pending, builder: (column) => column);
+}
+
+class $$HydrationExportsTableTableManager
+    extends
+        RootTableManager<
+          _$GTDatabaseImpl,
+          $HydrationExportsTable,
+          HydrationExport,
+          $$HydrationExportsTableFilterComposer,
+          $$HydrationExportsTableOrderingComposer,
+          $$HydrationExportsTableAnnotationComposer,
+          $$HydrationExportsTableCreateCompanionBuilder,
+          $$HydrationExportsTableUpdateCompanionBuilder,
+          (
+            HydrationExport,
+            BaseReferences<
+              _$GTDatabaseImpl,
+              $HydrationExportsTable,
+              HydrationExport
+            >,
+          ),
+          HydrationExport,
+          PrefetchHooks Function()
+        > {
+  $$HydrationExportsTableTableManager(
+    _$GTDatabaseImpl db,
+    $HydrationExportsTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$HydrationExportsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$HydrationExportsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$HydrationExportsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> owner = const Value.absent(),
+                Value<String> recordId = const Value.absent(),
+                Value<String> fingerprint = const Value.absent(),
+                Value<int> version = const Value.absent(),
+                Value<bool> pending = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => HydrationExportsCompanion(
+                owner: owner,
+                recordId: recordId,
+                fingerprint: fingerprint,
+                version: version,
+                pending: pending,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String owner,
+                required String recordId,
+                required String fingerprint,
+                required int version,
+                Value<bool> pending = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => HydrationExportsCompanion.insert(
+                owner: owner,
+                recordId: recordId,
+                fingerprint: fingerprint,
+                version: version,
+                pending: pending,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$HydrationExportsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$GTDatabaseImpl,
+      $HydrationExportsTable,
+      HydrationExport,
+      $$HydrationExportsTableFilterComposer,
+      $$HydrationExportsTableOrderingComposer,
+      $$HydrationExportsTableAnnotationComposer,
+      $$HydrationExportsTableCreateCompanionBuilder,
+      $$HydrationExportsTableUpdateCompanionBuilder,
+      (
+        HydrationExport,
+        BaseReferences<
+          _$GTDatabaseImpl,
+          $HydrationExportsTable,
+          HydrationExport
+        >,
+      ),
+      HydrationExport,
+      PrefetchHooks Function()
+    >;
+typedef $$HydrationSettingsTableCreateCompanionBuilder =
+    HydrationSettingsCompanion Function({
+      required String owner,
+      required DateTime enabledSince,
+      Value<bool> enabled,
+      Value<int> rowid,
+    });
+typedef $$HydrationSettingsTableUpdateCompanionBuilder =
+    HydrationSettingsCompanion Function({
+      Value<String> owner,
+      Value<DateTime> enabledSince,
+      Value<bool> enabled,
+      Value<int> rowid,
+    });
+
+class $$HydrationSettingsTableFilterComposer
+    extends Composer<_$GTDatabaseImpl, $HydrationSettingsTable> {
+  $$HydrationSettingsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get owner => $composableBuilder(
+    column: $table.owner,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get enabledSince => $composableBuilder(
+    column: $table.enabledSince,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get enabled => $composableBuilder(
+    column: $table.enabled,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$HydrationSettingsTableOrderingComposer
+    extends Composer<_$GTDatabaseImpl, $HydrationSettingsTable> {
+  $$HydrationSettingsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get owner => $composableBuilder(
+    column: $table.owner,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get enabledSince => $composableBuilder(
+    column: $table.enabledSince,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get enabled => $composableBuilder(
+    column: $table.enabled,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$HydrationSettingsTableAnnotationComposer
+    extends Composer<_$GTDatabaseImpl, $HydrationSettingsTable> {
+  $$HydrationSettingsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get owner =>
+      $composableBuilder(column: $table.owner, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get enabledSince => $composableBuilder(
+    column: $table.enabledSince,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<bool> get enabled =>
+      $composableBuilder(column: $table.enabled, builder: (column) => column);
+}
+
+class $$HydrationSettingsTableTableManager
+    extends
+        RootTableManager<
+          _$GTDatabaseImpl,
+          $HydrationSettingsTable,
+          HydrationSetting,
+          $$HydrationSettingsTableFilterComposer,
+          $$HydrationSettingsTableOrderingComposer,
+          $$HydrationSettingsTableAnnotationComposer,
+          $$HydrationSettingsTableCreateCompanionBuilder,
+          $$HydrationSettingsTableUpdateCompanionBuilder,
+          (
+            HydrationSetting,
+            BaseReferences<
+              _$GTDatabaseImpl,
+              $HydrationSettingsTable,
+              HydrationSetting
+            >,
+          ),
+          HydrationSetting,
+          PrefetchHooks Function()
+        > {
+  $$HydrationSettingsTableTableManager(
+    _$GTDatabaseImpl db,
+    $HydrationSettingsTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$HydrationSettingsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$HydrationSettingsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$HydrationSettingsTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<String> owner = const Value.absent(),
+                Value<DateTime> enabledSince = const Value.absent(),
+                Value<bool> enabled = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => HydrationSettingsCompanion(
+                owner: owner,
+                enabledSince: enabledSince,
+                enabled: enabled,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String owner,
+                required DateTime enabledSince,
+                Value<bool> enabled = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => HydrationSettingsCompanion.insert(
+                owner: owner,
+                enabledSince: enabledSince,
+                enabled: enabled,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$HydrationSettingsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$GTDatabaseImpl,
+      $HydrationSettingsTable,
+      HydrationSetting,
+      $$HydrationSettingsTableFilterComposer,
+      $$HydrationSettingsTableOrderingComposer,
+      $$HydrationSettingsTableAnnotationComposer,
+      $$HydrationSettingsTableCreateCompanionBuilder,
+      $$HydrationSettingsTableUpdateCompanionBuilder,
+      (
+        HydrationSetting,
+        BaseReferences<
+          _$GTDatabaseImpl,
+          $HydrationSettingsTable,
+          HydrationSetting
+        >,
+      ),
+      HydrationSetting,
+      PrefetchHooks Function()
+    >;
 
 class $GTDatabaseImplManager {
   final _$GTDatabaseImpl _db;
@@ -17130,4 +19653,12 @@ class $GTDatabaseImplManager {
       $$SyncContextTableTableManager(_db, _db.syncContext);
   $$SyncQuarantineTableTableManager get syncQuarantine =>
       $$SyncQuarantineTableTableManager(_db, _db.syncQuarantine);
+  $$CatalogSubmissionsTableTableManager get catalogSubmissions =>
+      $$CatalogSubmissionsTableTableManager(_db, _db.catalogSubmissions);
+  $$WaterLogsTableTableManager get waterLogs =>
+      $$WaterLogsTableTableManager(_db, _db.waterLogs);
+  $$HydrationExportsTableTableManager get hydrationExports =>
+      $$HydrationExportsTableTableManager(_db, _db.hydrationExports);
+  $$HydrationSettingsTableTableManager get hydrationSettings =>
+      $$HydrationSettingsTableTableManager(_db, _db.hydrationSettings);
 }

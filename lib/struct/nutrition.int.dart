@@ -575,9 +575,6 @@ enum NutritionLanguage {
       NutritionLanguage.values.toList()
         ..sort((a, b) => a.t(t: t).compareTo(b.t(t: t)));
 
-  OpenFoodFactsLanguage get offApiLanguage =>
-      OpenFoodFactsLanguage.fromOffTag(stringValue)!;
-
   String t({required Translations t}) =>
       t.food.languages[stringValue.toLowerCase()] ?? "UNKNOWN";
 }
@@ -1347,9 +1344,6 @@ enum NutritionCountry {
   static List<NutritionCountry> getSortedValues({required Translations t}) =>
       NutritionCountry.values.toList()
         ..sort((a, b) => a.t(t: t).compareTo(b.t(t: t)));
-
-  OpenFoodFactsCountry? get offApiCountry =>
-      OpenFoodFactsCountry.fromOffTag(stringValue);
 
   String t({required Translations t}) =>
       t.food.countries[stringValue.toLowerCase()] ?? "UNKNOWN";

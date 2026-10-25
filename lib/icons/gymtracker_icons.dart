@@ -400,6 +400,11 @@ class GTIcons {
 class _GymTrackerCompoundIcons {
   const _GymTrackerCompoundIcons();
 
+  CompoundIcon get add_water => const CompoundIcon.sized(
+    main: Icons.local_drink_outlined,
+    accessory: Icons.add_rounded,
+  );
+
   CompoundIcon get add_food_category => const CompoundIcon.sized(
     main: GTIcons.food_categories,
     accessory: Icons.add_rounded,

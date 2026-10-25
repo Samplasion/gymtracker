@@ -11,6 +11,7 @@ import 'package:gymtracker/data/distance.dart';
 import 'package:gymtracker/data/exercises.dart';
 import 'package:gymtracker/data/weights.dart';
 import 'package:gymtracker/db/model/tables/achievements.dart';
+import 'package:gymtracker/db/model/tables/catalog_submissions.dart';
 import 'package:gymtracker/db/model/tables/exercise.dart';
 import 'package:gymtracker/db/model/tables/foods.dart';
 import 'package:gymtracker/db/model/tables/history.dart';
@@ -22,6 +23,7 @@ import 'package:gymtracker/db/model/tables/preferences.dart';
 import 'package:gymtracker/db/model/tables/routines.dart';
 import 'package:gymtracker/db/model/tables/set.dart';
 import 'package:gymtracker/db/model/tables/sync.dart';
+import 'package:gymtracker/db/model/tables/water_logs.dart';
 import 'package:gymtracker/db/schema_versions.dart';
 import 'package:gymtracker/db/utils.dart';
 import 'package:gymtracker/model/achievements.dart';
@@ -49,16 +51,23 @@ import 'package:uuid/uuid.dart';
 export 'package:gymtracker/db/model/tables/foods.dart';
 export 'package:gymtracker/db/model/tables/nutrition_categories.dart';
 export 'package:gymtracker/db/model/tables/nutrition_goals.dart';
+export 'package:gymtracker/db/model/tables/water_logs.dart';
 
 part 'database.g.dart';
 
 // Used in the generated code
 const _uuid = Uuid();
 
-const DATABASE_VERSION = 21;
+const DATABASE_VERSION = 23;
 
 abstract class GTDatabase extends GeneratedDatabase with SyncableDatabase {
   GTDatabase(super.e);
+
+  $CatalogSubmissionsTable get catalogSubmissions;
+  $WaterLogsTable get waterLogs;
+  $FoodsTable get foods;
+  $HydrationExportsTable get hydrationExports;
+  $HydrationSettingsTable get hydrationSettings;
 
   /// The currently logged-in user's ID, or null if no user is logged in.
   /// When set, all syncable-table queries filter by this user ID.
@@ -204,6 +213,10 @@ abstract class GTDatabase extends GeneratedDatabase with SyncableDatabase {
     SyncConflicts,
     SyncContext,
     SyncQuarantine,
+    CatalogSubmissions,
+    WaterLogs,
+    HydrationExports,
+    HydrationSettings,
   ],
 )
 class GTDatabaseImpl extends _$GTDatabaseImpl
@@ -535,6 +548,18 @@ class GTDatabaseImpl extends _$GTDatabaseImpl
               schema.historyWorkoutExercises,
               schema.historyWorkoutExercises.progression,
             );
+          },
+          from22To23: (m, schema) async {
+            await m.createTable(schema.waterLogs);
+            await m.createTable(schema.hydrationExports);
+            await m.createTable(schema.hydrationSettings);
+            await m.addColumn(
+              schema.nutritionGoals,
+              schema.nutritionGoals.water,
+            );
+          },
+          from21To22: (m, schema) async {
+            await m.createTable(schema.catalogSubmissions);
           },
           from20To21: (m, schema) async {
             await m.addColumn(
@@ -1688,14 +1713,18 @@ class GTDatabaseImpl extends _$GTDatabaseImpl
                   _ownedBy(tbl.userId, userId)),
             ))
             .getSingle();
-    await update(foods).replace(
-      food
-          .toInsertable(generateInsertionDate: false, userId: userId)
-          .copyWith(
-            dateAdded: Value(oldFood.dateAdded),
-            updatedAt: Value(DateTime.now().toUtc()),
-          ),
-    );
+    if (currentUserId != userId) throw StateError("Account changed");
+    await (update(foods)..where(
+          (tbl) => tbl.id.equals(food.value.id!) & _ownedBy(tbl.userId, userId),
+        ))
+        .write(
+          food
+              .toInsertable(generateInsertionDate: false, userId: userId)
+              .copyWith(
+                dateAdded: Value(oldFood.dateAdded),
+                updatedAt: Value(DateTime.now().toUtc()),
+              ),
+        );
   }
 
   @override
@@ -2338,6 +2367,7 @@ class GTDatabaseImpl extends _$GTDatabaseImpl
     return transaction(() async {
       await deleteOngoingForUser(userId);
       for (final name in [
+        'catalog_submissions',
         'sync_outbox',
         'sync_metadata',
         'sync_cursors',
@@ -2525,6 +2555,15 @@ class GTDatabaseImpl extends _$GTDatabaseImpl
               userId: Value(userId),
               updatedAt: Value(now),
             ),
+          );
+
+      await (update(waterLogs)..where(
+            (r) =>
+                (r.userId.isNull() | r.userId.equals(userId)) &
+                r.updatedAt.isIn(epochs),
+          ))
+          .write(
+            WaterLogsCompanion(userId: Value(userId), updatedAt: Value(now)),
           );
 
       await (update(nutritionGoals)..where(
@@ -2857,6 +2896,7 @@ extension on model.TaggedNutritionGoal {
       fat: Value(value.dailyFat),
       carbs: Value(value.dailyCarbs),
       protein: Value(value.dailyProtein),
+      water: Value(value.dailyWater),
       userId: Value(userId),
       updatedAt: Value(updatedAt ?? DateTime.now().toUtc()),
       deleted: const Value(false),

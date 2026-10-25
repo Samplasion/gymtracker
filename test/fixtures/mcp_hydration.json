@@ -1,0 +1,15 @@
+{
+  "row": {
+    "id": "00000000-0000-0000-0000-000000000311",
+    "user_id": "00000000-0000-0000-0000-000000000301",
+    "date_added": "2025-10-25T22:00:00Z",
+    "reference_date": "2025-10-26T00:00:00Z",
+    "json_data": "{\"milliliters\":500.25,\"time\":\"2025-10-25T22:00:00Z\"}",
+    "updated_at": "2025-10-26T12:00:00Z",
+    "deleted": false,
+    "revision": 1
+  },
+  "api": {"id":"00000000-0000-0000-0000-000000000311","milliliters":500.25,"time":"2025-10-25T22:00:00Z","date":"2025-10-26"},
+  "food": {"name":"Hydration fixture","unit":"g","servingSizes":[],"amount":10,"pieces":3,"nutritionalValuesPer100g":{"calories":0,"fat":0,"saturatedFat":0,"carbs":0,"sugar":0,"protein":0,"water":90}},
+  "knownTotalWaterMl": 527.25
+}

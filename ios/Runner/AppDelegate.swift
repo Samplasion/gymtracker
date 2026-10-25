@@ -73,6 +73,64 @@ import flutter_app_intents
         GeneratedPluginRegistrant.register(with: engineBridge.pluginRegistry)
 
         let binaryMessenger = engineBridge.applicationRegistrar.messenger()
+        FlutterMethodChannel(name: "gymbro/hydration", binaryMessenger: binaryMessenger).setMethodCallHandler { call, result in
+            let store = HKHealthStore()
+            guard HKHealthStore.isHealthDataAvailable(),
+                  let type = HKQuantityType.quantityType(forIdentifier: .dietaryWater) else {
+                result(FlutterError(code: "unavailable", message: "Health is unavailable", details: nil)); return
+            }
+            func finish(_ error: Error?) {
+                DispatchQueue.main.async {
+                    if let error = error { result(FlutterError(code: "health", message: error.localizedDescription, details: nil)) }
+                    else { result(nil) }
+                }
+            }
+            if call.method == "permission" {
+                switch store.authorizationStatus(for: type) {
+                case .sharingAuthorized: result("granted")
+                case .sharingDenied: result("denied")
+                case .notDetermined: result("unknown")
+                @unknown default: result("unavailable")
+                }
+                return
+            }
+            if call.method == "authorize" {
+                store.requestAuthorization(toShare: [type], read: []) { _, error in
+                    DispatchQueue.main.async {
+                        if let error = error { result(FlutterError(code: "health", message: error.localizedDescription, details: nil)) }
+                        else { result(store.authorizationStatus(for: type) == .sharingAuthorized) }
+                    }
+                }
+                return
+            }
+            guard store.authorizationStatus(for: type) == .sharingAuthorized else {
+                result(FlutterError(code: "permission", message: "Water write permission required", details: nil)); return
+            }
+            guard let args = call.arguments as? [String: Any], let id = args["id"] as? String,
+                  id.hasPrefix("gymbro:") else {
+                result(FlutterError(code: "arguments", message: "Invalid record identifier", details: nil)); return
+            }
+            if call.method == "write" {
+                guard let ml = args["ml"] as? Double, ml.isFinite, ml > 0,
+                      let version = args["version"] as? NSNumber, let milliseconds = args["time"] as? NSNumber else {
+                    result(FlutterError(code: "arguments", message: "Invalid water entry", details: nil)); return
+                }
+                let time = Date(timeIntervalSince1970: milliseconds.doubleValue / 1000)
+                let sample = HKQuantitySample(type: type, quantity: HKQuantity(unit: .literUnit(with: .milli), doubleValue: ml), start: time, end: time,
+                    metadata: [HKMetadataKeySyncIdentifier: id, HKMetadataKeySyncVersion: version, HKMetadataKeyWasUserEntered: true])
+                store.save(sample) { success, error in
+                    if !success && error == nil { finish(NSError(domain: "GymBroHydration", code: 1)) }
+                    else { finish(error) }
+                }
+            } else if call.method == "delete" {
+                let predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
+                    HKQuery.predicateForObjects(withMetadataKey: HKMetadataKeySyncIdentifier, allowedValues: [id]),
+                    HKQuery.predicateForObjects(from: HKSource.default())
+                ])
+                store.deleteObjects(of: type, predicate: predicate) { _, _, error in finish(error) }
+            } else { result(FlutterMethodNotImplemented) }
+        }
+
         GymBroNativeHostAPISetup.setUp(binaryMessenger: binaryMessenger, api: self)
         flutterNativeApi = GymBroNativeFlutterAPI(binaryMessenger: binaryMessenger)
         logger = FlutterLogger(binaryMessenger: binaryMessenger)

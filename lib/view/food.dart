@@ -14,6 +14,9 @@ import 'package:gauge_indicator/gauge_indicator.dart';
 import 'package:gymtracker/i18n/strings.g.dart';
 import 'package:gymtracker/icons/gymtracker_icons.dart';
 import 'package:gymtracker/provider/food.dart';
+import 'package:gymtracker/provider/food_catalog.dart';
+import 'package:gymtracker/provider/online.dart';
+import 'package:gymtracker/repository/food_catalog.dart';
 import 'package:gymtracker/service/logger.dart';
 import 'package:gymtracker/struct/date_sequence.dart';
 import 'package:gymtracker/struct/nutrition.dart';
@@ -23,9 +26,12 @@ import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/utils/skeletons.dart';
 import 'package:gymtracker/utils/utils.dart';
+import 'package:gymtracker/view/catalog_report.dart';
+import 'package:gymtracker/view/catalog_submissions.dart';
 import 'package:gymtracker/view/components/alert_banner.dart';
 import 'package:gymtracker/view/components/error_view.dart';
 import 'package:gymtracker/view/components/gradient_bottom_bar.dart';
+import 'package:gymtracker/view/components/hydration_card.dart';
 import 'package:gymtracker/view/components/loading_indicator.dart';
 import 'package:gymtracker/view/components/pro_builder.dart';
 import 'package:gymtracker/view/components/stats.dart';
@@ -124,10 +130,8 @@ Future<Food?> searchFoodByBarcode(
   NutritionCategory? category,
 }) async {
   final customBarcodeFoods =
-      (ref.read(customBarcodeFoodsStreamProvider).asData?.value
-          as List<Food>?) ??
-      [];
-  final localFood = customBarcodeFoods.firstWhereOrNull((f) => f.id == barcode);
+      ref.read(customBarcodeFoodsStreamProvider).asData?.value ?? {};
+  final localFood = customBarcodeFoods[barcode];
   if (localFood != null) {
     final added = await showAddFoodView(context, localFood);
     return added;
@@ -141,7 +145,7 @@ Future<Food?> searchFoodByBarcode(
 
   try {
     final res = await ref.read(
-      searchOpenFoodFactsByBarcodeProvider(barcode).future,
+      searchFoodCatalogByBarcodeProvider(barcode).future,
     );
     if (context.mounted) Go.back();
 
@@ -183,7 +187,7 @@ Future<VagueFood?> showSearchResultsView(
 }) {
   return Go.to<VagueFood?>(
     () => SearchResultsView(
-      foods: ref.read(searchOpenFoodFactsProvider(query).future),
+      foods: ref.read(searchFoodCatalogProvider(query).future),
       category: category,
     ),
   );
@@ -196,7 +200,7 @@ Future<Food?> showSearchResultsViewForCombination(
 ) {
   return Go.to<Food?>(
     () => SearchResultsView(
-      foods: ref.read(searchOpenFoodFactsProvider(query).future),
+      foods: ref.read(searchFoodCatalogProvider(query).future),
       category: null,
     ),
   );
@@ -451,6 +455,14 @@ class _FoodViewState extends ConsumerState<FoodView> {
                                   ),
                                 ),
                               ],
+                              const Padding(
+                                padding: EdgeInsets.fromLTRB(16, 16, 16, 0),
+                                child: SafeArea(
+                                  top: false,
+                                  bottom: false,
+                                  child: HydrationCard(),
+                                ),
+                              ),
                               const SizedBox(height: 16),
                               Padding(
                                 padding:
@@ -1004,6 +1016,11 @@ class _FoodDayAppBar extends ConsumerWidget {
     final relativeDayText = ref.watch(foodRelativeDayTextProvider(context));
     return SliverAppBar.large(
       actions: [
+        IconButton(
+          icon: const Icon(Icons.cloud_upload_outlined),
+          tooltip: context.t.food.catalog.submissions,
+          onPressed: () => Go.to(() => const CatalogSubmissionsView()),
+        ),
         IconButton(
           icon: const Icon(GTIcons.food_categories),
           tooltip: context.t.food.categoryList.title,

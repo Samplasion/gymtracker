@@ -22,4 +22,11 @@ class FlutterLogger {
     func error(_ message: String) {
         channel.logError(error: message, completion: {_ in})
     }
+
+    func error(_ error: Error, context: String) {
+        let nsError = error as NSError
+        // An unreachable paired device is expected when the Watch is offline.
+        guard nsError.domain != "WCErrorDomain" || nsError.code != 7007 else { return }
+        self.error("\(context): \(error)")
+    }
 }

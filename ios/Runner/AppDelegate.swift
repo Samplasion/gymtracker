@@ -424,7 +424,7 @@ extension AppDelegate: GymBroNativeHostAPI {
             communicationReadySession.sendMessage(message, 
                 replyHandler: replyHandler, 
                 errorHandler: { [self] error in
-                    self.logger?.error("sending message to watch failed: error: \(error)")
+                    self.logger?.error(error, context: "sending message to watch failed: error")
                     let nsError = error as NSError
                     if nsError.domain == "WCErrorDomain" && nsError.code == 7007 && availableRetries > 0 {
                         availableRetries = availableRetries - 1
@@ -576,7 +576,7 @@ extension AppDelegate {
             do {
                 try await workoutDeadline(10) { try await HKHealthStore().startWatchApp(toHandle: configuration) }
                 self.synchronizeLegacyWorkout()
-            } catch { self.logger?.error("Watch launch: \(error)") }
+            } catch { self.logger?.error(error, context: "Watch launch") }
         }
     }
 
@@ -618,7 +618,7 @@ extension AppDelegate {
                 } else {
                     _ = try await self.legacySensorCommand(["action": "stop", "workoutId": id, "save": state["save"] as? Bool ?? false])
                 }
-            } catch { self.logger?.error("Watch workout: \(error)") }
+            } catch { self.logger?.error(error, context: "Watch workout") }
         }
     }
 
@@ -638,7 +638,7 @@ extension AppDelegate {
         UserDefaults.standard.set(snapshot, forKey: "watch.snapshot.v2")
         guard let session, session.activationState == .activated, session.isPaired, session.isWatchAppInstalled else { return }
         do { try session.updateApplicationContext(snapshot) }
-        catch { logger?.error("Unable to publish Watch snapshot: \(error)") }
+        catch { logger?.error(error, context: "Unable to publish Watch snapshot") }
         if session.isReachable { session.sendMessage(["method": "snapshot", "data": snapshot], replyHandler: nil, errorHandler: { _ in }) }
     }
 

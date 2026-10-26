@@ -5,12 +5,14 @@ import 'package:drift/drift.dart' hide isNull, isNotNull;
 import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:gymtracker/db/database.dart';
+import 'package:gymtracker/model/history.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:syncable/syncable.dart';
 
 class ProtocolBackend {
+  String entity = 'nutrition_goals';
   final rows = <String, Map<String, dynamic>>{};
   final changes = <Map<String, dynamic>>[];
   final receipts = <String, Map<String, dynamic>>{};
@@ -30,7 +32,7 @@ class ProtocolBackend {
     rows[payload['id'] as String] = row;
     changes.add({
       'revision': row['revision'],
-      'entity': 'nutrition_goals',
+      'entity': entity,
       'payload': row,
     });
   }
@@ -152,6 +154,101 @@ void main() {
     await manager.close();
     await db.close();
     await backend.client.dispose();
+  });
+
+  Future<Map<String, dynamic>> legacyWorkout({
+    String visibility = 'friends',
+  }) async {
+    backend.entity = 'history_workouts';
+    manager.registerSyncable<HistoryWorkout>(
+      backendTable: 'history_workouts',
+      fromJson: HistoryWorkout.fromJson,
+      companionConstructor: HistoryWorkoutsCompanion.new,
+    );
+    await db.customStatement(
+      """
+      INSERT INTO history_workouts
+        (id, user_id, name, duration, starting_date, weight_unit, distance_unit, visibility)
+      VALUES ('workout', ?, 'Offline workout', 3600, 1792490400, 'kg', 'km', ?)
+    """,
+      [owner, visibility],
+    );
+    final op = await db.customSelect('SELECT * FROM sync_outbox').getSingle();
+    final payload =
+        jsonDecode(op.read<String>('payload')) as Map<String, dynamic>;
+    if (visibility == 'friends') payload.remove('visibility');
+    payload.remove('publication_manifest');
+    await db.customStatement('UPDATE sync_outbox SET payload=?', [
+      jsonEncode(payload),
+    ]);
+    return (await db.select(db.historyWorkouts).getSingle()).toJson();
+  }
+
+  test(
+    'pull reconciles an equal workout queued before visibility existed',
+    () async {
+      final row = await legacyWorkout();
+      backend.put(row);
+      manager.enableSync();
+      await manager.syncTables();
+      expect(manager.lastResult!.outcome, SyncOutcome.completed);
+      expect(await SyncV2Store.pending(db, owner), 0);
+      expect(backend.pushes, 0);
+      expect(
+        (await db.select(db.historyWorkouts).getSingle()).visibility,
+        'friends',
+      );
+    },
+  );
+
+  for (final visibility in ['friends', 'private']) {
+    test(
+      'push upgrades a queued workout and preserves $visibility visibility',
+      () async {
+        await legacyWorkout(visibility: visibility);
+        manager.enableSync();
+        await manager.syncTables();
+        expect(manager.lastResult!.outcome, SyncOutcome.completed);
+        expect(backend.rows['workout']!['visibility'], visibility);
+        expect(backend.rows['workout']!['publication_manifest'], isNull);
+        expect(await SyncV2Store.pending(db, owner), 0);
+      },
+    );
+  }
+
+  test('queued nutrition goals accept a missing nullable water field', () async {
+    await local(1800);
+    final op = await db.customSelect('SELECT * FROM sync_outbox').getSingle();
+    final payload =
+        jsonDecode(op.read<String>('payload')) as Map<String, dynamic>;
+    payload.remove('water');
+    await db.customStatement('UPDATE sync_outbox SET payload=?', [
+      jsonEncode(payload),
+    ]);
+    manager.enableSync();
+    await manager.syncTables();
+    expect(manager.lastResult!.outcome, SyncOutcome.completed);
+    expect(backend.rows['day'], containsPair('water', null));
+    expect(await SyncV2Store.pending(db, owner), 0);
+  });
+
+  test('conflict resolution upgrades old workout snapshots', () async {
+    final row = await legacyWorkout();
+    backend.put({...row, 'name': 'Server workout'});
+    manager.enableSync();
+    await manager.syncTables();
+    expect(manager.lastResult!.outcome, SyncOutcome.partial);
+    final conflict = await db
+        .customSelect('SELECT * FROM sync_conflicts WHERE resolved=0')
+        .getSingle();
+    await manager.resolveConflict(
+      conflict.read<String>('operation_id'),
+      useLocal: true,
+    );
+    await manager.syncTables();
+    expect(manager.lastResult!.outcome, SyncOutcome.completed);
+    expect(backend.rows['workout']!['name'], 'Offline workout');
+    expect(backend.rows['workout']!['visibility'], 'friends');
   });
 
   test('domain change and outbox roll back together', () async {

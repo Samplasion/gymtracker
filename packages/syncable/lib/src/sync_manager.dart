@@ -686,6 +686,32 @@ class SyncManager<T extends SyncableDatabase> {
   Type _typeFor(String entity) =>
       _backendTables.entries.singleWhere((e) => e.value == entity).key;
 
+  Future<Map<String, dynamic>> _outboxJson(
+      String entity, String encoded) async {
+    final table = _localTables[_typeFor(entity)]!;
+    final data = jsonDecode(encoded) as Map<String, dynamic>;
+    // Outbox snapshots survive schema upgrades. Apply the same SQL defaults
+    // as migrations, without borrowing values from a newer local edit.
+    final missing = table.$columns
+        .where((column) =>
+            !data.containsKey(column.name) && column.defaultValue != null)
+        .toList();
+    if (missing.isNotEmpty) {
+      final context = GenerationContext.fromDb(_localDb);
+      context.buffer.write('SELECT ');
+      for (var i = 0; i < missing.length; i++) {
+        if (i > 0) context.buffer.write(', ');
+        missing[i].defaultValue!.writeInto(context);
+        context.buffer.write(' AS "${missing[i].name}"');
+      }
+      final defaults = await _localDb
+          .customSelect(context.sql, variables: context.introducedVariables)
+          .getSingle();
+      data.addAll(defaults.data);
+    }
+    return (await table.map(data)).toJson();
+  }
+
   Future<void> _applyV2(
       String owner, String entity, Map<String, dynamic> payload) async {
     if (payload['user_id'] != owner) throw StateError('Unexpected sync owner');
@@ -743,11 +769,8 @@ class SyncManager<T extends SyncableDatabase> {
           // Legacy bootstrap can prove equal data delivered, but never infer a
           // deletion or overwrite a different unsent value from an old checkpoint.
           if (ops.isNotEmpty) {
-            final type = _typeFor(entity);
-            final local = (await _localTables[type]!.map(
-                    jsonDecode(ops.last.read<String>('payload'))
-                        as Map<String, dynamic>))
-                .toJson();
+            final local =
+                await _outboxJson(entity, ops.last.read<String>('payload'));
             final l = Map<String, dynamic>.from(local)..remove('updated_at');
             final r = Map<String, dynamic>.from(payload)
               ..remove('updated_at')
@@ -802,9 +825,7 @@ class SyncManager<T extends SyncableDatabase> {
       final batch = <Map<String, dynamic>>[];
       for (final op in ops) {
         final entity = op.read<String>('entity');
-        final payload = (await _localTables[_typeFor(entity)]!.map(
-                jsonDecode(op.read<String>('payload')) as Map<String, dynamic>))
-            .toJson();
+        final payload = await _outboxJson(entity, op.read<String>('payload'));
         batch.add({
           'operation_id': op.read<String>('operation_id'),
           'entity': entity,
@@ -914,10 +935,8 @@ class SyncManager<T extends SyncableDatabase> {
             ? metadata.single.read<int>('revision')
             : c.read<int>('server_revision');
         if (pending.isNotEmpty) {
-          final latest = (await _localTables[_typeFor(entity)]!.map(
-                  jsonDecode(pending.first.read<String>('payload'))
-                      as Map<String, dynamic>))
-              .toJson();
+          final latest =
+              await _outboxJson(entity, pending.first.read<String>('payload'));
           await _localDb.customStatement(
               'UPDATE sync_conflicts SET local_payload=? WHERE operation_id=? AND owner=?',
               [jsonEncode(latest), operationId, owner]);
@@ -937,10 +956,8 @@ class SyncManager<T extends SyncableDatabase> {
                 revision,
                 pending.first.read<String>('payload')
               ]);
-          final local = (await _localTables[_typeFor(entity)]!.map(
-                  jsonDecode(pending.first.read<String>('payload'))
-                      as Map<String, dynamic>))
-              .toJson();
+          final local =
+              await _outboxJson(entity, pending.first.read<String>('payload'));
           await _applyV2(owner, entity, local);
         } else if (server.isNotEmpty) {
           await _applyV2(owner, entity, server);

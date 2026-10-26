@@ -547,19 +547,27 @@ class FoodCategoryFoodsView extends ConsumerWidget {
           },
         ),
       ],
-      onSubmitted: (query) {
-        showSearchResultsView(
+      onSubmitted: (query) async {
+        final selected = await showSearchResultsView(
           context,
           ref,
           query,
           category: category,
-        ).then((value) => print("${value?.toJson()}"));
+        );
+        if (selected == null || !context.mounted) return;
+        final food = selected is Food
+            ? selected
+            : await showAddFoodView(context, selected);
+        if (food == null || !context.mounted) return;
+        final selectedDate = ref.read(foodSelectedDateProvider);
+        await ref
+            .read(foodProvider.notifier)
+            .addFood(selectedDate, food, category: category);
       },
       textCapitalization: TextCapitalization.sentences,
       textInputAction: TextInputAction.search,
       keyboardType: TextInputType.text,
       viewFloatingActionButton: _AddCustomFoodFAB(
-        closeView: () => Navigator.of(context).pop(),
         category: category,
         onFoodAdded: (food) async {
           if (food != null && context.mounted) {

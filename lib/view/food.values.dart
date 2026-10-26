@@ -1241,10 +1241,12 @@ class SearchResultsView extends ConsumerWidget {
       ),
       floatingActionButton: showAddCustom
           ? _AddCustomFoodFAB(
-              closeView: () => Navigator.of(context).pop(),
+              closeSearchView: false,
               category: category,
               onFoodAdded: (food) async {
-                Navigator.of(context).pop(food);
+                if (food != null && context.mounted) {
+                  Navigator.of(context).pop(food);
+                }
               },
             )
           : null,
@@ -1763,7 +1765,6 @@ class _AddCombinedFoodViewState extends ConsumerState<AddCombinedFoodView> {
       textInputAction: TextInputAction.search,
       keyboardType: TextInputType.text,
       viewFloatingActionButton: _AddCustomFoodFAB(
-        closeView: () => Go.back(),
         category: widget.category,
         onFoodAdded: (food) async {
           if (food != null) {

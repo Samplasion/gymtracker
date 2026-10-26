@@ -37,6 +37,7 @@ import 'package:gymtracker/view/components/pro_builder.dart';
 import 'package:gymtracker/view/components/stats.dart';
 import 'package:gymtracker/view/components/subscription_nag.dart';
 import 'package:gymtracker/view/components/tweened_builder.dart';
+import 'package:gymtracker/view/skeleton.dart';
 import 'package:gymtracker/view/utils/crossfade.dart';
 import 'package:gymtracker/view/utils/date_picker.dart';
 import 'package:gymtracker/view/utils/input_decoration.dart';
@@ -704,7 +705,6 @@ class _FoodViewState extends ConsumerState<FoodView> {
       textInputAction: TextInputAction.search,
       keyboardType: TextInputType.text,
       viewFloatingActionButton: _AddCustomFoodFAB(
-        closeView: () => Go.back(),
         onFoodAdded: (food) async {
           if (food != null && context.mounted) {
             final selectedDate = ref.read(foodSelectedDateProvider);
@@ -1015,6 +1015,9 @@ class _FoodDayAppBar extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final relativeDayText = ref.watch(foodRelativeDayTextProvider(context));
     return SliverAppBar.large(
+      leading: SkeletonView.of(context) != null
+          ? const SkeletonDrawerButton()
+          : null,
       actions: [
         IconButton(
           icon: const Icon(Icons.cloud_upload_outlined),

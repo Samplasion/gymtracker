@@ -30,6 +30,7 @@ import 'package:gymtracker/view/components/error_view.dart';
 import 'package:gymtracker/view/components/pro_builder.dart';
 import 'package:gymtracker/view/debug.dart';
 import 'package:gymtracker/view/feed.dart';
+import 'package:gymtracker/view/food.dart';
 import 'package:gymtracker/view/legal.dart';
 import 'package:gymtracker/view/loading.dart';
 import 'package:gymtracker/view/logs.dart';
@@ -210,6 +211,7 @@ class _SkeletonViewState extends ConsumerState<SkeletonView>
   List<Widget> get pages => [
     const FeedView(),
     const MeView(),
+    const FoodView(),
     const RoutinesView(),
   ];
 
@@ -224,6 +226,7 @@ class _SkeletonViewState extends ConsumerState<SkeletonView>
   @override
   Widget build(BuildContext context) {
     final safeArea = MediaQuery.of(context).padding;
+    final subscriptionInfo = ref.watch(subscriptionInfoProvider).value;
     final showMDView = SkeletonView.isTwoPane(context);
     final leftNavigationSize = (showMDView
         ? (isSidebarCollapsed ? _kRailSize : _kDrawerSize - safeArea.left)
@@ -283,7 +286,7 @@ class _SkeletonViewState extends ConsumerState<SkeletonView>
                         bottom:
                             safeArea.bottom +
                             ((ref.watch(workoutControllerProvider) != null)
-                                ? (OngoingWorkoutBar.defaultHeight + 32)
+                                ? OngoingWorkoutBar.defaultHeight
                                 : 0) +
                             (showMDView ? 0 : _kNavBarHeight),
                         left: showMDView ? 0 : safeArea.left,
@@ -314,7 +317,7 @@ class _SkeletonViewState extends ConsumerState<SkeletonView>
                   data: MediaQuery.of(context).copyWith(
                     padding: safeArea.copyWith(
                       left: safeArea.left + leftNavigationSize,
-                      bottom: 0,
+                      bottom: showMDView ? safeArea.bottom : 0,
                     ),
                   ),
                   child: Crossfade(
@@ -337,8 +340,8 @@ class _SkeletonViewState extends ConsumerState<SkeletonView>
               },
             ),
             Crossfade(
-              firstChild: ProBuilder(
-                builder: (context, subscriptionInfo) {
+              firstChild: Builder(
+                builder: (context) {
                   final isSubscribed = subscriptionInfo?.hasProFeatures == true;
                   return NavigationBar(
                     onDestinationSelected: _onBottomDestinationTap,
@@ -352,6 +355,10 @@ class _SkeletonViewState extends ConsumerState<SkeletonView>
                       NavigationDestination(
                         icon: const Icon(GTIcons.profile),
                         label: context.t.me.title,
+                      ),
+                      NavigationDestination(
+                        icon: const Icon(GTIcons.food),
+                        label: context.t.food.title,
                       ),
                       NavigationDestination(
                         icon: const Icon(GTIcons.muscle),
@@ -376,11 +383,11 @@ class _SkeletonViewState extends ConsumerState<SkeletonView>
   }
 
   void _onBottomDestinationTap(int i) {
-    if (i == 3) {
+    if (i == 4) {
       ref.read(purchasesControllerProvider).presentPaywall();
       return;
     }
-    context.go(const ['/feed', '/profile', '/routines'][i]);
+    context.go(const ['/feed', '/profile', '/food', '/routines'][i]);
   }
 
   Widget _drawer(bool expanded) {
@@ -402,6 +409,10 @@ class _SkeletonViewState extends ConsumerState<SkeletonView>
           NavigationDrawerDestination(
             icon: const Icon(GTIcons.profile),
             label: Text(context.t.me.title),
+          ),
+          NavigationDrawerDestination(
+            icon: const Icon(GTIcons.food),
+            label: Text(context.t.food.title),
           ),
           NavigationDrawerDestination(
             icon: const Icon(GTIcons.muscle),

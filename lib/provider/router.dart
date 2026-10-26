@@ -6,6 +6,7 @@ import 'package:gymtracker/struct/navigation_observer.dart';
 import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/view/error.dart';
 import 'package:gymtracker/view/feed.dart';
+import 'package:gymtracker/view/food.dart';
 import 'package:gymtracker/view/me.dart';
 import 'package:gymtracker/view/onboarding.dart';
 import 'package:gymtracker/view/paywall.dart';
@@ -39,7 +40,8 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         builder: (_, state, child) => SkeletonView(
           sectionIndex: switch (state.uri.path) {
             '/profile' => 1,
-            '/routines' => 2,
+            '/food' => 2,
+            '/routines' => 3,
             _ => 0,
           },
           child: child,
@@ -52,6 +54,10 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           GoRoute(
             path: '/profile',
             pageBuilder: (_, state) => _sectionPage(state, const MeView()),
+          ),
+          GoRoute(
+            path: '/food',
+            pageBuilder: (_, state) => _sectionPage(state, const FoodView()),
           ),
           GoRoute(
             path: '/routines',

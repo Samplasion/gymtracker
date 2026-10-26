@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -12,7 +11,6 @@ import 'package:gymtracker/provider/connectivity.dart';
 import 'package:gymtracker/provider/feed.dart';
 import 'package:gymtracker/provider/friend.dart';
 import 'package:gymtracker/provider/online.dart';
-import 'package:gymtracker/utils/constants.dart';
 import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/utils/skeletons.dart';
 import 'package:gymtracker/view/components/content_unavailable.dart';
@@ -98,21 +96,21 @@ class _FeedViewState extends ConsumerState<FeedView>
         ? 0
         : (ref.watch(notificationSummaryProvider).value?['unread'] as int? ??
               0);
+    final mediaQuery = MediaQuery.of(context);
+    // Scaffold's floating FAB accounts for viewPadding, but Skeleton adds
+    // the bottom navigation and ongoing workout bar to padding only.
+    final bottomBarPadding =
+        (mediaQuery.padding.bottom - mediaQuery.viewPadding.bottom).clamp(
+          0.0,
+          double.infinity,
+        );
 
     return Scaffold(
-      floatingActionButtonLocation: .endDocked,
+      floatingActionButtonLocation: .endFloat,
       floatingActionButton: account.value == null
           ? null
           : Padding(
-              padding: EdgeInsets.only(
-                bottom: MediaQuery.of(context).padding.bottom == kNavBarHeight
-                    ? kNavBarHeight + kFloatingActionButtonMargin
-                    : max(
-                        MediaQuery.of(context).padding.bottom -
-                            kFloatingActionButtonMargin,
-                        kFloatingActionButtonMargin,
-                      ),
-              ),
+              padding: EdgeInsets.only(bottom: bottomBarPadding),
               child: FloatingActionButton(
                 onPressed: () {
                   showSearch(

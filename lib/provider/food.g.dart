@@ -669,7 +669,7 @@ final class FoodNotifierProvider extends $NotifierProvider<FoodNotifier, void> {
   }
 }
 
-String _$foodNotifierHash() => r'c5d25403fd69e637a71d5a8a0e7ce4c21e27c381';
+String _$foodNotifierHash() => r'7ceb1d44ff94fd8173619659fe6bc0c2d7cafbc6';
 
 abstract class _$FoodNotifier extends $Notifier<void> {
   void build();
@@ -927,7 +927,7 @@ final class NutritionGoalNotifierProvider
 }
 
 String _$nutritionGoalNotifierHash() =>
-    r'46e794eec767d95e0eac99a5e33499adf36b5fb5';
+    r'b8e1c05dfbd16978e382de635813aa0d65bfc6bd';
 
 abstract class _$NutritionGoalNotifier extends $Notifier<void> {
   void build();
@@ -1406,7 +1406,7 @@ final class NutritionCategoryNotifierProvider
 }
 
 String _$nutritionCategoryNotifierHash() =>
-    r'6217ed2faf398bad34dfd5413f327e15b7d8b12e';
+    r'c86349025903222bd692468a9b788c6399afd200';
 
 abstract class _$NutritionCategoryNotifier extends $Notifier<void> {
   void build();
@@ -1553,4 +1553,4 @@ final class FoodNativeSyncProvider extends $FunctionalProvider<void, void, void>
   }
 }
 
-String _$foodNativeSyncHash() => r'74b11c28dfca5059b977f81968d3cbe9676d1d4a';
+String _$foodNativeSyncHash() => r'81093092920779b4cf898e54dceb40be709d6512';

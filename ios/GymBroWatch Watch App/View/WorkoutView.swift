@@ -13,6 +13,12 @@ struct WorkoutView: View {
     @State private var editingSetID: String?
     private enum Tab { case workout, music }
 
+    // Use physical display width: nested page/navigation insets must not
+    // classify a 44 mm Watch as a small model.
+    private var isCompactWatch: Bool {
+        WKInterfaceDevice.current().screenBounds.width < 180
+    }
+
     var body: some View {
         TabView(selection: $selection) {
             NavigationStack { metrics }.tag(Tab.workout)
@@ -34,17 +40,19 @@ struct WorkoutView: View {
 
     @ViewBuilder private var metrics: some View {
         if workoutViewModel.state == .running || workoutViewModel.state == .paused {
-            VStack(alignment: .leading) {
+            VStack(alignment: .leading, spacing: isCompactWatch ? 2 : nil) {
                 TimelineView(MetricsTimelineSchedule()) { context in
                     ElapsedTimeView(elapsedTime: context.date.timeIntervalSince(workoutViewModel.workoutStart ?? context.date), showSubseconds: context.cadence == .live)
                 }
-                .font(.system(size: 24, weight: .semibold, design: .rounded))
+                .font(.system(size: isCompactWatch ? 20 : 24, weight: .semibold, design: .rounded))
                 .foregroundStyle(.tint)
                 Spacer()
                 if workoutViewModel.hasNextSet {
                     Text(workoutViewModel.exerciseName)
-                        .font(.system(size: 18, weight: .semibold, design: .rounded))
+                        .font(.system(size: isCompactWatch ? 15 : 18, weight: .semibold, design: .rounded))
                         .multilineTextAlignment(.center)
+                        .lineLimit(1)
+                        .truncationMode(.tail)
                     Button {
                         guard !workoutViewModel.isLoading else { return }
                         editingSetID = workoutViewModel.set?.id
@@ -52,56 +60,63 @@ struct WorkoutView: View {
                     } label: {
                         (SetTypeIndicatorView.richTextPrefix(set: workoutViewModel.set, label: workoutViewModel.setTypeLabel, primary: workoutViewModel.exerciseColor.asARGBColor())
                          + Text(workoutViewModel.exerciseParameters) + Text(" ") + Text(Image(systemName: "pencil")))
-                        .font(.system(size: 14)).multilineTextAlignment(.center)
+                        .font(.system(size: isCompactWatch ? 12 : 14)).multilineTextAlignment(.center)
                     }
                     .buttonStyle(.plain)
                     .disabled(!workoutViewModel.state.isRunning)
                 }
                 HStack {
-                    Image(systemName: "heart.fill").foregroundStyle(.red).frame(width: 30)
+                    Image(systemName: "heart.fill").foregroundStyle(.red).frame(width: isCompactWatch ? 24 : 30)
                     Text(workoutManager.heartRate > 0 ? "\(workoutManager.heartRate.formatted(.number.precision(.fractionLength(0)))) bpm" : "— bpm")
                 }
                 HStack {
-                    Image(systemName: "flame.fill").foregroundStyle(.orange).frame(width: 30)
+                    Image(systemName: "flame.fill").foregroundStyle(.orange).frame(width: isCompactWatch ? 24 : 30)
                     Text("\(workoutManager.activeEnergy.formatted(.number.precision(.fractionLength(1)))) kcal")
                 }
                 Spacer()
                 HStack {
                     Button { workoutViewModel.moveWorkoutCursorPrevious() } label: { Image(systemName: "chevron.left") }
+                    .accessibilityLabel("Previous set")
                     Spacer()
                     Button { workoutViewModel.markThisSetAsDone() } label: {
                         Image(systemName: "checkmark.circle")
-                            .font(.title2)
+                            .font(isCompactWatch ? .system(size: 20) : .title2)
                             .opacity(workoutViewModel.isLoading ? 0 : 1)
                             .overlay {
                                 ProgressView().opacity(workoutViewModel.isLoading ? 1 : 0)
                                     .allowsHitTesting(false)
                             }
                     }
+                    .accessibilityLabel("Complete set")
                     .modifier(HandGestureShortcutIfAvailable())
                     Spacer()
                     Button { workoutViewModel.moveWorkoutCursorNext() } label: { Image(systemName: "chevron.right") }
+                    .accessibilityLabel("Next set")
                 }
                 .buttonStyle(.bordered)
+                .controlSize(isCompactWatch ? .small : .regular)
                 // Keep the gesture target enabled while a request is in flight.
                 // The model rejects repeated actions without changing its identity.
                 .disabled(!workoutViewModel.state.isRunning || !workoutViewModel.hasNextSet)
-                .padding(.vertical, 8)
+                .padding(.vertical, isCompactWatch ? 4 : 8)
                 TimelineView(.periodic(from: .now, by: 1)) { context in
                     if let end = workoutViewModel.restTimeEnd, end >= context.date {
                         Label {
                             ElapsedTimeView(elapsedTime: end.timeIntervalSince(context.date).rounded(), showSubseconds: false)
-                        } icon: { Image(systemName: "timer").frame(width: 30) }
+                        } icon: { Image(systemName: "timer").frame(width: isCompactWatch ? 24 : 30) }
+                        .accessibilityElement(children: .ignore)
+                        .accessibilityLabel("Rest timer")
+                        .accessibilityValue(Text(end, style: .timer))
                     }
                 }
-                .font(.body)
+                .font(isCompactWatch ? .system(size: 14) : .body)
                 Spacer()
             }
-            .font(.system(.headline, design: .rounded).monospacedDigit().lowercaseSmallCaps())
+            .font((isCompactWatch ? Font.system(size: 14, weight: .semibold, design: .rounded) : Font.system(.headline, design: .rounded)).monospacedDigit().lowercaseSmallCaps())
             .frame(maxWidth: .infinity, alignment: .leading)
             .tint(workoutViewModel.exerciseColor == 0 ? .accentColor : workoutViewModel.exerciseColor.asARGBColor())
             .scenePadding()
-            .padding(.top, 30)
+            .padding(.top, isCompactWatch ? 12 : 20)
             .ignoresSafeArea(edges: .bottom)
         } else {
             Text("Start a workout from your iPhone.")

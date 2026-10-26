@@ -95,6 +95,9 @@ android {
     buildFeatures {
         viewBinding true
     }
+    testOptions {
+        unitTests.includeAndroidResources = true
+    }
 }
 
 flutter {
@@ -102,6 +105,8 @@ flutter {
 }
 
 dependencies {
+    testImplementation 'junit:junit:4.13.2'
+    testImplementation 'org.robolectric:robolectric:4.16.1'
     coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.1.5'
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.2.20"
     implementation 'androidx.glance:glance-appwidget:1.1.1'

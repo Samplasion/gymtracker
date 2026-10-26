@@ -22,11 +22,13 @@ final class PhoneMessageResponder: NSObject {
                let decoded = NativeFoodStateMessage.decodeFoodState(from: food) { foodDelegate?.set(foodParameters: decoded) }
         }
     }
+    private var sendingWater: Set<String> = []
     var session: WCSession?
     private var cursor = WatchSnapshotCursor(revision: (UserDefaults.standard.dictionary(forKey: "watch.receivedSnapshot.v2")?["revision"] as? NSNumber)?.int64Value ?? -1)
 
     nonisolated func session(_ session: WCSession, didReceiveMessage message: [String: Any]) {
         Task { @MainActor in
+            if self.receiveWaterAcknowledgement(message) { return }
             if message["method"] as? String == "snapshot", let snapshot = message["data"] as? [String: Any] {
                 self.apply(snapshot)
             } else if message["method"] as? String == "updateHomeWidgetParameters",
@@ -80,9 +82,36 @@ final class PhoneMessageResponder: NSObject {
         }
     }
     nonisolated func session(_ session: WCSession, didReceiveUserInfo info: [String: Any]) {
-        self.session(session, didReceiveApplicationContext: info)
+        Task { @MainActor in
+            if !self.receiveWaterAcknowledgement(info) { self.session(session, didReceiveApplicationContext: info) }
+        }
     }
     nonisolated func sessionReachabilityDidChange(_ session: WCSession) {
-        Task { @MainActor in self.workoutDelegate?.sessionReachabilityDidChange(session) }
+        Task { @MainActor in
+            self.workoutDelegate?.sessionReachabilityDidChange(session)
+            if session.isReachable { self.foodDelegate?.flushWaterEntries() }
+        }
     }
+    func sendWater(_ entry: WatchWaterEntry) {
+        guard let session, session.activationState == .activated else { return }
+        if !session.outstandingUserInfoTransfers.contains(where: {
+            $0.userInfo["method"] as? String == "addWater" &&
+            $0.userInfo["id"] as? String == entry.id && $0.userInfo["ownerScope"] as? String == entry.ownerScope
+        }) { session.transferUserInfo(entry.message) }
+        guard session.isReachable, sendingWater.insert(entry.id).inserted else { return }
+        session.sendMessage(entry.message, replyHandler: nil, errorHandler: { _ in })
+        DispatchQueue.main.asyncAfter(deadline: .now() + 10) { [weak self] in self?.sendingWater.remove(entry.id) }
+    }
+
+    private func receiveWaterAcknowledgement(_ message: [String: Any]) -> Bool {
+        guard message["method"] as? String == "waterAcknowledged",
+              let ids = message["ids"] as? [String], let scope = message["ownerScope"] as? String else { return false }
+        foodDelegate?.acknowledgeWater(ids: Set(ids), ownerScope: scope)
+        for transfer in session?.outstandingUserInfoTransfers ?? [] {
+            if let id = transfer.userInfo["id"] as? String, ids.contains(id),
+               transfer.userInfo["ownerScope"] as? String == scope { transfer.cancel() }
+        }
+        return true
+    }
+
 }

@@ -21,6 +21,9 @@ abstract class NativeService {
   factory NativeService.withHost(GymBroNativeHostAPI host) = _NativeServiceImpl;
 
   NativeService._();
+  Future<bool> Function(String, double, int, String)? onImportWaterEntry;
+  void waterReceiverReady() {}
+
   void Function()? onMarkSetDone;
   bool Function()? onCursorNext;
   bool Function()? onCursorPrevious;
@@ -30,6 +33,7 @@ abstract class NativeService {
   void attach() {}
 
   void clearCallbacks() {
+    onImportWaterEntry = null;
     onMarkSetDone = null;
     onCursorNext = null;
     onCursorPrevious = null;
@@ -68,6 +72,14 @@ class _UnsupportedNativeService extends NativeService
   Stream<double?> get energyStream => const Stream<double?>.empty();
   @override
   Stream<double?> get heartRateStream => const Stream<double?>.empty();
+
+  @override
+  Future<bool> importWaterEntry(
+    String id,
+    double milliliters,
+    int timeMilliseconds,
+    String ownerScope,
+  ) async => false;
 
   @override
   void markThisSetAsDone() {
@@ -185,6 +197,34 @@ class _NativeServiceImpl extends NativeService
   Stream<double?> get energyStream => _energy$.stream;
   @override
   Stream<double?> get heartRateStream => _heartRate$.stream;
+
+  @override
+  void waterReceiverReady() {
+    if (!_disposed) {
+      unawaited(
+        _watch.waterReceiverReady().catchError((Object error) {
+          logger.e('Watch water receiver unavailable', error: error);
+        }),
+      );
+    }
+  }
+
+  @override
+  Future<bool> importWaterEntry(
+    String id,
+    double milliliters,
+    int timeMilliseconds,
+    String ownerScope,
+  ) async {
+    if (_disposed) return false;
+    return await onImportWaterEntry?.call(
+          id,
+          milliliters,
+          timeMilliseconds,
+          ownerScope,
+        ) ??
+        false;
+  }
 
   @override
   void markThisSetAsDone() {

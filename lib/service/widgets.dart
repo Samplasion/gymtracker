@@ -17,7 +17,9 @@ const restKey = "daily_rest_streak_since";
 const totalWorkoutsKey = "total_workouts";
 const workoutDensityKey = "workout_density_chart_data";
 
-final isSupported = Platform.isIOS || Platform.isAndroid;
+// Android receives one complete snapshot through NativeService, including density
+// and the last workout date. Avoid a second writer and three partial refreshes.
+final isSupported = Platform.isIOS;
 
 abstract class WidgetsService {
   static WidgetsService instance() {
@@ -58,7 +60,7 @@ class _WidgetsService extends WidgetsService {
     _update();
   }
 
-  _update() async {
+  Future<void> _update() async {
     try {
       for (final name in iOSWidgetName) {
         await HomeWidget.updateWidget(

@@ -1,0 +1,71 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/widget_root"
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:background="@drawable/widget_background" android:padding="16dp"
+    android:gravity="center" android:orientation="vertical">
+    <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginBottom="8dp"
+        android:text="@string/widget_workouts" android:textSize="14sp" android:textColor="@color/widget_text" android:fontFamily="sans-serif-medium" />
+    <LinearLayout android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1">
+        <TextView android:layout_width="0dp" android:layout_weight="1" android:layout_height="match_parent" android:layout_margin="1dp" android:background="@color/widget_primary" />
+        <TextView android:layout_width="0dp" android:layout_weight="1" android:layout_height="match_parent" android:layout_margin="1dp" android:background="@color/widget_track" />
+        <TextView android:layout_width="0dp" android:layout_weight="1" android:layout_height="match_parent" android:layout_margin="1dp" android:background="@color/widget_track" />
+        <TextView android:layout_width="0dp" android:layout_weight="1" android:layout_height="match_parent" android:layout_margin="1dp" android:background="@color/widget_primary" />
+        <TextView android:layout_width="0dp" android:layout_weight="1" android:layout_height="match_parent" android:layout_margin="1dp" android:background="@color/widget_track" />
+        <TextView android:layout_width="0dp" android:layout_weight="1" android:layout_height="match_parent" android:layout_margin="1dp" android:background="@color/widget_primary" />
+        <TextView android:layout_width="0dp" android:layout_weight="1" android:layout_height="match_parent" android:layout_margin="1dp" android:background="@color/widget_track" />
+    </LinearLayout>
+    <LinearLayout android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1">
+        <TextView android:layout_width="0dp" android:layout_weight="1" android:layout_height="match_parent" android:layout_margin="1dp" android:background="@color/widget_track" />
+        <TextView android:layout_width="0dp" android:layout_weight="1" android:layout_height="match_parent" android:layout_margin="1dp" android:background="@color/widget_primary" />
+        <TextView android:layout_width="0dp" android:layout_weight="1" android:layout_height="match_parent" android:layout_margin="1dp" android:background="@color/widget_track" />
+        <TextView android:layout_width="0dp" android:layout_weight="1" android:layout_height="match_parent" android:layout_margin="1dp" android:background="@color/widget_track" />
+        <TextView android:layout_width="0dp" android:layout_weight="1" android:layout_height="match_parent" android:layout_margin="1dp" android:background="@color/widget_primary" />
+        <TextView android:layout_width="0dp" android:layout_weight="1" android:layout_height="match_parent" android:layout_margin="1dp" android:background="@color/widget_track" />
+        <TextView android:layout_width="0dp" android:layout_weight="1" android:layout_height="match_parent" android:layout_margin="1dp" android:background="@color/widget_primary" />
+    </LinearLayout>
+    <LinearLayout android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1">
+        <TextView android:layout_width="0dp" android:layout_weight="1" android:layout_height="match_parent" android:layout_margin="1dp" android:background="@color/widget_primary" />
+        <TextView android:layout_width="0dp" android:layout_weight="1" android:layout_height="match_parent" android:layout_margin="1dp" android:background="@color/widget_track" />
+        <TextView android:layout_width="0dp" android:layout_weight="1" android:layout_height="match_parent" android:layout_margin="1dp" android:background="@color/widget_primary" />
+        <TextView android:layout_width="0dp" android:layout_weight="1" android:layout_height="match_parent" android:layout_margin="1dp" android:background="@color/widget_track" />
+        <TextView android:layout_width="0dp" android:layout_weight="1" android:layout_height="match_parent" android:layout_margin="1dp" android:background="@color/widget_track" />
+        <TextView android:layout_width="0dp" android:layout_weight="1" android:layout_height="match_parent" android:layout_margin="1dp" android:background="@color/widget_primary" />
+        <TextView android:layout_width="0dp" android:layout_weight="1" android:layout_height="match_parent" android:layout_margin="1dp" android:background="@color/widget_track" />
+    </LinearLayout>
+    <LinearLayout android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1">
+        <TextView android:layout_width="0dp" android:layout_weight="1" android:layout_height="match_parent" android:layout_margin="1dp" android:background="@color/widget_track" />
+        <TextView android:layout_width="0dp" android:layout_weight="1" android:layout_height="match_parent" android:layout_margin="1dp" android:background="@color/widget_primary" />
+        <TextView android:layout_width="0dp" android:layout_weight="1" android:layout_height="match_parent" android:layout_margin="1dp" android:background="@color/widget_track" />
+        <TextView android:layout_width="0dp" android:layout_weight="1" android:layout_height="match_parent" android:layout_margin="1dp" android:background="@color/widget_primary" />
+        <TextView android:layout_width="0dp" android:layout_weight="1" android:layout_height="match_parent" android:layout_margin="1dp" android:background="@color/widget_track" />
+        <TextView android:layout_width="0dp" android:layout_weight="1" android:layout_height="match_parent" android:layout_margin="1dp" android:background="@color/widget_track" />
+        <TextView android:layout_width="0dp" android:layout_weight="1" android:layout_height="match_parent" android:layout_margin="1dp" android:background="@color/widget_primary" />
+    </LinearLayout>
+    <LinearLayout android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1">
+        <TextView android:layout_width="0dp" android:layout_weight="1" android:layout_height="match_parent" android:layout_margin="1dp" android:background="@color/widget_track" />
+        <TextView android:layout_width="0dp" android:layout_weight="1" android:layout_height="match_parent" android:layout_margin="1dp" android:background="@color/widget_track" />
+        <TextView android:layout_width="0dp" android:layout_weight="1" android:layout_height="match_parent" android:layout_margin="1dp" android:background="@color/widget_primary" />
+        <TextView android:layout_width="0dp" android:layout_weight="1" android:layout_height="match_parent" android:layout_margin="1dp" android:background="@color/widget_track" />
+        <TextView android:layout_width="0dp" android:layout_weight="1" android:layout_height="match_parent" android:layout_margin="1dp" android:background="@color/widget_primary" />
+        <TextView android:layout_width="0dp" android:layout_weight="1" android:layout_height="match_parent" android:layout_margin="1dp" android:background="@color/widget_track" />
+        <TextView android:layout_width="0dp" android:layout_weight="1" android:layout_height="match_parent" android:layout_margin="1dp" android:background="@color/widget_track" />
+    </LinearLayout>
+    <LinearLayout android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1">
+        <TextView android:layout_width="0dp" android:layout_weight="1" android:layout_height="match_parent" android:layout_margin="1dp" android:background="@color/widget_primary" />
+        <TextView android:layout_width="0dp" android:layout_weight="1" android:layout_height="match_parent" android:layout_margin="1dp" android:background="@color/widget_track" />
+        <TextView android:layout_width="0dp" android:layout_weight="1" android:layout_height="match_parent" android:layout_margin="1dp" android:background="@color/widget_track" />
+        <TextView android:layout_width="0dp" android:layout_weight="1" android:layout_height="match_parent" android:layout_margin="1dp" android:background="@color/widget_primary" />
+        <TextView android:layout_width="0dp" android:layout_weight="1" android:layout_height="match_parent" android:layout_margin="1dp" android:background="@color/widget_track" />
+        <TextView android:layout_width="0dp" android:layout_weight="1" android:layout_height="match_parent" android:layout_margin="1dp" android:background="@color/widget_primary" />
+        <TextView android:layout_width="0dp" android:layout_weight="1" android:layout_height="match_parent" android:layout_margin="1dp" android:background="@color/widget_track" />
+    </LinearLayout>
+    <LinearLayout android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1">
+        <TextView android:layout_width="0dp" android:layout_weight="1" android:layout_height="match_parent" android:layout_margin="1dp" android:background="@color/widget_track" />
+        <TextView android:layout_width="0dp" android:layout_weight="1" android:layout_height="match_parent" android:layout_margin="1dp" android:background="@color/widget_primary" />
+        <TextView android:layout_width="0dp" android:layout_weight="1" android:layout_height="match_parent" android:layout_margin="1dp" android:background="@color/widget_track" />
+        <TextView android:layout_width="0dp" android:layout_weight="1" android:layout_height="match_parent" android:layout_margin="1dp" android:background="@color/widget_track" />
+        <TextView android:layout_width="0dp" android:layout_weight="1" android:layout_height="match_parent" android:layout_margin="1dp" android:background="@color/widget_primary" />
+        <TextView android:layout_width="0dp" android:layout_weight="1" android:layout_height="match_parent" android:layout_margin="1dp" android:background="@color/widget_track" />
+        <TextView android:layout_width="0dp" android:layout_weight="1" android:layout_height="match_parent" android:layout_margin="1dp" android:background="@color/widget_primary" />
+    </LinearLayout>
+</LinearLayout>

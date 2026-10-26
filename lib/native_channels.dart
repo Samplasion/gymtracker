@@ -24,6 +24,8 @@ abstract class GymBroNativeHostAPI {
   );
   void requestHealthPermission();
 
+  void waterReceiverReady();
+
   // Food
   void updateFoodParameters(Map<String?, Object?> parameters);
 
@@ -34,6 +36,14 @@ abstract class GymBroNativeHostAPI {
 @FlutterApi()
 // This API is called by the native OS to communicate with the Flutter app
 abstract class GymBroNativeFlutterAPI {
+  @async
+  bool importWaterEntry(
+    String id,
+    double milliliters,
+    int timeMilliseconds,
+    String ownerScope,
+  );
+
   // Marks the current set as done
   void markThisSetAsDone();
 

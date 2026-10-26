@@ -80,6 +80,54 @@ class HydrationRepository {
     });
   }
 
+  String get ownerScope =>
+      db.currentUserId == null ? 'guest' : 'user:${db.currentUserId}';
+
+  /// A retransmission must not overwrite edits or resurrect a deleted entry.
+  /// Explicit lookup also covers SQLite's nullable guest primary key.
+  Future<bool> importWatchEntry({
+    required String id,
+    required double milliliters,
+    required DateTime time,
+    required String ownerScope,
+  }) async {
+    if (ownerScope != this.ownerScope) return false;
+    if (!RegExp(
+          r'^[0-9a-fA-F]{8}(-[0-9a-fA-F]{4}){3}-[0-9a-fA-F]{12}$',
+        ).hasMatch(id) ||
+        !milliliters.isFinite ||
+        milliliters <= 0 ||
+        time.isAfter(DateTime.now())) {
+      throw ArgumentError('Invalid watch water entry');
+    }
+    final owner = db.currentUserId;
+    return db.transaction(() async {
+      if (owner != db.currentUserId) return false;
+      final existing =
+          await (db.select(db.waterLogs)
+                ..where((t) => owned(t.userId, owner) & t.id.equals(id)))
+              .getSingleOrNull();
+      if (existing == null) {
+        await db
+            .into(db.waterLogs)
+            .insert(
+              WaterLogsCompanion.insert(
+                id: Value(id),
+                userId: Value(owner),
+                dateAdded: time.toUtc(),
+                referenceDate: DateTime.utc(time.year, time.month, time.day),
+                jsonData: jsonEncode({
+                  'milliliters': milliliters,
+                  'time': time.toUtc().toIso8601String(),
+                }),
+                updatedAt: Value(DateTime.now().toUtc()),
+              ),
+            );
+      }
+      return true;
+    });
+  }
+
   Future<void> remove(String id) {
     final owner = db.currentUserId;
     return (db.update(

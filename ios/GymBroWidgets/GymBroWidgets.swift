@@ -33,26 +33,7 @@ struct Provider: AppIntentTimelineProvider, TimelineProvider {
   typealias Intent = ConfigurationAppIntent
   
   func placeholder(in context: Context) -> WorkoutStreakEntry {
-    WorkoutStreakEntry(date: Date(), streak: 3, dailyRestStreak: .now.addingTimeInterval(-60*60*24*2), totalWorkouts: 54, workoutDensityChartData: [
-      1, 2, 0, 0, 0, 0, 0,
-      0, 0, 1, 4, 5, 1, 0,
-      0, 0, 0, 0, 0, 0, 0,
-      0, 0, 0, 2, 0, 0, 0,
-      0, 0, 0, 0, 0, 0, 0,
-      0, 0, 0, 0, 0, 0, 0,
-      0, 0, 1, 4, 5, 1, 0,
-      0, 0, 1, 2, 5, 1, 4,
-      0, 0, 1, 4, 5, 1, 0,
-      1, 2, 0, 0, 0, 0, 0,
-      0, 0, 1, 4, 5, 1, 0,
-      0, 0, 0, 0, 0, 0, 0,
-      0, 0, 0, 2, 0, 0, 0,
-      0, 0, 0, 0, 0, 0, 0,
-      0, 0, 0, 0, 0, 0, 0,
-      0, 0, 1, 4, 5, 1, 0,
-      0, 0, 1, 2, 5, 1, 4,
-      0, 0, 1, 4, 5, 1, 0,
-    ])
+    .example()
   }
   
   func snapshot(for configuration: ConfigurationAppIntent, in context: Context) async -> WorkoutStreakEntry {
@@ -89,27 +70,13 @@ struct WidgetsEntryView: View {
   var entry: Provider.Entry
   let widgetView: GBWidgetView
   
-  var bundle: URL {
-    let bundle = Bundle.main
-    if bundle.bundleURL.pathExtension == "appex" {
-      // Peel off two directory levels - MY_APP.app/PlugIns/MY_APP_EXTENSION.appex
-      var url = bundle.bundleURL.deletingLastPathComponent().deletingLastPathComponent()
-      url.append(component: "Frameworks/App.framework/flutter_assets")
-      return url
-    }
-    return bundle.bundleURL
-  }
-  
   init(entry: Provider.Entry, widgetView: GBWidgetView) {
-    self.entry = entry
+    self.entry = entry.isExample ? entry : entry.displayingExampleIfMissing(
+      widgetView == .streak ? "weekly_streak" : widgetView == .rest ? "daily_rest_streak_since" : "total_workouts",
+      defaults: UserDefaults(suiteName: "group.samplasion.gymtracker"))
     self.widgetView = widgetView
-    CTFontManagerRegisterFontsForURL(bundle.appending(path: "/fonts/GymTracker.ttf") as CFURL, CTFontManagerScope.process, nil)
-    for family in UIFont.familyNames.sorted() {
-      let names = UIFont.fontNames(forFamilyName: family)
-      print("Family: \(family) Font names: \(names)")
-    }
   }
-  
+
   var isOn: Bool {
     entry.streak > 0
   }
@@ -118,81 +85,68 @@ struct WidgetsEntryView: View {
     isOn ? Color.accentColor : Color.secondary
   }
   
+  private var title: LocalizedStringKey {
+    switch widgetView {
+    case .streak: "Streak"
+    case .rest: "Rest"
+    case .total: "Total"
+    }
+  }
+
+  private var value: LocalizedStringKey {
+    switch widgetView {
+    case .streak: "\(entry.streak) weeks"
+    case .rest: "\(entry.restStreakDays) days"
+    case .total: "\(entry.totalWorkouts) workouts"
+    }
+  }
+
+  private var count: Int {
+    switch widgetView {
+    case .streak: entry.streak
+    case .rest: entry.restStreakDays
+    case .total: entry.totalWorkouts
+    }
+  }
+
   var body: some View {
-    let streak: LocalizedStringKey = "\(entry.streak) weeks"
-    let rest: LocalizedStringKey = "\(entry.restStreakDays) days"
-    let total: LocalizedStringKey = "\(entry.totalWorkouts) workouts"
-    
     @ViewBuilder
-    var widgetContent: some View {
-      switch (widgetFamily) {
-        case .systemSmall:
-          VStack {
-            Spacer()
-            GBWidgetIcon(widgetView: widgetView, size: 48, color: color)
-            Spacer()
-            switch (widgetView) {
-              case .streak: Text("Streak").font(.caption)
-              case .rest: Text("Rest").font(.caption)
-              case .total: Text("Total").font(.caption)
-            }
-            switch (widgetView) {
-              case .streak: Text(streak).fontWeight(.semibold)
-              case .rest: Text(rest).fontWeight(.semibold)
-              case .total: Text(total).fontWeight(.semibold)
-            }
-            
-            Spacer()
+    var content: some View {
+      switch widgetFamily {
+      case .systemSmall:
+        VStack(spacing: 10) {
+          GBWidgetIcon(widgetView: widgetView, size: 44, color: color)
+          VStack(spacing: 3) {
+            Text(title).font(.caption)
+            Text(value).font(.headline)
           }
-        case .accessoryCircular:
-          VStack {
-            Spacer()
-            GBWidgetIcon(widgetView: widgetView, size: 24, color: color)
-            Spacer()
-            switch (widgetView) {
-              case .streak: Text("\(entry.streak)").font(.caption)
-                  .fontWeight(.semibold)
-              case .rest: Text("\(entry.restStreakDays)").font(.caption)
-                  .fontWeight(.semibold)
-              case .total: Text("\(entry.totalWorkouts)").font(.caption)
-                  .fontWeight(.semibold)
-            }
-            Spacer()
+        }
+      case .accessoryCircular:
+        VStack(spacing: 2) {
+          GBWidgetIcon(widgetView: widgetView, size: 20, color: color)
+          Text("\(count)").font(.caption).fontWeight(.semibold)
+        }
+      case .accessoryRectangular:
+        HStack(alignment: .center, spacing: 8) {
+          GBWidgetIcon(widgetView: widgetView, size: 28, color: color)
+          VStack(alignment: .center, spacing: 3) {
+            Text(title).font(.caption)
+            Text(value).font(.headline).lineLimit(2).minimumScaleFactor(0.7)
           }
-        case .accessoryRectangular:
-          HStack {
-            Spacer()
-            GBWidgetIcon(widgetView: widgetView, size: 32, color: color)
-            Spacer()
-            VStack {
-              switch (widgetView) {
-                case .streak: Text("Streak").font(.caption)
-                case .rest: Text("Rest").font(.caption)
-                case .total: Text("Total").font(.caption)
-              }
-              switch (widgetView) {
-                case .streak: Text(streak).fontWeight(.semibold)
-                case .rest: Text(rest).fontWeight(.semibold)
-                case .total: Text(total).fontWeight(.semibold)
-              }
-            }
-            Spacer()
-          }
-        case .accessoryInline:
-          let icon = GBWidgetIcon(widgetView: widgetView, size: 26, color: color)
-          HStack {
-            icon.asSFUI
-            switch (widgetView) {
-              case .streak: Text(streak).font(.caption).fontWeight(.semibold)
-              case .rest: Text(rest).font(.caption).fontWeight(.semibold)
-              case .total: Text(total).font(.caption).fontWeight(.semibold)
-            }
-          }
-        @unknown default:
-          fatalError()
+          .frame(maxWidth: .infinity, alignment: .center)
+        }
+      case .accessoryInline:
+        HStack(alignment: .center, spacing: 4) {
+          GBWidgetIcon(widgetView: widgetView, size: 14, color: color).asSFUI
+          Text(value).font(.caption).fontWeight(.semibold)
+        }
+      default:
+        EmptyView()
       }
     }
-    return widgetContent
+    return content
+      .multilineTextAlignment(.center)
+      .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
   }
 }
 
@@ -201,23 +155,36 @@ struct GBWidgetIcon: View {
   let size: Double
   let color: Color
   
+  // Gallery snapshots run without the containing Flutter app's asset layout.
+  private static let fontAvailable: Bool = {
+    guard let url = Bundle.main.url(forResource: "GymTracker", withExtension: "ttf") else { return false }
+    CTFontManagerRegisterFontsForURL(url as CFURL, .process, nil)
+    return UIFont(name: "GymTracker", size: 12) != nil
+  }()
+
   var body: some View {
-    switch (widgetView) {
-      case .streak: Text("\u{f06d}").font(Font.custom("GymTracker", size: size))
-          .foregroundColor(color)
-      case .rest: Image(systemName: "moon.fill").frame(width: CGFloat(size), height: CGFloat(size))
-          .tint(color)
-      case .total: Image(systemName: "gym.bag.fill").frame(width: CGFloat(size), height: CGFloat(size))
-          .tint(color)
+    Group {
+      if widgetView == .streak && Self.fontAvailable {
+        Text("\u{f06d}").font(.custom("GymTracker", size: size))
+      } else {
+        asSFUI
+      }
     }
+    .foregroundStyle(color)
+    .frame(width: size, height: size, alignment: .center)
   }
-  
-  @ViewBuilder
+
   var asSFUI: some View {
-    if widgetView == .streak {
-      Image(systemName: "flame.fill").frame(width: CGFloat(size), height: CGFloat(size)).tint(color)
-    } else {
-      body
+    Image(systemName: symbol).resizable().scaledToFit()
+      .foregroundStyle(color)
+      .frame(width: size, height: size, alignment: .center)
+  }
+
+  private var symbol: String {
+    switch widgetView {
+    case .streak: "flame.fill"
+    case .rest: "moon.fill"
+    case .total: "gym.bag.fill"
     }
   }
 }
@@ -274,10 +241,10 @@ struct GymBroWidgetsDensity: Widget {
   var body: some WidgetConfiguration {
     StaticConfiguration(kind: kind, provider: Provider()) { entry in
       if #available(watchOS 10.0, *) {
-        DensityChart(values: entry.calculatedWorkoutDensityChartData)
+        DensityChart(values: entry.densityDisplay)
           .containerBackground(.fill.tertiary, for: .widget)
       } else {
-        DensityChart(values: entry.calculatedWorkoutDensityChartData)
+        DensityChart(values: entry.densityDisplay)
           .background(.clear)
       }
     }
@@ -287,12 +254,9 @@ struct GymBroWidgetsDensity: Widget {
   }
 }
 
-//@available(iOS 17, *)
-//#Preview(as: .systemSmall) {
-//    GymBroWidgets()
-//} timeline: {
-//    WorkoutStreakEntry(date: .now, streak: 0, dailyRestStreak: 0, totalWorkouts: 0)
-//    WorkoutStreakEntry(date: .now.advanced(by: 1), streak: 1, dailyRestStreak: 0, totalWorkouts: 1)
-//}
-//
-
+@available(iOS 17.0, watchOS 10.0, *)
+#Preview("Serie", as: .systemSmall) {
+  GymBroWidgetsStreak()
+} timeline: {
+  WorkoutStreakEntry.example()
+}

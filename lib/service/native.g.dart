@@ -170,6 +170,24 @@ class GymBroNativeHostAPI {
     ;
   }
 
+  Future<void> waterReceiverReady() async {
+    final pigeonVar_channelName = 'dev.flutter.pigeon.gymtracker.GymBroNativeHostAPI.waterReceiverReady$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channel = BasicMessageChannel<Object?>(
+      pigeonVar_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: pigeonVar_binaryMessenger,
+    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(null);
+    final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
+
+    _extractReplyValueOrThrow(
+        pigeonVar_replyList,
+        pigeonVar_channelName,
+        isNullValid: true,
+    )
+    ;
+  }
+
   Future<void> updateFoodParameters(Map<String?, Object?> parameters) async {
     final pigeonVar_channelName = 'dev.flutter.pigeon.gymtracker.GymBroNativeHostAPI.updateFoodParameters$pigeonVar_messageChannelSuffix';
     final pigeonVar_channel = BasicMessageChannel<Object?>(
@@ -210,6 +228,8 @@ class GymBroNativeHostAPI {
 abstract class GymBroNativeFlutterAPI {
   static const MessageCodec<Object?> pigeonChannelCodec = _PigeonCodec();
 
+  Future<bool> importWaterEntry(String id, double milliliters, int timeMilliseconds, String ownerScope);
+
   void markThisSetAsDone();
 
   bool moveWorkoutCursorNext();
@@ -224,6 +244,30 @@ abstract class GymBroNativeFlutterAPI {
 
   static void setUp(GymBroNativeFlutterAPI? api, {BinaryMessenger? binaryMessenger, String messageChannelSuffix = '',}) {
     messageChannelSuffix = messageChannelSuffix.isNotEmpty ? '.$messageChannelSuffix' : '';
+    {
+      final pigeonVar_channel = BasicMessageChannel<Object?>(
+          'dev.flutter.pigeon.gymtracker.GymBroNativeFlutterAPI.importWaterEntry$messageChannelSuffix', pigeonChannelCodec,
+          binaryMessenger: binaryMessenger);
+      if (api == null) {
+        pigeonVar_channel.setMessageHandler(null);
+      } else {
+        pigeonVar_channel.setMessageHandler((Object? message) async {
+          final List<Object?> args = message! as List<Object?>;
+          final String arg_id = args[0]! as String;
+          final double arg_milliliters = args[1]! as double;
+          final int arg_timeMilliseconds = args[2]! as int;
+          final String arg_ownerScope = args[3]! as String;
+          try {
+            final bool output = await api.importWaterEntry(arg_id, arg_milliliters, arg_timeMilliseconds, arg_ownerScope);
+            return wrapResponse(result: output);
+          } on PlatformException catch (e) {
+            return wrapResponse(error: e);
+          }          catch (e) {
+            return wrapResponse(error: PlatformException(code: 'error', message: e.toString()));
+          }
+        });
+      }
+    }
     {
       final pigeonVar_channel = BasicMessageChannel<Object?>(
           'dev.flutter.pigeon.gymtracker.GymBroNativeFlutterAPI.markThisSetAsDone$messageChannelSuffix', pigeonChannelCodec,

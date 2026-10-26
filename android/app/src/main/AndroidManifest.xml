@@ -21,6 +21,7 @@
         android:label="Gym Bro">
         <receiver
             android:name=".StreakWidget"
+            android:label="@string/widget_streak"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
@@ -29,6 +30,38 @@
             <meta-data
                 android:name="android.appwidget.provider"
                 android:resource="@xml/streak_widget_info" />
+        </receiver>
+
+        <receiver android:name=".RestWidget" android:label="@string/widget_rest" android:exported="false">
+            <intent-filter><action android:name="android.appwidget.action.APPWIDGET_UPDATE" /></intent-filter>
+            <meta-data android:name="android.appwidget.provider" android:resource="@xml/rest_widget_info" />
+        </receiver>
+        <receiver android:name=".TotalWorkoutsWidget" android:label="@string/widget_total" android:exported="false">
+            <intent-filter><action android:name="android.appwidget.action.APPWIDGET_UPDATE" /></intent-filter>
+            <meta-data android:name="android.appwidget.provider" android:resource="@xml/total_widget_info" />
+        </receiver>
+        <receiver android:name=".WorkoutDensityWidget" android:label="@string/widget_density" android:exported="false">
+            <intent-filter><action android:name="android.appwidget.action.APPWIDGET_UPDATE" /></intent-filter>
+            <meta-data android:name="android.appwidget.provider" android:resource="@xml/density_widget_info" />
+        </receiver>
+        <receiver android:name=".WaterWidget" android:label="@string/widget_water" android:exported="false">
+            <intent-filter><action android:name="android.appwidget.action.APPWIDGET_UPDATE" /></intent-filter>
+            <meta-data android:name="android.appwidget.provider" android:resource="@xml/water_widget_info" />
+        </receiver>
+        <receiver android:name=".NutritionWidget" android:label="@string/widget_nutrition" android:exported="false">
+            <intent-filter><action android:name="android.appwidget.action.APPWIDGET_UPDATE" /></intent-filter>
+            <meta-data android:name="android.appwidget.provider" android:resource="@xml/nutrition_widget_info" />
+        </receiver>
+        <receiver android:name=".WidgetRefreshReceiver" android:exported="false">
+            <intent-filter>
+                <action android:name="android.intent.action.DATE_CHANGED" />
+                <action android:name="android.intent.action.TIME_SET" />
+                <action android:name="android.intent.action.TIMEZONE_CHANGED" />
+                <action android:name="android.intent.action.LOCALE_CHANGED" />
+                <action android:name="android.intent.action.CONFIGURATION_CHANGED" />
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
+            </intent-filter>
         </receiver>
 
         <activity

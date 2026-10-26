@@ -51,6 +51,7 @@ class MainActivity: FlutterFragmentActivity() {
         )
 
         GymBroNativeHostAPI.setUp(flutterEngine.dartExecutor.binaryMessenger, api, "")
+        WidgetRenderer.publishPreviews(this)
     }
 
     private fun log(message: String) {
@@ -189,15 +190,21 @@ class MainActivity: FlutterFragmentActivity() {
         }
 
         override fun updateHomeWidgetParameters(parameters: Map<String, Long>, workoutDensityChartData: List<Long>) {
-            // no-op; a plugin does this for us
+            WidgetStore.saveWorkouts(this@MainActivity, parameters, workoutDensityChartData)
+            GymBroWidgetProvider.refresh(this@MainActivity, setOf(
+                WidgetKind.STREAK, WidgetKind.REST, WidgetKind.TOTAL, WidgetKind.DENSITY,
+            ))
         }
         
         override fun requestHealthPermission() {
             // no-op; used on iOS only
         }
 
+        override fun waterReceiverReady() {}
+
         override fun updateFoodParameters(parameters: Map<String?, Any?>) {
-            // no-op; used on iOS only
+            WidgetStore.saveFood(this@MainActivity, parameters)
+            GymBroWidgetProvider.refresh(this@MainActivity, setOf(WidgetKind.WATER, WidgetKind.NUTRITION))
         }
 
         override fun updateShadowRoutines(routines: Map<String, String>) {

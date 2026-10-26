@@ -5,7 +5,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:gymtracker/model/native.dart';
 import 'package:gymtracker/provider/food.dart';
+import 'package:gymtracker/provider/hydration.dart';
+import 'package:gymtracker/provider/online.dart';
 import 'package:gymtracker/repository/foods.dart';
+import 'package:gymtracker/repository/hydration.dart';
 import 'package:gymtracker/service/native.dart';
 import 'package:gymtracker/service/version.dart';
 import 'package:gymtracker/struct/date_sequence.dart';
@@ -23,6 +26,7 @@ void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
   late BehaviorSubject<List<DateTagged<Food>>> foods;
   late BehaviorSubject<List<TaggedNutritionGoal>> goals;
+  late BehaviorSubject<List<WaterEntry>> water;
   late BehaviorSubject<DateSequence<Map<String, NutritionCategory>>> categories;
   late ProviderContainer container;
   late List<NativeFoodStateMessage> messages;
@@ -40,6 +44,7 @@ void main() {
     final native = _Native();
     foods = BehaviorSubject.seeded([]);
     goals = BehaviorSubject.seeded([]);
+    water = BehaviorSubject.seeded([]);
     categories = BehaviorSubject.seeded(DateSequence.empty());
     messages = [];
     sent = StreamController.broadcast(sync: true);
@@ -77,7 +82,9 @@ void main() {
       );
     container = ProviderContainer(
       overrides: [
+        currentUserIdProvider.overrideWithValue(null),
         foodsRepositoryProvider.overrideWithValue(repository),
+        waterEntriesProvider.overrideWith((ref) => water.stream),
         nativeServiceProvider.overrideWithValue(native),
         versionServiceProvider.overrideWithValue(version),
       ],
@@ -89,6 +96,7 @@ void main() {
     await Future.wait([
       foods.close(),
       goals.close(),
+      water.close(),
       categories.close(),
       sent.close(),
     ]);
@@ -109,6 +117,7 @@ void main() {
             dailyProtein: 120,
             dailyCarbs: 300,
             dailyFat: 80,
+            dailyWater: 2500,
           ),
         ),
       ]);
@@ -137,6 +146,7 @@ void main() {
         amount: 200,
         category: 'Lunch',
         nutritionalValuesPer100g: const NutritionValues(
+          water: 25,
           saturatedFat: 0,
           sugar: 0,
           calories: 100,
@@ -145,6 +155,14 @@ void main() {
           fat: 2,
         ),
       );
+      water.add([
+        WaterEntry(id: 'today', milliliters: 500, time: DateTime.now()),
+        WaterEntry(
+          id: 'yesterday',
+          milliliters: 800,
+          time: today.subtract(const Duration(hours: 1)),
+        ),
+      ]);
       foods.add([
         DateTagged(date: today, value: meal('today')),
         DateTagged(
@@ -165,6 +183,14 @@ void main() {
             m.categories.length == 2,
       );
       final snapshot = messages.last;
+      expect(snapshot.referenceDay, matches(r'^\d{4}-\d{2}-\d{2}$'));
+      expect(snapshot.generatedAt, isNotNull);
+      expect(snapshot.waterIntake, 550);
+      expect(snapshot.waterGoal, 2500);
+      expect(snapshot.waterOwnerScope, 'guest');
+      expect(snapshot.waterEntryIds, ['today']);
+      expect(snapshot.toJson()['waterEntryIds'], ['today']);
+      expect(snapshot.toJson()['waterIntake'], 550);
       expect(snapshot.calorieGoal, 2400);
       expect(snapshot.calorieIntake, 200);
       expect(snapshot.totalNutritionSplit.protein, 10);
@@ -175,11 +201,20 @@ void main() {
       expect(snapshot.categories.first.nutritionSplit.fatsGoal, 20);
       expect(snapshot.categories.last.nutritionSplit.proteinGoal, 0);
 
+      water.add([
+        WaterEntry(id: 'today', milliliters: 750, time: DateTime.now()),
+      ]);
+      await container.pump();
+      await waitForMessage((m) => m.waterIntake == 800);
+      water.add([]);
+      await container.pump();
+      await waitForMessage((m) => m.waterIntake == 50);
       foods.add([]);
 
       await container.pump();
       await waitForMessage((m) => m.calorieIntake == 0);
       expect(messages.last.calorieIntake, 0);
+      expect(messages.last.waterIntake, 0);
       expect(messages.last.categories.first.nutritionSplit.protein, 0);
       // No food view is mounted while repository updates continue to arrive.
       goals.add([DateTagged(date: today, value: NutritionGoal.defaultGoal)]);
@@ -192,6 +227,21 @@ void main() {
       await container.pump();
       await waitForMessage((m) => m.categories.isEmpty);
       expect(messages.last.categories, isEmpty);
+    },
+  );
+
+  test(
+    'does not publish a zero day while hydration is still loading',
+    () async {
+      await water.close();
+      water = BehaviorSubject<List<WaterEntry>>();
+      container.listen(foodNativeSyncProvider, (_, _) {});
+      await container.pump();
+      expect(messages, isEmpty);
+      water.add([]);
+      await container.pump();
+      await waitForMessage((m) => m.waterIntake == 0);
+      expect(messages.last.referenceDay, isNotNull);
     },
   );
 

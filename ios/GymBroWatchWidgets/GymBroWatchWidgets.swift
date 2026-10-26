@@ -10,26 +10,7 @@ import SwiftUI
 
 struct Provider: TimelineProvider {
   func placeholder(in context: Context) -> WorkoutStreakEntry {
-    WorkoutStreakEntry(date: Date(), streak: 3, dailyRestStreak: .now.addingTimeInterval(-60*60*24*2), totalWorkouts: 54, workoutDensityChartData: [
-      1, 2, 0, 0, 0, 0, 0,
-      0, 0, 1, 4, 5, 1, 0,
-      0, 0, 0, 0, 0, 0, 0,
-      0, 0, 0, 2, 0, 0, 0,
-      0, 0, 0, 0, 0, 0, 0,
-      0, 0, 0, 0, 0, 0, 0,
-      0, 0, 1, 4, 5, 1, 0,
-      0, 0, 1, 2, 5, 1, 4,
-      0, 0, 1, 4, 5, 1, 0,
-      1, 2, 0, 0, 0, 0, 0,
-      0, 0, 1, 4, 5, 1, 0,
-      0, 0, 0, 0, 0, 0, 0,
-      0, 0, 0, 2, 0, 0, 0,
-      0, 0, 0, 0, 0, 0, 0,
-      0, 0, 0, 0, 0, 0, 0,
-      0, 0, 1, 4, 5, 1, 0,
-      0, 0, 1, 2, 5, 1, 4,
-      0, 0, 1, 4, 5, 1, 0,
-    ])
+    .example()
   }
   
   func getSnapshot(in context: Context, completion: @escaping (WorkoutStreakEntry) -> ()) {
@@ -72,23 +53,13 @@ struct WidgetsEntryView: View {
   var entry: Provider.Entry
   let widgetView: GBWidgetView
   
-  var bundle: URL {
-    let bundle = Bundle.main
-    if bundle.bundleURL.pathExtension == "appex" {
-      // Peel off two directory levels - MY_APP.app/PlugIns/MY_APP_EXTENSION.appex
-      var url = bundle.bundleURL.deletingLastPathComponent().deletingLastPathComponent()
-      url.append(component: "Frameworks/App.framework/flutter_assets")
-      return url
-    }
-    return bundle.bundleURL
-  }
-  
   init(entry: Provider.Entry, widgetView: GBWidgetView) {
-    self.entry = entry
+    self.entry = entry.isExample ? entry : entry.displayingExampleIfMissing(
+      widgetView == .streak ? "weekly_streak" : widgetView == .rest ? "daily_rest_streak_since" : "total_workouts",
+      defaults: UserDefaults(suiteName: "group.samplasion.gymtracker"))
     self.widgetView = widgetView
-    CTFontManagerRegisterFontsForURL(bundle.appending(path: "/fonts/GymTracker.ttf") as CFURL, CTFontManagerScope.process, nil)
   }
-  
+
   var isOn: Bool {
     entry.streak > 0
   }
@@ -97,65 +68,61 @@ struct WidgetsEntryView: View {
     isOn ? Color.accentColor : Color.secondary
   }
   
+  private var title: LocalizedStringKey {
+    switch widgetView {
+    case .streak: "Streak"
+    case .rest: "Rest"
+    case .total: "Total"
+    }
+  }
+
+  private var value: LocalizedStringKey {
+    switch widgetView {
+    case .streak: "\(entry.streak) weeks"
+    case .rest: "\(entry.restStreakDays) days"
+    case .total: "\(entry.totalWorkouts) workouts"
+    }
+  }
+
+  private var count: Int {
+    switch widgetView {
+    case .streak: entry.streak
+    case .rest: entry.restStreakDays
+    case .total: entry.totalWorkouts
+    }
+  }
+
   var body: some View {
-    let streak: LocalizedStringKey = "\(entry.streak) weeks"
-    let rest: LocalizedStringKey = "\(entry.restStreakDays) days"
-    let total: LocalizedStringKey = "\(entry.totalWorkouts) workouts"
-    
     @ViewBuilder
-    var widgetContent: some View {
-      switch (widgetFamily) {
-        case .accessoryCircular:
-          VStack {
-            Spacer()
-            GBWidgetIcon(widgetView: widgetView, size: 24, color: color)
-            Spacer()
-            switch (widgetView) {
-              case .streak: Text("\(entry.streak)")
-                  .fontWeight(.semibold).widgetCurvesContent().widgetLabel(streak)
-              case .rest: Text("\(entry.restStreakDays)")
-                  .fontWeight(.semibold).widgetCurvesContent().widgetLabel(rest)
-              case .total: Text("\(entry.totalWorkouts)")
-                  .fontWeight(.semibold).widgetCurvesContent().widgetLabel(total)
-            }
-            Spacer()
+    var content: some View {
+      switch widgetFamily {
+      case .accessoryCircular:
+        VStack(spacing: 2) {
+          GBWidgetIcon(widgetView: widgetView, size: 20, color: color)
+          Text("\(count)").font(.caption).fontWeight(.semibold)
+        }
+        .widgetLabel { Text(value) }
+      case .accessoryRectangular:
+        HStack(alignment: .center, spacing: 8) {
+          GBWidgetIcon(widgetView: widgetView, size: 28, color: color)
+          VStack(alignment: .center, spacing: 3) {
+            Text(title).font(.caption)
+            Text(value).font(.system(size: 14, weight: .semibold)).lineLimit(2).minimumScaleFactor(0.7)
           }
-        case .accessoryRectangular:
-          HStack {
-            Spacer()
-            GBWidgetIcon(widgetView: widgetView, size: 40, color: color)
-            Spacer()
-            VStack {
-              switch (widgetView) {
-                case .streak: Text("Streak").font(.caption.scaled(by: 1.5)).lineLimit(1)
-                case .rest: Text("Rest").font(.caption.scaled(by: 1.5)).lineLimit(1)
-                case .total: Text("Total").font(.caption.scaled(by: 1.5)).lineLimit(1)
-              }
-              switch (widgetView) {
-                case .streak: Text(streak).fontWeight(.semibold).font(.caption.scaled(by: 1.8)).lineLimit(2).multilineTextAlignment(.center)
-                case .rest: Text(rest).fontWeight(.semibold).font(.caption.scaled(by: 1.8)).lineLimit(2).multilineTextAlignment(.center)
-                case .total: Text(total).fontWeight(.semibold).font(.caption.scaled(by: 1.8)).lineLimit(2).multilineTextAlignment(.center)
-              }
-            }
-            Spacer()
-          }
-        case .accessoryInline:
-          switch (widgetView) {
-            case .streak: GBWidgetIcon(widgetView: widgetView, size: 0, color: color).asText + Text(streak)
-            case .rest: GBWidgetIcon(widgetView: widgetView, size: 0, color: color).asText + Text(rest)
-            case .total: GBWidgetIcon(widgetView: widgetView, size: 0, color: color).asText + Text(total)
-          }
-        case .accessoryCorner:
-          switch (widgetView) {
-            case .streak: GBWidgetIcon(widgetView: widgetView, size: 12, color: color).asText.widgetCurvesContent().widgetLabel(streak)
-            case .rest: GBWidgetIcon(widgetView: widgetView, size: 12, color: color).asText.widgetCurvesContent().widgetLabel(rest)
-            case .total: GBWidgetIcon(widgetView: widgetView, size: 12, color: color).asText.widgetCurvesContent().widgetLabel(total)
-          }
-        @unknown default:
-          fatalError()
+          .frame(maxWidth: .infinity, alignment: .center)
+        }
+      case .accessoryInline:
+        GBWidgetIcon(widgetView: widgetView, size: 0, color: color).asText + Text(" ") + Text(value)
+      case .accessoryCorner:
+        GBWidgetIcon(widgetView: widgetView, size: 12, color: color).asText
+          .widgetCurvesContent().widgetLabel { Text(value) }
+      default:
+        EmptyView()
       }
     }
-    return widgetContent
+    return content
+      .multilineTextAlignment(.center)
+      .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
   }
 }
 
@@ -165,21 +132,20 @@ struct GBWidgetIcon: View {
   let color: Color
   
   var body: some View {
-    asText.frame(width: CGFloat(size), height: CGFloat(size))
-      .tint(color)
+    asImage.resizable().scaledToFit()
+      .foregroundStyle(color)
+      .frame(width: size, height: size, alignment: .center)
   }
-  
+
   var asImage: Image {
-    switch (widgetView) {
-      case .streak: Image(systemName: "flame.fill")
-      case .rest: Image(systemName: "moon.fill")
-      case .total: Image(systemName: "gym.bag.fill")
+    switch widgetView {
+    case .streak: Image(systemName: "flame.fill")
+    case .rest: Image(systemName: "moon.fill")
+    case .total: Image(systemName: "gym.bag.fill")
     }
   }
-  
-  var asText: Text {
-    Text(asImage)
-  }
+
+  var asText: Text { Text(asImage) }
 }
 
 @available(iOS 17, *)
@@ -248,10 +214,10 @@ struct GymBroWidgetsDensity: Widget {
   var body: some WidgetConfiguration {
     StaticConfiguration(kind: kind, provider: Provider()) { entry in
       if #available(watchOS 10.0, *) {
-        DensityChart(values: entry.calculatedWorkoutDensityChartData)
+        DensityChart(values: entry.densityDisplay)
           .containerBackground(.fill.tertiary, for: .widget)
       } else {
-        DensityChart(values: entry.calculatedWorkoutDensityChartData)
+        DensityChart(values: entry.densityDisplay)
           .background(.clear)
       }
     }
@@ -262,9 +228,9 @@ struct GymBroWidgetsDensity: Widget {
   }
 }
 
-//#Preview(as: .accessoryRectangular) {
-//    GymBroWatchWidgets()
-//} timeline: {
-//    SimpleEntry(date: .now, emoji: "😀")
-//    SimpleEntry(date: .now, emoji: "🤩")
-//}
+@available(iOS 17.0, watchOS 10.0, *)
+#Preview("Serie", as: .accessoryRectangular) {
+  GymBroWidgetsStreak()
+} timeline: {
+  WorkoutStreakEntry.example()
+}

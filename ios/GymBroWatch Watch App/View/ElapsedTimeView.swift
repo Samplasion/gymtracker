@@ -10,13 +10,14 @@ import SwiftUI
 struct ElapsedTimeView: View {
     var elapsedTime: TimeInterval = 0
     var showSubseconds = true
-    @State private var timeFormatter = ElapsedTimeFormatter()
+    @State private var timeFormatter: ElapsedTimeFormatter
     
     init(elapsedTime: TimeInterval, showSubseconds: Bool = true) {
         self.elapsedTime = elapsedTime
         self.showSubseconds = showSubseconds
-        self.timeFormatter = ElapsedTimeFormatter()
-        timeFormatter.showSubseconds = showSubseconds
+        let formatter = ElapsedTimeFormatter()
+        formatter.showSubseconds = showSubseconds
+        _timeFormatter = State(initialValue: formatter)
     }
 
     var body: some View {

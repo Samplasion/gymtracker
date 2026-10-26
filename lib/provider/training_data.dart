@@ -1,11 +1,13 @@
 import 'dart:math';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gymtracker/controller/routines_controller.dart';
 import 'package:gymtracker/model/exercise.dart';
 import 'package:gymtracker/model/workout.dart';
 import 'package:gymtracker/provider/db.dart';
 import 'package:gymtracker/provider/routines.dart';
+import 'package:gymtracker/utils/extensions.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'training_data.g.dart';
@@ -13,6 +15,22 @@ part 'training_data.g.dart';
 final trainingClockProvider = Provider<DateTime Function()>(
   (ref) => DateTime.now,
 );
+
+/// Shared daily grouping, retained until the history changes.
+final workoutsByDayProvider = Provider<Map<DateTime, List<Workout>>>((ref) {
+  final history = ref.watch(historyWorkoutsProvider).value ?? const <Workout>[];
+  final result = <DateTime, List<Workout>>{};
+  for (final workout in history) {
+    if (workout.isContinuation && !kDebugMode) continue;
+    final date = workout.startingDate;
+    if (date == null) continue;
+    (result[date.startOfDay] ??= []).add(workout);
+  }
+  return Map.unmodifiable({
+    for (final entry in result.entries)
+      entry.key: List<Workout>.unmodifiable(entry.value),
+  });
+});
 
 @Riverpod(keepAlive: true)
 Stream<List<Workout>> historyWorkouts(Ref ref) => ref

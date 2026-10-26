@@ -19,8 +19,6 @@ import 'package:gymtracker/model/measurements.dart';
 import 'package:gymtracker/provider/online.dart';
 import 'package:gymtracker/service/database.dart';
 import 'package:gymtracker/service/logger.dart';
-import 'package:gymtracker/service/native.dart';
-import 'package:gymtracker/service/widgets.dart';
 import 'package:gymtracker/utils/constants.dart';
 import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/utils/go.dart';
@@ -186,48 +184,7 @@ class _DebugViewState extends ConsumerState<DebugView> {
               ListTile(
                 title: const Text("Update home widgets"),
                 onTap: () async {
-                  WidgetsService.instance().updateWeeklyStreak(
-                    ref.read(historyControllerProvider).streaks.weekStreak,
-                  );
-                  WidgetsService.instance().updateRestStreak(
-                    ref.read(historyControllerProvider).streaks.restDays,
-                  );
-                  WidgetsService.instance().updateWorkouts(
-                    ref.read(historyControllerProvider).history.length,
-                  );
-                  ref
-                      .read(nativeServiceProvider)
-                      .updateHomeWidgetParameters(
-                        weekStreak: ref
-                            .read(historyControllerProvider)
-                            .streaks
-                            .weekStreak,
-                        lastWorkoutDay: ref
-                            .read(historyControllerProvider)
-                            .userVisibleWorkouts
-                            .let((self) {
-                              if (self.isEmpty) {
-                                return DateTime.now().startOfDay;
-                              }
-                              return ([
-                                self.first.startingDate!,
-                                self.last.startingDate!,
-                              ]..sort()).last.startOfDay;
-                            }),
-                        workouts: ref
-                            .read(historyControllerProvider)
-                            .userVisibleLength,
-                        workoutDensityChartData: [
-                          for (int i = 0; i < 7 * 18; i++)
-                            ref
-                                    .read(historyControllerProvider)
-                                    .workoutsByDay[DateTime.now()
-                                        .subtract(Duration(days: i))
-                                        .startOfDay]
-                                    ?.length ??
-                                0,
-                        ],
-                      );
+                  ref.read(historyControllerProvider).computeStreaks();
                 },
               ),
               ListTile(

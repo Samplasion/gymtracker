@@ -28,6 +28,7 @@ class GBAppDelegate: NSObject, WKApplicationDelegate {
         PhoneMessageResponder.shared.workoutDelegate = workoutViewModel
         PhoneMessageResponder.shared.session = session
         PhoneMessageResponder.shared.foodDelegate = foodViewModel
+        foodViewModel.sendWaterEntry = { entry in PhoneMessageResponder.shared.sendWater(entry) }
         
         session?.delegate = self
         session!.activate()
@@ -60,6 +61,7 @@ extension GBAppDelegate: WCSessionDelegate {
         Task { @MainActor in
             if let packet = WorkoutManager.shared.metricsPacket() { self.sendMetrics(packet) }
             self.workoutViewModel.requestFreshData()
+            self.foodViewModel.flushWaterEntries()
         }
     }
     

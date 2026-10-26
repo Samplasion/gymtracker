@@ -94,12 +94,27 @@ class NativeFoodNutritionSplit {
 }
 
 class NativeFoodStateMessage {
+  /// Gregorian diary day (yyyy-MM-dd) in the originating device’s local zone.
+  final String? referenceDay;
+
+  /// Unix timestamp in milliseconds; never used as the diary day.
+  final int? generatedAt;
+  final double? waterIntake;
+  final double? waterGoal;
+  final String? waterOwnerScope;
+  final List<String>? waterEntryIds;
   final double calorieGoal;
   final double calorieIntake;
   final List<NativeFoodCategory> categories;
   final NativeFoodNutritionSplit totalNutritionSplit;
 
   NativeFoodStateMessage({
+    this.referenceDay,
+    this.generatedAt,
+    this.waterIntake,
+    this.waterGoal,
+    this.waterOwnerScope,
+    this.waterEntryIds,
     required this.calorieGoal,
     required this.calorieIntake,
     required this.categories,
@@ -108,6 +123,12 @@ class NativeFoodStateMessage {
 
   Map<String, dynamic> toJson() {
     return {
+      if (referenceDay != null) 'referenceDay': referenceDay,
+      if (generatedAt != null) 'generatedAt': generatedAt,
+      if (waterIntake != null) 'waterIntake': waterIntake,
+      if (waterGoal != null) 'waterGoal': waterGoal,
+      if (waterOwnerScope != null) 'waterOwnerScope': waterOwnerScope,
+      if (waterEntryIds != null) 'waterEntryIds': waterEntryIds,
       'calorieGoal': calorieGoal,
       'calorieIntake': calorieIntake,
       'categories': categories.map((category) => category.toJson()).toList(),

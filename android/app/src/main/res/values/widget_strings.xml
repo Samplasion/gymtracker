@@ -1,0 +1,24 @@
+<resources>
+    <string name="widget_streak">Weekly streak</string>
+    <string name="widget_rest">Rest</string>
+    <string name="widget_total">Total workouts</string>
+    <string name="widget_density">Workout density</string>
+    <string name="widget_water">Water</string>
+    <string name="widget_nutrition">Nutrients</string>
+    <string name="widget_nutrients">Nutrients</string>
+    <string name="widget_workouts">Workouts</string>
+    <string name="widget_protein">Protein</string>
+    <string name="widget_carbs">Carbs</string>
+    <string name="widget_fats">Fats</string>
+    <string name="widget_streak_preview">3 weeks</string>
+    <string name="widget_rest_preview">2 days</string>
+    <string name="widget_total_preview">54 workouts</string>
+    <string name="widget_streak_description">Show off your weekly streak.</string>
+    <string name="widget_rest_description">Days since your last workout.</string>
+    <string name="widget_total_description">Your total completed workouts.</string>
+    <string name="widget_density_description">Your workouts over the last weeks.</string>
+    <string name="widget_water_description">Your daily hydration progress.</string>
+    <string name="widget_nutrition_description">Your daily protein, carbs and fats.</string>
+    <plurals name="widget_days"><item quantity="one">%d day</item><item quantity="other">%d days</item></plurals>
+    <plurals name="widget_workout_count"><item quantity="one">%d workout</item><item quantity="other">%d workouts</item></plurals>
+</resources>

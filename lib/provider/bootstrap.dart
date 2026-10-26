@@ -154,6 +154,15 @@ final appStartupProvider = FutureProvider<void>((ref) async {
   final lifecycle = ref.read(accountWorkoutLifecycleProvider);
   final native = ref.read(nativeServiceProvider);
   final workout = ref.read(workoutControllerProvider.notifier);
+  native.onImportWaterEntry = (id, amount, timestamp, scope) => ref
+      .read(hydrationRepositoryProvider)
+      .importWatchEntry(
+        id: id,
+        milliliters: amount,
+        time: DateTime.fromMillisecondsSinceEpoch(timestamp),
+        ownerScope: scope,
+      );
+  native.waterReceiverReady();
   native.onMarkSetDone = () {
     if (ref.read(workoutControllerProvider) != null) {
       workout.autoMarkNextSetDone();
@@ -166,6 +175,7 @@ final appStartupProvider = FutureProvider<void>((ref) async {
       ref.read(workoutControllerProvider) != null &&
       workout.moveSetCursorToPrevious();
   native.onRequestTrainingData = () {
+    ref.invalidate(foodNativeSyncProvider);
     if (ref.read(workoutControllerProvider) != null) {
       workout.refreshWatchData(
         primaryColor: Go.context == null

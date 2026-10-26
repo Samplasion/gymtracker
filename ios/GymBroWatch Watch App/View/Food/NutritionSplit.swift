@@ -1,10 +1,3 @@
-//
-//  NutritionSplit.swift
-//  GymBroWatch Watch App
-//
-//  Created by Francesco Arieti on 06/01/26.
-//
-
 import SwiftUI
 
 struct NutritionSplit: View {
@@ -14,41 +7,37 @@ struct NutritionSplit: View {
     var carbsGoal: Double
     var fats: Double
     var fatsGoal: Double
-    
-    func format(_ value: Double) -> String {
-        value.formatted(.number.precision(.fractionLength(0)).rounded()) + "g"
-    }
-    
-    var body: some View {
-        VStack {
-            Gauge(value: protein / proteinGoal, label: {
-                Text("Protein")
-            }, currentValueLabel: {
-                Text("\(format(protein))/\(format(proteinGoal))")
-            })
-            Gauge(value: carbs / carbsGoal, label: {
-                Text("Carbs")
-            }, currentValueLabel: {
-                Text("\(format(carbs))/\(format(carbsGoal))")
-            })
-            Gauge(value: fats / fatsGoal, label: {
-                Text("Fats")
-            }, currentValueLabel: {
-                Text("\(format(fats))/\(format(fatsGoal))")
-            })
-        }
-        .modifier(GaugeStyleModifier())
-        .tint(.accent)
-    }
-}
 
-fileprivate struct GaugeStyleModifier: ViewModifier {
-    func body(content: Content) -> some View {
-        if #available(watchOS 9, *) {
-            return content.gaugeStyle(.linearCapacity)
-        } else {
-            return content.gaugeStyle(.linear)
+    var body: some View {
+        VStack(spacing: 14) {
+            nutrient("Protein", value: protein, goal: proteinGoal, color: .purple)
+            nutrient("Carbs", value: carbs, goal: carbsGoal, color: .orange)
+            nutrient("Fats", value: fats, goal: fatsGoal, color: .pink)
         }
+    }
+
+    private func nutrient(_ name: LocalizedStringKey, value: Double, goal: Double, color: Color) -> some View {
+        let intake = DailyNutritionData.valid(value) ? value : 0
+        let hasGoal = DailyNutritionData.valid(goal) && goal > 0
+        return VStack(alignment: .leading, spacing: 6) {
+            HStack(alignment: .firstTextBaseline) {
+                Text(name).foregroundStyle(color).font(.caption.weight(.semibold))
+                Spacer(minLength: 4)
+                Text(intake.formatted(.number.precision(.fractionLength(0))) + " g")
+                    .font(.footnote.weight(.semibold)).monospacedDigit()
+            }
+            if hasGoal {
+                ProgressView(value: DailyNutritionData.progress(intake, goal: goal)).tint(color)
+                HStack {
+                    Text("Goal")
+                    Spacer()
+                    Text(goal.formatted(.number.precision(.fractionLength(0))) + " g")
+                }.font(.caption2).foregroundStyle(.secondary)
+            } else {
+                Text("No goal set").font(.caption2).foregroundStyle(.secondary)
+            }
+        }
+        .accessibilityElement(children: .combine)
     }
 }
 

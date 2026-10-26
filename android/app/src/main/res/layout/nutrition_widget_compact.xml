@@ -1,0 +1,60 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/widget_root"
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:background="@drawable/widget_background" android:padding="10dp"
+    android:gravity="center" android:orientation="vertical">
+    <TextView android:id="@+id/widget_title" android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:text="@string/widget_nutrients" android:textSize="14sp" android:fontFamily="sans-serif-medium"
+        android:textColor="@color/widget_text" android:gravity="start" android:maxLines="1" />
+
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:gravity="center_vertical" android:orientation="vertical" android:layout_marginTop="2dp">
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center_vertical">
+            <TextView android:id="@+id/protein_label" android:layout_width="0dp" android:layout_weight="1"
+                android:layout_height="wrap_content" android:text="@string/widget_protein" android:textSize="11sp"
+                android:textColor="@color/widget_secondary" android:maxLines="1" android:ellipsize="end" />
+            <TextView android:id="@+id/protein_value" android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:text="75/120 g" android:textSize="11sp" android:textColor="@color/widget_text"
+                android:gravity="start" android:maxLines="2" android:includeFontPadding="false" />
+        </LinearLayout>
+        <ProgressBar android:id="@+id/protein_progress" style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="match_parent" android:layout_height="3dp" android:layout_marginTop="2dp"
+            android:indeterminate="false" android:max="1000" android:progress="600"
+            android:progressTint="@color/widget_primary"
+            android:progressBackgroundTint="@color/widget_track" />
+    </LinearLayout>
+
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:gravity="center_vertical" android:orientation="vertical" android:layout_marginTop="2dp">
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center_vertical">
+            <TextView android:id="@+id/carbs_label" android:layout_width="0dp" android:layout_weight="1"
+                android:layout_height="wrap_content" android:text="@string/widget_carbs" android:textSize="11sp"
+                android:textColor="@color/widget_secondary" android:maxLines="1" android:ellipsize="end" />
+            <TextView android:id="@+id/carbs_value" android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:text="150/260 g" android:textSize="11sp" android:textColor="@color/widget_text"
+                android:gravity="start" android:maxLines="2" android:includeFontPadding="false" />
+        </LinearLayout>
+        <ProgressBar android:id="@+id/carbs_progress" style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="match_parent" android:layout_height="3dp" android:layout_marginTop="2dp"
+            android:indeterminate="false" android:max="1000" android:progress="600"
+            android:progressTint="@color/widget_carbs"
+            android:progressBackgroundTint="@color/widget_track" />
+    </LinearLayout>
+
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:gravity="center_vertical" android:orientation="vertical" android:layout_marginTop="2dp">
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center_vertical">
+            <TextView android:id="@+id/fats_label" android:layout_width="0dp" android:layout_weight="1"
+                android:layout_height="wrap_content" android:text="@string/widget_fats" android:textSize="11sp"
+                android:textColor="@color/widget_secondary" android:maxLines="1" android:ellipsize="end" />
+            <TextView android:id="@+id/fats_value" android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:text="35/70 g" android:textSize="11sp" android:textColor="@color/widget_text"
+                android:gravity="start" android:maxLines="2" android:includeFontPadding="false" />
+        </LinearLayout>
+        <ProgressBar android:id="@+id/fats_progress" style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="match_parent" android:layout_height="3dp" android:layout_marginTop="2dp"
+            android:indeterminate="false" android:max="1000" android:progress="600"
+            android:progressTint="@color/widget_fats"
+            android:progressBackgroundTint="@color/widget_track" />
+    </LinearLayout>
+</LinearLayout>

@@ -4,7 +4,7 @@
     <string name="add_widget">Add widget</string>
     <string name="app_widget_description">Show off your weekly streak.</string>
     <plurals name="streak">
-        <item quantity="one">%d weeks</item>
+        <item quantity="one">%d week</item>
         <item quantity="other">%d weeks</item>
     </plurals>
 </resources>

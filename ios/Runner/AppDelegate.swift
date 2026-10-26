@@ -11,6 +11,10 @@ import flutter_app_intents
 
 @main
 @objc class AppDelegate: FlutterAppDelegate, FlutterImplicitEngineDelegate {
+    private let waterInbox = WatchWaterQueue(defaults: .standard, key: "watch.water.inbox.v1")
+    private var waterReady = false
+    private var importingWater = false
+    private var waterRetry: DispatchWorkItem?
     var session: WCSession?
     private var latestFoodParameters: [String: Any]?
     private var legacySensorGeneration: String?
@@ -66,6 +70,13 @@ import flutter_app_intents
             for id in workout.discardedWorkoutIDs { workout.retryDiscard(id: id) }
         }
         
+        // Accept and persist deferred water before Flutter finishes starting.
+        if WCSession.isSupported() {
+            let watchSession = WCSession.default
+            watchSession.delegate = self
+            setSession(watchSession)
+            watchSession.activate()
+        }
         return super.application(application, didFinishLaunchingWithOptions: launchOptions)
     }
 
@@ -131,16 +142,11 @@ import flutter_app_intents
             } else { result(FlutterMethodNotImplemented) }
         }
 
+        waterReady = false
         GymBroNativeHostAPISetup.setUp(binaryMessenger: binaryMessenger, api: self)
         flutterNativeApi = GymBroNativeFlutterAPI(binaryMessenger: binaryMessenger)
         logger = FlutterLogger(binaryMessenger: binaryMessenger)
 
-        if WCSession.isSupported() {
-            let watchSession = WCSession.default
-            watchSession.delegate = self
-            setSession(watchSession)
-            watchSession.activate()
-        }
     }
     
     // MARK: live activity functions
@@ -247,7 +253,7 @@ import flutter_app_intents
 extension AppDelegate: WCSessionDelegate {
     func session(_ session: WCSession, activationDidCompleteWith activationState: WCSessionActivationState, error: (any Error)?) {
         if let error = error {
-            logger!.error("Error activating session: \(error)")
+            logger?.error("Error activating session: \(error)")
             return
         }
         
@@ -256,19 +262,24 @@ extension AppDelegate: WCSessionDelegate {
                 switch result {
                 case .success(_): break
                 case .failure(let error):
-                    self.logger!.error("Error requesting training data: \(error)")
+                    self.logger?.error("Error requesting training data: \(error)")
                 }
             })
         }
 
-        logger!.log("Activated session with activationState: \(activationState)")
+        logger?.log("Activated session with activationState: \(activationState)")
         Task { @MainActor in
             self.publishWatchSnapshot()
+            self.drainWaterEntries()
             if #available(iOS 17, *) { if session.isReachable { self.workout.watchBecameReachable() } }
             else { self.synchronizeLegacyWorkout() }
         }
     }
     
+    func session(_ session: WCSession, didReceiveUserInfo userInfo: [String: Any] = [:]) {
+        Task { @MainActor in self.receiveWater(userInfo) }
+    }
+
     func session(_ session: WCSession, didReceiveApplicationContext context: [String: Any]) {
         Task { @MainActor in
             if context["kind"] as? String == "workoutMetrics", let metrics = context["metrics"] as? [String: Any] {
@@ -278,11 +289,11 @@ extension AppDelegate: WCSessionDelegate {
     }
 
     func sessionDidBecomeInactive(_ session: WCSession) {
-        logger!.log("Watch session became inactive")
+        logger?.log("Watch session became inactive")
     }
     
     func sessionDidDeactivate(_ session: WCSession) {
-        logger!.log("Watch session deactivated")
+        logger?.log("Watch session deactivated")
         session.activate()
     }
 
@@ -294,7 +305,9 @@ extension AppDelegate: WCSessionDelegate {
         Task {
             guard let method = message["method"] as? String else { return }
             
-            if method == "requestTrainingData" {
+            if method == "addWater" {
+                self.receiveWater(message)
+            } else if method == "requestTrainingData" {
                 self.publishWatchSnapshot()
                 if #available(iOS 17, *) { self.workout.watchBecameReachable() }
                 else { self.synchronizeLegacyWorkout() }
@@ -302,19 +315,19 @@ extension AppDelegate: WCSessionDelegate {
                     switch result {
                     case .success(_): break
                     case .failure(let error):
-                        self.logger!.error("Error requesting training data: \(error)")
+                        self.logger?.error("Error requesting training data: \(error)")
                     }
                 })
             } else if method == "log" {
                 if let messageString = message["message"] as? String {
-                    self.logger!.log("[Watch] \(messageString)")
+                    self.logger?.log("[Watch] \(messageString)")
                 } else {
-                    self.logger!.error("Unknown log message from watch")
+                    self.logger?.error("Unknown log message from watch")
                 }
             } else if method == "workoutMetrics" {
                 self.receiveWorkoutMetrics(message["metrics"] as? [String: Any] ?? [:])
             } else {
-                logger!.error("Received unknown message from watch: \(method)")
+                logger?.error("Received unknown message from watch: \(method)")
                 return
             }
         }
@@ -324,6 +337,12 @@ extension AppDelegate: WCSessionDelegate {
         Task {
             logger?.log("\(#function): Received \(message)")
             guard let method = message["method"] as? String else { replyHandler(["success": false]); return }
+            if method == "addWater" {
+                self.receiveWater(message)
+                // Transport receipt is deliberately not a diary acknowledgement.
+                replyHandler(["received": true])
+                return
+            }
             guard message["workoutId"] as? String == self.watchSnapshot.workout["id"] as? String,
                   self.watchSnapshot.workout["active"] as? Bool == true,
                   message["setId"] as? String == self.applicationContext.set?.id,
@@ -335,7 +354,7 @@ extension AppDelegate: WCSessionDelegate {
                     case .success(): replyHandler(["success": true])
                     case .failure(let error):
                         replyHandler(["success": false])
-                        self.logger!.error("Error marking set as done: \(error)")
+                        self.logger?.error("Error marking set as done: \(error)")
                     }
                 })
             } else if method == "moveWorkoutCursorNext" {
@@ -344,7 +363,7 @@ extension AppDelegate: WCSessionDelegate {
                     case .success(let moved): replyHandler(["success": moved])
                     case .failure(let error):
                         replyHandler(["success": false])
-                        self.logger!.error("Error moving workout cursor to next set: \(error)")
+                        self.logger?.error("Error moving workout cursor to next set: \(error)")
                     }
                 })
             } else if method == "moveWorkoutCursorPrevious" {
@@ -353,7 +372,7 @@ extension AppDelegate: WCSessionDelegate {
                     case .success(let moved): replyHandler(["success": moved])
                     case .failure(let error):
                         replyHandler(["success": false])
-                        self.logger!.error("Error moving workout cursor to previous set: \(error)")
+                        self.logger?.error("Error moving workout cursor to previous set: \(error)")
                     }
                 })
             } else if method == "updateSetParameters" {
@@ -362,11 +381,11 @@ extension AppDelegate: WCSessionDelegate {
                     case .success(): replyHandler(["success": true])
                     case .failure(let error):
                         replyHandler(["success": false])
-                        self.logger!.error("Error updating set parameters: \(error)")
+                        self.logger?.error("Error updating set parameters: \(error)")
                     }
                 })
             } else {
-                logger!.error("Received unknown message from watch: \(method)")
+                logger?.error("Received unknown message from watch: \(method)")
                 return
             }
         }
@@ -380,6 +399,7 @@ extension AppDelegate: WCSessionDelegate {
                 } else { self.legacyHeartRateInvalidatedAt = Date(); self.publishLegacyMetrics() }
             }
             self.publishWatchSnapshot()
+            self.drainWaterEntries()
             if #available(iOS 17, *) { if session.isReachable { self.workout.watchBecameReachable() } }
             else { self.synchronizeLegacyWorkout() }
         }
@@ -576,6 +596,12 @@ extension AppDelegate: WorkoutMetricsListener {
 extension AppDelegate {
     func updateFoodParameters(parameters: [String? : Any?]) throws {
         guard let parameters = parameters as? [String: Any] else { return }
+        if let state = NativeFoodStateMessage.decodeFoodState(from: parameters) {
+            DailyNutritionData.save(state, to: UserDefaults(suiteName: DailyNutritionData.appGroup))
+            WidgetCenter.shared.reloadTimelines(ofKind: "GymBroWidgetsWater")
+            WidgetCenter.shared.reloadTimelines(ofKind: "GymBroWidgetsNutrition")
+        }
+        drainWaterEntries()
         latestFoodParameters = parameters
         watchSnapshot.update(food: parameters)
         publishWatchSnapshot()
@@ -741,4 +767,58 @@ struct AppShortcuts: AppShortcutsProvider {
       )
     ]
   }
+}
+
+// MARK: - Durable Watch hydration import
+extension AppDelegate {
+    func waterReceiverReady() throws {
+        waterReady = true
+        drainWaterEntries()
+    }
+
+    private func receiveWater(_ message: [String: Any]) {
+        guard let entry = WatchWaterEntry(message: message) else { return }
+        waterInbox.insert(entry)
+        drainWaterEntries()
+    }
+
+    private func drainWaterEntries() {
+        guard waterReady, !importingWater, let api = flutterNativeApi, !waterInbox.entries.isEmpty else { return }
+        importingWater = true
+        waterRetry?.cancel()
+        let entries = waterInbox.entries
+        func next(_ index: Int) {
+            guard index < entries.count else {
+                self.importingWater = false
+                if !self.waterInbox.entries.isEmpty {
+                    let retry = DispatchWorkItem { [weak self] in self?.drainWaterEntries() }
+                    self.waterRetry = retry
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 30, execute: retry)
+                }
+                return
+            }
+            let entry = entries[index]
+            api.importWaterEntry(id: entry.id, milliliters: entry.milliliters,
+                timeMilliseconds: entry.timeMilliseconds, ownerScope: entry.ownerScope) { result in
+                DispatchQueue.main.async {
+                    if case .success(true) = result {
+                        let ack: [String: Any] = ["method": "waterAcknowledged", "ids": [entry.id], "ownerScope": entry.ownerScope]
+                        // Queue the acknowledgement before removing our copy. A crash
+                        // between these operations only causes an idempotent replay.
+                        if let session = self.session, session.activationState == .activated {
+                            if !session.outstandingUserInfoTransfers.contains(where: {
+                                $0.userInfo["method"] as? String == "waterAcknowledged" &&
+                                $0.userInfo["ownerScope"] as? String == entry.ownerScope &&
+                                ($0.userInfo["ids"] as? [String])?.contains(entry.id) == true
+                            }) { session.transferUserInfo(ack) }
+                            if session.isReachable { session.sendMessage(ack, replyHandler: nil, errorHandler: { _ in }) }
+                            self.waterInbox.acknowledge(ids: [entry.id], ownerScope: entry.ownerScope)
+                        }
+                    }
+                    next(index + 1)
+                }
+            }
+        }
+        next(0)
+    }
 }

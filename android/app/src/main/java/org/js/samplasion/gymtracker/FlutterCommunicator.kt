@@ -66,6 +66,7 @@ interface GymBroNativeHostAPI {
   fun setExerciseParameters(parameters: Map<String?, Any?>)
   fun updateHomeWidgetParameters(parameters: Map<String, Long>, workoutDensityChartData: List<Long>)
   fun requestHealthPermission()
+  fun waterReceiverReady()
   fun updateFoodParameters(parameters: Map<String?, Any?>)
   fun updateShadowRoutines(routines: Map<String, String>)
 
@@ -170,6 +171,22 @@ interface GymBroNativeHostAPI {
         }
       }
       run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.gymtracker.GymBroNativeHostAPI.waterReceiverReady$separatedMessageChannelSuffix", codec)
+        if (api != null) {
+          channel.setMessageHandler { _, reply ->
+            val wrapped: List<Any?> = try {
+              api.waterReceiverReady()
+              listOf(null)
+            } catch (exception: Throwable) {
+              FlutterCommunicatorPigeonUtils.wrapError(exception)
+            }
+            reply.reply(wrapped)
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
         val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.gymtracker.GymBroNativeHostAPI.updateFoodParameters$separatedMessageChannelSuffix", codec)
         if (api != null) {
           channel.setMessageHandler { message, reply ->
@@ -214,6 +231,26 @@ class GymBroNativeFlutterAPI(private val binaryMessenger: BinaryMessenger, priva
     /** The codec used by GymBroNativeFlutterAPI. */
     val codec: MessageCodec<Any?> by lazy {
       FlutterCommunicatorPigeonCodec()
+    }
+  }
+  fun importWaterEntry(idArg: String, millilitersArg: Double, timeMillisecondsArg: Long, ownerScopeArg: String, callback: (Result<Boolean>) -> Unit)
+{
+    val separatedMessageChannelSuffix = if (messageChannelSuffix.isNotEmpty()) ".$messageChannelSuffix" else ""
+    val channelName = "dev.flutter.pigeon.gymtracker.GymBroNativeFlutterAPI.importWaterEntry$separatedMessageChannelSuffix"
+    val channel = BasicMessageChannel<Any?>(binaryMessenger, channelName, codec)
+    channel.send(listOf(idArg, millilitersArg, timeMillisecondsArg, ownerScopeArg)) {
+      if (it is List<*>) {
+        if (it.size > 1) {
+          callback(Result.failure(FlutterError(it[0] as String, it[1] as String, it[2] as String?)))
+        } else if (it[0] == null) {
+          callback(Result.failure(FlutterError("null-error", "Flutter api returned null value for non-null return value.", "")))
+        } else {
+          val output = it[0] as Boolean
+          callback(Result.success(output))
+        }
+      } else {
+        callback(Result.failure(FlutterCommunicatorPigeonUtils.createConnectionError(channelName)))
+      }
     }
   }
   fun markThisSetAsDone(callback: (Result<Unit>) -> Unit)

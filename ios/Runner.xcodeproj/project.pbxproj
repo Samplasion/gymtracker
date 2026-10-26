@@ -151,20 +151,33 @@
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				WorkoutStreakEntry.swift,
+				DailyNutritionWidgets.swift,
 			);
 			target = 97C146ED1CF9000F007C117D /* Runner */;
 		};
 		7E3AB0C12F0A904800C99337 /* Exceptions for "Shared" folder in "GymBroWidgetsExtension" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
-				WorkoutStreakEntry.swift,
+				WorkoutLifecycle.swift,
+				WorkoutManager.swift,
+				Logger.swift,
+				Model/NativeWorkoutStateMessage.swift,
+				Model/GTSet.swift,
+				WorkoutMetricsListener.swift,
+				WorkoutMetrics.swift,
 			);
 			target = 7EE0D9432E394FCB007A1B07 /* GymBroWidgetsExtension */;
 		};
 		7E3AB0C32F0A904800C99337 /* Exceptions for "Shared" folder in "GymBroWatchWidgetsExtension" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
-				WorkoutStreakEntry.swift,
+				WorkoutLifecycle.swift,
+				WorkoutManager.swift,
+				Logger.swift,
+				Model/NativeWorkoutStateMessage.swift,
+				Model/GTSet.swift,
+				WorkoutMetricsListener.swift,
+				WorkoutMetrics.swift,
 			);
 			target = 7EC6628A2EFDB99D000CD218 /* GymBroWatchWidgetsExtension */;
 		};
@@ -196,12 +209,21 @@
 			);
 			target = 97C146ED1CF9000F007C117D /* Runner */;
 		};
+
+		DAB100000000000000000001 /* Widget views excluded from Watch app */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				DailyNutritionWidgets.swift,
+			);
+			target = 7EE0DE1A2E3D0CD5007A1B07 /* GymBroWatch Watch App */;
+		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		7E388F772EFEDD8F00DF1010 /* Shared */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
+				DAB100000000000000000001 /* Widget views excluded from Watch app */,
 				7E3AB0C02F0A904800C99337 /* Exceptions for "Shared" folder in "Runner" target */,
 				7E3AB0C12F0A904800C99337 /* Exceptions for "Shared" folder in "GymBroWidgetsExtension" target */,
 				7E3AB0C32F0A904800C99337 /* Exceptions for "Shared" folder in "GymBroWatchWidgetsExtension" target */,
@@ -392,6 +414,7 @@
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
+				7E388F772EFEDD8F00DF1010 /* Shared */,
 				7EC6628E2EFDB99D000CD218 /* GymBroWatchWidgets */,
 			);
 			name = GymBroWatchWidgetsExtension;
@@ -412,6 +435,7 @@
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
+				7E388F772EFEDD8F00DF1010 /* Shared */,
 				7EE0D9472E394FCB007A1B07 /* GymBroWidgets */,
 			);
 			name = GymBroWidgetsExtension;

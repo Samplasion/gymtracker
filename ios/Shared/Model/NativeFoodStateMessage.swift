@@ -8,19 +8,33 @@
 import Foundation
 
 struct NativeFoodStateMessage: Codable {
+    /// Gregorian diary day (yyyy-MM-dd), independent of message delivery.
+    let referenceDay: String?
+    let generatedAt: Int64?
+    let waterIntake: Double?
+    let waterGoal: Double?
+    let waterOwnerScope: String?
+    let waterEntryIds: [String]?
     let calorieGoal: Double
     let calorieIntake: Double
     let categories: [NativeFoodCategory]
     let totalNutritionSplit: NativeFoodNutritionSplit
 
     enum CodingKeys: String, CodingKey {
+        case referenceDay, generatedAt, waterIntake, waterGoal, waterOwnerScope, waterEntryIds
         case calorieGoal
         case calorieIntake
         case categories
         case totalNutritionSplit
     }
     
-    init(calorieGoal: Double, calorieIntake: Double, categories: [NativeFoodCategory], totalNutritionSplit: NativeFoodNutritionSplit) {
+    init(calorieGoal: Double, calorieIntake: Double, categories: [NativeFoodCategory], totalNutritionSplit: NativeFoodNutritionSplit, referenceDay: String? = nil, generatedAt: Int64? = nil, waterIntake: Double? = nil, waterGoal: Double? = nil, waterOwnerScope: String? = nil, waterEntryIds: [String]? = nil) {
+        self.referenceDay = referenceDay
+        self.generatedAt = generatedAt
+        self.waterIntake = waterIntake
+        self.waterGoal = waterGoal
+        self.waterOwnerScope = waterOwnerScope
+        self.waterEntryIds = waterEntryIds
         self.calorieGoal = calorieGoal
         self.calorieIntake = calorieIntake
         self.categories = categories
@@ -31,6 +45,12 @@ struct NativeFoodStateMessage: Codable {
 
     func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encodeIfPresent(referenceDay, forKey: .referenceDay)
+        try container.encodeIfPresent(generatedAt, forKey: .generatedAt)
+        try container.encodeIfPresent(waterIntake, forKey: .waterIntake)
+        try container.encodeIfPresent(waterGoal, forKey: .waterGoal)
+        try container.encodeIfPresent(waterOwnerScope, forKey: .waterOwnerScope)
+        try container.encodeIfPresent(waterEntryIds, forKey: .waterEntryIds)
         try container.encode(calorieGoal, forKey: .calorieGoal)
         try container.encode(calorieIntake, forKey: .calorieIntake)
         try container.encode(categories, forKey: .categories)
@@ -55,6 +75,12 @@ struct NativeFoodStateMessage: Codable {
 
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
+        referenceDay = try container.decodeIfPresent(String.self, forKey: .referenceDay)
+        generatedAt = try container.decodeIfPresent(Int64.self, forKey: .generatedAt)
+        waterIntake = try container.decodeIfPresent(Double.self, forKey: .waterIntake)
+        waterGoal = try container.decodeIfPresent(Double.self, forKey: .waterGoal)
+        waterOwnerScope = try container.decodeIfPresent(String.self, forKey: .waterOwnerScope)
+        waterEntryIds = try container.decodeIfPresent([String].self, forKey: .waterEntryIds)
         calorieGoal = try container.decode(Double.self, forKey: .calorieGoal)
         calorieIntake = try container.decode(Double.self, forKey: .calorieIntake)
         categories = try container.decode([NativeFoodCategory].self, forKey: .categories)

@@ -1,0 +1,18 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/widget_root"
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:background="@drawable/widget_background" android:padding="12dp"
+    android:gravity="center" android:orientation="vertical">
+    <ImageView android:id="@+id/widget_icon" android:layout_width="40dp" android:layout_height="40dp"
+        android:src="@drawable/widget_moon" android:tint="@color/widget_primary" android:scaleType="fitCenter"
+        android:importantForAccessibility="no" />
+    <TextView android:id="@+id/widget_title" android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:layout_marginTop="8dp" android:text="@string/widget_rest" android:textSize="12sp"
+        android:textColor="@color/widget_secondary" android:gravity="center" android:maxLines="1"
+        android:autoSizeTextType="uniform" android:autoSizeMinTextSize="9sp" android:autoSizeMaxTextSize="12sp" android:autoSizeStepGranularity="1sp" />
+    <TextView android:id="@+id/widget_value" android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:layout_marginTop="3dp" android:text="@string/widget_rest_preview" android:textSize="18sp"
+        android:fontFamily="sans-serif-medium" android:textColor="@color/widget_text" android:gravity="center"
+        android:maxLines="1" android:ellipsize="end"
+        android:autoSizeTextType="uniform" android:autoSizeMinTextSize="12sp" android:autoSizeMaxTextSize="18sp" android:autoSizeStepGranularity="1sp" />
+</LinearLayout>

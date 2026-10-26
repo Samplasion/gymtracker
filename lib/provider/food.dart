@@ -8,6 +8,8 @@ import 'package:gymtracker/controller/achievements_controller.dart';
 import 'package:gymtracker/model/achievements.dart';
 import 'package:gymtracker/model/native.dart';
 import 'package:gymtracker/provider/bootstrap.dart';
+import 'package:gymtracker/provider/hydration.dart';
+import 'package:gymtracker/provider/online.dart';
 import 'package:gymtracker/repository/foods.dart';
 import 'package:gymtracker/service/logger.dart';
 import 'package:gymtracker/service/native.dart';
@@ -468,6 +470,8 @@ void foodNativeSync(Ref ref) {
   ref.watch(foodsForDateProvider(today));
   ref.watch(nutritionGoalForDateProvider(today));
   ref.watch(categoriesForDateProvider(today));
+  ref.watch(waterEntriesProvider);
+  ref.watch(currentUserIdProvider);
 
   final now = DateTime.now();
   final midnight = Timer(
@@ -483,6 +487,11 @@ void foodNativeSync(Ref ref) {
 }
 
 void _updateNativeData(Ref ref, DateTime now) {
+  // Loading is not an actual zero-consumption day. Wait for both diaries.
+  if (ref.read(foodLogsStreamProvider).asData == null ||
+      ref.read(waterEntriesProvider).asData == null) {
+    return;
+  }
   globalLogger.i("Syncing food data to native services.");
   final goal = ref.read(nutritionGoalForDateProvider(now));
   final foods = ref.read(foodsForDateProvider(now));
@@ -506,6 +515,24 @@ void _updateNativeData(Ref ref, DateTime now) {
       .read(nativeServiceProvider)
       .setFoodParameters(
         NativeFoodStateMessage(
+          referenceDay: DateFormat('yyyy-MM-dd', 'en_US').format(now),
+          generatedAt: DateTime.now().millisecondsSinceEpoch,
+          waterIntake:
+              (ref.read(waterEntriesProvider).asData?.value ?? [])
+                  .where((entry) => entry.time.isSameDay(now))
+                  .fold<double>(0, (sum, entry) => sum + entry.milliliters) +
+              foods.fold<double>(
+                0,
+                (sum, food) => sum + (food.nutritionalValues.water ?? 0),
+              ),
+          waterGoal: goal.dailyWater,
+          waterOwnerScope: ref.read(currentUserIdProvider) == null
+              ? 'guest'
+              : 'user:${ref.read(currentUserIdProvider)}',
+          waterEntryIds: (ref.read(waterEntriesProvider).asData?.value ?? [])
+              .where((entry) => entry.time.isSameDay(now))
+              .map((e) => e.id)
+              .toList(),
           calorieGoal: goal.dailyCalories,
           calorieIntake: foods.fold<double>(
             0,

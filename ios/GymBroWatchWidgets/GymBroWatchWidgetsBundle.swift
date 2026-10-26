@@ -16,6 +16,10 @@ struct GymBroWatchWidgetsBundle: WidgetBundle {
       GymBroWidgetsStreak()
       GymBroWidgetsRest()
       GymBroWidgetsDensity()
+      if #available(iOS 17.0, watchOS 10.0, *) {
+        GymBroWidgetsWater()
+        GymBroWidgetsNutrition()
+      }
     }
   }
 }

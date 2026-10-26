@@ -106,6 +106,7 @@ protocol GymBroNativeHostAPI {
   func setExerciseParameters(parameters: [String?: Any?]) throws
   func updateHomeWidgetParameters(parameters: [String: Int64], workoutDensityChartData: [Int64]) throws
   func requestHealthPermission() throws
+  func waterReceiverReady() throws
   func updateFoodParameters(parameters: [String?: Any?]) throws
   func updateShadowRoutines(routines: [String: String]) throws
 }
@@ -192,6 +193,19 @@ class GymBroNativeHostAPISetup {
     } else {
       requestHealthPermissionChannel.setMessageHandler(nil)
     }
+    let waterReceiverReadyChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.gymtracker.GymBroNativeHostAPI.waterReceiverReady\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      waterReceiverReadyChannel.setMessageHandler { _, reply in
+        do {
+          try api.waterReceiverReady()
+          reply(wrapResult(nil))
+        } catch {
+          reply(wrapError(error))
+        }
+      }
+    } else {
+      waterReceiverReadyChannel.setMessageHandler(nil)
+    }
     let updateFoodParametersChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.gymtracker.GymBroNativeHostAPI.updateFoodParameters\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
     if let api = api {
       updateFoodParametersChannel.setMessageHandler { message, reply in
@@ -227,6 +241,7 @@ class GymBroNativeHostAPISetup {
 
 /// Generated protocol from Pigeon that represents Flutter messages that can be called from Swift.
 protocol GymBroNativeFlutterAPIProtocol {
+  func importWaterEntry(id idArg: String, milliliters millilitersArg: Double, timeMilliseconds timeMillisecondsArg: Int64, ownerScope ownerScopeArg: String, completion: @escaping (Result<Bool, PigeonError>) -> Void)
   func markThisSetAsDone(completion: @escaping (Result<Void, PigeonError>) -> Void)
   func moveWorkoutCursorNext(completion: @escaping (Result<Bool, PigeonError>) -> Void)
   func moveWorkoutCursorPrevious(completion: @escaping (Result<Bool, PigeonError>) -> Void)
@@ -243,6 +258,27 @@ class GymBroNativeFlutterAPI: GymBroNativeFlutterAPIProtocol {
   }
   var codec: FlutterCommunicatorPigeonCodec {
     return FlutterCommunicatorPigeonCodec.shared
+  }
+  func importWaterEntry(id idArg: String, milliliters millilitersArg: Double, timeMilliseconds timeMillisecondsArg: Int64, ownerScope ownerScopeArg: String, completion: @escaping (Result<Bool, PigeonError>) -> Void) {
+    let channelName: String = "dev.flutter.pigeon.gymtracker.GymBroNativeFlutterAPI.importWaterEntry\(messageChannelSuffix)"
+    let channel = FlutterBasicMessageChannel(name: channelName, binaryMessenger: binaryMessenger, codec: codec)
+    channel.sendMessage([idArg, millilitersArg, timeMillisecondsArg, ownerScopeArg] as [Any?]) { response in
+      guard let listResponse = response as? [Any?] else {
+        completion(.failure(createConnectionError(withChannelName: channelName)))
+        return
+      }
+      if listResponse.count > 1 {
+        let code: String = listResponse[0] as! String
+        let message: String? = nilOrValue(listResponse[1])
+        let details: String? = nilOrValue(listResponse[2])
+        completion(.failure(PigeonError(code: code, message: message, details: details)))
+      } else if listResponse[0] == nil {
+        completion(.failure(PigeonError(code: "null-error", message: "Flutter api returned null value for non-null return value.", details: "")))
+      } else {
+        let result = listResponse[0] as! Bool
+        completion(.success(result))
+      }
+    }
   }
   func markThisSetAsDone(completion: @escaping (Result<Void, PigeonError>) -> Void) {
     let channelName: String = "dev.flutter.pigeon.gymtracker.GymBroNativeFlutterAPI.markThisSetAsDone\(messageChannelSuffix)"

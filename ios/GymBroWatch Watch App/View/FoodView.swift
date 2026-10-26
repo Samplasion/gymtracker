@@ -1,86 +1,72 @@
-//
-//  FoodView.swift
-//  GymBroWatch Watch App
-//
-//  Created by Francesco Arieti on 06/01/26.
-//
-
 import SwiftUI
 
 struct FoodView: View {
     @EnvironmentObject var viewModel: FoodViewModel
-    
-    @State private var selectedTab: Tab = .gauge
-    @State private var presentMenu: Bool = false
-    
-    enum Tab: String, CaseIterable {
-        case gauge, diary, nutrition
-    }
-    
-    func labelFor(tab: Tab) -> LocalizedStringKey {
-        switch tab {
-        case .gauge: return "Food"
-        case .diary: return "Diary"
-        case .nutrition: return "Nutrition split"
-        }
-    }
-    
-    @ViewBuilder
-    var innerBody: some View {
-        switch selectedTab {
-        case .gauge:
-            FoodGaugeView()
-        case .diary:
-            FoodDiaryView()
-        case .nutrition:
-            FoodNutritionView()
-        }
-    }
-    
-    var placement: ToolbarItemPlacement {
-        if #available(watchOS 10, *) {
-            return .topBarLeading
-        } else {
-            return .cancellationAction
-        }
-    }
-    
+    @Environment(\.scenePhase) private var scenePhase
+
     var body: some View {
-        NavigationView {
-            innerBody
-            //        TabView(selection: $selectedTab) {
-            //            FoodGaugeView().tag(Tab.gauge)
-            //            FoodDiaryView().tag(Tab.diary)
-            //            FoodNutritionView().tag(Tab.nutrition)
-            //        }
-            //        .tabViewStyle(.page)
-                .animation(.interpolatingSpring(bounce: 0.5), value: selectedTab)
-                .toolbar(content: {
-                    ToolbarItem(placement: placement) {
-                        Button {
-                            presentMenu = true
-                        } label: {
-                            Image(systemName: "info")
-                        }
+        NavigationStack {
+            ScrollView {
+                VStack(spacing: 10) {
+                    if !viewModel.hasData {
+                        Label("Open Gym Bro on iPhone to sync your diary.", systemImage: "iphone")
+                            .font(.caption).foregroundStyle(.secondary).foodCard()
                     }
-                })
-                .sheet(isPresented: $presentMenu, content: {
-                    List {
-                        ForEach(Tab.allCases, id: \.rawValue) { tab in
-                            Button {
-                                selectedTab = tab
-                                presentMenu = false
-                            } label: {
-                                Text(labelFor(tab: tab))
-                            }
-                        }
-                    }
-                })
+                    NavigationLink {
+                        FoodGaugeView()
+                    } label: {
+                        FoodCalorieSummary(disclosure: true)
+                    }.buttonStyle(.plain)
+                    NavigationLink {
+                        FoodNutritionView()
+                    } label: {
+                        VStack(alignment: .leading, spacing: 12) {
+                            FoodCardHeading(title: "Nutrients", icon: "chart.bar.fill", color: .purple, disclosure: true)
+                            NutritionSplit(protein: viewModel.totalNutritionSplit.protein,
+                                proteinGoal: viewModel.totalNutritionSplit.proteinGoal,
+                                carbs: viewModel.totalNutritionSplit.carbs,
+                                carbsGoal: viewModel.totalNutritionSplit.carbsGoal,
+                                fats: viewModel.totalNutritionSplit.fats,
+                                fatsGoal: viewModel.totalNutritionSplit.fatsGoal)
+                        }.foodCard(tint: .purple)
+                    }.buttonStyle(.plain)
+                    NavigationLink {
+                        FoodWaterView()
+                    } label: {
+                        FoodWaterSummary(disclosure: true)
+                    }.buttonStyle(.plain)
+                    FoodPendingWater()
+                    NavigationLink {
+                        FoodDiaryView()
+                    } label: {
+                        FoodCardHeading(title: "Diary", icon: "fork.knife", color: .orange, disclosure: true)
+                            .padding(.vertical, 4).foodCard(tint: .orange)
+                    }.buttonStyle(.plain)
+                }
+                .padding(.horizontal, 8).padding(.bottom, 12)
+            }
+            .navigationTitle("Food")
+            .navigationBarTitleDisplayMode(.inline)
+        }
+        .task {
+            viewModel.refreshDisplayedData()
+            viewModel.flushWaterEntries()
+            while !Task.isCancelled {
+                do { try await Task.sleep(nanoseconds: 30_000_000_000) }
+                catch { return }
+                viewModel.refreshDisplayedData()
+                viewModel.flushWaterEntries()
+            }
+        }
+        .onChange(of: scenePhase) { phase in
+            if phase == .active {
+                viewModel.refreshDisplayedData()
+                viewModel.flushWaterEntries()
+            }
         }
     }
 }
 
 #Preview {
-    FoodView()
-        .environmentObject(FoodViewModel())
+    FoodView().environmentObject(FoodViewModel())
 }

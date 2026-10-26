@@ -1,0 +1,9 @@
+<resources>
+    <color name="widget_background">#FF211F26</color>
+    <color name="widget_primary">#FFD0BCFF</color>
+    <color name="widget_text">#FFE6E0E9</color>
+    <color name="widget_secondary">#FFCAC4D0</color>
+    <color name="widget_track">#FF49454F</color>
+    <color name="widget_carbs">#FFEFB8C8</color>
+    <color name="widget_fats">#FFCCC2DC</color>
+</resources>

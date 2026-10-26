@@ -1,35 +1,18 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/streak_widget"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="?android:attr/colorBackground"
-    android:gravity="center"
-    android:orientation="vertical"
-    android:theme="@style/Theme.Android.AppWidgetContainer">
-
-    <ImageView
-        android:id="@+id/flame"
-        android:layout_width="64dp"
-        android:layout_height="64dp"
-        android:importantForAccessibility="no"
-        android:src="@drawable/fire"
-        android:tint="?android:attr/colorAccent" />
-
-    <TextView
-        android:id="@+id/streakText"
-        style="@style/Widget.Android.AppWidget.InnerView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="0dp"
-        android:layout_marginLeft="0dp"
-        android:layout_marginTop="8dp"
-        android:background="?android:attr/colorBackground"
-        android:text="3 weeks"
-        android:textColor="?android:attr/colorAccent"
-        android:textSize="28sp"
-        android:textFontWeight="700"
-        tools:ignore="HardcodedText" />
-
+    android:id="@+id/widget_root"
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:background="@drawable/widget_background" android:padding="12dp"
+    android:gravity="center" android:orientation="vertical">
+    <ImageView android:id="@+id/widget_icon" android:layout_width="40dp" android:layout_height="40dp"
+        android:src="@drawable/fire" android:tint="@color/widget_primary" android:scaleType="fitCenter"
+        android:importantForAccessibility="no" />
+    <TextView android:id="@+id/widget_title" android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:layout_marginTop="8dp" android:text="@string/widget_streak" android:textSize="12sp"
+        android:textColor="@color/widget_secondary" android:gravity="center" android:maxLines="1"
+        android:autoSizeTextType="uniform" android:autoSizeMinTextSize="9sp" android:autoSizeMaxTextSize="12sp" android:autoSizeStepGranularity="1sp" />
+    <TextView android:id="@+id/widget_value" android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:layout_marginTop="3dp" android:text="@string/widget_streak_preview" android:textSize="18sp"
+        android:fontFamily="sans-serif-medium" android:textColor="@color/widget_text" android:gravity="center"
+        android:maxLines="1" android:ellipsize="end"
+        android:autoSizeTextType="uniform" android:autoSizeMinTextSize="12sp" android:autoSizeMaxTextSize="18sp" android:autoSizeStepGranularity="1sp" />
 </LinearLayout>

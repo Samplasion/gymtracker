@@ -1,0 +1,24 @@
+<resources>
+    <string name="widget_streak">Serie settimanale</string>
+    <string name="widget_rest">Riposo</string>
+    <string name="widget_total">Allenamenti totali</string>
+    <string name="widget_density">Densità allenamenti</string>
+    <string name="widget_water">Acqua</string>
+    <string name="widget_nutrition">Nutrienti</string>
+    <string name="widget_nutrients">Nutrienti</string>
+    <string name="widget_workouts">Allenamenti</string>
+    <string name="widget_protein">Proteine</string>
+    <string name="widget_carbs">Carboidrati</string>
+    <string name="widget_fats">Grassi</string>
+    <string name="widget_streak_preview">3 settimane</string>
+    <string name="widget_rest_preview">2 giorni</string>
+    <string name="widget_total_preview">54 allenamenti</string>
+    <string name="widget_streak_description">Mostra la tua serie di settimane.</string>
+    <string name="widget_rest_description">Giorni dal tuo ultimo allenamento.</string>
+    <string name="widget_total_description">Il totale degli allenamenti completati.</string>
+    <string name="widget_density_description">I tuoi allenamenti nelle ultime settimane.</string>
+    <string name="widget_water_description">I tuoi progressi giornalieri di idratazione.</string>
+    <string name="widget_nutrition_description">Proteine, carboidrati e grassi della giornata.</string>
+    <plurals name="widget_days"><item quantity="one">%d giorno</item><item quantity="other">%d giorni</item></plurals>
+    <plurals name="widget_workout_count"><item quantity="one">%d allenamento</item><item quantity="other">%d allenamenti</item></plurals>
+</resources>

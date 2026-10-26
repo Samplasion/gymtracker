@@ -7,28 +7,87 @@
 
 import Foundation
 import Combine
+import WidgetKit
 
 fileprivate let key: String = "foodParameters"
 
 @MainActor
 class FoodViewModel: NSObject, ObservableObject {
     private let defaults: UserDefaults?
+    private let waterQueue: WatchWaterQueue
+    var sendWaterEntry: ((WatchWaterEntry) -> Void)?
+    @Published private(set) var pendingWaterEntries: [WatchWaterEntry] = []
+    @Published private(set) var waterIntake: Double = 0
+    @Published private(set) var waterGoal: Double?
+    @Published private(set) var waterOwnerScope: String?
+    @Published private(set) var hasData = false
+    private var sourceState: NativeFoodStateMessage?
     @Published var lastUpdated = Date.now
-    @Published var calorieGoal: Double = 2000
+    @Published var calorieGoal: Double = 0
     @Published var calorieIntake: Double = 0
     @Published var categories: [NativeFoodCategory] = []
-    @Published var totalNutritionSplit: NativeFoodNutritionSplit = .init(protein: 0, proteinGoal: 1, carbs: 0, carbsGoal: 1, fats: 0, fatsGoal: 1)
+    @Published var totalNutritionSplit: NativeFoodNutritionSplit = .init(protein: 0, proteinGoal: 0, carbs: 0, carbsGoal: 0, fats: 0, fatsGoal: 0)
     
     init(defaults: UserDefaults? = UserDefaults(suiteName: "group.samplasion.gymtracker")) {
         self.defaults = defaults
+        waterQueue = WatchWaterQueue(defaults: defaults ?? .standard, key: "watch.water.pending.v1")
         super.init()
+        pendingWaterEntries = waterQueue.entries
         restoreSavedData()
     }
     
     var percentage: Double {
-        Double(calorieIntake) / Double(calorieGoal)
+        DailyNutritionData.progress(calorieIntake, goal: calorieGoal)
     }
     
+    var pendingWaterAmount: Double {
+        pendingWaterEntries.filter {
+            $0.ownerScope == waterOwnerScope && DailyNutritionData.day($0.date) == DailyNutritionData.day(.now)
+        }.reduce(0) { $0 + $1.milliliters }
+    }
+    var hasOtherAccountEntries: Bool {
+        pendingWaterEntries.contains { $0.ownerScope != waterOwnerScope }
+    }
+    var currentPendingCount: Int {
+        pendingWaterEntries.filter { $0.ownerScope == waterOwnerScope }.count
+    }
+    @discardableResult
+    func addWater(_ milliliters: Double, at date: Date = .now) -> Bool {
+        guard let scope = waterOwnerScope, milliliters.isFinite, milliliters > 0 else { return false }
+        let entry = WatchWaterEntry(milliliters: milliliters,
+            timeMilliseconds: Int64(date.timeIntervalSince1970 * 1000), ownerScope: scope)
+        waterQueue.insert(entry)
+        pendingWaterEntries = waterQueue.entries
+        flushWaterEntries()
+        return true
+    }
+    func flushWaterEntries() {
+        for entry in pendingWaterEntries where entry.ownerScope == waterOwnerScope { sendWaterEntry?(entry) }
+    }
+    func acknowledgeWater(ids: Set<String>, ownerScope: String) {
+        waterQueue.acknowledge(ids: ids, ownerScope: ownerScope)
+        pendingWaterEntries = waterQueue.entries
+    }
+    func refreshDisplayedData(at date: Date = .now) {
+        guard let state = sourceState else { return }
+        let current = DailyNutritionData.isCurrent(state, at: date)
+        hasData = state.referenceDay != nil
+        calorieGoal = DailyNutritionData.valid(state.calorieGoal) ? state.calorieGoal : 0
+        calorieIntake = current && DailyNutritionData.valid(state.calorieIntake) ? state.calorieIntake : 0
+        waterIntake = current && DailyNutritionData.valid(state.waterIntake ?? -1) ? state.waterIntake! : 0
+        waterGoal = state.waterGoal.flatMap { DailyNutritionData.valid($0) && $0 > 0 ? $0 : nil }
+        waterOwnerScope = state.waterOwnerScope
+        let s = state.totalNutritionSplit
+        totalNutritionSplit = current ? s : .init(protein: 0, proteinGoal: s.proteinGoal,
+            carbs: 0, carbsGoal: s.carbsGoal, fats: 0, fatsGoal: s.fatsGoal)
+        categories = current ? state.categories : state.categories.map { category in
+            let s = category.nutritionSplit
+            return .init(name: category.name, emoji: category.emoji,
+                nutritionSplit: .init(protein: 0, proteinGoal: s.proteinGoal,
+                    carbs: 0, carbsGoal: s.carbsGoal, fats: 0, fatsGoal: s.fatsGoal))
+        }
+    }
+
     func update() {
         lastUpdated = .now
         save()
@@ -39,19 +98,16 @@ class FoodViewModel: NSObject, ObservableObject {
             return
         }
         
-        let foodParameters: NativeFoodStateMessage = .init(
-            calorieGoal: calorieGoal,
-            calorieIntake: calorieIntake,
-            categories: categories,
-            totalNutritionSplit: totalNutritionSplit
-        )
-        
+        guard let foodParameters = sourceState else { return }
+
         guard let jsonString = try? foodParameters.toJSONString() else {
             return
         }
         
         defaults.set(jsonString, forKey: key)
         defaults.set(Int64(lastUpdated.timeIntervalSince1970 * 1000), forKey: "_\(key)")
+        WidgetCenter.shared.reloadTimelines(ofKind: "GymBroWidgetsWater")
+        WidgetCenter.shared.reloadTimelines(ofKind: "GymBroWidgetsNutrition")
     }
     
     func restoreSavedData() {
@@ -64,40 +120,19 @@ class FoodViewModel: NSObject, ObservableObject {
             return
         }
         
-        let newCalorieGoal = foodParameters.calorieGoal
-        var newCalorieIntake = foodParameters.calorieIntake
-        var newCategories: [NativeFoodCategory] = foodParameters.categories
-        var newTotalNutritionSplit: NativeFoodNutritionSplit = foodParameters.totalNutritionSplit
-        
-        guard let lastUpdatedTimestamp = defaults.value(forKey: "_\(key)") as? Int64 else {
-            return
-        }
-        
-        lastUpdated = Date(timeIntervalSince1970: TimeInterval(lastUpdatedTimestamp) / 1000.0)
-        
-        let calendar = Calendar.current
-        if !calendar.isDateInToday(lastUpdated) {
-            newCalorieIntake = 0
-            newTotalNutritionSplit = .init(protein: 0, proteinGoal: newTotalNutritionSplit.proteinGoal, carbs: 0, carbsGoal: newTotalNutritionSplit.carbsGoal, fats: 0, fatsGoal: newTotalNutritionSplit.fatsGoal)
-            newCategories = newCategories.map { category in
-                .init(name: category.name, emoji: category.emoji, nutritionSplit: .init(protein: 0, proteinGoal: category.nutritionSplit.proteinGoal, carbs: 0, carbsGoal: category.nutritionSplit.carbsGoal, fats: 0, fatsGoal: category.nutritionSplit.fatsGoal))
-            }
-        }
-        
-        calorieGoal = newCalorieGoal
-        calorieIntake = newCalorieIntake
-        categories = newCategories
-        totalNutritionSplit = newTotalNutritionSplit
-        update()
+        set(foodParameters: foodParameters)
     }
+
 }
 
 extension FoodViewModel: FoodMessageDelegate {
     func set(foodParameters: NativeFoodStateMessage) {
-        calorieGoal = foodParameters.calorieGoal
-        calorieIntake = foodParameters.calorieIntake
-        categories = foodParameters.categories
-        totalNutritionSplit = foodParameters.totalNutritionSplit
+        sourceState = foodParameters
+        if let scope = foodParameters.waterOwnerScope, let ids = foodParameters.waterEntryIds {
+            acknowledgeWater(ids: Set(ids), ownerScope: scope)
+        }
+        refreshDisplayedData()
         update()
+        flushWaterEntries()
     }
 }

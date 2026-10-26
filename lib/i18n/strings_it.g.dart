@@ -38,7 +38,6 @@ class TranslationsIt with BaseTranslations<AppLocale, Translations> implements T
 	TranslationsIt $copyWith({TranslationMetadata<AppLocale, Translations>? meta}) => TranslationsIt(meta: meta ?? this.$meta);
 
 	// Translations
-	@override late final Translations$progression$it progression = Translations$progression$it._(_root);
 	@override String get appName => 'Gym Bro';
 	@override late final Translations$appInfo$it appInfo = Translations$appInfo$it._(_root);
 	@override late final Translations$set$it set = Translations$set$it._(_root);
@@ -180,34 +179,9 @@ class TranslationsIt with BaseTranslations<AppLocale, Translations> implements T
 	@override late final Translations$friendsList$it friendsList = Translations$friendsList$it._(_root);
 	@override late final Translations$social$it social = Translations$social$it._(_root);
 	@override late final Translations$hydration$it hydration = Translations$hydration$it._(_root);
-}
-
-// Path: progression
-class Translations$progression$it implements Translations$progression$en {
-	Translations$progression$it._(this._root);
-
-	final TranslationsIt _root; // ignore: unused_field
-
-	// Translations
-	@override String get title => 'Progressione guidata';
-	@override String get configure => 'Imposta progressione';
-	@override String get remove => 'Rimuovi progressione';
-	@override String get lastTime => 'Ultima volta';
-	@override String get noHistory => 'Completa una sessione per vedere l\'ultima prestazione';
-	@override String get goal => 'Obiettivo di oggi';
-	@override String get double => 'Doppia progressione';
-	@override String get cyclic => 'Progressione lineare ciclica';
-	@override String get minReps => 'Ripetizioni minime';
-	@override String get maxReps => 'Ripetizioni massime';
-	@override String get repsPerStep => 'Ripetizioni per passo';
-	@override String get startingWeight => 'Peso iniziale';
-	@override String get weightPerStep => 'Aumento del peso per passo';
-	@override String get weightPerCycle => 'Aumento del peso iniziale per ciclo';
-	@override String get preview => 'Prossimi obiettivi';
-	@override String get save => 'Salva';
-	@override String get invalid => 'Controlla i valori e il numero di serie normali';
-	@override String step({required Object cycle, required Object step}) => 'Ciclo ${cycle}, passo ${step}';
-	@override String get advance => 'Avanza manualmente';
+	@override late final Translations$reports$it reports = Translations$reports$it._(_root);
+	@override late final Translations$plateau$it plateau = Translations$plateau$it._(_root);
+	@override late final Translations$progression$it progression = Translations$progression$it._(_root);
 }
 
 // Path: appInfo
@@ -1843,6 +1817,140 @@ class Translations$hydration$it implements Translations$hydration$en {
 	@override String get waterPer100 => 'Acqua (ml per 100 g/ml)';
 	@override String get history => 'Cronologia acqua';
 	@override String get permissionDenied => 'L’acqua viene salvata nel diario. Per aggiungerla anche a Salute, consenti l’accesso da Impostazioni → Autorizzazioni.';
+}
+
+// Path: reports
+class Translations$reports$it implements Translations$reports$en {
+	Translations$reports$it._(this._root);
+
+	final TranslationsIt _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Report progressi';
+	@override String get day => 'Giorno';
+	@override String get week => 'Settimana';
+	@override String get month => 'Mese';
+	@override String get training => 'Allenamento';
+	@override String get nutrition => 'Alimentazione';
+	@override String get measurements => 'Misurazioni corporee';
+	@override String get preview => 'Anteprima report';
+	@override String get save => 'Salva PDF';
+	@override String get share => 'Condividi';
+	@override String get reference => 'Data di riferimento';
+	@override String get chooseSection => 'Seleziona almeno una sezione.';
+	@override String get empty => 'Nessuna registrazione nel periodo.';
+	@override String get missing => 'Nessuna registrazione';
+	@override String get unavailable => 'Non disponibile';
+	@override String get error => 'Impossibile generare il report. Riprova.';
+	@override String get exportError => 'Impossibile esportare il PDF. Riprova.';
+	@override String get retry => 'Riprova';
+	@override String get saved => 'PDF salvato';
+	@override String get generated => 'Generato il';
+	@override String get daily => 'Dettaglio giornaliero';
+	@override String get summary => 'Riepilogo';
+	@override String get sessions => 'Sessioni';
+	@override String get sets => 'Serie completate';
+	@override String get reps => 'Ripetizioni';
+	@override String get load => 'Carico';
+	@override String get duration => 'Durata';
+	@override String get distance => 'Distanza';
+	@override String get volume => 'Volume (carichi positivi × ripetizioni)';
+	@override String get exercise => 'Esercizio';
+	@override String get status => 'Stato';
+	@override String get done => 'Completata';
+	@override String get pending => 'Non completata';
+	@override String get superset => 'Superserie';
+	@override String get continuation => 'Continuazione';
+	@override String get food => 'Alimento / pasto';
+	@override String get quantity => 'Quantità';
+	@override String get calories => 'Calorie';
+	@override String get protein => 'Proteine';
+	@override String get carbs => 'Carboidrati';
+	@override String get fat => 'Grassi';
+	@override String get total => 'Totale';
+	@override String get average => 'Media per giorno registrato';
+	@override String get coverage => 'Giorni con registrazioni';
+	@override String get first => 'Prima';
+	@override String get last => 'Ultima';
+	@override String get change => 'Variazione';
+	@override String get value => 'Valore';
+	@override String get date => 'Data';
+	@override String get goal => 'Obiettivo giornaliero salvato';
+	@override String get criteria => 'Le medie alimentari usano solo i giorni con alimenti registrati, inclusi i valori zero. I totali descrivono gli alimenti registrati, non necessariamente giornate complete. Le registrazioni assenti non equivalgono a zero. I totali di allenamento comprendono solo le serie svolte; il volume include solo carichi positivi con ripetizioni. Le variazioni corporee usano la prima e l’ultima misura effettiva del periodo. Nessuna interpolazione o misura prevista. I grafici corporei mostrano l’ultima misura effettiva di ogni giorno.';
+	@override String get partial => 'Periodo in corso: sono incluse solo le registrazioni disponibili alla generazione.';
+	@override String get units => 'Unità';
+	@override String get activityChart => 'Serie completate per giorno';
+	@override String get calorieChart => 'Calorie registrate per giorno';
+	@override String get chartNote => 'I punti indicano valori registrati. I giorni senza dati restano vuoti, senza interpolazione.';
+	@override String get privacy => 'Report locale · Nessuna valutazione medica o nutrizionale';
+	@override String get selection => 'Contenuto del report';
+	@override String get weight => 'Peso';
+	@override String get configureDescription => 'Crea un report dei tuoi progressi da salvare o condividere con il tuo professionista.';
+	@override String get period => 'Periodo';
+	@override String get includedPeriod => 'Periodo incluso nel report';
+	@override String get weekReferenceHint => 'Scegli un giorno della settimana da includere.';
+	@override String get monthReferenceHint => 'Scegli un giorno del mese da includere.';
+	@override String get selectionHint => 'Scegli una o più sezioni da inserire nel PDF.';
+	@override String get previewTitle => 'Anteprima PDF';
+}
+
+// Path: plateau
+class Translations$plateau$it implements Translations$plateau$en {
+	Translations$plateau$it._(this._root);
+
+	final TranslationsIt _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Possibili plateau';
+	@override String get intro => 'Ultime 8 settimane, considerando solo le serie normali completate. A seguire sono riportati suggerimenti basati sull\'analisi dei dati, che non vanno presi come certezza.';
+	@override String get criteria => 'Servono 6 sedute confrontabili in almeno 28 giorni e 4 settimane di calendario, di cui l’ultima entro 14 giorni, senza pause oltre i 21 giorni. Il riferimento è la mediana delle prime 3 sedute. Viene considerato progresso: +2,5% di carico senza perdere ripetizioni, +1 ripetizione a carico equivalente (±1%) oppure +5% di volume. A corpo libero: +1 ripetizione nella serie migliore o +5% di ripetizioni totali.';
+	@override String get possiblePlateau => 'Possibile plateau';
+	@override String get progressing => 'Nessun possibile plateau rilevato';
+	@override String get insufficientData => 'Servono più dati: registra almeno 6 sedute confrontabili distribuite su 4 settimane.';
+	@override String get stale => 'Mancano sedute confrontabili recenti: riprendi a registrare questo esercizio prima di valutarne i progressi.';
+	@override String get unsupported => 'Non valutato: assistenza, tempo e distanza non offrono metriche confrontabili di carico e ripetizioni.';
+	@override String get incomparable => 'Non valutato: identità, definizione dell’esercizio o più sedute nello stesso giorno impediscono un confronto affidabile.';
+	@override String get empty => 'Servono più dati. Registra serie completati per diverse settimane per valutare i progressi.';
+	@override String get period => 'Periodo';
+	@override String get sessions => 'Sedute';
+	@override String get sets => 'Serie normali per seduta';
+	@override String get reference => 'Riferimento: mediana delle prime 3 sedute';
+	@override String get load => 'Carico massimo';
+	@override String get reps => 'Ripetizioni al carico massimo';
+	@override String get bestReps => 'Ripetizioni massime per serie';
+	@override String get totalReps => 'Ripetizioni totali';
+	@override String get volume => 'Volume della seduta';
+	@override String get data => 'Sedute utilizzate';
+	@override String get other => 'Altri esercizi';
+	@override String get volumeInfo => 'Volume = somma di carico × ripetizioni delle serie selezionati. Il corpo libero viene valutato solo tramite le ripetizioni.';
+}
+
+// Path: progression
+class Translations$progression$it implements Translations$progression$en {
+	Translations$progression$it._(this._root);
+
+	final TranslationsIt _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Progressione guidata';
+	@override String get configure => 'Imposta progressione';
+	@override String get remove => 'Rimuovi progressione';
+	@override String get lastTime => 'Ultima volta';
+	@override String get noHistory => 'Completa una sessione per vedere l\'ultima prestazione';
+	@override String get goal => 'Obiettivo di oggi';
+	@override String get double => 'Doppia progressione';
+	@override String get cyclic => 'Progressione lineare ciclica';
+	@override String get minReps => 'Ripetizioni minime';
+	@override String get maxReps => 'Ripetizioni massime';
+	@override String get repsPerStep => 'Ripetizioni per passo';
+	@override String get startingWeight => 'Peso iniziale';
+	@override String get weightPerStep => 'Aumento del peso per passo';
+	@override String get weightPerCycle => 'Aumento del peso iniziale per ciclo';
+	@override String get preview => 'Prossimi obiettivi';
+	@override String get save => 'Salva';
+	@override String get invalid => 'Controlla i valori e il numero di serie normali';
+	@override String step({required Object cycle, required Object step}) => 'Ciclo ${cycle}, passo ${step}';
+	@override String get advance => 'Avanza manualmente';
 }
 
 // Path: set.kindShort
@@ -6783,25 +6891,6 @@ class Translations$food$categoryEditor$fields$name$errors$it implements Translat
 extension on TranslationsIt {
 	dynamic _flatMapFunction(String path) {
 		return switch (path) {
-			'progression.title' => 'Progressione guidata',
-			'progression.configure' => 'Imposta progressione',
-			'progression.remove' => 'Rimuovi progressione',
-			'progression.lastTime' => 'Ultima volta',
-			'progression.noHistory' => 'Completa una sessione per vedere l\'ultima prestazione',
-			'progression.goal' => 'Obiettivo di oggi',
-			'progression.double' => 'Doppia progressione',
-			'progression.cyclic' => 'Progressione lineare ciclica',
-			'progression.minReps' => 'Ripetizioni minime',
-			'progression.maxReps' => 'Ripetizioni massime',
-			'progression.repsPerStep' => 'Ripetizioni per passo',
-			'progression.startingWeight' => 'Peso iniziale',
-			'progression.weightPerStep' => 'Aumento del peso per passo',
-			'progression.weightPerCycle' => 'Aumento del peso iniziale per ciclo',
-			'progression.preview' => 'Prossimi obiettivi',
-			'progression.save' => 'Salva',
-			'progression.invalid' => 'Controlla i valori e il numero di serie normali',
-			'progression.step' => ({required Object cycle, required Object step}) => 'Ciclo ${cycle}, passo ${step}',
-			'progression.advance' => 'Avanza manualmente',
 			'appName' => 'Gym Bro',
 			'appInfo.version' => ({required Object version, required Object build}) => 'Versione ${version} (build ${build})',
 			'appInfo.shortDescription' => 'Compagno di allenamenti',
@@ -7295,8 +7384,6 @@ extension on TranslationsIt {
 			'library.biceps.exercises.singleArmCableHammerCurls' => 'Hammer curl ai cavi (braccio singolo)',
 			'library.biceps.exercises.cableBicepsCurl' => 'Bicep curl (cavi)',
 			'library.biceps.exercises.dumbbellBicepsCurl' => 'Bicep curl (manubri)',
-			_ => null,
-		} ?? switch (path) {
 			'library.biceps.exercises.bicepsCurlMachine' => 'Bicep curl (macchina)',
 			'library.biceps.exercises.hammerCurlDumbbell' => 'Hammer curl (manubri)',
 			'library.biceps.exercises.concentrationCurl' => 'Curl concentrati',
@@ -7316,6 +7403,8 @@ extension on TranslationsIt {
 			'library.abs.exercises.crunchMachine' => 'Crunch machine',
 			'library.abs.exercises.heelsUpCrunch' => 'Crunch (caviglie alzate)',
 			'library.abs.exercises.fullBodyCrunch' => 'Crunch doppio',
+			_ => null,
+		} ?? switch (path) {
 			'library.abs.exercises.plank' => 'Plank',
 			'library.abs.exercises.hollowBodyHold' => 'Hollow body hold',
 			'library.abs.exercises.russianTwist' => 'Russian twist',
@@ -7809,8 +7898,6 @@ extension on TranslationsIt {
 			'food.languages.el' => 'Greco',
 			'food.languages.en' => 'Inglese',
 			'food.languages.eo' => 'Esperanto',
-			_ => null,
-		} ?? switch (path) {
 			'food.languages.es' => 'Spagnolo',
 			'food.languages.et' => 'Estone',
 			'food.languages.eu' => 'Basco',
@@ -7830,6 +7917,8 @@ extension on TranslationsIt {
 			'food.languages.ha' => 'Hausa',
 			'food.languages.he' => 'Ebraico',
 			'food.languages.hi' => 'Hindi',
+			_ => null,
+		} ?? switch (path) {
 			'food.languages.ho' => 'Hiri Motu',
 			'food.languages.hr' => 'Croato',
 			'food.languages.ht' => 'Creolo haitiano',
@@ -8323,8 +8412,6 @@ extension on TranslationsIt {
 			'achievements.cycleChampion.description.k1.km' => 'Pedala per un totale di 100 km',
 			'achievements.cycleChampion.description.k1.mi' => ({required Object p0}) => 'Pedala per un totale di 100 km (${p0})',
 			'achievements.cycleChampion.description.k2.km' => 'Pedala per un totale di 500 km',
-			_ => null,
-		} ?? switch (path) {
 			'achievements.cycleChampion.description.k2.mi' => ({required Object p0}) => 'Pedala per un totale di 500 km (${p0})',
 			'achievements.cycleChampion.description.k3.km' => 'Pedala per un totale di 1000 km',
 			'achievements.cycleChampion.description.k3.mi' => ({required Object p0}) => 'Pedala per un totale di 1000 km (${p0})',
@@ -8344,6 +8431,8 @@ extension on TranslationsIt {
 			'achievements.intensityInnovator.description' => 'Modifica una routine aumentando pesi o ripetizioni',
 			'achievements.completionist.title' => 'Completista',
 			'achievements.completionist.description' => 'Prova almeno una volta tutti gli esercizi della libreria',
+			_ => null,
+		} ?? switch (path) {
 			'achievements.notDrunk.title' => 'Non sono sbronzo ma brillo!',
 			'achievements.notDrunk.description' => 'Completa un allenamento di domenica mattina superando un record personale di volume o distanza',
 			'achievements.steamedHams.description' => 'Supera un record personale di massimale in un allenamento impiegando meno tempo del solito',
@@ -8614,6 +8703,113 @@ extension on TranslationsIt {
 			'hydration.waterPer100' => 'Acqua (ml per 100 g/ml)',
 			'hydration.history' => 'Cronologia acqua',
 			'hydration.permissionDenied' => 'L’acqua viene salvata nel diario. Per aggiungerla anche a Salute, consenti l’accesso da Impostazioni → Autorizzazioni.',
+			'reports.title' => 'Report progressi',
+			'reports.day' => 'Giorno',
+			'reports.week' => 'Settimana',
+			'reports.month' => 'Mese',
+			'reports.training' => 'Allenamento',
+			'reports.nutrition' => 'Alimentazione',
+			'reports.measurements' => 'Misurazioni corporee',
+			'reports.preview' => 'Anteprima report',
+			'reports.save' => 'Salva PDF',
+			'reports.share' => 'Condividi',
+			'reports.reference' => 'Data di riferimento',
+			'reports.chooseSection' => 'Seleziona almeno una sezione.',
+			'reports.empty' => 'Nessuna registrazione nel periodo.',
+			'reports.missing' => 'Nessuna registrazione',
+			'reports.unavailable' => 'Non disponibile',
+			'reports.error' => 'Impossibile generare il report. Riprova.',
+			'reports.exportError' => 'Impossibile esportare il PDF. Riprova.',
+			'reports.retry' => 'Riprova',
+			'reports.saved' => 'PDF salvato',
+			'reports.generated' => 'Generato il',
+			'reports.daily' => 'Dettaglio giornaliero',
+			'reports.summary' => 'Riepilogo',
+			'reports.sessions' => 'Sessioni',
+			'reports.sets' => 'Serie completate',
+			'reports.reps' => 'Ripetizioni',
+			'reports.load' => 'Carico',
+			'reports.duration' => 'Durata',
+			'reports.distance' => 'Distanza',
+			'reports.volume' => 'Volume (carichi positivi × ripetizioni)',
+			'reports.exercise' => 'Esercizio',
+			'reports.status' => 'Stato',
+			'reports.done' => 'Completata',
+			'reports.pending' => 'Non completata',
+			'reports.superset' => 'Superserie',
+			'reports.continuation' => 'Continuazione',
+			'reports.food' => 'Alimento / pasto',
+			'reports.quantity' => 'Quantità',
+			'reports.calories' => 'Calorie',
+			'reports.protein' => 'Proteine',
+			'reports.carbs' => 'Carboidrati',
+			'reports.fat' => 'Grassi',
+			'reports.total' => 'Totale',
+			'reports.average' => 'Media per giorno registrato',
+			'reports.coverage' => 'Giorni con registrazioni',
+			'reports.first' => 'Prima',
+			'reports.last' => 'Ultima',
+			'reports.change' => 'Variazione',
+			'reports.value' => 'Valore',
+			'reports.date' => 'Data',
+			'reports.goal' => 'Obiettivo giornaliero salvato',
+			'reports.criteria' => 'Le medie alimentari usano solo i giorni con alimenti registrati, inclusi i valori zero. I totali descrivono gli alimenti registrati, non necessariamente giornate complete. Le registrazioni assenti non equivalgono a zero. I totali di allenamento comprendono solo le serie svolte; il volume include solo carichi positivi con ripetizioni. Le variazioni corporee usano la prima e l’ultima misura effettiva del periodo. Nessuna interpolazione o misura prevista. I grafici corporei mostrano l’ultima misura effettiva di ogni giorno.',
+			'reports.partial' => 'Periodo in corso: sono incluse solo le registrazioni disponibili alla generazione.',
+			'reports.units' => 'Unità',
+			'reports.activityChart' => 'Serie completate per giorno',
+			'reports.calorieChart' => 'Calorie registrate per giorno',
+			'reports.chartNote' => 'I punti indicano valori registrati. I giorni senza dati restano vuoti, senza interpolazione.',
+			'reports.privacy' => 'Report locale · Nessuna valutazione medica o nutrizionale',
+			'reports.selection' => 'Contenuto del report',
+			'reports.weight' => 'Peso',
+			'reports.configureDescription' => 'Crea un report dei tuoi progressi da salvare o condividere con il tuo professionista.',
+			'reports.period' => 'Periodo',
+			'reports.includedPeriod' => 'Periodo incluso nel report',
+			'reports.weekReferenceHint' => 'Scegli un giorno della settimana da includere.',
+			'reports.monthReferenceHint' => 'Scegli un giorno del mese da includere.',
+			'reports.selectionHint' => 'Scegli una o più sezioni da inserire nel PDF.',
+			'reports.previewTitle' => 'Anteprima PDF',
+			'plateau.title' => 'Possibili plateau',
+			'plateau.intro' => 'Ultime 8 settimane, considerando solo le serie normali completate. A seguire sono riportati suggerimenti basati sull\'analisi dei dati, che non vanno presi come certezza.',
+			'plateau.criteria' => 'Servono 6 sedute confrontabili in almeno 28 giorni e 4 settimane di calendario, di cui l’ultima entro 14 giorni, senza pause oltre i 21 giorni. Il riferimento è la mediana delle prime 3 sedute. Viene considerato progresso: +2,5% di carico senza perdere ripetizioni, +1 ripetizione a carico equivalente (±1%) oppure +5% di volume. A corpo libero: +1 ripetizione nella serie migliore o +5% di ripetizioni totali.',
+			'plateau.possiblePlateau' => 'Possibile plateau',
+			'plateau.progressing' => 'Nessun possibile plateau rilevato',
+			'plateau.insufficientData' => 'Servono più dati: registra almeno 6 sedute confrontabili distribuite su 4 settimane.',
+			'plateau.stale' => 'Mancano sedute confrontabili recenti: riprendi a registrare questo esercizio prima di valutarne i progressi.',
+			'plateau.unsupported' => 'Non valutato: assistenza, tempo e distanza non offrono metriche confrontabili di carico e ripetizioni.',
+			'plateau.incomparable' => 'Non valutato: identità, definizione dell’esercizio o più sedute nello stesso giorno impediscono un confronto affidabile.',
+			'plateau.empty' => 'Servono più dati. Registra serie completati per diverse settimane per valutare i progressi.',
+			'plateau.period' => 'Periodo',
+			'plateau.sessions' => 'Sedute',
+			'plateau.sets' => 'Serie normali per seduta',
+			'plateau.reference' => 'Riferimento: mediana delle prime 3 sedute',
+			'plateau.load' => 'Carico massimo',
+			'plateau.reps' => 'Ripetizioni al carico massimo',
+			'plateau.bestReps' => 'Ripetizioni massime per serie',
+			'plateau.totalReps' => 'Ripetizioni totali',
+			'plateau.volume' => 'Volume della seduta',
+			'plateau.data' => 'Sedute utilizzate',
+			'plateau.other' => 'Altri esercizi',
+			'plateau.volumeInfo' => 'Volume = somma di carico × ripetizioni delle serie selezionati. Il corpo libero viene valutato solo tramite le ripetizioni.',
+			'progression.title' => 'Progressione guidata',
+			'progression.configure' => 'Imposta progressione',
+			'progression.remove' => 'Rimuovi progressione',
+			'progression.lastTime' => 'Ultima volta',
+			'progression.noHistory' => 'Completa una sessione per vedere l\'ultima prestazione',
+			'progression.goal' => 'Obiettivo di oggi',
+			'progression.double' => 'Doppia progressione',
+			'progression.cyclic' => 'Progressione lineare ciclica',
+			'progression.minReps' => 'Ripetizioni minime',
+			'progression.maxReps' => 'Ripetizioni massime',
+			'progression.repsPerStep' => 'Ripetizioni per passo',
+			'progression.startingWeight' => 'Peso iniziale',
+			'progression.weightPerStep' => 'Aumento del peso per passo',
+			'progression.weightPerCycle' => 'Aumento del peso iniziale per ciclo',
+			'progression.preview' => 'Prossimi obiettivi',
+			'progression.save' => 'Salva',
+			'progression.invalid' => 'Controlla i valori e il numero di serie normali',
+			'progression.step' => ({required Object cycle, required Object step}) => 'Ciclo ${cycle}, passo ${step}',
+			'progression.advance' => 'Avanza manualmente',
 			_ => null,
 		};
 	}

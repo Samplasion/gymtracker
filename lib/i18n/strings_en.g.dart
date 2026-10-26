@@ -41,7 +41,6 @@ class Translations with BaseTranslations<AppLocale, Translations> {
 	Translations $copyWith({TranslationMetadata<AppLocale, Translations>? meta}) => Translations(meta: meta ?? this.$meta);
 
 	// Translations
-	late final Translations$progression$en progression = Translations$progression$en._(_root);
 
 	/// en: 'Gym Bro'
 	String get appName => 'Gym Bro';
@@ -192,72 +191,9 @@ class Translations with BaseTranslations<AppLocale, Translations> {
 	late final Translations$friendsList$en friendsList = Translations$friendsList$en._(_root);
 	late final Translations$social$en social = Translations$social$en._(_root);
 	late final Translations$hydration$en hydration = Translations$hydration$en._(_root);
-}
-
-// Path: progression
-class Translations$progression$en {
-	Translations$progression$en._(this._root);
-
-	final Translations _root; // ignore: unused_field
-
-	// Translations
-
-	/// en: 'Guided progression'
-	String get title => 'Guided progression';
-
-	/// en: 'Set progression'
-	String get configure => 'Set progression';
-
-	/// en: 'Remove progression'
-	String get remove => 'Remove progression';
-
-	/// en: 'Last time'
-	String get lastTime => 'Last time';
-
-	/// en: 'Complete a session to see your last performance'
-	String get noHistory => 'Complete a session to see your last performance';
-
-	/// en: 'Today's goal'
-	String get goal => 'Today\'s goal';
-
-	/// en: 'Double progression'
-	String get double => 'Double progression';
-
-	/// en: 'Cyclic linear progression'
-	String get cyclic => 'Cyclic linear progression';
-
-	/// en: 'Minimum reps'
-	String get minReps => 'Minimum reps';
-
-	/// en: 'Maximum reps'
-	String get maxReps => 'Maximum reps';
-
-	/// en: 'Reps per step'
-	String get repsPerStep => 'Reps per step';
-
-	/// en: 'Starting weight'
-	String get startingWeight => 'Starting weight';
-
-	/// en: 'Weight increase per step'
-	String get weightPerStep => 'Weight increase per step';
-
-	/// en: 'Starting weight increase per cycle'
-	String get weightPerCycle => 'Starting weight increase per cycle';
-
-	/// en: 'Next goals'
-	String get preview => 'Next goals';
-
-	/// en: 'Save'
-	String get save => 'Save';
-
-	/// en: 'Check the values and the number of working sets'
-	String get invalid => 'Check the values and the number of working sets';
-
-	/// en: 'Cycle $cycle, step $step'
-	String step({required Object cycle, required Object step}) => 'Cycle ${cycle}, step ${step}';
-
-	/// en: 'Advance manually'
-	String get advance => 'Advance manually';
+	late final Translations$reports$en reports = Translations$reports$en._(_root);
+	late final Translations$plateau$en plateau = Translations$plateau$en._(_root);
+	late final Translations$progression$en progression = Translations$progression$en._(_root);
 }
 
 // Path: appInfo
@@ -2390,6 +2326,354 @@ class Translations$hydration$en {
 
 	/// en: 'Water is saved in your diary. To also add it to Health, allow access in Settings → Permissions.'
 	String get permissionDenied => 'Water is saved in your diary. To also add it to Health, allow access in Settings → Permissions.';
+}
+
+// Path: reports
+class Translations$reports$en {
+	Translations$reports$en._(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Progress reports'
+	String get title => 'Progress reports';
+
+	/// en: 'Day'
+	String get day => 'Day';
+
+	/// en: 'Week'
+	String get week => 'Week';
+
+	/// en: 'Month'
+	String get month => 'Month';
+
+	/// en: 'Training'
+	String get training => 'Training';
+
+	/// en: 'Nutrition'
+	String get nutrition => 'Nutrition';
+
+	/// en: 'Body measurements'
+	String get measurements => 'Body measurements';
+
+	/// en: 'Preview report'
+	String get preview => 'Preview report';
+
+	/// en: 'Save PDF'
+	String get save => 'Save PDF';
+
+	/// en: 'Share'
+	String get share => 'Share';
+
+	/// en: 'Reference date'
+	String get reference => 'Reference date';
+
+	/// en: 'Select at least one section.'
+	String get chooseSection => 'Select at least one section.';
+
+	/// en: 'No records in this period.'
+	String get empty => 'No records in this period.';
+
+	/// en: 'No records'
+	String get missing => 'No records';
+
+	/// en: 'Not available'
+	String get unavailable => 'Not available';
+
+	/// en: 'Unable to generate the report. Please retry.'
+	String get error => 'Unable to generate the report. Please retry.';
+
+	/// en: 'Unable to export the PDF. Please retry.'
+	String get exportError => 'Unable to export the PDF. Please retry.';
+
+	/// en: 'Retry'
+	String get retry => 'Retry';
+
+	/// en: 'PDF saved'
+	String get saved => 'PDF saved';
+
+	/// en: 'Generated'
+	String get generated => 'Generated';
+
+	/// en: 'Daily detail'
+	String get daily => 'Daily detail';
+
+	/// en: 'Summary'
+	String get summary => 'Summary';
+
+	/// en: 'Sessions'
+	String get sessions => 'Sessions';
+
+	/// en: 'Completed sets'
+	String get sets => 'Completed sets';
+
+	/// en: 'Repetitions'
+	String get reps => 'Repetitions';
+
+	/// en: 'Load'
+	String get load => 'Load';
+
+	/// en: 'Duration'
+	String get duration => 'Duration';
+
+	/// en: 'Distance'
+	String get distance => 'Distance';
+
+	/// en: 'Volume (positive loads × repetitions)'
+	String get volume => 'Volume (positive loads × repetitions)';
+
+	/// en: 'Exercise'
+	String get exercise => 'Exercise';
+
+	/// en: 'Status'
+	String get status => 'Status';
+
+	/// en: 'Completed'
+	String get done => 'Completed';
+
+	/// en: 'Not completed'
+	String get pending => 'Not completed';
+
+	/// en: 'Superset'
+	String get superset => 'Superset';
+
+	/// en: 'Continuation'
+	String get continuation => 'Continuation';
+
+	/// en: 'Food / meal'
+	String get food => 'Food / meal';
+
+	/// en: 'Quantity'
+	String get quantity => 'Quantity';
+
+	/// en: 'Calories'
+	String get calories => 'Calories';
+
+	/// en: 'Protein'
+	String get protein => 'Protein';
+
+	/// en: 'Carbohydrates'
+	String get carbs => 'Carbohydrates';
+
+	/// en: 'Fat'
+	String get fat => 'Fat';
+
+	/// en: 'Total'
+	String get total => 'Total';
+
+	/// en: 'Average per recorded day'
+	String get average => 'Average per recorded day';
+
+	/// en: 'Recorded days'
+	String get coverage => 'Recorded days';
+
+	/// en: 'First'
+	String get first => 'First';
+
+	/// en: 'Last'
+	String get last => 'Last';
+
+	/// en: 'Change'
+	String get change => 'Change';
+
+	/// en: 'Value'
+	String get value => 'Value';
+
+	/// en: 'Date'
+	String get date => 'Date';
+
+	/// en: 'Saved daily goal'
+	String get goal => 'Saved daily goal';
+
+	/// en: 'Nutrition averages use days with food records only; zero values are included. Totals describe logged food, not necessarily complete days. Missing records are not zero. Workout totals include completed sets only; volume includes positive repetition loads only. Measurement changes use the first and last actual observations in this period. No interpolation or predicted measurements. Body charts show the last actual measurement of each day.'
+	String get criteria => 'Nutrition averages use days with food records only; zero values are included. Totals describe logged food, not necessarily complete days. Missing records are not zero. Workout totals include completed sets only; volume includes positive repetition loads only. Measurement changes use the first and last actual observations in this period. No interpolation or predicted measurements. Body charts show the last actual measurement of each day.';
+
+	/// en: 'Period in progress: only records available at generation are included.'
+	String get partial => 'Period in progress: only records available at generation are included.';
+
+	/// en: 'Units'
+	String get units => 'Units';
+
+	/// en: 'Completed sets by day'
+	String get activityChart => 'Completed sets by day';
+
+	/// en: 'Logged calories by day'
+	String get calorieChart => 'Logged calories by day';
+
+	/// en: 'Dots show recorded values. Missing days are left blank; no interpolation.'
+	String get chartNote => 'Dots show recorded values. Missing days are left blank; no interpolation.';
+
+	/// en: 'Local report · No medical or nutritional assessment'
+	String get privacy => 'Local report · No medical or nutritional assessment';
+
+	/// en: 'Report contents'
+	String get selection => 'Report contents';
+
+	/// en: 'Weight'
+	String get weight => 'Weight';
+
+	/// en: 'Create a progress report to save or share with your trainer or nutritionist.'
+	String get configureDescription => 'Create a progress report to save or share with your trainer or nutritionist.';
+
+	/// en: 'Period'
+	String get period => 'Period';
+
+	/// en: 'Period included in the report'
+	String get includedPeriod => 'Period included in the report';
+
+	/// en: 'Choose any day in the week to include.'
+	String get weekReferenceHint => 'Choose any day in the week to include.';
+
+	/// en: 'Choose any day in the month to include.'
+	String get monthReferenceHint => 'Choose any day in the month to include.';
+
+	/// en: 'Choose one or more sections to include in the PDF.'
+	String get selectionHint => 'Choose one or more sections to include in the PDF.';
+
+	/// en: 'PDF preview'
+	String get previewTitle => 'PDF preview';
+}
+
+// Path: plateau
+class Translations$plateau$en {
+	Translations$plateau$en._(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Possible plateaus'
+	String get title => 'Possible plateaus';
+
+	/// en: 'Last 8 weeks, only considering completed normal sets. The following are suggestions based on your data, but they may not be accurate.'
+	String get intro => 'Last 8 weeks, only considering completed normal sets. The following are suggestions based on your data, but they may not be accurate.';
+
+	/// en: 'Requires 6 comparable sessions over at least 28 days and 4 calendar weeks, the latest within 14 days, with no gaps over 21 days. The first 3 sessions provide the median reference. Progress means +2.5% load without fewer reps, +1 rep at equivalent load (±1%), or +5% volume. For bodyweight: +1 best-set rep or +5% total reps.'
+	String get criteria => 'Requires 6 comparable sessions over at least 28 days and 4 calendar weeks, the latest within 14 days, with no gaps over 21 days. The first 3 sessions provide the median reference. Progress means +2.5% load without fewer reps, +1 rep at equivalent load (±1%), or +5% volume. For bodyweight: +1 best-set rep or +5% total reps.';
+
+	/// en: 'Possible plateau'
+	String get possiblePlateau => 'Possible plateau';
+
+	/// en: 'No possible plateau detected'
+	String get progressing => 'No possible plateau detected';
+
+	/// en: 'More data needed: record at least 6 comparable sessions over 4 weeks.'
+	String get insufficientData => 'More data needed: record at least 6 comparable sessions over 4 weeks.';
+
+	/// en: 'No recent comparable sessions: resume recording this exercise before assessing progress.'
+	String get stale => 'No recent comparable sessions: resume recording this exercise before assessing progress.';
+
+	/// en: 'Not assessed: assistance, time and distance do not provide comparable load and repetition metrics.'
+	String get unsupported => 'Not assessed: assistance, time and distance do not provide comparable load and repetition metrics.';
+
+	/// en: 'Not assessed: exercise identity, definition or multiple sessions on the same day prevent a reliable comparison.'
+	String get incomparable => 'Not assessed: exercise identity, definition or multiple sessions on the same day prevent a reliable comparison.';
+
+	/// en: 'More data needed. Record completed sets across several weeks to assess your progress.'
+	String get empty => 'More data needed. Record completed sets across several weeks to assess your progress.';
+
+	/// en: 'Period'
+	String get period => 'Period';
+
+	/// en: 'Sessions'
+	String get sessions => 'Sessions';
+
+	/// en: 'Normal sets per session'
+	String get sets => 'Normal sets per session';
+
+	/// en: 'Reference: median of first 3 sessions'
+	String get reference => 'Reference: median of first 3 sessions';
+
+	/// en: 'Maximum load'
+	String get load => 'Maximum load';
+
+	/// en: 'Reps at maximum load'
+	String get reps => 'Reps at maximum load';
+
+	/// en: 'Maximum reps per set'
+	String get bestReps => 'Maximum reps per set';
+
+	/// en: 'Total reps'
+	String get totalReps => 'Total reps';
+
+	/// en: 'Session volume'
+	String get volume => 'Session volume';
+
+	/// en: 'Sessions used'
+	String get data => 'Sessions used';
+
+	/// en: 'Other exercises'
+	String get other => 'Other exercises';
+
+	/// en: 'Volume = sum of load × reps for the selected sets. Bodyweight is assessed using repetitions only.'
+	String get volumeInfo => 'Volume = sum of load × reps for the selected sets. Bodyweight is assessed using repetitions only.';
+}
+
+// Path: progression
+class Translations$progression$en {
+	Translations$progression$en._(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Guided progression'
+	String get title => 'Guided progression';
+
+	/// en: 'Set progression'
+	String get configure => 'Set progression';
+
+	/// en: 'Remove progression'
+	String get remove => 'Remove progression';
+
+	/// en: 'Last time'
+	String get lastTime => 'Last time';
+
+	/// en: 'Complete a session to see your last performance'
+	String get noHistory => 'Complete a session to see your last performance';
+
+	/// en: 'Today's goal'
+	String get goal => 'Today\'s goal';
+
+	/// en: 'Double progression'
+	String get double => 'Double progression';
+
+	/// en: 'Cyclic linear progression'
+	String get cyclic => 'Cyclic linear progression';
+
+	/// en: 'Minimum reps'
+	String get minReps => 'Minimum reps';
+
+	/// en: 'Maximum reps'
+	String get maxReps => 'Maximum reps';
+
+	/// en: 'Reps per step'
+	String get repsPerStep => 'Reps per step';
+
+	/// en: 'Starting weight'
+	String get startingWeight => 'Starting weight';
+
+	/// en: 'Weight increase per step'
+	String get weightPerStep => 'Weight increase per step';
+
+	/// en: 'Starting weight increase per cycle'
+	String get weightPerCycle => 'Starting weight increase per cycle';
+
+	/// en: 'Next goals'
+	String get preview => 'Next goals';
+
+	/// en: 'Save'
+	String get save => 'Save';
+
+	/// en: 'Check the values and the number of working sets'
+	String get invalid => 'Check the values and the number of working sets';
+
+	/// en: 'Cycle $cycle, step $step'
+	String step({required Object cycle, required Object step}) => 'Cycle ${cycle}, step ${step}';
+
+	/// en: 'Advance manually'
+	String get advance => 'Advance manually';
 }
 
 // Path: set.kindShort
@@ -9327,25 +9611,6 @@ class Translations$food$categoryEditor$fields$name$errors$en {
 extension on Translations {
 	dynamic _flatMapFunction(String path) {
 		return switch (path) {
-			'progression.title' => 'Guided progression',
-			'progression.configure' => 'Set progression',
-			'progression.remove' => 'Remove progression',
-			'progression.lastTime' => 'Last time',
-			'progression.noHistory' => 'Complete a session to see your last performance',
-			'progression.goal' => 'Today\'s goal',
-			'progression.double' => 'Double progression',
-			'progression.cyclic' => 'Cyclic linear progression',
-			'progression.minReps' => 'Minimum reps',
-			'progression.maxReps' => 'Maximum reps',
-			'progression.repsPerStep' => 'Reps per step',
-			'progression.startingWeight' => 'Starting weight',
-			'progression.weightPerStep' => 'Weight increase per step',
-			'progression.weightPerCycle' => 'Starting weight increase per cycle',
-			'progression.preview' => 'Next goals',
-			'progression.save' => 'Save',
-			'progression.invalid' => 'Check the values and the number of working sets',
-			'progression.step' => ({required Object cycle, required Object step}) => 'Cycle ${cycle}, step ${step}',
-			'progression.advance' => 'Advance manually',
 			'appName' => 'Gym Bro',
 			'appInfo.version' => ({required Object version, required Object build}) => 'Version ${version} (build ${build})',
 			'appInfo.shortDescription' => 'Workout Buddy',
@@ -9839,8 +10104,6 @@ extension on Translations {
 			'library.biceps.exercises.singleArmCableHammerCurls' => 'Hammer curls (cable, single arm)',
 			'library.biceps.exercises.cableBicepsCurl' => 'Biceps curl (cable)',
 			'library.biceps.exercises.dumbbellBicepsCurl' => 'Biceps curl (dumbbell)',
-			_ => null,
-		} ?? switch (path) {
 			'library.biceps.exercises.bicepsCurlMachine' => 'Biceps curl (machine)',
 			'library.biceps.exercises.hammerCurlDumbbell' => 'Hammer curls (dumbbells)',
 			'library.biceps.exercises.concentrationCurl' => 'Concentration curls',
@@ -9860,6 +10123,8 @@ extension on Translations {
 			'library.abs.exercises.crunchMachine' => 'Crunch (machine)',
 			'library.abs.exercises.heelsUpCrunch' => 'Heels-up crunches',
 			'library.abs.exercises.fullBodyCrunch' => 'Double crunch',
+			_ => null,
+		} ?? switch (path) {
 			'library.abs.exercises.plank' => 'Plank',
 			'library.abs.exercises.hollowBodyHold' => 'Hollow body hold',
 			'library.abs.exercises.bicycleCrunches' => 'Bicycle crunches',
@@ -10353,8 +10618,6 @@ extension on Translations {
 			'food.languages.el' => 'Modern Greek',
 			'food.languages.en' => 'English',
 			'food.languages.eo' => 'Esperanto',
-			_ => null,
-		} ?? switch (path) {
 			'food.languages.es' => 'Spanish',
 			'food.languages.et' => 'Estonian',
 			'food.languages.eu' => 'Basque',
@@ -10374,6 +10637,8 @@ extension on Translations {
 			'food.languages.ha' => 'Hausa',
 			'food.languages.he' => 'Hebrew',
 			'food.languages.hi' => 'Hindi',
+			_ => null,
+		} ?? switch (path) {
 			'food.languages.ho' => 'Hiri Motu',
 			'food.languages.hr' => 'Croatian',
 			'food.languages.ht' => 'Haitian Creole',
@@ -10867,8 +11132,6 @@ extension on Translations {
 			'achievements.cycleChampion.description.k1.km' => 'Cycle a total of 100km',
 			'achievements.cycleChampion.description.k1.mi' => ({required Object p0}) => 'Cycle a total of 100km (${p0})',
 			'achievements.cycleChampion.description.k2.km' => 'Cycle a total of 500km',
-			_ => null,
-		} ?? switch (path) {
 			'achievements.cycleChampion.description.k2.mi' => ({required Object p0}) => 'Cycle a total of 500km (${p0})',
 			'achievements.cycleChampion.description.k3.km' => 'Cycle a total of 1000km',
 			'achievements.cycleChampion.description.k3.mi' => ({required Object p0}) => 'Cycle a total of 1000km (${p0})',
@@ -10888,6 +11151,8 @@ extension on Translations {
 			'achievements.intensityInnovator.description' => 'Update a routine by increasing your weight/reps',
 			'achievements.completionist.title' => 'Completionist',
 			'achievements.completionist.description' => 'Try all library exercises at least once',
+			_ => null,
+		} ?? switch (path) {
 			'achievements.notDrunk.title' => 'I\'m not drunk, I swear!',
 			'achievements.notDrunk.description' => 'Work out on a Sunday morning breaking a personal best in lifted weight or distance',
 			'achievements.steamedHams.description' => 'Set a new one-rep max personal record in a faster-than-usual workout',
@@ -11158,6 +11423,113 @@ extension on Translations {
 			'hydration.waterPer100' => 'Water (ml per 100 g/ml)',
 			'hydration.history' => 'Water history',
 			'hydration.permissionDenied' => 'Water is saved in your diary. To also add it to Health, allow access in Settings → Permissions.',
+			'reports.title' => 'Progress reports',
+			'reports.day' => 'Day',
+			'reports.week' => 'Week',
+			'reports.month' => 'Month',
+			'reports.training' => 'Training',
+			'reports.nutrition' => 'Nutrition',
+			'reports.measurements' => 'Body measurements',
+			'reports.preview' => 'Preview report',
+			'reports.save' => 'Save PDF',
+			'reports.share' => 'Share',
+			'reports.reference' => 'Reference date',
+			'reports.chooseSection' => 'Select at least one section.',
+			'reports.empty' => 'No records in this period.',
+			'reports.missing' => 'No records',
+			'reports.unavailable' => 'Not available',
+			'reports.error' => 'Unable to generate the report. Please retry.',
+			'reports.exportError' => 'Unable to export the PDF. Please retry.',
+			'reports.retry' => 'Retry',
+			'reports.saved' => 'PDF saved',
+			'reports.generated' => 'Generated',
+			'reports.daily' => 'Daily detail',
+			'reports.summary' => 'Summary',
+			'reports.sessions' => 'Sessions',
+			'reports.sets' => 'Completed sets',
+			'reports.reps' => 'Repetitions',
+			'reports.load' => 'Load',
+			'reports.duration' => 'Duration',
+			'reports.distance' => 'Distance',
+			'reports.volume' => 'Volume (positive loads × repetitions)',
+			'reports.exercise' => 'Exercise',
+			'reports.status' => 'Status',
+			'reports.done' => 'Completed',
+			'reports.pending' => 'Not completed',
+			'reports.superset' => 'Superset',
+			'reports.continuation' => 'Continuation',
+			'reports.food' => 'Food / meal',
+			'reports.quantity' => 'Quantity',
+			'reports.calories' => 'Calories',
+			'reports.protein' => 'Protein',
+			'reports.carbs' => 'Carbohydrates',
+			'reports.fat' => 'Fat',
+			'reports.total' => 'Total',
+			'reports.average' => 'Average per recorded day',
+			'reports.coverage' => 'Recorded days',
+			'reports.first' => 'First',
+			'reports.last' => 'Last',
+			'reports.change' => 'Change',
+			'reports.value' => 'Value',
+			'reports.date' => 'Date',
+			'reports.goal' => 'Saved daily goal',
+			'reports.criteria' => 'Nutrition averages use days with food records only; zero values are included. Totals describe logged food, not necessarily complete days. Missing records are not zero. Workout totals include completed sets only; volume includes positive repetition loads only. Measurement changes use the first and last actual observations in this period. No interpolation or predicted measurements. Body charts show the last actual measurement of each day.',
+			'reports.partial' => 'Period in progress: only records available at generation are included.',
+			'reports.units' => 'Units',
+			'reports.activityChart' => 'Completed sets by day',
+			'reports.calorieChart' => 'Logged calories by day',
+			'reports.chartNote' => 'Dots show recorded values. Missing days are left blank; no interpolation.',
+			'reports.privacy' => 'Local report · No medical or nutritional assessment',
+			'reports.selection' => 'Report contents',
+			'reports.weight' => 'Weight',
+			'reports.configureDescription' => 'Create a progress report to save or share with your trainer or nutritionist.',
+			'reports.period' => 'Period',
+			'reports.includedPeriod' => 'Period included in the report',
+			'reports.weekReferenceHint' => 'Choose any day in the week to include.',
+			'reports.monthReferenceHint' => 'Choose any day in the month to include.',
+			'reports.selectionHint' => 'Choose one or more sections to include in the PDF.',
+			'reports.previewTitle' => 'PDF preview',
+			'plateau.title' => 'Possible plateaus',
+			'plateau.intro' => 'Last 8 weeks, only considering completed normal sets. The following are suggestions based on your data, but they may not be accurate.',
+			'plateau.criteria' => 'Requires 6 comparable sessions over at least 28 days and 4 calendar weeks, the latest within 14 days, with no gaps over 21 days. The first 3 sessions provide the median reference. Progress means +2.5% load without fewer reps, +1 rep at equivalent load (±1%), or +5% volume. For bodyweight: +1 best-set rep or +5% total reps.',
+			'plateau.possiblePlateau' => 'Possible plateau',
+			'plateau.progressing' => 'No possible plateau detected',
+			'plateau.insufficientData' => 'More data needed: record at least 6 comparable sessions over 4 weeks.',
+			'plateau.stale' => 'No recent comparable sessions: resume recording this exercise before assessing progress.',
+			'plateau.unsupported' => 'Not assessed: assistance, time and distance do not provide comparable load and repetition metrics.',
+			'plateau.incomparable' => 'Not assessed: exercise identity, definition or multiple sessions on the same day prevent a reliable comparison.',
+			'plateau.empty' => 'More data needed. Record completed sets across several weeks to assess your progress.',
+			'plateau.period' => 'Period',
+			'plateau.sessions' => 'Sessions',
+			'plateau.sets' => 'Normal sets per session',
+			'plateau.reference' => 'Reference: median of first 3 sessions',
+			'plateau.load' => 'Maximum load',
+			'plateau.reps' => 'Reps at maximum load',
+			'plateau.bestReps' => 'Maximum reps per set',
+			'plateau.totalReps' => 'Total reps',
+			'plateau.volume' => 'Session volume',
+			'plateau.data' => 'Sessions used',
+			'plateau.other' => 'Other exercises',
+			'plateau.volumeInfo' => 'Volume = sum of load × reps for the selected sets. Bodyweight is assessed using repetitions only.',
+			'progression.title' => 'Guided progression',
+			'progression.configure' => 'Set progression',
+			'progression.remove' => 'Remove progression',
+			'progression.lastTime' => 'Last time',
+			'progression.noHistory' => 'Complete a session to see your last performance',
+			'progression.goal' => 'Today\'s goal',
+			'progression.double' => 'Double progression',
+			'progression.cyclic' => 'Cyclic linear progression',
+			'progression.minReps' => 'Minimum reps',
+			'progression.maxReps' => 'Maximum reps',
+			'progression.repsPerStep' => 'Reps per step',
+			'progression.startingWeight' => 'Starting weight',
+			'progression.weightPerStep' => 'Weight increase per step',
+			'progression.weightPerCycle' => 'Starting weight increase per cycle',
+			'progression.preview' => 'Next goals',
+			'progression.save' => 'Save',
+			'progression.invalid' => 'Check the values and the number of working sets',
+			'progression.step' => ({required Object cycle, required Object step}) => 'Cycle ${cycle}, step ${step}',
+			'progression.advance' => 'Advance manually',
 			_ => null,
 		};
 	}

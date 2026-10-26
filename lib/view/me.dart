@@ -23,10 +23,10 @@ import 'package:gymtracker/utils/utils.dart';
 import 'package:gymtracker/view/achievements.dart';
 import 'package:gymtracker/view/charts/density_calendar_chart.dart';
 import 'package:gymtracker/view/charts/weight_chart.dart';
-import 'package:gymtracker/view/food.dart';
 import 'package:gymtracker/view/history.dart';
 import 'package:gymtracker/view/me/calendar.dart';
 import 'package:gymtracker/view/me/statistics.dart';
+import 'package:gymtracker/view/progress_reports.dart';
 import 'package:gymtracker/view/skeleton.dart';
 import 'package:gymtracker/view/utils/crossfade.dart';
 import 'package:gymtracker/view/utils/date_field.dart';
@@ -46,6 +46,7 @@ class MeView extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     ref.watch(historyWorkoutsProvider);
+    final workoutsByDay = ref.watch(workoutsByDayProvider);
     final hasMeasurements =
         ref.watch(weightMeasurementsProvider).value?.isNotEmpty ?? false;
     return Scaffold(
@@ -97,13 +98,13 @@ class MeView extends ConsumerWidget {
                           },
                         ),
                         SpeedDialButton(
-                          icon: const Icon(GTIcons.food),
+                          icon: const Icon(Icons.picture_as_pdf),
                           text: Text(
-                            context.t.food.title,
+                            context.t.reports.title,
                             style: Theme.of(context).textTheme.bodySmall,
                           ),
                           onTap: () {
-                            Go.to(() => const FoodView());
+                            Go.to(() => const ProgressReportsView());
                           },
                         ),
                         SpeedDialButton(
@@ -138,8 +139,7 @@ class MeView extends ConsumerWidget {
                     );
                     final values = [
                       for (int i = 0; i < allDays; i++)
-                        historyController
-                                .workoutsByDay[now
+                        workoutsByDay[now
                                     .subtract(Duration(days: i))
                                     .startOfDay]
                                 ?.length ??

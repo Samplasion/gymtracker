@@ -1,6 +1,5 @@
 import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gymtracker/gen/exercises.gen.dart';
 import 'package:gymtracker/model/model.dart';
 import 'package:gymtracker/service/database.dart';
@@ -123,5 +122,11 @@ Map<MajorLiftType, Map<DateTime, double>> _processMajorThreeData(
       }
     }
   }
-  return result;
+  // History arrives newest first. Charts connect points and select the latest
+  // value in list order, so expose weekly points in chronological order.
+  return result.map((lift, weeks) {
+    final entries = weeks.entries.toList()
+      ..sort((a, b) => a.key.compareTo(b.key));
+    return MapEntry(lift, Map.fromEntries(entries));
+  });
 }

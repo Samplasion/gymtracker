@@ -31,6 +31,7 @@ import 'package:gymtracker/view/components/error_view.dart';
 import 'package:gymtracker/view/components/loading_indicator.dart';
 import 'package:gymtracker/view/components/muscles.dart';
 import 'package:gymtracker/view/components/tweened_builder.dart';
+import 'package:gymtracker/view/me/plateau.dart';
 import 'package:gymtracker/view/utils/input_decoration.dart';
 import 'package:gymtracker/view/utils/speed_dial.dart';
 import 'package:gymtracker/view/utils/timer.dart';
@@ -60,7 +61,7 @@ class MeStatisticsPage extends ConsumerStatefulWidget {
 class _MeStatisticsPageState extends ConsumerState<MeStatisticsPage>
     with SingleTickerProviderStateMixin {
   HistoryController get controller => ref.read(historyControllerProvider);
-  late final _controller = TabController(length: 4, vsync: this);
+  late final _controller = TabController(length: 5, vsync: this);
 
   TimeFrame timeFrame = TimeFrame.thirtyDays;
 
@@ -152,6 +153,10 @@ class _MeStatisticsPageState extends ConsumerState<MeStatisticsPage>
                 size: Theme.of(context).iconTheme.size ?? 24,
               ),
               text: context.t.me.stats.mainThree.label,
+            ),
+            Tab(
+              icon: const Icon(Icons.trending_flat),
+              text: context.t.plateau.title,
             ),
           ],
         ),
@@ -313,6 +318,7 @@ class _MeStatisticsPageState extends ConsumerState<MeStatisticsPage>
             ],
           ),
           _BigThreeStatsTab(),
+          const PlateauStatisticsTab(),
         ],
       ),
     );

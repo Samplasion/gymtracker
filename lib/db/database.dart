@@ -73,6 +73,9 @@ abstract class GTDatabase extends GeneratedDatabase with SyncableDatabase {
   /// When set, all syncable-table queries filter by this user ID.
   String? get currentUserId;
 
+  /// Emits every account transition, including guest sessions.
+  Stream<String?> watchCurrentUserId();
+
   /// Sets the current user ID and refreshes all active syncable-table streams.
   void setCurrentUserId(String? id);
 
@@ -621,6 +624,9 @@ class GTDatabaseImpl extends _$GTDatabaseImpl
 
   @override
   String? get currentUserId => _currentUserId;
+
+  @override
+  Stream<String?> watchCurrentUserId() => _userIdChanges.distinct();
 
   @override
   void setCurrentUserId(String? id) {

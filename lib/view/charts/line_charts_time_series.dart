@@ -1019,23 +1019,10 @@ class __LineChartTimeSeriesConcurrentConsumerState<T>
     _leftReservedSize = sizes.max;
   }
 
-  DateTime get startingDate {
-    final earliestLastDate = widget.categories.keys
-        .map((c) {
-          final lastData = widget.data[c]?.lastOrNull?.date;
-          final lastPred = widget.predictions?[c]?.lastOrNull?.date;
-          if (lastData == null && lastPred == null) return DateTime.now();
-          if (lastData == null) return lastPred!;
-          if (lastPred == null) return lastData;
-          return utils.maxDate(lastData, lastPred);
-        })
-        .fold(DateTime.now(), (a, b) => a.isBefore(b) ? a : b);
-
-    return utils.maxDate(
-      absoluteMinimum,
-      earliestLastDate.startOfDay.subtract(type.duration),
-    );
-  }
+  // Anchor both ends to the latest point across all series, independently of
+  // their ordering and of when each individual lift was last performed.
+  DateTime get startingDate =>
+      utils.maxDate(absoluteMinimum, absoluteMaximum.subtract(type.duration));
 
   DateTime get currentMinDate => startingDate.add(offset);
   DateTime get currentMaxDate => absoluteMaximum.add(offset);

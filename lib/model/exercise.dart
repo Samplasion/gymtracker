@@ -280,7 +280,7 @@ class Exercise extends WorkoutExercisable {
 
   /// The equipment needed for this exercise.
   GTGymEquipment get gymEquipment {
-    if (standard && !isAbstract) {
+    if (standard && parentID != null) {
       // ignore: deprecated_member_use_from_same_package
       return getStandardExerciseByID(parentID!)?.equipment ?? equipment;
     }
@@ -297,8 +297,7 @@ class Exercise extends WorkoutExercisable {
   bool get isOrphan => parentID == null;
   bool get isAbstract => workoutID == null;
   bool get isStandardLibraryExercise {
-    final query = isAbstract ? id : parentID;
-    return getStandardExerciseByID(query!) != null;
+    return getStandardExerciseByID(parentID ?? id) != null;
   }
 
   List<GTSet> get doneSets => [
@@ -345,10 +344,7 @@ class Exercise extends WorkoutExercisable {
   GTExerciseMuscleCategory? get category {
     if (isCustom) return GTExerciseMuscleCategory.custom;
     if (standard && _category == null) {
-      final query = isAbstract ? id : parentID;
-      if (query != null) {
-        return getStandardExerciseByID(query)?.category;
-      }
+      return getStandardExerciseByID(parentID ?? id)?.category;
     }
 
     return _category;
@@ -627,12 +623,17 @@ extension Display on Exercise {
     if (skeleton) return name;
     if (isCustom) return name;
 
-    final candidate = isAbstract
-        ? id
-        : (getStandardExerciseByID(parentID!)?.name ?? parentID!);
+    final candidate = parentID ?? id;
 
     if (t[candidate] != null) return t[candidate];
-    if (!isOrphan && t[parentID!] != null) return t[parentID!];
+    final original = getStandardExerciseByID(candidate);
+    if (original != null) {
+      // IDs stay stable when an exercise moves to another muscle category.
+      final currentKey =
+          'library.${original.category!.name}.exercises.${candidate.split('.').last}';
+      if (t[currentKey] != null) return t[currentKey];
+      return original.name;
+    }
     name.logger.e(
       "No translation found for exercise $candidate which ${isAbstract ? "is" : "is not"} abstract",
     );

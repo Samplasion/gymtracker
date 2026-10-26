@@ -8,6 +8,31 @@ import 'package:gymtracker/model/exercise.dart';
 import 'package:gymtracker/model/set.dart';
 
 void main() {
+  test('saved library children resolve metadata without a routine ID', () {
+    for (final original in exerciseStandardLibraryAsList) {
+      for (final workoutID in <String?>[null, 'routine-id']) {
+        final saved = Exercise.fromJson(
+          original
+              .makeChild()
+              .copyWith(name: original.id, workoutID: workoutID)
+              .toJson()
+            ..['equipment'] = 'none',
+        );
+        expect(saved.isStandardLibraryExercise, isTrue, reason: original.id);
+        expect(saved.category, original.category, reason: original.id);
+        expect(saved.gymEquipment, original.gymEquipment, reason: original.id);
+        for (final locale in AppLocale.values) {
+          final translations = locale.buildSync();
+          expect(
+            saved.getDisplayName(translations),
+            original.getDisplayName(translations),
+            reason: '${original.id}: ${locale.name}',
+          );
+        }
+      }
+    }
+  });
+
   test(
     'renaming preserves all existing IDs except the authorized reverse curl',
     () {

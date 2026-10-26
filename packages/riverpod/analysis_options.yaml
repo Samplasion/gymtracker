@@ -1,0 +1,5 @@
+# Keep upstream runtime sources verbatim; application code and regression tests
+# are analyzed by the root project's rules.
+analyzer:
+  exclude:
+    - lib/**

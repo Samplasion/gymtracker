@@ -95,7 +95,16 @@ dependencies:
   slang_flutter: ^4.19.0
   firebase_core: ^5.0.0
   firebase_messaging: ^17.0.0
+  pdf: ^3.13.1
+  printing: ^5.15.1
+  m3e_core: ^0.1.6
   
+# Backport the upstream provider-flush lifecycle fix without migrating the
+# analyzer-constrained code generators. See packages/riverpod/PATCH.md.
+dependency_overrides:
+  riverpod:
+    path: packages/riverpod
+
 dev_dependencies:
   sentry_dart_plugin: ^3.4.0
   flutter_test:
@@ -140,6 +149,7 @@ flutter:
 
   uses-material-design: true
   assets:
+    - assets/fonts/
     - assets/anim/
     - assets/audio/
     - assets/svg/

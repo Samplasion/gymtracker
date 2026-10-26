@@ -77,6 +77,22 @@ class $AssetsExercisesGen {
   $AssetsExercisesTricepsGen get triceps => const $AssetsExercisesTricepsGen();
 }
 
+class $AssetsFontsGen {
+  const $AssetsFontsGen();
+
+  /// File path: assets/fonts/NotoSans-Bold.ttf
+  String get notoSansBold => 'assets/fonts/NotoSans-Bold.ttf';
+
+  /// File path: assets/fonts/NotoSans-Regular.ttf
+  String get notoSansRegular => 'assets/fonts/NotoSans-Regular.ttf';
+
+  /// File path: assets/fonts/OFL.txt
+  String get ofl => 'assets/fonts/OFL.txt';
+
+  /// List of all assets
+  List<String> get values => [notoSansBold, notoSansRegular, ofl];
+}
+
 class $AssetsLegalGen {
   const $AssetsLegalGen();
 
@@ -1128,6 +1144,7 @@ abstract final class GTAssets {
   static const $AssetsAnimGen anim = $AssetsAnimGen();
   static const $AssetsAudioGen audio = $AssetsAudioGen();
   static const $AssetsExercisesGen exercises = $AssetsExercisesGen();
+  static const $AssetsFontsGen fonts = $AssetsFontsGen();
   static const $AssetsLegalGen legal = $AssetsLegalGen();
   static const $AssetsSvgGen svg = $AssetsSvgGen();
 }

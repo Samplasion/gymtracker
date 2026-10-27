@@ -120,8 +120,12 @@ class FoodCategoryListTile extends ConsumerWidget {
       ),
       trailing: canUpdate ? const Icon(GTIcons.lt_chevron) : null,
       onTap: canUpdate
-          ? () {
-              editCategory(context, ref, category);
+          ? () async {
+              final updated = await editCategory(context, ref, category);
+              if (updated == null || !context.mounted) return;
+              await ref
+                  .read(nutritionCategoryProvider.notifier)
+                  .updateCategory(category.name, updated);
             }
           : null,
     );

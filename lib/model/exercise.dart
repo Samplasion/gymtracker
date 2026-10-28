@@ -59,7 +59,7 @@ enum GTMuscleGroup {
   chest(GTMuscleCategory.chest),
   glutes(GTMuscleCategory.legs),
   hamstrings(GTMuscleCategory.legs),
-  lats(GTMuscleCategory.legs),
+  lats(GTMuscleCategory.back),
   lowerBack(GTMuscleCategory.back),
 
   /// Or cardio

@@ -165,7 +165,8 @@ class _WeightMeasurementDataPageState
                       child: Icon(() {
                         final diff =
                             predictedWeight.weight -
-                            controller.latestWeightMeasurement!.weight;
+                            controller.latestWeightMeasurement!
+                                .convertedWeightTo(predictedWeight.weightUnit);
                         final normalized = (diff * 100).truncate();
                         if (normalized > 10) {
                           return GTIcons.weight_up;

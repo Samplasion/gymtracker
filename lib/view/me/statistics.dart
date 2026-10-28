@@ -387,7 +387,7 @@ class _StatsMainLiftsChart extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     ref.watch(appPreferencesProvider);
     final weightResult = ref.watch(
-      majorThreeChartDataProvider(firstDayOfWeekFor(context.locale)),
+      majorThreeDisplayChartDataProvider(firstDayOfWeekFor(context.locale)),
     );
 
     return PageTransitionSwitcher(
@@ -506,7 +506,7 @@ class _StatsMainLiftsChart extends ConsumerWidget {
       },
       currentValueBuilder: (selectedCategory, hoveredIndex, point, isPredicted) {
         return Text(
-          "${names[selectedCategory] ?? selectedCategory}: ${point.value.getUserFacingWeight(context.t, ref.read(settingsControllerProvider).weightUnit)} (${DateFormat.yMMMd(context.locale.languageCode).format(point.date)})",
+          "${names[selectedCategory] ?? selectedCategory}: ${point.value.getUserFacingWeight(context.t, ref.read(statsWeightUnitProvider))} (${DateFormat.yMMMd(context.locale.languageCode).format(point.date)})",
         );
       },
       nullCurrentValueBuilder: (selectedCategory) {
@@ -516,7 +516,7 @@ class _StatsMainLiftsChart extends ConsumerWidget {
         if (weight < 0) return "";
         return weight.getUserFacingWeight(
           context.t,
-          ref.read(settingsControllerProvider).weightUnit,
+          ref.read(statsWeightUnitProvider),
         );
       },
       categoryColors: (context) => colors,

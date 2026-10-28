@@ -5,10 +5,20 @@ set -e
 # Set up environment
 name="GymBro"
 flavor="release"
-NOW=$(date +"%s")
 BUILD=$(git rev-parse HEAD | cut -c1-7)
 CUR=$(pwd)
-VER=$(grep "version: " $CUR/pubspec.yaml | sed 's/version: //')
+VERSION=$(awk '/^version: / { print $2; exit }' "$CUR/pubspec.yaml")
+VER=${VERSION%%+*}
+# Use pubspec's build number unless explicitly overridden by the caller.
+if [[ -z "${BUILD_NUMBER+x}" && "$VERSION" != *+* ]]; then
+    echo "Missing build number: add +<number> to pubspec.yaml or set BUILD_NUMBER." >&2
+    exit 1
+fi
+BUILD_NUMBER=${BUILD_NUMBER-${VERSION#*+}}
+if [[ ! "$BUILD_NUMBER" =~ ^[0-9]+$ ]]; then
+    echo "BUILD_NUMBER must be a non-negative integer." >&2
+    exit 1
+fi
 
 run="build && cleanup && copy"
 
@@ -19,6 +29,8 @@ usage() {
     echo
     echo "  -c       Only run cleanup"
     echo "  -h       Print this help message"
+    echo
+    echo "BUILD_NUMBER overrides the build number from pubspec.yaml."
 }
 
 while getopts ":ch" opt; do
@@ -41,7 +53,7 @@ echo "##                                                         ##"
 echo "#############################################################"
 echo 
 echo App version: $VER
-echo Build number: $NOW
+echo Build number: $BUILD_NUMBER
 echo Flavor: $flavor
 echo 
 
@@ -53,7 +65,7 @@ fi
 
 build() {
     echo "📦 Building the iOS app..."
-    flutter build ipa --$flavor --build-number=$NOW --dart-define=BUILD=$BUILD $CODESIGN
+    flutter build ipa --$flavor --build-number=$BUILD_NUMBER --dart-define=BUILD=$BUILD $CODESIGN
 }
 
 cleanup() {
@@ -71,11 +83,11 @@ copy() {
     # echo "📑 Copying output files from their directory to our organized directory..."
     # cp -r $CUR/build/ios/archive/Runner.xcarchive/Products/Applications/Runner.app/* $CUR/out/ios/Payload/Runner.app
     # cd $CUR/out/ios
-    # zip -r $name-ios-$VER+$NOW-$flavor.ipa Payload
+    # zip -r $name-ios-$VER+$BUILD_NUMBER-$flavor.ipa Payload
     # rm -rf Payload
     # cd -
     echo "📑 Copying output files from their directory to our organized directory..."
-    cp -r $CUR/build/ios/ipa/*.ipa $CUR/out/ios/$name-ios-$VER+$NOW-$flavor.ipa || true
+    cp -r $CUR/build/ios/ipa/*.ipa $CUR/out/ios/$name-ios-$VER+$BUILD_NUMBER-$flavor.ipa || true
 }
 
 eval $run

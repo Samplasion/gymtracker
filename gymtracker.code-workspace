@@ -1,0 +1,26 @@
+{
+  "folders": [
+    {
+      "path": "."
+    },
+    {
+      "path": "../gym-bro-landing"
+    },
+    {
+      "path": "../gym_bro_admin"
+    },
+    {
+      "path": "../gym_bro_catalog"
+    }
+  ],
+  "settings": {
+    "conventionalCommits.scopes": [
+      "i18n"
+    ],
+    "i18n-ally.sourceLanguage": "it",
+    "dart.flutterSdkPath": ".fvm/versions/3.47.7",
+    "i18n-ally.localesPaths": [
+      "lib/i18n"
+    ]
+  }
+}

@@ -446,3 +446,7 @@ verify_jwt = false
 # Handler verifies JWT and fetches current administrator privileges per request.
 [functions.admin-api]
 verify_jwt = false
+
+# Verifies JWT and current catalog privileges; SQL rechecks permissions atomically.
+[functions.catalog-api]
+verify_jwt = false

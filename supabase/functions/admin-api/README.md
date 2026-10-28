@@ -31,3 +31,18 @@ received/reviewing social counts, push queue/error/exhaustion counts, and the
 latest five catalog audit actions. It uses the same live administrator gate as
 all other operations. No new migration is needed; existing deployments must
 redeploy `admin-api` to expose this operation.
+
+### Gestione utenti
+
+La sezione `users` espone solo ID, username, nome pubblico e versione del profilo,
+con ricerca e paginazione. Il dettaglio legge il permesso `is_admin` dai metadati
+Auth aggiornati e lo presenta in sola lettura, anche per l'operatore stesso.
+Non esiste un'operazione per modificare ruoli o metadati Auth.
+`updateProfile` accetta esclusivamente username, nome pubblico, versione attesa e
+motivazione; campi aggiuntivi (inclusi permessi) vengono rifiutati. La modifica
+atomica registra prima/dopo e identità dell'operatore in `admin_user_audit`.
+Il filtro `userId` collega le segnalazioni sociali inviate/ricevute e quelle
+alimentari inviate, mantenendo filtri di stato e paginazione.
+
+Prima di utilizzare la nuova console applicare la migrazione
+`20261027120000_admin_users.sql` e pubblicare la funzione `admin-api` aggiornata.

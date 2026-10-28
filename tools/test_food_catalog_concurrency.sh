@@ -47,3 +47,36 @@ DO $$ DECLARE product public.food_catalog; BEGIN
  IF product.status<>'suspended' OR product.version<>2 OR (SELECT count(*) FROM public.food_catalog_reports WHERE food_id=product.id)<>5 OR (SELECT count(*) FROM public.food_catalog_audit WHERE food_id=product.id AND action='auto_suspend')<>1 THEN RAISE EXCEPTION 'Concurrent reports lost votes or suspended more than once'; END IF;
 END $$;
 SQL
+
+# A create-only publication must never become a correction, including when
+# two accounts submit different labels/nutrients for the same barcode.
+cat > "$scratch/create-only.sql" <<'SQL'
+SET ROLE authenticated;
+SELECT set_config('request.jwt.claim.sub',:'account',false);
+SELECT public.create_catalog_food(:'operation'::uuid, jsonb_build_object(
+ 'name', :'label', 'barcode', NULLIF(:'barcode',''), 'unit','g',
+ 'nutritionalValuesPer100g',jsonb_build_object('calories',100,'fat',1,'saturatedFat',0,'carbs',10,'sugar',1,'protein',:protein::numeric)));
+SQL
+for kind in barcode name; do
+ pids=()
+ for i in 0 1; do
+  account="00000000-0000-0000-0000-00000000081$i"
+  if [ "$kind" = barcode ]; then barcode=0000860; op="00000000-0000-0000-0000-00000000086$i"; else barcode=''; op="00000000-0000-0000-0000-00000000087$i"; fi
+  docker exec -i "$container" psql -h 127.0.0.1 -U supabase_admin -d postgres -v ON_ERROR_STOP=1 \
+   -v account="$account" -v operation="$op" -v barcode="$barcode" -v label="Create-only race $kind" -v protein="$((i+1))" \
+   < "$scratch/create-only.sql" > "$scratch/create-only-$kind-$i.log" 2>&1 &
+  pids+=("$!")
+ done
+ for pid in "${pids[@]}"; do wait "$pid"; done
+done
+docker exec -i "$container" psql -h 127.0.0.1 -U supabase_admin -d postgres -v ON_ERROR_STOP=1 <<'SQL'
+DO $$ BEGIN
+ IF (SELECT count(*) FROM public.food_catalog WHERE food->>'name'='Create-only race barcode')<>1
+ OR (SELECT count(*) FROM gymbro_food.receipts WHERE operation_id IN ('00000000-0000-0000-0000-000000000860','00000000-0000-0000-0000-000000000861') AND result->>'outcome'='already_present')<>1
+ OR EXISTS(SELECT 1 FROM public.food_catalog_corrections c JOIN public.food_catalog f ON f.id=c.food_id WHERE f.barcode='0000860') THEN
+  RAISE EXCEPTION 'Concurrent create-only barcode submission was not safe'; END IF;
+ IF (SELECT count(*) FROM public.food_catalog WHERE food->>'name'='Create-only race name')<>1
+ OR (SELECT count(*) FROM gymbro_food.receipts WHERE operation_id IN ('00000000-0000-0000-0000-000000000870','00000000-0000-0000-0000-000000000871') AND result->>'outcome'='uncertain')<>1 THEN
+  RAISE EXCEPTION 'Concurrent ambiguous publication was not blocked'; END IF;
+END $$;
+SQL

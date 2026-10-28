@@ -42,6 +42,8 @@ docker exec -i "$container" psql -h 127.0.0.1 -U supabase_admin -d postgres -v O
 bash tools/test_admin_console_concurrency.sh "$container"
 if [[ "${BACKEND_TEST_FILTER:-}" == "food_catalog" ]]; then
   docker exec -i "$container" psql -h 127.0.0.1 -U supabase_admin -d postgres -v ON_ERROR_STOP=1 < test/backend/food_catalog.sql
+  docker exec -i "$container" psql -h 127.0.0.1 -U supabase_admin -d postgres -v ON_ERROR_STOP=1 < test/backend/food_catalog_create_only.sql
+  docker exec -i "$container" psql -h 127.0.0.1 -U supabase_admin -d postgres -v ON_ERROR_STOP=1 < test/backend/catalog_operators.sql
   bash tools/test_food_catalog_concurrency.sh "$container"
   exit 0
 fi
@@ -70,5 +72,7 @@ docker exec -i "$container" psql -h 127.0.0.1 -U supabase_admin -d postgres -v O
 bash tools/test_mcp_concurrency.sh "$container"
 
 docker exec -i "$container" psql -h 127.0.0.1 -U supabase_admin -d postgres -v ON_ERROR_STOP=1 < test/backend/food_catalog.sql
+  docker exec -i "$container" psql -h 127.0.0.1 -U supabase_admin -d postgres -v ON_ERROR_STOP=1 < test/backend/food_catalog_create_only.sql
+  docker exec -i "$container" psql -h 127.0.0.1 -U supabase_admin -d postgres -v ON_ERROR_STOP=1 < test/backend/catalog_operators.sql
 
 bash tools/test_food_catalog_concurrency.sh "$container"

@@ -41,6 +41,15 @@ export async function handleAdmin(
       return reply({ error: "invalid_request" }, 400);
     }
     if (b.operation === "dashboard") return reply(await loadDashboard(client));
+    if (b.operation === "catalogReview") {
+      const { data, error } = await client.rpc("catalog_operator_execute", {
+        actor: user.id,
+        operation: "review",
+        payload: { ...b, operationId: b.operationId ?? crypto.randomUUID() },
+      });
+      if (error) throw error;
+      return reply(data);
+    }
     if (b.operation === "session") {
       return reply({ id: user.id, email: user.email });
     }
@@ -51,6 +60,31 @@ export async function handleAdmin(
       if (r.error) throw r.error;
       return r.data;
     };
+    if (b.operation === "updateProfile") {
+      // An exact allowlist prevents metadata/role writes, including self-promotion.
+      if (
+        Object.keys(b).some((k) =>
+          !["operation", "id", "username", "fullName", "updatedAt", "note"]
+            .includes(k)
+        ) ||
+        typeof b.id !== "string" || typeof b.username !== "string" ||
+        !/^[a-zA-Z0-9_]{3,30}$/.test(b.username) ||
+        typeof b.fullName !== "string" || b.fullName.trim().length > 100 ||
+        typeof b.updatedAt !== "string" ||
+        !Number.isFinite(Date.parse(b.updatedAt))
+      ) {
+        return reply({ error: "invalid_request" }, 400);
+      }
+      await checked(client.rpc("admin_update_public_profile", {
+        target_id: b.id,
+        expected_updated_at: b.updatedAt,
+        new_username: b.username,
+        new_full_name: b.fullName.trim(),
+        operator_id: user.id,
+        note: operatorNote(user.email, user.id, b.note),
+      }));
+      return reply({ ok: true });
+    }
     if (b.operation === "list" || b.operation === "detail") {
       if (!Object.hasOwn(sections, b.section)) {
         return reply({ error: "invalid_section" }, 400);
@@ -67,7 +101,8 @@ export async function handleAdmin(
         if (!record) return reply({ error: "not_found" }, 404);
         const extra: Record<string, unknown> = {};
         if (
-          section === "catalog" || section === "corrections" ||
+          section === "catalogRequests" || section === "catalog" ||
+          section === "corrections" ||
           section === "foodReports"
         ) {
           const foodId = section === "catalog" ? record.id : record.food_id;
@@ -80,6 +115,16 @@ export async function handleAdmin(
           extra.counts = await checked(
             client.rpc("admin_catalog_report_counts", { product_id: foodId }),
           );
+        }
+        if (section === "users") {
+          const { data, error } = await client.auth.admin.getUserById(
+            String(record.id),
+          );
+          if (error || !data.user) throw error ?? new Error("missing_user");
+          extra.permissions = {
+            is_admin: data.user.app_metadata?.is_admin === true,
+          };
+          extra.permissionsReadOnly = true;
         }
         return reply({ record, ...extra });
       }
@@ -112,6 +157,26 @@ export async function handleAdmin(
       if (
         b.foodId && ["audit", "foodReports", "corrections"].includes(section)
       ) query = query.eq("food_id", b.foodId);
+      if (b.userId && section === "social") {
+        if (
+          typeof b.userId !== "string" || !/^[0-9a-f-]{36}$/i.test(b.userId)
+        ) return reply({ error: "invalid_id" }, 400);
+        query = query.or(
+          `reporter_id.eq.${b.userId},reported_id.eq.${b.userId}`,
+        );
+      }
+      if (b.userId && section === "foodReports") {
+        query = query.eq("reporter_id", b.userId);
+      }
+      if (b.search && section === "users") {
+        if (typeof b.search !== "string" || b.search.length > 200) {
+          return reply({ error: "invalid_search" }, 400);
+        }
+        const words = b.search.match(/[\p{L}\p{N}_]+/gu) ?? [];
+        if (!words.length) return reply({ rows: [] });
+        const term = words.join(" ");
+        query = query.or(`username.ilike.%${term}%,full_name.ilike.%${term}%`);
+      }
       if (b.reportId && section === "notes") {
         query = query.eq("report_id", b.reportId);
       }

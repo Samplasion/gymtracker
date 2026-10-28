@@ -1,4 +1,6 @@
 export type Section =
+  | "users"
+  | "catalogRequests"
   | "catalog"
   | "corrections"
   | "foodReports"
@@ -11,6 +13,18 @@ export const sections: Record<
   Section,
   { table: string; columns: string; order: string; statuses?: string[] }
 > = {
+  users: {
+    table: "profiles",
+    columns: "id,username,full_name,updated_at",
+    order: "updated_at",
+  },
+  catalogRequests: {
+    table: "catalog_operator_requests",
+    columns:
+      "id,food_id,requester_id,kind,base_version,food,note,status,reviewer_id,review_note,created_at,reviewed_at,food_catalog(food)",
+    order: "created_at",
+    statuses: ["pending", "approved", "rejected"],
+  },
   catalog: {
     table: "food_catalog",
     columns:
@@ -80,8 +94,13 @@ export function isAdmin(
     user?.app_metadata?.is_admin === true;
 }
 export function errorStatus(code?: string): number {
-  return code === "40001"
+  return code === "40001" || code === "23505" || code === "23505" ||
+      code === "40P01"
     ? 409
+    : code === "42501"
+    ? 403
+    : code === "P0002"
+    ? 404
     : code === "22023" || code === "22P02"
     ? 400
     : 500;

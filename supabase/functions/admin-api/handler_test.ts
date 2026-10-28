@@ -169,3 +169,95 @@ Deno.test("Translates social and push commands into guarded RPC arguments", asyn
   assert(invalid.status === 400);
   assert(m.calls.length === 2);
 });
+Deno.test("Public profile writes reject admin metadata for self and other users", async () => {
+  for (
+    const id of [
+      "00000000-0000-0000-0000-000000000001",
+      "00000000-0000-0000-0000-000000000002",
+    ]
+  ) {
+    for (
+      const forged of [{ is_admin: true }, {
+        app_metadata: { is_admin: false },
+      }, { permissions: { is_admin: true } }]
+    ) {
+      const m = mock();
+      const r = await handleAdmin(
+        request({
+          operation: "updateProfile",
+          id,
+          username: "test_user",
+          fullName: "Test",
+          updatedAt: "2026-10-27T10:00:00Z",
+          note: "Review",
+          ...forged,
+        }),
+        m.client,
+      );
+      assert(r.status === 400);
+      assert(m.calls.length === 0);
+    }
+  }
+});
+Deno.test("Profile updates use a guarded public-fields-only RPC and verified operator", async () => {
+  const m = mock();
+  const r = await handleAdmin(
+    request({
+      operation: "updateProfile",
+      id: "00000000-0000-0000-0000-000000000002",
+      username: "test_user",
+      fullName: " Test ",
+      updatedAt: "2026-10-27T10:00:00Z",
+      note: "Review",
+    }),
+    m.client,
+  );
+  assert(r.status === 200);
+  const call = m.calls[0] as { name: string; args: Record<string, unknown> };
+  assert(call.name === "admin_update_public_profile");
+  assert(call.args.operator_id === "00000000-0000-0000-0000-000000000001");
+  assert(call.args.new_full_name === "Test");
+  assert(!("app_metadata" in call.args));
+});
+Deno.test("Catalog review requires admin and supplies verified actor to SQL", async () => {
+  const m = mock();
+  assert(
+    (await handleAdmin(
+      request({
+        operation: "catalogReview",
+        id: "request",
+        approve: true,
+        note: "Checked label",
+        actor: "forged",
+      }),
+      m.client,
+    )).status === 200,
+  );
+  const call = m.calls[0] as {
+    name: string;
+    args: {
+      actor: string;
+      operation: string;
+      payload: { operationId: string };
+    };
+  };
+  assert(
+    call.name === "catalog_operator_execute" &&
+      call.args.operation === "review",
+  );
+  assert(
+    call.args.actor === "00000000-0000-0000-0000-000000000001" &&
+      !!call.args.payload.operationId,
+  );
+  const operator = mock({ admin: false });
+  operator.client.auth.getUser = (() => ({
+    data: { user: { app_metadata: { is_catalog_operator: true } } },
+  })) as unknown as typeof operator.client.auth.getUser;
+  assert(
+    (await handleAdmin(
+      request({ operation: "catalogReview" }),
+      operator.client,
+    )).status === 403,
+  );
+  assert(operator.calls.length === 0);
+});

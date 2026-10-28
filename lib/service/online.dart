@@ -79,6 +79,9 @@ class OnlineServiceImpl with ChangeNotifier implements OnlineService {
   final SupabaseClient _db;
   late final StreamSubscription<AuthState> _authSubscription;
   bool _disposed = false;
+  int _authGeneration = 0;
+  int _lastSignOutGeneration = -1;
+  String? _authUserId;
 
   @override
   DateTime? nextFriendsFeedDate;
@@ -108,13 +111,37 @@ class OnlineServiceImpl with ChangeNotifier implements OnlineService {
   }) : _achievementCatalog = achievementCatalog,
        _db = client ?? Supabase.instance.client,
        _client = (client ?? Supabase.instance.client).auth {
-    _authSubscription = _client.onAuthStateChange.listen((event) {
-      if (_disposed) return;
-      logger.d("Auth state changed: ${event.event.name}");
-      if (event.session == null) {
-        _setAccount(null);
-      }
-    });
+    _authUserId = _client.currentUser?.id;
+    _authSubscription = _client.onAuthStateChange.listen(
+      (event) {
+        if (_disposed) return;
+        logger.d("Auth state changed: ${event.event.name}");
+        final userId = event.session?.user.id;
+        if (userId != _authUserId || event.event == AuthChangeEvent.signedOut) {
+          _authGeneration++;
+          _accounts.clear();
+        }
+        if (event.event == AuthChangeEvent.signedOut) {
+          _lastSignOutGeneration = _authGeneration;
+        }
+        _authUserId = userId;
+        if (event.session == null) {
+          _setAccount(null);
+        }
+      },
+      onError: (Object error, StackTrace stack) {
+        if (_disposed) return;
+        if (error is AuthRetryableFetchException) {
+          logger.w(
+            "Session refresh temporarily failed; recovery remains managed by Supabase",
+            error: error,
+            stackTrace: stack,
+          );
+          return;
+        }
+        Error.throwWithStackTrace(error, stack);
+      },
+    );
   }
 
   @override
@@ -133,6 +160,26 @@ class OnlineServiceImpl with ChangeNotifier implements OnlineService {
     notifyListeners();
   }
 
+  void _ensureSession(String? userId, int generation) {
+    if (_disposed ||
+        _authGeneration != generation ||
+        _client.currentUser?.id != userId) {
+      throw StateError('The account changed during the request');
+    }
+  }
+
+  void _ensureAuthenticationResult(User user, int generation) {
+    // Signing in can itself advance the identity once; other transitions
+    // invalidate the request, including logout followed by the same login.
+    if (_disposed ||
+        _client.currentUser?.id != user.id ||
+        _lastSignOutGeneration > generation ||
+        _authGeneration < generation ||
+        _authGeneration > generation + 1) {
+      throw StateError('The account changed during authentication');
+    }
+  }
+
   OnlineAccount? _mapAccount(User? user, Map<String, dynamic> data) {
     if (user == null) {
       return null;
@@ -148,11 +195,15 @@ class OnlineServiceImpl with ChangeNotifier implements OnlineService {
 
   @override
   Future<OnlineAccount?> getAccount() async {
+    final generation = _authGeneration;
     final user = _client.currentUser;
     if (user == null) {
       _setAccount(null);
       return null;
     }
+
+    OnlineAccount? currentAccount() =>
+        !_disposed && _account?.id == _client.currentUser?.id ? _account : null;
 
     try {
       Future<List<Map<String, dynamic>>> fetchProfile() async {
@@ -163,10 +214,17 @@ class OnlineServiceImpl with ChangeNotifier implements OnlineService {
         final row = await fetchProfile().timeout(const Duration(seconds: 8));
         return _mapAccount(user, row.single);
       });
-      if (_client.currentUser?.id != user.id) return null;
+      if (_disposed ||
+          generation != _authGeneration ||
+          _client.currentUser?.id != user.id)
+        return currentAccount();
       _setAccount(account);
       return _account;
     } catch (e) {
+      if (_disposed ||
+          generation != _authGeneration ||
+          _client.currentUser?.id != user.id)
+        return currentAccount();
       if (!isNetworkError(e)) rethrow;
       logger.w("[OnlineService] Offline during getAccount(): $e");
       if (_account?.id == user.id) return _account;
@@ -188,6 +246,7 @@ class OnlineServiceImpl with ChangeNotifier implements OnlineService {
 
   @override
   Future<void> login({required String email, required String password}) async {
+    final generation = _authGeneration;
     final response = await _client.signInWithPassword(
       email: email,
       password: password,
@@ -196,11 +255,14 @@ class OnlineServiceImpl with ChangeNotifier implements OnlineService {
       throw const AuthException("No user found");
     }
 
+    _ensureAuthenticationResult(response.user!, generation);
+    final profileGeneration = _authGeneration;
     final row = await _db
         .from("profiles")
         .select()
         .eq('id', response.user!.id)
         .limit(1);
+    _ensureSession(response.user!.id, profileGeneration);
     _setAccount(_mapAccount(response.user, row.first));
   }
 
@@ -210,11 +272,14 @@ class OnlineServiceImpl with ChangeNotifier implements OnlineService {
     required String password,
     required String username,
   }) async {
+    final owner = _client.currentUser?.id;
+    final generation = _authGeneration;
     final existing = await _db
         .from('profiles')
         .select('id')
         .eq('username', username)
         .maybeSingle();
+    _ensureSession(owner, generation);
     if (existing != null) {
       throw const AuthException("login.errors.usernameTaken");
     }
@@ -229,14 +294,18 @@ class OnlineServiceImpl with ChangeNotifier implements OnlineService {
     }
 
     if (response.session == null) {
+      _ensureSession(owner, generation);
       _setAccount(null);
       return;
     }
+    _ensureAuthenticationResult(response.user!, generation);
+    final profileGeneration = _authGeneration;
     final row = await _db
         .from("profiles")
         .select()
         .eq('id', response.user!.id)
         .limit(1);
+    _ensureSession(response.user!.id, profileGeneration);
     _setAccount(_mapAccount(response.user, row.first));
   }
 
@@ -245,6 +314,7 @@ class OnlineServiceImpl with ChangeNotifier implements OnlineService {
     required String email,
     required String username,
   }) async {
+    final generation = _authGeneration;
     final user = _client.currentUser;
     if (user == null) {
       return;
@@ -256,13 +326,15 @@ class OnlineServiceImpl with ChangeNotifier implements OnlineService {
         .eq('id', user.id)
         .select()
         .limit(1);
+    _ensureSession(user.id, generation);
     final response = await _client.updateUser(
       UserAttributes(
         email: email,
         data: {...?user.userMetadata, "username": username},
       ),
     );
-    if (response.user == null) {
+    _ensureSession(user.id, generation);
+    if (response.user == null || response.user!.id != user.id) {
       throw const AuthException("No user found");
     }
 
@@ -271,12 +343,13 @@ class OnlineServiceImpl with ChangeNotifier implements OnlineService {
 
   @override
   Future<void> updateProfile({String? fullName}) async {
+    final generation = _authGeneration;
     final user = _client.currentUser;
     if (user == null) {
       return;
     }
 
-    await _db
+    final row = await _db
         .from("profiles")
         .update({
           "full_name": fullName,
@@ -284,12 +357,14 @@ class OnlineServiceImpl with ChangeNotifier implements OnlineService {
         })
         .eq("id", user.id)
         .select()
-        .single()
-        .then((row) => _setAccount(_mapAccount(user, row)));
+        .single();
+    _ensureSession(user.id, generation);
+    _setAccount(_mapAccount(user, row));
   }
 
   @override
   Future<void> uploadAvatar(Uint8List bytes) async {
+    final generation = _authGeneration;
     final user = _client.currentUser;
     if (user == null) {
       throw const AuthException("No user found");
@@ -305,34 +380,39 @@ class OnlineServiceImpl with ChangeNotifier implements OnlineService {
             contentType: 'image/png',
           ),
         );
-    await _touchProfile(user);
+    _ensureSession(user.id, generation);
+    await _touchProfile(user, generation);
   }
 
-  Future<void> _touchProfile(User user) async {
+  Future<void> _touchProfile(User user, int generation) async {
+    _ensureSession(user.id, generation);
     final row = await _db
         .from('profiles')
         .update({'updated_at': DateTime.now().toUtc().toIso8601String()})
         .eq('id', user.id)
         .select()
         .single();
+    _ensureSession(user.id, generation);
     _setAccount(_mapAccount(user, row));
   }
 
   @override
   Future<void> removeAvatar() async {
+    final generation = _authGeneration;
     final user = _client.currentUser;
     if (user == null) {
       throw const AuthException("No user found");
     }
 
     await _db.storage.from("profile_pictures").remove([user.id]);
-    await _touchProfile(user);
+    _ensureSession(user.id, generation);
+    await _touchProfile(user, generation);
   }
 
   @override
   Future<void> logout() async {
     await _client.signOut();
-    _setAccount(null);
+    if (!_disposed && _client.currentUser == null) _setAccount(null);
   }
 
   @override
@@ -458,6 +538,7 @@ class OnlineServiceImpl with ChangeNotifier implements OnlineService {
 
   @override
   Future<void> deleteAccount() async {
+    final generation = _authGeneration;
     final user = _client.currentUser;
     if (user == null) {
       return;
@@ -467,8 +548,9 @@ class OnlineServiceImpl with ChangeNotifier implements OnlineService {
       'delete-user-complete',
       body: {'target_user_id': user.id},
     );
+    _ensureSession(user.id, generation);
     await _client.signOut();
-    _setAccount(null);
+    if (!_disposed && _client.currentUser == null) _setAccount(null);
   }
 
   @override
@@ -476,6 +558,7 @@ class OnlineServiceImpl with ChangeNotifier implements OnlineService {
     required String email,
     required String password,
   }) async {
+    final generation = _authGeneration;
     try {
       final response = await _client.signInWithPassword(
         email: email,
@@ -484,6 +567,7 @@ class OnlineServiceImpl with ChangeNotifier implements OnlineService {
       if (response.user == null || response.user?.emailConfirmedAt == null) {
         return false;
       }
+      _ensureAuthenticationResult(response.user!, generation);
       _setAccount(
         _mapAccount(response.user, response.user?.userMetadata ?? {}),
       );

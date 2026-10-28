@@ -532,11 +532,28 @@ Future<Friend> userIdentity(Ref ref, String id) {
 }
 
 @riverpod
-Future<String?> userAvatar(Ref ref, String id) {
-  final expiry = Timer(const Duration(seconds: 45), ref.invalidateSelf);
-  ref.onDispose(expiry.cancel);
-  ref.watch(userIdentityProvider(id));
-  return ref.watch(friendProvider.notifier).getAvatar(id);
+Future<String?> userAvatar(Ref ref, String id) async {
+  // Keep the signed URL across screen changes so Flutter's image cache can
+  // reuse it. Renew before its 60-second expiry, even while still visible.
+  final cache = ref.keepAlive();
+  Timer? expiry;
+  ref.onDispose(() => expiry?.cancel());
+  final identity = ref.watch(userIdentityProvider(id).future);
+  final friends = ref.watch(friendProvider.notifier);
+  try {
+    // Watching the future avoids signing twice as identity moves from loading
+    // to data, while still refreshing when the profile is invalidated.
+    await identity;
+    if (!ref.mounted) return null;
+    final url = await friends.getAvatar(id);
+    if (ref.mounted) {
+      expiry = Timer(const Duration(seconds: 45), ref.invalidateSelf);
+    }
+    return url;
+  } catch (_) {
+    cache.close();
+    rethrow;
+  }
 }
 
 @riverpod

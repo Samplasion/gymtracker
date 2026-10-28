@@ -50,7 +50,15 @@ void main() {
       anonKey: 'key',
       httpClient: MockClient((r) async {
         Object response = [];
-        if (r.url.path.endsWith('/friends')) {
+        if (r.method == 'POST' &&
+            r.url.path.startsWith(
+              '/storage/v1/object/sign/profile_pictures/',
+            )) {
+          response = {
+            'signedURL':
+                '${r.url.path.substring('/storage/v1'.length)}?token=test-token',
+          };
+        } else if (r.url.path.endsWith('/friends')) {
           if (r.method == 'GET') {
             relationReads++;
             response = relations;

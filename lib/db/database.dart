@@ -88,6 +88,10 @@ abstract class GTDatabase extends GeneratedDatabase with SyncableDatabase {
   Future<void> deleteRoutine(String id);
   Future<void> updateRoutine(model.Workout routine);
   Future<void> writeAllRoutines(List<model.Workout> routines);
+  Future<void> updateRoutineSortOrders(
+    List<String> ids, {
+    required String? owner,
+  });
   Future<void> overwriteAllRoutineExercises(
     List<model.WorkoutExercisable> routineExercises,
   );
@@ -917,6 +921,26 @@ class GTDatabaseImpl extends _$GTDatabaseImpl
   }
 
   @override
+  Future<void> updateRoutineSortOrders(
+    List<String> ids, {
+    required String? owner,
+  }) {
+    final now = DateTime.now().toUtc();
+    return batch((batch) {
+      for (final entry in ids.asMap().entries) {
+        batch.update(
+          routines,
+          RoutinesCompanion(sortOrder: Value(entry.key), updatedAt: Value(now)),
+          where: (row) =>
+              row.id.equals(entry.value) &
+              _ownedBy(row.userId, owner) &
+              row.deleted.equals(false),
+        );
+      }
+    });
+  }
+
+  @override
   Future writeAllRoutines(List<model.Workout> routines) {
     final userId = currentUserId;
     final now = DateTime.now().toUtc();
@@ -949,15 +973,19 @@ class GTDatabaseImpl extends _$GTDatabaseImpl
           mode: .insertOrReplace,
         );
       });
-      await overwriteAllRoutineExercises(routines.flattenedExercises);
+      await _overwriteAllRoutineExercises(routines.flattenedExercises, userId);
     });
   }
 
   @override
   Future<void> overwriteAllRoutineExercises(
     List<model.WorkoutExercisable> routineExercises,
+  ) => _overwriteAllRoutineExercises(routineExercises, currentUserId);
+
+  Future<void> _overwriteAllRoutineExercises(
+    List<model.WorkoutExercisable> routineExercises,
+    String? userId,
   ) async {
-    final userId = currentUserId;
     final now = DateTime.now().toUtc();
     final routineExerciseInsertables = routineExercises
         .fold(<String, List<model.WorkoutExercisable>>{}, (m, r) {
@@ -1884,15 +1912,25 @@ class GTDatabaseImpl extends _$GTDatabaseImpl
   @override
   Future<void> insertCustomBarcodeFood(String barcode, model.Food food) {
     final userId = currentUserId;
-    return into(customBarcodeFoods).insert(
-      CustomBarcodeFoodsCompanion(
+    return transaction(() async {
+      final values = CustomBarcodeFoodsCompanion(
         id: Value(barcode),
         jsonData: Value(jsonEncode(food.toJson())),
         userId: Value(userId),
         updatedAt: Value(DateTime.now().toUtc()),
         deleted: const Value(false),
-      ),
-    );
+      );
+      // Match the owner explicitly: SQLite allows duplicate composite keys
+      // when userId is null, so an upsert alone cannot handle guest foods.
+      final updated =
+          await (update(customBarcodeFoods)..where(
+                (tbl) => tbl.id.equals(barcode) & _ownedBy(tbl.userId, userId),
+              ))
+              .write(values);
+      if (updated == 0) {
+        await into(customBarcodeFoods).insert(values);
+      }
+    });
   }
 
   @override

@@ -737,6 +737,7 @@ class WorkoutFinishPage extends ConsumerStatefulWidget {
 }
 
 class _WorkoutFinishPageState extends ConsumerState<WorkoutFinishPage> {
+  bool _submitting = false;
   late Duration workoutDuration;
   final formKey = GlobalKey<FormState>();
 
@@ -771,6 +772,8 @@ class _WorkoutFinishPageState extends ConsumerState<WorkoutFinishPage> {
 
   @override
   Widget build(BuildContext context) {
+    final submitting =
+        ref.watch(workoutControllerProvider)?.isSubmitting ?? false;
     if (_workoutController(context) == null) {
       return const Dialog.fullscreen(child: SizedBox.shrink());
     }
@@ -790,7 +793,10 @@ class _WorkoutFinishPageState extends ConsumerState<WorkoutFinishPage> {
               child: Divider(height: 1),
             ),
             actions: [
-              IconButton(icon: const Icon(GTIcons.done), onPressed: _submit),
+              IconButton(
+                icon: const Icon(GTIcons.done),
+                onPressed: _submitting || submitting ? null : _submit,
+              ),
             ],
           ),
         ),
@@ -954,15 +960,24 @@ class _WorkoutFinishPageState extends ConsumerState<WorkoutFinishPage> {
     return GymTrackerInputDecoration(labelText: label);
   }
 
-  void _submit() {
-    final isValid = formKey.currentState!.validate();
-
-    if (isValid && _workoutController(context) != null) {
-      _workoutController(context)!.submitWithPresentation(
+  Future<void> _submit() async {
+    final controller = _workoutController(context);
+    if (_submitting || controller == null || controller.isSubmitting) return;
+    if (!formKey.currentState!.validate()) return;
+    setState(() => _submitting = true);
+    final generation = controller.sessionGeneration;
+    try {
+      await controller.submitWithPresentation(
         titleController.text,
         TimeInputField.parseDuration(timeController.text),
         ref: ref,
       );
+    } catch (error, stack) {
+      logger.e('Error submitting workout', error: error, stackTrace: stack);
+      if (mounted && controller.isSessionActive(generation)) {
+        setState(() => _submitting = false);
+        Go.snack('$error');
+      }
     }
   }
 }

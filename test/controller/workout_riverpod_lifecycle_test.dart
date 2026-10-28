@@ -97,6 +97,7 @@ void main() {
       controller.addStopwatch(
         TimeFieldStopwatch(
           setID: 'set',
+          clock: _WidgetClock(() => tester.binding.clock.now()),
           getCurrentTime: () => '00:10',
           onTick: (_, _, text) => ticks.add(text),
         ),
@@ -242,4 +243,11 @@ class _TestStopwatch extends StopwatchEx {
     _elapsed = Duration.zero;
     if (_started != null) _started = now();
   }
+}
+
+class _WidgetClock extends WorkoutClock {
+  const _WidgetClock(this.currentTime);
+  final DateTime Function() currentTime;
+  @override
+  DateTime now() => currentTime();
 }

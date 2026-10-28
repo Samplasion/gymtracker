@@ -453,6 +453,7 @@ extension WorkoutPresentation on WorkoutController {
     Duration duration, {
     required WidgetRef ref,
   }) async {
+    if (isSubmitting) return;
     final generation = sessionGeneration;
     final owner = ownerId;
     final routines = ref.read(routinesControllerProvider);

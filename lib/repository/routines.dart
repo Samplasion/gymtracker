@@ -43,15 +43,35 @@ class RoutinesRepository {
     int oldIndex,
     int newIndex,
   ) async {
-    var allRoutines = (await _db.getAllRoutinesFuture());
-    var thisFoldersRoutines = allRoutines
-        .where((routine) => routine.folder?.id == folder?.id)
-        .toList();
-    var otherRoutines = allRoutines
-        .where((routine) => routine.folder?.id != folder?.id)
-        .toList();
-    reorderNew(thisFoldersRoutines, oldIndex, newIndex);
-    return _db.writeAllRoutines([...thisFoldersRoutines, ...otherRoutines]);
+    final owner = _db.currentUserId;
+    var changed = false;
+    final subscription = _db.watchCurrentUserId().listen((id) {
+      if (id != owner) changed = true;
+    });
+    void checkOwner() {
+      if (changed || _db.currentUserId != owner) {
+        throw StateError('The account changed while reordering routines');
+      }
+    }
+
+    try {
+      await _db.transaction(() async {
+        checkOwner();
+        final allRoutines = await _db.getAllRoutinesFuture();
+        checkOwner();
+        final routines = allRoutines
+            .where((routine) => routine.folder?.id == folder?.id)
+            .toList();
+        reorderNew(routines, oldIndex, newIndex);
+        await _db.updateRoutineSortOrders(
+          routines.map((routine) => routine.id).toList(),
+          owner: owner,
+        );
+        checkOwner();
+      });
+    } finally {
+      await subscription.cancel();
+    }
   }
 }
 

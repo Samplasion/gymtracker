@@ -1,4 +1,6 @@
+import 'dart:async';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:gymtracker/controller/workout_controller.dart';
 import 'package:gymtracker/model/model.dart';
 import 'package:mocktail/mocktail.dart';
 
@@ -18,6 +20,95 @@ void main() {
   });
 
   group('WorkoutController -', () {
+    test('concurrent submits write once and return the same workout', () async {
+      final controller = MockServices.createWorkout('Workout', null, null);
+      controller.exercises.add(exerciseHelper('ex1', 'Bench Press'));
+      final pending = Completer<void>();
+      final writes = <Workout>[];
+      when(
+        () => MockServices.historyController.addNewWorkout(any()),
+      ).thenAnswer((invocation) {
+        writes.add(invocation.positionalArguments.first as Workout);
+        return pending.future;
+      });
+      final first = controller.submit('First', const Duration(minutes: 10));
+      final second = controller.submit('Second', const Duration(minutes: 20));
+      await Future<void>.delayed(Duration.zero);
+      final count = writes.length;
+      pending.complete();
+      final results = await Future.wait([first, second]);
+      expect(count, 1);
+      expect(identical(results[0], results[1]), isTrue);
+      expect(results.first.name, 'First');
+    });
+
+    test('submission error releases lock and allows retry', () async {
+      final controller = MockServices.createWorkout('Workout', null, null);
+      final pending = Completer<void>();
+      when(
+        () => MockServices.historyController.addNewWorkout(any()),
+      ).thenAnswer((_) => pending.future);
+      final first = controller.submit('Workout', const Duration(minutes: 10));
+      final second = controller.submit('Ignored', Duration.zero);
+      expect(controller.isSubmitting, isTrue);
+      controller.publishExercises();
+      expect(
+        MockServices.container.read(workoutControllerProvider)!.isSubmitting,
+        isTrue,
+      );
+      final expectations = Future.wait([
+        expectLater(first, throwsStateError),
+        expectLater(second, throwsStateError),
+      ]);
+      pending.completeError(StateError('Write failed'));
+      await expectations;
+      expect(controller.isSubmitting, isFalse);
+      expect(
+        MockServices.container.read(workoutControllerProvider)!.isSubmitting,
+        isFalse,
+      );
+      when(
+        () => MockServices.historyController.addNewWorkout(any()),
+      ).thenAnswer((_) async {});
+      await controller.submit('Retry', const Duration(minutes: 10));
+      verify(
+        () => MockServices.historyController.addNewWorkout(any()),
+      ).called(2);
+    });
+
+    test(
+      'late completion does not unlock a newer session submission',
+      () async {
+        final controller = MockServices.createWorkout('Old', null, null);
+        final oldWrite = Completer<void>();
+        final newWrite = Completer<void>();
+        var writes = 0;
+        when(
+          () => MockServices.historyController.addNewWorkout(any()),
+        ).thenAnswer((_) => ++writes == 1 ? oldWrite.future : newWrite.future);
+        final old = controller.submit('Old', Duration.zero);
+        await Future<void>.delayed(Duration.zero);
+        MockServices.database.setCurrentUserId('new-owner');
+        controller.start('New', null, null, saveInitial: false);
+        expect(controller.isSubmitting, isFalse);
+        final current = controller.submit('New', Duration.zero);
+        await Future<void>.delayed(Duration.zero);
+        oldWrite.complete();
+        await old;
+        expect(controller.isSubmitting, isTrue);
+        expect(
+          MockServices.container.read(workoutControllerProvider)!.isSubmitting,
+          isTrue,
+        );
+        final duplicate = controller.submit('Ignored', Duration.zero);
+        newWrite.complete();
+        final results = await Future.wait([current, duplicate]);
+        expect(results[0], same(results[1]));
+        expect(writes, 2);
+        expect(controller.isSubmitting, isFalse);
+      },
+    );
+
     test(
       'computed properties (progress, reps, liftedWeight) work correctly',
       () {

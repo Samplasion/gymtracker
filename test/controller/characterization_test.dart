@@ -56,6 +56,8 @@ void main() {
     registerFallbackValue(Prefs.defaultValue);
     registerFallbackValue(AchievementTrigger.workout);
     registerFallbackValue(DateTime(2026));
+    final Future<void> Function() transactionCallback = () async {};
+    registerFallbackValue(transactionCallback);
   });
   setUp(MockServices.setup);
   tearDown(MockServices.tearDown);
@@ -178,6 +180,12 @@ void main() {
         when(
           () => MockServices.databaseService.removeHistoryWorkoutById(any()),
         ).thenAnswer((_) async {});
+        when(
+          () => MockServices.databaseService.transaction<void>(any()),
+        ).thenAnswer((invocation) async {
+          await (invocation.positionalArguments.single
+              as Future<void> Function())();
+        });
         when(
           () => MockServices.achievementsController.maybeUnlockAchievements(
             any(),
@@ -388,6 +396,7 @@ void main() {
       final ticks = <String>[];
       final s = TimeFieldStopwatch(
         setID: 'set',
+        clock: _WidgetClock(() => tester.binding.clock.now()),
         getCurrentTime: () => '00:10',
         onTick: (_, _, text) => ticks.add(text),
       );
@@ -556,4 +565,11 @@ void main() {
       );
     });
   });
+}
+
+class _WidgetClock extends WorkoutClock {
+  const _WidgetClock(this.currentTime);
+  final DateTime Function() currentTime;
+  @override
+  DateTime now() => currentTime();
 }

@@ -241,7 +241,13 @@ class RoutinesController {
   Future<void> advanceProgressionsFromWorkout(Workout workout) async {
     final routineID = workout.parentID;
     if (routineID == null) return;
-    final routine = getRoutine(routineID);
+    final db = service.db;
+    final owner = db.currentUserId;
+    // The routine stream may still contain the version from before the user
+    // saved their workout changes. Advance from the committed version instead.
+    final routines = await db.getAllRoutinesFuture();
+    if (db.currentUserId != owner) return;
+    final routine = routines.firstWhereOrNull((r) => r.id == routineID);
     if (routine == null) return;
 
     final performed = <Exercise>[

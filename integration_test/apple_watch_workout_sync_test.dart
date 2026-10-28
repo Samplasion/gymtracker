@@ -9,6 +9,14 @@ import 'package:path_provider/path_provider.dart';
 
 class _PhoneCallbacks implements GymBroNativeFlutterAPI {
   @override
+  Future<bool> importWaterEntry(
+    String id,
+    double milliliters,
+    int timeMilliseconds,
+    String ownerScope,
+  ) async => false;
+
+  @override
   void requestTrainingData() {}
   @override
   void handleWorkoutMetrics(double? energy, double? heartRate) {}

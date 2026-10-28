@@ -82,6 +82,8 @@ class TimeFieldStopwatch extends GTStopwatch {
   void Function()? onChanged;
   final String Function() getCurrentTime;
   final String setID;
+  final WorkoutClock clock;
+  late final Duration _initialDuration;
 
   @override
   final DateTime startingTime;
@@ -95,23 +97,27 @@ class TimeFieldStopwatch extends GTStopwatch {
     required this.onTick,
     required this.setID,
     required this.getCurrentTime,
-    WorkoutClock clock = const WorkoutClock(),
+    this.clock = const WorkoutClock(),
   }) : startingTime = clock.now() {
     currentTime = getCurrentTime();
+    _initialDuration = parseTimerDuration(currentTime);
     timer = clock.periodic(const Duration(seconds: 1), (_) {
-      final parsed = parseTimerDuration(currentTime);
-      final encoded = encodeTimerDuration(
-        Duration(seconds: parsed.inSeconds + 1),
-      );
-      currentTime = encoded;
-      onTick(timer, parsed, encoded);
+      _updateTime();
       onChanged?.call();
     });
   }
 
+  void _updateTime() {
+    // Callbacks refresh the display; elapsed time also includes suspension.
+    final elapsed = _initialDuration + clock.now().difference(startingTime);
+    final duration = Duration(seconds: elapsed.inSeconds);
+    currentTime = encodeTimerDuration(duration);
+    onTick(timer, duration, currentTime);
+  }
+
   @override
   void dispose() {
-    onTick(timer, parseTimerDuration(currentTime), currentTime);
+    _updateTime();
     timer.cancel();
   }
 }

@@ -46,7 +46,9 @@ class WorkoutState {
     required this.ownerId,
     this.cursor,
     this.previousCursor,
+    this.isSubmitting = false,
   });
+  final bool isSubmitting;
   final Workout workout;
   final String? ownerId;
   final WorkoutSetCursor? cursor;
@@ -55,6 +57,11 @@ class WorkoutState {
 
 @Riverpod(keepAlive: true)
 class WorkoutController extends _$WorkoutController {
+  Future<Workout>? _submission;
+  int? _submissionGeneration;
+  bool get isSubmitting =>
+      _submission != null && _submissionGeneration == sessionGeneration;
+
   Future<void> _progressionWrite = Future.value();
   Timer? _pendingInputSave;
   AppLifecycleListener? _inputSaveLifecycle;
@@ -206,6 +213,7 @@ class WorkoutController extends _$WorkoutController {
       ownerId: ownerId,
       cursor: _setCursor,
       previousCursor: _previousSetCursor,
+      isSubmitting: isSubmitting,
     );
     final generation = sessionGeneration;
     SchedulerBinding.instance.addPostFrameCallback((_) {
@@ -794,7 +802,35 @@ class WorkoutController extends _$WorkoutController {
     }
   }
 
-  Future<Workout> submit(String name, Duration duration) async {
+  Future<Workout> submit(String name, Duration duration) {
+    if (isClosed || ownerId != service.db.currentUserId) {
+      return Future.error(
+        StateError('Cannot submit a workout belonging to another account'),
+      );
+    }
+    if (isSubmitting) return _submission!;
+    final generation = sessionGeneration;
+    final completion = Completer<Workout>();
+    _submission = completion.future;
+    _submissionGeneration = generation;
+    publishExercises();
+    unawaited(() async {
+      try {
+        completion.complete(await _performSubmit(name, duration));
+      } catch (error, stack) {
+        completion.completeError(error, stack);
+      } finally {
+        if (identical(_submission, completion.future)) {
+          _submission = null;
+          _submissionGeneration = null;
+          if (isSessionActive(generation)) publishExercises();
+        }
+      }
+    }());
+    return completion.future;
+  }
+
+  Future<Workout> _performSubmit(String name, Duration duration) async {
     if (isClosed || ownerId != service.db.currentUserId) {
       throw StateError('Cannot submit a workout belonging to another account');
     }
@@ -804,9 +840,6 @@ class WorkoutController extends _$WorkoutController {
     if (!isSessionActive(generation)) {
       throw StateError("Workout session changed during submission");
     }
-
-    removeCountdown();
-    removeRelevantStopwatches();
 
     final workout = Workout(
       name: name,
@@ -820,12 +853,14 @@ class WorkoutController extends _$WorkoutController {
       distanceUnit: distanceUnit,
     );
 
-    if (isContinuation) {
-      historyController.bindContinuation(continuation: workout);
-    }
-
     workout.logger.i("Submitting workout");
     await historyController.addNewWorkout(workout);
+    // Keep the active session recoverable when persistence fails, and avoid
+    // clearing timers belonging to a session started while the write awaited.
+    if (isSessionActive(generation)) {
+      removeCountdown();
+      removeRelevantStopwatches();
+    }
     return workout;
   }
 
@@ -1506,6 +1541,7 @@ and:
         ownerId: ownerId,
         cursor: _setCursor,
         previousCursor: _previousSetCursor,
+        isSubmitting: isSubmitting,
       );
     }
     final t = ref.read(translationsProvider);

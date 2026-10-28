@@ -109,10 +109,15 @@ class HistoryController {
       .maybeUnlockAchievements(AchievementTrigger.workout);
 
   Future<void> deleteWorkout(Workout workout) async {
-    await service.removeHistoryWorkoutById(workout.id);
-    if (workout.completedBy != null) {
-      await service.removeHistoryWorkoutById(workout.completedBy!);
-    }
+    final databaseService = service;
+    final owner = databaseService.db.currentUserId;
+    await databaseService.transaction<void>(() async {
+      await databaseService.removeHistoryWorkoutById(workout.id);
+      if (workout.completedBy != null) {
+        await databaseService.removeHistoryWorkoutById(workout.completedBy!);
+      }
+    });
+    if (!ref.mounted || databaseService.db.currentUserId != owner) return;
     scheduleBackup();
 
     unlockAchievements();
@@ -206,7 +211,6 @@ class HistoryController {
       getContinuation(incompleteWorkout: incompleteWorkout) != null;
 
   Workout? getContinuation({required Workout incompleteWorkout}) {
-    if (incompleteWorkout.isComplete) return null;
     return service.workoutHistory.firstWhereOrNull(
       (element) => element.completes == incompleteWorkout.id,
     );
@@ -240,21 +244,24 @@ class HistoryController {
   Future<void> addNewWorkout(Workout workout) async {
     logger.d(workout.toJson().toPrettyString());
     logger.i("Adding new workout to history");
-    final collides = service.hasHistoryWorkout(workout.id);
-    if (collides) {
+    if (service.hasHistoryWorkout(workout.id)) {
       workout = workout.regenerateID();
-      if (workout.completes != null) {
-        final completed = service.getHistoryWorkout(workout.completes!);
-        if (completed != null) {
-          await service.setHistoryWorkout(
-            completed.copyWith(completedBy: workout.id),
-          );
-        } else {
-          workout = workout.copyWith(completes: null);
-        }
-      }
     }
-    await service.setHistoryWorkout(workout);
+    if (workout.completes == null) {
+      await service.setHistoryWorkout(workout);
+      return;
+    }
+    await service.transaction(() async {
+      final completed = service.getHistoryWorkout(workout.completes!);
+      if (completed == null) {
+        await service.setHistoryWorkout(workout.copyWith(completes: null));
+        return;
+      }
+      await service.setHistoryWorkout(workout);
+      await service.setHistoryWorkout(
+        completed.copyWith(completedBy: workout.id),
+      );
+    });
   }
 
   Map<GTMuscleCategory, double> calculateMuscleCategoryDistributionFor({
@@ -506,7 +513,7 @@ extension WorkoutHistory on Workout {
   bool hasContinuationIn(Iterable<Workout> history) =>
       continuationIn(history) != null;
   Workout? continuationIn(Iterable<Workout> history) =>
-      isComplete ? null : history.where((w) => w.completes == id).firstOrNull;
+      history.where((w) => w.completes == id).firstOrNull;
   Workout? originalWorkoutForContinuationIn(Iterable<Workout> history) =>
       history.where((w) => w.id == completes).firstOrNull;
   SynthesizedWorkout synthesizeContinuations({

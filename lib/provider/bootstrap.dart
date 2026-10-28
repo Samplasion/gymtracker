@@ -208,7 +208,7 @@ final appStartupProvider = FutureProvider<void>((ref) async {
   ]);
   if (!ref.mounted) return;
   ref.read(purchasesControllerProvider);
-  ref.read(achievementsControllerProvider);
+  ref.listen(achievementsControllerProvider, (_, _) {});
   final releaseIntents = IntentsController.initialize(
     start: (id, _) {
       final controller = ref.read(routinesControllerProvider);

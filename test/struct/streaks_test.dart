@@ -3,6 +3,30 @@ import 'package:test/test.dart';
 
 void main() {
   group("Streaks -", () {
+    group('rest days count calendar dates', () {
+      final cases = [
+        (DateTime(2026, 3, 29), DateTime(2026, 3, 30), 1),
+        (DateTime(2026, 3, 28), DateTime(2026, 3, 31), 3),
+        (DateTime(2026, 10, 25), DateTime(2026, 10, 26), 1),
+        (DateTime(2026, 10, 24), DateTime(2026, 10, 27), 3),
+        (DateTime(2026, 3, 31), DateTime(2026, 4, 1), 1),
+        (DateTime(2026, 12, 31), DateTime(2027, 1, 1), 1),
+      ];
+
+      for (final (lastWorkout, today, expectedDays) in cases) {
+        test('$lastWorkout to $today is $expectedDays days', () {
+          expect(
+            Streaks.fromMappedDays(
+              {lastWorkout: [1]},
+              firstDayOfWeek: DateTime.monday,
+              today: today,
+            ).restDays,
+            expectedDays,
+          );
+        });
+      }
+    });
+
     test("should return Streaks.zero for an empty map", () {
       expect(
         Streaks.fromMappedDays({}, firstDayOfWeek: 1, today: DateTime.now()),

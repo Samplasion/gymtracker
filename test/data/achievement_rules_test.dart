@@ -10,6 +10,8 @@ import 'package:gymtracker/model/workout.dart';
 import 'package:gymtracker/provider/events.dart';
 import 'package:gymtracker/service/database.dart';
 import 'package:gymtracker/service/online.dart';
+import 'package:gymtracker/struct/date_sequence.dart';
+import 'package:gymtracker/struct/nutrition.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:rxdart/rxdart.dart';
 
@@ -19,6 +21,59 @@ class _Online extends Mock implements OnlineService {}
 
 void main() {
   setUpAll(() => registerFallbackValue(<AchievementCompletion>[]));
+
+  group('food watcher calendar streaks', () {
+    final now = DateTime.now();
+    DateTime day(int offset) => DateTime(now.year, now.month, now.day + offset);
+    TaggedFood food(DateTime date) => DateTagged(
+      date: date,
+      value: const Food(
+        name: 'Meal',
+        amount: 100,
+        nutritionalValuesPer100g: NutritionValues(
+          calories: 100,
+          fat: 0,
+          saturatedFat: 0,
+          carbs: 0,
+          sugar: 0,
+          protein: 0,
+        ),
+      ),
+    );
+
+    for (final days in [2, 7, 30]) {
+      test('unlocks at exactly $days consecutive days including the first', () {
+        final rules = AchievementRules(
+          foods: () => [for (var i = 0; i < days; i++) food(day(-i))],
+        );
+        final level = rules.catalog['foodWatcher']!.levels.firstWhere(
+          (level) => level.progressMax!() == days,
+        );
+        expect(level.progress!(), days.toDouble());
+        expect(level.checkCompletion(level.progress!()), isTrue);
+      });
+    }
+
+    test('counts today once and excludes future meals', () {
+      final rules = AchievementRules(
+        foods: () => [food(day(1)), food(day(0)), food(day(0))],
+      );
+      expect(rules.catalog['foodWatcher']!.levels.first.progress!(), 1);
+    });
+
+    test('keeps the longest historical streak across gaps and DST changes', () {
+      final rules = AchievementRules(
+        foods: () => [
+          food(DateTime(2024, 3, 30)),
+          food(DateTime(2024, 3, 31)),
+          food(DateTime(2024, 4, 1)),
+          food(DateTime(2024, 4, 1)),
+          food(day(0)),
+        ],
+      );
+      expect(rules.catalog['foodWatcher']!.levels.first.progress!(), 3);
+    });
+  });
 
   test(
     'catalog rules can evaluate empty data without an application scope',

@@ -56,7 +56,15 @@ class Streaks {
     if (!mappedDays.containsKey(today)) {
       final keys = mappedDays.keys.toList()..sort();
       if (keys.isNotEmpty) {
-        rest = today.difference(keys.last).inDays;
+        final lastWorkout = keys.last;
+        // Compare calendar dates without daylight-saving offset changes.
+        rest = DateTime.utc(today.year, today.month, today.day)
+            .difference(DateTime.utc(
+              lastWorkout.year,
+              lastWorkout.month,
+              lastWorkout.day,
+            ))
+            .inDays;
       }
     }
 

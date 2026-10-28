@@ -10,7 +10,9 @@ import 'package:gymtracker/data/achievements.dart';
 import 'package:gymtracker/model/achievements.dart';
 import 'package:gymtracker/provider/events.dart';
 import 'package:gymtracker/provider/online.dart';
+import 'package:gymtracker/provider/routines.dart';
 import 'package:gymtracker/provider/settings.dart';
+import 'package:gymtracker/provider/training_data.dart';
 import 'package:gymtracker/service/database.dart';
 import 'package:gymtracker/service/logger.dart';
 import 'package:gymtracker/service/online.dart';
@@ -295,6 +297,23 @@ AchievementsController achievementsController(Ref ref) {
     catalogResolver: () => ref.read(achievementCatalogProvider),
   );
   controller.init();
+  // Evaluate committed snapshots, after Riverpod has received the new data.
+  // Ignore each stream's initial load so startup does not unlock old data.
+  ref.listen(historyWorkoutsProvider, (previous, next) {
+    if (previous?.hasValue == true && next.hasValue) {
+      controller.maybeUnlockAchievements(AchievementTrigger.workout);
+    }
+  });
+  ref.listen(routinesStreamProvider, (previous, next) {
+    if (previous?.hasValue == true && next.hasValue) {
+      controller.maybeUnlockAchievements(AchievementTrigger.routines);
+    }
+  });
+  ref.listen(foldersStreamProvider, (previous, next) {
+    if (previous?.hasValue == true && next.hasValue) {
+      controller.maybeUnlockAchievements(AchievementTrigger.routines);
+    }
+  });
   ref.onDispose(controller.dispose);
   return controller;
 }

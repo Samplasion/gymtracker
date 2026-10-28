@@ -21,6 +21,7 @@ final Map<String, Achievement> achievements = AchievementRules().catalog;
 /// Rules read feature data supplied by their owner, never a global container.
 class AchievementRules {
   AchievementRules({
+    DateTime Function()? clock,
     List<Workout> Function()? history,
     List<Workout> Function()? routines,
     bool Function()? hasFolders,
@@ -29,13 +30,15 @@ class AchievementRules {
     List<Exercise> Function()? customExercises,
     this.distanceUnit = Distance.km,
     this.weightUnit = Weights.kg,
-  }) : history = history ?? (() => const []),
+  }) : clock = clock ?? DateTime.now,
+       history = history ?? (() => const []),
        routines = routines ?? (() => const []),
        hasFolders = hasFolders ?? (() => false),
        weights = weights ?? (() => const []),
        foods = foods ?? (() => const []),
        customExercises = customExercises ?? (() => const []);
 
+  final DateTime Function() clock;
   final List<Workout> Function() history;
   final List<Workout> Function() routines;
   final bool Function() hasFolders;
@@ -328,12 +331,12 @@ class AchievementRules {
             return _workoutFreak(_WorkoutFreakPeriod.month).length.toDouble();
           },
           progressMax: () {
-            final today = DateTime.now();
+            final today = clock();
             return DateTime(today.year, today.month + 1, 0).day.toDouble();
           },
           progressText: (t, value) => t.time.days(n: value.toInt()),
           checkCompletion: (progress) {
-            final today = DateTime.now().startOfDay;
+            final today = clock().startOfDay;
             final daysInMonth = DateTime(today.year, today.month + 1, 0).day;
             return progress! >= daysInMonth;
           },
@@ -348,12 +351,12 @@ class AchievementRules {
             return _workoutFreak(_WorkoutFreakPeriod.year).length.toDouble();
           },
           progressMax: () {
-            final today = DateTime.now();
+            final today = clock();
             return today.isLeapYear ? 366 : 365;
           },
           progressText: (t, value) => t.time.days(n: value.toInt()),
           checkCompletion: (progress) {
-            final today = DateTime.now().startOfDay;
+            final today = clock().startOfDay;
             final daysInYear = today.isLeapYear ? 366 : 365;
             return progress! >= daysInYear;
           },
@@ -848,7 +851,7 @@ class AchievementRules {
           descriptionKey: "achievements.swimsuitSeason.description",
           trigger: AchievementTrigger.workout,
           progress: () {
-            final year = DateTime.now().year;
+            final year = clock().year;
             final history = this.history();
             if (history.isEmpty) return 0;
             final subset = history.where(
@@ -869,7 +872,7 @@ class AchievementRules {
             if (history.isEmpty) return false;
 
             for (
-              int year = DateTime.now().year;
+              int year = clock().year;
               year >= history.first.startingDate!.year;
               year--
             ) {
@@ -1072,47 +1075,39 @@ class AchievementRules {
   }
 
   List<DateTime> _foodWatcher() {
-    final today = DateTime.now().startOfDay;
+    final now = clock();
+    // Compare calendar days in UTC to avoid daylight-saving time changing
+    // the duration between two consecutive local dates.
+    final today = DateTime.utc(now.year, now.month, now.day);
+    final days =
+        foods()
+            .map(
+              (food) =>
+                  DateTime.utc(food.date.year, food.date.month, food.date.day),
+            )
+            .where((day) => !day.isAfter(today))
+            .toSet()
+            .toList()
+          ..sort();
 
-    final loggedFoods = foods();
-    if (loggedFoods.isEmpty) return [];
-
-    final sortedFoods = loggedFoods.toList()
-      ..sort((a, b) => a.date.compareTo(b.date));
-    final firstDay = sortedFoods.first.date;
-
-    // Return the longest continuous streak of days of all time
-    final streaks = <List<DateTime>>[];
+    var longestStreak = <DateTime>[];
     var currentStreak = <DateTime>[];
-    final difference = firstDay.startOfDay.difference(today).abs().inDays;
-    for (var i = 0; i < difference; i++) {
-      final day = today.subtract(Duration(days: i));
-      final dayFoods = loggedFoods
-          .where((element) => element.date.isSameDay(day))
-          .toList();
-      if (dayFoods.isNotEmpty) {
-        currentStreak.add(day);
-      } else {
-        if (currentStreak.isNotEmpty) {
-          streaks.add(currentStreak);
-          currentStreak = [];
-        }
+    for (final day in days) {
+      if (currentStreak.isNotEmpty &&
+          day.difference(currentStreak.last).inDays != 1) {
+        currentStreak = [];
+      }
+      currentStreak.add(day);
+      if (currentStreak.length > longestStreak.length) {
+        longestStreak = currentStreak.toList();
       }
     }
 
-    if (currentStreak.isNotEmpty) {
-      streaks.add(currentStreak);
-    }
-
-    return streaks.isEmpty
-        ? []
-        : streaks.reduce(
-            (value, element) => value.length > element.length ? value : element,
-          );
+    return longestStreak;
   }
 
   List<DateTime> _workoutFreak(_WorkoutFreakPeriod period) {
-    final today = DateTime.now().startOfDay;
+    final today = clock().startOfDay;
 
     final periodWorkouts = history().where((element) {
       final yearMatches = element.startingDate!.year == today.year;

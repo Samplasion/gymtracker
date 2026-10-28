@@ -1,5 +1,13 @@
 {
   "appName": "Gym Bro",
+  "navigation": {
+    "feed": "Feed",
+    "profile": "Profilo",
+    "food": "Diario",
+    "workouts": "Allenati",
+    "pro": "PRO",
+    "settings": "Impostazioni"
+  },
   "appInfo": {
     "version": "Versione $version (build $build)",
     "shortDescription": "Compagno di allenamenti",
@@ -2294,8 +2302,39 @@
         "correction": "Correzione inviata per revisione",
         "unavailable": "Voce non disponibile per la pubblicazione",
         "cancelled": "Invio annullato",
-        "cancelled_unknown": "Tentativi annullati; un invio precedente potrebbe essere già stato ricevuto"
+        "cancelled_unknown": "Tentativi annullati; un invio precedente potrebbe essere già stato ricevuto",
+        "already_present": "Alimento già presente nel catalogo",
+        "uncertain": "Non è possibile verificare se questo alimento è già nel catalogo."
       }
+    },
+    "picker": {
+      "title": "Aggiungi alimento",
+      "search": "Ricerca",
+      "barcode": "Codice a barre",
+      "more": "Altro",
+      "added": "Aggiunti",
+      "done": "Fine",
+      "recent": "Recenti",
+      "results": "Catalogo",
+      "empty": "Nessun alimento trovato",
+      "retry": "Riprova",
+      "failed": "Operazione non riuscita. Riprova.",
+      "withBarcode": "Personalizzato con codice a barre",
+      "withoutBarcode": "Personalizzato senza codice a barre",
+      "save": "Salva",
+      "savePrivate": "Salva per me",
+      "share": "Aggiungi al catalogo",
+      "alreadyPresent": "Alimento già presente nel catalogo",
+      "uncertain": "Non è possibile verificare se questo alimento è già nel catalogo.",
+      "queued": "Condivisione in attesa di invio",
+      "published": "Alimento pubblicato nel catalogo",
+      "addedNotice": "Alimento aggiunto",
+      "noAdded": "Non hai ancora aggiunto alimenti",
+      "lookupFailed": "Impossibile cercare il codice. Riprova oppure inserisci un alimento personalizzato.",
+      "custom": "Inserisci alimento",
+      "shareNotice": "Salva condivide l’alimento nel catalogo pubblico. Salva per me lo mantiene personale.",
+      "invalidBarcode": "Inserisci un codice a barre valido (4–32 cifre).",
+      "showMore": "Mostra altro"
     }
   },
   "equipment": {

@@ -29,6 +29,10 @@ abstract class _$FoodCWProxy {
 
   Food category(String? category);
 
+  Food origin(String? origin);
+
+  Food catalogId(String? catalogId);
+
   /// Creates a new instance with the provided field values.
   /// Passing `null` to a nullable field nullifies it, while `null` for a non-nullable field is ignored. To update a single field use `Food(...).copyWith.fieldName(value)`.
   ///
@@ -48,6 +52,8 @@ abstract class _$FoodCWProxy {
     NutritionUnit unit,
     int pieces,
     String? category,
+    String? origin,
+    String? catalogId,
   });
 }
 
@@ -95,6 +101,12 @@ class _$FoodCWProxyImpl implements _$FoodCWProxy {
   Food category(String? category) => call(category: category);
 
   @override
+  Food origin(String? origin) => call(origin: origin);
+
+  @override
+  Food catalogId(String? catalogId) => call(catalogId: catalogId);
+
+  @override
   /// Creates a new instance with the provided field values.
   /// Passing `null` to a nullable field nullifies it, while `null` for a non-nullable field is ignored. To update a single field use `Food(...).copyWith.fieldName(value)`.
   ///
@@ -114,6 +126,8 @@ class _$FoodCWProxyImpl implements _$FoodCWProxy {
     Object? unit = const $CopyWithPlaceholder(),
     Object? pieces = const $CopyWithPlaceholder(),
     Object? category = const $CopyWithPlaceholder(),
+    Object? origin = const $CopyWithPlaceholder(),
+    Object? catalogId = const $CopyWithPlaceholder(),
   }) {
     return Food(
       name: name == const $CopyWithPlaceholder() || name == null
@@ -165,6 +179,14 @@ class _$FoodCWProxyImpl implements _$FoodCWProxy {
           ? _value.category
           // ignore: cast_nullable_to_non_nullable
           : category as String?,
+      origin: origin == const $CopyWithPlaceholder()
+          ? _value.origin
+          // ignore: cast_nullable_to_non_nullable
+          : origin as String?,
+      catalogId: catalogId == const $CopyWithPlaceholder()
+          ? _value.catalogId
+          // ignore: cast_nullable_to_non_nullable
+          : catalogId as String?,
     );
   }
 }

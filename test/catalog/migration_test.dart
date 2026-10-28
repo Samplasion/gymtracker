@@ -53,7 +53,7 @@ void main() {
             .data
             .values
             .single,
-        22,
+        DATABASE_VERSION,
       );
       expect(await db.select(db.catalogSubmissions).get(), isEmpty);
     },

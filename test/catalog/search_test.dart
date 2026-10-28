@@ -17,6 +17,50 @@ void main() {
     barcode: '00123456',
     nutritionalValuesPer100g: NutritionValues.zero,
   );
+  test('expanded catalog loads all remaining pages in stable order', () async {
+    final offsets = <int>[];
+    final client = SupabaseClient(
+      'https://catalog.test',
+      'key',
+      authOptions: const AuthClientOptions(autoRefreshToken: false),
+      httpClient: MockClient((request) async {
+        final params = jsonDecode(request.body) as Map;
+        final offset = params['result_offset'] as int;
+        offsets.add(offset);
+        expect(params['query'], 'Milk');
+        expect(params['result_limit'], 50);
+        return Response(
+          jsonEncode([
+            for (var i = offset; i < (offset == 50 ? 100 : 103); i++)
+              {'id': 'result-$i', 'version': 1, 'food': food.toJson()},
+          ]),
+          200,
+          request: request,
+          headers: {'content-type': 'application/json'},
+        );
+      }),
+    );
+    final container = ProviderContainer(
+      overrides: [foodCatalogClientProvider.overrideWithValue(client)],
+    );
+    final subscription = container.listen(
+      remainingFoodCatalogProvider(' Milk '),
+      (_, _) {},
+    );
+    addTearDown(() async {
+      subscription.close();
+      container.dispose();
+      await client.dispose();
+    });
+    final results = await container.read(
+      remainingFoodCatalogProvider(' Milk ').future,
+    );
+    expect(offsets, [50, 100]);
+    expect(results, hasLength(53));
+    expect((results.first as CatalogFood).catalogId, 'result-50');
+    expect((results.last as CatalogFood).catalogId, 'result-102');
+  });
+
   test('old JSON retains OFF provenance and copyWith wire schema', () {
     final old = {...food.toJson(), 'isDownloaded': true};
     final decoded = Food.fromJson(old);
@@ -123,7 +167,10 @@ void main() {
       expect(result.catalogId, 'backend-cucumber');
       expect(result.nutritionalValuesPer100g.water, 95.23);
       fail = true;
-      final failureSubscription = container.listen(searchFoodCatalogProvider('Anguria'), (_, _) {});
+      final failureSubscription = container.listen(
+        searchFoodCatalogProvider('Anguria'),
+        (_, _) {},
+      );
       await expectLater(
         container.read(searchFoodCatalogProvider('Anguria').future),
         throwsA(isA<PostgrestException>()),

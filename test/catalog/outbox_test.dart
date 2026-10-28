@@ -46,6 +46,55 @@ void main() {
   );
 
   test(
+    'create-only intent survives storage and never uses legacy submission',
+    () async {
+      await outbox.enqueue('A', sample, createOnly: true);
+      final request = (await outbox.watch('A').first).single;
+      expect(request.createOnly, isTrue);
+      expect(request.definition.keys, isNot(contains('intent')));
+      expect(
+        request.definition['nutritionalValuesPer100g'],
+        sample.nutritionalValuesPer100g.toJson(),
+      );
+      var calls = 0;
+      final worker = CatalogDelivery(
+        outbox: outbox,
+        activeOwner: () => owner,
+        now: () => now,
+        submit: (_, _, _) async =>
+            throw StateError('Must not propose corrections'),
+        submitCreateOnly: (_, _, food) async {
+          calls++;
+          expect(
+            food['nutritionalValuesPer100g'],
+            sample.nutritionalValuesPer100g.toJson(),
+          );
+          return {'outcome': 'already_present'};
+        },
+      );
+      await worker.process();
+      expect(calls, 1);
+      expect((await outbox.watch('A').first).single.status, 'already_present');
+      await worker.process();
+      expect(calls, 1);
+    },
+  );
+
+  test(
+    'missing create-only sender preserves intent instead of falling back',
+    () async {
+      await outbox.enqueue('A', sample, createOnly: true);
+      var legacyCalled = false;
+      await delivery((_, _, _) async {
+        legacyCalled = true;
+        return {'outcome': 'published'};
+      }).process();
+      expect(legacyCalled, isFalse);
+      expect((await outbox.watch('A').first).single.status, 'pending');
+    },
+  );
+
+  test(
     'snapshot excludes diary identity and never enters sync outbox',
     () async {
       await outbox.enqueue('A', sample);

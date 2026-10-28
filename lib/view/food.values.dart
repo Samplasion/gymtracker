@@ -45,6 +45,62 @@ class _AddFoodViewState extends ConsumerState<AddFoodView> {
     text: widget.food.nutritionalValuesPer100g.water?.toString() ?? "",
   );
 
+  bool _sharing = false;
+  String? _shareOperation;
+
+  Future<void> _shareToCatalog(Food food) async {
+    if (_sharing) return;
+    setState(() => _sharing = true);
+    final initialOwner = ref.read(currentUserIdProvider);
+    try {
+      final eligibility = await ref.refresh(
+        catalogEligibilityProvider(food).future,
+      );
+      if (!mounted) return;
+      if (eligibility != 'absent') {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              eligibility == 'present'
+                  ? context.t.food.picker.alreadyPresent
+                  : context.t.food.picker.uncertain,
+            ),
+          ),
+        );
+        return;
+      }
+      final owner = ref.read(currentUserIdProvider);
+      if (owner == null || owner != initialOwner) return;
+      _shareOperation = await ref
+          .read(catalogOutboxProvider)
+          .enqueue(owner, food, createOnly: true);
+      if (!mounted) return;
+      ref.invalidate(catalogEligibilityProvider(food));
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(context.t.food.picker.queued)));
+      unawaited(
+        Future<void>.sync(
+          () => ref.read(catalogDeliveryProvider).process(),
+        ).catchError((Object error, StackTrace stack) {
+          globalLogger.w(
+            'Catalog delivery deferred',
+            error: error,
+            stackTrace: stack,
+          );
+        }),
+      );
+    } catch (_) {
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(context.t.food.picker.failed)));
+      }
+    } finally {
+      if (mounted) setState(() => _sharing = false);
+    }
+  }
+
   bool _amountInitialized = false;
 
   @override
@@ -72,6 +128,40 @@ class _AddFoodViewState extends ConsumerState<AddFoodView> {
 
   @override
   Widget build(BuildContext context) {
+    if (widget.food is Food && (widget.food as Food).origin == 'personal') {
+      ref.listen(catalogSubmissionsProvider, (_, next) {
+        final operation = _shareOperation;
+        if (operation == null) return;
+        final request = next.asData?.value
+            .where((r) => r.operationId == operation)
+            .firstOrNull;
+        if (request == null ||
+            const {'pending', 'sending'}.contains(request.status)) {
+          return;
+        }
+        _shareOperation = null;
+        final strings = context.t.food.picker;
+        final message = switch (request.status) {
+          'already_present' || 'duplicate' => strings.alreadyPresent,
+          'published' => strings.published,
+          'uncertain' || 'unavailable' => strings.uncertain,
+          _ => strings.failed,
+        };
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(message)));
+      });
+    }
+    final catalogId = switch (widget.food) {
+      CatalogFood food => food.catalogId,
+      Food food => food.catalogId,
+      _ => null,
+    };
+    final shareFood = widget.food;
+    final canShare =
+        shareFood is Food &&
+        ref.watch(catalogEligibilityProvider(shareFood)).asData?.value ==
+            'absent';
     final servingSizes = widget.food.servingSizes;
     final hasServingSizes = servingSizes.isNotEmpty;
     final colorScheme = Theme.of(context).colorScheme;
@@ -90,15 +180,22 @@ class _AddFoodViewState extends ConsumerState<AddFoodView> {
           ].join(", "),
         ),
         actions: [
-          if (widget.food is CatalogFood)
+          if (canShare)
+            PopupMenuButton<String>(
+              enabled: !_sharing,
+              itemBuilder: (_) => [
+                PopupMenuItem(
+                  value: 'share',
+                  child: Text(context.t.food.picker.share),
+                ),
+              ],
+              onSelected: (_) => _shareToCatalog(shareFood),
+            ),
+          if (catalogId != null)
             IconButton(
               tooltip: context.t.food.catalog.report,
               icon: const Icon(Icons.flag_outlined),
-              onPressed: () => showCatalogReport(
-                context,
-                ref,
-                (widget.food as CatalogFood).catalogId,
-              ),
+              onPressed: () => showCatalogReport(context, ref, catalogId),
             ),
           if (widget.food is Food)
             Builder(
@@ -175,7 +272,7 @@ class _AddFoodViewState extends ConsumerState<AddFoodView> {
                           decoration: GymTrackerInputDecoration(
                             labelText: context.t.food.add.servingSize,
                           ),
-                          value: servingSize,
+                          initialValue: servingSize,
                           items: [
                             ...servingSizes.map(
                               (servingSize) => DropdownMenuItem(
@@ -295,6 +392,16 @@ class _AddFoodViewState extends ConsumerState<AddFoodView> {
                 Go.back(result: updatedFood);
               } else {
                 final food = Food(
+                  origin: widget.food is CatalogFood
+                      ? 'catalog'
+                      : (widget.food is Food
+                            ? (widget.food as Food).origin
+                            : null),
+                  catalogId: widget.food is CatalogFood
+                      ? (widget.food as CatalogFood).catalogId
+                      : (widget.food is Food
+                            ? (widget.food as Food).catalogId
+                            : null),
                   name: widget.food.name,
                   brand: widget.food.brand,
                   amount: amount,
@@ -843,7 +950,6 @@ class _CustomAddFoodViewState extends ConsumerState<CustomAddFoodView> {
 
   late final nameController = TextEditingController();
   late final brandController = TextEditingController();
-  bool submitToCatalog = true;
   bool saving = false;
   double amount = 100;
   int pieces = 1;
@@ -876,12 +982,13 @@ class _CustomAddFoodViewState extends ConsumerState<CustomAddFoodView> {
   dispose() {
     controllers.forEach((key, value) => value.dispose());
     amountController.dispose();
+    nameController.dispose();
+    brandController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final catalogOwner = ref.watch(currentUserIdProvider);
     final colorScheme = Theme.of(context).colorScheme;
     final gradientColor = colorScheme.surfaceContainerHigh;
     return Scaffold(
@@ -988,23 +1095,10 @@ class _CustomAddFoodViewState extends ConsumerState<CustomAddFoodView> {
                         ),
                       ),
                       const SizedBox(height: 16),
-                      CheckboxListTile(
-                        key: const ValueKey('submit-to-catalog'),
-                        contentPadding: EdgeInsets.zero,
-                        title: Text(context.t.food.catalog.submitAlso),
-                        subtitle: Text(
-                          catalogOwner == null
-                              ? context.t.food.catalog.loginToSubmit
-                              : context.t.food.catalog.publicNotice,
-                        ),
-                        value: submitToCatalog && catalogOwner != null,
-                        onChanged: catalogOwner == null || saving
-                            ? null
-                            : (value) {
-                                setState(
-                                  () => submitToCatalog = value ?? false,
-                                );
-                              },
+                      Text(context.t.food.picker.shareNotice),
+                      Text(
+                        context.t.food.catalog.publicNotice,
+                        style: Theme.of(context).textTheme.bodySmall,
                       ),
                       const Divider(height: 32),
                       Text(
@@ -1094,69 +1188,85 @@ class _CustomAddFoodViewState extends ConsumerState<CustomAddFoodView> {
         color: gradientColor,
         center: true,
         buttons: [
+          TextButton(
+            onPressed: saving ? null : () => _save(share: false),
+            child: Text(context.t.food.picker.savePrivate),
+          ),
           FilledButton(
-            onPressed: () async {
-              if (!formKey.currentState!.validate()) {
-                return;
-              }
-
-              if (saving) return;
-              setState(() => saving = true);
-              final food = Food(
-                name: nameController.text.trim(),
-                brand: brandController.text.trim().isEmpty
-                    ? null
-                    : brandController.text.trim(),
-                amount: amount,
-                unit: unit,
-                nutritionalValuesPer100g: NutritionValues.fromJson({
-                  for (var id in controllers.keys)
-                    if (controllers[id]!.text.isNotEmpty)
-                      id: controllers[id]!.text.parseDouble(),
-                }),
-                barcode: widget.barcode,
-                pieces: pieces,
-                category: widget.category?.name,
-              );
-
-              if (widget.barcode != null) {
-                await ref
-                    .read(foodProvider.notifier)
-                    .addCustomBarcodeFood(
-                      widget.barcode!,
-                      food,
-                      widget.category,
-                    );
-              }
-
-              if (submitToCatalog && catalogOwner != null) {
-                try {
-                  await ref
-                      .read(catalogOutboxProvider)
-                      .enqueue(catalogOwner, food);
-                } catch (error, stack) {
-                  globalLogger.w(
-                    'Could not queue explicit catalog submission',
-                    error: error,
-                    stackTrace: stack,
-                  );
-                  if (context.mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text(context.t.food.catalog.queueFailed),
-                      ),
-                    );
-                  }
-                }
-              }
-              if (!context.mounted) return;
-              Navigator.of(context).pop(food);
-            },
-            child: Text(context.t.food.add.add),
+            onPressed: saving ? null : () => _save(share: true),
+            child: Text(context.t.food.picker.save),
           ),
         ],
       ),
     );
+  }
+
+  Future<void> _save({required bool share}) async {
+    if (saving || !formKey.currentState!.validate()) return;
+    setState(() => saving = true);
+    try {
+      var owner = ref.read(currentUserIdProvider);
+      if (share && owner == null) {
+        await Go.to(() => const AuthScreen());
+        if (!mounted) return;
+        owner = ref.read(currentUserIdProvider);
+        if (owner == null) return;
+      }
+      final food = Food(
+        name: nameController.text.trim(),
+        brand: brandController.text.trim().isEmpty
+            ? null
+            : brandController.text.trim(),
+        amount: amount,
+        unit: unit,
+        pieces: pieces,
+        category: widget.category?.name,
+        origin: 'personal',
+        barcode: widget.barcode,
+        nutritionalValuesPer100g: NutritionValues.fromJson({
+          for (final id in controllers.keys)
+            if (controllers[id]!.text.isNotEmpty)
+              id: controllers[id]!.text.parseDouble(),
+        }),
+      );
+      if (widget.barcode != null) {
+        await ref
+            .read(foodProvider.notifier)
+            .addCustomBarcodeFood(widget.barcode!, food, widget.category);
+      }
+      if (share) {
+        await ref.read(catalogOutboxProvider).enqueue(owner!, food);
+        if (!mounted) return;
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(context.t.food.picker.queued)));
+        unawaited(
+          Future<void>.sync(
+            () => ref.read(catalogDeliveryProvider).process(),
+          ).catchError((Object error, StackTrace stack) {
+            globalLogger.w(
+              'Catalog delivery deferred',
+              error: error,
+              stackTrace: stack,
+            );
+          }),
+        );
+      }
+      if (mounted) Navigator.of(context).pop(food);
+    } catch (error, stack) {
+      globalLogger.w(
+        'Could not save custom food',
+        error: error,
+        stackTrace: stack,
+      );
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(context.t.food.picker.failed)));
+      }
+    } finally {
+      if (mounted) setState(() => saving = false);
+    }
   }
 }
 
@@ -1216,17 +1326,6 @@ class SearchResultsView extends ConsumerWidget {
                       child: ListTile(
                         title: Text(food.name),
                         subtitle: food.brand == null ? null : Text(food.brand!),
-                        trailing: food is CatalogFood
-                            ? IconButton(
-                                tooltip: context.t.food.catalog.report,
-                                icon: const Icon(Icons.flag_outlined),
-                                onPressed: () => showCatalogReport(
-                                  context,
-                                  ref,
-                                  food.catalogId,
-                                ),
-                              )
-                            : null,
                         onTap: () {
                           Navigator.of(context).pop(food);
                         },
@@ -1255,9 +1354,7 @@ class SearchResultsView extends ConsumerWidget {
 }
 
 class FoodBarcodeReaderView extends ConsumerStatefulWidget {
-  final void Function(Food) onFoodReceived;
-
-  const FoodBarcodeReaderView({super.key, required this.onFoodReceived});
+  const FoodBarcodeReaderView({super.key});
 
   @override
   ConsumerState<FoodBarcodeReaderView> createState() =>
@@ -1295,7 +1392,6 @@ class _FoodBarcodeReaderViewState extends ConsumerState<FoodBarcodeReaderView>
     // Stop listening to the barcode events.
     unawaited(_subscription?.cancel());
     _subscription = null;
-    EasyDebounce.cancel('barcode');
     unawaited(controller.dispose());
     // Dispose the widget itself.
     super.dispose();
@@ -1317,7 +1413,8 @@ class _FoodBarcodeReaderViewState extends ConsumerState<FoodBarcodeReaderView>
       case AppLifecycleState.resumed:
         // Restart the scanner when the app is resumed.
         // Don't forget to resume listening to the barcode events.
-        _subscription = controller.barcodes.listen(_rawHandleBarcode);
+        if (_handlingCode || _manualEntry) return;
+        _subscription ??= controller.barcodes.listen(_rawHandleBarcode);
 
         unawaited(controller.start());
       case AppLifecycleState.inactive:
@@ -1339,7 +1436,7 @@ class _FoodBarcodeReaderViewState extends ConsumerState<FoodBarcodeReaderView>
             IconButton(
               icon: const Icon(GTIcons.debug),
               onPressed: () async {
-                handleCode(context, ref, "8000965154468");
+                _acceptCode("8000965154468");
               },
             ),
         ],
@@ -1363,56 +1460,59 @@ class _FoodBarcodeReaderViewState extends ConsumerState<FoodBarcodeReaderView>
         },
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () async {
-          await Go.to(
-            () => ManualBarcodeInsertionScreen(
-              handleCode: (code) {
-                if (!mounted) return;
-                handleCode(context, ref, code);
-                Navigator.of(context).pop();
-              },
-            ),
-          );
-        },
+        onPressed: _openManualEntry,
         child: const Icon(GTIcons.keyboard),
       ),
     );
   }
 
-  void _rawHandleBarcode(BarcodeCapture result) async {
-    if (!mounted || result.barcodes.isEmpty) return;
-    EasyDebounce.debounce("barcode", const Duration(milliseconds: 2500), () {
-      if (mounted) {
-        unawaited(handleCode(context, ref, result.barcodes.first.rawValue));
-      }
-    });
+  final _scanGate = BarcodeScanGate();
+  bool get _handlingCode => _scanGate.completed;
+  bool _manualEntry = false;
+
+  void _rawHandleBarcode(BarcodeCapture capture) {
+    if (!_manualEntry) {
+      unawaited(_acceptCodes(capture.barcodes.map((b) => b.rawValue)));
+    }
   }
 
-  bool _handlingCode = false;
+  Future<void> _acceptCode(String? code) => _acceptCodes([code]);
 
-  Future<void> handleCode(
-    BuildContext context,
-    WidgetRef ref,
-    String? code,
-  ) async {
+  Future<void> _acceptCodes(Iterable<String?> codes) async {
     if (!mounted) return;
-    if (code == null) {
-      logger.w("Invalid code");
-      return;
+    final accepted = _scanGate.take(codes);
+    if (accepted == null) return;
+    await _subscription?.cancel();
+    _subscription = null;
+    try {
+      await controller.stop();
+    } catch (_) {
+      /* Camera may already be inactive. */
     }
+    if (mounted) Navigator.of(context).pop(accepted);
+  }
 
-    if (_handlingCode) return;
-    _handlingCode = true;
-    return searchFoodByBarcode(context, ref, code)
-        .then((food) async {
-          if (!mounted) return;
-          if (food == null) {
-            logger.w("No food found for barcode $code");
-            return;
-          }
-          widget.onFoodReceived(food);
-        })
-        .whenComplete(() => _handlingCode = false);
+  Future<void> _openManualEntry() async {
+    if (_handlingCode || _manualEntry) return;
+    _manualEntry = true;
+    try {
+      await controller.stop();
+    } catch (_) {
+      /* No active camera. */
+    }
+    if (!mounted) return;
+    String? code;
+    await Go.to(
+      () => ManualBarcodeInsertionScreen(handleCode: (value) => code = value),
+    );
+    if (!mounted) return;
+    _manualEntry = false;
+    if (code != null) {
+      await _acceptCode(code);
+    } else if (!_handlingCode) {
+      _subscription ??= controller.barcodes.listen(_rawHandleBarcode);
+      await controller.start();
+    }
   }
 }
 
@@ -1460,11 +1560,15 @@ class _ManualBarcodeInsertionScreenState
   void ok() {
     if (!formKey.currentState!.validate()) return;
 
-    final code = controller.text;
-    Go.back();
-    SchedulerBinding.instance.addPostFrameCallback((_) {
-      widget.handleCode(code);
-    });
+    final code = controller.text.trim();
+    widget.handleCode(code);
+    Navigator.of(context).pop();
+  }
+
+  @override
+  void dispose() {
+    controller.dispose();
+    super.dispose();
   }
 
   @override
@@ -1489,6 +1593,9 @@ class _ManualBarcodeInsertionScreenState
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return context.t.food.barcodeReader.codeField.empty;
+                  }
+                  if (!RegExp(r'^[0-9]{4,32}$').hasMatch(value.trim())) {
+                    return context.t.food.picker.invalidBarcode;
                   }
                   return null;
                 },
@@ -1527,8 +1634,18 @@ class _AddCombinedFoodViewState extends ConsumerState<AddCombinedFoodView> {
   var unit = NutritionUnit.G;
   var constituents = <Food>[];
 
+  @override
+  void dispose() {
+    nameController.dispose();
+    brandController.dispose();
+    amountController.dispose();
+    super.dispose();
+  }
+
   NutritionValues get nutritionalValues => NutritionValues.sum(
-    constituents.map((food) => (food.amount, food.nutritionalValues)),
+    constituents.map(
+      (food) => (food.amount * food.pieces, food.nutritionalValues),
+    ),
   );
 
   @override
@@ -1701,6 +1818,7 @@ class _AddCombinedFoodViewState extends ConsumerState<AddCombinedFoodView> {
                     }
 
                     final food = Food(
+                      origin: 'personal',
                       name: nameController.text.trim(),
                       brand: brandController.text.trim().isEmpty
                           ? null
@@ -1722,58 +1840,23 @@ class _AddCombinedFoodViewState extends ConsumerState<AddCombinedFoodView> {
     );
   }
 
-  Widget _getSearchBar() {
-    return SearchAnchorPlus(
-      suggestionsBuilder: _getSearchSuggestionBuilder(
-        ref: ref,
-        closeView: () => Go.back(),
-        onFoodTap: (dtfood) {
-          final food = dtfood.value;
-          setState(() {
-            constituents.add(food);
-          });
+  Widget _getSearchBar() => M3EButton.icon(
+    icon: const Icon(Icons.add),
+    label: Text(context.t.food.picker.title),
+    onPressed: () => Go.to(
+      () => FoodPickerView(
+        allowCombine: false,
+        onAdd: (food) async {
+          final ingredient = food.copyWith(id: const Uuid().v4());
+          if (mounted) setState(() => constituents.add(ingredient));
+          return ingredient;
         },
-      ),
-      hintText: context.t.food.searchBar.hint,
-      barTrailing: [
-        IconButton(
-          icon: const Icon(GTIcons.scan_barcode),
-          tooltip: context.t.food.barcodeReader.title,
-          onPressed: () async {
-            showScanBarcodeView(context, ref).then((value) async {
-              if (value != null) {
-                setState(() {
-                  constituents.add(value);
-                });
-              }
-            });
-          },
-        ),
-      ],
-      onSubmitted: (query) {
-        showSearchResultsViewForCombination(context, ref, query).then((
-          value,
-        ) async {
-          if (value != null) {
-            setState(() {
-              constituents.add(value);
-            });
-          }
-        });
-      },
-      textCapitalization: TextCapitalization.sentences,
-      textInputAction: TextInputAction.search,
-      keyboardType: TextInputType.text,
-      viewFloatingActionButton: _AddCustomFoodFAB(
-        category: widget.category,
-        onFoodAdded: (food) async {
-          if (food != null) {
-            setState(() {
-              constituents.add(food);
-            });
+        onRemove: (food) async {
+          if (mounted) {
+            setState(() => constituents.removeWhere((f) => f.id == food.id));
           }
         },
       ),
-    );
-  }
+    ),
+  );
 }

@@ -49,6 +49,7 @@ class FoodCategoryList extends ConsumerWidget {
                 final category = foodCategories[index];
                 return Slidable(
                   key: ValueKey(category),
+                  enabled: canUpdate,
                   endActionPane: ActionPane(
                     extentRatio: 1 / 3,
                     dragDismissible: false,
@@ -56,6 +57,9 @@ class FoodCategoryList extends ConsumerWidget {
                     children: [
                       SlidableAction(
                         onPressed: (_) async {
+                          if (!ref.read(foodCanUpdateCategoriesProvider)) {
+                            return;
+                          }
                           await ref
                               .read(nutritionCategoryProvider.notifier)
                               .removeCategory(category);
@@ -502,86 +506,10 @@ class FoodCategoryFoodsView extends ConsumerWidget {
     );
   }
 
-  Widget _buildOFFSearchBar(BuildContext context, WidgetRef ref) {
-    return SearchAnchorPlus(
-      suggestionsBuilder: _getSearchSuggestionBuilder(
-        ref: ref,
-        closeView: () => Go.back(),
-        onFoodTap: (dtfood) {
-          showAddFoodView(context, dtfood.value).then((food) async {
-            if (food != null && context.mounted) {
-              final selectedDate = ref.read(foodSelectedDateProvider);
-              await ref
-                  .read(foodProvider.notifier)
-                  .addFood(selectedDate, food, category: category);
-            }
-          });
-        },
-      ),
-      hintText: context.t.food.searchBar.hint,
-      barTrailing: [
-        IconButton(
-          icon: const Icon(GTIcons.combine),
-          tooltip: context.t.food.combine.title,
-          onPressed: () async {
-            showCombineFoodsView(context, ref, category: category).then((
-              food,
-            ) async {
-              if (food != null && context.mounted) {
-                final selectedDate = ref.read(foodSelectedDateProvider);
-                await ref
-                    .read(foodProvider.notifier)
-                    .addFood(selectedDate, food, category: category);
-              }
-            });
-          },
-        ),
-        IconButton(
-          icon: const Icon(GTIcons.scan_barcode),
-          tooltip: context.t.food.barcodeReader.title,
-          onPressed: () async {
-            showScanBarcodeView(context, ref).then((food) async {
-              if (food != null && context.mounted) {
-                final selectedDate = ref.read(foodSelectedDateProvider);
-                await ref
-                    .read(foodProvider.notifier)
-                    .addFood(selectedDate, food, category: category);
-              }
-            });
-          },
-        ),
-      ],
-      onSubmitted: (query) async {
-        final selected = await showSearchResultsView(
-          context,
-          ref,
-          query,
-          category: category,
-        );
-        if (selected == null || !context.mounted) return;
-        final food = selected is Food
-            ? selected
-            : await showAddFoodView(context, selected);
-        if (food == null || !context.mounted) return;
-        final selectedDate = ref.read(foodSelectedDateProvider);
-        await ref
-            .read(foodProvider.notifier)
-            .addFood(selectedDate, food, category: category);
-      },
-      textCapitalization: TextCapitalization.sentences,
-      textInputAction: TextInputAction.search,
-      keyboardType: TextInputType.text,
-      viewFloatingActionButton: _AddCustomFoodFAB(
-        category: category,
-        onFoodAdded: (food) async {
-          if (food != null && context.mounted) {
-            final selectedDate = ref.read(foodSelectedDateProvider);
-            await ref
-                .read(foodProvider.notifier)
-                .addFood(selectedDate, food, category: category);
-          }
-        },
-      ),
-    );
-  }
+  Widget _buildOFFSearchBar(BuildContext context, WidgetRef ref) =>
+      M3EButton.icon(
+        onPressed: () => showFoodPicker(context, ref, category: category),
+        icon: const Icon(Icons.add),
+        label: Text(context.t.food.picker.title),
+      );
 }

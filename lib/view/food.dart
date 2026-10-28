@@ -3,10 +3,8 @@ import 'dart:math' as math;
 import 'dart:ui';
 
 import 'package:dio/dio.dart';
-import 'package:easy_debounce/easy_debounce.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
@@ -17,6 +15,7 @@ import 'package:gymtracker/provider/food.dart';
 import 'package:gymtracker/provider/food_catalog.dart';
 import 'package:gymtracker/provider/online.dart';
 import 'package:gymtracker/repository/food_catalog.dart';
+import 'package:gymtracker/service/barcode_scan_gate.dart';
 import 'package:gymtracker/service/logger.dart';
 import 'package:gymtracker/struct/date_sequence.dart';
 import 'package:gymtracker/struct/nutrition.dart';
@@ -27,7 +26,6 @@ import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/utils/skeletons.dart';
 import 'package:gymtracker/utils/utils.dart';
 import 'package:gymtracker/view/catalog_report.dart';
-import 'package:gymtracker/view/catalog_submissions.dart';
 import 'package:gymtracker/view/components/alert_banner.dart';
 import 'package:gymtracker/view/components/error_view.dart';
 import 'package:gymtracker/view/components/gradient_bottom_bar.dart';
@@ -37,25 +35,27 @@ import 'package:gymtracker/view/components/pro_builder.dart';
 import 'package:gymtracker/view/components/stats.dart';
 import 'package:gymtracker/view/components/subscription_nag.dart';
 import 'package:gymtracker/view/components/tweened_builder.dart';
+import 'package:gymtracker/view/login.dart';
 import 'package:gymtracker/view/skeleton.dart';
 import 'package:gymtracker/view/utils/crossfade.dart';
 import 'package:gymtracker/view/utils/date_picker.dart';
 import 'package:gymtracker/view/utils/input_decoration.dart';
 import 'package:gymtracker/view/utils/int_stepper_form_field.dart';
 import 'package:gymtracker/view/utils/nutrition_category_icon_picker.dart';
-import 'package:gymtracker/view/utils/search_anchor_plus.dart';
 import 'package:gymtracker/view/utils/sliver_utils.dart';
 import 'package:gymtracker/view/utils/speed_dial.dart';
 import 'package:intl/intl.dart';
+import 'package:m3e_core/m3e_core.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
-import 'package:relative_time/relative_time.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 import 'package:sliver_tools/sliver_tools.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:uuid/uuid.dart';
 
 part 'food.categories.dart';
 part 'food.goals.dart';
 part 'food.search.dart';
+part 'food.picker.dart';
 part 'food.values.dart';
 
 const _kKeyboardType = TextInputType.numberWithOptions(
@@ -113,15 +113,10 @@ Future<Food?> showScanBarcodeView(
   WidgetRef ref, {
   NutritionCategory? category,
 }) {
-  final completer = Completer<Food?>();
-  Go.to<void>(
-    () => FoodBarcodeReaderView(
-      onFoodReceived: (food) {
-        if (!completer.isCompleted) completer.complete(food);
-      },
-    ),
-  );
-  return completer.future;
+  return Go.to<String>(() => const FoodBarcodeReaderView()).then((code) {
+    if (code == null || !context.mounted) return null;
+    return searchFoodByBarcode(context, ref, code, category: category);
+  });
 }
 
 Future<Food?> searchFoodByBarcode(
@@ -130,54 +125,96 @@ Future<Food?> searchFoodByBarcode(
   String barcode, {
   NutritionCategory? category,
 }) async {
-  final customBarcodeFoods =
-      ref.read(customBarcodeFoodsStreamProvider).asData?.value ?? {};
-  final localFood = customBarcodeFoods[barcode];
-  if (localFood != null) {
-    final added = await showAddFoodView(context, localFood);
-    return added;
-  }
-
-  showDialog(
-    context: context,
-    barrierDismissible: false,
-    builder: (context) => const Center(child: GBLoadingIndicator()),
-  );
-
-  try {
-    final res = await ref.read(
-      searchFoodCatalogByBarcodeProvider(barcode).future,
+  while (context.mounted) {
+    final navigator = Navigator.of(context, rootNavigator: true);
+    unawaited(
+      showDialog<void>(
+        context: context,
+        barrierDismissible: false,
+        builder: (_) => const PopScope(
+          canPop: false,
+          child: Center(child: GBLoadingIndicator()),
+        ),
+      ),
     );
-    if (context.mounted) Go.back();
-
-    if (res != null) {
-      if (context.mounted) {
-        final added = await showAddFoodView(context, res);
-        return added;
-      }
-    } else {
-      if (context.mounted) {
-        final added = await showAddCustomFoodView(
-          context,
-          ref,
-          category: category,
-          barcode: barcode,
+    VagueFood? result;
+    var inheritAmount = false;
+    Object? failure;
+    // Reading .future alone does not keep an auto-disposed stream alive.
+    // Hold both lookups until they finish, even on a cold database connection.
+    final localSubscription = ref.listenManual(
+      customBarcodeFoodsStreamProvider,
+      (_, _) {},
+    );
+    ProviderSubscription<AsyncValue<VagueFood?>>? catalogSubscription;
+    try {
+      final localFoods = await ref.read(
+        customBarcodeFoodsStreamProvider.future,
+      );
+      if (!context.mounted) return null;
+      result = localFoods[barcode];
+      inheritAmount = result != null;
+      if (result == null) {
+        catalogSubscription = ref.listenManual(
+          searchFoodCatalogByBarcodeProvider(barcode),
+          (_, _) {},
         );
-        return added;
+        result = await ref.read(
+          searchFoodCatalogByBarcodeProvider(barcode).future,
+        );
       }
+    } catch (error) {
+      failure = error;
+    } finally {
+      catalogSubscription?.close();
+      localSubscription.close();
+      if (context.mounted) navigator.pop();
     }
-  } catch (e) {
-    if (context.mounted) Navigator.of(context).pop();
-    if (context.mounted) {
-      final added = await showAddCustomFoodView(
+    if (!context.mounted) return null;
+    if (failure == null) {
+      if (result != null) {
+        return showAddFoodView(context, result, inheritAmount: inheritAmount);
+      }
+      return showAddCustomFoodView(
         context,
         ref,
         category: category,
         barcode: barcode,
       );
-      return added;
     }
+    final action = await showDialog<String>(
+      context: context,
+      builder: (context) => AlertDialog(
+        content: Text(context.t.food.picker.lookupFailed),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(context.t.food.picker.done),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, 'custom'),
+            child: Text(context.t.food.picker.custom),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(context, 'retry'),
+            child: Text(context.t.food.picker.retry),
+          ),
+        ],
+      ),
+    );
+    if (!context.mounted || action == null) return null;
+    if (action == 'custom') {
+      return showAddCustomFoodView(
+        context,
+        ref,
+        category: category,
+        barcode: barcode,
+      );
+    }
+    ref.invalidate(customBarcodeFoodsStreamProvider);
+    ref.invalidate(searchFoodCatalogByBarcodeProvider(barcode));
   }
+  return null;
 }
 
 Future<VagueFood?> showSearchResultsView(
@@ -270,8 +307,6 @@ class FoodView extends ConsumerStatefulWidget {
 }
 
 class _FoodViewState extends ConsumerState<FoodView> {
-  final searchController = SearchController();
-
   final eatenKey = GlobalKey();
   final gaugeKey = GlobalKey();
   final goalKey = GlobalKey();
@@ -279,12 +314,6 @@ class _FoodViewState extends ConsumerState<FoodView> {
   final macroTile1Key = GlobalKey();
   final macroTile2Key = GlobalKey();
   final macroTile3Key = GlobalKey();
-
-  @override
-  void dispose() {
-    searchController.dispose();
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -640,80 +669,11 @@ class _FoodViewState extends ConsumerState<FoodView> {
     );
   }
 
-  Widget _buildOFFSearchBar() {
-    return SearchAnchorPlus(
-      searchController: searchController,
-      suggestionsBuilder: _getSearchSuggestionBuilder(
-        ref: ref,
-        closeView: () => Go.back(),
-        onFoodTap: (dtfood) {
-          showAddFoodView(context, dtfood.value).then((food) async {
-            if (food != null && context.mounted) {
-              final selectedDate = ref.read(foodSelectedDateProvider);
-              await ref.read(foodProvider.notifier).addFood(selectedDate, food);
-            }
-          });
-        },
-      ),
-      hintText: context.t.food.searchBar.hint,
-      barTrailing: [
-        IconButton(
-          icon: const Icon(GTIcons.combine),
-          tooltip: context.t.food.combine.title,
-          onPressed: () async {
-            showCombineFoodsView(context, ref).then((food) async {
-              if (food != null && context.mounted) {
-                final selectedDate = ref.read(foodSelectedDateProvider);
-                await ref
-                    .read(foodProvider.notifier)
-                    .addFood(selectedDate, food);
-              }
-            });
-          },
-        ),
-        IconButton(
-          icon: const Icon(GTIcons.scan_barcode),
-          tooltip: context.t.food.barcodeReader.title,
-          onPressed: () async {
-            showScanBarcodeView(context, ref).then((food) async {
-              if (food != null && context.mounted) {
-                final selectedDate = ref.read(foodSelectedDateProvider);
-                await ref
-                    .read(foodProvider.notifier)
-                    .addFood(selectedDate, food);
-              }
-            });
-          },
-        ),
-      ],
-      onSubmitted: (query) {
-        showSearchResultsView(context, ref, query).then((food) async {
-          if (food == null) return;
-          if (context.mounted) {
-            Go.to(() => AddFoodView(food: food)).then((added) async {
-              if (added != null && context.mounted) {
-                final selectedDate = ref.read(foodSelectedDateProvider);
-                await ref
-                    .read(foodProvider.notifier)
-                    .addFood(selectedDate, added);
-              }
-            });
-          }
-        });
-      },
-      textCapitalization: TextCapitalization.sentences,
-      textInputAction: TextInputAction.search,
-      keyboardType: TextInputType.text,
-      viewFloatingActionButton: _AddCustomFoodFAB(
-        onFoodAdded: (food) async {
-          if (food != null && context.mounted) {
-            final selectedDate = ref.read(foodSelectedDateProvider);
-            await ref.read(foodProvider.notifier).addFood(selectedDate, food);
-          }
-        },
-      ),
-    );
-  }
+  Widget _buildOFFSearchBar() => M3EButton.icon(
+    onPressed: () => showFoodPicker(context, ref),
+    icon: const Icon(Icons.add),
+    label: Text(context.t.food.picker.title),
+  );
 }
 
 class _FauxVerticalDivider extends StatelessWidget {
@@ -940,74 +900,6 @@ class _HomeFoodCategoryListTile extends ConsumerWidget {
   }
 }
 
-SearchSuggestionBuilder _getSearchSuggestionBuilder({
-  required WidgetRef ref,
-  required void Function() closeView,
-  required void Function(DateTagged<Food>) onFoodTap,
-}) {
-  return (BuildContext context, SearchController searchController) {
-    final foodLogs = ref.watch(foodLogsStreamProvider).asData?.value ?? [];
-    final foods = foodLogs.map((fv) => fv.value).toList();
-    if (searchController.text.isEmpty) {
-      var searchHistory = foods.reversed
-          .map((e) => e.name)
-          .toSet()
-          .take(10)
-          .toList();
-      if (searchHistory.isNotEmpty) {
-        return [
-          ...searchHistory.map((term) {
-            return ListTile(
-              leading: const Icon(GTIcons.history),
-              title: Text(term),
-              trailing: RotatedBox(
-                quarterTurns: -1,
-                child: IconButton(
-                  icon: const Icon(Icons.arrow_outward_rounded),
-                  onPressed: () async {
-                    searchController.text = term;
-                    searchController.selection = TextSelection.collapsed(
-                      offset: searchController.text.length,
-                    );
-                  },
-                ),
-              ),
-            );
-          }),
-        ];
-      }
-
-      return [ListTile(title: Text(context.t.food.searchBar.noHistory))];
-    }
-
-    final res = ref.watch(foodSuggestionsProvider(searchController.text));
-    if (res.isEmpty) {
-      return [
-        ListTile(
-          title: Text(
-            context.t.food.searchBar.noResults(query: searchController.text),
-          ),
-        ),
-      ];
-    }
-    return [
-      const SizedBox(height: 8),
-      ...res.map<Widget>((dtfood) {
-        return _SearchFoodWithMacros(
-          dtfood: dtfood,
-          onTap: () {
-            closeView();
-            SchedulerBinding.instance.addPostFrameCallback((_) {
-              onFoodTap(dtfood);
-            });
-          },
-        );
-      }),
-      const SizedBox(height: 8),
-    ];
-  };
-}
-
 class _FoodDayAppBar extends ConsumerWidget {
   const _FoodDayAppBar();
 
@@ -1019,11 +911,6 @@ class _FoodDayAppBar extends ConsumerWidget {
           ? const SkeletonDrawerButton()
           : null,
       actions: [
-        IconButton(
-          icon: const Icon(Icons.cloud_upload_outlined),
-          tooltip: context.t.food.catalog.submissions,
-          onPressed: () => Go.to(() => const CatalogSubmissionsView()),
-        ),
         IconButton(
           icon: const Icon(GTIcons.food_categories),
           tooltip: context.t.food.categoryList.title,

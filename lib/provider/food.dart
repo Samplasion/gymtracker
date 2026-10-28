@@ -1,7 +1,7 @@
 import 'dart:async';
-import 'dart:io';
 
 import 'package:collection/collection.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:fuzzywuzzy/fuzzywuzzy.dart';
 import 'package:gymtracker/controller/achievements_controller.dart';
@@ -42,11 +42,11 @@ class FoodSelectedDate extends _$FoodSelectedDate {
   }
 
   void previousDay() {
-    state = state.subtract(const Duration(days: 1)).startOfDay;
+    state = DateTime(state.year, state.month, state.day - 1);
   }
 
   void nextDay() {
-    state = state.add(const Duration(days: 1)).startOfDay;
+    state = DateTime(state.year, state.month, state.day + 1);
   }
 
   bool canGoToPreviousDay() => state.isAfter(DateTime(2000));
@@ -146,27 +146,24 @@ class FoodNotifier extends _$FoodNotifier {
   @override
   void build() {}
 
-  Future<void> addFood(
+  Future<Food> addFood(
     DateTime dateTime,
     Food food, {
     NutritionCategory? category,
   }) async {
     final trigger = ref.read(achievementTriggerProvider);
     final backup = ref.read(backupSchedulerProvider);
+    final saved = food.copyWith(
+      id: const Uuid().v4(),
+      category: category?.name,
+    );
     await ref
         .read(foodsRepositoryProvider)
-        .addFood(
-          DateTagged(
-            date: dateTime.startOfDay,
-            value: food.copyWith(
-              id: const Uuid().v4(),
-              category: category?.name,
-            ),
-          ),
-        );
+        .addFood(DateTagged(date: dateTime.startOfDay, value: saved));
     // TODO: Move this stuff to the Event system so that we don't have to call the Coordinator directly
     trigger(AchievementTrigger.food);
     backup.schedule();
+    return saved;
   }
 
   Future<void> removeFood(DateTime dateTime, Food food) async {
@@ -407,16 +404,20 @@ class FoodPermissionsNotifier extends _$FoodPermissionsNotifier {
   }
 
   Future<FoodPermissions> _getPermissions() async {
-    if (Platform.isMacOS) {
+    if (defaultTargetPlatform == TargetPlatform.macOS) {
       return (camera: true, gallery: true);
     } else {
       Map<Permission, PermissionStatus> statuses = {
         Permission.camera: await Permission.camera.status,
-        Permission.photos: await Permission.photos.status,
+        if (defaultTargetPlatform != TargetPlatform.android)
+          Permission.photos: await Permission.photos.status,
       };
       return (
         camera: statuses[Permission.camera]!.isGranted,
-        gallery: statuses[Permission.photos]!.isGranted,
+        // Android selects individual files through the system picker.
+        gallery:
+            defaultTargetPlatform == TargetPlatform.android ||
+            statuses[Permission.photos]!.isGranted,
       );
     }
   }
@@ -426,6 +427,10 @@ class FoodPermissionsNotifier extends _$FoodPermissionsNotifier {
   }
 
   Future<void> requestPermission(Permission perm) async {
+    if (defaultTargetPlatform == TargetPlatform.android &&
+        perm == Permission.photos) {
+      return;
+    }
     logger.d("Requesting permission: $perm");
     try {
       final status = await perm.request();
@@ -453,7 +458,8 @@ class FoodPermissionsNotifier extends _$FoodPermissionsNotifier {
 bool showFoodPermissionsSettingsTile(Ref ref) {
   final perms = ref.watch(foodPermissionsProvider).asData?.value;
   if (perms == null) return false;
-  return !(perms.camera && perms.gallery);
+  return !perms.camera ||
+      (defaultTargetPlatform != TargetPlatform.android && !perms.gallery);
 }
 
 // -----------------------------------------------------------------------------

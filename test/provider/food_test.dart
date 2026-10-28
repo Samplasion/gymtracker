@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:gymtracker/controller/achievements_controller.dart';
@@ -310,7 +311,7 @@ void main() {
           icon: NutritionCategoryIcon.fork_and_spoon,
         );
 
-        await container
+        final saved = await container
             .read(foodProvider.notifier)
             .addFood(today, food, category: cat);
 
@@ -318,6 +319,7 @@ void main() {
             verify(() => mockFoodsRepo.addFood(captureAny())).captured.single
                 as DateTagged<Food>;
         expect(captured.date, today);
+        expect(saved, captured.value);
         expect(captured.value.name, "Chicken Breast");
         expect(captured.value.category, "Lunch");
         expect(captured.value.id, isNotNull);
@@ -792,6 +794,8 @@ void main() {
     test(
       "returns true if permissions are incomplete, false if both granted",
       () async {
+        debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
+        addTearDown(() => debugDefaultTargetPlatformOverride = null);
         final containerWithIncomplete = ProviderContainer(
           overrides: [
             foodPermissionsProvider.overrideWith(

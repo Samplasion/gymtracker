@@ -10,6 +10,7 @@ import 'package:gymtracker/provider/food.dart';
 import 'package:gymtracker/provider/food_catalog.dart';
 import 'package:gymtracker/provider/online.dart';
 import 'package:gymtracker/repository/food_catalog.dart';
+import 'package:gymtracker/service/catalog_delivery.dart';
 import 'package:gymtracker/struct/nutrition.dart';
 import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/view/food.dart';
@@ -17,8 +18,11 @@ import 'package:gymtracker/view/food.dart';
 class _FailingOutbox extends CatalogOutbox {
   _FailingOutbox(super.db);
   @override
-  Future<String> enqueue(String owner, VagueFood food) async =>
-      throw StateError('Local queue unavailable');
+  Future<String> enqueue(
+    String owner,
+    VagueFood food, {
+    bool createOnly = false,
+  }) async => throw StateError('Local queue unavailable');
 }
 
 void main() {
@@ -61,6 +65,13 @@ void main() {
           overrides: [
             appDatabaseProvider.overrideWithValue(db),
             currentUserIdProvider.overrideWithValue('A'),
+            catalogDeliveryProvider.overrideWithValue(
+              CatalogDelivery(
+                outbox: CatalogOutbox(db),
+                activeOwner: () => null,
+                submit: (_, _, _) async => {'outcome': 'published'},
+              ),
+            ),
             if (scenario.fail)
               catalogOutboxProvider.overrideWithValue(_FailingOutbox(db)),
           ],
@@ -100,12 +111,6 @@ void main() {
         );
         await tester.tap(find.text('Open'));
         await tester.pumpAndSettle();
-        final check = find.byKey(const ValueKey('submit-to-catalog'));
-        expect(tester.widget<CheckboxListTile>(check).value, isFalse);
-        if (consent) {
-          await tester.tap(check);
-          await tester.pump();
-        }
         for (final field in tester.widgetList<TextField>(
           find.byType(TextField),
         )) {
@@ -117,9 +122,18 @@ void main() {
             field.controller!.text = '0';
           }
         }
-        await tester.tap(find.widgetWithText(FilledButton, t.food.add.add));
+        await tester.tap(
+          consent
+              ? find.widgetWithText(FilledButton, t.food.picker.save)
+              : find.widgetWithText(TextButton, t.food.picker.savePrivate),
+        );
         await tester.pumpAndSettle();
-        expect(returned?.name, 'Widget food');
+        if (scenario.fail) {
+          expect(returned, isNull);
+          expect(find.byType(CustomAddFoodView), findsOneWidget);
+        } else {
+          expect(returned?.name, 'Widget food');
+        }
         expect(
           await tester.runAsync(() => db.select(db.catalogSubmissions).get()),
           hasLength(consent && !scenario.fail ? 1 : 0),
@@ -129,17 +143,64 @@ void main() {
     );
   }
 
-  testWidgets('guest cannot opt into submission', (tester) async {
+  testWidgets('guest has public and personal save actions', (tester) async {
     await tester.pumpWidget(
       app(const CustomAddFoodView(category: null), owner: null),
     );
     await tester.pumpAndSettle();
-    final checkbox = tester.widget<CheckboxListTile>(
-      find.byKey(const ValueKey('submit-to-catalog')),
+    expect(
+      find.widgetWithText(FilledButton, t.food.picker.save),
+      findsOneWidget,
     );
-    expect(checkbox.value, isFalse);
-    expect(checkbox.onChanged, isNull);
+    expect(
+      find.widgetWithText(TextButton, t.food.picker.savePrivate),
+      findsOneWidget,
+    );
+    expect(find.byType(CheckboxListTile), findsNothing);
   });
+
+  for (final eligible in [false, true]) {
+    testWidgets('share menu visible only with verified absence: $eligible', (
+      tester,
+    ) async {
+      const food = Food(
+        name: 'Personal food',
+        origin: 'personal',
+        amount: 250,
+        nutritionalValuesPer100g: NutritionValues.zero,
+      );
+      var checks = 0;
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            currentUserIdProvider.overrideWithValue('A'),
+            favoriteFoodsStreamProvider.overrideWith((ref) => Stream.value([])),
+            catalogSubmissionsProvider.overrideWith((ref) => Stream.value([])),
+            catalogEligibilityProvider(food).overrideWith((ref) async {
+              checks++;
+              return eligible && checks == 1 ? 'absent' : 'present';
+            }),
+          ],
+          child: app(AddFoodView(food: food)),
+        ),
+      );
+      await tester.pumpAndSettle();
+      if (eligible) {
+        expect(find.byType(PopupMenuButton<String>), findsOneWidget);
+        await tester.tap(find.byType(PopupMenuButton<String>));
+        await tester.pumpAndSettle();
+        await tester.tap(find.text(t.food.picker.share));
+        await tester.pumpAndSettle();
+        expect(find.text(t.food.picker.alreadyPresent), findsOneWidget);
+        expect(
+          await tester.runAsync(() => db.select(db.catalogSubmissions).get()),
+          isEmpty,
+        );
+      } else {
+        expect(find.byType(PopupMenuButton<String>), findsNothing);
+      }
+    });
+  }
 
   testWidgets('adding a catalog food returns a complete independent snapshot', (
     tester,
@@ -193,6 +254,7 @@ void main() {
     expect(identical(returned?.servingSizes, product.servingSizes), isFalse);
     expect(returned?.barcode, '00123456');
     expect(returned?.downloadedFromOFF, isFalse);
-    expect(returned?.toJson().containsKey('catalogId'), isFalse);
+    expect(returned?.catalogId, 'catalog-id');
+    expect(returned?.origin, 'catalog');
   });
 }

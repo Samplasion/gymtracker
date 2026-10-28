@@ -350,24 +350,24 @@ class _SkeletonViewState extends ConsumerState<SkeletonView>
                     destinations: [
                       NavigationDestination(
                         icon: const Icon(GTIcons.home),
-                        label: context.t.feed.title,
+                        label: context.t.navigation.feed,
                       ),
                       NavigationDestination(
                         icon: const Icon(GTIcons.profile),
-                        label: context.t.me.title,
+                        label: context.t.navigation.profile,
                       ),
                       NavigationDestination(
                         icon: const Icon(GTIcons.food),
-                        label: context.t.food.title,
+                        label: context.t.navigation.food,
                       ),
                       NavigationDestination(
                         icon: const Icon(GTIcons.muscle),
-                        label: context.t.workoutPage.title,
+                        label: context.t.navigation.workouts,
                       ),
                       if (!isSubscribed)
                         NavigationDestination(
                           icon: const Icon(GTIcons.pro),
-                          label: context.t.pro.title,
+                          label: context.t.navigation.pro,
                         ),
                     ],
                   );
@@ -437,6 +437,17 @@ class _SkeletonViewState extends ConsumerState<SkeletonView>
               icon: Icon(GTIcons.logs),
               label: Text("Logs"),
             ),
+        ];
+
+        final railLabels = [
+          context.t.navigation.feed,
+          context.t.navigation.profile,
+          context.t.navigation.food,
+          context.t.navigation.workouts,
+          if (!isSubscribed) context.t.navigation.pro,
+          context.t.navigation.settings,
+          if (kDebugMode) "Debug",
+          if (LoggerController.shouldShowPane) "Logs",
         ];
 
         void jumpOffTapHandler(int index) {
@@ -524,10 +535,14 @@ class _SkeletonViewState extends ConsumerState<SkeletonView>
                     labelType: NavigationRailLabelType.all,
                     destinations: destinations
                         .whereType<NavigationDrawerDestination>()
+                        .indexed
                         .map(
-                          (d) => NavigationRailDestination(
-                            icon: d.icon,
-                            label: d.label,
+                          (entry) => NavigationRailDestination(
+                            icon: entry.$2.icon,
+                            label: Text(
+                              railLabels[entry.$1],
+                              textAlign: TextAlign.center,
+                            ),
                           ),
                         )
                         .toList(),

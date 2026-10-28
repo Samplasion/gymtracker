@@ -1,5 +1,13 @@
 {
   "appName": "Gym Bro",
+  "navigation": {
+    "feed": "Feed",
+    "profile": "Profile",
+    "food": "Food",
+    "workouts": "Train",
+    "pro": "PRO",
+    "settings": "Settings"
+  },
   "appInfo": {
     "version": "Version $version (build $build)",
     "shortDescription": "Workout Buddy",
@@ -2294,8 +2302,39 @@
         "correction": "Correction submitted for review",
         "unavailable": "Entry unavailable for publication",
         "cancelled": "Submission cancelled",
-        "cancelled_unknown": "Retries cancelled; an earlier submission may already have been received"
+        "cancelled_unknown": "Retries cancelled; an earlier submission may already have been received",
+        "already_present": "Food already in the catalog",
+        "uncertain": "We cannot verify whether this food is already in the catalog."
       }
+    },
+    "picker": {
+      "title": "Add food",
+      "search": "Search",
+      "barcode": "Barcode",
+      "more": "More",
+      "added": "Added",
+      "done": "Done",
+      "recent": "Recent",
+      "results": "Catalog",
+      "empty": "No foods found",
+      "retry": "Retry",
+      "failed": "Operation failed. Please try again.",
+      "withBarcode": "Custom food with barcode",
+      "withoutBarcode": "Custom food without barcode",
+      "save": "Save",
+      "savePrivate": "Save for me",
+      "share": "Add to catalog",
+      "alreadyPresent": "Food already in the catalog",
+      "uncertain": "We cannot verify whether this food is already in the catalog.",
+      "queued": "Sharing queued for delivery",
+      "published": "Food published in the catalog",
+      "addedNotice": "Food added",
+      "noAdded": "No foods added yet",
+      "lookupFailed": "Could not look up the barcode. Retry or enter a custom food.",
+      "custom": "Enter food",
+      "shareNotice": "Save shares this food in the public catalog. Save for me keeps it personal.",
+      "invalidBarcode": "Enter a valid barcode (4–32 digits).",
+      "showMore": "Show more"
     }
   },
   "equipment": {

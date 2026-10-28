@@ -39,6 +39,7 @@ class TranslationsIt with BaseTranslations<AppLocale, Translations> implements T
 
 	// Translations
 	@override String get appName => 'Gym Bro';
+	@override late final Translations$navigation$it navigation = Translations$navigation$it._(_root);
 	@override late final Translations$appInfo$it appInfo = Translations$appInfo$it._(_root);
 	@override late final Translations$set$it set = Translations$set$it._(_root);
 	@override late final Translations$exercise$it exercise = Translations$exercise$it._(_root);
@@ -182,6 +183,21 @@ class TranslationsIt with BaseTranslations<AppLocale, Translations> implements T
 	@override late final Translations$reports$it reports = Translations$reports$it._(_root);
 	@override late final Translations$plateau$it plateau = Translations$plateau$it._(_root);
 	@override late final Translations$progression$it progression = Translations$progression$it._(_root);
+}
+
+// Path: navigation
+class Translations$navigation$it implements Translations$navigation$en {
+	Translations$navigation$it._(this._root);
+
+	final TranslationsIt _root; // ignore: unused_field
+
+	// Translations
+	@override String get feed => 'Feed';
+	@override String get profile => 'Profilo';
+	@override String get food => 'Diario';
+	@override String get workouts => 'Allenati';
+	@override String get pro => 'PRO';
+	@override String get settings => 'Impostazioni';
 }
 
 // Path: appInfo
@@ -1264,6 +1280,7 @@ class Translations$food$it implements Translations$food$en {
 	@override late final Translations$food$permission$it permission = Translations$food$permission$it._(_root);
 	@override late final Translations$food$datePicker$it datePicker = Translations$food$datePicker$it._(_root);
 	@override late final Translations$food$catalog$it catalog = Translations$food$catalog$it._(_root);
+	@override late final Translations$food$picker$it picker = Translations$food$picker$it._(_root);
 }
 
 // Path: equipment
@@ -3295,7 +3312,45 @@ class Translations$food$catalog$it implements Translations$food$catalog$en {
 		'unavailable': 'Voce non disponibile per la pubblicazione',
 		'cancelled': 'Invio annullato',
 		'cancelled_unknown': 'Tentativi annullati; un invio precedente potrebbe essere già stato ricevuto',
+		'already_present': 'Alimento già presente nel catalogo',
+		'uncertain': 'Non è possibile verificare se questo alimento è già nel catalogo.',
 	};
+}
+
+// Path: food.picker
+class Translations$food$picker$it implements Translations$food$picker$en {
+	Translations$food$picker$it._(this._root);
+
+	final TranslationsIt _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Aggiungi alimento';
+	@override String get search => 'Ricerca';
+	@override String get barcode => 'Codice a barre';
+	@override String get more => 'Altro';
+	@override String get added => 'Aggiunti';
+	@override String get done => 'Fine';
+	@override String get recent => 'Recenti';
+	@override String get results => 'Catalogo';
+	@override String get empty => 'Nessun alimento trovato';
+	@override String get retry => 'Riprova';
+	@override String get failed => 'Operazione non riuscita. Riprova.';
+	@override String get withBarcode => 'Personalizzato con codice a barre';
+	@override String get withoutBarcode => 'Personalizzato senza codice a barre';
+	@override String get save => 'Salva';
+	@override String get savePrivate => 'Salva per me';
+	@override String get share => 'Aggiungi al catalogo';
+	@override String get alreadyPresent => 'Alimento già presente nel catalogo';
+	@override String get uncertain => 'Non è possibile verificare se questo alimento è già nel catalogo.';
+	@override String get queued => 'Condivisione in attesa di invio';
+	@override String get published => 'Alimento pubblicato nel catalogo';
+	@override String get addedNotice => 'Alimento aggiunto';
+	@override String get noAdded => 'Non hai ancora aggiunto alimenti';
+	@override String get lookupFailed => 'Impossibile cercare il codice. Riprova oppure inserisci un alimento personalizzato.';
+	@override String get custom => 'Inserisci alimento';
+	@override String get shareNotice => 'Salva condivide l’alimento nel catalogo pubblico. Salva per me lo mantiene personale.';
+	@override String get invalidBarcode => 'Inserisci un codice a barre valido (4–32 cifre).';
+	@override String get showMore => 'Mostra altro';
 }
 
 // Path: equipment.none
@@ -6892,6 +6947,12 @@ extension on TranslationsIt {
 	dynamic _flatMapFunction(String path) {
 		return switch (path) {
 			'appName' => 'Gym Bro',
+			'navigation.feed' => 'Feed',
+			'navigation.profile' => 'Profilo',
+			'navigation.food' => 'Diario',
+			'navigation.workouts' => 'Allenati',
+			'navigation.pro' => 'PRO',
+			'navigation.settings' => 'Impostazioni',
 			'appInfo.version' => ({required Object version, required Object build}) => 'Versione ${version} (build ${build})',
 			'appInfo.shortDescription' => 'Compagno di allenamenti',
 			'appInfo.terms' => 'Termini di servizio',
@@ -7397,14 +7458,14 @@ extension on TranslationsIt {
 			'library.abs.exercises.reverseCrunch' => 'Crunch inverso',
 			'library.abs.exercises.cableCrunch' => 'Crunch al cavo',
 			'library.abs.exercises.pallofPress' => 'Pallof press al cavo',
+			_ => null,
+		} ?? switch (path) {
 			'library.abs.exercises.crunches' => 'Crunch',
 			'library.abs.exercises.kneeRaise' => 'Sollevamento delle ginocchia da sdraiati',
 			'library.abs.exercises.legRaise' => 'Sollevamento delle gambe da sdraiati',
 			'library.abs.exercises.crunchMachine' => 'Crunch machine',
 			'library.abs.exercises.heelsUpCrunch' => 'Crunch (caviglie alzate)',
 			'library.abs.exercises.fullBodyCrunch' => 'Crunch doppio',
-			_ => null,
-		} ?? switch (path) {
 			'library.abs.exercises.plank' => 'Plank',
 			'library.abs.exercises.hollowBodyHold' => 'Hollow body hold',
 			'library.abs.exercises.russianTwist' => 'Russian twist',
@@ -7911,14 +7972,14 @@ extension on TranslationsIt {
 			'food.languages.ga' => 'Irlandese',
 			'food.languages.gd' => 'Gaelico scozzese',
 			'food.languages.gl' => 'Galiziano',
+			_ => null,
+		} ?? switch (path) {
 			'food.languages.gn' => 'Guarani',
 			'food.languages.gu' => 'Gujarati',
 			'food.languages.gv' => 'Manx',
 			'food.languages.ha' => 'Hausa',
 			'food.languages.he' => 'Ebraico',
 			'food.languages.hi' => 'Hindi',
-			_ => null,
-		} ?? switch (path) {
 			'food.languages.ho' => 'Hiri Motu',
 			'food.languages.hr' => 'Croato',
 			'food.languages.ht' => 'Creolo haitiano',
@@ -8352,6 +8413,35 @@ extension on TranslationsIt {
 			'food.catalog.statuses.unavailable' => 'Voce non disponibile per la pubblicazione',
 			'food.catalog.statuses.cancelled' => 'Invio annullato',
 			'food.catalog.statuses.cancelled_unknown' => 'Tentativi annullati; un invio precedente potrebbe essere già stato ricevuto',
+			'food.catalog.statuses.already_present' => 'Alimento già presente nel catalogo',
+			'food.catalog.statuses.uncertain' => 'Non è possibile verificare se questo alimento è già nel catalogo.',
+			'food.picker.title' => 'Aggiungi alimento',
+			'food.picker.search' => 'Ricerca',
+			'food.picker.barcode' => 'Codice a barre',
+			'food.picker.more' => 'Altro',
+			'food.picker.added' => 'Aggiunti',
+			'food.picker.done' => 'Fine',
+			'food.picker.recent' => 'Recenti',
+			'food.picker.results' => 'Catalogo',
+			'food.picker.empty' => 'Nessun alimento trovato',
+			'food.picker.retry' => 'Riprova',
+			'food.picker.failed' => 'Operazione non riuscita. Riprova.',
+			'food.picker.withBarcode' => 'Personalizzato con codice a barre',
+			'food.picker.withoutBarcode' => 'Personalizzato senza codice a barre',
+			'food.picker.save' => 'Salva',
+			'food.picker.savePrivate' => 'Salva per me',
+			'food.picker.share' => 'Aggiungi al catalogo',
+			'food.picker.alreadyPresent' => 'Alimento già presente nel catalogo',
+			'food.picker.uncertain' => 'Non è possibile verificare se questo alimento è già nel catalogo.',
+			'food.picker.queued' => 'Condivisione in attesa di invio',
+			'food.picker.published' => 'Alimento pubblicato nel catalogo',
+			'food.picker.addedNotice' => 'Alimento aggiunto',
+			'food.picker.noAdded' => 'Non hai ancora aggiunto alimenti',
+			'food.picker.lookupFailed' => 'Impossibile cercare il codice. Riprova oppure inserisci un alimento personalizzato.',
+			'food.picker.custom' => 'Inserisci alimento',
+			'food.picker.shareNotice' => 'Salva condivide l’alimento nel catalogo pubblico. Salva per me lo mantiene personale.',
+			'food.picker.invalidBarcode' => 'Inserisci un codice a barre valido (4–32 cifre).',
+			'food.picker.showMore' => 'Mostra altro',
 			'equipment.none.long' => 'Corpo libero',
 			'equipment.none.short' => 'C. libero',
 			'equipment.barbell.long' => 'Bilanciere',
@@ -8396,6 +8486,8 @@ extension on TranslationsIt {
 			'achievements.nightOwl.description' => 'Inizia un allenamento dopo le 8 di sera',
 			'achievements.realGymBro.title' => 'Vero Gym Bro',
 			'achievements.realGymBro.description.k1' => 'Traccia un totale di 100 ore di allenamenti',
+			_ => null,
+		} ?? switch (path) {
 			'achievements.realGymBro.description.k2' => 'Traccia un totale di 500 ore di allenamenti',
 			'achievements.realGymBro.description.k3' => 'Traccia un totale di 1000 ore di allenamenti',
 			'achievements.workoutFreak.title' => 'Maniaco dell\'allenamento',
@@ -8431,8 +8523,6 @@ extension on TranslationsIt {
 			'achievements.intensityInnovator.description' => 'Modifica una routine aumentando pesi o ripetizioni',
 			'achievements.completionist.title' => 'Completista',
 			'achievements.completionist.description' => 'Prova almeno una volta tutti gli esercizi della libreria',
-			_ => null,
-		} ?? switch (path) {
 			'achievements.notDrunk.title' => 'Non sono sbronzo ma brillo!',
 			'achievements.notDrunk.description' => 'Completa un allenamento di domenica mattina superando un record personale di volume o distanza',
 			'achievements.steamedHams.description' => 'Supera un record personale di massimale in un allenamento impiegando meno tempo del solito',

@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -23,6 +24,7 @@ import 'package:gymtracker/service/version.dart';
 import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/view/actions/settings.dart';
+import 'package:gymtracker/view/catalog_submissions.dart';
 import 'package:gymtracker/view/components/health_permission.dart';
 import 'package:gymtracker/view/components/legacy_workout_recovery.dart';
 import 'package:gymtracker/view/components/loading_indicator.dart';

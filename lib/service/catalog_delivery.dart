@@ -9,6 +9,7 @@ class CatalogDelivery {
     required this.outbox,
     required this.activeOwner,
     required this.submit,
+    this.submitCreateOnly,
     DateTime Function()? now,
   }) : now = now ?? DateTime.now;
   final CatalogOutbox outbox;
@@ -19,6 +20,12 @@ class CatalogDelivery {
     Map<String, dynamic>,
   )
   submit;
+  final Future<Map<String, dynamic>> Function(
+    String,
+    String,
+    Map<String, dynamic>,
+  )?
+  submitCreateOnly;
   final DateTime Function() now;
   bool _working = false;
   bool _recovered = false;
@@ -46,7 +53,11 @@ class CatalogDelivery {
           return;
         }
         try {
-          final result = await submit(
+          final sender = request.createOnly ? submitCreateOnly : submit;
+          if (sender == null) {
+            throw StateError("Create-only delivery unavailable");
+          }
+          final result = await sender(
             owner,
             request.operationId,
             request.definition,
@@ -57,6 +68,8 @@ class CatalogDelivery {
             'duplicate',
             'correction',
             'unavailable',
+            'already_present',
+            'uncertain',
           }.contains(outcome)) {
             throw StateError('Unexpected catalog response');
           }

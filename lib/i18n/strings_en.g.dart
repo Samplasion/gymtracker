@@ -45,6 +45,7 @@ class Translations with BaseTranslations<AppLocale, Translations> {
 	/// en: 'Gym Bro'
 	String get appName => 'Gym Bro';
 
+	late final Translations$navigation$en navigation = Translations$navigation$en._(_root);
 	late final Translations$appInfo$en appInfo = Translations$appInfo$en._(_root);
 	late final Translations$set$en set = Translations$set$en._(_root);
 	late final Translations$exercise$en exercise = Translations$exercise$en._(_root);
@@ -194,6 +195,33 @@ class Translations with BaseTranslations<AppLocale, Translations> {
 	late final Translations$reports$en reports = Translations$reports$en._(_root);
 	late final Translations$plateau$en plateau = Translations$plateau$en._(_root);
 	late final Translations$progression$en progression = Translations$progression$en._(_root);
+}
+
+// Path: navigation
+class Translations$navigation$en {
+	Translations$navigation$en._(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Feed'
+	String get feed => 'Feed';
+
+	/// en: 'Profile'
+	String get profile => 'Profile';
+
+	/// en: 'Food'
+	String get food => 'Food';
+
+	/// en: 'Train'
+	String get workouts => 'Train';
+
+	/// en: 'PRO'
+	String get pro => 'PRO';
+
+	/// en: 'Settings'
+	String get settings => 'Settings';
 }
 
 // Path: appInfo
@@ -1466,6 +1494,7 @@ class Translations$food$en {
 	late final Translations$food$permission$en permission = Translations$food$permission$en._(_root);
 	late final Translations$food$datePicker$en datePicker = Translations$food$datePicker$en._(_root);
 	late final Translations$food$catalog$en catalog = Translations$food$catalog$en._(_root);
+	late final Translations$food$picker$en picker = Translations$food$picker$en._(_root);
 }
 
 // Path: equipment
@@ -4555,7 +4584,99 @@ class Translations$food$catalog$en {
 		'unavailable': 'Entry unavailable for publication',
 		'cancelled': 'Submission cancelled',
 		'cancelled_unknown': 'Retries cancelled; an earlier submission may already have been received',
+		'already_present': 'Food already in the catalog',
+		'uncertain': 'We cannot verify whether this food is already in the catalog.',
 	};
+}
+
+// Path: food.picker
+class Translations$food$picker$en {
+	Translations$food$picker$en._(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Add food'
+	String get title => 'Add food';
+
+	/// en: 'Search'
+	String get search => 'Search';
+
+	/// en: 'Barcode'
+	String get barcode => 'Barcode';
+
+	/// en: 'More'
+	String get more => 'More';
+
+	/// en: 'Added'
+	String get added => 'Added';
+
+	/// en: 'Done'
+	String get done => 'Done';
+
+	/// en: 'Recent'
+	String get recent => 'Recent';
+
+	/// en: 'Catalog'
+	String get results => 'Catalog';
+
+	/// en: 'No foods found'
+	String get empty => 'No foods found';
+
+	/// en: 'Retry'
+	String get retry => 'Retry';
+
+	/// en: 'Operation failed. Please try again.'
+	String get failed => 'Operation failed. Please try again.';
+
+	/// en: 'Custom food with barcode'
+	String get withBarcode => 'Custom food with barcode';
+
+	/// en: 'Custom food without barcode'
+	String get withoutBarcode => 'Custom food without barcode';
+
+	/// en: 'Save'
+	String get save => 'Save';
+
+	/// en: 'Save for me'
+	String get savePrivate => 'Save for me';
+
+	/// en: 'Add to catalog'
+	String get share => 'Add to catalog';
+
+	/// en: 'Food already in the catalog'
+	String get alreadyPresent => 'Food already in the catalog';
+
+	/// en: 'We cannot verify whether this food is already in the catalog.'
+	String get uncertain => 'We cannot verify whether this food is already in the catalog.';
+
+	/// en: 'Sharing queued for delivery'
+	String get queued => 'Sharing queued for delivery';
+
+	/// en: 'Food published in the catalog'
+	String get published => 'Food published in the catalog';
+
+	/// en: 'Food added'
+	String get addedNotice => 'Food added';
+
+	/// en: 'No foods added yet'
+	String get noAdded => 'No foods added yet';
+
+	/// en: 'Could not look up the barcode. Retry or enter a custom food.'
+	String get lookupFailed => 'Could not look up the barcode. Retry or enter a custom food.';
+
+	/// en: 'Enter food'
+	String get custom => 'Enter food';
+
+	/// en: 'Save shares this food in the public catalog. Save for me keeps it personal.'
+	String get shareNotice => 'Save shares this food in the public catalog. Save for me keeps it personal.';
+
+	/// en: 'Enter a valid barcode (4–32 digits).'
+	String get invalidBarcode => 'Enter a valid barcode (4–32 digits).';
+
+	/// en: 'Show more'
+	String get showMore => 'Show more';
 }
 
 // Path: equipment.none
@@ -9612,6 +9733,12 @@ extension on Translations {
 	dynamic _flatMapFunction(String path) {
 		return switch (path) {
 			'appName' => 'Gym Bro',
+			'navigation.feed' => 'Feed',
+			'navigation.profile' => 'Profile',
+			'navigation.food' => 'Food',
+			'navigation.workouts' => 'Train',
+			'navigation.pro' => 'PRO',
+			'navigation.settings' => 'Settings',
 			'appInfo.version' => ({required Object version, required Object build}) => 'Version ${version} (build ${build})',
 			'appInfo.shortDescription' => 'Workout Buddy',
 			'appInfo.terms' => 'Terms of service',
@@ -10117,14 +10244,14 @@ extension on Translations {
 			'library.abs.exercises.reverseCrunch' => 'Reverse crunch',
 			'library.abs.exercises.cableCrunch' => 'Cable crunch',
 			'library.abs.exercises.pallofPress' => 'Cable Pallof press',
+			_ => null,
+		} ?? switch (path) {
 			'library.abs.exercises.crunches' => 'Crunches',
 			'library.abs.exercises.kneeRaise' => 'Lying knee raise',
 			'library.abs.exercises.legRaise' => 'Lying leg raise',
 			'library.abs.exercises.crunchMachine' => 'Crunch (machine)',
 			'library.abs.exercises.heelsUpCrunch' => 'Heels-up crunches',
 			'library.abs.exercises.fullBodyCrunch' => 'Double crunch',
-			_ => null,
-		} ?? switch (path) {
 			'library.abs.exercises.plank' => 'Plank',
 			'library.abs.exercises.hollowBodyHold' => 'Hollow body hold',
 			'library.abs.exercises.bicycleCrunches' => 'Bicycle crunches',
@@ -10631,14 +10758,14 @@ extension on Translations {
 			'food.languages.ga' => 'Irish',
 			'food.languages.gd' => 'Scottish Gaelic',
 			'food.languages.gl' => 'Galician',
+			_ => null,
+		} ?? switch (path) {
 			'food.languages.gn' => 'Guarani',
 			'food.languages.gu' => 'Gujarati',
 			'food.languages.gv' => 'Manx',
 			'food.languages.ha' => 'Hausa',
 			'food.languages.he' => 'Hebrew',
 			'food.languages.hi' => 'Hindi',
-			_ => null,
-		} ?? switch (path) {
 			'food.languages.ho' => 'Hiri Motu',
 			'food.languages.hr' => 'Croatian',
 			'food.languages.ht' => 'Haitian Creole',
@@ -11072,6 +11199,35 @@ extension on Translations {
 			'food.catalog.statuses.unavailable' => 'Entry unavailable for publication',
 			'food.catalog.statuses.cancelled' => 'Submission cancelled',
 			'food.catalog.statuses.cancelled_unknown' => 'Retries cancelled; an earlier submission may already have been received',
+			'food.catalog.statuses.already_present' => 'Food already in the catalog',
+			'food.catalog.statuses.uncertain' => 'We cannot verify whether this food is already in the catalog.',
+			'food.picker.title' => 'Add food',
+			'food.picker.search' => 'Search',
+			'food.picker.barcode' => 'Barcode',
+			'food.picker.more' => 'More',
+			'food.picker.added' => 'Added',
+			'food.picker.done' => 'Done',
+			'food.picker.recent' => 'Recent',
+			'food.picker.results' => 'Catalog',
+			'food.picker.empty' => 'No foods found',
+			'food.picker.retry' => 'Retry',
+			'food.picker.failed' => 'Operation failed. Please try again.',
+			'food.picker.withBarcode' => 'Custom food with barcode',
+			'food.picker.withoutBarcode' => 'Custom food without barcode',
+			'food.picker.save' => 'Save',
+			'food.picker.savePrivate' => 'Save for me',
+			'food.picker.share' => 'Add to catalog',
+			'food.picker.alreadyPresent' => 'Food already in the catalog',
+			'food.picker.uncertain' => 'We cannot verify whether this food is already in the catalog.',
+			'food.picker.queued' => 'Sharing queued for delivery',
+			'food.picker.published' => 'Food published in the catalog',
+			'food.picker.addedNotice' => 'Food added',
+			'food.picker.noAdded' => 'No foods added yet',
+			'food.picker.lookupFailed' => 'Could not look up the barcode. Retry or enter a custom food.',
+			'food.picker.custom' => 'Enter food',
+			'food.picker.shareNotice' => 'Save shares this food in the public catalog. Save for me keeps it personal.',
+			'food.picker.invalidBarcode' => 'Enter a valid barcode (4–32 digits).',
+			'food.picker.showMore' => 'Show more',
 			'equipment.none.long' => 'Bodyweight',
 			'equipment.none.short' => 'Bodywt.',
 			'equipment.barbell.long' => 'Barbell',
@@ -11116,6 +11272,8 @@ extension on Translations {
 			'achievements.nightOwl.description' => 'Start a workout after 8pm',
 			'achievements.realGymBro.title' => 'Real Gym Bro',
 			'achievements.realGymBro.description.k1' => 'Log a total of 100 hours worth of workouts',
+			_ => null,
+		} ?? switch (path) {
 			'achievements.realGymBro.description.k2' => 'Log a total of 500 hours worth of workouts',
 			'achievements.realGymBro.description.k3' => 'Log a total of 1000 hours worth of workouts',
 			'achievements.workoutFreak.title' => 'Workout Freak',
@@ -11151,8 +11309,6 @@ extension on Translations {
 			'achievements.intensityInnovator.description' => 'Update a routine by increasing your weight/reps',
 			'achievements.completionist.title' => 'Completionist',
 			'achievements.completionist.description' => 'Try all library exercises at least once',
-			_ => null,
-		} ?? switch (path) {
 			'achievements.notDrunk.title' => 'I\'m not drunk, I swear!',
 			'achievements.notDrunk.description' => 'Work out on a Sunday morning breaking a personal best in lifted weight or distance',
 			'achievements.steamedHams.description' => 'Set a new one-rep max personal record in a faster-than-usual workout',

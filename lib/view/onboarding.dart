@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -114,7 +115,9 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
               ),
             ),
             PageViewModel(
-              title: context.t.onboarding.camera.title,
+              title: defaultTargetPlatform == TargetPlatform.android
+                  ? context.t.onboarding.camera.camera
+                  : context.t.onboarding.camera.title,
               image: const Icon(GTIcons.camera, size: 64),
               body: context.t.onboarding.camera.text,
               footer: Padding(
@@ -137,18 +140,19 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                                   .requestPermission(Permission.camera);
                             },
                     ),
-                    ElevatedButton.icon(
-                      icon: permIcon(Icons.photo, foodPerms.gallery),
-                      label: Text(context.t.onboarding.camera.gallery),
-                      onPressed: foodPerms.gallery
-                          ? null
-                          : () {
-                              // Request permission
-                              ref
-                                  .read(foodPermissionsProvider.notifier)
-                                  .requestPermission(Permission.photos);
-                            },
-                    ),
+                    if (defaultTargetPlatform != TargetPlatform.android)
+                      ElevatedButton.icon(
+                        icon: permIcon(Icons.photo, foodPerms.gallery),
+                        label: Text(context.t.onboarding.camera.gallery),
+                        onPressed: foodPerms.gallery
+                            ? null
+                            : () {
+                                // Request permission
+                                ref
+                                    .read(foodPermissionsProvider.notifier)
+                                    .requestPermission(Permission.photos);
+                              },
+                      ),
                     nextButton(true),
                   ],
                 ),

@@ -31,17 +31,21 @@ void main() {
         ),
       ),
     );
-    await tester.tap(find.byType(SearchBar));
+    await tester.tap(find.text(t.food.picker.title));
     await tester.pumpAndSettle();
-    await tester.tap(find.byType(FloatingActionButton));
+    await tester.tap(find.text(t.food.picker.more));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text(t.food.picker.withoutBarcode));
     await tester.pumpAndSettle();
 
     expect(find.byType(CustomAddFoodView), findsOneWidget);
     expect(tester.takeException(), isNull);
     Go.back();
     await tester.pumpAndSettle();
+    expect(find.byType(FoodPickerView), findsOneWidget);
+    Go.back();
+    await tester.pumpAndSettle();
     expect(find.byType(AddCombinedFoodView), findsOneWidget);
-    expect(find.byType(SearchBar), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
 
@@ -80,7 +84,9 @@ void main() {
         for (var i = 3; i <= 9; i++) {
           await tester.enterText(fields.at(i), '0');
         }
-        await tester.tap(find.widgetWithText(FilledButton, t.food.add.add));
+        await tester.tap(
+          find.widgetWithText(TextButton, t.food.picker.savePrivate),
+        );
       } else {
         Go.back();
       }

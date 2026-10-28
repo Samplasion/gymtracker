@@ -77,8 +77,8 @@ void main() {
           final destinations = bar.destinations.cast<NavigationDestination>();
           expect(destinations.map((d) => d.label).toList().sublist(1, 4), [
             'Profile',
-            'Food tracking',
-            'Work Out',
+            'Food',
+            'Train',
           ]);
           bar.onDestinationSelected!(3);
         } else {

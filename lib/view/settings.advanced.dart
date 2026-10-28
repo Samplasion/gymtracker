@@ -83,6 +83,12 @@ class AdvancedSettingsView extends ConsumerWidget {
                     }),
                   ),
                 ],
+                ListTile(
+                  leading: const Icon(Icons.cloud_upload_outlined),
+                  title: Text(context.t.food.catalog.submissions),
+                  trailing: const Icon(GTIcons.lt_chevron),
+                  onTap: () => Go.to(() => const CatalogSubmissionsView()),
+                ),
                 const SyncRecoveryActions(),
                 const Divider(),
                 ListTile(

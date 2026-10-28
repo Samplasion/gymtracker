@@ -8,7 +8,7 @@ import 'package:gymtracker/repository/food_catalog.dart';
 import 'package:gymtracker/struct/nutrition.dart';
 import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/view/food.dart';
-import 'package:gymtracker/view/utils/search_anchor_plus.dart';
+import 'package:m3e_core/m3e_core.dart';
 
 import '../test_helpers/widget_test_app.dart';
 
@@ -17,12 +17,13 @@ class _RecordingFoodNotifier extends FoodNotifier {
   final void Function(Food, NutritionCategory?) onAdd;
 
   @override
-  Future<void> addFood(
+  Future<Food> addFood(
     DateTime dateTime,
     Food food, {
     NutritionCategory? category,
   }) async {
     onAdd(food, category);
+    return food.copyWith(id: "recorded");
   }
 }
 
@@ -79,11 +80,12 @@ void main() {
         ),
       );
       await tester.pumpAndSettle();
-      tester
-          .widget<SearchAnchorPlus>(find.byType(SearchAnchorPlus))
-          .onSubmitted!('milk');
+      await tester.tap(find.byType(M3EButton).first);
       await tester.pumpAndSettle();
-      expect(find.byType(SearchResultsView), findsOneWidget);
+      await tester.enterText(find.byType(SearchBar), 'milk');
+      await tester.testTextInput.receiveAction(TextInputAction.search);
+      await tester.pumpAndSettle();
+      expect(find.byType(FoodPickerView), findsOneWidget);
       if (outcome == 'cancel results') {
         Go.back();
       } else {
@@ -107,6 +109,11 @@ void main() {
         }
       }
       await tester.pumpAndSettle();
+      if (outcome != 'cancel results') {
+        expect(find.byType(FoodPickerView), findsOneWidget);
+        Go.back();
+        await tester.pumpAndSettle();
+      }
       expect(find.byType(FoodCategoryFoodsView), findsOneWidget);
       if (outcome == 'confirm') {
         expect(added, hasLength(1));

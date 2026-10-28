@@ -55,7 +55,7 @@ class FoodPermissionsSettingsTile extends ConsumerWidget {
                   .requestPermission(Permission.camera);
             },
           ),
-        if (!perms.gallery)
+        if (defaultTargetPlatform != TargetPlatform.android && !perms.gallery)
           ListTile(
             leading: const Icon(GTIcons.gallery),
             title: Text(context.t.food.addCustomFood.permission.gallery),

@@ -5,7 +5,7 @@ import 'package:gymtracker/db/database.dart';
 import 'package:gymtracker/struct/nutrition.dart';
 import 'package:uuid/uuid.dart';
 
-/// Metadata is kept on search results, never in the serialized diary snapshot.
+/// Search results carry catalog identity; diary snapshots retain only a reference.
 class CatalogFood extends VagueFood {
   final String catalogId;
   final int version;
@@ -35,33 +35,41 @@ class CatalogSubmissionRequest {
   final String status;
   final String? error;
   final int attempts;
+  final bool createOnly;
 
   CatalogSubmissionRequest(Map<String, dynamic> row)
     : operationId = row['operation_id'] as String,
       owner = row['owner'] as String,
-      definition = jsonDecode(row['definition'] as String),
+      definition = _definition(row['definition'] as String),
+      createOnly =
+          (jsonDecode(row['definition'] as String) as Map)['intent'] ==
+          'createOnly',
       status = row['status'] as String,
       error = row['error'] as String?,
       attempts = row['attempts'] as int;
+
+  static Map<String, dynamic> _definition(String raw) {
+    final data = Map<String, dynamic>.from(jsonDecode(raw));
+    return data['intent'] == 'createOnly'
+        ? Map<String, dynamic>.from(data['food'] as Map)
+        : data;
+  }
 }
 
 class CatalogOutbox {
   CatalogOutbox(this.db);
   final GTDatabase db;
 
-  Future<String> enqueue(String owner, VagueFood food) async {
+  Future<String> enqueue(
+    String owner,
+    VagueFood food, {
+    bool createOnly = false,
+  }) async {
     if (db.currentUserId != owner) throw StateError('Account changed');
     // Nutrients are already expressed per 100 g, or per 100 ml when unit is ml.
     // Never send Food.nutritionalValues: those totals include amount and pieces.
     // Serving sizes remain optional portions, not the nutritional reference basis.
-    final definition = VagueFood(
-      name: food.name,
-      brand: food.brand,
-      barcode: food.barcode,
-      unit: food.unit,
-      servingSizes: food.servingSizes,
-      nutritionalValuesPer100g: food.nutritionalValuesPer100g,
-    ).toJson();
+    final definition = catalogDefinition(food);
     final id = const Uuid().v4();
     await db
         .into(db.catalogSubmissions)
@@ -69,7 +77,11 @@ class CatalogOutbox {
           CatalogSubmissionsCompanion.insert(
             operationId: id,
             owner: owner,
-            definition: jsonEncode(definition),
+            definition: jsonEncode(
+              createOnly
+                  ? {'intent': 'createOnly', 'food': definition}
+                  : definition,
+            ),
             nextAttempt: DateTime.now(),
             createdAt: DateTime.now(),
           ),
@@ -154,4 +166,19 @@ class CatalogOutbox {
       updates: {db.catalogSubmissions},
     );
   }
+}
+
+/// Catalog payloads never contain diary quantities, IDs, or provenance.
+Map<String, dynamic> catalogDefinition(VagueFood food) => VagueFood(
+  name: food.name,
+  brand: food.brand,
+  barcode: food.barcode,
+  unit: food.unit,
+  servingSizes: food.servingSizes,
+  nutritionalValuesPer100g: food.nutritionalValuesPer100g,
+).toJson();
+
+bool sameCatalogDefinition(Map<String, dynamic> definition, VagueFood food) {
+  final other = VagueFood.fromJson(definition);
+  return other == VagueFood.fromJson(catalogDefinition(food));
 }

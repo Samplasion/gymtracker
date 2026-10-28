@@ -236,6 +236,8 @@ class Food extends VagueFood {
   final double amount;
   final int pieces;
   final String? category;
+  final String? origin;
+  final String? catalogId;
 
   const Food({
     required super.name,
@@ -249,6 +251,8 @@ class Food extends VagueFood {
     super.unit,
     this.pieces = 1,
     this.category,
+    this.origin,
+    this.catalogId,
   });
 
   factory Food.fromJson(Map<String, dynamic> json) {
@@ -268,6 +272,8 @@ class Food extends VagueFood {
       unit: deserializeUnit(json['unit'] ?? 'g'),
       pieces: (json['pieces'] as int?) ?? 1,
       category: json['category'],
+      origin: json['origin'],
+      catalogId: json['catalogId'],
     );
   }
 
@@ -278,6 +284,8 @@ class Food extends VagueFood {
       'amount': amount,
       'pieces': pieces,
       'category': category,
+      if (origin != null) 'origin': origin,
+      if (catalogId != null) 'catalogId': catalogId,
       ...super.toJson(),
     };
   }
@@ -292,6 +300,8 @@ class Food extends VagueFood {
     if (identical(this, other)) return true;
 
     return other is Food &&
+        other.origin == origin &&
+        other.catalogId == catalogId &&
         other.id == id &&
         other.name == name &&
         other.brand == brand &&
@@ -307,6 +317,8 @@ class Food extends VagueFood {
 
   @override
   int get hashCode =>
+      origin.hashCode ^
+      catalogId.hashCode ^
       id.hashCode ^
       name.hashCode ^
       brand.hashCode ^

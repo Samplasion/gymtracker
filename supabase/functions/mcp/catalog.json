@@ -1,5 +1,5 @@
 {
-  "version": "3fe7c858e1f2ead35aaa6999208b83254023adaed8e8b3e934db1b400e82017b",
+  "version": "c289d87a015431b64d8e346ccd2dd4a0618786c5c81284b60b0bd387bc8e77b4",
   "exercises": [
     {
       "source": "standard",
@@ -797,7 +797,7 @@
       "id": "library.biceps.exercises.chinUps",
       "names": {
         "en": "Chin-ups",
-        "it": "Chin-ups"
+        "it": "Trazioni alla sbarra (presa supina)"
       },
       "category": "back",
       "parameters": "freeBodyReps",
@@ -1020,6 +1020,39 @@
     },
     {
       "source": "standard",
+      "id": "library.cardio.exercises.burpees",
+      "names": {
+        "en": "Burpees",
+        "it": "Burpees"
+      },
+      "category": "cardio",
+      "parameters": "freeBodyReps",
+      "primaryMuscleGroup": "quadriceps",
+      "secondaryMuscleGroups": [
+        "abs",
+        "chest",
+        "glutes",
+        "triceps"
+      ],
+      "equipment": "none"
+    },
+    {
+      "source": "standard",
+      "id": "library.cardio.exercises.buttKicks",
+      "names": {
+        "en": "Butt kicks (running in place)",
+        "it": "Corsa calciata dietro sul posto"
+      },
+      "category": "cardio",
+      "parameters": "time",
+      "primaryMuscleGroup": "hamstrings",
+      "secondaryMuscleGroups": [
+        "calves"
+      ],
+      "equipment": "none"
+    },
+    {
+      "source": "standard",
       "id": "library.cardio.exercises.crunchesTimed",
       "names": {
         "en": "Crunches (timed)",
@@ -1059,6 +1092,22 @@
     },
     {
       "source": "standard",
+      "id": "library.cardio.exercises.highKnees",
+      "names": {
+        "en": "High knees (running in place)",
+        "it": "Corsa sul posto a ginocchia alte"
+      },
+      "category": "cardio",
+      "parameters": "time",
+      "primaryMuscleGroup": "quadriceps",
+      "secondaryMuscleGroups": [
+        "abs",
+        "calves"
+      ],
+      "equipment": "none"
+    },
+    {
+      "source": "standard",
       "id": "library.cardio.exercises.jumpRope",
       "names": {
         "en": "Jump rope",
@@ -1072,6 +1121,23 @@
     },
     {
       "source": "standard",
+      "id": "library.cardio.exercises.jumpingJacks",
+      "names": {
+        "en": "Jumping jacks",
+        "it": "Jumping jack"
+      },
+      "category": "cardio",
+      "parameters": "freeBodyReps",
+      "primaryMuscleGroup": "quadriceps",
+      "secondaryMuscleGroups": [
+        "calves",
+        "glutes",
+        "shoulders"
+      ],
+      "equipment": "none"
+    },
+    {
+      "source": "standard",
       "id": "library.cardio.exercises.pilates",
       "names": {
         "en": "Pilates",
@@ -1081,6 +1147,22 @@
       "parameters": "time",
       "primaryMuscleGroup": "none",
       "secondaryMuscleGroups": [],
+      "equipment": "none"
+    },
+    {
+      "source": "standard",
+      "id": "library.cardio.exercises.plankJacks",
+      "names": {
+        "en": "Plank jacks",
+        "it": "Plank jack"
+      },
+      "category": "cardio",
+      "parameters": "freeBodyReps",
+      "primaryMuscleGroup": "abs",
+      "secondaryMuscleGroups": [
+        "glutes",
+        "shoulders"
+      ],
       "equipment": "none"
     },
     {
@@ -1107,6 +1189,55 @@
       "parameters": "distance",
       "primaryMuscleGroup": "none",
       "secondaryMuscleGroups": [],
+      "equipment": "none"
+    },
+    {
+      "source": "standard",
+      "id": "library.cardio.exercises.skaterJumps",
+      "names": {
+        "en": "Skater jumps",
+        "it": "Salti laterali del pattinatore"
+      },
+      "category": "cardio",
+      "parameters": "freeBodyReps",
+      "primaryMuscleGroup": "glutes",
+      "secondaryMuscleGroups": [
+        "calves",
+        "quadriceps"
+      ],
+      "equipment": "none"
+    },
+    {
+      "source": "standard",
+      "id": "library.cardio.exercises.squatJumps",
+      "names": {
+        "en": "Jump squats",
+        "it": "Squat con salto"
+      },
+      "category": "cardio",
+      "parameters": "freeBodyReps",
+      "primaryMuscleGroup": "quadriceps",
+      "secondaryMuscleGroups": [
+        "calves",
+        "glutes"
+      ],
+      "equipment": "none"
+    },
+    {
+      "source": "standard",
+      "id": "library.cardio.exercises.squatThrusts",
+      "names": {
+        "en": "Squat thrusts (without jump)",
+        "it": "Squat thrust (senza salto)"
+      },
+      "category": "cardio",
+      "parameters": "freeBodyReps",
+      "primaryMuscleGroup": "quadriceps",
+      "secondaryMuscleGroups": [
+        "abs",
+        "glutes",
+        "shoulders"
+      ],
       "equipment": "none"
     },
     {
@@ -1942,7 +2073,7 @@
       "id": "library.hips.exercises.clamshells",
       "names": {
         "en": "Clamshells",
-        "it": "Clamshells"
+        "it": "Clamshell per i glutei"
       },
       "category": "glutes",
       "parameters": "freeBodyReps",
@@ -1955,7 +2086,7 @@
       "id": "library.hips.exercises.gluteBridge",
       "names": {
         "en": "Glute bridge",
-        "it": "Glute bridge"
+        "it": "Ponte per i glutei"
       },
       "category": "glutes",
       "parameters": "repsWeight",
@@ -1968,7 +2099,7 @@
       "id": "library.hips.exercises.hipAbduction",
       "names": {
         "en": "Machine hip abduction",
-        "it": "Machine hip abduction"
+        "it": "Abduzioni dell’anca alla macchina"
       },
       "category": "glutes",
       "parameters": "repsWeight",
@@ -1994,7 +2125,7 @@
       "id": "library.hips.exercises.hipThrust",
       "names": {
         "en": "Machine hip thrust",
-        "it": "Machine hip thrust"
+        "it": "Hip thrust alla macchina"
       },
       "category": "glutes",
       "parameters": "repsWeight",
@@ -2007,7 +2138,7 @@
       "id": "library.hips.exercises.hipThrustBarbell",
       "names": {
         "en": "Hip thrust (barbell)",
-        "it": "Hip thrust (barbell)"
+        "it": "Hip thrust (bilanciere)"
       },
       "category": "glutes",
       "parameters": "repsWeight",

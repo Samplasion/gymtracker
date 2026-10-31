@@ -34,6 +34,12 @@ static const other = $GTStandardLibraryOtherExercises._();
       /// Biking
       String get biking => 'library.cardio.exercises.biking';
       
+      /// Burpees
+      String get burpees => 'library.cardio.exercises.burpees';
+
+      /// Butt kicks (running in place)
+      String get buttKicks => 'library.cardio.exercises.buttKicks';
+
       /// Crunches (timed)
       String get crunchesTimed => 'library.cardio.exercises.crunchesTimed';
       
@@ -43,25 +49,43 @@ static const other = $GTStandardLibraryOtherExercises._();
       /// Recumbent exercise bike
       String get ergometerHorizontal => 'library.cardio.exercises.ergometerHorizontal';
       
+      /// High knees (running in place)
+      String get highKnees => 'library.cardio.exercises.highKnees';
+
+      /// Jumping jacks
+      String get jumpingJacks => 'library.cardio.exercises.jumpingJacks';
+
       /// Jump rope
       String get jumpRope => 'library.cardio.exercises.jumpRope';
       
       /// Pilates
       String get pilates => 'library.cardio.exercises.pilates';
       
+      /// Plank jacks
+      String get plankJacks => 'library.cardio.exercises.plankJacks';
+
       /// Rowing machine
       String get rowingMachine => 'library.cardio.exercises.rowingMachine';
       
       /// Running
       String get running => 'library.cardio.exercises.running';
       
+      /// Skater jumps
+      String get skaterJumps => 'library.cardio.exercises.skaterJumps';
+
+      /// Jump squats
+      String get squatJumps => 'library.cardio.exercises.squatJumps';
+
+      /// Squat thrusts (without jump)
+      String get squatThrusts => 'library.cardio.exercises.squatThrusts';
+
       /// Treadmill
       String get treadmill => 'library.cardio.exercises.treadmill';
       
       /// Zumba
       String get zumba => 'library.cardio.exercises.zumba';
       
-      List<String> get values => [aerobics, bicycleCrunchesCardio, biking, crunchesTimed, ergometer, ergometerHorizontal, jumpRope, pilates, rowingMachine, running, treadmill, zumba];
+      List<String> get values => [aerobics, bicycleCrunchesCardio, biking, burpees, buttKicks, crunchesTimed, ergometer, ergometerHorizontal, highKnees, jumpingJacks, jumpRope, pilates, plankJacks, rowingMachine, running, skaterJumps, squatJumps, squatThrusts, treadmill, zumba];
 
     }
     

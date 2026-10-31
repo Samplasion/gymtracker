@@ -72,7 +72,7 @@ Future<void> testCombineWorkoutsFlow(
 
   expect(find.byType(WorkoutFinishPage), findsOneWidget);
 
-  await tester.tap(find.widgetWithIcon(IconButton, GTIcons.done));
+  await tester.tap(find.text(t.ongoingWorkout.finish.save));
   await tester.pumpAndSettle();
 
   expect(find.byType(WorkoutDoneSheet), findsOneWidget);
@@ -141,7 +141,7 @@ Future<void> testCombineWorkoutsFlow(
 
   expect(find.byType(WorkoutFinishPage), findsOneWidget);
 
-  await tester.tap(find.widgetWithIcon(IconButton, GTIcons.done));
+  await tester.tap(find.text(t.ongoingWorkout.finish.save));
   await tester.pumpAndSettle();
 
   expect(find.byType(WorkoutDoneSheet), findsOneWidget);

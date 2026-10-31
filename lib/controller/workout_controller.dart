@@ -40,6 +40,19 @@ typedef WorkoutSetCursor = ({
   int setIndex,
 });
 
+/// Metadata edited in the finish form, applied only after persistence succeeds.
+class WorkoutFinishDetails {
+  const WorkoutFinishDetails({
+    required this.startingTime,
+    required this.parentID,
+    required this.infobox,
+  });
+
+  final DateTime startingTime;
+  final String? parentID;
+  final String? infobox;
+}
+
 class WorkoutState {
   WorkoutState({
     required this.workout,
@@ -802,7 +815,11 @@ class WorkoutController extends _$WorkoutController {
     }
   }
 
-  Future<Workout> submit(String name, Duration duration) {
+  Future<Workout> submit(
+    String name,
+    Duration duration, {
+    WorkoutFinishDetails? details,
+  }) {
     if (isClosed || ownerId != service.db.currentUserId) {
       return Future.error(
         StateError('Cannot submit a workout belonging to another account'),
@@ -816,7 +833,9 @@ class WorkoutController extends _$WorkoutController {
     publishExercises();
     unawaited(() async {
       try {
-        completion.complete(await _performSubmit(name, duration));
+        completion.complete(
+          await _performSubmit(name, duration, details: details),
+        );
       } catch (error, stack) {
         completion.completeError(error, stack);
       } finally {
@@ -830,7 +849,11 @@ class WorkoutController extends _$WorkoutController {
     return completion.future;
   }
 
-  Future<Workout> _performSubmit(String name, Duration duration) async {
+  Future<Workout> _performSubmit(
+    String name,
+    Duration duration, {
+    WorkoutFinishDetails? details,
+  }) async {
     if (isClosed || ownerId != service.db.currentUserId) {
       throw StateError('Cannot submit a workout belonging to another account');
     }
@@ -845,9 +868,9 @@ class WorkoutController extends _$WorkoutController {
       name: name,
       exercises: exercises,
       duration: duration,
-      startingDate: time,
-      parentID: parentID,
-      infobox: infobox,
+      startingDate: details?.startingTime ?? time,
+      parentID: details == null ? parentID : details.parentID,
+      infobox: details == null ? infobox : details.infobox,
       completes: continuesID,
       weightUnit: weightUnit,
       distanceUnit: distanceUnit,
@@ -858,6 +881,12 @@ class WorkoutController extends _$WorkoutController {
     // Keep the active session recoverable when persistence fails, and avoid
     // clearing timers belonging to a session started while the write awaited.
     if (isSessionActive(generation)) {
+      if (details != null) {
+        this.name = name;
+        time = details.startingTime;
+        parentID = details.parentID;
+        infobox = details.infobox;
+      }
       removeCountdown();
       removeRelevantStopwatches();
     }

@@ -134,7 +134,7 @@ Future<void> testEditWorkoutFlow(
   expect(find.byType(WorkoutFinishPage), findsOneWidget);
 
   await dismissKeyboard(tester);
-  await tester.tap(find.widgetWithIcon(IconButton, GTIcons.done));
+  await tester.tap(find.text('Save workout'));
   await waitForWidget(tester, find.byType(WorkoutFinishPage), present: false);
 
   expect(find.byType(WorkoutFinishPage), findsNothing);

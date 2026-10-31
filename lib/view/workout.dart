@@ -738,37 +738,93 @@ class WorkoutFinishPage extends ConsumerStatefulWidget {
 
 class _WorkoutFinishPageState extends ConsumerState<WorkoutFinishPage> {
   bool _submitting = false;
-  late Duration workoutDuration;
+  Future<bool>? _closeRequest;
   final formKey = GlobalKey<FormState>();
+  late final WorkoutController _session;
+  late final int _generation;
+  late final String _initialName;
+  late final String _initialDuration;
+  late final DateTime _initialDate;
+  late final String? _initialParentID;
+  late final String _initialNotes;
+  late DateTime _date;
+  String? _parentID;
+  late final TextEditingController titleController;
+  late final TextEditingController timeController;
+  late final QuillController infoboxController;
 
-  late final titleController = TextEditingController(
-    text: _workoutController(context)?.name ?? "",
-  );
-  late final timeController = TextEditingController(
-    text: TimeInputField.encodeDuration(
-      _workoutController(context) == null
-          ? Duration.zero
-          : DateTime.now().difference(_workoutController(context)!.time),
-    ),
-  );
-  final dateController = TextEditingController();
-  late final infoboxController = QuillController(
-    document: (_workoutController(context)?.infobox ?? "").asQuillDocument(),
-    selection: const TextSelection.collapsed(offset: 0),
-  );
+  String get _notes =>
+      jsonEncode(infoboxController.document.toDelta().toJson());
 
-  late String? pwInitialItem = () {
-    // Parent workout data
-    String? pwInitialItem = _workoutController(context)?.parentID;
-    if (ProviderScope.containerOf(context, listen: false)
-        .read(routinesControllerProvider)
-        .workouts
-        .every((element) => element.id != pwInitialItem)) {
-      pwInitialItem = null;
+  @override
+  void initState() {
+    super.initState();
+    _session = ref.read(workoutControllerProvider.notifier);
+    final activeSession = _workoutController(context);
+    _generation = _session.sessionGeneration;
+    _initialName = activeSession?.name ?? '';
+    _initialDate = _date = activeSession?.time ?? DateTime.now();
+    _initialParentID = _parentID = activeSession?.parentID;
+    _initialDuration = TimeInputField.encodeDuration(
+      DateTime.now().difference(_initialDate),
+    );
+    titleController = TextEditingController(text: _initialName);
+    timeController = TextEditingController(text: _initialDuration);
+    infoboxController = QuillController(
+      document: (activeSession?.infobox ?? '').asQuillDocument(),
+      selection: const TextSelection.collapsed(offset: 0),
+    );
+    _initialNotes = _notes;
+  }
+
+  @override
+  void dispose() {
+    titleController.dispose();
+    timeController.dispose();
+    infoboxController.dispose();
+    super.dispose();
+  }
+
+  bool get _hasChanges =>
+      titleController.text != _initialName ||
+      timeController.text != _initialDuration ||
+      _date != _initialDate ||
+      _parentID != _initialParentID ||
+      _notes != _initialNotes;
+
+  Future<bool> _canClose() async {
+    if (_submitting || _session.isSubmitting) return false;
+    if (!_hasChanges) return true;
+    if (_closeRequest != null) return _closeRequest!;
+    final text = context.t.ongoingWorkout.finish.discard;
+    final request = showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(text.title),
+        content: Text(text.text),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: Text(text.keep),
+          ),
+          FilledButton.tonal(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: Text(text.confirm),
+          ),
+        ],
+      ),
+    ).then((discard) => discard ?? false);
+    _closeRequest = request;
+    try {
+      return await request;
+    } finally {
+      _closeRequest = null;
     }
+  }
 
-    return pwInitialItem;
-  }();
+  Future<void> _close() async {
+    if (await _canClose() && mounted) Navigator.of(context).pop();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -781,175 +837,204 @@ class _WorkoutFinishPageState extends ConsumerState<WorkoutFinishPage> {
     final controller = _workoutController(context)!;
 
     final padding = MediaQuery.of(context).viewPadding;
-    return Dialog.fullscreen(
-      child: Scaffold(
-        appBar: PreferredSize(
-          preferredSize: const Size(0, kToolbarHeight + 1),
-          child: AppBar(
-            title: Text(context.t.ongoingWorkout.finish.title),
-            leading: const CloseButton(),
-            bottom: const PreferredSize(
-              preferredSize: Size(0, 1),
-              child: Divider(height: 1),
-            ),
-            actions: [
-              IconButton(
-                icon: const Icon(GTIcons.done),
-                onPressed: _submitting || submitting ? null : _submit,
+    final toolbarHeight =
+        kToolbarHeight * MediaQuery.textScalerOf(context).scale(1);
+    // The Cupertino modal route uses scoped will-pop callbacks for drag dismissal.
+    // ignore: deprecated_member_use
+    return WillPopScope(
+      onWillPop: _canClose,
+      child: Dialog.fullscreen(
+        child: Scaffold(
+          appBar: PreferredSize(
+            preferredSize: Size(0, toolbarHeight + 1),
+            child: AppBar(
+              toolbarHeight: toolbarHeight,
+              title: Text(context.t.ongoingWorkout.finish.title, maxLines: 2),
+              leading: CloseButton(onPressed: _close),
+              bottom: const PreferredSize(
+                preferredSize: Size(0, 1),
+                child: Divider(height: 1),
               ),
-            ],
+            ),
           ),
-        ),
-        body: Form(
-          key: formKey,
-          child: Consumer(
-            builder: (context, ref, _) {
-              ref.watch(workoutControllerProvider);
-              ref.watch(countdownControllerProvider);
-              ref.watch(stopwatchControllerProvider);
-              return MediaQuery(
-                data: MediaQuery.of(context).copyWith(padding: EdgeInsets.zero),
-                child: ListView(
-                  padding: padding,
-                  children:
-                      [
-                            const SizedBox(height: 8),
-                            if (!controller.isContinuation)
-                              TextFormField(
-                                controller: titleController,
-                                decoration: _decoration(
-                                  context
-                                      .t
-                                      .ongoingWorkout
-                                      .finish
-                                      .fields
-                                      .name
-                                      .label,
-                                ),
-                                validator: (string) {
-                                  if (string == null || string.isEmpty) {
-                                    return context
+          bottomNavigationBar: SafeArea(
+            minimum: const EdgeInsets.all(16),
+            child: FilledButton(
+              onPressed: _submitting || submitting ? null : _submit,
+              child: _submitting || submitting
+                  ? Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const SizedBox(
+                          width: 16,
+                          height: 16,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        ),
+                        const SizedBox(width: 8),
+                        Text(context.t.ongoingWorkout.finish.saving),
+                      ],
+                    )
+                  : Text(context.t.ongoingWorkout.finish.save),
+            ),
+          ),
+          body: AbsorbPointer(
+            absorbing: _submitting || submitting,
+            child: Form(
+              key: formKey,
+              child: Consumer(
+                builder: (context, ref, _) {
+                  ref.watch(workoutControllerProvider);
+                  ref.watch(countdownControllerProvider);
+                  ref.watch(stopwatchControllerProvider);
+                  return MediaQuery(
+                    data: MediaQuery.of(
+                      context,
+                    ).copyWith(padding: EdgeInsets.zero),
+                    child: ListView(
+                      padding: padding,
+                      children:
+                          [
+                                const SizedBox(height: 8),
+                                if (!controller.isContinuation)
+                                  TextFormField(
+                                    controller: titleController,
+                                    decoration: _decoration(
+                                      context
+                                          .t
+                                          .ongoingWorkout
+                                          .finish
+                                          .fields
+                                          .name
+                                          .label,
+                                    ),
+                                    validator: (string) {
+                                      if (string == null || string.isEmpty) {
+                                        return context
+                                            .t
+                                            .ongoingWorkout
+                                            .finish
+                                            .fields
+                                            .name
+                                            .errors
+                                            .empty;
+                                      }
+                                      return null;
+                                    },
+                                  ),
+                                DateField(
+                                  decoration: _decoration(
+                                    context
                                         .t
                                         .ongoingWorkout
                                         .finish
                                         .fields
-                                        .name
-                                        .errors
-                                        .empty;
-                                  }
-                                  return null;
-                                },
-                              ),
-                            DateField(
-                              decoration: _decoration(
-                                context
-                                    .t
-                                    .ongoingWorkout
-                                    .finish
-                                    .fields
-                                    .startingTime
-                                    .label,
-                              ),
-                              date: controller.time,
-                              onSelect: (date) =>
-                                  setState(() => controller.setTime(date)),
-                              firstDate: DateTime.fromMillisecondsSinceEpoch(0),
-                              lastDate: DateTime.now().add(
-                                const Duration(days: 7),
-                              ),
-                            ),
-                            if (!controller.isContinuation)
-                              RoutineFormPicker(
-                                key: ValueKey(controller.parentID),
-                                decoration: _decoration(
-                                  context
-                                      .t
-                                      .ongoingWorkout
-                                      .finish
-                                      .fields
-                                      .parent
-                                      .label,
-                                ),
-                                onChanged: (routine) {
-                                  setState(() {
-                                    controller.setParentID(routine?.id);
-                                  });
-                                },
-                                routine:
-                                    ProviderScope.containerOf(
-                                          context,
-                                          listen: false,
-                                        )
-                                        .read(routinesControllerProvider)
-                                        .workouts
-                                        .firstWhereOrNull(
-                                          (element) =>
-                                              element.id == controller.parentID,
-                                        ),
-                              ),
-                            TimeInputField(
-                              controller: timeController,
-                              decoration: _decoration(
-                                context
-                                    .t
-                                    .ongoingWorkout
-                                    .finish
-                                    .fields
-                                    .duration
-                                    .label,
-                              ),
-                              validator: (duration) {
-                                if (duration == null ||
-                                    duration.inSeconds == 0) {
-                                  return context
-                                      .t
-                                      .ongoingWorkout
-                                      .finish
-                                      .fields
-                                      .duration
-                                      .errors
-                                      .empty;
-                                }
-                                return null;
-                              },
-                            ),
-                            GTRichTextEditor(
-                              controller: infoboxController,
-                              decoration: GymTrackerInputDecoration(
-                                labelText: context
-                                    .t
-                                    .ongoingWorkout
-                                    .finish
-                                    .fields
-                                    .infobox
-                                    .label,
-                                alignLabelWithHint: true,
-                              ),
-                              onTapOutside: () {
-                                logger.d("Quill Editor onTapOutside");
-                                controller.setInfobox(
-                                  jsonEncode(
-                                    infoboxController.document
-                                        .toDelta()
-                                        .toJson(),
+                                        .startingTime
+                                        .label,
                                   ),
-                                );
-                              },
-                            ),
-                          ]
-                          .map(
-                            (c) => Padding(
-                              padding: const EdgeInsets.symmetric(
-                                vertical: 16,
-                                horizontal: 16,
-                              ).copyWith(top: 0),
-                              child: c,
-                            ),
-                          )
-                          .toList(),
-                ),
-              );
-            },
+                                  date: _date,
+                                  onSelect: (date) =>
+                                      setState(() => _date = date),
+                                  firstDate:
+                                      DateTime.fromMillisecondsSinceEpoch(0),
+                                  lastDate: DateTime.now().add(
+                                    const Duration(days: 7),
+                                  ),
+                                ),
+                                if (!controller.isContinuation)
+                                  RoutineFormPicker(
+                                    key: ValueKey(_parentID),
+                                    decoration:
+                                        _decoration(
+                                          context
+                                              .t
+                                              .ongoingWorkout
+                                              .finish
+                                              .fields
+                                              .parent
+                                              .label,
+                                        ).copyWith(
+                                          helper: Text(
+                                            context
+                                                .t
+                                                .ongoingWorkout
+                                                .finish
+                                                .fields
+                                                .parent
+                                                .help,
+                                          ),
+                                        ),
+                                    onChanged: (routine) {
+                                      setState(() {
+                                        _parentID = routine?.id;
+                                      });
+                                    },
+                                    routine:
+                                        ProviderScope.containerOf(
+                                              context,
+                                              listen: false,
+                                            )
+                                            .read(routinesControllerProvider)
+                                            .workouts
+                                            .firstWhereOrNull(
+                                              (element) =>
+                                                  element.id == _parentID,
+                                            ),
+                                  ),
+                                TimeInputField(
+                                  controller: timeController,
+                                  decoration: _decoration(
+                                    context
+                                        .t
+                                        .ongoingWorkout
+                                        .finish
+                                        .fields
+                                        .duration
+                                        .label,
+                                  ),
+                                  validator: (duration) {
+                                    if (duration == null ||
+                                        duration.inSeconds == 0) {
+                                      return context
+                                          .t
+                                          .ongoingWorkout
+                                          .finish
+                                          .fields
+                                          .duration
+                                          .errors
+                                          .empty;
+                                    }
+                                    return null;
+                                  },
+                                ),
+                                GTRichTextEditor(
+                                  controller: infoboxController,
+                                  decoration: GymTrackerInputDecoration(
+                                    labelText: context
+                                        .t
+                                        .ongoingWorkout
+                                        .finish
+                                        .fields
+                                        .infobox
+                                        .label,
+                                    alignLabelWithHint: true,
+                                  ),
+                                ),
+                              ]
+                              .map(
+                                (c) => Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 16,
+                                    horizontal: 16,
+                                  ).copyWith(top: 0),
+                                  child: c,
+                                ),
+                              )
+                              .toList(),
+                    ),
+                  );
+                },
+              ),
+            ),
           ),
         ),
       ),
@@ -962,8 +1047,15 @@ class _WorkoutFinishPageState extends ConsumerState<WorkoutFinishPage> {
 
   Future<void> _submit() async {
     final controller = _workoutController(context);
-    if (_submitting || controller == null || controller.isSubmitting) return;
+    if (_submitting ||
+        controller == null ||
+        controller.isSubmitting ||
+        !identical(controller, _session) ||
+        !_session.isSessionActive(_generation)) {
+      return;
+    }
     if (!formKey.currentState!.validate()) return;
+    FocusManager.instance.primaryFocus?.unfocus();
     setState(() => _submitting = true);
     final generation = controller.sessionGeneration;
     try {
@@ -971,12 +1063,17 @@ class _WorkoutFinishPageState extends ConsumerState<WorkoutFinishPage> {
         titleController.text,
         TimeInputField.parseDuration(timeController.text),
         ref: ref,
+        details: WorkoutFinishDetails(
+          startingTime: _date,
+          parentID: _parentID,
+          infobox: _notes,
+        ),
       );
     } catch (error, stack) {
       logger.e('Error submitting workout', error: error, stackTrace: stack);
       if (mounted && controller.isSessionActive(generation)) {
         setState(() => _submitting = false);
-        Go.snack('$error');
+        Go.snack(context.t.ongoingWorkout.finish.saveError);
       }
     }
   }

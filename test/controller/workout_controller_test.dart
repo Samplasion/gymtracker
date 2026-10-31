@@ -20,6 +20,69 @@ void main() {
   });
 
   group('WorkoutController -', () {
+    test('finish metadata stays private until persistence succeeds', () async {
+      final controller = MockServices.createWorkout(
+        'Original',
+        'routine',
+        'Original notes',
+      );
+      final originalDate = controller.time;
+      final pending = Completer<void>();
+      when(
+        () => MockServices.historyController.addNewWorkout(any()),
+      ).thenAnswer((_) => pending.future);
+      final date = DateTime(2026, 1, 1);
+      final result = controller.submit(
+        'Edited',
+        const Duration(minutes: 20),
+        details: WorkoutFinishDetails(
+          startingTime: date,
+          parentID: null,
+          infobox: 'New notes',
+        ),
+      );
+      await Future<void>.delayed(Duration.zero);
+      expect(controller.time, originalDate);
+      expect(controller.parentID, 'routine');
+      expect(controller.infobox, 'Original notes');
+      pending.complete();
+      final workout = await result;
+      expect(workout.startingDate, date);
+      expect(workout.parentID, isNull);
+      expect(workout.infobox, 'New notes');
+      expect(workout.name, 'Edited');
+      expect(controller.time, date);
+      expect(controller.parentID, isNull);
+    });
+
+    test('failed submission does not apply finish metadata', () async {
+      final controller = MockServices.createWorkout(
+        'Original',
+        'routine',
+        'Notes',
+      );
+      final originalDate = controller.time;
+      when(
+        () => MockServices.historyController.addNewWorkout(any()),
+      ).thenAnswer((_) async => throw StateError('Write failed'));
+      await expectLater(
+        controller.submit(
+          'Edited',
+          const Duration(minutes: 20),
+          details: WorkoutFinishDetails(
+            startingTime: DateTime(2026, 1, 1),
+            parentID: null,
+            infobox: null,
+          ),
+        ),
+        throwsStateError,
+      );
+      expect(controller.time, originalDate);
+      expect(controller.parentID, 'routine');
+      expect(controller.infobox, 'Notes');
+      expect(controller.name, 'Original');
+    });
+
     test('concurrent submits write once and return the same workout', () async {
       final controller = MockServices.createWorkout('Workout', null, null);
       controller.exercises.add(exerciseHelper('ex1', 'Bench Press'));

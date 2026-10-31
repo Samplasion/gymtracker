@@ -3,7 +3,6 @@ import 'package:flutter_quill/flutter_quill.dart';
 import 'package:gymtracker/data/rich_text.dart';
 import 'package:gymtracker/i18n/strings.g.dart';
 import 'package:gymtracker/icons/gymtracker_icons.dart';
-import 'package:gymtracker/view/utils/input_decoration.dart';
 
 class GTRichTextEditor extends StatefulWidget {
   const GTRichTextEditor({
@@ -47,10 +46,7 @@ class _GTRichTextEditorState extends State<GTRichTextEditor> {
   Widget build(BuildContext context) {
     final shouldShowToolbar = _focusNode.hasPrimaryFocus;
     return InputDecorator(
-      decoration: GymTrackerInputDecoration(
-        labelText: context.t.ongoingWorkout.finish.fields.infobox.label,
-        alignLabelWithHint: true,
-      ),
+      decoration: widget.decoration,
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [

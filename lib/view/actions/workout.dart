@@ -452,6 +452,7 @@ extension WorkoutPresentation on WorkoutController {
     String name,
     Duration duration, {
     required WidgetRef ref,
+    WorkoutFinishDetails? details,
   }) async {
     if (isSubmitting) return;
     final generation = sessionGeneration;
@@ -460,7 +461,7 @@ extension WorkoutPresentation on WorkoutController {
     final history = ref.read(historyControllerProvider);
     final translations = ref.read(translationsProvider);
     final backups = ref.read(backupSchedulerProvider);
-    final workout = await submit(name, duration);
+    final workout = await submit(name, duration, details: details);
     if (!isSessionActive(generation)) return;
     Go.back();
     SchedulerBinding.instance.addPostFrameCallback((timeStamp) async {

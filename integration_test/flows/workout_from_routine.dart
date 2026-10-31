@@ -79,7 +79,7 @@ Future<void> testWorkoutFromRoutineFlow(
 
   expect(find.byType(WorkoutFinishPage), findsOneWidget);
 
-  await tester.tap(find.widgetWithIcon(IconButton, GTIcons.done));
+  await tester.tap(find.text('Save workout'));
   await tester.pumpAndSettle();
 
   expect(find.byType(WorkoutFinishPage), findsNothing);

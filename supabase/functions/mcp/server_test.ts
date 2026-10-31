@@ -275,6 +275,16 @@ Deno.test("JWT verification rejects expired, wrong audience, issuer, client, rol
       kid: "test",
     }).sign(privateKey);
   await verifyToken(await sign({}), config, keys);
+  const multi = { ...config, clientIds: [config.clientId, "claude-test"] };
+  await verifyToken(await sign({}), multi, keys);
+  await verifyToken(await sign({ client_id: "claude-test" }), multi, keys);
+  let legacyRejectedClaude = false;
+  try {
+    await verifyToken(await sign({ client_id: "claude-test" }), config, keys);
+  } catch {
+    legacyRejectedClaude = true;
+  }
+  assert(legacyRejectedClaude);
   for (
     const override of [
       { exp: 1 },
@@ -288,7 +298,7 @@ Deno.test("JWT verification rejects expired, wrong audience, issuer, client, rol
   ) {
     let rejected = false;
     try {
-      await verifyToken(await sign(override), config, keys);
+      await verifyToken(await sign(override), multi, keys);
     } catch {
       rejected = true;
     }

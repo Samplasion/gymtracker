@@ -4,6 +4,7 @@ INSERT INTO auth.users(id,email,raw_user_meta_data) VALUES
  ('00000000-0000-0000-0000-000000000031','mcp-a@unit.test','{"username":"mcpalpha"}'),
  ('00000000-0000-0000-0000-000000000032','mcp-b@unit.test','{"username":"mcpbeta"}');
 INSERT INTO gymbro_mcp.settings(singleton,client_id,resource) VALUES(true,'00000000-0000-0000-0000-000000000090','https://gym-bro.test/mcp');
+INSERT INTO gymbro_mcp.oauth_clients VALUES('00000000-0000-0000-0000-000000000090') ON CONFLICT DO NOTHING;
 INSERT INTO public.custom_exercises(id,user_id,name,parameters,primary_muscle_group,secondary_muscle_groups,equipment) VALUES
  ('custom-a','00000000-0000-0000-0000-000000000031','Custom timer','time','abs','{}','none'),
  ('custom-b','00000000-0000-0000-0000-000000000032','Private exercise','freeBodyReps','chest','{}','none');
@@ -106,6 +107,7 @@ ROLLBACK;
 BEGIN;
 INSERT INTO auth.users(id,email,raw_user_meta_data) VALUES('00000000-0000-0000-0000-000000000061','mcp-types@unit.test','{"username":"mcptypes"}');
 INSERT INTO gymbro_mcp.settings(singleton,client_id,resource) VALUES(true,'00000000-0000-0000-0000-000000000090','https://gym-bro.test/mcp');
+INSERT INTO gymbro_mcp.oauth_clients VALUES('00000000-0000-0000-0000-000000000090') ON CONFLICT DO NOTHING;
 INSERT INTO public.custom_exercises(id,user_id,name,parameters,primary_muscle_group,secondary_muscle_groups,equipment) VALUES('custom-later-deleted','00000000-0000-0000-0000-000000000061','Timer','time','abs','{}','none');
 INSERT INTO gymbro_mcp.billing SELECT id,true,NULL,now(),'PRODUCTION' FROM auth.users ON CONFLICT(user_id) DO NOTHING;
 SELECT public.test_mcp_oauth(id) FROM auth.users;

@@ -444,3 +444,58 @@ receipts and sync history. Existing app sessions are independent of OAuth.
 - https://supabase.com/docs/guides/auth/auth-hooks/custom-access-token-hook
 - https://developers.openai.com/plugins/build/auth
 - https://developers.openai.com/plugins/deploy/connect-chatgpt
+
+## Multiple static OAuth clients (2026-10-29)
+
+Apply `20261029120000_mcp_oauth_clients.sql` before deploying the updated MCP
+function and landing site. It seeds the private `gymbro_mcp.oauth_clients`
+registry from the existing settings row, preserving the existing connection.
+`settings.resource` remains the canonical audience; `settings.client_id` is
+retained for compatibility but is no longer the authorization allowlist.
+For a fresh installation, explicitly insert every client after configuring settings.
+
+Register each static client with authorization code + S256 PKCE, keeping dynamic
+registration disabled. For the Claude client already registered in Supabase,
+use its actual ID and exact registered callback. As the database operator:
+
+```sql
+INSERT INTO gymbro_mcp.oauth_clients(client_id)
+VALUES ('<registered-claude-client-id>') ON CONFLICT DO NOTHING;
+```
+
+Set the same server-only JSON configuration on the landing site and MCP function:
+
+```text
+MCP_OAUTH_CLIENTS=[{"clientId":"<existing-client-id>","redirectUris":["<exact-existing-https-callback>"]},{"clientId":"<claude-client-id>","redirectUris":["<exact-claude-https-callback>","<second-registered-https-callback>"]}]
+```
+
+These are placeholders, not usable credentials. The site validates exact
+client/callback pairs; the Edge Function uses their client IDs. Include both
+clients: a supplied list replaces the legacy single-client environment setting.
+The landing site requires nonempty `redirectUris` arrays, including for a single
+callback; the singular `redirectUri` format and legacy site variables are no
+longer supported. Register every callback in Supabase and migrate the site
+configuration before deploying. The Edge Function only uses the client IDs. Client secrets stay in the connecting application, never in the landing
+site or browser. Hosted configuration is not changed by local builds.
+
+All OAuth sessions remain isolated as `gymbro_mcp_user`; only registered clients
+receive the MCP audience. Every database operation also checks the allowlist,
+the token's exact client/session/account and a current non-revoked consent.
+Removing a registry entry blocks database access immediately; remove it from
+both environment lists too when retiring a client. Existing grants and ordinary
+account sessions do not require recreation.
+
+Release order: database migration and registry entry, MCP configuration/function,
+then site configuration/build. In staging test both clients' consent, denial,
+existing authorization, tool calls, refresh and revocation; check that ordinary
+login and account management still work and MCP tokens cannot reach them.
+Run `deno task test` and `deno task check` in `supabase/functions/mcp`, and
+`bash tools/test_sync_v2_backend.sh` with Docker running. The SQL suite includes
+`test/backend/mcp_oauth_clients.sql` for multi-client hooks, crossed sessions,
+private registry access and immediate consent revocation.
+
+For MCP Inspector, the landing also accepts explicitly configured HTTP callbacks
+on `localhost`, `127.0.0.1` and `[::1]`, with exact host, port and path matching.
+Add the Inspector's actual callback to its client's `redirectUris` array and
+register the same URL in Supabase. Other hosts still require HTTPS. A malformed
+callback invalidates the entire landing configuration, including other clients.

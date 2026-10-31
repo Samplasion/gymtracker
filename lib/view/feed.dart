@@ -11,17 +11,19 @@ import 'package:gymtracker/provider/connectivity.dart';
 import 'package:gymtracker/provider/feed.dart';
 import 'package:gymtracker/provider/friend.dart';
 import 'package:gymtracker/provider/online.dart';
+import 'package:gymtracker/provider/social.dart';
+import 'package:gymtracker/service/logger.dart';
 import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/utils/skeletons.dart';
 import 'package:gymtracker/view/components/content_unavailable.dart';
 import 'package:gymtracker/view/components/icon_grid.dart';
 import 'package:gymtracker/view/components/loading_indicator.dart';
+import 'package:gymtracker/view/components/retry_view.dart';
 import 'package:gymtracker/view/components/routines.dart';
 import 'package:gymtracker/view/exercises.dart';
-import 'package:gymtracker/view/social_notifications.dart';
-import 'package:gymtracker/provider/social.dart';
 import 'package:gymtracker/view/login.dart';
 import 'package:gymtracker/view/skeleton.dart';
+import 'package:gymtracker/view/social_notifications.dart';
 import 'package:gymtracker/view/user_profile.dart';
 import 'package:gymtracker/view/utils/crossfade.dart';
 import 'package:gymtracker/view/utils/feed_items.dart';
@@ -168,16 +170,29 @@ class _FeedViewState extends ConsumerState<FeedView>
                   ),
                   error: (error, stackTrace) => IconButton(
                     icon: const Icon(Icons.error, color: Colors.redAccent),
+                    tooltip: context.t.feed.userButton.error,
                     onPressed: () {
+                      globalLogger.e(
+                        'Unable to load profile',
+                        error: error,
+                        stackTrace: stackTrace,
+                      );
                       showDialog(
                         context: context,
                         builder: (context) => AlertDialog(
-                          title: Text("Error"),
-                          content: Text(error.toString()),
+                          title: Text(context.t.feed.userButton.error),
+                          content: Text(context.t.feed.loadError.text),
                           actions: [
                             TextButton(
-                              onPressed: () => Navigator.of(context).pop(),
-                              child: Text("OK"),
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                                unawaited(
+                                  ref
+                                      .read(onlineProvider.notifier)
+                                      .retryAccount(),
+                                );
+                              },
+                              child: Text(context.t.error.retry),
                             ),
                           ],
                         ),
@@ -242,7 +257,7 @@ class _FeedViewState extends ConsumerState<FeedView>
                               vertical: 16,
                             ).copyWith(bottom: 8),
                             child: Text(
-                              context.t.routines.quickWorkout.title,
+                              context.t.feed.suggestedRoutines,
                               style: Theme.of(context).textTheme.titleMedium,
                             ),
                           ),
@@ -315,9 +330,33 @@ class _FeedViewState extends ConsumerState<FeedView>
               loading: () => SliverFillRemaining(
                 child: Center(child: GBLoadingIndicator()),
               ),
-              error: (error, stackTrace) => SliverFillRemaining(
-                child: Center(child: Text("Error loading feed")),
-              ),
+              error: (error, stackTrace) {
+                globalLogger.e(
+                  'Unable to load feed',
+                  error: error,
+                  stackTrace: stackTrace,
+                );
+                return SliverFillRemaining(
+                  hasScrollBody: false,
+                  child: Center(
+                    child: RetryView(
+                      title: context.t.feed.loadError.title,
+                      description: context.t.feed.loadError.text,
+                      onRetry: () async {
+                        try {
+                          await feedNotifier.refresh();
+                        } catch (error, stackTrace) {
+                          globalLogger.e(
+                            'Unable to refresh feed',
+                            error: error,
+                            stackTrace: stackTrace,
+                          );
+                        }
+                      },
+                    ),
+                  ),
+                );
+              },
             ),
             if (feedNotifier.isLoadingMore) ...[
               SliverToBoxAdapter(

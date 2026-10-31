@@ -28,6 +28,7 @@ import 'package:gymtracker/view/components/error_view.dart';
 import 'package:gymtracker/view/components/infobox.dart';
 import 'package:gymtracker/view/components/legacy_workout_recovery.dart';
 import 'package:gymtracker/view/components/pro_builder.dart';
+import 'package:gymtracker/view/components/retry_view.dart';
 import 'package:gymtracker/view/components/rich_text_editor.dart';
 import 'package:gymtracker/view/components/routines.dart';
 import 'package:gymtracker/view/components/subscription_nag.dart';
@@ -114,6 +115,16 @@ class _RoutinesViewState extends ConsumerState<RoutinesView> with _RoutineList {
     final routinesByFolder = ref.watch(routinesByFolderProvider);
     final folders = ref.watch(foldersStreamProvider);
 
+    for (final source in [rootRoutines, folders, routinesByFolder]) {
+      if (source.hasError) {
+        logger.e(
+          'Unable to load routines',
+          error: source.error,
+          stackTrace: source.stackTrace,
+        );
+      }
+    }
+
     final loadingView = SliverSkeletonizer(
       enabled: true,
       child: MultiSliver(
@@ -172,8 +183,25 @@ class _RoutinesViewState extends ConsumerState<RoutinesView> with _RoutineList {
                     historyController.history.length >=
                         Configuration.trialWorkoutLimit;
                 return ListTile(
-                  title: Text(context.t.routines.quickWorkout.title),
-                  subtitle: Text(context.t.routines.quickWorkout.subtitle),
+                  title: Text.rich(
+                    TextSpan(
+                      children: [
+                        TextSpan(text: context.t.routines.quickWorkout.title),
+                        if (shouldDisable) ...[
+                          const TextSpan(text: ' '),
+                          const WidgetSpan(
+                            alignment: PlaceholderAlignment.middle,
+                            child: ProBadge(),
+                          ),
+                        ],
+                      ],
+                    ),
+                  ),
+                  subtitle: Text(
+                    shouldDisable
+                        ? context.t.routines.quickWorkout.proLimit
+                        : context.t.routines.quickWorkout.subtitle,
+                  ),
                   leading: Skeleton.leaf(
                     child: CircleAvatar(
                       foregroundColor:
@@ -194,37 +222,36 @@ class _RoutinesViewState extends ConsumerState<RoutinesView> with _RoutineList {
             ),
           ),
 
-          ...folders.maybeMap(
-            data: (folders) {
-              return routinesByFolder.maybeMap(
-                data: (folderMappings) {
-                  return rootRoutines.maybeMap(
-                    data: (routines) {
-                      return routineList(
-                        {
-                          for (final MapEntry(key: folderID, value: routine)
-                              in folderMappings.value.entries)
-                            if (folders.value.any(
-                              (folder) => folder.id == folderID,
-                            ))
-                              folders.value.firstWhere(
-                                (folder) => folder.id == folderID,
-                              ): routine,
-                        },
-                        routines.value
-                            .where((element) => element.folder == null)
-                            .toList(),
-                        foldersInNewPage: true,
-                      );
-                    },
-                    orElse: () => [loadingView],
-                  );
+          if (!isLoading &&
+              (folders.hasError ||
+                  rootRoutines.hasError ||
+                  routinesByFolder.hasError))
+            SliverToBoxAdapter(
+              child: RetryView(
+                title: context.t.routines.loadError.title,
+                description: context.t.routines.loadError.text,
+                onRetry: () {
+                  ref.invalidate(routinesStreamProvider);
+                  ref.invalidate(foldersStreamProvider);
                 },
-                orElse: () => [loadingView],
-              );
-            },
-            orElse: () => [loadingView],
-          ),
+              ),
+            )
+          else if (isLoading ||
+              !folders.hasValue ||
+              !rootRoutines.hasValue ||
+              !routinesByFolder.hasValue)
+            loadingView
+          else
+            ...routineList(
+              {
+                for (final folder in folders.requireValue)
+                  folder: routinesByFolder.requireValue[folder.id] ?? [],
+              },
+              rootRoutines.requireValue
+                  .where((routine) => routine.folder == null)
+                  .toList(),
+              foldersInNewPage: true,
+            ),
 
           SliverToBoxAdapter(
             child: ProBuilder(

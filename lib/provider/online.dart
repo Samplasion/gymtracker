@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'package:gymtracker/service/push.dart';
 import 'dart:typed_data';
 
 import 'package:drift/drift.dart' show Value;
@@ -16,6 +15,7 @@ import 'package:gymtracker/provider/events.dart';
 import 'package:gymtracker/service/database.dart';
 import 'package:gymtracker/service/logger.dart';
 import 'package:gymtracker/service/online.dart';
+import 'package:gymtracker/service/push.dart';
 import 'package:gymtracker/service/test.dart';
 import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/utils/utils.dart' show isNetworkError;
@@ -241,6 +241,33 @@ class Online extends _$Online {
       _onNetworkStatusChanged(next.value ?? false);
     });
     return _getAccountAndDoStuff();
+  }
+
+  /// Retry profile loading without disposing the active sync service.
+  Future<void> retryAccount() async {
+    if (state.isLoading) return;
+    state = const AsyncLoading();
+    try {
+      if (!_isInit) {
+        await _runOneTimeAsyncBoot();
+        if (!ref.mounted) return;
+        ref.listen<AsyncValue<bool>>(networkConnectivityProvider, (
+          previous,
+          next,
+        ) {
+          _onNetworkStatusChanged(next.value ?? false);
+        });
+      }
+      if (!ref.mounted) return;
+      await _getAccountAndDoStuff();
+    } catch (error, stackTrace) {
+      logger.e(
+        'Unable to reload profile',
+        error: error,
+        stackTrace: stackTrace,
+      );
+      if (ref.mounted) state = AsyncError(error, stackTrace);
+    }
   }
 
   Future<void> login({required String email, required String password}) =>
@@ -506,6 +533,12 @@ class Online extends _$Online {
       backendTable: 'water_logs',
       fromJson: DBWaterLog.fromJson,
       companionConstructor: WaterLogsCompanion.new,
+    );
+
+    _syncManager.registerSyncable<DBRecipe>(
+      backendTable: 'recipes',
+      fromJson: DBRecipe.fromJson,
+      companionConstructor: RecipesCompanion.new,
     );
 
     _syncManager.registerSyncable<DBFood>(

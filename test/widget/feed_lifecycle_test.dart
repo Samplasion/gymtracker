@@ -44,6 +44,30 @@ class _Connectivity extends NetworkConnectivityNotifier {
   Stream<bool> build() => Stream.value(false);
 }
 
+class _FailingFeed extends _Feed {
+  @override
+  Future<List<FeedItem>> build() async =>
+      throw StateError('technical feed error');
+
+  @override
+  Future<void> refresh() async {
+    refreshes++;
+    state = const AsyncData([]);
+  }
+}
+
+class _FailingOnline extends Online {
+  int retries = 0;
+  @override
+  Future<OnlineAccount?> build() async =>
+      throw StateError('technical account error');
+  @override
+  Future<void> retryAccount() async {
+    retries++;
+    state = const AsyncData(null);
+  }
+}
+
 void main() {
   setUp(() async {
     MockServices.setup();
@@ -53,6 +77,65 @@ void main() {
     ).thenReturn(<RoutineSuggestion>[]);
   });
   tearDown(MockServices.tearDown);
+
+  testWidgets('feed errors are localized and retry reloads activities', (
+    tester,
+  ) async {
+    final feed = _FailingFeed();
+    final container = ProviderContainer(
+      overrides: [
+        feedProvider.overrideWith(() => feed),
+        onlineProvider.overrideWith(_Online.new),
+        networkConnectivityProvider.overrideWith(_Connectivity.new),
+      ],
+    );
+    addTearDown(container.dispose);
+    await tester.pumpWidget(
+      UncontrolledProviderScope(
+        container: container,
+        child: const WidgetTestApp(child: FeedView()),
+      ),
+    );
+    await tester.pumpAndSettle();
+    expect(find.text('Choose a workout'), findsOneWidget);
+    expect(find.text('Unable to load activities'), findsOneWidget);
+    expect(find.textContaining('technical'), findsNothing);
+    await tester.tap(find.text('Try again'));
+    await tester.pumpAndSettle();
+    expect(feed.refreshes, greaterThan(0));
+    expect(find.text('Unable to load activities'), findsNothing);
+    await tester.pumpWidget(const SizedBox.shrink());
+  });
+
+  testWidgets('account error retries without rebuilding the online service', (
+    tester,
+  ) async {
+    final online = _FailingOnline();
+    final container = ProviderContainer(
+      overrides: [
+        feedProvider.overrideWith(_Feed.new),
+        onlineProvider.overrideWith(() => online),
+        networkConnectivityProvider.overrideWith(_Connectivity.new),
+      ],
+    );
+    addTearDown(container.dispose);
+    await tester.pumpWidget(
+      UncontrolledProviderScope(
+        container: container,
+        child: const WidgetTestApp(child: FeedView()),
+      ),
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(find.byTooltip('Unable to load profile'));
+    await tester.pumpAndSettle();
+    expect(find.text('Unable to load profile'), findsOneWidget);
+    expect(find.textContaining('technical'), findsNothing);
+    await tester.tap(find.text('Try again'));
+    await tester.pumpAndSettle();
+    expect(online.retries, 1);
+    expect(find.byType(AlertDialog), findsNothing);
+    await tester.pumpWidget(const SizedBox.shrink());
+  });
 
   for (final platform in [TargetPlatform.iOS, TargetPlatform.android]) {
     testWidgets(

@@ -354,6 +354,37 @@ class NutritionCategoryNotifier extends _$NutritionCategoryNotifier {
   @override
   void build() {}
 
+  Future<void> reorderCategories(DateTime date, List<String> names) async {
+    final day = date.startOfDay;
+    if (day.isBefore(DateTime.now().startOfDay)) {
+      throw StateError('Past categories cannot be reordered');
+    }
+    final keepAlive = ref.keepAlive();
+    try {
+      final repository = ref.read(foodsRepositoryProvider);
+      final backup = ref.read(backupSchedulerProvider);
+      final sequence = await repository.watchNutritionCategories().first;
+      final categories = sequence.isEmpty
+          ? <String, NutritionCategory>{}
+          : sequence[day];
+      if (names.length != categories.length ||
+          names.toSet().length != names.length ||
+          !names.every(categories.containsKey)) {
+        throw StateError('Categories changed while reordering');
+      }
+      if (listEquals(names, categories.keys.toList())) return;
+      if (day.isBefore(DateTime.now().startOfDay)) {
+        throw StateError('Past categories cannot be reordered');
+      }
+      await repository.setNutritionCategoriesForDay(day, {
+        for (final name in names) name: categories[name]!,
+      });
+      backup.schedule();
+    } finally {
+      keepAlive.close();
+    }
+  }
+
   Future<void> addCategory(NutritionCategory category) async {
     final date = ref.read(foodSelectedDateProvider);
     final categoriesSeq =

@@ -554,17 +554,17 @@ class NutritionTable extends StatelessWidget {
           bold: true,
         ),
         verticalSpace,
+        NutritionRow(id: "fat", value: nutritionalValues.fat, bold: true),
+        NutritionRow(id: "saturatedFat", value: nutritionalValues.saturatedFat),
+        verticalSpace,
+        NutritionRow(id: "carbs", value: nutritionalValues.carbs, bold: true),
+        NutritionRow(id: "sugar", value: nutritionalValues.sugar),
+        verticalSpace,
         NutritionRow(
           id: "protein",
           value: nutritionalValues.protein,
           bold: true,
         ),
-        verticalSpace,
-        NutritionRow(id: "carbs", value: nutritionalValues.carbs, bold: true),
-        NutritionRow(id: "sugar", value: nutritionalValues.sugar),
-        verticalSpace,
-        NutritionRow(id: "fat", value: nutritionalValues.fat, bold: true),
-        NutritionRow(id: "saturatedFat", value: nutritionalValues.saturatedFat),
         verticalSpace,
         if (nutritionalValues.water != null)
           NutritionRow(id: "water", value: nutritionalValues.water!),
@@ -870,11 +870,11 @@ class _CustomAddFoodViewState extends ConsumerState<CustomAddFoodView> {
   bool expanded = false;
   final controllers = {
     "calories": TextEditingController(),
-    "protein": TextEditingController(),
-    "carbs": TextEditingController(),
-    "sugar": TextEditingController(),
     "fat": TextEditingController(),
     "saturatedFat": TextEditingController(),
+    "carbs": TextEditingController(),
+    "sugar": TextEditingController(),
+    "protein": TextEditingController(),
     "water": TextEditingController(),
     "salt": TextEditingController(),
     "sodium": TextEditingController(),
@@ -1632,7 +1632,8 @@ class _AddCombinedFoodViewState extends ConsumerState<AddCombinedFoodView> {
 
   var amount = 100.0;
   var unit = NutritionUnit.G;
-  var constituents = <Food>[];
+  var constituents = <RecipeIngredient>[];
+  bool _customAmount = false;
 
   @override
   void dispose() {
@@ -1643,9 +1644,7 @@ class _AddCombinedFoodViewState extends ConsumerState<AddCombinedFoodView> {
   }
 
   NutritionValues get nutritionalValues => NutritionValues.sum(
-    constituents.map(
-      (food) => (food.amount * food.pieces, food.nutritionalValues),
-    ),
+    constituents.map((item) => (item.mass, item.food.nutritionalValues)),
   );
 
   @override
@@ -1695,44 +1694,14 @@ class _AddCombinedFoodViewState extends ConsumerState<AddCombinedFoodView> {
                             clarifyUnit: false,
                             onChanged: (value) {
                               setState(() {
-                                amount = value.tryParseDouble() ?? 100;
+                                _customAmount = true;
+                                amount = value.tryParseDouble() ?? 0;
                               });
                             },
                           ),
                         ),
                         const SizedBox(width: 8),
-                        SegmentedButton<NutritionUnit>(
-                          style: ButtonStyle(
-                            padding: WidgetStateProperty.all(
-                              EdgeInsets.symmetric(
-                                vertical:
-                                    Theme.of(context).materialTapTargetSize ==
-                                        MaterialTapTargetSize.padded
-                                    ? 14
-                                    : 18,
-                              ),
-                            ),
-                          ),
-                          showSelectedIcon: false,
-                          segments: <ButtonSegment<NutritionUnit>>[
-                            ButtonSegment<NutritionUnit>(
-                              label: Text(context.t.food.nutrimentUnits['g']!),
-                              value: NutritionUnit.G,
-                            ),
-                            ButtonSegment<NutritionUnit>(
-                              label: Text(
-                                context.t.food.nutrimentUnits['milliL']!,
-                              ),
-                              value: NutritionUnit.MILLI_L,
-                            ),
-                          ],
-                          onSelectionChanged: (value) {
-                            setState(() {
-                              unit = value.first;
-                            });
-                          },
-                          selected: {unit},
-                        ),
+                        const Text('g'),
                       ],
                     ),
                     const Divider(height: 32),
@@ -1742,20 +1711,31 @@ class _AddCombinedFoodViewState extends ConsumerState<AddCombinedFoodView> {
               ),
               SliverList.builder(
                 itemBuilder: (context, i) => FoodListTile(
-                  key: ValueKey(constituents[i]),
-                  food: constituents[i],
+                  key: ValueKey(constituents[i].food.id),
+                  food: constituents[i].food,
                   onDelete: () {
                     setState(() {
                       constituents.removeAt(i);
+                      _updateMass();
                     });
                   },
                   onTap: () {
-                    showAddFoodView(context, constituents[i]).then((
-                      value,
-                    ) async {
-                      if (value != null) {
+                    final item = constituents[i];
+                    showAddFoodView(
+                      context,
+                      item.food,
+                      inheritAmount: true,
+                    ).then((food) async {
+                      if (food == null || !context.mounted) return;
+                      final changed = await _weighIngredient(
+                        context,
+                        food.copyWith(id: item.food.id),
+                        gramsPerMl: item.gramsPerMl,
+                      );
+                      if (changed != null && mounted) {
                         setState(() {
-                          constituents[i] = value;
+                          constituents[i] = changed;
+                          _updateMass();
                         });
                       }
                     });
@@ -1774,13 +1754,16 @@ class _AddCombinedFoodViewState extends ConsumerState<AddCombinedFoodView> {
                           padding: const EdgeInsets.all(16),
                           child: Column(
                             children: [
+                              Text(
+                                '${context.t.food.recipes.automaticMass}: ${NumberFormat.decimalPattern().format(constituents.fold(0.0, (sum, item) => sum + item.mass))} g',
+                              ),
                               NutritionTable(
                                 per100g: nutritionalValues,
                                 amount: amount,
                                 unit: unit,
                               ),
                               if (constituents.any(
-                                (food) => food.downloadedFromOFF,
+                                (item) => item.food.downloadedFromOFF,
                               )) ...[
                                 const SizedBox(height: 16),
                                 OpenFoodFactsTableAttribution(
@@ -1813,7 +1796,9 @@ class _AddCombinedFoodViewState extends ConsumerState<AddCombinedFoodView> {
             onPressed: constituents.isEmpty
                 ? null
                 : () {
-                    if (!formKey.currentState!.validate()) {
+                    if (!formKey.currentState!.validate() ||
+                        !amount.isFinite ||
+                        amount <= 0) {
                       return;
                     }
 
@@ -1827,7 +1812,7 @@ class _AddCombinedFoodViewState extends ConsumerState<AddCombinedFoodView> {
                       unit: unit,
                       nutritionalValuesPer100g: nutritionalValues,
                       downloadedFromOFF: constituents.any(
-                        (food) => food.downloadedFromOFF,
+                        (item) => item.food.downloadedFromOFF,
                       ),
                     );
 
@@ -1840,6 +1825,12 @@ class _AddCombinedFoodViewState extends ConsumerState<AddCombinedFoodView> {
     );
   }
 
+  void _updateMass() {
+    if (_customAmount) return;
+    amount = constituents.fold(0.0, (sum, item) => sum + item.mass);
+    amountController.text = amount.toString();
+  }
+
   Widget _getSearchBar() => M3EButton.icon(
     icon: const Icon(Icons.add),
     label: Text(context.t.food.picker.title),
@@ -1847,13 +1838,25 @@ class _AddCombinedFoodViewState extends ConsumerState<AddCombinedFoodView> {
       () => FoodPickerView(
         allowCombine: false,
         onAdd: (food) async {
-          final ingredient = food.copyWith(id: const Uuid().v4());
-          if (mounted) setState(() => constituents.add(ingredient));
-          return ingredient;
+          final ingredient = await _weighIngredient(
+            context,
+            food.copyWith(id: const Uuid().v4()),
+          );
+          if (ingredient == null || !mounted) {
+            throw const _FoodSelectionCancelled();
+          }
+          setState(() {
+            constituents.add(ingredient);
+            _updateMass();
+          });
+          return ingredient.food;
         },
         onRemove: (food) async {
           if (mounted) {
-            setState(() => constituents.removeWhere((f) => f.id == food.id));
+            setState(() {
+              constituents.removeWhere((f) => f.food.id == food.id);
+              _updateMass();
+            });
           }
         },
       ),

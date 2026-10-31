@@ -296,8 +296,9 @@
     "title": "Routines",
     "newRoutine": "New routine",
     "quickWorkout": {
-      "title": "Quick workout",
-      "subtitle": "Quickly start an empty workout"
+      "title": "Free workout",
+      "subtitle": "Start without a routine",
+      "proLimit": "You have reached the free workout limit. Continue with PRO."
     },
     "actions": {
       "delete": {
@@ -366,7 +367,11 @@
     "folder": "Folder",
     "nullFolder": "You've deleted this folder",
     "nullFolderSubtitle": "You can go back to the Home page.",
-    "folderNotes": "Notes"
+    "folderNotes": "Notes",
+    "loadError": {
+      "title": "Unable to load routines",
+      "text": "Try again to load your routines and folders."
+    }
   },
   "history": {
     "title": "History",
@@ -625,10 +630,11 @@
           "label": "Starting time"
         },
         "parent": {
-          "label": "Categorize under",
+          "label": "Reference routine",
           "options": {
             "none": "No routine"
-          }
+          },
+          "help": "Link this workout to a routine. You will be asked about any routine updates after saving."
         },
         "duration": {
           "label": "Duration",
@@ -639,6 +645,15 @@
         "infobox": {
           "label": "Notes"
         }
+      },
+      "save": "Save workout",
+      "saving": "Saving…",
+      "saveError": "Unable to save the workout. Try again: your changes are still here.",
+      "discard": {
+        "title": "Discard changes?",
+        "text": "Your changes to the summary will be discarded. The workout will remain in progress.",
+        "keep": "Keep editing",
+        "confirm": "Discard changes"
       }
     },
     "cancel": {
@@ -943,6 +958,14 @@
     "cardio": {
       "name": "Cardio",
       "exercises": {
+        "burpees": "Burpees",
+        "squatThrusts": "Squat thrusts (without jump)",
+        "jumpingJacks": "Jumping jacks",
+        "highKnees": "High knees (running in place)",
+        "buttKicks": "Butt kicks (running in place)",
+        "skaterJumps": "Skater jumps",
+        "squatJumps": "Jump squats",
+        "plankJacks": "Plank jacks",
         "aerobics": "Aerobics",
         "biking": "Biking",
         "ergometer": "Upright exercise bike",
@@ -1567,6 +1590,7 @@
   "food": {
     "title": "Food tracking",
     "home": {
+      "dailyNutritionalValues": "Daily nutritional values",
       "calories": "Calories",
       "carbs": "Carbs",
       "protein": "Protein",
@@ -2222,6 +2246,7 @@
       "world": "World"
     },
     "categoryList": {
+      "reorderFailed": "Could not save the category order. Please try again.",
       "dailyPercentage": "$percentage% of daily total – $calories",
       "empty": "You haven't set up any categories",
       "unmodifiable": {
@@ -2335,6 +2360,52 @@
       "shareNotice": "Save shares this food in the public catalog. Save for me keeps it personal.",
       "invalidBarcode": "Enter a valid barcode (4–32 digits).",
       "showMore": "Show more"
+    },
+    "recipes": {
+      "title": "Recipes",
+      "create": "New recipe",
+      "edit": "Edit recipe",
+      "empty": "No saved recipes",
+      "search": "Search recipes",
+      "name": "Name",
+      "description": "Description",
+      "instructions": "Cooking instructions",
+      "servings": "Servings",
+      "ingredients": "Ingredients",
+      "addIngredient": "Add ingredient",
+      "automaticMass": "Ingredient weight",
+      "finalMass": "Final cooked weight (g, optional)",
+      "massHint": "Leave empty to use the sum of the ingredient weights.",
+      "total": "Total",
+      "perServing": "Per serving",
+      "save": "Save",
+      "delete": "Delete",
+      "deletePrompt": "Delete this recipe? Previously logged meals will stay unchanged.",
+      "cancel": "Cancel",
+      "confirm": "Confirm",
+      "add": "Add to diary",
+      "choose": "Recipe",
+      "grams": "Grams",
+      "portions": "Servings",
+      "equivalentMass": "Equivalent weight (g, optional)",
+      "liquidMass": "Convert ml to g",
+      "liquidHint": "You can enter the liquid weight in grams. Leave empty to use a conversion of 1 ml = 1 g.",
+      "invalid": "Enter a valid positive value.",
+      "invalidServings": "Enter an integer from 1 to 32.",
+      "requiredName": "Enter a name.",
+      "requiredIngredients": "Add at least one ingredient.",
+      "failed": "Could not complete the operation. Try again.",
+      "accountChanged": "The account changed. Reopen this screen.",
+      "editIngredient": "Edit ingredient",
+      "discard": "Discard changes?",
+      "discardBody": "Unsaved changes will be lost.",
+      "discardAction": "Discard",
+      "details": "Recipe details",
+      "yieldTitle": "Yield and servings",
+      "nutrition": "Nutrition",
+      "ingredientsHint": "Choose foods and quantities to build your recipe.",
+      "decreaseQuantity": "Decrease quantity",
+      "increaseQuantity": "Increase quantity"
     }
   },
   "equipment": {
@@ -2739,7 +2810,7 @@
       "title": "Your feed is empty",
       "text": "Start some workouts or log some meals to see them here."
     },
-    "startWorkout": "Start a workout",
+    "startWorkout": "Choose a workout",
     "workout": {
       "title": {
         "you": "You",
@@ -2760,13 +2831,19 @@
       }
     },
     "userButton": {
-      "loading": "Loading user profile..."
+      "loading": "Loading user profile...",
+      "error": "Unable to load profile"
     },
     "noSync": {
       "text": "Syncing is paused: you are not connected to the Internet. It may take a few minutes. Don't worry, the data will be kept locally and transferred later."
     },
     "noMoreData": "You've reached the end of your feed :)",
-    "loadMore": "Load more"
+    "loadMore": "Load more",
+    "suggestedRoutines": "Suggested routines",
+    "loadError": {
+      "title": "Unable to load activities",
+      "text": "Check your connection and try again."
+    }
   },
   "workoutPage": {
     "title": "Work Out"

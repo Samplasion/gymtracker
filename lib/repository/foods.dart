@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:gymtracker/db/database.dart';
 import 'package:gymtracker/provider/db.dart';
 import 'package:gymtracker/struct/date_sequence.dart';
@@ -97,7 +98,14 @@ class FoodsRepository {
   Stream<DateSequence<Map<String, NutritionCategory>>>
   watchNutritionCategories() {
     return _db.watchNutritionCategories().map(
-      (event) => DateSequence.fromDatesAndValues(event).normalize(),
+      (event) => DateSequence.fromDatesAndValues(event).normalize(
+        equals: (a, b) =>
+            const ListEquality<String>().equals(
+              a.keys.toList(),
+              b.keys.toList(),
+            ) &&
+            const MapEquality<String, NutritionCategory>().equals(a, b),
+      ),
     );
   }
 

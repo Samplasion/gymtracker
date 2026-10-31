@@ -1,7 +1,6 @@
 import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
-import 'package:gymtracker/db/database.dart';
 import 'package:gymtracker/db/imports/v1.dart';
 import 'package:gymtracker/db/imports/v10.dart';
 import 'package:gymtracker/db/imports/v11.dart';
@@ -21,6 +20,7 @@ import 'package:gymtracker/model/measurements.dart';
 import 'package:gymtracker/model/preferences.dart';
 import 'package:gymtracker/model/workout.dart';
 import 'package:gymtracker/struct/nutrition.dart';
+import 'package:gymtracker/struct/recipe.dart';
 
 const converters = {
   1: VersionedJsonImportV1(),
@@ -59,6 +59,7 @@ abstract class VersionedJsonImportBase {
 }
 
 class DatabaseSnapshot {
+  final List<Recipe> recipes;
   final List<Exercise> customExercises;
   final List<Workout> routines;
   final List<WorkoutExercisable> routineExercises;
@@ -76,6 +77,7 @@ class DatabaseSnapshot {
   final List<BodyMeasurement> bodyMeasurements;
 
   const DatabaseSnapshot({
+    this.recipes = const [],
     required this.customExercises,
     required this.routines,
     required this.routineExercises,
@@ -114,7 +116,10 @@ class DatabaseSnapshot {
 )""";
   }
 
-  Map<String, dynamic> toJson() => getConverter(DATABASE_VERSION).export(this);
+  Map<String, dynamic> toJson() => {
+    ...getConverter(12).export(this),
+    'recipes': recipes.map((r) => r.toJson()).toList(),
+  };
 }
 
 bool deepEquals(DatabaseSnapshot a, DatabaseSnapshot b) {

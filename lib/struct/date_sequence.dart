@@ -101,14 +101,15 @@ class DateSequence<T> {
   ///
   /// In case of collisions, the last value in the list is kept, even if it is
   /// not the last value chronologically.
-  factory DateSequence.normalized(List<DateTagged<T>> rawList) {
+  factory DateSequence.normalized(
+    List<DateTagged<T>> rawList, {
+    bool Function(T, T)? equals,
+  }) {
     final list = rawList.toList();
     final normalized = <DateTagged<T>>[];
-    final lastIndices = <DateTime, int>{
-      for (var i = 0; i < list.length; i++) list[i].date: i,
-    };
     // list.sort((a, b) => a.date.compareTo(b.date));
     bool equality(DateTagged<T> a, DateTagged<T> b) {
+      if (equals != null) return equals(a.value, b.value);
       if (a.value is List) {
         // print((
         //   a,
@@ -180,8 +181,8 @@ class DateSequence<T> {
 
   /// Returns a new DateSequence where all consecutive equal values are
   /// replaced by a single value, as per [DateSequence.normalized].
-  DateSequence<T> normalize() {
-    return DateSequence.normalized(_map.values.toList());
+  DateSequence<T> normalize({bool Function(T, T)? equals}) {
+    return DateSequence.normalized(_map.values.toList(), equals: equals);
   }
 
   /// Returns the values in the sequence.

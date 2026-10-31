@@ -1,7 +1,14 @@
 part of 'food.dart';
 
-class FoodCategoryList extends ConsumerWidget {
+class FoodCategoryList extends ConsumerStatefulWidget {
   const FoodCategoryList({super.key});
+
+  @override
+  ConsumerState<FoodCategoryList> createState() => _FoodCategoryListState();
+}
+
+class _FoodCategoryListState extends ConsumerState<FoodCategoryList> {
+  bool _saving = false;
 
   Color? getFabBackgroundColor(BuildContext context, bool canUpdate) =>
       canUpdate
@@ -19,8 +26,9 @@ class FoodCategoryList extends ConsumerWidget {
       canUpdate ? SystemMouseCursors.click : SystemMouseCursors.basic;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final canUpdate = ref.watch(foodCanUpdateCategoriesProvider);
+    final date = ref.watch(foodSelectedDateProvider);
     final foodCategories = ref
         .watch(categoriesForSelectedDateProvider)
         .values
@@ -44,12 +52,42 @@ class FoodCategoryList extends ConsumerWidget {
             ),
           ] else ...[
             const _NonFulfillingSumBanner(),
-            SliverList(
-              delegate: SliverChildBuilderDelegate((context, index) {
+            SliverReorderableList(
+              proxyDecorator: (child, index, animation) =>
+                  Material(elevation: 6, child: child),
+              onReorderItem: (oldIndex, newIndex) async {
+                if (_saving ||
+                    !ref.read(foodCanUpdateCategoriesProvider) ||
+                    ref.read(foodSelectedDateProvider) != date)
+                  return;
+                final names = foodCategories.map((c) => c.name).toList();
+                final moved = names.removeAt(oldIndex);
+                names.insert(newIndex, moved);
+                if (oldIndex == newIndex) return;
+                setState(() => _saving = true);
+                try {
+                  await ref
+                      .read(nutritionCategoryProvider.notifier)
+                      .reorderCategories(date, names);
+                } catch (_) {
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(
+                          context.t.food.categoryList.reorderFailed,
+                        ),
+                      ),
+                    );
+                  }
+                } finally {
+                  if (mounted) setState(() => _saving = false);
+                }
+              },
+              itemBuilder: (context, index) {
                 final category = foodCategories[index];
                 return Slidable(
-                  key: ValueKey(category),
-                  enabled: canUpdate,
+                  key: ValueKey(category.name),
+                  enabled: canUpdate && !_saving,
                   endActionPane: ActionPane(
                     extentRatio: 1 / 3,
                     dragDismissible: false,
@@ -71,15 +109,30 @@ class FoodCategoryList extends ConsumerWidget {
                       ),
                     ],
                   ),
-                  child: FoodCategoryListTile(category: category),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: IgnorePointer(
+                          ignoring: _saving,
+                          child: FoodCategoryListTile(category: category),
+                        ),
+                      ),
+                      if (canUpdate && !_saving && foodCategories.length > 1)
+                        Padding(
+                          padding: const EdgeInsets.all(12),
+                          child: DragHandle(index: index),
+                        ),
+                    ],
+                  ),
                 );
-              }, childCount: foodCategories.length),
+              },
+              itemCount: foodCategories.length,
             ),
           ],
         ],
       ),
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: canUpdate
+        onPressed: canUpdate && !_saving
             ? () async {
                 final cat = await showAddCategoryView(context, ref);
                 if (cat != null) {

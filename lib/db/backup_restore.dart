@@ -74,6 +74,10 @@ class PreparedDatabaseRestore {
       }
       // Exercise domain decoders before touching the live database.
       await source.watchFoods().first;
+      final recipes = await source.watchRecipes().first;
+      for (final recipe in recipes) {
+        recipe.validate();
+      }
       await HydrationRepository(source).watch(owner).first;
       await source.watchNutritionCategories().first;
       await source.watchCustomBarcodeFoods().first;

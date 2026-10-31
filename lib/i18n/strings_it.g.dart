@@ -289,6 +289,7 @@ class Translations$routines$it implements Translations$routines$en {
 	@override String get nullFolder => 'Cartella eliminata';
 	@override String get nullFolderSubtitle => 'Puoi tornare alla pagina Home.';
 	@override String get folderNotes => 'Note';
+	@override late final Translations$routines$loadError$it loadError = Translations$routines$loadError$it._(_root);
 }
 
 // Path: history
@@ -1281,6 +1282,7 @@ class Translations$food$it implements Translations$food$en {
 	@override late final Translations$food$datePicker$it datePicker = Translations$food$datePicker$it._(_root);
 	@override late final Translations$food$catalog$it catalog = Translations$food$catalog$it._(_root);
 	@override late final Translations$food$picker$it picker = Translations$food$picker$it._(_root);
+	@override late final Translations$food$recipes$it recipes = Translations$food$recipes$it._(_root);
 }
 
 // Path: equipment
@@ -1616,13 +1618,15 @@ class Translations$feed$it implements Translations$feed$en {
 	// Translations
 	@override String get title => 'Feed';
 	@override late final Translations$feed$empty$it empty = Translations$feed$empty$it._(_root);
-	@override String get startWorkout => 'Inizia un allenamento';
+	@override String get startWorkout => 'Scegli un allenamento';
 	@override late final Translations$feed$workout$it workout = Translations$feed$workout$it._(_root);
 	@override late final Translations$feed$achievement$it achievement = Translations$feed$achievement$it._(_root);
 	@override late final Translations$feed$userButton$it userButton = Translations$feed$userButton$it._(_root);
 	@override late final Translations$feed$noSync$it noSync = Translations$feed$noSync$it._(_root);
 	@override String get noMoreData => 'Hai raggiunto la fine del feed :)';
 	@override String get loadMore => 'Carica altro';
+	@override String get suggestedRoutines => 'Routine suggerite';
+	@override late final Translations$feed$loadError$it loadError = Translations$feed$loadError$it._(_root);
 }
 
 // Path: workoutPage
@@ -2135,8 +2139,9 @@ class Translations$routines$quickWorkout$it implements Translations$routines$qui
 	final TranslationsIt _root; // ignore: unused_field
 
 	// Translations
-	@override String get title => 'Allenamento rapido';
-	@override String get subtitle => 'Avvia rapidamente un allenamento vuoto';
+	@override String get title => 'Allenamento libero';
+	@override String get subtitle => 'Inizia senza una routine';
+	@override String get proLimit => 'Hai raggiunto il limite gratuito di allenamenti. Continua con PRO.';
 }
 
 // Path: routines.actions
@@ -2164,6 +2169,17 @@ class Translations$routines$editor$it implements Translations$routines$editor$en
 	@override late final Translations$routines$editor$exercises$it exercises = Translations$routines$editor$exercises$it._(_root);
 	@override late final Translations$routines$editor$fields$it fields = Translations$routines$editor$fields$it._(_root);
 	@override late final Translations$routines$editor$superset$it superset = Translations$routines$editor$superset$it._(_root);
+}
+
+// Path: routines.loadError
+class Translations$routines$loadError$it implements Translations$routines$loadError$en {
+	Translations$routines$loadError$it._(this._root);
+
+	final TranslationsIt _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Impossibile caricare le routine';
+	@override String get text => 'Riprova per caricare le routine e le cartelle.';
 }
 
 // Path: history.actions
@@ -2325,6 +2341,10 @@ class Translations$ongoingWorkout$finish$it implements Translations$ongoingWorko
 	// Translations
 	@override String get title => 'Termina allenamento';
 	@override late final Translations$ongoingWorkout$finish$fields$it fields = Translations$ongoingWorkout$finish$fields$it._(_root);
+	@override String get save => 'Salva allenamento';
+	@override String get saving => 'Salvataggio…';
+	@override String get saveError => 'Impossibile salvare l’allenamento. Riprova: le modifiche sono ancora qui.';
+	@override late final Translations$ongoingWorkout$finish$discard$it discard = Translations$ongoingWorkout$finish$discard$it._(_root);
 }
 
 // Path: ongoingWorkout.cancel
@@ -3078,6 +3098,7 @@ class Translations$food$home$it implements Translations$food$home$en {
 	final TranslationsIt _root; // ignore: unused_field
 
 	// Translations
+	@override String get dailyNutritionalValues => 'Valori nutrizionali della giornata';
 	@override String get calories => 'Calorie';
 	@override String get carbs => 'Carboidrati';
 	@override String get protein => 'Proteine';
@@ -3215,6 +3236,7 @@ class Translations$food$categoryList$it implements Translations$food$categoryLis
 	final TranslationsIt _root; // ignore: unused_field
 
 	// Translations
+	@override String get reorderFailed => 'Impossibile salvare l’ordine delle categorie. Riprova.';
 	@override String dailyPercentage({required Object percentage, required Object calories}) => '${percentage}% del totale giornaliero – ${calories}';
 	@override String get empty => 'Non hai ancora configurato le categorie';
 	@override late final Translations$food$categoryList$unmodifiable$it unmodifiable = Translations$food$categoryList$unmodifiable$it._(_root);
@@ -3351,6 +3373,59 @@ class Translations$food$picker$it implements Translations$food$picker$en {
 	@override String get shareNotice => 'Salva condivide l’alimento nel catalogo pubblico. Salva per me lo mantiene personale.';
 	@override String get invalidBarcode => 'Inserisci un codice a barre valido (4–32 cifre).';
 	@override String get showMore => 'Mostra altro';
+}
+
+// Path: food.recipes
+class Translations$food$recipes$it implements Translations$food$recipes$en {
+	Translations$food$recipes$it._(this._root);
+
+	final TranslationsIt _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Ricette';
+	@override String get create => 'Nuova ricetta';
+	@override String get edit => 'Modifica ricetta';
+	@override String get empty => 'Nessuna ricetta salvata';
+	@override String get search => 'Cerca ricette';
+	@override String get name => 'Nome';
+	@override String get description => 'Descrizione';
+	@override String get instructions => 'Istruzioni di cucina';
+	@override String get servings => 'Porzioni';
+	@override String get ingredients => 'Ingredienti';
+	@override String get addIngredient => 'Aggiungi ingrediente';
+	@override String get automaticMass => 'Peso degli ingredienti';
+	@override String get finalMass => 'Peso finale dopo la cottura (g, facoltativo)';
+	@override String get massHint => 'Lascia vuoto per usare la somma degli ingredienti.';
+	@override String get total => 'Totale';
+	@override String get perServing => 'Per porzione';
+	@override String get save => 'Salva';
+	@override String get delete => 'Elimina';
+	@override String get deletePrompt => 'Eliminare questa ricetta? I pasti già registrati resteranno invariati.';
+	@override String get cancel => 'Annulla';
+	@override String get confirm => 'Conferma';
+	@override String get add => 'Aggiungi al diario';
+	@override String get choose => 'Ricetta';
+	@override String get grams => 'Grammi';
+	@override String get portions => 'Porzioni';
+	@override String get equivalentMass => 'Peso equivalente (g, facoltativo)';
+	@override String get liquidMass => 'Conversione da ml a g';
+	@override String get liquidHint => 'Puoi indicare il peso del liquido in grammi. Se lasci il campo vuoto, verrà usata una conversione di 1 ml = 1 g.';
+	@override String get invalid => 'Inserisci un valore positivo valido.';
+	@override String get invalidServings => 'Inserisci un numero intero da 1 a 32.';
+	@override String get requiredName => 'Inserisci un nome.';
+	@override String get requiredIngredients => 'Aggiungi almeno un ingrediente.';
+	@override String get failed => 'Operazione non riuscita. Riprova.';
+	@override String get accountChanged => 'L’account è cambiato. Riapri la schermata.';
+	@override String get editIngredient => 'Modifica ingrediente';
+	@override String get discard => 'Scartare le modifiche?';
+	@override String get discardBody => 'Le modifiche non salvate andranno perse.';
+	@override String get discardAction => 'Scarta';
+	@override String get details => 'Dettagli ricetta';
+	@override String get yieldTitle => 'Resa e porzioni';
+	@override String get nutrition => 'Valori nutrizionali';
+	@override String get ingredientsHint => 'Scegli gli alimenti e le quantità per comporre la tua ricetta.';
+	@override String get decreaseQuantity => 'Diminuisci quantità';
+	@override String get increaseQuantity => 'Aumenta quantità';
 }
 
 // Path: equipment.none
@@ -3987,6 +4062,7 @@ class Translations$feed$userButton$it implements Translations$feed$userButton$en
 
 	// Translations
 	@override String get loading => 'Caricamento profilo utente in corso...';
+	@override String get error => 'Impossibile caricare il profilo';
 }
 
 // Path: feed.noSync
@@ -3997,6 +4073,17 @@ class Translations$feed$noSync$it implements Translations$feed$noSync$en {
 
 	// Translations
 	@override String get text => 'La sincronizzazione è in pausa: non sei connesso a Internet. Potrebbero volerci alcuni minuti. Non preoccuparti, i dati verranno mantenuti in locale e trasferiti in un secondo momento.';
+}
+
+// Path: feed.loadError
+class Translations$feed$loadError$it implements Translations$feed$loadError$en {
+	Translations$feed$loadError$it._(this._root);
+
+	final TranslationsIt _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Impossibile caricare le attività';
+	@override String get text => 'Controlla la connessione e riprova.';
 }
 
 // Path: userProfile.cancelRequestConfirmation
@@ -4693,6 +4780,19 @@ class Translations$ongoingWorkout$finish$fields$it implements Translations$ongoi
 	@override late final Translations$ongoingWorkout$finish$fields$infobox$it infobox = Translations$ongoingWorkout$finish$fields$infobox$it._(_root);
 }
 
+// Path: ongoingWorkout.finish.discard
+class Translations$ongoingWorkout$finish$discard$it implements Translations$ongoingWorkout$finish$discard$en {
+	Translations$ongoingWorkout$finish$discard$it._(this._root);
+
+	final TranslationsIt _root; // ignore: unused_field
+
+	// Translations
+	@override String get title => 'Scartare le modifiche?';
+	@override String get text => 'Le modifiche al riepilogo verranno scartate. L’allenamento rimarrà in corso.';
+	@override String get keep => 'Continua a modificare';
+	@override String get confirm => 'Scarta modifiche';
+}
+
 // Path: ongoingWorkout.cancel.actions
 class Translations$ongoingWorkout$cancel$actions$it implements Translations$ongoingWorkout$cancel$actions$en {
 	Translations$ongoingWorkout$cancel$actions$it._(this._root);
@@ -4781,6 +4881,14 @@ class Translations$library$cardio$exercises$it implements Translations$library$c
 	final TranslationsIt _root; // ignore: unused_field
 
 	// Translations
+	@override String get burpees => 'Burpees';
+	@override String get squatThrusts => 'Squat thrust (senza salto)';
+	@override String get jumpingJacks => 'Jumping jack';
+	@override String get highKnees => 'Corsa sul posto a ginocchia alte';
+	@override String get buttKicks => 'Corsa calciata dietro sul posto';
+	@override String get skaterJumps => 'Salti laterali del pattinatore';
+	@override String get squatJumps => 'Squat con salto';
+	@override String get plankJacks => 'Plank jack';
 	@override String get aerobics => 'Aerobica';
 	@override String get biking => 'Bicicletta';
 	@override String get ergometer => 'Cyclette verticale';
@@ -6234,8 +6342,9 @@ class Translations$ongoingWorkout$finish$fields$parent$it implements Translation
 	final TranslationsIt _root; // ignore: unused_field
 
 	// Translations
-	@override String get label => 'Salva come';
+	@override String get label => 'Routine di riferimento';
 	@override late final Translations$ongoingWorkout$finish$fields$parent$options$it options = Translations$ongoingWorkout$finish$fields$parent$options$it._(_root);
+	@override String get help => 'Associa questo allenamento a una routine. Le eventuali modifiche alla routine ti saranno chieste dopo il salvataggio.';
 }
 
 // Path: ongoingWorkout.finish.fields.duration
@@ -7095,8 +7204,9 @@ extension on TranslationsIt {
 			'workouts.actions.share.alert.noQr' => 'Impossibile generare codice QR: routine troppo grande. Usa il link in basso per condividere la tua routine.',
 			'routines.title' => 'Routine',
 			'routines.newRoutine' => 'Nuova routine',
-			'routines.quickWorkout.title' => 'Allenamento rapido',
-			'routines.quickWorkout.subtitle' => 'Avvia rapidamente un allenamento vuoto',
+			'routines.quickWorkout.title' => 'Allenamento libero',
+			'routines.quickWorkout.subtitle' => 'Inizia senza una routine',
+			'routines.quickWorkout.proLimit' => 'Hai raggiunto il limite gratuito di allenamenti. Continua con PRO.',
 			'routines.actions.delete.title' => 'Elimina routine',
 			'routines.actions.delete.text' => 'Vuoi davvero eliminare questa routine? Quest\'azione non può essere annullata.',
 			'routines.actions.delete.actions.no' => 'Annulla',
@@ -7134,6 +7244,8 @@ extension on TranslationsIt {
 			'routines.nullFolder' => 'Cartella eliminata',
 			'routines.nullFolderSubtitle' => 'Puoi tornare alla pagina Home.',
 			'routines.folderNotes' => 'Note',
+			'routines.loadError.title' => 'Impossibile caricare le routine',
+			'routines.loadError.text' => 'Riprova per caricare le routine e le cartelle.',
 			'history.title' => 'Cronologia',
 			'history.empty' => 'Nessun allenamento',
 			'history.andMore' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('it'))(n, one: '…e un altro', two: '…e altri ${n}', few: '…e altri ${n}', many: '…e altri ${n}', other: '…e altri ${n}', ), 
@@ -7253,11 +7365,19 @@ extension on TranslationsIt {
 			'ongoingWorkout.finish.fields.name.label' => 'Nome allenamento',
 			'ongoingWorkout.finish.fields.name.errors.empty' => 'Il nome non dev\'essere vuoto.',
 			'ongoingWorkout.finish.fields.startingTime.label' => 'Data di avvio',
-			'ongoingWorkout.finish.fields.parent.label' => 'Salva come',
+			'ongoingWorkout.finish.fields.parent.label' => 'Routine di riferimento',
 			'ongoingWorkout.finish.fields.parent.options.none' => 'Nessuna routine',
+			'ongoingWorkout.finish.fields.parent.help' => 'Associa questo allenamento a una routine. Le eventuali modifiche alla routine ti saranno chieste dopo il salvataggio.',
 			'ongoingWorkout.finish.fields.duration.label' => 'Durata',
 			'ongoingWorkout.finish.fields.duration.errors.empty' => 'La durata non dev\'essere zero.',
 			'ongoingWorkout.finish.fields.infobox.label' => 'Note',
+			'ongoingWorkout.finish.save' => 'Salva allenamento',
+			'ongoingWorkout.finish.saving' => 'Salvataggio…',
+			'ongoingWorkout.finish.saveError' => 'Impossibile salvare l’allenamento. Riprova: le modifiche sono ancora qui.',
+			'ongoingWorkout.finish.discard.title' => 'Scartare le modifiche?',
+			'ongoingWorkout.finish.discard.text' => 'Le modifiche al riepilogo verranno scartate. L’allenamento rimarrà in corso.',
+			'ongoingWorkout.finish.discard.keep' => 'Continua a modificare',
+			'ongoingWorkout.finish.discard.confirm' => 'Scarta modifiche',
 			'ongoingWorkout.cancel.title' => 'Scartare l\'allenamento?',
 			'ongoingWorkout.cancel.text' => 'Non potrai annullare quest\'azione se cambi idea.',
 			'ongoingWorkout.cancel.actions.no' => 'Annulla',
@@ -7394,6 +7514,14 @@ extension on TranslationsIt {
 			'androidNotificationChannel.description' => 'Invia una notifica quando il timer del tempo di recupero finisce.',
 			'library.title' => 'Libreria',
 			'library.cardio.name' => 'Cardio',
+			'library.cardio.exercises.burpees' => 'Burpees',
+			'library.cardio.exercises.squatThrusts' => 'Squat thrust (senza salto)',
+			'library.cardio.exercises.jumpingJacks' => 'Jumping jack',
+			'library.cardio.exercises.highKnees' => 'Corsa sul posto a ginocchia alte',
+			'library.cardio.exercises.buttKicks' => 'Corsa calciata dietro sul posto',
+			'library.cardio.exercises.skaterJumps' => 'Salti laterali del pattinatore',
+			'library.cardio.exercises.squatJumps' => 'Squat con salto',
+			'library.cardio.exercises.plankJacks' => 'Plank jack',
 			'library.cardio.exercises.aerobics' => 'Aerobica',
 			'library.cardio.exercises.biking' => 'Bicicletta',
 			'library.cardio.exercises.ergometer' => 'Cyclette verticale',
@@ -7439,6 +7567,8 @@ extension on TranslationsIt {
 			'library.biceps.name' => 'Bicipiti',
 			'library.biceps.exercises.behindBodyCableCurl' => 'Curl al cavo con braccio dietro al busto',
 			'library.biceps.exercises.ropeHammerCurl' => 'Hammer curl con corda al cavo',
+			_ => null,
+		} ?? switch (path) {
 			'library.biceps.exercises.inclineDumbbellCurl' => 'Curl su panca inclinata (manubri)',
 			'library.biceps.exercises.barbellBicepsCurl' => 'Bicep curl (bilanciere)',
 			'library.biceps.exercises.spiderCurls' => 'Spider curl',
@@ -7458,8 +7588,6 @@ extension on TranslationsIt {
 			'library.abs.exercises.reverseCrunch' => 'Crunch inverso',
 			'library.abs.exercises.cableCrunch' => 'Crunch al cavo',
 			'library.abs.exercises.pallofPress' => 'Pallof press al cavo',
-			_ => null,
-		} ?? switch (path) {
 			'library.abs.exercises.crunches' => 'Crunch',
 			'library.abs.exercises.kneeRaise' => 'Sollevamento delle ginocchia da sdraiati',
 			'library.abs.exercises.legRaise' => 'Sollevamento delle gambe da sdraiati',
@@ -7762,6 +7890,7 @@ extension on TranslationsIt {
 			'exercises.none.title' => 'Nessun esercizio',
 			'exercises.none.subtitle' => 'Tocca per deselezionare tutto e tornare indietro',
 			'food.title' => 'Diario alimentare',
+			'food.home.dailyNutritionalValues' => 'Valori nutrizionali della giornata',
 			'food.home.calories' => 'Calorie',
 			'food.home.carbs' => 'Carboidrati',
 			'food.home.protein' => 'Proteine',
@@ -7952,6 +8081,8 @@ extension on TranslationsIt {
 			'food.languages.cv' => 'Chuvash',
 			'food.languages.cy' => 'Gallese',
 			'food.languages.da' => 'Danese',
+			_ => null,
+		} ?? switch (path) {
 			'food.languages.de' => 'Tedesco',
 			'food.languages.dv' => 'Maldiviano',
 			'food.languages.dz' => 'Dzongkha',
@@ -7972,8 +8103,6 @@ extension on TranslationsIt {
 			'food.languages.ga' => 'Irlandese',
 			'food.languages.gd' => 'Gaelico scozzese',
 			'food.languages.gl' => 'Galiziano',
-			_ => null,
-		} ?? switch (path) {
 			'food.languages.gn' => 'Guarani',
 			'food.languages.gu' => 'Gujarati',
 			'food.languages.gv' => 'Manx',
@@ -8359,6 +8488,7 @@ extension on TranslationsIt {
 			'food.countries.zm' => 'Zambia',
 			'food.countries.zw' => 'Zimbabwe',
 			'food.countries.world' => 'Mondo',
+			'food.categoryList.reorderFailed' => 'Impossibile salvare l’ordine delle categorie. Riprova.',
 			'food.categoryList.dailyPercentage' => ({required Object percentage, required Object calories}) => '${percentage}% del totale giornaliero – ${calories}',
 			'food.categoryList.empty' => 'Non hai ancora configurato le categorie',
 			'food.categoryList.unmodifiable.title' => 'Impossibile modificare',
@@ -8442,6 +8572,52 @@ extension on TranslationsIt {
 			'food.picker.shareNotice' => 'Salva condivide l’alimento nel catalogo pubblico. Salva per me lo mantiene personale.',
 			'food.picker.invalidBarcode' => 'Inserisci un codice a barre valido (4–32 cifre).',
 			'food.picker.showMore' => 'Mostra altro',
+			'food.recipes.title' => 'Ricette',
+			'food.recipes.create' => 'Nuova ricetta',
+			'food.recipes.edit' => 'Modifica ricetta',
+			'food.recipes.empty' => 'Nessuna ricetta salvata',
+			'food.recipes.search' => 'Cerca ricette',
+			'food.recipes.name' => 'Nome',
+			'food.recipes.description' => 'Descrizione',
+			'food.recipes.instructions' => 'Istruzioni di cucina',
+			'food.recipes.servings' => 'Porzioni',
+			'food.recipes.ingredients' => 'Ingredienti',
+			'food.recipes.addIngredient' => 'Aggiungi ingrediente',
+			'food.recipes.automaticMass' => 'Peso degli ingredienti',
+			'food.recipes.finalMass' => 'Peso finale dopo la cottura (g, facoltativo)',
+			'food.recipes.massHint' => 'Lascia vuoto per usare la somma degli ingredienti.',
+			'food.recipes.total' => 'Totale',
+			'food.recipes.perServing' => 'Per porzione',
+			'food.recipes.save' => 'Salva',
+			'food.recipes.delete' => 'Elimina',
+			'food.recipes.deletePrompt' => 'Eliminare questa ricetta? I pasti già registrati resteranno invariati.',
+			'food.recipes.cancel' => 'Annulla',
+			'food.recipes.confirm' => 'Conferma',
+			'food.recipes.add' => 'Aggiungi al diario',
+			'food.recipes.choose' => 'Ricetta',
+			_ => null,
+		} ?? switch (path) {
+			'food.recipes.grams' => 'Grammi',
+			'food.recipes.portions' => 'Porzioni',
+			'food.recipes.equivalentMass' => 'Peso equivalente (g, facoltativo)',
+			'food.recipes.liquidMass' => 'Conversione da ml a g',
+			'food.recipes.liquidHint' => 'Puoi indicare il peso del liquido in grammi. Se lasci il campo vuoto, verrà usata una conversione di 1 ml = 1 g.',
+			'food.recipes.invalid' => 'Inserisci un valore positivo valido.',
+			'food.recipes.invalidServings' => 'Inserisci un numero intero da 1 a 32.',
+			'food.recipes.requiredName' => 'Inserisci un nome.',
+			'food.recipes.requiredIngredients' => 'Aggiungi almeno un ingrediente.',
+			'food.recipes.failed' => 'Operazione non riuscita. Riprova.',
+			'food.recipes.accountChanged' => 'L’account è cambiato. Riapri la schermata.',
+			'food.recipes.editIngredient' => 'Modifica ingrediente',
+			'food.recipes.discard' => 'Scartare le modifiche?',
+			'food.recipes.discardBody' => 'Le modifiche non salvate andranno perse.',
+			'food.recipes.discardAction' => 'Scarta',
+			'food.recipes.details' => 'Dettagli ricetta',
+			'food.recipes.yieldTitle' => 'Resa e porzioni',
+			'food.recipes.nutrition' => 'Valori nutrizionali',
+			'food.recipes.ingredientsHint' => 'Scegli gli alimenti e le quantità per comporre la tua ricetta.',
+			'food.recipes.decreaseQuantity' => 'Diminuisci quantità',
+			'food.recipes.increaseQuantity' => 'Aumenta quantità',
 			'equipment.none.long' => 'Corpo libero',
 			'equipment.none.short' => 'C. libero',
 			'equipment.barbell.long' => 'Bilanciere',
@@ -8486,8 +8662,6 @@ extension on TranslationsIt {
 			'achievements.nightOwl.description' => 'Inizia un allenamento dopo le 8 di sera',
 			'achievements.realGymBro.title' => 'Vero Gym Bro',
 			'achievements.realGymBro.description.k1' => 'Traccia un totale di 100 ore di allenamenti',
-			_ => null,
-		} ?? switch (path) {
 			'achievements.realGymBro.description.k2' => 'Traccia un totale di 500 ore di allenamenti',
 			'achievements.realGymBro.description.k3' => 'Traccia un totale di 1000 ore di allenamenti',
 			'achievements.workoutFreak.title' => 'Maniaco dell\'allenamento',
@@ -8633,7 +8807,7 @@ extension on TranslationsIt {
 			'feed.title' => 'Feed',
 			'feed.empty.title' => 'Nessuna attività',
 			'feed.empty.text' => 'Non ci sono ancora attività da mostrare. Inizia un allenamento o sblocca un traguardo per vedere le tue attività qui.',
-			'feed.startWorkout' => 'Inizia un allenamento',
+			'feed.startWorkout' => 'Scegli un allenamento',
 			'feed.workout.title.you' => 'Tu',
 			'feed.workout.title.unknown' => 'Utente Sconosciuto',
 			'feed.workout.subtitle.you' => 'hai completato un allenamento',
@@ -8642,9 +8816,13 @@ extension on TranslationsIt {
 			'feed.achievement.subtitle.you' => 'hai sbloccato un traguardo',
 			'feed.achievement.subtitle.friend' => 'ha sbloccato un traguardo',
 			'feed.userButton.loading' => 'Caricamento profilo utente in corso...',
+			'feed.userButton.error' => 'Impossibile caricare il profilo',
 			'feed.noSync.text' => 'La sincronizzazione è in pausa: non sei connesso a Internet. Potrebbero volerci alcuni minuti. Non preoccuparti, i dati verranno mantenuti in locale e trasferiti in un secondo momento.',
 			'feed.noMoreData' => 'Hai raggiunto la fine del feed :)',
 			'feed.loadMore' => 'Carica altro',
+			'feed.suggestedRoutines' => 'Routine suggerite',
+			'feed.loadError.title' => 'Impossibile caricare le attività',
+			'feed.loadError.text' => 'Controlla la connessione e riprova.',
 			'workoutPage.title' => 'Allenati',
 			'pro.title' => 'PRO',
 			'userProfile.title' => 'Profilo',

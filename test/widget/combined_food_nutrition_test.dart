@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:gymtracker/struct/nutrition.dart';
+import 'package:gymtracker/struct/recipe.dart';
 import 'package:gymtracker/view/food.dart';
 
 import '../test_helpers/widget_test_app.dart';
@@ -74,7 +75,9 @@ void main() {
         const WidgetTestApp(child: AddCombinedFoodView(category: null)),
       );
       final dynamic state = tester.state(find.byType(AddCombinedFoodView));
-      state.constituents = scenario.foods;
+      state.constituents = scenario.foods
+          .map((food) => RecipeIngredient(food: food))
+          .toList();
 
       final NutritionValues result = state.nutritionalValues;
       final expected = base * scenario.factor;

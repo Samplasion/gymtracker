@@ -1,5 +1,9 @@
 part of 'food.dart';
 
+class _FoodSelectionCancelled implements Exception {
+  const _FoodSelectionCancelled();
+}
+
 Future<void> showFoodPicker(
   BuildContext context,
   WidgetRef ref, {
@@ -8,6 +12,7 @@ Future<void> showFoodPicker(
   final date = ref.read(foodSelectedDateProvider);
   await Go.to(
     () => FoodPickerView(
+      allowRecipes: true,
       onAdd: (food) => ref
           .read(foodProvider.notifier)
           .addFood(date, food, category: category),
@@ -24,10 +29,12 @@ class FoodPickerView extends ConsumerStatefulWidget {
     required this.onAdd,
     required this.onRemove,
     this.allowCombine = true,
+    this.allowRecipes = false,
   });
   final Future<Food> Function(Food) onAdd;
   final Future<void> Function(Food) onRemove;
   final bool allowCombine;
+  final bool allowRecipes;
 
   @override
   ConsumerState<FoodPickerView> createState() => _FoodPickerViewState();
@@ -92,6 +99,8 @@ class _FoodPickerViewState extends ConsumerState<FoodPickerView> {
       if (!mounted) return;
       setState(() => _added.add(saved));
       _notice(context.t.food.picker.addedNotice);
+    } on _FoodSelectionCancelled {
+      // Cancelling an ingredient weight prompt is a normal picker action.
     } catch (_) {
       if (mounted) _notice(context.t.food.picker.failed);
     } finally {
@@ -113,6 +122,19 @@ class _FoodPickerViewState extends ConsumerState<FoodPickerView> {
         ? await showAddCustomFoodView(context, ref, barcode: code)
         : await searchFoodByBarcode(context, ref, code);
     if (food != null && mounted) await _add(food);
+  }
+
+  Future<void> _recipe() async {
+    if (_busy) return;
+    final repository = ref.read(recipesRepositoryProvider);
+    final owner = repository.db.currentUserId;
+    final food = await Go.to<Food>(() => const RecipeListView(picking: true));
+    if (!mounted || food == null) return;
+    if (owner != repository.db.currentUserId) {
+      _notice(context.t.food.recipes.accountChanged);
+      return;
+    }
+    await _add(food);
   }
 
   Future<void> _more() async {
@@ -364,6 +386,14 @@ class _FoodPickerViewState extends ConsumerState<FoodPickerView> {
                     const SizedBox(width: 8),
                     _modeAction(strings.barcode, GTIcons.scan_barcode, _scan),
                     const SizedBox(width: 8),
+                    if (widget.allowRecipes) ...[
+                      _modeAction(
+                        context.t.food.recipes.choose,
+                        Icons.menu_book_outlined,
+                        _recipe,
+                      ),
+                      const SizedBox(width: 8),
+                    ],
                     _modeAction(strings.more, Icons.more_horiz, _more),
                   ],
                 ),

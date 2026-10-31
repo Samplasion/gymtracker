@@ -296,8 +296,9 @@
     "title": "Routine",
     "newRoutine": "Nuova routine",
     "quickWorkout": {
-      "title": "Allenamento rapido",
-      "subtitle": "Avvia rapidamente un allenamento vuoto"
+      "title": "Allenamento libero",
+      "subtitle": "Inizia senza una routine",
+      "proLimit": "Hai raggiunto il limite gratuito di allenamenti. Continua con PRO."
     },
     "actions": {
       "delete": {
@@ -366,7 +367,11 @@
     "folder": "Cartella",
     "nullFolder": "Cartella eliminata",
     "nullFolderSubtitle": "Puoi tornare alla pagina Home.",
-    "folderNotes": "Note"
+    "folderNotes": "Note",
+    "loadError": {
+      "title": "Impossibile caricare le routine",
+      "text": "Riprova per caricare le routine e le cartelle."
+    }
   },
   "history": {
     "title": "Cronologia",
@@ -625,10 +630,11 @@
           "label": "Data di avvio"
         },
         "parent": {
-          "label": "Salva come",
+          "label": "Routine di riferimento",
           "options": {
             "none": "Nessuna routine"
-          }
+          },
+          "help": "Associa questo allenamento a una routine. Le eventuali modifiche alla routine ti saranno chieste dopo il salvataggio."
         },
         "duration": {
           "label": "Durata",
@@ -639,6 +645,15 @@
         "infobox": {
           "label": "Note"
         }
+      },
+      "save": "Salva allenamento",
+      "saving": "Salvataggio…",
+      "saveError": "Impossibile salvare l’allenamento. Riprova: le modifiche sono ancora qui.",
+      "discard": {
+        "title": "Scartare le modifiche?",
+        "text": "Le modifiche al riepilogo verranno scartate. L’allenamento rimarrà in corso.",
+        "keep": "Continua a modificare",
+        "confirm": "Scarta modifiche"
       }
     },
     "cancel": {
@@ -943,6 +958,14 @@
     "cardio": {
       "name": "Cardio",
       "exercises": {
+        "burpees": "Burpees",
+        "squatThrusts": "Squat thrust (senza salto)",
+        "jumpingJacks": "Jumping jack",
+        "highKnees": "Corsa sul posto a ginocchia alte",
+        "buttKicks": "Corsa calciata dietro sul posto",
+        "skaterJumps": "Salti laterali del pattinatore",
+        "squatJumps": "Squat con salto",
+        "plankJacks": "Plank jack",
         "aerobics": "Aerobica",
         "biking": "Bicicletta",
         "ergometer": "Cyclette verticale",
@@ -1567,6 +1590,7 @@
   "food": {
     "title": "Diario alimentare",
     "home": {
+      "dailyNutritionalValues": "Valori nutrizionali della giornata",
       "calories": "Calorie",
       "carbs": "Carboidrati",
       "protein": "Proteine",
@@ -2222,6 +2246,7 @@
       "world": "Mondo"
     },
     "categoryList": {
+      "reorderFailed": "Impossibile salvare l’ordine delle categorie. Riprova.",
       "dailyPercentage": "$percentage% del totale giornaliero – $calories",
       "empty": "Non hai ancora configurato le categorie",
       "unmodifiable": {
@@ -2335,6 +2360,52 @@
       "shareNotice": "Salva condivide l’alimento nel catalogo pubblico. Salva per me lo mantiene personale.",
       "invalidBarcode": "Inserisci un codice a barre valido (4–32 cifre).",
       "showMore": "Mostra altro"
+    },
+    "recipes": {
+      "title": "Ricette",
+      "create": "Nuova ricetta",
+      "edit": "Modifica ricetta",
+      "empty": "Nessuna ricetta salvata",
+      "search": "Cerca ricette",
+      "name": "Nome",
+      "description": "Descrizione",
+      "instructions": "Istruzioni di cucina",
+      "servings": "Porzioni",
+      "ingredients": "Ingredienti",
+      "addIngredient": "Aggiungi ingrediente",
+      "automaticMass": "Peso degli ingredienti",
+      "finalMass": "Peso finale dopo la cottura (g, facoltativo)",
+      "massHint": "Lascia vuoto per usare la somma degli ingredienti.",
+      "total": "Totale",
+      "perServing": "Per porzione",
+      "save": "Salva",
+      "delete": "Elimina",
+      "deletePrompt": "Eliminare questa ricetta? I pasti già registrati resteranno invariati.",
+      "cancel": "Annulla",
+      "confirm": "Conferma",
+      "add": "Aggiungi al diario",
+      "choose": "Ricetta",
+      "grams": "Grammi",
+      "portions": "Porzioni",
+      "equivalentMass": "Peso equivalente (g, facoltativo)",
+      "liquidMass": "Conversione da ml a g",
+      "liquidHint": "Puoi indicare il peso del liquido in grammi. Se lasci il campo vuoto, verrà usata una conversione di 1 ml = 1 g.",
+      "invalid": "Inserisci un valore positivo valido.",
+      "invalidServings": "Inserisci un numero intero da 1 a 32.",
+      "requiredName": "Inserisci un nome.",
+      "requiredIngredients": "Aggiungi almeno un ingrediente.",
+      "failed": "Operazione non riuscita. Riprova.",
+      "accountChanged": "L’account è cambiato. Riapri la schermata.",
+      "editIngredient": "Modifica ingrediente",
+      "discard": "Scartare le modifiche?",
+      "discardBody": "Le modifiche non salvate andranno perse.",
+      "discardAction": "Scarta",
+      "details": "Dettagli ricetta",
+      "yieldTitle": "Resa e porzioni",
+      "nutrition": "Valori nutrizionali",
+      "ingredientsHint": "Scegli gli alimenti e le quantità per comporre la tua ricetta.",
+      "decreaseQuantity": "Diminuisci quantità",
+      "increaseQuantity": "Aumenta quantità"
     }
   },
   "equipment": {
@@ -2739,7 +2810,7 @@
       "title": "Nessuna attività",
       "text": "Non ci sono ancora attività da mostrare. Inizia un allenamento o sblocca un traguardo per vedere le tue attività qui."
     },
-    "startWorkout": "Inizia un allenamento",
+    "startWorkout": "Scegli un allenamento",
     "workout": {
       "title": {
         "you": "Tu",
@@ -2760,13 +2831,19 @@
       }
     },
     "userButton": {
-      "loading": "Caricamento profilo utente in corso..."
+      "loading": "Caricamento profilo utente in corso...",
+      "error": "Impossibile caricare il profilo"
     },
     "noSync": {
       "text": "La sincronizzazione è in pausa: non sei connesso a Internet. Potrebbero volerci alcuni minuti. Non preoccuparti, i dati verranno mantenuti in locale e trasferiti in un secondo momento."
     },
     "noMoreData": "Hai raggiunto la fine del feed :)",
-    "loadMore": "Carica altro"
+    "loadMore": "Carica altro",
+    "suggestedRoutines": "Routine suggerite",
+    "loadError": {
+      "title": "Impossibile caricare le attività",
+      "text": "Controlla la connessione e riprova."
+    }
   },
   "workoutPage": {
     "title": "Allenati"

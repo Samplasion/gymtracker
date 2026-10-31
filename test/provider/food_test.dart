@@ -627,6 +627,96 @@ void main() {
     );
   });
 
+  group('Category reordering', () {
+    const a = NutritionCategory(
+      name: 'A',
+      dailyPercentage: 50,
+      icon: NutritionCategoryIcon.coffee,
+    );
+    const b = NutritionCategory(
+      name: 'B',
+      dailyPercentage: 50,
+      icon: NutritionCategoryIcon.cake,
+    );
+    setUp(() {
+      mockFoodsRepo.nutritionCategories$.add(
+        DateSequence.fromDatesAndValues({
+          DateTime.now().startOfDay: {'A': a, 'B': b},
+        }),
+      );
+      when(
+        () => mockFoodsRepo.setNutritionCategoriesForDay(any(), any()),
+      ).thenAnswer((_) async {});
+    });
+    test('saves order for today and future with backup', () async {
+      for (final offset in [0, 1]) {
+        final day = DateTime.now().startOfDay.add(Duration(days: offset));
+        await container
+            .read(nutritionCategoryProvider.notifier)
+            .reorderCategories(day, ['B', 'A']);
+        final saved =
+            verify(
+                  () => mockFoodsRepo.setNutritionCategoriesForDay(
+                    day,
+                    captureAny(),
+                  ),
+                ).captured.single
+                as Map<String, NutritionCategory>;
+        expect(saved.keys, ['B', 'A']);
+        expect(saved['A'], a);
+      }
+      verify(() => mockBackup.schedule()).called(2);
+    });
+    test('rejects past, missing, duplicate and unknown names', () async {
+      final today = DateTime.now().startOfDay;
+      for (final names in [
+        ['A'],
+        ['A', 'A'],
+        ['A', 'C'],
+      ]) {
+        await expectLater(
+          container
+              .read(nutritionCategoryProvider.notifier)
+              .reorderCategories(today, names),
+          throwsStateError,
+        );
+      }
+      await expectLater(
+        container.read(nutritionCategoryProvider.notifier).reorderCategories(
+          today.subtract(const Duration(days: 1)),
+          ['B', 'A'],
+        ),
+        throwsStateError,
+      );
+      verifyNever(
+        () => mockFoodsRepo.setNutritionCategoriesForDay(any(), any()),
+      );
+      verifyNever(() => mockBackup.schedule());
+    });
+    test('unchanged order performs no write or backup', () async {
+      await container
+          .read(nutritionCategoryProvider.notifier)
+          .reorderCategories(DateTime.now(), ['A', 'B']);
+      verifyNever(
+        () => mockFoodsRepo.setNutritionCategoriesForDay(any(), any()),
+      );
+      verifyNever(() => mockBackup.schedule());
+    });
+    test('failed save does not schedule backup', () async {
+      when(
+        () => mockFoodsRepo.setNutritionCategoriesForDay(any(), any()),
+      ).thenThrow(StateError('failed'));
+      await expectLater(
+        container.read(nutritionCategoryProvider.notifier).reorderCategories(
+          DateTime.now(),
+          ['B', 'A'],
+        ),
+        throwsStateError,
+      );
+      verifyNever(() => mockBackup.schedule());
+    });
+  });
+
   group("Nutrition Categories Providers", () {
     final date = DateTime(2026, 4, 1).startOfDay;
     const catBreakfast = NutritionCategory(

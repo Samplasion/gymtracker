@@ -8,7 +8,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gymtracker/db/backup_restore.dart';
 import 'package:gymtracker/db/database.dart';
-import 'package:gymtracker/db/exports/v23.dart';
+import 'package:gymtracker/db/exports/v24.dart';
 import 'package:gymtracker/db/imports/types.dart';
 import 'package:gymtracker/db/sync_diagnostics.dart';
 import 'package:gymtracker/model/achievements.dart';
@@ -23,6 +23,7 @@ import 'package:gymtracker/service/online.dart';
 import 'package:gymtracker/struct/date_sequence.dart';
 import 'package:gymtracker/struct/nutrition.dart' as gtn;
 import 'package:gymtracker/struct/nutrition.dart' hide NutritionGoal;
+import 'package:gymtracker/struct/recipe.dart';
 import 'package:gymtracker/utils/extensions.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:rxdart/rxdart.dart';
@@ -64,6 +65,7 @@ class DatabaseService extends ChangeNotifier with LoggerConfigurationMixin {
     [],
   );
   final folders$ = BehaviorSubject<List<GTRoutineFolder>>.seeded([]);
+  final recipes$ = BehaviorSubject<List<Recipe>>.seeded([]);
   final foods$ = BehaviorSubject<List<TaggedFood>>.seeded([]);
   final nutritionGoals$ = BehaviorSubject<List<TaggedNutritionGoal>>.seeded([
     TaggedNutritionGoal(
@@ -114,6 +116,7 @@ class DatabaseService extends ChangeNotifier with LoggerConfigurationMixin {
       ongoing$,
       weightMeasurements$,
       folders$,
+      recipes$,
       foods$,
       nutritionGoals$,
       customBarcodeFoods$,
@@ -150,6 +153,7 @@ class DatabaseService extends ChangeNotifier with LoggerConfigurationMixin {
     }
     weightMeasurements$.add([]);
     folders$.add([]);
+    recipes$.add([]);
     foods$.add([]);
     nutritionGoals$.add([
       TaggedNutritionGoal(
@@ -209,6 +213,7 @@ class DatabaseService extends ChangeNotifier with LoggerConfigurationMixin {
       "favoriteFoods",
       "nutritionCategories",
       "bodyMeasurements",
+      "recipes",
     ].map((element) => false).toList();
     check() {
       final shouldCall = !_isInit || overrideInitializationCheck;
@@ -329,6 +334,12 @@ class DatabaseService extends ChangeNotifier with LoggerConfigurationMixin {
       bodyMeasurements$.add(event);
       onDatabaseUpdated("body measurements")();
       initialized[13] = true;
+      check();
+    });
+    _listenTo(_db.watchRecipes(), (event) {
+      recipes$.add(event);
+      onDatabaseUpdated("recipes")();
+      initialized[14] = true;
       check();
     });
     _listenTo(backups.watch(), (event) {
@@ -612,6 +623,7 @@ class DatabaseService extends ChangeNotifier with LoggerConfigurationMixin {
   }
 
   DatabaseSnapshot get currentSnapshot => DatabaseSnapshot(
+    recipes: recipes$.value,
     customExercises: exercises,
     routines: routines,
     routineExercises: routines.flattenedExercises,
@@ -635,12 +647,10 @@ class DatabaseService extends ChangeNotifier with LoggerConfigurationMixin {
 
   /// Version 20 is export-only; legacy import converters remain separate.
   Future<Map<String, dynamic>> exportJson() =>
-      const VersionedJsonExportV23().export(_db);
+      const VersionedJsonExportV24().export(_db);
 
   Map<String, dynamic> toJson() {
-    final converter = getConverter(DATABASE_VERSION);
-
-    return converter.export(currentSnapshot);
+    return currentSnapshot.toJson();
   }
 
   Future fromJson(Map<String, dynamic> json) async {
@@ -869,6 +879,7 @@ class DatabaseService extends ChangeNotifier with LoggerConfigurationMixin {
       await _db.setPreferences(snapshot.preferences);
       await _writeWeightMeasurements(snapshot.weightMeasurements);
       await _db.writeAllRoutineFolders(snapshot.folders);
+      await _db.setRecipes(snapshot.recipes);
       await _db.setFoods(snapshot.foods);
       await _db.setNutritionGoals(snapshot.nutritionGoals);
       await _db.setCustomBarcodeFoods(snapshot.customBarcodeFoods);

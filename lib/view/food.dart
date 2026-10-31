@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:math' as math;
 import 'dart:ui';
 
@@ -6,6 +7,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_quill/flutter_quill.dart' show QuillController;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:gauge_indicator/gauge_indicator.dart';
@@ -15,10 +17,12 @@ import 'package:gymtracker/provider/food.dart';
 import 'package:gymtracker/provider/food_catalog.dart';
 import 'package:gymtracker/provider/online.dart';
 import 'package:gymtracker/repository/food_catalog.dart';
+import 'package:gymtracker/repository/recipes.dart';
 import 'package:gymtracker/service/barcode_scan_gate.dart';
 import 'package:gymtracker/service/logger.dart';
 import 'package:gymtracker/struct/date_sequence.dart';
 import 'package:gymtracker/struct/nutrition.dart';
+import 'package:gymtracker/struct/recipe.dart';
 import 'package:gymtracker/utils/colors.dart';
 import 'package:gymtracker/utils/constants.dart';
 import 'package:gymtracker/utils/extensions.dart';
@@ -31,7 +35,9 @@ import 'package:gymtracker/view/components/error_view.dart';
 import 'package:gymtracker/view/components/gradient_bottom_bar.dart';
 import 'package:gymtracker/view/components/hydration_card.dart';
 import 'package:gymtracker/view/components/loading_indicator.dart';
+import 'package:gymtracker/view/components/maybe_rich_text.dart';
 import 'package:gymtracker/view/components/pro_builder.dart';
+import 'package:gymtracker/view/components/rich_text_editor.dart';
 import 'package:gymtracker/view/components/stats.dart';
 import 'package:gymtracker/view/components/subscription_nag.dart';
 import 'package:gymtracker/view/components/tweened_builder.dart';
@@ -39,6 +45,7 @@ import 'package:gymtracker/view/login.dart';
 import 'package:gymtracker/view/skeleton.dart';
 import 'package:gymtracker/view/utils/crossfade.dart';
 import 'package:gymtracker/view/utils/date_picker.dart';
+import 'package:gymtracker/view/utils/drag_handle.dart';
 import 'package:gymtracker/view/utils/input_decoration.dart';
 import 'package:gymtracker/view/utils/int_stepper_form_field.dart';
 import 'package:gymtracker/view/utils/nutrition_category_icon_picker.dart';
@@ -57,6 +64,7 @@ part 'food.goals.dart';
 part 'food.search.dart';
 part 'food.picker.dart';
 part 'food.values.dart';
+part 'food.recipes.dart';
 
 const _kKeyboardType = TextInputType.numberWithOptions(
   decimal: true,
@@ -519,6 +527,9 @@ class _FoodViewState extends ConsumerState<FoodView> {
                             ),
                           ),
                           const _HomeUnassignedFoodsList(),
+                          const SliverToBoxAdapter(
+                            child: FoodDayNutritionTable(),
+                          ),
                           SliverToBoxAdapter(
                             child: SizedBox(height: bottomPaddingWithFAB),
                           ),
@@ -727,6 +738,43 @@ class _HomeUnassignedFoodsList extends ConsumerWidget {
   }
 }
 
+class FoodDayNutritionTable extends ConsumerWidget {
+  const FoodDayNutritionTable({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final foods = ref.watch(foodsForSelectedDateProvider);
+    final totals = foods.fold<NutritionValues>(
+      NutritionValues.zero,
+      (sum, food) => sum + food.nutritionalValues,
+    );
+    return SafeArea(
+      top: false,
+      bottom: false,
+      child: Card(
+        margin: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Text(
+                context.t.food.home.dailyNutritionalValues,
+                style: context.theme.textTheme.titleLarge,
+              ),
+              const SizedBox(height: 16),
+              NutritionTable.arbitrary(
+                nutritionValues: totals,
+                unit: NutritionUnit.G,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 class _HomeFoodCategoryList extends ConsumerWidget {
   const _HomeFoodCategoryList();
 
@@ -911,6 +959,11 @@ class _FoodDayAppBar extends ConsumerWidget {
           ? const SkeletonDrawerButton()
           : null,
       actions: [
+        IconButton(
+          icon: const Icon(Icons.menu_book_outlined),
+          tooltip: context.t.food.recipes.title,
+          onPressed: () => Go.to(() => const RecipeListView()),
+        ),
         IconButton(
           icon: const Icon(GTIcons.food_categories),
           tooltip: context.t.food.categoryList.title,

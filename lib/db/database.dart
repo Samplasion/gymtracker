@@ -20,6 +20,7 @@ import 'package:gymtracker/db/model/tables/nutrition_categories.dart';
 import 'package:gymtracker/db/model/tables/nutrition_goals.dart';
 import 'package:gymtracker/db/model/tables/ongoing.dart';
 import 'package:gymtracker/db/model/tables/preferences.dart';
+import 'package:gymtracker/db/model/tables/recipes.dart';
 import 'package:gymtracker/db/model/tables/routines.dart';
 import 'package:gymtracker/db/model/tables/set.dart';
 import 'package:gymtracker/db/model/tables/sync.dart';
@@ -40,6 +41,7 @@ import 'package:gymtracker/model/superset.dart' as model;
 import 'package:gymtracker/model/workout.dart' as model;
 import 'package:gymtracker/service/logger.dart';
 import 'package:gymtracker/struct/nutrition.dart' as model hide NutritionGoal;
+import 'package:gymtracker/struct/recipe.dart';
 import 'package:gymtracker/utils/extensions.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
@@ -51,6 +53,7 @@ import 'package:uuid/uuid.dart';
 export 'package:gymtracker/db/model/tables/foods.dart';
 export 'package:gymtracker/db/model/tables/nutrition_categories.dart';
 export 'package:gymtracker/db/model/tables/nutrition_goals.dart';
+export 'package:gymtracker/db/model/tables/recipes.dart';
 export 'package:gymtracker/db/model/tables/water_logs.dart';
 
 part 'database.g.dart';
@@ -58,7 +61,7 @@ part 'database.g.dart';
 // Used in the generated code
 const _uuid = Uuid();
 
-const DATABASE_VERSION = 23;
+const DATABASE_VERSION = 24;
 
 abstract class GTDatabase extends GeneratedDatabase with SyncableDatabase {
   GTDatabase(super.e);
@@ -134,6 +137,11 @@ abstract class GTDatabase extends GeneratedDatabase with SyncableDatabase {
   Future<void> deleteWeightMeasurement(String id);
   Future<void> updateWeightMeasurement(WeightMeasurement measurement);
   Future<void> setWeightMeasurements(List<WeightMeasurement> measurements);
+
+  Stream<List<Recipe>> watchRecipes();
+  Future<void> saveRecipe(Recipe recipe);
+  Future<void> deleteRecipe(String id);
+  Future<void> setRecipes(List<Recipe> recipes);
 
   Stream<List<model.TaggedFood>> watchFoods();
   Future<void> insertFoods(model.TaggedFood food);
@@ -221,6 +229,7 @@ abstract class GTDatabase extends GeneratedDatabase with SyncableDatabase {
     SyncContext,
     SyncQuarantine,
     CatalogSubmissions,
+    Recipes,
     WaterLogs,
     HydrationExports,
     HydrationSettings,
@@ -555,6 +564,9 @@ class GTDatabaseImpl extends _$GTDatabaseImpl
               schema.historyWorkoutExercises,
               schema.historyWorkoutExercises.progression,
             );
+          },
+          from23To24: (m, schema) async {
+            await m.createTable(schema.recipes);
           },
           from22To23: (m, schema) async {
             await m.createTable(schema.waterLogs);
@@ -1894,6 +1906,72 @@ class GTDatabaseImpl extends _$GTDatabaseImpl
   }
 
   @override
+  Stream<List<Recipe>> watchRecipes() => _watchForCurrentUser(
+    () =>
+        (select(recipes)..where(
+              (t) => t.deleted.equals(false) & _userIdPredicate(t.userId),
+            ))
+            .watch()
+            .map(
+              (rows) => rows.map((r) {
+                final value = Recipe.fromJson(jsonDecode(r.jsonData));
+                value.validate();
+                return value;
+              }).toList(),
+            ),
+  );
+
+  @override
+  Future<void> saveRecipe(Recipe recipe) {
+    recipe.validate();
+    final owner = currentUserId;
+    return transaction(() async {
+      final values = RecipesCompanion(
+        id: Value(recipe.id),
+        jsonData: Value(jsonEncode(recipe.toJson())),
+        userId: Value(owner),
+        updatedAt: Value(DateTime.now().toUtc()),
+        deleted: const Value(false),
+      );
+      final count =
+          await (update(recipes)..where(
+                (t) => t.id.equals(recipe.id) & _ownedBy(t.userId, owner),
+              ))
+              .write(values);
+      if (count == 0) await into(recipes).insert(values);
+    });
+  }
+
+  @override
+  Future<void> deleteRecipe(String id) async {
+    final owner = currentUserId;
+    await (update(
+      recipes,
+    )..where((t) => t.id.equals(id) & _ownedBy(t.userId, owner))).write(
+      RecipesCompanion(
+        deleted: const Value(true),
+        updatedAt: Value(DateTime.now().toUtc()),
+      ),
+    );
+  }
+
+  @override
+  Future<void> setRecipes(List<Recipe> values) => transaction(() async {
+    for (final value in values) {
+      value.validate();
+    }
+    await (update(recipes)..where((t) => _userIdPredicate(t.userId))).write(
+      RecipesCompanion(
+        deleted: const Value(true),
+        updatedAt: Value(DateTime.now().toUtc()),
+      ),
+    );
+    for (final value in values) {
+      await saveRecipe(value);
+    }
+  });
+
+  @override
   Stream<Map<String, model.Food>> watchCustomBarcodeFoods() {
     return _watchForCurrentUser(() {
       return (select(customBarcodeFoods)..where(
@@ -2159,6 +2237,20 @@ class GTDatabaseImpl extends _$GTDatabaseImpl
     if (oldName != null) {
       if (!map.containsKey(oldName))
         throw StateError('Category no longer exists');
+      if (category != null) {
+        if (category.name != oldName && map.containsKey(category.name)) {
+          throw StateError('Category already exists');
+        }
+        final updated = <String, model.NutritionCategory>{
+          for (final entry in map.entries)
+            if (entry.key == oldName)
+              category.name: category
+            else
+              entry.key: entry.value,
+        };
+        await setNutritionCategoriesForDay(day, updated);
+        return;
+      }
       map.remove(oldName);
     }
     if (category != null) {

@@ -5,6 +5,37 @@ struct WatchWorkoutLifecycleTests {
     @MainActor
     static func main() async throws {
         try testMetricsAggregation()
+        // The app can be active while its sensor session is still starting or failed.
+        precondition(WorkoutRecordingStatus(matchesWorkout: false, phase: .active, sensorActive: true) == .starting)
+        precondition(WorkoutRecordingStatus(matchesWorkout: true, phase: .starting, sensorActive: false) == .starting)
+        precondition(WorkoutRecordingStatus(matchesWorkout: true, phase: .active, sensorActive: true) == .recording)
+        precondition(WorkoutRecordingStatus(matchesWorkout: true, phase: .active, sensorActive: false) == .unavailable("Recording is not active."))
+        precondition(WorkoutRecordingStatus(matchesWorkout: true, phase: .failed("Failed"), sensorActive: true) == .unavailable("Failed"))
+
+        // A slow launch leaves a fresh budget for preparation, rather than the
+        // few milliseconds remaining from the launch's own deadline.
+        let prepared = try await prepareWorkoutAfterLaunch(timeout: 0.5, launch: {
+            try await Task.sleep(nanoseconds: 300_000_000)
+        }, prepare: { deadline in
+            precondition(deadline.timeIntervalSinceNow > 0.4)
+            try await Task.sleep(nanoseconds: 300_000_000)
+            return 42
+        })
+        precondition(prepared == 42)
+        var didPrepare = false
+        do {
+            _ = try await prepareWorkoutAfterLaunch(timeout: 0.01, launch: {
+                try await Task.sleep(nanoseconds: 100_000_000)
+            }, prepare: { _ in didPrepare = true })
+            preconditionFailure("Expected launch timeout")
+        } catch WorkoutOperationError.timeout {}
+        precondition(!didPrepare)
+        do {
+            _ = try await prepareWorkoutAfterLaunch(timeout: 0.01, launch: {}, prepare: { _ in
+                try await Task.sleep(nanoseconds: 100_000_000)
+            })
+            preconditionFailure("Expected preparation timeout")
+        } catch WorkoutOperationError.timeout {}
         var snapshot = WatchSnapshot()
         snapshot.update(workout: ["id": "A", "active": true])
         let beforeFood = snapshot.dictionary

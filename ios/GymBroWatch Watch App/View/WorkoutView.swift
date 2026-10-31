@@ -12,6 +12,15 @@ struct WorkoutView: View {
     @State private var presentEditSheet = false
     @State private var editingSetID: String?
     private enum Tab { case workout, music }
+    @State private var showRecordingError = false
+
+    private var recordingStatus: WorkoutRecordingStatus {
+        WorkoutRecordingStatus(
+            matchesWorkout: workoutManager.request?.id == workoutViewModel.workoutID,
+            phase: workoutManager.phase,
+            sensorActive: workoutManager.sessionState == .running || workoutManager.sessionState == .paused
+        )
+    }
 
     // Use physical display width: nested page/navigation insets must not
     // classify a 44 mm Watch as a small model.
@@ -35,6 +44,11 @@ struct WorkoutView: View {
         }
         .sheet(isPresented: $presentEditSheet, onDismiss: { editingSetID = nil }) {
             SetEditSheet(model: workoutViewModel)
+        }
+        .alert("Workout recording", isPresented: $showRecordingError) {
+            Button("Close", role: .cancel) {}
+        } message: {
+            if case .unavailable(let message) = recordingStatus { Text(message) }
         }
     }
 
@@ -65,9 +79,22 @@ struct WorkoutView: View {
                     .buttonStyle(.plain)
                     .disabled(!workoutViewModel.state.isRunning)
                 }
-                HStack {
-                    Image(systemName: "heart.fill").foregroundStyle(.red).frame(width: isCompactWatch ? 24 : 30)
-                    Text(workoutManager.heartRate > 0 ? "\(workoutManager.heartRate.formatted(.number.precision(.fractionLength(0)))) bpm" : "— bpm")
+                switch recordingStatus {
+                case .starting:
+                    Label("Starting recording…", systemImage: "hourglass")
+                        .font(.caption)
+                case .unavailable:
+                    Button { showRecordingError = true } label: {
+                        Label("Recording unavailable", systemImage: "exclamationmark.triangle")
+                            .font(.caption)
+                    }
+                    .buttonStyle(.plain)
+                    .foregroundStyle(.yellow)
+                case .recording:
+                    HStack {
+                        Image(systemName: "heart.fill").foregroundStyle(.red).frame(width: isCompactWatch ? 24 : 30)
+                        Text(workoutManager.heartRate > 0 ? "\(workoutManager.heartRate.formatted(.number.precision(.fractionLength(0)))) bpm" : "— bpm")
+                    }
                 }
                 HStack {
                     Image(systemName: "flame.fill").foregroundStyle(.orange).frame(width: isCompactWatch ? 24 : 30)

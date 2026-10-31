@@ -47,6 +47,8 @@ final class WorkoutManager: NSObject, ObservableObject {
     var remoteSession: HKWorkoutSession?
     var remoteCommand: (([String: Any]) async throws -> [String: Any])?
     var watchAvailable: (() -> Bool)?
+    var watchConfigured: (() -> Bool)?
+    var reportedWatchStartFailure: String?
     var onError: ((String, String) -> Void)?
     var onAuthorizationChanged: (() -> Void)?
     var watchAttemptInProgress = false

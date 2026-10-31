@@ -45,7 +45,10 @@ final class PhoneMessageResponder: NSObject {
                 do { reply(try await WorkoutManager.shared.handleSensorCommand(message)) }
                 catch {
                     let id = message["workoutId"] as? String ?? ""
-                    if WorkoutManager.shared.request?.id == id { WorkoutManager.shared.summary = .init(id: id, result: .failed(error.localizedDescription)) }
+                    if WorkoutManager.shared.request?.id == id {
+                        WorkoutManager.shared.phase = .failed(error.localizedDescription)
+                        WorkoutManager.shared.summary = .init(id: id, result: .failed(error.localizedDescription))
+                    }
                     reply(["success": false, "error": error.localizedDescription])
                 }
             }

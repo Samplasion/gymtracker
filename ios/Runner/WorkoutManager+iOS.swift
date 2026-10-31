@@ -63,6 +63,7 @@ extension WorkoutManager {
                 try await self.connectWatch(next)
             } catch {
                 guard self.desiredRequest == next else { return }
+                self.reportWatchStartFailure(next, error: error)
                 await self.startLocal(next)
             }
         }
@@ -114,6 +115,7 @@ extension WorkoutManager {
                   self.request == request, self.watchAvailable?() == true else { return }
             do { try await self.connectWatch(request) }
             catch {
+                self.reportWatchStartFailure(request, error: error)
                 self.nextWatchProbe = Date().addingTimeInterval(15)
                 if self.session == nil && self.device != "watch" && self.desiredRequest == request { await self.startLocal(request) }
             }
@@ -131,31 +133,29 @@ extension WorkoutManager {
         defer { watchAttemptInProgress = false }
         self.phase = device == "phone" ? .switchingDevice : .starting
         var token = UUID().uuidString
-        let preparationDeadline = Date().addingTimeInterval(10)
-        // Launch only prepares the companion UI. The command below owns the session.
+        // Launch and preparation each get a full, bounded time budget.
         let configuration = HKWorkoutConfiguration()
         configuration.activityType = .traditionalStrengthTraining
         configuration.locationType = .indoor
-        try await workoutDeadline(10) {
+        var command: [String: Any] = ["method": "workoutSensor", "action": "prepare", "workoutId": request.id,
+            "generation": token, "start": request.start.timeIntervalSince1970]
+        let prepared = try await prepareWorkoutAfterLaunch(launch: {
             try await self.healthStore.startWatchApp(toHandle: configuration)
             while self.watchAvailable?() != true {
                 try Task.checkCancellation()
                 try await Task.sleep(nanoseconds: 100_000_000)
             }
-        }
-        guard desiredRequest == request else { throw WorkoutOperationError.stale }
-        // Never replace an older Watch recording before applying its pending
-        // save/discard disposition, even if the latest snapshot already names B.
-        for (id, save) in pendingRemoteFinish where id != request.id {
-            try await workoutDeadline(max(0.001, preparationDeadline.timeIntervalSinceNow)) {
+        }, prepare: { deadline in
+            guard self.desiredRequest == request else { throw WorkoutOperationError.stale }
+            // Apply pending save/discard dispositions before replacing an old recording.
+            for (id, save) in self.pendingRemoteFinish where id != request.id {
                 try await self.finishRemote(id: id, save: save)
             }
-        }
-        var command: [String: Any] = ["method": "workoutSensor", "action": "prepare", "workoutId": request.id,
-            "generation": token, "start": request.start.timeIntervalSince1970,
-            "deadline": preparationDeadline.timeIntervalSince1970]
-        command["metrics"] = metricsPacket()?.dictionary
-        let prepared = try await workoutDeadline(max(0.001, preparationDeadline.timeIntervalSinceNow)) { try await remoteCommand(command) }
+            guard self.desiredRequest == request, Date() < deadline else { throw WorkoutOperationError.stale }
+            command["deadline"] = deadline.timeIntervalSince1970
+            command["metrics"] = self.metricsPacket()?.dictionary
+            return try await remoteCommand(command)
+        })
         guard prepared["success"] as? Bool == true else { throw WorkoutOperationError.unavailable }
         token = prepared["generation"] as? String ?? token
         if let metrics = prepared["metrics"] as? [String: Any], let data = try? JSONSerialization.data(withJSONObject: metrics) {
@@ -194,7 +194,9 @@ extension WorkoutManager {
             device = "watch"
             session = remoteSession?.state == .ended ? nil : remoteSession
             builder = nil
-            phase = .failed("Unable to confirm the Watch session. Reconnect your Watch.")
+            let message = "Unable to confirm the Watch session. Reconnect your Watch."
+            phase = .failed(message)
+            reportWatchStartFailure(request, message: message)
             return
         }
         guard desiredRequest == request else { return }
@@ -202,6 +204,7 @@ extension WorkoutManager {
         session = remoteSession?.state == .ended ? nil : remoteSession
         builder = nil
         summary = nil
+        reportedWatchStartFailure = nil
         phase = .active
 
     }
@@ -227,9 +230,30 @@ extension WorkoutManager {
 
     private func startLocal(_ request: WorkoutRequest) async {
         guard desiredRequest == request else { return }
-        guard #available(iOS 26, *) else { device = "none"; phase = .active; return }
+        guard #available(iOS 26, *) else {
+            device = "none"
+            phase = .failed("Sensor recording is unavailable. Your workout remains available in the iPhone app.")
+            return
+        }
         do { try await workoutDeadline(10) { try await self.createLocal(request) } }
-        catch { phase = .failed(error.localizedDescription); Logger.shared.error("Local workout: \(error)") }
+        catch {
+            guard desiredRequest == request else { return }
+            phase = .failed(error.localizedDescription)
+            Logger.shared.error("Local workout: \(error)")
+            onError?(request.id, error.localizedDescription)
+        }
+    }
+
+    private func reportWatchStartFailure(_ request: WorkoutRequest, error: Error) {
+        reportWatchStartFailure(request, message: error.localizedDescription)
+    }
+
+    private func reportWatchStartFailure(_ request: WorkoutRequest, message: String) {
+        Logger.shared.error("Watch workout start \(request.id): \(message)")
+        guard desiredRequest == request, watchConfigured?() == true,
+              reportedWatchStartFailure != request.id else { return }
+        reportedWatchStartFailure = request.id
+        onError?(request.id, "Watch recording could not be confirmed. \(message) Your workout remains available in the iPhone app.")
     }
 
     private func finishRemote(id: String, save: Bool) async throws {

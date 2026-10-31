@@ -40,9 +40,13 @@ extension WorkoutManager {
             if request?.id == id, let metrics = command["metrics"] as? [String: Any],
                let data = try? JSONSerialization.data(withJSONObject: metrics) { try handleReceivedData(data) }
             if let session, request?.id == id, session.state == .running || session.state == .paused {
+                phase = .active
                 return sensorReply(running: true)
             }
-            if request?.id == id && generation == token && session != nil { return sensorReply(running: false) }
+            if request?.id == id && generation == token && session != nil {
+                phase = .starting
+                return sensorReply(running: false)
+            }
             if session != nil { try await finishSegment(save: true) }
             guard Date().timeIntervalSince1970 <= deadline else { throw WorkoutOperationError.stale }
             let request = WorkoutRequest(id: id, start: Date(timeIntervalSince1970: command["start"] as? Double ?? Date().timeIntervalSince1970))
@@ -51,6 +55,7 @@ extension WorkoutManager {
             configuration.locationType = .indoor
             let primary = try HKWorkoutSession(healthStore: healthStore, configuration: configuration)
             selectWorkout(request)
+            phase = .starting
             if let metrics = command["metrics"] as? [String: Any], let data = try? JSONSerialization.data(withJSONObject: metrics) {
                 try handleReceivedData(data)
             }
@@ -67,6 +72,9 @@ extension WorkoutManager {
                 try? await Task.sleep(nanoseconds: 12_000_000_000)
                 guard self.session === primary, primary.state == .prepared || primary.state == .notStarted else { return }
                 try? await self.finishSegment(save: false)
+                if self.request?.id == request.id, self.generation == token {
+                    self.phase = .failed("Recording was not confirmed by your iPhone. Reconnect your devices.")
+                }
             }
             return sensorReply(running: false)
         }
@@ -76,6 +84,7 @@ extension WorkoutManager {
         }
         persistWatchIdentity()
         try await commitPrimary(at: Date())
+        phase = .active
         return ["success": true]
     }
 

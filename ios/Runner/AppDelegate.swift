@@ -58,6 +58,9 @@ import flutter_app_intents
             workout.listener = self
             workout.onMetricsPacket = { [weak self] packet in self?.publishPhoneMetrics(packet) }
             workout.watchAvailable = { [weak self] in self?.session?.isReachable == true }
+            workout.watchConfigured = { [weak self] in
+                self?.session?.isPaired == true && self?.session?.isWatchAppInstalled == true
+            }
             workout.remoteCommand = { [weak self] command in
                 guard let session = self?.session, session.isReachable else { throw WorkoutOperationError.unavailable }
                 return try await withCheckedThrowingContinuation { continuation in

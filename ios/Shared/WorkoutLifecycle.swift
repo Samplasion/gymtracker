@@ -10,6 +10,33 @@ enum WorkoutPhase: Equatable {
     case idle, starting, active, switchingDevice, finalizing, failed(String)
 }
 
+/// App navigation and sensor recording have independent lifecycles.
+enum WorkoutRecordingStatus: Equatable {
+    case starting, recording, unavailable(String)
+
+    init(matchesWorkout: Bool, phase: WorkoutPhase, sensorActive: Bool) {
+        guard matchesWorkout else { self = .starting; return }
+        if case .failed(let message) = phase { self = .unavailable(message) }
+        else if phase == .active {
+            self = sensorActive ? .recording : .unavailable("Recording is not active.")
+        }
+        else if phase == .idle { self = .unavailable("Recording is not active.") }
+        else { self = .starting }
+    }
+}
+
+/// Waking the companion must not consume the sensor handshake's time budget.
+@MainActor
+func prepareWorkoutAfterLaunch<T>(
+    timeout: Double = 10,
+    launch: @escaping @MainActor () async throws -> Void,
+    prepare: @escaping @MainActor (Date) async throws -> T
+) async throws -> T {
+    try await workoutDeadline(timeout, operation: launch)
+    let deadline = Date().addingTimeInterval(timeout)
+    return try await workoutDeadline(timeout) { try await prepare(deadline) }
+}
+
 /// A persisted, monotonically increasing revision shared by immediate and deferred delivery.
 /// Food and workout snapshots must always travel together in applicationContext.
 struct WatchSnapshot {

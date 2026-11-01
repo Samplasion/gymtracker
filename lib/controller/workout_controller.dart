@@ -1,4 +1,3 @@
-import 'package:gymtracker/db/database.dart';
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -11,6 +10,8 @@ import 'package:gymtracker/controller/stopwatch_controller.dart';
 import 'package:gymtracker/data/distance.dart';
 import 'package:gymtracker/data/exercises.dart';
 import 'package:gymtracker/data/weights.dart';
+import 'package:gymtracker/db/database.dart';
+import 'package:gymtracker/db/wearable_training_store.dart';
 import 'package:gymtracker/i18n/strings.g.dart';
 import 'package:gymtracker/model/exercisable.dart';
 import 'package:gymtracker/model/exercise.dart';
@@ -18,6 +19,7 @@ import 'package:gymtracker/model/native.dart';
 import 'package:gymtracker/model/progression.dart';
 import 'package:gymtracker/model/set.dart';
 import 'package:gymtracker/model/superset.dart';
+import 'package:gymtracker/model/wearable_training.dart';
 import 'package:gymtracker/model/workout.dart';
 import 'package:gymtracker/provider/locale.dart';
 import 'package:gymtracker/service/database.dart';
@@ -120,6 +122,7 @@ class WorkoutController extends _$WorkoutController {
     bool saveInitial = true,
     String? restoredNativeId,
     DateTime? restoredStart,
+    bool notifyNative = true,
   }) {
     _sessionGeneration++;
     _pendingInputSave?.cancel();
@@ -148,18 +151,21 @@ class WorkoutController extends _$WorkoutController {
         }
       },
     );
-    ref
-        .read(nativeServiceProvider)
-        .setIsWorkoutRunning(true, workoutId: nativeWorkoutId, start: time);
+    if (notifyNative) {
+      ref
+          .read(nativeServiceProvider)
+          .setIsWorkoutRunning(true, workoutId: nativeWorkoutId, start: time);
+    }
     if (saveInitial) save();
   }
 
-  void restore(Map<String, dynamic> data) {
+  void restore(Map<String, dynamic> data, {bool notifyNative = true}) {
     start(
       data['name'],
       data['parentID'],
       data['infobox'],
       saveInitial: false,
+      notifyNative: notifyNative,
       restoredNativeId:
           data['nativeWorkoutId'] as String? ??
           (data['time'] == null
@@ -189,6 +195,28 @@ class WorkoutController extends _$WorkoutController {
       (v) => v.name == data['distanceUnit'],
       orElse: () => Distance.km,
     );
+    final restoredCursor = data['cursor'];
+    if (data.containsKey('cursor')) {
+      _setCursor = null;
+      for (final cursor in _orderedSetCursors) {
+        if (_setForCursor(cursor).id == restoredCursor) {
+          _setCursor = cursor;
+          break;
+        }
+      }
+    }
+    final restEnd = data['restEnd'] as int?;
+    if (restEnd != null &&
+        restEnd > ref.read(workoutClockProvider).now().millisecondsSinceEpoch) {
+      ref
+          .read(countdownControllerProvider.notifier)
+          .restoreCountdown(
+            DateTime.fromMillisecondsSinceEpoch(
+              data['restStart'] as int? ?? restEnd,
+            ),
+            DateTime.fromMillisecondsSinceEpoch(restEnd),
+          );
+    }
     if (data.containsKey("globalStopwatch")) {
       final controller = ref.read(stopwatchControllerProvider.notifier);
 
@@ -231,7 +259,7 @@ class WorkoutController extends _$WorkoutController {
     );
     final generation = sessionGeneration;
     SchedulerBinding.instance.addPostFrameCallback((_) {
-      if (isSessionActive(generation)) refreshWatchData();
+      if (isSessionActive(generation)) refreshWearableData();
     });
   }
 
@@ -291,9 +319,41 @@ class WorkoutController extends _$WorkoutController {
     if (isSessionActive(generation)) _clear();
   }
 
-  Future<void> cancel({bool saveHealthWorkout = false}) async {
+  Future<void> cancel({
+    bool saveHealthWorkout = false,
+    bool publishWearableTerminal = true,
+  }) async {
     if (isClosed) return;
     final owner = ownerId;
+    final generation = sessionGeneration;
+    if (publishWearableTerminal) {
+      final store = WearableTrainingStore(service.db);
+      final raw = WearableTrainingDocument.copy(exportWearableSession());
+      final previous = await store.read(
+        raw['ownerScope'] as String,
+        nativeWorkoutId,
+      );
+      final terminal = WearableTrainingDocument.capture(
+        raw,
+        previous,
+        ref.read(workoutClockProvider).now().millisecondsSinceEpoch,
+      );
+      terminal['status'] = saveHealthWorkout ? 'completed' : 'discarded';
+      terminal['end'] = ref
+          .read(workoutClockProvider)
+          .now()
+          .millisecondsSinceEpoch;
+      await store.write(terminal, processed: true);
+      try {
+        await ref
+            .read(nativeServiceProvider)
+            .publishTrainingTerminal(terminal)
+            .timeout(const Duration(seconds: 5));
+      } catch (error) {
+        logger.w('Watch completion delivery deferred', error: error);
+      }
+    }
+    if (!isSessionActive(generation)) return;
     _clear(saveHealthWorkout: saveHealthWorkout);
     await service.db.deleteOngoingForUser(owner);
   }
@@ -781,6 +841,17 @@ class WorkoutController extends _$WorkoutController {
       "continuesID": continuesID,
       "weightUnit": weightUnit.name,
       "distanceUnit": distanceUnit.name,
+      "cursor": currentSetCursor == null
+          ? null
+          : _setForCursor(currentSetCursor!).id,
+      "restStart": ref
+          .read(countdownControllerProvider)
+          .startingTime
+          ?.millisecondsSinceEpoch,
+      "restEnd": ref
+          .read(countdownControllerProvider)
+          .targetTime
+          ?.millisecondsSinceEpoch,
       if (stopwatchController.globalStopwatch.currentDuration.inSeconds >
           0) ...{
         "globalStopwatch": stopwatchController
@@ -792,6 +863,101 @@ class WorkoutController extends _$WorkoutController {
             stopwatchController.globalStopwatch.currentDuration.inMilliseconds,
       },
     });
+  }
+
+  Map<String, dynamic> exportWearableExercise(Exercise exercise) {
+    final settings = ref.read(settingsControllerProvider);
+    final color = !settings.tintExercises
+        ? settings.color
+        : exercise.standard && exercise.category != null
+        ? exerciseStandardLibrary[exercise.category]?.color ??
+              nativePrimaryColor ??
+              Colors.red
+        : nativePrimaryColor ?? Colors.red;
+    return {
+      ...exercise.toJson(),
+      'name': exercise.getDisplayName(t),
+      'wearableColor': color.toARGB32(),
+    };
+  }
+
+  /// Full watch protocol state; the routine remains a separate immutable source.
+  Map<String, dynamic> exportWearableSession() {
+    final cursor = currentSetCursor;
+    final countdown = ref.read(countdownControllerProvider);
+    final stopwatch = ref
+        .read(stopwatchControllerProvider.notifier)
+        .globalStopwatch;
+    return {
+      'version': 1,
+      'id': nativeWorkoutId,
+      'nativeWorkoutId': nativeWorkoutId,
+      'ownerScope': ownerId == null ? 'guest' : 'user:$ownerId',
+      'status': 'active',
+      'name': name,
+      'parentID': parentID,
+      'infobox': infobox,
+      'time': time.millisecondsSinceEpoch,
+      'exercises': exercises
+          .map(
+            (group) => group.map(
+              exercise: (e) => exportWearableExercise(e),
+              superset: (s) => {
+                ...s.toJson(),
+                'exercises': s.exercises.map(exportWearableExercise).toList(),
+              },
+            ),
+          )
+          .toList(),
+      'weightUnit': weightUnit.name,
+      'distanceUnit': distanceUnit.name,
+      'cursor': cursor == null ? null : _setForCursor(cursor).id,
+      'restStart': countdown.startingTime?.millisecondsSinceEpoch,
+      'restEnd': countdown.targetTime?.millisecondsSinceEpoch,
+      'isContinuation': isContinuation,
+      'continuesID': continuesID,
+      'globalStopwatch': stopwatch.startingTime.millisecondsSinceEpoch,
+      'globalStopwatchPaused': stopwatch.isStopped,
+      'globalStopwatchNominalDuration': stopwatch.isStopped
+          ? stopwatch.currentDuration.inMilliseconds
+          : 0,
+    };
+  }
+
+  /// Adopts app state without starting a second sensor session.
+  Future<void> adoptWearableSession(Map<String, dynamic> document) async {
+    if (isClosed) {
+      restore(document, notifyNative: false);
+    } else {
+      exercises = (document['exercises'] as List)
+          .map((e) => WorkoutExercisable.fromJson(Map<String, dynamic>.from(e)))
+          .toList();
+    }
+    final cursorID = document['cursor'];
+    _setCursor = null;
+    for (final cursor in _orderedSetCursors) {
+      if (_setForCursor(cursor).id == cursorID) {
+        _setCursor = cursor;
+        break;
+      }
+    }
+    final end = document['restEnd'] as int?;
+    if (end != null &&
+        end > ref.read(workoutClockProvider).now().millisecondsSinceEpoch) {
+      ref
+          .read(countdownControllerProvider.notifier)
+          .restoreCountdown(
+            DateTime.fromMillisecondsSinceEpoch(
+              document['restStart'] as int? ?? end,
+            ),
+            DateTime.fromMillisecondsSinceEpoch(end),
+          );
+    } else {
+      removeCountdown();
+    }
+    publishExercises();
+    await persist();
+    refreshWearableData();
   }
 
   void generateNameIfEmpty() {
@@ -868,6 +1034,7 @@ class WorkoutController extends _$WorkoutController {
     }
 
     final workout = Workout(
+      id: nativeWorkoutId,
       name: name,
       exercises: exercises,
       duration: duration,
@@ -1126,7 +1293,7 @@ class WorkoutController extends _$WorkoutController {
       if (!_setForCursor(candidate).done) {
         _previousSetCursor = cursor;
         _setCursor = candidate;
-        refreshWatchData();
+        refreshWearableData();
         return true;
       }
     }
@@ -1151,7 +1318,7 @@ class WorkoutController extends _$WorkoutController {
       if (!_setForCursor(candidate).done) {
         _previousSetCursor = cursor;
         _setCursor = candidate;
-        refreshWatchData();
+        refreshWearableData();
         return true;
       }
     }
@@ -1165,7 +1332,7 @@ class WorkoutController extends _$WorkoutController {
 
     _previousSetCursor = _setCursor;
     _setCursor = cursor;
-    refreshWatchData();
+    refreshWearableData();
     return true;
   }
 
@@ -1176,7 +1343,7 @@ class WorkoutController extends _$WorkoutController {
       if (!_setForCursor(candidate).done) {
         _previousSetCursor = _setCursor;
         _setCursor = candidate;
-        refreshWatchData();
+        refreshWearableData();
         return true;
       }
     }
@@ -1191,7 +1358,7 @@ class WorkoutController extends _$WorkoutController {
 
     _previousSetCursor = _setCursor;
     _setCursor = cursor;
-    refreshWatchData();
+    refreshWearableData();
     return true;
   }
 
@@ -1549,7 +1716,7 @@ and:
     }
 
     publishExercises();
-    refreshWatchData();
+    refreshWearableData();
     save();
   }
 
@@ -1568,8 +1735,11 @@ and:
   }
 
   Color? nativePrimaryColor;
+  NativeWorkoutStateMessage? _nativeWorkoutState;
+  Map<String, dynamic>? get nativeWorkoutState =>
+      isActive ? _nativeWorkoutState?.toJson() : null;
 
-  void refreshWatchData({Color? primaryColor}) {
+  void refreshWearableData({Color? primaryColor}) {
     nativePrimaryColor = primaryColor ?? nativePrimaryColor;
     if (isClosed || ownerId != service.db.currentUserId) return;
     if (state?.cursor != _setCursor ||
@@ -1615,11 +1785,16 @@ and:
                     Colors.red
               : nativePrimaryColor ?? Colors.red);
       final set = exercise.sets[cursor.setIndex];
-      final setTypeLabel = _setTypeLabelForWatch(set, exercise.sets);
+      final setTypeLabel = _setTypeLabelForWearable(set, exercise.sets);
 
       message = NativeWorkoutStateMessage(
         hasExercise: true,
         exerciseName: name,
+        exerciseID: exercise.id,
+        exerciseNotes: exercise.notes.trim(),
+        supersetNotes: supersetIndex == null
+            ? ''
+            : (exercises[supersetIndex] as Superset).notes.trim(),
         exerciseColor: color,
         exerciseParameters: set.getHumanReadableDescription(
           t: t,
@@ -1653,6 +1828,7 @@ and:
     // TODO: Figure out why this was needed
     // SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
     // });
+    _nativeWorkoutState = message;
     ref.read(nativeServiceProvider).setExerciseParameters(message);
   }
 
@@ -1660,7 +1836,7 @@ and:
     exercises.add(Superset.empty());
   }
 
-  String _setTypeLabelForWatch(GTSet set, List<GTSet> allSets) {
+  String _setTypeLabelForWearable(GTSet set, List<GTSet> allSets) {
     switch (set.kind) {
       case GTSetKind.warmUp:
         return t.set.kindShort.warmUp;
@@ -1720,7 +1896,7 @@ and:
     }
 
     publishExercises();
-    refreshWatchData();
+    refreshWearableData();
     save();
   }
 }

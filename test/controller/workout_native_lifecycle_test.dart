@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:gymtracker/controller/workout_controller.dart';
@@ -7,6 +8,14 @@ import 'package:mocktail/mocktail.dart';
 import '../test_helpers/mock_services.dart';
 
 class _Native extends Mock implements NativeService {
+  Completer<void>? terminalGate;
+  final terminalEntered = Completer<void>();
+  @override
+  Future<void> publishTrainingTerminal(Map<String, dynamic> document) async {
+    if (!terminalEntered.isCompleted) terminalEntered.complete();
+    await terminalGate?.future;
+  }
+
   final calls = <({bool active, String id, DateTime start, bool save})>[];
 
   @override
@@ -44,6 +53,29 @@ void main() {
   tearDown(() {
     container.dispose();
     MockServices.tearDown();
+  });
+
+  test('a missing native reply cannot block workout cancellation', () async {
+    controller.start('Phone only', null, null, saveInitial: false);
+    native.terminalGate = Completer<void>();
+    await controller.cancel().timeout(const Duration(seconds: 8));
+    expect(controller.isActive, false);
+    expect(native.calls.last.active, false);
+    native.terminalGate!.complete();
+  });
+
+  test('late cancellation does not clear a newer workout', () async {
+    controller.start('First', null, null, saveInitial: false);
+    native.terminalGate = Completer<void>();
+    final cancellation = controller.cancel();
+    await native.terminalEntered.future;
+    controller.start('New', null, null, saveInitial: false);
+    final currentID = controller.nativeWorkoutId;
+    native.terminalGate!.complete();
+    await cancellation;
+    expect(controller.isActive, true);
+    expect(controller.nativeWorkoutId, currentID);
+    expect(native.calls.last.active, true);
   });
 
   test(

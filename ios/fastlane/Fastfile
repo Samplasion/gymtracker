@@ -1,0 +1,62 @@
+require "shellwords"
+
+default_platform(:ios)
+
+platform :ios do
+  desc "Incrementa la build Flutter, crea l'IPA e la carica su TestFlight"
+  lane :beta do
+    # Fastlane carica automaticamente fastlane/.env.
+    required = %w[ASC_API_ISSUER_ID ASC_API_KEY_ID ASC_API_KEY_PATH]
+    required.each do |name|
+      UI.user_error!("Configura #{name} in ios/fastlane/.env") if ENV[name].to_s.strip.empty?
+    end
+
+    ios_dir = File.expand_path("..", __dir__)
+    project_dir = File.expand_path("..", ios_dir)
+    key_path = File.expand_path(ENV.fetch("ASC_API_KEY_PATH"), __dir__)
+    UI.user_error!("File della chiave API .p8 non trovato") unless File.file?(key_path)
+
+    api_key = app_store_connect_api_key(
+      key_id: ENV.fetch("ASC_API_KEY_ID"),
+      issuer_id: ENV.fetch("ASC_API_ISSUER_ID"),
+      key_filepath: key_path
+    )
+
+    pubspec_path = File.join(project_dir, "pubspec.yaml")
+    pubspec = File.read(pubspec_path)
+    version_match = pubspec.match(/^version:\s*(\d+\.\d+\.\d+)\+(\d+)[ \t]*$/)
+    UI.user_error!("pubspec.yaml deve contenere version: x.y.z+numero") unless version_match
+    version = version_match[1]
+    latest_build = latest_testflight_build_number(
+      api_key: api_key,
+      app_identifier: CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier),
+      version: version,
+      initial_build_number: 0
+    )
+    build_number = [version_match[2].to_i, latest_build.to_i].max + 1
+    File.write(pubspec_path, pubspec.sub(version_match[0], "version: #{version}+#{build_number}"))
+
+    # Watch e widget devono avere le stesse versioni dell'app principale.
+    %w[GymBroWatch-Watch-App-Info.plist GymBroWidgets/Info.plist GymBroWatchWidgets/Info.plist].each do |plist|
+      set_info_plist_value(path: File.join(ios_dir, plist), key: "CFBundleShortVersionString", value: version)
+      set_info_plist_value(path: File.join(ios_dir, plist), key: "CFBundleVersion", value: build_number.to_s)
+    end
+
+    Dir.chdir(project_dir) do
+      sh("fvm", "flutter", "pub", "get")
+      sh("fvm", "flutter", "build", "ios", "--release", "--config-only",
+         "--build-name=#{version}", "--build-number=#{build_number}")
+    end
+
+    ipa = build_app(
+      workspace: File.join(ios_dir, "Runner.xcworkspace"),
+      scheme: "Runner",
+      configuration: "Release",
+      export_method: "app-store",
+      output_directory: File.join(project_dir, "build", "ios", "ipa"),
+      output_name: "GymBro.ipa",
+      xcargs: Shellwords.join(["CURRENT_PROJECT_VERSION=#{build_number}", "MARKETING_VERSION=#{version}"])
+    )
+    upload_to_testflight(api_key: api_key, ipa: ipa, skip_waiting_for_build_processing: true)
+  end
+end

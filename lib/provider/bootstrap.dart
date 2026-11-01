@@ -14,6 +14,7 @@ import 'package:gymtracker/controller/purchases_controller.dart';
 import 'package:gymtracker/controller/routines_controller.dart';
 import 'package:gymtracker/controller/settings_controller.dart';
 import 'package:gymtracker/controller/workout_controller.dart';
+import 'package:gymtracker/db/wearable_training_store.dart';
 import 'package:gymtracker/provider/food.dart';
 import 'package:gymtracker/provider/food_catalog.dart';
 import 'package:gymtracker/provider/hydration.dart';
@@ -26,6 +27,7 @@ import 'package:gymtracker/service/native.dart';
 import 'package:gymtracker/service/protocol.dart';
 import 'package:gymtracker/service/purchases.dart';
 import 'package:gymtracker/service/push.dart';
+import 'package:gymtracker/service/wearable_training.dart';
 import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/view/actions/routines.dart';
 
@@ -74,6 +76,15 @@ class AccountWorkoutLifecycle {
         ref.read(workoutControllerProvider) != null) {
       return;
     }
+    final id = data['nativeWorkoutId'] as String?;
+    final scope = owner == null ? 'guest' : 'user:$owner';
+    if (id != null && await WearableTrainingStore(database).processed(scope, id)) {
+      if (database.currentUserId == owner) {
+        await database.deleteOngoingForUser(owner);
+      }
+      return;
+    }
+    if (!ref.mounted || database.currentUserId != owner) return;
     ref.read(workoutControllerProvider.notifier).restore(data);
   }
 }
@@ -177,7 +188,7 @@ final appStartupProvider = FutureProvider<void>((ref) async {
   native.onRequestTrainingData = () {
     ref.invalidate(foodNativeSyncProvider);
     if (ref.read(workoutControllerProvider) != null) {
-      workout.refreshWatchData(
+      workout.refreshWearableData(
         primaryColor: Go.context == null
             ? null
             : Theme.of(Go.context!).colorScheme.primary,
@@ -192,7 +203,7 @@ final appStartupProvider = FutureProvider<void>((ref) async {
   ref.onDispose(native.clearCallbacks);
   ref.listen(countdownControllerProvider, (_, _) {
     if (ref.read(workoutControllerProvider) != null) {
-      workout.refreshWatchData(
+      workout.refreshWearableData(
         primaryColor: Go.context == null
             ? null
             : Theme.of(Go.context!).colorScheme.primary,
@@ -207,6 +218,7 @@ final appStartupProvider = FutureProvider<void>((ref) async {
     awaitRemoteInitialization(ref.read(purchasesServiceProvider).init()),
   ]);
   if (!ref.mounted) return;
+  ref.listen(wearableTrainingProvider, (_, _) {});
   ref.read(purchasesControllerProvider);
   ref.listen(achievementsControllerProvider, (_, _) {});
   final releaseIntents = IntentsController.initialize(

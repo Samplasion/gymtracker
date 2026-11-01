@@ -2,10 +2,7 @@ import SwiftUI
 
 extension View {
     func foodCard(tint: Color = .accentColor, padding: CGFloat = 12) -> some View {
-        self.padding(padding)
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .background(tint.opacity(0.09), in: RoundedRectangle(cornerRadius: 18))
-            .overlay(RoundedRectangle(cornerRadius: 18).strokeBorder(tint.opacity(0.18), lineWidth: 1))
+        self.watchCard(tint: tint, padding: padding)
     }
 }
 

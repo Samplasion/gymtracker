@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		DABC10000000000000000001 /* TrainingPhoneBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = DABC10000000000000000002 /* TrainingPhoneBridge.swift */; };
 		1498D2341E8E89220040F4C2 /* GeneratedPluginRegistrant.m in Sources */ = {isa = PBXBuildFile; fileRef = 1498D2331E8E89220040F4C2 /* GeneratedPluginRegistrant.m */; };
 		36900BDBD870D1B07CF63D1E /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = AAE21CAC9E9F8ABB3229997E /* GoogleService-Info.plist */; };
 		3B3967161E833CAA004F5970 /* AppFrameworkInfo.plist in Resources */ = {isa = PBXBuildFile; fileRef = 3B3967151E833CAA004F5970 /* AppFrameworkInfo.plist */; };
@@ -105,6 +106,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		DABC10000000000000000002 /* TrainingPhoneBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrainingPhoneBridge.swift; sourceTree = "<group>"; };
 		1498D2321E8E86230040F4C2 /* GeneratedPluginRegistrant.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GeneratedPluginRegistrant.h; sourceTree = "<group>"; };
 		1498D2331E8E89220040F4C2 /* GeneratedPluginRegistrant.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GeneratedPluginRegistrant.m; sourceTree = "<group>"; };
 		3B3967151E833CAA004F5970 /* AppFrameworkInfo.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = AppFrameworkInfo.plist; path = Flutter/AppFrameworkInfo.plist; sourceTree = "<group>"; };
@@ -392,6 +394,7 @@
 				1498D2331E8E89220040F4C2 /* GeneratedPluginRegistrant.m */,
 				7E3890E02F00018200DF1010 /* TypedApplicationContext.swift */,
 				74858FAE1ED2DC5600515810 /* AppDelegate.swift */,
+				DABC10000000000000000002 /* TrainingPhoneBridge.swift */,
 				74858FAD1ED2DC5600515810 /* Runner-Bridging-Header.h */,
 				7E388F7F2EFEDE1A00DF1010 /* WorkoutManager+iOS.swift */,
 			);
@@ -737,6 +740,7 @@
 				7E17F6102FFC12330082283F /* StartRoutineIntent.swift in Sources */,
 				7E3890E12F00018200DF1010 /* TypedApplicationContext.swift in Sources */,
 				74858FAF1ED2DC5600515810 /* AppDelegate.swift in Sources */,
+				DABC10000000000000000001 /* TrainingPhoneBridge.swift in Sources */,
 				1498D2341E8E89220040F4C2 /* GeneratedPluginRegistrant.m in Sources */,
 				7E683CB72D405CFC005EA05C /* FlutterCommunicator.g.swift in Sources */,
 				7EE0DE802E3D6EA6007A1B07 /* FlutterLogger.swift in Sources */,

@@ -42,6 +42,14 @@ import flutter_app_intents
         _ application: UIApplication,
         didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
     ) -> Bool {
+        liveActivityForegroundObserver = NotificationCenter.default.addObserver(
+            forName: UIApplication.didBecomeActiveNotification, object: nil, queue: .main
+        ) { [weak self] _ in
+            guard let self, self.applicationContext.isRunning else { return }
+            // Watch adoption can arrive while iOS disallows starting an activity
+            // in the background. Retry when the phone becomes active.
+            self.didUpdateApplicationContext(self.applicationContext)
+        }
         // This is required to make any communication available in the action isolate.
         FlutterLocalNotificationsPlugin.setPluginRegistrantCallback { (registry) in
             GeneratedPluginRegistrant.register(with: registry)
@@ -87,6 +95,29 @@ import flutter_app_intents
         GeneratedPluginRegistrant.register(with: engineBridge.pluginRegistry)
 
         let binaryMessenger = engineBridge.applicationRegistrar.messenger()
+        TrainingPhoneBridge.shared.attach(binaryMessenger)
+        TrainingPhoneBridge.shared.publish = { [weak self] in self?.publishWatchSnapshot() }
+        TrainingPhoneBridge.shared.adoptSensors = { [weak self] document in
+            guard let self, let id = document["id"] as? String,
+                  let start = document["time"] as? NSNumber else { return }
+            let date = Date(milliseconds: start.int64Value)
+            self.applicationContext.isRunning = true
+            self.applicationContext.startingTime = date
+            var snapshot = self.watchSnapshot.workout["id"] as? String == id ? self.watchSnapshot.workout : [:]
+            snapshot["id"] = id; snapshot["active"] = true; snapshot["save"] = true; snapshot["start"] = start
+            snapshot["metrics"] = self.metricsStore.ledger(for: id).packet(device: "phone").dictionary
+            self.watchSnapshot.update(workout: snapshot)
+            if let parameters = document["parameters"] as? [String: Any],
+               let decoded = NativeWorkoutStateMessage.decodeWorkoutState(from: parameters) {
+                do { try self.applyWorkoutParameters(decoded) }
+                catch { self.logger?.error(error, context: "Unable to adopt workout state") }
+            } else {
+                self.didUpdateApplicationContext(self.applicationContext)
+                self.publishWatchSnapshot()
+            }
+            if #available(iOS 17, *) { self.workout.adoptWatchWorkout(id: id, start: date) }
+            else { self.startLegacyMetricsMonitor(); self.publishLegacyMetrics() }
+        }
         FlutterMethodChannel(name: "gymbro/hydration", binaryMessenger: binaryMessenger).setMethodCallHandler { call, result in
             let store = HKHealthStore()
             guard HKHealthStore.isHealthDataAvailable(),
@@ -152,15 +183,26 @@ import flutter_app_intents
 
     }
     
+    private var liveActivityForegroundObserver: NSObjectProtocol?
+
     // MARK: live activity functions
     
+    private func liveActivityIsRunning(_ activity: Activity<GymBroWidgetsAttributes>) -> Bool {
+        if #available(iOS 16.2, *) {
+            return activity.activityState == .active || activity.activityState == .stale
+        }
+        return activity.activityState == .active
+    }
+
     func getHasLiveActivity() -> Bool {
-        return ActivityAuthorizationInfo().areActivitiesEnabled && !Activity<GymBroWidgetsAttributes>.activities.isEmpty
+        return ActivityAuthorizationInfo().areActivitiesEnabled && Activity<GymBroWidgetsAttributes>.activities.contains {
+            self.liveActivityIsRunning($0)
+        }
     }
         
     func startLiveActivity() {
         if #available(iOS 16.1, *) {
-            if ActivityAuthorizationInfo().areActivitiesEnabled {
+            if ActivityAuthorizationInfo().areActivitiesEnabled && UIApplication.shared.applicationState == .active {
                 do {
                     let attributes = GymBroWidgetsAttributes()
                     
@@ -198,7 +240,7 @@ import flutter_app_intents
     
     
     func updateLiveActivity() {
-        guard let activity = Activity<GymBroWidgetsAttributes>.activities.first else {
+        guard let activity = Activity<GymBroWidgetsAttributes>.activities.first(where: { self.liveActivityIsRunning($0) }) else {
             logger!.log("There is no active live activity to update.")
             return
         }
@@ -231,7 +273,7 @@ import flutter_app_intents
     
     
     func stopLiveActivity() {
-        guard let activity = Activity<GymBroWidgetsAttributes>.activities.first else {
+        guard let activity = Activity<GymBroWidgetsAttributes>.activities.first(where: { self.liveActivityIsRunning($0) }) else {
             logger!.log("No active Live Activity found.")
             return
         }
@@ -279,8 +321,24 @@ extension AppDelegate: WCSessionDelegate {
         }
     }
     
+    func session(_ session: WCSession, didFinish fileTransfer: WCSessionFileTransfer, error: Error?) {
+        Task { @MainActor in TrainingPhoneBridge.shared.fileTransferFinished(error: error) }
+        if fileTransfer.file.metadata?["kind"] as? String != nil {
+            try? FileManager.default.removeItem(at: fileTransfer.file.fileURL)
+        }
+    }
+
+    func session(_ session: WCSession, didReceive file: WCSessionFile) {
+        guard file.metadata?["kind"] as? String == "trainingDocument",
+              let data = try? Data(contentsOf: file.fileURL),
+              let document = try? JSONSerialization.jsonObject(with: data) as? [String: Any] else { return }
+        Task { @MainActor in _ = TrainingPhoneBridge.shared.receive(["method": "trainingSync", "document": document]) }
+    }
+
     func session(_ session: WCSession, didReceiveUserInfo userInfo: [String: Any] = [:]) {
-        Task { @MainActor in self.receiveWater(userInfo) }
+        Task { @MainActor in
+            if !TrainingPhoneBridge.shared.receive(userInfo) { self.receiveWater(userInfo) }
+        }
     }
 
     func session(_ session: WCSession, didReceiveApplicationContext context: [String: Any]) {
@@ -306,6 +364,7 @@ extension AppDelegate: WCSessionDelegate {
 
     func session(_ session: WCSession, didReceiveMessage message: [String : Any]) {
         Task {
+            if TrainingPhoneBridge.shared.receive(message) { return }
             guard let method = message["method"] as? String else { return }
             
             if method == "addWater" {
@@ -338,6 +397,7 @@ extension AppDelegate: WCSessionDelegate {
     
     func session(_ session: WCSession, didReceiveMessage message: [String : Any], replyHandler: @escaping ([String : Any]) -> Void) {
         Task {
+            if TrainingPhoneBridge.shared.receive(message, reply: replyHandler) { return }
             logger?.log("\(#function): Received \(message)")
             guard let method = message["method"] as? String else { replyHandler(["success": false]); return }
             if method == "addWater" {
@@ -464,6 +524,10 @@ extension AppDelegate: GymBroNativeHostAPI {
               watchSnapshot.workout["active"] as? Bool == true,
               let decoded = NativeWorkoutStateMessage.decodeWorkoutState(from: parameters) else { return }
         
+        try applyWorkoutParameters(decoded)
+    }
+
+    private func applyWorkoutParameters(_ decoded: NativeWorkoutStateMessage) throws {
         applicationContext.hasExercise = decoded.hasExercise
         applicationContext.exerciseName = decoded.exerciseName
         applicationContext.exerciseColor = decoded.exerciseColor
@@ -721,7 +785,11 @@ extension AppDelegate {
     }
 
     private func publishWatchSnapshot() {
-        let snapshot = watchSnapshot.dictionary
+        // Training-only/catalog publications also need their own envelope revision.
+        watchSnapshot.update()
+        var snapshot = watchSnapshot.dictionary
+        snapshot["training"] = TrainingPhoneBridge.shared.context
+        snapshot = WatchTraining.propertyList(snapshot)
         UserDefaults.standard.set(snapshot, forKey: "watch.snapshot.v2")
         guard let session, session.activationState == .activated, session.isPaired, session.isWatchAppInstalled else { return }
         do { try session.updateApplicationContext(snapshot) }

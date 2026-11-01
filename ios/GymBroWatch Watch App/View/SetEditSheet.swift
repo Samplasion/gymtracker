@@ -104,7 +104,7 @@ struct SetEditSheet: View {
             .font(.system(size: 20, design: .rounded).monospacedDigit())
         }
 //            .padding()
-            .tint(model.exerciseColor.asARGBColor())
+            .tint(model.exerciseColor == 0 ? .accentColor : model.exerciseColor.asARGBColor())
             .navigationBarTitle("Edit Set")
             .toolbar {
                 ToolbarItem(placement: .confirmationAction) {

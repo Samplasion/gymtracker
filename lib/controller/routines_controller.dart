@@ -1,10 +1,11 @@
-import 'package:gymtracker/db/database.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/widgets.dart';
 import 'package:gymtracker/controller/countdown_controller.dart';
 import 'package:gymtracker/controller/history_controller.dart';
 import 'package:gymtracker/controller/settings_controller.dart';
 import 'package:gymtracker/controller/workout_controller.dart';
+import 'package:gymtracker/db/database.dart';
+import 'package:gymtracker/db/wearable_training_store.dart';
 import 'package:gymtracker/model/exercisable.dart';
 import 'package:gymtracker/model/exercise.dart';
 import 'package:gymtracker/model/progression.dart';
@@ -172,8 +173,9 @@ class RoutinesController {
   String importWorkout(Workout workout) {
     if (service.db.cachedTrainerState.controls.contains(
       workout.isConcrete ? workout.parentID : workout.id,
-    ))
+    )) {
       return workout.id;
+    }
     final routine = workout.toRoutine();
     logger.d((routine, routine.exercises));
     service.setRoutine(routine);
@@ -247,6 +249,24 @@ class RoutinesController {
 
   /// Advances only goals belonging to the saved routine and completed workout.
   Future<void> advanceProgressionsFromWorkout(Workout workout) async {
+    final db = service.db;
+    final scope = db.currentUserId == null
+        ? 'guest'
+        : 'user:${db.currentUserId}';
+    final store = WearableTrainingStore(db);
+    final marker = 'progression:${workout.id}';
+    await db.transaction(() async {
+      if (await store.processed(scope, marker)) return;
+      await _advanceProgressionsFromWorkout(workout);
+      if ((db.currentUserId == null ? 'guest' : 'user:${db.currentUserId}') !=
+          scope) {
+        throw StateError('Account changed while advancing progression');
+      }
+      await store.write({'ownerScope': scope, 'id': marker}, processed: true);
+    });
+  }
+
+  Future<void> _advanceProgressionsFromWorkout(Workout workout) async {
     final routineID = workout.parentID;
     if (await service.db.isTrainerRoutine(routineID)) return;
     if (routineID == null) return;

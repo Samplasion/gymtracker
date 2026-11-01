@@ -1,7 +1,7 @@
 name: gymtracker
 description: A new Flutter project.
 publish_to: "none"
-version: 0.15.1+1793111108
+version: 0.15.1+1793111117
 
 environment:
   sdk: ">=3.11.0 <4.0.0"
@@ -105,6 +105,8 @@ dependencies:
 # Backport the upstream provider-flush lifecycle fix without migrating the
 # analyzer-constrained code generators. See packages/riverpod/PATCH.md.
 dependency_overrides:
+  # 2.6.0's Objective-C FFI class discovery blocks debug startup on iOS 27 Simulator.
+  path_provider_foundation: 2.5.1
   riverpod:
     path: packages/riverpod
 

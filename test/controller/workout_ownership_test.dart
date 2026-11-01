@@ -14,7 +14,7 @@ void main() {
       MockServices.database.setCurrentUserId('A');
       final controller = MockServices.createWorkout('A workout', null, null);
       MockServices.database.setCurrentUserId('B');
-      expect(controller.refreshWatchData, returnsNormally);
+      expect(controller.refreshWearableData, returnsNormally);
       await controller.persist(force: true);
       verifyNever(() => MockServices.databaseService.writeToOngoing(any()));
       await expectLater(

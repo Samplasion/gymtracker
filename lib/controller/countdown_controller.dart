@@ -77,6 +77,11 @@ class CountdownController extends _$CountdownController {
     logger.i('Rest timer finished');
   }
 
+  void restoreCountdown(DateTime start, DateTime end) {
+    state = CountdownState(startingTime: start, targetTime: end);
+    _onUpdate();
+  }
+
   void setCountdown(Duration delta) {
     final now = clock.now();
     state = CountdownState(startingTime: now, targetTime: now.add(delta));

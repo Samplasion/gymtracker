@@ -5,14 +5,17 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gymtracker/model/native.dart';
 import 'package:gymtracker/service/logger.dart';
 import 'package:gymtracker/service/native.g.dart';
+import 'package:gymtracker/service/wearable/training_transport.dart';
 import 'package:gymtracker/service/widgets.dart'
     show restKey, streakKey, totalWorkoutsKey;
 import 'package:rxdart/rxdart.dart';
 
 abstract class NativeService {
-  static NativeService instance() {
+  static NativeService instance({
+    WearableTrainingTransport? trainingTransport,
+  }) {
     if (Platform.isIOS || Platform.isAndroid) {
-      return _NativeServiceImpl();
+      return _NativeServiceImpl(null, trainingTransport);
     } else {
       return _UnsupportedNativeService._();
     }
@@ -23,12 +26,16 @@ abstract class NativeService {
   NativeService._();
   Future<bool> Function(String, double, int, String)? onImportWaterEntry;
   void waterReceiverReady() {}
+  Future<void> publishTrainingTerminal(Map<String, dynamic> document) async {}
 
   void Function()? onMarkSetDone;
   bool Function()? onCursorNext;
   bool Function()? onCursorPrevious;
   void Function()? onRequestTrainingData;
   void Function(double?, double?, int?, double?)? onUpdateSetParameters;
+
+  /// Binds subsequent updates to an adopted session without starting sensors.
+  void adoptWorkoutIdentity(String workoutId) {}
 
   void attach() {}
 
@@ -158,11 +165,31 @@ class _NativeServiceImpl extends NativeService
   final GymBroNativeHostAPI _watch;
   String? _workoutId;
 
-  _NativeServiceImpl([GymBroNativeHostAPI? host])
-    : _watch = host ?? GymBroNativeHostAPI(),
-      super._();
+  final WearableTrainingTransport _trainingTransport;
+  _NativeServiceImpl([
+    GymBroNativeHostAPI? host,
+    WearableTrainingTransport? trainingTransport,
+  ]) : _watch = host ?? GymBroNativeHostAPI(),
+       _trainingTransport =
+           trainingTransport ?? WearableTrainingTransport.forPlatform(),
+       super._();
   bool _disposed = false;
+  @override
+  Future<void> publishTrainingTerminal(Map<String, dynamic> document) async {
+    await _trainingTransport.publishTerminal(document);
+  }
+
   bool _attached = false;
+
+  @override
+  void adoptWorkoutIdentity(String workoutId) {
+    if (_disposed) return;
+    if (_workoutId != workoutId) {
+      _energy$.add(null);
+      _heartRate$.add(null);
+    }
+    _workoutId = workoutId;
+  }
 
   @override
   void attach() {
@@ -379,7 +406,9 @@ class _NativeServiceImpl extends NativeService
 }
 
 final nativeServiceProvider = Provider<NativeService>((ref) {
-  final service = NativeService.instance();
+  final service = NativeService.instance(
+    trainingTransport: ref.watch(wearableTrainingTransportProvider),
+  );
   service.attach();
   ref.onDispose(service.dispose);
   return service;

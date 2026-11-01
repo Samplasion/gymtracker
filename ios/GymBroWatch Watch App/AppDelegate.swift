@@ -25,6 +25,8 @@ class GBAppDelegate: NSObject, WKApplicationDelegate {
             if self?.workoutViewModel.isWorkoutRunning == true { self?.workoutViewModel.requestFreshData() }
         }
         WorkoutManager.shared.onAuthorizationChanged = { [weak self] in self?.workoutViewModel.requestFreshData() }
+        TrainingViewModel.shared.workout = workoutViewModel
+        TrainingViewModel.shared.refresh()
         PhoneMessageResponder.shared.workoutDelegate = workoutViewModel
         PhoneMessageResponder.shared.session = session
         PhoneMessageResponder.shared.foodDelegate = foodViewModel
@@ -89,6 +91,26 @@ extension GBAppDelegate: WCSessionDelegate {
         PhoneMessageResponder.shared.session(session, didReceiveUserInfo: userInfo)
     }
     
+    func session(_ session: WCSession, didFinish fileTransfer: WCSessionFileTransfer, error: Error?) {
+        if fileTransfer.file.metadata?["kind"] as? String != nil {
+            try? FileManager.default.removeItem(at: fileTransfer.file.fileURL)
+        }
+    }
+
+    func session(_ session: WCSession, didReceive file: WCSessionFile) {
+        // WCSession owns the URL only for the duration of this callback.
+        guard let kind = file.metadata?["kind"] as? String,
+              let data = try? Data(contentsOf: file.fileURL),
+              let document = try? JSONSerialization.jsonObject(with: data) as? [String: Any] else { return }
+        Task { @MainActor in
+            if kind == "trainingCatalog" { TrainingViewModel.shared.receiveCatalog(document) }
+            else if kind == "trainingAck" { TrainingViewModel.shared.acknowledge(document) }
+            else if kind == "trainingPhoneSession" {
+                TrainingViewModel.shared.receiveContext(["version": 1, "ownerScope": document["ownerScope"] ?? "", "session": document])
+            }
+        }
+    }
+
     func session(_ session: WCSession, didReceiveApplicationContext applicationContext: [String : Any]) {
         PhoneMessageResponder.shared.session(session, didReceiveApplicationContext: applicationContext)
     }

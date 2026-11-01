@@ -4,7 +4,29 @@ import HealthKit
 
 @available(watchOS 9, *)
 extension WorkoutManager {
-    /// This is the only entry point that creates a sensor session on Watch.
+    func startAutonomousWorkout(_ document: [String: Any]) async throws {
+        guard let id = document["id"] as? String, let start = document["time"] as? NSNumber else { return }
+        if let session {
+            if request?.id == id && (session.state == .running || session.state == .paused) { return }
+            try await finishSegment(save: true)
+        }
+        let request = WorkoutRequest(id: id, start: Date(milliseconds: start.int64Value))
+        selectWorkout(request)
+        phase = .starting
+        let configuration = HKWorkoutConfiguration()
+        configuration.activityType = .traditionalStrengthTraining
+        configuration.locationType = .indoor
+        let primary = try HKWorkoutSession(healthStore: healthStore, configuration: configuration)
+        let token = UUID().uuidString
+        attachPrimary(primary, request: request, generation: token)
+        try await builder?.addMetadata([HKMetadataKeyExternalUUID: id, "gymbro.segmentId": token])
+        persistWatchIdentity()
+        try await commitPrimary(at: request.start)
+        phase = .active
+        if #available(watchOS 10, *) { try? await primary.startMirroringToCompanionDevice() }
+    }
+
+    /// Phone-controlled sensor starts use a bounded prepare/commit handshake.
     /// Exercise snapshots never start, resume, or end HealthKit sessions.
     func handleSensorCommand(_ command: [String: Any]) async throws -> [String: Any] {
         guard let id = command["workoutId"] as? String,

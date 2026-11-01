@@ -11,7 +11,7 @@ struct WorkoutView: View {
     @State private var mediaIdentity = UUID()
     @State private var presentEditSheet = false
     @State private var editingSetID: String?
-    private enum Tab { case workout, music }
+    private enum Tab { case workout, music, actions }
     @State private var showRecordingError = false
 
     private var recordingStatus: WorkoutRecordingStatus {
@@ -30,15 +30,26 @@ struct WorkoutView: View {
 
     var body: some View {
         TabView(selection: $selection) {
-            NavigationStack { metrics }.tag(Tab.workout)
+            NavigationStack { metrics }
+                .id(workoutViewModel.isWorkoutRunning ? (workoutViewModel.workoutID ?? "active") : "training-home")
+                .tag(Tab.workout)
+            if TrainingViewModel.shared.active != nil {
+                NavigationStack { TrainingSessionActions() }.tag(Tab.actions)
+            }
             // The system media controller is a page root, outside NavigationStack.
             NowPlayingView().id(mediaIdentity).tag(Tab.music)
         }
         .tabViewStyle(.page)
         .onChange(of: selection) { tab in if tab == .music { mediaIdentity = UUID() } }
-        .onChange(of: scenePhase) { phase in if phase == .active { mediaIdentity = UUID() } }
+        .onChange(of: scenePhase) { phase in if phase == .active { mediaIdentity = UUID(); workoutViewModel.notifyRestIfDue() } }
         .onChange(of: isLuminanceReduced) { reduced in if reduced { selection = .workout } }
         .onChange(of: workoutViewModel.workoutID) { _ in presentEditSheet = false; selection = .workout }
+        .task {
+            while !Task.isCancelled {
+                TrainingViewModel.shared.flush()
+                do { try await Task.sleep(nanoseconds: 5_000_000_000) } catch { return }
+            }
+        }
         .onChange(of: workoutViewModel.set?.id) { id in
             if presentEditSheet && editingSetID != id { presentEditSheet = false }
         }
@@ -52,11 +63,15 @@ struct WorkoutView: View {
         }
     }
 
+    private func elapsed(at date: Date) -> TimeInterval {
+        return max(0, date.timeIntervalSince(workoutViewModel.workoutStart ?? date))
+    }
+
     @ViewBuilder private var metrics: some View {
         if workoutViewModel.state == .running || workoutViewModel.state == .paused {
             VStack(alignment: .leading, spacing: isCompactWatch ? 2 : nil) {
                 TimelineView(MetricsTimelineSchedule()) { context in
-                    ElapsedTimeView(elapsedTime: context.date.timeIntervalSince(workoutViewModel.workoutStart ?? context.date), showSubseconds: context.cadence == .live)
+                    ElapsedTimeView(elapsedTime: elapsed(at: context.date), showSubseconds: context.cadence == .live)
                 }
                 .font(.system(size: isCompactWatch ? 20 : 24, weight: .semibold, design: .rounded))
                 .foregroundStyle(.tint)
@@ -72,7 +87,8 @@ struct WorkoutView: View {
                         editingSetID = workoutViewModel.set?.id
                         presentEditSheet = true
                     } label: {
-                        (SetTypeIndicatorView.richTextPrefix(set: workoutViewModel.set, label: workoutViewModel.setTypeLabel, primary: workoutViewModel.exerciseColor.asARGBColor())
+                        ((workoutViewModel.set?.done == true ? Text(Image(systemName: "checkmark.circle.fill")) + Text(" ") : Text(""))
+                         + SetTypeIndicatorView.richTextPrefix(set: workoutViewModel.set, label: workoutViewModel.setTypeLabel, primary: workoutViewModel.exerciseColor == 0 ? .accentColor : workoutViewModel.exerciseColor.asARGBColor())
                          + Text(workoutViewModel.exerciseParameters) + Text(" ") + Text(Image(systemName: "pencil")))
                         .font(.system(size: isCompactWatch ? 12 : 14)).multilineTextAlignment(.center)
                     }
@@ -106,7 +122,7 @@ struct WorkoutView: View {
                     .accessibilityLabel("Previous set")
                     Spacer()
                     Button { workoutViewModel.markThisSetAsDone() } label: {
-                        Image(systemName: "checkmark.circle")
+                        Image(systemName: workoutViewModel.set?.done == true ? "checkmark.circle.fill" : "checkmark.circle")
                             .font(isCompactWatch ? .system(size: 20) : .title2)
                             .opacity(workoutViewModel.isLoading ? 0 : 1)
                             .overlay {
@@ -114,7 +130,7 @@ struct WorkoutView: View {
                                     .allowsHitTesting(false)
                             }
                     }
-                    .accessibilityLabel("Complete set")
+                    .accessibilityLabel(workoutViewModel.set?.done == true ? "Set completed" : "Complete set")
                     .modifier(HandGestureShortcutIfAvailable())
                     Spacer()
                     Button { workoutViewModel.moveWorkoutCursorNext() } label: { Image(systemName: "chevron.right") }
@@ -146,11 +162,7 @@ struct WorkoutView: View {
             .padding(.top, isCompactWatch ? 12 : 20)
             .ignoresSafeArea(edges: .bottom)
         } else {
-            Text("Start a workout from your iPhone.")
-                .multilineTextAlignment(.center)
-                .font(.system(.headline).weight(.regular))
-                .navigationTitle("Workout")
-                .navigationBarTitleDisplayMode(.inline)
+            TrainingHomeView()
         }
     }
 }

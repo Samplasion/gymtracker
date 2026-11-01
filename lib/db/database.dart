@@ -29,6 +29,7 @@ import 'package:gymtracker/model/trainer.dart';
 import 'package:gymtracker/db/model/tables/water_logs.dart';
 import 'package:gymtracker/db/schema_versions.dart';
 import 'package:gymtracker/db/utils.dart';
+import 'package:gymtracker/db/wearable_training_store.dart';
 import 'package:gymtracker/model/achievements.dart';
 import 'package:gymtracker/model/exercisable.dart' as model;
 import 'package:gymtracker/model/exercise.dart' as model;
@@ -695,6 +696,7 @@ class GTDatabaseImpl extends _$GTDatabaseImpl
     },
     beforeOpen: (details) async {
       await SyncV2Store.install(this);
+      await WearableTrainingStore.install(this);
       // Nutrition defaults are supplied by the providers until the user saves
       // them. Persisting defaults here would look like guest data at login.
 

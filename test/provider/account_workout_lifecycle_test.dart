@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:gymtracker/controller/exercises_controller.dart';
 import 'package:gymtracker/controller/workout_controller.dart';
+import 'package:gymtracker/db/wearable_training_store.dart';
 import 'package:gymtracker/provider/bootstrap.dart';
 import 'package:mocktail/mocktail.dart';
 
@@ -14,6 +15,29 @@ import '../test_helpers/mock_services.dart';
 void main() {
   setUp(MockServices.setup);
   tearDown(MockServices.tearDown);
+
+  test(
+    'a committed terminal receipt prevents ongoing recovery after a crash',
+    () async {
+      final db = MockServices.database;
+      await db.setOngoing({
+        'nativeWorkoutId': 'finished',
+        'name': 'Finished',
+        'exercises': [],
+      });
+      await WearableTrainingStore(db).write({
+        'ownerScope': 'guest',
+        'id': 'finished',
+        'status': 'completed',
+      }, processed: true);
+      final lifecycle = MockServices.container.read(
+        Provider((ref) => AccountWorkoutLifecycle(ref)),
+      );
+      await lifecycle.restore();
+      expect(MockServices.container.read(workoutControllerProvider), isNull);
+      expect(await db.watchOngoing().first, isNull);
+    },
+  );
 
   testWidgets('cancelled backup cannot write after the owner changes', (
     tester,

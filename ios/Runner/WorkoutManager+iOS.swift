@@ -21,6 +21,25 @@ extension WorkoutManager {
         }
     }
 
+    /// App control changes hands; the existing Watch sensor primary stays alive.
+    func adoptWatchWorkout(id: String, start: Date) {
+        let adopted = WorkoutRequest(id: id, start: start)
+        desiredRequest = adopted
+        persistDesiredRequest()
+        enqueue {
+            guard self.desiredRequest == adopted else { return }
+            // Preserve the operation order when replacing another phone recording.
+            if self.request?.id != id, self.session != nil, self.device == "phone" {
+                try? await self.finishSegment(save: true)
+            }
+            self.selectWorkout(adopted)
+            self.device = "watch"
+            self.session = self.remoteSession?.state == .ended ? nil : self.remoteSession
+            self.builder = nil
+            self.phase = .active
+        }
+    }
+
     func startPhoneWorkout(id: String, start: Date) {
         let next = WorkoutRequest(id: id, start: start)
         guard desiredRequest != next else {

@@ -10,7 +10,9 @@ final class PhoneMessageResponder: NSObject {
                 let workout = cached["workout"] as? [String: Any] ?? [:]
                 workoutDelegate?.apply(workoutSnapshot: workout)
                 if let id = workout["id"] as? String, let start = (workout["start"] as? NSNumber)?.int64Value {
+                    if TrainingViewModel.shared.active == nil || TrainingViewModel.shared.active?["id"] as? String == id {
                     WorkoutManager.shared.selectWorkout(.init(id: id, start: Date(milliseconds: start)))
+                }
                 }
             }
         }
@@ -28,6 +30,7 @@ final class PhoneMessageResponder: NSObject {
 
     nonisolated func session(_ session: WCSession, didReceiveMessage message: [String: Any]) {
         Task { @MainActor in
+            if message["method"] as? String == "trainingAcknowledged" { TrainingViewModel.shared.acknowledge(message); return }
             if self.receiveWaterAcknowledgement(message) { return }
             if message["method"] as? String == "snapshot", let snapshot = message["data"] as? [String: Any] {
                 self.apply(snapshot)
@@ -57,11 +60,14 @@ final class PhoneMessageResponder: NSObject {
 
     private func apply(_ snapshot: [String: Any]) {
         guard cursor.accept(snapshot) else { return }
+        if let training = snapshot["training"] as? [String: Any] { TrainingViewModel.shared.receiveContext(training) }
         UserDefaults.standard.set(snapshot, forKey: "watch.receivedSnapshot.v2")
         if let workout = snapshot["workout"] as? [String: Any] {
             workoutDelegate?.apply(workoutSnapshot: workout)
             if let id = workout["id"] as? String, let start = (workout["start"] as? NSNumber)?.int64Value {
-                WorkoutManager.shared.selectWorkout(.init(id: id, start: Date(milliseconds: start)))
+                if TrainingViewModel.shared.active == nil || TrainingViewModel.shared.active?["id"] as? String == id {
+                    WorkoutManager.shared.selectWorkout(.init(id: id, start: Date(milliseconds: start)))
+                }
                 if let metrics = workout["metrics"] as? [String: Any], let data = try? JSONSerialization.data(withJSONObject: metrics) {
                     try? WorkoutManager.shared.handleReceivedData(data)
                 }
@@ -86,12 +92,14 @@ final class PhoneMessageResponder: NSObject {
     }
     nonisolated func session(_ session: WCSession, didReceiveUserInfo info: [String: Any]) {
         Task { @MainActor in
+            if info["method"] as? String == "trainingAcknowledged" { TrainingViewModel.shared.acknowledge(info); return }
             if !self.receiveWaterAcknowledgement(info) { self.session(session, didReceiveApplicationContext: info) }
         }
     }
     nonisolated func sessionReachabilityDidChange(_ session: WCSession) {
         Task { @MainActor in
             self.workoutDelegate?.sessionReachabilityDidChange(session)
+            TrainingViewModel.shared.flush()
             if session.isReachable { self.foodDelegate?.flushWaterEntries() }
         }
     }

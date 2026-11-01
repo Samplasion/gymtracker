@@ -14,6 +14,9 @@ final class WorkoutViewModel: NSObject, ObservableObject {
     @Published var isWorkoutRunning = false
     @Published var hasNextSet = false
     @Published var exerciseName = ""
+    @Published var exerciseID = ""
+    @Published var exerciseNotes = ""
+    @Published var supersetNotes = ""
     @Published var exerciseColor: Int64 = 0
     @Published var exerciseParameters = ""
     @Published var setTypeLabel = ""
@@ -25,6 +28,9 @@ final class WorkoutViewModel: NSObject, ObservableObject {
     @Published var workoutID: String?
     @Published var restTimeEnd: Date? {
         didSet {
+            if restHaptic.update(restTimeEnd, now: Date(), running: isWorkoutRunning) {
+                WKInterfaceDevice.current().play(.notification)
+            }
             guard oldValue != restTimeEnd else { return }
             vibrationTask?.cancel()
             guard let date = restTimeEnd, date > Date() else { return }
@@ -32,11 +38,14 @@ final class WorkoutViewModel: NSObject, ObservableObject {
                 do { try await Task.sleep(nanoseconds: UInt64(max(0, date.timeIntervalSinceNow) * 1_000_000_000)) }
                 catch { return }
                 guard !Task.isCancelled else { return }
-                WKInterfaceDevice.current().play(.notification)
+                self.notifyRestIfDue()
             }
         }
     }
+    var hasExerciseNotes: Bool { !QuillNoteDocument(exerciseNotes).isEmpty }
+    var hasSupersetNotes: Bool { !QuillNoteDocument(supersetNotes).isEmpty }
     var session: WCSession
+    private var restHaptic = WatchRestHaptic()
     private var vibrationTask: Task<Void, Never>?
     private var requestTask: Task<Void, Never>?
     private var pendingRequest: UUID?
@@ -56,6 +65,10 @@ final class WorkoutViewModel: NSObject, ObservableObject {
     }
 
     private func perform(_ method: String, values: [String: Any] = [:]) {
+        if TrainingViewModel.shared.active?["id"] as? String == workoutID && (!TrainingViewModel.shared.connected || !session.isReachable) {
+            TrainingViewModel.shared.perform(method, values: values)
+            return
+        }
         guard !isLoading, state.isRunning, hasNextSet, let id = workoutID else { return }
         guard session.isReachable else { WKInterfaceDevice.current().play(.failure); return }
         let token = UUID()
@@ -72,6 +85,16 @@ final class WorkoutViewModel: NSObject, ObservableObject {
                 self.pendingRequest = nil
                 self.requestTask?.cancel()
                 self.isLoading = false
+                if !success, !self.session.isReachable, TrainingViewModel.shared.active?["id"] as? String == id,
+                   TrainingViewModel.shared.active?["cursor"] as? String == setID {
+                    TrainingViewModel.shared.perform(method, values: values)
+                    return
+                }
+                if !success && self.session.isReachable { self.requestFreshData() }
+                if success {
+                    TrainingViewModel.shared.mirrorRemoteCommand(method, values: values, workoutID: id, setID: setID)
+                    self.requestFreshData()
+                }
                 // A reply for an old set must not provide misleading feedback.
                 if self.set?.id == setID { WKInterfaceDevice.current().play(success ? .success : .failure) }
             }
@@ -90,7 +113,13 @@ final class WorkoutViewModel: NSObject, ObservableObject {
         isLoading = false
     }
 
+    func notifyRestIfDue() {
+        if restHaptic.due(now: Date(), running: isWorkoutRunning) { WKInterfaceDevice.current().play(.notification) }
+    }
+
     func requestFreshData() {
+        notifyRestIfDue()
+        TrainingViewModel.shared.flush()
         guard session.isReachable else { return }
         session.sendMessage(["method": "requestTrainingData"], replyHandler: nil, errorHandler: { _ in })
     }
@@ -98,6 +127,26 @@ final class WorkoutViewModel: NSObject, ObservableObject {
 
 extension WorkoutViewModel: WorkoutMessageDelegate {
     func apply(workoutSnapshot: [String: Any]) {
+        if workoutSnapshot["active"] as? Bool == false,
+           let id = workoutSnapshot["id"] as? String,
+           TrainingViewModel.shared.active?["id"] as? String == id || workoutID == id {
+            TrainingViewModel.shared.acknowledge([
+                "accepted": true, "terminal": true, "id": id,
+                "ownerScope": TrainingViewModel.shared.owner ?? "",
+                "document": ["status": workoutSnapshot["save"] as? Bool == true ? "completed" : "discarded"]
+            ])
+        }
+        if TrainingViewModel.shared.active != nil {
+            if TrainingViewModel.shared.connected,
+               workoutSnapshot["id"] as? String == workoutID,
+               let parameters = workoutSnapshot["parameters"] as? [String: Any],
+               let decoded = NativeWorkoutStateMessage.decodeWorkoutState(from: parameters) {
+                self.set(exerciseParameters: decoded)
+            }
+            return
+        }
+        if workoutSnapshot["active"] as? Bool != false,
+           let id = workoutSnapshot["id"] as? String, TrainingViewModel.shared.isFinished(id) { return }
         guard let id = workoutSnapshot["id"] as? String,
               let active = workoutSnapshot["active"] as? Bool else { return }
         if workoutID != id {
@@ -106,6 +155,9 @@ extension WorkoutViewModel: WorkoutMessageDelegate {
             set = nil
             hasNextSet = false
             exerciseName = ""
+            exerciseID = ""
+            exerciseNotes = ""
+            supersetNotes = ""
             exerciseParameters = ""
             workoutID = id
         }
@@ -119,11 +171,24 @@ extension WorkoutViewModel: WorkoutMessageDelegate {
     func set(isWorkoutRunning: Bool, shouldSave: Bool) {
         let wasRunning = self.isWorkoutRunning
         self.isWorkoutRunning = isWorkoutRunning
-        if isWorkoutRunning { state = .running }
+        if isWorkoutRunning {
+            state = .running
+            if restHaptic.update(restTimeEnd, now: Date(), running: true) { WKInterfaceDevice.current().play(.notification) }
+            notifyRestIfDue()
+        }
         else {
             cancelPendingRequest()
             restTimeEnd = nil
-            if !shouldSave { state = .cancelled }
+            exerciseID = ""
+            exerciseName = ""
+            exerciseColor = 0
+            exerciseParameters = ""
+            setTypeLabel = ""
+            set = nil
+            hasNextSet = false
+            exerciseNotes = ""
+            supersetNotes = ""
+            if !shouldSave { workoutID = nil; workoutStart = nil; workoutEnd = nil; state = .cancelled }
             else if wasRunning || state == .ended { state = .ended }
             else { state = .notStarted }
         }
@@ -132,6 +197,9 @@ extension WorkoutViewModel: WorkoutMessageDelegate {
     func set(exerciseParameters: NativeWorkoutStateMessage) {
         hasNextSet = exerciseParameters.hasExercise
         exerciseName = exerciseParameters.exerciseName
+        exerciseID = exerciseParameters.exerciseID
+        exerciseNotes = exerciseParameters.hasExercise ? exerciseParameters.exerciseNotes : ""
+        supersetNotes = exerciseParameters.hasExercise ? exerciseParameters.supersetNotes : ""
         exerciseColor = exerciseParameters.exerciseColor
         self.exerciseParameters = exerciseParameters.exerciseParameters
         setTypeLabel = exerciseParameters.setTypeLabel

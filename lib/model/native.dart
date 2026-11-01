@@ -6,6 +6,9 @@ import 'package:gymtracker/utils/extensions.dart';
 class NativeWorkoutStateMessage {
   final bool hasExercise;
   final String exerciseName;
+  final String exerciseID;
+  final String exerciseNotes;
+  final String supersetNotes;
   final Color exerciseColor;
   final String exerciseParameters;
   final String setTypeLabel;
@@ -18,6 +21,9 @@ class NativeWorkoutStateMessage {
   NativeWorkoutStateMessage({
     required this.hasExercise,
     required this.exerciseName,
+    this.exerciseID = '',
+    this.exerciseNotes = '',
+    this.supersetNotes = '',
     required this.exerciseColor,
     required this.exerciseParameters,
     required this.setTypeLabel,
@@ -32,6 +38,9 @@ class NativeWorkoutStateMessage {
     return {
       'hasExercise': hasExercise,
       'exerciseName': exerciseName,
+      'exerciseID': exerciseID,
+      'exerciseNotes': exerciseNotes,
+      'supersetNotes': supersetNotes,
       'exerciseColor': exerciseColor.hexValue,
       'exerciseParameters': exerciseParameters,
       'setTypeLabel': setTypeLabel,

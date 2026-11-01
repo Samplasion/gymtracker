@@ -727,7 +727,16 @@
           "few": "$n exercises changed",
           "many": "$n exercises changed",
           "other": "$n exercises changed"
-        }
+        },
+        "reordered": {
+          "zero": "No exercises reordered",
+          "one": "1 exercise reordered",
+          "two": "$n exercises reordered",
+          "few": "$n exercises reordered",
+          "many": "$n exercises reordered",
+          "other": "$n exercises reordered"
+        },
+        "metadata": "Routine name or notes changed"
       }
     },
     "goodJob": {
@@ -1429,7 +1438,12 @@
       "label": "Unsynced changes",
       "subtitle": "Tap to sync your changes with the cloud."
     },
-    "bodyMeasurements": "Body measurements"
+    "bodyMeasurements": "Body measurements",
+    "trainer": {
+      "heading": "Personal trainer",
+      "title": "My trainer",
+      "subtitle": "Manage your connection, training plans and shared routines."
+    }
   },
   "richText": {
     "highlight": "Highlight"
@@ -2997,7 +3011,8 @@
     "save": "Save",
     "push": "Push notifications",
     "pushDescription": "Requests, interactions, achievements and reports",
-    "pushDisabled": "Push notifications are not configured on this device"
+    "pushDisabled": "Push notifications are not configured on this device",
+    "trainerPlan": "Your trainer published a plan or revision"
   },
   "hydration": {
     "title": "Water",

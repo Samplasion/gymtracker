@@ -609,6 +609,7 @@ class Translations$me$it implements Translations$me$en {
 	@override late final Translations$me$profile$it profile = Translations$me$profile$it._(_root);
 	@override late final Translations$me$sync$it sync = Translations$me$sync$it._(_root);
 	@override String get bodyMeasurements => 'Misurazioni corporee';
+	@override late final Translations$me$trainer$it trainer = Translations$me$trainer$it._(_root);
 }
 
 // Path: richText
@@ -1793,6 +1794,7 @@ class Translations$social$it implements Translations$social$en {
 	@override String get push => 'Notifiche push';
 	@override String get pushDescription => 'Richieste, interazioni, achievement e segnalazioni';
 	@override String get pushDisabled => 'Push non configurate su questo dispositivo';
+	@override String get trainerPlan => 'Il tuo trainer ha pubblicato una scheda o una revisione';
 }
 
 // Path: hydration
@@ -2936,6 +2938,18 @@ class Translations$me$sync$it implements Translations$me$sync$en {
 	// Translations
 	@override String get label => 'Modifiche non salvate';
 	@override String get subtitle => 'Tocca per sincronizzare le modifiche con il cloud.';
+}
+
+// Path: me.trainer
+class Translations$me$trainer$it implements Translations$me$trainer$en {
+	Translations$me$trainer$it._(this._root);
+
+	final TranslationsIt _root; // ignore: unused_field
+
+	// Translations
+	@override String get heading => 'Personal trainer';
+	@override String get title => 'Il mio trainer';
+	@override String get subtitle => 'Gestisci il collegamento, le schede e le routine condivise.';
 }
 
 // Path: timeSeriesChart.noData
@@ -4846,6 +4860,15 @@ class Translations$ongoingWorkout$updateRoutine$differences$it implements Transl
 		many: '${n} esercizi modificati',
 		other: '${n} esercizi modificati',
 	);
+	@override String reordered({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('it'))(n,
+		zero: 'Nessun esercizio riordinato',
+		one: '1 esercizio riordinato',
+		two: '${n} esercizi riordinati',
+		few: '${n} esercizi riordinati',
+		many: '${n} esercizi riordinati',
+		other: '${n} esercizi riordinati',
+	);
+	@override String get metadata => 'Nome o note della routine modificati';
 }
 
 // Path: ongoingWorkout.exercisesToSuperset.errors
@@ -7411,6 +7434,8 @@ extension on TranslationsIt {
 			'ongoingWorkout.updateRoutine.differences.added' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('it'))(n, zero: 'Nessun esercizio aggiunto', one: '1 esercizio aggiunto', two: '${n} esercizi aggiunti', few: '${n} esercizi aggiunti', many: '${n} esercizi aggiunti', other: '${n} esercizi aggiunti', ), 
 			'ongoingWorkout.updateRoutine.differences.removed' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('it'))(n, zero: 'Nessun esercizio rimosso', one: '1 esercizio rimosso', two: '${n} esercizi rimossi', few: '${n} esercizi rimossi', many: '${n} esercizi rimossi', other: '${n} esercizi rimossi', ), 
 			'ongoingWorkout.updateRoutine.differences.changed' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('it'))(n, zero: 'Nessun esercizio modificato', one: '1 esercizio modificato', two: '${n} esercizi modificati', few: '${n} esercizi modificati', many: '${n} esercizi modificati', other: '${n} esercizi modificati', ), 
+			'ongoingWorkout.updateRoutine.differences.reordered' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('it'))(n, zero: 'Nessun esercizio riordinato', one: '1 esercizio riordinato', two: '${n} esercizi riordinati', few: '${n} esercizi riordinati', many: '${n} esercizi riordinati', other: '${n} esercizi riordinati', ),
+			'ongoingWorkout.updateRoutine.differences.metadata' => 'Nome o note della routine modificati',
 			'ongoingWorkout.goodJob.title' => 'Ottimo lavoro!',
 			'ongoingWorkout.goodJob.body' => 'Ecco delle statistiche sull\'allenamento appena terminato.',
 			'ongoingWorkout.exercisesToSuperset.title' => 'Crea nuova superserie',
@@ -7565,10 +7590,10 @@ extension on TranslationsIt {
 			'library.chest.exercises.inclineBenchFlys' => 'Croci su panca inclinata',
 			'library.chest.exercises.benchFlys' => 'Croci su panca piana',
 			'library.biceps.name' => 'Bicipiti',
-			'library.biceps.exercises.behindBodyCableCurl' => 'Curl al cavo con braccio dietro al busto',
-			'library.biceps.exercises.ropeHammerCurl' => 'Hammer curl con corda al cavo',
 			_ => null,
 		} ?? switch (path) {
+			'library.biceps.exercises.behindBodyCableCurl' => 'Curl al cavo con braccio dietro al busto',
+			'library.biceps.exercises.ropeHammerCurl' => 'Hammer curl con corda al cavo',
 			'library.biceps.exercises.inclineDumbbellCurl' => 'Curl su panca inclinata (manubri)',
 			'library.biceps.exercises.barbellBicepsCurl' => 'Bicep curl (bilanciere)',
 			'library.biceps.exercises.spiderCurls' => 'Spider curl',
@@ -7817,6 +7842,9 @@ extension on TranslationsIt {
 			'me.sync.label' => 'Modifiche non salvate',
 			'me.sync.subtitle' => 'Tocca per sincronizzare le modifiche con il cloud.',
 			'me.bodyMeasurements' => 'Misurazioni corporee',
+			'me.trainer.heading' => 'Personal trainer',
+			'me.trainer.title' => 'Il mio trainer',
+			'me.trainer.subtitle' => 'Gestisci il collegamento, le schede e le routine condivise.',
 			'richText.highlight' => 'Evidenzia',
 			'errorView.shortTitle' => 'Errore',
 			'errorView.title' => 'Oh cavolo!',
@@ -8076,13 +8104,13 @@ extension on TranslationsIt {
 			'food.languages.ch' => 'Chamorro',
 			'food.languages.co' => 'Corso',
 			'food.languages.cr' => 'Cree',
+			_ => null,
+		} ?? switch (path) {
 			'food.languages.cs' => 'Ceco',
 			'food.languages.cu' => 'Slavo ecclesiastico',
 			'food.languages.cv' => 'Chuvash',
 			'food.languages.cy' => 'Gallese',
 			'food.languages.da' => 'Danese',
-			_ => null,
-		} ?? switch (path) {
 			'food.languages.de' => 'Tedesco',
 			'food.languages.dv' => 'Maldiviano',
 			'food.languages.dz' => 'Dzongkha',
@@ -8590,13 +8618,13 @@ extension on TranslationsIt {
 			'food.recipes.perServing' => 'Per porzione',
 			'food.recipes.save' => 'Salva',
 			'food.recipes.delete' => 'Elimina',
+			_ => null,
+		} ?? switch (path) {
 			'food.recipes.deletePrompt' => 'Eliminare questa ricetta? I pasti già registrati resteranno invariati.',
 			'food.recipes.cancel' => 'Annulla',
 			'food.recipes.confirm' => 'Conferma',
 			'food.recipes.add' => 'Aggiungi al diario',
 			'food.recipes.choose' => 'Ricetta',
-			_ => null,
-		} ?? switch (path) {
 			'food.recipes.grams' => 'Grammi',
 			'food.recipes.portions' => 'Porzioni',
 			'food.recipes.equivalentMass' => 'Peso equivalente (g, facoltativo)',
@@ -8935,6 +8963,7 @@ extension on TranslationsIt {
 			'social.push' => 'Notifiche push',
 			'social.pushDescription' => 'Richieste, interazioni, achievement e segnalazioni',
 			'social.pushDisabled' => 'Push non configurate su questo dispositivo',
+			'social.trainerPlan' => 'Il tuo trainer ha pubblicato una scheda o una revisione',
 			'hydration.title' => 'Acqua',
 			'hydration.drinking' => 'Acqua bevuta',
 			'hydration.food' => 'Dagli alimenti',

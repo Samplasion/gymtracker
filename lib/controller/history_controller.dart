@@ -1,3 +1,4 @@
+import 'package:gymtracker/db/database.dart';
 import 'dart:async';
 
 import 'package:flutter/foundation.dart';
@@ -124,6 +125,8 @@ class HistoryController {
   }
 
   void setParentID(Workout workout, {String? newParentID}) {
+    if (service.db.cachedTrainerState.controls.contains(workout.parentID))
+      return;
     if (service.hasHistoryWorkout(workout.id)) {
       service.setHistoryWorkout(workout.copyWith(parentID: newParentID));
     }
@@ -354,6 +357,12 @@ class HistoryController {
     required List<Workout> workouts,
     required Workout combined,
   }) {
+    final controlled = workouts.where(
+      (w) => service.db.cachedTrainerState.controls.contains(w.parentID),
+    );
+    if (controlled.isNotEmpty &&
+        workouts.any((w) => w.parentID != controlled.first.parentID))
+      return;
     service.transaction(() async {
       for (final workout in workouts) {
         await deleteWorkout(workout);

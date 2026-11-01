@@ -1,3 +1,4 @@
+import 'package:gymtracker/provider/trainer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_quill/flutter_quill.dart';
@@ -952,23 +953,27 @@ class _WorkoutFinishEditingPageState
                               return null;
                             },
                           ),
-                        DateField(
-                          decoration: _decoration(
-                            context
-                                .t
-                                .historyEditor
-                                .finish
-                                .fields
-                                .startingTime
-                                .label,
+                        if (!trainerControls(ref, widget.workout.parentID))
+                          DateField(
+                            decoration: _decoration(
+                              context
+                                  .t
+                                  .historyEditor
+                                  .finish
+                                  .fields
+                                  .startingTime
+                                  .label,
+                            ),
+                            date: startingDate,
+                            onSelect: (date) =>
+                                setState(() => startingDate = date),
+                            firstDate: DateTime.fromMillisecondsSinceEpoch(0),
+                            lastDate: DateTime.now().add(
+                              const Duration(days: 7),
+                            ),
                           ),
-                          date: startingDate,
-                          onSelect: (date) =>
-                              setState(() => startingDate = date),
-                          firstDate: DateTime.fromMillisecondsSinceEpoch(0),
-                          lastDate: DateTime.now().add(const Duration(days: 7)),
-                        ),
-                        if (!widget.workout.isContinuation)
+                        if (!widget.workout.isContinuation &&
+                            !trainerControls(ref, widget.workout.parentID))
                           RoutineFormPicker(
                             key: ValueKey(parentWorkoutID),
                             decoration: _decoration(

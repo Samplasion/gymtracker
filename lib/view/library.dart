@@ -1,3 +1,4 @@
+import 'package:gymtracker/provider/trainer.dart';
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
@@ -455,6 +456,7 @@ class _ExerciseInfoViewState extends ConsumerState<ExerciseInfoView>
                       key: const Key("menu"),
                       itemBuilder: (_) => [
                         PopupMenuItem(
+                          enabled: !trainerProtectsExercise(ref, exercise.id),
                           child: Text(context.t.actions.edit),
                           onTap: () async {
                             final newExercise = await ref
@@ -479,6 +481,8 @@ class _ExerciseInfoViewState extends ConsumerState<ExerciseInfoView>
                               ),
                             ),
                             onTap: () async {
+                              if (trainerProtectsExercise(ref, exercise.id))
+                                return;
                               final delete = await Go.confirm(
                                 "exercise.delete.title",
                                 "exercise.delete.body",

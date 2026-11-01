@@ -1,3 +1,4 @@
+import 'package:gymtracker/db/database.dart';
 import 'package:gymtracker/controller/exercises_controller.dart';
 import 'package:gymtracker/controller/workout_controller.dart';
 import 'package:gymtracker/model/exercise.dart';
@@ -11,6 +12,8 @@ extension ExercisesPresentation on ExercisesController {
     Exercise exercise,
     List<(Exercise, int, Workout)> history,
   ) async {
+    if (service.db.cachedTrainerState.protectedExercises.contains(exercise.id))
+      return null;
     if (ref.read(workoutControllerProvider) != null &&
         ref.read(workoutControllerProvider.notifier).hasExercise(exercise)) {
       final shouldOverwrite = await Go.confirm(

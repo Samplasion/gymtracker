@@ -17,6 +17,7 @@ import 'package:gymtracker/service/logger.dart';
 import 'package:gymtracker/service/online.dart';
 import 'package:gymtracker/service/push.dart';
 import 'package:gymtracker/service/test.dart';
+import 'package:gymtracker/service/trainer.dart';
 import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/utils/utils.dart' show isNetworkError;
 import 'package:gymtracker/view/utils/sync_recovery.dart';
@@ -62,10 +63,13 @@ class GBSyncManager extends SyncManager<GTDatabase> {
     super.useProtocolV2,
     super.syncInterval,
     this.drainCheckInterval = const Duration(milliseconds: 100),
+    this.refreshTrainer,
     super.syncTimestampStorage,
     super.otherDevicesConsideredInactiveAfter,
     super.maxRows,
   });
+
+  final Future<void> Function(bool synced)? refreshTrainer;
 
   bool get isSyncingTables => isSyncing;
   bool get isSyncingAny =>
@@ -119,7 +123,9 @@ class GBSyncManager extends SyncManager<GTDatabase> {
   @override
   Future<void> syncTables() async {
     try {
+      await refreshTrainer?.call(false);
       await super.syncTables();
+      await refreshTrainer?.call(lastResult?.completed ?? false);
     } catch (e) {
       if (useProtocolV2 || !isNetworkError(e)) rethrow;
       logger.i('Sync deferred: $e');
@@ -183,8 +189,9 @@ class Online extends _$Online {
 
   Future<SyncResult> synchronize() async {
     final owner = state.value?.id ?? '';
-    if (!syncManager.syncingEnabled)
+    if (!syncManager.syncingEnabled) {
       return SyncResult(SyncOutcome.disabled, userId: owner, cycleId: '');
+    }
     try {
       await syncManager.retryPending();
     } catch (e) {
@@ -198,6 +205,27 @@ class Online extends _$Online {
     }
     return syncManager.lastResult ??
         SyncResult(SyncOutcome.cancelled, userId: owner, cycleId: '');
+  }
+
+  /// Drain a cycle whose remote horizon may predate a trainer acceptance before
+  /// requesting the pull that must include the imported plan.
+  Future<SyncResult> synchronizeFresh() async {
+    final owner = state.value?.id ?? '';
+    try {
+      await syncManager.waitForAllTables();
+    } catch (error) {
+      return SyncResult(
+        SyncOutcome.timeout,
+        userId: owner,
+        cycleId: '',
+        error: error,
+      );
+    }
+    if (state.value?.id != owner ||
+        _databaseService.db.currentUserId != owner) {
+      return SyncResult(SyncOutcome.cancelled, userId: owner, cycleId: '');
+    }
+    return synchronize();
   }
 
   Future<bool> sync() async {
@@ -444,6 +472,12 @@ class Online extends _$Online {
     _prefs = await SharedPreferences.getInstance();
     if (!ref.mounted) return;
     _syncManager = GBSyncManager(
+      refreshTrainer: TestService().isTest
+          ? null
+          : (synced) => TrainerService(
+              _databaseService.db,
+              Supabase.instance.client,
+            ).refreshIfAvailable(synced: synced),
       localDatabase: _databaseService.db,
       supabaseClient: Supabase.instance.client,
       eventBus: ref.read(eventBusProvider),

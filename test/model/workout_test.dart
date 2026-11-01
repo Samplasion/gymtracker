@@ -305,7 +305,8 @@ void main() {
               const WorkoutDifference.raw(
                 addedExercises: 0,
                 removedExercises: 0,
-                changedExercises: 2,
+                changedExercises: 0,
+                reorderedExercises: 2,
               ),
             );
           });
@@ -381,9 +382,9 @@ void main() {
             newWorkout: workout2,
           ),
           const WorkoutDifference.raw(
-            addedExercises: 0,
-            removedExercises: 0,
-            changedExercises: 1,
+            addedExercises: 1,
+            removedExercises: 1,
+            changedExercises: 0,
           ),
         );
 
@@ -466,7 +467,7 @@ void main() {
           const WorkoutDifference.raw(
             addedExercises: 1,
             removedExercises: 0,
-            changedExercises: 2,
+            changedExercises: 0,
           ),
         );
       });

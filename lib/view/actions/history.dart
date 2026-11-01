@@ -1,3 +1,4 @@
+import 'package:gymtracker/db/database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:gymtracker/controller/history_controller.dart';
@@ -139,6 +140,10 @@ extension HistoryPresentation on HistoryController {
           : getContinuation(incompleteWorkout: workout)!.infobox,
     );
 
+    if ((await service.db.isTrainerRoutine(w1.parentID) ||
+            await service.db.isTrainerRoutine(w2.parentID)) &&
+        w1.parentID != w2.parentID)
+      return;
     final shouldCombine = await Go.confirm(
       "exercise.continuation.combine.confirm.title",
       "exercise.continuation.combine.confirm.body",

@@ -287,7 +287,13 @@ class Workout {
     'folder': folder?.toJson(),
   };
 
-  Map<String, dynamic> shareWorkout() => {...toJson(), 'folder': null};
+  Map<String, dynamic> shareWorkout() => {
+    ...toJson(),
+    'folder': null,
+    'parentID': null,
+    'completedBy': null,
+    'completes': null,
+  };
 
   @override
   String toString() {
@@ -307,6 +313,9 @@ class Workout {
       duration: null,
       startingDate: null,
       id: newRoutineID,
+      parentID: null,
+      completedBy: null,
+      completes: null,
       exercises: [
         for (final exercise in exercises)
           exercise.map(
@@ -647,15 +656,25 @@ class SynthesizedWorkout implements Workout {
 
 class WorkoutDifference {
   final int addedExercises, removedExercises, changedExercises;
+  final int reorderedExercises;
+  final bool metadataChanged;
+  final List<String> changedExerciseIds;
 
-  bool get isEmpty =>
-      addedExercises == 0 && removedExercises == 0 && changedExercises == 0;
+  bool get hasExerciseChanges =>
+      addedExercises != 0 ||
+      removedExercises != 0 ||
+      changedExercises != 0 ||
+      reorderedExercises != 0;
+  bool get isEmpty => !hasExerciseChanges && !metadataChanged;
 
   @visibleForTesting
   const WorkoutDifference.raw({
     required this.addedExercises,
     required this.removedExercises,
     required this.changedExercises,
+    this.reorderedExercises = 0,
+    this.metadataChanged = false,
+    this.changedExerciseIds = const [],
   });
 
   factory WorkoutDifference.fromWorkouts({
@@ -666,12 +685,45 @@ class WorkoutDifference {
     final newExercises = newWorkout.exercises;
 
     int changedExercises = 0;
-
-    for (int i = 0; i < min(oldExercises.length, newExercises.length); i++) {
-      final oldCandidate = oldExercises[i];
-      final newCandidate = newExercises[i];
-
+    final changedIds = <String>[];
+    String identity(WorkoutExercisable e) => e.supersedesID ?? e.id;
+    final oldById = {for (final e in oldExercises) identity(e): e};
+    final newById = {for (final e in newExercises) identity(e): e};
+    final matches = newExercises
+        .where((e) => oldById.containsKey(identity(e)))
+        .toList();
+    final oldOrder = oldExercises
+        .where((e) => newById.containsKey(identity(e)))
+        .map(identity)
+        .toList();
+    final newOrder = matches.map(identity).toList();
+    final reordered = List.generate(
+      oldOrder.length,
+      (i) => i,
+    ).where((i) => oldOrder[i] != newOrder[i]).length;
+    final pairs = [for (final e in matches) (oldById[identity(e)]!, e)];
+    for (final (oldCandidate, newCandidate) in pairs) {
       bool isDifferent = false;
+      if (oldCandidate is Superset && newCandidate is Superset) {
+        final oldMembers = oldCandidate.exercises;
+        final newMembers = newCandidate.exercises;
+        for (var j = 0; j < min(oldMembers.length, newMembers.length); j++) {
+          isDifferent |=
+              oldMembers[j].id !=
+              (newMembers[j].supersedesID ?? newMembers[j].id);
+          isDifferent |= oldMembers[j].parentID != newMembers[j].parentID;
+          isDifferent |= oldMembers[j].name != newMembers[j].name;
+          isDifferent |= oldMembers[j].notes != newMembers[j].notes;
+          isDifferent |= oldMembers[j].restTime != newMembers[j].restTime;
+          isDifferent |= oldMembers[j].parameters != newMembers[j].parameters;
+        }
+      }
+      if (oldCandidate is Exercise && newCandidate is Exercise) {
+        isDifferent |= oldCandidate.parentID != newCandidate.parentID;
+        isDifferent |= oldCandidate.name != newCandidate.name;
+        isDifferent |= oldCandidate.parameters != newCandidate.parameters;
+        isDifferent |= oldCandidate.equipment != newCandidate.equipment;
+      }
       isDifferent |= oldCandidate.notes != newCandidate.notes;
       isDifferent |= oldCandidate.restTime != newCandidate.restTime;
       isDifferent |= oldCandidate.sets.length != newCandidate.sets.length;
@@ -716,16 +768,28 @@ class WorkoutDifference {
         );
       }
 
-      if (isDifferent) changedExercises++;
+      if (isDifferent) {
+        changedExercises++;
+        changedIds.add(newCandidate.id);
+      }
     }
 
-    final addedExercises = max(0, newExercises.length - oldExercises.length);
-    final removedExercises = max(0, oldExercises.length - newExercises.length);
+    final addedExercises = newById.keys
+        .where((id) => !oldById.containsKey(id))
+        .length;
+    final removedExercises = oldById.keys
+        .where((id) => !newById.containsKey(id))
+        .length;
 
     return WorkoutDifference.raw(
       addedExercises: addedExercises,
       removedExercises: removedExercises,
       changedExercises: changedExercises,
+      reorderedExercises: reordered,
+      metadataChanged:
+          oldWorkout.name != newWorkout.name ||
+          oldWorkout.infobox != newWorkout.infobox,
+      changedExerciseIds: List.unmodifiable(changedIds),
     );
   }
 
@@ -741,14 +805,18 @@ class WorkoutDifference {
     return other is WorkoutDifference &&
         other.addedExercises == addedExercises &&
         other.removedExercises == removedExercises &&
-        other.changedExercises == changedExercises;
+        other.changedExercises == changedExercises &&
+        other.reorderedExercises == reorderedExercises &&
+        other.metadataChanged == metadataChanged;
   }
 
   @override
   int get hashCode =>
       addedExercises.hashCode ^
       removedExercises.hashCode ^
-      changedExercises.hashCode;
+      changedExercises.hashCode ^
+      reorderedExercises.hashCode ^
+      metadataChanged.hashCode;
 }
 
 bool linearExercisesUseNewAlgorithm(Workout base, Workout cont) {

@@ -23,11 +23,13 @@ import 'package:gymtracker/utils/utils.dart';
 import 'package:gymtracker/view/achievements.dart';
 import 'package:gymtracker/view/charts/density_calendar_chart.dart';
 import 'package:gymtracker/view/charts/weight_chart.dart';
+import 'package:gymtracker/view/components/section_card.dart';
 import 'package:gymtracker/view/history.dart';
 import 'package:gymtracker/view/me/calendar.dart';
 import 'package:gymtracker/view/me/statistics.dart';
 import 'package:gymtracker/view/progress_reports.dart';
 import 'package:gymtracker/view/skeleton.dart';
+import 'package:gymtracker/view/trainer.dart';
 import 'package:gymtracker/view/utils/crossfade.dart';
 import 'package:gymtracker/view/utils/date_field.dart';
 import 'package:gymtracker/view/utils/input_decoration.dart';
@@ -214,6 +216,28 @@ class MeView extends ConsumerWidget {
                     },
                   ),
                 ),
+                if (ref.watch(currentUserIdProvider) != null)
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 24, 16, 16),
+                    child: SafeArea(
+                      top: false,
+                      bottom: false,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          SectionTitle(context.t.me.trainer.heading),
+                          const SizedBox(height: 12),
+                          GTSectionCard(
+                            icon: Icons.sports_rounded,
+                            title: context.t.me.trainer.title,
+                            subtitle: context.t.me.trainer.subtitle,
+                            trailing: const Icon(Icons.chevron_right_rounded),
+                            onTap: () => Go.to(() => const TrainerView()),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
               ]),
             ),
           ),

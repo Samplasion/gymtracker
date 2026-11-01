@@ -1,3 +1,4 @@
+import 'package:gymtracker/db/database.dart';
 import 'package:collection/collection.dart';
 import 'package:fuzzywuzzy/fuzzywuzzy.dart';
 import 'package:gymtracker/controller/history_controller.dart';
@@ -100,6 +101,8 @@ class ExercisesController {
   }
 
   void deleteExercise(Exercise exercise) {
+    if (service.db.cachedTrainerState.protectedExercises.contains(exercise.id))
+      return;
     service.removeExercise(exercise);
   }
 

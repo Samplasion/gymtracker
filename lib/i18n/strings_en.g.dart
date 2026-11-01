@@ -786,6 +786,8 @@ class Translations$me$en {
 
 	/// en: 'Body measurements'
 	String get bodyMeasurements => 'Body measurements';
+
+	late final Translations$me$trainer$en trainer = Translations$me$trainer$en._(_root);
 }
 
 // Path: richText
@@ -2246,6 +2248,9 @@ class Translations$social$en {
 
 	/// en: 'Push notifications are not configured on this device'
 	String get pushDisabled => 'Push notifications are not configured on this device';
+
+	/// en: 'Your trainer published a plan or revision'
+	String get trainerPlan => 'Your trainer published a plan or revision';
 }
 
 // Path: hydration
@@ -4046,6 +4051,24 @@ class Translations$me$sync$en {
 
 	/// en: 'Tap to sync your changes with the cloud.'
 	String get subtitle => 'Tap to sync your changes with the cloud.';
+}
+
+// Path: me.trainer
+class Translations$me$trainer$en {
+	Translations$me$trainer$en._(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Personal trainer'
+	String get heading => 'Personal trainer';
+
+	/// en: 'My trainer'
+	String get title => 'My trainer';
+
+	/// en: 'Manage your connection, training plans and shared routines.'
+	String get subtitle => 'Manage your connection, training plans and shared routines.';
 }
 
 // Path: timeSeriesChart.noData
@@ -6754,6 +6777,19 @@ class Translations$ongoingWorkout$updateRoutine$differences$en {
 		many: '${n} exercises changed',
 		other: '${n} exercises changed',
 	);
+
+	/// en: '(zero) {No exercises reordered} (one) {1 exercise reordered} (two) {$n exercises reordered} (few) {$n exercises reordered} (many) {$n exercises reordered} (other) {$n exercises reordered}'
+	String reordered({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n,
+		zero: 'No exercises reordered',
+		one: '1 exercise reordered',
+		two: '${n} exercises reordered',
+		few: '${n} exercises reordered',
+		many: '${n} exercises reordered',
+		other: '${n} exercises reordered',
+	);
+
+	/// en: 'Routine name or notes changed'
+	String get metadata => 'Routine name or notes changed';
 }
 
 // Path: ongoingWorkout.exercisesToSuperset.errors
@@ -10338,6 +10374,8 @@ extension on Translations {
 			'ongoingWorkout.updateRoutine.differences.added' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n, zero: 'No exercises added', one: '1 exercise added', two: '${n} exercises added', few: '${n} exercises added', many: '${n} exercises added', other: '${n} exercises added', ), 
 			'ongoingWorkout.updateRoutine.differences.removed' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n, zero: 'No exercises removed', one: '1 exercise removed', two: '${n} exercises removed', few: '${n} exercises removed', many: '${n} exercises removed', other: '${n} exercises removed', ), 
 			'ongoingWorkout.updateRoutine.differences.changed' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n, zero: 'No exercises changed', one: '1 exercise changed', two: '${n} exercises changed', few: '${n} exercises changed', many: '${n} exercises changed', other: '${n} exercises changed', ), 
+			'ongoingWorkout.updateRoutine.differences.reordered' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n, zero: 'No exercises reordered', one: '1 exercise reordered', two: '${n} exercises reordered', few: '${n} exercises reordered', many: '${n} exercises reordered', other: '${n} exercises reordered', ),
+			'ongoingWorkout.updateRoutine.differences.metadata' => 'Routine name or notes changed',
 			'ongoingWorkout.goodJob.title' => 'Good job!',
 			'ongoingWorkout.goodJob.body' => 'Here\'s some statistics about the workout you\'ve just finished.',
 			'ongoingWorkout.exercisesToSuperset.title' => 'Create new superset',
@@ -10492,10 +10530,10 @@ extension on Translations {
 			'library.chest.exercises.inclineBenchFlys' => 'Incline bench flyes',
 			'library.chest.exercises.benchFlys' => 'Bench flyes',
 			'library.biceps.name' => 'Biceps',
-			'library.biceps.exercises.behindBodyCableCurl' => 'Behind-the-body cable curl',
-			'library.biceps.exercises.ropeHammerCurl' => 'Cable rope hammer curl',
 			_ => null,
 		} ?? switch (path) {
+			'library.biceps.exercises.behindBodyCableCurl' => 'Behind-the-body cable curl',
+			'library.biceps.exercises.ropeHammerCurl' => 'Cable rope hammer curl',
 			'library.biceps.exercises.inclineDumbbellCurl' => 'Incline dumbbell curl',
 			'library.biceps.exercises.barbellBicepsCurl' => 'Biceps curl (barbell)',
 			'library.biceps.exercises.spiderCurls' => 'Spider curls',
@@ -10744,6 +10782,9 @@ extension on Translations {
 			'me.sync.label' => 'Unsynced changes',
 			'me.sync.subtitle' => 'Tap to sync your changes with the cloud.',
 			'me.bodyMeasurements' => 'Body measurements',
+			'me.trainer.heading' => 'Personal trainer',
+			'me.trainer.title' => 'My trainer',
+			'me.trainer.subtitle' => 'Manage your connection, training plans and shared routines.',
 			'richText.highlight' => 'Highlight',
 			'errorView.shortTitle' => 'Error',
 			'errorView.title' => 'Oh snap!',
@@ -11003,13 +11044,13 @@ extension on Translations {
 			'food.languages.ch' => 'Chamorro',
 			'food.languages.co' => 'Corsican',
 			'food.languages.cr' => 'Cree',
+			_ => null,
+		} ?? switch (path) {
 			'food.languages.cs' => 'Czech',
 			'food.languages.cu' => 'Church Slavonic',
 			'food.languages.cv' => 'Chuvash',
 			'food.languages.cy' => 'Welsh',
 			'food.languages.da' => 'Danish',
-			_ => null,
-		} ?? switch (path) {
 			'food.languages.de' => 'German',
 			'food.languages.dv' => 'Maldivian',
 			'food.languages.dz' => 'Dzongkha',
@@ -11517,13 +11558,13 @@ extension on Translations {
 			'food.recipes.perServing' => 'Per serving',
 			'food.recipes.save' => 'Save',
 			'food.recipes.delete' => 'Delete',
+			_ => null,
+		} ?? switch (path) {
 			'food.recipes.deletePrompt' => 'Delete this recipe? Previously logged meals will stay unchanged.',
 			'food.recipes.cancel' => 'Cancel',
 			'food.recipes.confirm' => 'Confirm',
 			'food.recipes.add' => 'Add to diary',
 			'food.recipes.choose' => 'Recipe',
-			_ => null,
-		} ?? switch (path) {
 			'food.recipes.grams' => 'Grams',
 			'food.recipes.portions' => 'Servings',
 			'food.recipes.equivalentMass' => 'Equivalent weight (g, optional)',
@@ -11862,6 +11903,7 @@ extension on Translations {
 			'social.push' => 'Push notifications',
 			'social.pushDescription' => 'Requests, interactions, achievements and reports',
 			'social.pushDisabled' => 'Push notifications are not configured on this device',
+			'social.trainerPlan' => 'Your trainer published a plan or revision',
 			'hydration.title' => 'Water',
 			'hydration.drinking' => 'Water drunk',
 			'hydration.food' => 'From foods',

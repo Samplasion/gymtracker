@@ -1,3 +1,4 @@
+import 'package:gymtracker/db/database.dart';
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -228,6 +229,8 @@ extension WorkoutPresentation on WorkoutController {
     required String? expectedOwner,
   }) async {
     if (routinesController.service.db.currentUserId != expectedOwner) return;
+    if (await routinesController.service.db.isTrainerRoutine(workout.parentID))
+      return;
     if (workout.isContinuation) {
       final orig = workout.originalWorkoutForContinuationIn(history.history)!;
       workout = SynthesizedWorkout([
@@ -241,7 +244,7 @@ extension WorkoutPresentation on WorkoutController {
       final routine = routinesController.getRoutine(workout.parentID!);
       final difference = WorkoutDifference.fromWorkouts(
         oldWorkout: routine!,
-        newWorkout: workout,
+        newWorkout: workout.copyWith(name: routine.name),
       );
       if (!difference.isEmpty) {
         final confirm = await Go.confirm(
@@ -262,6 +265,14 @@ extension WorkoutPresentation on WorkoutController {
                   "- ${t.ongoingWorkout.updateRoutine.differences.changed(n: difference.changedExercises)}\n";
             }
 
+            if (difference.reorderedExercises > 0) {
+              text +=
+                  "- ${t.ongoingWorkout.updateRoutine.differences.reordered(n: difference.reorderedExercises)}\n";
+            }
+            if (difference.metadataChanged) {
+              text +=
+                  "- ${t.ongoingWorkout.updateRoutine.differences.metadata}\n";
+            }
             return text.trim();
           }(),
         );

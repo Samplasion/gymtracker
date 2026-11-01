@@ -4,6 +4,7 @@ import 'package:crypto/crypto.dart';
 
 import 'package:drift/drift.dart';
 import 'package:gymtracker/db/database.dart';
+import 'package:gymtracker/model/trainer.dart';
 import 'package:gymtracker/repository/hydration.dart';
 import 'package:syncable/syncable.dart';
 
@@ -118,6 +119,8 @@ class PreparedDatabaseRestore {
     if (db.currentUserId != owner) {
       throw StateError('Account changed before restore');
     }
+    if ((await db.trainerState()).controls.isNotEmpty)
+      throw const TrainerControlledException();
     var newest = DateTime.now().millisecondsSinceEpoch ~/ 1000;
     for (final table in db.allTables) {
       if (table.asDslTable is! SyncableTable) continue;

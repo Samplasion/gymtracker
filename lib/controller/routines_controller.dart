@@ -1,3 +1,4 @@
+import 'package:gymtracker/db/database.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/widgets.dart';
 import 'package:gymtracker/controller/countdown_controller.dart';
@@ -93,6 +94,7 @@ class RoutinesController {
   }
 
   void deleteWorkout(Workout workout) {
+    if (service.db.cachedTrainerState.controls.contains(workout.id)) return;
     service.removeRoutine(workout);
     scheduleBackup();
     ref.read(historyControllerProvider).unbindAllFromParent(workout.id);
@@ -116,6 +118,7 @@ class RoutinesController {
   }
 
   void editRoutine(Workout newRoutine) {
+    if (service.db.cachedTrainerState.controls.contains(newRoutine.id)) return;
     if (service.hasRoutine(newRoutine.id)) {
       service.setRoutine(newRoutine);
       scheduleBackup();
@@ -167,6 +170,10 @@ class RoutinesController {
   }
 
   String importWorkout(Workout workout) {
+    if (service.db.cachedTrainerState.controls.contains(
+      workout.isConcrete ? workout.parentID : workout.id,
+    ))
+      return workout.id;
     final routine = workout.toRoutine();
     logger.d((routine, routine.exercises));
     service.setRoutine(routine);
@@ -183,6 +190,7 @@ class RoutinesController {
   }
 
   Future<void> updateRoutineFromWorkout(String s, Workout workout) async {
+    if (await service.db.isTrainerRoutine(s)) return;
     final oldRoutine = getRoutine(s);
     if (oldRoutine == null) return;
     final newRoutine = workout
@@ -240,6 +248,7 @@ class RoutinesController {
   /// Advances only goals belonging to the saved routine and completed workout.
   Future<void> advanceProgressionsFromWorkout(Workout workout) async {
     final routineID = workout.parentID;
+    if (await service.db.isTrainerRoutine(routineID)) return;
     if (routineID == null) return;
     final db = service.db;
     final owner = db.currentUserId;
@@ -329,6 +338,7 @@ class RoutinesController {
     required ExerciseProgression? progression,
   }) async {
     if (routineID == null || exercise.supersedesID == null) return;
+    if (await service.db.isTrainerRoutine(routineID)) return;
     final routine = getRoutine(routineID);
     if (routine == null) return;
     Exercise update(Exercise planned) => planned.id == exercise.supersedesID
@@ -376,12 +386,14 @@ class RoutinesController {
   }
 
   void moveToFolder(Workout data, GTRoutineFolder folder) {
+    if (service.db.cachedTrainerState.controls.contains(data.id)) return;
     final routine = data.copyWith(folder: folder);
     service.setRoutine(routine);
     scheduleBackup();
   }
 
   void moveToRoot(Workout data) {
+    if (service.db.cachedTrainerState.controls.contains(data.id)) return;
     if (data.folder == null) return;
 
     final routine = data.copyWith(folder: null);
@@ -392,29 +404,32 @@ class RoutinesController {
   void replaceExercise(Exercise from, Exercise to) {
     service.setAllRoutines([
       for (final routine in service.routines)
-        routine.copyWith(
-          exercises: [
-            for (final ex in routine.exercises)
-              ex.map(
-                exercise: (ex) {
-                  if (from.isTheSameAs(ex)) {
-                    return Exercise.replaced(from: ex, to: to.makeChild());
-                  } else {
-                    return ex;
-                  }
-                },
-                superset: (ss) => ss.copyWith(
-                  exercises: [
-                    for (final ex in ss.exercises)
-                      if (from.isTheSameAs(ex))
-                        Exercise.replaced(from: ex, to: to.makeChild())
-                      else
-                        ex,
-                  ],
+        if (service.db.cachedTrainerState.controls.contains(routine.id))
+          routine
+        else
+          routine.copyWith(
+            exercises: [
+              for (final ex in routine.exercises)
+                ex.map(
+                  exercise: (ex) {
+                    if (from.isTheSameAs(ex)) {
+                      return Exercise.replaced(from: ex, to: to.makeChild());
+                    } else {
+                      return ex;
+                    }
+                  },
+                  superset: (ss) => ss.copyWith(
+                    exercises: [
+                      for (final ex in ss.exercises)
+                        if (from.isTheSameAs(ex))
+                          Exercise.replaced(from: ex, to: to.makeChild())
+                        else
+                          ex,
+                    ],
+                  ),
                 ),
-              ),
-          ],
-        ),
+            ],
+          ),
     ]);
     scheduleBackup();
   }
@@ -422,45 +437,48 @@ class RoutinesController {
   void removeWeightFromExercise(Exercise exercise) {
     service.setAllRoutines([
       for (final routine in service.routines)
-        routine.copyWith(
-          exercises: [
-            for (final ex in routine.exercises)
-              ex.map(
-                exercise: (ex) {
-                  if (exercise.isTheSameAs(ex)) {
-                    return ex.copyWith(
-                      parameters: GTSetParameters.freeBodyReps,
-                      sets: [
-                        for (final set in ex.sets)
-                          set.copyWith(
+        if (service.db.cachedTrainerState.controls.contains(routine.id))
+          routine
+        else
+          routine.copyWith(
+            exercises: [
+              for (final ex in routine.exercises)
+                ex.map(
+                  exercise: (ex) {
+                    if (exercise.isTheSameAs(ex)) {
+                      return ex.copyWith(
+                        parameters: GTSetParameters.freeBodyReps,
+                        sets: [
+                          for (final set in ex.sets)
+                            set.copyWith(
+                              parameters: GTSetParameters.freeBodyReps,
+                            ),
+                        ],
+                      );
+                    } else {
+                      return ex;
+                    }
+                  },
+                  superset: (ss) => ss.copyWith(
+                    exercises: [
+                      for (final ex in ss.exercises)
+                        if (exercise.isTheSameAs(ex))
+                          ex.copyWith(
                             parameters: GTSetParameters.freeBodyReps,
-                          ),
-                      ],
-                    );
-                  } else {
-                    return ex;
-                  }
-                },
-                superset: (ss) => ss.copyWith(
-                  exercises: [
-                    for (final ex in ss.exercises)
-                      if (exercise.isTheSameAs(ex))
-                        ex.copyWith(
-                          parameters: GTSetParameters.freeBodyReps,
-                          sets: [
-                            for (final set in ex.sets)
-                              set.copyWith(
-                                parameters: GTSetParameters.freeBodyReps,
-                              ),
-                          ],
-                        )
-                      else
-                        ex,
-                  ],
+                            sets: [
+                              for (final set in ex.sets)
+                                set.copyWith(
+                                  parameters: GTSetParameters.freeBodyReps,
+                                ),
+                            ],
+                          )
+                        else
+                          ex,
+                    ],
+                  ),
                 ),
-              ),
-          ],
-        ),
+            ],
+          ),
     ]);
     scheduleBackup();
   }
@@ -475,39 +493,42 @@ class RoutinesController {
   void applyWeightMultiplier(Exercise exercise, double multiplier) {
     service.setAllRoutines([
       for (final routine in service.routines)
-        routine.copyWith(
-          exercises: [
-            for (final ex in routine.exercises)
-              ex.map(
-                exercise: (ex) {
-                  if (exercise.isTheSameAs(ex)) {
-                    return ex.copyWith(
-                      sets: [
-                        for (final set in ex.sets)
-                          set.copyWith(weight: set.weight! * multiplier),
-                      ],
-                    );
-                  } else {
-                    return ex;
-                  }
-                },
-                superset: (ss) => ss.copyWith(
-                  exercises: [
-                    for (final ex in ss.exercises)
-                      if (exercise.isTheSameAs(ex))
-                        ex.copyWith(
-                          sets: [
-                            for (final set in ex.sets)
-                              set.copyWith(weight: set.weight! * multiplier),
-                          ],
-                        )
-                      else
-                        ex,
-                  ],
+        if (service.db.cachedTrainerState.controls.contains(routine.id))
+          routine
+        else
+          routine.copyWith(
+            exercises: [
+              for (final ex in routine.exercises)
+                ex.map(
+                  exercise: (ex) {
+                    if (exercise.isTheSameAs(ex)) {
+                      return ex.copyWith(
+                        sets: [
+                          for (final set in ex.sets)
+                            set.copyWith(weight: set.weight! * multiplier),
+                        ],
+                      );
+                    } else {
+                      return ex;
+                    }
+                  },
+                  superset: (ss) => ss.copyWith(
+                    exercises: [
+                      for (final ex in ss.exercises)
+                        if (exercise.isTheSameAs(ex))
+                          ex.copyWith(
+                            sets: [
+                              for (final set in ex.sets)
+                                set.copyWith(weight: set.weight! * multiplier),
+                            ],
+                          )
+                        else
+                          ex,
+                    ],
+                  ),
                 ),
-              ),
-          ],
-        ),
+            ],
+          ),
     ]);
     scheduleBackup();
   }

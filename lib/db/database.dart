@@ -24,6 +24,8 @@ import 'package:gymtracker/db/model/tables/recipes.dart';
 import 'package:gymtracker/db/model/tables/routines.dart';
 import 'package:gymtracker/db/model/tables/set.dart';
 import 'package:gymtracker/db/model/tables/sync.dart';
+import 'package:gymtracker/db/model/tables/trainer.dart';
+import 'package:gymtracker/model/trainer.dart';
 import 'package:gymtracker/db/model/tables/water_logs.dart';
 import 'package:gymtracker/db/schema_versions.dart';
 import 'package:gymtracker/db/utils.dart';
@@ -61,7 +63,7 @@ part 'database.g.dart';
 // Used in the generated code
 const _uuid = Uuid();
 
-const DATABASE_VERSION = 24;
+const DATABASE_VERSION = 25;
 
 abstract class GTDatabase extends GeneratedDatabase with SyncableDatabase {
   GTDatabase(super.e);
@@ -204,8 +206,75 @@ abstract class GTDatabase extends GeneratedDatabase with SyncableDatabase {
   Future<void> close();
 }
 
+class _TrainerSnapshot {
+  final String owner;
+  final TrainerState state;
+  _TrainerSnapshot(this.owner, this.state);
+}
+
+final _trainerSnapshots = Expando<_TrainerSnapshot>();
+
+extension TrainerDatabase on GTDatabase {
+  TrainerState get cachedTrainerState {
+    final entry = _trainerSnapshots[this];
+    return entry != null && entry.owner == currentUserId
+        ? entry.state
+        : TrainerState.empty;
+  }
+
+  Future<TrainerState> trainerState() async {
+    final owner = currentUserId;
+    if (owner == null) return TrainerState.empty;
+    final row = await customSelect(
+      'SELECT payload FROM trainer_caches WHERE owner = ?',
+      variables: [Variable(owner)],
+    ).getSingleOrNull();
+    if (row == null) {
+      _trainerSnapshots[this] = _TrainerSnapshot(owner, TrainerState.empty);
+      return TrainerState.empty;
+    }
+    final result = TrainerState.fromJson(
+      jsonDecode(row.read<String>('payload')) as Map<String, dynamic>,
+    );
+    if (currentUserId == owner) {
+      _trainerSnapshots[this] = _TrainerSnapshot(owner, result);
+    }
+    return result;
+  }
+
+  Future<void> cacheTrainerState(
+    String owner,
+    Map<String, dynamic> payload,
+  ) async {
+    if (currentUserId != owner) return;
+    await customStatement(
+      'INSERT INTO trainer_caches(owner,payload,checked_at) VALUES(?,?,?) ON CONFLICT(owner) DO UPDATE SET payload=excluded.payload,checked_at=excluded.checked_at',
+      [
+        owner,
+        jsonEncode(payload),
+        DateTime.now().millisecondsSinceEpoch ~/ 1000,
+      ],
+    );
+    _trainerSnapshots[this] = _TrainerSnapshot(
+      owner,
+      TrainerState.fromJson(payload),
+    );
+    notifyUpdates({
+      const TableUpdate('trainer_caches', kind: UpdateKind.update),
+    });
+  }
+
+  Future<bool> isTrainerRoutine(String? id) async =>
+      id != null && (await trainerState()).controls.contains(id);
+
+  Future<void> requirePersonalRoutine(String? id) async {
+    if (await isTrainerRoutine(id)) throw const TrainerControlledException();
+  }
+}
+
 @DriftDatabase(
   tables: [
+    TrainerCaches,
     CustomExercises,
     HistoryWorkouts,
     HistoryWorkoutExercises,
@@ -263,6 +332,9 @@ class GTDatabaseImpl extends _$GTDatabaseImpl
         from: from,
         to: to,
         steps: migrationSteps(
+          from24To25: (m, schema) async {
+            await m.createTable(schema.trainerCaches);
+          },
           from2To3: (m, schema) async {
             await m.addColumn(
               schema.routineExercises,
@@ -775,6 +847,7 @@ class GTDatabaseImpl extends _$GTDatabaseImpl
 
   @override
   Future<void> insertRoutine(model.Workout routine) async {
+    await requirePersonalRoutine(routine.id);
     final userId = currentUserId;
     final newSortOrder =
         (await (select(routines)..where(
@@ -801,6 +874,7 @@ class GTDatabaseImpl extends _$GTDatabaseImpl
 
   @override
   Future<void> deleteRoutine(String id) async {
+    await requirePersonalRoutine(id);
     final userId = currentUserId;
     final now = DateTime.now().toUtc();
     final remainingIDs =
@@ -847,6 +921,7 @@ class GTDatabaseImpl extends _$GTDatabaseImpl
 
   @override
   Future<void> updateRoutine(model.Workout routine) async {
+    await requirePersonalRoutine(routine.id);
     final userId = currentUserId;
     final now = DateTime.now().toUtc();
     if (routine.id.isEmpty) {
@@ -953,8 +1028,18 @@ class GTDatabaseImpl extends _$GTDatabaseImpl
   }
 
   @override
-  Future writeAllRoutines(List<model.Workout> routines) {
+  Future writeAllRoutines(List<model.Workout> routines) async {
     final userId = currentUserId;
+    final controls = (await trainerState()).controls;
+    final existing = controls.isEmpty
+        ? <model.Workout>[]
+        : await getAllRoutinesFuture();
+    for (final r in existing.where((r) => controls.contains(r.id))) {
+      final replacement = routines.where((n) => n.id == r.id).firstOrNull;
+      if (replacement == null ||
+          jsonEncode(replacement.toJson()) != jsonEncode(r.toJson()))
+        throw const TrainerControlledException();
+    }
     final now = DateTime.now().toUtc();
     return transaction(() async {
       final oldRoutines =
@@ -992,7 +1077,21 @@ class GTDatabaseImpl extends _$GTDatabaseImpl
   @override
   Future<void> overwriteAllRoutineExercises(
     List<model.WorkoutExercisable> routineExercises,
-  ) => _overwriteAllRoutineExercises(routineExercises, currentUserId);
+  ) async {
+    final controls = (await trainerState()).controls;
+    if (controls.isNotEmpty) {
+      final incoming = {for (final e in routineExercises) e.id: e};
+      for (final r in await getAllRoutinesFuture()) {
+        if (!controls.contains(r.id)) continue;
+        for (final e in r.exercises) {
+          if (!incoming.containsKey(e.id) ||
+              jsonEncode(incoming[e.id]!.toJson()) != jsonEncode(e.toJson()))
+            throw const TrainerControlledException();
+        }
+      }
+    }
+    await _overwriteAllRoutineExercises(routineExercises, currentUserId);
+  }
 
   Future<void> _overwriteAllRoutineExercises(
     List<model.WorkoutExercisable> routineExercises,
@@ -1057,6 +1156,11 @@ class GTDatabaseImpl extends _$GTDatabaseImpl
 
   @override
   Future<void> deleteRoutineFolder(String id) async {
+    final controlled = (await trainerState()).controls;
+    if ((await getAllRoutinesFuture()).any(
+      (r) => r.folder?.id == id && controlled.contains(r.id),
+    ))
+      throw const TrainerControlledException();
     final userId = currentUserId;
     final now = DateTime.now().toUtc();
     final allRoutines =
@@ -1276,6 +1380,18 @@ class GTDatabaseImpl extends _$GTDatabaseImpl
 
   @override
   Future<void> updateHistoryWorkout(model.Workout workout) async {
+    if ((await trainerState()).controls.isNotEmpty) {
+      final existing = await getHistoryWorkout(workout.id);
+      if (await isTrainerRoutine(existing.parentID)) {
+        if (existing.parentID != workout.parentID ||
+            (existing.startingDate == null ||
+                workout.startingDate == null ||
+                !existing.startingDate!.isAtSameMomentAs(
+                  workout.startingDate!,
+                )))
+          throw const TrainerControlledException();
+      }
+    }
     final userId = currentUserId;
     final now = DateTime.now().toUtc();
     final version = _uuid.v4();
@@ -1360,8 +1476,21 @@ class GTDatabaseImpl extends _$GTDatabaseImpl
   }
 
   @override
-  Future writeAllHistoryWorkouts(List<model.Workout> historyWorkouts) {
+  Future writeAllHistoryWorkouts(List<model.Workout> historyWorkouts) async {
     final userId = currentUserId;
+    final controls = (await trainerState()).controls;
+    if (controls.isNotEmpty) {
+      final previous = await getAllHistoryWorkoutsFuture();
+      for (final old in previous.where((w) => controls.contains(w.parentID))) {
+        final next = historyWorkouts.where((w) => w.id == old.id).firstOrNull;
+        if (next != null &&
+            (old.parentID != next.parentID ||
+                old.startingDate == null ||
+                next.startingDate == null ||
+                !old.startingDate!.isAtSameMomentAs(next.startingDate!)))
+          throw const TrainerControlledException();
+      }
+    }
     final publicationVersions = {
       for (final workout in historyWorkouts) workout.id: _uuid.v4(),
     };
@@ -1489,6 +1618,8 @@ class GTDatabaseImpl extends _$GTDatabaseImpl
 
   @override
   Future<void> deleteCustomExercise(String id) async {
+    if ((await trainerState()).protectedExercises.contains(id))
+      throw const TrainerControlledException();
     final userId = currentUserId;
     final now = DateTime.now().toUtc();
     await (update(customExercises)
@@ -1503,6 +1634,8 @@ class GTDatabaseImpl extends _$GTDatabaseImpl
 
   @override
   Future<void> updateCustomExercise(model.Exercise exercise) async {
+    if ((await trainerState()).protectedExercises.contains(exercise.id))
+      throw const TrainerControlledException();
     final userId = currentUserId;
     await (update(customExercises)..where(
           (tbl) => tbl.id.equals(exercise.id) & _ownedBy(tbl.userId, userId),
@@ -1519,6 +1652,14 @@ class GTDatabaseImpl extends _$GTDatabaseImpl
 
   @override
   Future<void> writeAllCustomExercises(exercises) async {
+    final protected = (await trainerState()).protectedExercises;
+    for (final e in await getAllCustomExercises().first) {
+      if (!protected.contains(e.id)) continue;
+      final replacement = exercises.where((n) => n.id == e.id).firstOrNull;
+      if (replacement == null ||
+          jsonEncode(replacement.toJson()) != jsonEncode(e.toJson()))
+        throw const TrainerControlledException();
+    }
     final userId = currentUserId;
     final now = DateTime.now().toUtc();
     return batch((batch) {
@@ -2502,7 +2643,10 @@ class GTDatabaseImpl extends _$GTDatabaseImpl
   Future<void> clearUserData(String? userId) {
     return transaction(() async {
       await deleteOngoingForUser(userId);
+      if (_trainerSnapshots[this]?.owner == userId)
+        _trainerSnapshots[this] = null;
       for (final name in [
+        'trainer_caches',
         'catalog_submissions',
         'sync_outbox',
         'sync_metadata',

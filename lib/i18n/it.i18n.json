@@ -727,7 +727,16 @@
           "few": "$n esercizi modificati",
           "many": "$n esercizi modificati",
           "other": "$n esercizi modificati"
-        }
+        },
+        "reordered": {
+          "zero": "Nessun esercizio riordinato",
+          "one": "1 esercizio riordinato",
+          "two": "$n esercizi riordinati",
+          "few": "$n esercizi riordinati",
+          "many": "$n esercizi riordinati",
+          "other": "$n esercizi riordinati"
+        },
+        "metadata": "Nome o note della routine modificati"
       }
     },
     "goodJob": {
@@ -1429,7 +1438,12 @@
       "label": "Modifiche non salvate",
       "subtitle": "Tocca per sincronizzare le modifiche con il cloud."
     },
-    "bodyMeasurements": "Misurazioni corporee"
+    "bodyMeasurements": "Misurazioni corporee",
+    "trainer": {
+      "heading": "Personal trainer",
+      "title": "Il mio trainer",
+      "subtitle": "Gestisci il collegamento, le schede e le routine condivise."
+    }
   },
   "richText": {
     "highlight": "Evidenzia"
@@ -2997,7 +3011,8 @@
     "save": "Salva",
     "push": "Notifiche push",
     "pushDescription": "Richieste, interazioni, achievement e segnalazioni",
-    "pushDisabled": "Push non configurate su questo dispositivo"
+    "pushDisabled": "Push non configurate su questo dispositivo",
+    "trainerPlan": "Il tuo trainer ha pubblicato una scheda o una revisione"
   },
   "hydration": {
     "title": "Acqua",

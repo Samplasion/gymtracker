@@ -1,3 +1,4 @@
+import 'package:gymtracker/provider/trainer.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
@@ -74,6 +75,11 @@ class _ExercisesViewState extends ConsumerState<ExercisesView> {
   late Workout workout = widget.workout;
 
   void _saveWorkoutAsRoutine(Workout workout) {
+    if (trainerControls(
+      ref,
+      workout.isConcrete ? workout.parentID : workout.id,
+    ))
+      return;
     final id = ref.read(routinesControllerProvider).importWorkout(workout);
     if (workout.parentID == null) {
       ref.read(historyControllerProvider).setParentID(workout, newParentID: id);
@@ -167,8 +173,10 @@ class _ExercisesViewState extends ConsumerState<ExercisesView> {
                   if (workout.isConcrete) ...[
                     PopupMenuItem(
                       key: const Key("save-as-routine"),
-                      enabled: _canStart,
-                      onTap: _canStart
+                      enabled:
+                          _canStart && !trainerControls(ref, workout.parentID),
+                      onTap:
+                          _canStart && !trainerControls(ref, workout.parentID)
                           ? () {
                               if (shouldDisallowSaving) {
                                 SchedulerBinding.instance.addPostFrameCallback((
@@ -301,6 +309,7 @@ class _ExercisesViewState extends ConsumerState<ExercisesView> {
                       },
                     ),
                     PopupMenuItem(
+                      enabled: !trainerControls(ref, workout.id),
                       child: Text(context.t.routines.actions.edit),
                       onTap: () {
                         SchedulerBinding.instance.addPostFrameCallback((
@@ -324,13 +333,13 @@ class _ExercisesViewState extends ConsumerState<ExercisesView> {
                       },
                     ),
                     PopupMenuItem(
-                      textStyle: TextStyle(
-                        color: Theme.of(context).colorScheme.error,
-                      ),
+                      enabled: !trainerControls(ref, workout.id),
                       child: Text(
                         context.t.routines.actions.delete.title,
                         style: TextStyle(
-                          color: Theme.of(context).colorScheme.error,
+                          color: trainerControls(ref, workout.id)
+                              ? Theme.of(context).disabledColor
+                              : Theme.of(context).colorScheme.error,
                         ),
                       ),
                       onTap: () {

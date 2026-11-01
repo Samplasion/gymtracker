@@ -3,6 +3,273 @@
 part of 'database.dart';
 
 // ignore_for_file: type=lint
+class $TrainerCachesTable extends TrainerCaches
+    with TableInfo<$TrainerCachesTable, TrainerCache> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $TrainerCachesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _ownerMeta = const VerificationMeta('owner');
+  @override
+  late final GeneratedColumn<String> owner = GeneratedColumn<String>(
+    'owner',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _payloadMeta = const VerificationMeta(
+    'payload',
+  );
+  @override
+  late final GeneratedColumn<String> payload = GeneratedColumn<String>(
+    'payload',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _checkedAtMeta = const VerificationMeta(
+    'checkedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> checkedAt = GeneratedColumn<DateTime>(
+    'checked_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [owner, payload, checkedAt];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'trainer_caches';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<TrainerCache> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('owner')) {
+      context.handle(
+        _ownerMeta,
+        owner.isAcceptableOrUnknown(data['owner']!, _ownerMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_ownerMeta);
+    }
+    if (data.containsKey('payload')) {
+      context.handle(
+        _payloadMeta,
+        payload.isAcceptableOrUnknown(data['payload']!, _payloadMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_payloadMeta);
+    }
+    if (data.containsKey('checked_at')) {
+      context.handle(
+        _checkedAtMeta,
+        checkedAt.isAcceptableOrUnknown(data['checked_at']!, _checkedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_checkedAtMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {owner};
+  @override
+  TrainerCache map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return TrainerCache(
+      owner: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}owner'],
+      )!,
+      payload: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}payload'],
+      )!,
+      checkedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}checked_at'],
+      )!,
+    );
+  }
+
+  @override
+  $TrainerCachesTable createAlias(String alias) {
+    return $TrainerCachesTable(attachedDatabase, alias);
+  }
+}
+
+class TrainerCache extends DataClass implements Insertable<TrainerCache> {
+  final String owner;
+  final String payload;
+  final DateTime checkedAt;
+  const TrainerCache({
+    required this.owner,
+    required this.payload,
+    required this.checkedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['owner'] = Variable<String>(owner);
+    map['payload'] = Variable<String>(payload);
+    map['checked_at'] = Variable<DateTime>(checkedAt);
+    return map;
+  }
+
+  TrainerCachesCompanion toCompanion(bool nullToAbsent) {
+    return TrainerCachesCompanion(
+      owner: Value(owner),
+      payload: Value(payload),
+      checkedAt: Value(checkedAt),
+    );
+  }
+
+  factory TrainerCache.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return TrainerCache(
+      owner: serializer.fromJson<String>(json['owner']),
+      payload: serializer.fromJson<String>(json['payload']),
+      checkedAt: serializer.fromJson<DateTime>(json['checkedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'owner': serializer.toJson<String>(owner),
+      'payload': serializer.toJson<String>(payload),
+      'checkedAt': serializer.toJson<DateTime>(checkedAt),
+    };
+  }
+
+  TrainerCache copyWith({
+    String? owner,
+    String? payload,
+    DateTime? checkedAt,
+  }) => TrainerCache(
+    owner: owner ?? this.owner,
+    payload: payload ?? this.payload,
+    checkedAt: checkedAt ?? this.checkedAt,
+  );
+  TrainerCache copyWithCompanion(TrainerCachesCompanion data) {
+    return TrainerCache(
+      owner: data.owner.present ? data.owner.value : this.owner,
+      payload: data.payload.present ? data.payload.value : this.payload,
+      checkedAt: data.checkedAt.present ? data.checkedAt.value : this.checkedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('TrainerCache(')
+          ..write('owner: $owner, ')
+          ..write('payload: $payload, ')
+          ..write('checkedAt: $checkedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(owner, payload, checkedAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is TrainerCache &&
+          other.owner == this.owner &&
+          other.payload == this.payload &&
+          other.checkedAt == this.checkedAt);
+}
+
+class TrainerCachesCompanion extends UpdateCompanion<TrainerCache> {
+  final Value<String> owner;
+  final Value<String> payload;
+  final Value<DateTime> checkedAt;
+  final Value<int> rowid;
+  const TrainerCachesCompanion({
+    this.owner = const Value.absent(),
+    this.payload = const Value.absent(),
+    this.checkedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  TrainerCachesCompanion.insert({
+    required String owner,
+    required String payload,
+    required DateTime checkedAt,
+    this.rowid = const Value.absent(),
+  }) : owner = Value(owner),
+       payload = Value(payload),
+       checkedAt = Value(checkedAt);
+  static Insertable<TrainerCache> custom({
+    Expression<String>? owner,
+    Expression<String>? payload,
+    Expression<DateTime>? checkedAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (owner != null) 'owner': owner,
+      if (payload != null) 'payload': payload,
+      if (checkedAt != null) 'checked_at': checkedAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  TrainerCachesCompanion copyWith({
+    Value<String>? owner,
+    Value<String>? payload,
+    Value<DateTime>? checkedAt,
+    Value<int>? rowid,
+  }) {
+    return TrainerCachesCompanion(
+      owner: owner ?? this.owner,
+      payload: payload ?? this.payload,
+      checkedAt: checkedAt ?? this.checkedAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (owner.present) {
+      map['owner'] = Variable<String>(owner.value);
+    }
+    if (payload.present) {
+      map['payload'] = Variable<String>(payload.value);
+    }
+    if (checkedAt.present) {
+      map['checked_at'] = Variable<DateTime>(checkedAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('TrainerCachesCompanion(')
+          ..write('owner: $owner, ')
+          ..write('payload: $payload, ')
+          ..write('checkedAt: $checkedAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 class $CustomExercisesTable extends CustomExercises
     with TableInfo<$CustomExercisesTable, CustomExercise> {
   @override
@@ -10744,6 +11011,7 @@ class HydrationSettingsCompanion extends UpdateCompanion<HydrationSetting> {
 abstract class _$GTDatabaseImpl extends GeneratedDatabase {
   _$GTDatabaseImpl(QueryExecutor e) : super(e);
   $GTDatabaseImplManager get managers => $GTDatabaseImplManager(this);
+  late final $TrainerCachesTable trainerCaches = $TrainerCachesTable(this);
   late final $CustomExercisesTable customExercises = $CustomExercisesTable(
     this,
   );
@@ -10792,6 +11060,7 @@ abstract class _$GTDatabaseImpl extends GeneratedDatabase {
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
   @override
   List<DatabaseSchemaEntity> get allSchemaEntities => [
+    trainerCaches,
     customExercises,
     routineFolders,
     routines,
@@ -10822,6 +11091,170 @@ abstract class _$GTDatabaseImpl extends GeneratedDatabase {
   ];
 }
 
+typedef $$TrainerCachesTableCreateCompanionBuilder =
+    TrainerCachesCompanion Function({
+      required String owner,
+      required String payload,
+      required DateTime checkedAt,
+      Value<int> rowid,
+    });
+typedef $$TrainerCachesTableUpdateCompanionBuilder =
+    TrainerCachesCompanion Function({
+      Value<String> owner,
+      Value<String> payload,
+      Value<DateTime> checkedAt,
+      Value<int> rowid,
+    });
+
+class $$TrainerCachesTableFilterComposer
+    extends Composer<_$GTDatabaseImpl, $TrainerCachesTable> {
+  $$TrainerCachesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get owner => $composableBuilder(
+    column: $table.owner,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get payload => $composableBuilder(
+    column: $table.payload,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get checkedAt => $composableBuilder(
+    column: $table.checkedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$TrainerCachesTableOrderingComposer
+    extends Composer<_$GTDatabaseImpl, $TrainerCachesTable> {
+  $$TrainerCachesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get owner => $composableBuilder(
+    column: $table.owner,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get payload => $composableBuilder(
+    column: $table.payload,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get checkedAt => $composableBuilder(
+    column: $table.checkedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$TrainerCachesTableAnnotationComposer
+    extends Composer<_$GTDatabaseImpl, $TrainerCachesTable> {
+  $$TrainerCachesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get owner =>
+      $composableBuilder(column: $table.owner, builder: (column) => column);
+
+  GeneratedColumn<String> get payload =>
+      $composableBuilder(column: $table.payload, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get checkedAt =>
+      $composableBuilder(column: $table.checkedAt, builder: (column) => column);
+}
+
+class $$TrainerCachesTableTableManager
+    extends
+        RootTableManager<
+          _$GTDatabaseImpl,
+          $TrainerCachesTable,
+          TrainerCache,
+          $$TrainerCachesTableFilterComposer,
+          $$TrainerCachesTableOrderingComposer,
+          $$TrainerCachesTableAnnotationComposer,
+          $$TrainerCachesTableCreateCompanionBuilder,
+          $$TrainerCachesTableUpdateCompanionBuilder,
+          (
+            TrainerCache,
+            BaseReferences<_$GTDatabaseImpl, $TrainerCachesTable, TrainerCache>,
+          ),
+          TrainerCache,
+          PrefetchHooks Function()
+        > {
+  $$TrainerCachesTableTableManager(
+    _$GTDatabaseImpl db,
+    $TrainerCachesTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$TrainerCachesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$TrainerCachesTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$TrainerCachesTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> owner = const Value.absent(),
+                Value<String> payload = const Value.absent(),
+                Value<DateTime> checkedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => TrainerCachesCompanion(
+                owner: owner,
+                payload: payload,
+                checkedAt: checkedAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String owner,
+                required String payload,
+                required DateTime checkedAt,
+                Value<int> rowid = const Value.absent(),
+              }) => TrainerCachesCompanion.insert(
+                owner: owner,
+                payload: payload,
+                checkedAt: checkedAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$TrainerCachesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$GTDatabaseImpl,
+      $TrainerCachesTable,
+      TrainerCache,
+      $$TrainerCachesTableFilterComposer,
+      $$TrainerCachesTableOrderingComposer,
+      $$TrainerCachesTableAnnotationComposer,
+      $$TrainerCachesTableCreateCompanionBuilder,
+      $$TrainerCachesTableUpdateCompanionBuilder,
+      (
+        TrainerCache,
+        BaseReferences<_$GTDatabaseImpl, $TrainerCachesTable, TrainerCache>,
+      ),
+      TrainerCache,
+      PrefetchHooks Function()
+    >;
 typedef $$CustomExercisesTableCreateCompanionBuilder =
     CustomExercisesCompanion Function({
       Value<String> id,
@@ -20048,6 +20481,8 @@ typedef $$HydrationSettingsTableProcessedTableManager =
 class $GTDatabaseImplManager {
   final _$GTDatabaseImpl _db;
   $GTDatabaseImplManager(this._db);
+  $$TrainerCachesTableTableManager get trainerCaches =>
+      $$TrainerCachesTableTableManager(_db, _db.trainerCaches);
   $$CustomExercisesTableTableManager get customExercises =>
       $$CustomExercisesTableTableManager(_db, _db.customExercises);
   $$RoutineFoldersTableTableManager get routineFolders =>

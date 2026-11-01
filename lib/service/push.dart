@@ -1,3 +1,4 @@
+import 'package:gymtracker/view/trainer.dart';
 import 'dart:async';
 import 'dart:convert';
 
@@ -317,6 +318,10 @@ class PushService with WidgetsBindingObserver {
           .maybeSingle();
       if (notification == null) {
         Go.to(() => const SocialNotificationsPage());
+        return;
+      }
+      if (notification['kind'] == 'trainer_plan') {
+        Go.to(() => const TrainerView());
         return;
       }
       final post = notification['post_id'] as String?;

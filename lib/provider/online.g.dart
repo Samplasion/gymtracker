@@ -74,7 +74,7 @@ final class OnlineProvider
   Online create() => Online();
 }
 
-String _$onlineHash() => r'bf6866051035b96e65378f88d14346207d6cc62b';
+String _$onlineHash() => r'02f53a6eb8a4d902fc394dfe12540362d729ce85';
 
 abstract class _$Online extends $AsyncNotifier<OnlineAccount?> {
   FutureOr<OnlineAccount?> build();

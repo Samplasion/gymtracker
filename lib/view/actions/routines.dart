@@ -1,3 +1,4 @@
+import 'package:gymtracker/db/database.dart';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
@@ -21,6 +22,7 @@ import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/view/exercises.dart';
 import 'package:gymtracker/view/routines.dart';
+import 'package:gymtracker/view/trainer.dart';
 import 'package:gymtracker/view/utils/history_workout.dart';
 import 'package:gymtracker/view/utils/import_routine.dart';
 import 'package:gymtracker/view/utils/workout_navigation.dart';
@@ -216,9 +218,12 @@ extension RoutinesPresentation on RoutinesController {
 
   void onProtocolUrlReceived(String url) {
     final Uri parsed = Uri.parse(url);
-    logger.i('Url received: $parsed');
+    logger.i('URL received: ${parsed.scheme}://${parsed.host}');
 
     switch (parsed.host) {
+      case "trainer":
+        Go.to(() => TrainerView(token: parsed.queryParameters["token"]));
+        return;
       case "routine":
         return onRoutineUrlReceived(parsed);
       default:
@@ -344,6 +349,12 @@ extension RoutinesPresentation on RoutinesController {
   }
 
   Future<void> deleteFolder(GTRoutineFolder folder) async {
+    if (service.routines.any(
+      (r) =>
+          r.folder?.id == folder.id &&
+          service.db.cachedTrainerState.controls.contains(r.id),
+    ))
+      return;
     final t = ref.read(translationsProvider);
     final shouldDelete = await Go.confirm(
       t.routines.actions.deleteFolder.title,

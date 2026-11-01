@@ -1,3 +1,4 @@
+import 'package:gymtracker/provider/trainer.dart';
 import 'dart:convert';
 
 import 'package:custom_refresh_indicator/custom_refresh_indicator.dart';
@@ -921,26 +922,28 @@ class _WorkoutFinishPageState extends ConsumerState<WorkoutFinishPage> {
                                       return null;
                                     },
                                   ),
-                                DateField(
-                                  decoration: _decoration(
-                                    context
-                                        .t
-                                        .ongoingWorkout
-                                        .finish
-                                        .fields
-                                        .startingTime
-                                        .label,
+                                if (!trainerControls(ref, _initialParentID))
+                                  DateField(
+                                    decoration: _decoration(
+                                      context
+                                          .t
+                                          .ongoingWorkout
+                                          .finish
+                                          .fields
+                                          .startingTime
+                                          .label,
+                                    ),
+                                    date: _date,
+                                    onSelect: (date) =>
+                                        setState(() => _date = date),
+                                    firstDate:
+                                        DateTime.fromMillisecondsSinceEpoch(0),
+                                    lastDate: DateTime.now().add(
+                                      const Duration(days: 7),
+                                    ),
                                   ),
-                                  date: _date,
-                                  onSelect: (date) =>
-                                      setState(() => _date = date),
-                                  firstDate:
-                                      DateTime.fromMillisecondsSinceEpoch(0),
-                                  lastDate: DateTime.now().add(
-                                    const Duration(days: 7),
-                                  ),
-                                ),
-                                if (!controller.isContinuation)
+                                if (!controller.isContinuation &&
+                                    !trainerControls(ref, _initialParentID))
                                   RoutineFormPicker(
                                     key: ValueKey(_parentID),
                                     decoration:

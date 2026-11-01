@@ -1,3 +1,4 @@
+import 'package:gymtracker/view/trainer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gymtracker/i18n/strings.g.dart';
@@ -14,6 +15,7 @@ String socialNotificationText(
   BuildContext context,
   Map<String, dynamic> n,
 ) => switch (n['kind']) {
+  'trainer_plan' => context.t.social.trainerPlan,
   'friend_request' => context.t.social.friendRequest,
   'friend_accepted' => context.t.social.friendAccepted,
   'like' => context.t.social.likedPost,
@@ -126,6 +128,8 @@ class _SocialNotificationsPageState
                               ),
                             );
                           }
+                        } else if (n['kind'] == 'trainer_plan') {
+                          Go.to(() => const TrainerView());
                         } else if (n['report_id'] != null) {
                           Go.to(() => const SocialSettingsPage(reports: true));
                         } else if (n['actor_id'] != null) {

@@ -58,6 +58,53 @@ void main() {
     await tester.pumpWidget(const SizedBox.shrink());
     await tester.pumpAndSettle();
   });
+  testWidgets(
+    'folders follow alphabetical order instead of stored sort order',
+    (tester) async {
+      const first = GTRoutineFolder(
+        id: 'first',
+        name: 'Z first',
+        sortOrder: 0,
+        notes: '',
+      );
+      const second = GTRoutineFolder(
+        id: 'second',
+        name: 'A second',
+        sortOrder: 1,
+        notes: '',
+      );
+      await tester.pumpWidget(
+        WidgetTestApp(
+          wrapWithProviderScope: true,
+          child: ProviderScope(
+            overrides: [
+              routinesStreamProvider.overrideWith(
+                (ref) => Stream.value(<Workout>[]),
+              ),
+              foldersStreamProvider.overrideWith(
+                (ref) => Stream.value([second, first]),
+              ),
+            ],
+            child: const RoutinesView(),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      await tester.scrollUntilVisible(
+        find.text('Z first'),
+        200,
+        scrollable: find.byType(Scrollable).first,
+      );
+      expect(
+        tester.getTopLeft(find.text('A second')).dy,
+        lessThan(tester.getTopLeft(find.text('Z first')).dy),
+      );
+      expect(tester.takeException(), isNull);
+      await tester.pumpWidget(const SizedBox.shrink());
+      await tester.pumpAndSettle();
+    },
+  );
+
   for (final failFolders in [false, true]) {
     testWidgets(
       'routine loading failure offers retry (folders: $failFolders)',

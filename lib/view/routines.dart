@@ -1,3 +1,4 @@
+import 'package:gymtracker/provider/trainer.dart';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
@@ -424,6 +425,12 @@ class _EditFolderModalState extends ConsumerState<EditFolderModal> {
             icon: const Icon(GTIcons.delete),
             tooltip: context.t.actions.remove,
             onPressed: () {
+              if (controller.service.routines.any(
+                (r) =>
+                    r.folder?.id == widget.folder.id &&
+                    trainerControls(ref, r.id),
+              ))
+                return;
               controller.deleteFolder(widget.folder);
             },
           ),

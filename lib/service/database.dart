@@ -754,6 +754,7 @@ class DatabaseService extends ChangeNotifier with LoggerConfigurationMixin {
     final newRoutines = routines$.value.toList();
     for (int i = 0; i < newRoutines.length; i++) {
       final workout = newRoutines[i];
+      if (_db.cachedTrainerState.controls.contains(workout.id)) continue;
 
       final res = workout.exercises.toList();
       for (int i = 0; i < res.length; i++) {
@@ -918,6 +919,7 @@ class DatabaseService extends ChangeNotifier with LoggerConfigurationMixin {
     eraseAllSubjects(includeDeviceState: false);
     ongoing$.add(null);
     _db.setCurrentUserId(id);
+    await _db.trainerState();
     await afterUserChange?.call();
   }
 }

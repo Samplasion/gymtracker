@@ -698,17 +698,17 @@ class AchievementRules {
                 final oldW = rHistory[i - 1];
 
                 // Check that the current newer workout is the same as the routine
-                if (!WorkoutDifference.fromWorkouts(
+                if (WorkoutDifference.fromWorkouts(
                   oldWorkout: newW,
                   newWorkout: routine,
-                ).isEmpty) {
+                ).hasExerciseChanges) {
                   continue;
                 }
 
-                if (!WorkoutDifference.fromWorkouts(
+                if (WorkoutDifference.fromWorkouts(
                   oldWorkout: oldW,
                   newWorkout: newW,
-                ).isEmpty) {
+                ).hasExerciseChanges) {
                   return true;
                 }
               }

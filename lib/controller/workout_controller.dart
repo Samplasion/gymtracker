@@ -1,3 +1,4 @@
+import 'package:gymtracker/db/database.dart';
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -321,11 +322,13 @@ class WorkoutController extends _$WorkoutController {
   }
 
   void setTime(DateTime value) {
+    if (service.db.cachedTrainerState.controls.contains(parentID)) return;
     time = value;
     publishExercises();
   }
 
   void setParentID(String? value) {
+    if (service.db.cachedTrainerState.controls.contains(parentID)) return;
     parentID = value;
     publishExercises();
   }
@@ -868,8 +871,14 @@ class WorkoutController extends _$WorkoutController {
       name: name,
       exercises: exercises,
       duration: duration,
-      startingDate: details?.startingTime ?? time,
-      parentID: details == null ? parentID : details.parentID,
+      startingDate: service.db.cachedTrainerState.controls.contains(parentID)
+          ? time
+          : details?.startingTime ?? time,
+      parentID: service.db.cachedTrainerState.controls.contains(parentID)
+          ? parentID
+          : details == null
+          ? parentID
+          : details.parentID,
       infobox: details == null ? infobox : details.infobox,
       completes: continuesID,
       weightUnit: weightUnit,
@@ -883,8 +892,8 @@ class WorkoutController extends _$WorkoutController {
     if (isSessionActive(generation)) {
       if (details != null) {
         this.name = name;
-        time = details.startingTime;
-        parentID = details.parentID;
+        time = workout.startingDate!;
+        parentID = workout.parentID;
         infobox = details.infobox;
       }
       removeCountdown();

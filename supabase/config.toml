@@ -450,3 +450,7 @@ verify_jwt = false
 # Verifies JWT and current catalog privileges; SQL rechecks permissions atomically.
 [functions.catalog-api]
 verify_jwt = false
+
+# First-party JWTs are verified inside the handler, including asymmetric tokens.
+[functions.trainer-api]
+verify_jwt = false

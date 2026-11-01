@@ -22,11 +22,15 @@ $$;
 SQL
 docker exec -i "$container" psql -h 127.0.0.1 -U supabase_admin -d postgres -v ON_ERROR_STOP=1 < test/backend/mcp_oauth_fixture.sql
 for migration in supabase/migrations/*.sql; do
+  if [[ "$migration" == *20261031170000_trainer_plan_folders_and_account_deletion.sql ]]; then
+    docker exec -i "$container" psql -h 127.0.0.1 -U supabase_admin -d postgres -v ON_ERROR_STOP=1 < test/backend/trainer_plan_folder_upgrade.sql
+  fi
   if [[ "$migration" == *20261024130000_mcp_measurements_oauth.sql ]]; then
     docker exec -i "$container" psql -h 127.0.0.1 -U supabase_admin -d postgres -v ON_ERROR_STOP=1 < test/backend/mcp_oauth_upgrade.sql
   fi
   docker exec -i "$container" psql -h 127.0.0.1 -U supabase_admin -d postgres -v ON_ERROR_STOP=1 < "$migration"
 done
+docker exec -i "$container" psql -h 127.0.0.1 -U supabase_admin -d postgres -v ON_ERROR_STOP=1 < test/backend/trainer_plan_folder_upgraded.sql
 if [[ "${BACKEND_TEST_FILTER:-}" == "recipes" ]]; then
   docker exec -i "$container" psql -h 127.0.0.1 -U supabase_admin -d postgres -v ON_ERROR_STOP=1 < test/backend/recipes.sql
   exit 0
@@ -54,6 +58,10 @@ fi
 docker exec -i "$container" psql -h 127.0.0.1 -U supabase_admin -d postgres -v ON_ERROR_STOP=1 < test/backend/sync_v2.sql
 docker exec -i "$container" psql -h 127.0.0.1 -U supabase_admin -d postgres -v ON_ERROR_STOP=1 < test/backend/hydration.sql
 docker exec -i "$container" psql -h 127.0.0.1 -U supabase_admin -d postgres -v ON_ERROR_STOP=1 < test/backend/recipes.sql
+docker exec -i "$container" psql -h 127.0.0.1 -U supabase_admin -d postgres -v ON_ERROR_STOP=1 < test/backend/trainers.sql
+docker exec -i "$container" psql -h 127.0.0.1 -U supabase_admin -d postgres -v ON_ERROR_STOP=1 < test/backend/trainer_plan_folders.sql
+docker exec -i "$container" psql -h 127.0.0.1 -U supabase_admin -d postgres -v ON_ERROR_STOP=1 < test/backend/trainer_account_deletion.sql
+docker exec -i "$container" psql -h 127.0.0.1 -U supabase_admin -d postgres -v ON_ERROR_STOP=1 < test/backend/trainer_superset_order.sql
 
 docker exec -i "$container" psql -h 127.0.0.1 -U supabase_admin -d postgres -v ON_ERROR_STOP=1 < test/backend/social_posts.sql
 

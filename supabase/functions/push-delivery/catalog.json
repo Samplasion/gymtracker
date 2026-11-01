@@ -6,7 +6,8 @@
       "like": "Liked your post",
       "comment": "Commented on your post",
       "achievement": "Unlocked an achievement",
-      "report_status": "Your report status changed"
+      "report_status": "Your report status changed",
+      "trainer_plan": "Your trainer published a plan or revision"
     },
     "statuses": {
       "received": "Received",
@@ -23,7 +24,8 @@
       "like": "Ha messo Mi piace al tuo post",
       "comment": "Ha commentato il tuo post",
       "achievement": "Ha sbloccato un achievement",
-      "report_status": "Lo stato della tua segnalazione è cambiato"
+      "report_status": "Lo stato della tua segnalazione è cambiato",
+      "trainer_plan": "Il tuo trainer ha pubblicato una scheda o una revisione"
     },
     "statuses": {
       "received": "Ricevuta",

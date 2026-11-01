@@ -10,8 +10,8 @@ import 'package:gymtracker/provider/connectivity.dart';
 import 'package:gymtracker/provider/online.dart';
 import 'package:gymtracker/provider/sync_status.dart';
 import 'package:gymtracker/service/database.dart';
+import 'package:gymtracker/service/sync_conflict_resolution.dart';
 import 'package:share_plus/share_plus.dart';
-import 'package:syncable/syncable.dart';
 
 bool _it(BuildContext c) => Localizations.localeOf(c).languageCode == 'it';
 Future<bool> offerGuestImport(
@@ -58,7 +58,208 @@ class SyncConflictsPage extends ConsumerStatefulWidget {
 
 class _ConflictsState extends ConsumerState<SyncConflictsPage> {
   bool _history = false;
+  bool _busy = false;
+  int _completed = 0;
+  int _total = 0;
   late Future<List<Map<String, dynamic>>> _rows = _load();
+
+  Future<void> _resolveAll(
+    List<Map<String, dynamic>> rows, {
+    required bool useLocal,
+  }) async {
+    if (_busy || _history) return;
+    final owner = ref.read(currentUserIdProvider);
+    if (owner == null) return;
+    final it = _it(context);
+    final ids = {for (final row in rows) row['operation_id'] as String};
+    final count = {
+      for (final row in rows) (row['entity'], row['record_id']),
+    }.length;
+    final title = useLocal
+        ? (it ? 'Tieni tutto dal dispositivo' : 'Keep everything from device')
+        : (it ? 'Tieni tutto dal server' : 'Keep everything from server');
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (c) => AlertDialog(
+        icon: Icon(
+          useLocal ? Icons.phone_android_rounded : Icons.cloud_outlined,
+        ),
+        title: Text(title),
+        content: Text(
+          it
+              ? 'Verranno risolte $count modifiche in conflitto usando le versioni ${useLocal ? 'del dispositivo, che saranno inviate al server alla prossima sincronizzazione' : 'del server, che sostituiranno quelle sul dispositivo'}. Le versioni alternative resteranno nella cronologia dei conflitti risolti.'
+              : '$count conflicting changes will be resolved using ${useLocal ? 'device versions, which will be sent to the server during the next sync' : 'server versions, which will replace those on this device'}. Alternative versions will remain in the resolved conflict history.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(c, false),
+            child: Text(it ? 'Annulla' : 'Cancel'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(c, true),
+            child: Text(it ? 'Conferma scelta' : 'Confirm choice'),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true ||
+        !mounted ||
+        ref.read(currentUserIdProvider) != owner) {
+      return;
+    }
+    setState(() {
+      _busy = true;
+      _completed = 0;
+      _total = count;
+    });
+    try {
+      final resolved = await resolveSelectedSyncConflicts(
+        db: ref.read(databaseServiceProvider).db,
+        manager: ref.read(onlineProvider.notifier).syncManager,
+        owner: owner,
+        operationIds: ids,
+        useLocal: useLocal,
+        onProgress: (completed, total) {
+          if (mounted) {
+            setState(() {
+              _completed = completed;
+              _total = total;
+            });
+          }
+        },
+      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              it
+                  ? '$resolved modifiche risolte. Le versioni alternative sono nella cronologia.'
+                  : '$resolved changes resolved. Alternative versions are in history.',
+            ),
+          ),
+        );
+      }
+    } catch (_) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              it
+                  ? 'Impossibile completare la scelta. Le versioni restano conservate: controlla le modifiche e riprova.'
+                  : 'Unable to complete your choice. Your versions are preserved: review the changes and retry.',
+            ),
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _busy = false;
+          _rows = _load();
+        });
+      }
+    }
+  }
+
+  Widget _bulkActions(List<Map<String, dynamic>> rows, bool it) {
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+    return Card.filled(
+      margin: const EdgeInsets.fromLTRB(16, 12, 16, 16),
+      child: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Icon(Icons.rule_folder_outlined, color: colors.primary, size: 28),
+            const SizedBox(height: 12),
+            Text(
+              it ? 'Risolvi tutte le modifiche' : 'Resolve all changes',
+              style: theme.textTheme.titleLarge,
+            ),
+            const SizedBox(height: 8),
+            Text(
+              it
+                  ? 'Scegli quale versione mantenere per tutte le modifiche in conflitto. Le alternative resteranno nella cronologia.'
+                  : 'Choose which version to keep for all conflicting changes. Alternatives will remain in history.',
+              style: theme.textTheme.bodyMedium,
+            ),
+            const SizedBox(height: 20),
+            LayoutBuilder(
+              builder: (context, constraints) {
+                final wide = constraints.maxWidth >= 600;
+                final width = wide
+                    ? (constraints.maxWidth - 12) / 2
+                    : constraints.maxWidth;
+                return Wrap(
+                  spacing: 12,
+                  runSpacing: 12,
+                  children: [
+                    SizedBox(
+                      width: width,
+                      child: OutlinedButton.icon(
+                        onPressed: _busy
+                            ? null
+                            : () => _resolveAll(rows, useLocal: false),
+                        icon: const Icon(Icons.cloud_outlined),
+                        label: Text(
+                          it
+                              ? 'Tieni tutto dal server'
+                              : 'Keep everything from server',
+                        ),
+                        style: OutlinedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 16,
+                          ),
+                        ),
+                      ),
+                    ),
+                    SizedBox(
+                      width: width,
+                      child: OutlinedButton.icon(
+                        onPressed: _busy
+                            ? null
+                            : () => _resolveAll(rows, useLocal: true),
+                        icon: const Icon(Icons.phone_android_rounded),
+                        label: Text(
+                          it
+                              ? 'Tieni tutto dal dispositivo'
+                              : 'Keep everything from device',
+                        ),
+                        style: OutlinedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 16,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                );
+              },
+            ),
+            if (_busy) ...[
+              const SizedBox(height: 20),
+              LinearProgressIndicator(
+                value: _total == 0 ? null : _completed / _total,
+              ),
+              const SizedBox(height: 8),
+              Text(
+                it
+                    ? 'Risoluzione in corso… $_completed / $_total'
+                    : 'Resolving changes… $_completed / $_total',
+                semanticsLabel: it
+                    ? 'Risoluzione in corso'
+                    : 'Resolving changes',
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+
   Future<List<Map<String, dynamic>>> _load() async {
     final owner = ref.read(currentUserIdProvider);
     if (owner == null) return [];
@@ -73,15 +274,9 @@ class _ConflictsState extends ConsumerState<SyncConflictsPage> {
     for (final row in rows) {
       final value = Map<String, dynamic>.from(row.data);
       if (value['pending_payload'] != null) {
-        final table = db.allTables.singleWhere(
-          (t) => t.actualTableName == value['entity'],
-        );
-        final local = await table.map(
-          Map<String, dynamic>.from(
-            jsonDecode(value['pending_payload'] as String) as Map,
-          ),
-        );
-        value['local_payload'] = jsonEncode((local as Syncable).toJson());
+        // These are historical SQLite snapshots, not rows in today's schema.
+        // Display their fields directly: newer required columns may be absent.
+        value['local_payload'] = value['pending_payload'];
       }
       result.add(value);
     }
@@ -91,142 +286,155 @@ class _ConflictsState extends ConsumerState<SyncConflictsPage> {
   @override
   Widget build(BuildContext context) {
     final it = _it(context);
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          _history
-              ? (it ? 'Conflitti risolti' : 'Resolved conflicts')
-              : (it ? 'Modifiche da confrontare' : 'Changes to compare'),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => setState(() {
-              _history = !_history;
-              _rows = _load();
-            }),
-            child: Text(
-              _history
-                  ? (it ? 'Da risolvere' : 'Pending')
-                  : (it ? 'Cronologia' : 'History'),
-            ),
+    return PopScope(
+      canPop: !_busy,
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(
+            _history
+                ? (it ? 'Conflitti risolti' : 'Resolved conflicts')
+                : (it ? 'Modifiche da confrontare' : 'Changes to compare'),
           ),
-        ],
-      ),
-      body: FutureBuilder<List<Map<String, dynamic>>>(
-        future: _rows,
-        builder: (c, s) {
-          if (s.hasError) return Center(child: Text('${s.error}'));
-          if (!s.hasData || s.connectionState != ConnectionState.done)
-            return const Center(child: CircularProgressIndicator());
-          if (s.data!.isEmpty)
-            return Center(
+          actions: [
+            TextButton(
+              onPressed: _busy
+                  ? null
+                  : () => setState(() {
+                      _history = !_history;
+                      _rows = _load();
+                    }),
               child: Text(
-                it
-                    ? 'Nessun conflitto da risolvere'
-                    : 'No conflicts to resolve',
+                _history
+                    ? (it ? 'Da risolvere' : 'Pending')
+                    : (it ? 'Cronologia' : 'History'),
               ),
-            );
-          return ListView(
-            children: [
-              for (final row in s.data!)
-                ListTile(
+            ),
+          ],
+        ),
+        body: FutureBuilder<List<Map<String, dynamic>>>(
+          future: _rows,
+          builder: (c, s) {
+            if (s.hasError) return Center(child: Text('${s.error}'));
+            if (!s.hasData || s.connectionState != ConnectionState.done)
+              return const Center(child: CircularProgressIndicator());
+            if (s.data!.isEmpty)
+              return Center(
+                child: Text(
+                  it
+                      ? 'Nessun conflitto da risolvere'
+                      : 'No conflicts to resolve',
+                ),
+              );
+            return ListView.builder(
+              itemCount: s.data!.length + (_history ? 0 : 1),
+              itemBuilder: (context, index) {
+                if (!_history && index == 0) return _bulkActions(s.data!, it);
+                final row = s.data![index - (_history ? 0 : 1)];
+                return ListTile(
                   title: Text(recoveryLabel(row['entity'] as String, it)),
                   subtitle: Text(
                     it
                         ? 'Entrambe le versioni sono conservate'
                         : 'Both versions are preserved',
                   ),
-                  onTap: () async {
-                    final choice = await showDialog<bool>(
-                      context: context,
-                      builder: (c) => AlertDialog(
-                        title: Text(
-                          it ? 'Confronta le versioni' : 'Compare versions',
-                        ),
-                        content: SingleChildScrollView(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                it ? 'Sul dispositivo' : 'On this device',
-                                style: Theme.of(c).textTheme.titleMedium,
+                  onTap: _busy
+                      ? null
+                      : () async {
+                          final choice = await showDialog<bool>(
+                            context: context,
+                            builder: (c) => AlertDialog(
+                              title: Text(
+                                it
+                                    ? 'Confronta le versioni'
+                                    : 'Compare versions',
                               ),
-                              SelectableText(
-                                describeRecovery(
-                                  row['local_payload'] as String,
-                                  it,
+                              content: SingleChildScrollView(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      it ? 'Sul dispositivo' : 'On this device',
+                                      style: Theme.of(c).textTheme.titleMedium,
+                                    ),
+                                    SelectableText(
+                                      describeRecovery(
+                                        row['local_payload'] as String,
+                                        it,
+                                      ),
+                                    ),
+                                    const Divider(),
+                                    Text(
+                                      it ? 'Sul server' : 'On the server',
+                                      style: Theme.of(c).textTheme.titleMedium,
+                                    ),
+                                    SelectableText(
+                                      describeRecovery(
+                                        row['server_payload'] as String,
+                                        it,
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
-                              const Divider(),
-                              Text(
-                                it ? 'Sul server' : 'On the server',
-                                style: Theme.of(c).textTheme.titleMedium,
-                              ),
-                              SelectableText(
-                                describeRecovery(
-                                  row['server_payload'] as String,
-                                  it,
+                              actions: [
+                                TextButton(
+                                  onPressed: () => Navigator.pop(c),
+                                  child: Text(it ? 'Annulla' : 'Cancel'),
                                 ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        actions: [
-                          TextButton(
-                            onPressed: () => Navigator.pop(c),
-                            child: Text(it ? 'Annulla' : 'Cancel'),
-                          ),
-                          TextButton(
-                            onPressed: () => Navigator.pop(c, false),
-                            child: Text(
-                              _history
-                                  ? (it
-                                        ? 'Ripristina server'
-                                        : 'Restore server version')
-                                  : (it ? 'Usa server' : 'Use server'),
+                                TextButton(
+                                  onPressed: () => Navigator.pop(c, false),
+                                  child: Text(
+                                    _history
+                                        ? (it
+                                              ? 'Ripristina server'
+                                              : 'Restore server version')
+                                        : (it ? 'Usa server' : 'Use server'),
+                                  ),
+                                ),
+                                FilledButton(
+                                  onPressed: () => Navigator.pop(c, true),
+                                  child: Text(
+                                    _history
+                                        ? (it
+                                              ? 'Ripristina dispositivo'
+                                              : 'Restore device version')
+                                        : (it
+                                              ? 'Usa dispositivo'
+                                              : 'Use device'),
+                                  ),
+                                ),
+                              ],
                             ),
-                          ),
-                          FilledButton(
-                            onPressed: () => Navigator.pop(c, true),
-                            child: Text(
-                              _history
-                                  ? (it
-                                        ? 'Ripristina dispositivo'
-                                        : 'Restore device version')
-                                  : (it ? 'Usa dispositivo' : 'Use device'),
-                            ),
-                          ),
-                        ],
-                      ),
-                    );
-                    if (choice == null || !mounted) return;
-                    try {
-                      final manager = ref
-                          .read(onlineProvider.notifier)
-                          .syncManager;
-                      if (_history) {
-                        await manager.restoreConflictVersion(
-                          row['operation_id'] as String,
-                          useLocal: choice,
-                        );
-                      } else {
-                        await manager.resolveConflict(
-                          row['operation_id'] as String,
-                          useLocal: choice,
-                        );
-                      }
-                      if (mounted) setState(() => _rows = _load());
-                    } catch (e) {
-                      if (context.mounted)
-                        ScaffoldMessenger.of(
-                          context,
-                        ).showSnackBar(SnackBar(content: Text('$e')));
-                    }
-                  },
-                ),
-            ],
-          );
-        },
+                          );
+                          if (choice == null || !mounted) return;
+                          try {
+                            final manager = ref
+                                .read(onlineProvider.notifier)
+                                .syncManager;
+                            if (_history) {
+                              await manager.restoreConflictVersion(
+                                row['operation_id'] as String,
+                                useLocal: choice,
+                              );
+                            } else {
+                              await manager.resolveConflict(
+                                row['operation_id'] as String,
+                                useLocal: choice,
+                              );
+                            }
+                            if (mounted) setState(() => _rows = _load());
+                          } catch (e) {
+                            if (context.mounted)
+                              ScaffoldMessenger.of(
+                                context,
+                              ).showSnackBar(SnackBar(content: Text('$e')));
+                          }
+                        },
+                );
+              },
+            );
+          },
+        ),
       ),
     );
   }
@@ -262,6 +470,11 @@ String describeRecovery(String encoded, bool it) {
     ...map,
     if (body is Map) ...Map<String, dynamic>.from(body),
   };
+  if (fields['deleted'] == 0 || fields['deleted'] == false) {
+    fields['deleted'] = 'No';
+  } else if (fields['deleted'] == 1 || fields['deleted'] == true) {
+    fields['deleted'] = it ? 'Sì' : 'Yes';
+  }
   final labels = {
     'name': it ? 'Nome' : 'Name',
     'calories': it ? 'Calorie' : 'Calories',

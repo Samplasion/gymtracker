@@ -1,10 +1,11 @@
 name: gymtracker
 description: A new Flutter project.
 publish_to: "none"
-version: 0.15.1+1793111107
+version: 0.15.1+1793111108
 
 environment:
   sdk: ">=3.11.0 <4.0.0"
+  flutter: ">=3.47.0"
 
 dependencies:
   sentry_flutter: ^9.27.0
@@ -97,7 +98,9 @@ dependencies:
   firebase_messaging: ^17.0.0
   pdf: ^3.13.1
   printing: ^5.15.1
-  m3e_core: ^0.1.6
+  m3e_core: ^1.1.4
+  # 1.8 exports RoundedPolygon, conflicting with m3e_core 1.1.4's own shape.
+  material_ui: 1.7.0
   
 # Backport the upstream provider-flush lifecycle fix without migrating the
 # analyzer-constrained code generators. See packages/riverpod/PATCH.md.

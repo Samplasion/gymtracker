@@ -38,6 +38,7 @@ import 'package:gymtracker/view/components/loading_indicator.dart';
 import 'package:gymtracker/view/components/maybe_rich_text.dart';
 import 'package:gymtracker/view/components/pro_builder.dart';
 import 'package:gymtracker/view/components/rich_text_editor.dart';
+import 'package:gymtracker/view/components/section_card.dart';
 import 'package:gymtracker/view/components/stats.dart';
 import 'package:gymtracker/view/components/subscription_nag.dart';
 import 'package:gymtracker/view/components/tweened_builder.dart';

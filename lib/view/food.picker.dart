@@ -254,7 +254,8 @@ class _FoodPickerViewState extends ConsumerState<FoodPickerView> {
     ),
   ].join(' · ');
 
-  Widget _rows(List<VagueFood> foods) => M3ECardList(
+  Widget _rows(List<VagueFood> foods) => M3ESegmentedList(
+    color: context.theme.colorScheme.surfaceContainerHighest,
     padding: EdgeInsets.zero,
     itemCount: foods.length,
     itemBuilder: (context, index) {
@@ -268,15 +269,18 @@ class _FoodPickerViewState extends ConsumerState<FoodPickerView> {
               amount: food.servingSizes.firstOrNull?.amount ?? 100,
               nutritionalValuesPer100g: food.nutritionalValuesPer100g,
             );
-      return ListTile(
-        dense: true,
-        title: Text(food.name),
-        subtitle: Text(_summary(portion)),
-        onTap: _busy ? null : () => _add(food, details: true),
-        trailing: IconButton.filledTonal(
-          tooltip: '${context.t.food.picker.title}: ${food.name}',
-          onPressed: _busy ? null : () => _add(food),
-          icon: const Icon(Icons.add),
+      return Material(
+        type: MaterialType.transparency,
+        child: ListTile(
+          dense: true,
+          title: Text(food.name),
+          subtitle: Text(_summary(portion)),
+          onTap: _busy ? null : () => _add(food, details: true),
+          trailing: IconButton.filledTonal(
+            tooltip: '${context.t.food.picker.title}: ${food.name}',
+            onPressed: _busy ? null : () => _add(food),
+            icon: const Icon(Icons.add),
+          ),
         ),
       );
     },

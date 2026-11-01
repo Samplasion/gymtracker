@@ -4,6 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:gymtracker/i18n/strings.g.dart';
 import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/utils/theme.dart';
+import 'package:gymtracker/view/components/expressive_theme.dart';
 import 'package:intl/date_symbol_data_local.dart';
 
 import 'mock_services.dart';
@@ -32,6 +33,7 @@ class WidgetTestApp extends StatelessWidget {
         theme: baseTheme.copyWith(
           extensions: [MoreColors.fromColorScheme(baseTheme.colorScheme)],
         ),
+        builder: (context, child) => GTExpressiveTheme(child: child!),
         home: Scaffold(body: child),
       ),
     );

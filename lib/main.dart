@@ -39,6 +39,7 @@ import 'package:gymtracker/view/charts/density_calendar_chart.dart'
     show DensityCalendarChart;
 import 'package:gymtracker/view/charts/line_charts_time_series.dart';
 import 'package:gymtracker/view/charts/weight_chart.dart';
+import 'package:gymtracker/view/components/expressive_theme.dart';
 import 'package:gymtracker/view/debug/iphone15.dart';
 import 'package:gymtracker/view/me.dart';
 import 'package:gymtracker/view/utils/achievements.dart';
@@ -296,7 +297,9 @@ class _MainAppState extends ConsumerState<MainApp>
                             context,
                           ).colorScheme.surface.estimateForegroundBrightness(),
                         ),
-                        child: child ?? Container(),
+                        child: GTExpressiveTheme(
+                          child: child ?? const SizedBox.shrink(),
+                        ),
                       ),
                 );
               }(),

@@ -14,6 +14,7 @@ import 'package:gymtracker/struct/recipe.dart';
 import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/view/food.dart';
 import 'package:m3e_core/m3e_core.dart';
+import 'package:material_ui/material_ui.dart' as expressive;
 import '../test_helpers/widget_test_app.dart';
 
 const nutrition = NutritionValues(
@@ -404,7 +405,7 @@ void main() {
         '200 kcal · ${t.food.recipes.perServing.toLowerCase()}',
       );
       final material = find
-          .descendant(of: card, matching: find.byType(Material))
+          .descendant(of: card, matching: find.byType(expressive.Material))
           .first;
       var bounds = tester.getRect(material);
       expect(tester.getRect(subtitle).top, greaterThanOrEqualTo(bounds.top));

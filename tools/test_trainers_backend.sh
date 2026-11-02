@@ -30,4 +30,6 @@ docker exec -i "$container" psql -h 127.0.0.1 -U supabase_admin -d postgres -v O
 
 docker exec -i "$container" psql -h 127.0.0.1 -U supabase_admin -d postgres -v ON_ERROR_STOP=1 < test/backend/trainer_exercise_limit.sql
 
+docker exec -i "$container" psql -h 127.0.0.1 -U supabase_admin -d postgres -v ON_ERROR_STOP=1 < test/backend/trainer_invite_lookup.sql
+
 bash tools/test_trainer_concurrency.sh "$container"

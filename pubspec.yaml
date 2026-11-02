@@ -111,6 +111,7 @@ dependency_overrides:
     path: packages/riverpod
 
 dev_dependencies:
+  clock: ^1.1.2
   sentry_dart_plugin: ^3.4.0
   flutter_test:
     sdk: flutter

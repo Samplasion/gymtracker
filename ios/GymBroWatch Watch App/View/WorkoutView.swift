@@ -15,7 +15,8 @@ struct WorkoutView: View {
     @State private var showRecordingError = false
 
     private var recordingStatus: WorkoutRecordingStatus {
-        WorkoutRecordingStatus(
+        if ScreenshotMode.enabled { return .recording }
+        return WorkoutRecordingStatus(
             matchesWorkout: workoutManager.request?.id == workoutViewModel.workoutID,
             phase: workoutManager.phase,
             sensorActive: workoutManager.sessionState == .running || workoutManager.sessionState == .paused
@@ -64,6 +65,7 @@ struct WorkoutView: View {
     }
 
     private func elapsed(at date: Date) -> TimeInterval {
+        if ScreenshotMode.enabled { return 24 * 60 }
         return max(0, date.timeIntervalSince(workoutViewModel.workoutStart ?? date))
     }
 
@@ -71,7 +73,7 @@ struct WorkoutView: View {
         if workoutViewModel.state == .running || workoutViewModel.state == .paused {
             VStack(alignment: .leading, spacing: isCompactWatch ? 2 : nil) {
                 TimelineView(MetricsTimelineSchedule()) { context in
-                    ElapsedTimeView(elapsedTime: elapsed(at: context.date), showSubseconds: context.cadence == .live)
+                    ElapsedTimeView(elapsedTime: elapsed(at: context.date), showSubseconds: !ScreenshotMode.enabled && context.cadence == .live)
                 }
                 .font(.system(size: isCompactWatch ? 20 : 24, weight: .semibold, design: .rounded))
                 .foregroundStyle(.tint)
@@ -109,12 +111,12 @@ struct WorkoutView: View {
                 case .recording:
                     HStack {
                         Image(systemName: "heart.fill").foregroundStyle(.red).frame(width: isCompactWatch ? 24 : 30)
-                        Text(workoutManager.heartRate > 0 ? "\(workoutManager.heartRate.formatted(.number.precision(.fractionLength(0)))) bpm" : "— bpm")
+                        Text((ScreenshotMode.enabled ? 132.0 : workoutManager.heartRate) > 0 ? "\((ScreenshotMode.enabled ? 132.0 : workoutManager.heartRate).formatted(.number.precision(.fractionLength(0)))) bpm" : "— bpm")
                     }
                 }
                 HStack {
                     Image(systemName: "flame.fill").foregroundStyle(.orange).frame(width: isCompactWatch ? 24 : 30)
-                    Text("\(workoutManager.activeEnergy.formatted(.number.precision(.fractionLength(1)))) kcal")
+                    Text("\((ScreenshotMode.enabled ? 164.0 : workoutManager.activeEnergy).formatted(.number.precision(.fractionLength(1)))) kcal")
                 }
                 Spacer()
                 HStack {

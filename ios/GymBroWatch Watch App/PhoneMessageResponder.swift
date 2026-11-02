@@ -43,6 +43,10 @@ final class PhoneMessageResponder: NSObject {
 
     nonisolated func receiveCommand(_ message: [String: Any], reply: @escaping ([String: Any]) -> Void) {
         Task { @MainActor in
+            if ScreenshotMode.enabled {
+                reply(["success": false, "error": "HealthKit recording is disabled during screenshots"])
+                return
+            }
             guard message["method"] as? String == "workoutSensor" else { reply(["success": false]); return }
             WorkoutManager.shared.enqueue {
                 do { reply(try await WorkoutManager.shared.handleSensorCommand(message)) }

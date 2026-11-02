@@ -28,6 +28,13 @@ struct WatchFoodSyncTest {
             waterIntake: 1500, waterGoal: 2000)
         model.set(foodParameters: yesterday)
         precondition(model.calorieIntake == 0) // late delivery cannot become today's consumption
+        let reference = Date().addingTimeInterval(-172800)
+        model.clock = { reference }
+        model.refreshDisplayedData()
+        precondition(model.calorieIntake == 475 && model.waterIntake == 1500)
+        model.clock = Date.init
+        model.refreshDisplayedData()
+        precondition(model.calorieIntake == 0)
         precondition(DailyNutritionData.load(from: defaults)?.referenceDay == yesterday.referenceDay)
         precondition(DailyNutritionData.load(from: defaults)?.generatedAt == 123)
         let nextDay = FoodViewModel(defaults: defaults)

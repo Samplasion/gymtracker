@@ -284,10 +284,10 @@ extension WorkoutIterableUtils on Iterable<Workout> {
   /// Returns all the workouts performed in the given time [period].
   ///
   /// Assumes [this] is sorted such that the most recent workout is last.
-  List<Workout> inTimePeriod(Duration period) {
+  List<Workout> inTimePeriod(Duration period, {DateTime? now}) {
     List<Workout> result = [];
     List<Workout> self = toList();
-    final today = DateTime.now().startOfDay;
+    final today = (now ?? DateTime.now()).startOfDay;
     final timeStart = today.subtract(period);
     for (final workout in self.reversed) {
       if (workout.startingDate != null &&

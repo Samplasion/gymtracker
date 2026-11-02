@@ -1,0 +1,136 @@
+{
+  "reference_time": "2026-11-01T09:41:00",
+  "presets": {
+    "iphone": {
+      "device_type": "com.apple.CoreSimulator.SimDeviceType.iPhone-16-Pro-Max",
+      "width": 1320,
+      "height": 2868,
+      "output": {
+        "width": 1206,
+        "height": 2622
+      }
+    },
+    "watch": {
+      "device_type": "com.apple.CoreSimulator.SimDeviceType.Apple-Watch-Series-10-46mm",
+      "width": 416,
+      "height": 496
+    }
+  },
+  "locales": {
+    "it": "it",
+    "en": "en-US"
+  },
+  "screenshots": [
+    {
+      "id": "01",
+      "name": "workout",
+      "color": "#2196F3",
+      "titles": {
+        "it": "Ogni serie conta.",
+        "en": "Make every\nset count."
+      }
+    },
+    {
+      "id": "02",
+      "name": "routines",
+      "color": "#6366F1",
+      "titles": {
+        "it": "Scegli il tuo ritmo.",
+        "en": "Pace yourself."
+      }
+    },
+    {
+      "id": "03",
+      "name": "progress",
+      "color": "#A855F7",
+      "titles": {
+        "it": "Guarda quanto\nsei cresciuto.",
+        "en": "See how far\nyou’ve come."
+      }
+    },
+    {
+      "id": "04",
+      "name": "food",
+      "color": "#EC4899",
+      "titles": {
+        "it": "Dai energia\nai tuoi obiettivi.",
+        "en": "Fuel your goals."
+      }
+    },
+    {
+      "id": "05",
+      "name": "measurements",
+      "color": "#EF5350",
+      "titles": {
+        "it": "I tuoi cambiamenti,\nnel tempo.",
+        "en": "Track your changes\nover time."
+      }
+    },
+    {
+      "id": "06",
+      "name": "achievements",
+      "color": "#FF9800",
+      "titles": {
+        "it": "Ogni conquista\nmerita spazio.",
+        "en": "Celebrate\nevery milestone."
+      }
+    },
+    {
+      "id": "07",
+      "name": "social",
+      "color": "#FDD835",
+      "titles": {
+        "it": "Condividi\ni tuoi successi.",
+        "en": "Share your\nachievements."
+      }
+    },
+    {
+      "id": "08",
+      "name": "trainer",
+      "color": "#4CAF50",
+      "titles": {
+        "it": "Tieni il tuo trainer\nal corrente",
+        "en": "Keep your trainer\nin the loop"
+      }
+    },
+    {
+      "id": "09",
+      "name": "watch",
+      "color": "#00BCD4",
+      "titles": {
+        "it": "Il tuo allenamento.\nAl polso.",
+        "en": "Your workout.\nOn your wrist."
+      }
+    }
+  ],
+  "watch_screenshots": [
+    {
+      "id": "01",
+      "name": "workout"
+    },
+    {
+      "id": "02",
+      "name": "routines"
+    },
+    {
+      "id": "03",
+      "name": "edit-set"
+    },
+    {
+      "id": "04",
+      "name": "notes"
+    },
+    {
+      "id": "05",
+      "name": "calories"
+    },
+    {
+      "id": "06",
+      "name": "nutrients"
+    },
+    {
+      "id": "07",
+      "name": "water"
+    }
+  ]
+}

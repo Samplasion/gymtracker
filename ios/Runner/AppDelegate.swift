@@ -60,8 +60,15 @@ import flutter_app_intents
         }
         
         if #available(iOS 17, *) {
+            #if DEBUG
+            if ProcessInfo.processInfo.environment["GYMBRO_SCREENSHOTS"] != "1" {
+                requestHealthPermission()
+                workout.retrieveRemoteSession()
+            }
+            #else
             requestHealthPermission()
             workout.retrieveRemoteSession()
+            #endif
             
             workout.listener = self
             workout.onMetricsPacket = { [weak self] packet in self?.publishPhoneMetrics(packet) }
@@ -491,6 +498,10 @@ extension AppDelegate: GymBroNativeHostAPI {
         if old["id"] as? String == workoutId { state["parameters"] = old["parameters"] }
         watchSnapshot.update(workout: state)
         publishWatchSnapshot()
+        #if DEBUG
+        // Screenshot fixtures synchronize the real companion UI without sensors.
+        if workoutId.hasPrefix("screenshot-") { return }
+        #endif
         didUpdateApplicationContext(applicationContext)
         if #available(iOS 17, *) { workout.startPhoneWorkout(id: workoutId, start: applicationContext.startingTime) }
         else { startLegacyMetricsMonitor(); publishLegacyMetrics(); launchLegacyWatch(); synchronizeLegacyWorkout() }

@@ -12,13 +12,15 @@ struct SetEditSheet: View {
     @Environment(\.dismiss) var dismiss
     @EnvironmentObject var model: WorkoutViewModel
     
+    private let compactTitle: Bool
     @State private var weight: Double
     @State private var time: TimeInterval
     // Will be converted to Int at saving time
     @State private var reps: Double
     @State private var distance: Double
     
-    init(model: WorkoutViewModel) {
+    init(model: WorkoutViewModel, compactTitle: Bool = false) {
+        self.compactTitle = compactTitle
         if let wt = model.set?.weight {
             _weight = State(initialValue: wt)
         } else {
@@ -105,7 +107,7 @@ struct SetEditSheet: View {
         }
 //            .padding()
             .tint(model.exerciseColor == 0 ? .accentColor : model.exerciseColor.asARGBColor())
-            .navigationBarTitle("Edit Set")
+            .navigationBarTitle(LocalizedStringKey(compactTitle ? (Locale.current.languageCode == "it" ? "Serie" : "Set") : "Edit Set"))
             .toolbar {
                 ToolbarItem(placement: .confirmationAction) {
                     Button {

@@ -101,6 +101,9 @@ final class WorkoutManager: NSObject, ObservableObject {
     }
 
     func requestAuthorization() {
+        #if DEBUG && os(watchOS)
+        if ScreenshotMode.enabled { return }
+        #endif
         Task { @MainActor in
             do {
                 try await healthStore.requestAuthorization(toShare: typesToShare, read: typesToRead)

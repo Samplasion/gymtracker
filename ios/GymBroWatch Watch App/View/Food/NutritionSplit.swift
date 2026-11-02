@@ -8,8 +8,10 @@ struct NutritionSplit: View {
     var fats: Double
     var fatsGoal: Double
 
+    var compact = false
+
     var body: some View {
-        VStack(spacing: 14) {
+        VStack(spacing: compact ? 4 : 14) {
             nutrient("Protein", value: protein, goal: proteinGoal, color: .purple)
             nutrient("Carbs", value: carbs, goal: carbsGoal, color: .orange)
             nutrient("Fats", value: fats, goal: fatsGoal, color: .pink)
@@ -19,7 +21,7 @@ struct NutritionSplit: View {
     private func nutrient(_ name: LocalizedStringKey, value: Double, goal: Double, color: Color) -> some View {
         let intake = DailyNutritionData.valid(value) ? value : 0
         let hasGoal = DailyNutritionData.valid(goal) && goal > 0
-        return VStack(alignment: .leading, spacing: 6) {
+        return VStack(alignment: .leading, spacing: compact ? 2 : 6) {
             HStack(alignment: .firstTextBaseline) {
                 Text(name).foregroundStyle(color).font(.caption.weight(.semibold))
                 Spacer(minLength: 4)

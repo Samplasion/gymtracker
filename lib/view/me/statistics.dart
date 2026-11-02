@@ -67,7 +67,10 @@ class _MeStatisticsPageState extends ConsumerState<MeStatisticsPage>
 
   List<Workout> get periodWorkouts {
     if (timeFrame.duration != null) {
-      return controller.history.inTimePeriod(timeFrame.duration!);
+      return controller.history.inTimePeriod(
+        timeFrame.duration!,
+        now: ref.read(trainingClockProvider)(),
+      );
     }
     return controller.history;
   }

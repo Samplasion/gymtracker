@@ -31,7 +31,7 @@ struct PagingView: View {
         .onChange(of: workoutViewModel.supersetNotes) { _ in
             if !workoutViewModel.hasSupersetNotes && selection == .supersetNotes { selection = .workout }
         }
-        .onAppear { workoutManager.requestAuthorization() }
+        .onAppear { if !ScreenshotMode.enabled { workoutManager.requestAuthorization() } }
         .sheet(isPresented: Binding(get: { summaryID != nil }, set: { if !$0 { summaryID = nil } })) {
             if let id = summaryID { SummaryView(workoutID: id) }
         }

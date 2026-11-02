@@ -1,8 +1,40 @@
 require "shellwords"
+require "bundler"
 
 default_platform(:ios)
 
 platform :ios do
+  desc "Genera screenshot App Store localizzati con tema e cornici promozionali"
+  lane :screenshots do |options|
+    project_dir = File.expand_path("../..", __dir__)
+    python = File.join(project_dir, "tools", "screenshots", ".venv", "bin", "python")
+    UI.user_error!("Prepara Pillow: python3 -m venv tools/screenshots/.venv && tools/screenshots/.venv/bin/pip install -r tools/screenshots/requirements.txt (dalla root)") unless File.executable?(python)
+    Dir.chdir(project_dir) do
+      # Flutter invokes CocoaPods outside Fastlane's gem bundle.
+      Bundler.with_unbundled_env do
+        sh(python, "tools/screenshots/run.py",
+           "--locale", options.fetch(:locale, "all").to_s,
+           "--only", options.fetch(:only, "all").to_s,
+           "--stage", options.fetch(:stage, "all").to_s)
+      end
+    end
+  end
+
+  desc "Cattura sette schermate Apple Watch in italiano e inglese alla risoluzione nativa"
+  lane :watch_screenshots do |options|
+    project_dir = File.expand_path("../..", __dir__)
+    python = File.join(project_dir, "tools", "screenshots", ".venv", "bin", "python")
+    UI.user_error!("Prepara l'ambiente Python seguendo tools/screenshots/README.md") unless File.executable?(python)
+    Dir.chdir(project_dir) do
+      Bundler.with_unbundled_env do
+        sh(python, "tools/screenshots/run.py", "--target", "watch",
+           "--locale", options.fetch(:locale, "all").to_s,
+           "--only", options.fetch(:only, "all").to_s,
+           "--stage", options.fetch(:stage, "all").to_s)
+      end
+    end
+  end
+
   desc "Incrementa la build Flutter, crea l'IPA e la carica su TestFlight"
   lane :beta do
     # Fastlane carica automaticamente fastlane/.env.

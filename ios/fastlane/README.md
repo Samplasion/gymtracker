@@ -15,6 +15,22 @@ For _fastlane_ installation instructions, see [Installing _fastlane_](https://do
 
 ## iOS
 
+### ios screenshots
+
+```sh
+[bundle exec] fastlane ios screenshots
+```
+
+Genera screenshot App Store localizzati con tema e cornici promozionali
+
+### ios watch_screenshots
+
+```sh
+[bundle exec] fastlane ios watch_screenshots
+```
+
+Cattura sette schermate Apple Watch in italiano e inglese alla risoluzione nativa
+
 ### ios beta
 
 ```sh

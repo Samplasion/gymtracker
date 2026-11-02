@@ -46,6 +46,7 @@ class GBAppDelegate: NSObject, WKApplicationDelegate {
     }
 
     func handleActiveWorkoutRecovery() {
+        if ScreenshotMode.enabled { return }
         WorkoutManager.shared.enqueue {
             do {
                 if let recovered = try await WorkoutManager.shared.healthStore.recoverActiveWorkoutSession() {

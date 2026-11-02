@@ -66,3 +66,7 @@ sentry.properties
 
 # Internal documentation
 /internal_docs/
+
+# Screenshot compositor environment
+/tools/screenshots/.venv/
+/tools/screenshots/__pycache__/

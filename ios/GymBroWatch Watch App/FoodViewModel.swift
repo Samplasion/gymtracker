@@ -22,6 +22,7 @@ class FoodViewModel: NSObject, ObservableObject {
     @Published private(set) var waterOwnerScope: String?
     @Published private(set) var hasData = false
     private var sourceState: NativeFoodStateMessage?
+    var clock: () -> Date = Date.init
     @Published var lastUpdated = Date.now
     @Published var calorieGoal: Double = 0
     @Published var calorieIntake: Double = 0
@@ -68,7 +69,8 @@ class FoodViewModel: NSObject, ObservableObject {
         waterQueue.acknowledge(ids: ids, ownerScope: ownerScope)
         pendingWaterEntries = waterQueue.entries
     }
-    func refreshDisplayedData(at date: Date = .now) {
+    func refreshDisplayedData(at date: Date? = nil) {
+        let date = date ?? clock()
         guard let state = sourceState else { return }
         let current = DailyNutritionData.isCurrent(state, at: date)
         hasData = state.referenceDay != nil

@@ -1,11 +1,13 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:gymtracker/controller/countdown_controller.dart';
 import 'package:gymtracker/i18n/strings.g.dart';
 
 typedef TimerStringBuilder<T> = T Function(TextSpan time);
 
-class TimerView extends StatefulWidget {
+class TimerView extends ConsumerStatefulWidget {
   final DateTime startingTime;
   final Widget Function(BuildContext context, Widget text) builder;
 
@@ -16,7 +18,7 @@ class TimerView extends StatefulWidget {
   });
 
   @override
-  State<TimerView> createState() => _TimerViewState();
+  ConsumerState<TimerView> createState() => _TimerViewState();
 
   static T buildTimeString<T>(
     BuildContext context,
@@ -48,7 +50,7 @@ class TimerView extends StatefulWidget {
       RichText(text: time);
 }
 
-class _TimerViewState extends State<TimerView> {
+class _TimerViewState extends ConsumerState<TimerView> {
   Stream stream = Stream.periodic(const Duration(milliseconds: 200));
   late StreamSubscription subscription;
 
@@ -69,7 +71,10 @@ class _TimerViewState extends State<TimerView> {
 
   @override
   Widget build(BuildContext context) {
-    final time = DateTime.now().difference(widget.startingTime);
+    final time = ref
+        .read(workoutClockProvider)
+        .now()
+        .difference(widget.startingTime);
 
     return widget.builder(context, TimerView.buildTimeString(context, time));
   }

@@ -8,12 +8,14 @@ import 'package:gymtracker/controller/workout_controller.dart';
 import 'package:gymtracker/db/wearable_training_store.dart';
 import 'package:gymtracker/model/wearable_training.dart';
 import 'package:gymtracker/model/workout.dart';
+import 'package:gymtracker/provider/locale.dart';
 import 'package:gymtracker/provider/routines.dart';
 import 'package:gymtracker/service/database.dart';
 import 'package:gymtracker/service/logger.dart';
 import 'package:gymtracker/service/native.dart';
 import 'package:gymtracker/service/wearable/training_transport.dart';
 import 'package:gymtracker/utils/go.dart';
+import 'package:gymtracker/utils/utils.dart';
 import 'package:gymtracker/view/utils/workout_navigation.dart';
 
 final wearableTrainingProvider = Provider<WearableTrainingService>((ref) {
@@ -188,6 +190,25 @@ class WearableTrainingService {
     }
   }
 
+  Workout _completedWorkout(Map<String, dynamic> document) {
+    final workout = fixWorkout(
+      Workout.fromJson({
+        ...document,
+        'folder': null,
+        'startingDate': DateTime.fromMillisecondsSinceEpoch(
+          document['time'] as int,
+        ).toIso8601String(),
+      }),
+    );
+    if (workout.name.trim().isNotEmpty) return workout;
+    return workout.copyWith(
+      name: generateWorkoutTitleForExercises(
+        ref.read(translationsProvider),
+        workout.exercises,
+      ),
+    );
+  }
+
   Future<Map<String, dynamic>> receive(Map<String, dynamic> remote) async {
     if (remote['version'] != 1 ||
         remote['ownerScope'] != owner ||
@@ -207,33 +228,29 @@ class WearableTrainingService {
     final store = WearableTrainingStore(db);
     final id = remote['id'] as String;
     if (await store.processed(scope, id)) {
-      final terminal = await store.read(scope, id);
+      var terminal = await store.read(scope, id);
       if (terminal != null && terminal['status'] == 'completed') {
         final reconciled = WearableTrainingDocument.merge(terminal, remote);
+        reconciled['duration'] = WearableTrainingDocument.completedDuration(
+          reconciled,
+        );
+        final workout = _completedWorkout(reconciled);
+        reconciled['name'] = workout.name;
         if (WearableTrainingDocument.canonical(reconciled['exercises']) !=
-            WearableTrainingDocument.canonical(terminal['exercises'])) {
+                WearableTrainingDocument.canonical(terminal['exercises']) ||
+            reconciled['duration'] != terminal['duration'] ||
+            reconciled['name'] != terminal['name']) {
           await db.transaction(() async {
             if (owner != scope) throw StateError('Account changed');
             // Never resurrect a history entry the user has subsequently deleted.
             final history = await db.getAllHistoryWorkoutsFuture();
             if (history.any((workout) => workout.id == id)) {
-              await db.updateHistoryWorkout(
-                Workout.fromJson({
-                  ...reconciled,
-                  'folder': null,
-                  'startingDate': DateTime.fromMillisecondsSinceEpoch(
-                    reconciled['time'] as int,
-                  ).toIso8601String(),
-                  'duration':
-                      ((reconciled['end'] as int) -
-                          (reconciled['time'] as int)) *
-                      1000,
-                }),
-              );
+              await db.updateHistoryWorkout(workout);
             }
             if (owner != scope) throw StateError('Account changed');
             await store.write(reconciled, processed: true);
           });
+          terminal = reconciled;
         }
       }
       final running = ref.read(workoutControllerProvider.notifier);
@@ -283,16 +300,9 @@ class WearableTrainingService {
       final end = DateTime.fromMillisecondsSinceEpoch(merged['end'] as int);
       if (end.isBefore(start)) return {'accepted': false};
       if (merged['status'] == 'completed') {
-        final workout = fixWorkout(
-          Workout.fromJson({
-            ...merged,
-            'folder': null,
-            'duration':
-                merged['duration'] as int? ??
-                end.difference(start).inMicroseconds,
-            'startingDate': start.toIso8601String(),
-          }),
-        );
+        merged['duration'] = WearableTrainingDocument.completedDuration(merged);
+        final workout = _completedWorkout(merged);
+        merged['name'] = workout.name;
         await db.transaction(() async {
           if (db.currentUserId !=
               (scope == 'guest' ? null : scope.substring(5))) {

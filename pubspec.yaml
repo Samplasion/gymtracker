@@ -1,7 +1,7 @@
 name: gymtracker
 description: A new Flutter project.
 publish_to: "none"
-version: 0.15.1+1793111117
+version: 0.15.1+1793111119
 
 environment:
   sdk: ">=3.11.0 <4.0.0"

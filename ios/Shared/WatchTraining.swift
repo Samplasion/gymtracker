@@ -3,6 +3,12 @@ import Foundation
 /// Versioned JSON documents deliberately preserve fields the Watch cannot edit.
 /// Durations use Dart microseconds; wall-clock timestamps use milliseconds.
 enum WatchTraining {
+    /// Workout runtime is independent of the optional standard stopwatch.
+    /// Dates are milliseconds; the app's persisted Duration uses microseconds.
+    static func elapsedDuration(_ document: [String: Any], endingAt end: Int64) -> Int64 {
+        let start = (document["time"] as? NSNumber)?.int64Value ?? end
+        return max(0, end - start) * 1000
+    }
     static func immediateDocument(_ document: [String: Any], limit: Int = 35_000) -> [String: Any]? {
         guard let data = try? JSONSerialization.data(withJSONObject: propertyList(document)) else { return nil }
         if data.count <= limit { return document }

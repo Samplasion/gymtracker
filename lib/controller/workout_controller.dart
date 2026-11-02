@@ -964,23 +964,7 @@ class WorkoutController extends _$WorkoutController {
     final t = ref.read(translationsProvider);
 
     if (name.trim().isEmpty) {
-      final groups = <GTMuscleCategory>{};
-
-      for (final ex in exercises) {
-        ex.when(
-          exercise: (e) {
-            final cat = e.primaryMuscleGroup.category;
-            if (cat != null) groups.add(cat);
-          },
-          superset: (s) => groups.addAll(
-            s.exercises
-                .map((e) => e.primaryMuscleGroup.category)
-                .whereType<GTMuscleCategory>(),
-          ),
-        );
-      }
-
-      setName(generateWorkoutTitle(t, groups));
+      setName(generateWorkoutTitleForExercises(t, exercises));
     }
   }
 

@@ -2,6 +2,16 @@ import Foundation
 
 @main struct WatchTrainingTests {
     static func main() throws {
+        let runtime: Int64 = 60_000_000
+        for stopwatch: [String: Any] in [[:],
+            ["globalStopwatchPaused": true, "globalStopwatchNominalDuration": 0],
+            ["globalStopwatchPaused": true, "globalStopwatchNominalDuration": 5000],
+            ["globalStopwatchPaused": false, "globalStopwatch": 56000]] {
+            var session = stopwatch; session["time"] = 1000
+            assert(WatchTraining.elapsedDuration(session, endingAt: 61000) == runtime)
+            assert(WatchTraining.elapsedDuration(session, endingAt: 500) == 0)
+        }
+        print("Workout runtime ignores stopped/running standard stopwatch across takeover")
         let sent: [String: Any] = ["id": "s", "ownerScope": "guest", "sequence": 2,
             "modified": 20, "epoch": 1, "cursor": "a", "exercises": [["sets": [["id": "a", "done": false]]]]]
         assert(WatchTraining.matchesOutgoing(sent, active: sent))

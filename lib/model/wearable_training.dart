@@ -36,6 +36,16 @@ class WearableTrainingDocument {
 
   static String canonical(Object? value) => jsonEncode(_ordered(value));
 
+  /// Recover legacy Watch payloads saved with an unused stopwatch's zero value.
+  /// Wire dates are milliseconds, while Duration JSON values are microseconds.
+  static int completedDuration(Map document) {
+    final saved = (document['duration'] as num?)?.toInt();
+    if (saved != null && saved > 0) return saved;
+    final elapsed =
+        (document['end'] as num).toInt() - (document['time'] as num).toInt();
+    return elapsed > 0 ? elapsed * 1000 : 0;
+  }
+
   static String _setContent(Map? value) => canonical(
     value == null
         ? null

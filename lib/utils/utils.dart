@@ -5,7 +5,8 @@ import 'package:dynamic_color/dynamic_color.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_quill/flutter_quill.dart';
 import 'package:gymtracker/i18n/strings.g.dart';
-import 'package:gymtracker/model/model.dart' show GTMuscleCategory;
+import 'package:gymtracker/model/model.dart'
+    show GTMuscleCategory, WorkoutExercisable;
 import 'package:gymtracker/utils/extensions.dart';
 import 'package:http/http.dart';
 import 'package:share_plus/share_plus.dart';
@@ -253,6 +254,27 @@ String generateWorkoutTitle(
     ),
   };
   return t.titleGenerator.template(muscles: title).trim();
+}
+
+String generateWorkoutTitleForExercises(
+  Translations t,
+  Iterable<WorkoutExercisable> exercises,
+) {
+  final groups = <GTMuscleCategory>{};
+  for (final exercise in exercises) {
+    exercise.when(
+      exercise: (e) {
+        final category = e.primaryMuscleGroup.category;
+        if (category != null) groups.add(category);
+      },
+      superset: (s) => groups.addAll(
+        s.exercises
+            .map((e) => e.primaryMuscleGroup.category)
+            .whereType<GTMuscleCategory>(),
+      ),
+    );
+  }
+  return generateWorkoutTitle(t, groups);
 }
 
 DateTime maxDate(DateTime a, DateTime b) {

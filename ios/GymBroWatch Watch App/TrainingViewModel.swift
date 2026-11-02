@@ -128,15 +128,7 @@ final class TrainingViewModel: ObservableObject {
             document["status"] = save ? "completed" : "discarded"
             let end = WatchTraining.milliseconds() + clockOffset
             document["end"] = end
-            let elapsed: Int64
-            if document["globalStopwatchPaused"] as? Bool == true {
-                elapsed = (document["globalStopwatchNominalDuration"] as? NSNumber)?.int64Value ?? 0
-            } else {
-                let start = (document["globalStopwatch"] as? NSNumber)?.int64Value
-                    ?? (document["time"] as? NSNumber)?.int64Value ?? end
-                elapsed = max(0, end - start)
-            }
-            document["duration"] = elapsed * 1000
+            document["duration"] = WatchTraining.elapsedDuration(document, endingAt: end)
             var next = storage
             var queue = pending; queue.append(document)
             next["pending"] = queue

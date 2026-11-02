@@ -8,6 +8,7 @@ import 'package:gymtracker/controller/workout_controller.dart';
 import 'package:gymtracker/db/wearable_training_store.dart';
 import 'package:gymtracker/model/exercise.dart';
 import 'package:gymtracker/model/wearable_training.dart';
+import 'package:gymtracker/model/workout.dart';
 import 'package:gymtracker/service/wearable/apple_watch_training_transport.dart';
 import 'package:gymtracker/service/wearable/training_transport.dart';
 import 'package:gymtracker/service/wearable_training.dart';
@@ -469,6 +470,94 @@ void main() {
   });
 
   test(
+    'offline Watch completion preserves the phone workout name over its stale title',
+    () async {
+      final service = dataController(
+        (ref) => WearableTrainingService(ref, transport: _CompanionTransport()),
+      );
+      final adopted = await service.receive(session(status: 'active'));
+      final offline = WearableTrainingDocument.copy(adopted['document'] as Map);
+      final controller = MockServices.container.read(
+        workoutControllerProvider.notifier,
+      );
+      controller.setName('Allenamento rinominato sul telefono');
+      // The disconnected Watch still carries the title received at adoption.
+      expect(offline['name'], 'Watch workout');
+      offline['status'] = 'completed';
+      offline['end'] = (offline['time'] as int) + 60000;
+      offline['modified'] = DateTime.now().millisecondsSinceEpoch + 1000;
+      await service.receive(offline);
+      await service.receive(offline);
+      final history = await MockServices.database.getAllHistoryWorkoutsFuture();
+      expect(history, hasLength(1));
+      expect(history.single.name, 'Allenamento rinominato sul telefono');
+    },
+  );
+
+  test(
+    'unnamed phone workout completed offline gets the normal generated title',
+    () async {
+      final service = dataController(
+        (ref) => WearableTrainingService(ref, transport: _CompanionTransport()),
+      );
+      final source = session(status: 'active')..['name'] = '';
+      final adopted = await service.receive(source);
+      final offline = WearableTrainingDocument.copy(adopted['document'] as Map);
+      offline['status'] = 'completed';
+      offline['end'] = (offline['time'] as int) + 60000;
+      final response = await service.receive(offline);
+      expect((response['document'] as Map)['name'], 'Chest Workout');
+      await service.receive(offline);
+      final history = await MockServices.database.getAllHistoryWorkoutsFuture();
+      expect(history, hasLength(1));
+      expect(history.single.name, 'Chest Workout');
+    },
+  );
+
+  test(
+    'unnamed workout with no exercises receives the generic localized title',
+    () async {
+      final service = dataController(
+        (ref) => WearableTrainingService(ref, transport: _CompanionTransport()),
+      );
+      final source = session()
+        ..['name'] = '   '
+        ..['exercises'] = <dynamic>[];
+      await service.receive(source);
+      final history = await MockServices.database.getAllHistoryWorkoutsFuture();
+      expect(history.single.name, 'Workout');
+      expect(history.single.exercises, isEmpty);
+    },
+  );
+
+  test(
+    'unnamed Watch workout derives its title from superset exercises too',
+    () async {
+      final service = dataController(
+        (ref) => WearableTrainingService(ref, transport: _CompanionTransport()),
+      );
+      final source = session()..['name'] = '';
+      final shoulders = exerciseHelper(
+        'shoulder-source',
+        'Press',
+      ).copyWith(primaryMuscleGroup: GTMuscleGroup.shoulders);
+      await MockServices.database.insertCustomExercise(shoulders);
+      source['exercises'] = [
+        supersetHelper(
+          'superset',
+          exercises: [
+            exerciseHelper('chest', 'Bench').copyWith(parentID: 'source'),
+            shoulders.copyWith(id: 'shoulders', parentID: 'shoulder-source'),
+          ],
+        ).toJson(),
+      ];
+      await service.receive(source);
+      final history = await MockServices.database.getAllHistoryWorkoutsFuture();
+      expect(history.single.name, 'Chest and Shoulders Workout');
+    },
+  );
+
+  test(
     'completed offline workout imports once without starting an ongoing',
     () async {
       final service = dataController(
@@ -492,6 +581,95 @@ void main() {
       ).called(1);
     },
   );
+  test(
+    'Watch completion after phone takeover keeps runtime with stopped stopwatch',
+    () async {
+      final service = dataController(
+        (ref) => WearableTrainingService(ref, transport: _CompanionTransport()),
+      );
+      final adopted = await service.receive(session(status: 'active'));
+      final completed = WearableTrainingDocument.copy(
+        adopted['document'] as Map,
+      );
+      expect(completed['globalStopwatchPaused'], true);
+      expect(completed['globalStopwatchNominalDuration'], 0);
+      completed['status'] = 'completed';
+      completed['end'] = (completed['time'] as int) + 60_000;
+      // Compatibility with the zero duration emitted by previous Watch builds.
+      completed['duration'] = 0;
+      await service.receive(completed);
+      await service.receive(completed);
+      final history = await MockServices.database.getAllHistoryWorkoutsFuture();
+      expect(history.single.duration, const Duration(minutes: 1));
+      final journal = await WearableTrainingStore(
+        MockServices.database,
+      ).read('guest', 'watch-session');
+      expect(journal!['duration'], 60_000_000);
+      verify(
+        () => MockServices.routinesController.advanceProgressionsFromWorkout(
+          any(),
+        ),
+      ).called(1);
+    },
+  );
+
+  test(
+    'late set reconciliation preserves saved duration instead of recalculating it',
+    () async {
+      final service = dataController(
+        (ref) => WearableTrainingService(ref, transport: _CompanionTransport()),
+      );
+      final source = session()..['duration'] = 45_000_000;
+      final response = await service.receive(source);
+      final late = WearableTrainingDocument.copy(response['document'] as Map);
+      late['status'] = 'active';
+      final changed = late['exercises'][0]['sets'][0] as Map;
+      changed['weight'] = 73.0;
+      late['stamps'][changed['id']] = {
+        'time': (source['end'] as int) - 1,
+        'device': 'watch',
+        'sequence': 2,
+      };
+      await service.receive(late);
+      final history = await MockServices.database.getAllHistoryWorkoutsFuture();
+      expect(history.single.duration, const Duration(seconds: 45));
+      expect(history.single.exercises.first.sets.first.weight, 73.0);
+      verify(
+        () => MockServices.routinesController.advanceProgressionsFromWorkout(
+          any(),
+        ),
+      ).called(1);
+    },
+  );
+
+  test(
+    'redelivery repairs a previously imported zero runtime without reapplying progression',
+    () async {
+      final service = dataController(
+        (ref) => WearableTrainingService(ref, transport: _CompanionTransport()),
+      );
+      final response = await service.receive(session());
+      final legacy = WearableTrainingDocument.copy(response['document'] as Map)
+        ..['duration'] = 0;
+      final history = await MockServices.database.getAllHistoryWorkoutsFuture();
+      await MockServices.database.updateHistoryWorkout(
+        history.single.copyWith(duration: Duration.zero),
+      );
+      await WearableTrainingStore(
+        MockServices.database,
+      ).write(legacy, processed: true);
+      await service.receive(legacy);
+      final repaired = await MockServices.database
+          .getAllHistoryWorkoutsFuture();
+      expect(repaired.single.duration, const Duration(minutes: 1));
+      verify(
+        () => MockServices.routinesController.advanceProgressionsFromWorkout(
+          any(),
+        ),
+      ).called(1);
+    },
+  );
+
   test(
     'failed progression rolls back history and permits a clean retry',
     () async {

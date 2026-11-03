@@ -325,12 +325,19 @@ export function nutritionSummary(raw: Row) {
                 (e.food.pieces ?? 1) / 100, 0),
           ];
         }));
+      const compact = (totals: Record<string, number | null>) => ({
+        totals: Object.fromEntries(
+          Object.entries(totals).filter(([, value]) => value !== null),
+        ),
+        incompleteNutrients: nutrientNames.filter((key) =>
+          totals[key] === null
+        ),
+      });
       const totals = total(entries);
       return {
         ...setting,
         hydration: hydration.get(setting.date),
-        totals,
-        incompleteNutrients: nutrientNames.filter((k) => totals[k] === null),
+        ...compact(totals),
         remaining: {
           calories: totals.calories === null
             ? null
@@ -345,7 +352,7 @@ export function nutritionSummary(raw: Row) {
         },
         categories: [...groups].map(([category, list]) => ({
           category: category || null,
-          totals: total(list),
+          ...compact(total(list)),
         })),
       };
     }),

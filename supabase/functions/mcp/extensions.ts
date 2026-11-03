@@ -267,18 +267,18 @@ export function registerExtensions(
     })());
   add(
     "list_food_entries",
-    "Read the food diary for inclusive calendar dates, optionally filtering a meal category. Free accounts can access today ±7 days only.",
+    "Read the food diary for inclusive calendar dates, optionally filtering a meal category. Each item.id identifies a diary consumption; food.id is the same consumption snapshot ID, not the catalog product ID. Use item.id with get_food_entries. Free accounts can access today ±7 days only.",
     { ...s.dateRange, category: nm.optional(), ...s.cursorPage },
   );
   add(
     "get_food_entries",
-    "Read saved food consumption snapshots by ID. The same Free date restriction applies to direct ID access.",
+    "Read saved food consumption snapshots using diary item.id values returned by list_food_entries or log_foods, not catalog product IDs. Each returned food.id repeats its consumption item.id. The same Free date restriction applies to direct ID access.",
     { ids: s.idsSchema },
   );
   server.registerTool("log_foods", {
     title: "Log food consumption",
     description:
-      "After the user requests saving, log 1–100 consumptions atomically. Supply a resolved foodRef OR explicit manual food values per 100g/100ml, amount and pieces. For X units of Y (slices, spoons, glasses, packs), amount is grams/ml for ONE unit and pieces is X; e.g. three slices weighing 30g TOTAL: amount=10, pieces=3; three slices weighing 30g EACH: amount=30, pieces=3. If only a total for equal units is given divide by X. Use a matching servingSize or user-supplied unit size; ask when unknown. Nutrients stay per 100g/100ml; never multiply twice. Only calories, fat, saturatedFat, carbs, sugar and protein are required; missingNutrients reports missing values among these six. Optional nutrients may remain null (unknown), do not prevent logging and do not require completion. Do not invent missing nutrient values, replace unknown values with zero or convert mass to volume. Free: today ±7 days. Reuse idempotencyKey on retries.",
+      "After the user requests saving, log 1–100 consumptions atomically. Supply a resolved foodRef OR explicit manual food values per 100g/100ml, amount and pieces. For X units of Y (slices, spoons, glasses, packs), amount is grams/ml for ONE unit and pieces is X; e.g. three slices weighing 30g TOTAL: amount=10, pieces=3; three slices weighing 30g EACH: amount=30, pieces=3. If only a total for equal units is given divide by X. Use a matching servingSize or user-supplied unit size; ask when unknown. Nutrients stay per 100g/100ml; never multiply twice. Only calories, fat, saturatedFat, carbs, sugar and protein are required; missingNutrients reports missing values among these six. Optional nutrients may remain null (unknown), do not prevent logging and do not require completion. Do not invent missing nutrient values, replace unknown values with zero or convert mass to volume. Returned item.id and food.id both identify the newly created consumption snapshot, not the source catalog product. Separate consumptions receive distinct IDs. Free: today ±7 days. Reuse idempotencyKey on retries.",
     inputSchema: z.strictObject({
       ...uuid,
       entries: z.array(s.foodLogSchema).min(1).max(100),
@@ -312,7 +312,7 @@ export function registerExtensions(
     })());
   add(
     "get_nutrition_summary",
-    "Daily and meal totals, applicable goals and remaining nutrients for inclusive calendar dates. Missing optional nutrients remain unknown. Free: today ±7 days.",
+    "Daily and meal totals, applicable goals and remaining nutrients for inclusive calendar dates. At both day and meal level, totals contain only complete numeric nutrient totals, including known zeros; incompleteNutrients lists omitted nutrients whose totals are unknown or incomplete. Omitted nutrients are NOT zero; do not treat partial data as complete. Empty days remain present with zero totals. remaining may be null when its nutrient total is incomplete. nutrientUnits applies to the entire response; hydration is separate from food nutrient totals. Free: today ±7 days.",
     s.dateRange,
     false,
     (r) => nutritionSummary(r),

@@ -169,7 +169,17 @@ Deno.test("nutrition sums quantity and pieces, preserves missing optional values
   equal(result.items[0].totals.calories, 0);
   equal(result.items[1].totals.calories, 200);
   equal(result.items[1].remaining.calories, 1800);
-  equal(result.items[1].totals.fiber, null);
+  equal(Object.hasOwn(result.items[1].totals, "fiber"), false);
+  equal(result.items[1].incompleteNutrients.includes("fiber"), true);
+  equal(
+    result.items[1].categories[0].incompleteNutrients,
+    result.items[1].incompleteNutrients,
+  );
+  equal(
+    Object.values(result.items[1].categories[0].totals).includes(null),
+    false,
+  );
+  equal(result.items[0].incompleteNutrients, []);
   equal(result.items[1].categories[0].totals.protein, 10);
 });
 Deno.test("incomplete food sources cannot be silently logged and manual provenance is rejected", () => {
@@ -349,7 +359,7 @@ Deno.test("hydration shares daily totals with nutrition without changing food-on
   const nutrition = nutritionSummary(raw).items;
   equal(nutrition.map((d: any) => d.hydration), water);
   equal(nutrition[0].totals.water, 27);
-  equal(nutrition[1].totals.water, null);
+  equal(Object.hasOwn(nutrition[1].totals, "water"), false);
   equal(nutrition[1].incompleteNutrients.includes("water"), true);
 });
 
@@ -385,4 +395,39 @@ Deno.test("shared hydration fixture matches the Flutter diary calculation", asyn
     hydrationSummary(raw).items[0].knownTotalWaterMl,
     fixture.knownTotalWaterMl,
   );
+});
+
+Deno.test("compact nutrition totals preserve zeros and distinguish meal completeness", () => {
+  const result = nutritionSummary({
+    settings: [{ date: "2026-11-03", goal: { dailyCalories: 2000 } }],
+    entries: [
+      {
+        date: "2026-11-03",
+        food: {
+          category: "Lunch",
+          amount: 100,
+          nutritionalValuesPer100g: { calories: 100, fat: 0, fiber: 2 },
+        },
+      },
+      {
+        date: "2026-11-03",
+        food: {
+          amount: 100,
+          nutritionalValuesPer100g: { calories: null, fat: 0, fiber: null },
+        },
+      },
+    ],
+  });
+  const day = result.items[0];
+  equal(day.totals, { fat: 0 });
+  equal(day.remaining.calories, null);
+  equal(day.incompleteNutrients.includes("calories"), true);
+  equal(day.incompleteNutrients.includes("fiber"), true);
+  equal(day.incompleteNutrients.includes("fat"), false);
+  equal(day.categories[0].totals, { calories: 100, fat: 0, fiber: 2 });
+  equal(day.categories[0].incompleteNutrients.includes("fiber"), false);
+  equal(day.categories[1].category, null);
+  equal(day.categories[1].totals, { fat: 0 });
+  equal(day.categories[1].incompleteNutrients.includes("fiber"), true);
+  equal(JSON.parse(JSON.stringify(result)).items[0].totals, { fat: 0 });
 });

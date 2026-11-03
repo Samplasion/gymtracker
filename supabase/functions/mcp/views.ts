@@ -233,6 +233,66 @@ export function trainingStats(
     equipment,
   };
 }
+// Compact only responses; composition and statistics retain their complete inputs.
+export function compactTraining(value: Row, includeDetails = false): Row {
+  const result: Row = { ...value };
+  if (result.entries) delete result.exercises;
+  if (!includeDetails) {
+    delete result.components;
+    if (typeof result.notes === "string") {
+      result.notes = readableNotes(result.notes);
+    }
+    delete result.notesText;
+  }
+  for (const key of ["entries", "exercises", "components"]) {
+    if (Array.isArray(result[key])) {
+      result[key] = result[key].map((entry: Row) =>
+        compactTraining(entry, includeDetails)
+      );
+    }
+  }
+  if (Array.isArray(result.sets)) {
+    result.sets = result.sets.map((set: Row) => {
+      const compact = { ...set };
+      const parameters = String(set.parameters ?? result.parameters)
+        .toLowerCase();
+      if (compact.parameters === result.parameters) delete compact.parameters;
+      if (
+        compact.timeSeconds === 0 && !parameters.includes("time")
+      ) delete compact.timeSeconds;
+      if (
+        compact.distance === 0 &&
+        !parameters.includes("distance")
+      ) delete compact.distance;
+      return Object.fromEntries(
+        Object.entries(compact).filter(([, v]) =>
+          v !== null && v !== undefined
+        ),
+      );
+    });
+  }
+  return Object.fromEntries(
+    Object.entries(result).filter(([, v]) => v !== null && v !== undefined),
+  );
+}
+export function foodResult(result: Row): Row {
+  const items = result.items.map((item: Row) => ({
+    ...item,
+    food: foodView(item.food),
+  }));
+  const present = new Set(
+    items.flatMap((item: Row) =>
+      Object.keys(item.food.nutritionalValuesPer100g)
+    ),
+  );
+  return {
+    ...result,
+    items,
+    nutrientUnits: Object.fromEntries(
+      Object.entries(nutrientUnits).filter(([key]) => present.has(key)),
+    ),
+  };
+}
 export function foodView(f: Row) {
   const values = f.nutritionalValuesPer100g ?? {};
   const missingNutrients = nutrientNames.slice(0, 6).filter((k) =>
@@ -240,8 +300,12 @@ export function foodView(f: Row) {
   );
   return {
     ...f,
+    nutritionalValuesPer100g: Object.fromEntries(
+      Object.entries(values).filter(([, value]) =>
+        value !== null && value !== undefined
+      ),
+    ),
     missingNutrients,
-    nutrientUnits,
     ...(f.isDownloaded && f.barcode
       ? {
         attribution: {
@@ -328,9 +392,6 @@ export function nutritionSummary(raw: Row) {
       const compact = (totals: Record<string, number | null>) => ({
         totals: Object.fromEntries(
           Object.entries(totals).filter(([, value]) => value !== null),
-        ),
-        incompleteNutrients: nutrientNames.filter((key) =>
-          totals[key] === null
         ),
       });
       const totals = total(entries);

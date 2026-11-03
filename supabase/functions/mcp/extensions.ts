@@ -2,8 +2,9 @@ import { McpServer } from "@modelcontextprotocol/server";
 import { z } from "zod";
 import * as s from "./schemas.ts";
 import {
+  compactTraining,
   exerciseHistory,
-  foodView,
+  foodResult,
   hydrationSummary,
   nutritionSummary,
   routineView,
@@ -44,7 +45,8 @@ export function registerExtensions(
       _meta: { securitySchemes },
     }, (args: Row) =>
       wrap(async () => {
-        const { idempotencyKey, ...request } = args;
+        const { idempotencyKey, includeDetails: _includeDetails, ...request } =
+          args;
         const result = await call(name, request, idempotencyKey);
         return transform ? transform(result, args) : result;
       })());
@@ -143,12 +145,20 @@ export function registerExtensions(
   );
   add(
     "get_routines",
-    "Read complete routines including nested supersets, progression and set targets. Missing references are listed as unavailable.",
-    { ids: s.idsSchema, language: s.language },
+    "Read complete routines in one hierarchical entries array, including nested supersets, progression and set targets. Notes are readable text; includeDetails adds original rich notes. Omitted set parameters inherit from the exercise; omitted nonapplicable zero time/distance fields mean zero and omitted nulls are unset. done remains explicit. Missing references are listed as unavailable.",
+    {
+      ids: s.idsSchema,
+      language: s.language,
+      includeDetails: z.boolean().default(false).describe(
+        "Include original rich notes and, for workouts, full source session components.",
+      ),
+    },
     false,
     (r, a) => ({
       ...r,
-      items: r.items.map((x: Row) => routineView(x, a.language)),
+      items: r.items.map((x: Row) =>
+        compactTraining(routineView(x, a.language), a.includeDetails)
+      ),
     }),
   );
   add(
@@ -177,18 +187,30 @@ export function registerExtensions(
       ...r,
       items: r.items.map((raw: Row) => {
         const w = workoutView(raw, a.language);
-        return { ...w, entries: undefined, components: undefined };
+        return compactTraining({
+          ...w,
+          entries: undefined,
+          components: undefined,
+        });
       }),
     }),
   );
   add(
     "get_workouts",
-    "Read complete logical workouts with actual sets and original session components. A continuation ID resolves to the original workout.",
-    { ids: s.idsSchema, language: s.language },
+    "Read complete logical workouts with actual sets in one hierarchical entries array. A continuation ID resolves to the original workout. componentIds identifies source sessions; includeDetails adds their complete data and original rich notes. Default notes are text. Omitted set parameters inherit from the exercise; omitted nonapplicable zero time/distance fields mean zero and omitted nulls are unset. done remains explicit.",
+    {
+      ids: s.idsSchema,
+      language: s.language,
+      includeDetails: z.boolean().default(false).describe(
+        "Include original rich notes and, for workouts, full source session components.",
+      ),
+    },
     false,
     (r, a) => ({
       ...r,
-      items: r.items.map((x: Row) => workoutView(x, a.language)),
+      items: r.items.map((x: Row) =>
+        compactTraining(workoutView(x, a.language), a.includeDetails)
+      ),
     }),
   );
   add(
@@ -199,7 +221,7 @@ export function registerExtensions(
     (r, a) => ({
       ...r,
       items: r.items.map((x: Row) =>
-        exerciseHistory(x, a.references, a.language)
+        compactTraining(exerciseHistory(x, a.references, a.language))
       ),
     }),
   );
@@ -223,7 +245,7 @@ export function registerExtensions(
   server.registerTool("search_foods", {
     title: "Search foods",
     description:
-      "Search the shared Gym Bro food catalog, local favorites and personal barcode definitions. By default search all three sources; no external service is contacted. Use returned references when logging. missingNutrients lists only missing REQUIRED nutrients: calories, fat, saturatedFat, carbs, sugar and protein. An empty list means these six are present, not that all nutrients are known. Optional nutrients may be null (unknown, never zero) and do not prevent logging. Complete missing required nutrients explicitly before logging.",
+      "Search the shared Gym Bro food catalog, local favorites and personal barcode definitions. By default search all three sources; no external service is contacted. Use returned references when logging. missingNutrients lists only missing REQUIRED nutrients: calories, fat, saturatedFat, carbs, sugar and protein. An empty list means these six are present, not that all nutrients are known. Optional nutrients may be null (unknown, never zero) and do not prevent logging. Complete missing required nutrients explicitly before logging. Nutritional values omit unknown/null nutrients, never known zeros; omitted values are unknown, NOT zero. nutrientUnits is shared once at response level for returned nutrients.",
     inputSchema: z.strictObject({
       query: z.string().trim().min(1).max(200),
       source: z.enum(["all", "catalog", "favorite", "customBarcode"]).default(
@@ -238,15 +260,12 @@ export function registerExtensions(
   }, (args) =>
     wrap(async () => {
       const result = await call("search_foods", args);
-      return {
-        ...result,
-        items: result.items.map((i: Row) => ({ ...i, food: foodView(i.food) })),
-      };
+      return foodResult(result);
     })());
   server.registerTool("get_foods", {
     title: "Get food definitions",
     description:
-      "Resolve up to 20 food references. Catalog references use the product ID. Legacy Open Food Facts barcode references resolve only from the published Gym Bro catalog. missingNutrients lists only missing REQUIRED nutrients: calories, fat, saturatedFat, carbs, sugar and protein. An empty list means these six are present, not that all nutrients are known. Optional nutrients may be null (unknown, never zero) and do not prevent logging. Complete missing required nutrients explicitly before logging.",
+      "Resolve up to 20 food references. Catalog references use the product ID. Legacy Open Food Facts barcode references resolve only from the published Gym Bro catalog. missingNutrients lists only missing REQUIRED nutrients: calories, fat, saturatedFat, carbs, sugar and protein. An empty list means these six are present, not that all nutrients are known. Optional nutrients may be null (unknown, never zero) and do not prevent logging. Complete missing required nutrients explicitly before logging. Nutritional values omit unknown/null nutrients, never known zeros; omitted values are unknown, NOT zero. nutrientUnits is shared once at response level for returned nutrients.",
     inputSchema: z.strictObject({
       references: z.array(s.foodRef).min(1).max(20),
     }),
@@ -260,25 +279,26 @@ export function registerExtensions(
         }
       }
       const result = await call("get_foods", args);
-      return {
-        ...result,
-        items: result.items.map((i: Row) => ({ ...i, food: foodView(i.food) })),
-      };
+      return foodResult(result);
     })());
   add(
     "list_food_entries",
-    "Read the food diary for inclusive calendar dates, optionally filtering a meal category. Each item.id identifies a diary consumption; food.id is the same consumption snapshot ID, not the catalog product ID. Use item.id with get_food_entries. Free accounts can access today ±7 days only.",
+    "Read the food diary for inclusive calendar dates, optionally filtering a meal category. Each item.id identifies a diary consumption; food.id is the same consumption snapshot ID, not the catalog product ID. Use item.id with get_food_entries. Free accounts can access today ±7 days only. Nutritional values omit unknown/null nutrients, never known zeros; omitted values are unknown, NOT zero. nutrientUnits is shared once at response level for returned nutrients.",
     { ...s.dateRange, category: nm.optional(), ...s.cursorPage },
+    false,
+    (r) => foodResult(r),
   );
   add(
     "get_food_entries",
-    "Read saved food consumption snapshots using diary item.id values returned by list_food_entries or log_foods, not catalog product IDs. Each returned food.id repeats its consumption item.id. The same Free date restriction applies to direct ID access.",
+    "Read saved food consumption snapshots using diary item.id values returned by list_food_entries or log_foods, not catalog product IDs. Each returned food.id repeats its consumption item.id. The same Free date restriction applies to direct ID access. Nutritional values omit unknown/null nutrients, never known zeros; omitted values are unknown, NOT zero. nutrientUnits is shared once at response level for returned nutrients.",
     { ids: s.idsSchema },
+    false,
+    (r) => foodResult(r),
   );
   server.registerTool("log_foods", {
     title: "Log food consumption",
     description:
-      "After the user requests saving, log 1–100 consumptions atomically. Supply a resolved foodRef OR explicit manual food values per 100g/100ml, amount and pieces. For X units of Y (slices, spoons, glasses, packs), amount is grams/ml for ONE unit and pieces is X; e.g. three slices weighing 30g TOTAL: amount=10, pieces=3; three slices weighing 30g EACH: amount=30, pieces=3. If only a total for equal units is given divide by X. Use a matching servingSize or user-supplied unit size; ask when unknown. Nutrients stay per 100g/100ml; never multiply twice. Only calories, fat, saturatedFat, carbs, sugar and protein are required; missingNutrients reports missing values among these six. Optional nutrients may remain null (unknown), do not prevent logging and do not require completion. Do not invent missing nutrient values, replace unknown values with zero or convert mass to volume. Returned item.id and food.id both identify the newly created consumption snapshot, not the source catalog product. Separate consumptions receive distinct IDs. Free: today ±7 days. Reuse idempotencyKey on retries.",
+      "After the user requests saving, log 1–100 consumptions atomically. Supply a resolved foodRef OR explicit manual food values per 100g/100ml, amount and pieces. For X units of Y (slices, spoons, glasses, packs), amount is grams/ml for ONE unit and pieces is X; e.g. three slices weighing 30g TOTAL: amount=10, pieces=3; three slices weighing 30g EACH: amount=30, pieces=3. If only a total for equal units is given divide by X. Use a matching servingSize or user-supplied unit size; ask when unknown. Nutrients stay per 100g/100ml; never multiply twice. Only calories, fat, saturatedFat, carbs, sugar and protein are required; missingNutrients reports missing values among these six. Optional nutrients may remain null (unknown), do not prevent logging and do not require completion. Do not invent missing nutrient values, replace unknown values with zero or convert mass to volume. Returned item.id and food.id both identify the newly created consumption snapshot, not the source catalog product. Separate consumptions receive distinct IDs. Free: today ±7 days. Reuse idempotencyKey on retries. Nutritional values omit unknown/null nutrients, never known zeros; omitted values are unknown, NOT zero. nutrientUnits is shared once at response level for returned nutrients.",
     inputSchema: z.strictObject({
       ...uuid,
       entries: z.array(s.foodLogSchema).min(1).max(100),
@@ -288,10 +308,12 @@ export function registerExtensions(
   }, (args) =>
     wrap(async () => {
       try {
-        return await call(
-          "log_foods",
-          { entries: args.entries },
-          args.idempotencyKey,
+        return foodResult(
+          await call(
+            "log_foods",
+            { entries: args.entries },
+            args.idempotencyKey,
+          ),
         );
       } catch (error) {
         if (
@@ -303,16 +325,18 @@ export function registerExtensions(
             await rpc("@food_get", { barcode: entry.foodRef.id });
           }
         }
-        return await call(
-          "log_foods",
-          { entries: args.entries },
-          args.idempotencyKey,
+        return foodResult(
+          await call(
+            "log_foods",
+            { entries: args.entries },
+            args.idempotencyKey,
+          ),
         );
       }
     })());
   add(
     "get_nutrition_summary",
-    "Daily and meal totals, applicable goals and remaining nutrients for inclusive calendar dates. At both day and meal level, totals contain only complete numeric nutrient totals, including known zeros; incompleteNutrients lists omitted nutrients whose totals are unknown or incomplete. Omitted nutrients are NOT zero; do not treat partial data as complete. Empty days remain present with zero totals. remaining may be null when its nutrient total is incomplete. nutrientUnits applies to the entire response; hydration is separate from food nutrient totals. Free: today ±7 days.",
+    "Daily and meal totals, applicable goals and remaining nutrients for inclusive calendar dates. At both day and meal level, totals contain only complete numeric nutrient totals, including known zeros. Any nutrient from the response-level nutrientUnits map omitted from a total is unknown or incomplete; repeated incompleteNutrients lists are not returned. Omitted nutrients are NOT zero; do not treat partial data as complete. Empty days remain present with zero totals. remaining may be null when its nutrient total is incomplete. nutrientUnits applies to the entire response; hydration is separate from food nutrient totals. Free: today ±7 days.",
     s.dateRange,
     false,
     (r) => nutritionSummary(r),

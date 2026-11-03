@@ -1,5 +1,5 @@
 import { registerExtensions } from "./extensions.ts";
-import { routineView } from "./views.ts";
+import { compactTraining, routineView } from "./views.ts";
 import { createMcpHandler, McpServer } from "@modelcontextprotocol/server";
 import { z } from "zod";
 import { challenge, type Config, protectedResource } from "./auth.ts";
@@ -114,7 +114,7 @@ const content = (value: Record<string, unknown>) => {
   });
 };
 export function mcpServer(config: Config, rpc: Rpc) {
-  const server = new McpServer({ name: "gym-bro", version: "0.4.0" });
+  const server = new McpServer({ name: "gym-bro", version: "0.5.0" });
   const securitySchemes = [{ type: "oauth2", scopes: ["openid"] }];
   const read = {
     readOnlyHint: true,
@@ -206,8 +206,14 @@ export function mcpServer(config: Config, rpc: Rpc) {
   server.registerTool("get_routine", {
     title: "Read a saved routine",
     description:
-      "Read a complete routine, including ordered exercises, sets, notes and existing supersets. Time values are seconds; weight and distance use the routine’s units.",
-    inputSchema: z.strictObject({ id: z.string().min(1).max(300), language }),
+      "Read a complete routine in one hierarchical entries array, including ordered exercises, sets, text notes, progression and supersets. includeDetails adds original rich notes. Omitted set parameters inherit from the exercise; omitted nonapplicable zero time/distance fields mean zero and omitted nulls are unset. done remains explicit. Time values are seconds; weight and distance use the routine’s units.",
+    inputSchema: z.strictObject({
+      id: z.string().min(1).max(300),
+      language,
+      includeDetails: z.boolean().default(false).describe(
+        "Include original rich notes alongside readable notes.",
+      ),
+    }),
     annotations: read,
     _meta: { securitySchemes },
   }, (args) =>
@@ -215,7 +221,10 @@ export function mcpServer(config: Config, rpc: Rpc) {
       const routine = await rpc("mcp_get_routine", {
         routine_id: args.id,
       }) as Record<string, unknown>;
-      return routineView(routine, args.language);
+      return compactTraining(
+        routineView(routine, args.language),
+        args.includeDetails,
+      );
     })());
   server.registerTool("create_program", {
     title: "Save a complete training program",

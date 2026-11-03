@@ -1,4 +1,6 @@
 import {
+  compactTraining,
+  foodResult,
   foodView,
   hydrationSummary,
   nutritionSummary,
@@ -17,6 +19,110 @@ function equal(a: unknown, b: unknown) {
     throw new Error(`${JSON.stringify(a)} != ${JSON.stringify(b)}`);
   }
 }
+
+Deno.test("food results share units once and preserve zero, missing required nutrients and metadata", () => {
+  const source = {
+    items: [
+      {
+        id: "a",
+        date: "2026-11-03",
+        food: {
+          id: "a",
+          name: "Coffee",
+          nutritionalValuesPer100g: { calories: 0, fat: 0, fiber: null },
+        },
+      },
+      {
+        reference: { source: "catalog", id: "b" },
+        food: {
+          name: "Apple",
+          nutritionalValuesPer100g: { calories: 50, water: 85, fiber: null },
+        },
+      },
+    ],
+    unavailable: ["c"],
+    nextCursor: "next",
+  };
+  const result = foodResult(source);
+  equal(result.nutrientUnits, { calories: "kcal", fat: "g", water: "ml" });
+  equal(result.items[0].food.nutritionalValuesPer100g, { calories: 0, fat: 0 });
+  equal(result.items[0].food.missingNutrients, [
+    "saturatedFat",
+    "carbs",
+    "sugar",
+    "protein",
+  ]);
+  equal(Object.hasOwn(result.items[0].food, "nutrientUnits"), false);
+  equal(result.items[0].id, result.items[0].food.id);
+  equal(result.items[1].reference, source.items[1].reference);
+  equal(result.unavailable, ["c"]);
+  equal(result.nextCursor, "next");
+  equal(source.items[0].food.nutritionalValuesPer100g.fiber, null);
+});
+
+Deno.test("compact training preserves hierarchy, progression, set kinds, performed state and detailed source sessions", () => {
+  const rich = JSON.stringify([{ insert: "Rest carefully\n" }]);
+  const raw = workoutView({
+    id: "w",
+    components: [component("w", {
+      infobox: rich,
+      exercises: [
+        exercise("group", { is_superset: true, sets: [] }),
+        exercise("child", {
+          superset_id: "group",
+          notes: rich,
+          progression: '{"setCount":1}',
+          sets: [
+            {
+              kind: "drop",
+              weight: 0,
+              reps: 0,
+              done: false,
+              parameters: "repsWeight",
+              time: 0,
+              distance: 0,
+              rpe: null,
+            },
+            {
+              kind: "failure",
+              weight: 20,
+              reps: 5,
+              done: true,
+              parameters: "time",
+              time: 0,
+              rpe: 9,
+            },
+          ],
+        }),
+      ],
+    })],
+  });
+  const slim = compactTraining(raw);
+  equal(Object.hasOwn(slim, "components"), false);
+  equal(slim.componentIds, ["w"]);
+  equal(slim.notes, "Rest carefully\n");
+  const child = slim.entries[0].exercises[0];
+  equal(child.progression, { setCount: 1 });
+  equal(child.notes, "Rest carefully\n");
+  equal(child.sets[0], { kind: "drop", weight: 0, reps: 0, done: false });
+  equal(child.sets[1], {
+    kind: "failure",
+    weight: 20,
+    reps: 5,
+    done: true,
+    parameters: "time",
+    rpe: 9,
+    timeSeconds: 0,
+  });
+  const detailed = compactTraining(raw, true);
+  equal(detailed.components[0].notes, rich);
+  equal(detailed.components[0].notesText, "Rest carefully\n");
+  equal(Object.hasOwn(detailed.components[0], "exercises"), false);
+  equal(raw.components[0].exercises.length, 2);
+  if (JSON.stringify(slim).length >= JSON.stringify(raw).length / 2) {
+    throw new Error("Expected substantial payload reduction");
+  }
+});
 const exercise = (id: string, extra: Record<string, unknown> = {}) => ({
   id,
   name: id,
@@ -170,16 +276,16 @@ Deno.test("nutrition sums quantity and pieces, preserves missing optional values
   equal(result.items[1].totals.calories, 200);
   equal(result.items[1].remaining.calories, 1800);
   equal(Object.hasOwn(result.items[1].totals, "fiber"), false);
-  equal(result.items[1].incompleteNutrients.includes("fiber"), true);
+  equal(!Object.hasOwn(result.items[1].totals, "fiber"), true);
   equal(
-    result.items[1].categories[0].incompleteNutrients,
-    result.items[1].incompleteNutrients,
+    Object.hasOwn(result.items[1].categories[0], "incompleteNutrients"),
+    false,
   );
   equal(
     Object.values(result.items[1].categories[0].totals).includes(null),
     false,
   );
-  equal(result.items[0].incompleteNutrients, []);
+  equal(Object.hasOwn(result.items[0], "incompleteNutrients"), false);
   equal(result.items[1].categories[0].totals.protein, 10);
 });
 Deno.test("incomplete food sources cannot be silently logged and manual provenance is rejected", () => {
@@ -360,7 +466,7 @@ Deno.test("hydration shares daily totals with nutrition without changing food-on
   equal(nutrition.map((d: any) => d.hydration), water);
   equal(nutrition[0].totals.water, 27);
   equal(Object.hasOwn(nutrition[1].totals, "water"), false);
-  equal(nutrition[1].incompleteNutrients.includes("water"), true);
+  equal(!Object.hasOwn(nutrition[1].totals, "water"), true);
 });
 
 Deno.test("hydration totals reject numeric overflow instead of serializing Infinity as null", () => {
@@ -421,13 +527,13 @@ Deno.test("compact nutrition totals preserve zeros and distinguish meal complete
   const day = result.items[0];
   equal(day.totals, { fat: 0 });
   equal(day.remaining.calories, null);
-  equal(day.incompleteNutrients.includes("calories"), true);
-  equal(day.incompleteNutrients.includes("fiber"), true);
-  equal(day.incompleteNutrients.includes("fat"), false);
+  equal(!Object.hasOwn(day.totals, "calories"), true);
+  equal(!Object.hasOwn(day.totals, "fiber"), true);
+  equal(!Object.hasOwn(day.totals, "fat"), false);
   equal(day.categories[0].totals, { calories: 100, fat: 0, fiber: 2 });
-  equal(day.categories[0].incompleteNutrients.includes("fiber"), false);
+  equal(!Object.hasOwn(day.categories[0].totals, "fiber"), false);
   equal(day.categories[1].category, null);
   equal(day.categories[1].totals, { fat: 0 });
-  equal(day.categories[1].incompleteNutrients.includes("fiber"), true);
+  equal(!Object.hasOwn(day.categories[1].totals, "fiber"), true);
   equal(JSON.parse(JSON.stringify(result)).items[0].totals, { fat: 0 });
 });

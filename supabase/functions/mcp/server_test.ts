@@ -17,6 +17,109 @@ const config: Config = {
   publicKey: "public",
   siteOrigin: "https://gym-bro.techtonicfault.com",
 };
+
+Deno.test("compact food and training responses use real tool schemas without leaking presentation options into RPCs", async () => {
+  const requests: Record<string, unknown>[] = [];
+  const routine = {
+    id: "r",
+    name: "Routine",
+    exercises: [],
+    infobox: '[{"insert":"Note\\n"}]',
+  };
+  const food = {
+    id: "f",
+    name: "Food",
+    nutritionalValuesPer100g: { calories: 0, fat: null },
+  };
+  const testHandler = createHandler(
+    config,
+    () => Promise.resolve(),
+    () => (name, args = {}) => {
+      requests.push(args);
+      if (name === "mcp_get_routine") return Promise.resolve(routine);
+      if (args.operation === "get_routines") {
+        return Promise.resolve({
+          items: [routine],
+          unavailable: [],
+        });
+      }
+      if (args.operation === "get_workouts") {
+        return Promise.resolve({
+          items: [{ id: "r", components: [{ ...routine, duration: 60 }] }],
+          unavailable: [],
+        });
+      }
+      return Promise.resolve({
+        items: [{ id: "f", food }],
+        unavailable: [],
+        nextCursor: null,
+      });
+    },
+  );
+  const call = async (name: string, args: Record<string, unknown>) => {
+    const response = await testHandler(
+      new Request(config.resource, {
+        method: "POST",
+        headers: {
+          Authorization: "Bearer valid",
+          "Content-Type": "application/json",
+          Accept: "application/json, text/event-stream",
+        },
+        body: JSON.stringify({
+          jsonrpc: "2.0",
+          id: 1,
+          method: "tools/call",
+          params: { name, arguments: args },
+        }),
+      }),
+    );
+    const body = await response.text();
+    const result = JSON.parse(
+      body.startsWith("event:") || body.startsWith("data:")
+        ? body.split("\n").find((l) => l.startsWith("data:"))!.slice(5)
+        : body,
+    ).result;
+    assert(!result.isError, JSON.stringify(result));
+    equal(JSON.parse(result.content[0].text), result.structuredContent);
+    return result.structuredContent;
+  };
+  for (
+    const [name, args] of [
+      ["search_foods", { query: "Food" }],
+      ["get_foods", { references: [{ source: "catalog", id: "f" }] }],
+      ["list_food_entries", { from: "2026-11-03", to: "2026-11-03" }],
+      ["get_food_entries", { ids: ["f"] }],
+      ["log_foods", {
+        idempotencyKey: "b303cefc-01a7-4da4-9d2c-4ca75cefbe88",
+        entries: [{
+          date: "2026-11-03",
+          amount: 10,
+          foodRef: { source: "catalog", id: "f" },
+        }],
+      }],
+    ] as [string, Record<string, unknown>][]
+  ) {
+    const result = await call(name, args);
+    equal(result.items[0].food.nutritionalValuesPer100g, { calories: 0 });
+    equal(result.nutrientUnits, { calories: "kcal" });
+    equal(Object.hasOwn(result.items[0].food, "nutrientUnits"), false);
+  }
+  const single = await call("get_routine", { id: "r" });
+  equal(single.notes, "Note\n");
+  equal(Object.hasOwn(single, "exercises"), false);
+  for (const name of ["get_routines", "get_workouts"]) {
+    const compact = await call(name, { ids: ["r"] });
+    equal(Object.hasOwn(compact.items[0], "exercises"), false);
+    equal(Object.hasOwn(compact.items[0], "components"), false);
+    const details = await call(name, { ids: ["r"], includeDetails: true });
+    if (name === "get_workouts") equal(details.items[0].components.length, 1);
+    else equal(details.items[0].notes, routine.infobox);
+    equal(
+      Object.hasOwn(requests.at(-1)!.request as object, "includeDetails"),
+      false,
+    );
+  }
+});
 function assert(value: unknown, message = "Assertion failed"): asserts value {
   if (!value) throw new Error(message);
 }

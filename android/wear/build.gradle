@@ -1,0 +1,73 @@
+plugins {
+    id 'com.android.application'
+    id 'org.jetbrains.kotlin.android'
+    id 'org.jetbrains.kotlin.plugin.compose'
+}
+def local = new Properties()
+rootProject.file('local.properties').withInputStream { local.load(it) }
+def keys = new Properties()
+if (rootProject.file('key.properties').exists()) rootProject.file('key.properties').withInputStream { keys.load(it) }
+android {
+    namespace 'org.js.samplasion.gymtracker.wear'
+    compileSdk 36
+    defaultConfig {
+        applicationId 'org.js.samplasion.gymtracker'
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        minSdk 30
+        targetSdk 36
+        versionCode = (project.findProperty('wearVersionCode') ?: local.getProperty('flutter.versionCode') ?: '1').toInteger()
+        versionName = local.getProperty('flutter.versionName') ?: '1.0'
+    }
+    signingConfigs {
+        release {
+            keyAlias keys['keyAlias']; keyPassword keys['keyPassword']
+            storeFile keys['storeFile'] ? project(':app').file(keys['storeFile']) : null
+            storePassword keys['storePassword']
+        }
+    }
+    buildTypes {
+        debug { applicationIdSuffix '.debug' }
+        screenshot {
+            initWith debug
+            applicationIdSuffix '.preview'
+            matchingFallbacks = ['debug']
+            resValue 'string', 'app_name', 'Gym Bro Preview'
+        }
+        release { signingConfig signingConfigs.release; minifyEnabled true; proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro' }
+    }
+    testBuildType "screenshot"
+    testOptions { unitTests.includeAndroidResources = true }
+    buildFeatures { compose true; buildConfig true }
+    compileOptions { sourceCompatibility JavaVersion.VERSION_17; targetCompatibility JavaVersion.VERSION_17 }
+    kotlinOptions { jvmTarget = '17' }
+}
+dependencies {
+    androidTestImplementation platform('androidx.compose:compose-bom:2025.08.00')
+    androidTestImplementation 'androidx.compose.ui:ui-test-junit4'
+    // Test-only InputManager compatibility with the API 37 emulator.
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.8.0-alpha03'
+    androidTestImplementation 'androidx.test:runner:1.8.0-alpha03'
+    androidTestImplementation 'androidx.test:rules:1.8.0-alpha03'
+    androidTestImplementation 'androidx.test.ext:junit:1.4.0-alpha03' 
+    testImplementation "junit:junit:4.13.2"
+    testImplementation "org.robolectric:robolectric:4.16.1"
+    testImplementation "androidx.test:core:1.6.1"
+    implementation project(':wearable-core')
+    implementation platform('androidx.compose:compose-bom:2025.08.00')
+    implementation 'androidx.fragment:fragment-ktx:1.8.9'
+    implementation 'androidx.activity:activity-compose:1.10.1'
+    implementation 'androidx.compose.ui:ui'
+    implementation 'androidx.compose.foundation:foundation'
+    implementation 'androidx.compose.material:material-icons-extended:1.7.8'
+    implementation 'androidx.wear.compose:compose-material3:1.5.0'
+    implementation 'androidx.wear.compose:compose-foundation:1.5.0'
+    implementation 'androidx.lifecycle:lifecycle-viewmodel-compose:2.9.2'
+    implementation 'androidx.lifecycle:lifecycle-runtime-compose:2.9.2'
+    implementation 'androidx.health:health-services-client:1.1.0'
+    implementation 'com.google.guava:guava:33.4.8-android'
+    implementation 'androidx.concurrent:concurrent-futures-ktx:1.2.0'
+    implementation 'androidx.wear:wear-ongoing:1.0.0'
+    implementation 'androidx.wear:wear:1.3.0'
+    implementation 'androidx.wear.watchface:watchface-complications-data-source-ktx:1.2.1'
+    implementation 'androidx.core:core-ktx:1.16.0'
+}

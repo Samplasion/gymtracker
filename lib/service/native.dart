@@ -4,6 +4,8 @@ import 'dart:io';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gymtracker/model/native.dart';
 import 'package:gymtracker/service/logger.dart';
+import 'package:gymtracker/service/database.dart';
+import 'package:flutter/services.dart';
 import 'package:gymtracker/service/native.g.dart';
 import 'package:gymtracker/service/wearable/training_transport.dart';
 import 'package:gymtracker/service/widgets.dart'
@@ -13,9 +15,10 @@ import 'package:rxdart/rxdart.dart';
 abstract class NativeService {
   static NativeService instance({
     WearableTrainingTransport? trainingTransport,
+    String Function()? ownerScopeProvider,
   }) {
     if (Platform.isIOS || Platform.isAndroid) {
-      return _NativeServiceImpl(null, trainingTransport);
+      return _NativeServiceImpl(null, trainingTransport, ownerScopeProvider);
     } else {
       return _UnsupportedNativeService._();
     }
@@ -166,9 +169,11 @@ class _NativeServiceImpl extends NativeService
   String? _workoutId;
 
   final WearableTrainingTransport _trainingTransport;
+  final String Function()? _ownerScopeProvider;
   _NativeServiceImpl([
     GymBroNativeHostAPI? host,
     WearableTrainingTransport? trainingTransport,
+    this._ownerScopeProvider,
   ]) : _watch = host ?? GymBroNativeHostAPI(),
        _trainingTransport =
            trainingTransport ?? WearableTrainingTransport.forPlatform(),
@@ -351,6 +356,21 @@ class _NativeServiceImpl extends NativeService
     logger.i(
       """Sending complication data to native side: ${(weekStreak: weekStreak, restDays: lastWorkoutDay, workouts: workouts, workoutDensityChartData: workoutDensityChartData)}""",
     );
+    if (Platform.isAndroid && _ownerScopeProvider != null) {
+      unawaited(
+        const MethodChannel('gymbro/training')
+            .invokeMethod<void>('statistics', {
+              'ownerScope': _ownerScopeProvider(),
+              streakKey: weekStreak,
+              restKey: lastWorkoutDay.millisecondsSinceEpoch,
+              totalWorkoutsKey: workouts,
+              'density': workoutDensityChartData,
+            })
+            .catchError((Object error) {
+              logger.w('Wear OS statistics deferred', error: error);
+            }),
+      );
+    }
     return _watch.updateHomeWidgetParameters({
       streakKey: weekStreak,
       restKey: lastWorkoutDay.millisecondsSinceEpoch,
@@ -408,6 +428,10 @@ class _NativeServiceImpl extends NativeService
 final nativeServiceProvider = Provider<NativeService>((ref) {
   final service = NativeService.instance(
     trainingTransport: ref.watch(wearableTrainingTransportProvider),
+    ownerScopeProvider: () {
+      final user = ref.read(databaseServiceProvider).db.currentUserId;
+      return user == null ? 'guest' : 'user:$user';
+    },
   );
   service.attach();
   ref.onDispose(service.dispose);

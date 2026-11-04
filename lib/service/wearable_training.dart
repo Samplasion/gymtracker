@@ -3,6 +3,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:gymtracker/controller/intents_controller.dart';
 import 'package:gymtracker/controller/routines_controller.dart';
 import 'package:gymtracker/controller/workout_controller.dart';
 import 'package:gymtracker/db/wearable_training_store.dart';
@@ -29,7 +30,28 @@ final wearableTrainingProvider = Provider<WearableTrainingService>((ref) {
 });
 
 class WearableTrainingService {
-  WearableTrainingService(this.ref, {required this.transport});
+  WearableTrainingService(
+    this.ref, {
+    required this.transport,
+    this.donateRoutineStarted = IntentsController.donateRoutineStarted,
+  });
+  final Future<void> Function({
+    required String routineId,
+    required String routineDisplayName,
+    DateTime? timestamp,
+  })
+  donateRoutineStarted;
+
+  Future<void> _donateStart(Map<String, dynamic> document) async {
+    final routineId = document['parentID'] as String?;
+    if (routineId == null || routineId.isEmpty) return;
+    await donateRoutineStarted(
+      routineId: routineId,
+      routineDisplayName: document['name'] as String,
+      timestamp: DateTime.fromMillisecondsSinceEpoch(document['time'] as int),
+    );
+  }
+
   final WearableTrainingTransport transport;
   static const responseTimeout = Duration(seconds: 5);
   final Ref ref;
@@ -320,6 +342,9 @@ class WearableTrainingService {
       } else {
         await store.write(merged, processed: true);
       }
+      if (owner == scope && phone == null) {
+        await _donateStart(merged);
+      }
       if (owner == scope && merged['status'] == 'completed') {
         ref.read(databaseServiceProvider).onSocialDataSaved?.call();
         ref.read(routinesControllerProvider).scheduleBackup();
@@ -341,6 +366,7 @@ class WearableTrainingService {
     }
     if (active && !same) {
       await store.write(merged);
+      if (phone == null && owner == scope) await _donateStart(merged);
       if (!_declined.contains(id) && !_conflictShowing && Go.context != null) {
         _conflictShowing = true;
         final italian =
@@ -421,6 +447,7 @@ class WearableTrainingService {
     // A failed import must not leave new Watch results against an old phone UI:
     // the next capture would misinterpret that old UI as fresh phone edits.
     await store.write(merged);
+    if (phone == null) await _donateStart(merged);
     _last = merged;
     _lastRaw = _signature(adopted);
     await transport

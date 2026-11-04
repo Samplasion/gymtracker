@@ -11,3 +11,16 @@ GeneratedPluginRegistrant.java
 key.properties
 **/*.keystore
 **/*.jks
+
+# Local Android/Kotlin build artifacts
+/.kotlin/
+/build/
+
+# Fastlane credentials and generated reports
+fastlane/.env
+fastlane/.env.*
+!fastlane/.env.example
+fastlane/play-store-service-account.json
+fastlane/report.xml
+fastlane/Preview.html
+fastlane/test_output/

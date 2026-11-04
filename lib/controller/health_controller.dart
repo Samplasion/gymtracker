@@ -1,5 +1,7 @@
 import 'dart:io';
 
+import 'package:flutter/services.dart';
+
 import 'package:gymtracker/service/native.dart';
 import 'package:health/health.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -37,11 +39,24 @@ class HealthController {
     if (!_supported) return;
     await _health.configure();
     if (_disposed) return;
-    final granted = await _health.hasPermissions(typesToRead);
+    final granted = Platform.isAndroid
+        ? await const MethodChannel(
+            'gymbro/wearableHealth',
+          ).invokeMethod<bool>('permission')
+        : await _health.hasPermissions(typesToRead);
     if (!_disposed) hasPermissionStream.add(granted ?? false);
   }
 
   Future<void> requestPermission() async {
+    if (Platform.isAndroid && _supported && !_disposed) {
+      final granted =
+          await const MethodChannel(
+            'gymbro/wearableHealth',
+          ).invokeMethod<bool>('authorize') ??
+          false;
+      if (!_disposed) hasPermissionStream.add(granted);
+      return;
+    }
     if (!_supported ||
         _disposed ||
         await _health.hasPermissions(typesToRead) == true) {

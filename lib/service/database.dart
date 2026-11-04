@@ -5,6 +5,7 @@ import 'dart:io';
 import 'package:crypto/crypto.dart';
 import 'package:drift/drift.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gymtracker/db/backup_restore.dart';
 import 'package:gymtracker/db/database.dart';
@@ -490,6 +491,16 @@ class DatabaseService extends ChangeNotifier with LoggerConfigurationMixin {
   }
 
   Future removeHistoryWorkoutById(String id) async {
+    if (Platform.isAndroid) {
+      await const MethodChannel(
+        'gymbro/training',
+      ).invokeMethod<void>('deleteHealthWorkout', {
+        'id': id,
+        'ownerScope': _db.currentUserId == null
+            ? 'guest'
+            : 'user:${_db.currentUserId}',
+      });
+    }
     await _db.deleteHistoryWorkout(id);
   }
 

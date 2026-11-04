@@ -1,6 +1,8 @@
 package org.js.samplasion.gymtracker
 
 import android.annotation.SuppressLint
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.launch
 import android.app.BroadcastOptions
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -34,6 +36,12 @@ const val ACTION_MARK = "org.js.samplasion.MARK_COMPLETED"
 const val NOTIFICATION_ID = 1
 
 class MainActivity: FlutterFragmentActivity() {
+    private var healthResult: io.flutter.plugin.common.MethodChannel.Result? = null
+    private val healthPermissions = registerForActivityResult(androidx.health.connect.client.PermissionController.createRequestPermissionResultContract()) { granted ->
+        healthResult?.success(granted.containsAll(HealthExport.permissions))
+        healthResult = null
+        HealthExport.schedule(this)
+    }
     lateinit var nativeApi: GymBroNativeFlutterAPI
     lateinit var logger: GymBroNativeLoggerChannel
     val api = GymBroNativeHostAPIImpl()
@@ -51,7 +59,27 @@ class MainActivity: FlutterFragmentActivity() {
         )
 
         GymBroNativeHostAPI.setUp(flutterEngine.dartExecutor.binaryMessenger, api, "")
+        io.flutter.plugin.common.MethodChannel(flutterEngine.dartExecutor.binaryMessenger, "gymbro/wearableHealth").setMethodCallHandler { call, result ->
+            if (android.os.Build.VERSION.SDK_INT < 28 || androidx.health.connect.client.HealthConnectClient.getSdkStatus(this) != androidx.health.connect.client.HealthConnectClient.SDK_AVAILABLE) {
+                result.success(false)
+            } else when (call.method) {
+                "authorize" -> {
+                    if (healthResult != null) result.error("busy", "Permission request in progress", null)
+                    else { healthResult = result; healthPermissions.launch(HealthExport.permissions) }
+                }
+                "permission" -> lifecycleScope.launch {
+                    result.success(androidx.health.connect.client.HealthConnectClient.getOrCreate(this@MainActivity).permissionController.getGrantedPermissions().containsAll(HealthExport.permissions))
+                }
+                else -> result.notImplemented()
+            }
+        }
+        WearPhoneBridge.get(this).attach(flutterEngine.dartExecutor.binaryMessenger, nativeApi)
         WidgetRenderer.publishPreviews(this)
+    }
+
+    override fun cleanUpFlutterEngine(flutterEngine: FlutterEngine) {
+        WearPhoneBridge.get(this).detach()
+        super.cleanUpFlutterEngine(flutterEngine)
     }
 
     private fun log(message: String) {
@@ -94,16 +122,19 @@ class MainActivity: FlutterFragmentActivity() {
             .setCategory(NotificationCompat.CATEGORY_WORKOUT)
 
         override fun startWorkout(workoutId: String, startMilliseconds: Long) {
+            WearPhoneBridge.get(this@MainActivity).start(workoutId, startMilliseconds)
             createOrUpdateOngoingLiveNotification()
         }
 
         override fun stopWorkout(workoutId: String, save: Boolean) {
+            WearPhoneBridge.get(this@MainActivity).stop(workoutId, save)
             removeOngoingLiveNotification()
         }
 
         override fun setExerciseParameters(parameters: Map<String?, Any?>) {
             val message = NativeWorkoutStateMessage.fromJson(parameters)
             state = message
+            WearPhoneBridge.get(this@MainActivity).publishAsync("snapshot", org.json.JSONObject(parameters))
 
             createOrUpdateOngoingLiveNotification()
         }
@@ -200,9 +231,10 @@ class MainActivity: FlutterFragmentActivity() {
             // no-op; used on iOS only
         }
 
-        override fun waterReceiverReady() {}
+        override fun waterReceiverReady() { WearPhoneBridge.get(this@MainActivity).readyForWater() }
 
         override fun updateFoodParameters(parameters: Map<String?, Any?>) {
+            WearPhoneBridge.get(this@MainActivity).publishAsync("food", org.json.JSONObject(parameters))
             WidgetStore.saveFood(this@MainActivity, parameters)
             GymBroWidgetProvider.refresh(this@MainActivity, setOf(WidgetKind.WATER, WidgetKind.NUTRITION))
         }

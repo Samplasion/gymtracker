@@ -131,7 +131,7 @@ extension WorkoutManager {
                 try? await self.finishRemote(id: id, save: save)
             }
             guard let request = self.desiredRequest,
-                  self.request == request, self.watchAvailable?() == true else { return }
+                  self.request == request, self.watchConfigured?() == true else { return }
             do { try await self.connectWatch(request) }
             catch {
                 self.reportWatchStartFailure(request, error: error)

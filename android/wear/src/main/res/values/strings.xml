@@ -1,0 +1,1 @@
+<resources><string name="app_name" translatable="false">Gym Bro</string><string-array name="android_wear_capabilities" translatable="false"><item>gymbro_watch_v1</item></string-array></resources>

@@ -95,10 +95,11 @@ class IntentsController {
     }
   }
 
-  /// 3. Call this whenever the user successfully SAVES a workout
+  /// Donate a routine start, preserving its original time after offline sync.
   static Future<void> donateRoutineStarted({
     required String routineId,
     required String routineDisplayName,
+    DateTime? timestamp,
   }) async {
     if (!isSupported) return;
     try {
@@ -106,7 +107,7 @@ class IntentsController {
       await FlutterAppIntentsService.donateIntentWithMetadata(
         startRoutineIntent.identifier,
         {'routineId': routineId, 'routineDisplayName': routineDisplayName},
-        timestamp: DateTime.now(),
+        timestamp: timestamp ?? DateTime.now(),
       );
       debugPrint("Successfully donated $routineDisplayName to Siri.");
     } catch (e) {

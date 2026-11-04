@@ -105,6 +105,8 @@ flutter {
 }
 
 dependencies {
+    implementation project(":wearable-core")
+    implementation "androidx.health.connect:connect-client:1.1.0"
     testImplementation 'junit:junit:4.13.2'
     testImplementation 'org.robolectric:robolectric:4.16.1'
     coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.1.5'
@@ -130,3 +132,30 @@ kotlin {
 //        }
 //    }
 //}
+
+
+// A development companion has its own package but can use the same Firebase
+// project. A real src/debug config takes precedence (e.g. for OAuth/SHA clients).
+def generatedDebugFirebase = layout.buildDirectory.file('generated/debug-firebase/google-services.json')
+def prepareDebugFirebase = tasks.register('prepareDebugFirebase') {
+    inputs.file('google-services.json')
+    outputs.file(generatedDebugFirebase)
+    doLast {
+        def config = new groovy.json.JsonSlurper().parse(file('google-services.json'))
+        def client = config.client.find { it.client_info.android_client_info.package_name == 'org.js.samplasion.gymtracker' }
+        if (client == null) throw new GradleException('Production Firebase client not found')
+        client.client_info.android_client_info.package_name = 'org.js.samplasion.gymtracker.debug'
+        config.client = [client]
+        def target = generatedDebugFirebase.get().asFile
+        target.parentFile.mkdirs()
+        target.text = groovy.json.JsonOutput.toJson(config)
+    }
+}
+afterEvaluate {
+ tasks.named('processDebugGoogleServices').configure {
+    if (!file('src/debug/google-services.json').exists()) {
+        dependsOn prepareDebugFirebase
+        googleServicesJsonFiles.set(generatedDebugFirebase.map { [it.asFile] })
+    }
+}
+}

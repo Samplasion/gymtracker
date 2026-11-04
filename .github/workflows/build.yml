@@ -62,7 +62,6 @@ jobs:
           path: out/ios/GymBro-*
   build_android:
     name: Build Android app [${{ matrix.flag }}]
-    continue-on-error: true
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -123,6 +122,14 @@ jobs:
           dart run build_runner clean && dart run build_runner build --delete-conflicting-outputs
       - name: Build
         run: tools/build_android.sh -${{ matrix.flag }}
+      - name: Verify and build Wear OS
+        working-directory: android
+        run: ./gradlew :wearable-core:testDebugUnitTest :wear:testDebugUnitTest :wear:lintRelease :wear:assembleRelease :wear:bundleRelease
+      - name: Collect Wear OS artifacts
+        run: |
+          mkdir -p out/android
+          cp build/wear/outputs/apk/release/wear-release.apk out/android/GymBro-wear-release.apk
+          cp build/wear/outputs/bundle/release/wear-release.aab out/android/GymBro-wear-release.aab
       - name: Release
         if: github.event_name == 'release'
         uses: softprops/action-gh-release@v1

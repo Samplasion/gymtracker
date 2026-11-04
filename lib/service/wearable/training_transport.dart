@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gymtracker/service/wearable/apple_watch_training_transport.dart';
+import 'package:gymtracker/service/wearable/wear_os_training_transport.dart';
 
 typedef TrainingDocument = Map<String, dynamic>;
 typedef TrainingReceiver = Future<TrainingDocument> Function(TrainingDocument);
@@ -15,6 +16,8 @@ final wearableTrainingTransportProvider = Provider<WearableTrainingTransport>(
 abstract class WearableTrainingTransport {
   static WearableTrainingTransport forPlatform() => Platform.isIOS
       ? AppleWatchTrainingTransport()
+      : Platform.isAndroid
+      ? WearOsTrainingTransport()
       : const UnsupportedTrainingTransport();
 
   bool get isSupported;

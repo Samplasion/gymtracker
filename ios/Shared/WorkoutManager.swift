@@ -259,7 +259,7 @@ final class WorkoutManager: NSObject, ObservableObject {
                     do { try await Task.sleep(nanoseconds: 5_000_000_000) } catch { return }
                     self.refreshPublishedMetrics(emitPacket: false)
                     #if os(iOS)
-                    if self.desiredRequest != nil, self.watchAvailable?() == true,
+                    if self.desiredRequest != nil, self.watchConfigured?() == true,
                        self.device != "watch" || self.sessionState == .ended || self.sessionState == .stopped
                         || self.metricsStore.ledger(for: self.request?.id ?? "").activeGenerations["watch"] == nil {
                         self.watchBecameReachable()

@@ -1,0 +1,24 @@
+plugins {
+    id 'com.android.library'
+    id 'org.jetbrains.kotlin.android'
+    id 'org.jetbrains.kotlin.kapt'
+}
+android {
+    namespace 'org.js.samplasion.gymtracker.wearable'
+    compileSdk 36
+    defaultConfig { minSdk 26 }
+    compileOptions { sourceCompatibility JavaVersion.VERSION_17; targetCompatibility JavaVersion.VERSION_17 }
+    kotlinOptions { jvmTarget = '17' }
+    testOptions { unitTests.returnDefaultValues = true }
+}
+dependencies {
+    api 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.10.2'
+    api 'org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.10.2'
+    api 'com.google.android.gms:play-services-wearable:19.0.0'
+    api 'androidx.room:room-runtime:2.7.2'
+    api 'androidx.room:room-ktx:2.7.2'
+    kapt 'androidx.room:room-compiler:2.7.2'
+    api 'androidx.work:work-runtime-ktx:2.10.1'
+    testImplementation 'junit:junit:4.13.2'
+    testImplementation 'org.json:json:20240303'
+}

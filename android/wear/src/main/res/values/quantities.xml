@@ -1,0 +1,5 @@
+<resources>
+    <plurals name="exercise_count"><item quantity="one">%1$d exercise</item><item quantity="other">%1$d exercises</item></plurals>
+    <plurals name="routine_count"><item quantity="one">%1$d routine</item><item quantity="other">%1$d routines</item></plurals>
+    <plurals name="set_count"><item quantity="one">%1$d set</item><item quantity="other">%1$d sets</item></plurals>
+</resources>

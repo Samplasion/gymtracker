@@ -1,0 +1,94 @@
+# This file contains the fastlane.tools configuration
+# You can find the documentation at https://docs.fastlane.tools
+#
+# For a list of all available actions, check out
+#
+#     https://docs.fastlane.tools/actions
+#
+# For a list of all available plugins, check out
+#
+#     https://docs.fastlane.tools/plugins/available-plugins
+#
+
+# Uncomment the line if you want fastlane to automatically update itself
+# update_fastlane
+
+default_platform(:android)
+
+platform :android do
+  desc "Genera screenshot Android localizzati per telefono e tablet da 7 e 10 pollici"
+  lane :screenshots do |options|
+    require "bundler"
+    project_dir = File.expand_path("../..", __dir__)
+    python = File.join(project_dir, "tools/screenshots/.venv/bin/python")
+    UI.user_error!("Prepara Pillow seguendo tools/screenshots/README.md") unless File.executable?(python)
+    device = options.fetch(:device, "phone").to_s
+    profiles = {"phone" => "android-phone", "tablet7" => "android-tablet7", "tablet10" => "android-tablet10", "all" => "android-all"}
+    UI.user_error!("device: phone|tablet7|tablet10|all") unless profiles.key?(device)
+    Dir.chdir(project_dir) do
+      Bundler.with_unbundled_env do
+        sh(python, "tools/screenshots/devices.py", "--profile", profiles.fetch(device),
+           "--locale", options.fetch(:locale, "all").to_s,
+           "--only", options.fetch(:only, "all").to_s,
+           "--stage", options.fetch(:stage, "all").to_s)
+      end
+    end
+  end
+
+  desc "Runs all the tests"
+  lane :test do
+    gradle(task: "test")
+  end
+
+  desc "Incrementa la build Flutter, crea l'AAB e lo pubblica sulla track beta"
+  lane :beta do
+    android_dir = File.expand_path("..", __dir__)
+    project_dir = File.expand_path("..", android_dir)
+    # Fastlane carica automaticamente android/fastlane/.env.
+    key_file = ENV["JSON_KEY_FILE"].to_s
+    UI.user_error!("Configura JSON_KEY_FILE in android/fastlane/.env") if key_file.strip.empty?
+    key_path = File.expand_path(key_file, android_dir)
+    UI.user_error!("File JSON del service account non trovato") unless File.file?(key_path)
+    UI.user_error!("Configura la firma release in android/key.properties") unless File.file?(File.join(android_dir, "key.properties"))
+    package = CredentialsManager::AppfileConfig.try_fetch_value(:package_name)
+
+    pubspec_path = File.join(project_dir, "pubspec.yaml")
+    pubspec = File.read(pubspec_path)
+    version_match = pubspec.match(/^version:[ \t]*(\d+\.\d+\.\d+)\+(\d+)[ \t]*$/)
+    UI.user_error!("pubspec.yaml deve contenere version: x.y.z+numero") unless version_match
+    version = version_match[1]
+    # Controlla le track standard per evitare numeri già in uso su altre track.
+    play_codes = %w[production beta alpha internal].flat_map do |track|
+      google_play_track_version_codes(package_name: package, json_key: key_path, track: track)
+    end
+    build_number = ([version_match[2].to_i] + play_codes.map(&:to_i)).max + 1
+    UI.user_error!("versionCode supera il limite Google Play (2100000000)") if build_number > 2_100_000_000
+    File.write(pubspec_path, pubspec.sub(version_match[0], "version: #{version}+#{build_number}"))
+
+    Dir.chdir(project_dir) do
+      sh("fvm", "flutter", "pub", "get")
+      sh("fvm", "flutter", "build", "appbundle", "--release",
+         "--build-name=#{version}", "--build-number=#{build_number}")
+    end
+    aab = File.join(project_dir, "build", "app", "outputs", "bundle", "release", "app-release.aab")
+    UI.user_error!("App Bundle non trovato: #{aab}") unless File.file?(aab)
+    upload_to_play_store(
+      package_name: package,
+      json_key: key_path,
+      aab: aab,
+      track: "beta",
+      release_status: "completed",
+      skip_upload_apk: true,
+      skip_upload_metadata: true,
+      skip_upload_changelogs: true,
+      skip_upload_images: true,
+      skip_upload_screenshots: true
+    )
+  end
+
+  desc "Deploy a new version to the Google Play"
+  lane :deploy do
+    gradle(task: "clean assembleRelease")
+    upload_to_play_store
+  end
+end

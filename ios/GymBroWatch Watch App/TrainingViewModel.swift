@@ -344,12 +344,24 @@ final class TrainingViewModel: ObservableObject {
         workout.set = cursor.flatMap { WatchTraining.set($0, in: active) }.flatMap { GTSet.decode(from: $0) }
         workout.setTypeLabel = cursor.map { WatchTraining.setLabel(forSet: $0, in: active, italian: Locale.current.languageCode == "it") } ?? ""
         if let set = workout.set {
-            var parts: [String] = []
-            if set.parameters.hasReps { parts.append("\(set.reps ?? 0) ×") }
-            if set.parameters.hasWeight { parts.append("\((set.weight ?? 0).formatted()) \(active["weightUnit"] as? String ?? "kg")") }
-            if set.parameters.hasTime { parts.append("\(Int(set.time ?? 0)) s") }
-            if set.parameters.hasDistance { parts.append("\((set.distance ?? 0).formatted()) \(active["distanceUnit"] as? String ?? "km")") }
-            workout.exerciseParameters = parts.joined(separator: " ")
+            let italian = Locale.current.languageCode == "it"
+            let count = set.reps ?? 0
+            let reps = "\(count) " + (italian ? "rip." : (count == 1 ? "rep" : "reps"))
+            let seconds = max(0, Int(set.time ?? 0))
+            let hours = seconds / 3600
+            let clock = String(format: "%02d:%02d", seconds / 60 % 60, seconds % 60)
+            let duration = hours == 0 ? clock : "\(hours) " + (italian ? (hours == 1 ? "ora" : "ore") : (hours == 1 ? "hour" : "hours")) + ", " + clock
+            let weight = (set.weight ?? 0) * (set.parameters == .repsNegWeight ? -1 : 1)
+            switch set.parameters {
+            case .repsWeight, .repsNegWeight:
+                workout.exerciseParameters = "\(weight.formatted()) \(active["weightUnit"] as? String ?? "kg") × \(reps)"
+            case .freeBodyReps: workout.exerciseParameters = reps
+            case .timeWeight: workout.exerciseParameters = "\(reps) \(duration)"
+            case .time: workout.exerciseParameters = duration
+            case .distance:
+                workout.exerciseParameters = "\((set.distance ?? 0).formatted()) \(active["distanceUnit"] as? String ?? "km")"
+            case .setless: workout.exerciseParameters = ""
+            }
         }
         workout.restTimeEnd = (active["restEnd"] as? NSNumber).map { Date(milliseconds: $0.int64Value) }
     }

@@ -1,0 +1,9 @@
+Porta Gym Bro sul tuo smartwatch Wear OS.
+
+Sincronizza le routine dal telefono Android e allenati anche senza connessione: consulta esercizi e note, modifica carichi e ripetizioni, completa le serie e controlla i recuperi.
+
+Visualizza battito e calorie durante la registrazione sui dispositivi compatibili. Gli allenamenti salvati vengono sincronizzati con lo storico di Gym Bro. Puoi autorizzare l’esportazione in Health Connect dal telefono.
+
+Consulta calorie, nutrienti e riepiloghi del diario alimentare. Registra l’acqua dal polso e sincronizzala con il telefono. Personalizza il quadrante con le complicazioni Gym Bro.
+
+Richiede Wear OS 3 o successivo e Gym Bro su un telefono Android con Google Play services per la configurazione e la sincronizzazione iniziali. Dopo aver scaricato le routine, puoi registrare gli allenamenti offline. Le metriche dipendono dai sensori e dai permessi del dispositivo.

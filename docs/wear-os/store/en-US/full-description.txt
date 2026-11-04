@@ -1,0 +1,9 @@
+Bring Gym Bro to your Wear OS watch.
+
+Sync routines from your Android phone and train offline: read exercises and notes, edit weights and reps, complete sets and follow your rest timers.
+
+View heart rate and calories while recording on compatible devices. Saved workouts sync to your Gym Bro history. You can authorize Health Connect export on your phone.
+
+Check calories, nutrients and food diary summaries. Log water from your wrist and sync it to your phone. Add Gym Bro complications to your watch face.
+
+Requires Wear OS 3 or later and Gym Bro on an Android phone with Google Play services for initial setup and synchronization. Once routines are downloaded, workouts can be logged offline. Metrics depend on device sensors and permissions.

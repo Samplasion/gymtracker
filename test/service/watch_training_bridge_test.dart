@@ -85,6 +85,42 @@ void main() {
         .setMockMethodCallHandler(AppleWatchTrainingTransport.channel, null);
     MockServices.tearDown();
   });
+  for (final status in ['active', 'completed', 'discarded']) {
+    test(
+      'donates the first $status routine sync once with original time',
+      () async {
+        final donations = <Map<String, dynamic>>[];
+        final service = dataController(
+          (ref) => WearableTrainingService(
+            ref,
+            transport: _CompanionTransport(),
+            donateRoutineStarted:
+                ({
+                  required String routineId,
+                  required String routineDisplayName,
+                  DateTime? timestamp,
+                }) async {
+                  donations.add({
+                    'id': routineId,
+                    'name': routineDisplayName,
+                    'time': timestamp,
+                  });
+                },
+          ),
+        );
+        final document = session(status: status)..['parentID'] = 'routine';
+        expect((await service.receive(document))['accepted'], true);
+        expect((await service.receive(document))['accepted'], true);
+        expect(donations, [
+          {
+            'id': 'routine',
+            'name': 'Watch workout',
+            'time': DateTime.fromMillisecondsSinceEpoch(1700000000000),
+          },
+        ]);
+      },
+    );
+  }
   test(
     'another companion adapter reuses catalog and session adoption without iOS channels',
     () async {

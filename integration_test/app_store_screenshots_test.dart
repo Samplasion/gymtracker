@@ -36,6 +36,7 @@ import 'package:gymtracker/provider/friend.dart';
 import 'package:gymtracker/provider/hydration.dart';
 import 'package:gymtracker/provider/locale.dart';
 import 'package:gymtracker/provider/online.dart';
+import 'package:gymtracker/provider/router.dart';
 import 'package:gymtracker/provider/routines.dart';
 import 'package:gymtracker/provider/settings.dart';
 import 'package:gymtracker/provider/social.dart';
@@ -47,6 +48,7 @@ import 'package:gymtracker/service/feed.dart';
 import 'package:gymtracker/service/native.g.dart';
 import 'package:gymtracker/service/online.dart';
 import 'package:gymtracker/service/trainer.dart';
+import 'package:gymtracker/service/version.dart';
 import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/utils/theme.dart';
 import 'package:gymtracker/view/achievements.dart';
@@ -57,6 +59,7 @@ import 'package:gymtracker/view/food.dart';
 import 'package:gymtracker/view/me.dart';
 import 'package:gymtracker/view/me/statistics.dart';
 import 'package:gymtracker/view/routines.dart';
+import 'package:gymtracker/view/skeleton.dart';
 import 'package:gymtracker/view/trainer.dart';
 import 'package:gymtracker/view/utils/feed_items.dart';
 import 'package:gymtracker/view/workout.dart';
@@ -113,6 +116,10 @@ class _Feed extends Feed {
 void main() {
   final binding = IntegrationTestWidgetsFlutterBinding.ensureInitialized();
   binding.framePolicy = LiveTestWidgetsFlutterBindingFramePolicy.onlyPumps;
+  const companion = String.fromEnvironment(
+    'SCREENSHOT_COMPANION',
+    defaultValue: 'apple',
+  );
   const watchSeries = bool.fromEnvironment('SCREENSHOT_WATCH_SERIES');
   const language = String.fromEnvironment(
     'SCREENSHOT_LOCALE',
@@ -133,6 +140,8 @@ void main() {
         DateTime.parse(manifest['reference_time']),
       );
       MockServices.setup();
+      // The real adaptive drawer includes the version in its footer.
+      await VersionService().init();
       registerFallbackValue(fixtures.exercises("fallback").first);
       final service = DatabaseService.withDatabase(MockServices.database);
       await service.ensureInitialized();
@@ -186,6 +195,7 @@ void main() {
       );
       final container = ProviderContainer(
         overrides: [
+          showDeveloperNavigationProvider.overrideWithValue(false),
           healthEnergyProvider.overrideWith((ref) => Stream.value(164.0)),
           healthHeartRateProvider.overrideWith((ref) => Stream.value(132.0)),
           healthPermissionProvider.overrideWith((ref) => Stream.value(true)),
@@ -353,6 +363,13 @@ void main() {
           ),
         );
         await service.db.watchPreferences().firstWhere((p) => p.color == color);
+        // Each capture starts with its own workout state; otherwise the shell
+        // would show an ongoing-workout bar left over from screenshot 01.
+        if (container.read(workoutControllerProvider) != null) {
+          await container
+              .read(workoutControllerProvider.notifier)
+              .cancel(publishWearableTerminal: false);
+        }
         if (id == '01' || id == '09') {
           final controller = container.read(workoutControllerProvider.notifier);
           controller.start(
@@ -368,9 +385,22 @@ void main() {
           container
               .read(countdownControllerProvider.notifier)
               .restoreCountdown(
-                fixtures.now.subtract(const Duration(seconds: 30)),
-                fixtures.now.add(const Duration(seconds: 59)),
+                fixtures.now,
+                // CountdownController includes the final displayed second.
+                fixtures.now.add(
+                  Duration(
+                    seconds:
+                        (manifest['workout_fixture']['rest_seconds'] as int) -
+                        1,
+                  ),
+                ),
               );
+          expect(
+            container.read(countdownControllerProvider.notifier).remaining,
+            Duration(
+              seconds: manifest['workout_fixture']['rest_seconds'] as int,
+            ),
+          );
           container
               .read(stopwatchControllerProvider.notifier)
               .globalStopwatch
@@ -388,6 +418,16 @@ void main() {
           '08' => const TrainerView(),
           _ => throw StateError('Unknown screenshot $id'),
         };
+        final section = switch (id) {
+          '02' || '01' || '09' => '/routines',
+          '04' => '/food',
+          '07' => '/feed',
+          _ => '/profile',
+        };
+        // Reuse the production router and ShellRoute, including its adaptive
+        // navigation. Bypass only startup, which must not contact real services.
+        final router = container.read(appRouterProvider);
+        router.go(section);
         await tester.pumpWidget(
           UncontrolledProviderScope(
             container: container,
@@ -395,10 +435,10 @@ void main() {
               child: Builder(
                 builder: (context) {
                   final settings = container.read(settingsControllerProvider);
-                  return MaterialApp(
+                  return MaterialApp.router(
                     debugShowCheckedModeBanner: false,
                     key: ValueKey(id),
-                    navigatorKey: Go.navigatorKey,
+                    routerConfig: router,
                     locale: Locale(language),
                     supportedLocales: AppLocaleUtils.supportedLocales,
                     localizationsDelegates: const [
@@ -419,7 +459,6 @@ void main() {
                       ).copyWith(textScaler: TextScaler.noScaling),
                       child: GTExpressiveTheme(child: child!),
                     ),
-                    home: page,
                   );
                 },
               ),
@@ -432,6 +471,31 @@ void main() {
           EnginePhase.sendSemanticsUpdate,
           const Duration(seconds: 25),
         );
+        final isSection = {'02', '04', '07'}.contains(id);
+        expect(find.byType(SkeletonView), findsOneWidget);
+        expect(find.text('Debug').hitTestable(), findsNothing);
+        expect(find.text('Logs').hitTestable(), findsNothing);
+        if (isSection) {
+          final context = tester.element(find.byType(SkeletonView));
+          if (SkeletonView.isTwoPane(context)) {
+            expect(find.byType(NavigationDrawer).hitTestable(), findsOneWidget);
+          } else {
+            expect(find.byType(NavigationBar).hitTestable(), findsOneWidget);
+          }
+        } else {
+          // These views are full-screen routes in the real app. Keep their
+          // back stack instead of artificially adding navigation around them.
+          if (id == '01' || id == '09') {
+            unawaited(Go.toNamed(WorkoutView.routeName));
+          } else {
+            unawaited(Go.to(() => page));
+          }
+          await tester.pumpAndSettle(
+            const Duration(milliseconds: 100),
+            EnginePhase.sendSemanticsUpdate,
+            const Duration(seconds: 25),
+          );
+        }
         if (id == '01' || id == '09') {
           expect(find.text(t.ongoingWorkout.title), findsOneWidget);
         }
@@ -458,7 +522,7 @@ void main() {
         expect(find.byType(page.runtimeType), findsOneWidget);
         expect(tester.takeException(), isNull);
         expect(find.byType(GBLoadingIndicator), findsNothing);
-        if (id == '09') {
+        if (id == '09' && companion == 'apple') {
           final host = GymBroNativeHostAPI();
           await host.startWorkout(
             'screenshot-$runID',
@@ -553,6 +617,10 @@ void main() {
             await publishWatchData();
             await Future<void>.delayed(const Duration(seconds: 1));
           }
+        }
+        if (Platform.isAndroid && id == shots.first['id']) {
+          await binding.convertFlutterSurfaceToImage();
+          await tester.pumpAndSettle();
         }
         // UIKit's capture waits for a native display update. Let that frame run
         // while keeping all visible clocks and fixture values fixed.

@@ -54,7 +54,7 @@ bundle exec fastlane ios watch_screenshots locale:it only:03,07
 bundle exec fastlane ios watch_screenshots stage:compose
 ```
 
-Output in `build/app_store_watch_screenshots/`, separati dalle composizioni iPhone.
+Output in `build/screenshots/watchos/apple-watch/`, separati dalle composizioni iPhone.
 `raw/` conserva gli originali, `final/it/` e `final/en-US/` contengono i sette PNG
 per lingua; `proofs/` contiene i provini. La cornice Watch dell'immagine iPhone 09
 non viene usata nelle immagini native. Per preparazione e manutenzione consultare

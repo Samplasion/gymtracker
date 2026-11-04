@@ -12,10 +12,22 @@ platform :ios do
     Dir.chdir(project_dir) do
       # Flutter invokes CocoaPods outside Fastlane's gem bundle.
       Bundler.with_unbundled_env do
-        sh(python, "tools/screenshots/run.py",
-           "--locale", options.fetch(:locale, "all").to_s,
-           "--only", options.fetch(:only, "all").to_s,
-           "--stage", options.fetch(:stage, "all").to_s)
+        device = options.fetch(:device, "iphone").to_s
+        if device == "iphone"
+          sh(python, "tools/screenshots/run.py",
+             "--locale", options.fetch(:locale, "all").to_s,
+             "--only", options.fetch(:only, "all").to_s,
+             "--stage", options.fetch(:stage, "all").to_s)
+        else
+          profile = device == "all" ? "ios-tablets" : device
+          UI.user_error!("device: iphone|ipad|duo-outer|duo-inner|all") unless %w[ipad duo-outer duo-inner ios-tablets].include?(profile)
+          args = [python, "tools/screenshots/devices.py", "--profile", profile,
+                  "--locale", options.fetch(:locale, "all").to_s,
+                  "--only", options.fetch(:only, "all").to_s,
+                  "--stage", options.fetch(:stage, "all").to_s]
+          args += ["--simulator", options[:simulator].to_s] if options[:simulator]
+          sh(*args)
+        end
       end
     end
   end

@@ -14,7 +14,9 @@ import uuid
 from pathlib import Path
 from compose import ROOT, MANIFEST, selected, capture_path, export_watch
 
-OUTPUT = ROOT / 'build/app_store_screenshots'
+from paths import output_for
+
+OUTPUT = output_for('iphone')
 PHONE_BUNDLE = 'org.js.samplasion.gymbro'
 WATCH_BUNDLE = PHONE_BUNDLE + '.watchkitapp'
 
@@ -233,8 +235,7 @@ def main():
     parser.add_argument('--only', default='all')
     parser.add_argument('--stage', default='all', choices=['capture', 'compose', 'all'])
     args = parser.parse_args()
-    if args.target == 'watch':
-        OUTPUT = ROOT / 'build/app_store_watch_screenshots'
+    OUTPUT = output_for(args.target)
     locales, shots = selected(args.locale, args.only, args.target)
     if args.stage != 'compose':
         if not (ROOT / '.fvm/flutter_sdk/bin/flutter').exists():

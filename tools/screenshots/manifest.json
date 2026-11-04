@@ -132,5 +132,155 @@
       "id": "07",
       "name": "water"
     }
-  ]
+  ],
+  "device_profiles": {
+    "android-phone": {
+      "platform": "android",
+      "hardware": "pixel_8",
+      "width": 1080,
+      "height": 2400,
+      "density": 420,
+      "output": {
+        "width": 1080,
+        "height": 1920
+      },
+      "shots": [
+        "01",
+        "02",
+        "04",
+        "05",
+        "06",
+        "07",
+        "08",
+        "09"
+      ],
+      "presentation": "promotional",
+      "companion": "wear",
+      "store_group": "phoneScreenshots",
+      "companion_preset": {
+        "width": 480,
+        "height": 480,
+        "hardware": "wearos_small_round",
+        "system_image": "system-images;android-30;android-wear;arm64-v8a",
+        "density": 320
+      }
+    },
+    "android-tablet7": {
+      "platform": "android",
+      "hardware": "Nexus 7 2013",
+      "width": 1200,
+      "height": 1920,
+      "density": 320,
+      "output": {
+        "width": 1440,
+        "height": 2560
+      },
+      "shots": [
+        "01",
+        "02",
+        "03",
+        "04",
+        "05",
+        "06",
+        "07",
+        "08"
+      ],
+      "presentation": "native",
+      "store_group": "sevenInchScreenshots"
+    },
+    "android-tablet10": {
+      "platform": "android",
+      "hardware": "Nexus 10",
+      "width": 1600,
+      "height": 2560,
+      "density": 320,
+      "output": {
+        "width": 1440,
+        "height": 2560
+      },
+      "shots": [
+        "01",
+        "02",
+        "03",
+        "04",
+        "05",
+        "06",
+        "07",
+        "08"
+      ],
+      "presentation": "native",
+      "store_group": "tenInchScreenshots"
+    },
+    "ipad": {
+      "platform": "ios",
+      "device_type": "com.apple.CoreSimulator.SimDeviceType.iPad-Pro-13-inch-M4-8GB",
+      "width": 2064,
+      "height": 2752,
+      "output": {
+        "width": 2064,
+        "height": 2752
+      },
+      "shots": [
+        "01",
+        "02",
+        "03",
+        "04",
+        "05",
+        "06",
+        "07",
+        "08"
+      ],
+      "presentation": "promotional"
+    },
+    "duo-outer": {
+      "platform": "ios",
+      "device_name_match": "iPhone Duo",
+      "minimum_runtime": "27.1",
+      "width": 1398,
+      "height": 2034,
+      "output": {
+        "width": 1398,
+        "height": 2034
+      },
+      "shots": [
+        "01",
+        "02",
+        "03",
+        "04",
+        "05",
+        "06",
+        "07",
+        "08"
+      ],
+      "presentation": "promotional",
+      "pose": "outer"
+    },
+    "duo-inner": {
+      "platform": "ios",
+      "device_name_match": "iPhone Duo",
+      "minimum_runtime": "27.1",
+      "width": 2007,
+      "height": 2853,
+      "output": {
+        "width": 2007,
+        "height": 2853
+      },
+      "shots": [
+        "01",
+        "02",
+        "03",
+        "04",
+        "05",
+        "06",
+        "07",
+        "08"
+      ],
+      "presentation": "promotional",
+      "pose": "inner"
+    }
+  },
+  "android_system_image": "system-images;android-37.0;google_apis_playstore;arm64-v8a",
+  "workout_fixture": {
+    "rest_seconds": 90
+  }
 }

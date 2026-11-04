@@ -20,6 +20,45 @@ alla lane: vengono creati se assenti, abbinati e spenti al termine. Non vengono
 cancellati o usati i simulatori personali. I runtime vengono selezionati tra quelli
 installati, dal più recente; devono supportare l'abbinamento iPhone/Watch.
 
+## Cartella unica degli output
+
+Tutti gli script salvano sotto `build/screenshots/` (ignorata da Git), prima per
+sistema operativo e poi per dispositivo:
+
+```text
+build/screenshots/
+├── ios/
+│   ├── iphone/
+│   ├── ipad/
+│   ├── duo-outer/
+│   └── duo-inner/
+├── watchos/
+│   └── apple-watch/
+├── android/
+│   ├── phone/
+│   ├── tablet7/
+│   ├── tablet10/
+│   └── _emulators/     # dati temporanei e log AVD
+└── wearos/
+    └── watch/
+```
+
+Le cartelle dispositivo mantengono `raw/`, `final/`, `proofs/` e `logs/`.
+I profili Duo compaiono quando vengono effettivamente catturati. Lo script
+`capture_wear.py` conserva le catture standalone in `wearos/watch/raw/<locale>/`;
+i metadati testuali dello store Wear restano in `docs/wear-os/store/`.
+
+I percorsi sono centralizzati in `tools/screenshots/paths.py`. Per migrare gli
+output delle versioni precedenti senza ricatturare o ricomporre:
+
+```sh
+tools/screenshots/.venv/bin/python tools/screenshots/migrate_outputs.py
+```
+
+La migrazione conserva i file originali, può essere ripetuta e verifica tutti i
+conflitti prima di spostare file. Un file diverso già presente a destinazione
+interrompe l'operazione senza sovrascriverlo.
+
 ## Comandi
 
 Da `ios/`:
@@ -39,7 +78,7 @@ e le composizioni precedenti della selezione vengono rimosse prima della nuova
 cattura: un errore non può produrre un risultato apparentemente aggiornato usando
 quelle vecchie. La composizione autonoma usa intenzionalmente le catture salvate.
 
-Output (ignorati da Git) in `build/app_store_screenshots/`:
+Output (ignorati da Git) in `build/screenshots/ios/iphone/`:
 
 - `raw/it/`, `raw/en/`: catture originali; `09-watch-watch.png` è la cattura watchOS.
 - `final/it/`, `final/en-US/`: PNG RGB verticali **1206 × 2622**, ordinati per nome.
@@ -75,7 +114,7 @@ bundle exec fastlane ios watch_screenshots stage:compose
 
 `locale`, `only` e `stage` funzionano come nella lane iPhone; gli ID Watch sono
 indipendenti e vanno da `01` a `07`. Gli output sono separati in
-`build/app_store_watch_screenshots/`: `raw/it/` e `raw/en/` conservano le catture
+`build/screenshots/watchos/apple-watch/`: `raw/it/` e `raw/en/` conservano le catture
 native e la cattura iPhone intermedia necessaria alla sincronizzazione;
 `final/it/` e `final/en-US/` contengono sette PNG ciascuna; `proofs/` e `logs/`
 contengono provini e diagnostica. Una cattura parziale mantiene gli altri output.
@@ -122,8 +161,8 @@ Estendere i dati trasferiti e le condizioni di disponibilità se la nuova vista
 richiede altri contenuti. Barre di stato e controlli di sistema vengono conservati
 come catturati, senza ricostruirli nel compositore.
 
-Preset iPad e Android richiederanno layout e cattura specifici: non scalare
-semplicemente le immagini iPhone; la promozione Watch va sostituita su Android.
+Per iPad, Android e Duo usare i profili dedicati descritti sotto; le catture
+iPhone non possono sostituire quelle native di questi dispositivi.
 
 ## Verifica
 
@@ -138,3 +177,101 @@ Dopo la lane completa controllare i provini e le 18 immagini a dimensione reale:
 lingua, colore, dati, titoli, tastiera nascosta, grafici caricati, assenza di
 indicatori di caricamento e coerenza tra telefono e orologio. La disponibilità dei
 runtime e WatchConnectivity richiedono una prova sul Mac che esegue la lane.
+
+## Android, tablet e iPhone Duo
+
+La suite usa catture reali per ogni dispositivo, lo stesso profilo demo bilingue,
+lo stesso tema scuro e gli stessi colori. Le immagini iPhone e Watch già esistenti
+restano nelle rispettive cartelle. Nessun caricamento e nessun incremento di build.
+
+| Profilo | Cattura nativa verticale | Output verticale | Schermate per lingua |
+|---|---|---|---|
+| Android telefono | 1080 × 2400 | 1080 × 1920, composizione | 01, 02, 04–09 |
+| Android tablet 7″ | 1200 × 1920, 600 dp di larghezza | 1440 × 2560, UI senza titoli | 01–08 |
+| Android tablet 10″ | 1600 × 2560, 800 dp di larghezza | 1440 × 2560, UI senza titoli | 01–08 |
+| iPad Pro 13″ M4 | 2064 × 2752 | 2064 × 2752, composizione | 01–08 |
+| iPhone Duo esterno | 1398 × 2034 | 1398 × 2034, composizione | 01–08 |
+| iPhone Duo interno | 2007 × 2853 | 2007 × 2853, composizione | 01–08 |
+
+Android telefono esclude Progressi (03), su scelta concordata, per rispettare il
+massimo di otto screenshot Google Play. La nona composizione usa la UI Wear OS
+reale in debug, con Panca piana/Bench press, 8 × 72,5 kg, 24 minuti, 132 bpm,
+164 kcal e colore ciano. Tutti i tablet e i due profili Duo escludono 09.
+
+I tablet Android usano l'interfaccia nativa senza titoli promozionali, inserita
+senza deformazioni in un output 9:16. Non viene ridimensionata una cattura del
+telefono per simulare il tablet. La piccola letterbox nera conserva l'intera UI.
+
+Da `android/`:
+
+```sh
+bundle exec fastlane android screenshots                       # telefono
+bundle exec fastlane android screenshots device:tablet7
+bundle exec fastlane android screenshots device:tablet10
+bundle exec fastlane android screenshots device:all
+bundle exec fastlane android screenshots device:tablet7 locale:it only:01,05
+bundle exec fastlane android screenshots device:all stage:compose
+```
+
+Richiede Android SDK, emulator, platform-tools, cmdline-tools e le immagini
+`system-images;android-37.0;google_apis_playstore;arm64-v8a` e, per la schermata
+telefono 09, `system-images;android-30;android-wear;arm64-v8a`.
+Il runner compila il modulo Wear in debug e aggiorna i plugin Flutter di test
+prima delle catture Android (una precedente build release può averli esclusi).
+Servono almeno 9 GiB liberi per la sequenza telefono con Wear OS e 4 GiB
+per gli altri profili; gli emulatori telefono e Wear vengono avviati in sequenza.
+Gli AVD vengono creati solo in `build/screenshots/android/_emulators/`, con nomi dedicati
+e porte 5580/5582/5584 (telefono/tablet) e 5578 (Wear OS). Se una porta è occupata, la lane si ferma invece di
+fermare emulatori personali. I dati temporanei degli AVD sono eliminati alla
+chiusura per non accumulare gigabyte; i log e tutti gli screenshot rimangono.
+
+Da `ios/`:
+
+```sh
+bundle exec fastlane ios screenshots device:ipad
+bundle exec fastlane ios screenshots device:ipad locale:it only:01,05
+bundle exec fastlane ios screenshots device:duo-outer simulator:UUID
+bundle exec fastlane ios screenshots device:duo-inner simulator:UUID
+bundle exec fastlane ios screenshots device:all stage:compose
+```
+
+Per Duo servono Xcode 27.1, un runtime iOS 27.1 o successivo e il supporto per
+il simulatore iPhone Duo. Preparare in Device Hub simulatori dedicati chiamati
+`GymBro Screenshots duo-outer` e `GymBro Screenshots duo-inner`, nella posa/display
+corrispondente. La lane li cerca per nome; `simulator:UUID` consente una selezione
+esplicita dello stesso dispositivo dedicato. La lane rifiuta simulatori personali o di tipo
+diverso e verifica le dimensioni effettive prima di comporre. Il Mac di sviluppo
+attuale ha iOS 27.0: la cattura Duo non è verificabile finché non viene installato
+il runtime richiesto. Non sono prodotti screenshot Duo riciclati da iPhone/iPad.
+
+Output sotto `build/screenshots/<sistema>/<dispositivo>/`, con `raw/it/`, `raw/en/`,
+`final/it/`, `final/en-US/`, `proofs/` e `logs/`. `locale`, `only` e `stage` hanno
+lo stesso significato delle lane esistenti. La composizione autonoma funziona
+senza SDK/emulatori, ma richiede le catture originali del profilo esatto.
+
+Per aggiungere un dispositivo: aggiungere il preset in `device_profiles` nel
+manifesto, specificando dimensioni reali, output, selezione e presentazione;
+aggiungere l'alias alla lane pertinente e controllare catture e provini reali.
+
+Fonti ufficiali:
+
+- [Dimensioni Apple, compresi i due display Duo e iPad 13″](https://developer.apple.com/help/app-store-connect/reference/app-information/screenshot-specifications/).
+- [Supporto iPhone Duo e Xcode 27.1](https://developer.apple.com/iphone-duo/prepare/).
+- [Google Play: massimo otto screenshot, tablet e formato 9:16](https://support.google.com/googleplay/android-developer/answer/9866151?hl=en).
+
+### Navigazione nelle catture
+
+La suite riusa `appRouterProvider` e la `ShellRoute` di produzione: routine (02),
+alimentazione (04) e feed (07) includono la barra inferiore o la navigazione
+laterale in base alla larghezza effettiva del dispositivo. Il drawer sui telefoni rimane chiuso,
+come durante il normale utilizzo. Allenamento e dettagli del profilo vengono
+aperti sopra la sezione di origine, con il comportamento a tutto schermo e il
+ritorno indietro previsti dall’app. Le destinazioni sviluppatore (Debug e Logs)
+sono escluse tramite override, come nelle build pubblicate. Lo stato dell’allenamento viene azzerato tra
+le catture per evitare barre di sessioni residue.
+
+La composizione Android 09 usa una cattura reale Wear OS da 480 × 480 pixel,
+con la UI corrente e la fixture `app_store` (ciano, 72,5 kg, timer fermo).
+`workout_fixture.rest_seconds` nel manifesto fissa il recupero condiviso a 90
+secondi: la suite Flutter ne verifica il valore visualizzato e quella Wear OS
+attende `01:30` nella UI prima di catturare.

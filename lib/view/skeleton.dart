@@ -44,6 +44,9 @@ import 'package:gymtracker/view/utils/workout_navigation.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
+// Allows capture/test hosts to present the same destinations as release builds.
+final showDeveloperNavigationProvider = Provider<bool>((ref) => true);
+
 const _kDrawerSize = 304.0;
 const _kRailSize = 96.0;
 const _kNavBarHeight = kNavBarHeight;
@@ -395,10 +398,16 @@ class _SkeletonViewState extends ConsumerState<SkeletonView>
       builder: (context, info) {
         final safeArea = MediaQuery.of(context).padding;
         final isSubscribed = info != null && info.hasProFeatures;
+        final showDeveloperNavigation = ref.watch(
+          showDeveloperNavigationProvider,
+        );
+        final showDebug = showDeveloperNavigation && kDebugMode;
+        final showLogs =
+            showDeveloperNavigation && LoggerController.shouldShowPane;
         final offset = () {
           int offset = 1; // Settings
-          if (kDebugMode) offset += 1;
-          if (LoggerController.shouldShowPane) offset += 1;
+          if (showDebug) offset += 1;
+          if (showLogs) offset += 1;
           return offset;
         }();
         final destinations = [
@@ -427,12 +436,12 @@ class _SkeletonViewState extends ConsumerState<SkeletonView>
             icon: const Icon(GTIcons.settings),
             label: Text(context.t.settings.title, textAlign: TextAlign.center),
           ),
-          if (kDebugMode)
+          if (showDebug)
             const NavigationDrawerDestination(
               icon: Icon(GTIcons.debug),
               label: Text("Debug"),
             ),
-          if (LoggerController.shouldShowPane)
+          if (showLogs)
             const NavigationDrawerDestination(
               icon: Icon(GTIcons.logs),
               label: Text("Logs"),
@@ -446,8 +455,8 @@ class _SkeletonViewState extends ConsumerState<SkeletonView>
           context.t.navigation.workouts,
           if (!isSubscribed) context.t.navigation.pro,
           context.t.navigation.settings,
-          if (kDebugMode) "Debug",
-          if (LoggerController.shouldShowPane) "Logs",
+          if (showDebug) "Debug",
+          if (showLogs) "Logs",
         ];
 
         void jumpOffTapHandler(int index) {
